@@ -8,3 +8,324 @@ li {
   padding-left: 0;
   list-style: none;
 }
+
+
+// DEFAULTS
+
+body {
+  background-color: $bg;
+  font-family: 'fontRegular', sans-serif;
+  color: $gray;
+}
+
+// TYPOGRAPHY
+
+.h1 {
+  font-family: 'fontBold', sans-serif;
+  font-size: 54px;
+  line-height: 120%;
+}
+.h2 {
+  font-family: 'fontBold', sans-serif;
+  font-size: 42px;
+  line-height: 120%;
+}
+.h3 {
+  font-family: 'fontBold', sans-serif;
+  font-size: 32px;
+  line-height: 120%;
+}
+
+.h4 {
+  font-family: 'fontBold', sans-serif;
+  font-size: 21px;
+  line-height: 120%;
+}
+
+.caption {
+  font-family: 'fontBold', sans-serif;
+  font-size: 16px;
+  line-height: 160%;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.smallCaption {
+  font-family: 'fontBold', sans-serif;
+  font-size: 14px;
+  line-height: 160%;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.p,
+p {
+  font-size: 16px;
+  line-height: 160%;
+}
+
+.smallParagraph {
+  font-size: 14px;
+  line-height: 160%;
+}
+
+.text-bold {
+  font-family: 'fontBold', sans-serif;
+}
+
+.trans {
+  opacity: 0.7;
+}
+
+// Buttons
+
+.btn-md {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  border-radius: 16px;
+  line-height: 100%;
+  font-size: 12px;
+  font-family: 'fontBold', sans-serif;
+  text-transform: uppercase;
+  padding-left: $m;
+  padding-right: $m;
+}
+
+.btn-lg {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-family: 'fontBold', sans-serif;
+  height: 42px;
+  border-radius: 21px;
+  transition: 0.2 ease-in-out;
+  transform: scale(1);
+
+}
+
+.btn-primary {
+  background-color: $blue;
+  border-color: $blue;
+  color: $white;
+  &:hover,
+  &:focus,
+  &:active {
+    background-color: darken(blue, 0.2);
+  }
+}
+
+.btn-white {
+  background-color: $white;
+  color: $blue;
+
+  &:hover,
+  &:focus,
+  &:active {
+    background-color: $white;
+    color: $blue;
+  }
+}
+
+.btn-trans {
+  color: rgba($white, 0.7);
+  &:hover,
+  &:focus,
+  &:active {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: $white;
+  }
+}
+
+// Forms
+
+.custom-input {
+  background-color: $bg-shadow;
+  border-color: $bg-shadow;
+}
+
+// Navigation
+
+.logo {
+  height: 32px;
+  width: auto;
+}
+
+.main-nav {
+  width: 100%;
+  height: 70px;
+  background-color: $blue;
+  padding: $m;
+  .nav-links {
+    display: flex;
+    align-items: center;
+    margin: 0px;
+    padding: 0px;
+    list-style: none;
+    margin-left: $m * 2;
+    li {
+      margin-left: $m;
+    }
+    a {
+      font-family: 'fontMedium', sans-serif;
+      font-size: 14px;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: rgba($white, 0.7);
+      letter-spacing: 0.02em;
+      padding: $m/4 0px;
+      margin: 0px $m/2;
+      border-bottom: 2px solid rgba($white, 0);
+      transition: 0.2s ease-in-out;
+      &:hover,
+      &.active {
+        color: $white;
+        text-decoration: none;
+        border-bottom: 2px solid rgba($white, 0.3);
+      }
+    }
+  }
+}
+
+.account-bepro {
+  display: flex;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.1);
+  background-image: url('https://64.media.tumblr.com/95a86e7d8880b0a5c35a2fd7ba318140/e8afc16b16e16514-1a/s75x75_c1/696047f5fc05984243125426c0ec7984fd4d0824.png');
+  padding-left: 32px;
+  padding-right: 16px;
+  background-repeat: no-repeat;
+  background-position: 6px center;
+  background-size: 20px;
+  border-radius: 16px;
+  height: 32px;
+  font-size: 12px;
+  text-transform: uppercase;
+  transition: 0.2s ease-in-out;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+    color: $white;
+    cursor: pointer;
+  }
+}
+
+.banner {
+  width: 100%;
+  min-height: 240px;
+  background-color: $blue;
+  color: $white;
+  padding: $m * 2;
+  .stats {
+    padding-top: $m;
+    margin-top: $m;
+    border-top: 4px solid $white;
+  }
+}
+
+.list-item {
+  background-color: $bg-shadow;
+  padding: $m * 2;
+  border-radius: $m/2;
+  margin-bottom: $m;
+  transition: 0.8 ease-in-out;
+  &:hover {
+    background-color: lighten($bg-shadow, 5);
+    cursor: pointer;
+    .h4 {
+      color: $white;
+    }
+  }
+}
+
+.status {
+  font-size: 14px;
+  line-height: 150%;
+  padding: 0px $m/2;
+  border-radius: $m/8;
+  color: $bg-shadow;
+  font-weight: 500;
+  &.gray {
+    background-color: $gray;
+  }
+  &.blue {
+    background-color: $blue;
+  }
+  &.green {
+    background-color: $green;
+  }
+  &.red {
+    background-color: $red;
+  }
+}
+
+.avatar-list {
+  .avatar {
+    margin-left: -$m/4;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.4);
+  }
+}
+
+// Utils
+
+.mr-1 { margin-right: $m/2 }
+.mr-2 { margin-right: $m }
+.mr-3 { margin-right: $m*2 }
+.ml-1 { margin-left: $m/2 }
+.ml-2 { margin-left: $m }
+.ml-3 { margin-left: $m*2 }
+
+.mt-1 { margin-top: $m/2 }
+.mt-2 { margin-top: $m }
+.mt-3 { margin-top: $m*2 }
+.mb-1 { margin-bottom: $m/2 }
+.mb-2 { margin-bottom: $m }
+.mb-3 { margin-bottom: $m*2 }
+
+.pr-1 { padding-right: $m/2 }
+.pr-2 { padding-right: $m }
+.pr-3 { padding-right: $m*2 }
+.pl-1 { padding-left: $m/2 }
+.pl-2 { padding-left: $m }
+.pl-3 { padding-left: $m*2 }
+
+.pt-1 { padding-top: $m/2 }
+.pt-2 { padding-top: $m }
+.pt-3 { padding-top: $m*2 }
+.pb-1 { padding-bottom: $m/2 }
+.pb-2 { padding-bottom: $m }
+.pb-3 { padding-bottom: $m*2 }
+
+.bg-shadow {
+  background-color: $bg-shadow;
+}
+
+.color-blue {
+  color: $blue;
+}
+.color-secondary {
+  color: $secondary;
+}
+
+.circle-1 {
+  width: 64px;
+  height: 64px;
+  border-radius: 32px;
+}
+.circle-2 {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+}
+.circle-3 {
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+}
+
+.ico-metamask {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  background-image: url('https://64.media.tumblr.com/edb3b3524f57c2c52e5d86f4edd212c6/e8afc16b16e16514-4a/s75x75_c1/9617ed784ce210ba45d9635cf6cc7f5821515c40.png');
+  background-size: cover;
+}
