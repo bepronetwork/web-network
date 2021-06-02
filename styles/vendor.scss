@@ -1,0 +1,17 @@
+@import "~bootstrap/scss/bootstrap";
+
+@font-face {
+  font-family: 'fontRegular';
+  src: url('../assets/SpaceGrotesk-Regular.woff2') format('woff2'),
+       url('../assets/SpaceGrotesk-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'fontMedium';
+  src: url('../assets/SpaceGrotesk-Medium.woff2') format('woff2'),
+       url('../assets/SpaceGrotesk-Medium.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'fontBold';
+  src: url('../assets/SpaceGrotesk-Bold.woff2') format('woff2'),
+       url('../assets/SpaceGrotesk-Bold.ttf') format('truetype');
+}
