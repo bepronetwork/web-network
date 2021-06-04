@@ -15,9 +15,11 @@ export default function MainNav() {
                         />
                     </a>
                     <ul className="nav-links">
-                        <li><a href="/developers">Developers</a></li>
-                        <li><a href="/council">Council</a></li>
-                        <li><a href="/oracle">Oracle</a></li>
+                        <li><a href="/list">Lists</a></li>
+                        <li><a href="/create-issue">Create issue</a></li>
+                        <li><a href="/issue">Issue</a></li>
+                        <li><a href="/proposal">Proposal</a></li>
+                        <li><a href="/account">My account</a></li>
                     </ul>
                 </div>
                 <div className="d-flex flex-row align-center">

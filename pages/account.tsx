@@ -5,7 +5,7 @@ import MainNav from '../components/main-nav';
 import PageHero from '../components/page-hero';
 import TypographyTest from '../components/typography-test';
 
-export default function PageOracle() {
+export default function PageAccount() {
   return (
       <div>
         <MainNav></MainNav>

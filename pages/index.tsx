@@ -32,7 +32,7 @@ export default function Home() {
           </div>
         </div>
 
-        <TypographyTest></TypographyTest>
+        {/* <TypographyTest></TypographyTest> */}
 
       </div>
   )

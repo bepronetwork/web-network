@@ -5,11 +5,11 @@ import MainNav from '../components/main-nav';
 import PageHero from '../components/page-hero';
 import TypographyTest from '../components/typography-test';
 
-export default function PageDevelopers() {
+export default function PageProposal() {
   return (
       <div>
         <MainNav></MainNav>
-        <h1 className="h1">Developers</h1>
+        <h1 className="h1">Oracle</h1>
       </div>
   )
 }
