@@ -5,11 +5,13 @@ import MainNav from '../components/main-nav';
 import PageHero from '../components/page-hero';
 import TypographyTest from '../components/typography-test';
 
-export default function PageCouncil() {
+export default function PageCreateIssue() {
   return (
       <div>
         <MainNav></MainNav>
-        <h1 className="h1">Council</h1>
+
+
+
       </div>
   )
 }

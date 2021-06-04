@@ -5,7 +5,7 @@ import MainNav from '../components/main-nav';
 import PageHero from '../components/page-hero';
 import TypographyTest from '../components/typography-test';
 
-export default function Home() {
+export default function PageCouncil() {
   return (
     <div>
 
@@ -32,7 +32,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* <TypographyTest></TypographyTest> */}
+      <TypographyTest></TypographyTest>
 
     </div>
   )

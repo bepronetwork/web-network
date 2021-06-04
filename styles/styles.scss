@@ -111,14 +111,14 @@ p {
   &:hover,
   &:focus,
   &:active {
-    background-color: darken(blue, 0.2);
+    background-color: darken($blue, 5);
+    border-color: darken($blue, 5);
   }
 }
 
 .btn-white {
   background-color: $white;
   color: $blue;
-
   &:hover,
   &:focus,
   &:active {
@@ -127,12 +127,23 @@ p {
   }
 }
 
+.btn-opac {
+  color: rgba($white, 0.7);
+  background-color: rgba(255, 255, 255, 0.1);
+  &:hover,
+  &:focus,
+  &:active {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: $white;
+  }
+}
+
 .btn-trans {
   color: rgba($white, 0.7);
   &:hover,
   &:focus,
   &:active {
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: rgba(255, 255, 255, 0.2);
     color: $white;
   }
 }
@@ -237,6 +248,16 @@ p {
   }
 }
 
+.content-wrapper {
+  background-color: $bg-shadow;
+  padding: $m * 2;
+  border-radius: $m/2;
+  &.child {
+    padding: $m;
+    background-color: $bg;
+  }
+}
+
 .status {
   font-size: 14px;
   line-height: 150%;
@@ -267,16 +288,20 @@ p {
 
 // Utils
 
+.mr-0 { margin-right: 0px !important }
 .mr-1 { margin-right: $m/2 }
 .mr-2 { margin-right: $m }
 .mr-3 { margin-right: $m*2 }
+.ml-0 { margin-right: 0px !important }
 .ml-1 { margin-left: $m/2 }
 .ml-2 { margin-left: $m }
 .ml-3 { margin-left: $m*2 }
 
+.mt-0 { margin-top: 0px !important }
 .mt-1 { margin-top: $m/2 }
 .mt-2 { margin-top: $m }
 .mt-3 { margin-top: $m*2 }
+.mb-0 { margin-bottom: 0px !important }
 .mb-1 { margin-bottom: $m/2 }
 .mb-2 { margin-bottom: $m }
 .mb-3 { margin-bottom: $m*2 }
