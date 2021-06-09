@@ -1,5 +1,6 @@
 import { GetStaticProps } from 'next'
 import React, { useEffect, useState } from 'react';
+import { ProgressBar } from 'react-bootstrap';
 import IssueHero from '../components/issue-hero';
 import IssueListItem from '../components/issue-list-item';
 import MainNav from '../components/main-nav';
@@ -13,10 +14,30 @@ export default function PageIssue() {
       <MainNav></MainNav>
       <IssueHero></IssueHero>
 
+      <div className="container mt-up">
+        <div className="row justify-content-center">
+          <div className="col-md-10">
+            <div className="content-wrapper mb-4">
+              <div className="row align-items-center">
+                <div className="col-md-9">
+                  <div className="d-flex flex-column">
+                    <h3 className="h4 mb-3"><span className="color-purple">300</span> / 600 Oracles</h3>
+                    <ProgressBar variant="info" now={40} />
+                  </div>
+                </div>
+                <div className="col-md-3 justify-content-center">
+                  <button className="btn btn-md btn-trans w-100">View all addresses</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10">
-            <div className="d-flex align-items-center justify-content-between mb-3">
+            <div className="d-flex align-items-center justify-content-between mb-4">
               <h4 className="h4">Details</h4>
               <div className="d-flex align-items-center">
                 <div className="avatar-list mr-1">

@@ -79,9 +79,14 @@ p {
 
 // Buttons
 
+.btn {
+  letter-spacing: 0.06em;
+}
+
 .btn-md {
   display: flex;
   align-items: center;
+  justify-content: center;
   height: 32px;
   border-radius: 16px;
   line-height: 100%;
@@ -95,6 +100,7 @@ p {
 .btn-lg {
   display: flex;
   align-items: center;
+  justify-content: center;
   font-size: 16px;
   font-family: 'fontBold', sans-serif;
   height: 42px;
@@ -198,6 +204,16 @@ p {
   }
 }
 
+.subnav-item {
+  text-decoration: none;
+  color: $gray;
+  opacity: 0.7;
+  &.active, &:hover {
+    color: $white;
+    opacity: 1;
+  }
+}
+
 .account-bepro {
   display: flex;
   align-items: center;
@@ -226,11 +242,18 @@ p {
   background-color: $blue;
   color: $white;
   padding: $m * 2;
-  .stats {
-    padding-top: $m;
+  .banner-highlight {
+    background-color: rgba($white, 0.1);
+    padding: $m;
     margin-top: $m;
-    border-top: 4px solid $white;
+    text-align: center;
   }
+}
+
+.top-border {
+  padding-top: $m;
+  margin-top: $m;
+  border-top: 4px solid $white;
 }
 
 .list-item {
@@ -258,6 +281,18 @@ p {
   }
 }
 
+.form-group {
+  margin-bottom: $m;
+  label {
+    color: $gray;
+  }
+  .form-control {
+    background-color: $black;
+    border: 1px solid $black;
+    color: $gray;
+  }
+}
+
 .status {
   font-size: 14px;
   line-height: 150%;
@@ -279,6 +314,14 @@ p {
   }
 }
 
+.badge-opac {
+  font-size: 14px;
+  line-height: 150%;
+  padding: 0px $m/2;
+  border-radius: $m/8;
+  background-color: rgba($white, 0.1);
+}
+
 .avatar-list {
   .avatar {
     margin-left: -$m/4;
@@ -287,6 +330,7 @@ p {
 }
 
 // Utils
+.mt-up { margin-top: -$m*3; }
 
 .mr-0 { margin-right: 0px !important }
 .mr-1 { margin-right: $m/2 }
@@ -297,31 +341,34 @@ p {
 .ml-2 { margin-left: $m }
 .ml-3 { margin-left: $m*2 }
 
-.mt-0 { margin-top: 0px !important }
-.mt-1 { margin-top: $m/2 }
-.mt-2 { margin-top: $m }
-.mt-3 { margin-top: $m*2 }
-.mb-0 { margin-bottom: 0px !important }
-.mb-1 { margin-bottom: $m/2 }
-.mb-2 { margin-bottom: $m }
-.mb-3 { margin-bottom: $m*2 }
+// .mt-0 { margin-top: 0px !important }
+// .mt-1 { margin-top: $m/2 }
+// .mt-2 { margin-top: $m }
+// .mt-3 { margin-top: $m*2 }
+// .mb-0 { margin-bottom: 0px !important }
+// .mb-1 { margin-bottom: $m/2 }
+// .mb-2 { margin-bottom: $m }
+// .mb-3 { margin-bottom: $m*2 }
 
-.pr-1 { padding-right: $m/2 }
-.pr-2 { padding-right: $m }
-.pr-3 { padding-right: $m*2 }
-.pl-1 { padding-left: $m/2 }
-.pl-2 { padding-left: $m }
-.pl-3 { padding-left: $m*2 }
+// .pr-1 { padding-right: $m/2 }
+// .pr-2 { padding-right: $m }
+// .pr-3 { padding-right: $m*2 }
+// .pl-1 { padding-left: $m/2 }
+// .pl-2 { padding-left: $m }
+// .pl-3 { padding-left: $m*2 }
 
-.pt-1 { padding-top: $m/2 }
-.pt-2 { padding-top: $m }
-.pt-3 { padding-top: $m*2 }
-.pb-1 { padding-bottom: $m/2 }
-.pb-2 { padding-bottom: $m }
-.pb-3 { padding-bottom: $m*2 }
+// .pt-1 { padding-top: $m/2 }
+// .pt-2 { padding-top: $m }
+// .pt-3 { padding-top: $m*2 }
+// .pb-1 { padding-bottom: $m/2 }
+// .pb-2 { padding-bottom: $m }
+// .pb-3 { padding-bottom: $m*2 }
 
 .bg-shadow {
   background-color: $bg-shadow;
+}
+.bg-opac {
+  background-color: rgba($white, 0.1);
 }
 
 .color-blue {
@@ -329,6 +376,9 @@ p {
 }
 .color-secondary {
   color: $secondary;
+}
+.color-purple {
+  color: $purple;
 }
 
 .circle-1 {
@@ -353,4 +403,17 @@ p {
   height: 18px;
   background-image: url('https://64.media.tumblr.com/edb3b3524f57c2c52e5d86f4edd212c6/e8afc16b16e16514-4a/s75x75_c1/9617ed784ce210ba45d9635cf6cc7f5821515c40.png');
   background-size: cover;
+}
+
+// Overrides
+
+.progress {
+  height: $m/2;
+  border-radius: $m/4;
+  background-color: rgba($white, 0.2);
+  .progress-bar {
+    &.bg-info {
+      background-color: $purple !important;
+    }
+  }
 }

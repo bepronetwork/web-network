@@ -11,9 +11,7 @@ export default function IssueListItem() {
               from Application and instead functions from Application and
               instead
             </h4>
-                    <div
-                        className="d-flex align-center flex-wrap justify-content-center justify-content-md-start"
-                    >
+                    <div className="d-flex align-center flex-wrap justify-content-center justify-content-md-start">
                         <span className="status blue mr-3 mt-1">In progress</span>
                         <span className="smallParagraph trans mr-3 mt-1">2 comments</span>
                         <span className="smallParagraph trans mr-3 mt-1">1 hour ago</span>
