@@ -34,7 +34,7 @@ export default function PageAccountOracles() {
                 </div>
                 <p>Lock $BEPRO to get Oracles</p>
                 <div className="form-group mb-4">
-                  <label className="smallParagraph trans mb-2">$BEPRO Ammout</label>
+                  <label className="p-small trans mb-2">$BEPRO Ammout</label>
                   <input type="number" className="form-control" placeholder="$BEPRO Ammout" />
                 </div>
                 <button className="btn btn-lg btn-primary w-100">LOCK</button>
@@ -48,11 +48,11 @@ export default function PageAccountOracles() {
                   <span className="badge-opac">200 Available</span>
                 </div>
                 <div className="form-group mb-4">
-                  <label className="smallParagraph trans mb-2">Oracles Ammout</label>
+                  <label className="p-small trans mb-2">Oracles Ammout</label>
                   <input type="number" className="form-control" placeholder="Oracles Ammout" />
                 </div>
                 <div className="form-group mb-4">
-                  <label className="smallParagraph trans mb-2">Delegation address</label>
+                  <label className="p-small trans mb-2">Delegation address</label>
                   <input type="number" className="form-control" placeholder="Type and address" />
                 </div>
                 <button className="btn btn-lg btn-primary w-100">DELEGATE</button>
@@ -87,8 +87,8 @@ export default function PageAccountOracles() {
                     <div className="bg-opac w-100 mb-1 p-3">
                       <div className="row align-items-center">
                         <div className="col-md-6">
-                          <p className="smallParagraph text-bold color-purple mb-1">200,000 Oracles</p>
-                          <p className="smallParagraph mb-0">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</p>
+                          <p className="p-small text-bold color-purple mb-1">200,000 Oracles</p>
+                          <p className="p-small mb-0">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</p>
                         </div>
                         <div className="col-md-6 d-flex justify-content-end">
                           <button className="btn btn-md btn-white">TAKE BACK</button>

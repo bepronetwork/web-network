@@ -13,13 +13,13 @@ export default function PageHero() {
                                 <div className="col-md-3">
                                     <div className="top-border">
                                         <h4 className="h4 mb-0">10</h4>
-                                        <span className="smallParagraph">In progress</span>
+                                        <span className="p-small">In progress</span>
                                     </div>
                                 </div>
                                 <div className="col-md-3">
                                     <div className="top-border">
                                         <h4 className="h4 mb-0">12</h4>
-                                        <span className="smallParagraph">Issues closed</span>
+                                        <span className="p-small">Issues closed</span>
                                     </div>
                                 </div>
                                 <div className="col-md-6">
@@ -27,7 +27,7 @@ export default function PageHero() {
                                         <h4 className="h4 mb-0">
                                             120,300,000 <span className="smallCaption trans">$BEPRO</span>
                                         </h4>
-                                        <span className="smallParagraph">On network</span>
+                                        <span className="p-small">On network</span>
                                     </div>
                                 </div>
                             </div>

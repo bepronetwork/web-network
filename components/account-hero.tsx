@@ -13,19 +13,19 @@ export default function AccountHero() {
                                 <div className="col-md-4">
                                     <div className="top-border">
                                         <h4 className="h4 mb-0">3</h4>
-                                        <span className="smallParagraph">Issues</span>
+                                        <span className="p-small">Issues</span>
                                     </div>
                                 </div>
                                 <div className="col-md-4">
                                     <div className="top-border">
                                         <h4 className="h4 mb-0">300.000</h4>
-                                        <span className="smallParagraph">Oracles</span>
+                                        <span className="p-small">Oracles</span>
                                     </div>
                                 </div>
                                 <div className="col-md-4">
                                     <div className="top-border">
                                         <h4 className="h4 mb-0">0</h4>
-                                        <span className="smallParagraph">Delegated oracles</span>
+                                        <span className="p-small">Delegated oracles</span>
                                     </div>
                                 </div>
                             </div>
