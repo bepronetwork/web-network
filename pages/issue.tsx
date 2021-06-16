@@ -6,23 +6,24 @@ import IssueHero from '../components/issue-hero';
 import MainNav from '../components/main-nav';
 import IssueDraftProgress from '../components/issue-draft-progress';
 import PageActions from '../components/page-actions';
+import IssueProposals from '../components/issue-proposals';
 
 export default function PageIssue() {
   return (
-    <div>
+    <>
 
       <MainNav></MainNav>
       <IssueHero></IssueHero>
 
       {/* <IssueDraftProgress></IssueDraftProgress> */}
-
+      <IssueProposals></IssueProposals>
 
       <PageActions></PageActions>
 
       <IssueDescription></IssueDescription>
       <IssueComments></IssueComments>
 
-    </div>
+    </>
   )
 }
 
