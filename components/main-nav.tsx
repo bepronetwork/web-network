@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 export default function MainNav() {
     return (
         <div className="main-nav">
-            <div className="d-flex justify-content-between align-center">
+            <div className="d-flex justify-content-between align-items-center">
                 <div className="d-flex">
                     <a href="/">
                         <img
@@ -15,15 +15,28 @@ export default function MainNav() {
                         />
                     </a>
                     <ul className="nav-links">
-                        <li><a href="/">Lists</a></li>
+                        <li><a href="/developers">Developers</a></li>
+                        <li><a href="/council">Council</a></li>
+                        <li><a href="/oracle">Oracle</a></li>
+                        {/* <li><a href="/">Lists</a></li>
                         <li><a href="/issue">Issue</a></li>
                         <li><a href="/proposal">Proposal</a></li>
-                        <li><a href="/account">My account</a></li>
+                        <li><a href="/account">My account</a></li> */}
                     </ul>
                 </div>
-                <div className="d-flex flex-row align-center">
-                    <a href="/create-issue" className="btn btn-md btn-trans mr-2">+ Create issue</a>
-                    <button className="btn btn-md btn-white">Connect <i className="ico-metamask ml-1"></i></button>
+                <div className="d-flex flex-row align-items-center">
+                    <a href="/create-issue" className="btn btn-md btn-trans mr-1">+ Create issue</a>
+                    {/* <button className="btn btn-md btn-white">Connect <i className="ico-metamask ml-1"></i></button> */}
+                    <div className="d-flex account-info align-items-center">
+                        <button className="btn btn-md btn-trans mr-1"><i className="ico-bepro mr-1"></i>12.7K</button>
+                        <a className="meta-info d-flex align-items-center">
+                            <div className="d-flex flex-column text-right mr-2">
+                                <p className="p-small mb-0">OXDR...ESAE</p>
+                                <p className="p-small mb-0 trans">0.023 ETH</p>
+                            </div>
+                            <img className="avatar circle-2"src="https://uifaces.co/our-content/donated/Xp0NB-TL.jpg" alt="" />
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
