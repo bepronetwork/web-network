@@ -2,12 +2,10 @@ import { GetStaticProps } from 'next'
 import React, { useEffect, useState } from 'react';
 import AccountHero from '../components/account-hero';
 import IssueListItem from '../components/issue-list-item';
-import MainNav from '../components/main-nav';
 
 export default function PageAccount() {
   return (
       <div>
-        <MainNav></MainNav>
         <AccountHero></AccountHero>
 
         <div className="container">
