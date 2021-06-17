@@ -232,6 +232,15 @@ p {
         font-family: 'fontBold', sans-serif;
         text-align: right;
       }
+      .short-address {
+        position: relative;
+        width: 80px;
+        overflow: hidden;
+        direction: rtl;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
     }
   }
 }
