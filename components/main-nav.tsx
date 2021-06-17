@@ -2,6 +2,7 @@ import { GetStaticProps } from 'next'
 import React from 'react';
 import { useEffect, useState } from 'react';
 import BeproService from '../services/bepro';
+import Link from 'next/link';
 
 export default function MainNav() {
 
@@ -57,13 +58,15 @@ export default function MainNav() {
                     :
                         <div className="d-flex account-info align-items-center">
                             <button className="btn btn-md btn-trans mr-1"><i className="ico-bepro mr-1"></i>12.7K</button>
-                            <a className="meta-info d-flex align-items-center">
-                                <div className="d-flex flex-column text-right mr-2">
-                                    <p className="p-small mb-0">{address}</p>
-                                    <p className="p-small mb-0 trans">0.023 ETH</p>
-                                </div>
-                                <img className="avatar circle-2"src="https://uifaces.co/our-content/donated/Xp0NB-TL.jpg" alt="" />
-                            </a>
+                            <Link href="/account" >
+                                <a className="meta-info d-flex align-items-center">
+                                    <div className="d-flex flex-column text-right mr-2">
+                                        <p className="p-small mb-0">{address}</p>
+                                        <p className="p-small mb-0 trans">0.023 ETH</p>
+                                    </div>
+                                    <img className="avatar circle-2"src="https://uifaces.co/our-content/donated/Xp0NB-TL.jpg" alt="" />
+                                </a>
+                            </Link>
                         </div>
                     }
                 </div>
