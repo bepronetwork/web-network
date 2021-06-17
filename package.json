@@ -11,6 +11,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "bepro-js": "^1.2.7",
     "bootstrap": "^5.0.1",
     "date-fns": "^2.11.1",
     "electron": "^13.0.1",
