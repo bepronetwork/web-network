@@ -1,16 +1,23 @@
 import { GetStaticProps } from 'next'
 import React, { useEffect, useState } from 'react';
+import AccountHero from '../components/account-hero';
 import IssueListItem from '../components/issue-list-item';
 import MainNav from '../components/main-nav';
-import PageHero from '../components/page-hero';
-import TypographyTest from '../components/typography-test';
 
-export default function Home() {
+export default function PageAccount() {
   return (
       <div>
-
         <MainNav></MainNav>
-        <PageHero></PageHero>
+        <AccountHero></AccountHero>
+
+        <div className="container">
+          <div className="row">
+            <div className="d-flex justify-content-center mb-3">
+              <a className="subnav-item active mr-3" href="/account"><h3 className="h3">My issues</h3></a>
+              <a className="subnav-item" href="/account-oracles"><h3 className="h3">My oracles</h3></a>
+          </div>
+          </div>
+        </div>
 
         <div className="container">
           <div className="row justify-content-center">
@@ -20,19 +27,8 @@ export default function Home() {
             <div className="col-md-10">
               <IssueListItem></IssueListItem>
             </div>
-            <div className="col-md-10">
-              <IssueListItem></IssueListItem>
-            </div>
-            <div className="col-md-10">
-              <IssueListItem></IssueListItem>
-            </div>
-            <div className="col-md-10">
-              <IssueListItem></IssueListItem>
-            </div>
           </div>
         </div>
-
-        {/* <TypographyTest></TypographyTest> */}
 
       </div>
   )
