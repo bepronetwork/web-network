@@ -1,4 +1,4 @@
-import {Application} from 'bepro-js';
+import { Application, Network } from 'bepro-js';
 
 export default class BeproService {
 
@@ -6,6 +6,9 @@ export default class BeproService {
 
   // bepro app
   public bepro: any;
+
+  // network app
+  public network: any;
 
   // smart contract bepro instance
   public contract: any;
@@ -18,10 +21,39 @@ export default class BeproService {
 
   constructor() {
     this.bepro = new Application({
-      test: false,
       opt: {
         web3Connection: this.web3Connection,
       }
     });
+
+    this.network = new Network({
+      contractAddress: '0x852D6375c55498B326Fb87C69E16F010d2906C0E',
+      opt: {
+        web3Connection: this.web3Connection,
+      }
+    });
+  }
+
+  public async login() {
+    if (this.loggedIn) return true;
+
+    try {
+      this.loggedIn = await this.bepro.login();
+      // successful login
+      if (this.loggedIn) {
+        this.address = await this.getAddress();
+      }
+    } catch (e) {
+      // should be non-blocking
+      return false;
+    }
+
+    return this.loggedIn;
+  }
+
+  public async getAddress(): Promise<string> {
+    if (this.address) return this.address;
+
+    return this.bepro.getAddress() || '';
   }
 }
