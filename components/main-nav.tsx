@@ -1,8 +1,34 @@
 import { GetStaticProps } from 'next'
 import React from 'react';
 import { useEffect, useState } from 'react';
+import BeproService from '../services/bepro';
 
 export default function MainNav() {
+
+    const [loggedIn, setLoggedIn] = useState<boolean>(false);
+    const [address, setAddress] = useState<string>(null);
+
+    useEffect(() => {
+        checkLogin();
+    }, []); // initial load
+
+    const checkLogin = async () => {
+        if (await BeproService.isLoggedIn()) {
+            setAddress(await BeproService.getAddress());
+            setLoggedIn(true);
+        } else {
+            setLoggedIn(false);
+        }
+    }
+
+    const login = async () => {
+        await BeproService.login();
+        setAddress(await BeproService.getAddress());
+        setLoggedIn(true);
+        // console.log('await BeproService.bepro.getETHNetwork():', await BeproService.bepro.getETHNetwork());
+        // console.log('await BeproService.bepro.getETHBalance():', await BeproService.bepro.getETHBalance());
+    }
+
     return (
         <div className="main-nav">
             <div className="d-flex justify-content-between align-center">
@@ -23,7 +49,11 @@ export default function MainNav() {
                 </div>
                 <div className="d-flex flex-row align-center">
                     <a href="/create-issue" className="btn btn-md btn-trans mr-2">+ Create issue</a>
-                    <button className="btn btn-md btn-white">Connect <i className="ico-metamask ml-1"></i></button>
+                    { !loggedIn ?
+                        <button className="btn btn-md btn-white" onClick={login}>Connect <i className="ico-metamask ml-1"></i></button>
+                        :
+                        <span>{address}</span>
+                    }
                 </div>
             </div>
         </div>
