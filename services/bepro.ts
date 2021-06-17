@@ -1,6 +1,9 @@
-// import {Application} from 'bepro-js';
-// const beprojs = require('bepro-js');
+import {Application} from 'bepro-js';
+
 export default class BeproService {
+
+  public web3Connection = 'https://kovan.infura.io/v3/811fe4fa5c4b41cb9b92f9656aaeaa3b';
+
   // bepro app
   public bepro: any;
 
@@ -14,6 +17,11 @@ export default class BeproService {
   public address: string = '';
 
   constructor() {
-    // this.bepro = new beprojs.Application({ test: true });
+    this.bepro = new Application({
+      test: false,
+      opt: {
+        web3Connection: this.web3Connection,
+      }
+    });
   }
 }
