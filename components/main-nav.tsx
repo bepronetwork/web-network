@@ -31,8 +31,8 @@ export default function MainNav() {
     }
 
     return (
-        <div className="main-nav">
-            <div className="d-flex justify-content-between align-items-center">
+        <div className="main-nav d-flex align-items-center justify-content-between">
+
                 <div className="d-flex">
                     <a href="/">
                         <img
@@ -60,17 +60,17 @@ export default function MainNav() {
                             <button className="btn btn-md btn-trans mr-1"><i className="ico-bepro mr-1"></i>12.7K</button>
                             <Link href="/account" >
                                 <a className="meta-info d-flex align-items-center">
-                                    <div className="d-flex flex-column text-right mr-2">
-                                        <p className="p-small mb-0">{address}</p>
+                                    <div className="d-flex flex-column text-right">
+                                        <p className="p-small short-address mb-0">{address}</p>
                                         <p className="p-small mb-0 trans">0.023 ETH</p>
                                     </div>
-                                    <img className="avatar circle-2"src="https://uifaces.co/our-content/donated/Xp0NB-TL.jpg" alt="" />
+                                    {/* <img className="avatar circle-2"src="https://uifaces.co/our-content/donated/Xp0NB-TL.jpg" alt="" /> */}
                                 </a>
                             </Link>
                         </div>
                     }
                 </div>
-            </div>
+
         </div>
     )
 }

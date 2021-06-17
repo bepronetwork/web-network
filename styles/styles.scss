@@ -185,9 +185,7 @@ p {
   width: 100%;
   height: 70px;
   background-color: $blue;
-  .logo {
-    margin: 0px $m;
-  }
+  padding: 0px $m;
   .nav-links {
     display: flex;
     align-items: center;
@@ -219,8 +217,9 @@ p {
   }
   .account-info {
     // padding: $m $m*2;
+    margin-right: -$m;
     .meta-info {
-      padding: $m/2 $m;
+      padding: $m;
       background-color: rgba($white, 0.1);
       color: $white;
       text-decoration: none;
@@ -231,7 +230,17 @@ p {
         text-transform: uppercase;
         margin-bottom: 0px;
         font-family: 'fontBold', sans-serif;
+        text-align: right;
       }
+      .short-address {
+        position: relative;
+        width: 80px;
+        overflow: hidden;
+        direction: rtl;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
     }
   }
 }

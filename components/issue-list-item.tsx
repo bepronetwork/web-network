@@ -2,8 +2,8 @@ import { GetStaticProps } from 'next'
 import React, { useEffect, useState } from 'react';
 import IssueAvatars from './issue-avatars';
 
-export default function IssueListItem({state: string}) {
-    // console.log(state);
+export default function IssueListItem({state}) {
+    console.log(state);
 
     return (
         <div className="bg-shadow list-item rounded p-4 mb-3">
