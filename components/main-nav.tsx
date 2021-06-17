@@ -15,13 +15,14 @@ export default function MainNav() {
                         />
                     </a>
                     <ul className="nav-links">
-                        <li><a href="/developers">Developers</a></li>
-                        <li><a href="/council">Council</a></li>
-                        <li><a href="/oracle">Oracle</a></li>
+                        <li><a href="/">Lists</a></li>
+                        <li><a href="/issue">Issue</a></li>
+                        <li><a href="/proposal">Proposal</a></li>
+                        <li><a href="/account">My account</a></li>
                     </ul>
                 </div>
                 <div className="d-flex flex-row align-center">
-                    <button className="btn btn-md btn-trans mr-2">+ Create issue</button>
+                    <a href="/create-issue" className="btn btn-md btn-trans mr-2">+ Create issue</a>
                     <button className="btn btn-md btn-white">Connect <i className="ico-metamask ml-1"></i></button>
                 </div>
             </div>

@@ -1,33 +1,31 @@
 import { GetStaticProps } from 'next'
 import { useEffect, useState } from 'react';
 
-export default function PageHero() {
+export default function AccountHero() {
     return (
         <div className="banner bg-bepro-blue mb-4">
             <div className="container">
                 <div className="row justify-content-center">
                     <div className="col-md-10">
                         <div className="d-flex flex-column">
-                            <h1 className="h1 mb-0">Find issues to work</h1>
+                            <h1 className="h1 mb-0">My account</h1>
                             <div className="row">
-                                <div className="col-md-3">
+                                <div className="col-md-4">
                                     <div className="top-border">
-                                        <h4 className="h4 mb-0">10</h4>
-                                        <span className="p-small">In progress</span>
+                                        <h4 className="h4 mb-0">3</h4>
+                                        <span className="p-small">Issues</span>
                                     </div>
                                 </div>
-                                <div className="col-md-3">
+                                <div className="col-md-4">
                                     <div className="top-border">
-                                        <h4 className="h4 mb-0">12</h4>
-                                        <span className="p-small">Issues closed</span>
+                                        <h4 className="h4 mb-0">300.000</h4>
+                                        <span className="p-small">Oracles</span>
                                     </div>
                                 </div>
-                                <div className="col-md-6">
+                                <div className="col-md-4">
                                     <div className="top-border">
-                                        <h4 className="h4 mb-0">
-                                            120,300,000 <span className="smallCaption trans">$BEPRO</span>
-                                        </h4>
-                                        <span className="p-small">On network</span>
+                                        <h4 className="h4 mb-0">0</h4>
+                                        <span className="p-small">Delegated oracles</span>
                                     </div>
                                 </div>
                             </div>
