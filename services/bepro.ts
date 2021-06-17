@@ -32,6 +32,7 @@ export default class BeproService {
         web3Connection: this.web3Connection,
       }
     });
+    await this.network.start();
   }
 
   public static async isLoggedIn() {
@@ -43,6 +44,7 @@ export default class BeproService {
 
     try {
       this.loggedIn = await this.bepro.login();
+      await this.network.login();
       // successful login
       if (this.loggedIn) {
         this.address = await this.getAddress();
