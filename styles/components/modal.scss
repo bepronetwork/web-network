@@ -1,0 +1,10 @@
+.modal {
+  &-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: opacify(black, 0.2);
+  }
+  &-dialog {
+    background-color: $dark-gray;
+  }
+}
