@@ -1,34 +1,39 @@
-import { useState } from "react";
-import { Modal } from "react-bootstrap";
+import ButtonDialog from "./button-dialog";
+import Select from "react-select";
+
+const options = [
+  {
+    value: "Pull Request #32 by @asantos",
+    label: "Pull Request #32 by @asantos",
+  },
+  {
+    value: "Pull Request #34 by @bka",
+    label: "Pull Request #34 by @bka",
+  },
+  {
+    value: "Pull Request #36 by @alisouza",
+    label: "Pull Request #36 by @alisouza",
+  },
+  {
+    value: "Pull Request #64 by @kgb",
+    label: "Pull Request #64 by @kgb",
+  },
+  {
+    value: "Pull Request #69 by @alisa",
+    label: "Pull Request #69 by @alisa",
+  },
+];
 
 export default function NewProposal() {
-  const [open, setOpen] = useState(false);
-
-  function handleOpenClick() {
-    setOpen(true);
-  }
-  function handleCloseClick() {
-    setOpen(false);
-  }
-
   return (
-    <>
-      <button className="btn btn-md btn-primary" onClick={handleOpenClick}>
-        Start working
-      </button>
-      <Modal show={open} onHide={handleCloseClick} centered>
-        <Modal.Header>
-          <Modal.Title>New Proposal</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p className="p-small">Select a pull request </p>
-          <br />
-          <p className="p-small">Propose distribution</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <button className="btn btn-md btn-primary">Create Proposal</button>
-        </Modal.Footer>
-      </Modal>
-    </>
+    <ButtonDialog
+      title="New Proposal"
+      footer={
+        <button className="btn btn-md btn-primary">Create Proposal</button>
+      }>
+      <p className="p-small">Select a pull request </p>
+      <Select {...{ options }} />
+      <p className="p-small">Propose distribution</p>
+    </ButtonDialog>
   );
 }
