@@ -1,5 +1,5 @@
-@import 'variables';
-@import 'vendor';
+@import "variables";
+@import "vendor";
 
 //bootstrap-overrides
 ul,
@@ -8,7 +8,6 @@ li {
   padding-left: 0;
   list-style: none;
 }
-
 .modal {
   &-content {
     background-color: $bg-shadow;
@@ -19,41 +18,84 @@ li {
     border: 0;
   }
 }
+.react-select {
+  &-container & {
+    &__control {
+      border-color: transparent;
+      background-color: $bg;
+      min-height: 48px;
+      box-shadow: none;
+      &:hover,
+      &--is-focused {
+        border-color: $surface-primary;
+      }
+    }
+    &__value-container {
+      padding: 2px 16px;
+    }
+    &__indicator-separator {
+      display: none;
+    }
+    &__indicator {
+      padding: 14px;
+    }
+    &__single-value {
+      color: $emphasis-primary;
+    }
+    &__control--is-focused &__single-value {
+      color: $emphasis-secondary;
+    }
+    &__menu {
+      background-color: $bg-shadow;
+    }
+    &__option {
+      &--is-focused {
+        background-color: $bg;
+      }
+      &--is-selected {
+        background-color: $surface-primary;
+      }
+    }
+  }
+  &__input {
+    color: $emphasis-secondary;
+  }
+}
 
 // DEFAULTS
 
 body {
   background-color: $bg;
-  font-family: 'fontRegular', sans-serif;
+  font-family: "fontRegular", sans-serif;
   color: $gray;
 }
 
 // TYPOGRAPHY
 
 .h1 {
-  font-family: 'fontBold', sans-serif;
+  font-family: "fontBold", sans-serif;
   font-size: 54px;
   line-height: 120%;
 }
 .h2 {
-  font-family: 'fontBold', sans-serif;
+  font-family: "fontBold", sans-serif;
   font-size: 42px;
   line-height: 120%;
 }
 .h3 {
-  font-family: 'fontBold', sans-serif;
+  font-family: "fontBold", sans-serif;
   font-size: 32px;
   line-height: 120%;
 }
 
 .h4 {
-  font-family: 'fontBold', sans-serif;
+  font-family: "fontBold", sans-serif;
   font-size: 21px;
   line-height: 120%;
 }
 
 .caption {
-  font-family: 'fontBold', sans-serif;
+  font-family: "fontBold", sans-serif;
   font-size: 16px;
   line-height: 160%;
   letter-spacing: 0.03em;
@@ -61,7 +103,7 @@ body {
 }
 
 .smallCaption {
-  font-family: 'fontBold', sans-serif;
+  font-family: "fontBold", sans-serif;
   font-size: 14px;
   line-height: 160%;
   letter-spacing: 0.03em;
@@ -80,11 +122,23 @@ p {
 }
 
 .text-bold {
-  font-family: 'fontBold', sans-serif;
+  font-family: "fontBold", sans-serif;
 }
 
 .trans {
   opacity: 0.7;
+}
+
+.emphasis {
+  &-primary {
+    color: $emphasis-primary;
+  }
+  &-secondary {
+    color: $emphasis-secondary;
+  }
+  &-tertiary {
+    color: $emphasis-tertiary;
+  }
 }
 
 // Buttons
@@ -101,7 +155,7 @@ p {
   border-radius: 16px;
   line-height: 100%;
   font-size: 12px;
-  font-family: 'fontBold', sans-serif;
+  font-family: "fontBold", sans-serif;
   text-transform: uppercase;
   padding-left: $m;
   padding-right: $m;
@@ -112,12 +166,11 @@ p {
   align-items: center;
   justify-content: center;
   font-size: 16px;
-  font-family: 'fontBold', sans-serif;
+  font-family: "fontBold", sans-serif;
   height: 42px;
   border-radius: 21px;
   transition: 0.2 ease-in-out;
   transform: scale(1);
-
 }
 
 .btn-primary {
@@ -207,7 +260,7 @@ p {
       margin-left: $m;
     }
     a {
-      font-family: 'fontMedium', sans-serif;
+      font-family: "fontMedium", sans-serif;
       font-size: 14px;
       text-transform: uppercase;
       text-decoration: none;
@@ -231,7 +284,8 @@ p {
   text-decoration: none;
   color: $gray;
   opacity: 0.7;
-  &.active, &:hover {
+  &.active,
+  &:hover {
     color: $white;
     opacity: 1;
   }
@@ -241,7 +295,7 @@ p {
   display: flex;
   align-items: center;
   background-color: rgba(0, 0, 0, 0.1);
-  background-image: url('https://64.media.tumblr.com/95a86e7d8880b0a5c35a2fd7ba318140/e8afc16b16e16514-1a/s75x75_c1/696047f5fc05984243125426c0ec7984fd4d0824.png');
+  background-image: url("https://64.media.tumblr.com/95a86e7d8880b0a5c35a2fd7ba318140/e8afc16b16e16514-1a/s75x75_c1/696047f5fc05984243125426c0ec7984fd4d0824.png");
   padding-left: 32px;
   padding-right: 16px;
   background-repeat: no-repeat;
@@ -303,8 +357,8 @@ p {
     background-color: $bg-shadow;
   }
   .content-list-item {
-    margin-left: -$m*2;
-    margin-right: -$m*2;
+    margin-left: -$m * 2;
+    margin-right: -$m * 2;
     padding: $m $m * 2;
     background-color: $bg-shadow;
     border-top: 2px solid rgba($black, 0.2);
@@ -360,16 +414,34 @@ p {
 }
 
 // Utils
-.mt-up { margin-top: -$m*3; }
+.mt-up {
+  margin-top: -$m * 3;
+}
 
-.mr-0 { margin-right: 0px !important }
-.mr-1 { margin-right: $m/2 }
-.mr-2 { margin-right: $m }
-.mr-3 { margin-right: $m*2 }
-.ml-0 { margin-right: 0px !important }
-.ml-1 { margin-left: $m/2 }
-.ml-2 { margin-left: $m }
-.ml-3 { margin-left: $m*2 }
+.mr-0 {
+  margin-right: 0px !important;
+}
+.mr-1 {
+  margin-right: $m/2;
+}
+.mr-2 {
+  margin-right: $m;
+}
+.mr-3 {
+  margin-right: $m * 2;
+}
+.ml-0 {
+  margin-right: 0px !important;
+}
+.ml-1 {
+  margin-left: $m/2;
+}
+.ml-2 {
+  margin-left: $m;
+}
+.ml-3 {
+  margin-left: $m * 2;
+}
 
 // .mt-0 { margin-top: 0px !important }
 // .mt-1 { margin-top: $m/2 }
@@ -432,7 +504,7 @@ p {
   width: 18px;
   height: 18px;
   background-size: cover;
-  background-image: url('https://64.media.tumblr.com/edb3b3524f57c2c52e5d86f4edd212c6/e8afc16b16e16514-4a/s75x75_c1/9617ed784ce210ba45d9635cf6cc7f5821515c40.png');
+  background-image: url("https://64.media.tumblr.com/edb3b3524f57c2c52e5d86f4edd212c6/e8afc16b16e16514-4a/s75x75_c1/9617ed784ce210ba45d9635cf6cc7f5821515c40.png");
 }
 
 .ico-back {
@@ -440,7 +512,7 @@ p {
   width: 16px;
   height: 16px;
   background-size: cover;
-	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAFVBMVEUAAAD///////////////////////9Iz20EAAAABnRSTlMAECB/gN/cNkdOAAAATElEQVR42u3QoREAMRQCUXJw9F9yZuIjVuej9xl0mS00t4Y9Eu6ZYd9/wf6b/sV+ejLal/ZVKKBCVOgIduuIEU+KBUUkJCIhEaHl1m+mwQ5NfYxofQAAAABJRU5ErkJggg==);
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAFVBMVEUAAAD///////////////////////9Iz20EAAAABnRSTlMAECB/gN/cNkdOAAAATElEQVR42u3QoREAMRQCUXJw9F9yZuIjVuej9xl0mS00t4Y9Eu6ZYd9/wf6b/sV+ejLal/ZVKKBCVOgIduuIEU+KBUUkJCIhEaHl1m+mwQ5NfYxofQAAAABJRU5ErkJggg==);
 }
 
 // Overrides
