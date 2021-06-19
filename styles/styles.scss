@@ -61,6 +61,19 @@ li {
     color: $emphasis-secondary;
   }
 }
+.form-control {
+  border-color: transparent;
+  color: $emphasis-secondary;
+  &,
+  &:focus {
+    box-shadow: none;
+    background-color: $bg;
+  }
+  &:focus {
+    border-color: $surface-primary;
+    color: $emphasis-primary;
+  }
+}
 
 // DEFAULTS
 
