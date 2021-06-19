@@ -1,5 +1,5 @@
 import ButtonDialog from "./button-dialog";
-import Select from "react-select";
+import ReactSelect from "./react-select";
 
 const options = [
   {
@@ -31,9 +31,9 @@ export default function NewProposal() {
       footer={
         <button className="btn btn-md btn-primary">Create Proposal</button>
       }>
-      <p className="p-small">Select a pull request </p>
-      <Select {...{ options }} />
-      <p className="p-small">Propose distribution</p>
+      <p className="p-small emphasis-secondary">Select a pull request </p>
+      <ReactSelect defaultValue={options[0]} options={options} />
+      <p className="p-small emphasis-secondary">Propose distribution</p>
     </ButtonDialog>
   );
 }
