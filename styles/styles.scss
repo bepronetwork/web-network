@@ -9,6 +9,16 @@ li {
   list-style: none;
 }
 
+.modal {
+  &-content {
+    background-color: $bg-shadow;
+  }
+  &-header,
+  &-footer {
+    justify-content: center;
+    border: 0;
+  }
+}
 
 // DEFAULTS
 
