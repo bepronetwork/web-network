@@ -4,12 +4,14 @@ import { Form } from "react-bootstrap";
 export default function NewProposalDistributionItem({
   by = "",
   onChange = () => {},
+  onBlur = () => {},
   InputProps = {},
   maxValue = 0,
   ...props
 }: {
   by: string;
   onChange: (params: Object) => void;
+  onBlur: () => void;
   InputProps?: Object;
   maxValue: number;
 }) {
@@ -29,6 +31,7 @@ export default function NewProposalDistributionItem({
 
     setState(value);
     onChange({ [by]: value || "0" });
+    onBlur();
   }
 
   return (
@@ -36,7 +39,7 @@ export default function NewProposalDistributionItem({
       className="d-flex align-items-center new-proposal-distribution-item"
       {...props}>
       <span style={{ flex: 1 }}>{by}</span>
-      <div className="d-flex align-items-center">
+      <div>
         <Form.Control
           type="number"
           value={state}

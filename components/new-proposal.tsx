@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Form } from "react-bootstrap";
 import ButtonDialog from "./button-dialog";
 import ReactSelect from "./react-select";
 import NewProposalDistributionItem from "./new-proposal-distribution-item";
@@ -30,56 +29,80 @@ const options = [
 const distributed = ["@asantos", "@vazTros", "@MikeSon"];
 
 export default function NewProposal() {
-  const [distributedBy, setDistributedBy] = useState<Object>({});
-  const [missingDistribution, setMissingDistribution] = useState<number>(0);
-  const renderDistributionItems = distributed.map((item) => (
+  const [show, setShow] = useState<boolean>(false);
+  const [distrib, setDistrib] = useState<Object>({});
+  const [missingDistrib, setMissingDistrib] = useState<number>(0);
+  const renderDistribItems = distributed.map((item) => (
     <NewProposalDistributionItem
       key={item}
       by={item}
-      onChange={handleChangeDistribution}
-      maxValue={verifyDistribution(distributedBy)}
+      onChange={handleChangeDistrib}
+      onBlur={handleBlurDistrib}
+      maxValue={restDistrib(distrib)}
       InputProps={{
-        isInvalid: missingDistribution,
+        isInvalid: missingDistrib,
       }}
     />
   ));
-  const renderErrorDistribution = missingDistribution ? (
+  const renderErrorDistribution = missingDistrib ? (
     <p className="p error mt-3 mb-0">
-      {missingDistribution < 100
-        ? missingDistribution + "% is missing!"
+      {missingDistrib < 100
+        ? missingDistrib + "% is missing!"
         : "Distribution must be equal to 100%."}
     </p>
   ) : null;
 
-  function handleChangeDistribution(params: Object) {
-    setDistributedBy((prevState) => ({
+  function handleBlurDistrib() {
+    setMissingDistrib(0);
+  }
+  function handleChangeDistrib(params: Object) {
+    setDistrib((prevState) => ({
       ...prevState,
       ...params,
     }));
   }
   function handleClickCreate() {
-    if (sumObj(distributedBy) < 100) {
-      return setMissingDistribution(verifyDistribution(distributedBy));
+    if (sumObj(distrib) < 100) {
+      return setMissingDistrib(restDistrib(distrib));
     }
-
-    return setMissingDistribution(0);
+    resetDistrib();
+    handleHide();
   }
-  function verifyDistribution(params: Object) {
-    let restDistribution = 100 - sumObj(params);
+  function restDistrib(params: Object) {
+    let restDistrib = 100 - sumObj(params);
 
-    if (restDistribution > 100) {
-      restDistribution = 100;
+    if (restDistrib > 100) {
+      restDistrib = 100;
     }
-    if (Number.isNaN(restDistribution) || restDistribution < 0) {
-      restDistribution = 0;
+    if (Number.isNaN(restDistrib) || restDistrib < 0) {
+      restDistrib = 0;
     }
 
-    return restDistribution;
+    return restDistrib;
   }
+  function resetDistrib() {
+    setDistrib({});
+    setMissingDistrib(0);
+  }
+  function handleShow() {
+    setShow(true);
+  }
+  function handleHide() {
+    setShow(false);
+  }
+
+  console.log({
+    distrib,
+    missingDistrib,
+    restDistrib: restDistrib(distrib),
+  });
 
   return (
     <ButtonDialog
       title="New Proposal"
+      show={show}
+      onClick={handleShow}
+      onHide={handleHide}
       footer={
         <button className="btn btn-md btn-primary" onClick={handleClickCreate}>
           Create Proposal
@@ -90,9 +113,9 @@ export default function NewProposal() {
       </p>
       <ReactSelect defaultValue={options[0]} options={options} />
       <p className="p-small emphasis-secondary new-proposal-heading mt-3">
-        Propose distribution
+        Propose distrib
       </p>
-      <ul className="new-proposal-distribution">{renderDistributionItems}</ul>
+      <ul className="new-proposal-distrib">{renderDistribItems}</ul>
       {renderErrorDistribution}
     </ButtonDialog>
   );
