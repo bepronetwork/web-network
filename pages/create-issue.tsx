@@ -24,7 +24,7 @@ export default function PageCreateIssue() {
     const test = await BeproService.network.openIssue({tokenAmount: issueAmount, address: beproAddress});
 
   }
-  const beproMax = 100;
+
   return (
       <>
         <div className="banner bg-bepro-blue mb-4">
@@ -54,7 +54,7 @@ export default function PageCreateIssue() {
                   </div>
                   <div className="form-group mb-4">
                     <label className="p-small trans mb-2">Set $BEPRO ammout</label>
-                    <input min="0" max="100" type="number" className="form-control" placeholder="0"
+                    <input min="0" type="number" className="form-control" placeholder="0"
                       value={issueAmount}
                       onChange={e => setIssueAmount(parseInt(e.target.value))}/>
                   </div>
