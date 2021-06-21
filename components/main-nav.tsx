@@ -8,6 +8,7 @@ export default function MainNav() {
 
     const [loggedIn, setLoggedIn] = useState<boolean>(false);
     const [address, setAddress] = useState<string>(null);
+    const [beproStaked, setBeproStaked] = useState<number>(0);
 
     useEffect(() => {
         checkLogin();
@@ -29,7 +30,8 @@ export default function MainNav() {
         setLoggedIn(true);
 
         console.log('await BeproService.bepro.getIssuesByAddress():', await BeproService.network.getIssuesByAddress(beproAddress));
-        console.log('%c%s', 'color: #00a3cc', await BeproService.bepro.getETHBalance());
+        setBeproStaked(await BeproService.network.getBEPROStaked())
+        // console.log('%c%s', 'color: #00a3cc', await BeproService.bepro.getETHBalance());
     }
 
     return (
@@ -54,12 +56,14 @@ export default function MainNav() {
                     </ul>
                 </div>
                 <div className="d-flex flex-row align-items-center">
-                    <a href="/create-issue" className="btn btn-md btn-trans mr-1">+ Create issue</a>
+                    <Link href="/create-issue" >
+                        <a className="btn btn-md btn-trans mr-1">+ Create issue</a>
+                    </Link>
                     { !loggedIn ?
                         <button className="btn btn-md btn-white" onClick={login}>Connect <i className="ico-metamask ml-1"></i></button>
                     :
                         <div className="d-flex account-info align-items-center">
-                            <button className="btn btn-md btn-trans mr-1"><i className="ico-bepro mr-1"></i>12.7K</button>
+                            <button className="btn btn-md btn-trans mr-1"><i className="ico-bepro mr-1"></i>{beproStaked}</button>
                             <Link href="/account" >
                                 <a className="meta-info d-flex align-items-center">
                                     <div className="d-flex flex-column text-right">
