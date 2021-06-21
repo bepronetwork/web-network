@@ -25,18 +25,24 @@ export default class BeproService {
         web3Connection: this.web3Connection,
       }
     });
-    this.bepro.start();
+    // this.bepro.start();
     this.network = new Network({
       contractAddress: '0x852D6375c55498B326Fb87C69E16F010d2906C0E',
       opt: {
         web3Connection: this.web3Connection,
       }
     });
-    await this.network.start();
+    // this.network.start();
+
   }
 
   public static async isLoggedIn() {
-    return !!(await this.bepro.getAddress());
+    try {
+      return !!(await this.bepro.getAddress());
+    } catch(e) {
+
+    }
+    return false;
   }
 
   public static async login() {
@@ -44,12 +50,15 @@ export default class BeproService {
 
     try {
       this.loggedIn = await this.bepro.login();
-      await this.network.login();
+      const networkLogin = await this.network.login();
+      const networkAssert = await this.network.__assert();
+
       // successful login
       if (this.loggedIn) {
         this.address = await this.getAddress();
       }
     } catch (e) {
+      console.log('e:', e);
       // should be non-blocking
       return false;
     }

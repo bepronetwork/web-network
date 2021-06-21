@@ -24,10 +24,12 @@ export default function MainNav() {
 
     const login = async () => {
         await BeproService.login();
-        setAddress(await BeproService.getAddress());
+        const beproAddress = await BeproService.getAddress();
+        setAddress(beproAddress);
         setLoggedIn(true);
-        // console.log('await BeproService.bepro.getETHNetwork():', await BeproService.bepro.getETHNetwork());
-        // console.log('await BeproService.bepro.getETHBalance():', await BeproService.bepro.getETHBalance());
+
+        console.log('await BeproService.bepro.getIssuesByAddress():', await BeproService.network.getIssuesByAddress(beproAddress));
+        console.log('%c%s', 'color: #00a3cc', await BeproService.bepro.getETHBalance());
     }
 
     return (
