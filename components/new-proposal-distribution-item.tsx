@@ -22,10 +22,10 @@ export default function NewProposalDistributionItem({
   function handleBlurChange(event: ChangeEvent<HTMLInputElement>) {
     let { value } = event.target;
 
-    if (Number(value) > max) {
-      value = `${max}`;
+    if (Number(value) > 100) {
+      value = "100";
     }
-    if (!value || Number.isNaN(value) || Number(value) < 0) {
+    if (!value || Number(value) < 0) {
       value = "0";
     }
 
