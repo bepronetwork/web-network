@@ -9,6 +9,8 @@ export default function ButtonDialog({
   onClick = () => {},
   show = false,
   onHide = () => {},
+  className = "btn-primary",
+  ...params
 }: {
   title: string;
   children: ReactNode | ReactNodeArray;
@@ -16,10 +18,14 @@ export default function ButtonDialog({
   onClick: () => void;
   show: boolean;
   onHide?: () => void;
+  className?: string;
 }) {
   return (
     <>
-      <button className="btn btn-md btn-primary" onClick={onClick}>
+      <button
+        className={`btn btn-md ${className}`}
+        onClick={onClick}
+        {...params}>
         {title}
       </button>
       <Modal
