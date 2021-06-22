@@ -1,3 +1,4 @@
+import { kebabCase } from "lodash";
 import { ReactNode, ReactNodeArray } from "react";
 import { Modal } from "react-bootstrap";
 
@@ -6,12 +7,15 @@ export default function ButtonDialog({
   children = null,
   footer = null,
   onClick = () => {},
-  ...params
+  show = false,
+  onHide = () => {},
 }: {
   title: string;
   children: ReactNode | ReactNodeArray;
   footer?: ReactNode;
-  onClick?: () => void;
+  onClick: () => void;
+  show: boolean;
+  onHide?: () => void;
 }) {
   return (
     <>
@@ -20,9 +24,10 @@ export default function ButtonDialog({
       </button>
       <Modal
         centered
-        aria-labelledby={title}
-        aria-describedby={title}
-        {...params}>
+        aria-labelledby={`${kebabCase(title)}-modal`}
+        aria-describedby={`${kebabCase(title)}-modal`}
+        show={show}
+        onHide={onHide}>
         <Modal.Header>
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>

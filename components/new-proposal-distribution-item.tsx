@@ -1,48 +1,47 @@
+import { sum } from "lodash";
 import { ChangeEvent, useState } from "react";
 import { Form } from "react-bootstrap";
 
 export default function NewProposalDistributionItem({
   by = "",
   onChange = () => {},
-  onBlur = () => {},
-  InputProps = {},
-  maxValue = 0,
-  ...props
+  InputProps = { isInvalid: false },
+  max = 0,
+  ...params
 }: {
   by: string;
   onChange: (params: Object) => void;
-  onBlur: () => void;
-  InputProps?: Object;
-  maxValue: number;
+  InputProps?: { isInvalid: boolean };
+  max: number;
 }) {
-  const [state, setState] = useState<string>("0");
+  const [value, setValue] = useState<string>("0");
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
-    setState(event.target.value);
+    setValue(event.target.value);
   }
   function handleBlurChange(event: ChangeEvent<HTMLInputElement>) {
     let { value } = event.target;
-    if (Number(value) > maxValue) {
-      value = `${maxValue}`;
+
+    if (Number(value) > max) {
+      value = `${max}`;
     }
-    if (Number.isNaN(value) || Number(value) < 0) {
+    if (!value || Number.isNaN(value) || Number(value) < 0) {
       value = "0";
     }
 
-    setState(value);
-    onChange({ [by]: value || "0" });
-    onBlur();
+    setValue(value);
+    onChange({ [by]: value });
   }
 
   return (
     <li
       className="d-flex align-items-center new-proposal-distribution-item"
-      {...props}>
+      {...params}>
       <span style={{ flex: 1 }}>{by}</span>
       <div>
         <Form.Control
-          type="number"
-          value={state}
+          type="text"
+          value={value}
           onChange={handleChange}
           onBlur={handleBlurChange}
           {...InputProps}
