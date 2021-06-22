@@ -64,11 +64,14 @@ export default function NewProposal() {
     }));
   }
   function handleClickCreate() {
+    if (amount > 0 && amount < 100) {
+      return setError(`${amount}% is missing!`);
+    }
     if (amount === 100) {
       return setError("Distribution must be equal to 100%.");
     }
-    if (amount > 0 && amount < 100) {
-      return setError(`${amount}% is missing!`);
+    if (amount < 0) {
+      return setError(`Distribution exceed 100%.`);
     }
 
     setDistrib({});
