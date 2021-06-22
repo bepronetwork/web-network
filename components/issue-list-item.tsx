@@ -2,7 +2,9 @@ import { GetStaticProps } from 'next'
 import React, { useEffect, useState } from 'react';
 import IssueAvatars from './issue-avatars';
 
-export default function IssueListItem() {
+export default function IssueListItem({state}) {
+    console.log(state);
+
     return (
         <div className="bg-shadow list-item rounded p-4 mb-3">
             <div className="row align-center">
