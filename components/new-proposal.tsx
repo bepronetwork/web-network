@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ButtonDialog from "./button-dialog";
 import ReactSelect from "./react-select";
 import NewProposalDistributionItem from "./new-proposal-distribution-item";
@@ -31,30 +31,32 @@ const distributed = ["@asantos", "@vazTros", "@MikeSon"];
 export default function NewProposal() {
   const [show, setShow] = useState<boolean>(false);
   const [distrib, setDistrib] = useState<Object>({});
-  const [missingDistrib, setMissingDistrib] = useState<number>(0);
+  const [amount, setAmount] = useState<number>(100);
+  const [error, setError] = useState<string>("");
   const renderDistribItems = distributed.map((item) => (
     <NewProposalDistributionItem
       key={item}
       by={item}
       onChange={handleChangeDistrib}
-      onBlur={handleBlurDistrib}
-      maxValue={restDistrib(distrib)}
+      max={amount}
       InputProps={{
-        isInvalid: missingDistrib,
+        isInvalid: !!error,
       }}
     />
   ));
-  const renderErrorDistribution = missingDistrib ? (
-    <p className="p error mt-3 mb-0">
-      {missingDistrib < 100
-        ? missingDistrib + "% is missing!"
-        : "Distribution must be equal to 100%."}
-    </p>
-  ) : null;
+  const renderErrorDistribution = error && (
+    <p className="p error mt-3 mb-0">{error}</p>
+  );
 
-  function handleBlurDistrib() {
-    setMissingDistrib(0);
-  }
+  console.log({ amount });
+
+  useEffect(() => {
+    // Must be calculated as a function and not as an object. To be fixed as (x) => x - sumObj()
+    setAmount(100 - sumObj(distrib));
+  }, [distrib]);
+  useEffect(() => {
+    setError("");
+  }, [distrib]);
   function handleChangeDistrib(params: Object) {
     setDistrib((prevState) => ({
       ...prevState,
@@ -62,27 +64,15 @@ export default function NewProposal() {
     }));
   }
   function handleClickCreate() {
-    if (sumObj(distrib) < 100) {
-      return setMissingDistrib(restDistrib(distrib));
+    if (amount === 100) {
+      return setError("Distribution must be equal to 100%.");
     }
-    resetDistrib();
-    handleHide();
-  }
-  function restDistrib(params: Object) {
-    let restDistrib = 100 - sumObj(params);
-
-    if (restDistrib > 100) {
-      restDistrib = 100;
-    }
-    if (Number.isNaN(restDistrib) || restDistrib < 0) {
-      restDistrib = 0;
+    if (amount > 0 && amount < 100) {
+      return setError(`${amount}% is missing!`);
     }
 
-    return restDistrib;
-  }
-  function resetDistrib() {
     setDistrib({});
-    setMissingDistrib(0);
+    handleHide();
   }
   function handleShow() {
     setShow(true);
@@ -90,12 +80,6 @@ export default function NewProposal() {
   function handleHide() {
     setShow(false);
   }
-
-  console.log({
-    distrib,
-    missingDistrib,
-    restDistrib: restDistrib(distrib),
-  });
 
   return (
     <ButtonDialog
@@ -113,9 +97,9 @@ export default function NewProposal() {
       </p>
       <ReactSelect defaultValue={options[0]} options={options} />
       <p className="p-small emphasis-secondary new-proposal-heading mt-3">
-        Propose distrib
+        Propose distribution
       </p>
-      <ul className="new-proposal-distrib">{renderDistribItems}</ul>
+      <ul className="new-proposal-distribution">{renderDistribItems}</ul>
       {renderErrorDistribution}
     </ButtonDialog>
   );
