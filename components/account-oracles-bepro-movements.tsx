@@ -15,13 +15,13 @@ export default function AccountOraclesBeproMovements({
   const [state, setState] = useState<string>("waiting");
   const renderByMovement = {
     Lock: {
-      label: "Lock",
+      label: `Get ${amount} oracles`,
       caption: "Get Oracles from $BEPRO",
       body: `You are locking ${amount} $BEPRO /br/ to get /oracles${amount} Oracles/`,
     },
     Unlock: {
-      label: "Unlock",
-      caption: "Get $BEPRO form Oracles",
+      label: `Unlock ${amount} $BEPRO`,
+      caption: "Get $BEPRO from Oracles",
       body: `Give away /oracles${amount} Oracles/ /br/ to get back ${amount} $BEPRO`,
     },
   }[movement];
@@ -93,9 +93,9 @@ export default function AccountOraclesBeproMovements({
 
   return (
     <ButtonDialog
-      title={`${renderByMovement.label} $BEPRO`}
+      title={renderByMovement.label}
       disabled={!amount}
-      className="btn-white"
+      className="btn-lg btn-primary w-100"
       show={show}
       onClick={handleShow}
       onHide={handleHide}
