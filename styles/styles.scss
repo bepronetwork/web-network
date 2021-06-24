@@ -565,22 +565,3 @@ p {
     border-color: rgba($purple, 0.2);
   }
 }
-
-// components
-
-.new-proposal {
-  &-heading {
-    margin-bottom: $m/2;
-  }
-  &-distribution {
-    margin-bottom: 0;
-    & > &-item:not(&-item:last-child) {
-      margin-bottom: $m/4;
-    }
-    &-item {
-      background-color: transparentize(white, 0.9);
-      padding: 6px 16px;
-      border-radius: $m/4;
-    }
-  }
-}
