@@ -33,9 +33,12 @@ export default function NewProposalDistributionItem({
   }
 
   return (
-    <li className="d-flex align-items-center " {...params}>
+    <li
+      className="d-flex align-items-center px-3 py-1 my-1 rounded-3"
+      style={{ background: "rgba(255, 255, 255, 0.1)" }}
+      {...params}>
       <span className="flex-grow-1">{by}</span>
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 w-25">
         <Form.Control
           type="text"
           value={value}

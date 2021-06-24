@@ -72,7 +72,6 @@ export default function NewProposal() {
       return setError(`Distribution exceed 100%.`);
     }
 
-    setDistrib({});
     handleHide();
   }
   function handleShow() {
@@ -80,6 +79,7 @@ export default function NewProposal() {
   }
   function handleHide() {
     setShow(false);
+    setDistrib({});
   }
 
   return (
