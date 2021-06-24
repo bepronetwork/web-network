@@ -1,8 +1,7 @@
 import { GetStaticProps } from "next";
-import React, { useEffect, useState } from "react";
-import { Modal } from "react-bootstrap";
 import IssueAvatars from "./issue-avatars";
-import NewProposal from "./new-proposal";
+import CreateProposal from "./create-proposal";
+import StartWorking from "./start-working";
 
 export default function PageActions() {
   return (
@@ -16,7 +15,8 @@ export default function PageActions() {
               <button className="btn btn-md btn-opac mr-1">
                 View on github
               </button>
-              <NewProposal />
+              <CreateProposal />
+              <StartWorking />
             </div>
           </div>
         </div>
