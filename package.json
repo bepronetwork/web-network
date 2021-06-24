@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@types/lodash": "^4.14.170",
+    "bepro-js": "^1.2.8",
     "bootstrap": "^5.0.1",
     "clsx": "^1.1.1",
     "date-fns": "^2.11.1",
