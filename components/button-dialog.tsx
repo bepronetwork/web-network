@@ -10,6 +10,7 @@ export default function ButtonDialog({
   show = false,
   onHide = () => {},
   className = "btn-primary",
+  disabled = false,
   ...params
 }: {
   title: string;
@@ -19,12 +20,14 @@ export default function ButtonDialog({
   show: boolean;
   onHide?: () => void;
   className?: string;
+  disabled: boolean;
 }) {
   return (
     <>
       <button
         className={`btn btn-md ${className}`}
         onClick={onClick}
+        disabled={disabled}
         {...params}>
         {title}
       </button>
