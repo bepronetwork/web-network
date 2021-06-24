@@ -26,7 +26,6 @@ export default function StartWorking() {
           <button className="btn btn-md btn-primary">Start Working</button>
         </>
       }>
-      <p className="p-small text-white-50 text-center">Are you sure?</p>
       <p className="text-center fs-6 text fw-bold">
         Remove all getContract functions from Application and instead calling
         the Object directly
