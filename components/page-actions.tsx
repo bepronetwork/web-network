@@ -2,6 +2,7 @@ import { GetStaticProps } from "next";
 import IssueAvatars from "./issue-avatars";
 import CreateProposal from "./create-proposal";
 import StartWorking from "./start-working";
+import OpenIssue from "./open-issue";
 
 export default function PageActions() {
   return (
@@ -17,6 +18,7 @@ export default function PageActions() {
               </button>
               <CreateProposal />
               <StartWorking />
+              <OpenIssue />
             </div>
           </div>
         </div>
