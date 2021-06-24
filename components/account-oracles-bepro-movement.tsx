@@ -20,11 +20,14 @@ export default function AccountOraclesBeproMovement(): JSX.Element {
   ));
 
   function handleClickMovement(params: string) {
-    setAmount("");
+    handleCloseMovement();
     setMovement(params);
   }
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     setAmount(event.target.value);
+  }
+  function handleCloseMovement() {
+    setAmount("");
   }
 
   return (
@@ -42,7 +45,10 @@ export default function AccountOraclesBeproMovement(): JSX.Element {
           onChange={handleChange}
         />
       </div>
-      <AccountOraclesBeproMovements {...{ movement, amount }} />
+      <AccountOraclesBeproMovements
+        onClose={handleCloseMovement}
+        {...{ movement, amount }}
+      />
     </div>
   );
 }

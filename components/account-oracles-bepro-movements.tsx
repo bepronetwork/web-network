@@ -1,74 +1,82 @@
 import clsx from "clsx";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import ButtonDialog from "./button-dialog";
 
 export default function AccountOraclesBeproMovements({
   movement = "Lock",
   amount = "0",
+  onClose = () => {},
 }: {
   movement: string;
   amount: string;
+  onClose: () => void;
 }): JSX.Element {
   const [show, setShow] = useState<boolean>(false);
   const [state, setState] = useState<string>("waiting");
-  const renderPlainText = {
-    Lock: [
-      "Lock",
-      "Get Oracles from $BEPRO",
-      `You are locking ${amount} $BEPRO to get /oracles${amount} Oracles/`,
-    ],
-    Unlock: [
-      "Unlock",
-      "Get $BEPRO form Oracles",
-      `Give away /oracles${amount} Oracles/ to get back ${amount} $BEPRO`,
-    ],
+  const renderByMovement = {
+    Lock: {
+      label: "Lock",
+      caption: "Get Oracles from $BEPRO",
+      body: `You are locking ${amount} $BEPRO /br/ to get /oracles${amount} Oracles/`,
+    },
+    Unlock: {
+      label: "Unlock",
+      caption: "Get $BEPRO form Oracles",
+      body: `Give away /oracles${amount} Oracles/ /br/ to get back ${amount} $BEPRO`,
+    },
   }[movement];
-  const renderBodyText = {
-    waiting: (
-      <p className="text-center fs-4">
-        {renderPlainText[2]
-          ?.split("/")
-          .map((sentence: string) =>
-            sentence.startsWith("oracles") ? (
-              <span className="text-bold color-purple">
-                {sentence.replace(/oracles/, "")}
-              </span>
-            ) : (
-              sentence
-            ),
-          )}
-      </p>
-    ),
-    confirmed: (
-      <div className="d-flex flex-column align-items-center">
-        <svg
-          width="64"
-          height="64"
-          viewBox="0 0 64 64"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="mb-2 mt-3">
-          <path
-            d="M32 0C14.336 0 0 14.336 0 32C0 49.664 14.336 64 32 64C49.664 64 64 49.664 64 32C64 14.336 49.664 0 32 0ZM25.6 48L9.6 32L14.112 27.488L25.6 38.944L49.888 14.656L54.4 19.2L25.6 48Z"
-            fill="#35E0AD"
-          />
-        </svg>
-        <p className="text-center fs-4 text-success">Transaction completed</p>
-      </div>
-    ),
-  }[state];
-  const renderLabel = {
-    waiting: "Confirm",
-    confirmed: "Close",
-  }[state];
-  const renderCancelButton = state === "waiting" && (
-    <button className="btn btn-md btn-opac" onClick={handleHide}>
-      Cancel
-    </button>
-  );
-  const renderButtonHandler = {
-    waiting: handleClickConfirmation,
-    confirmed: handleHide,
+  const renderByState = {
+    waiting: {
+      body: (
+        <p className="text-center fs-4">
+          {renderByMovement.body?.split("/").map((sentence: string) => {
+            const Component =
+              (sentence.startsWith("oracles") && "span") || Fragment;
+
+            return (
+              <Fragment key={sentence}>
+                <Component
+                  {...(sentence.startsWith("oracles") && {
+                    className: "text-bold color-purple",
+                  })}>
+                  {sentence.replace(/oracles|br/, "")}
+                </Component>
+                {sentence.startsWith("br") && <br />}
+              </Fragment>
+            );
+          })}
+        </p>
+      ),
+      label: "Confirm",
+      button: (
+        <button className="btn btn-md btn-opac" onClick={handleHide}>
+          Cancel
+        </button>
+      ),
+      fx: handleClickConfirmation,
+    },
+    confirmed: {
+      body: (
+        <div className="d-flex flex-column align-items-center">
+          <svg
+            width="64"
+            height="64"
+            viewBox="0 0 64 64"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="mb-2 mt-3">
+            <path
+              d="M32 0C14.336 0 0 14.336 0 32C0 49.664 14.336 64 32 64C49.664 64 64 49.664 64 32C64 14.336 49.664 0 32 0ZM25.6 48L9.6 32L14.112 27.488L25.6 38.944L49.888 14.656L54.4 19.2L25.6 48Z"
+              fill="#35E0AD"
+            />
+          </svg>
+          <p className="text-center fs-4 text-success">Transaction completed</p>
+        </div>
+      ),
+      label: "Close",
+      button: null,
+      fx: handleHide,
+    },
   }[state];
 
   function handleShow() {
@@ -77,6 +85,7 @@ export default function AccountOraclesBeproMovements({
   function handleHide() {
     setShow(false);
     setState("waiting");
+    onClose();
   }
   function handleClickConfirmation() {
     setState("confirmed");
@@ -84,7 +93,7 @@ export default function AccountOraclesBeproMovements({
 
   return (
     <ButtonDialog
-      title={`${renderPlainText[0]} $BEPRO`}
+      title={`${renderByMovement.label} $BEPRO`}
       disabled={!amount}
       className="btn-white"
       show={show}
@@ -92,16 +101,16 @@ export default function AccountOraclesBeproMovements({
       onHide={handleHide}
       footer={
         <>
-          {renderCancelButton}
-          <button
-            className="btn btn-md btn-primary"
-            onClick={renderButtonHandler}>
-            {renderLabel}
+          {renderByState.button}
+          <button className="btn btn-md btn-primary" onClick={renderByState.fx}>
+            {renderByState.label}
           </button>
         </>
       }>
-      <p className="p-small text-white-50 text-center">{renderPlainText[1]}</p>
-      {renderBodyText}
+      <p className="p-small text-white-50 text-center">
+        {renderByMovement.caption}
+      </p>
+      {renderByState.body}
     </ButtonDialog>
   );
 }
