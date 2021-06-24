@@ -1,6 +1,7 @@
 import { GetStaticProps } from "next";
 import React, { useEffect, useState } from "react";
 import AccountHero from "../components/account-hero";
+import AccountOraclesBeproMovement from "../components/account-oracles-bepro-movement";
 import DelegateOracle from "../components/delegate-oracle";
 import IssueListItem from "../components/issue-list-item";
 import MainNav from "../components/main-nav";
@@ -29,29 +30,7 @@ export default function PageAccountOracles() {
       <div className="container">
         <div className="row justify-content-center mb-5">
           <div className="col-md-5">
-            <div className="content-wrapper">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <div className="d-flex">
-                  <a href="#" className="subnav-item active pl-0">
-                    <h4 className="h4 mb-0 mr-2">Lock</h4>
-                  </a>
-                  <a href="#" className="subnav-item">
-                    <h4 className="h4 mb-0">Unlock</h4>
-                  </a>
-                </div>
-                <span className="badge-opac">200 Available</span>
-              </div>
-              <p>Lock $BEPRO to get Oracles</p>
-              <div className="form-group mb-4">
-                <label className="p-small trans mb-2">$BEPRO Ammout</label>
-                <input
-                  type="number"
-                  className="form-control"
-                  placeholder="$BEPRO Ammout"
-                />
-              </div>
-              <button className="btn btn-lg btn-primary w-100">LOCK</button>
-            </div>
+            <AccountOraclesBeproMovement />
           </div>
 
           <div className="col-md-5">

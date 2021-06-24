@@ -23,12 +23,15 @@ export default function DelegateOrableTakeBack({
       onHide={handleHide}
       footer={
         <>
-          <button className="btn btn-md btn-opac">Cancel</button>
+          <button className="btn btn-md btn-opac" onClick={handleHide}>
+            Cancel
+          </button>
           <button className="btn btn-md btn-primary">Confirm</button>
         </>
       }>
-      <p className="p-small emphasis-secondary new-proposal-heading">
-        Give away <span className="text-bold color-purple">{amount}</span> Oracles to get back 200,000 $BEPRO
+      <p className="text-center fs-4">
+        Give away <span className="text-bold color-purple">{amount}</span>{" "}
+        Oracles to get back 200,000 $BEPRO
       </p>
     </ButtonDialog>
   );
