@@ -1,7 +1,7 @@
 import clsx from "clsx";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { Form } from "react-bootstrap";
-import AccountOraclesBeproMovementModal from "./account-oracles-bepro-movement-modal";
+import AccountOraclesBeproMovements from "./account-oracles-bepro-movements";
 
 const movements: string[] = ["Lock", "Unlock"];
 
@@ -11,7 +11,7 @@ export default function AccountOraclesBeproMovement(): JSX.Element {
   const renderMovements = movements.map((movementItem) => (
     <button
       key={movementItem}
-      onClick={() => setMovement(movementItem)}
+      onClick={() => handleClickMovement(movementItem)}
       className={clsx("btn p-0 subnav-item", {
         active: movementItem === movement,
       })}>
@@ -19,6 +19,10 @@ export default function AccountOraclesBeproMovement(): JSX.Element {
     </button>
   ));
 
+  function handleClickMovement(params: string) {
+    setAmount("");
+    setMovement(params);
+  }
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     setAmount(event.target.value);
   }
@@ -38,7 +42,7 @@ export default function AccountOraclesBeproMovement(): JSX.Element {
           onChange={handleChange}
         />
       </div>
-      <AccountOraclesBeproMovementModal {...{ movement, amount }} />
+      <AccountOraclesBeproMovements {...{ movement, amount }} />
     </div>
   );
 }
