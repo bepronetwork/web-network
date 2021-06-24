@@ -1,4 +1,3 @@
-import { sum } from "lodash";
 import { ChangeEvent, useState } from "react";
 import { Form } from "react-bootstrap";
 
@@ -34,11 +33,9 @@ export default function NewProposalDistributionItem({
   }
 
   return (
-    <li
-      className="d-flex align-items-center new-proposal-distribution-item"
-      {...params}>
-      <span style={{ flex: 1 }}>{by}</span>
-      <div>
+    <li className="d-flex align-items-center " {...params}>
+      <span className="flex-grow-1">{by}</span>
+      <div className="flex-shrink-0">
         <Form.Control
           type="text"
           value={value}

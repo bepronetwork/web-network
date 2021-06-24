@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ButtonDialog from "./button-dialog";
 import ReactSelect from "./react-select";
-import NewProposalDistributionItem from "./new-proposal-distribution-item";
+import CreateProposalDistributionItem from "./create-proposal-distribution-item";
 import { sumObj } from "../services/helpers";
 
 const options = [
@@ -34,7 +34,7 @@ export default function NewProposal() {
   const [amount, setAmount] = useState<number>(100);
   const [error, setError] = useState<string>("");
   const renderDistribItems = distributed.map((item) => (
-    <NewProposalDistributionItem
+    <CreateProposalDistributionItem
       key={item}
       by={item}
       onChange={handleChangeDistrib}
@@ -47,8 +47,6 @@ export default function NewProposal() {
   const renderErrorDistribution = error && (
     <p className="p error mt-3 mb-0">{error}</p>
   );
-
-  console.log({ amount });
 
   useEffect(() => {
     // Must be calculated as a function and not as an object. To be fixed as (x) => x - sumObj()
@@ -86,7 +84,7 @@ export default function NewProposal() {
 
   return (
     <ButtonDialog
-      title="New Proposal"
+      title="Create Proposal"
       show={show}
       onClick={handleShow}
       onHide={handleHide}
@@ -95,14 +93,10 @@ export default function NewProposal() {
           Create Proposal
         </button>
       }>
-      <p className="p-small emphasis-secondary new-proposal-heading">
-        Select a pull request{" "}
-      </p>
+      <p className="p-small text-50">Select a pull request </p>
       <ReactSelect defaultValue={options[0]} options={options} />
-      <p className="p-small emphasis-secondary new-proposal-heading mt-3">
-        Propose distribution
-      </p>
-      <ul className="new-proposal-distribution">{renderDistribItems}</ul>
+      <p className="p-small mt-3">Propose distribution</p>
+      <ul className="mb-0">{renderDistribItems}</ul>
       {renderErrorDistribution}
     </ButtonDialog>
   );
