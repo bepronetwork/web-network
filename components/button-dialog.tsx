@@ -20,7 +20,7 @@ export default function ButtonDialog({
   show: boolean;
   onHide?: () => void;
   className?: string;
-  disabled: boolean;
+  disabled?: boolean;
 }) {
   return (
     <>
