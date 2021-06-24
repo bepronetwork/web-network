@@ -18,6 +18,10 @@ export default function AccountOraclesBeproMovement(): JSX.Element {
       <h4 className="h4 mb-0 mr-2">{movementItem}</h4>
     </button>
   ));
+  const renderByMovement = {
+    Lock: "Lock $BEPRO to get oracles",
+    Unlock: "Unlock $BEPRO by giving away oracles",
+  }[movement];
 
   function handleClickMovement(params: string) {
     handleCloseMovement();
@@ -36,15 +40,14 @@ export default function AccountOraclesBeproMovement(): JSX.Element {
         <div className="d-flex">{renderMovements}</div>
         <span className="badge-opac">200 Available</span>
       </div>
-      <div className="form-group mb-4">
-        <label className="p-small trans mb-2">$BEPRO Ammout</label>
-        <Form.Control
-          type="text"
-          value={amount}
-          placeholder="$BEPRO Amount"
-          onChange={handleChange}
-        />
-      </div>
+      <p className="p text-white">{renderByMovement}</p>
+      <Form.Control
+        className="mb-4"
+        type="text"
+        value={amount}
+        placeholder="Amount"
+        onChange={handleChange}
+      />
       <AccountOraclesBeproMovements
         onClose={handleCloseMovement}
         {...{ movement, amount }}
