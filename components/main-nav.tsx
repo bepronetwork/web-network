@@ -29,7 +29,6 @@ export default function MainNav() {
         setAddress(beproAddress);
         setLoggedIn(true);
 
-        console.log('await BeproService.bepro.getIssuesByAddress():', await BeproService.network.getIssuesByAddress(beproAddress));
         setBeproStaked(await BeproService.network.getBEPROStaked())
         // console.log('%c%s', 'color: #00a3cc', await BeproService.bepro.getETHBalance());
     }

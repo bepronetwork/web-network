@@ -14,6 +14,7 @@ export default function PageCreateIssue() {
   // TODO add loaders since is slow on metamask
   const allow = async (evt) => {
     evt.preventDefault();
+    await BeproService.login();
     const beproAddress = await BeproService.getAddress();
     const payload = {
       amount: issueAmount,
@@ -37,6 +38,7 @@ export default function PageCreateIssue() {
     const beproAddress = await BeproService.getAddress();
     const contractPayload = {tokenAmount: issueAmount, cid: beproAddress};
     const res = await BeproService.network.openIssue(contractPayload);
+    console.log("🚀 ~ file: create-issue.tsx ~ line 41 ~ createIssue ~ res", res)
 
     payload.issueId = res?.transactionHash;
     const res2 = await GithubMicroService.createIssue(payload);
