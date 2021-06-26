@@ -2,8 +2,20 @@ import { GetStaticProps } from 'next'
 import React, { useEffect, useState } from 'react';
 import AccountHero from '../components/account-hero';
 import IssueListItem from '../components/issue-list-item';
+import BeproService from '../services/bepro';
 
 export default function PageAccount() {
+
+  useEffect(() => {
+    getMyIssues();
+  }, []); // initial load
+
+  const getMyIssues = async () => {
+    await BeproService.login();
+    const beproAddress = await BeproService.getAddress();
+    console.log('await BeproService.bepro.getIssuesByAddress():', await BeproService.network.getIssuesByAddress(beproAddress));
+  }
+
   return (
       <div>
         <AccountHero></AccountHero>
