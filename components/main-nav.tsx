@@ -15,12 +15,13 @@ export default function MainNav() {
     }, []); // initial load
 
     const checkLogin = async () => {
-        if (await BeproService.isLoggedIn()) {
-            setAddress(await BeproService.getAddress());
-            setLoggedIn(true);
-        } else {
-            setLoggedIn(false);
-        }
+        await login();
+        // if (await BeproService.isLoggedIn()) {
+        //     setAddress(await BeproService.getAddress());
+        //     setLoggedIn(true);
+        // } else {
+        //     setLoggedIn(false);
+        // }
     }
 
     const login = async () => {
@@ -85,3 +86,4 @@ export const getStaticProps: GetStaticProps = async () => {
         props: {}
     }
 }
+

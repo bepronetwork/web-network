@@ -1,11 +1,10 @@
 import { GetStaticProps } from 'next'
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import AccountHero from '../components/account-hero';
 import IssueListItem from '../components/issue-list-item';
 import BeproService from '../services/bepro';
 
 export default function PageAccount() {
-
   useEffect(() => {
     getMyIssues();
   }, []); // initial load
