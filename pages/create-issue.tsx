@@ -88,7 +88,7 @@ export default function PageCreateIssue() {
                       <span className="input-group-text text-white-50 p-small">$BEPRO</span>
                     </div>
                     <div className="d-flex justify-content">
-                    <p className="p-small trans my-2">{isNaN(parseInt(issueAmount))? balance : balance - toNumber(issueAmount)} $BEPRO </p> 
+                    <p className="p-small trans my-2">{balance} $BEPRO </p> 
                     <a className="button-max p-small ms-1 my-2" onClick={() => setIssueAmount(String(balance))}>(Max)</a> 
                     </div>
                   </div>
