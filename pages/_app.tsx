@@ -1,8 +1,14 @@
 import "../styles/styles.scss";
 import { AppProps } from "next/app";
 import Head from "next/head";
+import BeproService from "../services/bepro";
+import MainNav from "../components/main-nav";
 
 export default function App({ Component, pageProps }: AppProps) {
+  (async () => {
+    await BeproService.init();
+  })();
+
   return (
     <>
       <Head>
@@ -12,6 +18,7 @@ export default function App({ Component, pageProps }: AppProps) {
         />
         <title>WEB Network</title>
       </Head>
+      <MainNav />
       <Component {...pageProps} />
     </>
   );

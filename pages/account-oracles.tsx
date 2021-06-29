@@ -1,18 +1,16 @@
-import { GetStaticProps } from "next";
-import React, { useEffect, useState } from "react";
-import AccountHero from "../components/account-hero";
+import { GetStaticProps } from 'next'
+import React, { useEffect, useState } from 'react';
+import AccountHero from '../components/account-hero';
+import IssueListItem from '../components/issue-list-item';
+import PageHero from '../components/page-hero';
+import TypographyTest from '../components/typography-test';
 import AccountOraclesBeproMovement from "../components/account-oracles-bepro-movement";
 import DelegateOracle from "../components/delegate-oracle";
-import IssueListItem from "../components/issue-list-item";
-import MainNav from "../components/main-nav";
-import PageHero from "../components/page-hero";
-import TypographyTest from "../components/typography-test";
 
 export default function PageAccountOracles() {
   return (
-    <div>
-      <MainNav></MainNav>
-      <AccountHero></AccountHero>
+      <div>
+        <AccountHero></AccountHero>
 
       <div className="container">
         <div className="row">
