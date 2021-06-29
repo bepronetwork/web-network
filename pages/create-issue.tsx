@@ -11,7 +11,6 @@ export default function PageCreateIssue() {
   const [issueDescription, setIssueDescription] = useState("");
   const [issueAmount, setIssueAmount] = useState<string>('0');
   const [balance, setBalance] = useState<number>(2314);
-  //const [issueAmount, setIssueAmount] = useState<number>(0);
   const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
 
   // TODO add loaders since is slow on metamask
@@ -20,7 +19,7 @@ export default function PageCreateIssue() {
     await BeproService.login();
     const beproAddress = await BeproService.getAddress();
     const payload = {
-      amount: issueAmount,
+      amount: parseInt(issueAmount),
       address: beproAddress
     }
     const res = await BeproService.network.approveTransactionalERC20Token();
@@ -39,13 +38,17 @@ export default function PageCreateIssue() {
       issueId: null,
     }
     const beproAddress = await BeproService.getAddress();
-    const contractPayload = {tokenAmount: issueAmount, cid: beproAddress};
+    const contractPayload = {tokenAmount: parseInt(issueAmount), cid: beproAddress};
     const res = await BeproService.network.openIssue(contractPayload);
     console.log("🚀 ~ file: create-issue.tsx ~ line 41 ~ createIssue ~ res", res)
 
     payload.issueId = res.events?.OpenIssue?.returnValues?.id;
     const res2 = await GithubMicroService.createIssue(payload);
 
+  }
+
+  const title_and_description_validation = () => {
+    return (issueTitle.length && issueDescription.length) ? false : true
   }
 
   return (
@@ -86,7 +89,7 @@ export default function PageCreateIssue() {
                     </div>
                     <div className="d-flex justify-content">
                     <p className="p-small trans my-2">{isNaN(parseInt(issueAmount))? balance : balance - toNumber(issueAmount)} $BEPRO </p> 
-                    <a className="p-small ms-1 my-2" onClick={() => setIssueAmount(String(balance))}>(Max)</a> 
+                    <a className="button-max p-small ms-1 my-2" onClick={() => setIssueAmount(String(balance))}>(Max)</a> 
                     </div>
                   </div>
                   <div className="form-group">
@@ -103,7 +106,7 @@ export default function PageCreateIssue() {
                     }
                   </div>
                   <div className="d-flex align-items-center mt-2">
-                    <button className="btn btn-lg btn-primary" disabled={!allowedTransaction}>Create Issue</button>
+                    <button className="btn btn-lg btn-primary" disabled={(!allowedTransaction && title_and_description_validation())}>Create Issue</button>
                   </div>
                 </div>
               </div>
