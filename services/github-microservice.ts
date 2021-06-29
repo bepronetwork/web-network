@@ -6,6 +6,9 @@ export default class GithubMicroService {
 
   static async createIssue(payload) {
     await axios.post(API_HOST  + '/issues', payload);
-
+  }
+  static async getIssues(issueIds) {
+    const {data} = await axios.get(API_HOST  + '/issues', {params: {issueIds}});
+    return data;
   }
 }
