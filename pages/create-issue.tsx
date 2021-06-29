@@ -19,7 +19,7 @@ export default function PageCreateIssue() {
     await BeproService.login();
     const beproAddress = await BeproService.getAddress();
     const payload = {
-      amount: parseInt(issueAmount),
+      amount: toNumber(issueAmount),
       address: beproAddress
     }
     const res = await BeproService.network.approveTransactionalERC20Token();
@@ -38,7 +38,7 @@ export default function PageCreateIssue() {
       issueId: null,
     }
     const beproAddress = await BeproService.getAddress();
-    const contractPayload = {tokenAmount: parseInt(issueAmount), cid: beproAddress};
+    const contractPayload = {tokenAmount: toNumber(issueAmount), cid: beproAddress};
     const res = await BeproService.network.openIssue(contractPayload);
     console.log("🚀 ~ file: create-issue.tsx ~ line 41 ~ createIssue ~ res", res)
 
@@ -82,7 +82,7 @@ export default function PageCreateIssue() {
                   <div className="form-group col-md-4 mb-4">
                     <label className="p-small mb-2">Set $BEPRO value</label>
                     <div className="input-group">
-                      <input min="0" max={`${balance}`} step="0.0000001" type="number" className="form-control" placeholder="0"
+                      <input min="0" max={`${balance}`} step="0.0000000001" type="number" className="form-control" placeholder="0"
                         value={issueAmount}
                         onChange={e => setIssueAmount(e.target.value)}/>
                       <span className="input-group-text text-white-50 p-small">$BEPRO</span>
