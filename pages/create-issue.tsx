@@ -1,12 +1,14 @@
 import { GetStaticProps } from 'next'
+import { title } from 'process';
 import React, { useEffect, useState } from 'react';
+import { toNumber } from '../helpers/number-transformation';
 import BeproService from '../services/bepro';
 
 export default function PageCreateIssue() {
 
   const [issueTitle, setIssueTitle] = useState("");
   const [issueDescription, setIssueDescription] = useState("");
-  const [issueAmount, setIssueAmount] = useState<number>(0);
+  const [issueAmount, setIssueAmount] = useState<string>('0');
   const [balance, setBalance] = useState<number>(2314);
 
   const createIssue = async (evt) => {
@@ -18,8 +20,9 @@ export default function PageCreateIssue() {
     }
     // await axios.post('/issues', payload);
     const beproAddress = await BeproService.getAddress();
-    const test = await BeproService.network.openIssue({tokenAmount: issueAmount, address: beproAddress});
-
+    
+    const test = await BeproService.network.openIssue({tokenAmount: parseInt(issueAmount), address: beproAddress});
+    console.log('test ->', issueAmount,toNumber(issueAmount) )
   }
 
   return (
@@ -53,12 +56,15 @@ export default function PageCreateIssue() {
                   <div className="form-group col-md-4 mb-4">
                     <label className="p-small mb-2">Set $BEPRO value</label>
                     <div className="input-group">
-                      <input min="0" max={balance} type="number" className="form-control" placeholder="0"
+                      <input min="0" max={`${balance}`} step="0.0000001" type="number" className="form-control" placeholder="0"
                         value={issueAmount}
-                        onChange={e => setIssueAmount(parseInt(e.target.value))}/>
+                        onChange={e => setIssueAmount(e.target.value)}/>
                       <span className="input-group-text text-white-50 p-small">$BEPRO</span>
                     </div>
-                    <p className="p-small trans my-2">{isNaN(issueAmount)? balance : balance - issueAmount} $BEPRO (Max)</p>  
+                    <div className="d-flex justify-content">
+                    <p className="p-small trans my-2">{isNaN(parseInt(issueAmount))? balance : balance - toNumber(issueAmount)} $BEPRO </p> 
+                    <a className="p-small ms-1 my-2" onClick={() => setIssueAmount(String(balance))}>(Max)</a> 
+                    </div>
                   </div>
                   <div className="form-group">
                     <label className="p-small mb-2">Description</label>
@@ -69,7 +75,9 @@ export default function PageCreateIssue() {
                   </div>
                   <div className="d-flex justify-content-center align-items-center pt-4 pb-2">
                     <button type="button" className="btn btn-lg btn-opac me-3 px-5">Approve</button>
-                    <button className="btn btn-lg btn-primary ms-3 px-4">Create Issue</button>
+                    <button className="btn btn-lg btn-primary ms-3 px-4" 
+                      disabled={(issueTitle.length && issueDescription.length) ? false : true}>Create Issue
+                    </button>
                   </div>
                 </div>
               </div>
