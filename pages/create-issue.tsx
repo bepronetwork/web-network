@@ -60,6 +60,10 @@ export default function PageCreateIssue() {
     return !(issueTitle.length && issueDescription.length)
   }
 
+  const verifyAmountBiggerThanBalance = () => {
+    return (toNumber(issueAmount) > toNumber(balance))
+  }
+
   const handleIssueAmountBlurChange = (event: ChangeEvent<HTMLInputElement>) => {
     let { value } = event.target;
 
@@ -126,7 +130,7 @@ export default function PageCreateIssue() {
                     }
                   </div>
                   <div className="d-flex align-items-center mt-2">
-                    <button className="btn btn-lg btn-primary" disabled={(!allowedTransaction && titleAndIssueExist())}>Create Issue</button>
+                    <button className="btn btn-lg btn-primary" disabled={(!allowedTransaction && titleAndIssueExist() && verifyAmountBiggerThanBalance())}>Create Issue</button>
                   </div>
                 </div>
               </div>
