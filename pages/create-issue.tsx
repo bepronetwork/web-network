@@ -1,15 +1,20 @@
 import { GetStaticProps } from 'next'
-import { title } from 'process';
-import React, { ChangeEvent, useEffect, useState } from 'react';
-import { toNumber } from '../helpers/number-transformation';
+import React, { useEffect, useState } from 'react';
+import NumberFormat from 'react-number-format';
 import BeproService from '../services/bepro';
 import GithubMicroService from '../services/github-microservice';
+
+interface Amount {
+  value?: string,
+  formattedValue: string,
+  floatValue?: number
+}
 
 export default function PageCreateIssue() {
 
   const [issueTitle, setIssueTitle] = useState("");
   const [issueDescription, setIssueDescription] = useState("");
-  const [issueAmount, setIssueAmount] = useState<string>('0');
+  const [issueAmount, setIssueAmount] = useState<Amount>({ value: '0', formattedValue: '0', floatValue: 0});
   const [balance, setBalance] = useState<string>('0');
   const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
 
@@ -28,7 +33,7 @@ export default function PageCreateIssue() {
     await BeproService.login();
     const beproAddress = await BeproService.getAddress();
     const payload = {
-      amount: toNumber(issueAmount),
+      amount:  issueAmount.floatValue,
       address: beproAddress
     }
     const res = await BeproService.network.approveTransactionalERC20Token();
@@ -47,7 +52,7 @@ export default function PageCreateIssue() {
       issueId: null,
     }
     const beproAddress = await BeproService.getAddress();
-    const contractPayload = {tokenAmount: toNumber(issueAmount), cid: beproAddress};
+    const contractPayload = {tokenAmount: issueAmount.floatValue, cid: beproAddress};
     const res = await BeproService.network.openIssue(contractPayload);
     console.log("🚀 ~ file: create-issue.tsx ~ line 41 ~ createIssue ~ res", res)
 
@@ -61,7 +66,7 @@ export default function PageCreateIssue() {
   }
 
   const verifyAmountBiggerThanBalance = () => {
-    return !(toNumber(issueAmount) > toNumber(balance))
+    return !(issueAmount.floatValue > Number(balance))
   }
 
   const checksToEnableCreateIssue = () => {
@@ -71,31 +76,25 @@ export default function PageCreateIssue() {
       return true
     }else if(!verifyAmountBiggerThanBalance()){
       return true
-    }else if(Number(issueAmount) <= 0 ){
+    }else if(issueAmount.floatValue <= 0 || issueAmount.formattedValue === ""){
       return true
     }else {
       return false
     }
   }
 
-  const handleIssueAmountBlurChange = (event: ChangeEvent<HTMLInputElement>) => {
-    let { value } = event.target;
-
-    if (Number(value) > Number(balance)) {
-      value = balance;
+  const handleIssueAmountBlurChange = () => {
+    if (issueAmount.floatValue > Number(balance)) {
+      setIssueAmount({formattedValue: balance});
     }
-
-    setIssueAmount(value);
   }
 
-  const handleIssueAmountOnChange = (event: ChangeEvent<HTMLInputElement>) => {
-    let { value } = event.target;
-
-    if (Number(value) < 0) {
-      value = '0';
+  const handleIssueAmountOnValueChange = (values: Amount) => {
+    if (values.floatValue < 0 || values.value === '-'){
+      setIssueAmount({formattedValue: ''})
+    }else {
+      setIssueAmount(values)
     }
-
-    setIssueAmount(value);
   }
 
   return (
@@ -129,15 +128,16 @@ export default function PageCreateIssue() {
                   <div className="form-group col-md-4 mb-4">
                     <label className="p-small mb-2">Set $BEPRO value</label>
                     <div className="input-group">
-                      <input min="0" max={`${balance}`} step="0.000001" type="number" className="form-control" placeholder="0"
-                        value={issueAmount}
-                        onChange={handleIssueAmountOnChange}
+                      <NumberFormat min="0" max={`${balance}`} className="form-control" placeholder="0"
+                        value={issueAmount.formattedValue}
+                        thousandSeparator={true}
+                        onValueChange={handleIssueAmountOnValueChange}
                         onBlur={handleIssueAmountBlurChange}/>
                       <span className="input-group-text text-white-50 p-small">$BEPRO</span>
                     </div>
                     <div className="d-flex justify-content">
                     <p className="p-small trans my-2">{balance} $BEPRO </p> 
-                    <a className="button-max p-small ms-1 my-2" onClick={() => setIssueAmount(String(balance))}>(Max)</a> 
+                    <a className="button-max p-small ms-1 my-2" onClick={() => setIssueAmount({formattedValue: balance})}>(Max)</a> 
                     </div>
                   </div>
                   <div className="form-group">
@@ -154,6 +154,7 @@ export default function PageCreateIssue() {
                     }
                   </div>
                   <div className="d-flex align-items-center mt-2">
+                    {console.log('loadash to number ->', )}
                     <button className="btn btn-lg btn-primary" disabled={checksToEnableCreateIssue()}>Create Issue</button>
                   </div>
                 </div>
