@@ -1,6 +1,6 @@
 import { GetStaticProps } from 'next'
 import { title } from 'process';
-import React, { useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { toNumber } from '../helpers/number-transformation';
 import BeproService from '../services/bepro';
 import GithubMicroService from '../services/github-microservice';
@@ -10,8 +10,17 @@ export default function PageCreateIssue() {
   const [issueTitle, setIssueTitle] = useState("");
   const [issueDescription, setIssueDescription] = useState("");
   const [issueAmount, setIssueAmount] = useState<string>('0');
-  const [balance, setBalance] = useState<number>(2314);
+  const [balance, setBalance] = useState<string>('0');
   const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
+
+
+  useEffect(() => {
+    const resBepro = async () => {
+      await BeproService.login();
+      setBalance(await BeproService.network.getBEPROStaked())
+    }
+    resBepro()
+  },[])
 
   // TODO add loaders since is slow on metamask
   const allow = async (evt) => {
@@ -51,6 +60,16 @@ export default function PageCreateIssue() {
     return (issueTitle.length && issueDescription.length) ? false : true
   }
 
+  const handleIssueAmountBlurChange = (event: ChangeEvent<HTMLInputElement>) => {
+    let { value } = event.target;
+
+    if (Number(value) > Number(balance)) {
+      value = balance;
+    }
+
+    setIssueAmount(value);
+  }
+
   return (
       <>
         <div className="banner bg-bepro-blue mb-4">
@@ -82,9 +101,10 @@ export default function PageCreateIssue() {
                   <div className="form-group col-md-4 mb-4">
                     <label className="p-small mb-2">Set $BEPRO value</label>
                     <div className="input-group">
-                      <input min="0" max={`${balance}`} step="0.0000000001" type="number" className="form-control" placeholder="0"
+                      <input min="0" max={`${balance}`} step="0.0000001" type="number" className="form-control" placeholder="0"
                         value={issueAmount}
-                        onChange={e => setIssueAmount(e.target.value)}/>
+                        onChange={e => setIssueAmount(e.target.value)}
+                        onBlur={handleIssueAmountBlurChange}/>
                       <span className="input-group-text text-white-50 p-small">$BEPRO</span>
                     </div>
                     <div className="d-flex justify-content">
