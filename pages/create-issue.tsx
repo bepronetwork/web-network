@@ -61,7 +61,21 @@ export default function PageCreateIssue() {
   }
 
   const verifyAmountBiggerThanBalance = () => {
-    return (toNumber(issueAmount) > toNumber(balance))
+    return !(toNumber(issueAmount) > toNumber(balance))
+  }
+
+  const checksToEnableCreateIssue = () => {
+    if (!allowedTransaction === false){
+      return true
+    }else if(titleAndIssueExist() === true){
+      return true
+    }else if(verifyAmountBiggerThanBalance() === false){
+      return true
+    }else if(Number(issueAmount) <= 0 ){
+      return true
+    }else {
+      return false
+    }
   }
 
   const handleIssueAmountBlurChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -69,6 +83,16 @@ export default function PageCreateIssue() {
 
     if (Number(value) > Number(balance)) {
       value = balance;
+    }
+
+    setIssueAmount(value);
+  }
+
+  const handleIssueAmountOnChange = (event: ChangeEvent<HTMLInputElement>) => {
+    let { value } = event.target;
+
+    if (Number(value) < 0) {
+      value = '0';
     }
 
     setIssueAmount(value);
@@ -107,7 +131,7 @@ export default function PageCreateIssue() {
                     <div className="input-group">
                       <input min="0" max={`${balance}`} step="0.0000001" type="number" className="form-control" placeholder="0"
                         value={issueAmount}
-                        onChange={e => setIssueAmount(e.target.value)}
+                        onChange={handleIssueAmountOnChange}
                         onBlur={handleIssueAmountBlurChange}/>
                       <span className="input-group-text text-white-50 p-small">$BEPRO</span>
                     </div>
@@ -130,7 +154,7 @@ export default function PageCreateIssue() {
                     }
                   </div>
                   <div className="d-flex align-items-center mt-2">
-                    <button className="btn btn-lg btn-primary" disabled={(!allowedTransaction && titleAndIssueExist() && verifyAmountBiggerThanBalance())}>Create Issue</button>
+                    <button className="btn btn-lg btn-primary" disabled={checksToEnableCreateIssue()}>Create Issue</button>
                   </div>
                 </div>
               </div>
