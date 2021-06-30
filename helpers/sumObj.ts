@@ -1,4 +1,4 @@
-export function sumObj(params: Object) {
+export function sumObj(params: Object): number {
   let sum = 0;
   for (const prop in params) {
     if (params.hasOwnProperty(prop)) {

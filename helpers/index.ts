@@ -1,0 +1,1 @@
+export { sumObj } from "./sumObj";
