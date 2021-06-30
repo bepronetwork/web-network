@@ -11,6 +11,7 @@ export default function ButtonDialog({
   onHide = () => {},
   className = "btn-primary",
   disabled = false,
+  label = "",
   ...params
 }: {
   title: string;
@@ -21,6 +22,7 @@ export default function ButtonDialog({
   onHide?: () => void;
   className?: string;
   disabled?: boolean;
+  label?: string;
 }) {
   return (
     <>
@@ -29,7 +31,7 @@ export default function ButtonDialog({
         onClick={onClick}
         disabled={disabled}
         {...params}>
-        {title}
+        {label || title}
       </button>
       <Modal
         centered
