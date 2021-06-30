@@ -33,7 +33,6 @@ export default class BeproService {
       }
     });
     // this.network.start();
-
   }
 
   public static async isLoggedIn() {
@@ -46,7 +45,8 @@ export default class BeproService {
   }
 
   public static async login() {
-    if (this.loggedIn) return true;
+    await BeproService.init();
+    // if (this.loggedIn) return true;
 
     try {
       this.loggedIn = await this.bepro.login();

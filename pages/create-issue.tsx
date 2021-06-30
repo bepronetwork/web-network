@@ -1,9 +1,7 @@
 import { GetStaticProps } from 'next'
-import React, { useEffect, useState } from 'react';
-import IssueListItem from '../components/issue-list-item';
-import PageHero from '../components/page-hero';
-import TypographyTest from '../components/typography-test';
+import React, { useState } from 'react';
 import BeproService from '../services/bepro';
+import GithubMicroService from '../services/github-microservice';
 
 export default function PageCreateIssue() {
 
@@ -11,17 +9,39 @@ export default function PageCreateIssue() {
   const [issueTitle, setIssueTitle] = useState("");
   const [issueDescription, setIssueDescription] = useState("");
   const [issueAmount, setIssueAmount] = useState<number>(0);
+  const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
 
+  // TODO add loaders since is slow on metamask
+  const allow = async (evt) => {
+    evt.preventDefault();
+    await BeproService.login();
+    const beproAddress = await BeproService.getAddress();
+    const payload = {
+      amount: issueAmount,
+      address: beproAddress
+    }
+    const res = await BeproService.network.approveTransactionalERC20Token();
+    const resApproved = await BeproService.network.isApprovedTransactionalToken(payload);
+    if (resApproved) {
+      setAllowedTransaction(true);
+    }
+
+  }
   const createIssue = async (evt) => {
     evt.preventDefault();
 
     const payload = {
       title: issueTitle,
       description: issueDescription,
+      issueId: null,
     }
-    // await axios.post('/issues', payload);
     const beproAddress = await BeproService.getAddress();
-    const test = await BeproService.network.openIssue({tokenAmount: issueAmount, address: beproAddress});
+    const contractPayload = {tokenAmount: issueAmount, cid: beproAddress};
+    const res = await BeproService.network.openIssue(contractPayload);
+    console.log("🚀 ~ file: create-issue.tsx ~ line 41 ~ createIssue ~ res", res)
+
+    payload.issueId = res.events?.OpenIssue?.returnValues?.id;
+    const res2 = await GithubMicroService.createIssue(payload);
 
   }
 
@@ -66,7 +86,13 @@ export default function PageCreateIssue() {
                     ></textarea>
                   </div>
                   <div className="d-flex align-items-center">
-                    <button className="btn btn-lg btn-primary">Create Issue</button>
+                    {!allowedTransaction ?
+                      <button className="btn btn-lg btn-primary" onClick={allow}>Allow the Nework Protocol to use your BEPRO</button>
+                      : null
+                    }
+                  </div>
+                  <div className="d-flex align-items-center mt-2">
+                    <button className="btn btn-lg btn-primary" disabled={!allowedTransaction}>Create Issue</button>
                   </div>
                 </div>
               </div>
