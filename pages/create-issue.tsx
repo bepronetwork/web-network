@@ -65,7 +65,7 @@ export default function PageCreateIssue() {
   }
 
   const checksToEnableCreateIssue = () => {
-    if (allowedTransaction){
+    if (!allowedTransaction){
       return true
     }else if(titleAndIssueExist()){
       return true
