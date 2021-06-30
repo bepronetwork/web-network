@@ -65,7 +65,7 @@ export default function PageCreateIssue() {
   }
 
   const checksToEnableCreateIssue = () => {
-    if (!allowedTransaction){
+    if (allowedTransaction){
       return true
     }else if(titleAndIssueExist()){
       return true
@@ -129,7 +129,7 @@ export default function PageCreateIssue() {
                   <div className="form-group col-md-4 mb-4">
                     <label className="p-small mb-2">Set $BEPRO value</label>
                     <div className="input-group">
-                      <input min="0" max={`${balance}`} step="0.0000001" type="number" className="form-control" placeholder="0"
+                      <input min="0" max={`${balance}`} step="0.000001" type="number" className="form-control" placeholder="0"
                         value={issueAmount}
                         onChange={handleIssueAmountOnChange}
                         onBlur={handleIssueAmountBlurChange}/>
