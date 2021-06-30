@@ -56,8 +56,8 @@ export default function PageCreateIssue() {
 
   }
 
-  const title_and_description_validation = () => {
-    return (issueTitle.length && issueDescription.length) ? false : true
+  const titleAndIssueExist = () => {
+    return !(issueTitle.length && issueDescription.length)
   }
 
   const handleIssueAmountBlurChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -126,7 +126,7 @@ export default function PageCreateIssue() {
                     }
                   </div>
                   <div className="d-flex align-items-center mt-2">
-                    <button className="btn btn-lg btn-primary" disabled={(!allowedTransaction && title_and_description_validation())}>Create Issue</button>
+                    <button className="btn btn-lg btn-primary" disabled={(!allowedTransaction && titleAndIssueExist())}>Create Issue</button>
                   </div>
                 </div>
               </div>
