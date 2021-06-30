@@ -65,11 +65,11 @@ export default function PageCreateIssue() {
   }
 
   const checksToEnableCreateIssue = () => {
-    if (allowedTransaction === false){
+    if (allowedTransaction){
       return true
-    }else if(titleAndIssueExist() === true){
+    }else if(titleAndIssueExist()){
       return true
-    }else if(verifyAmountBiggerThanBalance() === false){
+    }else if(!verifyAmountBiggerThanBalance()){
       return true
     }else if(Number(issueAmount) <= 0 ){
       return true
