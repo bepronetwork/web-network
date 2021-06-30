@@ -15,12 +15,13 @@ export default function MainNav() {
     }, []); // initial load
 
     const checkLogin = async () => {
-        if (await BeproService.isLoggedIn()) {
-            setAddress(await BeproService.getAddress());
-            setLoggedIn(true);
-        } else {
-            setLoggedIn(false);
-        }
+        await login();
+        // if (await BeproService.isLoggedIn()) {
+        //     setAddress(await BeproService.getAddress());
+        //     setLoggedIn(true);
+        // } else {
+        //     setLoggedIn(false);
+        // }
     }
 
     const login = async () => {
@@ -29,7 +30,6 @@ export default function MainNav() {
         setAddress(beproAddress);
         setLoggedIn(true);
 
-        console.log('await BeproService.bepro.getIssuesByAddress():', await BeproService.network.getIssuesByAddress(beproAddress));
         setBeproStaked(await BeproService.network.getBEPROStaked())
         // console.log('%c%s', 'color: #00a3cc', await BeproService.bepro.getETHBalance());
     }
@@ -46,9 +46,9 @@ export default function MainNav() {
                         />
                     </a>
                     <ul className="nav-links">
-                        <li><a href="/developers">Developers</a></li>
-                        <li><a href="/council">Council</a></li>
-                        <li><a href="/oracle">Oracle</a></li>
+                        <li><Link href="/account" ><a href="/developers">Developers</a></Link></li>
+                        <li><Link href="/council" ><a href="/council">Council</a></Link></li>
+                        <li><Link href="/oracle" ><a href="/oracle">Oracle</a></Link></li>
                         {/* <li><a href="/">Lists</a></li>
                         <li><a href="/issue">Issue</a></li>
                         <li><a href="/proposal">Proposal</a></li>
@@ -63,7 +63,7 @@ export default function MainNav() {
                         <button className="btn btn-md btn-white" onClick={login}>Connect <i className="ico-metamask ml-1"></i></button>
                     :
                         <div className="d-flex account-info align-items-center">
-                            <button className="btn btn-md btn-trans mr-1"><i className="ico-bepro mr-1"></i>{beproStaked}</button>
+                            <Link href="/account" ><button className="btn btn-md btn-trans mr-1"><i className="ico-bepro mr-1"></i>{beproStaked}</button></Link>
                             <Link href="/account" >
                                 <a className="meta-info d-flex align-items-center">
                                     <div className="d-flex flex-column text-right">
@@ -86,3 +86,4 @@ export const getStaticProps: GetStaticProps = async () => {
         props: {}
     }
 }
+

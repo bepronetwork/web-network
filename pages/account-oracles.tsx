@@ -1,4 +1,5 @@
 import { GetStaticProps } from 'next'
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import AccountHero from '../components/account-hero';
 import IssueListItem from '../components/issue-list-item';
@@ -12,18 +13,14 @@ export default function PageAccountOracles() {
       <div>
         <AccountHero></AccountHero>
 
-      <div className="container">
-        <div className="row">
-          <div className="d-flex justify-content-center mb-3">
-            <a className="subnav-item mr-3" href="/account">
-              <h3 className="h3">My issues</h3>
-            </a>
-            <a className="subnav-item active" href="/account-oracles">
-              <h3 className="h3">My oracles</h3>
-            </a>
+        <div className="container">
+          <div className="row">
+            <div className="d-flex justify-content-center mb-3">
+              <Link href="/account" ><a className="subnav-item mr-3" href="/account"><h3 className="h3">My issues</h3></a></Link>
+              <Link href="/account" ><a className="subnav-item active" href="/account-oracles"><h3 className="h3">My oracles</h3></a></Link>
+            </div>
           </div>
         </div>
-      </div>
 
       <div className="container">
         <div className="row justify-content-center mb-5">

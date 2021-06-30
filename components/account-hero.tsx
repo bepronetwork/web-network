@@ -1,7 +1,7 @@
 import { GetStaticProps } from 'next'
 import { useEffect, useState } from 'react';
 
-export default function AccountHero() {
+export default function AccountHero({issuesCount = 0}, {issuesCount: number}) {
     return (
         <div className="banner bg-bepro-blue mb-4">
             <div className="container">
@@ -12,7 +12,7 @@ export default function AccountHero() {
                             <div className="row">
                                 <div className="col-md-4">
                                     <div className="top-border">
-                                        <h4 className="h4 mb-0">3</h4>
+                                        <h4 className="h4 mb-0">{issuesCount}</h4>
                                         <span className="p-small">Issues</span>
                                     </div>
                                 </div>
