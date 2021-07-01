@@ -61,26 +61,18 @@ export default function PageCreateIssue() {
 
   }
 
-  const titleAndIssueExist = () => {
-    return !(issueTitle.length && issueDescription.length)
-  }
+  const issueContentIsValid = () =>  !!issueTitle && !!issueDescription;
 
-  const verifyAmountBiggerThanBalance = () => {
-    return !(issueAmount.floatValue > Number(balance))
-  }
+  const verifyAmountBiggerThanBalance = () => !(issueAmount.floatValue > Number(balance))
 
-  const checksToEnableCreateIssue = () => {
-    if (!allowedTransaction){
-      return true
-    }else if(titleAndIssueExist()){
-      return true
-    }else if(!verifyAmountBiggerThanBalance()){
-      return true
-    }else if(issueAmount.floatValue <= 0 || issueAmount.formattedValue === ""){
-      return true
-    }else {
-      return false
-    }
+  const isButtonDisabled = (): boolean => {
+    return [
+      allowedTransaction,
+      issueContentIsValid(),
+      verifyAmountBiggerThanBalance(),
+      issueAmount.floatValue > 0, 
+      !!issueAmount.formattedValue
+    ].some(value => value === false);
   }
 
   const handleIssueAmountBlurChange = () => {
@@ -154,7 +146,7 @@ export default function PageCreateIssue() {
                       : null
                     }
                   <div className="d-flex justify-content-center align-items-center mt-2">
-                    <button className="btn btn-lg btn-primary" disabled={checksToEnableCreateIssue()}>Create Issue</button>
+                    <button className="btn btn-lg btn-primary" disabled={isButtonDisabled()}>Create Issue</button>
                   </div>
                 </div>
               </div>
