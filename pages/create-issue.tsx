@@ -61,9 +61,9 @@ export default function PageCreateIssue() {
 
   }
 
-  const issueContentIsValid = () =>  !!issueTitle && !!issueDescription;
+  const issueContentIsValid = (): boolean =>  !!issueTitle && !!issueDescription;
 
-  const verifyAmountBiggerThanBalance = () => !(issueAmount.floatValue > Number(balance))
+  const verifyAmountBiggerThanBalance = (): boolean => !(issueAmount.floatValue > Number(balance))
 
   const isButtonDisabled = (): boolean => {
     return [
