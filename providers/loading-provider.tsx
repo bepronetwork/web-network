@@ -10,7 +10,7 @@ const LoadingContext = createContext(false)
 function LoadingContextProvider({ children }) {
   const [isLoading, setLoading] = useState<boolean>(false);
   setLoadingState = (value: boolean) => setLoading(value);
-  getLoadingState = () => getLoadingState();
+  getLoadingState = () => isLoading;
 
   return (
     <LoadingContext.Provider value={isLoading}>
