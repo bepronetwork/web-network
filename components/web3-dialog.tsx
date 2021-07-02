@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import WebThreeUnavailable from "../assets/web3-unavailable";
 import { isWebThreeInstalled } from "../helpers";
-import plaintText from "../plain-text";
+import plainText from "../plain-text";
 
 export default function WebThreeDialog() {
   const [show, setShow] = useState<boolean>(false);
@@ -22,15 +22,15 @@ export default function WebThreeDialog() {
       aria-describedby={`${kebabCase("WebThreeDialog")}-modal`}
       show={!show}>
       <Modal.Header>
-        <Modal.Title>{plaintText.enUs["0000"]}</Modal.Title>
+        <Modal.Title>{plainText.enUs["0000"]}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <p className="p-small text-white-50 text-center">
-          {plaintText.enUs["0001"]}
+          {plainText.enUs["0001"]}
         </p>
         <div className="d-flex flex-column align-items-center">
           <WebThreeUnavailable />
-          <p className="p mb-0 text-center">{plaintText.enUs["0002"]}</p>
+          <p className="p mb-0 text-center">{plainText.enUs["0002"]}</p>
         </div>
       </Modal.Body>
       <Modal.Footer>
@@ -39,12 +39,12 @@ export default function WebThreeDialog() {
           href="https://metamask.io/download.html"
           rel="noopener noreferrer"
           target="_blank">
-          install
+          {plainText.enUs["0003"]}
         </a>
         <button
           className="btn btn-md btn-primary"
           onClick={handleClickTryAgain}>
-          Try again
+          {plainText.enUs["0004"]}
         </button>
       </Modal.Footer>
     </Modal>
