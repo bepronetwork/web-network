@@ -4,7 +4,7 @@ import Head from 'next/head'
 import BeproService from '../services/bepro';
 import MainNav from '../components/main-nav';
 import React from 'react';
-import { LoadingContextProvider } from '../providers/loading';
+import { LoadingContextProvider } from '../providers/loading-provider';
 
 export default function App({ Component, pageProps }: AppProps) {
   
