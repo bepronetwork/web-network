@@ -30,7 +30,7 @@ export default function WebThreeDialog() {
         </p>
         <div className="d-flex flex-column align-items-center">
           <WebThreeUnavailable />
-          <p className="p mb-0 text-center">{plainText.enUs["0002"]}</p>
+          <p className="p mb-0 mt-4 text-center">{plainText.enUs["0002"]}</p>
         </div>
       </Modal.Body>
       <Modal.Footer>

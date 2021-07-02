@@ -9,8 +9,14 @@ li {
   list-style: none;
 }
 .modal {
+  &-header {
+    padding-bottom: 0.2rem;
+  }
   &-content {
     background-color: $bg-shadow;
+  }
+  &-body {
+    padding-top: 0.2rem;
   }
   &-header,
   &-footer {
