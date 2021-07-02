@@ -1,6 +1,6 @@
 import '../styles/styles.scss'
 import { AppProps } from 'next/app'
-
+import WebThreeDialog from '../components/web3-dialog';
 import Head from 'next/head'
 import BeproService from '../services/bepro';
 import MainNav from '../components/main-nav';
@@ -16,6 +16,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <Head>
     </Head>
     <MainNav></MainNav>
+    <WebThreeDialog />
     <Component {...pageProps} />
 
   </>
