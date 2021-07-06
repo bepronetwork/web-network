@@ -1,14 +1,13 @@
-import clsx from "clsx";
 import { Fragment, useState } from "react";
 import ButtonDialog from "./button-dialog";
 
 export default function AccountOraclesBeproMovements({
   movement = "Lock",
-  amount = "0",
+  amount = 0,
   onClose = () => {},
 }: {
   movement: string;
-  amount: string;
+  amount: number;
   onClose: () => void;
 }): JSX.Element {
   const [show, setShow] = useState<boolean>(false);
