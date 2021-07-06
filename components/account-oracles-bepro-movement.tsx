@@ -1,13 +1,13 @@
 import clsx from "clsx";
 import { ChangeEvent, useState } from "react";
-import { Form } from "react-bootstrap";
 import AccountOraclesBeproMovements from "./account-oracles-bepro-movements";
+import NumberFormat, { NumberFormatValues } from "react-number-format";
 
 const movements: string[] = ["Lock", "Unlock"];
 
 export default function AccountOraclesBeproMovement(): JSX.Element {
   const [movement, setMovement] = useState<string>(movements[0]);
-  const [amount, setAmount] = useState<string>("");
+  const [amount, setAmount] = useState<number>(0);
   const renderMovements = movements.map((movementItem) => (
     <button
       key={movementItem}
@@ -27,11 +27,11 @@ export default function AccountOraclesBeproMovement(): JSX.Element {
     handleCloseMovement();
     setMovement(params);
   }
-  function handleChange(event: ChangeEvent<HTMLInputElement>) {
-    setAmount(event.target.value);
+  function handleChange(values: NumberFormatValues) {
+    setAmount(values.floatValue);
   }
   function handleCloseMovement() {
-    setAmount("");
+    setAmount(0);
   }
 
   return (
@@ -41,13 +41,20 @@ export default function AccountOraclesBeproMovement(): JSX.Element {
         <span className="badge-opac">200 Available</span>
       </div>
       <p className="p text-white">{renderByMovement}</p>
-      <Form.Control
-        className="mb-4"
-        type="text"
-        value={amount}
-        placeholder="Amount"
-        onChange={handleChange}
-      />
+      <div className="input-group mb-4">
+        <NumberFormat
+          min="0"
+          className="form-control"
+          placeholder="0"
+          value={amount}
+          thousandSeparator={true}
+          onValueChange={handleChange}
+        />
+        <span className="input-group-text text-white-50 p-small">$BEPRO</span>
+      </div>
+      <button className="btn btn-md btn-lg btn-trans w-100 mb-4">
+        Approve
+      </button>
       <AccountOraclesBeproMovements
         onClose={handleCloseMovement}
         {...{ movement, amount }}
