@@ -4,6 +4,7 @@ import NumberFormat from 'react-number-format';
 import BeproService from '../services/bepro';
 import GithubMicroService from '../services/github-microservice';
 import { getLoadingState, setLoadingAttributes } from '../providers/loading-provider';
+import { BeproBalance } from '../helpers/bepro-balance';
 
 interface Amount {
   value?: string,
@@ -19,13 +20,12 @@ export default function PageCreateIssue() {
   const [balance, setBalance] = useState<string>('0');
   const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
 
+  const useBeproBalance = async () => {
+    setBalance(await BeproBalance())
+  }
 
   useEffect(() => {
-    const resBepro = async () => {
-      await BeproService.login();
-      setBalance(await BeproService.network.getBEPROStaked())
-    }
-    resBepro()
+    useBeproBalance()
   },[])
 
   // TODO add loaders since is slow on metamask
