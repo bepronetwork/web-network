@@ -65,11 +65,19 @@ export default function PageCreateIssue() {
       const res = await BeproService.network.openIssue(contractPayload);
       payload.issueId = res.events?.OpenIssue?.returnValues?.id;
       await GithubMicroService.createIssue(payload);
+      cleanFields()
       setLoadingAttributes(false);
     } catch (error){
       console.error(error)
       setLoadingAttributes(false);
     }
+  }
+
+  const cleanFields = () => {
+    setIssueTitle('')
+    setIssueDescription('')
+    setIssueAmount({ value: '0', formattedValue: '0', floatValue: 0})
+    setAllowedTransaction(false)
   }
 
   const issueContentIsValid = (): boolean =>  !!issueTitle && !!issueDescription;
