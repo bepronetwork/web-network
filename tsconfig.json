@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es5",
     "lib": [
-      "dom", 
+      "dom",
       "dom.iterable",
       "esnext"
     ],
@@ -23,7 +23,7 @@
   ],
   "include": [
     "next-env.d.ts",
-    "**/*.ts", 
+    "**/*.ts",
     "**/*.tsx"
   ]
 }
