@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import NumberFormat from 'react-number-format';
 import BeproService from '../services/bepro';
 import GithubMicroService from '../services/github-microservice';
+import { getLoadingState, setLoadingAttributes } from '../providers/loading-provider';
 
 interface Amount {
   value?: string,
@@ -29,36 +30,44 @@ export default function PageCreateIssue() {
 
   // TODO add loaders since is slow on metamask
   const allow = async (evt) => {
-    evt.preventDefault();
-    await BeproService.login();
-    const beproAddress = await BeproService.getAddress();
-    const payload = {
-      amount:  issueAmount.floatValue,
-      address: beproAddress
-    }
-    const res = await BeproService.network.approveTransactionalERC20Token();
-    const resApproved = await BeproService.network.isApprovedTransactionalToken(payload);
-    if (resApproved) {
+    evt.preventDefault();    
+    try {
+      setLoadingAttributes(true);
+      await BeproService.login();
+      const beproAddress = await BeproService.getAddress();
+      const payload = {
+        amount:  issueAmount.floatValue,
+        address: beproAddress
+      }
+      await BeproService.network.approveTransactionalERC20Token()
+      const Transaction = await BeproService.network.isApprovedTransactionalToken(payload)
+      if(Transaction){
       setAllowedTransaction(true);
+      setLoadingAttributes(false);
+      }
+    } catch {
+      setLoadingAttributes(false)
     }
-
   }
+  
   const createIssue = async (evt) => {
     evt.preventDefault();
-
-    const payload = {
-      title: issueTitle,
-      description: issueDescription,
-      issueId: null,
+    try {
+      setLoadingAttributes(true);
+      const payload = {
+        title: issueTitle,
+        description: issueDescription,
+        issueId: null,
+      }
+      const beproAddress = await BeproService.getAddress();
+      const contractPayload = {tokenAmount: issueAmount.floatValue, cid: beproAddress};
+      const res = await BeproService.network.openIssue(contractPayload);
+      payload.issueId = res.events?.OpenIssue?.returnValues?.id;
+      await GithubMicroService.createIssue(payload);
+      setLoadingAttributes(false);
+    } catch {
+      setLoadingAttributes(false);
     }
-    const beproAddress = await BeproService.getAddress();
-    const contractPayload = {tokenAmount: issueAmount.floatValue, cid: beproAddress};
-    const res = await BeproService.network.openIssue(contractPayload);
-    console.log("🚀 ~ file: create-issue.tsx ~ line 41 ~ createIssue ~ res", res)
-
-    payload.issueId = res.events?.OpenIssue?.returnValues?.id;
-    const res2 = await GithubMicroService.createIssue(payload);
-
   }
 
   const issueContentIsValid = (): boolean =>  !!issueTitle && !!issueDescription;
