@@ -3,21 +3,29 @@ import Loading from "../components/loading";
 
 let getLoadingState: () => boolean;
 
-let setLoadingState: (value: boolean) => void;
+let setLoadingAttributes: (show: boolean, message?: string) => void;
 
-const LoadingContext = createContext(false)
+const LoadingContext = createContext(false);
 
 function LoadingContextProvider({ children }) {
   const [isLoading, setLoading] = useState<boolean>(false);
-  setLoadingState = (value: boolean) => setLoading(value);
+  const [message, setMessage] = useState<string>();
+  setLoadingAttributes = (show: boolean, message?: string) => {
+    setLoading(show);
+    setMessage(message);
+  };
   getLoadingState = () => isLoading;
-
   return (
     <LoadingContext.Provider value={isLoading}>
-      <Loading show={isLoading} />
+      <Loading show={isLoading}>{message}</Loading>
       {children}
     </LoadingContext.Provider>
   );
 }
 
-export { LoadingContextProvider, LoadingContext, setLoadingState, getLoadingState };
+export {
+  LoadingContextProvider,
+  LoadingContext,
+  setLoadingAttributes,
+  getLoadingState,
+};
