@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import ButtonDialog from "./button-dialog";
 import ReactSelect from "./react-select";
 import CreateProposalDistributionItem from "./create-proposal-distribution-item";
-import { sumObj } from "../helpers";
+import sumObj from "../helpers/sumObj";
 
 const options = [
   {
