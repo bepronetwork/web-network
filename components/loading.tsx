@@ -18,11 +18,11 @@ export default function Loading({
       aria-labelledby="loading-modal"
       centered
     >
-      <Modal.Body className="show-grid px-0">
-        <div className="d-flex justify-content-center">
-          <Spinner className="me-2" animation="border" />
-          <h4 className="mt-1">{children ? children : "Please wait"}</h4>
-        </div>
+      <Modal.Body className="d-flex align-self-center">
+        <Spinner className="align-self-center p-2 mt-1" animation="border" />
+        <h4 className="align-self-stretch ms-3 mt-2">
+          {children ? children : "Please wait"}
+        </h4>
       </Modal.Body>
     </Modal>
   );
