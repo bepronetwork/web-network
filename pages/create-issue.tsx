@@ -155,14 +155,12 @@ export default function PageCreateIssue() {
                     onChange={e => setIssueDescription(e.target.value)}
                     ></textarea>
                   </div>
+                  <div className="d-flex justify-content-center align-items-center mt-4">
                   {!allowedTransaction ?
-                      <div className="d-flex justify-content-center align-items-center">
-                        <button className="btn btn-lg btn-primary" onClick={allow}>Allow the Nework Protocol to use your BEPRO</button>
-                      </div>
+                        <button className="btn btn-lg btn-opac me-3 px-5" onClick={allow}>Approve</button>
                       : null
-                    }
-                  <div className="d-flex justify-content-center align-items-center mt-2">
-                    <button className="btn btn-lg btn-primary" disabled={isButtonDisabled()}>Create Issue</button>
+                  }
+                    <button className="btn btn-lg btn-primary px-4" disabled={isButtonDisabled()}>Create Issue</button>
                   </div>
                 </div>
               </div>
