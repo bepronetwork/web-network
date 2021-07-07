@@ -30,48 +30,52 @@ export default function PageCreateIssue() {
 
   // TODO add loaders since is slow on metamask
   const allow = async (evt) => {
-    evt.preventDefault();    
-    try {
-      setLoadingAttributes(true);
-      await BeproService.login();
-      const beproAddress = await BeproService.getAddress();
-      const payload = {
-        amount:  issueAmount.floatValue,
-        address: beproAddress
-      }
-      await BeproService.network.approveTransactionalERC20Token()
-      const Transaction = await BeproService.network.isApprovedTransactionalToken(payload)
-      if(Transaction){
-      setAllowedTransaction(true);
-      setLoadingAttributes(false);
-      }
-    } catch (error){
-      console.error(error)
-      setLoadingAttributes(false);
-    }
-  }
+    evt.preventDefault();        
+    await BeproService.login()
+      .then(() => setLoadingAttributes(true))
+      .catch((error) => handleErrorAndLoading(error));
+    const beproAddress = await BeproService.getAddress();
+    const payload = {
+      amount: issueAmount.floatValue,
+      address: beproAddress,
+    };
+    await BeproService.network
+      .approveTransactionalERC20Token()
+      .catch((error) => handleErrorAndLoading(error));
+    await BeproService.network
+      .isApprovedTransactionalToken(payload)
+      .then(() => {
+        setAllowedTransaction(true);
+        setLoadingAttributes(false);
+      })
+      .catch((error) => handleErrorAndLoading(error));
+  };
   
   const createIssue = async (evt) => {
     evt.preventDefault();
-    try {
-      setLoadingAttributes(true);
-      const payload = {
-        title: issueTitle,
-        description: issueDescription,
-        issueId: null,
-      }
-      const beproAddress = await BeproService.getAddress();
-      const contractPayload = {tokenAmount: issueAmount.floatValue, cid: beproAddress};
-      const res = await BeproService.network.openIssue(contractPayload);
-      payload.issueId = res.events?.OpenIssue?.returnValues?.id;
-      await GithubMicroService.createIssue(payload);
-      setLoadingAttributes(false);
-      cleanFields()
-      router.push('/account')
-    } catch (error){
-      console.error(error)
-      setLoadingAttributes(false);
+    setLoadingAttributes(true);
+    const payload = {
+      title: issueTitle,
+      description: issueDescription,
+      issueId: null,
     }
+    const beproAddress = await BeproService.getAddress();
+    const contractPayload = {tokenAmount: issueAmount.floatValue, cid: beproAddress};
+    await BeproService.network.openIssue(contractPayload)
+      .then(async (response) => {
+        payload.issueId = response.events?.OpenIssue?.returnValues?.id;
+        await GithubMicroService.createIssue(payload)
+          .then(() => {
+            setLoadingAttributes(false);
+            cleanFields();
+            router.push('/account');
+          }).catch((error) => handleErrorAndLoading(error))
+      }).catch((error) => handleErrorAndLoading(error))
+  }
+
+  const handleErrorAndLoading = (error) => {
+    console.error(error)
+    setLoadingAttributes(false)
   }
 
   const cleanFields = () => {
@@ -138,10 +142,9 @@ export default function PageCreateIssue() {
                     <p className="p-small trans my-2">Tip: Try to be as much descriptive as possible</p>
                   </div>
                   <div className="form-group col-md-4 mb-4">
-                    <label className="p-small mb-2">Set $BEPRO value</label>
                     <InputNumber min="0" max={balance} className="form-control"
+                      label="Set $BEPRO value"
                       value={issueAmount.formattedValue}
-                      thousandSeparator={true}
                       onValueChange={handleIssueAmountOnValueChange}
                       onBlur={handleIssueAmountBlurChange}/>
                     <div className="d-flex justify-content">
