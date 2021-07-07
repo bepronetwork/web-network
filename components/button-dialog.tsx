@@ -10,7 +10,6 @@ export default function ButtonDialog({
   show = false,
   onHide = () => {},
   className = "btn-primary",
-  disabled = false,
   label = "",
   ...params
 }: {
@@ -26,11 +25,7 @@ export default function ButtonDialog({
 }) {
   return (
     <>
-      <button
-        className={`btn btn-md ${className}`}
-        onClick={onClick}
-        disabled={disabled}
-        {...params}>
+      <button className={`btn btn-md ${className}`} {...params}>
         {label || title}
       </button>
       <Modal

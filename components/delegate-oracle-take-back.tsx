@@ -16,7 +16,7 @@ export default function DelegateOrableTakeBack({
 
   return (
     <ButtonDialog
-      title="Take Back Oracles"
+      title="Take Back"
       className="btn-white"
       show={show}
       onClick={handleShow}
