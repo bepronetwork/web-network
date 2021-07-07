@@ -41,12 +41,14 @@ export default function PageCreateIssue() {
     };
     await BeproService.network
       .approveTransactionalERC20Token()
-      .catch((error) => handleErrorAndLoading(error));
-    await BeproService.network
-      .isApprovedTransactionalToken(payload)
-      .then(() => {
-        setAllowedTransaction(true);
-        setLoadingAttributes(false);
+      .then(async () => {
+        await BeproService.network
+        .isApprovedTransactionalToken(payload)
+        .then(() => {
+          setAllowedTransaction(true);
+          setLoadingAttributes(false);
+        })
+        .catch((error) => handleErrorAndLoading(error))
       })
       .catch((error) => handleErrorAndLoading(error));
   };
