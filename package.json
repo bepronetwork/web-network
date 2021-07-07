@@ -8,11 +8,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next start"
   },
   "dependencies": {
-    "@types/lodash": "^4.14.170",
     "axios": "^0.21.1",
     "bepro-js": "^1.2.8",
     "bootstrap": "^5.0.1",
@@ -36,8 +34,6 @@
     "@types/node": "^13.11.0",
     "@types/react": "^17.0.6",
     "@types/react-select": "^4.0.15",
-    "eslint": "^7.28.0",
-    "eslint-config-next": "^11.0.0",
     "typescript": "^3.8.3"
   }
 }
