@@ -45,8 +45,9 @@ export default function PageCreateIssue() {
       setAllowedTransaction(true);
       setLoadingAttributes(false);
       }
-    } catch {
-      setLoadingAttributes(false)
+    } catch (error){
+      console.error(error)
+      setLoadingAttributes(false);
     }
   }
   
@@ -65,7 +66,8 @@ export default function PageCreateIssue() {
       payload.issueId = res.events?.OpenIssue?.returnValues?.id;
       await GithubMicroService.createIssue(payload);
       setLoadingAttributes(false);
-    } catch {
+    } catch (error){
+      console.error(error)
       setLoadingAttributes(false);
     }
   }
