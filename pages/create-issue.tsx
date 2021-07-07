@@ -1,5 +1,5 @@
 import { GetStaticProps } from 'next'
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import BeproService from '../services/bepro';
 import GithubMicroService from '../services/github-microservice';
 import { setLoadingAttributes } from '../providers/loading-provider';
@@ -19,14 +19,15 @@ export default function PageCreateIssue() {
   const [balance, setBalance] = useState<string>('0');
   const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
   const router = useRouter()
-  const useBeproBalance = async () => {
+
+  const useBeproBalance = useCallback(async () => {
     await BeproService.login(); 
     setBalance(await BeproService.network.getBEPROStaked())
-  }
+  }, [])
 
   useEffect(() => {
     useBeproBalance()
-  },[])
+  },[useBeproBalance])
 
   // TODO add loaders since is slow on metamask
   const allow = async (evt) => {
