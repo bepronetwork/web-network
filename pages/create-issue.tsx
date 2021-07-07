@@ -4,6 +4,7 @@ import BeproService from '../services/bepro';
 import GithubMicroService from '../services/github-microservice';
 import { setLoadingAttributes } from '../providers/loading-provider';
 import InputNumber from '../components/inputNumber';
+import { useRouter } from 'next/router';
 
 interface Amount {
   value?: string,
@@ -12,13 +13,12 @@ interface Amount {
 }
 
 export default function PageCreateIssue() {
-
   const [issueTitle, setIssueTitle] = useState("");
   const [issueDescription, setIssueDescription] = useState("");
   const [issueAmount, setIssueAmount] = useState<Amount>({ value: '0', formattedValue: '0', floatValue: 0});
   const [balance, setBalance] = useState<string>('0');
   const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
-
+  const router = useRouter()
   const useBeproBalance = async () => {
     await BeproService.login(); 
     setBalance(await BeproService.network.getBEPROStaked())
@@ -65,8 +65,9 @@ export default function PageCreateIssue() {
       const res = await BeproService.network.openIssue(contractPayload);
       payload.issueId = res.events?.OpenIssue?.returnValues?.id;
       await GithubMicroService.createIssue(payload);
-      cleanFields()
       setLoadingAttributes(false);
+      cleanFields()
+      router.push('/account')
     } catch (error){
       console.error(error)
       setLoadingAttributes(false);
