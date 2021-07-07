@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import BeproService from '../services/bepro';
 import GithubMicroService from '../services/github-microservice';
 import { setLoadingAttributes } from '../providers/loading-provider';
-import { BeproBalance } from '../helpers/bepro-balance';
 import InputNumber from '../components/inputNumber';
 
 interface Amount {
@@ -21,7 +20,8 @@ export default function PageCreateIssue() {
   const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
 
   const useBeproBalance = async () => {
-    setBalance(await BeproBalance())
+    await BeproService.login(); 
+    setBalance(await BeproService.network.getBEPROStaked())
   }
 
   useEffect(() => {
