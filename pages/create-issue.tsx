@@ -129,7 +129,7 @@ export default function PageCreateIssue() {
                   <div className="form-group col-md-4 mb-4">
                     <label className="p-small mb-2">Set $BEPRO value</label>
                     <div className="input-group">
-                      <NumberFormat min="0" max={`${balance}`} className="form-control" placeholder="0"
+                      <NumberFormat min="0" max={balance} className="form-control" placeholder="0"
                         value={issueAmount.formattedValue}
                         thousandSeparator={true}
                         onValueChange={handleIssueAmountOnValueChange}
