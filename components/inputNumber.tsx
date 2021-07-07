@@ -1,15 +1,29 @@
-import { ReactNode, ReactNodeArray } from "react";
 import NumberFormat, { NumberFormatProps } from "react-number-format";
 
+interface InputNumber extends NumberFormatProps {
+  label?: string;
+  symbol?: string;
+  placeholder?: string;
+}
+
 export default function InputNumber({
-  inputText = "$BEPRO",
+  label = "",
+  symbol = "$BEPRO",
   placeholder = "0",
+  thousandSeparator = true,
   ...params
-}: NumberFormatProps) {
+}: InputNumber) {
   return (
-    <div className="input-group">
-      <NumberFormat {...params} placeholder={placeholder} />
-      <span className="input-group-text text-white-50 p-small">{inputText}</span>
-    </div>
+    <>
+      {label && <label className="p-small mb-2">{label}</label>}
+      <div className="input-group">
+        <NumberFormat
+          {...params}
+          placeholder={placeholder}
+          thousandSeparator={thousandSeparator}
+        />
+        <span className="input-group-text text-white-50 p-small">{symbol}</span>
+      </div>
+    </>
   );
 }
