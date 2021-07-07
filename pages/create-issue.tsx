@@ -1,10 +1,10 @@
 import { GetStaticProps } from 'next'
 import React, { useEffect, useState } from 'react';
-import NumberFormat from 'react-number-format';
 import BeproService from '../services/bepro';
 import GithubMicroService from '../services/github-microservice';
-import { getLoadingState, setLoadingAttributes } from '../providers/loading-provider';
+import { setLoadingAttributes } from '../providers/loading-provider';
 import { BeproBalance } from '../helpers/bepro-balance';
+import InputNumber from '../components/inputNumber';
 
 interface Amount {
   value?: string,
@@ -128,17 +128,14 @@ export default function PageCreateIssue() {
                   </div>
                   <div className="form-group col-md-4 mb-4">
                     <label className="p-small mb-2">Set $BEPRO value</label>
-                    <div className="input-group">
-                      <NumberFormat min="0" max={balance} className="form-control" placeholder="0"
-                        value={issueAmount.formattedValue}
-                        thousandSeparator={true}
-                        onValueChange={handleIssueAmountOnValueChange}
-                        onBlur={handleIssueAmountBlurChange}/>
-                      <span className="input-group-text text-white-50 p-small">$BEPRO</span>
-                    </div>
+                    <InputNumber min="0" max={balance} className="form-control"
+                      value={issueAmount.formattedValue}
+                      thousandSeparator={true}
+                      onValueChange={handleIssueAmountOnValueChange}
+                      onBlur={handleIssueAmountBlurChange}/>
                     <div className="d-flex justify-content">
-                    <p className="p-small trans my-2">{balance} $BEPRO </p> 
-                    <a className="button-max p-small ms-1 my-2" onClick={() => setIssueAmount({formattedValue: balance})}>(Max)</a> 
+                      <p className="p-small trans my-2">{balance} $BEPRO </p> 
+                      <a className="button-max p-small ms-1 my-2" onClick={() => setIssueAmount({formattedValue: balance})}>(Max)</a> 
                     </div>
                   </div>
                   <div className="form-group">
