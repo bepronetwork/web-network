@@ -1,9 +1,7 @@
 import { GetStaticProps } from 'next'
 import React, { useEffect, useState } from 'react';
 import IssueListItem from '../components/issue-list-item';
-import MainNav from '../components/main-nav';
 import PageHero from '../components/page-hero';
-import TypographyTest from '../components/typography-test';
 import GithubMicroService from '../services/github-microservice';
 
 export default function PageCouncil() {
@@ -22,7 +20,6 @@ export default function PageCouncil() {
   return (
     <div>
       <PageHero title="Ready to propose" numIssuesInProgress={10} numIssuesClosed={12} numBeprosOnNetwork={120000}></PageHero>
-      {console.log('issues return ->', issues)}
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10">
@@ -42,9 +39,6 @@ export default function PageCouncil() {
           </div>
         </div>
       </div>
-
-      <TypographyTest></TypographyTest>
-
     </div>
   )
 }
