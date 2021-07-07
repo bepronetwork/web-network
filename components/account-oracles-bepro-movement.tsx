@@ -41,20 +41,21 @@ export default function AccountOraclesBeproMovement(): JSX.Element {
         <span className="badge-opac">200 Available</span>
       </div>
       <p className="p text-white">{renderByMovement}</p>
-      <div className="input-group mb-4">
-        <NumberFormat
-          min="0"
-          className="form-control"
-          placeholder="0"
-          value={amount}
-          thousandSeparator={true}
-          onValueChange={handleChange}
-        />
-        <span className="input-group-text text-white-50 p-small">$BEPRO</span>
+      <div className="form-group">
+        <label className="p-small mb-2">$BEPRO Amount</label>
+        <div className="input-group mb-4">
+          <NumberFormat
+            min="0"
+            className="form-control"
+            placeholder="0"
+            value={amount}
+            thousandSeparator={true}
+            onValueChange={handleChange}
+          />
+          <span className="input-group-text text-white-50 p-small">$BEPRO</span>
+        </div>
       </div>
-      <button className="btn btn-md btn-lg btn-trans w-100 mb-4">
-        Approve
-      </button>
+      <button className="btn btn-md btn-lg btn-opac w-100 mb-4">Approve</button>
       <AccountOraclesBeproMovements
         onClose={handleCloseMovement}
         {...{ movement, amount }}

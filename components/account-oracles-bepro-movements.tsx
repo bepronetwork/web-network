@@ -12,16 +12,17 @@ export default function AccountOraclesBeproMovements({
 }): JSX.Element {
   const [show, setShow] = useState<boolean>(false);
   const [state, setState] = useState<string>("waiting");
+  const renderAmount = amount ? amount : "";
   const renderByMovement = {
     Lock: {
       title: `Lock $BEPRO`,
-      label: `Get ${amount} oracles`,
+      label: `Get ${renderAmount} oracles`,
       caption: "Get Oracles from $BEPRO",
       body: `You are locking ${amount} $BEPRO /br/ to get /oracles${amount} Oracles/`,
     },
     Unlock: {
       title: `Unlock $BEPRO`,
-      label: `Recover ${amount} $BEPRO`,
+      label: `Recover ${renderAmount} $BEPRO`,
       caption: "Get $BEPRO from Oracles",
       body: `Give away /oracles${amount} Oracles/ /br/ to get back ${amount} $BEPRO`,
     },

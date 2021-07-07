@@ -410,25 +410,28 @@ p {
 
 .form-group {
   margin-bottom: $m;
-  label {
-    color: $gray;
-  }
-  .form-control {
+
+}
+
+label {
+  color: $gray;
+}
+.form-control {
+  background-color: $black;
+  border: 1px solid $black;
+  color: $gray;
+}
+
+.input-group {
+  .input-group-text{
     background-color: $black;
     border: 1px solid $black;
     color: $gray;
   }
-  .input-group {
-    .input-group-text{
-      background-color: $black;
-      border: 1px solid $black;
-      color: $gray;
-    }
-    input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button { 
-      -webkit-appearance: none; 
-      margin: 0; 
-    }
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
   }
 }
 
