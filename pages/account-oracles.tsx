@@ -7,12 +7,13 @@ import PageHero from '../components/page-hero';
 import TypographyTest from '../components/typography-test';
 import AccountOraclesBeproMovement from "../components/account-oracles-bepro-movement";
 import DelegateOracle from "../components/delegate-oracle";
+import PageActions from '../components/page-actions'
 
 export default function PageAccountOracles() {
   return (
       <div>
         <AccountHero></AccountHero>
-
+<PageActions />
         <div className="container">
           <div className="row">
             <div className="d-flex justify-content-center mb-3">

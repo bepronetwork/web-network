@@ -10,6 +10,9 @@ li {
 }
 
 .modal {
+  &-header {
+    padding-bottom: 0;
+  }
   &-content {
     background-color: $bg-shadow;
   }
