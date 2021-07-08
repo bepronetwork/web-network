@@ -1,28 +1,26 @@
 import { kebabCase } from "lodash";
-import { ReactNode, ReactNodeArray } from "react";
+import { ComponentPropsWithoutRef, ReactNode, ReactNodeArray } from "react";
 import { Modal } from "react-bootstrap";
+
+interface Props extends ComponentPropsWithoutRef<"button"> {
+  title: string;
+  footer?: ReactNode;
+  show: boolean;
+  onHide?: () => void;
+  className?: string;
+  label?: string;
+}
 
 export default function ButtonDialog({
   title = "",
   children = null,
   footer = null,
-  onClick = () => {},
   show = false,
   onHide = () => {},
   className = "btn-primary",
   label = "",
   ...params
-}: {
-  title: string;
-  children: ReactNode | ReactNodeArray;
-  footer?: ReactNode;
-  onClick: () => void;
-  show: boolean;
-  onHide?: () => void;
-  className?: string;
-  disabled?: boolean;
-  label?: string;
-}) {
+}: Props) {
   return (
     <>
       <button className={`btn btn-md ${className}`} {...params}>
