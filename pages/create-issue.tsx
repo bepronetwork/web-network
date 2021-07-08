@@ -20,16 +20,19 @@ export default function PageCreateIssue() {
   const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
   const router = useRouter()
 
-  const useBeproBalance = useCallback(async () => {
-    await BeproService.login(); 
-    setBalance(await BeproService.network.getBEPROStaked())
+  useEffect(() => {
+    let isMounted = true;
+    void async function getBeproBalance() {
+      await BeproService.login(); 
+      if (isMounted) {
+        setBalance(await BeproService.network.getBEPROStaked());
+      }
+    }();
+    return () => {
+      isMounted = false;
+    }
   }, [])
 
-  useEffect(() => {
-    useBeproBalance()
-  },[useBeproBalance])
-
-  // TODO add loaders since is slow on metamask
   const allow = async (evt) => {
     evt.preventDefault();        
     await BeproService.login()
