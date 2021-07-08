@@ -27,6 +27,7 @@ export default function PageCreateIssue() {
     }
 
   }
+
   const createIssue = async (evt) => {
     evt.preventDefault();
 
@@ -41,8 +42,7 @@ export default function PageCreateIssue() {
     console.log("🚀 ~ file: create-issue.tsx ~ line 41 ~ createIssue ~ res", res)
 
     payload.issueId = res.events?.OpenIssue?.returnValues?.id;
-    const res2 = await GithubMicroService.createIssue(payload);
-
+    await GithubMicroService.createIssue(payload);
   }
 
   return (
