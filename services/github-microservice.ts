@@ -25,9 +25,26 @@ export default class GithubMicroService {
     const {data} = await axios.get(API_HOST  + `/issues/${issueId}`);
     return data;
   }
-  
+
   static async getCommentsIssue(githubId: string | string[]) {
     const {data} = await axios.get(API_HOST  + `/issues/github/${githubId}/comments`);
     return data;
+  }
+
+  /**
+   * Should merge the address and the github handle
+   * @param address wallet address
+   * @param handle github handle
+   */
+  static joinAddressToHandle(address: string, handle: string) {
+    return Promise.resolve(handle);
+  }
+
+  /**
+   * Should return the handle of a given wallet address
+   * @param address wallet address
+   */
+  static async getHandleOf(address: string): Promise<string> {
+    return Promise.resolve(``)
   }
 }
