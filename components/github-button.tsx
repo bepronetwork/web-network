@@ -34,5 +34,11 @@ export default function GithubButton() {
 
   useEffect(setHandleIfConnected, []);
 
-  return (<div>{ !loading ? handle ? getHandleView() : getButtonView() : getLoadingView() }</div>)
+  if (loading)
+    return getLoadingView();
+
+  if (handle)
+    return getHandleView();
+
+  return getButtonView();
 }
