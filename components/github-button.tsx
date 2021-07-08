@@ -5,6 +5,7 @@ import GithubMicroService from '../services/github-microservice';
 export default function GithubButton() {
   const [handle, setHandle] = useState<string>(``);
   const [loading, setLoading] = useState<boolean>(true);
+  const url = `https://github.com/login/oauth/authorize?scope=user&client_id=${process.env.GITHUB_OAUTH_CLIENT_ID}&redirect_uri=${process.env.GITHUB_OAUTH_REDIRECT}`;
 
   function setHandleIfConnected() {
 
@@ -18,27 +19,13 @@ export default function GithubButton() {
                 .finally(() => setLoading(false))
   }
 
-  function getButtonView() {
-    const url = `https://github.com/login/oauth/authorize?scope=user&client_id=${process.env.GITHUB_OAUTH_CLIENT_ID}&redirect_uri=${process.env.GITHUB_OAUTH_REDIRECT}`;
-
-    return (<a href={url}>connect to github</a>)
-  }
-
-  function getHandleView() {
-    return (<span>{handle}</span>)
-  }
-
-  function getLoadingView() {
-    return (<span>wait..</span>)
-  }
-
   useEffect(setHandleIfConnected, []);
 
   if (loading)
-    return getLoadingView();
+    return <span>wait..</span>;
 
   if (handle)
-    return getHandleView();
+    return <span>{handle}</span>;
 
-  return getButtonView();
+  return <a href={url}>connect to github</a>;
 }
