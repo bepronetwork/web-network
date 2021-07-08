@@ -34,25 +34,22 @@ export default function PageCreateIssue() {
   }, [])
 
   const allow = async (evt) => {
-    evt.preventDefault();        
+    evt.preventDefault();
+    let beproAddress       
     await BeproService.login()
       .then(() => setLoadingAttributes(true))
-      .catch((error) => handleErrorAndLoading(error));
-    const beproAddress = await BeproService.getAddress();
-    const payload = {
-      amount: issueAmount.floatValue,
-      address: beproAddress,
-    };
-    await BeproService.network
-      .approveTransactionalERC20Token()
-      .then(async () => {
-        await BeproService.network
-        .isApprovedTransactionalToken(payload)
-        .then(() => {
-          setAllowedTransaction(true);
-          setLoadingAttributes(false);
-        })
-        .catch((error) => handleErrorAndLoading(error))
+      .then(() => { beproAddress = BeproService.getAddress() })
+      .then(() => BeproService.network.approveTransactionalERC20Token())
+      .then(() => {
+        const payload = {
+          amount: issueAmount.floatValue,
+          address: beproAddress,
+        };
+       const transaction =  BeproService.network.isApprovedTransactionalToken(payload)
+       if (transaction) {
+        setAllowedTransaction(true);
+        setLoadingAttributes(false);
+       }
       })
       .catch((error) => handleErrorAndLoading(error));
   };
@@ -68,9 +65,9 @@ export default function PageCreateIssue() {
     const beproAddress = await BeproService.getAddress();
     const contractPayload = {tokenAmount: issueAmount.floatValue, cid: beproAddress};
     await BeproService.network.openIssue(contractPayload)
-      .then(async (response) => {
+      .then((response) => {
         payload.issueId = response.events?.OpenIssue?.returnValues?.id;
-        await GithubMicroService.createIssue(payload)
+         GithubMicroService.createIssue(payload)
           .then(() => {
             setLoadingAttributes(false);
             cleanFields();
