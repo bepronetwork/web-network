@@ -34,26 +34,19 @@ export default function PageCreateIssue() {
   }, [])
 
   const allow = async (evt) => {
-    evt.preventDefault();     
-    setLoadingAttributes(true)
+    evt.preventDefault();
+    setLoadingAttributes(true);    
     await BeproService.login()
-      .then(() => BeproService.network.approveTransactionalERC20Token())
-      .then(() => {
-        BeproService.getAddress().then((adress) => {
-          const payload = {
-            amount: issueAmount.floatValue,
-            address: adress,
-          };
-          BeproService.network.isApprovedTransactionalToken(payload).then((transaction) => {
-            if (transaction) {
-              setAllowedTransaction(true);
-            }
-          })    
-        })
-      })
-      .catch((error) => console.log('Error',error))
-      .finally(() => setLoadingAttributes(false))
-  };
+    .then(() => BeproService.network.approveTransactionalERC20Token()) 
+    .then(() => BeproService.getAddress()) 
+    .then(address => BeproService.network.isApprovedTransactionalToken({ address, amount: issueAmount.floatValue}))
+    .then(transaction => {
+        setAllowedTransaction(transaction)
+        setLoadingAttributes(false)
+    })
+    .catch((error) => console.log('Error',error))
+    .finally(() => setLoadingAttributes(false))
+  }
   
   const createIssue = async (evt) => {
     evt.preventDefault();
