@@ -34,24 +34,25 @@ export default function PageCreateIssue() {
   }, [])
 
   const allow = async (evt) => {
-    evt.preventDefault();
-    let beproAddress       
+    evt.preventDefault();     
+    setLoadingAttributes(true)
     await BeproService.login()
-      .then(() => setLoadingAttributes(true))
-      .then(() => { beproAddress = BeproService.getAddress() })
       .then(() => BeproService.network.approveTransactionalERC20Token())
       .then(() => {
-        const payload = {
-          amount: issueAmount.floatValue,
-          address: beproAddress,
-        };
-       const transaction =  BeproService.network.isApprovedTransactionalToken(payload)
-       if (transaction) {
-        setAllowedTransaction(true);
-        setLoadingAttributes(false);
-       }
+        BeproService.getAddress().then((adress) => {
+          const payload = {
+            amount: issueAmount.floatValue,
+            address: adress,
+          };
+          BeproService.network.isApprovedTransactionalToken(payload).then((transaction) => {
+            if (transaction) {
+              setAllowedTransaction(true);
+            }
+          })    
+        })
       })
-      .catch((error) => handleErrorAndLoading(error));
+      .catch((error) => console.log('Error',error))
+      .finally(() => setLoadingAttributes(false))
   };
   
   const createIssue = async (evt) => {
@@ -59,26 +60,20 @@ export default function PageCreateIssue() {
     setLoadingAttributes(true);
     const payload = {
       title: issueTitle,
-      description: issueDescription,
-      issueId: null,
+      description: issueDescription
     }
     const beproAddress = await BeproService.getAddress();
     const contractPayload = {tokenAmount: issueAmount.floatValue, cid: beproAddress};
     await BeproService.network.openIssue(contractPayload)
       .then((response) => {
-        payload.issueId = response.events?.OpenIssue?.returnValues?.id;
-         GithubMicroService.createIssue(payload)
+         GithubMicroService.createIssue({...payload, issueId: response.events?.OpenIssue?.returnValues?.id})
           .then(() => {
-            setLoadingAttributes(false);
-            cleanFields();
             router.push('/account');
-          }).catch((error) => handleErrorAndLoading(error))
-      }).catch((error) => handleErrorAndLoading(error))
-  }
-
-  const handleErrorAndLoading = (error) => {
-    console.error(error)
-    setLoadingAttributes(false)
+            cleanFields();
+          })
+      })
+      .catch((error) => console.log('Error', error))
+      .finally(() => setLoadingAttributes(false))
   }
 
   const cleanFields = () => {
