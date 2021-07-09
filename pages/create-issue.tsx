@@ -19,18 +19,13 @@ export default function PageCreateIssue() {
   const [balance, setBalance] = useState<string>('0');
   const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
   const router = useRouter()
-
+  
   useEffect(() => {
-    let isMounted = true;
-    void async function getBeproBalance() {
-      await BeproService.login(); 
-      if (isMounted) {
-        setBalance(await BeproService.network.getBEPROStaked());
-      }
-    }();
-    return () => {
-      isMounted = false;
+    const getBalance = async () => {
+      await BeproService.login();
+      setBalance(await BeproService.network.getBEPROStaked())
     }
+    getBalance()   
   }, [])
 
   const allow = async (evt) => {
