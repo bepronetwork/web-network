@@ -13,4 +13,9 @@ export default class GithubMicroService {
     const {data} = await axios.get(API_HOST  + '/issues');
     return data;
   }
+
+  static async getIssuesState(state: any) {
+    const {data} = await axios.get(API_HOST  + '/issues', state);
+    return data;
+  }
 }
