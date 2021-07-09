@@ -12,7 +12,7 @@ export default function PageCouncil() {
   },[])
 
   const getIssues = async () => {
-    const issues = await GithubMicroService.getIssuesState({ filterState: 'ready'})
+    const issues = await GithubMicroService.getIssuesState({ filterState: "ready"})
     setIssues(issues)
     console.log('issues', issues)
   }
