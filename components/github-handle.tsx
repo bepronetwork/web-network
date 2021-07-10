@@ -1,8 +1,9 @@
 import {useEffect, useState} from 'react';
 import BeproService from '../services/bepro';
 import GithubMicroService from '../services/github-microservice';
+import {Errors} from "../interfaces/enums/Errors";
 
-export default function GithubButton() {
+export default function GithubHandle() {
   const [handle, setHandle] = useState<string>(``);
   const [loading, setLoading] = useState<boolean>(true);
   const url = `https://github.com/login/oauth/authorize?scope=user&client_id=${process.env.GITHUB_OAUTH_CLIENT_ID}&redirect_uri=${process.env.GITHUB_OAUTH_REDIRECT}`;
@@ -10,6 +11,12 @@ export default function GithubButton() {
   function setHandleIfConnected() {
 
     BeproService.isLoggedIn()
+                .then(bool => {
+                  if (!bool)
+                    throw new Error(Errors.WalletNotConnected);
+
+                  return BeproService.getAddress();
+                })
                 .then(BeproService.getAddress)
                 .then(GithubMicroService.getHandleOf)
                 .then(setHandle)
