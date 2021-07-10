@@ -1,7 +1,8 @@
 import {useEffect, useState} from 'react';
-import GithubButton from '../components/github-button';
 import BeproService from '../services/bepro';
 import GithubMicroService from '../services/github-microservice';
+import GithubHandle from "../components/github-handle";
+import ConnectWalletButton from "../components/connect-wallet-button";
 
 export default function OathGithub() {
   const [hasCode, setCodeState] = useState<null|boolean>(null);
@@ -35,7 +36,7 @@ export default function OathGithub() {
     <div className="container">
       <div className="row justify-content-center mb-5">
         <div className="content-wrapper">
-          { !hasCode ? <GithubButton /> : `Wait...`}
+          { !hasCode ? <ConnectWalletButton> <GithubHandle /> </ConnectWalletButton> : `Wait...`}
         </div>
       </div>
     </div>
