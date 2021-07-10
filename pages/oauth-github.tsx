@@ -13,11 +13,19 @@ export default function OathGithub() {
     if (!hasCode)
       return;
 
-    //todo: send code to the microservice if it exists
-    const newHandle = ``; // todo: retrieve this from the answer from the microservice?
-
-    BeproService.getAddress()
-                .then(address => GithubMicroService.joinAddressToHandle(address, newHandle));
+    GithubMicroService
+      .tradeTokenForHandle(urlSearchParams.get(`code`))
+      .then(async (handle) => {
+        const address = await BeproService.getAddress();
+        return {handle, address};
+      })
+      .then(({handle, address}) =>
+              GithubMicroService.joinAddressToHandle(address, handle))
+      .then(() => window.location.pathname = `/account`)
+      .catch((error) => {
+        console.log(`error`, error);
+        window.location.pathname = `/`;
+      });
   }
 
 
