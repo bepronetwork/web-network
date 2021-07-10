@@ -31,7 +31,7 @@ li {
       box-shadow: none;
       &:hover,
       &--is-focused {
-        border-color: $surface-primary;
+        border-color: $blue;
       }
     }
     &__value-container {
@@ -44,10 +44,10 @@ li {
       padding: 14px;
     }
     &__single-value {
-      color: $emphasis-primary;
+      color: $white;
     }
     &__control--is-focused &__single-value {
-      color: $emphasis-secondary;
+      color: transparentize($white, 0.4);
     }
     &__menu {
       background-color: $bg;
@@ -57,26 +57,26 @@ li {
         background-color: $bg;
       }
       &--is-selected {
-        background-color: $surface-primary;
+        background-color: $blue;
       }
     }
   }
   &__input {
-    color: $emphasis-secondary;
+    color: transparentize($white, 0.4);
   }
 }
 .form-control {
   min-width: 100px;
   border-color: transparent;
-  color: $emphasis-secondary;
+  color: transparentize($white, 0.4);
   &,
   &:focus {
     box-shadow: none;
     background-color: $bg;
   }
   &:focus {
-    border-color: $surface-primary;
-    color: $emphasis-primary;
+    border-color: $blue;
+    color: $white;
   }
 }
 
@@ -145,18 +145,6 @@ p {
 
 .trans {
   opacity: 0.7;
-}
-
-.emphasis {
-  &-primary {
-    color: $emphasis-primary;
-  }
-  &-secondary {
-    color: $emphasis-secondary;
-  }
-  &-tertiary {
-    color: $emphasis-tertiary;
-  }
 }
 
 // Buttons
