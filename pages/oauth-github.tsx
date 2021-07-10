@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import BeproService from '../services/bepro';
 import GithubMicroService from '../services/github-microservice';
 import GithubHandle from "../components/github-handle";
