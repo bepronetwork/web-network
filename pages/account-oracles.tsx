@@ -5,7 +5,7 @@ import AccountHero from '../components/account-hero';
 import IssueListItem from '../components/issue-list-item';
 import PageHero from '../components/page-hero';
 import TypographyTest from '../components/typography-test';
-import AccountOraclesBeproMovement from "../components/account-oracles-bepro-movement";
+import BalanceActions from "../components/balance-actions";
 import DelegateOracle from "../components/delegate-oracle";
 import PageActions from '../components/page-actions'
 
@@ -26,7 +26,7 @@ export default function PageAccountOracles() {
         <div className="container">
           <div className="row justify-content-center mb-5">
             <div className="col-md-5">
-              <AccountOraclesBeproMovement />
+              <BalanceActions />
             </div>
 
             <div className="col-md-5">
