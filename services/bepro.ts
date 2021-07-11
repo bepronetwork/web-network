@@ -67,7 +67,7 @@ export default class BeproService {
   }
 
   public static async getAddress(): Promise<string> {
-    if (this.address) return this.address;
+    if (BeproService.address) return BeproService.address;
 
     return this.bepro.getAddress() || '';
   }

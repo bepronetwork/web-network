@@ -5,28 +5,28 @@ import GithubHandle from "../components/github-handle";
 import ConnectWalletButton from "../components/connect-wallet-button";
 
 export default function OathGithub() {
-  const [hasCode, setCodeState] = useState<null|boolean>(null);
+  const [hasCode, setCodeState] = useState<boolean>(false);
 
   function checkForGithubCode() {
     const urlSearchParams = new URLSearchParams(window.location.search);
     setCodeState(urlSearchParams.has(`code`));
 
-    if (!hasCode)
+    if (urlSearchParams.has(`error`))
+      return console.log(urlSearchParams.get(`error`), urlSearchParams.get(`error_description`));
+
+    if (!urlSearchParams.has(`code`))
       return;
 
     GithubMicroService
       .tradeTokenForHandle(urlSearchParams.get(`code`))
-      .then(async (handle) => {
-        const address = await BeproService.getAddress();
-        return {handle, address};
+      .then((handle) =>
+              GithubMicroService.joinAddressToHandle({handle, address: BeproService.address}))
+      .then(() => {
+        // todo: redirect user to account
       })
-      .then(({handle, address}) =>
-              GithubMicroService.joinAddressToHandle(address, handle))
-      .then(() => window.location.pathname = `/account`)
       .catch((error) => {
-        console.log(`error`, error);
-        window.location.pathname = `/`;
-      });
+        // todo: redirect user to root
+      })
   }
 
 

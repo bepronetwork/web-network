@@ -5,30 +5,31 @@ import Head from "next/head";
 import BeproService from "../services/bepro";
 import MainNav from "../components/main-nav";
 import React from "react";
+import ApplicationContextProvider from '../contexts/application';
 import { LoadingContextProvider } from "../providers/loading-provider";
-import { Provider as AccountProvider } from "hooks/useAccount";
 
 export default function App({ Component, pageProps }: AppProps) {
-  (async () => {
+
+  const init = async () => {
     await BeproService.init();
-  })();
+  }
+
+  init();
 
   return (
-    <>
-      <Head>
-        <link
-          href="https://fonts.googleapis.com/icon?family=Material+Icons"
-          rel="stylesheet"
-        />
-        <title>WEB Network</title>
-      </Head>
-      <AccountProvider>
-        <LoadingContextProvider>
-          <MainNav />
-          <WebThreeDialog />
-          <Component {...pageProps} />
-        </LoadingContextProvider>
-      </AccountProvider>
-    </>
-  );
+    <ApplicationContextProvider>
+      <LoadingContextProvider>
+        <Head>
+          <link
+            href="https://fonts.googleapis.com/icon?family=Material+Icons"
+            rel="stylesheet"
+          />
+          <title>WEB Network</title>
+        </Head>
+        <MainNav />
+        <WebThreeDialog />
+        <Component {...pageProps} />
+      </LoadingContextProvider>
+    </ApplicationContextProvider>
+  )
 }
