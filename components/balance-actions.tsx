@@ -10,19 +10,19 @@ export default function BalanceActions(): JSX.Element {
   const [action, setAction] = useState<string>(actions[0]);
   const [amount, setAmount] = useState<number>(0);
   const [success, setSuccess] = useState<boolean>(false);
-  const renderAmount = amount ? amount : "";
+  const renderAmount = amount ? `${amount} ` : "";
   const info = {
     Lock: {
       title: "Lock $BEPRO",
       description: "Lock $BEPRO to get oracles",
-      label: `Get ${renderAmount} oracles`,
+      label: `Get ${renderAmount}oracles`,
       caption: "Get Oracles from $BEPRO",
       body: `You are locking ${amount} $BEPRO /br/ to get /oracles${amount} Oracles/`,
     },
     Unlock: {
       title: "Unlock $BEPRO",
       description: "Unlock $BEPRO by giving away oracles",
-      label: `Recover ${renderAmount} $BEPRO`,
+      label: `Recover ${renderAmount}$BEPRO`,
       caption: "Get $BEPRO from Oracles",
       body: `Give away /oracles${amount} Oracles/ /br/ to get back ${amount} $BEPRO`,
     },
