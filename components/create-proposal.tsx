@@ -29,31 +29,13 @@ const options = [
 const distributed = ["@asantos", "@vazTros", "@MikeSon"];
 
 export default function NewProposal() {
-  const [show, setShow] = useState<boolean>(false);
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>(100);
   const [error, setError] = useState<string>("");
-  const renderDistribItems = distributed.map((item) => (
-    <CreateProposalDistributionItem
-      key={item}
-      by={item}
-      onChange={handleChangeDistrib}
-      max={amount}
-      InputProps={{
-        isInvalid: !!error,
-      }}
-    />
-  ));
-  const renderErrorDistribution = error && (
-    <p className="p error mt-3 mb-0">{error}</p>
-  );
 
   useEffect(() => {
-    // Must be calculated as a function and not as an object. To be fixed as (x) => x - sumObj()
-    setAmount(100 - sumObj(distrib));
-  }, [distrib]);
-  useEffect(() => {
     setError("");
+    setAmount(100 - sumObj(distrib));
   }, [distrib]);
   function handleChangeDistrib(params: Object) {
     setDistrib((prevState) => ({
@@ -61,7 +43,7 @@ export default function NewProposal() {
       ...params,
     }));
   }
-  function handleClickCreate() {
+  function handleClickCreate({ hideModal }: { hideModal: () => void }) {
     if (amount > 0 && amount < 100) {
       return setError(`${amount}% is missing!`);
     }
@@ -69,35 +51,45 @@ export default function NewProposal() {
       return setError("Distribution must be equal to 100%.");
     }
     if (amount < 0) {
-      return setError(`Distribution exceed 100%.`);
+      return setError("Distribution exceed 100%.");
     }
 
-    handleHide();
-  }
-  function handleShow() {
-    setShow(true);
-  }
-  function handleHide() {
-    setShow(false);
     setDistrib({});
+    hideModal();
   }
 
   return (
     <ButtonDialog
       title="Create Proposal"
-      show={show}
-      onClick={handleShow}
-      onHide={handleHide}
-      footer={
-        <button className="btn btn-md btn-primary" onClick={handleClickCreate}>
-          Create Proposal
-        </button>
-      }>
+      footer={({ hideModal }) => (
+        <>
+          <button className="btn btn-md btn-opac" onClick={hideModal}>
+            Cancel
+          </button>
+          <button
+            className="btn btn-md btn-primary"
+            onClick={() => handleClickCreate({ hideModal })}>
+            Create Proposal
+          </button>
+        </>
+      )}>
       <p className="p-small text-50">Select a pull request </p>
       <ReactSelect defaultValue={options[0]} options={options} />
       <p className="p-small mt-3">Propose distribution</p>
-      <ul className="mb-0">{renderDistribItems}</ul>
-      {renderErrorDistribution}
+      <ul className="mb-0">
+        {distributed.map((item) => (
+          <CreateProposalDistributionItem
+            key={item}
+            by={item}
+            onChange={handleChangeDistrib}
+            max={amount}
+            InputProps={{
+              isInvalid: !!error,
+            }}
+          />
+        ))}
+      </ul>
+      {error && <p className="p error mt-3 mb-0">{error}</p>}
     </ButtonDialog>
   );
 }

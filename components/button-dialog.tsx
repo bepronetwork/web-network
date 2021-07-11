@@ -1,12 +1,13 @@
 import { kebabCase } from "lodash";
-import { ComponentPropsWithoutRef, ReactNode, ReactNodeArray } from "react";
+import { ComponentPropsWithoutRef, ReactElement, useState } from "react";
 import { Modal } from "react-bootstrap";
 
 interface Props extends ComponentPropsWithoutRef<"button"> {
   title: string;
-  footer?: ReactNode;
-  show: boolean;
-  onHide?: () => void;
+  footer?:
+    | (({ hideModal }: { hideModal: () => void }) => ReactElement)
+    | ReactElement;
+  onClick?: () => void;
   className?: string;
   label?: string;
 }
@@ -15,15 +16,22 @@ export default function ButtonDialog({
   title = "",
   children = null,
   footer = null,
-  show = false,
-  onHide = () => {},
+  onClick = () => {},
   className = "btn-primary",
   label = "",
   ...params
-}: Props) {
+}: Props): JSX.Element {
+  const [show, setShow] = useState<boolean>(false);
+
   return (
     <>
-      <button className={`btn btn-md ${className}`} {...params}>
+      <button
+        className={`btn btn-md ${className}`}
+        onClick={() => {
+          setShow(true);
+          onClick();
+        }}
+        {...params}>
         {label || title}
       </button>
       <Modal
@@ -31,12 +39,20 @@ export default function ButtonDialog({
         aria-labelledby={`${kebabCase(title)}-modal`}
         aria-describedby={`${kebabCase(title)}-modal`}
         show={show}
-        onHide={onHide}>
+        backdrop="static">
         <Modal.Header>
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>{children}</Modal.Body>
-        <Modal.Footer>{footer}</Modal.Footer>
+        <Modal.Footer>
+          {typeof footer === "function"
+            ? footer({
+                hideModal: () => {
+                  setShow(false);
+                },
+              })
+            : footer}
+        </Modal.Footer>
       </Modal>
     </>
   );
