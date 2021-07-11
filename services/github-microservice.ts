@@ -33,18 +33,13 @@ export default class GithubMicroService {
 
   /**
    * Should merge the address and the github handle
-   * @param address wallet address
-   * @param handle github handle
-   * @return Promise<string>
    */
-  static joinAddressToHandle(address: string, handle: string): Promise<string> {
+  static joinAddressToHandle({address, handle}: {address: string, handle: string}): Promise<string> {
     return Promise.resolve(handle);
   }
 
   /**
    * Should return the handle of a given wallet address
-   * @param address wallet address
-   * @return Promise<string>
    */
   static async getHandleOf(address: string): Promise<string> {
     return Promise.resolve(``)
@@ -52,8 +47,6 @@ export default class GithubMicroService {
 
   /**
    * Sends a token to GithubMicroService and expects a github handle string
-   * @param code github oath code
-   * @return Promise<string>
    */
   static async tradeTokenForHandle(code: string): Promise<string> {
     return Promise.resolve(`@handle`);
