@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ButtonDialog from "./button-dialog";
 import ReactSelect from "./react-select";
-import CreateProposalDistributionItem from "./create-proposal-distribution-item";
+import DistributionItem from "./distribution-item";
 import sumObj from "../helpers/sumObj";
 
 const options = [
@@ -30,12 +30,12 @@ const distributed = ["@asantos", "@vazTros", "@MikeSon"];
 
 export default function NewProposal() {
   const [distrib, setDistrib] = useState<Object>({});
-  const [amount, setAmount] = useState<number>(100);
+  const [amount, setAmount] = useState<number>(0);
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
     setError("");
-    setAmount(100 - sumObj(distrib));
+    setAmount(sumObj(distrib));
   }, [distrib]);
   function handleChangeDistrib(params: Object) {
     setDistrib((prevState) => ({
@@ -43,19 +43,16 @@ export default function NewProposal() {
       ...params,
     }));
   }
-  function handleClickCreate({ hideModal }: { hideModal: () => void }) {
+  function handleClickCreate() {
     if (amount > 0 && amount < 100) {
-      return setError(`${amount}% is missing!`);
+      return setError(`${100 - amount}% is missing!`);
     }
-    if (amount === 100) {
+    if (amount === 0) {
       return setError("Distribution must be equal to 100%.");
     }
-    if (amount < 0) {
+    if (amount > 100) {
       return setError("Distribution exceed 100%.");
     }
-
-    setDistrib({});
-    hideModal();
   }
 
   return (
@@ -68,7 +65,14 @@ export default function NewProposal() {
           </button>
           <button
             className="btn btn-md btn-primary"
-            onClick={() => handleClickCreate({ hideModal })}>
+            onClick={() => {
+              handleClickCreate();
+
+              if (amount === 100 && !error) {
+                hideModal();
+                setDistrib({});
+              }
+            }}>
             Create Proposal
           </button>
         </>
@@ -78,11 +82,10 @@ export default function NewProposal() {
       <p className="p-small mt-3">Propose distribution</p>
       <ul className="mb-0">
         {distributed.map((item) => (
-          <CreateProposalDistributionItem
+          <DistributionItem
             key={item}
             by={item}
             onChange={handleChangeDistrib}
-            max={amount}
             InputProps={{
               isInvalid: !!error,
             }}
