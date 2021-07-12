@@ -79,7 +79,7 @@ export default function PageCreateIssue() {
       allowedTransaction,
       issueContentIsValid(),
       verifyAmountBiggerThanBalance(),
-      issueAmount.floatValue >= 0, 
+      issueAmount.floatValue > 0, 
       !!issueAmount.formattedValue
     ].some(value => value === false);
   }
