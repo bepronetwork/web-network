@@ -1,17 +1,15 @@
 import { ChangeEvent, useState } from "react";
 import { Form } from "react-bootstrap";
 
-export default function NewProposalDistributionItem({
+export default function DistributionItem({
   by = "",
   onChange = () => {},
   InputProps = { isInvalid: false },
-  max = 0,
   ...params
 }: {
   by: string;
   onChange: (params: Object) => void;
   InputProps?: { isInvalid: boolean };
-  max: number;
 }) {
   const [value, setValue] = useState<string>("0");
 
