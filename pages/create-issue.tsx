@@ -43,7 +43,7 @@ export default function PageCreateIssue() {
     .catch((error) => console.log('Error',error))
     .finally(() => setLoadingAttributes(false))
   }
-  
+
   const createIssue = async (evt) => {
     evt.preventDefault();
     setLoadingAttributes(true);

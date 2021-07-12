@@ -2,12 +2,13 @@ import { GetStaticProps } from 'next'
 import Link from 'next/link';
 import React, { useContext, useEffect, useState } from 'react';
 import AccountHero from '../components/account-hero';
-import IssueListItem from '../components/issue-list-item';
+import IssueListItem, { IIssue } from '../components/issue-list-item';
 import BeproService from '../services/bepro';
+import GithubMicroService from '../services/github-microservice';
 
 export default function PageAccount() {
 
-  const [myIssues, setMyIssues] = useState([]);
+  const [myIssues, setMyIssues] = useState<IIssue[]>([]);
   useEffect(() => {
     getMyIssues();
   }, []); // initial load
@@ -15,13 +16,17 @@ export default function PageAccount() {
   const getMyIssues = async () => {
     await BeproService.login();
     const beproAddress = await BeproService.getAddress();
-    setMyIssues(await BeproService.network.getIssuesByAddress(beproAddress));
+    let issueIds = await BeproService.network.getIssuesByAddress(beproAddress);
+    issueIds = issueIds.map((i) => i+1)
+    if (issueIds.length > 0) {
+      const issues = await GithubMicroService.getIssues(issueIds);
+      setMyIssues(issues);
+    }
   }
 
   return (
       <div>
         <AccountHero issuesCount={myIssues.length}></AccountHero>
-
         <div className="container">
           <div className="row">
             <div className="d-flex justify-content-center mb-3">
@@ -33,12 +38,12 @@ export default function PageAccount() {
 
         <div className="container">
           <div className="row justify-content-center">
-            <div className="col-md-10">
-              <IssueListItem></IssueListItem>
-            </div>
-            <div className="col-md-10">
-              <IssueListItem></IssueListItem>
-            </div>
+            {myIssues.map((issue) => (
+              <div className="col-md-10" key={issue.issueId}>
+                <IssueListItem issue={issue}></IssueListItem>
+              </div>
+            ))}
+
           </div>
         </div>
 
