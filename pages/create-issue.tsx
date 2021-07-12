@@ -54,12 +54,10 @@ export default function PageCreateIssue() {
     const beproAddress = await BeproService.getAddress();
     const contractPayload = {tokenAmount: issueAmount.floatValue, cid: beproAddress};
     await BeproService.network.openIssue(contractPayload)
-      .then((response) => {
-         GithubMicroService.createIssue({...payload, issueId: response.events?.OpenIssue?.returnValues?.id})
-          .then(() => {
-            router.push('/account');
-            cleanFields();
-          })
+      .then((response) => GithubMicroService.createIssue({...payload, issueId: response.events?.OpenIssue?.returnValues?.id}))
+      .then(() => {
+        router.push('/account');
+        cleanFields();
       })
       .catch((error) => console.log('Error', error))
       .finally(() => setLoadingAttributes(false))
@@ -81,7 +79,7 @@ export default function PageCreateIssue() {
       allowedTransaction,
       issueContentIsValid(),
       verifyAmountBiggerThanBalance(),
-      issueAmount.floatValue > 0, 
+      issueAmount.floatValue >= 0, 
       !!issueAmount.formattedValue
     ].some(value => value === false);
   }
