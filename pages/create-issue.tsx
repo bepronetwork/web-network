@@ -5,6 +5,7 @@ import GithubMicroService from '../services/github-microservice';
 import { setLoadingAttributes } from '../providers/loading-provider';
 import InputNumber from '../components/inputNumber';
 import { useRouter } from 'next/router';
+import clsx from 'clsx';
 
 interface Amount {
   value?: string,
@@ -128,14 +129,15 @@ export default function PageCreateIssue() {
                     <p className="p-small trans my-2">Tip: Try to be as much descriptive as possible</p>
                   </div>
                   <div className="form-group col-md-4 mb-4">
-                    <InputNumber min="0" max={balance} className="form-control"
+                    <InputNumber min="0" max={balance} className={clsx("form-control", { 'text-muted': allowedTransaction })}
                       label="Set $BEPRO value"
                       value={issueAmount.formattedValue}
+                      disabled={allowedTransaction}
                       onValueChange={handleIssueAmountOnValueChange}
                       onBlur={handleIssueAmountBlurChange}/>
                     <div className="d-flex justify-content">
                       <p className="p-small trans my-2">{balance} $BEPRO </p> 
-                      <a className="button-max p-small ms-1 my-2" onClick={() => setIssueAmount({formattedValue: balance})}>(Max)</a> 
+                      {!allowedTransaction && <a className="button-max p-small ms-1 my-2" onClick={() => setIssueAmount({formattedValue: balance})}>(Max)</a>}
                     </div>
                   </div>
                   <div className="form-group">
