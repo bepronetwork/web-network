@@ -56,8 +56,6 @@ function BalanceActions({
     }
   }, [address, amount]);
 
-  console.log({ isApproved });
-
   useEffect(() => {
     handleApprovedCallback();
   }, [handleApprovedCallback]);
