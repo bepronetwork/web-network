@@ -217,7 +217,7 @@ p {
 }
 
 .btn-opac {
-  color: rgba($white, 0.7);
+  color: $white;
   background-color: rgba(255, 255, 255, 0.1);
   &:hover,
   &:focus,
@@ -412,9 +412,8 @@ label {
   border: 1px solid $black;
   color: $gray;
 }
-
 .input-group {
-  .input-group-text{
+  .input-group-text {
     background-color: $black;
     border: 1px solid $black;
     color: $gray;
@@ -423,6 +422,9 @@ label {
   input[type=number]::-webkit-outer-spin-button { 
     -webkit-appearance: none; 
     margin: 0; 
+  }
+  .button-max {
+    cursor: pointer;
   }
 }
 
