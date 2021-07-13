@@ -1,15 +1,31 @@
 import clsx from "clsx";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import BalanceActionsHandlers from "./balance-actions-handlers";
 import NumberFormat, { NumberFormatValues } from "react-number-format";
 import BalanceActionsSuccess from "./balance-actions-success";
+import BeproService from "../services/bepro";
+import { InferGetStaticPropsType } from "next";
 
 const actions: string[] = ["Lock", "Unlock"];
 
-export default function BalanceActions(): JSX.Element {
+export async function getStaticProps() {
+  await BeproService.login();
+  const address: string = await BeproService.getAddress();
+
+  return {
+    props: {
+      address,
+    },
+  };
+}
+
+function BalanceActions({
+  address,
+}: InferGetStaticPropsType<typeof getStaticProps>): JSX.Element {
   const [action, setAction] = useState<string>(actions[0]);
   const [amount, setAmount] = useState<number>(0);
   const [success, setSuccess] = useState<boolean>(false);
+  const [isApproved, setIsApproved] = useState<boolean>(false);
   const renderAmount = amount ? `${amount} ` : "";
   const info = {
     Lock: {
@@ -27,7 +43,24 @@ export default function BalanceActions(): JSX.Element {
       body: `Give away /oracles${amount} Oracles/ /br/ to get back ${amount} $BEPRO`,
     },
   }[action];
+  const handleApprovedCallback = useCallback(async () => {
+    try {
+      const isApprovedSettlerToken =
+        await BeproService.network.isApprovedSettlerToken({
+          address,
+          amount,
+        });
+      setIsApproved(isApprovedSettlerToken);
+    } catch (error) {
+      console.log("Error", error);
+    }
+  }, [address, amount]);
 
+  console.log({ isApproved });
+
+  useEffect(() => {
+    handleApprovedCallback();
+  }, [handleApprovedCallback]);
   function handleSuccessAction() {
     handleCloseAction();
     setSuccess(true);
@@ -78,9 +111,13 @@ export default function BalanceActions(): JSX.Element {
             </span>
           </div>
         </div>
-        <button className="btn btn-md btn-lg btn-opac w-100 mb-4">
-          Approve
-        </button>
+        {!isApproved && (
+          <button
+            className="btn btn-md btn-lg btn-opac w-100 mb-4"
+            onClick={handleApprovedCallback}>
+            Approve
+          </button>
+        )}
         <BalanceActionsHandlers
           onCloseAction={handleCloseAction}
           onSuccessAction={handleSuccessAction}
@@ -96,3 +133,5 @@ export default function BalanceActions(): JSX.Element {
     </>
   );
 }
+
+export default BalanceActions;
