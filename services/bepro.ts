@@ -27,7 +27,7 @@ export default class BeproService {
     });
     // this.bepro.start();
     this.network = new Network({
-      contractAddress: '0x852D6375c55498B326Fb87C69E16F010d2906C0E',
+      contractAddress: '0x0CCb54d3b4248FE833aCaB4E8993Bc720737F4B3',
       opt: {
         web3Connection: this.web3Connection,
       }
