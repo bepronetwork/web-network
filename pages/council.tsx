@@ -1,11 +1,12 @@
 import { GetStaticProps } from "next";
 import React, { useEffect, useState } from "react";
-import IssueListItem from "../components/issue-list-item";
+import IssueListItem, { IIssue } from "../components/issue-list-item";
+import ListIssues from "../components/list-issues";
 import PageHero from "../components/page-hero";
 import GithubMicroService from "../services/github-microservice";
 
 export default function PageCouncil() {
-  const [issues, setIssues] = useState<[]>([]);
+  const [issues, setIssues] = useState<[IIssue]>();
 
   useEffect(() => {
     getIssues();
@@ -29,21 +30,7 @@ export default function PageCouncil() {
       ></PageHero>
       <div className="container">
         <div className="row justify-content-center">
-          <div className="col-md-10">
-            <IssueListItem></IssueListItem>
-          </div>
-          <div className="col-md-10">
-            <IssueListItem></IssueListItem>
-          </div>
-          <div className="col-md-10">
-            <IssueListItem></IssueListItem>
-          </div>
-          <div className="col-md-10">
-            <IssueListItem></IssueListItem>
-          </div>
-          <div className="col-md-10">
-            <IssueListItem></IssueListItem>
-          </div>
+          <ListIssues listIssues={issues} />
         </div>
       </div>
     </div>
