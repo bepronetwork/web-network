@@ -1,9 +1,6 @@
 import { GetStaticProps } from 'next'
 import React, { useEffect, useState } from 'react';
 import IssueAvatars from './issue-avatars';
-import CreateProposal from "./create-proposal";
-import StartWorking from "./start-working";
-import OpenIssue from "./open-issue";
 
 export default function PageActions() {
     return (
@@ -14,12 +11,8 @@ export default function PageActions() {
                         <h4 className="h4">Details</h4>
                         <div className="d-flex align-items-center">
                             <IssueAvatars></IssueAvatars>
-                            <button className="btn btn-md btn-opac mr-1">
-                              View on github
-                            </button>
-                            <CreateProposal />
-                            <StartWorking />
-                            <OpenIssue />
+                            <button className="btn btn-md btn-opac mr-1">View on github</button>
+                            <button className="btn btn-md btn-primary">Start working</button>
                         </div>
                     </div>
                 </div>
