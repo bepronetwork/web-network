@@ -6,26 +6,25 @@ export default function ListIssues({
   listIssues,
   className = "col-md-10",
 }: {
-  listIssues: [IIssue];
+  listIssues: [IIssue] | [];
   className?: string;
 }): JSX.Element {
-  function list() {
-    if (listIssues && listIssues.length > 0) {
-      return listIssues.map((issue) => (
-        <div className={className} key={issue.issueId}>
-          <IssueListItem issue={issue}></IssueListItem>
-        </div>
-      ));
-    } else {
-      return (
-        <div className={className}>
-          <h3>No issues ready to propose</h3>
-        </div>
-      );
-    }
+  if (listIssues.length > 0) {
+    return (
+      <>
+        {listIssues.map((issue) => (
+          <div className={className} key={issue.issueId}>
+            <IssueListItem issue={issue}></IssueListItem>
+          </div>
+        ))}
+      </>
+    );
   }
-
-  return <>{list()}</>;
+  return (
+    <div className={className}>
+      <h3>No issues ready to propose</h3>
+    </div>
+  );
 }
 
 export const getStaticProps: GetStaticProps = async () => {
