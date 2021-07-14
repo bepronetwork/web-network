@@ -1,5 +1,6 @@
 import { GetStaticProps } from 'next'
 import React, { useEffect, useState } from 'react';
+import { formatDate } from '../helpers/formatDate';
 import IssueAvatars from './issue-avatars';
 
 export interface IIssue {
@@ -24,7 +25,7 @@ export default function IssueListItem({issue = null}:{issue?: IIssue}) {
                     <div className="d-flex align-center flex-wrap justify-content-center justify-content-md-start">
                         <span className="status blue mr-3 mt-1">{issue?.state}</span>
                         <span className="p-small trans mr-3 mt-1">{issue?.numberOfComments} comments</span>
-                        <span className="p-small trans mr-3 mt-1">{issue?.createdAt}</span>
+                        <span className="p-small trans mr-3 mt-1">{formatDate(issue?.createdAt)}</span>
                         <span className="p-small trans mr-3 mt-1">by @missing</span>
                     </div>
                 </div>
