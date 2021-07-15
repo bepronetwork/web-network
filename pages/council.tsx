@@ -4,20 +4,26 @@ import IssueListItem, { IIssue } from "../components/issue-list-item";
 import ListIssues from "../components/list-issues";
 import PageHero from "../components/page-hero";
 import GithubMicroService from "../services/github-microservice";
+import { setLoadingAttributes } from "../providers/loading-provider";
+import { isEmpty } from "lodash";
 
 export default function PageCouncil() {
-  const [issues, setIssues] = useState<[IIssue]>();
+  const [issues, setIssues] = useState<IIssue[]>([]);
 
   useEffect(() => {
     getIssues();
   }, []);
 
   const getIssues = async () => {
-    const issues = await GithubMicroService.getIssuesState({
+    if (isEmpty(issues)) {
+      setLoadingAttributes(true);
+    }
+    await GithubMicroService.getIssuesState({
       filterState: "ready",
-    });
-    setIssues(issues);
-    console.log("issues", issues);
+    })
+      .then((issues) => setIssues(issues))
+      .catch((error) => console.log("Error", error))
+      .finally(() => setLoadingAttributes(false));
   };
 
   return (
