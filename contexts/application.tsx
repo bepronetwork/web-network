@@ -13,6 +13,9 @@ const defaultState = {
   state: {
     githubHandle: ``,
     metaMaskWallet: false,
+    loading: {
+      isLoading: false,
+    }
   },
   dispatch: () => undefined
 };
