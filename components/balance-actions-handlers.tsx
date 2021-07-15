@@ -14,11 +14,7 @@ export default function BalanceActionsHandlers({
   disabled = false,
 }: {
   info: {
-    title: string;
-    description: string;
-    label: string;
-    caption: string;
-    body: string;
+    [key: string]: string;
   };
   onCloseAction: () => void;
   onSuccessAction: () => void;
