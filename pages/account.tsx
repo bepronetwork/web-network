@@ -19,7 +19,7 @@ export default function PageAccount() {
     let issueIds = await BeproService.network.getIssuesByAddress(beproAddress);
     issueIds = issueIds.map((i) => i+1)
     if (issueIds.length > 0) {
-      const issues = await GithubMicroService.getIssues(issueIds);
+      const issues = await GithubMicroService.getIssuesIds(issueIds);
       setMyIssues(issues);
     }
   }
