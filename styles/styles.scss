@@ -61,6 +61,44 @@ li {
       }
     }
   }
+  &-filterIssues & {
+    &__control {
+      border-color: transparent;
+      background-color: $bg-shadow;
+      min-height: 38px;
+      box-shadow: none;
+      &:hover,
+      &--is-focused {
+        border-color: $blue;
+      }
+    }
+    &__value-filterIssues {
+      padding: 2px 16px;
+    }
+    &__indicator-separator {
+      display: none;
+    }
+    &__indicator {
+      padding: 14px;
+    }
+    &__single-value {
+      color: $white;
+    }
+    &__control--is-focused &__single-value {
+      color: transparentize($white, 0.4);
+    }
+    &__menu {
+      background-color: $bg-shadow;
+    }
+    &__option {
+      &--is-focused {
+        background-color: $bg-shadow;
+      }
+      &--is-selected {
+        background-color: $blue;
+      }
+    }
+  }
   &__input {
     color: transparentize($white, 0.4);
   }
