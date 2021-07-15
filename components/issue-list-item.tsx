@@ -15,7 +15,6 @@ export interface IIssue {
 }
 export default function IssueListItem({issue = null}:{issue?: IIssue}) {
 
-
     return (
         <div className="bg-shadow list-item rounded p-4 mb-3">
             <div className="row align-center">
@@ -25,13 +24,13 @@ export default function IssueListItem({issue = null}:{issue?: IIssue}) {
                     <div className="d-flex align-center flex-wrap justify-content-center justify-content-md-start">
                         <span className="status blue mr-3 mt-1">{issue?.state}</span>
                         <span className="p-small trans mr-3 mt-1">{issue?.numberOfComments} comments</span>
-                        <span className="p-small trans mr-3 mt-1">{formatDate(issue?.createdAt)}</span>
+                        <span className="p-small trans mr-3 mt-1">{issue != null && formatDate(issue?.createdAt)}</span>
                         <span className="p-small trans mr-3 mt-1">by @missing</span>
                     </div>
                 </div>
                 <div className="col-md-2 my-auto text-center">
                     <span className="caption trans">MISSING $BEPRO</span>
-                    <IssueAvatars></IssueAvatars>
+                    {(issue?.developers.length > 0) && <IssueAvatars></IssueAvatars>}
                 </div>
             </div>
         </div>
