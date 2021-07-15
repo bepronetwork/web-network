@@ -1,11 +1,12 @@
 import { GetStaticProps } from 'next'
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import BeproService from '../services/bepro';
 import GithubMicroService from '../services/github-microservice';
-import { setLoadingAttributes } from '../providers/loading-provider';
 import InputNumber from '../components/input-number';
 import { useRouter } from 'next/router';
 import clsx from 'clsx';
+import {ApplicationContext} from '../contexts/application';
+import {changeLoadState} from '../contexts/reducers/change-load-state';
 
 interface Amount {
   value?: string,
@@ -19,34 +20,36 @@ export default function PageCreateIssue() {
   const [issueAmount, setIssueAmount] = useState<Amount>({ value: '0', formattedValue: '0', floatValue: 0});
   const [balance, setBalance] = useState<string>('0');
   const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
+  const {dispatch} = useContext(ApplicationContext);
   const router = useRouter()
-  
+
   useEffect(() => {
     const getBalance = async () => {
       await BeproService.login();
       setBalance(await BeproService.network.getBEPROStaked())
     }
-    getBalance()   
+    getBalance()
   }, [])
 
   const allow = async (evt) => {
     evt.preventDefault();
-    setLoadingAttributes(true);    
+    dispatch(changeLoadState(true))
     await BeproService.login()
-    .then(() => BeproService.network.approveTransactionalERC20Token()) 
-    .then(() => BeproService.getAddress()) 
+    .then(() => BeproService.network.approveTransactionalERC20Token())
+    .then(() => BeproService.getAddress())
     .then(address => BeproService.network.isApprovedTransactionalToken({ address, amount: issueAmount.floatValue}))
     .then(transaction => {
         setAllowedTransaction(transaction)
-        setLoadingAttributes(false)
+        dispatch(changeLoadState(false))
     })
     .catch((error) => console.log('Error',error))
-    .finally(() => setLoadingAttributes(false))
+    .finally(() => dispatch(changeLoadState(false)))
   }
 
   const createIssue = async (evt) => {
     evt.preventDefault();
-    setLoadingAttributes(true);
+    dispatch(changeLoadState(true))
+
     const payload = {
       title: issueTitle,
       description: issueDescription
@@ -60,7 +63,7 @@ export default function PageCreateIssue() {
         cleanFields();
       })
       .catch((error) => console.log('Error', error))
-      .finally(() => setLoadingAttributes(false))
+      .finally(() => dispatch(changeLoadState(false)))
   }
 
   const cleanFields = () => {
@@ -79,7 +82,7 @@ export default function PageCreateIssue() {
       allowedTransaction,
       issueContentIsValid(),
       verifyAmountBiggerThanBalance(),
-      issueAmount.floatValue > 0, 
+      issueAmount.floatValue > 0,
       !!issueAmount.formattedValue
     ].some(value => value === false);
   }
@@ -138,9 +141,9 @@ export default function PageCreateIssue() {
                     onBlur={handleIssueAmountBlurChange}
                     helperText={
                       <>
-                        {balance} $BEPRO 
-                        {!allowedTransaction && (
-                          <button 
+                        {balance} $BEPRO
+                      {!allowedTransaction && (
+                          <button
                             className="btn btn-opac ml-1 py-1"
                             onClick={() => setIssueAmount({ formattedValue: balance })}>
                             Max
