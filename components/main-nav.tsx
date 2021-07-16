@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react';
 import BeproService from '../services/bepro';
 import Link from 'next/link';
 import ConnectWalletButton from "./connect-wallet-button";
-import useAccount, { TYPES } from "hooks/useAccount";
+import GithubHandle from './github-handle';
 
 export default function MainNav() {
-    const account = useAccount();
+
     const [loggedIn, setLoggedIn] = useState<boolean>(false);
     const [address, setAddress] = useState<string>(null);
     const [beproStaked, setBeproStaked] = useState<number>(0);
@@ -115,7 +115,8 @@ export default function MainNav() {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {},
-  };
-};
+    return {
+        props: {}
+    }
+}
+

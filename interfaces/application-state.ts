@@ -4,4 +4,5 @@ export interface ApplicationState {
   githubHandle: string;
   metaMaskWallet: boolean;
   loading: LoadingState;
+  beproInit: boolean;
 }

@@ -1,44 +1,39 @@
 import {useContext, useEffect, useState,} from 'react';
 import BeproService from '../services/bepro';
 import GithubMicroService from '../services/github-microservice';
-import {Errors} from "../interfaces/enums/Errors";
+import {Errors} from '../interfaces/enums/Errors';
 import {ApplicationContext} from '../contexts/application';
 import {changeGithubHandle} from '../contexts/reducers/change-github-handle';
+import {useSession} from 'next-auth/client';
 
 export default function GithubHandle() {
-  const {state: {githubHandle: handle}, dispatch} = useContext(ApplicationContext)
+  const {state: {githubHandle: contextHandle}, dispatch} = useContext(ApplicationContext)
   const [loading, setLoading] = useState<boolean>(true);
-
-  const url = new URL(`/login/oauth/authorize`, `https://github.com`)
-  url.searchParams.append(`scope`, `user`);
-  url.searchParams.append(`client_id`, process.env.NEXT_PUBLIC_GH_CLIENT_ID);
-  url.searchParams.append(`redirect_uri`, process.env.NEXT_PUBLIC_GH_REDIRECT);
+  const [session, sessionLoading] = useSession();
 
   function setHandleIfConnected() {
-    if (!handle)
-      BeproService.isLoggedIn()
-                  .then(bool => {
-                    if (!bool)
-                      return Promise.reject(Errors.WalletNotConnected);
+    if (contextHandle) {
+      setLoading(false);
+      return;
+    }
 
-                    return BeproService.getAddress();
-                  })
-                  .then(BeproService.getAddress)
-                  .then(GithubMicroService.getHandleOf)
-                  .then(v => dispatch(changeGithubHandle(v)))
-                  .catch(e => {
-                    console.log(`Error`,e );
-                  })
-                  .finally(() => setLoading(false))
+    if (!session?.user?.name) {
+      setLoading(false);
+      return;
+    }
+
+    dispatch(changeGithubHandle(session.user.name));
+    setLoading(false);
+
   }
 
-  useEffect(setHandleIfConnected, []);
+  useEffect(setHandleIfConnected, [session]);
 
-  if (loading)
-    return <span>Loading..</span>;
+  if (loading || sessionLoading)
+    return <span className="btn btn-md btn-trans mr-1">Loading..</span>;
 
-  if (handle)
-    return <span>{handle}</span>;
+  if (contextHandle)
+    return <span className="btn btn-md btn-trans mr-1">{contextHandle}</span>;
 
-  return <a href={url.toString()}>connect to github</a>;
+  return <a href="/api/auth/signin" className="btn btn-md btn-trans mr-1">connect to github</a>;
 }
