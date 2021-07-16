@@ -1,13 +1,14 @@
 import axios from 'axios';
 
-const API_HOST = process.env.API_HOST || 'http://localhost:3005';
+
+const client = axios.create({baseURL: process.env.API_HOST || 'http://localhost:3005'})
 export default class GithubMicroService {
 
   static async createIssue(payload) {
-    await axios.post(API_HOST  + '/issues', payload);
+    await client.post('/issues', payload);
   }
   static async getIssuesIds(issueIds) {
-    const {data} = await axios.get(API_HOST  + '/issues', {params: {issueIds}});
+    const {data} = await client.get('/issues', {params: {issueIds}});
     return data;
   }
 
@@ -34,14 +35,20 @@ export default class GithubMicroService {
   /**
    * Should merge the address and the github handle
    */
-  static joinAddressToHandle({address, handle}: {address: string, handle: string}): Promise<string> {
-    return Promise.resolve(handle);
+  static joinAddressToHandle(payload: {address: string, githubHandle: string}): Promise<boolean> {
+    return client.post<string>(`/connect`, payload)
+                 .then(({data}) => data === `ok`)
+                 .catch((error) => {
+                   console.log(`Error`, error)
+                   return false;
+                 });
   }
 
   /**
    * Should return the handle of a given wallet address
    */
   static async getHandleOf(address: string): Promise<string> {
+    // return client.get(`/address`)
     return Promise.resolve(``)
   }
 

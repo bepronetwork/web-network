@@ -6,7 +6,7 @@ const ReduceActions: ReduceAction[] = [];
 
 const findReducer = (action: ReduceActionName) => ReduceActions.find(({name}) => name === action);
 
-export const mainReducer = (state: ApplicationState, action: ReduceActor) => {
+export const mainReducer = <T = any>(state: ApplicationState, action: ReduceActor<T>) => {
   const act = ReduceActions.find(({name}) => name === action.name)?.fn;
   return act ? act(state, action.payload) : {...state};
 }
