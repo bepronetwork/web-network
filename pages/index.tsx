@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { IIssue } from "../components/issue-list-item";
 import PageHero from "../components/page-hero";
 import { isEmpty } from "lodash";
-import { setLoadingAttributes } from "../providers/loading-provider";
+import { getLoadingState ,setLoadingAttributes } from "../providers/loading-provider";
 import GithubMicroService from "../services/github-microservice";
 import ListIssues from "../components/list-issues";
 import ReactSelect from "../components/react-select";
@@ -56,7 +56,9 @@ export default function Home() {
     await GithubMicroService.getIssues()
       .then((issues) => {
         setIssues(issues);
-        setfilterStateIssues({ state: "all", issues });
+        if (filterStateIssues.issues.length === 0) {
+          setfilterStateIssues({ state: "all", issues });
+        }
       })
       .catch((error) => console.log("Error", error))
       .finally(() => setLoadingAttributes(false));
@@ -114,6 +116,16 @@ export default function Home() {
             </div>
           </div>
           <ListIssues listIssues={filterStateIssues.issues} />
+          {filterStateIssues.issues.length === 0 && !getLoadingState &&  (
+            <div className="col-md-10">
+              <h4>
+                {filterStateIssues.state !== "all"
+                  ? filterStateIssues.state
+                  : null}{" "}
+                issues not found
+              </h4>
+            </div>
+          )}
         </div>
       </div>
     </div>
