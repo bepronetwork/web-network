@@ -9,6 +9,8 @@ export interface IIssue {
     developers: [],
     githubId: string,
     issueId: string,
+    creatorGithub?: string,
+    amount?: number,
     numberOfComments: number,
     state: string,
     title: string,
@@ -42,11 +44,11 @@ export default function IssueListItem({issue = null}:{issue?: IIssue}) {
                         <span className={`status ${handleColorState(issue?.state)} mr-3 mt-1`}>{issue?.state}</span>
                         <span className="p-small trans mr-3 mt-1">{issue?.numberOfComments} comments</span>
                         <span className="p-small trans mr-3 mt-1">{issue != null && formatDate(issue?.createdAt)}</span>
-                        <span className="p-small trans mr-3 mt-1">by @missing</span>
+                        <span className="p-small trans mr-3 mt-1">{issue?.creatorGithub}</span>
                     </div>
                 </div>
                 <div className="col-md-2 my-auto text-center">
-                    <span className="caption trans">MISSING $BEPRO</span>
+                    <span className="caption trans">{issue?.amount > 0 ? issue?.amount : "MISSING"} $BEPRO</span>
                     {(issue?.developers.length > 0) && <IssueAvatars></IssueAvatars>}
                 </div>
             </div>
