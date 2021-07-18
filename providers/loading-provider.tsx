@@ -1,5 +1,5 @@
 import { createContext, Dispatch, SetStateAction, useState } from "react";
-import Loading from "../components/loading";
+import Loading from "../components/loading-global";
 
 let getLoadingState: () => boolean;
 
