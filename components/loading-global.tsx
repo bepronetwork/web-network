@@ -1,7 +1,7 @@
 import { ReactNode, ReactNodeArray } from "react";
 import { Modal, Spinner } from "react-bootstrap";
 
-export default function Loading({
+export default function LoadingGlobal({
   show,
   children,
   ...params
