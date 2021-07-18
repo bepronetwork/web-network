@@ -10,23 +10,23 @@ import ReactSelect from "../components/react-select";
 
 const options_issue = [
   {
-    value: "All issues",
+    value: "all",
     label: "All issues",
   },
   {
-    value: "Open issues",
+    value: "open",
     label: "Open issues",
   },
   {
-    value: "In progress issues",
+    value: "in progress",
     label: "In progress issues",
   },
   {
-    value: "Ready issues",
+    value: "ready",
     label: "Ready issues",
   },
   {
-    value: "Draft issues",
+    value: "draft",
     label: "Draft issues",
   },
 ];
@@ -40,6 +40,10 @@ const options_time = [
 
 export default function Home() {
   const [issues, setIssues] = useState<IIssue[]>([]);
+  const [filterStateIssues, setfilterStateIssues] = useState({
+    state: "",
+    issues: issues,
+  });
 
   useEffect(() => {
     getIssues();
@@ -50,9 +54,31 @@ export default function Home() {
       setLoadingAttributes(true);
     }
     await GithubMicroService.getIssues()
-      .then((issues) => setIssues(issues))
+      .then((issues) => {
+        setIssues(issues);
+        setfilterStateIssues({ state: "all", issues });
+      })
       .catch((error) => console.log("Error", error))
       .finally(() => setLoadingAttributes(false));
+  };
+
+  const handleChangeFilterIssue = (params: {
+    value: string;
+    label: string;
+  }) => {
+    if (params.value === "all") {
+      setfilterStateIssues({
+        state: params.value,
+        issues,
+      });
+    } else {
+      setfilterStateIssues({
+        state: params.value,
+        issues: issues.filter(
+          (obj: IIssue) => obj.state.toLowerCase() === params.value
+        ),
+      });
+    }
   };
 
   return (
@@ -69,21 +95,25 @@ export default function Home() {
             <div className="d-flex justify-content-between mb-4">
               <div className="col-md-3">
                 <ReactSelect
+                  id="filterIssue"
                   className="react-select-filterIssues"
                   defaultValue={options_issue[0]}
                   options={options_issue}
+                  onChange={handleChangeFilterIssue}
                 />
               </div>
               <div className="col-md-3">
                 <ReactSelect
-                  className="react-select-filterIssues"
+                  id="filterTime"
+                  className="react-select-filterIssues trans"
                   defaultValue={options_time[0]}
                   options={options_time}
+                  isDisabled
                 />
               </div>
             </div>
           </div>
-          <ListIssues listIssues={issues} />
+          <ListIssues listIssues={filterStateIssues.issues} />
         </div>
       </div>
     </div>
