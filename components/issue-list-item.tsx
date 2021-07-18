@@ -15,6 +15,23 @@ export interface IIssue {
 }
 export default function IssueListItem({issue = null}:{issue?: IIssue}) {
 
+   function handleColorState (state: string) {
+    switch(state.toLowerCase()) {
+     case "draft": {
+        return "gray"
+     }
+     case "in progress" || "open": {
+        return "blue"
+     }
+     case "ready": {
+        return "green"
+     }
+     default: {
+        return "blue" 
+     }
+    }
+   }
+
     return (
         <div className="bg-shadow list-item rounded p-4 mb-3">
             <div className="row align-center">
@@ -22,7 +39,7 @@ export default function IssueListItem({issue = null}:{issue?: IIssue}) {
                     <h4 className="h4 text-truncate">
                         <span className="trans">#{issue?.githubId}</span> {issue?.title}</h4>
                     <div className="d-flex align-center flex-wrap justify-content-center justify-content-md-start">
-                        <span className="status blue mr-3 mt-1">{issue?.state}</span>
+                        <span className={`status ${handleColorState(issue?.state)} mr-3 mt-1`}>{issue?.state}</span>
                         <span className="p-small trans mr-3 mt-1">{issue?.numberOfComments} comments</span>
                         <span className="p-small trans mr-3 mt-1">{issue != null && formatDate(issue?.createdAt)}</span>
                         <span className="p-small trans mr-3 mt-1">by @missing</span>
