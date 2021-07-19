@@ -38,13 +38,15 @@ export default function MainNav() {
         <div className="main-nav d-flex align-items-center justify-content-between">
 
                 <div className="d-flex">
-                    <a href="/">
-                        <img
-                            className="logo"
-                            src="https://64.media.tumblr.com/3cf2d2b58643cb6f46b42a652771b73b/e8afc16b16e16514-bc/s250x400/191e77982d8901585030f596d3e90935d42099ed.png"
-                            alt=""
-                        />
-                    </a>
+                    <Link href="/">
+                        <a>
+                            <img
+                                className="logo"
+                                src="https://64.media.tumblr.com/3cf2d2b58643cb6f46b42a652771b73b/e8afc16b16e16514-bc/s250x400/191e77982d8901585030f596d3e90935d42099ed.png"
+                                alt=""
+                            />
+                        </a>
+                    </Link>
                     <ul className="nav-links">
                         <li><Link href="/developers" >Developers</Link></li>
                         <li><Link href="/council" >Council</Link></li>
