@@ -1,6 +1,6 @@
 import { GetStaticProps } from "next";
 import React, { useEffect, useState } from "react";
-import IssueListItem, { IIssue } from "../components/issue-list-item";
+import { IIssue } from "../components/issue-list-item";
 import ListIssues from "../components/list-issues";
 import PageHero from "../components/page-hero";
 import GithubMicroService from "../services/github-microservice";
