@@ -1,9 +1,10 @@
 import clsx from "clsx";
-import { MouseEventHandler, useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import BalanceActionsHandlers from "./balance-actions-handlers";
-import NumberFormat, { NumberFormatValues } from "react-number-format";
+import { NumberFormatValues } from "react-number-format";
 import BalanceActionsSuccess from "./balance-actions-success";
-import BeproService from "../services/bepro";
+import InputNumber from "./input-number";
+import ApproveSettlerToken from "./approve-settler-token";
 
 const actions: string[] = ["Lock", "Unlock"];
 
@@ -11,25 +12,6 @@ function BalanceActions(): JSX.Element {
   const [action, setAction] = useState<string>(actions[0]);
   const [amount, setAmount] = useState<number>(0);
   const [success, setSuccess] = useState<boolean>(false);
-  const [isApproved, setIsApproved] = useState<boolean>(false);
-  const handleIsApproved = useCallback<
-    MouseEventHandler<HTMLButtonElement> | any
-  >(() => {
-    void (async function getIsApproved() {
-      try {
-        await BeproService.login();
-        const address: string = await BeproService.getAddress();
-        const isApprovedSettlerToken: boolean =
-          await BeproService.network.isApprovedSettlerToken({
-            address,
-            amount,
-          });
-        setIsApproved(isApprovedSettlerToken);
-      } catch (error) {
-        console.log("Error", error);
-      }
-    })();
-  }, [amount]);
   const renderAmount = amount ? `${amount} ` : "";
   const info = {
     Lock: {
@@ -48,19 +30,12 @@ function BalanceActions(): JSX.Element {
     },
   }[action];
 
-  useEffect(() => {
-    handleIsApproved();
-  }, [handleIsApproved]);
   function handleSuccessAction() {
     handleCloseAction();
     setSuccess(true);
   }
   function handleAction(params: string) {
-    handleCloseAction();
     setAction(params);
-  }
-  function handleChange(values: NumberFormatValues) {
-    setAmount(values.floatValue);
   }
   function handleCloseAction() {
     setAmount(0);
@@ -85,34 +60,24 @@ function BalanceActions(): JSX.Element {
           <span className="badge-opac">200 Available</span>
         </div>
         <p className="p text-white">{info.description}</p>
-        <div className="form-group">
-          <label className="p-small mb-2">$BEPRO Amount</label>
-          <div className="input-group mb-4">
-            <NumberFormat
-              min="0"
-              className="form-control"
-              placeholder="0"
-              value={amount}
-              thousandSeparator={true}
-              onValueChange={handleChange}
+        <InputNumber
+          label="$BEPRO Amount"
+          symbol="$BEPRO"
+          value={amount}
+          onValueChange={(values: NumberFormatValues) =>
+            setAmount(values.floatValue)
+          }
+        />
+        <ApproveSettlerToken
+          amount={amount}
+          fallback={
+            <BalanceActionsHandlers
+              onCloseAction={handleCloseAction}
+              onSuccessAction={handleSuccessAction}
+              disabled={!amount}
+              info={info}
             />
-            <span className="input-group-text text-white-50 p-small">
-              $BEPRO
-            </span>
-          </div>
-        </div>
-        {!isApproved && (
-          <button
-            className="btn btn-md btn-lg btn-opac w-100 mb-4"
-            onClick={handleIsApproved}>
-            Approve
-          </button>
-        )}
-        <BalanceActionsHandlers
-          onCloseAction={handleCloseAction}
-          onSuccessAction={handleSuccessAction}
-          disabled={!amount}
-          info={info}
+          }
         />
       </div>
       <BalanceActionsSuccess
