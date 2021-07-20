@@ -1,5 +1,4 @@
 import { Application, Network } from 'bepro-js';
-import variables from '../variables';
 
 export default class BeproService {
 
@@ -28,7 +27,7 @@ export default class BeproService {
     });
     // this.bepro.start();
     this.network = new Network({
-      contractAddress: variables.beproJs.contractAddress,
+      contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
       opt: {
         web3Connection: this.web3Connection,
       }
