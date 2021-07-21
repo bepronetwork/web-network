@@ -3,10 +3,19 @@ import React, { useEffect, useState } from 'react';
 import { formatDate } from '../helpers/formatDate';
 import IssueAvatars from './issue-avatars';
 
+export interface developer {
+    id?: number,
+    login?: string,
+    avatar_url?: string,
+    url?: string,
+    type?: string,
+}
+
 export interface IIssue {
     body: string,
     createdAt: Date,
-    developers: [],
+    developers: developer[],
+    dueDate?: string,
     githubId: string,
     issueId: string,
     creatorGithub?: string,
@@ -45,11 +54,12 @@ export default function IssueListItem({issue = null}:{issue?: IIssue}) {
                         <span className="p-small trans mr-3 mt-1">{issue?.numberOfComments} comments</span>
                         <span className="p-small trans mr-3 mt-1">{issue != null && formatDate(issue?.createdAt)}</span>
                         <span className="p-small trans mr-3 mt-1">{issue?.creatorGithub}</span>
+                        {issue?.dueDate && <span className="p-small text-warning mr-3 mt-1">{issue?.dueDate}</span>}
                     </div>
                 </div>
                 <div className="col-md-2 my-auto text-center">
                     <span className="caption trans">{issue?.amount > 0 ? issue?.amount : "MISSING"} $BEPRO</span>
-                    {(issue?.developers.length > 0) && <IssueAvatars></IssueAvatars>}
+                    {(issue?.developers.length > 0) && <IssueAvatars users={issue?.developers}></IssueAvatars>}
                 </div>
             </div>
         </div>
