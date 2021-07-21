@@ -50,7 +50,7 @@ export default function MainNav() {
                     <ul className="nav-links">
                         <li><Link href="/developers" >Developers</Link></li>
                         <li><Link href="/council" >Council</Link></li>
-                        <li><Link href="/oracle" ><a href="/oracle">Oracle</a></Link></li>
+                        <li><Link href="/oracle/new-issues" >Oracle</Link></li>
                         {/* <li><a href="/">Lists</a></li>
                         <li><a href="/issue">Issue</a></li>
                         <li><a href="/proposal">Proposal</a></li>
