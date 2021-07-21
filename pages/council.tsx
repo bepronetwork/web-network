@@ -6,12 +6,13 @@ import PageHero from "../components/page-hero";
 import GithubMicroService from "../services/github-microservice";
 import { setLoadingAttributes } from "../providers/loading-provider";
 import { isEmpty } from "lodash";
+import { mockReadyIssues } from "../helpers/mockdata/mockIssues";
 
 export default function PageCouncil() {
-  const [issues, setIssues] = useState<IIssue[]>([]);
+  const [issues, setIssues] = useState<IIssue[]>(mockReadyIssues);
 
   useEffect(() => {
-    getIssues();
+    //getIssues();
   }, []);
 
   const getIssues = async () => {

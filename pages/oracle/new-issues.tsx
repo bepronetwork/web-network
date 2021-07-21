@@ -6,12 +6,13 @@ import GithubMicroService from "../../services/github-microservice";
 import { setLoadingAttributes } from "../../providers/loading-provider";
 import { isEmpty } from "lodash";
 import Oracle from "../../components/oracle";
+import { mockNewIssues } from "../../helpers/mockdata/mockIssues";
 
 export default function Newissues() {
-  const [issues, setIssues] = useState<IIssue[]>([]);
+  const [issues, setIssues] = useState<IIssue[]>(mockNewIssues);
 
   useEffect(() => {
-    getIssues();
+    //getIssues();
   }, []);
 
   const getIssues = async () => {
