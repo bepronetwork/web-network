@@ -6,9 +6,10 @@ import GithubMicroService from "../../services/github-microservice";
 import { setLoadingAttributes } from "../../providers/loading-provider";
 import { isEmpty } from "lodash";
 import Oracle from "../../components/oracle";
+import { mockReadyIssues } from "../../helpers/mockdata/mockIssues";
 
 export default function ReadyToMergeIssues() {
-  const [issues, setIssues] = useState<IIssue[]>([]);
+  const [issues, setIssues] = useState<IIssue[]>(mockReadyIssues);
 
   useEffect(() => {
     getIssues();

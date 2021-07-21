@@ -10,6 +10,7 @@ import {
 import GithubMicroService from "../services/github-microservice";
 import ListIssues from "../components/list-issues";
 import ReactSelect from "../components/react-select";
+import { mockDeveloperIssues } from "../helpers/mockdata/mockIssues";
 
 const options_issue = [
   {
@@ -42,14 +43,14 @@ const options_time = [
 ];
 
 export default function PageDevelopers() {
-  const [issues, setIssues] = useState<IIssue[]>([]);
+  const [issues, setIssues] = useState<IIssue[]>(mockDeveloperIssues);
   const [filterStateIssues, setfilterStateIssues] = useState({
     state: "",
-    issues: issues,
+    issues: mockDeveloperIssues,
   });
 
   useEffect(() => {
-    getIssues();
+    //getIssues();
   }, []);
 
   const getIssues = async () => {
@@ -119,8 +120,7 @@ export default function PageDevelopers() {
             </div>
           </div>
           <ListIssues listIssues={filterStateIssues.issues} />
-          {console.log("filter ", filterStateIssues, !getLoadingState())}
-          {(filterStateIssues.issues.length === 0 && !getLoadingState()) ? (
+          {filterStateIssues.issues.length === 0 && !getLoadingState() ? (
             <div className="col-md-10">
               <h4>
                 {filterStateIssues.state !== "all"
