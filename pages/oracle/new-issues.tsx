@@ -5,7 +5,7 @@ import ListIssues from "../../components/list-issues";
 import GithubMicroService from "../../services/github-microservice";
 import { setLoadingAttributes } from "../../providers/loading-provider";
 import { isEmpty } from "lodash";
-import Oracle from "../../components/oracle-page";
+import Oracle from "../../components/oracle";
 
 export default function Newissues() {
   const [issues, setIssues] = useState<IIssue[]>([]);
