@@ -401,7 +401,6 @@ p {
 
 .form-group {
   margin-bottom: $m;
-
 }
 
 label {
@@ -411,6 +410,10 @@ label {
   background-color: $black;
   border: 1px solid $black;
   color: $gray;
+  &:disabled, &[readonly] {
+    background-color: $black;
+    opacity: 0.4;
+  }
 }
 .input-group {
   .input-group-text {
@@ -588,4 +591,11 @@ label {
   &.progress-5 {
     border-color: rgba($purple, 0.2);
   }
+}
+
+.material-icons {
+  &.md-small { font-size: 16px; }
+  &.md-medium { font-size: 24px; }
+  &.md-large { font-size: 44px; }
+  &.md-larger { font-size: 64px; }
 }
