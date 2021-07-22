@@ -9,15 +9,15 @@ export default function BalanceActionsHandlers({
     caption: "",
     body: "",
   },
-  onCloseAction = () => {},
-  onSuccessAction = () => {},
+  onCancel = () => {},
+  onConfirm = () => {},
   disabled = false,
 }: {
   info: {
     [key: string]: string;
   };
-  onCloseAction: () => void;
-  onSuccessAction: () => void;
+  onCancel: () => void;
+  onConfirm: () => void;
   disabled: boolean;
 }): JSX.Element {
   return (
@@ -31,7 +31,7 @@ export default function BalanceActionsHandlers({
           <button
             className="btn btn-md btn-opac"
             onClick={() => {
-              onCloseAction();
+              onCancel();
               hideModal();
             }}>
             Cancel
@@ -39,7 +39,7 @@ export default function BalanceActionsHandlers({
           <button
             className="btn btn-md btn-primary"
             onClick={() => {
-              onSuccessAction();
+              onConfirm();
               hideModal();
             }}>
             Confirm
