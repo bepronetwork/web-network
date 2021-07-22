@@ -19,16 +19,16 @@ export default function IssueAvatars({ users }) {
         }
       })}
       {users.length > 3 && (
-        <span
-          className="avatar circle-3  ms-1"
+        <div
+          className="d-inline "
           data-bs-toggle="tooltip"
           data-bs-html="true"
           title={users
             .filter((_users, index) => index > 2)
             .map((nextUser) => ` ${nextUser.login}`)}
         >
-          {users.length - 3}+
-        </span>
+          <span className="p-1 avatar-number circle-3">+{users.length - 3}</span>
+        </div>
       )}
     </div>
   );
