@@ -1,44 +1,62 @@
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BalanceActionsHandlers from "./balance-actions-handlers";
 import { NumberFormatValues } from "react-number-format";
-import BalanceActionsSuccess from "./balance-actions-success";
+import BalanceActionsStatus from "./balance-actions-status";
 import InputNumber from "./input-number";
 import ApproveSettlerToken from "./approve-settler-token";
+import BeproService from "../services/bepro";
+import { setLoadingAttributes } from "../providers/loading-provider";
 
 const actions: string[] = ["Lock", "Unlock"];
 
 function BalanceActions(): JSX.Element {
   const [action, setAction] = useState<string>(actions[0]);
-  const [amount, setAmount] = useState<number>(0);
-  const [success, setSuccess] = useState<boolean>(false);
-  const renderAmount = amount ? `${amount} ` : "";
-  const info = {
+  const [tokenAmount, setTokenAmount] = useState<number>(0);
+  const [isApproved, setIsApproved] = useState<boolean>(false);
+  const [showStatus, setShowStatus] = useState<boolean>(false);
+  const [isSucceed, setIsSucceed] = useState<boolean>(false);
+  const renderAmount = tokenAmount ? `${tokenAmount} ` : "";
+  const renderInfo = {
     Lock: {
       title: "Lock $BEPRO",
       description: "Lock $BEPRO to get oracles",
       label: `Get ${renderAmount}oracles`,
       caption: "Get Oracles from $BEPRO",
-      body: `You are locking ${amount} $BEPRO /br/ to get /oracles${amount} Oracles/`,
+      body: `You are locking ${tokenAmount} $BEPRO /br/ to get /oracles${tokenAmount} Oracles/`,
     },
     Unlock: {
       title: "Unlock $BEPRO",
       description: "Unlock $BEPRO by giving away oracles",
       label: `Recover ${renderAmount}$BEPRO`,
       caption: "Get $BEPRO from Oracles",
-      body: `Give away /oracles${amount} Oracles/ /br/ to get back ${amount} $BEPRO`,
+      body: `Give away /oracles${tokenAmount} Oracles/ /br/ to get back ${tokenAmount} $BEPRO`,
     },
   }[action];
 
-  function handleSuccessAction() {
-    handleCloseAction();
-    setSuccess(true);
+  useEffect(() => {
+    setIsApproved(false);
+  }, [tokenAmount]);
+  async function handleConfirm() {
+    try {
+      setLoadingAttributes(true);
+      await BeproService.login();
+      const response = await BeproService.network[action.toLowerCase()]({
+        tokenAmount,
+      });
+
+      setIsSucceed(response.status);
+      setShowStatus(true);
+      handleCancel();
+      setLoadingAttributes(false);
+    } catch (error) {
+      console.log("balance-actions handleConfirm", error);
+      setLoadingAttributes(false);
+    }
   }
-  function handleAction(params: string) {
-    setAction(params);
-  }
-  function handleCloseAction() {
-    setAmount(0);
+  function handleCancel() {
+    setTokenAmount(0);
+    setIsApproved(false);
   }
 
   return (
@@ -49,7 +67,7 @@ function BalanceActions(): JSX.Element {
             {actions.map((actionItem) => (
               <button
                 key={actionItem}
-                onClick={() => handleAction(actionItem)}
+                onClick={() => setAction(actionItem)}
                 className={clsx("btn p-0 subnav-item", {
                   active: actionItem === action,
                 })}>
@@ -59,31 +77,36 @@ function BalanceActions(): JSX.Element {
           </div>
           <span className="badge-opac">200 Available</span>
         </div>
-        <p className="p text-white">{info.description}</p>
+        <p className="p text-white">{renderInfo.description}</p>
         <InputNumber
+          disabled={isApproved}
           label="$BEPRO Amount"
           symbol="$BEPRO"
-          value={amount}
+          value={tokenAmount}
           onValueChange={(values: NumberFormatValues) =>
-            setAmount(values.floatValue)
+            setTokenAmount(values.floatValue)
           }
         />
         <ApproveSettlerToken
-          amount={amount}
-          fallback={
-            <BalanceActionsHandlers
-              onCloseAction={handleCloseAction}
-              onSuccessAction={handleSuccessAction}
-              disabled={!amount}
-              info={info}
-            />
+          amount={tokenAmount}
+          onApprove={setIsApproved}
+          disabled={
+            !Boolean(tokenAmount) || (Boolean(tokenAmount) && isApproved)
           }
+          className="mb-4"
+        />
+        <BalanceActionsHandlers
+          onCancel={handleCancel}
+          onConfirm={handleConfirm}
+          disabled={!isApproved || !Boolean(tokenAmount)}
+          info={renderInfo}
         />
       </div>
-      <BalanceActionsSuccess
-        info={{ title: info.title, description: info.description }}
-        show={success}
-        onClose={() => setSuccess(false)}
+      <BalanceActionsStatus
+        info={{ title: renderInfo.title, description: renderInfo.description }}
+        show={showStatus}
+        isSucceed={isSucceed}
+        onClose={() => setShowStatus(false)}
       />
     </>
   );
