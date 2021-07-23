@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { kebabCase } from "lodash";
 import { ComponentPropsWithoutRef, ReactElement, useState } from "react";
 import { Modal } from "react-bootstrap";
@@ -26,7 +27,7 @@ export default function ButtonDialog({
   return (
     <>
       <button
-        className={`btn btn-md ${className}`}
+        className={clsx("btn btn-md", className)}
         onClick={() => {
           setShow(true);
           onClick();

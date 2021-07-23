@@ -5,26 +5,12 @@ import DistributionItem from "./distribution-item";
 import sumObj from "../helpers/sumObj";
 
 const options = [
-  {
-    value: "Pull Request #32 by @asantos",
-    label: "Pull Request #32 by @asantos",
-  },
-  {
-    value: "Pull Request #34 by @bka",
-    label: "Pull Request #34 by @bka",
-  },
-  {
-    value: "Pull Request #36 by @alisouza",
-    label: "Pull Request #36 by @alisouza",
-  },
-  {
-    value: "Pull Request #64 by @kgb",
-    label: "Pull Request #64 by @kgb",
-  },
-  {
-    value: "Pull Request #69 by @alisa",
-    label: "Pull Request #69 by @alisa",
-  },
+  "Pull Request #32 by @asantos",
+  "Pull Request #34 by @bka",
+  "Pull Request #36 by @alisouza",
+  "Pull Request #64 by @kgb",
+  "Pull Request #69 by @alisa",
+  "Pull Request #69 by @alisa",
 ];
 const distributed = ["@asantos", "@vazTros", "@MikeSon"];
 
@@ -78,7 +64,13 @@ export default function NewProposal() {
         </>
       )}>
       <p className="p-small text-50">Select a pull request </p>
-      <ReactSelect defaultValue={options[0]} options={options} />
+      <ReactSelect
+        defaultValue={options[0]}
+        options={options.map((value) => ({
+          value,
+          label: value,
+        }))}
+      />
       <p className="p-small mt-3">Propose distribution</p>
       <ul className="mb-0">
         {distributed.map((item) => (
