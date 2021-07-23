@@ -48,7 +48,7 @@ export default function IssueListItem({issue = null}:{issue?: IIssue}) {
             <div className="row align-center">
                 <div className="col-md-10 mb-3 mb-md-0">
                     <h4 className="h4 text-truncate">
-                        <span className="trans">#{issue?.githubId}</span> 
+                        <span className="trans me-1">#{issue?.githubId}</span>  
                         {issue?.title.length > 61 ? 
                          issue?.title.substring(0,61)+"..." 
                         : 
