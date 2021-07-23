@@ -48,7 +48,13 @@ export default function IssueListItem({issue = null}:{issue?: IIssue}) {
             <div className="row align-center">
                 <div className="col-md-10 mb-3 mb-md-0">
                     <h4 className="h4 text-truncate">
-                        <span className="trans">#{issue?.githubId}</span> {issue?.title}</h4>
+                        <span className="trans">#{issue?.githubId}</span> 
+                        {issue?.title.length > 61 ? 
+                         issue?.title.substring(0,61)+"..." 
+                        : 
+                         issue?.title
+                        }
+                    </h4>
                     <div className="d-flex align-center flex-wrap justify-content-center justify-content-md-start">
                         <span className={`status ${handleColorState(issue?.state)} mr-3 mt-1`}>{issue?.state}</span>
                         <span className="p-small trans mr-3 mt-1">{issue?.numberOfComments} comments</span>
