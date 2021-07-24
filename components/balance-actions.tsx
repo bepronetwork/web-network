@@ -13,7 +13,7 @@ const actions: string[] = ["Lock", "Unlock"];
 function BalanceActions(): JSX.Element {
   const [action, setAction] = useState<string>(actions[0]);
   const [tokenAmount, setTokenAmount] = useState<number>(0);
-  const [isApproved, setIsApproved] = useState<boolean>(false);
+  const [isApproved, setIsApproved] = useState<boolean>(true);
   const [showStatus, setShowStatus] = useState<boolean>(false);
   const [isSucceed, setIsSucceed] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -35,20 +35,19 @@ function BalanceActions(): JSX.Element {
       label: `Recover ${renderAmount}$BEPRO`,
       caption: "Get $BEPRO from Oracles",
       body: `Give away /oracles${tokenAmount} Oracles/ /br/ to get back ${tokenAmount} $BEPRO`,
-      params(address: string) {
-        return { tokenAmount, address };
+      params(from: string) {
+        return { tokenAmount, from };
       },
     },
   }[action];
 
   useEffect(() => {
-    setIsApproved(false);
+    setIsApproved(true);
     setError("");
   }, [tokenAmount]);
   async function handleConfirm() {
     try {
       setLoadingAttributes(true);
-      await BeproService.login();
       const address: string = await BeproService.getAddress();
       const response = await BeproService.network[action.toLowerCase()]({
         ...renderInfo.params(address),
@@ -59,12 +58,38 @@ function BalanceActions(): JSX.Element {
       handleCancel();
       setLoadingAttributes(false);
     } catch (error) {
+      console.log(error);
       setLoadingAttributes(false);
     }
   }
   function handleCancel() {
     setTokenAmount(0);
-    setIsApproved(false);
+    setIsApproved(true);
+  }
+  async function handleClickHandlers() {
+    if (!tokenAmount) {
+      return setError("$BEPRO amount needs to be higher than 0.");
+    }
+
+    try {
+      const address: string = await BeproService.getAddress();
+      const isApprovedSettlerToken: boolean =
+        await BeproService.network.isApprovedSettlerToken({
+          address,
+          amount: tokenAmount,
+        });
+
+      if (!isApprovedSettlerToken) {
+        return () => {
+          setError(
+            "Settler token not approved. Approve the settler ERC20 token and try again",
+          );
+          setIsApproved(false);
+        };
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -87,7 +112,7 @@ function BalanceActions(): JSX.Element {
         </div>
         <p className="p text-white">{renderInfo.description}</p>
         <InputNumber
-          disabled={isApproved}
+          disabled={!isApproved}
           label="$BEPRO Amount"
           symbol="$BEPRO"
           error={error}
@@ -97,16 +122,16 @@ function BalanceActions(): JSX.Element {
           }
         />
         <ApproveSettlerToken
-          amount={tokenAmount}
           onApprove={setIsApproved}
-          onCatch={setError}
-          disabled={Boolean(tokenAmount) && isApproved}
+          disabled={isApproved}
           className="mb-4"
         />
         <BalanceActionsHandlers
           onCancel={handleCancel}
           onConfirm={handleConfirm}
-          disabled={!Boolean(tokenAmount) || !isApproved}
+          onClick={handleClickHandlers}
+          disabled={!isApproved}
+          canShow={!Boolean(error)}
           info={renderInfo}
         />
       </div>
