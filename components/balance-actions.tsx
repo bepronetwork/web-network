@@ -7,6 +7,7 @@ import InputNumber from "./input-number";
 import ApproveSettlerToken from "./approve-settler-token";
 import BeproService from "../services/bepro";
 import { setLoadingAttributes } from "../providers/loading-provider";
+import OraclesBoxHeader from "./oracles-box-header";
 
 const actions: string[] = ["Lock", "Unlock"];
 
@@ -81,9 +82,7 @@ function BalanceActions(): JSX.Element {
 
       if (!isApprovedSettlerToken) {
         return () => {
-          setError(
-            "Settler token not approved. Check it and try again",
-          );
+          setError("Settler token not approved. Check it and try again");
           setIsApproved(false);
         };
       }
@@ -95,21 +94,12 @@ function BalanceActions(): JSX.Element {
   return (
     <>
       <div className="content-wrapper">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <div className="d-flex">
-            {actions.map((actionItem) => (
-              <button
-                key={actionItem}
-                onClick={() => setAction(actionItem)}
-                className={clsx("btn p-0 subnav-item", {
-                  active: actionItem === action,
-                })}>
-                <h4 className="h4 mb-0 mr-2">{actionItem}</h4>
-              </button>
-            ))}
-          </div>
-          <span className="badge-opac">200 Available</span>
-        </div>
+        <OraclesBoxHeader
+          actions={actions}
+          onChange={setAction}
+          currentAction={action}
+          oracles={200}
+        />
         <p className="p text-white">{renderInfo.description}</p>
         <InputNumber
           disabled={!isApproved}
