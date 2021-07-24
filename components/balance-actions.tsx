@@ -16,6 +16,7 @@ function BalanceActions(): JSX.Element {
   const [isApproved, setIsApproved] = useState<boolean>(false);
   const [showStatus, setShowStatus] = useState<boolean>(false);
   const [isSucceed, setIsSucceed] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
   const renderAmount = tokenAmount ? `${tokenAmount} ` : "";
   const renderInfo = {
     Lock: {
@@ -24,6 +25,9 @@ function BalanceActions(): JSX.Element {
       label: `Get ${renderAmount}oracles`,
       caption: "Get Oracles from $BEPRO",
       body: `You are locking ${tokenAmount} $BEPRO /br/ to get /oracles${tokenAmount} Oracles/`,
+      params() {
+        return { tokenAmount };
+      },
     },
     Unlock: {
       title: "Unlock $BEPRO",
@@ -31,18 +35,23 @@ function BalanceActions(): JSX.Element {
       label: `Recover ${renderAmount}$BEPRO`,
       caption: "Get $BEPRO from Oracles",
       body: `Give away /oracles${tokenAmount} Oracles/ /br/ to get back ${tokenAmount} $BEPRO`,
+      params(address: string) {
+        return { tokenAmount, address };
+      },
     },
   }[action];
 
   useEffect(() => {
     setIsApproved(false);
+    setError("");
   }, [tokenAmount]);
   async function handleConfirm() {
     try {
       setLoadingAttributes(true);
       await BeproService.login();
+      const address: string = await BeproService.getAddress();
       const response = await BeproService.network[action.toLowerCase()]({
-        tokenAmount,
+        ...renderInfo.params(address),
       });
 
       setIsSucceed(response.status);
@@ -50,7 +59,6 @@ function BalanceActions(): JSX.Element {
       handleCancel();
       setLoadingAttributes(false);
     } catch (error) {
-      console.log("balance-actions handleConfirm", error);
       setLoadingAttributes(false);
     }
   }
@@ -82,6 +90,7 @@ function BalanceActions(): JSX.Element {
           disabled={isApproved}
           label="$BEPRO Amount"
           symbol="$BEPRO"
+          error={error}
           value={tokenAmount}
           onValueChange={(values: NumberFormatValues) =>
             setTokenAmount(values.floatValue)
@@ -90,15 +99,14 @@ function BalanceActions(): JSX.Element {
         <ApproveSettlerToken
           amount={tokenAmount}
           onApprove={setIsApproved}
-          disabled={
-            !Boolean(tokenAmount) || (Boolean(tokenAmount) && isApproved)
-          }
+          onApproveError={setError}
+          disabled={Boolean(tokenAmount) && isApproved}
           className="mb-4"
         />
         <BalanceActionsHandlers
           onCancel={handleCancel}
           onConfirm={handleConfirm}
-          disabled={!isApproved || !Boolean(tokenAmount)}
+          disabled={!Boolean(tokenAmount) || !isApproved}
           info={renderInfo}
         />
       </div>
