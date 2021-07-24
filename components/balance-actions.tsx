@@ -82,7 +82,7 @@ function BalanceActions(): JSX.Element {
       if (!isApprovedSettlerToken) {
         return () => {
           setError(
-            "Settler token not approved. Approve the settler ERC20 token and try again",
+            "Settler token not approved. Check it and try again",
           );
           setIsApproved(false);
         };
