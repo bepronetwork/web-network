@@ -18,20 +18,24 @@ export default function InputNumber({
   min = "0",
   helperText = "",
   className = "",
-  // todo: add error style too
   error = "",
   ...params
 }: InputNumber) {
   const id = kebabCase(label);
+  const errorStyle = { "text-danger": error };
 
   return (
     <div className="form-group mb-4">
       <label className="p-small trans mb-2" id={id}>
         {label}
       </label>
-      <div className="input-group">
+      <div
+        className={clsx("input-group", {
+          ...errorStyle,
+          "border border-1 border-danger rounded": error,
+        })}>
         <NumberFormat
-          className={clsx("form-control", className)}
+          className={clsx("form-control", { ...errorStyle }, className)}
           htmlFor={id}
           min={min}
           placeholder={placeholder}
@@ -39,7 +43,11 @@ export default function InputNumber({
           {...params}
         />
         {symbol && (
-          <span className="input-group-text text-white-50 p-small">
+          <span
+            className={clsx("input-group-text p-small", {
+              "text-white-50": !error,
+              ...errorStyle,
+            })}>
             {symbol}
           </span>
         )}
