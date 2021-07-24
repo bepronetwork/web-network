@@ -1,5 +1,14 @@
 import { Fragment } from "react";
+import { ButtonDialog as ButtonDialogProps } from "../types/button-dialog";
 import ButtonDialog from "./button-dialog";
+
+interface Props extends ButtonDialogProps {
+  info: {
+    [key: string]: string;
+  };
+  onCancel: () => void;
+  onConfirm: () => void;
+}
 
 export default function BalanceActionsHandlers({
   info = {
@@ -11,20 +20,12 @@ export default function BalanceActionsHandlers({
   },
   onCancel = () => {},
   onConfirm = () => {},
-  disabled = false,
-}: {
-  info: {
-    [key: string]: string;
-  };
-  onCancel: () => void;
-  onConfirm: () => void;
-  disabled: boolean;
-}): JSX.Element {
+  ...params
+}: Props): JSX.Element {
   return (
     <ButtonDialog
       title={info.title}
       label={info.label}
-      disabled={disabled}
       className="btn-lg btn-primary w-100"
       footer={({ hideModal }) => (
         <>
@@ -45,7 +46,8 @@ export default function BalanceActionsHandlers({
             Confirm
           </button>
         </>
-      )}>
+      )}
+      {...params}>
       <p className="p-small text-white-50 text-center">{info.caption}</p>
       <p className="text-center fs-4">
         {info.body?.split("/").map((sentence: string) => {
