@@ -99,7 +99,7 @@ function BalanceActions(): JSX.Element {
         <ApproveSettlerToken
           amount={tokenAmount}
           onApprove={setIsApproved}
-          onApproveError={setError}
+          onCatch={setError}
           disabled={Boolean(tokenAmount) && isApproved}
           className="mb-4"
         />

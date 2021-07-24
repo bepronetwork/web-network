@@ -6,17 +6,17 @@ import BeproService from "../services/bepro";
 interface Props extends ComponentPropsWithRef<"button"> {
   amount: number;
   onApprove: (isApproved: boolean) => void;
-  onApproveError?: (message: string) => void;
+  onCatch?: (message: string) => void;
 }
 
 const ApproveSettlerToken = forwardRef<HTMLButtonElement, Props>(
   function ApproveSettlerToken(
-    { amount, onApprove, onApproveError = () => {}, className, ...props },
+    { amount, onApprove, onCatch = () => {}, className, ...props },
     ref,
   ): JSX.Element {
-    async function handleClickApproval() {
+    async function handleClick() {
       if (!amount) {
-        return onApproveError("$BEPRO amount needs to be bigger than 0.");
+        return onCatch("$BEPRO amount needs to be higher than 0.");
       }
 
       try {
@@ -32,15 +32,11 @@ const ApproveSettlerToken = forwardRef<HTMLButtonElement, Props>(
         if (isApproved) {
           const response =
             await BeproService.network.approveSettlerERC20Token();
-          // Can't be destructured since response can't even come due to data error processment.
-          // todo: notice if it can be done in a better way
-          const isAllowed = response.status;
 
-          if (isAllowed) {
-            onApprove(isAllowed);
-            setLoadingAttributes(false);
-          }
+          onApprove(response.status);
         }
+
+        setLoadingAttributes(false);
       } catch (error) {
         console.log("Error", error);
         setLoadingAttributes(false);
@@ -52,7 +48,7 @@ const ApproveSettlerToken = forwardRef<HTMLButtonElement, Props>(
       <button
         ref={ref}
         className={clsx("btn btn-md btn-lg btn-opac w-100", className)}
-        onClick={handleClickApproval}
+        onClick={handleClick}
         {...props}>
         Approve
       </button>
