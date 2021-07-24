@@ -6,14 +6,19 @@ import BeproService from "../services/bepro";
 interface Props extends ComponentPropsWithRef<"button"> {
   amount: number;
   onApprove: (isApproved: boolean) => void;
+  onApproveError?: (message: string) => void;
 }
 
 const ApproveSettlerToken = forwardRef<HTMLButtonElement, Props>(
   function ApproveSettlerToken(
-    { amount = 0, onApprove = () => {}, className, ...props },
+    { amount, onApprove, onApproveError = () => {}, className, ...props },
     ref,
   ): JSX.Element {
     async function handleClickApproval() {
+      if (!amount) {
+        return onApproveError("$BEPRO amount needs to be bigger than 0.");
+      }
+
       try {
         setLoadingAttributes(true);
         await BeproService.login();

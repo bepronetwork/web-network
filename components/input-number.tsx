@@ -7,6 +7,7 @@ interface InputNumber extends NumberFormatProps {
   label: string;
   symbol?: string;
   helperText?: string | ReactElement;
+  error?: string;
 }
 
 export default function InputNumber({
@@ -17,6 +18,8 @@ export default function InputNumber({
   min = "0",
   helperText = "",
   className = "",
+  // todo: add error style too
+  error = "",
   ...params
 }: InputNumber) {
   const id = kebabCase(label);
@@ -41,6 +44,7 @@ export default function InputNumber({
           </span>
         )}
       </div>
+      {error && <p className="p-small text-danger my-2">{error}</p>}
       {helperText && <p className="p-small trans my-2">{helperText}</p>}
     </div>
   );
