@@ -10,7 +10,7 @@ interface Props extends ButtonDialogProps {
   onConfirm: () => void;
 }
 
-export default function BalanceActionsHandlers({
+export default function OraclesActionsHandlers({
   info = {
     title: "",
     description: "",

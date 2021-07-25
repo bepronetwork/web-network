@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { Modal } from "react-bootstrap";
 import Icon from "./icon";
 
-export default function BalanceActionsStatus({
+export default function OraclesActionsStatus({
   info = { title: "", description: "" },
   onClose = () => {},
   show = false,
