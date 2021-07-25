@@ -2,10 +2,10 @@ import { GetStaticProps } from "next";
 import Link from "next/link";
 import React from "react";
 import AccountHero from "components/account-hero";
-import BalanceActions from "components/balance-actions";
-import Delegations from "components/delegations";
+import OraclesActions from "components/oracles-actions";
 import PageActions from "components/page-actions";
-import DelegateOracles from "components/delegate-oracles";
+import OraclesDelegation from "components/oracles-delegation";
+import OraclesTakeBack from "components/oracles-take-back";
 
 export default function PageAccountOracles() {
   return (
@@ -30,36 +30,13 @@ export default function PageAccountOracles() {
       </div>
       <div className="container">
         <div className="row justify-content-center mb-5">
-          <BalanceActions />
-          <DelegateOracles />
+          <OraclesActions />
+          <OraclesDelegation />
         </div>
       </div>
       <div className="container">
         <div className="row justify-content-center">
-          <div className="col-md-10">
-            <div className="content-wrapper mb-5">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <h4 className="h4 mb-0">Delegations</h4>
-                <span className="badge-opac">200 Available</span>
-              </div>
-              <div className="row">
-                <div className="col">
-                  <Delegations
-                    oracles={[
-                      {
-                        amount: 200000,
-                        key: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-                      },
-                      {
-                        amount: 150000,
-                        key: "yrf2493p83kkfjhx0wlhbc1qxy2kgdygjrsqtzq2n0",
-                      },
-                    ]}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          <OraclesTakeBack />
         </div>
       </div>
       <div className="container">

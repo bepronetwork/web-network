@@ -5,7 +5,7 @@ import BeproService from "services/bepro";
 import InputNumber from "./input-number";
 import OraclesBoxHeader from "./oracles-box-header";
 
-function DelegateOracles(): JSX.Element {
+function OraclesDelegation(): JSX.Element {
   const [tokenAmount, setOracles] = useState<number>(0);
   const [delegatedTo, setAddress] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -67,4 +67,4 @@ function DelegateOracles(): JSX.Element {
   );
 }
 
-export default DelegateOracles;
+export default OraclesDelegation;

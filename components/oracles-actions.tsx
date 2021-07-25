@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import BalanceActionsHandlers from "./balance-actions-handlers";
+import OraclesActionsHandlers from "./oracles-actions-handlers";
 import { NumberFormatValues } from "react-number-format";
-import BalanceActionsStatus from "./balance-actions-status";
+import OraclesActionsStatus from "./oracles-actions-status";
 import InputNumber from "./input-number";
 import ApproveSettlerToken from "./approve-settler-token";
 import BeproService from "../services/bepro";
@@ -10,7 +10,7 @@ import OraclesBoxHeader from "./oracles-box-header";
 
 const actions: string[] = ["Lock", "Unlock"];
 
-function BalanceActions(): JSX.Element {
+function OraclesActions(): JSX.Element {
   const [action, setAction] = useState<string>(actions[0]);
   const [tokenAmount, setTokenAmount] = useState<number>(0);
   const [isApproved, setIsApproved] = useState<boolean>(true);
@@ -126,7 +126,7 @@ function BalanceActions(): JSX.Element {
             disabled={isApproved}
             className="mb-4"
           />
-          <BalanceActionsHandlers
+          <OraclesActionsHandlers
             onCancel={handleCancel}
             onConfirm={handleConfirm}
             onClick={handleClickHandlers}
@@ -136,7 +136,7 @@ function BalanceActions(): JSX.Element {
           />
         </div>
       </div>
-      <BalanceActionsStatus
+      <OraclesActionsStatus
         info={{ title: renderInfo.title, description: renderInfo.description }}
         show={showStatus}
         isSucceed={isSucceed}
@@ -146,4 +146,4 @@ function BalanceActions(): JSX.Element {
   );
 }
 
-export default BalanceActions;
+export default OraclesActions;
