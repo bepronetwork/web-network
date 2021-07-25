@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { ComponentPropsWithRef, forwardRef } from "react";
-import { setLoadingAttributes } from "../providers/loading-provider";
-import BeproService from "../services/bepro";
+import { setLoadingAttributes } from "providers/loading-provider";
+import BeproService from "services/bepro";
 
 interface Props extends ComponentPropsWithRef<"button"> {
   onApprove: (isApproved: boolean) => void;

@@ -6,7 +6,7 @@ import BalanceActionsStatus from "./balance-actions-status";
 import InputNumber from "./input-number";
 import ApproveSettlerToken from "./approve-settler-token";
 import BeproService from "../services/bepro";
-import { setLoadingAttributes } from "../providers/loading-provider";
+import { setLoadingAttributes } from "providers/loading-provider";
 import OraclesBoxHeader from "./oracles-box-header";
 
 const actions: string[] = ["Lock", "Unlock"];
@@ -46,6 +46,22 @@ function BalanceActions(): JSX.Element {
     setIsApproved(true);
     setError("");
   }, [tokenAmount]);
+  function handleChangeAction(params: string) {
+    setAction(params);
+  }
+  function handleChangeToken(params: NumberFormatValues) {
+    setTokenAmount(params.floatValue);
+  }
+  function handleApproveToken(params: boolean) {
+    setIsApproved(params);
+  }
+  function handleCloseStatus() {
+    setShowStatus(false);
+  }
+  function handleCancel() {
+    setTokenAmount(0);
+    setIsApproved(true);
+  }
   async function handleConfirm() {
     try {
       setLoadingAttributes(true);
@@ -62,10 +78,6 @@ function BalanceActions(): JSX.Element {
       console.log(error);
       setLoadingAttributes(false);
     }
-  }
-  function handleCancel() {
-    setTokenAmount(0);
-    setIsApproved(true);
   }
   async function handleClickHandlers() {
     if (!tokenAmount) {
@@ -96,7 +108,7 @@ function BalanceActions(): JSX.Element {
       <div className="content-wrapper">
         <OraclesBoxHeader
           actions={actions}
-          onChange={setAction}
+          onChange={handleChangeAction}
           currentAction={action}
           oracles={200}
         />
@@ -107,12 +119,10 @@ function BalanceActions(): JSX.Element {
           symbol="$BEPRO"
           error={error}
           value={tokenAmount}
-          onValueChange={(values: NumberFormatValues) =>
-            setTokenAmount(values.floatValue)
-          }
+          onValueChange={handleChangeToken}
         />
         <ApproveSettlerToken
-          onApprove={setIsApproved}
+          onApprove={handleApproveToken}
           disabled={isApproved}
           className="mb-4"
         />
@@ -129,7 +139,7 @@ function BalanceActions(): JSX.Element {
         info={{ title: renderInfo.title, description: renderInfo.description }}
         show={showStatus}
         isSucceed={isSucceed}
-        onClose={() => setShowStatus(false)}
+        onClose={handleCloseStatus}
       />
     </>
   );
