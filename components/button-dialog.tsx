@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { kebabCase } from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { Modal } from "react-bootstrap";
-import { ButtonDialog as Props } from "../types/button-dialog";
+import { ButtonDialog as Props } from "types/button-dialog";
 
 export default function ButtonDialog({
   title = "",

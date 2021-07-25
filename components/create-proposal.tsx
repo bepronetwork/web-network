@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import ButtonDialog from "./button-dialog";
 import ReactSelect from "./react-select";
 import DistributionItem from "./distribution-item";
-import sumObj from "../helpers/sumObj";
+import sumObj from "helpers/sumObj";
 
 const options = [
   "Pull Request #32 by @asantos",

@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { ButtonDialog as ButtonDialogProps } from "../types/button-dialog";
+import { ButtonDialog as ButtonDialogProps } from "types/button-dialog";
 import ButtonDialog from "./button-dialog";
 
 interface Props extends ButtonDialogProps {
