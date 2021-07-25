@@ -1,10 +1,10 @@
 import { GetStaticProps } from 'next'
 import Link from 'next/link';
 import React, { useContext, useEffect, useState } from 'react';
-import AccountHero from '../components/account-hero';
-import IssueListItem, { IIssue } from '../components/issue-list-item';
-import BeproService from '../services/bepro';
-import GithubMicroService from '../services/github-microservice';
+import AccountHero from '../../components/account-hero';
+import IssueListItem, { IIssue } from '../../components/issue-list-item';
+import BeproService from '../../services/bepro';
+import GithubMicroService from '../../services/github-microservice';
 
 export default function PageAccount() {
 
