@@ -25,7 +25,7 @@ export default function InputNumber({
   const errorStyle = { "text-danger": error };
 
   return (
-    <div className="form-group mb-4">
+    <div className="form-group">
       <label className="p-small trans mb-2" id={id}>
         {label}
       </label>
