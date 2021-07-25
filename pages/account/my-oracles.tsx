@@ -3,8 +3,9 @@ import Link from "next/link";
 import React from "react";
 import AccountHero from "components/account-hero";
 import BalanceActions from "components/balance-actions";
-import DelegateOracle from "components/delegate-oracle";
+import Delegations from "components/delegations";
 import PageActions from "components/page-actions";
+import DelegateOracles from "components/delegate-oracles";
 
 export default function PageAccountOracles() {
   return (
@@ -27,52 +28,23 @@ export default function PageAccountOracles() {
           </div>
         </div>
       </div>
-
       <div className="container">
         <div className="row justify-content-center mb-5">
-          <div className="col-md-5">
-            <BalanceActions />
-          </div>
-
-          <div className="col-md-5">
-            <div className="content-wrapper">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <h4 className="h4 mb-0">Delegate oracles</h4>
-                <span className="badge-opac">200 Available</span>
-              </div>
-              <div className="form-group mb-4">
-                <label className="p-small trans mb-2">Oracles Ammout</label>
-                <input
-                  type="number"
-                  className="form-control"
-                  placeholder="Oracles Ammout"
-                />
-              </div>
-              <div className="form-group mb-4">
-                <label className="p-small trans mb-2">Delegation address</label>
-                <input
-                  type="number"
-                  className="form-control"
-                  placeholder="Type and address"
-                />
-              </div>
-              <button className="btn btn-lg btn-primary w-100">DELEGATE</button>
-            </div>
-          </div>
+          <BalanceActions />
+          <DelegateOracles />
         </div>
       </div>
-
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10">
             <div className="content-wrapper mb-5">
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h4 className="h4 mb-0">Delegate oracles</h4>
+                <h4 className="h4 mb-0">Delegations</h4>
                 <span className="badge-opac">200 Available</span>
               </div>
               <div className="row">
                 <div className="col">
-                  <DelegateOracle
+                  <Delegations
                     oracles={[
                       {
                         amount: 200000,
@@ -90,7 +62,6 @@ export default function PageAccountOracles() {
           </div>
         </div>
       </div>
-
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10">

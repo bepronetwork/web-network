@@ -1,6 +1,6 @@
 import DelegateOrableTakeBack from "./delegate-oracle-take-back";
 
-export default function DelegateOracle({
+export default function Delegations({
   oracles = [],
 }: {
   oracles: Array<{ amount: number; key: string }>;
