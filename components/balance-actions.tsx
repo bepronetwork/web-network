@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import { useEffect, useState } from "react";
 import BalanceActionsHandlers from "./balance-actions-handlers";
 import { NumberFormatValues } from "react-number-format";
@@ -45,7 +44,7 @@ function BalanceActions(): JSX.Element {
   useEffect(() => {
     setIsApproved(true);
     setError("");
-  }, [tokenAmount]);
+  }, [tokenAmount, action]);
   function handleChangeAction(params: string) {
     setAction(params);
   }
@@ -105,35 +104,37 @@ function BalanceActions(): JSX.Element {
 
   return (
     <>
-      <div className="content-wrapper">
-        <OraclesBoxHeader
-          actions={actions}
-          onChange={handleChangeAction}
-          currentAction={action}
-          oracles={200}
-        />
-        <p className="p text-white">{renderInfo.description}</p>
-        <InputNumber
-          disabled={!isApproved}
-          label="$BEPRO Amount"
-          symbol="$BEPRO"
-          error={error}
-          value={tokenAmount}
-          onValueChange={handleChangeToken}
-        />
-        <ApproveSettlerToken
-          onApprove={handleApproveToken}
-          disabled={isApproved}
-          className="mb-4"
-        />
-        <BalanceActionsHandlers
-          onCancel={handleCancel}
-          onConfirm={handleConfirm}
-          onClick={handleClickHandlers}
-          disabled={!isApproved}
-          canShow={!Boolean(error)}
-          info={renderInfo}
-        />
+      <div className="col-md-5">
+        <div className="content-wrapper">
+          <OraclesBoxHeader
+            actions={actions}
+            onChange={handleChangeAction}
+            currentAction={action}
+            oracles={200}
+          />
+          <p className="p text-white">{renderInfo.description}</p>
+          <InputNumber
+            disabled={!isApproved}
+            label="$BEPRO Amount"
+            symbol="$BEPRO"
+            error={error}
+            value={tokenAmount}
+            onValueChange={handleChangeToken}
+          />
+          <ApproveSettlerToken
+            onApprove={handleApproveToken}
+            disabled={isApproved}
+            className="mb-4"
+          />
+          <BalanceActionsHandlers
+            onCancel={handleCancel}
+            onConfirm={handleConfirm}
+            onClick={handleClickHandlers}
+            disabled={!isApproved}
+            canShow={!Boolean(error)}
+            info={renderInfo}
+          />
+        </div>
       </div>
       <BalanceActionsStatus
         info={{ title: renderInfo.title, description: renderInfo.description }}
