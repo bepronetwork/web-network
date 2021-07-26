@@ -13,7 +13,7 @@ export default function PageActions() {
                     <div className="d-flex align-items-center justify-content-between mb-4">
                         <h4 className="h4">Details</h4>
                         <div className="d-flex align-items-center">
-                            <IssueAvatars></IssueAvatars>
+                            {/*<IssueAvatars></IssueAvatars>*/}
                             <button className="btn btn-md btn-opac mr-1">
                               View on github
                             </button>

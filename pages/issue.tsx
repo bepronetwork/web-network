@@ -6,6 +6,8 @@ import IssueHero from '../components/issue-hero';
 import IssueDraftProgress from '../components/issue-draft-progress';
 import PageActions from '../components/page-actions';
 import IssueProposals from '../components/issue-proposals';
+import { mockNewIssues } from '../helpers/mockdata/mockIssues';
+import { mockCommentsIssue } from '../helpers/mockdata/mockCommentsIssue';
 
 export default function PageIssue() {
   return (
@@ -13,13 +15,13 @@ export default function PageIssue() {
 
       <IssueHero></IssueHero>
 
-      {/* <IssueDraftProgress></IssueDraftProgress> */}
-      <IssueProposals></IssueProposals>
+       {/*<IssueDraftProgress></IssueDraftProgress>
+      {/*<IssueProposals></IssueProposals>
 
       <PageActions></PageActions>
 
-      <IssueDescription></IssueDescription>
-      <IssueComments></IssueComments>
+      <IssueDescription></IssueDescription>*/}
+      <IssueComments url="/" comments={mockCommentsIssue}></IssueComments>
 
     </>
   )
