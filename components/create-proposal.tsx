@@ -23,49 +23,48 @@ export default function NewProposal() {
     setError("");
     setAmount(sumObj(distrib));
   }, [distrib]);
-  function handleChangeDistrib(params: Object) {
+  function handleChangeDistrib(params: { [key: string]: number }): void {
     setDistrib((prevState) => ({
       ...prevState,
       ...params,
     }));
   }
-  function handleClickCreate() {
-    if (amount > 0 && amount < 100) {
-      return setError(`${100 - amount}% is missing!`);
+  function renderFooter({ hideModal }) {
+    function handleClickCreate(): void {
+      if (amount > 0 && amount < 100) {
+        return setError(`${100 - amount}% is missing!`);
+      }
+      if (amount === 0) {
+        return setError("Distribution must be equal to 100%.");
+      }
+      if (amount > 100) {
+        return setError("Distribution exceed 100%.");
+      }
+
+      hideModal();
+      setDistrib({});
     }
-    if (amount === 0) {
-      return setError("Distribution must be equal to 100%.");
-    }
-    if (amount > 100) {
-      return setError("Distribution exceed 100%.");
-    }
+
+    return (
+      <>
+        <button className="btn btn-md btn-opac" onClick={hideModal}>
+          Cancel
+        </button>
+        <button className="btn btn-md btn-primary" onClick={handleClickCreate}>
+          Create Proposal
+        </button>
+      </>
+    );
   }
 
   return (
-    <ButtonDialog
-      title="Create Proposal"
-      footer={({ hideModal }) => (
-        <>
-          <button className="btn btn-md btn-opac" onClick={hideModal}>
-            Cancel
-          </button>
-          <button
-            className="btn btn-md btn-primary"
-            onClick={() => {
-              handleClickCreate();
-
-              if (amount === 100 && !error) {
-                hideModal();
-                setDistrib({});
-              }
-            }}>
-            Create Proposal
-          </button>
-        </>
-      )}>
+    <ButtonDialog title="Create Proposal" footer={renderFooter}>
       <p className="p-small text-50">Select a pull request </p>
       <ReactSelect
-        defaultValue={options[0]}
+        defaultValue={{
+          value: options[0],
+          label: options[0],
+        }}
         options={options.map((value) => ({
           value,
           label: value,
@@ -73,18 +72,16 @@ export default function NewProposal() {
       />
       <p className="p-small mt-3">Propose distribution</p>
       <ul className="mb-0">
-        {distributed.map((item) => (
+        {distributed.map((item: string) => (
           <DistributionItem
             key={item}
             by={item}
-            onChange={handleChangeDistrib}
-            InputProps={{
-              isInvalid: !!error,
-            }}
+            onChangeDistribution={handleChangeDistrib}
+            error={error}
           />
         ))}
       </ul>
-      {error && <p className="p error mt-3 mb-0">{error}</p>}
+      {error && <p className="p error mt-3 mb-0 text-danger">{error}</p>}
     </ButtonDialog>
   );
 }
