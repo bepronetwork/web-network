@@ -45,6 +45,7 @@ function OraclesDelegation(): JSX.Element {
           label="Oracles Ammout"
           value={tokenAmount}
           onValueChange={handleChangeOracles}
+          thousandSeparator
         />
         <div className="form-group">
           <label className="p-small trans mb-2">Delegation address</label>

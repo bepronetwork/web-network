@@ -127,6 +127,7 @@ export default function PageCreateIssue() {
                     <p className="p-small trans my-2">Tip: Try to be as much descriptive as possible</p>
                   </div>
                   <InputNumber
+                    thousandSeparator
                     max={balance}
                     className={clsx({ "text-muted": allowedTransaction })}
                     label="Set $BEPRO value"
