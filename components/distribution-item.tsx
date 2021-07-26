@@ -1,47 +1,46 @@
-import { ChangeEvent, useState } from "react";
-import { Form } from "react-bootstrap";
+import InputNumber from "components/input-number";
+import { useState } from "react";
+import { NumberFormatValues } from "react-number-format";
+import { InputNumber as InputNumberProps } from "types/input-number";
+
+interface Props extends InputNumberProps {
+  by: string;
+  onChangeDistribution(params: { [key: string]: number }): void;
+}
 
 export default function DistributionItem({
   by = "",
-  onChange = () => {},
-  InputProps = { isInvalid: false },
+  onChangeDistribution = (params = { key: 0 }) => {},
   ...params
-}: {
-  by: string;
-  onChange: (params: Object) => void;
-  InputProps?: { isInvalid: boolean };
-}) {
-  const [value, setValue] = useState<string>("0");
+}: Props) {
+  const [value, setValue] = useState<number>(0);
 
-  function handleChange(event: ChangeEvent<HTMLInputElement>) {
-    setValue(event.target.value);
+  function handleValueChange(params: NumberFormatValues) {
+    setValue(params.floatValue);
   }
-  function handleBlurChange(event: ChangeEvent<HTMLInputElement>) {
-    let { value } = event.target;
+  function handleBlur() {
+    let enhancedValue = value;
 
-    if (Number(value) > 100) {
-      value = "100";
+    if (value > 100) {
+      enhancedValue = 100;
     }
-    if (!value || Number(value) < 0) {
-      value = "0";
+    if (!value || value < 0) {
+      enhancedValue = 0;
     }
 
-    setValue(value);
-    onChange({ [by]: value });
+    setValue(enhancedValue);
+    onChangeDistribution({ [by]: enhancedValue });
   }
 
   return (
-    <li
-      className="d-flex align-items-center px-3 py-1 my-1 rounded-3 btn-opac"
-      {...params}>
+    <li className="d-flex align-items-center px-3 py-1 my-1 rounded-3 btn-opac">
       <span className="flex-grow-1">{by}</span>
       <div className="flex-shrink-0 w-25">
-        <Form.Control
-          type="text"
+        <InputNumber
           value={value}
-          onChange={handleChange}
-          onBlur={handleBlurChange}
-          {...InputProps}
+          onValueChange={handleValueChange}
+          onBlur={handleBlur}
+          {...params}
         />
       </div>
     </li>
