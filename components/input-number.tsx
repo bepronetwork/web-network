@@ -1,34 +1,27 @@
 import clsx from "clsx";
 import { kebabCase } from "lodash";
-import { ReactElement } from "react";
-import NumberFormat, { NumberFormatProps } from "react-number-format";
-
-interface InputNumber extends NumberFormatProps {
-  label: string;
-  symbol?: string;
-  helperText?: string | ReactElement;
-  error?: string;
-}
+import NumberFormat from "react-number-format";
+import { InputNumber as InputNumberProps } from "types/input-number";
 
 export default function InputNumber({
-  label,
+  label = "",
   symbol = "",
   placeholder = "0",
-  thousandSeparator = true,
   min = "0",
   helperText = "",
   className = "",
   error = "",
   ...params
-}: InputNumber) {
+}: InputNumberProps): JSX.Element {
   const id = kebabCase(label);
   const errorStyle = { "text-danger": error };
-
-  return (
-    <div className="form-group">
-      <label className="p-small trans mb-2" id={id}>
-        {label}
-      </label>
+  const inputBody = (
+    <>
+      {label && (
+        <label className="p-small trans mb-2" id={id}>
+          {label}
+        </label>
+      )}
       <div
         className={clsx("input-group", {
           ...errorStyle,
@@ -39,7 +32,6 @@ export default function InputNumber({
           htmlFor={id}
           min={min}
           placeholder={placeholder}
-          thousandSeparator={thousandSeparator}
           {...params}
         />
         {symbol && (
@@ -52,8 +44,21 @@ export default function InputNumber({
           </span>
         )}
       </div>
-      {error && <p className="p-small text-danger my-2">{error}</p>}
-      {helperText && <p className="p-small trans my-2">{helperText}</p>}
-    </div>
+      {helperText && (
+        <p
+          className={clsx("p-small my-2", {
+            trans: !error,
+            ...errorStyle,
+          })}>
+          {helperText}
+        </p>
+      )}
+    </>
   );
+
+  if (label || helperText) {
+    return <div className="form-group">{inputBody}</div>;
+  }
+
+  return inputBody;
 }

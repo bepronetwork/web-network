@@ -118,8 +118,10 @@ function OraclesActions(): JSX.Element {
             label="$BEPRO Amount"
             symbol="$BEPRO"
             error={error}
+            helperText={error}
             value={tokenAmount}
             onValueChange={handleChangeToken}
+            thousandSeparator
           />
           <ApproveSettlerToken
             onApprove={handleApproveToken}
