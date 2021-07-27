@@ -7,8 +7,8 @@ interface Props extends ComponentPropsWithRef<"button"> {
   onApprove: (isApproved: boolean) => void;
 }
 
-const ApproveSettlerToken = forwardRef<HTMLButtonElement, Props>(
-  function ApproveSettlerToken(
+const SettlerTokenApproval = forwardRef<HTMLButtonElement, Props>(
+  function SettlerTokenApproval(
     { onApprove, className, ...props },
     ref,
   ): JSX.Element {
@@ -20,7 +20,7 @@ const ApproveSettlerToken = forwardRef<HTMLButtonElement, Props>(
         onApprove(response.status);
         setLoadingAttributes(false);
       } catch (error) {
-        console.log("Error", error);
+        console.log("SettlerTokenApproval", error);
         setLoadingAttributes(false);
         onApprove(false);
       }
@@ -38,5 +38,5 @@ const ApproveSettlerToken = forwardRef<HTMLButtonElement, Props>(
   },
 );
 
-ApproveSettlerToken.displayName = "ApproveSettlerToken";
-export default ApproveSettlerToken;
+SettlerTokenApproval.displayName = "SettlerTokenApproval";
+export default SettlerTokenApproval;
