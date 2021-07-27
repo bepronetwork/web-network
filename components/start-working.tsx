@@ -5,6 +5,7 @@ export default function StartWorking(): JSX.Element {
   return (
     <ButtonDialog
       title="Start Working"
+      className="btn-primary me-2"
       footer={({ hideModal }) => (
         <>
           <button className="btn btn-md btn-opac" onClick={hideModal}>
