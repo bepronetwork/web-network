@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { kebabCase } from "lodash";
+import { Fragment } from "react";
 import NumberFormat from "react-number-format";
 import { InputNumber as InputNumberProps } from "types/input-number";
 
@@ -15,8 +16,11 @@ export default function InputNumber({
 }: InputNumberProps): JSX.Element {
   const id = kebabCase(label);
   const errorStyle = { "text-danger": error };
-  const inputBody = (
-    <>
+  const shouldBeWrapped = label || helperText;
+  const Component = shouldBeWrapped ? "div" : Fragment;
+
+  return (
+    <Component {...(shouldBeWrapped && { className: "form-group" })}>
       {label && (
         <label className="p-small trans mb-2" id={id}>
           {label}
@@ -53,12 +57,6 @@ export default function InputNumber({
           {helperText}
         </p>
       )}
-    </>
+    </Component>
   );
-
-  if (label || helperText) {
-    return <div className="form-group">{inputBody}</div>;
-  }
-
-  return inputBody;
 }
