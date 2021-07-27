@@ -8,7 +8,7 @@ interface Props extends InputNumberProps {
   onChangeDistribution(params: { [key: string]: number }): void;
 }
 
-export default function DistributionItem({
+export default function CreateProposalDistributionItem({
   by = "",
   onChangeDistribution = (params = { key: 0 }) => {},
   ...params
@@ -18,6 +18,8 @@ export default function DistributionItem({
   function handleValueChange(params: NumberFormatValues) {
     setValue(params.floatValue);
   }
+  // Wasted logic.
+  // todo: move within InputNumber itself.
   function handleBlur() {
     let enhancedValue = value;
 
