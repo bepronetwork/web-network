@@ -3,10 +3,11 @@ import OraclesActionsHandlers from "./oracles-actions-handlers";
 import { NumberFormatValues } from "react-number-format";
 import OraclesActionsStatus from "./oracles-actions-status";
 import InputNumber from "./input-number";
-import ApproveSettlerToken from "./approve-settler-token";
+import SettlerTokenApproval from "./settler-token-approval";
 import BeproService from "../services/bepro";
 import { setLoadingAttributes } from "providers/loading-provider";
 import OraclesBoxHeader from "./oracles-box-header";
+import SettlerTokenCheck from "components/settler-token-check";
 
 const actions: string[] = ["Lock", "Unlock"];
 
@@ -15,6 +16,7 @@ function OraclesActions(): JSX.Element {
   const [tokenAmount, setTokenAmount] = useState<number>(0);
   const [isApproved, setIsApproved] = useState<boolean>(true);
   const [showStatus, setShowStatus] = useState<boolean>(false);
+  const [showHandlers, setShowHandlers] = useState<boolean>(false);
   const [isSucceed, setIsSucceed] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const renderAmount = tokenAmount ? `${tokenAmount} ` : "";
@@ -51,7 +53,7 @@ function OraclesActions(): JSX.Element {
   function handleChangeToken(params: NumberFormatValues) {
     setTokenAmount(params.floatValue);
   }
-  function handleApproveToken(params: boolean) {
+  function handleApproveSettlerToken(params: boolean) {
     setIsApproved(params);
   }
   function handleCloseStatus() {
@@ -60,6 +62,7 @@ function OraclesActions(): JSX.Element {
   function handleCancel() {
     setTokenAmount(0);
     setIsApproved(true);
+    setShowHandlers(false);
   }
   async function handleConfirm() {
     try {
@@ -78,28 +81,17 @@ function OraclesActions(): JSX.Element {
       setLoadingAttributes(false);
     }
   }
-  async function handleClickHandlers() {
+  function handleCheckSettlerToken(isChecked: boolean) {
     if (!tokenAmount) {
       return setError("$BEPRO amount needs to be higher than 0.");
     }
 
-    try {
-      const address: string = await BeproService.getAddress();
-      const isApprovedSettlerToken: boolean =
-        await BeproService.network.isApprovedSettlerToken({
-          address,
-          amount: tokenAmount,
-        });
-
-      if (!isApprovedSettlerToken) {
-        return () => {
-          setError("Settler token not approved. Check it and try again");
-          setIsApproved(false);
-        };
-      }
-    } catch (error) {
-      console.log(error);
+    if (!isChecked) {
+      return setError("Settler token not approved. Check it and try again");
     }
+
+    setShowHandlers(isChecked);
+    setIsApproved(isChecked);
   }
 
   return (
@@ -123,21 +115,33 @@ function OraclesActions(): JSX.Element {
             onValueChange={handleChangeToken}
             thousandSeparator
           />
-          <ApproveSettlerToken
-            onApprove={handleApproveToken}
+          <SettlerTokenApproval
+            onApprove={handleApproveSettlerToken}
             disabled={isApproved}
             className="mb-4"
           />
-          <OraclesActionsHandlers
-            onCancel={handleCancel}
-            onConfirm={handleConfirm}
-            onClick={handleClickHandlers}
+          <SettlerTokenCheck
+            onCheck={handleCheckSettlerToken}
             disabled={!isApproved}
-            canShow={!Boolean(error)}
-            info={renderInfo}
-          />
+            amount={tokenAmount}>
+            {renderInfo.label}
+          </SettlerTokenCheck>
         </div>
       </div>
+      <OraclesActionsHandlers
+        info={renderInfo}
+        show={showHandlers}
+        footer={
+          <>
+            <button className="btn btn-md btn-opac" onClick={handleCancel}>
+              Cancel
+            </button>
+            <button className="btn btn-md btn-primary" onClick={handleConfirm}>
+              Confirm
+            </button>
+          </>
+        }
+      />
       <OraclesActionsStatus
         info={{ title: renderInfo.title, description: renderInfo.description }}
         show={showStatus}

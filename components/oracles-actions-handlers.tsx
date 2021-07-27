@@ -1,13 +1,11 @@
 import { Fragment } from "react";
-import { ButtonDialog as ButtonDialogProps } from "types/button-dialog";
-import ButtonDialog from "./button-dialog";
+import { Modal as ModalProps } from "types/modal";
+import Modal from "./modal";
 
-interface Props extends ButtonDialogProps {
+interface Props extends ModalProps {
   info: {
     [key: string]: string;
   };
-  onCancel: () => void;
-  onConfirm: () => void;
 }
 
 export default function OraclesActionsHandlers({
@@ -18,36 +16,10 @@ export default function OraclesActionsHandlers({
     caption: "",
     body: "",
   },
-  onCancel = () => {},
-  onConfirm = () => {},
   ...params
 }: Props): JSX.Element {
   return (
-    <ButtonDialog
-      title={info.title}
-      label={info.label}
-      className="btn-lg btn-primary w-100"
-      footer={({ hideModal }) => (
-        <>
-          <button
-            className="btn btn-md btn-opac"
-            onClick={() => {
-              onCancel();
-              hideModal();
-            }}>
-            Cancel
-          </button>
-          <button
-            className="btn btn-md btn-primary"
-            onClick={() => {
-              onConfirm();
-              hideModal();
-            }}>
-            Confirm
-          </button>
-        </>
-      )}
-      {...params}>
+    <Modal title={info.title} {...params}>
       <p className="p-small text-white-50 text-center">{info.caption}</p>
       <p className="text-center fs-4">
         {info.body?.split("/").map((sentence: string) => {
@@ -67,6 +39,6 @@ export default function OraclesActionsHandlers({
           );
         })}
       </p>
-    </ButtonDialog>
+    </Modal>
   );
 }
