@@ -37,7 +37,7 @@ export default function OraclesActionsHandlers({
   onCancel(): void;
   onConfirm(confirmation: boolean): void;
 }): JSX.Element {
-  const [showHandlers, setShowHandlers] = useState<boolean>(false);
+  const [show, setShow] = useState<boolean>(false);
 
   function handleCheck(isChecked: boolean) {
     if (!tokenAmount) {
@@ -45,10 +45,10 @@ export default function OraclesActionsHandlers({
     }
 
     if (!isChecked) {
-      return onError("Settler token not approved. Check it and try again");
+      onError("Settler token not approved. Check it and try again");
     }
 
-    setShowHandlers(isChecked);
+    setShow(isChecked);
     onCheck(isChecked);
   }
   async function handleConfirm() {
@@ -70,7 +70,7 @@ export default function OraclesActionsHandlers({
   }
   function handleCancel() {
     onCancel();
-    setShowHandlers(false);
+    setShow(false);
   }
 
   return (
@@ -83,7 +83,7 @@ export default function OraclesActionsHandlers({
       </SettlerTokenCheck>
       <Modal
         title={info.title}
-        show={showHandlers}
+        show={show}
         footer={
           <>
             <button className="btn btn-md btn-opac" onClick={handleCancel}>
