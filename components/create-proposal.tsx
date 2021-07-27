@@ -58,6 +58,7 @@ export default function NewProposal() {
   return (
     <ButtonDialog
       title="Create Proposal"
+      className="btn-primary me-2"
       footer={({ hideModal }) => (
         <>
           <button className="btn btn-md btn-opac" onClick={hideModal}>
