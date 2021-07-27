@@ -12,12 +12,13 @@ export default function MainNav() {
       await BeproService.login();
 
       const beproAddress = await BeproService.getAddress();
+      const beproStaked = await BeproService.network.getBEPROStaked();
 
       setAddress(beproAddress);
+      setBeproStaked(beproStaked);
       setLoggedIn(true);
-      setBeproStaked(await BeproService.network.getBEPROStaked());
     } catch (error) {
-      console.log(error);
+      console.log("MainNav", error);
     }
   }, []);
 
