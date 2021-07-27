@@ -20,6 +20,7 @@ export interface IIssue {
     issueId: string,
     creatorGithub?: string,
     amount?: number,
+    url?: string,
     numberOfComments: number,
     state: string,
     title: string,
