@@ -1,12 +1,8 @@
-import { Fragment } from "react";
-import { Modal as ModalProps } from "types/modal";
+import SettlerTokenCheck from "./settler-token-check";
+import { Fragment, useState } from "react";
 import Modal from "./modal";
-
-interface Props extends ModalProps {
-  info: {
-    [key: string]: string;
-  };
-}
+import { setLoadingAttributes } from "providers/loading-provider";
+import BeproService from "services/bepro";
 
 export default function OraclesActionsHandlers({
   info = {
@@ -15,30 +11,109 @@ export default function OraclesActionsHandlers({
     label: "",
     caption: "",
     body: "",
+    params: () => {},
   },
-  ...params
-}: Props): JSX.Element {
-  return (
-    <Modal title={info.title} {...params}>
-      <p className="p-small text-white-50 text-center">{info.caption}</p>
-      <p className="text-center fs-4">
-        {info.body?.split("/").map((sentence: string) => {
-          const Component =
-            (sentence.startsWith("oracles") && "span") || Fragment;
+  tokenAmount = 0,
+  action = "",
+  isApproved = true,
+  onError = () => {},
+  onCheck = () => {},
+  onCancel = () => {},
+  onConfirm = () => {},
+}: {
+  info: {
+    title: string;
+    description: string;
+    label: string;
+    caption: string;
+    body: string;
+    params(from?: string): void;
+  };
+  tokenAmount: number;
+  action: string;
+  isApproved: boolean;
+  onError(message: string): void;
+  onCheck(isChecked: boolean): void;
+  onCancel(): void;
+  onConfirm(confirmation: boolean): void;
+}): JSX.Element {
+  const [showHandlers, setShowHandlers] = useState<boolean>(false);
 
-          return (
-            <Fragment key={sentence}>
-              <Component
-                {...(sentence.startsWith("oracles") && {
-                  className: "text-bold color-purple",
-                })}>
-                {sentence.replace(/oracles|br/, "")}
-              </Component>
-              {sentence.startsWith("br") && <br />}
-            </Fragment>
-          );
-        })}
-      </p>
-    </Modal>
+  function handleCheck(isChecked: boolean) {
+    if (!tokenAmount) {
+      return onError("$BEPRO amount needs to be higher than 0.");
+    }
+
+    if (!isChecked) {
+      return onError("Settler token not approved. Check it and try again");
+    }
+
+    setShowHandlers(isChecked);
+    onCheck(isChecked);
+  }
+  async function handleConfirm() {
+    try {
+      handleCancel();
+      setLoadingAttributes(true);
+
+      const address: string = await BeproService.getAddress();
+      const response = await BeproService.network[action.toLowerCase()](
+        Object.assign({}, info.params(address)),
+      );
+
+      onConfirm(response.status);
+      setLoadingAttributes(false);
+    } catch (error) {
+      console.log(error);
+      setLoadingAttributes(false);
+    }
+  }
+  function handleCancel() {
+    onCancel();
+    setShowHandlers(false);
+  }
+
+  return (
+    <>
+      <SettlerTokenCheck
+        onCheck={handleCheck}
+        disabled={!isApproved}
+        amount={tokenAmount}>
+        {info.label}
+      </SettlerTokenCheck>
+      <Modal
+        title={info.title}
+        show={showHandlers}
+        footer={
+          <>
+            <button className="btn btn-md btn-opac" onClick={handleCancel}>
+              Cancel
+            </button>
+            <button className="btn btn-md btn-primary" onClick={handleConfirm}>
+              Confirm
+            </button>
+          </>
+        }>
+        <p className="p-small text-white-50 text-center">{info.caption}</p>
+        <p className="text-center fs-4">
+          {info.body?.split("/").map((sentence: string) => {
+            const Component =
+              (sentence.startsWith("oracles") && "span") || Fragment;
+
+            return (
+              <Fragment key={sentence}>
+                <Component
+                  {...(sentence.startsWith("oracles") && {
+                    className: "text-bold color-purple",
+                  })}>
+                  {sentence.replace(/oracles|br/, "")}
+                </Component>
+                {sentence.startsWith("br") && <br />}
+              </Fragment>
+            );
+          })}
+        </p>
+      </Modal>
+    </>
   );
 }

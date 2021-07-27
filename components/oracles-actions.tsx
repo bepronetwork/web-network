@@ -4,10 +4,7 @@ import { NumberFormatValues } from "react-number-format";
 import OraclesActionsStatus from "./oracles-actions-status";
 import InputNumber from "./input-number";
 import SettlerTokenApproval from "./settler-token-approval";
-import BeproService from "../services/bepro";
-import { setLoadingAttributes } from "providers/loading-provider";
 import OraclesBoxHeader from "./oracles-box-header";
-import SettlerTokenCheck from "components/settler-token-check";
 
 const actions: string[] = ["Lock", "Unlock"];
 
@@ -16,7 +13,6 @@ function OraclesActions(): JSX.Element {
   const [tokenAmount, setTokenAmount] = useState<number>(0);
   const [isApproved, setIsApproved] = useState<boolean>(true);
   const [showStatus, setShowStatus] = useState<boolean>(false);
-  const [showHandlers, setShowHandlers] = useState<boolean>(false);
   const [isSucceed, setIsSucceed] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const renderAmount = tokenAmount ? `${tokenAmount} ` : "";
@@ -47,51 +43,16 @@ function OraclesActions(): JSX.Element {
     setIsApproved(true);
     setError("");
   }, [tokenAmount, action]);
-  function handleChangeAction(params: string) {
-    setAction(params);
-  }
   function handleChangeToken(params: NumberFormatValues) {
     setTokenAmount(params.floatValue);
-  }
-  function handleApproveSettlerToken(params: boolean) {
-    setIsApproved(params);
-  }
-  function handleCloseStatus() {
-    setShowStatus(false);
   }
   function handleCancel() {
     setTokenAmount(0);
     setIsApproved(true);
-    setShowHandlers(false);
   }
-  async function handleConfirm() {
-    try {
-      setLoadingAttributes(true);
-      const address: string = await BeproService.getAddress();
-      const response = await BeproService.network[action.toLowerCase()]({
-        ...renderInfo.params(address),
-      });
-
-      setIsSucceed(response.status);
-      setShowStatus(true);
-      handleCancel();
-      setLoadingAttributes(false);
-    } catch (error) {
-      console.log(error);
-      setLoadingAttributes(false);
-    }
-  }
-  function handleCheckSettlerToken(isChecked: boolean) {
-    if (!tokenAmount) {
-      return setError("$BEPRO amount needs to be higher than 0.");
-    }
-
-    if (!isChecked) {
-      return setError("Settler token not approved. Check it and try again");
-    }
-
-    setShowHandlers(isChecked);
-    setIsApproved(isChecked);
+  function handleConfirm(confirmation: boolean) {
+    setIsSucceed(confirmation);
+    setShowStatus(true);
   }
 
   return (
@@ -100,7 +61,7 @@ function OraclesActions(): JSX.Element {
         <div className="content-wrapper">
           <OraclesBoxHeader
             actions={actions}
-            onChange={handleChangeAction}
+            onChange={setAction}
             currentAction={action}
             oracles={200}
           />
@@ -116,37 +77,27 @@ function OraclesActions(): JSX.Element {
             thousandSeparator
           />
           <SettlerTokenApproval
-            onApprove={handleApproveSettlerToken}
+            onApprove={setIsApproved}
             disabled={isApproved}
             className="mb-4"
           />
-          <SettlerTokenCheck
-            onCheck={handleCheckSettlerToken}
-            disabled={!isApproved}
-            amount={tokenAmount}>
-            {renderInfo.label}
-          </SettlerTokenCheck>
+          <OraclesActionsHandlers
+            info={renderInfo}
+            tokenAmount={tokenAmount}
+            action={action}
+            isApproved={isApproved}
+            onError={setError}
+            onCheck={setIsApproved}
+            onCancel={handleCancel}
+            onConfirm={handleConfirm}
+          />
         </div>
       </div>
-      <OraclesActionsHandlers
-        info={renderInfo}
-        show={showHandlers}
-        footer={
-          <>
-            <button className="btn btn-md btn-opac" onClick={handleCancel}>
-              Cancel
-            </button>
-            <button className="btn btn-md btn-primary" onClick={handleConfirm}>
-              Confirm
-            </button>
-          </>
-        }
-      />
       <OraclesActionsStatus
         info={{ title: renderInfo.title, description: renderInfo.description }}
         show={showStatus}
         isSucceed={isSucceed}
-        onClose={handleCloseStatus}
+        onClose={() => setShowStatus(false)}
       />
     </>
   );
