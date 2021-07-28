@@ -5,7 +5,7 @@ import BeproService from "services/bepro";
 import InputNumber from "./input-number";
 import OraclesBoxHeader from "./oracles-box-header";
 
-function OraclesDelegation(): JSX.Element {
+function OraclesDelegate(): JSX.Element {
   const [tokenAmount, setOracles] = useState<number>(0);
   const [delegatedTo, setAddress] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -29,7 +29,8 @@ function OraclesDelegation(): JSX.Element {
         delegatedTo,
       });
 
-      console.log({ transaction });
+      // todo: onConfirm
+      console.log(transaction.status);
       setLoadingAttributes(false);
     } catch (error) {
       console.log({ error });
@@ -54,7 +55,7 @@ function OraclesDelegation(): JSX.Element {
             onChange={handleChangeAddress}
             type="text"
             className="form-control"
-            placeholder="Type and address"
+            placeholder="Type an address"
           />
         </div>
         {error && <p className="p-small text-danger mt-2">{error}</p>}
@@ -68,4 +69,4 @@ function OraclesDelegation(): JSX.Element {
   );
 }
 
-export default OraclesDelegation;
+export default OraclesDelegate;
