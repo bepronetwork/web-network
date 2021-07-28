@@ -5,8 +5,9 @@ import CreateProposal from "./create-proposal";
 import StartWorking from "./start-working";
 import OpenIssue from "./open-issue";
 import Link from "next/link";
+import BeproService from "../services/bepro";
 
-export default function PageActions({ issue }) {
+export default function PageActions({ issue, userAddress, finalized }) {
   const handleAvatar = () => {
     if (issue?.developers.length > 0) {
       return <IssueAvatars users={issue?.developers}></IssueAvatars>;
@@ -21,7 +22,29 @@ export default function PageActions({ issue }) {
   const handleStartworking = () => {
     return (
       (issue?.state.toLowerCase() === "open" ||
-        issue?.state.toLowerCase() === "in progress") && <StartWorking />
+        (issue?.state.toLowerCase() === "in progress" &&
+          !finalized &&
+          issue?.isIssueinDraft === false)) && <StartWorking />
+    );
+  };
+
+  const handleRedeem = () => {
+    return (
+      issue?.isIssueinDraft === true &&
+      issue?.creatorAddress === userAddress && (
+        <button className="btn btn-md btn-primary mr-1 px-4">Redeem</button>
+      )
+    );
+  };
+
+  const handleProposeDestribution = () => {
+    return (
+      issue?.state.toLowerCase() === "in progress" &&
+      issue?.isIssueinDraft === false && (
+        <button className="btn btn-md btn-primary mr-1 px-3">
+          Propose Destribution
+        </button>
+      )
     );
   };
 
@@ -39,7 +62,9 @@ export default function PageActions({ issue }) {
                 </Link>
               )}
               {handleStartworking()}
+              {handleRedeem()}
               {issue?.state.toLowerCase() === "ready" && <CreateProposal />}
+              {handleProposeDestribution()}
 
               {/*<OpenIssue />*/}
             </div>
