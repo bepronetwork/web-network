@@ -23,6 +23,8 @@ export const mockDeveloperIssues: IIssue[] = [
     numberOfComments: 8,
     state: "open",
     url:"www.google.com",
+    isIssueinDraft: false,
+    creatorAddress:"add1",
     title:
       "Remove all getContract functions from Application and create new contract",
   },
@@ -53,6 +55,8 @@ export const mockDeveloperIssues: IIssue[] = [
     numberOfComments: 2,
     url:"www.google.com",
     state: "in progress",
+    creatorAddress:"add1",
+    isIssueinDraft: false,
     title:
       "Remove all functions from Application X-app and create new functions",
   },
@@ -103,6 +107,7 @@ export const mockDeveloperIssues: IIssue[] = [
     amount: 1500,
     numberOfComments: 4,
     state: "ready",
+    creatorAddress:"add1",
     title: "Create all screens and functions for the application",
   },
   {
@@ -116,6 +121,8 @@ export const mockDeveloperIssues: IIssue[] = [
     amount: 150,
     numberOfComments: 6,
     state: "draft",
+    isIssueinDraft: true,
+    creatorAddress:"0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d",
     title: "Change all screens and functions for the application",
   },
 ];
