@@ -3,7 +3,6 @@ import Link from "next/link";
 import React from "react";
 import AccountHero from "components/account-hero";
 import OraclesActions from "components/oracles-actions";
-import PageActions from "components/page-actions";
 import OraclesDelegation from "components/oracles-delegation";
 import OraclesTakeBack from "components/oracles-take-back";
 
@@ -11,7 +10,6 @@ export default function PageAccountOracles() {
   return (
     <div>
       <AccountHero></AccountHero>
-      <PageActions />
       <div className="container">
         <div className="row">
           <div className="d-flex justify-content-center mb-3">
