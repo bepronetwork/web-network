@@ -22,16 +22,14 @@ export default function OraclesTakeBack(): JSX.Element {
           .map((amount: ItemT["amount"], index: number) => {
             const mappedAddress = response?.addresses[index];
 
-            if (Number(amount) || !isEqual(address, mappedAddress)) {
+            if (!!Number(amount) && !isEqual(address, mappedAddress)) {
               return {
                 address: mappedAddress,
                 amount,
               };
             }
           })
-          .filter((item: ItemT | undefined) => {
-            typeof item !== "undefined";
-          });
+          .filter((item: ItemT | undefined) => typeof item !== "undefined");
 
         setItems(mappedSummary);
       } catch (error) {
