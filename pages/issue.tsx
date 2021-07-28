@@ -13,18 +13,24 @@ import {
 } from "../helpers/mockdata/mockIssues";
 import { mockCommentsIssue } from "../helpers/mockdata/mockCommentsIssue";
 import { IIssue } from "../components/issue-list-item";
+import { useRouter } from "next/router";
 
 export default function PageIssue() {
-  const [issue, setIssue] = useState<IIssue>(mockDeveloperIssues[2]);
+  const router = useRouter();
+  const { id } = router.query;
+
+  const [issue] = useState<IIssue>(
+    mockDeveloperIssues.find((element) => element.issueId === id)
+  );
 
   return (
     <>
-      <IssueHero></IssueHero>
+      <IssueHero issue={issue}></IssueHero>
       {issue?.state.toLowerCase() === "draft" && (
         <IssueDraftProgress amountTotal={600} amountUsed={300} />
       )}
 
-      <IssueProposals></IssueProposals>
+      {/*<IssueProposals></IssueProposals>*/}
 
       <PageActions
         finalized={true}
