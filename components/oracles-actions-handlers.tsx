@@ -44,12 +44,11 @@ export default function OraclesActionsHandlers({
       return onError("$BEPRO amount needs to be higher than 0.");
     }
 
-    if (!isChecked) {
-      onError("Settler token not approved. Check it and try again");
-    }
-
     setShow(isChecked);
     onCheck(isChecked);
+    onError(
+      !isChecked ? "Settler token not approved. Check it and try again" : "",
+    );
   }
   async function handleConfirm() {
     try {
