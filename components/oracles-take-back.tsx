@@ -1,17 +1,45 @@
+import { isEmpty, isEqual, uniqueId } from "lodash";
+import { useEffect, useState } from "react";
+import BeproService from "services/bepro";
 import OraclesTakeBackItem from "./oracles-take-back-item";
 
-const items: { amount: number; address: string }[] = [
-  {
-    amount: 200000,
-    address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-  },
-  {
-    amount: 150000,
-    address: "yrf2493p83kkfjhx0wlhbc1qxy2kgdygjrsqtzq2n0",
-  },
-];
+type ItemT = { address: string; amount: number };
 
 export default function OraclesTakeBack(): JSX.Element {
+  const [items, setItems] = useState<ItemT[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await BeproService.login();
+
+        const address = await BeproService.getAddress();
+        const response = await BeproService.network.getOraclesSummary({
+          address,
+        });
+
+        const mappedSummary = response?.amounts
+          .map((amount: ItemT["amount"], index: number) => {
+            const mappedAddress = response?.addresses[index];
+
+            if (Number(amount) || !isEqual(address, mappedAddress)) {
+              return {
+                address: mappedAddress,
+                amount,
+              };
+            }
+          })
+          .filter((item: ItemT | undefined) => {
+            typeof item !== "undefined";
+          });
+
+        setItems(mappedSummary);
+      } catch (error) {
+        console.log("MainNav", error);
+      }
+    })();
+  }, []);
+
   return (
     <div className="col-md-10">
       <div className="content-wrapper mb-5">
@@ -21,13 +49,16 @@ export default function OraclesTakeBack(): JSX.Element {
         </div>
         <div className="row">
           <div className="col">
-            {items.map((item) => (
-              <OraclesTakeBackItem
-                key={item.address}
-                address={item.address}
-                amount={item.amount}
-              />
-            ))}
+            {isEmpty(items)
+              ? "No delegates found"
+              : items.map(({ address, amount }) => (
+                  <OraclesTakeBackItem
+                    key={uniqueId("OraclesTakeBackItem_")}
+                    address={address}
+                    amount={amount}
+                    onConfirm={(status) => console.log(status, address)}
+                  />
+                ))}
           </div>
         </div>
       </div>
