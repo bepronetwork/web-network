@@ -19,6 +19,8 @@ export interface IIssue {
     githubId: string,
     issueId: string,
     creatorGithub?: string,
+    creatorAddress?: string,
+    isIssueinDraft?: boolean,
     amount?: number,
     url?: string,
     numberOfComments: number,
