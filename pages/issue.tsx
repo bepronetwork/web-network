@@ -15,16 +15,22 @@ import { mockCommentsIssue } from "../helpers/mockdata/mockCommentsIssue";
 import { IIssue } from "../components/issue-list-item";
 
 export default function PageIssue() {
-  const [issue, setIssue] = useState<IIssue>(mockDeveloperIssues[3]);
+  const [issue, setIssue] = useState<IIssue>(mockDeveloperIssues[2]);
 
   return (
     <>
       <IssueHero></IssueHero>
-      {issue?.state.toLowerCase() === "draft" && <IssueDraftProgress />}
+      {issue?.state.toLowerCase() === "draft" && (
+        <IssueDraftProgress amountTotal={600} amountUsed={300} />
+      )}
 
-      {/*<IssueProposals></IssueProposals>
-       */}
-      <PageActions issue={issue}></PageActions>
+      <IssueProposals></IssueProposals>
+
+      <PageActions
+        finalized={true}
+        userAddress="0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d"
+        issue={issue}
+      ></PageActions>
 
       <IssueDescription
         description={`Change the architecture of Application.getContractType()<br></br><br></br>
