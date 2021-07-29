@@ -1,29 +1,26 @@
 import { useEffect, useState } from "react";
 import GithubMicroService from "services/github-microservice";
 import BeproService from "services/bepro";
+import useAccount from "hooks/useAccount";
 
 export default function AccountHero() {
-  const [oracles, setOracles] = useState<number>(0);
+  const { account } = useAccount();
   const [issues, setIssues] = useState<number>(0);
 
   useEffect(() => {
     (async function getData() {
       try {
         await BeproService.login();
-        const address = await BeproService.getAddress();
-        const issueIds = await BeproService.network.getIssuesByAddress(address);
-        const getOraclesByAddress =
-          await BeproService.network.getOraclesByAddress({
-            address,
-          });
 
-        if (issueIds.map((index: number) => index + 1).length > 0) {
+        const issueIds = await BeproService.network.getIssuesByAddress(
+          account.address,
+        );
+
+        if (issueIds.map((index: number) => index + 1).length) {
           const issues = await GithubMicroService.getIssues(issueIds);
 
           setIssues(issues);
         }
-
-        setOracles(getOraclesByAddress);
       } catch (error) {
         console.log("AccountHero getData()", error);
       }
@@ -46,7 +43,7 @@ export default function AccountHero() {
                 </div>
                 <div className="col-md-4">
                   <div className="top-border">
-                    <h4 className="h4 mb-0">{oracles}</h4>
+                    <h4 className="h4 mb-0">{account.oracles}</h4>
                     <span className="p-small">Oracles</span>
                   </div>
                 </div>

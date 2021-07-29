@@ -1,30 +1,10 @@
 import { GetStaticProps } from "next";
-import React, { useCallback, useEffect, useState } from "react";
-import BeproService from "../services/bepro";
+import React from "react";
 import Link from "next/link";
+import useAccount from "hooks/useAccount";
 
 export default function MainNav() {
-  const [loggedIn, setLoggedIn] = useState<boolean>(false);
-  const [address, setAddress] = useState<string>("");
-  const [beproStaked, setBeproStaked] = useState<number>(0);
-  const handleLogin = useCallback(async () => {
-    try {
-      await BeproService.login();
-
-      const beproAddress = await BeproService.getAddress();
-      const beproStaked = await BeproService.network.getBEPROStaked();
-
-      setAddress(beproAddress);
-      setBeproStaked(beproStaked);
-      setLoggedIn(true);
-    } catch (error) {
-      console.log("MainNav", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    handleLogin();
-  }, []);
+  const { account, actions } = useAccount();
 
   return (
     <div className="main-nav d-flex align-items-center justify-content-between">
@@ -48,8 +28,8 @@ export default function MainNav() {
         <Link href="/create-issue" passHref>
           <a className="btn btn-md btn-trans mr-1">+ Create issue</a>
         </Link>
-        {!loggedIn ? (
-          <button className="btn btn-md btn-white" onClick={handleLogin}>
+        {!account.isConnected ? (
+          <button className="btn btn-md btn-white" onClick={actions.connect}>
             Connect <i className="ico-metamask ml-1"></i>
           </button>
         ) : (
@@ -57,13 +37,15 @@ export default function MainNav() {
             <Link href="/account" passHref>
               <a className="btn btn-md btn-trans mr-1">
                 <i className="ico-bepro mr-1"></i>
-                {beproStaked}
+                {account.staked}
               </a>
             </Link>
             <Link href="/account" passHref>
               <a className="meta-info d-flex align-items-center">
                 <div className="d-flex flex-column text-right">
-                  <p className="p-small short-address mb-0">{address}</p>
+                  <p className="p-small short-address mb-0">
+                    {account.address}
+                  </p>
                   <p className="p-small mb-0 trans">0.023 ETH</p>
                 </div>
                 {/* <img className="avatar circle-2"src="https://uifaces.co/our-content/donated/Xp0NB-TL.jpg" alt="" /> */}
