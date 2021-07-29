@@ -3,25 +3,21 @@ import Link from "next/link";
 import React from "react";
 import AccountHero from "components/account-hero";
 import OraclesActions from "components/oracles-actions";
-import OraclesDelegation from "components/oracles-delegation";
+import OraclesDelegate from "components/oracles-delegate";
 import OraclesTakeBack from "components/oracles-take-back";
 
-export default function PageAccountOracles() {
+export default function MyOracles() {
   return (
     <div>
       <AccountHero></AccountHero>
       <div className="container">
         <div className="row">
           <div className="d-flex justify-content-center mb-3">
-            <Link href="/account">
-              <a className="subnav-item mr-3" href="/account">
-                <h3 className="h3">My issues</h3>
-              </a>
+            <Link href="/account/" passHref>
+              <a className="subnav-item active mr-3 h3">My issues</a>
             </Link>
-            <Link href="/account">
-              <a className="subnav-item active" href="/account-oracles">
-                <h3 className="h3">My oracles</h3>
-              </a>
+            <Link href="/account/my-oracles" passHref>
+              <a className="subnav-item h3">My oracles</a>
             </Link>
           </div>
         </div>
@@ -29,7 +25,7 @@ export default function PageAccountOracles() {
       <div className="container">
         <div className="row justify-content-center mb-5">
           <OraclesActions />
-          <OraclesDelegation />
+          <OraclesDelegate />
         </div>
       </div>
       <div className="container">

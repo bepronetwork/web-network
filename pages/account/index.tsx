@@ -6,7 +6,7 @@ import IssueListItem, { IIssue } from "components/issue-list-item";
 import BeproService from "services/bepro";
 import GithubMicroService from "services/github-microservice";
 
-export default function PageAccount() {
+export default function MyIssues() {
   const [myIssues, setMyIssues] = useState<IIssue[]>([]);
 
   useEffect(() => {
@@ -33,14 +33,14 @@ export default function PageAccount() {
 
   return (
     <div>
-      <AccountHero issuesCount={myIssues.length}></AccountHero>
+      <AccountHero />
       <div className="container">
         <div className="row">
           <div className="d-flex justify-content-center mb-3">
-            <Link href="/account" passHref>
+            <Link href="/account/" passHref>
               <a className="subnav-item active mr-3 h3">My issues</a>
             </Link>
-            <Link href="account/my-oracles" passHref>
+            <Link href="/account/my-oracles" passHref>
               <a className="subnav-item h3">My oracles</a>
             </Link>
           </div>
