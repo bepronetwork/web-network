@@ -47,7 +47,7 @@ export default function OraclesActionsHandlers({
     setShow(isChecked);
     onCheck(isChecked);
     onError(
-      !isChecked ? "Settler token not approved. Check it and try again" : "",
+      !isChecked ? "Settler token not approved. Check it and try again." : "",
     );
   }
   async function handleConfirm() {

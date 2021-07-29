@@ -6,15 +6,15 @@ import InputNumber from "./input-number";
 import OraclesBoxHeader from "./oracles-box-header";
 
 function OraclesDelegate(): JSX.Element {
-  const [tokenAmount, setOracles] = useState<number>(0);
-  const [delegatedTo, setAddress] = useState<string>("");
+  const [tokenAmount, setTokenAmount] = useState<number>(0);
+  const [delegatedTo, setDelegatedTo] = useState<string>("");
   const [error, setError] = useState<string>("");
 
   function handleChangeOracles(params: NumberFormatValues) {
-    setOracles(params.floatValue);
+    setTokenAmount(params.floatValue);
   }
   function handleChangeAddress(params: ChangeEvent<HTMLInputElement>) {
-    setAddress(params.target.value);
+    setDelegatedTo(params.target.value);
   }
   async function handleClickDelegate() {
     if (!tokenAmount || !delegatedTo) {
@@ -24,13 +24,14 @@ function OraclesDelegate(): JSX.Element {
     try {
       setError("");
       setLoadingAttributes(true);
+
       const transaction = await BeproService.network.delegateOracles({
         tokenAmount,
         delegatedTo,
       });
 
       // todo: onConfirm
-      console.log(transaction.status);
+      console.log({ transaction });
       setLoadingAttributes(false);
     } catch (error) {
       console.log({ error });
