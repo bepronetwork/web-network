@@ -10,6 +10,10 @@ import {
 } from "react";
 import BeproService from "services/bepro";
 
+const TYPES = {
+  SET: "set",
+  RESET: "reset",
+} as const;
 const initialState = {
   issues: [],
   bepros: "",
@@ -22,7 +26,7 @@ const initialState = {
 
 type State = typeof initialState;
 type Action = {
-  type: string;
+  type: typeof TYPES[keyof typeof TYPES];
   props: {
     [key: string]: string | number | any;
   };
@@ -38,12 +42,12 @@ function init(initialState: State) {
 }
 function reducer(state: State, action: Action) {
   switch (action.type) {
-    case "set":
+    case TYPES.SET:
       return {
         ...state,
         ...action.props,
       };
-    case "reset":
+    case TYPES.RESET:
       return init(initialState);
     default:
       throw new Error("Action not allowed.");
@@ -67,7 +71,7 @@ function useAccount() {
       setLoadingAttributes(true);
       await BeproService.login();
       dispatch({
-        type: "set",
+        type: TYPES.SET,
         props: {
           isConnected: true,
         },
@@ -81,7 +85,7 @@ function useAccount() {
       const issues = await BeproService.network.getIssuesByAddress(address);
 
       dispatch({
-        type: "set",
+        type: TYPES.SET,
         props: {
           address,
           bepros,
@@ -111,5 +115,5 @@ function useAccount() {
 
 Account.State.displayName = "AccountState";
 Account.Dispatch.displayName = "AccountDispatch";
-export { Provider };
+export { Provider, TYPES };
 export default useAccount;
