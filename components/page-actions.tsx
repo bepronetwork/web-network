@@ -6,8 +6,14 @@ import StartWorking from "./start-working";
 import OpenIssue from "./open-issue";
 import Link from "next/link";
 import BeproService from "../services/bepro";
+import { setLoadingAttributes } from "../providers/loading-provider";
 
-export default function PageActions({ issue, userAddress, finalized }) {
+export default function PageActions({
+  issue,
+  userAddress,
+  finalized,
+  isIssueinDraft,
+}) {
   const handleAvatar = () => {
     if (issue?.developers.length > 0) {
       return <IssueAvatars users={issue?.developers}></IssueAvatars>;
@@ -24,15 +30,30 @@ export default function PageActions({ issue, userAddress, finalized }) {
       (issue?.state.toLowerCase() === "open" ||
         (issue?.state.toLowerCase() === "in progress" &&
           !finalized &&
-          issue?.isIssueinDraft === false)) && <StartWorking />
+          isIssueinDraft === false)) && <StartWorking />
     );
   };
 
   const handleRedeem = () => {
     return (
-      issue?.isIssueinDraft === true &&
+      isIssueinDraft === true &&
       issue?.creatorAddress === userAddress && (
-        <button className="btn btn-md btn-primary mr-1 px-4">Redeem</button>
+        <button
+          className="btn btn-md btn-primary mr-1 px-4"
+          onClick={async () => {
+            setLoadingAttributes(true);
+            await BeproService.login()
+              .then(() =>
+                BeproService.network.redeemIssue({
+                  issueId: issue?.issueId,
+                })
+              )
+              .catch((err) => console.log(err))
+              .finally(() => setLoadingAttributes(false));
+          }}
+        >
+          Redeem
+        </button>
       )
     );
   };
@@ -40,7 +61,7 @@ export default function PageActions({ issue, userAddress, finalized }) {
   const handleProposeDestribution = () => {
     return (
       issue?.state.toLowerCase() === "in progress" &&
-      issue?.isIssueinDraft === false && (
+      isIssueinDraft === false && (
         <button className="btn btn-md btn-primary mr-1 px-3">
           Propose Destribution
         </button>
