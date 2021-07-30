@@ -21,7 +21,12 @@ const initialState = {
 };
 
 type State = typeof initialState;
-type Action = { type: string; [key: string]: string | number | any };
+type Action = {
+  type: string;
+  props: {
+    [key: string]: string | number | any;
+  };
+};
 
 const Account = {
   State: createContext<State>(initialState),
@@ -31,20 +36,15 @@ const Account = {
 function init(initialState: State) {
   return { ...initialState };
 }
-function stateWithoutType(action: Action) {
-  delete action.type;
-
-  return action;
-}
 function reducer(state: State, action: Action) {
   switch (action.type) {
     case "set":
       return {
         ...state,
-        ...stateWithoutType(action),
+        ...action.props,
       };
     case "reset":
-      return init(action.payload);
+      return init(initialState);
     default:
       throw new Error("Action not allowed.");
   }
@@ -66,7 +66,12 @@ function useAccount() {
     try {
       setLoadingAttributes(true);
       await BeproService.login();
-      dispatch({ type: "set", isConnected: true });
+      dispatch({
+        type: "set",
+        props: {
+          isConnected: true,
+        },
+      });
 
       const address = await BeproService.getAddress();
       const bepros = await BeproService.network.getBEPROStaked();
@@ -77,10 +82,12 @@ function useAccount() {
 
       dispatch({
         type: "set",
-        address,
-        bepros,
-        oracles,
-        issues,
+        props: {
+          address,
+          bepros,
+          oracles,
+          issues,
+        },
       });
       setLoadingAttributes(false);
     } catch (error) {
