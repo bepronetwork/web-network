@@ -6,6 +6,7 @@ import BeproService from "../services/bepro";
 import MainNav from "../components/main-nav";
 import React from "react";
 import { LoadingContextProvider } from "../providers/loading-provider";
+import { Provider as AccountProvider } from "hooks/useAccount";
 
 export default function App({ Component, pageProps }: AppProps) {
   (async () => {
@@ -21,11 +22,13 @@ export default function App({ Component, pageProps }: AppProps) {
         />
         <title>WEB Network</title>
       </Head>
-      <LoadingContextProvider>
-        <MainNav />
-        <WebThreeDialog />
-        <Component {...pageProps} />
-      </LoadingContextProvider>
+      <AccountProvider>
+        <LoadingContextProvider>
+          <MainNav />
+          <WebThreeDialog />
+          <Component {...pageProps} />
+        </LoadingContextProvider>
+      </AccountProvider>
     </>
   );
 }

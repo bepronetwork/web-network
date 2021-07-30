@@ -1,31 +1,7 @@
-import { useEffect, useState } from "react";
-import GithubMicroService from "services/github-microservice";
-import BeproService from "services/bepro";
 import useAccount from "hooks/useAccount";
 
 export default function AccountHero() {
-  const { account } = useAccount();
-  const [issues, setIssues] = useState<number>(0);
-
-  useEffect(() => {
-    (async function getData() {
-      try {
-        await BeproService.login();
-
-        const issueIds = await BeproService.network.getIssuesByAddress(
-          account.address,
-        );
-
-        if (issueIds.map((index: number) => index + 1).length) {
-          const issues = await GithubMicroService.getIssues(issueIds);
-
-          setIssues(issues);
-        }
-      } catch (error) {
-        console.log("AccountHero getData()", error);
-      }
-    })();
-  }, []);
+  const account = useAccount();
 
   return (
     <div className="banner bg-bepro-blue mb-4">
@@ -37,7 +13,7 @@ export default function AccountHero() {
               <div className="row">
                 <div className="col-md-4">
                   <div className="top-border">
-                    <h4 className="h4 mb-0">{issues}</h4>
+                    <h4 className="h4 mb-0">{account.issues?.length}</h4>
                     <span className="p-small">Issues</span>
                   </div>
                 </div>
