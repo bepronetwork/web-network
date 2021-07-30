@@ -24,12 +24,15 @@ const initialState = {
   isConnected: false,
 };
 
+type Type = typeof TYPES;
 type State = typeof initialState;
+// todo: catch type by object property and not all of them
+type StateOptional = {
+  [key in keyof State]?: State[keyof State];
+};
 type Action = {
-  type: typeof TYPES[keyof typeof TYPES];
-  props: {
-    [key: string]: string | number | any;
-  };
+  type: Type[keyof Type];
+  props: StateOptional;
 };
 
 const Account = {
@@ -37,8 +40,8 @@ const Account = {
   Dispatch: createContext<Dispatch<Action>>(() => {}),
 };
 
-function init(initialState: State) {
-  return { ...initialState };
+function init(initialState: StateOptional) {
+  return initialState;
 }
 function reducer(state: State, action: Action) {
   switch (action.type) {
@@ -48,7 +51,7 @@ function reducer(state: State, action: Action) {
         ...action.props,
       };
     case TYPES.RESET:
-      return init(initialState);
+      return init(action.props);
     default:
       throw new Error("Action not allowed.");
   }
@@ -79,7 +82,7 @@ function useAccount() {
 
       const address = await BeproService.getAddress();
       const bepros = await BeproService.network.getBEPROStaked();
-      const oracles = await BeproService.network.getOraclesByAddress({
+      const summary = await BeproService.network.getOraclesSummary({
         address,
       });
       const issues = await BeproService.network.getIssuesByAddress(address);
@@ -89,8 +92,9 @@ function useAccount() {
         props: {
           address,
           bepros,
-          oracles,
+          oracles: summary?.tokensLocked ?? 0,
           issues,
+          delegated: summary?.oraclesDelegatedByOthers ?? 0,
         },
       });
       setLoadingAttributes(false);
@@ -104,6 +108,7 @@ function useAccount() {
     connect();
   }, []);
 
+  // todo: verify why this is been rendered 3 times (2 is justify because it's in strict mode)
   return {
     ...useContext(Account.State),
     actions: {

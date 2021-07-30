@@ -25,7 +25,7 @@ export default function AccountHero() {
                 </div>
                 <div className="col-md-4">
                   <div className="top-border">
-                    <h4 className="h4 mb-0">0</h4>
+                    <h4 className="h4 mb-0">{account.delegated}</h4>
                     <span className="p-small">Delegated oracles</span>
                   </div>
                 </div>
