@@ -1,10 +1,43 @@
 import { GetStaticProps } from "next";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import Link from "next/link";
-import useAccount from "hooks/useAccount";
+import useAccount, { TYPES } from "hooks/useAccount";
+import { setLoadingAttributes } from "providers/loading-provider";
+import BeproService from "services/bepro";
 
 export default function MainNav() {
   const account = useAccount();
+  const handleClickLogin = useCallback(async () => {
+    try {
+      setLoadingAttributes(true);
+      await BeproService.login();
+      account.dispatch({
+        type: TYPES.SET,
+        props: {
+          isConnected: true,
+        },
+      });
+
+      const address = await BeproService.getAddress();
+      const bepros = await BeproService.network.getBEPROStaked();
+
+      account.dispatch({
+        type: TYPES.SET,
+        props: {
+          address,
+          bepros,
+        },
+      });
+      setLoadingAttributes(false);
+    } catch (error) {
+      console.log("useAccount handleClickLogin", error);
+      setLoadingAttributes(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    handleClickLogin();
+  }, []);
 
   return (
     <div className="main-nav d-flex align-items-center justify-content-between">
@@ -29,9 +62,7 @@ export default function MainNav() {
           <a className="btn btn-md btn-trans mr-1">+ Create issue</a>
         </Link>
         {!account.isConnected ? (
-          <button
-            className="btn btn-md btn-white"
-            onClick={account.actions.connect}>
+          <button className="btn btn-md btn-white" onClick={handleClickLogin}>
             Connect <i className="ico-metamask ml-1"></i>
           </button>
         ) : (

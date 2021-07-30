@@ -3,6 +3,7 @@ import { Fragment, useState } from "react";
 import Modal from "./modal";
 import { setLoadingAttributes } from "providers/loading-provider";
 import BeproService from "services/bepro";
+import useAccount, { TYPES } from "hooks/useAccount";
 
 export default function OraclesActionsHandlers({
   info = {
@@ -37,6 +38,7 @@ export default function OraclesActionsHandlers({
   onCancel(): void;
   onConfirm(confirmation: boolean): void;
 }): JSX.Element {
+  const account = useAccount();
   const [show, setShow] = useState<boolean>(false);
 
   function handleCheck(isChecked: boolean) {
@@ -55,10 +57,18 @@ export default function OraclesActionsHandlers({
       handleCancel();
       setLoadingAttributes(true);
 
-      const address: string = await BeproService.getAddress();
       const response = await BeproService.network[action.toLowerCase()](
-        Object.assign({}, info.params(address)),
+        Object.assign({}, info.params(account.address)),
       );
+      const oracles = await BeproService.network.getOraclesByAddress({
+        address: account.address,
+      });
+      account.dispatch({
+        type: TYPES.SET,
+        props: {
+          oracles,
+        },
+      });
 
       onConfirm(response.status);
       setLoadingAttributes(false);
