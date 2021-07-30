@@ -63,7 +63,6 @@ function OraclesActions(): JSX.Element {
             actions={actions}
             onChange={setAction}
             currentAction={action}
-            oracles={200}
           />
           <p className="p text-white">{renderInfo.description}</p>
           <InputNumber

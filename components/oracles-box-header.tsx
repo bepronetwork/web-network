@@ -4,13 +4,13 @@ import clsx from "clsx";
 // todo: create something like <Tabs /> <TabContainer />
 function OraclesBoxHeader({
   actions = null,
-  oracles = 0,
-  onChange = (action = "") => {},
+  available = 0,
+  onChange = () => {},
   currentAction = "",
 }: {
   actions: string | string[];
-  oracles: number;
-  onChange: (action: string) => void;
+  available?: number;
+  onChange?(action: string): void;
   currentAction?: string;
 }): JSX.Element {
   return (
@@ -31,7 +31,7 @@ function OraclesBoxHeader({
           ))
         )}
       </div>
-      <span className="badge-opac">{oracles} Available</span>
+      {!!available && <span className="badge-opac">{available} Available</span>}
     </div>
   );
 }
