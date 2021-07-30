@@ -1,3 +1,4 @@
+import { setLoadingAttributes } from "providers/loading-provider";
 import {
   createContext,
   Dispatch,
@@ -10,7 +11,7 @@ import {
 import BeproService from "services/bepro";
 
 const initialState = {
-  issues: 0,
+  issues: [],
   bepros: "",
   oracles: "",
   delegated: 0,
@@ -63,6 +64,7 @@ function useAccount() {
   const dispatch = useContext(Account.Dispatch);
   const connect = useCallback(async () => {
     try {
+      setLoadingAttributes(true);
       await BeproService.login();
       dispatch({ type: "set", isConnected: true });
 
@@ -71,10 +73,19 @@ function useAccount() {
       const oracles = await BeproService.network.getOraclesByAddress({
         address,
       });
+      const issues = await BeproService.network.getIssuesByAddress(address);
 
-      dispatch({ type: "set", address, bepros, oracles });
+      dispatch({
+        type: "set",
+        address,
+        bepros,
+        oracles,
+        issues,
+      });
+      setLoadingAttributes(false);
     } catch (error) {
       console.log("useAccount connect", error);
+      setLoadingAttributes(false);
     }
   }, []);
 
@@ -83,7 +94,7 @@ function useAccount() {
   }, []);
 
   return {
-    account: useContext(Account.State),
+    ...useContext(Account.State),
     actions: {
       dispatch,
       connect,

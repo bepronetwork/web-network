@@ -4,7 +4,7 @@ import Link from "next/link";
 import useAccount from "hooks/useAccount";
 
 export default function MainNav() {
-  const { account, actions } = useAccount();
+  const account = useAccount();
 
   return (
     <div className="main-nav d-flex align-items-center justify-content-between">
@@ -29,7 +29,9 @@ export default function MainNav() {
           <a className="btn btn-md btn-trans mr-1">+ Create issue</a>
         </Link>
         {!account.isConnected ? (
-          <button className="btn btn-md btn-white" onClick={actions.connect}>
+          <button
+            className="btn btn-md btn-white"
+            onClick={account.actions.connect}>
             Connect <i className="ico-metamask ml-1"></i>
           </button>
         ) : (
@@ -37,7 +39,7 @@ export default function MainNav() {
             <Link href="/account" passHref>
               <a className="btn btn-md btn-trans mr-1">
                 <i className="ico-bepro mr-1"></i>
-                {account.staked}
+                {account.bepros}
               </a>
             </Link>
             <Link href="/account" passHref>

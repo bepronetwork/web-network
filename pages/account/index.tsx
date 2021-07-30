@@ -3,30 +3,23 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import AccountHero from "components/account-hero";
 import IssueListItem, { IIssue } from "components/issue-list-item";
-import BeproService from "services/bepro";
 import GithubMicroService from "services/github-microservice";
+import useAccount from "hooks/useAccount";
 
 export default function MyIssues() {
-  const [myIssues, setMyIssues] = useState<IIssue[]>([]);
+  const account = useAccount();
+  const [issues, setIssues] = useState<IIssue[]>([]);
 
   useEffect(() => {
-    (async () => {
+    (async function getIssues() {
       try {
-        await BeproService.login();
-        const beproAddress = await BeproService.getAddress();
-        let issueIds = await BeproService.network.getIssuesByAddress(
-          beproAddress,
-        );
+        if (account.issues.length) {
+          const issues = await GithubMicroService.getIssues(account.issues);
 
-        issueIds = issueIds.map((index: number) => index + 1);
-
-        if (issueIds.length > 0) {
-          const issues = await GithubMicroService.getIssues(issueIds);
-
-          setMyIssues(issues);
+          setIssues(issues);
         }
       } catch (error) {
-        console.log(error);
+        console.log("MyIssues getIssues", error);
       }
     })();
   }, []);
@@ -48,7 +41,7 @@ export default function MyIssues() {
       </div>
       <div className="container">
         <div className="row justify-content-center">
-          {myIssues.map((issue) => (
+          {issues.map((issue) => (
             <div className="col-md-10" key={issue.issueId}>
               <IssueListItem issue={issue}></IssueListItem>
             </div>
