@@ -1,7 +1,38 @@
-import useAccount from "hooks/useAccount";
+import useAccount, { TYPES } from "hooks/useAccount";
+import { setLoadingAttributes } from "providers/loading-provider";
+import { useEffect } from "react";
+import BeproService from "services/bepro";
 
 export default function AccountHero() {
   const account = useAccount();
+
+  useEffect(() => {
+    (async function getData() {
+      try {
+        setLoadingAttributes(true);
+        await BeproService.login();
+
+        const address = await BeproService.getAddress();
+        const issues = await BeproService.network.getIssuesByAddress(address);
+        const summary = await BeproService.network.getOraclesSummary({
+          address,
+        });
+
+        account.dispatch({
+          type: TYPES.SET,
+          props: {
+            oracles: summary?.tokensLocked ?? "0",
+            issues,
+            delegated: summary?.oraclesDelegatedByOthers ?? "0",
+          },
+        });
+        setLoadingAttributes(false);
+      } catch (error) {
+        console.log("AccountHero getData", error);
+        setLoadingAttributes(false);
+      }
+    })();
+  }, []);
 
   return (
     <div className="banner bg-bepro-blue mb-4">

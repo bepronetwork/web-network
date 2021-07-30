@@ -1,14 +1,10 @@
-import { setLoadingAttributes } from "providers/loading-provider";
 import {
   createContext,
   Dispatch,
   ReactElement,
-  useCallback,
   useContext,
-  useEffect,
   useReducer,
 } from "react";
-import BeproService from "services/bepro";
 
 const TYPES = {
   SET: "set",
@@ -68,53 +64,9 @@ function Provider({ children }: { children: ReactElement }) {
   );
 }
 function useAccount() {
-  const dispatch = useContext(Account.Dispatch);
-  const connect = useCallback(async () => {
-    try {
-      setLoadingAttributes(true);
-      await BeproService.login();
-      dispatch({
-        type: TYPES.SET,
-        props: {
-          isConnected: true,
-        },
-      });
-
-      const address = await BeproService.getAddress();
-      const bepros = await BeproService.network.getBEPROStaked();
-      const summary = await BeproService.network.getOraclesSummary({
-        address,
-      });
-      const issues = await BeproService.network.getIssuesByAddress(address);
-
-      dispatch({
-        type: TYPES.SET,
-        props: {
-          address,
-          bepros,
-          oracles: summary?.tokensLocked ?? 0,
-          issues,
-          delegated: summary?.oraclesDelegatedByOthers ?? 0,
-        },
-      });
-      setLoadingAttributes(false);
-    } catch (error) {
-      console.log("useAccount connect", error);
-      setLoadingAttributes(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    connect();
-  }, []);
-
-  // todo: verify why this is been rendered 3 times (2 is justify because it's in strict mode)
   return {
     ...useContext(Account.State),
-    actions: {
-      dispatch,
-      connect,
-    },
+    dispatch: useContext(Account.Dispatch),
   };
 }
 
