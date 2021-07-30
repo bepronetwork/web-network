@@ -42,7 +42,7 @@ function OraclesDelegate(): JSX.Element {
   return (
     <div className="col-md-5">
       <div className="content-wrapper">
-        <OraclesBoxHeader actions="Delegate oracles" oracles={200} />
+        <OraclesBoxHeader actions="Delegate oracles" available={200} />
         <InputNumber
           label="Oracles Ammout"
           value={tokenAmount}
