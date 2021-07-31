@@ -19,7 +19,7 @@ export default function IssueProposals() {
                                 <div className="col-md-4">
                                     <div className="d-flex align-items-center justify-content-end">
                                         <p className="smallCaption color-purple mb-0 mr-2">500 Oracles</p>
-                                        <button className="btn btn-md btn-purple">Vote</button>
+                                        <button className="btn btn-md btn-purple">Dispute</button>
                                     </div>
                                 </div>
                             </div>
@@ -35,7 +35,7 @@ export default function IssueProposals() {
                                 <div className="col-md-4">
                                     <div className="d-flex align-items-center justify-content-end">
                                         <p className="smallCaption color-purple mb-0 mr-2">500 Oracles</p>
-                                        <button className="btn btn-md btn-purple">Vote</button>
+                                        <button className="btn btn-md btn-purple">Dispute</button>
                                     </div>
                                 </div>
                             </div>
@@ -51,7 +51,7 @@ export default function IssueProposals() {
                                 <div className="col-md-4">
                                     <div className="d-flex align-items-center justify-content-end">
                                         <p className="smallCaption color-purple mb-0 mr-2">500 Oracles</p>
-                                        <button className="btn btn-md btn-purple">Vote</button>
+                                        <button className="btn btn-md btn-purple">Dispute</button>
                                     </div>
                                 </div>
                             </div>
