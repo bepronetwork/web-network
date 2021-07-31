@@ -60,16 +60,16 @@ export default function OraclesActionsHandlers({
       const response = await BeproService.network[action.toLowerCase()](
         Object.assign({}, info.params(account.address)),
       );
-      const oracles = await BeproService.network.getOraclesByAddress({
+      const oracles = await BeproService.network.getOraclesSummary({
         address: account.address,
       });
+
       account.dispatch({
         type: TYPES.SET,
         props: {
           oracles,
         },
       });
-
       onConfirm(response.status);
       setLoadingAttributes(false);
     } catch (error) {
