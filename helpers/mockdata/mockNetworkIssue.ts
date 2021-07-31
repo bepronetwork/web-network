@@ -22,7 +22,7 @@ export const NetworkIssues = [
     },
     {
         issueId: "50",
-        finalized: true,
+        finalized: false,
         tokensStaked: 250
     },
     {
