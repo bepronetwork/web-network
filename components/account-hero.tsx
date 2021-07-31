@@ -10,20 +10,19 @@ export default function AccountHero() {
     (async function getData() {
       try {
         setLoadingAttributes(true);
-        await BeproService.login();
 
-        const address = await BeproService.getAddress();
-        const issues = await BeproService.network.getIssuesByAddress(address);
-        const summary = await BeproService.network.getOraclesSummary({
-          address,
+        const issuesIds = await BeproService.network.getIssuesByAddress(
+          account.address,
+        );
+        const oracles = await BeproService.network.getOraclesSummary({
+          address: account.address,
         });
 
         account.dispatch({
           type: TYPES.SET,
           props: {
-            oracles: summary?.tokensLocked ?? "0",
-            issues,
-            delegated: summary?.oraclesDelegatedByOthers ?? "0",
+            issuesIds,
+            oracles,
           },
         });
         setLoadingAttributes(false);
@@ -32,7 +31,7 @@ export default function AccountHero() {
         setLoadingAttributes(false);
       }
     })();
-  }, []);
+  }, [account.address]);
 
   return (
     <div className="banner bg-bepro-blue mb-4">
@@ -44,19 +43,21 @@ export default function AccountHero() {
               <div className="row">
                 <div className="col-md-4">
                   <div className="top-border">
-                    <h4 className="h4 mb-0">{account.issues?.length}</h4>
+                    <h4 className="h4 mb-0">{account.issuesIds?.length}</h4>
                     <span className="p-small">Issues</span>
                   </div>
                 </div>
                 <div className="col-md-4">
                   <div className="top-border">
-                    <h4 className="h4 mb-0">{account.oracles}</h4>
+                    <h4 className="h4 mb-0">{account.oracles.tokensLocked}</h4>
                     <span className="p-small">Oracles</span>
                   </div>
                 </div>
                 <div className="col-md-4">
                   <div className="top-border">
-                    <h4 className="h4 mb-0">{account.delegated}</h4>
+                    <h4 className="h4 mb-0">
+                      {account.oracles.oraclesDelegatedByOthers}
+                    </h4>
                     <span className="p-small">Delegated oracles</span>
                   </div>
                 </div>
