@@ -1,5 +1,4 @@
 import { IIssue } from "../../components/issue-list-item";
-
 export const mockDeveloperIssues: IIssue[] = [
   {
     body: "Testing",
@@ -107,6 +106,7 @@ export const mockDeveloperIssues: IIssue[] = [
     amount: 1500,
     numberOfComments: 4,
     state: "ready",
+    dueDate: "7 days to expire",
     creatorAddress:"add1",
     title: "Create all screens and functions for the application",
   },
@@ -124,6 +124,56 @@ export const mockDeveloperIssues: IIssue[] = [
     isIssueinDraft: true,
     creatorAddress:"0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d",
     title: "Change all screens and functions for the application",
+  },
+  {
+    body: "Testing in progress issue",
+    createdAt: new Date("2021-07-07T21:10:59.495Z"),
+    developers: [
+      {
+        id: 1,
+        login: "DevOne",
+        avatar_url: "https://img.pizza/28/28",
+      },
+      {
+        id: 2,
+        login: "DevTwo",
+        avatar_url: "https://img.pizza/28/28",
+      },
+      {
+        id: 3,
+        login: "DevThree",
+        avatar_url: "https://img.pizza/28/28",
+      },
+      {
+        id: 4,
+        login: "DevFour",
+        avatar_url: "https://img.pizza/28/28",
+      },
+      {
+        id: 5,
+        login: "DevFive",
+        avatar_url: "https://img.pizza/28/28",
+      },
+      {
+        id: 6,
+        login: "DevSix",
+        avatar_url: "https://img.pizza/28/28",
+      },
+      {
+        id: 7,
+        login: "DevSeven",
+        avatar_url: "https://img.pizza/28/28",
+      },
+    ],
+    githubId: "05",
+    issueId: "50",
+    creatorGithub: "@SkyTeam",
+    url:"www.google.com",
+    amount: 1500,
+    numberOfComments: 4,
+    state: "in progress",
+    creatorAddress:"add1",
+    title: "Create all screens and functions for the application",
   },
 ];
 

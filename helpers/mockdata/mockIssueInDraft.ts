@@ -5,7 +5,7 @@ export const isIssuesinDraft = [
     },
     {
         issueId: "20",
-        value: true
+        value: false
     },
     {
         issueId: "30",
@@ -17,7 +17,7 @@ export const isIssuesinDraft = [
     },
     {
         issueId: "50",
-        value: true
+        value: false
     },
     {
         issueId: "60",
