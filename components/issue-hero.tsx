@@ -25,6 +25,7 @@ export default function IssueHero({ issue }) {
                       <span className="p-small trans mr-3 mt-1">
                         by {issue?.creatorGithub}
                       </span>
+                      {issue?.dueDate && <span className="p-small text-warning mr-3 mt-1">{issue?.dueDate}</span>}
                     </div>
                   </div>
                 </div>
