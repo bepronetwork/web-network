@@ -11,21 +11,16 @@ export default function MainNav() {
     try {
       setLoadingAttributes(true);
       await BeproService.login();
+
+      const address = await BeproService.getAddress();
+      const beproStaked = await BeproService.network.getBEPROStaked();
+
       account.dispatch({
         type: TYPES.SET,
         props: {
           isConnected: true,
-        },
-      });
-
-      const address = await BeproService.getAddress();
-      const bepros = await BeproService.network.getBEPROStaked();
-
-      account.dispatch({
-        type: TYPES.SET,
-        props: {
           address,
-          bepros,
+          beproStaked,
         },
       });
       setLoadingAttributes(false);
@@ -37,7 +32,7 @@ export default function MainNav() {
 
   useEffect(() => {
     handleClickLogin();
-  }, []);
+  }, [account.oracles.tokensLocked]);
 
   return (
     <div className="main-nav d-flex align-items-center justify-content-between">
@@ -70,7 +65,7 @@ export default function MainNav() {
             <Link href="/account" passHref>
               <a className="btn btn-md btn-trans mr-1">
                 <i className="ico-bepro mr-1"></i>
-                {account.bepros}
+                {account.beproStaked}
               </a>
             </Link>
             <Link href="/account" passHref>
