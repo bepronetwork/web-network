@@ -1,50 +1,39 @@
-import { isEmpty, isEqual, uniqueId } from "lodash";
+import OraclesBoxHeader from "./oracles-box-header";
+import useAccount from "hooks/useAccount";
+import { isEmpty, isEqual, sumBy, uniqueId } from "lodash";
 import { useEffect, useState } from "react";
-import BeproService from "services/bepro";
 import OraclesTakeBackItem from "./oracles-take-back-item";
 
-type ItemT = { address: string; amount: number };
+type Item = { address: string; amount: string };
 
 export default function OraclesTakeBack(): JSX.Element {
-  const [items, setItems] = useState<ItemT[]>([]);
+  const account = useAccount();
+  const [items, setItems] = useState<Item[]>([]);
 
   useEffect(() => {
-    (async () => {
-      try {
-        await BeproService.login();
+    const mappedSummary = account.oracles?.amounts
+      .map((amount: Item["amount"], index: number) => {
+        const mappedAddress = account.oracles.addresses[index];
 
-        const address = await BeproService.getAddress();
-        const response = await BeproService.network.getOraclesSummary({
-          address,
-        });
+        if (!!Number(amount) && !isEqual(account.address, mappedAddress)) {
+          return {
+            address: mappedAddress,
+            amount,
+          };
+        }
+      })
+      .filter((item: Item | undefined) => typeof item !== "undefined");
 
-        const mappedSummary = response?.amounts
-          .map((amount: ItemT["amount"], index: number) => {
-            const mappedAddress = response?.addresses[index];
-
-            if (!!Number(amount) && !isEqual(address, mappedAddress)) {
-              return {
-                address: mappedAddress,
-                amount,
-              };
-            }
-          })
-          .filter((item: ItemT | undefined) => typeof item !== "undefined");
-
-        setItems(mappedSummary);
-      } catch (error) {
-        console.log("MainNav", error);
-      }
-    })();
-  }, []);
+    setItems(mappedSummary);
+  }, [account.oracles]);
 
   return (
     <div className="col-md-10">
       <div className="content-wrapper mb-5">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h4 className="h4 mb-0">Delegated Oracles</h4>
-          <span className="badge-opac">200 Available</span>
-        </div>
+        <OraclesBoxHeader
+          actions="List of delegations"
+          available={sumBy(items, "amount")}
+        />
         <div className="row">
           <div className="col">
             {isEmpty(items)
