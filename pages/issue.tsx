@@ -35,8 +35,6 @@ export default function PageIssue() {
   const [commentsIssue, setCommentsIssue] = useState(mockCommentsIssue);
   const [balance, setBalance] = useState(600);
 
-  console.log("tudo", networkIssue, isIssueinDraft);
-
   const getIssueNetwork = async () => {
     await BeproService.login();
     setNetworkIssue(
@@ -73,15 +71,15 @@ export default function PageIssue() {
           amountUsed={networkIssue?.tokensStaked}
         />
       )}
-      {console.log("test", networkIssue)}
-      {/*<IssueProposals></IssueProposals>*/}
-
       <PageActions
         finalized={networkIssue?.finalized}
         isIssueinDraft={isIssueinDraft?.value}
         userAddress="0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d"
         issue={issue}
-      ></PageActions>
+      />
+      {issue?.state.toLocaleLowerCase() === "ready" && (
+        <IssueProposals></IssueProposals>
+      )}
 
       <IssueDescription description={issue?.body}></IssueDescription>
       <IssueComments url="/" comments={commentsIssue}></IssueComments>
