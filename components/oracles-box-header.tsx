@@ -4,12 +4,12 @@ import clsx from "clsx";
 // todo: create something like <Tabs /> <TabContainer />
 function OraclesBoxHeader({
   actions = null,
-  available = 0,
+  available,
   onChange = () => {},
   currentAction = "",
 }: {
   actions: string | string[];
-  available?: number;
+  available?: number | undefined;
   onChange?(action: string): void;
   currentAction?: string;
 }): JSX.Element {
@@ -31,7 +31,9 @@ function OraclesBoxHeader({
           ))
         )}
       </div>
-      {!!available && <span className="badge-opac">{available} Available</span>}
+      {typeof available !== "undefined" && (
+        <span className="badge-opac">{available} Available</span>
+      )}
     </div>
   );
 }

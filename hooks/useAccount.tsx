@@ -11,10 +11,14 @@ const TYPES = {
   RESET: "reset",
 } as const;
 const initialState = {
-  issues: [],
-  bepros: "",
-  oracles: "",
-  delegated: 0,
+  issuesIds: [null as number],
+  beproStaked: 0,
+  oracles: {
+    oraclesDelegatedByOthers: "",
+    amounts: [null as string],
+    addresses: [null as string],
+    tokensLocked: "",
+  },
   address: "",
   amount: "",
   isConnected: false,
@@ -22,8 +26,9 @@ const initialState = {
 
 type Type = typeof TYPES;
 type State = typeof initialState;
-// todo: catch type by object property and not all of them
 type StateOptional = {
+  // todo: catch type by object property and not all of them
+  // doesn't work: [key in keyof State]?: State[key in keyof State];
   [key in keyof State]?: State[keyof State];
 };
 type Action = {
