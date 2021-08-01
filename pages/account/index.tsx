@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import IssueListItem, { IIssue } from "components/issue-list-item";
 import GithubMicroService from "services/github-microservice";
 import useAccount from "hooks/useAccount";
-import TemplateMyOracles from "components/template-my-oracles";
+import Account from "components/account";
 
 export default function MyIssues() {
   const account = useAccount();
@@ -24,7 +24,7 @@ export default function MyIssues() {
   }, []);
 
   return (
-    <TemplateMyOracles>
+    <Account>
       <div className="container">
         <div className="row justify-content-center">
           {issues.map((issue) => (
@@ -34,7 +34,7 @@ export default function MyIssues() {
           ))}
         </div>
       </div>
-    </TemplateMyOracles>
+    </Account>
   );
 }
 
