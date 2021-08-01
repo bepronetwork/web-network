@@ -29,7 +29,8 @@ export default function ConnectWalletButton({children, forceLogin = false, onSuc
       action = BeproService.login;
     else action = () => Promise.resolve(BeproService.address);
 
-    action().then((state: string|boolean) => dispatch(changeWalletState(!!state)))
+    action().then((state: string|boolean) =>
+                    dispatch(changeWalletState(!!state)))
             .catch(e => {
               console.log(`Error`, e);
             });
@@ -37,7 +38,7 @@ export default function ConnectWalletButton({children, forceLogin = false, onSuc
   }, [beproInit]);
 
   if (!metaMaskWallet)
-    return <button className="btn btn-md btn-white" onClick={connectWallet}>Connect <i className="ico-metamask ml-1"></i></button>;
+    return <button className="btn btn-md btn-white" disabled={!beproInit} onClick={connectWallet}>Connect <i className="ico-metamask ml-1" /></button>;
 
   return children;
 
