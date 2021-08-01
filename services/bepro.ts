@@ -46,7 +46,7 @@ export default class BeproService {
 
   public static async login() {
     await BeproService.init();
-    // if (this.loggedIn) return true;
+    if (this.loggedIn) return true;
 
     try {
       this.loggedIn = await this.bepro.login();
