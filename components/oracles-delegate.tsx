@@ -1,12 +1,11 @@
-import useAccount, { TYPES as AccountTypes } from "hooks/useAccount";
-import { setLoadingAttributes } from "providers/loading-provider";
+import NetworkTx from "./network-tx";
+import useAccount from "hooks/useAccount";
 import { ChangeEvent, useState } from "react";
 import { NumberFormatValues } from "react-number-format";
-import BeproService from "services/bepro";
 import InputNumber from "./input-number";
 import OraclesBoxHeader from "./oracles-box-header";
 
-function OraclesDelegate({ onConfirm }): JSX.Element {
+function OraclesDelegate(): JSX.Element {
   const account = useAccount();
   const [tokenAmount, setTokenAmount] = useState<number>(0);
   const [delegatedTo, setDelegatedTo] = useState<string>("");
@@ -18,41 +17,13 @@ function OraclesDelegate({ onConfirm }): JSX.Element {
   function handleChangeAddress(params: ChangeEvent<HTMLInputElement>) {
     setDelegatedTo(params.target.value);
   }
-  async function handleClickDelegate() {
+  function handleClickVerification() {
     if (!tokenAmount || !delegatedTo) {
       return setError("Please fill all required fields.");
     }
-
-    try {
-      setError("");
-      setLoadingAttributes(true);
-
-      const transaction = await BeproService.network.delegateOracles({
-        tokenAmount,
-        delegatedTo,
-      });
-      const oracles = await BeproService.network.getOraclesSummary({
-        address: account.address,
-      });
-
-      account.dispatch({
-        type: AccountTypes.SET,
-        props: {
-          oracles,
-        },
-      });
-      onConfirm({
-        status: transaction.status,
-        info: {
-          title: "Delegate oracles",
-          description: "Delegate oracles for an address",
-        },
-      });
-      setLoadingAttributes(false);
-    } catch (error) {
-      console.log({ error });
-      setLoadingAttributes(false);
-    }
+  }
+  function handleTransition() {
+    setError("");
   }
 
   return (
@@ -79,11 +50,24 @@ function OraclesDelegate({ onConfirm }): JSX.Element {
           />
         </div>
         {error && <p className="p-small text-danger mt-2">{error}</p>}
-        <button
-          className="btn btn-lg btn-primary w-100"
-          onClick={handleClickDelegate}>
+        <NetworkTx
+          className="btn-lg w-100 mt-3"
+          onTransaction={handleTransition}
+          onTransactionError={setError}
+          onClickVerification={handleClickVerification}
+          call={{
+            id: "delegateOracles",
+            params: {
+              tokenAmount,
+              delegatedTo,
+            },
+          }}
+          info={{
+            title: "Delegate oracles",
+            description: "Delegate oracles for an address",
+          }}>
           DELEGATE
-        </button>
+        </NetworkTx>
       </div>
     </div>
   );
