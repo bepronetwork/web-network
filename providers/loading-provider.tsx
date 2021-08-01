@@ -1,5 +1,5 @@
 import { createContext, Dispatch, SetStateAction, useState } from "react";
-import Loading from "../components/loading";
+import LoadingGlobal from "../components/loading-global";
 
 let getLoadingState: () => boolean;
 
@@ -17,7 +17,7 @@ function LoadingContextProvider({ children }) {
   getLoadingState = () => isLoading;
   return (
     <LoadingContext.Provider value={isLoading}>
-      <Loading show={isLoading}>{message}</Loading>
+      <LoadingGlobal show={isLoading}>{message}</LoadingGlobal>
       {children}
     </LoadingContext.Provider>
   );
