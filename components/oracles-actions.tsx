@@ -1,19 +1,22 @@
 import { useEffect, useState } from "react";
 import OraclesActionsHandlers from "./oracles-actions-handlers";
 import { NumberFormatValues } from "react-number-format";
-import OraclesActionsStatus from "./oracles-actions-status";
 import InputNumber from "./input-number";
 import SettlerTokenApproval from "./settler-token-approval";
 import OraclesBoxHeader from "./oracles-box-header";
+import SettlerTokenCheck from "./settler-token-check";
+import useAccount, { TYPES as AccountTypes } from "hooks/useAccount";
+import { setLoadingAttributes } from "providers/loading-provider";
+import BeproService from "services/bepro";
 
 const actions: string[] = ["Lock", "Unlock"];
 
-function OraclesActions(): JSX.Element {
+function OraclesActions({ onConfirm }): JSX.Element {
+  const account = useAccount();
+  const [show, setShow] = useState<boolean>(false);
   const [action, setAction] = useState<string>(actions[0]);
   const [tokenAmount, setTokenAmount] = useState<number>(0);
   const [isApproved, setIsApproved] = useState<boolean>(true);
-  const [showStatus, setShowStatus] = useState<boolean>(false);
-  const [isSucceed, setIsSucceed] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const renderAmount = tokenAmount ? `${tokenAmount} ` : "";
   const renderInfo = {
@@ -46,13 +49,49 @@ function OraclesActions(): JSX.Element {
   function handleChangeToken(params: NumberFormatValues) {
     setTokenAmount(params.floatValue);
   }
+  function handleCheck(isChecked: boolean) {
+    if (!tokenAmount) {
+      return setError("$BEPRO amount needs to be higher than 0.");
+    }
+
+    setShow(isChecked);
+    setIsApproved(isChecked);
+    setError(
+      !isChecked ? "Settler token not approved. Check it and try again." : "",
+    );
+  }
+  async function handleConfirm() {
+    try {
+      handleCancel();
+      setLoadingAttributes(true);
+
+      const transaction = await BeproService.network[action.toLowerCase()](
+        Object.assign({}, renderInfo.params(account.address)),
+      );
+      const oracles = await BeproService.network.getOraclesSummary({
+        address: account.address,
+      });
+
+      account.dispatch({
+        type: AccountTypes.SET,
+        props: {
+          oracles,
+        },
+      });
+      onConfirm({
+        status: transaction.status,
+        info: renderInfo,
+      });
+      setLoadingAttributes(false);
+    } catch (error) {
+      console.log(error);
+      setLoadingAttributes(false);
+    }
+  }
   function handleCancel() {
     setTokenAmount(0);
     setIsApproved(true);
-  }
-  function handleConfirm(confirmation: boolean) {
-    setIsSucceed(confirmation);
-    setShowStatus(true);
+    setShow(false);
   }
 
   return (
@@ -80,23 +119,19 @@ function OraclesActions(): JSX.Element {
             disabled={isApproved}
             className="mb-4"
           />
-          <OraclesActionsHandlers
-            info={renderInfo}
-            tokenAmount={tokenAmount}
-            action={action}
-            isApproved={isApproved}
-            onError={setError}
-            onCheck={setIsApproved}
-            onCancel={handleCancel}
-            onConfirm={handleConfirm}
-          />
+          <SettlerTokenCheck
+            onCheck={handleCheck}
+            disabled={!isApproved}
+            amount={tokenAmount}>
+            {renderInfo.label}
+          </SettlerTokenCheck>
         </div>
       </div>
-      <OraclesActionsStatus
-        info={{ title: renderInfo.title, description: renderInfo.description }}
-        show={showStatus}
-        isSucceed={isSucceed}
-        onClose={() => setShowStatus(false)}
+      <OraclesActionsHandlers
+        info={renderInfo}
+        onCancel={handleCancel}
+        onConfirm={handleConfirm}
+        show={show}
       />
     </>
   );
