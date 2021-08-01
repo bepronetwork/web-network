@@ -1,3 +1,4 @@
+import useAccount, { TYPES as AccountTypes } from "hooks/useAccount";
 import { setLoadingAttributes } from "providers/loading-provider";
 import { ChangeEvent, useState } from "react";
 import { NumberFormatValues } from "react-number-format";
@@ -5,7 +6,8 @@ import BeproService from "services/bepro";
 import InputNumber from "./input-number";
 import OraclesBoxHeader from "./oracles-box-header";
 
-function OraclesDelegate(): JSX.Element {
+function OraclesDelegate({ onConfirm }): JSX.Element {
+  const account = useAccount();
   const [tokenAmount, setTokenAmount] = useState<number>(0);
   const [delegatedTo, setDelegatedTo] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -29,9 +31,23 @@ function OraclesDelegate(): JSX.Element {
         tokenAmount,
         delegatedTo,
       });
+      const oracles = await BeproService.network.getOraclesSummary({
+        address: account.address,
+      });
 
-      // todo: onConfirm
-      console.log({ transaction });
+      account.dispatch({
+        type: AccountTypes.SET,
+        props: {
+          oracles,
+        },
+      });
+      onConfirm({
+        status: transaction.status,
+        info: {
+          title: "Delegate oracles",
+          description: "Delegate oracles for an address",
+        },
+      });
       setLoadingAttributes(false);
     } catch (error) {
       console.log({ error });
@@ -42,7 +58,10 @@ function OraclesDelegate(): JSX.Element {
   return (
     <div className="col-md-5">
       <div className="content-wrapper">
-        <OraclesBoxHeader actions="Delegate oracles" available={200} />
+        <OraclesBoxHeader
+          actions="Delegate oracles"
+          available={parseInt(account.oracles.oraclesDelegatedByOthers)}
+        />
         <InputNumber
           label="Oracles Ammout"
           value={tokenAmount}
