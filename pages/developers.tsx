@@ -43,14 +43,14 @@ const options_time = [
 ];
 
 export default function PageDevelopers() {
-  const [issues, setIssues] = useState<IIssue[]>(mockDeveloperIssues);
+  const [issues, setIssues] = useState<IIssue[]>([]);
   const [filterStateIssues, setfilterStateIssues] = useState({
     state: "",
-    issues: mockDeveloperIssues,
+    issues: [],
   });
 
   useEffect(() => {
-    //getIssues();
+    getIssues();
   }, []);
 
   const getIssues = async () => {
@@ -60,6 +60,7 @@ export default function PageDevelopers() {
     await GithubMicroService.getIssues()
       .then((issues) => {
         setIssues(issues);
+        console.log('issues ->', issues)
         if (filterStateIssues.issues.length === 0) {
           setfilterStateIssues({ state: "all", issues });
         }
