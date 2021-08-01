@@ -4,13 +4,13 @@ import { setLoadingAttributes } from "providers/loading-provider";
 import BeproService from "services/bepro";
 
 interface Props extends ComponentPropsWithoutRef<"div"> {
-  amount: number;
+  amount: string;
   address: string;
   onConfirm(status: boolean): void;
 }
 
 export default function OraclesTakeBackItem({
-  amount = 0,
+  amount = "",
   address = "",
   onConfirm = () => {},
 }: Props): JSX.Element {
