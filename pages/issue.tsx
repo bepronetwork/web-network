@@ -17,6 +17,7 @@ import { useRouter } from "next/router";
 import BeproService from "../services/bepro";
 import { NetworkIssues } from "../helpers/mockdata/mockNetworkIssue";
 import { isIssuesinDraft } from "../helpers/mockdata/mockIssueInDraft";
+import GithubMicroService from "../services/github-microservice";
 
 export default function PageIssue() {
   const router = useRouter();
@@ -59,6 +60,16 @@ export default function PageIssue() {
       await BeproService.login();
       setBalance(await BeproService.network.getBEPROStaked());
     };
+    const gets = async () => {
+      await BeproService.login();
+      console.log(`"testing2`, await GithubMicroService.getIssues());
+      const test = await BeproService.network.getIssueById({ issueId: "7" });
+      console.log("test bepro-js", test);
+
+      const dispute = await BeproService.network.disputeMerge({ issueId: "7", mergeID: "6"});
+      console.log(`dispute`, dispute);
+    };
+    gets();
     //getBalance();
   }, []);
 
