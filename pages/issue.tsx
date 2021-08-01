@@ -25,8 +25,9 @@ export default function PageIssue() {
 
   const [issue, setIssue] = useState<IIssue>();
   const [networkIssue, setNetworkIssue] = useState<any>();
-  const [isIssueinDraft, setIsIssueinDraft] = useState();
-  const [commentsIssue, setCommentsIssue] = useState(mockCommentsIssue);
+  const [isIssueinDraft, setIsIssueinDraft] = useState(false);
+  const [commentsIssue, setCommentsIssue] = useState();
+  const [userAddress, setUserAddress] = useState<any>();
   const [balance, setBalance] = useState();
 
   const getIssueNetwork = async () => {
@@ -37,61 +38,31 @@ export default function PageIssue() {
       })
     );
   };
-  const getisIssueinDraft = async () => {
-    await BeproService.login();
-    setIsIssueinDraft(
-      await BeproService.network.isIssueinDraft({
-        issueId: id,
-      })
-    );
-  };
 
   useEffect(() => {
-    //getIssueNetwork();
-    //getisIssueinDraft();
-    const getBalance = async () => {
-      await BeproService.login();
-    };
     const gets = async () => {
       await BeproService.login();
+      const address = await BeproService.getAddress();
+      setUserAddress(address);
 
-      /*const deploy = await BeproService.network.deploy({
-        settlerTokenAddress: "0x7a7748bd6f9bac76c2f3fcb29723227e3376cbb2",
-        transactionTokenAddress: "0x7a7748bd6f9bac76c2f3fcb29723227e3376cbb2",
-        governanceAddress: "0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d",
-      });
+      setIssue(await GithubMicroService.getIssueId(id));
+      console.log("id ->", id);
 
-      console.log("testing 02", deploy);*/
-      
-      /*console.log(`"testing2`, await GithubMicroService.getIssues());
-      const test = await BeproService.network.getIssueById({ issueId: "7" });
-      console.log("test bepro-js", test);
-
-      /*const dispute = await BeproService.network.disputeMerge({
-        issueId: "7",
-        mergeID: "6",
-      });
-
-      console.log(`dispute`, dispute);*/
-      const issue = await GithubMicroService.getIssueId(id);
-      setIssue(issue);
-      const issueId = id;
       const networkIssue = await BeproService.network.getIssueById({
         issueId: id,
       });
-      console.log("newtowkrIssue ->", networkIssue);
       setNetworkIssue(networkIssue);
       setBalance(await BeproService.network.getBEPROStaked());
-      console.log('network functions ->', await BeproService.network.isIssueinDraft)
-      await BeproService.network.isIssueinDraft({
-        issueId: "7",
+      /*const testing01 = await BeproService.network.isIssueInDraft({
+        issueId: id,
       });
-      //setIsIssueinDraft(isIssueInDraft);
-      //console.log("network ->", networkIssue);
-      /* const dispute = await BeproService.network.disputeMerge({
-        issueID: "7",
-        mergeID: "6",
-      });*/
+      console.log("testing", testing01);*/
+      if (issue) {
+        const comments = await GithubMicroService.getCommentsIssue(
+          issue.githubId
+        );
+        setCommentsIssue(comments);
+      }
     };
     gets();
     //getBalance();
@@ -109,7 +80,7 @@ export default function PageIssue() {
       <PageActions
         finalized={networkIssue?.finalized}
         isIssueinDraft={isIssueinDraft}
-        userAddress="0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d"
+        userAddress={userAddress}
         issue={issue}
       />
       {issue?.state.toLocaleLowerCase() === "ready" && (
