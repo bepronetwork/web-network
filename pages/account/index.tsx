@@ -1,10 +1,9 @@
 import { GetStaticProps } from "next";
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import AccountHero from "components/account-hero";
 import IssueListItem, { IIssue } from "components/issue-list-item";
 import GithubMicroService from "services/github-microservice";
 import useAccount from "hooks/useAccount";
+import Account from "components/account";
 
 export default function MyIssues() {
   const account = useAccount();
@@ -13,8 +12,8 @@ export default function MyIssues() {
   useEffect(() => {
     (async function getIssues() {
       try {
-        if (account.issues.length) {
-          const issues = await GithubMicroService.getIssues(account.issues);
+        if (account.issuesIds?.length) {
+          const issues = await GithubMicroService.getIssues(account.issuesIds);
 
           setIssues(issues);
         }
@@ -25,20 +24,7 @@ export default function MyIssues() {
   }, []);
 
   return (
-    <div>
-      <AccountHero />
-      <div className="container">
-        <div className="row">
-          <div className="d-flex justify-content-center mb-3">
-            <Link href="/account/" passHref>
-              <a className="subnav-item active mr-3 h3">My issues</a>
-            </Link>
-            <Link href="/account/my-oracles" passHref>
-              <a className="subnav-item h3">My oracles</a>
-            </Link>
-          </div>
-        </div>
-      </div>
+    <Account>
       <div className="container">
         <div className="row justify-content-center">
           {issues.map((issue) => (
@@ -48,7 +34,7 @@ export default function MyIssues() {
           ))}
         </div>
       </div>
-    </div>
+    </Account>
   );
 }
 

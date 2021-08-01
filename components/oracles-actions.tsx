@@ -1,20 +1,23 @@
-import { useEffect, useState } from "react";
-import OraclesActionsHandlers from "./oracles-actions-handlers";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { NumberFormatValues } from "react-number-format";
-import OraclesActionsStatus from "./oracles-actions-status";
 import InputNumber from "./input-number";
 import SettlerTokenApproval from "./settler-token-approval";
 import OraclesBoxHeader from "./oracles-box-header";
+import SettlerTokenCheck from "./settler-token-check";
+import useAccount from "hooks/useAccount";
+import Modal from "./modal";
+import NetworkTx from "./network-tx";
 
 const actions: string[] = ["Lock", "Unlock"];
 
 function OraclesActions(): JSX.Element {
+  const account = useAccount();
+  const [show, setShow] = useState<boolean>(false);
   const [action, setAction] = useState<string>(actions[0]);
   const [tokenAmount, setTokenAmount] = useState<number>(0);
   const [isApproved, setIsApproved] = useState<boolean>(true);
-  const [showStatus, setShowStatus] = useState<boolean>(false);
-  const [isSucceed, setIsSucceed] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const networkTxRef = useRef<HTMLButtonElement>(null);
   const renderAmount = tokenAmount ? `${tokenAmount} ` : "";
   const renderInfo = {
     Lock: {
@@ -46,13 +49,24 @@ function OraclesActions(): JSX.Element {
   function handleChangeToken(params: NumberFormatValues) {
     setTokenAmount(params.floatValue);
   }
+  function handleCheck(isChecked: boolean) {
+    if (!tokenAmount) {
+      return setError("$BEPRO amount needs to be higher than 0.");
+    }
+
+    setShow(isChecked);
+    setIsApproved(isChecked);
+    setError(
+      !isChecked ? "Settler token not approved. Check it and try again." : "",
+    );
+  }
+  function handleConfirm() {
+    networkTxRef.current.click();
+  }
   function handleCancel() {
     setTokenAmount(0);
     setIsApproved(true);
-  }
-  function handleConfirm(confirmation: boolean) {
-    setIsSucceed(confirmation);
-    setShowStatus(true);
+    setShow(false);
   }
 
   return (
@@ -78,26 +92,61 @@ function OraclesActions(): JSX.Element {
           <SettlerTokenApproval
             onApprove={setIsApproved}
             disabled={isApproved}
-            className="mb-4"
+            className="mb-3"
           />
-          <OraclesActionsHandlers
-            info={renderInfo}
-            tokenAmount={tokenAmount}
-            action={action}
-            isApproved={isApproved}
-            onError={setError}
-            onCheck={setIsApproved}
-            onCancel={handleCancel}
-            onConfirm={handleConfirm}
-          />
+          <SettlerTokenCheck
+            onCheck={handleCheck}
+            disabled={!isApproved}
+            amount={tokenAmount}>
+            {renderInfo.label}
+          </SettlerTokenCheck>
         </div>
       </div>
-      <OraclesActionsStatus
-        info={{ title: renderInfo.title, description: renderInfo.description }}
-        show={showStatus}
-        isSucceed={isSucceed}
-        onClose={() => setShowStatus(false)}
+      <NetworkTx
+        ref={networkTxRef}
+        onTransaction={handleCancel}
+        onTransactionError={setError}
+        call={{
+          id: action.toLowerCase(),
+          params: renderInfo.params(account.address),
+        }}
+        info={renderInfo}
       />
+      <Modal
+        title={renderInfo.title}
+        show={show}
+        footer={
+          <>
+            <button className="btn btn-md btn-opac" onClick={handleCancel}>
+              Cancel
+            </button>
+            <button className="btn btn-md btn-primary" onClick={handleConfirm}>
+              Confirm
+            </button>
+          </>
+        }>
+        <p className="p-small text-white-50 text-center">
+          {renderInfo.caption}
+        </p>
+        <p className="text-center fs-4">
+          {renderInfo.body?.split("/").map((sentence: string) => {
+            const Component =
+              (sentence.startsWith("oracles") && "span") || Fragment;
+
+            return (
+              <Fragment key={sentence}>
+                <Component
+                  {...(sentence.startsWith("oracles") && {
+                    className: "text-bold color-purple",
+                  })}>
+                  {sentence.replace(/oracles|br/, "")}
+                </Component>
+                {sentence.startsWith("br") && <br />}
+              </Fragment>
+            );
+          })}
+        </p>
+      </Modal>
     </>
   );
 }

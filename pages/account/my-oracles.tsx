@@ -1,27 +1,12 @@
-import { GetStaticProps } from "next";
-import Link from "next/link";
 import React from "react";
-import AccountHero from "components/account-hero";
 import OraclesActions from "components/oracles-actions";
 import OraclesDelegate from "components/oracles-delegate";
 import OraclesTakeBack from "components/oracles-take-back";
+import Account from "components/account";
 
 export default function MyOracles() {
   return (
-    <div>
-      <AccountHero></AccountHero>
-      <div className="container">
-        <div className="row">
-          <div className="d-flex justify-content-center mb-3">
-            <Link href="/account/" passHref>
-              <a className="subnav-item active mr-3 h3">My issues</a>
-            </Link>
-            <Link href="/account/my-oracles" passHref>
-              <a className="subnav-item h3">My oracles</a>
-            </Link>
-          </div>
-        </div>
-      </div>
+    <Account>
       <div className="container">
         <div className="row justify-content-center mb-5">
           <OraclesActions />
@@ -55,12 +40,6 @@ export default function MyOracles() {
           </div>
         </div>
       </div>
-    </div>
+    </Account>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {},
-  };
-};
