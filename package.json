@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
-    "bepro-js": "^1.2.8",
+    "bepro-js": "git+https://github.com/bepronetwork/bepro-js.git#master",
     "bootstrap": "^5.0.1",
     "clsx": "^1.1.1",
     "date-fns": "^2.11.1",
