@@ -25,4 +25,9 @@ export default class GithubMicroService {
     const {data} = await axios.get(API_HOST  + `/issues/${issueId}`);
     return data;
   }
+  
+  static async getCommentsIssue(githubId: string | string[]) {
+    const {data} = await axios.get(API_HOST  + `/issues/github/${githubId}/comments`);
+    return data;
+  }
 }
