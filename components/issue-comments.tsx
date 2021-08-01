@@ -9,20 +9,20 @@ export default function IssueComments({ url, comments }) {
         <div className="col-md-10">
           <div className="content-wrapper">
             <div className="d-flex justify-content-between align-items-center mb-3">
-              <h3 className="smallCaption mb-0">{comments.length} comments</h3>
+              <h3 className="smallCaption mb-0">{comments?.length} comments</h3>
               <Link href={url}>
                 <a className="subnav-github">
                   {"Reply on github".toUpperCase()}
                 </a>
               </Link>
             </div>
-            {comments.map((comment) => (
-              <div className="content-wrapper child mb-3" key={comment.id}>
+            {comments?.map((comment) => (
+              <div className="content-wrapper child mb-3" key={comment?.id}>
                 <p className="p-small trans">
-                  @{comment.user.login}{" "}
-                  {comment.updated_at && formatDate(comment.updated_at)}
+                  @{comment?.user.login}{" "}
+                  {comment?.updated_at && formatDate(comment?.updated_at)}
                 </p>
-                <p className="p-small">{comment.body}</p>
+                <p className="p-small">{comment?.body}</p>
               </div>
             ))}
           </div>
