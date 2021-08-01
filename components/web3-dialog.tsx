@@ -9,7 +9,7 @@ export default function WebThreeDialog() {
 
   useEffect(() => {
     setShow(isWebThreeInstalled());
-  }, [isWebThreeInstalled()]);
+  }, [isWebThreeInstalled]);
   function handleClickTryAgain() {
     window.location.reload();
   }
