@@ -6,16 +6,9 @@ import IssueHero from "../components/issue-hero";
 import IssueDraftProgress from "../components/issue-draft-progress";
 import PageActions from "../components/page-actions";
 import IssueProposals from "../components/issue-proposals";
-import {
-  mockNewIssues,
-  mockReadyIssues,
-  mockDeveloperIssues,
-} from "../helpers/mockdata/mockIssues";
-import { mockCommentsIssue } from "../helpers/mockdata/mockCommentsIssue";
 import { IIssue } from "../components/issue-list-item";
 import { useRouter } from "next/router";
 import BeproService from "../services/bepro";
-import { NetworkIssues } from "../helpers/mockdata/mockNetworkIssue";
 import { isIssuesinDraft } from "../helpers/mockdata/mockIssueInDraft";
 import GithubMicroService from "../services/github-microservice";
 
@@ -30,22 +23,13 @@ export default function PageIssue() {
   const [userAddress, setUserAddress] = useState<any>();
   const [balance, setBalance] = useState();
 
-  const getIssueNetwork = async () => {
-    await BeproService.login();
-    setNetworkIssue(
-      await BeproService.network.getIssueById({
-        issueId: id,
-      })
-    );
-  };
-
   useEffect(() => {
     const gets = async () => {
       await BeproService.login();
       const address = await BeproService.getAddress();
       setUserAddress(address);
-
-      setIssue(await GithubMicroService.getIssueId(id));
+      const issue = await GithubMicroService.getIssueId(id);
+      setIssue(issue);
       console.log("id ->", id);
 
       const networkIssue = await BeproService.network.getIssueById({
@@ -57,15 +41,13 @@ export default function PageIssue() {
         issueId: id,
       });
       console.log("testing", testing01);*/
-      if (issue) {
-        const comments = await GithubMicroService.getCommentsIssue(
-          issue.githubId
-        );
-        setCommentsIssue(comments);
-      }
+
+      const comments = await GithubMicroService.getCommentsIssue(
+        issue.githubId
+      );
+      setCommentsIssue(comments);
     };
     gets();
-    //getBalance();
   }, []);
 
   return (
@@ -88,7 +70,10 @@ export default function PageIssue() {
       )}
 
       <IssueDescription description={issue?.body}></IssueDescription>
-      <IssueComments url={issue?.url} comments={commentsIssue}></IssueComments>
+      <IssueComments
+        url={issue?.url || "/"}
+        comments={commentsIssue}
+      ></IssueComments>
     </>
   );
 }
