@@ -52,7 +52,7 @@ export default class BeproService {
       this.loggedIn = await this.bepro.login();
       const networkLogin = await this.network.login();
       const networkAssert = await this.network.__assert();
-
+      alert("asserterd");
       // successful login
       if (this.loggedIn) {
         this.address = await this.getAddress();

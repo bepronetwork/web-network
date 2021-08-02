@@ -21,7 +21,9 @@ export default function PageCreateIssue() {
     }
     // await axios.post('/issues', payload);
     const beproAddress = await BeproService.getAddress();
-    const test = await BeproService.network.openIssue({tokenAmount: issueAmount, address: beproAddress});
+    let cid = "test";
+    alert(issueAmount, cid)
+    const test = await BeproService.network.openIssue({tokenAmount: issueAmount, cid});
 
   }
 
