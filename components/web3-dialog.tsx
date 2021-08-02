@@ -2,24 +2,24 @@ import { kebabCase } from "lodash";
 import { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import WebThreeUnavailable from "../assets/web3-unavailable";
-import isWebThreeInstalled from "../helpers/isWebThreeInstalled";
 
 export default function WebThreeDialog() {
   const [show, setShow] = useState<boolean>(false);
 
-  useEffect(() => {
-    setShow(isWebThreeInstalled());
-  }, [isWebThreeInstalled]);
   function handleClickTryAgain() {
     window.location.reload();
   }
 
-  return (
+  useEffect(() => {
+    setShow(!window?.ethereum);
+  }, []);
+
+  return (<>
     <Modal
       centered
       aria-labelledby={`${kebabCase("WebThreeDialog")}-modal`}
       aria-describedby={`${kebabCase("WebThreeDialog")}-modal`}
-      show={!show}>
+      show={show}>
       <Modal.Header>
         <Modal.Title>MetaMask not detected</Modal.Title>
       </Modal.Header>
@@ -51,5 +51,5 @@ export default function WebThreeDialog() {
         </button>
       </Modal.Footer>
     </Modal>
-  );
+  </>);
 }

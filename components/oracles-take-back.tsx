@@ -1,39 +1,43 @@
 import OraclesBoxHeader from "./oracles-box-header";
-import useAccount from "hooks/useAccount";
 import { isEmpty, isEqual, sumBy, uniqueId } from "lodash";
-import { useEffect, useState } from "react";
+import {useContext, useEffect, useState} from 'react';
 import OraclesTakeBackItem from "./oracles-take-back-item";
+import {ApplicationContext} from '../contexts/application';
+import BeproService from '../services/bepro';
 
 type Item = { address: string; amount: string };
 
 export default function OraclesTakeBack(): JSX.Element {
-  const account = useAccount();
+
+  const {dispatch, state: {oracles, metaMaskWallet, beproInit}} = useContext(ApplicationContext)
   const [items, setItems] = useState<Item[]>([]);
+  const [delegatedAmount, setDelegatedAmount] = useState(0);
 
-  useEffect(() => {
-    const mappedSummary = account.oracles?.amounts
-      .map((amount: Item["amount"], index: number) => {
-        const mappedAddress = account.oracles.addresses[index];
+  function setMappedSummaryItems() {
+    if (!metaMaskWallet || !beproInit)
+      return;
 
-        if (!!Number(amount) && !isEqual(account.address, mappedAddress)) {
-          return {
-            address: mappedAddress,
-            amount,
-          };
-        }
-      })
-      .filter((item: Item | undefined) => typeof item !== "undefined");
+    function mapAmount(amount, index) {
+      const address = oracles.addresses[index];
+      return {amount, address}
+    }
 
-    setItems(mappedSummary);
-  }, [account.oracles]);
+    function filterAmounts(amount, index) {
+      return oracles.addresses[index] !== BeproService.address;
+    }
+
+    const issues = oracles.amounts.filter(filterAmounts).map(mapAmount);
+
+    setItems(issues);
+    setDelegatedAmount(issues.reduce((total, current) => total += +current.amount, 0))
+  }
+
+  useEffect(setMappedSummaryItems, [beproInit, metaMaskWallet, oracles]);
 
   return (
     <div className="col-md-10">
       <div className="content-wrapper mb-5">
-        <OraclesBoxHeader
-          actions="List of delegations"
-          available={sumBy(items, "amount")}
-        />
+        <OraclesBoxHeader actions="List of delegations" available={delegatedAmount} />
         <div className="row">
           <div className="col">
             {isEmpty(items)
