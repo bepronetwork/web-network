@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import BeproService from '../services/bepro';
 import GithubMicroService from '../services/github-microservice';
 import { setLoadingAttributes } from '../providers/loading-provider';
-import InputNumber from '../components/inputNumber';
+import InputNumber from '../components/input-number';
 import { useRouter } from 'next/router';
 import clsx from 'clsx';
 
@@ -126,18 +126,29 @@ export default function PageCreateIssue() {
                       />
                     <p className="p-small trans my-2">Tip: Try to be as much descriptive as possible</p>
                   </div>
-                  <div className="form-group col-md-4 mb-4">
-                    <InputNumber min="0" max={balance} className={clsx("form-control", { 'text-muted': allowedTransaction })}
-                      label="Set $BEPRO value"
-                      value={issueAmount.formattedValue}
-                      disabled={allowedTransaction}
-                      onValueChange={handleIssueAmountOnValueChange}
-                      onBlur={handleIssueAmountBlurChange}/>
-                    <div className="d-flex justify-content">
-                      <p className="p-small trans my-2">{balance} $BEPRO </p> 
-                      {!allowedTransaction && <a className="button-max p-small ms-1 my-2" onClick={() => setIssueAmount({formattedValue: balance})}>(Max)</a>}
-                    </div>
-                  </div>
+                  <InputNumber
+                    thousandSeparator
+                    max={balance}
+                    className={clsx({ "text-muted": allowedTransaction })}
+                    label="Set $BEPRO value"
+                    symbol="$BEPRO"
+                    value={issueAmount.formattedValue}
+                    disabled={allowedTransaction}
+                    onValueChange={handleIssueAmountOnValueChange}
+                    onBlur={handleIssueAmountBlurChange}
+                    helperText={
+                      <>
+                        {balance} $BEPRO 
+                        {!allowedTransaction && (
+                          <button 
+                            className="btn btn-opac ml-1 py-1"
+                            onClick={() => setIssueAmount({ formattedValue: balance })}>
+                            Max
+                          </button>
+                        )}
+                      </>
+                    }
+                  />
                   <div className="form-group">
                     <label className="p-small mb-2">Description</label>
                     <textarea className="form-control" rows={6} placeholder="Type a description..."
