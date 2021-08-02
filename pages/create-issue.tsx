@@ -1,5 +1,5 @@
 import { GetStaticProps } from 'next'
-import React, {useCallback, useContext, useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import BeproService from '../services/bepro';
 import GithubMicroService from '../services/github-microservice';
 import InputNumber from '../components/input-number';
@@ -18,18 +18,10 @@ export default function PageCreateIssue() {
   const [issueTitle, setIssueTitle] = useState("");
   const [issueDescription, setIssueDescription] = useState("");
   const [issueAmount, setIssueAmount] = useState<Amount>({ value: '0', formattedValue: '0', floatValue: 0});
-  const [balance, setBalance] = useState<string>('0');
-  const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
-  const {dispatch} = useContext(ApplicationContext);
-  const router = useRouter()
 
-  useEffect(() => {
-    const getBalance = async () => {
-      await BeproService.login();
-      setBalance(await BeproService.network.getBEPROStaked())
-    }
-    getBalance()
-  }, [])
+  const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
+  const {dispatch, state: {beproStaked: balance}} = useContext(ApplicationContext);
+  const router = useRouter()
 
   const allow = async (evt) => {
     evt.preventDefault();
@@ -89,7 +81,7 @@ export default function PageCreateIssue() {
 
   const handleIssueAmountBlurChange = () => {
     if (issueAmount.floatValue > Number(balance)) {
-      setIssueAmount({formattedValue: balance});
+      setIssueAmount({formattedValue: balance.toString()});
     }
   }
 
@@ -145,7 +137,7 @@ export default function PageCreateIssue() {
                       {!allowedTransaction && (
                           <button
                             className="btn btn-opac ml-1 py-1"
-                            onClick={() => setIssueAmount({ formattedValue: balance })}>
+                            onClick={() => setIssueAmount({ formattedValue: balance.toString() })}>
                             Max
                           </button>
                         )}

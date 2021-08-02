@@ -463,10 +463,10 @@ label {
     border: 1px solid $black;
     color: $gray;
   }
-  input[type=number]::-webkit-inner-spin-button, 
-  input[type=number]::-webkit-outer-spin-button { 
-    -webkit-appearance: none; 
-    margin: 0; 
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
   .button-max {
     cursor: pointer;
@@ -645,4 +645,38 @@ label {
   &.md-medium { font-size: 24px; }
   &.md-large { font-size: 44px; }
   &.md-larger { font-size: 64px; }
+}
+
+$c_directions: ('left': 'l', 'right': 'r', 'top': 't', 'bottom': 'b') !default;
+$c_dimensions: ('0': 0, '1': .25, '2': .5, '3': 1, '4': 2, '5': 3) !default;
+$c_props: ('m': 'margin') !default;
+
+@each $d, $prop in $c_props {
+  .m {
+    @each $dir, $values in (x: (right, left), y: (top, bottom)) {
+      &#{$dir} {
+        @each $amount, $multiplier in $spacers {
+          &n-#{$amount} {
+            @each $value in $values {
+              #{$prop}-#{$value}: -#{$multiplier}!important;
+            }
+          }
+        }
+      }
+    }
+
+    @each $dir, $alias in $c_directions {
+      &#{$alias} {
+        @each $amount, $multiplier in $spacers {
+          &n-#{$amount} { #{$prop}-#{$dir}: -#{$multiplier}!important; }
+        }
+      }
+    }
+
+    @each $amount, $multiplier in $spacers {
+      &n-#{$amount} {
+        #{$prop}: -#{$multiplier} !important;
+      }
+    }
+  }
 }

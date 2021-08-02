@@ -40,4 +40,4 @@ class BeproFacet {
 }
 
 // todo: complete this beast
-//export const BeproService = new BeproFacet();
+export const BeproService = new BeproFacet();
