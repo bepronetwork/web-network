@@ -46,7 +46,7 @@ export default function ApplicationContextProvider({children}) {
   }
 
   function onMetaMaskChange() {
-    console.log(`onMetaMaskChange`, state.metaMaskWallet);
+    console.log(`meta changed`, state);
     if (state.metaMaskWallet)
       GithubMicroService.getHandleOf(BeproService.address)
                         .then(handle => {
@@ -60,10 +60,21 @@ export default function ApplicationContextProvider({children}) {
                         });
   }
 
+  function setHandleIfConnected() {
+    if (state.githubHandle)
+      return;
+
+    if (!session?.user?.name)
+      return;
+
+    dispatch(changeGithubHandle(session.user.name));
+  }
+
   LoadApplicationReducers();
 
   useEffect(Initialize, []);
   useEffect(onMetaMaskChange, [state.metaMaskWallet]);
+  useEffect(setHandleIfConnected, [session]);
 
   return <ApplicationContext.Provider
     value={{state, dispatch: dispatch as any}}>{children}</ApplicationContext.Provider>

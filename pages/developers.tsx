@@ -1,16 +1,12 @@
 import { GetStaticProps } from "next";
-import React, { useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from 'react';
 import { IIssue } from "../components/issue-list-item";
 import PageHero from "../components/page-hero";
-import { isEmpty } from "lodash";
-import {
-  getLoadingState,
-  setLoadingAttributes,
-} from "../providers/loading-provider";
 import GithubMicroService from "../services/github-microservice";
 import ListIssues from "../components/list-issues";
 import ReactSelect from "../components/react-select";
-import { mockDeveloperIssues } from "../helpers/mockdata/mockIssues";
+import {ApplicationContext} from '../contexts/application';
+import {changeLoadState} from '../contexts/reducers/change-load-state';
 
 const options_issue = [
   {
@@ -43,36 +39,15 @@ const options_time = [
 ];
 
 export default function PageDevelopers() {
+  const {dispatch, state: {loading}} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IIssue[]>([]);
   const [filterStateIssues, setfilterStateIssues] = useState({
     state: "",
     issues: [],
   });
 
-  useEffect(() => {
-    getIssues();
-  }, []);
 
-  const getIssues = async () => {
-    if (isEmpty(issues)) {
-      setLoadingAttributes(true);
-    }
-    await GithubMicroService.getIssues()
-      .then((issues) => {
-        setIssues(issues);
-        console.log('issues ->', issues)
-        if (filterStateIssues.issues.length === 0) {
-          setfilterStateIssues({ state: "all", issues });
-        }
-      })
-      .catch((error) => console.log("Error", error))
-      .finally(() => setLoadingAttributes(false));
-  };
-
-  const handleChangeFilterIssue = (params: {
-    value: string;
-    label: string;
-  }) => {
+  function handleChangeFilterIssue(params: { value: string; label: string; }) {
     if (params.value === "all") {
       setfilterStateIssues({
         state: params.value,
@@ -86,7 +61,29 @@ export default function PageDevelopers() {
         ),
       });
     }
-  };
+  }
+
+  function updateIssuesList(issues: IIssue[]) {
+    console.log(`got issues`, issues);
+    setIssues(issues);
+    if (filterStateIssues.issues.length === 0) {
+      setfilterStateIssues({ state: "all", issues });
+    }
+  }
+
+  function getIssues() {
+    dispatch(changeLoadState(true))
+    GithubMicroService.getIssues()
+                      .then(updateIssuesList)
+                      .catch((error) => {
+                        console.log('Error', error)
+                      })
+                      .finally(() => {
+                        dispatch(changeLoadState(false))
+                      });
+  }
+
+  useEffect(getIssues, []);
 
   return (
     <div>
@@ -94,8 +91,7 @@ export default function PageDevelopers() {
         title="Find issue to work"
         numIssuesInProgress={6}
         numIssuesClosed={123}
-        numBeprosOnNetwork={120000}
-      ></PageHero>
+        numBeprosOnNetwork={120000}/>
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10">
@@ -121,7 +117,7 @@ export default function PageDevelopers() {
             </div>
           </div>
           <ListIssues listIssues={filterStateIssues.issues} />
-          {filterStateIssues.issues.length === 0 && !getLoadingState() ? (
+          {filterStateIssues.issues.length === 0 && !loading ? (
             <div className="col-md-10">
               <h4>
                 {filterStateIssues.state !== "all"
