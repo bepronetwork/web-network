@@ -17,8 +17,7 @@ export default function Oracle({
         title="Approve issues"
         numIssuesInProgress={10}
         numIssuesClosed={12}
-        numBeprosOnNetwork={120000}
-      ></PageHero>
+        numBeprosOnNetwork={120000} />
       <div className="container">
         <div className="row">
           <div className="d-flex justify-content-center mb-3">

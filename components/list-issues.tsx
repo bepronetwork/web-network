@@ -3,7 +3,7 @@ import React from "react";
 import IssueListItem, { IIssue } from "../components/issue-list-item";
 
 export default function ListIssues({
-  listIssues,
+  listIssues = [],
   className = "col-md-10",
 }: {
   listIssues: IIssue[];
