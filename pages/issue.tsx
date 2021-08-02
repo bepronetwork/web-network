@@ -88,7 +88,7 @@ export default function PageIssue() {
       )}
 
       <IssueDescription description={issue?.body}></IssueDescription>
-      <IssueComments url="/" comments={commentsIssue}></IssueComments>
+      <IssueComments url={issue?.url} comments={commentsIssue}></IssueComments>
     </>
   );
 }
