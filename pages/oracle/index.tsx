@@ -1,9 +1,9 @@
-import React from "react";
 import { GetStaticProps } from "next";
-import PageDevelopers from "./developers";
+import React from "react";
+import Newissues from "./new-issues";
 
-export default function Home() {
-  return <PageDevelopers />;
+export default function PageOracle() {
+  return <Newissues />;
 }
 
 export const getStaticProps: GetStaticProps = async () => {
