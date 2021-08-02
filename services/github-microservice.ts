@@ -1,5 +1,12 @@
 import axios from 'axios';
 
+interface User {
+  githubHandle: string;
+  address: string;
+  createdAt: string;
+  id: number;
+  updatedAt: string;
+}
 
 const client = axios.create({baseURL: process.env.API_HOST || 'http://localhost:3005'})
 export default class GithubMicroService {
@@ -13,22 +20,22 @@ export default class GithubMicroService {
   }
 
   static async getIssues() {
-    const {data} = await axios.get(API_HOST  + '/issues');
+    const {data} = await client.get('/issues');
     return data;
   }
 
   static async getIssuesState(state: any) {
-    const {data} = await axios.get(API_HOST  + '/issues', state);
+    const {data} =  await client.get('/issues', state);
     return data;
   }
 
   static async getIssueId(issueId: string | string[]) {
-    const {data} = await axios.get(API_HOST  + `/issues/${issueId}`);
+    const {data} = await client.get(`/issues/${issueId}`);
     return data;
   }
 
   static async getCommentsIssue(githubId: string | string[]) {
-    const {data} = await axios.get(API_HOST  + `/issues/github/${githubId}/comments`);
+    const {data} = await client.get(`/issues/github/${githubId}/comments`);
     return data;
   }
 
@@ -36,7 +43,7 @@ export default class GithubMicroService {
    * Should merge the address and the github handle
    */
   static joinAddressToHandle(payload: {address: string, githubHandle: string}): Promise<boolean> {
-    return client.post<string>(`/connect`, payload)
+    return client.post<string>(`/users/connect`, payload)
                  .then(({data}) => data === `ok`)
                  .catch((error) => {
                    console.log(`Error`, error)
@@ -45,18 +52,18 @@ export default class GithubMicroService {
   }
 
   /**
-   * Should return the handle of a given wallet address
+   * Should return user of address
    */
-  static async getHandleOf(address: string): Promise<string> {
-    // return client.get(`/address`)
-    return Promise.resolve(``)
+  static async getUserOf(address: string): Promise<User> {
+    return client.get<User>(`/users/address/${address}`)
+                 .then(({data}) => data)
   }
 
   /**
-   * Sends a token to GithubMicroService and expects a github handle string
+   * Should return the handle of a given wallet address
    */
-  static async tradeTokenForHandle(code: string): Promise<string> {
-    return Promise.resolve(`@handle`);
+  static async getHandleOf(address: string): Promise<any> {
+    return GithubMicroService.getUserOf(address).then(({githubHandle}) => githubHandle);
   }
 
 }

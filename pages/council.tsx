@@ -1,43 +1,43 @@
-import { GetStaticProps } from "next";
-import React, { useEffect, useState } from "react";
-import { IIssue } from "../components/issue-list-item";
-import ListIssues from "../components/list-issues";
-import PageHero from "../components/page-hero";
-import GithubMicroService from "../services/github-microservice";
-import { setLoadingAttributes } from "../providers/loading-provider";
-import { isEmpty } from "lodash";
-import { mockReadyIssues } from "../helpers/mockdata/mockIssues";
+import {GetStaticProps} from 'next';
+import React, {useContext, useEffect, useState} from 'react';
+import {IIssue} from '../components/issue-list-item';
+import ListIssues from '../components/list-issues';
+import PageHero from '../components/page-hero';
+import GithubMicroService from '../services/github-microservice';
+import {mockReadyIssues} from '../helpers/mockdata/mockIssues';
+import {ApplicationContext} from '../contexts/application';
+import {changeLoadState} from '../contexts/reducers/change-load-state';
 
 export default function PageCouncil() {
-  const [issues, setIssues] = useState<IIssue[]>(mockReadyIssues);
+  const {dispatch} = useContext(ApplicationContext);
+  const [issues, setIssues] = useState<IIssue[]>();
 
-  useEffect(() => {
-    //getIssues();
-  }, []);
+  function getIssues() {
+    dispatch(changeLoadState(true))
+    GithubMicroService.getIssuesState({filterState: `ready`})
+                      .then(issues => {
+                        setIssues(issues)
+                        console.log(`got issues`, issues)
+                      })
+                      .catch((error) => {
+                        console.log('Error', error)
+                      })
+                      .finally(() => {
+                        dispatch(changeLoadState(false))
+                      });
+  }
 
-  const getIssues = async () => {
-    if (isEmpty(issues)) {
-      setLoadingAttributes(true);
-    }
-    await GithubMicroService.getIssuesState({
-      filterState: "ready",
-    })
-      .then((issues) => setIssues(issues))
-      .catch((error) => console.log("Error", error))
-      .finally(() => setLoadingAttributes(false));
-  };
+  useEffect(getIssues, []);
 
   return (
     <div>
-      <PageHero
-        title="Ready to propose"
-        numIssuesInProgress={10}
-        numIssuesClosed={12}
-        numBeprosOnNetwork={120000}
-      ></PageHero>
+      <PageHero title="Ready to propose"
+                numIssuesInProgress={10}
+                numIssuesClosed={12}
+                numBeprosOnNetwork={120000} />
       <div className="container">
         <div className="row justify-content-center">
-          <ListIssues listIssues={issues} />
+          <ListIssues listIssues={issues}/>
         </div>
       </div>
     </div>

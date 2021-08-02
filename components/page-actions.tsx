@@ -1,19 +1,18 @@
 import { GetStaticProps } from "next";
-import React, { useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from 'react';
 import IssueAvatars from "./issue-avatars";
 import CreateProposal from "./create-proposal";
 import StartWorking from "./start-working";
 import OpenIssue from "./open-issue";
 import Link from "next/link";
 import BeproService from "../services/bepro";
-import { setLoadingAttributes } from "../providers/loading-provider";
+import {ApplicationContext} from '../contexts/application';
+import {changeLoadState} from '../contexts/reducers/change-load-state';
 
-export default function PageActions({
-  issue,
-  userAddress,
-  finalized,
-  isIssueinDraft,
-}) {
+export default function PageActions({issue, userAddress, finalized, isIssueinDraft,}) {
+
+  const {dispatch} = useContext(ApplicationContext);
+
   const handleAvatar = () => {
     if (issue?.developers.length > 0) {
       return <IssueAvatars users={issue?.developers}></IssueAvatars>;
@@ -41,7 +40,7 @@ export default function PageActions({
         <button
           className="btn btn-md btn-primary mr-1 px-4"
           onClick={async () => {
-            setLoadingAttributes(true);
+            dispatch(changeLoadState(true));
             await BeproService.login()
               .then(() =>
                 BeproService.network.redeemIssue({
@@ -49,7 +48,7 @@ export default function PageActions({
                 })
               )
               .catch((err) => console.log(err))
-              .finally(() => setLoadingAttributes(false));
+              .finally(() => dispatch(changeLoadState(false)));
           }}
         >
           Redeem
