@@ -12,15 +12,18 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+<<<<<<< HEAD
     "bepro-js": "git+https://github.com/bepronetwork/bepro-js.git#master",
+=======
+    "bepro-js": "github:bepronetwork/bepro-js#master",
+>>>>>>> origin/main
     "bootstrap": "^5.0.1",
     "clsx": "^1.1.1",
     "date-fns": "^2.11.1",
     "electron": "^13.0.1",
     "gray-matter": "^4.0.2",
     "lodash": "^4.17.21",
-    "material-design-icons": "^3.0.1",
-    "next": "^11.0.0",
+    "next": "^11.0.1",
     "react": "^17.0.2",
     "react-bootstrap": "^1.6.0",
     "react-dom": "^17.0.2",
