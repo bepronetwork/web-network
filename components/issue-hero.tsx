@@ -1,14 +1,14 @@
 import { GetStaticProps } from "next";
 import { formatDate } from "../helpers/formatDate";
 
-export default function IssueHero({ issue }) {
+export default function IssueHero({ issue, state }) {
   return (
     <div className="banner bg-bepro-blue mb-4">
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10">
             <div className="d-flex flex-column">
-              <h3 className="h4 trans mb-0">{issue?.state} issue</h3>
+              <h3 className="h4 trans mb-0">{state} issue</h3>
               <div className="row">
                 <div className="col-md-9">
                   <div className="top-border">
