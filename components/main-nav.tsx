@@ -1,16 +1,18 @@
 import { GetStaticProps } from 'next'
-import React from 'react';
+import React, {useContext} from 'react';
 import { useEffect, useState } from 'react';
 import BeproService from '../services/bepro';
 import Link from 'next/link';
 import ConnectWalletButton from "./connect-wallet-button";
 import GithubHandle from './github-handle';
+import {ApplicationContext} from '../contexts/application';
+import {changeStakedState} from '../contexts/reducers/change-staked-amount';
 
 export default function MainNav() {
+    const {dispatch, state: {beproStaked}} = useContext(ApplicationContext);
 
     const [loggedIn, setLoggedIn] = useState<boolean>(false);
     const [address, setAddress] = useState<string>(null);
-    const [beproStaked, setBeproStaked] = useState<number>(0);
 
     useEffect(() => {
         checkLogin();
@@ -27,40 +29,10 @@ export default function MainNav() {
     }
 
     const login = async () => {
-        const beproAddress = await BeproService.getAddress();
-        setAddress(beproAddress);
+        setAddress(await BeproService.getAddress());
+        dispatch(changeStakedState(await BeproService.network.getBEPROStaked()));
         setLoggedIn(true);
-
-        setBeproStaked(await BeproService.network.getBEPROStaked())
-        // console.log('%c%s', 'color: #00a3cc', await BeproService.bepro.getETHBalance());
     }
-
-    // const handleClickLogin = useCallback(async () => {
-    //     try {
-    //         setLoadingAttributes(true);
-    //         await BeproService.login();
-    //
-    //         const address = await BeproService.getAddress();
-    //         const beproStaked = await BeproService.network.getBEPROStaked();
-    //
-    //         account.dispatch({
-    //                              type: TYPES.SET,
-    //                              props: {
-    //                                  isConnected: true,
-    //                                  address,
-    //                                  beproStaked,
-    //                              },
-    //                          });
-    //         setLoadingAttributes(false);
-    //     } catch (error) {
-    //         console.log("useAccount handleClickLogin", error);
-    //         setLoadingAttributes(false);
-    //     }
-    // }, []);
-    //
-    // useEffect(() => {
-    //     handleClickLogin();
-    // }, [account.oracles.tokensLocked]);
 
     return (
         <div className="main-nav d-flex align-items-center justify-content-between">
@@ -74,9 +46,9 @@ export default function MainNav() {
                         />
                     </Link>
                     <ul className="nav-links">
-                        <li><Link href="/developers" ><a href="/developers">Developers</a></Link></li>
-                        <li><Link href="/council" ><a href="/council">Council</a></Link></li>
-                        <li><Link href="/oracle" ><a href="/oracle">Oracle</a></Link></li>
+                        <li><Link href="/developers" passHref><a >Developers</a></Link></li>
+                        <li><Link href="/council" passHref><a >Council</a></Link></li>
+                        <li><Link href="/oracle" passHref><a >Oracle</a></Link></li>
                         {/* <li><a href="/">Lists</a></li>
                         <li><a href="/issue">Issue</a></li>
                         <li><a href="/proposal">Proposal</a></li>

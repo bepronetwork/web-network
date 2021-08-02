@@ -1,7 +1,8 @@
 import Modal from "./modal";
-import { ComponentPropsWithoutRef, useState } from "react";
-import { setLoadingAttributes } from "providers/loading-provider";
+import {ComponentPropsWithoutRef, useContext, useState} from 'react';
 import BeproService from "services/bepro";
+import {changeLoadState} from '../contexts/reducers/change-load-state';
+import {ApplicationContext} from '../contexts/application';
 
 interface Props extends ComponentPropsWithoutRef<"div"> {
   amount: string;
@@ -15,6 +16,7 @@ export default function OraclesTakeBackItem({
   onConfirm = () => {},
 }: Props): JSX.Element {
   const [show, setShow] = useState<boolean>(false);
+  const {dispatch} = useContext(ApplicationContext);
 
   function handleShow() {
     setShow(true);
@@ -24,7 +26,7 @@ export default function OraclesTakeBackItem({
   }
   async function handleTakeBack() {
     try {
-      setLoadingAttributes(true);
+      dispatch(changeLoadState(true));
 
       const response = await BeproService.network.unlock({
         tokenAmount: amount,
@@ -32,10 +34,10 @@ export default function OraclesTakeBackItem({
       });
 
       onConfirm(response.status);
-      setLoadingAttributes(false);
+      dispatch(changeLoadState(false));
     } catch (error) {
       console.log("OraclesTakeBackItem handleTakeBack", error);
-      setLoadingAttributes(false);
+      dispatch(changeLoadState(false));
     }
   }
 

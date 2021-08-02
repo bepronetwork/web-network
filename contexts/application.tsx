@@ -14,7 +14,7 @@ interface GlobalState {
   dispatch: (action: ReduceActor<any>) => Dispatch<ReduceActor<any>>,
 }
 
-const defaultState = {
+const defaultState: GlobalState = {
   state: {
     githubHandle: ``,
     metaMaskWallet: false,
@@ -22,6 +22,14 @@ const defaultState = {
       isLoading: false,
     },
     beproInit: false,
+    beproStaked: 0,
+    oracles: {
+      addresses: [],
+      amounts: [],
+      oraclesDelegatedByOthers: ``,
+      tokensLocked: ``
+    },
+    myIssues: [],
   },
   dispatch: () => undefined
 };
@@ -38,7 +46,7 @@ export default function ApplicationContextProvider({children}) {
   }
 
   function onMetaMaskChange() {
-    console.log(`onMetaChange`, state.metaMaskWallet);
+    console.log(`onMetaMaskChange`, state.metaMaskWallet);
     if (state.metaMaskWallet)
       GithubMicroService.getHandleOf(BeproService.address)
                         .then(handle => {
