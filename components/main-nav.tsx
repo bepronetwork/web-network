@@ -47,7 +47,7 @@ export default function MainNav() {
           </a>
         </Link>
         <nav className="nav-links">
-          <Link href="/account">Developers</Link>
+          <Link href="/developers">Developers</Link>
           <Link href="/council">Council</Link>
           <Link href="/oracle">Oracle</Link>
         </nav>
