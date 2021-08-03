@@ -48,7 +48,7 @@ export default function NewProposal({issueId}) {
     const propose =  await BeproService.network.proposeIssueMerge({
       issueID: issueId,
       prAddresses: [distributed[0].adress,distributed[1].adress,distributed[2].adress],
-      prAmounts: [200,100,10]
+      prAmounts: [20,20,20]
     })
     console.log('propsoe', propose)
     handleClose();
