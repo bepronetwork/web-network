@@ -1,38 +1,57 @@
-import NetworkTx from "./network-tx";
-import useAccount from "hooks/useAccount";
-import { ChangeEvent, useState } from "react";
+import {ChangeEvent, useContext, useEffect, useState} from 'react';
 import { NumberFormatValues } from "react-number-format";
 import InputNumber from "./input-number";
 import OraclesBoxHeader from "./oracles-box-header";
+import {ApplicationContext} from '../contexts/application';
+import NetworkTxButton from './network-tx-button';
 
 function OraclesDelegate(): JSX.Element {
-  const account = useAccount();
+  const {state: {oracles, beproInit, metaMaskWallet}} = useContext(ApplicationContext);
   const [tokenAmount, setTokenAmount] = useState<number>(0);
   const [delegatedTo, setDelegatedTo] = useState<string>("");
+  const [delegatedAmount, setDelegatedAmount] = useState(0);
   const [error, setError] = useState<string>("");
 
   function handleChangeOracles(params: NumberFormatValues) {
+    if (params.floatValue > delegatedAmount)
+      setError(`Amount is greater than your total amount`);
+    else setError(``);
+
     setTokenAmount(params.floatValue);
   }
+
   function handleChangeAddress(params: ChangeEvent<HTMLInputElement>) {
     setDelegatedTo(params.target.value);
   }
+
   function handleClickVerification() {
     if (!tokenAmount || !delegatedTo) {
       return setError("Please fill all required fields.");
     }
   }
+
   function handleTransition() {
     setError("");
   }
 
+  function updateAmounts() {
+    if (!beproInit || !metaMaskWallet)
+      return;
+
+    console.log(oracles.amounts)
+
+    setDelegatedAmount(
+      oracles.amounts.reduce((total, current) => total += +current, 0)
+    )
+
+  }
+
+  useEffect(updateAmounts, [beproInit, metaMaskWallet, oracles]);
+
   return (
     <div className="col-md-5">
       <div className="content-wrapper">
-        <OraclesBoxHeader
-          actions="Delegate oracles"
-          available={parseInt(account.oracles.oraclesDelegatedByOthers)}
-        />
+        <OraclesBoxHeader actions="Delegate oracles" available={delegatedAmount} />
         <InputNumber
           label="Oracles Ammout"
           value={tokenAmount}
@@ -50,24 +69,14 @@ function OraclesDelegate(): JSX.Element {
           />
         </div>
         {error && <p className="p-small text-danger mt-2">{error}</p>}
-        <NetworkTx
-          className="btn-lg w-100 mt-3"
-          onTransaction={handleTransition}
-          onTransactionError={setError}
-          onClickVerification={handleClickVerification}
-          call={{
-            id: "delegateOracles",
-            params: {
-              tokenAmount,
-              delegatedTo,
-            },
-          }}
-          info={{
-            title: "Delegate oracles",
-            description: "Delegate oracles for an address",
-          }}>
-          DELEGATE
-        </NetworkTx>
+
+        <NetworkTxButton txMethod="delegateOracles"
+                         txParams={{tokenAmount, delegatedTo}}
+                         modalTitle="Delegate oracles"
+                         modalDescription="Delegate oracles to an address"
+                         onTxStart={handleClickVerification}
+                         onSuccess={handleTransition}
+                         onFail={setError} buttonLabel="delegate" />
       </div>
     </div>
   );

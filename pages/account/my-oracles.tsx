@@ -8,7 +8,7 @@ export default function MyOracles() {
   return (
     <Account>
       <div className="container">
-        <div className="row justify-content-center mb-5">
+        <div className="row justify-content-center mb-5 align-content-stretch">
           <OraclesActions />
           <OraclesDelegate />
         </div>
