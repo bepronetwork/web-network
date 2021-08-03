@@ -18,7 +18,7 @@ export default function PageIssue() {
 
   const [issue, setIssue] = useState<IIssue>();
   const [networkIssue, setNetworkIssue] = useState<any>();
-  const [isIssueinDraft, setIsIssueinDraft] = useState(false);
+  const [isIssueinDraft, setIsIssueinDraft] = useState(true);
   const [commentsIssue, setCommentsIssue] = useState();
   const [userAddress, setUserAddress] = useState<any>();
   const [balance, setBalance] = useState();
@@ -28,20 +28,22 @@ export default function PageIssue() {
       await BeproService.login();
       const address = await BeproService.getAddress();
       setUserAddress(address);
+      console.log('user adrress', address)
       const issue = await GithubMicroService.getIssueId(id);
       setIssue(issue);
-      console.log("id ->", id);
+      console.log("issue ->", issue);
 
       const networkIssue = await BeproService.network.getIssueById({
         issueId: id,
       });
       setNetworkIssue(networkIssue);
+      console.log("network -->", networkIssue);
       setBalance(await BeproService.network.getBEPROStaked());
-      /*const testing01 = await BeproService.network.isIssueInDraft({
+      const isIssueInDraft = await BeproService.network.isIssueInDraft({
         issueId: id,
       });
-      console.log("testing", testing01);*/
-
+      setIsIssueinDraft(isIssueInDraft);
+      console.log("issue in draft", isIssueInDraft);
       const comments = await GithubMicroService.getCommentsIssue(
         issue.githubId
       );
@@ -50,24 +52,34 @@ export default function PageIssue() {
     gets();
   }, []);
 
+  const handleStateissue = () => {
+    if (isIssueinDraft) {
+      return "Draft";
+    } else if (!isIssueinDraft && networkIssue.finalized) {
+      return "Closed";
+    } else {
+      return "Open";
+    }
+  };
+
   return (
     <>
-      <IssueHero issue={issue}></IssueHero>
-      {issue?.state.toLowerCase() === "draft" && (
+      <IssueHero state={handleStateissue()} issue={issue}></IssueHero>
+      {handleStateissue() === "Draft" && (
         <IssueDraftProgress
           amountTotal={balance}
           amountUsed={networkIssue?.tokensStaked}
         />
       )}
       <PageActions
+        state={handleStateissue()}
         finalized={networkIssue?.finalized}
         isIssueinDraft={isIssueinDraft}
         userAddress={userAddress}
+        addressNetwork={networkIssue?.cid}
         issue={issue}
       />
-      {issue?.state.toLocaleLowerCase() === "ready" && (
-        <IssueProposals></IssueProposals>
-      )}
+      {handleStateissue() === "Open" && <IssueProposals></IssueProposals>}
 
       <IssueDescription description={issue?.body}></IssueDescription>
       <IssueComments
