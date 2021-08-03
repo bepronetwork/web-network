@@ -31,13 +31,11 @@ export default function PageIssue() {
       console.log('user adrress', address)
       const issue = await GithubMicroService.getIssueId(id);
       setIssue(issue);
-      console.log("issue ->", issue);
 
       const networkIssue = await BeproService.network.getIssueById({
         issueId: id,
       });
       setNetworkIssue(networkIssue);
-      console.log("network -->", networkIssue);
       setBalance(await BeproService.network.getBEPROStaked());
       const isIssueInDraft = await BeproService.network.isIssueInDraft({
         issueId: id,
@@ -73,11 +71,13 @@ export default function PageIssue() {
       )}
       <PageActions
         state={handleStateissue()}
+        developers={issue?.developers}
         finalized={networkIssue?.finalized}
         isIssueinDraft={isIssueinDraft}
         userAddress={userAddress}
         addressNetwork={networkIssue?.cid}
-        issue={issue}
+        issueId={issue?.issueId}
+        UrlGithub={issue?.url}
       />
       {handleStateissue() === "Open" && <IssueProposals></IssueProposals>}
 
