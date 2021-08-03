@@ -7,19 +7,22 @@ import OpenIssue from "./open-issue";
 import Link from "next/link";
 import BeproService from "../services/bepro";
 import { setLoadingAttributes } from "../providers/loading-provider";
+import NewProposal from "./create-proposal";
 
 export default function PageActions({
   issue,
   userAddress,
   finalized,
+  addressNetwork,
   isIssueinDraft,
+  state,
 }) {
   const handleAvatar = () => {
     if (issue?.developers.length > 0) {
       return <IssueAvatars users={issue?.developers}></IssueAvatars>;
     } else if (
       issue?.developers.length &&
-      issue?.state.toLowerCase() !== "draft"
+      state.toLowerCase() !== "draft"
     ) {
       return <p className="p-small trans me-2 mt-3">no one is working </p>;
     }
@@ -27,8 +30,8 @@ export default function PageActions({
 
   const handleStartworking = () => {
     return (
-      (issue?.state.toLowerCase() === "open" ||
-        (issue?.state.toLowerCase() === "in progress" &&
+      (state.toLowerCase() === "open" ||
+        (state.toLowerCase() === "in progress" &&
           !finalized &&
           isIssueinDraft === false)) && <StartWorking />
     );
@@ -37,7 +40,7 @@ export default function PageActions({
   const handleRedeem = () => {
     return (
       isIssueinDraft === true &&
-      issue?.creatorAddress === userAddress && (
+      addressNetwork === userAddress && (
         <button
           className="btn btn-md btn-primary mr-1 px-4"
           onClick={async () => {
@@ -59,14 +62,7 @@ export default function PageActions({
   };
 
   const handleProposeDestribution = () => {
-    return (
-      issue?.state.toLowerCase() === "in progress" &&
-      isIssueinDraft === false && (
-        <button className="btn btn-md btn-primary mr-1 px-3">
-          Propose Destribution
-        </button>
-      )
-    );
+    return !isIssueinDraft && <NewProposal issueId={issue?.issueId} />;
   };
 
   return (
@@ -84,7 +80,9 @@ export default function PageActions({
               )}
               {handleStartworking()}
               {handleRedeem()}
-              {issue?.state.toLowerCase() === "ready" && <CreateProposal />}
+              {state.toLowerCase() === "ready" && (
+                <CreateProposal issueId={issue?.issueId} />
+              )}
               {handleProposeDestribution()}
 
               {/*<OpenIssue />*/}
