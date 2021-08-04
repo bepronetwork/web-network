@@ -9,6 +9,114 @@ li {
   list-style: none;
 }
 
+.modal {
+  &-header {
+    padding-bottom: 0;
+  }
+  &-content {
+    background-color: $bg-shadow;
+  }
+  &-header,
+  &-footer {
+    justify-content: center;
+    border: 0;
+  }
+}
+.react-select {
+  &-container & {
+    &__control {
+      border-color: transparent;
+      background-color: $bg;
+      min-height: 48px;
+      box-shadow: none;
+      &:hover,
+      &--is-focused {
+        border-color: $blue;
+      }
+    }
+    &__value-container {
+      padding: 2px 16px;
+    }
+    &__indicator-separator {
+      display: none;
+    }
+    &__indicator {
+      padding: 14px;
+    }
+    &__single-value {
+      color: $white;
+    }
+    &__control--is-focused &__single-value {
+      color: transparentize($white, 0.4);
+    }
+    &__menu {
+      background-color: $bg;
+    }
+    &__option {
+      &--is-focused {
+        background-color: $bg;
+      }
+      &--is-selected {
+        background-color: $blue;
+      }
+    }
+  }
+  &-filterIssues & {
+    &__control {
+      border-color: transparent;
+      background-color: $bg-shadow;
+      min-height: 38px;
+      box-shadow: none;
+      &:hover,
+      &--is-focused {
+        border-color: $blue;
+      }
+    }
+    &__value-filterIssues {
+      padding: 2px 16px;
+    }
+    &__indicator-separator {
+      display: none;
+    }
+    &__indicator {
+      padding: 14px;
+    }
+    &__single-value {
+      color: $white;
+    }
+    &__control--is-focused &__single-value {
+      color: transparentize($white, 0.4);
+    }
+    &__menu {
+      background-color: $bg-shadow;
+    }
+    &__option {
+      &--is-focused {
+        background-color: $bg-shadow;
+      }
+      &--is-selected {
+        background-color: $blue;
+      }
+    }
+  }
+  &__input {
+    color: transparentize($white, 0.4);
+  }
+}
+.form-control {
+  min-width: 100px;
+  border-color: transparent;
+  color: transparentize($white, 0.4);
+  &,
+  &:focus {
+    box-shadow: none;
+    background-color: $bg;
+  }
+  &:focus {
+    border-color: $blue;
+    color: $white;
+  }
+}
 
 // DEFAULTS
 
@@ -147,7 +255,7 @@ p {
 }
 
 .btn-opac {
-  color: rgba($white, 0.7);
+  color: $white;
   background-color: rgba(255, 255, 255, 0.1);
   &:hover,
   &:focus,
@@ -255,6 +363,10 @@ p {
   }
 }
 
+.subnav-github {
+  text-decoration: none;
+}
+
 .account-bepro {
   display: flex;
   align-items: center;
@@ -331,13 +443,33 @@ p {
 
 .form-group {
   margin-bottom: $m;
-  label {
-    color: $gray;
+}
+
+label {
+  color: $gray;
+}
+.form-control {
+  background-color: $black;
+  border: 1px solid $black;
+  color: $gray;
+  &:disabled, &[readonly] {
+    background-color: $black;
+    opacity: 0.4;
   }
-  .form-control {
+}
+.input-group {
+  .input-group-text {
     background-color: $black;
     border: 1px solid $black;
     color: $gray;
+  }
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+  }
+  .button-max {
+    cursor: pointer;
   }
 }
 
@@ -372,6 +504,11 @@ p {
 
 .avatar-list {
   .avatar {
+    margin-left: -$m/4;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.4);
+  }
+  .avatar-number {
+    background-color: $dark-gray;
     margin-left: -$m/4;
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.4);
   }
@@ -501,4 +638,11 @@ p {
   &.progress-5 {
     border-color: rgba($purple, 0.2);
   }
+}
+
+.material-icons {
+  &.md-small { font-size: 16px; }
+  &.md-medium { font-size: 24px; }
+  &.md-large { font-size: 44px; }
+  &.md-larger { font-size: 64px; }
 }
