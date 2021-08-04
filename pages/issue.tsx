@@ -1,5 +1,5 @@
 import { GetStaticProps } from "next";
-import React, { useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from 'react';
 import IssueComments from "../components/issue-comments";
 import IssueDescription from "../components/issue-description";
 import IssueHero from "../components/issue-hero";
@@ -8,13 +8,14 @@ import PageActions from "../components/page-actions";
 import IssueProposals from "../components/issue-proposals";
 import { IIssue } from "../components/issue-list-item";
 import { useRouter } from "next/router";
-import BeproService from "../services/bepro";
-import { isIssuesinDraft } from "../helpers/mockdata/mockIssueInDraft";
+import {BeproService} from "../services/bepro-service";
 import GithubMicroService from "../services/github-microservice";
+import {ApplicationContext} from '../contexts/application';
 
 export default function PageIssue() {
   const router = useRouter();
   const { id } = router.query;
+  const {state: {currentAddress}} = useContext(ApplicationContext)
 
   const [issue, setIssue] = useState<IIssue>();
   const [networkIssue, setNetworkIssue] = useState<any>();
@@ -24,9 +25,12 @@ export default function PageIssue() {
   const [balance, setBalance] = useState();
 
   useEffect(() => {
+    if (!currentAddress)
+      return;
+
     const gets = async () => {
-      await BeproService.login();
-      const address = await BeproService.getAddress();
+
+      const address = BeproService.address;
       setUserAddress(address);
       console.log('user adrress', address)
       const issue = await GithubMicroService.getIssueId(id);
@@ -47,8 +51,10 @@ export default function PageIssue() {
       );
       setCommentsIssue(comments);
     };
+
     gets();
-  }, []);
+
+  }, [currentAddress]);
 
   const handleStateissue = () => {
     if (isIssueinDraft) {

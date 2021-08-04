@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import {ComponentPropsWithRef, forwardRef, useContext} from 'react';
 // import { setLoadingAttributes } from "providers/loading-provider";
-import BeproService from "services/bepro";
+import {BeproService} from "services/bepro-service";
 import {changeLoadState} from '../contexts/reducers/change-load-state';
 import {ApplicationContext} from '../contexts/application';
 
@@ -19,7 +19,7 @@ const SettlerTokenCheck = forwardRef<HTMLButtonElement, Props>(
     async function handleClick() {
       try {
         dispatch(changeLoadState(true));
-        const address: string = await BeproService.getAddress();
+        const address: string = BeproService.address;
         const isApprovedSettlerToken: boolean =
           await BeproService.network.isApprovedSettlerToken({
             address,
