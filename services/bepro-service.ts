@@ -12,7 +12,7 @@ class BeproFacet {
 
   constructor(
       public readonly web3Connection = `https://kovan.infura.io/v3/811fe4fa5c4b41cb9b92f9656aaeaa3b`,
-      public readonly contractAddress = `0x0CCb54d3b4248FE833aCaB4E8993Bc720737F4B3`,) {
+      public readonly contractAddress = `0xDf956E90a6E1c2BE14FB0c694389a0071EB6Eb91`,) {
 
     const opt = {opt: {web3Connection}};
     this._bepro = new Application(opt);
