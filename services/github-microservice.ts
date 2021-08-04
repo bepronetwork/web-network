@@ -63,7 +63,7 @@ export default class GithubMicroService {
    * Should return the handle of a given wallet address
    */
   static async getHandleOf(address: string): Promise<any> {
-    return GithubMicroService.getUserOf(address).then(({githubHandle}) => githubHandle);
+    return GithubMicroService.getUserOf(address).then((data) => data?.githubHandle || ``).catch( _ => ``);
   }
 
 }

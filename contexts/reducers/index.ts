@@ -6,6 +6,7 @@ import {ChangeBeproInit} from './change-bepro-init-state';
 import {ChangeMyIssuesState} from './change-my-issues';
 import {ChangeOraclesState} from './change-oracles';
 import {ChangeStakedState} from './change-staked-amount';
+import {ChangeCurrentAddress} from './change-current-address';
 
 export default function LoadApplicationReducers() {
   [
@@ -16,5 +17,6 @@ export default function LoadApplicationReducers() {
     ChangeMyIssuesState,
     ChangeOraclesState,
     ChangeStakedState,
+    ChangeCurrentAddress,
   ].forEach(addReducer);
 }

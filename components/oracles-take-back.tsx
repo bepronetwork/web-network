@@ -3,7 +3,7 @@ import { isEmpty, isEqual, sumBy, uniqueId } from "lodash";
 import {useContext, useEffect, useState} from 'react';
 import OraclesTakeBackItem from "./oracles-take-back-item";
 import {ApplicationContext} from '../contexts/application';
-import BeproService from '../services/bepro';
+import {BeproService} from '../services/bepro-service';
 
 type Item = { address: string; amount: string };
 

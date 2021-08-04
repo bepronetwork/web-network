@@ -5,7 +5,7 @@ import CreateProposal from "./create-proposal";
 import StartWorking from "./start-working";
 import OpenIssue from "./open-issue";
 import Link from "next/link";
-import BeproService from "../services/bepro";
+import {BeproService} from "../services/bepro-service";
 import NewProposal from "./create-proposal";
 
 import { ApplicationContext } from "../contexts/application";
