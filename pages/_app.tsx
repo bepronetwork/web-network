@@ -1,34 +1,30 @@
-import "../styles/styles.scss";
-import { AppProps } from "next/app";
-import WebThreeDialog from "../components/web3-dialog";
-import Head from "next/head";
-import BeproService from "../services/bepro";
-import MainNav from "../components/main-nav";
-import React from "react";
-import { LoadingContextProvider } from "../providers/loading-provider";
-import { Provider as AccountProvider } from "hooks/useAccount";
+import '../styles/styles.scss'
+import {AppProps} from 'next/app'
+import WebThreeDialog from '../components/web3-dialog';
+import Head from 'next/head'
 
-export default function App({ Component, pageProps }: AppProps) {
-  (async () => {
-    await BeproService.init();
-  })();
+import MainNav from '../components/main-nav';
+import React, {useContext, useEffect} from 'react';
+import ApplicationContextProvider, {ApplicationContext} from '../contexts/application';
+import Loading from '../components/loading';
 
-  return (
-    <>
-      <Head>
-        <link
-          href="https://fonts.googleapis.com/icon?family=Material+Icons"
-          rel="stylesheet"
-        />
-        <title>WEB Network</title>
-      </Head>
-      <AccountProvider>
-        <LoadingContextProvider>
-          <MainNav />
-          <WebThreeDialog />
-          <Component {...pageProps} />
-        </LoadingContextProvider>
-      </AccountProvider>
-    </>
-  );
+
+export default function App({Component, pageProps}: AppProps) {
+  const {state,} = useContext(ApplicationContext)
+
+  return (<>
+    <ApplicationContextProvider>
+      <Loading show={state.loading.isLoading}>{state.loading.text}</Loading>
+      <Head> <link
+            href="https://fonts.googleapis.com/icon?family=Material+Icons"
+            rel="stylesheet"
+          />
+          <title>WEB Network</title>
+        </Head>
+      <MainNav/>
+        <WebThreeDialog />
+      <WebThreeDialog></WebThreeDialog>
+      <Component {...pageProps} />
+    </ApplicationContextProvider>
+  </>)
 }

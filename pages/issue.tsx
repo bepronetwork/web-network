@@ -6,16 +6,9 @@ import IssueHero from "../components/issue-hero";
 import IssueDraftProgress from "../components/issue-draft-progress";
 import PageActions from "../components/page-actions";
 import IssueProposals from "../components/issue-proposals";
-import {
-  mockNewIssues,
-  mockReadyIssues,
-  mockDeveloperIssues,
-} from "../helpers/mockdata/mockIssues";
-import { mockCommentsIssue } from "../helpers/mockdata/mockCommentsIssue";
 import { IIssue } from "../components/issue-list-item";
 import { useRouter } from "next/router";
 import BeproService from "../services/bepro";
-import { NetworkIssues } from "../helpers/mockdata/mockNetworkIssue";
 import { isIssuesinDraft } from "../helpers/mockdata/mockIssueInDraft";
 import GithubMicroService from "../services/github-microservice";
 
@@ -25,70 +18,74 @@ export default function PageIssue() {
 
   const [issue, setIssue] = useState<IIssue>();
   const [networkIssue, setNetworkIssue] = useState<any>();
-  const [isIssueinDraft, setIsIssueinDraft] = useState(false);
+  const [isIssueinDraft, setIsIssueinDraft] = useState(true);
   const [commentsIssue, setCommentsIssue] = useState();
   const [userAddress, setUserAddress] = useState<any>();
   const [balance, setBalance] = useState();
-
-  const getIssueNetwork = async () => {
-    await BeproService.login();
-    setNetworkIssue(
-      await BeproService.network.getIssueById({
-        issueId: id,
-      })
-    );
-  };
 
   useEffect(() => {
     const gets = async () => {
       await BeproService.login();
       const address = await BeproService.getAddress();
       setUserAddress(address);
-
-      setIssue(await GithubMicroService.getIssueId(id));
-      console.log("id ->", id);
+      console.log('user adrress', address)
+      const issue = await GithubMicroService.getIssueId(id);
+      setIssue(issue);
 
       const networkIssue = await BeproService.network.getIssueById({
         issueId: id,
       });
       setNetworkIssue(networkIssue);
       setBalance(await BeproService.network.getBEPROStaked());
-      /*const testing01 = await BeproService.network.isIssueInDraft({
+      const isIssueInDraft = await BeproService.network.isIssueInDraft({
         issueId: id,
       });
-      console.log("testing", testing01);*/
-      if (issue) {
-        const comments = await GithubMicroService.getCommentsIssue(
-          issue.githubId
-        );
-        setCommentsIssue(comments);
-      }
+      setIsIssueinDraft(isIssueInDraft);
+      console.log("issue in draft", isIssueInDraft);
+      const comments = await GithubMicroService.getCommentsIssue(
+        issue.githubId
+      );
+      setCommentsIssue(comments);
     };
     gets();
-    //getBalance();
   }, []);
+
+  const handleStateissue = () => {
+    if (isIssueinDraft) {
+      return "Draft";
+    } else if (!isIssueinDraft && networkIssue.finalized) {
+      return "Closed";
+    } else {
+      return "Open";
+    }
+  };
 
   return (
     <>
-      <IssueHero issue={issue}></IssueHero>
-      {issue?.state.toLowerCase() === "draft" && (
+      <IssueHero state={handleStateissue()} issue={issue}></IssueHero>
+      {handleStateissue() === "Draft" && (
         <IssueDraftProgress
           amountTotal={balance}
           amountUsed={networkIssue?.tokensStaked}
         />
       )}
       <PageActions
+        state={handleStateissue()}
+        developers={issue?.developers}
         finalized={networkIssue?.finalized}
         isIssueinDraft={isIssueinDraft}
         userAddress={userAddress}
-        issue={issue}
+        addressNetwork={networkIssue?.cid}
+        issueId={issue?.issueId}
+        UrlGithub={issue?.url}
       />
-      {issue?.state.toLocaleLowerCase() === "ready" && (
-        <IssueProposals></IssueProposals>
-      )}
+      {handleStateissue() === "Open" && <IssueProposals></IssueProposals>}
 
       <IssueDescription description={issue?.body}></IssueDescription>
-      <IssueComments url={issue?.url} comments={commentsIssue}></IssueComments>
+      <IssueComments
+        url={issue?.url || "/"}
+        comments={commentsIssue}
+      ></IssueComments>
     </>
   );
 }

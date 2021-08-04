@@ -8,7 +8,7 @@ export default class BeproService {
   public static bepro: any;
 
   // network app
-  public static network: any;
+  public static network: Network;
 
   // smart contract bepro instance
   public static contract: any;
@@ -27,7 +27,7 @@ export default class BeproService {
     });
     // this.bepro.start();
     this.network = new Network({
-      contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+      contractAddress: `0x67d98dc9a353b72493c987d4d9abaf5114271675`,
       opt: {
         web3Connection: this.web3Connection,
       }
@@ -45,7 +45,8 @@ export default class BeproService {
   }
 
   public static async login() {
-    await BeproService.init();
+    if (!this.network || this.bepro) await BeproService.init();
+
     // if (this.loggedIn) return true;
 
     try {
@@ -66,7 +67,7 @@ export default class BeproService {
   }
 
   public static async getAddress(): Promise<string> {
-    if (this.address) return this.address;
+    if (BeproService.address) return BeproService.address;
 
     return this.bepro.getAddress() || '';
   }
