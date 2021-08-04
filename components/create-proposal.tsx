@@ -3,6 +3,7 @@ import Modal from "./modal";
 import ReactSelect from "./react-select";
 import CreateProposalDistributionItem from "./create-proposal-distribution-item";
 import sumObj from "helpers/sumObj";
+import BeproService from "../services/bepro";
 
 const options = [
   "Pull Request #32 by @asantos",
@@ -12,9 +13,13 @@ const options = [
   "Pull Request #69 by @alisa",
   "Pull Request #69 by @alisa",
 ];
-const distributed = ["@asantos", "@vazTros", "@MikeSon"];
+const distributed = [
+  {handlegithub:"@ruipedro", adress:"0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d", },
+  {handlegithub:"@moshmage", adress:"0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d", }, 
+  {handlegithub:"@marcusvinicius", adress:"0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d", }
+];
 
-export default function NewProposal() {
+export default function NewProposal({issueId}) {
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>(0);
   const [error, setError] = useState<string>("");
@@ -30,7 +35,7 @@ export default function NewProposal() {
       ...params,
     }));
   }
-  function handleClickCreate(): void {
+  async function handleClickCreate(): Promise<void> {
     if (amount > 0 && amount < 100) {
       return setError(`${100 - amount}% is missing!`);
     }
@@ -40,7 +45,12 @@ export default function NewProposal() {
     if (amount > 100) {
       return setError("Distribution exceed 100%.");
     }
-
+    const propose =  await BeproService.network.proposeIssueMerge({
+      issueID: issueId,
+      prAddresses: [distributed[0].adress,distributed[1].adress,distributed[2].adress],
+      prAmounts: [5,10,5]
+    })
+    console.log('propsoe', propose)
     handleClose();
     setDistrib({});
   }
@@ -81,10 +91,10 @@ export default function NewProposal() {
         />
         <p className="p-small mt-3">Propose distribution</p>
         <ul className="mb-0">
-          {distributed.map((item: string) => (
+          {distributed.map((item) => (
             <CreateProposalDistributionItem
-              key={item}
-              by={item}
+              key={item.handlegithub}
+              by={item.handlegithub}
               onChangeDistribution={handleChangeDistrib}
               error={error}
             />
