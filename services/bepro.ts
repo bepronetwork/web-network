@@ -8,7 +8,7 @@ export default class BeproService {
   public static bepro: any;
 
   // network app
-  public static network: Network;
+  public static network: any;
 
   // smart contract bepro instance
   public static contract: any;
@@ -27,7 +27,7 @@ export default class BeproService {
     });
     // this.bepro.start();
     this.network = new Network({
-      contractAddress: `0x67d98dc9a353b72493c987d4d9abaf5114271675`,
+      contractAddress: "0xDf956E90a6E1c2BE14FB0c694389a0071EB6Eb91",
       opt: {
         web3Connection: this.web3Connection,
       }
