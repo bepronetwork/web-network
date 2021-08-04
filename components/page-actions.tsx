@@ -1,34 +1,40 @@
 import { GetStaticProps } from "next";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import IssueAvatars from "./issue-avatars";
 import CreateProposal from "./create-proposal";
 import StartWorking from "./start-working";
 import OpenIssue from "./open-issue";
 import Link from "next/link";
 import BeproService from "../services/bepro";
-import { setLoadingAttributes } from "../providers/loading-provider";
+import NewProposal from "./create-proposal";
+
+import { ApplicationContext } from "../contexts/application";
+import { changeLoadState } from "../contexts/reducers/change-load-state";
 
 export default function PageActions({
-  issue,
+  issueId,
+  UrlGithub,
+  developers,
   userAddress,
   finalized,
+  addressNetwork,
   isIssueinDraft,
+  state,
 }) {
+  const { dispatch } = useContext(ApplicationContext);
+
   const handleAvatar = () => {
-    if (issue?.developers.length > 0) {
-      return <IssueAvatars users={issue?.developers}></IssueAvatars>;
-    } else if (
-      issue?.developers.length &&
-      issue?.state.toLowerCase() !== "draft"
-    ) {
+    if (developers.length > 0) {
+      return <IssueAvatars users={developers}></IssueAvatars>;
+    } else if (developers.length && state.toLowerCase() !== "draft") {
       return <p className="p-small trans me-2 mt-3">no one is working </p>;
     }
   };
 
   const handleStartworking = () => {
     return (
-      (issue?.state.toLowerCase() === "open" ||
-        (issue?.state.toLowerCase() === "in progress" &&
+      (state.toLowerCase() === "open" ||
+        (state.toLowerCase() === "in progress" &&
           !finalized &&
           isIssueinDraft === false)) && <StartWorking />
     );
@@ -37,19 +43,19 @@ export default function PageActions({
   const handleRedeem = () => {
     return (
       isIssueinDraft === true &&
-      issue?.creatorAddress === userAddress && (
+      addressNetwork === userAddress && (
         <button
           className="btn btn-md btn-primary mr-1 px-4"
           onClick={async () => {
-            setLoadingAttributes(true);
+            dispatch(changeLoadState(true));
             await BeproService.login()
               .then(() =>
                 BeproService.network.redeemIssue({
-                  issueId: issue?.issueId,
+                  issueId,
                 })
               )
               .catch((err) => console.log(err))
-              .finally(() => setLoadingAttributes(false));
+              .finally(() => dispatch(changeLoadState(false)));
           }}
         >
           Redeem
@@ -59,14 +65,7 @@ export default function PageActions({
   };
 
   const handleProposeDestribution = () => {
-    return (
-      issue?.state.toLowerCase() === "in progress" &&
-      isIssueinDraft === false && (
-        <button className="btn btn-md btn-primary mr-1 px-3">
-          Propose Destribution
-        </button>
-      )
-    );
+    return isIssueinDraft && <NewProposal issueId={issueId} />;
   };
 
   return (
@@ -77,16 +76,22 @@ export default function PageActions({
             <h4 className="h4">Details</h4>
             <div className="d-flex align-items-center">
               {handleAvatar()}
-              {issue?.url && (
-                <Link href={issue?.url}>
+              {UrlGithub && (
+                <Link href={UrlGithub}>
                   <a className="btn btn-md btn-opac mr-1">View on github</a>
                 </Link>
               )}
               {handleStartworking()}
               {handleRedeem()}
-              {issue?.state.toLowerCase() === "ready" && <CreateProposal />}
+              {state.toLowerCase() === "ready" && (
+                <CreateProposal issueId={issueId} />
+              )}
               {handleProposeDestribution()}
-
+              {state.toLowerCase() === "pull request" && (
+                <button className="btn btn-md btn-primary mr-1 px-4">
+                  Dispute
+                </button>
+              )}
               {/*<OpenIssue />*/}
             </div>
           </div>
