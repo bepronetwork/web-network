@@ -14,12 +14,21 @@ const options = [
   "Pull Request #69 by @alisa",
 ];
 const distributed = [
-  {handlegithub:"@ruipedro", adress:"0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d", },
-  {handlegithub:"@moshmage", adress:"0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d", }, 
-  {handlegithub:"@marcusvinicius", adress:"0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d", }
+  {
+    handlegithub: "@ruipedro",
+    adress: "0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d",
+  },
+  {
+    handlegithub: "@moshmage",
+    adress: "0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d",
+  },
+  {
+    handlegithub: "@marcusvinicius",
+    adress: "0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d",
+  },
 ];
 
-export default function NewProposal({issueId}) {
+export default function NewProposal({ issueId }) {
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>(0);
   const [error, setError] = useState<string>("");
@@ -45,12 +54,16 @@ export default function NewProposal({issueId}) {
     if (amount > 100) {
       return setError("Distribution exceed 100%.");
     }
-    const propose =  await BeproService.network.proposeIssueMerge({
+    console.log("id ->", issueId);
+    const propose = await BeproService.network.proposeIssueMerge({
       issueID: issueId,
-      prAddresses: [distributed[0].adress,distributed[1].adress,distributed[2].adress],
-      prAmounts: [5,10,5]
-    })
-    console.log('propsoe', propose)
+      prAddresses: [
+        "0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d",
+        "0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d",
+      ],
+      prAmounts: [800, 200],
+    });
+    console.log("propsoe,", propose);
     handleClose();
     setDistrib({});
   }
@@ -73,11 +86,13 @@ export default function NewProposal({issueId}) {
             </button>
             <button
               className="btn btn-md btn-primary"
-              onClick={handleClickCreate}>
+              onClick={handleClickCreate}
+            >
               Create Proposal
             </button>
           </>
-        }>
+        }
+      >
         <p className="p-small text-50">Select a pull request </p>
         <ReactSelect
           defaultValue={{
