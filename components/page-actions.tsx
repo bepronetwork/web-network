@@ -24,9 +24,9 @@ export default function PageActions({
   const { dispatch } = useContext(ApplicationContext);
 
   const handleAvatar = () => {
-    if (developers.length > 0) {
+    if (developers?.length > 0) {
       return <IssueAvatars users={developers}></IssueAvatars>;
-    } else if (developers.length && state.toLowerCase() !== "draft") {
+    } else if (developers?.length && state.toLowerCase() !== "draft") {
       return <p className="p-small trans me-2 mt-3">no one is working </p>;
     }
   };
