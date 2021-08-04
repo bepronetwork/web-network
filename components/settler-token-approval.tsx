@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import {ComponentPropsWithRef, forwardRef, useContext} from 'react';
-import BeproService from "services/bepro";
+import {BeproService} from "services/bepro-service";
 import {changeLoadState} from '../contexts/reducers/change-load-state';
 import {ApplicationContext} from '../contexts/application';
 
