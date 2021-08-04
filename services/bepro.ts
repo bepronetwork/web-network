@@ -27,13 +27,12 @@ export default class BeproService {
     });
     // this.bepro.start();
     this.network = new Network({
-      contractAddress: '0x852D6375c55498B326Fb87C69E16F010d2906C0E',
+      contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
       opt: {
         web3Connection: this.web3Connection,
       }
     });
     // this.network.start();
-
   }
 
   public static async isLoggedIn() {
@@ -46,13 +45,13 @@ export default class BeproService {
   }
 
   public static async login() {
-    if (this.loggedIn) return true;
+    await BeproService.init();
+    // if (this.loggedIn) return true;
 
     try {
       this.loggedIn = await this.bepro.login();
       const networkLogin = await this.network.login();
       const networkAssert = await this.network.__assert();
-      alert("asserterd");
       // successful login
       if (this.loggedIn) {
         this.address = await this.getAddress();
