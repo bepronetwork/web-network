@@ -9,4 +9,5 @@ export interface ApplicationState {
   beproStaked: number;
   oracles: OraclesState;
   myIssues: number[];
+  currentAddress: string;
 }

@@ -1,5 +1,5 @@
 import {useContext, useEffect, useState} from 'react';
-import BeproService from "services/bepro";
+import {BeproService} from "services/bepro-service";
 import {changeLoadState} from '../contexts/reducers/change-load-state';
 import {ApplicationContext} from '../contexts/application';
 import {changeMyIssuesState} from '../contexts/reducers/change-my-issues';
@@ -7,12 +7,12 @@ import {changeOraclesState} from '../contexts/reducers/change-oracles';
 import GithubHandle from './github-handle';
 
 export default function AccountHero() {
-  const {dispatch, state: {beproInit, oracles, metaMaskWallet}} = useContext(ApplicationContext);
+  const {dispatch, state: {beproInit, oracles, metaMaskWallet, currentAddress}} = useContext(ApplicationContext);
 
   const [myIssueCount, setMyIssueCount] = useState<number>()
 
   function loadBeproNetworkInformation() {
-    if (!beproInit || !metaMaskWallet)
+    if (!beproInit || !metaMaskWallet || !currentAddress)
       return;
     const address = BeproService.address;
 
@@ -33,7 +33,7 @@ export default function AccountHero() {
 
   }
 
-  useEffect(loadBeproNetworkInformation, [beproInit, metaMaskWallet])
+  useEffect(loadBeproNetworkInformation, [beproInit, metaMaskWallet, currentAddress])
 
   return (
     <div className="banner bg-bepro-blue mb-4">

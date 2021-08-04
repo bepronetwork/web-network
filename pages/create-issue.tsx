@@ -1,6 +1,6 @@
 import { GetStaticProps } from 'next'
 import React, {useContext, useState} from 'react';
-import BeproService from '../services/bepro';
+import {BeproService} from '../services/bepro-service';
 import GithubMicroService from '../services/github-microservice';
 import InputNumber from '../components/input-number';
 import { useRouter } from 'next/router';

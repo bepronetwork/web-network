@@ -1,5 +1,5 @@
 import { Network } from 'bepro-js';
-import BeproService from '../services/bepro';
+import {BeproService} from '../services/bepro-service';
 import {forwardRef, useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '../contexts/application';
 import {changeLoadState} from '../contexts/reducers/change-load-state';
