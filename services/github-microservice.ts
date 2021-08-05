@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {IssueData} from '../interfaces/issue-data';
 
 interface User {
   githubHandle: string;
@@ -69,13 +70,56 @@ export default class GithubMicroService {
   static async createPullRequestIssue(issueId: string | string[], payload) {
     await client.post(`/issues/${issueId}/pullrequest`, payload);
   }
-
-  static async createMergeProposal(issueId: string | string[], payload) {
-    await client.post(`/issues/${issueId}/mergeproposal`, payload);
-  }
-
+  
   static async startWorkingIssue(issueId: string | string[], payload) {
     await client.post(`developers/working/${issueId}`, payload);
   }
 
+  /**
+   * Should return network status
+   */
+  static async getNetworkStats() {
+    return client.get<{openIssues: number, beproStaked: number, tokensStaked: number, closedIssues?: number}>(`/networkstatus`)
+                 .then(({data}) => data)
+                 .catch(e => {
+                   console.error(e);
+                   return {openIssues: 0, beproStaked: 0, tokensStaked: 0, closedIssues: 0}
+                 });
+  }
+
+  static async getPullRequestParticipants(prId: string) {
+    return client.get<{githubHandle: string; address?: string}>(`/pullrequests/${prId}/participants`)
+                 .then(({data}) => data)
+                 .catch(e => {
+                   console.error(e);
+                   return {githubHandle: '', address: ''};
+                 })
+  }
+
+  static async getPullRequestsOfIssue(id: string): Promise<IssueData|null> {
+    return client.get<IssueData>(`/issues/issue/${id}`)
+                 .then(({data}) => data)
+                 .catch(e => {
+                   console.error(e);
+                   return null;
+                 })
+  }
+
+  static async createMergeProposal(id: string) {
+    return client.post<'ok'>(`/issues/${id}/mergeproposal`)
+                 .then(({data}) => data === 'ok')
+                 .catch(e => {
+                   console.error(e);
+                   return false;
+                 });
+  }
+
+  static async getForks() {
+    return client.get(`/forks`)
+                 .then(({data}) => data)
+                 .catch(e => {
+                   console.error(e);
+                   return null;
+                 })
+  }
 }

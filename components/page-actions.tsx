@@ -2,15 +2,12 @@ import { GetStaticProps } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import IssueAvatars from "./issue-avatars";
 import CreateProposal from "./create-proposal";
-import StartWorking from "./start-working";
-import OpenIssue from "./open-issue";
 import Link from "next/link";
-import BeproService from "../services/bepro";
+import {BeproService} from "../services/bepro-service";
 import NewProposal from "./create-proposal";
 
 import { ApplicationContext } from "../contexts/application";
 import { changeLoadState } from "../contexts/reducers/change-load-state";
-import GithubMicroService from "../services/github-microservice";
 
 export default function PageActions({
   issueId,

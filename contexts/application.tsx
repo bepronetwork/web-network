@@ -1,13 +1,16 @@
-import {createContext, Dispatch, useContext, useEffect, useReducer} from 'react';
+import React, {createContext, Dispatch, useContext, useEffect, useReducer} from 'react';
 import {mainReducer} from './reducers/main';
 import {ApplicationState} from '../interfaces/application-state';
 import {ReduceActor} from '../interfaces/reduce-action';
 import LoadApplicationReducers from './reducers';
-import BeproService from '../services/bepro';
+import {BeproService} from '../services/bepro-service';
 import {changeBeproInitState} from './reducers/change-bepro-init-state';
 import GithubMicroService from '../services/github-microservice';
 import {useSession} from 'next-auth/client';
 import {changeGithubHandle} from './reducers/change-github-handle';
+import {changeCurrentAddress} from './reducers/change-current-address';
+import {changeLoadState} from './reducers/change-load-state';
+import Loading from '../components/loading';
 
 interface GlobalState {
   state: ApplicationState,
@@ -18,6 +21,7 @@ const defaultState: GlobalState = {
   state: {
     githubHandle: ``,
     metaMaskWallet: false,
+    currentAddress: ``,
     loading: {
       isLoading: false,
     },
@@ -40,24 +44,36 @@ export default function ApplicationContextProvider({children}) {
   const [state, dispatch] = useReducer(mainReducer, defaultState.state);
   const [session,] = useSession();
 
-  function Initialize() {
-    BeproService.init()
-                .then(() => dispatch(changeBeproInitState(true) as any));
+  function onMetaMaskChange() {
+    if (!state.metaMaskWallet || state.currentAddress === BeproService.address)
+      return;
+
+    GithubMicroService.getHandleOf(BeproService.address)
+                      .then(handle => {
+                        if (!handle && session?.user?.name)
+                          GithubMicroService.joinAddressToHandle({
+                                                                   githubHandle: session.user.name,
+                                                                   address: BeproService.address
+                                                                 })
+                                            .then(() => dispatch(changeGithubHandle(session.user.name)));
+                        else dispatch(changeGithubHandle(handle));
+                      });
   }
 
-  function onMetaMaskChange() {
-    console.log(`meta changed`, state);
+  function updateBeproLogin(newAddress) {
     if (state.metaMaskWallet)
-      GithubMicroService.getHandleOf(BeproService.address)
-                        .then(handle => {
-                          if (!handle && session?.user?.name)
-                            GithubMicroService.joinAddressToHandle({
-                                                                            githubHandle: session.user.name,
-                                                                            address: BeproService.address
-                                                                          })
-                                                     .then(() => dispatch(changeGithubHandle(session.user.name)));
-                          else dispatch(changeGithubHandle(handle));
-                        });
+      BeproService.login(true)
+                  .then(_ => { dispatch(changeCurrentAddress(newAddress)) })
+                  .then(() => { onMetaMaskChange() });
+  }
+
+  function Initialize() {
+    dispatch(changeBeproInitState(true) as any);
+
+    if (!window.ethereum)
+      return;
+
+    window.ethereum.on(`accountsChanged`, (accounts) => updateBeproLogin(accounts[0]))
   }
 
   function setHandleIfConnected() {
@@ -76,6 +92,8 @@ export default function ApplicationContextProvider({children}) {
   useEffect(onMetaMaskChange, [state.metaMaskWallet]);
   useEffect(setHandleIfConnected, [session]);
 
-  return <ApplicationContext.Provider
-    value={{state, dispatch: dispatch as any}}>{children}</ApplicationContext.Provider>
+  return <ApplicationContext.Provider value={{state, dispatch: dispatch as any}}>
+    <Loading show={state.loading.isLoading} text={state.loading.text} />
+    {children}
+  </ApplicationContext.Provider>
 }
