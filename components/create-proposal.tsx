@@ -28,9 +28,9 @@ const distributed = [
   },
 ];
 
-export default function NewProposal({ issueId }) {
+export default function NewProposal({ issueId, amountTotal }) {
   const [distrib, setDistrib] = useState<Object>({});
-  const [amount, setAmount] = useState<number>(0);
+  const [amount, setAmount] = useState<number>();
   const [error, setError] = useState<string>("");
   const [show, setShow] = useState<boolean>(false);
 
@@ -39,11 +39,13 @@ export default function NewProposal({ issueId }) {
     setAmount(sumObj(distrib));
   }, [distrib]);
   function handleChangeDistrib(params: { [key: string]: number }): void {
+    console.log("params->", params);
     setDistrib((prevState) => ({
       ...prevState,
       ...params,
     }));
   }
+
   async function handleClickCreate(): Promise<void> {
     if (amount > 0 && amount < 100) {
       return setError(`${100 - amount}% is missing!`);
@@ -54,14 +56,18 @@ export default function NewProposal({ issueId }) {
     if (amount > 100) {
       return setError("Distribution exceed 100%.");
     }
-    console.log("id ->", issueId);
     const propose = await BeproService.network.proposeIssueMerge({
       issueID: issueId,
       prAddresses: [
         "0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d",
         "0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d",
+        "0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d",
       ],
-      prAmounts: [800, 200],
+      prAmounts: [
+        (amountTotal * distrib[distributed[0].handlegithub]) / 100,
+        (amountTotal * distrib[distributed[1].handlegithub]) / 100,
+        (amountTotal * distrib[distributed[2].handlegithub]) / 100,
+      ],
     });
     console.log("propsoe,", propose);
     handleClose();
