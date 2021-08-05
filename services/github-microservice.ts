@@ -9,7 +9,7 @@ interface User {
   updatedAt: string;
 }
 
-const client = axios.create({baseURL: process.env.API_HOST || 'http://localhost:3005'})
+const client = axios.create({baseURL: process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:3005'})
 export default class GithubMicroService {
 
   static async createIssue(payload) {
@@ -70,7 +70,7 @@ export default class GithubMicroService {
   static async createPullRequestIssue(issueId: string | string[], payload) {
     await client.post(`/issues/${issueId}/pullrequest`, payload);
   }
-  
+
   static async startWorkingIssue(issueId: string | string[], payload) {
     await client.post(`developers/working/${issueId}`, payload);
   }
