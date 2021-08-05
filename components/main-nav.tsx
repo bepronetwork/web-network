@@ -59,11 +59,13 @@ export default function MainNav() {
 
       <div className="d-flex">
         <Link href="/" passHref>
-          <img
-            className="logo"
-            src="https://64.media.tumblr.com/3cf2d2b58643cb6f46b42a652771b73b/e8afc16b16e16514-bc/s250x400/191e77982d8901585030f596d3e90935d42099ed.png"
-            alt=""
-          />
+          <a>
+            <img
+              className="logo"
+              src="https://64.media.tumblr.com/3cf2d2b58643cb6f46b42a652771b73b/e8afc16b16e16514-bc/s250x400/191e77982d8901585030f596d3e90935d42099ed.png"
+              alt=""
+            />
+          </a>
         </Link>
         <ul className="nav-links">
           <li><Link href="/developers" passHref><a>Developers</a></Link></li>
@@ -77,7 +79,7 @@ export default function MainNav() {
       </div>
       <div className="d-flex flex-row align-items-center">
         <Link href="/create-issue" passHref>
-          <a className="btn btn-md btn-trans mr-1">+ Create issue</a>
+          <button className="btn btn-md btn-trans mr-1">+ Create issue</button>
         </Link>
         <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
           <div className="d-flex account-info align-items-center">
