@@ -10,7 +10,7 @@ export default function Home() {
     <div>
 
       <MainNav></MainNav>
-      <PageHero></PageHero>
+      <PageHero />
 
       <div className="container">
         <div className="row justify-content-center">
