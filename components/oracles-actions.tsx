@@ -4,7 +4,7 @@ import InputNumber from "./input-number";
 import OraclesBoxHeader from "./oracles-box-header";
 import Modal from "./modal";
 import {ApplicationContext} from '../contexts/application';
-import BeproService from '../services/bepro';
+import {BeproService} from '../services/bepro-service';
 import {changeLoadState} from '../contexts/reducers/change-load-state';
 import ApproveButton from './approve-button';
 import TransferOraclesButton from './transfer-oracles-button';

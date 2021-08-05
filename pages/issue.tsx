@@ -1,22 +1,23 @@
 import { GetStaticProps } from "next";
-import React, { useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from 'react';
 import IssueComments from "../components/issue-comments";
 import IssueDescription from "../components/issue-description";
 import IssueHero from "../components/issue-hero";
 import IssueDraftProgress from "../components/issue-draft-progress";
 import PageActions from "../components/page-actions";
 import IssueProposals from "../components/issue-proposals";
-import { IIssue } from "../components/issue-list-item";
 import { useRouter } from "next/router";
-import BeproService from "../services/bepro";
-import { isIssuesinDraft } from "../helpers/mockdata/mockIssueInDraft";
+import {BeproService} from "../services/bepro-service";
 import GithubMicroService from "../services/github-microservice";
+import {ApplicationContext} from '../contexts/application';
+import {IssueData} from '../interfaces/issue-data';
 
 export default function PageIssue() {
   const router = useRouter();
   const { id } = router.query;
+  const {state: {currentAddress}} = useContext(ApplicationContext)
 
-  const [issue, setIssue] = useState<IIssue>();
+  const [issue, setIssue] = useState<IssueData>();
   const [networkIssue, setNetworkIssue] = useState<any>();
   const [isIssueinDraft, setIsIssueinDraft] = useState(true);
   const [commentsIssue, setCommentsIssue] = useState();
@@ -24,14 +25,15 @@ export default function PageIssue() {
   const [balance, setBalance] = useState();
 
   useEffect(() => {
+    if (!currentAddress)
+      return;
+
     const gets = async () => {
-      await BeproService.login();
-      const address = await BeproService.getAddress();
+
+      const address = BeproService.address;
       setUserAddress(address);
-      console.log('user adrress', address)
       const issue = await GithubMicroService.getIssueId(id);
       setIssue(issue);
-
       const networkIssue = await BeproService.network.getIssueById({
         issueId: id,
       });
@@ -47,8 +49,10 @@ export default function PageIssue() {
       );
       setCommentsIssue(comments);
     };
+
     gets();
-  }, []);
+
+  }, [currentAddress]);
 
   const handleStateissue = () => {
     if (isIssueinDraft) {
@@ -62,13 +66,11 @@ export default function PageIssue() {
 
   return (
     <>
-      <IssueHero state={handleStateissue()} issue={issue}></IssueHero>
-      {handleStateissue() === "Draft" && (
-        <IssueDraftProgress
-          amountTotal={balance}
-          amountUsed={networkIssue?.tokensStaked}
-        />
-      )}
+      <IssueHero
+        amount={networkIssue?.tokensStaked}
+        state={handleStateissue()}
+        issue={issue}
+      />
       <PageActions
         state={handleStateissue()}
         developers={issue?.developers}
@@ -79,7 +81,13 @@ export default function PageIssue() {
         issueId={issue?.issueId}
         UrlGithub={issue?.url}
       />
-      {handleStateissue() === "Open" && <IssueProposals></IssueProposals>}
+      {networkIssue?.mergeProposalsAmount > 0 && (
+        <IssueProposals
+          numberProposals={networkIssue?.mergeProposalsAmount}
+          issueId={issue?.issueId}
+          amount={networkIssue?.tokensStaked}
+        />
+      )}
 
       <IssueDescription description={issue?.body}></IssueDescription>
       <IssueComments

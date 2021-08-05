@@ -6,6 +6,7 @@
     "node": "12.x"
   },
   "scripts": {
+    "clean": "npm cache clean --force && rm -rf .next",
     "dev": "next dev",
     "build": "next build",
     "clean": "npm cache clean --force && rm -rf .next",

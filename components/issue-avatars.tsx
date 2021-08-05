@@ -8,7 +8,7 @@ export default function IssueAvatars({ users }) {
           return (
             <img
               className="avatar circle-3"
-              src={user.avatar_url}
+              src={user.avatar_url || "https://img.pizza/28/28"}
               alt={user.login}
               key={user.id}
               data-bs-toggle="tooltip"
