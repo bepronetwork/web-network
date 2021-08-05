@@ -85,7 +85,7 @@ export default function PageDevelopers() {
 
   useEffect(getIssues, []);
 
-  return (
+  return (<>
     <div>
       <PageHero title="Find issue to work"/>
       <div className="container">
@@ -126,7 +126,7 @@ export default function PageDevelopers() {
         </div>
       </div>
     </div>
-  );
+  </>);
 }
 
 export const getStaticProps: GetStaticProps = async () => {
