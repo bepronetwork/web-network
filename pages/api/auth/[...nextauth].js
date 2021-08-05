@@ -16,7 +16,7 @@ export default NextAuth({
       if (BeproService.address)
         return GithubMicroService.joinAddressToHandle({githubHandle: user.name, address: BeproService.address});
 
-      return !!user?.email;
+      return !!user?.name;
     }
   }
 })
