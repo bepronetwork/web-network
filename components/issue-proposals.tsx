@@ -70,7 +70,9 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
           </div>
           <div className="col-md-4">
             <div className="d-flex align-items-center justify-content-end">
-              <p className="smallCaption color-purple mb-0 mr-2">... Oracles</p>
+              <p className="smallCaption color-purple mb-0 mr-2">
+                {proposal.disputes} Oracles
+              </p>
               <button
                 className="btn btn-md btn-purple"
                 onClick={() => handleDispute(toNumber(proposal._id))}
