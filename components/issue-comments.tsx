@@ -10,7 +10,7 @@ export default function IssueComments({ url, comments }) {
           <div className="content-wrapper">
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h3 className="smallCaption mb-0">{comments?.length} comments</h3>
-              <Link href={url}>
+              <Link href={url} passHref>
                 <a className="subnav-github">
                   {"Reply on github".toUpperCase()}
                 </a>
