@@ -1,7 +1,7 @@
 import { GetStaticProps } from "next";
 import { formatDate } from "../helpers/formatDate";
 
-export default function IssueHero({ issue, state }) {
+export default function IssueHero({ issue, state, amount }) {
   return (
     <div className="banner bg-bepro-blue mb-4">
       <div className="container">
@@ -32,7 +32,7 @@ export default function IssueHero({ issue, state }) {
                 <div className="col-md-3">
                   <div className="banner-highlight">
                     <h4 className="h4 mb-0">
-                      {issue?.amount > 0 ? issue?.amount : "MISSING"}{" "}
+                      {amount > 0 ? amount : "MISSING"}{" "}
                       <span className="p-small trans">$BEPRO</span>
                     </h4>
                   </div>
