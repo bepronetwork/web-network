@@ -66,4 +66,12 @@ export default class GithubMicroService {
     return GithubMicroService.getUserOf(address).then((data) => data?.githubHandle || ``).catch( _ => ``);
   }
 
+  static async getNetworkStats() {
+    return client.get<{openIssues: number, beproStaked: number, tokensStaked: number, closedIssues?: number}>(`/networkstatus`)
+                 .then(({data}) => data)
+                 .catch(e => {
+                   console.error(e);
+                   return {openIssues: 0, beproStaked: 0, tokensStaked: 0, closedIssues: 0}
+                 });
+  }
 }
