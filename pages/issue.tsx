@@ -32,10 +32,8 @@ export default function PageIssue() {
 
       const address = BeproService.address;
       setUserAddress(address);
-      console.log('user adrress', address)
       const issue = await GithubMicroService.getIssueId(id);
       setIssue(issue);
-
       const networkIssue = await BeproService.network.getIssueById({
         issueId: id,
       });
@@ -68,13 +66,11 @@ export default function PageIssue() {
 
   return (
     <>
-      <IssueHero state={handleStateissue()} issue={issue}></IssueHero>
-      {handleStateissue() === "Draft" && (
-        <IssueDraftProgress
-          amountTotal={balance}
-          amountUsed={networkIssue?.tokensStaked}
-        />
-      )}
+      <IssueHero
+        amount={networkIssue?.tokensStaked}
+        state={handleStateissue()}
+        issue={issue}
+      />
       <PageActions
         state={handleStateissue()}
         developers={issue?.developers}
@@ -85,7 +81,13 @@ export default function PageIssue() {
         issueId={issue?.issueId}
         UrlGithub={issue?.url}
       />
-      {handleStateissue() === "Open" && <IssueProposals></IssueProposals>}
+      {networkIssue?.mergeProposalsAmount > 0 && (
+        <IssueProposals
+          numberProposals={networkIssue?.mergeProposalsAmount}
+          issueId={issue?.issueId}
+          amount={networkIssue?.tokensStaked}
+        />
+      )}
 
       <IssueDescription description={issue?.body}></IssueDescription>
       <IssueComments

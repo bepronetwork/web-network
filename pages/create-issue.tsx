@@ -28,7 +28,7 @@ export default function PageCreateIssue() {
     dispatch(changeLoadState(true))
     await BeproService.login()
     .then(() => BeproService.network.approveTransactionalERC20Token())
-    .then(() => BeproService.getAddress())
+    .then(() => BeproService.getAddress)
     .then(address => BeproService.network.isApprovedTransactionalToken({ address, amount: issueAmount.floatValue}))
     .then(transaction => {
         setAllowedTransaction(transaction)

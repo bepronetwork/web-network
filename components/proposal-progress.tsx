@@ -12,9 +12,8 @@ export default function ProposalProgress({ developers }) {
               {developers.map((developer, index) => (
                 <div
                   key={developer.user.id}
-                  className={`user-block-progress progress-${
-                    index + 1
-                  } d-flex flex-column align-items-center w-${developer.value}`}
+                  className={`user-block-progress d-flex flex-column align-items-center`}
+                  style={{ width: `${developer.value}%` }}
                 >
                   <img
                     className="avatar circle-2 mb-1"

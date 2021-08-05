@@ -67,6 +67,14 @@ export default class GithubMicroService {
     return GithubMicroService.getUserOf(address).then((data) => data?.githubHandle || ``).catch( _ => ``);
   }
 
+  static async createPullRequestIssue(issueId: string | string[], payload) {
+    await client.post(`/issues/${issueId}/pullrequest`, payload);
+  }
+  
+  static async startWorkingIssue(issueId: string | string[], payload) {
+    await client.post(`developers/working/${issueId}`, payload);
+  }
+
   /**
    * Should return network status
    */
