@@ -1,12 +1,12 @@
 import { GetStaticProps } from "next";
 import React, {useContext, useEffect, useState} from 'react';
-import { IIssue } from "../components/issue-list-item";
 import PageHero from "../components/page-hero";
 import GithubMicroService from "../services/github-microservice";
 import ListIssues from "../components/list-issues";
 import ReactSelect from "../components/react-select";
 import {ApplicationContext} from '../contexts/application';
 import {changeLoadState} from '../contexts/reducers/change-load-state';
+import {IssueData} from '../interfaces/issue-data';
 
 const options_issue = [
   {
@@ -40,7 +40,7 @@ const options_time = [
 
 export default function PageDevelopers() {
   const {dispatch, state: {loading}} = useContext(ApplicationContext);
-  const [issues, setIssues] = useState<IIssue[]>([]);
+  const [issues, setIssues] = useState<IssueData[]>([]);
   const [filterStateIssues, setfilterStateIssues] = useState({
     state: "",
     issues: [],
@@ -57,13 +57,13 @@ export default function PageDevelopers() {
       setfilterStateIssues({
         state: params.value,
         issues: issues.filter(
-          (obj: IIssue) => obj.state.toLowerCase() === params.value
+          (obj: IssueData) => obj.state.toLowerCase() === params.value
         ),
       });
     }
   }
 
-  function updateIssuesList(issues: IIssue[]) {
+  function updateIssuesList(issues: IssueData[]) {
     console.log(`got issues`, issues);
     setIssues(issues);
     if (filterStateIssues.issues.length === 0) {

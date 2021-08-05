@@ -1,5 +1,6 @@
-import { IIssue } from "../../components/issue-list-item";
-export const mockDeveloperIssues: IIssue[] = [
+import {IssueData} from '../../interfaces/issue-data';
+
+export const mockDeveloperIssues: IssueData[] = [
   {
     body: "Testing",
     createdAt: new Date("2021-07-07T21:10:59.495Z"),
@@ -177,7 +178,7 @@ export const mockDeveloperIssues: IIssue[] = [
   },
 ];
 
-export const mockReadyIssues: IIssue[] = [
+export const mockReadyIssues: IssueData[] = [
   {
     body: "Testing",
     createdAt: new Date("2021-07-07T21:10:59.495Z"),
@@ -326,7 +327,7 @@ export const mockReadyIssues: IIssue[] = [
   },
 ];
 
-export const mockNewIssues: IIssue[] = [
+export const mockNewIssues: IssueData[] = [
   {
     body: "Testing",
     createdAt: new Date("2021-07-07T21:10:59.495Z"),
