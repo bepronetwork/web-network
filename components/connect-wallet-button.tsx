@@ -13,7 +13,6 @@ export default function ConnectWalletButton({children, forceLogin = false, onSuc
 
     try {
       loggedIn = await BeproService.login();
-      // await BeproService.getAddress();
     } catch (e) {
       console.log(e);
     }
