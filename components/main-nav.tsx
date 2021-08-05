@@ -30,18 +30,22 @@ export default function MainNav() {
     }
   }
 
+  function updateAddress(address) {
+    setAddress(`${address.substr(0,6)}...${address.substr(-4)}`);
+  }
+
   function updateState() {
     if (!currentAddress)
       return;
 
-    setAddress(BeproService.address);
+    updateAddress(BeproService.address);
     BeproService.getBalance('eth').then(setEthBalance);
     BeproService.getBalance('bepro').then(setBeproBalance);
     BeproService.network.getBEPROStaked().then(amount => dispatch(changeStakedState(amount)))
   }
 
   const login = async () => {
-    setAddress(BeproService.address);
+    updateAddress(BeproService.address);
     setEthBalance(await BeproService.getBalance('eth'))
     setBeproBalance(await BeproService.getBalance('bepro'))
     setLoggedIn(true);
@@ -86,7 +90,7 @@ export default function MainNav() {
             <Link href="/account" passHref>
               <a className="meta-info d-flex align-items-center">
                 <div className="d-flex flex-column text-right">
-                  <p className="p-small short-address mb-0">
+                  <p className="p-small mb-0">
                     {address}
                   </p>
                   <p className="p-small mb-0 trans">{ethBalance} ETH</p>
