@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "clean": "npm cache clean --force && rm -rf .next",
     "start": "next start"
   },
   "dependencies": {
