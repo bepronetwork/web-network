@@ -5,5 +5,6 @@ export enum ReduceActionName {
   BeproInit = `BeproInit`,
   MyIssues = `MyIssues`,
   Oracles = `Oracles`,
-  Staked = `Staked`
+  Staked = `Staked`,
+  ChangeAddress = `ChangeAddress`,
 }

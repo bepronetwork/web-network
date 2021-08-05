@@ -1,6 +1,6 @@
 import { GetStaticProps } from 'next'
 import React, {useContext, useState} from 'react';
-import BeproService from '../services/bepro';
+import {BeproService} from '../services/bepro-service';
 import GithubMicroService from '../services/github-microservice';
 import InputNumber from '../components/input-number';
 import { useRouter } from 'next/router';
@@ -28,7 +28,7 @@ export default function PageCreateIssue() {
     dispatch(changeLoadState(true))
     await BeproService.login()
     .then(() => BeproService.network.approveTransactionalERC20Token())
-    .then(() => BeproService.getAddress())
+    .then(() => BeproService.getAddress)
     .then(address => BeproService.network.isApprovedTransactionalToken({ address, amount: issueAmount.floatValue}))
     .then(transaction => {
         setAllowedTransaction(transaction)

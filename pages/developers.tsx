@@ -87,11 +87,7 @@ export default function PageDevelopers() {
 
   return (
     <div>
-      <PageHero
-        title="Find issue to work"
-        numIssuesInProgress={6}
-        numIssuesClosed={123}
-        numBeprosOnNetwork={120000}/>
+      <PageHero title="Find issue to work"/>
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10">
