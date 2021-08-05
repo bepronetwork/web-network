@@ -1,4 +1,4 @@
-import {createContext, Dispatch, useContext, useEffect, useReducer} from 'react';
+import React, {createContext, Dispatch, useContext, useEffect, useReducer} from 'react';
 import {mainReducer} from './reducers/main';
 import {ApplicationState} from '../interfaces/application-state';
 import {ReduceActor} from '../interfaces/reduce-action';
@@ -9,6 +9,8 @@ import GithubMicroService from '../services/github-microservice';
 import {useSession} from 'next-auth/client';
 import {changeGithubHandle} from './reducers/change-github-handle';
 import {changeCurrentAddress} from './reducers/change-current-address';
+import {changeLoadState} from './reducers/change-load-state';
+import Loading from '../components/loading';
 
 interface GlobalState {
   state: ApplicationState,
@@ -90,6 +92,8 @@ export default function ApplicationContextProvider({children}) {
   useEffect(onMetaMaskChange, [state.metaMaskWallet]);
   useEffect(setHandleIfConnected, [session]);
 
-  return <ApplicationContext.Provider
-    value={{state, dispatch: dispatch as any}}>{children}</ApplicationContext.Provider>
+  return <ApplicationContext.Provider value={{state, dispatch: dispatch as any}}>
+    <Loading show={state.loading.isLoading} text={state.loading.text} />
+    {children}
+  </ApplicationContext.Provider>
 }
