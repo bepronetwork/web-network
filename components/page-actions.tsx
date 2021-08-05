@@ -32,17 +32,6 @@ export default function PageActions({
     }
   }
 
-  function renderStartworking() {
-    return (
-      (state.toLowerCase() !== "open" ||
-        (state.toLowerCase() === "in progress" &&
-          !finalized &&
-          isIssueinDraft === false)) && (
-        <StartWorking issueId={issueId} userAddress={userAddress} />
-      )
-    );
-  }
-
   async function handleRedeem() {
     dispatch(changeLoadState(true));
     await BeproService.login()
@@ -69,13 +58,25 @@ export default function PageActions({
     );
   };
 
-  function handleProposeDestribution() {
-    return isIssueinDraft && <NewProposal issueId={issueId} />;
+  function renderProposeDestribution() {
+    return (
+      !finalized && (
+        <>
+          <NewProposal issueId={issueId} amountTotal={"1000"} />
+          <button
+            className="btn btn-md btn-primary ms-1 px-4"
+            onClick={handlePullrequest}
+          >
+            Create Pull Request
+          </button>
+        </>
+      )
+    );
   }
 
   async function handlePullrequest() {
     //todo need logic
-    console.log('Construction...')
+    console.log("Construction...");
   }
 
   return (
@@ -91,23 +92,16 @@ export default function PageActions({
                   <a className="btn btn-md btn-opac mx-1">View on github</a>
                 </Link>
               )}
-              {renderStartworking()}
               {renderRedeem()}
               {state.toLowerCase() === "ready" && (
-                <CreateProposal issueId={issueId} />
+                <CreateProposal issueId={issueId} amountTotal={"1000"} />
               )}
-              {handleProposeDestribution()}
+              {renderProposeDestribution()}
               {state.toLowerCase() === "pull request" && (
                 <button className="btn btn-md btn-primary mx-1 px-4">
                   Dispute
                 </button>
               )}
-              <button
-                className="btn btn-md btn-primary mx-1 px-4"
-                onClick={handlePullrequest}
-              >
-                Create Pull Request
-              </button>
 
               {/*<OpenIssue />*/}
             </div>
