@@ -3,7 +3,7 @@ import Modal from "./modal";
 import ReactSelect from "./react-select";
 import CreateProposalDistributionItem from "./create-proposal-distribution-item";
 import sumObj from "helpers/sumObj";
-import BeproService from "../services/bepro";
+import {BeproService} from "../services/bepro-service";
 
 const options = [
   "Pull Request #32 by @asantos",

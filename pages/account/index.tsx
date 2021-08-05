@@ -1,15 +1,16 @@
 import { GetStaticProps } from "next";
 import React, {useContext, useEffect, useState} from 'react';
 import Link from "next/link";
-import IssueListItem, { IIssue } from "components/issue-list-item";
+import IssueListItem from "components/issue-list-item";
 import GithubMicroService from "services/github-microservice";
 import Account from "components/account";
 import {ApplicationContext} from '../../contexts/application';
+import {IssueData} from '../../interfaces/issue-data';
 
 export default function MyIssues() {
 
   const {dispatch, state: {myIssues, beproInit, metaMaskWallet}} = useContext(ApplicationContext)
-  const [issues, setIssues] = useState<IIssue[]>([]);
+  const [issues, setIssues] = useState<IssueData[]>([]);
 
   let issueChild;
 

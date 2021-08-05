@@ -1,12 +1,13 @@
 import { GetStaticProps } from "next";
 import React from "react";
-import IssueListItem, { IIssue } from "../components/issue-list-item";
+import IssueListItem from "../components/issue-list-item";
+import {IssueData} from '../interfaces/issue-data';
 
 export default function ListIssues({
   listIssues = [],
   className = "col-md-10",
 }: {
-  listIssues: IIssue[];
+  listIssues: IssueData[];
   className?: string;
 }): JSX.Element {
   return (

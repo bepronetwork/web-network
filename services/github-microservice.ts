@@ -10,7 +10,8 @@ interface User {
   updatedAt: string;
 }
 
-const client = axios.create({baseURL: API})
+const client = axios.create({baseURL: API});
+
 export default class GithubMicroService {
 
   static async createIssue(payload) {
@@ -71,7 +72,7 @@ export default class GithubMicroService {
   static async createPullRequestIssue(issueId: string | string[], payload) {
     await client.post(`/issues/${issueId}/pullrequest`, payload);
   }
-  
+
   static async startWorkingIssue(issueId: string | string[], payload) {
     await client.post(`developers/working/${issueId}`, payload);
   }
