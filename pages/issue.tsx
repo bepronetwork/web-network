@@ -6,18 +6,18 @@ import IssueHero from "../components/issue-hero";
 import IssueDraftProgress from "../components/issue-draft-progress";
 import PageActions from "../components/page-actions";
 import IssueProposals from "../components/issue-proposals";
-import { IIssue } from "../components/issue-list-item";
 import { useRouter } from "next/router";
 import {BeproService} from "../services/bepro-service";
 import GithubMicroService from "../services/github-microservice";
 import {ApplicationContext} from '../contexts/application';
+import {IssueData} from '../interfaces/issue-data';
 
 export default function PageIssue() {
   const router = useRouter();
   const { id } = router.query;
   const {state: {currentAddress}} = useContext(ApplicationContext)
 
-  const [issue, setIssue] = useState<IIssue>();
+  const [issue, setIssue] = useState<IssueData>();
   const [networkIssue, setNetworkIssue] = useState<any>();
   const [isIssueinDraft, setIsIssueinDraft] = useState(true);
   const [commentsIssue, setCommentsIssue] = useState();
