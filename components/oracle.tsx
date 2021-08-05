@@ -13,11 +13,7 @@ export default function Oracle({
 }) {
   return (
     <div>
-      <PageHero
-        title="Approve issues"
-        numIssuesInProgress={10}
-        numIssuesClosed={12}
-        numBeprosOnNetwork={120000} />
+      <PageHero title="Approve issues" />
       <div className="container">
         <div className="row">
           <div className="d-flex justify-content-center mb-3">
