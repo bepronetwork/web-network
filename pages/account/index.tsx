@@ -17,7 +17,7 @@ export default function MyIssues() {
     if (!beproInit || !myIssues.length)
       return;
 
-    GithubMicroService.getIssues(myIssues).then(setIssues)
+    GithubMicroService.getIssues().then(setIssues)
   }
 
   useEffect(getIssueList, [beproInit, myIssues])

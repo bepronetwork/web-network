@@ -1,6 +1,6 @@
 import {GetStaticProps} from 'next';
 import React, {useContext, useEffect, useState} from 'react';
-import {IIssue} from '../components/issue-list-item';
+import {IssueData} from '../interfaces/issue-data';
 import ListIssues from '../components/list-issues';
 import PageHero from '../components/page-hero';
 import GithubMicroService from '../services/github-microservice';
@@ -10,7 +10,7 @@ import {changeLoadState} from '../contexts/reducers/change-load-state';
 
 export default function PageCouncil() {
   const {dispatch} = useContext(ApplicationContext);
-  const [issues, setIssues] = useState<IIssue[]>();
+  const [issues, setIssues] = useState<IssueData[]>();
 
   function getIssues() {
     dispatch(changeLoadState(true))
@@ -31,10 +31,7 @@ export default function PageCouncil() {
 
   return (
     <div>
-      <PageHero title="Ready to propose"
-                numIssuesInProgress={10}
-                numIssuesClosed={12}
-                numBeprosOnNetwork={120000} />
+      <PageHero title="Ready to propose" />
       <div className="container">
         <div className="row justify-content-center">
           <ListIssues listIssues={issues}/>

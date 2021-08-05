@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { formatDate } from '../helpers/formatDate';
 import IssueAvatars from './issue-avatars';
+import {IssueData} from '../interfaces/issue-data';
 
 export interface developer {
     id?: number,
@@ -12,23 +13,8 @@ export interface developer {
     type?: string,
 }
 
-export interface IIssue {
-    body: string,
-    createdAt: Date,
-    developers: developer[],
-    dueDate?: string,
-    githubId: string,
-    issueId: string,
-    creatorGithub?: string,
-    creatorAddress?: string,
-    isIssueinDraft?: boolean,
-    amount?: number,
-    url?: string,
-    numberOfComments: number,
-    state: string,
-    title: string,
-}
-export default function IssueListItem({issue = null}:{issue?: IIssue}) {
+
+export default function IssueListItem({issue = null}:{issue?: IssueData}) {
  const router = useRouter()
    function handleColorState (state: string) {
     switch(state.toLowerCase()) {
@@ -42,7 +28,7 @@ export default function IssueListItem({issue = null}:{issue?: IIssue}) {
         return "green"
      }
      default: {
-        return "blue" 
+        return "blue"
      }
     }
    }
@@ -57,10 +43,10 @@ export default function IssueListItem({issue = null}:{issue?: IIssue}) {
                 <div className="row align-center">
                     <div className="col-md-10 mb-3 mb-md-0">
                         <h4 className="h4 text-truncate">
-                            <span className="trans me-1">#{issue?.githubId}</span>  
-                            {issue?.title.length > 61 ? 
-                            issue?.title.substring(0,61)+"..." 
-                            : 
+                            <span className="trans me-1">#{issue?.githubId}</span>
+                            {issue?.title.length > 61 ?
+                            issue?.title.substring(0,61)+"..."
+                            :
                             issue?.title
                             }
                         </h4>
