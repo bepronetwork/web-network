@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {IssueData} from '../interfaces/issue-data';
+import { API } from '../env';
 
 interface User {
   githubHandle: string;
@@ -9,7 +10,7 @@ interface User {
   updatedAt: string;
 }
 
-const client = axios.create({baseURL: process.env.API_HOST || 'http://localhost:3005'})
+const client = axios.create({baseURL: API})
 export default class GithubMicroService {
 
   static async createIssue(payload) {

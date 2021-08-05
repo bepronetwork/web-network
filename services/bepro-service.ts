@@ -1,4 +1,5 @@
 import {Application, Network, ERC20Contract} from 'bepro-js';
+import { CONTRACT_ADDRESS, SETTLER_ADDRESS, TRANSACTION_ADDRESS, WEB3_CONNECTION } from '../env';
 
 class BeproFacet {
   private _bepro: Application;
@@ -17,9 +18,10 @@ class BeproFacet {
   get address(): string { return this._address; }
 
   constructor(
-      public readonly web3Connection = `https://kovan.infura.io/v3/811fe4fa5c4b41cb9b92f9656aaeaa3b`,
-      public readonly contractAddress = `0xDf956E90a6E1c2BE14FB0c694389a0071EB6Eb91`,
-      public readonly settlerAddress = `0x7a7748bd6f9bac76c2f3fcb29723227e3376cbb2`) {
+      public readonly web3Connection = WEB3_CONNECTION,
+      public readonly contractAddress = CONTRACT_ADDRESS,
+      public readonly settlerAddress = SETTLER_ADDRESS,
+      public readonly transactionAddress = TRANSACTION_ADDRESS, ) {
 
     const opt = {opt: {web3Connection}};
     this._bepro = new Application(opt);
@@ -73,6 +75,10 @@ class BeproFacet {
       return this.network.getBEPROStaked();
 
     throw new Error(`Wrong kind, must be eth|bepro|staked`);
+  }
+
+  public async getAddress() {
+    return await this._bepro.getAddress();
   }
 }
 
