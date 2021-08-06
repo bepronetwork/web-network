@@ -49,34 +49,15 @@ const options_time = [
 export default function PageDevelopers() {
   const {dispatch, state: {loading}} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
-  const [filterStateIssues, setfilterStateIssues] = useState({
-    state: "",
-    issues: [],
-  });
+  const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
 
-
-  function handleChangeFilterIssue(params: { value: string; label: string; }) {
-    if (params.value === "all") {
-      setfilterStateIssues({
-        state: params.value,
-        issues,
-      });
-    } else {
-      setfilterStateIssues({
-        state: params.value,
-        issues: issues.filter(
-          (obj: IssueData) => obj.state.toLowerCase() === params.value
-        ),
-      });
-    }
+  function handleChangeFilterByState(filter: Filter) {
+    setFilterByState(filter);
   }
 
   function updateIssuesList(issues: IssueData[]) {
     console.log(`got issues`, issues);
     setIssues(issues);
-    if (filterStateIssues.issues.length === 0) {
-      setfilterStateIssues({ state: "all", issues });
-    }
   }
 
   function getIssues() {
