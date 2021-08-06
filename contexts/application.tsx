@@ -34,6 +34,11 @@ const defaultState: GlobalState = {
       tokensLocked: ``
     },
     myIssues: [],
+    balance: {
+      eth: 0,
+      staked: 0,
+      bepro: 0,
+    }
   },
   dispatch: () => undefined
 };
@@ -45,6 +50,7 @@ export default function ApplicationContextProvider({children}) {
   const [session,] = useSession();
 
   function onMetaMaskChange() {
+    console.log(`onMetaMaskChange`, state.currentAddress, BeproService.address, state.currentAddress === BeproService.address)
     if (!state.metaMaskWallet || state.currentAddress === BeproService.address)
       return;
 
@@ -61,7 +67,6 @@ export default function ApplicationContextProvider({children}) {
   }
 
   function updateBeproLogin(newAddress) {
-    if (state.metaMaskWallet)
       BeproService.login(true)
                   .then(_ => { dispatch(changeCurrentAddress(newAddress)) })
                   .then(() => { onMetaMaskChange() });

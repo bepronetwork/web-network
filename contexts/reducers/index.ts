@@ -7,6 +7,7 @@ import {ChangeMyIssuesState} from './change-my-issues';
 import {ChangeOraclesState} from './change-oracles';
 import {ChangeStakedState} from './change-staked-amount';
 import {ChangeCurrentAddress} from './change-current-address';
+import {ChangeBalance} from './change-balance';
 
 export default function LoadApplicationReducers() {
   [
@@ -18,5 +19,6 @@ export default function LoadApplicationReducers() {
     ChangeOraclesState,
     ChangeStakedState,
     ChangeCurrentAddress,
+    ChangeBalance,
   ].forEach(addReducer);
 }

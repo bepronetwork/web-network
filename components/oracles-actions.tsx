@@ -9,11 +9,12 @@ import {changeLoadState} from '../contexts/reducers/change-load-state';
 import ApproveButton from './approve-button';
 import TransferOraclesButton from './transfer-oracles-button';
 import NetworkTxButton from './network-tx-button';
+import {changeBalance} from '../contexts/reducers/change-balance';
 
 const actions: string[] = ["Lock", "Unlock"];
 
 function OraclesActions(): JSX.Element {
-  const {state: {beproInit, metaMaskWallet}, dispatch} = useContext(ApplicationContext);
+  const {state: {beproInit, metaMaskWallet, currentAddress, balance}, dispatch} = useContext(ApplicationContext);
 
   const [show, setShow] = useState<boolean>(false);
   const [action, setAction] = useState<string>(actions[0]);
@@ -48,27 +49,45 @@ function OraclesActions(): JSX.Element {
     },
   }[action];
 
-  function updateWalletAddress() {
-    if (!beproInit || !metaMaskWallet)
-      return;
-
-    setWalletAddress(BeproService.address);
-  }
-
-  function handleChangeToken(params: NumberFormatValues) {
-    setTokenAmount(params.floatValue);
+  function updateErrorsAndApproval(bool: boolean) {
+    setIsApproved(bool);
+    setError(
+      !bool ? "Settler token not approved. Check it and try again." : "",
+    );
   }
 
   function handleCheck(isChecked: boolean) {
     if (!tokenAmount) {
       return setError("$BEPRO amount needs to be higher than 0.");
     }
-
     setShow(isChecked);
-    setIsApproved(isChecked);
-    setError(
-      !isChecked ? "Settler token not approved. Check it and try again." : "",
-    );
+    updateErrorsAndApproval(isChecked)
+  }
+
+  function updateValues() {
+    console.log(`updating values`)
+    BeproService.getBalance('bepro').then(bepro => dispatch(changeBalance({bepro})));
+    BeproService.getBalance('eth').then(eth => dispatch(changeBalance({eth})));
+    BeproService.getBalance('staked').then(staked => dispatch(changeBalance({staked})));
+
+    BeproService.network
+                .isApprovedSettlerToken({address: BeproService.address, amount: balance.bepro})
+                .then(updateErrorsAndApproval);
+  }
+
+  function updateWalletAddress() {
+    if (!beproInit || !metaMaskWallet)
+      return;
+
+    setWalletAddress(BeproService.address);
+    updateValues();
+  }
+
+  function handleChangeToken(params: NumberFormatValues) {
+    if (params.floatValue > balance.bepro)
+      return setError(`Amount is greater than your BEPRO amount`)
+
+    setTokenAmount(params.floatValue);
   }
 
   function handleConfirm() {
@@ -79,6 +98,7 @@ function OraclesActions(): JSX.Element {
     setTokenAmount(0);
     setIsApproved(false);
     setShow(false);
+    updateValues();
   }
 
   function approveSettlerToken() {
@@ -108,11 +128,10 @@ function OraclesActions(): JSX.Element {
   }
 
   useEffect(() => {
-    setIsApproved(false);
     setError("");
   }, [tokenAmount, action]);
 
-  useEffect(updateWalletAddress, [beproInit, metaMaskWallet])
+  useEffect(updateWalletAddress, [beproInit, metaMaskWallet, currentAddress])
 
   return (
     <>
@@ -123,16 +142,17 @@ function OraclesActions(): JSX.Element {
           <p className="p text-white">{renderInfo.description}</p>
 
           <InputNumber
-            disabled={isApproved || !metaMaskWallet}
+            disabled={!isApproved || !metaMaskWallet}
             label="$BEPRO Amount"
             symbol="$BEPRO"
+            max={balance.bepro}
             error={error}
             helperText={error}
             value={tokenAmount}
             onValueChange={handleChangeToken}
             thousandSeparator />
 
-          <ApproveButton disabled={isApproved || !tokenAmount || !metaMaskWallet} onClick={approveSettlerToken} />
+          { action === 'Lock' && <ApproveButton disabled={isApproved || !tokenAmount || !metaMaskWallet || !!error} onClick={approveSettlerToken} /> || ``}
           <TransferOraclesButton buttonLabel={renderInfo.label} disabled={!isApproved || !metaMaskWallet} onClick={checkLockedAmount} />
 
           <NetworkTxButton txMethod={action.toLowerCase()}
