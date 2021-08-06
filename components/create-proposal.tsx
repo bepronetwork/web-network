@@ -60,12 +60,10 @@ export default function NewProposal({
 
     const payload = {
       issueID: issueId,
-      prAddresses: [participants.map((items) => items.address)],
-      prAmounts: [
-        participants.map(
-          (items) => (amountTotal * distrib[items.githubHandle]) / 100
-        ),
-      ],
+      prAddresses: participants.map((items) => items.address),
+      prAmounts: participants.map(
+        (items) => (amountTotal * distrib[items.githubHandle]) / 100
+      ),
     };
     await BeproService.network
       .proposeIssueMerge(payload)
