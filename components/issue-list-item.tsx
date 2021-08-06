@@ -4,18 +4,12 @@ import React, { useEffect, useState } from 'react';
 import { formatDate } from '../helpers/formatDate';
 import IssueAvatars from './issue-avatars';
 import {IssueData} from '../interfaces/issue-data';
-
-export interface developer {
-    id?: number,
-    login?: string,
-    avatar_url?: string,
-    url?: string,
-    type?: string,
-}
-
+import { BeproService } from '../services/bepro-service';
 
 export default function IssueListItem({issue = null}:{issue?: IssueData}) {
- const router = useRouter()
+    const router = useRouter()
+    const [amount, setAmount] = useState<string>()
+
    function handleColorState (state: string) {
     switch(state.toLowerCase()) {
      case "draft": {
@@ -32,6 +26,15 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
      }
     }
    }
+
+   useEffect(() => {
+    async function getIssueBeprosStaked(issueId: string){
+        await BeproService.network.getIssueById({issueId})
+            .then((issue) => setAmount(issue.tokensStaked))
+            .catch((err)  => console.log('err ->', err))
+    }
+     getIssueBeprosStaked(issue?.issueId)
+   },[issue])
 
     return (
             <div className="bg-shadow list-item rounded p-4 mb-3" onClick={() => {
@@ -59,7 +62,7 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
                         </div>
                     </div>
                     <div className="col-md-2 my-auto text-center">
-                        <span className="caption trans">{issue?.amount > 0 ? issue?.amount : "MISSING"} $BEPRO</span>
+                        <span className="caption trans">{amount == "0" ? "MISSING" : amount } $BEPRO</span>
                         {(issue?.developers.length > 0) && <IssueAvatars users={issue?.developers}></IssueAvatars>}
                     </div>
                 </div>
