@@ -3,11 +3,12 @@ import React, { useContext, useEffect, useState } from "react";
 import IssueAvatars from "./issue-avatars";
 import CreateProposal from "./create-proposal";
 import Link from "next/link";
-import {BeproService} from "../services/bepro-service";
+import { BeproService } from "../services/bepro-service";
 import NewProposal from "./create-proposal";
 
 import { ApplicationContext } from "../contexts/application";
 import { changeLoadState } from "../contexts/reducers/change-load-state";
+import GithubMicroService from "../services/github-microservice";
 
 export default function PageActions({
   issueId,
@@ -18,8 +19,13 @@ export default function PageActions({
   addressNetwork,
   isIssueinDraft,
   state,
+  pullRequests,
+  amountIssue,
 }) {
-  const { dispatch } = useContext(ApplicationContext);
+  const {
+    dispatch,
+    state: { githubHandle },
+  } = useContext(ApplicationContext);
 
   function handleAvatar() {
     if (developers?.length > 0) {
@@ -57,16 +63,28 @@ export default function PageActions({
 
   function renderProposeDestribution() {
     return (
-      !finalized && (
+      !finalized &&
+      pullRequests?.length > 0 && (
         <>
-          <NewProposal issueId={issueId} amountTotal={"1000"} />
-          <button
-            className="btn btn-md btn-primary ms-1 px-4"
-            onClick={handlePullrequest}
-          >
-            Create Pull Request
-          </button>
+          <NewProposal
+            issueId={issueId}
+            amountTotal={amountIssue}
+            pullRequests={pullRequests}
+          />
         </>
+      )
+    );
+  }
+
+  function renderPullrequest() {
+    return (
+      !finalized && (
+        <button
+          className="btn btn-md btn-primary ms-1 px-4"
+          onClick={handlePullrequest}
+        >
+          Create Pull Request
+        </button>
       )
     );
   }
@@ -91,9 +109,14 @@ export default function PageActions({
               )}
               {renderRedeem()}
               {state.toLowerCase() === "ready" && (
-                <CreateProposal issueId={issueId} amountTotal={"1000"} />
+                <CreateProposal
+                  issueId={issueId}
+                  amountTotal={amountIssue}
+                  pullRequests={pullRequests}
+                />
               )}
               {renderProposeDestribution()}
+              {renderPullrequest()}
               {state.toLowerCase() === "pull request" && (
                 <button className="btn btn-md btn-primary mx-1 px-4">
                   Dispute

@@ -34,9 +34,11 @@ export default function PageIssue() {
       setUserAddress(address);
       const issue = await GithubMicroService.getIssueId(id);
       setIssue(issue);
+      console.log('microService issue ->', issue)
       const networkIssue = await BeproService.network.getIssueById({
         issueId: id,
       });
+      console.log('bepro issue ->', networkIssue)
       setNetworkIssue(networkIssue);
       setBalance(await BeproService.network.getBEPROStaked());
       const isIssueInDraft = await BeproService.network.isIssueInDraft({
@@ -48,6 +50,9 @@ export default function PageIssue() {
         issue.githubId
       );
       setCommentsIssue(comments);
+      
+      const forks = await GithubMicroService.getForks()
+      console.log('forks', forks)
     };
 
     gets();
@@ -80,6 +85,8 @@ export default function PageIssue() {
         addressNetwork={networkIssue?.cid}
         issueId={issue?.issueId}
         UrlGithub={issue?.url}
+        pullRequests={issue?.pullRequests}
+        amountIssue={networkIssue?.tokensStaked}
       />
       {networkIssue?.mergeProposalsAmount > 0 && (
         <IssueProposals
