@@ -38,7 +38,8 @@ export default function CreateProposalDistributionItem({
     <li className="d-flex align-items-center px-3 py-1 my-1 rounded-3 btn-opac">
       <img
         className="avatar circle-3 me-2 mt-1"
-        src="https://img.pizza/28/28"/>
+        src={`https://github.com/${by}.png`}
+      />
       <span className="flex-grow-1">{by}</span>
       <div className="flex-shrink-0 w-25">
         <InputNumber
