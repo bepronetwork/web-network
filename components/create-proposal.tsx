@@ -3,47 +3,48 @@ import Modal from "./modal";
 import ReactSelect from "./react-select";
 import CreateProposalDistributionItem from "./create-proposal-distribution-item";
 import sumObj from "helpers/sumObj";
-import {BeproService} from "../services/bepro-service";
+import { BeproService } from "../services/bepro-service";
+import GithubMicroService from "../services/github-microservice";
+import { pullRequest } from "interfaces/issue-data";
 
-const options = [
-  "Pull Request #32 by @asantos",
-  "Pull Request #34 by @bka",
-  "Pull Request #36 by @alisouza",
-  "Pull Request #64 by @kgb",
-  "Pull Request #69 by @alisa",
-  "Pull Request #69 by @alisa",
-];
-const distributed = [
-  {
-    handlegithub: "@ruipedro",
-    adress: "0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d",
-  },
-  {
-    handlegithub: "@moshmage",
-    adress: "0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d",
-  },
-  {
-    handlegithub: "@marcusvinicius",
-    adress: "0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d",
-  },
-];
+interface participants {
+  githubHandle: string;
+  address?: string;
+}
 
-export default function NewProposal({ issueId, amountTotal }) {
+export default function NewProposal({
+  issueId,
+  amountTotal,
+  pullRequests = [],
+}) {
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>();
   const [error, setError] = useState<string>("");
   const [show, setShow] = useState<boolean>(false);
+  const [participants, setParticipants] = useState<participants[]>([]);
 
   useEffect(() => {
     setError("");
     setAmount(sumObj(distrib));
   }, [distrib]);
+
+  useEffect(() => {
+    console.log("pullRequests", pullRequests);
+    pullRequests.length > 0 && getParticipantsPullRequest(pullRequests[0]?.id);
+  }, [pullRequests]);
+
   function handleChangeDistrib(params: { [key: string]: number }): void {
     console.log("params->", params);
     setDistrib((prevState) => ({
       ...prevState,
       ...params,
     }));
+  }
+
+  async function getParticipantsPullRequest(id: string) {
+    await GithubMicroService.getPullRequestParticipants(id)
+      .then((participantsPr) => setParticipants(participantsPr))
+      .catch((err) => console.log("err", err));
   }
 
   async function handleClickCreate(): Promise<void> {
@@ -56,25 +57,34 @@ export default function NewProposal({ issueId, amountTotal }) {
     if (amount > 100) {
       return setError("Distribution exceed 100%.");
     }
-    const propose = await BeproService.network.proposeIssueMerge({
+
+    const payload = {
       issueID: issueId,
-      prAddresses: [
-        "0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d",
-        "0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d",
-        "0x8E3c42FA292a187865b466f05d7EBbFe77f1CF5d",
-      ],
+      prAddresses: [participants.map((items) => items.address)],
       prAmounts: [
-        (amountTotal * distrib[distributed[0].handlegithub]) / 100,
-        (amountTotal * distrib[distributed[1].handlegithub]) / 100,
-        (amountTotal * distrib[distributed[2].handlegithub]) / 100,
+        participants.map(
+          (items) => (amountTotal * distrib[items.githubHandle]) / 100
+        ),
       ],
-    });
-    console.log("propsoe,", propose);
-    handleClose();
-    setDistrib({});
+    };
+    await BeproService.network
+      .proposeIssueMerge(payload)
+      .then(() => {
+        handleClose();
+        setDistrib({});
+      })
+      .catch((err) => {
+        setError(err);
+        console.log("err", err);
+      });
   }
+
   function handleClose() {
     setShow(false);
+  }
+
+  function handleChangeSelect(obj: { label: string; value: string }) {
+    getParticipantsPullRequest(obj.value);
   }
 
   return (
@@ -102,20 +112,21 @@ export default function NewProposal({ issueId, amountTotal }) {
         <p className="p-small text-50">Select a pull request </p>
         <ReactSelect
           defaultValue={{
-            value: options[0],
-            label: options[0],
+            value: pullRequests[0]?.id,
+            label: `#${pullRequests[0]?.githubId} Pull Request`,
           }}
-          options={options.map((value) => ({
-            value,
-            label: value,
+          options={pullRequests?.map((items: pullRequest) => ({
+            value: items.id,
+            label: `#${items.githubId} Pull Request`,
           }))}
+          onChange={handleChangeSelect}
         />
         <p className="p-small mt-3">Propose distribution</p>
         <ul className="mb-0">
-          {distributed.map((item) => (
+          {participants.map((item) => (
             <CreateProposalDistributionItem
-              key={item.handlegithub}
-              by={item.handlegithub}
+              key={item.githubHandle}
+              by={item.githubHandle}
               onChangeDistribution={handleChangeDistrib}
               error={error}
             />
