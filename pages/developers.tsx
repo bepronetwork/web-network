@@ -18,12 +18,8 @@ const options_issue = [
     label: "Open issues",
   },
   {
-    value: "in progress",
-    label: "In progress issues",
-  },
-  {
-    value: "ready",
-    label: "Ready issues",
+    value: "closed",
+    label: "Closed issues",
   },
   {
     value: "draft",
