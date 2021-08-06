@@ -90,11 +90,11 @@ export default class GithubMicroService {
   }
 
   static async getPullRequestParticipants(prId: string) {
-    return client.get<{githubHandle: string; address?: string}>(`/pullrequests/${prId}/participants`)
+    return client.get<{githubHandle: string; address?: string}[]>(`/pullrequests/${prId}/participants`)
                  .then(({data}) => data)
                  .catch(e => {
                    console.error(e);
-                   return {githubHandle: '', address: ''};
+                   return [{githubHandle: '', address: ''}];
                  })
   }
 
