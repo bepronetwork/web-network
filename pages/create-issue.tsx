@@ -21,7 +21,7 @@ export default function PageCreateIssue() {
   const [issueAmount, setIssueAmount] = useState<Amount>({value: '0', formattedValue: '0', floatValue: 0});
   const [balance, setBalance] = useState(0);
   const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
-  const {dispatch, state: {currentAddress}} = useContext(ApplicationContext);
+  const {dispatch, state: {currentAddress, githubHandle}} = useContext(ApplicationContext);
   const router = useRouter()
 
   const allow = async (evt) => {
@@ -46,11 +46,14 @@ export default function PageCreateIssue() {
     evt.preventDefault();
     dispatch(changeLoadState(true))
 
+    const beproAddress = BeproService.address;
     const payload = {
       title: issueTitle,
-      description: issueDescription
+      description: issueDescription,
+      amount: issueAmount.floatValue,
+      creatorAddress: beproAddress,
+      creatorGithub: githubHandle
     }
-    const beproAddress = BeproService.address;
     const contractPayload = {tokenAmount: issueAmount.floatValue, cid: beproAddress};
     console.log('pay', contractPayload)
     await BeproService.network.openIssue(contractPayload)
