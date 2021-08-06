@@ -63,20 +63,28 @@ export default function PageActions({
 
   function renderProposeDestribution() {
     return (
-      !finalized && (
+      !finalized &&
+      pullRequests?.length > 0 && (
         <>
           <NewProposal
             issueId={issueId}
             amountTotal={amountIssue}
             pullRequests={pullRequests}
           />
-          <button
-            className="btn btn-md btn-primary ms-1 px-4"
-            onClick={handlePullrequest}
-          >
-            Create Pull Request
-          </button>
         </>
+      )
+    );
+  }
+
+  function renderPullrequest() {
+    return (
+      !finalized && (
+        <button
+          className="btn btn-md btn-primary ms-1 px-4"
+          onClick={handlePullrequest}
+        >
+          Create Pull Request
+        </button>
       )
     );
   }
@@ -108,6 +116,7 @@ export default function PageActions({
                 />
               )}
               {renderProposeDestribution()}
+              {renderPullrequest()}
               {state.toLowerCase() === "pull request" && (
                 <button className="btn btn-md btn-primary mx-1 px-4">
                   Dispute
