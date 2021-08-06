@@ -8,23 +8,35 @@ import {ApplicationContext} from '../contexts/application';
 import {changeLoadState} from '../contexts/reducers/change-load-state';
 import {IssueData} from '../interfaces/issue-data';
 
-const options_issue = [
+type Filter = {
+  label: string;
+  value: string;
+  emptyState: string;
+};
+
+type FiltersByIssueState = Filter[];
+
+const filtersByIssueState: FiltersByIssueState = [
   {
-    value: "all",
     label: "All issues",
+    value: 'all',
+    emptyState: 'Issues not found'
   },
   {
-    value: "open",
-    label: "Open issues",
+    label: 'Open issues',
+    value: 'open',
+    emptyState: 'Open issues not found'
   },
   {
-    value: "closed",
-    label: "Closed issues",
+    label: 'Draft issues',
+    value: 'draft',
+    emptyState: 'Draft issues not found'
   },
   {
-    value: "draft",
-    label: "Draft issues",
-  },
+    label: 'Closed issues',
+    value: 'closed',
+    emptyState: 'Closed issues not found'
+  }
 ];
 
 const options_time = [
