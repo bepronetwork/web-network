@@ -1,7 +1,7 @@
-import NextAuth from 'next-auth'
-import Providers from 'next-auth/providers'
+import NextAuth from "next-auth";
+import Providers from "next-auth/providers";
 import GithubMicroService from "../../../services/github-microservice";
-import {BeproService} from "../../../services/bepro-service";
+import { BeproService } from "../../../services/bepro-service";
 
 export default NextAuth({
   providers: [
@@ -12,11 +12,14 @@ export default NextAuth({
     }),
   ],
   callbacks: {
-    signIn(user, account, profile) {
+    signIn(user, account, profile: { login: string }) {
       if (BeproService.address)
-        return GithubMicroService.joinAddressToHandle({githubHandle: user.name, address: BeproService.address});
+        return GithubMicroService.joinAddressToHandle({
+          githubHandle: profile.login,
+          address: BeproService.address,
+        });
 
-      return !!user?.name;
+      return !!profile?.login;
     },
-  }
-})
+  },
+});
