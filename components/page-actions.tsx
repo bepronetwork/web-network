@@ -21,6 +21,7 @@ export default function PageActions({
   state,
   pullRequests,
   amountIssue,
+  forks
 }) {
   const {
     dispatch,
@@ -102,6 +103,7 @@ export default function PageActions({
             <h4 className="h4">Details</h4>
             <div className="d-flex align-items-center">
               {handleAvatar()}
+              {forks && <span className="p-1 mx-2">+{forks.length} FORKS</span>}
               {UrlGithub && (
                 <Link href={UrlGithub}>
                   <a className="btn btn-md btn-opac mx-1">View on github</a>
@@ -122,8 +124,6 @@ export default function PageActions({
                   Dispute
                 </button>
               )}
-
-              {/*<OpenIssue />*/}
             </div>
           </div>
         </div>

@@ -23,6 +23,7 @@ export default function PageIssue() {
   const [commentsIssue, setCommentsIssue] = useState();
   const [userAddress, setUserAddress] = useState<any>();
   const [balance, setBalance] = useState();
+  const [forks, setForks] = useState();
 
   useEffect(() => {
     if (!currentAddress)
@@ -52,7 +53,7 @@ export default function PageIssue() {
       setCommentsIssue(comments);
       
       const forks = await GithubMicroService.getForks()
-      console.log('forks', forks)
+      setForks(forks)
     };
 
     gets();
@@ -87,6 +88,7 @@ export default function PageIssue() {
         UrlGithub={issue?.url}
         pullRequests={issue?.pullRequests}
         amountIssue={networkIssue?.tokensStaked}
+        forks={forks}
       />
       {networkIssue?.mergeProposalsAmount > 0 && (
         <IssueProposals
