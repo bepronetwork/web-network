@@ -7,4 +7,5 @@ export enum ReduceActionName {
   Oracles = `Oracles`,
   Staked = `Staked`,
   ChangeAddress = `ChangeAddress`,
+  ChangeBalance = `ChangeBalance`,
 }

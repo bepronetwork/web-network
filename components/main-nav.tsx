@@ -9,7 +9,7 @@ import {ApplicationContext} from '../contexts/application';
 import {changeStakedState} from '../contexts/reducers/change-staked-amount';
 
 export default function MainNav() {
-  const {dispatch, state: {currentAddress}} = useContext(ApplicationContext);
+  const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
 
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [address, setAddress] = useState<string>(null);
@@ -34,6 +34,12 @@ export default function MainNav() {
     setAddress(`${address.substr(0,6)}...${address.substr(-4)}`);
   }
 
+  function updateBalances() {
+    setBeproBalance(balance.bepro);
+    setEthBalance(balance.eth);
+    changeStakedState(balance.staked);
+  }
+
   function updateState() {
     if (!currentAddress)
       return;
@@ -53,6 +59,7 @@ export default function MainNav() {
   }
 
   useEffect(updateState, [currentAddress]);
+  useEffect(updateBalances, [balance])
 
   return (
     <div className="main-nav d-flex align-items-center justify-content-between">

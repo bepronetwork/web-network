@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState} from 'react';
+import {useContext, useEffect, useReducer, useState} from 'react';
 import {BeproService} from "services/bepro-service";
 import {changeLoadState} from '../contexts/reducers/change-load-state';
 import {ApplicationContext} from '../contexts/application';
@@ -7,15 +7,17 @@ import {changeOraclesState} from '../contexts/reducers/change-oracles';
 import GithubHandle from './github-handle';
 
 export default function AccountHero() {
-  const {dispatch, state: {beproInit, oracles, metaMaskWallet, currentAddress}} = useContext(ApplicationContext);
+  const {dispatch, state: {beproInit, oracles, metaMaskWallet, currentAddress, balance}} = useContext(ApplicationContext);
 
   const [myIssueCount, setMyIssueCount] = useState<number>()
+  const [sumOfOracles, setSumOfOracles] = useState(0);
+  const [delegatedOracles, setDelegatedOracles] = useState(0);
 
   function loadBeproNetworkInformation() {
     if (!beproInit || !metaMaskWallet || !currentAddress)
       return;
-    const address = BeproService.address;
 
+    const address = currentAddress;
     dispatch(changeLoadState(true));
 
     BeproService.network
@@ -25,7 +27,9 @@ export default function AccountHero() {
                   dispatch(changeMyIssuesState(issuesList));
                 })
                 .then(_ => BeproService.network.getOraclesSummary({address}))
-                .then(oracles => dispatch(changeOraclesState(oracles)))
+                .then(oracles => {
+                  dispatch(changeOraclesState(oracles));
+                })
                 .catch(e => {
                   console.error(e);
                 })
@@ -34,6 +38,22 @@ export default function AccountHero() {
   }
 
   useEffect(loadBeproNetworkInformation, [beproInit, metaMaskWallet, currentAddress])
+  useEffect(() => {
+    if (!currentAddress)
+      return;
+
+    setSumOfOracles(
+      oracles.amounts
+             .filter(address => address !== currentAddress)
+             .reduce((prev, current) => prev += +current, 0) + +oracles.oraclesDelegatedByOthers
+    )
+
+    setDelegatedOracles(
+      oracles.amounts
+             .filter(address => address === currentAddress)
+             .reduce((prev, current) => prev += +current, 0)
+    )
+  }, [balance.staked, oracles])
 
   return (
     <div className="banner bg-bepro-blue mb-4">
@@ -61,7 +81,7 @@ export default function AccountHero() {
                 <div className="col-md-4">
                   <div className="top-border">
                     <h4 className="h4 mb-0">
-                      {oracles.oraclesDelegatedByOthers}
+                      {delegatedOracles}
                     </h4>
                     <span className="p-small">Delegated oracles</span>
                   </div>

@@ -4,9 +4,11 @@ import InputNumber from "./input-number";
 import OraclesBoxHeader from "./oracles-box-header";
 import {ApplicationContext} from '../contexts/application';
 import NetworkTxButton from './network-tx-button';
+import {changeBalance} from '../contexts/reducers/change-balance';
+import {BeproService} from '../services/bepro-service';
 
 function OraclesDelegate(): JSX.Element {
-  const {state: {oracles, beproInit, metaMaskWallet}} = useContext(ApplicationContext);
+  const {dispatch, state: {oracles, beproInit, metaMaskWallet, balance: {bepro: beproBalance, staked}}} = useContext(ApplicationContext);
   const [tokenAmount, setTokenAmount] = useState<number>(0);
   const [delegatedTo, setDelegatedTo] = useState<string>("");
   const [delegatedAmount, setDelegatedAmount] = useState(0);
@@ -32,13 +34,14 @@ function OraclesDelegate(): JSX.Element {
 
   function handleTransition() {
     setError("");
+    BeproService.network.getBEPROStaked().then(staked => dispatch(changeBalance({staked})));
   }
 
   function updateAmounts() {
     if (!beproInit || !metaMaskWallet)
       return;
 
-    console.log(oracles.amounts)
+    console.log(`updating delegated amount`, oracles);
 
     setDelegatedAmount(
       oracles.amounts.reduce((total, current) => total += +current, 0)
@@ -46,7 +49,7 @@ function OraclesDelegate(): JSX.Element {
 
   }
 
-  useEffect(updateAmounts, [beproInit, metaMaskWallet, oracles]);
+  useEffect(updateAmounts, [beproInit, metaMaskWallet, oracles, beproBalance, staked]);
 
   return (
     <div className="col-md-5">
