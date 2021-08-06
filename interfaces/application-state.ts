@@ -1,5 +1,6 @@
 import {LoadingState} from './loading-state';
 import {OraclesState} from './oracles-state';
+import {BalanceState} from './balance-state';
 
 export interface ApplicationState {
   githubHandle: string;
@@ -10,4 +11,5 @@ export interface ApplicationState {
   oracles: OraclesState;
   myIssues: number[];
   currentAddress: string;
+  balance: BalanceState;
 }

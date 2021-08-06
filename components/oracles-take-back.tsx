@@ -4,12 +4,13 @@ import {useContext, useEffect, useState} from 'react';
 import OraclesTakeBackItem from "./oracles-take-back-item";
 import {ApplicationContext} from '../contexts/application';
 import {BeproService} from '../services/bepro-service';
+import {changeOraclesState} from '../contexts/reducers/change-oracles';
 
 type Item = { address: string; amount: string };
 
 export default function OraclesTakeBack(): JSX.Element {
 
-  const {dispatch, state: {oracles, metaMaskWallet, beproInit}} = useContext(ApplicationContext)
+  const {dispatch, state: {oracles, metaMaskWallet, beproInit, balance, currentAddress}} = useContext(ApplicationContext)
   const [items, setItems] = useState<Item[]>([]);
   const [delegatedAmount, setDelegatedAmount] = useState(0);
 
@@ -22,17 +23,26 @@ export default function OraclesTakeBack(): JSX.Element {
       return {amount, address}
     }
 
-    function filterAmounts(amount, index) {
-      return oracles.addresses[index] !== BeproService.address;
+    function filterAddresses(amount, index) {
+      return oracles.addresses[index] !== currentAddress;
     }
 
-    const issues = oracles.amounts.filter(filterAmounts).map(mapAmount);
+    const issues = oracles.amounts.filter(filterAddresses).map(mapAmount);
 
     setItems(issues);
     setDelegatedAmount(issues.reduce((total, current) => total += +current.amount, 0))
   }
 
-  useEffect(setMappedSummaryItems, [beproInit, metaMaskWallet, oracles]);
+  useEffect(setMappedSummaryItems, [beproInit, metaMaskWallet, oracles, currentAddress]);
+
+  useEffect(() => {
+    if (!currentAddress)
+      return;
+
+    BeproService.network.getOraclesSummary({address: currentAddress})
+                .then(oracles => dispatch(changeOraclesState(oracles)));
+
+  }, [balance.staked])
 
   return (
     <div className="col-md-10">
