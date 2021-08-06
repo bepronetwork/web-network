@@ -75,6 +75,18 @@ export default function PageDevelopers() {
     getIssues();
   }, []);
 
+  const isDraftIssue = (issue: IssueData) => issue.state === 'draft';
+  const isClosedIssue = (issue: IssueData) => issue.state === 'closed';
+  const isOpenIssue = (issue: IssueData) => !isDraftIssue(issue) && !isClosedIssue(issue);
+
+  const issuesFilteredByState = issues.filter(issue => {
+    if (filterByState.value === 'all') return true;
+    if (filterByState.value === 'open') return isOpenIssue(issue);
+    if (filterByState.value === 'draft') return isDraftIssue(issue);
+    if (filterByState.value === 'closed') return isClosedIssue(issue);
+    }
+  );
+
   return (<>
     <div>
       <PageHero title="Find issue to work"/>
