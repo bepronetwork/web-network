@@ -60,19 +60,20 @@ export default function PageDevelopers() {
     setIssues(issues);
   }
 
-  function getIssues() {
-    dispatch(changeLoadState(true))
-    GithubMicroService.getIssues()
-                      .then(updateIssuesList)
-                      .catch((error) => {
-                        console.log('Error', error)
-                      })
-                      .finally(() => {
-                        dispatch(changeLoadState(false))
-                      });
-  }
-
-  useEffect(getIssues, []);
+  useEffect(() => {
+    async function getIssues() {
+      dispatch(changeLoadState(true))
+      GithubMicroService.getIssues()
+                        .then(updateIssuesList)
+                        .catch((error) => {
+                          console.log('Error', error)
+                        })
+                        .finally(() => {
+                          dispatch(changeLoadState(false))
+                        });
+    }
+    getIssues();
+  }, []);
 
   return (<>
     <div>
