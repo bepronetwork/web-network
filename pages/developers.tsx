@@ -96,11 +96,11 @@ export default function PageDevelopers() {
             <div className="d-flex justify-content-between mb-4">
               <div className="col-md-3">
                 <ReactSelect
-                  id="filterIssue"
+                  id="filterByIssueState"
                   className="react-select-filterIssues"
-                  defaultValue={options_issue[0]}
-                  options={options_issue}
-                  onChange={handleChangeFilterIssue}
+                  defaultValue={filtersByIssueState[0]}
+                  options={filtersByIssueState}
+                  onChange={handleChangeFilterByState}
                 />
               </div>
               <div className="col-md-3">
@@ -114,14 +114,11 @@ export default function PageDevelopers() {
               </div>
             </div>
           </div>
-          <ListIssues listIssues={filterStateIssues.issues} />
-          {filterStateIssues.issues.length === 0 && !loading ? (
+          <ListIssues listIssues={issuesFilteredByState} />
+          {issuesFilteredByState.length === 0 && !loading.isLoading ? (
             <div className="col-md-10">
               <h4>
-                {filterStateIssues.state !== "all"
-                  ? filterStateIssues.state
-                  : null}{" "}
-                issues not found
+                {`${filterByState.emptyState}`}
               </h4>
             </div>
           ) : null}
