@@ -31,7 +31,7 @@ export default function MyIssues() {
                                  <div className="col-md-10" key={issue.issueId}><IssueListItem issue={issue} /></div>)
 
   return (
-    <Account>
+    <Account buttonPrimaryActive={true}>
       <div className="container">
         <div className="row justify-content-center">
           {issueChild}
