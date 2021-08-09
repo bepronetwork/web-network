@@ -6,7 +6,7 @@ import Account from "components/account";
 
 export default function MyOracles() {
   return (
-    <Account>
+    <Account buttonPrimaryActive={false}>
       <div className="container">
         <div className="row justify-content-center mb-5 align-content-stretch">
           <OraclesActions />
