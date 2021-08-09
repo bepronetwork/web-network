@@ -83,6 +83,7 @@ export default function PageActions({
         <button
           className="btn btn-md btn-primary ms-1 px-4"
           onClick={handlePullrequest}
+          disabled={!githubHandle}
         >
           Create Pull Request
         </button>
