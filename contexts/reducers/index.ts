@@ -8,6 +8,8 @@ import {ChangeOraclesState} from './change-oracles';
 import {ChangeStakedState} from './change-staked-amount';
 import {ChangeCurrentAddress} from './change-current-address';
 import {ChangeBalance} from './change-balance';
+import {AddToast} from './add-toast';
+import {RemoveToast} from './remove-toast';
 
 export default function LoadApplicationReducers() {
   [
@@ -20,5 +22,7 @@ export default function LoadApplicationReducers() {
     ChangeStakedState,
     ChangeCurrentAddress,
     ChangeBalance,
+    AddToast,
+    RemoveToast,
   ].forEach(addReducer);
 }
