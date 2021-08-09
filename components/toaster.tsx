@@ -1,7 +1,8 @@
-import {useContext, useEffect, useState} from 'react';
+import {useContext} from 'react';
 import {ApplicationContext} from '../contexts/application';
 import {Toast} from 'react-bootstrap';
 import {removeToast} from '../contexts/reducers/remove-toast';
+import {ReduceActionName} from '../interfaces/enums/reduce-action-names';
 
 export default function Toaster() {
   const {state: {toaster}, dispatch} = useContext(ApplicationContext);
