@@ -1,7 +1,20 @@
+import Avatar from "components/avatar";
 import { GetStaticProps } from "next";
 import { formatDate } from "../helpers/formatDate";
 
 export default function IssueHero({ issue, state, amount }) {
+  function renderCreator() {
+    return (
+      issue?.creatorGithub && (
+        <>
+          by
+          <Avatar className="me-2" userLogin={issue.creatorGithub} />
+          {issue.creatorGithub}
+        </>
+      )
+    );
+  }
+
   return (
     <div className="banner bg-bepro-blue mb-4">
       <div className="container">
@@ -23,9 +36,13 @@ export default function IssueHero({ issue, state, amount }) {
                         {issue && formatDate(issue?.createdAt)}
                       </span>
                       <span className="p-small trans mr-3 mt-1">
-                        by {issue?.creatorGithub}
+                        {renderCreator()}
                       </span>
-                      {issue?.dueDate && <span className="p-small text-warning mr-3 mt-1">{issue?.dueDate}</span>}
+                      {issue?.dueDate && (
+                        <span className="p-small text-warning mr-3 mt-1">
+                          {issue?.dueDate}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
