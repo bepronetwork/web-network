@@ -35,23 +35,19 @@ export default function PageIssue() {
       setUserAddress(address);
       const issue = await GithubMicroService.getIssueId(id);
       setIssue(issue);
-      console.log('microService issue ->', issue)
       const networkIssue = await BeproService.network.getIssueById({
         issueId: id,
       });
-      console.log('bepro issue ->', networkIssue)
       setNetworkIssue(networkIssue);
       setBalance(await BeproService.network.getBEPROStaked());
       const isIssueInDraft = await BeproService.network.isIssueInDraft({
         issueId: id,
       });
       setIsIssueinDraft(isIssueInDraft);
-      console.log("issue in draft", isIssueInDraft);
       const comments = await GithubMicroService.getCommentsIssue(
         issue.githubId
       );
       setCommentsIssue(comments);
-      
       const forks = await GithubMicroService.getForks()
       setForks(forks)
     };
@@ -100,7 +96,6 @@ export default function PageIssue() {
 
       <IssueDescription description={issue?.body}></IssueDescription>
       <IssueComments
-        url={issue?.url || "/"}
         comments={commentsIssue}
       ></IssueComments>
     </>
