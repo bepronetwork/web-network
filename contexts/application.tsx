@@ -76,8 +76,7 @@ export default function ApplicationContextProvider({children}) {
   }
 
   function Initialize() {
-    dispatch(changeBeproInitState(true) as any);
-    dispatch(addToast({content: `World!`, type: 'warning', title: `Hey`}))
+    dispatch(changeBeproInitState(true) as any)
 
     if (!window.ethereum)
       return;
