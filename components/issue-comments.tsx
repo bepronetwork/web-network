@@ -2,7 +2,7 @@ import { GetStaticProps } from "next";
 import Link from "next/link";
 import { formatDate } from "../helpers/formatDate";
 
-export default function IssueComments({ url, comments }) {
+export default function IssueComments({ comments }) {
   return (
     <div className="container">
       <div className="row justify-content-center">
@@ -10,11 +10,13 @@ export default function IssueComments({ url, comments }) {
           <div className="content-wrapper">
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h3 className="smallCaption mb-0">{comments?.length} comments</h3>
-              <Link href={url} passHref>
-                <a className="subnav-github">
-                  {"Reply on github".toUpperCase()}
-                </a>
-              </Link>
+              {comments?.length > 0 && (
+                <Link href={comments[0]?.html_url} passHref>
+                  <a className="subnav-github" target="_blank">
+                    {"Reply on github".toUpperCase()}
+                  </a>
+                </Link>
+              )}
             </div>
             {comments?.map((comment) => (
               <div className="content-wrapper child mb-3" key={comment?.id}>
