@@ -1,21 +1,22 @@
 import { GetStaticProps } from "next";
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from "react";
 import IssueComments from "../components/issue-comments";
 import IssueDescription from "../components/issue-description";
 import IssueHero from "../components/issue-hero";
-import IssueDraftProgress from "../components/issue-draft-progress";
 import PageActions from "../components/page-actions";
 import IssueProposals from "../components/issue-proposals";
 import { useRouter } from "next/router";
-import {BeproService} from "../services/bepro-service";
+import { BeproService } from "../services/bepro-service";
 import GithubMicroService from "../services/github-microservice";
-import {ApplicationContext} from '../contexts/application';
-import {IssueData} from '../interfaces/issue-data';
+import { ApplicationContext } from "../contexts/application";
+import { IssueData } from "../interfaces/issue-data";
 
 export default function PageIssue() {
   const router = useRouter();
   const { id } = router.query;
-  const {state: {currentAddress}} = useContext(ApplicationContext)
+  const {
+    state: { currentAddress },
+  } = useContext(ApplicationContext);
 
   const [issue, setIssue] = useState<IssueData>();
   const [networkIssue, setNetworkIssue] = useState<any>();
@@ -26,35 +27,38 @@ export default function PageIssue() {
   const [forks, setForks] = useState();
 
   useEffect(() => {
-    if (!currentAddress)
-      return;
+    if (!currentAddress) return;
 
     const gets = async () => {
-
       const address = BeproService.address;
       setUserAddress(address);
       const issue = await GithubMicroService.getIssueId(id);
       setIssue(issue);
-      const networkIssue = await BeproService.network.getIssueById({
-        issueId: id,
-      });
-      setNetworkIssue(networkIssue);
+
       setBalance(await BeproService.network.getBEPROStaked());
       const isIssueInDraft = await BeproService.network.isIssueInDraft({
         issueId: id,
       });
+      getNetworkIssue();
       setIsIssueinDraft(isIssueInDraft);
+      console.log("is issue in draft", isIssueInDraft);
       const comments = await GithubMicroService.getCommentsIssue(
         issue.githubId
       );
       setCommentsIssue(comments);
-      const forks = await GithubMicroService.getForks()
-      setForks(forks)
+      const forks = await GithubMicroService.getForks();
+      setForks(forks);
     };
 
     gets();
-
   }, [currentAddress]);
+
+  const getNetworkIssue = async () => {
+    const networkIssue = await BeproService.network.getIssueById({
+      issueId: id,
+    });
+    setNetworkIssue(networkIssue);
+  };
 
   const handleStateissue = () => {
     if (isIssueinDraft) {
@@ -82,6 +86,9 @@ export default function PageIssue() {
         addressNetwork={networkIssue?.cid}
         issueId={issue?.issueId}
         UrlGithub={issue?.url}
+        title={issue?.title}
+        description={issue?.body}
+        handleNetworkIssue={getNetworkIssue}
         pullRequests={issue?.pullRequests}
         amountIssue={networkIssue?.tokensStaked}
         forks={forks}
@@ -95,9 +102,7 @@ export default function PageIssue() {
       )}
 
       <IssueDescription description={issue?.body}></IssueDescription>
-      <IssueComments
-        comments={commentsIssue}
-      ></IssueComments>
+      <IssueComments comments={commentsIssue}></IssueComments>
     </>
   );
 }
