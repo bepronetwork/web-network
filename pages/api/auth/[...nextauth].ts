@@ -15,7 +15,8 @@ export default NextAuth({
     signIn(user, account, profile: { login: string }) {
       if (BeproService.address)
         return GithubMicroService.joinAddressToHandle({
-          githubHandle: profile.login,
+          githubHandle: user.name,
+          githubLogin: profile.login,
           address: BeproService.address,
         });
 

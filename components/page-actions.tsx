@@ -9,6 +9,24 @@ import NewProposal from "./create-proposal";
 import { ApplicationContext } from "../contexts/application";
 import { changeLoadState } from "../contexts/reducers/change-load-state";
 import GithubMicroService from "../services/github-microservice";
+import { developer, pullRequest } from "interfaces/issue-data";
+
+interface pageActions {
+  issueId: string,
+  UrlGithub: string,
+  developers?: developer[],  
+  userAddress: string,
+  finalized: boolean,
+  addressNetwork: string,
+  isIssueinDraft: boolean,
+  state?: string,
+  pullRequests?: pullRequest[],
+  amountIssue?: string | number,
+  forks?: [],
+  title?: string,
+  description?: string,
+  handleNetworkIssue?: () => Promise<void>
+}
 
 export default function PageActions({
   issueId,
@@ -21,8 +39,11 @@ export default function PageActions({
   state,
   pullRequests,
   amountIssue,
-  forks
-}) {
+  forks,
+  title,
+  description,
+  handleNetworkIssue,
+}: pageActions) {
   const {
     dispatch,
     state: { githubHandle },
@@ -92,8 +113,13 @@ export default function PageActions({
   }
 
   async function handlePullrequest() {
-    //todo need logic
-    console.log("Construction...");
+    GithubMicroService.createPullRequestIssue(issueId, {
+      title: title,
+      description: description,
+      username: githubHandle,
+    })
+      .then(() => handleNetworkIssue())
+      .catch((err) => console.log("err", err));
   }
 
   return (
