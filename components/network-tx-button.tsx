@@ -5,6 +5,7 @@ import {ApplicationContext} from '../contexts/application';
 import {changeLoadState} from '../contexts/reducers/change-load-state';
 import Modal from './modal';
 import Icon from "./icon";
+import {addToast} from '../contexts/reducers/add-toast';
 
 interface NetworkTxButtonParams {
   txMethod: string;
@@ -41,9 +42,13 @@ function networkTxButton({txMethod, txParams, onTxStart = () => {}, onSuccess, o
 
     BeproService.network[txMethod](txParams)
       .then(({status, message}) => {
-        if (status)
-         onSuccess()
-        else onFail(message)
+        if (status) {
+          onSuccess()
+          dispatch(addToast({content: `Success!`, title: txMethod}));
+        } else {
+          onFail(message)
+          dispatch(addToast({content: message, title: txMethod}));
+        }
 
         setTxSuccess(status);
       })
