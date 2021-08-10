@@ -1,3 +1,4 @@
+import Avatar from "components/avatar";
 import InputNumber from "components/input-number";
 import { useState } from "react";
 import { NumberFormatValues } from "react-number-format";
@@ -36,10 +37,7 @@ export default function CreateProposalDistributionItem({
 
   return (
     <li className="d-flex align-items-center px-3 py-1 my-1 rounded-3 btn-opac">
-      <img
-        className="avatar circle-3 me-2 mt-1"
-        src={`https://github.com/${by}.png`}
-      />
+      <Avatar userLogin={by} className="me-2 mt-1"/>
       <span className="flex-grow-1">{by}</span>
       <div className="flex-shrink-0 w-25">
         <InputNumber
