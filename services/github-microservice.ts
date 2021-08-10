@@ -4,6 +4,7 @@ import { API } from '../env';
 
 interface User {
   githubHandle: string;
+  githubLogin: string;
   address: string;
   createdAt: string;
   id: number;
@@ -45,7 +46,7 @@ export default class GithubMicroService {
   /**
    * Should merge the address and the github handle
    */
-  static joinAddressToHandle(payload: {address: string, githubHandle: string}): Promise<boolean> {
+  static joinAddressToHandle(payload: {address: string, githubHandle: string, githubLogin: string}): Promise<boolean> {
     return client.post<string>(`/users/connect`, payload)
                  .then(({data}) => data === `ok`)
                  .catch((error) => {
