@@ -7,6 +7,7 @@ import Link from 'next/link';
 import ConnectWalletButton from './connect-wallet-button';
 import {ApplicationContext} from '../contexts/application';
 import {changeStakedState} from '../contexts/reducers/change-staked-amount';
+import { formatNumberToNScale, formatNumberToString } from 'helpers/formatNumber';
 
 export default function MainNav() {
   const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
@@ -93,7 +94,7 @@ export default function MainNav() {
             <Link href="/account" passHref>
               <a className="btn btn-md btn-trans mr-1">
                 <i className="ico-bepro mr-1"></i>
-                {beproBalance}
+                {formatNumberToNScale(beproBalance)}
               </a>
             </Link>
             <Link href="/account" passHref>
@@ -102,7 +103,7 @@ export default function MainNav() {
                   <p className="p-small mb-0">
                     {address}
                   </p>
-                  <p className="p-small mb-0 trans">{ethBalance} ETH</p>
+                  <p className="p-small mb-0 trans">{formatNumberToString(ethBalance)} ETH</p>
                 </div>
                 {/* <img className="avatar circle-2"src="https://uifaces.co/our-content/donated/Xp0NB-TL.jpg" alt="" /> */}
               </a>
