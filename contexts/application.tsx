@@ -8,11 +8,9 @@ import {changeBeproInitState} from './reducers/change-bepro-init-state';
 import GithubMicroService from '../services/github-microservice';
 import {useSession} from 'next-auth/client';
 import {changeGithubHandle} from './reducers/change-github-handle';
-import {changeCurrentAddress} from './reducers/change-current-address';
-import {changeLoadState} from './reducers/change-load-state';
+import {changeCurrentAddress} from './reducers/change-current-address'
 import Loading from '../components/loading';
 import Toaster from '../components/toaster';
-import {addToast} from './reducers/add-toast';
 
 interface GlobalState {
   state: ApplicationState,
@@ -50,8 +48,7 @@ export const ApplicationContext = createContext<GlobalState>(defaultState)
 
 export default function ApplicationContextProvider({children}) {
   const [state, dispatch] = useReducer(mainReducer, defaultState.state);
-  const [session,] = useSession();
-
+  const [session] = useSession();
   function onMetaMaskChange() {
     console.log(`onMetaMaskChange`, state.currentAddress, BeproService.address, state.currentAddress === BeproService.address)
     if (!state.metaMaskWallet || state.currentAddress === BeproService.address)
@@ -59,13 +56,7 @@ export default function ApplicationContextProvider({children}) {
 
     GithubMicroService.getHandleOf(BeproService.address)
                       .then(handle => {
-                        if (!handle && session?.user?.name)
-                          GithubMicroService.joinAddressToHandle({
-                                                                   githubHandle: session.user.name,
-                                                                   address: BeproService.address
-                                                                 })
-                                            .then(() => dispatch(changeGithubHandle(session.user.name)));
-                        else dispatch(changeGithubHandle(handle));
+                        if (handle) dispatch(changeGithubHandle(handle))
                       });
   }
 
@@ -87,10 +78,10 @@ export default function ApplicationContextProvider({children}) {
   function setHandleIfConnected() {
     if (state.githubHandle)
       return;
-
-    if (!session?.user?.name)
+    if (!session?.user?.name){
+      dispatch(changeGithubHandle(``))
       return;
-
+    }
     dispatch(changeGithubHandle(session.user.name));
   }
 
