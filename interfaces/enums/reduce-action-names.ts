@@ -8,4 +8,6 @@ export enum ReduceActionName {
   Staked = `Staked`,
   ChangeAddress = `ChangeAddress`,
   ChangeBalance = `ChangeBalance`,
+  AddToast = `AddToast`,
+  RemoveToast = `RemoveToast`,
 }

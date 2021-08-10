@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useContext, useEffect, useState} from 'react';
 import Modal from "./modal";
 import ReactSelect from "./react-select";
 import CreateProposalDistributionItem from "./create-proposal-distribution-item";
@@ -6,6 +6,7 @@ import sumObj from "helpers/sumObj";
 import { BeproService } from "../services/bepro-service";
 import GithubMicroService from "../services/github-microservice";
 import { pullRequest } from "interfaces/issue-data";
+import {ApplicationContext} from '../contexts/application';
 
 interface participants {
   githubHandle: string;
@@ -17,21 +18,14 @@ export default function NewProposal({
   amountTotal,
   pullRequests = [],
 }) {
+  const {state: {balance}} = useContext(ApplicationContext);
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>();
   const [error, setError] = useState<string>("");
   const [show, setShow] = useState<boolean>(false);
   const [participants, setParticipants] = useState<participants[]>([]);
-
-  useEffect(() => {
-    setError("");
-    setAmount(sumObj(distrib));
-  }, [distrib]);
-
-  useEffect(() => {
-    console.log("pullRequests", pullRequests);
-    pullRequests.length > 0 && getParticipantsPullRequest(pullRequests[0]?.id);
-  }, [pullRequests]);
+  const [hideCreateProposal, setHideCreateProposal] = useState(true);
+  const [councilAmount, setCouncilAmount] = useState(0);
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
     console.log("params->", params);
@@ -41,8 +35,8 @@ export default function NewProposal({
     }));
   }
 
-  async function getParticipantsPullRequest(id: string) {
-    await GithubMicroService.getPullRequestParticipants(id)
+  function getParticipantsPullRequest(id: string) {
+    GithubMicroService.getPullRequestParticipants(id)
       .then((participantsPr) => setParticipants(participantsPr))
       .catch((err) => console.log("err", err));
   }
@@ -85,11 +79,30 @@ export default function NewProposal({
     getParticipantsPullRequest(obj.value);
   }
 
+  function updateHideCreateProposalState() {
+    setHideCreateProposal(councilAmount > balance.bepro);
+  }
+
+  function getCouncilAmount() {
+    BeproService.network.COUNCIL_AMOUNT().then(setCouncilAmount);
+  }
+
+  useEffect(() => {
+    setError("");
+    setAmount(sumObj(distrib));
+  }, [distrib]);
+
+  useEffect(() => {
+    if (pullRequests.length)
+      getParticipantsPullRequest(pullRequests[0]?.id);
+  }, [pullRequests]);
+
+  useEffect(getCouncilAmount, []);
+  useEffect(updateHideCreateProposalState, [balance.bepro]);
+
   return (
-    <>
-      <button className="btn btn-md btn-primary" onClick={() => setShow(true)}>
-        Create Proposal
-      </button>
+    <> {!hideCreateProposal && <button className="btn btn-md btn-primary" onClick={() => setShow(true)}>Create Proposal</button> || `You need at least ${councilAmount}BEPRO to Create a Proposal`}
+
       <Modal
         show={show}
         title="Create Proposal"
@@ -105,8 +118,7 @@ export default function NewProposal({
               Create Proposal
             </button>
           </>
-        }
-      >
+        }>
         <p className="p-small text-50">Select a pull request </p>
         <ReactSelect
           defaultValue={{

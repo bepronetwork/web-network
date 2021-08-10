@@ -11,6 +11,8 @@ import {changeGithubHandle} from './reducers/change-github-handle';
 import {changeCurrentAddress} from './reducers/change-current-address';
 import {changeLoadState} from './reducers/change-load-state';
 import Loading from '../components/loading';
+import Toaster from '../components/toaster';
+import {addToast} from './reducers/add-toast';
 
 interface GlobalState {
   state: ApplicationState,
@@ -38,7 +40,8 @@ const defaultState: GlobalState = {
       eth: 0,
       staked: 0,
       bepro: 0,
-    }
+    },
+    toaster: []
   },
   dispatch: () => undefined
 };
@@ -73,7 +76,7 @@ export default function ApplicationContextProvider({children}) {
   }
 
   function Initialize() {
-    dispatch(changeBeproInitState(true) as any);
+    dispatch(changeBeproInitState(true) as any)
 
     if (!window.ethereum)
       return;
@@ -99,6 +102,7 @@ export default function ApplicationContextProvider({children}) {
 
   return <ApplicationContext.Provider value={{state, dispatch: dispatch as any}}>
     <Loading show={state.loading.isLoading} text={state.loading.text} />
+    <Toaster />
     {children}
   </ApplicationContext.Provider>
 }
