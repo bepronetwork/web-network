@@ -1,4 +1,4 @@
-export type IssueState = 'ready' | 'draft' | null
+export type IssueState = 'ready' | 'draft' | 'redeemed' | 'closed' | 'open'
 
 export interface IssueData {
   body: string;
