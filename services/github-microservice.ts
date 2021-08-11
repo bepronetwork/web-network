@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {IssueData} from '../interfaces/issue-data';
+import {IssueData, IssueState} from '../interfaces/issue-data';
 import { API } from '../env';
 
 interface User {
@@ -27,8 +27,9 @@ export default class GithubMicroService {
     return data;
   }
 
-  static async getIssuesState(state: any) {
-    const {data} =  await client.get('/issues', state);
+  static async getIssuesState(filterState: IssueState) {
+    const {data} =  await client.get('/issues',{params: {filterState}});
+    debugger;
     return data;
   }
 

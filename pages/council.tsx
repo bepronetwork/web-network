@@ -14,7 +14,8 @@ export default function PageCouncil() {
 
   function getIssues() {
     dispatch(changeLoadState(true))
-    GithubMicroService.getIssuesState({filterState: `ready`})
+    debugger;
+    GithubMicroService.getIssuesState('ready')
                       .then(issues => {
                         setIssues(issues)
                         console.log(`got issues`, issues)
