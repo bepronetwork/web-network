@@ -8,7 +8,7 @@ export default function IssueHero({ issue, state, amount }) {
       issue?.creatorGithub && (
         <>
           by
-          <Avatar className="me-2" userLogin={issue.creatorGithub} />
+          <Avatar className="mx-2" userLogin={issue.creatorGithub} />
           {issue.creatorGithub}
         </>
       )
