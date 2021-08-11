@@ -109,8 +109,8 @@ export default class GithubMicroService {
                  })
   }
 
-  static async createMergeProposal(id: string) {
-    return client.post<'ok'>(`/issues/${id}/mergeproposal`)
+  static async createMergeProposal(id: string, payload: { pullRequestGithubId: number, scMergeId: string}) {
+    return client.post<'ok'>(`/issues/${id}/mergeproposal`, payload)
                  .then(({data}) => data === 'ok')
                  .catch(e => {
                    console.error(e);
