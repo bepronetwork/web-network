@@ -83,7 +83,7 @@ export default class GithubMicroService {
    * Should return network status
    */
   static async getNetworkStats() {
-    return client.get<{openIssues: number, beproStaked: number, tokensStaked: number, closedIssues?: number}>(`/networkstatus`)
+    return client.get<{openIssues: number, beproStaked: number, tokensStaked: number, closedIssues?: number}>(`/networkstats`)
                  .then(({data}) => data)
                  .catch(e => {
                    console.error(e);
