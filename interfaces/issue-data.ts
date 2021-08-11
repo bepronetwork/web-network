@@ -1,3 +1,5 @@
+export type IssueState = 'ready' | 'draft' | null
+
 export interface IssueData {
   body: string;
   createdAt: Date;
@@ -11,7 +13,7 @@ export interface IssueData {
   amount?: number;
   url?: string;
   numberOfComments: number;
-  state: string;
+  state: IssueState;
   title: string;
   pullRequests: pullRequest[];
 }
