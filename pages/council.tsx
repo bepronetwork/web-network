@@ -4,7 +4,6 @@ import {IssueData} from '../interfaces/issue-data';
 import ListIssues from '../components/list-issues';
 import PageHero from '../components/page-hero';
 import GithubMicroService from '../services/github-microservice';
-import {mockReadyIssues} from '../helpers/mockdata/mockIssues';
 import {ApplicationContext} from '../contexts/application';
 import {changeLoadState} from '../contexts/reducers/change-load-state';
 
