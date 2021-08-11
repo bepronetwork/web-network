@@ -1,12 +1,14 @@
 import { GetStaticProps } from 'next'
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { formatDate } from '../helpers/formatDate';
 import IssueAvatars from './issue-avatars';
 import {IssueData} from '../interfaces/issue-data';
 import { BeproService } from '../services/bepro-service';
+import { ApplicationContext } from 'contexts/application';
 
 export default function IssueListItem({issue = null}:{issue?: IssueData}) {
+    const { state: { metaMaskWallet }} = useContext(ApplicationContext)
     const router = useRouter()
     const [amount, setAmount] = useState<string>()
 
@@ -34,7 +36,7 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
             .catch((err)  => console.log('err ->', err))
     }
      getIssueBeprosStaked(issue?.issueId)
-   },[issue])
+   },[metaMaskWallet])
 
     return (
             <div className="bg-shadow list-item rounded p-4 mb-3" onClick={() => {
