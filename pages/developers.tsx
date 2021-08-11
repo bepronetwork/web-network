@@ -76,7 +76,7 @@ export default function PageDevelopers() {
   }, []);
 
   const isDraftIssue = (issue: IssueData) => issue.state === 'draft';
-  const isClosedIssue = (issue: IssueData) => issue.state === 'closed';
+  const isClosedIssue = (issue: IssueData) => issue.state === 'closed' || issue.state === 'redeemed';
   const isOpenIssue = (issue: IssueData) => !isDraftIssue(issue) && !isClosedIssue(issue);
 
   const issuesFilteredByState = issues.filter(issue => {
@@ -101,15 +101,6 @@ export default function PageDevelopers() {
                   defaultValue={filtersByIssueState[0]}
                   options={filtersByIssueState}
                   onChange={handleChangeFilterByState}
-                />
-              </div>
-              <div className="col-md-3">
-                <ReactSelect
-                  id="filterTime"
-                  className="react-select-filterIssues trans"
-                  defaultValue={options_time[0]}
-                  options={options_time}
-                  isDisabled
                 />
               </div>
             </div>
