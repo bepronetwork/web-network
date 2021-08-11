@@ -1,31 +1,30 @@
 import { GetStaticProps } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import IssueAvatars from "./issue-avatars";
-import CreateProposal from "./create-proposal";
 import Link from "next/link";
 import { BeproService } from "../services/bepro-service";
 import NewProposal from "./create-proposal";
-
 import { ApplicationContext } from "../contexts/application";
 import { changeLoadState } from "../contexts/reducers/change-load-state";
 import GithubMicroService from "../services/github-microservice";
 import { developer, pullRequest } from "interfaces/issue-data";
+import { changeBalance } from "contexts/reducers/change-balance";
 
 interface pageActions {
-  issueId: string,
-  UrlGithub: string,
-  developers?: developer[],  
-  userAddress: string,
-  finalized: boolean,
-  addressNetwork: string,
-  isIssueinDraft: boolean,
-  state?: string,
-  pullRequests?: pullRequest[],
-  amountIssue?: string | number,
-  forks?: [],
-  title?: string,
-  description?: string,
-  handleNetworkIssue?: () => Promise<void>
+  issueId: string;
+  UrlGithub: string;
+  developers?: developer[];
+  userAddress: string;
+  finalized: boolean;
+  addressNetwork: string;
+  isIssueinDraft: boolean;
+  state?: string;
+  pullRequests?: pullRequest[];
+  amountIssue?: string | number;
+  forks?: [];
+  title?: string;
+  description?: string;
+  handleNetworkIssue?: () => Promise<void>;
 }
 
 export default function PageActions({
@@ -46,7 +45,7 @@ export default function PageActions({
 }: pageActions) {
   const {
     dispatch,
-    state: { githubHandle },
+    state: { githubHandle, metaMaskWallet },
   } = useContext(ApplicationContext);
 
   function handleAvatar() {
@@ -60,11 +59,14 @@ export default function PageActions({
   async function handleRedeem() {
     dispatch(changeLoadState(true));
     await BeproService.login()
-      .then(() =>
+      .then(() => {
         BeproService.network.redeemIssue({
           issueId,
-        })
-      )
+        });
+        BeproService.getBalance("bepro").then((bepro) =>
+          dispatch(changeBalance({ bepro }))
+        );
+      })
       .catch((err) => console.log(err))
       .finally(() => dispatch(changeLoadState(false)));
   }
@@ -121,7 +123,7 @@ export default function PageActions({
       .then(() => handleNetworkIssue())
       .catch((err) => console.log("err", err));
   }
-
+  if (!metaMaskWallet) return <></>;
   return (
     <div className="container">
       <div className="row justify-content-center">
@@ -137,13 +139,6 @@ export default function PageActions({
                 </Link>
               )}
               {renderRedeem()}
-              {state.toLowerCase() === "ready" && (
-                <CreateProposal
-                  issueId={issueId}
-                  amountTotal={amountIssue}
-                  pullRequests={pullRequests}
-                />
-              )}
               {renderProposeDestribution()}
               {renderPullrequest()}
               {state.toLowerCase() === "pull request" && (
