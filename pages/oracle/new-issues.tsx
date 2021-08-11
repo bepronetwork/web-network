@@ -13,7 +13,7 @@ export default function Newissues() {
 
   function getIssues() {
     dispatch(changeLoadState(true))
-    GithubMicroService.getIssuesState({filterState: `draft`})
+    GithubMicroService.getIssuesState('draft')
                       .then(setIssues)
                       .catch((error) => {
                         console.log('Error', error)
