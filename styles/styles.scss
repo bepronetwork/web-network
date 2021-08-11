@@ -9,6 +9,114 @@ li {
   list-style: none;
 }
 
+.modal {
+  &-header {
+    padding-bottom: 0;
+  }
+  &-content {
+    background-color: $bg-shadow;
+  }
+  &-header,
+  &-footer {
+    justify-content: center;
+    border: 0;
+  }
+}
+.react-select {
+  &-container & {
+    &__control {
+      border-color: transparent;
+      background-color: $bg;
+      min-height: 48px;
+      box-shadow: none;
+      &:hover,
+      &--is-focused {
+        border-color: $blue;
+      }
+    }
+    &__value-container {
+      padding: 2px 16px;
+    }
+    &__indicator-separator {
+      display: none;
+    }
+    &__indicator {
+      padding: 14px;
+    }
+    &__single-value {
+      color: $white;
+    }
+    &__control--is-focused &__single-value {
+      color: transparentize($white, 0.4);
+    }
+    &__menu {
+      background-color: $bg;
+    }
+    &__option {
+      &--is-focused {
+        background-color: $bg;
+      }
+      &--is-selected {
+        background-color: $blue;
+      }
+    }
+  }
+  &-filterIssues & {
+    &__control {
+      border-color: transparent;
+      background-color: $bg-shadow;
+      min-height: 38px;
+      box-shadow: none;
+      &:hover,
+      &--is-focused {
+        border-color: $blue;
+      }
+    }
+    &__value-filterIssues {
+      padding: 2px 16px;
+    }
+    &__indicator-separator {
+      display: none;
+    }
+    &__indicator {
+      padding: 14px;
+    }
+    &__single-value {
+      color: $white;
+    }
+    &__control--is-focused &__single-value {
+      color: transparentize($white, 0.4);
+    }
+    &__menu {
+      background-color: $bg-shadow;
+    }
+    &__option {
+      &--is-focused {
+        background-color: $bg-shadow;
+      }
+      &--is-selected {
+        background-color: $blue;
+      }
+    }
+  }
+  &__input {
+    color: transparentize($white, 0.4);
+  }
+}
+.form-control {
+  min-width: 100px;
+  border-color: transparent;
+  color: transparentize($white, 0.4);
+  &,
+  &:focus {
+    box-shadow: none;
+    background-color: $bg;
+  }
+  &:focus {
+    border-color: $blue;
+    color: $white;
+  }
+}
 
 // DEFAULTS
 
@@ -147,7 +255,7 @@ p {
 }
 
 .btn-opac {
-  color: rgba($white, 0.7);
+  color: $white;
   background-color: rgba(255, 255, 255, 0.1);
   &:hover,
   &:focus,
@@ -255,6 +363,10 @@ p {
   }
 }
 
+.subnav-github {
+  text-decoration: none;
+}
+
 .account-bepro {
   display: flex;
   align-items: center;
@@ -331,13 +443,33 @@ p {
 
 .form-group {
   margin-bottom: $m;
-  label {
-    color: $gray;
+}
+
+label {
+  color: $gray;
+}
+.form-control {
+  background-color: $black;
+  border: 1px solid $black;
+  color: $gray;
+  &:disabled, &[readonly] {
+    background-color: $black;
+    opacity: 0.4;
   }
-  .form-control {
+}
+.input-group {
+  .input-group-text {
     background-color: $black;
     border: 1px solid $black;
     color: $gray;
+  }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .button-max {
+    cursor: pointer;
   }
 }
 
@@ -372,6 +504,11 @@ p {
 
 .avatar-list {
   .avatar {
+    margin-left: -$m/4;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.4);
+  }
+  .avatar-number {
+    background-color: $dark-gray;
     margin-left: -$m/4;
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.4);
   }
@@ -455,8 +592,8 @@ p {
 
 .ico-bepro {
   display: inline-block;
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 20px;
   background-size: cover;
 	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADUAAAAwCAYAAACxKzLDAAAEvUlEQVR42s3ZA3AsyxfH8f7btm3btm0827ZtFZ5t27btazPe7Gamz/l9X3KZO5lNJruzd/Op6uLoV93Vp6c7lGVggI+bsZ47p0rc7s58cyUSqzDDzFkITJe4NEb2Gmw/BN4Q2ikT5tdmutFFDRANkIjmzHRnjyThk6GdgBdVKvwEOMidHhqWCWi6DPhQaC9eBLwtRvYAuihHnzt7AW8DXtTu3vsM8DzlEHBbX8JnQrv19fFZdyZTng4z+3XLemyPPXgx8CLgzUtfkv+ioRnNXaI8/e5sVGow4BVJwr8krpUQgEQ3cCTwjrxJxN0PolxJjGxTVqCXA/tQ3+RKhS+EjAUL+IiEKFfFjN/mjpDieFGaslGBGnTXQnhttrfMuJOSSVRT+HKzvfQkBZjxj5z7d6IFTDwYGtVb5VvAAAW4c0jISFPWoEViZKfQiFqNHwCimDOzY71Ss//SIu7UqtXq+0bvlV7eumgRrwvDVKu8F5hLMWdlQ9Vq9h9aSOLSMBozLs4uKIEXAWdP3FBKB3vrPSFPkvBZoMudTUJGVxdvlJg5EUMB1Gq+f8gTI7sBuGvmpEm8ImRUq7zHjBsnYih3PRXyDK8nacr69WpWjPwoOjsDey5rJxcNZcZNwJ7D2kkSzwJOEyTSauTb2VryTnP1sYxER5ryzdEK8vIG/LBoqFrNd8vcu7x9Bjha0iIaFJ3tsrXkGxLGqhamKV8LYxh/qPqA90ncSgNMuio79P5Pvo4k4R/Ay4EXtTJU5ofzwAYK8d1huErVd6QOCQkuN+NPHR28vszhF+oYeo9JF0Fx5poPw2qsO3tQzOIYuRc4yp09l7WTKD5R3Lz8vhjZw4w1gbeHHMAHJBZSXFzlWVA0VPl1SmJ2kvCfkCONfiTFdQJvaGuoDJmxds5i+OsSsdFQu7c5FBKLgFdnhuDL3PVcwfv7gfcOWy34Du0OBTA004YMiXspIFpmojDjP5TjzGZC9VZsjZE7wH5isVCZKd2MP0k4zbsIeFFmW/r3FJQ3YSSJLqAAM64csUySqNEkiUnZUJUK73TXogL3Vvr7effIHSk9RzFb5C1o76N5ydBqPmQAGwNiFO4cnzP7fdWdGmOQGHrvt0JWdPaRaFqMbJ8T6mUx+uH1grlzJvDGnG/aWaKI54G35f0kfkair4Qh2JX3gUPM+KuJOyRMIkrca8aadY6IPuqu5ykgTTks1CNxKyVIzU8rsnANdQBvTI1jih79JPDZUE+M/ExigOZ5knhD21fA65aVmP6CoW4MYzHnHEoggWd/3Apw94OLnnG5k2Y3iupuk0kyShIjDw22H47RO+9OEvur2fiGf4y+ayjKjPUokYSbM8OMM5OE/wJrAv8fDPIPM46JpjmMk4vngJeF8YimG5i4OqpVvhnGa/Cm97vzGBOMBpnx/9Co3l4+IWnuxAmExci2oVGZojyp/YEU3ZsMlKnuHzHTzbTHsn1I3yCUjxel5idJOKuRuyYlCZ8LrWTGH82ZQYsJzMyP667VPhxWB+B1MbK3O92UTMIlru9P+XJoB+DNZvwzRh52J6Vx0UyzYuRo4LNhIgBeBnw6OjtIutqdZ130uhMZSeb0C3rMdM1A6ocPDWngTaEkLwBA5w1TDyB5XQAAAABJRU5ErkJggg==);
 }
@@ -481,6 +618,31 @@ p {
       background-color: $purple !important;
     }
   }
+  &.progress-purple{
+    background-color: rgba($purple, 1);
+  }
+}
+
+.number-block-progress{
+  padding: 8px;
+  background-color: $bg-shadow;
+  color: rgba($purple, 1);
+  border-bottom: 6px solid $purple;
+  &.progress-1 {
+    border-color: rgba($purple, 1);
+  }
+  &.progress-2 {
+    border-color: rgba($purple, 0.8);
+  }
+  &.progress-3 {
+    border-color: rgba($purple, 0.6);
+  }
+  &.progress-4 {
+    border-color: rgba($purple, 0.4);
+  }
+  &.progress-5 {
+    border-color: rgba($purple, 0.4);
+  }
 }
 
 .user-block-progress {
@@ -500,5 +662,46 @@ p {
   }
   &.progress-5 {
     border-color: rgba($purple, 0.2);
+  }
+}
+
+.material-icons {
+  &.md-small { font-size: 16px; }
+  &.md-medium { font-size: 24px; }
+  &.md-large { font-size: 44px; }
+  &.md-larger { font-size: 64px; }
+}
+
+$c_directions: ('left': 'l', 'right': 'r', 'top': 't', 'bottom': 'b') !default;
+$c_dimensions: ('0': 0, '1': .25, '2': .5, '3': 1, '4': 2, '5': 3) !default;
+$c_props: ('m': 'margin') !default;
+
+@each $d, $prop in $c_props {
+  .m {
+    @each $dir, $values in (x: (right, left), y: (top, bottom)) {
+      &#{$dir} {
+        @each $amount, $multiplier in $spacers {
+          &n-#{$amount} {
+            @each $value in $values {
+              #{$prop}-#{$value}: -#{$multiplier}!important;
+            }
+          }
+        }
+      }
+    }
+
+    @each $dir, $alias in $c_directions {
+      &#{$alias} {
+        @each $amount, $multiplier in $spacers {
+          &n-#{$amount} { #{$prop}-#{$dir}: -#{$multiplier}!important; }
+        }
+      }
+    }
+
+    @each $amount, $multiplier in $spacers {
+      &n-#{$amount} {
+        #{$prop}: -#{$multiplier} !important;
+      }
+    }
   }
 }
