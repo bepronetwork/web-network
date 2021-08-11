@@ -13,7 +13,7 @@ export default function ReadyToMergeIssues() {
 
   function getIssues() {
     dispatch(changeLoadState(true))
-    GithubMicroService.getIssuesState({filterState: `ready`})
+    GithubMicroService.getIssuesState('ready')
                       .then(setIssues)
                       .catch((error) => {
                         console.log('Error', error)
