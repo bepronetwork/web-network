@@ -28,6 +28,10 @@ export default function Newissues() {
   return (
     <Oracle buttonPrimaryActive={true}>
       <ListIssues listIssues={issues} />
+      {
+        issues?.length === 0 &&
+        <h3 className="text-center">No issues in draft</h3>
+      }
     </Oracle>
   );
 }
