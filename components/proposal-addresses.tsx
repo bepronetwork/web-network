@@ -1,6 +1,5 @@
 import { GetStaticProps } from 'next'
-import React, { useEffect, useState } from 'react';
-import { ProgressBar } from 'react-bootstrap';
+import React from 'react';
 
 export default function ProposalAddresses({ addresses }) {
     return (
@@ -13,7 +12,7 @@ export default function ProposalAddresses({ addresses }) {
                             <div key={index} className="content-list-item d-flex justify-content-between align-items-center">
                                 <p className="p-small mb-0">{item.address}</p>
                                 <p className="smallCaption color-purple mb-0">{item.oracles} oracles</p>
-                            </div>                            
+                            </div>
                         ))}
                     </div>
                 </div>

@@ -1,11 +1,11 @@
-import { GetStaticProps } from "next";
+import { GetStaticProps } from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
-import Link from "next/link";
-import IssueListItem from "components/issue-list-item";
-import GithubMicroService from "services/github-microservice";
-import Account from "components/account";
-import {ApplicationContext} from '../../contexts/application';
-import {IssueData} from '../../interfaces/issue-data';
+import Link from 'next/link';
+import IssueListItem from '@components/issue-list-item';
+import GithubMicroService from '@services/github-microservice';
+import Account from '@components/account';
+import {ApplicationContext} from '@contexts/application';
+import {IssueData} from '@interfaces/issue-data';
 
 export default function MyIssues() {
 
