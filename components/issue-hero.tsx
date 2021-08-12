@@ -51,7 +51,7 @@ export default function IssueHero({ issue, state, amount }) {
                     {amount && (
                       <h4 className="h4 mb-0">
                         {amount > 0 ? amount : "MISSING"}
-                        <span className="p-small trans">$BEPRO</span>
+                        <span className="p-small trans"> $BEPRO</span>
                       </h4>
                     )}
                   </div>
