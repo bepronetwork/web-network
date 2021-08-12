@@ -153,7 +153,7 @@ export default function PageActions({
               {renderRedeem()}
               {renderProposeDestribution()}
               {renderPullrequest()}
-              {state.toLowerCase() === "pull request" && (
+              {state?.toLowerCase() === "pull request" && (
                 <button className="btn btn-md btn-primary mx-1 px-4">
                   Dispute
                 </button>
