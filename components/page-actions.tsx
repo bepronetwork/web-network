@@ -21,7 +21,7 @@ interface pageActions {
   state?: string;
   pullRequests?: pullRequest[];
   amountIssue?: string | number;
-  forks?: [];
+  forks?: { owner: developer }[];
   title?: string;
   description?: string;
   handleNetworkIssue?: () => Promise<void>;
@@ -53,6 +53,13 @@ export default function PageActions({
       return <IssueAvatars users={developers}></IssueAvatars>;
     } else if (developers?.length && state.toLowerCase() !== "draft") {
       return <p className="p-small trans me-2 mt-3">no one is working </p>;
+    }
+  }
+
+  function handleFork() {
+    console.log('forks', forks)
+    if (forks?.length > 0) {
+      return (<><IssueAvatars users={forks.map((item) => item.owner)}></IssueAvatars><p className="mb-1 me-2">Forks</p></>);
     }
   }
 
@@ -135,7 +142,7 @@ export default function PageActions({
             <h4 className="h4">Details</h4>
             <div className="d-flex align-items-center">
               {handleAvatar()}
-              {forks && <span className="p-1 mx-2">+{forks.length} FORKS</span>}
+              {forks && handleFork()}
               {UrlGithub && (
                 <Link href={UrlGithub}>
                   <a className="btn btn-md btn-opac mx-1">View on github</a>
