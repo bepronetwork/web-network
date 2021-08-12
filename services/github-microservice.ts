@@ -11,6 +11,15 @@ interface User {
   updatedAt: string;
 }
 
+export interface MergeProposal {
+  id: number,
+  scMergeId: string,
+  issueId: string,
+  pullRequestId: string,
+  createdAt: string,
+  updatedAt: string,
+}
+
 const client = axios.create({baseURL: API});
 
 export default class GithubMicroService {
@@ -120,6 +129,14 @@ export default class GithubMicroService {
 
   static async getForks() {
     return client.get(`/forks`)
+                 .then(({data}) => data)
+                 .catch(e => {
+                   console.error(e);
+                   return null;
+                 })
+  }
+  static async getMergeProposalIssue(issueId: string, MergeId: string) {
+    return client.get<MergeProposal>(`/issues/mergeproposal/${MergeId}/${issueId}`)
                  .then(({data}) => data)
                  .catch(e => {
                    console.error(e);
