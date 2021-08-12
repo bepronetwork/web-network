@@ -64,7 +64,7 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
                         </div>
                     </div>
                     <div className="col-md-2 my-auto text-center">
-                        <span className="caption trans">{amount == "0" ? "MISSING" : amount } $BEPRO</span>
+                        <span className="caption trans">{amount == "0" ? "MISSING" : amount } {amount && "$BEPRO"}</span>
                         {(issue?.developers.length > 0) && <IssueAvatars users={issue?.developers}></IssueAvatars>}
                     </div>
                 </div>
