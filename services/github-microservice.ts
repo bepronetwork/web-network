@@ -30,7 +30,7 @@ export default class GithubMicroService {
 
   static async getIssuesState(filterState: IssueState) {
     const {data} =  await client.get('/issues',{params: {filterState}});
-    debugger;
+
     return data;
   }
 

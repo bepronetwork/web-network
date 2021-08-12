@@ -10,6 +10,7 @@ import { ApplicationContext } from "../contexts/application";
 import { changeLoadState } from "../contexts/reducers/change-load-state";
 import GithubMicroService from "../services/github-microservice";
 import { developer, pullRequest } from "interfaces/issue-data";
+import { addToast } from "contexts/reducers/add-toast";
 
 interface pageActions {
   issueId: string,
@@ -119,7 +120,7 @@ export default function PageActions({
       username: githubHandle,
     })
       .then(() => handleNetworkIssue())
-      .catch((err) => console.log("err", err));
+      .catch((err) => dispatch(addToast({type: 'danger', content:'failed to create pull request'})));
   }
 
   return (
