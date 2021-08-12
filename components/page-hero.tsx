@@ -23,7 +23,7 @@ export default function PageHero({title = "Find issues to work",}) {
                       })
   }
 
-  useEffect(loadTotals, []);
+  useEffect(loadTotals, [beproInit]);
 
   return (
     <div className="banner bg-bepro-blue mb-4">
