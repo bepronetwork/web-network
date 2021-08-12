@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { toNumber } from "lodash";
 import { GetStaticProps } from "next";
 import { useEffect, useState } from "react";
+import GithubMicroService from "../services/github-microservice";
 import { BeproService } from "../services/bepro-service";
 
 interface Proposal {
@@ -12,6 +13,7 @@ interface Proposal {
   votes: string;
   _id: string;
   isDisputed?: boolean;
+  pullRequestId?: string;
 }
 
 export default function IssueProposals({ numberProposals, issueId, amount }) {
@@ -46,11 +48,21 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
             merge_id: i,
           })
           .then((values: Proposal) => {
-            values.isDisputed = BeproService.network.IsMergeDisputed({
-              issueId: issueId,
-              mergeId: i,
-            });
-            arrayProposals.push(values);
+            BeproService.network
+              .IsMergeDisputed({
+                issueId: issueId,
+                mergeId: i,
+              })
+              .then((isDisputed) => {
+                values.isDisputed = isDisputed;
+                GithubMicroService.getMergeProposalIssue(
+                  issueId,
+                  i.toString()
+                ).then((items) => {
+                  values.pullRequestId = items.pullRequestId;
+                  arrayProposals.push(values);
+                });
+              });
           })
           .catch((err) => console.log("error", err));
       }
@@ -72,7 +84,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                 "text-danger": proposal?.isDisputed,
               })}
             >
-              PR #.. by @....
+              PR #{proposal.pullRequestId}
             </p>
           </div>
           <div className="col-md-4">
