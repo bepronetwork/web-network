@@ -51,7 +51,6 @@ export default function PageProposal() {
         developers={[]}
         finalized={false}
         isIssueinDraft={false}
-        userAddress={"0xE1Zr7u"}
         addressNetwork={"0xE1Zr7u"}
         issueId={"10"}
         UrlGithub={"https://github.com/bepronetwork/web-network"}
