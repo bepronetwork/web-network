@@ -60,12 +60,15 @@ export default function PageActions({
     dispatch(changeLoadState(true));
     await BeproService.login()
       .then(() => {
-        BeproService.network.redeemIssue({
-          issueId,
-        });
-        BeproService.getBalance("bepro").then((bepro) =>
-          dispatch(changeBalance({ bepro }))
-        );
+        BeproService.network
+          .redeemIssue({
+            issueId,
+          })
+          .then(() =>
+            BeproService.getBalance("bepro").then((bepro) =>
+              dispatch(changeBalance({ bepro }))
+            )
+          );
       })
       .catch((err) => console.log(err))
       .finally(() => dispatch(changeLoadState(false)));
