@@ -63,7 +63,7 @@ export default function PageIssue() {
   const handleStateissue = () => {
     if (isIssueinDraft) {
       return "Draft";
-    } else if (!isIssueinDraft && networkIssue.finalized) {
+    } else if (!isIssueinDraft && networkIssue?.finalized) {
       return "Closed";
     } else {
       return "Open";
