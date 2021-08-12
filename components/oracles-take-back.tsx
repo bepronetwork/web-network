@@ -42,7 +42,7 @@ export default function OraclesTakeBack(): JSX.Element {
     BeproService.network.getOraclesSummary({address: currentAddress})
                 .then(oracles => dispatch(changeOraclesState(oracles)));
 
-  }, [balance.staked])
+  }, [balance.staked, currentAddress])
 
   return (
     <div className="col-md-10">
