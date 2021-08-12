@@ -1,5 +1,5 @@
 import { GetStaticProps } from "next";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import IssueAvatars from "./issue-avatars";
 import Link from "next/link";
 import { BeproService } from "../services/bepro-service";
@@ -14,7 +14,6 @@ interface pageActions {
   issueId: string;
   UrlGithub: string;
   developers?: developer[];
-  userAddress: string;
   finalized: boolean;
   addressNetwork: string;
   isIssueinDraft: boolean;
@@ -24,14 +23,13 @@ interface pageActions {
   forks?: { owner: developer }[];
   title?: string;
   description?: string;
-  handleNetworkIssue?: () => Promise<void>;
+  handleNetworkIssue?: () => void;
 }
 
 export default function PageActions({
   issueId,
   UrlGithub,
   developers,
-  userAddress,
   finalized,
   addressNetwork,
   isIssueinDraft,
@@ -45,7 +43,7 @@ export default function PageActions({
 }: pageActions) {
   const {
     dispatch,
-    state: { githubHandle, metaMaskWallet },
+    state: { githubHandle, currentAddress },
   } = useContext(ApplicationContext);
 
   function handleAvatar() {
@@ -57,9 +55,13 @@ export default function PageActions({
   }
 
   function handleFork() {
-    console.log('forks', forks)
     if (forks?.length > 0) {
-      return (<><IssueAvatars users={forks.map((item) => item.owner)}></IssueAvatars><p className="mb-1 me-2">Forks</p></>);
+      return (
+        <>
+          <IssueAvatars users={forks.map((item) => item.owner)}></IssueAvatars>
+          <p className="mb-1 me-2">Forks</p>
+        </>
+      );
     }
   }
 
@@ -84,7 +86,7 @@ export default function PageActions({
   const renderRedeem = () => {
     return (
       isIssueinDraft === true &&
-      addressNetwork === userAddress && (
+      addressNetwork === currentAddress && (
         <button
           className="btn btn-md btn-primary mx-1 px-4"
           onClick={handleRedeem}
@@ -116,7 +118,7 @@ export default function PageActions({
         <button
           className="btn btn-md btn-primary ms-1 px-4"
           onClick={handlePullrequest}
-          disabled={!githubHandle}
+          disabled={!githubHandle || !currentAddress}
         >
           Create Pull Request
         </button>
@@ -133,7 +135,7 @@ export default function PageActions({
       .then(() => handleNetworkIssue())
       .catch((err) => console.log("err", err));
   }
-  if (!metaMaskWallet) return <></>;
+
   return (
     <div className="container">
       <div className="row justify-content-center">
