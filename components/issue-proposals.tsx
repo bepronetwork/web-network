@@ -16,6 +16,7 @@ interface Proposal {
 
 export default function IssueProposals({ numberProposals, issueId, amount }) {
   const [proposals, setProposals] = useState<Proposal[]>([]);
+  const ProgressBallRightInitial = 81.7;
 
   const handleDispute = async (mergeId) => {
     const dispute = await BeproService.network.disputeMerge({
@@ -23,6 +24,16 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
       mergeID: mergeId,
     });
     console.log("dispute", dispute);
+  };
+
+  const calcProgressBallright = (value: number) => {
+    const InitialLimit = ProgressBallRightInitial;
+    const FinalLimit = 88.67;
+    return ((value - InitialLimit) * 100) / (FinalLimit - InitialLimit);
+  };
+
+  const calcAmountProgressBallLeft = (value: number) => {
+    return (value * 7) / 100;
   };
 
   useEffect(() => {
@@ -137,7 +148,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                           style={{
                             width: `${handlePercentage(
                               toNumber(proposal.disputes),
-                              (amount * 7) / 100
+                              calcAmountProgressBallLeft(amount)
                             )}%`,
                           }}
                         ></div>
@@ -154,14 +165,13 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                               handlePercentage(
                                 toNumber(proposal.disputes),
                                 amount
-                              ) > 81.6 &&
-                              ((handlePercentage(
-                                toNumber(proposal.disputes),
-                                amount
-                              ) -
-                                81.7) *
-                                100) /
-                                6.97
+                              ) >= ProgressBallRightInitial &&
+                              calcProgressBallright(
+                                handlePercentage(
+                                  toNumber(proposal.disputes),
+                                  amount
+                                )
+                              )
                             }%`,
                           }}
                         ></div>
