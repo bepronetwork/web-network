@@ -3,10 +3,10 @@ import Modal from "./modal";
 import ReactSelect from "./react-select";
 import CreateProposalDistributionItem from "./create-proposal-distribution-item";
 import sumObj from "helpers/sumObj";
-import { BeproService } from "../services/bepro-service";
+import { BeproService } from '@services/bepro-service';
 import GithubMicroService from "../services/github-microservice";
 import { pullRequest } from "interfaces/issue-data";
-import {ApplicationContext} from '../contexts/application';
+import {ApplicationContext} from '@contexts/application';
 
 interface participants {
   githubHandle: string;

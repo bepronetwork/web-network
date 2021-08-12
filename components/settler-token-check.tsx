@@ -1,9 +1,8 @@
 import clsx from "clsx";
 import {ComponentPropsWithRef, forwardRef, useContext} from 'react';
-// import { setLoadingAttributes } from "providers/loading-provider";
-import {BeproService} from "services/bepro-service";
-import {changeLoadState} from '../contexts/reducers/change-load-state';
-import {ApplicationContext} from '../contexts/application';
+import {BeproService} from "@services/bepro-service";
+import {changeLoadState} from '@reducers/change-load-state';
+import {ApplicationContext} from '@contexts/application';
 
 interface Props extends ComponentPropsWithRef<"button"> {
   onCheck(isChecked: boolean): void;

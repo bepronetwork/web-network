@@ -1,8 +1,8 @@
 import Modal from "./modal";
 import {ComponentPropsWithoutRef, useContext, useState} from 'react';
 import {BeproService} from "services/bepro-service";
-import {changeLoadState} from '../contexts/reducers/change-load-state';
-import {ApplicationContext} from '../contexts/application';
+import {changeLoadState} from '@reducers/change-load-state';
+import {ApplicationContext} from '@contexts/application';
 
 interface Props extends ComponentPropsWithoutRef<"div"> {
   amount: string;
