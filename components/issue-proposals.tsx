@@ -203,7 +203,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                   Dispute
                 </button>
               ) : (
-                <button className="btn btn-md btn-red">Failed</button>
+                <button className="btn btn-md btn-danger">Failed</button>
               )}
             </div>
           </div>
