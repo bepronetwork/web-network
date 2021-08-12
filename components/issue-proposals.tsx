@@ -69,7 +69,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
           <div className="col-md-4 mt-3">
             <p
               className={clsx("p-small mb-0", {
-                "color-red": proposal?.isDisputed,
+                "text-danger": proposal?.isDisputed,
               })}
             >
               PR #.. by @....
@@ -89,7 +89,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                     <div className="bd-highlight">
                       <p
                         className={clsx("p-small mb-0", {
-                          "color-red": proposal?.isDisputed,
+                          "text-danger": proposal?.isDisputed,
                           "color-purple": !proposal?.isDisputed,
                         })}
                       >
@@ -99,7 +99,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
 
                     <div
                       className={clsx("proposal-progress  bd-highlight", {
-                        "bg-red": proposal?.isDisputed,
+                        "bg-danger": proposal?.isDisputed,
                         "bg-purple": !proposal?.isDisputed,
                       })}
                       key={index}
@@ -115,7 +115,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                 <div className="d-flex align-items-stretch mb-0 ">
                   <p
                     className={clsx("smallCaption mb-0", {
-                      "color-red": proposal?.isDisputed,
+                      "text-danger": proposal?.isDisputed,
                       "color-purple": !proposal?.isDisputed,
                     })}
                   >
@@ -127,7 +127,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                   <div className="progress progress-oracle my-1">
                     <div
                       className={clsx("progress-bar ", {
-                        "bg-red": proposal?.isDisputed,
+                        "bg-danger": proposal?.isDisputed,
                         "bg-purple": !proposal?.isDisputed,
                       })}
                       role="progressbar"
@@ -141,7 +141,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                       <div className="progress progress-ball left">
                         <div
                           className={clsx("progress-bar", {
-                            "bg-red": proposal?.isDisputed,
+                            "bg-danger": proposal?.isDisputed,
                             "bg-purple": !proposal?.isDisputed,
                           })}
                           role="progressbar"
@@ -156,7 +156,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                       <div className="progress progress-ball right">
                         <div
                           className={clsx("progress-bar", {
-                            "bg-red": proposal?.isDisputed,
+                            "bg-danger": proposal?.isDisputed,
                             "bg-purple": !proposal?.isDisputed,
                           })}
                           role="progressbar"
@@ -183,7 +183,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                 <div className="d-flex justify-content-center">
                   <p
                     className={clsx("smallCaption  mb-0", {
-                      "color-red": proposal?.isDisputed,
+                      "text-danger": proposal?.isDisputed,
                       "color-purple": !proposal?.isDisputed,
                     })}
                   >
