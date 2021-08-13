@@ -13,14 +13,17 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "baseUrl": "./",
+    "baseUrl": ".",
     "paths": {
-      "assets": ["./assets/*"],
-      "components": ["./components/*"],
-      "helpers": ["./helpers/*"],
-      "pages": ["./pages/*"],
-      "providers": ["./providers/*"],
-      "services": ["./services/*"]
+      "@assets/*": ["assets/*"],
+      "@components/*": ["components/*"],
+      "@helpers/*": ["helpers/*"],
+      "@pages/*": ["pages/*"],
+      "@providers/*": ["providers/*"],
+      "@services/*": ["services/*"],
+      "@interfaces/*": ["interfaces/*"],
+      "@contexts/*": ["contexts/*"],
+      "@reducers/*": ["contexts/reducers/*"]
     }
   },
   "exclude": ["node_modules"],
