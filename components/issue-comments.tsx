@@ -1,6 +1,6 @@
 import { GetStaticProps } from "next";
 import Link from "next/link";
-import { formatDate } from "../helpers/formatDate";
+import { formatDate } from '@helpers/formatDate';
 
 export default function IssueComments({ comments }) {
   return (
