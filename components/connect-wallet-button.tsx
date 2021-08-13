@@ -1,9 +1,8 @@
-import {BeproService} from '../services/bepro-service';
+import {BeproService} from '@services/bepro-service';
 import React, {useContext, useEffect, useState,} from 'react';
-import {ApplicationContext} from '../contexts/application';
-import {changeWalletState} from '../contexts/reducers/change-wallet-connect';
-import {changeCurrentAddress} from '../contexts/reducers/change-current-address';
-// import {BeproService} from '../services/bepro-service';
+import {ApplicationContext} from '@contexts/application';
+import {changeWalletState} from '@reducers/change-wallet-connect';
+import {changeCurrentAddress} from '@reducers/change-current-address';
 
 export default function ConnectWalletButton({children, forceLogin = false, onSuccess = () => null, onFail = () => console.log("error")}) {
   const { state: {metaMaskWallet, beproInit}, dispatch } = useContext(ApplicationContext);

@@ -1,7 +1,7 @@
-import {ReduceActionName} from '../../interfaces/enums/reduce-action-names';
-import {ReduceAction, ReduceActor} from '../../interfaces/reduce-action';
-import {ApplicationState} from '../../interfaces/application-state';
-import {LoadingState} from '../../interfaces/loading-state';
+import {ReduceActionName} from '@interfaces/enums/reduce-action-names';
+import {ReduceAction, ReduceActor} from '@interfaces/reduce-action';
+import {ApplicationState} from '@interfaces/application-state';
+import {LoadingState} from '@interfaces/loading-state';
 
 let loaderWeight = 0
 

@@ -2,7 +2,7 @@ import AccountHero from "./account-hero";
 import Link from "next/link";
 import React, { ComponentPropsWithoutRef, useContext } from "react";
 import ConnectGithub from "./connect-github";
-import { ApplicationContext } from "../contexts/application";
+import { ApplicationContext } from "@contexts/application";
 import clsx from "clsx";
 
 interface Props extends ComponentPropsWithoutRef<"div"> {

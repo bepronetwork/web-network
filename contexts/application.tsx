@@ -1,14 +1,14 @@
 import React, {createContext, Dispatch, useContext, useEffect, useReducer} from 'react';
-import {mainReducer} from './reducers/main';
-import {ApplicationState} from '../interfaces/application-state';
-import {ReduceActor} from '../interfaces/reduce-action';
+import {mainReducer} from '@reducers/main';
+import {ApplicationState} from '@interfaces/application-state';
+import {ReduceActor} from '@interfaces/reduce-action';
 import LoadApplicationReducers from './reducers';
-import {BeproService} from '../services/bepro-service';
-import {changeBeproInitState} from './reducers/change-bepro-init-state';
+import {BeproService} from '@services/bepro-service';
+import {changeBeproInitState} from '@reducers/change-bepro-init-state';
 import GithubMicroService from '../services/github-microservice';
 import {useSession} from 'next-auth/client';
-import {changeGithubHandle} from './reducers/change-github-handle';
-import {changeCurrentAddress} from './reducers/change-current-address'
+import {changeGithubHandle} from '@reducers/change-github-handle';
+import {changeCurrentAddress} from '@reducers/change-current-address'
 import Loading from '../components/loading';
 import Toaster from '../components/toaster';
 
