@@ -1,6 +1,6 @@
 import Avatar from "components/avatar";
 import { GetStaticProps } from "next";
-import { formatDate } from "../helpers/formatDate";
+import { formatDate } from '@helpers/formatDate';
 
 export default function IssueHero({ issue, state, amount }) {
   function renderCreator() {

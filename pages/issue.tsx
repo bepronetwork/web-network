@@ -1,15 +1,15 @@
-import { GetStaticProps } from "next";
-import React, { useContext, useEffect, useState } from "react";
-import IssueComments from "../components/issue-comments";
-import IssueDescription from "../components/issue-description";
-import IssueHero from "../components/issue-hero";
-import PageActions from "../components/page-actions";
-import IssueProposals from "../components/issue-proposals";
-import { useRouter } from "next/router";
-import { BeproService } from "../services/bepro-service";
-import GithubMicroService from "../services/github-microservice";
-import { ApplicationContext } from "../contexts/application";
-import { IssueData } from "../interfaces/issue-data";
+import { GetStaticProps } from 'next/types';
+import React, { useContext, useEffect, useState } from 'react';
+import IssueComments from '@components/issue-comments';
+import IssueDescription from '@components/issue-description';
+import IssueHero from '@components/issue-hero';
+import PageActions from '@components/page-actions';
+import IssueProposals from '@components/issue-proposals';
+import { useRouter } from 'next/router';
+import { BeproService } from '@services/bepro-service';
+import GithubMicroService from '@services/github-microservice';
+import { ApplicationContext } from '@contexts/application';
+import { IssueData } from '@interfaces/issue-data';
 
 export default function PageIssue() {
   const router = useRouter();

@@ -2,13 +2,13 @@ import { GetStaticProps } from "next";
 import React, { useContext } from "react";
 import IssueAvatars from "./issue-avatars";
 import Link from "next/link";
-import { BeproService } from "../services/bepro-service";
+import { BeproService } from '@services/bepro-service';
 import NewProposal from "./create-proposal";
-import { ApplicationContext } from "../contexts/application";
-import { changeLoadState } from "../contexts/reducers/change-load-state";
-import GithubMicroService from "../services/github-microservice";
-import { developer, pullRequest } from "interfaces/issue-data";
-import { changeBalance } from "contexts/reducers/change-balance";
+import { ApplicationContext } from '@contexts/application';
+import { changeLoadState } from '@reducers/change-load-state';
+import GithubMicroService from "@services/github-microservice";
+import { developer, pullRequest } from "@interfaces/issue-data";
+import { changeBalance } from "@contexts/reducers/change-balance";
 
 interface pageActions {
   issueId: string;

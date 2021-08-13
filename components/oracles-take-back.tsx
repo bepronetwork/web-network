@@ -2,9 +2,9 @@ import OraclesBoxHeader from "./oracles-box-header";
 import { isEmpty, isEqual, sumBy, uniqueId } from "lodash";
 import {useContext, useEffect, useState} from 'react';
 import OraclesTakeBackItem from "./oracles-take-back-item";
-import {ApplicationContext} from '../contexts/application';
-import {BeproService} from '../services/bepro-service';
-import {changeOraclesState} from '../contexts/reducers/change-oracles';
+import {ApplicationContext} from '@contexts/application';
+import {BeproService} from '@services/bepro-service';
+import {changeOraclesState} from '@reducers/change-oracles';
 
 type Item = { address: string; amount: string };
 

@@ -1,7 +1,7 @@
 import { kebabCase } from "lodash";
 import { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
-import WebThreeUnavailable from "../assets/web3-unavailable";
+import WebThreeUnavailable from "@assets/web3-unavailable";
 
 export default function WebThreeDialog() {
   const [show, setShow] = useState<boolean>(false);
