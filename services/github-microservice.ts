@@ -140,7 +140,7 @@ export default class GithubMicroService {
                  .then(({data}) => data)
                  .catch(e => {
                    console.error(e);
-                   return null;
+                   return {scMergeId: '', pullRequestId: '', issueId: '', id: ''}
                  })
   }
 }
