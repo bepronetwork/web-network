@@ -1,7 +1,7 @@
 import { toNumber } from "lodash";
 import { GetStaticProps } from "next";
 import { useEffect, useState } from "react";
-import {BeproService} from "../services/bepro-service";
+import {BeproService} from '@services/bepro-service';
 
 interface Proposal {
   disputes: string;

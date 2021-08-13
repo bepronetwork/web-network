@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {IssueData, IssueState} from '../interfaces/issue-data';
+import {IssueData, IssueState} from '@interfaces/issue-data';
 import { API } from '../env';
 
 interface User {
@@ -83,7 +83,7 @@ export default class GithubMicroService {
    * Should return network status
    */
   static async getNetworkStats() {
-    return client.get<{openIssues: number, beproStaked: number, tokensStaked: number, closedIssues?: number}>(`/networkstatus`)
+    return client.get<{openIssues: number, beproStaked: number, tokensStaked: number, closedIssues?: number}>(`/networkstats`)
                  .then(({data}) => data)
                  .catch(e => {
                    console.error(e);
