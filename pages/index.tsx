@@ -1,6 +1,6 @@
-import React from "react";
-import { GetStaticProps } from "next";
-import PageDevelopers from "./developers";
+import React from 'react';
+import { GetStaticProps } from 'next/types';
+import PageDevelopers from './developers';
 
 export default function Home() {
   return <PageDevelopers />;

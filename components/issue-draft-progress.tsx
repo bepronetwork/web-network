@@ -1,5 +1,5 @@
 import { GetStaticProps } from "next";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { ProgressBar } from "react-bootstrap";
 
 export default function IssueDraftProgress({ amountUsed, amountTotal }) {
