@@ -1,8 +1,7 @@
 import { GetStaticProps } from "next";
 import {useContext, useEffect, useState} from 'react';
-import {BeproService} from '../services/bepro-service';
-import {ApplicationContext} from '../contexts/application';
-import GithubMicroService from '../services/github-microservice';
+import {ApplicationContext} from '@contexts/application';
+import GithubMicroService from '@services/github-microservice';
 
 export default function PageHero({title = "Find issues to work",}) {
 
@@ -23,7 +22,7 @@ export default function PageHero({title = "Find issues to work",}) {
                       })
   }
 
-  useEffect(loadTotals, []);
+  useEffect(loadTotals, [beproInit]);
 
   return (
     <div className="banner bg-bepro-blue mb-4">

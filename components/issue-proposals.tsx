@@ -2,8 +2,8 @@ import clsx from "clsx";
 import { toNumber } from "lodash";
 import { GetStaticProps } from "next";
 import { useEffect, useState } from "react";
-import GithubMicroService from "../services/github-microservice";
-import { BeproService } from "../services/bepro-service";
+import GithubMicroService from "@services/github-microservice";
+import { BeproService } from "@services/bepro-service";
 
 interface Proposal {
   disputes: string;
