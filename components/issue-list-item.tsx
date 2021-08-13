@@ -1,10 +1,10 @@
 import { GetStaticProps } from 'next'
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { formatDate } from '../helpers/formatDate';
+import { formatDate } from '@helpers/formatDate';
 import IssueAvatars from './issue-avatars';
-import {IssueData} from '../interfaces/issue-data';
-import { BeproService } from '../services/bepro-service';
+import {IssueData} from '@interfaces/issue-data';
+import { BeproService } from '@services/bepro-service';
 
 export default function IssueListItem({issue = null}:{issue?: IssueData}) {
     const router = useRouter()

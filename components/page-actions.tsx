@@ -1,13 +1,12 @@
 import { GetStaticProps } from "next";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, } from "react";
 import IssueAvatars from "./issue-avatars";
 import CreateProposal from "./create-proposal";
 import Link from "next/link";
-import { BeproService } from "../services/bepro-service";
+import { BeproService } from '@services/bepro-service';
 import NewProposal from "./create-proposal";
-
-import { ApplicationContext } from "../contexts/application";
-import { changeLoadState } from "../contexts/reducers/change-load-state";
+import { ApplicationContext } from '@contexts/application';
+import { changeLoadState } from '@reducers/change-load-state';
 import GithubMicroService from "../services/github-microservice";
 import { developer, pullRequest } from "interfaces/issue-data";
 import { addToast } from "contexts/reducers/add-toast";
@@ -15,7 +14,7 @@ import { addToast } from "contexts/reducers/add-toast";
 interface pageActions {
   issueId: string,
   UrlGithub: string,
-  developers?: developer[],  
+  developers?: developer[],
   userAddress: string,
   finalized: boolean,
   addressNetwork: string,

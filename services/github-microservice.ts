@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {IssueData, IssueState} from '../interfaces/issue-data';
+import {IssueData, IssueState} from '@interfaces/issue-data';
 import { API } from '../env';
 
 interface User {

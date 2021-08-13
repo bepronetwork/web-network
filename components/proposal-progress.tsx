@@ -1,6 +1,6 @@
 import { GetStaticProps } from "next";
-import React, { useEffect, useState } from "react";
-import { ProgressBar } from "react-bootstrap";
+import React from "react";
+
 
 export default function ProposalProgress({ developers }) {
   return (

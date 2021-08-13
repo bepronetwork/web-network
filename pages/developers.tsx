@@ -1,12 +1,12 @@
-import { GetStaticProps } from "next";
+import { GetStaticProps } from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
-import PageHero from "../components/page-hero";
-import GithubMicroService from "../services/github-microservice";
-import ListIssues from "../components/list-issues";
-import ReactSelect from "../components/react-select";
-import {ApplicationContext} from '../contexts/application';
-import {changeLoadState} from '../contexts/reducers/change-load-state';
-import {IssueData} from '../interfaces/issue-data';
+import PageHero from "@components/page-hero";
+import GithubMicroService from '@services/github-microservice';
+import ListIssues from '@components/list-issues';
+import ReactSelect from '@components/react-select';
+import {ApplicationContext} from '@contexts/application';
+import {changeLoadState} from '@reducers/change-load-state';
+import {IssueData} from '@interfaces/issue-data';
 
 type Filter = {
   label: string;

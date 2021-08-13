@@ -1,9 +1,9 @@
-import { GetStaticProps } from "next";
-import React, { useEffect, useState } from "react";
-import PageActions from "../components/page-actions";
-import ProposalAddresses from "../components/proposal-addresses";
-import ProposalHero from "../components/proposal-hero";
-import ProposalProgress from "../components/proposal-progress";
+import { GetStaticProps } from 'next/types';
+import React from 'react';
+import PageActions from '@components/page-actions';
+import ProposalAddresses from '@components/proposal-addresses';
+import ProposalHero from '@components/proposal-hero';
+import ProposalProgress from '@components/proposal-progress';
 
 export default function PageProposal() {
   return (
