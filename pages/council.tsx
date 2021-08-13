@@ -1,11 +1,11 @@
 import {GetStaticProps} from 'next';
 import React, {useContext, useEffect, useState} from 'react';
-import {IssueData} from '../interfaces/issue-data';
-import ListIssues from '../components/list-issues';
-import PageHero from '../components/page-hero';
-import GithubMicroService from '../services/github-microservice';
-import {ApplicationContext} from '../contexts/application';
-import {changeLoadState} from '../contexts/reducers/change-load-state';
+import {IssueData} from '@interfaces/issue-data';
+import ListIssues from '@components/list-issues';
+import PageHero from '@components/page-hero';
+import GithubMicroService from '@services/github-microservice';
+import {ApplicationContext} from '@contexts/application';
+import {changeLoadState} from '@reducers/change-load-state';
 
 export default function PageCouncil() {
   const {dispatch} = useContext(ApplicationContext);

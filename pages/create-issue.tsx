@@ -1,13 +1,13 @@
-import {GetStaticProps} from 'next'
+import {GetStaticProps} from 'next/types'
 import React, {useContext, useEffect, useState} from 'react';
-import {BeproService} from '../services/bepro-service';
-import GithubMicroService from '../services/github-microservice';
-import InputNumber from '../components/input-number';
+import {BeproService} from '@services/bepro-service';
+import GithubMicroService from '@services/github-microservice';
+import InputNumber from '@components/input-number';
 import {useRouter} from 'next/router';
 import clsx from 'clsx';
-import {ApplicationContext} from '../contexts/application';
-import {changeLoadState} from '../contexts/reducers/change-load-state';
-import ConnectWalletButton from '../components/connect-wallet-button';
+import {ApplicationContext} from '@contexts/application';
+import {changeLoadState} from '@reducers/change-load-state';
+import ConnectWalletButton from '@components/connect-wallet-button';
 
 interface Amount {
   value?: string,

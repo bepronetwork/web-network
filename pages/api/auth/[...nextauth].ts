@@ -1,7 +1,7 @@
-import NextAuth from "next-auth";
-import Providers from "next-auth/providers";
-import GithubMicroService from "../../../services/github-microservice";
-import { BeproService } from "../../../services/bepro-service";
+import NextAuth from 'next-auth';
+import Providers from 'next-auth/providers';
+import GithubMicroService from '@services/github-microservice';
+import { BeproService } from '@services/bepro-service';
 
 export default NextAuth({
   providers: [

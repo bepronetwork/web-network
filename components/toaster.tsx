@@ -1,7 +1,7 @@
 import {useContext} from 'react';
-import {ApplicationContext} from '../contexts/application';
+import {ApplicationContext} from '@contexts/application';
 import {Toast} from 'react-bootstrap';
-import {removeToast} from '../contexts/reducers/remove-toast';
+import {removeToast} from '@reducers/remove-toast';
 
 export default function Toaster() {
   const {state: {toaster}, dispatch} = useContext(ApplicationContext);
