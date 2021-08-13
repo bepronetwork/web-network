@@ -40,33 +40,24 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
 
   useEffect(() => {
     const gets = async () => {
-      var arrayProposals = [];
+      const pool = [];
       for (var i = 0; i < numberProposals; i++) {
-        await BeproService.network
-          .getMergeById({
-            issue_id: issueId,
-            merge_id: i,
-          })
-          .then((values: Proposal) => {
-            BeproService.network
-              .IsMergeDisputed({
-                issueId: issueId,
-                mergeId: i,
-              })
-              .then((isDisputed) => {
-                values.isDisputed = isDisputed;
-                GithubMicroService.getMergeProposalIssue(
-                  issueId,
-                  i.toString()
-                ).then((items) => {
-                  values.pullRequestId = items.pullRequestId;
-                  arrayProposals.push(values);
-                });
-              });
-          })
-          .catch((err) => console.log("error", err));
+        const merge = await BeproService.network.getMergeById({ issueId, i });
+        const isMergeDisputed = await BeproService.network.IsMergeDisputed({
+          issueId,
+          i,
+        });
+        const mergeProposal = await GithubMicroService.getMergeProposalIssue(
+          issueId,
+          i.toString()
+        );
+
+        merge.isDisputed = isMergeDisputed;
+        merge.pullRequestId = mergeProposal.pullRequestId;
+
+        pool.push(merge);
       }
-      arrayProposals.length === numberProposals && setProposals(arrayProposals);
+      pool.length === numberProposals && setProposals(pool);
     };
     gets();
   }, []);
