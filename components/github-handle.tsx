@@ -1,9 +1,5 @@
-import {useContext, useEffect, useState,} from 'react';
-import Link from 'next/link';
-import {ApplicationContext} from '../contexts/application';
-import {changeGithubHandle} from '../contexts/reducers/change-github-handle';
-import {useSession} from 'next-auth/client';
-import GithubImage from './github-image';
+import {useContext,} from 'react';
+import {ApplicationContext} from '@contexts/application';
 import Avatar from 'components/avatar';
 
 export default function GithubHandle() {

@@ -1,12 +1,11 @@
 import {GetStaticProps} from 'next'
 import React, {useContext} from 'react';
 import {useEffect, useState} from 'react';
-import {BeproService} from '../services/bepro-service';
-// import {BeproService as beproService} from '../services/bepro-service';
+import {BeproService} from '@services/bepro-service';
 import Link from 'next/link';
 import ConnectWalletButton from './connect-wallet-button';
-import {ApplicationContext} from '../contexts/application';
-import {changeStakedState} from '../contexts/reducers/change-staked-amount';
+import {ApplicationContext} from '@contexts/application';
+import {changeStakedState} from '@reducers/change-staked-amount';
 import { formatNumberToNScale, formatNumberToString } from 'helpers/formatNumber';
 
 export default function MainNav() {
