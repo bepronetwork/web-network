@@ -22,6 +22,7 @@ interface pageActions {
   state?: string,
   pullRequests?: pullRequest[],
   amountIssue?: string | number,
+  mergeProposals?: number,
   forks?: [],
   title?: string,
   description?: string,
@@ -42,6 +43,7 @@ export default function PageActions({
   forks,
   title,
   description,
+  mergeProposals,
   handleNetworkIssue,
 }: pageActions) {
   const {
@@ -91,6 +93,7 @@ export default function PageActions({
           <NewProposal
             issueId={issueId}
             amountTotal={amountIssue}
+            numberMergeProposals={mergeProposals}
             pullRequests={pullRequests}
           />
         </>
@@ -140,6 +143,7 @@ export default function PageActions({
               {state.toLowerCase() === "ready" && (
                 <CreateProposal
                   issueId={issueId}
+                  numberMergeProposals={mergeProposals}
                   amountTotal={amountIssue}
                   pullRequests={pullRequests}
                 />
