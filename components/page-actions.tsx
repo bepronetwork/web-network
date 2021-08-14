@@ -1,39 +1,37 @@
 import { GetStaticProps } from "next";
-import React, { useContext, } from "react";
+import React, { useContext } from "react";
 import IssueAvatars from "./issue-avatars";
-import CreateProposal from "./create-proposal";
 import Link from "next/link";
 import { BeproService } from '@services/bepro-service';
 import NewProposal from "./create-proposal";
 import { ApplicationContext } from '@contexts/application';
 import { changeLoadState } from '@reducers/change-load-state';
-import GithubMicroService from "../services/github-microservice";
-import { developer, pullRequest } from "interfaces/issue-data";
-import { addToast } from "contexts/reducers/add-toast";
+import GithubMicroService from "@services/github-microservice";
+import { developer, pullRequest } from "@interfaces/issue-data";
+import { changeBalance } from "@contexts/reducers/change-balance";
+import { addToast } from "@contexts/reducers/add-toast";
 
 interface pageActions {
-  issueId: string,
-  UrlGithub: string,
-  developers?: developer[],
-  userAddress: string,
-  finalized: boolean,
-  addressNetwork: string,
-  isIssueinDraft: boolean,
-  state?: string,
-  pullRequests?: pullRequest[],
-  amountIssue?: string | number,
-  mergeProposals?: number,
-  forks?: [],
-  title?: string,
-  description?: string,
-  handleNetworkIssue?: () => Promise<void>
+  issueId: string;
+  UrlGithub: string;
+  developers?: developer[];
+  finalized: boolean;
+  addressNetwork: string;
+  isIssueinDraft: boolean;
+  state?: string;
+  pullRequests?: pullRequest[];
+  mergeProposals?: number;
+  amountIssue?: string | number;
+  forks?: { owner: developer }[];
+  title?: string;
+  description?: string;
+  handleNetworkIssue?: () => void;
 }
 
 export default function PageActions({
   issueId,
   UrlGithub,
   developers,
-  userAddress,
   finalized,
   addressNetwork,
   isIssueinDraft,
@@ -48,7 +46,7 @@ export default function PageActions({
 }: pageActions) {
   const {
     dispatch,
-    state: { githubHandle },
+    state: { githubHandle, currentAddress },
   } = useContext(ApplicationContext);
 
   function handleAvatar() {
@@ -59,14 +57,32 @@ export default function PageActions({
     }
   }
 
+  function handleFork() {
+    if (forks?.length > 0) {
+      return (
+        <>
+          <IssueAvatars users={forks.map((item) => item.owner)}></IssueAvatars>
+          <p className="mb-1 me-2">Forks</p>
+        </>
+      );
+    }
+  }
+
   async function handleRedeem() {
     dispatch(changeLoadState(true));
     await BeproService.login()
-      .then(() =>
-        BeproService.network.redeemIssue({
-          issueId,
-        })
-      )
+      .then(() => {
+        BeproService.network
+          .redeemIssue({
+            issueId,
+          })
+          .then(() => {
+            BeproService.getBalance("bepro").then((bepro) =>
+              dispatch(changeBalance({ bepro }))
+            );
+            handleNetworkIssue();
+          });
+      })
       .catch((err) => console.log(err))
       .finally(() => dispatch(changeLoadState(false)));
   }
@@ -74,7 +90,8 @@ export default function PageActions({
   const renderRedeem = () => {
     return (
       isIssueinDraft === true &&
-      addressNetwork === userAddress && (
+      addressNetwork === currentAddress &&
+      !finalized && (
         <button
           className="btn btn-md btn-primary mx-1 px-4"
           onClick={handleRedeem}
@@ -107,7 +124,7 @@ export default function PageActions({
         <button
           className="btn btn-md btn-primary ms-1 px-4"
           onClick={handlePullrequest}
-          disabled={!githubHandle}
+          disabled={!githubHandle || !currentAddress}
         >
           Create Pull Request
         </button>
@@ -133,24 +150,16 @@ export default function PageActions({
             <h4 className="h4">Details</h4>
             <div className="d-flex align-items-center">
               {handleAvatar()}
-              {forks && <span className="p-1 mx-2">+{forks.length} FORKS</span>}
+              {forks && handleFork()}
               {UrlGithub && (
                 <Link href={UrlGithub}>
                   <a className="btn btn-md btn-opac mx-1">View on github</a>
                 </Link>
               )}
               {renderRedeem()}
-              {state.toLowerCase() === "ready" && (
-                <CreateProposal
-                  issueId={issueId}
-                  numberMergeProposals={mergeProposals}
-                  amountTotal={amountIssue}
-                  pullRequests={pullRequests}
-                />
-              )}
               {renderProposeDestribution()}
               {renderPullrequest()}
-              {state.toLowerCase() === "pull request" && (
+              {state?.toLowerCase() === "pull request" && (
                 <button className="btn btn-md btn-primary mx-1 px-4">
                   Dispute
                 </button>

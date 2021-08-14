@@ -8,7 +8,7 @@ export default function IssueHero({ issue, state, amount }) {
       issue?.creatorGithub && (
         <>
           by
-          <Avatar className="me-2" userLogin={issue.creatorGithub} />
+          <Avatar className="mx-2" userLogin={issue.creatorGithub} />
           {issue.creatorGithub}
         </>
       )
@@ -48,10 +48,12 @@ export default function IssueHero({ issue, state, amount }) {
                 </div>
                 <div className="col-md-3">
                   <div className="banner-highlight">
-                    <h4 className="h4 mb-0">
-                      {amount > 0 ? amount : "MISSING"}{" "}
-                      <span className="p-small trans">$BEPRO</span>
-                    </h4>
+                    {amount && (
+                      <h4 className="h4 mb-0">
+                        {amount > 0 ? amount : "MISSING"}
+                        <span className="p-small trans"> $BEPRO</span>
+                      </h4>
+                    )}
                   </div>
                 </div>
               </div>

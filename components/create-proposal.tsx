@@ -20,9 +20,7 @@ export default function NewProposal({
   numberMergeProposals,
   pullRequests = [],
 }) {
-  const {
-    state: { balance },
-  } = useContext(ApplicationContext);
+  const {state: {balance,  currentAddress}} = useContext(ApplicationContext);
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>();
   const [error, setError] = useState<string>("");
@@ -143,6 +141,7 @@ export default function NewProposal({
             <button
               className="btn btn-md btn-primary"
               onClick={handleClickCreate}
+              disabled={!currentAddress}
             >
               Create Proposal
             </button>

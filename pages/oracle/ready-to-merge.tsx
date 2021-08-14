@@ -28,6 +28,10 @@ export default function ReadyToMergeIssues() {
   return (
     <Oracle buttonPrimaryActive={false}>
       <ListIssues listIssues={issues} />
+      {
+        issues?.length === 0 &&
+        <h3 className="text-center">No issues ready to merge</h3>
+      }
     </Oracle>
   );
 }
