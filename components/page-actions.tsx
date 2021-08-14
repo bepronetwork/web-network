@@ -2,13 +2,13 @@ import { GetStaticProps } from "next";
 import React, { useContext } from "react";
 import IssueAvatars from "./issue-avatars";
 import Link from "next/link";
-import { BeproService } from "../services/bepro-service";
+import { BeproService } from '@services/bepro-service';
 import NewProposal from "./create-proposal";
-import { ApplicationContext } from "../contexts/application";
-import { changeLoadState } from "../contexts/reducers/change-load-state";
-import GithubMicroService from "../services/github-microservice";
-import { developer, pullRequest } from "interfaces/issue-data";
-import { changeBalance } from "contexts/reducers/change-balance";
+import { ApplicationContext } from '@contexts/application';
+import { changeLoadState } from '@reducers/change-load-state';
+import GithubMicroService from "@services/github-microservice";
+import { developer, pullRequest } from "@interfaces/issue-data";
+import { changeBalance } from "@contexts/reducers/change-balance";
 
 interface pageActions {
   issueId: string;
@@ -39,6 +39,7 @@ export default function PageActions({
   forks,
   title,
   description,
+  mergeProposals,
   handleNetworkIssue,
 }: pageActions) {
   const {
@@ -107,6 +108,7 @@ export default function PageActions({
           <NewProposal
             issueId={issueId}
             amountTotal={amountIssue}
+            numberMergeProposals={mergeProposals}
             pullRequests={pullRequests}
           />
         </>
@@ -135,7 +137,7 @@ export default function PageActions({
       username: githubHandle,
     })
       .then(() => handleNetworkIssue())
-      .catch((err) => console.log("err", err));
+      .catch((err) => dispatch(addToast({type: 'danger', content:'failed to create pull request'})));
   }
 
   return (

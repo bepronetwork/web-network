@@ -1,11 +1,11 @@
 import { GetStaticProps } from 'next'
 import { useRouter } from 'next/router';
 import React, { useContext, useEffect, useState } from 'react';
-import { formatDate } from '../helpers/formatDate';
+import { formatDate } from '@helpers/formatDate';
 import IssueAvatars from './issue-avatars';
-import {IssueData} from '../interfaces/issue-data';
-import { BeproService } from '../services/bepro-service';
-import { ApplicationContext } from 'contexts/application';
+import {IssueData} from '@interfaces/issue-data';
+import { BeproService } from '@services/bepro-service';
+import { ApplicationContext } from '@contexts/application';
 
 export default function IssueListItem({issue = null}:{issue?: IssueData}) {
     const { state: { metaMaskWallet }} = useContext(ApplicationContext)
