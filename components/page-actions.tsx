@@ -73,11 +73,12 @@ export default function PageActions({
           .redeemIssue({
             issueId,
           })
-          .then(() =>
+          .then(() => {
             BeproService.getBalance("bepro").then((bepro) =>
               dispatch(changeBalance({ bepro }))
-            )
-          );
+            );
+            handleNetworkIssue();
+          });
       })
       .catch((err) => console.log(err))
       .finally(() => dispatch(changeLoadState(false)));
@@ -86,7 +87,8 @@ export default function PageActions({
   const renderRedeem = () => {
     return (
       isIssueinDraft === true &&
-      addressNetwork === currentAddress && (
+      addressNetwork === currentAddress &&
+      !finalized && (
         <button
           className="btn btn-md btn-primary mx-1 px-4"
           onClick={handleRedeem}
