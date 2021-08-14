@@ -9,6 +9,7 @@ import { changeLoadState } from '@reducers/change-load-state';
 import GithubMicroService from "@services/github-microservice";
 import { developer, pullRequest } from "@interfaces/issue-data";
 import { changeBalance } from "@contexts/reducers/change-balance";
+import { addToast } from "@contexts/reducers/add-toast";
 
 interface pageActions {
   issueId: string;
@@ -19,6 +20,7 @@ interface pageActions {
   isIssueinDraft: boolean;
   state?: string;
   pullRequests?: pullRequest[];
+  mergeProposals?: number;
   amountIssue?: string | number;
   forks?: { owner: developer }[];
   title?: string;
