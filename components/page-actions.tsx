@@ -39,6 +39,7 @@ export default function PageActions({
   forks,
   title,
   description,
+  mergeProposals,
   handleNetworkIssue,
 }: pageActions) {
   const {
@@ -105,6 +106,7 @@ export default function PageActions({
           <NewProposal
             issueId={issueId}
             amountTotal={amountIssue}
+            numberMergeProposals={mergeProposals}
             pullRequests={pullRequests}
           />
         </>
@@ -133,7 +135,7 @@ export default function PageActions({
       username: githubHandle,
     })
       .then(() => handleNetworkIssue())
-      .catch((err) => console.log("err", err));
+      .catch((err) => dispatch(addToast({type: 'danger', content:'failed to create pull request'})));
   }
 
   return (
