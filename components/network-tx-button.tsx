@@ -1,11 +1,10 @@
-import { Network } from 'bepro-js';
-import {BeproService} from '../services/bepro-service';
+import {BeproService} from '@services/bepro-service';
 import {forwardRef, useContext, useEffect, useState} from 'react';
-import {ApplicationContext} from '../contexts/application';
-import {changeLoadState} from '../contexts/reducers/change-load-state';
+import {ApplicationContext} from '@contexts/application';
+import {changeLoadState} from '@reducers/change-load-state';
 import Modal from './modal';
 import Icon from "./icon";
-import {addToast} from '../contexts/reducers/add-toast';
+import {addToast} from '@reducers/add-toast';
 
 interface NetworkTxButtonParams {
   txMethod: string;

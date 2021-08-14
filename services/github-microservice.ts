@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {IssueData, IssueState} from '../interfaces/issue-data';
+import {IssueData, IssueState} from '@interfaces/issue-data';
 import { API } from '../env';
 
 interface User {
@@ -9,6 +9,15 @@ interface User {
   createdAt: string;
   id: number;
   updatedAt: string;
+}
+
+export interface MergeProposal {
+  id: number,
+  scMergeId: string,
+  issueId: string,
+  pullRequestId: string,
+  createdAt: string,
+  updatedAt: string,
 }
 
 const client = axios.create({baseURL: API});
@@ -108,8 +117,8 @@ export default class GithubMicroService {
                  })
   }
 
-  static async createMergeProposal(id: string) {
-    return client.post<'ok'>(`/issues/${id}/mergeproposal`)
+  static async createMergeProposal(id: string, payload: { pullRequestGithubId: number, scMergeId: string}) {
+    return client.post<'ok'>(`/issues/${id}/mergeproposal`, payload)
                  .then(({data}) => data === 'ok')
                  .catch(e => {
                    console.error(e);
@@ -123,6 +132,14 @@ export default class GithubMicroService {
                  .catch(e => {
                    console.error(e);
                    return null;
+                 })
+  }
+  static async getMergeProposalIssue(issueId: string, MergeId: string) {
+    return client.get<MergeProposal>(`/issues/mergeproposal/${MergeId}/${issueId}`)
+                 .then(({data}) => data)
+                 .catch(e => {
+                   console.error(e);
+                   return {scMergeId: '', pullRequestId: '', issueId: '', id: ''}
                  })
   }
 }

@@ -1,9 +1,9 @@
-import {useContext, useEffect, useReducer, useState} from 'react';
-import {BeproService} from "services/bepro-service";
-import {changeLoadState} from '../contexts/reducers/change-load-state';
-import {ApplicationContext} from '../contexts/application';
-import {changeMyIssuesState} from '../contexts/reducers/change-my-issues';
-import {changeOraclesState} from '../contexts/reducers/change-oracles';
+import {useContext, useEffect, useState} from 'react';
+import {BeproService} from "@services/bepro-service";
+import {changeLoadState} from '@reducers/change-load-state';
+import {ApplicationContext} from '@contexts/application';
+import {changeMyIssuesState} from '@reducers/change-my-issues';
+import {changeOraclesState} from '@reducers/change-oracles';
 import GithubHandle from './github-handle';
 
 export default function AccountHero() {
