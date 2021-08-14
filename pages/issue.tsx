@@ -90,6 +90,7 @@ export default function PageIssue() {
         description={issue?.body}
         handleNetworkIssue={getNetworkIssue}
         pullRequests={issue?.pullRequests}
+        mergeProposals={networkIssue?.mergeProposalsAmount}
         amountIssue={networkIssue?.tokensStaked}
         forks={forks}
       />
