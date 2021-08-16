@@ -68,7 +68,7 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
                             issue?.title
                             }
                         </h4>
-                        <div className="d-flex align-center flex-wrap justify-content-center justify-content-md-start">
+                        <div className="d-flex align-center flex-wrap align-item-center justify-content-md-start">
                             <span className={`status ${handleColorState(issue?.state)} mr-3 mt-1`}>{issue?.state}</span>
                             <span className="p-small trans mr-3 mt-1">{issue?.numberOfComments} comments</span>
                             <span className="p-small trans mr-3 mt-1">{issue != null && formatDate(issue?.createdAt)}</span>
