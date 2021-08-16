@@ -6,27 +6,40 @@ import IssueAvatars from './issue-avatars';
 import {IssueData} from '@interfaces/issue-data';
 import { BeproService } from '@services/bepro-service';
 import { ApplicationContext } from '@contexts/application';
+import { IssueState } from '@interfaces/issue-data'
 
 export default function IssueListItem({issue = null}:{issue?: IssueData}) {
     const { state: { metaMaskWallet }} = useContext(ApplicationContext)
     const router = useRouter()
     const [amount, setAmount] = useState<string>()
 
-   function handleColorState (state: string) {
-    switch(state.toLowerCase()) {
-     case "draft": {
-        return "gray"
-     }
-     case "in progress" || "open": {
-        return "blue"
-     }
-     case "ready": {
-        return "green"
-     }
-     default: {
-        return "blue"
-     }
-    }
+   function handleColorState (state: IssueState) {
+        switch(state.toLowerCase()) {
+            case "draft": {
+                return "gray"
+            }
+            case "in progress":{
+                return "blue"
+            }
+            case "open":{
+                return "blue"
+            }
+            case "redeemed":{
+                return "blue"
+            }
+            case "ready":{
+                return "green"
+            }
+            case "done":{
+                return "green"
+            }
+            case "disputed":{
+                return "red"
+            }
+            default: {
+                return "blue"
+            }
+        }
    }
 
    useEffect(() => {
