@@ -26,6 +26,7 @@ interface pageActions {
   title?: string;
   description?: string;
   handleNetworkIssue?: () => void;
+  githubLogin?: string;
 }
 
 export default function PageActions({
@@ -43,6 +44,7 @@ export default function PageActions({
   description,
   mergeProposals,
   handleNetworkIssue,
+  githubLogin
 }: pageActions) {
   const {
     dispatch,
@@ -120,7 +122,7 @@ export default function PageActions({
 
   function renderPullrequest() {
     return (
-      !finalized && (
+      !finalized && githubLogin && (
         <button
           className="btn btn-md btn-primary ms-1 px-4"
           onClick={handlePullrequest}
@@ -136,7 +138,7 @@ export default function PageActions({
     GithubMicroService.createPullRequestIssue(issueId, {
       title: title,
       description: description,
-      username: githubHandle,
+      username: githubLogin,
     })
       .then(() => handleNetworkIssue())
       .catch((err) => dispatch(addToast({type: 'danger', content:'failed to create pull request'})));
