@@ -139,7 +139,7 @@ export default function PageActions({
       username: githubHandle,
     })
       .then(() => handleNetworkIssue())
-      .catch((err) => dispatch(addToast({type: 'danger', content:'failed to create pull request'})));
+      .catch((err) => dispatch(addToast({type: 'danger', title: "Failed",content:'failed to create pull request'})));
   }
 
   return (
