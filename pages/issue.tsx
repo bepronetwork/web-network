@@ -1,15 +1,15 @@
-import { GetStaticProps } from 'next/types';
-import React, { useContext, useEffect, useState } from 'react';
-import IssueComments from '@components/issue-comments';
-import IssueDescription from '@components/issue-description';
-import IssueHero from '@components/issue-hero';
-import PageActions from '@components/page-actions';
-import IssueProposals from '@components/issue-proposals';
-import { useRouter } from 'next/router';
-import { BeproService } from '@services/bepro-service';
-import GithubMicroService from '@services/github-microservice';
-import { ApplicationContext } from '@contexts/application';
-import { IssueData } from '@interfaces/issue-data';
+import { GetStaticProps } from "next/types";
+import React, { useContext, useEffect, useState } from "react";
+import IssueComments from "@components/issue-comments";
+import IssueDescription from "@components/issue-description";
+import IssueHero from "@components/issue-hero";
+import PageActions from "@components/page-actions";
+import IssueProposals from "@components/issue-proposals";
+import { useRouter } from "next/router";
+import { BeproService } from "@services/bepro-service";
+import GithubMicroService, { User } from "@services/github-microservice";
+import { ApplicationContext } from "@contexts/application";
+import { IssueData } from "@interfaces/issue-data";
 
 export default function PageIssue() {
   const router = useRouter();
@@ -24,6 +24,7 @@ export default function PageIssue() {
   const [commentsIssue, setCommentsIssue] = useState();
   const [balance, setBalance] = useState();
   const [forks, setForks] = useState();
+  const [currentUser, setCurrentUser] = useState<User>();
 
   const getsIssueMicroService = () => {
     GithubMicroService.getIssueId(id).then((issue) => {
@@ -45,10 +46,17 @@ export default function PageIssue() {
       .then((isIssueInDraft) => setIsIssueinDraft(isIssueInDraft));
   };
 
+  const getCurrentUserMicroService = () => {
+    GithubMicroService.getUserOf(currentAddress).then((user: User) =>
+      setCurrentUser(user)
+    );
+  };
+
   const gets = () => {
     if (currentAddress && id) {
       getsIssueMicroService();
       getsIssueBeproService();
+      getCurrentUserMicroService();
     } else if (id) getsIssueMicroService();
   };
   useEffect(gets, [currentAddress, id]);
@@ -95,6 +103,7 @@ export default function PageIssue() {
         mergeProposals={networkIssue?.mergeProposalsAmount}
         amountIssue={networkIssue?.tokensStaked}
         forks={forks}
+        githubLogin={currentUser?.githubLogin}
       />
       {networkIssue?.mergeProposalsAmount > 0 && (
         <IssueProposals
