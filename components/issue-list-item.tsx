@@ -6,27 +6,40 @@ import IssueAvatars from './issue-avatars';
 import {IssueData} from '@interfaces/issue-data';
 import { BeproService } from '@services/bepro-service';
 import { ApplicationContext } from '@contexts/application';
+import { IssueState } from '@interfaces/issue-data'
 
 export default function IssueListItem({issue = null}:{issue?: IssueData}) {
     const { state: { metaMaskWallet }} = useContext(ApplicationContext)
     const router = useRouter()
     const [amount, setAmount] = useState<string>()
 
-   function handleColorState (state: string) {
-    switch(state.toLowerCase()) {
-     case "draft": {
-        return "gray"
-     }
-     case "in progress" || "open": {
-        return "blue"
-     }
-     case "ready": {
-        return "green"
-     }
-     default: {
-        return "blue"
-     }
-    }
+   function handleColorState (state: IssueState) {
+        switch(state.toLowerCase()) {
+            case "draft": {
+                return "gray"
+            }
+            case "in progress":{
+                return "blue"
+            }
+            case "open":{
+                return "blue"
+            }
+            case "redeemed":{
+                return "blue"
+            }
+            case "ready":{
+                return "green"
+            }
+            case "done":{
+                return "green"
+            }
+            case "disputed":{
+                return "red"
+            }
+            default: {
+                return "blue"
+            }
+        }
    }
 
    useEffect(() => {
@@ -55,7 +68,7 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
                             issue?.title
                             }
                         </h4>
-                        <div className="d-flex align-center flex-wrap justify-content-center justify-content-md-start">
+                        <div className="d-flex align-center flex-wrap align-item-center justify-content-md-start">
                             <span className={`status ${handleColorState(issue?.state)} mr-3 mt-1`}>{issue?.state}</span>
                             <span className="p-small trans mr-3 mt-1">{issue?.numberOfComments} comments</span>
                             <span className="p-small trans mr-3 mt-1">{issue != null && formatDate(issue?.createdAt)}</span>

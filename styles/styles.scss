@@ -493,18 +493,21 @@ label {
   padding: 0px $m/2;
   border-radius: $m/8;
   color: $bg-shadow;
-  font-weight: 500;
+  font-weight: 400;
+  text-transform: capitalize;
   &.gray {
     background-color: $gray;
   }
   &.blue {
     background-color: $blue;
+    color: $white;
   }
   &.green {
     background-color: $green;
   }
   &.red {
     background-color: $red;
+    color: $white;
   }
 }
 
