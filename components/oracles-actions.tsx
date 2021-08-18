@@ -158,7 +158,7 @@ function OraclesActions(): JSX.Element {
           <NetworkTxButton txMethod={action.toLowerCase()}
                            txParams={renderInfo.params(walletAddress)}
                            buttonLabel=""
-                           modalTitle={renderInfo.tile}
+                           modalTitle={renderInfo.title}
                            modalDescription={renderInfo.description}
                            onSuccess={handleCancel}
                            onFail={setError}

@@ -20,7 +20,7 @@ export default function NewProposal({
   numberMergeProposals,
   pullRequests = [],
 }) {
-  const {state: {balance,  currentAddress}} = useContext(ApplicationContext);
+  const {state: {balance,  currentAddress, beproInit}} = useContext(ApplicationContext);
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>();
   const [error, setError] = useState<string>("");
@@ -99,6 +99,9 @@ export default function NewProposal({
   }
 
   function getCouncilAmount() {
+    if (!beproInit)
+      return;
+
     BeproService.network.COUNCIL_AMOUNT().then(setCouncilAmount);
   }
 
@@ -115,7 +118,7 @@ export default function NewProposal({
       );
   }, [pullRequests]);
 
-  useEffect(getCouncilAmount, []);
+  useEffect(getCouncilAmount, [beproInit]);
   useEffect(updateHideCreateProposalState, [balance.bepro]);
 
   return (

@@ -1,7 +1,7 @@
 import {GetStaticProps} from 'next/types'
 import React, {useContext, useEffect, useState} from 'react';
 import {BeproService} from '@services/bepro-service';
-import GithubMicroService from '@services/github-microservice';
+import GithubMicroService, { User } from '@services/github-microservice';
 import InputNumber from '@components/input-number';
 import {useRouter} from 'next/router';
 import clsx from 'clsx';
@@ -23,6 +23,7 @@ export default function PageCreateIssue() {
   const [balance, setBalance] = useState(0);
   const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
   const {dispatch, state: {currentAddress, githubHandle}} = useContext(ApplicationContext);
+  const [currentUser, setCurrentUser] = useState<User>();
   const router = useRouter()
 
   const allow = async (evt) => {
@@ -53,7 +54,7 @@ export default function PageCreateIssue() {
       description: issueDescription,
       amount: issueAmount.floatValue,
       creatorAddress: beproAddress,
-      creatorGithub: githubHandle
+      creatorGithub: currentUser?.githubLogin
     }
     const contractPayload = {tokenAmount: issueAmount.floatValue, cid: beproAddress};
     console.log('pay', contractPayload)
@@ -108,6 +109,7 @@ export default function PageCreateIssue() {
 
   useEffect(() => {
     BeproService.getBalance('bepro').then(setBalance);
+    GithubMicroService.getUserOf(currentAddress).then(setCurrentUser);
   }, [currentAddress])
 
   return (
