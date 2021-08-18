@@ -57,6 +57,7 @@ export default function ApplicationContextProvider({children}) {
     GithubMicroService.getHandleOf(BeproService.address)
                       .then(handle => {
                         if (handle) dispatch(changeGithubHandle(handle))
+                        else if(session?.user?.name) GithubMicroService.joinAddressToUser(session?.user?.name,{ address: BeproService.address})
                       });
   }
 
