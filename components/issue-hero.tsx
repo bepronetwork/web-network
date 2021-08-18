@@ -28,7 +28,7 @@ export default function IssueHero({ issue, state, amount }) {
                     <h1 className="h4 mb-2">
                       #{issue?.githubId} {issue?.title}
                     </h1>
-                    <div className="d-flex align-center flex-wrap justify-content-center justify-content-md-start">
+                    <div className="d-flex align-center flex-wrap align-item-center justify-content-md-start">
                       <span className="p-small trans mr-3 mt-1">
                         {issue?.numberOfComments} comments
                       </span>
