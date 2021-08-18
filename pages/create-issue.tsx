@@ -8,6 +8,7 @@ import clsx from 'clsx';
 import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';
 import ConnectWalletButton from '@components/connect-wallet-button';
+import { addToast } from '@contexts/reducers/add-toast';
 
 interface Amount {
   value?: string,
@@ -62,6 +63,7 @@ export default function PageCreateIssue() {
                                                                            issueId: response.events?.OpenIssue?.returnValues?.id
                                                                          }))
                       .then(() => {
+                        dispatch(addToast({type:'success', title: 'Success', content: `Create Issue using ${issueAmount.value} $BEPROS`}))
                         router.push('/account');
                         cleanFields();
                       })
