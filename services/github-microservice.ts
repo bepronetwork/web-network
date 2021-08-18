@@ -2,10 +2,10 @@ import axios from 'axios';
 import {IssueData, IssueState} from '@interfaces/issue-data';
 import { API } from '../env';
 
-interface User {
+export interface User {
   githubHandle: string;
   githubLogin: string;
-  address: string;
+  address?: string;
   createdAt: string;
   id: number;
   updatedAt: string;
@@ -52,12 +52,18 @@ export default class GithubMicroService {
     return data;
   }
 
-  /**
-   * Should merge the address and the github handle
-   */
-  static joinAddressToHandle(payload: {address: string, githubHandle: string, githubLogin: string}): Promise<boolean> {
+  static async createGithubData(payload: {githubHandle: string, githubLogin: string}): Promise<boolean> {
     return client.post<string>(`/users/connect`, payload)
                  .then(({data}) => data === `ok`)
+                 .catch((error) => {
+                   console.log(`Error`, error)
+                   return false;
+                 });
+  }
+
+  static async joinAddressToUser(githubHandle: string,payload: {address: string}): Promise<boolean> {
+    return client.patch<string>(`/users/connect/${githubHandle}`, payload)
+                 .then(() => true)
                  .catch((error) => {
                    console.log(`Error`, error)
                    return false;
