@@ -13,14 +13,16 @@ export default NextAuth({
   ],
   callbacks: {
     signIn(user, account, profile: { login: string }) {
-      if (BeproService.address)
-        return GithubMicroService.joinAddressToHandle({
+      if(user.name && profile.login){
+        return GithubMicroService.createGithubData({
           githubHandle: user.name,
-          githubLogin: profile.login,
-          address: BeproService.address,
-        });
+          githubLogin: profile.login
+        })
+        .then(() => true)
+        .catch(() => false)
+      }
 
-      return !!profile?.login;
+      return false
     },
   },
 });
