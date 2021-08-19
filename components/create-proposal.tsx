@@ -132,7 +132,7 @@ export default function NewProposal({
           Create Proposal
         </button>
       )) ||
-        `You need at least ${councilAmount}BEPRO to Create a Proposal`}
+        `You need at least ${councilAmount} BEPRO to Create a Proposal`}
       <Modal
         show={show}
         title="Create Proposal"
@@ -171,6 +171,7 @@ export default function NewProposal({
             <CreateProposalDistributionItem
               key={item.githubHandle}
               by={item.githubHandle}
+              address={item.address}
               onChangeDistribution={handleChangeDistrib}
               error={error}
             />
