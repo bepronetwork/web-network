@@ -13,7 +13,7 @@ export default function GithubHandle() {
   function getGithubLogin() {
     if (contextHandle && currentAddress)
       GithubMicroService.getUserOf(currentAddress).then((handle: User) =>
-        setGithubLogin(handle.githubLogin)
+        setGithubLogin(handle?.githubLogin)
       );
   }
 
