@@ -4,12 +4,22 @@ import TransactionIcon from '../assets/icons/transaction';
 
 const Transactions: React.FC = ()=> {
     return (
-        <div className="container">
+        <div className="container transaction">
+            <h3 className="title white">Ongoing transactions</h3>
+            <div className="d-flex flex-row mb-3 transaction-card">
+                <div className="p-2 bd-highlight">
+                <i className="material-icons-outlined"></i>
+                <span className="material-icons-outlined">
+                    file_download
+                    </span>
+                </div>
+                <div className="p-2 bd-highlight">Flex item 2</div>
+            </div>
         </div>
     )
 }
 
-const Empty: React.FC = ()=> <span className="title mx-5">No ongoing transactions</span>
+const Empty: React.FC = ()=> <h3 className="title mx-5">No ongoing transactions</h3>
 
 const TransactionPopover: React.FC = ({children}) => {
     const [isOpen,setOpen] = useState(false)
@@ -24,6 +34,7 @@ const TransactionPopover: React.FC = ({children}) => {
         <Popover id={`transaction-popover`}>
             <Popover.Body>
                 <Empty/>
+                {/* <Transactions/> */}
             </Popover.Body>
         </Popover>
             }>

@@ -323,7 +323,6 @@ p {
       }
     }
   }
-  
   .account-info {
     // padding: $m $m*2;
     margin-right: -$m;
@@ -692,9 +691,10 @@ label {
     height: fit-content;
 
     .title{
-      font-family: 'fontMedium';
+      font-family: 'fontRegular';
       color: $gray;
       white-space: nowrap;
+      font-size: 18px;
     }
   }
   .popover-arrow{
@@ -703,9 +703,9 @@ label {
     }
   }
 
-  .transactions{
+  .transaction{
     &-card{
-      background: #000000;
+      background-color: $black;
       border-radius: 3px;
     }
   }
