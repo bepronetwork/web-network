@@ -43,10 +43,10 @@ function networkTxButton({txMethod, txParams, onTxStart = () => {}, onSuccess, o
       .then(({status, message}) => {
         if (status) {
           onSuccess()
-          dispatch(addToast({content: `Success!`, title: txMethod}));
+          dispatch(addToast({type:'success', title: 'Success', content: `${txMethod} ${txParams?.tokenAmount} oracles`}));
         } else {
           onFail(message)
-          dispatch(addToast({content: message, title: txMethod}));
+          dispatch(addToast({type: 'danger', title: 'Failed'}));
         }
 
         setTxSuccess(status);
