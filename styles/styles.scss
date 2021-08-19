@@ -323,6 +323,7 @@ p {
       }
     }
   }
+  
   .account-info {
     // padding: $m $m*2;
     margin-right: -$m;
@@ -670,6 +671,44 @@ label {
   &.md-medium { font-size: 24px; }
   &.md-large { font-size: 44px; }
   &.md-larger { font-size: 64px; }
+}
+// Popovers
+
+#transaction-popover{
+  border:none;
+  background-color: transparent;
+  margin-top: $m;
+  .popover-body{
+    background-color: $bg-shadow;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.25);
+    border-radius: $m/2;
+
+    display: flex;
+    align-items: center;
+    text-align: center;
+
+    padding: 20px;
+    width: fit-content;
+    height: fit-content;
+
+    .title{
+      font-family: 'fontMedium';
+      color: $gray;
+      white-space: nowrap;
+    }
+  }
+  .popover-arrow{
+    &::after{
+      border-bottom-color: $bg-shadow;
+    }
+  }
+
+  .transactions{
+    &-card{
+      background: #000000;
+      border-radius: 3px;
+    }
+  }
 }
 
 $c_directions: ('left': 'l', 'right': 'r', 'top': 't', 'bottom': 'b') !default;
