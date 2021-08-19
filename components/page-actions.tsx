@@ -2,10 +2,10 @@ import { GetStaticProps } from "next";
 import React, { useContext } from "react";
 import IssueAvatars from "./issue-avatars";
 import Link from "next/link";
-import { BeproService } from '@services/bepro-service';
+import { BeproService } from "@services/bepro-service";
 import NewProposal from "./create-proposal";
-import { ApplicationContext } from '@contexts/application';
-import { changeLoadState } from '@reducers/change-load-state';
+import { ApplicationContext } from "@contexts/application";
+import { changeLoadState } from "@reducers/change-load-state";
 import GithubMicroService from "@services/github-microservice";
 import { developer, pullRequest } from "@interfaces/issue-data";
 import { changeBalance } from "@contexts/reducers/change-balance";
@@ -25,7 +25,7 @@ interface pageActions {
   forks?: { owner: developer }[];
   title?: string;
   description?: string;
-  handleNetworkIssue?: () => void;
+  handleBeproService?: () => void;
   githubLogin?: string;
 }
 
@@ -43,8 +43,8 @@ export default function PageActions({
   title,
   description,
   mergeProposals,
-  handleNetworkIssue,
-  githubLogin
+  handleBeproService,
+  githubLogin,
 }: pageActions) {
   const {
     dispatch,
@@ -82,7 +82,7 @@ export default function PageActions({
             BeproService.getBalance("bepro").then((bepro) =>
               dispatch(changeBalance({ bepro }))
             );
-            handleNetworkIssue();
+            handleBeproService();
           });
       })
       .catch((err) => console.log(err))
@@ -107,7 +107,8 @@ export default function PageActions({
   function renderProposeDestribution() {
     return (
       !finalized &&
-      pullRequests?.length > 0 && (
+      pullRequests?.length > 0 &&
+      githubLogin && (
         <>
           <NewProposal
             issueId={issueId}
@@ -122,7 +123,8 @@ export default function PageActions({
 
   function renderPullrequest() {
     return (
-      !finalized && githubLogin && (
+      !finalized &&
+      githubLogin && (
         <button
           className="btn btn-md btn-primary ms-1 px-4"
           onClick={handlePullrequest}
@@ -140,8 +142,38 @@ export default function PageActions({
       description: description,
       username: githubLogin,
     })
-      .then(() => handleNetworkIssue())
-      .catch((err) => dispatch(addToast({type: 'danger', title: "Failed",content:'failed to create pull request'})));
+      .then(() => {
+        dispatch(
+          addToast({
+            type: "success",
+            title: "Sucess",
+            content: "Created pull request",
+          })
+        );
+        handleBeproService();
+      })
+      .catch((err) => {
+        console.log("err", err.response);
+        if (err.response?.status === 422 && err.response?.data) {
+          err.response?.data.map((item) =>
+            dispatch(
+              addToast({
+                type: "danger",
+                title: "Failed",
+                content: item.message,
+              })
+            )
+          );
+        } else {
+          dispatch(
+            addToast({
+              type: "danger",
+              title: "Failed",
+              content: "To create pull request",
+            })
+          );
+        }
+      });
   }
 
   return (
