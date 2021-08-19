@@ -12,4 +12,4 @@ export const AddToast: ReduceAction<string> = {
 }
 
 export const addToast = (payload: ToastNotification): ReduceActor<ToastNotification> =>
-  ({name: ReduceActionName.AddToast, payload: {type: 'light', delay: 3000, ...payload}});
+  ({name: ReduceActionName.AddToast, payload: {type: 'primary', delay: 3000, ...payload}});
