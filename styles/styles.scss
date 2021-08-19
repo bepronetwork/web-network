@@ -9,6 +9,80 @@ li {
   list-style: none;
 }
 
+.stylingToast {
+  width: 80%;
+  color: $white;
+  border-radius: 8px;
+  &.warning {
+    border: 2px solid $warning;
+    background-color: rgba($warning, 0.25);
+  }
+  &.info {
+    border: 2px solid $info;
+    background-color: rgba($info, 0.25);
+  }
+  &.secondary {
+    border: 2px solid $secondary;
+    background-color: rgba($secondary, 0.25);
+  }
+  &.primary {
+    border: 2px solid $primary;
+    background-color: rgba($primary, 0.25);
+  }
+  &.danger {
+    border: 2px solid $danger;
+    background-color: rgba($danger, 0.25);
+  }
+  &.success {
+    border: 2px solid $green;
+    background-color: rgba($green, 0.25);
+  }
+
+  .toast-body {
+    padding: 0px 12px 12px 12px;
+  }
+
+}
+
+.link-toast {
+  color: $white;
+  text-decoration: none;
+  &:hover {
+    color: rgba($white, 0.85);
+  }
+}
+
+.stylingToastHeader {
+  display: flex;
+  padding: 10px 10px 0px 5px;
+
+  button {
+    width: 12px;
+    height: 12px;
+    margin-top: 4px;
+    padding: 0px;
+  }
+}
+
+.fill-success {
+  fill: $green
+}
+.fill-warning {
+  fill: $warning
+}
+.fill-danger {
+  fill: $danger
+}
+.fill-info {
+  fill: $info
+}
+.fill-secondary {
+  fill: $secondary
+}
+.fill-primary {
+  fill: $primary
+}
+
 .modal {
   &-header {
     padding-bottom: 0;
