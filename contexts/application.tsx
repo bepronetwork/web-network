@@ -11,6 +11,7 @@ import {changeGithubHandle} from '@reducers/change-github-handle';
 import {changeCurrentAddress} from '@reducers/change-current-address'
 import Loading from '../components/loading';
 import Toaster from '../components/toaster';
+import {addToast} from '@reducers/add-toast';
 
 interface GlobalState {
   state: ApplicationState,
@@ -50,7 +51,6 @@ export default function ApplicationContextProvider({children}) {
   const [state, dispatch] = useReducer(mainReducer, defaultState.state);
   const [session] = useSession();
   function onMetaMaskChange() {
-    console.log(`onMetaMaskChange`, state.currentAddress, BeproService.address, state.currentAddress === BeproService.address)
     if (!state.metaMaskWallet || state.currentAddress === BeproService.address)
       return;
 

@@ -40,7 +40,7 @@ export default function PageCreateIssue() {
                         setAllowedTransaction(transaction)
                         dispatch(changeLoadState(false))
                       })
-                      .catch((error) => console.log('Error', error))
+                      .catch((error) => console.error('Error allow()', error))
                       .finally(() => dispatch(changeLoadState(false)))
   }
 
@@ -56,8 +56,8 @@ export default function PageCreateIssue() {
       creatorAddress: beproAddress,
       creatorGithub: currentUser?.githubLogin
     }
+
     const contractPayload = {tokenAmount: issueAmount.floatValue, cid: beproAddress};
-    console.log('pay', contractPayload)
     await BeproService.network.openIssue(contractPayload)
                       .then((response) => GithubMicroService.createIssue({
                                                                            ...payload,

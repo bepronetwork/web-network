@@ -64,7 +64,7 @@ export default function MainNav() {
   useEffect(updateState, [currentAddress]);
   useEffect(updateBalances, [balance])
 
-  useEffect(()=> console.log(">>",asPath),[asPath])
+  useEffect(()=> console.log("changed `asPath`", asPath),[asPath])
 
   return (
     <div className="main-nav d-flex align-items-center justify-content-between">
@@ -80,17 +80,17 @@ export default function MainNav() {
           </a>
         </Link>
         <ul className="nav-links">
-          <li><Link href="/developers" passHref><a 
+          <li><Link href="/developers" passHref><a
           className={clsx({
             active: asPath === '/developers',
           })}
           >Developers</a></Link></li>
-          <li><Link href="/council" passHref><a 
+          <li><Link href="/council" passHref><a
           className={clsx({
             active: asPath === '/council',
           })}
           >Council</a></Link></li>
-          <li><Link href="/oracle" passHref><a 
+          <li><Link href="/oracle" passHref><a
           className={clsx({
             active: asPath === '/oracle',
           })}

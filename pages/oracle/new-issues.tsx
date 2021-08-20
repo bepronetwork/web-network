@@ -16,7 +16,7 @@ export default function Newissues() {
     GithubMicroService.getIssuesState('draft')
                       .then(setIssues)
                       .catch((error) => {
-                        console.log('Error', error)
+                        console.error('getIssuesState Error', error)
                       })
                       .finally(() => {
                         dispatch(changeLoadState(false))
