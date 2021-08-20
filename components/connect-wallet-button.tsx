@@ -45,7 +45,7 @@ export default function ConnectWalletButton({children, forceLogin = false, onSuc
   }, [beproInit]);
 
   if (!metaMaskWallet)
-    return <button className="btn btn-md btn-white" disabled={beproInit !== true} onClick={connectWallet}>Connect <i className="ico-metamask ml-1" /></button>;
+    return <button className="btn btn-md btn-white" onClick={connectWallet}>Connect <i className="ico-metamask ml-1" /></button>;
 
   return children;
 

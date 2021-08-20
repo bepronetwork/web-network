@@ -11,6 +11,7 @@ import {changeGithubHandle} from '@reducers/change-github-handle';
 import {changeCurrentAddress} from '@reducers/change-current-address'
 import Loading from '../components/loading';
 import Toaster from '../components/toaster';
+import {addToast} from '@reducers/add-toast';
 
 interface GlobalState {
   state: ApplicationState,
