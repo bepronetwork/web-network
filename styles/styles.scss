@@ -716,6 +716,7 @@ label {
       margin-bottom: 12px;
     }
     &__box {
+      cursor: pointer;
       width: 327px;
       padding: 5px 17px;
       background-color: $black;
@@ -756,11 +757,13 @@ label {
     }
     &__header {
       > h3 {
+        font-family: 'Inter-Medium';
         font-size: 16px;
         margin: 0px 0 2px 0;
         color: $white;
       }
       p {
+        font-family: 'Inter-Medium';
         font-size: 14px;;
         color: $gray;
         margin: 0px;;
@@ -773,6 +776,80 @@ label {
       height: 50px;
     }
   }
+}
+  .transaction-modal{
+    max-width: 400px;
+    &__title{
+      >h1{
+        font-family: 'fontBold';
+        font-size: 32px;
+        color: $white;
+      }
+    }
+    &__status{
+        >span{
+          font-family: "Inter-Medium";
+          font-size: 14px;
+          line-height: 160%;
+          color: $gray;
+          margin-bottom: 5px;
+        }
+
+        .indicator{
+          background-color: transparent;
+          border: 1px solid $blue-info;
+          border-radius: 3px;
+          padding: 5px 10px;
+          font-family: 'fontRegular';
+  
+          > p {
+            font-family: 'fontRegular';
+            font-size: 14px;
+            color: $blue-info;
+            margin: 0
+          }
+
+          &.blue-info {
+            border-color: $blue-info;
+            >p{
+              color: $blue-info;
+            }
+          }
+          &.orange {
+            border-color: $secondary;
+            >p{
+              color: $secondary;
+            }
+          }
+        }
+    }
+
+    &__labels{
+      margin: 12px 0;
+    }
+    &__btn-links{
+      button{
+        background: $bg;
+        border-radius: 3px;
+        border:none;
+        margin: 0 5px
+      }
+    }
+    &__box{
+      &-content{
+        background-color: $bg;
+        padding: 14px 17px;
+        margin-bottom: 12px;
+        >span{
+          font-family: "Inter-Medium";
+          font-size: 14px;
+          color: $gray;
+          &.white{
+            color: $white;
+          }
+        }
+      }
+    }
 }
 
 $c_directions: ('left': 'l', 'right': 'r', 'top': 't', 'bottom': 'b') !default;
