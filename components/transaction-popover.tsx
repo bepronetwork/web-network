@@ -78,7 +78,6 @@ const TransactionModal: React.FC<ITransactionModalProps> = ({item, onHide}) => {
 }
 
 const Transactions: React.FC<ITransactionProps>= ({onClickItem})=> {
-    console.log("view")
     return (
         <section className="d-flex flex-column align-items-start w-100">
             <div className="transaction__title">
