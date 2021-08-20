@@ -1,11 +1,16 @@
 import React, { useContext } from "react";
 import { ApplicationContext } from "@contexts/application";
-import { Toast } from "react-bootstrap";
+import {Toast, ToastContainer} from 'react-bootstrap';
 import { removeToast } from "@reducers/remove-toast";
-import IconSuccess from "@assets/icon-success";
-import IconInfo from "@assets/icon-info";
-import IconDanger from "@assets/icon-danger";
-import IconLink from "@assets/icon-link";
+import Icon from '@components/icon';
+
+enum IconMapper {
+  info = `info`,
+  danger = `cancel`,
+  success = `check_circle`,
+  warning = `warning`,
+  secondary = `info`
+}
 
 export default function Toaster() {
   const {
@@ -14,69 +19,31 @@ export default function Toaster() {
   } = useContext(ApplicationContext);
 
   function onClose(i: number) {
+    console.log(`close called`, i);
     dispatch(removeToast(i));
   }
 
-  function handleIconByType(type: string) {
-    switch (type.toLowerCase()) {
-      case "success": {
-        return <IconSuccess className="ms-2 me-4"  />;
-      }
-      case "danger": {
-        return <IconDanger className="ms-2 me-4" />;
-      }
-      case "warning": {
-        return <IconInfo type="warning" className="ms-2 me-4" />;
-      }
-      case "info": {
-        return <IconInfo type="info" className="ms-2 me-4" />;
-      }
-      case "secondary": {
-        return <IconInfo type="secondary" className="ms-2 me-4" />;
-      }
-      case "primary": {
-        return <i className="ico-bepro  ms-2 me-4"></i>;
-      }
-    }
-  }
-
-  return (
-    <>
+  return (<>
+    <ToastContainer position="top-end" className="mt-5 mr-2 fs-5">
       {toaster.map((toast, i) => (
-        <div
-          key={`${toast.title}${i}`}
-          className="position-absolute w-100 d-flex justify-content-end pt-5"
-          style={{ right: "1rem", bottom: "0" }}
-        >
-          <div className="w-25 pb-3 pr-3 d-flex justify-content-end">
-            <Toast
-              bsPrefix={`stylingToast ${toast.type}`}
-              delay={toast.delay || 3000}
-              onClose={() => onClose(i)}
-              show={true}
-              key={i}
-            >
-              <Toast.Header bsPrefix="stylingToastHeader" closeVariant="white">
-                {handleIconByType(toast.type)}
-                <strong className="me-auto">{toast.title}</strong>
-              </Toast.Header>
-              <Toast.Body className="ps-5 ms-2">
-                {toast.content}
-                {toast.link && (
-                  <a href={toast.link} className="link-toast">
-                    <p className="p-0 m-0">
-                      <strong>
-                        {toast.linkName ? toast.linkName : toast.link}
-                      </strong>
-                      <IconLink className="position-absolute ms-1 mt-1" />
-                    </p>
-                  </a>
-                )}
-              </Toast.Body>
-            </Toast>
-          </div>
-        </div>
+        <Toast delay={toast.delay || 3000} autohide={true}
+               onClose={() => onClose(toast.id)}
+               show={true} key={i} bg={toast.type} className={`border border-2 border-${toast.type}`}>
+          <Toast.Header className="border-bottom-0 bg-transparent px-3">
+            {toast.type === `primary` && <i className="ico-bepro me-3 pe-2" /> || <Icon className={`text-${toast.type} me-3 pe-2`}>{IconMapper[toast.type]}</Icon>}
+            <strong className="me-auto">{toast.title}</strong>
+          </Toast.Header>
+          <Toast.Body className="ps-5 pe-3 ms-2">
+            {toast.content}
+            {toast.link && (
+              <a href={toast.link} className="d-block text-decoration-none text-white" target="_blank">
+                  <strong>{toast.linkName ? toast.linkName : toast.link}</strong>
+                  <Icon className="text-white ms-1">north_east</Icon>
+              </a>
+            )}
+          </Toast.Body>
+        </Toast>
       ))}
-    </>
-  );
+    </ToastContainer>
+  </>)
 }
