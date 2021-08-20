@@ -98,7 +98,7 @@ export default function PageIssue() {
         UrlGithub={issue?.url}
         title={issue?.title}
         description={issue?.body}
-        handleNetworkIssue={getNetworkIssue}
+        handleBeproService={getsIssueBeproService}
         pullRequests={issue?.pullRequests}
         mergeProposals={networkIssue?.mergeProposalsAmount}
         amountIssue={networkIssue?.tokensStaked}
