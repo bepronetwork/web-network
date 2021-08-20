@@ -73,10 +73,10 @@ export default function NewProposal({
         }).then(() => {
           handleClose();
           setDistrib({});
-        })
+        }).catch(() => setError("Error to create proposal in MicroService"))
       )
       .catch((err) => {
-        setError(err);
+        setError("Error to create proposal")
         console.error("proposeIssueMerge", err);
       });
   }
