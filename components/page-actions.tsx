@@ -25,6 +25,7 @@ interface pageActions {
   forks?: { owner: developer }[];
   title?: string;
   description?: string;
+  handleMicroService?: () => void;
   handleBeproService?: () => void;
   githubLogin?: string;
 }
@@ -43,6 +44,7 @@ export default function PageActions({
   title,
   description,
   mergeProposals,
+  handleMicroService,
   handleBeproService,
   githubLogin,
 }: pageActions) {
@@ -150,7 +152,7 @@ export default function PageActions({
             content: "Created pull request",
           })
         );
-        handleBeproService();
+        handleMicroService();
       })
       .catch((err) => {
         console.log("err", err.response);
@@ -173,7 +175,7 @@ export default function PageActions({
             })
           );
         }
-      });
+      })
   }
 
   return (
