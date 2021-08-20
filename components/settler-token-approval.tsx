@@ -23,7 +23,7 @@ const SettlerTokenApproval = forwardRef<HTMLButtonElement, Props>(
         onApprove(response.status);
         dispatch(changeLoadState(false));
       } catch (error) {
-        console.log("SettlerTokenApproval", error);
+        console.error("SettlerTokenApproval", error);
         dispatch(changeLoadState(false));
         onApprove(false);
       }

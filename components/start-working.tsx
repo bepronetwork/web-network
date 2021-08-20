@@ -11,7 +11,7 @@ export default function StartWorking({ issueId, userAddress }): JSX.Element {
       githubHandle: "Mock",
       address: userAddress,
     });
-    console.log("startWorking", startWorking);
+
     setShow(false);
   }
 

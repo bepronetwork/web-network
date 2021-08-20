@@ -31,7 +31,6 @@ export default function NewProposal({
   const [currentGithubId, setCurrentGithubId] = useState<string>();
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
-    console.log("params->", params);
     setDistrib((prevState) => ({
       ...prevState,
       ...params,
@@ -78,7 +77,7 @@ export default function NewProposal({
       )
       .catch((err) => {
         setError(err);
-        console.log("err", err);
+        console.error("proposeIssueMerge", err);
       });
   }
 

@@ -46,7 +46,7 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
     async function getIssueBeprosStaked(issueId: string){
         await BeproService.network.getIssueById({issueId})
             .then((issue) => setAmount(issue.tokensStaked))
-            .catch((err)  => console.log('err ->', err))
+            .catch((err)  => console.error('Failed to getIssue', err))
     }
      getIssueBeprosStaked(issue?.issueId)
    },[metaMaskWallet])
