@@ -22,9 +22,9 @@ const Transactions: React.FC = ()=> {
                         </div> 
                     </div>
                     <div className="d-flex flex-row align-items-center justify-content-center">
-                        <button className="transaction__btn-status">
+                        <div className="transaction__status">
                             <p>Processing</p>
-                        </button>
+                        </div>
                     </div>
                 </div>
                 <div className="d-flex flex-row align-items-center justify-content-between transaction__box">
@@ -36,9 +36,9 @@ const Transactions: React.FC = ()=> {
                         </div> 
                     </div>
                     <div className="d-flex flex-row align-items-center justify-content-center">
-                        <button className="transaction__btn-status orange">
+                        <div className="transaction__status orange">
                             <p>Pending</p>
-                        </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -60,7 +60,7 @@ const TransactionPopover: React.FC = ({children}) => {
         overlay={
         <Popover id={`transaction-popover`}>
             <Popover.Body>
-                {transactions ? <Empty/> : <Transactions/>}
+                <Transactions/>
             </Popover.Body>
         </Popover>
             }>
