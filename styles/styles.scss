@@ -690,7 +690,7 @@ label {
     width: fit-content;
     height: fit-content;
 
-    .title{
+    .empty-title{
       font-family: 'fontRegular';
       color: $gray;
       white-space: nowrap;
@@ -702,11 +702,75 @@ label {
       border-bottom-color: $bg-shadow;
     }
   }
+  
 
   .transaction{
+    &__title {
+      > h3 {
+        font-family: 'fontRegular';
+        font-size: 18px;
+        color: $white;
+        margin: 0px;
+      }
+
+      margin-bottom: 12px;
+    }
+    &__box {
+      width: 327px;
+      padding: 5px 17px;
+      background-color: $black;
+      border-radius: 3px;
+      margin: {
+        bottom: 12px;
+      }
+    }
+    &__btn-status {
+        background-color: transparent;
+        border: 1px solid $blue-info;
+        border-radius: 3px;
+        padding: 5px 10px;
+        font-family: 'fontRegular';
+
+        > p {
+          font-family: 'fontRegular';
+          font-size: 14px;
+          color: $blue-info;
+          margin: 0
+        }
+
+        &.blue-info {
+          border-color: $blue-info;
+          >p{
+            color: $blue-info;
+          }
+        }
+        &.orange {
+          border-color: $secondary;
+          >p{
+            color: $secondary;
+          }
+        }
+    }
+    &__icon {
+      margin-right: 17px;
+    }
+    &__header {
+      > h3 {
+        font-size: 16px;
+        margin: 0px 0 2px 0;
+        color: $white;
+      }
+      p {
+        font-size: 14px;;
+        color: $gray;
+        margin: 0px;;
+      }
+    }
     &-card{
       background-color: $black;
       border-radius: 3px;
+      width: 100%;
+      height: 50px;
     }
   }
 }
