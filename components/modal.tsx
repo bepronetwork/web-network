@@ -4,11 +4,12 @@ import { Modal as ModalProps } from "types/modal";
 
 export default function Modal({
   title = "",
+  key,
   children = null,
   footer = null,
   ...params
 }: ModalProps): JSX.Element {
-  const modalTitle = `${kebabCase(title)}-modal`;
+  const modalTitle = `${kebabCase(key||title)}-modal`;
 
   return (
     <ModalBootstrap

@@ -91,8 +91,10 @@ export default function MainNav() {
           <button className="btn btn-md btn-trans mr-1">+ Create issue</button>
         </Link>
         <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
-          <TransactionPopover/>
           <div className="d-flex account-info align-items-center">
+    
+            <TransactionPopover/>
+
             <Link href="/account" passHref>
               <a className="btn btn-md btn-trans mr-1">
                 <i className="ico-bepro mr-1"></i>
