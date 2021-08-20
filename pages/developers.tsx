@@ -56,7 +56,6 @@ export default function PageDevelopers() {
   }
 
   function updateIssuesList(issues: IssueData[]) {
-    console.log(`got issues`, issues);
     setIssues(issues);
   }
 

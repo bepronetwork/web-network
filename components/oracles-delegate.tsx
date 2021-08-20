@@ -41,8 +41,6 @@ function OraclesDelegate(): JSX.Element {
     if (!beproInit || !metaMaskWallet)
       return;
 
-    console.log(`updating delegated amount`, oracles);
-
     setDelegatedAmount(
       oracles.amounts.reduce((total, current) => total += +current, 0)
     )

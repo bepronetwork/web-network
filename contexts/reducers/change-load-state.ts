@@ -17,7 +17,5 @@ export const changeLoadState = (isLoading: boolean, text?: string): ReduceActor<
   loaderWeight += isLoading ? 1 : -1;
   if (loaderWeight < 0) loaderWeight = 0;
 
-  console.log(`Changing load state to`, isLoading, `with weight`, loaderWeight)
-
   return ({name: ReduceActionName.Loading, payload: {isLoading: !!loaderWeight, text}});
 }

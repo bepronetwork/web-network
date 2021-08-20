@@ -28,7 +28,7 @@ const SettlerTokenCheck = forwardRef<HTMLButtonElement, Props>(
         onCheck(isApprovedSettlerToken);
         dispatch(changeLoadState(false));
       } catch (error) {
-        console.log("SettlerTokenCheck", error);
+        console.error("SettlerTokenCheck", error);
         dispatch(changeLoadState(false));
       }
     }
