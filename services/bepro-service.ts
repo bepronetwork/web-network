@@ -23,6 +23,8 @@ class BeproFacet {
       public readonly settlerAddress = SETTLER_ADDRESS,
       public readonly transactionAddress = TRANSACTION_ADDRESS, ) {
 
+    console.table({web3: WEB3_CONNECTION, contract: CONTRACT_ADDRESS, settler: SETTLER_ADDRESS, transaction: TRANSACTION_ADDRESS})
+
     const opt = {opt: {web3Connection}};
     this._bepro = new Application(opt);
     this._network = new Network({contractAddress, ...opt});
@@ -57,7 +59,7 @@ class BeproFacet {
 
     } catch (e) {
       success = false;
-      console.log(`Error logging in,`, e);
+      console.error(`Error logging in,`, e);
     }
 
     return this._loggedIn = success;

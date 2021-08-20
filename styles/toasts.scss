@@ -1,0 +1,52 @@
+@import "variables";
+@import "vendor";
+
+.toast-container {
+  .toast {
+    color: $white;
+    border-radius: 8px;
+    font-size: 14px;
+
+    @each $color, $value in $theme-colors {
+      &.bg-#{$color} {
+        background-color: rgba($value, 0.25)!important;
+        .toast-header .btn-close::before {
+          color: $value;
+        }
+      }
+    }
+
+    &.bg-primary .toast-header .btn-close::before {
+      color: $white;
+    }
+
+    &.border-primary {
+      border-color: $white!important;
+    }
+
+    .toast-body {
+      padding: 0px 12px 12px 12px;
+      a .material-icons { font-size: 14px; }
+    }
+
+
+    .toast-header {
+      display: flex;
+      padding: 10px 10px 0px 5px;
+      color: $white;
+      .btn-close {
+        background: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: .15rem;
+        &::before {
+          content: "\1F5D9";
+        }
+      }
+    }
+
+
+  }
+
+}
