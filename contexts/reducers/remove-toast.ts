@@ -5,12 +5,9 @@ import {ReduceActionName} from '@interfaces/enums/reduce-action-names';
 const reducer = (state: ApplicationState, payload): ApplicationState => {
   const toaster = Array.from(state.toaster);
   const i = toaster.findIndex(({id}) => id === payload);
-  console.log(`i`, i, payload)
 
   if (i > -1)
     toaster.splice(i, 1);
-
-  console.log(`AFTER`,JSON.parse(JSON.stringify(toaster)))
 
   return ({...state, toaster})
 }

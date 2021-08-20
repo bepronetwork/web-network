@@ -59,7 +59,7 @@ class BeproFacet {
 
     } catch (e) {
       success = false;
-      console.log(`Error logging in,`, e);
+      console.error(`Error logging in,`, e);
     }
 
     return this._loggedIn = success;

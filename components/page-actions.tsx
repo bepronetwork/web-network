@@ -85,7 +85,7 @@ export default function PageActions({
             handleNetworkIssue();
           });
       })
-      .catch((err) => console.log(err))
+      .catch((err) => console.error(`Error redeeming`, err))
       .finally(() => dispatch(changeLoadState(false)));
   }
 

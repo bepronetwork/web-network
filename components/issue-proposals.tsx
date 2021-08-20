@@ -25,7 +25,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
       issueID: issueId,
       mergeID: mergeId,
     });
-    console.log("dispute", dispute);
+
   };
 
   const calcProgressBallright = (value: number) => {
