@@ -56,9 +56,7 @@ export default function OraclesTakeBack(): JSX.Element {
                   <OraclesTakeBackItem
                     key={uniqueId("OraclesTakeBackItem_")}
                     address={address}
-                    amount={amount}
-                    onConfirm={(status) => console.log(status, address)}
-                  />
+                    amount={amount} />
                 ))}
           </div>
         </div>

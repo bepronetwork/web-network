@@ -56,7 +56,7 @@ export default class GithubMicroService {
     return client.post<string>(`/users/connect`, payload)
                  .then(({data}) => data === `ok`)
                  .catch((error) => {
-                   console.log(`Error`, error)
+                   console.error(`createGithubData Error`, error)
                    return false;
                  });
   }
@@ -65,7 +65,7 @@ export default class GithubMicroService {
     return client.patch<string>(`/users/connect/${githubHandle}`, payload)
                  .then(() => true)
                  .catch((error) => {
-                   console.log(`Error`, error)
+                   console.error(`joinAddressToUser Error`, error)
                    return false;
                  });
   }

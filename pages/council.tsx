@@ -14,12 +14,9 @@ export default function PageCouncil() {
   function getIssues() {
     dispatch(changeLoadState(true))
     GithubMicroService.getIssuesState('ready')
-                      .then(issues => {
-                        setIssues(issues)
-                        console.log(`got issues`, issues)
-                      })
+                      .then(setIssues)
                       .catch((error) => {
-                        console.log('Error', error)
+                        console.error('getIssuesState Error', error)
                       })
                       .finally(() => {
                         dispatch(changeLoadState(false))
@@ -33,7 +30,7 @@ export default function PageCouncil() {
       <PageHero title="Ready to propose" />
       <div className="container">
         <div className="row justify-content-center">
-          <ListIssues listIssues={issues}/> 
+          <ListIssues listIssues={issues}/>
           {
             issues?.length === 0 &&
             <h3 className="text-center">No issues ready to propose</h3>

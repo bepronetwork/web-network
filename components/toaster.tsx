@@ -19,7 +19,6 @@ export default function Toaster() {
   } = useContext(ApplicationContext);
 
   function onClose(i: number) {
-    console.log(`close called`, i);
     dispatch(removeToast(i));
   }
 

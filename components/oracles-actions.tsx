@@ -65,7 +65,6 @@ function OraclesActions(): JSX.Element {
   }
 
   function updateValues() {
-    console.log(`updating values`)
     BeproService.getBalance('bepro').then(bepro => dispatch(changeBalance({bepro})));
     BeproService.getBalance('eth').then(eth => dispatch(changeBalance({eth})));
     BeproService.getBalance('staked').then(staked => dispatch(changeBalance({staked})));

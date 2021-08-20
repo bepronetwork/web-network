@@ -39,7 +39,7 @@ export default function ConnectWalletButton({children, forceLogin = false, onSuc
     action().then((state: string|boolean) =>
                     dispatch(changeWalletState(!!state)))
             .catch(e => {
-              console.log(`Error`, e);
+              console.error(`Error changing wallet state`, e);
             });
 
   }, [beproInit]);

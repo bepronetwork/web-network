@@ -51,7 +51,6 @@ export default function ApplicationContextProvider({children}) {
   const [state, dispatch] = useReducer(mainReducer, defaultState.state);
   const [session] = useSession();
   function onMetaMaskChange() {
-    console.log(`onMetaMaskChange`, state.currentAddress, BeproService.address, state.currentAddress === BeproService.address)
     if (!state.metaMaskWallet || state.currentAddress === BeproService.address)
       return;
 
