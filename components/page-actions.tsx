@@ -117,6 +117,8 @@ export default function PageActions({
             amountTotal={amountIssue}
             numberMergeProposals={mergeProposals}
             pullRequests={pullRequests}
+            handleBeproService={handleBeproService}
+            handleMicroService={handleMicroService}
           />
         </>
       )

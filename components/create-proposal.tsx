@@ -3,11 +3,12 @@ import Modal from "./modal";
 import ReactSelect from "./react-select";
 import CreateProposalDistributionItem from "./create-proposal-distribution-item";
 import sumObj from "helpers/sumObj";
-import { BeproService } from '@services/bepro-service';
+import { BeproService } from "@services/bepro-service";
 import GithubMicroService from "../services/github-microservice";
 import { pullRequest } from "interfaces/issue-data";
 import { toNumber } from "lodash";
-import {ApplicationContext} from '@contexts/application';
+import { ApplicationContext } from "@contexts/application";
+import { changeLoadState } from "@contexts/reducers/change-load-state";
 
 interface participants {
   githubHandle: string;
@@ -19,8 +20,13 @@ export default function NewProposal({
   amountTotal,
   numberMergeProposals,
   pullRequests = [],
+  handleBeproService,
+  handleMicroService,
 }) {
-  const {state: {balance,  currentAddress, beproInit}} = useContext(ApplicationContext);
+  const {
+    dispatch,
+    state: { balance, currentAddress, beproInit },
+  } = useContext(ApplicationContext);
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>();
   const [error, setError] = useState<string>("");
@@ -64,6 +70,7 @@ export default function NewProposal({
         (items) => (amountTotal * distrib[items.githubHandle]) / 100
       ),
     };
+    dispatch(changeLoadState(true));
     await BeproService.network
       .proposeIssueMerge(payload)
       .then(() =>
@@ -71,6 +78,8 @@ export default function NewProposal({
           pullRequestGithubId: toNumber(currentGithubId),
           scMergeId: (numberMergeProposals + 1).toString(),
         }).then(() => {
+          handleBeproService();
+          handleMicroService();
           handleClose();
           setDistrib({});
         })
@@ -78,7 +87,8 @@ export default function NewProposal({
       .catch((err) => {
         setError(err);
         console.error("proposeIssueMerge", err);
-      });
+      })
+      .finally(() => dispatch(changeLoadState(false)));
   }
 
   function handleClose() {
@@ -98,8 +108,7 @@ export default function NewProposal({
   }
 
   function getCouncilAmount() {
-    if (!beproInit)
-      return;
+    if (!beproInit) return;
 
     BeproService.network.COUNCIL_AMOUNT().then(setCouncilAmount);
   }
