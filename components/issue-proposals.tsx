@@ -1,9 +1,12 @@
+import { useContext } from "react";
 import clsx from "clsx";
 import { toNumber } from "lodash";
 import { GetStaticProps } from "next";
 import { useEffect, useState } from "react";
 import GithubMicroService from "@services/github-microservice";
 import { BeproService } from "@services/bepro-service";
+import { ApplicationContext } from "@contexts/application";
+import { changeLoadState } from "@contexts/reducers/change-load-state";
 
 interface Proposal {
   disputes: string;
@@ -17,15 +20,20 @@ interface Proposal {
 }
 
 export default function IssueProposals({ numberProposals, issueId, amount }) {
+  const { dispatch } = useContext(ApplicationContext);
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const ProgressBallRightInitial = 81.7;
 
   const handleDispute = async (mergeId) => {
-    const dispute = await BeproService.network.disputeMerge({
-      issueID: issueId,
-      mergeID: mergeId,
-    });
-
+    dispatch(changeLoadState(true));
+    await BeproService.network
+      .disputeMerge({
+        issueID: issueId,
+        mergeID: mergeId,
+      })
+      .then(() => gets())
+      .catch((err) => console.log("err dispute", err))
+      .finally(() => dispatch(changeLoadState(false)));
   };
 
   const calcProgressBallright = (value: number) => {
@@ -38,29 +46,39 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
     return (value * 7) / 100;
   };
 
-  useEffect(() => {
-    const gets = async () => {
-      const pool = [];
+  const gets = async () => {
+    const pool = [];
+    if (issueId)
       for (var i = 0; i < numberProposals; i++) {
-        const merge = await BeproService.network.getMergeById({ issueId, i });
-        const isMergeDisputed = await BeproService.network.IsMergeDisputed({
-          issueId,
-          i,
+        const merge = await BeproService.network.getMergeById({
+          issue_id: issueId,
+          merge_id: i,
         });
-        const mergeProposal = await GithubMicroService.getMergeProposalIssue(
+        await BeproService.network
+          .isMergeDisputed({
+            issueId: issueId,
+            mergeId: i,
+          })
+          .then((isMergeDisputed) => (merge.isDisputed = isMergeDisputed))
+          .catch((err) => console.log("err is merge disputed", err));
+        await GithubMicroService.getMergeProposalIssue(
           issueId,
-          i.toString()
-        );
-
-        merge.isDisputed = isMergeDisputed;
-        merge.pullRequestId = mergeProposal.pullRequestId;
+          (i + 1).toString()
+        )
+          .then((mergeProposal) => {
+            merge.pullRequestId = mergeProposal.pullRequestId;
+          })
+          .catch((err) => console.log("err microService", err));
 
         pool.push(merge);
       }
-      pool.length === numberProposals && setProposals(pool);
-    };
+    pool.length === numberProposals && setProposals(pool);
+    pool.length === numberProposals && console.log("pool ->", pool);
+  };
+
+  useEffect(() => {
     gets();
-  }, []);
+  }, [issueId, numberProposals]);
 
   const handlePercentage = (value: number, amount: number) =>
     (value * 100) / amount;
@@ -198,16 +216,20 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                   </p>
                 </div>
               </div>
-              {!proposal?.isDisputed ? (
-                <button
-                  className="btn btn-md btn-purple"
-                  onClick={() => handleDispute(toNumber(proposal._id))}
-                >
-                  Dispute
-                </button>
-              ) : (
-                <button className="btn btn-md btn-danger">Failed</button>
-              )}
+              <div className="d-flex align-items-center justify-content-end ms-2">
+                {!proposal?.isDisputed ? (
+                  <button
+                    className="btn btn-md btn-purple p-3"
+                    onClick={() => handleDispute(toNumber(proposal._id))}
+                  >
+                    Dispute
+                  </button>
+                ) : (
+                  <button className="btn btn-outline-danger me-1">
+                    Failed
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
