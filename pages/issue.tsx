@@ -99,6 +99,7 @@ export default function PageIssue() {
         title={issue?.title}
         description={issue?.body}
         handleBeproService={getsIssueBeproService}
+        handleMicroService={getsIssueMicroService}
         pullRequests={issue?.pullRequests}
         mergeProposals={networkIssue?.mergeProposalsAmount}
         amountIssue={networkIssue?.tokensStaked}
