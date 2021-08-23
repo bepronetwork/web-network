@@ -75,7 +75,7 @@ export default function NewProposal({
       .proposeIssueMerge(payload)
       .then(() =>
         GithubMicroService.createMergeProposal(issueId, {
-          pullRequestGithubId: toNumber(currentGithubId),
+          pullRequestGithubId: currentGithubId,
           scMergeId: (numberMergeProposals + 1).toString(),
         }).then(() => {
           handleBeproService();
@@ -140,7 +140,7 @@ export default function NewProposal({
           Create Proposal
         </button>
       )) ||
-        `You need at least ${councilAmount} BEPRO to Create a Proposal`}
+        ` You need at least ${councilAmount} BEPRO to Create a Proposal `}
       <Modal
         show={show}
         title="Create Proposal"
