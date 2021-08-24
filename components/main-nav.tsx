@@ -9,6 +9,7 @@ import ConnectWalletButton from './connect-wallet-button';
 import {ApplicationContext} from '@contexts/application';
 import {changeStakedState} from '@reducers/change-staked-amount';
 import { formatNumberToNScale, formatNumberToString } from 'helpers/formatNumber';
+import {formatAddress} from '@helpers/format-address';
 
 export default function MainNav() {
   const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
@@ -18,6 +19,7 @@ export default function MainNav() {
   const [address, setAddress] = useState<string>(null);
   const [ethBalance, setEthBalance] = useState(0);
   const [beproBalance, setBeproBalance] = useState(0);
+  const [network, setNetwork] = useState(``);
 
   useEffect(() => {
     checkLogin();
@@ -34,7 +36,7 @@ export default function MainNav() {
   }
 
   function updateAddress(address) {
-    setAddress(`${address.substr(0,6)}...${address.substr(-4)}`);
+    setAddress(formatAddress(address));
   }
 
   function updateBalances() {
@@ -51,6 +53,7 @@ export default function MainNav() {
     BeproService.getBalance('eth').then(setEthBalance);
     BeproService.getBalance('bepro').then(setBeproBalance);
     BeproService.network.getBEPROStaked().then(amount => dispatch(changeStakedState(amount)))
+    BeproService.bepro.web3.eth.net.getNetworkType().then(setNetwork);
   }
 
   const login = async () => {
@@ -116,10 +119,8 @@ export default function MainNav() {
             <Link href="/account" passHref>
               <a className="meta-info d-flex align-items-center">
                 <div className="d-flex flex-column text-right">
-                  <p className="p-small mb-0">
-                    {address}
-                  </p>
-                  <p className="p-small mb-0 trans">{formatNumberToString(ethBalance)} ETH</p>
+                  <p className="p-small mb-0">{address}</p>
+                  <p className="p-small mb-0 trans">{formatNumberToString(ethBalance)} ETH {network}</p>
                 </div>
                 {/* <img className="avatar circle-2"src="https://uifaces.co/our-content/donated/Xp0NB-TL.jpg" alt="" /> */}
               </a>

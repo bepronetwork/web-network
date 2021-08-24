@@ -49,15 +49,17 @@ export default function NewProposal({
   }
 
   async function handleClickCreate(): Promise<void> {
-    if (amount > 0 && amount < 100) {
-      return setError(`${100 - amount}% is missing!`);
-    }
-    if (amount === 0) {
-      return setError("Distribution must be equal to 100%.");
-    }
-    if (amount > 100) {
-      return setError("Distribution exceed 100%.");
-    }
+    let error;
+
+    if (amount > 0 && amount < 100)
+      error = `${100 - amount}% is missing!`;
+    else if (amount === 0)
+      error = `Distribution must be equal to 100%.`;
+    else
+      error = `Distribution exceed 100%.`;
+
+    if (error)
+      return setError(error);
 
     const payload = {
       issueID: issueId,
@@ -66,20 +68,26 @@ export default function NewProposal({
         (items) => (amountTotal * distrib[items.githubHandle]) / 100
       ),
     };
-    await BeproService.network
+
+    const mergeProposal = {
+      pullRequestGithubId: toNumber(currentGithubId),
+      scMergeId: (numberMergeProposals + 1).toString(),
+    }
+
+    BeproService.network
       .proposeIssueMerge(payload)
-      .then(() =>
-        GithubMicroService.createMergeProposal(issueId, {
-          pullRequestGithubId: toNumber(currentGithubId),
-          scMergeId: (numberMergeProposals + 1).toString(),
-        })
-          .then(() => {
-            handleClose();
-            setDistrib({});
-          })
-          .catch(() => setError("Error to create proposal in MicroService"))
-      )
-      .catch(() => setError("Error to create proposal in MicroService"));
+      .then(() => GithubMicroService.createMergeProposal(issueId, mergeProposal))
+      .then((success) => {
+        if (success) {
+          handleClose();
+          setDistrib({});
+        } else
+          setError("There were problems creating the proposal, check pending screen")
+      })
+      .catch((error) => {
+        console.error(`Error creating proposal`, error)
+        setError("Error creating proposal");
+      });
   }
 
   function handleClose() {
