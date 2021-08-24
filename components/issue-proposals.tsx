@@ -72,8 +72,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
 
         pool.push(merge);
       }
-    pool.length === numberProposals && setProposals(pool);
-    pool.length === numberProposals && console.log("pool ->", pool);
+    if (pool.length === numberProposals) setProposals(pool);
   };
 
   useEffect(() => {
