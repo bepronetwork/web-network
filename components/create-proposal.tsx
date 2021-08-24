@@ -3,11 +3,11 @@ import Modal from "./modal";
 import ReactSelect from "./react-select";
 import CreateProposalDistributionItem from "./create-proposal-distribution-item";
 import sumObj from "helpers/sumObj";
-import { BeproService } from '@services/bepro-service';
+import { BeproService } from "@services/bepro-service";
 import GithubMicroService from "../services/github-microservice";
 import { pullRequest } from "interfaces/issue-data";
 import { toNumber } from "lodash";
-import {ApplicationContext} from '@contexts/application';
+import { ApplicationContext } from "@contexts/application";
 
 interface participants {
   githubHandle: string;
@@ -20,7 +20,9 @@ export default function NewProposal({
   numberMergeProposals,
   pullRequests = [],
 }) {
-  const {state: {balance,  currentAddress, beproInit}} = useContext(ApplicationContext);
+  const {
+    state: { balance, currentAddress, beproInit },
+  } = useContext(ApplicationContext);
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>();
   const [error, setError] = useState<string>("");
@@ -70,15 +72,14 @@ export default function NewProposal({
         GithubMicroService.createMergeProposal(issueId, {
           pullRequestGithubId: toNumber(currentGithubId),
           scMergeId: (numberMergeProposals + 1).toString(),
-        }).then(() => {
-          handleClose();
-          setDistrib({});
         })
+          .then(() => {
+            handleClose();
+            setDistrib({});
+          })
+          .catch(() => setError("Error to create proposal in MicroService"))
       )
-      .catch((err) => {
-        setError(err);
-        console.error("proposeIssueMerge", err);
-      });
+      .catch(() => setError("Error to create proposal in MicroService"));
   }
 
   function handleClose() {
@@ -98,8 +99,7 @@ export default function NewProposal({
   }
 
   function getCouncilAmount() {
-    if (!beproInit)
-      return;
+    if (!beproInit) return;
 
     BeproService.network.COUNCIL_AMOUNT().then(setCouncilAmount);
   }
