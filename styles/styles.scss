@@ -166,6 +166,25 @@ body {
   text-transform: uppercase;
 }
 
+// familys
+.family-Regular{
+  font-family: 'fontRegular', sans-serif;
+}
+
+.family-bold{
+  font-family: 'fontBold', sans-serif;
+}
+
+.family-inter{
+  font-family: "Inter-Regular", sans-serif;
+}
+.family-inter-medium{
+  font-family: "Inter-Medium", sans-serif;;
+}
+.family-inter-bold{
+  font-family: "Inter-bold", sans-serif;;
+}
+
 .p,
 p {
   font-size: 16px;
@@ -691,10 +710,7 @@ label {
     height: fit-content;
 
     .empty-title{
-      font-family: 'fontRegular';
-      color: $gray;
-      white-space: nowrap;
-      font-size: 18px;
+      font-family: 'fontMedium';
     }
   }
   .popover-arrow{
@@ -705,151 +721,48 @@ label {
   
 
   .transaction{
-    &__title {
-      > h3 {
-        font-family: 'fontRegular';
-        font-size: 18px;
-        color: $white;
-        margin: 0px;
-      }
-
-      margin-bottom: 12px;
-    }
-    &__box {
+    &.box {
       cursor: pointer;
       width: 327px;
-      padding: 5px 17px;
       background-color: $black;
-      border-radius: 3px;
-      margin: {
-        bottom: 12px;
-      }
     }
-    &__status {
-        background-color: transparent;
-        border: 1px solid $blue-info;
-        border-radius: 3px;
-        padding: 5px 10px;
-        font-family: 'fontRegular';
-
+    &.status {
         > p {
-          font-family: 'fontRegular';
           font-size: 14px;
           color: $blue-info;
-          margin: 0
-        }
-
-        &.blue-info {
-          border-color: $blue-info;
-          >p{
-            color: $blue-info;
-          }
-        }
-        &.orange {
-          border-color: $secondary;
-          >p{
-            color: $secondary;
-          }
         }
     }
-    &__icon {
-      margin-right: 17px;
-    }
-    &__header {
-      > h3 {
-        font-family: 'Inter-Medium';
-        font-size: 16px;
-        margin: 0px 0 2px 0;
-        color: $white;
-      }
+    &.header {
       p {
-        font-family: 'Inter-Medium';
         font-size: 14px;;
         color: $gray;
-        margin: 0px;;
       }
-    }
-    &-card{
-      background-color: $black;
-      border-radius: 3px;
-      width: 100%;
-      height: 50px;
     }
   }
 }
-  .transaction-modal{
-    max-width: 400px;
-    &__title{
-      >h1{
-        font-family: 'fontBold';
-        font-size: 32px;
-        color: $white;
+.transaction-modal{
+  &.status{
+      >span{
+        font-size: 14px;
+        line-height: 160%;
+        color: $gray;
       }
-    }
-    &__status{
-        >span{
-          font-family: "Inter-Medium";
-          font-size: 14px;
-          line-height: 160%;
-          color: $gray;
-          margin-bottom: 5px;
-        }
 
-        .indicator{
-          background-color: transparent;
-          border: 1px solid $blue-info;
-          border-radius: 3px;
-          padding: 5px 10px;
-          font-family: 'fontRegular';
+      .indicator{
+        > p {
+          font-size: 14px;
+        }
+      }
+  }
   
-          > p {
-            font-family: 'fontRegular';
-            font-size: 14px;
-            color: $blue-info;
-            margin: 0
-          }
-
-          &.blue-info {
-            border-color: $blue-info;
-            >p{
-              color: $blue-info;
-            }
-          }
-          &.orange {
-            border-color: $secondary;
-            >p{
-              color: $secondary;
-            }
-          }
-        }
+  &.box{
+    background-color: $bg;
+    >span{
+      font-family: "Inter-Medium";
+      font-size: 14px;
+      color: $gray;
     }
-
-    &__labels{
-      margin: 12px 0;
-    }
-    &__btn-links{
-      button{
-        background: $bg;
-        border-radius: 3px;
-        border:none;
-        margin: 0 5px
-      }
-    }
-    &__box{
-      &-content{
-        background-color: $bg;
-        padding: 14px 17px;
-        margin-bottom: 12px;
-        >span{
-          font-family: "Inter-Medium";
-          font-size: 14px;
-          color: $gray;
-          &.white{
-            color: $white;
-          }
-        }
-      }
-    }
+  }
 }
 
 $c_directions: ('left': 'l', 'right': 'r', 'top': 't', 'bottom': 'b') !default;

@@ -27,27 +27,27 @@ const TransactionModal: React.FC<ITransactionModalProps> = ({item, onHide}) => {
         size="sm"
         backdrop={true}
         onHide={onHide}>
-            <section className="d-flex flex-column align-items-start w-100 ">
-            <div className="d-flex justify-content-center align-items-center w-100 transaction-modal__title">
-                <h1>Details</h1>
+            <section className="d-flex flex-column align-items-start w-100">
+            <div className="d-flex justify-content-center align-items-center w-100">
+                <h1 className="family-bold fs-2 text-white">Details</h1>
             </div>
             <div className="d-flex flex-row justify-content-between w-100">
-                <div className="d-flex flex-column transaction-modal__status">
-                    <span>Status</span>
-                    <div className="indicator orange">
-                        <p>Pending</p>
+                <div className="d-flex flex-column transaction-modal status">
+                    <span className="family-inter-medium mb-2">Status</span>
+                    <div className="bg-transparent rounded p-2 border border-secondary indicator">
+                        <p className="family-regular m-0 text-secondary">Pending</p>
                     </div>
                 </div>
-                <div className="d-flex flex-row align-items-end transaction-modal__btn-links">
-                    <button>
+                <div className="d-flex flex-row align-items-end">
+                    <button className="border-0 rounded mx-1 bg-dark">
                         <CopyIcon/>
                     </button>
-                    <button>
+                    <button className="border-0 rounded mx-1 bg-dark">
                         <ArrowGoTo/>
                     </button>
                 </div>
             </div>
-            <div className="d-flex flex-row align-items-center justify-content-between w-100 transaction-modal__labels">
+            <div className="d-flex flex-row align-items-center justify-content-between w-100 my-4">
                 <p className="p-small mb-0">
                 From: 0x442d0fc...
                 </p>
@@ -58,18 +58,18 @@ const TransactionModal: React.FC<ITransactionModalProps> = ({item, onHide}) => {
                 To: 0x442d20fc...
                 </p>
             </div>
-            <div className="d-flex flex-column align-items-start w-100 transaction-modal__box">
-                <div className="d-flex flex-row align-items-cenrter justify-content-between w-100 transaction-modal__box-content">
+            <div className="d-flex flex-column align-items-start w-100">
+                <div className="d-flex flex-row align-items-cenrter justify-content-between w-100 mb-3 p-3 bg transaction-modal box">
                     <span>Amount</span>
-                    <span className="white">210,000 $BEPRO</span>
+                    <span className="text-white">210,000 $BEPRO</span>
                 </div>
-                <div className="d-flex flex-row align-items-cenrter justify-content-between w-100 transaction-modal__box-content">
+                <div className="d-flex flex-row align-items-cenrter justify-content-between w-100 mb-3 p-3 transaction-modal box">
                     <span>Confirmations</span>
-                    <span className="white">0/23 Confirmations</span>
+                    <span className="text-white">0/23 Confirmations</span>
                 </div>
-                <div className="d-flex flex-row align-items-cenrter justify-content-between w-100 transaction-modal__box-content">
+                <div className="d-flex flex-row align-items-cenrter justify-content-between w-100 mb-3 p-3 transaction-modal box">
                     <span>Date</span>
-                    <span className="white">April 8 2021 12:11:03 PM</span>
+                    <span className="text-white">April 8 2021 12:11:03 PM</span>
                 </div>
             </div>
         </section>
@@ -79,38 +79,38 @@ const TransactionModal: React.FC<ITransactionModalProps> = ({item, onHide}) => {
 
 const Transactions: React.FC<ITransactionProps>= ({onClickItem})=> {
     return (
-        <section className="d-flex flex-column align-items-start w-100">
-            <div className="transaction__title">
-                <h3>Ongoing transactions</h3>
+        <section className="d-flex flex-column align-items-start w-100 transaction">
+            <div className="mb-3">
+                <h3 className="family-bold m-0 fs-5 text-white">Ongoing transactions</h3>
             </div>
             <div className="d-flex flex-column align-items-start w-100">
-                <div className="d-flex flex-row align-items-center justify-content-between transaction__box" onClick={onClickItem}>
+                <div className="d-flex flex-row align-items-center justify-content-between px-3 py-2 mb-2 rounded transaction box" onClick={onClickItem}>
                     <div className="d-flex flex-row align-items-center justify-content-center">
-                        <div className="d-flex justify-content-center align-item-center transaction__icon">
+                        <div className="d-flex justify-content-center align-item-center mr-2">
                             <DownloadIcon/>
                         </div>
-                        <div className="d-flex flex-column align-items-start transaction__header">
-                            <h3>10,000 Oracles</h3>
-                            <p>Lock</p>
+                        <div className="d-flex flex-column align-items-start transaction header">
+                            <h3 className="fs-6 mb-1 text-white family-inter-medium">10,000 Oracles</h3>
+                            <p className="m-0 family-inter-medium">Lock</p>
                         </div> 
                     </div>
                     <div className="d-flex flex-row align-items-center justify-content-center">
-                        <div className="transaction__status">
-                            <p>Processing</p>
+                        <div className="bg-transparent px-3 py-2 rounded border border-info transaction status">
+                            <p className="family-regular m-0 text-info">Processing</p>
                         </div>
                     </div>
                 </div>
-                <div className="d-flex flex-row align-items-center justify-content-between transaction__box" onClick={onClickItem}>
+                <div className="d-flex flex-row align-items-center justify-content-between px-3 py-2 mb-2 rounded transaction box" onClick={onClickItem}>
                     <div className="d-flex flex-row align-items-center justify-content-center">
-                        <div className="d-flex justify-content-center align-item-center transaction__icon"><UploadIcon/></div>
-                        <div className="d-flex flex-column align-items-start transaction__header">
-                            <h3>210,000 $BEPRO</h3>
-                            <p>Lock</p>
+                        <div className="d-flex justify-content-center align-item-center mr-2"><UploadIcon/></div>
+                        <div className="d-flex flex-column align-items-start transaction header">
+                            <h3 className="fs-6 mb-1 text-white family-inter-medium">210,000 $BEPRO</h3>
+                            <p className="m-0 family-inter-medium">Lock</p>
                         </div> 
                     </div>
                     <div className="d-flex flex-row align-items-center justify-content-center">
-                        <div className="transaction__status orange">
-                            <p>Pending</p>
+                        <div className="bg-transparent px-3 py-2 rounded border border-secondary transaction status">
+                        <p className="family-regular m-0 text-secondary">Pending</p>
                         </div>
                     </div>
                 </div>
@@ -119,7 +119,7 @@ const Transactions: React.FC<ITransactionProps>= ({onClickItem})=> {
     )
 }
 
-const Empty: React.FC = ()=> <h3 className="empty-title mx-5">No ongoing transactions</h3>
+const Empty: React.FC = ()=> <h3 className="text-white fs-6 mx-5 text-nowrap empty-title">No ongoing transactions</h3>
 
 const TransactionPopover: React.FC = ({children}) => {
     const [isOpen,setOpen] = useState(false)
