@@ -8,6 +8,7 @@ import GithubMicroService from "../services/github-microservice";
 import { pullRequest } from "interfaces/issue-data";
 import { toNumber } from "lodash";
 import { ApplicationContext } from "@contexts/application";
+import { changeLoadState } from "@contexts/reducers/change-load-state";
 
 interface participants {
   githubHandle: string;
@@ -19,8 +20,11 @@ export default function NewProposal({
   amountTotal,
   numberMergeProposals,
   pullRequests = [],
+  handleBeproService,
+  handleMicroService,
 }) {
   const {
+    dispatch,
     state: { balance, currentAddress, beproInit },
   } = useContext(ApplicationContext);
   const [distrib, setDistrib] = useState<Object>({});
@@ -66,12 +70,18 @@ export default function NewProposal({
         (items) => (amountTotal * distrib[items.githubHandle]) / 100
       ),
     };
+    dispatch(changeLoadState(true));
     await BeproService.network
       .proposeIssueMerge(payload)
       .then(() =>
         GithubMicroService.createMergeProposal(issueId, {
-          pullRequestGithubId: toNumber(currentGithubId),
+          pullRequestGithubId: currentGithubId,
           scMergeId: (numberMergeProposals + 1).toString(),
+        }).then(() => {
+          handleBeproService();
+          handleMicroService();
+          handleClose();
+          setDistrib({});
         })
           .then(() => {
             handleClose();
@@ -79,7 +89,8 @@ export default function NewProposal({
           })
           .catch(() => setError("Error to create proposal in MicroService"))
       )
-      .catch(() => setError("Error to create proposal in MicroService"));
+      .catch(() => setError("Error to create proposal in MicroService"))  
+      .finally(() => dispatch(changeLoadState(false)));
   }
 
   function handleClose() {
@@ -131,7 +142,7 @@ export default function NewProposal({
           Create Proposal
         </button>
       )) ||
-        `You need at least ${councilAmount} BEPRO to Create a Proposal`}
+        ` You need at least ${councilAmount} BEPRO to Create a Proposal `}
       <Modal
         show={show}
         title="Create Proposal"
