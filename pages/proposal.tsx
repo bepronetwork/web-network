@@ -88,7 +88,7 @@ export default function PageProposal() {
     for (const [i, address] of proposalBepro.prAddresses.entries()) {
       const {githubLogin} = await GithubMicroService.getUserOf(address);
       const oracles = proposalBepro.prAmounts[i];
-      const percentage = handlePercentage(oracles, +amountIssue);
+      const percentage = handlePercentage(+oracles, +amountIssue);
 
       users.push({githubLogin, percentage, address, oracles});
     }
