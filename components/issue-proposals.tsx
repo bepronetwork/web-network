@@ -19,6 +19,7 @@ interface Proposal {
   _id: string;
   isDisputed?: boolean;
   pullRequestId?: string;
+  pullRequestGithubId?: string;
 }
 
 export default function IssueProposals({ numberProposals, issueId, amount }) {
@@ -69,6 +70,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
         )
           .then((mergeProposal) => {
             merge.pullRequestId = mergeProposal.pullRequestId;
+            merge.pullRequestGithubId = mergeProposal.pullRequest.githubId
           })
           .catch((err) => console.log("err microService", err));
 
@@ -99,7 +101,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                 "text-danger": proposal?.isDisputed,
               })}
             >
-              PR #{proposal.pullRequestId}
+              PR #{proposal.pullRequestGithubId}
             </p>
           </div>
           <div className="col-md-4">

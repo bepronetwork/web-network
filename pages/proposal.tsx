@@ -29,6 +29,13 @@ export interface ProposalMicroService {
   issueId: number;
   scMergeId: string;
   pullRequestId: number;
+  pullRequest: {
+    id: number;
+    githubId: string;
+    issueId: number;
+    createdAt: string;
+    updatedAt: string;
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -152,7 +159,7 @@ export default function PageProposal() {
       <ProposalHero
         githubId={issueMicroService?.githubId}
         title={issueMicroService?.title}
-        pullRequestId={proposalMicroService?.pullRequestId}
+        pullRequestId={proposalMicroService?.pullRequest.githubId}
         authorPullRequest={proposalBepro?.author}
         createdAt={
           proposalMicroService && formatDate(proposalMicroService.createdAt)
@@ -171,7 +178,7 @@ export default function PageProposal() {
           mergeId={id.toString()}
           handleBeproService={getsProposalBeproService}
           isDisputed={proposalBepro?.isDisputed}
-          UrlGithub={"https://github.com/bepronetwork/bepro-js-edge/"}
+          UrlGithub={`https://github.com/bepronetwork/bepro-js-edge/pull/${proposalMicroService?.pullRequest.githubId}`}
         />
       )}
 
