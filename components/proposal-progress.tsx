@@ -8,25 +8,22 @@ export default function ProposalProgress({ developers }) {
       <div className="row justify-content-center">
         <div className="col-md-10">
           <div className="content-wrapper p-0 overflow-hidden mb-4">
-            <div className="d-flex align-items-center">
+            <div className="d-flex align-items-center gap-1">
               {developers?.map((developer, index) => (
-                <>
-                  <div
+                <div
+                  key={index}
+                  className={`user-block-progress d-flex flex-column align-items-center`}
+                  style={{ width: `${developer.percentage}%` }}
+                >
+                  <Avatar
                     key={index}
-                    className={`user-block-progress d-flex flex-column align-items-center`}
-                    style={{ width: `${developer.percentage}%` }}
-                  >
-                    <Avatar
-                      key={index}
-                      className="mb-1"
-                      userLogin={developer.githubLogin}
-                    />
-                    <p className="p-small mb-0">
-                      {developer.percentage}% @{developer.githubLogin}
-                    </p>
-                  </div>
-                  {index + 1 < developers.length && <>&nbsp;&nbsp;</>}
-                </>
+                    className="mb-1"
+                    userLogin={developer.githubLogin}
+                  />
+                  <p className="p-small mb-0">
+                    {developer.percentage}% @{developer.githubLogin}
+                  </p>
+                </div>
               ))}
             </div>
           </div>
