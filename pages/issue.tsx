@@ -1,21 +1,21 @@
-import { GetStaticProps } from "next/types";
-import React, { useContext, useEffect, useState } from "react";
-import IssueComments from "@components/issue-comments";
-import IssueDescription from "@components/issue-description";
-import IssueHero from "@components/issue-hero";
-import PageActions from "@components/page-actions";
-import IssueProposals from "@components/issue-proposals";
-import { useRouter } from "next/router";
-import { BeproService } from "@services/bepro-service";
-import GithubMicroService, { User } from "@services/github-microservice";
-import { ApplicationContext } from "@contexts/application";
-import { IssueData } from "@interfaces/issue-data";
+import {GetStaticProps} from 'next/types';
+import React, {useContext, useEffect, useState} from 'react';
+import IssueComments from '@components/issue-comments';
+import IssueDescription from '@components/issue-description';
+import IssueHero from '@components/issue-hero';
+import PageActions from '@components/page-actions';
+import IssueProposals from '@components/issue-proposals';
+import {useRouter} from 'next/router';
+import {BeproService} from '@services/bepro-service';
+import GithubMicroService, {User} from '@services/github-microservice';
+import {ApplicationContext} from '@contexts/application';
+import {IssueData} from '@interfaces/issue-data';
 
 export default function PageIssue() {
   const router = useRouter();
-  const { id } = router.query;
+  const {id} = router.query;
   const {
-    state: { currentAddress },
+    state: {currentAddress},
   } = useContext(ApplicationContext);
 
   const [issue, setIssue] = useState<IssueData>();
@@ -27,12 +27,16 @@ export default function PageIssue() {
   const [currentUser, setCurrentUser] = useState<User>();
 
   const getsIssueMicroService = () => {
-    GithubMicroService.getIssueId(id).then((issue) => {
-      setIssue(issue);
-      GithubMicroService.getCommentsIssue(issue.githubId).then((comments) =>
-        setCommentsIssue(comments)
-      );
-    });
+    GithubMicroService.getIssueId(id)
+                      .then((issue) => {
+                        if (!issue)
+                          return;
+
+                        setIssue(issue);
+                        GithubMicroService.getCommentsIssue(issue.githubId)
+                                          .then((comments) => setCommentsIssue(comments));
+                      });
+
     GithubMicroService.getForks().then((forks) => setForks(forks));
   };
 
@@ -40,15 +44,15 @@ export default function PageIssue() {
     getNetworkIssue();
     setBalance(BeproService.network.getBEPROStaked());
     BeproService.network
-      .isIssueInDraft({
-        issueId: id,
-      })
-      .then((isIssueInDraft) => setIsIssueinDraft(isIssueInDraft));
+                .isIssueInDraft({
+                                  issueId: id,
+                                })
+                .then((isIssueInDraft) => setIsIssueinDraft(isIssueInDraft));
   };
 
   const getCurrentUserMicroService = () => {
     GithubMicroService.getUserOf(currentAddress).then((user: User) =>
-      setCurrentUser(user)
+                                                        setCurrentUser(user)
     );
   };
 
@@ -63,21 +67,24 @@ export default function PageIssue() {
 
   const getNetworkIssue = () => {
     BeproService.network
-      .getIssueById({
-        issueId: id,
-      })
-      .then((networkIssue) => setNetworkIssue(networkIssue));
+                .getIssueById({
+                                issueId: id,
+                              })
+                .then((networkIssue) => {
+                  console.log(networkIssue);
+                  setNetworkIssue(networkIssue)
+                });
   };
 
   const handleStateissue = () => {
     if (!isIssueinDraft) return issue?.state;
 
     if (isIssueinDraft) {
-      return "Draft";
+      return 'Draft';
     } else if (networkIssue?.finalized) {
-      return "Closed";
+      return 'Closed';
     } else {
-      return "Open";
+      return 'Open';
     }
   };
 
