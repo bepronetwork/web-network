@@ -8,6 +8,7 @@ import clsx from 'clsx';
 import {ApplicationContext} from '../contexts/application';
 import {changeLoadState} from '../contexts/reducers/change-load-state';
 import ConnectWalletButton from '../components/connect-wallet-button';
+import { addTransactions } from 'contexts/reducers/add-transactions';
 
 interface Amount {
   value?: string,
@@ -27,16 +28,30 @@ export default function PageCreateIssue() {
   const allow = async (evt) => {
     evt.preventDefault();
     dispatch(changeLoadState(true))
+    let txHash;
     await BeproService.login()
-                      .then(() => BeproService.network.approveTransactionalERC20Token())
+                      .then(async () => {
+                        const transaction = await BeproService.network.approveTransactionalERC20Token()
+                        txHash = transaction.transactionHash;
+                        return transaction;
+                      })
                       .then(() => BeproService.address)
-                      .then(address => BeproService.network.isApprovedTransactionalToken({
-                                                                                           address,
-                                                                                           amount: issueAmount.floatValue
-                                                                                         }))
-                      .then(transaction => {
+                      .then(address => 
+                        BeproService.network.isApprovedTransactionalToken({ address, amount: issueAmount.floatValue}))  
+                      .then(async (transaction) => {
                         setAllowedTransaction(transaction)
                         dispatch(changeLoadState(false))
+                      }).then(()=> BeproService.getTransaction(txHash))
+                      .then((transaction)=>{
+                        const status = transaction.confirmations < 16 ? 'pending' : (transaction.confirmations > 23 ? 'processing' : 'approved');
+                        dispatch(addTransactions({
+                          ...transaction,
+                          status,
+                          date: new Date(),
+                          amount: issueAmount.formattedValue,
+                          type: 'approval',
+                          amountType: '$BEPRO'
+                        }))
                       })
                       .catch((error) => console.log('Error', error))
                       .finally(() => dispatch(changeLoadState(false)))
@@ -57,10 +72,25 @@ export default function PageCreateIssue() {
     const contractPayload = {tokenAmount: issueAmount.floatValue, cid: beproAddress};
     console.log('pay', contractPayload)
     await BeproService.network.openIssue(contractPayload)
-                      .then((response) => GithubMicroService.createIssue({
-                                                                           ...payload,
-                                                                           issueId: response.events?.OpenIssue?.returnValues?.id
-                                                                         }))
+                      .then(async(response) => {
+                        await GithubMicroService.createIssue({
+                          ...payload,
+                          issueId: response.events?.OpenIssue?.returnValues?.id
+                        })
+                        return response;
+                      })
+                      .then((transaction)=> BeproService.getTransaction(transaction.transactionHash))
+                      .then((transaction)=>{
+                        const status = transaction.confirmations < 16 ? 'pending' : (transaction.confirmations > 23 ? 'processing' : 'approved');
+                        dispatch(addTransactions({
+                          ...transaction,
+                          status,
+                          type: 'create issue',
+                          date: new Date(),
+                          amount: issueAmount.floatValue,
+                          amountType: '$BEPRO'
+                        }))
+                      })
                       .then(() => {
                         router.push('/account');
                         cleanFields();

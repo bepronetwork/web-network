@@ -39,7 +39,8 @@ const defaultState: GlobalState = {
       staked: 0,
       bepro: 0,
     },
-    toaster: []
+    toaster: [],
+    myTransactions: []
   },
   dispatch: () => undefined
 };

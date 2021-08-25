@@ -1,4 +1,5 @@
 import {Application, Network, ERC20Contract} from 'bepro-js';
+import { BlockTransactions } from 'interfaces/transactions';
 import { CONTRACT_ADDRESS, SETTLER_ADDRESS, TRANSACTION_ADDRESS, WEB3_CONNECTION } from '../env';
 
 class BeproFacet {
@@ -79,6 +80,24 @@ class BeproFacet {
 
   public async getAddress() {
     return await this._bepro.getAddress();
+  }
+  
+  public async getTransaction(tx:string): Promise<BlockTransactions> {
+    const eth = this._bepro.web3.eth
+
+    const now = await eth.getBlockNumber();
+
+    const transaction =  await eth.getTransaction(tx);
+    
+    const confirmations = now - transaction.blockNumber
+
+    return {
+      addressFrom: transaction.from,
+      addressTo: transaction.to,
+      transactionHash: tx,
+      blockHash: transaction.blockHash,
+      confirmations,
+    };
   }
 }
 

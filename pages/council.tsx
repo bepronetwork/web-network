@@ -13,7 +13,6 @@ export default function PageCouncil() {
 
   function getIssues() {
     dispatch(changeLoadState(true))
-    debugger;
     GithubMicroService.getIssuesState('ready')
                       .then(issues => {
                         setIssues(issues)
