@@ -11,7 +11,7 @@ export interface User {
   updatedAt: string;
 }
 
-export interface ProposalMicroService {
+export interface ProposalData {
   id: number;
   issueId: number;
   scMergeId: string;
@@ -40,7 +40,7 @@ export default class GithubMicroService {
   }
 
   static async getIssues() {
-    const {data} = await client.get('/issues');
+    const {data} = await client.get('/issues/');
     return data;
   }
 
@@ -50,8 +50,12 @@ export default class GithubMicroService {
   }
 
   static async getIssueId(issueId: string | string[]) {
-    const {data} = await client.get(`/issues/${issueId}`);
-    return data;
+    return client.get(`/issues/${issueId}`)
+                 .then(({data}) => data)
+                 .catch(e => {
+                   console.error(`Error fetchin issue`, e);
+                   return null;
+                 });
   }
 
   static async getCommentsIssue(githubId: string | string[]) {
@@ -83,6 +87,10 @@ export default class GithubMicroService {
   static async getUserOf(address: string): Promise<User> {
     return client.get<User>(`/users/address/${address}`)
                  .then(({data}) => data)
+                 .catch(e => {
+                   console.error(`Failed to fetch user with address ${address}`, e);
+                   return {} as User;
+                 })
   }
 
   /**
@@ -148,7 +156,7 @@ export default class GithubMicroService {
                  })
   }
   static async getMergeProposalIssue(issueId: string | string[], MergeId: string | string[]) {
-    return client.get<ProposalMicroService>(`/issues/mergeproposal/${MergeId}/${issueId}`)
+    return client.get<ProposalData>(`/issues/mergeproposal/${MergeId}/${issueId}`)
                  .then(({data}) => data)
                  .catch(e => {
                    console.error(e);
