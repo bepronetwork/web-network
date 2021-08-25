@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {IssueData, IssueState} from '@interfaces/issue-data';
 import { API } from '../env';
+import { ProposalMicroService } from '@pages/proposal';
 
 export interface User {
   githubHandle: string;
@@ -9,15 +10,6 @@ export interface User {
   createdAt: string;
   id: number;
   updatedAt: string;
-}
-
-export interface MergeProposal {
-  id: number,
-  scMergeId: string,
-  issueId: string,
-  pullRequestId: string,
-  createdAt: string,
-  updatedAt: string,
 }
 
 const client = axios.create({baseURL: API});
@@ -140,8 +132,8 @@ export default class GithubMicroService {
                    return null;
                  })
   }
-  static async getMergeProposalIssue(issueId: string, MergeId: string) {
-    return client.get<MergeProposal>(`/issues/mergeproposal/${MergeId}/${issueId}`)
+  static async getMergeProposalIssue(issueId: string | string[], MergeId: string | string[]) {
+    return client.get<ProposalMicroService>(`/issues/mergeproposal/${MergeId}/${issueId}`)
                  .then(({data}) => data)
                  .catch(e => {
                    console.error(e);
