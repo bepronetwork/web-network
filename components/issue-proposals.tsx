@@ -4,7 +4,7 @@ import { toNumber } from "lodash";
 import { GetStaticProps } from "next";
 import { useEffect, useState } from "react";
 import GithubMicroService, {
-  ProposalMicroService,
+  ProposalData,
 } from "@services/github-microservice";
 import { BeproService } from "@services/bepro-service";
 import { ApplicationContext } from "@contexts/application";
@@ -55,29 +55,31 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
     const pool = [];
     if (issueId)
       for (var i = 0; i < numberProposals; i++) {
+
+        console.log({issue_id: issueId, merge_id: i,})
         const merge = await BeproService.network.getMergeById({
           issue_id: issueId,
           merge_id: i,
         });
-        await BeproService.network
-          .isMergeDisputed({
-            issueId: issueId,
-            mergeId: i,
-          })
+
+        console.log(`merge`, merge);
+
+        await BeproService.network.isMergeDisputed({issueId: issueId, mergeId: i,})
           .then((isMergeDisputed) => (merge.isDisputed = isMergeDisputed))
           .catch((err) => console.log("err is merge disputed", err));
-        await GithubMicroService.getMergeProposalIssue(
-          issueId,
-          (i + 1).toString()
-        )
-          .then((mergeProposal: ProposalMicroService) => {
-            merge.pullRequestId = mergeProposal.pullRequestId;
-            merge.pullRequestGithubId = mergeProposal.pullRequest.githubId;
+
+        console.log({issue_id: issueId, merge_id: i+1,})
+        await GithubMicroService.getMergeProposalIssue(issueId, (i + 1).toString())
+          .then((mergeProposal: ProposalData) => {
+            console.log(`mergeProposal`, mergeProposal)
+            merge.pullRequestId = mergeProposal?.pullRequestId;
+            merge.pullRequestGithubId = mergeProposal?.pullRequest.githubId;
           })
           .catch((err) => console.log("err microService", err));
 
         pool.push(merge);
       }
+    console.log(`pool`, pool);
     if (pool.length === numberProposals) setProposals(pool);
   };
 

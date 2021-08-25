@@ -89,7 +89,7 @@ export default function NewProposal({
           })
           .catch(() => setError("Error to create proposal in MicroService"))
       )
-      .catch(() => setError("Error to create proposal in MicroService"))  
+      .catch(() => setError("Error to create proposal in MicroService"))
       .finally(() => dispatch(changeLoadState(false)));
   }
 
@@ -106,7 +106,7 @@ export default function NewProposal({
   }
 
   function updateHideCreateProposalState() {
-    setHideCreateProposal(councilAmount > balance.bepro);
+    setHideCreateProposal(councilAmount > balance.staked);
   }
 
   function getCouncilAmount() {
@@ -135,12 +135,7 @@ export default function NewProposal({
     <>
       {" "}
       {(!hideCreateProposal && (
-        <button
-          className="btn btn-md btn-primary"
-          onClick={() => setShow(true)}
-        >
-          Create Proposal
-        </button>
+        <button className="btn btn-md btn-primary" onClick={() => setShow(true)}>Create Proposal</button>
       )) ||
         ` You need at least ${councilAmount} BEPRO to Create a Proposal `}
       <Modal

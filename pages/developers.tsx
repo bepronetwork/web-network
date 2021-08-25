@@ -7,6 +7,7 @@ import ReactSelect from '@components/react-select';
 import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';
 import {IssueData} from '@interfaces/issue-data';
+import {BeproService} from '@services/bepro-service';
 
 type Filter = {
   label: string;
@@ -47,7 +48,7 @@ const options_time = [
 ];
 
 export default function PageDevelopers() {
-  const {dispatch, state: {loading}} = useContext(ApplicationContext);
+  const {dispatch, state: {loading, currentAddress}} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
   const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
 
@@ -73,6 +74,7 @@ export default function PageDevelopers() {
     }
     getIssues();
   }, []);
+
 
   const isDraftIssue = (issue: IssueData) => issue.state === 'draft';
   const isClosedIssue = (issue: IssueData) => issue.state === 'closed' || issue.state === 'redeemed';

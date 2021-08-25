@@ -1,20 +1,21 @@
-import { GetStaticProps } from "next/types";
-import React, { useContext, useEffect, useState } from "react";
-import PageActions from "@components/page-actions";
-import ProposalAddresses from "@components/proposal-addresses";
-import ProposalHero from "@components/proposal-hero";
-import ProposalProgress from "@components/proposal-progress";
-import { useRouter } from "next/router";
-import { ApplicationContext } from "@contexts/application";
-import { BeproService } from "@services/bepro-service";
+import {GetStaticProps} from 'next/types';
+import React, {useContext, useEffect, useState} from 'react';
+import PageActions from '@components/page-actions';
+import ProposalAddresses from '@components/proposal-addresses';
+import ProposalHero from '@components/proposal-hero';
+import ProposalProgress from '@components/proposal-progress';
+import {useRouter} from 'next/router';
+import {ApplicationContext} from '@contexts/application';
+import {BeproService} from '@services/bepro-service';
 import GithubMicroService, {
-  ProposalMicroService,
+  ProposalData,
   User,
-} from "@services/github-microservice";
-import { toNumber } from "lodash";
-import { formatDate } from "@helpers/formatDate";
-import { handlePercentage } from "@helpers/handlePercentage";
-import { IssueData } from "@interfaces/issue-data";
+} from '@services/github-microservice';
+import {toNumber} from 'lodash';
+import {formatDate} from '@helpers/formatDate';
+import {handlePercentage} from '@helpers/handlePercentage';
+import {IssueData} from '@interfaces/issue-data';
+import {addToast} from '@reducers/add-toast';
 
 interface ProposalBepro {
   disputes: string;
@@ -36,110 +37,76 @@ interface usersAddresses {
 
 export default function PageProposal() {
   const router = useRouter();
-  const { id, issueId } = router.query;
-  const {
-    state: { currentAddress },
-  } = useContext(ApplicationContext);
+  const {id, issueId} = router.query;
+  const { dispatch, state: {currentAddress}, } = useContext(ApplicationContext);
 
   const [proposalBepro, setProposalBepro] = useState<ProposalBepro>();
-  const [proposalMicroService, setProposalMicroService] =
-    useState<ProposalMicroService>();
+  const [proposalMicroService, setProposalMicroService] = useState<ProposalData>();
   const [amountIssue, setAmountIssue] = useState<string>();
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
   const [issueMicroService, setIssueMicroService] = useState<IssueData>();
 
-  const getsProposalMicroService = () => {
-    GithubMicroService.getMergeProposalIssue(
-      issueId,
-      (toNumber(id) + 1).toString()
-    )
-      .then((mergeProposal: ProposalMicroService) => {
-        setProposalMicroService(mergeProposal);
-      })
-      .catch((err) => console.log("err microService", err));
+  async function getProposalData() {
+    const mergeProposal = await GithubMicroService.getMergeProposalIssue(issueId, id);
+    const issueData = await GithubMicroService.getIssueId(issueId);
+    setProposalMicroService(mergeProposal as ProposalData);
+    setIssueMicroService(issueData);
 
-    GithubMicroService.getIssueId(issueId).then(
-      (issueMicroservice: IssueData) => setIssueMicroService(issueMicroservice)
-    );
-  };
+    console.log(`mergeProposal`, mergeProposal,);
+    console.log(`issueData`, issueData,);
 
-  const getsProposalBeproService = () => {
-    BeproService.network
-      .getMergeById({
-        issue_id: issueId,
-        merge_id: id,
-      })
-      .then((merge: ProposalBepro) => {
-        BeproService.network
-          .isMergeDisputed({
-            issueId: issueId,
-            mergeId: id,
-          })
-          .then((isMergeDisputed: boolean) => {
-            GithubMicroService.getUserOf(merge.proposalAddress).then(
-              (handle: User) => {
-                setProposalBepro({
-                  ...merge,
-                  isDisputed: isMergeDisputed,
-                  author: handle?.githubLogin,
-                });
-              }
-            );
-          });
-      })
-      .catch((err) => console.log("err is merge disputed", err));
-  };
+    return Promise.resolve();
+  }
 
-  const getIssueBepro = () => {
-    BeproService.network
-      .getIssueById({
-        issueId: id,
-      })
-      .then((networkIssue: { tokensStaked: string }) =>
-        setAmountIssue(networkIssue.tokensStaked)
-      );
-  };
+  async function getProposal() {
+    const mergeId = id;
 
-  const getUsersAddresses = () => {
-    if (proposalBepro?.prAddresses.length === proposalBepro?.prAmounts.length) {
-      const userAddress = [];
-      proposalBepro?.prAddresses.map((item, index) => {
-        GithubMicroService.getUserOf(item).then((handle: User) => {
-          userAddress.push({
-            githubLogin: handle.githubLogin,
-            percentage: handlePercentage(
-              toNumber(proposalBepro?.prAmounts[index]),
-              toNumber(amountIssue)
-            ),
-            address: item,
-            oracles: proposalBepro?.prAmounts[index],
-          });
-          if (proposalBepro?.prAddresses.length === userAddress.length)
-            setUsersAddresses(userAddress);
-        });
-      });
+    try {
+      const merge = await BeproService.network.getMergeById({issue_id: issueId, merge_id: (+id - 1).toString()});
+      const isDisputed = await BeproService.network.isMergeDisputed({issueId, mergeId: (+id - 1).toString(),});
+      const author = await GithubMicroService.getHandleOf(merge.proposalAddress);
+
+      setProposalBepro({...merge, isDisputed, author});
+      return Promise.resolve();
+    } catch (e) {
+      console.error(`Error fetching Proposal for issue ${issueId} with merge ${mergeId}`, e);
     }
-  };
+  }
 
-  const gets = () => {
-    if (currentAddress && id && issueId) {
-      getsProposalMicroService();
-      getsProposalBeproService();
-      getIssueBepro();
-    } else if (issueId) {
-      router.push({
-        pathname: "/issue",
-        query: { id: issueId },
-      });
-    } else {
-      router.push({
-        pathname: "/",
-      });
+  function getIssueAmount() {
+    BeproService.network.getIssueById({issueId: id})
+                .then(issue => setAmountIssue(issue.tokensStaked))
+  }
+
+  async function joinUserAddresses() {
+    console.log(`Proposal changed`, proposalBepro);
+    if (!proposalBepro)
+      return;
+
+    const users = [];
+
+    for (const [i, address] of proposalBepro.prAddresses.entries()) {
+      const {githubLogin} = await GithubMicroService.getUserOf(address);
+      const oracles = proposalBepro.prAmounts[i];
+      const percentage = handlePercentage(oracles, +amountIssue);
+
+      users.push({githubLogin, percentage, address, oracles});
     }
-  };
-  useEffect(gets, [currentAddress, id, issueId]);
 
-  useEffect(getUsersAddresses, [proposalBepro]);
+    setUsersAddresses(users);
+    console.log(`users`, users)
+  }
+
+  function initialize() {
+    if (issueId && id && currentAddress) {
+      getProposalData()
+        .then(_ => getProposal())
+        .then(_ => getIssueAmount())
+    }
+  }
+
+  useEffect(() => { initialize() }, [currentAddress, id, issueId]);
+  useEffect(() => { joinUserAddresses() }, [proposalBepro]);
 
   return (
     <>
@@ -151,25 +118,23 @@ export default function PageProposal() {
         createdAt={
           proposalMicroService && formatDate(proposalMicroService.createdAt)
         }
-        beproStaked={amountIssue}
-      />
-      <ProposalProgress developers={usersAddresses} />
-      {issueId && id && (
-        <PageActions
-          state={"pull request"}
-          developers={[]}
-          finalized={false}
-          isIssueinDraft={false}
-          addressNetwork={"0xE1Zr7u"}
-          issueId={issueId.toString()}
-          mergeId={id.toString()}
-          handleBeproService={getsProposalBeproService}
-          isDisputed={proposalBepro?.isDisputed}
-          UrlGithub={`https://github.com/bepronetwork/bepro-js-edge/pull/${proposalMicroService?.pullRequest.githubId}`}
-        />
-      )}
+        beproStaked={amountIssue}/>
+      <ProposalProgress developers={usersAddresses}/>
 
-      <ProposalAddresses addresses={usersAddresses}></ProposalAddresses>
+      <PageActions
+        state={'pull request'}
+        developers={[]}
+        finalized={false}
+        isIssueinDraft={false}
+        addressNetwork={'0xE1Zr7u'}
+        issueId={issueId?.toString()}
+        mergeId={id?.toString()}
+        handleBeproService={getProposal}
+        isDisputed={proposalBepro?.isDisputed}
+        UrlGithub={`https://github.com/bepronetwork/bepro-js-edge/pull/${proposalMicroService?.pullRequest.githubId}`}
+      />
+
+      <ProposalAddresses addresses={usersAddresses} />
     </>
   );
 }
