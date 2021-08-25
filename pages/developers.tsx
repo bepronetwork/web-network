@@ -7,6 +7,7 @@ import ReactSelect from '@components/react-select';
 import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';
 import {IssueData} from '@interfaces/issue-data';
+import {BeproService} from '@services/bepro-service';
 
 type Filter = {
   label: string;
@@ -47,7 +48,7 @@ const options_time = [
 ];
 
 export default function PageDevelopers() {
-  const {dispatch, state: {loading}} = useContext(ApplicationContext);
+  const {dispatch, state: {loading, currentAddress}} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
   const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
 
@@ -73,6 +74,41 @@ export default function PageDevelopers() {
     }
     getIssues();
   }, []);
+
+  let old = null;
+
+  useEffect(() => {
+    if (currentAddress && currentAddress !== old) {
+      old = currentAddress
+
+
+      setTimeout(() => {
+        BeproService.bepro.web3.eth.handleRevert = true
+        // BeproService.network
+        //             .deploy({
+        //                       settlerTokenAddress: "0x7a7748bd6f9bac76c2f3fcb29723227e3376cbb2",
+        //                       transactionTokenAddress: "0x7a7748bd6f9bac76c2f3fcb29723227e3376cbb2",
+        //                       governanceAddress: currentAddress,
+        //                     })
+        //             .then(info => {
+        //               console.log(`Deployed!`)
+        //               console.table(info);
+        //               return true;
+        //             })
+        //             .then(_ =>
+        // BeproService.network.changeCouncilAmount(101000)
+        //             .then(info => {
+        //               console.log(`Council Changed!`);
+        //               console.table(info);
+        //             })
+        //             .catch(e => {
+        //               console.error(`Error deploying`, e);
+        //             })
+        // )
+      }, 1000)
+    }
+  }, [currentAddress])
+
 
   const isDraftIssue = (issue: IssueData) => issue.state === 'draft';
   const isClosedIssue = (issue: IssueData) => issue.state === 'closed' || issue.state === 'redeemed';
