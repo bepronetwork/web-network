@@ -171,6 +171,10 @@ body {
   font-family: 'fontRegular', sans-serif;
 }
 
+.family-medium{
+  font-family: 'fontMedium', sans-serif;
+}
+
 .family-bold{
   font-family: 'fontBold', sans-serif;
 }
@@ -708,10 +712,6 @@ label {
     padding: 20px;
     width: fit-content;
     height: fit-content;
-
-    .empty-title{
-      font-family: 'fontMedium';
-    }
   }
   .popover-arrow{
     &::after{
