@@ -7,6 +7,8 @@ import GithubMicroService from "@services/github-microservice";
 import { BeproService } from "@services/bepro-service";
 import { ApplicationContext } from "@contexts/application";
 import { changeLoadState } from "@contexts/reducers/change-load-state";
+import router from "next/router";
+import { handlePercentage } from "@helpers/handlePercentage";
 
 interface Proposal {
   disputes: string;
@@ -79,14 +81,19 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
     gets();
   }, [issueId, numberProposals]);
 
-  const handlePercentage = (value: number, amount: number) =>
-    (value * 100) / amount;
-
   const renderProposals = () => {
     return proposals.map((proposal) => (
       <div className="content-list-item" key={proposal._id}>
-        <div className="row align-items-center">
-          <div className="col-md-4 mt-3">
+        <div className="list-item-proposal rounded row align-items-center">
+          <div
+            className="col-md-4 mt-3"
+            onClick={() => {
+              router.push({
+                pathname: "/proposal",
+                query: { id: proposal.pullRequestId, issueId: issueId },
+              });
+            }}
+          >
             <p
               className={clsx("p-small mb-0", {
                 "text-danger": proposal?.isDisputed,
