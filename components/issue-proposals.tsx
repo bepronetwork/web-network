@@ -3,10 +3,14 @@ import clsx from "clsx";
 import { toNumber } from "lodash";
 import { GetStaticProps } from "next";
 import { useEffect, useState } from "react";
-import GithubMicroService from "@services/github-microservice";
+import GithubMicroService, {
+  ProposalMicroService,
+} from "@services/github-microservice";
 import { BeproService } from "@services/bepro-service";
 import { ApplicationContext } from "@contexts/application";
 import { changeLoadState } from "@contexts/reducers/change-load-state";
+import router from "next/router";
+import { handlePercentage } from "@helpers/handlePercentage";
 
 interface Proposal {
   disputes: string;
@@ -17,6 +21,7 @@ interface Proposal {
   _id: string;
   isDisputed?: boolean;
   pullRequestId?: string;
+  pullRequestGithubId?: string;
 }
 
 export default function IssueProposals({ numberProposals, issueId, amount }) {
@@ -65,8 +70,9 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
           issueId,
           (i + 1).toString()
         )
-          .then((mergeProposal) => {
+          .then((mergeProposal: ProposalMicroService) => {
             merge.pullRequestId = mergeProposal.pullRequestId;
+            merge.pullRequestGithubId = mergeProposal.pullRequest.githubId;
           })
           .catch((err) => console.log("err microService", err));
 
@@ -79,20 +85,25 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
     gets();
   }, [issueId, numberProposals]);
 
-  const handlePercentage = (value: number, amount: number) =>
-    (value * 100) / amount;
-
   const renderProposals = () => {
     return proposals.map((proposal) => (
       <div className="content-list-item" key={proposal._id}>
-        <div className="row align-items-center">
-          <div className="col-md-4 mt-3">
+        <div className="list-item-proposal rounded row align-items-center">
+          <div
+            className="col-md-4 mt-3"
+            onClick={() => {
+              router.push({
+                pathname: "/proposal",
+                query: { id: proposal.pullRequestId, issueId: issueId },
+              });
+            }}
+          >
             <p
               className={clsx("p-small mb-0", {
                 "text-danger": proposal?.isDisputed,
               })}
             >
-              PR #{proposal.pullRequestId}
+              PR #{proposal.pullRequestGithubId}
             </p>
           </div>
           <div className="col-md-4">
