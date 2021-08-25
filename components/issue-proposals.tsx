@@ -3,7 +3,9 @@ import clsx from "clsx";
 import { toNumber } from "lodash";
 import { GetStaticProps } from "next";
 import { useEffect, useState } from "react";
-import GithubMicroService from "@services/github-microservice";
+import GithubMicroService, {
+  ProposalMicroService,
+} from "@services/github-microservice";
 import { BeproService } from "@services/bepro-service";
 import { ApplicationContext } from "@contexts/application";
 import { changeLoadState } from "@contexts/reducers/change-load-state";
@@ -19,6 +21,7 @@ interface Proposal {
   _id: string;
   isDisputed?: boolean;
   pullRequestId?: string;
+  pullRequestGithubId?: string;
 }
 
 export default function IssueProposals({ numberProposals, issueId, amount }) {
@@ -67,8 +70,9 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
           issueId,
           (i + 1).toString()
         )
-          .then((mergeProposal) => {
+          .then((mergeProposal: ProposalMicroService) => {
             merge.pullRequestId = mergeProposal.pullRequestId;
+            merge.pullRequestGithubId = mergeProposal.pullRequest.githubId;
           })
           .catch((err) => console.log("err microService", err));
 
@@ -99,7 +103,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                 "text-danger": proposal?.isDisputed,
               })}
             >
-              PR #{proposal.pullRequestId}
+              PR #{proposal.pullRequestGithubId}
             </p>
           </div>
           <div className="col-md-4">

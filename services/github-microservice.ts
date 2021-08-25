@@ -1,7 +1,6 @@
 import axios from 'axios';
 import {IssueData, IssueState} from '@interfaces/issue-data';
 import { API } from '../env';
-import { ProposalMicroService } from '@pages/proposal';
 
 export interface User {
   githubHandle: string;
@@ -9,6 +8,22 @@ export interface User {
   address?: string;
   createdAt: string;
   id: number;
+  updatedAt: string;
+}
+
+export interface ProposalMicroService {
+  id: number;
+  issueId: number;
+  scMergeId: string;
+  pullRequestId: number;
+  pullRequest: {
+    id: number;
+    githubId: string;
+    issueId: number;
+    createdAt: string;
+    updatedAt: string;
+  };
+  createdAt: string;
   updatedAt: string;
 }
 
