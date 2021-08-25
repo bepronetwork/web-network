@@ -10,6 +10,7 @@ import GithubMicroService from "@services/github-microservice";
 import { developer, pullRequest } from "@interfaces/issue-data";
 import { changeBalance } from "@contexts/reducers/change-balance";
 import { addToast } from "@contexts/reducers/add-toast";
+import clsx from "clsx";
 
 interface pageActions {
   issueId: string;
@@ -28,6 +29,8 @@ interface pageActions {
   handleMicroService?: () => void;
   handleBeproService?: () => void;
   githubLogin?: string;
+  mergeId?: string;
+  isDisputed?: boolean;
 }
 
 export default function PageActions({
@@ -47,6 +50,8 @@ export default function PageActions({
   handleMicroService,
   handleBeproService,
   githubLogin,
+  mergeId,
+  isDisputed,
 }: pageActions) {
   const {
     dispatch,
@@ -177,7 +182,31 @@ export default function PageActions({
             })
           );
         }
+      });
+  }
+
+  async function handleDispute() {
+    dispatch(changeLoadState(true));
+    await BeproService.network
+      .disputeMerge({
+        issueID: issueId,
+        mergeID: mergeId,
       })
+      .then(() => handleBeproService())
+      .catch((err) => console.log("err dispute", err))
+      .finally(() => dispatch(changeLoadState(false)));
+  }
+
+  async function handleClose() {
+    dispatch(changeLoadState(true));
+    await BeproService.network
+      .closeIssue({
+        issueID: issueId,
+        mergeID: mergeId,
+      })
+      .then(() => handleBeproService())
+      .catch((err) => console.log("err close", err))
+      .finally(() => dispatch(changeLoadState(false)));
   }
 
   return (
@@ -191,16 +220,31 @@ export default function PageActions({
               {forks && handleFork()}
               {UrlGithub && (
                 <Link href={UrlGithub}>
-                  <a className="btn btn-md btn-opac mx-1">View on github</a>
+                  <a className="btn btn-md btn-opac me-3" target="_blank" >View on github</a>
                 </Link>
               )}
               {renderRedeem()}
               {renderProposeDestribution()}
               {renderPullrequest()}
               {state?.toLowerCase() === "pull request" && (
-                <button className="btn btn-md btn-primary mx-1 px-4">
-                  Dispute
-                </button>
+                <>
+                  <button
+                    className={clsx("btn btn-md  px-4", {
+                      "btn-purple": !isDisputed,
+                      "btn-primary": isDisputed,
+                    })}
+                    onClick={handleDispute}
+                  >
+                    Dispute
+                  </button>
+
+                  <button
+                    className="btn btn-md btn-primary mx-3 px-4"
+                    onClick={handleClose}
+                  >
+                    Close
+                  </button>
+                </>
               )}
             </div>
           </div>
