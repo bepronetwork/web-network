@@ -75,40 +75,6 @@ export default function PageDevelopers() {
     getIssues();
   }, []);
 
-  let old = null;
-
-  useEffect(() => {
-    if (currentAddress && currentAddress !== old) {
-      old = currentAddress
-
-
-      setTimeout(() => {
-        BeproService.bepro.web3.eth.handleRevert = true
-        // BeproService.network
-        //             .deploy({
-        //                       settlerTokenAddress: "0x7a7748bd6f9bac76c2f3fcb29723227e3376cbb2",
-        //                       transactionTokenAddress: "0x7a7748bd6f9bac76c2f3fcb29723227e3376cbb2",
-        //                       governanceAddress: currentAddress,
-        //                     })
-        //             .then(info => {
-        //               console.log(`Deployed!`)
-        //               console.table(info);
-        //               return true;
-        //             })
-        //             .then(_ =>
-        // BeproService.network.changeCouncilAmount(101000)
-        //             .then(info => {
-        //               console.log(`Council Changed!`);
-        //               console.table(info);
-        //             })
-        //             .catch(e => {
-        //               console.error(`Error deploying`, e);
-        //             })
-        // )
-      }, 1000)
-    }
-  }, [currentAddress])
-
 
   const isDraftIssue = (issue: IssueData) => issue.state === 'draft';
   const isClosedIssue = (issue: IssueData) => issue.state === 'closed' || issue.state === 'redeemed';
