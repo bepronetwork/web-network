@@ -90,6 +90,8 @@ class BeproFacet {
     const transaction =  await eth.getTransaction(tx);
     
     const confirmations = now - transaction.blockNumber
+    
+    const status = transaction.confirmations < 16 ? 'pending' : (transaction.confirmations > 23 ? 'processing' : 'approved');
 
     return {
       addressFrom: transaction.from,
@@ -97,6 +99,7 @@ class BeproFacet {
       transactionHash: tx,
       blockHash: transaction.blockHash,
       confirmations,
+      status,
     };
   }
 }

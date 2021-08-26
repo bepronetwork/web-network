@@ -43,10 +43,9 @@ export default function PageCreateIssue() {
                         dispatch(changeLoadState(false))
                       }).then(()=> BeproService.getTransaction(txHash))
                       .then((transaction)=>{
-                        const status = transaction.confirmations < 16 ? 'pending' : (transaction.confirmations > 23 ? 'processing' : 'approved');
                         dispatch(addTransactions({
                           ...transaction,
-                          status,
+                          status: transaction.status,
                           date: new Date(),
                           amount: issueAmount.formattedValue,
                           type: 'approval',
@@ -81,10 +80,9 @@ export default function PageCreateIssue() {
                       })
                       .then((transaction)=> BeproService.getTransaction(transaction.transactionHash))
                       .then((transaction)=>{
-                        const status = transaction.confirmations < 16 ? 'pending' : (transaction.confirmations > 23 ? 'processing' : 'approved');
                         dispatch(addTransactions({
                           ...transaction,
-                          status,
+                          status: transaction.status,
                           type: 'create issue',
                           date: new Date(),
                           amount: issueAmount.floatValue,
