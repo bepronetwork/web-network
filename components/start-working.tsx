@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Form } from "react-bootstrap";
-import GithubMicroService from "../services/github-microservice";
+import GithubMicroService from "@services/github-microservice";
 import Modal from "./modal";
 
 export default function StartWorking({ issueId, userAddress }): JSX.Element {
@@ -11,7 +11,7 @@ export default function StartWorking({ issueId, userAddress }): JSX.Element {
       githubHandle: "Mock",
       address: userAddress,
     });
-    console.log("startWorking", startWorking);
+
     setShow(false);
   }
 

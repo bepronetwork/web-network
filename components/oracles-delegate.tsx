@@ -2,10 +2,10 @@ import {ChangeEvent, useContext, useEffect, useState} from 'react';
 import { NumberFormatValues } from "react-number-format";
 import InputNumber from "./input-number";
 import OraclesBoxHeader from "./oracles-box-header";
-import {ApplicationContext} from '../contexts/application';
+import {ApplicationContext} from '@contexts/application';
 import NetworkTxButton from './network-tx-button';
-import {changeBalance} from '../contexts/reducers/change-balance';
-import {BeproService} from '../services/bepro-service';
+import {changeBalance} from '@reducers/change-balance';
+import {BeproService} from '@services/bepro-service';
 
 function OraclesDelegate(): JSX.Element {
   const {dispatch, state: {oracles, beproInit, metaMaskWallet, balance: {bepro: beproBalance, staked}}} = useContext(ApplicationContext);
@@ -40,8 +40,6 @@ function OraclesDelegate(): JSX.Element {
   function updateAmounts() {
     if (!beproInit || !metaMaskWallet)
       return;
-
-    console.log(`updating delegated amount`, oracles);
 
     setDelegatedAmount(
       oracles.amounts.reduce((total, current) => total += +current, 0)

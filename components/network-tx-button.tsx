@@ -1,12 +1,12 @@
-import { Network } from 'bepro-js';
-import {BeproService} from '../services/bepro-service';
+import {BeproService} from '@services/bepro-service';
 import {forwardRef, useContext, useEffect, useState} from 'react';
-import {ApplicationContext} from '../contexts/application';
-import {changeLoadState} from '../contexts/reducers/change-load-state';
+import {ApplicationContext} from '@contexts/application';
+import {changeLoadState} from '@reducers/change-load-state';
 import Modal from './modal';
 import Icon from "./icon";
 import {addToast} from '../contexts/reducers/add-toast';
 import {addTransactions} from 'contexts/reducers/add-transactions'
+import {addToast} from '@reducers/add-toast';
 
 interface NetworkTxButtonParams {
   txMethod: string;
@@ -45,7 +45,7 @@ function networkTxButton({txMethod, txParams, onTxStart = () => {}, onSuccess, o
       .then(async({transactionHash, status, message, ...rest}) => {
         if (status) {
           onSuccess()
-          dispatch(addToast({content: `Success!`, title: txMethod}));
+          dispatch(addToast({type:'success', title: 'Success', content: `${txMethod} ${txParams?.tokenAmount} oracles`}));;
           const transactionsInfo = await BeproService.getTransaction(transactionHash)
           dispatch(addTransactions({
             ...transactionsInfo,
@@ -57,7 +57,7 @@ function networkTxButton({txMethod, txParams, onTxStart = () => {}, onSuccess, o
           }))
         } else {
           onFail(message)
-          dispatch(addToast({content: message, title: txMethod}));
+          dispatch(addToast({type: 'danger', title: 'Failed'}));
         }
 
         setTxSuccess(status);
@@ -72,7 +72,7 @@ function networkTxButton({txMethod, txParams, onTxStart = () => {}, onSuccess, o
   }
 
   function getButtonClass() {
-    return `btn btn-md btn-lg w-100 mt-3 btn-primary ${!children && !buttonLabel && `visually-hidden` || ``}`
+    return `btn btn-md btn-lg mt-3 btn-primary ${!children && !buttonLabel && `visually-hidden` || ``}`
   }
 
   function getDivClass() {

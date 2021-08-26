@@ -2,9 +2,9 @@ import OraclesBoxHeader from "./oracles-box-header";
 import { isEmpty, isEqual, sumBy, uniqueId } from "lodash";
 import {useContext, useEffect, useState} from 'react';
 import OraclesTakeBackItem from "./oracles-take-back-item";
-import {ApplicationContext} from '../contexts/application';
-import {BeproService} from '../services/bepro-service';
-import {changeOraclesState} from '../contexts/reducers/change-oracles';
+import {ApplicationContext} from '@contexts/application';
+import {BeproService} from '@services/bepro-service';
+import {changeOraclesState} from '@reducers/change-oracles';
 
 type Item = { address: string; amount: string };
 
@@ -42,7 +42,7 @@ export default function OraclesTakeBack(): JSX.Element {
     BeproService.network.getOraclesSummary({address: currentAddress})
                 .then(oracles => dispatch(changeOraclesState(oracles)));
 
-  }, [balance.staked])
+  }, [balance.staked, currentAddress])
 
   return (
     <div className="col-md-10">
@@ -56,9 +56,7 @@ export default function OraclesTakeBack(): JSX.Element {
                   <OraclesTakeBackItem
                     key={uniqueId("OraclesTakeBackItem_")}
                     address={address}
-                    amount={amount}
-                    onConfirm={(status) => console.log(status, address)}
-                  />
+                    amount={amount} />
                 ))}
           </div>
         </div>

@@ -1,40 +1,55 @@
 import { GetStaticProps } from 'next'
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
-import { formatDate } from '../helpers/formatDate';
+import React, { useContext, useEffect, useState } from 'react';
+import { formatDate } from '@helpers/formatDate';
 import IssueAvatars from './issue-avatars';
-import {IssueData} from '../interfaces/issue-data';
-import { BeproService } from '../services/bepro-service';
+import {IssueData} from '@interfaces/issue-data';
+import { BeproService } from '@services/bepro-service';
+import { ApplicationContext } from '@contexts/application';
+import { IssueState } from '@interfaces/issue-data'
 
 export default function IssueListItem({issue = null}:{issue?: IssueData}) {
+    const { state: { metaMaskWallet }} = useContext(ApplicationContext)
     const router = useRouter()
     const [amount, setAmount] = useState<string>()
 
-   function handleColorState (state: string) {
-    switch(state.toLowerCase()) {
-     case "draft": {
-        return "gray"
-     }
-     case "in progress" || "open": {
-        return "blue"
-     }
-     case "ready": {
-        return "green"
-     }
-     default: {
-        return "blue"
-     }
-    }
+   function handleColorState (state: IssueState) {
+        switch(state.toLowerCase()) {
+            case "draft": {
+                return "gray"
+            }
+            case "in progress":{
+                return "blue"
+            }
+            case "open":{
+                return "blue"
+            }
+            case "redeemed":{
+                return "blue"
+            }
+            case "ready":{
+                return "green"
+            }
+            case "done":{
+                return "green"
+            }
+            case "disputed":{
+                return "red"
+            }
+            default: {
+                return "blue"
+            }
+        }
    }
 
    useEffect(() => {
     async function getIssueBeprosStaked(issueId: string){
         await BeproService.network.getIssueById({issueId})
             .then((issue) => setAmount(issue.tokensStaked))
-            .catch((err)  => console.log('err ->', err))
+            .catch((err)  => console.error('Failed to getIssue', err))
     }
      getIssueBeprosStaked(issue?.issueId)
-   },[issue])
+   },[metaMaskWallet])
 
     return (
             <div className="bg-shadow list-item rounded p-4 mb-3" onClick={() => {
@@ -53,7 +68,7 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
                             issue?.title
                             }
                         </h4>
-                        <div className="d-flex align-center flex-wrap justify-content-center justify-content-md-start">
+                        <div className="d-flex align-center flex-wrap align-item-center justify-content-md-start">
                             <span className={`status ${handleColorState(issue?.state)} mr-3 mt-1`}>{issue?.state}</span>
                             <span className="p-small trans mr-3 mt-1">{issue?.numberOfComments} comments</span>
                             <span className="p-small trans mr-3 mt-1">{issue != null && formatDate(issue?.createdAt)}</span>
@@ -62,7 +77,7 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
                         </div>
                     </div>
                     <div className="col-md-2 my-auto text-center">
-                        <span className="caption trans">{amount == "0" ? "MISSING" : amount } $BEPRO</span>
+                        <span className="caption trans">{amount == "0" ? "MISSING" : amount } {amount && "$BEPRO"}</span>
                         {(issue?.developers.length > 0) && <IssueAvatars users={issue?.developers}></IssueAvatars>}
                     </div>
                 </div>

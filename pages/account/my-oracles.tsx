@@ -1,8 +1,8 @@
-import React from "react";
-import OraclesActions from "components/oracles-actions";
-import OraclesDelegate from "components/oracles-delegate";
-import OraclesTakeBack from "components/oracles-take-back";
-import Account from "components/account";
+import React from 'react';
+import OraclesActions from '@components/oracles-actions';
+import OraclesDelegate from '@components/oracles-delegate';
+import OraclesTakeBack from '@components/oracles-take-back';
+import Account from '@components/account';
 
 export default function MyOracles() {
   return (

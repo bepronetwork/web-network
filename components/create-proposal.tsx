@@ -1,12 +1,14 @@
-import {useContext, useEffect, useState} from 'react';
+import { useContext, useEffect, useState } from "react";
 import Modal from "./modal";
 import ReactSelect from "./react-select";
 import CreateProposalDistributionItem from "./create-proposal-distribution-item";
 import sumObj from "helpers/sumObj";
-import { BeproService } from "../services/bepro-service";
+import { BeproService } from "@services/bepro-service";
 import GithubMicroService from "../services/github-microservice";
 import { pullRequest } from "interfaces/issue-data";
-import {ApplicationContext} from '../contexts/application';
+import { toNumber } from "lodash";
+import { ApplicationContext } from "@contexts/application";
+import { changeLoadState } from "@contexts/reducers/change-load-state";
 
 interface participants {
   githubHandle: string;
@@ -16,9 +18,15 @@ interface participants {
 export default function NewProposal({
   issueId,
   amountTotal,
+  numberMergeProposals,
   pullRequests = [],
+  handleBeproService,
+  handleMicroService,
 }) {
-  const {state: {balance}} = useContext(ApplicationContext);
+  const {
+    dispatch,
+    state: { balance, currentAddress, beproInit },
+  } = useContext(ApplicationContext);
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>();
   const [error, setError] = useState<string>("");
@@ -26,18 +34,21 @@ export default function NewProposal({
   const [participants, setParticipants] = useState<participants[]>([]);
   const [hideCreateProposal, setHideCreateProposal] = useState(true);
   const [councilAmount, setCouncilAmount] = useState(0);
+  const [currentGithubId, setCurrentGithubId] = useState<string>();
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
-    console.log("params->", params);
     setDistrib((prevState) => ({
       ...prevState,
       ...params,
     }));
   }
 
-  function getParticipantsPullRequest(id: string) {
+  function getParticipantsPullRequest(id: string, githubId: string) {
     GithubMicroService.getPullRequestParticipants(id)
-      .then((participantsPr) => setParticipants(participantsPr))
+      .then((participantsPr) => {
+        setCurrentGithubId(githubId);
+        setParticipants(participantsPr);
+      })
       .catch((err) => console.log("err", err));
   }
 
@@ -59,31 +70,48 @@ export default function NewProposal({
         (items) => (amountTotal * distrib[items.githubHandle]) / 100
       ),
     };
+    dispatch(changeLoadState(true));
     await BeproService.network
       .proposeIssueMerge(payload)
-      .then(() => {
-        handleClose();
-        setDistrib({});
-      })
-      .catch((err) => {
-        setError(err);
-        console.log("err", err);
-      });
+      .then(() =>
+        GithubMicroService.createMergeProposal(issueId, {
+          pullRequestGithubId: currentGithubId,
+          scMergeId: (numberMergeProposals + 1).toString(),
+        }).then(() => {
+          handleBeproService();
+          handleMicroService();
+          handleClose();
+          setDistrib({});
+        })
+          .then(() => {
+            handleClose();
+            setDistrib({});
+          })
+          .catch(() => setError("Error to create proposal in MicroService"))
+      )
+      .catch(() => setError("Error to create proposal in MicroService"))
+      .finally(() => dispatch(changeLoadState(false)));
   }
 
   function handleClose() {
     setShow(false);
   }
 
-  function handleChangeSelect(obj: { label: string; value: string }) {
-    getParticipantsPullRequest(obj.value);
+  function handleChangeSelect(obj: {
+    label: string;
+    value: string;
+    githubId: string;
+  }) {
+    getParticipantsPullRequest(obj.value, obj.githubId);
   }
 
   function updateHideCreateProposalState() {
-    setHideCreateProposal(councilAmount > balance.bepro);
+    setHideCreateProposal(councilAmount > balance.staked);
   }
 
   function getCouncilAmount() {
+    if (!beproInit) return;
+
     BeproService.network.COUNCIL_AMOUNT().then(setCouncilAmount);
   }
 
@@ -94,15 +122,22 @@ export default function NewProposal({
 
   useEffect(() => {
     if (pullRequests.length)
-      getParticipantsPullRequest(pullRequests[0]?.id);
+      getParticipantsPullRequest(
+        pullRequests[0]?.id,
+        pullRequests[0]?.githubId
+      );
   }, [pullRequests]);
 
-  useEffect(getCouncilAmount, []);
+  useEffect(getCouncilAmount, [beproInit]);
   useEffect(updateHideCreateProposalState, [balance.bepro]);
 
   return (
-    <> {!hideCreateProposal && <button className="btn btn-md btn-primary" onClick={() => setShow(true)}>Create Proposal</button> || `You need at least ${councilAmount}BEPRO to Create a Proposal`}
-
+    <>
+      {" "}
+      {(!hideCreateProposal && (
+        <button className="btn btn-md btn-primary" onClick={() => setShow(true)}>Create Proposal</button>
+      )) ||
+        ` You need at least ${councilAmount} BEPRO to Create a Proposal `}
       <Modal
         show={show}
         title="Create Proposal"
@@ -114,20 +149,24 @@ export default function NewProposal({
             <button
               className="btn btn-md btn-primary"
               onClick={handleClickCreate}
+              disabled={!currentAddress}
             >
               Create Proposal
             </button>
           </>
-        }>
+        }
+      >
         <p className="p-small text-50">Select a pull request </p>
         <ReactSelect
           defaultValue={{
             value: pullRequests[0]?.id,
             label: `#${pullRequests[0]?.githubId} Pull Request`,
+            githubId: pullRequests[0]?.githubId,
           }}
           options={pullRequests?.map((items: pullRequest) => ({
             value: items.id,
             label: `#${items.githubId} Pull Request`,
+            githubId: items.githubId,
           }))}
           onChange={handleChangeSelect}
         />
@@ -137,6 +176,7 @@ export default function NewProposal({
             <CreateProposalDistributionItem
               key={item.githubHandle}
               by={item.githubHandle}
+              address={item.address}
               onChangeDistribution={handleChangeDistrib}
               error={error}
             />

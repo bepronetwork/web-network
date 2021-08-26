@@ -1,7 +1,7 @@
-import {ReduceActionName} from '../../interfaces/enums/reduce-action-names';
-import {ReduceAction, ReduceActor} from '../../interfaces/reduce-action';
-import {ApplicationState} from '../../interfaces/application-state';
-import {OraclesState} from '../../interfaces/oracles-state';
+import {ReduceActionName} from '@interfaces/enums/reduce-action-names';
+import {ReduceAction, ReduceActor} from '@interfaces/reduce-action';
+import {ApplicationState} from '@interfaces/application-state';
+import {OraclesState} from '@interfaces/oracles-state';
 
 const reducer = (state: ApplicationState, payload: OraclesState): ApplicationState =>
   ({...state, oracles: payload})

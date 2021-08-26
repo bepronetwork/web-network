@@ -1,13 +1,13 @@
 import Modal from "./modal";
 import {ComponentPropsWithoutRef, useContext, useState} from 'react';
 import {BeproService} from "services/bepro-service";
-import {changeLoadState} from '../contexts/reducers/change-load-state';
-import {ApplicationContext} from '../contexts/application';
+import {changeLoadState} from '@reducers/change-load-state';
+import {ApplicationContext} from '@contexts/application';
 
 interface Props extends ComponentPropsWithoutRef<"div"> {
   amount: string;
   address: string;
-  onConfirm(status: boolean): void;
+  onConfirm?(status: boolean): void;
 }
 
 export default function OraclesTakeBackItem({
@@ -36,7 +36,7 @@ export default function OraclesTakeBackItem({
       onConfirm(response.status);
       dispatch(changeLoadState(false));
     } catch (error) {
-      console.log("OraclesTakeBackItem handleTakeBack", error);
+      console.error("OraclesTakeBackItem handleTakeBack", error);
       dispatch(changeLoadState(false));
     }
   }
