@@ -4,8 +4,7 @@ import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';
 import Modal from './modal';
 import Icon from "./icon";
-import {addToast} from '../contexts/reducers/add-toast';
-import {addTransactions} from 'contexts/reducers/add-transactions'
+import {addTransactions} from '@contexts/reducers/add-transactions'
 import {addToast} from '@reducers/add-toast';
 
 interface NetworkTxButtonParams {
