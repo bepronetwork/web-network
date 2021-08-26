@@ -1,17 +1,19 @@
 import {GetStaticProps} from 'next'
+import { useRouter } from 'next/router'
 import React, {useContext} from 'react';
 import {useEffect, useState} from 'react';
-import {BeproService} from '../services/bepro-service';
-// import {BeproService as beproService} from '../services/bepro-service';
+import {BeproService} from '@services/bepro-service';
 import Link from 'next/link';
+import clsx from "clsx";
 import ConnectWalletButton from './connect-wallet-button';
-import {ApplicationContext} from '../contexts/application';
-import {changeStakedState} from '../contexts/reducers/change-staked-amount';
+import {ApplicationContext} from '@contexts/application';
+import {changeStakedState} from '@reducers/change-staked-amount';
 import { formatNumberToNScale, formatNumberToString } from 'helpers/formatNumber';
 import TransactionPopover from './transaction-popover'
 
 export default function MainNav() {
   const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
+  const {asPath} = useRouter()
 
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [address, setAddress] = useState<string>(null);
@@ -63,6 +65,8 @@ export default function MainNav() {
   useEffect(updateState, [currentAddress]);
   useEffect(updateBalances, [balance])
 
+  useEffect(()=> console.log("changed `asPath`", asPath),[asPath])
+
   return (
     <div className="main-nav d-flex align-items-center justify-content-between">
 
@@ -77,9 +81,21 @@ export default function MainNav() {
           </a>
         </Link>
         <ul className="nav-links">
-          <li><Link href="/developers" passHref><a>Developers</a></Link></li>
-          <li><Link href="/council" passHref><a>Council</a></Link></li>
-          <li><Link href="/oracle" passHref><a>Oracle</a></Link></li>
+          <li><Link href="/developers" passHref><a
+          className={clsx({
+            active: asPath === '/developers',
+          })}
+          >Developers</a></Link></li>
+          <li><Link href="/council" passHref><a
+          className={clsx({
+            active: asPath === '/council',
+          })}
+          >Council</a></Link></li>
+          <li><Link href="/oracle" passHref><a
+          className={clsx({
+            active: asPath === '/oracle',
+          })}
+          >Oracle</a></Link></li>
           {/* <li><a href="/">Lists</a></li>
                         <li><a href="/issue">Issue</a></li>
                         <li><a href="/proposal">Proposal</a></li>

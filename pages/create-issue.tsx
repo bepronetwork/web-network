@@ -1,14 +1,15 @@
-import {GetStaticProps} from 'next'
+import {GetStatcProps} from 'next/types'
 import React, {useContext, useEffect, useState} from 'react';
-import {BeproService} from '../services/bepro-service';
-import GithubMicroService from '../services/github-microservice';
-import InputNumber from '../components/input-number';
+import {BeproService} from '@services/bepro-service';
+import GithubMicroService, { User } from '@services/github-microservice';
+import InputNumber from '@components/input-number';
 import {useRouter} from 'next/router';
 import clsx from 'clsx';
 import {ApplicationContext} from '../contexts/application';
 import {changeLoadState} from '../contexts/reducers/change-load-state';
 import ConnectWalletButton from '../components/connect-wallet-button';
 import { addTransactions } from 'contexts/reducers/add-transactions';
+import { addToast } from '@contexts/reducers/add-to
 
 interface Amount {
   value?: string,
@@ -23,6 +24,7 @@ export default function PageCreateIssue() {
   const [balance, setBalance] = useState(0);
   const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
   const {dispatch, state: {currentAddress, githubHandle}} = useContext(ApplicationContext);
+  const [currentUser, setCurrentUser] = useState<User>();
   const router = useRouter()
 
   const allow = async (evt) => {
@@ -52,7 +54,7 @@ export default function PageCreateIssue() {
                           amountType: '$BEPRO'
                         }))
                       })
-                      .catch((error) => console.log('Error', error))
+                      .catch((error) => console.error('Error allow()', error))
                       .finally(() => dispatch(changeLoadState(false)))
   }
 
@@ -66,10 +68,10 @@ export default function PageCreateIssue() {
       description: issueDescription,
       amount: issueAmount.floatValue,
       creatorAddress: beproAddress,
-      creatorGithub: githubHandle
+      creatorGithub: currentUser?.githubLogin
     }
+
     const contractPayload = {tokenAmount: issueAmount.floatValue, cid: beproAddress};
-    console.log('pay', contractPayload)
     await BeproService.network.openIssue(contractPayload)
                       .then(async(response) => {
                         await GithubMicroService.createIssue({
@@ -90,6 +92,8 @@ export default function PageCreateIssue() {
                         }))
                       })
                       .then(() => {
+                        dispatch(
+                          ({type:'success', title: 'Success', content: `Create Issue using ${issueAmount.value} $BEPROS`}))
                         router.push('/account');
                         cleanFields();
                       })
@@ -134,6 +138,7 @@ export default function PageCreateIssue() {
 
   useEffect(() => {
     BeproService.getBalance('bepro').then(setBalance);
+    GithubMicroService.getUserOf(currentAddress).then(setCurrentUser);
   }, [currentAddress])
 
   return (

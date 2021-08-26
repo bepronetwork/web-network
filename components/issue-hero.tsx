@@ -1,6 +1,6 @@
 import Avatar from "components/avatar";
 import { GetStaticProps } from "next";
-import { formatDate } from "../helpers/formatDate";
+import { formatDate } from '@helpers/formatDate';
 
 export default function IssueHero({ issue, state, amount }) {
   function renderCreator() {
@@ -8,7 +8,7 @@ export default function IssueHero({ issue, state, amount }) {
       issue?.creatorGithub && (
         <>
           by
-          <Avatar className="me-2" userLogin={issue.creatorGithub} />
+          <Avatar className="mx-2" userLogin={issue.creatorGithub} />
           {issue.creatorGithub}
         </>
       )
@@ -28,7 +28,7 @@ export default function IssueHero({ issue, state, amount }) {
                     <h1 className="h4 mb-2">
                       #{issue?.githubId} {issue?.title}
                     </h1>
-                    <div className="d-flex align-center flex-wrap justify-content-center justify-content-md-start">
+                    <div className="d-flex align-center flex-wrap align-item-center justify-content-md-start">
                       <span className="p-small trans mr-3 mt-1">
                         {issue?.numberOfComments} comments
                       </span>
@@ -48,10 +48,12 @@ export default function IssueHero({ issue, state, amount }) {
                 </div>
                 <div className="col-md-3">
                   <div className="banner-highlight">
-                    <h4 className="h4 mb-0">
-                      {amount > 0 ? amount : "MISSING"}{" "}
-                      <span className="p-small trans">$BEPRO</span>
-                    </h4>
+                    {amount && (
+                      <h4 className="h4 mb-0">
+                        {amount > 0 ? amount : "MISSING"}
+                        <span className="p-small trans"> $BEPRO</span>
+                      </h4>
+                    )}
                   </div>
                 </div>
               </div>

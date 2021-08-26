@@ -1,4 +1,5 @@
 @import 'variables';
+@import 'toasts';
 @import 'vendor';
 
 //bootstrap-overrides
@@ -447,6 +448,19 @@ p {
   }
 }
 
+.list-item-proposal {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  transition: 0.8 ease-in-out;
+  &:hover {
+    background-color: lighten($bg-shadow, 2);
+    cursor: pointer;
+    .h4 {
+      color: $white;
+    }
+  }
+}
+
 .content-wrapper {
   background-color: $dark-gray;
   padding: $m * 2;
@@ -460,6 +474,20 @@ p {
     margin-right: -$m*2;
     padding: $m $m * 2;
     background-color: $bg-shadow;
+    border-top: 2px solid rgba($black, 0.2);
+  }
+}
+
+.content-proposals {
+  padding: $m * 2;
+  border-radius: $m/2;
+  &.child {
+    padding: $m;
+  }
+  .content-list-item {
+    margin-left: -$m*2;
+    margin-right: -$m*2;
+    padding: $m $m * 2;
     border-top: 2px solid rgba($black, 0.2);
   }
 }
@@ -502,18 +530,21 @@ label {
   padding: 0px $m/2;
   border-radius: $m/8;
   color: $bg-shadow;
-  font-weight: 500;
+  font-weight: 400;
+  text-transform: capitalize;
   &.gray {
     background-color: $gray;
   }
   &.blue {
     background-color: $blue;
+    color: $white;
   }
   &.green {
     background-color: $green;
   }
   &.red {
     background-color: $red;
+    color: $white;
   }
 }
 
@@ -578,6 +609,9 @@ label {
 .bg-opac {
   background-color: rgba($white, 0.1);
 }
+.bg-purple {
+  background-color: $purple;
+}
 
 .color-blue {
   color: $blue;
@@ -587,6 +621,9 @@ label {
 }
 .color-purple {
   color: $purple;
+}
+.color-red {
+  color: $red;
 }
 
 .circle-1 {
@@ -646,46 +683,38 @@ label {
   }
 }
 
-.number-block-progress{
-  padding: 8px;
-  background-color: $bg-shadow;
-  color: rgba($purple, 1);
-  border-bottom: 6px solid $purple;
-  &.progress-1 {
-    border-color: rgba($purple, 1);
+.proposal-progress{
+  height: 6px;
+  border-radius: 19px;
+}
+
+.progress-ball{
+  position: absolute;
+  height: 10px;
+  width: 10px;
+  border-radius: 10px;
+  background-color: $dark-gray;
+  &.left {
+    left: 0;
   }
-  &.progress-2 {
-    border-color: rgba($purple, 0.8);
+  &.right {
+    right: 1rem;
   }
-  &.progress-3 {
-    border-color: rgba($purple, 0.6);
-  }
-  &.progress-4 {
-    border-color: rgba($purple, 0.4);
-  }
-  &.progress-5 {
-    border-color: rgba($purple, 0.4);
-  }
+}
+
+.progress-oracle{
+  background-color: $dark-gray;
+  height: 4px;
+}
+
+.content-relative {
+  position: relative;
 }
 
 .user-block-progress {
   padding: $m;
   border-bottom: 6px solid $purple;
-  &.progress-1 {
-    border-color: rgba($purple, 1);
-  }
-  &.progress-2 {
-    border-color: rgba($purple, 0.8);
-  }
-  &.progress-3 {
-    border-color: rgba($purple, 0.6);
-  }
-  &.progress-4 {
-    border-color: rgba($purple, 0.4);
-  }
-  &.progress-5 {
-    border-color: rgba($purple, 0.2);
-  }
+  border-radius: 6px;
 }
 
 .material-icons {

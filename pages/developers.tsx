@@ -1,12 +1,13 @@
-import { GetStaticProps } from "next";
+import { GetStaticProps } from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
-import PageHero from "../components/page-hero";
-import GithubMicroService from "../services/github-microservice";
-import ListIssues from "../components/list-issues";
-import ReactSelect from "../components/react-select";
-import {ApplicationContext} from '../contexts/application';
-import {changeLoadState} from '../contexts/reducers/change-load-state';
-import {IssueData} from '../interfaces/issue-data';
+import PageHero from "@components/page-hero";
+import GithubMicroService from '@services/github-microservice';
+import ListIssues from '@components/list-issues';
+import ReactSelect from '@components/react-select';
+import {ApplicationContext} from '@contexts/application';
+import {changeLoadState} from '@reducers/change-load-state';
+import {IssueData} from '@interfaces/issue-data';
+import {BeproService} from '@services/bepro-service';
 
 type Filter = {
   label: string;
@@ -47,7 +48,7 @@ const options_time = [
 ];
 
 export default function PageDevelopers() {
-  const {dispatch, state: {loading}} = useContext(ApplicationContext);
+  const {dispatch, state: {loading, currentAddress}} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
   const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
 
@@ -56,7 +57,6 @@ export default function PageDevelopers() {
   }
 
   function updateIssuesList(issues: IssueData[]) {
-    console.log(`got issues`, issues);
     setIssues(issues);
   }
 
@@ -75,8 +75,9 @@ export default function PageDevelopers() {
     getIssues();
   }, []);
 
+
   const isDraftIssue = (issue: IssueData) => issue.state === 'draft';
-  const isClosedIssue = (issue: IssueData) => issue.state === 'closed';
+  const isClosedIssue = (issue: IssueData) => issue.state === 'closed' || issue.state === 'redeemed';
   const isOpenIssue = (issue: IssueData) => !isDraftIssue(issue) && !isClosedIssue(issue);
 
   const issuesFilteredByState = issues.filter(issue => {
@@ -101,15 +102,6 @@ export default function PageDevelopers() {
                   defaultValue={filtersByIssueState[0]}
                   options={filtersByIssueState}
                   onChange={handleChangeFilterByState}
-                />
-              </div>
-              <div className="col-md-3">
-                <ReactSelect
-                  id="filterTime"
-                  className="react-select-filterIssues trans"
-                  defaultValue={options_time[0]}
-                  options={options_time}
-                  isDisabled
                 />
               </div>
             </div>

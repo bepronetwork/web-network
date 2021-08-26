@@ -1,8 +1,8 @@
 import clsx from "clsx";
 import {ComponentPropsWithRef, forwardRef, useContext} from 'react';
-import {BeproService} from "services/bepro-service";
-import {changeLoadState} from '../contexts/reducers/change-load-state';
-import {ApplicationContext} from '../contexts/application';
+import {BeproService} from "@services/bepro-service";
+import {changeLoadState} from '@reducers/change-load-state';
+import {ApplicationContext} from '@contexts/application';
 
 interface Props extends ComponentPropsWithRef<"button"> {
   onApprove: (isApproved: boolean) => void;
@@ -23,7 +23,7 @@ const SettlerTokenApproval = forwardRef<HTMLButtonElement, Props>(
         onApprove(response.status);
         dispatch(changeLoadState(false));
       } catch (error) {
-        console.log("SettlerTokenApproval", error);
+        console.error("SettlerTokenApproval", error);
         dispatch(changeLoadState(false));
         onApprove(false);
       }

@@ -1,7 +1,7 @@
 import { GetStaticProps } from "next";
 import React from "react";
-import IssueListItem from "../components/issue-list-item";
-import {IssueData} from '../interfaces/issue-data';
+import IssueListItem from "@components/issue-list-item";
+import {IssueData} from '@interfaces/issue-data';
 
 export default function ListIssues({
   listIssues = [],
