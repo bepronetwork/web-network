@@ -827,3 +827,9 @@ $c_props: ('m': 'margin') !default;
     }
   }
 }
+
+.fs {
+  &-7 { font-size: .7rem; }
+  &-8 { font-size: .8rem; }
+  &-9 { font-size: .9rem; }
+}

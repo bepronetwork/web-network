@@ -10,7 +10,8 @@ import {ChangeCurrentAddress} from './change-current-address';
 import {ChangeBalance} from './change-balance';
 import {AddToast} from './add-toast';
 import {RemoveToast} from './remove-toast';
-import {AddTransactions} from './add-transactions'
+import {ChangeMicroServiceReady} from '@reducers/change-microservice-ready';
+import {AddTransactions} from './add-transactions';
 
 export default function LoadApplicationReducers() {
   [
@@ -25,6 +26,7 @@ export default function LoadApplicationReducers() {
     ChangeBalance,
     AddToast,
     RemoveToast,
-    AddTransactions
+    ChangeMicroServiceReady,
+    AddTransactions,
   ].forEach(addReducer);
 }

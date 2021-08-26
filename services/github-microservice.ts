@@ -163,4 +163,13 @@ export default class GithubMicroService {
                    return {scMergeId: '', pullRequestId: '', issueId: '', id: ''}
                  })
   }
+
+  static async getHealth() {
+    return client.get(`/`)
+                 .then(({status}) => status === 200)
+                 .catch(_ => {
+                   console.log(_);
+                   return false;
+                 });
+  }
 }
