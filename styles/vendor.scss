@@ -2,16 +2,39 @@
 
 @font-face {
   font-family: 'fontRegular';
-  src: url('../assets/SpaceGrotesk-Regular.woff2') format('woff2'),
-       url('../assets/SpaceGrotesk-Regular.ttf') format('truetype');
+  src: url('../assets/fonts/SpaceGrotesk-Regular.woff2') format('woff2'),
+       url('../assets/fonts/SpaceGrotesk-Regular.ttf') format('truetype');
 }
 @font-face {
   font-family: 'fontMedium';
-  src: url('../assets/SpaceGrotesk-Medium.woff2') format('woff2'),
-       url('../assets/SpaceGrotesk-Medium.ttf') format('truetype');
+  src: url('../assets/fonts/SpaceGrotesk-Medium.woff2') format('woff2'),
+       url('../assets/fonts/SpaceGrotesk-Medium.ttf') format('truetype');
 }
 @font-face {
   font-family: 'fontBold';
-  src: url('../assets/SpaceGrotesk-Bold.woff2') format('woff2'),
-       url('../assets/SpaceGrotesk-Bold.ttf') format('truetype');
+  src: url('../assets/fonts/SpaceGrotesk-Bold.woff2') format('woff2'),
+       url('../assets/fonts/SpaceGrotesk-Bold.ttf') format('truetype');
+}
+
+//inter
+@font-face {
+  font-family: 'Inter-Regular';
+  src: url('../assets/fonts/Inter-Regular.ttf') format('ttf'),
+       url('../assets/fonts/Inter-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Inter-Bold';
+  src: url('../assets/fonts/Inter-Bold.ttf') format('ttf'),
+       url('../assets/fonts/Inter-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inter-Medium';
+  src: url('../assets/fonts/Inter-Medium.ttf') format('ttf'),
+       url('../assets/fonts/Inter-Medium.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Inter-Thin';
+  src: url('../assets/fonts/Inter-Thin.ttf') format('ttf'),
+       url('../assets/fonts/Inter-Thin.ttf') format('truetype');
 }

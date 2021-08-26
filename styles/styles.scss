@@ -167,6 +167,29 @@ body {
   text-transform: uppercase;
 }
 
+// familys
+.family-Regular{
+  font-family: 'fontRegular', sans-serif;
+}
+
+.family-medium{
+  font-family: 'fontMedium', sans-serif;
+}
+
+.family-bold{
+  font-family: 'fontBold', sans-serif;
+}
+
+.family-inter{
+  font-family: "Inter-Regular", sans-serif;
+}
+.family-inter-medium{
+  font-family: "Inter-Medium", sans-serif;;
+}
+.family-inter-bold{
+  font-family: "Inter-bold", sans-serif;;
+}
+
 .p,
 p {
   font-size: 16px;
@@ -699,6 +722,76 @@ label {
   &.md-medium { font-size: 24px; }
   &.md-large { font-size: 44px; }
   &.md-larger { font-size: 64px; }
+}
+// Popovers
+
+#transaction-popover{
+  border:none;
+  background-color: transparent;
+  margin-top: $m;
+  .popover-body{
+    background-color: $bg-shadow;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.25);
+    border-radius: $m/2;
+
+    display: flex;
+    align-items: center;
+    text-align: center;
+
+    padding: 20px;
+    width: fit-content;
+    height: fit-content;
+  }
+  .popover-arrow{
+    &::after{
+      border-bottom-color: $bg-shadow;
+    }
+  }
+  
+
+  .transaction{
+    &.box {
+      cursor: pointer;
+      width: 327px;
+      background-color: $black;
+    }
+    &.status {
+        > p {
+          font-size: 14px;
+          color: $blue-info;
+        }
+    }
+    &.header {
+      p {
+        font-size: 14px;;
+        color: $gray;
+      }
+    }
+  }
+}
+.transaction-modal{
+  &.status{
+      >span{
+        font-size: 14px;
+        line-height: 160%;
+        color: $gray;
+      }
+
+      .indicator{
+        > p {
+          font-size: 14px;
+        }
+      }
+  }
+  
+  &.box{
+    background-color: $bg;
+    >span{
+      font-family: "Inter-Medium";
+      font-size: 14px;
+      color: $gray;
+    }
+  }
 }
 
 $c_directions: ('left': 'l', 'right': 'r', 'top': 't', 'bottom': 'b') !default;

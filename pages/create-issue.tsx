@@ -5,10 +5,11 @@ import GithubMicroService, { User } from '@services/github-microservice';
 import InputNumber from '@components/input-number';
 import {useRouter} from 'next/router';
 import clsx from 'clsx';
-import {ApplicationContext} from '@contexts/application';
-import {changeLoadState} from '@reducers/change-load-state';
-import ConnectWalletButton from '@components/connect-wallet-button';
-import { addToast } from '@contexts/reducers/add-toast';
+import {ApplicationContext} from '../contexts/application';
+import {changeLoadState} from '../contexts/reducers/change-load-state';
+import ConnectWalletButton from '../components/connect-wallet-button';
+import { addTransactions } from '@contexts/reducers/add-transactions';
+import {AddToast, addToast} from '@contexts/reducers/add-toast'
 
 interface Amount {
   value?: string,
@@ -29,16 +30,29 @@ export default function PageCreateIssue() {
   const allow = async (evt) => {
     evt.preventDefault();
     dispatch(changeLoadState(true))
+    let txHash;
     await BeproService.login()
-                      .then(() => BeproService.network.approveTransactionalERC20Token())
+                      .then(async () => {
+                        const transaction = await BeproService.network.approveTransactionalERC20Token()
+                        txHash = transaction.transactionHash;
+                        return transaction;
+                      })
                       .then(() => BeproService.address)
-                      .then(address => BeproService.network.isApprovedTransactionalToken({
-                                                                                           address,
-                                                                                           amount: issueAmount.floatValue
-                                                                                         }))
-                      .then(transaction => {
+                      .then(address => 
+                        BeproService.network.isApprovedTransactionalToken({ address, amount: issueAmount.floatValue}))  
+                      .then(async (transaction) => {
                         setAllowedTransaction(transaction)
                         dispatch(changeLoadState(false))
+                      }).then(()=> BeproService.getTransaction(txHash))
+                      .then((transaction)=>{
+                        dispatch(addTransactions({
+                          ...transaction,
+                          status: transaction.status,
+                          date: new Date(),
+                          amount: issueAmount.formattedValue,
+                          type: 'approval',
+                          amountType: '$BEPRO'
+                        }))
                       })
                       .catch((error) => console.error('Error allow()', error))
                       .finally(() => dispatch(changeLoadState(false)))
@@ -59,12 +73,27 @@ export default function PageCreateIssue() {
 
     const contractPayload = {tokenAmount: issueAmount.floatValue, cid: beproAddress};
     await BeproService.network.openIssue(contractPayload)
-                      .then((response) => GithubMicroService.createIssue({
-                                                                           ...payload,
-                                                                           issueId: response.events?.OpenIssue?.returnValues?.id
-                                                                         }))
+                      .then(async(response) => {
+                        await GithubMicroService.createIssue({
+                          ...payload,
+                          issueId: response.events?.OpenIssue?.returnValues?.id
+                        })
+                        return response;
+                      })
+                      .then((transaction)=> BeproService.getTransaction(transaction.transactionHash))
+                      .then((transaction)=>{
+                        dispatch(addTransactions({
+                          ...transaction,
+                          status: transaction.status,
+                          type: 'create issue',
+                          date: new Date(),
+                          amount: issueAmount.floatValue,
+                          amountType: '$BEPRO'
+                        }))
+                      })
                       .then(() => {
-                        dispatch(addToast({type:'success', title: 'Success', content: `Create Issue using ${issueAmount.value} $BEPROS`}))
+                        dispatch(
+                          addToast({type: 'success', title: 'Success', content: `Create Issue using ${issueAmount.value} $BEPROS`}))
                         router.push('/account');
                         cleanFields();
                       })
