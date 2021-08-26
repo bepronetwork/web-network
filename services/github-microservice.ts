@@ -167,8 +167,8 @@ export default class GithubMicroService {
   static async getHealth() {
     return client.get(`/`)
                  .then(({status}) => status === 200)
-                 .catch(_ => {
-                   console.log(_);
+                 .catch(e => {
+                   console.error(e);
                    return false;
                  });
   }
