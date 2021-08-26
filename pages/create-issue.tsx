@@ -1,4 +1,4 @@
-import {GetStatcProps} from 'next/types'
+import {GetStaticProps} from 'next/types'
 import React, {useContext, useEffect, useState} from 'react';
 import {BeproService} from '@services/bepro-service';
 import GithubMicroService, { User } from '@services/github-microservice';
@@ -8,8 +8,8 @@ import clsx from 'clsx';
 import {ApplicationContext} from '../contexts/application';
 import {changeLoadState} from '../contexts/reducers/change-load-state';
 import ConnectWalletButton from '../components/connect-wallet-button';
-import { addTransactions } from 'contexts/reducers/add-transactions';
-import { addToast } from '@contexts/reducers/add-to
+import { addTransactions } from '@contexts/reducers/add-transactions';
+import {AddToast, addToast} from '@contexts/reducers/add-toast'
 
 interface Amount {
   value?: string,
@@ -93,7 +93,7 @@ export default function PageCreateIssue() {
                       })
                       .then(() => {
                         dispatch(
-                          ({type:'success', title: 'Success', content: `Create Issue using ${issueAmount.value} $BEPROS`}))
+                          addToast({type: 'success', title: 'Success', content: `Create Issue using ${issueAmount.value} $BEPROS`}))
                         router.push('/account');
                         cleanFields();
                       })
