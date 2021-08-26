@@ -53,7 +53,7 @@ function networkTxButton({txMethod, txParams, onTxStart = () => {}, onSuccess, o
             ...transactionsInfo,
             type: `${txMethod}`,
             amount: `${txParams.tokenAmount}`,
-            amountType: 'Oracles',
+            amountType: txMethod === 'lock'? 'Oracles' : "$BEPRO",
             status: transactionsInfo.status,
             date: new Date(),
           }))
