@@ -10,6 +10,7 @@ export interface BlockTransactions {
   date?: Date;
   addressFrom: string;
   addressTo: string;
+  status?: TransactionsStatus;
 }
 
 export interface Transactions extends BlockTransactions {

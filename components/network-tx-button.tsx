@@ -6,6 +6,7 @@ import {changeLoadState} from '../contexts/reducers/change-load-state';
 import Modal from './modal';
 import Icon from "./icon";
 import {addToast} from '../contexts/reducers/add-toast';
+import {addTransactions} from 'contexts/reducers/add-transactions'
 
 interface NetworkTxButtonParams {
   txMethod: string;
@@ -41,10 +42,21 @@ function networkTxButton({txMethod, txParams, onTxStart = () => {}, onSuccess, o
     dispatch(changeLoadState(true));
 
     BeproService.network[txMethod](txParams)
-      .then(({status, message}) => {
+      .then(async({transactionHash, status, message, ...rest}) => {
+        debugger;
+        
         if (status) {
           onSuccess()
           dispatch(addToast({content: `Success!`, title: txMethod}));
+          const transactionsInfo = await BeproService.getTransaction(transactionHash)
+          dispatch(addTransactions({
+            ...transactionsInfo,
+            type: `${txMethod}`,
+            amount: `${txParams.tokenAmount}`,
+            amountType: 'Oracles',
+            status: transactionsInfo.status,
+            date: new Date(),
+          }))
         } else {
           onFail(message)
           dispatch(addToast({content: message, title: txMethod}));

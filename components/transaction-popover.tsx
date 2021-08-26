@@ -114,7 +114,7 @@ const TransactionsBody: React.FC<ITransactionProps>= ({transactions, onClickItem
                     onClick={()=> onClickItem(item)}>
                     <div className="d-flex flex-row align-items-center justify-content-center">
                         <div className="d-flex justify-content-center align-item-center mr-2">
-                            <DownloadIcon/>
+                            {item.type === 'lock'? <UploadIcon/> : <DownloadIcon/>}
                         </div>
                         <div className="d-flex flex-column align-items-start transaction header">
                             <h3 className="fs-6 mb-1 text-white family-inter-medium">{item?.amount} {item?.amountType}</h3>
