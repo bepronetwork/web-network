@@ -43,8 +43,6 @@ function networkTxButton({txMethod, txParams, onTxStart = () => {}, onSuccess, o
 
     BeproService.network[txMethod](txParams)
       .then(async({transactionHash, status, message, ...rest}) => {
-        debugger;
-        
         if (status) {
           onSuccess()
           dispatch(addToast({content: `Success!`, title: txMethod}));

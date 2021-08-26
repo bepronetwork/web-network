@@ -108,10 +108,9 @@ function OraclesActions(): JSX.Element {
     dispatch(changeLoadState(true));
 
     BeproService.network.approveSettlerERC20Token()
-                .then((data) => {
-                  debugger;
-                  console.log(`status`, data.status);
-                  return data.status
+                .then(({status}) => {
+                  console.log(`status`, status);
+                  return status
                 })
                 .then(setIsApproved)
                 .finally(() => {
