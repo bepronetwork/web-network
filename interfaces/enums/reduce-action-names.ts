@@ -10,4 +10,6 @@ export enum ReduceActionName {
   ChangeBalance = `ChangeBalance`,
   AddToast = `AddToast`,
   RemoveToast = `RemoveToast`,
+  MyTransactions = `MyTransactions`,
+  AddTransactions = `AddTransactions`,
 }

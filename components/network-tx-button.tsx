@@ -4,6 +4,7 @@ import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';
 import Modal from './modal';
 import Icon from "./icon";
+import {addTransactions} from '@contexts/reducers/add-transactions'
 import {addToast} from '@reducers/add-toast';
 
 interface NetworkTxButtonParams {
@@ -40,10 +41,19 @@ function networkTxButton({txMethod, txParams, onTxStart = () => {}, onSuccess, o
     dispatch(changeLoadState(true));
 
     BeproService.network[txMethod](txParams)
-      .then(({status, message}) => {
+      .then(async({transactionHash, status, message, ...rest}) => {
         if (status) {
           onSuccess()
-          dispatch(addToast({type:'success', title: 'Success', content: `${txMethod} ${txParams?.tokenAmount} oracles`}));
+          dispatch(addToast({type:'success', title: 'Success', content: `${txMethod} ${txParams?.tokenAmount} oracles`}));;
+          const transactionsInfo = await BeproService.getTransaction(transactionHash)
+          dispatch(addTransactions({
+            ...transactionsInfo,
+            type: `${txMethod}`,
+            amount: `${txParams.tokenAmount}`,
+            amountType: txMethod === 'lock'? 'Oracles' : "$BEPRO",
+            status: transactionsInfo.status,
+            date: new Date(),
+          }))
         } else {
           onFail(message)
           dispatch(addToast({type: 'danger', title: 'Failed'}));
