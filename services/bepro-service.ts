@@ -93,7 +93,7 @@ class BeproFacet {
     
     const confirmations = now - transaction.blockNumber
     
-    const status = transaction.confirmations < 16 ? 'pending' : (transaction.confirmations > 23 ? 'processing' : 'approved');
+    const status = transaction.confirmations < 16 ? 'pending' : (transaction.confirmations > 23 ? 'approved' : 'processing');
 
     return {
       addressFrom: transaction.from,
