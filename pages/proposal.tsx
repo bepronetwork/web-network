@@ -52,18 +52,16 @@ export default function PageProposal() {
     setProposalMicroService(mergeProposal as ProposalData);
     setIssueMicroService(issueData);
 
-    console.log(`mergeProposal`, mergeProposal,);
-    console.log(`issueData`, issueData,);
-
     return Promise.resolve();
   }
 
   async function getProposal() {
-    const mergeId = id;
+    // todo: match the correct merge id on the database with the one on smart contract
+    const mergeId = (+id - 1).toString();
 
     try {
-      const merge = await BeproService.network.getMergeById({issue_id: issueId, merge_id: (+id - 1).toString()});
-      const isDisputed = await BeproService.network.isMergeDisputed({issueId, mergeId: (+id - 1).toString(),});
+      const merge = await BeproService.network.getMergeById({issue_id: issueId, merge_id: mergeId});
+      const isDisputed = await BeproService.network.isMergeDisputed({issueId, mergeId});
       const author = await GithubMicroService.getHandleOf(merge.proposalAddress);
 
       setProposalBepro({...merge, isDisputed, author});
@@ -78,26 +76,22 @@ export default function PageProposal() {
                 .then(issue => setAmountIssue(issue.tokensStaked))
   }
 
-  async function joinUserAddresses() {
-    console.log(`Proposal changed`, proposalBepro);
-    if (!proposalBepro)
+  function updateUsersAddresses(proposal: ProposalBepro) {
+    if (!proposal)
       return;
 
-    const users = [];
-
-    for (const [i, address] of proposalBepro.prAddresses.entries()) {
+    async function mapUser(address: string, i: number) {
       const {githubLogin} = await GithubMicroService.getUserOf(address);
-      const oracles = proposalBepro.prAmounts[i];
+      const oracles = proposal.prAmounts[i].toString();
       const percentage = handlePercentage(+oracles, +amountIssue);
 
-      users.push({githubLogin, percentage, address, oracles});
+      return {githubLogin, percentage, address, oracles};
     }
 
-    setUsersAddresses(users);
-    console.log(`users`, users)
+    Promise.all(proposal.prAddresses.map(mapUser)).then(setUsersAddresses)
   }
 
-  function initialize() {
+  function loadProposalData() {
     if (issueId && id && currentAddress) {
       getProposalData()
         .then(_ => getProposal())
@@ -105,8 +99,8 @@ export default function PageProposal() {
     }
   }
 
-  useEffect(() => { initialize() }, [currentAddress, id, issueId]);
-  useEffect(() => { joinUserAddresses() }, [proposalBepro]);
+  useEffect(() => { loadProposalData() }, [currentAddress, id, issueId]);
+  useEffect(() => { updateUsersAddresses(proposalBepro) }, [proposalBepro]);
 
   return (
     <>

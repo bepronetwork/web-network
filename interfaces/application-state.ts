@@ -15,5 +15,6 @@ export interface ApplicationState {
   currentAddress: string;
   balance: BalanceState;
   toaster: ToastNotification[];
+  microServiceReady: boolean|null;
   myTransactions: Transactions[];
 }
