@@ -11,7 +11,7 @@ export default function NationDialog() {
 
   useEffect(() => {
     axios.get('http://ip-api.com/json').then(({data})=>{
-      const itsBlock = COUNTRY_CODE_BLOCKED.indexOf("US")
+      const itsBlock = COUNTRY_CODE_BLOCKED.indexOf(data.countryCode)
       if(itsBlock != -1){
         setCountry(data.country)
         setShow(true)
