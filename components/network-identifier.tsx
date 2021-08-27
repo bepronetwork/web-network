@@ -16,6 +16,9 @@ export default function NetworkIdentifier() {
   const [network, setNetwork] = useState(``);
 
   function updateNetwork() {
+    if (!currentAddress)
+      return;
+
     BeproService.bepro.web3.eth.net.getNetworkType().then(setNetwork);
   }
 
