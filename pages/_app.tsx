@@ -28,10 +28,11 @@ export default function App({ Component, pageProps }: AppProps) {
           />
           <title>WEB Network</title>
         </Head>
-        <MainNav />
-        <NationDialog/>
-        <WebThreeDialog />
-        <Component {...pageProps} />
+        <NationDialog>
+          <MainNav />
+          <WebThreeDialog />
+          <Component {...pageProps} />
+        </NationDialog>
       </ApplicationContextProvider>
     </>
   );
