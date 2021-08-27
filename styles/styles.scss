@@ -205,6 +205,14 @@ p {
   font-family: 'fontBold', sans-serif;
 }
 
+.text-gray{
+  color: $gray;
+}
+
+.text-blue-dark{
+  color: $blue-dark;
+}
+
 .trans {
   opacity: 0.7;
 }
@@ -791,6 +799,14 @@ label {
       font-size: 14px;
       color: $gray;
     }
+  }
+}
+
+#nation-dialog-modal{
+  max-width: 414px;
+
+  .white-space-wrap{
+    white-space: pre-wrap;
   }
 }
 
