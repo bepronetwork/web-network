@@ -11,6 +11,9 @@ import {changeStakedState} from '@reducers/change-staked-amount';
 import { formatNumberToNScale, formatNumberToString } from 'helpers/formatNumber';
 import NetworkIdentifier from '@components/network-identifier';
 import TransactionPopover from '@components/transaction-popover'
+import HelpIcon from '@assets/icons/help-icon';
+import ButtonTrans from '@components/button-trans';
+import HelpModal from '@components/help-modal';
 
 export default function MainNav() {
   const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
@@ -20,7 +23,7 @@ export default function MainNav() {
   const [address, setAddress] = useState<string>(null);
   const [ethBalance, setEthBalance] = useState(0);
   const [beproBalance, setBeproBalance] = useState(0);
-  const [network, setNetwork] = useState(``);
+  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     checkLogin();
@@ -109,6 +112,9 @@ export default function MainNav() {
           <button className="btn btn-md btn-trans mr-1">+ Create issue</button>
         </Link>
         <NetworkIdentifier />
+
+        <ButtonTrans onClick={() => setShowHelp(true)} className="ms-2 me-3" rounded={true}><HelpIcon /></ButtonTrans>
+
         <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
           <div className="d-flex account-info align-items-center">
 
@@ -134,6 +140,8 @@ export default function MainNav() {
           </div>
         </ConnectWalletButton>
       </div>
+
+      <HelpModal show={showHelp} onCloseClick={() => setShowHelp(false)} />
 
     </div>
   )

@@ -39,10 +39,10 @@ const handleColorState = (state: TransactionsStatus) => {
 const TransactionModal: React.FC<ITransactionModalProps> = ({item, onHide}) => {
     if(!item) return;
     return(
-        <Modal 
-        show={!!item} 
+        <Modal
+        show={!!item}
         key="transaction-modal"
-        centered 
+        centered
         size="sm"
         backdrop={true}
         onHide={onHide}>
@@ -97,7 +97,7 @@ const TransactionModal: React.FC<ITransactionModalProps> = ({item, onHide}) => {
 }
 
 const TransactionsBody: React.FC<ITransactionProps>= ({transactions, onClickItem})=> {
-    
+
     if(!transactions || transactions.length < 1){
         return <h3 className="text-white fs-6 mx-5 text-nowrap family-medium">No ongoing transactions</h3>
     }
@@ -109,8 +109,8 @@ const TransactionsBody: React.FC<ITransactionProps>= ({transactions, onClickItem
             </div>
             <div className="d-flex flex-column align-items-start w-100">
                 {transactions?.map((item)=>(
-                    <div 
-                    className="d-flex flex-row align-items-center justify-content-between px-3 py-2 mb-2 rounded transaction box" 
+                    <div
+                    className="d-flex flex-row align-items-center justify-content-between px-3 py-2 mb-2 rounded transaction box"
                     onClick={()=> onClickItem(item)}>
                     <div className="d-flex flex-row align-items-center justify-content-center">
                         <div className="d-flex justify-content-center align-item-center mr-2">
@@ -119,9 +119,9 @@ const TransactionsBody: React.FC<ITransactionProps>= ({transactions, onClickItem
                         <div className="d-flex flex-column align-items-start transaction header">
                             <h3 className="fs-6 mb-1 text-white family-inter-medium">{item?.amount} {item?.amountType}</h3>
                             <p className="m-0 family-inter-medium">{item?.type}</p>
-                        </div> 
+                        </div>
                     </div>
-                    
+
                     <div className="d-flex flex-row align-items-center justify-content-center">
                         <div className={`bg-transparent px-3 py-2 rounded border border-${handleColorState(item?.status)} transaction status`}>
                             <p className={`family-regular m-0 text-${handleColorState(item?.status)} text-capitalize`}>{item?.status}</p>
@@ -158,11 +158,11 @@ const TransactionPopover: React.FC = ({children}) => {
         rootClose
         overlay={overlay}>
             <div>
-                <button className="btn btn-md circle-2 btn-opac p-0 mr-1" onClick={()=> setOpen(!isOpen)}>
+                <button className="btn btn-md circle-2 btn-opac p-0 me-3" onClick={()=> setOpen(!isOpen)}>
                     {isOpen
-                        ?(<span 
-                            className="spinner-border spinner-border-sm" 
-                            role="status" 
+                        ?(<span
+                            className="spinner-border spinner-border-sm"
+                            role="status"
                             aria-hidden="true">
                             </span>)
                         : <TransactionIcon/>
