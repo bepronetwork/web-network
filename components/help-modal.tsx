@@ -6,29 +6,33 @@ import FeedbackIcon from '@assets/icons/feedback-icon';
 import Modal from '@components/modal';
 
 export default function HelpModal({show = false, onCloseClick = () => {}}) {
-  const helpItem = (title = ``, tagline = ``, icon) => ({title, tagline, icon});
+  const helpItem = (title = ``, tagline = ``, icon, href = ``) => ({title, tagline, icon, href});
 
   const helpItems = [
-    helpItem(`help center`, `Explore tutorials and help articles.`, <HelpIcon />),
-    helpItem(`api documentation`, `Some description.`, <ApiIcon />),
-    helpItem(`live chat`, `Explore tutorials and help articles`, <ChatIcon />),
-    helpItem(`provide feedback`, `Explore tutorials and help articles`, <FeedbackIcon />),
+    helpItem(`help center`, `Know more about Bepro Network and how to use it`, <HelpIcon/>, `http://docs.bepro.network`),
+    helpItem(`api documentation`, `Develop with bepro-js and create your next web3 app`, <ApiIcon/>, `http://docs.bepro.network`),
+    helpItem(`live chat`, `Get in contact with our team via Discord`, <ChatIcon/>, `https://discord.gg/RQMAu2DZFA`),
+    helpItem(`provide feedback`, `Propose ideas and new features`, <FeedbackIcon/>, `https://discord.gg/RQMAu2DZFA`),
   ];
 
+  function navigateOut(href) {
+    window.open(href);
+  }
+
   function HelpItemRow(item, i) {
-    const rowClassName = `row ${i !== helpItems.length && `pb-3` || ``} d-flex align-items-center`;
+    const rowClassName = `help-row row ${i+1 !== helpItems.length && `pb-1 mb-2` || ``} d-flex align-items-center cursor-pointer border-bottom-hover border-white-hover`;
 
     return <>
-      <div className={rowClassName} key={item.title}>
-        <div className="col-2 text-center">
+      <div className={rowClassName} key={item.title} onClick={() => navigateOut(item.href)}>
+          <div className="col-2 text-center">
             {item.icon}
-        </div>
-        <div className="col">
+          </div>
+          <div className="col">
             <strong className="d-block text-uppercase text-white">{item.title}</strong>
             <span className="d-block text-white-50">{item.tagline}</span>
-        </div>
+          </div>
       </div>
-      </>
+    </>
   }
 
   return <>

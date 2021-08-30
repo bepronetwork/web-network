@@ -747,7 +747,7 @@ label {
       border-bottom-color: $bg-shadow;
     }
   }
-  
+
 
   .transaction{
     &.box {
@@ -783,7 +783,7 @@ label {
         }
       }
   }
-  
+
   &.box{
     background-color: $bg;
     >span{
@@ -805,7 +805,7 @@ $c_props: ('m': 'margin') !default;
         @each $amount, $multiplier in $spacers {
           &n-#{$amount} {
             @each $value in $values {
-              #{$prop}-#{$value}: -#{$multiplier}!important;
+              #{$prop}-#{$value}: -#{$multiplier}rem!important;
             }
           }
         }
@@ -815,14 +815,14 @@ $c_props: ('m': 'margin') !default;
     @each $dir, $alias in $c_directions {
       &#{$alias} {
         @each $amount, $multiplier in $spacers {
-          &n-#{$amount} { #{$prop}-#{$dir}: -#{$multiplier}!important; }
+          &n-#{$amount} { #{$prop}-#{$dir}: -#{$multiplier}rem!important; }
         }
       }
     }
 
     @each $amount, $multiplier in $spacers {
       &n-#{$amount} {
-        #{$prop}: -#{$multiplier} !important;
+        #{$prop}: -#{$multiplier}rem !important;
       }
     }
   }
@@ -833,3 +833,20 @@ $c_props: ('m': 'margin') !default;
   &-8 { font-size: .8rem; }
   &-9 { font-size: .9rem; }
 }
+
+.cursor {
+  &-pointer {
+    cursor: pointer;
+  }
+}
+
+.help-row:hover {
+  + .help-row {
+    margin-top: -1px;
+  }
+
+  &:last-of-type:hover {
+    margin-top: 1px;
+  }
+}
+
