@@ -9,7 +9,7 @@ import { ApplicationContext } from '@contexts/application';
 import { IssueState } from '@interfaces/issue-data'
 
 export default function IssueListItem({issue = null}:{issue?: IssueData}) {
-    const { state: { metaMaskWallet }} = useContext(ApplicationContext)
+    const { state: { currentAddress }} = useContext(ApplicationContext)
     const router = useRouter()
     const [amount, setAmount] = useState<string>()
 
@@ -43,13 +43,15 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
    }
 
    useEffect(() => {
+     if (!currentAddress)
+       return;
     async function getIssueBeprosStaked(issueId: string){
         await BeproService.network.getIssueById({issueId})
             .then((issue) => setAmount(issue.tokensStaked))
             .catch((err)  => console.error('Failed to getIssue', err))
     }
      getIssueBeprosStaked(issue?.issueId)
-   },[metaMaskWallet])
+   },[currentAddress, issue])
 
     return (
             <div className="bg-shadow list-item rounded p-4 mb-3" onClick={() => {

@@ -10,4 +10,5 @@ export enum TransactionTypes {
   dispute,
   closeIssue,
   redeemIssue,
+  approveSettlerToken,
 }
