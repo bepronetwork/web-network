@@ -22,17 +22,17 @@ export default function HelpModal({show = false, onCloseClick = () => {}}) {
   function HelpItemRow(item, i) {
     const rowClassName = `help-row row ${i+1 !== helpItems.length && `pb-1 mb-2` || ``} d-flex align-items-center cursor-pointer border-bottom-hover border-white-hover`;
 
-    return <>
+    return (
       <div className={rowClassName} key={item.title} onClick={() => navigateOut(item.href)}>
-          <div className="col-2 text-center">
-            {item.icon}
-          </div>
-          <div className="col">
-            <strong className="d-block text-uppercase text-white">{item.title}</strong>
-            <span className="d-block text-white-50">{item.tagline}</span>
-          </div>
+        <div className="col-2 text-center">
+          {item.icon}
+        </div>
+        <div className="col">
+          <strong className="d-block text-uppercase text-white">{item.title}</strong>
+          <span className="d-block text-white-50">{item.tagline}</span>
+        </div>
       </div>
-    </>
+    )
   }
 
   return <>

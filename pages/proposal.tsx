@@ -72,7 +72,7 @@ export default function PageProposal() {
   }
 
   function getIssueAmount() {
-    BeproService.network.getIssueById({issueId: id})
+    return BeproService.network.getIssueById({issueId: id})
                 .then(issue => setAmountIssue(issue.tokensStaked))
   }
 
@@ -80,7 +80,12 @@ export default function PageProposal() {
     if (!proposal)
       return;
 
+    console.log(`mapping proposal`, JSON.parse(JSON.stringify(proposal)));
+
     async function mapUser(address: string, i: number) {
+
+      console.log(`address`, address, `i`, i, `${amountIssue}`);
+
       const {githubLogin} = await GithubMicroService.getUserOf(address);
       const oracles = proposal.prAmounts[i].toString();
       const percentage = handlePercentage(+oracles, +amountIssue);
@@ -93,9 +98,9 @@ export default function PageProposal() {
 
   function loadProposalData() {
     if (issueId && id && currentAddress) {
-      getProposalData()
+      getIssueAmount()
+        .then(_ => getProposalData())
         .then(_ => getProposal())
-        .then(_ => getIssueAmount())
     }
   }
 

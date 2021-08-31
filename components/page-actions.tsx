@@ -81,22 +81,24 @@ export default function PageActions({
   }
 
   async function handleRedeem() {
-    dispatch(changeLoadState(true));
+
+    const redeemTx = addTransaction({type: TransactionTypes.redeemIssue})
+
     await BeproService.login()
       .then(() => {
-        BeproService.network
-          .redeemIssue({
-            issueId,
-          })
-          .then(() => {
-            BeproService.getBalance("bepro").then((bepro) =>
-              dispatch(changeBalance({ bepro }))
-            );
-            handleBeproService();
-          });
+        BeproService.network.redeemIssue({issueId,})
+                    .then(txInfo => {
+                      BeproService.parseTransaction(txInfo, redeemTx.payload)
+                                  .then(block => dispatch(updateTransaction(block)));
+                      BeproService.getBalance("bepro")
+                                  .then((bepro) => dispatch(changeBalance({ bepro })));
+                      handleBeproService();
+                    })
       })
-      .catch((err) => console.error(`Error redeeming`, err))
-      .finally(() => dispatch(changeLoadState(false)));
+      .catch((err) => {
+        dispatch(updateTransaction({...redeemTx.payload as any, remove: true}));
+        console.error(`Error redeeming`, err)
+      })
   }
 
   const renderRedeem = () => {
