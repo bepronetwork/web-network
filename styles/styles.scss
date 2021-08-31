@@ -747,7 +747,7 @@ label {
       border-bottom-color: $bg-shadow;
     }
   }
-  
+
 
   .transaction{
     &.box {
@@ -783,7 +783,7 @@ label {
         }
       }
   }
-  
+
   &.box{
     background-color: $bg;
     >span{
@@ -805,7 +805,7 @@ $c_props: ('m': 'margin') !default;
         @each $amount, $multiplier in $spacers {
           &n-#{$amount} {
             @each $value in $values {
-              #{$prop}-#{$value}: -#{$multiplier}!important;
+              #{$prop}-#{$value}: -#{$multiplier}rem!important;
             }
           }
         }
@@ -826,4 +826,59 @@ $c_props: ('m': 'margin') !default;
       }
     }
   }
+}
+
+.fs {
+  &-7 { font-size: .7rem; }
+  &-8 { font-size: .8rem; }
+  &-9 { font-size: .9rem; }
+  &-smallest { font-size: 12px; }
+  &-small { font-size: 14px; }
+}
+
+.cursor {
+  &-pointer {
+    cursor: pointer;
+  }
+}
+
+.help-row:hover {
+  + .help-row {
+    margin-top: -1px;
+  }
+
+  &:last-of-type:hover {
+    margin-top: 1px;
+  }
+}
+
+#transactions-indicator {
+
+  &.popover {
+    max-width: 367px;
+  }
+  .popover-arrow {
+    &::after {
+      border-bottom-color: $bg-shadow;
+    }
+  }
+}
+
+.transaction-list {
+  .tx-row {
+    background-color: $black;
+    width: 333px;
+  }
+
+  path {
+    fill: map-get($theme-colors, 'primary')
+  }
+}
+
+.bg-black {
+  background-color: $black;
+}
+
+.toast-container {
+  z-index: $zindex-tooltip+1;
 }

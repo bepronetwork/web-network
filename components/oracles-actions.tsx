@@ -1,8 +1,8 @@
 import {Fragment, useContext, useEffect, useRef, useState} from 'react';
-import { NumberFormatValues } from "react-number-format";
-import InputNumber from "./input-number";
-import OraclesBoxHeader from "./oracles-box-header";
-import Modal from "./modal";
+import {NumberFormatValues} from 'react-number-format';
+import InputNumber from './input-number';
+import OraclesBoxHeader from './oracles-box-header';
+import Modal from './modal';
 import {ApplicationContext} from '@contexts/application';
 import {BeproService} from '@services/bepro-service';
 import {changeLoadState} from '@reducers/change-load-state';
@@ -10,6 +10,7 @@ import ApproveButton from './approve-button';
 import TransferOraclesButton from './transfer-oracles-button';
 import NetworkTxButton from './network-tx-button';
 import {changeBalance} from '@reducers/change-balance';
+import {TransactionTypes} from '@interfaces/enums/transaction-types';
 
 const actions: string[] = ["Lock", "Unlock"];
 
@@ -90,6 +91,7 @@ function OraclesActions(): JSX.Element {
   }
 
   function handleConfirm() {
+    setShow(false);
     networkTxRef.current.click();
   }
 
@@ -126,11 +128,16 @@ function OraclesActions(): JSX.Element {
                 .then(handleCheck);
   }
 
+  function getTxType() {
+    return action === `Lock` && TransactionTypes.lock || TransactionTypes.unlock;
+  }
+
   useEffect(() => {
     setError("");
   }, [tokenAmount, action]);
 
   useEffect(updateWalletAddress, [beproInit, metaMaskWallet, currentAddress])
+
 
   return (
     <>
@@ -155,6 +162,8 @@ function OraclesActions(): JSX.Element {
           <TransferOraclesButton buttonLabel={renderInfo.label} disabled={!isApproved || !metaMaskWallet} onClick={checkLockedAmount} />
 
           <NetworkTxButton txMethod={action.toLowerCase()}
+                           txType={getTxType()}
+                           txCurrency={action === `Lock` && `$BEPRO` || `Oracles`}
                            txParams={renderInfo.params(walletAddress)}
                            buttonLabel=""
                            modalTitle={renderInfo.title}

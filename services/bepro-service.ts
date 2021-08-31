@@ -1,6 +1,7 @@
-import {Application, Network, ERC20Contract} from 'bepro-js';
-import { BlockTransactions } from 'interfaces/transactions';
-import { CONTRACT_ADDRESS, SETTLER_ADDRESS, TRANSACTION_ADDRESS, WEB3_CONNECTION } from '../env';
+import {Application, ERC20Contract, Network} from 'bepro-js';
+import {BlockTransaction, SimpleBlockTransactionPayload} from '@interfaces/transaction';
+import {CONTRACT_ADDRESS, SETTLER_ADDRESS, TRANSACTION_ADDRESS, WEB3_CONNECTION} from '../env';
+import {TransactionStatus} from '@interfaces/enums/transaction-status';
 
 class BeproFacet {
   private _bepro: Application;
@@ -83,26 +84,19 @@ class BeproFacet {
   public async getAddress() {
     return await this._bepro.getAddress();
   }
-  
-  public async getTransaction(tx:string): Promise<BlockTransactions> {
-    const eth = this._bepro.web3.eth
 
-    const now = await eth.getBlockNumber();
-
-    const transaction =  await eth.getTransaction(tx);
-    
-    const confirmations = now - transaction.blockNumber
-    
-    const status = transaction.confirmations < 16 ? 'pending' : (transaction.confirmations > 23 ? 'approved' : 'processing');
+  public async parseTransaction(transaction, simpleTx?: SimpleBlockTransactionPayload) {
+    const result = await this._bepro.web3.eth.getTransaction(transaction.transactionHash).catch(_ => null);
 
     return {
+      ...simpleTx,
       addressFrom: transaction.from,
       addressTo: transaction.to,
-      transactionHash: tx,
+      transactionHash: transaction.transactionHash,
       blockHash: transaction.blockHash,
-      confirmations,
-      status,
-    };
+      confirmations: result?.nonce,
+      status: result && transaction.status ? TransactionStatus.completed : TransactionStatus.failed,
+    }
   }
 }
 

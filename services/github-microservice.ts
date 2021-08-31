@@ -32,8 +32,14 @@ const client = axios.create({baseURL: API});
 export default class GithubMicroService {
 
   static async createIssue(payload) {
-    await client.post('/issues', payload);
+    return client.post('/issues', payload)
+                 .then(({data}) => data === `ok`)
+                 .catch(e => {
+                   console.error(`Error creating issue`, e);
+                   return null;
+                 });
   }
+
   static async getIssuesIds(issueIds) {
     const {data} = await client.get('/issues', {params: {issueIds}});
     return data;
@@ -162,5 +168,14 @@ export default class GithubMicroService {
                    console.error(e);
                    return {scMergeId: '', pullRequestId: '', issueId: '', id: ''}
                  })
+  }
+
+  static async getHealth() {
+    return client.get(`/`)
+                 .then(({status}) => status === 200)
+                 .catch(e => {
+                   console.error(e);
+                   return false;
+                 });
   }
 }
