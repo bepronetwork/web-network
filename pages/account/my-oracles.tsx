@@ -11,7 +11,7 @@ export default function MyOracles() {
 
       <div className="container">
         <div className="row justify-content-center mb-5 align-content-stretch">
-          <ConnectWalletButton asModal={true} />
+
           <OraclesActions />
           <OraclesDelegate />
         </div>
@@ -23,6 +23,7 @@ export default function MyOracles() {
       </div>
       <div className="container">
         <div className="row justify-content-center">
+          <ConnectWalletButton asModal={true} />
           <div className="col-md-10">
             <div className="content-wrapper mb-5">
               <div className="row">

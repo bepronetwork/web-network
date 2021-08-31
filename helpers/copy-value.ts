@@ -1,14 +1,12 @@
-export function CopyValue(value: string, inputId?: string) {
-  let input: HTMLInputElement;
+export function CopyValue(value: string) {
+  let input: HTMLTextAreaElement;
 
-  if (!inputId) {
-    input = document.createElement(`input`);
-    input.style.display = `none`;
-    document.body.appendChild(input)
-  } else input = document.getElementById(inputId) as HTMLInputElement;
-
+  input = document.createElement(`textarea`);
+  input.style.display = `hidden`;
+  input.id = `made-input`
+  input.value = value;
+  document.body.appendChild(input);
   input.select();
-  input.setSelectionRange(0, input.value.length);
   document.execCommand('copy');
-
+  document.body.removeChild(input);
 }
