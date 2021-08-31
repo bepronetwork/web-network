@@ -11,6 +11,8 @@ import TransferOraclesButton from './transfer-oracles-button';
 import NetworkTxButton from './network-tx-button';
 import {changeBalance} from '@reducers/change-balance';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
+import {addTransaction} from '@reducers/add-transaction';
+import {updateTransaction} from '@reducers/update-transaction';
 
 const actions: string[] = ["Lock", "Unlock"];
 
@@ -103,24 +105,26 @@ function OraclesActions(): JSX.Element {
   }
 
   function approveSettlerToken() {
-    if (!beproInit || !metaMaskWallet)
+    if (!currentAddress)
       return;
 
-    dispatch(changeLoadState(true));
+    const approveTx = addTransaction({type: TransactionTypes.approveSettlerToken});
 
     BeproService.network.approveSettlerERC20Token()
-                .then(({status}) => {
-                  console.log(`status`, status);
-                  return status
+                .then((txInfo) => {
+                  BeproService.parseTransaction(txInfo, approveTx.payload)
+                              .then(block => dispatch(updateTransaction(block)));
+                  return txInfo.status
                 })
                 .then(setIsApproved)
-                .finally(() => {
-                  dispatch(changeLoadState(false));
-                });
+                .catch(e => {
+                  dispatch(updateTransaction({...approveTx.payload as any, remove: true}));
+                  console.error(`Failed to approve settler token`, e);
+                })
   }
 
   function checkLockedAmount() {
-    if (!beproInit || !metaMaskWallet)
+    if (!currentAddress)
       return;
 
     BeproService.network
@@ -158,7 +162,7 @@ function OraclesActions(): JSX.Element {
             onValueChange={handleChangeToken}
             thousandSeparator />
 
-          { action === 'Lock' && <ApproveButton disabled={isApproved || !tokenAmount || !metaMaskWallet || !!error} onClick={approveSettlerToken} /> || ``}
+          { action === 'Lock' && <ApproveButton disabled={isApproved || !tokenAmount || !metaMaskWallet} onClick={approveSettlerToken} /> || ``}
           <TransferOraclesButton buttonLabel={renderInfo.label} disabled={!isApproved || !metaMaskWallet} onClick={checkLockedAmount} />
 
           <NetworkTxButton txMethod={action.toLowerCase()}
