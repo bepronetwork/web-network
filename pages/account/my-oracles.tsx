@@ -3,12 +3,15 @@ import OraclesActions from '@components/oracles-actions';
 import OraclesDelegate from '@components/oracles-delegate';
 import OraclesTakeBack from '@components/oracles-take-back';
 import Account from '@components/account';
+import ConnectWalletButton from '@components/connect-wallet-button';
 
 export default function MyOracles() {
   return (
     <Account buttonPrimaryActive={false}>
+
       <div className="container">
         <div className="row justify-content-center mb-5 align-content-stretch">
+          <ConnectWalletButton asModal={true} />
           <OraclesActions />
           <OraclesDelegate />
         </div>
