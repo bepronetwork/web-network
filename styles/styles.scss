@@ -832,6 +832,8 @@ $c_props: ('m': 'margin') !default;
   &-7 { font-size: .7rem; }
   &-8 { font-size: .8rem; }
   &-9 { font-size: .9rem; }
+  &-smallest { font-size: 12px; }
+  &-small { font-size: 14px; }
 }
 
 .cursor {
@@ -850,3 +852,33 @@ $c_props: ('m': 'margin') !default;
   }
 }
 
+#transactions-indicator {
+
+  &.popover {
+    max-width: 367px;
+  }
+  .popover-arrow {
+    &::after {
+      border-bottom-color: $bg-shadow;
+    }
+  }
+}
+
+.transaction-list {
+  .tx-row {
+    background-color: $black;
+    width: 333px;
+  }
+
+  path {
+    fill: map-get($theme-colors, 'primary')
+  }
+}
+
+.bg-black {
+  background-color: $black;
+}
+
+.toast-container {
+  z-index: $zindex-tooltip+1;
+}

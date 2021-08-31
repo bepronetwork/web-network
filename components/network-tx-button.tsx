@@ -1,11 +1,13 @@
 import {BeproService} from '@services/bepro-service';
 import {forwardRef, useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
-import {changeLoadState} from '@reducers/change-load-state';
 import Modal from './modal';
-import Icon from "./icon";
-import {addTransactions} from '@contexts/reducers/add-transactions'
+import Icon from './icon';
+import {addTransaction} from '@reducers/add-transaction'
 import {addToast} from '@reducers/add-toast';
+import {TransactionTypes} from '@interfaces/enums/transaction-types';
+import {TransactionCurrency} from '@interfaces/transaction';
+import {updateTransaction} from '@reducers/update-transaction';
 
 interface NetworkTxButtonParams {
   txMethod: string;
@@ -18,10 +20,23 @@ interface NetworkTxButtonParams {
   buttonLabel?: string;
   children?: JSX.Element;
   disabled?: boolean;
+  txType: TransactionTypes;
+  txCurrency: TransactionCurrency;
 }
 
 
-function networkTxButton({txMethod, txParams, onTxStart = () => {}, onSuccess, onFail, buttonLabel, modalTitle, modalDescription, children = null, disabled = false}: NetworkTxButtonParams, elementRef) {
+function networkTxButton({
+                           txMethod,
+                           txParams,
+                           onTxStart = () => {},
+                           onSuccess,
+                           onFail,
+                           buttonLabel,
+                           modalTitle,
+                           modalDescription,
+                           children = null,
+                           disabled = false, txType = TransactionTypes.unknown, txCurrency = `$BEPRO`,
+                         }: NetworkTxButtonParams, elementRef) {
   const {dispatch, state: {beproInit, metaMaskWallet}} = useContext(ApplicationContext);
   const [showModal, setShowModal] = useState(false);
   const [txSuccess, setTxSuccess] = useState(false);
@@ -38,36 +53,35 @@ function networkTxButton({txMethod, txParams, onTxStart = () => {}, onSuccess, o
     if (!beproInit || !metaMaskWallet)
       return;
 
-    dispatch(changeLoadState(true));
-
+    const tmpTransaction = addTransaction({type: txType, amount: txParams?.tokenAmount || 0, currency: txCurrency});
+    dispatch(tmpTransaction);
     BeproService.network[txMethod](txParams)
-      .then(async({transactionHash, status, message, ...rest}) => {
-        if (status) {
+      .then((answer) => {
+        if (answer.status) {
           onSuccess()
-          dispatch(addToast({type:'success', title: 'Success', content: `${txMethod} ${txParams?.tokenAmount} oracles`}));;
-          const transactionsInfo = await BeproService.getTransaction(transactionHash)
-          dispatch(addTransactions({
-            ...transactionsInfo,
-            type: `${txMethod}`,
-            amount: `${txParams.tokenAmount}`,
-            amountType: txMethod === 'lock'? 'Oracles' : "$BEPRO",
-            status: transactionsInfo.status,
-            date: new Date(),
-          }))
-        } else {
-          onFail(message)
-          dispatch(addToast({type: 'danger', title: 'Failed'}));
-        }
+          dispatch(addToast({
+                              type: 'success',
+                              title: 'Success',
+                              content: `${txMethod} ${txParams?.tokenAmount} ${txCurrency}`
+                            }));
 
-        setTxSuccess(status);
+          BeproService.parseTransaction(answer, tmpTransaction.payload)
+                      .then(info => {
+                        dispatch(updateTransaction(info))
+                      })
+
+        } else {
+          onFail(answer.message)
+          dispatch(addToast({type: 'danger', title: 'Failed'}));
+          dispatch(updateTransaction({...tmpTransaction.payload as any, remove: true}));
+        }
       })
       .catch(e => {
         onFail(e.message);
+        dispatch(updateTransaction({...tmpTransaction.payload as any, remove: true}));
         console.error(e);
       })
-      .finally(() => {
-        dispatch(changeLoadState(false))
-      });
+
   }
 
   function getButtonClass() {

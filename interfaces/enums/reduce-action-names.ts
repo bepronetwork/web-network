@@ -12,5 +12,7 @@ export enum ReduceActionName {
   RemoveToast = `RemoveToast`,
   MyTransactions = `MyTransactions`,
   AddTransactions = `AddTransactions`,
+  UpdateTransaction = `UpdateTransaction`,
   ChangeMicroServiceReadyState = `ChangeMicroServiceReadyState`,
+  ChangeNetwork = `ChangeNetwork`,
 }

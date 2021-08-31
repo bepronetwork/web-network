@@ -1,15 +1,17 @@
+import {useRouter} from 'next/router';
+import clsx from 'clsx';
 import {GetStaticProps} from 'next/types'
 import React, {useContext, useEffect, useState} from 'react';
 import {BeproService} from '@services/bepro-service';
-import GithubMicroService, { User } from '@services/github-microservice';
+import GithubMicroService, {User} from '@services/github-microservice';
 import InputNumber from '@components/input-number';
-import {useRouter} from 'next/router';
-import clsx from 'clsx';
-import {ApplicationContext} from '../contexts/application';
-import {changeLoadState} from '../contexts/reducers/change-load-state';
-import ConnectWalletButton from '../components/connect-wallet-button';
-import { addTransactions } from '@contexts/reducers/add-transactions';
-import {AddToast, addToast} from '@contexts/reducers/add-toast'
+import {ApplicationContext} from '@contexts/application';
+import ConnectWalletButton from '@components/connect-wallet-button';
+import {addTransaction} from '@reducers/add-transaction';
+import {toastSuccess} from '@contexts/reducers/add-toast'
+import {TransactionTypes} from '@interfaces/enums/transaction-types';
+import {updateTransaction} from '@reducers/update-transaction';
+import {BlockTransaction,} from '@interfaces/transaction';
 
 interface Amount {
   value?: string,
@@ -27,81 +29,89 @@ export default function PageCreateIssue() {
   const [currentUser, setCurrentUser] = useState<User>();
   const router = useRouter()
 
-  const allow = async (evt) => {
-    evt.preventDefault();
-    dispatch(changeLoadState(true))
-    let txHash;
-    await BeproService.login()
-                      .then(async () => {
-                        const transaction = await BeproService.network.approveTransactionalERC20Token()
-                        txHash = transaction.transactionHash;
-                        return transaction;
-                      })
-                      .then(() => BeproService.address)
-                      .then(address => 
-                        BeproService.network.isApprovedTransactionalToken({ address, amount: issueAmount.floatValue}))  
-                      .then(async (transaction) => {
-                        setAllowedTransaction(transaction)
-                        dispatch(changeLoadState(false))
-                      }).then(()=> BeproService.getTransaction(txHash))
-                      .then((transaction)=>{
-                        dispatch(addTransactions({
-                          ...transaction,
-                          status: transaction.status,
-                          date: new Date(),
-                          amount: issueAmount.formattedValue,
-                          type: 'approval',
-                          amountType: '$BEPRO'
-                        }))
-                      })
-                      .catch((error) => console.error('Error allow()', error))
-                      .finally(() => dispatch(changeLoadState(false)))
+  async function allowCreateIssue() {
+    const loggedIn = await BeproService.login();
+    if (!loggedIn)
+      return;
+
+    const tmpTransactional = addTransaction({
+                                              type: TransactionTypes.approveTransactionalERC20Token,
+                                              amount: issueAmount.floatValue
+                                            });
+    dispatch(tmpTransactional);
+
+    BeproService.network.approveTransactionalERC20Token()
+                .then(txInfo => {
+                  if (!txInfo)
+                    throw new Error(`Failed to approve transaction`);
+                  return txInfo;
+                })
+                .then(txInfo => {
+                  BeproService.network.isApprovedTransactionalToken({
+                                                                      address: BeproService.address,
+                                                                      amount: issueAmount.floatValue
+                                                                    })
+                              .then(setAllowedTransaction)
+                              .catch(() => setAllowedTransaction(false))
+                              .finally(() => {
+                                BeproService.parseTransaction(txInfo, tmpTransactional.payload)
+                                            .then((info) => dispatch(updateTransaction(info)))
+                              });
+                })
+                .catch(e => {
+                  console.error(e);
+                  dispatch(updateTransaction({...tmpTransactional.payload as any, remove: true}));
+                })
+
   }
 
-  const createIssue = async (evt) => {
-    evt.preventDefault();
-    dispatch(changeLoadState(true))
-
-    const beproAddress = BeproService.address;
+  async function createIssue() {
     const payload = {
       title: issueTitle,
       description: issueDescription,
       amount: issueAmount.floatValue,
-      creatorAddress: beproAddress,
-      creatorGithub: currentUser?.githubLogin
+      creatorAddress: BeproService.address,
+      creatorGithub: currentUser?.githubLogin,
+    }
+    const contractPayload = {tokenAmount: issueAmount.floatValue, cid: BeproService.address};
+
+    const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount: payload.amount});
+    dispatch(openIssueTx);
+
+    let createIssueTx;
+
+    const updateBlock = (block: BlockTransaction, remove = false) => {
+      dispatch(updateTransaction({...block as any, remove}))
     }
 
-    const contractPayload = {tokenAmount: issueAmount.floatValue, cid: beproAddress};
-    await BeproService.network.openIssue(contractPayload)
-                      .then(async(response) => {
-                        await GithubMicroService.createIssue({
-                          ...payload,
-                          issueId: response.events?.OpenIssue?.returnValues?.id
-                        })
-                        return response;
-                      })
-                      .then((transaction)=> BeproService.getTransaction(transaction.transactionHash))
-                      .then((transaction)=>{
-                        dispatch(addTransactions({
-                          ...transaction,
-                          status: transaction.status,
-                          type: 'create issue',
-                          date: new Date(),
-                          amount: issueAmount.floatValue,
-                          amountType: '$BEPRO'
-                        }))
-                      })
-                      .then(() => {
-                        dispatch(
-                          addToast({type: 'success', title: 'Success', content: `Create Issue using ${issueAmount.value} $BEPROS`}))
-                        router.push('/account');
-                        cleanFields();
-                      })
-                      .catch((error) => console.log('Error', error))
-                      .finally(() => dispatch(changeLoadState(false)))
+    BeproService.network.openIssue(contractPayload)
+                .then(txInfo => {
+                  if (!txInfo)
+                    throw new Error(`Failed to open issue`);
+                  return txInfo;
+                })
+                .then(txInfo => {
+                  BeproService.parseTransaction(txInfo, openIssueTx.payload)
+                              .then(updateBlock)
+                  return txInfo;
+                })
+                .then((txInfo) => GithubMicroService.createIssue({
+                                                             ...payload,
+                                                             issueId: txInfo.events?.OpenIssue?.returnValues?.id
+                                                           }))
+                .then(() => {
+                  dispatch(toastSuccess(`Create Issue using ${issueAmount.value} $BEPROS`));
+                  return router.push(`/account`);
+                })
+                .catch(e => {
+                  cleanFields();
+                  dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                  console.error(e);
+                })
+
   }
 
-  const cleanFields = () => {
+  function cleanFields() {
     setIssueTitle('')
     setIssueDescription('')
     setIssueAmount({value: '0', formattedValue: '0', floatValue: 0})
@@ -160,54 +170,56 @@ export default function PageCreateIssue() {
             <ConnectWalletButton>
               {/*<form onSubmit={}>*/}
 
-                <div className="content-wrapper mt-up mb-5">
-                  <h3 className="h3 mr-2 mb-4">Details</h3>
-                  <div className="form-group mb-4">
-                    <label className="p-small mb-2">Issue title</label>
-                    <input type="text"
-                           className="form-control" placeholder="Your issue title"
-                           value={issueTitle}
-                           onChange={e => setIssueTitle(e.target.value)}
-                    />
-                    <p className="p-small trans my-2">Tip: Try to be as much descriptive as possible</p>
-                  </div>
-                  <InputNumber
-                    thousandSeparator
-                    max={balance}
-                    className={clsx({'text-muted': allowedTransaction})}
-                    label="Set $BEPRO value"
-                    symbol="$BEPRO"
-                    value={issueAmount.formattedValue}
-                    disabled={allowedTransaction}
-                    onValueChange={handleIssueAmountOnValueChange}
-                    onBlur={handleIssueAmountBlurChange}
-                    helperText={
-                      <>
-                        {balance} $BEPRO
-                        {!allowedTransaction && (
-                          <button
-                            className="btn btn-opac ml-1 py-1"
-                            onClick={() => setIssueAmount({formattedValue: balance.toString()})}>
-                            Max
-                          </button>
-                        )}
-                      </>
-                    }
+              <div className="content-wrapper mt-up mb-5">
+                <h3 className="h3 mr-2 mb-4">Details</h3>
+                <div className="form-group mb-4">
+                  <label className="p-small mb-2">Issue title</label>
+                  <input type="text"
+                         className="form-control" placeholder="Your issue title"
+                         value={issueTitle}
+                         onChange={e => setIssueTitle(e.target.value)}
                   />
-                  <div className="form-group">
-                    <label className="p-small mb-2">Description</label>
-                    <textarea className="form-control" rows={6} placeholder="Type a description..."
-                              value={issueDescription}
-                              onChange={e => setIssueDescription(e.target.value)} />
-                  </div>
-                  <div className="d-flex justify-content-center align-items-center mt-4">
-                    {!allowedTransaction ?
-                      <button className="btn btn-lg btn-opac me-3 px-5" onClick={allow}>Approve</button>
-                      : null
-                    }
-                    <button className="btn btn-lg btn-primary px-4" disabled={isButtonDisabled()} onClick={createIssue}>Create Issue</button>
-                  </div>
+                  <p className="p-small trans my-2">Tip: Try to be as much descriptive as possible</p>
                 </div>
+                <InputNumber
+                  thousandSeparator
+                  max={balance}
+                  className={clsx({'text-muted': allowedTransaction})}
+                  label="Set $BEPRO value"
+                  symbol="$BEPRO"
+                  value={issueAmount.formattedValue}
+                  disabled={allowedTransaction}
+                  onValueChange={handleIssueAmountOnValueChange}
+                  onBlur={handleIssueAmountBlurChange}
+                  helperText={
+                    <>
+                      {balance} $BEPRO
+                      {!allowedTransaction && (
+                        <button
+                          className="btn btn-opac ml-1 py-1"
+                          onClick={() => setIssueAmount({formattedValue: balance.toString()})}>
+                          Max
+                        </button>
+                      )}
+                    </>
+                  }
+                />
+                <div className="form-group">
+                  <label className="p-small mb-2">Description</label>
+                  <textarea className="form-control" rows={6} placeholder="Type a description..."
+                            value={issueDescription}
+                            onChange={e => setIssueDescription(e.target.value)}/>
+                </div>
+                <div className="d-flex justify-content-center align-items-center mt-4">
+                  {!allowedTransaction ?
+                    <button className="btn btn-lg btn-opac me-3 px-5" onClick={allowCreateIssue}>Approve</button>
+                    : null
+                  }
+                  <button className="btn btn-lg btn-primary px-4" disabled={isButtonDisabled()}
+                          onClick={createIssue}>Create Issue
+                  </button>
+                </div>
+              </div>
               {/*</form>*/}
             </ConnectWalletButton>
           </div>
