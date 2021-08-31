@@ -16,6 +16,7 @@ import {formatDate} from '@helpers/formatDate';
 import {handlePercentage} from '@helpers/handlePercentage';
 import {IssueData} from '@interfaces/issue-data';
 import {addToast} from '@reducers/add-toast';
+import ProposalStepProgress from '@components/proposal-step-progress';
 
 interface ProposalBepro {
   disputes: string;
@@ -43,7 +44,26 @@ export default function PageProposal() {
   const [proposalBepro, setProposalBepro] = useState<ProposalBepro>();
   const [proposalMicroService, setProposalMicroService] = useState<ProposalData>();
   const [amountIssue, setAmountIssue] = useState<string>();
-  const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
+  const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>([
+    {
+      address: "teste1",
+      githubLogin: "teste1",
+      oracles: "10",
+      percentage: 20,
+    },
+    {
+      address: "teste1",
+      githubLogin: "teste1",
+      oracles: "10",
+      percentage: 30,
+    },
+    {
+      address: "teste1",
+      githubLogin: "teste1",
+      oracles: "10",
+      percentage: 50,
+    },
+  ]);
   const [issueMicroService, setIssueMicroService] = useState<IssueData>();
 
   async function getProposalData() {
@@ -120,7 +140,7 @@ export default function PageProposal() {
         }
         beproStaked={amountIssue}/>
       <ProposalProgress developers={usersAddresses}/>
-
+      <ProposalStepProgress/>
       <PageActions
         state={'pull request'}
         developers={[]}
