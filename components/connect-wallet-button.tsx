@@ -3,9 +3,13 @@ import React, {useContext, useEffect, useState,} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import {changeWalletState} from '@reducers/change-wallet-connect';
 import {changeCurrentAddress} from '@reducers/change-current-address';
+import Modal from '@components/modal';
+import Image from 'next/image';
+import metamaskLogo from '@assets/metamask.png';
+import ArrowRight from '@assets/icons/arrow-right';
 
-export default function ConnectWalletButton({children, forceLogin = false, onSuccess = () => null, onFail = () => console.log("error")}) {
-  const { state: {metaMaskWallet, beproInit}, dispatch } = useContext(ApplicationContext);
+export default function ConnectWalletButton({children = null, forceLogin = false, onSuccess = () => null, onFail = () => console.log("error"), asModal = false}) {
+  const { state: {metaMaskWallet, beproInit, currentAddress}, dispatch } = useContext(ApplicationContext);
 
   async function connectWallet() {
     let loggedIn = false;
@@ -15,8 +19,6 @@ export default function ConnectWalletButton({children, forceLogin = false, onSuc
     } catch (e) {
       console.log(e);
     }
-
-
 
     if (!loggedIn)
       onFail()
@@ -43,6 +45,18 @@ export default function ConnectWalletButton({children, forceLogin = false, onSuc
             });
 
   }, [beproInit]);
+
+  if (asModal)
+    return (
+      <Modal title="Connect your MetaMask Wallet" show={!currentAddress || !metaMaskWallet} onCloseClick={() => {}}>
+        <div className="text-white-50 fs-small mtn-3 mb-5">to deposit funds and start using our service</div>
+        <div className="d-flex justify-content-start px-3 bg-black py-4 align-items-center rounded cursor-pointer" onClick={connectWallet}>
+          <Image src={metamaskLogo}/>
+          <span className="fw-bold text-white text-uppercase ms-4 me-auto">metamask</span>
+          <ArrowRight />
+        </div>
+      </Modal>
+    )
 
   if (!metaMaskWallet)
     return <button className="btn btn-md btn-white" onClick={connectWallet}>Connect <i className="ico-metamask ml-1" /></button>;

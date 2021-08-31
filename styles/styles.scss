@@ -815,14 +815,14 @@ $c_props: ('m': 'margin') !default;
     @each $dir, $alias in $c_directions {
       &#{$alias} {
         @each $amount, $multiplier in $spacers {
-          &n-#{$amount} { #{$prop}-#{$dir}: -#{$multiplier}rem!important; }
+          &n-#{$amount} { #{$prop}-#{$dir}: -#{$multiplier}!important; }
         }
       }
     }
 
     @each $amount, $multiplier in $spacers {
       &n-#{$amount} {
-        #{$prop}: -#{$multiplier}rem !important;
+        #{$prop}: -#{$multiplier} !important;
       }
     }
   }
