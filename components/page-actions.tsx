@@ -1,16 +1,19 @@
-import { GetStaticProps } from "next";
-import React, { useContext } from "react";
-import IssueAvatars from "./issue-avatars";
-import Link from "next/link";
-import { BeproService } from "@services/bepro-service";
-import NewProposal from "./create-proposal";
-import { ApplicationContext } from "@contexts/application";
-import { changeLoadState } from "@reducers/change-load-state";
-import GithubMicroService from "@services/github-microservice";
-import { developer, pullRequest } from "@interfaces/issue-data";
-import { changeBalance } from "@contexts/reducers/change-balance";
-import { addToast } from "@contexts/reducers/add-toast";
-import clsx from "clsx";
+import {GetStaticProps} from 'next';
+import React, {useContext} from 'react';
+import IssueAvatars from './issue-avatars';
+import Link from 'next/link';
+import {BeproService} from '@services/bepro-service';
+import NewProposal from './create-proposal';
+import {ApplicationContext} from '@contexts/application';
+import {changeLoadState} from '@reducers/change-load-state';
+import GithubMicroService from '@services/github-microservice';
+import {developer, pullRequest} from '@interfaces/issue-data';
+import {changeBalance} from '@contexts/reducers/change-balance';
+import {addToast} from '@contexts/reducers/add-toast';
+import clsx from 'clsx';
+import {addTransaction} from '@reducers/add-transaction';
+import {TransactionTypes} from '@interfaces/enums/transaction-types';
+import {updateTransaction} from '@reducers/update-transaction';
 
 interface pageActions {
   issueId: string;
@@ -186,27 +189,35 @@ export default function PageActions({
   }
 
   async function handleDispute() {
-    dispatch(changeLoadState(true));
-    await BeproService.network
-      .disputeMerge({
-        issueID: issueId,
-        mergeID: mergeId,
-      })
-      .then(() => handleBeproService())
-      .catch((err) => console.log("err dispute", err))
-      .finally(() => dispatch(changeLoadState(false)));
+    const disputeTx = addTransaction({type: TransactionTypes.dispute});
+    dispatch(disputeTx);
+
+    await BeproService.network.disputeMerge({issueID: issueId, mergeID: mergeId,})
+                      .then(txInfo => {
+                        BeproService.parseTransaction(txInfo, disputeTx.payload)
+                                    .then(block => dispatch(updateTransaction(block)));
+                      })
+                      .then(() => handleBeproService())
+                      .catch((err) => {
+                        dispatch(updateTransaction({...disputeTx.payload as any, remove: true}));
+                        console.log("Error creating dispute", err)
+                      })
   }
 
   async function handleClose() {
-    dispatch(changeLoadState(true));
-    await BeproService.network
-      .closeIssue({
-        issueID: issueId,
-        mergeID: mergeId,
-      })
-      .then(() => handleBeproService())
-      .catch((err) => console.log("err close", err))
-      .finally(() => dispatch(changeLoadState(false)));
+    const closeIssueTx = addTransaction({type: TransactionTypes.closeIssue});
+    dispatch(closeIssueTx);
+
+    await BeproService.network.closeIssue({issueID: issueId, mergeID: mergeId,})
+                      .then(txInfo => {
+                        BeproService.parseTransaction(txInfo, closeIssueTx.payload)
+                                    .then(block => dispatch(updateTransaction(block)));
+                      })
+                      .then(() => handleBeproService())
+                      .catch((err) => {
+                        dispatch(updateTransaction({...closeIssueTx.payload as any, remove: true}));
+                        console.log(`Error closing issue`, err);
+                      })
   }
 
   return (

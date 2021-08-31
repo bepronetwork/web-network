@@ -2,7 +2,7 @@ import {LoadingState} from './loading-state';
 import {OraclesState} from './oracles-state';
 import {BalanceState} from './balance-state';
 import {ToastNotification} from './toast-notification';
-import {Transactions} from './transactions'
+import {BlockTransaction, SimpleBlockTransactionPayload, Transaction, UpdateBlockTransaction} from './transaction'
 
 export interface ApplicationState {
   githubHandle: string;
@@ -15,5 +15,7 @@ export interface ApplicationState {
   currentAddress: string;
   balance: BalanceState;
   toaster: ToastNotification[];
-  myTransactions: Transactions[];
+  microServiceReady: boolean|null;
+  myTransactions: (SimpleBlockTransactionPayload|BlockTransaction|UpdateBlockTransaction)[];
+  network: string;
 }
