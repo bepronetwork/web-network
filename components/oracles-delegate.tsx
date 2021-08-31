@@ -1,11 +1,12 @@
 import {ChangeEvent, useContext, useEffect, useState} from 'react';
-import { NumberFormatValues } from "react-number-format";
-import InputNumber from "./input-number";
-import OraclesBoxHeader from "./oracles-box-header";
+import {NumberFormatValues} from 'react-number-format';
+import InputNumber from './input-number';
+import OraclesBoxHeader from './oracles-box-header';
 import {ApplicationContext} from '@contexts/application';
 import NetworkTxButton from './network-tx-button';
 import {changeBalance} from '@reducers/change-balance';
 import {BeproService} from '@services/bepro-service';
+import {TransactionTypes} from '@interfaces/enums/transaction-types';
 
 function OraclesDelegate(): JSX.Element {
   const {dispatch, state: {oracles, beproInit, metaMaskWallet, balance: {bepro: beproBalance, staked}}} = useContext(ApplicationContext);
@@ -73,6 +74,8 @@ function OraclesDelegate(): JSX.Element {
 
         <NetworkTxButton txMethod="delegateOracles"
                          txParams={{tokenAmount, delegatedTo}}
+                         txType={TransactionTypes.delegateOracles}
+                         txCurrency="Oracles"
                          modalTitle="Delegate oracles"
                          modalDescription="Delegate oracles to an address"
                          onTxStart={handleClickVerification}

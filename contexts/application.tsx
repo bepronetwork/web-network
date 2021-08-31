@@ -44,6 +44,7 @@ const defaultState: GlobalState = {
     toaster: [],
     microServiceReady: null,
     myTransactions: [],
+    network: ``
   },
   dispatch: () => undefined
 };

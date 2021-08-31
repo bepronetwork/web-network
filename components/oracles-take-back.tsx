@@ -13,9 +13,10 @@ export default function OraclesTakeBack(): JSX.Element {
   const {dispatch, state: {oracles, metaMaskWallet, beproInit, balance, currentAddress}} = useContext(ApplicationContext)
   const [items, setItems] = useState<Item[]>([]);
   const [delegatedAmount, setDelegatedAmount] = useState(0);
+  let oldAddress;
 
   function setMappedSummaryItems() {
-    if (!metaMaskWallet || !beproInit)
+    if (!metaMaskWallet || !beproInit || !currentAddress)
       return;
 
     function mapAmount(amount, index) {
@@ -23,11 +24,11 @@ export default function OraclesTakeBack(): JSX.Element {
       return {amount, address}
     }
 
-    function filterAddresses(amount, index) {
-      return oracles.addresses[index] !== currentAddress;
+    function filterAddresses({amount, address}, index) {
+      return +amount > 0 && address !== currentAddress;
     }
 
-    const issues = oracles.amounts.filter(filterAddresses).map(mapAmount);
+    const issues = oracles.amounts.map(mapAmount).filter(filterAddresses);
 
     setItems(issues);
     setDelegatedAmount(issues.reduce((total, current) => total += +current.amount, 0))
@@ -36,9 +37,10 @@ export default function OraclesTakeBack(): JSX.Element {
   useEffect(setMappedSummaryItems, [beproInit, metaMaskWallet, oracles, currentAddress]);
 
   useEffect(() => {
-    if (!currentAddress)
+    if (!currentAddress || currentAddress === oldAddress)
       return;
 
+    oldAddress = currentAddress;
     BeproService.network.getOraclesSummary({address: currentAddress})
                 .then(oracles => dispatch(changeOraclesState(oracles)));
 

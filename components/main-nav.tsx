@@ -10,10 +10,10 @@ import {ApplicationContext} from '@contexts/application';
 import {changeStakedState} from '@reducers/change-staked-amount';
 import { formatNumberToNScale, formatNumberToString } from 'helpers/formatNumber';
 import NetworkIdentifier from '@components/network-identifier';
-import TransactionPopover from '@components/transaction-popover'
 import HelpIcon from '@assets/icons/help-icon';
 import ButtonTrans from '@components/button-trans';
 import HelpModal from '@components/help-modal';
+import TransactionsStateIndicator from '@components/transactions-state-indicator';
 
 export default function MainNav() {
   const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
@@ -118,7 +118,7 @@ export default function MainNav() {
         <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
           <div className="d-flex account-info align-items-center">
 
-            <TransactionPopover/>
+            <TransactionsStateIndicator />
 
             <Link href="/account" passHref>
               <a className="btn btn-md btn-trans mr-1">
