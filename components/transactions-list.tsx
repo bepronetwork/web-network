@@ -5,7 +5,6 @@ import UploadIcon from '@assets/icons/upload';
 import DownloadIcon from '@assets/icons/download';
 import HelpIcon from '@assets/icons/help-icon';
 import {Transaction} from '@interfaces/transaction';
-import TransactionModal from '@components/transaction-modal';
 import TransactionStats from '@components/transaction-stats';
 import TransactionType from '@components/transaction-type';
 
@@ -26,7 +25,7 @@ export default function TransactionsList({onActiveTransaction = (transaction) =>
     return (
       <div className="px-3 rounded py-2 tx-row cursor-pointer mt-3" onClick={() => onActiveTransaction(item)} key={item.id}>
         <div className="d-flex justify-content-start align-items-center">
-          {IconMaps[item.type]}
+          {IconMaps[item.type] || <HelpIcon/>}
 
           <div className="ms-3 me-auto">
             {item.amount && <h6 className="text-white">{item.amount} {item.currency}</h6> || ``}
