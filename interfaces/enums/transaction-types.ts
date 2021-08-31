@@ -9,4 +9,6 @@ export enum TransactionTypes {
   proposeMerge,
   dispute,
   closeIssue,
+  redeemIssue,
+  approveSettlerToken,
 }

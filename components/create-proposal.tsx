@@ -69,6 +69,8 @@ export default function NewProposal({
       ),
     };
 
+    setShow(false);
+
     const proposeMergeTx = addTransaction({type: TransactionTypes.proposeMerge})
     dispatch(proposeMergeTx);
 
@@ -165,6 +167,7 @@ export default function NewProposal({
       >
         <p className="p-small text-50">Select a pull request </p>
         <ReactSelect
+          id="pullRequestSelect"
           defaultValue={{
             value: pullRequests[0]?.id,
             label: `#${pullRequests[0]?.githubId} Pull Request`,
