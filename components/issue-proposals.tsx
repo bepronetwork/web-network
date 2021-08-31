@@ -57,16 +57,13 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
       for (var i = 0; i < numberProposals; i++) {
 
         console.log({issue_id: issueId, merge_id: i,})
-        const merge = await BeproService.network.getMergeById({
-          issue_id: issueId,
-          merge_id: i,
-        });
+        const merge = await BeproService.network.getMergeById({issue_id: issueId, merge_id: i,});
 
         console.log(`merge`, merge);
 
         await BeproService.network.isMergeDisputed({issueId: issueId, mergeId: i,})
           .then((isMergeDisputed) => (merge.isDisputed = isMergeDisputed))
-          .catch((err) => console.log("err is merge disputed", err));
+          .catch((err) => console.log("Error getting mergeDisputed state", err));
 
         console.log({issue_id: issueId, merge_id: i+1,})
         await GithubMicroService.getMergeProposalIssue(issueId, (i + 1).toString())
@@ -79,7 +76,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
 
         pool.push(merge);
       }
-    console.log(`pool`, pool);
+    console.log(`pool`, pool, amount);
     if (pool.length === numberProposals) setProposals(pool);
   };
 
@@ -98,26 +95,19 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                 pathname: "/proposal",
                 query: { id: proposal.pullRequestId, issueId: issueId },
               });
-            }}
-          >
-            <p
-              className={clsx("p-small mb-0", {
-                "text-danger": proposal?.isDisputed,
-              })}
-            >
+            }}>
+            <p className={clsx("p-small mb-0", {"text-danger": proposal?.isDisputed,})}>
               PR #{proposal.pullRequestGithubId}
             </p>
           </div>
           <div className="col-md-4">
             <div className="content-proposals p-0 mb-2">
               <div className="d-flex">
-                {proposal.prAmounts.map((item, index) => (
+                {proposal.prAmounts.map((prAmount, index) => (
                   <div
                     key={index}
                     className="d-flex flex-column bd-highlight mt-4 me-2"
-                    style={{
-                      width: `${handlePercentage(toNumber(item), amount)}%`,
-                    }}
+                    style={{width: `${handlePercentage(+prAmount, amount)}%`,}}
                   >
                     <div className="bd-highlight">
                       <p
@@ -126,7 +116,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                           "color-purple": !proposal?.isDisputed,
                         })}
                       >
-                        {handlePercentage(toNumber(item), amount)}%
+                        {handlePercentage(+prAmount, amount)}%
                       </p>
                     </div>
 

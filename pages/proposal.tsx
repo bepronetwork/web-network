@@ -100,7 +100,7 @@ export default function PageProposal() {
   }
 
   useEffect(() => { loadProposalData() }, [currentAddress, id, issueId]);
-  useEffect(() => { updateUsersAddresses(proposalBepro) }, [proposalBepro]);
+  useEffect(() => { updateUsersAddresses(proposalBepro) }, [proposalBepro, currentAddress]);
 
   return (
     <>
