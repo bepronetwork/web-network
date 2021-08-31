@@ -2,14 +2,14 @@ import { GetStaticProps } from "next";
 import React from "react";
 import Avatar from "./avatar";
 
-export default function ProposalProgress({ developers }) {
+export default function ProposalProgress({ developers = [] }) {
   return (
     <div className="container mt-up">
       <div className="row justify-content-center">
         <div className="col-md-10">
           <div className="content-wrapper p-0 overflow-hidden mb-4">
             <div className="d-flex align-items-center gap-1">
-              {developers?.map((developer, index) => (
+              {developers.map((developer, index) => (
                 <div
                   key={index}
                   className={`user-block-progress d-flex flex-column align-items-center`}

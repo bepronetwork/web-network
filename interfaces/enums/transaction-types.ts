@@ -6,4 +6,7 @@ export enum TransactionTypes {
   approveTransactionalERC20Token,
   openIssue,
   delegateOracles,
+  proposeMerge,
+  dispute,
+  closeIssue,
 }
