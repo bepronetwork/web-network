@@ -140,7 +140,7 @@ export default function PageProposal() {
         }
         beproStaked={amountIssue}/>
       <ProposalProgress developers={usersAddresses}/>
-      <ProposalStepProgress/>
+      <ProposalStepProgress amountIssue={18} stateIssue="Open"/>
       <PageActions
         state={'pull request'}
         developers={[]}
