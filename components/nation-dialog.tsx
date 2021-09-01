@@ -34,7 +34,7 @@ export default function NationDialog({children}) {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className="d-flex flex-column mt-4 align-items-center">
+          <div className="d-flex flex-column mt-2 align-items-center">
             <p className="family-inter p mb-2 text-center white-space-wrap text-white">At the moment BEPRO services and{'\n '}BEPRO Token (BEPRO) are not available in {country}</p>
             <span className="family-inter p mb-2 text-center ">Excluded Jurisdictions.</span>
             <p className="family-inter p mb-2 text-center text-white">For further information please contact us on</p>
