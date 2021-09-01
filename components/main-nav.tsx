@@ -10,6 +10,7 @@ import {ApplicationContext} from '@contexts/application';
 import {changeStakedState} from '@reducers/change-staked-amount';
 import { formatNumberToNScale, formatNumberToString } from 'helpers/formatNumber';
 import NetworkIdentifier from '@components/network-identifier';
+import BeproLogo from '@assets/icons/bepro-logo';
 import HelpIcon from '@assets/icons/help-icon';
 import ButtonTrans from '@components/button-trans';
 import HelpModal from '@components/help-modal';
@@ -78,11 +79,7 @@ export default function MainNav() {
       <div className="d-flex">
         <Link href="/" passHref>
           <a>
-            <img
-              className="logo"
-              src="https://64.media.tumblr.com/3cf2d2b58643cb6f46b42a652771b73b/e8afc16b16e16514-bc/s250x400/191e77982d8901585030f596d3e90935d42099ed.png"
-              alt=""
-            />
+            <BeproLogo aria-hidden={true} />
           </a>
         </Link>
         <ul className="nav-links">
