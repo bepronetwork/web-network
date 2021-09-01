@@ -1,6 +1,7 @@
 import "../styles/styles.scss";
 import { AppProps } from "next/app";
 import React from "react";
+import NationDialog from "@components/nation-dialog";
 import WebThreeDialog from "@components/web3-dialog";
 import Head from "next/head";
 import MainNav from "@components/main-nav";
@@ -27,9 +28,11 @@ export default function App({ Component, pageProps }: AppProps) {
           />
           <title>WEB Network</title>
         </Head>
-        <MainNav />
-        <WebThreeDialog />
-        <Component {...pageProps} />
+        <NationDialog>
+          <MainNav />
+          <WebThreeDialog />
+          <Component {...pageProps} />
+        </NationDialog>
       </ApplicationContextProvider>
     </>
   );
