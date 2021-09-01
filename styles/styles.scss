@@ -215,6 +215,11 @@ p {
   letter-spacing: 0.06em;
 }
 
+.btn-sm, .btn-md, .btn-lg {
+  text-transform: uppercase;
+}
+
+
 .btn-md {
   display: flex;
   align-items: center;
@@ -224,7 +229,6 @@ p {
   line-height: 100%;
   font-size: 12px;
   font-family: 'fontBold', sans-serif;
-  text-transform: uppercase;
   padding-left: $m;
   padding-right: $m;
 }
