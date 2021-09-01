@@ -44,26 +44,7 @@ export default function PageProposal() {
   const [proposalBepro, setProposalBepro] = useState<ProposalBepro>();
   const [proposalMicroService, setProposalMicroService] = useState<ProposalData>();
   const [amountIssue, setAmountIssue] = useState<string>();
-  const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>([
-    {
-      address: "teste1",
-      githubLogin: "teste1",
-      oracles: "10",
-      percentage: 20,
-    },
-    {
-      address: "teste1",
-      githubLogin: "teste1",
-      oracles: "10",
-      percentage: 30,
-    },
-    {
-      address: "teste1",
-      githubLogin: "teste1",
-      oracles: "10",
-      percentage: 50,
-    },
-  ]);
+  const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
   const [issueMicroService, setIssueMicroService] = useState<IssueData>();
 
   async function getProposalData() {
@@ -140,7 +121,7 @@ export default function PageProposal() {
         }
         beproStaked={amountIssue}/>
       <ProposalProgress developers={usersAddresses}/>
-      <ProposalStepProgress amountIssue={18} stateIssue="Open"/>
+      <ProposalStepProgress amountIssue={18} stateIssue="Open" isDisputed={true}/>
       <PageActions
         state={'pull request'}
         developers={[]}

@@ -1,7 +1,8 @@
 import { GetStaticProps } from "next";
 import React, { useEffect, useState } from "react";
+import clsx from "clsx";
 
-export default function ProposalStepProgress({ stateIssue, amountIssue }) {
+export default function ProposalStepProgress({ stateIssue, amountIssue, isDisputed }) {
   const [base] = useState(500);
 
   const [percentage, setPercentage] = useState<number>(0);
@@ -18,9 +19,21 @@ export default function ProposalStepProgress({ stateIssue, amountIssue }) {
         <div className="col-md-10">
           <div className="col-md-4 mb-5">
             <div className="d-flex align-items-center justify-content-between mb-4">
-              <h4 className="h4 m-0">Falied</h4>
-              <div className="smallCaption ml-5">
-                <span>{amountIssue}</span>/{base} ORACLES<span>({percentage}%)</span>
+              <h4
+              className={clsx("h4 m-0",{
+                "text-danger": !isDisputed,
+                "color-purple": isDisputed,
+              })}>Falied</h4>
+              <div className="smallCaption ml-5 align-items-center">
+                <span
+                className={clsx({
+                  "text-danger": !isDisputed,
+                  "color-purple": isDisputed,
+                })}>{amountIssue}</span>/{base} ORACLES<span
+                className={clsx({
+                  "text-danger": !isDisputed,
+                  "color-purple": isDisputed,
+                })}>  ({percentage}%)</span>
               </div>
             </div>
     
