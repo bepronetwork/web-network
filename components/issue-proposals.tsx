@@ -11,6 +11,9 @@ import { ApplicationContext } from "@contexts/application";
 import { changeLoadState } from "@contexts/reducers/change-load-state";
 import router from "next/router";
 import { handlePercentage } from "@helpers/handlePercentage";
+import {addTransaction} from '@reducers/add-transaction';
+import {TransactionTypes} from '@interfaces/enums/transaction-types';
+import {updateTransaction} from '@reducers/update-transaction';
 
 interface Proposal {
   disputes: string;
@@ -29,17 +32,22 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const ProgressBallRightInitial = 81.7;
 
-  const handleDispute = async (mergeId) => {
-    dispatch(changeLoadState(true));
-    await BeproService.network
-      .disputeMerge({
-        issueID: issueId,
-        mergeID: mergeId,
-      })
-      .then(() => gets())
-      .catch((err) => console.log("err dispute", err))
-      .finally(() => dispatch(changeLoadState(false)));
-  };
+  async function handleDispute(mergeId) {
+    const disputeTx = addTransaction({type: TransactionTypes.dispute});
+    dispatch(disputeTx);
+
+    await BeproService.network.disputeMerge({issueID: issueId, mergeID: mergeId,})
+                      .then(txInfo => {
+                        BeproService.parseTransaction(txInfo, disputeTx.payload)
+                                    .then(block => dispatch(updateTransaction(block)));
+                      })
+                      .then(() => gets())
+                      .catch((err) => {
+                        dispatch(updateTransaction({...disputeTx.payload as any, remove: true}));
+                        console.log("Error creating dispute", err)
+                      })
+  }
+
 
   const calcProgressBallright = (value: number) => {
     const InitialLimit = ProgressBallRightInitial;
@@ -54,34 +62,34 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
   const gets = async () => {
     const pool = [];
     if (issueId)
-      for (var i = 0; i < numberProposals; i++) {
+      for (let i = 0; i < numberProposals; i++) {
 
-        console.log({issue_id: issueId, merge_id: i,})
-        const merge = await BeproService.network.getMergeById({
-          issue_id: issueId,
-          merge_id: i,
-        });
-
-        console.log(`merge`, merge);
+        const merge = await BeproService.network.getMergeById({issue_id: issueId, merge_id: i,});
 
         await BeproService.network.isMergeDisputed({issueId: issueId, mergeId: i,})
           .then((isMergeDisputed) => (merge.isDisputed = isMergeDisputed))
-          .catch((err) => console.log("err is merge disputed", err));
+          .catch((err) => console.log("Error getting mergeDisputed state", err));
 
-        console.log({issue_id: issueId, merge_id: i+1,})
         await GithubMicroService.getMergeProposalIssue(issueId, (i + 1).toString())
           .then((mergeProposal: ProposalData) => {
-            console.log(`mergeProposal`, mergeProposal)
             merge.pullRequestId = mergeProposal?.pullRequestId;
             merge.pullRequestGithubId = mergeProposal?.pullRequest.githubId;
           })
-          .catch((err) => console.log("err microService", err));
+          .catch((err) => console.log(`Error getting proposal from microservice`, err));
 
         pool.push(merge);
       }
-    console.log(`pool`, pool);
+
     if (pool.length === numberProposals) setProposals(pool);
   };
+
+  function getProgressBarWidth(proposal) {
+    let value = `0%`;
+    if (handlePercentage(toNumber(proposal.disputes), amount) >= ProgressBallRightInitial)
+      value = `${calcProgressBallright(handlePercentage(toNumber(proposal.disputes), amount))}%`;
+
+    return value;
+  }
 
   useEffect(() => {
     gets();
@@ -98,26 +106,19 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                 pathname: "/proposal",
                 query: { id: proposal.pullRequestId, issueId: issueId },
               });
-            }}
-          >
-            <p
-              className={clsx("p-small mb-0", {
-                "text-danger": proposal?.isDisputed,
-              })}
-            >
+            }}>
+            <p className={clsx("p-small mb-0", {"text-danger": proposal?.isDisputed,})}>
               PR #{proposal.pullRequestGithubId}
             </p>
           </div>
           <div className="col-md-4">
             <div className="content-proposals p-0 mb-2">
               <div className="d-flex">
-                {proposal.prAmounts.map((item, index) => (
+                {proposal.prAmounts.map((prAmount, index) => (
                   <div
                     key={index}
                     className="d-flex flex-column bd-highlight mt-4 me-2"
-                    style={{
-                      width: `${handlePercentage(toNumber(item), amount)}%`,
-                    }}
+                    style={{width: `${handlePercentage(+prAmount, amount)}%`,}}
                   >
                     <div className="bd-highlight">
                       <p
@@ -126,17 +127,11 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                           "color-purple": !proposal?.isDisputed,
                         })}
                       >
-                        {handlePercentage(toNumber(item), amount)}%
+                        {handlePercentage(+prAmount, amount)}%
                       </p>
                     </div>
 
-                    <div
-                      className={clsx("proposal-progress  bd-highlight", {
-                        "bg-danger": proposal?.isDisputed,
-                        "bg-purple": !proposal?.isDisputed,
-                      })}
-                      key={index}
-                    ></div>
+                    <div className={clsx("proposal-progress  bd-highlight", {"bg-danger": proposal?.isDisputed, "bg-purple": !proposal?.isDisputed,})} key={index} />
                   </div>
                 ))}
               </div>
@@ -146,12 +141,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
             <div className="d-flex align-items-center justify-content-end">
               <div className="d-flex flex-column bd-highlight mr-2">
                 <div className="d-flex align-items-stretch mb-0 ">
-                  <p
-                    className={clsx("smallCaption mb-0", {
-                      "text-danger": proposal?.isDisputed,
-                      "color-purple": !proposal?.isDisputed,
-                    })}
-                  >
+                  <p className={clsx("smallCaption mb-0", {"text-danger": proposal?.isDisputed, "color-purple": !proposal?.isDisputed,})}>
                     {proposal.disputes}
                   </p>
                   <p className="smallCaption mb-0">/{amount} Oracles</p>
@@ -159,81 +149,33 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                 <div className="content-relative">
                   <div className="progress progress-oracle my-1">
                     <div
-                      className={clsx("progress-bar ", {
-                        "bg-danger": proposal?.isDisputed,
-                        "bg-purple": !proposal?.isDisputed,
-                      })}
+                      className={clsx("progress-bar ", {"bg-danger": proposal?.isDisputed, "bg-purple": !proposal?.isDisputed,})}
                       role="progressbar"
-                      style={{
-                        width: `${handlePercentage(
-                          toNumber(proposal.disputes),
-                          amount
-                        )}%`,
-                      }}
-                    >
+                      style={{width: `${handlePercentage(toNumber(proposal.disputes), amount)}%`,}}>
                       <div className="progress progress-ball left">
-                        <div
-                          className={clsx("progress-bar", {
-                            "bg-danger": proposal?.isDisputed,
-                            "bg-purple": !proposal?.isDisputed,
-                          })}
-                          role="progressbar"
-                          style={{
-                            width: `${handlePercentage(
-                              toNumber(proposal.disputes),
-                              calcAmountProgressBallLeft(amount)
-                            )}%`,
-                          }}
-                        ></div>
+                        <div className={clsx("progress-bar", {"bg-danger": proposal?.isDisputed, "bg-purple": !proposal?.isDisputed,})}
+                             role="progressbar"
+                             style={{width: `${handlePercentage(toNumber(proposal.disputes), calcAmountProgressBallLeft(amount))}%`,}} />
                       </div>
                       <div className="progress progress-ball right">
-                        <div
-                          className={clsx("progress-bar", {
-                            "bg-danger": proposal?.isDisputed,
-                            "bg-purple": !proposal?.isDisputed,
-                          })}
-                          role="progressbar"
-                          style={{
-                            width: `${
-                              handlePercentage(
-                                toNumber(proposal.disputes),
-                                amount
-                              ) >= ProgressBallRightInitial &&
-                              calcProgressBallright(
-                                handlePercentage(
-                                  toNumber(proposal.disputes),
-                                  amount
-                                )
-                              )
-                            }%`,
-                          }}
-                        ></div>
+                        <div className={clsx("progress-bar", {"bg-danger": proposal?.isDisputed, "bg-purple": !proposal?.isDisputed,})}
+                             role="progressbar"
+                             style={{width: getProgressBarWidth(proposal),}} />
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div className="d-flex justify-content-center">
-                  <p
-                    className={clsx("smallCaption  mb-0", {
-                      "text-danger": proposal?.isDisputed,
-                      "color-purple": !proposal?.isDisputed,
-                    })}
-                  >
-                    {handlePercentage(
-                      toNumber(proposal.disputes),
-                      amount
-                    ).toFixed(2)}
-                    %
+                  <p className={clsx("smallCaption  mb-0", {"text-danger": proposal?.isDisputed, "color-purple": !proposal?.isDisputed,})}>
+                    {handlePercentage(toNumber(proposal.disputes), amount).toFixed(2)}%
                   </p>
                 </div>
               </div>
               <div className="d-flex align-items-center justify-content-end ms-2">
                 {!proposal?.isDisputed ? (
-                  <button
-                    className="btn btn-md btn-purple p-3"
-                    onClick={() => handleDispute(toNumber(proposal._id))}
-                  >
+                  <button className="btn btn-md btn-purple p-3"
+                          onClick={() => handleDispute(toNumber(proposal._id))}>
                     Dispute
                   </button>
                 ) : (

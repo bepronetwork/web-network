@@ -9,7 +9,12 @@ import ConnectWalletButton from './connect-wallet-button';
 import {ApplicationContext} from '@contexts/application';
 import {changeStakedState} from '@reducers/change-staked-amount';
 import { formatNumberToNScale, formatNumberToString } from 'helpers/formatNumber';
-import TransactionPopover from './transaction-popover'
+import NetworkIdentifier from '@components/network-identifier';
+import BeproLogo from '@assets/icons/bepro-logo';
+import HelpIcon from '@assets/icons/help-icon';
+import ButtonTrans from '@components/button-trans';
+import HelpModal from '@components/help-modal';
+import TransactionsStateIndicator from '@components/transactions-state-indicator';
 
 export default function MainNav() {
   const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
@@ -19,6 +24,7 @@ export default function MainNav() {
   const [address, setAddress] = useState<string>(null);
   const [ethBalance, setEthBalance] = useState(0);
   const [beproBalance, setBeproBalance] = useState(0);
+  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     checkLogin();
@@ -51,7 +57,7 @@ export default function MainNav() {
     updateAddress(BeproService.address);
     BeproService.getBalance('eth').then(setEthBalance);
     BeproService.getBalance('bepro').then(setBeproBalance);
-    BeproService.network.getBEPROStaked().then(amount => dispatch(changeStakedState(amount)))
+    BeproService.network.getBEPROStaked().then(amount => dispatch(changeStakedState(amount)));
   }
 
   const login = async () => {
@@ -73,11 +79,7 @@ export default function MainNav() {
       <div className="d-flex">
         <Link href="/" passHref>
           <a>
-            <img
-              className="logo"
-              src="https://64.media.tumblr.com/3cf2d2b58643cb6f46b42a652771b73b/e8afc16b16e16514-bc/s250x400/191e77982d8901585030f596d3e90935d42099ed.png"
-              alt=""
-            />
+            <BeproLogo aria-hidden={true} />
           </a>
         </Link>
         <ul className="nav-links">
@@ -106,10 +108,14 @@ export default function MainNav() {
         <Link href="/create-issue" passHref>
           <button className="btn btn-md btn-trans mr-1">+ Create issue</button>
         </Link>
+        <NetworkIdentifier />
+
+        <ButtonTrans onClick={() => setShowHelp(true)} className="ms-2 me-3" rounded={true}><HelpIcon /></ButtonTrans>
+
         <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
           <div className="d-flex account-info align-items-center">
-    
-            <TransactionPopover/>
+
+            <TransactionsStateIndicator />
 
             <Link href="/account" passHref>
               <a className="btn btn-md btn-trans mr-1">
@@ -131,6 +137,8 @@ export default function MainNav() {
           </div>
         </ConnectWalletButton>
       </div>
+
+      <HelpModal show={showHelp} onCloseClick={() => setShowHelp(false)} />
 
     </div>
   )

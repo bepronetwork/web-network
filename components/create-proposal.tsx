@@ -1,14 +1,16 @@
-import { useContext, useEffect, useState } from "react";
-import Modal from "./modal";
-import ReactSelect from "./react-select";
-import CreateProposalDistributionItem from "./create-proposal-distribution-item";
-import sumObj from "helpers/sumObj";
-import { BeproService } from "@services/bepro-service";
-import GithubMicroService from "../services/github-microservice";
-import { pullRequest } from "interfaces/issue-data";
-import { toNumber } from "lodash";
-import { ApplicationContext } from "@contexts/application";
-import { changeLoadState } from "@contexts/reducers/change-load-state";
+import {useContext, useEffect, useState} from 'react';
+import Modal from './modal';
+import ReactSelect from './react-select';
+import CreateProposalDistributionItem from './create-proposal-distribution-item';
+import sumObj from 'helpers/sumObj';
+import {BeproService} from '@services/bepro-service';
+import GithubMicroService from '../services/github-microservice';
+import {pullRequest} from 'interfaces/issue-data';
+import {ApplicationContext} from '@contexts/application';
+import {changeLoadState} from '@contexts/reducers/change-load-state';
+import {addTransaction} from '@reducers/add-transaction';
+import {TransactionTypes} from '@interfaces/enums/transaction-types';
+import {updateTransaction} from '@reducers/update-transaction';
 
 interface participants {
   githubHandle: string;
@@ -16,20 +18,17 @@ interface participants {
 }
 
 export default function NewProposal({
-  issueId,
-  amountTotal,
-  numberMergeProposals,
-  pullRequests = [],
-  handleBeproService,
-  handleMicroService,
-}) {
-  const {
-    dispatch,
-    state: { balance, currentAddress, beproInit },
-  } = useContext(ApplicationContext);
+                                      issueId,
+                                      amountTotal,
+                                      numberMergeProposals,
+                                      pullRequests = [],
+                                      handleBeproService,
+                                      handleMicroService,
+                                    }) {
+  const {dispatch, state: {balance, currentAddress, beproInit},} = useContext(ApplicationContext);
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>();
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string>('');
   const [show, setShow] = useState<boolean>(false);
   const [participants, setParticipants] = useState<participants[]>([]);
   const [hideCreateProposal, setHideCreateProposal] = useState(true);
@@ -45,23 +44,22 @@ export default function NewProposal({
 
   function getParticipantsPullRequest(id: string, githubId: string) {
     GithubMicroService.getPullRequestParticipants(id)
-      .then((participantsPr) => {
-        setCurrentGithubId(githubId);
-        setParticipants(participantsPr);
-      })
-      .catch((err) => console.log("err", err));
+                      .then((participantsPr) => {
+                        setCurrentGithubId(githubId);
+                        setParticipants(participantsPr);
+                      })
+                      .catch((err) => console.log('err', err));
   }
 
   async function handleClickCreate(): Promise<void> {
-    if (amount > 0 && amount < 100) {
+    if (amount > 0 && amount < 100)
       return setError(`${100 - amount}% is missing!`);
-    }
-    if (amount === 0) {
-      return setError("Distribution must be equal to 100%.");
-    }
-    if (amount > 100) {
-      return setError("Distribution exceed 100%.");
-    }
+
+    if (amount === 0)
+      return setError('Distribution must be equal to 100%.');
+
+    if (amount > 100)
+      return setError('Distribution exceed 100%.');
 
     const payload = {
       issueID: issueId,
@@ -70,27 +68,38 @@ export default function NewProposal({
         (items) => (amountTotal * distrib[items.githubHandle]) / 100
       ),
     };
-    dispatch(changeLoadState(true));
+
+    setShow(false);
+
+    const proposeMergeTx = addTransaction({type: TransactionTypes.proposeMerge})
+    dispatch(proposeMergeTx);
+
     await BeproService.network
-      .proposeIssueMerge(payload)
-      .then(() =>
-        GithubMicroService.createMergeProposal(issueId, {
-          pullRequestGithubId: currentGithubId,
-          scMergeId: (numberMergeProposals + 1).toString(),
-        }).then(() => {
-          handleBeproService();
-          handleMicroService();
-          handleClose();
-          setDistrib({});
-        })
-          .then(() => {
-            handleClose();
-            setDistrib({});
-          })
-          .catch(() => setError("Error to create proposal in MicroService"))
-      )
-      .catch(() => setError("Error to create proposal in MicroService"))
-      .finally(() => dispatch(changeLoadState(false)));
+                      .proposeIssueMerge(payload)
+                      .then(txInfo => {
+                        BeproService.parseTransaction(txInfo, proposeMergeTx.payload)
+                                    .then(block => dispatch(updateTransaction(block)));
+                      })
+                      .then(() =>
+                              GithubMicroService.createMergeProposal(issueId, {
+                                pullRequestGithubId: currentGithubId,
+                                scMergeId: (numberMergeProposals + 1).toString(),
+                              }).then(() => {
+                                handleBeproService();
+                                handleMicroService();
+                                handleClose();
+                                setDistrib({});
+                              })
+                                                .then(() => {
+                                                  handleClose();
+                                                  setDistrib({});
+                                                })
+                                                .catch(() => setError('Error to create proposal in MicroService'))
+                      )
+                      .catch(() => {
+                        dispatch(updateTransaction({...proposeMergeTx.payload as any, remove: true}))
+                        setError('Error to create proposal in Smart Contract')
+                      })
   }
 
   function handleClose() {
@@ -116,7 +125,7 @@ export default function NewProposal({
   }
 
   useEffect(() => {
-    setError("");
+    setError('');
     setAmount(sumObj(distrib));
   }, [distrib]);
 
@@ -133,11 +142,11 @@ export default function NewProposal({
 
   return (
     <>
-      {" "}
+      {' '}
       {(!hideCreateProposal && (
         <button className="btn btn-md btn-primary" onClick={() => setShow(true)}>Create Proposal</button>
       )) ||
-        ` You need at least ${councilAmount} BEPRO to Create a Proposal `}
+      ` You need at least ${councilAmount} BEPRO to Create a Proposal `}
       <Modal
         show={show}
         title="Create Proposal"
@@ -158,6 +167,7 @@ export default function NewProposal({
       >
         <p className="p-small text-50">Select a pull request </p>
         <ReactSelect
+          id="pullRequestSelect"
           defaultValue={{
             value: pullRequests[0]?.id,
             label: `#${pullRequests[0]?.githubId} Pull Request`,

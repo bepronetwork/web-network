@@ -6,4 +6,5 @@ export interface Modal extends ModalProps {
   key?: string;
   children: ReactElement | ReactElement[];
   footer?: ReactElement | ReactElement[];
+  onCloseClick?: () => void;
 }

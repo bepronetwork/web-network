@@ -205,6 +205,14 @@ p {
   font-family: 'fontBold', sans-serif;
 }
 
+.text-gray{
+  color: $gray;
+}
+
+.text-blue-dark{
+  color: $blue-dark;
+}
+
 .trans {
   opacity: 0.7;
 }
@@ -215,6 +223,11 @@ p {
   letter-spacing: 0.06em;
 }
 
+.btn-sm, .btn-md, .btn-lg {
+  text-transform: uppercase;
+}
+
+
 .btn-md {
   display: flex;
   align-items: center;
@@ -224,7 +237,6 @@ p {
   line-height: 100%;
   font-size: 12px;
   font-family: 'fontBold', sans-serif;
-  text-transform: uppercase;
   padding-left: $m;
   padding-right: $m;
 }
@@ -774,7 +786,7 @@ label {
       border-bottom-color: $bg-shadow;
     }
   }
-  
+
 
   .transaction{
     &.box {
@@ -810,7 +822,7 @@ label {
         }
       }
   }
-  
+
   &.box{
     background-color: $bg;
     >span{
@@ -818,6 +830,14 @@ label {
       font-size: 14px;
       color: $gray;
     }
+  }
+}
+
+#nation-dialog-modal{
+  max-width: 414px;
+
+  .white-space-wrap{
+    white-space: pre-wrap;
   }
 }
 
@@ -832,7 +852,7 @@ $c_props: ('m': 'margin') !default;
         @each $amount, $multiplier in $spacers {
           &n-#{$amount} {
             @each $value in $values {
-              #{$prop}-#{$value}: -#{$multiplier}!important;
+              #{$prop}-#{$value}: -#{$multiplier}rem!important;
             }
           }
         }
@@ -853,4 +873,59 @@ $c_props: ('m': 'margin') !default;
       }
     }
   }
+}
+
+.fs {
+  &-7 { font-size: .7rem; }
+  &-8 { font-size: .8rem; }
+  &-9 { font-size: .9rem; }
+  &-smallest { font-size: 12px; }
+  &-small { font-size: 14px; }
+}
+
+.cursor {
+  &-pointer {
+    cursor: pointer;
+  }
+}
+
+.help-row:hover {
+  + .help-row {
+    margin-top: -1px;
+  }
+
+  &:last-of-type:hover {
+    margin-top: 1px;
+  }
+}
+
+#transactions-indicator {
+
+  &.popover {
+    max-width: 367px;
+  }
+  .popover-arrow {
+    &::after {
+      border-bottom-color: $bg-shadow;
+    }
+  }
+}
+
+.transaction-list {
+  .tx-row {
+    background-color: $black;
+    width: 333px;
+  }
+
+  path {
+    fill: map-get($theme-colors, 'primary')
+  }
+}
+
+.bg-black {
+  background-color: $black;
+}
+
+.toast-container {
+  z-index: $zindex-tooltip+1;
 }

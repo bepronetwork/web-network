@@ -1,3 +1,7 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/utilities";
+
 $white: #fff;
 $black: #000;
 $dark-gray: #20222b;
@@ -17,3 +21,14 @@ $bg-shadow: #151720;
 
 $toast-font-size: 1rem;
 $m: 16px;
+
+$utilities: map-merge(
+  $utilities, (
+                'shadow': map-merge(map-get($utilities, 'shadow'), (state: hover)),
+                'border-bottom': map-merge(map-get($utilities, 'border-bottom'), (state: hover)),
+                'border-top': map-merge(map-get($utilities, 'border-top'), (state: hover)),
+                'border-color': map-merge(map-get($utilities, 'border-color'), (state: hover)),
+                'color': map-merge(map-get($utilities, 'color'), (state: hover)),
+        )
+)
+
