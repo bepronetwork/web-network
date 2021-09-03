@@ -33,12 +33,6 @@ export default function MyOracles() {
                     Oracles can be used on Council to vote and approve issues
                   </p>
                 </div>
-                <div className="col-md-6">
-                  <h4 className="h4">Why use Oracles?</h4>
-                  <p>
-                    Oracles can be used on Council to vote and approve issues
-                  </p>
-                </div>
               </div>
             </div>
           </div>
