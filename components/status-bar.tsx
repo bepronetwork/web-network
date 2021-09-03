@@ -18,7 +18,7 @@ export default function StatusBar() {
   useEffect(initialize, []);
 
   return (<>
-    <div className="position-fixed bg-dark bottom-0 w-100 px-3 py-1 d-flex justify-content-between border-top border-primary" id="status-bar">
+    <div className="position-fixed bg-dark bottom-0 w-100 px-3 py-1 d-flex justify-content-between" id="status-bar">
       <div className="d-flex align-items-center">
         <span className={getIndicatorClasses()} style={{height: `.5rem`, width: `.5rem`}} />
         <span className="text-uppercase fs-7">{microServiceReady === null ? `waiting` : microServiceReady ? `operational` : `network congestion`}</span>
