@@ -9,7 +9,7 @@ import {IssueData} from '@interfaces/issue-data';
 
 export default function MyIssues() {
 
-  const {dispatch, state: {myIssues, beproInit, metaMaskWallet}} = useContext(ApplicationContext)
+  const {dispatch, state: {myIssues, beproInit, metaMaskWallet, currentAddress}} = useContext(ApplicationContext)
   const [issues, setIssues] = useState<IssueData[]>([]);
 
   let issueChild;
@@ -18,7 +18,9 @@ export default function MyIssues() {
     if (!beproInit || !myIssues.length)
       return;
 
-    GithubMicroService.getIssues().then(setIssues)
+    GithubMicroService.getUserOf(currentAddress)
+    .then((user)=> GithubMicroService.getIssuesByGhLogin(user.githubLogin))
+    .then(setIssues)
   }
 
   useEffect(getIssueList, [beproInit, myIssues])
