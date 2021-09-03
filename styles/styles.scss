@@ -621,8 +621,14 @@ label {
 .bg-opac {
   background-color: rgba($white, 0.1);
 }
+.bg-green {
+  background-color: $green;
+}
 .bg-purple {
   background-color: $purple;
+}
+.bg-red {
+  background-color: $red;
 }
 
 .color-blue {
@@ -630,6 +636,9 @@ label {
 }
 .color-secondary {
   color: $secondary;
+}
+.color-green {
+  color: $green;
 }
 .color-purple {
   color: $purple;
@@ -718,6 +727,32 @@ label {
   background-color: $dark-gray;
   height: 4px;
 }
+
+.step{
+  top: 0;
+ &-0{
+   left: 0% !important;
+ }
+ &-20{
+   left: 25% !important;
+ }
+ &-40{
+   left: 50% !important;
+   right: 50% !important;
+ }
+ &-80{
+   right: 25% !important;
+ }
+ &-100{
+   right: 0% !important;
+ }
+ 
+}
+
+.step-dots{
+  width: 20px;
+  height: 20px;
+} 
 
 .content-relative {
   position: relative;
