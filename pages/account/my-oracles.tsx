@@ -25,7 +25,7 @@ export default function MyOracles() {
         <div className="row justify-content-center">
           <ConnectWalletButton asModal={true} />
           <div className="col-md-10">
-            <div className="content-wrapper mb-5">
+            <div className="content-wrapper mb-5 cursor-pointer">
               <div className="row">
                 <div className="col-md-6">
                   <h4 className="h4">How to use Oracles?</h4>
