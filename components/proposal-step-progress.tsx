@@ -16,18 +16,30 @@ export default function ProposalStepProgress({ amountIssue, isDisputed }) {
 
   const handlerColorState = () => {
     if (isDisputed) {
-      return "red";
-    }
-
-    if (!isDisputed) {
       return "purple";
+    }
+    if (!isDisputed) {
+      return "red";
     }
     return "green";
   };
+  
+  const handlerState = () => {
+    if (isDisputed) {
+      setStateIssue('Open for dispute')
+    }
+    else if (!isDisputed) {
+      setStateIssue('Failed')
+    }else{
+      setStateIssue('Accepted')
+    }
+    
+  };
+  useEffect(handlerState, [isDisputed])
 
   useEffect(() => {
-    setPercentage(handlePercentage(amountIssue, base));
-    setProgress(handlePercentToRange(amountIssue, base, 4));
+    setPercentage(handlePercentage(amountIssue, base)|| 0);
+    setProgress(handlePercentToRange(amountIssue, base, 4)|| 0);
   }, [amountIssue, base]);
 
   return (
