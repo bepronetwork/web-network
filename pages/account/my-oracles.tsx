@@ -4,6 +4,7 @@ import OraclesDelegate from '@components/oracles-delegate';
 import OraclesTakeBack from '@components/oracles-take-back';
 import Account from '@components/account';
 import ConnectWalletButton from '@components/connect-wallet-button';
+import OpenIcon from '@assets/icons/open-icon';
 
 export default function MyOracles() {
   return (
@@ -28,7 +29,10 @@ export default function MyOracles() {
             <div className="content-wrapper mb-5 cursor-pointer shadow-lg-hover">
               <div className="row">
                 <div className="col-md-6">
-                  <h4 className="h4">How to use Oracles?</h4>
+                  <div className="d-flex align-items-flex-start">
+                    <h4 className="h4">How to use Oracles?</h4>
+                    <OpenIcon className="ml-1"/>
+                  </div>
                   <p>
                     Oracles can be used on Council to vote and approve issues
                   </p>
