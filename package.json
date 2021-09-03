@@ -12,6 +12,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@octokit/types": "^6.26.0",
     "axios": "^0.21.1",
     "bepro-js": "github:bepronetwork/bepro-js#master",
     "bootstrap": "^5.0.1",
@@ -22,6 +23,7 @@
     "lodash": "^4.17.21",
     "next": "^11.0.1",
     "next-auth": "^3.27.3",
+    "octokit": "^1.0.5",
     "react": "^17.0.2",
     "react-bootstrap": "^2.0.0-beta.4",
     "react-device-detect": "^1.17.0",
@@ -38,6 +40,6 @@
     "@types/node": "^13.11.0",
     "@types/react": "^17.0.6",
     "@types/react-select": "^4.0.15",
-    "typescript": "^3.8.3"
+    "typescript": "^4.3.2"
   }
 }
