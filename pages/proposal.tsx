@@ -62,7 +62,6 @@ export default function PageProposal() {
 
     try {
       const merge = await BeproService.network.getMergeById({issue_id: issueId, merge_id: mergeId});
-      debugger;
       const isDisputed = await BeproService.network.isMergeDisputed({issueId, mergeId});
       const author = await GithubMicroService.getHandleOf(merge.proposalAddress);
 
