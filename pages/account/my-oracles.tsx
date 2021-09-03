@@ -7,6 +7,11 @@ import ConnectWalletButton from '@components/connect-wallet-button';
 import OpenIcon from '@assets/icons/open-icon';
 
 export default function MyOracles() {
+
+  function navigateOut(href) {
+    window.open(href);
+  }
+
   return (
     <Account buttonPrimaryActive={false}>
 
@@ -26,7 +31,7 @@ export default function MyOracles() {
         <div className="row justify-content-center">
           <ConnectWalletButton asModal={true} />
           <div className="col-md-10">
-            <div className="content-wrapper mb-5 cursor-pointer shadow-lg-hover">
+            <div className="content-wrapper mb-5 cursor-pointer shadow-lg-hover" onClick={() => navigateOut('https://docs.bepro.network/getting-started/the-network')}>
               <div className="row">
                 <div className="col-md-6">
                   <div className="d-flex align-items-flex-start">
