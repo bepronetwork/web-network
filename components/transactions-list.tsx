@@ -7,18 +7,26 @@ import HelpIcon from '@assets/icons/help-icon';
 import {Transaction} from '@interfaces/transaction';
 import TransactionStats from '@components/transaction-stats';
 import TransactionType from '@components/transaction-type';
+import InformationChatBubble from '@assets/icons/information-chat-bubble';
+import ThumbsUp from '@assets/icons/thumbs-up';
+import CrossArrow from '@assets/icons/cross-arrow';
+import ChatBubbles from '@assets/icons/chat-bubbles';
+import ChatBubbleCross from '@assets/icons/chat-bubble-cross';
+import ReturnArrow from '@assets/icons/return-arrow';
 
 export default function TransactionsList({onActiveTransaction = (transaction) => {}}) {
   const {state: {myTransactions}} = useContext(ApplicationContext);
 
 
   const IconMaps = {
-    [TransactionTypes.unknown]: <HelpIcon/>,
-    [TransactionTypes.createIssue]: <HelpIcon/>,
+    [TransactionTypes.openIssue]: <InformationChatBubble />,
     [TransactionTypes.lock]: <UploadIcon/>,
     [TransactionTypes.unlock]: <DownloadIcon/>,
-    [TransactionTypes.approveTransactionalERC20Token]: <HelpIcon/>,
-    [TransactionTypes.openIssue]: <HelpIcon/>,
+    [TransactionTypes.approveTransactionalERC20Token]: <ThumbsUp />,
+    [TransactionTypes.delegateOracles]: <CrossArrow />,
+    [TransactionTypes.dispute]: <ChatBubbles />,
+    [TransactionTypes.closeIssue]: <ChatBubbleCross />,
+    [TransactionTypes.redeemIssue]: <ReturnArrow />
   }
 
   function renderTransactionRow(item: Transaction) {

@@ -20,7 +20,7 @@ export default function HelpModal({show = false, onCloseClick = () => {}}) {
   }
 
   function HelpItemRow(item, i) {
-    const rowClassName = `help-row row ${i+1 !== helpItems.length && `pb-1 mb-2` || ``} d-flex align-items-center cursor-pointer border-bottom-hover border-white-hover`;
+    const rowClassName = `row ${i+1 !== helpItems.length && `mb-2` || ``} d-flex align-items-center cursor-pointer bg-dark-hover mxn-3 px-3 py-2`;
 
     return (
       <div className={rowClassName} key={item.title} onClick={() => navigateOut(item.href)}>
