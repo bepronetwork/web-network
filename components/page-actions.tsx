@@ -1,5 +1,5 @@
 import {GetStaticProps} from 'next';
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import IssueAvatars from './issue-avatars';
 import Link from 'next/link';
 import {BeproService} from '@services/bepro-service';
@@ -14,6 +14,7 @@ import clsx from 'clsx';
 import {addTransaction} from '@reducers/add-transaction';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
+import CreatePullRequestModal from '@components/create-pull-request-modal';
 
 interface pageActions {
   issueId: string;
@@ -60,6 +61,8 @@ export default function PageActions({
     dispatch,
     state: { githubHandle, currentAddress },
   } = useContext(ApplicationContext);
+
+  const [showPRModal, setShowPRModal] = useState(false);
 
   function handleAvatar() {
     if (developers?.length > 0) {
@@ -140,21 +143,19 @@ export default function PageActions({
     return (
       !finalized &&
       githubLogin && (
-        <button
-          className="btn btn-md btn-primary ms-1 px-4"
-          onClick={handlePullrequest}
-          disabled={!githubHandle || !currentAddress}
-        >
+        <button className="btn btn-md btn-primary ms-1 px-4"
+                onClick={() => setShowPRModal(true)}
+                disabled={!githubHandle || !currentAddress}>
           Create Pull Request
         </button>
       )
     );
   }
 
-  async function handlePullrequest() {
+  async function handlePullrequest({title: prTitle, description: prDescription}) {
     GithubMicroService.createPullRequestIssue(issueId, {
-      title: title,
-      description: description,
+      title: prTitle,
+      description: prDescription,
       username: githubLogin,
     })
       .then(() => {
@@ -166,6 +167,7 @@ export default function PageActions({
           })
         );
         handleMicroService();
+        setShowPRModal(false);
       })
       .catch((err) => {
         console.log("err", err.response);
@@ -254,8 +256,7 @@ export default function PageActions({
 
                   <button
                     className="btn btn-md btn-primary mx-3 px-4"
-                    onClick={handleClose}
-                  >
+                    onClick={handleClose}>
                     Close
                   </button>
                 </>
@@ -264,6 +265,11 @@ export default function PageActions({
           </div>
         </div>
       </div>
+      <CreatePullRequestModal show={showPRModal}
+                              title={title}
+                              description={description}
+                              onConfirm={handlePullrequest}
+                              onCloseClick={() => setShowPRModal(false)} />
     </div>
   );
 }
