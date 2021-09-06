@@ -29,6 +29,7 @@ $utilities: map-merge(
                 'border-top': map-merge(map-get($utilities, 'border-top'), (state: hover)),
                 'border-color': map-merge(map-get($utilities, 'border-color'), (state: hover)),
                 'color': map-merge(map-get($utilities, 'color'), (state: hover)),
+                'background-color': map-merge(map-get($utilities, 'background-color'), (state: hover))
         )
 )
 
