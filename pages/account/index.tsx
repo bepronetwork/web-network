@@ -6,6 +6,7 @@ import GithubMicroService from '@services/github-microservice';
 import Account from '@components/account';
 import {ApplicationContext} from '@contexts/application';
 import {IssueData} from '@interfaces/issue-data';
+import NothingFound from '@components/nothing-found';
 
 export default function MyIssues() {
 
@@ -26,7 +27,20 @@ export default function MyIssues() {
   if (!beproInit || !metaMaskWallet)
     issueChild = (<div className="col-md-10">{!metaMaskWallet ? `Connect your wallet` : `Loading`}...</div>)
   else if (!myIssues.length)
-    issueChild = (<div className="col-md-10">No issues, <Link href="/create-issue" passHref>create one</Link></div>)
+    issueChild = (
+    <div className="col-md-10">
+      <div className="mt-4">
+        <NothingFound 
+          description="No issues"
+          action={
+            <Link href="/create-issue" passHref>
+              <button className="btn btn-md btn-primary">
+                create one
+              </button>
+            </Link>
+          } />
+      </div>
+    </div>)
   else issueChild = issues.map(issue =>
                                  <div className="col-md-10" key={issue.issueId}><IssueListItem issue={issue} /></div>)
 
