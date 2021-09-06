@@ -83,6 +83,7 @@ export default function PageActions({
   async function handleRedeem() {
 
     const redeemTx = addTransaction({type: TransactionTypes.redeemIssue})
+    dispatch(redeemTx);
 
     await BeproService.login()
       .then(() => {
