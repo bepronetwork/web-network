@@ -4,14 +4,16 @@ import clsx from "clsx";
 import {
   handlePercentage,
   handlePercentToRange,
+  handlePercentToSteps
 } from "@helpers/handlePercentage";
 
 export type StateIssue = "Failed" | "Accepted" | "Open for dispute";
 export default function ProposalStepProgress({ amountIssue, isDisputed }) {
-  const [base] = useState<number>(500);
+  const [total] = useState<number>(500);
   const [stateIssue, setStateIssue] = useState<StateIssue>("Open for dispute");
   const [percentage, setPercentage] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
+  const [steps, setSteps] = useState<number[]>([]);
 
 
   const handlerColorState = () => {
@@ -38,9 +40,17 @@ export default function ProposalStepProgress({ amountIssue, isDisputed }) {
   useEffect(handlerState, [isDisputed])
 
   useEffect(() => {
-    setPercentage(handlePercentage(amountIssue, base)|| 0);
-    setProgress(handlePercentToRange(amountIssue, base, 4)|| 0);
-  }, [amountIssue, base]);
+    setPercentage(handlePercentage(amountIssue, total)|| 0);
+    setProgress(handlePercentToRange(amountIssue, total, 4)|| 0);
+    const increment = handlePercentToSteps(amountIssue, total)
+    setSteps([
+      0,
+      increment,
+      increment*2,
+      increment*3,
+    ])
+
+  }, [amountIssue, total]);
 
   return (
     <div className="container my-5">
@@ -57,9 +67,8 @@ export default function ProposalStepProgress({ amountIssue, isDisputed }) {
                 <span className={`color-${handlerColorState()}`}>
                   {amountIssue}
                 </span>
-                /{base} ORACLES
+                /{total} ORACLES
                 <span className={`color-${handlerColorState()}`}>
-                  {" "}
                   ({percentage}%)
                 </span>
               </div>
@@ -81,7 +90,7 @@ export default function ProposalStepProgress({ amountIssue, isDisputed }) {
                         }
                       )}
                     />
-                    <span className="caption mt-3 p-0">0%</span>
+                    <span className="caption mt-3 p-0">{steps[0]?.toFixed()}%</span>
                   </div>
                   <div className="position-absolute step step-20 d-flex align-items-center flex-column">
                     <div
@@ -93,7 +102,7 @@ export default function ProposalStepProgress({ amountIssue, isDisputed }) {
                         }
                       )}
                     />
-                    <span className="caption mt-3 p-0">1%</span>
+                    <span className="caption mt-3 p-0">{steps[1]?.toFixed()}%</span>
                   </div>
                   <div className="position-absolute step step-40 d-flex align-items-center flex-column">
                     <div
@@ -105,7 +114,7 @@ export default function ProposalStepProgress({ amountIssue, isDisputed }) {
                         }
                       )}
                     />
-                    <span className="caption mt-3 p-0">2%</span>
+                    <span className="caption mt-3 p-0">{steps[2]?.toFixed()}%</span>
                   </div>
                   <div className="position-absolute step step-80 d-flex align-items-center flex-column">
                     <div
@@ -117,11 +126,11 @@ export default function ProposalStepProgress({ amountIssue, isDisputed }) {
                         }
                       )}
                     />
-                    <span className="caption mt-3 p-0">3%</span>
+                    <span className="caption mt-3 p-0">{steps[3]?.toFixed()}%</span>
                   </div>
                   <div className="position-absolute step step-100 d-flex align-items-center flex-column">
                     <div className="rounded-circle step-dots bg-transparent" />
-                    <span className="caption mt-3 p-0">{">3%"}</span>
+                    <span className="caption mt-3 p-0">{">"}{steps[3]?.toFixed()}</span>
                   </div>
                 </div>
               </div>
