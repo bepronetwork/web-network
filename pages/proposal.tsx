@@ -16,6 +16,7 @@ import {formatDate} from '@helpers/formatDate';
 import {handlePercentage} from '@helpers/handlePercentage';
 import {IssueData} from '@interfaces/issue-data';
 import {addToast} from '@reducers/add-toast';
+import ProposalStepProgress from '@components/proposal-step-progress';
 
 interface ProposalBepro {
   disputes: string;
@@ -119,7 +120,7 @@ export default function PageProposal() {
         }
         beproStaked={amountIssue}/>
       <ProposalProgress developers={usersAddresses}/>
-
+      <ProposalStepProgress amountIssue={proposalBepro?.prAmounts} isDisputed={proposalBepro?.isDisputed}/>
       <PageActions
         state={'pull request'}
         developers={[]}
