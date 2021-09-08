@@ -47,6 +47,9 @@ const options_time = [
   },
 ];
 
+const customStyles = {
+  
+}
 export default function PageDevelopers() {
   const {dispatch, state: {loading, currentAddress}} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
@@ -89,7 +92,7 @@ export default function PageDevelopers() {
 
   return (<>
     <div>
-      <PageHero title="Find issue to work"/>
+      <PageHero title="Find issues to work"/>
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10">
@@ -101,6 +104,15 @@ export default function PageDevelopers() {
                   defaultValue={filtersByIssueState[0]}
                   options={filtersByIssueState}
                   onChange={handleChangeFilterByState}
+                  styles={{
+                    option: styles => ({
+                      ...styles,
+                      ':active': {
+                        ...styles[':active'],
+                        backgroundColor: '#1825AD'
+                      },
+                    }),
+                  }}
                 />
               </div>
             </div>
