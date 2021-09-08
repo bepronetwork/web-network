@@ -32,7 +32,6 @@ export default function ProposalStepProgress({ amountIssue, isDisputed, createdA
       new Date(),
       new Date(createdAt)
     )
-    debugger;
     if (daysAgo < 3 && isDisputed) {
       setStateIssue('Accepted')
     }
