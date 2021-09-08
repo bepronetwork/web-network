@@ -31,14 +31,13 @@ export default function MyIssues() {
     <div className="col-md-10">
       <div className="mt-4">
         <NothingFound 
-          description="No issues"
-          action={
-            <Link href="/create-issue" passHref>
-              <button className="btn btn-md btn-primary">
-                create one
-              </button>
-            </Link>
-          } />
+          description="No issues">
+          <Link href="/create-issue" passHref>
+            <button className="btn btn-md btn-primary">
+              create one
+            </button>
+          </Link>
+        </NothingFound>
       </div>
     </div>)
   else issueChild = issues.map(issue =>
