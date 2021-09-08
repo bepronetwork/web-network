@@ -4,15 +4,15 @@ import React, { ReactNode } from "react";
 
 type NothingFoundProps = {
   description: string;
-  action?: ReactNode;
+  children: ReactNode;
 }
 
-export default function NothingFound({ description, action }: NothingFoundProps) {
+export default function NothingFound({ description, children }: NothingFoundProps) {
   return (
       <div className="d-flex flex-column align-items-center gap-4">
         <SearchIcon />
         <p className="text-center text-uppercase fw-bold mb-0">{description}</p>
-        { action || null }
+        { children }
       </div>
   );
 }
