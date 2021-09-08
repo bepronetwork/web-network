@@ -47,9 +47,6 @@ const options_time = [
   },
 ];
 
-const customStyles = {
-  
-}
 export default function PageDevelopers() {
   const {dispatch, state: {loading, currentAddress}} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
