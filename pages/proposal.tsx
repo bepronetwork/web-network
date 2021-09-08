@@ -120,7 +120,10 @@ export default function PageProposal() {
         }
         beproStaked={amountIssue}/>
       <ProposalProgress developers={usersAddresses}/>
-      <ProposalStepProgress amountIssue={proposalBepro?.prAmounts} isDisputed={proposalBepro?.isDisputed}/>
+      <ProposalStepProgress 
+        amountIssue={proposalBepro?.prAmounts} 
+        createdAt={proposalMicroService} 
+        isDisputed={proposalBepro?.isDisputed}/>
       <PageActions
         state={'pull request'}
         developers={[]}

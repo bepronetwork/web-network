@@ -1,6 +1,7 @@
 import { GetStaticProps } from "next";
 import React, { useEffect, useState } from "react";
 import clsx from "clsx";
+import { differenceInDays } from 'date-fns'
 import {
   handlePercentage,
   handlePercentToRange,
@@ -8,7 +9,7 @@ import {
 } from "@helpers/handlePercentage";
 
 export type StateIssue = "Failed" | "Accepted" | "Open for dispute";
-export default function ProposalStepProgress({ amountIssue, isDisputed }) {
+export default function ProposalStepProgress({ amountIssue, isDisputed, createdAt }) {
   const [total] = useState<number>(500);
   const [stateIssue, setStateIssue] = useState<StateIssue>("Open for dispute");
   const [percentage, setPercentage] = useState<number>(0);
@@ -27,17 +28,22 @@ export default function ProposalStepProgress({ amountIssue, isDisputed }) {
   };
   
   const handlerState = () => {
-    if (isDisputed) {
-      setStateIssue('Open for dispute')
+    const daysAgo = differenceInDays(
+      new Date(),
+      new Date(createdAt)
+    )
+    debugger;
+    if (daysAgo < 3 && isDisputed) {
+      setStateIssue('Accepted')
     }
-    else if (!isDisputed) {
+    else if (daysAgo >= 3 && !isDisputed) {
       setStateIssue('Failed')
     }else{
-      setStateIssue('Accepted')
+      setStateIssue('Open for dispute')
     }
     
   };
-  useEffect(handlerState, [isDisputed])
+  useEffect(handlerState, [isDisputed, createdAt])
 
   useEffect(() => {
     setPercentage(handlePercentage(amountIssue, total)|| 0);
