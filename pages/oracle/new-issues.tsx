@@ -34,14 +34,13 @@ export default function Newissues() {
         issues?.length === 0 &&
         <div className="mt-4">
           <NothingFound 
-          description="No issues in draft"
-          action={
-            <Link href="/create-issue" passHref>
-              <button className="btn btn-md btn-primary">
-                create one
-              </button>
-            </Link>
-          } />
+          description="No issues in draft">
+          <Link href="/create-issue" passHref>
+            <button className="btn btn-md btn-primary">
+              create one
+            </button>
+          </Link>
+        </NothingFound>
         </div>
       }
     </Oracle>

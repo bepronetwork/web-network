@@ -34,14 +34,13 @@ export default function ReadyToMergeIssues() {
         issues?.length === 0 &&
         <div className="mt-4">
           <NothingFound 
-          description="No issues ready to merge"
-          action={
-            <Link href="/create-issue" passHref>
-              <button className="btn btn-md btn-primary">
-                create one
-              </button>
-            </Link>
-          } />
+          description="No issues ready to merge">
+          <Link href="/create-issue" passHref>
+            <button className="btn btn-md btn-primary">
+              create one
+            </button>
+          </Link>
+        </NothingFound>
         </div>
       }
     </Oracle>

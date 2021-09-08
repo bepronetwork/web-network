@@ -111,14 +111,13 @@ export default function PageDevelopers() {
           {issuesFilteredByState.length === 0 && !loading.isLoading ? (
             <div className="col-md-10">
               <NothingFound 
-                description={filterByState.emptyState}
-                action={
-                  <Link href="/create-issue" passHref>
-                    <button className="btn btn-md btn-primary">
-                       create one
-                    </button>
-                  </Link>
-                } />
+                description={filterByState.emptyState}>
+                <Link href="/create-issue" passHref>
+                  <button className="btn btn-md btn-primary">
+                    create one
+                  </button>
+                </Link>
+              </NothingFound>
             </div>
           ) : null}
         </div>
