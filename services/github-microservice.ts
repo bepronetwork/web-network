@@ -49,6 +49,11 @@ export default class GithubMicroService {
     const {data} = await client.get('/issues/');
     return data;
   }
+  
+  static async getIssuesByGhLogin(ghlogin) {
+    const {data} = await client.get(`/issues/githublogin/${ghlogin}`);
+    return data;
+  }
 
   static async getIssuesState(filterState: IssueState) {
     const {data} =  await client.get('/issues',{params: {filterState}});

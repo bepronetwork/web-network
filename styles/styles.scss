@@ -860,7 +860,7 @@ $c_props: ('m': 'margin') !default;
         @each $amount, $multiplier in $spacers {
           &n-#{$amount} {
             @each $value in $values {
-              #{$prop}-#{$value}: -#{$multiplier}rem!important;
+              #{$prop}-#{$value}: -#{$multiplier}!important;
             }
           }
         }
@@ -894,16 +894,6 @@ $c_props: ('m': 'margin') !default;
 .cursor {
   &-pointer {
     cursor: pointer;
-  }
-}
-
-.help-row:hover {
-  + .help-row {
-    margin-top: -1px;
-  }
-
-  &:last-of-type:hover {
-    margin-top: 1px;
   }
 }
 
