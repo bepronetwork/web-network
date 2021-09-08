@@ -19,11 +19,11 @@ export default function MyIssues() {
       return;
 
     GithubMicroService.getUserOf(currentAddress)
-    .then((user)=> GithubMicroService.getIssuesByGhLogin(user.githubLogin))
+    .then((user)=> GithubMicroService.getIssuesByGhLogin(user?.githubLogin))
     .then(setIssues)
   }
 
-  useEffect(getIssueList, [beproInit, myIssues])
+  useEffect(getIssueList, [currentAddress,beproInit, myIssues])
 
   if (!beproInit || !metaMaskWallet)
     issueChild = (<div className="col-md-10">{!metaMaskWallet ? `Connect your wallet` : `Loading`}...</div>)

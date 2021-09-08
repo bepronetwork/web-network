@@ -87,13 +87,14 @@ export default function PageActions({
 
     const redeemTx = addTransaction({type: TransactionTypes.redeemIssue})
     dispatch(redeemTx);
-
+    
     await BeproService.login()
       .then(() => {
         BeproService.network.redeemIssue({issueId,})
                     .then(txInfo => {
                       BeproService.parseTransaction(txInfo, redeemTx.payload)
                                   .then(block => dispatch(updateTransaction(block)));
+                      GithubMicroService.updateIssueState(issueId, 'redeemed');
                       BeproService.getBalance("bepro")
                                   .then((bepro) => dispatch(changeBalance({ bepro })));
                       handleBeproService();
