@@ -28,10 +28,10 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
                 return "blue"
             }
             case "ready":{
-                return "green"
+                return "success"
             }
             case "done":{
-                return "green"
+                return "success"
             }
             case "disputed":{
                 return "red"
