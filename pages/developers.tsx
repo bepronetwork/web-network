@@ -1,5 +1,6 @@
 import { GetStaticProps } from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
+import Link from 'next/link';
 import PageHero from "@components/page-hero";
 import GithubMicroService from '@services/github-microservice';
 import ListIssues from '@components/list-issues';
@@ -8,6 +9,7 @@ import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';
 import {IssueData} from '@interfaces/issue-data';
 import {BeproService} from '@services/bepro-service';
+import NothingFound from '@components/nothing-found';
 
 type Filter = {
   label: string;
@@ -108,9 +110,14 @@ export default function PageDevelopers() {
           <ListIssues listIssues={issuesFilteredByState} />
           {issuesFilteredByState.length === 0 && !loading.isLoading ? (
             <div className="col-md-10">
-              <h4>
-                {`${filterByState.emptyState}`}
-              </h4>
+              <NothingFound 
+                description={filterByState.emptyState}>
+                <Link href="/create-issue" passHref>
+                  <button className="btn btn-md btn-primary">
+                    create one
+                  </button>
+                </Link>
+              </NothingFound>
             </div>
           ) : null}
         </div>
