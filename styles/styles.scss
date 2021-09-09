@@ -927,3 +927,11 @@ $c_props: ('m': 'margin') !default;
 .toast-container {
   z-index: $zindex-tooltip+1;
 }
+
+#filterByIssueState{
+  .react-select__option{
+    &:active{
+      background-color: $bg-blue-shadow;
+    }
+  }
+}

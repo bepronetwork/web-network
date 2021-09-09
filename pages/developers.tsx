@@ -101,15 +101,6 @@ export default function PageDevelopers() {
                   defaultValue={filtersByIssueState[0]}
                   options={filtersByIssueState}
                   onChange={handleChangeFilterByState}
-                  styles={{
-                    option: styles => ({
-                      ...styles,
-                      ':active': {
-                        ...styles[':active'],
-                        backgroundColor: '#1825AD'
-                      },
-                    }),
-                  }}
                 />
               </div>
             </div>
