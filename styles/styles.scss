@@ -551,8 +551,8 @@ label {
     background-color: $blue;
     color: $white;
   }
-  &.green {
-    background-color: $green;
+  &.success {
+    background-color: $success;
   }
   &.red {
     background-color: $red;
@@ -621,8 +621,8 @@ label {
 .bg-opac {
   background-color: rgba($white, 0.1);
 }
-.bg-green {
-  background-color: $green;
+.bg-success {
+  background-color: $success;
 }
 .bg-purple {
   background-color: $purple;
@@ -637,14 +637,14 @@ label {
 .color-secondary {
   color: $secondary;
 }
-.color-green {
-  color: $green;
-}
 .color-purple {
   color: $purple;
 }
 .color-red {
   color: $red;
+}
+.color-success {
+  color: $success;
 }
 
 .circle-1 {
@@ -926,4 +926,12 @@ $c_props: ('m': 'margin') !default;
 
 .toast-container {
   z-index: $zindex-tooltip+1;
+}
+
+#filterByIssueState{
+  .react-select__option{
+    &:active{
+      background-color: $bg-blue-shadow;
+    }
+  }
 }
