@@ -21,7 +21,7 @@ export default function ProposalStepProgress({ amountIssue, isDisputed }) {
     if (!isDisputed) {
       return "red";
     }
-    return "green";
+    return "success";
   };
   
   const handlerState = () => {

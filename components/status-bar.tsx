@@ -12,7 +12,7 @@ export default function StatusBar() {
   }
 
   function getIndicatorClasses() {
-    return `d-inline-block me-2 rounded bg-${microServiceReady === null ? `warning` : microServiceReady ? `green` : `danger`}`
+    return `d-inline-block me-2 rounded bg-${microServiceReady === null ? `warning` : microServiceReady ? `success` : `danger`}`
   }
 
   useEffect(initialize, []);
