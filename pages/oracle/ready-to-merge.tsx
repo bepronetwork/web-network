@@ -1,11 +1,13 @@
 import { GetStaticProps } from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
+import Link from 'next/link';
 import ListIssues from '@components/list-issues';
 import GithubMicroService from '@services/github-microservice';
 import Oracle from '@components/oracle';
 import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';
 import {IssueData} from '@interfaces/issue-data';
+import NothingFound from '@components/nothing-found';
 
 export default function ReadyToMergeIssues() {
   const {dispatch} = useContext(ApplicationContext);
@@ -30,7 +32,16 @@ export default function ReadyToMergeIssues() {
       <ListIssues listIssues={issues} />
       {
         issues?.length === 0 &&
-        <h3 className="text-center">No issues ready to merge</h3>
+        <div className="mt-4">
+          <NothingFound 
+          description="No issues ready to merge">
+          <Link href="/create-issue" passHref>
+            <button className="btn btn-md btn-primary">
+              create one
+            </button>
+          </Link>
+        </NothingFound>
+        </div>
       }
     </Oracle>
   );
