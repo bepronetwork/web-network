@@ -59,6 +59,11 @@ export default class GithubMicroService {
     const {data} =  await client.get('/issues',{params: {filterState}});
     return data;
   }
+  
+  static async updateIssueState(issueID: string, state: IssueState) {
+    const {data} =  await client.put(`/issues/${issueID}`, {state});
+    return data;
+  }
 
   static async getIssueId(issueId: string | string[]) {
     return client.get(`/issues/${issueId}`)
