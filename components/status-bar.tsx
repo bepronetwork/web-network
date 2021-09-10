@@ -10,9 +10,11 @@ export default function StatusBar() {
   function neverEndingUpdate() {
     const past = +new Date();
     GithubMicroService.getHealth()
-                      .then(state => dispatch(changeMicroServiceReady(state)))
-                      .then(_ => setMs(+new Date() - past))
-                      .then(_ => setTimeout(neverEndingUpdate, 60*1000));
+                      .then(state => {
+                        setMs(+new Date() - past)
+                        dispatch(changeMicroServiceReady(state))
+                        setTimeout(neverEndingUpdate, 60*1000)
+                      })
   }
 
   function renderNetworkStatus() {
