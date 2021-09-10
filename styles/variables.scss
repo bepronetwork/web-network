@@ -23,6 +23,8 @@ $bg-blue-shadow: #1825AD;
 $toast-font-size: 1rem;
 $m: 16px;
 
+$more-bg: ('white-50': $gray, 'orange': $warning);
+
 $utilities: map-merge(
   $utilities, (
                 'shadow': map-merge(map-get($utilities, 'shadow'), (state: hover)),
@@ -30,7 +32,7 @@ $utilities: map-merge(
                 'border-top': map-merge(map-get($utilities, 'border-top'), (state: hover)),
                 'border-color': map-merge(map-get($utilities, 'border-color'), (state: hover)),
                 'color': map-merge(map-get($utilities, 'color'), (state: hover)),
-                'background-color': map-merge(map-get($utilities, 'background-color'), (state: hover))
+                'background-color': map-merge(map-get($utilities, 'background-color'), (state: hover, values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-bg)))
         )
 )
 
