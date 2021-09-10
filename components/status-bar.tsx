@@ -15,15 +15,6 @@ export default function StatusBar() {
                       .then(_ => setTimeout(neverEndingUpdate, 60*1000));
   }
 
-  function initialize() {
-    GithubMicroService.getHealth()
-                      .then(state => dispatch(changeMicroServiceReady(state)));
-  }
-
-  function getIndicatorClasses() {
-    return `d-inline-block me-2 rounded bg-${microServiceReady === null ? `warning` : microServiceReady ? `success` : `danger`}`
-  }
-
   function renderNetworkStatus() {
     let info;
 
