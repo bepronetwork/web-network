@@ -14,7 +14,9 @@ export default function TransactionsStateIndicator() {
   const [activeTransaction, setActiveTransaction] = useState<Transaction | null>(null)
 
   function updateLoadingState() {
-    setLoading(myTransactions.some(({status}) => status !== TransactionStatus.completed));
+    const loading = myTransactions.some(({status}) => status !== TransactionStatus.completed)
+    setLoading(loading);
+    setShowOverlay(loading);
   }
 
   function onActiveTransactionChange(transaction) {
