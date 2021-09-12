@@ -15,6 +15,7 @@ import {addTransaction} from '@reducers/add-transaction';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import CreatePullRequestModal from '@components/create-pull-request-modal';
+import { TransactionStatus } from '@interfaces/enums/transaction-status';
 
 interface pageActions {
   issueId: string;
@@ -59,7 +60,7 @@ export default function PageActions({
 }: pageActions) {
   const {
     dispatch,
-    state: { githubHandle, currentAddress },
+    state: { githubHandle, currentAddress, myTransactions },
   } = useContext(ApplicationContext);
 
   const [showPRModal, setShowPRModal] = useState(false);
@@ -83,6 +84,11 @@ export default function PageActions({
     }
   }
 
+  const isReedemButtonDisable = () => [
+    !myTransactions.find(transactions=> 
+      transactions.type === TransactionTypes.redeemIssue 
+      && transactions.status === TransactionStatus.pending)]
+      .some(values => values === false)
   async function handleRedeem() {
 
     const redeemTx = addTransaction({type: TransactionTypes.redeemIssue})
@@ -90,7 +96,7 @@ export default function PageActions({
     
     await BeproService.login()
       .then(() => {
-        BeproService.network.redeemIssue({issueId,})
+        BeproService.network.redeemIssue({issueId})
                     .then(txInfo => {
                       BeproService.parseTransaction(txInfo, redeemTx.payload)
                                   .then(block => dispatch(updateTransaction(block)));
@@ -98,6 +104,7 @@ export default function PageActions({
                       BeproService.getBalance("bepro")
                                   .then((bepro) => dispatch(changeBalance({ bepro })));
                       handleBeproService();
+                      handleMicroService();
                     })
       })
       .catch((err) => {
@@ -113,6 +120,7 @@ export default function PageActions({
       !finalized && (
         <button
           className="btn btn-md btn-primary mx-1 px-4"
+          disabled={isReedemButtonDisable()}
           onClick={handleRedeem}
         >
           Redeem
