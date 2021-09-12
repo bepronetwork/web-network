@@ -9,3 +9,5 @@ export const formatNumberToNScale = (number: number) => {
   if (number >= 1e9 && number < 1e12) return +(number / 1e9).toFixed(1) + "B";
   if (number >= 1e12) return +(number / 1e12).toFixed(1) + "T";
 };
+
+export const formatNumberToCurrency = (number: number) => new Intl.NumberFormat('en').format(number);
