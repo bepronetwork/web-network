@@ -7,8 +7,16 @@ export default function StatusBar() {
   const {dispatch, state: {microServiceReady}} = useContext(ApplicationContext);
 
   function initialize() {
-    GithubMicroService.getHealth()
-                      .then(state => dispatch(changeMicroServiceReady(state)));
+    let timer;
+    
+    const check = () => GithubMicroService.getHealth()
+      .then(state => dispatch(changeMicroServiceReady(state)));
+
+    setTimeout(() => {
+      check();
+      timer = setInterval(() => check(), 60000);
+    }, 1);
+    return () => clearInterval(timer);
   }
 
   function getIndicatorClasses() {
