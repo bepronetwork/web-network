@@ -5,6 +5,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import {BeproService} from '@services/bepro-service';
 import GithubMicroService, {User} from '@services/github-microservice';
 import InputNumber from '@components/input-number';
+import ConnectGithub from "@components/connect-github";
 import {ApplicationContext} from '@contexts/application';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import {addTransaction} from '@reducers/add-transaction';
@@ -209,13 +210,21 @@ export default function PageCreateIssue() {
                           onChange={e => setIssueDescription(e.target.value)}/>
               </div>
               <div className="d-flex justify-content-center align-items-center mt-4">
-                {!allowedTransaction ?
-                  <button className="btn btn-lg btn-opac me-3 px-5" onClick={allowCreateIssue}>Approve</button>
-                  : null
-                }
-                <button className="btn btn-lg btn-primary px-4" disabled={isButtonDisabled()}
-                        onClick={createIssue}>Create Issue
-                </button>
+                {!githubHandle ? (
+                  <div className="mt-3 mb-0">
+                    <ConnectGithub />
+                  </div>
+                ) : (
+                  <>
+                    {!allowedTransaction ?
+                      <button className="btn btn-lg btn-opac me-3 px-5" onClick={allowCreateIssue}>Approve</button>
+                      : null
+                    }
+                    <button className="btn btn-lg btn-primary px-4" disabled={isButtonDisabled()}
+                            onClick={createIssue}>Create Issue
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
