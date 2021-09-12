@@ -13,7 +13,7 @@ import {toastSuccess} from '@contexts/reducers/add-toast'
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import {BlockTransaction,} from '@interfaces/transaction';
-
+import {formatNumberToCurrency} from '@helpers/formatNumber'
 interface Amount {
   value?: string,
   formattedValue: string,
@@ -192,7 +192,7 @@ export default function PageCreateIssue() {
                 onBlur={handleIssueAmountBlurChange}
                 helperText={
                   <>
-                    {balance} $BEPRO
+                    {formatNumberToCurrency(balance)} $BEPRO
                     {!allowedTransaction && (
                       <button
                         className="btn btn-opac ml-1 py-1"
