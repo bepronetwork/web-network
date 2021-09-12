@@ -14,6 +14,7 @@ import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import {BlockTransaction,} from '@interfaces/transaction';
 import {formatNumberToCurrency} from '@helpers/formatNumber'
+import { TransactionStatus } from '@interfaces/enums/transaction-status';
 interface Amount {
   value?: string,
   formattedValue: string,
@@ -26,7 +27,7 @@ export default function PageCreateIssue() {
   const [issueAmount, setIssueAmount] = useState<Amount>({value: '0', formattedValue: '0', floatValue: 0});
   const [balance, setBalance] = useState(0);
   const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
-  const {dispatch, state: {currentAddress, githubHandle}} = useContext(ApplicationContext);
+  const {dispatch, state: {currentAddress, githubHandle, myTransactions}} = useContext(ApplicationContext);
   const [currentUser, setCurrentUser] = useState<User>();
   const router = useRouter()
 
@@ -123,15 +124,21 @@ export default function PageCreateIssue() {
 
   const verifyAmountBiggerThanBalance = (): boolean => !(issueAmount.floatValue > Number(balance))
 
-  const isButtonDisabled = (): boolean => {
-    return [
+  const verifyTransactionState = (type: TransactionTypes): boolean => !!myTransactions.find(transactions=> transactions.type === type && transactions.status === TransactionStatus.pending);
+  
+  const isCreateButtonDisabled = (): boolean => [
       allowedTransaction,
       issueContentIsValid(),
       verifyAmountBiggerThanBalance(),
       issueAmount.floatValue > 0,
-      !!issueAmount.formattedValue
+      !!issueAmount.formattedValue,
+      !verifyTransactionState(TransactionTypes.createIssue),
     ].some(value => value === false);
-  }
+
+  const isApproveButtonDisable = (): boolean =>[
+    issueAmount.floatValue > 0,
+    !verifyTransactionState(TransactionTypes.approveTransactionalERC20Token),
+  ].some(value => value === false)
 
   const handleIssueAmountBlurChange = () => {
     if (issueAmount.floatValue > Number(balance)) {
@@ -217,10 +224,10 @@ export default function PageCreateIssue() {
                 ) : (
                   <>
                     {!allowedTransaction ?
-                      <button className="btn btn-lg btn-opac me-3 px-5" onClick={allowCreateIssue}>Approve</button>
+                      <button className="btn btn-lg btn-opac me-3 px-5" disabled={isApproveButtonDisable()} onClick={allowCreateIssue}>Approve</button>
                       : null
                     }
-                    <button className="btn btn-lg btn-primary px-4" disabled={isButtonDisabled()}
+                    <button className="btn btn-lg btn-primary px-4" disabled={isCreateButtonDisabled()}
                             onClick={createIssue}>Create Issue
                     </button>
                   </>
