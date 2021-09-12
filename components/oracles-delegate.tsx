@@ -7,9 +7,10 @@ import NetworkTxButton from './network-tx-button';
 import {changeBalance} from '@reducers/change-balance';
 import {BeproService} from '@services/bepro-service';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
+import { TransactionStatus } from '@interfaces/enums/transaction-status';
 
 function OraclesDelegate(): JSX.Element {
-  const {dispatch, state: {oracles, beproInit, metaMaskWallet, balance: {bepro: beproBalance, staked}}} = useContext(ApplicationContext);
+  const {dispatch, state: {oracles, beproInit, metaMaskWallet,myTransactions, balance: {bepro: beproBalance, staked}}} = useContext(ApplicationContext);
   const [tokenAmount, setTokenAmount] = useState<number>(0);
   const [delegatedTo, setDelegatedTo] = useState<string>("");
   const [delegatedAmount, setDelegatedAmount] = useState(0);
@@ -34,6 +35,12 @@ function OraclesDelegate(): JSX.Element {
   }
 
   function handleTransition() {
+    handleChangeOracles({
+      floatValue: 0,
+      formattedValue: '0',
+      value: '0',
+    })
+    setDelegatedTo("")
     setError("");
     BeproService.network.getBEPROStaked().then(staked => dispatch(changeBalance({staked})));
   }
@@ -48,6 +55,11 @@ function OraclesDelegate(): JSX.Element {
 
   }
 
+  const isButtonDisabled = (): boolean => [
+    tokenAmount > 0,
+    delegatedTo.length > 0,
+    !myTransactions.find(transaction => transaction.status === TransactionStatus.pending && transaction.type === TransactionTypes.delegateOracles)
+  ].some(values => values === false)
   useEffect(updateAmounts, [beproInit, metaMaskWallet, oracles, beproBalance, staked]);
 
   return (
@@ -72,15 +84,19 @@ function OraclesDelegate(): JSX.Element {
         </div>
         {error && <p className="p-small text-danger mt-2">{error}</p>}
 
-        <NetworkTxButton txMethod="delegateOracles"
-                         txParams={{tokenAmount, delegatedTo}}
-                         txType={TransactionTypes.delegateOracles}
-                         txCurrency="Oracles"
-                         modalTitle="Delegate oracles"
-                         modalDescription="Delegate oracles to an address"
-                         onTxStart={handleClickVerification}
-                         onSuccess={handleTransition}
-                         onFail={setError} buttonLabel="delegate" />
+        <NetworkTxButton 
+          txMethod="delegateOracles"
+          txParams={{tokenAmount, delegatedTo}}
+          txType={TransactionTypes.delegateOracles}
+          txCurrency="Oracles"
+          modalTitle="Delegate oracles"
+          modalDescription="Delegate oracles to an address"
+          onTxStart={handleClickVerification}
+          onSuccess={handleTransition}
+          onFail={setError} 
+          buttonLabel="delegate"
+          disabled={isButtonDisabled()}
+          />
       </div>
     </div>
   );

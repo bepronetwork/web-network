@@ -58,7 +58,7 @@ function networkTxButton({
     BeproService.network[txMethod](txParams)
       .then((answer) => {
         if (answer.status) {
-          onSuccess()
+          onSuccess && onSuccess();
           dispatch(addToast({
                               type: 'success',
                               title: 'Success',
@@ -85,7 +85,7 @@ function networkTxButton({
   }
 
   function getButtonClass() {
-    return `btn btn-md btn-lg mt-3 btn-primary ${!children && !buttonLabel && `visually-hidden` || ``}`
+    return `btn btn-md btn-lg w-100 mt-3 btn-primary ${!children && !buttonLabel && `visually-hidden` || ``}`
   }
 
   function getDivClass() {
