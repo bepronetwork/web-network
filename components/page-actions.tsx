@@ -36,6 +36,7 @@ interface pageActions {
   githubLogin?: string;
   mergeId?: string;
   isDisputed?: boolean;
+  canOpenPR?: boolean;
 }
 
 export default function PageActions({
@@ -57,6 +58,7 @@ export default function PageActions({
   githubLogin,
   mergeId,
   isDisputed,
+  canOpenPR
 }: pageActions) {
   const {
     dispatch,
@@ -152,11 +154,12 @@ export default function PageActions({
     return (
       !finalized &&
       githubLogin && (
-        <button className="btn btn-md btn-primary ms-1 px-4"
-                onClick={() => setShowPRModal(true)}
-                disabled={!githubHandle || !currentAddress}>
-          Create Pull Request
-        </button>
+          <button 
+            className="btn btn-md btn-primary ms-1 px-4"
+            onClick={() => setShowPRModal(true)}
+            disabled={!githubHandle || !currentAddress || !canOpenPR}>
+            Create Pull Request
+          </button>
       )
     );
   }
