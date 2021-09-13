@@ -70,7 +70,7 @@ export default function PageIssue() {
       getCurrentUserMicroService();
     } else if (id) getsIssueMicroService();
 
-    // if(githubHandle) getRepoForked();
+    if(githubHandle) getRepoForked();
   };
   useEffect(gets, [githubHandle,currentAddress, id]);
 
