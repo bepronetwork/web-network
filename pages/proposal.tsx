@@ -7,18 +7,15 @@ import ProposalProgress from '@components/proposal-progress';
 import {useRouter} from 'next/router';
 import {ApplicationContext} from '@contexts/application';
 import {BeproService} from '@services/bepro-service';
-import GithubMicroService, {
-  ProposalData,
-  User,
-} from '@services/github-microservice';
-import {toNumber} from 'lodash';
+import GithubMicroService, {ProposalData, User,} from '@services/github-microservice';
 import {formatDate} from '@helpers/formatDate';
 import {handlePercentage} from '@helpers/handlePercentage';
 import {IssueData} from '@interfaces/issue-data';
 import {addToast} from '@reducers/add-toast';
-import ProposalStepProgress from '@components/proposal-step-progress';
-import StepProgressBar from '@components/step-progress-bar';
+
+import ProposalProgressBar from '@components/proposal-progress-bar';
 import {changeOraclesState} from '@reducers/change-oracles';
+import CustomContainer from '@components/custom-container';
 
 interface ProposalBepro {
   disputes: string;
@@ -124,14 +121,11 @@ export default function PageProposal() {
         }
         beproStaked={amountIssue}/>
       <ProposalProgress developers={usersAddresses}/>
-      <div className="container my-5">
-        <StepProgressBar issueAmount={+proposalBepro?.prAmounts}
-        createdAt={proposalMicroService}isDisputed={proposalBepro?.isDisputed} stakedAmount={oracles?.tokensLocked} />
-      </div>
-      <ProposalStepProgress
-        amountIssue={proposalBepro?.prAmounts}
-        createdAt={proposalMicroService}
-        isDisputed={proposalBepro?.isDisputed}/>
+      <CustomContainer>
+        <div className="col-6">
+          <ProposalProgressBar issueDisputeAmount={+proposalBepro?.disputes} isDisputed={proposalBepro?.isDisputed} stakedAmount={+oracles?.tokensLocked} />
+        </div>
+      </CustomContainer>
       <PageActions
         state={'pull request'}
         developers={[]}
@@ -145,7 +139,7 @@ export default function PageProposal() {
         UrlGithub={`https://github.com/bepronetwork/bepro-js-edge/pull/${proposalMicroService?.pullRequest.githubId}`}
       />
 
-      <ProposalAddresses addresses={usersAddresses} />
+      <ProposalAddresses addresses={usersAddresses} currency="$BEPRO" />
     </>
   );
 }
