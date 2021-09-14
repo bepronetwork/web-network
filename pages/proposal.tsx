@@ -17,6 +17,8 @@ import {handlePercentage} from '@helpers/handlePercentage';
 import {IssueData} from '@interfaces/issue-data';
 import {addToast} from '@reducers/add-toast';
 import ProposalStepProgress from '@components/proposal-step-progress';
+import StepProgressBar from '@components/step-progress-bar';
+import {changeOraclesState} from '@reducers/change-oracles';
 
 interface ProposalBepro {
   disputes: string;
@@ -39,7 +41,7 @@ interface usersAddresses {
 export default function PageProposal() {
   const router = useRouter();
   const {id, issueId} = router.query;
-  const { dispatch, state: {currentAddress}, } = useContext(ApplicationContext);
+  const { dispatch, state: {currentAddress, oracles}, } = useContext(ApplicationContext);
 
   const [proposalBepro, setProposalBepro] = useState<ProposalBepro>();
   const [proposalMicroService, setProposalMicroService] = useState<ProposalData>();
@@ -74,7 +76,7 @@ export default function PageProposal() {
 
   function getIssueAmount() {
     return BeproService.network.getIssueById({issueId: id})
-                .then(issue => setAmountIssue(issue.tokensStaked))
+                       .then(issue => setAmountIssue(issue.tokensStaked))
   }
 
   function updateUsersAddresses(proposal: ProposalBepro) {
@@ -99,9 +101,11 @@ export default function PageProposal() {
 
   function loadProposalData() {
     if (issueId && id && currentAddress) {
-      getIssueAmount()
-        .then(_ => getProposalData())
-        .then(_ => getProposal())
+      BeproService.network.getOraclesSummary({address: currentAddress})
+                  .then(oracles => dispatch(changeOraclesState(oracles)))
+                  .then(_ => getIssueAmount())
+                  .then(_ => getProposalData())
+                  .then(_ => getProposal());
     }
   }
 
@@ -120,9 +124,13 @@ export default function PageProposal() {
         }
         beproStaked={amountIssue}/>
       <ProposalProgress developers={usersAddresses}/>
-      <ProposalStepProgress 
-        amountIssue={proposalBepro?.prAmounts} 
-        createdAt={proposalMicroService} 
+      <div className="container my-5">
+        <StepProgressBar issueAmount={+proposalBepro?.prAmounts}
+        createdAt={proposalMicroService}isDisputed={proposalBepro?.isDisputed} stakedAmount={oracles?.tokensLocked} />
+      </div>
+      <ProposalStepProgress
+        amountIssue={proposalBepro?.prAmounts}
+        createdAt={proposalMicroService}
         isDisputed={proposalBepro?.isDisputed}/>
       <PageActions
         state={'pull request'}

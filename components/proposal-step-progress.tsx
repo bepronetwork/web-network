@@ -26,7 +26,7 @@ export default function ProposalStepProgress({ amountIssue, isDisputed, createdA
     }
     return "success";
   };
-  
+
   const handlerState = () => {
     const daysAgo = differenceInDays(
       new Date(),
@@ -40,7 +40,7 @@ export default function ProposalStepProgress({ amountIssue, isDisputed, createdA
     }else{
       setStateIssue('Open for dispute')
     }
-    
+
   };
   useEffect(handlerState, [isDisputed, createdAt])
 
@@ -63,9 +63,7 @@ export default function ProposalStepProgress({ amountIssue, isDisputed, createdA
         <div className="col-md-10">
           <div className="col-md-6 mb-5">
             <div className="d-flex align-items-center justify-content-between mb-4">
-              <h4
-                className={`h4 m-0 text-capitalize color-${handlerColorState()}`}
-              >
+              <h4 className={`h4 m-0 text-capitalize color-${handlerColorState()}`}>
                 {stateIssue}
               </h4>
               <div className="smallCaption ml-5 align-items-center">
@@ -83,8 +81,7 @@ export default function ProposalStepProgress({ amountIssue, isDisputed, createdA
                 <div
                   className={`progress-bar bg-${handlerColorState()}`}
                   role="progressbar"
-                  style={{ width: `${progress}%` }}
-                >
+                  style={{ width: `${progress}%` }}>
                   <div className="position-absolute step step-0 d-flex align-items-center flex-column">
                     <div
                       className={clsx(
