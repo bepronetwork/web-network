@@ -2,6 +2,7 @@ import {useContext, useEffect, useState,} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import {changeMicroServiceReady} from '@reducers/change-microservice-ready';
 import GithubMicroService from '@services/github-microservice';
+import Link from 'next/link';
 
 export default function StatusBar() {
   const {dispatch, state: {microServiceReady}} = useContext(ApplicationContext);
@@ -11,8 +12,8 @@ export default function StatusBar() {
     const past = +new Date();
     GithubMicroService.getHealth()
                       .then(state => {
-                        setMs(+new Date() - past)
                         dispatch(changeMicroServiceReady(state))
+                        setMs(+new Date() - past);
                         setTimeout(neverEndingUpdate, 60*1000)
                       })
   }
@@ -32,7 +33,7 @@ export default function StatusBar() {
 
     return <>
       <span className={indicatorClass} style={indicatorStyle} />
-      <span className="text-uppercase fs-7">{info[1]} {ms}ms</span>
+      <span className="text-uppercase fs-7 me-5">{info[1]} {ms}ms</span>
     </>
   }
 
@@ -42,6 +43,8 @@ export default function StatusBar() {
     <div className="position-fixed bg-dark bottom-0 w-100 px-3 py-1 d-flex" id="status-bar">
       <div className="d-flex align-items-center">
         {renderNetworkStatus()}
+        <span className="mx-5 fs-smallest">Bepro Network Services and BEPRO Token ($BEPRO) are not available in Excluded Jurisdictions.
+By accessing and using the interface you agree with our <a href="https://bepro-landing.herokuapp.com/terms" target="_blank">Terms & Conditions</a></span>
       </div>
       <div className="px-2">|</div>
       <div className="d-flex align-items-center">
