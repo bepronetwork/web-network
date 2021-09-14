@@ -9,6 +9,7 @@ import ApplicationContextProvider from "@contexts/application";
 import MobileInformation from "@components/mobile-information";
 import { isMobile } from "react-device-detect";
 import MobileLayout from "@components/mobile-layout";
+import StatusBar from '@components/status-bar';
 
 export default function App({ Component, pageProps }: AppProps) {
   if (isMobile) {
@@ -32,6 +33,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <MainNav />
           <WebThreeDialog />
           <Component {...pageProps} />
+          <StatusBar/>
         </NationDialog>
       </ApplicationContextProvider>
     </>

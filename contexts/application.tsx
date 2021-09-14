@@ -12,7 +12,6 @@ import {changeCurrentAddress} from '@reducers/change-current-address'
 import Loading from '../components/loading';
 import Toaster from '../components/toaster';
 import {addToast} from '@reducers/add-toast';
-import StatusBar from '@components/status-bar';
 
 interface GlobalState {
   state: ApplicationState,
@@ -100,6 +99,5 @@ export default function ApplicationContextProvider({children}) {
     <Loading show={state.loading.isLoading} text={state.loading.text} />
     <Toaster />
     {children}
-    <StatusBar />
   </ApplicationContext.Provider>
 }
