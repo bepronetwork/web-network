@@ -14,6 +14,8 @@ import { handlePercentage } from "@helpers/handlePercentage";
 import {addTransaction} from '@reducers/add-transaction';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
+import Link from 'next/link';
+import ProposalItem from '@components/proposal';
 
 interface Proposal {
   disputes: string;
@@ -28,7 +30,7 @@ interface Proposal {
 }
 
 export default function IssueProposals({ numberProposals, issueId, amount }) {
-  const { dispatch } = useContext(ApplicationContext);
+  const { dispatch, state: {beproStaked} } = useContext(ApplicationContext);
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const ProgressBallRightInitial = 81.7;
 
@@ -95,48 +97,46 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
     gets();
   }, [issueId, numberProposals]);
 
+  function _renderProposals() {
+    return proposals.map(proposal => <ProposalItem proposal={proposal} issueId={issueId} beproStaked={beproStaked} />)
+  }
+
   const renderProposals = () => {
     return proposals.map((proposal) => (
       <div className="content-list-item" key={proposal._id}>
         <div className="list-item-proposal rounded row align-items-center">
-          <div
-            className="col-md-4 mt-3"
-            onClick={() => {
-              router.push({
-                pathname: "/proposal",
-                query: { id: proposal.pullRequestId, issueId: issueId },
-              });
-            }}>
-            <p className={clsx("p-small mb-0", {"text-danger": proposal?.isDisputed,})}>
-              PR #{proposal.pullRequestGithubId}
-            </p>
-          </div>
-          <div className="col-md-4">
-            <div className="content-proposals p-0 mb-2">
-              <div className="d-flex">
-                {proposal.prAmounts.map((prAmount, index) => (
-                  <div
-                    key={index}
-                    className="d-flex flex-column bd-highlight mt-4 me-2"
-                    style={{width: `${handlePercentage(+prAmount, amount)}%`,}}
-                  >
-                    <div className="bd-highlight">
-                      <p
-                        className={clsx("p-small mb-0", {
-                          "text-danger": proposal?.isDisputed,
-                          "color-purple": !proposal?.isDisputed,
-                        })}
-                      >
-                        {handlePercentage(+prAmount, amount)}%
-                      </p>
-                    </div>
-
-                    <div className={clsx("proposal-progress  bd-highlight", {"bg-danger": proposal?.isDisputed, "bg-purple": !proposal?.isDisputed,})} key={index} />
-                  </div>
-                ))}
+          <Link passHref href={{pathname: "/proposal", query: { id: proposal.pullRequestId, issueId: issueId },}}>
+            <>
+              <div className="col-md-4 mt-3 cursor-pointer">
+                <p className={clsx("p-small mb-0", {"text-danger": proposal?.isDisputed,})}>
+                  PR #{proposal.pullRequestGithubId}
+                </p>
               </div>
-            </div>
-          </div>
+              <div className="col-md-4 cursor-pointer">
+                <div className="content-proposals p-0 mb-2">
+                  <div className="d-flex">
+                    {proposal.prAmounts.map((prAmount, index) => (
+                      <div key={index}
+                        className="d-flex flex-column bd-highlight mt-4 me-2"
+                        style={{width: `${handlePercentage(+prAmount, amount)}%`,}}>
+                        <div className="bd-highlight">
+                          <p
+                            className={clsx("p-small mb-0", {
+                              "text-danger": proposal?.isDisputed,
+                              "color-purple": !proposal?.isDisputed,
+                            })}>
+                            {handlePercentage(+prAmount, amount)}%
+                          </p>
+                        </div>
+
+                        <div className={clsx("proposal-progress  bd-highlight", {"bg-danger": proposal?.isDisputed, "bg-purple": !proposal?.isDisputed,})} key={index} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </>
+          </Link>
           <div className="col-md-4">
             <div className="d-flex align-items-center justify-content-end">
               <div className="d-flex flex-column bd-highlight mr-2">
@@ -144,7 +144,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
                   <p className={clsx("smallCaption mb-0", {"text-danger": proposal?.isDisputed, "color-purple": !proposal?.isDisputed,})}>
                     {proposal.disputes}
                   </p>
-                  <p className="smallCaption mb-0">/{amount} Oracles</p>
+                  <p className="smallCaption mb-0">/{beproStaked} Oracles</p>
                 </div>
                 <div className="content-relative">
                   <div className="progress progress-oracle my-1">
@@ -197,7 +197,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
         <div className="col-md-10">
           <div className="content-wrapper mb-4 pb-0">
             <h3 className="smallCaption pb-3">{numberProposals} Proposals</h3>
-            {renderProposals()}
+            {_renderProposals()}
           </div>
         </div>
       </div>

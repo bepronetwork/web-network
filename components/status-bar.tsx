@@ -31,27 +31,24 @@ export default function StatusBar() {
     const indicatorStyle = {height: `.5rem`, width: `.5rem`};
     const indicatorClass = `d-inline-block me-2 rounded bg-${info[0]}`
 
-    return <>
+    return <div>
       <span className={indicatorClass} style={indicatorStyle} />
-      <span className="text-uppercase fs-7 me-5">{info[1]} {ms}ms</span>
-    </>
+      <span className="text-uppercase fs-7">{info[1]} {ms}ms</span>
+    </div>
   }
 
   useEffect(neverEndingUpdate, []);
 
   return (<>
     <div className="position-fixed bg-dark bottom-0 w-100 px-3 py-1 d-flex" id="status-bar">
-      <div className="d-flex align-items-center">
+      <div className="d-flex align-items-center w-100">
         {renderNetworkStatus()}
-        <span className="mx-5 fs-smallest">Bepro Network Services and BEPRO Token ($BEPRO) are not available in Excluded Jurisdictions.
-By accessing and using the interface you agree with our <a href="https://bepro-landing.herokuapp.com/terms" target="_blank">Terms & Conditions</a></span>
-      </div>
-      <div className="px-2">|</div>
-      <div className="d-flex align-items-center">
-        <p className="text-uppercase fs-7 mb-0 text-center family-regular ">
+        <div className="ms-3">|</div>
+        <div className="ms-3 flex-grow-1 text-center fs-7 text-uppercase family-Regular">
           Bepro Network Services and BEPRO Token ($BEPRO) are not available in Excluded Jurisdictions. By accessing and using the interface you agree with our <a href="https://www.bepro.network/terms-and-conditions" className="text-decoration-none">{`Terms & Conditions`}</a>
-        </p>
+        </div>
       </div>
+
     </div>
   </>)
 
