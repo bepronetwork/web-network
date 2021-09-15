@@ -1,5 +1,5 @@
 import clsx from "clsx";
-
+import {formatNumberToCurrency} from 'helpers/formatNumber'
 // This has to be generic.
 // todo: create something like <Tabs /> <TabContainer />
 function OraclesBoxHeader({
@@ -32,7 +32,7 @@ function OraclesBoxHeader({
         )}
       </div>
       {typeof available !== "undefined" && (
-        <span className="badge-opac">{available} Available</span>
+        <span className="badge-opac">{formatNumberToCurrency(available)} Available</span>
       )}
     </div>
   );

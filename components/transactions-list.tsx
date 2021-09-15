@@ -13,7 +13,7 @@ import CrossArrow from '@assets/icons/cross-arrow';
 import ChatBubbles from '@assets/icons/chat-bubbles';
 import ChatBubbleCross from '@assets/icons/chat-bubble-cross';
 import ReturnArrow from '@assets/icons/return-arrow';
-
+import {formatNumberToCurrency} from 'helpers/formatNumber'
 export default function TransactionsList({onActiveTransaction = (transaction) => {}}) {
   const {state: {myTransactions}} = useContext(ApplicationContext);
 
@@ -36,7 +36,7 @@ export default function TransactionsList({onActiveTransaction = (transaction) =>
           {IconMaps[item.type] || <HelpIcon/>}
 
           <div className="ms-3 me-auto">
-            {item.amount && <h6 className="text-white">{item.amount} {item.currency}</h6> || ``}
+            {item.amount && <h6 className="text-white">{formatNumberToCurrency(item.amount)} {item.currency}</h6> || ``}
             <TransactionType type={item.type}/>
           </div>
 

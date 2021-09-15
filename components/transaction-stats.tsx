@@ -4,14 +4,18 @@ import {TransactionStatus} from '@interfaces/enums/transaction-status';
 export default function TransactionStats({status = null}: {status: TransactionStatus}) {
   const ColorMap = {
     [TransactionStatus.pending]: `warning`,
-    [TransactionStatus.processing]: `info`,
+    [TransactionStatus.processing]: `blue-info`,
+    [TransactionStatus.pending]: `warning`,
+    [TransactionStatus.failed]: `red`,
     [TransactionStatus.completed]: `success`,
   }
 
   const StatusMap = {
-    [TransactionStatus.completed]: `Complete`,
     [TransactionStatus.pending]: `Pending`,
     [TransactionStatus.processing]: `Processing`,
+    [TransactionStatus.pending]: `Pending`,
+    [TransactionStatus.failed]: `Rejected`,
+    [TransactionStatus.completed]: `Complete`,
   }
 
   function rowClassName() {
