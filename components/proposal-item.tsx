@@ -1,0 +1,69 @@
+import {Proposal} from '@interfaces/proposal';
+import Link from 'next/link';
+import PercentageProgressBar from '@components/percentage-progress-bar';
+import ProposalProgressSmall from '@components/proposal-progress-small';
+import {addTransaction} from '@reducers/add-transaction';
+import {TransactionTypes} from '@interfaces/enums/transaction-types';
+import {BeproService} from '@services/bepro-service';
+import {updateTransaction} from '@reducers/update-transaction';
+import {useContext} from 'react';
+import {ApplicationContext} from '@contexts/application';
+
+interface Options {
+  proposal: Proposal,
+  issueId: string;
+  amount: number;
+  beproStaked: number;
+  onTakenBack: (error?: boolean) => void;
+}
+
+export default function ProposalItem({proposal, issueId, amount, beproStaked, onTakenBack = () => {}}: Options) {
+  const { dispatch,} = useContext(ApplicationContext);
+
+  async function handleDispute(mergeId) {
+    const disputeTx = addTransaction({type: TransactionTypes.dispute});
+    dispatch(disputeTx);
+
+    await BeproService.network.disputeMerge({issueID: issueId, mergeID: mergeId,})
+                      .then(txInfo => {
+                        BeproService.parseTransaction(txInfo, disputeTx.payload)
+                                    .then(block => dispatch(updateTransaction(block)));
+                      })
+                      .then(() => onTakenBack())
+                      .catch((err) => {
+                        dispatch(updateTransaction({...disputeTx.payload as any, remove: true}));
+                        onTakenBack(true);
+                        console.log("Error creating dispute", err)
+                      })
+  }
+
+  return <>
+    <div className="container-list-item">
+      <div className="rounded row align-items-top">
+          <Link passHref href={{pathname: "/proposal", query: { id: proposal.pullRequestId, issueId: issueId },}}>
+            <div className={`col-4 p-small cursor-pointer ${proposal.isDisputed && `text-danger` || ``}`}>
+              PR #{proposal.pullRequestGithubId}
+            </div>
+          </Link>
+          <Link passHref href={{pathname: "/proposal", query: { id: proposal.pullRequestId, issueId: issueId },}}>
+            <div className="col-4 cursor-pointer d-flex justify-content-start">
+              {proposal.prAmounts.map((value, i) =>
+                <PercentageProgressBar textClass={`smallCaption p-small pb-2 ${proposal.isDisputed ? `text-danger` : `color-purple`}`}
+                                       pgClass={`bg-${proposal.isDisputed ? `danger` : `purple`}`}
+                                       className={i+1 < proposal.prAmounts.length && `me-2` || ``}
+                                       value={value} total={amount} />)}
+            </div>
+          </Link>
+        <div className="col-4 d-flex justify-content-between align-items-center">
+          <ProposalProgressSmall pgClass={`bg-${proposal.isDisputed ? `danger` : `purple`}`}
+                                 value={+proposal.disputes}
+                                 total={beproStaked}
+                                 textClass={`pb-2 ${proposal.isDisputed ? `text-danger` : `color-purple`}`}/>
+          <button className={`ms-3 btn rounded btn-${proposal.isDisputed ? `outline-danger` : `purple`}`} onClick={() => handleDispute(+proposal._id)}>
+            {proposal.isDisputed ? `Failed` : `Dispute`}
+          </button>
+        </div>
+      </div>
+    </div>
+    </>
+}

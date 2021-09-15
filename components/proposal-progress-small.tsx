@@ -1,5 +1,3 @@
-import {Proposal} from '@interfaces/proposal';
-
 interface Options {
   pgClass: string;
   value: number;
