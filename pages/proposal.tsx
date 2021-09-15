@@ -46,7 +46,7 @@ export default function PageProposal() {
   const [networkCid, setNetworkCid] = useState<string>();
   const [isFinalized, setIsFinalized] = useState<boolean>();
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
-  const [issueMicroService, setIssueMicroService] = useState<IssueData>();
+  const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
 
   async function getProposalData() {
     const mergeProposal = await GithubMicroService.getMergeProposalIssue(issueId, id);
@@ -136,7 +136,7 @@ export default function PageProposal() {
         state={'pull request'}
         developers={[]}
         finalized={isFinalized}
-        isIssueinDraft={issueMicroService.state === `draft`}
+        isIssueinDraft={issueMicroService?.state === `draft`}
         addressNetwork={networkCid}
         issueId={issueId?.toString()}
         mergeId={(+id+1).toString()}

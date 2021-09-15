@@ -43,7 +43,7 @@ export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null
 
   function renderColumn(dotLabel, index) {
     const dotClass = `rounded-circle bg-${!percentage || dotLabel >= percentage ? `dark` : issueColor}`;
-    const style = {left: `${index*20}%`};
+    const style = {left: index === 0 ? `1%` : `${index*20}%`};
     const dotStyle = {width: `10px`, height: `10px`};
 
     return <>
@@ -67,7 +67,7 @@ export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null
       </div>
     </div>
     <div className="row">
-      <div className="ms-3 col-12 position-relative">
+      <div className="ms-2 col-12 position-relative">
         <div className="progress bg-dark">
           <div className={`progress-bar bg-${issueColor}`} role="progressbar" style={{width: `${toRepresentationPercent(percentage)}%`}}>
             {columns.map(renderColumn)}
