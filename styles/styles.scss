@@ -466,7 +466,6 @@ p {
   transition: 0.8 ease-in-out;
   &:hover {
     background-color: lighten($bg-shadow, 2);
-    cursor: pointer;
     .h4 {
       color: $white;
     }
@@ -474,19 +473,28 @@ p {
 }
 
 .content-wrapper {
-  background-color: $dark-gray;
+  background-color: $bg-shadow;
   padding: $m * 2;
   border-radius: $m/2;
+
   &.child {
     padding: $m;
-    background-color: $bg-shadow;
+    background-color: $dark-gray;
   }
+
   .content-list-item {
     margin-left: -$m*2;
     margin-right: -$m*2;
     padding: $m $m * 2;
-    background-color: $bg-shadow;
+    background-color: $dark-gray;
     border-top: 2px solid rgba($black, 0.2);
+  }
+
+  .rounded.row {
+    margin-left: -$m*2;
+    margin-right: -$m*2;
+    padding-left: $m*2;
+    padding-right: $m*2;
   }
 }
 
@@ -691,14 +699,46 @@ label {
 // Overrides
 
 .progress {
-  height: $m/2;
-  border-radius: $m/4;
+  height: $m/4;
+  border-radius: $m/6;
   background-color: rgba($white, 0.2);
+
+  &.bg-purple {
+    background-color: #3e345b;
+    .progress-bar {
+      background-color: rgba($purple, 1);
+    }
+    .empty-dot {
+      background-color: #3e345b;
+    }
+  }
+
+  &.bg-danger {
+    background-color: #895151;
+    .progress-bar {
+      background-color: rgba($danger, 1);
+    }
+    .empty-dot {
+      background-color: #895151;
+    }
+  }
+
+  &.bg-success {
+    background-color: #4c8473;
+    .progress-bar {
+      background-color: rgba($success, 1);
+      .empty-dot {
+        background-color: #4c8473;
+      }
+    }
+  }
+
   .progress-bar {
     &.bg-info {
       background-color: $purple !important;
     }
   }
+
   &.progress-purple{
     background-color: rgba($purple, 1);
   }
@@ -723,9 +763,13 @@ label {
   }
 }
 
-.progress-oracle{
+.progress {
   background-color: $dark-gray;
-  height: 4px;
+  //height: 4px;
+
+  .empty-dot {
+    background-color: $dark-gray;
+  }
 }
 
 .step{
@@ -746,13 +790,13 @@ label {
  &-100{
    right: 0% !important;
  }
- 
+
 }
 
 .step-dots{
   width: 20px;
   height: 20px;
-} 
+}
 
 .content-relative {
   position: relative;

@@ -1,7 +1,7 @@
 import { GetStaticProps } from 'next'
 import React from 'react';
 
-export default function ProposalAddresses({ addresses }) {
+export default function ProposalAddresses({ addresses, currency = `oracles` }) {
     return (
         <div className="container">
             <div className="row justify-content-center">
@@ -11,7 +11,7 @@ export default function ProposalAddresses({ addresses }) {
                         {addresses?.length > 0 && addresses.map((item, index) => (
                             <div key={index} className="content-list-item d-flex justify-content-between align-items-center">
                                 <p className="p-small mb-0">{item.address}</p>
-                                <p className="smallCaption color-purple mb-0">{item.oracles} oracles</p>
+                                <p className="smallCaption color-purple mb-0">{item.oracles} {currency}</p>
                             </div>
                         ))}
                     </div>
