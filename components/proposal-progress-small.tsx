@@ -6,7 +6,7 @@ interface Options {
 }
 
 export default function ProposalProgressSmall({pgClass = ``, value, total, textClass}: Options) {
-  const dotStyle = {width: `20px`, height: `20px`};
+  const dotStyle = {width: `10px`, height: `10px`};
   const percent = ((value * 100) / total).toFixed(2);
   return <div className="text-center position-relative d-inline-block">
     <div className={`smallCaption`}>
