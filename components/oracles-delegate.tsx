@@ -52,7 +52,7 @@ function OraclesDelegate(): JSX.Element {
 
   return (
     <div className="col-md-5">
-      <div className="content-wrapper">
+      <div className="content-wrapper h-100">
         <OraclesBoxHeader actions="Delegate oracles" available={delegatedAmount} />
         <InputNumber
           label="Oracles Ammout"
@@ -80,6 +80,7 @@ function OraclesDelegate(): JSX.Element {
                          modalDescription="Delegate oracles to an address"
                          onTxStart={handleClickVerification}
                          onSuccess={handleTransition}
+                         disabled={delegatedTo.length === 0 || tokenAmount > 0 || tokenAmount < delegatedAmount }
                          onFail={setError} buttonLabel="delegate" />
       </div>
     </div>
