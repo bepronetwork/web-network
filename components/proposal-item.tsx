@@ -24,6 +24,9 @@ export default function ProposalItem({proposal, issueId, amount, beproStaked, on
     const disputeTx = addTransaction({type: TransactionTypes.dispute});
     dispatch(disputeTx);
 
+    if (proposal.isDisputed)
+      return;
+
     await BeproService.network.disputeMerge({issueID: issueId, mergeID: mergeId,})
                       .then(txInfo => {
                         BeproService.parseTransaction(txInfo, disputeTx.payload)
