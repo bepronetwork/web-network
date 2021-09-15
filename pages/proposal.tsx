@@ -139,7 +139,7 @@ export default function PageProposal() {
         isIssueinDraft={issueMicroService?.state === `draft`}
         addressNetwork={networkCid}
         issueId={issueId?.toString()}
-        mergeId={(+id+1).toString()}
+        mergeId={(+id - 1).toString()}
         handleBeproService={getProposal}
         isDisputed={proposalBepro?.isDisputed}
         UrlGithub={`https://github.com/bepronetwork/bepro-js-edge/pull/${proposalMicroService?.pullRequest.githubId}`}/>

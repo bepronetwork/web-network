@@ -41,12 +41,12 @@ export default function ProposalItem({proposal, issueId, amount, beproStaked, on
     <div className="container-list-item">
       <div className="rounded row align-items-top">
           <Link passHref href={{pathname: "/proposal", query: { id: proposal.pullRequestId, issueId: issueId },}}>
-            <div className={`col-4 p-small cursor-pointer mt-3 ${proposal.isDisputed && `text-danger` || ``}`}>
+            <div className={`col-4 p-small cursor-pointer mt-2 ${proposal.isDisputed && `text-danger` || ``}`}>
               PR #{proposal.pullRequestGithubId}
             </div>
           </Link>
           <Link passHref href={{pathname: "/proposal", query: { id: proposal.pullRequestId, issueId: issueId },}}>
-            <div className="col-4 cursor-pointer d-flex justify-content-start mt-2">
+            <div className="col-4 cursor-pointer d-flex justify-content-start mb-2">
               {proposal.prAmounts.map((value, i) =>
                 <PercentageProgressBar textClass={`smallCaption p-small ${proposal.isDisputed ? `text-danger` : `color-purple`}`}
                                        pgClass={`bg-${proposal.isDisputed ? `danger` : `purple`}`}

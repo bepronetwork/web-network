@@ -17,7 +17,7 @@ export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null
 
   function getStateColor() {
     if (isDisputed)
-      return `failed`
+      return `danger`
 
     if (isDisputed === false)
       return `success`;
