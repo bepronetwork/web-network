@@ -44,7 +44,7 @@ export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null
   function renderColumn(dotLabel, index) {
     const dotClass = `rounded-circle bg-${!percentage || dotLabel >= percentage ? `dark` : issueColor}`;
     const style = {left: `${index*20}%`};
-    const dotStyle = {width: `20px`, height: `20px`};
+    const dotStyle = {width: `10px`, height: `10px`};
 
     return <>
       <div className="position-absolute d-flex align-items-center flex-column" style={style}>

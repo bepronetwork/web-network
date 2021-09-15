@@ -473,19 +473,28 @@ p {
 }
 
 .content-wrapper {
-  background-color: $dark-gray;
+  background-color: $bg-shadow;
   padding: $m * 2;
   border-radius: $m/2;
+
   &.child {
     padding: $m;
-    background-color: $bg-shadow;
+    background-color: $dark-gray;
   }
+
   .content-list-item {
     margin-left: -$m*2;
     margin-right: -$m*2;
     padding: $m $m * 2;
-    background-color: $bg-shadow;
+    background-color: $dark-gray;
     border-top: 2px solid rgba($black, 0.2);
+  }
+
+  .rounded.row {
+    margin-left: -$m*2;
+    margin-right: -$m*2;
+    padding-left: $m*2;
+    padding-right: $m*2;
   }
 }
 
@@ -690,8 +699,8 @@ label {
 // Overrides
 
 .progress {
-  height: $m/2;
-  border-radius: $m/4;
+  height: $m/4;
+  border-radius: $m/6;
   background-color: rgba($white, 0.2);
 
   &.bg-purple {

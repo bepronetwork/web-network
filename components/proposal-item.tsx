@@ -41,25 +41,25 @@ export default function ProposalItem({proposal, issueId, amount, beproStaked, on
     <div className="container-list-item">
       <div className="rounded row align-items-top">
           <Link passHref href={{pathname: "/proposal", query: { id: proposal.pullRequestId, issueId: issueId },}}>
-            <div className={`col-4 p-small cursor-pointer ${proposal.isDisputed && `text-danger` || ``}`}>
+            <div className={`col-4 p-small cursor-pointer mt-3 ${proposal.isDisputed && `text-danger` || ``}`}>
               PR #{proposal.pullRequestGithubId}
             </div>
           </Link>
           <Link passHref href={{pathname: "/proposal", query: { id: proposal.pullRequestId, issueId: issueId },}}>
-            <div className="col-4 cursor-pointer d-flex justify-content-start">
+            <div className="col-4 cursor-pointer d-flex justify-content-start mt-2">
               {proposal.prAmounts.map((value, i) =>
-                <PercentageProgressBar textClass={`smallCaption p-small pb-2 ${proposal.isDisputed ? `text-danger` : `color-purple`}`}
+                <PercentageProgressBar textClass={`smallCaption p-small ${proposal.isDisputed ? `text-danger` : `color-purple`}`}
                                        pgClass={`bg-${proposal.isDisputed ? `danger` : `purple`}`}
                                        className={i+1 < proposal.prAmounts.length && `me-2` || ``}
                                        value={value} total={amount} />)}
             </div>
           </Link>
-        <div className="col-4 d-flex justify-content-between align-items-center">
+        <div className="col-4 d-flex justify-content-between">
           <ProposalProgressSmall pgClass={`bg-${proposal.isDisputed ? `danger` : `purple`}`}
                                  value={+proposal.disputes}
                                  total={beproStaked}
                                  textClass={`pb-2 ${proposal.isDisputed ? `text-danger` : `color-purple`}`}/>
-          <button className={`ms-3 btn rounded btn-${proposal.isDisputed ? `outline-danger` : `purple`}`} onClick={() => handleDispute(+proposal._id)}>
+          <button className={`align-self-center mb-2 ms-3 btn btn-md btn-${proposal.isDisputed ? `outline-danger` : `purple`}`} onClick={() => handleDispute(+proposal._id)}>
             {proposal.isDisputed ? `Failed` : `Dispute`}
           </button>
         </div>
