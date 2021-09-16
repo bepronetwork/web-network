@@ -5,7 +5,6 @@ export default function TransactionStats({status = null}: {status: TransactionSt
   const ColorMap = {
     [TransactionStatus.pending]: `warning`,
     [TransactionStatus.processing]: `info`,
-    [TransactionStatus.pending]: `warning`,
     [TransactionStatus.failed]: `red`,
     [TransactionStatus.completed]: `success`,
   }
@@ -13,7 +12,6 @@ export default function TransactionStats({status = null}: {status: TransactionSt
   const StatusMap = {
     [TransactionStatus.pending]: `Pending`,
     [TransactionStatus.processing]: `Processing`,
-    [TransactionStatus.pending]: `Pending`,
     [TransactionStatus.failed]: `Rejected`,
     [TransactionStatus.completed]: `Complete`,
   }
