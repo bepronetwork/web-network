@@ -212,8 +212,9 @@ p {
 .text-blue-dark{
   color: $blue-dark;
 }
-.text-blue-info{
-  color: $blue-info;
+.text-info{
+  // !important to overwrite bootstrap css.
+  color: $blue-info !important;
 }
 
 .text-red {
@@ -657,7 +658,8 @@ label {
 .color-blue {
   color: $blue;
 }
-.color-blue-info {
+.color-info {
+  // !important to overwrite bootstrap css.
   color: $blue-info;
 }
 .color-secondary {
