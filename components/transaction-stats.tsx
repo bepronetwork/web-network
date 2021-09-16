@@ -5,13 +5,15 @@ export default function TransactionStats({status = null}: {status: TransactionSt
   const ColorMap = {
     [TransactionStatus.pending]: `warning`,
     [TransactionStatus.processing]: `info`,
+    [TransactionStatus.failed]: `red`,
     [TransactionStatus.completed]: `success`,
   }
 
   const StatusMap = {
-    [TransactionStatus.completed]: `Complete`,
     [TransactionStatus.pending]: `Pending`,
     [TransactionStatus.processing]: `Processing`,
+    [TransactionStatus.failed]: `Rejected`,
+    [TransactionStatus.completed]: `Complete`,
   }
 
   function rowClassName() {

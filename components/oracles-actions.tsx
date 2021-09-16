@@ -13,8 +13,10 @@ import {changeBalance} from '@reducers/change-balance';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {addTransaction} from '@reducers/add-transaction';
 import {updateTransaction} from '@reducers/update-transaction';
+import {formatNumberToCurrency} from 'helpers/formatNumber'
 
 const actions: string[] = ["Lock", "Unlock"];
+
 
 function OraclesActions(): JSX.Element {
   const {state: {beproInit, metaMaskWallet, currentAddress, balance}, dispatch} = useContext(ApplicationContext);
@@ -27,7 +29,7 @@ function OraclesActions(): JSX.Element {
   const [walletAddress, setWalletAddress] = useState(``);
 
   const networkTxRef = useRef<HTMLButtonElement>(null);
-  const renderAmount = tokenAmount ? `${tokenAmount} ` : "";
+  const renderAmount = tokenAmount ? `${formatNumberToCurrency(tokenAmount)} ` : "";
 
   const renderInfo = {
     Lock: {
@@ -146,7 +148,7 @@ function OraclesActions(): JSX.Element {
   return (
     <>
       <div className="col-md-5">
-        <div className="content-wrapper">
+        <div className="content-wrapper h-100">
           <OraclesBoxHeader actions={actions} onChange={setAction} currentAction={action} />
 
           <p className="p text-white">{renderInfo.description}</p>

@@ -212,6 +212,22 @@ p {
 .text-blue-dark{
   color: $blue-dark;
 }
+.text-info{
+  // !important to overwrite bootstrap css.
+  color: $blue-info !important;
+}
+
+.text-red {
+  color: $red;
+}
+
+.text-orange {
+  color: $orange;
+}
+.text-success {
+  // !important to overwrite bootstrap css.
+  color: $success !important;
+}
 
 .trans {
   opacity: 0.7;
@@ -430,7 +446,7 @@ p {
   min-height: 240px;
   background-color: $blue;
   color: $white;
-  padding: $m * 2;
+  padding: $m * 3;
   .banner-highlight {
     background-color: rgba($white, 0.1);
     padding: $m;
@@ -642,6 +658,10 @@ label {
 .color-blue {
   color: $blue;
 }
+.color-info {
+  // !important to overwrite bootstrap css.
+  color: $blue-info;
+}
 .color-secondary {
   color: $secondary;
 }
@@ -651,8 +671,13 @@ label {
 .color-red {
   color: $red;
 }
+
+.color-orange {
+  color: $orange;
+}
 .color-success {
-  color: $success;
+  // !important to overwrite bootstrap css.
+  color: $success !important;
 }
 
 .circle-1 {
