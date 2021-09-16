@@ -29,7 +29,6 @@ export default function AccountHero() {
                 })
                 .then(_ => BeproService.network.getOraclesSummary({address}))
                 .then(oracles => {
-                  debugger;
                   dispatch(changeOraclesState(oracles));
                 })
                 .catch(e => {
