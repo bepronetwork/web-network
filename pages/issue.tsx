@@ -10,7 +10,6 @@ import {BeproService} from '@services/bepro-service';
 import GithubMicroService, {User} from '@services/github-microservice';
 import {ApplicationContext} from '@contexts/application';
 import {IssueData} from '@interfaces/issue-data';
-import { Capitalize } from '@helpers/string';
 
 export default function PageIssue() {
   const router = useRouter();
@@ -86,7 +85,7 @@ export default function PageIssue() {
   };
 
   const handleStateissue = () => {
-    if (issue?.state) return Capitalize(issue?.state);
+    if (issue?.state) return issue?.state;
 
     if (isIssueinDraft) {
       return 'Draft';

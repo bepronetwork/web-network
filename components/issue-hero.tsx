@@ -21,7 +21,7 @@ export default function IssueHero({ issue, state, amount }) {
         <div className="row justify-content-center">
           <div className="col-md-10">
             <div className="d-flex flex-column">
-              <h3 className="h4 trans mb-0">{state} issue</h3>
+              <h3 className="h4 trans text-capitalize mb-0">{state} issue</h3>
               <div className="row">
                 <div className="col-md-9">
                   <div className="top-border">

@@ -53,7 +53,6 @@ function OraclesDelegate(): JSX.Element {
   }
 
   function updateAmounts() {
-    debugger;
     if (!beproInit || !metaMaskWallet)
       return;
       const teste = oracles.amounts.reduce((total, current) => total += +current, 0) 
