@@ -205,29 +205,7 @@ p {
   font-family: 'fontBold', sans-serif;
 }
 
-.text-gray{
-  color: $gray;
-}
 
-.text-blue-dark{
-  color: $blue-dark;
-}
-.text-info{
-  // !important to overwrite bootstrap css.
-  color: $blue-info !important;
-}
-
-.text-red {
-  color: $red;
-}
-
-.text-orange {
-  color: $orange;
-}
-.text-success {
-  // !important to overwrite bootstrap css.
-  color: $success !important;
-}
 
 .trans {
   opacity: 0.7;
@@ -579,7 +557,7 @@ label {
     background-color: $success;
   }
   &.red {
-    background-color: $red;
+    background-color: $danger;
     color: $white;
   }
 }
@@ -639,46 +617,6 @@ label {
 // .pb-2 { padding-bottom: $m }
 // .pb-3 { padding-bottom: $m*2 }
 
-.bg-shadow {
-  background-color: $bg-shadow;
-}
-.bg-opac {
-  background-color: rgba($white, 0.1);
-}
-.bg-success {
-  background-color: $success;
-}
-.bg-purple {
-  background-color: $purple;
-}
-.bg-red {
-  background-color: $red;
-}
-
-.color-blue {
-  color: $blue;
-}
-.color-info {
-  // !important to overwrite bootstrap css.
-  color: $blue-info;
-}
-.color-secondary {
-  color: $secondary;
-}
-.color-purple {
-  color: $purple;
-}
-.color-red {
-  color: $red;
-}
-
-.color-orange {
-  color: $orange;
-}
-.color-success {
-  // !important to overwrite bootstrap css.
-  color: $success !important;
-}
 
 .circle-1 {
   width: 64px;
@@ -874,7 +812,7 @@ label {
     &.status {
         > p {
           font-size: 14px;
-          color: $blue-info;
+          color: $info;
         }
     }
     &.header {

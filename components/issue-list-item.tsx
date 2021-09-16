@@ -34,7 +34,7 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
                 return "success"
             }
             case "disputed":{
-                return "red"
+                return "danger"
             }
             default: {
                 return "blue"
