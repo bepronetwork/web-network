@@ -4,7 +4,7 @@ import {TransactionStatus} from '@interfaces/enums/transaction-status';
 export default function TransactionStats({status = null}: {status: TransactionStatus}) {
   const ColorMap = {
     [TransactionStatus.pending]: `warning`,
-    [TransactionStatus.processing]: `blue-info`,
+    [TransactionStatus.processing]: `info`,
     [TransactionStatus.pending]: `warning`,
     [TransactionStatus.failed]: `red`,
     [TransactionStatus.completed]: `success`,
