@@ -29,7 +29,7 @@ export default function PageCouncil() {
 
   return (
     <div>
-      <PageHero title="Ready to propose" />
+      <PageHero title="Curate the Network" />
       <div className="container">
         <div className="row justify-content-center">
           <ListIssues listIssues={issues}/>
