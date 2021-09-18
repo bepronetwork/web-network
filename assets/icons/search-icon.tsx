@@ -13,9 +13,9 @@ function SearchIcon(props: SVGProps<SVGSVGElement>) {
       <path
         d="M44 44L33.85 33.85M39.3333 20.6667C39.3333 30.976 30.9759 39.3333 20.6666 39.3333C10.3573 39.3333 2 30.976 2 20.6667C2 10.3574 10.3573 2 20.6666 2C30.9759 2 39.3333 10.3574 39.3333 20.6667Z"
         stroke="#C4C7D3"
-        stroke-width="4"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
