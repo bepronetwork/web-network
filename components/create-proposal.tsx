@@ -143,43 +143,53 @@ export default function NewProposal({
   return (
     <>
       {
-       !hideCreateProposal && <button className="btn btn-md btn-primary" onClick={() => setShow(true)}>Create Proposal</button> ||
-      `You need at least ${councilAmount} BEPRO to Create a Proposal `
+        !hideCreateProposal &&
+        <button className="btn btn-md btn-primary" onClick={() => setShow(true)}>Create Proposal</button> ||
+        `You need at least ${councilAmount} BEPRO to Create a Proposal `
       }
       <Modal show={show}
              title="Create Proposal"
              footer={
                <>
-            <button className="btn btn-md btn-opac" onClick={handleClose}>
-              Cancel
-            </button>
-            <button
-              className="btn btn-md btn-primary"
-              onClick={handleClickCreate}
-              disabled={!currentAddress}
-            >
-              Create Proposal
-            </button>
-          </>
+                 <button className="btn btn-md btn-opac" onClick={handleClose}>
+                   Cancel
+                 </button>
+                 <button
+                   className="btn btn-md btn-primary"
+                   onClick={handleClickCreate}
+                   disabled={!currentAddress}
+                 >
+                   Create Proposal
+                 </button>
+               </>
              }>
         <p className="p-small text-50">Select a pull request </p>
         <ReactSelect id="pullRequestSelect"
-                     defaultValue={{value: pullRequests[0]?.id, label: `#${pullRequests[0]?.githubId} Pull Request`, githubId: pullRequests[0]?.githubId,}}
-                     options={pullRequests?.map((items: pullRequest) => ({value: items.id, label: `#${items.githubId} Pull Request`, githubId: items.githubId,}))}
-                     onChange={handleChangeSelect} />
+                     defaultValue={{
+                       value: pullRequests[0]?.id,
+                       label: `#${pullRequests[0]?.githubId} Pull Request`,
+                       githubId: pullRequests[0]?.githubId,
+                     }}
+                     options={pullRequests?.map((items: pullRequest) => ({
+                       value: items.id,
+                       label: `#${items.githubId} Pull Request`,
+                       githubId: items.githubId,
+                     }))}
+                     onChange={handleChangeSelect}/>
 
         <p className="p-small mt-3">Propose distribution</p>
         <ul className="mb-0">
           {participants.map((item) => (
-            <CreateProposalDistributionItem key={item.githubHandle}
-                                            by={item.githubHandle}
-                                            address={item.address}
-                                            onChangeDistribution={handleChangeDistrib}
-                                            error={error}/>
-                                            )
+                              <CreateProposalDistributionItem key={item.githubHandle}
+                                                              by={item.githubHandle}
+                                                              address={item.address}
+                                                              onChangeDistribution={handleChangeDistrib}
+                                                              error={error}/>
+                            )
           )}
         </ul>
-        {error && <p className="p error mt-3 mb-0 text-danger">{error}</p> || <p className="mt-3 mb-0 text-white-50">Distribute reward percentage</p>}
+        {error && <p className="p error mt-3 mb-0 text-danger">{error}</p> ||
+        <p className="mt-3 mb-0 text-white-50">Distribute reward percentage</p>}
       </Modal>
     </>
   );
