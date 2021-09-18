@@ -1,13 +1,11 @@
 import {useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import {Octokit} from 'octokit';
-import {FormControl} from 'react-bootstrap';
 import {addTransaction} from '@reducers/add-transaction';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {BeproService} from '@services/bepro-service';
 import {updateTransaction} from '@reducers/update-transaction';
 import GithubMicroService from '@services/github-microservice';
-import IssueListItem from '@components/issue-list-item';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import {formatNumberToString} from '@helpers/formatNumber';
 import {changeLoadState} from '@reducers/change-load-state';
@@ -37,10 +35,39 @@ export default function ParityPage() {
     return formMaker.some(({value}) => !value);
   }
 
+  async function createComments(issue_number, out_issue_number) {
+    const octokit = new Octokit({auth: githubToken});
+    const readRepoInfo = {owner: githubLogin, repo: readRepoName};
+    const outRepoInfo = {owner: githubLogin, repo: outputRepoName};
+
+    async function getComments(page = 1, comments = []) {
+      const mapComment = ({user: {login = ``,}, created_at = ``, updated_at = ``, body = ``}) =>
+        ({login, createdAt: created_at, updatedAt: updated_at, body,});
+
+      return octokit.rest.issues.listComments({...readRepoInfo, issue_number, page})
+                    .then(({data}) => {
+                      if (data.length === 100)
+                        return getComments(page + 1, [...comments, ...data.map(mapComment)])
+                      return [...comments, ...data.map(mapComment)];
+                    })
+    }
+
+    function createComment({login = ``, body = ``, createdAt = ``, updatedAt = ``, issue_number}) {
+      body = `> Created by ${login} at ${new Date(createdAt).toISOString()} ${updatedAt ? `and updated at ${new Date(updatedAt).toISOString()}` : ``}\n\n`.concat(body);
+      return octokit.rest.issues.createComment({...outRepoInfo, issue_number: out_issue_number, body})
+    }
+
+    const comments = await getComments();
+    for (const comment of comments)
+      await createComment(comment);
+
+  }
+
   function listIssues() {
     const octokit = new Octokit({auth: githubToken});
     const readRepoInfo = {owner: githubLogin, repo: readRepoName};
     const outRepoInfo = {owner: githubLogin, repo: outputRepoName};
+
     const openIssues = [];
 
     function mapOpenIssue({title = ``, number = 0, body = ``, labels = [], tokenAmount}) {
@@ -54,6 +81,7 @@ export default function ParityPage() {
       return ({title, number, body, tokenAmount,});
     }
 
+
     function getAllIssues(repoInfo) {
       try {
         return octokit.rest.issues.listForRepo({...repoInfo, state: `open`})
@@ -63,6 +91,7 @@ export default function ParityPage() {
         return Promise.resolve([]);
       }
     }
+
 
     dispatch(changeLoadState(true))
 
@@ -81,7 +110,7 @@ export default function ParityPage() {
 
   }
 
-  function createIssue({title, body: description = `No description`, tokenAmount}) {
+  function createIssue({title, body: description = `No description`, tokenAmount, number}) {
 
     const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount: +tokenAmount})
     dispatch(openIssueTx);
@@ -100,10 +129,14 @@ export default function ParityPage() {
                          return txInfo;
                        })
                        .then(txInfo =>
-                               GithubMicroService.createIssue({
-                                                                ...msPayload,
-                                                                issueId: txInfo.events?.OpenIssue?.returnValues?.id
-                                                              }))
+                         GithubMicroService.createIssue({
+                                                          ...msPayload,
+                                                          issueId: txInfo.events?.OpenIssue?.returnValues?.id
+                                                        })
+                                           .then(oknok =>
+                                             GithubMicroService.getIssueId(txInfo.events?.OpenIssue?.returnValues?.id)
+                                                               .then((info) => info?.githubId && createComments(number, info.githubId))
+                                                               .then(() => oknok)))
                        .catch(e => {
                          dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
                          console.error(`Failed to createIssue`, e);
@@ -134,7 +167,7 @@ export default function ParityPage() {
           <strong className="mb-2">Title:</strong> {title}
 
           <span className="fs-small d-block mb-1">
-            {body.substr(0, 500).concat(`...`)}
+            {(body || `No body?`).substr(0, 500).concat(`...`)}
           </span>
           <hr />
           <span className="fs-smallest d-block mbn-2">{formatNumberToString(tokenAmount)} BEPRO</span>
