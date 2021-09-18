@@ -80,7 +80,8 @@ function OraclesDelegate(): JSX.Element {
                          modalDescription="Delegate oracles to an address"
                          onTxStart={handleClickVerification}
                          onSuccess={handleTransition}
-                         disabled={delegatedTo.length === 0 || tokenAmount > 0 || tokenAmount < delegatedAmount }
+                         fullWidth={true}
+                         disabled={!delegatedTo || tokenAmount > +oracles.tokensLocked }
                          onFail={setError} buttonLabel="delegate" />
       </div>
     </div>
