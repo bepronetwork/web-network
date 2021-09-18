@@ -29,7 +29,7 @@ export default function PageCouncil() {
 
   return (
     <div>
-      <PageHero title="Curate the Network" />
+      <PageHero title="Create Bounty Distributions" />
       <div className="container">
         <div className="row justify-content-center">
           <ListIssues listIssues={issues}/>
