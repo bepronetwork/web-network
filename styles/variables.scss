@@ -33,13 +33,7 @@ $more-bg: (
         'success': $success
 );
 
-$more-colors: (
-        'gray': $gray,
-        'orange': $orange,
-        'purple': $purple,
-        'success': $success,
-        'blue-dark': $blue-dark,
-);
+$more-colors: ('blue-dark': $blue-dark);
 
 $utilities: map-merge(
   $utilities, (
