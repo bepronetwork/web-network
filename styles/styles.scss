@@ -1004,3 +1004,11 @@ $c_props: ('m': 'margin') !default;
     }
   }
 }
+
+.bg-main-image {
+  background: url('/images/bg-main.png') no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
