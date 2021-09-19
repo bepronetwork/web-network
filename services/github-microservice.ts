@@ -31,6 +31,15 @@ const client = axios.create({baseURL: API});
 
 export default class GithubMicroService {
 
+  static async getClientNation() {
+    return client.get(`/ip`)
+                 .then(({data}) => data)
+                 .catch(e => {
+                   console.error(e);
+                   return null;
+                 })
+  }
+
   static async createIssue(payload) {
     return client.post('/issues', payload)
                  .then(({data}) => data === `ok`)
