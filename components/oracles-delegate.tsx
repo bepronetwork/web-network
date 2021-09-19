@@ -61,16 +61,16 @@ function OraclesDelegate(): JSX.Element {
   }
 
   const isButtonDisabled = (): boolean => [
-    tokenAmount > 0,
-    delegatedTo.length > 0,
-    !myTransactions.find(transaction => transaction.status === TransactionStatus.pending && transaction.type === TransactionTypes.delegateOracles)
-  ].some(values => values === false)
+      !(tokenAmount > +oracles.tokensLocked),
+      !!(delegatedTo),
+      !myTransactions.find(transaction => transaction.status === TransactionStatus.pending && transaction.type === TransactionTypes.delegateOracles)
+    ].some(values => values === false)
 
   useEffect(updateAmounts, [beproInit, metaMaskWallet, oracles, beproBalance, staked]);
 
   return (
     <div className="col-md-5">
-      <div className="content-wrapper">
+      <div className="content-wrapper h-100">
         <OraclesBoxHeader actions="Delegate oracles" available={delegatedAmount} />
         <InputNumber
           label="Oracles Ammout"
@@ -101,6 +101,7 @@ function OraclesDelegate(): JSX.Element {
           onSuccess={handleTransition}
           onFail={setError} 
           buttonLabel="delegate"
+          fullWidth={true}
           disabled={isButtonDisabled()}
           />
       </div>

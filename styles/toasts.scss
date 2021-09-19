@@ -41,7 +41,8 @@
         justify-content: center;
         margin-right: .15rem;
         &::before {
-          content: "\1F5D9";
+          // content: "\1F5D9";
+          content: "x"
         }
       }
     }

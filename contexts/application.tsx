@@ -6,7 +6,7 @@ import LoadApplicationReducers from './reducers';
 import {BeproService} from '@services/bepro-service';
 import {changeBeproInitState} from '@reducers/change-bepro-init-state';
 import GithubMicroService from '../services/github-microservice';
-import {useSession} from 'next-auth/client';
+import {signOut, useSession} from 'next-auth/client';
 import {changeGithubHandle} from '@reducers/change-github-handle';
 import {changeCurrentAddress} from '@reducers/change-current-address'
 import Loading from '../components/loading';
@@ -61,7 +61,12 @@ export default function ApplicationContextProvider({children}) {
     GithubMicroService.getHandleOf(BeproService.address)
                       .then(handle => {
                         if (handle) dispatch(changeGithubHandle(handle))
-                        else if(session?.user?.name) GithubMicroService.joinAddressToUser(session?.user?.name,{ address: BeproService.address})
+                        else if(session?.user?.name)
+                          GithubMicroService.joinAddressToUser(session?.user?.name,{ address: BeproService.address})
+                                            .then(bool => {
+                                              if (!bool)
+                                                return signOut({redirect: false,});
+                                            })
                       });
   }
 

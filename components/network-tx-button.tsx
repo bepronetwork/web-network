@@ -22,6 +22,7 @@ interface NetworkTxButtonParams {
   disabled?: boolean;
   txType: TransactionTypes;
   txCurrency: TransactionCurrency;
+  fullWidth?: boolean;
 }
 
 
@@ -34,7 +35,7 @@ function networkTxButton({
                            buttonLabel,
                            modalTitle,
                            modalDescription,
-                           children = null,
+                           children = null, fullWidth = false,
                            disabled = false, txType = TransactionTypes.unknown, txCurrency = `$BEPRO`,
                          }: NetworkTxButtonParams, elementRef) {
   const {dispatch, state: {beproInit, metaMaskWallet}} = useContext(ApplicationContext);
@@ -85,7 +86,7 @@ function networkTxButton({
   }
 
   function getButtonClass() {
-    return `btn btn-md btn-lg w-100 mt-3 btn-primary ${!children && !buttonLabel && `visually-hidden` || ``}`
+    return `btn btn-md btn-lg mt-3 btn-primary ${fullWidth ? `w-100` : ``} ${!children && !buttonLabel && `visually-hidden` || ``}`
   }
 
   function getDivClass() {
