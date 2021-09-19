@@ -4,7 +4,7 @@ import {useContext, useEffect, useState} from 'react';
 import OraclesTakeBackItem from "./oracles-take-back-item";
 import {ApplicationContext} from '@contexts/application';
 import {BeproService} from '@services/bepro-service';
-import {changeOraclesState} from '@reducers/change-oracles';
+import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 
 type Item = { address: string; amount: string };
 
@@ -42,7 +42,7 @@ export default function OraclesTakeBack(): JSX.Element {
 
     oldAddress = currentAddress;
     BeproService.network.getOraclesSummary({address: currentAddress})
-                .then(oracles => dispatch(changeOraclesState(oracles)));
+                .then(oracles => dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles))));
 
   }, [balance.staked, currentAddress])
 

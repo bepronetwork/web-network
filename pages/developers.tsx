@@ -110,7 +110,7 @@ export default function PageDevelopers() {
           <ListIssues listIssues={issuesFilteredByState} />
           {issuesFilteredByState.length === 0 && !loading.isLoading ? (
             <div className="col-md-10">
-              <NothingFound 
+              <NothingFound
                 description={filterByState.emptyState}>
                 <Link href="/create-issue" passHref>
                   <button className="btn btn-md btn-primary">
