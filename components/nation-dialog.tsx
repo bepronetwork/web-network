@@ -5,20 +5,20 @@ import BeProBlue from "@assets/icons/bepro-blue";
 import Loading from 'components/loading'
 import { COUNTRY_CODE_BLOCKED } from "../env";
 import axios from "axios";
+import GithubMicroService from "@services/github-microservice";
 
 export default function NationDialog({ children }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isBlock, setBlock] = useState<boolean>(false);
   const [country, setCountry] = useState<string>("");
-
+  
   useEffect(() => {
     setIsLoading(true);
-    axios
-      .get("http://ip-api.com/json")
-      .then(({ data }) => {
-        const itsBlock = COUNTRY_CODE_BLOCKED.indexOf(data.countryCode);
+    GithubMicroService.getClientNation()
+      .then(({countryCode, country})=>{
+        const itsBlock = COUNTRY_CODE_BLOCKED.indexOf(countryCode);
         if (itsBlock != -1) {
-          setCountry(data.country);
+          setCountry(country || '');
           setBlock(true);
         }
       })
