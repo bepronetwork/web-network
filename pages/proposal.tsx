@@ -14,7 +14,7 @@ import {IssueData} from '@interfaces/issue-data';
 import {addToast} from '@reducers/add-toast';
 
 import ProposalProgressBar from '@components/proposal-progress-bar';
-import {changeOraclesState} from '@reducers/change-oracles';
+import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import CustomContainer from '@components/custom-container';
 
 interface ProposalBepro {
@@ -105,7 +105,7 @@ export default function PageProposal() {
   function loadProposalData() {
     if (issueId && id && currentAddress) {
       BeproService.network.getOraclesSummary({address: currentAddress})
-                  .then(oracles => dispatch(changeOraclesState(oracles)))
+                  .then(oracles => dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles))))
                   .then(_ => getIssueAmount())
                   .then(_ => getProposalData())
                   .then(_ => getProposal());

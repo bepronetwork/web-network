@@ -30,7 +30,7 @@ export default function OraclesTakeBackItem({
   }
 
   async function handleTakeBack() {
-    const delegateTx = addTransaction({type: TransactionTypes.delegateOracles, amount: +amount, currency: 'Oracles'});
+    const delegateTx = addTransaction({type: TransactionTypes.takeBackOracles, amount: +amount, currency: 'Oracles'});
     dispatch(delegateTx);
 
     try {
