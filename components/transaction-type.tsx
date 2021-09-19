@@ -10,6 +10,7 @@ export default function TransactionType({type}) {
     [TransactionTypes.approveTransactionalERC20Token]: `Approval`,
     [TransactionTypes.openIssue]: `Open issue`,
     [TransactionTypes.delegateOracles]: `Delegate`,
+    [TransactionTypes.takeBackOracles]: `Removing Delegation`,
     [TransactionTypes.dispute]: `Dispute issue`,
     [TransactionTypes.proposeMerge]: `Propose merge request`,
     [TransactionTypes.closeIssue]: `Close issue`,

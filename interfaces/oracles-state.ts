@@ -3,4 +3,5 @@ export interface OraclesState {
   amounts: string[];
   addresses: string[];
   tokensLocked: string;
+  delegatedToOthers?: number;
 }

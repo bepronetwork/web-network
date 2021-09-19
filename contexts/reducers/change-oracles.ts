@@ -11,4 +11,14 @@ export const ChangeOraclesState: ReduceAction<OraclesState> = {
   fn: reducer
 }
 
+export const changeOraclesParse = (currentAddress: string, oracles: OraclesState) => {
+  let delegatedToOthers = 0;
+  oracles.amounts.forEach((amount, i) => {
+    if (oracles.addresses[i] !== currentAddress)
+      delegatedToOthers += +amount;
+  });
+
+  return ({...oracles, delegatedToOthers})
+}
+
 export const changeOraclesState = (payload: OraclesState): ReduceActor<OraclesState> => ({name: ReduceActionName.Oracles, payload});
