@@ -11,10 +11,10 @@ import {Proposal} from '@interfaces/proposal';
 
 
 export default function IssueProposals({ numberProposals, issueId, amount }) {
-  const { state: {beproStaked} } = useContext(ApplicationContext);
+  const { state: {beproStaked, currentAddress} } = useContext(ApplicationContext);
   const [proposals, setProposals] = useState<Proposal[]>([]);
 
-  const gets = async (error?: boolean) => {
+  async function loadProposalData(error?: boolean) {
     if (error)
       return;
 
@@ -25,26 +25,24 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
         const merge = await BeproService.network.getMergeById({issue_id: issueId, merge_id: i,});
 
         await BeproService.network.isMergeDisputed({issueId: issueId, mergeId: i,})
-          .then((isMergeDisputed) => (merge.isDisputed = isMergeDisputed))
-          .catch((err) => console.log("Error getting mergeDisputed state", err));
+                          .then((isMergeDisputed) => (merge.isDisputed = isMergeDisputed))
+                          .catch((err) => console.log("Error getting mergeDisputed state", err));
 
         await GithubMicroService.getMergeProposalIssue(issueId, (i + 1).toString())
-          .then((mergeProposal: ProposalData) => {
-            merge.pullRequestId = mergeProposal?.pullRequestId;
-            merge.pullRequestGithubId = mergeProposal?.pullRequest.githubId;
-          })
-          .catch((err) => console.log(`Error getting proposal from microservice`, err));
+                                .then((mergeProposal: ProposalData) => {
+                                  console.log(mergeProposal);
+                                  merge.pullRequestId = mergeProposal?.pullRequestId;
+                                  merge.pullRequestGithubId = mergeProposal?.pullRequest.githubId;
+                                })
+                                .catch((err) => console.log(`Error getting proposal from microservice`, err));
 
         pool.push(merge);
       }
+    console.log(pool);
+    setProposals(pool);
+  }
 
-    if (pool.length === numberProposals) setProposals(pool);
-  };
-
-
-  useEffect(() => {
-    gets();
-  }, [issueId, numberProposals]);
+  useEffect(() => { loadProposalData() }, [issueId, numberProposals, currentAddress]);
 
   return (
     <div className="container">
@@ -52,7 +50,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
         <div className="col-md-10">
           <div className="content-wrapper mb-4 pb-0">
             <h3 className="smallCaption pb-3">{numberProposals} Proposals</h3>
-            {proposals.map(proposal => <ProposalItem proposal={proposal} issueId={issueId} amount={amount} beproStaked={beproStaked} onDispute={gets} />)}
+            {proposals.map(proposal => <ProposalItem key={proposal._id} proposal={proposal} issueId={issueId} amount={amount} beproStaked={beproStaked} onDispute={loadProposalData} />)}
           </div>
         </div>
       </div>
