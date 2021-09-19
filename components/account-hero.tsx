@@ -3,7 +3,7 @@ import {BeproService} from "@services/bepro-service";
 import {changeLoadState} from '@reducers/change-load-state';
 import {ApplicationContext} from '@contexts/application';
 import {changeMyIssuesState} from '@reducers/change-my-issues';
-import {changeOraclesState} from '@reducers/change-oracles';
+import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import GithubHandle from './github-handle';
 import { toNumber } from 'lodash';
 
@@ -29,7 +29,9 @@ export default function AccountHero() {
                 })
                 .then(_ => BeproService.network.getOraclesSummary({address}))
                 .then(oracles => {
-                  dispatch(changeOraclesState(oracles));
+                  dispatch(changeOraclesState(changeOraclesParse(address, oracles)));
+                  setSumOfOracles(+oracles.tokensLocked + +oracles.oraclesDelegatedByOthers)
+                  setDelegatedOracles(toNumber(oracles.oraclesDelegatedByOthers))
                 })
                 .catch(e => {
                   console.error(e);
@@ -39,17 +41,6 @@ export default function AccountHero() {
   }
 
   useEffect(loadBeproNetworkInformation, [beproInit, metaMaskWallet, currentAddress])
-  useEffect(() => {
-    if (!currentAddress)
-      return;
-
-    setSumOfOracles(
-      oracles.amounts
-             .filter(address => address !== currentAddress)
-             .reduce((prev, current) => prev += +current, 0) + +oracles.oraclesDelegatedByOthers
-    )
-    setDelegatedOracles(toNumber(oracles.oraclesDelegatedByOthers))
-  }, [balance.staked, oracles])
 
   return (
     <div className="banner bg-bepro-blue mb-4">
@@ -70,7 +61,7 @@ export default function AccountHero() {
                 </div>
                 <div className="col-md-4">
                   <div className="top-border">
-                    <h4 className="h4 mb-0">{oracles.tokensLocked}</h4>
+                    <h4 className="h4 mb-0">{sumOfOracles}</h4>
                     <span className="p-small">Oracles</span>
                   </div>
                 </div>

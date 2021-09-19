@@ -24,8 +24,9 @@ export default function NewProposal({
                                       pullRequests = [],
                                       handleBeproService,
                                       handleMicroService,
+                                      isIssueOwner = false,
                                     }) {
-  const {dispatch, state: {balance, currentAddress, beproInit},} = useContext(ApplicationContext);
+  const {dispatch, state: {balance, currentAddress, beproInit, oracles,},} = useContext(ApplicationContext);
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>();
   const [error, setError] = useState<string>('');
@@ -115,7 +116,7 @@ export default function NewProposal({
   }
 
   function updateHideCreateProposalState() {
-    setHideCreateProposal(councilAmount > balance.staked);
+    setHideCreateProposal(councilAmount >= +oracles.tokensLocked || isIssueOwner);
   }
 
   function getCouncilAmount() {
@@ -157,8 +158,7 @@ export default function NewProposal({
                  <button
                    className="btn btn-md btn-primary"
                    onClick={handleClickCreate}
-                   disabled={!currentAddress}
-                 >
+                   disabled={!currentAddress}>
                    Create Proposal
                  </button>
                </>

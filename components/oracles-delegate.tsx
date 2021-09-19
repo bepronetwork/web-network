@@ -8,7 +8,7 @@ import {changeBalance} from '@reducers/change-balance';
 import {BeproService} from '@services/bepro-service';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import { TransactionStatus } from '@interfaces/enums/transaction-status';
-import {changeOraclesState} from '@reducers/change-oracles';
+import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 
 function OraclesDelegate(): JSX.Element {
   const {dispatch, state: {oracles, currentAddress, beproInit, metaMaskWallet,myTransactions, balance: {bepro: beproBalance, staked}}} = useContext(ApplicationContext);
@@ -36,35 +36,32 @@ function OraclesDelegate(): JSX.Element {
   }
 
   function handleTransition() {
-    handleChangeOracles({
-      floatValue: 0,
-      formattedValue: '0',
-      value: '0',
-    })
+    handleChangeOracles({floatValue: 0, formattedValue: '0', value: '0',})
     setDelegatedTo("")
     setError("");
+
     BeproService.network.getBEPROStaked()
-    .then(staked => dispatch(changeBalance({staked})))
+                .then(staked => dispatch(changeBalance({staked})))
+
     BeproService.network.getOraclesSummary({address: currentAddress})
                 .then(oracles => {
-                  dispatch(changeOraclesState(oracles))
+                  dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles)))
                 });
-
   }
 
   function updateAmounts() {
     if (!beproInit || !metaMaskWallet)
       return;
-      const teste = oracles.amounts.reduce((total, current) => total += +current, 0) 
-    setDelegatedAmount(teste)
 
+    setDelegatedAmount(+oracles.tokensLocked - oracles.delegatedToOthers);
   }
 
   const isButtonDisabled = (): boolean => [
-      !(tokenAmount > +oracles.tokensLocked),
-      !!(delegatedTo),
-      !myTransactions.find(transaction => transaction.status === TransactionStatus.pending && transaction.type === TransactionTypes.delegateOracles)
-    ].some(values => values === false)
+      tokenAmount > +oracles.tokensLocked,
+      !delegatedTo,
+      myTransactions.find(({status, type}) =>
+                            status === TransactionStatus.pending && type === TransactionTypes.delegateOracles)
+    ].some(values => values)
 
   useEffect(updateAmounts, [beproInit, metaMaskWallet, oracles, beproBalance, staked]);
 
@@ -72,12 +69,13 @@ function OraclesDelegate(): JSX.Element {
     <div className="col-md-5">
       <div className="content-wrapper h-100">
         <OraclesBoxHeader actions="Delegate oracles" available={delegatedAmount} />
+
         <InputNumber
           label="Oracles Ammout"
           value={tokenAmount}
           onValueChange={handleChangeOracles}
-          thousandSeparator
-        />
+          thousandSeparator/>
+
         <div className="form-group">
           <label className="p-small trans mb-2">Delegation address</label>
           <input
@@ -85,12 +83,12 @@ function OraclesDelegate(): JSX.Element {
             onChange={handleChangeAddress}
             type="text"
             className="form-control"
-            placeholder="Type an address"
-          />
+            placeholder="Type an address"/>
         </div>
+
         {error && <p className="p-small text-danger mt-2">{error}</p>}
 
-        <NetworkTxButton 
+        <NetworkTxButton
           txMethod="delegateOracles"
           txParams={{tokenAmount, delegatedTo}}
           txType={TransactionTypes.delegateOracles}
@@ -99,11 +97,11 @@ function OraclesDelegate(): JSX.Element {
           modalDescription="Delegate oracles to an address"
           onTxStart={handleClickVerification}
           onSuccess={handleTransition}
-          onFail={setError} 
+          onFail={setError}
           buttonLabel="delegate"
           fullWidth={true}
-          disabled={isButtonDisabled()}
-          />
+          disabled={isButtonDisabled()}/>
+
       </div>
     </div>
   );

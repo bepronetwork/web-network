@@ -87,10 +87,11 @@ export default function PageActions({
   }
 
   const isReedemButtonDisable = () => [
-    !myTransactions.find(transactions=> 
-      transactions.type === TransactionTypes.redeemIssue 
+    !myTransactions.find(transactions=>
+      transactions.type === TransactionTypes.redeemIssue
       && transactions.status === TransactionStatus.pending)]
       .some(values => values === false)
+
   async function handleRedeem() {
 
     const redeemTx = addTransaction({type: TransactionTypes.redeemIssue})
@@ -139,6 +140,7 @@ export default function PageActions({
         <>
           <NewProposal
             issueId={issueId}
+            isIssueOwner={addressNetwork === currentAddress}
             amountTotal={amountIssue}
             numberMergeProposals={mergeProposals}
             pullRequests={pullRequests}
@@ -154,7 +156,7 @@ export default function PageActions({
     return (
       !finalized &&
       githubLogin && (
-          <button 
+          <button
             className="btn btn-md btn-primary ms-1 px-4"
             onClick={() => setShowPRModal(true)}
             disabled={!githubHandle || !currentAddress || !canOpenPR}>
