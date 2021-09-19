@@ -52,7 +52,7 @@ export default function TransactionsList({onActiveTransaction = (transaction) =>
   if (!myTransactions || !myTransactions.length) {
     return <span className="text-white fs-6 mx-3 family-medium">No ongoing transactions</span>
   }
-
+  
   return (
     <div className="transaction-list">
       <div className="row">
@@ -60,7 +60,9 @@ export default function TransactionsList({onActiveTransaction = (transaction) =>
           <h5 className="fw-bold m-0 text-white text-uppercase fs-smallest">Ongoing transactions</h5>
         </div>
       </div>
-      {myTransactions.map(renderTransactionRow)}
+      <div className="overflow-auto tx-container">
+        {myTransactions.map(renderTransactionRow)}
+      </div>
     </div>
   )
 }

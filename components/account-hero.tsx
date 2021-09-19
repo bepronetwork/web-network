@@ -5,6 +5,7 @@ import {ApplicationContext} from '@contexts/application';
 import {changeMyIssuesState} from '@reducers/change-my-issues';
 import {changeOraclesState} from '@reducers/change-oracles';
 import GithubHandle from './github-handle';
+import { toNumber } from 'lodash';
 
 export default function AccountHero() {
   const {dispatch, state: {beproInit, oracles, metaMaskWallet, currentAddress, balance}} = useContext(ApplicationContext);
@@ -47,12 +48,7 @@ export default function AccountHero() {
              .filter(address => address !== currentAddress)
              .reduce((prev, current) => prev += +current, 0) + +oracles.oraclesDelegatedByOthers
     )
-
-    setDelegatedOracles(
-      oracles.amounts
-             .filter(address => address === currentAddress)
-             .reduce((prev, current) => prev += +current, 0)
-    )
+    setDelegatedOracles(toNumber(oracles.oraclesDelegatedByOthers))
   }, [balance.staked, oracles])
 
   return (

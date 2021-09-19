@@ -173,6 +173,16 @@ export default class GithubMicroService {
                    return null;
                  })
   }
+  
+  static async getForkedRepo(ghHandler: string) {
+    return client.get(`/forks/repo/${ghHandler}`)
+                 .then(({data}) => data)
+                 .catch(e => {
+                   console.error(e);
+                   return null;
+                 })
+  }
+
   static async getMergeProposalIssue(issueId: string | string[], MergeId: string | string[]) {
     return client.get<ProposalData>(`/issues/mergeproposal/${MergeId}/${issueId}`)
                  .then(({data}) => data)

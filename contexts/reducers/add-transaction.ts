@@ -8,7 +8,7 @@ import {TransactionStatus} from '@interfaces/enums/transaction-status';
 
 
 const reducer = (state: ApplicationState, payload: SimpleBlockTransactionPayload): ApplicationState =>
-  ({...state, myTransactions: [...state.myTransactions, payload]})
+  ({...state, myTransactions: [payload, ...state.myTransactions]})
 
 export const AddTransactions: ReduceAction<SimpleBlockTransactionPayload> = {
   name: ReduceActionName.AddTransactions,
