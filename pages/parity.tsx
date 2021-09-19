@@ -11,6 +11,7 @@ import {formatNumberToString} from '@helpers/formatNumber';
 import {changeLoadState} from '@reducers/change-load-state';
 import {changeBalance} from '@reducers/change-balance';
 import router from 'next/router';
+import {toastInfo} from '@reducers/add-toast';
 
 export default function ParityPage() {
   const {state: {currentAddress, balance,}, dispatch} = useContext(ApplicationContext);
@@ -19,6 +20,8 @@ export default function ParityPage() {
   const [readRepoName, setReadRepoName] = useState(``);
   const [outputRepoName, setOutputRepoName] = useState(``);
   const [githubCreator, setGithubCreator] = useState(``);
+  const [deployedContract, setDeployedContract] = useState(``);
+  const [councilAmount, setCouncilAmount] = useState(``);
   const [issuesList, setIssuesList] = useState([]);
 
   const formItem = (label = ``, placeholder = ``, value = ``, onChange = (ev) => {}) =>
@@ -29,6 +32,7 @@ export default function ParityPage() {
     formItem(`Github Login`, `Login handle of the owner of the token`, githubLogin, (ev) => setGithubLogin(ev?.target?.value)),
     formItem(`Read Repo`, `Github repo name to read from (pex bepro-js)`, readRepoName, (ev) => setReadRepoName(ev?.target?.value)),
     formItem(`Output Repo`, `Github repo name to output to (pex bepro-js-edge)`, outputRepoName, (ev) => setOutputRepoName(ev?.target?.value)),
+    formItem(`New council amount`, `Set a new council amount`, councilAmount, (ev) => setCouncilAmount(ev?.target?.value)),
   ]
 
   function isValidForm() {
@@ -160,6 +164,34 @@ export default function ParityPage() {
                 })
   }
 
+  function deployNewContract() {
+    BeproService.network
+                .deploy({
+                          settlerTokenAddress: "0x7a7748bd6f9bac76c2f3fcb29723227e3376cbb2",
+                          transactionTokenAddress: "0x7a7748bd6f9bac76c2f3fcb29723227e3376cbb2",
+                          governanceAddress: currentAddress,
+                        })
+                .then(info => {
+                  console.log(`Deployed!`)
+                  console.table(info);
+                  dispatch(toastInfo(`Deployed!`));
+                  setDeployedContract(info.contractAddress);
+                  return true;
+                })
+  }
+
+  function updateCouncilAmount() {
+    BeproService.network.changeCouncilAmount(+councilAmount)
+                .then(info => {
+                  dispatch(toastInfo(`Council amount changed!`));
+                  console.log(`Council Changed!`);
+                  console.table(info);
+                })
+                .catch(e => {
+                  console.error(`Error deploying`, e);
+                })
+  }
+
   function renderIssuesList({title = ``, body = ``, tokenAmount = 100000,}, i: number) {
     return (
       <div className="mb-4" key={i}>
@@ -206,11 +238,17 @@ export default function ParityPage() {
       <ConnectWalletButton asModal={true} />
       <div className="div mt-3 mb-4 content-wrapper">
         {formMaker.map(renderFormItems)}
+        <div className="row mb-3">
+          <label className="p-small trans mb-2">New contract address</label>
+          <input value={deployedContract} readOnly={true} type="text" className="form-control" placeholder={`Address will appear here`}/>
+        </div>
         <div className="row">
           <div className="col d-flex justify-content-end align-items-center">
-            {issuesList.length && <span className="me-auto fs-small">Will cost <span className={getCostClass()}>{formatNumberToString(getSumOfTokenAmount())} BEPRO </span> / {formatNumberToString(balance.bepro)} BEPRO</span> || ``}
+            <button className="btn btn-md me-2 btn-primary" onClick={() => deployNewContract()}>Deploy contract</button>
+            <button className="btn btn-md btn-primary me-auto" disabled={!councilAmount} onClick={() => updateCouncilAmount()}>Update council amount</button>
+            {issuesList.length && <span className="fs-small me-2">Will cost <span className={getCostClass()}>{formatNumberToString(getSumOfTokenAmount())} BEPRO </span> / {formatNumberToString(balance.bepro)} BEPRO</span> || ``}
             {issuesList.length && <button className="btn btn-trans mr-2" onClick={() => createIssuesFromList()}>Create Issues</button> || ``}
-            <button className="btn btn-primary" disabled={isValidForm()} onClick={() => listIssues()}>List issues</button>
+            <button className="btn btn-md btn-primary" disabled={isValidForm()} onClick={() => listIssues()}>List issues</button>
           </div>
         </div>
       </div>

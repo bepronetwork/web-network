@@ -32,7 +32,7 @@ export default function PageIssue() {
                       .then((issue) => {
                         if (!issue)
                           return;
-
+                        console.log(issue);
                         setIssue(issue);
                         GithubMicroService.getCommentsIssue(issue.githubId)
                                           .then((comments) => setCommentsIssue(comments));
@@ -62,16 +62,17 @@ export default function PageIssue() {
     .then((repo) => setCanOpenPR(!!repo))
   }
 
-  const gets = () => {
+  function loadIssueData() {
     if (currentAddress && id) {
       getsIssueMicroService();
       getsIssueBeproService();
       getCurrentUserMicroService();
     } else if (id) getsIssueMicroService();
 
-    if(githubHandle) getRepoForked();
-  };
-  useEffect(gets, [githubHandle,currentAddress, id]);
+    if (githubHandle) getRepoForked();
+  }
+
+  useEffect(loadIssueData, [githubHandle,currentAddress, id]);
 
   const getNetworkIssue = () => {
     BeproService.network
@@ -120,6 +121,7 @@ export default function PageIssue() {
         forks={forks}
         githubLogin={currentUser?.githubLogin}
         canOpenPR={canOpenPR}
+        githubId={issue?.githubId}
       />
       {networkIssue?.mergeProposalsAmount > 0 && (
         <IssueProposals
