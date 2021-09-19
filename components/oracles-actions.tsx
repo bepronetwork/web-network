@@ -19,7 +19,7 @@ const actions: string[] = ["Lock", "Unlock"];
 
 
 function OraclesActions(): JSX.Element {
-  const {state: {beproInit, metaMaskWallet, currentAddress, balance}, dispatch} = useContext(ApplicationContext);
+  const {state: {beproInit, metaMaskWallet, currentAddress, balance, myTransactions}, dispatch} = useContext(ApplicationContext);
 
   const [show, setShow] = useState<boolean>(false);
   const [action, setAction] = useState<string>(actions[0]);
@@ -167,16 +167,17 @@ function OraclesActions(): JSX.Element {
           { action === 'Lock' && <ApproveButton disabled={isApproved || !tokenAmount || !metaMaskWallet} onClick={approveSettlerToken} /> || ``}
           <TransferOraclesButton buttonLabel={renderInfo.label} disabled={!isApproved || !metaMaskWallet} onClick={checkLockedAmount} />
 
-          <NetworkTxButton txMethod={action.toLowerCase()}
-                           txType={getTxType()}
-                           txCurrency={action === `Lock` && `$BEPRO` || `Oracles`}
-                           txParams={renderInfo.params(walletAddress)}
-                           buttonLabel=""
-                           modalTitle={renderInfo.title}
-                           modalDescription={renderInfo.description}
-                           onSuccess={handleCancel}
-                           onFail={setError}
-                           ref={networkTxRef} />
+          <NetworkTxButton 
+            txMethod={action.toLowerCase()}
+            txType={getTxType()}
+            txCurrency={action === `Lock` && `$BEPRO` || `Oracles`}
+            txParams={renderInfo.params(walletAddress)}
+            buttonLabel=""
+            modalTitle={renderInfo.title}
+            modalDescription={renderInfo.description}
+            onSuccess={handleCancel}
+            onFail={setError}
+            ref={networkTxRef} />
 
         </div>
       </div>

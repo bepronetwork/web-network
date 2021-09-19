@@ -979,6 +979,14 @@ $c_props: ('m': 'margin') !default;
 }
 
 .transaction-list {
+  .tx-container{
+    max-height: 244px;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
   .tx-row {
     background-color: $black;
     width: 333px;

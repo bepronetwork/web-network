@@ -15,15 +15,16 @@ export default function PageIssue() {
   const router = useRouter();
   const {id} = router.query;
   const {
-    state: {currentAddress},
+    state: {githubHandle, currentAddress},
   } = useContext(ApplicationContext);
 
   const [issue, setIssue] = useState<IssueData>();
   const [networkIssue, setNetworkIssue] = useState<any>();
-  const [isIssueinDraft, setIsIssueinDraft] = useState(true);
+  const [isIssueinDraft, setIsIssueinDraft] = useState(false);
   const [commentsIssue, setCommentsIssue] = useState();
   const [balance, setBalance] = useState();
   const [forks, setForks] = useState();
+  const [canOpenPR, setCanOpenPR] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>();
 
   const getsIssueMicroService = () => {
@@ -56,14 +57,21 @@ export default function PageIssue() {
     );
   };
 
+  const getRepoForked = () =>{
+    GithubMicroService.getForkedRepo(githubHandle)
+    .then((repo) => setCanOpenPR(!!repo))
+  }
+
   const gets = () => {
     if (currentAddress && id) {
       getsIssueMicroService();
       getsIssueBeproService();
       getCurrentUserMicroService();
     } else if (id) getsIssueMicroService();
+
+    if(githubHandle) getRepoForked();
   };
-  useEffect(gets, [currentAddress, id]);
+  useEffect(gets, [githubHandle,currentAddress, id]);
 
   const getNetworkIssue = () => {
     BeproService.network
@@ -77,7 +85,7 @@ export default function PageIssue() {
   };
 
   const handleStateissue = () => {
-    if (!isIssueinDraft) return issue?.state;
+    if (issue?.state) return issue?.state;
 
     if (isIssueinDraft) {
       return 'Draft';
@@ -111,6 +119,7 @@ export default function PageIssue() {
         amountIssue={networkIssue?.tokensStaked}
         forks={forks}
         githubLogin={currentUser?.githubLogin}
+        canOpenPR={canOpenPR}
       />
       {networkIssue?.mergeProposalsAmount > 0 && (
         <IssueProposals

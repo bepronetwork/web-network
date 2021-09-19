@@ -59,7 +59,7 @@ function networkTxButton({
     BeproService.network[txMethod](txParams)
       .then((answer) => {
         if (answer.status) {
-          onSuccess()
+          onSuccess && onSuccess();
           dispatch(addToast({
                               type: 'success',
                               title: 'Success',
