@@ -28,7 +28,7 @@ export default function NationDialog({ children }) {
 
   if (isBlock) {
     return (
-      <>
+      <div className="container-fluid vw-100 vh-100 bg-image bg-main-image">
         <Modal
           centered
           aria-labelledby={`${kebabCase("NationDialog")}-modal`}
@@ -62,7 +62,7 @@ export default function NationDialog({ children }) {
             </div>
           </Modal.Body>
         </Modal>
-      </>
+      </div>
     );
   }
 
