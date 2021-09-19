@@ -95,7 +95,7 @@ export default function PageActions({
 
     const redeemTx = addTransaction({type: TransactionTypes.redeemIssue})
     dispatch(redeemTx);
-    
+
     await BeproService.login()
       .then(() => {
         BeproService.network.redeemIssue({issueId})
@@ -261,8 +261,7 @@ export default function PageActions({
                       "btn-purple": !isDisputed,
                       "btn-primary": isDisputed,
                     })}
-                    onClick={handleDispute}
-                  >
+                    onClick={handleDispute}>
                     Dispute
                   </button>
 

@@ -13,8 +13,10 @@ import {changeBalance} from '@reducers/change-balance';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {addTransaction} from '@reducers/add-transaction';
 import {updateTransaction} from '@reducers/update-transaction';
+import {formatNumberToCurrency} from 'helpers/formatNumber'
 
 const actions: string[] = ["Lock", "Unlock"];
+
 
 function OraclesActions(): JSX.Element {
   const {state: {beproInit, metaMaskWallet, currentAddress, balance, myTransactions}, dispatch} = useContext(ApplicationContext);
@@ -27,13 +29,13 @@ function OraclesActions(): JSX.Element {
   const [walletAddress, setWalletAddress] = useState(``);
 
   const networkTxRef = useRef<HTMLButtonElement>(null);
-  const renderAmount = tokenAmount ? `${tokenAmount} ` : "";
+  const renderAmount = tokenAmount ? `${formatNumberToCurrency(tokenAmount)} ` : "";
 
   const renderInfo = {
     Lock: {
       title: "Lock $BEPRO",
-      description: "Lock $BEPRO to get oracles",
-      label: `Get ${renderAmount}oracles`,
+      description: "Lock $BEPRO to curate the Network",
+      label: `Lock ${renderAmount}$BEPRO`,
       caption: "Get Oracles from $BEPRO",
       body: `You are locking ${tokenAmount} $BEPRO /br/ to get /oracles${tokenAmount} Oracles/`,
       params() {
@@ -42,8 +44,8 @@ function OraclesActions(): JSX.Element {
     },
     Unlock: {
       title: "Unlock $BEPRO",
-      description: "Unlock $BEPRO by giving away oracles",
-      label: `Recover ${renderAmount}$BEPRO`,
+      description: "Unlock $BEPRO And Withdraw",
+      label: `Withdraw ${renderAmount}$BEPRO`,
       caption: "Get $BEPRO from Oracles",
       body: `Give away /oracles${tokenAmount} Oracles/ /br/ to get back ${tokenAmount} $BEPRO`,
       params(from: string) {
@@ -55,7 +57,7 @@ function OraclesActions(): JSX.Element {
   function updateErrorsAndApproval(bool: boolean) {
     setIsApproved(bool);
     setError(
-      !bool ? "Settler token not approved. Check it and try again." : "",
+      !bool ? "Please approve BEPRO Transactions First. Check it and try again." : "",
     );
   }
 
@@ -146,7 +148,7 @@ function OraclesActions(): JSX.Element {
   return (
     <>
       <div className="col-md-5">
-        <div className="content-wrapper">
+        <div className="content-wrapper h-100">
           <OraclesBoxHeader actions={actions} onChange={setAction} currentAction={action} />
 
           <p className="p text-white">{renderInfo.description}</p>

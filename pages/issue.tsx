@@ -101,8 +101,7 @@ export default function PageIssue() {
       <IssueHero
         amount={networkIssue?.tokensStaked}
         state={handleStateissue()}
-        issue={issue}
-      />
+        issue={issue}/>
       <PageActions
         state={handleStateissue()}
         developers={issue?.developers}

@@ -7,16 +7,15 @@ import ProposalProgress from '@components/proposal-progress';
 import {useRouter} from 'next/router';
 import {ApplicationContext} from '@contexts/application';
 import {BeproService} from '@services/bepro-service';
-import GithubMicroService, {
-  ProposalData,
-  User,
-} from '@services/github-microservice';
-import {toNumber} from 'lodash';
+import GithubMicroService, {ProposalData, User,} from '@services/github-microservice';
 import {formatDate} from '@helpers/formatDate';
 import {handlePercentage} from '@helpers/handlePercentage';
 import {IssueData} from '@interfaces/issue-data';
 import {addToast} from '@reducers/add-toast';
-import ProposalStepProgress from '@components/proposal-step-progress';
+
+import ProposalProgressBar from '@components/proposal-progress-bar';
+import {changeOraclesState} from '@reducers/change-oracles';
+import CustomContainer from '@components/custom-container';
 
 interface ProposalBepro {
   disputes: string;
@@ -39,13 +38,15 @@ interface usersAddresses {
 export default function PageProposal() {
   const router = useRouter();
   const {id, issueId} = router.query;
-  const { dispatch, state: {currentAddress}, } = useContext(ApplicationContext);
+  const { dispatch, state: {currentAddress, beproStaked}, } = useContext(ApplicationContext);
 
   const [proposalBepro, setProposalBepro] = useState<ProposalBepro>();
   const [proposalMicroService, setProposalMicroService] = useState<ProposalData>();
   const [amountIssue, setAmountIssue] = useState<string>();
+  const [networkCid, setNetworkCid] = useState<string>();
+  const [isFinalized, setIsFinalized] = useState<boolean>();
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
-  const [issueMicroService, setIssueMicroService] = useState<IssueData>();
+  const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
 
   async function getProposalData() {
     const mergeProposal = await GithubMicroService.getMergeProposalIssue(issueId, id);
@@ -74,7 +75,11 @@ export default function PageProposal() {
 
   function getIssueAmount() {
     return BeproService.network.getIssueById({issueId: id})
-                .then(issue => setAmountIssue(issue.tokensStaked))
+                       .then(issue => {
+                         setAmountIssue(issue.tokensStaked);
+                         setNetworkCid(issue.cid);
+                         setIsFinalized(issue.finalized);
+                       })
   }
 
   function updateUsersAddresses(proposal: ProposalBepro) {
@@ -99,9 +104,11 @@ export default function PageProposal() {
 
   function loadProposalData() {
     if (issueId && id && currentAddress) {
-      getIssueAmount()
-        .then(_ => getProposalData())
-        .then(_ => getProposal())
+      BeproService.network.getOraclesSummary({address: currentAddress})
+                  .then(oracles => dispatch(changeOraclesState(oracles)))
+                  .then(_ => getIssueAmount())
+                  .then(_ => getProposalData())
+                  .then(_ => getProposal());
     }
   }
 
@@ -120,24 +127,24 @@ export default function PageProposal() {
         }
         beproStaked={amountIssue}/>
       <ProposalProgress developers={usersAddresses}/>
-      <ProposalStepProgress 
-        amountIssue={proposalBepro?.prAmounts} 
-        createdAt={proposalMicroService} 
-        isDisputed={proposalBepro?.isDisputed}/>
+      <CustomContainer>
+        <div className="col-6">
+          <ProposalProgressBar issueDisputeAmount={+proposalBepro?.disputes} isDisputed={proposalBepro?.isDisputed} stakedAmount={+beproStaked} />
+        </div>
+      </CustomContainer>
       <PageActions
         state={'pull request'}
         developers={[]}
-        finalized={false}
-        isIssueinDraft={false}
-        addressNetwork={'0xE1Zr7u'}
+        finalized={isFinalized}
+        isIssueinDraft={issueMicroService?.state === `draft`}
+        addressNetwork={networkCid}
         issueId={issueId?.toString()}
-        mergeId={id?.toString()}
+        mergeId={(+id - 1).toString()}
         handleBeproService={getProposal}
         isDisputed={proposalBepro?.isDisputed}
-        UrlGithub={`https://github.com/bepronetwork/bepro-js-edge/pull/${proposalMicroService?.pullRequest.githubId}`}
-      />
+        UrlGithub={`https://github.com/bepronetwork/bepro-js-edge/pull/${proposalMicroService?.pullRequest.githubId}`}/>
 
-      <ProposalAddresses addresses={usersAddresses} />
+      <ProposalAddresses addresses={usersAddresses} currency="$BEPRO" />
     </>
   );
 }

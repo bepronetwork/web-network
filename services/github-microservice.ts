@@ -49,7 +49,7 @@ export default class GithubMicroService {
     const {data} = await client.get('/issues/');
     return data;
   }
-  
+
   static async getIssuesByGhLogin(ghlogin) {
     const {data} = await client.get(`/issues/githublogin/${ghlogin}`);
     return data;
@@ -59,7 +59,7 @@ export default class GithubMicroService {
     const {data} =  await client.get('/issues',{params: {filterState}});
     return data;
   }
-  
+
   static async updateIssueState(issueID: string, state: IssueState) {
     const {data} =  await client.put(`/issues/${issueID}`, {state});
     return data;
@@ -92,6 +92,8 @@ export default class GithubMicroService {
     return client.patch<string>(`/users/connect/${githubHandle}`, payload)
                  .then(() => true)
                  .catch((error) => {
+                   if (error.status === 400)
+                     return false;
                    console.error(`joinAddressToUser Error`, error)
                    return false;
                  });
