@@ -116,7 +116,7 @@ export default function NewProposal({
   }
 
   function updateHideCreateProposalState() {
-    setHideCreateProposal(councilAmount >= +oracles.tokensLocked || isIssueOwner);
+    setHideCreateProposal(councilAmount >= +oracles.tokensLocked || !isIssueOwner);
   }
 
   function getCouncilAmount() {
