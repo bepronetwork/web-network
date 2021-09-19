@@ -67,21 +67,21 @@ export default function PageActions({
 
   const [showPRModal, setShowPRModal] = useState(false);
 
-  function handleAvatar() {
-    if (developers?.length > 0) {
-      return <IssueAvatars users={developers}></IssueAvatars>;
-    } else if (developers?.length && state.toLowerCase() !== "draft") {
+  function renderIssueAvatars() {
+    if (developers?.length > 0)
+      return <IssueAvatars users={developers} />;
+
+    if (developers?.length && state.toLowerCase() !== "draft")
       return <p className="p-small trans me-2 mt-3">no one is working </p>;
-    }
   }
 
-  function handleFork() {
+  function renderForkAvatars() {
     if (forks?.length > 0) {
       return (
-        <>
-          <IssueAvatars users={forks.map((item) => item.owner)}></IssueAvatars>
-          <p className="mb-1 me-2">Forks</p>
-        </>
+        <div className="d-flex align-items-center">
+          <IssueAvatars users={forks.map((item) => item.owner)} />
+          <span className="me-3 fs-small">Forks</span>
+        </div>
       );
     }
   }
@@ -246,8 +246,8 @@ export default function PageActions({
           <div className="d-flex align-items-center justify-content-between mb-4">
             <h4 className="h4">Details</h4>
             <div className="d-flex align-items-center">
-              {handleAvatar()}
-              {forks && handleFork()}
+              {renderIssueAvatars()}
+              {forks && renderForkAvatars()}
               {UrlGithub && (
                 <Link href={UrlGithub}>
                   <a className="btn btn-md btn-opac me-3" target="_blank" >View on github</a>

@@ -52,7 +52,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
         <div className="col-md-10">
           <div className="content-wrapper mb-4 pb-0">
             <h3 className="smallCaption pb-3">{numberProposals} Proposals</h3>
-            {proposals.map(proposal => <ProposalItem proposal={proposal} issueId={issueId} amount={amount} beproStaked={beproStaked} onTakenBack={gets} />)}
+            {proposals.map(proposal => <ProposalItem proposal={proposal} issueId={issueId} amount={amount} beproStaked={beproStaked} onDispute={gets} />)}
           </div>
         </div>
       </div>
