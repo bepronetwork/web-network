@@ -115,14 +115,12 @@ export default function NewProposal({
     getParticipantsPullRequest(obj.value, obj.githubId);
   }
 
-  function updateHideCreateProposalState() {
-    setHideCreateProposal(councilAmount >= +oracles.tokensLocked || !isIssueOwner);
-  }
-
-  function getCouncilAmount() {
+  function updateCreateProposalHideState() {
     if (!beproInit) return;
 
-    BeproService.network.COUNCIL_AMOUNT().then(setCouncilAmount);
+    BeproService.network.COUNCIL_AMOUNT().then(setCouncilAmount)
+                .then(() => BeproService.network.isCouncil({address: currentAddress}))
+                .then(isCouncil => setHideCreateProposal(!isCouncil || !isIssueOwner));
   }
 
   useEffect(() => {
@@ -138,16 +136,11 @@ export default function NewProposal({
       );
   }, [pullRequests]);
 
-  useEffect(getCouncilAmount, [beproInit]);
-  useEffect(updateHideCreateProposalState, [balance.bepro]);
+  useEffect(updateCreateProposalHideState, [currentAddress]);
 
   return (
     <>
-      {
-        !hideCreateProposal &&
-        <button className="btn btn-md btn-primary" onClick={() => setShow(true)}>Create Proposal</button> ||
-        `You need at least ${councilAmount} BEPRO to Create a Proposal `
-      }
+      { !hideCreateProposal && <button className="btn btn-md btn-primary" onClick={() => setShow(true)}>Create Proposal</button> || `` }
       <Modal show={show}
              title="Create Proposal"
              footer={

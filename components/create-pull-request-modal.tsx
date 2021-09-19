@@ -39,7 +39,7 @@ export default function CreatePullRequestModal({
           </div>
         </div>
         <div className="d-flex justify-content-center">
-          <ButtonTrans opac={true} className="mr-2" disabled={!title && !description} onClick={() => onConfirm({title, description})}>start working</ButtonTrans>
+          <ButtonTrans noAppend={true} className="btn btn-md btn-primary mr-2 text-uppercase" disabled={!title && !description} onClick={() => onConfirm({title, description})}>Create pull request</ButtonTrans>
           <ButtonTrans opac={true}  onClick={onCloseClick}>cancel</ButtonTrans>
         </div>
       </div>

@@ -14,10 +14,10 @@ interface Options {
   issueId: string;
   amount: number;
   beproStaked: number;
-  onTakenBack: (error?: boolean) => void;
+  onDispute: (error?: boolean) => void;
 }
 
-export default function ProposalItem({proposal, issueId, amount, beproStaked, onTakenBack = () => {}}: Options) {
+export default function ProposalItem({proposal, issueId, amount, beproStaked, onDispute = () => {}}: Options) {
   const { dispatch,} = useContext(ApplicationContext);
 
   async function handleDispute(mergeId) {
@@ -32,10 +32,10 @@ export default function ProposalItem({proposal, issueId, amount, beproStaked, on
                         BeproService.parseTransaction(txInfo, disputeTx.payload)
                                     .then(block => dispatch(updateTransaction(block)));
                       })
-                      .then(() => onTakenBack())
+                      .then(() => onDispute())
                       .catch((err) => {
                         dispatch(updateTransaction({...disputeTx.payload as any, remove: true}));
-                        onTakenBack(true);
+                        onDispute(true);
                         console.log("Error creating dispute", err)
                       })
   }
