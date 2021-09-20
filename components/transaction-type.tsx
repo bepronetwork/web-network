@@ -15,6 +15,8 @@ export default function TransactionType({type}) {
     [TransactionTypes.proposeMerge]: `Propose merge request`,
     [TransactionTypes.closeIssue]: `Close issue`,
     [TransactionTypes.redeemIssue]: `Redeem issue`,
+    [TransactionTypes.approveSettlerToken]: `Approve settler token`,
+    [TransactionTypes.recognizedAsFinish]: `Recognize issue as finished`,
   }
 
   return (<span className="d-block text-white-50 fs-small">{[TypeMaps[type]] || `Missing map`}</span>)

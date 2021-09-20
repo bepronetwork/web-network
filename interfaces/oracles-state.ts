@@ -4,4 +4,5 @@ export interface OraclesState {
   addresses: string[];
   tokensLocked: string;
   delegatedToOthers?: number;
+  delegatedEntries?: [string, number][]
 }

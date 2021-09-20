@@ -11,6 +11,7 @@ import {changeLoadState} from '@contexts/reducers/change-load-state';
 import {addTransaction} from '@reducers/add-transaction';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
+import {toastWarning} from '@reducers/add-toast';
 
 interface participants {
   githubHandle: string;
@@ -24,7 +25,7 @@ export default function NewProposal({
                                       pullRequests = [],
                                       handleBeproService,
                                       handleMicroService,
-                                      isIssueOwner = false,
+                                      isIssueOwner = false, isFinished = false
                                     }) {
   const {dispatch, state: {balance, currentAddress, beproInit, oracles,},} = useContext(ApplicationContext);
   const [distrib, setDistrib] = useState<Object>({});
@@ -107,12 +108,27 @@ export default function NewProposal({
     setShow(false);
   }
 
-  function handleChangeSelect(obj: {
-    label: string;
-    value: string;
-    githubId: string;
-  }) {
-    getParticipantsPullRequest(obj.value, obj.githubId);
+  function handleChangeSelect({ value, githubId }) {
+    getParticipantsPullRequest(value, githubId);
+  }
+
+  function recognizeAsFinished() {
+    const recognizeAsFinished = addTransaction({type: TransactionTypes.recognizedAsFinish})
+    dispatch(recognizeAsFinished);
+
+    BeproService.network.recognizeAsFinished({issueId})
+                .then(txInfo => {
+                  BeproService.parseTransaction(txInfo, recognizeAsFinished.payload)
+                              .then(block => dispatch(updateTransaction(block)));
+                })
+                .then(() => {
+                  handleBeproService();
+                  handleMicroService();
+                })
+                .catch(() => {
+                  dispatch(updateTransaction({...recognizeAsFinished.payload as any, remove: true}))
+                  dispatch(toastWarning(`Failed to mark issue as finished!`));
+                })
   }
 
   function updateCreateProposalHideState() {
@@ -140,7 +156,13 @@ export default function NewProposal({
 
   return (
     <>
-      { !hideCreateProposal && <button className="btn btn-md btn-primary" onClick={() => setShow(true)}>Create Proposal</button> || `` }
+      {
+        !hideCreateProposal ?
+        isFinished
+          ? <button className="btn btn-md btn-primary" onClick={() => setShow(true)}>Create Proposal</button>
+          : <button className="btn btn-md btn-primary" onClick={() => recognizeAsFinished()}>Recognize as finished</button>
+        : ``
+      }
       <Modal show={show}
              title="Create Proposal"
              footer={
