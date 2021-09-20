@@ -1,3 +1,4 @@
+export type OraclesActionLabel = "Lock" | "Unlock"
 export interface OraclesState {
   oraclesDelegatedByOthers: string;
   amounts: string[];

@@ -17,9 +17,8 @@ import {formatNumberToCurrency} from 'helpers/formatNumber'
 
 const actions: string[] = ["Lock", "Unlock"];
 
-
 function OraclesActions(): JSX.Element {
-  const {state: {beproInit, metaMaskWallet, currentAddress, balance, myTransactions}, dispatch} = useContext(ApplicationContext);
+  const {state: {beproInit, metaMaskWallet, currentAddress, balance, oracles}, dispatch} = useContext(ApplicationContext);
 
   const [show, setShow] = useState<boolean>(false);
   const [action, setAction] = useState<string>(actions[0]);
@@ -88,8 +87,14 @@ function OraclesActions(): JSX.Element {
   }
 
   function handleChangeToken(params: NumberFormatValues) {
-    if (params.floatValue > balance.bepro)
+    if(params.floatValue < 0)
+      return setTokenAmount(0)
+    
+    if (action === 'Lock' && params.floatValue > balance.bepro)
       return setError(`Amount is greater than your BEPRO amount`)
+    
+    if (action === 'Unlock' && params.floatValue > Number(oracles.tokensLocked))
+      return setError(`Amount is greater than your Oracles amount`)
 
     setTokenAmount(params.floatValue);
   }

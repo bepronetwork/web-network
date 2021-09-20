@@ -20,7 +20,8 @@ export default function App({ Component, pageProps }: AppProps) {
       <ApplicationContextProvider>
         <Head>
           <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-          <title>WEB Network</title>
+          <title>App | Web3 Decentralized Development</title>
+          <link href="/favicon.ico" rel="shortcut icon"  />
         </Head>
         <NationDialog>
           <MainNav />
