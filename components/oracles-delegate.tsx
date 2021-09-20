@@ -21,6 +21,7 @@ function OraclesDelegate(): JSX.Element {
     if (params.floatValue > delegatedAmount)
       setError(`Amount is greater than your total amount`);
     else setError(``);
+    if(params.floatValue < 1) return setTokenAmount(0)
 
     setTokenAmount(params.floatValue);
   }
@@ -43,7 +44,7 @@ function OraclesDelegate(): JSX.Element {
     BeproService.network.getBEPROStaked()
                 .then(staked => dispatch(changeBalance({staked})))
 
-    BeproService.network.getOraclesSummary({address: currentAddress})
+                BeproService.network.getOraclesSummary({address: currentAddress})
                 .then(oracles => {
                   dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles)))
                 });
@@ -57,6 +58,7 @@ function OraclesDelegate(): JSX.Element {
   }
 
   const isButtonDisabled = (): boolean => [
+      tokenAmount < 1,
       tokenAmount > +oracles.tokensLocked,
       !delegatedTo,
       myTransactions.find(({status, type}) =>

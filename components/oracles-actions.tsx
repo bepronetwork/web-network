@@ -11,6 +11,8 @@ import TransferOraclesButton from './transfer-oracles-button';
 import NetworkTxButton from './network-tx-button';
 import {changeBalance} from '@reducers/change-balance';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
+import { TransactionStatus } from '@interfaces/enums/transaction-status'
+import {TransactionCurrency} from '@interfaces/transaction';
 import {addTransaction} from '@reducers/add-transaction';
 import {updateTransaction} from '@reducers/update-transaction';
 import {formatNumberToCurrency} from 'helpers/formatNumber'
@@ -18,7 +20,7 @@ import {formatNumberToCurrency} from 'helpers/formatNumber'
 const actions: string[] = ["Lock", "Unlock"];
 
 function OraclesActions(): JSX.Element {
-  const {state: {beproInit, metaMaskWallet, currentAddress, balance, oracles}, dispatch} = useContext(ApplicationContext);
+  const {state: {beproInit, metaMaskWallet, currentAddress, balance, oracles, myTransactions}, dispatch} = useContext(ApplicationContext);
 
   const [show, setShow] = useState<boolean>(false);
   const [action, setAction] = useState<string>(actions[0]);
@@ -89,12 +91,9 @@ function OraclesActions(): JSX.Element {
   function handleChangeToken(params: NumberFormatValues) {
     if(params.floatValue < 0)
       return setTokenAmount(0)
-    
-    if (action === 'Lock' && params.floatValue > balance.bepro)
-      return setError(`Amount is greater than your BEPRO amount`)
-    
-    if (action === 'Unlock' && params.floatValue > Number(oracles.tokensLocked))
-      return setError(`Amount is greater than your Oracles amount`)
+
+    if (params.floatValue > getMaxAmmount())
+      return setError(`Amount is greater than your ${getCurrentLabel()} amount`)
 
     setTokenAmount(params.floatValue);
   }
@@ -110,6 +109,15 @@ function OraclesActions(): JSX.Element {
     setShow(false);
     updateValues();
   }
+
+  const isButtonDisabled = (): boolean => [
+    tokenAmount < 1,
+    !isApproved,
+    !metaMaskWallet,
+    tokenAmount > getMaxAmmount(),
+    myTransactions.find(({status, type}) =>
+                          status === TransactionStatus.pending && type === getTxType())
+  ].some(values => values)
 
   function approveSettlerToken() {
     if (!currentAddress)
@@ -139,6 +147,14 @@ function OraclesActions(): JSX.Element {
                 .then(handleCheck);
   }
 
+  function getCurrentLabel(): TransactionCurrency {
+    return action === `Lock` && `$BEPRO` || `Oracles`
+  }
+
+  function getMaxAmmount(): number {
+    return action === `Lock` && balance.bepro || (+oracles.tokensLocked - oracles.delegatedToOthers);
+  }
+
   function getTxType() {
     return action === `Lock` && TransactionTypes.lock || TransactionTypes.unlock;
   }
@@ -160,8 +176,8 @@ function OraclesActions(): JSX.Element {
 
           <InputNumber
             disabled={!isApproved || !metaMaskWallet}
-            label="$BEPRO Amount"
-            symbol="$BEPRO"
+            label={`${getCurrentLabel()} Amount`}
+            symbol={`${getCurrentLabel().toLocaleUpperCase()}`}
             max={balance.bepro}
             error={error}
             helperText={error}
@@ -170,12 +186,12 @@ function OraclesActions(): JSX.Element {
             thousandSeparator />
 
           { action === 'Lock' && <ApproveButton disabled={isApproved || !tokenAmount || !metaMaskWallet} onClick={approveSettlerToken} /> || ``}
-          <TransferOraclesButton buttonLabel={renderInfo.label} disabled={!isApproved || !metaMaskWallet} onClick={checkLockedAmount} />
+          <TransferOraclesButton buttonLabel={renderInfo.label} disabled={isButtonDisabled()} onClick={checkLockedAmount} />
 
           <NetworkTxButton 
             txMethod={action.toLowerCase()}
             txType={getTxType()}
-            txCurrency={action === `Lock` && `$BEPRO` || `Oracles`}
+            txCurrency={getCurrentLabel()}
             txParams={renderInfo.params(walletAddress)}
             buttonLabel=""
             modalTitle={renderInfo.title}
