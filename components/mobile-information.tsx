@@ -3,13 +3,11 @@ import { Modal } from "react-bootstrap";
 
 export default function MobileInformation() {
   return (
-    <>
-      <Modal
-        centered
-        aria-labelledby={`${kebabCase("Mobile-Information")}-modal`}
-        aria-describedby={`${kebabCase("Mobile-Information")}-modal`}
-        show={true}
-      >
+    <div>
+      <Modal centered backdrop={false}
+             aria-labelledby={`${kebabCase("Mobile-Information")}-modal`}
+             aria-describedby={`${kebabCase("Mobile-Information")}-modal`}
+             show={true}>
         <Modal.Header>
           <Modal.Title></Modal.Title>
         </Modal.Header>
@@ -31,6 +29,6 @@ export default function MobileInformation() {
         </Modal.Body>
         <Modal.Footer></Modal.Footer>
       </Modal>
-    </>
+    </div>
   );
 }

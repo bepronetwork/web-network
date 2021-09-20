@@ -33,7 +33,7 @@ export default function NewProposal({
   const [error, setError] = useState<string>('');
   const [show, setShow] = useState<boolean>(false);
   const [participants, setParticipants] = useState<participants[]>([]);
-  const [hideCreateProposal, setHideCreateProposal] = useState(true);
+  const [isCouncil, setIsCouncil] = useState(false);
   const [councilAmount, setCouncilAmount] = useState(0);
   const [currentGithubId, setCurrentGithubId] = useState<string>();
 
@@ -136,7 +136,11 @@ export default function NewProposal({
 
     BeproService.network.COUNCIL_AMOUNT().then(setCouncilAmount)
                 .then(() => BeproService.network.isCouncil({address: currentAddress}))
-                .then(isCouncil => setHideCreateProposal(!isCouncil || !isIssueOwner));
+                .then(isCouncil => setIsCouncil(isCouncil));
+  }
+
+  function renderRecognizeAsFinished() {
+    return <button className="btn btn-md btn-primary" onClick={() => recognizeAsFinished()}>Recognize as finished</button>;
   }
 
   useEffect(() => {
@@ -157,12 +161,10 @@ export default function NewProposal({
   return (
     <>
       {
-        !hideCreateProposal ?
-        isFinished
-          ? <button className="btn btn-md btn-primary" onClick={() => setShow(true)}>Create Proposal</button>
-          : <button className="btn btn-md btn-primary" onClick={() => recognizeAsFinished()}>Recognize as finished</button>
-        : ``
+        isCouncil && isFinished && <button className="btn btn-md btn-primary" onClick={() => setShow(true)}>Create Proposal</button>
+          || (isIssueOwner || isCouncil) && !isFinished && renderRecognizeAsFinished()
       }
+
       <Modal show={show}
              title="Create Proposal"
              footer={
