@@ -93,7 +93,9 @@ function OraclesActions(): JSX.Element {
       return setTokenAmount(0)
 
     if (params.floatValue > getMaxAmmount())
-      return setError(`Amount is greater than your ${getCurrentLabel()} amount`)
+      setError(`Amount is greater than your ${getCurrentLabel()} amount`)
+    else if(error)
+      setError("")
 
     setTokenAmount(params.floatValue);
   }
@@ -159,12 +161,7 @@ function OraclesActions(): JSX.Element {
     return action === `Lock` && TransactionTypes.lock || TransactionTypes.unlock;
   }
 
-  useEffect(() => {
-    setError("");
-  }, [tokenAmount, action]);
-
   useEffect(updateWalletAddress, [beproInit, metaMaskWallet, currentAddress])
-
 
   return (
     <>
