@@ -48,7 +48,7 @@ export default function NationDialog({ children }) {
                 At the moment BEPRO services and BEPRO Token{"\n "}(BEPRO) are
                 not available in {country}
               </p>
-              <a href="https://www.bepro.network/terms-and-conditions" 
+              <a target="_blank" href="https://www.bepro.network/terms-and-conditions" 
                 className="mb-2 text-center text-white-50 text-decoration-none text-uppercase fs-8">
                 Excluded Jurisdictions.
               </a>
