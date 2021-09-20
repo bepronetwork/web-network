@@ -11,7 +11,7 @@ type Item = { address: string; amount: string };
 export default function OraclesTakeBack(): JSX.Element {
 
   const {dispatch, state: {oracles, metaMaskWallet, beproInit, balance, currentAddress}} = useContext(ApplicationContext)
-  const [items, setItems] = useState<Item[]>([]);
+  const [items, setItems] = useState<[string, number][]>([]);
   const [delegatedAmount, setDelegatedAmount] = useState(0);
   let oldAddress;
 
@@ -19,19 +19,8 @@ export default function OraclesTakeBack(): JSX.Element {
     if (!metaMaskWallet || !beproInit || !currentAddress)
       return;
 
-    function mapAmount(amount, index) {
-      const address = oracles.addresses[index];
-      return {amount, address}
-    }
-
-    function filterAddresses({amount, address}, index) {
-      return +amount > 0 && address !== currentAddress;
-    }
-
-    const issues = oracles.amounts.map(mapAmount).filter(filterAddresses);
-
-    setItems(issues);
-    setDelegatedAmount(issues.reduce((total, current) => total += +current.amount, 0))
+    setItems(oracles.delegatedEntries);
+    setDelegatedAmount(oracles.delegatedToOthers)
   }
 
   useEffect(setMappedSummaryItems, [beproInit, metaMaskWallet, oracles, currentAddress]);
@@ -54,11 +43,11 @@ export default function OraclesTakeBack(): JSX.Element {
           <div className="col">
             {isEmpty(items)
               ? "No delegates found"
-              : items.map(({ address, amount }) => (
+              : items.map(([address, amount]) => (
                   <OraclesTakeBackItem
                     key={uniqueId("OraclesTakeBackItem_")}
                     address={address}
-                    amount={amount} />
+                    amount={amount.toString()} />
                 ))}
           </div>
         </div>

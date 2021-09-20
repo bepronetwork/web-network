@@ -7,8 +7,6 @@ import {BlockTransaction, UpdateBlockTransaction} from '@interfaces/transaction'
 const reducer = (state: ApplicationState, payload: UpdateBlockTransaction): ApplicationState => {
   const index = state.myTransactions.findIndex(({id}) => id === payload.id);
 
-  console.log(`finding`, payload.id, index, state.myTransactions);
-
   if (index === -1)
     return ({...state,})
 

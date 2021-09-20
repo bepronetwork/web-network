@@ -88,11 +88,7 @@ export default function PageProposal() {
     if (!proposal)
       return;
 
-    console.log(`mapping proposal`, JSON.parse(JSON.stringify(proposal)));
-
     async function mapUser(address: string, i: number) {
-
-      console.log(`address`, address, `i`, i, `${amountIssue}`);
 
       const {githubLogin} = await GithubMicroService.getUserOf(address);
       const oracles = proposal.prAmounts[i].toString();
