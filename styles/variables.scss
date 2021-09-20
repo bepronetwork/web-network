@@ -6,6 +6,7 @@ $white: #fff;
 $black: #000;
 $dark-gray: #20222b;
 $gray: #c4c7d3;
+$ligth-gray: #434758;
 $blue: #4250e4;
 $blue-dark: #3b49e0;
 $purple: #9669ed;
@@ -33,7 +34,7 @@ $more-bg: (
         'success': $success
 );
 
-$more-colors: ('blue-dark': $blue-dark);
+$more-colors: ('blue-dark': $blue-dark, 'dark-gray': $dark-gray, 'ligth-gray': $ligth-gray);
 
 $utilities: map-merge(
   $utilities, (
