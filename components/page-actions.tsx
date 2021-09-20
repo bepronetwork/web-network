@@ -38,6 +38,7 @@ interface pageActions {
   isDisputed?: boolean;
   canOpenPR?: boolean;
   githubId?: string;
+  finished?: boolean;
 }
 
 export default function PageActions({
@@ -60,7 +61,7 @@ export default function PageActions({
                                       mergeId,
                                       isDisputed,
                                       canOpenPR,
-                                      githubId = ``
+                                      githubId = ``, finished = false
                                     }: pageActions) {
   const {
     dispatch,
@@ -123,11 +124,9 @@ export default function PageActions({
       isIssueinDraft === true &&
       addressNetwork === currentAddress &&
       !finalized && (
-        <button
-          className="btn btn-md btn-primary mx-1 px-4"
-          disabled={isReedemButtonDisable()}
-          onClick={handleRedeem}
-        >
+        <button className="btn btn-md btn-primary mx-1 px-4"
+                disabled={isReedemButtonDisable()}
+                onClick={handleRedeem}>
           Redeem
         </button>
       )
@@ -140,14 +139,14 @@ export default function PageActions({
       pullRequests?.length > 0 &&
       githubLogin && (
         <>
-          <NewProposal
-            issueId={issueId}
-            isIssueOwner={addressNetwork === currentAddress}
-            amountTotal={amountIssue}
-            numberMergeProposals={mergeProposals}
-            pullRequests={pullRequests}
-            handleBeproService={handleBeproService}
-            handleMicroService={handleMicroService}/>
+          <NewProposal issueId={issueId}
+                       isFinished={finished}
+                       isIssueOwner={addressNetwork === currentAddress}
+                       amountTotal={amountIssue}
+                       numberMergeProposals={mergeProposals}
+                       pullRequests={pullRequests}
+                       handleBeproService={handleBeproService}
+                       handleMicroService={handleMicroService}/>
         </>
       )
     );

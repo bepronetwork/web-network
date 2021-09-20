@@ -12,13 +12,14 @@ export const ChangeOraclesState: ReduceAction<OraclesState> = {
 }
 
 export const changeOraclesParse = (currentAddress: string, oracles: OraclesState) => {
-  let delegatedToOthers = 0;
-  oracles.amounts.forEach((amount, i) => {
-    if (oracles.addresses[i] !== currentAddress)
-      delegatedToOthers += +amount;
-  });
 
-  return ({...oracles, delegatedToOthers})
+  const reduceAddresses = (p, c, i) =>
+    (c === currentAddress ? {...p} : {...p, [c]: +oracles.amounts[i]});
+
+  const delegatedEntries: [string, number][] = Object.entries(oracles.addresses.reduce(reduceAddresses, {}))
+  const delegatedToOthers = delegatedEntries.reduce((p, [address, value]) => p += +value, 0);
+
+  return ({...oracles, delegatedToOthers, delegatedEntries})
 }
 
 export const changeOraclesState = (payload: OraclesState): ReduceActor<OraclesState> => ({name: ReduceActionName.Oracles, payload});

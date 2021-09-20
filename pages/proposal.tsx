@@ -45,6 +45,7 @@ export default function PageProposal() {
   const [amountIssue, setAmountIssue] = useState<string>();
   const [networkCid, setNetworkCid] = useState<string>();
   const [isFinalized, setIsFinalized] = useState<boolean>();
+  const [isFinished, setIsFinished] = useState<boolean>();
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
 
@@ -79,6 +80,7 @@ export default function PageProposal() {
                          setAmountIssue(issue.tokensStaked);
                          setNetworkCid(issue.cid);
                          setIsFinalized(issue.finalized);
+                         setIsFinished(issue.recognizedAsFinished);
                        })
   }
 
@@ -86,11 +88,7 @@ export default function PageProposal() {
     if (!proposal)
       return;
 
-    console.log(`mapping proposal`, JSON.parse(JSON.stringify(proposal)));
-
     async function mapUser(address: string, i: number) {
-
-      console.log(`address`, address, `i`, i, `${amountIssue}`);
 
       const {githubLogin} = await GithubMicroService.getUserOf(address);
       const oracles = proposal.prAmounts[i].toString();
@@ -122,9 +120,7 @@ export default function PageProposal() {
         title={issueMicroService?.title}
         pullRequestId={proposalMicroService?.pullRequest.githubId}
         authorPullRequest={proposalBepro?.author}
-        createdAt={
-          proposalMicroService && formatDate(proposalMicroService.createdAt)
-        }
+        createdAt={proposalMicroService && formatDate(proposalMicroService.createdAt)}
         beproStaked={amountIssue}/>
       <ProposalProgress developers={usersAddresses}/>
       <CustomContainer>
@@ -142,6 +138,7 @@ export default function PageProposal() {
         mergeId={(+id - 1).toString()}
         handleBeproService={getProposal}
         isDisputed={proposalBepro?.isDisputed}
+        finished={isFinished}
         UrlGithub={`https://github.com/bepronetwork/bepro-js-edge/pull/${proposalMicroService?.pullRequest.githubId}`}/>
 
       <ProposalAddresses addresses={usersAddresses} currency="$BEPRO" />
