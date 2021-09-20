@@ -192,11 +192,13 @@ body {
 
 .p,
 p {
+  font-family: "Inter-Regular", sans-serif;
   font-size: 16px;
   line-height: 160%;
 }
 
 .p-small {
+  font-family: "Inter-Regular", sans-serif;
   font-size: 14px;
   line-height: 160%;
 }
@@ -849,8 +851,8 @@ label {
 }
 
 #nation-dialog-modal{
-  max-width: 414px;
-
+  max-width: 420px;
+  color: $white;
   .white-space-wrap{
     white-space: pre-wrap;
   }
