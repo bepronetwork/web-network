@@ -13,6 +13,7 @@ export const ChangeOraclesState: ReduceAction<OraclesState> = {
 
 export const changeOraclesParse = (currentAddress: string, oracles: OraclesState) => {
   let delegatedToOthers = 0;
+
   oracles.amounts.forEach((amount, i) => {
     if (oracles.addresses[i] !== currentAddress)
       delegatedToOthers += +amount;

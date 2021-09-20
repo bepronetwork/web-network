@@ -11,6 +11,10 @@ import GithubMicroService, {User} from '@services/github-microservice';
 import {ApplicationContext} from '@contexts/application';
 import {IssueData} from '@interfaces/issue-data';
 
+interface NetworkIssue {
+  recognizedAsFinished: boolean;
+}
+
 export default function PageIssue() {
   const router = useRouter();
   const {id} = router.query;
@@ -121,8 +125,7 @@ export default function PageIssue() {
         forks={forks}
         githubLogin={currentUser?.githubLogin}
         canOpenPR={canOpenPR}
-        githubId={issue?.githubId}
-      />
+        githubId={issue?.githubId} finished={networkIssue?.recognizedAsFinished}/>
       {networkIssue?.mergeProposalsAmount > 0 && (
         <IssueProposals
           numberProposals={networkIssue?.mergeProposalsAmount}
