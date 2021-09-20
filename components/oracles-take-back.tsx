@@ -18,7 +18,7 @@ export default function OraclesTakeBack(): JSX.Element {
   function setMappedSummaryItems() {
     if (!metaMaskWallet || !beproInit || !currentAddress)
       return;
-    setItems(oracles?.delegatedEntries?.filter(([address])=> address !== currentAddress));
+    setItems(oracles?.delegatedEntries);
     setDelegatedAmount(oracles.delegatedToOthers)
   }
 
