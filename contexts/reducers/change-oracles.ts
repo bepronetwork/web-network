@@ -14,7 +14,7 @@ export const ChangeOraclesState: ReduceAction<OraclesState> = {
 export const changeOraclesParse = (currentAddress: string, oracles: OraclesState) => {
 
   const reduceAddresses = (p, c, i) =>
-    (c === currentAddress ? {...p} : {...p, [c]: +oracles.amounts[i]});
+  (c === currentAddress || !+oracles.amounts[i] ? {...p} : {...p, [c]: +oracles.amounts[i]});
 
   const delegatedEntries: [string, number][] = Object.entries(oracles.addresses.reduce(reduceAddresses, {}))
   const delegatedToOthers = delegatedEntries.reduce((p, [address, value]) => p += +value, 0);
