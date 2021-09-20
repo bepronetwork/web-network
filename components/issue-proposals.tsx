@@ -30,7 +30,6 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
 
         await GithubMicroService.getMergeProposalIssue(issueId, (i + 1).toString())
                                 .then((mergeProposal: ProposalData) => {
-                                  console.log(mergeProposal);
                                   merge.pullRequestId = mergeProposal?.pullRequestId;
                                   merge.pullRequestGithubId = mergeProposal?.pullRequest.githubId;
                                 })
@@ -38,7 +37,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
 
         pool.push(merge);
       }
-    console.log(pool);
+
     setProposals(pool);
   }
 

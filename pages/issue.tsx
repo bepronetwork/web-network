@@ -36,7 +36,7 @@ export default function PageIssue() {
                       .then((issue) => {
                         if (!issue)
                           return;
-                        console.log(issue);
+
                         setIssue(issue);
                         GithubMicroService.getCommentsIssue(issue.githubId)
                                           .then((comments) => setCommentsIssue(comments));
@@ -84,7 +84,6 @@ export default function PageIssue() {
                                 issueId: id,
                               })
                 .then((networkIssue) => {
-                  console.log(networkIssue);
                   setNetworkIssue(networkIssue)
                 });
   };
