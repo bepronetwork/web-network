@@ -9,7 +9,7 @@ export default function HelpModal({show = false, onCloseClick = () => {}}) {
   const helpItem = (title = ``, tagline = ``, icon, href = ``) => ({title, tagline, icon, href});
 
   const helpItems = [
-    helpItem(`help center`, `Know more about Bepro Network and how to use it`, <HelpIcon/>, `http://docs.bepro.network`),
+    helpItem(`help center`, `Know more about Bepro Network and how to use it`, <HelpIcon/>, `http://support.bepro.network`),
     helpItem(`api documentation`, `Develop with bepro-js and create your next web3 app`, <ApiIcon/>, `http://docs.bepro.network`),
     helpItem(`live chat`, `Get in contact with our team via Discord`, <ChatIcon/>, `https://discord.gg/RQMAu2DZFA`),
     helpItem(`provide feedback`, `Propose ideas and new features`, <FeedbackIcon/>, `https://discord.gg/RQMAu2DZFA`),
