@@ -2,27 +2,15 @@ import { useContext, useEffect, useState } from "react";
 import { ApplicationContext } from "@contexts/application";
 import Avatar from "components/avatar";
 import GithubMicroService, { User } from "@services/github-microservice";
+import {changeGithubHandle} from '@reducers/change-github-handle';
 
 export default function GithubHandle() {
-  const {
-    state: { githubHandle: contextHandle, currentAddress },
-    dispatch,
-  } = useContext(ApplicationContext);
-  const [githubLogin, setGithubLogin] = useState<string>();
+  const {state: { githubHandle, githubLogin },} = useContext(ApplicationContext);
 
-  function getGithubLogin() {
-    if (contextHandle && currentAddress)
-      GithubMicroService.getUserOf(currentAddress).then((handle: User) =>
-        setGithubLogin(handle?.githubLogin)
-      );
-  }
-
-  useEffect(getGithubLogin, [contextHandle, currentAddress]);
-
-  if (contextHandle)
+  if (githubHandle)
     return (
       <span className="btn btn-md btn-trans mr-1">
-        {contextHandle}{" "}
+        {githubHandle}{" "}
         {githubLogin && <Avatar userLogin={githubLogin} className="ms-2" />}
       </span>
     );

@@ -1,7 +1,16 @@
 import GithubImage from './github-image';
 import Link from 'next/link';
+import {useRouter} from 'next/router';
+import {useContext, useEffect} from 'react';
+import {ApplicationContext} from '@contexts/application';
 
 export default function ConnectGithub() {
+  const {state: {currentAddress}} = useContext(ApplicationContext);
+
+  useEffect(() => {
+    localStorage.setItem(`lastAddressBeforeConnect`, currentAddress);
+  }, [currentAddress])
+
   return (
     <div className="container-fluid">
       <div className="row mtn-4 mb-2">

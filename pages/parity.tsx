@@ -229,7 +229,6 @@ export default function ParityPage() {
 
     if (currentAddress !== `0xA0dac0a23707fd504c77cd97c40a34b0256C51F8`)
       router.push(`/account`);
-    else BeproService.getBalance('bepro').then(bepro => dispatch(changeBalance({bepro})));
 
   }, [currentAddress])
 
