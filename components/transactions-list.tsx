@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import UploadIcon from '@assets/icons/upload';
@@ -35,7 +35,7 @@ export default function TransactionsList({onActiveTransaction = (transaction) =>
           {IconMaps[item.type] || <HelpIcon/>}
 
           <div className="ms-3 me-auto">
-            {item.amount && <h6 className="text-white text-uppercase">{formatNumberToCurrency(item.amount)} {item.currency}</h6> || ``}
+            {item.amount && <h6 className="caption text-white text-uppercase">{formatNumberToCurrency(item.amount)} {item.currency}</h6> || ``}
             <TransactionType type={item.type}/>
           </div>
 
