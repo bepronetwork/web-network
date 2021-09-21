@@ -13,7 +13,7 @@ export default function MobileInformation() {
         </Modal.Header>
         <Modal.Body>
           <div className="d-flex flex-column align-items-center">
-            <span className="material-icons">info</span>
+            <span className="material-icons text-blue">info</span>
             <p className="text-white mb-0 mt-4 text-center">
               Our web application currently does not support a mobile version.
             </p>
