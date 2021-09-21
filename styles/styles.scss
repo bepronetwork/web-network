@@ -907,9 +907,16 @@ $c_props: ('m': 'margin') !default;
 }
 
 #transactions-indicator {
-
+  border:0;
+  background-color: transparent;
   &.popover {
-    max-width: 367px;
+    border-radius: 8px;
+    min-width: 415px;
+    min-height: 96px;
+  }
+  .popover-body{
+    border-radius: 8px;
+    min-height: 96px;
   }
   .popover-arrow {
     &::after {
@@ -928,7 +935,8 @@ $c_props: ('m': 'margin') !default;
     }
   }
   .tx-row {
-    background-color: $black;
+    background-color: $dark-gray;
+    border-radius: 8px;
     width: 333px;
   }
 

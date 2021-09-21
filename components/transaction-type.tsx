@@ -19,5 +19,5 @@ export default function TransactionType({type}) {
     [TransactionTypes.recognizedAsFinish]: `Recognize issue as finished`,
   }
 
-  return (<span className="d-block text-white-50 fs-small">{[TypeMaps[type]] || `Missing map`}</span>)
+  return (<span className="d-block text-white-50 text-uppercase fs-small">{[TypeMaps[type]] || `Missing map`}</span>)
 }
