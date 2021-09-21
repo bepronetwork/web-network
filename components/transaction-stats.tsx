@@ -5,7 +5,7 @@ export default function TransactionStats({status = null}: {status: TransactionSt
   const ColorMap = {
     [TransactionStatus.pending]: `warning`,
     [TransactionStatus.processing]: `info`,
-    [TransactionStatus.failed]: `red`,
+    [TransactionStatus.failed]: `danger`,
     [TransactionStatus.completed]: `success`,
   }
 
@@ -13,11 +13,11 @@ export default function TransactionStats({status = null}: {status: TransactionSt
     [TransactionStatus.pending]: `Pending`,
     [TransactionStatus.processing]: `Processing`,
     [TransactionStatus.failed]: `Rejected`,
-    [TransactionStatus.completed]: `Complete`,
+    [TransactionStatus.completed]: `Accepted`,
   }
 
   function rowClassName() {
-    return `bg-transparent px-2 py-1 rounded border border-${ColorMap[status]} text-${ColorMap[status]} fs-small`
+    return `bg-transparent smallCaption px-2 py-1 rounded border border-2 border-${ColorMap[status]} text-${ColorMap[status]} text-uppercase fs-small`
   }
 
   return <><div className={rowClassName()}><strong>{StatusMap[status]}</strong></div></>
