@@ -71,10 +71,6 @@ function OraclesActions(): JSX.Element {
   }
 
   function updateValues() {
-    BeproService.getBalance('bepro').then(bepro => dispatch(changeBalance({bepro})));
-    BeproService.getBalance('eth').then(eth => dispatch(changeBalance({eth})));
-    BeproService.getBalance('staked').then(staked => dispatch(changeBalance({staked})));
-
     BeproService.network
                 .isApprovedSettlerToken({address: BeproService.address, amount: balance.bepro})
                 .then(updateErrorsAndApproval);
@@ -185,7 +181,7 @@ function OraclesActions(): JSX.Element {
           { action === 'Lock' && <ApproveButton disabled={isApproved || !tokenAmount || !metaMaskWallet} onClick={approveSettlerToken} /> || ``}
           <TransferOraclesButton buttonLabel={renderInfo.label} disabled={isButtonDisabled()} onClick={checkLockedAmount} />
 
-          <NetworkTxButton 
+          <NetworkTxButton
             txMethod={action.toLowerCase()}
             txType={getTxType()}
             txCurrency={getCurrentLabel()}

@@ -14,6 +14,7 @@ import {ChangeMicroServiceReady} from '@reducers/change-microservice-ready';
 import {AddTransactions} from './add-transaction';
 import {UpdateTransaction} from '@reducers/update-transaction';
 import {ChangeNetwork} from '@reducers/change-network';
+import {ChangeGithubLogin} from '@reducers/change-github-login';
 
 export default function LoadApplicationReducers() {
   [
@@ -32,5 +33,6 @@ export default function LoadApplicationReducers() {
     AddTransactions,
     UpdateTransaction,
     ChangeNetwork,
+    ChangeGithubLogin,
   ].forEach(addReducer);
 }
