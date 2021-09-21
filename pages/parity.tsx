@@ -23,6 +23,9 @@ export default function ParityPage() {
   const [githubCreator, setGithubCreator] = useState(``);
   const [deployedContract, setDeployedContract] = useState(``);
   const [councilAmount, setCouncilAmount] = useState(``);
+  const [settlerTokenName, setSettlerTokenName] = useState(``);
+  const [settlerTokenSymbol, setSettlerTokenSymbol] = useState(``);
+  const [settlerTokenAddress, setSettlerTokenAddress] = useState(``);
   const [issuesList, setIssuesList] = useState([]);
 
   const formItem = (label = ``, placeholder = ``, value = ``, onChange = (ev) => {}) =>
@@ -33,7 +36,6 @@ export default function ParityPage() {
     formItem(`Github Login`, `Login handle of the owner of the token`, githubLogin, (ev) => setGithubLogin(ev?.target?.value)),
     formItem(`Read Repo`, `Github repo name to read from (pex bepro-js)`, readRepoName, (ev) => setReadRepoName(ev?.target?.value)),
     formItem(`Output Repo`, `Github repo name to output to (pex bepro-js-edge)`, outputRepoName, (ev) => setOutputRepoName(ev?.target?.value)),
-    formItem(`New council amount`, `Set a new council amount`, councilAmount, (ev) => setCouncilAmount(ev?.target?.value)),
   ]
 
   function isValidForm() {
@@ -193,6 +195,20 @@ export default function ParityPage() {
                 })
   }
 
+  function deploySettlerToken() {
+    BeproService.ERC20.deploy({
+                                name: settlerTokenName,
+                                symbol: settlerTokenSymbol,
+                                cap: "10000000000000000000000000000",
+                                distributionAddress: currentAddress
+                              })
+                .then(txInfo => {
+                  console.log(txInfo);
+                  dispatch(toastInfo(`Deployed!`));
+                  setSettlerTokenAddress(txInfo.contractAddress);
+                })
+  }
+
   function renderIssuesList({title = ``, body = ``, tokenAmount = 100000,}, i: number) {
     return (
       <div className="mb-4" key={i}>
@@ -236,16 +252,44 @@ export default function ParityPage() {
   return <>
     <div className="container mb-5">
       <ConnectWalletButton asModal={true} />
-      <div className="div mt-3 mb-4 content-wrapper">
-        {formMaker.map(renderFormItems)}
+      <div className="mt-3 content-wrapper">
         <div className="row mb-3">
           <label className="p-small trans mb-2">New contract address</label>
           <input value={deployedContract} readOnly={true} type="text" className="form-control" placeholder={`Address will appear here`}/>
         </div>
+        <div className="row mb-3">
+          <label className="p-small trans mb-2">New council amount</label>
+          <input className="form-control" value={councilAmount} onChange={(e) => setCouncilAmount(e?.target?.value)} type="text" placeholder={`Amount needed to be a council member`}/>
+        </div>
+        <hr />
+        <div className="row mb-3 mxn-4">
+          <div className="col">
+            <label className="p-small trans mb-2 ml-2">New settler token name</label>
+            <input className="form-control" placeholder="pex BEPRO" value={settlerTokenName} onChange={(e) => setSettlerTokenName(e?.target.value)}/>
+          </div>
+          <div className="col">
+            <label className="p-small trans mb-2 ml-2">New settler token symbol</label>
+            <input className="form-control" placeholder="pex $BEPRO" value={settlerTokenSymbol} onChange={(e) => setSettlerTokenSymbol(e?.target.value)}/>
+          </div>
+        </div>
+        <div className="row mb-3">
+          <label className="p-small trans mb-2">Settler token address</label>
+          <input className="form-control" value={settlerTokenAddress} readOnly={true}/>
+        </div>
+
         <div className="row">
           <div className="col d-flex justify-content-end align-items-center">
             <button className="btn btn-md me-2 btn-primary" onClick={() => deployNewContract()}>Deploy contract</button>
-            <button className="btn btn-md btn-primary me-auto" disabled={!councilAmount} onClick={() => updateCouncilAmount()}>Update council amount</button>
+            <button className="btn btn-md btn-primary me-2" disabled={!councilAmount} onClick={() => updateCouncilAmount()}>Update council amount</button>
+            <button className="btn btn-md btn-primary" disabled={!settlerTokenName || !settlerTokenSymbol} onClick={() => deploySettlerToken()}>Deploy settler token</button>
+
+          </div>
+        </div>
+      </div>
+      <div className="div mt-3 mb-4 content-wrapper">
+        {formMaker.map(renderFormItems)}
+        <div className="row">
+          <div className="col d-flex justify-content-end align-items-center">
             {issuesList.length && <span className="fs-small me-2">Will cost <span className={getCostClass()}>{formatNumberToString(getSumOfTokenAmount())} BEPRO </span> / {formatNumberToString(balance.bepro)} BEPRO</span> || ``}
             {issuesList.length && <button className="btn btn-trans mr-2" onClick={() => createIssuesFromList()}>Create Issues</button> || ``}
             <button className="btn btn-md btn-primary" disabled={isValidForm()} onClick={() => listIssues()}>List issues</button>
