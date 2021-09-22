@@ -45,7 +45,7 @@ export default function StatusBar() {
         {renderNetworkStatus()}
         <div className="ms-3">|</div>
         <div className="ms-3 flex-grow-1 text-center fs-7 text-uppercase family-Regular text-ligth-gray">
-          Bepro Network Services and BEPRO Token ($BEPRO) are not available in Excluded Jurisdictions. By accessing and using the interface you agree with our <a href="https://www.bepro.network/terms-and-conditions" className="text-decoration-none">{`Terms & Conditions`}</a>
+          Bepro Network Services and BEPRO Token ($BEPRO) are not available in Excluded Jurisdictions. By accessing and using the interface you agree with our <a href="https://www.bepro.network/terms-and-conditions" target="_blank" className="text-decoration-none">{`Terms & Conditions`}</a>
         </div>
       </div>
 
