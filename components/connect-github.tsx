@@ -1,7 +1,5 @@
 import GithubImage from './github-image';
-import Link from 'next/link';
-import {useRouter} from 'next/router';
-import {useContext, useEffect} from 'react';
+import {useContext} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import {signIn} from 'next-auth/react';
 
