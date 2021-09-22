@@ -968,3 +968,8 @@ $c_props: ('m': 'margin') !default;
   -o-background-size: cover;
   background-size: cover;
 }
+.connect-account{
+  .button-connect{
+    height: 60px;
+  }
+}

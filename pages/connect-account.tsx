@@ -3,10 +3,11 @@ import metamaskLogo from '@assets/metamask.png';
 import Image from 'next/image';
 import React, {useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
-import {signOut, useSession} from 'next-auth/react';
+import {signOut, useSession, signIn} from 'next-auth/react';
 import GithubMicroService from '@services/github-microservice';
 import {changeGithubHandle} from '@reducers/change-github-handle';
 import {changeGithubLogin} from '@reducers/change-github-login';
+import GithubImage from '@components/github-image';
 import {changeLoadState} from '@reducers/change-load-state';
 import {toastError, toastSuccess} from '@reducers/add-toast';
 import {useRouter} from 'next/router';
@@ -16,13 +17,16 @@ import {changeWalletState} from '@reducers/change-wallet-connect';
 import {changeCurrentAddress} from '@reducers/change-current-address';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import CheckMarkIcon from '@assets/icons/checkmark-icon';
+import LockIcon from '@assets/icons/lock';
+import ErrorMarkIcon from '@assets/icons/errormark-icon';
+
 
 export default function ConnectAccount() {
   const {state: {currentAddress}, dispatch} = useContext(ApplicationContext);
   const [lastAddressBeforeConnect, setLastAddressBeforeConnect] = useState(``);
   const [isGhValid, setIsGhValid] = useState(null)
   const [githubLogin, setGithubLogin] = useState(null)
-  const {data: session,} = useSession();
+  const {data: session} = useSession();
   const router = useRouter();
 
   function updateLastUsedAddress() {
@@ -99,56 +103,79 @@ export default function ConnectAccount() {
     return loggedIn;
   }
 
-  function renderMetamaskLogo() {
-    return <Image src={metamaskLogo} width={28} height={28}/>;
+  function connectGithub(){
+    localStorage.setItem(`lastAddressBeforeConnect`, currentAddress);
+    return signIn('github', {callbackUrl: `${window.location.protocol}//${window.location.host}/connect-account`})
   }
 
+  function renderMetamaskLogo() {
+    return <Image src={metamaskLogo} width={15} height={15}/>;
+  }
+  function setGhLoginBySession(){
+    if(session?.user.name !== githubLogin){
+      setGithubLogin(session?.user?.name)
+    }
+  }
   useEffect(updateLastUsedAddress, [])
   useEffect(checkAddressVsGh, [currentAddress])
-
+  useEffect(setGhLoginBySession,[session])
 
   return <>
     <div className="banner bg-bepro-blue mb-4">
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10 d-flex justify-content-center">
-            <h1>Connect accounts</h1>
+            <h1 className="h2 text-white text-center">Connect your GitHub account and MetaMask wallet</h1>
           </div>
         </div>
       </div>
     </div>
-    <div className="container">
+    <div className="container connect-account">
       <div className="row justify-content-center">
         <div className="col-md-8 d-flex justify-content-center">
           <div className="content-wrapper mt-up mb-5">
-            <strong className="d-block text-uppercase mb-4">To access and use our network please connect your github account to a web3 wallet</strong>
+            <strong className="capition d-block text-uppercase mb-4">To access and use our network please connect your github account and web3 wallet</strong>
             <div className="row gx-3">
               <div className="col-6">
-                <div className={`bg-dark border border-dark rounded d-flex justify-content-between align-items-center p-3 ${getValidClass()}`}>
-                  <div><Avatar userLogin={githubLogin || session?.user?.name || `null`} /> <span className="ms-2">{session?.user?.name}</span></div>
-                  {githubLogin || session?.user?.name && <CheckMarkIcon /> || ``}
+                <div className={`button-connect border bg-${githubLogin? `dark border-dark`: `black border-black border-primary-hover cursor-pointer`} rounded d-flex justify-content-between p-3 align-items-center`} onClick={connectGithub}>
+                  {!githubLogin && <div className="mx-auto d-flex align-items-center text-uppercase smallCaption"><GithubImage width={15} height={15} opacity={1}/> <span className="ms-2">github</span></div>}
+                  {githubLogin && (
+                    <>
+                    <div><Avatar userLogin={githubLogin || `null`} /> <span className="ms-2">{session?.user?.name}</span></div>
+                    <CheckMarkIcon />
+                    </>
+                  )}
+                  
                 </div>
               </div>
               <div className="col-6">
-                <div className={`border bg-${currentAddress ? `dark border-dark` : `black border-black border-primary-hover cursor-pointer`} rounded d-flex justify-content-between p-3 align-items-center ${getValidClass()}`} onClick={connectWallet}>
+                <div className={`button-connect border bg-${currentAddress ? `dark border-dark` : `black border-black border-primary-hover cursor-pointer`} rounded d-flex justify-content-between p-3 align-items-center ${getValidClass()}`} onClick={connectWallet}>
                   {!currentAddress && <div className="mx-auto d-flex align-items-center text-uppercase smallCaption">{renderMetamaskLogo()} <span className="ms-2">metamask</span></div>}
-                  {currentAddress && <div className="d-flex w-100 justify-content-between">{renderMetamaskLogo()} <span className="ms-auto">{currentAddress && truncateAddress(currentAddress) || `Connect wallet`}</span></div> }
+                  {currentAddress && (
+                    <>
+                    <div>{renderMetamaskLogo()} <span className="ms-2">{currentAddress && truncateAddress(currentAddress) || `Connect wallet`}</span></div>
+                    {isGhValid ? <CheckMarkIcon /> : <ErrorMarkIcon/>}  
+                    </>
+                    )}
+                  
                 </div>
               </div>
             </div>
-            <div className="text-center fs-smallest text-dark text-uppercase mt-4">
-              By connecting, you accept Terms of Service <a href="https://www.bepro.network/terms-and-conditions" target="_blank" className="text-decoration-none">Terms & Conditions</a>
+            <div className="smallCaption text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-4">
+              By connecting, you accept Terms of Service <a href="https://www.bepro.network/terms-and-conditions" target="_blank" className="text-decoration-none">Terms & Conditions</a> & <a href="https://www.bepro.network/private-policy" target="_blank" className="text-decoration-none">PRIVACY POLICY</a>
             </div>
             <div className="d-flex justify-content-center mt-4">
-              <button className="btn btn-md btn-primary me-3"
+              <button className="btn btn-md btn-primary me-3 text-uppercase text-center
+              d-flex align-items-center justify-content-between"
                       disabled={!isGhValid}
                       onClick={joinAddressToGh}>
-                Connect accounts
+                <span className="mr-1">{!isGhValid && <LockIcon/>}</span>
+                DONE
               </button>
 
-              <button className="btn btn-md btn-primary"
+              <button className="btn btn-md btn-primary text-uppercase"
                       onClick={cancelAndSignOut}>
-                Cancel
+                CANCEL
               </button>
 
             </div>
