@@ -10,6 +10,7 @@ import {changeGithubLogin} from '@reducers/change-github-login';
 import {changeLoadState} from '@reducers/change-load-state';
 import {toastError, toastSuccess} from '@reducers/add-toast';
 import {useRouter} from 'next/router';
+import {truncateAddress} from '@helpers/truncate-address';
 
 export default function ConnectAccount() {
   const {state: {currentAddress}, dispatch} = useContext(ApplicationContext);
@@ -31,8 +32,15 @@ export default function ConnectAccount() {
 
     GithubMicroService.getUserOf(currentAddress)
                       .then(user => {
+
+                        console.log(user, session?.user.name)
+
                         setIsGhValid(user && user.githubHandle === session?.user.name || true)
+
                         if (!user)
+                          return;
+
+                        if (!isGhValid)
                           return;
 
                         if (user.githubHandle)
@@ -47,19 +55,22 @@ export default function ConnectAccount() {
   }
 
   function checkAddressVsLast() {
-    setConnectedAddressValid(lastAddressBeforeConnect === currentAddress)
+    setConnectedAddressValid(lastAddressBeforeConnect.toLowerCase() === currentAddress.toLowerCase())
   }
 
   function joinAddressToGh() {
-    dispatch(changeLoadState(true, `Connecting accounts, please wait...`));
-    GithubMicroService.joinAddressToUser(githubHandle,{ address: currentAddress})
-                      .then(() => {
-                        dispatch(toastSuccess(`Connected accounts!`))
-                        return router.push(`/account`)
-                      })
-                      .catch(() => {
+    dispatch(changeLoadState(true));
+    GithubMicroService.joinAddressToUser(session.user.name,{ address: currentAddress})
+                      .then((sucess) => {
+                        if (sucess) {
+                          dispatch(toastSuccess(`Connected accounts!`))
+                          dispatch(changeLoadState(false));
+                          return router.push(`/account`)
+                        }
+
                         dispatch(toastError(`Failed to join accounted on GH level`));
-                      })
+                        dispatch(changeLoadState(false));
+                      });
   }
 
   function cancelAndSignOut() {
@@ -70,8 +81,12 @@ export default function ConnectAccount() {
   }
 
   useEffect(updateLastUsedAddress, [])
-  useEffect(checkAddressVsGh, [])
-  useEffect(checkAddressVsLast, [currentAddress])
+
+  useEffect(() => {
+    checkAddressVsLast()
+    checkAddressVsGh()
+  }, [currentAddress])
+
   useEffect(() => {
     console.log(`Session`, session, status)
   }, [session])
@@ -81,7 +96,7 @@ export default function ConnectAccount() {
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10 d-flex justify-content-center">
-            <h1>Connect accounts</h1>
+            <h1>Connect accounts {isGhValid?.toString()} {connectedAddressValid?.toString()}</h1>
           </div>
         </div>
       </div>
@@ -94,17 +109,17 @@ export default function ConnectAccount() {
             <div className="row gx-3">
               <div className="col-6">
                 <div className={`bg-dark rounded d-flex justify-content-between p-3 ${getValidClass()}`}>
-                  <Avatar userLogin={githubLogin} /> {session?.user?.name}
+                  <Avatar userLogin={githubLogin || session?.user?.name} /> {session?.user?.name}
                 </div>
               </div>
               <div className="col-6">
                 <div className={`bg-dark rounded d-flex justify-content-between p-3 ${getValidClass()}`}>
-                  <Image src={metamaskLogo} width={28} height={28}/> {lastAddressBeforeConnect || currentAddress || `Waiting`}
+                  <Image src={metamaskLogo} width={28} height={28}/> {truncateAddress(lastAddressBeforeConnect) || truncateAddress(currentAddress) || `Waiting`}
                 </div>
               </div>
             </div>
             <div className="d-flex justify-content-center align-items-center mt-4">
-              in order to continue we need you to connect {lastAddressBeforeConnect ? `your metamask wallet ${lastAddressBeforeConnect}` : `a wallet` } with your github account
+              in order to continue we need you to connect {lastAddressBeforeConnect ? `your metamask wallet ${truncateAddress(lastAddressBeforeConnect)}` : `a wallet` } with your github account
             </div>
             <div className="text-center fs-smallest text-dark text-uppercase mt-4">
               By connecting, you accept Terms of Service <a href="https://www.bepro.network/terms-and-conditions" className="text-decoration-none">Terms & Conditions</a>
