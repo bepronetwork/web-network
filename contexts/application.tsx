@@ -6,7 +6,7 @@ import LoadApplicationReducers from './reducers';
 import {BeproService} from '@services/bepro-service';
 import {changeBeproInitState} from '@reducers/change-bepro-init-state';
 import GithubMicroService from '../services/github-microservice';
-import {useSession} from 'next-auth/client';
+import {getSession, useSession} from 'next-auth/react';
 import {changeGithubHandle} from '@reducers/change-github-handle';
 import {changeCurrentAddress} from '@reducers/change-current-address'
 import Loading from '../components/loading';
@@ -15,6 +15,8 @@ import {changeGithubLogin} from '@reducers/change-github-login';
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import {changeBalance} from '@reducers/change-balance';
 import {useRouter} from 'next/router';
+import {GetServerSideProps, GetStaticProps} from 'next';
+
 
 interface GlobalState {
   state: ApplicationState,
@@ -56,10 +58,7 @@ export const ApplicationContext = createContext<GlobalState>(defaultState)
 
 export default function ApplicationContextProvider({children}) {
   const [state, dispatch] = useReducer(mainReducer, defaultState.state);
-  const [session,] = useSession();
-  const router = useRouter();
-
-  console.log(`session`, session);
+  const {data: session, status} = useSession();
 
   function updateSteFor(newAddress: string) {
     BeproService.login(true)
@@ -88,7 +87,6 @@ export default function ApplicationContextProvider({children}) {
 
   function Initialize() {
     dispatch(changeBeproInitState(true) as any)
-    console.log(`init session`, session)
 
     if (!window.ethereum)
       return;
@@ -101,8 +99,8 @@ export default function ApplicationContextProvider({children}) {
   useEffect(Initialize, []);
   useEffect(onAddressChanged, [state.currentAddress]);
   useEffect(() => {
-    console.log(`session`, session);
-  }, [session])
+    console.log( `session`, session, status);
+  }, [session, status]);
 
   return <ApplicationContext.Provider value={{state, dispatch: dispatch as any}}>
     <Loading show={state.loading.isLoading} text={state.loading.text}/>

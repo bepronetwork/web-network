@@ -3,7 +3,7 @@ import metamaskLogo from '@assets/metamask.png';
 import Image from 'next/image';
 import React, {useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
-import {signOut, useSession} from 'next-auth/client';
+import {getSession, signOut, useSession} from 'next-auth/react';
 import GithubMicroService from '@services/github-microservice';
 import {changeGithubHandle} from '@reducers/change-github-handle';
 import {changeGithubLogin} from '@reducers/change-github-login';
@@ -18,11 +18,10 @@ export default function ConnectAccount() {
   const [connectedAddressValid, setConnectedAddressValid] = useState(null)
   const [githubHandle, setGithubHandle] = useState(null)
   const [githubLogin, setGithubLogin] = useState(null)
-  const [session,] = useSession();
+  const {data: session, status} = useSession();
   const router = useRouter();
 
   function updateLastUsedAddress() {
-    console.log(session)
     setLastAddressBeforeConnect(localStorage.getItem(`lastAddressBeforeConnect`))
   }
 
@@ -73,6 +72,9 @@ export default function ConnectAccount() {
   useEffect(updateLastUsedAddress, [])
   useEffect(checkAddressVsGh, [])
   useEffect(checkAddressVsLast, [currentAddress])
+  useEffect(() => {
+    console.log(`Session`, session, status)
+  }, [session])
 
   return <>
     <div className="banner bg-bepro-blue mb-4">
