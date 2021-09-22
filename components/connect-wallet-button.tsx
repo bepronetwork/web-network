@@ -8,7 +8,7 @@ import Image from 'next/image';
 import metamaskLogo from '@assets/metamask.png';
 import ArrowRight from '@assets/icons/arrow-right';
 
-export default function ConnectWalletButton({children = null, forceLogin = false, onSuccess = () => null, onFail = () => console.log("error"), asModal = false}) {
+export default function ConnectWalletButton({children = null, forceLogin = false, onSuccess = () => null, onFail = () => console.log("error"), asModal = false, btnColor = `white`}) {
   const { state: {metaMaskWallet, beproInit, currentAddress}, dispatch } = useContext(ApplicationContext);
 
   async function connectWallet() {
@@ -59,7 +59,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
     )
 
   if (!metaMaskWallet)
-    return <button className="btn btn-md btn-white" onClick={connectWallet}>Connect <i className="ico-metamask ml-1" /></button>;
+    return <button className={`btn btn-md btn-${btnColor}`} onClick={connectWallet}>Connect <i className="ico-metamask ml-1" /></button>;
 
   return children;
 
