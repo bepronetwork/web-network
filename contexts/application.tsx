@@ -71,11 +71,8 @@ export default function ApplicationContextProvider({children}) {
 
     const address = state.currentAddress;
 
-    console.log( `address`, address);
-
     GithubMicroService.getUserOf(address)
                       .then(user => {
-                        console.log(`got user`, user);
                         dispatch(changeGithubHandle(user?.githubHandle));
                         dispatch(changeGithubLogin(user?.githubLogin));
                       })
@@ -101,9 +98,6 @@ export default function ApplicationContextProvider({children}) {
 
   useEffect(Initialize, []);
   useEffect(onAddressChanged, [state.currentAddress]);
-  useEffect(() => {
-    console.log( `session`, session, status);
-  }, [session, status]);
 
   return <ApplicationContext.Provider value={{state, dispatch: dispatch as any}}>
     <Loading show={state.loading.isLoading} text={state.loading.text}/>

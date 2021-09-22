@@ -1,6 +1,6 @@
 import "../styles/styles.scss";
 import { AppProps } from "next/app";
-import React, {useEffect} from 'react';
+import React from 'react';
 import NationDialog from "@components/nation-dialog";
 import WebThreeDialog from "@components/web3-dialog";
 import Head from "next/head";
@@ -16,10 +16,6 @@ export default function App({ Component, pageProps: {session, ...pageProps} }: A
   if (isMobile) {
     return <MobileNotSupported />;
   }
-
-  useEffect(() => {
-    console.log(`session updated`, session);
-  }, [session])
 
   return (<SessionProvider session={session}>
       <ApplicationContextProvider>

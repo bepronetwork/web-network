@@ -3,7 +3,7 @@ import metamaskLogo from '@assets/metamask.png';
 import Image from 'next/image';
 import React, {useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
-import {getSession, signOut, useSession} from 'next-auth/react';
+import {signOut, useSession} from 'next-auth/react';
 import GithubMicroService from '@services/github-microservice';
 import {changeGithubHandle} from '@reducers/change-github-handle';
 import {changeGithubLogin} from '@reducers/change-github-login';
@@ -17,9 +17,8 @@ export default function ConnectAccount() {
   const [lastAddressBeforeConnect, setLastAddressBeforeConnect] = useState(``);
   const [isGhValid, setIsGhValid] = useState(null)
   const [connectedAddressValid, setConnectedAddressValid] = useState(null)
-  const [githubHandle, setGithubHandle] = useState(null)
   const [githubLogin, setGithubLogin] = useState(null)
-  const {data: session, status} = useSession();
+  const {data: session,} = useSession();
   const router = useRouter();
 
   function updateLastUsedAddress() {
@@ -32,9 +31,6 @@ export default function ConnectAccount() {
 
     GithubMicroService.getUserOf(currentAddress)
                       .then(user => {
-
-                        console.log(user, session?.user.name)
-
                         setIsGhValid(user && user.githubHandle === session?.user.name || true)
 
                         if (!user)
@@ -43,8 +39,6 @@ export default function ConnectAccount() {
                         if (!isGhValid)
                           return;
 
-                        if (user.githubHandle)
-                          setGithubHandle(user.githubHandle);
                         if (user.githubLogin)
                           setGithubLogin(user.githubLogin);
                       })
@@ -65,6 +59,7 @@ export default function ConnectAccount() {
                         if (sucess) {
                           dispatch(toastSuccess(`Connected accounts!`))
                           dispatch(changeLoadState(false));
+                          dispatch(changeGithubHandle(session.user.name))
                           return router.push(`/account`)
                         }
 
@@ -87,16 +82,12 @@ export default function ConnectAccount() {
     checkAddressVsGh()
   }, [currentAddress])
 
-  useEffect(() => {
-    console.log(`Session`, session, status)
-  }, [session])
-
   return <>
     <div className="banner bg-bepro-blue mb-4">
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10 d-flex justify-content-center">
-            <h1>Connect accounts {isGhValid?.toString()} {connectedAddressValid?.toString()}</h1>
+            <h1>Connect accounts</h1>
           </div>
         </div>
       </div>
@@ -109,7 +100,7 @@ export default function ConnectAccount() {
             <div className="row gx-3">
               <div className="col-6">
                 <div className={`bg-dark rounded d-flex justify-content-between p-3 ${getValidClass()}`}>
-                  <Avatar userLogin={githubLogin || session?.user?.name} /> {session?.user?.name}
+                  <Avatar userLogin={githubLogin || session?.user?.name || `null`} /> {session?.user?.name}
                 </div>
               </div>
               <div className="col-6">
