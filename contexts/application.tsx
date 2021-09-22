@@ -6,11 +6,18 @@ import LoadApplicationReducers from './reducers';
 import {BeproService} from '@services/bepro-service';
 import {changeBeproInitState} from '@reducers/change-bepro-init-state';
 import GithubMicroService from '../services/github-microservice';
-import {signOut, useSession} from 'next-auth/client';
+import {getSession, useSession} from 'next-auth/react';
 import {changeGithubHandle} from '@reducers/change-github-handle';
 import {changeCurrentAddress} from '@reducers/change-current-address'
 import Loading from '../components/loading';
 import Toaster from '../components/toaster';
+import {changeGithubLogin} from '@reducers/change-github-login';
+import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
+import {changeBalance} from '@reducers/change-balance';
+import {useRouter} from 'next/router';
+import {GetServerSideProps, GetStaticProps} from 'next';
+
+
 interface GlobalState {
   state: ApplicationState,
   dispatch: (action: ReduceActor<any>) => Dispatch<ReduceActor<any>>,
@@ -41,7 +48,8 @@ const defaultState: GlobalState = {
     toaster: [],
     microServiceReady: null,
     myTransactions: [],
-    network: ``
+    network: ``,
+    githubLogin: ``,
   },
   dispatch: () => undefined
 };
@@ -50,27 +58,31 @@ export const ApplicationContext = createContext<GlobalState>(defaultState)
 
 export default function ApplicationContextProvider({children}) {
   const [state, dispatch] = useReducer(mainReducer, defaultState.state);
-  const [session] = useSession();
-  function onMetaMaskChange() {
-    if (!state.metaMaskWallet || state.currentAddress === BeproService.address)
-      return;
+  const {data: session, status} = useSession();
 
-    GithubMicroService.getHandleOf(BeproService.address)
-                      .then(handle => {
-                        if (handle) dispatch(changeGithubHandle(handle))
-                        else if(session?.user?.name)
-                          GithubMicroService.joinAddressToUser(session?.user?.name,{ address: BeproService.address})
-                                            .then(bool => {
-                                              if (!bool)
-                                                return signOut({redirect: false,});
-                                            })
-                      });
+  function updateSteFor(newAddress: string) {
+    BeproService.login(true)
+                .then(() =>  dispatch(changeCurrentAddress(newAddress)))
   }
 
-  function updateBeproLogin(newAddress) {
-      BeproService.login(true)
-                  .then(_ => { dispatch(changeCurrentAddress(newAddress)) })
-                  .then(() => { onMetaMaskChange() });
+  function onAddressChanged() {
+    if (!state.currentAddress)
+      return;
+
+    const address = state.currentAddress;
+
+    GithubMicroService.getUserOf(address)
+                      .then(user => {
+                        dispatch(changeGithubHandle(user?.githubHandle));
+                        dispatch(changeGithubLogin(user?.githubLogin));
+                      })
+
+    BeproService.network.getOraclesSummary({address})
+                .then(oracles => dispatch(changeOraclesState(changeOraclesParse(address, oracles))))
+
+    BeproService.getBalance('bepro').then(bepro => dispatch(changeBalance({bepro})));
+    BeproService.getBalance('eth').then(eth => dispatch(changeBalance({eth})));
+    BeproService.getBalance('staked').then(staked => dispatch(changeBalance({staked})));
   }
 
   function Initialize() {
@@ -79,28 +91,17 @@ export default function ApplicationContextProvider({children}) {
     if (!window.ethereum)
       return;
 
-    window.ethereum.on(`accountsChanged`, (accounts) => updateBeproLogin(accounts[0]))
-  }
-
-  function setHandleIfConnected() {
-    if (state.githubHandle)
-      return;
-    if (!session?.user?.name){
-      dispatch(changeGithubHandle(``))
-      return;
-    }
-    dispatch(changeGithubHandle(session.user.name));
+    window.ethereum.on(`accountsChanged`, (accounts) => updateSteFor(accounts[0]))
   }
 
   LoadApplicationReducers();
 
   useEffect(Initialize, []);
-  useEffect(onMetaMaskChange, [state.metaMaskWallet]);
-  useEffect(setHandleIfConnected, [session]);
+  useEffect(onAddressChanged, [state.currentAddress]);
 
   return <ApplicationContext.Provider value={{state, dispatch: dispatch as any}}>
-    <Loading show={state.loading.isLoading} text={state.loading.text} />
-    <Toaster />
+    <Loading show={state.loading.isLoading} text={state.loading.text}/>
+    <Toaster/>
     {children}
   </ApplicationContext.Provider>
 }
