@@ -11,12 +11,16 @@ import {changeLoadState} from '@reducers/change-load-state';
 import {toastError, toastSuccess} from '@reducers/add-toast';
 import {useRouter} from 'next/router';
 import {truncateAddress} from '@helpers/truncate-address';
+import {BeproService} from '@services/bepro-service';
+import {changeWalletState} from '@reducers/change-wallet-connect';
+import {changeCurrentAddress} from '@reducers/change-current-address';
+import ConnectWalletButton from '@components/connect-wallet-button';
+import CheckMarkIcon from '@assets/icons/checkmark-icon';
 
 export default function ConnectAccount() {
   const {state: {currentAddress}, dispatch} = useContext(ApplicationContext);
   const [lastAddressBeforeConnect, setLastAddressBeforeConnect] = useState(``);
   const [isGhValid, setIsGhValid] = useState(null)
-  const [connectedAddressValid, setConnectedAddressValid] = useState(null)
   const [githubLogin, setGithubLogin] = useState(null)
   const {data: session,} = useSession();
   const router = useRouter();
@@ -45,11 +49,7 @@ export default function ConnectAccount() {
   }
 
   function getValidClass() {
-    return (isGhValid === null || connectedAddressValid === null) ? `` : `border border-${!(isGhValid && connectedAddressValid) ? `danger` : `success`}`;
-  }
-
-  function checkAddressVsLast() {
-    setConnectedAddressValid(!lastAddressBeforeConnect ? true : lastAddressBeforeConnect.toLowerCase() === currentAddress.toLowerCase())
+    return isGhValid === null ? `` : `border border-${!isGhValid ? `danger` : `success`}`;
   }
 
   function joinAddressToGh() {
@@ -76,12 +76,36 @@ export default function ConnectAccount() {
       .then(() => router.push(`/`));
   }
 
-  useEffect(updateLastUsedAddress, [])
+  async function connectWallet() {
+    if (currentAddress)
+      return;
 
-  useEffect(() => {
-    checkAddressVsLast()
-    checkAddressVsGh()
-  }, [currentAddress])
+    let loggedIn = false;
+
+    try {
+      loggedIn = await BeproService.login();
+    } catch (e) {
+      console.log(e);
+    }
+
+    if (!loggedIn) {
+      dispatch(changeWalletState(false))
+      dispatch(changeCurrentAddress(``));
+    } else {
+      dispatch(changeWalletState(loggedIn))
+      dispatch(changeCurrentAddress(BeproService.address));
+    }
+
+    return loggedIn;
+  }
+
+  function renderMetamaskLogo() {
+    return <Image src={metamaskLogo} width={28} height={28}/>;
+  }
+
+  useEffect(updateLastUsedAddress, [])
+  useEffect(checkAddressVsGh, [currentAddress])
+
 
   return <>
     <div className="banner bg-bepro-blue mb-4">
@@ -97,28 +121,27 @@ export default function ConnectAccount() {
       <div className="row justify-content-center">
         <div className="col-md-8 d-flex justify-content-center">
           <div className="content-wrapper mt-up mb-5">
-            <strong className="d-block text-uppercase mb-4">To access and use our network please connect your github account and web3 wallet</strong>
+            <strong className="d-block text-uppercase mb-4">To access and use our network please connect your github account to a web3 wallet</strong>
             <div className="row gx-3">
               <div className="col-6">
-                <div className={`bg-dark rounded d-flex justify-content-between p-3 ${getValidClass()}`}>
-                  <Avatar userLogin={githubLogin || session?.user?.name || `null`} /> {session?.user?.name}
+                <div className={`bg-dark border border-dark rounded d-flex justify-content-between align-items-center p-3 ${getValidClass()}`}>
+                  <div><Avatar userLogin={githubLogin || session?.user?.name || `null`} /> <span className="ms-2">{session?.user?.name}</span></div>
+                  {githubLogin || session?.user?.name && <CheckMarkIcon /> || ``}
                 </div>
               </div>
               <div className="col-6">
-                <div className={`bg-dark rounded d-flex justify-content-between p-3 ${getValidClass()}`}>
-                  <Image src={metamaskLogo} width={28} height={28}/> {truncateAddress(lastAddressBeforeConnect) || truncateAddress(currentAddress) || `Waiting`}
+                <div className={`border bg-${currentAddress ? `dark border-dark` : `black border-black border-primary-hover cursor-pointer`} rounded d-flex justify-content-between p-3 align-items-center ${getValidClass()}`} onClick={connectWallet}>
+                  {!currentAddress && <div className="mx-auto d-flex align-items-center text-uppercase smallCaption">{renderMetamaskLogo()} <span className="ms-2">metamask</span></div>}
+                  {currentAddress && <div className="d-flex w-100 justify-content-between">{renderMetamaskLogo()} <span className="ms-auto">{currentAddress && truncateAddress(currentAddress) || `Connect wallet`}</span></div> }
                 </div>
               </div>
             </div>
-            <div className="d-flex justify-content-center align-items-center mt-4">
-              in order to continue we need you to connect {lastAddressBeforeConnect ? `your metamask wallet ${truncateAddress(lastAddressBeforeConnect)}` : `a wallet` } with your github account
-            </div>
             <div className="text-center fs-smallest text-dark text-uppercase mt-4">
-              By connecting, you accept Terms of Service <a href="https://www.bepro.network/terms-and-conditions" className="text-decoration-none">Terms & Conditions</a>
+              By connecting, you accept Terms of Service <a href="https://www.bepro.network/terms-and-conditions" target="_blank" className="text-decoration-none">Terms & Conditions</a>
             </div>
             <div className="d-flex justify-content-center mt-4">
               <button className="btn btn-md btn-primary me-3"
-                      disabled={!(isGhValid && connectedAddressValid)}
+                      disabled={!isGhValid}
                       onClick={joinAddressToGh}>
                 Connect accounts
               </button>
