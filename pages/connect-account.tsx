@@ -47,6 +47,9 @@ export default function ConnectAccount() {
                         if (!isGhValid)
                           return;
 
+                        if(user.address === currentAddress )
+                          return router.push('/account')
+
                         if (user.githubLogin)
                           setGithubLogin(user.githubLogin);
                       })
@@ -162,7 +165,7 @@ export default function ConnectAccount() {
               </div>
             </div>
             <div className="smallCaption text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-4">
-              By connecting, you accept Terms of Service <a href="https://www.bepro.network/terms-and-conditions" target="_blank" className="text-decoration-none">Terms & Conditions</a> & <a href="https://www.bepro.network/private-policy" target="_blank" className="text-decoration-none">PRIVACY POLICY</a>
+              By connecting, you accept <a href="https://www.bepro.network/terms-and-conditions" target="_blank" className="text-decoration-none">Terms & Conditions</a> & <a href="https://www.bepro.network/private-policy" target="_blank" className="text-decoration-none">PRIVACY POLICY</a>
             </div>
             <div className="d-flex justify-content-center mt-4">
               <button className="btn btn-md btn-primary me-3 text-uppercase text-center
