@@ -18,4 +18,5 @@ export interface ApplicationState {
   microServiceReady: boolean|null;
   myTransactions: (SimpleBlockTransactionPayload|BlockTransaction|UpdateBlockTransaction)[];
   network: string;
+  githubLogin: string;
 }

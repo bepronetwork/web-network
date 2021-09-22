@@ -50,7 +50,7 @@ class BeproFacet {
       const network = await this.network.login();
       const erc20 = await this.ERC20.login();
 
-      success = ![bepro, network, erc20 ].some(bool => !bool);
+      success = ![bepro, network, erc20].some(bool => !bool);
 
       if (success) {
         await this.network.__assert();

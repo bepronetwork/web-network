@@ -1,26 +1,22 @@
 import NextAuth from 'next-auth';
-import Providers from 'next-auth/providers';
+import GithubProvider from 'next-auth/providers/github';
 import GithubMicroService from '@services/github-microservice';
-import { BeproService } from '@services/bepro-service';
 
 export default NextAuth({
   providers: [
-    Providers.GitHub({
+    GithubProvider({
       clientId: process.env.NEXT_PUBLIC_GH_CLIENT_ID,
       clientSecret: process.env.GH_SECRET,
-      scope: ``,
     }),
   ],
   callbacks: {
-    signIn(user, account, profile: { login: string }) {
-      if(user.name && profile.login){
-        return GithubMicroService.createGithubData({
+    async signIn({user, account, profile}) {
+
+      if (user.name && profile.login)
+        return await GithubMicroService.createGithubData({
           githubHandle: user.name,
-          githubLogin: profile.login
-        })
-        .then(() => true)
-        .catch(() => false)
-      }
+          githubLogin: profile.login.toString()
+        }).then(_ => true).catch(_ => false);
 
       return false
     },
