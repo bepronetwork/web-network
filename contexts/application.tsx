@@ -71,8 +71,11 @@ export default function ApplicationContextProvider({children}) {
 
     const address = state.currentAddress;
 
+    console.log( `address`, address);
+
     GithubMicroService.getUserOf(address)
                       .then(user => {
+                        console.log(`got user`, user);
                         dispatch(changeGithubHandle(user?.githubHandle));
                         dispatch(changeGithubLogin(user?.githubLogin));
                       })

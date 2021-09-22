@@ -60,7 +60,7 @@ export default function ConnectAccount() {
 
   function joinAddressToGh() {
     dispatch(changeLoadState(true));
-    GithubMicroService.joinAddressToUser(session.user.name,{ address: currentAddress})
+    GithubMicroService.joinAddressToUser(session.user.name,{ address: currentAddress.toLowerCase() })
                       .then((sucess) => {
                         if (sucess) {
                           dispatch(toastSuccess(`Connected accounts!`))

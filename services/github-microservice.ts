@@ -112,7 +112,7 @@ export default class GithubMicroService {
    * Should return user of address
    */
   static async getUserOf(address: string): Promise<User> {
-    return client.get<User>(`/users/address/${address}`)
+    return client.get<User>(`/users/address/${address.toLowerCase()}`)
                  .then(({data}) => data)
                  .catch(e => {
                    console.error(`Failed to fetch user with address ${address}`, e);
@@ -124,7 +124,7 @@ export default class GithubMicroService {
    * Should return the handle of a given wallet address
    */
   static async getHandleOf(address: string): Promise<any> {
-    return GithubMicroService.getUserOf(address).then((data) => data?.githubHandle || ``).catch( _ => ``);
+    return GithubMicroService.getUserOf(address.toLowerCase()).then((data) => data?.githubHandle || ``).catch( _ => ``);
   }
 
   static async createPullRequestIssue(issueId: string | string[], payload) {
@@ -182,7 +182,7 @@ export default class GithubMicroService {
                    return null;
                  })
   }
-  
+
   static async getForkedRepo(ghHandler: string) {
     return client.get(`/forks/repo/${ghHandler}`)
                  .then(({data}) => data)
