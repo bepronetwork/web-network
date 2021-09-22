@@ -31,10 +31,10 @@ export default function StatusBar() {
     const indicatorStyle = {height: `.5rem`, width: `.5rem`};
     const indicatorClass = `d-inline-block me-2 rounded bg-${info[0]}`
 
-    return <div>
+    return <a className="text-decoration-none text-white-50" href="https://bepronetwork.statuspage.io/" target="_blank">
       <span className={indicatorClass} style={indicatorStyle} />
       <span className="text-uppercase fs-7">{info[1]} {ms}ms</span>
-    </div>
+    </a>
   }
 
   useEffect(neverEndingUpdate, []);
