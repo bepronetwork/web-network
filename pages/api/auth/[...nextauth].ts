@@ -16,7 +16,7 @@ export default NextAuth({
         return await GithubMicroService.createGithubData({
           githubHandle: user.name,
           githubLogin: profile.login.toString()
-        }).then(_ => true);
+        }).then(_ => true).catch(_ => false);
 
       return false
     },
