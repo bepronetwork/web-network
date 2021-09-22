@@ -49,7 +49,7 @@ export default function ConnectAccount() {
   }
 
   function checkAddressVsLast() {
-    setConnectedAddressValid(lastAddressBeforeConnect.toLowerCase() === currentAddress.toLowerCase())
+    setConnectedAddressValid(!lastAddressBeforeConnect ? true : lastAddressBeforeConnect.toLowerCase() === currentAddress.toLowerCase())
   }
 
   function joinAddressToGh() {
@@ -60,6 +60,7 @@ export default function ConnectAccount() {
                           dispatch(toastSuccess(`Connected accounts!`))
                           dispatch(changeLoadState(false));
                           dispatch(changeGithubHandle(session.user.name))
+                          dispatch(changeGithubLogin(githubLogin))
                           return router.push(`/account`)
                         }
 
