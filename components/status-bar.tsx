@@ -2,7 +2,7 @@ import {useContext, useEffect, useState,} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import {changeMicroServiceReady} from '@reducers/change-microservice-ready';
 import GithubMicroService from '@services/github-microservice';
-import Link from 'next/link';
+import ExternalLinkIcon from '@assets/icons/external-link-icon';
 
 export default function StatusBar() {
   const {dispatch, state: {microServiceReady}} = useContext(ApplicationContext);
@@ -47,8 +47,9 @@ export default function StatusBar() {
         <div className="ms-3 flex-grow-1 text-center fs-7 text-uppercase family-Regular text-ligth-gray">
           Bepro Network Services and BEPRO Token ($BEPRO) are not available in Excluded Jurisdictions. By accessing and using the interface you agree with our <a href="https://www.bepro.network/terms-and-conditions" target="_blank" className="text-decoration-none">{`Terms & Conditions`}</a>
         </div>
+        <div className="ms-3">|</div>
+        <a className="ms-3 text-decoration-none smallCaption fs-7 text-whitels" target="_blank" href="https://support.bepro.network/">support <ExternalLinkIcon className="ml-1" height={11} width={11} color="text-whitels"/></a>
       </div>
-
     </div>
   </>)
 
