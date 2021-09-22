@@ -101,7 +101,7 @@ export default class GithubMicroService {
     return client.patch<string>(`/users/connect/${githubHandle}`, payload)
                  .then(() => true)
                  .catch((error) => {
-                   if (error.status === 400)
+                   if ([400, 409].includes(error.status))
                      return false;
                    console.error(`joinAddressToUser Error`, error)
                    return false;
