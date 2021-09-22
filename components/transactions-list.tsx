@@ -56,7 +56,7 @@ export default function TransactionsList({onActiveTransaction = (transaction) =>
     <div className="transaction-list w-100">
       <div className="row">
         <div className="col mb-3">
-          <h5 className="h5 m-0 text-white">Transactions</h5>
+          <h4 className="h4 m-0 text-white">Transactions</h4>
         </div>
       </div>
       <div className="overflow-auto">
