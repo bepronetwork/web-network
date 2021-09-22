@@ -30,15 +30,16 @@ $more-bg: (
         'opac': $bg-opac,
         'purple': $purple,
         'blue': $blue,
-        'orange': $orange, 
+        'orange': $orange,
         'success': $success
 );
 
-$more-colors: ('blue-dark': $blue-dark, 'dark-gray': $dark-gray, 'ligth-gray': $ligth-gray);
+$more-colors: ('blue-dark': $blue-dark, 'dark-gray': $dark-gray, 'ligth-gray': $ligth-gray, 'black': $black);
 
 $utilities: map-merge(
   $utilities, (
                 'shadow': map-merge(map-get($utilities, 'shadow'), (state: hover)),
+                'border': map-merge(map-get($utilities, 'border'), (state: hover)),
                 'border-bottom': map-merge(map-get($utilities, 'border-bottom'), (state: hover)),
                 'border-top': map-merge(map-get($utilities, 'border-top'), (state: hover)),
                 'border-color': map-merge(map-get($utilities, 'border-color'), (state: hover, values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-colors))),
