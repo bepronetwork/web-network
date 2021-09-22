@@ -71,16 +71,20 @@ function OraclesActions(): JSX.Element {
   }
 
   function updateValues() {
-    BeproService.network
-                .isApprovedSettlerToken({address: BeproService.address, amount: balance.bepro})
-                .then(updateErrorsAndApproval);
+    BeproService.getBalance('bepro')
+                .then(amount => {
+                  console.log(`amount`, amount);
+                  BeproService.network
+                              .isApprovedSettlerToken({address: currentAddress, amount})
+                              .then(updateErrorsAndApproval)
+                })
   }
 
   function updateWalletAddress() {
-    if (!beproInit || !metaMaskWallet)
+    if (!currentAddress)
       return;
 
-    setWalletAddress(BeproService.address);
+    setWalletAddress(currentAddress);
     updateValues();
   }
 
@@ -111,7 +115,7 @@ function OraclesActions(): JSX.Element {
   const isButtonDisabled = (): boolean => [
     tokenAmount < 1,
     !isApproved,
-    !metaMaskWallet,
+    !currentAddress,
     tokenAmount > getMaxAmmount(),
     myTransactions.find(({status, type}) =>
                           status === TransactionStatus.pending && type === getTxType())
@@ -129,7 +133,10 @@ function OraclesActions(): JSX.Element {
                               .then(block => dispatch(updateTransaction(block)));
                   return txInfo.status
                 })
-                .then(setIsApproved)
+                .then(() => {
+                  setIsApproved(true);
+                  setError(``);
+                })
                 .catch(e => {
                   dispatch(updateTransaction({...approveTx.payload as any, remove: true}));
                   console.error(`Failed to approve settler token`, e);
@@ -157,7 +164,7 @@ function OraclesActions(): JSX.Element {
     return action === `Lock` && TransactionTypes.lock || TransactionTypes.unlock;
   }
 
-  useEffect(updateWalletAddress, [beproInit, metaMaskWallet, currentAddress])
+  useEffect(updateWalletAddress, [currentAddress])
 
   return (
     <>
@@ -178,8 +185,8 @@ function OraclesActions(): JSX.Element {
             onValueChange={handleChangeToken}
             thousandSeparator />
 
-          { action === 'Lock' && <ApproveButton disabled={isApproved || !tokenAmount || !metaMaskWallet} onClick={approveSettlerToken} /> || ``}
-          <TransferOraclesButton buttonLabel={renderInfo.label} disabled={isButtonDisabled()} onClick={checkLockedAmount} />
+          { action === 'Lock' && !isApproved && <ApproveButton disabled={!currentAddress} onClick={approveSettlerToken} /> || ``}
+          {isApproved && <TransferOraclesButton buttonLabel={renderInfo.label} disabled={isButtonDisabled()} onClick={checkLockedAmount} />}
 
           <NetworkTxButton
             txMethod={action.toLowerCase()}

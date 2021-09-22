@@ -12,6 +12,7 @@ import {changeLoadState} from '@reducers/change-load-state';
 import {changeBalance} from '@reducers/change-balance';
 import router from 'next/router';
 import {toastInfo} from '@reducers/add-toast';
+import {SETTLER_ADDRESS, TRANSACTION_ADDRESS} from '../env';
 
 export default function ParityPage() {
   const {state: {currentAddress, balance,}, dispatch} = useContext(ApplicationContext);
@@ -167,8 +168,8 @@ export default function ParityPage() {
   function deployNewContract() {
     BeproService.network
                 .deploy({
-                          settlerTokenAddress: "0x7a7748bd6f9bac76c2f3fcb29723227e3376cbb2",
-                          transactionTokenAddress: "0x7a7748bd6f9bac76c2f3fcb29723227e3376cbb2",
+                          settlerTokenAddress: SETTLER_ADDRESS,
+                          transactionTokenAddress: TRANSACTION_ADDRESS,
                           governanceAddress: currentAddress,
                         })
                 .then(info => {
