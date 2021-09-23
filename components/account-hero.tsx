@@ -8,42 +8,29 @@ import GithubHandle from './github-handle';
 import { toNumber } from 'lodash';
 
 export default function AccountHero() {
-  const {dispatch, state: {beproInit, oracles, metaMaskWallet, currentAddress, balance}} = useContext(ApplicationContext);
-
-  const [myIssueCount, setMyIssueCount] = useState<number>()
-  const [sumOfOracles, setSumOfOracles] = useState(0);
-  const [delegatedOracles, setDelegatedOracles] = useState(0);
-  const [delegatedOraclesByOthers, setDelegatedOraclesByOthers] = useState(0);
+  const {dispatch, state: {beproInit, oracles, metaMaskWallet, currentAddress, balance, myIssues}} = useContext(ApplicationContext);
 
   function loadBeproNetworkInformation() {
     if (!beproInit || !metaMaskWallet || !currentAddress)
       return;
 
     const address = currentAddress;
-    dispatch(changeLoadState(true));
 
     BeproService.network
                 .getIssuesByAddress(address)
                 .then(issuesList => {
-                  setMyIssueCount(issuesList.length);
                   dispatch(changeMyIssuesState(issuesList));
                 })
                 .then(_ => BeproService.network.getOraclesSummary({address}))
                 .then(oracles => {
-                  const parseOracles = changeOraclesParse(address, oracles)
-                  dispatch(changeOraclesState(parseOracles));
-                  setSumOfOracles(+oracles.tokensLocked + +oracles.oraclesDelegatedByOthers)
-                  setDelegatedOracles(parseOracles.delegatedToOthers)
-                  setDelegatedOraclesByOthers(toNumber(oracles.oraclesDelegatedByOthers))
+                  dispatch(changeOraclesState(changeOraclesParse(address, oracles)));
                 })
                 .catch(e => {
                   console.error(e);
                 })
-                .finally(() => dispatch(changeLoadState(false)))
-
   }
 
-  useEffect(loadBeproNetworkInformation, [beproInit, metaMaskWallet, currentAddress])
+  useEffect(loadBeproNetworkInformation, [beproInit, metaMaskWallet, currentAddress, oracles])
 
   return (
     <div className="banner bg-bepro-blue mb-4">
@@ -58,20 +45,20 @@ export default function AccountHero() {
               <div className="row">
                 <div className="col-md-3">
                   <div className="top-border">
-                    <h4 className="h4 mb-0">{myIssueCount}</h4>
+                    <h4 className="h4 mb-0">{myIssues.length || 0}</h4>
                     <span className="p-small">Issues</span>
                   </div>
                 </div>
                 <div className="col-md-3">
                   <div className="top-border">
-                    <h4 className="h4 mb-0">{sumOfOracles}</h4>
+                    <h4 className="h4 mb-0">{+oracles?.tokensLocked + +oracles?.oraclesDelegatedByOthers || 0}</h4>
                     <span className="p-small">Oracles</span>
                   </div>
                 </div>
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4 className="h4 mb-0">
-                      {delegatedOracles}
+                      {oracles?.delegatedToOthers || 0}
                     </h4>
                     <span className="p-small">Delegated oracles</span>
                   </div>
@@ -79,7 +66,7 @@ export default function AccountHero() {
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4 className="h4 mb-0">
-                      {delegatedOraclesByOthers}
+                      {+oracles?.oraclesDelegatedByOthers || 0}
                     </h4>
                     <span className="p-small">Delegated by Others</span>
                   </div>
