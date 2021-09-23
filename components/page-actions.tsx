@@ -171,6 +171,7 @@ export default function PageActions({
     return (
         <a
           href="https://github.com/bepronetwork/web-network"
+          target="_blank"
           className="btn btn-md ms-1 px-4 bg-shadow text-white-50 mr-1"
           >
           VIEW ON GITHUB <ExternalLinkIcon className="ml-1" height={11} width={11} color="text-white-50"/>
@@ -181,6 +182,7 @@ export default function PageActions({
   function workButton() {
     return (
         <a
+          target="_blank"
           href="https://github.com/bepronetwork/web-network/fork"
           className="btn btn-md btn-primary ms-1 px-4 mr-1"
           >
