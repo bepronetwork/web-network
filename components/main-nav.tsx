@@ -14,6 +14,7 @@ import BeproLogo from '@assets/icons/bepro-logo';
 import HelpIcon from '@assets/icons/help-icon';
 import ButtonTrans from '@components/button-trans';
 import HelpModal from '@components/help-modal';
+import ExternalLinkIcon from '@assets/icons/external-link-icon';
 import TransactionsStateIndicator from '@components/transactions-state-indicator';
 
 export default function MainNav() {
@@ -105,6 +106,7 @@ export default function MainNav() {
         </ul>
       </div>
       <div className="d-flex flex-row align-items-center">
+        <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" target="_blank" className="btn btn-md btn-trans mr-1 text-decoration-none">GET STARTED <ExternalLinkIcon className="ml-1" height={11} width={11} color="text-white"/></a>
         <Link href="/create-issue" passHref>
           <button className="btn btn-md btn-trans mr-1">+ Create issue</button>
         </Link>
