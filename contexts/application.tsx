@@ -14,8 +14,7 @@ import Toaster from '../components/toaster';
 import {changeGithubLogin} from '@reducers/change-github-login';
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import {changeBalance} from '@reducers/change-balance';
-import {useRouter} from 'next/router';
-import {GetServerSideProps, GetStaticProps} from 'next';
+import {changeNetwork} from '@reducers/change-network';
 
 
 interface GlobalState {
@@ -92,6 +91,11 @@ export default function ApplicationContextProvider({children}) {
       return;
 
     window.ethereum.on(`accountsChanged`, (accounts) => updateSteFor(accounts[0]))
+    window.ethereum.on('networkChanged', () =>
+      BeproService.bepro.web3.eth.net.getNetworkType()
+                  .then(network => {
+                    dispatch(changeNetwork(network));
+                  }))
   }
 
   LoadApplicationReducers();
