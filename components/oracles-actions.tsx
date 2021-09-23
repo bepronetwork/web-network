@@ -16,6 +16,7 @@ import {TransactionCurrency} from '@interfaces/transaction';
 import {addTransaction} from '@reducers/add-transaction';
 import {updateTransaction} from '@reducers/update-transaction';
 import {formatNumberToCurrency} from 'helpers/formatNumber'
+import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 
 const actions: string[] = ["Lock", "Unlock"];
 
@@ -73,11 +74,17 @@ function OraclesActions(): JSX.Element {
   function updateValues() {
     BeproService.getBalance('bepro')
                 .then(amount => {
-                  console.log(`amount`, amount);
                   BeproService.network
                               .isApprovedSettlerToken({address: currentAddress, amount})
                               .then(updateErrorsAndApproval)
                 })
+  }
+
+  function onSuccess() {
+    BeproService.network.getOraclesSummary({address: currentAddress})
+                .then(oracles => {
+                  dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles)))
+                });
   }
 
   function updateWalletAddress() {
@@ -196,7 +203,7 @@ function OraclesActions(): JSX.Element {
             buttonLabel=""
             modalTitle={renderInfo.title}
             modalDescription={renderInfo.description}
-            onSuccess={handleCancel}
+            onSuccess={onSuccess}
             onFail={setError}
             ref={networkTxRef} />
 
