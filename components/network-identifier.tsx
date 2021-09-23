@@ -31,6 +31,6 @@ export default function NetworkIdentifier() {
   return network &&
       <>
         <WrongNetworkModal requiredNetwork="kovan" /><button className="btn btn-md btn-trans text-uppercase mr-1"> <Indicator bg={networkMap[network]} /> {network} {network !== `ethereum` && `testnet` || `mainnet`}</button>
-      </> || ``
+      </> || <></>
 
 }
