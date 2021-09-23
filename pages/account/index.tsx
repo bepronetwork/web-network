@@ -51,7 +51,7 @@ export default function MyIssues() {
 
   return (
     <Account buttonPrimaryActive={true}>
-      <div className="container">
+      <div className="container p-footer">
         <div className="row justify-content-center">
           {issueChild}
         </div>

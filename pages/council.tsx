@@ -30,7 +30,7 @@ export default function PageCouncil() {
   return (
     <div>
       <PageHero title="Create Bounty Distributions" />
-      <div className="container">
+      <div className="container p-footer">
         <div className="row justify-content-center">
           <ListIssues listIssues={issues}/>
           {
