@@ -59,7 +59,7 @@ export default function TransactionsList({onActiveTransaction = (transaction) =>
           <h4 className="h4 m-0 text-white">Transactions</h4>
         </div>
       </div>
-      <div className="overflow-auto">
+      <div className="overflow-auto tx-container">
         {(!myTransactions || !myTransactions.length) && emptyTransaction()}
         {myTransactions.map(renderTransactionRow)}
       </div>
