@@ -16,15 +16,19 @@ export default function MyIssues() {
   let issueChild;
 
   function getIssueList() {
-    if (!beproInit || !myIssues.length)
+    if (!currentAddress)
       return;
 
     GithubMicroService.getUserOf(currentAddress)
-    .then((user)=> GithubMicroService.getIssuesByGhLogin(user?.githubLogin))
+    .then((user)=> {
+      if (user)
+        return GithubMicroService.getIssuesByGhLogin(user?.githubLogin);
+      else return [];
+    })
     .then(setIssues)
   }
 
-  useEffect(getIssueList, [currentAddress,beproInit, myIssues])
+  useEffect(getIssueList, [currentAddress])
 
   if (!beproInit || !metaMaskWallet)
     issueChild = (<div className="col-md-10">{!metaMaskWallet ? `Connect your wallet` : `Loading`}...</div>)
@@ -32,7 +36,7 @@ export default function MyIssues() {
     issueChild = (
     <div className="col-md-10">
       <div className="mt-4">
-        <NothingFound 
+        <NothingFound
           description="No issues">
           <Link href="/create-issue" passHref>
             <button className="btn btn-md btn-primary">
