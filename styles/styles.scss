@@ -900,6 +900,10 @@ $c_props: ('m': 'margin') !default;
   &-small { font-size: 14px; }
 }
 
+.p-footer{
+  padding-bottom: $m*3;
+}
+
 .cursor {
   &-pointer {
     cursor: pointer;

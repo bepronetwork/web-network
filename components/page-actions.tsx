@@ -11,6 +11,7 @@ import {developer, pullRequest} from '@interfaces/issue-data';
 import {changeBalance} from '@contexts/reducers/change-balance';
 import {addToast} from '@contexts/reducers/add-toast';
 import clsx from 'clsx';
+import ExternalLinkIcon from '@assets/icons/external-link-icon';
 import {addTransaction} from '@reducers/add-transaction';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
@@ -165,6 +166,28 @@ export default function PageActions({
       )
     );
   }
+  
+  function viewGHButton() {
+    return (
+        <a
+          href="https://github.com/bepronetwork/web-network"
+          className="btn btn-md ms-1 px-4 bg-shadow text-white-50 mr-1"
+          >
+          VIEW ON GITHUB <ExternalLinkIcon className="ml-1" height={11} width={11} color="text-white-50"/>
+        </a>
+    );
+  }
+
+  function workButton() {
+    return (
+        <a
+          href="https://github.com/bepronetwork/web-network/fork"
+          className="btn btn-md btn-primary ms-1 px-4 mr-1"
+          >
+          WORK ON THIS ISSUE <ExternalLinkIcon className="ml-1" height={11} width={11} color="text-white"/>
+        </a>
+    );
+  }
 
   async function handlePullrequest({title: prTitle, description: prDescription}) {
     GithubMicroService.createPullRequestIssue(issueId, {
@@ -253,6 +276,8 @@ export default function PageActions({
                   <a className="btn btn-md btn-opac me-3" target="_blank">View on github</a>
                 </Link>
               )}
+              {viewGHButton()}
+              {workButton()}
               {renderRedeem()}
               {renderProposeDestribution()}
               {renderPullrequest()}
