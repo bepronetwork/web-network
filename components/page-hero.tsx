@@ -50,7 +50,7 @@ export default function PageHero({title = "Find issues to work",}) {
                       {onNetwork}{" "}
                       <span className="smallCaption trans">$BEPRO</span>
                     </h4>
-                    <span className="p-small">On network</span>
+                    <span className="p-small">Bounties in the Network</span>
                   </div>
                 </div>
               </div>
