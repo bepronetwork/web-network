@@ -899,6 +899,11 @@ $c_props: ('m': 'margin') !default;
   &-smallest { font-size: 12px; }
   &-small { font-size: 14px; }
 }
+//bg-white-hover from bootstrap, not have --bg-bg-opacity defined.
+.bg-white-hover:hover{
+  background-color: rgba($white, 0.2) !important;
+  color: white !important;
+}
 
 .p-footer{
   padding-bottom: $m*3;
@@ -975,5 +980,11 @@ $c_props: ('m': 'margin') !default;
 .connect-account{
   .button-connect{
     height: 60px;
+  }
+}
+.hover-white{
+  &:hover {
+    background-color: rgba(rgba($white, 0), 0.2);
+    color: #fff;
   }
 }
