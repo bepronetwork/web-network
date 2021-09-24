@@ -15,23 +15,19 @@ export default function HelpModal({show = false, onCloseClick = () => {}}) {
     helpItem(`provide feedback`, `Propose ideas and new features`, <FeedbackIcon/>, `https://discord.gg/RQMAu2DZFA`),
   ];
 
-  function navigateOut(href) {
-    window.open(href);
-  }
-
   function HelpItemRow(item, i) {
-    const rowClassName = `row ${i+1 !== helpItems.length && `mb-2` || ``} d-flex align-items-center cursor-pointer bg-dark-hover mxn-3 px-3 py-2`;
+    const rowClassName = `row ${i+1 !== helpItems.length && `mb-2` || ``} d-flex align-items-center cursor-pointer bg-opac-hover mxn-3 px-3 py-2 text-decoration-none`;
 
     return (
-      <div className={rowClassName} key={item.title} onClick={() => navigateOut(item.href)}>
+      <a className={rowClassName} key={item.title} href={`${item.href}`} target="_blank">
         <div className="col-2 text-center">
           {item.icon}
         </div>
         <div className="col">
-          <strong className="d-block text-uppercase text-white">{item.title}</strong>
+          <strong className="d-block text-uppercase text-white-50">{item.title}</strong>
           <span className="d-block text-white-50">{item.tagline}</span>
         </div>
-      </div>
+      </a>
     )
   }
 

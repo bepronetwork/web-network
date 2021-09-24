@@ -23,7 +23,7 @@ export default function Toaster() {
   }
 
   return (<>
-    <ToastContainer position="top-end" className="mt-5 mr-2 fs-5">
+    <ToastContainer position="bottom-end" className="mt-5 mr-2 fs-5">
       {toaster.map((toast, i) => (
         <Toast delay={toast.delay || 3000} autohide={true}
                onClose={() => onClose(toast.id)}

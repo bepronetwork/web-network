@@ -977,3 +977,9 @@ $c_props: ('m': 'margin') !default;
     height: 60px;
   }
 }
+.hover-white{
+  &:hover {
+    background-color: rgba(rgba($white, 0), 0.2);
+    color: #fff;
+  }
+}
