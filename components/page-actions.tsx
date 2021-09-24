@@ -170,7 +170,8 @@ export default function PageActions({
   function viewGHButton() {
     return (
         <a
-          href="https://github.com/bepronetwork/web-network"
+          href="https://github.com/bepronetwork/webapp-community"
+          target="_blank"
           className="btn btn-md ms-1 px-4 bg-shadow text-white-50 mr-1"
           >
           VIEW ON GITHUB <ExternalLinkIcon className="ml-1" height={11} width={11} color="text-white-50"/>
@@ -181,7 +182,8 @@ export default function PageActions({
   function workButton() {
     return (
         <a
-          href="https://github.com/bepronetwork/web-network/fork"
+          target="_blank"
+          href="https://github.com/bepronetwork/webapp-community/fork"
           className="btn btn-md btn-primary ms-1 px-4 mr-1"
           >
           WORK ON THIS ISSUE <ExternalLinkIcon className="ml-1" height={11} width={11} color="text-white"/>
