@@ -162,7 +162,7 @@ export default function NewProposal({
     <>
       {
         isCouncil && isFinished && <button className="btn btn-md btn-primary" onClick={() => setShow(true)}>Create Proposal</button>
-          || (isIssueOwner || isCouncil) && !isFinished && renderRecognizeAsFinished()
+          || isIssueOwner && !isFinished && renderRecognizeAsFinished()
       }
 
       <Modal show={show}
