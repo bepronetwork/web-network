@@ -1,4 +1,5 @@
 import { GetStaticProps } from 'next'
+import MarkedRender from '@components/MarkedRender';
 
 export default function IssueDescription({ description }) {
     return (
@@ -8,7 +9,7 @@ export default function IssueDescription({ description }) {
                     <div className="content-wrapper mb-3">
                         <h3 className="smallCaption mb-3">DESCRIPTION</h3>
                         <p className="paragraph">
-                            { description }
+                            <MarkedRender source={description} />
                         </p>
                     </div>
                 </div>
