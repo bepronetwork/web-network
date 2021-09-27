@@ -35,7 +35,6 @@ export default function ParityPage() {
     formItem(`Github Token`, `Token to be able to login and act`, githubToken, (ev) => setGithubToken(ev?.target?.value)),
     formItem(`Github Login`, `Login handle of the owner of the token`, githubLogin, (ev) => setGithubLogin(ev?.target?.value)),
     formItem(`Read Repo`, `Github repo name to read from (pex bepro-js)`, readRepoName, (ev) => setReadRepoName(ev?.target?.value)),
-    formItem(`Output Repo`, `Github repo name to output to (pex bepro-js-edge)`, outputRepoName, (ev) => setOutputRepoName(ev?.target?.value)),
   ]
 
   function isValidForm() {
@@ -65,6 +64,7 @@ export default function ParityPage() {
     }
 
     const comments = await getComments();
+
     for (const comment of comments)
       await createComment(comment);
 
@@ -73,8 +73,6 @@ export default function ParityPage() {
   function listIssues() {
     const octokit = new Octokit({auth: githubToken});
     const readRepoInfo = {owner: githubLogin, repo: readRepoName};
-    const outRepoInfo = {owner: githubLogin, repo: outputRepoName};
-
     const openIssues = [];
 
     function mapOpenIssue({title = ``, number = 0, body = ``, labels = [], tokenAmount}) {
@@ -88,33 +86,31 @@ export default function ParityPage() {
       return ({title, number, body, tokenAmount,});
     }
 
-
-    function getAllIssues(repoInfo) {
-      try {
-        return octokit.rest.issues.listForRepo({...repoInfo, state: `open`})
-                      .then(({data}) => data)
-      } catch (e) {
-        console.log(`Failed to getAllIssues of`, repoInfo, e);
-        return Promise.resolve([]);
-      }
+    function getAllIssuesRecursive(repoInfo, page = 1, pool = []) {
+      return octokit.rest.issues.listForRepo({...repoInfo, state: `open`, per_page: 100, page})
+                    .then(({data}) =>
+                      data.length === 100 ? getAllIssuesRecursive(repoInfo, page++, data) : pool.concat(data))
+                    .catch(e => {
+                      console.log(`Failed to get issues for`, repoInfo, page, e);
+                      return [];
+                    })
     }
-
 
     dispatch(changeLoadState(true))
 
-    getAllIssues(readRepoInfo)
-      .then(issues => {
-        openIssues.push(...issues.map(mapOpenIssue));
-        return getAllIssues(outRepoInfo)
+    getAllIssuesRecursive(readRepoInfo)
+      .then(issues => issues.map(mapOpenIssue))
+      .then(async issues => {
+        for (const issue of issues)
+          if (!await BeproService.network.getIssueById({issueId: issue.number.toString()}))
+            openIssues.push(issue);
+
+        return openIssues;
       })
-      .then(issues => {
-        const filterExistingIssues = ({title = ``}) => !issues.some((item) => item.title === title);
-        setIssuesList(openIssues.filter(filterExistingIssues).map(mapOpenIssue));
-      })
+      .then(setIssuesList)
       .finally(() => {
         dispatch(changeLoadState(false))
       })
-
   }
 
   function createIssue({title, body: description = `No description`, tokenAmount, number}) {
@@ -127,7 +123,23 @@ export default function ParityPage() {
       creatorAddress: currentAddress, creatorGithub: githubCreator,
     }
 
-    const scPayload = {tokenAmount: 10 /*tokenAmount*/, cid: currentAddress,};
+    const scPayload = {tokenAmount: 10 /*tokenAmount*/,};
+
+    return GithubMicroService.createIssue(msPayload)
+                             .then(cid => {
+                               if (!cid)
+                                 throw new Error(`Failed to create github issue!`);
+                               return BeproService.network.createIssue({...scPayload, cid})
+                                                  .then(txInfo => {
+                                                    BeproService.parseTransaction(txInfo, openIssueTx.payload)
+                                                                .then(block => dispatch(updateTransaction(block)))
+                                                    return {githubId: cid, issueId: txInfo.events?.OpenIssue?.returnValues?.id};
+                                                  })
+                             })
+                             .then(({githubId, issueId}) => {
+                               // todo call PATCH /issues/github/ghId/issueId/scId
+                             })
+
 
     return BeproService.network.openIssue(scPayload)
                        .then(txInfo => {
