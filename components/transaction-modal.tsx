@@ -10,8 +10,9 @@ import {formatNumberToString} from '@helpers/formatNumber';
 import {CopyValue} from '@helpers/copy-value';
 import {ApplicationContext} from '@contexts/application';
 import {toastInfo} from '@reducers/add-toast';
+import { format } from 'date-fns';
 
-export default function TransactionModal({transaction = null, onCloseClick = () => {}}: { transaction: Transaction, onCloseClick: () => void }) {
+export default function TransactionModal({ transaction = null, onCloseClick = () => {}}: { transaction: Transaction, onCloseClick: () => void }) {
   const {dispatch, state: {network}} = useContext(ApplicationContext);
   const [addressFrom, setAddressFrom] = useState(`...`);
   const [addressTo, setAddressTo] = useState(`...`);
@@ -23,15 +24,15 @@ export default function TransactionModal({transaction = null, onCloseClick = () 
 
     const blockTransaction = transaction as BlockTransaction;
 
-    setAddressFrom(blockTransaction.addressFrom.substr(0, 7).concat(`...`));
-    setAddressTo(blockTransaction.addressTo.substr(0, 7).concat(`...`));
+    setAddressFrom(blockTransaction.addressFrom.substr(0, 15).concat(`...`));
+    setAddressTo(blockTransaction.addressTo.substr(0, 15).concat(`...`));
 
     const makeDetail = (span, content) => ({span, content})
     setDetails(
       [
         makeDetail(`Amount`, [formatNumberToString(blockTransaction.amount), blockTransaction.currency].join(` `)),
         makeDetail(`Confirmations`, [blockTransaction.confirmations, 23].join(`/`).concat(` Confirmations`)),
-        makeDetail(`Date`, blockTransaction.date),
+        makeDetail(`Date`, format(new Date(blockTransaction.date), "MMMM dd yyyy hh:mm:ss a")),
       ]
     )
   }
@@ -40,9 +41,9 @@ export default function TransactionModal({transaction = null, onCloseClick = () 
 
   function renderDetailRow(item): any {
     return <>
-      <div className="d-flex align-items-center justify-content-between bg-black py-3 mt-2 px-3 rounded">
-        <span className="text-white-50 fs-small">{item.span}</span>
-        <span className="text-white">{item.content}</span>
+      <div className="d-flex align-items-center justify-content-between bg-dark-gray py-3 mt-2 px-3 rounded">
+        <span className="smallCaption text-white-50 fs-smallest text-uppercase">{item.span}</span>
+        <span className=".p text-white fs-small">{item.content}</span>
       </div>
     </>
   }
@@ -65,19 +66,26 @@ export default function TransactionModal({transaction = null, onCloseClick = () 
   }
 
   return <>
-    <Modal title="Details" show={!!transaction} onCloseClick={onCloseClick}>
-      <span className="d-block text-white-50">Status</span>
+    <Modal 
+    id="transaction-modal" 
+    title="Transaction Details" 
+    show={!!transaction} 
+    onCloseClick={onCloseClick}
+    titlePosition="center"
+    titleClass="h3 text-white bg-opacity-100 fs-2"
+    >
+      <span className="d-block smallCaption text-white-50 text-uppercase">Status</span>
       <div className="d-flex justify-content-between align-items-center py-2 mb-3">
         <TransactionStats status={transaction?.status} />
-        <div>
-          { hasTransactionId() && <a onClick={() => copyValue(getTransactionId())} className="rounded border-0 px-1 bg-dark me-2 cursor-pointer"><CopyIcon/></a> || ``}
-          <a href={getEtherScanHref(getTransactionId())} target="_blank" className="rounded border-0 px-1 bg-dark"><ArrowGoTo/></a>
+        <div className="d-flex">
+          { hasTransactionId() && <a onClick={() => copyValue(getTransactionId())} className="btn btn-md circle-2 btn-opac p-0 mr-1 border border-dark-gray bg-shadow"><CopyIcon height={14} width={14} color="white"/></a> || ``}
+          <a href={getEtherScanHref(getTransactionId())} target="_blank" className="btn btn-md circle-2 btn-opac p-0 border border-dark-gray bg-shadow"><ArrowGoTo color="white"/></a>
         </div>
       </div>
-      <div className="d-flex py-2 mb-1">
-        <div>From {addressFrom}</div>
+      <div className="d-flex py-2 mb-1 smallCaption text-white bg-opacity-100 fs-smallest">
+        <span>From: {addressFrom}</span>
         <div className="mx-auto"><ArrowRightSmall/></div>
-        <div>To {addressTo}</div>
+        <span>To: {addressTo}</span>
       </div>
       {details.map(renderDetailRow)}
     </Modal>
