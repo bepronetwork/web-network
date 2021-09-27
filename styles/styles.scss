@@ -620,6 +620,9 @@ label {
 // .pb-3 { padding-bottom: $m*2 }
 
 
+.end-90{
+  left: 90%;
+}
 .circle-1 {
   width: 64px;
   height: 64px;
@@ -825,28 +828,14 @@ label {
     }
   }
 }
-.transaction-modal{
-  &.status{
-      >span{
-        font-size: 14px;
-        line-height: 160%;
-        color: $gray;
-      }
-
-      .indicator{
-        > p {
-          font-size: 14px;
-        }
-      }
+#transaction-modal{
+  .modal-content{
+    background-color: $bg-shadow;
+    border-radius: $m/2;
   }
 
-  &.box{
-    background-color: $bg;
-    >span{
-      font-family: "Inter-Medium";
-      font-size: 14px;
-      color: $gray;
-    }
+  .modal-body{
+    padding: 28px 30px 6px;
   }
 }
 
