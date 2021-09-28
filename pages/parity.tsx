@@ -136,31 +136,18 @@ export default function ParityPage() {
                                                     return {githubId: cid, issueId: txInfo.events?.OpenIssue?.returnValues?.id};
                                                   })
                              })
-                             .then(({githubId, issueId}) => {
-                               // todo call PATCH /issues/github/ghId/issueId/scId
+                             .then(({githubId, issueId}) => GithubMicroService.patchGithubId(githubId, issueId))
+                             .then(result => {
+                               if (!result)
+                                 return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                               return true;
+                             })
+                             .catch(e => {
+                               console.log(e);
+                               dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                               return false;
                              })
 
-
-    return BeproService.network.openIssue(scPayload)
-                       .then(txInfo => {
-                         BeproService.parseTransaction(txInfo, openIssueTx.payload)
-                                     .then(block => dispatch(updateTransaction(block)))
-                         return txInfo;
-                       })
-                       .then(txInfo =>
-                         GithubMicroService.createIssue({
-                                                          ...msPayload,
-                                                          issueId: txInfo.events?.OpenIssue?.returnValues?.id
-                                                        })
-                                           .then(oknok =>
-                                             GithubMicroService.getIssueId(txInfo.events?.OpenIssue?.returnValues?.id)
-                                                               .then((info) => info?.githubId && createComments(number, info.githubId))
-                                                               .then(() => oknok)))
-                       .catch(e => {
-                         dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
-                         console.error(`Failed to createIssue`, e);
-                         return false;
-                       })
   }
 
   function createIssuesFromList() {
