@@ -121,28 +121,33 @@ export default function ParityPage() {
     const msPayload = {
       title, description, amount: 10 /*tokenAmount*/,
       creatorAddress: currentAddress, creatorGithub: githubCreator,
+      githubIssueId: number.toString(),
     }
 
     const scPayload = {tokenAmount: 10 /*tokenAmount*/,};
 
-
-    return BeproService.network.createIssue({...scPayload, cid: number.toString()})
-                       .then(txInfo => {
-                         BeproService.parseTransaction(txInfo, openIssueTx.payload)
-                                     .then(block => dispatch(updateTransaction(block)))
-                         return {githubId: number.toString(), issueId: txInfo.events?.OpenIssue?.returnValues?.id};
-                       })
-                       .then(({githubId, issueId}) => GithubMicroService.patchGithubId(githubId, issueId))
-                       .then(result => {
-                         if (!result)
-                           return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
-                         return true;
-                       })
-                       .catch(e => {
-                         console.log(e);
-                         dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
-                         return false;
-                       })
+    return GithubMicroService.createIssue(msPayload)
+                             .then(cid => {
+                               if (!cid)
+                                 throw new Error(`Failed to create github issue!`);
+                               return BeproService.network.createIssue({...scPayload, cid})
+                                                  .then(txInfo => {
+                                                    BeproService.parseTransaction(txInfo, openIssueTx.payload)
+                                                                .then(block => dispatch(updateTransaction(block)))
+                                                    return {githubId: cid, issueId: txInfo.events?.OpenIssue?.returnValues?.id};
+                                                  })
+                             })
+                             .then(({githubId, issueId}) => GithubMicroService.patchGithubId(githubId, issueId))
+                             .then(result => {
+                               if (!result)
+                                 return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                               return true;
+                             })
+                             .catch(e => {
+                               console.log(e);
+                               dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                               return false;
+                             })
 
   }
 
