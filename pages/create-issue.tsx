@@ -75,7 +75,7 @@ export default function PageCreateIssue() {
       creatorAddress: BeproService.address,
       creatorGithub: currentUser?.githubLogin,
     }
-    const contractPayload = {tokenAmount: issueAmount.floatValue, cid: BeproService.address};
+    const contractPayload = {tokenAmount: issueAmount.floatValue,};
 
     const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount: payload.amount});
     dispatch(openIssueTx);
@@ -86,30 +86,55 @@ export default function PageCreateIssue() {
       dispatch(updateTransaction({...block as any, remove}))
     }
 
-    BeproService.network.openIssue(contractPayload)
-                .then(txInfo => {
-                  if (!txInfo)
-                    throw new Error(`Failed to open issue`);
-                  return txInfo;
-                })
-                .then(txInfo => {
-                  BeproService.parseTransaction(txInfo, openIssueTx.payload)
-                              .then(updateBlock)
-                  return txInfo;
-                })
-                .then((txInfo) => GithubMicroService.createIssue({
-                                                             ...payload,
-                                                             issueId: txInfo.events?.OpenIssue?.returnValues?.id
-                                                           }))
-                .then(() => {
-                  dispatch(toastSuccess(`Create Issue using ${issueAmount.value} $BEPROS`));
-                  return router.push(`/account`);
-                })
-                .catch(e => {
-                  cleanFields();
-                  dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
-                  console.error(e);
-                })
+    GithubMicroService.createIssue(payload)
+                      .then(cid => {
+                        if (!cid)
+                          throw new Error(`Failed to create github issue!`);
+                        return BeproService.network.createIssue({...contractPayload, cid})
+                                           .then(txInfo => {
+                                             BeproService.parseTransaction(txInfo, openIssueTx.payload)
+                                                         .then(block => dispatch(updateTransaction(block)))
+                                             return {
+                                               githubId: cid,
+                                               issueId: txInfo.events?.OpenIssue?.returnValues?.id
+                                             };
+                                           })
+                      })
+                      .then(({githubId, issueId}) => GithubMicroService.patchGithubId(githubId, issueId))
+                      .then(result => {
+                        if (!result)
+                          return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                      })
+                      .catch(e => {
+                        console.log(e);
+                        dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                        return false;
+                      })
+
+    // BeproService.network.openIssue(contractPayload)
+    //             .then(txInfo => {
+    //               if (!txInfo)
+    //                 throw new Error(`Failed to open issue`);
+    //               return txInfo;
+    //             })
+    //             .then(txInfo => {
+    //               BeproService.parseTransaction(txInfo, openIssueTx.payload)
+    //                           .then(updateBlock)
+    //               return txInfo;
+    //             })
+    //             .then((txInfo) => GithubMicroService.createIssue({
+    //                                                          ...payload,
+    //                                                          issueId: txInfo.events?.OpenIssue?.returnValues?.id
+    //                                                        }))
+    //             .then(() => {
+    //               dispatch(toastSuccess(`Create Issue using ${issueAmount.value} $BEPROS`));
+    //               return router.push(`/account`);
+    //             })
+    //             .catch(e => {
+    //               cleanFields();
+    //               dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+    //               console.error(e);
+    //             })
 
   }
 
@@ -125,7 +150,7 @@ export default function PageCreateIssue() {
   const verifyAmountBiggerThanBalance = (): boolean => !(issueAmount.floatValue > Number(balance))
 
   const verifyTransactionState = (type: TransactionTypes): boolean => !!myTransactions.find(transactions=> transactions.type === type && transactions.status === TransactionStatus.pending);
-  
+
   const isCreateButtonDisabled = (): boolean => [
       allowedTransaction,
       issueContentIsValid(),

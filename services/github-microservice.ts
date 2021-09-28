@@ -209,4 +209,13 @@ export default class GithubMicroService {
                    return false;
                  });
   }
+
+  static async patchGithubId(githubId: string, withIssueId: string) {
+    return client.patch(`/issues/githubId/${githubId}/issueId/${withIssueId}`)
+                 .then((data) => data.data === 'ok')
+                 .catch((e) => {
+                   console.log(`Failed to patch github issue id with SC issue id`, e);
+                   return false;
+                 })
+  }
 }
