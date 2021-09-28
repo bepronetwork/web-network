@@ -13,6 +13,7 @@ import {changeBalance} from '@reducers/change-balance';
 import router from 'next/router';
 import {toastInfo} from '@reducers/add-toast';
 import {SETTLER_ADDRESS, TRANSACTION_ADDRESS} from '../env';
+import {number} from 'prop-types';
 
 export default function ParityPage() {
   const {state: {currentAddress, balance,}, dispatch} = useContext(ApplicationContext);
@@ -73,10 +74,9 @@ export default function ParityPage() {
   function listIssues() {
     const octokit = new Octokit({auth: githubToken});
     const readRepoInfo = {owner: githubLogin, repo: readRepoName};
-    const openIssues = [];
 
     function mapOpenIssue({title = ``, number = 0, body = ``, labels = [], tokenAmount}) {
-      const getTokenAmount = (lbls) => +lbls.find((label = ``) => label.search(/k (BEPRO|\$USDC)/) > -1)?.replace(/k (BEPRO|\$USDC)/, `000`) || 100000;
+      const getTokenAmount = (lbls) => +lbls.find((label = ``) => label.search(/k \$?(BEPRO|USDC)/) > -1)?.replace(/k \$?(BEPRO|USDC)/, `000`) || 100000;
 
       if (labels.length && !tokenAmount)
         tokenAmount = getTokenAmount(labels.map(({name}) => name));
@@ -101,8 +101,10 @@ export default function ParityPage() {
     getAllIssuesRecursive(readRepoInfo)
       .then(issues => issues.map(mapOpenIssue))
       .then(async issues => {
+        const openIssues = [];
+
         for (const issue of issues)
-          if (!await BeproService.network.getIssueById({issueId: issue.number.toString()}))
+          if (!(await BeproService.network.getIssueById({issueId: issue.number.toString()}))?.cid)
             openIssues.push(issue);
 
         return openIssues;
@@ -124,13 +126,15 @@ export default function ParityPage() {
       githubIssueId: number.toString(),
     }
 
-    const scPayload = {tokenAmount: 10 /*tokenAmount*/,};
+    const scPayload = {tokenAmount: "10" /*tokenAmount*/,};
+
+    console.log(`scPayload,`, scPayload, `msPayload`, msPayload);
 
     return GithubMicroService.createIssue(msPayload)
                              .then(cid => {
                                if (!cid)
                                  throw new Error(`Failed to create github issue!`);
-                               return BeproService.network.createIssue({...scPayload, cid})
+                               return BeproService.network.openIssue({...scPayload, cid})
                                                   .then(txInfo => {
                                                     BeproService.parseTransaction(txInfo, openIssueTx.payload)
                                                                 .then(block => dispatch(updateTransaction(block)))
@@ -291,7 +295,7 @@ export default function ParityPage() {
         <div className="row">
           <div className="col d-flex justify-content-end align-items-center">
             {issuesList.length && <span className="fs-small me-2">Will cost <span className={getCostClass()}>{formatNumberToString(getSumOfTokenAmount())} BEPRO </span> / {formatNumberToString(balance.bepro)} BEPRO</span> || ``}
-            {issuesList.length && <button className="btn btn-trans mr-2" onClick={() => createIssuesFromList()}>Create Issues</button> || ``}
+            {issuesList.length && <button className="btn btn-md btn-outline-primary mr-2" onClick={() => createIssuesFromList()}>Create Issues</button> || ``}
             <button className="btn btn-md btn-primary" disabled={isValidForm()} onClick={() => listIssues()}>List issues</button>
           </div>
         </div>

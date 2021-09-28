@@ -90,7 +90,7 @@ export default function PageCreateIssue() {
                       .then(cid => {
                         if (!cid)
                           throw new Error(`Failed to create github issue!`);
-                        return BeproService.network.createIssue({...contractPayload, cid})
+                        return BeproService.network.openIssue({...contractPayload, cid})
                                            .then(txInfo => {
                                              BeproService.parseTransaction(txInfo, openIssueTx.payload)
                                                          .then(block => dispatch(updateTransaction(block)))
