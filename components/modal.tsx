@@ -11,6 +11,8 @@ export default function Modal({
                                 footer = null,
                                 onCloseClick = () => {},
                                 backdrop = `static`,
+                                titlePosition = `start`,
+                                titleClass,
                                 ...params
                               }: ModalProps): JSX.Element {
   const modalTitle = `${kebabCase(key || title)}-modal`;
@@ -24,9 +26,9 @@ export default function Modal({
                     aria-describedby={modalTitle}
                     backdrop={backdrop}
                     {...params}>
-      <ModalBootstrap.Header className="d-flex justify-content-between">
-        <ModalBootstrap.Title>{title}</ModalBootstrap.Title>
-        <ButtonTrans onClick={onCloseClick} noAppend={true} className="btn p-1"><CloseIcon /></ButtonTrans>
+      <ModalBootstrap.Header className={`relative d-flex w-100 justify-content-${titlePosition} `}>
+        <ModalBootstrap.Title className={`${titleClass}`}>{title}</ModalBootstrap.Title>
+        <ButtonTrans onClick={onCloseClick} noAppend={true} className="btn p-1 position-absolute end-90"><CloseIcon /></ButtonTrans>
       </ModalBootstrap.Header>
       <ModalBootstrap.Body>{children}</ModalBootstrap.Body>
       <ModalBootstrap.Footer>{footer && footer || ``}</ModalBootstrap.Footer>
