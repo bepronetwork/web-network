@@ -1,13 +1,19 @@
 import GithubMicroService from '@services/github-microservice';
 import {BeproService} from '@services/bepro-service';
-import {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import {Octokit} from 'octokit';
+import router from 'next/router';
+import ConnectWalletButton from '@components/connect-wallet-button';
 
 export default function FalconPunchPage() {
   const {state: {currentAddress}} = useContext(ApplicationContext);
   const [githubToken, setGithubToken] = useState(``);
   const [userList, setUserList] = useState<{created_at: string; username: string; public_repos: string; eth: number}[]>([])
+
+  function toDays(date = ``) {
+    return +new Date(date) / (24 * 60 * 60 * 1000)
+  }
 
   function listAllUsers() {
 
@@ -37,17 +43,38 @@ export default function FalconPunchPage() {
                       .then(setUserList as any)
   }
 
+  function renderUserRow({created_at, username, public_repos, eth}) {
+    return <div className="row mb-3">
+      <div className="col">@{username}</div>
+      <div className={`col text-${toDays(created_at) >= 7 ? `success` : `danger`}`}>&gt; 7 {toDays(created_at) > 7 ? `yes` : `no`} </div>
+      <div className={`col text-${!!public_repos ? `success` : `danger`}`}>&gt; 0 repos {!!public_repos ? `yes` : `no`} </div>
+      <div className={`col text-${!!eth ? `success` : `danger`}`}>&gt; 0 eth {!!eth ? `yes` : `no`} </div>
+    </div>
+  }
+
+  useEffect(() => {
+    if (!currentAddress)
+      return;
+
+    if (currentAddress !== `0xA0dac0a23707fd504c77cd97c40a34b0256C51F8`)
+      router.push(`/`);
+
+  }, [currentAddress])
+
   return <>
     <div className="container mb-5">
+      <ConnectWalletButton asModal={true} />
       <div className="mt-3 content-wrapper">
         <div className="row mb-3">
-          <button className="btn btn-md btn-primary">list all users</button>
+          <label className="p-small trans mb-2">New contract address</label>
+          <input value={githubToken} onChange={(ev) => setGithubToken(ev?.target?.value)} type="text" className="form-control" placeholder={`Address will appear here`}/>
+        </div>
+        <div className="row mb-3">
+          <button className="btn btn-md btn-primary" onClick={listAllUsers}>list all users</button>
         </div>
       </div>
       <div className="mt-3 content-wrapper">
-        <div className="row mb-3">
-
-        </div>
+        {userList.map(renderUserRow)}
       </div>
     </div>
   </>
