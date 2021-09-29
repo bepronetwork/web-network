@@ -42,7 +42,7 @@ export default class GithubMicroService {
 
   static async createIssue(payload) {
     return client.post('/issues', payload)
-                 .then(({data}) => data === `ok`)
+                 .then(({data}) => data)
                  .catch(e => {
                    console.error(`Error creating issue`, e);
                    return null;
@@ -208,5 +208,14 @@ export default class GithubMicroService {
                    console.error(e);
                    return false;
                  });
+  }
+
+  static async patchGithubId(githubId: string, withIssueId: string) {
+    return client.patch(`/issues/github/${githubId}/issueId/${withIssueId}`)
+                 .then((data) => data.data === 'ok')
+                 .catch((e) => {
+                   console.log(`Failed to patch github issue id with SC issue id`, e);
+                   return false;
+                 })
   }
 }
