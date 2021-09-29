@@ -9,7 +9,7 @@ import ConnectWalletButton from '@components/connect-wallet-button';
 export default function FalconPunchPage() {
   const {state: {currentAddress}} = useContext(ApplicationContext);
   const [githubToken, setGithubToken] = useState(``);
-  const [userList, setUserList] = useState<{created_at: string; login: string; public_repos: string; eth: number}[]>([])
+  const [userList, setUserList] = useState<{created_at: string; login: string; public_repos: number; eth: number}[]>([])
 
   function toDays(date = ``) {
     return +new Date(date) / (24 * 60 * 60 * 1000)
@@ -22,25 +22,34 @@ export default function FalconPunchPage() {
 
       return octokit.rest.users.getByUsername({username: ghlogin,})
                     .then(({data}) => data)
-                    .catch(() => null)
+                    .catch(() => ({created_at: '0', login: ghlogin, public_repos: 0,}))
     }
 
     async function hasEthBalance(address: string) {
       return BeproService.login()
                          .then(() => BeproService.bepro.web3.eth.getBalance(address as any))
-                         .then(eth => eth)
+                         .then(eth => +eth)
+                         .catch(e => {
+                           console.log(`Error on get eth`, e);
+                           return 0;
+                         })
     }
 
     async function getInfo({githubLogin, address, createdAt, updatedAt, id}) {
       const ghInfo = await getGithubInfo(githubLogin);
       const eth = await hasEthBalance(address);
 
-      return {...ghInfo, eth};
+      setUserList([...userList as any, {...ghInfo, eth}]);
     }
 
     GithubMicroService.getAllUsers()
                       .then(users => Promise.all(users.map(getInfo)))
-                      .then(setUserList as any)
+                      .catch(e => {
+                        console.error(`Failed`, e);
+                      })
+                      .finally(() => {
+                        console.log(`Finished`, userList);
+                      })
   }
 
   function renderUserRow({created_at, login, public_repos, eth}) {
