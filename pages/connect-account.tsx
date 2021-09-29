@@ -29,6 +29,7 @@ export default function ConnectAccount() {
   const {data: session} = useSession();
   const router = useRouter();
 
+
   function updateLastUsedAddress() {
     setLastAddressBeforeConnect(localStorage.getItem(`lastAddressBeforeConnect`))
   }
@@ -62,8 +63,8 @@ export default function ConnectAccount() {
   function joinAddressToGh() {
     dispatch(changeLoadState(true));
     GithubMicroService.joinAddressToUser(session.user.name,{ address: currentAddress.toLowerCase() })
-                      .then((sucess) => {
-                        if (sucess) {
+                      .then((result) => {
+                        if (result === true) {
                           dispatch(toastSuccess(`Connected accounts!`))
                           dispatch(changeLoadState(false));
                           dispatch(changeGithubHandle(session.user.name))
@@ -71,7 +72,7 @@ export default function ConnectAccount() {
                           return router.push(`/account`)
                         }
 
-                        dispatch(toastError(`Failed to join accounted on GH level`));
+                        dispatch(toastError(result as unknown as string));
                         dispatch(changeLoadState(false));
                       });
   }
@@ -123,6 +124,7 @@ export default function ConnectAccount() {
   useEffect(checkAddressVsGh, [currentAddress])
   useEffect(setGhLoginBySession,[session])
 
+
   return <>
     <div className="banner bg-bepro-blue mb-4">
       <div className="container">
@@ -148,7 +150,7 @@ export default function ConnectAccount() {
                     <CheckMarkIcon />
                     </>
                   )}
-                  
+
                 </div>
               </div>
               <div className="col-6">
@@ -157,10 +159,10 @@ export default function ConnectAccount() {
                   {currentAddress && (
                     <>
                     <div>{renderMetamaskLogo()} <span className="ms-2">{currentAddress && truncateAddress(currentAddress) || `Connect wallet`}</span></div>
-                    {isGhValid ? <CheckMarkIcon /> : <ErrorMarkIcon/>}  
+                    {isGhValid ? <CheckMarkIcon /> : <ErrorMarkIcon/>}
                     </>
                     )}
-                  
+
                 </div>
               </div>
             </div>
