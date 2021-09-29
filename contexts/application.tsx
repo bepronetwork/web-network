@@ -17,7 +17,7 @@ import {changeBalance} from '@reducers/change-balance';
 import {changeNetwork} from '@reducers/change-network';
 import {useRouter} from 'next/router';
 import {toastError} from '@reducers/add-toast';
-
+import sanitizeHtml from 'sanitize-html';
 
 interface GlobalState {
   state: ApplicationState,
@@ -108,8 +108,8 @@ export default function ApplicationContextProvider({children}) {
   useEffect(() => {
     if (!authError)
       return;
-    console.log(authError);
-    dispatch(toastError(authError as string));
+
+    dispatch(toastError(sanitizeHtml(authError, {allowedTags: [], allowedAttributes: {}})));
   }, [authError])
 
   return <ApplicationContext.Provider value={{state, dispatch: dispatch as any}}>
