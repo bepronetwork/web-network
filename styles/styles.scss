@@ -576,12 +576,12 @@ label {
 
 .avatar-list {
   .avatar {
-    margin-left: -math.div($m, 4);
+    margin-left: -(math.div($m, 4));
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.4);
   }
   .avatar-number {
     background-color: $dark-gray;
-    margin-left: -math.div($m, 4);
+    margin-left: -(math.div($m, 4));
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.4);
   }
 }
