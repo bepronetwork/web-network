@@ -39,7 +39,7 @@ export default function FalconPunchPage() {
       const ghInfo = await getGithubInfo(githubLogin);
       const eth = await hasEthBalance(address);
 
-      setUserList([...userList as any, {...ghInfo, eth}]);
+      setUserList(prev => [...prev as any, {...ghInfo, eth}]);
     }
 
     GithubMicroService.getAllUsers()
