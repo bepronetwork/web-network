@@ -15,6 +15,8 @@ import {changeGithubLogin} from '@reducers/change-github-login';
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import {changeBalance} from '@reducers/change-balance';
 import {changeNetwork} from '@reducers/change-network';
+import {useRouter} from 'next/router';
+import {toastError} from '@reducers/add-toast';
 
 
 interface GlobalState {
@@ -58,6 +60,7 @@ export const ApplicationContext = createContext<GlobalState>(defaultState)
 export default function ApplicationContextProvider({children}) {
   const [state, dispatch] = useReducer(mainReducer, defaultState.state);
   const {data: session, status} = useSession();
+  const { authError } = useRouter().query;
 
   function updateSteFor(newAddress: string) {
     BeproService.login(true)
@@ -102,6 +105,12 @@ export default function ApplicationContextProvider({children}) {
 
   useEffect(Initialize, []);
   useEffect(onAddressChanged, [state.currentAddress]);
+  useEffect(() => {
+    if (!authError)
+      return;
+    console.log(authError);
+    dispatch(toastError(authError as string));
+  }, [authError])
 
   return <ApplicationContext.Provider value={{state, dispatch: dispatch as any}}>
     <Loading show={state.loading.isLoading} text={state.loading.text}/>
