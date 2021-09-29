@@ -168,7 +168,7 @@ export default function ConnectAccount() {
               By connecting, you accept <a href="https://www.bepro.network/terms-and-conditions" target="_blank" className="text-decoration-none">Terms & Conditions</a> & <a href="https://www.bepro.network/private-policy" target="_blank" className="text-decoration-none">PRIVACY POLICY</a>
             </div>
             <div className="d-flex justify-content-center mt-4">
-              <button className="btn btn-md btn-primary me-3 text-uppercase text-center
+              <button className="btn btn-md p-3 btn-primary me-3 text-uppercase text-center
               d-flex align-items-center justify-content-between"
                       disabled={!isGhValid}
                       onClick={joinAddressToGh}>
@@ -176,7 +176,7 @@ export default function ConnectAccount() {
                 DONE
               </button>
 
-              <button className="btn btn-md btn-primary text-uppercase"
+              <button className="btn btn-md p-3 btn-opac text-uppercase text-white"
                       onClick={cancelAndSignOut}>
                 CANCEL
               </button>
