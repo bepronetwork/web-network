@@ -104,7 +104,7 @@ export default function ParityPage() {
         const openIssues = [];
 
         for (const issue of issues)
-          if (!(await BeproService.network.getIssueById({issueId: issue.number.toString()}))?.cid)
+          if (!(await BeproService.network.getIssueByCID({issueCID: issue.number.toString()}))?.cid)
             openIssues.push(issue);
 
         return openIssues;
