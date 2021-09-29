@@ -8,6 +8,7 @@
   "scripts": {
     "clean": "npm cache clean --force && rm -rf .next",
     "dev": "next dev",
+    "prebuild": "next telemetry disable",
     "build": "next build",
     "start": "next start"
   },
