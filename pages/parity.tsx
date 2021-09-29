@@ -13,6 +13,7 @@ import {changeBalance} from '@reducers/change-balance';
 import router from 'next/router';
 import {toastInfo} from '@reducers/add-toast';
 import {SETTLER_ADDRESS, TRANSACTION_ADDRESS} from '../env';
+import {number} from 'prop-types';
 
 export default function ParityPage() {
   const {state: {currentAddress, balance,}, dispatch} = useContext(ApplicationContext);
@@ -35,7 +36,6 @@ export default function ParityPage() {
     formItem(`Github Token`, `Token to be able to login and act`, githubToken, (ev) => setGithubToken(ev?.target?.value)),
     formItem(`Github Login`, `Login handle of the owner of the token`, githubLogin, (ev) => setGithubLogin(ev?.target?.value)),
     formItem(`Read Repo`, `Github repo name to read from (pex bepro-js)`, readRepoName, (ev) => setReadRepoName(ev?.target?.value)),
-    formItem(`Output Repo`, `Github repo name to output to (pex bepro-js-edge)`, outputRepoName, (ev) => setOutputRepoName(ev?.target?.value)),
   ]
 
   function isValidForm() {
@@ -65,6 +65,7 @@ export default function ParityPage() {
     }
 
     const comments = await getComments();
+
     for (const comment of comments)
       await createComment(comment);
 
@@ -73,12 +74,9 @@ export default function ParityPage() {
   function listIssues() {
     const octokit = new Octokit({auth: githubToken});
     const readRepoInfo = {owner: githubLogin, repo: readRepoName};
-    const outRepoInfo = {owner: githubLogin, repo: outputRepoName};
-
-    const openIssues = [];
 
     function mapOpenIssue({title = ``, number = 0, body = ``, labels = [], tokenAmount}) {
-      const getTokenAmount = (lbls) => +lbls.find((label = ``) => label.search(/k (BEPRO|\$USDC)/) > -1)?.replace(/k (BEPRO|\$USDC)/, `000`) || 100000;
+      const getTokenAmount = (lbls) => +lbls.find((label = ``) => label.search(/k \$?(BEPRO|USDC)/) > -1)?.replace(/k \$?(BEPRO|USDC)/, `000`) || 100000;
 
       if (labels.length && !tokenAmount)
         tokenAmount = getTokenAmount(labels.map(({name}) => name));
@@ -88,33 +86,33 @@ export default function ParityPage() {
       return ({title, number, body, tokenAmount,});
     }
 
-
-    function getAllIssues(repoInfo) {
-      try {
-        return octokit.rest.issues.listForRepo({...repoInfo, state: `open`})
-                      .then(({data}) => data)
-      } catch (e) {
-        console.log(`Failed to getAllIssues of`, repoInfo, e);
-        return Promise.resolve([]);
-      }
+    function getAllIssuesRecursive(repoInfo, page = 1, pool = []) {
+      return octokit.rest.issues.listForRepo({...repoInfo, state: `open`, per_page: 100, page})
+                    .then(({data}) =>
+                      data.length === 100 ? getAllIssuesRecursive(repoInfo, page++, data) : pool.concat(data))
+                    .catch(e => {
+                      console.log(`Failed to get issues for`, repoInfo, page, e);
+                      return [];
+                    })
     }
-
 
     dispatch(changeLoadState(true))
 
-    getAllIssues(readRepoInfo)
-      .then(issues => {
-        openIssues.push(...issues.map(mapOpenIssue));
-        return getAllIssues(outRepoInfo)
+    getAllIssuesRecursive(readRepoInfo)
+      .then(issues => issues.map(mapOpenIssue))
+      .then(async issues => {
+        const openIssues = [];
+
+        for (const issue of issues)
+          if (!(await BeproService.network.getIssueByCID({issueCID: issue.number.toString()}))?.cid)
+            openIssues.push(issue);
+
+        return openIssues;
       })
-      .then(issues => {
-        const filterExistingIssues = ({title = ``}) => !issues.some((item) => item.title === title);
-        setIssuesList(openIssues.filter(filterExistingIssues).map(mapOpenIssue));
-      })
+      .then(setIssuesList)
       .finally(() => {
         dispatch(changeLoadState(false))
       })
-
   }
 
   function createIssue({title, body: description = `No description`, tokenAmount, number}) {
@@ -125,30 +123,41 @@ export default function ParityPage() {
     const msPayload = {
       title, description, amount: 10 /*tokenAmount*/,
       creatorAddress: currentAddress, creatorGithub: githubCreator,
+      githubIssueId: number.toString(),
     }
 
-    const scPayload = {tokenAmount: 10 /*tokenAmount*/, cid: currentAddress,};
+    const scPayload = {tokenAmount: "10" /*tokenAmount*/,};
 
-    return BeproService.network.openIssue(scPayload)
-                       .then(txInfo => {
-                         BeproService.parseTransaction(txInfo, openIssueTx.payload)
-                                     .then(block => dispatch(updateTransaction(block)))
-                         return txInfo;
-                       })
-                       .then(txInfo =>
-                         GithubMicroService.createIssue({
-                                                          ...msPayload,
-                                                          issueId: txInfo.events?.OpenIssue?.returnValues?.id
-                                                        })
-                                           .then(oknok =>
-                                             GithubMicroService.getIssueId(txInfo.events?.OpenIssue?.returnValues?.id)
-                                                               .then((info) => info?.githubId && createComments(number, info.githubId))
-                                                               .then(() => oknok)))
-                       .catch(e => {
-                         dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
-                         console.error(`Failed to createIssue`, e);
-                         return false;
-                       })
+    console.log(`scPayload,`, scPayload, `msPayload`, msPayload);
+
+    return GithubMicroService.createIssue(msPayload)
+                             .then(cid => {
+                               if (!cid)
+                                 throw new Error(`Failed to create github issue!`);
+                               return BeproService.network.openIssue({...scPayload, cid})
+                                                  .then(txInfo => {
+                                                    BeproService.parseTransaction(txInfo, openIssueTx.payload)
+                                                                .then(block => dispatch(updateTransaction(block)))
+                                                    return {githubId: cid, issueId: txInfo.events?.OpenIssue?.returnValues?.id};
+                                                  })
+                             })
+                             .then(({githubId, issueId}) => {
+                               if (!issueId)
+                                 throw new Error(`Failed to create issue on SC!`);
+
+                               return GithubMicroService.patchGithubId(githubId, issueId)
+                             })
+                             .then(result => {
+                               if (!result)
+                                 return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                               return true;
+                             })
+                             .catch(e => {
+                               console.log(e);
+                               dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                               return false;
+                             })
+
   }
 
   function createIssuesFromList() {
@@ -291,7 +300,7 @@ export default function ParityPage() {
         <div className="row">
           <div className="col d-flex justify-content-end align-items-center">
             {issuesList.length && <span className="fs-small me-2">Will cost <span className={getCostClass()}>{formatNumberToString(getSumOfTokenAmount())} BEPRO </span> / {formatNumberToString(balance.bepro)} BEPRO</span> || ``}
-            {issuesList.length && <button className="btn btn-trans mr-2" onClick={() => createIssuesFromList()}>Create Issues</button> || ``}
+            {issuesList.length && <button className="btn btn-md btn-outline-primary mr-2" onClick={() => createIssuesFromList()}>Create Issues</button> || ``}
             <button className="btn btn-md btn-primary" disabled={isValidForm()} onClick={() => listIssues()}>List issues</button>
           </div>
         </div>
