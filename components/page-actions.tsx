@@ -170,7 +170,7 @@ export default function PageActions({
   function viewGHButton() {
     return (
         <a
-          href="https://github.com/bepronetwork/webapp-community"
+          href={`https://github.com/bepronetwork/webapp-community/issues/${issueId || ''}`}
           target="_blank"
           className="btn btn-md ms-1 px-4 bg-shadow text-white-50 mr-1"
           >

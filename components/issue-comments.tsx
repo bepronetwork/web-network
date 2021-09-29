@@ -1,6 +1,7 @@
 import { GetStaticProps } from "next";
 import Link from "next/link";
 import { formatDate } from '@helpers/formatDate';
+import MarkedRender from '@components/MarkedRender';
 
 export default function IssueComments({ comments }) {
   return (
@@ -24,7 +25,7 @@ export default function IssueComments({ comments }) {
                   @{comment?.user.login}{" "}
                   {comment?.updated_at && formatDate(comment?.updated_at)}
                 </p>
-                <p className="p-small">{comment?.body}</p>
+                <p className="p-small"><MarkedRender source={comment?.body || `_No comment available_`} /></p>
               </div>
             ))}
           </div>

@@ -27,6 +27,7 @@ function OraclesDelegate(): JSX.Element {
   }
 
   function handleChangeAddress(params: ChangeEvent<HTMLInputElement>) {
+    if(error) setError(``);
     setDelegatedTo(params.target.value);
   }
 

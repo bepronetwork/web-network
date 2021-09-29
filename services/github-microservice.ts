@@ -42,7 +42,7 @@ export default class GithubMicroService {
 
   static async createIssue(payload) {
     return client.post('/issues', payload)
-                 .then(({data}) => data === `ok`)
+                 .then(({data}) => data)
                  .catch(e => {
                    console.error(`Error creating issue`, e);
                    return null;
@@ -92,6 +92,9 @@ export default class GithubMicroService {
     return client.post<string>(`/users/connect`, payload)
                  .then(({data}) => data === `ok`)
                  .catch((error) => {
+                   if (error.response?.data)
+                     return error.response?.data;
+
                    console.error(`createGithubData Error`, error)
                    return false;
                  });
@@ -101,10 +104,11 @@ export default class GithubMicroService {
     return client.patch<string>(`/users/connect/${githubHandle}`, payload)
                  .then(() => true)
                  .catch((error) => {
-                   if ([400, 409].includes(error.status))
-                     return false;
+                   if (error.response)
+                     return error.response.data;
+
                    console.error(`joinAddressToUser Error`, error)
-                   return false;
+                   return `Unknown error. Check logs.`;
                  });
   }
 
@@ -196,7 +200,7 @@ export default class GithubMicroService {
     return client.get<ProposalData>(`/issues/mergeproposal/${MergeId}/${issueId}`)
                  .then(({data}) => data)
                  .catch(e => {
-                   console.error(e);
+                   console.error(`Failed to get proposal`, issueId, MergeId, e);
                    return {scMergeId: '', pullRequestId: '', issueId: '', id: ''}
                  })
   }
@@ -205,8 +209,26 @@ export default class GithubMicroService {
     return client.get(`/`)
                  .then(({status}) => status === 200)
                  .catch(e => {
-                   console.error(e);
+                   console.error(`Failed to get health`, e);
                    return false;
                  });
+  }
+
+  static async patchGithubId(githubId: string, withIssueId: string) {
+    return client.patch(`/issues/github/${githubId}/issueId/${withIssueId}`)
+                 .then((data) => data.data === 'ok')
+                 .catch((e) => {
+                   console.error(`Failed to patch github issue id with SC issue id`, e);
+                   return false;
+                 })
+  }
+
+  static async getAllUsers() {
+    return client.get(`/users/all`)
+                 .then(({data}) => data)
+                 .catch(e => {
+                   console.error(`Failed to get all users`, e);
+                   return [];
+                 })
   }
 }

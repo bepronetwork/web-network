@@ -110,7 +110,6 @@ export default function MainNav() {
         <Link href="/create-issue" passHref>
           <button className="btn btn-md btn-trans mr-1">+ Create issue</button>
         </Link>
-        <NetworkIdentifier />
 
         <ButtonTrans onClick={() => setShowHelp(true)} className="ms-2 me-3" rounded={true}><HelpIcon /></ButtonTrans>
 
@@ -118,6 +117,8 @@ export default function MainNav() {
           <div className="d-flex account-info align-items-center">
 
             <TransactionsStateIndicator />
+
+            <NetworkIdentifier />
 
             <Link href="/account" passHref>
               <a className="btn btn-md btn-trans mr-1">
