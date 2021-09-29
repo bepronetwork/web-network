@@ -11,12 +11,18 @@ export default NextAuth({
   ],
   callbacks: {
     async signIn({user, account, profile}) {
-
       if (user.name && profile.login)
         return await GithubMicroService.createGithubData({
           githubHandle: user.name,
           githubLogin: profile.login.toString()
-        }).then(_ => true).catch(_ => false);
+        }).then(result => {
+          if (result === true)
+            return true;
+
+          console.log(result);
+
+          return `/?authError=${result}`;
+        });
 
       return false
     },

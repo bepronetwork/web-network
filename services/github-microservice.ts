@@ -92,6 +92,9 @@ export default class GithubMicroService {
     return client.post<string>(`/users/connect`, payload)
                  .then(({data}) => data === `ok`)
                  .catch((error) => {
+                   if (error.response?.data)
+                     return error.response?.data;
+
                    console.error(`createGithubData Error`, error)
                    return false;
                  });
@@ -101,10 +104,11 @@ export default class GithubMicroService {
     return client.patch<string>(`/users/connect/${githubHandle}`, payload)
                  .then(() => true)
                  .catch((error) => {
-                   if ([400, 409].includes(error.status))
-                     return false;
+                   if (error.response)
+                     return error.response.data;
+
                    console.error(`joinAddressToUser Error`, error)
-                   return false;
+                   return `Unknown error. Check logs.`;
                  });
   }
 
