@@ -1,6 +1,8 @@
+@use "sass:math";
 @import 'variables';
 @import 'toasts';
 @import 'vendor';
+
 
 //bootstrap-overrides
 ul,
@@ -343,8 +345,8 @@ p {
       text-decoration: none;
       color: rgba($white, 0.7);
       letter-spacing: 0.02em;
-      padding: $m/4 0px;
-      margin: 0px $m/2;
+      padding: math.div($m, 4) 0px;
+      margin: 0px math.div($m, 2);
       border-bottom: 2px solid rgba($white, 0);
       transition: 0.2s ease-in-out;
       &:hover,
@@ -444,7 +446,7 @@ p {
 .list-item {
   background-color: $bg-shadow;
   padding: $m * 2;
-  border-radius: $m/2;
+  border-radius: math.div($m, 2);
   margin-bottom: $m;
   transition: 0.8 ease-in-out;
   &:hover {
@@ -471,7 +473,7 @@ p {
 .content-wrapper {
   background-color: $bg-shadow;
   padding: $m * 2;
-  border-radius: $m/2;
+  border-radius: math.div($m, 2);
 
   &.child {
     padding: $m;
@@ -496,7 +498,7 @@ p {
 
 .content-proposals {
   padding: $m * 2;
-  border-radius: $m/2;
+  border-radius: math.div($m, 2);
   &.child {
     padding: $m;
   }
@@ -543,8 +545,8 @@ label {
 .status {
   font-size: 14px;
   line-height: 150%;
-  padding: 0px $m/2;
-  border-radius: $m/8;
+  padding: 0px math.div($m, 2);
+  border-radius: math.div($m, 8);
   color: $bg-shadow;
   font-weight: 400;
   text-transform: capitalize;
@@ -567,19 +569,19 @@ label {
 .badge-opac {
   font-size: 14px;
   line-height: 150%;
-  padding: 0px $m/2;
-  border-radius: $m/8;
+  padding: 0px math.div($m, 2);
+  border-radius: math.div($m, 8);
   background-color: rgba($white, 0.1);
 }
 
 .avatar-list {
   .avatar {
-    margin-left: -$m/4;
+    margin-left: -(math.div($m, 4));
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.4);
   }
   .avatar-number {
     background-color: $dark-gray;
-    margin-left: -$m/4;
+    margin-left: -(math.div($m, 4));
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.4);
   }
 }
@@ -588,34 +590,34 @@ label {
 .mt-up { margin-top: -$m*3; }
 
 .mr-0 { margin-right: 0px !important }
-.mr-1 { margin-right: $m/2 }
+.mr-1 { margin-right: math.div($m, 2) }
 .mr-2 { margin-right: $m }
 .mr-3 { margin-right: $m*2 }
 .ml-0 { margin-right: 0px !important }
-.ml-1 { margin-left: $m/2 }
+.ml-1 { margin-left: math.div($m, 2) }
 .ml-2 { margin-left: $m }
 .ml-3 { margin-left: $m*2 }
 
 // .mt-0 { margin-top: 0px !important }
-// .mt-1 { margin-top: $m/2 }
+// .mt-1 { margin-top: math.div($m, 2) }
 // .mt-2 { margin-top: $m }
 // .mt-3 { margin-top: $m*2 }
 // .mb-0 { margin-bottom: 0px !important }
-// .mb-1 { margin-bottom: $m/2 }
+// .mb-1 { margin-bottom: math.div($m, 2) }
 // .mb-2 { margin-bottom: $m }
 // .mb-3 { margin-bottom: $m*2 }
 
-// .pr-1 { padding-right: $m/2 }
+// .pr-1 { padding-right: math.div($m, 2) }
 // .pr-2 { padding-right: $m }
 // .pr-3 { padding-right: $m*2 }
-// .pl-1 { padding-left: $m/2 }
+// .pl-1 { padding-left: math.div($m, 2) }
 // .pl-2 { padding-left: $m }
 // .pl-3 { padding-left: $m*2 }
 
-// .pt-1 { padding-top: $m/2 }
+// .pt-1 { padding-top: math.div($m, 2) }
 // .pt-2 { padding-top: $m }
 // .pt-3 { padding-top: $m*2 }
-// .pb-1 { padding-bottom: $m/2 }
+// .pb-1 { padding-bottom: math.div($m, 2) }
 // .pb-2 { padding-bottom: $m }
 // .pb-3 { padding-bottom: $m*2 }
 
@@ -667,8 +669,8 @@ label {
 // Overrides
 
 .progress {
-  height: $m/4;
-  border-radius: $m/6;
+  height: math.div($m, 4);
+  border-radius: math.div($m, 6);
   background-color: rgba($white, 0.2);
 
   &.bg-purple {
@@ -791,7 +793,7 @@ label {
   .popover-body{
     background-color: $bg-shadow;
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.25);
-    border-radius: $m/2;
+    border-radius: math.div($m, 2);
 
     display: flex;
     align-items: center;
@@ -955,7 +957,7 @@ $c_props: ('m': 'margin') !default;
 }
 
 .bg-main-image {
-  background: url('/images/bg-main.png') no-repeat center center fixed; 
+  background: url('/images/bg-main.png') no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -964,5 +966,11 @@ $c_props: ('m': 'margin') !default;
 .connect-account{
   .button-connect{
     height: 60px;
+  }
+}
+.hover-white{
+  &:hover {
+    background-color: rgba(rgba($white, 0), 0.2);
+    color: #fff;
   }
 }

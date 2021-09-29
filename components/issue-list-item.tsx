@@ -7,11 +7,10 @@ import {IssueData} from '@interfaces/issue-data';
 import { BeproService } from '@services/bepro-service';
 import { ApplicationContext } from '@contexts/application';
 import { IssueState } from '@interfaces/issue-data'
+import {formatNumberToNScale} from '@helpers/formatNumber';
 
 export default function IssueListItem({issue = null}:{issue?: IssueData}) {
-    const { state: { currentAddress }} = useContext(ApplicationContext)
     const router = useRouter()
-    const [amount, setAmount] = useState<string>()
 
    function handleColorState (state: IssueState) {
         switch(state.toLowerCase()) {
@@ -42,17 +41,6 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
         }
    }
 
-   useEffect(() => {
-     if (!currentAddress)
-       return;
-    async function getIssueBeprosStaked(issueId: string){
-        await BeproService.network.getIssueById({issueId})
-            .then((issue) => setAmount(issue.tokensStaked))
-            .catch((err)  => console.error('Failed to getIssue', err))
-    }
-     getIssueBeprosStaked(issue?.issueId)
-   },[currentAddress, issue])
-
     return (
             <div className="bg-shadow list-item rounded p-4 mb-3" onClick={() => {
                 router.push({
@@ -64,10 +52,9 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
                     <div className="col-md-10 mb-3 mb-md-0">
                         <h4 className="h4 text-truncate">
                             <span className="trans me-1">#{issue?.githubId}</span>
-                            {issue?.title.length > 61 ?
-                            issue?.title.substring(0,61)+"..."
-                            :
-                            issue?.title
+                            {issue?.title.length > 61
+                              ? issue?.title.substring(0,61)+"..."
+                              : issue?.title
                             }
                         </h4>
                         <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start">
@@ -79,7 +66,7 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
                         </div>
                     </div>
                     <div className="col-md-2 my-auto text-center">
-                        <span className="caption trans">{amount == "0" ? "MISSING" : amount } {amount && "$BEPRO"}</span>
+                        <span className="caption trans">{formatNumberToNScale(issue?.amount || 0)} $BEPRO</span>
                         {(issue?.developers.length > 0) && <IssueAvatars users={issue?.developers}></IssueAvatars>}
                     </div>
                 </div>

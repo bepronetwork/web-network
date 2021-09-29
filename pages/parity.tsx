@@ -13,6 +13,7 @@ import {changeBalance} from '@reducers/change-balance';
 import router from 'next/router';
 import {toastInfo} from '@reducers/add-toast';
 import {SETTLER_ADDRESS, TRANSACTION_ADDRESS} from '../env';
+import {number} from 'prop-types';
 
 export default function ParityPage() {
   const {state: {currentAddress, balance,}, dispatch} = useContext(ApplicationContext);
@@ -23,6 +24,9 @@ export default function ParityPage() {
   const [githubCreator, setGithubCreator] = useState(``);
   const [deployedContract, setDeployedContract] = useState(``);
   const [councilAmount, setCouncilAmount] = useState(``);
+  const [settlerTokenName, setSettlerTokenName] = useState(``);
+  const [settlerTokenSymbol, setSettlerTokenSymbol] = useState(``);
+  const [settlerTokenAddress, setSettlerTokenAddress] = useState(``);
   const [issuesList, setIssuesList] = useState([]);
 
   const formItem = (label = ``, placeholder = ``, value = ``, onChange = (ev) => {}) =>
@@ -32,8 +36,6 @@ export default function ParityPage() {
     formItem(`Github Token`, `Token to be able to login and act`, githubToken, (ev) => setGithubToken(ev?.target?.value)),
     formItem(`Github Login`, `Login handle of the owner of the token`, githubLogin, (ev) => setGithubLogin(ev?.target?.value)),
     formItem(`Read Repo`, `Github repo name to read from (pex bepro-js)`, readRepoName, (ev) => setReadRepoName(ev?.target?.value)),
-    formItem(`Output Repo`, `Github repo name to output to (pex bepro-js-edge)`, outputRepoName, (ev) => setOutputRepoName(ev?.target?.value)),
-    formItem(`New council amount`, `Set a new council amount`, councilAmount, (ev) => setCouncilAmount(ev?.target?.value)),
   ]
 
   function isValidForm() {
@@ -63,6 +65,7 @@ export default function ParityPage() {
     }
 
     const comments = await getComments();
+
     for (const comment of comments)
       await createComment(comment);
 
@@ -71,12 +74,9 @@ export default function ParityPage() {
   function listIssues() {
     const octokit = new Octokit({auth: githubToken});
     const readRepoInfo = {owner: githubLogin, repo: readRepoName};
-    const outRepoInfo = {owner: githubLogin, repo: outputRepoName};
-
-    const openIssues = [];
 
     function mapOpenIssue({title = ``, number = 0, body = ``, labels = [], tokenAmount}) {
-      const getTokenAmount = (lbls) => +lbls.find((label = ``) => label.search(/k (BEPRO|\$USDC)/) > -1)?.replace(/k (BEPRO|\$USDC)/, `000`) || 100000;
+      const getTokenAmount = (lbls) => +lbls.find((label = ``) => label.search(/k \$?(BEPRO|USDC)/) > -1)?.replace(/k \$?(BEPRO|USDC)/, `000`) || 100000;
 
       if (labels.length && !tokenAmount)
         tokenAmount = getTokenAmount(labels.map(({name}) => name));
@@ -86,33 +86,33 @@ export default function ParityPage() {
       return ({title, number, body, tokenAmount,});
     }
 
-
-    function getAllIssues(repoInfo) {
-      try {
-        return octokit.rest.issues.listForRepo({...repoInfo, state: `open`})
-                      .then(({data}) => data)
-      } catch (e) {
-        console.log(`Failed to getAllIssues of`, repoInfo, e);
-        return Promise.resolve([]);
-      }
+    function getAllIssuesRecursive(repoInfo, page = 1, pool = []) {
+      return octokit.rest.issues.listForRepo({...repoInfo, state: `open`, per_page: 100, page})
+                    .then(({data}) =>
+                      data.length === 100 ? getAllIssuesRecursive(repoInfo, page++, data) : pool.concat(data))
+                    .catch(e => {
+                      console.log(`Failed to get issues for`, repoInfo, page, e);
+                      return [];
+                    })
     }
-
 
     dispatch(changeLoadState(true))
 
-    getAllIssues(readRepoInfo)
-      .then(issues => {
-        openIssues.push(...issues.map(mapOpenIssue));
-        return getAllIssues(outRepoInfo)
+    getAllIssuesRecursive(readRepoInfo)
+      .then(issues => issues.map(mapOpenIssue))
+      .then(async issues => {
+        const openIssues = [];
+
+        for (const issue of issues)
+          if (!(await BeproService.network.getIssueByCID({issueCID: issue.number.toString()}))?.cid)
+            openIssues.push(issue);
+
+        return openIssues;
       })
-      .then(issues => {
-        const filterExistingIssues = ({title = ``}) => !issues.some((item) => item.title === title);
-        setIssuesList(openIssues.filter(filterExistingIssues).map(mapOpenIssue));
-      })
+      .then(setIssuesList)
       .finally(() => {
         dispatch(changeLoadState(false))
       })
-
   }
 
   function createIssue({title, body: description = `No description`, tokenAmount, number}) {
@@ -123,30 +123,41 @@ export default function ParityPage() {
     const msPayload = {
       title, description, amount: 10 /*tokenAmount*/,
       creatorAddress: currentAddress, creatorGithub: githubCreator,
+      githubIssueId: number.toString(),
     }
 
-    const scPayload = {tokenAmount: 10 /*tokenAmount*/, cid: currentAddress,};
+    const scPayload = {tokenAmount: "10" /*tokenAmount*/,};
 
-    return BeproService.network.openIssue(scPayload)
-                       .then(txInfo => {
-                         BeproService.parseTransaction(txInfo, openIssueTx.payload)
-                                     .then(block => dispatch(updateTransaction(block)))
-                         return txInfo;
-                       })
-                       .then(txInfo =>
-                         GithubMicroService.createIssue({
-                                                          ...msPayload,
-                                                          issueId: txInfo.events?.OpenIssue?.returnValues?.id
-                                                        })
-                                           .then(oknok =>
-                                             GithubMicroService.getIssueId(txInfo.events?.OpenIssue?.returnValues?.id)
-                                                               .then((info) => info?.githubId && createComments(number, info.githubId))
-                                                               .then(() => oknok)))
-                       .catch(e => {
-                         dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
-                         console.error(`Failed to createIssue`, e);
-                         return false;
-                       })
+    console.log(`scPayload,`, scPayload, `msPayload`, msPayload);
+
+    return GithubMicroService.createIssue(msPayload)
+                             .then(cid => {
+                               if (!cid)
+                                 throw new Error(`Failed to create github issue!`);
+                               return BeproService.network.openIssue({...scPayload, cid})
+                                                  .then(txInfo => {
+                                                    BeproService.parseTransaction(txInfo, openIssueTx.payload)
+                                                                .then(block => dispatch(updateTransaction(block)))
+                                                    return {githubId: cid, issueId: txInfo.events?.OpenIssue?.returnValues?.id};
+                                                  })
+                             })
+                             .then(({githubId, issueId}) => {
+                               if (!issueId)
+                                 throw new Error(`Failed to create issue on SC!`);
+
+                               return GithubMicroService.patchGithubId(githubId, issueId)
+                             })
+                             .then(result => {
+                               if (!result)
+                                 return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                               return true;
+                             })
+                             .catch(e => {
+                               console.log(e);
+                               dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                               return false;
+                             })
+
   }
 
   function createIssuesFromList() {
@@ -193,6 +204,20 @@ export default function ParityPage() {
                 })
   }
 
+  function deploySettlerToken() {
+    BeproService.ERC20.deploy({
+                                name: settlerTokenName,
+                                symbol: settlerTokenSymbol,
+                                cap: "10000000000000000000000000000",
+                                distributionAddress: currentAddress
+                              })
+                .then(txInfo => {
+                  console.log(txInfo);
+                  dispatch(toastInfo(`Deployed!`));
+                  setSettlerTokenAddress(txInfo.contractAddress);
+                })
+  }
+
   function renderIssuesList({title = ``, body = ``, tokenAmount = 100000,}, i: number) {
     return (
       <div className="mb-4" key={i}>
@@ -236,18 +261,46 @@ export default function ParityPage() {
   return <>
     <div className="container mb-5">
       <ConnectWalletButton asModal={true} />
-      <div className="div mt-3 mb-4 content-wrapper">
-        {formMaker.map(renderFormItems)}
+      <div className="mt-3 content-wrapper">
         <div className="row mb-3">
           <label className="p-small trans mb-2">New contract address</label>
           <input value={deployedContract} readOnly={true} type="text" className="form-control" placeholder={`Address will appear here`}/>
         </div>
+        <div className="row mb-3">
+          <label className="p-small trans mb-2">New council amount</label>
+          <input className="form-control" value={councilAmount} onChange={(e) => setCouncilAmount(e?.target?.value)} type="text" placeholder={`Amount needed to be a council member`}/>
+        </div>
+        <hr />
+        <div className="row mb-3 mxn-4">
+          <div className="col">
+            <label className="p-small trans mb-2 ml-2">New settler token name</label>
+            <input className="form-control" placeholder="pex BEPRO" value={settlerTokenName} onChange={(e) => setSettlerTokenName(e?.target.value)}/>
+          </div>
+          <div className="col">
+            <label className="p-small trans mb-2 ml-2">New settler token symbol</label>
+            <input className="form-control" placeholder="pex $BEPRO" value={settlerTokenSymbol} onChange={(e) => setSettlerTokenSymbol(e?.target.value)}/>
+          </div>
+        </div>
+        <div className="row mb-3">
+          <label className="p-small trans mb-2">Settler token address</label>
+          <input className="form-control" value={settlerTokenAddress} readOnly={true}/>
+        </div>
+
         <div className="row">
           <div className="col d-flex justify-content-end align-items-center">
             <button className="btn btn-md me-2 btn-primary" onClick={() => deployNewContract()}>Deploy contract</button>
-            <button className="btn btn-md btn-primary me-auto" disabled={!councilAmount} onClick={() => updateCouncilAmount()}>Update council amount</button>
+            <button className="btn btn-md btn-primary me-2" disabled={!councilAmount} onClick={() => updateCouncilAmount()}>Update council amount</button>
+            <button className="btn btn-md btn-primary" disabled={!settlerTokenName || !settlerTokenSymbol} onClick={() => deploySettlerToken()}>Deploy settler token</button>
+
+          </div>
+        </div>
+      </div>
+      <div className="div mt-3 mb-4 content-wrapper">
+        {formMaker.map(renderFormItems)}
+        <div className="row">
+          <div className="col d-flex justify-content-end align-items-center">
             {issuesList.length && <span className="fs-small me-2">Will cost <span className={getCostClass()}>{formatNumberToString(getSumOfTokenAmount())} BEPRO </span> / {formatNumberToString(balance.bepro)} BEPRO</span> || ``}
-            {issuesList.length && <button className="btn btn-trans mr-2" onClick={() => createIssuesFromList()}>Create Issues</button> || ``}
+            {issuesList.length && <button className="btn btn-md btn-outline-primary mr-2" onClick={() => createIssuesFromList()}>Create Issues</button> || ``}
             <button className="btn btn-md btn-primary" disabled={isValidForm()} onClick={() => listIssues()}>List issues</button>
           </div>
         </div>
