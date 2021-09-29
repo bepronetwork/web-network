@@ -200,7 +200,7 @@ export default class GithubMicroService {
     return client.get<ProposalData>(`/issues/mergeproposal/${MergeId}/${issueId}`)
                  .then(({data}) => data)
                  .catch(e => {
-                   console.error(e);
+                   console.error(`Failed to get proposal`, issueId, MergeId, e);
                    return {scMergeId: '', pullRequestId: '', issueId: '', id: ''}
                  })
   }
@@ -209,7 +209,7 @@ export default class GithubMicroService {
     return client.get(`/`)
                  .then(({status}) => status === 200)
                  .catch(e => {
-                   console.error(e);
+                   console.error(`Failed to get health`, e);
                    return false;
                  });
   }
@@ -218,8 +218,17 @@ export default class GithubMicroService {
     return client.patch(`/issues/github/${githubId}/issueId/${withIssueId}`)
                  .then((data) => data.data === 'ok')
                  .catch((e) => {
-                   console.log(`Failed to patch github issue id with SC issue id`, e);
+                   console.error(`Failed to patch github issue id with SC issue id`, e);
                    return false;
+                 })
+  }
+
+  static async getAllUsers() {
+    return client.get(`/users/all`)
+                 .then(({data}) => data)
+                 .catch(e => {
+                   console.error(`Failed to get all users`, e);
+                   return [];
                  })
   }
 }
