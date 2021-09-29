@@ -141,7 +141,12 @@ export default function ParityPage() {
                                                     return {githubId: cid, issueId: txInfo.events?.OpenIssue?.returnValues?.id};
                                                   })
                              })
-                             .then(({githubId, issueId}) => GithubMicroService.patchGithubId(githubId, issueId))
+                             .then(({githubId, issueId}) => {
+                               if (!issueId)
+                                 throw new Error(`Failed to create issue on SC!`);
+
+                               return GithubMicroService.patchGithubId(githubId, issueId)
+                             })
                              .then(result => {
                                if (!result)
                                  return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
