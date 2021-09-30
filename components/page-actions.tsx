@@ -170,7 +170,7 @@ export default function PageActions({
   function viewGHButton() {
     return (
         <a
-          href={`https://github.com/bepronetwork/webapp-community/issues/${issueId || ''}`}
+          href={`https://github.com/bepronetwork/webapp-community/issues/${githubId || ''}`}
           target="_blank"
           className="btn btn-md mx-1 px-4 bg-shadow text-white-50"
           >
@@ -279,10 +279,10 @@ export default function PageActions({
                 </Link>
               )}
               {viewGHButton()}
-              {workButton()}
+              {state.toLocaleLowerCase() !== 'redeemed' && workButton()}
               {renderRedeem()}
               {renderProposeDestribution()}
-              {renderPullrequest()}
+              {state.toLocaleLowerCase() !== 'redeemed' && renderPullrequest()}
               {state?.toLowerCase() === 'pull request' && (
                 <>
                   <button
