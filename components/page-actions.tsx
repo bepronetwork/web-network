@@ -82,10 +82,10 @@ export default function PageActions({
   function renderForkAvatars() {
     if (forks?.length > 0) {
       return (
-        <div className="d-flex align-items-center">
+        <a className="d-flex align-items-center text-decoration-none text-white-50 mx-1" href="https://github.com/bepronetwork/webapp-community/network/members" target="_blank">
           <IssueAvatars users={forks.map((item) => item.owner)}/>
           <span className="me-3 fs-small">Forks</span>
-        </div>
+        </a>
       );
     }
   }
@@ -172,7 +172,7 @@ export default function PageActions({
         <a
           href={`https://github.com/bepronetwork/webapp-community/issues/${issueId || ''}`}
           target="_blank"
-          className="btn btn-md ms-1 px-4 bg-shadow text-white-50 mr-1"
+          className="btn btn-md mx-1 px-4 bg-shadow text-white-50"
           >
           VIEW ON GITHUB <ExternalLinkIcon className="ml-1" height={11} width={11} color="text-white-50"/>
         </a>
@@ -184,7 +184,7 @@ export default function PageActions({
         <a
           target="_blank"
           href="https://github.com/bepronetwork/webapp-community/fork"
-          className="btn btn-md btn-primary ms-1 px-4 mr-1"
+          className="btn btn-md mx-1 btn-primary px-4"
           >
           WORK ON THIS ISSUE <ExternalLinkIcon className="ml-1" height={11} width={11} color="text-white"/>
         </a>
@@ -275,7 +275,7 @@ export default function PageActions({
               {forks && renderForkAvatars()}
               {UrlGithub && (
                 <Link href={UrlGithub}>
-                  <a className="btn btn-md btn-opac me-3" target="_blank">View on github</a>
+                  <a className="btn btn-md btn-opac mx-1" target="_blank">View on github</a>
                 </Link>
               )}
               {viewGHButton()}

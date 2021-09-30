@@ -48,7 +48,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
 
   if (asModal)
     return (
-      <Modal title="Connect your MetaMask Wallet" show={!currentAddress || !metaMaskWallet} onCloseClick={() => {}}>
+      <Modal title="Connect your MetaMask Wallet" show={!currentAddress || !metaMaskWallet}>
         <div className="text-white-50 fs-small mtn-3 mb-5">to deposit funds and start using our service</div>
         <div className="d-flex justify-content-start px-3 bg-black py-4 align-items-center rounded cursor-pointer" onClick={connectWallet}>
           <Image src={metamaskLogo}/>
