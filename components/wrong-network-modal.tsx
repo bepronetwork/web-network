@@ -32,11 +32,6 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
 
     return `col-6 rounded border border-${color} text-${color} p-3 d-flex justify-content-between align-items-center`;
   }
-  function connectGithub(){
-    if(showModal())
-      localStorage.setItem(`lastAddressBeforeConnect`, currentAddress);
-      return signIn('github', {callbackUrl: `${window.location.protocol}//${window.location.host}/connect-account`})
-  }
 
   return (
     <Modal
@@ -64,7 +59,7 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
                 {!showModal() ? <CheckMarkIcon /> : <ErrorMarkIcon />}
               </div>
             ) : (
-              <div className={`button-connect border bg-dark border-dark rounded d-flex justify-content-between p-3 align-items-center w-75 ${showModal() && `cursor-pointer`}`} onClick={connectGithub}>
+              <div className={`button-connect border bg-dark border-dark rounded d-flex justify-content-between p-3 align-items-center w-75 ${showModal() && `cursor-pointer`}`}>
                 <div className="mx-auto d-flex align-items-center text-uppercase smallCaption">
                   <Image src={metamaskLogo} width={15} height={15} />{" "}
                   <span className="ms-2 text-white text-opacity-1">
@@ -76,7 +71,7 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
           </div>
         </div>
         <div className="smallInfo text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-4">
-          BY CONNECTING, YOU{" "}
+        BY CONNECTING, YOU ACCEPT
           <a
             href="https://www.bepro.network/terms-and-conditions"
             target="_blank"
