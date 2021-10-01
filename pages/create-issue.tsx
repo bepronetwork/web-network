@@ -101,7 +101,6 @@ export default function PageCreateIssue() {
                                            })
                       })
                       .then(({githubId, issueId}) => GithubMicroService.patchGithubId(githubId, issueId).then(result => {
-                        debugger;
                         if (!result)
                            dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
                            return router.push(`/issue?id=${issueId}`)
