@@ -89,7 +89,7 @@ export default function ParityPage() {
     function getAllIssuesRecursive(repoInfo, page = 1, pool = []) {
       return octokit.rest.issues.listForRepo({...repoInfo, state: `open`, per_page: 100, page})
                     .then(({data}) =>
-                      data.length === 100 ? getAllIssuesRecursive(repoInfo, page++, data) : pool.concat(data))
+                            data.length === 100 ? getAllIssuesRecursive(repoInfo, page++, data) : pool.concat(data))
                     .catch(e => {
                       console.log(`Failed to get issues for`, repoInfo, page, e);
                       return [];
@@ -98,21 +98,27 @@ export default function ParityPage() {
 
     dispatch(changeLoadState(true))
 
-    getAllIssuesRecursive(readRepoInfo)
-      .then(issues => issues.map(mapOpenIssue))
-      .then(async issues => {
-        const openIssues = [];
+    BeproService.login()
+                .then(_ => GithubMicroService.getUserOf(currentAddress))
+                .then(user => {
+                  setGithubCreator(user.githubLogin)
+                  console.log(`github`, githubCreator, user);
+                })
+                .then(() => getAllIssuesRecursive(readRepoInfo)
+                .then(issues => issues.map(mapOpenIssue))
+                .then(async issues => {
+                  const openIssues = [];
 
-        for (const issue of issues)
-          if (!(await BeproService.network.getIssueByCID({issueCID: issue.number.toString()}))?.cid)
-            openIssues.push(issue);
+                  for (const issue of issues)
+                    if (!(await BeproService.network.getIssueByCID({issueCID: issue.number.toString()}))?.cid)
+                      openIssues.push(issue);
 
-        return openIssues;
-      })
-      .then(setIssuesList)
-      .finally(() => {
-        dispatch(changeLoadState(false))
-      })
+                  return openIssues;
+                })
+                .then(setIssuesList)
+                .finally(() => {
+                  dispatch(changeLoadState(false))
+                }))
   }
 
   function createIssue({title, body: description = `No description`, tokenAmount, number}) {
@@ -121,12 +127,12 @@ export default function ParityPage() {
     dispatch(openIssueTx);
 
     const msPayload = {
-      title, description, amount: 10 /*tokenAmount*/,
+      title, description, amount: tokenAmount,
       creatorAddress: currentAddress, creatorGithub: githubCreator,
       githubIssueId: number.toString(),
     }
 
-    const scPayload = {tokenAmount: "10" /*tokenAmount*/,};
+    const scPayload = {tokenAmount: tokenAmount.toString(),};
 
     console.log(`scPayload,`, scPayload, `msPayload`, msPayload);
 
@@ -161,19 +167,17 @@ export default function ParityPage() {
   }
 
   function createIssuesFromList() {
-    BeproService.login()
-                .then(_ => GithubMicroService.getUserOf(currentAddress))
-                .then(user => setGithubCreator(user.githubLogin))
-                .then(_ => Promise.all(issuesList.map(createIssue)))
-                .then(okList => {
-                  console.log(`All true?`, !okList.some(b => !b));
-                  console.log(`How many trues vs falses?`, okList.reduce((p, c) => p += c && 1 || -1, 0))
-                  console.log(`Length of issuesList,`, issuesList.length);
-                  console.log(`okList`, okList);
-                })
-                .catch(e => {
-                  console.error(`Some error occurred while trying to open issues,`, e);
-                })
+
+    return Promise.all(issuesList.map(createIssue))
+                  .then(okList => {
+                    console.log(`All true?`, !okList.some(b => !b));
+                    console.log(`How many trues vs falses?`, okList.reduce((p, c) => p += c && 1 || -1, 0))
+                    console.log(`Length of issuesList,`, issuesList.length);
+                    console.log(`okList`, okList);
+                  })
+                  .catch(e => {
+                    console.error(`Some error occurred while trying to open issues,`, e);
+                  })
   }
 
   function deployNewContract() {
@@ -300,7 +304,7 @@ export default function ParityPage() {
         <div className="row">
           <div className="col d-flex justify-content-end align-items-center">
             {issuesList.length && <span className="fs-small me-2">Will cost <span className={getCostClass()}>{formatNumberToString(getSumOfTokenAmount())} BEPRO </span> / {formatNumberToString(balance.bepro)} BEPRO</span> || ``}
-            {issuesList.length && <button className="btn btn-md btn-outline-primary mr-2" onClick={() => createIssuesFromList()}>Create Issues</button> || ``}
+            {issuesList.length && <button className="btn btn-md btn-outline-primary mr-2" disabled={!githubCreator} onClick={() => createIssuesFromList()}>Create Issues</button> || ``}
             <button className="btn btn-md btn-primary" disabled={isValidForm()} onClick={() => listIssues()}>List issues</button>
           </div>
         </div>
