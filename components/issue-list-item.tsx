@@ -8,6 +8,8 @@ import { BeproService } from '@services/bepro-service';
 import { ApplicationContext } from '@contexts/application';
 import { IssueState } from '@interfaces/issue-data'
 import {formatNumberToNScale} from '@helpers/formatNumber';
+import Avatar from "components/avatar";
+import { formatRelative } from 'date-fns';
 
 export default function IssueListItem({issue = null}:{issue?: IssueData}) {
     const router = useRouter()
@@ -41,6 +43,13 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
         }
    }
 
+   function GhInfo(color, value) {
+    return <div className={`bg-transparent smallCaption text-uppercase px-1 rounded border border-2 border-${color} text-${color} text-uppercase fs-smallest`}>
+            <strong>{value}</strong>
+        </div>
+    }
+  
+
     return (
             <div className="bg-shadow list-item rounded p-4 mb-3" onClick={() => {
                 router.push({
@@ -52,21 +61,24 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
                     <div className="col-md-10 mb-3 mb-md-0">
                         <h4 className="h4 text-truncate">
                             <span className="trans me-1">#{issue?.githubId}</span>
-                            {issue?.title.length > 61
-                              ? issue?.title.substring(0,61)+"..."
-                              : issue?.title
+                            {(issue?.title || ``).length > 61
+                              ? (issue?.title || ``).substring(0,61)+"..."
+                              : (issue?.title || `Error fetching issue`)
                             }
                         </h4>
                         <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start">
-                            <span className={`status ${handleColorState(issue?.state)} mr-3 mt-1`}>{issue?.state}</span>
-                            <span className="p-small trans mr-3 mt-1">{issue?.numberOfComments} comments</span>
-                            <span className="p-small trans mr-3 mt-1">{issue != null && formatDate(issue?.createdAt)}</span>
-                            <span className="p-small trans mr-3 mt-1">{issue?.creatorGithub}</span>
-                            {issue?.dueDate && <span className="p-small text-warning mr-3 mt-1">{issue?.dueDate}</span>}
+                            <span className={`status ${handleColorState(issue?.state)} mr-2 mt-1`}>{issue?.state}</span>
+                            <span className="p-small trans mr-2 mt-1">{issue?.numberOfComments} comments</span>
+                            <span className="p-small trans mr-2 mt-1">{issue != null && formatDate(issue?.createdAt)}</span>
+                            {issue?.repo && <span className="p-small trans mr-2 mt-1 text-uppercase">{GhInfo('blue', issue?.repo)}</span>}
+                            <span className="p-small trans mr-2 mt-1">by</span>
+                            <span className="p-small trans mr-2 mt-1">{GhInfo('gray', `@${issue?.creatorGithub}`)}</span>
+                            <Avatar className="mr-2" userLogin={issue.creatorGithub} />
+                            {issue?.dueDate && <span className="p-small text-warning mr-2 mt-1">{issue?.dueDate}</span>}
                         </div>
                     </div>
                     <div className="col-md-2 my-auto text-center">
-                        <span className="caption trans">{formatNumberToNScale(issue?.amount || 0)} $BEPRO</span>
+                        <span className="caption trans text-white text-opacity-1">{formatNumberToNScale(issue?.amount || 0)} <label className="text-uppercase text-blue">$BEPRO</label></span>
                         {(issue?.developers.length > 0) && <IssueAvatars users={issue?.developers}></IssueAvatars>}
                     </div>
                 </div>

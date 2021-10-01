@@ -3,16 +3,17 @@ import { GetStaticProps } from "next";
 import { formatDate } from '@helpers/formatDate';
 
 export default function IssueHero({ issue, state, amount }) {
+  function GhInfo(color, value) {
+    return <div className={`bg-transparent smallCaption text-uppercase px-1 rounded border border-2 border-${color} text-${color} text-opacity-1 text-center text-uppercase fs-smallest`}>
+            <strong>{value}</strong>
+        </div>
+  }
+
   function renderCreator() {
-    return (
-      issue?.creatorGithub && (
-        <>
-          by
-          <Avatar className="mx-2" userLogin={issue.creatorGithub} />
-          {issue.creatorGithub}
-        </>
-      )
-    );
+    if(issue?.creatorGithub)
+    return <div className="d-flex align-items-center">
+          <span className="mr-2">by</span> {GhInfo('white',issue.creatorGithub)} <Avatar className="mx-2" userLogin={issue.creatorGithub} />
+        </div>
   }
 
   return (
@@ -30,10 +31,12 @@ export default function IssueHero({ issue, state, amount }) {
                     </h1>
                     <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start">
                       <span className="p-small trans mr-3 mt-1">
-                        {issue?.numberOfComments} comments
-                      </span>
-                      <span className="p-small trans mr-3 mt-1">
                         {issue && formatDate(issue?.createdAt)}
+                      </span>
+                      <span className="p-small trans mr-2 mt-1">
+                      {issue?.repo && (<div className="bg-white smallCaption text-uppercase px-1 rounded border border-2 border-white bg-opacity-1 text-blue text-center text-uppercase fs-smallest">
+                          <strong>{issue?.repo}</strong>
+                      </div>)}
                       </span>
                       <span className="p-small trans mr-3 mt-1">
                         {renderCreator()}

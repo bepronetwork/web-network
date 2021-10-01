@@ -15,6 +15,7 @@ import {updateTransaction} from '@reducers/update-transaction';
 import {BlockTransaction,} from '@interfaces/transaction';
 import {formatNumberToCurrency} from '@helpers/formatNumber'
 import { TransactionStatus } from '@interfaces/enums/transaction-status';
+import LockIcon from '@assets/icons/lock';
 interface Amount {
   value?: string,
   formattedValue: string,
@@ -202,21 +203,28 @@ export default function PageCreateIssue() {
           <div className="col-md-10">
             <ConnectWalletButton asModal={true} />
             <div className="content-wrapper mt-up mb-5">
-              <h3 className="h3 mr-2 mb-4">Details</h3>
+              <h3 className="h3 mr-2 mb-4 text-white text-opacity-1">Details</h3>
               <div className="form-group mb-4">
-                <label className="p-small mb-2">Issue title</label>
+                <label className="smallCaption mb-2 text-uppercase">Issue title</label>
                 <input type="text"
-                       className="form-control" placeholder="Your issue title"
+                       className="form-control rounded-lg" placeholder="Your issue title"
                        value={issueTitle}
                        onChange={e => setIssueTitle(e.target.value)}
                 />
                 <p className="p-small trans my-2">Tip: Try to be as much descriptive as possible</p>
               </div>
+              <div className="form-group">
+                <label className="smallCaption mb-2 text-uppercase">Description</label>
+                <textarea className="form-control" rows={6} placeholder="Type a description..."
+                          value={issueDescription}
+                          onChange={e => setIssueDescription(e.target.value)}/>
+              </div>
+              <div className="form-group w-50">
               <InputNumber
                 thousandSeparator
                 max={balance}
                 className={clsx({'text-muted': allowedTransaction})}
-                label="Set $BEPRO value"
+                label="SET $BEPRO VALUE"
                 symbol="$BEPRO"
                 value={issueAmount.formattedValue}
                 disabled={allowedTransaction}
@@ -224,22 +232,17 @@ export default function PageCreateIssue() {
                 onBlur={handleIssueAmountBlurChange}
                 helperText={
                   <>
-                    {formatNumberToCurrency(balance)} $BEPRO
+                    {formatNumberToCurrency(balance)} $BEPRO Available
                     {!allowedTransaction && (
-                      <button
-                        className="btn btn-opac ml-1 py-1"
+                      <span
+                        className="smallCaption text-blue ml-1 cursor-pointer text-uppercase"
                         onClick={() => setIssueAmount({formattedValue: balance.toString()})}>
                         Max
-                      </button>
+                      </span>
                     )}
                   </>
                 }
               />
-              <div className="form-group">
-                <label className="p-small mb-2">Description</label>
-                <textarea className="form-control" rows={6} placeholder="Type a description..."
-                          value={issueDescription}
-                          onChange={e => setIssueDescription(e.target.value)}/>
               </div>
               <div className="d-flex justify-content-center align-items-center mt-4">
                 {!githubHandle ? (
@@ -249,11 +252,11 @@ export default function PageCreateIssue() {
                 ) : (
                   <>
                     {!allowedTransaction ?
-                      <button className="btn btn-lg btn-opac me-3 px-5" disabled={isApproveButtonDisable()} onClick={allowCreateIssue}>Approve</button>
+                      <button className="btn btn-md p-3 btn-primary me-3" disabled={isApproveButtonDisable()} onClick={allowCreateIssue}>Approve</button>
                       : null
                     }
-                    <button className="btn btn-lg btn-primary px-4" disabled={isCreateButtonDisabled()}
-                            onClick={createIssue}>Create Issue
+                    <button className="btn btn-md p-3 btn-primary" disabled={isCreateButtonDisabled()}
+                            onClick={createIssue}><span className="mr-1">{isCreateButtonDisabled() && <LockIcon width={12} height={14}/>}</span> Create Issue
                     </button>
                   </>
                 )}

@@ -944,10 +944,6 @@ $c_props: ('m': 'margin') !default;
   background-color: $black;
 }
 
-.toast-container {
-  z-index: $zindex-tooltip+1;
-}
-
 #filterByIssueState{
   .react-select__option{
     &:active{
@@ -974,3 +970,4 @@ $c_props: ('m': 'margin') !default;
     color: #fff;
   }
 }
+
