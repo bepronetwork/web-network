@@ -100,11 +100,12 @@ export default function PageCreateIssue() {
                                              };
                                            })
                       })
-                      .then(({githubId, issueId}) => GithubMicroService.patchGithubId(githubId, issueId))
-                      .then(result => {
+                      .then(({githubId, issueId}) => GithubMicroService.patchGithubId(githubId, issueId).then(result => {
+                        debugger;
                         if (!result)
-                          return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
-                      })
+                           dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                           return router.push(`/issue?id=${issueId}`)
+                      }))
                       .catch(e => {
                         console.log(e);
                         dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
@@ -157,7 +158,7 @@ export default function PageCreateIssue() {
       verifyAmountBiggerThanBalance(),
       issueAmount.floatValue > 0,
       !!issueAmount.formattedValue,
-      !verifyTransactionState(TransactionTypes.createIssue),
+      !verifyTransactionState(TransactionTypes.openIssue),
     ].some(value => value === false);
 
   const isApproveButtonDisable = (): boolean =>[
