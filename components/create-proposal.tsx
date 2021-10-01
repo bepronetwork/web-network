@@ -161,7 +161,7 @@ export default function NewProposal({
   return (
     <>
       {
-        isCouncil && isFinished && <button className="btn btn-md btn-primary" onClick={() => setShow(true)}>Create Proposal</button>
+        isCouncil && isFinished && <button className="btn btn-md btn-primary mx-1" onClick={() => setShow(true)}>Create Proposal</button>
           || isIssueOwner && !isFinished && renderRecognizeAsFinished()
       }
 

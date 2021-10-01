@@ -16,6 +16,8 @@ export interface IssueData {
   state: IssueState;
   title: string;
   pullRequests: pullRequest[];
+  owner?: string;
+  repo?: string;
 }
 
 export interface pullRequest {
