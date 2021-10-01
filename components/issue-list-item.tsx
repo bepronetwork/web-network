@@ -1,32 +1,33 @@
 import { GetStaticProps } from 'next'
 import { useRouter } from 'next/router';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { formatDate } from '@helpers/formatDate';
 import IssueAvatars from './issue-avatars';
 import {IssueData} from '@interfaces/issue-data';
-import { BeproService } from '@services/bepro-service';
 import { ApplicationContext } from '@contexts/application';
 import { IssueState } from '@interfaces/issue-data'
 import {formatNumberToNScale} from '@helpers/formatNumber';
 import Avatar from "components/avatar";
-import { formatRelative } from 'date-fns';
 
 export default function IssueListItem({issue = null}:{issue?: IssueData}) {
     const router = useRouter()
 
-   function handleColorState (state: IssueState) {
+    function handleColorState (state: IssueState) {
         switch(state.toLowerCase()) {
             case "draft": {
                 return "gray"
             }
-            case "in progress":{
-                return "blue"
-            }
             case "open":{
                 return "blue"
             }
-            case "redeemed":{
+            case "in progress":{
                 return "blue"
+            }
+            case "canceled":{
+                return "dark-gray"
+            }
+            case "closed":{
+                return "dark-gray"
             }
             case "ready":{
                 return "success"
@@ -37,10 +38,18 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
             case "disputed":{
                 return "danger"
             }
+            // REVIEW: redeem not exist in figma
+            case "redeemed":{
+                return "blue"
+            }
             default: {
                 return "blue"
             }
         }
+    }
+
+   function replaceRedeem(issueState: IssueState): IssueState{
+        return issue?.state === 'redeemed' ? 'closed' : issueState;
    }
 
    function GhInfo(color, value) {
@@ -67,7 +76,7 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
                             }
                         </h4>
                         <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start">
-                            <span className={`status ${handleColorState(issue?.state)} mr-2 mt-1`}>{issue?.state}</span>
+                            <span className={`status ${handleColorState(replaceRedeem(issue?.state))} mr-2 mt-1`}>{replaceRedeem(issue?.state)}</span>
                             <span className="p-small trans mr-2 mt-1">{issue?.numberOfComments} comments</span>
                             <span className="p-small trans mr-2 mt-1">{issue != null && formatDate(issue?.createdAt)}</span>
                             {issue?.repo && <span className="p-small trans mr-2 mt-1 text-uppercase">{GhInfo('blue', issue?.repo)}</span>}

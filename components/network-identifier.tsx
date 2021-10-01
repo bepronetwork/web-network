@@ -30,7 +30,7 @@ export default function NetworkIdentifier() {
 
   return network &&
       <>
-        <div className="d-inline-flex align-items-center justify-content-center bg-white py-1 px-2 mr-1 rounded text-uppercase smallCaption fs-smallest text-center text-black text-nowrap"> 
+        <div className="d-inline-flex align-items-center justify-content-center bg-white py-1 px-2 mr-1 rounded text-uppercase family-bold fs-smallest text-center text-black text-nowrap"> 
           <Indicator bg={networkMap[network]} /> <span>{network} {network !== `ethereum` && `testnet` || `mainnet`}</span>
         </div>
         <WrongNetworkModal requiredNetwork="kovan" />

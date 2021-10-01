@@ -35,13 +35,13 @@ export default function PageHero({title = "Find issues to work",}) {
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4 className="h4 mb-0">{inProgress}</h4>
-                    <span className="p-small">In progress</span>
+                    <span className="smallCaption">In progress</span>
                   </div>
                 </div>
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4 className="h4 mb-0">{closed}</h4>
-                    <span className="p-small">Issues closed</span>
+                    <span className="smallCaption">Issues closed</span>
                   </div>
                 </div>
                 <div className="col-md-6">
@@ -50,7 +50,7 @@ export default function PageHero({title = "Find issues to work",}) {
                       {onNetwork}{" "}
                       <span className="smallCaption trans">$BEPRO</span>
                     </h4>
-                    <span className="p-small">Bounties in the Network</span>
+                    <span className="smallCaption">Bounties in the Network</span>
                   </div>
                 </div>
               </div>
