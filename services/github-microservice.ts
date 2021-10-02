@@ -59,6 +59,22 @@ export default class GithubMicroService {
     return data;
   }
 
+  static async getIssuesByGhId(ghId: string | string[]) {
+    return client.get(`/issues/github/${ghId}`).then(({data}) => data)
+    .catch(e => {
+      console.error(`Error fetchin issue`, e);
+      return null;
+    });
+  }
+
+  static async updateIssueByGhId(ghId: string, state: IssueState) {
+    return client.put(`/issues/${ghId}`, {state}).then(({data}) => data)
+    .catch(e => {
+      console.error(`Error fetchin issue`, e);
+      return null;
+    });
+  }
+
   static async getIssuesByGhLogin(ghlogin) {
     const {data} = await client.get(`/issues/githublogin/${ghlogin}`);
     return data;
