@@ -59,7 +59,7 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
                 {!showModal() ? <CheckMarkIcon /> : <ErrorMarkIcon />}
               </div>
             ) : (
-              <div className={`button-connect border bg-dark border-dark rounded d-flex justify-content-between p-3 align-items-center w-75 ${showModal() && `cursor-pointer`}`}>
+              <div className="button-connect border bg-dark border-dark rounded d-flex justify-content-between p-3 align-items-center w-75">
                 <div className="mx-auto d-flex align-items-center text-uppercase smallCaption">
                   <Image src={metamaskLogo} width={15} height={15} />{" "}
                   <span className="ms-2 text-white text-opacity-1">
@@ -71,7 +71,7 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
           </div>
         </div>
         <div className="smallInfo text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-4">
-        BY CONNECTING, YOU ACCEPT
+        BY CONNECTING, YOU ACCEPT{" "}
           <a
             href="https://www.bepro.network/terms-and-conditions"
             target="_blank"
