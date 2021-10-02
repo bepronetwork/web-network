@@ -1,5 +1,6 @@
 import React, {createContext, Dispatch, useContext, useEffect, useReducer} from 'react';
 import {mainReducer} from '@reducers/main';
+import { identifierNeworkLabel } from '@helpers/metamask'
 import {ApplicationState} from '@interfaces/application-state';
 import {ReduceActor} from '@interfaces/reduce-action';
 import LoadApplicationReducers from './reducers';
@@ -92,13 +93,15 @@ export default function ApplicationContextProvider({children}) {
 
     if (!window.ethereum)
       return;
+    
+    if(window.ethereum.networkVersion) 
+      dispatch(changeNetwork(identifierNeworkLabel(window.ethereum.networkVersion)));
 
     window.ethereum.on(`accountsChanged`, (accounts) => updateSteFor(accounts[0]))
-    window.ethereum.on('networkChanged', () =>
-      BeproService.bepro.web3.eth.net.getNetworkType()
-                  .then(network => {
-                    dispatch(changeNetwork(network));
-                  }))
+
+    window.ethereum.on(`chainChanged`, (chainId) => {
+      dispatch(changeNetwork(identifierNeworkLabel(chainId)));
+    })
   }
 
   LoadApplicationReducers();
