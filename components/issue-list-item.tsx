@@ -63,7 +63,7 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
             <div className="bg-shadow list-item rounded p-4 mb-3" onClick={() => {
                 router.push({
                     pathname: '/issue',
-                    query: { id: issue?.issueId },
+                    query: { id: issue?.githubId },
                 })
             }}>
                 <div className="row align-center">
