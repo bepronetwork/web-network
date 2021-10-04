@@ -16,15 +16,15 @@ export default function NetworkIdentifier() {
   const {state: {network}, dispatch} = useContext(ApplicationContext);
 
   function updateNetwork() {
-      dispatch(changeNetwork(identifierNeworkLabel(window.ethereum.networkVersion)))
+      dispatch(changeNetwork(window.ethereum.networkVersion))
   }
-  
+
   useEffect(updateNetwork, [window.ethereum.networkVersion]);
 
   return network &&
       <>
         <div className="d-inline-flex align-items-center justify-content-center bg-white py-1 px-2 mr-1 rounded text-uppercase family-bold fs-smallest text-center text-black text-nowrap"> 
-          <Indicator bg={networkMap[network]} /> <span>{network} {network !== `ethereum` && `testnet` || `mainnet`}</span>
+          <Indicator bg={networkMap[identifierNeworkLabel(network)]} /> <span>{identifierNeworkLabel(network)} {(network !== '1' && network !== '1284') && `testnet`}</span>
         </div>
       </> || <></>
 

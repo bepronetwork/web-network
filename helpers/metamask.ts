@@ -1,4 +1,4 @@
-export const identifierNeworkLabel = (chainId: number) => {
+export const identifierNeworkLabel = (chainId: number | string) => {
     // To identifier more Networks, visite: 
     // https://chainlist.org/
     switch (Number(chainId)) {

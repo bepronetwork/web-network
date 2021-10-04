@@ -28,7 +28,7 @@ export default function App({ Component, pageProps: {session, ...pageProps} }: A
         <NationDialog>
           <MainNav />
           <WebThreeDialog />
-          <WrongNetworkModal requiredNetwork="Kovan" />
+          <WrongNetworkModal requiredNetwork="42" />
           <Component {...pageProps} />
           <StatusBar />
         </NationDialog>
