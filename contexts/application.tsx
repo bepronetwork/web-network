@@ -93,10 +93,6 @@ export default function ApplicationContextProvider({children}) {
 
     if (!window.ethereum)
       return;
-    
-    if(window.ethereum.networkVersion){
-      dispatch(changeNetwork(window.ethereum.networkVersion));
-    }
 
     window.ethereum.on(`accountsChanged`, (accounts) => updateSteFor(accounts[0]))
 

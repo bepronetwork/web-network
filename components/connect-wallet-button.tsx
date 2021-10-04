@@ -1,8 +1,9 @@
 import {BeproService} from '@services/bepro-service';
-import React, {useContext, useEffect, useState,} from 'react';
+import React, {useContext, useEffect,} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import {changeWalletState} from '@reducers/change-wallet-connect';
 import {changeCurrentAddress} from '@reducers/change-current-address';
+import {changeNetwork} from '@reducers/change-network';
 import Modal from '@components/modal';
 import Image from 'next/image';
 import metamaskLogo from '@assets/metamask.png';
@@ -13,6 +14,10 @@ export default function ConnectWalletButton({children = null, forceLogin = false
 
   async function connectWallet() {
     let loggedIn = false;
+    
+    if(window.ethereum.networkVersion){
+      dispatch(changeNetwork(window.ethereum.networkVersion));
+    }
 
     try {
       loggedIn = await BeproService.login();
