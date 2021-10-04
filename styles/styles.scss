@@ -869,6 +869,12 @@ label {
     border-radius: $m/2;
   }
 }
+#connect-your-meta-mask-wallet-modal{
+  .modal-content{
+    background-color: $bg-shadow;
+    border-radius: $m/2;
+  }
+}
 #transaction-modal{
   .modal-content{
     background-color: $bg-shadow;
