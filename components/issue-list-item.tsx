@@ -1,15 +1,12 @@
 import { GetStaticProps } from 'next'
 import { useRouter } from 'next/router';
-import React, { useContext, useEffect, useState } from 'react';
+import React from 'react';
 import { formatDate } from '@helpers/formatDate';
 import IssueAvatars from './issue-avatars';
 import {IssueData} from '@interfaces/issue-data';
-import { BeproService } from '@services/bepro-service';
-import { ApplicationContext } from '@contexts/application';
 import { IssueState } from '@interfaces/issue-data'
 import {formatNumberToNScale} from '@helpers/formatNumber';
 import Avatar from "components/avatar";
-import { formatRelative } from 'date-fns';
 
 export default function IssueListItem({issue = null}:{issue?: IssueData}) {
     const router = useRouter()
@@ -72,7 +69,7 @@ export default function IssueListItem({issue = null}:{issue?: IssueData}) {
                             <span className="p-small trans mr-2 mt-1">{issue != null && formatDate(issue?.createdAt)}</span>
                             {issue?.repo && <span className="p-small trans mr-2 mt-1 text-uppercase">{GhInfo('blue', issue?.repo)}</span>}
                             <span className="p-small trans mr-2 mt-1">by</span>
-                            <span className="p-small trans mr-2 mt-1">{GhInfo('gray', `@${issue?.creatorGithub}`)}</span>
+                            <span className="p-small trans mr-2 mt-1">{GhInfo('gray', `${issue?.creatorGithub}`)}</span>
                             <Avatar className="mr-2" userLogin={issue.creatorGithub} />
                             {issue?.dueDate && <span className="p-small text-warning mr-2 mt-1">{issue?.dueDate}</span>}
                         </div>

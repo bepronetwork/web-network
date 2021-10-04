@@ -99,6 +99,7 @@ export default function PageDevelopers() {
               <div className="col-md-3">
                 <ReactSelect
                   id="filterByIssueState"
+                  isSearchable={false}
                   className="react-select-filterIssues"
                   defaultValue={filtersByIssueState[0]}
                   options={filtersByIssueState}
