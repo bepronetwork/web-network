@@ -1,23 +1,27 @@
 import {BeproService} from '@services/bepro-service';
-import React, {useContext, useEffect,} from 'react';
+import React, {useContext, useEffect, useState,} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import {changeWalletState} from '@reducers/change-wallet-connect';
 import {changeCurrentAddress} from '@reducers/change-current-address';
 import {changeNetwork} from '@reducers/change-network';
 import Modal from '@components/modal';
 import Image from 'next/image';
+import {CURRENT_NETWORK_CHAINID} from 'env'
 import metamaskLogo from '@assets/metamask.png';
-import ArrowRight from '@assets/icons/arrow-right';
 
 export default function ConnectWalletButton({children = null, forceLogin = false, onSuccess = () => null, onFail = () => console.log("error"), asModal = false, btnColor = `white`}) {
   const { state: {metaMaskWallet, beproInit, currentAddress}, dispatch } = useContext(ApplicationContext);
-
+  const [showModal, setShowModal] = useState(false)
   async function connectWallet() {
-    let loggedIn = false;
     
-    if(window.ethereum.networkVersion){
-      dispatch(changeNetwork(window.ethereum.networkVersion));
+    if(window.ethereum.networkVersion !== CURRENT_NETWORK_CHAINID){
+      setShowModal(true)
+      return dispatch(changeNetwork(window.ethereum.networkVersion));
     }
+    
+    setShowModal(false)
+    
+    let loggedIn = false;
 
     try {
       loggedIn = await BeproService.login();
@@ -51,7 +55,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
 
   }, [beproInit]);
 
-  if (asModal)
+  if (asModal || showModal)
     return (
       <Modal 
       title="Connect your MetaMask Wallet" 
