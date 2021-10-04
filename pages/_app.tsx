@@ -8,6 +8,7 @@ import MainNav from "@components/main-nav";
 import ApplicationContextProvider from "@contexts/application";
 import StatusBar from '@components/status-bar';
 import { isMobile } from "react-device-detect";
+import { CURRENT_NETWORK_CHAINID } from "../env";
 import MobileNotSupported from '@components/mobile-not-supported';
 import {getSession, SessionProvider} from 'next-auth/react'
 import {GetServerSideProps} from 'next';
@@ -28,7 +29,7 @@ export default function App({ Component, pageProps: {session, ...pageProps} }: A
         <NationDialog>
           <MainNav />
           <WebThreeDialog />
-          <WrongNetworkModal requiredNetwork="42" />
+          <WrongNetworkModal requiredNetwork={CURRENT_NETWORK_CHAINID} />
           <Component {...pageProps} />
           <StatusBar />
         </NationDialog>

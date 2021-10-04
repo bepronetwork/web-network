@@ -24,7 +24,7 @@ export default function NetworkIdentifier() {
   return network &&
       <>
         <div className="d-inline-flex align-items-center justify-content-center bg-white py-1 px-2 mr-1 rounded text-uppercase family-bold fs-smallest text-center text-black text-nowrap"> 
-          <Indicator bg={networkMap[identifierNeworkLabel(network)]} /> <span>{identifierNeworkLabel(network)} {(network !== '1' && network !== '1284') && `testnet`}</span>
+          <Indicator bg={networkMap[identifierNeworkLabel(network)]} /> <span>{identifierNeworkLabel(network)} {(identifierNeworkLabel(network) !== 'Mainnet' && identifierNeworkLabel(network) !== 'Moonbeam') && `testnet`}</span>
         </div>
       </> || <></>
 
