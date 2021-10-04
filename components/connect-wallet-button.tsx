@@ -53,13 +53,40 @@ export default function ConnectWalletButton({children = null, forceLogin = false
 
   if (asModal)
     return (
-      <Modal title="Connect your MetaMask Wallet" show={!currentAddress || !metaMaskWallet}>
-        <div className="text-white-50 fs-small mtn-3 mb-5">to deposit funds and start using our service</div>
-        <div className="d-flex justify-content-start px-3 bg-black py-4 align-items-center rounded cursor-pointer" onClick={connectWallet}>
-          <Image src={metamaskLogo}/>
-          <span className="fw-bold text-white text-uppercase ms-4 me-auto">metamask</span>
-          <ArrowRight />
+      <Modal 
+      title="Connect your MetaMask Wallet" 
+      titlePosition="center"
+      titleClass="h4 text-white bg-opacity-100"
+      show={!currentAddress || !metaMaskWallet}>
+        <div className="text-center">
+        <strong className="smallCaption d-block text-uppercase text-white-50 mb-3 pb-1">
+          to access this page please, connect to the <br/><span className="text-purple">kovan test network</span> on your metamask wallet
+        </strong>
+          <div className="d-flex justify-content-center align-items-center w-100">
+              <div className="rounded-3 bg-dark-gray text-white p-3 d-flex text-center justify-content-center align-items-center w-75 cursor-pointer" onClick={connectWallet}>
+                  <Image src={metamaskLogo} width={15} height={15}/>
+                  <span className="fw-bold text-white text-uppercase ms-2">metamask</span>
+              </div>
         </div>
+        <div className="smallInfo text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-2 pt-1">
+        by connecting, you accept{" "}
+          <a
+            href="https://www.bepro.network/terms-and-conditions"
+            target="_blank"
+            className="text-decoration-none"
+          >
+            Terms & Conditions
+          </a>{" "}
+          <br /> and{" "}
+          <a
+            href="https://www.bepro.network/private-policy"
+            target="_blank"
+            className="text-decoration-none"
+          >
+            PRIVACY POLICY
+          </a>
+        </div>
+      </div>
       </Modal>
     )
 
