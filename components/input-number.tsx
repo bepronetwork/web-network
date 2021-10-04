@@ -22,7 +22,7 @@ export default function InputNumber({
   return (
     <Component {...(shouldBeWrapped && { className: "form-group" })}>
       {label && (
-        <label className="p-small trans mb-2" id={id}>
+        <label className="smallCaption mb-2 text-uppercase text-white text-opacity-1" id={id}>
           {label}
         </label>
       )}
@@ -41,7 +41,7 @@ export default function InputNumber({
         {symbol && (
           <span
             className={clsx("input-group-text p-small", {
-              "text-white-50": !error,
+              "text-blue": !error,
               ...errorStyle,
             })}>
             {symbol}
