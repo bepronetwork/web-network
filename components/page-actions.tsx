@@ -25,7 +25,7 @@ interface pageActions {
   finalized: boolean;
   addressNetwork: string;
   isIssueinDraft: boolean;
-  state?: IssueState;
+  state?: IssueState | string;
   pullRequests?: pullRequest[];
   mergeProposals?: number;
   amountIssue?: string | number;
@@ -94,7 +94,7 @@ export default function PageActions({
     }
   }
 
-  const isClosedIssue = (state: IssueState): Boolean =>
+  const isClosedIssue = (state: IssueState | string): Boolean =>
     state.toLocaleLowerCase() === "closed" ||
     state.toLocaleLowerCase() === "redeemed";
   const isReedemButtonDisable = () =>
