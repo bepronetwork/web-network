@@ -94,13 +94,14 @@ export default function ApplicationContextProvider({children}) {
     if (!window.ethereum)
       return;
     
-    if(window.ethereum.networkVersion) 
-      dispatch(changeNetwork(identifierNeworkLabel(window.ethereum.networkVersion)));
+    if(window.ethereum.networkVersion){
+      dispatch(changeNetwork(window.ethereum.networkVersion));
+    }
 
     window.ethereum.on(`accountsChanged`, (accounts) => updateSteFor(accounts[0]))
 
-    window.ethereum.on(`chainChanged`, (chainId) => {
-      dispatch(changeNetwork(identifierNeworkLabel(chainId)));
+    window.ethereum.on(`chainChanged`, (chainId: string) => {
+      dispatch(changeNetwork(Number(chainId).toString()));
     })
   }
 
