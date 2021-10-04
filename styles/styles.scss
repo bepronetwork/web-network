@@ -68,11 +68,23 @@ li {
     &__control {
       border-color: transparent;
       background-color: $bg-shadow;
+      min-width: 210px;
       min-height: 38px;
       box-shadow: none;
-      &:hover,
+      border-radius: 8px;
+      border-width: 2px;
+      &:hover{
+        border-color: $ligth-gray;
+      }
       &--is-focused {
-        border-color: $blue;
+        border-color: $blue
+      }
+      &--menu-is-open{
+        border-color: $blue !important;
+        background: $black;
+      }
+      &--is-disabled{
+        border-color: transparent;
       }
     }
     &__value-filterIssues {
@@ -83,6 +95,8 @@ li {
     }
     &__indicator {
       padding: 14px;
+      font-size: 12px;
+      color: $gray;
     }
     &__single-value {
       color: $white;
@@ -91,14 +105,25 @@ li {
       color: transparentize($white, 0.4);
     }
     &__menu {
+      min-width: 210px;
+      border-radius: 8px;
+      border: 1px solid $ligth-gray;
       background-color: $bg-shadow;
     }
+    &__value{
+      text-transform: uppercase;
+    }
     &__option {
-      &--is-focused {
-        background-color: $bg-shadow;
-      }
+      @extend .p-small;
+      background-color: transparent;
       &--is-selected {
-        background-color: $blue;
+        color: $blue;
+      }
+      &:hover{
+        color: $white;
+      }
+      &:active{
+        background-color: transparent;
       }
     }
   }
@@ -950,14 +975,6 @@ $c_props: ('m': 'margin') !default;
 
 .bg-black {
   background-color: $black;
-}
-
-#filterByIssueState{
-  .react-select__option{
-    &:active{
-      background-color: $bg-blue-shadow;
-    }
-  }
 }
 
 .bg-main-image {
