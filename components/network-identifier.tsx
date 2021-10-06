@@ -1,8 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import Indicator from '@components/indicator';
-import {changeNetwork} from '@reducers/change-network';
-import {identifierNeworkLabel} from '@helpers/metamask'
+import { NetworkChain } from "@interfaces/enums/network-chain";
 import WrongNetworkModal from '@components/wrong-network-modal';
 import { CURRENT_NETWORK_CHAINID } from "../env";
 const networkMap = {
@@ -14,18 +13,12 @@ const networkMap = {
 }
 
 export default function NetworkIdentifier() {
-  const {state: {network}, dispatch} = useContext(ApplicationContext);
-
-  function updateNetwork() {
-      dispatch(changeNetwork(window.ethereum.networkVersion))
-  }
-
-  useEffect(updateNetwork, [window.ethereum.networkVersion]);
+  const {state: {network}} = useContext(ApplicationContext);
 
   return network &&
       <>
         <div className="d-inline-flex align-items-center justify-content-center bg-white py-1 px-2 mr-1 rounded text-uppercase family-bold fs-smallest text-center text-black text-nowrap"> 
-          <Indicator bg={networkMap[identifierNeworkLabel(network)]} /> <span>{identifierNeworkLabel(network)} {(identifierNeworkLabel(network) !== 'Mainnet' && identifierNeworkLabel(network) !== 'Moonbeam') && `testnet`}</span>
+          <Indicator bg={networkMap[NetworkChain[network]]} /> <span>{NetworkChain[network]} {(NetworkChain[network] !== 'Mainnet' && NetworkChain[network] !== 'Moonbeam') && `testnet`}</span>
         </div>
         <WrongNetworkModal requiredNetwork={CURRENT_NETWORK_CHAINID} />
       </> || <></>
