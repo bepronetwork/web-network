@@ -13,7 +13,7 @@ export default function TransactionStats({status = null}: {status: TransactionSt
     [TransactionStatus.pending]: `Pending`,
     [TransactionStatus.processing]: `Processing`,
     [TransactionStatus.failed]: `Rejected`,
-    [TransactionStatus.completed]: `Accepted`,
+    [TransactionStatus.completed]: `Completed`,
   }
 
   function rowClassName() {
