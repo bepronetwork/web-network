@@ -858,7 +858,7 @@ label {
 #transaction-modal{
   .modal-content{
     background-color: $bg-shadow;
-    border-radius: $m/2;
+    border-radius: math.div($m,2);
   }
 
   .modal-body{
