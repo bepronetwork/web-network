@@ -1,6 +1,5 @@
 import React, {createContext, Dispatch, useContext, useEffect, useReducer} from 'react';
 import {mainReducer} from '@reducers/main';
-import { identifierNeworkLabel } from '@helpers/metamask'
 import {ApplicationState} from '@interfaces/application-state';
 import {ReduceActor} from '@interfaces/reduce-action';
 import LoadApplicationReducers from './reducers';
