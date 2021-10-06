@@ -1,7 +1,6 @@
 import Modal from '@components/modal';
 import React, {useContext} from 'react';
 import Image from 'next/image';
-import {signIn} from 'next-auth/react';
 import metamaskLogo from '@assets/metamask.png';
 import {ApplicationContext} from '@contexts/application';
 import {truncateAddress} from '@helpers/truncate-address';

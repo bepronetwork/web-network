@@ -16,11 +16,10 @@ export default function ConnectWalletButton({children = null, forceLogin = false
     
     if(window.ethereum.networkVersion !== CURRENT_NETWORK_CHAINID){
       setShowModal(true)
-      return dispatch(changeNetwork(window.ethereum.networkVersion));
+      return;
     }
     
     setShowModal(false)
-    
     let loggedIn = false;
 
     try {
