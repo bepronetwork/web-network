@@ -39,7 +39,6 @@ export default function PageCreateIssue() {
 
     const tmpTransactional = addTransaction({
                                               type: TransactionTypes.approveTransactionalERC20Token,
-                                              amount: issueAmount.floatValue
                                             });
     dispatch(tmpTransactional);
 

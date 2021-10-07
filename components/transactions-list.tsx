@@ -9,6 +9,7 @@ import TransactionStats from '@components/transaction-stats';
 import TransactionType from '@components/transaction-type';
 import InformationChatBubble from '@assets/icons/information-chat-bubble';
 import ThumbsUp from '@assets/icons/thumbs-up';
+import CenterArrows from '@assets/icons/center-arrows';
 import CrossArrow from '@assets/icons/cross-arrow';
 import ChatBubbles from '@assets/icons/chat-bubbles';
 import ChatBubbleCross from '@assets/icons/chat-bubble-cross';
@@ -19,13 +20,17 @@ export default function TransactionsList({onActiveTransaction = (transaction) =>
 
   const IconMaps = {
     [TransactionTypes.openIssue]: <InformationChatBubble />,
+    [TransactionTypes.createIssue]:<InformationChatBubble />,
     [TransactionTypes.lock]: <UploadIcon/>,
     [TransactionTypes.unlock]: <DownloadIcon/>,
     [TransactionTypes.approveTransactionalERC20Token]: <ThumbsUp />,
     [TransactionTypes.delegateOracles]: <CrossArrow />,
     [TransactionTypes.dispute]: <ChatBubbles />,
     [TransactionTypes.closeIssue]: <ChatBubbleCross />,
-    [TransactionTypes.redeemIssue]: <ReturnArrow />
+    [TransactionTypes.redeemIssue]: <ReturnArrow />,
+    [TransactionTypes.closeIssue]: <ReturnArrow />,
+    [TransactionTypes.proposeMerge]: <CenterArrows />,
+    [TransactionTypes.approveSettlerToken]: <ThumbsUp />,
   }
 
   function renderTransactionRow(item: Transaction) {
