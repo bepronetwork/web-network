@@ -194,6 +194,14 @@ body {
   text-transform: uppercase;
 }
 
+.largeCaption {
+  font-family: 'fontBold', sans-serif;
+  font-size: 16px;
+  line-height: 160%;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
 // familys
 .family-Regular{
   font-family: 'fontRegular', sans-serif;
@@ -244,6 +252,16 @@ p {
 
 .btn {
   letter-spacing: 0.06em;
+}
+//Button Label;
+.btn-label{
+  font-family: "font-regular";
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 9px;
+  letter-spacing: 0.1em;
+  text-align: center;
 }
 
 .btn-sm, .btn-md, .btn-lg {
@@ -594,7 +612,7 @@ label {
 .badge-opac {
   font-size: 14px;
   line-height: 150%;
-  padding: 0px math.div($m, 2);
+  padding: math.div($m,2) $m;
   border-radius: math.div($m, 8);
   background-color: rgba($white, 0.1);
 }

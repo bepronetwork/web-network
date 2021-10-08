@@ -16,6 +16,7 @@ $secondary: $purple;
 $warning: #fd8b2a;
 $orange: #EE9240;
 $info: #87C7EC;
+$disabled:#423B51;
 
 $bg: #0d0f19;
 $bg-opac: rgba($white, 0.1);
@@ -34,6 +35,7 @@ $more-bg: (
         'success': $success,
         'dark-gray': $dark-gray, 
         'ligth-gray': $ligth-gray,
+        'disabled': $disabled
 );
 
 $more-colors: ('blue-dark': $blue-dark, 'dark-gray': $dark-gray, 'ligth-gray': $ligth-gray, 'black': $black);
