@@ -9,6 +9,7 @@ import {BeproService} from '@services/bepro-service';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import { TransactionStatus } from '@interfaces/enums/transaction-status';
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
+import {formatNumberToCurrency} from 'helpers/formatNumber'
 
 function OraclesDelegate(): JSX.Element {
   const {dispatch, state: {oracles, currentAddress, beproInit, metaMaskWallet,myTransactions, balance: {bepro: beproBalance, staked}}} = useContext(ApplicationContext);
@@ -18,12 +19,18 @@ function OraclesDelegate(): JSX.Element {
   const [error, setError] = useState<string>("");
 
   function handleChangeOracles(params: NumberFormatValues) {
+    if(params.floatValue < 1 || !params.floatValue)
+      return setTokenAmount(0)
+
     if (params.floatValue > delegatedAmount)
       setError(`Amount is greater than your total amount`);
     else setError(``);
-    if(params.floatValue < 1) return setTokenAmount(0)
 
     setTokenAmount(params.floatValue);
+  }
+
+  function setMaxAmmount() {
+    return setTokenAmount(delegatedAmount)
   }
 
   function handleChangeAddress(params: ChangeEvent<HTMLInputElement>) {
@@ -72,15 +79,31 @@ function OraclesDelegate(): JSX.Element {
     <div className="col-md-5">
       <div className="content-wrapper h-100">
         <OraclesBoxHeader actions="Delegate oracles" available={delegatedAmount} />
-
+        <p className="smallCaption text-white text-uppercase mt-2 mb-3">Delagate Oracles to use them in issues</p>
         <InputNumber
           label="Oracles Ammout"
           value={tokenAmount}
+          symbol="ORACLES"
+          classSymbol="text-purple"
           onValueChange={handleChangeOracles}
-          thousandSeparator/>
+          thousandSeparator
+          error={error}
+          helperText={(
+            <>
+              {formatNumberToCurrency(delegatedAmount)} Oracles Available
+              {!error && (
+                <span
+                  className="smallCaption ml-1 cursor-pointer text-uppercase text-purple"
+                  onClick={setMaxAmmount}
+                  >
+                  Max
+                </span>
+              )}
+            </>)
+          }/>
 
-        <div className="form-group">
-          <label className="p-small trans mb-2">Delegation address</label>
+        <div className="form-group mt-2">
+          <label className="smallCaption text-uppercase text-white bg-opacity-100 mb-2">Delegation address</label>
           <input
             value={delegatedTo}
             onChange={handleChangeAddress}
@@ -103,7 +126,8 @@ function OraclesDelegate(): JSX.Element {
           onFail={setError}
           buttonLabel="delegate"
           fullWidth={true}
-          disabled={isButtonDisabled()}/>
+          disabled={isButtonDisabled()}
+          />
 
       </div>
     </div>
