@@ -65,7 +65,7 @@ export default function FalconPunchPage() {
     if (!currentAddress)
       return;
 
-    if (currentAddress !== `0xA0dac0a23707fd504c77cd97c40a34b0256C51F8`)
+    if (currentAddress !== process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS)
       router.push(`/`);
 
   }, [currentAddress])

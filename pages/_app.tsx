@@ -36,8 +36,8 @@ export default function App({ Component, pageProps: {session, ...pageProps} }: A
 }
 
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
-    props: {session: await getSession()},
+    props: {session: await getSession(ctx)},
   };
 };

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {IssueData, IssueState} from '@interfaces/issue-data';
 import { API } from '../env';
+import {ReposList} from '@interfaces/repos-list';
 
 export interface User {
   githubHandle: string;
@@ -9,6 +10,7 @@ export interface User {
   createdAt: string;
   id: number;
   updatedAt: string;
+  accessToken?: string;
 }
 
 export interface ProposalData {
@@ -88,7 +90,7 @@ export default class GithubMicroService {
     return data;
   }
 
-  static async createGithubData(payload: {githubHandle: string, githubLogin: string}): Promise<boolean> {
+  static async createGithubData(payload: {githubHandle: string, githubLogin: string, accessToken: string}): Promise<boolean> {
     return client.post<string>(`/users/connect`, payload)
                  .then(({data}) => data === `ok`)
                  .catch((error) => {
@@ -230,5 +232,32 @@ export default class GithubMicroService {
                    console.error(`Failed to get all users`, e);
                    return [];
                  })
+  }
+
+  static async createRepo(owner, repo) {
+    return client.post(`/repos/`, {owner, repo})
+                 .then(({status}) => {
+                   console.log(`Stataus`, status)
+                   return status === 200
+                 })
+                 .catch((e) => {
+                   console.error(`Failed to create repo`, e)
+                   return false;
+                 })
+  }
+
+  static async getReposList() {
+    return client.get<ReposList>(`/repos/`)
+                 .then(({data}) => data)
+                 .catch(e => {
+                   console.error(`Failed to grep list`, e);
+                   return [] as ReposList;
+                 });
+  }
+
+  static async removeRepo(id: string) {
+    return client.delete(`/repos/${id}`)
+                 .then(({status}) => status === 200)
+                 .catch(() => false);
   }
 }

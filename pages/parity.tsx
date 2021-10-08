@@ -9,11 +9,12 @@ import GithubMicroService from '@services/github-microservice';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import {formatNumberToString} from '@helpers/formatNumber';
 import {changeLoadState} from '@reducers/change-load-state';
-import {changeBalance} from '@reducers/change-balance';
 import router from 'next/router';
-import {toastInfo} from '@reducers/add-toast';
+import {toastError, toastInfo} from '@reducers/add-toast';
 import {SETTLER_ADDRESS, TRANSACTION_ADDRESS} from '../env';
-import {number} from 'prop-types';
+import {ReposList} from '@interfaces/repos-list';
+import {Dropdown, ListGroup} from 'react-bootstrap';
+import ConnectGithub from '@components/connect-github';
 
 export default function ParityPage() {
   const {state: {currentAddress, balance,}, dispatch} = useContext(ApplicationContext);
@@ -28,6 +29,8 @@ export default function ParityPage() {
   const [settlerTokenSymbol, setSettlerTokenSymbol] = useState(``);
   const [settlerTokenAddress, setSettlerTokenAddress] = useState(``);
   const [issuesList, setIssuesList] = useState([]);
+  const [reposList, setReposList] = useState<ReposList>([]);
+  const [availReposList, setAvailableList] = useState<string[]>([]);
 
   const formItem = (label = ``, placeholder = ``, value = ``, onChange = (ev) => {}) =>
     ({label, placeholder, value, onChange})
@@ -35,7 +38,7 @@ export default function ParityPage() {
   const formMaker = [
     formItem(`Github Token`, `Token to be able to login and act`, githubToken, (ev) => setGithubToken(ev?.target?.value)),
     formItem(`Github Login`, `Login handle of the owner of the token`, githubLogin, (ev) => setGithubLogin(ev?.target?.value)),
-    formItem(`Read Repo`, `Github repo name to read from (pex bepro-js)`, readRepoName, (ev) => setReadRepoName(ev?.target?.value)),
+    // formItem(`Read Repo`, `Github repo name to read from (pex bepro-js)`, readRepoName, (ev) => setReadRepoName(ev?.target?.value)),
   ]
 
   function isValidForm() {
@@ -73,9 +76,15 @@ export default function ParityPage() {
 
   function listIssues() {
     const octokit = new Octokit({auth: githubToken});
-    const readRepoInfo = {owner: githubLogin, repo: readRepoName};
 
-    function mapOpenIssue({title = ``, number = 0, body = ``, labels = [], tokenAmount}) {
+    function getRepoId(path: string) {
+      return reposList.find(({githubPath}) => {
+        console.log(githubPath, path);
+        return githubPath === path
+      }).id;
+    }
+
+    function mapOpenIssue({title = ``, number = 0, body = ``, labels = [], tokenAmount, repository_url, user: {login}}) {
       const getTokenAmount = (lbls) => +lbls.find((label = ``) => label.search(/k \$?(BEPRO|USDC)/) > -1)?.replace(/k \$?(BEPRO|USDC)/, `000`) || 100000;
 
       if (labels.length && !tokenAmount)
@@ -83,53 +92,53 @@ export default function ParityPage() {
       if (!tokenAmount)
         tokenAmount = 100000;
 
-      return ({title, number, body, tokenAmount,});
+      return ({title, number, body, tokenAmount, login, repository_id: getRepoId(repository_url?.split(`/`)?.slice(-2)?.join(`/`))});
     }
 
-    function getAllIssuesRecursive(repoInfo, page = 1, pool = []) {
-      return octokit.rest.issues.listForRepo({...repoInfo, state: `open`, per_page: 100, page})
+    async function getAllIssuesRecursive({githubPath}, page = 1, pool = []) {
+      const [owner, repo] = githubPath.split(`/`);
+      return octokit.rest.issues.listForRepo({owner, repo, state: `open`, per_page: 100, page})
                     .then(({data}) =>
-                            data.length === 100 ? getAllIssuesRecursive(repoInfo, page++, data) : pool.concat(data))
+                            data.length === 100 ? getAllIssuesRecursive({githubPath}, page++, pool.concat(data)) : pool.concat(data))
                     .catch(e => {
-                      console.log(`Failed to get issues for`, repoInfo, page, e);
-                      return [];
+                      console.log(`Failed to get issues for`, githubPath, page, e);
+                      return pool;
                     })
     }
 
     dispatch(changeLoadState(true))
 
-    BeproService.login()
-                .then(_ => GithubMicroService.getUserOf(currentAddress))
-                .then(user => {
-                  setGithubCreator(user.githubLogin)
-                  console.log(`github`, githubCreator, user);
-                })
-                .then(() => getAllIssuesRecursive(readRepoInfo)
-                .then(issues => issues.map(mapOpenIssue))
-                .then(async issues => {
-                  const openIssues = [];
+    Promise.all(reposList.map(repo => getAllIssuesRecursive(repo)))
+           .then(allIssues => {
+             console.log(`All`,allIssues);
+             console.log(`Flat 2 `,allIssues.flat(2));
+             return allIssues.flat().map(mapOpenIssue)
+           })
+           .then(async issues => {
+             const openIssues = [];
+             console.log(`got issues`, issues);
+             for (const issue of issues)
+               if (!(await BeproService.network.getIssueByCID({issueCID: `${issue.repository_id}/${issue.number}`}))?.cid)
+                 openIssues.push(issue);
+             console.log(`Open`, openIssues)
+             return openIssues;
+            })
+            .then(setIssuesList)
+            .finally(() => {
+              dispatch(changeLoadState(false))
+            })
 
-                  for (const issue of issues)
-                    if (!(await BeproService.network.getIssueByCID({issueCID: issue.number.toString()}))?.cid)
-                      openIssues.push(issue);
-
-                  return openIssues;
-                })
-                .then(setIssuesList)
-                .finally(() => {
-                  dispatch(changeLoadState(false))
-                }))
   }
 
-  function createIssue({title, body: description = `No description`, tokenAmount, number}) {
+  function createIssue({title, body: description = `No description`, tokenAmount, number, repository_id, creatorGithub = githubLogin}) {
 
     const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount: +tokenAmount})
     dispatch(openIssueTx);
 
     const msPayload = {
       title, description, amount: tokenAmount,
-      creatorAddress: currentAddress, creatorGithub: githubCreator,
-      githubIssueId: number.toString(),
+      creatorAddress: currentAddress, creatorGithub,
+      githubIssueId: number.toString(), repository_id,
     }
 
     const scPayload = {tokenAmount: tokenAmount.toString(),};
@@ -222,9 +231,73 @@ export default function ParityPage() {
                 })
   }
 
-  function renderIssuesList({title = ``, body = ``, tokenAmount = 100000,}, i: number) {
+  function getSelfRepos() {
+    GithubMicroService.getUserOf(currentAddress)
+                      .then((user) => {
+                        setGithubLogin(user?.githubLogin);
+                        setGithubToken(user?.accessToken);
+                      })
+                      .then(() => {
+                        if (!githubToken)
+                          return [];
+                        const octokit = new Octokit({auth: githubToken});
+
+                        return octokit.rest.orgs.listForUser({username: githubLogin})
+                               .then(({data}) => data)
+                               .then(orgs => orgs.map(org => org.login))
+                               .then(orgs => {
+                                 function listReposOf(username: string) {
+                                   return octokit.rest.repos.listForUser({username}).then(({data}) => data);
+                                 }
+                                 return Promise.all(orgs.map(listReposOf))
+                                               .then(allOrgs => allOrgs.flat())
+                                               .then(allOrgsRepos => allOrgsRepos.filter(repo => repo.permissions.admin))
+                               })
+                               .then(orgRepos => {
+                                 return octokit.rest.repos.listForUser({username: githubLogin}).then(({data}) => data)
+                                        .then(repos => repos.concat(orgRepos))
+                               })
+                      })
+                      .then(async (repos) => {
+                        setReposList(await GithubMicroService.getReposList());
+                        setAvailableList(repos.filter(repo => repo.has_issues && !repo.fork).map(repo => repo.full_name))
+                      })
+                      .catch(e => {
+                        console.log(`Failed to grep user`, e);
+                      })
+  }
+
+  async function addNewRepo(owner, repo) {
+    const created = await GithubMicroService.createRepo(owner, repo);
+
+    if (!created)
+      return dispatch(toastError(`Failed to create repo`));
+
+    setReposList(await GithubMicroService.getReposList());
+
+  }
+
+  async function removeRepo(id: string) {
+    return GithubMicroService.removeRepo(id)
+                             .then(async (result) => {
+                               if (!result)
+                                 return dispatch(toastError(`Could't remove repo`));
+
+                               setReposList(await GithubMicroService.getReposList())
+                             });
+  }
+
+  function getSumOfTokenAmount() {
+    return issuesList.reduce((p, c) => p += +(c.tokenAmount || 100000), 0);
+  }
+
+  function getCostClass() {
+    return `text-${getSumOfTokenAmount() > balance.bepro ? `danger` : `white`}`;
+  }
+
+  function renderIssuesList({title = ``, body = ``, tokenAmount = 100000, repository_id = null}, i: number) {
     return (
-      <div className="mb-4" key={i}>
+      <div className="mt-4" key={i}>
         <div className="content-wrapper">
           <strong className="mb-2">Title:</strong> {title}
 
@@ -233,6 +306,7 @@ export default function ParityPage() {
           </span>
           <hr />
           <span className="fs-smallest d-block mbn-2">{formatNumberToString(tokenAmount)} BEPRO</span>
+          <span className="fs-smallest d-block mbn-2">{reposList.find(repo => repo.id === repository_id)?.githubPath}</span>
         </div>
       </div>
     )
@@ -245,20 +319,22 @@ export default function ParityPage() {
       </div>
   }
 
-  function getSumOfTokenAmount() {
-    return issuesList.reduce((p, c) => p += +(c.tokenAmount || 100000), 0);
-  }
-
-  function getCostClass() {
-    return `text-${getSumOfTokenAmount() > balance.bepro ? `danger` : `white`}`;
+  function renderAvailListItem(repoPath: string) {
+    const [owner, repo] = repoPath.split(`/`)
+    const isActive = reposList.find(({githubPath}) => githubPath === repoPath);
+    return <ListGroup.Item active={!!isActive}
+                           variant={isActive ? `success` : `shadow`} action={true}
+                           onClick={() => !isActive ? addNewRepo(owner, repo) : removeRepo(isActive.id.toString())}>{repoPath}</ListGroup.Item>
   }
 
   useEffect(() => {
     if (!currentAddress)
       return;
 
-    if (currentAddress !== `0xA0dac0a23707fd504c77cd97c40a34b0256C51F8`)
+    if (currentAddress !== process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS)
       router.push(`/account`);
+
+    getSelfRepos();
 
   }, [currentAddress])
 
@@ -301,11 +377,26 @@ export default function ParityPage() {
       </div>
       <div className="div mt-3 mb-4 content-wrapper">
         {formMaker.map(renderFormItems)}
+      </div>
+      <div className="content-wrapper mt-3">
         <div className="row">
-          <div className="col d-flex justify-content-end align-items-center">
+          <div className="col text-center">
+              { githubToken && <span className="d-block mb-2">Select a repository to add it to the microservice list</span> || <ConnectGithub /> }
+          </div>
+        </div>
+        <div className="row">
+          <div className="col">
+            <ListGroup>
+              {availReposList.map(renderAvailListItem)}
+            </ListGroup>
+          </div>
+        </div>
+        <div className="row mt-3">
+          <div className="col d-flex justify-content-end">
             {issuesList.length && <span className="fs-small me-2">Will cost <span className={getCostClass()}>{formatNumberToString(getSumOfTokenAmount())} BEPRO </span> / {formatNumberToString(balance.bepro)} BEPRO</span> || ``}
             {issuesList.length && <button className="btn btn-md btn-outline-primary mr-2" disabled={!githubCreator} onClick={() => createIssuesFromList()}>Create Issues</button> || ``}
-            <button className="btn btn-md btn-primary" disabled={isValidForm()} onClick={() => listIssues()}>List issues</button>
+            { githubToken && reposList.length && <button className="btn btn-md btn-primary" disabled={isValidForm()} onClick={() => listIssues()}>List issues</button> || `` }
+            { githubToken && !availReposList.length && <button className="btn btn-md btn-primary" onClick={getSelfRepos}>load repos</button> || `` }
           </div>
         </div>
       </div>
