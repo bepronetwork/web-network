@@ -16,6 +16,7 @@ import {BlockTransaction,} from '@interfaces/transaction';
 import {formatNumberToCurrency} from '@helpers/formatNumber'
 import { TransactionStatus } from '@interfaces/enums/transaction-status';
 import LockIcon from '@assets/icons/lock';
+import {ReposList} from '@interfaces/repos-list';
 interface Amount {
   value?: string,
   formattedValue: string,
@@ -30,6 +31,8 @@ export default function PageCreateIssue() {
   const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
   const {dispatch, state: {currentAddress, githubHandle, myTransactions}} = useContext(ApplicationContext);
   const [currentUser, setCurrentUser] = useState<User>();
+  const [repository_id, setRepositoryId] = useState(``);
+  const [repoList, setRepoList] = useState<ReposList>([])
   const router = useRouter()
 
   async function allowCreateIssue() {
@@ -74,6 +77,7 @@ export default function PageCreateIssue() {
       amount: issueAmount.floatValue,
       creatorAddress: BeproService.address,
       creatorGithub: currentUser?.githubLogin,
+      repository_id,
     }
     const contractPayload = {tokenAmount: issueAmount.floatValue,};
 
@@ -182,6 +186,7 @@ export default function PageCreateIssue() {
   useEffect(() => {
     BeproService.getBalance('bepro').then(setBalance);
     GithubMicroService.getUserOf(currentAddress).then(setCurrentUser);
+    GithubMicroService.getReposList().then(setRepoList);
   }, [currentAddress])
 
   return (

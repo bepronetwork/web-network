@@ -33,12 +33,14 @@ $more-bg: (
         'blue': $blue,
         'orange': $orange,
         'success': $success,
-        'dark-gray': $dark-gray, 
+        'dark-gray': $dark-gray,
         'ligth-gray': $ligth-gray,
         'disabled': $disabled
 );
 
-$more-colors: ('blue-dark': $blue-dark, 'dark-gray': $dark-gray, 'ligth-gray': $ligth-gray, 'black': $black);
+$more-colors: ('blue-dark': $blue-dark, 'dark-gray': $dark-gray, 'ligth-gray': $ligth-gray, 'black': $black, 'white': #fff);
+
+$theme-colors: map-merge($theme-colors, map-merge($more-bg, $more-colors));
 
 $utilities: map-merge(
   $utilities, (
@@ -48,7 +50,7 @@ $utilities: map-merge(
                 'border-top': map-merge(map-get($utilities, 'border-top'), (state: hover)),
                 'border-color': map-merge(map-get($utilities, 'border-color'), (state: hover, values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-colors))),
                 'color': map-merge(map-get($utilities, 'color'), (state: hover , values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-colors))),
-                'background-color': map-merge(map-get($utilities, 'background-color'), (state: hover, values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-bg)))
+                'background-color': map-merge(map-get($utilities, 'background-color'), (state: hover, values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-bg))),
         )
 )
 

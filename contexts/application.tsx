@@ -18,6 +18,7 @@ import {changeNetwork} from '@reducers/change-network';
 import {useRouter} from 'next/router';
 import {toastError} from '@reducers/add-toast';
 import sanitizeHtml from 'sanitize-html';
+import {GetServerSideProps} from 'next';
 
 interface GlobalState {
   state: ApplicationState,
@@ -61,6 +62,10 @@ export default function ApplicationContextProvider({children}) {
   const [state, dispatch] = useReducer(mainReducer, defaultState.state);
   const {data: session, status} = useSession();
   const { authError } = useRouter().query;
+
+  useEffect(() => {
+    console.log(session, status);
+  }, [session])
 
   function updateSteFor(newAddress: string) {
     BeproService.login(true)
@@ -118,3 +123,9 @@ export default function ApplicationContextProvider({children}) {
     {children}
   </ApplicationContext.Provider>
 }
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  return {
+    props: {session: await getSession(ctx)},
+  };
+};
