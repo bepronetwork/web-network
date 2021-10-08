@@ -34,7 +34,7 @@ export default function MyOracles() {
             <div className="content-wrapper mb-5 cursor-pointer shadow-lg-hover" onClick={() => navigateOut('https://support.bepro.network/en/collections/3143296-bepro-holder#bepro-protocol')}>
               <div className="row">
                 <div className="d-flex align-items-center mb-1">
-                  <h4 className="h4 mb-0">How to use Oracles?</h4>
+                  <h4 className="h4 mb-0 text-white bg-opacity-100">How to use Oracles?</h4>
                   <ExternalLinkIcon className="ml-1" color="text-white-50"/>
                 </div>
                 <p>
