@@ -259,7 +259,7 @@ export default function ParityPage() {
                                })
                       })
                       .then(async (repos) => {
-                        setReposList(await GithubMicroService.getReposList());
+                        setReposList(await GithubMicroService.getReposList(true));
                         setAvailableList(repos.filter(repo => repo.has_issues && !repo.fork).map(repo => repo.full_name))
                       })
                       .catch(e => {
@@ -273,7 +273,7 @@ export default function ParityPage() {
     if (!created)
       return dispatch(toastError(`Failed to create repo`));
 
-    setReposList(await GithubMicroService.getReposList());
+    setReposList(await GithubMicroService.getReposList(true));
 
   }
 
@@ -283,7 +283,7 @@ export default function ParityPage() {
                                if (!result)
                                  return dispatch(toastError(`Could't remove repo`));
 
-                               setReposList(await GithubMicroService.getReposList())
+                               setReposList(await GithubMicroService.getReposList(true))
                              });
   }
 
