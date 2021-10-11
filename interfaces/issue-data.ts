@@ -1,4 +1,5 @@
-export type IssueState = 'ready' | 'draft' | 'redeemed'| 'in progress' | 'closed' | 'open'
+// REVIEW: redeem not exist in figma
+export type IssueState =  'redeemed' | 'peding' |  'draft' | 'open' | 'in progress' | 'canceled' | 'closed' | 'ready' | 'done' | 'disputed'
 
 export interface IssueData {
   body: string;

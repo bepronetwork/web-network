@@ -1,17 +1,17 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {ApplicationContext} from '@contexts/application';
-import {BeproService} from '@services/bepro-service';
 import Indicator from '@components/indicator';
-import {changeNetwork} from '@reducers/change-network';
-import WrongNetworkModal from '@components/wrong-network-modal';
 import {NetworkIds} from '@interfaces/enums/network-ids';
+import { BeproService } from '@services/bepro-service';
+import { changeNetwork } from '@contexts/reducers/change-network';
 
 const networkMap = {
+  mainnet: `#29b6af`,
   ethereum: `#29b6af`,
-  roptsen: `#ff4a8d`,
+  ropsten: `#ff4a8d`,
   kovan: `#9064ff`,
   rinkeby: `#f6c343`,
-  goerly: `#f6c343`
+  goerli: `#f6c343`
 }
 
 export default function NetworkIdentifier() {
@@ -23,7 +23,7 @@ export default function NetworkIdentifier() {
 
     BeproService.bepro.web3.eth.getChainId()
                 .then(net => {
-                  dispatch(changeNetwork(NetworkIds[net].toLowerCase()))
+                  dispatch(changeNetwork(NetworkIds[net]?.toLowerCase()))
                 });
   }
 
