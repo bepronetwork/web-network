@@ -64,10 +64,6 @@ export default function ApplicationContextProvider({children}) {
   const {data: session, status} = useSession();
   const { authError } = useRouter().query;
 
-  useEffect(() => {
-    console.log(session, status);
-  }, [session])
-
   function updateSteFor(newAddress: string) {
     BeproService.login(true)
                 .then(() =>  dispatch(changeCurrentAddress(newAddress)))
@@ -101,7 +97,6 @@ export default function ApplicationContextProvider({children}) {
 
     window.ethereum.on(`accountsChanged`, (accounts) => updateSteFor(accounts[0]))
     window.ethereum.on('chainChanged', (evt) => {
-      console.log(`on load?`);
       dispatch(changeNetwork(NetworkIds[+evt.toString()].toLowerCase()))
     })
   }

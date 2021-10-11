@@ -11,8 +11,8 @@ export default NextAuth({
   ],
   callbacks: {
     async signIn({user, account, profile}) {
-      console.log(`User`, user);
-      console.log(`Account`, account);
+      // console.log(`User`, user);
+      // console.log(`Account`, account);
       // console.log(`Profile`, profile);
 
       if (user.name && profile.login)
@@ -24,7 +24,7 @@ export default NextAuth({
           if (result === true)
             return true;
 
-          console.log(result);
+          console.error(`Error logging in`, result);
 
           return `/?authError=${result}`;
         });

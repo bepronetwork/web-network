@@ -237,10 +237,7 @@ export default class GithubMicroService {
 
   static async createRepo(owner, repo) {
     return client.post(`/repos/`, {owner, repo})
-                 .then(({status}) => {
-                   console.log(`Stataus`, status)
-                   return status === 200
-                 })
+                 .then(({status}) => status === 200)
                  .catch((e) => {
                    console.error(`Failed to create repo`, e)
                    return false;

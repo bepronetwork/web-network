@@ -30,7 +30,7 @@ export default function FalconPunchPage() {
                          .then(() => BeproService.bepro.web3.eth.getBalance(address as any))
                          .then(eth => +eth)
                          .catch(e => {
-                           console.log(`Error on get eth`, e);
+                           console.error(`Error on get eth`, e);
                            return 0;
                          })
     }
@@ -45,10 +45,7 @@ export default function FalconPunchPage() {
     GithubMicroService.getAllUsers()
                       .then(users => Promise.all(users.map(getInfo)))
                       .catch(e => {
-                        console.error(`Failed`, e);
-                      })
-                      .finally(() => {
-                        console.log(`Finished`, userList);
+                        console.error(`Failed to get users`, e);
                       })
   }
 

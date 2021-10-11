@@ -79,7 +79,6 @@ export default function ParityPage() {
 
     function getRepoId(path: string) {
       return reposList.find(({githubPath}) => {
-        console.log(githubPath, path);
         return githubPath === path
       }).id;
     }
@@ -101,7 +100,7 @@ export default function ParityPage() {
                     .then(({data}) =>
                             data.length === 100 ? getAllIssuesRecursive({githubPath}, page++, pool.concat(data)) : pool.concat(data))
                     .catch(e => {
-                      console.log(`Failed to get issues for`, githubPath, page, e);
+                      console.error(`Failed to get issues for`, githubPath, page, e);
                       return pool;
                     })
     }
@@ -168,7 +167,7 @@ export default function ParityPage() {
                                return true;
                              })
                              .catch(e => {
-                               console.log(e);
+                               console.error(`Failed to createIssue`, e);
                                dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
                                return false;
                              })
@@ -179,10 +178,10 @@ export default function ParityPage() {
 
     return Promise.all(issuesList.map(createIssue))
                   .then(okList => {
-                    console.log(`All true?`, !okList.some(b => !b));
-                    console.log(`How many trues vs falses?`, okList.reduce((p, c) => p += c && 1 || -1, 0))
-                    console.log(`Length of issuesList,`, issuesList.length);
-                    console.log(`okList`, okList);
+                    console.debug(`All true?`, !okList.some(b => !b));
+                    console.debug(`How many trues vs falses?`, okList.reduce((p, c) => p += c && 1 || -1, 0))
+                    console.debug(`Length of issuesList,`, issuesList.length);
+                    console.debug(`okList`, okList);
                   })
                   .catch(e => {
                     console.error(`Some error occurred while trying to open issues,`, e);
@@ -197,7 +196,7 @@ export default function ParityPage() {
                           governanceAddress: currentAddress,
                         })
                 .then(info => {
-                  console.log(`Deployed!`)
+                  console.debug(`Deployed!`)
                   console.table(info);
                   dispatch(toastInfo(`Deployed!`));
                   setDeployedContract(info.contractAddress);
@@ -209,7 +208,7 @@ export default function ParityPage() {
     BeproService.network.changeCouncilAmount(+councilAmount)
                 .then(info => {
                   dispatch(toastInfo(`Council amount changed!`));
-                  console.log(`Council Changed!`);
+                  console.debug(`Council Changed!`);
                   console.table(info);
                 })
                 .catch(e => {
@@ -225,7 +224,7 @@ export default function ParityPage() {
                                 distributionAddress: currentAddress
                               })
                 .then(txInfo => {
-                  console.log(txInfo);
+                  console.debug(txInfo);
                   dispatch(toastInfo(`Deployed!`));
                   setSettlerTokenAddress(txInfo.contractAddress);
                 })
@@ -263,7 +262,7 @@ export default function ParityPage() {
                         setAvailableList(repos.filter(repo => repo.has_issues && !repo.fork).map(repo => repo.full_name))
                       })
                       .catch(e => {
-                        console.log(`Failed to grep user`, e);
+                        console.error(`Failed to grep user`, e);
                       })
   }
 
