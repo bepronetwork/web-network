@@ -26,14 +26,16 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
 
         await BeproService.network.isMergeDisputed({issueId: issueId, mergeId: i,})
                           .then((isMergeDisputed) => (merge.isDisputed = isMergeDisputed))
-                          .catch((err) => console.log("Error getting mergeDisputed state", err));
+                          .catch((err) => {
+                            console.error("Error getting mergeDisputed state", err)
+                          });
 
         await GithubMicroService.getMergeProposalIssue(issueId, (i + 1).toString())
                                 .then((mergeProposal: ProposalData) => {
                                   merge.pullRequestId = mergeProposal?.pullRequestId;
                                   merge.pullRequestGithubId = mergeProposal?.pullRequest.githubId;
                                 })
-                                .catch((err) => console.log(`Error getting proposal from microservice`, err));
+                                .catch((err) => console.error(`Error getting proposal from microservice`, err));
 
         pool.push(merge);
       }

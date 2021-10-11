@@ -38,7 +38,7 @@ export default function PageIssue() {
                           return;
 
                         setIssue(issue);
-                        GithubMicroService.getCommentsIssue(issue.githubId)
+                        GithubMicroService.getCommentsIssue(issue.githubId, issue.repository_id)
                                           .then((comments) => setCommentsIssue(comments));
                       });
 
@@ -62,7 +62,7 @@ export default function PageIssue() {
   };
 
   const getRepoForked = () =>{
-    GithubMicroService.getForkedRepo(githubHandle)
+    GithubMicroService.getForkedRepo(githubHandle, id.toString())
     .then((repo) => setCanOpenPR(!!repo))
   }
 

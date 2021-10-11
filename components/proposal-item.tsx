@@ -36,7 +36,7 @@ export default function ProposalItem({proposal, issueId, amount, beproStaked, on
                       .catch((err) => {
                         dispatch(updateTransaction({...disputeTx.payload as any, remove: true}));
                         onDispute(true);
-                        console.log("Error creating dispute", err)
+                        console.error("Error creating dispute", err)
                       })
   }
 
