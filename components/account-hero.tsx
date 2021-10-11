@@ -5,7 +5,6 @@ import {ApplicationContext} from '@contexts/application';
 import {changeMyIssuesState} from '@reducers/change-my-issues';
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import GithubHandle from './github-handle';
-import { toNumber } from 'lodash';
 
 export default function AccountHero() {
   const {dispatch, state: {beproInit, oracles, metaMaskWallet, currentAddress, balance, myIssues}} = useContext(ApplicationContext);
@@ -30,7 +29,7 @@ export default function AccountHero() {
                 })
   }
 
-  useEffect(loadBeproNetworkInformation, [beproInit, metaMaskWallet, currentAddress, oracles])
+  useEffect(loadBeproNetworkInformation, [beproInit, metaMaskWallet, currentAddress])
 
   return (
     <div className="banner bg-bepro-blue mb-4">
