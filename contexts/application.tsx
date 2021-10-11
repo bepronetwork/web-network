@@ -61,7 +61,6 @@ export const ApplicationContext = createContext<GlobalState>(defaultState)
 
 export default function ApplicationContextProvider({children}) {
   const [state, dispatch] = useReducer(mainReducer, defaultState.state);
-  const {data: session, status} = useSession();
   const { authError } = useRouter().query;
 
   function updateSteFor(newAddress: string) {
@@ -92,12 +91,13 @@ export default function ApplicationContextProvider({children}) {
   function Initialize() {
     dispatch(changeBeproInitState(true) as any)
 
+    
     if (!window.ethereum)
       return;
 
     window.ethereum.on(`accountsChanged`, (accounts) => updateSteFor(accounts[0]))
     window.ethereum.on('chainChanged', (evt) => {
-      dispatch(changeNetwork(NetworkIds[+evt.toString()].toLowerCase()))
+      dispatch(changeNetwork(NetworkIds[+evt?.toString()]?.toLowerCase()))
     })
   }
 

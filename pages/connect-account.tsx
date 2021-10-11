@@ -95,7 +95,7 @@ export default function ConnectAccount() {
     try {
       const chainId = (window as any).web3?.currentProvider?.chainId;
       if (+process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID !== +chainId) {
-        dispatch(changeNetwork(NetworkIds[+chainId].toLowerCase()))
+        dispatch(changeNetwork(NetworkIds[+chainId]?.toLowerCase()))
         return;
       } else loggedIn = await BeproService.login();
     } catch (e) {
