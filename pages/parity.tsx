@@ -98,7 +98,7 @@ export default function ParityPage() {
       const [owner, repo] = githubPath.split(`/`);
       return octokit.rest.issues.listForRepo({owner, repo, state: `open`, per_page: 100, page})
                     .then(({data}) =>
-                            data.length === 100 ? getAllIssuesRecursive({githubPath}, page++, pool.concat(data)) : pool.concat(data))
+                            data.length === 100 ? getAllIssuesRecursive({githubPath}, page+1, pool.concat(data)) : pool.concat(data))
                     .catch(e => {
                       console.error(`Failed to get issues for`, githubPath, page, e);
                       return pool;
@@ -111,13 +111,18 @@ export default function ParityPage() {
            .then(allIssues => allIssues.flat().map(mapOpenIssue))
            .then(async issues => {
              const openIssues = [];
-             for (const issue of issues)
+             for (const issue of issues) {
+               console.debug(`(SC) Checking ${issue.title}`);
                if (!(await BeproService.network.getIssueByCID({issueCID: `${issue.repository_id}/${issue.number}`}))?.cid)
                  openIssues.push(issue);
+             }
 
              return openIssues;
             })
             .then(setIssuesList)
+            .catch(e => {
+              console.log(`Found error`, e);
+            })
             .finally(() => {
               dispatch(changeLoadState(false))
             })
