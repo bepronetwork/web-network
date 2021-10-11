@@ -73,8 +73,6 @@ export default function MainNav() {
   useEffect(updateState, [currentAddress]);
   useEffect(updateBalances, [balance])
 
-  useEffect(()=> console.log("changed `asPath`", asPath),[asPath])
-
   return (
     <div className="main-nav d-flex align-items-center justify-content-between">
 

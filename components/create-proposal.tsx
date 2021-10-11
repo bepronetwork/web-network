@@ -50,7 +50,9 @@ export default function NewProposal({
                         setCurrentGithubId(githubId);
                         setParticipants(participantsPr);
                       })
-                      .catch((err) => console.log('err', err));
+                      .catch((err) => {
+                        console.error('Error fetching pullRequestsParticipants', err)
+                      });
   }
 
   async function handleClickCreate(): Promise<void> {

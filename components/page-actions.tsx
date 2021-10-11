@@ -166,7 +166,7 @@ export default function PageActions({
       )
     );
   }
-  
+
   function viewGHButton() {
     return (
         <a
@@ -209,7 +209,6 @@ export default function PageActions({
                         setShowPRModal(false);
                       })
                       .catch((err) => {
-                        console.log('err', err.response);
                         if (err.response?.status === 422 && err.response?.data) {
                           err.response?.data.map((item) =>
                                                    dispatch(
@@ -244,7 +243,7 @@ export default function PageActions({
                       .then(() => handleBeproService())
                       .catch((err) => {
                         dispatch(updateTransaction({...disputeTx.payload as any, remove: true}));
-                        console.log('Error creating dispute', err)
+                        console.error('Error creating dispute', err)
                       })
   }
 
@@ -260,7 +259,7 @@ export default function PageActions({
                       .then(() => handleBeproService())
                       .catch((err) => {
                         dispatch(updateTransaction({...closeIssueTx.payload as any, remove: true}));
-                        console.log(`Error closing issue`, err);
+                        console.error(`Error closing issue`, err);
                       })
   }
 
