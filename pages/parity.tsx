@@ -89,7 +89,7 @@ export default function ParityPage() {
       if (labels.length && !tokenAmount)
         tokenAmount = getTokenAmount(labels.map(({name}) => name));
       if (!tokenAmount)
-        tokenAmount = 100000;
+        tokenAmount = 50000;
 
       return ({title, number, body, tokenAmount, creatorGithub, repository_id: getRepoId(repository_url?.split(`/`)?.slice(-2)?.join(`/`))});
     }
@@ -287,14 +287,14 @@ export default function ParityPage() {
   }
 
   function getSumOfTokenAmount() {
-    return issuesList.reduce((p, c) => p += +(c.tokenAmount || 100000), 0);
+    return issuesList.reduce((p, c) => p += +(c.tokenAmount || 50000), 0);
   }
 
   function getCostClass() {
     return `text-${getSumOfTokenAmount() > balance.bepro ? `danger` : `white`}`;
   }
 
-  function renderIssuesList({title = ``, body = ``, tokenAmount = 100000, repository_id = null}, i: number) {
+  function renderIssuesList({title = ``, body = ``, tokenAmount = 50000, repository_id = null}, i: number) {
     return (
       <div className="mt-4" key={i}>
         <div className="content-wrapper">
