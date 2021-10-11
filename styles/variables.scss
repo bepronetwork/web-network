@@ -8,11 +8,12 @@ $dark-gray: #20222b;
 $gray: #c4c7d3;
 $ligth-gray: #434758;
 $blue: #4250e4;
+$primary: blue;
 $blue-dark: #3b49e0;
 $purple: #9669ed;
+$secondary: $purple;
 $success: #35e0ad;
 $danger: #eb5757;
-$secondary: $purple;
 $warning: #fd8b2a;
 $orange: #EE9240;
 $info: #87C7EC;
@@ -41,6 +42,27 @@ $more-bg: (
 $more-colors: ('blue-dark': $blue-dark, 'dark-gray': $dark-gray, 'ligth-gray': $ligth-gray, 'black': $black, 'white': #fff);
 
 $theme-colors: map-merge($theme-colors, map-merge($more-bg, $more-colors));
+
+//butons
+$btn-font-family: 'fontRegular', sans-serif;
+$btn-font-weight: 600;
+$btn-line-height: 71%;
+
+$btn-padding-y: 12px;
+$btn-padding-y-sm: $btn-padding-y;
+$btn-padding-y-lg: $btn-padding-y;
+
+$btn-padding-x: 20px;
+$btn-padding-x-sm: $btn-padding-x;
+$btn-padding-x-lg: $btn-padding-x;
+
+$btn-font-size: 12px;
+$btn-font-size-sm: $btn-font-size;
+$btn-font-size-lg: $btn-font-size;
+
+$btn-border-radius: 20px;
+$btn-border-radius-sm: $btn-border-radius;
+$btn-border-radius-lg: $btn-border-radius;
 
 $utilities: map-merge(
   $utilities, (

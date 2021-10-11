@@ -1,4 +1,4 @@
-import SearchIcon from "@assets/icons/search-icon";
+import NotFoundIcon from "@assets/icons/not-found-icon";
 import { GetStaticProps } from "next";
 import React, { ReactNode } from "react";
 
@@ -10,7 +10,7 @@ type NothingFoundProps = {
 export default function NothingFound({ description, children }: NothingFoundProps) {
   return (
       <div className="d-flex flex-column align-items-center gap-4">
-        <SearchIcon />
+        <NotFoundIcon  height={52} width={56}/>
         <p className="smallCaption text-center text-uppercase fw-bold mb-0">{description}</p>
         { children }
       </div>
