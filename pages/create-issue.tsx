@@ -105,11 +105,13 @@ export default function PageCreateIssue() {
                                              };
                                            })
                       })
-                      .then(({githubId, issueId}) => GithubMicroService.patchGithubId(githubId, issueId))
-                      .then(result => {
-                        if (!result)
-                          return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
-                      })
+                      .then(({githubId, issueId}) =>
+                        GithubMicroService.patchGithubId(githubId, issueId)
+                          .then(result => {
+                            if (!result)
+                                return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                            router.push(`/issue?id=${githubId}`)
+                          }))
                       .catch(e => {
                         console.error(`Failed to createIssue`, e);
                         cleanFields();
