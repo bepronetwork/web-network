@@ -26,18 +26,30 @@ li {
   }
 }
 .react-select {
-  &-container & {
+  &-container &{
     &__control {
       border-color: transparent;
-      background-color: $bg;
-      min-height: 48px;
+      background-color: $black;
+      min-width: 210px;
+      min-height: 38px;
       box-shadow: none;
-      &:hover,
+      border-radius: 8px;
+      border-width: 2px;
+      &:hover{
+        border-color: $ligth-gray;
+      }
       &--is-focused {
-        border-color: $blue;
+        border-color: $blue
+      }
+      &--menu-is-open{
+        border-color: $blue !important;
+        background: $black;
+      }
+      &--is-disabled{
+        border-color: transparent;
       }
     }
-    &__value-container {
+    &__value-filterIssues {
       padding: 2px 16px;
     }
     &__indicator-separator {
@@ -45,6 +57,8 @@ li {
     }
     &__indicator {
       padding: 14px;
+      font-size: 12px;
+      color: $gray;
     }
     &__single-value {
       color: $white;
@@ -53,14 +67,25 @@ li {
       color: transparentize($white, 0.4);
     }
     &__menu {
-      background-color: $bg;
+      min-width: 210px;
+      border-radius: 8px;
+      border: 1px solid $ligth-gray;
+      background-color: $bg-shadow;
+    }
+    &__value{
+      text-transform: uppercase;
     }
     &__option {
-      &--is-focused {
-        background-color: $bg;
-      }
+      @extend .p-small;
+      background-color: transparent;
       &--is-selected {
-        background-color: $blue;
+        color: $blue;
+      }
+      &:hover{
+        color: $white;
+      }
+      &:active{
+        background-color: transparent;
       }
     }
   }
