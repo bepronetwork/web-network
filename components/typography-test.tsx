@@ -46,17 +46,26 @@ export default function TypographyTest() {
                     </div>
 
                     <div className="d-flex justify-content-between mb-3">
-                        <div className="">
+                        <div className="d-flex flex-column">
                             <p className="p-small trans mb-2">.btn-primary</p>
-                            <button className="btn btn-md btn-primary">Primary button</button>
+                            <button className="btn btn-sm btn-primary mb-2">Primary button</button>
+                            <button className="btn btn-primary mb-2">Primary button</button>
+                            <button className="btn btn-md btn-primary mb-2">Primary button</button>
+                            <button className="btn btn-lg btn-primary mb-2">Primary button</button>
                         </div>
-                        <div className="">
+                        <div className="d-flex flex-column">
                             <p className="p-small trans mb-2">.btn-white</p>
-                            <button className="btn btn-md btn-white">White button</button>
+                            <button className="btn btn-sm btn-white mb-2">White button</button>
+                            <button className="btn btn-white mb-2">White button</button>
+                            <button className="btn btn-md btn-white mb-2">White button</button>
+                            <button className="btn btn-lg btn-white mb-2">White button</button>
                         </div>
-                        <div className="">
+                        <div className="d-flex flex-column">
                             <p className="p-small trans mb-2">.btn-trans</p>
-                            <button className="btn btn-md btn-trans">Transparent button</button>
+                            <button className="btn btn-sm btn-trans mb-2">Transparent button</button>
+                            <button className="btn btn-trans mb-2">Transparent button</button>
+                            <button className="btn btn-md btn-trans mb-2">Transparent button</button>
+                            <button className="btn btn-lg btn-trans mb-2">Transparent button</button>
                         </div>
                     </div>
                 </div>
