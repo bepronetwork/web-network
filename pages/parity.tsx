@@ -108,18 +108,13 @@ export default function ParityPage() {
     dispatch(changeLoadState(true))
 
     Promise.all(reposList.map(repo => getAllIssuesRecursive(repo)))
-           .then(allIssues => {
-             console.log(`All`,allIssues);
-             console.log(`Flat 2 `,allIssues.flat(2));
-             return allIssues.flat().map(mapOpenIssue)
-           })
+           .then(allIssues => allIssues.flat().map(mapOpenIssue))
            .then(async issues => {
              const openIssues = [];
-             console.log(`got issues`, issues);
              for (const issue of issues)
                if (!(await BeproService.network.getIssueByCID({issueCID: `${issue.repository_id}/${issue.number}`}))?.cid)
                  openIssues.push(issue);
-             console.log(`Open`, openIssues)
+
              return openIssues;
             })
             .then(setIssuesList)
@@ -142,7 +137,7 @@ export default function ParityPage() {
 
     const scPayload = {tokenAmount: tokenAmount.toString(),};
 
-    console.log(`scPayload,`, scPayload, `msPayload`, msPayload);
+    console.debug(`scPayload,`, scPayload, `msPayload`, msPayload);
 
     return GithubMicroService.createIssue(msPayload)
                              .then(cid => {

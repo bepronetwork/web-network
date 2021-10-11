@@ -9,7 +9,7 @@ import ConnectGithub from "@components/connect-github";
 import {ApplicationContext} from '@contexts/application';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import {addTransaction} from '@reducers/add-transaction';
-import {toastSuccess} from '@contexts/reducers/add-toast'
+import {toastError, toastSuccess} from '@contexts/reducers/add-toast'
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import {BlockTransaction,} from '@interfaces/transaction';
@@ -33,7 +33,6 @@ export default function PageCreateIssue() {
   const {dispatch, state: {currentAddress, githubHandle, myTransactions}} = useContext(ApplicationContext);
   const [currentUser, setCurrentUser] = useState<User>();
   const [repository_id, setRepositoryId] = useState(``);
-  const [repoList, setRepoList] = useState<ReposList>([])
   const router = useRouter()
 
   async function allowCreateIssue() {
@@ -71,6 +70,13 @@ export default function PageCreateIssue() {
 
   }
 
+  function cleanFields() {
+    setIssueTitle('')
+    setIssueDescription('')
+    setIssueAmount({value: '0', formattedValue: '0', floatValue: 0})
+    setAllowedTransaction(false)
+  }
+
   async function createIssue() {
     const payload = {
       title: issueTitle,
@@ -84,12 +90,6 @@ export default function PageCreateIssue() {
 
     const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount: payload.amount});
     dispatch(openIssueTx);
-
-    let createIssueTx;
-
-    const updateBlock = (block: BlockTransaction, remove = false) => {
-      dispatch(updateTransaction({...block as any, remove}))
-    }
 
     GithubMicroService.createIssue(payload)
                       .then(cid => {
@@ -111,43 +111,12 @@ export default function PageCreateIssue() {
                           return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
                       })
                       .catch(e => {
-                        console.log(e);
+                        console.error(`Failed to createIssue`, e);
+                        cleanFields();
                         dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                        dispatch(toastError(e.message || `Error creating issue`));
                         return false;
                       })
-
-    // BeproService.network.openIssue(contractPayload)
-    //             .then(txInfo => {
-    //               if (!txInfo)
-    //                 throw new Error(`Failed to open issue`);
-    //               return txInfo;
-    //             })
-    //             .then(txInfo => {
-    //               BeproService.parseTransaction(txInfo, openIssueTx.payload)
-    //                           .then(updateBlock)
-    //               return txInfo;
-    //             })
-    //             .then((txInfo) => GithubMicroService.createIssue({
-    //                                                          ...payload,
-    //                                                          issueId: txInfo.events?.OpenIssue?.returnValues?.id
-    //                                                        }))
-    //             .then(() => {
-    //               dispatch(toastSuccess(`Create Issue using ${issueAmount.value} $BEPROS`));
-    //               return router.push(`/account`);
-    //             })
-    //             .catch(e => {
-    //               cleanFields();
-    //               dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
-    //               console.error(e);
-    //             })
-
-  }
-
-  function cleanFields() {
-    setIssueTitle('')
-    setIssueDescription('')
-    setIssueAmount({value: '0', formattedValue: '0', floatValue: 0})
-    setAllowedTransaction(false)
   }
 
   const issueContentIsValid = (): boolean => !!issueTitle && !!issueDescription;
@@ -190,7 +159,6 @@ export default function PageCreateIssue() {
   useEffect(() => {
     BeproService.getBalance('bepro').then(setBalance);
     GithubMicroService.getUserOf(currentAddress).then(setCurrentUser);
-    GithubMicroService.getReposList().then(setRepoList);
   }, [currentAddress])
 
   return (
