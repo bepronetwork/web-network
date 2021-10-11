@@ -68,7 +68,7 @@ export default function PageDevelopers() {
       GithubMicroService.getIssues()
                         .then(updateIssuesList)
                         .catch((error) => {
-                          console.log('Error', error)
+                          console.error('Error fetching issues', error)
                         })
                         .finally(() => {
                           dispatch(changeLoadState(false))

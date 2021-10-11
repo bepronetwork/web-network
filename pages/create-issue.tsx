@@ -9,13 +9,15 @@ import ConnectGithub from "@components/connect-github";
 import {ApplicationContext} from '@contexts/application';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import {addTransaction} from '@reducers/add-transaction';
-import {toastSuccess} from '@contexts/reducers/add-toast'
+import {toastError, toastSuccess} from '@contexts/reducers/add-toast'
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import {BlockTransaction,} from '@interfaces/transaction';
 import {formatNumberToCurrency} from '@helpers/formatNumber'
 import { TransactionStatus } from '@interfaces/enums/transaction-status';
 import LockIcon from '@assets/icons/lock';
+import {ReposList} from '@interfaces/repos-list';
+import ReposDropdown from '@components/repos-dropdown';
 interface Amount {
   value?: string,
   formattedValue: string,
@@ -30,6 +32,7 @@ export default function PageCreateIssue() {
   const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
   const {dispatch, state: {currentAddress, githubHandle, myTransactions}} = useContext(ApplicationContext);
   const [currentUser, setCurrentUser] = useState<User>();
+  const [repository_id, setRepositoryId] = useState(``);
   const router = useRouter()
 
   async function allowCreateIssue() {
@@ -67,6 +70,13 @@ export default function PageCreateIssue() {
 
   }
 
+  function cleanFields() {
+    setIssueTitle('')
+    setIssueDescription('')
+    setIssueAmount({value: '0', formattedValue: '0', floatValue: 0})
+    setAllowedTransaction(false)
+  }
+
   async function createIssue() {
     const payload = {
       title: issueTitle,
@@ -74,17 +84,12 @@ export default function PageCreateIssue() {
       amount: issueAmount.floatValue,
       creatorAddress: BeproService.address,
       creatorGithub: currentUser?.githubLogin,
+      repository_id,
     }
     const contractPayload = {tokenAmount: issueAmount.floatValue,};
 
     const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount: payload.amount});
     dispatch(openIssueTx);
-
-    let createIssueTx;
-
-    const updateBlock = (block: BlockTransaction, remove = false) => {
-      dispatch(updateTransaction({...block as any, remove}))
-    }
 
     GithubMicroService.createIssue(payload)
                       .then(cid => {
@@ -106,43 +111,12 @@ export default function PageCreateIssue() {
                           return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
                       })
                       .catch(e => {
-                        console.log(e);
+                        console.error(`Failed to createIssue`, e);
+                        cleanFields();
                         dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                        dispatch(toastError(e.message || `Error creating issue`));
                         return false;
                       })
-
-    // BeproService.network.openIssue(contractPayload)
-    //             .then(txInfo => {
-    //               if (!txInfo)
-    //                 throw new Error(`Failed to open issue`);
-    //               return txInfo;
-    //             })
-    //             .then(txInfo => {
-    //               BeproService.parseTransaction(txInfo, openIssueTx.payload)
-    //                           .then(updateBlock)
-    //               return txInfo;
-    //             })
-    //             .then((txInfo) => GithubMicroService.createIssue({
-    //                                                          ...payload,
-    //                                                          issueId: txInfo.events?.OpenIssue?.returnValues?.id
-    //                                                        }))
-    //             .then(() => {
-    //               dispatch(toastSuccess(`Create Issue using ${issueAmount.value} $BEPROS`));
-    //               return router.push(`/account`);
-    //             })
-    //             .catch(e => {
-    //               cleanFields();
-    //               dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
-    //               console.error(e);
-    //             })
-
-  }
-
-  function cleanFields() {
-    setIssueTitle('')
-    setIssueDescription('')
-    setIssueAmount({value: '0', formattedValue: '0', floatValue: 0})
-    setAllowedTransaction(false)
   }
 
   const issueContentIsValid = (): boolean => !!issueTitle && !!issueDescription;
@@ -151,14 +125,17 @@ export default function PageCreateIssue() {
 
   const verifyTransactionState = (type: TransactionTypes): boolean => !!myTransactions.find(transactions=> transactions.type === type && transactions.status === TransactionStatus.pending);
 
-  const isCreateButtonDisabled = (): boolean => [
+  function isCreateButtonDisabled() {
+    return [
       allowedTransaction,
       issueContentIsValid(),
       verifyAmountBiggerThanBalance(),
       issueAmount.floatValue > 0,
       !!issueAmount.formattedValue,
       !verifyTransactionState(TransactionTypes.createIssue),
+      !!repository_id,
     ].some(value => value === false);
+  }
 
   const isApproveButtonDisable = (): boolean =>[
     issueAmount.floatValue > 0,
@@ -218,31 +195,37 @@ export default function PageCreateIssue() {
                           value={issueDescription}
                           onChange={e => setIssueDescription(e.target.value)}/>
               </div>
-              <div className="form-group w-50">
-              <InputNumber
-                thousandSeparator
-                max={balance}
-                className={clsx({'text-muted': allowedTransaction})}
-                label="SET $BEPRO VALUE"
-                symbol="$BEPRO"
-                value={issueAmount.formattedValue}
-                disabled={allowedTransaction}
-                onValueChange={handleIssueAmountOnValueChange}
-                onBlur={handleIssueAmountBlurChange}
-                helperText={
-                  <>
-                    {formatNumberToCurrency(balance)} $BEPRO Available
-                    {!allowedTransaction && (
-                      <span
-                        className="smallCaption text-blue ml-1 cursor-pointer text-uppercase"
-                        onClick={() => setIssueAmount({formattedValue: balance.toString()})}>
+              <div className="row">
+                <div className="col">
+                  <InputNumber
+                    thousandSeparator
+                    max={balance}
+                    className={clsx({'text-muted': allowedTransaction})}
+                    label="SET $BEPRO VALUE"
+                    symbol="$BEPRO"
+                    value={issueAmount.formattedValue}
+                    disabled={allowedTransaction}
+                    onValueChange={handleIssueAmountOnValueChange}
+                    onBlur={handleIssueAmountBlurChange}
+                    helperText={
+                      <>
+                        {formatNumberToCurrency(balance)} $BEPRO Available
+                        {!allowedTransaction && (
+                          <span
+                            className="smallCaption text-blue ml-1 cursor-pointer text-uppercase"
+                            onClick={() => setIssueAmount({formattedValue: balance.toString()})}>
                         Max
                       </span>
-                    )}
-                  </>
-                }
-              />
+                        )}
+                      </>
+                    }
+                  />
+                </div>
+                <div className="col">
+                  <ReposDropdown onSelected={opt => setRepositoryId(opt.value)} />
+                </div>
               </div>
+
               <div className="d-flex justify-content-center align-items-center mt-4">
                 {!githubHandle ? (
                   <div className="mt-3 mb-0">
