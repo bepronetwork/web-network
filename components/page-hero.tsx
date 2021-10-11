@@ -2,6 +2,7 @@ import { GetStaticProps } from "next";
 import {useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import GithubMicroService from '@services/github-microservice';
+import {formatNumberToCurrency} from 'helpers/formatNumber'
 
 export default function PageHero({title = "Find issues to work",}) {
 
@@ -47,7 +48,7 @@ export default function PageHero({title = "Find issues to work",}) {
                 <div className="col-md-6">
                   <div className="top-border">
                     <h4 className="h4 mb-0">
-                      {onNetwork}{" "}
+                      {formatNumberToCurrency(onNetwork)}{" "}
                       <span className="smallCaption trans">$BEPRO</span>
                     </h4>
                     <span className="smallCaption">Bounties in the Network</span>

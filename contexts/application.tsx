@@ -18,6 +18,8 @@ import {changeNetwork} from '@reducers/change-network';
 import {useRouter} from 'next/router';
 import {toastError} from '@reducers/add-toast';
 import sanitizeHtml from 'sanitize-html';
+import {GetServerSideProps} from 'next';
+import {NetworkIds} from '@interfaces/enums/network-ids';
 
 interface GlobalState {
   state: ApplicationState,
@@ -89,16 +91,13 @@ export default function ApplicationContextProvider({children}) {
   function Initialize() {
     dispatch(changeBeproInitState(true) as any)
 
+    
     if (!window.ethereum)
       return;
 
-    if(window.ethereum.networkVersion)
-      dispatch(changeNetwork(window.ethereum.networkVersion));
-    
     window.ethereum.on(`accountsChanged`, (accounts) => updateSteFor(accounts[0]))
-
-    window.ethereum.on(`chainChanged`, (chainId: string) => {
-      dispatch(changeNetwork(Number(chainId).toString()));
+    window.ethereum.on('chainChanged', (evt) => {
+      dispatch(changeNetwork(NetworkIds[+evt?.toString()]?.toLowerCase()))
     })
   }
 
@@ -119,3 +118,9 @@ export default function ApplicationContextProvider({children}) {
     {children}
   </ApplicationContext.Provider>
 }
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  return {
+    props: {session: await getSession(ctx)},
+  };
+};

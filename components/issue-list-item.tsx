@@ -4,7 +4,6 @@ import React, { useContext } from "react";
 import { formatDate } from "@helpers/formatDate";
 import IssueAvatars from "./issue-avatars";
 import { IssueData } from "@interfaces/issue-data";
-import { ApplicationContext } from "@contexts/application";
 import { IssueState } from "@interfaces/issue-data";
 import { formatNumberToNScale } from "@helpers/formatNumber";
 import Avatar from "components/avatar";

@@ -1,5 +1,5 @@
 import Modal from '@components/modal';
-import React, {useContext} from 'react';
+import React, {useContext, useEffect} from 'react';
 import Image from 'next/image';
 import metamaskLogo from '@assets/metamask.png';
 import {ApplicationContext} from '@contexts/application';
@@ -8,7 +8,6 @@ import CheckMarkIcon from '@assets/icons/checkmark-icon';
 import ErrorMarkIcon from '@assets/icons/errormark-icon';
 
 export default function WrongNetworkModal({requiredNetwork = ``}) {
-
   const {state: {currentAddress, network: activeNetwork}} = useContext(ApplicationContext);
 
   function showModal() {

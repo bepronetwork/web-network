@@ -68,7 +68,7 @@ export default function PageDevelopers() {
       GithubMicroService.getIssues()
                         .then(updateIssuesList)
                         .catch((error) => {
-                          console.log('Error', error)
+                          console.error('Error fetching issues', error)
                         })
                         .finally(() => {
                           dispatch(changeLoadState(false))
@@ -99,6 +99,7 @@ export default function PageDevelopers() {
               <div className="col-md-3">
                 <ReactSelect
                   id="filterByIssueState"
+                  isSearchable={false}
                   className="react-select-filterIssues"
                   defaultValue={filtersByIssueState[0]}
                   options={filtersByIssueState}

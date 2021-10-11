@@ -1,12 +1,13 @@
 import GithubImage from './github-image';
 import {useContext} from 'react';
 import {ApplicationContext} from '@contexts/application';
-import {signIn} from 'next-auth/react';
+import {signIn, signOut} from 'next-auth/react';
 
 export default function ConnectGithub() {
   const {state: {currentAddress}} = useContext(ApplicationContext);
 
-  function clickSignIn() {
+  async function clickSignIn() {
+    await signOut({redirect: false});
     localStorage.setItem(`lastAddressBeforeConnect`, currentAddress);
     return signIn('github', {callbackUrl: `${window.location.protocol}//${window.location.host}/connect-account`})
   }

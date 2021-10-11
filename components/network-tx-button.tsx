@@ -8,6 +8,7 @@ import {addToast} from '@reducers/add-toast';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {TransactionCurrency} from '@interfaces/transaction';
 import {updateTransaction} from '@reducers/update-transaction';
+import LockIcon from '@assets/icons/lock';
 
 interface NetworkTxButtonParams {
   txMethod: string;
@@ -86,7 +87,7 @@ function networkTxButton({
   }
 
   function getButtonClass() {
-    return `btn btn-md btn-lg mt-3 btn-primary ${fullWidth ? `w-100` : ``} ${!children && !buttonLabel && `visually-hidden` || ``}`
+    return `btn btn-md btn-lg mt-3 btn-purple ${fullWidth ? `w-100` : ``} ${!children && !buttonLabel && `visually-hidden` || ``} ${disabled && `bg-disabled border-0`}`
   }
 
   function getDivClass() {
@@ -99,7 +100,7 @@ function networkTxButton({
 
   return (<>
     <button ref={elementRef} className={getButtonClass()} onClick={makeTx} disabled={disabled}>
-      {buttonLabel}
+    {disabled && <LockIcon width={12} height={14} className="mr-1"/>} {buttonLabel}
     </button>
 
     <Modal show={showModal} title={modalTitle} footer={modalFooter}>
