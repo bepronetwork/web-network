@@ -19,6 +19,8 @@ import ConnectWalletButton from '@components/connect-wallet-button';
 import CheckMarkIcon from '@assets/icons/checkmark-icon';
 import LockIcon from '@assets/icons/lock';
 import ErrorMarkIcon from '@assets/icons/errormark-icon';
+import {changeNetwork} from '@reducers/change-network';
+import {NetworkIds} from '@interfaces/enums/network-ids';
 
 
 export default function ConnectAccount() {
@@ -91,9 +93,13 @@ export default function ConnectAccount() {
     let loggedIn = false;
 
     try {
-      loggedIn = await BeproService.login();
+      const chainId = (window as any).web3?.currentProvider?.chainId;
+      if (+process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID !== +chainId) {
+        dispatch(changeNetwork(NetworkIds[+chainId].toLowerCase()))
+        return;
+      } else loggedIn = await BeproService.login();
     } catch (e) {
-      console.log(e);
+      console.error(`Failed to login on BeproService`, e);
     }
 
     if (!loggedIn) {

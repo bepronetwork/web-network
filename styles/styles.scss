@@ -972,3 +972,19 @@ $c_props: ('m': 'margin') !default;
   }
 }
 
+.list-group-item-shadow {
+  background-color: $black;
+  color: $gray;
+  border-bottom-color: $dark-gray;
+
+  &:last-child {
+    border-bottom-color: $black;
+  }
+
+  &.list-group-item-action {
+    &:hover,&:focus {
+      color: $white;
+      background-color: $dark-gray;
+    }
+  }
+}
