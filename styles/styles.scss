@@ -194,6 +194,14 @@ body {
   text-transform: uppercase;
 }
 
+.smallInfo{
+  font-family: 'fontBold', sans-serif;
+  font-size: 9px;
+  line-height: 130%;
+  letter-spacing: 10%;
+  text-transform: uppercase;
+}
+
 .largeCaption {
   font-family: 'fontBold', sans-serif;
   font-size: 16px;
@@ -837,6 +845,18 @@ label {
         color: $gray;
       }
     }
+  }
+}
+#change-network-modal{
+  .modal-content{
+    background-color: $bg-shadow;
+    border-radius: math.div($m,2);
+  }
+}
+#connect-your-meta-mask-wallet-modal{
+  .modal-content{
+    background-color: $bg-shadow;
+    border-radius: math.div($m,2);
   }
 }
 #transaction-modal{

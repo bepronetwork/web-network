@@ -32,7 +32,7 @@ export default function PageIssue() {
   const [currentUser, setCurrentUser] = useState<User>();
 
   const getsIssueMicroService = () => {
-    GithubMicroService.getIssueId(id)
+    GithubMicroService.getIssuesByGhId(id)
                       .then((issue) => {
                         if (!issue)
                           return;

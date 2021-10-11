@@ -24,6 +24,7 @@ export default function Modal({
                     onHide={onCloseClick}
                     aria-labelledby={modalTitle}
                     aria-describedby={modalTitle}
+                    id={modalTitle}
                     backdrop={backdrop}
                     {...params}>
       <ModalBootstrap.Header className={`relative d-flex w-100 justify-content-${titlePosition} `}>
