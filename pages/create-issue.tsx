@@ -17,6 +17,7 @@ import {formatNumberToCurrency} from '@helpers/formatNumber'
 import { TransactionStatus } from '@interfaces/enums/transaction-status';
 import LockIcon from '@assets/icons/lock';
 import {ReposList} from '@interfaces/repos-list';
+import ReposDropdown from '@components/repos-dropdown';
 interface Amount {
   value?: string,
   formattedValue: string,
@@ -155,14 +156,17 @@ export default function PageCreateIssue() {
 
   const verifyTransactionState = (type: TransactionTypes): boolean => !!myTransactions.find(transactions=> transactions.type === type && transactions.status === TransactionStatus.pending);
 
-  const isCreateButtonDisabled = (): boolean => [
+  function isCreateButtonDisabled() {
+    return [
       allowedTransaction,
       issueContentIsValid(),
       verifyAmountBiggerThanBalance(),
       issueAmount.floatValue > 0,
       !!issueAmount.formattedValue,
       !verifyTransactionState(TransactionTypes.createIssue),
+      !!repository_id,
     ].some(value => value === false);
+  }
 
   const isApproveButtonDisable = (): boolean =>[
     issueAmount.floatValue > 0,
@@ -223,31 +227,37 @@ export default function PageCreateIssue() {
                           value={issueDescription}
                           onChange={e => setIssueDescription(e.target.value)}/>
               </div>
-              <div className="form-group w-50">
-              <InputNumber
-                thousandSeparator
-                max={balance}
-                className={clsx({'text-muted': allowedTransaction})}
-                label="SET $BEPRO VALUE"
-                symbol="$BEPRO"
-                value={issueAmount.formattedValue}
-                disabled={allowedTransaction}
-                onValueChange={handleIssueAmountOnValueChange}
-                onBlur={handleIssueAmountBlurChange}
-                helperText={
-                  <>
-                    {formatNumberToCurrency(balance)} $BEPRO Available
-                    {!allowedTransaction && (
-                      <span
-                        className="smallCaption text-blue ml-1 cursor-pointer text-uppercase"
-                        onClick={() => setIssueAmount({formattedValue: balance.toString()})}>
+              <div className="row">
+                <div className="col">
+                  <InputNumber
+                    thousandSeparator
+                    max={balance}
+                    className={clsx({'text-muted': allowedTransaction})}
+                    label="SET $BEPRO VALUE"
+                    symbol="$BEPRO"
+                    value={issueAmount.formattedValue}
+                    disabled={allowedTransaction}
+                    onValueChange={handleIssueAmountOnValueChange}
+                    onBlur={handleIssueAmountBlurChange}
+                    helperText={
+                      <>
+                        {formatNumberToCurrency(balance)} $BEPRO Available
+                        {!allowedTransaction && (
+                          <span
+                            className="smallCaption text-blue ml-1 cursor-pointer text-uppercase"
+                            onClick={() => setIssueAmount({formattedValue: balance.toString()})}>
                         Max
                       </span>
-                    )}
-                  </>
-                }
-              />
+                        )}
+                      </>
+                    }
+                  />
+                </div>
+                <div className="col">
+                  <ReposDropdown onSelected={opt => setRepositoryId(opt.value)} />
+                </div>
               </div>
+
               <div className="d-flex justify-content-center align-items-center mt-4">
                 {!githubHandle ? (
                   <div className="mt-3 mb-0">

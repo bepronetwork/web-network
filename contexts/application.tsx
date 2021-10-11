@@ -19,6 +19,7 @@ import {useRouter} from 'next/router';
 import {toastError} from '@reducers/add-toast';
 import sanitizeHtml from 'sanitize-html';
 import {GetServerSideProps} from 'next';
+import {NetworkIds} from '@interfaces/enums/network-ids';
 
 interface GlobalState {
   state: ApplicationState,
@@ -99,11 +100,10 @@ export default function ApplicationContextProvider({children}) {
       return;
 
     window.ethereum.on(`accountsChanged`, (accounts) => updateSteFor(accounts[0]))
-    window.ethereum.on('networkChanged', () =>
-      BeproService.bepro.web3.eth.net.getNetworkType()
-                  .then(network => {
-                    dispatch(changeNetwork(network));
-                  }))
+    window.ethereum.on('chainChanged', (evt) => {
+      console.log(`on load?`);
+      dispatch(changeNetwork(NetworkIds[+evt.toString()].toLowerCase()))
+    })
   }
 
   LoadApplicationReducers();

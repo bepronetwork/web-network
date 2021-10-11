@@ -16,6 +16,7 @@ import ButtonTrans from '@components/button-trans';
 import HelpModal from '@components/help-modal';
 import ExternalLinkIcon from '@assets/icons/external-link-icon';
 import TransactionsStateIndicator from '@components/transactions-state-indicator';
+import WrongNetworkModal from '@components/wrong-network-modal';
 
 export default function MainNav() {
   const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
@@ -112,6 +113,7 @@ export default function MainNav() {
         </Link>
 
         <ButtonTrans onClick={() => setShowHelp(true)} className="ms-2 me-3" rounded={true}><HelpIcon /></ButtonTrans>
+        <WrongNetworkModal requiredNetwork="kovan" />
 
         <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
           <div className="d-flex account-info align-items-center">

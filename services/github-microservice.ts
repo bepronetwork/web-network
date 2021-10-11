@@ -30,6 +30,7 @@ export interface ProposalData {
 }
 
 const client = axios.create({baseURL: API});
+const repoList = [];
 
 export default class GithubMicroService {
 
@@ -246,7 +247,10 @@ export default class GithubMicroService {
                  })
   }
 
-  static async getReposList() {
+  static async getReposList(force = false) {
+    if (!force && repoList.length)
+      return Promise.resolve(repoList);
+
     return client.get<ReposList>(`/repos/`)
                  .then(({data}) => data)
                  .catch(e => {
