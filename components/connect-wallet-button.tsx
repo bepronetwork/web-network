@@ -3,29 +3,26 @@ import React, {useContext, useEffect, useState,} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import {changeWalletState} from '@reducers/change-wallet-connect';
 import {changeCurrentAddress} from '@reducers/change-current-address';
-import {changeNetwork} from '@reducers/change-network';
 import Modal from '@components/modal';
 import Image from 'next/image';
-import {CURRENT_NETWORK_CHAINID} from 'env'
 import metamaskLogo from '@assets/metamask.png';
+import { changeNetwork } from '@contexts/reducers/change-network';
+import { NetworkIds } from '@interfaces/enums/network-ids';
 
-export default function ConnectWalletButton({children = null, forceLogin = false, onSuccess = () => null, onFail = () => console.log("error"), asModal = false, btnColor = `white`}) {
+export default function ConnectWalletButton({children = null, forceLogin = false, onSuccess = () => null, onFail = () => console.log("Failed to login"), asModal = false, btnColor = `white`}) {
   const { state: {metaMaskWallet, beproInit, currentAddress}, dispatch } = useContext(ApplicationContext);
-  const [showModal, setShowModal] = useState(false)
-  async function connectWallet() {
-    
-    if(window.ethereum.networkVersion !== CURRENT_NETWORK_CHAINID){
-      setShowModal(true)
-      return;
-    }
-    
-    setShowModal(false)
-    let loggedIn = false;
 
+  async function connectWallet() {
+    let loggedIn = false;
+    
     try {
-      loggedIn = await BeproService.login();
+      const chainId = (window as any).web3?.currentProvider?.chainId;
+      if (+process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID !== +chainId) {
+        dispatch(changeNetwork(NetworkIds[+chainId]?.toLowerCase()))
+        return;
+      } else loggedIn = await BeproService.login();
     } catch (e) {
-      console.log(e);
+      console.error(`Failed to login on BeproService`, e);
     }
 
     if (!loggedIn)
@@ -54,7 +51,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
 
   }, [beproInit]);
 
-  if (asModal || showModal)
+  if (asModal)
     return (
       <Modal 
       title="Connect your MetaMask Wallet" 
