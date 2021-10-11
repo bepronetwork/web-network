@@ -52,11 +52,6 @@ export default class GithubMicroService {
                  });
   }
 
-  static async getIssuesIds(issueIds) {
-    const {data} = await client.get('/issues', {params: {issueIds}});
-    return data;
-  }
-
   static async getIssues() {
     const {data} = await client.get('/issues/');
     return data;
@@ -86,8 +81,8 @@ export default class GithubMicroService {
                  });
   }
 
-  static async getCommentsIssue(githubId: string | string[]) {
-    const {data} = await client.get(`/issues/github/${githubId}/comments`);
+  static async getCommentsIssue(githubId: string | string[], repoId = ``) {
+    const {data} = await client.get(`/issues/github/${githubId}/${repoId}/comments`);
     return data;
   }
 
@@ -190,8 +185,8 @@ export default class GithubMicroService {
                  })
   }
 
-  static async getForkedRepo(ghHandler: string) {
-    return client.get(`/forks/repo/${ghHandler}`)
+  static async getForkedRepo(ghHandler: string, ofIssue: string) {
+    return client.get(`/forks/repo/${ghHandler}/${ofIssue}`)
                  .then(({data}) => data)
                  .catch(e => {
                    console.error(e);

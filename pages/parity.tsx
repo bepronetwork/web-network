@@ -83,7 +83,7 @@ export default function ParityPage() {
       }).id;
     }
 
-    function mapOpenIssue({title = ``, number = 0, body = ``, labels = [], tokenAmount, repository_url, user: {login}}) {
+    function mapOpenIssue({title = ``, number = 0, body = ``, labels = [], tokenAmount, repository_url, user: {login: creatorGithub}}) {
       const getTokenAmount = (lbls) => +lbls.find((label = ``) => label.search(/k \$?(BEPRO|USDC)/) > -1)?.replace(/k \$?(BEPRO|USDC)/, `000`) || 100000;
 
       if (labels.length && !tokenAmount)
@@ -91,7 +91,7 @@ export default function ParityPage() {
       if (!tokenAmount)
         tokenAmount = 100000;
 
-      return ({title, number, body, tokenAmount, login, repository_id: getRepoId(repository_url?.split(`/`)?.slice(-2)?.join(`/`))});
+      return ({title, number, body, tokenAmount, creatorGithub, repository_id: getRepoId(repository_url?.split(`/`)?.slice(-2)?.join(`/`))});
     }
 
     async function getAllIssuesRecursive({githubPath}, page = 1, pool = []) {
@@ -143,7 +143,7 @@ export default function ParityPage() {
                              .then(cid => {
                                if (!cid)
                                  throw new Error(`Failed to create github issue!`);
-                               return BeproService.network.openIssue({...scPayload, cid})
+                               return BeproService.network.openIssue({...scPayload, cid: [repository_id, cid].join(`/`)})
                                                   .then(txInfo => {
                                                     BeproService.parseTransaction(txInfo, openIssueTx.payload)
                                                                 .then(block => dispatch(updateTransaction(block)))
