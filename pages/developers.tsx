@@ -11,8 +11,8 @@ import {IssueData} from '@interfaces/issue-data';
 import {BeproService} from '@services/bepro-service';
 import NothingFound from '@components/nothing-found';
 import Paginate from '@components/paginate';
-import usePage from '../x-hooks/use-page';
-import useCount from '../x-hooks/use-count';
+import usePage from '@x-hooks/use-page';
+import useCount from '@x-hooks/use-count';
 import {useRouter} from 'next/router';
 
 type Filter = {

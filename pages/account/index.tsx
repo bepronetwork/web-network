@@ -8,8 +8,8 @@ import {ApplicationContext} from '@contexts/application';
 import {IssueData} from '@interfaces/issue-data';
 import NothingFound from '@components/nothing-found';
 import Paginate from '@components/paginate';
-import usePage from '../../x-hooks/use-page';
-import useCount from '../../x-hooks/use-count';
+import usePage from '@x-hooks/use-page';
+import useCount from '@x-hooks/use-count';
 import {useRouter} from 'next/router';
 
 export default function MyIssues() {
