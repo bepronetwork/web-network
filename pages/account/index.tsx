@@ -57,15 +57,16 @@ export default function MyIssues() {
         </NothingFound>
       </div>
     </div>)
-  else issueChild = issues.map(issue =>
-                                 <div className="col-md-10" key={issue.issueId}><IssueListItem issue={issue} /></div>)
+  else issueChild = <>
+      {issues.map(issue => <div className="col-md-10" key={issue.issueId}><IssueListItem issue={issue}/></div>)}
+      <Paginate count={pages.count} onChange={(page) => router.push({pathname: `/account`, query:{page}})} />
+    </>
 
   return (
     <Account buttonPrimaryActive={true}>
       <div className="container p-footer">
         <div className="row justify-content-center">
           {issueChild}
-          <Paginate count={pages.count} onChange={(page) => router.push({pathname: `/`, query:{page}})} />
         </div>
       </div>
     </Account>
