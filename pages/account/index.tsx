@@ -7,11 +7,18 @@ import Account from '@components/account';
 import {ApplicationContext} from '@contexts/application';
 import {IssueData} from '@interfaces/issue-data';
 import NothingFound from '@components/nothing-found';
+import Paginate from '@components/paginate';
+import usePage from '@x-hooks/use-page';
+import useCount from '@x-hooks/use-count';
+import {useRouter} from 'next/router';
 
 export default function MyIssues() {
 
   const {dispatch, state: {myIssues, beproInit, metaMaskWallet, currentAddress}} = useContext(ApplicationContext)
   const [issues, setIssues] = useState<IssueData[]>([]);
+  const page = usePage();
+  const pages = useCount();
+  const router = useRouter();
 
   let issueChild;
 
@@ -22,7 +29,11 @@ export default function MyIssues() {
     GithubMicroService.getUserOf(currentAddress)
     .then((user)=> {
       if (user)
-        return GithubMicroService.getIssuesByGhLogin(user?.githubLogin);
+        return GithubMicroService.getIssuesByGhLogin(user?.githubLogin)
+                                 .then(({rows, count}) => {
+                                   pages.setCount(count);
+                                   return rows
+                                 });
       else return [];
     })
     .then(setIssues)
@@ -46,8 +57,10 @@ export default function MyIssues() {
         </NothingFound>
       </div>
     </div>)
-  else issueChild = issues.map(issue =>
-                                 <div className="col-md-10" key={issue.issueId}><IssueListItem issue={issue} /></div>)
+  else issueChild = <>
+      {issues.map(issue => <div className="col-md-10" key={issue.issueId}><IssueListItem issue={issue}/></div>)}
+      <Paginate count={pages.count} onChange={(page) => router.push({pathname: `/account`, query:{page}})} />
+    </>
 
   return (
     <Account buttonPrimaryActive={true}>
