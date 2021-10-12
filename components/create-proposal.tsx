@@ -12,7 +12,6 @@ import {addTransaction} from '@reducers/add-transaction';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import {toastWarning} from '@reducers/add-toast';
-import ArrowRight from '@assets/icons/arrow-right';
 
 interface participants {
   githubHandle: string;
@@ -173,7 +172,6 @@ export default function NewProposal({
              footer={
                <>
                  <button className="btn btn-md btn-opac" onClick={handleClose}>
-                   <ArrowRight />
                    Cancel
                  </button>
                  <button
