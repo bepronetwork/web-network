@@ -10,6 +10,10 @@ import {changeLoadState} from '@reducers/change-load-state';
 import {IssueData} from '@interfaces/issue-data';
 import {BeproService} from '@services/bepro-service';
 import NothingFound from '@components/nothing-found';
+import Paginate from '@components/paginate';
+import usePage from '../x-hooks/use-page';
+import useCount from '../x-hooks/use-count';
+import {useRouter} from 'next/router';
 
 type Filter = {
   label: string;
@@ -53,6 +57,9 @@ export default function PageDevelopers() {
   const {dispatch, state: {loading, currentAddress}} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
   const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
+  const page = usePage();
+  const pages = useCount();
+  const router = useRouter();
 
   function handleChangeFilterByState(filter: Filter) {
     setFilterByState(filter);
@@ -62,20 +69,23 @@ export default function PageDevelopers() {
     setIssues(issues);
   }
 
-  useEffect(() => {
-    async function getIssues() {
-      dispatch(changeLoadState(true))
-      GithubMicroService.getIssues()
-                        .then(updateIssuesList)
-                        .catch((error) => {
-                          console.error('Error fetching issues', error)
-                        })
-                        .finally(() => {
-                          dispatch(changeLoadState(false))
-                        });
-    }
-    getIssues();
-  }, []);
+  function getIssues() {
+    dispatch(changeLoadState(true))
+    GithubMicroService.getIssues(page)
+                      .then(({rows, count}) => {
+                        pages.setCount(count);
+                        return rows;
+                      })
+                      .then(updateIssuesList)
+                      .catch((error) => {
+                        console.error('Error fetching issues', error)
+                      })
+                      .finally(() => {
+                        dispatch(changeLoadState(false))
+                      });
+  }
+
+  useEffect(getIssues, [page]);
 
   const isDraftIssue = (issue: IssueData) => issue?.state === 'draft';
   const isClosedIssue = (issue: IssueData) => issue?.state === 'closed' || issue?.state === 'redeemed';
@@ -109,6 +119,7 @@ export default function PageDevelopers() {
             </div>
           </div>
           <ListIssues listIssues={issuesFilteredByState} />
+          <Paginate count={pages.count} onChange={(page) => router.push({pathname: `/`, query:{page}})} />
           {issuesFilteredByState.length === 0 && !loading.isLoading ? (
             <div className="col-md-10">
               <NothingFound

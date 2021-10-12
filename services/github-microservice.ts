@@ -52,8 +52,8 @@ export default class GithubMicroService {
                  });
   }
 
-  static async getIssues() {
-    const {data} = await client.get('/issues/');
+  static async getIssues(page = 1) {
+    const {data} = await client.get(`/issues/?page=${page}`);
     return data;
   }
 
@@ -73,8 +73,8 @@ export default class GithubMicroService {
     });
   }
 
-  static async getIssuesByGhLogin(ghlogin) {
-    const {data} = await client.get(`/issues/githublogin/${ghlogin}`);
+  static async getIssuesByGhLogin(ghlogin, page = 1) {
+    const {data} = await client.get(`/issues/githublogin/${ghlogin}?page=${page}`);
     return data;
   }
 
