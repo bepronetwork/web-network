@@ -111,7 +111,7 @@ export default function PageIssue() {
         developers={issue?.developers}
         finalized={networkIssue?.finalized}
         isIssueinDraft={isIssueinDraft}
-        addressNetwork={networkIssue?.cid}
+        networkCID={networkIssue?.cid}
         issueId={issue?.issueId}
         UrlGithub={issue?.url}
         title={issue?.title}
@@ -124,6 +124,7 @@ export default function PageIssue() {
         forks={forks}
         githubLogin={currentUser?.githubLogin}
         canOpenPR={canOpenPR}
+        issueCreator={issue.creatorAddress}
         githubId={issue?.githubId} finished={networkIssue?.recognizedAsFinished}/>
       {networkIssue?.mergeProposalsAmount > 0 && (
         <IssueProposals
