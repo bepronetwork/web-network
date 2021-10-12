@@ -8,7 +8,6 @@ import ReactSelect from '@components/react-select';
 import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';
 import {IssueData} from '@interfaces/issue-data';
-import {BeproService} from '@services/bepro-service';
 import NothingFound from '@components/nothing-found';
 import Paginate from '@components/paginate';
 import usePage from '@x-hooks/use-page';
@@ -60,6 +59,7 @@ export default function PageDevelopers() {
   const page = usePage();
   const pages = useCount();
   const router = useRouter();
+  const {repoId} = router.query;
 
   function handleChangeFilterByState(filter: Filter) {
     setFilterByState(filter);
@@ -71,7 +71,7 @@ export default function PageDevelopers() {
 
   function getIssues() {
     dispatch(changeLoadState(true))
-    GithubMicroService.getIssues(page)
+    GithubMicroService.getIssues(page, repoId as string)
                       .then(({rows, count}) => {
                         pages.setCount(count);
                         return rows;
@@ -85,7 +85,7 @@ export default function PageDevelopers() {
                       });
   }
 
-  useEffect(getIssues, [page]);
+  useEffect(getIssues, [page, repoId]);
 
   const isDraftIssue = (issue: IssueData) => issue?.state === 'draft';
   const isClosedIssue = (issue: IssueData) => issue?.state === 'closed' || issue?.state === 'redeemed';

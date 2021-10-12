@@ -1,18 +1,14 @@
 import Avatar from "components/avatar";
 import { GetStaticProps } from "next";
 import { formatDate } from '@helpers/formatDate';
+import GithubInfo from '@components/github-info';
 
 export default function IssueHero({ issue, state, amount }) {
-  function GhInfo(color, value) {
-    return <div className={`bg-transparent smallCaption text-uppercase px-1 rounded border border-2 border-${color} text-${color} text-opacity-1 text-center text-uppercase fs-smallest`}>
-            <strong>{value}</strong>
-        </div>
-  }
 
   function renderCreator() {
     if(issue?.creatorGithub)
     return <div className="d-flex align-items-center">
-          <span className="mr-2">by</span> {GhInfo('white',issue.creatorGithub)} <Avatar className="mx-2" userLogin={issue.creatorGithub} />
+          <span className="mr-2">by</span> <GithubInfo color="white" value={[`@`, issue.creatorGithub].join(``)} /> <Avatar className="mx-2" userLogin={issue.creatorGithub} />
         </div>
   }
 
