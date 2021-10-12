@@ -52,8 +52,11 @@ export default class GithubMicroService {
                  });
   }
 
-  static async getIssues(page = 1) {
-    const {data} = await client.get(`/issues/?page=${page}`);
+  static async getIssues(page = 1, repoId?: string) {
+    const search = new URLSearchParams(JSON.parse(JSON.stringify({page, repoId})));
+
+
+    const {data} = await client.get(`/issues/?${search.toString()}`);
     return data;
   }
 

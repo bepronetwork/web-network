@@ -7,6 +7,7 @@ import { IssueData } from "@interfaces/issue-data";
 import { IssueState } from "@interfaces/issue-data";
 import { formatNumberToNScale } from "@helpers/formatNumber";
 import Avatar from "components/avatar";
+import GithubInfo from '@components/github-info';
 
 export default function IssueListItem({ issue = null }: { issue?: IssueData }) {
   const router = useRouter();
@@ -47,15 +48,6 @@ export default function IssueListItem({ issue = null }: { issue?: IssueData }) {
     }
   }
 
-  function GhInfo(color, value) {
-    return (
-      <div
-        className={`bg-transparent smallCaption text-uppercase px-1 rounded border border-2 border-${color} text-${color} text-uppercase fs-smallest`}
-      >
-        <strong>{value}</strong>
-      </div>
-    );
-  }
 
   return (
     <div
@@ -89,12 +81,12 @@ export default function IssueListItem({ issue = null }: { issue?: IssueData }) {
             </span>
             {issue?.repo && (
               <span className="p-small trans mr-2 mt-1 text-uppercase">
-                {GhInfo("blue", issue?.repo)}
+                <GithubInfo color="blue" value={issue?.repo} hoverTextColor="white" onClicked={() => router.push({pathname: `/`, query: {repoId: issue?.repository_id}})} />
               </span>
             )}
             <span className="p-small trans mr-2 mt-1">by</span>
             <span className="p-small trans mr-2 mt-1">
-              {GhInfo("gray", `@${issue?.creatorGithub}`)}
+              <GithubInfo color="gray" value={[`@`, issue?.creatorGithub].join(``)} />
             </span>
             <Avatar className="mr-2" userLogin={issue.creatorGithub} />
             {issue?.dueDate && (
