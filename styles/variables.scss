@@ -8,7 +8,7 @@ $dark-gray: #20222b;
 $gray: #c4c7d3;
 $ligth-gray: #434758;
 $blue: #4250e4;
-$primary: blue;
+$primary: $blue;
 $blue-dark: #3b49e0;
 $purple: #9669ed;
 $secondary: $purple;
@@ -49,8 +49,8 @@ $btn-font-weight: 600;
 $btn-line-height: 71%;
 
 $btn-padding-y: 8px;
-$btn-padding-y-sm: $btn-padding-y;
-$btn-padding-y-lg: $btn-padding-y;
+$btn-padding-y-sm: $btn-padding-y/2;
+$btn-padding-y-lg: $btn-padding-y*2;
 
 $btn-padding-x: 20px;
 $btn-padding-x-sm: $btn-padding-x;
@@ -63,6 +63,20 @@ $btn-font-size-lg: $btn-font-size;
 $btn-border-radius: 20px;
 $btn-border-radius-sm: $btn-border-radius;
 $btn-border-radius-lg: $btn-border-radius;
+
+$pagination-color:                  $gray;
+$pagination-bg:                     $bg;
+$pagination-border-color:           $bg;
+$pagination-disabled-bg:            $bg;
+$pagination-disabled-border-color:  $bg;
+$pagination-active-bg:              $primary;
+$pagination-active-border-color:    $primary;
+$pagination-border-radius:          8px;
+$pagination-hover-bg:               $bg;
+$pagination-hover-border-color:     $bg;
+$pagination-hover-color:            $white;
+$pagination-focus-bg:               $bg;
+$pagination-focus-outline:          $bg;
 
 $utilities: map-merge(
   $utilities, (

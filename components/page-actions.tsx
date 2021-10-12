@@ -23,7 +23,7 @@ interface pageActions {
   UrlGithub: string;
   developers?: developer[];
   finalized: boolean;
-  addressNetwork: string;
+  networkCID: string;
   isIssueinDraft: boolean;
   state?: IssueState | string;
   pullRequests?: pullRequest[];
@@ -40,6 +40,7 @@ interface pageActions {
   canOpenPR?: boolean;
   githubId?: string;
   finished?: boolean;
+  issueCreator?: string;
 }
 
 export default function PageActions({
@@ -47,7 +48,7 @@ export default function PageActions({
   UrlGithub,
   developers,
   finalized,
-  addressNetwork,
+  networkCID,
   isIssueinDraft,
   state,
   pullRequests,
@@ -64,6 +65,7 @@ export default function PageActions({
   canOpenPR,
   githubId = ``,
   finished = false,
+  issueCreator,
 }: pageActions) {
   const {
     dispatch,
@@ -135,7 +137,7 @@ export default function PageActions({
   const renderRedeem = () => {
     return (
       isIssueinDraft === true &&
-      addressNetwork === currentAddress &&
+      issueCreator === currentAddress &&
       !finalized && (
         <button
           className="btn btn-md btn-primary mx-1 px-4"
@@ -157,7 +159,7 @@ export default function PageActions({
           <NewProposal
             issueId={issueId}
             isFinished={finished}
-            isIssueOwner={addressNetwork === currentAddress}
+            isIssueOwner={issueCreator === currentAddress}
             amountTotal={amountIssue}
             numberMergeProposals={mergeProposals}
             pullRequests={pullRequests}
