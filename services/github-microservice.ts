@@ -52,16 +52,14 @@ export default class GithubMicroService {
                  });
   }
 
-  static async getIssues(page = 1, repoId?: string) {
-    const search = new URLSearchParams(JSON.parse(JSON.stringify({page, repoId})));
-
-
+  static async getIssues(page = '1', repoId = '', time = ``, state = ``) {
+    const search = new URLSearchParams({page, repoId, time, state});
     const {data} = await client.get(`/issues/?${search.toString()}`);
     return data;
   }
 
-  static async getIssuesByGhId(ghId: string | string[]) {
-    return client.get(`/issues/github/${ghId}`).then(({data}) => data)
+  static async getIssuesByGhId(ghId: string | string[], repoId: string) {
+    return client.get(`/issues/github/${repoId}/${ghId}`).then(({data}) => data)
     .catch(e => {
       console.error(`Error fetchin issue`, e);
       return null;
@@ -76,8 +74,14 @@ export default class GithubMicroService {
     });
   }
 
-  static async getIssuesByGhLogin(ghlogin, page = 1) {
+  static async getIssuesByGhLogin(ghlogin, page = '1') {
     const {data} = await client.get(`/issues/githublogin/${ghlogin}?page=${page}`);
+    return data;
+  }
+
+  static async getPendingIssuesOf(address) {
+    const search = new URLSearchParams({address});
+    const {data} = await client.get(`/issues/pending?${search.toString()}`);
     return data;
   }
 
