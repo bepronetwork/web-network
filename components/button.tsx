@@ -1,16 +1,16 @@
 import React, {ButtonHTMLAttributes} from 'react';
 
 interface IButtonProps extends  ButtonHTMLAttributes<HTMLButtonElement>{
-  color: string;
+  color?: string;
   outline?: boolean;
   transparent?: boolean;
   rounded?: boolean;
 }
-const Button: React.FC<IButtonProps> = ({children, color = "primary", outline, transparent, rounded, ...rest}) => {
+const Button: React.FC<IButtonProps> = ({children, color = "primary", outline, transparent, rounded, className = ``,...rest}) => {
   const getClass = (): string =>{
     let type = `btn-${outline? `outline-${color}`: color}`
-    let textColor = !outline && 'text-white bg-opacity-100'
-    let append = '';
+    let textColor = !outline && color !== 'white'&& 'text-white bg-opacity-100'
+    let append = className;
     
     if(transparent)
       append += ' bg-transparent border-transparent bg-opac-hover'
@@ -21,9 +21,11 @@ const Button: React.FC<IButtonProps> = ({children, color = "primary", outline, t
     if(outline)
       append += ` bg-opac-hover-25`
     
-    return `btn ${type} ${textColor} d-flex align-items-center justify-content-center text-uppercase shadow-sm ${append}`
+    return `btn ${type} ${textColor} d-flex align-items-center justify-content-center shadow-none ${append}`
   }
-  return <button className={getClass()} {...rest}>{children}</button>
+  return <>
+    <button className={getClass()} {...rest}>{children}</button>
+  </>
 }
 
 export default Button;
