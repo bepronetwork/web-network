@@ -12,6 +12,7 @@ import {addTransaction} from '@reducers/add-transaction';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import {toastWarning} from '@reducers/add-toast';
+import Button from './button';
 
 interface participants {
   githubHandle: string;
@@ -142,7 +143,7 @@ export default function NewProposal({
   }
 
   function renderRecognizeAsFinished() {
-    return <button className="btn btn-md btn-primary" onClick={() => recognizeAsFinished()}>Recognize as finished</button>;
+    return <Button onClick={() => recognizeAsFinished()}>Recognize as finished</Button>;
   }
 
   useEffect(() => {
@@ -163,7 +164,7 @@ export default function NewProposal({
   return (
     <>
       {
-        isCouncil && isFinished && <button className="btn btn-md btn-primary mx-1" onClick={() => setShow(true)}>Create Proposal</button>
+        isCouncil && isFinished && <Button className="mx-1" onClick={() => setShow(true)}>Create Proposal</Button>
           || isIssueOwner && !isFinished && renderRecognizeAsFinished()
       }
 
@@ -171,15 +172,14 @@ export default function NewProposal({
              title="Create Proposal"
              footer={
                <>
-                 <button className="btn btn-md btn-opac" onClick={handleClose}>
+                 <Button color='dark-gray' onClick={handleClose}>
                    Cancel
-                 </button>
-                 <button
-                   className="btn btn-md btn-primary"
+                 </Button>
+                 <Button
                    onClick={handleClickCreate}
                    disabled={!currentAddress}>
                    Create Proposal
-                 </button>
+                 </Button>
                </>
              }>
         <p className="p-small text-50">Select a pull request </p>

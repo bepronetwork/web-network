@@ -11,6 +11,7 @@ import {CopyValue} from '@helpers/copy-value';
 import {ApplicationContext} from '@contexts/application';
 import {toastInfo} from '@reducers/add-toast';
 import { format } from 'date-fns';
+import Button from './button';
 
 export default function TransactionModal({ transaction = null, onCloseClick = () => {}}: { transaction: Transaction, onCloseClick: () => void }) {
   const {dispatch, state: {network}} = useContext(ApplicationContext);
@@ -78,8 +79,12 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
       <div className="d-flex justify-content-between align-items-center py-2 mb-3">
         <TransactionStats status={transaction?.status} />
         <div className="d-flex">
-          { hasTransactionId() && <a onClick={() => copyValue(getTransactionId())} className="btn btn-md circle-2 btn-opac p-0 mr-1 border border-dark-gray bg-shadow"><CopyIcon height={14} width={14} color="white"/></a> || ``}
-          <a href={getEtherScanHref(getTransactionId())} target="_blank" className="btn btn-md circle-2 btn-opac p-0 border border-dark-gray bg-shadow"><ArrowGoTo color="white"/></a>
+           {hasTransactionId() && 
+                <Button onClick={() => copyValue(getTransactionId())} className="border-dark-gray mr-1" transparent rounded><CopyIcon height={14} width={14} color="white"/></Button>
+          || ``}
+          <a href={getEtherScanHref(getTransactionId())} className='text-decoration-none' target="_blank">
+            <Button className="border-dark-gray mr-1" transparent rounded><ArrowGoTo color="white"/></Button>
+          </a>
         </div>
       </div>
       <div className="d-flex py-2 mb-1 smallCaption text-white bg-opacity-100 fs-smallest">

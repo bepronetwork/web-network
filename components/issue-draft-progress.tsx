@@ -1,6 +1,7 @@
 import { GetStaticProps } from "next";
 import React from "react";
 import { ProgressBar } from "react-bootstrap";
+import Button from "./button";
 
 export default function IssueDraftProgress({ amountUsed, amountTotal }) {
   return (
@@ -22,9 +23,9 @@ export default function IssueDraftProgress({ amountUsed, amountTotal }) {
                 </div>
               </div>
               <div className="col-md-3 justify-content-center">
-                <button className="btn btn-md btn-trans w-100">
+                <Button className="w-100" transparent>
                   View all addresses
-                </button>
+                </Button>
               </div>
             </div>
           </div>

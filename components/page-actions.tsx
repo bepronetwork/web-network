@@ -44,7 +44,6 @@ interface pageActions {
 
 export default function PageActions({
   issueId,
-  UrlGithub,
   developers,
   finalized,
   addressNetwork,
@@ -150,10 +149,10 @@ export default function PageActions({
 
   function renderProposeDestribution() {
     return (
-      !finalized &&
-      pullRequests?.length > 0 &&
-      githubLogin && (
-        <>
+      // !finalized &&
+      // pullRequests?.length > 0 &&
+      // githubLogin && (
+      //   <>
           <NewProposal
             issueId={issueId}
             isFinished={finished}
@@ -164,8 +163,8 @@ export default function PageActions({
             handleBeproService={handleBeproService}
             handleMicroService={handleMicroService}
           />
-        </>
-      )
+        // </>
+      // )
     );
   }
 
@@ -319,13 +318,6 @@ export default function PageActions({
             <div className="d-flex align-items-center">
               {renderIssueAvatars()}
               {forks && renderForkAvatars()}
-              {UrlGithub && (
-                <Link href={UrlGithub}>
-                  <a className="btn btn-md btn-opac mx-1" target="_blank">
-                    View on github
-                  </a>
-                </Link>
-              )}
               {viewGHButton()}
               {!isClosedIssue(state) && workButton()}
               {renderRedeem()}

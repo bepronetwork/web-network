@@ -8,6 +8,7 @@ import {BeproService} from '@services/bepro-service';
 import {updateTransaction} from '@reducers/update-transaction';
 import {useContext} from 'react';
 import {ApplicationContext} from '@contexts/application';
+import Button from './button';
 
 interface Options {
   proposal: Proposal,
@@ -62,9 +63,9 @@ export default function ProposalItem({proposal, issueId, amount, beproStaked, on
                                  value={+proposal.disputes}
                                  total={beproStaked}
                                  textClass={`pb-2 ${proposal.isDisputed ? `text-danger` : `color-purple`}`}/>
-          <button className={`align-self-center mb-2 ms-3 btn btn-md btn-${proposal.isDisputed ? `outline-danger` : `purple`}`} onClick={() => handleDispute(+proposal._id)}>
+          <Button color={proposal.isDisputed ? `danger` : `purple`} outline={proposal.isDisputed} className={`align-self-center mb-2 ms-3`} onClick={() => handleDispute(+proposal._id)}>
             {proposal.isDisputed ? `Failed` : `Dispute`}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

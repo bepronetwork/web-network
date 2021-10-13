@@ -95,7 +95,7 @@ function networkTxButton({
     return `d-flex flex-column align-items-center text-${txSuccess ? `success` : `danger`}`;
   }
 
-  const modalFooter = (<button className="btn btn-md btn-opac" onClick={() => setShowModal(false)}>Close</button>)
+  const modalFooter = (<Button color='dark-gray' onClick={() => setShowModal(false)}>Close</Button>)
 
   useEffect(checkForTxMethod, [beproInit, metaMaskWallet])
 

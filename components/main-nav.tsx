@@ -12,7 +12,6 @@ import { formatNumberToNScale, formatNumberToString } from 'helpers/formatNumber
 import NetworkIdentifier from '@components/network-identifier';
 import BeproLogo from '@assets/icons/bepro-logo';
 import HelpIcon from '@assets/icons/help-icon';
-import ButtonTrans from '@components/button-trans';
 import HelpModal from '@components/help-modal';
 import ExternalLinkIcon from '@assets/icons/external-link-icon';
 import TransactionsStateIndicator from '@components/transactions-state-indicator';

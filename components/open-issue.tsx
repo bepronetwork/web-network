@@ -1,25 +1,27 @@
 import { useState } from "react";
+import Button from "./button";
 import Modal from "./modal";
 
+// Review This component is not being used
 export default function OpenIssue(): JSX.Element {
   const [show, setShow] = useState<boolean>(false);
 
   return (
     <>
-      <button className="btn btn-md btn-primary" onClick={() => setShow(true)}>
+      <Button onClick={() => setShow(true)}>
         Open issue
-      </button>
+      </Button>
       <Modal
         show={show}
         title="Open issue"
         footer={
           <>
-            <button
-              className="btn btn-md btn-opac"
+            <Button
+              color="dark-gray"
               onClick={() => setShow(false)}>
               Cancel
-            </button>
-            <button className="btn btn-md btn-primary">Open Issue</button>
+            </Button>
+            <Button>Open Issue</Button>
           </>
         }>
         <p className="p-small text-white-50 text-center">Are you sure?</p>

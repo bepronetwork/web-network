@@ -1,6 +1,6 @@
 import Modal from '@components/modal';
 import {useEffect, useState} from 'react';
-import ButtonTrans from '@components/button-trans';
+import Button from './button';
 
 export default function CreatePullRequestModal({
                                                  show = false,
@@ -39,8 +39,8 @@ export default function CreatePullRequestModal({
           </div>
         </div>
         <div className="d-flex justify-content-center">
-          <ButtonTrans noAppend={true} className="btn btn-md btn-primary mr-2 text-uppercase" disabled={!title && !description} onClick={() => onConfirm({title, description})}>Create pull request</ButtonTrans>
-          <ButtonTrans opac={true}  onClick={onCloseClick}>cancel</ButtonTrans>
+          <Button className='mr-2' disabled={!title && !description} onClick={() => onConfirm({title, description})}>Create pull request</Button>
+          <Button color='dark-gray' onClick={onCloseClick}>cancel</Button>
         </div>
       </div>
     </Modal>
