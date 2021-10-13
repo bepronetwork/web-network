@@ -6,6 +6,7 @@ import TransactionIcon from '@assets/icons/transaction';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import TransactionModal from '@components/transaction-modal';
 import {Transaction} from '@interfaces/transaction';
+import Button from './button';
 
 export default function TransactionsStateIndicator() {
   const {state: {myTransactions}} = useContext(ApplicationContext);
@@ -42,9 +43,9 @@ export default function TransactionsStateIndicator() {
         rootClose={true}
         onToggle={(next) => setShowOverlay(next)}
         overlay={overlay}>
-        <button className={`btn btn-md circle-2 btn-${showOverlay ? `opac` : `trans`} p-0 me-3 me-3`} onClick={() => setShowOverlay(!showOverlay)}>
-          {loading && <span className="spinner-border spinner-border-sm"/> || <TransactionIcon color="bg-opac"/>}
-        </button>
+          <div>
+            <Button className='me-3 me-3' transparent rounded onClick={() => setShowOverlay(!showOverlay)}>{loading && <span className="spinner-border spinner-border-sm"/> || <TransactionIcon color="bg-opac"/>}</Button>
+          </div>
     </OverlayTrigger>
     <TransactionModal transaction={activeTransaction} onCloseClick={() => setActiveTransaction(null)}/>
     </span>

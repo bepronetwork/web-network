@@ -8,6 +8,7 @@ import GithubMicroService from '@services/github-microservice';
 import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';
 import NothingFound from '@components/nothing-found';
+import Button from '@components/button';
 
 export default function PageCouncil() {
   const {dispatch} = useContext(ApplicationContext);
@@ -39,9 +40,9 @@ export default function PageCouncil() {
               <NothingFound 
               description="No issues ready to propose">
                 <Link href="/create-issue" passHref>
-                  <button className="btn btn-md btn-primary">
+                  <Button>
                     create one
-                  </button>
+                  </Button>
                 </Link>
               </NothingFound>
             </div>

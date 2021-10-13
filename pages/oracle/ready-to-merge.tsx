@@ -8,6 +8,7 @@ import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';
 import {IssueData} from '@interfaces/issue-data';
 import NothingFound from '@components/nothing-found';
+import { Button } from 'react-bootstrap';
 
 export default function ReadyToMergeIssues() {
   const {dispatch} = useContext(ApplicationContext);
@@ -36,9 +37,9 @@ export default function ReadyToMergeIssues() {
           <NothingFound 
           description="No issues ready to merge">
           <Link href="/create-issue" passHref>
-            <button className="btn btn-md btn-primary">
+            <Button>
               create one
-            </button>
+            </Button>
           </Link>
         </NothingFound>
         </div>

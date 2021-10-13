@@ -15,12 +15,12 @@ import {truncateAddress} from '@helpers/truncate-address';
 import {BeproService} from '@services/bepro-service';
 import {changeWalletState} from '@reducers/change-wallet-connect';
 import {changeCurrentAddress} from '@reducers/change-current-address';
-import ConnectWalletButton from '@components/connect-wallet-button';
 import CheckMarkIcon from '@assets/icons/checkmark-icon';
 import LockIcon from '@assets/icons/lock';
 import ErrorMarkIcon from '@assets/icons/errormark-icon';
 import {changeNetwork} from '@reducers/change-network';
 import {NetworkIds} from '@interfaces/enums/network-ids';
+import Button from '@components/button';
 
 
 export default function ConnectAccount() {
@@ -176,18 +176,17 @@ export default function ConnectAccount() {
               By connecting, you accept <a href="https://www.bepro.network/terms-and-conditions" target="_blank" className="text-decoration-none">Terms & Conditions</a> & <a href="https://www.bepro.network/private-policy" target="_blank" className="text-decoration-none">PRIVACY POLICY</a>
             </div>
             <div className="d-flex justify-content-center mt-4">
-              <button className="btn btn-md p-3 btn-primary me-3 text-uppercase text-center
-              d-flex align-items-center justify-content-between"
-                      disabled={!isGhValid}
-                      onClick={joinAddressToGh}>
-                <span className="mr-1">{!isGhValid && <LockIcon/>}</span>
+              <Button 
+                className='me-3'
+                disabled={!isGhValid}
+                onClick={joinAddressToGh}>
+                {!isGhValid && <LockIcon  className="mr-1" width={14} height={14}/>}
                 DONE
-              </button>
-
-              <button className="btn btn-md p-3 btn-opac text-uppercase text-white"
+              </Button>
+              <Button color='dark-gray'
                       onClick={cancelAndSignOut}>
                 CANCEL
-              </button>
+              </Button>
 
             </div>
           </div>

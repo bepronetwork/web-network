@@ -7,6 +7,7 @@ import Account from '@components/account';
 import {ApplicationContext} from '@contexts/application';
 import {IssueData} from '@interfaces/issue-data';
 import NothingFound from '@components/nothing-found';
+import Button from '@components/button';
 import Paginate from '@components/paginate';
 import usePage from '@x-hooks/use-page';
 import useCount from '@x-hooks/use-count';
@@ -50,9 +51,9 @@ export default function MyIssues() {
         <NothingFound
           description="No issues">
           <Link href="/create-issue" passHref>
-            <button className="btn btn-md btn-primary">
+            <Button>
               create one
-            </button>
+            </Button>
           </Link>
         </NothingFound>
       </div>
