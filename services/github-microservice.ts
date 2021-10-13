@@ -52,8 +52,8 @@ export default class GithubMicroService {
                  });
   }
 
-  static async getIssues(page = '1', repoId = '') {
-    const search = new URLSearchParams({page, repoId});
+  static async getIssues(page = '1', repoId = '', time = ``, state = ``) {
+    const search = new URLSearchParams({page, repoId, time, state});
     const {data} = await client.get(`/issues/?${search.toString()}`);
     return data;
   }

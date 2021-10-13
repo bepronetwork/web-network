@@ -4,5 +4,7 @@ export interface IssueFilterBoxParams {
   title: string;
   options: IssueFilterBoxOption[];
   onChange?: (option: IssueFilterBoxOption, newValue: boolean) => void
-  type?: "radio" | "checkbox"
+  type?: "radio" | "checkbox";
+  className?: string;
+  filterPlaceholder?: string;
 }

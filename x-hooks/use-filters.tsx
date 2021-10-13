@@ -2,45 +2,65 @@ import {useEffect, useState} from 'react';
 import {IssueFilterBoxOption} from '@interfaces/filters';
 import GithubMicroService from '@services/github-microservice';
 import {RepoInfo} from '@interfaces/repos-list';
-import {subMonths, subWeeks, subYears} from 'date-fns';
+import {subHours, subMonths, subWeeks, subYears} from 'date-fns';
+import {useRouter} from 'next/router';
 
 type FilterStateUpdater = (opts: IssueFilterBoxOption[], opt: IssueFilterBoxOption, checked: boolean, type: ('time' | 'repo' | 'state'), multi?: boolean) => void;
 
 export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpdater] {
-
   const [stateFilters, setStateFilters] = useState<IssueFilterBoxOption[]>([]);
   const [timeFilters, setTimeFilters] = useState<IssueFilterBoxOption[]>([]);
   const [repoFilters, setRepoFilters] = useState<IssueFilterBoxOption[]>([]);
+
+  const router = useRouter()
+
+
+  function getActiveFiltersOf(opts: IssueFilterBoxOption[]) {
+    return opts.filter(({checked, label}) => checked && label !== `All`).map(({value}) => value).join(`,`);
+  }
+
+  function updateRouterQuery() {
+    const state = getActiveFiltersOf(stateFilters);
+    const time = getActiveFiltersOf(timeFilters);
+    const repoId = getActiveFiltersOf(repoFilters);
+
+    const query = {
+      ... state ? {state} : {},
+      ... time ? {time} : {},
+      ... repoId ? {repoId} : {},
+    }
+
+    router.push({pathname: './', query});
+  }
 
   function makeFilterOption(label, value, checked = false) {
     return {label, value, checked}
   }
 
-  const All = makeFilterOption(`All`, `all`, true);
-
   function loadRepos() {
 
     function mapRepo({id: value, githubPath: label,}: RepoInfo) {
-      return makeFilterOption(label, value);
+      return makeFilterOption(label, value, router.query?.repoId as string === label);
     }
 
     GithubMicroService.getReposList()
-                      .then(repos => [makeFilterOption(`All`, `allrepos`, true)].concat(repos.map(mapRepo)))
+                      .then(repos => [makeFilterOption(`All`, `allrepos`, !router.query?.repoId)].concat(repos.map(mapRepo)))
                       .then(setRepoFilters)
   }
 
   function loadFilters() {
+    const {time, state} = router.query || {};
     setStateFilters([
-                      makeFilterOption(`All`, `allstates`, true),
-                      makeFilterOption(`Open Issues`, `open`),
-                      makeFilterOption(`Draft Issues`, `draft`),
-                      makeFilterOption(`Closed Issues`, `closed`),])
+                      makeFilterOption(`All`, `allstates`, !state),
+                      makeFilterOption(`Open Issues`, `open`, state === `open`),
+                      makeFilterOption(`Draft Issues`, `draft`, state === `draft`),
+                      makeFilterOption(`Closed Issues`, `closed`, state === `closed`),])
 
     setTimeFilters([
-                     makeFilterOption(`All`, `alltime`, true),
-                     makeFilterOption(`Past Week`, +subWeeks(+new Date(), 1)),
-                     makeFilterOption(`Past Month`, +subMonths(+new Date(), 1)),
-                     makeFilterOption(`Past Year`, +subYears(+new Date(), 1)),])
+                     makeFilterOption(`All`, `alltime`, !time),
+                     makeFilterOption(`Past Week`, `week`, time === `week`),
+                     makeFilterOption(`Past Month`, `month`, time === `month`),
+                     makeFilterOption(`Past Year`, `year`, time === `year`),])
   }
 
   useEffect(loadFilters, [])
@@ -48,8 +68,6 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
 
   function updateOpt(opts: IssueFilterBoxOption[], opt: IssueFilterBoxOption, checked: boolean, type: `time` | `repo` | `state`, multi = false): void {
     const tmp: IssueFilterBoxOption[] = [...opts];
-
-    console.log(`Passing on ${type}`, opts, opt, checked);
 
     if (multi)
       tmp.find(o => o.value === opt.value).checked = checked;
@@ -60,6 +78,8 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
     else if (type === 'state')
       setStateFilters(tmp);
     else setRepoFilters(tmp);
+
+    updateRouterQuery()
   }
 
   return [[repoFilters, stateFilters, timeFilters,], updateOpt]
