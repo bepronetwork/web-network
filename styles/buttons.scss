@@ -18,11 +18,3 @@ $btn-font-size-lg: 1rem;
 $btn-border-radius: 1.25rem;
 $btn-border-radius-sm: $btn-border-radius;
 $btn-border-radius-lg: $btn-border-radius;
-
-.btn .btn-sm, .btn-lg {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: $white;
-  text-transform: uppercase;
-}
