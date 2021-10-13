@@ -1,4 +1,30 @@
+@import "variables";
+
 .filter-box {
+  width: 294px;
+
+  &.h-100 {
+    border-right: none!important;
+    border-top-right-radius: 0!important;
+    border-bottom-right-radius: 0!important;
+
+    .filter-content {
+      height: calc(100% - 30px);
+      &.filter-search {
+        height: calc(100% - 76px);
+      }
+    }
+  }
+
+  &:not(.h-100) {
+    border-top-left-radius: 0!important;
+    border-bottom-left-radius: 0!important;
+  }
+
+  .filter-header {
+    background-color: $bg;
+  }
+
   &:not(:last-child) {
     &,.filter-content {
       border-bottom-left-radius: 0!important;
@@ -13,4 +39,10 @@
     border-top-left-radius: 0!important;
     margin-top: -2px;
   }
+}
+
+.filter-wrapper {
+  z-index: 10000;
+  right: 0px;
+  top: 3rem;
 }
