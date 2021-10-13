@@ -58,8 +58,8 @@ export default class GithubMicroService {
     return data;
   }
 
-  static async getIssuesByGhId(ghId: string | string[]) {
-    return client.get(`/issues/github/${ghId}`).then(({data}) => data)
+  static async getIssuesByGhId(ghId: string | string[], repoId: string) {
+    return client.get(`/issues/github/${repoId}/${ghId}`).then(({data}) => data)
     .catch(e => {
       console.error(`Error fetchin issue`, e);
       return null;
