@@ -151,10 +151,10 @@ export default function PageActions({
 
   function renderProposeDestribution() {
     return (
-      // !finalized &&
-      // pullRequests?.length > 0 &&
-      // githubLogin && (
-      //   <>
+      !finalized &&
+      pullRequests?.length > 0 &&
+      githubLogin && (
+        <>
           <NewProposal
             issueId={issueId}
             isFinished={finished}
@@ -165,8 +165,8 @@ export default function PageActions({
             handleBeproService={handleBeproService}
             handleMicroService={handleMicroService}
           />
-        // </>
-      // )
+        </>
+      )
     );
   }
 
