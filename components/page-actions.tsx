@@ -10,13 +10,13 @@ import GithubMicroService from "@services/github-microservice";
 import { developer, IssueState, pullRequest } from "@interfaces/issue-data";
 import { changeBalance } from "@contexts/reducers/change-balance";
 import { addToast } from "@contexts/reducers/add-toast";
-import clsx from "clsx";
 import ExternalLinkIcon from "@assets/icons/external-link-icon";
 import { addTransaction } from "@reducers/add-transaction";
 import { TransactionTypes } from "@interfaces/enums/transaction-types";
 import { updateTransaction } from "@reducers/update-transaction";
 import CreatePullRequestModal from "@components/create-pull-request-modal";
 import { TransactionStatus } from "@interfaces/enums/transaction-status";
+import Button from "./button";
 
 interface pageActions {
   issueId: string;
@@ -137,13 +137,13 @@ export default function PageActions({
       isIssueinDraft === true &&
       addressNetwork === currentAddress &&
       !finalized && (
-        <button
-          className="btn btn-md btn-primary mx-1 px-4"
+        <Button
+          className="mx-1"
           disabled={isReedemButtonDisable()}
           onClick={handleRedeem}
         >
           Redeem
-        </button>
+        </Button>
       )
     );
   };
@@ -173,13 +173,13 @@ export default function PageActions({
     return (
       !finalized &&
       githubLogin && (
-        <button
-          className="btn btn-md btn-primary ms-1 px-4"
+        <Button
+          className="ms-1"
           onClick={() => setShowPRModal(true)}
           disabled={!githubHandle || !currentAddress || !canOpenPR}
         >
           Create Pull Request
-        </button>
+        </Button>
       )
     );
   }
@@ -191,15 +191,17 @@ export default function PageActions({
           githubId || ""
         }`}
         target="_blank"
-        className="btn btn-md mx-1 px-4 bg-shadow text-white-50"
+        className="text-decoration-none"
       >
-        VIEW ON GITHUB{" "}
-        <ExternalLinkIcon
-          className="ml-1"
-          height={11}
-          width={11}
-          color="text-white-50"
-        />
+        <Button color="dark-gray">
+          VIEW ON GITHUB{" "}
+          <ExternalLinkIcon
+            className="ml-1"
+            height={10}
+            width={10}
+            color="text-white-50"
+          />
+        </Button>
       </a>
     );
   }
@@ -207,17 +209,19 @@ export default function PageActions({
   function workButton() {
     return (
       <a
-        target="_blank"
         href="https://github.com/bepronetwork/webapp-community/fork"
-        className="btn btn-md mx-1 btn-primary px-4"
+        target="_blank"
+        className="text-decoration-none"
       >
-        WORK ON THIS ISSUE{" "}
-        <ExternalLinkIcon
-          className="ml-1"
-          height={11}
-          width={11}
-          color="text-white"
-        />
+        <Button className="mx-1">
+          WORK ON THIS ISSUE{" "}
+          <ExternalLinkIcon
+            className="ml-1"
+            height={10}
+            width={10}
+            color="text-white"
+          />
+        </Button>
       </a>
     );
   }
@@ -327,24 +331,21 @@ export default function PageActions({
               {renderRedeem()}
               {renderProposeDestribution()}
               {!isClosedIssue(state) && renderPullrequest()}
-              {state?.toLowerCase() === "pull request" && (
+              {state?.toLowerCase() == "pull request" && (
                 <>
-                  <button
-                    className={clsx("btn btn-md  px-4", {
-                      "btn-purple": !isDisputed,
-                      "btn-primary": isDisputed,
-                    })}
+                  <Button
+                    color={`${isDisputed ? 'primary': 'purple'}`}
                     onClick={handleDispute}
                   >
                     Dispute
-                  </button>
+                  </Button>
 
-                  <button
-                    className="btn btn-md btn-primary mx-3 px-4"
+                  <Button
+                    className="mx-3"
                     onClick={handleClose}
                   >
                     Close
-                  </button>
+                  </Button>
                 </>
               )}
             </div>
