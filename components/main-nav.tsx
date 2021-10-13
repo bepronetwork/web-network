@@ -17,6 +17,7 @@ import HelpModal from '@components/help-modal';
 import ExternalLinkIcon from '@assets/icons/external-link-icon';
 import TransactionsStateIndicator from '@components/transactions-state-indicator';
 import WrongNetworkModal from '@components/wrong-network-modal';
+import Button from './button';
 
 export default function MainNav() {
   const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
@@ -105,12 +106,13 @@ export default function MainNav() {
         </ul>
       </div>
       <div className="d-flex flex-row align-items-center">
-        <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" target="_blank" className="btn btn-md btn-trans mr-1 text-decoration-none">GET STARTED <ExternalLinkIcon className="ml-1" height={11} width={11} color="text-white"/></a>
-        <Link href="/create-issue" passHref>
-          <button className="btn btn-md btn-trans mr-1">+ Create issue</button>
+        <Link href="https://support.bepro.network/en/articles/5595864-using-the-testnet" passHref>
+          <Button transparent className='text-uppercase'>Get Started<ExternalLinkIcon className="ml-1" height={10} width={10} color="text-white"/></Button>
         </Link>
-
-        <ButtonTrans onClick={() => setShowHelp(true)} className="ms-2 me-3" rounded={true}><HelpIcon /></ButtonTrans>
+        <Link href="/create-issue" passHref>
+          <Button transparent className='text-uppercase'>+ Create issue</Button>
+        </Link>
+        <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 text-uppercase" transparent rounded><HelpIcon /></Button>
         <WrongNetworkModal requiredNetwork="kovan" />
 
         <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
@@ -121,10 +123,10 @@ export default function MainNav() {
             <NetworkIdentifier />
 
             <Link href="/account" passHref>
-              <a className="btn btn-md btn-trans mr-1">
+              <Button className='mr-1' transparent>
                 <i className="ico-bepro mr-1"></i>
                 {formatNumberToNScale(beproBalance)}
-              </a>
+              </Button>
             </Link>
             <Link href="/account" passHref>
               <a className="meta-info d-flex align-items-center">
