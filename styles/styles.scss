@@ -2,8 +2,11 @@
 @import 'variables';
 @import 'toasts';
 @import 'vendor';
+
+@import "filter-box";
 @import "x-pagination";
 @import "x-modals";
+@import "x-form-check";
 
 //bootstrap-overrides
 ul,

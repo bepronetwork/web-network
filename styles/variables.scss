@@ -89,6 +89,13 @@ $pagination-hover-color:            $white;
 $pagination-focus-bg:               $bg;
 $pagination-focus-outline:          $bg;
 
+$form-check-input-bg:                   $bg-shadow;
+$form-check-input-border:               1px solid $gray;
+$form-check-input-focus-border:         $primary;
+$form-check-input-checked-bg-color:     $primary;
+$form-check-input-checked-border-color: $primary;
+
+
 $utilities: map-merge(
   $utilities, (
                 'shadow': map-merge(map-get($utilities, 'shadow'), (state: hover)),

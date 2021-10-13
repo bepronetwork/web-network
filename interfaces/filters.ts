@@ -1,0 +1,8 @@
+export interface IssueFilterBoxOption { label: string; value: any; checked: boolean }
+
+export interface IssueFilterBoxParams {
+  title: string;
+  options: IssueFilterBoxOption[];
+  onChange?: (option: IssueFilterBoxOption, newValue: boolean) => void
+  type?: "radio" | "checkbox"
+}
