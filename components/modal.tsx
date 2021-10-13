@@ -5,17 +5,28 @@ import CloseIcon from '@assets/icons/close-icon';
 import Button from './button';
 
 export default function Modal({
-                                title = '',
+                                title = '', centerTitle = false,
                                 key,
                                 children = null,
                                 footer = null,
                                 onCloseClick,
                                 backdrop = `static`,
                                 titlePosition = `start`,
-                                titleClass,
+                                titleClass, okLabel = ``, cancelLabel = ``, onOkClick = () => {},
                                 ...params
                               }: ModalProps): JSX.Element {
   const modalTitle = `${kebabCase(key || title)}-modal`;
+
+  function renderFooter() {
+    if (footer)
+      return footer;
+    if (okLabel || cancelLabel)
+      return <div className="mb-3">
+        {okLabel && <button className="btn btn-primary mr-2" onClick={() => onOkClick()}>{okLabel}</button>}
+        {cancelLabel && <button className="btn btn-secondary" onClick={() => onCloseClick()}>{cancelLabel}</button>}
+        </div>
+    return <></>
+  }
 
   return (
     <ModalBootstrap centered
@@ -28,11 +39,13 @@ export default function Modal({
                     backdrop={backdrop}
                     {...params}>
       <ModalBootstrap.Header className={`relative d-flex w-100 justify-content-${titlePosition} `}>
-        <ModalBootstrap.Title className={`${titleClass}`}>{title}</ModalBootstrap.Title>
+        <ModalBootstrap.Title className={`text-white ${titleClass || ``} ${centerTitle ? `text-center w-100` : ``}`}>
+          <span className={centerTitle && `h3`}>{title}</span>
+        </ModalBootstrap.Title>
         {onCloseClick && <Button transparent className="p-1 position-absolute end-90" onClick={onCloseClick}><CloseIcon /></Button>}
       </ModalBootstrap.Header>
       <ModalBootstrap.Body>{children}</ModalBootstrap.Body>
-      <ModalBootstrap.Footer>{footer && footer || ``}</ModalBootstrap.Footer>
+      <ModalBootstrap.Footer>{renderFooter()}</ModalBootstrap.Footer>
     </ModalBootstrap>
   );
 }
