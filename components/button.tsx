@@ -7,9 +7,9 @@ interface IButtonProps extends  ButtonHTMLAttributes<HTMLButtonElement>{
   rounded?: boolean;
 }
 const Button: React.FC<IButtonProps> = ({children, color = "primary", outline, transparent, rounded, className = ``,...rest}) => {
-  const getClass = (): string =>{
-    let type = `btn-${outline? `outline-${color}`: color}`
-    let textColor = !outline && color !== 'white'&& 'text-white bg-opacity-100'
+  function getClass(): string {
+    const type = `btn-${outline? `outline-${color}`: color}`
+    const textColor = !outline && color !== 'white'&& 'text-white bg-opacity-100'
     let append = className;
     
     if(transparent)
