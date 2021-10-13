@@ -1,0 +1,16 @@
+@import "variables";
+
+.form-check {
+  [type=radio],[type=radio] {
+    &:hover {
+      border-color: $primary;
+      cursor: pointer;
+    }
+
+    &:checked + label {
+      font-weight: bold;
+      color: $primary;
+    }
+    + label { cursor: pointer }
+  }
+}

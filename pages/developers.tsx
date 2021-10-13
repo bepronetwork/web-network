@@ -14,6 +14,8 @@ import Paginate from '@components/paginate';
 import usePage from '@x-hooks/use-page';
 import useCount from '@x-hooks/use-count';
 import {useRouter} from 'next/router';
+import IssueFilterBox from '@components/issue-filter-box';
+import useFilters from '@x-hooks/use-filters';
 
 type Filter = {
   label: string;
@@ -57,6 +59,9 @@ export default function PageDevelopers() {
   const {dispatch, state: {loading, currentAddress}} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
   const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
+  const [[repoOptions, stateOptions, timeOptions], updateOptions] = useFilters();
+
+
   const page = usePage();
   const results = useCount();
   const router = useRouter();
@@ -107,6 +112,11 @@ export default function PageDevelopers() {
         <div className="row justify-content-center">
           <div className="col-md-10">
             <div className="d-flex justify-content-between mb-4">
+              <div className="col-md-3">
+                <IssueFilterBox title="timeframe" options={timeOptions} onChange={(opt, checked) => updateOptions(timeOptions, opt, checked, 'time')} />
+                <IssueFilterBox title="issue state" options={stateOptions} onChange={(opt, checked) => updateOptions(stateOptions, opt, checked, 'state')} />
+                <IssueFilterBox title="repository" options={repoOptions} onChange={(opt, checked) => updateOptions(repoOptions, opt, checked, 'repo')} />
+              </div>
               <div className="col-md-3">
                 <ReactSelect
                   id="filterByIssueState"
