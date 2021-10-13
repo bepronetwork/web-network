@@ -7,6 +7,7 @@ import Account from '@components/account';
 import {ApplicationContext} from '@contexts/application';
 import {IssueData} from '@interfaces/issue-data';
 import NothingFound from '@components/nothing-found';
+import Button from '@components/button';
 
 export default function MyIssues() {
 
@@ -39,9 +40,9 @@ export default function MyIssues() {
         <NothingFound
           description="No issues">
           <Link href="/create-issue" passHref>
-            <button className="btn btn-md btn-primary">
+            <Button>
               create one
-            </button>
+            </Button>
           </Link>
         </NothingFound>
       </div>

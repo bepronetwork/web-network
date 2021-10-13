@@ -8,6 +8,7 @@ import {changeLoadState} from '@reducers/change-load-state';
 import {ApplicationContext} from '@contexts/application';
 import {IssueData} from '@interfaces/issue-data';
 import NothingFound from '@components/nothing-found';
+import Button from '@components/button';
 
 export default function Newissues() {
   const {dispatch} = useContext(ApplicationContext);
@@ -36,9 +37,9 @@ export default function Newissues() {
           <NothingFound 
           description="No issues in draft">
           <Link href="/create-issue" passHref>
-            <button className="btn btn-md btn-primary">
+            <Button>
               create one
-            </button>
+            </Button>
           </Link>
         </NothingFound>
         </div>
