@@ -21,7 +21,7 @@ const Button: React.FC<IButtonProps> = ({children, color = "primary", outline, t
     if(outline)
       append += ` bg-opac-hover-25`
     
-    return `btn ${type} ${textColor} d-flex align-items-center justify-content-center shadow-none ${append}`
+    return `btn ${type} ${textColor} d-flex align-items-center justify-content-center text-uppercase shadow-none ${append}`
   }
   return <>
     <button className={getClass()} {...rest}>{children}</button>

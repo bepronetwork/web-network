@@ -12,12 +12,12 @@ import {addTransaction} from '@reducers/add-transaction';
 import {toastError, toastSuccess} from '@contexts/reducers/add-toast'
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
-import {BlockTransaction,} from '@interfaces/transaction';
 import {formatNumberToCurrency} from '@helpers/formatNumber'
 import { TransactionStatus } from '@interfaces/enums/transaction-status';
 import LockIcon from '@assets/icons/lock';
-import {ReposList} from '@interfaces/repos-list';
 import ReposDropdown from '@components/repos-dropdown';
+import Button from '@components/button';
+
 interface Amount {
   value?: string,
   formattedValue: string,
@@ -236,12 +236,12 @@ export default function PageCreateIssue() {
                 ) : (
                   <>
                     {!allowedTransaction ?
-                      <button className="btn btn-md p-3 btn-primary me-3" disabled={isApproveButtonDisable()} onClick={allowCreateIssue}>Approve</button>
+                      <Button className="me-3" disabled={isApproveButtonDisable()} onClick={allowCreateIssue}>Approve</Button>
                       : null
                     }
-                    <button className="btn btn-md p-3 btn-primary" disabled={isCreateButtonDisabled()}
-                            onClick={createIssue}><span className="mr-1">{isCreateButtonDisabled() && <LockIcon width={12} height={14}/>}</span> Create Issue
-                    </button>
+                    <Button disabled={isCreateButtonDisabled()}
+                            onClick={createIssue}>{isCreateButtonDisabled() && <LockIcon className="mr-1" width={13} height={13}/>}Create Issue
+                    </Button>
                   </>
                 )}
               </div>

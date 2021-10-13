@@ -107,10 +107,10 @@ export default function MainNav() {
       </div>
       <div className="d-flex flex-row align-items-center">
         <Link href="https://support.bepro.network/en/articles/5595864-using-the-testnet" passHref>
-          <Button transparent className='text-uppercase'>Get Started<ExternalLinkIcon className="ml-1" height={10} width={10} color="text-white"/></Button>
+          <Button transparent>Get Started<ExternalLinkIcon className="ml-1" height={10} width={10} color="text-white"/></Button>
         </Link>
         <Link href="/create-issue" passHref>
-          <Button transparent className='text-uppercase'>+ Create issue</Button>
+          <Button transparent>+ Create issue</Button>
         </Link>
         <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 text-uppercase" transparent rounded><HelpIcon /></Button>
         <WrongNetworkModal requiredNetwork="kovan" />

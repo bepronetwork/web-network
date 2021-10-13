@@ -6,6 +6,7 @@ import {ApplicationContext} from '@contexts/application';
 import {addTransaction} from '@reducers/add-transaction';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
+import Button from './button';
 
 interface Props extends ComponentPropsWithoutRef<"div"> {
   amount: string;
@@ -57,9 +58,9 @@ export default function OraclesTakeBackItem({
             <p className="smallCaption text-white mb-0">{address}</p>
           </div>
           <div className="col-md-6 d-flex justify-content-end">
-            <button className="btn btn-md btn-trans border-purple text-purple" onClick={handleShow}>
+            <Button color='purple' outline onClick={handleShow}>
               Take Back
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -69,12 +70,12 @@ export default function OraclesTakeBackItem({
         onCloseClick={handleCancel}
         footer={
           <>
-            <button className="btn btn-md btn-opac" onClick={handleCancel}>
+            <Button color='dark-gray' onClick={handleCancel}>
               Cancel
-            </button>
-            <button className="btn btn-md btn-primary" onClick={handleTakeBack}>
+            </Button>
+            <Button onClick={handleTakeBack}>
               Confirm
-            </button>
+            </Button>
           </>
         }>
         <p className="text-center fs-4">

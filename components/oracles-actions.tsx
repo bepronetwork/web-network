@@ -5,11 +5,7 @@ import OraclesBoxHeader from './oracles-box-header';
 import Modal from './modal';
 import {ApplicationContext} from '@contexts/application';
 import {BeproService} from '@services/bepro-service';
-import {changeLoadState} from '@reducers/change-load-state';
-import ApproveButton from './approve-button';
-import TransferOraclesButton from './transfer-oracles-button';
 import NetworkTxButton from './network-tx-button';
-import {changeBalance} from '@reducers/change-balance';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import { TransactionStatus } from '@interfaces/enums/transaction-status'
 import {TransactionCurrency} from '@interfaces/transaction';
@@ -17,6 +13,8 @@ import {addTransaction} from '@reducers/add-transaction';
 import {updateTransaction} from '@reducers/update-transaction';
 import {formatNumberToCurrency} from 'helpers/formatNumber'
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
+import Button from './button';
+import LockIcon from "@assets/icons/lock"
 
 const actions: string[] = ["Lock", "Unlock"];
 
@@ -216,8 +214,14 @@ function OraclesActions(): JSX.Element {
             />
 
           <div className="mt-5">
-            <ApproveButton disabled={isApproveButtonDisabled()} onClick={approveSettlerToken} />
-            {isApproved && <TransferOraclesButton action={action} buttonLabel={renderInfo.label} disabled={isButtonDisabled()} onClick={checkLockedAmount} />}
+            
+            <Button className='w-100 mb-3' disabled={isApproveButtonDisabled()} onClick={approveSettlerToken}>Approve</Button>
+            {isApproved && 
+            <Button color={action === 'Lock' ? 'purple' : 'primary'} className="w-100" disabled={isButtonDisabled()} 
+              onClick={checkLockedAmount}>
+                  {isButtonDisabled() && <LockIcon width={12} height={12} className="mr-1"/>}
+                  {renderInfo.label}
+            </Button>}
           </div>
 
           <NetworkTxButton
@@ -243,12 +247,12 @@ function OraclesActions(): JSX.Element {
         show={show}
         footer={
           <>
-            <button className="btn btn-md btn-opac" onClick={handleCancel}>
+            <Button color='dark-gray' onClick={handleCancel}>
               Cancel
-            </button>
-            <button className="btn btn-md btn-primary" onClick={handleConfirm}>
+            </Button>
+            <Button onClick={handleConfirm}>
               Confirm
-            </button>
+            </Button>
           </>
         }>
         <p className="p-small text-white-50 text-center">
