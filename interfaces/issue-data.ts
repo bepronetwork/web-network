@@ -19,6 +19,7 @@ export interface IssueData {
   pullRequests: pullRequest[];
   owner?: string;
   repo?: string;
+  repository_id?: number;
 }
 
 export interface pullRequest {

@@ -24,7 +24,9 @@
       "@services/*": ["services/*"],
       "@interfaces/*": ["interfaces/*"],
       "@contexts/*": ["contexts/*"],
-      "@reducers/*": ["contexts/reducers/*"]
+      "@reducers/*": ["contexts/reducers/*"],
+      "@styles/*": ["styles/*"],
+      "@x-hooks/*": ["x-hooks/*"]
     }
   },
   "exclude": ["node_modules"],

@@ -133,7 +133,7 @@ export default function PageProposal() {
         developers={[]}
         finalized={isFinalized}
         isIssueinDraft={issueMicroService?.state === `draft`}
-        addressNetwork={networkCid}
+        networkCID={networkCid}
         issueId={issueId?.toString()}
         mergeId={(+id - 1).toString()}
         handleBeproService={getProposal}
