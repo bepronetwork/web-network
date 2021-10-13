@@ -3,6 +3,7 @@
 @import 'toasts';
 @import 'vendor';
 @import "x-pagination";
+@import "x-modals";
 
 //bootstrap-overrides
 ul,
@@ -962,4 +963,8 @@ $c_props: ('m': 'margin') !default;
       background-color: $dark-gray;
     }
   }
+}
+
+.rounded-4 {
+  border-radius: .5rem;
 }

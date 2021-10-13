@@ -58,7 +58,7 @@ export default function PageDevelopers() {
   const [issues, setIssues] = useState<IssueData[]>([]);
   const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
   const page = usePage();
-  const pages = useCount();
+  const results = useCount();
   const router = useRouter();
   const {repoId} = router.query;
 
@@ -74,7 +74,7 @@ export default function PageDevelopers() {
     dispatch(changeLoadState(true))
     GithubMicroService.getIssues(page, repoId as string)
                       .then(({rows, count}) => {
-                        pages.setCount(count);
+                        results.setCount(count);
                         return rows;
                       })
                       .then(updateIssuesList)
@@ -120,7 +120,7 @@ export default function PageDevelopers() {
             </div>
           </div>
           <ListIssues listIssues={issuesFilteredByState} />
-          <Paginate count={pages.count} onChange={(page) => router.push({pathname: `/`, query:{page}})} />
+          <Paginate count={results.count} onChange={(page) => router.push({pathname: `/`, query:{page}})} />
           {issuesFilteredByState.length === 0 && !loading.isLoading ? (
             <div className="col-md-10">
               <NothingFound

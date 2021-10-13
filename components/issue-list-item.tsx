@@ -9,7 +9,7 @@ import { formatNumberToNScale } from "@helpers/formatNumber";
 import Avatar from "components/avatar";
 import GithubInfo from '@components/github-info';
 
-export default function IssueListItem({ issue = null }: { issue?: IssueData }) {
+export default function IssueListItem({ issue = null, xClick }: { issue?: IssueData, xClick?: () => void; }) {
   const router = useRouter();
 
   function handleColorState(state: IssueState) {
@@ -53,6 +53,9 @@ export default function IssueListItem({ issue = null }: { issue?: IssueData }) {
     <div
       className="bg-shadow list-item rounded p-4 mb-3"
       onClick={() => {
+        if (xClick)
+          return xClick();
+
         router.push({
           pathname: "/issue",
           query: { id: issue?.githubId },
@@ -88,7 +91,7 @@ export default function IssueListItem({ issue = null }: { issue?: IssueData }) {
             <span className="p-small trans mr-2 mt-1">
               <GithubInfo color="gray" value={[`@`, issue?.creatorGithub].join(``)} />
             </span>
-            <Avatar className="mr-2" userLogin={issue.creatorGithub} />
+            <Avatar className="mr-2" userLogin={issue?.creatorGithub} />
             {issue?.dueDate && (
               <span className="p-small text-warning mr-2 mt-1">
                 {issue?.dueDate}
@@ -101,9 +104,9 @@ export default function IssueListItem({ issue = null }: { issue?: IssueData }) {
             {formatNumberToNScale(issue?.amount || 0)}{" "}
             <label className="text-uppercase text-blue">$BEPRO</label>
           </span>
-          {issue?.developers.length > 0 && (
+          {issue?.developers?.length > 0 && (
             <IssueAvatars users={issue?.developers}></IssueAvatars>
-          )}
+          ) || ``}
         </div>
       </div>
     </div>
