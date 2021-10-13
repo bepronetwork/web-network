@@ -153,7 +153,7 @@ export default function ParityPage() {
                                                   .then(txInfo => {
                                                     BeproService.parseTransaction(txInfo, openIssueTx.payload)
                                                                 .then(block => dispatch(updateTransaction(block)))
-                                                    return {githubId: cid, issueId: txInfo.events?.OpenIssue?.returnValues?.id};
+                                                    return {githubId: cid, issueId: txInfo.events?.OpenIssue?.returnValues?.id && [repository_id, cid].join(`/`)};
                                                   })
                              })
                              .then(({githubId, issueId}) => {
