@@ -17,10 +17,8 @@ interface NetworkIssue {
 
 export default function PageIssue() {
   const router = useRouter();
-  const {id} = router.query;
-  const {
-    state: {githubHandle, currentAddress},
-  } = useContext(ApplicationContext);
+  const {id, repoId} = router.query;
+  const {state: {githubHandle, currentAddress},} = useContext(ApplicationContext);
 
   const [issue, setIssue] = useState<IssueData>();
   const [networkIssue, setNetworkIssue] = useState<any>();
@@ -32,7 +30,7 @@ export default function PageIssue() {
   const [currentUser, setCurrentUser] = useState<User>();
 
   const getsIssueMicroService = () => {
-    GithubMicroService.getIssuesByGhId(id)
+    GithubMicroService.getIssuesByGhId(id, repoId as string)
                       .then((issue) => {
                         if (!issue)
                           return;
@@ -80,9 +78,7 @@ export default function PageIssue() {
 
   const getNetworkIssue = () => {
     BeproService.network
-                .getIssueById({
-                                issueId: id,
-                              })
+                .getIssueByCID({issueCID: [repoId, id].join(`/`),})
                 .then((networkIssue) => {
                   setNetworkIssue(networkIssue)
                 });
@@ -124,7 +120,7 @@ export default function PageIssue() {
         forks={forks}
         githubLogin={currentUser?.githubLogin}
         canOpenPR={canOpenPR}
-        issueCreator={issue.creatorAddress}
+        issueCreator={issue?.creatorAddress}
         githubId={issue?.githubId} finished={networkIssue?.recognizedAsFinished}/>
       {networkIssue?.mergeProposalsAmount > 0 && (
         <IssueProposals

@@ -58,7 +58,7 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
 
         router.push({
           pathname: "/issue",
-          query: { id: issue?.githubId },
+          query: { id: issue?.githubId, repoId: issue?.repository_id },
         });
       }}
     >
