@@ -6,7 +6,7 @@ import FilterIcon from '@assets/icons/filter-icon';
 
 export default function IssueFilters() {
   const node = useRef()
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false);
   const [[repoOptions, stateOptions, timeOptions], updateOptions] = useFilters();
 
   function handleClick(e) {

@@ -101,7 +101,7 @@ export default function PageCreateIssue() {
                                                          .then(block => dispatch(updateTransaction(block)))
                                              return {
                                                githubId: cid,
-                                               issueId: txInfo.events?.OpenIssue?.returnValues?.id
+                                               issueId: txInfo.events?.OpenIssue?.returnValues?.id && [repository_id, cid].join(`/`)
                                              };
                                            })
                       })
