@@ -1,22 +1,24 @@
-@import "~bootstrap/scss/functions";
-@import "~bootstrap/scss/variables";
-@import "~bootstrap/scss/utilities";
-
 $white: #fff;
 $black: #000;
+
+//Brand Colors
+$primary: #4250E4;
+$secondary: #FD8B2A;
+
+//Buttons, Label and States
+$info: #87C7EC;
+$purple: #9669ed;
+$success: #35e0ad;
+$danger: #eb5757;
+$warning: #EE9240;
+$light-warning: #FFD646;
+//Specials
 $dark-gray: #20222b;
 $gray: #c4c7d3;
 $ligth-gray: #434758;
 $blue: #4250e4;
-$primary: $blue;
 $blue-dark: #3b49e0;
-$purple: #9669ed;
-$secondary: $purple;
-$success: #35e0ad;
-$danger: #eb5757;
-$warning: #fd8b2a;
-$orange: #EE9240;
-$info: #87C7EC;
+// Fix-ME: Remove disabled color
 $disabled:#423B51;
 
 $bg: #0d0f19;
@@ -25,6 +27,13 @@ $bg-shadow: #151720;
 $bg-blue-shadow: #1825AD;
 $toast-font-size: 1rem;
 $m: 16px;
+
+// NOTE Attention, the variables colors change need be before boostrap imports or not work.
+// to check see on console `@debug $theme-colors;`
+
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/utilities";
 
 $more-bg: (
         'white-50': $gray,
@@ -43,27 +52,29 @@ $more-colors: ('blue-dark': $blue-dark, 'dark-gray': $dark-gray, 'ligth-gray': $
 
 $theme-colors: map-merge($theme-colors, map-merge($more-bg, $more-colors));
 
-//butons
+//buttons
 $btn-font-family: 'fontRegular', sans-serif;
 $btn-font-weight: 600;
 $btn-line-height: 71%;
 
-$btn-padding-y: 8px;
-$btn-padding-y-sm: $btn-padding-y/2;
-$btn-padding-y-lg: $btn-padding-y*2;
+$btn-padding-y: 0.75rem;
+$btn-padding-y-sm: 0.625rem;
+$btn-padding-y-lg: 0.875rem;
 
-$btn-padding-x: 20px;
+$btn-padding-x: 1.25rem;
 $btn-padding-x-sm: $btn-padding-x;
 $btn-padding-x-lg: $btn-padding-x;
 
-$btn-font-size: 12px;
-$btn-font-size-sm: $btn-font-size;
-$btn-font-size-lg: $btn-font-size;
+$btn-font-size: 0.75rem;
+$btn-font-size-sm: 0.5rem;
+$btn-font-size-lg: 1rem;
 
-$btn-border-radius: 20px;
+$btn-border-radius: 1.25rem;
 $btn-border-radius-sm: $btn-border-radius;
 $btn-border-radius-lg: $btn-border-radius;
 
+
+//pagination
 $pagination-color:                  $gray;
 $pagination-bg:                     $bg;
 $pagination-border-color:           $bg;

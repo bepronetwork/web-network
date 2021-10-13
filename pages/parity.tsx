@@ -15,6 +15,7 @@ import {SETTLER_ADDRESS, TRANSACTION_ADDRESS} from '../env';
 import {ReposList} from '@interfaces/repos-list';
 import {Dropdown, ListGroup} from 'react-bootstrap';
 import ConnectGithub from '@components/connect-github';
+import Button from '@components/button';
 
 export default function ParityPage() {
   const {state: {currentAddress, balance,}, dispatch} = useContext(ApplicationContext);
@@ -367,9 +368,9 @@ export default function ParityPage() {
 
         <div className="row">
           <div className="col d-flex justify-content-end align-items-center">
-            <button className="btn btn-md me-2 btn-primary" onClick={() => deployNewContract()}>Deploy contract</button>
-            <button className="btn btn-md btn-primary me-2" disabled={!councilAmount} onClick={() => updateCouncilAmount()}>Update council amount</button>
-            <button className="btn btn-md btn-primary" disabled={!settlerTokenName || !settlerTokenSymbol} onClick={() => deploySettlerToken()}>Deploy settler token</button>
+            <Button className="me-2" onClick={() => deployNewContract()}>Deploy contract</Button>
+            <Button className="me-2" disabled={!councilAmount} onClick={() => updateCouncilAmount()}>Update council amount</Button>
+            <Button disabled={!settlerTokenName || !settlerTokenSymbol} onClick={() => deploySettlerToken()}>Deploy settler token</Button>
 
           </div>
         </div>
@@ -393,9 +394,9 @@ export default function ParityPage() {
         <div className="row mt-3">
           <div className="col d-flex justify-content-end">
             {issuesList.length && <span className="fs-small me-2">Will cost <span className={getCostClass()}>{formatNumberToString(getSumOfTokenAmount())} BEPRO </span> / {formatNumberToString(balance.bepro)} BEPRO</span> || ``}
-            {issuesList.length && <button className="btn btn-md btn-outline-primary mr-2" onClick={() => createIssuesFromList()}>Create Issues</button> || ``}
-            { githubToken && reposList.length && <button className="btn btn-md btn-primary mr-2" disabled={isValidForm()} onClick={() => listIssues()}>List issues</button> || `` }
-            { githubToken && !availReposList.length && <button className="btn btn-md btn-primary" onClick={getSelfRepos}>load repos</button> || `` }
+            {issuesList.length && <Button className="mr-2" outline onClick={() => createIssuesFromList()}>Create Issues</Button> || ``}
+            { githubToken && reposList.length && <Button className="mr-2" disabled={isValidForm()} onClick={() => listIssues()}>List issues</Button> || `` }
+            { githubToken && !availReposList.length && <Button onClick={getSelfRepos}>load repos</Button> || `` }
           </div>
         </div>
       </div>
