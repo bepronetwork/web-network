@@ -9,6 +9,7 @@ import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {TransactionCurrency} from '@interfaces/transaction';
 import {updateTransaction} from '@reducers/update-transaction';
 import LockIcon from '@assets/icons/lock';
+import Button from './button';
 
 interface NetworkTxButtonParams {
   txMethod: string;
@@ -87,7 +88,7 @@ function networkTxButton({
   }
 
   function getButtonClass() {
-    return `btn btn-md btn-lg mt-3 btn-purple ${fullWidth ? `w-100` : ``} ${!children && !buttonLabel && `visually-hidden` || ``} ${disabled && `bg-disabled border-0`}`
+    return `mt-3 ${fullWidth ? `w-100` : ``} ${!children && !buttonLabel && `visually-hidden` || ``}`
   }
 
   function getDivClass() {
@@ -99,9 +100,11 @@ function networkTxButton({
   useEffect(checkForTxMethod, [beproInit, metaMaskWallet])
 
   return (<>
-    <button ref={elementRef} className={getButtonClass()} onClick={makeTx} disabled={disabled}>
-    {disabled && <LockIcon width={12} height={14} className="mr-1"/>} {buttonLabel}
-    </button>
+    <button className='d-none' ref={elementRef} onClick={makeTx} disabled={disabled}/>
+
+    <Button color='purple' className={getButtonClass()} onClick={makeTx} disabled={disabled}>
+      {disabled && <LockIcon width={12} height={12} className="mr-1"/>} {buttonLabel}
+    </Button>
 
     <Modal show={showModal} title={modalTitle} footer={modalFooter}>
       <p className="p-small text-white-50 text-center">{modalDescription}</p>

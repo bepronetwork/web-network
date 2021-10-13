@@ -10,6 +10,7 @@ import {changeLoadState} from '@reducers/change-load-state';
 import {IssueData} from '@interfaces/issue-data';
 import {BeproService} from '@services/bepro-service';
 import NothingFound from '@components/nothing-found';
+import Button from '@components/button';
 
 type Filter = {
   label: string;
@@ -114,9 +115,9 @@ export default function PageDevelopers() {
               <NothingFound
                 description={filterByState.emptyState}>
                 <Link href="/create-issue" passHref>
-                  <button className="btn btn-md btn-primary">
+                  <Button>
                     create one
-                  </button>
+                  </Button>
                 </Link>
               </NothingFound>
             </div>
