@@ -1,22 +1,24 @@
-@import "~bootstrap/scss/functions";
-@import "~bootstrap/scss/variables";
-@import "~bootstrap/scss/utilities";
-
 $white: #fff;
 $black: #000;
+
+//Brand Colors
+$primary: #4250E4;
+$secondary: #FD8B2A;
+
+//Buttons, Label and States
+$info: #87C7EC;
+$purple: #9669ed;
+$success: #35e0ad;
+$danger: #eb5757;
+$warning: #EE9240;
+$light-warning: #FFD646;
+//Specials
 $dark-gray: #20222b;
 $gray: #c4c7d3;
 $ligth-gray: #434758;
 $blue: #4250e4;
-$primary: $blue;
 $blue-dark: #3b49e0;
-$purple: #9669ed;
-$secondary: $purple;
-$success: #35e0ad;
-$danger: #eb5757;
-$warning: #fd8b2a;
-$orange: #EE9240;
-$info: #87C7EC;
+// Fix-ME: Remove disabled color
 $disabled:#423B51;
 
 $bg: #0d0f19;
@@ -25,6 +27,13 @@ $bg-shadow: #151720;
 $bg-blue-shadow: #1825AD;
 $toast-font-size: 1rem;
 $m: 16px;
+
+// NOTE Attention, the variables colors change need be before boostrap imports or not work.
+// to check see on console `@debug $theme-colors;`
+
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/utilities";
 
 $more-bg: (
         'white-50': $gray,
