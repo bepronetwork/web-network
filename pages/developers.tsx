@@ -14,6 +14,9 @@ import Paginate from '@components/paginate';
 import usePage from '@x-hooks/use-page';
 import useCount from '@x-hooks/use-count';
 import {useRouter} from 'next/router';
+import IssueFilterBox from '@components/issue-filter-box';
+import useFilters from '@x-hooks/use-filters';
+import IssueFilters from '@components/issue-filters';
 
 type Filter = {
   label: string;
@@ -57,14 +60,11 @@ export default function PageDevelopers() {
   const {dispatch, state: {loading, currentAddress}} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
   const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
-  const page = usePage();
-  const pages = useCount();
-  const router = useRouter();
-  const {repoId} = router.query;
 
-  function handleChangeFilterByState(filter: Filter) {
-    setFilterByState(filter);
-  }
+  const page = usePage();
+  const results = useCount();
+  const router = useRouter();
+  const {repoId, time, state} = router.query;
 
   function updateIssuesList(issues: IssueData[]) {
     setIssues(issues);
@@ -72,9 +72,9 @@ export default function PageDevelopers() {
 
   function getIssues() {
     dispatch(changeLoadState(true))
-    GithubMicroService.getIssues(page, repoId as string)
+    GithubMicroService.getIssues(page, repoId as string, time as string, state as string)
                       .then(({rows, count}) => {
-                        pages.setCount(count);
+                        results.setCount(count);
                         return rows;
                       })
                       .then(updateIssuesList)
@@ -86,19 +86,7 @@ export default function PageDevelopers() {
                       });
   }
 
-  useEffect(getIssues, [page, repoId]);
-
-  const isDraftIssue = (issue: IssueData) => issue?.state === 'draft';
-  const isClosedIssue = (issue: IssueData) => issue?.state === 'closed' || issue?.state === 'redeemed';
-  const isOpenIssue = (issue: IssueData) => !isDraftIssue(issue) && !isClosedIssue(issue);
-
-  const issuesFilteredByState = issues.filter(issue => {
-    if (filterByState.value === 'all') return true;
-    if (filterByState.value === 'open') return isOpenIssue(issue);
-    if (filterByState.value === 'draft') return isDraftIssue(issue);
-    if (filterByState.value === 'closed') return isClosedIssue(issue);
-    }
-  );
+  useEffect(getIssues, [page, repoId, time, state]);
 
   return (<>
     <div>
@@ -106,22 +94,15 @@ export default function PageDevelopers() {
       <div className="container p-footer">
         <div className="row justify-content-center">
           <div className="col-md-10">
-            <div className="d-flex justify-content-between mb-4">
+            <div className="d-flex justify-content-end mb-4">
               <div className="col-md-3">
-                <ReactSelect
-                  id="filterByIssueState"
-                  isSearchable={false}
-                  className="react-select-filterIssues"
-                  defaultValue={filtersByIssueState[0]}
-                  options={filtersByIssueState}
-                  onChange={handleChangeFilterByState}
-                />
+                <IssueFilters />
               </div>
             </div>
           </div>
-          <ListIssues listIssues={issuesFilteredByState} />
-          <Paginate count={pages.count} onChange={(page) => router.push({pathname: `/`, query:{page}})} />
-          {issuesFilteredByState.length === 0 && !loading.isLoading ? (
+          <ListIssues listIssues={issues} />
+          <Paginate count={results.count} onChange={(page) => router.push({pathname: `/`, query:{page}})} />
+          {issues.length === 0 && !loading.isLoading ? (
             <div className="col-md-10">
               <NothingFound
                 description={filterByState.emptyState}>

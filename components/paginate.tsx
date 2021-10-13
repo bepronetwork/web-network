@@ -13,7 +13,7 @@ export default function Paginate({count = 1, onChange = (evt: string) => {}}) {
 
   return <div className="w-100 d-flex justify-content-center">
     <Pagination totalPages={Math.ceil(count / 10)}
-                value={page - 1}
+                value={+page - 1}
                 showFirstLast={false}
                 atBeginEnd={4}
                 aroundCurrent={1} onChange={handleOnChange} />

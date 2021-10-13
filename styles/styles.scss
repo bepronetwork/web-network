@@ -2,7 +2,12 @@
 @import 'variables';
 @import 'toasts';
 @import 'vendor';
+
+@import "filter-box";
 @import "x-pagination";
+@import "x-modals";
+@import "x-form-check";
+@import "x-button";
 
 //bootstrap-overrides
 ul,
@@ -428,6 +433,7 @@ p {
       color: $white;
     }
   }
+
 }
 
 .list-item-proposal {
@@ -962,4 +968,8 @@ $c_props: ('m': 'margin') !default;
       background-color: $dark-gray;
     }
   }
+}
+
+.rounded-4 {
+  border-radius: .5rem;
 }

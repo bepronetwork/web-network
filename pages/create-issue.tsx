@@ -95,7 +95,7 @@ export default function PageCreateIssue() {
                       .then(cid => {
                         if (!cid)
                           throw new Error(`Failed to create github issue!`);
-                        return BeproService.network.openIssue({...contractPayload, cid})
+                        return BeproService.network.openIssue({...contractPayload, cid: [repository_id, cid].join(`/`)})
                                            .then(txInfo => {
                                              BeproService.parseTransaction(txInfo, openIssueTx.payload)
                                                          .then(block => dispatch(updateTransaction(block)))
@@ -110,7 +110,7 @@ export default function PageCreateIssue() {
                           .then(result => {
                             if (!result)
                                 return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
-                            router.push(`/issue?id=${githubId}`)
+                            router.push(`/issue?id=${githubId}&repoId=${repository_id}`)
                           }))
                       .catch(e => {
                         console.error(`Failed to createIssue`, e);

@@ -1,0 +1,10 @@
+.max-height-body .height-body {
+  max-height: 300px;
+  overflow-y: scroll;
+  scrollbar-width: thin;
+}
+.modal-md {
+  .modal-dialog {
+    max-width: 660px;
+  }
+}
