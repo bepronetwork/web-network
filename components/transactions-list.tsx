@@ -20,7 +20,6 @@ export default function TransactionsList({onActiveTransaction = (transaction) =>
 
   const IconMaps = {
     [TransactionTypes.openIssue]: <InformationChatBubble />,
-    [TransactionTypes.createIssue]:<InformationChatBubble />,
     [TransactionTypes.lock]: <UploadIcon/>,
     [TransactionTypes.unlock]: <DownloadIcon/>,
     [TransactionTypes.approveTransactionalERC20Token]: <ThumbsUp />,

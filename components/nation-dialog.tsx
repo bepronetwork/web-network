@@ -36,7 +36,7 @@ export default function NationDialog({ children }) {
                aria-labelledby={`${kebabCase("NationDialog")}-modal`}
                aria-describedby={`${kebabCase("NationDialog")}-modal`}
                id="nation-dialog-modal"
-               show={isBlock}>
+               show={true}>
           <Modal.Header>
             <Modal.Title>
               <BeProBlue width={40} height={40}/>
@@ -46,9 +46,9 @@ export default function NationDialog({ children }) {
             <div className="d-flex flex-column mt-2 align-items-center text-whit">
               <p className="p text-white mb-2 text-center fs-9 white-space-wrap">
                 At the moment BEPRO Services are
-                not available in 
+                not available in
               </p>
-              <a target="_blank" href="https://www.bepro.network/terms-and-conditions" 
+              <a target="_blank" href="https://www.bepro.network/terms-and-conditions"
                 className="mb-2 text-center text-white-50 text-decoration-none text-uppercase fs-8">
                 Excluded Jurisdictions.
               </a>

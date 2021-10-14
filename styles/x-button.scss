@@ -1,13 +1,22 @@
-button.btn {
+$small-icon: 10px;
+$only-child: 18px;
+
+.btn + .btn { margin-left: 8px; }
+
+button.btn,a.btn {
 
   i {
-    width: 14px;
-    height: 14px;
+    &:not(:only-child) {
+      width: $small-icon;
+      height: $small-icon;
+    }
+    &:only-child {
+      width: $only-child;
+      height: $only-child;
+    }
   }
 
   svg {
-    width: 14px;
-    height: 14px;
     &:not(:only-child) {
       &:not(:last-child) {
         margin-right: 8px;
@@ -15,6 +24,13 @@ button.btn {
       &:last-child {
         margin-left: 8px;
       }
+      width: $small-icon;
+      height: $small-icon;
+    }
+
+    &:only-child {
+      width: $only-child;
+      height: $only-child;
     }
   }
 }
