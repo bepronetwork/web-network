@@ -11,7 +11,7 @@ export default function GithubHandle() {
   if (githubHandle)
     return (
       <Button className="mr-1" transparent>
-        {githubHandle}{" "}
+        <span>{githubHandle}{" "}</span>
         {session?.user?.image && <Image src={session?.user?.image} className="ms-2 circle-3" />}
       </Button>
     );

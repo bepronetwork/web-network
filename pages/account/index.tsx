@@ -43,6 +43,12 @@ export default function MyIssues() {
                                                    .then(({rows, count}) => {
                                                      results.setCount(count);
                                                      return rows
+                                                   })
+                                                   .catch(e => {
+                                                     if (e.status === 404)
+                                                       return [];
+                                                     console.error(`Failed fetching issues`, e);
+                                                     return [];
                                                    });
                         else return [];
                       })

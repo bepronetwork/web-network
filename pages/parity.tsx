@@ -122,7 +122,7 @@ export default function ParityPage() {
             })
             .then(setIssuesList)
             .catch(e => {
-              console.log(`Found error`, e);
+              console.error(`Found error`, e);
             })
             .finally(() => {
               dispatch(changeLoadState(false))

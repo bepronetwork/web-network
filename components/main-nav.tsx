@@ -106,7 +106,7 @@ export default function MainNav() {
       </div>
       <div className="d-flex flex-row align-items-center">
         <Link href="https://support.bepro.network/en/articles/5595864-using-the-testnet" passHref>
-          <Button transparent>Get Started<ExternalLinkIcon className="ml-1" height={10} width={10} color="text-white"/></Button>
+          <Button transparent><span>Get Started</span><ExternalLinkIcon className="ml-1" height={10} width={10} color="text-white"/></Button>
         </Link>
         <Link href="/create-issue" passHref>
           <Button transparent>+ Create issue</Button>
@@ -124,7 +124,7 @@ export default function MainNav() {
             <Link href="/account" passHref>
               <Button className='mr-1' transparent>
                 <i className="ico-bepro mr-1"></i>
-                {formatNumberToNScale(beproBalance)}
+                <span>{formatNumberToNScale(beproBalance)}</span>
               </Button>
             </Link>
             <Link href="/account" passHref>
