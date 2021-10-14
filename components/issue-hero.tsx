@@ -49,7 +49,7 @@ export default function IssueHero({ issue, state, amount }) {
                   <div className="banner-highlight">
                     {amount && (
                       <h4 className="h4 mb-0">
-                        {amount > 0 ? amount : "MISSING"}
+                        {amount || `&infin;`}
                         <span className="p-small trans"> $BEPRO</span>
                       </h4>
                     )}

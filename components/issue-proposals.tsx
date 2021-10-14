@@ -10,7 +10,7 @@ import ProposalItem from '@components/proposal-item';
 import {Proposal} from '@interfaces/proposal';
 
 
-export default function IssueProposals({ numberProposals, issueId, amount }) {
+export default function IssueProposals({ numberProposals, issueId, amount, dbId }) {
   const { state: {beproStaked, currentAddress} } = useContext(ApplicationContext);
   const [proposals, setProposals] = useState<Proposal[]>([]);
 
@@ -22,18 +22,21 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
     if (issueId)
       for (let i = 0; i < numberProposals; i++) {
 
-        const merge = await BeproService.network.getMergeById({issue_id: issueId, merge_id: i,});
+        const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
 
-        await BeproService.network.isMergeDisputed({issueId: issueId, mergeId: i,})
+        const merge = await BeproService.network.getMergeById({issue_id, merge_id: i,});
+
+        await BeproService.network.isMergeDisputed({issueId: issue_id, mergeId: i,})
                           .then((isMergeDisputed) => (merge.isDisputed = isMergeDisputed))
                           .catch((err) => {
                             console.error("Error getting mergeDisputed state", err)
                           });
 
-        await GithubMicroService.getMergeProposalIssue(issueId, (i + 1).toString())
+        await GithubMicroService.getMergeProposalIssue(dbId, (i + 1).toString())
                                 .then((mergeProposal: ProposalData) => {
                                   merge.pullRequestId = mergeProposal?.pullRequestId;
                                   merge.pullRequestGithubId = mergeProposal?.pullRequest.githubId;
+                                  merge.scMergeId = mergeProposal?.scMergeId;
                                 })
                                 .catch((err) => console.error(`Error getting proposal from microservice`, err));
 
@@ -51,7 +54,7 @@ export default function IssueProposals({ numberProposals, issueId, amount }) {
         <div className="col-md-10">
           <div className="content-wrapper mb-4 pb-0">
             <h3 className="smallCaption pb-3">{numberProposals} Proposals</h3>
-            {proposals.map(proposal => <ProposalItem key={proposal._id} proposal={proposal} issueId={issueId} amount={amount} beproStaked={beproStaked} onDispute={loadProposalData} />)}
+            {proposals.map(proposal => <ProposalItem key={proposal._id} proposal={proposal} issueId={issueId} dbId={dbId} amount={amount} beproStaked={beproStaked} onDispute={loadProposalData} />)}
           </div>
         </div>
       </div>

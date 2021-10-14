@@ -134,7 +134,7 @@ export default function PageCreateIssue() {
       verifyAmountBiggerThanBalance(),
       issueAmount.floatValue > 0,
       !!issueAmount.formattedValue,
-      !verifyTransactionState(TransactionTypes.createIssue),
+      !verifyTransactionState(TransactionTypes.openIssue),
       !!repository_id,
     ].some(value => value === false);
   }
@@ -240,7 +240,7 @@ export default function PageCreateIssue() {
                       : null
                     }
                     <Button disabled={isCreateButtonDisabled()}
-                            onClick={createIssue}>{isCreateButtonDisabled() && <LockIcon className="mr-1" width={13} height={13}/>}Create Issue
+                            onClick={createIssue}>{isCreateButtonDisabled() && <LockIcon className="mr-1" width={13} height={13}/>}<span>Create Issue</span>
                     </Button>
                   </>
                 )}

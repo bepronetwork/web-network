@@ -2,12 +2,14 @@
 export type IssueState =  'redeemed' | 'pending' |  'draft' | 'open' | 'in progress' | 'canceled' | 'closed' | 'ready' | 'done' | 'disputed'
 
 export interface IssueData {
+  _id?: string; // sc id
+  id?: string; // database id
   body: string;
   createdAt: Date;
   developers: developer[];
   dueDate?: string;
   githubId: string;
-  issueId: string;
+  issueId: string; // custom id repo/githubid
   creatorGithub?: string;
   creatorAddress?: string;
   isIssueinDraft?: boolean;

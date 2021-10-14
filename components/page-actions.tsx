@@ -17,10 +17,10 @@ import { updateTransaction } from "@reducers/update-transaction";
 import CreatePullRequestModal from "@components/create-pull-request-modal";
 import { TransactionStatus } from "@interfaces/enums/transaction-status";
 import Button from "./button";
+import GithubLink from '@components/github-link';
 
 interface pageActions {
   issueId: string;
-  UrlGithub: string;
   developers?: developer[];
   finalized: boolean;
   networkCID: string;
@@ -41,6 +41,7 @@ interface pageActions {
   githubId?: string;
   finished?: boolean;
   issueCreator?: string;
+  repoPath?: string;
 }
 
 export default function PageActions({
@@ -64,6 +65,7 @@ export default function PageActions({
   canOpenPR,
   githubId = ``,
   finished = false,
+  repoPath = ``,
   issueCreator,
 }: pageActions) {
   const {
@@ -110,27 +112,26 @@ export default function PageActions({
   async function handleRedeem() {
     const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue });
     dispatch(redeemTx);
+    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
 
     await BeproService.login()
       .then(() => {
-        BeproService.network.redeemIssue({ issueId }).then((txInfo) => {
-          BeproService.parseTransaction(txInfo, redeemTx.payload).then(
-            (block) => dispatch(updateTransaction(block))
-          );
-          GithubMicroService.updateIssueState(issueId, "canceled");
-          BeproService.getBalance("bepro").then((bepro) =>
-            dispatch(changeBalance({ bepro }))
-          );
-          handleBeproService();
-          handleMicroService();
-        });
+        BeproService.network.redeemIssue({ issueId: issue_id })
+                    .then((txInfo) => BeproService.parseTransaction(txInfo, redeemTx.payload)
+                                            .then((block) => dispatch(updateTransaction(block))))
+                    .then(() => {
+                      BeproService.getBalance("bepro")
+                                  .then((bepro) => dispatch(changeBalance({ bepro })))
+                    })
+                    .then(() => { handleBeproService(); handleMicroService(); })
+                    .catch((err) => {
+                      dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
+                      console.error(`Error redeeming`, err);
+                    });
+      }).catch((err) => {
+        dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
+        console.error(`Error logging in`, err);
       })
-      .catch((err) => {
-        dispatch(
-          updateTransaction({ ...(redeemTx.payload as any), remove: true })
-        );
-        console.error(`Error redeeming`, err);
-      });
   }
 
   const renderRedeem = () => {
@@ -158,7 +159,7 @@ export default function PageActions({
           <NewProposal
             issueId={issueId}
             isFinished={finished}
-            isIssueOwner={issueCreator === currentAddress}
+            isIssueOwner={issueCreator == currentAddress}
             amountTotal={amountIssue}
             numberMergeProposals={mergeProposals}
             pullRequests={pullRequests}
@@ -185,48 +186,6 @@ export default function PageActions({
     );
   }
 
-  function viewGHButton() {
-    return (
-      <a
-        href={`https://github.com/bepronetwork/webapp-community/issues/${
-          githubId || ""
-        }`}
-        target="_blank"
-        className="text-decoration-none"
-      >
-        <Button color="dark-gray">
-          VIEW ON GITHUB{" "}
-          <ExternalLinkIcon
-            className="ml-1"
-            height={10}
-            width={10}
-            color="text-white-50"
-          />
-        </Button>
-      </a>
-    );
-  }
-
-  function workButton() {
-    return (
-      <a
-        href="https://github.com/bepronetwork/webapp-community/fork"
-        target="_blank"
-        className="text-decoration-none"
-      >
-        <Button className="mx-1">
-          WORK ON THIS ISSUE{" "}
-          <ExternalLinkIcon
-            className="ml-1"
-            height={10}
-            width={10}
-            color="text-white"
-          />
-        </Button>
-      </a>
-    );
-  }
-
   async function handlePullrequest({
     title: prTitle,
     description: prDescription,
@@ -248,7 +207,7 @@ export default function PageActions({
         setShowPRModal(false);
       })
       .catch((err) => {
-        console.log("err", err.response);
+        console.error("Error handling PR", err);
         if (err.response?.status === 422 && err.response?.data) {
           err.response?.data.map((item) =>
             dispatch(
@@ -275,8 +234,10 @@ export default function PageActions({
     const disputeTx = addTransaction({ type: TransactionTypes.dispute });
     dispatch(disputeTx);
 
+    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+
     await BeproService.network
-      .disputeMerge({ issueID: issueId, mergeID: mergeId })
+      .disputeMerge({ issueID: issue_id, mergeID: mergeId })
       .then((txInfo) => {
         BeproService.parseTransaction(txInfo, disputeTx.payload).then((block) =>
           dispatch(updateTransaction(block))
@@ -287,7 +248,7 @@ export default function PageActions({
         dispatch(
           updateTransaction({ ...(disputeTx.payload as any), remove: true })
         );
-        console.log("Error creating dispute", err);
+        console.error("Error creating dispute", err);
       });
   }
 
@@ -295,8 +256,10 @@ export default function PageActions({
     const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue });
     dispatch(closeIssueTx);
 
+    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+
     await BeproService.network
-      .closeIssue({ issueID: issueId, mergeID: mergeId })
+      .closeIssue({ issueID: issue_id, mergeID: mergeId })
       .then((txInfo) => {
         BeproService.parseTransaction(txInfo, closeIssueTx.payload).then(
           (block) => dispatch(updateTransaction(block))
@@ -307,7 +270,7 @@ export default function PageActions({
         dispatch(
           updateTransaction({ ...(closeIssueTx.payload as any), remove: true })
         );
-        console.log(`Error closing issue`, err);
+        console.error(`Error closing issue`, err);
       });
   }
 
@@ -320,8 +283,13 @@ export default function PageActions({
             <div className="d-flex align-items-center">
               {renderIssueAvatars()}
               {forks && renderForkAvatars()}
-              {viewGHButton()}
-              {!isClosedIssue(state) && workButton()}
+
+              <GithubLink forcePath={repoPath} hrefPath={`issues/${githubId || ""}`}>
+                view on github
+              </GithubLink>
+
+              {!isClosedIssue(state) && <GithubLink color="primary" forcePath={repoPath} hrefPath="fork">work on this issue</GithubLink>}
+
               {renderRedeem()}
               {renderProposeDestribution()}
               {!isClosedIssue(state) && renderPullrequest()}

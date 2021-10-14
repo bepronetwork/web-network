@@ -103,7 +103,7 @@ function networkTxButton({
     <button className='d-none' ref={elementRef} onClick={makeTx} disabled={disabled}/>
 
     <Button color='purple' className={getButtonClass()} onClick={makeTx} disabled={disabled}>
-      {disabled && <LockIcon width={12} height={12} className="mr-1"/>} {buttonLabel}
+      {disabled && <LockIcon width={12} height={12} className="mr-1"/>} <span>{buttonLabel}</span>
     </Button>
 
     <Modal show={showModal} title={modalTitle} footer={modalFooter}>

@@ -1,5 +1,6 @@
 import { GetStaticProps } from 'next'
 import React from 'react';
+import {formatNumberToCurrency} from '@helpers/formatNumber';
 
 export default function ProposalAddresses({ addresses, currency = `oracles` }) {
     return (
@@ -11,7 +12,7 @@ export default function ProposalAddresses({ addresses, currency = `oracles` }) {
                         {addresses?.length > 0 && addresses.map((item, index) => (
                             <div key={index} className="content-list-item d-flex justify-content-between align-items-center">
                                 <p className="p-small mb-0">{item.address}</p>
-                                <p className="smallCaption color-purple mb-0">{item.oracles} {currency}</p>
+                                <p className="smallCaption color-purple mb-0">{formatNumberToCurrency(item.oracles)} {currency}</p>
                             </div>
                         ))}
                     </div>

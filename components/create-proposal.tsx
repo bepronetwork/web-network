@@ -13,6 +13,7 @@ import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import {toastWarning} from '@reducers/add-toast';
 import Button from './button';
+import {useRouter} from 'next/router';
 
 interface participants {
   githubHandle: string;
@@ -28,7 +29,7 @@ export default function NewProposal({
                                       handleMicroService,
                                       isIssueOwner = false, isFinished = false
                                     }) {
-  const {dispatch, state: {balance, currentAddress, beproInit, oracles,},} = useContext(ApplicationContext);
+  const {dispatch, state: {balance, currentAddress, beproInit, oracles, githubLogin},} = useContext(ApplicationContext);
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>();
   const [error, setError] = useState<string>('');
@@ -37,6 +38,8 @@ export default function NewProposal({
   const [isCouncil, setIsCouncil] = useState(false);
   const [councilAmount, setCouncilAmount] = useState(0);
   const [currentGithubId, setCurrentGithubId] = useState<string>();
+  const router = useRouter()
+
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
     setDistrib((prevState) => ({
@@ -66,8 +69,10 @@ export default function NewProposal({
     if (amount > 100)
       return setError('Distribution exceed 100%.');
 
+    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+
     const payload = {
-      issueID: issueId,
+      issueID: issue_id,
       prAddresses: participants.map((items) => items.address),
       prAmounts: participants.map(
         (items) => (amountTotal * distrib[items.githubHandle]) / 100
@@ -88,7 +93,8 @@ export default function NewProposal({
                       .then(() =>
                               GithubMicroService.createMergeProposal(issueId, {
                                 pullRequestGithubId: currentGithubId,
-                                scMergeId: (numberMergeProposals + 1).toString(),
+                                scMergeId: numberMergeProposals.toString(),
+                                githubLogin,
                               }).then(() => {
                                 handleBeproService();
                                 handleMicroService();
@@ -119,7 +125,11 @@ export default function NewProposal({
     const recognizeAsFinished = addTransaction({type: TransactionTypes.recognizedAsFinish})
     dispatch(recognizeAsFinished);
 
-    BeproService.network.recognizeAsFinished({issueId})
+    BeproService.network.getIssueByCID({issueCID: issueId})
+                .then((issue) => {
+                  return BeproService.network.recognizeAsFinished({issueId: issue._id}).catch(console.error)
+
+                })
                 .then(txInfo => {
                   BeproService.parseTransaction(txInfo, recognizeAsFinished.payload)
                               .then(block => dispatch(updateTransaction(block)));
@@ -128,9 +138,10 @@ export default function NewProposal({
                   handleBeproService();
                   handleMicroService();
                 })
-                .catch(() => {
+                .catch((e) => {
                   dispatch(updateTransaction({...recognizeAsFinished.payload as any, remove: true}))
                   dispatch(toastWarning(`Failed to mark issue as finished!`));
+                  console.error(`Failed to mark as finished`, e);
                 })
   }
 

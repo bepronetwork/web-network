@@ -10,6 +10,7 @@ import {BeproService} from '@services/bepro-service';
 import GithubMicroService, {User} from '@services/github-microservice';
 import {ApplicationContext} from '@contexts/application';
 import {IssueData} from '@interfaces/issue-data';
+import {formatNumberToCurrency} from '@helpers/formatNumber';
 
 interface NetworkIssue {
   recognizedAsFinished: boolean;
@@ -24,12 +25,16 @@ export default function PageIssue() {
   const [networkIssue, setNetworkIssue] = useState<any>();
   const [isIssueinDraft, setIsIssueinDraft] = useState(false);
   const [commentsIssue, setCommentsIssue] = useState();
-  const [balance, setBalance] = useState();
   const [forks, setForks] = useState();
   const [canOpenPR, setCanOpenPR] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>();
 
+  function getIssueCID() {
+    return [repoId, id].join(`/`)
+  }
+
   const getsIssueMicroService = () => {
+
     GithubMicroService.getIssuesByGhId(id, repoId as string)
                       .then((issue) => {
                         if (!issue)
@@ -43,24 +48,30 @@ export default function PageIssue() {
     GithubMicroService.getForks().then((forks) => setForks(forks));
   };
 
-  const getsIssueBeproService = () => {
-    getNetworkIssue();
-    setBalance(BeproService.network.getBEPROStaked());
-    BeproService.network
-                .isIssueInDraft({
-                                  issueId: id,
-                                })
-                .then((isIssueInDraft) => setIsIssueinDraft(isIssueInDraft));
-  };
+  function getsIssueBeproService() {
+    console.log(getIssueCID());
+    BeproService.network.getIssueByCID({issueCID: getIssueCID()})
+                .then(netIssue => {
+                  setNetworkIssue(netIssue);
+                  return netIssue._id;
+                })
+                .then(issueId => BeproService.network.isIssueInDraft({issueId}))
+                .then((isIssueInDraft) => setIsIssueinDraft(isIssueInDraft))
+                .catch(e => {
+                  console.error(`Failed to fetch network issue or draft state`, e);
+                });
+  }
 
   const getCurrentUserMicroService = () => {
-    GithubMicroService.getUserOf(currentAddress).then((user: User) =>
-                                                        setCurrentUser(user)
-    );
+    if (currentAddress == currentUser?.address)
+      return;
+
+    GithubMicroService.getUserOf(currentAddress)
+                      .then((user: User) => setCurrentUser(user));
   };
 
   const getRepoForked = () =>{
-    GithubMicroService.getForkedRepo(githubHandle, id.toString())
+    GithubMicroService.getForkedRepo(githubHandle, [repoId, id].join(`/`))
     .then((repo) => setCanOpenPR(!!repo))
   }
 
@@ -74,15 +85,8 @@ export default function PageIssue() {
     if (githubHandle) getRepoForked();
   }
 
-  useEffect(loadIssueData, [githubHandle,currentAddress, id]);
-
-  const getNetworkIssue = () => {
-    BeproService.network
-                .getIssueByCID({issueCID: [repoId, id].join(`/`),})
-                .then((networkIssue) => {
-                  setNetworkIssue(networkIssue)
-                });
-  };
+  useEffect(loadIssueData, [githubHandle, currentAddress, id]);
+  useEffect(getsIssueMicroService, [])
 
   const handleStateissue = () => {
     if (issue?.state) return issue?.state;
@@ -99,7 +103,7 @@ export default function PageIssue() {
   return (
     <>
       <IssueHero
-        amount={networkIssue?.tokensStaked}
+        amount={formatNumberToCurrency(issue?.amount || networkIssue?.tokensStaked)}
         state={handleStateissue()}
         issue={issue}/>
       <PageActions
@@ -109,23 +113,24 @@ export default function PageIssue() {
         isIssueinDraft={isIssueinDraft}
         networkCID={networkIssue?.cid}
         issueId={issue?.issueId}
-        UrlGithub={issue?.url}
         title={issue?.title}
         description={issue?.body}
         handleBeproService={getsIssueBeproService}
         handleMicroService={getsIssueMicroService}
-        pullRequests={issue?.pullRequests}
+        pullRequests={issue?.pullRequests && (Array.isArray(issue.pullRequests) && issue.pullRequests || [issue.pullRequests as any]) || []}
         mergeProposals={networkIssue?.mergeProposalsAmount}
         amountIssue={networkIssue?.tokensStaked}
         forks={forks}
         githubLogin={currentUser?.githubLogin}
         canOpenPR={canOpenPR}
-        issueCreator={issue?.creatorAddress}
+        issueCreator={networkIssue?.issueGenerator}
+        repoPath={issue?.repo}
         githubId={issue?.githubId} finished={networkIssue?.recognizedAsFinished}/>
       {networkIssue?.mergeProposalsAmount > 0 && (
         <IssueProposals
           numberProposals={networkIssue?.mergeProposalsAmount}
           issueId={issue?.issueId}
+          dbId={issue?.id}
           amount={networkIssue?.tokensStaked}
         />
       )}
