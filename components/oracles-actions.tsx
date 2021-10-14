@@ -126,7 +126,7 @@ function OraclesActions(): JSX.Element {
     myTransactions.find(({status, type}) =>
                           status === TransactionStatus.pending && type === getTxType())
   ].some(values => values)
-  
+
   const isApproveButtonDisabled = (): boolean => [
     !currentAddress,
     isApproved,
@@ -170,7 +170,7 @@ function OraclesActions(): JSX.Element {
   function getMaxAmmount(): number {
     return action === `Lock` && balance.bepro || (+oracles.tokensLocked - oracles.delegatedToOthers);
   }
-  
+
   function setMaxAmmount() {
     return setTokenAmount(getMaxAmmount())
   }
@@ -214,13 +214,13 @@ function OraclesActions(): JSX.Element {
             />
 
           <div className="mt-5">
-            
+
             <Button className='w-100 mb-3' disabled={isApproveButtonDisabled()} onClick={approveSettlerToken}>Approve</Button>
-            {isApproved && 
-            <Button color={action === 'Lock' ? 'purple' : 'primary'} className="w-100" disabled={isButtonDisabled()} 
+            {isApproved &&
+            <Button color={action === 'Lock' ? 'purple' : 'primary'} className="w-100" disabled={isButtonDisabled()}
               onClick={checkLockedAmount}>
                   {isButtonDisabled() && <LockIcon width={12} height={12} className="mr-1"/>}
-                  {renderInfo.label}
+                  <span>{renderInfo.label}</span>
             </Button>}
           </div>
 

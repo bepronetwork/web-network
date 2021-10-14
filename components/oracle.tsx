@@ -18,20 +18,12 @@ export default function Oracle({
         <div className="row">
           <div className="d-flex justify-content-center mb-3">
             <Link href="/oracle/new-issues">
-              <a
-                className={clsx("subnav-item mr-3", {
-                  active: buttonPrimaryActive,
-                })}
-              >
+              <a className={clsx("subnav-item mr-3", {active: buttonPrimaryActive,})}>
                 <h3 className="h3">New issues</h3>
               </a>
             </Link>
             <Link href="/oracle/ready-to-merge">
-              <a
-                className={clsx("subnav-item", {
-                  active: !buttonPrimaryActive,
-                })}
-              >
+              <a className={clsx("subnav-item", {active: !buttonPrimaryActive,})}>
                 <h3 className="h3">Ready to merge</h3>
               </a>
             </Link>

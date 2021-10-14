@@ -85,8 +85,8 @@ export default class GithubMicroService {
     return data;
   }
 
-  static async getIssuesState(filterState: IssueState) {
-    const {data} =  await client.get('/issues',{params: {filterState}});
+  static async getIssuesState(state: IssueState, page = '1') {
+    const {data} =  await client.get('/issues',{params: {state, page}});
     return data;
   }
 
@@ -149,7 +149,12 @@ export default class GithubMicroService {
    * Should return the handle of a given wallet address
    */
   static async getHandleOf(address: string): Promise<any> {
-    return GithubMicroService.getUserOf(address.toLowerCase()).then((data) => data?.githubHandle || ``).catch( _ => ``);
+    return GithubMicroService.getUserOf(address.toLowerCase())
+                             .then((data) => data?.githubHandle || ``)
+                             .catch(e => {
+                               console.error(`Error fetching user of ${address}`, e);
+                               return ``
+                             });
   }
 
   static async createPullRequestIssue(issueId: string | string[], payload) {
@@ -190,7 +195,7 @@ export default class GithubMicroService {
                  })
   }
 
-  static async createMergeProposal(id: string, payload: { pullRequestGithubId: string, scMergeId: string}) {
+  static async createMergeProposal(id: string, payload: { pullRequestGithubId: string, scMergeId: string; githubLogin: string}) {
     return client.post<'ok'>(`/issues/${id}/mergeproposal`, payload)
                  .then(({data}) => data === 'ok')
                  .catch(e => {
@@ -212,7 +217,10 @@ export default class GithubMicroService {
     return client.get(`/forks/repo/${ghHandler}/${ofIssue}`)
                  .then(({data}) => data)
                  .catch(e => {
-                   console.error(e);
+                   if (e.status === 404)
+                     return null;
+
+                   console.error(`Failed to get forked repo`, e);
                    return null;
                  })
   }

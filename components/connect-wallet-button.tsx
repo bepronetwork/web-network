@@ -10,12 +10,12 @@ import { changeNetwork } from '@contexts/reducers/change-network';
 import { NetworkIds } from '@interfaces/enums/network-ids';
 import Button from './button';
 
-export default function ConnectWalletButton({children = null, forceLogin = false, onSuccess = () => null, onFail = () => console.log("Failed to login"), asModal = false, btnColor = `white`}) {
+export default function ConnectWalletButton({children = null, forceLogin = false, onSuccess = () => null, onFail = () => console.error("Failed to login"), asModal = false, btnColor = `white`}) {
   const { state: {metaMaskWallet, beproInit, currentAddress}, dispatch } = useContext(ApplicationContext);
 
   async function connectWallet() {
     let loggedIn = false;
-    
+
     try {
       const chainId = (window as any).web3?.currentProvider?.chainId;
       if (+process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID !== +chainId) {
@@ -54,8 +54,8 @@ export default function ConnectWalletButton({children = null, forceLogin = false
 
   if (asModal)
     return (
-      <Modal 
-      title="Connect your MetaMask Wallet" 
+      <Modal
+      title="Connect your MetaMask Wallet"
       titlePosition="center"
       titleClass="h4 text-white bg-opacity-100"
       show={!currentAddress || !metaMaskWallet}>
@@ -92,7 +92,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
     )
 
   if (!metaMaskWallet)
-    return <Button color='white' className='text-primary bg-opacity-100' onClick={connectWallet}>Connect <i className="ico-metamask ml-1" /></Button>
+    return <Button color='white' className='text-primary bg-opacity-100' onClick={connectWallet}><span>Connect</span> <i className="ico-metamask ml-1" /></Button>
 
   return children;
 
