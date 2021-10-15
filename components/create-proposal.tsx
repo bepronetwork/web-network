@@ -126,9 +126,9 @@ export default function NewProposal({
     dispatch(recognizeAsFinished);
 
     BeproService.network.getIssueByCID({issueCID: issueId})
-                .then((issue) => {
-                  return BeproService.network.recognizeAsFinished({issueId: issue._id}).catch(console.error)
-
+                .then((_issue) => {
+                  console.log(`Issue`, _issue)
+                  return BeproService.network.recognizeAsFinished({issueId: _issue._id})
                 })
                 .then(txInfo => {
                   BeproService.parseTransaction(txInfo, recognizeAsFinished.payload)
