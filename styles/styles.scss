@@ -233,7 +233,6 @@ body {
   line-height: 140%;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  font-feature-settings: 'tnum' on, 'lnum' on, 'ss02' on, 'ss03' on, 'ss04' on;
 }
 
 .smallCaption {
@@ -996,4 +995,11 @@ $c_props: ('m': 'margin') !default;
 
 .rounded-4 {
   border-radius: .5rem;
+}
+
+.main-nav {
+  .btn svg:only-child {
+    width: 24px;
+    height: 24px;
+  }
 }
