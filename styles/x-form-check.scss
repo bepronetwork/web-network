@@ -5,6 +5,9 @@
     &:hover {
       border-color: $primary;
       cursor: pointer;
+      + label {
+        color: $white;
+      }
     }
 
     &:checked + label {

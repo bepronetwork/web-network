@@ -66,7 +66,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
           <div className="d-flex justify-content-center align-items-center w-100">
               <div className="rounded-3 bg-dark-gray text-white p-3 d-flex text-center justify-content-center align-items-center w-75 cursor-pointer" onClick={connectWallet}>
                   <Image src={metamaskLogo} width={15} height={15}/>
-                  <span className="fw-bold text-white text-uppercase ms-2">metamask</span>
+                  <span className="text-white text-uppercase ms-2">metamask</span>
               </div>
         </div>
         <div className="smallInfo text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-2 pt-1">

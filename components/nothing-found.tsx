@@ -11,7 +11,7 @@ export default function NothingFound({ description, children }: NothingFoundProp
   return (
       <div className="d-flex flex-column align-items-center gap-4">
         <NotFoundIcon  height={52} width={56}/>
-        <p className="smallCaption text-center text-uppercase fw-bold mb-0">{description}</p>
+        <p className="smallCaption text-center text-uppercase mb-0">{description}</p>
         { children }
       </div>
   );

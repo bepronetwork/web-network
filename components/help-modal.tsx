@@ -16,7 +16,7 @@ export default function HelpModal({show = false, onCloseClick = () => {}}) {
   ];
 
   function HelpItemRow(item, i) {
-    const rowClassName = `row ${i+1 !== helpItems.length && `mb-2` || ``} d-flex align-items-center cursor-pointer bg-opac-hover mxn-3 px-3 py-2 text-decoration-none`;
+    const rowClassName = `row row-button ${i+1 !== helpItems.length && `mb-2` || ``} d-flex align-items-center cursor-pointer bg-opac-hover mxn-3 px-3 py-2 text-decoration-none`;
 
     return (
       <a className={rowClassName} key={item.title} href={`${item.href}`} target="_blank">
