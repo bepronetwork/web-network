@@ -17,6 +17,7 @@ export default function PageCouncil() {
   function getIssues() {
     dispatch(changeLoadState(true))
     GithubMicroService.getIssuesState('ready')
+                      .then(data => data.rows)
                       .then(setIssues)
                       .catch((error) => {
                         console.error('getIssuesState Error', error)
