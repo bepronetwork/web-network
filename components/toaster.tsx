@@ -3,6 +3,7 @@ import { ApplicationContext } from "@contexts/application";
 import {Toast, ToastContainer} from 'react-bootstrap';
 import { removeToast } from "@reducers/remove-toast";
 import Icon from '@components/icon';
+import BeproSmallLogo from '@assets/icons/bepro-small-logo';
 
 enum IconMapper {
   info = `info`,
@@ -29,7 +30,7 @@ export default function Toaster() {
                onClose={() => onClose(toast.id)}
                show={true} key={i} bg={toast.type} className={`border border-2 border-${toast.type}`}>
           <Toast.Header className="border-bottom-0 bg-transparent px-3">
-            {toast.type === `primary` && <i className="ico-bepro me-3 pe-2" /> || <Icon className={`text-${toast.type} me-3 pe-2`}>{IconMapper[toast.type]}</Icon>}
+            {toast.type === `primary` && <span className="mr-1"><BeproSmallLogo /></span> || <Icon className={`text-${toast.type} me-3 pe-2`}>{IconMapper[toast.type]}</Icon>}
             <strong className="me-auto">{toast.title}</strong>
           </Toast.Header>
           <Toast.Body className="ps-5 pe-3 ms-2">
