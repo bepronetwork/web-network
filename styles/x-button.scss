@@ -1,22 +1,11 @@
-$small-icon: 10px;
-$only-child: 18px;
+$small-icon: 14px;
+$only-child: 14px;
 
 .btn + .btn { margin-left: 8px; }
 
 button.btn,a.btn {
-
-  i {
-    &:not(:only-child) {
-      width: $small-icon;
-      height: $small-icon;
-    }
-    &:only-child {
-      width: $only-child;
-      height: $only-child;
-    }
-  }
-
-  svg {
+  letter-spacing: .06rem;
+  svg,i {
     &:not(:only-child) {
       &:not(:last-child) {
         margin-right: 8px;
@@ -26,6 +15,8 @@ button.btn,a.btn {
       }
       width: $small-icon;
       height: $small-icon;
+      margin-top: -2px;
+      margin-bottom: -2px;
     }
 
     &:only-child {
