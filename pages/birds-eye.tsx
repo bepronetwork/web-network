@@ -73,7 +73,7 @@ export default function FalconPunchPage() {
       <div className="mt-3 content-wrapper">
         <div className="row mb-3">
           <div className="col">
-            <label className="p-small trans mb-2">Github Token</label>
+            <label className="p-small mb-2">Github Token</label>
             <input value={githubToken} onChange={(ev) => setGithubToken(ev?.target?.value)} type="text" className="form-control" placeholder={`Github token`}/>
           </div>
         </div>
