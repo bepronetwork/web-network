@@ -213,11 +213,11 @@ function OraclesActions(): JSX.Element {
             }
             />
 
-          <div className="mt-5">
+          <div className="mt-5 d-grid gap-3">
 
-            <Button className='w-100 mb-3' disabled={isApproveButtonDisabled()} onClick={approveSettlerToken}>Approve</Button>
+            <Button disabled={isApproveButtonDisabled()} onClick={approveSettlerToken}>Approve</Button>
             {isApproved &&
-            <Button color={action === 'Lock' ? 'purple' : 'primary'} className="w-100" disabled={isButtonDisabled()}
+            <Button color={action === 'Lock' ? 'purple' : 'primary'} className="ms-0" disabled={isButtonDisabled()}
               onClick={checkLockedAmount}>
                   {isButtonDisabled() && <LockIcon width={12} height={12} className="mr-1"/>}
                   <span>{renderInfo.label}</span>
