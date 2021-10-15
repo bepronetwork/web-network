@@ -58,7 +58,7 @@ export default function OraclesTakeBackItem({
             <p className="smallCaption text-white mb-0">{address}</p>
           </div>
           <div className="col-md-6 d-flex justify-content-end">
-            <Button color='purple' outline onClick={handleShow}>
+            <Button color='purple text-white-hover' outline onClick={handleShow}>
               Take Back
             </Button>
           </div>

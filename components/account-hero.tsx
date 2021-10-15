@@ -31,10 +31,6 @@ export default function AccountHero() {
                 })
   }
 
-  useEffect(() => {
-    dispatch(toastPrimary(`hey`));
-  }, [])
-
   useEffect(loadBeproNetworkInformation, [beproInit, metaMaskWallet, currentAddress])
 
   return (
