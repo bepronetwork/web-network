@@ -8,7 +8,7 @@ export default function IssueHero({ issue, state, amount }) {
   function renderCreator() {
     if(issue?.creatorGithub)
     return <div className="d-flex align-items-center">
-          <span className="mr-2">by</span> <GithubInfo color="white" value={[`@`, issue.creatorGithub].join(``)} /> <Avatar className="mx-2" userLogin={issue.creatorGithub} />
+          <span className="mr-2 text-white-50">by</span> <GithubInfo color="white" value={[`@`, issue.creatorGithub].join(``)} /> <Avatar className="mx-2" userLogin={issue.creatorGithub} />
         </div>
   }
 
@@ -18,7 +18,7 @@ export default function IssueHero({ issue, state, amount }) {
         <div className="row justify-content-center">
           <div className="col-md-10">
             <div className="d-flex flex-column">
-              <h3 className="h4 trans text-capitalize mb-0">{state} issue</h3>
+              <h3 className="h4 text-capitalize mb-0">{state} issue</h3>
               <div className="row">
                 <div className="col-md-9">
                   <div className="top-border">
@@ -26,15 +26,13 @@ export default function IssueHero({ issue, state, amount }) {
                       #{issue?.githubId} {issue?.title}
                     </h1>
                     <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start">
-                      <span className="p-small trans mr-3 mt-1">
+                      <span className="p-small mr-3 mt-1 text-white-50">
                         {issue && formatDate(issue?.createdAt)}
                       </span>
-                      <span className="p-small trans mr-2 mt-1">
-                      {issue?.repo && (<div className="bg-white smallCaption text-uppercase px-1 rounded border border-2 border-white bg-opacity-1 text-blue text-center text-uppercase fs-smallest">
-                          <strong>{issue?.repo}</strong>
-                      </div>)}
+                      <span className="p-small mr-2 mt-1">
+                        {issue?.repo && <GithubInfo color="blue" bgColor="white" value={issue?.repo} /> || ``}
                       </span>
-                      <span className="p-small trans mr-3 mt-1">
+                      <span className="p-small mr-3 mt-1">
                         {renderCreator()}
                       </span>
                       {issue?.dueDate && (
@@ -50,7 +48,7 @@ export default function IssueHero({ issue, state, amount }) {
                     {amount && (
                       <h4 className="h4 mb-0">
                         {amount || `&infin;`}
-                        <span className="p-small trans"> $BEPRO</span>
+                        <span className="p-small"> $BEPRO</span>
                       </h4>
                     )}
                   </div>

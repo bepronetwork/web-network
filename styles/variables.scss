@@ -32,8 +32,7 @@ $m: 16px;
 // to check see on console `@debug $theme-colors;`
 
 @import "~bootstrap/scss/functions";
-@import "~bootstrap/scss/variables";
-@import "~bootstrap/scss/utilities";
+
 
 $more-bg: (
         'white-50': $gray,
@@ -41,7 +40,6 @@ $more-bg: (
         'opac': $bg-opac,
         'purple': $purple,
         'blue': $blue,
-        'orange': $orange,
         'success': $success,
         'dark-gray': $dark-gray,
         'ligth-gray': $ligth-gray,
@@ -50,7 +48,7 @@ $more-bg: (
 
 $more-colors: ('blue-dark': $blue-dark, 'dark-gray': $dark-gray, 'ligth-gray': $ligth-gray, 'black': $black, 'white': #fff);
 
-$theme-colors: map-merge($theme-colors, map-merge($more-bg, $more-colors));
+
 
 //buttons
 $btn-font-family: 'fontRegular', sans-serif;
@@ -95,6 +93,9 @@ $form-check-input-focus-border:         $primary;
 $form-check-input-checked-bg-color:     $primary;
 $form-check-input-checked-border-color: $primary;
 
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/utilities";
+$theme-colors: map-merge($theme-colors, map-merge($more-bg, $more-colors));
 
 $utilities: map-merge(
   $utilities, (
@@ -107,4 +108,5 @@ $utilities: map-merge(
                 'background-color': map-merge(map-get($utilities, 'background-color'), (state: hover, values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-bg))),
         )
 )
+
 

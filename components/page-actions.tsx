@@ -79,7 +79,7 @@ export default function PageActions({
     if (developers?.length > 0) return <IssueAvatars users={developers} />;
 
     if (developers?.length && state.toLowerCase() !== "draft")
-      return <p className="p-small trans me-2 mt-3">no one is working </p>;
+      return <p className="p-small me-2 mt-3">no one is working </p>;
   }
 
   function renderForkAvatars() {
