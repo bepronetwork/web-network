@@ -12,7 +12,7 @@ import Button from '@components/button';
 
 export default function PageCouncil() {
   const {dispatch} = useContext(ApplicationContext);
-  const [issues, setIssues] = useState<IssueData[]>();
+  const [issues, setIssues] = useState<IssueData[]>([]);
 
   function getIssues() {
     dispatch(changeLoadState(true))
@@ -37,7 +37,7 @@ export default function PageCouncil() {
           {
             issues?.length === 0 &&
             <div className="mt-4">
-              <NothingFound 
+              <NothingFound
               description="No issues ready to propose">
                 <Link href="/create-issue" passHref>
                   <Button>
