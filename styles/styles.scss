@@ -181,6 +181,7 @@ li {
 body {
   background-color: $bg;
   font-family: 'fontRegular', sans-serif;
+  font-feature-settings: 'tnum' on, 'lnum' on, 'ss02' on, 'ss03' on, 'ss04' on;
   color: $gray;
 }
 
@@ -1003,3 +1004,16 @@ $c_props: ('m': 'margin') !default;
     height: 24px;
   }
 }
+
+svg {
+  &:not([height]) {
+    width: 14px;
+    height: 14px;
+  }
+}
+a.row-button svg {
+  width: 24px;
+  height: 24px;
+}
+
+.text-white:hover svg path { fill: white; }

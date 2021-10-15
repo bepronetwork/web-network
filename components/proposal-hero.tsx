@@ -12,7 +12,7 @@ export default function ProposalHero({githubId, title, pullRequestId, authorPull
                 <div className="row justify-content-center">
                     <div className="col-md-10">
                         <div className="d-flex flex-column">
-                            <div className="d-flex align-items-center trans cursor-pointer">
+                            <div className="d-flex align-items-center cursor-pointer">
                                 <Link
                                     href={{
                                         pathname:"/issue",
@@ -30,7 +30,7 @@ export default function ProposalHero({githubId, title, pullRequestId, authorPull
                                     <div className="top-border">
                                         <h1 className="h4 mb-0">Pull Request #{pullRequestId} by @{authorPullRequest}</h1>
                                         <div className="d-flex align-center flex-wrap justify-content-center justify-content-md-start">
-                                            <span className="p-small trans mr-3 mt-1">Created {createdAt}</span>
+                                            <span className="p-small mr-3 mt-1">Created {createdAt}</span>
                                         </div>
                                     </div>
                                 </div>

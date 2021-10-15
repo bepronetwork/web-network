@@ -76,19 +76,19 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
             >
               {issue?.state}
             </span>
-            <span className="p-small trans mr-2 mt-1">
+            <span className="p-small mr-2 mt-1">
               {issue?.numberOfComments} comments
             </span>
-            <span className="p-small trans mr-2 mt-1">
+            <span className="p-small mr-2 mt-1">
               {issue != null && formatDate(issue?.createdAt)}
             </span>
             {issue?.repo && (
-              <span className="p-small trans mr-2 mt-1 text-uppercase">
+              <span className="p-small mr-2 mt-1 text-uppercase">
                 <GithubInfo color="blue" value={issue?.repo} hoverTextColor="white" onClicked={() => router.push({pathname: `/`, query: {repoId: issue?.repository_id}})} />
               </span>
             )}
-            <span className="p-small trans mr-2 mt-1">by</span>
-            <span className="p-small trans mr-2 mt-1">
+            <span className="p-small mr-2 mt-1">by</span>
+            <span className="p-small mr-2 mt-1">
               <GithubInfo color="gray" value={[`@`, issue?.creatorGithub].join(``)} />
             </span>
             <Avatar className="mr-2" userLogin={issue?.creatorGithub} />
@@ -100,7 +100,7 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
           </div>
         </div>
         <div className="col-md-2 my-auto text-center">
-          <span className="caption trans text-white text-opacity-1">
+          <span className="caption text-white text-opacity-1">
             {formatNumberToNScale(issue?.amount || 0)}{" "}
             <label className="text-uppercase text-blue">$BEPRO</label>
           </span>

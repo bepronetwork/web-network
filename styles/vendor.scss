@@ -4,19 +4,16 @@
   font-family: 'fontRegular';
   src: url('../assets/fonts/SpaceGrotesk-Regular.woff2') format('woff2'),
        url('../assets/fonts/SpaceGrotesk-Regular.ttf') format('truetype');
-  font-feature-settings: 'tnum' on, 'lnum' on, 'ss02' on, 'ss03' on, 'ss04' on;
 }
 @font-face {
   font-family: 'fontMedium';
   src: url('../assets/fonts/SpaceGrotesk-Medium.woff2') format('woff2'),
        url('../assets/fonts/SpaceGrotesk-Medium.ttf') format('truetype');
-  font-feature-settings: 'tnum' on, 'lnum' on, 'ss02' on, 'ss03' on, 'ss04' on;
 }
 @font-face {
   font-family: 'fontBold';
   src: url('../assets/fonts/SpaceGrotesk-Bold.woff2') format('woff2'),
        url('../assets/fonts/SpaceGrotesk-Bold.ttf') format('truetype');
-  font-feature-settings: 'tnum' on, 'lnum' on, 'ss02' on, 'ss03' on, 'ss04' on;
 }
 
 //inter
