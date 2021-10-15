@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 export default function ProposalHero({githubId, title, pullRequestId, authorPullRequest, createdAt, beproStaked}) {
     const router = useRouter();
     const { issueId } = router.query;
-    
+
     return (
         <div className="banner bg-bepro-blue mb-4">
             <div className="container">
@@ -13,13 +13,13 @@ export default function ProposalHero({githubId, title, pullRequestId, authorPull
                     <div className="col-md-10">
                         <div className="d-flex flex-column">
                             <div className="d-flex align-items-center trans cursor-pointer">
-                                <Link 
+                                <Link
                                     href={{
                                         pathname:"/issue",
                                         query: { id: issueId }
                                     }}>
                                     <a>
-                                        <i className="ico-back mr-2"></i>
+                                        <i className="ico-back"></i>
                                     </a>
                                 </Link>
 

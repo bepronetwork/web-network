@@ -92,7 +92,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
     )
 
   if (!metaMaskWallet)
-    return <Button color='white' className='text-primary bg-opacity-100' onClick={connectWallet}><span>Connect</span> <i className="ico-metamask ml-1" /></Button>
+    return <Button color='white' className='text-primary bg-opacity-100' onClick={connectWallet}><span>Connect</span> <i className="ico-metamask" /></Button>
 
   return children;
 
