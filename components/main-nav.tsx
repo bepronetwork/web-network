@@ -17,6 +17,7 @@ import ExternalLinkIcon from '@assets/icons/external-link-icon';
 import TransactionsStateIndicator from '@components/transactions-state-indicator';
 import WrongNetworkModal from '@components/wrong-network-modal';
 import Button from './button';
+import PlusIcon from '@assets/icons/plus-icon';
 
 export default function MainNav() {
   const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
@@ -109,7 +110,7 @@ export default function MainNav() {
           <Button transparent><span>Get Started</span><ExternalLinkIcon className="ml-1" height={10} width={10} color="text-white"/></Button>
         </Link>
         <Link href="/create-issue" passHref>
-          <Button transparent>+ Create issue</Button>
+          <Button transparent><PlusIcon /> <span>Create issue</span></Button>
         </Link>
         <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 text-uppercase" transparent rounded><HelpIcon /></Button>
         <WrongNetworkModal requiredNetwork="kovan" />
@@ -123,7 +124,7 @@ export default function MainNav() {
 
             <Link href="/account" passHref>
               <Button className='mr-1' transparent>
-                <i className="ico-bepro mr-1"></i>
+                <i className="ico-bepro"></i>
                 <span>{formatNumberToNScale(beproBalance)}</span>
               </Button>
             </Link>
