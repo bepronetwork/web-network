@@ -18,6 +18,7 @@ import TransactionsStateIndicator from '@components/transactions-state-indicator
 import WrongNetworkModal from '@components/wrong-network-modal';
 import Button from './button';
 import PlusIcon from '@assets/icons/plus-icon';
+import BeproSmallLogo from '@assets/icons/bepro-small-logo';
 
 export default function MainNav() {
   const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
@@ -124,7 +125,7 @@ export default function MainNav() {
 
             <Link href="/account" passHref>
               <Button className='mr-1' transparent>
-                <i className="ico-bepro"></i>
+                <BeproSmallLogo />
                 <span>{formatNumberToNScale(beproBalance)}</span>
               </Button>
             </Link>
