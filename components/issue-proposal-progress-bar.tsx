@@ -81,7 +81,7 @@ export default function IssueProposalProgressBar({
       currentValue = item.Completed;
     }
 
-    if (index === currentStep) {
+    if (index === currentStep && isIssueinDraft) {
       currentValue = item.Warning;
     }
 

@@ -1,13 +1,13 @@
-import {GetStaticProps} from 'next'
+import { GetStaticProps } from 'next'
 import { useRouter } from 'next/router'
-import React, {useContext} from 'react';
-import {useEffect, useState} from 'react';
-import {BeproService} from '@services/bepro-service';
+import React, { useContext } from 'react';
+import { useEffect, useState } from 'react';
+import { BeproService } from '@services/bepro-service';
 import Link from 'next/link';
 import clsx from "clsx";
 import ConnectWalletButton from './connect-wallet-button';
-import {ApplicationContext} from '@contexts/application';
-import {changeStakedState} from '@reducers/change-staked-amount';
+import { ApplicationContext } from '@contexts/application';
+import { changeStakedState } from '@reducers/change-staked-amount';
 import { formatNumberToNScale, formatNumberToString } from 'helpers/formatNumber';
 import NetworkIdentifier from '@components/network-identifier';
 import BeproLogo from '@assets/icons/bepro-logo';
@@ -21,8 +21,8 @@ import PlusIcon from '@assets/icons/plus-icon';
 import BeproSmallLogo from '@assets/icons/bepro-small-logo';
 
 export default function MainNav() {
-  const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
-  const {asPath} = useRouter()
+  const { dispatch, state: { currentAddress, balance } } = useContext(ApplicationContext);
+  const { asPath } = useRouter()
 
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [address, setAddress] = useState<string>(null);
@@ -45,7 +45,7 @@ export default function MainNav() {
   }
 
   function updateAddress(address) {
-    setAddress(`${address.substr(0,6)}...${address.substr(-4)}`);
+    setAddress(`${address.substr(0, 6)}...${address.substr(-4)}`);
   }
 
   function updateBalances() {
@@ -86,19 +86,19 @@ export default function MainNav() {
         </Link>
         <ul className="nav-links">
           <li><Link href="/developers" passHref><a
-          className={clsx({
-            active: asPath === '/developers',
-          })}
+            className={clsx({
+              active: asPath === '/developers',
+            })}
           >Developers</a></Link></li>
           <li><Link href="/council" passHref><a
-          className={clsx({
-            active: asPath === '/council',
-          })}
+            className={clsx({
+              active: asPath === '/council',
+            })}
           >Council</a></Link></li>
           <li><Link href="/oracle" passHref><a
-          className={clsx({
-            active: asPath === '/oracle',
-          })}
+            className={clsx({
+              active: asPath === '/oracle',
+            })}
           >Oracle</a></Link></li>
           {/* <li><a href="/">Lists</a></li>
                         <li><a href="/issue">Issue</a></li>
@@ -107,13 +107,13 @@ export default function MainNav() {
         </ul>
       </div>
       <div className="d-flex flex-row align-items-center">
-        <Link href="https://support.bepro.network/en/articles/5595864-using-the-testnet" passHref>
-          <Button transparent><span>Get Started</span><ExternalLinkIcon className="ml-1" height={10} width={10} color="text-white"/></Button>
-        </Link>
+        <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" className='text-decoration-none' target="_blank">
+          <Button transparent><span>Get Started</span><ExternalLinkIcon className="ml-1" height={10} width={10} color="text-white" /></Button>
+        </a>
         <Link href="/create-issue" passHref>
           <Button transparent><PlusIcon /> <span>Create issue</span></Button>
         </Link>
-        <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 text-uppercase" transparent rounded><HelpIcon /></Button>
+        <Button onClick={() => setShowHelp(true)} className="ms-2 me-3 text-uppercase" transparent rounded><HelpIcon /></Button>
         <WrongNetworkModal requiredNetwork="kovan" />
 
         <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
