@@ -176,7 +176,7 @@ function OraclesActions(): JSX.Element {
   }
 
   function getTxType() {
-    return action === `Lock` && TransactionTypes.lock || TransactionTypes.unlock;
+    return action === `Lock` ? TransactionTypes.lock : TransactionTypes.unlock;
   }
 
   useEffect(updateWalletAddress, [currentAddress])
