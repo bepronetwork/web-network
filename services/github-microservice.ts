@@ -1,7 +1,7 @@
 import axios from 'axios';
-import {IssueData, IssueState} from '@interfaces/issue-data';
+import { IssueData, IssueState } from '@interfaces/issue-data';
 import { API } from '../env';
-import {ReposList} from '@interfaces/repos-list';
+import { ReposList } from '@interfaces/repos-list';
 
 export interface User {
   githubHandle: string;
@@ -29,108 +29,108 @@ export interface ProposalData {
   updatedAt: string;
 }
 
-const client = axios.create({baseURL: API});
+const client = axios.create({ baseURL: API });
 const repoList = [];
 
 export default class GithubMicroService {
 
   static async getClientNation() {
     return client.get(`/ip`)
-                 .then(({data}) => data)
-                 .catch(e => {
-                   console.error(e);
-                   return null;
-                 })
+      .then(({ data }) => data)
+      .catch(e => {
+        console.error(e);
+        return null;
+      })
   }
 
   static async createIssue(payload) {
     return client.post('/issues', payload)
-                 .then(({data}) => data)
-                 .catch(e => {
-                   console.error(`Error creating issue`, e);
-                   return null;
-                 });
+      .then(({ data }) => data)
+      .catch(e => {
+        console.error(`Error creating issue`, e);
+        return null;
+      });
   }
 
-  static async getIssues(page = '1', repoId = '', time = ``, state = ``) {
-    const search = new URLSearchParams({page, repoId, time, state});
-    const {data} = await client.get(`/issues/?${search.toString()}`);
+  static async getIssues(page = '1', repoId = '', time = ``, state = ``, sortBy = 'updatedAt', order = 'DESC') {
+    const search = new URLSearchParams({ page, repoId, time, state, sortBy, order });
+    const { data } = await client.get(`/issues/?${search.toString()}`);
     return data;
   }
 
   static async getIssuesByGhId(ghId: string | string[], repoId: string) {
-    return client.get(`/issues/github/${repoId}/${ghId}`).then(({data}) => data)
-    .catch(e => {
-      console.error(`Error fetchin issue`, e);
-      return null;
-    });
+    return client.get(`/issues/github/${repoId}/${ghId}`).then(({ data }) => data)
+      .catch(e => {
+        console.error(`Error fetchin issue`, e);
+        return null;
+      });
   }
 
   static async updateIssueByGhId(ghId: string, state: IssueState) {
-    return client.put(`/issues/${ghId}`, {state}).then(({data}) => data)
-    .catch(e => {
-      console.error(`Error fetchin issue`, e);
-      return null;
-    });
+    return client.put(`/issues/${ghId}`, { state }).then(({ data }) => data)
+      .catch(e => {
+        console.error(`Error fetchin issue`, e);
+        return null;
+      });
   }
 
   static async getIssuesByGhLogin(ghlogin, page = '1') {
-    const {data} = await client.get(`/issues/githublogin/${ghlogin}?page=${page}`);
+    const { data } = await client.get(`/issues/githublogin/${ghlogin}?page=${page}`);
     return data;
   }
 
   static async getPendingIssuesOf(address) {
-    const search = new URLSearchParams({address});
-    const {data} = await client.get(`/issues/pending?${search.toString()}`);
+    const search = new URLSearchParams({ address });
+    const { data } = await client.get(`/issues/pending?${search.toString()}`);
     return data;
   }
 
   static async getIssuesState(state: IssueState, page = '1') {
-    const {data} =  await client.get('/issues',{params: {state, page}});
+    const { data } = await client.get('/issues', { params: { state, page } });
     return data;
   }
 
   static async updateIssueState(issueID: string, state: IssueState) {
-    const {data} =  await client.put(`/issues/${issueID}`, {state});
+    const { data } = await client.put(`/issues/${issueID}`, { state });
     return data;
   }
 
   static async getIssueId(issueId: string | string[]) {
     return client.get(`/issues/${issueId}`)
-                 .then(({data}) => data)
-                 .catch(e => {
-                   console.error(`Error fetchin issue`, e);
-                   return null;
-                 });
+      .then(({ data }) => data)
+      .catch(e => {
+        console.error(`Error fetchin issue`, e);
+        return null;
+      });
   }
 
   static async getCommentsIssue(githubId: string | string[], repoId = ``) {
-    const {data} = await client.get(`/issues/github/${githubId}/${repoId}/comments`);
+    const { data } = await client.get(`/issues/github/${githubId}/${repoId}/comments`);
     return data;
   }
 
-  static async createGithubData(payload: {githubHandle: string, githubLogin: string, accessToken: string}): Promise<boolean> {
+  static async createGithubData(payload: { githubHandle: string, githubLogin: string, accessToken: string }): Promise<boolean> {
     return client.post<string>(`/users/connect`, payload)
-                 .then(({data}) => data === `ok`)
-                 .catch((error) => {
-                   if (error.response?.data)
-                     return error.response?.data;
+      .then(({ data }) => data === `ok`)
+      .catch((error) => {
+        if (error.response?.data)
+          return error.response?.data;
 
-                   console.error(`createGithubData Error`, error)
-                   return false;
-                 });
+        console.error(`createGithubData Error`, error)
+        return false;
+      });
   }
 
-  static async joinAddressToUser(githubHandle: string,payload: {address: string}): Promise<boolean> {
+  static async joinAddressToUser(githubHandle: string, payload: { address: string }): Promise<boolean> {
     return client.patch<string>(`/users/connect/${githubHandle}`, payload)
-                 .then(() => true)
-                 .catch((error) => {
-                   if (error.response)
-                     return error.response.data;
+      .then(() => true)
+      .catch((error) => {
+        if (error.response)
+          return error.response.data;
 
-                   console.error(`joinAddressToUser Error`, error)
-                   return `Unknown error. Check logs.`;
-                 });
+        console.error(`joinAddressToUser Error`, error)
+        return `Unknown error. Check logs.`;
+      });
   }
 
   /**
@@ -138,11 +138,11 @@ export default class GithubMicroService {
    */
   static async getUserOf(address: string): Promise<User> {
     return client.get<User>(`/users/address/${address.toLowerCase()}`)
-                 .then(({data}) => data)
-                 .catch(e => {
-                   console.error(`Failed to fetch user with address ${address}`, e);
-                   return {} as User;
-                 })
+      .then(({ data }) => data)
+      .catch(e => {
+        console.error(`Failed to fetch user with address ${address}`, e);
+        return {} as User;
+      })
   }
 
   /**
@@ -150,11 +150,11 @@ export default class GithubMicroService {
    */
   static async getHandleOf(address: string): Promise<any> {
     return GithubMicroService.getUserOf(address.toLowerCase())
-                             .then((data) => data?.githubHandle || ``)
-                             .catch(e => {
-                               console.error(`Error fetching user of ${address}`, e);
-                               return ``
-                             });
+      .then((data) => data?.githubHandle || ``)
+      .catch(e => {
+        console.error(`Error fetching user of ${address}`, e);
+        return ``
+      });
   }
 
   static async createPullRequestIssue(issueId: string | string[], payload) {
@@ -169,105 +169,105 @@ export default class GithubMicroService {
    * Should return network status
    */
   static async getNetworkStats() {
-    return client.get<{openIssues: number, beproStaked: number, tokensStaked: number, closedIssues?: number}>(`/networkstats`)
-                 .then(({data}) => data)
-                 .catch(e => {
-                   console.error(e);
-                   return {openIssues: 0, beproStaked: 0, tokensStaked: 0, closedIssues: 0}
-                 });
+    return client.get<{ openIssues: number, beproStaked: number, tokensStaked: number, closedIssues?: number }>(`/networkstats`)
+      .then(({ data }) => data)
+      .catch(e => {
+        console.error(e);
+        return { openIssues: 0, beproStaked: 0, tokensStaked: 0, closedIssues: 0 }
+      });
   }
 
   static async getPullRequestParticipants(prId: string) {
-    return client.get<{githubHandle: string; address?: string}[]>(`/pullrequests/${prId}/participants`)
-                 .then(({data}) => data)
-                 .catch(e => {
-                   console.error(e);
-                   return [{githubHandle: '', address: ''}];
-                 })
+    return client.get<{ githubHandle: string; address?: string }[]>(`/pullrequests/${prId}/participants`)
+      .then(({ data }) => data)
+      .catch(e => {
+        console.error(e);
+        return [{ githubHandle: '', address: '' }];
+      })
   }
 
-  static async getPullRequestsOfIssue(id: string): Promise<IssueData|null> {
+  static async getPullRequestsOfIssue(id: string): Promise<IssueData | null> {
     return client.get<IssueData>(`/issues/issue/${id}`)
-                 .then(({data}) => data)
-                 .catch(e => {
-                   console.error(e);
-                   return null;
-                 })
+      .then(({ data }) => data)
+      .catch(e => {
+        console.error(e);
+        return null;
+      })
   }
 
-  static async createMergeProposal(id: string, payload: { pullRequestGithubId: string, scMergeId: string; githubLogin: string}) {
+  static async createMergeProposal(id: string, payload: { pullRequestGithubId: string, scMergeId: string; githubLogin: string }) {
     return client.post<'ok'>(`/issues/${id}/mergeproposal`, payload)
-                 .then(({data}) => data === 'ok')
-                 .catch(e => {
-                   console.error(e);
-                   return false;
-                 });
+      .then(({ data }) => data === 'ok')
+      .catch(e => {
+        console.error(e);
+        return false;
+      });
   }
 
   static async getForks() {
     return client.get(`/forks`)
-                 .then(({data}) => data)
-                 .catch(e => {
-                   console.error(e);
-                   return null;
-                 })
+      .then(({ data }) => data)
+      .catch(e => {
+        console.error(e);
+        return null;
+      })
   }
 
   static async getForkedRepo(ghHandler: string, ofIssue: string) {
     return client.get(`/forks/repo/${ghHandler}/${ofIssue}`)
-                 .then(({data}) => data)
-                 .catch(e => {
-                   if (e.status === 404)
-                     return null;
+      .then(({ data }) => data)
+      .catch(e => {
+        if (e.status === 404)
+          return null;
 
-                   console.error(`Failed to get forked repo`, e);
-                   return null;
-                 })
+        console.error(`Failed to get forked repo`, e);
+        return null;
+      })
   }
 
   static async getMergeProposalIssue(issueId: string | string[], MergeId: string | string[]) {
     return client.get<ProposalData>(`/issues/mergeproposal/${MergeId}/${issueId}`)
-                 .then(({data}) => data)
-                 .catch(e => {
-                   console.error(`Failed to get proposal`, issueId, MergeId, e);
-                   return {scMergeId: '', pullRequestId: '', issueId: '', id: ''}
-                 })
+      .then(({ data }) => data)
+      .catch(e => {
+        console.error(`Failed to get proposal`, issueId, MergeId, e);
+        return { scMergeId: '', pullRequestId: '', issueId: '', id: '' }
+      })
   }
 
   static async getHealth() {
     return client.get(`/`)
-                 .then(({status}) => status === 200)
-                 .catch(e => {
-                   console.error(`Failed to get health`, e);
-                   return false;
-                 });
+      .then(({ status }) => status === 200)
+      .catch(e => {
+        console.error(`Failed to get health`, e);
+        return false;
+      });
   }
 
   static async patchGithubId(githubId: string, withIssueId: string) {
     return client.patch(`/issues/github/${githubId}/issueId/${withIssueId}`)
-                 .then((data) => data.data === 'ok')
-                 .catch((e) => {
-                   console.error(`Failed to patch github issue id with SC issue id`, e);
-                   return false;
-                 })
+      .then((data) => data.data === 'ok')
+      .catch((e) => {
+        console.error(`Failed to patch github issue id with SC issue id`, e);
+        return false;
+      })
   }
 
   static async getAllUsers() {
     return client.get(`/users/all`)
-                 .then(({data}) => data)
-                 .catch(e => {
-                   console.error(`Failed to get all users`, e);
-                   return [];
-                 })
+      .then(({ data }) => data)
+      .catch(e => {
+        console.error(`Failed to get all users`, e);
+        return [];
+      })
   }
 
   static async createRepo(owner, repo) {
-    return client.post(`/repos/`, {owner, repo})
-                 .then(({status}) => status === 200)
-                 .catch((e) => {
-                   console.error(`Failed to create repo`, e)
-                   return false;
-                 })
+    return client.post(`/repos/`, { owner, repo })
+      .then(({ status }) => status === 200)
+      .catch((e) => {
+        console.error(`Failed to create repo`, e)
+        return false;
+      })
   }
 
   static async getReposList(force = false) {
@@ -275,16 +275,16 @@ export default class GithubMicroService {
       return Promise.resolve(repoList);
 
     return client.get<ReposList>(`/repos/`)
-                 .then(({data}) => data)
-                 .catch(e => {
-                   console.error(`Failed to grep list`, e);
-                   return [] as ReposList;
-                 });
+      .then(({ data }) => data)
+      .catch(e => {
+        console.error(`Failed to grep list`, e);
+        return [] as ReposList;
+      });
   }
 
   static async removeRepo(id: string) {
     return client.delete(`/repos/${id}`)
-                 .then(({status}) => status === 200)
-                 .catch(() => false);
+      .then(({ status }) => status === 200)
+      .catch(() => false);
   }
 }
