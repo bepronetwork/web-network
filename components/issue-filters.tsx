@@ -1,14 +1,23 @@
 import IssueFilterBox from '@components/issue-filter-box';
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import useFilters from '@x-hooks/use-filters';
 import Button from '@components/button';
 import FilterIcon from '@assets/icons/filter-icon';
+import { useRouter } from 'next/router';
 
 export default function IssueFilters() {
   const node = useRef()
   const [show, setShow] = useState(false);
   const [[repoOptions, stateOptions, timeOptions], updateOptions] = useFilters();
+  const router = useRouter()
+  const { state, time, repoId } = router.query
+  function countFilters() {
+    const value = [state, time, repoId].reduce((p, c) => !!c ? p + 1 : p, 0);
+    if (value > 0)
+      return <span className='mr-1'>{value}</span>
 
+    return <FilterIcon />
+  }
   function handleClick(e) {
     // @ts-ignore
     if (node.current.contains(e.target))
@@ -29,17 +38,17 @@ export default function IssueFilters() {
   useEffect(loadOutsideClick, [show]);
 
   return <div className="position-relative d-flex justify-content-end" ref={node}>
-    <Button color="outline-dark bg-blue-hover" className={show && `border-blue` || ``} onClick={() => setShow(!show)}><FilterIcon/> <span>Filters</span></Button>
+    <Button color="outline-dark bg-blue-hover" className={show && `border-blue` || ``} onClick={() => setShow(!show)}>{countFilters()}<span>Filters</span></Button>
     <div className={`filter-wrapper d-${show ? `flex` : `none`} justify-content-start align-items-stretch position-absolute`}>
       <div>
         <IssueFilterBox className="h-100" title="repository" options={repoOptions} filterPlaceholder="Search repositories"
-                        onChange={(opt, checked) => updateOptions(repoOptions, opt, checked, 'repo')}/>
+          onChange={(opt, checked) => updateOptions(repoOptions, opt, checked, 'repo')} />
       </div>
       <div>
         <IssueFilterBox title="timeframe" options={timeOptions}
-                        onChange={(opt, checked) => updateOptions(timeOptions, opt, checked, 'time')}/>
+          onChange={(opt, checked) => updateOptions(timeOptions, opt, checked, 'time')} />
         <IssueFilterBox title="issue state" options={stateOptions}
-                        onChange={(opt, checked) => updateOptions(stateOptions, opt, checked, 'state')}/>
+          onChange={(opt, checked) => updateOptions(stateOptions, opt, checked, 'state')} />
       </div>
     </div>
   </div>
