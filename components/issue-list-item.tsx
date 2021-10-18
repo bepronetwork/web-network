@@ -84,7 +84,7 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
             </span>
             {issue?.repo && (
               <span className="p-small mr-2 mt-1 text-uppercase">
-                <GithubInfo color="blue" value={issue?.repo} hoverTextColor="white" onClicked={() => router.push({pathname: `/`, query: {repoId: issue?.repository_id}})} />
+                <GithubInfo color="blue" value={issue?.repo} hoverTextColor="white" onClicked={() => router.push({ pathname: `/`, query: { repoId: issue?.repository_id } })} />
               </span>
             )}
             <span className="p-small mr-2 mt-1">by</span>

@@ -1,25 +1,25 @@
-import {Fragment, useContext, useEffect, useRef, useState} from 'react';
-import {NumberFormatValues} from 'react-number-format';
+import { Fragment, useContext, useEffect, useRef, useState } from 'react';
+import { NumberFormatValues } from 'react-number-format';
 import InputNumber from './input-number';
 import OraclesBoxHeader from './oracles-box-header';
 import Modal from './modal';
-import {ApplicationContext} from '@contexts/application';
-import {BeproService} from '@services/bepro-service';
+import { ApplicationContext } from '@contexts/application';
+import { BeproService } from '@services/bepro-service';
 import NetworkTxButton from './network-tx-button';
-import {TransactionTypes} from '@interfaces/enums/transaction-types';
+import { TransactionTypes } from '@interfaces/enums/transaction-types';
 import { TransactionStatus } from '@interfaces/enums/transaction-status'
-import {TransactionCurrency} from '@interfaces/transaction';
-import {addTransaction} from '@reducers/add-transaction';
-import {updateTransaction} from '@reducers/update-transaction';
-import {formatNumberToCurrency} from 'helpers/formatNumber'
-import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
+import { TransactionCurrency } from '@interfaces/transaction';
+import { addTransaction } from '@reducers/add-transaction';
+import { updateTransaction } from '@reducers/update-transaction';
+import { formatNumberToCurrency } from 'helpers/formatNumber'
+import { changeOraclesParse, changeOraclesState } from '@reducers/change-oracles';
 import Button from './button';
 import LockIcon from "@assets/icons/lock"
 
 const actions: string[] = ["Lock", "Unlock"];
 
 function OraclesActions(): JSX.Element {
-  const {state: {beproInit, metaMaskWallet, currentAddress, balance, oracles, myTransactions}, dispatch} = useContext(ApplicationContext);
+  const { state: { beproInit, metaMaskWallet, currentAddress, balance, oracles, myTransactions }, dispatch } = useContext(ApplicationContext);
 
   const [show, setShow] = useState<boolean>(false);
   const [action, setAction] = useState<string>(actions[0]);
@@ -71,18 +71,18 @@ function OraclesActions(): JSX.Element {
 
   function updateValues() {
     BeproService.getBalance('bepro')
-                .then(amount => {
-                  BeproService.network
-                              .isApprovedSettlerToken({address: currentAddress, amount})
-                              .then(updateErrorsAndApproval)
-                })
+      .then(amount => {
+        BeproService.network
+          .isApprovedSettlerToken({ address: currentAddress, amount })
+          .then(updateErrorsAndApproval)
+      })
   }
 
   function onSuccess() {
-    BeproService.network.getOraclesSummary({address: currentAddress})
-                .then(oracles => {
-                  dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles)))
-                });
+    BeproService.network.getOraclesSummary({ address: currentAddress })
+      .then(oracles => {
+        dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles)))
+      });
   }
 
   function updateWalletAddress() {
@@ -94,10 +94,10 @@ function OraclesActions(): JSX.Element {
   }
 
   function handleChangeToken(params: NumberFormatValues) {
-    if(error)
+    if (error)
       setError("")
 
-    if(params.floatValue < 1 || !params.floatValue)
+    if (params.floatValue < 1 || !params.floatValue)
       return setTokenAmount(0)
 
     if (params.floatValue > getMaxAmmount())
@@ -123,8 +123,8 @@ function OraclesActions(): JSX.Element {
     !isApproved,
     !currentAddress,
     tokenAmount > getMaxAmmount(),
-    myTransactions.find(({status, type}) =>
-                          status === TransactionStatus.pending && type === getTxType())
+    myTransactions.find(({ status, type }) =>
+      status === TransactionStatus.pending && type === getTxType())
   ].some(values => values)
 
   const isApproveButtonDisabled = (): boolean => [
@@ -136,22 +136,22 @@ function OraclesActions(): JSX.Element {
     if (!currentAddress)
       return;
 
-    const approveTx = addTransaction({type: TransactionTypes.approveSettlerToken});
+    const approveTx = addTransaction({ type: TransactionTypes.approveSettlerToken });
 
     BeproService.network.approveSettlerERC20Token()
-                .then((txInfo) => {
-                  BeproService.parseTransaction(txInfo, approveTx.payload)
-                              .then(block => dispatch(updateTransaction(block)));
-                  return txInfo.status
-                })
-                .then(() => {
-                  setIsApproved(true);
-                  setError(``);
-                })
-                .catch(e => {
-                  dispatch(updateTransaction({...approveTx.payload as any, remove: true}));
-                  console.error(`Failed to approve settler token`, e);
-              })
+      .then((txInfo) => {
+        BeproService.parseTransaction(txInfo, approveTx.payload)
+          .then(block => dispatch(updateTransaction(block)));
+        return txInfo.status
+      })
+      .then(() => {
+        setIsApproved(true);
+        setError(``);
+      })
+      .catch(e => {
+        dispatch(updateTransaction({ ...approveTx.payload as any, remove: true }));
+        console.error(`Failed to approve settler token`, e);
+      })
   }
 
   function checkLockedAmount() {
@@ -159,8 +159,8 @@ function OraclesActions(): JSX.Element {
       return;
 
     BeproService.network
-                .isApprovedSettlerToken({address: BeproService.address, amount: tokenAmount})
-                .then(handleCheck);
+      .isApprovedSettlerToken({ address: BeproService.address, amount: tokenAmount })
+      .then(handleCheck);
   }
 
   function getCurrentLabel(): TransactionCurrency {
@@ -176,11 +176,10 @@ function OraclesActions(): JSX.Element {
   }
 
   function getTxType() {
-    return action === `Lock` && TransactionTypes.lock || TransactionTypes.unlock;
+    return action === `Lock` ? TransactionTypes.lock : TransactionTypes.unlock;
   }
 
   useEffect(updateWalletAddress, [currentAddress])
-
   return (
     <>
       <div className="col-md-5">
@@ -211,17 +210,17 @@ function OraclesActions(): JSX.Element {
                 )}
               </>)
             }
-            />
+          />
 
           <div className="mt-5 d-grid gap-3">
 
             <Button disabled={isApproveButtonDisabled()} onClick={approveSettlerToken}>Approve</Button>
             {isApproved &&
-            <Button color={action === 'Lock' ? 'purple' : 'primary'} className="ms-0" disabled={isButtonDisabled()}
-              onClick={checkLockedAmount}>
-                  {isButtonDisabled() && <LockIcon width={12} height={12} className="mr-1"/>}
-                  <span>{renderInfo.label}</span>
-            </Button>}
+              <Button color={action === 'Lock' ? 'purple' : 'primary'} className="ms-0" disabled={isButtonDisabled()}
+                onClick={checkLockedAmount}>
+                {isButtonDisabled() && <LockIcon width={12} height={12} className="mr-1" />}
+                <span>{renderInfo.label}</span>
+              </Button>}
           </div>
 
           <NetworkTxButton
@@ -235,7 +234,7 @@ function OraclesActions(): JSX.Element {
             onSuccess={onSuccess}
             onFail={setError}
             ref={networkTxRef}
-            />
+          />
 
         </div>
       </div>

@@ -112,22 +112,22 @@ export default function PageActions({
   async function handleRedeem() {
     const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue });
     dispatch(redeemTx);
-    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    const issue_id = await BeproService.network.getIssueByCID({ issueCID: issueId }).then(({ _id }) => _id);
 
     await BeproService.login()
       .then(() => {
         BeproService.network.redeemIssue({ issueId: issue_id })
-                    .then((txInfo) => BeproService.parseTransaction(txInfo, redeemTx.payload)
-                                            .then((block) => dispatch(updateTransaction(block))))
-                    .then(() => {
-                      BeproService.getBalance("bepro")
-                                  .then((bepro) => dispatch(changeBalance({ bepro })))
-                    })
-                    .then(() => { handleBeproService(); handleMicroService(); })
-                    .catch((err) => {
-                      dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
-                      console.error(`Error redeeming`, err);
-                    });
+          .then((txInfo) => BeproService.parseTransaction(txInfo, redeemTx.payload)
+            .then((block) => dispatch(updateTransaction(block))))
+          .then(() => {
+            BeproService.getBalance("bepro")
+              .then((bepro) => dispatch(changeBalance({ bepro })))
+          })
+          .then(() => { handleBeproService(); handleMicroService(); })
+          .catch((err) => {
+            dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
+            console.error(`Error redeeming`, err);
+          });
       }).catch((err) => {
         dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
         console.error(`Error logging in`, err);
@@ -140,7 +140,7 @@ export default function PageActions({
       issueCreator === currentAddress &&
       !finalized && (
         <Button
-          className="mx-1"
+          className="ml-2"
           disabled={isReedemButtonDisable()}
           onClick={handleRedeem}
         >
@@ -234,7 +234,7 @@ export default function PageActions({
     const disputeTx = addTransaction({ type: TransactionTypes.dispute });
     dispatch(disputeTx);
 
-    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    const issue_id = await BeproService.network.getIssueByCID({ issueCID: issueId }).then(({ _id }) => _id);
 
     await BeproService.network
       .disputeMerge({ issueID: issue_id, mergeID: mergeId })
@@ -256,7 +256,7 @@ export default function PageActions({
     const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue });
     dispatch(closeIssueTx);
 
-    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    const issue_id = await BeproService.network.getIssueByCID({ issueCID: issueId }).then(({ _id }) => _id);
 
     await BeproService.network
       .closeIssue({ issueID: issue_id, mergeID: mergeId })
@@ -296,7 +296,7 @@ export default function PageActions({
               {state?.toLowerCase() == "pull request" && (
                 <>
                   <Button
-                    color={`${isDisputed ? 'primary': 'purple'}`}
+                    color={`${isDisputed ? 'primary' : 'purple'}`}
                     onClick={handleDispute}
                   >
                     Dispute
