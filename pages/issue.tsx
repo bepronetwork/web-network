@@ -149,7 +149,7 @@ export default function PageIssue() {
       />
 
       <IssueDescription description={issue?.body}></IssueDescription>
-      <IssueComments comments={commentsIssue}></IssueComments>
+      <IssueComments comments={commentsIssue} repo={issue?.repo} issueId={issue?.id}></IssueComments>
     </>
   );
 }

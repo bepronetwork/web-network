@@ -228,7 +228,7 @@ body {
 }
 
 .mediumCaption{
-  font-family: 'fontRegular', sans-serif;
+  font-family: 'fontMedium', sans-serif;
   font-weight: 700;
   font-size: 14px;
   line-height: 140%;
@@ -392,10 +392,6 @@ p {
     color: $white;
     opacity: 1;
   }
-}
-
-.subnav-github {
-  text-decoration: none;
 }
 
 .account-bepro {
