@@ -101,7 +101,7 @@ export default function PageDevelopers() {
             </div>
           </div>
           <ListIssues listIssues={issues} />
-          <Paginate count={results.count} onChange={(page) => router.push({pathname: `/`, query:{page}})} />
+          {issues.length !== 0 && <Paginate count={results.count} onChange={(page) => router.push({pathname: `/`, query:{page}})} />}
           {issues.length === 0 && !loading.isLoading ? (
             <div className="col-md-10">
               <NothingFound

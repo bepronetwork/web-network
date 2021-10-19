@@ -33,6 +33,7 @@ export default function PageCreateIssue() {
   const {dispatch, state: {currentAddress, githubHandle, myTransactions}} = useContext(ApplicationContext);
   const [currentUser, setCurrentUser] = useState<User>();
   const [repository_id, setRepositoryId] = useState(``);
+  const [redirecting, setRedirecting] = useState(false);
   const router = useRouter()
 
   async function allowCreateIssue() {
@@ -90,7 +91,7 @@ export default function PageCreateIssue() {
 
     const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount: payload.amount});
     dispatch(openIssueTx);
-
+    setRedirecting(true)
     GithubMicroService.createIssue(payload)
                       .then(cid => {
                         if (!cid)
@@ -107,10 +108,10 @@ export default function PageCreateIssue() {
                       })
                       .then(({githubId, issueId}) =>
                         GithubMicroService.patchGithubId(githubId, issueId)
-                          .then(result => {
+                          .then(async(result) => {
                             if (!result)
                                 return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
-                            router.push(`/issue?id=${githubId}&repoId=${repository_id}`)
+                            await router.push(`/issue?id=${githubId}&repoId=${repository_id}`)
                           }))
                       .catch(e => {
                         console.error(`Failed to createIssue`, e);
@@ -118,7 +119,7 @@ export default function PageCreateIssue() {
                         dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
                         dispatch(toastError(e.message || `Error creating issue`));
                         return false;
-                      })
+                      }).finally(()=> setRedirecting(false))
   }
 
   const issueContentIsValid = (): boolean => !!issueTitle && !!issueDescription;
@@ -136,6 +137,7 @@ export default function PageCreateIssue() {
       !!issueAmount.formattedValue,
       !verifyTransactionState(TransactionTypes.openIssue),
       !!repository_id,
+      !redirecting,
     ].some(value => value === false);
   }
 

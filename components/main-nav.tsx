@@ -107,9 +107,9 @@ export default function MainNav() {
         </ul>
       </div>
       <div className="d-flex flex-row align-items-center">
-        <Link href="https://support.bepro.network/en/articles/5595864-using-the-testnet" passHref>
+        <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" className='text-decoration-none' target="_blank">
           <Button transparent><span>Get Started</span><ExternalLinkIcon className="ml-1" height={10} width={10} color="text-white"/></Button>
-        </Link>
+        </a>
         <Link href="/create-issue" passHref>
           <Button transparent><PlusIcon /> <span>Create issue</span></Button>
         </Link>
