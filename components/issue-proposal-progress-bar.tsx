@@ -5,7 +5,8 @@ export enum StatusIds {
   Canceled = 'Canceled',
   UntilDone = '3 days until done',
   Distribution = 'Distribution',
-  Pending = 'Pending'
+  Pending = 'Pending',
+  InProgress = 'In Progress'
 }
 export default function IssueProposalProgressBar({
   isFinalized = false,
@@ -16,7 +17,7 @@ export default function IssueProposalProgressBar({
 }) {
   const [stepColor, setStepColor] = useState<string>('');
   const [currentStep, setCurrentStep] = useState<number>();
-  const steps = ['Draft', 'Development', 'Finalized', 'Validation & Disputes', 'Closed and Distributed']
+  const steps = ['Draft', 'Development', 'Finalized', 'Validation & Disputes', 'Closed & Distributed']
 
   function toRepresentationPercent() {
     return currentStep === 0 ? `1` : `${currentStep * 25}`
@@ -40,13 +41,13 @@ export default function IssueProposalProgressBar({
       value = 1
       if (isFinished) {
         value = 2
-        if (mergeProposalsAmount >= 0)
+        if (mergeProposalsAmount > 0)
           value = 4;
-        if (isFinalized)
+        if(isFinalized){
           value = 5;
+        }
       }
     }
-
     setCurrentStep(value)
     setStepColor(getStepColor());
   }
@@ -72,6 +73,11 @@ export default function IssueProposalProgressBar({
         text: StatusIds.Pending,
         color: 'gray',
         bgColor: 'dark-gray',
+      },
+      InProgress: {
+        text: StatusIds.InProgress,
+        color: 'white',
+        bgColor: 'primary',
       }
     }
 
@@ -79,6 +85,10 @@ export default function IssueProposalProgressBar({
 
     if (index < currentStep) {
       currentValue = item.Completed;
+    }
+
+    if (index === currentStep) {
+      currentValue = item.InProgress;
     }
 
     if (index === currentStep && isIssueinDraft) {
@@ -118,7 +128,7 @@ export default function IssueProposalProgressBar({
     </>
   }
 
-  useEffect(loadDisputeState, [isFinalized, isIssueinDraft, mergeProposalsAmount]);
+  useEffect(loadDisputeState, [isFinalized, isIssueinDraft, isCanceled, mergeProposalsAmount, isFinished]);
 
   return (
     <div className="container">

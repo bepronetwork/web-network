@@ -228,7 +228,7 @@ body {
 }
 
 .mediumCaption{
-  font-family: 'fontRegular', sans-serif;
+  font-family: 'fontMedium', sans-serif;
   font-weight: 700;
   font-size: 14px;
   line-height: 140%;
@@ -394,10 +394,6 @@ p {
   }
 }
 
-.subnav-github {
-  text-decoration: none;
-}
-
 .account-bepro {
   display: flex;
   align-items: center;
@@ -548,20 +544,6 @@ label {
   color: $bg-shadow;
   font-weight: 400;
   text-transform: capitalize;
-  &.gray {
-    background-color: $gray;
-  }
-  &.blue {
-    background-color: $blue;
-    color: $white;
-  }
-  &.success {
-    background-color: $success;
-  }
-  &.red {
-    background-color: $danger;
-    color: $white;
-  }
 }
 
 .badge-opaque {

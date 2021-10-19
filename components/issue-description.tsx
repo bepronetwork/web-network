@@ -8,9 +8,11 @@ export default function IssueDescription({ description }) {
                 <div className="col-md-10">
                     <div className="content-wrapper mb-3">
                         <h3 className="smallCaption mb-3">DESCRIPTION</h3>
-                        <p className="paragraph">
-                            <MarkedRender source={description} />
-                        </p>
+                        <div className="bg-dark-gray p-3 rounded">
+                            <div className="p p-1">
+                                <MarkedRender source={description} />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
