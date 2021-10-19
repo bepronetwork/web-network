@@ -15,28 +15,28 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
   function handleColorState(state: IssueState) {
     switch (state.toLowerCase()) {
       case "draft": {
-        return "gray";
+        return "bg-white-50";
       }
       case "open": {
-        return "blue";
+        return "bg-blue text-white";
       }
       case "in progress": {
-        return "blue";
+        return "bg-blue text-white";
       }
       case "canceled": {
-        return "dark-gray";
+        return "bg-dark-gray text-white";
       }
       case "closed": {
-        return "dark-gray";
+        return "bg-dark-gray text-white";
       }
       case "ready": {
-        return "success";
+        return "bg-success";
       }
       case "done": {
-        return "success";
+        return "bg-success";
       }
       case "disputed": {
-        return "danger";
+        return "bg-danger text-white";
       }
       // REVIEW: redeem not exist in figma
       case "redeemed": {

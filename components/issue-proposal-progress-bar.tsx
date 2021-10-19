@@ -40,13 +40,13 @@ export default function IssueProposalProgressBar({
       value = 1
       if (isFinished) {
         value = 2
-        if (mergeProposalsAmount >= 0)
+        if (mergeProposalsAmount > 0)
           value = 4;
-        if (isFinalized)
+        if(isFinalized){
           value = 5;
+        }
       }
     }
-
     setCurrentStep(value)
     setStepColor(getStepColor());
   }
@@ -118,7 +118,7 @@ export default function IssueProposalProgressBar({
     </>
   }
 
-  useEffect(loadDisputeState, [isFinalized, isIssueinDraft, mergeProposalsAmount]);
+  useEffect(loadDisputeState, [isFinalized, isIssueinDraft, isCanceled, mergeProposalsAmount, isFinished]);
 
   return (
     <div className="container">

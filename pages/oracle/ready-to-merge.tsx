@@ -39,7 +39,7 @@ export default function ReadyToMergeIssues() {
   return (
     <Oracle buttonPrimaryActive={false}>
       <ListIssues listIssues={issues} />
-      {issues.length !== 0 && <Paginate count={results.count} />}
+      {issues?.length !== 0 && <Paginate count={results.count} />}
       {
         issues?.length === 0 &&
         <div className="mt-4">
