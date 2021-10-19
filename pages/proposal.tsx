@@ -50,6 +50,7 @@ export default function PageProposal() {
   const [isFinished, setIsFinished] = useState<boolean>();
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
+  const [repo, setRepo] = useState(``);
 
   async function getProposalData() {
     const mergeProposal = await GithubMicroService.getMergeProposalIssue(dbId, mergeId);
@@ -75,7 +76,7 @@ export default function PageProposal() {
   }
 
   function getIssueAmount() {
-    return BeproService.network.getIssueByCID({issueCID: issueMicroService?.issueId})
+    return BeproService.network.getIssueByCID({issueCID: issueId})
                        .then(({_id}) => BeproService.network.getIssueById({issueId: _id}))
                        .then(issue => {
                          setAmountIssue(issue.tokensStaked);
@@ -114,6 +115,11 @@ export default function PageProposal() {
 
   useEffect(() => { loadProposalData() }, [currentAddress, issueId]);
   useEffect(() => { updateUsersAddresses(proposalBepro) }, [proposalBepro, currentAddress]);
+  useEffect(() => {
+    GithubMicroService.getReposList()
+                      .then(list => list.find(({id}) => id.toString() === (issueId as string).split(`/`)[0]))
+                      .then(item => setRepo(item?.githubPath))
+  }, [])
 
   return (
     <>
@@ -140,6 +146,7 @@ export default function PageProposal() {
         mergeId={mergeId as string}
         handleBeproService={getProposal}
         isDisputed={proposalBepro?.isDisputed}
+        repoPath={repo}
         finished={isFinished} />
       <ProposalAddresses addresses={usersAddresses} currency="$BEPRO" />
 

@@ -18,7 +18,7 @@ export interface ProposalData {
   issueId: number;
   scMergeId: string;
   pullRequestId: number;
-  pullRequest: {
+  pullRequest?: {
     id: number;
     githubId: string;
     issueId: number;
@@ -272,7 +272,7 @@ export default class GithubMicroService {
 
   static async getReposList(force = false) {
     if (!force && repoList.length)
-      return Promise.resolve(repoList);
+      return Promise.resolve(repoList as ReposList);
 
     return client.get<ReposList>(`/repos/`)
                  .then(({data}) => data)
@@ -286,5 +286,16 @@ export default class GithubMicroService {
     return client.delete(`/repos/${id}`)
                  .then(({status}) => status === 200)
                  .catch(() => false);
+  }
+
+  static async waitForMerge(login, scId, ghPrId) {
+    return client.get(`/merge/created/for/${login}/${scId}/${ghPrId}`)
+                 .then(({data}) => {
+                   console.log(data);
+                   return data;
+                 })
+                 .catch(e => {
+                   console.log(`E`, e);
+                 })
   }
 }
