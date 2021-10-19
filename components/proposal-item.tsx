@@ -45,31 +45,34 @@ export default function ProposalItem({proposal, dbId, issueId, amount, beproStak
 
   return <>
     <div className="container-list-item">
-      <div className="rounded row align-items-top">
-          <Link passHref href={{pathname: "/proposal", query: { prId: proposal.pullRequestId, mergeId: proposal.scMergeId, dbId, issueId },}}>
+      <Link passHref href={{pathname: "/proposal", query: { prId: proposal.pullRequestId, mergeId: proposal.scMergeId, dbId, issueId },}}>
+        <a className="text-decoration-none text-white">
+          <div className="rounded row align-items-top">
             <div className={`col-4 p-small cursor-pointer mt-2 ${proposal.isDisputed && `text-danger` || ``}`}>
               PR #{proposal.pullRequestGithubId}
             </div>
-          </Link>
-          <Link passHref href={{pathname: "/proposal", query: { prId: proposal.pullRequestId, mergeId: proposal.scMergeId, dbId, issueId  },}}>
             <div className="col-4 cursor-pointer d-flex justify-content-start mb-2">
               {proposal.prAmounts.map((value, i) =>
-                <PercentageProgressBar textClass={`smallCaption p-small ${proposal.isDisputed ? `text-danger` : `color-purple`}`}
-                                       pgClass={`bg-${proposal.isDisputed ? `danger` : `purple`}`}
-                                       className={i+1 < proposal.prAmounts.length && `me-2` || ``}
-                                       value={value} total={amount} />)}
+                                        <PercentageProgressBar textClass={`smallCaption p-small ${proposal.isDisputed ? `text-danger` : `color-purple`}`}
+                                                               pgClass={`bg-${proposal.isDisputed ? `danger` : `purple`}`}
+                                                               className={i+1 < proposal.prAmounts.length && `me-2` || ``}
+                                                               value={value} total={amount} />)}
             </div>
-          </Link>
-        <div className="col-4 d-flex justify-content-between">
-          <ProposalProgressSmall pgClass={`bg-${proposal.isDisputed ? `danger` : `purple`}`}
-                                 value={+proposal.disputes}
-                                 total={beproStaked}
-                                 textClass={`pb-2 ${proposal.isDisputed ? `text-danger` : `color-purple`}`}/>
-          <Button color={proposal.isDisputed ? `danger` : `purple`} outline={proposal.isDisputed} className={`align-self-center mb-2 ms-3`} onClick={() => handleDispute(+proposal._id)}>
-            {proposal.isDisputed ? `Failed` : `Dispute`}
-          </Button>
-        </div>
-      </div>
+
+            <div className="col-4 d-flex justify-content-between">
+              <ProposalProgressSmall pgClass={`bg-${proposal.isDisputed ? `danger` : `purple`}`}
+                                     value={+proposal.disputes}
+                                     total={beproStaked}
+                                     textClass={`pb-2 ${proposal.isDisputed ? `text-danger` : `color-purple`}`}/>
+              <Button color={proposal.isDisputed ? `danger` : `purple`}
+                      outline={proposal.isDisputed} className={`align-self-center mb-2 ms-3`}
+                      onClick={(ev) => { ev.stopPropagation(); handleDispute(+proposal._id) }}>
+                {proposal.isDisputed ? `Failed` : `Dispute`}
+              </Button>
+            </div>
+          </div>
+        </a>
+    </Link>
     </div>
     </>
 }

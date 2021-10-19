@@ -52,7 +52,7 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
     const {time, state} = router.query || {};
     setStateFilters([
                       makeFilterOption(`All`, `allstates`, !state),
-                      makeFilterOption(`Open Issues`, `open`, state === `open`),
+                      makeFilterOption(`Open Issues`, `open`, state === `ready`),
                       makeFilterOption(`Draft Issues`, `draft`, state === `draft`),
                       makeFilterOption(`Closed Issues`, `closed`, state === `closed`),])
 

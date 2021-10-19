@@ -4,26 +4,21 @@ import { useRouter } from 'next/router';
 
 export default function ProposalHero({githubId, title, pullRequestId, authorPullRequest, createdAt, beproStaked}) {
     const router = useRouter();
-    const { issueId } = router.query;
-
+    const { issueId: issueCID } = router.query;
+    const [repoId, issueId] = (issueCID as string).split(`/`);
     return (
         <div className="banner bg-bepro-blue mb-4">
             <div className="container">
                 <div className="row justify-content-center">
                     <div className="col-md-10">
                         <div className="d-flex flex-column">
-                            <div className="d-flex align-items-center cursor-pointer">
-                                <Link
-                                    href={{
-                                        pathname:"/issue",
-                                        query: { id: issueId }
-                                    }}>
-                                    <a>
-                                        <i className="ico-back"></i>
+                            <div className="d-flex align-items-center cursor-pointer text-truncate">
+                                <Link href={{ pathname:"/issue", query: { id: issueId, repoId }}}>
+                                    <a className="text-decoration-none text-white">
+                                        <i className="ico-back me-2" />
+                                        <span className="p mb-0">#{githubId} {title}</span>
                                     </a>
                                 </Link>
-
-                                <p className="p mb-0 text-truncate w-50">#{githubId} {title}</p>
                             </div>
                             <div className="row">
                                 <div className="col-md-9">
