@@ -95,7 +95,7 @@ export default function MyIssues() {
       </div>)
   else issueChild = <>
       {issues.map(issue => <div className="col-md-10" key={issue.issueId}><IssueListItem issue={issue}/></div>)}
-      <Paginate count={results.count} onChange={(page) => router.push({pathname: `/account`, query: {page}})}/>
+      {issues.length !== 0 && <Paginate count={results.count} onChange={(page) => router.push({pathname: `/account`, query: {page}})}/>}
     </>
 
   return (
