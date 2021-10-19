@@ -50,7 +50,9 @@ export default function PageIssue() {
   };
 
   function getsIssueBeproService() {
-    console.log(getIssueCID());
+    if (!currentAddress)
+      return;
+
     BeproService.network.getIssueByCID({ issueCID: getIssueCID() })
       .then(netIssue => {
         setNetworkIssue(netIssue);
@@ -118,7 +120,7 @@ export default function PageIssue() {
         description={issue?.body}
         handleBeproService={getsIssueBeproService}
         handleMicroService={getsIssueMicroService}
-        pullRequests={issue?.pullRequests && (Array.isArray(issue.pullRequests) && issue.pullRequests || [issue.pullRequests as any]) || []}
+        pullRequests={issue?.pullRequests || []}
         mergeProposals={networkIssue?.mergeProposalsAmount}
         amountIssue={networkIssue?.tokensStaked}
         forks={forks}
@@ -130,6 +132,8 @@ export default function PageIssue() {
         finished={networkIssue?.recognizedAsFinished} />
       {networkIssue?.mergeProposalsAmount > 0 && (
         <IssueProposals
+          metaProposals={issue?.mergeProposals}
+          metaRequests={issue?.pullRequests}
           numberProposals={networkIssue?.mergeProposalsAmount}
           issueId={issue?.issueId}
           dbId={issue?.id}
