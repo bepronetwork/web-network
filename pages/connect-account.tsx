@@ -149,7 +149,7 @@ export default function ConnectAccount() {
             <div className="row gx-3">
               <div className="col-6">
                 <div className={`button-connect border bg-${githubLogin? `dark border-dark`: `black border-black border-primary-hover cursor-pointer`} rounded d-flex justify-content-between p-3 align-items-center`} onClick={connectGithub}>
-                  {!githubLogin && <div className="mx-auto d-flex align-items-center text-uppercase smallCaption"><GithubImage width={15} height={15} opacity={1}/> <span className="ms-2">github</span></div>}
+                  {!githubLogin && <div className="mx-auto d-flex align-items-center"><GithubImage width={15} height={15} opacity={1}/> <span className="ms-2 text-uppercase smallCaption">github</span></div>}
                   {githubLogin && (
                     <>
                     <div><Avatar userLogin={githubLogin || `null`} /> <span className="ms-2">{session?.user?.name}</span></div>
@@ -161,7 +161,7 @@ export default function ConnectAccount() {
               </div>
               <div className="col-6">
                 <div className={`button-connect border bg-${currentAddress ? `dark border-dark` : `black border-black border-primary-hover cursor-pointer`} rounded d-flex justify-content-between p-3 align-items-center ${getValidClass()}`} onClick={connectWallet}>
-                  {!currentAddress && <div className="mx-auto d-flex align-items-center text-uppercase smallCaption">{renderMetamaskLogo()} <span className="ms-2">metamask</span></div>}
+                  {!currentAddress && <div className="mx-auto d-flex align-items-center">{renderMetamaskLogo()} <span className="ms-2 text-uppercase smallCaption">metamask</span></div>}
                   {currentAddress && (
                     <>
                     <div>{renderMetamaskLogo()} <span className="ms-2">{currentAddress && truncateAddress(currentAddress) || `Connect wallet`}</span></div>
