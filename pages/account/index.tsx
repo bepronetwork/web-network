@@ -95,14 +95,14 @@ export default function MyIssues() {
       </div>)
   else issueChild = <>
       {issues.map(issue => <div className="col-md-10" key={issue.issueId}><IssueListItem issue={issue}/></div>)}
-      {issues.length !== 0 && <Paginate count={results.count} onChange={(page) => router.push({pathname: `/account`, query: {page}})}/>}
+      {issues?.length !== 0 && <Paginate count={results.count} onChange={(page) => router.push({pathname: `/account`, query: {page}})}/>}
     </>
 
   return (
     <Account buttonPrimaryActive={true}>
       <div className="container p-footer">
         <div className="row justify-content-center">
-          {pendingIssues.length &&
+          {pendingIssues?.length &&
           <div className="col-md-10">
             <div className="h4 mb-4">Pending issues</div>
             {pendingIssues.map(issue => <IssueListItem issue={issue} xClick={() => updatePendingIssue(issue)}/>)}
