@@ -154,20 +154,14 @@ export default function PageActions({
     return (
       !finalized &&
       pullRequests?.length > 0 &&
-      githubLogin && (
-        <>
-          <NewProposal
-            issueId={issueId}
-            isFinished={finished}
-            isIssueOwner={issueCreator == currentAddress}
-            amountTotal={amountIssue}
-            numberMergeProposals={mergeProposals}
-            pullRequests={pullRequests}
-            handleBeproService={handleBeproService}
-            handleMicroService={handleMicroService}
-          />
-        </>
-      )
+      githubLogin && <NewProposal issueId={issueId}
+                                  isFinished={finished}
+                                  isIssueOwner={issueCreator == currentAddress}
+                                  amountTotal={amountIssue}
+                                  numberMergeProposals={mergeProposals}
+                                  pullRequests={pullRequests}
+                                  handleBeproService={handleBeproService}
+                                  handleMicroService={handleMicroService}/>
     );
   }
 
@@ -175,11 +169,7 @@ export default function PageActions({
     return (
       !finalized &&
       githubLogin && (
-        <Button
-          className="ms-1"
-          onClick={() => setShowPRModal(true)}
-          disabled={!githubHandle || !currentAddress || !canOpenPR}
-        >
+        <Button onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || !canOpenPR}>
           Create Pull Request
         </Button>
       )
@@ -267,9 +257,7 @@ export default function PageActions({
       })
       .then(() => handleBeproService())
       .catch((err) => {
-        dispatch(
-          updateTransaction({ ...(closeIssueTx.payload as any), remove: true })
-        );
+        dispatch(updateTransaction({ ...(closeIssueTx.payload as any), remove: true }));
         console.error(`Error closing issue`, err);
       });
   }
@@ -284,30 +272,17 @@ export default function PageActions({
               {renderIssueAvatars()}
               {forks && renderForkAvatars()}
 
-              <GithubLink forcePath={repoPath} hrefPath={`issues/${githubId || ""}`}>
-                view on github
-              </GithubLink>
+              <GithubLink forcePath={repoPath} hrefPath={`issues/${githubId || ""}`}>view on github</GithubLink>
 
-              {!isClosedIssue(state) && <GithubLink color="primary" forcePath={repoPath} hrefPath="fork">work on this issue</GithubLink>}
+              {!isClosedIssue(state) && githubLogin && <GithubLink color="primary" forcePath={repoPath} hrefPath="fork">work on this issue</GithubLink>}
 
               {renderRedeem()}
               {renderProposeDestribution()}
-              {!isClosedIssue(state) && renderPullrequest()}
+              {!isClosedIssue(state) && githubLogin && renderPullrequest()}
               {state?.toLowerCase() == "pull request" && (
                 <>
-                  <Button
-                    color={`${isDisputed ? 'primary': 'purple'}`}
-                    onClick={handleDispute}
-                  >
-                    Dispute
-                  </Button>
-
-                  <Button
-                    className="mx-3"
-                    onClick={handleClose}
-                  >
-                    Close
-                  </Button>
+                  <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>Dispute</Button>
+                  <Button onClick={handleClose}>Close</Button>
                 </>
               )}
             </div>

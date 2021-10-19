@@ -84,29 +84,21 @@ export default function NewProposal({
     const proposeMergeTx = addTransaction({type: TransactionTypes.proposeMerge})
     dispatch(proposeMergeTx);
 
+    GithubMicroService.waitForMerge(githubLogin, issue_id, currentGithubId)
+                      .then(data => {
+                        console.log(`GOT`, data);
+                        handleBeproService();
+                        handleMicroService();
+                        handleClose();
+                        setDistrib({});
+                      })
+
     await BeproService.network
                       .proposeIssueMerge(payload)
                       .then(txInfo => {
                         BeproService.parseTransaction(txInfo, proposeMergeTx.payload)
                                     .then(block => dispatch(updateTransaction(block)));
                       })
-                      .then(() =>
-                              GithubMicroService.createMergeProposal(issueId, {
-                                pullRequestGithubId: currentGithubId,
-                                scMergeId: numberMergeProposals.toString(),
-                                githubLogin,
-                              }).then(() => {
-                                handleBeproService();
-                                handleMicroService();
-                                handleClose();
-                                setDistrib({});
-                              })
-                                                .then(() => {
-                                                  handleClose();
-                                                  setDistrib({});
-                                                })
-                                                .catch(() => setError('Error to create proposal in MicroService'))
-                      )
                       .catch(() => {
                         dispatch(updateTransaction({...proposeMergeTx.payload as any, remove: true}))
                         setError('Error to create proposal in Smart Contract')
@@ -175,8 +167,8 @@ export default function NewProposal({
   return (
     <>
       {
-        isCouncil && isFinished && <Button className="mx-1" onClick={() => setShow(true)}>Create Proposal</Button>
-          || isIssueOwner && !isFinished && renderRecognizeAsFinished()
+        isCouncil && isFinished && <Button onClick={() => setShow(true)}>Create Proposal</Button>
+        || isIssueOwner && !isFinished && renderRecognizeAsFinished()
       }
 
       <Modal show={show}
