@@ -9,7 +9,7 @@ export default function useGithubRepo(id: string, path: string) {
       return;
 
     GithubMicroService.getReposList()
-                      .then(repos => repos.find(({id: _id}) => _id === id)?.githubPath)
+                      .then(repos => repos.find(({id: _id}) => +_id === +id)?.githubPath)
                       .then(setGithubPath)
   }
 
