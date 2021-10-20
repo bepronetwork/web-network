@@ -213,8 +213,8 @@ export default class GithubMicroService {
                  })
   }
 
-  static async getForkedRepo(ghHandler: string, ofIssue: string) {
-    return client.get(`/forks/repo/${ghHandler}/${ofIssue}`)
+  static async getForkedRepo(ghLogin: string, ofIssue: string) {
+    return client.get(`/forks/repo/${ghLogin}/${ofIssue}`)
                  .then(({data}) => data)
                  .catch(e => {
                    if (e.status === 404)
