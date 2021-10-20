@@ -20,7 +20,7 @@ interface NetworkIssue {
 export default function PageIssue() {
   const router = useRouter();
   const { id, repoId } = router.query;
-  const { state: { githubHandle, currentAddress }, } = useContext(ApplicationContext);
+  const { state: { githubHandle, currentAddress, githubLogin }, } = useContext(ApplicationContext);
 
   const [issue, setIssue] = useState<IssueData>();
   const [networkIssue, setNetworkIssue] = useState<any>();
@@ -74,7 +74,7 @@ export default function PageIssue() {
   };
 
   const getRepoForked = () => {
-    GithubMicroService.getForkedRepo(githubHandle, [repoId, id].join(`/`))
+    GithubMicroService.getForkedRepo(githubLogin, [repoId, id].join(`/`))
       .then((repo) => setCanOpenPR(!!repo))
   }
 
@@ -140,13 +140,13 @@ export default function PageIssue() {
           amount={networkIssue?.tokensStaked}
         />
       )}
-      <IssueProposalProgressBar
+      {networkIssue && <IssueProposalProgressBar
         isFinalized={networkIssue?.finalized}
-        isIssueinDraft={issue?.state === `draft`}
+        isIssueinDraft={issue?.state === `draft` || issue?.pullRequests.length < 1}
         mergeProposalsAmount={networkIssue?.mergeProposalsAmount}
         isFinished={networkIssue?.recognizedAsFinished}
-        isCanceled={issue?.state === `closed`}
-      />
+        isCanceled={issue?.state === `canceled` || networkIssue?.canceled}
+      />}
 
       <IssueDescription description={issue?.body}></IssueDescription>
       <IssueComments comments={commentsIssue} repo={issue?.repo} issueId={issue?.id}></IssueComments>

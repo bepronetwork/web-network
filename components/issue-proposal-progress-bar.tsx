@@ -42,9 +42,9 @@ export default function IssueProposalProgressBar({
       if (isFinished) {
         value = 2
         if (mergeProposalsAmount > 0)
-          value = 4;
+          value = 3;
         if(isFinalized){
-          value = 5;
+          value = 4;
         }
       }
     }
