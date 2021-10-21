@@ -142,7 +142,7 @@ export default function PageIssue() {
       )}
       {networkIssue && <IssueProposalProgressBar
         isFinalized={networkIssue?.finalized}
-        isIssueinDraft={issue?.state === `draft` || issue?.pullRequests.length < 1}
+        isIssueinDraft={isIssueinDraft}
         mergeProposalsAmount={networkIssue?.mergeProposalsAmount}
         isFinished={networkIssue?.recognizedAsFinished}
         isCanceled={issue?.state === `canceled` || networkIssue?.canceled}
