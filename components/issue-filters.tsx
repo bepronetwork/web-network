@@ -15,7 +15,7 @@ export default function IssueFilters() {
   function countFilters() {
     const value = +!!state + +!!time + +!!repoId;
     if (value > 0)
-      return <div className='mr-1 bg-primary rounded-4 p-1'>{value}</div>
+      return <div className='mr-1 bg-primary rounded-4 p-1 mx-n1'>{value}</div>
 
     return <FilterIcon />
   }

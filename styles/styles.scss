@@ -952,6 +952,28 @@ $c_props: ('m': 'margin') !default;
     height: 60px;
   }
 }
+.opacity-hover{
+  &-25{
+    &:hover{
+      opacity: 25!important;
+    }
+  }
+  &-50{
+    &:hover{
+      opacity: 50!important;
+    }
+  }
+  &-75{
+    &:hover{
+      opacity: 75!important;
+    }
+  }
+  &-100{
+    &:hover{
+      opacity: 100!important;
+    }
+  }
+}
 .hover-white{
   &:hover {
     background-color: rgba(rgba($white, 0), 0.2);
