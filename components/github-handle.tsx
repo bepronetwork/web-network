@@ -3,16 +3,17 @@ import { ApplicationContext } from "@contexts/application";
 import {useSession} from 'next-auth/react';
 import {Image} from 'react-bootstrap';
 import Button from "./button";
+import Avatar from "./avatar";
 
 export default function GithubHandle() {
-  const {state: { githubHandle }} = useContext(ApplicationContext);
+  const {state: { githubHandle, githubLogin }} = useContext(ApplicationContext);
   const {data: session} = useSession();
-
+  
   if (githubHandle)
     return (
       <Button className="mr-1" transparent>
         <span>{githubHandle}{" "}</span>
-        {session?.user?.image && <Image src={session?.user?.image} className="ms-2 circle-3" />}
+        <Avatar src={session?.user?.image} userLogin={githubLogin} className="ms-2" />
       </Button>
     );
 
