@@ -140,7 +140,6 @@ export default function PageActions({
       issueCreator === currentAddress &&
       !finalized && (
         <Button
-          className="mx-1"
           disabled={isReedemButtonDisable()}
           onClick={handleRedeem}
         >

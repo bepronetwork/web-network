@@ -152,7 +152,7 @@ export default function ConnectAccount() {
                   {!githubLogin && <div className="mx-auto d-flex align-items-center"><GithubImage width={15} height={15} opacity={1}/> <span className="ms-2 text-uppercase smallCaption">github</span></div>}
                   {githubLogin && (
                     <>
-                    <div><Avatar userLogin={githubLogin || `null`} /> <span className="ms-2">{session?.user?.name}</span></div>
+                    <div><Avatar src={session?.user?.image} userLogin={githubLogin || `null`} /> <span className="ms-2">{session?.user?.name}</span></div>
                     <CheckMarkIcon />
                     </>
                   )}
