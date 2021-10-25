@@ -17,7 +17,7 @@ function OraclesBoxHeader({
     <div className="d-flex justify-content-between align-items-center mb-3">
       <div className="d-flex">
         {typeof actions === "string" ? (
-          <h4 className="h4 mb-0">{actions}</h4>
+          <h4 className="h4 mb-0 text-white bg-opacity-100">{actions}</h4>
         ) : (
           actions.map((action: string) => (
             <button
@@ -32,7 +32,7 @@ function OraclesBoxHeader({
         )}
       </div>
       {typeof available !== "undefined" && (
-        <span className="badge-opac">{formatNumberToCurrency(available)} Available</span>
+        <span className="badge-opac bg-dark-gray text-white text-opacity-100 smallCaption py-1 px-3">{formatNumberToCurrency(available)} Available</span>
       )}
     </div>
   );

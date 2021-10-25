@@ -1,13 +1,9 @@
 import OraclesBoxHeader from "./oracles-box-header";
-import { isEmpty, isEqual, sumBy, uniqueId } from "lodash";
 import {useContext, useEffect, useState} from 'react';
 import OraclesTakeBackItem from "./oracles-take-back-item";
 import {ApplicationContext} from '@contexts/application';
 import {BeproService} from '@services/bepro-service';
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
-import {characterEntities} from 'character-entities';
-
-type Item = { address: string; amount: string };
 
 export default function OraclesTakeBack(): JSX.Element {
 
@@ -23,6 +19,11 @@ export default function OraclesTakeBack(): JSX.Element {
     setDelegatedAmount(oracles.delegatedToOthers)
   }
 
+  function updateOracles() {
+    BeproService.network.getOraclesSummary({address: currentAddress})
+                .then(oracles => dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles))));
+  }
+
   useEffect(setMappedSummaryItems, [beproInit, metaMaskWallet, oracles, currentAddress]);
 
   useEffect(() => {
@@ -30,8 +31,7 @@ export default function OraclesTakeBack(): JSX.Element {
       return;
 
     oldAddress = currentAddress;
-    BeproService.network.getOraclesSummary({address: currentAddress})
-                .then(oracles => dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles))));
+    updateOracles();
 
   }, [balance.staked, currentAddress])
 
@@ -44,10 +44,9 @@ export default function OraclesTakeBack(): JSX.Element {
             {!(items || []).length
               ? "No delegates found"
               : items.map(([address, amount]) => (
-                  <OraclesTakeBackItem
-                    key={[address, amount].join(`.`)}
-                    address={address}
-                    amount={amount.toString()} />
+                  <OraclesTakeBackItem key={[address, amount].join(`.`)}
+                                       address={address}
+                                       amount={amount.toString()} onConfirm={() => updateOracles()} />
                 ))}
           </div>
         </div>

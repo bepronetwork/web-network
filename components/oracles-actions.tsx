@@ -5,11 +5,7 @@ import OraclesBoxHeader from './oracles-box-header';
 import Modal from './modal';
 import {ApplicationContext} from '@contexts/application';
 import {BeproService} from '@services/bepro-service';
-import {changeLoadState} from '@reducers/change-load-state';
-import ApproveButton from './approve-button';
-import TransferOraclesButton from './transfer-oracles-button';
 import NetworkTxButton from './network-tx-button';
-import {changeBalance} from '@reducers/change-balance';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import { TransactionStatus } from '@interfaces/enums/transaction-status'
 import {TransactionCurrency} from '@interfaces/transaction';
@@ -17,6 +13,8 @@ import {addTransaction} from '@reducers/add-transaction';
 import {updateTransaction} from '@reducers/update-transaction';
 import {formatNumberToCurrency} from 'helpers/formatNumber'
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
+import Button from './button';
+import LockIcon from "@assets/icons/lock"
 
 const actions: string[] = ["Lock", "Unlock"];
 
@@ -31,13 +29,13 @@ function OraclesActions(): JSX.Element {
   const [walletAddress, setWalletAddress] = useState(``);
 
   const networkTxRef = useRef<HTMLButtonElement>(null);
-  const renderAmount = tokenAmount ? `${formatNumberToCurrency(tokenAmount)} ` : "";
+  const renderAmount = tokenAmount ? `${formatNumberToCurrency(tokenAmount)} ` : "0";
 
   const renderInfo = {
     Lock: {
       title: "Lock $BEPRO",
-      description: "Lock $BEPRO to curate the Network",
-      label: `Lock ${renderAmount}$BEPRO`,
+      description: "Lock $BEPRO to receive Oracles",
+      label: `Get ${renderAmount} Oracles`,
       caption: "Get Oracles from $BEPRO",
       body: `You are locking ${tokenAmount} $BEPRO /br/ to get /oracles${tokenAmount} Oracles/`,
       params() {
@@ -47,7 +45,7 @@ function OraclesActions(): JSX.Element {
     Unlock: {
       title: "Unlock $BEPRO",
       description: "Unlock $BEPRO And Withdraw",
-      label: `Withdraw ${renderAmount}$BEPRO`,
+      label: `Get ${renderAmount} $BEPRO`,
       caption: "Get $BEPRO from Oracles",
       body: `Give away /oracles${tokenAmount} Oracles/ /br/ to get back ${tokenAmount} $BEPRO`,
       params(from: string) {
@@ -96,13 +94,14 @@ function OraclesActions(): JSX.Element {
   }
 
   function handleChangeToken(params: NumberFormatValues) {
-    if(params.floatValue < 0)
+    if(error)
+      setError("")
+
+    if(params.floatValue < 1 || !params.floatValue)
       return setTokenAmount(0)
 
     if (params.floatValue > getMaxAmmount())
       setError(`Amount is greater than your ${getCurrentLabel()} amount`)
-    else if(error)
-      setError("")
 
     setTokenAmount(params.floatValue);
   }
@@ -128,6 +127,11 @@ function OraclesActions(): JSX.Element {
                           status === TransactionStatus.pending && type === getTxType())
   ].some(values => values)
 
+  const isApproveButtonDisabled = (): boolean => [
+    !currentAddress,
+    isApproved,
+  ].some(values => values)
+
   function approveSettlerToken() {
     if (!currentAddress)
       return;
@@ -147,7 +151,7 @@ function OraclesActions(): JSX.Element {
                 .catch(e => {
                   dispatch(updateTransaction({...approveTx.payload as any, remove: true}));
                   console.error(`Failed to approve settler token`, e);
-                })
+              })
   }
 
   function checkLockedAmount() {
@@ -167,8 +171,12 @@ function OraclesActions(): JSX.Element {
     return action === `Lock` && balance.bepro || (+oracles.tokensLocked - oracles.delegatedToOthers);
   }
 
+  function setMaxAmmount() {
+    return setTokenAmount(getMaxAmmount())
+  }
+
   function getTxType() {
-    return action === `Lock` && TransactionTypes.lock || TransactionTypes.unlock;
+    return action === `Lock` ? TransactionTypes.lock : TransactionTypes.unlock;
   }
 
   useEffect(updateWalletAddress, [currentAddress])
@@ -177,23 +185,44 @@ function OraclesActions(): JSX.Element {
     <>
       <div className="col-md-5">
         <div className="content-wrapper h-100">
-          <OraclesBoxHeader actions={actions} onChange={setAction} currentAction={action} />
+          <OraclesBoxHeader actions={actions} onChange={setAction} currentAction={action} available={getMaxAmmount()} />
 
-          <p className="p text-white">{renderInfo.description}</p>
+          <p className="smallCaption text-white text-uppercase mt-2 mb-3">{renderInfo.description}</p>
 
           <InputNumber
             disabled={!isApproved || !metaMaskWallet}
             label={`${getCurrentLabel()} Amount`}
-            symbol={`${getCurrentLabel().toLocaleUpperCase()}`}
+            symbol={`${getCurrentLabel()}`}
+            classSymbol={`${getCurrentLabel() === 'Oracles' ? "text-purple" : "text-blue"}`}
             max={balance.bepro}
             error={error}
-            helperText={error}
             value={tokenAmount}
             onValueChange={handleChangeToken}
-            thousandSeparator />
+            thousandSeparator
+            helperText={(
+              <>
+                {formatNumberToCurrency(getMaxAmmount())} {getCurrentLabel()} Available
+                {!error && (
+                  <span
+                    className={`smallCaption ml-1 cursor-pointer text-uppercase ${`${getCurrentLabel() === 'Oracles' ? "text-purple" : "text-blue"}`}`}
+                    onClick={setMaxAmmount}>
+                    Max
+                  </span>
+                )}
+              </>)
+            }
+            />
 
-          { action === 'Lock' && !isApproved && <ApproveButton disabled={!currentAddress} onClick={approveSettlerToken} /> || ``}
-          {isApproved && <TransferOraclesButton buttonLabel={renderInfo.label} disabled={isButtonDisabled()} onClick={checkLockedAmount} />}
+          <div className="mt-5 d-grid gap-3">
+
+            <Button disabled={isApproveButtonDisabled()} onClick={approveSettlerToken}>Approve</Button>
+            {isApproved &&
+            <Button color={action === 'Lock' ? 'purple' : 'primary'} className="ms-0" disabled={isButtonDisabled()}
+              onClick={checkLockedAmount}>
+                  {isButtonDisabled() && <LockIcon width={12} height={12} className="mr-1"/>}
+                  <span>{renderInfo.label}</span>
+            </Button>}
+          </div>
 
           <NetworkTxButton
             txMethod={action.toLowerCase()}
@@ -205,7 +234,8 @@ function OraclesActions(): JSX.Element {
             modalDescription={renderInfo.description}
             onSuccess={onSuccess}
             onFail={setError}
-            ref={networkTxRef} />
+            ref={networkTxRef}
+            />
 
         </div>
       </div>
@@ -217,12 +247,12 @@ function OraclesActions(): JSX.Element {
         show={show}
         footer={
           <>
-            <button className="btn btn-md btn-opac" onClick={handleCancel}>
+            <Button color='dark-gray' onClick={handleCancel}>
               Cancel
-            </button>
-            <button className="btn btn-md btn-primary" onClick={handleConfirm}>
+            </Button>
+            <Button onClick={handleConfirm}>
               Confirm
-            </button>
+            </Button>
           </>
         }>
         <p className="p-small text-white-50 text-center">

@@ -8,14 +8,16 @@ import GithubMicroService from '@services/github-microservice';
 import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';
 import NothingFound from '@components/nothing-found';
+import Button from '@components/button';
 
 export default function PageCouncil() {
   const {dispatch} = useContext(ApplicationContext);
-  const [issues, setIssues] = useState<IssueData[]>();
+  const [issues, setIssues] = useState<IssueData[]>([]);
 
   function getIssues() {
     dispatch(changeLoadState(true))
     GithubMicroService.getIssuesState('ready')
+                      .then(data => data.rows)
                       .then(setIssues)
                       .catch((error) => {
                         console.error('getIssuesState Error', error)
@@ -36,12 +38,12 @@ export default function PageCouncil() {
           {
             issues?.length === 0 &&
             <div className="mt-4">
-              <NothingFound 
+              <NothingFound
               description="No issues ready to propose">
                 <Link href="/create-issue" passHref>
-                  <button className="btn btn-md btn-primary">
+                  <Button>
                     create one
-                  </button>
+                  </Button>
                 </Link>
               </NothingFound>
             </div>
