@@ -4,6 +4,8 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   color?: string;
   outline?: boolean;
   transparent?: boolean;
+  opacity?: 100 | 75 | 50 | 25,
+  active?: boolean,
   rounded?: boolean;
   upperCase?: boolean;
 }
@@ -14,7 +16,9 @@ export default function Button({
                                  outline,
                                  transparent,
                                  rounded,
+                                 opacity,
                                  className = ``,
+                                 active,
                                  ...rest
                                }: ButtonProps) {
 
@@ -24,7 +28,7 @@ export default function Button({
     let append = className;
 
     if (transparent)
-      append += ' bg-transparent border-transparent bg-opac-hover'
+      append += ' bg-transparent border-transparent'
 
     if (rounded)
       append += ` circle-2 p-0`;
@@ -32,6 +36,9 @@ export default function Button({
     if (outline)
       append += ` bg-opac-hover-25`
 
+    if(opacity && !active)
+      append += ` opacity-${opacity} opacity-hover-100`
+    
     return `btn ${type} ${textColor} d-flex align-items-center justify-content-center text-uppercase shadow-none ${append}`
   }
 
