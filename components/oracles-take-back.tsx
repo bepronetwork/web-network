@@ -1,12 +1,9 @@
 import OraclesBoxHeader from "./oracles-box-header";
-import { isEmpty, isEqual, sumBy, uniqueId } from "lodash";
 import {useContext, useEffect, useState} from 'react';
 import OraclesTakeBackItem from "./oracles-take-back-item";
 import {ApplicationContext} from '@contexts/application';
 import {BeproService} from '@services/bepro-service';
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
-
-type Item = { address: string; amount: string };
 
 export default function OraclesTakeBack(): JSX.Element {
 
@@ -44,10 +41,10 @@ export default function OraclesTakeBack(): JSX.Element {
         <OraclesBoxHeader actions="List of delegations" available={delegatedAmount} />
         <div className="row">
           <div className="col">
-            {isEmpty(items)
+            {!(items || []).length
               ? "No delegates found"
               : items.map(([address, amount]) => (
-                  <OraclesTakeBackItem key={uniqueId("OraclesTakeBackItem_")}
+                  <OraclesTakeBackItem key={[address, amount].join(`.`)}
                                        address={address}
                                        amount={amount.toString()} onConfirm={() => updateOracles()} />
                 ))}
