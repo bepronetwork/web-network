@@ -11,20 +11,33 @@ export default NextAuth({
   ],
   callbacks: {
     async signIn({user, account, profile}) {
+      // console.log(`User`, user);
+      // console.log(`Account`, account);
+      // console.log(`Profile`, profile);
+
       if (user.name && profile.login)
         return await GithubMicroService.createGithubData({
           githubHandle: user.name,
-          githubLogin: profile.login.toString()
+          githubLogin: profile.login?.toString(),
+          accessToken: account?.access_token,
         }).then(result => {
           if (result === true)
             return true;
 
-          console.log(result);
+          console.error(`Error logging in`, result);
 
           return `/?authError=${result}`;
         });
 
       return false
     },
+    async jwt({ token, user, account, profile, isNewUser }) {
+      // console.log(`JWT`, token, user, account, profile, isNewUser);
+      return token;
+    },
+    async session({ session, user, token }) {
+      // console.log(`Session`, session, user, token);
+      return session;
+    }
   },
 });

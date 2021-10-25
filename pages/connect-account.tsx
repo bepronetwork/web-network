@@ -15,10 +15,12 @@ import {truncateAddress} from '@helpers/truncate-address';
 import {BeproService} from '@services/bepro-service';
 import {changeWalletState} from '@reducers/change-wallet-connect';
 import {changeCurrentAddress} from '@reducers/change-current-address';
-import ConnectWalletButton from '@components/connect-wallet-button';
 import CheckMarkIcon from '@assets/icons/checkmark-icon';
 import LockIcon from '@assets/icons/lock';
 import ErrorMarkIcon from '@assets/icons/errormark-icon';
+import {changeNetwork} from '@reducers/change-network';
+import {NetworkIds} from '@interfaces/enums/network-ids';
+import Button from '@components/button';
 
 
 export default function ConnectAccount() {
@@ -91,9 +93,13 @@ export default function ConnectAccount() {
     let loggedIn = false;
 
     try {
-      loggedIn = await BeproService.login();
+      const chainId = (window as any).web3?.currentProvider?.chainId;
+      if (+process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID !== +chainId) {
+        dispatch(changeNetwork(NetworkIds[+chainId]?.toLowerCase()))
+        return;
+      } else loggedIn = await BeproService.login();
     } catch (e) {
-      console.log(e);
+      console.error(`Failed to login on BeproService`, e);
     }
 
     if (!loggedIn) {
@@ -143,10 +149,10 @@ export default function ConnectAccount() {
             <div className="row gx-3">
               <div className="col-6">
                 <div className={`button-connect border bg-${githubLogin? `dark border-dark`: `black border-black border-primary-hover cursor-pointer`} rounded d-flex justify-content-between p-3 align-items-center`} onClick={connectGithub}>
-                  {!githubLogin && <div className="mx-auto d-flex align-items-center text-uppercase smallCaption"><GithubImage width={15} height={15} opacity={1}/> <span className="ms-2">github</span></div>}
+                  {!githubLogin && <div className="mx-auto d-flex align-items-center"><GithubImage width={15} height={15} opacity={1}/> <span className="ms-2 text-uppercase smallCaption">github</span></div>}
                   {githubLogin && (
                     <>
-                    <div><Avatar userLogin={githubLogin || `null`} /> <span className="ms-2">{session?.user?.name}</span></div>
+                    <div><Avatar src={session?.user?.image} userLogin={githubLogin || `null`} /> <span className="ms-2">{session?.user?.name}</span></div>
                     <CheckMarkIcon />
                     </>
                   )}
@@ -155,7 +161,7 @@ export default function ConnectAccount() {
               </div>
               <div className="col-6">
                 <div className={`button-connect border bg-${currentAddress ? `dark border-dark` : `black border-black border-primary-hover cursor-pointer`} rounded d-flex justify-content-between p-3 align-items-center ${getValidClass()}`} onClick={connectWallet}>
-                  {!currentAddress && <div className="mx-auto d-flex align-items-center text-uppercase smallCaption">{renderMetamaskLogo()} <span className="ms-2">metamask</span></div>}
+                  {!currentAddress && <div className="mx-auto d-flex align-items-center">{renderMetamaskLogo()} <span className="ms-2 text-uppercase smallCaption">metamask</span></div>}
                   {currentAddress && (
                     <>
                     <div>{renderMetamaskLogo()} <span className="ms-2">{currentAddress && truncateAddress(currentAddress) || `Connect wallet`}</span></div>
@@ -170,18 +176,17 @@ export default function ConnectAccount() {
               By connecting, you accept <a href="https://www.bepro.network/terms-and-conditions" target="_blank" className="text-decoration-none">Terms & Conditions</a> & <a href="https://www.bepro.network/private-policy" target="_blank" className="text-decoration-none">PRIVACY POLICY</a>
             </div>
             <div className="d-flex justify-content-center mt-4">
-              <button className="btn btn-md p-3 btn-primary me-3 text-uppercase text-center
-              d-flex align-items-center justify-content-between"
-                      disabled={!isGhValid}
-                      onClick={joinAddressToGh}>
-                <span className="mr-1">{!isGhValid && <LockIcon/>}</span>
+              <Button 
+                className='me-3'
+                disabled={!isGhValid}
+                onClick={joinAddressToGh}>
+                {!isGhValid && <LockIcon  className="mr-1" width={14} height={14}/>}
                 DONE
-              </button>
-
-              <button className="btn btn-md p-3 btn-opac text-uppercase text-white"
+              </Button>
+              <Button color='dark-gray'
                       onClick={cancelAndSignOut}>
                 CANCEL
-              </button>
+              </Button>
 
             </div>
           </div>

@@ -8,16 +8,18 @@ import {BeproService} from '@services/bepro-service';
 import {updateTransaction} from '@reducers/update-transaction';
 import {useContext} from 'react';
 import {ApplicationContext} from '@contexts/application';
+import Button from './button';
 
 interface Options {
   proposal: Proposal,
+  dbId: string;
   issueId: string;
   amount: number;
   beproStaked: number;
   onDispute: (error?: boolean) => void;
 }
 
-export default function ProposalItem({proposal, issueId, amount, beproStaked, onDispute = () => {}}: Options) {
+export default function ProposalItem({proposal, dbId, issueId, amount, beproStaked, onDispute = () => {}}: Options) {
   const { dispatch,} = useContext(ApplicationContext);
 
   async function handleDispute(mergeId) {
@@ -27,7 +29,8 @@ export default function ProposalItem({proposal, issueId, amount, beproStaked, on
     if (proposal.isDisputed)
       return;
 
-    await BeproService.network.disputeMerge({issueID: issueId, mergeID: mergeId,})
+    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    await BeproService.network.disputeMerge({issueID: issue_id, mergeID: mergeId,})
                       .then(txInfo => {
                         BeproService.parseTransaction(txInfo, disputeTx.payload)
                                     .then(block => dispatch(updateTransaction(block)));
@@ -36,37 +39,40 @@ export default function ProposalItem({proposal, issueId, amount, beproStaked, on
                       .catch((err) => {
                         dispatch(updateTransaction({...disputeTx.payload as any, remove: true}));
                         onDispute(true);
-                        console.log("Error creating dispute", err)
+                        console.error("Error creating dispute", err)
                       })
   }
 
   return <>
     <div className="container-list-item">
-      <div className="rounded row align-items-top">
-          <Link passHref href={{pathname: "/proposal", query: { id: proposal.pullRequestId, issueId: issueId },}}>
+      <Link passHref href={{pathname: "/proposal", query: { prId: proposal.pullRequestId, mergeId: proposal.scMergeId, dbId, issueId },}}>
+        <a className="text-decoration-none text-white">
+          <div className="rounded row align-items-top">
             <div className={`col-4 p-small cursor-pointer mt-2 ${proposal.isDisputed && `text-danger` || ``}`}>
               PR #{proposal.pullRequestGithubId}
             </div>
-          </Link>
-          <Link passHref href={{pathname: "/proposal", query: { id: proposal.pullRequestId, issueId: issueId },}}>
             <div className="col-4 cursor-pointer d-flex justify-content-start mb-2">
               {proposal.prAmounts.map((value, i) =>
-                <PercentageProgressBar textClass={`smallCaption p-small ${proposal.isDisputed ? `text-danger` : `color-purple`}`}
-                                       pgClass={`bg-${proposal.isDisputed ? `danger` : `purple`}`}
-                                       className={i+1 < proposal.prAmounts.length && `me-2` || ``}
-                                       value={value} total={amount} />)}
+                                        <PercentageProgressBar textClass={`smallCaption p-small ${proposal.isDisputed ? `text-danger` : `color-purple`}`}
+                                                               pgClass={`bg-${proposal.isDisputed ? `danger` : `purple`}`}
+                                                               className={i+1 < proposal.prAmounts.length && `me-2` || ``}
+                                                               value={value} total={amount} />)}
             </div>
-          </Link>
-        <div className="col-4 d-flex justify-content-between">
-          <ProposalProgressSmall pgClass={`bg-${proposal.isDisputed ? `danger` : `purple`}`}
-                                 value={+proposal.disputes}
-                                 total={beproStaked}
-                                 textClass={`pb-2 ${proposal.isDisputed ? `text-danger` : `color-purple`}`}/>
-          <button className={`align-self-center mb-2 ms-3 btn btn-md btn-${proposal.isDisputed ? `outline-danger` : `purple`}`} onClick={() => handleDispute(+proposal._id)}>
-            {proposal.isDisputed ? `Failed` : `Dispute`}
-          </button>
-        </div>
-      </div>
+
+            <div className="col-4 d-flex justify-content-between">
+              <ProposalProgressSmall pgClass={`bg-${proposal.isDisputed ? `danger` : `purple`}`}
+                                     value={+proposal.disputes}
+                                     total={beproStaked}
+                                     textClass={`pb-2 ${proposal.isDisputed ? `text-danger` : `color-purple`}`}/>
+              <Button color={proposal.isDisputed ? `danger` : `purple`}
+                      outline={proposal.isDisputed} className={`align-self-center mb-2 ms-3`}
+                      onClick={(ev) => { ev.stopPropagation(); handleDispute(+proposal._id) }}>
+                {proposal.isDisputed ? `Failed` : `Dispute`}
+              </Button>
+            </div>
+          </div>
+        </a>
+    </Link>
     </div>
     </>
 }

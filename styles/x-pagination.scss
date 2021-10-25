@@ -1,0 +1,14 @@
+@import "variables";
+
+ul.pagination .page-item {
+  &:not(.disabled) {
+    &:first-child .page-link { color: $primary;  }
+    &:last-child .page-link {color: $primary; }
+  }
+
+  .page-link {
+    border-radius: $pagination-border-radius;
+    font-size: 14px;
+    line-height: 150%;
+  }
+}

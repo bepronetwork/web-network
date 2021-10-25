@@ -12,6 +12,8 @@ import {addTransaction} from '@reducers/add-transaction';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import {toastWarning} from '@reducers/add-toast';
+import Button from './button';
+import {useRouter} from 'next/router';
 
 interface participants {
   githubHandle: string;
@@ -27,7 +29,7 @@ export default function NewProposal({
                                       handleMicroService,
                                       isIssueOwner = false, isFinished = false
                                     }) {
-  const {dispatch, state: {balance, currentAddress, beproInit, oracles,},} = useContext(ApplicationContext);
+  const {dispatch, state: {balance, currentAddress, beproInit, oracles, githubLogin},} = useContext(ApplicationContext);
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>();
   const [error, setError] = useState<string>('');
@@ -36,6 +38,8 @@ export default function NewProposal({
   const [isCouncil, setIsCouncil] = useState(false);
   const [councilAmount, setCouncilAmount] = useState(0);
   const [currentGithubId, setCurrentGithubId] = useState<string>();
+  const router = useRouter()
+
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
     setDistrib((prevState) => ({
@@ -50,7 +54,9 @@ export default function NewProposal({
                         setCurrentGithubId(githubId);
                         setParticipants(participantsPr);
                       })
-                      .catch((err) => console.log('err', err));
+                      .catch((err) => {
+                        console.error('Error fetching pullRequestsParticipants', err)
+                      });
   }
 
   async function handleClickCreate(): Promise<void> {
@@ -63,8 +69,10 @@ export default function NewProposal({
     if (amount > 100)
       return setError('Distribution exceed 100%.');
 
+    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+
     const payload = {
-      issueID: issueId,
+      issueID: issue_id,
       prAddresses: participants.map((items) => items.address),
       prAmounts: participants.map(
         (items) => (amountTotal * distrib[items.githubHandle]) / 100
@@ -76,28 +84,21 @@ export default function NewProposal({
     const proposeMergeTx = addTransaction({type: TransactionTypes.proposeMerge})
     dispatch(proposeMergeTx);
 
+    GithubMicroService.waitForMerge(githubLogin, issue_id, currentGithubId)
+                      .then(data => {
+                        console.log(`GOT`, data);
+                        handleBeproService();
+                        handleMicroService();
+                        handleClose();
+                        setDistrib({});
+                      })
+
     await BeproService.network
                       .proposeIssueMerge(payload)
                       .then(txInfo => {
                         BeproService.parseTransaction(txInfo, proposeMergeTx.payload)
                                     .then(block => dispatch(updateTransaction(block)));
                       })
-                      .then(() =>
-                              GithubMicroService.createMergeProposal(issueId, {
-                                pullRequestGithubId: currentGithubId,
-                                scMergeId: (numberMergeProposals + 1).toString(),
-                              }).then(() => {
-                                handleBeproService();
-                                handleMicroService();
-                                handleClose();
-                                setDistrib({});
-                              })
-                                                .then(() => {
-                                                  handleClose();
-                                                  setDistrib({});
-                                                })
-                                                .catch(() => setError('Error to create proposal in MicroService'))
-                      )
                       .catch(() => {
                         dispatch(updateTransaction({...proposeMergeTx.payload as any, remove: true}))
                         setError('Error to create proposal in Smart Contract')
@@ -116,7 +117,11 @@ export default function NewProposal({
     const recognizeAsFinished = addTransaction({type: TransactionTypes.recognizedAsFinish})
     dispatch(recognizeAsFinished);
 
-    BeproService.network.recognizeAsFinished({issueId})
+    BeproService.network.getIssueByCID({issueCID: issueId})
+                .then((_issue) => {
+                  console.log(`Issue`, _issue)
+                  return BeproService.network.recognizeAsFinished({issueId: +_issue._id})
+                })
                 .then(txInfo => {
                   BeproService.parseTransaction(txInfo, recognizeAsFinished.payload)
                               .then(block => dispatch(updateTransaction(block)));
@@ -125,9 +130,10 @@ export default function NewProposal({
                   handleBeproService();
                   handleMicroService();
                 })
-                .catch(() => {
+                .catch((e) => {
                   dispatch(updateTransaction({...recognizeAsFinished.payload as any, remove: true}))
                   dispatch(toastWarning(`Failed to mark issue as finished!`));
+                  console.error(`Failed to mark as finished`, e);
                 })
   }
 
@@ -140,7 +146,7 @@ export default function NewProposal({
   }
 
   function renderRecognizeAsFinished() {
-    return <button className="btn btn-md btn-primary" onClick={() => recognizeAsFinished()}>Recognize as finished</button>;
+    return <Button onClick={() => recognizeAsFinished()}>Recognize as finished</Button>;
   }
 
   useEffect(() => {
@@ -161,23 +167,22 @@ export default function NewProposal({
   return (
     <>
       {
-        isCouncil && isFinished && <button className="btn btn-md btn-primary mx-1" onClick={() => setShow(true)}>Create Proposal</button>
-          || isIssueOwner && !isFinished && renderRecognizeAsFinished()
+        isCouncil && isFinished && <Button onClick={() => setShow(true)}>Create Proposal</Button>
+        || isIssueOwner && !isFinished && renderRecognizeAsFinished()
       }
 
       <Modal show={show}
              title="Create Proposal"
              footer={
                <>
-                 <button className="btn btn-md btn-opac" onClick={handleClose}>
+                 <Button color='dark-gray' onClick={handleClose}>
                    Cancel
-                 </button>
-                 <button
-                   className="btn btn-md btn-primary"
+                 </Button>
+                 <Button
                    onClick={handleClickCreate}
                    disabled={!currentAddress}>
                    Create Proposal
-                 </button>
+                 </Button>
                </>
              }>
         <p className="p-small text-50">Select a pull request </p>

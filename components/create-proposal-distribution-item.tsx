@@ -48,7 +48,7 @@ export default function CreateProposalDistributionItem({
   }
 
   return (
-    <li className="d-flex align-items-center px-3 py-1 my-1 rounded-3 btn-opac">
+    <li className="d-flex align-items-center px-3 py-1 my-1 rounded-3">
       {githubLogin && <Avatar userLogin={githubLogin} className="me-2 mt-1"/>}
       <span className="flex-grow-1">{by}</span>
       <div className="flex-shrink-0 w-25">

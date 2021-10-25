@@ -12,10 +12,13 @@ import { formatNumberToNScale, formatNumberToString } from 'helpers/formatNumber
 import NetworkIdentifier from '@components/network-identifier';
 import BeproLogo from '@assets/icons/bepro-logo';
 import HelpIcon from '@assets/icons/help-icon';
-import ButtonTrans from '@components/button-trans';
 import HelpModal from '@components/help-modal';
 import ExternalLinkIcon from '@assets/icons/external-link-icon';
 import TransactionsStateIndicator from '@components/transactions-state-indicator';
+import WrongNetworkModal from '@components/wrong-network-modal';
+import Button from './button';
+import PlusIcon from '@assets/icons/plus-icon';
+import BeproSmallLogo from '@assets/icons/bepro-small-logo';
 
 export default function MainNav() {
   const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
@@ -72,8 +75,6 @@ export default function MainNav() {
   useEffect(updateState, [currentAddress]);
   useEffect(updateBalances, [balance])
 
-  useEffect(()=> console.log("changed `asPath`", asPath),[asPath])
-
   return (
     <div className="main-nav d-flex align-items-center justify-content-between">
 
@@ -106,12 +107,14 @@ export default function MainNav() {
         </ul>
       </div>
       <div className="d-flex flex-row align-items-center">
-        <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" target="_blank" className="btn btn-md btn-trans mr-1 text-decoration-none">GET STARTED <ExternalLinkIcon className="ml-1" height={11} width={11} color="text-white"/></a>
+        <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" className='text-decoration-none' target="_blank">
+          <Button transparent><span>Get Started</span><ExternalLinkIcon className="ml-1" height={10} width={10} color="text-white"/></Button>
+        </a>
         <Link href="/create-issue" passHref>
-          <button className="btn btn-md btn-trans mr-1">+ Create issue</button>
+          <Button transparent><PlusIcon /> <span>Create issue</span></Button>
         </Link>
-
-        <ButtonTrans onClick={() => setShowHelp(true)} className="ms-2 me-3" rounded={true}><HelpIcon /></ButtonTrans>
+        <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 text-uppercase" transparent rounded><HelpIcon /></Button>
+        <WrongNetworkModal requiredNetwork="kovan" />
 
         <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
           <div className="d-flex account-info align-items-center">
@@ -121,10 +124,10 @@ export default function MainNav() {
             <NetworkIdentifier />
 
             <Link href="/account" passHref>
-              <a className="btn btn-md btn-trans mr-1">
-                <i className="ico-bepro mr-1"></i>
-                {formatNumberToNScale(beproBalance)}
-              </a>
+              <Button className='mr-1' transparent>
+                <BeproSmallLogo />
+                <span>{formatNumberToNScale(beproBalance)}</span>
+              </Button>
             </Link>
             <Link href="/account" passHref>
               <a className="meta-info d-flex align-items-center">

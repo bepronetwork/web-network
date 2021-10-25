@@ -5,7 +5,8 @@ import {ApplicationContext} from '@contexts/application';
 import {changeMyIssuesState} from '@reducers/change-my-issues';
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import GithubHandle from './github-handle';
-import { toNumber } from 'lodash';
+import {formatNumberToCurrency} from '@helpers/formatNumber';
+import {toastPrimary} from '@reducers/add-toast';
 
 export default function AccountHero() {
   const {dispatch, state: {beproInit, oracles, metaMaskWallet, currentAddress, balance, myIssues}} = useContext(ApplicationContext);
@@ -30,7 +31,7 @@ export default function AccountHero() {
                 })
   }
 
-  useEffect(loadBeproNetworkInformation, [beproInit, metaMaskWallet, currentAddress, oracles])
+  useEffect(loadBeproNetworkInformation, [beproInit, metaMaskWallet, currentAddress])
 
   return (
     <div className="banner bg-bepro-blue mb-4">
@@ -45,30 +46,30 @@ export default function AccountHero() {
               <div className="row">
                 <div className="col-md-3">
                   <div className="top-border">
-                    <h4 className="h4 mb-0">{myIssues.length || 0}</h4>
-                    <span className="p-small">Issues</span>
+                    <h4 className="h4 mb-0">{formatNumberToCurrency(myIssues.length || 0)}</h4>
+                    <span className="smallCaption">Issues</span>
                   </div>
                 </div>
                 <div className="col-md-3">
                   <div className="top-border">
-                    <h4 className="h4 mb-0">{+oracles?.tokensLocked + +oracles?.oraclesDelegatedByOthers || 0}</h4>
-                    <span className="p-small">Oracles</span>
-                  </div>
-                </div>
-                <div className="col-md-3">
-                  <div className="top-border">
-                    <h4 className="h4 mb-0">
-                      {oracles?.delegatedToOthers || 0}
-                    </h4>
-                    <span className="p-small">Delegated oracles</span>
+                    <h4 className="h4 mb-0">{formatNumberToCurrency(+oracles?.tokensLocked + +oracles?.oraclesDelegatedByOthers || 0)}</h4>
+                    <span className="smallCaption">Oracles</span>
                   </div>
                 </div>
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4 className="h4 mb-0">
-                      {+oracles?.oraclesDelegatedByOthers || 0}
+                      {formatNumberToCurrency(oracles?.delegatedToOthers || 0)}
                     </h4>
-                    <span className="p-small">Delegated by Others</span>
+                    <span className="smallCaption">Delegated oracles</span>
+                  </div>
+                </div>
+                <div className="col-md-3">
+                  <div className="top-border">
+                    <h4 className="h4 mb-0">
+                      {formatNumberToCurrency(+oracles?.oraclesDelegatedByOthers || 0)}
+                    </h4>
+                    <span className="smallCaption">Delegated by Others</span>
                   </div>
                 </div>
               </div>

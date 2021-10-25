@@ -18,6 +18,8 @@ import {changeNetwork} from '@reducers/change-network';
 import {useRouter} from 'next/router';
 import {toastError} from '@reducers/add-toast';
 import sanitizeHtml from 'sanitize-html';
+import {GetServerSideProps} from 'next';
+import {NetworkIds} from '@interfaces/enums/network-ids';
 
 interface GlobalState {
   state: ApplicationState,
@@ -59,7 +61,6 @@ export const ApplicationContext = createContext<GlobalState>(defaultState)
 
 export default function ApplicationContextProvider({children}) {
   const [state, dispatch] = useReducer(mainReducer, defaultState.state);
-  const {data: session, status} = useSession();
   const { authError } = useRouter().query;
 
   function updateSteFor(newAddress: string) {
@@ -90,15 +91,14 @@ export default function ApplicationContextProvider({children}) {
   function Initialize() {
     dispatch(changeBeproInitState(true) as any)
 
+    
     if (!window.ethereum)
       return;
 
     window.ethereum.on(`accountsChanged`, (accounts) => updateSteFor(accounts[0]))
-    window.ethereum.on('networkChanged', () =>
-      BeproService.bepro.web3.eth.net.getNetworkType()
-                  .then(network => {
-                    dispatch(changeNetwork(network));
-                  }))
+    window.ethereum.on('chainChanged', (evt) => {
+      dispatch(changeNetwork(NetworkIds[+evt?.toString()]?.toLowerCase()))
+    })
   }
 
   LoadApplicationReducers();
@@ -118,3 +118,9 @@ export default function ApplicationContextProvider({children}) {
     {children}
   </ApplicationContext.Provider>
 }
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  return {
+    props: {session: await getSession(ctx)},
+  };
+};

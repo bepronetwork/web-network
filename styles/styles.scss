@@ -3,6 +3,11 @@
 @import 'toasts';
 @import 'vendor';
 
+@import "filter-box";
+@import "x-pagination";
+@import "x-modals";
+@import "x-form-check";
+@import "x-button";
 
 //bootstrap-overrides
 ul,
@@ -26,53 +31,27 @@ li {
   }
 }
 .react-select {
-  &-container & {
+  &-container &{
     &__control {
       border-color: transparent;
-      background-color: $bg;
-      min-height: 48px;
-      box-shadow: none;
-      &:hover,
-      &--is-focused {
-        border-color: $blue;
-      }
-    }
-    &__value-container {
-      padding: 2px 16px;
-    }
-    &__indicator-separator {
-      display: none;
-    }
-    &__indicator {
-      padding: 14px;
-    }
-    &__single-value {
-      color: $white;
-    }
-    &__control--is-focused &__single-value {
-      color: transparentize($white, 0.4);
-    }
-    &__menu {
-      background-color: $bg;
-    }
-    &__option {
-      &--is-focused {
-        background-color: $bg;
-      }
-      &--is-selected {
-        background-color: $blue;
-      }
-    }
-  }
-  &-filterIssues & {
-    &__control {
-      border-color: transparent;
-      background-color: $bg-shadow;
+      background-color: $black;
+      min-width: 210px;
       min-height: 38px;
       box-shadow: none;
-      &:hover,
+      border-radius: 8px;
+      border-width: 2px;
+      &:hover{
+        border-color: $ligth-gray;
+      }
       &--is-focused {
-        border-color: $blue;
+        border-color: $blue
+      }
+      &--menu-is-open{
+        border-color: $blue !important;
+        background: $black;
+      }
+      &--is-disabled{
+        border-color: transparent;
       }
     }
     &__value-filterIssues {
@@ -83,6 +62,8 @@ li {
     }
     &__indicator {
       padding: 14px;
+      font-size: 12px;
+      color: $gray;
     }
     &__single-value {
       color: $white;
@@ -91,14 +72,88 @@ li {
       color: transparentize($white, 0.4);
     }
     &__menu {
+      min-width: 210px;
+      border-radius: 8px;
+      border: 1px solid $ligth-gray;
       background-color: $bg-shadow;
     }
+    &__value{
+      text-transform: uppercase;
+    }
     &__option {
-      &--is-focused {
-        background-color: $bg-shadow;
-      }
+      @extend .p-small;
+      background-color: transparent;
       &--is-selected {
-        background-color: $blue;
+        color: $blue;
+      }
+      &:hover{
+        color: $white;
+      }
+      &:active{
+        background-color: transparent;
+      }
+    }
+  }
+  &-filterIssues & {
+    &__control {
+      border-color: transparent;
+      background-color: $bg-shadow;
+      min-width: 210px;
+      min-height: 38px;
+      box-shadow: none;
+      border-radius: 8px;
+      border-width: 2px;
+      &:hover{
+        border-color: $ligth-gray;
+      }
+      &--is-focused {
+        border-color: $blue
+      }
+      &--menu-is-open{
+        border-color: $blue !important;
+        background: $black;
+      }
+      &--is-disabled{
+        border-color: transparent;
+      }
+    }
+    &__value-filterIssues {
+      padding: 2px 16px;
+    }
+    &__indicator-separator {
+      display: none;
+    }
+    &__indicator {
+      padding: 14px;
+      font-size: 12px;
+      color: $gray;
+    }
+    &__single-value {
+      color: $white;
+    }
+    &__control--is-focused &__single-value {
+      color: transparentize($white, 0.4);
+    }
+    &__menu {
+      min-width: 210px;
+      border-radius: 8px;
+      border: 1px solid $ligth-gray;
+      background-color: $bg-shadow;
+    }
+    &__value{
+      text-transform: uppercase;
+    }
+    &__option {
+      @extend .p-small;
+      background-color: transparent;
+      &--is-selected {
+        color: $blue;
+      }
+      &:hover{
+        color: $white;
+      }
+      &:active{
+        background-color: transparent;
       }
     }
   }
@@ -126,7 +181,8 @@ li {
 body {
   background-color: $bg;
   font-family: 'fontRegular', sans-serif;
-  color: $gray;
+  font-feature-settings: 'tnum' on, 'lnum' on, 'ss02' on, 'ss03' on, 'ss04' on;
+  color: $white;
 }
 
 // TYPOGRAPHY
@@ -153,6 +209,16 @@ body {
   line-height: 120%;
 }
 
+.btn-label{
+  font-family: 'fontRegular', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 71%;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  font-feature-settings: 'tnum' on, 'lnum' on, 'ss02' on, 'ss03' on, 'ss04' on;
+}
+
 .caption {
   font-family: 'fontBold', sans-serif;
   font-size: 16px;
@@ -161,9 +227,34 @@ body {
   text-transform: uppercase;
 }
 
+.mediumCaption{
+  font-family: 'fontMedium', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 140%;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
 .smallCaption {
   font-family: 'fontBold', sans-serif;
   font-size: 14px;
+  line-height: 160%;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.smallInfo{
+  font-family: 'fontBold', sans-serif;
+  font-size: 9px;
+  line-height: 130%;
+  letter-spacing: 10%;
+  text-transform: uppercase;
+}
+
+.largeCaption {
+  font-family: 'fontBold', sans-serif;
+  font-size: 16px;
   line-height: 160%;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -213,100 +304,6 @@ p {
 
 .trans {
   opacity: 0.7;
-}
-
-// Buttons
-
-.btn {
-  letter-spacing: 0.06em;
-}
-
-.btn-sm, .btn-md, .btn-lg {
-  text-transform: uppercase;
-}
-
-
-.btn-md {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 32px;
-  border-radius: 16px;
-  line-height: 100%;
-  font-size: 12px;
-  font-family: 'fontBold', sans-serif;
-  padding-left: $m;
-  padding-right: $m;
-}
-
-.btn-lg {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-family: 'fontBold', sans-serif;
-  height: 42px;
-  border-radius: 21px;
-  transition: 0.2 ease-in-out;
-  transform: scale(1);
-
-}
-
-.btn-primary {
-  background-color: $blue;
-  border-color: $blue;
-  color: $white;
-  &:hover,
-  &:focus,
-  &:active {
-    background-color: darken($blue, 5);
-    border-color: darken($blue, 5);
-  }
-}
-
-.btn-white {
-  background-color: $white;
-  color: $blue;
-  &:hover,
-  &:focus,
-  &:active {
-    background-color: $white;
-    color: $blue;
-  }
-}
-
-.btn-purple {
-  background-color: $purple;
-  border-color: $purple;
-  color: $white;
-  &:hover,
-  &:focus,
-  &:active {
-    background-color: darken($purple, 5);
-    border-color: darken($purple, 5);
-    color: $white;
-  }
-}
-
-.btn-opac {
-  color: $white;
-  background-color: rgba(255, 255, 255, 0.1);
-  &:hover,
-  &:focus,
-  &:active {
-    background-color: rgba(255, 255, 255, 0.2);
-    color: $white;
-  }
-}
-
-.btn-trans {
-  color: rgba($white, 0.7);
-  &:hover,
-  &:focus,
-  &:active {
-    background-color: rgba(255, 255, 255, 0.2);
-    color: $white;
-  }
 }
 
 // Forms
@@ -397,10 +394,6 @@ p {
   }
 }
 
-.subnav-github {
-  text-decoration: none;
-}
-
 .account-bepro {
   display: flex;
   align-items: center;
@@ -456,6 +449,7 @@ p {
       color: $white;
     }
   }
+
 }
 
 .list-item-proposal {
@@ -550,26 +544,12 @@ label {
   color: $bg-shadow;
   font-weight: 400;
   text-transform: capitalize;
-  &.gray {
-    background-color: $gray;
-  }
-  &.blue {
-    background-color: $blue;
-    color: $white;
-  }
-  &.success {
-    background-color: $success;
-  }
-  &.red {
-    background-color: $danger;
-    color: $white;
-  }
 }
 
-.badge-opac {
+.badge-opaque {
   font-size: 14px;
   line-height: 150%;
-  padding: 0px math.div($m, 2);
+  padding: math.div($m,2) $m;
   border-radius: math.div($m, 8);
   background-color: rgba($white, 0.1);
 }
@@ -719,6 +699,10 @@ label {
   border-radius: 19px;
 }
 
+.issue-proposal-progress{
+  min-height: 125px;
+}
+
 .progress-ball{
   position: absolute;
   height: 10px;
@@ -830,10 +814,22 @@ label {
     }
   }
 }
+#change-network-modal{
+  .modal-content{
+    background-color: $bg-shadow;
+    border-radius: math.div($m,2);
+  }
+}
+#connect-your-meta-mask-wallet-modal{
+  .modal-content{
+    background-color: $bg-shadow;
+    border-radius: math.div($m,2);
+  }
+}
 #transaction-modal{
   .modal-content{
     background-color: $bg-shadow;
-    border-radius: $m/2;
+    border-radius: math.div($m,2);
   }
 
   .modal-body{
@@ -944,14 +940,6 @@ $c_props: ('m': 'margin') !default;
   background-color: $black;
 }
 
-#filterByIssueState{
-  .react-select__option{
-    &:active{
-      background-color: $bg-blue-shadow;
-    }
-  }
-}
-
 .bg-main-image {
   background: url('/images/bg-main.png') no-repeat center center fixed;
   -webkit-background-size: cover;
@@ -971,3 +959,43 @@ $c_props: ('m': 'margin') !default;
   }
 }
 
+.list-group-item-shadow {
+  background-color: $black;
+  color: $gray;
+  border-bottom-color: $dark-gray;
+
+  &:last-child {
+    border-bottom-color: $black;
+  }
+
+  &.list-group-item-action {
+    &:hover,&:focus {
+      color: $white;
+      background-color: $dark-gray;
+    }
+  }
+}
+
+.rounded-4 {
+  border-radius: .5rem;
+}
+
+.main-nav {
+  .btn svg:only-child {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+svg {
+  &:not([height]) {
+    width: 14px;
+    height: 14px;
+  }
+}
+a.row-button svg {
+  width: 24px;
+  height: 24px;
+}
+
+.text-white:hover svg path { fill: white; }
