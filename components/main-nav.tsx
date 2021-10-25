@@ -19,6 +19,7 @@ import WrongNetworkModal from '@components/wrong-network-modal';
 import Button from './button';
 import PlusIcon from '@assets/icons/plus-icon';
 import BeproSmallLogo from '@assets/icons/bepro-small-logo';
+import { truncateAddress } from '@helpers/truncate-address';
 
 export default function MainNav() {
   const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
@@ -45,7 +46,7 @@ export default function MainNav() {
   }
 
   function updateAddress(address) {
-    setAddress(`${address.substr(0,4)}...${address.substr(-4)}`);
+    setAddress(truncateAddress(address, 4));
   }
 
   function updateBalances() {
@@ -86,13 +87,13 @@ export default function MainNav() {
         </Link>
         <ul className="nav-links">
           <li><Link href="/developers" passHref><Button
-          transparent opacity={75} active={asPath === '/developers'}
+          transparent className={`${asPath !== '/developers' && 'opacity-75 opacity-100-hover'}`}
           >Developers</Button></Link></li>
           <li><Link href="/council" passHref><Button
-          transparent opacity={75} active={ asPath === '/council'}
+          transparent className={`${asPath !== '/council' && 'opacity-75 opacity-100-hover'}`}
           >Council</Button></Link></li>
           <li><Link href="/oracle" passHref><Button
-          transparent opacity={75} active={asPath === '/oracle'}
+          transparent className={`${asPath !== '/oracle' && 'opacity-75 opacity-100-hover'}`}
           >Oracle</Button></Link></li>
           {/* <li><a href="/">Lists</a></li>
                         <li><a href="/issue">Issue</a></li>
@@ -102,12 +103,12 @@ export default function MainNav() {
       </div>
       <div className="d-flex flex-row align-items-center">
         <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" className='text-decoration-none' target="_blank">
-          <Button transparent opacity={75}><span>Get Started</span><ExternalLinkIcon className="ml-1" height={10} width={10} color="text-white"/></Button>
+          <Button transparent className="opacity-75 opacity-100-hover"><span>Get Started</span><ExternalLinkIcon className="ml-1" height={10} width={10} color="text-white"/></Button>
         </a>
         <Link href="/create-issue" passHref>
-          <Button transparent opacity={75}><PlusIcon /> <span>Create issue</span></Button>
+          <Button transparent className="opacity-75 opacity-100-hover"><PlusIcon /> <span>Create issue</span></Button>
         </Link>
-        <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 text-uppercase" transparent rounded opacity={75}><HelpIcon color='white' /></Button>
+        <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 text-uppercase opacity-75 opacity-100-hover" transparent rounded><HelpIcon color='white' /></Button>
         <WrongNetworkModal requiredNetwork="kovan" />
 
         <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
@@ -118,7 +119,7 @@ export default function MainNav() {
             <NetworkIdentifier />
 
             <Link href="/account" passHref>
-              <Button className='mr-1' transparent opacity={75}>
+              <Button className='mr-1 opacity-75 opacity-100-hover' transparent>
                 <span>{formatNumberToNScale(beproBalance)}</span>
                 <BeproSmallLogo />
               </Button>
