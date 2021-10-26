@@ -21,10 +21,9 @@ export default function NetworkIdentifier() {
     if (!currentAddress)
       return;
 
-    BeproService.bepro.web3.eth.getChainId()
-                .then(net => {
-                  dispatch(changeNetwork(NetworkIds[net]?.toLowerCase()))
-                });
+    const chainId = (window as any)?.ethereum?.chainId;
+    dispatch(changeNetwork(NetworkIds[+chainId]?.toLowerCase()))
+
   }
 
   useEffect(updateNetwork, [currentAddress]);
@@ -32,7 +31,7 @@ export default function NetworkIdentifier() {
   return network &&
       <>
         <div className="d-inline-flex align-items-center justify-content-center bg-white py-1 px-2 mr-1 rounded text-uppercase smallCaption fs-smallest text-center text-black text-nowrap">
-          <Indicator bg={networkMap[network]} /> <span>{network} {network !== `ethereum` && `testnet` || `mainnet`}</span>
+          <Indicator bg={networkMap[network]} /> <span>{network} {network !== `moonbeam` && `testnet` || `mainnet`}</span>
         </div>
       </> || <></>
 

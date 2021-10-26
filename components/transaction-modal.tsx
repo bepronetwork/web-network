@@ -63,14 +63,14 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
   }
 
   function getEtherScanHref(tx: string) {
-    return `//${network === `ethereum` && `` || `${network}.`}etherscan.io/tx/${tx}`
+    return `//${process.env.NEXT_PUBLIC_BLOCKSCAN_LINK}/tx/${tx}`
   }
 
   return <>
-    <Modal 
-    id="transaction-modal" 
-    title="Transaction Details" 
-    show={!!transaction} 
+    <Modal
+    id="transaction-modal"
+    title="Transaction Details"
+    show={!!transaction}
     onCloseClick={onCloseClick}
     titlePosition="center"
     titleClass="h3 text-white bg-opacity-100 fs-2"
@@ -79,7 +79,7 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
       <div className="d-flex justify-content-between align-items-center py-2 mb-3">
         <TransactionStats status={transaction?.status} />
         <div className="d-flex">
-           {hasTransactionId() && 
+           {hasTransactionId() &&
                 <Button onClick={() => copyValue(getTransactionId())} className="border-dark-gray mr-1" transparent rounded><CopyIcon height={14} width={14} color="white"/></Button>
           || ``}
           <a href={getEtherScanHref(getTransactionId())} className='text-decoration-none' target="_blank">
