@@ -20,6 +20,9 @@ import Button from './button';
 import PlusIcon from '@assets/icons/plus-icon';
 import BeproSmallLogo from '@assets/icons/bepro-small-logo';
 
+const CURRENCY = process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME;
+const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
+
 export default function MainNav() {
   const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
   const {asPath} = useRouter()
@@ -114,7 +117,7 @@ export default function MainNav() {
           <Button transparent><PlusIcon /> <span>Create issue</span></Button>
         </Link>
         <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 text-uppercase" transparent rounded><HelpIcon /></Button>
-        <WrongNetworkModal requiredNetwork="kovan" />
+        <WrongNetworkModal requiredNetwork={REQUIRED_NETWORK} />
 
         <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
           <div className="d-flex account-info align-items-center">
@@ -135,7 +138,7 @@ export default function MainNav() {
                   <p className="p-small mb-0">
                     {address}
                   </p>
-                  <p className="p-small mb-0 trans">{formatNumberToString(ethBalance)} ETH</p>
+                  <p className="p-small mb-0 trans">{formatNumberToString(ethBalance)} {CURRENCY}</p>
                 </div>
                 {/* <img className="avatar circle-2"src="https://uifaces.co/our-content/donated/Xp0NB-TL.jpg" alt="" /> */}
               </a>
