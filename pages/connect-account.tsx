@@ -93,7 +93,7 @@ export default function ConnectAccount() {
     let loggedIn = false;
 
     try {
-      const chainId = (window as any).web3?.currentProvider?.chainId;
+      const chainId = (window as any)?.ethereum?.chainId;
       if (+process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID !== +chainId) {
         dispatch(changeNetwork(NetworkIds[+chainId]?.toLowerCase()))
         return;
@@ -176,7 +176,7 @@ export default function ConnectAccount() {
               By connecting, you accept <a href="https://www.bepro.network/terms-and-conditions" target="_blank" className="text-decoration-none">Terms & Conditions</a> & <a href="https://www.bepro.network/private-policy" target="_blank" className="text-decoration-none">PRIVACY POLICY</a>
             </div>
             <div className="d-flex justify-content-center mt-4">
-              <Button 
+              <Button
                 className='me-3'
                 disabled={!isGhValid}
                 onClick={joinAddressToGh}>
