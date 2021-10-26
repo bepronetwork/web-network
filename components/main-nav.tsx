@@ -87,13 +87,13 @@ export default function MainNav() {
         </Link>
         <ul className="nav-links">
           <li><Link href="/developers" passHref><Button
-          transparent className={`${asPath !== '/developers' && 'opacity-75 opacity-100-hover'}`}
+          transparent className={`p-0 ${asPath !== '/developers' && 'opacity-75 opacity-100-hover'}`}
           >Developers</Button></Link></li>
           <li><Link href="/council" passHref><Button
-          transparent className={`${asPath !== '/council' && 'opacity-75 opacity-100-hover'}`}
+          transparent className={`p-0 ${asPath !== '/council' && 'opacity-75 opacity-100-hover'}`}
           >Council</Button></Link></li>
           <li><Link href="/oracle" passHref><Button
-          transparent className={`${asPath !== '/oracle' && 'opacity-75 opacity-100-hover'}`}
+          transparent className={`p-0 ${asPath !== '/oracle' && 'opacity-75 opacity-100-hover'}`}
           >Oracle</Button></Link></li>
           {/* <li><a href="/">Lists</a></li>
                         <li><a href="/issue">Issue</a></li>
