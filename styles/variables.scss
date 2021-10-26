@@ -95,6 +95,7 @@ $form-check-input-checked-border-color: $primary;
 
 @import "~bootstrap/scss/variables";
 @import "~bootstrap/scss/utilities";
+
 $theme-colors: map-merge($theme-colors, map-merge($more-bg, $more-colors));
 
 $utilities: map-merge(
@@ -106,7 +107,10 @@ $utilities: map-merge(
                 'border-color': map-merge(map-get($utilities, 'border-color'), (state: hover, values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-colors))),
                 'color': map-merge(map-get($utilities, 'color'), (state: hover , values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-colors))),
                 'background-color': map-merge(map-get($utilities, 'background-color'), (state: hover, values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-bg))),
+                "opacity": map-merge(map-get($utilities, 'opacity'),(state: hover, values: map-get(map-get($utilities, 'opacity'), 'values')),
+                )
         )
 )
+
 
 
