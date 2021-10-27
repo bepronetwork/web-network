@@ -44,7 +44,7 @@ export default function TransactionsStateIndicator() {
         onToggle={(next) => setShowOverlay(next)}
         overlay={overlay}>
           <div>
-            <Button className='me-3 me-3' transparent rounded onClick={() => setShowOverlay(!showOverlay)}>{loading && <span className="spinner-border spinner-border-sm"/> || <TransactionIcon color="bg-opac"/>}</Button>
+            <Button className='me-3 opacity-75 opacity-100-hover' transparent rounded onClick={() => setShowOverlay(!showOverlay)}>{loading && <span className="spinner-border spinner-border-sm"/> || <TransactionIcon color="bg-opac"/>}</Button>
           </div>
     </OverlayTrigger>
     <TransactionModal transaction={activeTransaction} onCloseClick={() => setActiveTransaction(null)}/>
