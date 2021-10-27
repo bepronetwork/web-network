@@ -896,7 +896,9 @@ $c_props: ('m': 'margin') !default;
     cursor: pointer;
   }
 }
-
+#status-bar{
+  z-index: 1030;
+}
 #transactions-indicator {
   border:0;
   background-color: transparent;
@@ -952,6 +954,7 @@ $c_props: ('m': 'margin') !default;
     height: 60px;
   }
 }
+
 .hover-white{
   &:hover {
     background-color: rgba(rgba($white, 0), 0.2);

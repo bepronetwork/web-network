@@ -24,7 +24,7 @@ export default function Button({
     let append = className;
 
     if (transparent)
-      append += ' bg-transparent border-transparent bg-opac-hover'
+      append += ' bg-transparent border-transparent'
 
     if (rounded)
       append += ` circle-2 p-0`;
