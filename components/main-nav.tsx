@@ -106,12 +106,12 @@ export default function MainNav() {
       </div>
       <div className="d-flex flex-row align-items-center">
         <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" className='text-decoration-none' target="_blank">
-          <Button transparent className="opacity-75 opacity-100-hover"><span>Get Started</span><ExternalLinkIcon className="ml-1" height={10} width={10} color="text-white"/></Button>
+          <Button transparent className="opacity-75 opacity-100-hover"><span>Get Started</span><ExternalLinkIcon className="ml-1"/></Button>
         </a>
         <Link href="/create-issue" passHref>
           <Button transparent className="opacity-75 opacity-100-hover"><PlusIcon /> <span>Create issue</span></Button>
         </Link>
-        <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 text-uppercase" transparent rounded><HelpIcon /></Button>
+        <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 opacity-75 opacity-100-hover" transparent rounded><HelpIcon /></Button>
         <WrongNetworkModal requiredNetwork={REQUIRED_NETWORK} />
 
         <ConnectWalletButton onSuccess={login} onFail={checkLogin}>

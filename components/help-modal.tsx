@@ -1,16 +1,16 @@
 import HelpIcon from '@assets/icons/help-icon';
 import React from 'react';
-import ApiIcon from '@assets/icons/api-icon';
 import ChatIcon from '@assets/icons/chat-icon';
 import FeedbackIcon from '@assets/icons/feedback-icon';
 import Modal from '@components/modal';
+import PageIcon from '@assets/icons/page-icon';
 
 export default function HelpModal({ show = false, onCloseClick = () => { } }) {
   const helpItem = (title = ``, tagline = ``, icon, href = ``) => ({ title, tagline, icon, href });
 
   const helpItems = [
     helpItem(`help center`, `Know more about Bepro Network and how to use it`, <HelpIcon />, `http://support.bepro.network`),
-    helpItem(`api documentation`, `Develop with bepro-js and create your next web3 app`, <ApiIcon />, `http://docs.bepro.network`),
+    helpItem(`api documentation`, `Develop with bepro-js and create your next web3 app`, <PageIcon />, `http://docs.bepro.network`),
     helpItem(`live chat`, `Get in contact with our team via Discord`, <ChatIcon />, `https://discord.gg/RQMAu2DZFA`),
     helpItem(`provide feedback`, `Propose ideas and new features`, <FeedbackIcon />, `https://discord.gg/RQMAu2DZFA`),
   ];
