@@ -42,7 +42,7 @@ export default function Modal({
         <ModalBootstrap.Title className={`text-white ${titleClass || ``} ${centerTitle ? `text-center w-100` : ``}`}>
           <span className={centerTitle && `h3`}>{title}</span>
         </ModalBootstrap.Title>
-        {onCloseClick && <Button transparent className="p-1 position-absolute end-90" onClick={onCloseClick}><CloseIcon /></Button>}
+        {onCloseClick && <Button transparent className="p-1 position-absolute end-90" onClick={onCloseClick}><CloseIcon color='text-gray' /></Button>}
       </ModalBootstrap.Header>
       <ModalBootstrap.Body>{children}</ModalBootstrap.Body>
       <ModalBootstrap.Footer>{renderFooter()}</ModalBootstrap.Footer>
