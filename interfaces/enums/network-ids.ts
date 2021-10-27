@@ -4,5 +4,5 @@ export enum NetworkIds {
   Ropsten = 3,
   Rinkeby = 4,
   Goerli = 5,
-  Moonriver = 1284,
+  Moonriver = 1285,
 }
