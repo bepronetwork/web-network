@@ -42,7 +42,7 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
     >
       <div className="text-center">
         <strong className="smallCaption d-block text-uppercase text-white-50 mb-3 pb-1">
-          please, connect to the  <span className="text-purple"><span className="mr-2">{requiredNetwork}</span> network</span><br/> on your metamask wallet
+          please, connect to the  <span className="text-purple"><span>{requiredNetwork}</span> network</span><br/> on your metamask wallet
         </strong>
           <div className="d-flex justify-content-center w-100">
               <div className={getColumnClass()}>

@@ -39,8 +39,8 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
 
   function loadRepos() {
 
-    function mapRepo({id: value, githubPath: label,}: RepoInfo) {
-      return makeFilterOption(label, value, router.query?.repoId as string === label);
+    function mapRepo({id: value, githubPath: label}: RepoInfo) {
+      return makeFilterOption(label, value, router.query?.repoId as string === value.toString());
     }
 
     GithubMicroService.getReposList()
@@ -52,9 +52,9 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
     const {time, state} = router.query || {};
     setStateFilters([
                       makeFilterOption(`All`, `allstates`, !state),
-                      makeFilterOption(`Open Issues`, `open`, state === `ready`),
+                      makeFilterOption(`Open Issues`, `open`, state === `ready` || state === `open`),
                       makeFilterOption(`Draft Issues`, `draft`, state === `draft`),
-                      makeFilterOption(`Closed Issues`, `closed`, state === `closed`),])
+                      makeFilterOption(`Closed Issues`, `closed`, state === `closed`)])
 
     setTimeFilters([
                      makeFilterOption(`All`, `alltime`, !time),
@@ -82,5 +82,5 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
     updateRouterQuery()
   }
 
-  return [[repoFilters, stateFilters, timeFilters,], updateOpt]
+  return [[repoFilters, stateFilters, timeFilters], updateOpt]
 }

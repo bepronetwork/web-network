@@ -2,7 +2,6 @@ import React, {useContext, useEffect, useState} from 'react';
 import Modal from '@components/modal';
 import TransactionStats from '@components/transaction-stats';
 import CopyIcon from '@assets/icons/copy';
-import ArrowGoTo from '@assets/icons/arrow-goto';
 import {BlockTransaction, Transaction} from '@interfaces/transaction';
 import ArrowRightSmall from '@assets/icons/arrow-ritght-small';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
@@ -12,6 +11,7 @@ import {ApplicationContext} from '@contexts/application';
 import {toastInfo} from '@reducers/add-toast';
 import { format } from 'date-fns';
 import Button from './button';
+import LinkIcon from '@assets/icons/link-icon';
 
 export default function TransactionModal({ transaction = null, onCloseClick = () => {}}: { transaction: Transaction, onCloseClick: () => void }) {
   const {dispatch, state: {network}} = useContext(ApplicationContext);
@@ -80,10 +80,10 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
         <TransactionStats status={transaction?.status} />
         <div className="d-flex">
            {hasTransactionId() &&
-                <Button onClick={() => copyValue(getTransactionId())} className="border-dark-gray mr-1" transparent rounded><CopyIcon height={14} width={14} color="white"/></Button>
+                <Button onClick={() => copyValue(getTransactionId())} className="border-dark-gray mr-1" transparent rounded><CopyIcon /></Button>
           || ``}
           <a href={getEtherScanHref(getTransactionId())} className='text-decoration-none' target="_blank">
-            <Button className="border-dark-gray mr-1" transparent rounded><ArrowGoTo color="white"/></Button>
+            <Button className="border-dark-gray mr-1" transparent rounded><LinkIcon /></Button>
           </a>
         </div>
       </div>
