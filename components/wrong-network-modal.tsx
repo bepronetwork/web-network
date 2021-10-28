@@ -1,15 +1,19 @@
 import Modal from '@components/modal';
-import React, {useContext, useEffect} from 'react';
+import React, {useContext, useState} from 'react';
 import Image from 'next/image';
 import metamaskLogo from '@assets/metamask.png';
 import {ApplicationContext} from '@contexts/application';
 import {truncateAddress} from '@helpers/truncate-address';
 import CheckMarkIcon from '@assets/icons/checkmark-icon';
 import ErrorMarkIcon from '@assets/icons/errormark-icon';
+import {NETWORKS} from '@helpers/networks'
+import Button from './button';
 
 
 
 export default function WrongNetworkModal({requiredNetwork = ``}) {
+  const [isAddingNetwork, setIsAddingNetwork] = useState(false);
+  
   const {state: {currentAddress, network: activeNetwork}} = useContext(ApplicationContext);
 
   function showModal() {
@@ -33,6 +37,47 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
     return `rounded-3 bg-black border border-2 border-${color} text-${color} p-3 d-flex justify-content-between align-items-center w-75`;
   }
 
+  async function handleAddNetwork() {
+    setIsAddingNetwork(true);
+    const chainId = `0x${Number(process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID).toString(16)}`;
+    const currencyNetwork = NETWORKS[chainId]
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [
+          {
+            chainId: chainId,
+          }
+        ]
+      });
+    } catch (error: any) {
+      if (error.code === 4902) {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [
+            {
+              chainId: chainId,
+              chainName: currencyNetwork.name,
+              nativeCurrency: {
+                name: currencyNetwork.currency.name,
+                symbol: currencyNetwork.currency.symbol,
+                decimals: currencyNetwork.decimals,
+              },
+              rpcUrls: currencyNetwork.rpcUrls,
+              blockExplorerUrls: [currencyNetwork.explorerURL]
+            }
+          ]
+        });
+      }
+    }finally{
+      setIsAddingNetwork(false);
+    }
+  }
+
+  const isButtonDisabled = (): boolean => [
+    isAddingNetwork 
+  ].some(values => values)
+
   return (
     <Modal
       title="Change network"
@@ -40,7 +85,7 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
       titleClass="h4 text-white bg-opacity-100"
       show={showModal()}
     >
-      <div className="text-center">
+      <div className="d-flex flex-column text-center align-items-center">
         <strong className="smallCaption d-block text-uppercase text-white-50 mb-3 pb-1">
           please, connect to the  <span className="text-purple"><span>{requiredNetwork}</span> network</span><br/> on your metamask wallet
         </strong>
@@ -55,7 +100,8 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
                 {!showModal() ? <CheckMarkIcon /> : <ErrorMarkIcon />}
               </div>
         </div>
-        <div className="smallInfo text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-2 pt-1">
+        <Button className='my-3' disabled={isButtonDisabled()} onClick={handleAddNetwork}>Change network</Button>
+        <div className="smallInfo text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-1 pt-1">
         by connecting, you accept{" "}
           <a
             href="https://www.bepro.network/terms-and-conditions"
