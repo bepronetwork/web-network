@@ -21,6 +21,9 @@ import PlusIcon from '@assets/icons/plus-icon';
 import BeproSmallLogo from '@assets/icons/bepro-small-logo';
 import { truncateAddress } from '@helpers/truncate-address';
 
+const CURRENCY = process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME;
+const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
+
 export default function MainNav() {
   const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
   const {asPath} = useRouter()
@@ -87,13 +90,13 @@ export default function MainNav() {
         </Link>
         <ul className="nav-links">
           <li><Link href="/developers" passHref><Button
-          transparent className={`${asPath !== '/developers' && 'opacity-75 opacity-100-hover'}`}
+          transparent className={`p-0 ${asPath !== '/developers' && 'opacity-75 opacity-100-hover'}`}
           >Developers</Button></Link></li>
           <li><Link href="/council" passHref><Button
-          transparent className={`${asPath !== '/council' && 'opacity-75 opacity-100-hover'}`}
+          transparent className={`p-0 ${asPath !== '/council' && 'opacity-75 opacity-100-hover'}`}
           >Council</Button></Link></li>
           <li><Link href="/oracle" passHref><Button
-          transparent className={`${asPath !== '/oracle' && 'opacity-75 opacity-100-hover'}`}
+          transparent className={`p-0 ${asPath !== '/oracle' && 'opacity-75 opacity-100-hover'}`}
           >Oracle</Button></Link></li>
           {/* <li><a href="/">Lists</a></li>
                         <li><a href="/issue">Issue</a></li>
@@ -103,13 +106,13 @@ export default function MainNav() {
       </div>
       <div className="d-flex flex-row align-items-center">
         <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" className='text-decoration-none' target="_blank">
-          <Button transparent className="opacity-75 opacity-100-hover"><span>Get Started</span><ExternalLinkIcon className="ml-1" height={10} width={10} color="text-white"/></Button>
+          <Button transparent className="opacity-75 opacity-100-hover"><span>Get Started</span><ExternalLinkIcon className="ml-1"/></Button>
         </a>
         <Link href="/create-issue" passHref>
           <Button transparent className="opacity-75 opacity-100-hover"><PlusIcon /> <span>Create issue</span></Button>
         </Link>
-        <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 text-uppercase opacity-75 opacity-100-hover" transparent rounded><HelpIcon color='white' /></Button>
-        <WrongNetworkModal requiredNetwork="kovan" />
+        <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 opacity-75 opacity-100-hover" transparent rounded><HelpIcon /></Button>
+        <WrongNetworkModal requiredNetwork={REQUIRED_NETWORK} />
 
         <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
           <div className="d-flex account-info align-items-center">
@@ -130,7 +133,7 @@ export default function MainNav() {
                   <p className="p-small mb-0">
                     {address}
                   </p>
-                  <p className="p-small mb-0 trans">{formatNumberToString(ethBalance)} ETH</p>
+                  <p className="p-small mb-0 trans">{formatNumberToString(ethBalance)} {CURRENCY}</p>
                 </div>
                 {/* <img className="avatar circle-2"src="https://uifaces.co/our-content/donated/Xp0NB-TL.jpg" alt="" /> */}
               </a>

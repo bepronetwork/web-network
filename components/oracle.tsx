@@ -30,7 +30,7 @@ export default function Oracle({
           </div>
         </div>
       </div>
-      <div className="container">
+      <div className="container p-footer">
         <div className="row justify-content-center">{children}</div>
       </div>
     </div>
