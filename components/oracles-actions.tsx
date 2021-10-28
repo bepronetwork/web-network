@@ -137,7 +137,7 @@ function OraclesActions(): JSX.Element {
       return;
 
     const approveTx = addTransaction({type: TransactionTypes.approveSettlerToken});
-
+    dispatch(approveTx);
     BeproService.network.approveSettlerERC20Token()
                 .then((txInfo) => {
                   BeproService.parseTransaction(txInfo, approveTx.payload)

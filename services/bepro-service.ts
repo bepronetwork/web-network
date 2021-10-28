@@ -53,8 +53,10 @@ class BeproFacet {
       success = ![bepro, network, erc20].some(bool => !bool);
 
       if (success) {
-        await this.network.__assert();
         await this.ERC20.__assert();
+        (async () => {
+          await this.network.__assert();
+        })();
         this._address = await this.bepro.getAddress();
       }
 

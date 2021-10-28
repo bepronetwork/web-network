@@ -22,10 +22,9 @@ export default function NetworkIdentifier() {
     if (!currentAddress)
       return;
 
-    BeproService.bepro.web3.eth.getChainId()
-                .then(net => {
-                  dispatch(changeNetwork(NetworkIds[net]?.toLowerCase()))
-                });
+    const chainId = (window as any)?.ethereum?.chainId;
+    dispatch(changeNetwork(NetworkIds[+chainId]?.toLowerCase()))
+
   }
 
   useEffect(updateNetwork, [currentAddress]);
