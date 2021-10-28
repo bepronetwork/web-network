@@ -23,7 +23,6 @@ import { truncateAddress } from '@helpers/truncate-address';
 
 const CURRENCY = process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME;
 const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
-const CHAIN_ID = process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID;
 
 export default function MainNav() {
   const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
@@ -113,7 +112,7 @@ export default function MainNav() {
           <Button transparent className="opacity-75 opacity-100-hover"><PlusIcon /> <span>Create issue</span></Button>
         </Link>
         <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 opacity-75 opacity-100-hover" transparent rounded><HelpIcon /></Button>
-        <WrongNetworkModal requiredNetwork={REQUIRED_NETWORK} chainId={CHAIN_ID} />
+        <WrongNetworkModal requiredNetwork={REQUIRED_NETWORK} />
 
         <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
           <div className="d-flex account-info align-items-center">
