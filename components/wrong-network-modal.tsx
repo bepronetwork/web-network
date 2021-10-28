@@ -39,7 +39,7 @@ export default function WrongNetworkModal({requiredNetwork = ``, requiredId}) {
 
   async function handleAddNetwork() {
     setIsAddingNetwork(true);
-    const currencyId = `0x${Number(0x505).toString(16)}`;
+    const currencyId = `0x${Number(requiredId).toString(16)}`;
     const currencyNetwork = NETWORKS[currencyId]
     try {
       await window.ethereum.request({
@@ -51,7 +51,6 @@ export default function WrongNetworkModal({requiredNetwork = ``, requiredId}) {
         ]
       });
     } catch (error: any) {
-      debugger;
       if (error.code === 4902) {
         await window.ethereum.request({
           method: 'wallet_addEthereumChain',
