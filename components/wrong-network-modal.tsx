@@ -11,7 +11,7 @@ import Button from './button';
 
 
 
-export default function WrongNetworkModal({requiredNetwork = ``, chainId}) {
+export default function WrongNetworkModal({requiredNetwork = ``}) {
   const [isAddingNetwork, setIsAddingNetwork] = useState(false);
   
   const {state: {currentAddress, network: activeNetwork}} = useContext(ApplicationContext);
@@ -39,6 +39,7 @@ export default function WrongNetworkModal({requiredNetwork = ``, chainId}) {
 
   async function handleAddNetwork() {
     setIsAddingNetwork(true);
+    const chainId = `0x${Number(process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID).toString(16)}`;
     const currencyNetwork = NETWORKS[chainId]
     try {
       await window.ethereum.request({
