@@ -27,7 +27,7 @@ export default function App({ Component, pageProps: {session, ...pageProps} }: A
         <NationDialog>
           <MainNav />
           <WebThreeDialog />
-          <Component {...pageProps} />
+          <div className="pb-5"><Component {...pageProps} /></div>
           <StatusBar />
         </NationDialog>
       </ApplicationContextProvider>
