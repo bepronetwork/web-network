@@ -12,7 +12,8 @@ const networkMap = {
   ropsten: `#ff4a8d`,
   kovan: `#9064ff`,
   rinkeby: `#f6c343`,
-  goerli: `#f6c343`
+  goerli: `#f6c343`,
+  moonriver: `#f6c343`,
 }
 
 export default function NetworkIdentifier() {
@@ -32,7 +33,7 @@ export default function NetworkIdentifier() {
   return network &&
       <>
         <Button color='white' className='px-2 py-1 rounded pe-none'>
-          <Indicator bg={networkMap[network]} /> <span>{network} {network !== `ethereum` && `testnet` || `mainnet`}</span>
+          <Indicator bg={networkMap[network]} /> <span>{network} {network !== process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME && `testnet` || ``}</span>
         </Button>
       </> || <></>
 

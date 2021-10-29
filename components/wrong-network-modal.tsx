@@ -1,20 +1,24 @@
 import Modal from '@components/modal';
 import React, {useContext, useState} from 'react';
-import Image from 'next/image';
-import metamaskLogo from '@assets/metamask.png';
 import {ApplicationContext} from '@contexts/application';
-import {truncateAddress} from '@helpers/truncate-address';
-import CheckMarkIcon from '@assets/icons/checkmark-icon';
-import ErrorMarkIcon from '@assets/icons/errormark-icon';
 import {NETWORKS} from '@helpers/networks'
 import Button from './button';
+import {Spinner} from 'react-bootstrap';
 
-
+const networkMap = {
+  mainnet: `#29b6af`,
+  ethereum: `#29b6af`,
+  ropsten: `#ff4a8d`,
+  kovan: `#9064ff`,
+  rinkeby: `#f6c343`,
+  goerli: `#f6c343`,
+  moonriver: `#f6c343`,
+}
 
 export default function WrongNetworkModal({requiredNetwork = ``}) {
   const [isAddingNetwork, setIsAddingNetwork] = useState(false);
-  
-  const {state: {currentAddress, network: activeNetwork}} = useContext(ApplicationContext);
+
+  const {state: {network: activeNetwork}} = useContext(ApplicationContext);
 
   function showModal() {
     return activeNetwork && requiredNetwork && activeNetwork !== requiredNetwork;
@@ -28,13 +32,6 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
       return `success`
 
     return `danger`
-  }
-
-
-  function getColumnClass() {
-    const color = getColor();
-
-    return `rounded-3 bg-black border border-2 border-${color} text-${color} p-3 d-flex justify-content-between align-items-center w-75`;
   }
 
   async function handleAddNetwork() {
@@ -74,32 +71,20 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
     }
   }
 
-  const isButtonDisabled = (): boolean => [
-    isAddingNetwork 
-  ].some(values => values)
+  const isButtonDisabled = (): boolean => [isAddingNetwork].some(values => values)
 
   return (
     <Modal
-      title="Change network"
+      title=""
       titlePosition="center"
       titleClass="h4 text-white bg-opacity-100"
       show={showModal()}
     >
       <div className="d-flex flex-column text-center align-items-center">
         <strong className="smallCaption d-block text-uppercase text-white-50 mb-3 pb-1">
-          please, connect to the  <span className="text-purple"><span>{requiredNetwork}</span> network</span><br/> on your metamask wallet
+          please, connect to the  <span style={{color: networkMap[requiredNetwork.toLowerCase()]}}><span>{requiredNetwork}</span> network</span><br/> on your metamask wallet
         </strong>
-          <div className="d-flex justify-content-center w-100">
-              <div className={getColumnClass()}>
-                <div className="d-flex justify-content-start align-items-center">
-                  <Image src={metamaskLogo} width={15} height={15} />{" "}
-                  <span className="ms-2">
-                    {truncateAddress(currentAddress,7,3)}
-                  </span>
-                </div>
-                {!showModal() ? <CheckMarkIcon /> : <ErrorMarkIcon />}
-              </div>
-        </div>
+        {isAddingNetwork && <Spinner className="text-blue align-self-center p-2 mt-1 mb-2" style={{width: `5rem`, height: `5rem`}} animation="border" /> || ``}
         <Button className='my-3' disabled={isButtonDisabled()} onClick={handleAddNetwork}>Change network</Button>
         <div className="smallInfo text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-1 pt-1">
         by connecting, you accept{" "}

@@ -12,6 +12,15 @@ import Button from './button';
 import { NETWORKS } from '@helpers/networks';
 
 const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
+const networkMap = {
+  mainnet: `#29b6af`,
+  ethereum: `#29b6af`,
+  ropsten: `#ff4a8d`,
+  kovan: `#9064ff`,
+  rinkeby: `#f6c343`,
+  goerli: `#f6c343`,
+  moonriver: `#f6c343`,
+}
 
 export default function ConnectWalletButton({children = null, forceLogin = false, onSuccess = () => null, onFail = () => console.error("Failed to login"), asModal = false, btnColor = `white`}) {
   const { state: {metaMaskWallet, beproInit, currentAddress, network: activeNetwork}, dispatch } = useContext(ApplicationContext);
@@ -107,7 +116,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
       show={!currentAddress || !metaMaskWallet}>
         <div className="d-flex flex-column text-center align-items-center">
         <strong className="smallCaption d-block text-uppercase text-white-50 mb-3 pb-1">
-          to access this page please, connect to the <br/><span className="text-purple"><span>{REQUIRED_NETWORK}</span> network</span> on your metamask wallet
+          to access this page please, connect to the <br/><span style={{color: networkMap[REQUIRED_NETWORK.toLowerCase()]}}><span>{REQUIRED_NETWORK}</span> network</span> on your metamask wallet
         </strong>
           <div className="d-flex justify-content-center align-items-center w-100">
               <div className="rounded-3 bg-dark-gray text-white p-3 d-flex text-center justify-content-center align-items-center w-75 cursor-pointer" onClick={connectWallet}>
