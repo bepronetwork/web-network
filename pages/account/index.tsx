@@ -1,13 +1,11 @@
 import {GetStaticProps} from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
-import Link from 'next/link';
 import IssueListItem from '@components/issue-list-item';
 import GithubMicroService from '@services/github-microservice';
 import Account from '@components/account';
 import {ApplicationContext} from '@contexts/application';
 import {IssueData} from '@interfaces/issue-data';
 import NothingFound from '@components/nothing-found';
-import Button from '@components/button';
 import Paginate from '@components/paginate';
 import usePage from '@x-hooks/use-page';
 import useCount from '@x-hooks/use-count';
@@ -18,6 +16,7 @@ import usePendingIssue from '@x-hooks/use-pending-issue';
 import MarkedRender from '@components/MarkedRender';
 import {formatNumberToCurrency, formatNumberToNScale, formatNumberToString} from '@helpers/formatNumber';
 import {toastError} from '@reducers/add-toast';
+import InternalLink from '@components/internal-link';
 
 export default function MyIssues() {
 
@@ -85,11 +84,9 @@ export default function MyIssues() {
         <div className="mt-4">
           <NothingFound
             description="No issues">
-            <Link href="/create-issue" passHref>
-              <Button>
-                create one
-              </Button>
-            </Link>
+            <InternalLink href="/create-issue" passHref active>
+              create one
+            </InternalLink>
           </NothingFound>
         </div>
       </div>)
