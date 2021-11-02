@@ -42,7 +42,9 @@ export default function PageCouncil() {
             <div className="mt-4">
               <NothingFound
               description="No issues ready to propose">
-                <InternalLink href="/create-issue" label="create one" uppercase />
+                <InternalLink href="/create-issue" passHref active>
+                    create one
+                </InternalLink>
               </NothingFound>
             </div>
           }
