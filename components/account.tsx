@@ -26,9 +26,13 @@ export default function Account({
       <div className="container">
         <div className="row">
           <div className="d-flex justify-content-center mb-3">
-            <InternalLink href="/account" label="My issues" className={clsx("subnav-item mr-3 h3 p-0")} nav transparent />
+            <InternalLink href="/account" component="a" className={clsx("subnav-item mr-3 h3", {active: buttonPrimaryActive,})} active passHref>
+              My issues
+            </InternalLink>
 
-            <InternalLink href="/account/my-oracles" label="My oracles" className={clsx("subnav-item h3 p-0")} nav transparent />
+            <InternalLink href="/account/my-oracles" component="a" className={clsx("subnav-item h3", {active: !buttonPrimaryActive,})} active passHref>
+              My oracles
+            </InternalLink>
           </div>
         </div>
       </div>

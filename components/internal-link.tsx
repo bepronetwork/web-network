@@ -34,10 +34,10 @@ export default function InternalLink({
     if (!isActive && nav)
       classes += ' opacity-75 opacity-100-hover '
 
-    if (transparent || nav) 
+    if (transparent || nav)
       classes += ' bg-transparent border-transparent '
 
-    if (uppercase) 
+    if (uppercase)
       classes += ' text-uppercase '
 
     return `btn btn-primary text-white bg-opacity-100 d-flex align-items-center justify-content-center text-decoration-none shadow-none ${classes}`
