@@ -39,3 +39,5 @@ export default function Button({
     <button className={getClass()} {...rest}>{children}</button>
   </>
 }
+
+export type { ButtonProps }
