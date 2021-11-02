@@ -1,6 +1,5 @@
 import { GetStaticProps } from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
-import Link from 'next/link';
 import PageHero from "@components/page-hero";
 import GithubMicroService from '@services/github-microservice';
 import ListIssues from '@components/list-issues';
@@ -9,7 +8,6 @@ import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';
 import {IssueData} from '@interfaces/issue-data';
 import NothingFound from '@components/nothing-found';
-import Button from '@components/button';
 import Paginate from '@components/paginate';
 import usePage from '@x-hooks/use-page';
 import useCount from '@x-hooks/use-count';
@@ -17,6 +15,7 @@ import {useRouter} from 'next/router';
 import IssueFilterBox from '@components/issue-filter-box';
 import useFilters from '@x-hooks/use-filters';
 import IssueFilters from '@components/issue-filters';
+import InternalLink from '@components/internal-link';
 
 type Filter = {
   label: string;
@@ -106,11 +105,9 @@ export default function PageDevelopers() {
             <div className="col-md-10">
               <NothingFound
                 description={filterByState.emptyState}>
-                <Link href="/create-issue" passHref>
-                  <Button>
-                    create one
-                  </Button>
-                </Link>
+                <InternalLink href="/create-issue" passHref active>
+                  create one
+                </InternalLink>
               </NothingFound>
             </div>
           ) : null}
