@@ -148,8 +148,8 @@ export default function PageIssue() {
         isCanceled={issue?.state === `canceled` || networkIssue?.canceled}
       />}
 
-      <IssueDescription description={issue?.body}></IssueDescription>
-      <IssueComments comments={commentsIssue} repo={issue?.repo} issueId={issue?.id}></IssueComments>
+      <IssueDescription description={issue?.body} />
+      <IssueComments comments={commentsIssue} repo={issue?.repo} issueId={id} />
     </>
   );
 }
