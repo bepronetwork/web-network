@@ -75,7 +75,7 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
 
   return (
     <Modal
-      title=""
+      title="Change network"
       titlePosition="center"
       titleClass="h4 text-white bg-opacity-100"
       show={showModal()}
