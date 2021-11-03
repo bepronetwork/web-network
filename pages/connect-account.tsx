@@ -30,15 +30,24 @@ export default function ConnectAccount() {
   const [githubLogin, setGithubLogin] = useState(null)
   const {data: session} = useSession();
   const router = useRouter();
+  const { migrate } = router.query;
 
 
   function updateLastUsedAddress() {
+    dispatch(changeLoadState(false));
     setLastAddressBeforeConnect(localStorage.getItem(`lastAddressBeforeConnect`))
   }
 
-  function checkAddressVsGh() {
+  async function checkAddressVsGh() {
     if (!currentAddress)
       return;
+
+    const user = await GithubMicroService.getUserOfLogin(githubLogin);
+    if (user && user.address && user.address !== currentAddress.toLowerCase()) {
+      dispatch(toastError(`When migrating, address must match ${truncateAddress(user.address)}.`, undefined, {delay: 10000}));
+      setIsGhValid(false)
+      return;
+    }
 
     GithubMicroService.getUserOf(currentAddress)
                       .then(user => {
@@ -62,9 +71,17 @@ export default function ConnectAccount() {
     return isGhValid === null ? `` : `border border-${!isGhValid ? `danger` : `success`}`;
   }
 
-  function joinAddressToGh() {
+  async function joinAddressToGh() {
     dispatch(changeLoadState(true));
-    GithubMicroService.joinAddressToUser(session.user.name,{ address: currentAddress.toLowerCase() })
+
+    const user = await GithubMicroService.getUserOf(currentAddress);
+
+    if (user && (user.githubHandle || user.githubLogin !== githubLogin)) {
+      dispatch(changeLoadState(false));
+      return dispatch(toastError(`Migration not possible or already happened`));
+    }
+
+    GithubMicroService.joinAddressToUser(session.user.name,{ address: currentAddress.toLowerCase(), migrate: !!migrate })
                       .then((result) => {
                         if (result === true) {
                           dispatch(toastSuccess(`Connected accounts!`))
@@ -121,13 +138,16 @@ export default function ConnectAccount() {
   function renderMetamaskLogo() {
     return <Image src={metamaskLogo} width={15} height={15}/>;
   }
-  function setGhLoginBySession(){
+
+  function setGhLoginBySession() {
+    console.log(`session`, session, githubLogin);
     if(session?.user.name !== githubLogin){
       setGithubLogin(session?.user?.name)
     }
   }
+
   useEffect(updateLastUsedAddress, [])
-  useEffect(checkAddressVsGh, [currentAddress])
+  useEffect(() => { checkAddressVsGh() }, [currentAddress])
   useEffect(setGhLoginBySession,[session])
 
 
