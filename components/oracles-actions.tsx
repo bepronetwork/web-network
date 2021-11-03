@@ -34,19 +34,19 @@ function OraclesActions(): JSX.Element {
   const renderInfo = {
     Lock: {
       title: "Lock $BEPRO",
-      description: "Lock $BEPRO to receive Oracles",
-      label: `Get ${renderAmount} Oracles`,
+      description: "Lock $BEPRO to receive ORACLES",
+      label: `Get ${renderAmount} ORACLES`,
       caption: "Get Oracles from $BEPRO",
-      body: `You are locking ${tokenAmount} $BEPRO /br/ to get /oracles${tokenAmount} Oracles/`,
+      body: `You are locking /${tokenAmount} $BEPRO /br/ to get /oracles${tokenAmount} Oracles/`,
       params() {
         return { tokenAmount };
       },
     },
     Unlock: {
       title: "Unlock $BEPRO",
-      description: "Unlock $BEPRO And Withdraw",
+      description: "Get $BEPRO from ORACLES",
       label: `Get ${renderAmount} $BEPRO`,
-      caption: "Get $BEPRO from Oracles",
+      caption: "Get $BEPRO from ORACLES",
       body: `Give away /oracles${tokenAmount} Oracles/ /br/ to get back ${tokenAmount} $BEPRO`,
       params(from: string) {
         return { tokenAmount, from };
@@ -245,6 +245,8 @@ function OraclesActions(): JSX.Element {
       <Modal
         title={renderInfo.title}
         show={show}
+        titlePosition="center"
+        onCloseClick={handleCancel}
         footer={
           <>
             <Button color='dark-gray' onClick={handleCancel}>
