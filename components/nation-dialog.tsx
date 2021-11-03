@@ -45,8 +45,7 @@ export default function NationDialog({ children }) {
           <Modal.Body>
             <div className="d-flex flex-column mt-2 align-items-center text-whit">
               <p className="p text-white mb-2 text-center fs-9 white-space-wrap">
-                At the moment BEPRO Services are
-                not available in
+              At the moment BEPRO services and BEPRO Token (BEPRO) are not available in Your Country
               </p>
               <a target="_blank" href="https://www.bepro.network/terms-and-conditions"
                 className="mb-2 text-center text-white-50 text-decoration-none text-uppercase fs-8">

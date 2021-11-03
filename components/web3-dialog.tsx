@@ -25,15 +25,14 @@ export default function WebThreeDialog() {
         <Modal.Title>MetaMask not detected</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p className="p-small text-white-50 text-center">
+        <p className="smallCaption text-warning text-center">
           No ETH account available
         </p>
         <div className="d-flex flex-column align-items-center">
           <WebThreeUnavailable />
-          <p className="p mb-0 mt-4 text-center">
-            Click upon install and follow the instructions to configure it. Make
-            sure your wallet is unlocked, you have at least one account in your
-            accounts list and try again.
+          <p className="p mb-0 mt-4 text-center fs-small">
+          It seems that you don’t have a MetaMask account selected. 
+          If using MetaMask, please make sure that your wallet is unlocked and that you have at least one account in your accounts list.
           </p>
         </div>
       </Modal.Body>
