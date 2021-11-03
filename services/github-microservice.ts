@@ -111,8 +111,13 @@ export default class GithubMicroService {
 
   static async createGithubData(payload: {githubHandle: string, githubLogin: string, accessToken: string}): Promise<boolean> {
     return client.post<string>(`/users/connect`, payload)
-                 .then(({data}) => data === `ok`)
+                 .then(({data, status}) => {
+                   return data === `ok`
+                 })
                  .catch((error) => {
+                   if (error.response?.status === 302)
+                     return true;
+
                    if (error.response?.data)
                      return error.response?.data;
 
@@ -121,7 +126,7 @@ export default class GithubMicroService {
                  });
   }
 
-  static async joinAddressToUser(githubHandle: string,payload: {address: string}): Promise<boolean> {
+  static async joinAddressToUser(githubHandle: string,payload: {address: string, migrate?: boolean}): Promise<boolean> {
     return client.patch<string>(`/users/connect/${githubHandle}`, payload)
                  .then(() => true)
                  .catch((error) => {
@@ -297,5 +302,11 @@ export default class GithubMicroService {
                  .catch(e => {
                    console.log(`E`, e);
                  })
+  }
+
+  static async getUserOfLogin(githubLogin: string) {
+    return client.get(`/users/github/${githubLogin}`)
+                 .then(({data}) => data)
+                 .catch(() => null);
   }
 }
