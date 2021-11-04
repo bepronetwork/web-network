@@ -20,7 +20,7 @@ export default function Button({
 
   function getClass(): string {
     const type = `btn-${outline ? `outline-${color}` : color}`
-    const textColor = !outline && color !== 'white' && 'text-white bg-opacity-100' || ``
+    const textColor = !outline && color !== 'white' && 'text-white' || ``
     let append = className;
 
     if (transparent)

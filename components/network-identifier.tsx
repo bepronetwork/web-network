@@ -32,7 +32,7 @@ export default function NetworkIdentifier() {
 
   return network &&
       <>
-        <Button color='white' className='px-2 py-1 rounded pe-none'>
+        <Button className='px-3 py-2 rounded pe-none bg-white bg-opacity-10'>
           <Indicator bg={networkMap[network]} /> <span>{network} {network !== process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME && `testnet` || ``}</span>
         </Button>
       </> || <></>
