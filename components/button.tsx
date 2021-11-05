@@ -1,6 +1,6 @@
-import React, {ButtonHTMLAttributes} from 'react';
+import React, {ButtonHTMLAttributes, ReactNode} from 'react';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   color?: string;
   outline?: boolean;
   transparent?: boolean;
@@ -39,5 +39,3 @@ export default function Button({
     <button className={getClass()} {...rest}>{children}</button>
   </>
 }
-
-export type { ButtonProps }

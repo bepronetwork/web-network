@@ -1,4 +1,5 @@
 import {GetStaticProps} from 'next'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, {useContext} from 'react';
 import {useEffect, useState} from 'react';
@@ -82,42 +83,31 @@ export default function MainNav() {
     <div className="main-nav d-flex align-items-center justify-content-between">
 
       <div className="d-flex">
-        <InternalLink href="/" component="a" passHref active>
-          <BeproLogo aria-hidden={true} />
-        </InternalLink>
+        <InternalLink href="/" icon={<BeproLogo aria-hidden={true} />} className="brand" nav active />
         <ul className="nav-links">
           <li>
-            <InternalLink href="/developers" active={asPath === '/developers'} variant="nav" passHref transparent>
-              Developers
-            </InternalLink>
+            <InternalLink href="/developers" label="Developers" nav uppercase />
           </li>
 
           <li>
-            <InternalLink href="/council" active={asPath === '/council'} variant="nav" passHref transparent>
-              Council
-            </InternalLink>
+            <InternalLink href="/council" label="Council" nav uppercase />
           </li>
 
           <li>
-            <InternalLink href="/oracle" active={asPath === '/oracle'} variant="nav" passHref transparent>
-              Oracle
-            </InternalLink>
+            <InternalLink href="/oracle" label="Oracle" nav uppercase />
           </li>
-          {/* <li><a href="/">Lists</a></li>
-                        <li><a href="/issue">Issue</a></li>
-                        <li><a href="/proposal">Proposal</a></li>
-                        <li><a href="/account">My account</a></li> */}
         </ul>
       </div>
+
       <div className="d-flex flex-row align-items-center">
         <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" className='text-decoration-none' target="_blank">
           <Button transparent className="opacity-75 opacity-100-hover"><span>Get Started</span><ExternalLinkIcon className="ml-1"/></Button>
         </a>
-        <InternalLink href="/create-issue" passHref transparent>
-          <PlusIcon /> 
-          <span>Create issue</span>
-        </InternalLink>
+
+        <InternalLink href="/create-issue" icon={<PlusIcon />} label="Create issue" iconBefore nav uppercase />
+
         <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 opacity-75 opacity-100-hover" transparent rounded><HelpIcon /></Button>
+
         <WrongNetworkModal requiredNetwork={REQUIRED_NETWORK} />
 
         <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
@@ -127,12 +117,10 @@ export default function MainNav() {
 
             <NetworkIdentifier />
 
-            <InternalLink href="/account" className="mr-1" passHref transparent>
-              <span>{formatNumberToNScale(beproBalance)}</span>
-              <BeproSmallLogo />
-            </InternalLink>
+            <InternalLink href="/account" icon={<BeproSmallLogo />} label={formatNumberToNScale(beproBalance)} transparent nav />
 
-            <InternalLink href="/account" component="a" className="meta-info d-flex align-items-center" active passHref>
+            <Link href="/account" passHref>
+              <a className="meta-info d-flex align-items-center">
                 <div className="d-flex flex-column text-right">
                   <p className="p-small mb-0">
                     {address}
@@ -140,7 +128,8 @@ export default function MainNav() {
                   <p className="p-small mb-0 trans">{formatNumberToString(ethBalance)} {CURRENCY}</p>
                 </div>
                 {/* <img className="avatar circle-2"src="https://uifaces.co/our-content/donated/Xp0NB-TL.jpg" alt="" /> */}
-            </InternalLink>
+              </a>
+            </Link>
           </div>
         </ConnectWalletButton>
       </div>

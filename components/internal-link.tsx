@@ -1,76 +1,55 @@
 import { ReactNode } from 'react'
-import { GetStaticProps } from 'next'
-import Link, { LinkProps } from 'next/link'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { UrlObject } from 'url'
 
-import Button, { ButtonProps } from './button'
-
-interface InternalLinkProps extends LinkProps, ButtonProps {
-  children: ReactNode | ReactNode[]
+interface InternalLinkProps {
+  href: string | UrlObject
+  label?: string | number
+  className?: string
+  transparent?: boolean
+  nav?: boolean
   active?: boolean
-  component?: 'a' |  'button',
-  variant?: 'nav' | 'regular'
+  icon?: ReactNode
+  uppercase?: boolean
+  iconBefore?: boolean
 }
 
 export default function InternalLink({
-  children,
+  className = '',
+  nav = false,
+  transparent = false,
   active = false,
-  component = 'button',
-  variant = 'regular',
+  iconBefore = false,
+  uppercase = false,
   ...props
 }: InternalLinkProps) {
-  const {
-    href,
-    as,
-    replace,
-    scroll,
-    shallow,
-    passHref,
-    prefetch,
-    locale,
-    color,
-    outline,
-    transparent,
-    rounded,
-    upperCase,
-    className
-  } = props
+  const { asPath } = useRouter()
 
-  const isNav = variant === 'nav'
-  const classes = `${className} ${isNav && 'p-0'} ${!active && 'opacity-75 opacity-100-hover'}`
+  function getClasses(): string {
+    const isActive = asPath === props.href || active
 
-  const linkProps: LinkProps = {
-    href,
-    as,
-    replace,
-    scroll,
-    shallow,
-    passHref,
-    prefetch,
-    locale
-  }
-  const buttonProps: ButtonProps = {
-    color,
-    outline,
-    transparent,
-    rounded,
-    upperCase
-  }
+    let classes = `${className}`
 
-  function renderMatchingComponent() {
-    if (component === 'button') return <Button className={classes} {...buttonProps}>{children}</Button>
-    
-    return <a href={linkProps.href.toString()} className={classes}>{children}</a>
+    if (!isActive && nav)
+      classes += ' opacity-75 opacity-100-hover '
+
+    if (transparent || nav) 
+      classes += ' bg-transparent border-transparent '
+
+    if (uppercase) 
+      classes += ' text-uppercase '
+
+    return `btn btn-primary text-white bg-opacity-100 d-flex align-items-center justify-content-center text-decoration-none shadow-none ${classes}`
   }
 
   return (
-    <Link {...linkProps}>
-      {renderMatchingComponent()}
+    <Link href={props.href} passHref>
+      <a className={getClasses()}>
+        {(iconBefore && props.icon) || ``}
+        {props.label && <span>{props.label}</span> || ``}
+        {(!iconBefore && props.icon) || ``}
+      </a>
     </Link>
   )
-}
-
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {}
-  }
 }

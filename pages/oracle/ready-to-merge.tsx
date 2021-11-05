@@ -44,9 +44,7 @@ export default function ReadyToMergeIssues() {
         <div className="mt-4">
           <NothingFound
           description="No issues ready to merge">
-          <InternalLink href="/create-issue" passHref active>
-            create one
-          </InternalLink>
+          <InternalLink href="/create-issue" label="create one" uppercase />
         </NothingFound>
         </div>
       }

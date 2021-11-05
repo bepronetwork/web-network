@@ -18,9 +18,7 @@ export default function NotFound() {
           The link you followed may be broken or the page may have been moved.
         </p>
         <div className='d-flex justify-content-center align-items-center'>
-          <InternalLink href="/" className="mt-3" active>
-            back to homepage
-          </InternalLink>
+          <InternalLink href="/" className="mt-3" label="back to homepage" uppercase />
         </div>
       </div>
     </div>

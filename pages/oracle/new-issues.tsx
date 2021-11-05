@@ -45,9 +45,7 @@ export default function Newissues() {
           <div className="mt-4">
             <NothingFound
               description="No issues in draft">
-              <InternalLink href="/create-issue" passHref active>
-                  create one
-              </InternalLink>
+              <InternalLink href="/create-issue" label="create one" uppercase />
             </NothingFound>
           </div>
           || ``
