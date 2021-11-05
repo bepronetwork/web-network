@@ -11,6 +11,7 @@ import { TransactionStatus } from '@interfaces/enums/transaction-status'
 import {TransactionCurrency} from '@interfaces/transaction';
 import {addTransaction} from '@reducers/add-transaction';
 import {updateTransaction} from '@reducers/update-transaction';
+import {changeBalance} from '@reducers/change-balance';
 import {formatNumberToCurrency} from 'helpers/formatNumber'
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import Button from './button';
@@ -19,7 +20,7 @@ import LockIcon from "@assets/icons/lock"
 const actions: string[] = ["Lock", "Unlock"];
 
 function OraclesActions(): JSX.Element {
-  const {state: {beproInit, metaMaskWallet, currentAddress, balance, oracles, myTransactions}, dispatch} = useContext(ApplicationContext);
+  const {state: {metaMaskWallet, currentAddress, balance, oracles, myTransactions}, dispatch} = useContext(ApplicationContext);
 
   const [show, setShow] = useState<boolean>(false);
   const [action, setAction] = useState<string>(actions[0]);
@@ -79,10 +80,16 @@ function OraclesActions(): JSX.Element {
   }
 
   function onSuccess() {
+    setTokenAmount(0);
+    setError("");
+
+    BeproService.getBalance('bepro')
+                .then(bepro => dispatch(changeBalance({bepro})))
+
     BeproService.network.getOraclesSummary({address: currentAddress})
-                .then(oracles => {
-                  dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles)))
-                });
+    .then(oracles => {
+      dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles)))
+    });
   }
 
   function updateWalletAddress() {
@@ -215,7 +222,7 @@ function OraclesActions(): JSX.Element {
 
           <div className="mt-5 d-grid gap-3">
 
-            <Button disabled={isApproveButtonDisabled()} onClick={approveSettlerToken}>Approve</Button>
+            {action === 'Lock' && <Button disabled={isApproveButtonDisabled()} onClick={approveSettlerToken}>Approve</Button>}
             {isApproved &&
             <Button color={action === 'Lock' ? 'purple' : 'primary'} className="ms-0" disabled={isButtonDisabled()}
               onClick={checkLockedAmount}>
