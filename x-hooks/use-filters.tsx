@@ -23,7 +23,7 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
     const state = getActiveFiltersOf(stateFilters);
     const time = getActiveFiltersOf(timeFilters);
     const repoId = getActiveFiltersOf(repoFilters);
-    console.log(repoId)
+    
     const query = {
       ... state ? {state} : {},
       ... time ? {time} : {},
