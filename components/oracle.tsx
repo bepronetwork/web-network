@@ -17,13 +17,9 @@ export default function Oracle({
       <div className="container">
         <div className="row">
           <div className="d-flex justify-content-center mb-3">
-            <InternalLink href="/oracle/new-issues" component="a" className={clsx("subnav-item mr-3 h3", {active: buttonPrimaryActive,})} active passHref>
-              New issues
-            </InternalLink>
+            <InternalLink href="/oracle/new-issues" label="New issues" className={clsx("mr-3 h3 p-0")} nav transparent />
 
-            <InternalLink href="/oracle/ready-to-merge" component="a" className={clsx("subnav-item h3", {active: !buttonPrimaryActive,})} active passHref>
-              Ready to merge
-            </InternalLink>
+            <InternalLink href="/oracle/ready-to-merge" label="Ready to merge" className={clsx("h3 p-0")} nav transparent />
           </div>
         </div>
       </div>

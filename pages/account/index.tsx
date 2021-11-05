@@ -84,9 +84,7 @@ export default function MyIssues() {
         <div className="mt-4">
           <NothingFound
             description="No issues">
-            <InternalLink href="/create-issue" passHref active>
-              create one
-            </InternalLink>
+            <InternalLink href="/create-issue" label="create one" uppercase />
           </NothingFound>
         </div>
       </div>)

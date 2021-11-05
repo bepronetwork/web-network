@@ -325,6 +325,15 @@ p {
   height: 70px;
   background-color: $blue;
   padding: 0px $m;
+
+  .brand {
+    padding: 0;
+  }
+
+  .btn {
+    margin: 0;
+  }
+
   .nav-links {
     display: flex;
     align-items: center;
@@ -336,21 +345,13 @@ p {
       margin-left: $m;
     }
     a {
-      font-family: 'fontMedium', sans-serif;
-      font-size: 14px;
-      text-transform: uppercase;
-      text-decoration: none;
       color: rgba($white, 0.7);
-      letter-spacing: 0.02em;
       padding: math.div($m, 4) 0px;
-      margin: 0px math.div($m, 2);
-      border-bottom: 2px solid rgba($white, 0);
       transition: 0.2s ease-in-out;
       &:hover,
       &.active {
         color: $white;
         text-decoration: none;
-        border-bottom: 2px solid rgba($white, 0.3);
       }
     }
   }
@@ -984,7 +985,7 @@ $c_props: ('m': 'margin') !default;
 }
 
 .main-nav {
-  .btn svg:only-child {
+  .btn:not(.brand) svg:only-child {
     width: 24px;
     height: 24px;
   }

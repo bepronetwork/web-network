@@ -105,9 +105,7 @@ export default function PageDevelopers() {
             <div className="col-md-10">
               <NothingFound
                 description={filterByState.emptyState}>
-                <InternalLink href="/create-issue" passHref active>
-                  create one
-                </InternalLink>
+                <InternalLink href="/create-issue" label="create one" uppercase />
               </NothingFound>
             </div>
           ) : null}
