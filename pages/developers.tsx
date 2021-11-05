@@ -15,6 +15,8 @@ import {useRouter} from 'next/router';
 import IssueFilterBox from '@components/issue-filter-box';
 import useFilters from '@x-hooks/use-filters';
 import IssueFilters from '@components/issue-filters';
+import useMergeData from '@x-hooks/use-merge-data';
+import useRepos from '@x-hooks/use-repos';
 import InternalLink from '@components/internal-link';
 
 type Filter = {
@@ -59,7 +61,8 @@ export default function PageDevelopers() {
   const {dispatch, state: {loading, currentAddress}} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
   const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
-
+  const mergedData = useMergeData();
+  const {activeRepo} = useRepos();
   const page = usePage();
   const results = useCount();
   const router = useRouter();
@@ -70,10 +73,12 @@ export default function PageDevelopers() {
   }
 
   function getIssues() {
+
     dispatch(changeLoadState(true))
-    GithubMicroService.getIssues(page, repoId as string, time as string, state as string)
+    mergedData.getIssues(page, repoId as string, time as string, state as string)
                       .then(({rows, count}) => {
                         results.setCount(count);
+                        console.log(rows)
                         return rows;
                       })
                       .then(updateIssuesList)
