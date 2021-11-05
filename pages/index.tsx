@@ -2,6 +2,7 @@ import React from 'react';
 import {GetServerSideProps, GetStaticProps} from 'next/types';
 import PageDevelopers from './developers';
 import {getSession} from 'next-auth/react';
+import useOctokit from '@x-hooks/use-octokit';
 
 export default function Home() {
   return <PageDevelopers />;
