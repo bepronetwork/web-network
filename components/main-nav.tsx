@@ -20,6 +20,7 @@ import PlusIcon from '@assets/icons/plus-icon';
 import BeproSmallLogo from '@assets/icons/bepro-small-logo';
 import { truncateAddress } from '@helpers/truncate-address';
 import InternalLink from './internal-link';
+import BalanceAddressAvatar from './balance-address-avatar';
 
 const CURRENCY = process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME;
 const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
@@ -118,18 +119,8 @@ export default function MainNav() {
             <NetworkIdentifier />
 
             <InternalLink href="/account" icon={<BeproSmallLogo />} label={formatNumberToNScale(beproBalance)} transparent nav />
-
-            <Link href="/account" passHref>
-              <a className="meta-info d-flex align-items-center">
-                <div className="d-flex flex-column text-right">
-                  <p className="p-small mb-0">
-                    {address}
-                  </p>
-                  <p className="p-small mb-0 trans">{formatNumberToString(ethBalance)} {CURRENCY}</p>
-                </div>
-                {/* <img className="avatar circle-2"src="https://uifaces.co/our-content/donated/Xp0NB-TL.jpg" alt="" /> */}
-              </a>
-            </Link>
+            
+            <InternalLink href="/account" icon={<BalanceAddressAvatar address={address} balance={ethBalance} currency={CURRENCY} />} className="meta-info d-flex align-items-center" />
           </div>
         </ConnectWalletButton>
       </div>
