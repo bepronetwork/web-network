@@ -44,7 +44,7 @@ export default function NewProposal({
   const router = useRouter();
   const [[activeRepo]] = useRepos();
   const {getParticipants} = useOctokit();
-  const {getUserWith} = useApi();
+  const {getUserWith, waitForMerge, processMergeProposal} = useApi();
 
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
@@ -99,7 +99,7 @@ export default function NewProposal({
     const proposeMergeTx = addTransaction({type: TransactionTypes.proposeMerge})
     dispatch(proposeMergeTx);
 
-    GithubMicroService.waitForMerge(githubLogin, issue_id, currentGithubId)
+    waitForMerge(githubLogin, issue_id, currentGithubId)
                       .then(data => {
                         console.log(`GOT`, data);
                         handleBeproService();
@@ -111,6 +111,7 @@ export default function NewProposal({
     await BeproService.network
                       .proposeIssueMerge(payload)
                       .then(txInfo => {
+                        processMergeProposal(txInfo.blockNumber, issue_id);
                         BeproService.parseTransaction(txInfo, proposeMergeTx.payload)
                                     .then(block => dispatch(updateTransaction(block)));
                       })

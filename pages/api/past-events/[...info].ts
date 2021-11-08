@@ -3,9 +3,7 @@ import {Network} from 'bepro-js';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {CONTRACT_ADDRESS, WEB3_CONNECTION} from '../../../env';
 import {Octokit} from 'octokit';
-import {IssueData} from '@interfaces/issue-data';
-import {Model} from 'sequelize';
-
+import { Bus } from '@helpers/bus';
 
 const octokit = new Octokit({auth: process.env.NEXT_GITHUB_TOKEN});
 
@@ -79,22 +77,23 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
                     if (!pr)
                       return console.log(`Could not find PR for db-issue ${issue?.id}`, event);
 
-                    const merge = await models.mergeProposal.create({
-                                                                      scMergeId,
-                                                                      issueId: issue?.id,
-                                                                      pullRequestId: pr?.id,
-                                                                    });
+                    const mergeExists = await models.mergeProposal.findOne({where: {scMergeId, issueId: issue?.id, pullRequestId: pr?.id,}})
+                    if (mergeExists) {
+                      Bus.emit(`mergeProposal:created:${user?.githubLogin}:${scIssueId}:${pr?.githubId}`, mergeExists)
+                      return console.log(`Event was already parsed. mergeProposal:created:${user?.githubLogin}:${scIssueId}:${pr?.githubId}`);
+                    }
 
-                    // console.log(`Emitting `, `mergeProposal:created:${user?.githubLogin}:${scIssueId}:${pr?.githubId}`);
+                    const merge = await models.mergeProposal.create({scMergeId, issueId: issue?.id, pullRequestId: pr?.id,});
 
-                    // Bus.emit(`mergeProposal:created:${user?.githubLogin}:${scIssueId}:${pr?.githubId}`, merge)
+                    console.log(`Emitting `, `mergeProposal:created:${user?.githubLogin}:${scIssueId}:${pr?.githubId}`);
+                    Bus.emit(`mergeProposal:created:${user?.githubLogin}:${scIssueId}:${pr?.githubId}`, merge)
                   }
                 })
 
   return res.status(204);
 }
 
-export default async function PullRequest(req: NextApiRequest, res: NextApiResponse) {
+export default async function PastEvents(req: NextApiRequest, res: NextApiResponse) {
 
   switch (req.method.toLowerCase()) {
     case 'get':
