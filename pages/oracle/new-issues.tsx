@@ -1,6 +1,5 @@
 import { GetStaticProps } from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
-import Link from 'next/link';
 import ListIssues from '@components/list-issues';
 import GithubMicroService from '@services/github-microservice';
 import Oracle from '@components/oracle';
@@ -8,10 +7,10 @@ import {changeLoadState} from '@reducers/change-load-state';
 import {ApplicationContext} from '@contexts/application';
 import {IssueData} from '@interfaces/issue-data';
 import NothingFound from '@components/nothing-found';
-import Button from '@components/button';
 import usePage from '@x-hooks/use-page';
 import useCount from '@x-hooks/use-count';
 import Paginate from '@components/paginate';
+import InternalLink from '@components/internal-link';
 
 export default function Newissues() {
   const {dispatch} = useContext(ApplicationContext);
@@ -46,11 +45,7 @@ export default function Newissues() {
           <div className="mt-4">
             <NothingFound
               description="No issues in draft">
-              <Link href="/create-issue" passHref>
-                <Button>
-                  create one
-                </Button>
-              </Link>
+              <InternalLink href="/create-issue" label="create one" uppercase />
             </NothingFound>
           </div>
           || ``

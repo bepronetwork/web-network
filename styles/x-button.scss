@@ -3,7 +3,7 @@ $only-child: 14px;
 
 .btn + .btn { margin-left: 8px; }
 
-button.btn,a.btn {
+button.btn,a.btn:not(.brand) {
   letter-spacing: .06rem;
   svg,i {
     &:not(:only-child) {

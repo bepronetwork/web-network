@@ -1,9 +1,9 @@
 import AccountHero from "./account-hero";
-import Link from "next/link";
 import React, { ComponentPropsWithoutRef, useContext } from "react";
 import ConnectGithub from "./connect-github";
 import { ApplicationContext } from "@contexts/application";
 import clsx from "clsx";
+import InternalLink from "./internal-link";
 
 interface Props extends ComponentPropsWithoutRef<"div"> {
   buttonPrimaryActive: boolean;
@@ -26,16 +26,9 @@ export default function Account({
       <div className="container">
         <div className="row">
           <div className="d-flex justify-content-center mb-3">
-            <Link href="/account" passHref>
-              <a className={clsx("subnav-item mr-3 h3", {active: buttonPrimaryActive,})}>
-                My issues
-              </a>
-            </Link>
-            <Link href="/account/my-oracles" passHref>
-              <a className={clsx("subnav-item h3", {active: !buttonPrimaryActive,})}>
-                My oracles
-              </a>
-            </Link>
+            <InternalLink href="/account" label="My issues" className={clsx("subnav-item mr-3 h3 p-0")} nav transparent />
+
+            <InternalLink href="/account/my-oracles" label="My oracles" className={clsx("subnav-item h3 p-0")} nav transparent />
           </div>
         </div>
       </div>

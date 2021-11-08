@@ -1,6 +1,5 @@
-import {GetStaticProps} from 'next';
 import React, {useContext, useEffect, useState} from 'react';
-import Link from 'next/link';
+import {GetStaticProps} from 'next';
 import {IssueData} from '@interfaces/issue-data';
 import ListIssues from '@components/list-issues';
 import PageHero from '@components/page-hero';
@@ -8,7 +7,7 @@ import GithubMicroService from '@services/github-microservice';
 import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';
 import NothingFound from '@components/nothing-found';
-import Button from '@components/button';
+import InternalLink from '@components/internal-link';
 
 export default function PageCouncil() {
   const {dispatch} = useContext(ApplicationContext);
@@ -40,11 +39,7 @@ export default function PageCouncil() {
             <div className="mt-4">
               <NothingFound
               description="No issues ready to propose">
-                <Link href="/create-issue" passHref>
-                  <Button>
-                    create one
-                  </Button>
-                </Link>
+                <InternalLink href="/create-issue" label="create one" uppercase />
               </NothingFound>
             </div>
           }
