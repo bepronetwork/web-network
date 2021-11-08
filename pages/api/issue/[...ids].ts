@@ -7,7 +7,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const {ids: [repoId, ghId]} = req.query;
   const issueId = [repoId, ghId].join(`/`);
 
-  const issue = await models.issue.findOne({where:{issueId}})
+  const issue = await models.issue.findOne({where:{issueId}, raw: true})
 
   if (!issue)
     return res.status(404).json(null);
