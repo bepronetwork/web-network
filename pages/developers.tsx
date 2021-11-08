@@ -66,7 +66,7 @@ export default function PageDevelopers() {
   const page = usePage();
   const results = useCount();
   const router = useRouter();
-  const {repoId, time, state} = router.query;
+  const {repoId, time, state} = router.query as {repoId: string; time: string; state: string};
 
   function updateIssuesList(issues: IssueData[]) {
     setIssues(issues);
@@ -75,7 +75,7 @@ export default function PageDevelopers() {
   function getIssues() {
 
     dispatch(changeLoadState(true))
-    mergedData.getIssues(page, repoId as string, time as string, state as string)
+    mergedData.getIssues({page, repoId, time, state})
                       .then(({rows, count}) => {
                         results.setCount(count);
                         return rows;

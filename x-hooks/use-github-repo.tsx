@@ -10,7 +10,7 @@ export default function useGithubRepo(id: string, path: string) {
     if (!id)
       return;
 
-    setGithubPath(findRepo(id)?.githubPath)
+    setGithubPath(findRepo(+id)?.githubPath)
   }
 
   useEffect(loadRepoId, [id]);

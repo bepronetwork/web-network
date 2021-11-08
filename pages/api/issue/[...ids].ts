@@ -1,6 +1,7 @@
 import models from '@db/models';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {composeIssues} from '@db/middlewares/compose-issues';
+import {Octokit} from 'octokit';
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {ids: [repoId, ghId]} = req.query;
@@ -16,7 +17,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(issue);
 }
 
-export default async function GetIssue(req: NextApiRequest, res: NextApiResponse) {
+export default async function GetIssues(req: NextApiRequest, res: NextApiResponse) {
 
   switch (req.method.toLowerCase()) {
     case 'get':

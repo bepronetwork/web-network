@@ -4,6 +4,7 @@ import {useEffect, useState} from 'react';
 import {IssueData} from '@interfaces/issue-data';
 import {ProposalData, User} from '@services/github-microservice';
 import {ReposList} from '@interfaces/repos-list';
+import {BeproService} from '@services/bepro-service';
 
 const client = axios.create({baseURL: `http://localhost:3000`});
 client.interceptors.response.use(
@@ -15,6 +16,15 @@ interface Paginated<T = any> {
   rows: T[]
 }
 
+interface NewIssueParams {
+  title: string,
+  description: string,
+  amount: number,
+  creatorAddress: string,
+  creatorGithub: string,
+  repository_id: string,
+}
+
 const repoList: ReposList = [];
 
 export default function useApi() {
@@ -24,8 +34,10 @@ export default function useApi() {
                            time = ``,
                            state = ``,
                            sortBy = 'updatedAt',
-                           order = 'DESC') {
-    const search = new URLSearchParams({page, repoId, time, state, sortBy, order}).toString();
+                           order = 'DESC',
+                           address = ``,
+                           creator = ``) {
+    const search = new URLSearchParams({address, page, repoId, time, state, sortBy, order, creator}).toString();
     return client.get<{rows: IssueData[], count: number}>(`/api/issues/?${search}`)
                  .then(({data}) => data)
                  .catch(() => ({rows: [], count: 0}));
@@ -35,6 +47,18 @@ export default function useApi() {
     return client.get<IssueData>(`/api/issue/${repoId}/${ghId}`)
                  .then(({data}) => data)
                  .catch(() => null);
+  }
+
+  async function createIssue(payload: NewIssueParams) {
+    return client.post<number>(`/api/issue`, payload)
+                 .then(({data}) => data)
+                 .catch(() => null);
+  }
+
+  async function patchIssueWithScId(repoId, githubId, scId) {
+    return client.patch(`/api/issue`, {repoId, githubId, scId})
+                 .then(({data}) => data === `ok`)
+                 .catch(_ => false)
   }
 
   async function getIssuesOfLogin(login: string, page = '1') {
@@ -57,8 +81,8 @@ export default function useApi() {
                  .catch(() => ({scMergeId: '', pullRequestId: '', issueId: '', id: ''}))
   }
 
-  async function createPullRequestIssue(repoId: string, issueGitId: string, payload: {title: string; description: string; username: string;}) {
-    return client.post(`/api/issue/pull/${repoId}/${issueGitId}`, payload)
+  async function createPullRequestIssue(repoId: string, githubId: string, payload: {title: string; description: string; username: string;}) {
+    return client.post(`/api/pull-request/`, {...payload, repoId, githubId})
                  .then(() => true)
                  .catch(() => false)
   }
@@ -161,5 +185,16 @@ export default function useApi() {
                  });
   }
 
-  return {getIssue, getReposList, getIssues, health, getClientNation}
+  return {
+    getIssue,
+    getReposList,
+    getIssues,
+    health,
+    getClientNation,
+    getUserOf,
+    getPendingFor,
+    createPullRequestIssue,
+    createIssue,
+    patchIssueWithScId,
+  }
 }

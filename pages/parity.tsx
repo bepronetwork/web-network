@@ -16,6 +16,7 @@ import {ReposList} from '@interfaces/repos-list';
 import {Dropdown, ListGroup} from 'react-bootstrap';
 import ConnectGithub from '@components/connect-github';
 import Button from '@components/button';
+import useApi from '@x-hooks/use-api';
 
 export default function ParityPage() {
   const {state: {currentAddress, balance,}, dispatch} = useContext(ApplicationContext);
@@ -32,6 +33,7 @@ export default function ParityPage() {
   const [issuesList, setIssuesList] = useState([]);
   const [reposList, setReposList] = useState<ReposList>([]);
   const [availReposList, setAvailableList] = useState<string[]>([]);
+  const {getUserOf} = useApi();
 
   const formItem = (label = ``, placeholder = ``, value = ``, onChange = (ev) => {}) =>
     ({label, placeholder, value, onChange})
@@ -232,7 +234,7 @@ export default function ParityPage() {
   }
 
   function getSelfRepos() {
-    GithubMicroService.getUserOf(currentAddress)
+    getUserOf(currentAddress)
                       .then((user) => {
                         setGithubLogin(user?.githubLogin);
                         setGithubToken(user?.accessToken);
