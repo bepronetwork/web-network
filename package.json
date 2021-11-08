@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "14.x"
+    "node": "14.17.0"
   },
   "scripts": {
     "prestart": "npm run migrate",
@@ -19,7 +19,7 @@
     "@octokit/types": "^6.26.0",
     "@vlsergey/react-bootstrap-pagination": "^3.0.2",
     "axios": "^0.21.1",
-    "bepro-js": "~1.2.9",
+    "bepro-js": "github:bepronetwork/bepro-js#master",
     "bootstrap": "^5.1.3",
     "clsx": "^1.1.1",
     "cron": "^1.8.2",
@@ -31,8 +31,8 @@
     "next": "11.1.2",
     "next-auth": "4.0.0-beta.2",
     "octokit": "1.0.5",
-    "pg": "^8.6.0",
-    "pg-hstore": "^2.3.3",
+    "pg": "^8.7.1",
+    "pg-hstore": "^2.3.4",
     "react": "17.0.2",
     "react-bootstrap": "2.0.0-beta.4",
     "react-device-detect": "1.17.0",
@@ -44,8 +44,8 @@
     "remark-html": "^12.0.0",
     "sanitize-html": "^2.5.1",
     "sass": "^1.32.13",
-    "sequelize": "~6.6.2",
-    "sequelize-cli": "~6.2.0",
+    "sequelize": "^6.6.5",
+    "sequelize-cli": "^6.2.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

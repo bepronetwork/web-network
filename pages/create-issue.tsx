@@ -17,6 +17,7 @@ import { TransactionStatus } from '@interfaces/enums/transaction-status';
 import LockIcon from '@assets/icons/lock';
 import ReposDropdown from '@components/repos-dropdown';
 import Button from '@components/button';
+import useApi from '@x-hooks/use-api';
 
 interface Amount {
   value?: string,
@@ -34,7 +35,8 @@ export default function PageCreateIssue() {
   const [currentUser, setCurrentUser] = useState<User>();
   const [repository_id, setRepositoryId] = useState(``);
   const [redirecting, setRedirecting] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
+  const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId} = useApi();
 
   async function allowCreateIssue() {
     const loggedIn = await BeproService.login();
@@ -53,10 +55,7 @@ export default function PageCreateIssue() {
                   return txInfo;
                 })
                 .then(txInfo => {
-                  BeproService.network.isApprovedTransactionalToken({
-                                                                      address: BeproService.address,
-                                                                      amount: issueAmount.floatValue
-                                                                    })
+                  BeproService.network.isApprovedTransactionalToken({address: BeproService.address, amount: issueAmount.floatValue})
                               .then(setAllowedTransaction)
                               .catch(() => setAllowedTransaction(false))
                               .finally(() => {
@@ -92,7 +91,7 @@ export default function PageCreateIssue() {
     const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount: payload.amount});
     dispatch(openIssueTx);
     setRedirecting(true)
-    GithubMicroService.createIssue(payload)
+    apiCreateIssue(payload)
                       .then(cid => {
                         if (!cid)
                           throw new Error(`Failed to create github issue!`);
@@ -107,7 +106,7 @@ export default function PageCreateIssue() {
                                            })
                       })
                       .then(({githubId, issueId}) =>
-                        GithubMicroService.patchGithubId(githubId, issueId)
+                        patchIssueWithScId(repository_id, githubId, issueId)
                           .then(async(result) => {
                             if (!result)
                                 return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
@@ -162,7 +161,7 @@ export default function PageCreateIssue() {
 
   useEffect(() => {
     BeproService.getBalance('bepro').then(setBalance);
-    GithubMicroService.getUserOf(currentAddress).then(setCurrentUser);
+    getUserOf(currentAddress).then(setCurrentUser);
   }, [currentAddress])
 
   return (

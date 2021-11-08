@@ -3,14 +3,14 @@ import {useEffect, useState} from 'react';
 import {RepoInfo, ReposList} from '@interfaces/repos-list';
 import {useRouter} from 'next/router';
 
-export default function useRepos(): [[RepoInfo, ReposList], {findRepo(id: string): RepoInfo, loadRepos(): Promise<ReposList>}] {
+export default function useRepos(): [[RepoInfo, ReposList], {findRepo(id?: number): RepoInfo, loadRepos(): Promise<ReposList>}] {
   const [repoList, setRepoList] = useState<ReposList>([]);
   const [activeRepo, setActiveRepo] = useState<RepoInfo>(null);
   const {query: {repoId}} = useRouter();
   const {getReposList} = useApi();
 
-  function findRepo(id: string) {
-    return repoList?.find(({id}) => id === +repoId)
+  function findRepo(_id?: number) {
+    return repoList?.find(({id}) => id === (_id || +repoId))
   }
 
   async function loadRepos() {
@@ -19,7 +19,13 @@ export default function useRepos(): [[RepoInfo, ReposList], {findRepo(id: string
     return repos;
   }
 
-  useEffect(() => { setActiveRepo(findRepo(repoId as string)) }, [repoId])
+  useEffect(() => {
+    if (!repoList.length)
+      return;
+
+    setActiveRepo(findRepo())
+
+  }, [repoId, repoList])
   useEffect(() => { loadRepos() }, [])
 
   return [[activeRepo, repoList], {findRepo, loadRepos},];

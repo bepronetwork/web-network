@@ -3,14 +3,16 @@ import {useContext} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import {signIn, signOut} from 'next-auth/react';
 import GithubMicroService from '@services/github-microservice';
+import useApi from '@x-hooks/use-api';
 
 export default function ConnectGithub() {
   const {state: {currentAddress}} = useContext(ApplicationContext);
+  const api = useApi();
 
   async function clickSignIn() {
     await signOut({redirect: false});
     localStorage.setItem(`lastAddressBeforeConnect`, currentAddress);
-    const user = await GithubMicroService.getUserOf(currentAddress);
+    const user = await api.getUserOf(currentAddress);
     return signIn('github', {callbackUrl: `${window.location.protocol}//${window.location.host}/connect-account${!!user ? `?migrate=1` : ``}`})
   }
 

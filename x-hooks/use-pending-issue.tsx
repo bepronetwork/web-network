@@ -6,6 +6,7 @@ import {addTransaction} from '@reducers/add-transaction';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import GithubMicroService from '@services/github-microservice';
 import {IssueData} from '@interfaces/issue-data';
+import useApi from '@x-hooks/use-api';
 
 interface usePendingIssueActions {
   treatPendingIssue(): Promise<boolean>,
@@ -18,9 +19,10 @@ export default function usePendingIssue<S = IssueData>(): usePendingIssueReturn 
   const [pendingIssue, setPendingIssue] = useState<IssueData>(null);
   const [issueExistsOnSc, setIssueExistsOnSc] = useState<boolean>(false);
   const {dispatch,} = useContext(ApplicationContext);
+  const {patchIssueWithScId} = useApi();
 
-  async function updateIssueWithCID(githubId, issueId): Promise<boolean> {
-    return GithubMicroService.patchGithubId(githubId, issueId)
+  async function updateIssueWithCID(repoId, githubId, issueId): Promise<boolean> {
+    return patchIssueWithScId(repoId, githubId, issueId)
   }
 
   async function createPendingIssue(): Promise<{githubId?: string; repoId?: string; issueId}> {
@@ -63,13 +65,13 @@ export default function usePendingIssue<S = IssueData>(): usePendingIssueReturn 
 
   async function treatPendingIssue(): Promise<boolean> {
     if (issueExistsOnSc)
-      return updateIssueWithCID(pendingIssue.githubId, pendingIssue.issueId || [pendingIssue.repository_id,pendingIssue.githubId].join(`/`));
+      return updateIssueWithCID(pendingIssue.repository_id, pendingIssue.githubId, pendingIssue.issueId || [pendingIssue.repository_id,pendingIssue.githubId].join(`/`));
 
     return createPendingIssue()
       .then(_issue => {
       if (!_issue.issueId)
         return false;
-      return updateIssueWithCID(_issue?.githubId, _issue?.issueId)
+      return updateIssueWithCID(_issue?.repoId, _issue?.githubId, _issue?.issueId)
     });
   }
 

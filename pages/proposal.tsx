@@ -19,6 +19,7 @@ import CustomContainer from '@components/custom-container';
 import {formatNumberToCurrency} from '@helpers/formatNumber';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import useRepos from '@x-hooks/use-repos';
+import useApi from '@x-hooks/use-api';
 
 interface ProposalBepro {
   disputes: string;
@@ -53,6 +54,7 @@ export default function PageProposal() {
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
   const [repo, setRepo] = useState(``);
   const [[activeRepo]] = useRepos();
+  const {getUserOf} = useApi();
 
   async function getProposalData() {
     const mergeProposal = await GithubMicroService.getMergeProposalIssue(dbId, mergeId);
@@ -68,7 +70,7 @@ export default function PageProposal() {
       const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
       const merge = await BeproService.network.getMergeById({issue_id: issue_id, merge_id: mergeId});
       const isDisputed = await BeproService.network.isMergeDisputed({issueId: issue_id, mergeId});
-      const author = await GithubMicroService.getHandleOf(merge.proposalAddress);
+      const author = (await getUserOf(merge.proposalAddress))?.githubHandle;
 
       setProposalBepro({...merge, isDisputed, author});
       return Promise.resolve();
@@ -94,7 +96,7 @@ export default function PageProposal() {
 
     async function mapUser(address: string, i: number) {
 
-      const {githubLogin} = await GithubMicroService.getUserOf(address);
+      const {githubLogin} = await getUserOf(address);
       const oracles = proposal.prAmounts[i].toString();
       const percentage = handlePercentage(+oracles, +amountIssue);
       return {githubLogin, percentage, address, oracles};

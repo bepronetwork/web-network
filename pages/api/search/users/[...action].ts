@@ -8,7 +8,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   if (!action)
     return res.status(200).json(await models.user.findAll({raw: true,}));
 
-  const users: string[] = req.body;
+  const users: string[] = req.body.map(s => s.toLowerCase());
 
   if (action === `login`)
     return res.status(200).json(await models.user.findAll({raw: true, where: {githubLogin: {[Op.in]: users}}}));
