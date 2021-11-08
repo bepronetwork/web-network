@@ -4,6 +4,7 @@ import GithubMicroService from '@services/github-microservice';
 import {RepoInfo} from '@interfaces/repos-list';
 import {subHours, subMonths, subWeeks, subYears} from 'date-fns';
 import {useRouter} from 'next/router';
+import useRepos from '@x-hooks/use-repos';
 
 type FilterStateUpdater = (opts: IssueFilterBoxOption[], opt: IssueFilterBoxOption, checked: boolean, type: ('time' | 'repo' | 'state'), multi?: boolean) => void;
 
@@ -11,6 +12,7 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
   const [stateFilters, setStateFilters] = useState<IssueFilterBoxOption[]>([]);
   const [timeFilters, setTimeFilters] = useState<IssueFilterBoxOption[]>([]);
   const [repoFilters, setRepoFilters] = useState<IssueFilterBoxOption[]>([]);
+  const [[, repoList]] = useRepos();
 
   const router = useRouter()
 
@@ -23,7 +25,7 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
     const state = getActiveFiltersOf(stateFilters);
     const time = getActiveFiltersOf(timeFilters);
     const repoId = getActiveFiltersOf(repoFilters);
-    
+
     const query = {
       ... state ? {state} : {},
       ... time ? {time} : {},
@@ -43,14 +45,12 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
       return makeFilterOption(label, value, router.query?.repoId as string === value.toString());
     }
 
-    GithubMicroService.getReposList()
-                      .then(repos => [makeFilterOption(`All`, `allrepos`, !router.query?.repoId)].concat(repos.map(mapRepo)))
-                      .then(setRepoFilters)
+    setRepoFilters([makeFilterOption(`All`, `allrepos`, !router.query?.repoId)].concat(repoList.map(mapRepo)))
   }
 
   function loadFilters() {
     const {time, state, repoId} = router.query || {};
-    
+
     setStateFilters([
                       makeFilterOption(`All`, `allstates`, !state),
                       makeFilterOption(`Open Issues`, `open`, state === `ready` || state === `open`),
@@ -72,7 +72,7 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
   }
 
   useEffect(loadFilters, [router.query])
-  useEffect(loadRepos, [])
+  useEffect(loadRepos, [repoList])
 
   function updateOpt(opts: IssueFilterBoxOption[], opt: IssueFilterBoxOption, checked: boolean, type: `time` | `repo` | `state`, multi = false): void {
     const tmp: IssueFilterBoxOption[] = [...opts];

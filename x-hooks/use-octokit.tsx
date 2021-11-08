@@ -2,7 +2,7 @@ import {Octokit} from 'octokit';
 import {useEffect, useState} from 'react';
 
 export default function useOctokit() {
-  const [octokit, setOctokit] = useState<Octokit>(null);
+  const [octokit, setOctokit] = useState<Octokit>(new Octokit());
 
   function getOwnerRepoFrom(path: string) {
     const [owner, repo] = path.split(`/`);
@@ -53,8 +53,6 @@ export default function useOctokit() {
   async function authenticate(auth: string) {
     setOctokit(new Octokit({auth}));
   }
-
-  useEffect(() => { setOctokit(new Octokit()); }, [])
 
   return {getIssue, getIssueComments, getCommitsOfPr, getForksOf, getStargazers, authenticate};
 

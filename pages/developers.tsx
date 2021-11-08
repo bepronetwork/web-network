@@ -62,7 +62,7 @@ export default function PageDevelopers() {
   const [issues, setIssues] = useState<IssueData[]>([]);
   const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
   const mergedData = useMergeData();
-  const {activeRepo} = useRepos();
+
   const page = usePage();
   const results = useCount();
   const router = useRouter();
@@ -78,7 +78,6 @@ export default function PageDevelopers() {
     mergedData.getIssues(page, repoId as string, time as string, state as string)
                       .then(({rows, count}) => {
                         results.setCount(count);
-                        console.log(rows)
                         return rows;
                       })
                       .then(updateIssuesList)

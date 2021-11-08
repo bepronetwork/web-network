@@ -89,9 +89,11 @@ export default function ApplicationContextProvider({children}) {
   }
 
   function Initialize() {
-    dispatch(changeBeproInitState(true) as any)
+    BeproService.start()
+                .then(state => {
+                  dispatch(changeBeproInitState(state))
+                });
 
-    
     if (!window.ethereum)
       return;
 

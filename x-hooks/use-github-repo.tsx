@@ -1,16 +1,16 @@
 import {useEffect, useState} from 'react';
 import GithubMicroService from '@services/github-microservice';
+import useRepos from '@x-hooks/use-repos';
 
 export default function useGithubRepo(id: string, path: string) {
   const [githubPath, setGithubPath] = useState(``);
+  const [, {findRepo}] = useRepos();
 
   function loadRepoId() {
     if (!id)
       return;
 
-    GithubMicroService.getReposList()
-                      .then(repos => repos.find(({id: _id}) => +_id === +id)?.githubPath)
-                      .then(setGithubPath)
+    setGithubPath(findRepo(id)?.githubPath)
   }
 
   useEffect(loadRepoId, [id]);

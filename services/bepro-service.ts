@@ -31,12 +31,29 @@ class BeproFacet {
     this._bepro = new Application(opt);
     this._network = new Network({contractAddress, ...opt});
     this._ERC20 = new ERC20Contract({contractAddress: settlerAddress, ...opt});
+
+  }
+
+  public async start() {
+    // this._bepro.test = true;
+    this._network.test = true;
+    this._ERC20.test = true;
+
+    try {
+      await this._network.start();
+      await this._ERC20.start();
+    } catch (e) {
+      console.log(`Failed to start`, e);
+      return false;
+    }
+
+    return true;
   }
 
   public async login(force?: boolean): Promise<boolean> {
     if (!force && this._loggedIn) return true;
 
-    if (force) {
+    if (force || this._network.test) {
       const opt = {opt: {web3Connection: this.web3Connection}};
       this._bepro = new Application(opt);
       this._network = new Network({contractAddress: this.contractAddress, ...opt});
@@ -98,6 +115,38 @@ class BeproFacet {
       confirmations: result?.nonce,
       status: result && transaction.status ? TransactionStatus.completed : TransactionStatus.failed,
     }
+  }
+
+  async getClosedIssues() {
+    return this._network.getAmountofIssuesClosed()
+               .catch(e => {
+                 console.log(`Error while getClosedIssued`, e)
+                 return 0;
+               });
+  }
+
+  async getOpenIssues() {
+    return this._network.getAmountofIssuesOpened()
+                       .catch(e => {
+                         console.log(`Error while getOpenIssues`, e)
+                         return 0;
+                       });
+  }
+
+  async getBEPROStaked() {
+    return this._network.getBEPROStaked()
+                       .catch(e => {
+                         console.log(`Error while getBEPROStaked`, e)
+                         return 0;
+                       });
+  }
+
+  async getTokensStaked() {
+    return this._network.getTokensStaked()
+                       .catch(e => {
+                         console.log(`Error while getBEPROStaked`, e)
+                         return 0;
+                       });
   }
 }
 
