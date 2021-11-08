@@ -45,9 +45,9 @@ export default function useOctokit() {
 
     const users = [];
 
-    for (const {author: {name}} of commits)
-      if (!users.includes(name))
-        users.push(name)
+    for (const {author: {login}} of commits)
+      if (!users.includes(login))
+        users.push(login)
 
     return users;
   }
@@ -61,6 +61,6 @@ export default function useOctokit() {
 
   useEffect(() => { authenticate(accessToken) }, [accessToken])
 
-  return {getIssue, getIssueComments, getCommitsOfPr, getForksOf, getStargazers, authenticate};
+  return {getIssue, getIssueComments, getCommitsOfPr, getForksOf, getStargazers, authenticate, getParticipants};
 
 }
