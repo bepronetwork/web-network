@@ -16,6 +16,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   if (action === `address`)
     return res.status(200).json(await models.user.findAll({raw: true, where: {address: {[Op.in]: users}}}));
 
+  return res.status(404).json([]);
+
 }
 
 export default async function SearchUsers(req: NextApiRequest, res: NextApiResponse) {

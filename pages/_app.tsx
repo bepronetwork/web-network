@@ -1,6 +1,6 @@
 import "../styles/styles.scss";
 import { AppProps } from "next/app";
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import NationDialog from "@components/nation-dialog";
 import WebThreeDialog from "@components/web3-dialog";
 import Head from "next/head";
@@ -11,11 +11,20 @@ import { isMobile } from "react-device-detect";
 import MobileNotSupported from '@components/mobile-not-supported';
 import {getSession, SessionProvider} from 'next-auth/react'
 import {GetServerSideProps} from 'next';
+import useRepos from '@x-hooks/use-repos';
 
 export default function App({ Component, pageProps: {session, ...pageProps} }: AppProps) {
+  const [[, repos]] = useRepos();
+  const [loaded, setLoaded] = useState(false);
+
   if (isMobile) {
     return <MobileNotSupported />;
   }
+
+  useEffect(() => {
+    setLoaded(!!repos.length)
+    console.log(loaded, repos,)
+  }, [repos])
 
   return (<SessionProvider session={session}>
       <ApplicationContextProvider>
@@ -24,12 +33,14 @@ export default function App({ Component, pageProps: {session, ...pageProps} }: A
           <title>App | Web3 Decentralized Development</title>
           <link href="/favicon.ico" rel="shortcut icon"  />
         </Head>
+
         <NationDialog>
           <MainNav />
           <WebThreeDialog />
-          <div className="pb-5"><Component {...pageProps} /></div>
+          <div className="pb-5">{!loaded ? `` : <Component {...pageProps} /> }</div>
           <StatusBar />
         </NationDialog>
+
       </ApplicationContextProvider>
   </SessionProvider>
   );

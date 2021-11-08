@@ -3,7 +3,7 @@ import {NextApiRequest, NextApiResponse} from 'next';
 
 
 async function getAllRepos(req, res) {
-  return res.status(200).json(await models.repositories.findAll());
+  return res.status(200).json(await models.repositories.findAll({raw: true}));
 }
 
 async function addNewRepo(req, res) {

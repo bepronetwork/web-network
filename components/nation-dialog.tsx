@@ -5,24 +5,23 @@ import BeProBlue from "@assets/icons/bepro-blue";
 import Loading from 'components/loading'
 import { COUNTRY_CODE_BLOCKED } from "../env";
 import GithubMicroService from "@services/github-microservice";
+import useApi from '@x-hooks/use-api';
 
 export default function NationDialog({ children }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isBlock, setBlock] = useState<boolean>(false);
   const [country, setCountry] = useState<string>("Your Country");
+  const {getClientNation} = useApi();
 
   useEffect(() => {
     setIsLoading(true);
-    GithubMicroService.getClientNation()
-      .catch((e) => {
-        console.error(`Failed to fetch Nation; Blocking.`, e);
-        return {countryCode: `US`};
-      })
-      .then(({countryCode, country})=>{
-        if (COUNTRY_CODE_BLOCKED.indexOf(countryCode) === -1)
+    getClientNation()
+      .then((data)=>{
+        console.log(`Data`, data);
+        if (COUNTRY_CODE_BLOCKED.indexOf(data.countryCode) === -1)
           return;
 
-        setCountry(country || '');
+        setCountry(data.country || '');
         setBlock(true);
 
       })
