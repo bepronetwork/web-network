@@ -16,6 +16,8 @@ import usePendingIssue from '@x-hooks/use-pending-issue';
 import MarkedRender from '@components/MarkedRender';
 import {formatNumberToCurrency, formatNumberToNScale, formatNumberToString} from '@helpers/formatNumber';
 import {toastError} from '@reducers/add-toast';
+import useApi from '@x-hooks/use-api';
+import useMergeData from '@x-hooks/use-merge-data';
 import InternalLink from '@components/internal-link';
 
 export default function MyIssues() {
@@ -29,16 +31,19 @@ export default function MyIssues() {
   const results = useCount();
   const router = useRouter();
 
+  const {getUserOf} = useApi();
+  const {getPendingFor, getIssues} = useMergeData();
+
   let issueChild;
 
   function getIssueList() {
     if (!currentAddress)
       return;
 
-    GithubMicroService.getUserOf(currentAddress)
+    getUserOf(currentAddress)
                       .then((user) => {
                         if (user)
-                          return GithubMicroService.getIssuesByGhLogin(user?.githubLogin, page)
+                          return getIssues({creator: user?.githubLogin, page})
                                                    .then(({rows, count}) => {
                                                      results.setCount(count);
                                                      return rows
@@ -58,7 +63,7 @@ export default function MyIssues() {
     if (!currentAddress)
       return;
 
-    GithubMicroService.getPendingIssuesOf(currentAddress).then(setPendingIssues);
+    getPendingFor(currentAddress).then(pending => setPendingIssues(pending.rows));
   }
 
   function createPendingIssue() {

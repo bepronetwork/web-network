@@ -20,6 +20,7 @@ import {toastError} from '@reducers/add-toast';
 import sanitizeHtml from 'sanitize-html';
 import {GetServerSideProps} from 'next';
 import {NetworkIds} from '@interfaces/enums/network-ids';
+import useApi from '@x-hooks/use-api';
 
 interface GlobalState {
   state: ApplicationState,
@@ -62,6 +63,7 @@ export const ApplicationContext = createContext<GlobalState>(defaultState)
 export default function ApplicationContextProvider({children}) {
   const [state, dispatch] = useReducer(mainReducer, defaultState.state);
   const { authError } = useRouter().query;
+  const {getUserOf} = useApi();
 
   function updateSteFor(newAddress: string) {
     BeproService.login(true)
@@ -74,7 +76,7 @@ export default function ApplicationContextProvider({children}) {
 
     const address = state.currentAddress;
 
-    GithubMicroService.getUserOf(address)
+    getUserOf(address)
                       .then(user => {
                         dispatch(changeGithubHandle(user?.githubHandle));
                         dispatch(changeGithubLogin(user?.githubLogin));

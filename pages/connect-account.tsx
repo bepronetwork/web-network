@@ -21,6 +21,7 @@ import ErrorMarkIcon from '@assets/icons/errormark-icon';
 import {changeNetwork} from '@reducers/change-network';
 import {NetworkIds} from '@interfaces/enums/network-ids';
 import Button from '@components/button';
+import useApi from '@x-hooks/use-api';
 
 
 export default function ConnectAccount() {
@@ -31,6 +32,7 @@ export default function ConnectAccount() {
   const {data: session} = useSession();
   const router = useRouter();
   const { migrate } = router.query;
+  const {getUserOf} = useApi();
 
 
   function updateLastUsedAddress() {
@@ -49,7 +51,7 @@ export default function ConnectAccount() {
       return;
     }
 
-    GithubMicroService.getUserOf(currentAddress)
+    getUserOf(currentAddress)
                       .then(user => {
                         setIsGhValid(user && user.githubHandle === session?.user.name || true)
 
@@ -74,7 +76,7 @@ export default function ConnectAccount() {
   async function joinAddressToGh() {
     dispatch(changeLoadState(true));
 
-    const user = await GithubMicroService.getUserOf(currentAddress);
+    const user = await getUserOf(currentAddress);
 
     if (user && (user.githubHandle || user.githubLogin !== githubLogin)) {
       dispatch(changeLoadState(false));

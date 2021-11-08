@@ -18,6 +18,8 @@ import CreatePullRequestModal from "@components/create-pull-request-modal";
 import { TransactionStatus } from "@interfaces/enums/transaction-status";
 import Button from "./button";
 import GithubLink from '@components/github-link';
+import {useRouter} from 'next/router';
+import useApi from '@x-hooks/use-api';
 
 interface pageActions {
   issueId: string;
@@ -72,6 +74,8 @@ export default function PageActions({
     dispatch,
     state: { githubHandle, currentAddress, myTransactions },
   } = useContext(ApplicationContext);
+  const {query: {repoId, id}} = useRouter();
+  const {createPullRequestIssue} = useApi();
 
   const [showPRModal, setShowPRModal] = useState(false);
 
@@ -175,15 +179,9 @@ export default function PageActions({
     );
   }
 
-  async function handlePullrequest({
-    title: prTitle,
-    description: prDescription,
-  }) {
-    GithubMicroService.createPullRequestIssue(issueId, {
-      title: prTitle,
-      description: prDescription,
-      username: githubLogin,
-    })
+  async function handlePullrequest({title: prTitle, description: prDescription,}) {
+
+    createPullRequestIssue(repoId as string, githubId, {title: prTitle, description: prDescription, username: githubLogin,})
       .then(() => {
         dispatch(
           addToast({

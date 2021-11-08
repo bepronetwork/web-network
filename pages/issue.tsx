@@ -15,7 +15,8 @@ import IssueProposalProgressBar from '@components/issue-proposal-progress-bar';
 import useMergeData from '@x-hooks/use-merge-data';
 import useRepos from '@x-hooks/use-repos';
 import useOctokit from '@x-hooks/use-octokit';
-import useBEPRO from '@x-hooks/use-bepro';
+import useApi from '@x-hooks/use-api';
+// import useBEPRO from '@x-hooks/use-bepro';
 
 interface NetworkIssue {
   recognizedAsFinished: boolean;
@@ -34,16 +35,16 @@ export default function PageIssue() {
   const [canOpenPR, setCanOpenPR] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>();
   const {getIssue} = useMergeData();
-  const {getIssueComments} = useOctokit();
-  const [[activeRepo]] = useRepos();
-  const bepro = useBEPRO();
+  const {getIssueComments, getForksOf} = useOctokit();
+  const [[activeRepo, reposList]] = useRepos();
+  const {getUserOf} = useApi();
 
   function getIssueCID() {
     return [repoId, id].join(`/`)
   }
 
   function getsIssueMicroService() {
-    if (!activeRepo)
+    if (!activeRepo || issue)
       return;
 
     getIssue(repoId as string, id as string, activeRepo.githubPath)
@@ -52,19 +53,22 @@ export default function PageIssue() {
           return;
 
         setIssue(issue);
-        getIssueComments(+issue.githubId, activeRepo.githubPath)
-          .then((comments) => setCommentsIssue(comments.data as any));
+
+        if (!commentsIssue)
+          getIssueComments(+issue.githubId, activeRepo.githubPath)
+            .then((comments) => setCommentsIssue(comments.data as any));
       });
 
-    GithubMicroService.getForks().then((forks) => setForks(forks));
+    if (!forks)
+      getForksOf(activeRepo.githubPath).then((frk) => setForks(frk.data as any));
   }
 
   function getsIssueBeproService() {
-    // if (!currentAddress)
-    //   return;
+    if (!currentAddress || networkIssue)
+      return;
 
-    bepro.network.getIssueByCID({ issueCID: getIssueCID() })
-    // BeproService.network.getIssueByCID({ issueCID: getIssueCID() })
+    // bepro.network.getIssueByCID({ issueCID: getIssueCID() })
+    BeproService.network.getIssueByCID({ issueCID: getIssueCID() })
       .then(netIssue => {
         setNetworkIssue(netIssue);
         return netIssue._id;
@@ -80,13 +84,17 @@ export default function PageIssue() {
     if (currentAddress == currentUser?.address)
       return;
 
-    GithubMicroService.getUserOf(currentAddress)
+    getUserOf(currentAddress)
       .then((user: User) => setCurrentUser(user));
   };
 
-  const getRepoForked = () => {
-    GithubMicroService.getForkedRepo(githubLogin, [repoId, id].join(`/`))
-      .then((repo) => setCanOpenPR(!!repo))
+  function getRepoForked() {
+    if (!activeRepo || !githubLogin)
+      return;
+
+    const path = `${githubLogin}/${activeRepo.githubPath.split(`/`)[1]}`
+    getForksOf(path)
+      .then((repo) => setCanOpenPR(!!repo.data))
   }
 
   function loadIssueData() {
@@ -96,11 +104,11 @@ export default function PageIssue() {
       getCurrentUserMicroService();
     } else if (id) getsIssueMicroService();
 
-    if (githubHandle) getRepoForked();
+    if (githubLogin && activeRepo) getRepoForked();
   }
 
-  useEffect(loadIssueData, [githubHandle, currentAddress, id]);
-  useEffect(getsIssueMicroService, [activeRepo])
+  useEffect(loadIssueData, [githubLogin, currentAddress, id, activeRepo]);
+  useEffect(getsIssueMicroService, [activeRepo, reposList])
 
   const handleStateissue = () => {
     if (issue?.state) return issue?.state;
