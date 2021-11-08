@@ -12,6 +12,10 @@ import { ApplicationContext } from '@contexts/application';
 import { IssueData } from '@interfaces/issue-data';
 import { formatNumberToCurrency } from '@helpers/formatNumber';
 import IssueProposalProgressBar from '@components/issue-proposal-progress-bar';
+import useMergeData from '@x-hooks/use-merge-data';
+import useRepos from '@x-hooks/use-repos';
+import useOctokit from '@x-hooks/use-octokit';
+import useBEPRO from '@x-hooks/use-bepro';
 
 interface NetworkIssue {
   recognizedAsFinished: boolean;
@@ -29,31 +33,38 @@ export default function PageIssue() {
   const [forks, setForks] = useState();
   const [canOpenPR, setCanOpenPR] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>();
+  const {getIssue} = useMergeData();
+  const {getIssueComments} = useOctokit();
+  const [[activeRepo]] = useRepos();
+  const bepro = useBEPRO();
 
   function getIssueCID() {
     return [repoId, id].join(`/`)
   }
 
-  const getsIssueMicroService = () => {
+  function getsIssueMicroService() {
+    if (!activeRepo)
+      return;
 
-    GithubMicroService.getIssuesByGhId(id, repoId as string)
+    getIssue(repoId as string, id as string, activeRepo.githubPath)
       .then((issue) => {
         if (!issue)
           return;
 
         setIssue(issue);
-        GithubMicroService.getCommentsIssue(issue.githubId, issue.repository_id)
-          .then((comments) => setCommentsIssue(comments));
+        getIssueComments(+issue.githubId, activeRepo.githubPath)
+          .then((comments) => setCommentsIssue(comments.data as any));
       });
 
     GithubMicroService.getForks().then((forks) => setForks(forks));
-  };
+  }
 
   function getsIssueBeproService() {
-    if (!currentAddress)
-      return;
+    // if (!currentAddress)
+    //   return;
 
-    BeproService.network.getIssueByCID({ issueCID: getIssueCID() })
+    bepro.network.getIssueByCID({ issueCID: getIssueCID() })
+    // BeproService.network.getIssueByCID({ issueCID: getIssueCID() })
       .then(netIssue => {
         setNetworkIssue(netIssue);
         return netIssue._id;
@@ -89,7 +100,7 @@ export default function PageIssue() {
   }
 
   useEffect(loadIssueData, [githubHandle, currentAddress, id]);
-  useEffect(getsIssueMicroService, [])
+  useEffect(getsIssueMicroService, [activeRepo])
 
   const handleStateissue = () => {
     if (issue?.state) return issue?.state;

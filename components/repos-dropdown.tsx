@@ -1,24 +1,15 @@
 import ReactSelect from '@components/react-select';
 import {useEffect, useState} from 'react';
 import GithubMicroService from '@services/github-microservice';
+import useRepos from '@x-hooks/use-repos';
 
 export default function ReposDropdown({onSelected = (opt: {value}) => {}}) {
-  const [reposList, setReposList] = useState<{ value: string; label: string }[]>();
-
-  function loadReposFromBackend() {
-    function mapRepo({id: value, githubPath: label}) {
-      return ({value, label})
-    }
-
-    GithubMicroService.getReposList().then(repos => repos.map(mapRepo)).then(setReposList);
-  }
-
-  useEffect(loadReposFromBackend, [])
+  const [[, repoList]] = useRepos();
 
   return <div>
     <label className="smallCaption mb-2 text-uppercase">
       Select a repository
     </label>
-    <ReactSelect options={reposList} onChange={onSelected} />
+    <ReactSelect options={repoList} onChange={onSelected} />
     </div>
 }

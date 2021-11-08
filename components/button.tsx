@@ -6,6 +6,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   transparent?: boolean;
   rounded?: boolean;
   upperCase?: boolean;
+  asAnchor?: boolean;
 }
 
 export default function Button({
@@ -14,7 +15,7 @@ export default function Button({
                                  outline,
                                  transparent,
                                  rounded,
-                                 className = ``,
+                                 className = ``, asAnchor = false,
                                  ...rest
                                }: ButtonProps) {
 
@@ -36,6 +37,6 @@ export default function Button({
   }
 
   return <>
-    <button className={getClass()} {...rest}>{children}</button>
+    {!asAnchor ? <button className={getClass()} {...rest}>{children}</button> : <a className={getClass()}>{children}</a> }
   </>
 }

@@ -150,11 +150,16 @@ export default function useApi() {
   async function health() {
     return client.get(`/api/health`)
                  .then(({status}) => status === 200)
+                 .catch(e => false);
+  }
+
+  async function getClientNation() {
+    return client.get(`/api/ip`)
+                 .then(({data}) => data || ({countryCode: `US`, country: ``}))
                  .catch(e => {
-                   console.error(`Failed to get health`, e);
-                   return false;
+                   return ({countryCode: `US`, country: ``})
                  });
   }
 
-  return {getIssue, getReposList, getIssues}
+  return {getIssue, getReposList, getIssues, health, getClientNation}
 }
