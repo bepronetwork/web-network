@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import {formatNumberToCurrency} from 'helpers/formatNumber'
+import Button from "./button";
 // This has to be generic.
 // todo: create something like <Tabs /> <TabContainer />
 function OraclesBoxHeader({
@@ -20,14 +21,15 @@ function OraclesBoxHeader({
           <h4 className="h4 mb-0 text-white bg-opacity-100">{actions}</h4>
         ) : (
           actions.map((action: string) => (
-            <button
+            <Button
               key={action}
+              transparent
               onClick={() => onChange(action)}
-              className={clsx("btn p-0 subnav-item", {
+              className={clsx("btn p-0 subnav-item text-capitalize", {
                 active: action === currentAction,
               })}>
               <h4 className="h4 mb-0 mr-2">{action}</h4>
-            </button>
+            </Button>
           ))
         )}
       </div>

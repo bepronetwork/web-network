@@ -23,7 +23,7 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
     const state = getActiveFiltersOf(stateFilters);
     const time = getActiveFiltersOf(timeFilters);
     const repoId = getActiveFiltersOf(repoFilters);
-
+    
     const query = {
       ... state ? {state} : {},
       ... time ? {time} : {},
@@ -49,7 +49,8 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
   }
 
   function loadFilters() {
-    const {time, state} = router.query || {};
+    const {time, state, repoId} = router.query || {};
+    
     setStateFilters([
                       makeFilterOption(`All`, `allstates`, !state),
                       makeFilterOption(`Open Issues`, `open`, state === `ready` || state === `open`),
@@ -61,9 +62,16 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
                      makeFilterOption(`Past Week`, `week`, time === `week`),
                      makeFilterOption(`Past Month`, `month`, time === `month`),
                      makeFilterOption(`Past Year`, `year`, time === `year`),])
+    if(repoFilters.length > 0 && repoId){
+      const index = repoFilters.findIndex(repo => repo.value.toString() === repoId)
+      if(index){
+        repoFilters[index].checked = true;
+        setRepoFilters([...repoFilters])
+      }
+    }
   }
 
-  useEffect(loadFilters, [])
+  useEffect(loadFilters, [router.query])
   useEffect(loadRepos, [])
 
   function updateOpt(opts: IssueFilterBoxOption[], opt: IssueFilterBoxOption, checked: boolean, type: `time` | `repo` | `state`, multi = false): void {
