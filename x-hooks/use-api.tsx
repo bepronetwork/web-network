@@ -114,6 +114,12 @@ export default function useApi() {
                  });
   }
 
+  async function getUserWith(login: string): Promise<User> {
+    return client.post<User[]>(`/api/search/users/login/`, [login])
+                 .then(({data}) => data[0])
+                 .catch(() => ({} as User))
+  }
+
   async function getUserOf(address: string): Promise<User> {
     return client.post<User[]>(`/api/search/users/address/`, [address])
                  .then(({data}) => data[0])
@@ -192,6 +198,7 @@ export default function useApi() {
     health,
     getClientNation,
     getUserOf,
+    getUserWith,
     getPendingFor,
     createPullRequestIssue,
     createIssue,
