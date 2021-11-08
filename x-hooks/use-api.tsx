@@ -171,10 +171,14 @@ export default function useApi() {
                  .catch(() => false);
   }
 
-  async function waitForMerge(login, scId, ghPrId) {
-    return client.get(`/api/poll/merge/${login}/${scId}/${ghPrId}`)
+  async function waitForMerge(githubLogin, issue_id, currentGithubId) {
+    return client.get(`/api/merge-proposal/${githubLogin}/${issue_id}/${currentGithubId}`)
                  .then(({data}) => data)
                  .catch(() => null)
+  }
+
+  async function processMergeProposal(fromBlock, id) {
+    return client.post(`/api/past-events/merge-proposal/`, {fromBlock, id})
   }
 
   async function health() {
@@ -203,5 +207,7 @@ export default function useApi() {
     createPullRequestIssue,
     createIssue,
     patchIssueWithScId,
+    waitForMerge,
+    processMergeProposal,
   }
 }
