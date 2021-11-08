@@ -19,14 +19,14 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const contract = network.getWeb3Contract();
 
   await contract.getPastEvents(`RedeemIssue`, {fromBlock, toBlock: 'latest'})
-          .then(async function redeemIssues(events) {
+                .then(async function redeemIssues(events) {
             for (const event of events) {
               const eventData = event.returnValues;
               const issueId = await network.getIssueById({issueId: eventData.id}).then(({cid}) => cid);
               const issue = await models.issue.findOne({where: {issueId,}});
 
               if (!issue)
-                return;
+                return console.log(`Failed to find an issue to redeem`, event);
 
               const repoInfo = await models.repositories.findOne({where: {id: issue?.repository_id}})
               const [owner, repo] = repoInfo.githubPath.split(`/`);
@@ -43,6 +43,10 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
                     // Merge PR and close issue on github
                     const issueId = await network.getIssueById({issueId: eventData.id}).then(({cid}) => cid);
                     const issue = await models.issue.findOne({where: {issueId,}, include: ['mergeProposals'],});
+
+                    if (!issue)
+                      return console.log(`Failed to find an issue to close`, event);
+
                     const mergeProposal = issue.mergeProposals.find((mp) => mp.scMergeId = eventData.mergeID);
 
                     const pullRequest = await mergeProposal.getPullRequest();
