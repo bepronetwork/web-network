@@ -76,7 +76,7 @@ export default function ConnectAccount() {
 
     const user = await GithubMicroService.getUserOf(currentAddress);
 
-    if (user && (user.githubHandle || user.githubLogin !== githubLogin)) {
+    if (user && (user.githubHandle || user.githubLogin.toLowerCase() !== githubLogin.toLowerCase())) {
       dispatch(changeLoadState(false));
       return dispatch(toastError(`Migration not possible or already happened`));
     }
