@@ -21,6 +21,7 @@ import sanitizeHtml from 'sanitize-html';
 import {GetServerSideProps} from 'next';
 import {NetworkIds} from '@interfaces/enums/network-ids';
 import useApi from '@x-hooks/use-api';
+import {changeAccessToken} from '@reducers/change-access-token';
 
 interface GlobalState {
   state: ApplicationState,
@@ -54,6 +55,7 @@ const defaultState: GlobalState = {
     myTransactions: [],
     network: ``,
     githubLogin: ``,
+    accessToken: ``
   },
   dispatch: () => undefined
 };
@@ -80,6 +82,7 @@ export default function ApplicationContextProvider({children}) {
                       .then(user => {
                         dispatch(changeGithubHandle(user?.githubHandle));
                         dispatch(changeGithubLogin(user?.githubLogin));
+                        dispatch(changeAccessToken(user?.accessToken));
                       })
 
     BeproService.network.getOraclesSummary({address})

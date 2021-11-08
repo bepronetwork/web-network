@@ -3,6 +3,7 @@ import models from '@db/models';
 import {Op, WhereOptions} from 'sequelize';
 import {subHours, subMonths, subWeeks, subYears} from 'date-fns';
 import paginate from '@helpers/paginate';
+import {composeIssues} from '@db/middlewares/compose-issues';
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
@@ -42,7 +43,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const issues = await models.issue.findAndCountAll(paginate({ where: whereCondition, raw: true, nest: true }, req.query, [[req.query.sortBy || 'updatedAt', req.query.order || 'DESC']]));
-  // await composeIssues(issues.rows);
+  await composeIssues(issues.rows);
 
   return res.status(200).json(issues);
 }
