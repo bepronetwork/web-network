@@ -1,0 +1,105 @@
+import models from '@db/models';
+import {Network} from 'bepro-js';
+import {NextApiRequest, NextApiResponse} from 'next';
+import {CONTRACT_ADDRESS, WEB3_CONNECTION} from '../../../env';
+import {Octokit} from 'octokit';
+import {IssueData} from '@interfaces/issue-data';
+import {Model} from 'sequelize';
+
+
+const octokit = new Octokit({auth: process.env.NEXT_GITHUB_TOKEN});
+
+async function get(req: NextApiRequest, res: NextApiResponse) {
+  const {info: [fromBlock,]} = req.query;
+
+  const opt = {opt: {web3Connection: WEB3_CONNECTION,  privateKey: process.env.NEXT_PRIVATE_KEY}, test: true,};
+  const network = new Network({contractAddress: CONTRACT_ADDRESS, ...opt});
+
+  await network.start();
+  const contract = network.getWeb3Contract();
+
+  await contract.getPastEvents(`RedeemIssue`, {fromBlock, toBlock: 'latest'})
+          .then(async function redeemIssues(events) {
+            for (const event of events) {
+              const eventData = event.returnValues;
+              const issueId = await network.getIssueById({issueId: eventData.id}).then(({cid}) => cid);
+              const issue = await models.issue.findOne({where: {issueId,}});
+
+              if (!issue)
+                return;
+
+              const repoInfo = await models.repositories.findOne({where: {id: issue?.repository_id}})
+              const [owner, repo] = repoInfo.githubPath.split(`/`);
+              await octokit.rest.issues.update({owner, repo, issue_number: issueId, state: 'closed',});
+              issue.state = 'canceled';
+              await issue.save();
+            }
+          });
+
+  await contract.getPastEvents(`CloseIssue`, {fromBlock, toBlock: 'latest'})
+                .then(async function readCloseIssues(events) {
+                  for (const event of events) {
+                    const eventData = event.returnValues;
+                    // Merge PR and close issue on github
+                    const issueId = await network.getIssueById({issueId: eventData.id}).then(({cid}) => cid);
+                    const issue = await models.issue.findOne({where: {issueId,}, include: ['mergeProposals'],});
+                    const mergeProposal = issue.mergeProposals.find((mp) => mp.scMergeId = eventData.mergeID);
+
+                    const pullRequest = await mergeProposal.getPullRequest();
+
+                    const repoInfo = await models.repositories.findOne({where: {id: issue?.repository_id}})
+                    const [owner, repo] = repoInfo.githubPath.split(`/`);
+                    await octokit.rest.pulls.merge({owner, repo, pull_number: pullRequest.githubId})
+                    await octokit.rest.issues.update({owner, repo, issue_number: issue.githubId, state: 'closed',});
+
+                    issue.state = 'closed';
+                    await issue.save();
+                  }
+                })
+
+  await contract.getPastEvents(`MergeProposalCreated`, {fromBlock, toBlock: `latest`})
+                .then(async function mergeProposalCreated(events) {
+                  for (const event of events) {
+                    const {id: scIssueId, mergeID: scMergeId, creator} = event.returnValues;
+                    const issueId = await network.getIssueById({issueId: scIssueId}).then(({cid}) => cid);
+
+                    const issue = await models.issue.findOne({where: {issueId,}});
+                    if (!issue)
+                      return console.log(`Failed to find an issue to add merge proposal`, event);
+
+                    const user = await models.user.findOne({where: {address: creator.toLowerCase()}});
+                    if (!user)
+                      return console.log(`Could not find a user for ${creator}`, event);
+
+                    const pr = await models.pullRequest.findOne({where: {issueId: issue?.id}});
+                    if (!pr)
+                      return console.log(`Could not find PR for db-issue ${issue?.id}`, event);
+
+                    const merge = await models.mergeProposal.create({
+                                                                      scMergeId,
+                                                                      issueId: issue?.id,
+                                                                      pullRequestId: pr?.id,
+                                                                    });
+
+                    // console.log(`Emitting `, `mergeProposal:created:${user?.githubLogin}:${scIssueId}:${pr?.githubId}`);
+
+                    // Bus.emit(`mergeProposal:created:${user?.githubLogin}:${scIssueId}:${pr?.githubId}`, merge)
+                  }
+                })
+
+  return res.status(204);
+}
+
+export default async function PullRequest(req: NextApiRequest, res: NextApiResponse) {
+
+  switch (req.method.toLowerCase()) {
+    case 'get':
+      await get(req, res);
+      break;
+
+    default:
+      res.status(405);
+  }
+
+  res.end();
+}
