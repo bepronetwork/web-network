@@ -20,6 +20,7 @@ export default function IssueProposals({ metaProposals, metaRequests, numberProp
 
     const scIssueId = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
     const pool = [];
+    console.log(metaProposals, scIssueId);
     for (const meta of metaProposals as ProposalData[]) {
       const {scMergeId, pullRequestId} = meta;
       if (scMergeId) {
@@ -31,6 +32,8 @@ export default function IssueProposals({ metaProposals, metaRequests, numberProp
         pool.push({...merge, scMergeId, isDisputed, pullRequestId, pullRequestGithubId: pr?.githubId } as Proposal)
       }
     }
+
+    console.log(pool);
 
     setProposals(pool);
   }
