@@ -80,7 +80,6 @@ function OraclesActions(): JSX.Element {
   }
 
   function onSuccess() {
-    setTokenAmount(0);
     setError("");
 
     BeproService.getBalance('bepro')
