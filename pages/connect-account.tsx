@@ -53,6 +53,9 @@ export default function ConnectAccount() {
                       .then(user => {
                         setIsGhValid(user && user.githubHandle === session?.user.name || true)
 
+                        if (user.githubLogin)
+                          setGithubLogin(user.githubLogin);
+
                         if (!user)
                           return;
 
@@ -61,9 +64,6 @@ export default function ConnectAccount() {
 
                         if(user.address === currentAddress )
                           return router.push('/account')
-
-                        if (user.githubLogin)
-                          setGithubLogin(user.githubLogin);
                       })
   }
 
