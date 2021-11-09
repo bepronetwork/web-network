@@ -4,7 +4,6 @@ import Image from 'next/image';
 import React, {useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import {signOut, useSession, signIn} from 'next-auth/react';
-import GithubMicroService from '@services/github-microservice';
 import {changeGithubHandle} from '@reducers/change-github-handle';
 import {changeGithubLogin} from '@reducers/change-github-login';
 import GithubImage from '@components/github-image';
@@ -32,7 +31,7 @@ export default function ConnectAccount() {
   const {data: session} = useSession();
   const router = useRouter();
   const { migrate } = router.query;
-  const {getUserOf, joinAddressToUser} = useApi();
+  const {getUserOf, joinAddressToUser, getUserWith} = useApi();
 
 
   function updateLastUsedAddress() {
@@ -44,8 +43,7 @@ export default function ConnectAccount() {
     if (!currentAddress)
       return;
 
-    // todo: replace
-    const user = await GithubMicroService.getUserOfLogin(githubLogin);
+    const user = await getUserWith(githubLogin);
     if (user && user.address && user.address !== currentAddress.toLowerCase()) {
       dispatch(toastError(`When migrating, address must match ${truncateAddress(user.address)}.`, undefined, {delay: 10000}));
       setIsGhValid(false)

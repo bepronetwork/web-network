@@ -4,7 +4,6 @@ import { Modal } from "react-bootstrap";
 import BeProBlue from "@assets/icons/bepro-blue";
 import Loading from 'components/loading'
 import { COUNTRY_CODE_BLOCKED } from "../env";
-import GithubMicroService from "@services/github-microservice";
 import useApi from '@x-hooks/use-api';
 
 export default function NationDialog({ children }) {

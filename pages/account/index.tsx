@@ -1,7 +1,6 @@
 import {GetStaticProps} from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
 import IssueListItem from '@components/issue-list-item';
-import GithubMicroService from '@services/github-microservice';
 import Account from '@components/account';
 import {ApplicationContext} from '@contexts/application';
 import {IssueData} from '@interfaces/issue-data';
@@ -10,11 +9,10 @@ import Paginate from '@components/paginate';
 import usePage from '@x-hooks/use-page';
 import useCount from '@x-hooks/use-count';
 import {useRouter} from 'next/router';
-
 import Modal from '@components/modal';
 import usePendingIssue from '@x-hooks/use-pending-issue';
 import MarkedRender from '@components/MarkedRender';
-import {formatNumberToCurrency, formatNumberToNScale, formatNumberToString} from '@helpers/formatNumber';
+import {formatNumberToCurrency,} from '@helpers/formatNumber';
 import {toastError} from '@reducers/add-toast';
 import useApi from '@x-hooks/use-api';
 import useMergeData from '@x-hooks/use-merge-data';

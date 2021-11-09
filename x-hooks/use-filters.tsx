@@ -1,8 +1,6 @@
 import {useEffect, useState} from 'react';
 import {IssueFilterBoxOption} from '@interfaces/filters';
-import GithubMicroService from '@services/github-microservice';
 import {RepoInfo} from '@interfaces/repos-list';
-import {subHours, subMonths, subWeeks, subYears} from 'date-fns';
 import {useRouter} from 'next/router';
 import useRepos from '@x-hooks/use-repos';
 

@@ -5,7 +5,6 @@ import {addTransaction} from '@reducers/add-transaction';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {BeproService} from '@services/bepro-service';
 import {updateTransaction} from '@reducers/update-transaction';
-import GithubMicroService from '@services/github-microservice';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import {formatNumberToString} from '@helpers/formatNumber';
 import {changeLoadState} from '@reducers/change-load-state';
@@ -13,7 +12,7 @@ import router from 'next/router';
 import {toastError, toastInfo} from '@reducers/add-toast';
 import {SETTLER_ADDRESS, TRANSACTION_ADDRESS} from '../env';
 import {ReposList} from '@interfaces/repos-list';
-import {Dropdown, ListGroup} from 'react-bootstrap';
+import {ListGroup} from 'react-bootstrap';
 import ConnectGithub from '@components/connect-github';
 import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
@@ -33,7 +32,7 @@ export default function ParityPage() {
   const [issuesList, setIssuesList] = useState([]);
   const [reposList, setReposList] = useState<ReposList>([]);
   const [availReposList, setAvailableList] = useState<string[]>([]);
-  const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId} = useApi();
+  const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId, createRepo, getReposList, removeRepo: apiRemoveRepo} = useApi();
 
   const formItem = (label = ``, placeholder = ``, value = ``, onChange = (ev) => {}) =>
     ({label, placeholder, value, onChange})
@@ -261,7 +260,7 @@ export default function ParityPage() {
                                })
                       })
                       .then(async (repos) => {
-                        setReposList(await GithubMicroService.getReposList(true));
+                        setReposList(await getReposList(true));
                         setAvailableList(repos.filter(repo => repo.has_issues && !repo.fork).map(repo => repo.full_name))
                       })
                       .catch(e => {
@@ -270,22 +269,21 @@ export default function ParityPage() {
   }
 
   async function addNewRepo(owner, repo) {
-    const created = await GithubMicroService.createRepo(owner, repo);
+    const created = await createRepo(owner, repo);
 
     if (!created)
       return dispatch(toastError(`Failed to create repo`));
 
-    setReposList(await GithubMicroService.getReposList(true));
-
+    setReposList(await getReposList(true));
   }
 
   async function removeRepo(id: string) {
-    return GithubMicroService.removeRepo(id)
+    return apiRemoveRepo(id)
                              .then(async (result) => {
                                if (!result)
-                                 return dispatch(toastError(`Could't remove repo`));
+                                 return dispatch(toastError(`Couldn't remove repo`));
 
-                               setReposList(await GithubMicroService.getReposList(true))
+                               setReposList(await getReposList(true))
                              });
   }
 

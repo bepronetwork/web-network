@@ -1,12 +1,13 @@
 import {NextApiRequest, NextApiResponse} from 'next';
 import models from '@db/models';
 import {Op} from 'sequelize';
+import paginate from '@helpers/paginate';
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const {action: [action]} = req.query;
+  const {action: [action,]} = req.query;
 
   if (!action)
-    return res.status(200).json(await models.user.findAll({raw: true,}));
+    return res.status(200).json(await models.user.findAll(paginate({raw: true,}, req.body, [[req.body.sortBy || 'updatedAt', req.body.order || 'DESC']])));
 
   const users: string[] = req.body.map(s => s.toLowerCase());
 

@@ -7,7 +7,7 @@ import PageActions from '@components/page-actions';
 import IssueProposals from '@components/issue-proposals';
 import { useRouter } from 'next/router';
 import { BeproService } from '@services/bepro-service';
-import GithubMicroService, { User } from '@services/github-microservice';
+import { User } from '@services/github-microservice';
 import { ApplicationContext } from '@contexts/application';
 import { IssueData } from '@interfaces/issue-data';
 import { formatNumberToCurrency } from '@helpers/formatNumber';
@@ -16,7 +16,7 @@ import useMergeData from '@x-hooks/use-merge-data';
 import useRepos from '@x-hooks/use-repos';
 import useOctokit from '@x-hooks/use-octokit';
 import useApi from '@x-hooks/use-api';
-// import useBEPRO from '@x-hooks/use-bepro';
+
 
 interface NetworkIssue {
   recognizedAsFinished: boolean;
@@ -25,7 +25,7 @@ interface NetworkIssue {
 export default function PageIssue() {
   const router = useRouter();
   const { id, repoId } = router.query;
-  const { state: { githubHandle, currentAddress, githubLogin }, } = useContext(ApplicationContext);
+  const { state: { currentAddress, githubLogin }, } = useContext(ApplicationContext);
 
   const [issue, setIssue] = useState<IssueData>();
   const [networkIssue, setNetworkIssue] = useState<any>();

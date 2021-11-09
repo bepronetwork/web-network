@@ -5,7 +5,6 @@ import {ReduceActor} from '@interfaces/reduce-action';
 import LoadApplicationReducers from './reducers';
 import {BeproService} from '@services/bepro-service';
 import {changeBeproInitState} from '@reducers/change-bepro-init-state';
-import GithubMicroService from '../services/github-microservice';
 import {getSession, useSession} from 'next-auth/react';
 import {changeGithubHandle} from '@reducers/change-github-handle';
 import {changeCurrentAddress} from '@reducers/change-current-address'

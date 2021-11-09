@@ -1,9 +1,7 @@
 import { GetStaticProps } from "next";
 import {useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
-import GithubMicroService from '@services/github-microservice';
 import {formatNumberToCurrency} from 'helpers/formatNumber'
-import useApi from '@x-hooks/use-api';
 import {BeproService} from '@services/bepro-service';
 
 export default function PageHero({title = "Find issues to work",}) {
