@@ -257,6 +257,7 @@ export default class GithubMicroService {
                  })
   }
 
+  // todo: remove
   static async getAllUsers() {
     return client.get(`/users/all`)
                  .then(({data}) => data)
@@ -266,6 +267,7 @@ export default class GithubMicroService {
                  })
   }
 
+  // todo: remove
   static async createRepo(owner, repo) {
     return client.post(`/repos/`, {owner, repo})
                  .then(({status}) => status === 200)
@@ -275,6 +277,7 @@ export default class GithubMicroService {
                  })
   }
 
+  // todo: remove
   static async getReposList(force = false) {
     if (!force && repoList.length)
       return Promise.resolve(repoList as ReposList);
@@ -287,6 +290,7 @@ export default class GithubMicroService {
                  });
   }
 
+  // todo: remove
   static async removeRepo(id: string) {
     return client.delete(`/repos/${id}`)
                  .then(({status}) => status === 200)
