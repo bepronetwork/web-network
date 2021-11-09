@@ -32,14 +32,20 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
                       const issueId = await network.getIssueById({issueId: eventData.id}).then(({cid}) => cid);
                       const issue = await models.issue.findOne({where: {issueId,}});
 
-                      if (!issue)
-                        return console.log(`Failed to find an issue to redeem`, event);
-
+                      if (!issue || issue?.state === `canceled`) {
+                        console.log(`Emitting redeemIssue:created:${issueId}`);
+                        Bus.emit(`redeemIssue:created:${issueId}`, issue)
+                        return console.log(`Failed to find an issue to redeem or already redeemed`, event);
+                      }
+                      
                       const repoInfo = await models.repositories.findOne({where: {id: issue?.repository_id}})
                       const [owner, repo] = repoInfo.githubPath.split(`/`);
                       await octokit.rest.issues.update({owner, repo, issue_number: issueId, state: 'closed',});
                       issue.state = 'canceled';
                       await issue.save();
+
+                      console.log(`Emitting redeemIssue:created:${issueId}`);
+                      Bus.emit(`redeemIssue:created:${issueId}`, issue)
                     }
                   })
                   .catch(error => {
@@ -54,8 +60,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
                       const issueId = await network.getIssueById({issueId: eventData.id}).then(({cid}) => cid);
                       const issue = await models.issue.findOne({where: {issueId,}, include: ['mergeProposals'],});
 
-                      if (!issue)
-                        return console.log(`Failed to find an issue to close`, event);
+                      if (!issue || issue?.state === `closed`) {
+                        console.log(`Emitting closeIssue:created:${issueId}`);
+                        Bus.emit(`closeIssue:created:${issueId}`, issue)
+                        return console.log(`Failed to find an issue to close or already closed`, event);
+                      }
 
                       const mergeProposal = issue.mergeProposals.find((mp) => mp.scMergeId = eventData.mergeID);
 
@@ -68,6 +77,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
                       issue.state = 'closed';
                       await issue.save();
+
+                      console.log(`Emitting closeIssue:created:${issueId}`);
+                      Bus.emit(`closeIssue:created:${issueId}`, issue)
                     }
                   })
                   .catch(error => {
