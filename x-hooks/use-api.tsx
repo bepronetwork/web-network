@@ -183,7 +183,7 @@ export default function useApi() {
 
   async function getHealth() {
     return client.get(`/api/health`)
-                 .then(({status}) => status === 200)
+                 .then(({status}) => status === 204)
                  .catch(e => false);
   }
 
