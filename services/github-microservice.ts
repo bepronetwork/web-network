@@ -39,7 +39,7 @@ export default class GithubMicroService {
                  .then(({data}) => data)
                  .catch(e => {
                    console.error(e);
-                   return null;
+                   return {countryCode: `US`};
                  })
   }
 

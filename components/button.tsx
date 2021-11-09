@@ -1,11 +1,12 @@
-import React, {ButtonHTMLAttributes} from 'react';
+import React, {ButtonHTMLAttributes, ReactNode} from 'react';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   color?: string;
   outline?: boolean;
   transparent?: boolean;
   rounded?: boolean;
   upperCase?: boolean;
+  asAnchor?: boolean;
 }
 
 export default function Button({
@@ -14,13 +15,13 @@ export default function Button({
                                  outline,
                                  transparent,
                                  rounded,
-                                 className = ``,
+                                 className = ``, asAnchor = false,
                                  ...rest
                                }: ButtonProps) {
 
   function getClass(): string {
     const type = `btn-${outline ? `outline-${color}` : color}`
-    const textColor = !outline && color !== 'white' && 'text-white bg-opacity-100' || ``
+    const textColor = !outline && color !== 'white' && 'text-white' || ``
     let append = className;
 
     if (transparent)
@@ -36,6 +37,6 @@ export default function Button({
   }
 
   return <>
-    <button className={getClass()} {...rest}>{children}</button>
+    {!asAnchor ? <button className={getClass()} {...rest}>{children}</button> : <a className={getClass()}>{children}</a> }
   </>
 }

@@ -1,16 +1,12 @@
 import { GetStaticProps } from "next";
 import React, { useContext, useState } from "react";
 import IssueAvatars from "./issue-avatars";
-import Link from "next/link";
 import { BeproService } from "@services/bepro-service";
 import NewProposal from "./create-proposal";
 import { ApplicationContext } from "@contexts/application";
-import { changeLoadState } from "@reducers/change-load-state";
-import GithubMicroService from "@services/github-microservice";
 import { developer, IssueState, pullRequest } from "@interfaces/issue-data";
 import { changeBalance } from "@contexts/reducers/change-balance";
 import { addToast } from "@contexts/reducers/add-toast";
-import ExternalLinkIcon from "@assets/icons/external-link-icon";
 import { addTransaction } from "@reducers/add-transaction";
 import { TransactionTypes } from "@interfaces/enums/transaction-types";
 import { updateTransaction } from "@reducers/update-transaction";
@@ -18,6 +14,8 @@ import CreatePullRequestModal from "@components/create-pull-request-modal";
 import { TransactionStatus } from "@interfaces/enums/transaction-status";
 import Button from "./button";
 import GithubLink from '@components/github-link';
+import {useRouter} from 'next/router';
+import useApi from '@x-hooks/use-api';
 
 interface pageActions {
   issueId: string;
@@ -72,6 +70,8 @@ export default function PageActions({
     dispatch,
     state: { githubHandle, currentAddress, myTransactions },
   } = useContext(ApplicationContext);
+  const {query: {repoId, id}} = useRouter();
+  const {createPullRequestIssue} = useApi();
 
   const [showPRModal, setShowPRModal] = useState(false);
 
@@ -175,15 +175,9 @@ export default function PageActions({
     );
   }
 
-  async function handlePullrequest({
-    title: prTitle,
-    description: prDescription,
-  }) {
-    GithubMicroService.createPullRequestIssue(issueId, {
-      title: prTitle,
-      description: prDescription,
-      username: githubLogin,
-    })
+  async function handlePullrequest({title: prTitle, description: prDescription,}) {
+
+    createPullRequestIssue(repoId as string, githubId, {title: prTitle, description: prDescription, username: githubLogin,})
       .then(() => {
         dispatch(
           addToast({
