@@ -55,10 +55,9 @@ export default function PageProposal() {
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
   const [repo, setRepo] = useState(``);
   const [[activeRepo]] = useRepos();
-  const {getUserOf, getMergeProposal, getIssue} = useApi();
+  const {getUserOf, getIssue} = useApi();
 
   async function getProposalData() {
-    // const mergeProposal = await getMergeProposal(dbId as string);
     const [repoId, ghId] = (issueId as string).split(`/ `);
     const issueData = await getIssue(repoId, ghId);
 
