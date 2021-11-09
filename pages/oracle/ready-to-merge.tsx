@@ -10,6 +10,7 @@ import NothingFound from '@components/nothing-found';
 import usePage from '@x-hooks/use-page';
 import useCount from '@x-hooks/use-count';
 import Paginate from '@components/paginate';
+import useMergeData from '@x-hooks/use-merge-data';
 import InternalLink from '@components/internal-link';
 
 export default function ReadyToMergeIssues() {
@@ -17,10 +18,11 @@ export default function ReadyToMergeIssues() {
   const [issues, setIssues] = useState<IssueData[]>([]);
   const page = usePage();
   const results = useCount();
+  const {getIssues: getIssuesWith} = useMergeData();
 
   function getIssues() {
     dispatch(changeLoadState(true))
-    GithubMicroService.getIssuesState('ready', page)
+    getIssuesWith({state: 'ready', page})
                       .then((data) => {
                         results.setCount(data.count);
                         setIssues(data.rows)

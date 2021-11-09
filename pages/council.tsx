@@ -8,14 +8,18 @@ import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';
 import NothingFound from '@components/nothing-found';
 import InternalLink from '@components/internal-link';
+import useMergeData from '@x-hooks/use-merge-data';
+import usePage from '@x-hooks/use-page';
 
 export default function PageCouncil() {
   const {dispatch} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
+  const page = usePage();
+  const {getIssues: getIssuesWith} = useMergeData();
 
   function getIssues() {
     dispatch(changeLoadState(true))
-    GithubMicroService.getIssuesState('ready')
+    getIssuesWith({state: 'ready', page})
                       .then(data => data.rows)
                       .then(setIssues)
                       .catch((error) => {
