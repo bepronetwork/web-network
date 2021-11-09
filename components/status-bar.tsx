@@ -1,21 +1,22 @@
 import {useContext, useEffect, useState,} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import {changeMicroServiceReady} from '@reducers/change-microservice-ready';
-import GithubMicroService from '@services/github-microservice';
 import ExternalLinkIcon from '@assets/icons/external-link-icon';
+import useApi from '@x-hooks/use-api';
 
 export default function StatusBar() {
   const {dispatch, state: {microServiceReady}} = useContext(ApplicationContext);
   const [ms, setMs] = useState(0);
+  const {getHealth} = useApi();
 
   function neverEndingUpdate() {
     const past = +new Date();
-    GithubMicroService.getHealth()
-                      .then(state => {
-                        dispatch(changeMicroServiceReady(state))
-                        setMs(+new Date() - past);
-                        setTimeout(neverEndingUpdate, 60*1000)
-                      })
+    getHealth()
+      .then(state => {
+        dispatch(changeMicroServiceReady(state))
+        setMs(+new Date() - past);
+        setTimeout(neverEndingUpdate, 60 * 1000)
+      })
   }
 
   function renderNetworkStatus() {

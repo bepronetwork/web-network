@@ -141,8 +141,8 @@ export default function useApi() {
                  .catch(() => false)
   }
 
-  async function getAllUsers() {
-    return client.get<User[]>(`/api/search/users/`)
+  async function getAllUsers(payload: {page: number,} = {page: 1}) {
+    return client.post<User[]>(`/api/search/users/`, payload)
                  .then(({data}) => data)
                  .catch(() => []);
   }
@@ -181,7 +181,7 @@ export default function useApi() {
     return client.post(`/api/past-events/merge-proposal/`, {fromBlock, id})
   }
 
-  async function health() {
+  async function getHealth() {
     return client.get(`/api/health`)
                  .then(({status}) => status === 200)
                  .catch(e => false);
@@ -199,7 +199,7 @@ export default function useApi() {
     getIssue,
     getReposList,
     getIssues,
-    health,
+    getHealth,
     getClientNation,
     getUserOf,
     getUserWith,
@@ -211,5 +211,8 @@ export default function useApi() {
     processMergeProposal,
     getMergeProposal,
     joinAddressToUser,
+    getAllUsers,
+    createRepo,
+    removeRepo,
   }
 }

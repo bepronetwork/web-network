@@ -1,9 +1,7 @@
 import { GetStaticProps } from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
 import PageHero from "@components/page-hero";
-import GithubMicroService from '@services/github-microservice';
 import ListIssues from '@components/list-issues';
-import ReactSelect from '@components/react-select';
 import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';
 import {IssueData} from '@interfaces/issue-data';
@@ -12,8 +10,6 @@ import Paginate from '@components/paginate';
 import usePage from '@x-hooks/use-page';
 import useCount from '@x-hooks/use-count';
 import {useRouter} from 'next/router';
-import IssueFilterBox from '@components/issue-filter-box';
-import useFilters from '@x-hooks/use-filters';
 import IssueFilters from '@components/issue-filters';
 import useMergeData from '@x-hooks/use-merge-data';
 import useRepos from '@x-hooks/use-repos';

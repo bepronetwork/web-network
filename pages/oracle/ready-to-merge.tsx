@@ -1,7 +1,6 @@
 import { GetStaticProps } from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
 import ListIssues from '@components/list-issues';
-import GithubMicroService from '@services/github-microservice';
 import Oracle from '@components/oracle';
 import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';

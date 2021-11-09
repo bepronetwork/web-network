@@ -4,7 +4,6 @@ import {Dispatch, SetStateAction, useContext, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import {addTransaction} from '@reducers/add-transaction';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
-import GithubMicroService from '@services/github-microservice';
 import {IssueData} from '@interfaces/issue-data';
 import useApi from '@x-hooks/use-api';
 

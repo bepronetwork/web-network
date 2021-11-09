@@ -1,6 +1,5 @@
 import ReactSelect from '@components/react-select';
 import {useEffect, useState} from 'react';
-import GithubMicroService from '@services/github-microservice';
 import useRepos from '@x-hooks/use-repos';
 
 export default function ReposDropdown({onSelected = (opt: {value}) => {}}) {

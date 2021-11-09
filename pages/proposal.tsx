@@ -7,12 +7,10 @@ import ProposalProgress from '@components/proposal-progress';
 import {useRouter} from 'next/router';
 import {ApplicationContext} from '@contexts/application';
 import {BeproService} from '@services/bepro-service';
-import GithubMicroService, {ProposalData, User,} from '@services/github-microservice';
+import {ProposalData} from '@services/github-microservice';
 import {formatDate} from '@helpers/formatDate';
 import {handlePercentage} from '@helpers/handlePercentage';
 import {IssueData} from '@interfaces/issue-data';
-import {addToast} from '@reducers/add-toast';
-
 import ProposalProgressBar from '@components/proposal-progress-bar';
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import CustomContainer from '@components/custom-container';
@@ -20,7 +18,6 @@ import {formatNumberToCurrency} from '@helpers/formatNumber';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import useRepos from '@x-hooks/use-repos';
 import useApi from '@x-hooks/use-api';
-import useMergeData from '@x-hooks/use-merge-data';
 
 interface ProposalBepro {
   disputes: string;

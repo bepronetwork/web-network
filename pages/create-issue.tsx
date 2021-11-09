@@ -3,7 +3,6 @@ import clsx from 'clsx';
 import {GetStaticProps} from 'next/types'
 import React, {useContext, useEffect, useState} from 'react';
 import {BeproService} from '@services/bepro-service';
-import GithubMicroService, {User} from '@services/github-microservice';
 import InputNumber from '@components/input-number';
 import ConnectGithub from "@components/connect-github";
 import {ApplicationContext} from '@contexts/application';

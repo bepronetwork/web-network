@@ -1,15 +1,17 @@
-import GithubMicroService from '@services/github-microservice';
+import {User} from '@services/github-microservice';
 import {BeproService} from '@services/bepro-service';
 import React, {useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import {Octokit} from 'octokit';
 import router from 'next/router';
 import ConnectWalletButton from '@components/connect-wallet-button';
+import useApi from '@x-hooks/use-api';
 
 export default function FalconPunchPage() {
   const {state: {currentAddress}} = useContext(ApplicationContext);
   const [githubToken, setGithubToken] = useState(``);
   const [userList, setUserList] = useState<{created_at: string; login: string; public_repos: number; eth: number}[]>([])
+  const {getAllUsers} = useApi();
 
   function toDays(date = ``) {
     return +new Date(date) / (24 * 60 * 60 * 1000)
@@ -35,14 +37,14 @@ export default function FalconPunchPage() {
                          })
     }
 
-    async function getInfo({githubLogin, address, createdAt, updatedAt, id}) {
+    async function getInfo({githubLogin, address, createdAt, updatedAt, id}: Partial<User>) {
       const ghInfo = await getGithubInfo(githubLogin);
       const eth = await hasEthBalance(address);
 
       setUserList(prev => [...prev as any, {...ghInfo, eth}]);
     }
 
-    GithubMicroService.getAllUsers()
+    getAllUsers()
                       .then(users => Promise.all(users.map(getInfo)))
                       .catch(e => {
                         console.error(`Failed to get users`, e);
