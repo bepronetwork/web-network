@@ -3,6 +3,7 @@ import {NextApiRequest, NextApiResponse} from 'next';
 import {CONTRACT_ADDRESS, WEB3_CONNECTION} from '../../../../env';
 import {Network} from 'bepro-js';
 import {Octokit} from 'octokit';
+import {Bus} from '@helpers/bus';
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {fromBlock, id} = req.body;
@@ -21,14 +22,20 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
                     const issueId = await network.getIssueById({issueId: eventData.id}).then(({cid}) => cid);
                     const issue = await models.issue.findOne({where: {issueId,}});
 
-                    if (!issue)
-                      return console.log(`Failed to find an issue to redeem`, event);
+                    if (!issue || issue?.state === `canceled`) {
+                      console.log(`Emitting redeemIssue:created:${issueId}`);
+                      Bus.emit(`redeemIssue:created:${issueId}`, issue)
+                      return console.log(`Failed to find an issue to redeem or already redeemed`, event);
+                    }
 
                     const repoInfo = await models.repositories.findOne({where: {id: issue?.repository_id}})
                     const [owner, repo] = repoInfo.githubPath.split(`/`);
                     await octokit.rest.issues.update({owner, repo, issue_number: issueId, state: 'closed',});
                     issue.state = 'canceled';
                     await issue.save();
+
+                    console.log(`Emitting redeemIssue:created:${issueId}`);
+                    Bus.emit(`redeemIssue:created:${issueId}`, issue)
                   }
                 })
                 .catch(error => {
