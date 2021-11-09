@@ -7,17 +7,17 @@ import ProposalProgress from '@components/proposal-progress';
 import {useRouter} from 'next/router';
 import {ApplicationContext} from '@contexts/application';
 import {BeproService} from '@services/bepro-service';
-import GithubMicroService, {ProposalData, User,} from '@services/github-microservice';
+import {ProposalData} from '@services/github-microservice';
 import {formatDate} from '@helpers/formatDate';
 import {handlePercentage} from '@helpers/handlePercentage';
 import {IssueData} from '@interfaces/issue-data';
-import {addToast} from '@reducers/add-toast';
-
 import ProposalProgressBar from '@components/proposal-progress-bar';
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import CustomContainer from '@components/custom-container';
 import {formatNumberToCurrency} from '@helpers/formatNumber';
 import ConnectWalletButton from '@components/connect-wallet-button';
+import useRepos from '@x-hooks/use-repos';
+import useApi from '@x-hooks/use-api';
 
 interface ProposalBepro {
   disputes: string;
@@ -51,12 +51,15 @@ export default function PageProposal() {
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
   const [repo, setRepo] = useState(``);
+  const [[activeRepo]] = useRepos();
+  const {getUserOf, getIssue} = useApi();
 
   async function getProposalData() {
-    const mergeProposal = await GithubMicroService.getMergeProposalIssue(dbId, mergeId);
-    const issueData = await GithubMicroService.getIssueId(issueId);
-    setProposalMicroService(mergeProposal as ProposalData);
+    const [repoId, ghId] = (issueId as string).split(`/ `);
+    const issueData = await getIssue(repoId, ghId);
+
     setIssueMicroService(issueData);
+    setProposalMicroService(issueData.mergeProposals.find(({id}) => id === +dbId));
     setAmountIssue(issueData?.amount?.toString())
   }
 
@@ -66,7 +69,7 @@ export default function PageProposal() {
       const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
       const merge = await BeproService.network.getMergeById({issue_id: issue_id, merge_id: mergeId});
       const isDisputed = await BeproService.network.isMergeDisputed({issueId: issue_id, mergeId});
-      const author = await GithubMicroService.getHandleOf(merge.proposalAddress);
+      const author = (await getUserOf(merge.proposalAddress))?.githubHandle;
 
       setProposalBepro({...merge, isDisputed, author});
       return Promise.resolve();
@@ -92,7 +95,7 @@ export default function PageProposal() {
 
     async function mapUser(address: string, i: number) {
 
-      const {githubLogin} = await GithubMicroService.getUserOf(address);
+      const {githubLogin} = await getUserOf(address);
       const oracles = proposal.prAmounts[i].toString();
       const percentage = handlePercentage(+oracles, +amountIssue);
       return {githubLogin, percentage, address, oracles};
@@ -115,11 +118,7 @@ export default function PageProposal() {
 
   useEffect(() => { loadProposalData() }, [currentAddress, issueId]);
   useEffect(() => { updateUsersAddresses(proposalBepro) }, [proposalBepro, currentAddress]);
-  useEffect(() => {
-    GithubMicroService.getReposList()
-                      .then(list => list.find(({id}) => id.toString() === (issueId as string).split(`/`)[0]))
-                      .then(item => setRepo(item?.githubPath))
-  }, [])
+  useEffect(() => { setRepo(activeRepo?.githubPath) }, [activeRepo])
 
   return (
     <>

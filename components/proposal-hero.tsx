@@ -1,6 +1,6 @@
 import { GetStaticProps } from 'next'
-import Link from 'next/link';
 import { useRouter } from 'next/router';
+import InternalLink from './internal-link';
 
 export default function ProposalHero({githubId, title, pullRequestId, authorPullRequest, createdAt, beproStaked}) {
     const router = useRouter();
@@ -13,12 +13,7 @@ export default function ProposalHero({githubId, title, pullRequestId, authorPull
                     <div className="col-md-10">
                         <div className="d-flex flex-column">
                             <div className="d-flex align-items-center cursor-pointer text-truncate">
-                                <Link href={{ pathname:"/issue", query: { id: issueId, repoId }}}>
-                                    <a className="text-decoration-none text-white">
-                                        <i className="ico-back me-2" />
-                                        <span className="p mb-0">#{githubId} {title}</span>
-                                    </a>
-                                </Link>
+                                <InternalLink href={{ pathname:"/issue", query: { id: issueId, repoId }}} icon={<i className="ico-back me-2" />} label={`#${githubId} ${title}`} transparent />
                             </div>
                             <div className="row">
                                 <div className="col-md-9">

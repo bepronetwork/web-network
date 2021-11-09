@@ -1,6 +1,7 @@
 import NextAuth from 'next-auth';
 import GithubProvider from 'next-auth/providers/github';
-import GithubMicroService from '@services/github-microservice';
+import models from '@db/models';
+import {Timers} from '@helpers/timers';
 
 export default NextAuth({
   providers: [
@@ -14,22 +15,22 @@ export default NextAuth({
       // console.log(`User`, user);
       // console.log(`Account`, account);
       // console.log(`Profile`, profile);
+      if (!user?.name || !profile?.login)
+        return `/?authError=Profile not found`;
 
-      if (user.name && profile.login)
-        return await GithubMicroService.createGithubData({
-          githubHandle: user.name,
-          githubLogin: profile.login?.toString(),
-          accessToken: account?.access_token,
-        }).then(result => {
-          if (result === true)
-            return true;
+      const find = await models.user.findOne({where: {githubLogin: profile.githubLogin}, raw: true,})
 
-          console.error(`Error logging in`, result);
+      if (!find)
+        await models.user.create({
+                                   githubHandle: user.name,
+                                   githubLogin: profile.login?.toString(),
+                                   accessToken: account?.access_token,
+                                 });
+      else await models.user.update({accessToken: account?.access_token}, {where: {githubLogin: profile.login?.toString()}});
 
-          return `/?authError=${result}`;
-        });
+      Timers[profile.login?.toString()] = setTimeout(async () => await models.user.destroy({where: {githubLogin: profile.login?.toString()}}), 60*1000)
 
-      return false
+      return true;
     },
     async jwt({ token, user, account, profile, isNewUser }) {
       // console.log(`JWT`, token, user, account, profile, isNewUser);

@@ -7,11 +7,16 @@ import PageActions from '@components/page-actions';
 import IssueProposals from '@components/issue-proposals';
 import { useRouter } from 'next/router';
 import { BeproService } from '@services/bepro-service';
-import GithubMicroService, { User } from '@services/github-microservice';
+import { User } from '@services/github-microservice';
 import { ApplicationContext } from '@contexts/application';
 import { IssueData } from '@interfaces/issue-data';
 import { formatNumberToCurrency } from '@helpers/formatNumber';
 import IssueProposalProgressBar from '@components/issue-proposal-progress-bar';
+import useMergeData from '@x-hooks/use-merge-data';
+import useRepos from '@x-hooks/use-repos';
+import useOctokit from '@x-hooks/use-octokit';
+import useApi from '@x-hooks/use-api';
+
 
 interface NetworkIssue {
   recognizedAsFinished: boolean;
@@ -20,7 +25,7 @@ interface NetworkIssue {
 export default function PageIssue() {
   const router = useRouter();
   const { id, repoId } = router.query;
-  const { state: { githubHandle, currentAddress, githubLogin }, } = useContext(ApplicationContext);
+  const { state: { currentAddress, githubLogin }, } = useContext(ApplicationContext);
 
   const [issue, setIssue] = useState<IssueData>();
   const [networkIssue, setNetworkIssue] = useState<any>();
@@ -29,30 +34,40 @@ export default function PageIssue() {
   const [forks, setForks] = useState();
   const [canOpenPR, setCanOpenPR] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>();
+  const {getIssue} = useMergeData();
+  const {getIssueComments, getForksOf} = useOctokit();
+  const [[activeRepo, reposList]] = useRepos();
+  const {getUserOf} = useApi();
 
   function getIssueCID() {
     return [repoId, id].join(`/`)
   }
 
-  const getsIssueMicroService = () => {
+  function getsIssueMicroService() {
+    if (!activeRepo || issue)
+      return;
 
-    GithubMicroService.getIssuesByGhId(id, repoId as string)
+    getIssue(repoId as string, id as string, activeRepo.githubPath)
       .then((issue) => {
         if (!issue)
           return;
 
         setIssue(issue);
-        GithubMicroService.getCommentsIssue(issue.githubId, issue.repository_id)
-          .then((comments) => setCommentsIssue(comments));
+
+        if (!commentsIssue)
+          getIssueComments(+issue.githubId, activeRepo.githubPath)
+            .then((comments) => setCommentsIssue(comments.data as any));
       });
 
-    GithubMicroService.getForks().then((forks) => setForks(forks));
-  };
+    if (!forks)
+      getForksOf(activeRepo.githubPath).then((frk) => setForks(frk.data as any));
+  }
 
   function getsIssueBeproService() {
-    if (!currentAddress)
+    if (!currentAddress || networkIssue)
       return;
 
+    // bepro.network.getIssueByCID({ issueCID: getIssueCID() })
     BeproService.network.getIssueByCID({ issueCID: getIssueCID() })
       .then(netIssue => {
         setNetworkIssue(netIssue);
@@ -69,13 +84,17 @@ export default function PageIssue() {
     if (currentAddress == currentUser?.address)
       return;
 
-    GithubMicroService.getUserOf(currentAddress)
+    getUserOf(currentAddress)
       .then((user: User) => setCurrentUser(user));
   };
 
-  const getRepoForked = () => {
-    GithubMicroService.getForkedRepo(githubLogin, [repoId, id].join(`/`))
-      .then((repo) => setCanOpenPR(!!repo))
+  function getRepoForked() {
+    if (!activeRepo || !githubLogin)
+      return;
+
+    const path = `${githubLogin}/${activeRepo.githubPath.split(`/`)[1]}`
+    getForksOf(path)
+      .then((repo) => setCanOpenPR(!!repo.data))
   }
 
   function loadIssueData() {
@@ -85,11 +104,11 @@ export default function PageIssue() {
       getCurrentUserMicroService();
     } else if (id) getsIssueMicroService();
 
-    if (githubHandle) getRepoForked();
+    if (githubLogin && activeRepo) getRepoForked();
   }
 
-  useEffect(loadIssueData, [githubHandle, currentAddress, id]);
-  useEffect(getsIssueMicroService, [])
+  useEffect(loadIssueData, [githubLogin, currentAddress, id, activeRepo]);
+  useEffect(getsIssueMicroService, [activeRepo, reposList])
 
   const handleStateissue = () => {
     if (issue?.state) return issue?.state;
@@ -148,8 +167,8 @@ export default function PageIssue() {
         isCanceled={issue?.state === `canceled` || networkIssue?.canceled}
       />}
 
-      <IssueDescription description={issue?.body}></IssueDescription>
-      <IssueComments comments={commentsIssue} repo={issue?.repo} issueId={issue?.id}></IssueComments>
+      <IssueDescription description={issue?.body} />
+      <IssueComments comments={commentsIssue} repo={issue?.repo} issueId={id} />
     </>
   );
 }

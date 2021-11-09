@@ -1,9 +1,10 @@
-import GithubMicroService, { User } from "@services/github-microservice";
+import { User } from "@services/github-microservice";
 import Avatar from "components/avatar";
 import InputNumber from "components/input-number";
 import { useEffect, useState } from "react";
 import { NumberFormatValues } from "react-number-format";
 import { InputNumber as InputNumberProps } from "types/input-number";
+import useApi from '@x-hooks/use-api';
 
 interface Props extends InputNumberProps {
   by: string;
@@ -19,9 +20,10 @@ export default function CreateProposalDistributionItem({
 }: Props) {
   const [value, setValue] = useState<number>(0);
   const [githubLogin, setGithubLogin] = useState<string>();
+  const {getUserOf} = useApi();
 
   function getGithubLogin() {
-      GithubMicroService.getUserOf(address).then((handle: User) =>
+      getUserOf(address).then((handle: User) =>
         setGithubLogin(handle?.githubLogin)
       );
   }

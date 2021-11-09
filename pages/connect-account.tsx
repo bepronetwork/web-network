@@ -4,7 +4,6 @@ import Image from 'next/image';
 import React, {useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import {signOut, useSession, signIn} from 'next-auth/react';
-import GithubMicroService from '@services/github-microservice';
 import {changeGithubHandle} from '@reducers/change-github-handle';
 import {changeGithubLogin} from '@reducers/change-github-login';
 import GithubImage from '@components/github-image';
@@ -21,6 +20,7 @@ import ErrorMarkIcon from '@assets/icons/errormark-icon';
 import {changeNetwork} from '@reducers/change-network';
 import {NetworkIds} from '@interfaces/enums/network-ids';
 import Button from '@components/button';
+import useApi from '@x-hooks/use-api';
 
 
 export default function ConnectAccount() {
@@ -31,6 +31,7 @@ export default function ConnectAccount() {
   const {data: session} = useSession();
   const router = useRouter();
   const { migrate } = router.query;
+  const {getUserOf, joinAddressToUser, getUserWith} = useApi();
 
 
   function updateLastUsedAddress() {
@@ -42,16 +43,19 @@ export default function ConnectAccount() {
     if (!currentAddress)
       return;
 
-    const user = await GithubMicroService.getUserOfLogin(githubLogin);
+    const user = await getUserWith(githubLogin);
     if (user && user.address && user.address !== currentAddress.toLowerCase()) {
       dispatch(toastError(`When migrating, address must match ${truncateAddress(user.address)}.`, undefined, {delay: 10000}));
       setIsGhValid(false)
       return;
     }
 
-    GithubMicroService.getUserOf(currentAddress)
+    getUserOf(currentAddress)
                       .then(user => {
                         setIsGhValid(user && user.githubHandle === session?.user.name || true)
+
+                        if (user.githubLogin)
+                          setGithubLogin(user.githubLogin);
 
                         if (!user)
                           return;
@@ -61,9 +65,6 @@ export default function ConnectAccount() {
 
                         if(user.address === currentAddress )
                           return router.push('/account')
-
-                        if (user.githubLogin)
-                          setGithubLogin(user.githubLogin);
                       })
   }
 
@@ -74,14 +75,14 @@ export default function ConnectAccount() {
   async function joinAddressToGh() {
     dispatch(changeLoadState(true));
 
-    const user = await GithubMicroService.getUserOf(currentAddress);
+    const user = await getUserOf(currentAddress);
 
-    if (user && (user.githubHandle || user.githubLogin !== githubLogin)) {
+    if (user && (user.githubHandle || user.githubLogin.toLowerCase() !== githubLogin.toLowerCase())) {
       dispatch(changeLoadState(false));
       return dispatch(toastError(`Migration not possible or already happened`));
     }
 
-    GithubMicroService.joinAddressToUser(session.user.name,{ address: currentAddress.toLowerCase(), migrate: !!migrate })
+    joinAddressToUser(session.user.name,{ address: currentAddress.toLowerCase(), migrate: !!migrate })
                       .then((result) => {
                         if (result === true) {
                           dispatch(toastSuccess(`Connected accounts!`))
