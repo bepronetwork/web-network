@@ -75,8 +75,8 @@ export default function useApi() {
                  .catch(() => null);
   }
 
-  async function getMergeProposalOf(mergeId: string, issueId: string) {
-    return client.get<ProposalData>(`/api/issue/merge/${mergeId}/${issueId}`)
+  async function getMergeProposal(dbId: string,) {
+    return client.get<ProposalData>(`/api/merge-proposal/${dbId}/`)
                  .then(({data}) => data)
                  .catch(() => ({scMergeId: '', pullRequestId: '', issueId: '', id: ''}))
   }
@@ -172,7 +172,7 @@ export default function useApi() {
   }
 
   async function waitForMerge(githubLogin, issue_id, currentGithubId) {
-    return client.get(`/api/merge-proposal/${githubLogin}/${issue_id}/${currentGithubId}`)
+    return client.get(`/api/merge-proposal/poll/${githubLogin}/${issue_id}/${currentGithubId}`)
                  .then(({data}) => data)
                  .catch(() => null)
   }
@@ -209,5 +209,6 @@ export default function useApi() {
     patchIssueWithScId,
     waitForMerge,
     processMergeProposal,
+    getMergeProposal,
   }
 }
