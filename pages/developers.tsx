@@ -1,22 +1,19 @@
 import { GetStaticProps } from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
-import Link from 'next/link';
 import PageHero from "@components/page-hero";
-import GithubMicroService from '@services/github-microservice';
 import ListIssues from '@components/list-issues';
-import ReactSelect from '@components/react-select';
 import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';
 import {IssueData} from '@interfaces/issue-data';
 import NothingFound from '@components/nothing-found';
-import Button from '@components/button';
 import Paginate from '@components/paginate';
 import usePage from '@x-hooks/use-page';
 import useCount from '@x-hooks/use-count';
 import {useRouter} from 'next/router';
-import IssueFilterBox from '@components/issue-filter-box';
-import useFilters from '@x-hooks/use-filters';
 import IssueFilters from '@components/issue-filters';
+import useMergeData from '@x-hooks/use-merge-data';
+import useRepos from '@x-hooks/use-repos';
+import InternalLink from '@components/internal-link';
 
 type Filter = {
   label: string;
@@ -60,19 +57,21 @@ export default function PageDevelopers() {
   const {dispatch, state: {loading, currentAddress}} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
   const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
+  const mergedData = useMergeData();
 
   const page = usePage();
   const results = useCount();
   const router = useRouter();
-  const {repoId, time, state} = router.query;
+  const {repoId, time, state} = router.query as {repoId: string; time: string; state: string};
 
   function updateIssuesList(issues: IssueData[]) {
     setIssues(issues);
   }
 
   function getIssues() {
+
     dispatch(changeLoadState(true))
-    GithubMicroService.getIssues(page, repoId as string, time as string, state as string)
+    mergedData.getIssues({page, repoId, time, state})
                       .then(({rows, count}) => {
                         results.setCount(count);
                         return rows;
@@ -106,11 +105,7 @@ export default function PageDevelopers() {
             <div className="col-md-10">
               <NothingFound
                 description={filterByState.emptyState}>
-                <Link href="/create-issue" passHref>
-                  <Button>
-                    create one
-                  </Button>
-                </Link>
+                <InternalLink href="/create-issue" label="create one" uppercase />
               </NothingFound>
             </div>
           ) : null}

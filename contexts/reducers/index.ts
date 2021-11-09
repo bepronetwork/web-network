@@ -15,6 +15,7 @@ import {AddTransactions} from './add-transaction';
 import {UpdateTransaction} from '@reducers/update-transaction';
 import {ChangeNetwork} from '@reducers/change-network';
 import {ChangeGithubLogin} from '@reducers/change-github-login';
+import {ChangeAccessToken} from '@reducers/change-access-token';
 
 export default function LoadApplicationReducers() {
   [
@@ -34,5 +35,6 @@ export default function LoadApplicationReducers() {
     UpdateTransaction,
     ChangeNetwork,
     ChangeGithubLogin,
+    ChangeAccessToken,
   ].forEach(addReducer);
 }

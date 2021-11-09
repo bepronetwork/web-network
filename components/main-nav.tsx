@@ -1,10 +1,9 @@
 import {GetStaticProps} from 'next'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, {useContext} from 'react';
 import {useEffect, useState} from 'react';
 import {BeproService} from '@services/bepro-service';
-import Link from 'next/link';
-import clsx from "clsx";
 import ConnectWalletButton from './connect-wallet-button';
 import {ApplicationContext} from '@contexts/application';
 import {changeStakedState} from '@reducers/change-staked-amount';
@@ -20,6 +19,8 @@ import Button from './button';
 import PlusIcon from '@assets/icons/plus-icon';
 import BeproSmallLogo from '@assets/icons/bepro-small-logo';
 import { truncateAddress } from '@helpers/truncate-address';
+import InternalLink from './internal-link';
+import BalanceAddressAvatar from './balance-address-avatar';
 
 const CURRENCY = process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME;
 const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
@@ -83,35 +84,31 @@ export default function MainNav() {
     <div className="main-nav d-flex align-items-center justify-content-between">
 
       <div className="d-flex">
-        <Link href="/" passHref>
-          <a>
-            <BeproLogo aria-hidden={true} />
-          </a>
-        </Link>
+        <InternalLink href="/" icon={<BeproLogo aria-hidden={true} />} className="brand" nav active />
         <ul className="nav-links">
-          <li><Link href="/developers" passHref><Button
-          transparent className={`p-0 ${asPath !== '/developers' && 'opacity-75 opacity-100-hover'}`}
-          >Developers</Button></Link></li>
-          <li><Link href="/council" passHref><Button
-          transparent className={`p-0 ${asPath !== '/council' && 'opacity-75 opacity-100-hover'}`}
-          >Council</Button></Link></li>
-          <li><Link href="/oracle" passHref><Button
-          transparent className={`p-0 ${asPath !== '/oracle' && 'opacity-75 opacity-100-hover'}`}
-          >Oracle</Button></Link></li>
-          {/* <li><a href="/">Lists</a></li>
-                        <li><a href="/issue">Issue</a></li>
-                        <li><a href="/proposal">Proposal</a></li>
-                        <li><a href="/account">My account</a></li> */}
+          <li>
+            <InternalLink href="/developers" label="Developers" nav uppercase />
+          </li>
+
+          <li>
+            <InternalLink href="/council" label="Council" nav uppercase />
+          </li>
+
+          <li>
+            <InternalLink href="/oracle" label="Oracle" nav uppercase />
+          </li>
         </ul>
       </div>
+
       <div className="d-flex flex-row align-items-center">
         <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" className='text-decoration-none' target="_blank">
           <Button transparent className="opacity-75 opacity-100-hover"><span>Get Started</span><ExternalLinkIcon className="ml-1"/></Button>
         </a>
-        <Link href="/create-issue" passHref>
-          <Button transparent className="opacity-75 opacity-100-hover"><PlusIcon /> <span>Create issue</span></Button>
-        </Link>
+
+        <InternalLink href="/create-issue" icon={<PlusIcon />} label="Create issue" iconBefore nav uppercase />
+
         <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 opacity-75 opacity-100-hover" transparent rounded><HelpIcon /></Button>
+
         <WrongNetworkModal requiredNetwork={REQUIRED_NETWORK} />
 
         <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
@@ -121,23 +118,9 @@ export default function MainNav() {
 
             <NetworkIdentifier />
 
-            <Link href="/account" passHref>
-              <Button className='mr-1 opacity-75 opacity-100-hover' transparent>
-                <span>{formatNumberToNScale(beproBalance)}</span>
-                <BeproSmallLogo />
-              </Button>
-            </Link>
-            <Link href="/account" passHref>
-              <a className="meta-info d-flex align-items-center">
-                <div className="d-flex flex-column text-right">
-                  <p className="p-small mb-0">
-                    {address}
-                  </p>
-                  <p className="p-small mb-0 trans">{formatNumberToString(ethBalance)} {CURRENCY}</p>
-                </div>
-                {/* <img className="avatar circle-2"src="https://uifaces.co/our-content/donated/Xp0NB-TL.jpg" alt="" /> */}
-              </a>
-            </Link>
+            <InternalLink href="/account" icon={<BeproSmallLogo />} label={formatNumberToNScale(beproBalance)} transparent nav />
+            
+            <InternalLink href="/account" icon={<BalanceAddressAvatar address={address} balance={ethBalance} currency={CURRENCY} />} className="meta-info d-flex align-items-center" />
           </div>
         </ConnectWalletButton>
       </div>

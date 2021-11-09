@@ -1,8 +1,8 @@
 import { GetStaticProps } from "next";
 import {useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
-import GithubMicroService from '@services/github-microservice';
 import {formatNumberToCurrency} from 'helpers/formatNumber'
+import {BeproService} from '@services/bepro-service';
 
 export default function PageHero({title = "Find issues to work",}) {
 
@@ -15,12 +15,11 @@ export default function PageHero({title = "Find issues to work",}) {
     if (!beproInit)
       return;
 
-    GithubMicroService.getNetworkStats()
-                      .then(({openIssues, closedIssues = 0, tokensStaked}) => {
-                        setInProgress(openIssues);
-                        setClosed(closedIssues);
-                        setOnNetwork(tokensStaked);
-                      })
+
+    BeproService.getClosedIssues().then(setClosed);
+    BeproService.getOpenIssues().then(setInProgress);
+    BeproService.getTokensStaked().then(setOnNetwork);
+
   }
 
   useEffect(loadTotals, [beproInit]);

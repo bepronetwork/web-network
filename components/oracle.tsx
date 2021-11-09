@@ -2,7 +2,7 @@ import { GetStaticProps } from "next";
 import React, { ReactNode, ReactNodeArray, useState } from "react";
 import PageHero from "./page-hero";
 import clsx from "clsx";
-import Link from "next/link";
+import InternalLink from "./internal-link";
 
 export default function Oracle({
   children,
@@ -17,16 +17,9 @@ export default function Oracle({
       <div className="container">
         <div className="row">
           <div className="d-flex justify-content-center mb-3">
-            <Link href="/oracle/new-issues">
-              <a className={clsx("subnav-item mr-3", {active: buttonPrimaryActive,})}>
-                <h3 className="h3">New issues</h3>
-              </a>
-            </Link>
-            <Link href="/oracle/ready-to-merge">
-              <a className={clsx("subnav-item", {active: !buttonPrimaryActive,})}>
-                <h3 className="h3">Ready to merge</h3>
-              </a>
-            </Link>
+            <InternalLink href="/oracle/new-issues" label="New issues" className={clsx("mr-3 h3 p-0")} nav transparent />
+
+            <InternalLink href="/oracle/ready-to-merge" label="Ready to merge" className={clsx("h3 p-0")} nav transparent />
           </div>
         </div>
       </div>

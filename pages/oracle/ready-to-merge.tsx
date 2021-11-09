@@ -1,27 +1,27 @@
 import { GetStaticProps } from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
-import Link from 'next/link';
 import ListIssues from '@components/list-issues';
-import GithubMicroService from '@services/github-microservice';
 import Oracle from '@components/oracle';
 import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';
 import {IssueData} from '@interfaces/issue-data';
 import NothingFound from '@components/nothing-found';
-import { Button } from 'react-bootstrap';
 import usePage from '@x-hooks/use-page';
 import useCount from '@x-hooks/use-count';
 import Paginate from '@components/paginate';
+import useMergeData from '@x-hooks/use-merge-data';
+import InternalLink from '@components/internal-link';
 
 export default function ReadyToMergeIssues() {
   const {dispatch} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
   const page = usePage();
   const results = useCount();
+  const {getIssues: getIssuesWith} = useMergeData();
 
   function getIssues() {
     dispatch(changeLoadState(true))
-    GithubMicroService.getIssuesState('ready', page)
+    getIssuesWith({state: 'ready', page})
                       .then((data) => {
                         results.setCount(data.count);
                         setIssues(data.rows)
@@ -45,11 +45,7 @@ export default function ReadyToMergeIssues() {
         <div className="mt-4">
           <NothingFound
           description="No issues ready to merge">
-          <Link href="/create-issue" passHref>
-            <Button>
-              create one
-            </Button>
-          </Link>
+          <InternalLink href="/create-issue" label="create one" uppercase />
         </NothingFound>
         </div>
       }

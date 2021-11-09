@@ -4,16 +4,17 @@ import ReactSelect from './react-select';
 import CreateProposalDistributionItem from './create-proposal-distribution-item';
 import sumObj from 'helpers/sumObj';
 import {BeproService} from '@services/bepro-service';
-import GithubMicroService from '../services/github-microservice';
 import {pullRequest} from 'interfaces/issue-data';
 import {ApplicationContext} from '@contexts/application';
-import {changeLoadState} from '@contexts/reducers/change-load-state';
 import {addTransaction} from '@reducers/add-transaction';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import {toastWarning} from '@reducers/add-toast';
 import Button from './button';
 import {useRouter} from 'next/router';
+import useOctokit from '@x-hooks/use-octokit';
+import useRepos from '@x-hooks/use-repos';
+import useApi from '@x-hooks/use-api';
 
 interface participants {
   githubHandle: string;
@@ -38,7 +39,10 @@ export default function NewProposal({
   const [isCouncil, setIsCouncil] = useState(false);
   const [councilAmount, setCouncilAmount] = useState(0);
   const [currentGithubId, setCurrentGithubId] = useState<string>();
-  const router = useRouter()
+  const router = useRouter();
+  const [[activeRepo]] = useRepos();
+  const {getParticipants} = useOctokit();
+  const {getUserWith, waitForMerge, processMergeProposal} = useApi();
 
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
@@ -49,14 +53,23 @@ export default function NewProposal({
   }
 
   function getParticipantsPullRequest(id: string, githubId: string) {
-    GithubMicroService.getPullRequestParticipants(id)
-                      .then((participantsPr) => {
-                        setCurrentGithubId(githubId);
-                        setParticipants(participantsPr);
-                      })
-                      .catch((err) => {
-                        console.error('Error fetching pullRequestsParticipants', err)
-                      });
+    if (!activeRepo)
+      return;
+
+    getParticipants(+githubId, activeRepo.githubPath)
+      .then(participants => {
+        return Promise.all(participants.map(async login => {
+          const {address, githubLogin, githubHandle} = await getUserWith(login);
+          return {address, githubLogin, githubHandle};
+        }))
+      })
+      .then((participantsPr) => {
+        setCurrentGithubId(githubId);
+        setParticipants(participantsPr);
+      })
+      .catch((err) => {
+        console.error('Error fetching pullRequestsParticipants', err)
+      });
   }
 
   async function handleClickCreate(): Promise<void> {
@@ -84,7 +97,7 @@ export default function NewProposal({
     const proposeMergeTx = addTransaction({type: TransactionTypes.proposeMerge})
     dispatch(proposeMergeTx);
 
-    GithubMicroService.waitForMerge(githubLogin, issue_id, currentGithubId)
+    waitForMerge(githubLogin, issue_id, currentGithubId)
                       .then(data => {
                         console.log(`GOT`, data);
                         handleBeproService();
@@ -96,6 +109,7 @@ export default function NewProposal({
     await BeproService.network
                       .proposeIssueMerge(payload)
                       .then(txInfo => {
+                        processMergeProposal(txInfo.blockNumber, issue_id);
                         BeproService.parseTransaction(txInfo, proposeMergeTx.payload)
                                     .then(block => dispatch(updateTransaction(block)));
                       })
@@ -155,12 +169,9 @@ export default function NewProposal({
   }, [distrib]);
 
   useEffect(() => {
-    if (pullRequests.length)
-      getParticipantsPullRequest(
-        pullRequests[0]?.id,
-        pullRequests[0]?.githubId
-      );
-  }, [pullRequests]);
+    if (pullRequests.length && activeRepo)
+      getParticipantsPullRequest(pullRequests[0]?.id, pullRequests[0]?.githubId);
+  }, [pullRequests, activeRepo]);
 
   useEffect(updateCreateProposalHideState, [currentAddress]);
 
