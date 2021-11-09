@@ -32,7 +32,7 @@ export default function ConnectAccount() {
   const {data: session} = useSession();
   const router = useRouter();
   const { migrate } = router.query;
-  const {getUserOf} = useApi();
+  const {getUserOf, joinAddressToUser} = useApi();
 
 
   function updateLastUsedAddress() {
@@ -83,7 +83,7 @@ export default function ConnectAccount() {
       return dispatch(toastError(`Migration not possible or already happened`));
     }
 
-    GithubMicroService.joinAddressToUser(session.user.name,{ address: currentAddress.toLowerCase(), migrate: !!migrate })
+    joinAddressToUser(session.user.name,{ address: currentAddress.toLowerCase(), migrate: !!migrate })
                       .then((result) => {
                         if (result === true) {
                           dispatch(toastSuccess(`Connected accounts!`))

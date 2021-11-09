@@ -104,7 +104,7 @@ export default function useApi() {
   }
 
   async function joinAddressToUser(githubHandle: string, payload: {address: string, migrate?: boolean}): Promise<boolean> {
-    return client.patch<string>(`/api/users/connect/${githubHandle}`, payload)
+    return client.patch<string>(`/api/user/connect/${githubHandle}`, payload)
                  .then(() => true)
                  .catch((error) => {
                    if (error.response)
@@ -210,5 +210,6 @@ export default function useApi() {
     waitForMerge,
     processMergeProposal,
     getMergeProposal,
+    joinAddressToUser,
   }
 }
