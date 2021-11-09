@@ -20,6 +20,7 @@ import {formatNumberToCurrency} from '@helpers/formatNumber';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import useRepos from '@x-hooks/use-repos';
 import useApi from '@x-hooks/use-api';
+import useMergeData from '@x-hooks/use-merge-data';
 
 interface ProposalBepro {
   disputes: string;
@@ -54,13 +55,15 @@ export default function PageProposal() {
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
   const [repo, setRepo] = useState(``);
   const [[activeRepo]] = useRepos();
-  const {getUserOf} = useApi();
+  const {getUserOf, getMergeProposal, getIssue} = useApi();
 
   async function getProposalData() {
-    const mergeProposal = await GithubMicroService.getMergeProposalIssue(dbId, mergeId);
-    const issueData = await GithubMicroService.getIssueId(issueId);
-    setProposalMicroService(mergeProposal as ProposalData);
+    // const mergeProposal = await getMergeProposal(dbId as string);
+    const [repoId, ghId] = (issueId as string).split(`/ `);
+    const issueData = await getIssue(repoId, ghId);
+
     setIssueMicroService(issueData);
+    setProposalMicroService(issueData.mergeProposals.find(({id}) => id === +dbId));
     setAmountIssue(issueData?.amount?.toString())
   }
 
