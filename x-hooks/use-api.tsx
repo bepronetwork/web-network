@@ -6,7 +6,7 @@ import {ProposalData, User} from '@services/github-microservice';
 import {ReposList} from '@interfaces/repos-list';
 import {BeproService} from '@services/bepro-service';
 
-const client = axios.create({baseURL: `http://localhost:3000`});
+const client = axios.create({baseURL: process.env.NEXT_API_HOST});
 client.interceptors.response.use(
   undefined,
   error => { console.debug(`Failed`, error); return error; })
