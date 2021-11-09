@@ -44,6 +44,7 @@ export default function ConnectAccount() {
     if (!currentAddress)
       return;
 
+    // todo: replace
     const user = await GithubMicroService.getUserOfLogin(githubLogin);
     if (user && user.address && user.address !== currentAddress.toLowerCase()) {
       dispatch(toastError(`When migrating, address must match ${truncateAddress(user.address)}.`, undefined, {delay: 10000}));
