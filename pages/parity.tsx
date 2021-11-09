@@ -33,7 +33,7 @@ export default function ParityPage() {
   const [issuesList, setIssuesList] = useState([]);
   const [reposList, setReposList] = useState<ReposList>([]);
   const [availReposList, setAvailableList] = useState<string[]>([]);
-  const {getUserOf} = useApi();
+  const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId} = useApi();
 
   const formItem = (label = ``, placeholder = ``, value = ``, onChange = (ev) => {}) =>
     ({label, placeholder, value, onChange})
@@ -147,7 +147,7 @@ export default function ParityPage() {
 
     console.debug(`scPayload,`, scPayload, `msPayload`, msPayload);
 
-    return GithubMicroService.createIssue(msPayload)
+    return apiCreateIssue(msPayload)
                              .then(cid => {
                                if (!cid)
                                  throw new Error(`Failed to create github issue!`);
@@ -162,7 +162,7 @@ export default function ParityPage() {
                                if (!issueId)
                                  throw new Error(`Failed to create issue on SC!`);
 
-                               return GithubMicroService.patchGithubId(githubId, issueId)
+                               return patchIssueWithScId(repository_id, githubId, issueId)
                              })
                              .then(result => {
                                if (!result)
