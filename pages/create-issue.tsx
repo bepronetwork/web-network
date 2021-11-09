@@ -17,6 +17,7 @@ import LockIcon from '@assets/icons/lock';
 import ReposDropdown from '@components/repos-dropdown';
 import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
+import {User} from '@services/github-microservice';
 
 interface Amount {
   value?: string,
