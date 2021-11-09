@@ -3,6 +3,7 @@ import {NextApiRequest, NextApiResponse} from 'next';
 import {CONTRACT_ADDRESS, WEB3_CONNECTION} from '../../../../env';
 import {Network} from 'bepro-js';
 import {Octokit} from 'octokit';
+import {Bus} from '@helpers/bus';
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {fromBlock, id} = req.body;
@@ -22,8 +23,11 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
                     const issueId = await network.getIssueById({issueId: eventData.id}).then(({cid}) => cid);
                     const issue = await models.issue.findOne({where: {issueId,}, include: ['mergeProposals'],});
 
-                    if (!issue)
-                      return console.log(`Failed to find an issue to close`, event);
+                    if (!issue || issue?.state === `closed`) {
+                      console.log(`Emitting closeIssue:created:${issueId}`);
+                      Bus.emit(`closeIssue:created:${issueId}`, issue)
+                      return console.log(`Failed to find an issue to close or already closed`, event);
+                    }
 
                     const mergeProposal = issue.mergeProposals.find((mp) => mp.scMergeId = eventData.mergeID);
 
@@ -36,6 +40,9 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
                     issue.state = 'closed';
                     await issue.save();
+
+                    console.log(`Emitting closeIssue:created:${issueId}`);
+                    Bus.emit(`closeIssue:created:${issueId}`, issue)
                   }
                 })
                 .catch(error => {
