@@ -1,5 +1,4 @@
 import {useEffect, useState} from 'react';
-import GithubMicroService from '@services/github-microservice';
 import useRepos from '@x-hooks/use-repos';
 
 export default function useGithubRepo(id: string, path: string) {

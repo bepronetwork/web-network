@@ -3,7 +3,6 @@ import {GetStaticProps} from 'next';
 import {IssueData} from '@interfaces/issue-data';
 import ListIssues from '@components/list-issues';
 import PageHero from '@components/page-hero';
-import GithubMicroService from '@services/github-microservice';
 import {ApplicationContext} from '@contexts/application';
 import {changeLoadState} from '@reducers/change-load-state';
 import NothingFound from '@components/nothing-found';

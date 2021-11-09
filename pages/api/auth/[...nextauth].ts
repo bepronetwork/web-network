@@ -1,7 +1,5 @@
 import NextAuth from 'next-auth';
 import GithubProvider from 'next-auth/providers/github';
-import GithubMicroService from '@services/github-microservice';
-import {Octokit} from 'octokit';
 import models from '@db/models';
 import {Timers} from '@helpers/timers';
 

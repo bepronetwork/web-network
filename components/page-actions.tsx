@@ -1,16 +1,12 @@
 import { GetStaticProps } from "next";
 import React, { useContext, useState } from "react";
 import IssueAvatars from "./issue-avatars";
-import Link from "next/link";
 import { BeproService } from "@services/bepro-service";
 import NewProposal from "./create-proposal";
 import { ApplicationContext } from "@contexts/application";
-import { changeLoadState } from "@reducers/change-load-state";
-import GithubMicroService from "@services/github-microservice";
 import { developer, IssueState, pullRequest } from "@interfaces/issue-data";
 import { changeBalance } from "@contexts/reducers/change-balance";
 import { addToast } from "@contexts/reducers/add-toast";
-import ExternalLinkIcon from "@assets/icons/external-link-icon";
 import { addTransaction } from "@reducers/add-transaction";
 import { TransactionTypes } from "@interfaces/enums/transaction-types";
 import { updateTransaction } from "@reducers/update-transaction";

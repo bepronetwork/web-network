@@ -1,4 +1,4 @@
-import GithubMicroService, { User } from "@services/github-microservice";
+import { User } from "@services/github-microservice";
 import Avatar from "components/avatar";
 import InputNumber from "components/input-number";
 import { useEffect, useState } from "react";

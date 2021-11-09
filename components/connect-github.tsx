@@ -2,7 +2,6 @@ import GithubImage from './github-image';
 import {useContext} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import {signIn, signOut} from 'next-auth/react';
-import GithubMicroService from '@services/github-microservice';
 import useApi from '@x-hooks/use-api';
 
 export default function ConnectGithub() {
