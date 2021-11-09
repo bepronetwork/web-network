@@ -14,7 +14,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const octokit = new Octokit({auth: process.env.NEXT_GITHUB_TOKEN});
   const [owner, repo] = repository.githubPath.split(`/`);
-  await octokit.rest.issues.create({owner,repo, title, body, labels: ['draft']});
 
   const githubId = req.body.githubIssueId || (await octokit.rest.issues.create({owner,repo, title, body, labels: ['draft']}))?.data?.number?.toString()
 
