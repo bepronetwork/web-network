@@ -11,7 +11,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const repo = repoInfo.split(`/`)[1];
 
-  const octoKit = new Octokit({auth: process.env.NEXT_GH_TOKEN});
+  const octoKit = new Octokit({auth: process.env.NEXT_GITHUB_TOKEN});
 
   const options = {
     accept: 'application/vnd.github.v3+json',

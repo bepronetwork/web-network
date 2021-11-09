@@ -13,7 +13,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   await network.start();
   const contract = network.getWeb3Contract();
 
-  await contract.getPastEvents(`MergeProposalCreated`, {fromBlock, filter: {id}, toBlock: `latest`})
+  await contract.getPastEvents(`MergeProposalCreated`, {fromBlock, toBlock: +fromBlock+1, filter: {id},})
+  // await contract.getPastEvents(`MergeProposalCreated`, {fromBlock, toBlock: +fromBlock+1,})
                 .then(async function mergeProposalCreated(events) { // todo: refactor this onto a helper
                   console.log(`Events`, events);
                   for (const event of events) {
@@ -46,7 +47,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
                 })
 }
 
-export default async function ParsePastEvents(req: NextApiRequest, res: NextApiResponse) {
+export default async function ParseMergeCreateProposal(req: NextApiRequest, res: NextApiResponse) {
 
   switch (req.method.toLowerCase()) {
     case 'post':
