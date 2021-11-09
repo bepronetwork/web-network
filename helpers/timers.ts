@@ -1,3 +1,1 @@
-import Timer = NodeJS.Timer;
-
-export const Timers: {[k: string]: Timer} = {};
+export const Timers: {[k: string]: any} = {};
