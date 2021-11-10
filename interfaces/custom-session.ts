@@ -1,3 +1,5 @@
+import { ISODateString } from "next-auth";
+
 export interface CustomSession extends Record<string, unknown> {
     user?: {
         name?: string | null;
