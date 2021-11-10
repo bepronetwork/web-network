@@ -62,13 +62,16 @@ export default function ProposalItem({proposal, dbId, issueId, amount, beproStak
             <div className="col-4 d-flex justify-content-between">
               <ProposalProgressSmall pgClass={`bg-${proposal.isDisputed ? `danger` : `purple`}`}
                                      value={+proposal.disputes}
-                                     total={amount}
+                                     total={beproStaked}
                                      textClass={`pb-2 ${proposal.isDisputed ? `text-danger` : `color-purple`}`}/>
-              <Button color={proposal.isDisputed ? `danger` : `purple`}
-                      outline={proposal.isDisputed} className={`align-self-center mb-2 ms-3`}
-                      onClick={(ev) => { ev.stopPropagation(); handleDispute(+proposal._id) }}>
-                {proposal.isDisputed ? `Failed` : `Dispute`}
-              </Button>
+              <div className="col justify-content-end d-flex">
+                <Button color={proposal.isDisputed ? `danger` : `purple`}
+                        outline={proposal.isDisputed} className={`align-self-center mb-2 ms-3`}
+                        onClick={(ev) => { ev.stopPropagation(); handleDispute(+proposal._id) }}>
+                  {proposal.isDisputed ? `Failed` : `Dispute`}
+                </Button>
+              </div>
+
             </div>
           </div>
         </a>
