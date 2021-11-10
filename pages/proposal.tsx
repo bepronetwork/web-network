@@ -18,6 +18,7 @@ import {formatNumberToCurrency} from '@helpers/formatNumber';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import useRepos from '@x-hooks/use-repos';
 import useApi from '@x-hooks/use-api';
+import useMergeData from '@x-hooks/use-merge-data';
 
 interface ProposalBepro {
   disputes: string;
@@ -52,11 +53,15 @@ export default function PageProposal() {
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
   const [repo, setRepo] = useState(``);
   const [[activeRepo]] = useRepos();
-  const {getUserOf, getIssue} = useApi();
+  const {getUserOf,} = useApi();
+  const {getIssue,} = useMergeData();
 
   async function getProposalData() {
+    if (!repo)
+      return;
+
     const [repoId, ghId] = (issueId as string).split(`/ `);
-    const issueData = await getIssue(repoId, ghId);
+    const issueData = await getIssue(repoId, ghId, repo);
 
     setIssueMicroService(issueData);
     setProposalMicroService(issueData.mergeProposals.find(({id}) => id === +dbId));
@@ -105,7 +110,7 @@ export default function PageProposal() {
   }
 
   function loadProposalData() {
-    if (issueId && currentAddress) {
+    if (issueId && currentAddress && repo) {
       BeproService.network.getOraclesSummary({address: currentAddress})
                   .then(oracles => dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles))))
                   .then(async () => {
@@ -116,7 +121,7 @@ export default function PageProposal() {
     }
   }
 
-  useEffect(() => { loadProposalData() }, [currentAddress, issueId]);
+  useEffect(() => { loadProposalData() }, [currentAddress, issueId, repo]);
   useEffect(() => { updateUsersAddresses(proposalBepro) }, [proposalBepro, currentAddress]);
   useEffect(() => { setRepo(activeRepo?.githubPath) }, [activeRepo])
 
