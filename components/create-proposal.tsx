@@ -42,7 +42,7 @@ export default function NewProposal({
   const router = useRouter();
   const [[activeRepo]] = useRepos();
   const {getParticipants} = useOctokit();
-  const {getUserWith, waitForMerge, processMergeProposal} = useApi();
+  const {getUserWith, waitForMerge, processMergeProposal, processEvent} = useApi();
 
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
@@ -109,7 +109,7 @@ export default function NewProposal({
     await BeproService.network
                       .proposeIssueMerge(payload)
                       .then(txInfo => {
-                        processMergeProposal(txInfo.blockNumber, issue_id);
+                        processEvent(`merge-proposal`, txInfo.blockNumber, issue_id);
                         BeproService.parseTransaction(txInfo, proposeMergeTx.payload)
                                     .then(block => dispatch(updateTransaction(block)));
                       })
