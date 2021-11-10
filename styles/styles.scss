@@ -17,6 +17,15 @@ li {
   list-style: none;
 }
 
+.cursor-now-allowed {
+  cursor: not-allowed;
+}
+
+.pull-request-button {
+  height: 40px;
+  width: 210.08px;
+}
+
 .modal {
   &-header {
     padding-bottom: 0;
@@ -294,6 +303,13 @@ p {
   font-family: "Inter-Regular", sans-serif;
   font-size: 14px;
   line-height: 160%;
+}
+
+.p-nm {
+  font-size: 14px;
+  line-height: 140%;
+  padding-left: 0;
+  font-weight: 400;
 }
 
 .text-bold {

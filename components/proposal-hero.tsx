@@ -13,7 +13,7 @@ export default function ProposalHero({githubId, title, pullRequestId, authorPull
                     <div className="col-md-10">
                         <div className="d-flex flex-column">
                             <div className="d-flex align-items-center cursor-pointer text-truncate">
-                                <InternalLink href={{ pathname:"/issue", query: { id: issueId, repoId }}} icon={<i className="ico-back me-2" />} label={`#${githubId} ${title}`} transparent />
+                                <InternalLink href={{ pathname:"/issue", query: { id: issueId, repoId }}} icon={<i className="ico-back me-2" />} label={`#${githubId} ${title}`} className="p-nm trans" iconBefore transparent />
                             </div>
                             <div className="row">
                                 <div className="col-md-9">

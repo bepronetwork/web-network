@@ -15,6 +15,7 @@ import ChatBubbles from '@assets/icons/chat-bubbles';
 import ChatBubbleCross from '@assets/icons/chat-bubble-cross';
 import ReturnArrow from '@assets/icons/return-arrow';
 import {formatNumberToCurrency} from 'helpers/formatNumber'
+import { TransactionStatus } from '@interfaces/enums/transaction-status';
 export default function TransactionsList({onActiveTransaction = (transaction) => {}}) {
   const {state: {myTransactions}} = useContext(ApplicationContext);
 
@@ -33,8 +34,11 @@ export default function TransactionsList({onActiveTransaction = (transaction) =>
   }
 
   function renderTransactionRow(item: Transaction) {
+    const isPending = item.status === TransactionStatus.pending
+    const className = `h-100 w-100 px-3 py-2 tx-row mt-2 ${isPending ? 'cursor-now-allowed' : 'cursor-pointer'}`
+
     return (
-      <div className="h-100 w-100 px-3 py-2 tx-row cursor-pointer mt-2" onClick={() => onActiveTransaction(item)} key={item.id}>
+      <div className={className} onClick={() => !isPending && onActiveTransaction(item)} key={item.id}>
         <div className="d-flex justify-content-start align-items-center">
           {IconMaps[item.type] || <HelpIcon/>}
 
