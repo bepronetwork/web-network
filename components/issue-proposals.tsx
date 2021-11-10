@@ -44,7 +44,7 @@ export default function IssueProposals({ metaProposals, metaRequests, numberProp
       <div className="row justify-content-center">
         <div className="col-md-10">
           <div className="content-wrapper mb-4 pb-0">
-            <h3 className="smallCaption pb-3">{numberProposals} Proposals</h3>
+            <h3 className="smallCaption pb-3">{numberProposals} {numberProposals} {numberProposals > 1 ? 'Proposals' : 'Proposal'}</h3>
             {proposals.map(proposal => <ProposalItem key={proposal._id} proposal={proposal} issueId={issueId} dbId={dbId} amount={amount} beproStaked={beproStaked} onDispute={loadProposalsMeta} isFinished={isFinished} owner={proposal.owner}/>)}
           </div>
         </div>
