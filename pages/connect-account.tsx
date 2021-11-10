@@ -21,7 +21,7 @@ import {changeNetwork} from '@reducers/change-network';
 import {NetworkIds} from '@interfaces/enums/network-ids';
 import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
-import { CustomSession } from 'types/custom-session';
+import { CustomSession } from '@interfaces/custom-session';
 
 
 export default function ConnectAccount() {
