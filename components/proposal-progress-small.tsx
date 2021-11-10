@@ -10,19 +10,24 @@ interface Options {
 export default function ProposalProgressSmall({pgClass = ``, value, total, textClass}: Options) {
   const dotStyle = {width: `10px`, height: `10px`};
 
-  const percent = ((((value * 100) / total) * 100) / 3).toFixed(2);
+  function toRepresentationPercent(value = 0, total = 5) {
+    return (value * 100) / total;
+  }
 
-  return <div className="text-center position-relative d-inline-block">
+  const percent = ((value / total)* 100).toFixed(2);
+
+  return <div className="text-center position-relative d-inline-block col">
     <div className={`smallCaption`}>
       <span className={textClass}>{formatNumberToNScale(value)}</span>
       <span>/{formatNumberToNScale(total)} oracles</span>
     </div>
-    <div className={`progress ${pgClass}`}>
-      <div className={`progress-bar`}
+    <div className={`progress bg-gray w-100`}>
+      <div className="wrapper bg-gray w-100" />
+      <div className={`progress-bar ${pgClass}`}
            role="progressbar"
-           style={{width: `${percent}%`}}>
-        <div style={{...dotStyle, left: 0}} className={`rounded-circle position-absolute ${+percent > 10 ? pgClass : `empty-dot`}`}/>
-        <div style={{...dotStyle, right: `10%`}} className={`rounded-circle position-absolute ${+percent >= 100 ? pgClass : `empty-dot`}`}/>
+           style={{width: `${toRepresentationPercent(+percent, 3)}%`}}>
+        <div style={{...dotStyle, left: 0}} className={`rounded-circle position-absolute ${+toRepresentationPercent(+percent, 3) > 0 ? pgClass : `empty-dot`}`}/>
+        <div style={{...dotStyle, right: `10%`}} className={`rounded-circle position-absolute ${+toRepresentationPercent(+percent, 3) >= 100 ? pgClass : `empty-dot`}`}/>
       </div>
     </div>
     <div className={`smallCaption ${textClass}`}>{percent}%</div>

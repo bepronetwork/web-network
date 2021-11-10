@@ -52,16 +52,15 @@ export default function PageProposal() {
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
   const [repo, setRepo] = useState(``);
-  const [[activeRepo]] = useRepos();
+  const [[activeRepo], {findRepo, loadRepos}] = useRepos();
   const {getUserOf,} = useApi();
   const {getIssue,} = useMergeData();
 
   async function getProposalData() {
-    if (!repo)
-      return;
+    const [repoId, ghId] = (issueId as string).split(`/`);
+    const _repo = findRepo(+repoId);
 
-    const [repoId, ghId] = (issueId as string).split(`/ `);
-    const issueData = await getIssue(repoId, ghId, repo);
+    const issueData = await getIssue(repoId, ghId, _repo?.githubPath);
 
     setIssueMicroService(issueData);
     setProposalMicroService(issueData.mergeProposals.find(({id}) => id === +dbId));
@@ -110,7 +109,7 @@ export default function PageProposal() {
   }
 
   function loadProposalData() {
-    if (issueId && currentAddress && repo) {
+    if (issueId && currentAddress) {
       BeproService.network.getOraclesSummary({address: currentAddress})
                   .then(oracles => dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles))))
                   .then(async () => {
@@ -121,7 +120,7 @@ export default function PageProposal() {
     }
   }
 
-  useEffect(() => { loadProposalData() }, [currentAddress, issueId, repo]);
+  useEffect(() => { loadProposalData() }, [currentAddress, issueId,]);
   useEffect(() => { updateUsersAddresses(proposalBepro) }, [proposalBepro, currentAddress]);
   useEffect(() => { setRepo(activeRepo?.githubPath) }, [activeRepo])
 
@@ -130,7 +129,7 @@ export default function PageProposal() {
       <ProposalHero
         githubId={issueMicroService?.githubId}
         title={issueMicroService?.title}
-        pullRequestId={proposalMicroService?.pullRequest.githubId}
+        pullRequestId={proposalMicroService?.pullRequest?.githubId}
         authorPullRequest={proposalBepro?.author}
         createdAt={proposalMicroService && formatDate(proposalMicroService.createdAt)}
         beproStaked={formatNumberToCurrency(amountIssue)}/>
