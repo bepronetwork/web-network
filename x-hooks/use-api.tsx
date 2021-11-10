@@ -172,9 +172,25 @@ export default function useApi() {
   }
 
   async function waitForMerge(githubLogin, issue_id, currentGithubId) {
-    return client.get(`/api/merge-proposal/poll/${githubLogin}/${issue_id}/${currentGithubId}`)
+    return client.get(`/api/poll/mergeProposal/${githubLogin}/${issue_id}/${currentGithubId}`)
                  .then(({data}) => data)
                  .catch(() => null)
+  }
+
+  async function waitForClose(currentGithubId) {
+    return client.get(`/api/poll/closeIssue/${currentGithubId}`)
+                 .then(({data}) => data)
+                 .catch(() => null)
+  }
+
+  async function waitForRedeem(currentGithubId) {
+    return client.get(`/api/poll/redeemIssue/${currentGithubId}`)
+                 .then(({data}) => data)
+                 .catch(() => null)
+  }
+
+  async function processEvent(eventName, fromBlock: number, id: number) {
+    return client.post(`/api/past-events/${eventName}/`, {fromBlock, id})
   }
 
   async function processMergeProposal(fromBlock, id) {
@@ -183,7 +199,7 @@ export default function useApi() {
 
   async function getHealth() {
     return client.get(`/api/health`)
-                 .then(({status}) => status === 200)
+                 .then(({status}) => status === 204)
                  .catch(e => false);
   }
 
@@ -209,10 +225,13 @@ export default function useApi() {
     patchIssueWithScId,
     waitForMerge,
     processMergeProposal,
+    processEvent,
     getMergeProposal,
     joinAddressToUser,
     getAllUsers,
     createRepo,
     removeRepo,
+    waitForClose,
+    waitForRedeem,
   }
 }

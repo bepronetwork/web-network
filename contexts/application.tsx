@@ -103,7 +103,7 @@ export default function ApplicationContextProvider({children}) {
 
     window.ethereum.on(`accountsChanged`, (accounts) => updateSteFor(accounts[0]))
     window.ethereum.on('chainChanged', (evt) => {
-      dispatch(changeNetwork(NetworkIds[+evt?.toString()]?.toLowerCase()))
+      dispatch(changeNetwork((NetworkIds[+evt?.toString()] || `unknown`)?.toLowerCase()))
     })
   }
 

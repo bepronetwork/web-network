@@ -113,7 +113,7 @@ export default function ConnectAccount() {
     try {
       const chainId = (window as any)?.ethereum?.chainId;
       if (+process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID !== +chainId) {
-        dispatch(changeNetwork(NetworkIds[+chainId]?.toLowerCase()))
+        dispatch(changeNetwork((NetworkIds[+chainId] || `unknown`)?.toLowerCase()))
         return;
       } else loggedIn = await BeproService.login();
     } catch (e) {

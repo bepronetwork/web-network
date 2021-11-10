@@ -28,7 +28,7 @@ export default NextAuth({
                                  });
       else await models.user.update({accessToken: account?.access_token}, {where: {githubLogin: profile.login?.toString()}});
 
-      Timers[profile.login?.toString()] = setTimeout(async () => await models.user.destroy({where: {githubLogin: profile.login?.toString()}}), 60*1000)
+      Timers[user.name.toString()] = setTimeout(async () => await models.user.destroy({where: {githubLogin: profile.login?.toString()}}), 60*1000)
 
       return true;
     },
