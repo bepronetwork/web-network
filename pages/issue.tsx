@@ -35,7 +35,7 @@ export default function PageIssue() {
   const [canOpenPR, setCanOpenPR] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>();
   const {getIssue} = useMergeData();
-  const {getIssueComments, getForksOf} = useOctokit();
+  const {getIssueComments, getForksOf, getUserRepos} = useOctokit();
   const [[activeRepo, reposList]] = useRepos();
   const {getUserOf, moveIssueToOpen} = useApi();
 
@@ -101,9 +101,16 @@ export default function PageIssue() {
     if (!activeRepo || !githubLogin)
       return;
 
+    console.log('active repo: ', activeRepo, githubLogin)
+
     const path = `${githubLogin}/${activeRepo.githubPath.split(`/`)[1]}`
-    getForksOf(path)
-      .then((repo) => setCanOpenPR(!!repo.data))
+    getUserRepos(githubLogin, activeRepo.githubPath.split(`/`)[1])
+      .then((repo) => {
+        if (repo.data.fork && repo.data.parent?.full_name === activeRepo.githubPath)
+          setCanOpenPR(true)
+        else
+          setCanOpenPR(false)
+      })
   }
 
   function loadIssueData() {
