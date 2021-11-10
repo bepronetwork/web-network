@@ -1,6 +1,6 @@
 import {OverlayTrigger, Popover} from 'react-bootstrap';
 import TransactionsList from '@components/transactions-list';
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import TransactionIcon from '@assets/icons/transaction';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
@@ -43,8 +43,8 @@ export default function TransactionsStateIndicator() {
         rootClose={true}
         onToggle={(next) => setShowOverlay(next)}
         overlay={overlay}>
-          <div>
-            <Button className='me-3 opacity-75 opacity-100-hover' transparent rounded onClick={() => setShowOverlay(!showOverlay)}>{loading && <span className="spinner-border spinner-border-sm"/> || <TransactionIcon color="bg-opac"/>}</Button>
+          <div className="me-3">
+            <Button className='opacity-75 opacity-100-hover' transparent rounded onClick={() => setShowOverlay(!showOverlay)}>{loading && <span className="spinner-border spinner-border-sm"/> || <TransactionIcon color="bg-opac"/>}</Button>
           </div>
     </OverlayTrigger>
     <TransactionModal transaction={activeTransaction} onCloseClick={() => setActiveTransaction(null)}/>
