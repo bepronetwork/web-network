@@ -37,7 +37,7 @@ export default function PageIssue() {
   const {getIssue} = useMergeData();
   const {getIssueComments, getForksOf, getUserRepos} = useOctokit();
   const [[activeRepo, reposList]] = useRepos();
-  const {getUserOf} = useApi();
+  const {getUserOf, moveIssueToOpen} = useApi();
 
   function getIssueCID() {
     return [repoId, id].join(`/`)
@@ -68,7 +68,8 @@ export default function PageIssue() {
       return;
 
     // bepro.network.getIssueByCID({ issueCID: getIssueCID() })
-    BeproService.network.getIssueByCID({ issueCID: getIssueCID() })
+    const issueCID = getIssueCID()
+    BeproService.network.getIssueByCID({ issueCID })
       .then(netIssue => {
         setNetworkIssue(netIssue);
         return netIssue._id;
@@ -166,6 +167,8 @@ export default function PageIssue() {
           issueId={issue?.issueId}
           dbId={issue?.id}
           amount={networkIssue?.tokensStaked}
+          isFinished={networkIssue?.recognizedAsFinished}
+          repoPath={issue?.repo}
         />
       )}
       {networkIssue && <IssueProposalProgressBar

@@ -1,7 +1,6 @@
-// REVIEW: redeem not exist in figma
 import {ProposalData} from '@services/github-microservice';
 
-export type IssueState =  'redeemed' | 'pending' |  'draft' | 'open' | 'in progress' | 'canceled' | 'closed' | 'ready' | 'done' | 'disputed'
+export type IssueState =  'pending' |  'draft' | 'open' | 'in progress' | 'canceled' | 'closed' | 'ready' | 'done' | 'disputed'
 
 export interface IssueData {
   _id?: string; // sc id

@@ -83,9 +83,7 @@ export default function IssueProposalProgressBar({
 
     let currentValue = item.Pending;
 
-    if (index < currentStep) {
-      currentValue = item.Completed;
-    }
+
 
     if (index === currentStep) {
       currentValue = item.InProgress;
@@ -93,6 +91,10 @@ export default function IssueProposalProgressBar({
 
     if (index === currentStep && isIssueinDraft) {
       currentValue = item.Warning;
+    }
+
+    if (index < currentStep || currentStep === steps.length - 1) {
+      currentValue = item.Completed;
     }
 
     if (isCanceled) {

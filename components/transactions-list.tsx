@@ -12,9 +12,9 @@ import ThumbsUp from '@assets/icons/thumbs-up';
 import CenterArrows from '@assets/icons/center-arrows';
 import CrossArrow from '@assets/icons/cross-arrow';
 import ChatBubbles from '@assets/icons/chat-bubbles';
-import ChatBubbleCross from '@assets/icons/chat-bubble-cross';
 import ReturnArrow from '@assets/icons/return-arrow';
 import {formatNumberToCurrency} from 'helpers/formatNumber'
+import CloseIssueIcon from '@assets/icons/close-issue';
 import { TransactionStatus } from '@interfaces/enums/transaction-status';
 export default function TransactionsList({onActiveTransaction = (transaction) => {}}) {
   const {state: {myTransactions}} = useContext(ApplicationContext);
@@ -26,9 +26,8 @@ export default function TransactionsList({onActiveTransaction = (transaction) =>
     [TransactionTypes.approveTransactionalERC20Token]: <ThumbsUp />,
     [TransactionTypes.delegateOracles]: <CrossArrow />,
     [TransactionTypes.dispute]: <ChatBubbles />,
-    [TransactionTypes.closeIssue]: <ChatBubbleCross />,
     [TransactionTypes.redeemIssue]: <ReturnArrow />,
-    [TransactionTypes.closeIssue]: <ReturnArrow />,
+    [TransactionTypes.closeIssue]: <CloseIssueIcon />,
     [TransactionTypes.proposeMerge]: <CenterArrows />,
     [TransactionTypes.approveSettlerToken]: <ThumbsUp />,
   }

@@ -7,17 +7,26 @@ import {CONTRACT_ADDRESS, WEB3_CONNECTION} from '../../../../env';
 import {Network} from 'bepro-js';
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-
   const opt = {opt: {web3Connection: WEB3_CONNECTION,  privateKey: process.env.NEXT_PRIVATE_KEY}, test: true,};
   const network = new Network({contractAddress: CONTRACT_ADDRESS, ...opt});
 
   await network.start();
   const redeemTime = (await network.redeemTime()) * 1000;
 
-  const where = {
-    createdAt: {[Op.lt]: subMilliseconds(+new Date(), redeemTime),},
-    state: 'draft',
-  };
+  const {scIssueId} = req.body;
+  let where;
+
+  if(scIssueId){
+    where = {
+      issueId: scIssueId
+    }
+  }
+  else{
+    where = {
+      createdAt: {[Op.lt]: subMilliseconds(+new Date(), redeemTime),},
+      state: 'draft',
+    };
+  }
 
   const issues = await models.issue.findAll({where});
   const octokit = new Octokit({auth: process.env.NEXT_GITHUB_TOKEN});
@@ -35,7 +44,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     await issue.save();
   }
 
-  return res.status(200).json(issues.length);
+  return res.status(200).json(issues);
 }
 
 export default async function MoveToOpen(req: NextApiRequest, res: NextApiResponse) {
