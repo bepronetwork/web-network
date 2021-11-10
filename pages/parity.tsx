@@ -336,6 +336,8 @@ export default function ParityPage() {
 
     getSelfRepos();
 
+    BeproService.network.changeRedeemTime('2 minutes').then(console.log)
+
   }, [currentAddress])
 
   return <>
