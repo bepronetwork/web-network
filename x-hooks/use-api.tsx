@@ -55,6 +55,13 @@ export default function useApi() {
                  .catch(() => null);
   }
 
+  async function moveIssueToOpen(scIssueId?: string) {
+    return client.post(`/api/past-events/move-to-open`, {scIssueId})
+                 .then(({data}) => data)
+                 .catch(() => null);
+  }
+
+
   async function patchIssueWithScId(repoId, githubId, scId) {
     return client.patch(`/api/issue`, {repoId, githubId, scId})
                  .then(({data}) => data === `ok`)
@@ -222,6 +229,7 @@ export default function useApi() {
     getPendingFor,
     createPullRequestIssue,
     createIssue,
+    moveIssueToOpen,
     patchIssueWithScId,
     waitForMerge,
     processMergeProposal,
