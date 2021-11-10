@@ -110,6 +110,8 @@ export default function PageIssue() {
           setCanOpenPR(true)
         else
           setCanOpenPR(false)
+      }).catch(e => {
+        console.log(`Failed to get users repositories: `, e)
       })
   }
 
