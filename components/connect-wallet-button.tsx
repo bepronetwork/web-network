@@ -124,7 +124,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
                   <span className="text-white text-uppercase ms-2">metamask</span>
               </div>
         </div>
-        <Button className='my-3' disabled={isButtonDisabled()} onClick={handleAddNetwork}>add network</Button>
+        
         <div className="smallInfo text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-1 pt-1">
         by connecting, you accept{" "}
           <a
