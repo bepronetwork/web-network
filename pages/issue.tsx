@@ -37,7 +37,7 @@ export default function PageIssue() {
   const {getIssue} = useMergeData();
   const {getIssueComments, getForksOf} = useOctokit();
   const [[activeRepo, reposList]] = useRepos();
-  const {getUserOf} = useApi();
+  const {getUserOf, moveIssueToOpen} = useApi();
 
   function getIssueCID() {
     return [repoId, id].join(`/`)
@@ -68,13 +68,22 @@ export default function PageIssue() {
       return;
 
     // bepro.network.getIssueByCID({ issueCID: getIssueCID() })
-    BeproService.network.getIssueByCID({ issueCID: getIssueCID() })
+    const issueCID = getIssueCID()
+    BeproService.network.getIssueByCID({ issueCID })
       .then(netIssue => {
         setNetworkIssue(netIssue);
         return netIssue._id;
       })
       .then(issueId => BeproService.network.isIssueInDraft({ issueId }))
-      .then((isIssueInDraft) => setIsIssueinDraft(isIssueInDraft))
+      .then((isIssueInDraft) => {
+        setIsIssueinDraft(isIssueInDraft)
+        //Update current issue
+        if(!isIssueinDraft && issue.state === 'draft'){
+          moveIssueToOpen(issueCID).then(data => {
+            setIssue(data[0])
+          })
+        }
+      })
       .catch(e => {
         console.error(`Failed to fetch network issue or draft state`, e);
       });

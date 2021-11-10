@@ -144,7 +144,7 @@ export default function PageActions({
 
   const renderRedeem = () => {
     return (
-      isIssueinDraft === true &&
+      isIssueinDraft &&
       issueCreator === currentAddress &&
       !finalized && (
         <Button
@@ -174,6 +174,7 @@ export default function PageActions({
 
   function renderPullrequest() {
     return (
+      !isIssueinDraft &&
       !finalized &&
       githubLogin && (
         <Button onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || !canOpenPR}>
