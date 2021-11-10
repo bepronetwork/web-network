@@ -9,8 +9,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   const issue = await models.issue.findOne({where: {githubId, repository_id,},});
   const repoInfo = await models.repositories.findOne({where: {id: repository_id}, raw: true});
 
-  const repo = repoInfo.githubPath.split(`/`)[1];
-  const owner = repoInfo.githubPath.split(`/`)[0];
+  const [owner, repo] = repoInfo.githubPath.split(`/`);
 
   const octoKit = new Octokit({auth: process.env.NEXT_GITHUB_TOKEN});
 
