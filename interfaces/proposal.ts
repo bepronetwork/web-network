@@ -8,5 +8,6 @@ export interface Proposal {
   isDisputed?: boolean;
   pullRequestId?: string;
   pullRequestGithubId?: string;
+  owner?: string;
   scMergeId: string;
 }

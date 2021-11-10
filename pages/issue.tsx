@@ -75,15 +75,7 @@ export default function PageIssue() {
         return netIssue._id;
       })
       .then(issueId => BeproService.network.isIssueInDraft({ issueId }))
-      .then((isIssueInDraft) => {
-        setIsIssueinDraft(isIssueInDraft)
-        //Update current issue
-        if(!isIssueinDraft && issue.state === 'draft'){
-          moveIssueToOpen(issueCID).then(data => {
-            setIssue(data[0])
-          })
-        }
-      })
+      .then((isIssueInDraft) => setIsIssueinDraft(isIssueInDraft))
       .catch(e => {
         console.error(`Failed to fetch network issue or draft state`, e);
       });
@@ -175,6 +167,8 @@ export default function PageIssue() {
           issueId={issue?.issueId}
           dbId={issue?.id}
           amount={networkIssue?.tokensStaked}
+          isFinished={networkIssue?.recognizedAsFinished}
+          repoPath={issue?.repo}
         />
       )}
       {networkIssue && <IssueProposalProgressBar
