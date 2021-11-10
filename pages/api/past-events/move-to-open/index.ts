@@ -1,25 +1,23 @@
 import {NextApiRequest, NextApiResponse} from 'next';
-import {subDays} from 'date-fns';
+import {subMilliseconds} from 'date-fns';
 import {Op} from 'sequelize';
 import models from '@db/models';
 import {Octokit} from 'octokit';
+import {CONTRACT_ADDRESS, WEB3_CONNECTION} from '../../../../env';
+import {Network} from 'bepro-js';
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const {scIssueId} = req.body;
-  let where;
 
-  if(scIssueId){
-    where = {
-      issueId: scIssueId
-    }
-  }
-  else{
-    where = {
-      createdAt: {[Op.lt]: subDays(+new Date(), 3),},
-      state: 'draft',
-    };
-  }
-  
+  const opt = {opt: {web3Connection: WEB3_CONNECTION,  privateKey: process.env.NEXT_PRIVATE_KEY}, test: true,};
+  const network = new Network({contractAddress: CONTRACT_ADDRESS, ...opt});
+
+  await network.start();
+  const redeemTime = (await network.redeemTime()) * 1000;
+
+  const where = {
+    createdAt: {[Op.lt]: subMilliseconds(+new Date(), redeemTime),},
+    state: 'draft',
+  };
 
   const issues = await models.issue.findAll({where});
   const octokit = new Octokit({auth: process.env.NEXT_GITHUB_TOKEN});
