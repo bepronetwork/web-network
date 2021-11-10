@@ -174,7 +174,7 @@ export default function PageActions({
 
   function renderPullrequest() {
     return (
-      !finalized &&
+      !finalized && !finished && !isIssueinDraft &&
       githubLogin && (
         <Button onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || !canOpenPR}>
           Create Pull Request
@@ -282,14 +282,14 @@ export default function PageActions({
 
               <GithubLink forcePath={repoPath} hrefPath={`issues/${githubId || ""}`}>view on github</GithubLink>
 
-              {!isClosedIssue(state) && githubLogin && <GithubLink color="primary" forcePath={repoPath} hrefPath="fork">work on this issue</GithubLink>}
+              {!isClosedIssue(state) && !finished && githubLogin && <GithubLink color="primary" forcePath={repoPath} hrefPath="fork">work on this issue</GithubLink>}
 
               {renderRedeem()}
               {renderProposeDestribution()}
               {!isClosedIssue(state) && githubLogin && renderPullrequest()}
               {state?.toLowerCase() == "pull request" && (
                 <>
-                  <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>Dispute</Button>
+                  { !isDisputed && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>Dispute</Button> || ``}
                   <Button onClick={handleClose}>Close</Button>
                 </>
               )}
