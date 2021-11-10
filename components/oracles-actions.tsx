@@ -73,9 +73,9 @@ function OraclesActions(): JSX.Element {
   function updateValues() {
     BeproService.getBalance('bepro')
                 .then(amount => {
-                  BeproService.network
-                              .isApprovedSettlerToken({address: currentAddress, amount})
-                              .then(updateErrorsAndApproval)
+                  BeproService?.network
+                              ?.isApprovedSettlerToken({address: currentAddress, amount})
+                              ?.then(updateErrorsAndApproval)
                 })
   }
 
@@ -165,8 +165,8 @@ function OraclesActions(): JSX.Element {
       return;
 
     BeproService.network
-                .isApprovedSettlerToken({address: BeproService.address, amount: tokenAmount})
-                .then(handleCheck);
+                ?.isApprovedSettlerToken({address: BeproService.address, amount: tokenAmount})
+                ?.then(handleCheck);
   }
 
   function getCurrentLabel(): TransactionCurrency {
@@ -222,12 +222,11 @@ function OraclesActions(): JSX.Element {
           <div className="mt-5 d-grid gap-3">
 
             {action === 'Lock' && <Button disabled={isApproveButtonDisabled()} onClick={approveSettlerToken}>Approve</Button>}
-            {isApproved &&
             <Button color={action === 'Lock' ? 'purple' : 'primary'} className="ms-0" disabled={isButtonDisabled()}
               onClick={checkLockedAmount}>
                   {isButtonDisabled() && <LockedIcon width={12} height={12} className="mr-1"/>}
                   <span>{renderInfo.label}</span>
-            </Button>}
+            </Button>
           </div>
 
           <NetworkTxButton

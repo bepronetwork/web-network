@@ -5,10 +5,21 @@ import models from '@db/models';
 import {Octokit} from 'octokit';
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const where = {
-    createdAt: {[Op.lt]: subDays(+new Date(), 3),},
-    state: 'draft',
-  };
+  const {scIssueId} = req.body;
+  let where;
+
+  if(scIssueId){
+    where = {
+      issueId: scIssueId
+    }
+  }
+  else{
+    where = {
+      createdAt: {[Op.lt]: subDays(+new Date(), 3),},
+      state: 'draft',
+    };
+  }
+  
 
   const issues = await models.issue.findAll({where});
   const octokit = new Octokit({auth: process.env.NEXT_GITHUB_TOKEN});
@@ -26,7 +37,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     await issue.save();
   }
 
-  return res.status(200).json(issues.length);
+  return res.status(200).json(issues);
 }
 
 export default async function MoveToOpen(req: NextApiRequest, res: NextApiResponse) {
