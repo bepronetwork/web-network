@@ -15,7 +15,7 @@ import {BeproService} from '@services/bepro-service';
 import {changeWalletState} from '@reducers/change-wallet-connect';
 import {changeCurrentAddress} from '@reducers/change-current-address';
 import CheckMarkIcon from '@assets/icons/checkmark-icon';
-import LockIcon from '@assets/icons/lock';
+import LockedIcon from '@assets/icons/locked-icon'
 import ErrorMarkIcon from '@assets/icons/errormark-icon';
 import {changeNetwork} from '@reducers/change-network';
 import {NetworkIds} from '@interfaces/enums/network-ids';
@@ -201,7 +201,7 @@ export default function ConnectAccount() {
                 className='me-3'
                 disabled={!isGhValid}
                 onClick={joinAddressToGh}>
-                {!isGhValid && <LockIcon  className="mr-1" width={14} height={14}/>}
+                {!isGhValid && <LockedIcon  className="mr-1" width={14} height={14}/>}
                 DONE
               </Button>
               <Button color='dark-gray'
