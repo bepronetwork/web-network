@@ -13,7 +13,7 @@ import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import {formatNumberToCurrency} from '@helpers/formatNumber'
 import { TransactionStatus } from '@interfaces/enums/transaction-status';
-import LockIcon from '@assets/icons/lock';
+import LockedIcon from '@assets/icons/locked-icon';
 import ReposDropdown from '@components/repos-dropdown';
 import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
@@ -241,7 +241,7 @@ export default function PageCreateIssue() {
                       : null
                     }
                     <Button disabled={isCreateButtonDisabled()}
-                            onClick={createIssue}>{isCreateButtonDisabled() && <LockIcon className="mr-1" width={13} height={13}/>}<span>Create Issue</span>
+                            onClick={createIssue}>{isCreateButtonDisabled() && <LockedIcon className="mr-1" width={13} height={13}/>}<span>Create Issue</span>
                     </Button>
                   </>
                 )}
