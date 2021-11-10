@@ -87,7 +87,7 @@ export default function PageActions({
       return (
         <a
           className="d-flex align-items-center text-decoration-none text-white-50 mx-1"
-          href="https://github.com/bepronetwork/webapp-community/network/members"
+          href={`https://github.com/${repoPath}/network/members`}
           target="_blank"
         >
           <IssueAvatars users={forks.map((item) => item.owner)} />
@@ -264,7 +264,6 @@ export default function PageActions({
           (block) => dispatch(updateTransaction(block))
         );
       })
-      // .then(() => handleBeproService())
       .catch((err) => {
         dispatch(updateTransaction({ ...(closeIssueTx.payload as any), remove: true }));
         console.error(`Error closing issue`, err);
