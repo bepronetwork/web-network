@@ -5,10 +5,10 @@ module.exports = {
   database: process.env.NEXT_DB_DATABASE || 'github',
   host: process.env.NEXT_DB_HOST || 'localhost',
   port: +process.env.NEXT_DB_PORT || 54320,
-  // "dialectOptions": {
-  //   "ssl": {
-  //     required: true,
-  //     rejectUnauthorized: false
-  //   },
-  // }
+  "dialectOptions": {
+    "ssl": {
+      required: true,
+      rejectUnauthorized: false
+    },
+  }
 }
