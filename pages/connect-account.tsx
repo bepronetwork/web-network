@@ -21,6 +21,7 @@ import {changeNetwork} from '@reducers/change-network';
 import {NetworkIds} from '@interfaces/enums/network-ids';
 import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
+import { CustomSession } from 'types/custom-session';
 
 
 export default function ConnectAccount() {
@@ -44,6 +45,7 @@ export default function ConnectAccount() {
       return;
 
     const user = await getUserWith(githubLogin);
+
     if (user && user.address && user.address !== currentAddress.toLowerCase()) {
       dispatch(toastError(`When migrating, address must match ${truncateAddress(user.address)}.`, undefined, {delay: 10000}));
       setIsGhValid(false)
