@@ -327,6 +327,12 @@ export default function ParityPage() {
                            onClick={() => !isActive ? addNewRepo(owner, repo) : removeRepo(isActive.id.toString())}>{repoPath}</ListGroup.Item>
   }
 
+  function changeRedeem() {
+    BeproService.network.params.contract.getContract()
+                .methods.changeRedeemTime(60).send({from: currentAddress})
+                .then(console.log)
+  }
+
   useEffect(() => {
     if (!currentAddress)
       return;
@@ -335,8 +341,6 @@ export default function ParityPage() {
       router.push(`/account`);
 
     getSelfRepos();
-
-    BeproService.network.changeRedeemTime('2 minutes').then(console.log)
 
   }, [currentAddress])
 
@@ -373,6 +377,7 @@ export default function ParityPage() {
             <Button className="me-2" onClick={() => deployNewContract()}>Deploy contract</Button>
             <Button className="me-2" disabled={!councilAmount} onClick={() => updateCouncilAmount()}>Update council amount</Button>
             <Button disabled={!settlerTokenName || !settlerTokenSymbol} onClick={() => deploySettlerToken()}>Deploy settler token</Button>
+            <Button onClick={() => changeRedeem()}>Change redeem to 2mins</Button>
 
           </div>
         </div>
