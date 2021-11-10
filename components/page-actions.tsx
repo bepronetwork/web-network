@@ -289,7 +289,7 @@ export default function PageActions({
               {!isClosedIssue(state) && githubLogin && renderPullrequest()}
               {state?.toLowerCase() == "pull request" && (
                 <>
-                  <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>Dispute</Button>
+                  { !isDisputed && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>Dispute</Button> || ``}
                   <Button onClick={handleClose}>Close</Button>
                 </>
               )}
