@@ -18,6 +18,7 @@ import {formatNumberToCurrency} from '@helpers/formatNumber';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import useRepos from '@x-hooks/use-repos';
 import useApi from '@x-hooks/use-api';
+import useMergeData from '@x-hooks/use-merge-data';
 
 interface ProposalBepro {
   disputes: string;
@@ -51,12 +52,15 @@ export default function PageProposal() {
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
   const [repo, setRepo] = useState(``);
-  const [[activeRepo]] = useRepos();
-  const {getUserOf, getIssue} = useApi();
+  const [[activeRepo], {findRepo, loadRepos}] = useRepos();
+  const {getUserOf,} = useApi();
+  const {getIssue,} = useMergeData();
 
   async function getProposalData() {
-    const [repoId, ghId] = (issueId as string).split(`/ `);
-    const issueData = await getIssue(repoId, ghId);
+    const [repoId, ghId] = (issueId as string).split(`/`);
+    const _repo = findRepo(+repoId);
+
+    const issueData = await getIssue(repoId, ghId, _repo?.githubPath);
 
     setIssueMicroService(issueData);
     setProposalMicroService(issueData.mergeProposals.find(({id}) => id === +dbId));
@@ -116,7 +120,7 @@ export default function PageProposal() {
     }
   }
 
-  useEffect(() => { loadProposalData() }, [currentAddress, issueId]);
+  useEffect(() => { loadProposalData() }, [currentAddress, issueId,]);
   useEffect(() => { updateUsersAddresses(proposalBepro) }, [proposalBepro, currentAddress]);
   useEffect(() => { setRepo(activeRepo?.githubPath) }, [activeRepo])
 
@@ -125,7 +129,7 @@ export default function PageProposal() {
       <ProposalHero
         githubId={issueMicroService?.githubId}
         title={issueMicroService?.title}
-        pullRequestId={proposalMicroService?.pullRequest.githubId}
+        pullRequestId={proposalMicroService?.pullRequest?.githubId}
         authorPullRequest={proposalBepro?.author}
         createdAt={proposalMicroService && formatDate(proposalMicroService.createdAt)}
         beproStaked={formatNumberToCurrency(amountIssue)}/>

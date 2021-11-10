@@ -32,7 +32,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
     try {
       const chainId = (window as any)?.ethereum?.chainId;
       if (+process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID !== +chainId) {
-        dispatch(changeNetwork(NetworkIds[+chainId]?.toLowerCase()))
+        dispatch(changeNetwork((NetworkIds[+chainId] || `unknown`)?.toLowerCase()))
         return;
       } else loggedIn = await BeproService.login();
     } catch (e) {
@@ -102,10 +102,12 @@ export default function ConnectWalletButton({children = null, forceLogin = false
     }
   }
 
-  const isButtonDisabled = (): boolean => [
-    isAddingNetwork,
-    activeNetwork === process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME
-  ].some(values => values)
+  function isButtonDisabled() {
+    return [
+      isAddingNetwork,
+      activeNetwork === process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME
+    ].some(values => values)
+  }
 
   if (asModal)
     return (

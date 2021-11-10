@@ -71,7 +71,7 @@ export default function PageActions({
     state: { githubHandle, currentAddress, myTransactions },
   } = useContext(ApplicationContext);
   const {query: {repoId, id}} = useRouter();
-  const {createPullRequestIssue} = useApi();
+  const {createPullRequestIssue, waitForRedeem, waitForClose, processEvent} = useApi();
 
   const [showPRModal, setShowPRModal] = useState(false);
 
@@ -114,16 +114,24 @@ export default function PageActions({
     dispatch(redeemTx);
     const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
 
+    waitForRedeem(issueId)
+      .then(() => {
+        handleBeproService(); handleMicroService();
+      })
+
     await BeproService.login()
       .then(() => {
         BeproService.network.redeemIssue({ issueId: issue_id })
-                    .then((txInfo) => BeproService.parseTransaction(txInfo, redeemTx.payload)
-                                            .then((block) => dispatch(updateTransaction(block))))
+                    .then((txInfo) => {
+                      processEvent(`redeem-issue`, txInfo.blockNumber, issue_id);
+                      return BeproService.parseTransaction(txInfo, redeemTx.payload)
+                                         .then((block) => dispatch(updateTransaction(block)))
+                    })
                     .then(() => {
                       BeproService.getBalance("bepro")
                                   .then((bepro) => dispatch(changeBalance({ bepro })))
                     })
-                    .then(() => { handleBeproService(); handleMicroService(); })
+                    // .then(() => { handleBeproService(); handleMicroService(); })
                     .catch((err) => {
                       dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
                       console.error(`Error redeeming`, err);
@@ -241,14 +249,21 @@ export default function PageActions({
 
     const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
 
+    waitForClose(issueId)
+      .then(() => {
+        handleBeproService(); handleMicroService();
+      })
+
     await BeproService.network
       .closeIssue({ issueID: issue_id, mergeID: mergeId })
       .then((txInfo) => {
-        BeproService.parseTransaction(txInfo, closeIssueTx.payload).then(
+        processEvent(`close-issue`, txInfo.blockNumber, issue_id);
+
+        return BeproService.parseTransaction(txInfo, closeIssueTx.payload).then(
           (block) => dispatch(updateTransaction(block))
         );
       })
-      .then(() => handleBeproService())
+      // .then(() => handleBeproService())
       .catch((err) => {
         dispatch(updateTransaction({ ...(closeIssueTx.payload as any), remove: true }));
         console.error(`Error closing issue`, err);
