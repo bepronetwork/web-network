@@ -16,12 +16,15 @@ interface Options {
   issueId: string;
   amount: number;
   beproStaked: number;
+  isFinished: boolean;
+  owner?: string;
   onDispute: (error?: boolean) => void;
 }
 
-export default function ProposalItem({proposal, dbId, issueId, amount, beproStaked, onDispute = () => {}}: Options) {
+export default function ProposalItem({proposal, dbId, issueId, amount, beproStaked, isFinished, owner, onDispute = () => {}}: Options) {
   const { dispatch,} = useContext(ApplicationContext);
-
+  proposal.isDisputed = true;
+  isFinished = false;
   async function handleDispute(mergeId) {
     const disputeTx = addTransaction({type: TransactionTypes.dispute});
     dispatch(disputeTx);
@@ -43,32 +46,57 @@ export default function ProposalItem({proposal, dbId, issueId, amount, beproStak
                       })
   }
 
+  function getColors(){
+    if(isFinished && !proposal.isDisputed){
+      return `success`
+    }
+
+    if(proposal.isDisputed){
+      return `danger`
+    }
+
+    return `purple`
+  }
+
+  function getLabel(){
+    if(isFinished && !proposal.isDisputed){
+      return `Accepted`
+    }
+
+    if(proposal.isDisputed){
+      return `Failed`
+    }
+
+    return `Dispute`
+  }
+
+  
   return <>
     <div className="container-list-item">
       <Link passHref href={{pathname: "/proposal", query: { prId: proposal.pullRequestId, mergeId: proposal.scMergeId, dbId, issueId },}}>
         <a className="text-decoration-none text-white">
           <div className="rounded row align-items-top">
-            <div className={`col-4 p-small cursor-pointer mt-2 ${proposal.isDisputed && `text-danger` || ``}`}>
-              PR #{proposal.pullRequestGithubId}
+            <div className={`col-4 p-small cursor-pointer mt-2 text-uppercase text-${getColors()}`}>
+              PR #{proposal.pullRequestGithubId} {owner && `BY ${owner}`}
             </div>
             <div className="col-4 cursor-pointer d-flex justify-content-start mb-2">
               {proposal.prAmounts.map((value, i) =>
-                                        <PercentageProgressBar textClass={`smallCaption p-small ${proposal.isDisputed ? `text-danger` : `color-purple`}`}
-                                                               pgClass={`bg-${proposal.isDisputed ? `danger` : `purple`}`}
+                                        <PercentageProgressBar textClass={`smallCaption p-small text-${getColors()}`}
+                                                               pgClass={`bg-${getColors()}`}
                                                                className={i+1 < proposal.prAmounts.length && `me-2` || ``}
-                                                               value={value} total={amount} />)}
+                                                               value={100000} total={amount} />)}
             </div>
 
             <div className="col-4 d-flex justify-content-between">
-              <ProposalProgressSmall pgClass={`bg-${proposal.isDisputed ? `danger` : `purple`}`}
-                                     value={+proposal.disputes}
+              <ProposalProgressSmall pgClass={`bg-${getColors()}`}
+                                     value={100000}
                                      total={beproStaked}
-                                     textClass={`pb-2 ${proposal.isDisputed ? `text-danger` : `color-purple`}`}/>
+                                     textClass={`pb-2 text-${getColors()}`}/>
               <div className="col justify-content-end d-flex">
-                <Button color={proposal.isDisputed ? `danger` : `purple`}
+                <Button color={getColors()}
                         outline={proposal.isDisputed} className={`align-self-center mb-2 ms-3`}
                         onClick={(ev) => { ev.stopPropagation(); handleDispute(+proposal._id) }}>
-                  {proposal.isDisputed ? `Failed` : `Dispute`}
+                        {getLabel()}
                 </Button>
               </div>
 
