@@ -43,8 +43,13 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
                     console.log(`Emitting `, `mergeProposal:created:${user?.githubLogin}:${scIssueId}:${pr?.githubId}`);
                     Bus.emit(`mergeProposal:created:${user?.githubLogin}:${scIssueId}:${pr?.githubId}`, merge)
+                    res.status(204);
                   }
                 })
+                .catch(error => {
+                  console.log(`Error reading MergeProposalCreated`, error);
+                  res.status(400);
+                });
 }
 
 export default async function ParseMergeCreateProposal(req: NextApiRequest, res: NextApiResponse) {
