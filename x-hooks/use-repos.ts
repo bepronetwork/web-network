@@ -20,7 +20,7 @@ export default function useRepos(): [[RepoInfo, ReposList], {findRepo(id?: numbe
   }
 
   useEffect(() => {
-    if (!repoList.length)
+    if (!repoList?.length)
       return;
 
     setActiveRepo(findRepo())
