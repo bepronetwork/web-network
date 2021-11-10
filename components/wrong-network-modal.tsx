@@ -21,7 +21,6 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
   const {state: {network: activeNetwork}} = useContext(ApplicationContext);
 
   function showModal() {
-    console.log(`activeNetwork`, activeNetwork, requiredNetwork)
     return activeNetwork && requiredNetwork && activeNetwork !== requiredNetwork;
   }
 
