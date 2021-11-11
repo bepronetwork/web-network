@@ -13,7 +13,7 @@ export default function MyOracles() {
   }
 
   return (
-    <Account buttonPrimaryActive={false}>
+    <Account>
 
       <div className="container">
         <div className="row justify-content-center mb-5 align-content-stretch">
