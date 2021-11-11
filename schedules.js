@@ -7,7 +7,7 @@ async function processPastEvents() {
   return client.get(`past-events/`)
     .then(({data}) => console.log(`Ran past events.`, data))
     .catch(error => console.log(`Error on past events`, error?.message || error))
-    .finally(() => setTimeout(async () => await processPastEvents(), 24*60*60*1000));
+    .finally(() => setTimeout(async () => await processPastEvents(), 1*60*60*1000));
 }
 
 async function moveToReady() {
