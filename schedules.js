@@ -5,14 +5,14 @@ const client = axios.create({baseURL: process.env.NEXT_PUBLIC_API_HOST + `/api/`
 
 async function processPastEvents() {
   return client.get(`past-events/`)
-    .then(data => console.log(`Ran past events.`, data))
+    .then(({data}) => console.log(`Ran past events.`, data))
     .catch(error => console.log(`Error on past events`, error))
     .finally(() => setTimeout(async () => await processPastEvents(), 24*60*60*1000));
 }
 
 async function moveToReady() {
   return client.get(`past-events/move-to-open/`)
-    .then(data => console.log(`Ran move to open.`, data))
+    .then(({data}) => console.log(`Ran move to open.`, data))
     .catch(error => console.log(`Error move to open`, error))
     .finally(() => setTimeout(async () => await processPastEvents(), 10*60*1000));
 }

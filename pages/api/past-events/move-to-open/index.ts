@@ -56,4 +56,6 @@ export default async function MoveToOpen(req: NextApiRequest, res: NextApiRespon
     default:
       res.status(405);
   }
+
+  res.end();
 }
