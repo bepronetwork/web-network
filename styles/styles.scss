@@ -508,6 +508,16 @@ p {
   }
 }
 
+.proposal {
+  &:nth-child(odd){
+    background-color: $bg-shadow;
+  }
+  
+  &:nth-child(even){
+    background-color: $dark-gray;
+  }
+}
+
 .content-proposals {
   padding: $m * 2;
   border-radius: math.div($m, 2);

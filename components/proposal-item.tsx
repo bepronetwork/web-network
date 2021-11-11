@@ -79,10 +79,10 @@ export default function ProposalItem({proposal, dbId, issueId, amount, beproStak
 
   
   return <>
-    <div className="container-list-item">
+    <div className="content-list-item proposal">
       <div className="rounded row align-items-top">
         <div className={`col-4 p-small mt-2 text-uppercase text-${getColors()}`}>
-          PR #{proposal.pullRequestGithubId} {owner && `BY ${owner}`}
+          PR #{proposal.pullRequestGithubId} {owner && `BY @${owner}`}
         </div>
         <div className="col-4 d-flex justify-content-start mb-2">
           {proposal.prAmounts.map((value, i) =>
