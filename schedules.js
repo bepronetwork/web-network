@@ -11,7 +11,7 @@ async function processPastEvents() {
 }
 
 async function moveToReady() {
-  return client.get(`past-events/move-to-open/`)
+  return client.post(`past-events/move-to-open/`)
     .then(({data}) => console.log(`Ran move to open.`, data))
     .catch(error => console.log(`Error move to open`, error))
     .finally(() => setTimeout(async () => await processPastEvents(), 10*60*1000));
