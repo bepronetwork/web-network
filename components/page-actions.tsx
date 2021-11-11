@@ -175,6 +175,7 @@ export default function PageActions({
   function renderPullrequest() {
     return (
       !isIssueinDraft &&
+      !finished &&
       !finalized &&
       githubLogin && (
         <Button onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || !canOpenPR}>
