@@ -12,7 +12,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   const network = new Network({contractAddress: CONTRACT_ADDRESS, ...opt});
 
   await network.start();
-  const redeemTime = (await network.redeemTime()) * 1000;
+  const redeemTime = (await network.params.contract.getContract().methods.redeemTime().call()) * 1000;
 
   const where = {
     createdAt: {[Op.lt]: subMilliseconds(+new Date(), redeemTime),},
