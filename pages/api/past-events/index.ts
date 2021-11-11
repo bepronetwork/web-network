@@ -9,7 +9,7 @@ const octokit = new Octokit({auth: process.env.NEXT_GITHUB_TOKEN});
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const bulk = await models.chainEvents.findOne({where: {name: `Bulk`}});
-  const fromBlock = bulk?.lastBlock || 1731488;
+  const fromBlock = bulk?.dataValues?.lastBlock || 1731488;
 
   const opt = {opt: {web3Connection: WEB3_CONNECTION,  privateKey: process.env.NEXT_PRIVATE_KEY}, test: true,};
   const network = new Network({contractAddress: CONTRACT_ADDRESS, ...opt});
@@ -20,7 +20,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const lastBlock = await web3.eth.getBlockNumber();
 
   const PER_PAGE = 1500;
-  const pages = Math.ceil(lastBlock / PER_PAGE);
+  const pages = Math.ceil((lastBlock - fromBlock) / PER_PAGE);
 
   let start = +fromBlock;
   let end = 0;
