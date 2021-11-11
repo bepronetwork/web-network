@@ -18,5 +18,5 @@ async function moveToReady() {
 }
 
 moveToReady();
-// processPastEvents();
+processPastEvents();
 
