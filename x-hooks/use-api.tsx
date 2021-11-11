@@ -9,7 +9,7 @@ import {BeproService} from '@services/bepro-service';
 const client = axios.create({baseURL: process.env.NEXT_API_HOST});
 client.interceptors.response.use(
   undefined,
-  error => { console.debug(`Failed`, error); return error; })
+  error => { console.debug(`Failed`, error); throw new Error(error); })
 
 interface Paginated<T = any> {
   count: number;
