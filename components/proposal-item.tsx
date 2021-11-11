@@ -84,12 +84,12 @@ export default function ProposalItem({proposal, dbId, issueId, amount, beproStak
                                         <PercentageProgressBar textClass={`smallCaption p-small text-${getColors()}`}
                                                                pgClass={`bg-${getColors()}`}
                                                                className={i+1 < proposal.prAmounts.length && `me-2` || ``}
-                                                               value={100000} total={amount} />)}
+                                                               value={value} total={amount} />)}
             </div>
 
             <div className="col-4 d-flex justify-content-between">
               <ProposalProgressSmall pgClass={`bg-${getColors()}`}
-                                     value={100000}
+                                     value={+proposal.disputes}
                                      total={beproStaked}
                                      textClass={`pb-2 text-${getColors()}`}/>
               <div className="col justify-content-end d-flex">
