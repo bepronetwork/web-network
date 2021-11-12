@@ -54,7 +54,7 @@ export default function ConnectAccount() {
 
     getUserOf(currentAddress)
                       .then(user => {
-                        setIsGhValid(user && user.githubHandle === session?.user.name || true)
+                        setIsGhValid(user && user.githubHandle === (session?.user.name || (session?.user as any).login) || true)
 
                         if (user?.githubLogin)
                           setGithubLogin(user.githubLogin);
@@ -84,12 +84,12 @@ export default function ConnectAccount() {
       return dispatch(toastError(`Migration not possible or already happened`));
     }
 
-    joinAddressToUser(session.user.name,{ address: currentAddress.toLowerCase(), migrate: !!migrate })
+    joinAddressToUser(session.user.name||githubLogin,{ address: currentAddress.toLowerCase(), migrate: !!migrate })
                       .then((result) => {
                         if (result === true) {
                           dispatch(toastSuccess(`Connected accounts!`))
                           dispatch(changeLoadState(false));
-                          dispatch(changeGithubHandle(session.user.name))
+                          dispatch(changeGithubHandle(session.user.name||githubLogin))
                           dispatch(changeGithubLogin(githubLogin))
                           return router.push(`/account`)
                         }
@@ -144,10 +144,8 @@ export default function ConnectAccount() {
 
   function setGhLoginBySession() {
     console.log(`session`, session, githubLogin);
-    let castedSession = session as CustomSession
-    
-    if(castedSession?.user.login !== githubLogin){
-      setGithubLogin(castedSession?.user?.login)
+    if((session?.user.name || (session?.user as any).login) !== githubLogin){
+      setGithubLogin(session?.user?.name || (session?.user as any)?.login)
     }
   }
 

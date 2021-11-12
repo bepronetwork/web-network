@@ -384,6 +384,10 @@ p {
       transition: 0.2s ease-in-out;
       cursor: pointer;
       border-radius: 0;
+      border: 0;
+      &:hover {
+        border: 0;
+      }
       .p-small {
         font-size: 12px;
         text-transform: uppercase;
@@ -678,6 +682,16 @@ label {
 
 // Overrides
 
+.proposal {
+  .text-danger {
+    color: rgba($danger, 1) !important;
+  }
+
+  .text-success {
+    color: rgba($success, 1);
+  }
+}
+
 .progress {
   height: math.div($m, 4);
   border-radius: math.div($m, 6);
@@ -686,6 +700,15 @@ label {
   .wrapper {
     position: absolute;
     height: math.div($m, 4);
+    background-color: #3e345b;
+  }
+
+  .wrapper-danger {
+    background-color: #895151;
+  }
+
+  .wrapper-success {
+    background-color: #4c8473;
   }
 
   &.bg-purple {
@@ -703,8 +726,9 @@ label {
     .progress-bar {
       background-color: rgba($danger, 1);
     }
+    
     .empty-dot {
-      background-color: #895151;
+      background-color: #895151 !important;
     }
   }
 
@@ -719,8 +743,27 @@ label {
   }
 
   .progress-bar {
+    z-index: 1;
     &.bg-info {
       background-color: $purple !important;
+    }
+
+    &.bg-purple {
+      .empty-dot {
+        background-color: #3e345b;
+      }
+    }
+  
+    &.bg-danger {
+      .empty-dot {
+        background-color: #895151 !important;
+      }
+    }
+  
+    &.bg-success {
+      .empty-dot {
+        background-color: #4c8473;
+      }
     }
   }
 
@@ -752,14 +795,6 @@ label {
   }
 }
 
-.progress {
-  background-color: $dark-gray;
-  //height: 4px;
-
-  .empty-dot {
-    background-color: $dark-gray;
-  }
-}
 
 .step{
   top: -10%;

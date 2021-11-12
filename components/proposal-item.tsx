@@ -82,7 +82,7 @@ export default function ProposalItem({proposal, dbId, issueId, amount, beproStak
   return <>
     <div className="content-list-item proposal">
       <div className="rounded row align-items-top">
-        <div className={`col-4 p-small mt-2 text-uppercase text-${getColors()}`}>
+        <div className={`col-4 p-small mt-2 text-uppercase text-${getColors() === 'purple' ? 'white' : getColors()}`}>
           PR #{proposal.pullRequestGithubId} {owner && `BY @${owner}`}
         </div>
         <div className="col-4 d-flex justify-content-start mb-2">
@@ -94,7 +94,7 @@ export default function ProposalItem({proposal, dbId, issueId, amount, beproStak
         </div>
 
         <div className="col-4 d-flex justify-content-between">
-          <ProposalProgressSmall pgClass={`bg-${getColors()}`}
+          <ProposalProgressSmall pgClass={`${getColors()}`}
                                   value={+proposal.disputes}
                                   total={beproStaked}
                                   textClass={`pb-2 text-${getColors()}`}/>
