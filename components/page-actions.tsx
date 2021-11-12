@@ -202,9 +202,8 @@ export default function PageActions({
         setShowPRModal(false);
       })
       .catch((err) => {
-        console.error("Error handling PR", err);
         if (err.response?.status === 422 && err.response?.data) {
-          err.response?.data.map((item) =>
+          err.response?.data.errors?.map((item) =>
             dispatch(
               addToast({
                 type: "danger",
