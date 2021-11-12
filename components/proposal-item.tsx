@@ -41,9 +41,9 @@ export default function ProposalItem({proposal, dbId, issueId, amount, beproStak
                       .then(txInfo => {
                         // BeproService.parseTransaction(txInfo, disputeTx.payload)
                         //             .then(block => {
-                                      dispatch(updateTransaction(block))
-                                      router.push({pathname: "/proposal", query: { prId: proposal.pullRequestId, mergeId: proposal.scMergeId, dbId, issueId },})
-                                    });
+                        //               dispatch(updateTransaction(block))
+                        //               router.push({pathname: "/proposal", query: { prId: proposal.pullRequestId, mergeId: proposal.scMergeId, dbId, issueId },})
+                        //             });
                       })
                       .then(() => onDispute())
                       .catch((err) => {
