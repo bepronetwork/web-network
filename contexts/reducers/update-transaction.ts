@@ -12,6 +12,8 @@ const reducer = (state: ApplicationState, payload: UpdateBlockTransaction): Appl
 
   state.myTransactions.splice(index, 1, ...!payload.remove ? [payload] : []);
 
+
+
   return ({...state, myTransactions: [...state.myTransactions]})
 }
 

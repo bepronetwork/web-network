@@ -145,17 +145,14 @@ function OraclesActions(): JSX.Element {
     const approveTx = addTransaction({type: TransactionTypes.approveSettlerToken});
     dispatch(approveTx);
     BeproService.network.approveSettlerERC20Token()
-                .then((txInfo) => {
-                  BeproService.parseTransaction(txInfo, approveTx.payload)
-                              .then(block => dispatch(updateTransaction(block)));
-                  return txInfo.status
-                })
                 .then(() => {
                   setIsApproved(true);
                   setError(``);
                 })
                 .catch(e => {
-                  dispatch(updateTransaction({...approveTx.payload as any, remove: true}));
+                  if (e?.message?.search(`User denied`) > -1)
+                    dispatch(updateTransaction({...approveTx.payload as any, remove: true}));
+
                   console.error(`Failed to approve settler token`, e);
               })
   }

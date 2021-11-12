@@ -33,8 +33,8 @@ export default function TransactionsList({onActiveTransaction = (transaction) =>
   }
 
   function renderTransactionRow(item: Transaction) {
-    const isPending = item.status === TransactionStatus.pending
-    const className = `h-100 w-100 px-3 py-2 tx-row mt-2 ${isPending ? 'cursor-now-allowed' : 'cursor-pointer'}`
+    const isPending = item.status === TransactionStatus.pending;
+    const className = `h-100 w-100 px-3 py-2 tx-row mt-2 cursor-pointer`
 
     return (
       <div className={className} onClick={() => !isPending && onActiveTransaction(item)} key={item.id}>

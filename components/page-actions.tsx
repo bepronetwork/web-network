@@ -124,8 +124,8 @@ export default function PageActions({
         BeproService.network.redeemIssue({ issueId: issue_id })
                     .then((txInfo) => {
                       processEvent(`redeem-issue`, txInfo.blockNumber, issue_id);
-                      return BeproService.parseTransaction(txInfo, redeemTx.payload)
-                                         .then((block) => dispatch(updateTransaction(block)))
+                      // return BeproService.parseTransaction(txInfo, redeemTx.payload)
+                      //                    .then((block) => dispatch(updateTransaction(block)))
                     })
                     .then(() => {
                       BeproService.getBalance("bepro")
@@ -133,11 +133,13 @@ export default function PageActions({
                     })
                     // .then(() => { handleBeproService(); handleMicroService(); })
                     .catch((err) => {
-                      dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
+                      if (err?.message?.search(`User denied`) > -1)
+                        dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
                       console.error(`Error redeeming`, err);
                     });
       }).catch((err) => {
-        dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
+        if (err?.message?.search(`User denied`) > -1)
+          dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
         console.error(`Error logging in`, err);
       })
   }
@@ -230,16 +232,15 @@ export default function PageActions({
 
     await BeproService.network
       .disputeMerge({ issueID: issue_id, mergeID: mergeId })
-      .then((txInfo) => {
-        BeproService.parseTransaction(txInfo, disputeTx.payload).then((block) =>
-          dispatch(updateTransaction(block))
-        );
-      })
+      // .then((txInfo) => {
+      //   BeproService.parseTransaction(txInfo, disputeTx.payload).then((block) =>
+      //     dispatch(updateTransaction(block))
+      //   );
+      // })
       .then(() => handleBeproService())
       .catch((err) => {
-        dispatch(
-          updateTransaction({ ...(disputeTx.payload as any), remove: true })
-        );
+        if (err?.message?.search(`User denied`) > -1)
+          dispatch(updateTransaction({ ...(disputeTx.payload as any), remove: true }));
         console.error("Error creating dispute", err);
       });
   }
@@ -260,12 +261,13 @@ export default function PageActions({
       .then((txInfo) => {
         processEvent(`close-issue`, txInfo.blockNumber, issue_id);
 
-        return BeproService.parseTransaction(txInfo, closeIssueTx.payload).then(
-          (block) => dispatch(updateTransaction(block))
-        );
+        // return BeproService.parseTransaction(txInfo, closeIssueTx.payload).then(
+        //   (block) => dispatch(updateTransaction(block))
+        // );
       })
       .catch((err) => {
-        dispatch(updateTransaction({ ...(closeIssueTx.payload as any), remove: true }));
+        if (err?.message?.search(`User denied`) > -1)
+          dispatch(updateTransaction({ ...(closeIssueTx.payload as any), remove: true }));
         console.error(`Error closing issue`, err);
       });
   }

@@ -110,11 +110,12 @@ export default function NewProposal({
                       .proposeIssueMerge(payload)
                       .then(txInfo => {
                         processEvent(`merge-proposal`, txInfo.blockNumber, issue_id);
-                        BeproService.parseTransaction(txInfo, proposeMergeTx.payload)
-                                    .then(block => dispatch(updateTransaction(block)));
+                        // BeproService.parseTransaction(txInfo, proposeMergeTx.payload)
+                        //             .then(block => dispatch(updateTransaction(block)));
                       })
-                      .catch(() => {
-                        dispatch(updateTransaction({...proposeMergeTx.payload as any, remove: true}))
+                      .catch((e) => {
+                        if (e?.message?.search(`User denied`) > -1)
+                          dispatch(updateTransaction({...proposeMergeTx.payload as any, remove: true}))
                         setError('Error to create proposal in Smart Contract')
                       })
   }
@@ -137,15 +138,16 @@ export default function NewProposal({
                   return BeproService.network.recognizeAsFinished({issueId: +_issue._id})
                 })
                 .then(txInfo => {
-                  BeproService.parseTransaction(txInfo, recognizeAsFinished.payload)
-                              .then(block => dispatch(updateTransaction(block)));
+                  // BeproService.parseTransaction(txInfo, recognizeAsFinished.payload)
+                  //             .then(block => dispatch(updateTransaction(block)));
                 })
                 .then(() => {
                   handleBeproService();
                   handleMicroService();
                 })
                 .catch((e) => {
-                  dispatch(updateTransaction({...recognizeAsFinished.payload as any, remove: true}))
+                  if (e?.message?.search(`User denied`) > -1)
+                    dispatch(updateTransaction({...recognizeAsFinished.payload as any, remove: true}))
                   dispatch(toastWarning(`Failed to mark issue as finished!`));
                   console.error(`Failed to mark as finished`, e);
                 })
