@@ -37,13 +37,14 @@ export default function usePendingIssue<S = IssueData>(): usePendingIssueReturn 
 
     return BeproService.network.openIssue({tokenAmount, cid})
                        .then(txInfo => {
-                         BeproService.parseTransaction(txInfo, openIssueTx.payload)
-                                     .then(block => dispatch(updateTransaction(block)))
+                         // BeproService.parseTransaction(txInfo, openIssueTx.payload)
+                         //             .then(block => dispatch(updateTransaction(block)))
                          return {githubId: pendingIssue.githubId, issueId: txInfo.events?.OpenIssue?.returnValues?.id};
                        })
                        .catch(e => {
                          console.error(`Failed to createIssue`, e);
-                         dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                         if (e?.message?.search(`User denied`) > -1)
+                          dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
                          return {};
                        });
   }
