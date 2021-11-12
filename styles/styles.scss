@@ -384,6 +384,10 @@ p {
       transition: 0.2s ease-in-out;
       cursor: pointer;
       border-radius: 0;
+      border: 0;
+      &:hover {
+        border: 0;
+      }
       .p-small {
         font-size: 12px;
         text-transform: uppercase;
