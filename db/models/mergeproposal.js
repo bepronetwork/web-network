@@ -23,6 +23,7 @@ module.exports = (sequelize) => {
     scMergeId: DataTypes.STRING,
     issueId: DataTypes.INTEGER,
     pullRequestId: DataTypes.INTEGER,
+    githubLogin: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'mergeProposal',

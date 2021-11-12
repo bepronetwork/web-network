@@ -2,23 +2,23 @@ import {NextApiRequest, NextApiResponse} from 'next';
 import {Bus} from '@helpers/bus';
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const {eventName, ...rest} = req.body;
+  const {meta: [eventName, ...rest]} = req.query;
 
   return new Promise((resolve) => {
     if (eventName === `mergeProposal`) {
-      const {login, scId, ghPrId} = rest;
+      const [login, scId, ghPrId] = rest;
       console.log(`Listening `, `mergeProposal:created:${login}:${scId}:${ghPrId}`);
       Bus.once(`mergeProposal:created:${login}:${scId}:${ghPrId}`, (merge) => resolve(res.json(merge)));
     }
 
     if (eventName === `closeIssue`) {
-      const {issueId} = rest;
+      const [issueId] = rest;
       console.log(`Listening `, `closeIssue:created:${issueId}`);
       Bus.once(`closeIssue:created:${issueId}`, (issue) => resolve(res.json(issue)));
     }
 
     if (eventName === `redeemIssue`) {
-      const {issueId} = rest;
+      const [issueId] = rest;
       console.log(`Listening redeemIssue:created:${issueId}`);
       Bus.once(`redeemIssue:created:${issueId}`, (issue) => resolve(res.json(issue)));
     }
