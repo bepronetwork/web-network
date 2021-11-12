@@ -21,29 +21,30 @@ export default NextAuth({
   ],
   callbacks: {
     async signIn({user, account, profile}) {
-      // console.log(`User`, user);
-      // console.log(`Account`, account);
-      // console.log(`Profile`, profile);
-      if (!user?.name || !profile?.login)
+      console.log(`User`, user);
+      console.log(`Account`, account);
+      console.log(`Profile`, profile);
+      if (!profile?.login)
         return `/?authError=Profile not found`;
 
       const find = await models.user.findOne({where: {githubLogin: profile.login}, raw: true,})
-
+      const name = profile?.name||profile.login;
       if (!find)
         await models.user.create({
-                                   githubHandle: user.name,
+                                   githubHandle: name,
                                    githubLogin: profile.login?.toString(),
                                    accessToken: account?.access_token,
                                  });
       else await models.user.update({accessToken: account?.access_token}, {where: {githubLogin: profile.login?.toString()}});
 
-      Timers[user.name.toString()] = setTimeout(async () => await models.user.destroy({where: {githubLogin: profile.login?.toString()}}), 60*1000)
+      Timers[name.toString()] = setTimeout(async () => await models.user.destroy({where: {githubLogin: profile.login?.toString()}}), 60*1000)
 
       return true;
     },
     async jwt({ token, user, account, profile, isNewUser }) {
       // console.log(`JWT`, token, user, account, profile, isNewUser);
       return {...token, ...profile};
+      // return token;
     },
     async session({ session, user, token }) {
       // console.log(`Session`, session, user, token);
