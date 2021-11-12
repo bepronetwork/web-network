@@ -1,15 +1,12 @@
 import axios from 'axios';
-import {API} from '../env';
-import {useEffect, useState} from 'react';
 import {IssueData} from '@interfaces/issue-data';
 import {ProposalData, User} from '@services/github-microservice';
 import {ReposList} from '@interfaces/repos-list';
-import {BeproService} from '@services/bepro-service';
 
 const client = axios.create({baseURL: process.env.NEXT_API_HOST});
 client.interceptors.response.use(
   undefined,
-  error => { console.debug(`Failed`, error); throw new Error(error); })
+  error => { console.debug(`Failed`, error); throw error; })
 
 interface Paginated<T = any> {
   count: number;
@@ -91,7 +88,9 @@ export default function useApi() {
   async function createPullRequestIssue(repoId: string, githubId: string, payload: {title: string; description: string; username: string;}) {
     return client.post(`/api/pull-request/`, {...payload, repoId, githubId})
                  .then(() => true)
-                 .catch(() => false)
+                 .catch((error) => {
+                   throw error
+                 })
   }
 
   async function createGithubData(payload: {githubHandle: string, githubLogin: string, accessToken: string}): Promise<boolean> {

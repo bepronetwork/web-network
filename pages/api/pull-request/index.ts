@@ -22,16 +22,19 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     draft: false
   }
 
-  const created = await octoKit.rest.pulls.create(options);
-  if (!created.data?.number)
-    return res.status(created.status).json(created.data)
+  try {
+    const created = await octoKit.rest.pulls.create(options);
 
-  await models.pullRequest.create({issueId: issue.id, githubId: created.data?.number,});
+    await models.pullRequest.create({issueId: issue.id, githubId: created.data?.number,});
 
-  issue.state = `ready`;
-  await issue.save();
+    issue.state = `ready`;
 
-  return res.json(`ok`);
+    await issue.save();
+  
+    return res.json(`ok`);
+  } catch(error) {
+    return res.status(error.response.status).json(error.response.data)
+  }
 }
 
 export default async function PullRequest(req: NextApiRequest, res: NextApiResponse) {
