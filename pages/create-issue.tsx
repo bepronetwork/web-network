@@ -59,13 +59,14 @@ export default function PageCreateIssue() {
                               .then(setAllowedTransaction)
                               .catch(() => setAllowedTransaction(false))
                               .finally(() => {
-                                BeproService.parseTransaction(txInfo, tmpTransactional.payload)
-                                            .then((info) => dispatch(updateTransaction(info)))
+                                // BeproService.parseTransaction(txInfo, tmpTransactional.payload)
+                                //             .then((info) => dispatch(updateTransaction(info)))
                               });
                 })
                 .catch(e => {
                   console.error(e);
-                  dispatch(updateTransaction({...tmpTransactional.payload as any, remove: true}));
+                  if (e?.message?.search(`User denied`) > -1)
+                    dispatch(updateTransaction({...tmpTransactional.payload as any, remove: true}));
                 })
 
   }
@@ -97,8 +98,8 @@ export default function PageCreateIssue() {
                           throw new Error(`Failed to create github issue!`);
                         return BeproService.network.openIssue({...contractPayload, cid: [repository_id, cid].join(`/`)})
                                            .then(txInfo => {
-                                             BeproService.parseTransaction(txInfo, openIssueTx.payload)
-                                                         .then(block => dispatch(updateTransaction(block)))
+                                             // BeproService.parseTransaction(txInfo, openIssueTx.payload)
+                                             //             .then(block => dispatch(updateTransaction(block)))
                                              return {
                                                githubId: cid,
                                                issueId: txInfo.events?.OpenIssue?.returnValues?.id && [repository_id, cid].join(`/`)
@@ -109,13 +110,14 @@ export default function PageCreateIssue() {
                         patchIssueWithScId(repository_id, githubId, issueId)
                           .then(async(result) => {
                             if (!result)
-                                return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                                return dispatch(toastError(`Error creating issue`));;
                             await router.push(`/issue?id=${githubId}&repoId=${repository_id}`)
                           }))
                       .catch(e => {
                         console.error(`Failed to createIssue`, e);
                         cleanFields();
-                        dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                        if (e?.message?.search(`User denied`) > -1)
+                          dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
                         dispatch(toastError(e.message || `Error creating issue`));
                         return false;
                       }).finally(()=> setRedirecting(false))

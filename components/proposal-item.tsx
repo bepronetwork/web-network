@@ -39,15 +39,16 @@ export default function ProposalItem({proposal, dbId, issueId, amount, beproStak
     const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
     await BeproService.network.disputeMerge({issueID: issue_id, mergeID: mergeId,})
                       .then(txInfo => {
-                        BeproService.parseTransaction(txInfo, disputeTx.payload)
-                                    .then(block => {
-                                      dispatch(updateTransaction(block))
-                                      router.push({pathname: "/proposal", query: { prId: proposal.pullRequestId, mergeId: proposal.scMergeId, dbId, issueId },})
-                                    });
+                        // BeproService.parseTransaction(txInfo, disputeTx.payload)
+                        //             .then(block => {
+                        //               dispatch(updateTransaction(block))
+                        //               router.push({pathname: "/proposal", query: { prId: proposal.pullRequestId, mergeId: proposal.scMergeId, dbId, issueId },})
+                        //             });
                       })
                       .then(() => onDispute())
                       .catch((err) => {
-                        dispatch(updateTransaction({...disputeTx.payload as any, remove: true}));
+                        if (err?.message?.search(`User denied`) > -1)
+                          dispatch(updateTransaction({...disputeTx.payload as any, remove: true}));
                         onDispute(true);
                         console.error("Error creating dispute", err)
                       })
@@ -77,7 +78,7 @@ export default function ProposalItem({proposal, dbId, issueId, amount, beproStak
     return `Dispute`
   }
 
-  
+
   return <>
     <div className="content-list-item proposal">
       <div className="rounded row align-items-top">
