@@ -68,20 +68,20 @@ function networkTxButton({
                               content: `${txMethod} ${txParams?.tokenAmount} ${txCurrency}`
                             }));
 
-          BeproService.parseTransaction(answer, tmpTransaction.payload)
-                      .then(info => {
-                        dispatch(updateTransaction(info))
-                      })
+          // BeproService.parseTransaction(answer, tmpTransaction.payload)
+          //             .then(info => {
+          //               dispatch(updateTransaction(info))
+          //             })
 
         } else {
           onFail(answer.message)
-          dispatch(addToast({type: 'danger', title: 'Failed'}));
-          dispatch(updateTransaction({...tmpTransaction.payload as any, remove: true}));
+          dispatch(addToast({type: 'danger', title: 'Failed', content: answer?.message}));
         }
       })
       .catch(e => {
         onFail(e.message);
-        dispatch(updateTransaction({...tmpTransaction.payload as any, remove: true}));
+        if (e?.message?.search(`User denied`) > -1)
+          dispatch(updateTransaction({...tmpTransaction.payload as any, remove: true}));
         console.error(e);
       })
 

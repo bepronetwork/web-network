@@ -20,13 +20,13 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
   const [details, setDetails] = useState<any>([]);
 
   function updateAddresses() {
-    if (!transaction || transaction.status === TransactionStatus.pending)
+    if (!transaction)
       return;
 
     const blockTransaction = transaction as BlockTransaction;
 
-    setAddressFrom(blockTransaction.addressFrom.substr(0, 15).concat(`...`));
-    setAddressTo(blockTransaction.addressTo.substr(0, 15).concat(`...`));
+    setAddressFrom(blockTransaction?.addressFrom?.substr(0, 15)?.concat(`...`));
+    setAddressTo(blockTransaction?.addressTo?.substr(0, 15)?.concat(`...`));
 
     const makeDetail = (span, content) => ({span, content})
     setDetails(

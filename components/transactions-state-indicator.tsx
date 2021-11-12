@@ -18,6 +18,12 @@ export default function TransactionsStateIndicator() {
     const loading = myTransactions.some(({status}) => status !== TransactionStatus.completed)
     setLoading(loading);
     setShowOverlay(loading);
+    if (activeTransaction) {
+      console.log(activeTransaction);
+      const tx = myTransactions.find(({id}) => id === activeTransaction.id);
+      console.log(`TX`, tx);
+      setActiveTransaction(tx);
+    }
   }
 
   function onActiveTransactionChange(transaction) {
