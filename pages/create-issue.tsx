@@ -110,7 +110,7 @@ export default function PageCreateIssue() {
                         patchIssueWithScId(repository_id, githubId, issueId)
                           .then(async(result) => {
                             if (!result)
-                                return dispatch(toastError(e.message || `Error creating issue`));;
+                                return dispatch(toastError(`Error creating issue`));;
                             await router.push(`/issue?id=${githubId}&repoId=${repository_id}`)
                           }))
                       .catch(e => {
