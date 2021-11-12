@@ -338,7 +338,9 @@ p {
 
 .main-nav {
   width: 100%;
-  height: 70px;
+  position: fixed;
+  z-index: 5;
+  height: $navbar-height;
   background-color: $blue;
   padding: 0px $m;
 
@@ -439,7 +441,7 @@ p {
   min-height: 240px;
   background-color: $blue;
   color: $white;
-  padding: $m * 3;
+  padding: ($navbar-height + $m * 3) $m * 3 $m * 3 $m * 3; 
   .banner-highlight {
     background-color: rgba($white, 0.1);
     padding: $m;
@@ -505,6 +507,16 @@ p {
     margin-right: -$m*2;
     padding-left: $m*2;
     padding-right: $m*2;
+  }
+}
+
+.proposal {
+  &:nth-child(odd){
+    background-color: $bg-shadow;
+  }
+  
+  &:nth-child(even){
+    background-color: $dark-gray;
   }
 }
 

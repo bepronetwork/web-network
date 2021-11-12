@@ -97,7 +97,7 @@ export default function MyIssues() {
     </>
 
   return (
-    <Account buttonPrimaryActive={true}>
+    <Account>
       <div className="container p-footer">
         <div className="row justify-content-center">
           {pendingIssues?.length &&
