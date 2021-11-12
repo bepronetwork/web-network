@@ -57,7 +57,7 @@ export default function PageProposal() {
   const {getIssue,} = useMergeData();
 
   async function getProposalData() {
-    const [repoId, ghId] = (issueId as string).split(`/`);
+    const [repoId, ghId] = String(issueId).split('/');
     const _repo = findRepo(+repoId);
 
     const issueData = await getIssue(repoId, ghId, _repo?.githubPath);
