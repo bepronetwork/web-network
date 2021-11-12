@@ -39,7 +39,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
                       return console.log(`Event was already parsed. mergeProposal:created:${user?.githubLogin}:${scIssueId}:${pr?.githubId}`);
                     }
 
-                    const merge = await models.mergeProposal.create({scMergeId, issueId: issue?.id, pullRequestId: pr?.id,});
+                    const merge = await models.mergeProposal.create({scMergeId, issueId: issue?.id, pullRequestId: pr?.id, githubLogin: user?.githubLogin});
 
                     console.log(`Emitting `, `mergeProposal:created:${user?.githubLogin}:${scIssueId}:${pr?.githubId}`);
                     Bus.emit(`mergeProposal:created:${user?.githubLogin}:${scIssueId}:${pr?.githubId}`, merge)

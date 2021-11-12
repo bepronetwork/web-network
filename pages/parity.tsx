@@ -152,8 +152,8 @@ export default function ParityPage() {
                                  throw new Error(`Failed to create github issue!`);
                                return BeproService.network.openIssue({...scPayload, cid: [repository_id, cid].join(`/`)})
                                                   .then(txInfo => {
-                                                    BeproService.parseTransaction(txInfo, openIssueTx.payload)
-                                                                .then(block => dispatch(updateTransaction(block)))
+                                                    // BeproService.parseTransaction(txInfo, openIssueTx.payload)
+                                                    //             .then(block => dispatch(updateTransaction(block)))
                                                     return {githubId: cid, issueId: txInfo.events?.OpenIssue?.returnValues?.id && [repository_id, cid].join(`/`)};
                                                   })
                              })
@@ -165,12 +165,13 @@ export default function ParityPage() {
                              })
                              .then(result => {
                                if (!result)
-                                 return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                                 // return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
                                return true;
                              })
                              .catch(e => {
                                console.error(`Failed to createIssue`, e);
-                               dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                               if (e?.message?.search(`User denied`) > -1)
+                                dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
                                return false;
                              })
 
