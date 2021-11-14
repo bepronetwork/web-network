@@ -37,7 +37,7 @@ export default function IssueProposals({ metaProposals, metaRequests, numberProp
     setProposals(pool);
   }
 
-  useEffect(() => { loadProposalsMeta() }, [issueId, numberProposals, currentAddress]);
+  useEffect(() => { loadProposalsMeta() }, [issueId, numberProposals, metaProposals, currentAddress, amount]);
 
   return (
     <div className="container">

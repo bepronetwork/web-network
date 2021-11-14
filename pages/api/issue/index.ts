@@ -46,6 +46,19 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
                .catch(_ => res.status(422).json(`nok`));
 }
 
+async function put(req: NextApiRequest, res: NextApiResponse) {
+  const {state, issueId} = req.body;
+
+  return models.issue.update({state}, {where: {issueId}})
+               .then(result => {
+                 if (!result[0])
+                   return res.status(422).json(`nok`)
+
+                 return res.status(200).json(result[0])
+               })
+               .catch(_ => res.status(422).json(`nok`));
+}
+
 export default async function Issue(req: NextApiRequest, res: NextApiResponse) {
 
   switch (req.method.toLowerCase()) {
@@ -55,6 +68,10 @@ export default async function Issue(req: NextApiRequest, res: NextApiResponse) {
 
     case 'patch':
       await patch(req, res);
+      break;
+    
+    case 'put':
+      await put(req, res);
       break;
 
     default:

@@ -37,14 +37,14 @@ export default function PageIssue() {
   const {getIssue} = useMergeData();
   const {getIssueComments, getForksOf, getUserRepos} = useOctokit();
   const [[activeRepo, reposList]] = useRepos();
-  const {getUserOf, moveIssueToOpen} = useApi();
+  const {getUserOf, putIssue} = useApi();
 
   function getIssueCID() {
     return [repoId, id].join(`/`)
   }
 
   function getsIssueMicroService() {
-    if (!activeRepo || issue)
+    if (!activeRepo)
       return;
 
     getIssue(repoId as string, id as string, activeRepo.githubPath)
@@ -64,7 +64,7 @@ export default function PageIssue() {
   }
 
   function getsIssueBeproService() {
-    if (!currentAddress || networkIssue)
+    if (!currentAddress)
       return;
 
     // bepro.network.getIssueByCID({ issueCID: getIssueCID() })
@@ -75,7 +75,14 @@ export default function PageIssue() {
         return netIssue._id;
       })
       .then(issueId => BeproService.network.isIssueInDraft({ issueId }))
-      .then((isIssueInDraft) => setIsIssueinDraft(isIssueInDraft))
+      .then((isIssueInDraft) => {
+          setIsIssueinDraft(isIssueInDraft)
+          if(!isIssueInDraft && issue.state === 'draft'){
+            putIssue(issueCID, 'ready').then(()=>{
+              setIssue((oldState)=>({...oldState, state: 'ready'}))
+            })
+          }
+      })
       .catch(e => {
         console.error(`Failed to fetch network issue or draft state`, e);
       });
@@ -95,7 +102,7 @@ export default function PageIssue() {
 
     console.log('active repo: ', activeRepo, githubLogin)
 
-    const path = `${githubLogin}/${activeRepo.githubPath.split(`/`)[1]}`
+    const m = `${githubLogin}/${activeRepo.githubPath.split(`/`)[1]}`
     getUserRepos(githubLogin, activeRepo.githubPath.split(`/`)[1])
       .then((repo) => {
         if (repo.data.fork && repo.data.parent?.full_name === activeRepo.githubPath)

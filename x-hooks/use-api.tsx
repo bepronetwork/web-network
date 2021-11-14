@@ -64,6 +64,12 @@ export default function useApi() {
                  .then(({data}) => data === `ok`)
                  .catch(_ => false)
   }
+  
+  async function putIssue(issueId, state) {
+    return client.put(`/api/issue`, {issueId, state})
+                 .then(({data}) => data)
+                 .catch(_ => false)
+  }
 
   async function getIssuesOfLogin(login: string, page = '1') {
     const search = new URLSearchParams({page, creator: login}).toString();
@@ -230,6 +236,7 @@ export default function useApi() {
     createIssue,
     moveIssueToOpen,
     patchIssueWithScId,
+    putIssue,
     waitForMerge,
     processMergeProposal,
     processEvent,
