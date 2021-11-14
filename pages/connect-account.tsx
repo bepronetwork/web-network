@@ -52,7 +52,7 @@ export default function ConnectAccount() {
 
     getUserOf(currentAddress)
                       .then(user => {
-                        setIsGhValid(user && user.githubHandle === (session?.user.name || (session?.user as any).login) || true)
+                        setIsGhValid(user && user.githubHandle === (session?.user.name || (session?.user as any)?.login) || true)
 
                         if (user?.githubLogin)
                           setGithubLogin(user.githubLogin);
@@ -142,7 +142,7 @@ export default function ConnectAccount() {
 
   function setGhLoginBySession() {
     console.log(`session`, session, githubLogin);
-    if((session?.user.name || (session?.user as any).login) !== githubLogin){
+    if((session?.user.name || (session?.user as any)?.login) !== githubLogin){
       setGithubLogin(session?.user?.name || (session?.user as any)?.login)
     }
   }
