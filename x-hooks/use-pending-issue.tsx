@@ -6,6 +6,7 @@ import {addTransaction} from '@reducers/add-transaction';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {IssueData} from '@interfaces/issue-data';
 import useApi from '@x-hooks/use-api';
+import {TransactionStatus} from '@interfaces/enums/transaction-status';
 
 interface usePendingIssueActions {
   treatPendingIssue(): Promise<boolean>,
@@ -45,6 +46,7 @@ export default function usePendingIssue<S = IssueData>(): usePendingIssueReturn 
                          console.error(`Failed to createIssue`, e);
                          if (e?.message?.search(`User denied`) > -1)
                           dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                         else dispatch(updateTransaction({...openIssueTx.payload as any, status: TransactionStatus.failed}));
                          return {};
                        });
   }

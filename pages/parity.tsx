@@ -16,6 +16,7 @@ import {ListGroup} from 'react-bootstrap';
 import ConnectGithub from '@components/connect-github';
 import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
+import {TransactionStatus} from '@interfaces/enums/transaction-status';
 
 export default function ParityPage() {
   const {state: {currentAddress, balance,}, dispatch} = useContext(ApplicationContext);
@@ -172,6 +173,8 @@ export default function ParityPage() {
                                console.error(`Failed to createIssue`, e);
                                if (e?.message?.search(`User denied`) > -1)
                                 dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                               else dispatch(updateTransaction({...openIssueTx.payload as any, status: TransactionStatus.failed}));
+
                                return false;
                              })
 

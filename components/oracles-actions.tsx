@@ -152,6 +152,7 @@ function OraclesActions(): JSX.Element {
                 .catch(e => {
                   if (e?.message?.search(`User denied`) > -1)
                     dispatch(updateTransaction({...approveTx.payload as any, remove: true}));
+                  else dispatch(updateTransaction({...approveTx.payload as any, status: TransactionStatus.failed}));
 
                   console.error(`Failed to approve settler token`, e);
               })

@@ -10,6 +10,7 @@ import {updateTransaction} from '@reducers/update-transaction';
 import {useContext} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import Button from './button';
+import {TransactionStatus} from '@interfaces/enums/transaction-status';
 
 interface Options {
   proposal: Proposal,
@@ -49,6 +50,7 @@ export default function ProposalItem({proposal, dbId, issueId, amount, beproStak
                       .catch((err) => {
                         if (err?.message?.search(`User denied`) > -1)
                           dispatch(updateTransaction({...disputeTx.payload as any, remove: true}));
+                        else dispatch(updateTransaction({...disputeTx.payload as any, status: TransactionStatus.failed}));
                         onDispute(true);
                         console.error("Error creating dispute", err)
                       })

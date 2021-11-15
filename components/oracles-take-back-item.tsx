@@ -7,6 +7,7 @@ import {addTransaction} from '@reducers/add-transaction';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import Button from './button';
+import {TransactionStatus} from '@interfaces/enums/transaction-status';
 
 interface Props extends ComponentPropsWithoutRef<"div"> {
   amount: string;
@@ -49,6 +50,7 @@ export default function OraclesTakeBackItem({
       console.error("OraclesTakeBackItem handleTakeBack", error);
       if (error?.message?.search(`User denied`) > -1)
         dispatch(updateTransaction({...delegateTx as any, remove: true}));
+      else dispatch(updateTransaction({...delegateTx.payload as any, status: TransactionStatus.failed}));
     }
   }
 

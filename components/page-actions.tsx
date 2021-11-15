@@ -135,11 +135,13 @@ export default function PageActions({
                     .catch((err) => {
                       if (err?.message?.search(`User denied`) > -1)
                         dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
+                      else dispatch(updateTransaction({...redeemTx.payload as any, status: TransactionStatus.failed}));
                       console.error(`Error redeeming`, err);
                     });
       }).catch((err) => {
         if (err?.message?.search(`User denied`) > -1)
           dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
+        else dispatch(updateTransaction({...redeemTx.payload as any, status: TransactionStatus.failed}));
         console.error(`Error logging in`, err);
       })
   }
@@ -241,6 +243,8 @@ export default function PageActions({
       .catch((err) => {
         if (err?.message?.search(`User denied`) > -1)
           dispatch(updateTransaction({ ...(disputeTx.payload as any), remove: true }));
+        else dispatch(updateTransaction({...disputeTx.payload as any, status: TransactionStatus.failed}));
+
         console.error("Error creating dispute", err);
       });
   }
@@ -268,6 +272,7 @@ export default function PageActions({
       .catch((err) => {
         if (err?.message?.search(`User denied`) > -1)
           dispatch(updateTransaction({ ...(closeIssueTx.payload as any), remove: true }));
+        else dispatch(updateTransaction({...closeIssueTx.payload as any, status: TransactionStatus.failed}));
         console.error(`Error closing issue`, err);
       });
   }
