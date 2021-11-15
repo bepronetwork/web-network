@@ -101,8 +101,11 @@ export default function NewProposal({
     waitForMerge(githubLogin, issue_id, currentGithubId)
                       .then(data => {
                         console.log(`GOT`, data);
-                        handleBeproService();
-                        handleMicroService();
+                        if (handleBeproService)
+                          handleBeproService(true);
+
+                        if (handleMicroService)
+                          handleMicroService(true);
                         handleClose();
                         setDistrib({});
                       })
@@ -144,8 +147,11 @@ export default function NewProposal({
                   //             .then(block => dispatch(updateTransaction(block)));
                 })
                 .then(() => {
-                  handleBeproService();
-                  handleMicroService();
+                  if (handleBeproService)
+                    handleBeproService(true);
+
+                  if (handleMicroService)
+                    handleMicroService(true);
                 })
                 .catch((e) => {
                   if (e?.message?.search(`User denied`) > -1)

@@ -30,8 +30,8 @@ interface pageActions {
   forks?: { owner: developer }[];
   title?: string;
   description?: string;
-  handleMicroService?: () => void;
-  handleBeproService?: () => void;
+  handleMicroService?: (force?: boolean) => void;
+  handleBeproService?: (force?: boolean) => void;
   githubLogin?: string;
   mergeId?: string;
   isDisputed?: boolean;
@@ -116,7 +116,11 @@ export default function PageActions({
 
     waitForRedeem(issueId)
       .then(() => {
-        handleBeproService(); handleMicroService();
+        if (handleBeproService)
+          handleBeproService(true);
+
+        if (handleMicroService)
+          handleMicroService(true);
       })
 
     await BeproService.login()
@@ -200,7 +204,8 @@ export default function PageActions({
             content: "Created pull request",
           })
         );
-        handleMicroService();
+        if (handleMicroService)
+          handleMicroService(true);
         setShowPRModal(false);
       })
       .catch((err) => {
@@ -257,7 +262,11 @@ export default function PageActions({
 
     waitForClose(issueId)
       .then(() => {
-        handleBeproService(); handleMicroService();
+        if (handleBeproService)
+          handleBeproService(true);
+
+        if (handleMicroService)
+          handleMicroService(true);
       })
 
     await BeproService.network
