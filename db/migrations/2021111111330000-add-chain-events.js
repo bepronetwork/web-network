@@ -1,4 +1,3 @@
-const ChainEventModel = require('../models/chain-events.model');
 const {DataTypes} = require("sequelize");
 
 module.exports = {
