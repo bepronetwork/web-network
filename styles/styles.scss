@@ -690,6 +690,11 @@ label {
   .text-success {
     color: rgba($success, 1);
   }
+
+  .btn-success {
+    background-color: rgba($success, 0.3);
+    color: $success !important;
+  }
 }
 
 .progress {
