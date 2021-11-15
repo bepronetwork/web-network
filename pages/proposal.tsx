@@ -138,7 +138,7 @@ export default function PageProposal() {
         createdAt={proposalMicroService && formatDate(proposalMicroService.createdAt)}
         beproStaked={formatNumberToCurrency(amountIssue)}/>
       <ProposalProgress developers={usersAddresses}/>
-      <CustomContainer>
+      <CustomContainer className="mgt-20 mgb-20">
         <div className="col-6">
           <ProposalProgressBar issueDisputeAmount={+proposalBepro?.disputes} isDisputed={proposalBepro?.isDisputed} stakedAmount={+beproStaked} />
         </div>
