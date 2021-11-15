@@ -29,8 +29,8 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
                       accessToken: req.body.accessToken,
                     })
 
-  if (Timers[user.githubHandle])
-    clearInterval(Timers[user.githubHandle]);
+  if (Timers[user.githubLogin])
+    clearInterval(Timers[user.githubLogin]);
 
   return res.status(204).json('ok');
 }
