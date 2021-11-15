@@ -37,7 +37,7 @@ export default function ProposalItem({
   const router = useRouter()
 
   async function handleDispute(mergeId) {
-    if (proposal.isDisputed)
+    if (proposal.isDisputed || isFinished)
       return;
 
     const disputeTx = addTransaction({type: TransactionTypes.dispute});
