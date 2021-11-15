@@ -284,7 +284,7 @@ export default function PageActions({
 
               <GithubLink forcePath={repoPath} hrefPath={`issues/${githubId || ""}`}>view on github</GithubLink>
 
-              {!isIssueinDraft && !isClosedIssue(state) && !finished && githubLogin && <GithubLink color="primary" forcePath={repoPath} hrefPath="fork">work on this issue</GithubLink>}
+              {!isIssueinDraft && canOpenPR && !isClosedIssue(state) && !finished && githubLogin && <GithubLink color="primary" forcePath={repoPath} hrefPath="fork">work on this issue</GithubLink>}
 
               {renderRedeem()}
               {renderProposeDestribution()}
