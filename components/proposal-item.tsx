@@ -27,9 +27,6 @@ export default function ProposalItem({proposal, dbId, issueId, amount, beproStak
   const { dispatch,} = useContext(ApplicationContext);
   const router = useRouter()
 
-  proposal.isDisputed = true;
-  isFinished = false;
-
   async function handleDispute(mergeId) {
     if (proposal.isDisputed)
       return;
