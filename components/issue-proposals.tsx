@@ -10,7 +10,7 @@ import useApi from '@x-hooks/use-api';
 import useOctokit from "@x-hooks/use-octokit";
 
 
-export default function IssueProposals({ metaProposals, metaRequests, numberProposals, issueId, amount, dbId,isFinished, repoPath }) {
+export default function IssueProposals({ metaProposals, metaRequests, numberProposals, issueId, amount, dbId,isFinished, repoPath, isFinalized = false }) {
   const { state: {beproStaked, currentAddress} } = useContext(ApplicationContext);
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const {getMergeProposal} = useApi();
@@ -45,7 +45,7 @@ export default function IssueProposals({ metaProposals, metaRequests, numberProp
         <div className="col-md-10">
           <div className="content-wrapper mb-4 pb-0">
             <h3 className="smallCaption pb-3">{numberProposals} {numberProposals > 1 ? 'Proposals' : 'Proposal'}</h3>
-            {proposals.map(proposal => <ProposalItem key={proposal._id} proposal={proposal} issueId={issueId} dbId={dbId} amount={amount} beproStaked={beproStaked} onDispute={loadProposalsMeta} isFinished={isFinished} owner={proposal.owner}/>)}
+            {proposals.map(proposal => <ProposalItem key={proposal._id} proposal={proposal} issueId={issueId} dbId={dbId} amount={amount} beproStaked={beproStaked} onDispute={loadProposalsMeta} isFinished={isFinalized} owner={proposal.owner}/>)}
           </div>
         </div>
       </div>

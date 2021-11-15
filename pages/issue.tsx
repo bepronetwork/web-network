@@ -169,6 +169,7 @@ export default function PageIssue() {
           dbId={issue?.id}
           amount={networkIssue?.tokensStaked}
           isFinished={networkIssue?.recognizedAsFinished}
+          isFinalized={networkIssue?.finalized}
           repoPath={issue?.repo}
         />
       )}
