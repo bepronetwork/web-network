@@ -8,7 +8,7 @@ export default function ProposalProgress({ developers = [] }) {
     <div className="container mt-up">
       <div className="row justify-content-center">
         <div className="col-md-10">
-          <div className="content-wrapper p-0 overflow-hidden mb-4">
+          <div className="content-wrapper p-0 overflow-hidden">
             <div className="d-flex align-items-center gap-1">
               {developers.map((developer, index) => (
                 <div
