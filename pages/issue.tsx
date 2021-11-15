@@ -32,12 +32,13 @@ export default function PageIssue() {
   const [isIssueinDraft, setIsIssueinDraft] = useState(false);
   const [commentsIssue, setCommentsIssue] = useState();
   const [forks, setForks] = useState();
+  const [canCreateFork, setCanCreateFork] = useState(false);
   const [canOpenPR, setCanOpenPR] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>();
   const {getIssue} = useMergeData();
-  const {getIssueComments, getForksOf, getUserRepos} = useOctokit();
+  const {getIssueComments, getForksOf, getUserRepos,} = useOctokit();
   const [[activeRepo, reposList]] = useRepos();
-  const {getUserOf, moveIssueToOpen} = useApi();
+  const {getUserOf, moveIssueToOpen, userHasPR} = useApi();
 
   function getIssueCID() {
     return [repoId, id].join(`/`)
@@ -93,15 +94,22 @@ export default function PageIssue() {
     if (!activeRepo || !githubLogin)
       return;
 
-    console.log('active repo: ', activeRepo, githubLogin)
-
-    const path = `${githubLogin}/${activeRepo.githubPath.split(`/`)[1]}`
     getUserRepos(githubLogin, activeRepo.githubPath.split(`/`)[1])
       .then((repo) => {
-        setCanOpenPR(repo.data?.fork)
+        setCanCreateFork(!repo.data?.fork)
       }).catch(e => {
         console.log(`Failed to get users repositories: `, e)
       })
+
+    userHasPR(`${repoId}/${id}`, githubLogin)
+      .then((result) => {
+        setCanOpenPR(!result)
+      })
+      .catch(e => {console.log(`Failed to list PRs`, e)});
+  }
+
+  function getPrForRepo() {
+
   }
 
   function loadIssueData() {
