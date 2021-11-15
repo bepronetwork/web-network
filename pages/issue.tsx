@@ -98,10 +98,7 @@ export default function PageIssue() {
     const path = `${githubLogin}/${activeRepo.githubPath.split(`/`)[1]}`
     getUserRepos(githubLogin, activeRepo.githubPath.split(`/`)[1])
       .then((repo) => {
-        if (repo.data.fork && repo.data.parent?.full_name === activeRepo.githubPath)
-          setCanOpenPR(true)
-        else
-          setCanOpenPR(false)
+        setCanOpenPR(repo.data?.fork)
       }).catch(e => {
         console.log(`Failed to get users repositories: `, e)
       })
