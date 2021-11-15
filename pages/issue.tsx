@@ -44,8 +44,8 @@ export default function PageIssue() {
     return [repoId, id].join(`/`)
   }
 
-  function getsIssueMicroService() {
-    if (!activeRepo || issue)
+  function getsIssueMicroService(force = false) {
+    if (!activeRepo || (!force && issue))
       return;
 
     getIssue(repoId as string, id as string, activeRepo.githubPath)
@@ -64,8 +64,8 @@ export default function PageIssue() {
       getForksOf(activeRepo.githubPath).then((frk) => setForks(frk.data as any));
   }
 
-  function getsIssueBeproService() {
-    if (!currentAddress || networkIssue)
+  function getsIssueBeproService(force = false) {
+    if (!currentAddress || (networkIssue && !force))
       return;
 
     // bepro.network.getIssueByCID({ issueCID: getIssueCID() })

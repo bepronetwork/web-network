@@ -67,7 +67,7 @@ export default function PageProposal() {
     setAmountIssue(issueData?.amount?.toString())
   }
 
-  async function getProposal() {
+  async function getProposal(force = false) {
 
     try {
       const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
