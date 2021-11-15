@@ -10,6 +10,7 @@ import {TransactionCurrency} from '@interfaces/transaction';
 import {updateTransaction} from '@reducers/update-transaction';
 import LockedIcon from '@assets/icons/locked-icon';
 import Button from './button';
+import {TransactionStatus} from '@interfaces/enums/transaction-status';
 
 interface NetworkTxButtonParams {
   txMethod: string;
@@ -82,6 +83,7 @@ function networkTxButton({
         onFail(e.message);
         if (e?.message?.search(`User denied`) > -1)
           dispatch(updateTransaction({...tmpTransaction.payload as any, remove: true}));
+        else dispatch(updateTransaction({...tmpTransaction.payload as any, status: TransactionStatus.failed}));
         console.error(e);
       })
 

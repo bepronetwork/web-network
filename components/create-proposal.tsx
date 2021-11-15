@@ -15,6 +15,7 @@ import {useRouter} from 'next/router';
 import useOctokit from '@x-hooks/use-octokit';
 import useRepos from '@x-hooks/use-repos';
 import useApi from '@x-hooks/use-api';
+import {TransactionStatus} from '@interfaces/enums/transaction-status';
 
 interface participants {
   githubHandle: string;
@@ -116,6 +117,7 @@ export default function NewProposal({
                       .catch((e) => {
                         if (e?.message?.search(`User denied`) > -1)
                           dispatch(updateTransaction({...proposeMergeTx.payload as any, remove: true}))
+                        else dispatch(updateTransaction({...proposeMergeTx.payload as any, status: TransactionStatus.failed}));
                         setError('Error to create proposal in Smart Contract')
                       })
   }
@@ -148,6 +150,7 @@ export default function NewProposal({
                 .catch((e) => {
                   if (e?.message?.search(`User denied`) > -1)
                     dispatch(updateTransaction({...recognizeAsFinished.payload as any, remove: true}))
+                  else dispatch(updateTransaction({...recognizeAsFinished.payload as any, status: TransactionStatus.failed}));
                   dispatch(toastWarning(`Failed to mark issue as finished!`));
                   console.error(`Failed to mark as finished`, e);
                 })

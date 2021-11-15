@@ -4,15 +4,15 @@ import {GetStaticProps} from 'next/types'
 import React, {useContext, useEffect, useState} from 'react';
 import {BeproService} from '@services/bepro-service';
 import InputNumber from '@components/input-number';
-import ConnectGithub from "@components/connect-github";
+import ConnectGithub from '@components/connect-github';
 import {ApplicationContext} from '@contexts/application';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import {addTransaction} from '@reducers/add-transaction';
-import {toastError, toastSuccess} from '@contexts/reducers/add-toast'
+import {toastError} from '@contexts/reducers/add-toast'
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import {formatNumberToCurrency} from '@helpers/formatNumber'
-import { TransactionStatus } from '@interfaces/enums/transaction-status';
+import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import LockedIcon from '@assets/icons/locked-icon';
 import ReposDropdown from '@components/repos-dropdown';
 import Button from '@components/button';
@@ -67,6 +67,7 @@ export default function PageCreateIssue() {
                   console.error(e);
                   if (e?.message?.search(`User denied`) > -1)
                     dispatch(updateTransaction({...tmpTransactional.payload as any, remove: true}));
+                  else dispatch(updateTransaction({...tmpTransactional.payload as any, status: TransactionStatus.failed}));
                 })
 
   }
@@ -118,6 +119,8 @@ export default function PageCreateIssue() {
                         cleanFields();
                         if (e?.message?.search(`User denied`) > -1)
                           dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                        else dispatch(updateTransaction({...openIssueTx.payload as any, status: TransactionStatus.failed}));
+
                         dispatch(toastError(e.message || `Error creating issue`));
                         return false;
                       }).finally(()=> setRedirecting(false))
