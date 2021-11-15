@@ -296,7 +296,7 @@ export default function PageActions({
               {renderIssueAvatars()}
               {forks && renderForkAvatars()}
 
-              <GithubLink forcePath={repoPath} hrefPath={`issues/${githubId || ""}`}>view on github</GithubLink>
+              <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`pull/${githubId || ""}`}>view on github</GithubLink>
 
               {!isIssueinDraft && canOpenPR && !isClosedIssue(state) && !finished && githubLogin && <GithubLink color="primary" forcePath={repoPath} hrefPath="fork">work on this issue</GithubLink>}
 

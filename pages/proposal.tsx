@@ -49,21 +49,24 @@ export default function PageProposal() {
   const [networkCid, setNetworkCid] = useState<string>();
   const [isFinalized, setIsFinalized] = useState<boolean>();
   const [isFinished, setIsFinished] = useState<boolean>();
+  const [prGithubId, setPrGithubId] = useState<string>();
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
   const [repo, setRepo] = useState(``);
-  const [[activeRepo], {findRepo, loadRepos}] = useRepos();
+  const [[activeRepo, repoList], {findRepo, loadRepos}] = useRepos();
   const {getUserOf,} = useApi();
   const {getIssue,} = useMergeData();
 
   async function getProposalData() {
-    const [repoId, ghId] = (issueId as string).split(`/`);
+    const [repoId, ghId] = String(issueId).split(`/`);
     const repos = await loadRepos();
     const _repo = repos.find(({id}) => id === +repoId);
 
     const issueData = await getIssue(repoId, ghId, _repo?.githubPath);
 
+    setRepo(_repo?.githubPath)
     setIssueMicroService(issueData);
+    setPrGithubId(issueData.pullRequests[0].githubId);
     setProposalMicroService(issueData.mergeProposals.find(({id}) => id === +dbId));
     setAmountIssue(issueData?.amount?.toString())
   }
@@ -150,6 +153,7 @@ export default function PageProposal() {
         mergeId={mergeId as string}
         handleBeproService={getProposal}
         isDisputed={proposalBepro?.isDisputed}
+        githubId={prGithubId}
         repoPath={repo}
         finished={isFinished} />
       <ProposalAddresses addresses={usersAddresses} currency="$BEPRO" />
