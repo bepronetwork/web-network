@@ -92,6 +92,15 @@ export default function useApi() {
                    throw error
                  })
   }
+  async function getPullRequestIssue(issueId: string) {
+    const search = new URLSearchParams({issueId}).toString();
+    return client.get<boolean>(`/api/pull-request?${search}`)
+                 .then(({data}) => data)
+                 .catch(e => {
+                   console.log(`Failed to fetch PR information`, e);
+                   return false;
+                 });
+  }
 
   async function createGithubData(payload: {githubHandle: string, githubLogin: string, accessToken: string}): Promise<boolean> {
     return client.post<string>(`/api/users/connect`, payload)
@@ -220,7 +229,7 @@ export default function useApi() {
   async function userHasPR(issueId: string, login: string) {
     const search = new URLSearchParams({issueId, login}).toString();
     return client.get<boolean>(`/api/pull-request?${search}`)
-                 .then(({data}) => data === true)
+                 .then(({data}) => !!data)
                  .catch(e => {
                    console.log(`Failed to fetch PR information`, e);
                    return false;
@@ -237,6 +246,7 @@ export default function useApi() {
     getUserWith,
     getPendingFor,
     createPullRequestIssue,
+    getPullRequestIssue,
     createIssue,
     moveIssueToOpen,
     patchIssueWithScId,
