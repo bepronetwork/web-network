@@ -26,8 +26,8 @@ export default function ProposalProgressSmall({pgClass = ``, value, total, textC
       <div className={`progress-bar bg-${pgClass}`}
            role="progressbar"
            style={{width: `${toRepresentationPercent(+percent, 3)}%`}}>
-        <div style={{...dotStyle, left: 0}} className={`rounded-circle position-absolute ${toRepresentationPercent(+percent, 3) > 0 ? `bg-${pgClass}` : `empty-dot`}`}/>
-        <div style={{...dotStyle, right: `10%`}} className={`rounded-circle position-absolute ${+toRepresentationPercent(+percent, 3) >= 100 ? `bg-${pgClass}` : `empty-dot`}`}/>
+        <div style={{...dotStyle, left: 0}} className={`rounded-circle position-absolute ${+percent > 0 ? `bg-${pgClass}` : `empty-dot`}`}/>
+        <div style={{...dotStyle, right: `10%`}} className={`rounded-circle position-absolute ${+toRepresentationPercent(+percent, 3) >= 90 ? `bg-${pgClass}` : `empty-dot`}`}/>
       </div>
     </div>
     <div className={`smallCaption ${textClass}`}>{percent}%</div>
