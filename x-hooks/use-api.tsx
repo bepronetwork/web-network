@@ -1,15 +1,12 @@
 import axios from 'axios';
-import {API} from '../env';
-import {useEffect, useState} from 'react';
 import {IssueData} from '@interfaces/issue-data';
 import {ProposalData, User} from '@services/github-microservice';
 import {ReposList} from '@interfaces/repos-list';
-import {BeproService} from '@services/bepro-service';
 
 const client = axios.create({baseURL: process.env.NEXT_API_HOST});
 client.interceptors.response.use(
   undefined,
-  error => { console.debug(`Failed`, error); return error; })
+  error => { console.debug(`Failed`, error); throw error; })
 
 interface Paginated<T = any> {
   count: number;
@@ -55,6 +52,13 @@ export default function useApi() {
                  .catch(() => null);
   }
 
+  async function moveIssueToOpen(scIssueId?: string) {
+    return client.post(`/api/past-events/move-to-open`, {scIssueId})
+                 .then(({data}) => data)
+                 .catch(() => null);
+  }
+
+
   async function patchIssueWithScId(repoId, githubId, scId) {
     return client.patch(`/api/issue`, {repoId, githubId, scId})
                  .then(({data}) => data === `ok`)
@@ -84,7 +88,9 @@ export default function useApi() {
   async function createPullRequestIssue(repoId: string, githubId: string, payload: {title: string; description: string; username: string;}) {
     return client.post(`/api/pull-request/`, {...payload, repoId, githubId})
                  .then(() => true)
-                 .catch(() => false)
+                 .catch((error) => {
+                   throw error
+                 })
   }
 
   async function createGithubData(payload: {githubHandle: string, githubLogin: string, accessToken: string}): Promise<boolean> {
@@ -172,9 +178,25 @@ export default function useApi() {
   }
 
   async function waitForMerge(githubLogin, issue_id, currentGithubId) {
-    return client.get(`/api/merge-proposal/poll/${githubLogin}/${issue_id}/${currentGithubId}`)
+    return client.get(`/api/poll/mergeProposal/${githubLogin}/${issue_id}/${currentGithubId}`)
                  .then(({data}) => data)
                  .catch(() => null)
+  }
+
+  async function waitForClose(currentGithubId) {
+    return client.get(`/api/poll/closeIssue/${currentGithubId}`)
+                 .then(({data}) => data)
+                 .catch(() => null)
+  }
+
+  async function waitForRedeem(currentGithubId) {
+    return client.get(`/api/poll/redeemIssue/${currentGithubId}`)
+                 .then(({data}) => data)
+                 .catch(() => null)
+  }
+
+  async function processEvent(eventName, fromBlock: number, id: number) {
+    return client.post(`/api/past-events/${eventName}/`, {fromBlock, id})
   }
 
   async function processMergeProposal(fromBlock, id) {
@@ -195,6 +217,16 @@ export default function useApi() {
                  });
   }
 
+  async function userHasPR(issueId: string, login: string) {
+    const search = new URLSearchParams({issueId, login}).toString();
+    return client.get<boolean>(`/api/pull-request?${search}`)
+                 .then(({data}) => data === true)
+                 .catch(e => {
+                   console.log(`Failed to fetch PR information`, e);
+                   return false;
+                 });
+  }
+
   return {
     getIssue,
     getReposList,
@@ -206,13 +238,18 @@ export default function useApi() {
     getPendingFor,
     createPullRequestIssue,
     createIssue,
+    moveIssueToOpen,
     patchIssueWithScId,
     waitForMerge,
     processMergeProposal,
+    processEvent,
     getMergeProposal,
     joinAddressToUser,
     getAllUsers,
     createRepo,
     removeRepo,
+    waitForClose,
+    waitForRedeem,
+    userHasPR,
   }
 }

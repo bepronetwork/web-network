@@ -36,10 +36,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
                     console.log(`Emitting redeemIssue:created:${issueId}`);
                     Bus.emit(`redeemIssue:created:${issueId}`, issue)
+                    res.status(204);
                   }
                 })
                 .catch(error => {
                   console.log(`Error reading RedeemIssue`, error);
+                  res.status(400);
                 });
 
 }

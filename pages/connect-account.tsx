@@ -15,12 +15,13 @@ import {BeproService} from '@services/bepro-service';
 import {changeWalletState} from '@reducers/change-wallet-connect';
 import {changeCurrentAddress} from '@reducers/change-current-address';
 import CheckMarkIcon from '@assets/icons/checkmark-icon';
-import LockIcon from '@assets/icons/lock';
+import LockedIcon from '@assets/icons/locked-icon'
 import ErrorMarkIcon from '@assets/icons/errormark-icon';
 import {changeNetwork} from '@reducers/change-network';
 import {NetworkIds} from '@interfaces/enums/network-ids';
 import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
+import { CustomSession } from '@interfaces/custom-session';
 
 
 export default function ConnectAccount() {
@@ -44,6 +45,7 @@ export default function ConnectAccount() {
       return;
 
     const user = await getUserWith(githubLogin);
+
     if (user && user.address && user.address !== currentAddress.toLowerCase()) {
       dispatch(toastError(`When migrating, address must match ${truncateAddress(user.address)}.`, undefined, {delay: 10000}));
       setIsGhValid(false)
@@ -113,7 +115,7 @@ export default function ConnectAccount() {
     try {
       const chainId = (window as any)?.ethereum?.chainId;
       if (+process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID !== +chainId) {
-        dispatch(changeNetwork(NetworkIds[+chainId]?.toLowerCase()))
+        dispatch(changeNetwork((NetworkIds[+chainId] || `unknown`)?.toLowerCase()))
         return;
       } else loggedIn = await BeproService.login();
     } catch (e) {
@@ -201,7 +203,7 @@ export default function ConnectAccount() {
                 className='me-3'
                 disabled={!isGhValid}
                 onClick={joinAddressToGh}>
-                {!isGhValid && <LockIcon  className="mr-1" width={14} height={14}/>}
+                {!isGhValid && <LockedIcon  className="mr-1" width={14} height={14}/>}
                 DONE
               </Button>
               <Button color='dark-gray'

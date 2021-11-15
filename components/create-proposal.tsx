@@ -15,6 +15,7 @@ import {useRouter} from 'next/router';
 import useOctokit from '@x-hooks/use-octokit';
 import useRepos from '@x-hooks/use-repos';
 import useApi from '@x-hooks/use-api';
+import {TransactionStatus} from '@interfaces/enums/transaction-status';
 
 interface participants {
   githubHandle: string;
@@ -42,7 +43,7 @@ export default function NewProposal({
   const router = useRouter();
   const [[activeRepo]] = useRepos();
   const {getParticipants} = useOctokit();
-  const {getUserWith, waitForMerge, processMergeProposal} = useApi();
+  const {getUserWith, waitForMerge, processMergeProposal, processEvent} = useApi();
 
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
@@ -100,8 +101,11 @@ export default function NewProposal({
     waitForMerge(githubLogin, issue_id, currentGithubId)
                       .then(data => {
                         console.log(`GOT`, data);
-                        handleBeproService();
-                        handleMicroService();
+                        if (handleBeproService)
+                          handleBeproService(true);
+
+                        if (handleMicroService)
+                          handleMicroService(true);
                         handleClose();
                         setDistrib({});
                       })
@@ -109,12 +113,14 @@ export default function NewProposal({
     await BeproService.network
                       .proposeIssueMerge(payload)
                       .then(txInfo => {
-                        processMergeProposal(txInfo.blockNumber, issue_id);
-                        BeproService.parseTransaction(txInfo, proposeMergeTx.payload)
-                                    .then(block => dispatch(updateTransaction(block)));
+                        processEvent(`merge-proposal`, txInfo.blockNumber, issue_id);
+                        // BeproService.parseTransaction(txInfo, proposeMergeTx.payload)
+                        //             .then(block => dispatch(updateTransaction(block)));
                       })
-                      .catch(() => {
-                        dispatch(updateTransaction({...proposeMergeTx.payload as any, remove: true}))
+                      .catch((e) => {
+                        if (e?.message?.search(`User denied`) > -1)
+                          dispatch(updateTransaction({...proposeMergeTx.payload as any, remove: true}))
+                        else dispatch(updateTransaction({...proposeMergeTx.payload as any, status: TransactionStatus.failed}));
                         setError('Error to create proposal in Smart Contract')
                       })
   }
@@ -137,15 +143,20 @@ export default function NewProposal({
                   return BeproService.network.recognizeAsFinished({issueId: +_issue._id})
                 })
                 .then(txInfo => {
-                  BeproService.parseTransaction(txInfo, recognizeAsFinished.payload)
-                              .then(block => dispatch(updateTransaction(block)));
+                  // BeproService.parseTransaction(txInfo, recognizeAsFinished.payload)
+                  //             .then(block => dispatch(updateTransaction(block)));
                 })
                 .then(() => {
-                  handleBeproService();
-                  handleMicroService();
+                  if (handleBeproService)
+                    handleBeproService(true);
+
+                  if (handleMicroService)
+                    handleMicroService(true);
                 })
                 .catch((e) => {
-                  dispatch(updateTransaction({...recognizeAsFinished.payload as any, remove: true}))
+                  if (e?.message?.search(`User denied`) > -1)
+                    dispatch(updateTransaction({...recognizeAsFinished.payload as any, remove: true}))
+                  else dispatch(updateTransaction({...recognizeAsFinished.payload as any, status: TransactionStatus.failed}));
                   dispatch(toastWarning(`Failed to mark issue as finished!`));
                   console.error(`Failed to mark as finished`, e);
                 })
@@ -160,7 +171,7 @@ export default function NewProposal({
   }
 
   function renderRecognizeAsFinished() {
-    return <Button onClick={() => recognizeAsFinished()}>Recognize as finished</Button>;
+    return <Button onClick={recognizeAsFinished}>Recognize as finished</Button>;
   }
 
   useEffect(() => {

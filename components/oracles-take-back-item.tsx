@@ -7,6 +7,7 @@ import {addTransaction} from '@reducers/add-transaction';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import Button from './button';
+import {TransactionStatus} from '@interfaces/enums/transaction-status';
 
 interface Props extends ComponentPropsWithoutRef<"div"> {
   amount: string;
@@ -37,15 +38,19 @@ export default function OraclesTakeBackItem({
     try {
 
       BeproService.network.unlock({tokenAmount: amount, from: address,})
-                  .then(txInfo =>
-                          BeproService.parseTransaction(txInfo, delegateTx.payload)
-                                      .then((block) => {
-                                        dispatch(updateTransaction(block));
-                                        onConfirm(txInfo.status);
-                                      }))
+                  .then(txInfo => {
+                    onConfirm(txInfo.status);
+                  })
+                          // BeproService.parseTransaction(txInfo, delegateTx.payload)
+                          //             .then((block) => {
+                          //               dispatch(updateTransaction(block));
+                          //               onConfirm(txInfo.status);
+                          //             }))
     } catch (error) {
       console.error("OraclesTakeBackItem handleTakeBack", error);
-      dispatch(updateTransaction({...delegateTx as any, remove: true}));
+      if (error?.message?.search(`User denied`) > -1)
+        dispatch(updateTransaction({...delegateTx as any, remove: true}));
+      else dispatch(updateTransaction({...delegateTx.payload as any, status: TransactionStatus.failed}));
     }
   }
 

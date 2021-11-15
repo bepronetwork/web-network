@@ -43,7 +43,7 @@ export default function CreatePullRequestModal({
           </div>
         </div>
         <div className="d-flex justify-content-center">
-          <Button className='mr-2' disabled={isButtonDisabled()} onClick={() => onConfirm({title, description})}>{isButtonDisabled() && <LockedIcon className='me-2'/>}Create pull request</Button>
+          <Button className='mr-2 pull-request-button' disabled={isButtonDisabled()} onClick={() => onConfirm({title, description})}>{isButtonDisabled() && <LockedIcon className='me-2'/>}Create pull request</Button>
           <Button color='dark-gray' onClick={onCloseClick}>cancel</Button>
         </div>
       </div>

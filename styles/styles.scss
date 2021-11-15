@@ -17,6 +17,23 @@ li {
   list-style: none;
 }
 
+.cursor-now-allowed {
+  cursor: not-allowed;
+}
+
+.pull-request-button {
+  height: 40px;
+  width: 215px;
+}
+
+.mgt-20 {
+  margin-top: 20px !important;
+}
+
+.mgb-20 {
+  margin-bottom: 20px !important;
+}
+
 .modal {
   &-header {
     padding-bottom: 0;
@@ -296,6 +313,13 @@ p {
   line-height: 160%;
 }
 
+.p-nm {
+  font-size: 14px;
+  line-height: 140%;
+  padding-left: 0;
+  font-weight: 400;
+}
+
 .text-bold {
   font-family: 'fontBold', sans-serif;
 }
@@ -322,7 +346,9 @@ p {
 
 .main-nav {
   width: 100%;
-  height: 70px;
+  position: fixed;
+  z-index: 5;
+  height: $navbar-height;
   background-color: $blue;
   padding: 0px $m;
 
@@ -366,6 +392,10 @@ p {
       transition: 0.2s ease-in-out;
       cursor: pointer;
       border-radius: 0;
+      border: 0;
+      &:hover {
+        border: 0;
+      }
       .p-small {
         font-size: 12px;
         text-transform: uppercase;
@@ -423,7 +453,7 @@ p {
   min-height: 240px;
   background-color: $blue;
   color: $white;
-  padding: $m * 3;
+  padding: ($navbar-height + $m * 3) $m * 3 $m * 3 $m * 3; 
   .banner-highlight {
     background-color: rgba($white, 0.1);
     padding: $m;
@@ -489,6 +519,16 @@ p {
     margin-right: -$m*2;
     padding-left: $m*2;
     padding-right: $m*2;
+  }
+}
+
+.proposal {
+  &:nth-child(odd){
+    background-color: $bg-shadow;
+  }
+  
+  &:nth-child(even){
+    background-color: $dark-gray;
   }
 }
 
@@ -650,10 +690,39 @@ label {
 
 // Overrides
 
+.proposal {
+  .text-danger {
+    color: rgba($danger, 1) !important;
+  }
+
+  .text-success {
+    color: rgba($success, 1);
+  }
+
+  .btn-success {
+    background-color: rgba($success, 0.3);
+    color: $success !important;
+  }
+}
+
 .progress {
   height: math.div($m, 4);
   border-radius: math.div($m, 6);
   background-color: rgba($white, 0.2);
+
+  .wrapper {
+    position: absolute;
+    height: math.div($m, 4);
+    background-color: #3e345b;
+  }
+
+  .wrapper-danger {
+    background-color: #895151;
+  }
+
+  .wrapper-success {
+    background-color: #4c8473;
+  }
 
   &.bg-purple {
     background-color: #3e345b;
@@ -670,8 +739,9 @@ label {
     .progress-bar {
       background-color: rgba($danger, 1);
     }
+    
     .empty-dot {
-      background-color: #895151;
+      background-color: #895151 !important;
     }
   }
 
@@ -686,8 +756,27 @@ label {
   }
 
   .progress-bar {
+    z-index: 1;
     &.bg-info {
       background-color: $purple !important;
+    }
+
+    &.bg-purple {
+      .empty-dot {
+        background-color: #3e345b;
+      }
+    }
+  
+    &.bg-danger {
+      .empty-dot {
+        background-color: #895151 !important;
+      }
+    }
+  
+    &.bg-success {
+      .empty-dot {
+        background-color: #4c8473;
+      }
     }
   }
 
@@ -719,14 +808,6 @@ label {
   }
 }
 
-.progress {
-  background-color: $dark-gray;
-  //height: 4px;
-
-  .empty-dot {
-    background-color: $dark-gray;
-  }
-}
 
 .step{
   top: -10%;

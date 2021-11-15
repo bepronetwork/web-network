@@ -15,7 +15,7 @@ import {changeBalance} from '@reducers/change-balance';
 import {formatNumberToCurrency} from 'helpers/formatNumber'
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import Button from './button';
-import LockIcon from "@assets/icons/lock"
+import LockedIcon from "@assets/icons/locked-icon"
 
 const actions: string[] = ["Lock", "Unlock"];
 
@@ -73,9 +73,9 @@ function OraclesActions(): JSX.Element {
   function updateValues() {
     BeproService.getBalance('bepro')
                 .then(amount => {
-                  BeproService.network
-                              .isApprovedSettlerToken({address: currentAddress, amount})
-                              .then(updateErrorsAndApproval)
+                  BeproService?.network
+                              ?.isApprovedSettlerToken({address: currentAddress, amount})
+                              ?.then(updateErrorsAndApproval)
                 })
   }
 
@@ -126,7 +126,7 @@ function OraclesActions(): JSX.Element {
 
   const isButtonDisabled = (): boolean => [
     tokenAmount < 1,
-    !isApproved,
+    action === 'Lock' && !isApproved,
     !currentAddress,
     tokenAmount > getMaxAmmount(),
     myTransactions.find(({status, type}) =>
@@ -145,17 +145,15 @@ function OraclesActions(): JSX.Element {
     const approveTx = addTransaction({type: TransactionTypes.approveSettlerToken});
     dispatch(approveTx);
     BeproService.network.approveSettlerERC20Token()
-                .then((txInfo) => {
-                  BeproService.parseTransaction(txInfo, approveTx.payload)
-                              .then(block => dispatch(updateTransaction(block)));
-                  return txInfo.status
-                })
                 .then(() => {
                   setIsApproved(true);
                   setError(``);
                 })
                 .catch(e => {
-                  dispatch(updateTransaction({...approveTx.payload as any, remove: true}));
+                  if (e?.message?.search(`User denied`) > -1)
+                    dispatch(updateTransaction({...approveTx.payload as any, remove: true}));
+                  else dispatch(updateTransaction({...approveTx.payload as any, status: TransactionStatus.failed}));
+
                   console.error(`Failed to approve settler token`, e);
               })
   }
@@ -165,8 +163,8 @@ function OraclesActions(): JSX.Element {
       return;
 
     BeproService.network
-                .isApprovedSettlerToken({address: BeproService.address, amount: tokenAmount})
-                .then(handleCheck);
+                ?.isApprovedSettlerToken({address: BeproService.address, amount: tokenAmount})
+                ?.then(handleCheck);
   }
 
   function getCurrentLabel(): TransactionCurrency {
@@ -222,12 +220,11 @@ function OraclesActions(): JSX.Element {
           <div className="mt-5 d-grid gap-3">
 
             {action === 'Lock' && <Button disabled={isApproveButtonDisabled()} onClick={approveSettlerToken}>Approve</Button>}
-            {isApproved &&
             <Button color={action === 'Lock' ? 'purple' : 'primary'} className="ms-0" disabled={isButtonDisabled()}
               onClick={checkLockedAmount}>
-                  {isButtonDisabled() && <LockIcon width={12} height={12} className="mr-1"/>}
+                  {isButtonDisabled() && <LockedIcon width={12} height={12} className="mr-1"/>}
                   <span>{renderInfo.label}</span>
-            </Button>}
+            </Button>
           </div>
 
           <NetworkTxButton

@@ -32,19 +32,20 @@ export default function PageIssue() {
   const [isIssueinDraft, setIsIssueinDraft] = useState(false);
   const [commentsIssue, setCommentsIssue] = useState();
   const [forks, setForks] = useState();
+  const [canCreateFork, setCanCreateFork] = useState(false);
   const [canOpenPR, setCanOpenPR] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>();
   const {getIssue} = useMergeData();
-  const {getIssueComments, getForksOf} = useOctokit();
+  const {getIssueComments, getForksOf, getUserRepos,} = useOctokit();
   const [[activeRepo, reposList]] = useRepos();
-  const {getUserOf} = useApi();
+  const {getUserOf, moveIssueToOpen, userHasPR} = useApi();
 
   function getIssueCID() {
     return [repoId, id].join(`/`)
   }
 
-  function getsIssueMicroService() {
-    if (!activeRepo || issue)
+  function getsIssueMicroService(force = false) {
+    if (!activeRepo || (!force && issue))
       return;
 
     getIssue(repoId as string, id as string, activeRepo.githubPath)
@@ -63,12 +64,13 @@ export default function PageIssue() {
       getForksOf(activeRepo.githubPath).then((frk) => setForks(frk.data as any));
   }
 
-  function getsIssueBeproService() {
-    if (!currentAddress || networkIssue)
+  function getsIssueBeproService(force = false) {
+    if (!currentAddress || (networkIssue && !force))
       return;
 
     // bepro.network.getIssueByCID({ issueCID: getIssueCID() })
-    BeproService.network.getIssueByCID({ issueCID: getIssueCID() })
+    const issueCID = getIssueCID()
+    BeproService.network.getIssueByCID({ issueCID })
       .then(netIssue => {
         setNetworkIssue(netIssue);
         return netIssue._id;
@@ -92,9 +94,18 @@ export default function PageIssue() {
     if (!activeRepo || !githubLogin)
       return;
 
-    const path = `${githubLogin}/${activeRepo.githubPath.split(`/`)[1]}`
-    getForksOf(path)
-      .then((repo) => setCanOpenPR(!!repo.data))
+    getUserRepos(githubLogin, activeRepo.githubPath.split(`/`)[1])
+      .then((repo) => {
+        setCanCreateFork(!repo.data?.fork)
+      }).catch(e => {
+        console.log(`Failed to get users repositories: `, e)
+      })
+
+    userHasPR(`${repoId}/${id}`, githubLogin)
+      .then((result) => {
+        setCanOpenPR(!result)
+      })
+      .catch(e => {console.log(`Failed to list PRs`, e)});
   }
 
   function loadIssueData() {
@@ -157,6 +168,9 @@ export default function PageIssue() {
           issueId={issue?.issueId}
           dbId={issue?.id}
           amount={networkIssue?.tokensStaked}
+          isFinished={networkIssue?.recognizedAsFinished}
+          isFinalized={networkIssue?.finalized}
+          repoPath={issue?.repo}
         />
       )}
       {networkIssue && <IssueProposalProgressBar

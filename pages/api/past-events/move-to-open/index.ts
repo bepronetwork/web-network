@@ -1,12 +1,21 @@
 import {NextApiRequest, NextApiResponse} from 'next';
-import {subDays} from 'date-fns';
+import {subMilliseconds} from 'date-fns';
 import {Op} from 'sequelize';
 import models from '@db/models';
 import {Octokit} from 'octokit';
+import {CONTRACT_ADDRESS, WEB3_CONNECTION} from '../../../../env';
+import {Network} from 'bepro-js';
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
+
+  const opt = {opt: {web3Connection: WEB3_CONNECTION,  privateKey: process.env.NEXT_PRIVATE_KEY}, test: true,};
+  const network = new Network({contractAddress: CONTRACT_ADDRESS, ...opt});
+
+  await network.start();
+  const redeemTime = (await network.params.contract.getContract().methods.redeemTime().call()) * 1000;
+
   const where = {
-    createdAt: {[Op.lt]: subDays(+new Date(), 3),},
+    createdAt: {[Op.lt]: subMilliseconds(+new Date(), redeemTime),},
     state: 'draft',
   };
 
@@ -26,7 +35,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     await issue.save();
   }
 
-  return res.status(200).json(issues.length);
+  return res.status(200).json(issues);
 }
 
 export default async function MoveToOpen(req: NextApiRequest, res: NextApiResponse) {
@@ -38,4 +47,6 @@ export default async function MoveToOpen(req: NextApiRequest, res: NextApiRespon
     default:
       res.status(405);
   }
+
+  res.end();
 }

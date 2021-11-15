@@ -4,16 +4,16 @@ import {GetStaticProps} from 'next/types'
 import React, {useContext, useEffect, useState} from 'react';
 import {BeproService} from '@services/bepro-service';
 import InputNumber from '@components/input-number';
-import ConnectGithub from "@components/connect-github";
+import ConnectGithub from '@components/connect-github';
 import {ApplicationContext} from '@contexts/application';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import {addTransaction} from '@reducers/add-transaction';
-import {toastError, toastSuccess} from '@contexts/reducers/add-toast'
+import {toastError} from '@contexts/reducers/add-toast'
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import {formatNumberToCurrency} from '@helpers/formatNumber'
-import { TransactionStatus } from '@interfaces/enums/transaction-status';
-import LockIcon from '@assets/icons/lock';
+import {TransactionStatus} from '@interfaces/enums/transaction-status';
+import LockedIcon from '@assets/icons/locked-icon';
 import ReposDropdown from '@components/repos-dropdown';
 import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
@@ -59,13 +59,15 @@ export default function PageCreateIssue() {
                               .then(setAllowedTransaction)
                               .catch(() => setAllowedTransaction(false))
                               .finally(() => {
-                                BeproService.parseTransaction(txInfo, tmpTransactional.payload)
-                                            .then((info) => dispatch(updateTransaction(info)))
+                                // BeproService.parseTransaction(txInfo, tmpTransactional.payload)
+                                //             .then((info) => dispatch(updateTransaction(info)))
                               });
                 })
                 .catch(e => {
                   console.error(e);
-                  dispatch(updateTransaction({...tmpTransactional.payload as any, remove: true}));
+                  if (e?.message?.search(`User denied`) > -1)
+                    dispatch(updateTransaction({...tmpTransactional.payload as any, remove: true}));
+                  else dispatch(updateTransaction({...tmpTransactional.payload as any, status: TransactionStatus.failed}));
                 })
 
   }
@@ -97,8 +99,8 @@ export default function PageCreateIssue() {
                           throw new Error(`Failed to create github issue!`);
                         return BeproService.network.openIssue({...contractPayload, cid: [repository_id, cid].join(`/`)})
                                            .then(txInfo => {
-                                             BeproService.parseTransaction(txInfo, openIssueTx.payload)
-                                                         .then(block => dispatch(updateTransaction(block)))
+                                             // BeproService.parseTransaction(txInfo, openIssueTx.payload)
+                                             //             .then(block => dispatch(updateTransaction(block)))
                                              return {
                                                githubId: cid,
                                                issueId: txInfo.events?.OpenIssue?.returnValues?.id && [repository_id, cid].join(`/`)
@@ -109,13 +111,16 @@ export default function PageCreateIssue() {
                         patchIssueWithScId(repository_id, githubId, issueId)
                           .then(async(result) => {
                             if (!result)
-                                return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                                return dispatch(toastError(`Error creating issue`));;
                             await router.push(`/issue?id=${githubId}&repoId=${repository_id}`)
                           }))
                       .catch(e => {
                         console.error(`Failed to createIssue`, e);
                         cleanFields();
-                        dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                        if (e?.message?.search(`User denied`) > -1)
+                          dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                        else dispatch(updateTransaction({...openIssueTx.payload as any, status: TransactionStatus.failed}));
+
                         dispatch(toastError(e.message || `Error creating issue`));
                         return false;
                       }).finally(()=> setRedirecting(false))
@@ -241,7 +246,7 @@ export default function PageCreateIssue() {
                       : null
                     }
                     <Button disabled={isCreateButtonDisabled()}
-                            onClick={createIssue}>{isCreateButtonDisabled() && <LockIcon className="mr-1" width={13} height={13}/>}<span>Create Issue</span>
+                            onClick={createIssue}>{isCreateButtonDisabled() && <LockedIcon className="mr-1" width={13} height={13}/>}<span>Create Issue</span>
                     </Button>
                   </>
                 )}
