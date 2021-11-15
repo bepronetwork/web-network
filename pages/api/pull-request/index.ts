@@ -2,7 +2,24 @@ import models from '@db/models';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Octokit} from 'octokit';
 
-async function get(req: NextApiRequest, res: NextApiResponse) {}
+async function get(req: NextApiRequest, res: NextApiResponse) {
+  const {login, issueId} = req.query;
+
+  console.log(req.query);
+
+  if (!login || !issueId)
+    return res.status(422);
+
+  const find = await models.issue.findOne({where: {issueId}});
+  if (!find)
+    return res.status(422);
+
+
+  const prs = await models.pullRequest.findOne({where: {issueId: find.id, githubLogin: login}, raw: true});
+
+  return res.status(200).json(!!prs)
+}
+
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {repoId: repository_id, githubId, title, description: body, username} = req.body;
 
@@ -25,12 +42,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   try {
     const created = await octoKit.rest.pulls.create(options);
 
-    await models.pullRequest.create({issueId: issue.id, githubId: created.data?.number,});
+    await models.pullRequest.create({issueId: issue.id, githubId: created.data?.number, githubLogin: username});
 
     issue.state = `ready`;
 
     await issue.save();
-  
+
     return res.json(`ok`);
   } catch(error) {
     return res.status(error.response.status).json(error.response.data)
