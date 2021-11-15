@@ -13,7 +13,7 @@ export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null
   }
 
   function toRepresentationPercent(value = 0, total = 5) {
-    return (value * 100) / total;
+    return value > 3 ? 100 : (value * 100) / total;
   }
 
   function getStateColor() {
@@ -46,11 +46,12 @@ export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null
     const dotClass = `rounded-circle bg-${!percentage || dotLabel >= percentage ? `dark` : issueColor}`;
     const style = {left: index === 0 ? `1%` : `${index*20}%`};
     const dotStyle = {width: `10px`, height: `10px`};
+    const isLastColumn = index+1 === columns.length
 
     return <>
       <div className="position-absolute d-flex align-items-center flex-column" style={style}>
         <div className={dotClass} style={dotStyle}>
-          <div className={`caption text-white mt-4 ms-1`}>{index+1 === columns.length ? `>` : ``}{dotLabel}%</div>
+          <div className={`caption ${isLastColumn ? `text-${issueColor}` : `text-white`} mt-4 ms-1`}>{isLastColumn ? `>` : ``}{dotLabel}%</div>
         </div>
       </div>
     </>
@@ -59,11 +60,11 @@ export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null
   useEffect(loadDisputeState, [stakedAmount, issueDisputeAmount, isDisputed]);
 
   return <>
-    <div className="row mb-2">
+    <div className="row mb-2 proposal-progress-bar">
       <div className="col d-flex justify-content-between">
         <h4 className={`h4 text-capitalize text-${issueColor}`}>{issueState}</h4>
         <div className="fs-small smallCaption d-flex align-items-center">
-          <span className={`text-${issueColor}`}>{issueDisputeAmount} </span> /{formatNumberToNScale(stakedAmount)} ORACLES <span className={`text-${issueColor}`}> ({percentage}%)</span>
+          <span className={`text-${issueColor}`}>{formatNumberToNScale(issueDisputeAmount)} </span> /{formatNumberToNScale(stakedAmount)} ORACLES <span className={`text-${issueColor}`}> ({percentage}%)</span>
         </div>
       </div>
     </div>
@@ -71,6 +72,7 @@ export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null
       <div className="ms-2 col-12 position-relative">
         <div className="progress bg-dark">
           <div className={`progress-bar bg-${issueColor}`} role="progressbar" style={{width: `${toRepresentationPercent(percentage)}%`}}>
+            {console.log(toRepresentationPercent(percentage))}
             {columns.map(renderColumn)}
           </div>
         </div>

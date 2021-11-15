@@ -31,7 +31,7 @@ li {
 }
 
 .mgb-20 {
-  margin-bottom: 20px !important;
+  margin-bottom: 50px !important;
 }
 
 .modal {
@@ -690,7 +690,7 @@ label {
 
 // Overrides
 
-.proposal {
+.proposal, .proposal-progress-bar {
   .text-danger {
     color: rgba($danger, 1) !important;
   }
