@@ -15,7 +15,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     return res.status(200).json(await models.user.findAll({raw: true, where: {githubLogin: {[Op.in]: users}}}));
 
   if (action === `address`)
-    return res.status(200).json(await models.user.findAll({raw: true, where: {address: users[0]}}));
+    return res.status(200).json(await models.user.findAll({raw: true, where: {address: {[Op.in]: users}}}));
 
   return res.status(404).json([]);
 
