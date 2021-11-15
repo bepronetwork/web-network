@@ -108,10 +108,6 @@ export default function PageIssue() {
       .catch(e => {console.log(`Failed to list PRs`, e)});
   }
 
-  function getPrForRepo() {
-
-  }
-
   function loadIssueData() {
     if (currentAddress && id) {
       getsIssueMicroService();
