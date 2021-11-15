@@ -16,6 +16,7 @@ import {ListGroup} from 'react-bootstrap';
 import ConnectGithub from '@components/connect-github';
 import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
+import {TransactionStatus} from '@interfaces/enums/transaction-status';
 
 export default function ParityPage() {
   const {state: {currentAddress, balance,}, dispatch} = useContext(ApplicationContext);
@@ -152,8 +153,8 @@ export default function ParityPage() {
                                  throw new Error(`Failed to create github issue!`);
                                return BeproService.network.openIssue({...scPayload, cid: [repository_id, cid].join(`/`)})
                                                   .then(txInfo => {
-                                                    BeproService.parseTransaction(txInfo, openIssueTx.payload)
-                                                                .then(block => dispatch(updateTransaction(block)))
+                                                    // BeproService.parseTransaction(txInfo, openIssueTx.payload)
+                                                    //             .then(block => dispatch(updateTransaction(block)))
                                                     return {githubId: cid, issueId: txInfo.events?.OpenIssue?.returnValues?.id && [repository_id, cid].join(`/`)};
                                                   })
                              })
@@ -165,12 +166,15 @@ export default function ParityPage() {
                              })
                              .then(result => {
                                if (!result)
-                                 return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                                 // return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
                                return true;
                              })
                              .catch(e => {
                                console.error(`Failed to createIssue`, e);
-                               dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                               if (e?.message?.search(`User denied`) > -1)
+                                dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
+                               else dispatch(updateTransaction({...openIssueTx.payload as any, status: TransactionStatus.failed}));
+
                                return false;
                              })
 
@@ -327,6 +331,12 @@ export default function ParityPage() {
                            onClick={() => !isActive ? addNewRepo(owner, repo) : removeRepo(isActive.id.toString())}>{repoPath}</ListGroup.Item>
   }
 
+  function changeRedeem() {
+    BeproService.network.params.contract.getContract()
+                .methods.changeRedeemTime(60).send({from: currentAddress})
+                .then(console.log)
+  }
+
   useEffect(() => {
     if (!currentAddress)
       return;
@@ -371,6 +381,7 @@ export default function ParityPage() {
             <Button className="me-2" onClick={() => deployNewContract()}>Deploy contract</Button>
             <Button className="me-2" disabled={!councilAmount} onClick={() => updateCouncilAmount()}>Update council amount</Button>
             <Button disabled={!settlerTokenName || !settlerTokenSymbol} onClick={() => deploySettlerToken()}>Deploy settler token</Button>
+            <Button onClick={() => changeRedeem()}>Change redeem to 2mins</Button>
 
           </div>
         </div>

@@ -32,7 +32,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
     try {
       const chainId = (window as any)?.ethereum?.chainId;
       if (+process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID !== +chainId) {
-        dispatch(changeNetwork(NetworkIds[+chainId]?.toLowerCase()))
+        dispatch(changeNetwork((NetworkIds[+chainId] || `unknown`)?.toLowerCase()))
         return;
       } else loggedIn = await BeproService.login();
     } catch (e) {
@@ -102,10 +102,12 @@ export default function ConnectWalletButton({children = null, forceLogin = false
     }
   }
 
-  const isButtonDisabled = (): boolean => [
-    isAddingNetwork,
-    activeNetwork === process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME
-  ].some(values => values)
+  function isButtonDisabled() {
+    return [
+      isAddingNetwork,
+      activeNetwork === process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME
+    ].some(values => values)
+  }
 
   if (asModal)
     return (
@@ -124,7 +126,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
                   <span className="text-white text-uppercase ms-2">metamask</span>
               </div>
         </div>
-        <Button className='my-3' disabled={isButtonDisabled()} onClick={handleAddNetwork}>add network</Button>
+        
         <div className="smallInfo text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-1 pt-1">
         by connecting, you accept{" "}
           <a

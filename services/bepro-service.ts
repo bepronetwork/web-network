@@ -105,15 +105,16 @@ class BeproFacet {
 
   public async parseTransaction(transaction, simpleTx?: SimpleBlockTransactionPayload) {
     const result = await this._bepro.web3.eth.getTransaction(transaction.transactionHash).catch(_ => null);
+    console.log(`TxResult`, result);
 
     return {
       ...simpleTx,
-      addressFrom: transaction.from,
-      addressTo: transaction.to,
-      transactionHash: transaction.transactionHash,
-      blockHash: transaction.blockHash,
+      addressFrom: (transaction||result).from,
+      addressTo: (transaction||result).to,
+      transactionHash: (transaction||result).transactionHash,
+      blockHash: (transaction||result).blockHash,
       confirmations: result?.nonce,
-      status: result && transaction.status ? TransactionStatus.completed : TransactionStatus.failed,
+      status: result && (transaction||result).status ? TransactionStatus.completed : TransactionStatus.failed,
     }
   }
 

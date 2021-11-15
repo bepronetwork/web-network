@@ -44,9 +44,13 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
                     console.log(`Emitting closeIssue:created:${issueId}`);
                     Bus.emit(`closeIssue:created:${issueId}`, issue)
                   }
+                  if (events.length)
+                    return res.status(200);
+                  else return res.status(204);
                 })
                 .catch(error => {
                   console.log(`Error reading CloseIssue`, error);
+                  return res.status(400);
                 });
 }
 

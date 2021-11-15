@@ -7,13 +7,14 @@ import { ApplicationContext } from "@contexts/application";
 import ProposalItem from '@components/proposal-item';
 import {Proposal} from '@interfaces/proposal';
 import useApi from '@x-hooks/use-api';
+import useOctokit from "@x-hooks/use-octokit";
 
 
-export default function IssueProposals({ metaProposals, metaRequests, numberProposals, issueId, amount, dbId }) {
+export default function IssueProposals({ metaProposals, metaRequests, numberProposals, issueId, amount, dbId,isFinished, repoPath, isFinalized = false }) {
   const { state: {beproStaked, currentAddress} } = useContext(ApplicationContext);
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const {getMergeProposal} = useApi();
-
+  const {getParticipants} = useOctokit()
   async function loadProposalsMeta() {
     if (!issueId)
       return;
@@ -43,8 +44,8 @@ export default function IssueProposals({ metaProposals, metaRequests, numberProp
       <div className="row justify-content-center">
         <div className="col-md-10">
           <div className="content-wrapper mb-4 pb-0">
-            <h3 className="smallCaption pb-3">{numberProposals} Proposals</h3>
-            {proposals.map(proposal => <ProposalItem key={proposal._id} proposal={proposal} issueId={issueId} dbId={dbId} amount={amount} beproStaked={beproStaked} onDispute={loadProposalsMeta} />)}
+            <h3 className="smallCaption pb-3">{numberProposals} {numberProposals > 1 ? 'Proposals' : 'Proposal'}</h3>
+            {proposals.map(proposal => <ProposalItem key={proposal._id} proposal={proposal} issueId={issueId} dbId={dbId} amount={amount} beproStaked={beproStaked} onDispute={loadProposalsMeta} isFinished={isFinalized} owner={proposal.owner}/>)}
           </div>
         </div>
       </div>

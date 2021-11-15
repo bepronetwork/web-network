@@ -6,9 +6,10 @@ import {Octokit} from 'octokit';
 import { Bus } from '@helpers/bus';
 
 const octokit = new Octokit({auth: process.env.NEXT_GITHUB_TOKEN});
-// last 1731488
+
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const {info: [fromBlock,]} = req.query;
+  const bulk = await models.chainEvents.findOne({where: {name: `Bulk`}});
+  const fromBlock = bulk?.dataValues?.lastBlock || 1731488;
 
   const opt = {opt: {web3Connection: WEB3_CONNECTION,  privateKey: process.env.NEXT_PRIVATE_KEY}, test: true,};
   const network = new Network({contractAddress: CONTRACT_ADDRESS, ...opt});
@@ -19,11 +20,14 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const lastBlock = await web3.eth.getBlockNumber();
 
   const PER_PAGE = 1500;
-  const pages = Math.ceil(lastBlock / PER_PAGE);
+  const pages = Math.ceil((lastBlock - fromBlock) / PER_PAGE);
 
   let start = +fromBlock;
+  let end = 0;
   for (let page = 1; page <= pages; page++) {
-    let end = start + PER_PAGE;
+    const nextEnd = start + PER_PAGE;
+    end = nextEnd > lastBlock ? lastBlock : nextEnd;
+
     console.log(`Reading from ${start} to ${end}; page: ${page} of ${pages}`);
     await contract.getPastEvents(`RedeemIssue`, {fromBlock: start, toBlock: end})
                   .then(async function redeemIssues(events) {
@@ -37,7 +41,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
                         Bus.emit(`redeemIssue:created:${issueId}`, issue)
                         return console.log(`Failed to find an issue to redeem or already redeemed`, event);
                       }
-                      
+
                       const repoInfo = await models.repositories.findOne({where: {id: issue?.repository_id}})
                       const [owner, repo] = repoInfo.githubPath.split(`/`);
                       await octokit.rest.issues.update({owner, repo, issue_number: issueId, state: 'closed',});
@@ -123,9 +127,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
                   });
 
     start+=PER_PAGE;
+    bulk.lastBlock = +end;
+    await bulk.save();
   }
 
-  return res.status(204);
+  return res.status(200).json(end);
 }
 
 export default async function PastEvents(req: NextApiRequest, res: NextApiResponse) {

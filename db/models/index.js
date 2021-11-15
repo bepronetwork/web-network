@@ -7,6 +7,7 @@ import User from './user';
 import * as MergeProposals from './mergeproposal';
 import * as PullRequests from './pullRequest.model';
 import * as Repositories from './repositories.model';
+import * as ChainEvents from './chain-events.model';
 
 const Database = {sequelize: null,};
 
@@ -18,6 +19,7 @@ Database.issue = Issues(sequelize);
 Database.mergeProposal = MergeProposals(sequelize);
 Database.repositories = Repositories(sequelize);
 Database.pullRequest = PullRequests(sequelize);
+Database.chainEvents = ChainEvents(sequelize);
 
 Object.values(Database).forEach((model) => {
   if (model?.associate)

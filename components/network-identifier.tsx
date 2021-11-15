@@ -24,7 +24,7 @@ export default function NetworkIdentifier() {
       return;
 
     const chainId = (window as any)?.ethereum?.chainId;
-    dispatch(changeNetwork(NetworkIds[+chainId]?.toLowerCase()))
+    dispatch(changeNetwork((NetworkIds[+chainId] || `unknown`)?.toLowerCase()))
 
   }
 

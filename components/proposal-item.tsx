@@ -1,3 +1,4 @@
+import {useRouter} from 'next/router';
 import {Proposal} from '@interfaces/proposal';
 import Link from 'next/link';
 import PercentageProgressBar from '@components/percentage-progress-bar';
@@ -9,6 +10,7 @@ import {updateTransaction} from '@reducers/update-transaction';
 import {useContext} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import Button from './button';
+import {TransactionStatus} from '@interfaces/enums/transaction-status';
 
 interface Options {
   proposal: Proposal,
@@ -16,63 +18,116 @@ interface Options {
   issueId: string;
   amount: number;
   beproStaked: number;
+  isFinished: boolean;
+  owner?: string;
   onDispute: (error?: boolean) => void;
 }
 
-export default function ProposalItem({proposal, dbId, issueId, amount, beproStaked, onDispute = () => {}}: Options) {
-  const { dispatch,} = useContext(ApplicationContext);
+export default function ProposalItem({
+                                       proposal,
+                                       dbId,
+                                       issueId,
+                                       amount,
+                                       beproStaked,
+                                       isFinished,
+                                       owner,
+                                       onDispute = () => {}
+                                     }: Options) {
+  const {dispatch,} = useContext(ApplicationContext);
+  const router = useRouter()
 
   async function handleDispute(mergeId) {
+    if (proposal.isDisputed || isFinished)
+      return;
+
     const disputeTx = addTransaction({type: TransactionTypes.dispute});
     dispatch(disputeTx);
-
-    if (proposal.isDisputed)
-      return;
 
     const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
     await BeproService.network.disputeMerge({issueID: issue_id, mergeID: mergeId,})
                       .then(txInfo => {
-                        BeproService.parseTransaction(txInfo, disputeTx.payload)
-                                    .then(block => dispatch(updateTransaction(block)));
+                        // BeproService.parseTransaction(txInfo, disputeTx.payload)
+                        //             .then(block => {
+                        //               dispatch(updateTransaction(block))
+                        //               router.push({pathname: "/proposal", query: { prId: proposal.pullRequestId, mergeId: proposal.scMergeId, dbId, issueId },})
+                        //             });
                       })
                       .then(() => onDispute())
                       .catch((err) => {
-                        dispatch(updateTransaction({...disputeTx.payload as any, remove: true}));
+                        if (err?.message?.search(`User denied`) > -1)
+                          dispatch(updateTransaction({...disputeTx.payload as any, remove: true}));
+                        else dispatch(updateTransaction({
+                                                          ...disputeTx.payload as any,
+                                                          status: TransactionStatus.failed
+                                                        }));
                         onDispute(true);
-                        console.error("Error creating dispute", err)
+                        console.error('Error creating dispute', err)
                       })
   }
 
+  function getColors() {
+    if (isFinished && !proposal.isDisputed) {
+      return `success`
+    }
+
+    if (proposal.isDisputed) {
+      return `danger`
+    }
+
+    return `purple`
+  }
+
+  function getLabel() {
+    if (isFinished && !proposal.isDisputed) {
+      return `Accepted`
+    }
+
+    if (proposal.isDisputed) {
+      return `Failed`
+    }
+
+    return `Dispute`
+  }
+
+
   return <>
-    <div className="container-list-item">
-      <Link passHref href={{pathname: "/proposal", query: { prId: proposal.pullRequestId, mergeId: proposal.scMergeId, dbId, issueId },}}>
+    <div className="content-list-item proposal">
+      <Link passHref href={{pathname: '/proposal', query: {prId: proposal.pullRequestId, mergeId: proposal.scMergeId, dbId, issueId},}}>
         <a className="text-decoration-none text-white">
           <div className="rounded row align-items-top">
-            <div className={`col-4 p-small cursor-pointer mt-2 ${proposal.isDisputed && `text-danger` || ``}`}>
-              PR #{proposal.pullRequestGithubId}
+            <div
+              className={`col-4 p-small mt-2 text-uppercase text-${getColors() === 'purple' ? 'white' : getColors()}`}>
+              PR #{proposal.pullRequestGithubId} {owner && `BY @${owner}`}
             </div>
-            <div className="col-4 cursor-pointer d-flex justify-content-start mb-2">
+            <div className="col-4 d-flex justify-content-start mb-2">
               {proposal.prAmounts.map((value, i) =>
-                                        <PercentageProgressBar textClass={`smallCaption p-small ${proposal.isDisputed ? `text-danger` : `color-purple`}`}
-                                                               pgClass={`bg-${proposal.isDisputed ? `danger` : `purple`}`}
-                                                               className={i+1 < proposal.prAmounts.length && `me-2` || ``}
-                                                               value={value} total={amount} />)}
+                                        <PercentageProgressBar textClass={`smallCaption p-small text-${getColors()}`}
+                                                               pgClass={`bg-${getColors()}`}
+                                                               className={i + 1 < proposal.prAmounts.length && `me-2` || ``}
+                                                               value={value} total={amount}/>)}
             </div>
 
             <div className="col-4 d-flex justify-content-between">
-              <ProposalProgressSmall pgClass={`bg-${proposal.isDisputed ? `danger` : `purple`}`}
+              <ProposalProgressSmall pgClass={`${getColors()}`}
                                      value={+proposal.disputes}
-                                     total={amount}
-                                     textClass={`pb-2 ${proposal.isDisputed ? `text-danger` : `color-purple`}`}/>
-              <Button color={proposal.isDisputed ? `danger` : `purple`}
-                      outline={proposal.isDisputed} className={`align-self-center mb-2 ms-3`}
-                      onClick={(ev) => { ev.stopPropagation(); handleDispute(+proposal._id) }}>
-                {proposal.isDisputed ? `Failed` : `Dispute`}
-              </Button>
+                                     total={beproStaked}
+                                     textClass={`pb-2 text-${getColors()}`}/>
+              <div className="col justify-content-end d-flex">
+                <Button color={getColors()}
+                        disabled={proposal.isDisputed}
+                        outline={proposal.isDisputed} className={`align-self-center mb-2 ms-3`}
+                        onClick={(ev) => {
+                          ev.stopPropagation();
+                          handleDispute(+proposal._id)
+                        }}>
+                  {getLabel()}
+                </Button>
+              </div>
+
             </div>
           </div>
         </a>
-    </Link>
+      </Link>
     </div>
-    </>
+  </>
 }

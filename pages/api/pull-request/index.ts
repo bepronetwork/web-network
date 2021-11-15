@@ -2,36 +2,56 @@ import models from '@db/models';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Octokit} from 'octokit';
 
-async function get(req: NextApiRequest, res: NextApiResponse) {}
+async function get(req: NextApiRequest, res: NextApiResponse) {
+  const {login, issueId} = req.query;
+
+  console.log(req.query);
+
+  if (!login || !issueId)
+    return res.status(422);
+
+  const find = await models.issue.findOne({where: {issueId}});
+  if (!find)
+    return res.status(422);
+
+
+  const prs = await models.pullRequest.findOne({where: {issueId: find.id, githubLogin: login}, raw: true});
+
+  return res.status(200).json(!!prs)
+}
+
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const {repoId: repository_id, githubId, title, description: body, username: owner} = req.body;
+  const {repoId: repository_id, githubId, title, description: body, username} = req.body;
 
   const issue = await models.issue.findOne({where: {githubId, repository_id,},});
   const repoInfo = await models.repositories.findOne({where: {id: repository_id}, raw: true});
 
-  const repo = repoInfo.split(`/`)[1];
+  const [owner, repo] = repoInfo.githubPath.split(`/`);
 
   const octoKit = new Octokit({auth: process.env.NEXT_GITHUB_TOKEN});
 
   const options = {
     accept: 'application/vnd.github.v3+json',
     owner, repo, title, body,
-    head: `${owner}:${process.env.NEXT_GITHUB_MAINBRANCH}`,
+    head: `${username}:${process.env.NEXT_GITHUB_MAINBRANCH}`,
     base: process.env.NEXT_GITHUB_MAINBRANCH,
     maintainer_can_modify: false,
     draft: false
   }
 
-  const created = await octoKit.rest.pulls.create(options);
-  if (!created.data?.number)
-    return res.status(created.status).json(created.data)
+  try {
+    const created = await octoKit.rest.pulls.create(options);
 
-  await models.pullRequest.create({issueId: issue.id, githubId: created.data?.number,});
+    await models.pullRequest.create({issueId: issue.id, githubId: created.data?.number, githubLogin: username});
 
-  issue.state = `ready`;
-  await issue.save();
+    issue.state = `ready`;
 
-  return res.json(`ok`);
+    await issue.save();
+
+    return res.json(`ok`);
+  } catch(error) {
+    return res.status(error.response.status).json(error.response.data)
+  }
 }
 
 export default async function PullRequest(req: NextApiRequest, res: NextApiResponse) {

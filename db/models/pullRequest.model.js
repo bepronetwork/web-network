@@ -21,7 +21,8 @@ module.exports = (sequelize,) => {
   };
   PullRequest.init({
     githubId: DataTypes.STRING,
-    issueId: DataTypes.INTEGER
+    issueId: DataTypes.INTEGER,
+    githubLogin: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'pullRequest',

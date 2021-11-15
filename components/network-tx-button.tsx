@@ -8,8 +8,9 @@ import {addToast} from '@reducers/add-toast';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {TransactionCurrency} from '@interfaces/transaction';
 import {updateTransaction} from '@reducers/update-transaction';
-import LockIcon from '@assets/icons/lock';
+import LockedIcon from '@assets/icons/locked-icon';
 import Button from './button';
+import {TransactionStatus} from '@interfaces/enums/transaction-status';
 
 interface NetworkTxButtonParams {
   txMethod: string;
@@ -68,20 +69,21 @@ function networkTxButton({
                               content: `${txMethod} ${txParams?.tokenAmount} ${txCurrency}`
                             }));
 
-          BeproService.parseTransaction(answer, tmpTransaction.payload)
-                      .then(info => {
-                        dispatch(updateTransaction(info))
-                      })
+          // BeproService.parseTransaction(answer, tmpTransaction.payload)
+          //             .then(info => {
+          //               dispatch(updateTransaction(info))
+          //             })
 
         } else {
           onFail(answer.message)
-          dispatch(addToast({type: 'danger', title: 'Failed'}));
-          dispatch(updateTransaction({...tmpTransaction.payload as any, remove: true}));
+          dispatch(addToast({type: 'danger', title: 'Failed', content: answer?.message}));
         }
       })
       .catch(e => {
         onFail(e.message);
-        dispatch(updateTransaction({...tmpTransaction.payload as any, remove: true}));
+        if (e?.message?.search(`User denied`) > -1)
+          dispatch(updateTransaction({...tmpTransaction.payload as any, remove: true}));
+        else dispatch(updateTransaction({...tmpTransaction.payload as any, status: TransactionStatus.failed}));
         console.error(e);
       })
 
@@ -103,7 +105,7 @@ function networkTxButton({
     <button className='d-none' ref={elementRef} onClick={makeTx} disabled={disabled}/>
 
     <Button color='purple' className={getButtonClass()} onClick={makeTx} disabled={disabled}>
-      {disabled && <LockIcon width={12} height={12} className="mr-1"/>} <span>{buttonLabel}</span>
+      {disabled && <LockedIcon width={12} height={12} className="mr-1"/>} <span>{buttonLabel}</span>
     </Button>
 
     <Modal show={showModal} title={modalTitle} footer={modalFooter}>
