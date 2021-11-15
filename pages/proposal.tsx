@@ -19,6 +19,9 @@ import ConnectWalletButton from '@components/connect-wallet-button';
 import useRepos from '@x-hooks/use-repos';
 import useApi from '@x-hooks/use-api';
 import useMergeData from '@x-hooks/use-merge-data';
+import Modal from '@components/modal';
+import Button from '@components/button';
+import GithubLink from '@components/github-link';
 
 interface ProposalBepro {
   disputes: string;
@@ -50,11 +53,13 @@ export default function PageProposal() {
   const [isFinalized, setIsFinalized] = useState<boolean>();
   const [isFinished, setIsFinished] = useState<boolean>();
   const [prGithubId, setPrGithubId] = useState<string>();
+  const [isMergiable, setIsMergiable] = useState<boolean>();
+  const [showModal, setShowModal] = useState<boolean>(false);
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
   const [repo, setRepo] = useState(``);
   const [[activeRepo, repoList], {findRepo, loadRepos}] = useRepos();
-  const {getUserOf,} = useApi();
+  const {getUserOf, getPullRequestIssue} = useApi();
   const {getIssue,} = useMergeData();
 
   async function getProposalData() {
@@ -114,6 +119,11 @@ export default function PageProposal() {
 
   function loadProposalData() {
     if (issueId && currentAddress) {
+      getPullRequestIssue(issueId.toString()).then((pr: any)=>{
+        setIsMergiable(pr.isMergeable)
+        setShowModal(!pr.isMergeable)
+      })
+
       BeproService.network.getOraclesSummary({address: currentAddress})
                   .then(oracles => dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles))))
                   .then(async () => {
@@ -127,7 +137,7 @@ export default function PageProposal() {
   useEffect(() => { loadProposalData() }, [currentAddress, issueId,]);
   useEffect(() => { updateUsersAddresses(proposalBepro) }, [proposalBepro, currentAddress]);
   useEffect(() => { setRepo(activeRepo?.githubPath) }, [activeRepo])
-
+  
   return (
     <>
       <ProposalHero
@@ -155,9 +165,21 @@ export default function PageProposal() {
         isDisputed={proposalBepro?.isDisputed}
         githubId={prGithubId}
         repoPath={repo}
+        canClose={isMergiable}
         finished={isFinished} />
       <ProposalAddresses addresses={usersAddresses} currency="$BEPRO" />
 
+      <Modal show={showModal} title="Proposal cannot be accepted" titlePosition="center">
+        <div>
+          <div className="d-flex justify-content-center m-2 text-center">
+            <p className="smallCaption trans mb-2 text-white-50 text-uppercase">this proposal has github conflicts and cannot be merged. please, fix it before doing so.</p>
+          </div>
+          <div className="d-flex justify-content-center">
+            <Button color='dark-gray' onClick={() => setShowModal(false)}>cancel</Button>
+            <GithubLink forcePath={repo} hrefPath={`pull/${prGithubId || ""}/conflicts`} color='primary'>View on github</GithubLink>
+          </div>
+        </div>
+      </Modal>
       <ConnectWalletButton asModal={true} />
     </>
   );
