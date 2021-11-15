@@ -58,7 +58,8 @@ export default function PageProposal() {
 
   async function getProposalData() {
     const [repoId, ghId] = (issueId as string).split(`/`);
-    const _repo = findRepo(+repoId);
+    const repos = await loadRepos();
+    const _repo = repos.find(({id}) => id === +repoId);
 
     const issueData = await getIssue(repoId, ghId, _repo?.githubPath);
 
