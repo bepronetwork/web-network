@@ -36,6 +36,7 @@ interface pageActions {
   mergeId?: string;
   isDisputed?: boolean;
   canOpenPR?: boolean;
+  canClose?: boolean;
   githubId?: string;
   finished?: boolean;
   issueCreator?: string;
@@ -61,6 +62,7 @@ export default function PageActions({
   mergeId,
   isDisputed,
   canOpenPR,
+  canClose = true,
   githubId = ``,
   finished = false,
   repoPath = ``,
@@ -306,7 +308,7 @@ export default function PageActions({
               {state?.toLowerCase() == "pull request" && (
                 <>
                   { (!isDisputed && !finalized ) && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>Dispute</Button> || ``}
-                  {!finalized && <Button onClick={handleClose}>Close</Button> || ``}
+                  {!finalized && <Button disabled={!canClose} onClick={handleClose}>Close</Button> || ``}
                 </>
               )}
             </div>
