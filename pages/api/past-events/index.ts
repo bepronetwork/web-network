@@ -5,7 +5,7 @@ import {CONTRACT_ADDRESS, WEB3_CONNECTION} from '../../../env';
 import {Octokit} from 'octokit';
 import { Bus } from '@helpers/bus';
 
-const octokit = new Octokit({auth: process.env.NEXT_GITHUB_TOKEN});
+const octokit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const bulk = await models.chainEvents.findOne({where: {name: `Bulk`}});
