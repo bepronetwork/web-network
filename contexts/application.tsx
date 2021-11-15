@@ -127,18 +127,25 @@ export default function ApplicationContextProvider({children}) {
                         if (!cheatAddress || !waitingForTx)
                           return;
 
-                        web3.eth.getTransaction(transactionHash)
-                            .then(result => {
-                              return {
-                                ...waitingForTx,
-                                addressFrom: result.from,
-                                addressTo: result.to,
-                                transactionHash: result.transactionHash || transactionHash,
-                                blockHash: result.blockHash,
-                                confirmations: result?.nonce,
-                                status: TransactionStatus.pending,
-                              }
-                            })
+                        const getTx = (txHash) => web3.eth.getTransaction(transactionHash)
+                                                      .then(result => {
+                                                        if (!result)
+                                                          return getTx(transactionHash);
+                                                        return {
+                                                          ...waitingForTx,
+                                                          addressFrom: result.from,
+                                                          addressTo: result.to,
+                                                          transactionHash: result.transactionHash || transactionHash,
+                                                          blockHash: result.blockHash,
+                                                          confirmations: result?.nonce,
+                                                          status: TransactionStatus.pending,
+                                                        }
+                                                      })
+                                                      .catch((error) => {
+                                                        console.log(`Failed to getTransaction`, error)
+                                                        return getTx(transactionHash);
+                                                      })
+                        getTx(transactionHash)
                             .then(tx => {
                               if (tx?.addressFrom === cheatAddress) {
                                 dispatch(updateTransaction(tx));
@@ -153,7 +160,9 @@ export default function ApplicationContextProvider({children}) {
                                 waitTillReceipt();
                               }
                             })
-                            .catch(_ => null);
+                            .catch(_ => {
+                              console.log(`Failed to subscribe to pastEvents`, _);
+                            });
                       }))
   }
 
