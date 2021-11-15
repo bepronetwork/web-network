@@ -25,8 +25,11 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
 
     const blockTransaction = transaction as BlockTransaction;
 
-    setAddressFrom(blockTransaction?.addressFrom?.substr(0, 15)?.concat(`...`));
-    setAddressTo(blockTransaction?.addressTo?.substr(0, 15)?.concat(`...`));
+    let blockFrom = blockTransaction?.addressFrom
+    let blockTo = blockTransaction?.addressTo
+
+    setAddressFrom(blockFrom?.substr(0, 12)?.concat(`...`).concat(blockFrom?.substr(blockFrom?.length - 3, blockFrom.length)));
+    setAddressTo(blockTo?.substr(0, 12)?.concat(`...`).concat(blockTo?.substr(blockTo?.length - 3, blockTo.length)));
 
     const makeDetail = (span, content) => ({span, content})
     setDetails(
