@@ -7,17 +7,38 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   console.log(req.query);
 
-  if (!login || !issueId)
+  if (!issueId)
     return res.status(422);
 
   const find = await models.issue.findOne({where: {issueId}});
   if (!find)
     return res.status(422);
 
+  let where = {
+    issueId: find.id
+  } as any;
 
-  const prs = await models.pullRequest.findOne({where: {issueId: find.id, githubLogin: login}, raw: true});
+  if(login){
+    where.githubLogin = login
+  }
 
-  return res.status(200).json(!!prs)
+  const pr = await models.pullRequest.findOne({where, raw: true});
+  
+  if(pr){
+    const repoInfo = await models.repositories.findOne({where: {id: find.repository_id}, raw: true});
+    const [owner, repo] = repoInfo.githubPath.split(`/`);
+
+    const octoKit = new Octokit({auth: process.env.NEXT_GITHUB_TOKEN});
+    const {data} = await octoKit.rest.pulls.get({
+      owner,
+      repo,
+      pull_number: pr.githubId,
+    });
+    pr.isMergeable = data.mergeable;
+    pr.state = data.state;
+  }
+
+  return res.status(200).json(pr)
 }
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
@@ -28,7 +49,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const [owner, repo] = repoInfo.githubPath.split(`/`);
 
-  const octoKit = new Octokit({auth: process.env.NEXT_GITHUB_TOKEN});
+  const octoKit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
 
   const options = {
     accept: 'application/vnd.github.v3+json',

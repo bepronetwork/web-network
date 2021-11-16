@@ -11,6 +11,7 @@ import {useContext} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import Button from './button';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
+import useTransactions from '@x-hooks/useTransactions';
 
 interface Options {
   proposal: Proposal,
@@ -18,7 +19,7 @@ interface Options {
   issueId: string;
   amount: number;
   beproStaked: number;
-  isFinished: boolean;
+  isFinalized: boolean;
   owner?: string;
   onDispute: (error?: boolean) => void;
 }
@@ -29,15 +30,15 @@ export default function ProposalItem({
                                        issueId,
                                        amount,
                                        beproStaked,
-                                       isFinished,
+                                       isFinalized,
                                        owner,
                                        onDispute = () => {}
                                      }: Options) {
   const {dispatch,} = useContext(ApplicationContext);
-  const router = useRouter()
+  const txWindow = useTransactions();
 
   async function handleDispute(mergeId) {
-    if (proposal.isDisputed || isFinished)
+    if (proposal.isDisputed || isFinalized)
       return;
 
     const disputeTx = addTransaction({type: TransactionTypes.dispute});
@@ -46,6 +47,7 @@ export default function ProposalItem({
     const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
     await BeproService.network.disputeMerge({issueID: issue_id, mergeID: mergeId,})
                       .then(txInfo => {
+                        txWindow.updateItem(disputeTx.payload.id, BeproService.parseTransaction(txInfo, disputeTx.payload));
                         // BeproService.parseTransaction(txInfo, disputeTx.payload)
                         //             .then(block => {
                         //               dispatch(updateTransaction(block))
@@ -66,7 +68,7 @@ export default function ProposalItem({
   }
 
   function getColors() {
-    if (isFinished && !proposal.isDisputed) {
+    if (isFinalized && !proposal.isDisputed) {
       return `success`
     }
 
@@ -78,7 +80,7 @@ export default function ProposalItem({
   }
 
   function getLabel() {
-    if (isFinished && !proposal.isDisputed) {
+    if (isFinalized && !proposal.isDisputed) {
       return `Accepted`
     }
 

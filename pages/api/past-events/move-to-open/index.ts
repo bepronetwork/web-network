@@ -20,7 +20,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   };
 
   const issues = await models.issue.findAll({where});
-  const octokit = new Octokit({auth: process.env.NEXT_GITHUB_TOKEN});
+  const octokit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
 
   for (const issue of issues) {
     try {

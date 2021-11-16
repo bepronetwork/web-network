@@ -8,6 +8,9 @@ import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import Button from './button';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
+import useTransactions from '@x-hooks/useTransactions';
+import { formatNumberToString } from '@helpers/formatNumber';
+import { truncateAddress } from '@helpers/truncate-address';
 
 interface Props extends ComponentPropsWithoutRef<"div"> {
   amount: string;
@@ -22,6 +25,7 @@ export default function OraclesTakeBackItem({
 }: Props): JSX.Element {
   const [show, setShow] = useState<boolean>(false);
   const {dispatch} = useContext(ApplicationContext);
+  const txWindow = useTransactions();
 
   function handleShow() {
     setShow(true);
@@ -32,6 +36,8 @@ export default function OraclesTakeBackItem({
   }
 
   async function handleTakeBack() {
+    handleCancel()
+    
     const delegateTx = addTransaction({type: TransactionTypes.takeBackOracles, amount: +amount, currency: 'Oracles'});
     dispatch(delegateTx);
 
@@ -39,6 +45,7 @@ export default function OraclesTakeBackItem({
 
       BeproService.network.unlock({tokenAmount: amount, from: address,})
                   .then(txInfo => {
+                    txWindow.updateItem(delegateTx.payload.id, BeproService.parseTransaction(txInfo, delegateTx.payload));
                     onConfirm(txInfo.status);
                   })
                           // BeproService.parseTransaction(txInfo, delegateTx.payload)
@@ -59,7 +66,7 @@ export default function OraclesTakeBackItem({
       <div className="bg-opac w-100 mb-1 p-3">
         <div className="row align-items-center">
           <div className="col-md-6">
-            <p className="largeCaption text-bold text-purple mb-1 text-uppercase">{amount} ORACLES</p>
+            <p className="largeCaption text-bold text-purple mb-1 text-uppercase">{formatNumberToString(amount, 2)} ORACLES</p>
             <p className="smallCaption text-white mb-0">{address}</p>
           </div>
           <div className="col-md-6 d-flex justify-content-end">
@@ -75,18 +82,18 @@ export default function OraclesTakeBackItem({
         onCloseClick={handleCancel}
         footer={
           <>
-            <Button color='dark-gray' onClick={handleCancel}>
-              Cancel
-            </Button>
             <Button onClick={handleTakeBack}>
               Confirm
+            </Button>
+            <Button color='dark-gray' onClick={handleCancel}>
+              Cancel
             </Button>
           </>
         }>
         <p className="text-center fs-4">
-          <span className="me-2">Give away</span>
-          <span className="text-bold color-purple me-2">{amount} Oracles</span>
-          <span>to get back $BEPRO {amount}</span>
+          <span className="me-2">Take back</span>
+          <span className="text-bold text-purple me-2">{formatNumberToString(amount, 2)} Oracles</span>
+          <span className="text-bold">from {truncateAddress(address, 12, 3)}</span>
         </p>
       </Modal>
     </>
