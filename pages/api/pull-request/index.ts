@@ -35,6 +35,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       pull_number: pr.githubId,
     });
     pr.isMergeable = data.mergeable;
+    pr.state = data.state;
   }
 
   return res.status(200).json(pr)
