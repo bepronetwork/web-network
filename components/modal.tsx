@@ -31,7 +31,6 @@ export default function Modal({
   return (
     <ModalBootstrap centered
                     onEscapeKeyDown={onCloseClick}
-                    onBackdropClick={onCloseClick}
                     onHide={onCloseClick}
                     aria-labelledby={modalTitle}
                     aria-describedby={modalTitle}
