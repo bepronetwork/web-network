@@ -149,14 +149,6 @@ export default function ApplicationContextProvider({children}) {
                               if (tx?.addressFrom === cheatAddress) {
                                 dispatch(updateTransaction(tx));
                                 waitingForTx = null;
-                                const waitTillReceipt = () => web3.eth.getTransactionReceipt(tx.transactionHash)
-                                                                  .then(_tx => {
-                                                                    console.log(`Receipt`, _tx);
-                                                                    if (!_tx)
-                                                                      return setTimeout(() => waitTillReceipt(), 1000);
-                                                                    dispatch(updateTransaction({...tx, status: _tx.status ? TransactionStatus.completed : TransactionStatus.failed }))
-                                                                  })
-                                waitTillReceipt();
                               }
                             })
                             .catch(_ => {
