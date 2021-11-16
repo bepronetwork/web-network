@@ -31,7 +31,7 @@ li {
 }
 
 .mgb-20 {
-  margin-bottom: 20px !important;
+  margin-bottom: 50px !important;
 }
 
 .modal {
@@ -453,7 +453,7 @@ p {
   min-height: 240px;
   background-color: $blue;
   color: $white;
-  padding: ($navbar-height + $m * 3) $m * 3 $m * 3 $m * 3; 
+  padding: ($navbar-height + $m * 3) $m * 3 $m * 3 $m * 3;
   .banner-highlight {
     background-color: rgba($white, 0.1);
     padding: $m;
@@ -526,7 +526,7 @@ p {
   &:nth-child(odd){
     background-color: $bg-shadow;
   }
-  
+
   &:nth-child(even){
     background-color: $dark-gray;
   }
@@ -690,7 +690,7 @@ label {
 
 // Overrides
 
-.proposal {
+.proposal, .proposal-progress-bar {
   .text-danger {
     color: rgba($danger, 1) !important;
   }
@@ -739,7 +739,7 @@ label {
     .progress-bar {
       background-color: rgba($danger, 1);
     }
-    
+
     .empty-dot {
       background-color: #895151 !important;
     }
@@ -766,13 +766,13 @@ label {
         background-color: #3e345b;
       }
     }
-  
+
     &.bg-danger {
       .empty-dot {
         background-color: #895151 !important;
       }
     }
-  
+
     &.bg-success {
       .empty-dot {
         background-color: #4c8473;
@@ -1085,3 +1085,8 @@ a.row-button svg {
 }
 
 .text-white:hover svg path { fill: white; }
+
+.spinner-border-xs {
+  width: 12px;
+  height: 12px;
+}

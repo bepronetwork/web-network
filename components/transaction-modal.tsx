@@ -12,6 +12,7 @@ import {toastInfo} from '@reducers/add-toast';
 import { format } from 'date-fns';
 import Button from './button';
 import LinkIcon from '@assets/icons/link-icon';
+import { truncateAddress } from '@helpers/truncate-address';
 
 export default function TransactionModal({ transaction = null, onCloseClick = () => {}}: { transaction: Transaction, onCloseClick: () => void }) {
   const {dispatch, state: {network}} = useContext(ApplicationContext);
@@ -25,11 +26,8 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
 
     const blockTransaction = transaction as BlockTransaction;
 
-    let blockFrom = blockTransaction?.addressFrom
-    let blockTo = blockTransaction?.addressTo
-
-    setAddressFrom(blockFrom?.substr(0, 12)?.concat(`...`).concat(blockFrom?.substr(blockFrom?.length - 3, blockFrom.length)));
-    setAddressTo(blockTo?.substr(0, 12)?.concat(`...`).concat(blockTo?.substr(blockTo?.length - 3, blockTo.length)));
+    setAddressFrom(truncateAddress(blockTransaction?.addressFrom, 12, 3, '...'));
+    setAddressTo(truncateAddress(blockTransaction?.addressTo, 12, 3, '...'));
 
     const makeDetail = (span, content) => ({span, content})
     setDetails(

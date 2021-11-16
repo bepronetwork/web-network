@@ -1,4 +1,4 @@
-import {Fragment, useContext, useEffect, useRef, useState} from 'react';
+import React, {Fragment, useContext, useEffect, useRef, useState} from 'react';
 import {NumberFormatValues} from 'react-number-format';
 import InputNumber from './input-number';
 import OraclesBoxHeader from './oracles-box-header';
@@ -16,6 +16,8 @@ import {formatNumberToCurrency} from 'helpers/formatNumber'
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import Button from './button';
 import LockedIcon from "@assets/icons/locked-icon"
+import {Spinner} from 'react-bootstrap';
+import useTransactions from '@x-hooks/useTransactions';
 
 const actions: string[] = ["Lock", "Unlock"];
 
@@ -25,12 +27,14 @@ function OraclesActions(): JSX.Element {
   const [show, setShow] = useState<boolean>(false);
   const [action, setAction] = useState<string>(actions[0]);
   const [tokenAmount, setTokenAmount] = useState<number>(0);
-  const [isApproved, setIsApproved] = useState<boolean>(false);
+  const [isApproved, setIsApproved] = useState<boolean>(null);
   const [error, setError] = useState<string>("");
   const [walletAddress, setWalletAddress] = useState(``);
 
   const networkTxRef = useRef<HTMLButtonElement>(null);
   const renderAmount = tokenAmount ? `${formatNumberToCurrency(tokenAmount)} ` : "0";
+
+  const txWindow = useTransactions();
 
   const renderInfo = {
     Lock: {
@@ -145,7 +149,8 @@ function OraclesActions(): JSX.Element {
     const approveTx = addTransaction({type: TransactionTypes.approveSettlerToken});
     dispatch(approveTx);
     BeproService.network.approveSettlerERC20Token()
-                .then(() => {
+                .then((txInfo) => {
+                  txWindow.updateItem(approveTx.payload.id, BeproService.parseTransaction(txInfo, approveTx.payload));
                   setIsApproved(true);
                   setError(``);
                 })
@@ -219,7 +224,7 @@ function OraclesActions(): JSX.Element {
 
           <div className="mt-5 d-grid gap-3">
 
-            {action === 'Lock' && <Button disabled={isApproveButtonDisabled()} onClick={approveSettlerToken}>Approve</Button>}
+            {action === 'Lock' && <Button disabled={isApproveButtonDisabled()} onClick={approveSettlerToken}>Approve {currentAddress && isApproved === null ? <Spinner size={"xs" as unknown as 'sm'} className="align-self-center ml-1" animation="border" /> : ``}</Button>}
             <Button color={action === 'Lock' ? 'purple' : 'primary'} className="ms-0" disabled={isButtonDisabled()}
               onClick={checkLockedAmount}>
                   {isButtonDisabled() && <LockedIcon width={12} height={12} className="mr-1"/>}

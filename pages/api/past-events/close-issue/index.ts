@@ -7,7 +7,7 @@ import {Bus} from '@helpers/bus';
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {fromBlock, id} = req.body;
-  const octokit = new Octokit({auth: process.env.NEXT_GITHUB_TOKEN});
+  const octokit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
 
   const opt = {opt: {web3Connection: WEB3_CONNECTION,  privateKey: process.env.NEXT_PRIVATE_KEY}, test: true,};
   const network = new Network({contractAddress: CONTRACT_ADDRESS, ...opt});

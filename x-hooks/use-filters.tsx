@@ -60,13 +60,8 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
                      makeFilterOption(`Past Week`, `week`, time === `week`),
                      makeFilterOption(`Past Month`, `month`, time === `month`),
                      makeFilterOption(`Past Year`, `year`, time === `year`),])
-    if(repoFilters.length > 0 && repoId){
-      const index = repoFilters.findIndex(repo => repo.value.toString() === repoId)
-      if(index){
-        repoFilters[index].checked = true;
-        setRepoFilters([...repoFilters])
-      }
-    }
+
+    loadRepos()
   }
 
   useEffect(loadFilters, [router.query])

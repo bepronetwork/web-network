@@ -18,6 +18,7 @@ import ReposDropdown from '@components/repos-dropdown';
 import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
 import {User} from '@services/github-microservice';
+import useTransactions from '@x-hooks/useTransactions';
 
 interface Amount {
   value?: string,
@@ -37,6 +38,7 @@ export default function PageCreateIssue() {
   const [redirecting, setRedirecting] = useState(false);
   const router = useRouter();
   const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId} = useApi();
+  const txWindow = useTransactions();
 
   async function allowCreateIssue() {
     const loggedIn = await BeproService.login();
@@ -55,6 +57,8 @@ export default function PageCreateIssue() {
                   return txInfo;
                 })
                 .then(txInfo => {
+                  txWindow.updateItem(tmpTransactional.payload.id, BeproService.parseTransaction(txInfo, tmpTransactional.payload));
+
                   BeproService.network.isApprovedTransactionalToken({address: BeproService.address, amount: issueAmount.floatValue})
                               .then(setAllowedTransaction)
                               .catch(() => setAllowedTransaction(false))
@@ -91,14 +95,16 @@ export default function PageCreateIssue() {
     const contractPayload = {tokenAmount: issueAmount.floatValue,};
 
     const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount: payload.amount});
-    dispatch(openIssueTx);
+
     setRedirecting(true)
     apiCreateIssue(payload)
                       .then(cid => {
                         if (!cid)
                           throw new Error(`Failed to create github issue!`);
+                        dispatch(openIssueTx);
                         return BeproService.network.openIssue({...contractPayload, cid: [repository_id, cid].join(`/`)})
                                            .then(txInfo => {
+                                             txWindow.updateItem(openIssueTx.payload.id, BeproService.parseTransaction(txInfo, openIssueTx.payload));
                                              // BeproService.parseTransaction(txInfo, openIssueTx.payload)
                                              //             .then(block => dispatch(updateTransaction(block)))
                                              return {

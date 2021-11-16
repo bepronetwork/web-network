@@ -7,6 +7,7 @@ import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {IssueData} from '@interfaces/issue-data';
 import useApi from '@x-hooks/use-api';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
+import useTransactions from '@x-hooks/useTransactions';
 
 interface usePendingIssueActions {
   treatPendingIssue(): Promise<boolean>,
@@ -20,6 +21,7 @@ export default function usePendingIssue<S = IssueData>(): usePendingIssueReturn 
   const [issueExistsOnSc, setIssueExistsOnSc] = useState<boolean>(false);
   const {dispatch,} = useContext(ApplicationContext);
   const {patchIssueWithScId} = useApi();
+  const txWindow = useTransactions();
 
   async function updateIssueWithCID(repoId, githubId, issueId): Promise<boolean> {
     return patchIssueWithScId(repoId, githubId, issueId)
@@ -38,6 +40,7 @@ export default function usePendingIssue<S = IssueData>(): usePendingIssueReturn 
 
     return BeproService.network.openIssue({tokenAmount, cid})
                        .then(txInfo => {
+                         txWindow.updateItem(openIssueTx.payload.id, BeproService.parseTransaction(txInfo, openIssueTx.payload));
                          // BeproService.parseTransaction(txInfo, openIssueTx.payload)
                          //             .then(block => dispatch(updateTransaction(block)))
                          return {githubId: pendingIssue.githubId, issueId: txInfo.events?.OpenIssue?.returnValues?.id};
