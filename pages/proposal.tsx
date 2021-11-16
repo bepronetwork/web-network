@@ -143,7 +143,7 @@ export default function PageProposal() {
       <ProposalHero
         githubId={issueMicroService?.githubId}
         title={issueMicroService?.title}
-        pullRequestId={proposalMicroService?.pullRequest?.githubId}
+        pullRequestId={prGithubId}
         authorPullRequest={proposalBepro?.author}
         createdAt={proposalMicroService && formatDate(proposalMicroService.createdAt)}
         beproStaked={formatNumberToCurrency(amountIssue)}/>
