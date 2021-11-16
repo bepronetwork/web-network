@@ -41,8 +41,8 @@ function OraclesActions(): JSX.Element {
       title: "Lock $BEPRO",
       description: "Lock $BEPRO to receive ORACLES",
       label: `Get ${renderAmount} ORACLES`,
-      caption: "Get Oracles from $BEPRO",
-      body: `You are locking /${tokenAmount} $BEPRO /br/ to get /oracles${tokenAmount} Oracles/`,
+      caption: <>Get <span className="text-purple">Oracles</span> from <span className="text-blue">$BEPRO</span></>,
+      body: `You are locking /bepro${renderAmount} $BEPRO /br/ to get /oracles${renderAmount} Oracles`,
       params() {
         return { tokenAmount };
       },
@@ -51,8 +51,8 @@ function OraclesActions(): JSX.Element {
       title: "Unlock $BEPRO",
       description: "Get $BEPRO from ORACLES",
       label: `Get ${renderAmount} $BEPRO`,
-      caption: "Get $BEPRO from ORACLES",
-      body: `Give away /oracles${tokenAmount} Oracles/ /br/ to get back ${tokenAmount} $BEPRO`,
+      caption: <>Get <span className="text-blue">$BEPRO</span> from <span className="text-purple">Oracles</span></>,
+      body: `Give away /oracles${renderAmount} Oracles/ /br/ to get back /bepro${renderAmount} $BEPRO`,
       params(from: string) {
         return { tokenAmount, from };
       },
@@ -211,22 +211,33 @@ function OraclesActions(): JSX.Element {
             helperText={(
               <>
                 {formatNumberToCurrency(getMaxAmmount())} {getCurrentLabel()} Available
-                {!error && (
-                  <span
+                <span
                     className={`smallCaption ml-1 cursor-pointer text-uppercase ${`${getCurrentLabel() === 'Oracles' ? "text-purple" : "text-blue"}`}`}
                     onClick={setMaxAmmount}>
                     Max
                   </span>
-                )}
               </>)
             }
             />
 
           <div className="mt-5 d-grid gap-3">
 
-            {action === 'Lock' && <Button disabled={isApproveButtonDisabled()} onClick={approveSettlerToken}>Approve {currentAddress && isApproved === null ? <Spinner size={"xs" as unknown as 'sm'} className="align-self-center ml-1" animation="border" /> : ``}</Button>}
-            <Button color={action === 'Lock' ? 'purple' : 'primary'} className="ms-0" disabled={isButtonDisabled()}
-              onClick={checkLockedAmount}>
+            {action === 'Lock' && 
+            <Button 
+              disabled={isApproveButtonDisabled()}
+              className="ms-0" 
+              onClick={approveSettlerToken}
+            >
+                {isApproveButtonDisabled() && <LockedIcon width={12} height={12} className="mr-1"/>}
+                <span>Approve {currentAddress && isApproved === null ? <Spinner size={"xs" as unknown as 'sm'} className="align-self-center ml-1" animation="border" /> : ``}</span>
+            </Button>}
+
+            <Button 
+              color={action === 'Lock' ? 'purple' : 'primary'} 
+              className="ms-0" 
+              disabled={isButtonDisabled()}
+              onClick={checkLockedAmount}
+            >
                   {isButtonDisabled() && <LockedIcon width={12} height={12} className="mr-1"/>}
                   <span>{renderInfo.label}</span>
             </Button>
@@ -257,29 +268,32 @@ function OraclesActions(): JSX.Element {
         onCloseClick={handleCancel}
         footer={
           <>
+            <Button onClick={handleConfirm} color={action === 'Lock' ? 'purple' : 'primary'}>
+              Confirm
+            </Button>
             <Button color='dark-gray' onClick={handleCancel}>
               Cancel
             </Button>
-            <Button onClick={handleConfirm}>
-              Confirm
-            </Button>
           </>
         }>
-        <p className="p-small text-white-50 text-center">
+        <p className="smallCaption text-uppercase text-center">
           {renderInfo.caption}
         </p>
-        <p className="text-center fs-4">
+        <p className="text-center text-bold fs-4">
           {renderInfo.body?.split("/").map((sentence: string) => {
             const Component =
-              (sentence.startsWith("oracles") && "span") || Fragment;
+              ((sentence.startsWith("oracles") || sentence.startsWith("bepro") ) && "span") || Fragment;
 
             return (
               <Fragment key={sentence}>
                 <Component
                   {...(sentence.startsWith("oracles") && {
-                    className: "text-bold color-purple",
+                    className: "text-bold text-purple",
+                  })}
+                  {...(sentence.startsWith("bepro") && {
+                    className: "text-bold text-blue",
                   })}>
-                  {sentence.replace(/oracles|br/, "")}
+                  {sentence.replace(/bepro|oracles|br/, "")}
                 </Component>
                 {sentence.startsWith("br") && <br />}
               </Fragment>
