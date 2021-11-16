@@ -220,7 +220,7 @@ function OraclesActions(): JSX.Element {
 
           <div className="mt-5 d-grid gap-3">
 
-            {action === 'Lock' && <Button disabled={isApproveButtonDisabled()} onClick={approveSettlerToken}>Approve {isApproved === null ? <Spinner size={"xs" as unknown as 'sm'} className="align-self-center ml-1" animation="border" /> : ``}</Button>}
+            {action === 'Lock' && <Button disabled={isApproveButtonDisabled()} onClick={approveSettlerToken}>Approve {currentAddress && isApproved === null ? <Spinner size={"xs" as unknown as 'sm'} className="align-self-center ml-1" animation="border" /> : ``}</Button>}
             <Button color={action === 'Lock' ? 'purple' : 'primary'} className="ms-0" disabled={isButtonDisabled()}
               onClick={checkLockedAmount}>
                   {isButtonDisabled() && <LockedIcon width={12} height={12} className="mr-1"/>}
