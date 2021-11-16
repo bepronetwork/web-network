@@ -9,6 +9,7 @@ import {updateTransaction} from '@reducers/update-transaction';
 import Button from './button';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import useTransactions from '@x-hooks/useTransactions';
+import { formatNumberToString } from '@helpers/formatNumber';
 
 interface Props extends ComponentPropsWithoutRef<"div"> {
   amount: string;
@@ -62,7 +63,7 @@ export default function OraclesTakeBackItem({
       <div className="bg-opac w-100 mb-1 p-3">
         <div className="row align-items-center">
           <div className="col-md-6">
-            <p className="largeCaption text-bold text-purple mb-1 text-uppercase">{amount} ORACLES</p>
+            <p className="largeCaption text-bold text-purple mb-1 text-uppercase">{formatNumberToString(amount, 2)} ORACLES</p>
             <p className="smallCaption text-white mb-0">{address}</p>
           </div>
           <div className="col-md-6 d-flex justify-content-end">
@@ -88,8 +89,8 @@ export default function OraclesTakeBackItem({
         }>
         <p className="text-center fs-4">
           <span className="me-2">Give away</span>
-          <span className="text-bold color-purple me-2">{amount} Oracles</span>
-          <span>to get back $BEPRO {amount}</span>
+          <span className="text-bold color-purple me-2">{formatNumberToString(amount, 2)} Oracles</span>
+          <span>to get back $BEPRO {formatNumberToString(amount, 2)}</span>
         </p>
       </Modal>
     </>
