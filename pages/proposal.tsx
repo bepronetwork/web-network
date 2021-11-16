@@ -84,6 +84,11 @@ export default function PageProposal() {
       const isDisputed = await BeproService.network.isMergeDisputed({issueId: issue_id, mergeId});
       const author = (await getUserOf(merge.proposalAddress))?.githubHandle;
 
+      getPullRequestIssue(issueId.toString()).then((pr: any)=>{
+        setIsMergiable(pr.isMergeable)
+        setShowModal((!pr.isMergeable && pr.state === 'open' && !isDisputed))
+      })
+
       setProposalBepro({...merge, isDisputed, author});
       return Promise.resolve();
     } catch (e) {
@@ -119,18 +124,14 @@ export default function PageProposal() {
 
   function loadProposalData() {
     if (issueId && currentAddress) {
-      getPullRequestIssue(issueId.toString()).then((pr: any)=>{
-        setIsMergiable(pr.isMergeable)
-        setShowModal(!pr.isMergeable)
-      })
-
+      
       BeproService.network.getOraclesSummary({address: currentAddress})
-                  .then(oracles => dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles))))
-                  .then(async () => {
-                    await getProposalData();
-                    await getProposal();
-                    await getIssueAmount();
-                  })
+      .then(oracles => dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles))))
+      .then(async () => {
+        await getProposalData();
+        await getProposal();
+        await getIssueAmount();
+      })
     }
   }
 
@@ -175,8 +176,8 @@ export default function PageProposal() {
             <p className="smallCaption trans mb-2 text-white-50 text-uppercase">this proposal has github conflicts and cannot be merged. please, fix it before doing so.</p>
           </div>
           <div className="d-flex justify-content-center">
-            <Button color='dark-gray' onClick={() => setShowModal(false)}>cancel</Button>
             <GithubLink forcePath={repo} hrefPath={`pull/${prGithubId || ""}/conflicts`} color='primary'>View on github</GithubLink>
+            <Button color='dark-gray' onClick={() => setShowModal(false)}>cancel</Button>
           </div>
         </div>
       </Modal>
