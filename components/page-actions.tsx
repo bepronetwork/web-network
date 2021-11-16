@@ -16,6 +16,7 @@ import Button from "./button";
 import GithubLink from '@components/github-link';
 import {useRouter} from 'next/router';
 import useApi from '@x-hooks/use-api';
+import useTransactions from '@x-hooks/useTransactions';
 
 interface pageActions {
   issueId: string;
@@ -77,6 +78,8 @@ export default function PageActions({
 
   const [showPRModal, setShowPRModal] = useState(false);
 
+  const txWindow = useTransactions();
+
   function renderIssueAvatars() {
     if (developers?.length > 0) return <IssueAvatars users={developers} />;
 
@@ -130,6 +133,7 @@ export default function PageActions({
         BeproService.network.redeemIssue({ issueId: issue_id })
                     .then((txInfo) => {
                       processEvent(`redeem-issue`, txInfo.blockNumber, issue_id);
+                      txWindow.updateItem(redeemTx.payload.id, BeproService.parseTransaction(txInfo, redeemTx.payload));
                       // return BeproService.parseTransaction(txInfo, redeemTx.payload)
                       //                    .then((block) => dispatch(updateTransaction(block)))
                     })
@@ -241,11 +245,9 @@ export default function PageActions({
 
     await BeproService.network
       .disputeMerge({ issueID: issue_id, mergeID: mergeId })
-      // .then((txInfo) => {
-      //   BeproService.parseTransaction(txInfo, disputeTx.payload).then((block) =>
-      //     dispatch(updateTransaction(block))
-      //   );
-      // })
+      .then((txInfo) => {
+        txWindow.updateItem(disputeTx.payload.id, BeproService.parseTransaction(txInfo, disputeTx.payload));
+      })
       .then(() => handleBeproService())
       .catch((err) => {
         if (err?.message?.search(`User denied`) > -1)
@@ -275,7 +277,7 @@ export default function PageActions({
       .closeIssue({ issueID: issue_id, mergeID: mergeId })
       .then((txInfo) => {
         processEvent(`close-issue`, txInfo.blockNumber, issue_id);
-
+        txWindow.updateItem(closeIssueTx.payload.id, BeproService.parseTransaction(txInfo, closeIssueTx.payload));
         // return BeproService.parseTransaction(txInfo, closeIssueTx.payload).then(
         //   (block) => dispatch(updateTransaction(block))
         // );

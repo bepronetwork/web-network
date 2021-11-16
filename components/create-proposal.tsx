@@ -16,6 +16,7 @@ import useOctokit from '@x-hooks/use-octokit';
 import useRepos from '@x-hooks/use-repos';
 import useApi from '@x-hooks/use-api';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
+import useTransactions from '@x-hooks/useTransactions';
 
 interface participants {
   githubHandle: string;
@@ -44,6 +45,7 @@ export default function NewProposal({
   const [[activeRepo]] = useRepos();
   const {getParticipants} = useOctokit();
   const {getUserWith, waitForMerge, processMergeProposal, processEvent} = useApi();
+  const txWindow = useTransactions();
 
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
@@ -114,8 +116,8 @@ export default function NewProposal({
                       .proposeIssueMerge(payload)
                       .then(txInfo => {
                         processEvent(`merge-proposal`, txInfo.blockNumber, issue_id);
-                        // BeproService.parseTransaction(txInfo, proposeMergeTx.payload)
-                        //             .then(block => dispatch(updateTransaction(block)));
+
+                        txWindow.updateItem(proposeMergeTx.payload.id, BeproService.parseTransaction(txInfo, proposeMergeTx.payload));
                       })
                       .catch((e) => {
                         if (e?.message?.search(`User denied`) > -1)
@@ -143,8 +145,7 @@ export default function NewProposal({
                   return BeproService.network.recognizeAsFinished({issueId: +_issue._id})
                 })
                 .then(txInfo => {
-                  // BeproService.parseTransaction(txInfo, recognizeAsFinished.payload)
-                  //             .then(block => dispatch(updateTransaction(block)));
+                  txWindow.updateItem(recognizeAsFinished.payload.id, BeproService.parseTransaction(txInfo, recognizeAsFinished.payload));
                 })
                 .then(() => {
                   if (handleBeproService)

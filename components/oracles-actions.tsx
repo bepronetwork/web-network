@@ -17,6 +17,7 @@ import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import Button from './button';
 import LockedIcon from "@assets/icons/locked-icon"
 import {Spinner} from 'react-bootstrap';
+import useTransactions from '@x-hooks/useTransactions';
 
 const actions: string[] = ["Lock", "Unlock"];
 
@@ -32,6 +33,8 @@ function OraclesActions(): JSX.Element {
 
   const networkTxRef = useRef<HTMLButtonElement>(null);
   const renderAmount = tokenAmount ? `${formatNumberToCurrency(tokenAmount)} ` : "0";
+
+  const txWindow = useTransactions();
 
   const renderInfo = {
     Lock: {
@@ -146,7 +149,8 @@ function OraclesActions(): JSX.Element {
     const approveTx = addTransaction({type: TransactionTypes.approveSettlerToken});
     dispatch(approveTx);
     BeproService.network.approveSettlerERC20Token()
-                .then(() => {
+                .then((txInfo) => {
+                  txWindow.updateItem(approveTx.payload.id, BeproService.parseTransaction(txInfo, approveTx.payload));
                   setIsApproved(true);
                   setError(``);
                 })

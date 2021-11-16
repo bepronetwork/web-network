@@ -11,6 +11,7 @@ import {updateTransaction} from '@reducers/update-transaction';
 import LockedIcon from '@assets/icons/locked-icon';
 import Button from './button';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
+import useTransactions from '@x-hooks/useTransactions';
 
 interface NetworkTxButtonParams {
   txMethod: string;
@@ -44,6 +45,7 @@ function networkTxButton({
   const {dispatch, state: {beproInit, metaMaskWallet}} = useContext(ApplicationContext);
   const [showModal, setShowModal] = useState(false);
   const [txSuccess, setTxSuccess] = useState(false);
+  const txWindow = useTransactions();
 
   function checkForTxMethod() {
     if (!beproInit || !metaMaskWallet)
@@ -69,10 +71,8 @@ function networkTxButton({
                               content: `${txMethod} ${txParams?.tokenAmount} ${txCurrency}`
                             }));
 
-          // BeproService.parseTransaction(answer, tmpTransaction.payload)
-          //             .then(info => {
-          //               dispatch(updateTransaction(info))
-          //             })
+
+          txWindow.updateItem(tmpTransaction.payload.id, BeproService.parseTransaction(answer, tmpTransaction.payload));
 
         } else {
           onFail(answer.message)

@@ -11,6 +11,7 @@ import {useContext} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import Button from './button';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
+import useTransactions from '@x-hooks/useTransactions';
 
 interface Options {
   proposal: Proposal,
@@ -34,7 +35,7 @@ export default function ProposalItem({
                                        onDispute = () => {}
                                      }: Options) {
   const {dispatch,} = useContext(ApplicationContext);
-  const router = useRouter()
+  const txWindow = useTransactions();
 
   async function handleDispute(mergeId) {
     if (proposal.isDisputed || isFinalized)
@@ -46,6 +47,7 @@ export default function ProposalItem({
     const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
     await BeproService.network.disputeMerge({issueID: issue_id, mergeID: mergeId,})
                       .then(txInfo => {
+                        txWindow.updateItem(disputeTx.payload.id, BeproService.parseTransaction(txInfo, disputeTx.payload));
                         // BeproService.parseTransaction(txInfo, disputeTx.payload)
                         //             .then(block => {
                         //               dispatch(updateTransaction(block))
