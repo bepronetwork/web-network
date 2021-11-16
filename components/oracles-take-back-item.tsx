@@ -8,6 +8,7 @@ import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import Button from './button';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
+import useTransactions from '@x-hooks/useTransactions';
 
 interface Props extends ComponentPropsWithoutRef<"div"> {
   amount: string;
@@ -22,6 +23,7 @@ export default function OraclesTakeBackItem({
 }: Props): JSX.Element {
   const [show, setShow] = useState<boolean>(false);
   const {dispatch} = useContext(ApplicationContext);
+  const txWindow = useTransactions();
 
   function handleShow() {
     setShow(true);
@@ -39,6 +41,7 @@ export default function OraclesTakeBackItem({
 
       BeproService.network.unlock({tokenAmount: amount, from: address,})
                   .then(txInfo => {
+                    txWindow.updateItem(delegateTx.payload.id, BeproService.parseTransaction(txInfo, delegateTx.payload));
                     onConfirm(txInfo.status);
                   })
                           // BeproService.parseTransaction(txInfo, delegateTx.payload)
