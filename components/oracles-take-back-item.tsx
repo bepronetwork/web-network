@@ -10,6 +10,7 @@ import Button from './button';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import useTransactions from '@x-hooks/useTransactions';
 import { formatNumberToString } from '@helpers/formatNumber';
+import { truncateAddress } from '@helpers/truncate-address';
 
 interface Props extends ComponentPropsWithoutRef<"div"> {
   amount: string;
@@ -35,6 +36,8 @@ export default function OraclesTakeBackItem({
   }
 
   async function handleTakeBack() {
+    handleCancel()
+    
     const delegateTx = addTransaction({type: TransactionTypes.takeBackOracles, amount: +amount, currency: 'Oracles'});
     dispatch(delegateTx);
 
@@ -79,18 +82,18 @@ export default function OraclesTakeBackItem({
         onCloseClick={handleCancel}
         footer={
           <>
-            <Button color='dark-gray' onClick={handleCancel}>
-              Cancel
-            </Button>
             <Button onClick={handleTakeBack}>
               Confirm
+            </Button>
+            <Button color='dark-gray' onClick={handleCancel}>
+              Cancel
             </Button>
           </>
         }>
         <p className="text-center fs-4">
-          <span className="me-2">Give away</span>
-          <span className="text-bold color-purple me-2">{formatNumberToString(amount, 2)} Oracles</span>
-          <span>to get back $BEPRO {formatNumberToString(amount, 2)}</span>
+          <span className="me-2">Take back</span>
+          <span className="text-bold text-purple me-2">{formatNumberToString(amount, 2)} Oracles</span>
+          <span className="text-bold">from {truncateAddress(address, 12, 3)}</span>
         </p>
       </Modal>
     </>
