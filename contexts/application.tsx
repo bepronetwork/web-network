@@ -142,8 +142,7 @@ export default function ApplicationContextProvider({children}) {
                                                         }
                                                       })
                                                       .catch((error) => {
-                                                        console.log(`Failed to getTransaction`, error)
-                                                        return getTx(transactionHash);
+                                                        console.log(`Failed to getTransaction`, error);
                                                       })
                         getTx(transactionHash)
                             .then(tx => {
@@ -154,7 +153,7 @@ export default function ApplicationContextProvider({children}) {
                                                                   .then(_tx => {
                                                                     console.log(`Receipt`, _tx);
                                                                     if (!_tx)
-                                                                      return waitTillReceipt();
+                                                                      return setTimeout(() => waitTillReceipt(), 1000);
                                                                     dispatch(updateTransaction({...tx, status: _tx.status ? TransactionStatus.completed : TransactionStatus.failed }))
                                                                   })
                                 waitTillReceipt();
