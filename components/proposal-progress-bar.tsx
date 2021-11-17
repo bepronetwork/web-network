@@ -60,7 +60,7 @@ export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null
     </>
   }
 
-  useEffect(loadDisputeState, [stakedAmount, issueDisputeAmount, isDisputed]);
+  useEffect(loadDisputeState, [stakedAmount, issueDisputeAmount, isDisputed, isFinished]);
 
   return <>
     <div className="row mb-2 proposal-progress-bar">
