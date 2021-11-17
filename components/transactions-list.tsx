@@ -16,6 +16,7 @@ import ReturnArrow from '@assets/icons/return-arrow';
 import {formatNumberToCurrency} from 'helpers/formatNumber'
 import { TransactionStatus } from '@interfaces/enums/transaction-status';
 import CloseIssueIcon from '@assets/icons/close-issue';
+import RecognizeFinishedIcon from '@assets/icons/recognize-finished-icon';
 export default function TransactionsList({onActiveTransaction = (transaction) => {}}) {
   const {state: {myTransactions}} = useContext(ApplicationContext);
 
@@ -30,6 +31,7 @@ export default function TransactionsList({onActiveTransaction = (transaction) =>
     [TransactionTypes.closeIssue]: <CloseIssueIcon />,
     [TransactionTypes.proposeMerge]: <CenterArrows />,
     [TransactionTypes.approveSettlerToken]: <ThumbsUp />,
+    [TransactionTypes.recognizedAsFinish]: <RecognizeFinishedIcon />,
   }
 
   function renderTransactionRow(item: Transaction) {
