@@ -34,6 +34,14 @@ li {
   margin-bottom: 50px !important;
 }
 
+.hover-blue {
+  &:hover {
+    svg {
+      color: $blue;
+    }
+  }
+}
+
 .modal {
   &-header {
     padding-bottom: 0;

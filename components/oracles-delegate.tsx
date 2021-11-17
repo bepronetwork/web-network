@@ -79,7 +79,7 @@ function OraclesDelegate(): JSX.Element {
     <div className="col-md-5">
       <div className="content-wrapper h-100">
         <OraclesBoxHeader actions="Delegate oracles" available={delegatedAmount} />
-        <p className="smallCaption text-white text-uppercase mt-2 mb-3">Delagate Oracles to use them in issues</p>
+        <p className="smallCaption text-white text-uppercase mt-2 mb-3">Delegate Oracles to use them in issues</p>
         <InputNumber
           label="Oracles Ammout"
           value={tokenAmount}
@@ -91,14 +91,12 @@ function OraclesDelegate(): JSX.Element {
           helperText={(
             <>
               {formatNumberToCurrency(delegatedAmount)} Oracles Available
-              {!error && (
-                <span
+              <span
                   className="smallCaption ml-1 cursor-pointer text-uppercase text-purple"
                   onClick={setMaxAmmount}
                   >
                   Max
-                </span>
-              )}
+              </span>
             </>)
           }/>
 
