@@ -72,7 +72,7 @@ export default function PageProposal() {
     setRepo(_repo?.githubPath)
     setIssueMicroService(issueData);
     setPrGithubId(issueData.pullRequests[0].githubId);
-    setProposalMicroService(issueData.mergeProposals.find(({id}) => id === +dbId));
+    setProposalMicroService(issueData.mergeProposals.find(({scMergeId, issueId, pullRequestId}) => scMergeId === String(mergeId) && pullRequestId === +prId && issueId === +dbId));
     setAmountIssue(issueData?.amount?.toString())
   }
 
@@ -151,7 +151,7 @@ export default function PageProposal() {
       <ProposalProgress developers={usersAddresses}/>
       <CustomContainer className="mgt-20 mgb-20">
         <div className="col-6">
-          <ProposalProgressBar issueDisputeAmount={+proposalBepro?.disputes} isDisputed={proposalBepro?.isDisputed} stakedAmount={+beproStaked} />
+          <ProposalProgressBar issueDisputeAmount={+proposalBepro?.disputes} isDisputed={proposalBepro?.isDisputed} stakedAmount={+beproStaked} isFinished={isFinished} />
         </div>
       </CustomContainer>
       <PageActions
