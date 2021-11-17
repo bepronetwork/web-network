@@ -7,6 +7,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   rounded?: boolean;
   upperCase?: boolean;
   asAnchor?: boolean;
+  applyTextColor?: boolean;
 }
 
 export default function Button({
@@ -15,7 +16,9 @@ export default function Button({
                                  outline,
                                  transparent,
                                  rounded,
-                                 className = ``, asAnchor = false,
+                                 className = ``, 
+                                 asAnchor = false,
+                                 applyTextColor = true,
                                  ...rest
                                }: ButtonProps) {
 
@@ -33,7 +36,7 @@ export default function Button({
     if (outline)
       append += ` bg-opac-hover-25`
 
-    return `btn ${type} ${textColor} d-flex align-items-center justify-content-center text-uppercase shadow-none ${append}`
+    return `btn ${type} ${applyTextColor && textColor || ''} d-flex align-items-center justify-content-center text-uppercase shadow-none ${append}`
   }
 
   return <>

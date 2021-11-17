@@ -1038,10 +1038,16 @@ $c_props: ('m': 'margin') !default;
   }
 }
 
-.hover-white{
-  &:hover {
+.hover {
+  &-white:hover {
     background-color: rgba(rgba($white, 0), 0.2);
     color: #fff;
+  }
+
+  &-blue:hover {
+    svg {
+      color: $blue;
+    }
   }
 }
 

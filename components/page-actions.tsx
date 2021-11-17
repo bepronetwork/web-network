@@ -17,6 +17,7 @@ import GithubLink from '@components/github-link';
 import {useRouter} from 'next/router';
 import useApi from '@x-hooks/use-api';
 import useTransactions from '@x-hooks/useTransactions';
+import LockedIcon from "@assets/icons/locked-icon";
 
 interface pageActions {
   issueId: string;
@@ -310,7 +311,10 @@ export default function PageActions({
               {state?.toLowerCase() == "pull request" && (
                 <>
                   { (!isDisputed && !finalized ) && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>Dispute</Button> || ``}
-                  {!finalized && <Button disabled={!canClose} onClick={handleClose}>Close</Button> || ``}
+                  {!finalized && <Button disabled={!canClose} onClick={handleClose}>
+                  {!canClose && <LockedIcon width={12} height={12} className="mr-1"/>}
+                    Close
+                    </Button> || ``}
                 </>
               )}
             </div>
