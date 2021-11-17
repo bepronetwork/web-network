@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {formatNumberToNScale, formatNumberToString} from '@helpers/formatNumber';
 
-export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null, issueDisputeAmount = 0}) {
+export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null, issueDisputeAmount = 0, isFinished = false}) {
   const [issueState, setIssueState] = useState<string>(``);
   const [issueColor, setIssueColor] = useState<string>(``);
   const [percentage, setPercentage] = useState<number>(0);
@@ -30,8 +30,11 @@ export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null
     if (isDisputed === true)
       return `Failed`
 
-    if (isDisputed === false)
+    if (isDisputed === false && isFinished === false)
       return `Open for dispute`;
+    
+    if (isDisputed === false && isFinished === true)
+      return `Accepted`;
 
     return `Waiting`;
   }
@@ -72,7 +75,6 @@ export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null
       <div className="ms-2 col-12 position-relative">
         <div className="progress bg-dark">
           <div className={`progress-bar bg-${issueColor}`} role="progressbar" style={{width: `${toRepresentationPercent(percentage)}%`}}>
-            {console.log(toRepresentationPercent(percentage))}
             {columns.map(renderColumn)}
           </div>
         </div>

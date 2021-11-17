@@ -20,7 +20,7 @@ export default function ProposalHero({githubId, title, pullRequestId, authorPull
                                     <div className="top-border">
                                         <h1 className="h4 mb-0">Pull Request #{pullRequestId} by @{authorPullRequest}</h1>
                                         <div className="d-flex align-center flex-wrap justify-content-center justify-content-md-start">
-                                            <span className="p-small mr-3 mt-1">Created {createdAt}</span>
+                                            <span className="p-small mr-3 mt-1">Created at {createdAt}</span>
                                         </div>
                                     </div>
                                 </div>
