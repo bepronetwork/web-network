@@ -6,7 +6,7 @@ import paginate from '@helpers/paginate';
 import {composeIssues} from '@db/middlewares/compose-issues';
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const whereCondition: WhereOptions = {};
+  const whereCondition: WhereOptions = {state: {[Op.not]: `pending`}};
   const {state, issueId, repoId, time, creator, address} = req.query || {};
 
   if (state)
