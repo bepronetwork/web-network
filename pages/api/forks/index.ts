@@ -3,10 +3,6 @@ import {Octokit} from 'octokit'
 
 import models from '@db/models'
 
-function get(req: NextApiRequest, res: NextApiResponse) {
-
-}
-
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { repoPath } = req.body
 
@@ -35,11 +31,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
 export default async function RepoRoute(req: NextApiRequest, res: NextApiResponse) {
 
-  switch (req.method.toLowerCase()) {
-    case 'get':
-      await get(req, res);
-      break;
-    
+  switch (req.method.toLowerCase()) {    
     case 'post':
       await post(req, res);
       break;

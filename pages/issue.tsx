@@ -125,13 +125,13 @@ export default function PageIssue() {
   }
 
   function checkIsWorking() {
-    if (commentsIssue)
-      setIsWorking(!!(commentsIssue as any).find(comment => comment.body === START_WORKING_COMMENT && comment.user.login === githubLogin))
+    if (issue)
+      setIsWorking(!!issue.working.find(el => el === githubLogin))
   }
 
   useEffect(loadIssueData, [githubLogin, currentAddress, id, activeRepo]);
   useEffect(getsIssueMicroService, [activeRepo, reposList])
-  useEffect(checkIsWorking, [commentsIssue])
+  useEffect(checkIsWorking, [issue])
   useEffect(getRepoForked, [issue])
 
   const handleStateissue = () => {

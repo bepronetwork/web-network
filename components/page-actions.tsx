@@ -83,7 +83,7 @@ export default function PageActions({
     state: { githubHandle, currentAddress, myTransactions },
   } = useContext(ApplicationContext);
   const {query: {repoId, id}} = useRouter();
-  const {createPullRequestIssue, waitForRedeem, waitForClose, processEvent, createRepoFork, createIssueComment} = useApi();
+  const {createPullRequestIssue, waitForRedeem, waitForClose, processEvent, createRepoFork, startWorking} = useApi();
 
   const [showPRModal, setShowPRModal] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
@@ -215,6 +215,9 @@ export default function PageActions({
   function renderForkRepository() {
     return (
       !isRepoForked &&
+      !isIssueinDraft &&
+      !finished &&
+      !finalized &&
       githubLogin &&
       <Button 
         color="primary" 
@@ -222,7 +225,7 @@ export default function PageActions({
         disabled={isExecuting}
       >
         <span>Fork this repository</span>
-        {isExecuting ? <span className="spinner-border spinner-border-xs ml-1"/> : <ExternalLinkIcon className="ml-1" height={12} width={12} color="text-white-50"/>}
+        {isExecuting ? <span className="spinner-border spinner-border-xs ml-1"/> : ''}
       </Button>
     )
   }
@@ -231,6 +234,9 @@ export default function PageActions({
     return (
       isRepoForked &&
       !isWorking &&
+      !isIssueinDraft &&
+      !finished &&
+      !finalized &&
       githubLogin &&
       <Button 
         color="primary" 
@@ -238,13 +244,14 @@ export default function PageActions({
         disabled={isExecuting}
       >
         <span>Start Working</span>
-        {isExecuting ? <span className="spinner-border spinner-border-xs ml-1"/> : <ExternalLinkIcon className="ml-1" height={12} width={12} color="text-white-50"/>}
+        {isExecuting ? <span className="spinner-border spinner-border-xs ml-1"/> : ''}
       </Button>
     )
   }
 
   function renderViewPullrequest() {
     return (
+      !isIssueinDraft &&
       hasOpenPR &&
       githubLogin &&
       <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`pull/${pullRequests[0]?.githubId || ""}`} color="primary">View Pull Request</GithubLink>
@@ -325,15 +332,18 @@ export default function PageActions({
   async function handleStartWorking() {
     setIsExecuting(true)
 
-    createIssueComment(repoPath, +githubId, START_WORKING_COMMENT)
+    startWorking(networkCID, githubLogin)
       .then((response) => {
         dispatch(
           addToast({
             type: "success",
             title: "Success",
-            content: "To start working on issue",
+            content: "To start working on this issue",
           })
         )
+
+        if (handleMicroService)
+          handleMicroService(true)
 
         if (addNewComment)
           addNewComment(response.data)
@@ -345,7 +355,7 @@ export default function PageActions({
           addToast({
             type: "danger",
             title: "Failed",
-            content: "To start working on issue",
+            content: "To start working on this issue",
           })
         )
 
@@ -434,8 +444,7 @@ export default function PageActions({
 
               {renderViewPullrequest()}
               
-              {state?.toLowerCase() !== "pull request" && <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`issues/${githubId || ""}`}>view on github</GithubLink>
-              || ''}
+              <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`issues/${githubId || ""}`}>view on github</GithubLink>
 
             </div>
           </div>

@@ -245,8 +245,8 @@ export default function useApi() {
                 })
   }
 
-  async function createIssueComment(repoPath: string, issueId: number, body: string) {
-    return client.post('/api/comments', { type: 'issue', repoPath, issueId, body })
+  async function startWorking(issueId: string, githubLogin: string) {
+    return client.put('/api/issue/working',  { issueId, githubLogin })
                 .then((response) => response)
                 .catch(error => {
                   throw error
@@ -279,6 +279,6 @@ export default function useApi() {
     waitForRedeem,
     userHasPR,
     createRepoFork,
-    createIssueComment,
+    startWorking,
   }
 }
