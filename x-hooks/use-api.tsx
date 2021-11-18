@@ -234,6 +234,23 @@ export default function useApi() {
                    console.log(`Failed to fetch PR information`, e);
                    return false;
                  });
+
+  }
+  
+  async function createRepoFork(repoPath: string) {
+    return client.post('/api/forks', {repoPath})
+                .then(() => true)
+                .catch(error => {
+                  throw error
+                })
+  }
+
+  async function createIssueComment(repoPath: string, issueId: number, body: string) {
+    return client.post('/api/comments', { type: 'issue', repoPath, issueId, body })
+                .then((response) => response)
+                .catch(error => {
+                  throw error
+                })
   }
 
   return {
@@ -261,5 +278,7 @@ export default function useApi() {
     waitForClose,
     waitForRedeem,
     userHasPR,
+    createRepoFork,
+    createIssueComment,
   }
 }

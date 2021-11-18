@@ -16,8 +16,7 @@ import useMergeData from '@x-hooks/use-merge-data';
 import useRepos from '@x-hooks/use-repos';
 import useOctokit from '@x-hooks/use-octokit';
 import useApi from '@x-hooks/use-api';
-
-
+import { START_WORKING_COMMENT } from '@helpers/constants';
 interface NetworkIssue {
   recognizedAsFinished: boolean;
 }
@@ -32,8 +31,9 @@ export default function PageIssue() {
   const [isIssueinDraft, setIsIssueinDraft] = useState(false);
   const [commentsIssue, setCommentsIssue] = useState();
   const [forks, setForks] = useState();
-  const [canCreateFork, setCanCreateFork] = useState(false);
-  const [canOpenPR, setCanOpenPR] = useState(false);
+  const [isRepoForked, setIsRepoForked] = useState(false);
+  const [isWorking, setIsWorking] = useState(false);
+  const [hasOpenPR, setHasOpenPR] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>();
   const {getIssue} = useMergeData();
   const {getIssueComments, getForksOf, getUserRepos,} = useOctokit();
@@ -57,7 +57,9 @@ export default function PageIssue() {
 
         if (!commentsIssue)
           getIssueComments(+issue.githubId, activeRepo.githubPath)
-            .then((comments) => setCommentsIssue(comments.data as any));
+            .then((comments) => {
+              setCommentsIssue(comments.data as any)
+            });
       });
 
     if (!forks)
@@ -96,14 +98,14 @@ export default function PageIssue() {
 
     getUserRepos(githubLogin, activeRepo.githubPath.split(`/`)[1])
       .then((repo) => {
-        setCanCreateFork(!repo.data?.fork)
+        setIsRepoForked(repo.data?.fork)
       }).catch(e => {
         console.log(`Failed to get users repositories: `, e)
       })
 
     userHasPR(`${repoId}/${id}`, githubLogin)
       .then((result) => {
-        setCanOpenPR(!result)
+        setHasOpenPR(result)
       })
       .catch(e => {console.log(`Failed to list PRs`, e)});
   }
@@ -118,8 +120,19 @@ export default function PageIssue() {
     if (githubLogin && activeRepo) getRepoForked();
   }
 
+  function addNewComment(comment) {
+    setCommentsIssue([...(commentsIssue as any), comment] as any)
+  }
+
+  function checkIsWorking() {
+    if (commentsIssue)
+      setIsWorking(!!(commentsIssue as any).find(comment => comment.body === START_WORKING_COMMENT && comment.user.login === githubLogin))
+  }
+
   useEffect(loadIssueData, [githubLogin, currentAddress, id, activeRepo]);
   useEffect(getsIssueMicroService, [activeRepo, reposList])
+  useEffect(checkIsWorking, [commentsIssue])
+  useEffect(getRepoForked, [issue])
 
   const handleStateissue = () => {
     if (issue?.state) return issue?.state;
@@ -155,10 +168,13 @@ export default function PageIssue() {
         amountIssue={networkIssue?.tokensStaked}
         forks={forks}
         githubLogin={currentUser?.githubLogin}
-        canOpenPR={canOpenPR}
+        hasOpenPR={hasOpenPR}
+        isRepoForked={isRepoForked}
+        isWorking={isWorking}
         issueCreator={networkIssue?.issueGenerator}
         repoPath={issue?.repo}
         githubId={issue?.githubId}
+        addNewComment={addNewComment}
         finished={networkIssue?.recognizedAsFinished} />
       {networkIssue?.mergeProposalsAmount > 0 && (
         <IssueProposals
