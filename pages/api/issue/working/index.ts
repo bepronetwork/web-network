@@ -27,7 +27,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         owner,
         repo,
         issue_number: issue.githubId,
-        body: START_WORKING_COMMENT
+        body: START_WORKING_COMMENT(githubLogin)
       })
 
       return res.status(response.status).json(response.data)

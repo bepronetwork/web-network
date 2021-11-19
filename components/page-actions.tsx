@@ -201,6 +201,7 @@ export default function PageActions({
       !finished &&
       !finalized &&
       !hasOpenPR &&
+      isRepoForked &&
       isWorking &&
       githubLogin && (
         <Button onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || hasOpenPR}>

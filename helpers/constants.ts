@@ -1,4 +1,4 @@
-const START_WORKING_COMMENT = 'I am working on this.'
+const START_WORKING_COMMENT = githubLogin => `@${githubLogin} is working on this.`
 
 export {
     START_WORKING_COMMENT

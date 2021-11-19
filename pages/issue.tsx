@@ -16,7 +16,6 @@ import useMergeData from '@x-hooks/use-merge-data';
 import useRepos from '@x-hooks/use-repos';
 import useOctokit from '@x-hooks/use-octokit';
 import useApi from '@x-hooks/use-api';
-import { START_WORKING_COMMENT } from '@helpers/constants';
 interface NetworkIssue {
   recognizedAsFinished: boolean;
 }
