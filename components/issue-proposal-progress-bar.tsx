@@ -59,7 +59,6 @@ export default function IssueProposalProgressBar({
   }
 
   function renderStepStatus(stepLabel, index) {
-    console.log(getTimeDifferenceInWords(addSeconds(creationDate, redeemTime), new Date()))
     let item = {
       Completed: {
         text: StatusIds.Completed,
