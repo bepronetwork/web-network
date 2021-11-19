@@ -201,7 +201,7 @@ export default function PageCreateIssue() {
                        value={issueTitle}
                        onChange={e => setIssueTitle(e.target.value)}
                 />
-                <p className="p-small trans my-2">Tip: Try to be as much descriptive as possible</p>
+                <p className="p-small trans my-2">Tip: Try to be as descriptive as possible</p>
               </div>
               <div className="form-group">
                 <label className="smallCaption mb-2 text-uppercase">Description</label>
