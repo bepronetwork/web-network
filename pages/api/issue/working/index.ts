@@ -2,7 +2,6 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { Octokit } from 'octokit'
 
 import models from '@db/models'
-import { START_WORKING_COMMENT } from '@helpers/constants'
 
 async function put(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, githubLogin } = req.body
@@ -27,7 +26,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         owner,
         repo,
         issue_number: issue.githubId,
-        body: START_WORKING_COMMENT(githubLogin)
+        body: `@${githubLogin} is working on this.`
       })
 
       return res.status(response.status).json(response.data)
