@@ -18,8 +18,6 @@ import {useRouter} from 'next/router';
 import useApi from '@x-hooks/use-api';
 import useTransactions from '@x-hooks/useTransactions';
 import LockedIcon from "@assets/icons/locked-icon";
-import ExternalLinkIcon from "@assets/icons/externallink";
-import { START_WORKING_COMMENT } from "@helpers/constants";
 
 interface pageActions {
   issueId: string;
@@ -83,7 +81,7 @@ export default function PageActions({
     state: { githubHandle, currentAddress, myTransactions },
   } = useContext(ApplicationContext);
   const {query: {repoId, id}} = useRouter();
-  const {createPullRequestIssue, waitForRedeem, waitForClose, processEvent, createRepoFork, startWorking} = useApi();
+  const {createPullRequestIssue, waitForRedeem, waitForClose, processEvent, startWorking} = useApi();
 
   const [showPRModal, setShowPRModal] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
@@ -219,14 +217,14 @@ export default function PageActions({
       !finished &&
       !finalized &&
       githubLogin &&
-      <Button 
-        color="primary" 
-        onClick={handleForkRepository}
-        disabled={isExecuting}
+      <GithubLink 
+        repoId={String(repoId)} 
+        forcePath={repoPath} 
+        hrefPath="fork"
+        color="primary"
       >
-        <span>Fork this repository</span>
-        {isExecuting ? <span className="spinner-border spinner-border-xs ml-1"/> : ''}
-      </Button>
+        Fork this repository
+      </GithubLink>
     )
   }
 
@@ -296,37 +294,6 @@ export default function PageActions({
           );
         }
       });
-  }
-
-  async function handleForkRepository() {
-    setIsExecuting(true)
-
-    createRepoFork(repoPath)
-      .then(() => {
-        dispatch(
-          addToast({
-            type: "success",
-            title: "Success",
-            content: "Repository forked",
-          })
-        )
-
-        if (handleMicroService)
-          handleMicroService(true)
-        
-        setIsExecuting(false)
-      })
-      .catch((error) => {
-        dispatch(
-          addToast({
-            type: "danger",
-            title: "Failed",
-            content: "To fork the repository",
-          })
-        )
-
-        setIsExecuting(false)
-      })
   }
 
   async function handleStartWorking() {

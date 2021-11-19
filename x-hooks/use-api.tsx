@@ -236,14 +236,6 @@ export default function useApi() {
                  });
 
   }
-  
-  async function createRepoFork(repoPath: string) {
-    return client.post('/api/forks', {repoPath})
-                .then(() => true)
-                .catch(error => {
-                  throw error
-                })
-  }
 
   async function startWorking(issueId: string, githubLogin: string) {
     return client.put('/api/issue/working',  { issueId, githubLogin })
@@ -278,7 +270,6 @@ export default function useApi() {
     waitForClose,
     waitForRedeem,
     userHasPR,
-    createRepoFork,
     startWorking,
   }
 }
