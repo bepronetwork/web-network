@@ -209,27 +209,6 @@ export default class GithubMicroService {
                  });
   }
 
-  static async getForks() {
-    return client.get(`/forks`)
-                 .then(({data}) => data)
-                 .catch(e => {
-                   console.error(e);
-                   return null;
-                 })
-  }
-
-  static async getForkedRepo(ghLogin: string, ofIssue: string) {
-    return client.get(`/forks/repo/${ghLogin}/${ofIssue}`)
-                 .then(({data}) => data)
-                 .catch(e => {
-                   if (e.status === 404)
-                     return null;
-
-                   console.error(`Failed to get forked repo`, e);
-                   return null;
-                 })
-  }
-
   static async getMergeProposalIssue(issueId: string | string[], MergeId: string | string[]) {
     return client.get<ProposalData>(`/issues/mergeproposal/${MergeId}/${issueId}`)
                  .then(({data}) => data)

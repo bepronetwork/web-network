@@ -23,7 +23,8 @@ export interface IssueData {
   owner?: string;
   repo?: string;
   repository_id?: number;
-  mergeProposals: ProposalData[]
+  mergeProposals: ProposalData[];
+  working: string[];
 }
 
 export interface pullRequest {
