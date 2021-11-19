@@ -32,7 +32,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       return res.status(response.status).json(response.data)
     }
 
-    return res.status(409).json({status: 409, message: 'Already working'})
+    return res.status(409).json('Already working')
   } catch(error) {
     return res.status(error.response?.status || 500).json(error.response?.data || error)
   }
