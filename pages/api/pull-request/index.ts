@@ -28,7 +28,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     const repoInfo = await models.repositories.findOne({where: {id: find.repository_id}, raw: true});
     const [owner, repo] = repoInfo.githubPath.split(`/`);
 
-    const octoKit = new Octokit({auth: process.env.NEXT_GITHUB_TOKEN});
+    const octoKit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
     const {data} = await octoKit.rest.pulls.get({
       owner,
       repo,
