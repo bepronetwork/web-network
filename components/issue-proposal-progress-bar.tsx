@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 
+import { formatDistanceInWords } from '@helpers/formatDate';
+import { addDays } from 'date-fns';
+
 export enum StatusIds {
   Completed = 'Completed',
   Canceled = 'Canceled',
-  UntilDone = '3 days until done',
+  UntilDone = '[DISTANCE] until done',
   Distribution = 'Distribution',
   Pending = 'Pending',
   InProgress = 'In Progress'
@@ -14,6 +17,7 @@ export default function IssueProposalProgressBar({
   mergeProposalsAmount = 0,
   isFinished = false,
   isCanceled = false,
+  creationDate
 }) {
   const [stepColor, setStepColor] = useState<string>('');
   const [currentStep, setCurrentStep] = useState<number>();
@@ -65,7 +69,7 @@ export default function IssueProposalProgressBar({
         bgColor: 'danger',
       },
       Warning: {
-        text: StatusIds.UntilDone,
+        text: StatusIds.UntilDone.replace('[DISTANCE]', formatDistanceInWords(addDays(creationDate, 3), new Date())) as StatusIds,
         color: 'warning',
         bgColor: 'warning',
       },

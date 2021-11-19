@@ -26,9 +26,9 @@ export default function useMergeData() {
         Object.assign(issue, OctoData[`${issue.githubId}/${issue.repository_id}`]);
       else {
         const {githubPath: repo} = list.find(({id}) => id === issue.repository_id);
-        const {data: {title, body}} = await octokit.getIssue(+issue.githubId, repo);
-        OctoData[`${issue.githubId}/${issue.repository_id}`] = {title, body, repo};
-        Object.assign(issue, {title, body, repo})
+        const {data: {title, body, comments}} = await octokit.getIssue(+issue.githubId, repo);
+        OctoData[`${issue.githubId}/${issue.repository_id}`] = {title, body, repo, numberOfComments: comments};
+        Object.assign(issue, {title, body, repo, numberOfComments: comments})
       }
     }
   }
