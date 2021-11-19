@@ -5,6 +5,6 @@ export const formatDate = (date: string|Date, joiner = '/') => {
   return [d.getDate(), d.getMonth()+1, d.getFullYear()].join(joiner);
 }
 
-export const formatDistanceInWords = (date: Date, dateToCompare: Date) => {
-  return formatDistanceStrict( date, dateToCompare);
+export const getTimeDifferenceInWords = (date: Date, dateToCompare: Date) => {
+  return formatDistanceStrict( date, dateToCompare );
 }
