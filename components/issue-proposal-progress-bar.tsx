@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react';
 
+import { getTimeDifferenceInWords } from '@helpers/formatDate';
+import { addSeconds } from 'date-fns';
+import { BeproService } from '@services/bepro-service';
+
 export enum StatusIds {
   Completed = 'Completed',
   Canceled = 'Canceled',
-  UntilDone = '3 days until done',
+  UntilDone = '[DISTANCE] until done',
   Distribution = 'Distribution',
   Pending = 'Pending',
   InProgress = 'In Progress'
@@ -14,9 +18,11 @@ export default function IssueProposalProgressBar({
   mergeProposalsAmount = 0,
   isFinished = false,
   isCanceled = false,
+  creationDate
 }) {
   const [stepColor, setStepColor] = useState<string>('');
   const [currentStep, setCurrentStep] = useState<number>();
+  const [redeemTime, setRedeemTime] = useState(0);
   const steps = ['Draft', 'Development', 'Finalized', 'Validation & Disputes', 'Closed & Distributed']
 
   function toRepresentationPercent() {
@@ -65,7 +71,7 @@ export default function IssueProposalProgressBar({
         bgColor: 'danger',
       },
       Warning: {
-        text: StatusIds.UntilDone,
+        text: StatusIds.UntilDone.replace('[DISTANCE]', getTimeDifferenceInWords(addSeconds(creationDate, redeemTime), new Date())) as StatusIds,
         color: 'warning',
         bgColor: 'warning',
       },
@@ -131,6 +137,11 @@ export default function IssueProposalProgressBar({
   }
 
   useEffect(loadDisputeState, [isFinalized, isIssueinDraft, isCanceled, mergeProposalsAmount, isFinished]);
+  useEffect(() => {
+    BeproService.getRedeemTime()
+      .then(time => setRedeemTime(time))
+      .catch(error => console.log('Failed to get redeem time:', error))
+  }, [])
 
   return (
     <div className="container">
