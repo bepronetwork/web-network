@@ -124,7 +124,7 @@ export default function PageIssue() {
   }
 
   function checkIsWorking() {
-    if (issue)
+    if (issue?.working)
       setIsWorking(!!issue.working.find(el => el === githubLogin))
   }
 
@@ -192,6 +192,7 @@ export default function PageIssue() {
         mergeProposalsAmount={networkIssue?.mergeProposalsAmount}
         isFinished={networkIssue?.recognizedAsFinished}
         isCanceled={issue?.state === `canceled` || networkIssue?.canceled}
+        creationDate={networkIssue.creationDate}
       />}
 
       <IssueDescription description={issue?.body} />

@@ -145,6 +145,10 @@ class BeproFacet {
                          return 0;
                        });
   }
+
+  async getRedeemTime() {
+    return this._network.params.contract.getContract().methods.redeemTime().call()
+  }
 }
 
 // todo: complete this beast
