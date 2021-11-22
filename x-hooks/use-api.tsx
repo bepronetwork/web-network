@@ -245,6 +245,14 @@ export default function useApi() {
                 })
   }
 
+  async function mergeClosedIssue(issueId: string, pullRequestId: string, mergeProposalId: string, address: string) {
+    return client.post('/api/pull-request/merge', { issueId, pullRequestId, mergeProposalId, address })
+      .then(response => response)
+      .catch(error => {
+        throw error
+      })
+  }
+
   return {
     getIssue,
     getReposList,
@@ -271,5 +279,6 @@ export default function useApi() {
     waitForRedeem,
     userHasPR,
     startWorking,
+    mergeClosedIssue
   }
 }
