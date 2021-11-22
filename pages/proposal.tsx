@@ -19,9 +19,7 @@ import ConnectWalletButton from '@components/connect-wallet-button';
 import useRepos from '@x-hooks/use-repos';
 import useApi from '@x-hooks/use-api';
 import useMergeData from '@x-hooks/use-merge-data';
-import Modal from '@components/modal';
-import Button from '@components/button';
-import GithubLink from '@components/github-link';
+import NotMergeableModal from '@components/not-mergeable-modal';
 
 interface ProposalBepro {
   disputes: string;
@@ -44,7 +42,7 @@ interface usersAddresses {
 export default function PageProposal() {
   const router = useRouter();
   const {prId, mergeId, dbId, issueId} = router.query;
-  const { dispatch, state: {currentAddress, beproStaked}, } = useContext(ApplicationContext);
+  const { dispatch, state: {currentAddress, beproStaked, githubLogin}, } = useContext(ApplicationContext);
 
   const [proposalBepro, setProposalBepro] = useState<ProposalBepro>();
   const [proposalMicroService, setProposalMicroService] = useState<ProposalData>();
@@ -54,7 +52,8 @@ export default function PageProposal() {
   const [isFinished, setIsFinished] = useState<boolean>();
   const [prGithubId, setPrGithubId] = useState<string>();
   const [isMergiable, setIsMergiable] = useState<boolean>();
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [pullRequestGh, setPullRequestGh] = useState();
+  const [isCouncil, setIsCouncil] = useState(false);
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
   const [repo, setRepo] = useState(``);
@@ -85,8 +84,8 @@ export default function PageProposal() {
       const author = (await getUserOf(merge.proposalAddress))?.githubHandle;
 
       getPullRequestIssue(issueId.toString()).then((pr: any)=>{
+        setPullRequestGh(pr)
         setIsMergiable(pr.isMergeable)
-        setShowModal((!pr.isMergeable && pr.state === 'open' && !isDisputed))
       })
 
       setProposalBepro({...merge, isDisputed, author});
@@ -124,6 +123,8 @@ export default function PageProposal() {
 
   function loadProposalData() {
     if (issueId && currentAddress) {
+      BeproService.network.isCouncil({address: currentAddress})
+        .then(isCouncil => setIsCouncil(isCouncil))
       
       BeproService.network.getOraclesSummary({address: currentAddress})
       .then(oracles => dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles))))
@@ -151,7 +152,7 @@ export default function PageProposal() {
       <ProposalProgress developers={usersAddresses}/>
       <CustomContainer className="mgt-20 mgb-20">
         <div className="col-6">
-          <ProposalProgressBar issueDisputeAmount={+proposalBepro?.disputes} isDisputed={proposalBepro?.isDisputed} stakedAmount={+beproStaked} isFinished={isFinished} />
+          <ProposalProgressBar issueDisputeAmount={+proposalBepro?.disputes} isDisputed={proposalBepro?.isDisputed} stakedAmount={+beproStaked} isFinished={isFinalized} />
         </div>
       </CustomContainer>
       <PageActions
@@ -169,8 +170,17 @@ export default function PageProposal() {
         canClose={isMergiable}
         finished={isFinished} />
       <ProposalAddresses addresses={usersAddresses} currency="$BEPRO" />
+      <NotMergeableModal
+        currentGithubLogin={githubLogin}
+        currentAddress={currentAddress}
+        issue={issueMicroService}
+        pullRequest={pullRequestGh}
+        mergeProposal={proposalBepro}
+        isFinalized={isFinalized}
+        isCouncil={isCouncil}
+      />
 
-      <Modal show={showModal} title="Proposal cannot be accepted" titlePosition="center">
+      {/* <Modal show={showModal} title="Proposal cannot be accepted" titlePosition="center">
         <div>
           <div className="d-flex justify-content-center m-2 text-center">
             <p className="smallCaption trans mb-2 text-white-50 text-uppercase">this proposal has github conflicts and cannot be merged. please, fix it before doing so.</p>
@@ -180,7 +190,7 @@ export default function PageProposal() {
             <Button color='dark-gray' onClick={() => setShowModal(false)}>cancel</Button>
           </div>
         </div>
-      </Modal>
+      </Modal> */}
       <ConnectWalletButton asModal={true} />
     </>
   );

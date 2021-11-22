@@ -2,6 +2,7 @@ import React, {ButtonHTMLAttributes, ReactNode} from 'react';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   color?: string;
+  textClass?: string;
   outline?: boolean;
   transparent?: boolean;
   rounded?: boolean;
@@ -19,12 +20,13 @@ export default function Button({
                                  className = ``, 
                                  asAnchor = false,
                                  applyTextColor = true,
+                                 textClass,
                                  ...rest
                                }: ButtonProps) {
 
   function getClass(): string {
     const type = `btn-${outline ? `outline-${color}` : color}`
-    const textColor = !outline && color !== 'white' && 'text-white' || ``
+    const textColor = textClass || (!outline && color !== 'white' && 'text-white' || ``)
     let append = className;
 
     if (transparent)
@@ -36,7 +38,7 @@ export default function Button({
     if (outline)
       append += ` bg-opac-hover-25`
 
-    return `btn ${type} ${applyTextColor && textColor || ''} d-flex align-items-center justify-content-center text-uppercase shadow-none ${append}`
+    return `btn ${type} ${applyTextColor ? textColor : ''} d-flex align-items-center justify-content-center text-uppercase shadow-none ${append}`
   }
 
   return <>
