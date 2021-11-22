@@ -17,6 +17,7 @@ import useRepos from '@x-hooks/use-repos';
 import useApi from '@x-hooks/use-api';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import useTransactions from '@x-hooks/useTransactions';
+import LockedIcon from '@assets/icons/locked-icon';
 
 interface participants {
   githubHandle: string;
@@ -203,13 +204,15 @@ export default function NewProposal({
                  </Button>
                  <Button
                    onClick={handleClickCreate}
-                   disabled={!currentAddress}>
+                   disabled={!currentAddress || participants.length === 0}>
+                   {participants.length === 0 && <LockedIcon width={12} height={12} className="mr-1"/>}
                    Create Proposal
                  </Button>
                </>
              }>
         <p className="p-small text-50">Select a pull request </p>
         <ReactSelect id="pullRequestSelect"
+                      isDisabled={participants.length === 0}
                      defaultValue={{
                        value: pullRequests[0]?.id,
                        label: `#${pullRequests[0]?.githubId} Pull Request`,
@@ -221,20 +224,21 @@ export default function NewProposal({
                        githubId: items.githubId,
                      }))}
                      onChange={handleChangeSelect}/>
-
-        <p className="p-small mt-3">Propose distribution</p>
-        <ul className="mb-0">
-          {participants.map((item) => (
-                              <CreateProposalDistributionItem key={item.githubHandle}
-                                                              by={item.githubHandle}
-                                                              address={item.address}
-                                                              onChangeDistribution={handleChangeDistrib}
-                                                              error={error}/>
-                            )
-          )}
-        </ul>
-        {error && <p className="p error mt-3 mb-0 text-danger">{error}</p> ||
-        <p className="mt-3 mb-0 text-white-50">Distribute reward percentage</p>}
+        {participants.length === 0 && <p className="text-uppercase text-danger text-center w-100 caption mt-4 mb-0">Network Congestion</p> || <>
+          <p className="p-small mt-3">Propose distribution</p>
+          <ul className="mb-0">
+            {participants.map((item) => (
+                                <CreateProposalDistributionItem key={item.githubHandle}
+                                                                by={item.githubHandle}
+                                                                address={item.address}
+                                                                onChangeDistribution={handleChangeDistrib}
+                                                                error={error}/>
+                              )
+            )}
+          </ul>
+          {error && <p className="p error mt-3 mb-0 text-danger">{error}</p> ||
+          <p className="mt-3 mb-0 text-white-50">Distribute reward percentage</p>}
+        </>}
       </Modal>
     </>
   );
