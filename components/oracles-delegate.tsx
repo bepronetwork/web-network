@@ -13,12 +13,15 @@ import {formatNumberToCurrency} from 'helpers/formatNumber'
 
 function OraclesDelegate(): JSX.Element {
   const {dispatch, state: {oracles, currentAddress, beproInit, metaMaskWallet,myTransactions, balance: {bepro: beproBalance, staked}}} = useContext(ApplicationContext);
-  const [tokenAmount, setTokenAmount] = useState<number>(0);
+  const [tokenAmount, setTokenAmount] = useState<number | undefined>();
   const [delegatedTo, setDelegatedTo] = useState<string>("");
   const [delegatedAmount, setDelegatedAmount] = useState(0);
   const [error, setError] = useState<string>("");
 
   function handleChangeOracles(params: NumberFormatValues) {
+    if (params.value === '')
+      return setTokenAmount(undefined)
+
     if(params.floatValue < 1 || !params.floatValue)
       return setTokenAmount(0)
 
@@ -79,26 +82,26 @@ function OraclesDelegate(): JSX.Element {
     <div className="col-md-5">
       <div className="content-wrapper h-100">
         <OraclesBoxHeader actions="Delegate oracles" available={delegatedAmount} />
-        <p className="smallCaption text-white text-uppercase mt-2 mb-3">Delagate Oracles to use them in issues</p>
+        <p className="smallCaption text-white text-uppercase mt-2 mb-3">Delegate Oracles to use them in issues</p>
         <InputNumber
           label="Oracles Ammout"
           value={tokenAmount}
           symbol="ORACLES"
           classSymbol="text-purple"
           onValueChange={handleChangeOracles}
+          min={0}
+          placeholder="Insert an amount of Oracles"
           thousandSeparator
           error={error}
           helperText={(
             <>
               {formatNumberToCurrency(delegatedAmount)} Oracles Available
-              {!error && (
-                <span
+              <span
                   className="smallCaption ml-1 cursor-pointer text-uppercase text-purple"
                   onClick={setMaxAmmount}
                   >
                   Max
-                </span>
-              )}
+              </span>
             </>)
           }/>
 

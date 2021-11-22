@@ -17,6 +17,7 @@ import GithubLink from '@components/github-link';
 import {useRouter} from 'next/router';
 import useApi from '@x-hooks/use-api';
 import useTransactions from '@x-hooks/useTransactions';
+import LockedIcon from "@assets/icons/locked-icon";
 
 interface pageActions {
   issueId: string;
@@ -36,12 +37,15 @@ interface pageActions {
   githubLogin?: string;
   mergeId?: string;
   isDisputed?: boolean;
-  canOpenPR?: boolean;
+  hasOpenPR?: boolean;
+  isRepoForked?: boolean;
+  isWorking?: boolean;
   canClose?: boolean;
   githubId?: string;
   finished?: boolean;
   issueCreator?: string;
   repoPath?: string;
+  addNewComment?: (comment: any) => void;
 }
 
 export default function PageActions({
@@ -62,11 +66,14 @@ export default function PageActions({
   githubLogin,
   mergeId,
   isDisputed,
-  canOpenPR,
+  hasOpenPR = false,
+  isRepoForked = false,
+  isWorking = false,
   canClose = true,
   githubId = ``,
   finished = false,
   repoPath = ``,
+  addNewComment,
   issueCreator,
 }: pageActions) {
   const {
@@ -74,9 +81,10 @@ export default function PageActions({
     state: { githubHandle, currentAddress, myTransactions },
   } = useContext(ApplicationContext);
   const {query: {repoId, id}} = useRouter();
-  const {createPullRequestIssue, waitForRedeem, waitForClose, processEvent} = useApi();
+  const {createPullRequestIssue, waitForRedeem, waitForClose, processEvent, startWorking} = useApi();
 
   const [showPRModal, setShowPRModal] = useState(false);
+  const [isExecuting, setIsExecuting] = useState(false);
 
   const txWindow = useTransactions();
 
@@ -188,15 +196,65 @@ export default function PageActions({
 
   function renderPullrequest() {
     return (
+      !isClosedIssue(state) &&
       !isIssueinDraft &&
       !finished &&
       !finalized &&
+      !hasOpenPR &&
+      isRepoForked &&
+      isWorking &&
       githubLogin && (
-        <Button onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || !canOpenPR}>
+        <Button onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || hasOpenPR}>
           Create Pull Request
         </Button>
       )
     );
+  }
+
+  function renderForkRepository() {
+    return (
+      !isRepoForked &&
+      !isIssueinDraft &&
+      !finished &&
+      !finalized &&
+      githubLogin &&
+      <GithubLink 
+        repoId={String(repoId)} 
+        forcePath={repoPath} 
+        hrefPath="fork"
+        color="primary"
+      >
+        Fork this repository
+      </GithubLink>
+    )
+  }
+
+  function renderStartWorking() {
+    return (
+      isRepoForked &&
+      !isWorking &&
+      !isIssueinDraft &&
+      !finished &&
+      !finalized &&
+      githubLogin &&
+      <Button 
+        color="primary" 
+        onClick={handleStartWorking}
+        disabled={isExecuting}
+      >
+        <span>Start Working</span>
+        {isExecuting ? <span className="spinner-border spinner-border-xs ml-1"/> : ''}
+      </Button>
+    )
+  }
+
+  function renderViewPullrequest() {
+    return (
+      !isIssueinDraft &&
+      hasOpenPR &&
+      githubLogin &&
+      <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`pull/${pullRequests[0]?.githubId || ""}`} color="primary">View Pull Request</GithubLink>
+    )
   }
 
   async function handlePullrequest({title: prTitle, description: prDescription,}) {
@@ -206,12 +264,14 @@ export default function PageActions({
         dispatch(
           addToast({
             type: "success",
-            title: "Sucess",
+            title: "Success",
             content: "Created pull request",
           })
         );
+
         if (handleMicroService)
           handleMicroService(true);
+
         setShowPRModal(false);
       })
       .catch((err) => {
@@ -235,6 +295,40 @@ export default function PageActions({
           );
         }
       });
+  }
+
+  async function handleStartWorking() {
+    setIsExecuting(true)
+
+    startWorking(networkCID, githubLogin)
+      .then((response) => {
+        dispatch(
+          addToast({
+            type: "success",
+            title: "Success",
+            content: "To start working on this issue",
+          })
+        )
+
+        if (handleMicroService)
+          handleMicroService(true)
+
+        if (addNewComment)
+          addNewComment(response.data)
+        
+        setIsExecuting(false)
+      })
+      .catch((error) => {
+        dispatch(
+          addToast({
+            type: "danger",
+            title: "Failed",
+            content: "To start working on this issue",
+          })
+        )
+
+        setIsExecuting(false)
+      })
   }
 
   async function handleDispute() {
@@ -300,19 +394,26 @@ export default function PageActions({
               {renderIssueAvatars()}
               {forks && renderForkAvatars()}
 
-              <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`pull/${githubId || ""}`}>view on github</GithubLink>
-
-              {!isIssueinDraft && canOpenPR && !isClosedIssue(state) && !finished && githubLogin && <GithubLink color="primary" forcePath={repoPath} hrefPath="fork">work on this issue</GithubLink>}
+              {renderForkRepository()}
+              {renderStartWorking()}
+              {renderPullrequest()}
 
               {renderRedeem()}
               {renderProposeDestribution()}
-              {!isClosedIssue(state) && githubLogin && renderPullrequest()}
               {state?.toLowerCase() == "pull request" && (
                 <>
                   { (!isDisputed && !finalized ) && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>Dispute</Button> || ``}
-                  {!finalized && <Button disabled={!canClose} onClick={handleClose}>Close</Button> || ``}
+                  {!finalized && <Button disabled={canClose} onClick={handleClose}>
+                  {!canClose && <LockedIcon width={12} height={12} className="mr-1"/>}
+                    Close
+                    </Button> || ``}
                 </>
               )}
+
+              {renderViewPullrequest()}
+              
+              <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`${state?.toLowerCase() === 'pull request' && 'pull' || 'issues' }/${githubId || ""}`}>view on github</GithubLink>
+
             </div>
           </div>
         </div>
