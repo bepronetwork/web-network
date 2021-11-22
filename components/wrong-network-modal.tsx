@@ -97,7 +97,7 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
           </a>{" "}
           <br /> and{" "}
           <a
-            href="https://www.bepro.network/private-policy"
+            href="https://www.bepro.network/privacy"
             target="_blank"
             className="text-decoration-none"
           >
