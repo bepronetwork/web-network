@@ -131,7 +131,7 @@ export default function useApi() {
 
   async function getUserWith(login: string): Promise<User> {
     return client.post<User[]>(`/api/search/users/login/`, [login])
-                 .then(({data}) => data[0])
+                 .then(({data}) => data[0] || {} as User)
                  .catch(() => ({} as User))
   }
 
@@ -234,6 +234,23 @@ export default function useApi() {
                    console.log(`Failed to fetch PR information`, e);
                    return false;
                  });
+
+  }
+
+  async function startWorking(issueId: string, githubLogin: string) {
+    return client.put('/api/issue/working',  { issueId, githubLogin })
+                .then((response) => response)
+                .catch(error => {
+                  throw error
+                })
+  }
+
+  async function mergeClosedIssue(issueId: string, pullRequestId: string, mergeProposalId: string, address: string) {
+    return client.post('/api/pull-request/merge', { issueId, pullRequestId, mergeProposalId, address })
+      .then(response => response)
+      .catch(error => {
+        throw error
+      })
   }
 
   return {
@@ -261,5 +278,7 @@ export default function useApi() {
     waitForClose,
     waitForRedeem,
     userHasPR,
+    startWorking,
+    mergeClosedIssue
   }
 }

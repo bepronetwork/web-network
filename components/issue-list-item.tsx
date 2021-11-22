@@ -77,7 +77,7 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
               {issue?.state}
             </span>
             <span className="p-small mr-2 mt-1 text-white-50">
-              {issue?.numberOfComments || 0} comments
+              {issue?.numberOfComments || 0} comment{issue?.numberOfComments > 1 && 's' || ''}
             </span>
             <span className="p-small mr-2 mt-1 text-white-50">
               {issue != null && formatDate(issue?.createdAt)}

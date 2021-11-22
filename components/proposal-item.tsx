@@ -98,10 +98,10 @@ export default function ProposalItem({
         <a className="text-decoration-none text-white">
           <div className="rounded row align-items-top">
             <div
-              className={`col-4 p-small mt-2 text-uppercase text-${getColors() === 'purple' ? 'white' : getColors()}`}>
+              className={`col-2 p-small mt-2 text-uppercase text-${getColors() === 'purple' ? 'white' : getColors()}`}>
               PR #{proposal.pullRequestGithubId} {owner && `BY @${owner}`}
             </div>
-            <div className="col-4 d-flex justify-content-start mb-2">
+            <div className="col-6 d-flex justify-content-start mb-2">
               {proposal.prAmounts.map((value, i) =>
                                         <PercentageProgressBar textClass={`smallCaption p-small text-${getColors()}`}
                                                                pgClass={`bg-${getColors()}`}
@@ -109,12 +109,15 @@ export default function ProposalItem({
                                                                value={value} total={amount}/>)}
             </div>
 
-            <div className="col-4 d-flex justify-content-between">
+            <div className="col-4 d-flex">              
+              <div className="col-9 offset-1">
               <ProposalProgressSmall pgClass={`${getColors()}`}
                                      value={+proposal.disputes}
                                      total={beproStaked}
                                      textClass={`pb-2 text-${getColors()}`}/>
-              <div className="col justify-content-end d-flex">
+              </div>
+
+              <div className="col-1 offset-1 justify-content-end d-flex">
                 <Button color={getColors()}
                         disabled={proposal.isDisputed}
                         outline={proposal.isDisputed} className={`align-self-center mb-2 ms-3`}
