@@ -13,12 +13,15 @@ import {formatNumberToCurrency} from 'helpers/formatNumber'
 
 function OraclesDelegate(): JSX.Element {
   const {dispatch, state: {oracles, currentAddress, beproInit, metaMaskWallet,myTransactions, balance: {bepro: beproBalance, staked}}} = useContext(ApplicationContext);
-  const [tokenAmount, setTokenAmount] = useState<number>(0);
+  const [tokenAmount, setTokenAmount] = useState<number | undefined>();
   const [delegatedTo, setDelegatedTo] = useState<string>("");
   const [delegatedAmount, setDelegatedAmount] = useState(0);
   const [error, setError] = useState<string>("");
 
   function handleChangeOracles(params: NumberFormatValues) {
+    if (params.value === '')
+      return setTokenAmount(undefined)
+
     if(params.floatValue < 1 || !params.floatValue)
       return setTokenAmount(0)
 
@@ -86,6 +89,8 @@ function OraclesDelegate(): JSX.Element {
           symbol="ORACLES"
           classSymbol="text-purple"
           onValueChange={handleChangeOracles}
+          min={0}
+          placeholder="Insert an amount of Oracles"
           thousandSeparator
           error={error}
           helperText={(

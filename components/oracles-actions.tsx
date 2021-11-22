@@ -26,7 +26,7 @@ function OraclesActions(): JSX.Element {
 
   const [show, setShow] = useState<boolean>(false);
   const [action, setAction] = useState<string>(actions[0]);
-  const [tokenAmount, setTokenAmount] = useState<number>(0);
+  const [tokenAmount, setTokenAmount] = useState<number | undefined>();
   const [isApproved, setIsApproved] = useState<boolean>(null);
   const [error, setError] = useState<string>("");
   const [walletAddress, setWalletAddress] = useState(``);
@@ -106,6 +106,9 @@ function OraclesActions(): JSX.Element {
   function handleChangeToken(params: NumberFormatValues) {
     if(error)
       setError("")
+
+    if (params.value === '')
+      return setTokenAmount(undefined)
 
     if(params.floatValue < 1 || !params.floatValue)
       return setTokenAmount(0)
@@ -206,6 +209,8 @@ function OraclesActions(): JSX.Element {
             max={balance.bepro}
             error={error}
             value={tokenAmount}
+            min={0}
+            placeholder={`Insert an amount of ${getCurrentLabel()}`}
             onValueChange={handleChangeToken}
             thousandSeparator
             helperText={(
