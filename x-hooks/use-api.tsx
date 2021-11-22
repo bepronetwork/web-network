@@ -131,7 +131,7 @@ export default function useApi() {
 
   async function getUserWith(login: string): Promise<User> {
     return client.post<User[]>(`/api/search/users/login/`, [login])
-                 .then(({data}) => data[0])
+                 .then(({data}) => data[0] || {} as User)
                  .catch(() => ({} as User))
   }
 
