@@ -72,9 +72,12 @@ function OraclesDelegate(): JSX.Element {
       tokenAmount < 1,
       tokenAmount > +oracles.tokensLocked,
       !delegatedTo,
+      isAddressesEqual(),
       myTransactions.find(({status, type}) =>
                             status === TransactionStatus.pending && type === TransactionTypes.delegateOracles)
     ].some(values => values)
+
+  const isAddressesEqual = () => delegatedTo?.toLowerCase() === currentAddress?.toLowerCase()
 
   useEffect(updateAmounts, [beproInit, metaMaskWallet, oracles, beproBalance, staked]);
 
@@ -111,8 +114,10 @@ function OraclesDelegate(): JSX.Element {
             value={delegatedTo}
             onChange={handleChangeAddress}
             type="text"
-            className="form-control"
-            placeholder="Type an address"/>
+            className={`form-control ${isAddressesEqual() && 'is-invalid' || ''}`}
+            placeholder="Type an address"
+            />
+            {isAddressesEqual() && <span className="text-danger smallCaption">You can't delegate coins to yourself</span> || ''}
         </div>
 
         {error && <p className="p-small text-danger mt-2">{error}</p>}

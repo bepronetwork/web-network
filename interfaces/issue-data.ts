@@ -30,8 +30,12 @@ export interface IssueData {
 export interface pullRequest {
   createdAt: Date;
   githubId: string;
+  githubLogin: string;
   id: number;
+  isMergeable: boolean;
   issueId: number;
+  state: string;
+  merged: boolean;
   updatedAt: Date;
 }
 

@@ -10,7 +10,7 @@ import {BeproService} from '@services/bepro-service';
 import {ProposalData} from '@services/github-microservice';
 import {formatDate} from '@helpers/formatDate';
 import {handlePercentage} from '@helpers/handlePercentage';
-import {IssueData} from '@interfaces/issue-data';
+import {IssueData, pullRequest} from '@interfaces/issue-data';
 import ProposalProgressBar from '@components/proposal-progress-bar';
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import CustomContainer from '@components/custom-container';
@@ -52,7 +52,8 @@ export default function PageProposal() {
   const [isFinished, setIsFinished] = useState<boolean>();
   const [prGithubId, setPrGithubId] = useState<string>();
   const [isMergiable, setIsMergiable] = useState<boolean>();
-  const [pullRequestGh, setPullRequestGh] = useState();
+  const [pullRequestGh, setPullRequestGh] = useState<pullRequest>();
+  const [issuePRs, setIssuePRs] = useState<pullRequest[]>();
   const [isCouncil, setIsCouncil] = useState(false);
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
@@ -70,7 +71,7 @@ export default function PageProposal() {
 
     setRepo(_repo?.githubPath)
     setIssueMicroService(issueData);
-    setPrGithubId(issueData.pullRequests[0].githubId);
+    setPrGithubId(issueData.pullRequests?.find(el => el.id === +prId).githubId);
     setProposalMicroService(issueData.mergeProposals.find(({scMergeId, issueId, pullRequestId}) => scMergeId === String(mergeId) && pullRequestId === +prId && issueId === +dbId));
     setAmountIssue(issueData?.amount?.toString())
   }
@@ -83,9 +84,11 @@ export default function PageProposal() {
       const isDisputed = await BeproService.network.isMergeDisputed({issueId: issue_id, mergeId});
       const author = (await getUserOf(merge.proposalAddress))?.githubHandle;
 
-      getPullRequestIssue(issueId.toString()).then((pr: any)=>{
-        setPullRequestGh(pr)
-        setIsMergiable(pr.isMergeable)
+      getPullRequestIssue(issueId.toString()).then((prs: any)=>{
+        const currentPR = prs.find(pr => pr.id === +prId)
+        setPullRequestGh(currentPR)
+        setIsMergiable(currentPR?.isMergeable)
+        setIssuePRs(prs)
       })
 
       setProposalBepro({...merge, isDisputed, author});
@@ -146,7 +149,7 @@ export default function PageProposal() {
         githubId={issueMicroService?.githubId}
         title={issueMicroService?.title}
         pullRequestId={prGithubId}
-        authorPullRequest={proposalBepro?.author}
+        authorPullRequest={pullRequestGh?.githubLogin}
         createdAt={proposalMicroService && formatDate(proposalMicroService.createdAt)}
         beproStaked={formatNumberToCurrency(amountIssue)}/>
       <ProposalProgress developers={usersAddresses}/>
@@ -172,6 +175,7 @@ export default function PageProposal() {
       <ProposalAddresses addresses={usersAddresses} currency="$BEPRO" />
       <NotMergeableModal
         currentGithubLogin={githubLogin}
+        issuePRs={issuePRs}
         currentAddress={currentAddress}
         issue={issueMicroService}
         pullRequest={pullRequestGh}
