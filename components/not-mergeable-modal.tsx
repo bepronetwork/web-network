@@ -13,6 +13,7 @@ export default function NotMergeableModal({
   issue,
   pullRequest,
   mergeProposal,
+  issuePRs,
   isFinalized = false,
   isCouncil = false
 }) {
@@ -23,13 +24,15 @@ export default function NotMergeableModal({
   const isPullRequestOwner = pullRequest?.githubLogin === currentGithubLogin
   const isProposer =
     mergeProposal?.proposalAddress?.toLowerCase() === currentAddress
+  const hasPRMerged = !!issuePRs?.find((pr) => pr.merged === true)
   const { mergeClosedIssue } = useApi()
 
   function handleModalVisibility() {
-    if (!pullRequest) return
+    if (!pullRequest || !issuePRs || mergeState === 'success') return
 
     if (
-      pullRequest.isMergeable ||
+      (pullRequest.isMergeable && !isFinalized) ||
+      hasPRMerged ||
       !(isIssueOwner || isPullRequestOwner || isCouncil || isProposer)
     ) {
       setVisible(false)
@@ -84,7 +87,8 @@ export default function NotMergeableModal({
     mergeProposal,
     isFinalized,
     isCouncil,
-    mergeState
+    mergeState,
+    issuePRs
   ])
 
   return (
