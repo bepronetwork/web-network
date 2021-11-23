@@ -15,30 +15,34 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     return res.status(422);
 
   let where = {
-    issueId: find.id
+    issueId: find.id,
   } as any;
 
   if(login){
     where.githubLogin = login
   }
 
-  const pr = await models.pullRequest.findOne({where, raw: true});
+  const prs = await models.pullRequest.findAll({where, raw: true});
   
-  if(pr){
+  if(prs){
     const repoInfo = await models.repositories.findOne({where: {id: find.repository_id}, raw: true});
     const [owner, repo] = repoInfo.githubPath.split(`/`);
-
     const octoKit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
-    const {data} = await octoKit.rest.pulls.get({
-      owner,
-      repo,
-      pull_number: pr.githubId,
-    });
-    pr.isMergeable = data.mergeable;
-    pr.state = data.state;
+
+    for(const pr of prs) {
+      const {data} = await octoKit.rest.pulls.get({
+        owner,
+        repo,
+        pull_number: pr.githubId,
+      });
+      
+      pr.isMergeable = data.mergeable;
+      pr.state = data.state;
+      pr.merged = data.merged;
+    } 
   }
 
-  return res.status(200).json(pr)
+  return res.status(200).json(prs)
 }
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
