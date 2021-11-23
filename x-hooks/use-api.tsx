@@ -204,8 +204,8 @@ export default function useApi() {
                  .catch(() => null)
   }
 
-  async function processEvent(eventName, fromBlock: number, id: number) {
-    return client.post(`/api/past-events/${eventName}/`, {fromBlock, id})
+  async function processEvent(eventName, fromBlock: number, id: number, pullRequestId = '') {
+    return client.post(`/api/past-events/${eventName}/`, {fromBlock, id, pullRequestId})
   }
 
   async function processMergeProposal(fromBlock, id) {

@@ -26,14 +26,17 @@ export default function NotMergeableModal({
   const { mergeClosedIssue } = useApi()
 
   function handleModalVisibility() {
-    if (mergeState === 'success') {
-      setVisible(false)
-    } else if (
-      (isIssueOwner || isPullRequestOwner || isCouncil || isProposer) &&
-      ((pullRequest?.state === 'open' && isFinalized) ||
-        (!isFinalized && !pullRequest?.isMergeable))
+    if (!pullRequest) return
+
+    if (
+      pullRequest.isMergeable ||
+      !(isIssueOwner || isPullRequestOwner || isCouncil || isProposer)
     ) {
-      setVisible(true)
+      setVisible(false)
+    } else {
+      if (isIssueOwner || isPullRequestOwner || isCouncil || isProposer) {
+        setVisible(pullRequest.state === 'open')
+      }
     }
   }
 
@@ -58,6 +61,7 @@ export default function NotMergeableModal({
         )
 
         setMergeState('success')
+        setVisible(false)
       })
       .catch((error) => {
         dispatch(
@@ -98,7 +102,6 @@ export default function NotMergeableModal({
               ''}
 
             {(!isFinalized &&
-              !pullRequest?.isMergeable &&
               'This proposal has github conflicts and cannot be merged. Please, fix it before doing so.') ||
               ''}
           </p>

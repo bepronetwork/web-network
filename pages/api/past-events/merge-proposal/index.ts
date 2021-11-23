@@ -5,7 +5,7 @@ import {Bus} from '@helpers/bus';
 import models from '@db/models';
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const {fromBlock, id} = req.body;
+  const {fromBlock, id, pullRequestId} = req.body;
 
   const opt = {opt: {web3Connection: WEB3_CONNECTION,  privateKey: process.env.NEXT_PRIVATE_KEY}, test: true,};
   const network = new Network({contractAddress: CONTRACT_ADDRESS, ...opt});
@@ -29,7 +29,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
                     if (!user)
                       return console.log(`Could not find a user for ${creator}`, event);
 
-                    const pr = await models.pullRequest.findOne({where: {issueId: issue?.id}});
+                    const pr = await models.pullRequest.findOne({where: {issueId: issue?.id, githubId: pullRequestId}});
                     if (!pr)
                       return console.log(`Could not find PR for db-issue ${issue?.id}`, event);
 
