@@ -403,7 +403,7 @@ export default function PageActions({
               {state?.toLowerCase() == "pull request" && (
                 <>
                   { (!isDisputed && !finalized ) && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>Dispute</Button> || ``}
-                  {!finalized && <Button disabled={canClose} onClick={handleClose}>
+                  {!finalized && <Button disabled={!canClose} onClick={handleClose}>
                   {!canClose && <LockedIcon width={12} height={12} className="mr-1"/>}
                     Close
                     </Button> || ``}
