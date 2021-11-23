@@ -116,23 +116,34 @@ export default function NewProposal({
     await BeproService.network
                       .proposeIssueMerge(payload)
                       .then(txInfo => {
-                        processEvent(`merge-proposal`, txInfo.blockNumber, issue_id);
+                        processEvent(`merge-proposal`, txInfo.blockNumber, issue_id, currentGithubId);
 
                         txWindow.updateItem(proposeMergeTx.payload.id, BeproService.parseTransaction(txInfo, proposeMergeTx.payload));
+
+                        handleClose();
                       })
                       .catch((e) => {
                         if (e?.message?.search(`User denied`) > -1)
                           dispatch(updateTransaction({...proposeMergeTx.payload as any, remove: true}))
                         else dispatch(updateTransaction({...proposeMergeTx.payload as any, status: TransactionStatus.failed}));
                         setError('Error to create proposal in Smart Contract')
+                        handleClose();
                       })
   }
 
   function handleClose() {
+    if (pullRequests.length && activeRepo)
+      getParticipantsPullRequest(pullRequests[0]?.id, pullRequests[0]?.githubId)
+      setCurrentGithubId(pullRequests[0]?.githubId)
+
     setShow(false);
+    setAmount(0);
+    setDistrib({});
   }
 
   function handleChangeSelect({ value, githubId }) {
+    setDistrib({});
+    setAmount(0);
     getParticipantsPullRequest(value, githubId);
   }
 
