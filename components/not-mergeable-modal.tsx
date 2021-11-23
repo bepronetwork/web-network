@@ -37,6 +37,7 @@ export default function NotMergeableModal({
       if (isIssueOwner || isPullRequestOwner || isCouncil || isProposer) {
         setVisible(pullRequest.state === 'open')
       }
+    }
   }
 
   function handleRetryMerge() {
