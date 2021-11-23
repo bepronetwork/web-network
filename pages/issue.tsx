@@ -163,7 +163,7 @@ export default function PageIssue() {
         handleBeproService={getsIssueBeproService}
         handleMicroService={getsIssueMicroService}
         pullRequests={issue?.pullRequests || []}
-        mergeProposals={issue?.pullRequests?.length}
+        mergeProposals={issue?.mergeProposals?.length}
         amountIssue={networkIssue?.tokensStaked}
         forks={forks}
         githubLogin={currentUser?.githubLogin}
