@@ -77,7 +77,7 @@ function OraclesDelegate(): JSX.Element {
                             status === TransactionStatus.pending && type === TransactionTypes.delegateOracles)
     ].some(values => values)
 
-  const isAddressesEqual = () => delegatedTo?.toLowerCase() === currentAddress?.toLowerCase()
+  const isAddressesEqual = () => currentAddress && delegatedTo?.toLowerCase() === currentAddress?.toLowerCase()
 
   useEffect(updateAmounts, [beproInit, metaMaskWallet, oracles, beproBalance, staked]);
 
