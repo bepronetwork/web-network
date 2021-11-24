@@ -215,7 +215,7 @@ function OraclesActions(): JSX.Element {
             thousandSeparator
             helperText={(
               <>
-                {formatNumberToCurrency(getMaxAmmount())} {getCurrentLabel()} Available
+                {formatNumberToCurrency(Math.floor(getMaxAmmount()))} {getCurrentLabel()} Available
                 <span
                     className={`smallCaption ml-1 cursor-pointer text-uppercase ${`${getCurrentLabel() === 'Oracles' ? "text-purple" : "text-blue"}`}`}
                     onClick={setMaxAmmount}>

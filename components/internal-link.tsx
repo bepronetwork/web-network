@@ -47,7 +47,7 @@ export default function InternalLink({
     <Link href={props.href} passHref>
       <a className={getClasses()}>
         {(iconBefore && props.icon) || ``}
-        {props.label && <span>{props.label}</span> || ``}
+        {props.label !== undefined && <span>{props.label}</span> || ``}
         {(!iconBefore && props.icon) || ``}
       </a>
     </Link>

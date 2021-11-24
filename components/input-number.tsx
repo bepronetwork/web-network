@@ -37,6 +37,7 @@ export default function InputNumber({
           htmlFor={id}
           min={min}
           placeholder={placeholder}
+          decimalScale={0}
           {...params}
         />
         {symbol && (

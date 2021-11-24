@@ -118,7 +118,7 @@ export default function MainNav() {
 
             <NetworkIdentifier />
 
-            <InternalLink href="/account" icon={<BeproSmallLogo />} label={formatNumberToNScale(beproBalance)} transparent nav />
+            <InternalLink href="/account" icon={<BeproSmallLogo />} label={formatNumberToNScale(Math.floor(beproBalance))} transparent nav />
 
             <InternalLink href="/account" icon={<BalanceAddressAvatar address={address} balance={ethBalance} currency={CURRENCY} />} className="meta-info d-flex align-items-center" />
           </div>

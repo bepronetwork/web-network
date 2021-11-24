@@ -36,7 +36,7 @@ function OraclesBoxHeader({
         )}
       </div>
       {typeof available !== "undefined" && (
-        <span className="badge-opac bg-dark-gray text-white text-opacity-100 smallCaption py-1 px-3">{formatNumberToCurrency(available)} {delegatedBox && 'Delegated' || 'Available'}</span>
+        <span className="badge-opac bg-dark-gray text-white text-opacity-100 smallCaption py-1 px-3">{formatNumberToCurrency(Math.floor(available))} {delegatedBox && 'Delegated' || 'Available'}</span>
       )}
     </div>
   );
