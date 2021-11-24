@@ -38,7 +38,7 @@ export default function OraclesTakeBack(): JSX.Element {
   return (
     <div className="col-md-10">
       <div className="content-wrapper mb-5">
-        <OraclesBoxHeader actions="List of delegations" available={delegatedAmount} />
+        <OraclesBoxHeader actions="List of delegations" available={delegatedAmount} delegatedBox />
         <div className="row">
           <div className="col">
             {!(items || []).length
