@@ -5,8 +5,6 @@ import {Octokit} from 'octokit';
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {login, issueId} = req.query;
 
-  console.log(req.query);
-
   if (!issueId)
     return res.status(422);
 
@@ -24,7 +22,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   const prs = await models.pullRequest.findAll({where, raw: true});
   
-  if(prs){
+  if(prs && !login){
     const repoInfo = await models.repositories.findOne({where: {id: find.repository_id}, raw: true});
     const [owner, repo] = repoInfo.githubPath.split(`/`);
     const octoKit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
