@@ -11,4 +11,4 @@ export const formatNumberToNScale = (number: number) => {
   if (number >= 1e12) return +(number / 1e12).toFixed(1) + "T";
 };
 
-export const formatNumberToCurrency = (number: number | string) => new Intl.NumberFormat('en').format(toNumber(number));
+export const formatNumberToCurrency = (number: number | string, options = {}) => new Intl.NumberFormat('en', options).format(toNumber(number));
