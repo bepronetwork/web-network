@@ -104,8 +104,7 @@ export default function PageIssue() {
 
     userHasPR(`${repoId}/${id}`, githubLogin)
       .then((result) => {
-        console.log('hasOpenPR', result)
-        setHasOpenPR(result)
+        setHasOpenPR(!!result)
       })
       .catch(e => {console.log(`Failed to list PRs`, e)});
   }
@@ -125,14 +124,14 @@ export default function PageIssue() {
   }
 
   function checkIsWorking() {
-    if (issue?.working)
-      setIsWorking(!!issue.working.find(el => el === githubLogin))
+    if (issue?.working && githubLogin)
+      setIsWorking(issue.working.some(el => el === githubLogin))
   }
 
   useEffect(loadIssueData, [githubLogin, currentAddress, id, activeRepo]);
   useEffect(getsIssueMicroService, [activeRepo, reposList])
-  useEffect(checkIsWorking, [issue])
-  useEffect(getRepoForked, [issue])
+  useEffect(checkIsWorking, [issue, githubLogin])
+  useEffect(getRepoForked, [issue, githubLogin])
 
   const handleStateissue = () => {
     if (issue?.state) return issue?.state;

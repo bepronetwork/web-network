@@ -20,6 +20,7 @@ import useRepos from '@x-hooks/use-repos';
 import useApi from '@x-hooks/use-api';
 import useMergeData from '@x-hooks/use-merge-data';
 import NotMergeableModal from '@components/not-mergeable-modal';
+import useOctokit from '@x-hooks/use-octokit';
 
 interface ProposalBepro {
   disputes: string;
@@ -61,6 +62,7 @@ export default function PageProposal() {
   const [[activeRepo, repoList], {findRepo, loadRepos}] = useRepos();
   const {getUserOf, getPullRequestIssue} = useApi();
   const {getIssue,} = useMergeData();
+  const {getPullRequest} = useOctokit();
 
   async function getProposalData() {
     const [repoId, ghId] = String(issueId).split(`/`);
@@ -83,15 +85,21 @@ export default function PageProposal() {
       const merge = await BeproService.network.getMergeById({issue_id: issue_id, merge_id: mergeId});
       const isDisputed = await BeproService.network.isMergeDisputed({issueId: issue_id, mergeId});
       const author = (await getUserOf(merge.proposalAddress))?.githubHandle;
+      const pullRequests = [];
 
-      getPullRequestIssue(issueId.toString()).then((prs: any)=>{
-        const currentPR = prs.find(pr => pr.id === +prId)
-        setPullRequestGh(currentPR)
-        setIsMergiable(currentPR?.isMergeable)
-        setIssuePRs(prs)
-      })
+      for (const pullRequest of issueMicroService?.pullRequests) {
+        const {data: {merged, mergeable, number, state}} = await getPullRequest(+pullRequest.githubId, issueMicroService.repo);
+        if (number === +prGithubId) {
+          setIsMergiable(mergeable);
+          setPullRequestGh({...pullRequest, merged, isMergeable: mergeable, state});
+        }
 
+        pullRequests.push({...pullRequest, merged, isMergeable: mergeable, state})
+      }
+
+      setIssuePRs(pullRequests)
       setProposalBepro({...merge, isDisputed, author});
+
       return Promise.resolve();
     } catch (e) {
       console.error(`Error fetching Proposal for issue cid:${issueId} with merge:${mergeId}`, e);
@@ -128,21 +136,24 @@ export default function PageProposal() {
     if (issueId && currentAddress) {
       BeproService.network.isCouncil({address: currentAddress})
         .then(isCouncil => setIsCouncil(isCouncil))
-      
+
       BeproService.network.getOraclesSummary({address: currentAddress})
-      .then(oracles => dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles))))
-      .then(async () => {
-        await getProposalData();
-        await getProposal();
-        await getIssueAmount();
-      })
+                  .then(oracles => dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles))))
+                  .then(getProposalData)
+                  .then(getProposal)
+                  .then(getIssueAmount)
+      // .then(async () => {
+      //   await getProposalData();
+      //   await getProposal();
+      //   await getIssueAmount();
+      // })
     }
   }
 
   useEffect(() => { loadProposalData() }, [currentAddress, issueId,]);
   useEffect(() => { updateUsersAddresses(proposalBepro) }, [proposalBepro, currentAddress]);
   useEffect(() => { setRepo(activeRepo?.githubPath) }, [activeRepo])
-  
+
   return (
     <>
       <ProposalHero
@@ -175,7 +186,7 @@ export default function PageProposal() {
       <ProposalAddresses addresses={usersAddresses} currency="$BEPRO" />
       <NotMergeableModal
         currentGithubLogin={githubLogin}
-        issuePRs={issuePRs}
+        issuePRs={issueMicroService?.pullRequests}
         currentAddress={currentAddress}
         issue={issueMicroService}
         pullRequest={pullRequestGh}
