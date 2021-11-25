@@ -93,7 +93,7 @@ export default function ApplicationContextProvider({children}) {
         dispatch(changeAccessToken(user?.accessToken));
       })
 
-    BeproService.network.getOraclesSummary({address})
+    BeproService.getOraclesSummary()
                 .then(oracles => dispatch(changeOraclesState(changeOraclesParse(address, oracles))))
 
     BeproService.getBalance('bepro').then(bepro => dispatch(changeBalance({bepro})));

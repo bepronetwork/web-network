@@ -89,7 +89,7 @@ function OraclesActions(): JSX.Element {
     BeproService.getBalance('bepro')
                 .then(bepro => dispatch(changeBalance({bepro})))
 
-    BeproService.network.getOraclesSummary({address: currentAddress})
+    BeproService.getOraclesSummary()
     .then(oracles => {
       dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles)))
     });
@@ -213,6 +213,8 @@ function OraclesActions(): JSX.Element {
             placeholder={`Insert an amount of ${getCurrentLabel()}`}
             onValueChange={handleChangeToken}
             thousandSeparator
+            decimalSeparator="."
+            decimalScale={18}
             helperText={(
               <>
                 {formatNumberToCurrency(getMaxAmmount())} {getCurrentLabel()} Available
@@ -259,12 +261,11 @@ function OraclesActions(): JSX.Element {
             onSuccess={onSuccess}
             onFail={setError}
             ref={networkTxRef}
+            useContract
             />
 
         </div>
       </div>
-
-
 
       <Modal
         title={renderInfo.title}
