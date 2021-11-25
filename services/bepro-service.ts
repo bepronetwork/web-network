@@ -89,9 +89,9 @@ class BeproFacet {
       return 0;
 
     if (kind === 'bepro')
-      return this.ERC20.getTokenAmount(this.address);
+      return this.fromWei((await this.ERC20.getContract().methods.balanceOf(this.address).call()))
     if (kind === 'eth')
-      return this.bepro.web3.utils.fromWei((await this.bepro.web3.eth.getBalance(this.address)), `ether`);
+      return this.fromWei((await this.bepro.web3.eth.getBalance(this.address)));
     if (kind === 'staked')
       return this.network.getBEPROStaked();
 
@@ -149,6 +149,26 @@ class BeproFacet {
   async getRedeemTime() {
     return this._network.params.contract.getContract().methods.redeemTime().call()
   }
+
+  async getOraclesSummary() {
+    const summary = await this.network.params.contract.getContract().methods.getOraclesSummary(this.address).call()
+
+    return {
+      oraclesDelegatedByOthers: this.fromWei(summary[0]),
+      amounts: summary[1] ? summary[1].map(a => this.fromWei(a)) : [],
+      addresses: summary[2] ? summary[2].map(a => a) : [],
+      tokensLocked: this.fromWei(summary[3]),
+    }
+  }
+
+  fromWei(wei: string) {
+    return this.bepro.web3.utils.fromWei(wei, 'ether')
+  }
+
+  toWei(number: string | number) {
+    return this.bepro.web3.utils.toWei(number.toString(), 'ether')
+  }
+
 }
 
 // todo: complete this beast
