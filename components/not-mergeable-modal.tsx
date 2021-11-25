@@ -30,17 +30,11 @@ export default function NotMergeableModal({
   function handleModalVisibility() {
     if (!pullRequest || !issuePRs || mergeState === 'success') return
 
-    if (
-      (pullRequest.isMergeable && !isFinalized) ||
-      hasPRMerged ||
-      !(isIssueOwner || isPullRequestOwner || isCouncil || isProposer)
-    ) {
+    if (hasPRMerged || !isFinalized || pullRequest.isMergeable || !(isIssueOwner || isPullRequestOwner || isCouncil || isProposer)) {
       setVisible(false)
-    } else {
-      if (isIssueOwner || isPullRequestOwner || isCouncil || isProposer) {
-        setVisible(pullRequest.state === 'open')
-      }
-    }
+    } else if (isIssueOwner || isPullRequestOwner || isCouncil || isProposer)
+      setVisible(pullRequest.state === 'open')
+
   }
 
   function handleRetryMerge() {
@@ -49,7 +43,7 @@ export default function NotMergeableModal({
     setMergeState('loading')
 
     mergeClosedIssue(
-      issue.issueId,
+      issue?.issueId,
       pullRequest.githubId,
       mergeProposal._id,
       currentAddress

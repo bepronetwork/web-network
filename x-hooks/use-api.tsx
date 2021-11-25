@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {IssueData} from '@interfaces/issue-data';
+import {IssueData, pullRequest} from '@interfaces/issue-data';
 import {ProposalData, User} from '@services/github-microservice';
 import {ReposList} from '@interfaces/repos-list';
 
@@ -85,7 +85,7 @@ export default function useApi() {
                  .catch(() => ({scMergeId: '', pullRequestId: '', issueId: '', id: ''}))
   }
 
-  async function createPullRequestIssue(repoId: string, githubId: string, payload: {title: string; description: string; username: string;}) {
+  async function createPullRequestIssue(repoId: string, githubId: string, payload: {title: string; description: string; username: string; branch: string}) {
     return client.post(`/api/pull-request/`, {...payload, repoId, githubId})
                  .then(() => true)
                  .catch((error) => {
@@ -94,11 +94,11 @@ export default function useApi() {
   }
   async function getPullRequestIssue(issueId: string) {
     const search = new URLSearchParams({issueId}).toString();
-    return client.get<boolean>(`/api/pull-request?${search}`)
+    return client.get<pullRequest>(`/api/pull-request?${search}`)
                  .then(({data}) => data)
                  .catch(e => {
                    console.log(`Failed to fetch PR information`, e);
-                   return false;
+                   return null;
                  });
   }
 
@@ -186,20 +186,24 @@ export default function useApi() {
                  .catch(() => false);
   }
 
+  async function poll(eventName: string, rest) {
+    return client.post(`/api/poll/`, {eventName, ...rest})
+  }
+
   async function waitForMerge(githubLogin, issue_id, currentGithubId) {
-    return client.get(`/api/poll/mergeProposal/${githubLogin}/${issue_id}/${currentGithubId}`)
+    return poll('mergeProposal', {githubLogin, issue_id, currentGithubId})
                  .then(({data}) => data)
                  .catch(() => null)
   }
 
   async function waitForClose(currentGithubId) {
-    return client.get(`/api/poll/closeIssue/${currentGithubId}`)
+    return poll(`closeIssue`, {currentGithubId})
                  .then(({data}) => data)
                  .catch(() => null)
   }
 
   async function waitForRedeem(currentGithubId) {
-    return client.get(`/api/poll/redeemIssue/${currentGithubId}`)
+    return poll(`redeemIssue`, {currentGithubId})
                  .then(({data}) => data)
                  .catch(() => null)
   }
