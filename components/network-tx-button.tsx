@@ -27,6 +27,7 @@ interface NetworkTxButtonParams {
   txType: TransactionTypes;
   txCurrency: TransactionCurrency;
   fullWidth?: boolean;
+  useContract?: boolean;
 }
 
 
@@ -39,10 +40,10 @@ function networkTxButton({
                            buttonLabel,
                            modalTitle,
                            modalDescription,
-                           children = null, fullWidth = false,
+                           children = null, fullWidth = false, useContract = false,
                            disabled = false, txType = TransactionTypes.unknown, txCurrency = `$BEPRO`,
                          }: NetworkTxButtonParams, elementRef) {
-  const {dispatch, state: {beproInit, metaMaskWallet}} = useContext(ApplicationContext);
+  const {dispatch, state: {beproInit, metaMaskWallet, currentAddress}} = useContext(ApplicationContext);
   const [showModal, setShowModal] = useState(false);
   const [txSuccess, setTxSuccess] = useState(false);
   const txWindow = useTransactions();
@@ -61,8 +62,19 @@ function networkTxButton({
 
     const tmpTransaction = addTransaction({type: txType, amount: txParams?.tokenAmount || 0, currency: txCurrency});
     dispatch(tmpTransaction);
-    BeproService.network[txMethod](txParams)
-      .then((answer) => {
+
+    let transactionMethod
+
+    if(!useContract)
+      transactionMethod = BeproService.network[txMethod](txParams)
+    else {
+      const weiAmount = BeproService.toWei(txParams?.tokenAmount.toString())
+  
+      transactionMethod = BeproService.network.params.contract.getContract().methods[txMethod]
+      transactionMethod = txMethod === 'lock' ? transactionMethod(weiAmount).send({from: currentAddress}) : transactionMethod(weiAmount, txParams?.from).send({from: currentAddress})
+    }
+
+    transactionMethod.then((answer) => {
         if (answer.status) {
           onSuccess && onSuccess();
           dispatch(addToast({
