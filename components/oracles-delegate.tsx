@@ -98,7 +98,7 @@ function OraclesDelegate(): JSX.Element {
           error={error}
           helperText={(
             <>
-              {formatNumberToCurrency(delegatedAmount)} Oracles Available
+              {formatNumberToCurrency(delegatedAmount, { maximumFractionDigits: 18 })} Oracles Available
               <span
                   className="smallCaption ml-1 cursor-pointer text-uppercase text-purple"
                   onClick={setMaxAmmount}

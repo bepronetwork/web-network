@@ -217,7 +217,7 @@ function OraclesActions(): JSX.Element {
             decimalScale={18}
             helperText={(
               <>
-                {formatNumberToCurrency(getMaxAmmount())} {getCurrentLabel()} Available
+                {formatNumberToCurrency(getMaxAmmount(), { maximumFractionDigits: 18 })} {getCurrentLabel()} Available
                 <span
                     className={`smallCaption ml-1 cursor-pointer text-uppercase ${`${getCurrentLabel() === 'Oracles' ? "text-purple" : "text-blue"}`}`}
                     onClick={setMaxAmmount}>
