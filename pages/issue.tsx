@@ -104,6 +104,7 @@ export default function PageIssue() {
 
     userHasPR(`${repoId}/${id}`, githubLogin)
       .then((result) => {
+        console.log('hasOpenPR', result)
         setHasOpenPR(result)
       })
       .catch(e => {console.log(`Failed to list PRs`, e)});
