@@ -34,6 +34,15 @@ li {
   margin-bottom: 50px !important;
 }
 
+.border-radius {
+  &-4 {
+    border-radius: 4px;
+  }
+  &-8 {
+    border-radius: 8px;
+  }
+}
+
 .modal {
   &-header {
     padding-bottom: 0;
