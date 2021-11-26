@@ -69,7 +69,7 @@ export default function NewProposal({
       })
       .then((participantsPr) => {
         setCurrentGithubId(githubId);
-        setParticipants(participantsPr);
+        setParticipants(participantsPr.filter(({address}) => !!address));
       })
       .catch((err) => {
         console.error('Error fetching pullRequestsParticipants', err)

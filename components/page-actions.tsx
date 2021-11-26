@@ -424,7 +424,7 @@ export default function PageActions({
         title={title}
         description={description}
         onConfirm={handlePullrequest}
-        repo={githubLogin && [githubLogin, repoPath.split(`/`)[1]].join(`/`) || ``}
+        repo={githubLogin && repoPath && [githubLogin, repoPath.split(`/`)[1]].join(`/`) || ``}
         onCloseClick={() => setShowPRModal(false)}
       />
     </div>

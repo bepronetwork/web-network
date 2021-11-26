@@ -29,7 +29,7 @@ interface Amount {
 export default function PageCreateIssue() {
   const [issueTitle, setIssueTitle] = useState('');
   const [issueDescription, setIssueDescription] = useState('');
-  const [issueAmount, setIssueAmount] = useState<Amount>({value: '0', formattedValue: '0', floatValue: 0});
+  const [issueAmount, setIssueAmount] = useState<Amount>({value: '', formattedValue: '', floatValue: 0});
   const [balance, setBalance] = useState(0);
   const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
   const {dispatch, state: {currentAddress, githubHandle, myTransactions}} = useContext(ApplicationContext);
@@ -218,6 +218,7 @@ export default function PageCreateIssue() {
                     label="SET $BEPRO VALUE"
                     symbol="$BEPRO"
                     value={issueAmount.formattedValue}
+                    placeholder="0"
                     disabled={allowedTransaction}
                     onValueChange={handleIssueAmountOnValueChange}
                     onBlur={handleIssueAmountBlurChange}
