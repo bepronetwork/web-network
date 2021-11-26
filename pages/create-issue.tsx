@@ -223,7 +223,7 @@ export default function PageCreateIssue() {
                     onBlur={handleIssueAmountBlurChange}
                     helperText={
                       <>
-                        {formatNumberToCurrency(balance)} $BEPRO Available
+                        {formatNumberToCurrency(balance, { maximumFractionDigits: 18 })} $BEPRO Available
                         {!allowedTransaction && (
                           <span
                             className="smallCaption text-blue ml-1 cursor-pointer text-uppercase"
