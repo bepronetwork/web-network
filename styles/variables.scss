@@ -95,6 +95,8 @@ $form-check-input-focus-border:         $primary;
 $form-check-input-checked-bg-color:     $primary;
 $form-check-input-checked-border-color: $primary;
 
+$enable-validation-icons: false;
+
 @import "~bootstrap/scss/variables";
 @import "~bootstrap/scss/utilities";
 

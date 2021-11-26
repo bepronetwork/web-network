@@ -34,6 +34,15 @@ li {
   margin-bottom: 50px !important;
 }
 
+.border-radius {
+  &-4 {
+    border-radius: 4px;
+  }
+  &-8 {
+    border-radius: 8px;
+  }
+}
+
 .modal {
   &-header {
     padding-bottom: 0;
@@ -324,7 +333,13 @@ p {
   font-family: 'fontBold', sans-serif;
 }
 
+.text-italic {
+  font-style: italic !important;
+}
 
+.is-invalid {
+  border: 2px solid $danger;
+}
 
 .trans {
   opacity: 0.7;
