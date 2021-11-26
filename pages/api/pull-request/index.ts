@@ -48,6 +48,10 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     issue.state = `ready`;
 
+    const issueLink = `${process.env.NEXT_HOME_URL}/issue?id=${issue.githubId}&repoId=${issue.repository_id}`
+    const body = `@${issue.creatorGithub}, @${username} has a solution - [check your issue](${issueLink})`;
+    await octoKit.rest.issues.createComment({owner, repo, issue_number: issue.githubId, body});
+
     await issue.save();
 
     return res.json(`ok`);
