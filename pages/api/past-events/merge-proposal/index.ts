@@ -16,7 +16,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   await contract.getPastEvents(`MergeProposalCreated`, {fromBlock, toBlock: +fromBlock+1, filter: {id},})
   // await contract.getPastEvents(`MergeProposalCreated`, {fromBlock, toBlock: +fromBlock+1,})
                 .then(async function mergeProposalCreated(events) { // todo: refactor this onto a helper
-                  console.log(`Events`, events);
                   for (const event of events) {
                     const {id: scIssueId, mergeID: scMergeId, creator} = event.returnValues;
                     const issueId = await network.getIssueById({issueId: scIssueId}).then(({cid}) => cid);

@@ -16,7 +16,6 @@ export default function NationDialog({ children }) {
     setIsLoading(true);
     getClientNation()
       .then((data)=>{
-        console.log(`Data`, data);
         if (COUNTRY_CODE_BLOCKED.indexOf(data.countryCode) === -1)
           return;
 
