@@ -45,7 +45,9 @@ $more-bg: (
         'success': $success,
         'dark-gray': $dark-gray,
         'ligth-gray': $ligth-gray,
-        'disabled': $disabled
+        'disabled': $disabled,
+        'danger': $danger,
+        'warning': $warning,
 );
 
 $more-colors: ('blue-dark': $blue-dark, 'dark-gray': $dark-gray, 'ligth-gray': $ligth-gray, 'black': $black, 'white': #fff);
