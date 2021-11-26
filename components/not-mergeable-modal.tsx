@@ -28,7 +28,6 @@ export default function NotMergeableModal({
   const { mergeClosedIssue } = useApi()
 
   function handleModalVisibility() {
-    console.log(`Pullrequest visibility`, isIssueOwner || isPullRequestOwner || isCouncil || isProposer, pullRequest, issuePRs, mergeState,)
     if (!pullRequest || !issuePRs?.length || mergeState === 'success') return
 
     if (hasPRMerged || pullRequest.isMergeable || !(isIssueOwner || isPullRequestOwner || isCouncil || isProposer)) {

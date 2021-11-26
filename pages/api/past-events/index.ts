@@ -96,8 +96,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
                       const {id: scIssueId, mergeID: scMergeId, creator} = event.returnValues;
                       const issueId = await network.getIssueById({issueId: scIssueId}).then(({cid}) => cid);
 
-                      console.log(`IssueId`, issueId);
-
                       const issue = await models.issue.findOne({where: {issueId,}});
                       if (!issue)
                         return console.log(`Failed to find an issue to add merge proposal`, event);

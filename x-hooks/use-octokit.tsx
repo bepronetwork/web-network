@@ -48,13 +48,10 @@ export default function useOctokit() {
       return [];
 
     const users = [];
-    console.log(commits);
 
     for (const {author: {login}} of commits)
       if (!users.includes(login))
         users.push(login)
-
-    console.log(users);
 
     return users;
   }
