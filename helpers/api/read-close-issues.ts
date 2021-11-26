@@ -35,6 +35,7 @@ export default async function readCloseIssues(events, {network, models, octokit,
       }
     }
 
+    issue.merged = pullRequest.githubId;
     issue.state = 'closed';
     await issue.save();
 
