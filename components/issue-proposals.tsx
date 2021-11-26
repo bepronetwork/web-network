@@ -10,11 +10,9 @@ import useApi from '@x-hooks/use-api';
 import useOctokit from "@x-hooks/use-octokit";
 
 
-export default function IssueProposals({ metaProposals, metaRequests, numberProposals, issueId, amount, dbId, isFinalized = false }) {
+export default function IssueProposals({ metaProposals, metaRequests, numberProposals, issueId, amount, dbId, isFinalized = false, mergedPrId = `` }) {
   const { state: {beproStaked, currentAddress} } = useContext(ApplicationContext);
   const [proposals, setProposals] = useState<Proposal[]>([]);
-  const {getMergeProposal} = useApi();
-  const {getParticipants} = useOctokit()
   async function loadProposalsMeta() {
     if (!issueId)
       return;
@@ -27,7 +25,7 @@ export default function IssueProposals({ metaProposals, metaRequests, numberProp
       if (scMergeId) {
         // if we don't have a scMergeId then something broke on the BE side and we should have a log - but we lost its connection to a PR
         const merge = await BeproService.network.getMergeById({merge_id: scMergeId, issue_id: scIssueId});
-        const isDisputed = await BeproService.network.isMergeDisputed({issueId: scIssueId, mergeId: scMergeId});
+        const isDisputed = mergedPrId ? +mergedPrId !== pullRequestId : await BeproService.network.isMergeDisputed({issueId: scIssueId, mergeId: scMergeId});
         const pr = metaRequests.find(({id}) => meta.pullRequestId === id);
 
         pool.push({...merge, scMergeId, isDisputed, pullRequestId, pullRequestGithubId: pr?.githubId } as Proposal)
@@ -45,7 +43,16 @@ export default function IssueProposals({ metaProposals, metaRequests, numberProp
         <div className="col-md-10">
           <div className="content-wrapper mb-4 pb-0">
             <h3 className="smallCaption pb-3">{numberProposals} {numberProposals > 1 ? 'Proposals' : 'Proposal'}</h3>
-            {proposals.map(proposal => <ProposalItem key={proposal._id} proposal={proposal} issueId={issueId} dbId={dbId} amount={amount} beproStaked={beproStaked} onDispute={loadProposalsMeta} isFinalized={isFinalized} owner={proposal.owner}/>)}
+            {proposals.map(proposal =>
+                             <ProposalItem key={proposal._id}
+                                           proposal={proposal}
+                                           issueId={issueId}
+                                           dbId={dbId}
+                                           amount={amount}
+                                           beproStaked={beproStaked}
+                                           onDispute={loadProposalsMeta}
+                                           isFinalized={isFinalized}
+                                           owner={proposal.owner}/>)}
           </div>
         </div>
       </div>

@@ -34,6 +34,7 @@ module.exports = (sequelize) => {
     working: {
       type: DataTypes.ARRAY(DataTypes.STRING)
     },
+    merged: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'issue',

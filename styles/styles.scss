@@ -87,70 +87,6 @@ li {
       display: none;
     }
     &__indicator {
-      padding: 14px;
-      font-size: 12px;
-      color: $gray;
-    }
-    &__single-value {
-      color: $white;
-    }
-    &__control--is-focused &__single-value {
-      color: transparentize($white, 0.4);
-    }
-    &__menu {
-      min-width: 210px;
-      border-radius: 8px;
-      border: 1px solid $ligth-gray;
-      background-color: $bg-shadow;
-    }
-    &__value{
-      text-transform: uppercase;
-    }
-    &__option {
-      @extend .p-small;
-      background-color: transparent;
-      &--is-selected {
-        color: $blue;
-      }
-      &:hover{
-        color: $white;
-      }
-      &:active{
-        background-color: transparent;
-      }
-    }
-  }
-  &-filterIssues & {
-    &__control {
-      border-color: transparent;
-      background-color: $bg-shadow;
-      min-width: 210px;
-      min-height: 38px;
-      box-shadow: none;
-      border-radius: 8px;
-      border-width: 2px;
-      &:hover{
-        border-color: $ligth-gray;
-      }
-      &--is-focused {
-        border-color: $blue
-      }
-      &--menu-is-open{
-        border-color: $blue !important;
-        background: $black;
-      }
-      &--is-disabled{
-        border-color: transparent;
-      }
-    }
-    &__value-filterIssues {
-      padding: 2px 16px;
-    }
-    &__indicator-separator {
-      display: none;
-    }
-    &__indicator {
-      padding: 14px;
       font-size: 12px;
       color: $gray;
     }
@@ -187,6 +123,7 @@ li {
     color: transparentize($white, 0.4);
   }
 }
+
 .form-control {
   min-width: 100px;
   border-color: transparent;

@@ -28,19 +28,13 @@ export default function NotMergeableModal({
   const { mergeClosedIssue } = useApi()
 
   function handleModalVisibility() {
-    if (!pullRequest || !issuePRs || mergeState === 'success') return
+    if (!pullRequest || !issuePRs?.length || mergeState === 'success') return
 
-    if (
-      (pullRequest.isMergeable && !isFinalized) ||
-      hasPRMerged ||
-      !(isIssueOwner || isPullRequestOwner || isCouncil || isProposer)
-    ) {
+    if (hasPRMerged || pullRequest.isMergeable || !(isIssueOwner || isPullRequestOwner || isCouncil || isProposer)) {
       setVisible(false)
-    } else {
-      if (isIssueOwner || isPullRequestOwner || isCouncil || isProposer) {
-        setVisible(pullRequest.state === 'open')
-      }
-    }
+    } else if (isIssueOwner || isPullRequestOwner || isCouncil || isProposer)
+      setVisible(pullRequest.state === 'open')
+
   }
 
   function handleRetryMerge() {
@@ -49,7 +43,7 @@ export default function NotMergeableModal({
     setMergeState('loading')
 
     mergeClosedIssue(
-      issue.issueId,
+      issue?.issueId,
       pullRequest.githubId,
       mergeProposal._id,
       currentAddress
@@ -128,12 +122,11 @@ export default function NotMergeableModal({
               )}
             </Button>
           )}
-
+          <Button color="dark-gray" onClick={() => setVisible(false)}>Close</Button>
           <GithubLink
             forcePath={issue?.repo}
             hrefPath={`pull/${pullRequest?.githubId || ''}/conflicts`}
-            color="primary"
-          >
+            color="primary">
             Go to Pull Request
           </GithubLink>
         </div>

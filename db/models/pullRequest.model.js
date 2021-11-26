@@ -18,11 +18,12 @@ module.exports = (sequelize,) => {
         sourceKey: 'id'
       });
     }
-  };
+  }
   PullRequest.init({
     githubId: DataTypes.STRING,
     issueId: DataTypes.INTEGER,
     githubLogin: DataTypes.STRING,
+    branch: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'pullRequest',
