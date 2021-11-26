@@ -69,7 +69,7 @@ export default function NewProposal({
       })
       .then((participantsPr) => {
         setCurrentGithubId(githubId);
-        setParticipants(participantsPr);
+        setParticipants(participantsPr.filter(({address}) => !!address));
       })
       .catch((err) => {
         console.error('Error fetching pullRequestsParticipants', err)
@@ -102,8 +102,7 @@ export default function NewProposal({
     dispatch(proposeMergeTx);
 
     waitForMerge(githubLogin, issue_id, currentGithubId)
-                      .then(data => {
-                        console.log(`GOT`, data);
+                      .then(() => {
                         if (handleBeproService)
                           handleBeproService(true);
 
@@ -153,7 +152,6 @@ export default function NewProposal({
 
     BeproService.network.getIssueByCID({issueCID: issueId})
                 .then((_issue) => {
-                  console.log(`Issue`, _issue)
                   return BeproService.network.recognizeAsFinished({issueId: +_issue._id})
                 })
                 .then(txInfo => {

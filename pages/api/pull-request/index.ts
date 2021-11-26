@@ -12,39 +12,18 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if (!find)
     return res.status(422);
 
-  let where = {
+  const where = {
     issueId: find.id,
-  } as any;
+    ... login && {githubLogin: login} || {}
+  };
 
-  if(login){
-    where.githubLogin = login
-  }
-
-  const prs = await models.pullRequest.findAll({where, raw: true});
-  
-  if(prs && !login){
-    const repoInfo = await models.repositories.findOne({where: {id: find.repository_id}, raw: true});
-    const [owner, repo] = repoInfo.githubPath.split(`/`);
-    const octoKit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
-
-    for(const pr of prs) {
-      const {data} = await octoKit.rest.pulls.get({
-        owner,
-        repo,
-        pull_number: pr.githubId,
-      });
-      
-      pr.isMergeable = data.mergeable;
-      pr.state = data.state;
-      pr.merged = data.merged;
-    } 
-  }
+  const prs = await models.pullRequest.findOne({where, raw: true});
 
   return res.status(200).json(prs)
 }
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const {repoId: repository_id, githubId, title, description: body, username} = req.body;
+  const {repoId: repository_id, githubId, title, description: body, username, branch} = req.body;
 
   const issue = await models.issue.findOne({where: {githubId, repository_id,},});
   const repoInfo = await models.repositories.findOne({where: {id: repository_id}, raw: true});
@@ -56,7 +35,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   const options = {
     accept: 'application/vnd.github.v3+json',
     owner, repo, title, body,
-    head: `${username}:${process.env.NEXT_GITHUB_MAINBRANCH}`,
+    head: `${username}:${branch}`,
     base: process.env.NEXT_GITHUB_MAINBRANCH,
     maintainer_can_modify: false,
     draft: false
@@ -65,9 +44,13 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   try {
     const created = await octoKit.rest.pulls.create(options);
 
-    await models.pullRequest.create({issueId: issue.id, githubId: created.data?.number, githubLogin: username});
+    await models.pullRequest.create({issueId: issue.id, githubId: created.data?.number, githubLogin: username, branch});
 
     issue.state = `ready`;
+
+    const issueLink = `${process.env.NEXT_HOME_URL}/issue?id=${issue.githubId}&repoId=${issue.repository_id}`
+    const body = `@${issue.creatorGithub}, @${username} has a solution - [check your issue](${issueLink})`;
+    await octoKit.rest.issues.createComment({owner, repo, issue_number: issue.githubId, body});
 
     await issue.save();
 

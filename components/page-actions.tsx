@@ -46,6 +46,7 @@ interface pageActions {
   issueCreator?: string;
   repoPath?: string;
   addNewComment?: (comment: any) => void;
+  issueRepo?: string;
 }
 
 export default function PageActions({
@@ -218,9 +219,9 @@ export default function PageActions({
       !finished &&
       !finalized &&
       githubLogin &&
-      <GithubLink 
-        repoId={String(repoId)} 
-        forcePath={repoPath} 
+      <GithubLink
+        repoId={String(repoId)}
+        forcePath={repoPath}
         hrefPath="fork"
         color="primary"
       >
@@ -237,8 +238,8 @@ export default function PageActions({
       !finished &&
       !finalized &&
       githubLogin &&
-      <Button 
-        color="primary" 
+      <Button
+        color="primary"
         onClick={handleStartWorking}
         disabled={isExecuting}
       >
@@ -257,9 +258,9 @@ export default function PageActions({
     )
   }
 
-  async function handlePullrequest({title: prTitle, description: prDescription,}) {
+  async function handlePullrequest({title: prTitle, description: prDescription, branch}) {
 
-    createPullRequestIssue(repoId as string, githubId, {title: prTitle, description: prDescription, username: githubLogin,})
+    createPullRequestIssue(repoId as string, githubId, {title: prTitle, description: prDescription, username: githubLogin, branch})
       .then(() => {
         dispatch(
           addToast({
@@ -315,7 +316,7 @@ export default function PageActions({
 
         if (addNewComment)
           addNewComment(response.data)
-        
+
         setIsExecuting(false)
       })
       .catch((error) => {
@@ -389,7 +390,7 @@ export default function PageActions({
       <div className="row justify-content-center">
         <div className="col-md-10">
           <div className="d-flex align-items-center justify-content-between mb-4">
-            <h4 className="h4">Details</h4>
+            <h4 className="h4 d-flex align-items-center">Details {!canClose && !finalized && <span className="ml-2 smallInfo text-white-50">(Pull request has merge conflicts and can't be merged)</span> || ``}</h4>
             <div className="d-flex align-items-center">
               {renderIssueAvatars()}
               {forks && renderForkAvatars()}
@@ -411,7 +412,7 @@ export default function PageActions({
               )}
 
               {renderViewPullrequest()}
-              
+
               <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`${state?.toLowerCase() === 'pull request' && 'pull' || 'issues' }/${githubId || ""}`}>view on github</GithubLink>
 
             </div>
@@ -423,6 +424,7 @@ export default function PageActions({
         title={title}
         description={description}
         onConfirm={handlePullrequest}
+        repo={githubLogin && repoPath && [githubLogin, repoPath.split(`/`)[1]].join(`/`) || ``}
         onCloseClick={() => setShowPRModal(false)}
       />
     </div>
