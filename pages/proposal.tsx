@@ -58,9 +58,8 @@ export default function PageProposal() {
   const [isCouncil, setIsCouncil] = useState(false);
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
-  const [repo, setRepo] = useState(``);
-  const [[activeRepo, repoList], {findRepo, loadRepos}] = useRepos();
-  const {getUserOf, getPullRequestIssue} = useApi();
+  const [[], {loadRepos}] = useRepos();
+  const {getUserOf,} = useApi();
   const {getIssue,} = useMergeData();
   const {getPullRequest} = useOctokit();
 
@@ -71,7 +70,6 @@ export default function PageProposal() {
 
     const issueData = await getIssue(repoId, ghId, _repo?.githubPath);
 
-    setRepo(_repo?.githubPath)
     setIssueMicroService(issueData);
     setPrGithubId(issueData.pullRequests?.find(el => el.id === +prId).githubId);
     setProposalMicroService(issueData.mergeProposals.find(({scMergeId, issueId, pullRequestId}) => scMergeId === String(mergeId) && pullRequestId === +prId && issueId === +dbId));
@@ -79,6 +77,8 @@ export default function PageProposal() {
   }
 
   async function getProposal(force = false) {
+    if (!issueMicroService || !prGithubId)
+      return;
 
     try {
       const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
@@ -139,20 +139,17 @@ export default function PageProposal() {
 
       BeproService.network.getOraclesSummary({address: currentAddress})
                   .then(oracles => dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles))))
-                  .then(getProposalData)
-                  .then(getProposal)
-                  .then(getIssueAmount)
-      // .then(async () => {
-      //   await getProposalData();
-      //   await getProposal();
-      //   await getIssueAmount();
-      // })
+                  .then(async () => {
+                    await getProposalData();
+                    await getIssueAmount();
+                  })
     }
   }
 
   useEffect(() => { loadProposalData() }, [currentAddress, issueId,]);
   useEffect(() => { updateUsersAddresses(proposalBepro) }, [proposalBepro, currentAddress]);
-  useEffect(() => { setRepo(activeRepo?.githubPath) }, [activeRepo])
+  useEffect(() => { getProposal() }, [issueMicroService, prGithubId])
+
 
   return (
     <>
@@ -180,13 +177,13 @@ export default function PageProposal() {
         handleBeproService={getProposal}
         isDisputed={proposalBepro?.isDisputed}
         githubId={prGithubId}
-        repoPath={repo}
+        repoPath={issueMicroService?.repo}
         canClose={isMergiable}
         finished={isFinished} />
       <ProposalAddresses addresses={usersAddresses} currency="$BEPRO" />
       <NotMergeableModal
         currentGithubLogin={githubLogin}
-        issuePRs={issueMicroService?.pullRequests}
+        issuePRs={issuePRs}
         currentAddress={currentAddress}
         issue={issueMicroService}
         pullRequest={pullRequestGh}
