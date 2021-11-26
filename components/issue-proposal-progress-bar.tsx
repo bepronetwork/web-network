@@ -68,12 +68,12 @@ export default function IssueProposalProgressBar({
       Canceled: {
         text: StatusIds.Canceled,
         color: 'danger',
-        bgColor: 'danger',
+        bgColor: 'danger-opac-25',
       },
       Warning: {
         text: StatusIds.UntilDone.replace('[DISTANCE]', getTimeDifferenceInWords(addSeconds(creationDate, redeemTime), new Date())) as StatusIds,
         color: 'warning',
-        bgColor: 'warning',
+        bgColor: 'warning-opac-25',
       },
       Pending: {
         text: StatusIds.Pending,
