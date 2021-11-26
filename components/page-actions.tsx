@@ -390,7 +390,7 @@ export default function PageActions({
       <div className="row justify-content-center">
         <div className="col-md-10">
           <div className="d-flex align-items-center justify-content-between mb-4">
-            <h4 className="h4">Details {!canClose && <span className="ml-2 smallInfo text-warning">Pull request has merge conflicts and can't be merged.</span> || ``}</h4>
+            <h4 className="h4 d-flex align-items-center">Details {!canClose && !finalized && <span className="ml-2 smallInfo text-white-50">(Pull request has merge conflicts and can't be merged)</span> || ``}</h4>
             <div className="d-flex align-items-center">
               {renderIssueAvatars()}
               {forks && renderForkAvatars()}
