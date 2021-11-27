@@ -90,6 +90,7 @@ export default function NotMergeableModal({
       show={isVisible}
       title="Merging Issue"
       titlePosition="center"
+      onCloseClick={() => setVisible(false)}
       centerTitle
     >
       <div>
@@ -122,13 +123,13 @@ export default function NotMergeableModal({
               )}
             </Button>
           )}
-          <Button color="dark-gray" onClick={() => setVisible(false)}>Close</Button>
           <GithubLink
             forcePath={issue?.repo}
             hrefPath={`pull/${pullRequest?.githubId || ''}/conflicts`}
             color="primary">
             Go to Pull Request
           </GithubLink>
+          <Button color="dark-gray" onClick={() => setVisible(false)}>Close</Button>
         </div>
       </div>
     </Modal>
