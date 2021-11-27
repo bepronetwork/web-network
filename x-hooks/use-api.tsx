@@ -233,7 +233,7 @@ export default function useApi() {
   async function userHasPR(issueId: string, login: string) {
     const search = new URLSearchParams({issueId, login}).toString();
     return client.get<boolean>(`/api/pull-request?${search}`)
-                 .then((response) => (response?.data as any).length > 0)
+                 .then(({data}) => !!data)
                  .catch(e => {
                    console.log(`Failed to fetch PR information`, e);
                    return false;
