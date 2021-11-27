@@ -390,8 +390,9 @@ export default function PageActions({
       <div className="row justify-content-center">
         <div className="col-md-10">
           <div className="d-flex align-items-center justify-content-between mb-4">
-            <h4 className="h4 d-flex align-items-center">Details {!canClose && !finalized && <span className="ml-2 smallInfo text-white-50">(Pull request has merge conflicts and can't be merged)</span> || ``}</h4>
+            <h4 className="h4 d-flex align-items-center">Details</h4>
             <div className="d-flex align-items-center">
+              {!canClose && !finalized && <span className="mr-2 text-uppercase smallCaption text-danger">Pull request has merge conflicts and can't be merged</span> || ``}
               {renderIssueAvatars()}
               {forks && renderForkAvatars()}
 
@@ -406,7 +407,7 @@ export default function PageActions({
                   { (!isDisputed && !finalized ) && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>Dispute</Button> || ``}
                   {!finalized && <Button disabled={!canClose} onClick={handleClose}>
                   {!canClose && <LockedIcon width={12} height={12} className="mr-1"/>}
-                    Close
+                    Merge
                     </Button> || ``}
                 </>
               )}
