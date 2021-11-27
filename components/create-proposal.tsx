@@ -208,9 +208,6 @@ export default function NewProposal({
         || isIssueOwner && !isFinished && renderRecognizeAsFinished()
       }
 
-      {console.log('amount', amount)}
-      {console.log('distrib', distrib)}
-
       <Modal show={show}
              title="Create Proposal"
              footer={
