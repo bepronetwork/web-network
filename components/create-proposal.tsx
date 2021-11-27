@@ -68,8 +68,12 @@ export default function NewProposal({
         }))
       })
       .then((participantsPr) => {
+        const tmpParticipants = participantsPr.filter(({address}) => !!address);
+        const amountPerParticipant = 100 / tmpParticipants.length
+    
+        setDistrib(Object.fromEntries(tmpParticipants.map(participant => [participant.githubHandle, amountPerParticipant])))
         setCurrentGithubId(githubId);
-        setParticipants(participantsPr.filter(({address}) => !!address));
+        setParticipants(tmpParticipants);
       })
       .catch((err) => {
         console.error('Error fetching pullRequestsParticipants', err)
@@ -204,6 +208,9 @@ export default function NewProposal({
         || isIssueOwner && !isFinished && renderRecognizeAsFinished()
       }
 
+      {console.log('amount', amount)}
+      {console.log('distrib', distrib)}
+
       <Modal show={show}
              title="Create Proposal"
              footer={
@@ -241,6 +248,7 @@ export default function NewProposal({
                                                                 by={item.githubHandle}
                                                                 address={item.address}
                                                                 onChangeDistribution={handleChangeDistrib}
+                                                                defaultPercentage={participants?.length > 1 && (100 / participants.length) || 100}
                                                                 error={error}/>
                               )
             )}
