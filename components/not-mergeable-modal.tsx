@@ -30,7 +30,7 @@ export default function NotMergeableModal({
   function handleModalVisibility() {
     if (!pullRequest || !issuePRs?.length || mergeState === 'success') return
 
-    if (hasPRMerged || pullRequest.isMergeable || !(isIssueOwner || isPullRequestOwner || isCouncil || isProposer)) {
+    if (hasPRMerged || (pullRequest.isMergeable && hasPRMerged) || !(isIssueOwner || isPullRequestOwner || isCouncil || isProposer)) {
       setVisible(false)
     } else if (isIssueOwner || isPullRequestOwner || isCouncil || isProposer)
       setVisible(pullRequest.state === 'open')
@@ -94,6 +94,7 @@ export default function NotMergeableModal({
       centerTitle
     >
       <div>
+      {console.log('pullRequest', pullRequest)}
         <div className="d-flex justify-content-center m-2 text-center">
           <p className="h4 mb-2 text-white">
             {(isFinalized &&
