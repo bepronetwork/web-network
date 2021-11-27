@@ -18,6 +18,7 @@ import {useRouter} from 'next/router';
 import useApi from '@x-hooks/use-api';
 import useTransactions from '@x-hooks/useTransactions';
 import LockedIcon from "@assets/icons/locked-icon";
+import { find } from "lodash";
 
 interface pageActions {
   issueId: string;
@@ -254,7 +255,7 @@ export default function PageActions({
       !isIssueinDraft &&
       hasOpenPR &&
       githubLogin &&
-      <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`pull/${pullRequests[0]?.githubId || ""}`} color="primary">View Pull Request</GithubLink>
+      <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`pull/${pullRequests?.find(pr => pr.githubLogin === githubLogin).githubId || ""}`} color="primary">View Pull Request</GithubLink>
     )
   }
 
