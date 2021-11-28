@@ -255,7 +255,7 @@ export default function PageActions({
       !isIssueinDraft &&
       hasOpenPR &&
       githubLogin &&
-      <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`pull/${pullRequests?.find(pr => pr.githubLogin === githubLogin).githubId || ""}`} color="primary">View Pull Request</GithubLink>
+      <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`pull/${pullRequests?.find(pr => pr.githubLogin === githubLogin)?.githubId || ""}`} color="primary">View Pull Request</GithubLink>
     )
   }
 
