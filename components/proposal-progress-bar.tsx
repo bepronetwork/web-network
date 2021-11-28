@@ -20,8 +20,11 @@ export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null
     if (isDisputed)
       return `danger`
 
+    if (isDisputed === false && isFinished === true)
+      return 'success'
+
     if (isDisputed === false)
-      return `success`;
+      return `purple`;
 
     return `white-50`;
   }
