@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {formatNumberToNScale, formatNumberToString} from '@helpers/formatNumber';
 
-export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null, issueDisputeAmount = 0, isFinished = false}) {
+export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null, issueDisputeAmount = 0, isFinished = false, isCurrentPRMerged=false}) {
   const [issueState, setIssueState] = useState<string>(``);
   const [issueColor, setIssueColor] = useState<string>(``);
   const [percentage, setPercentage] = useState<number>(0);
@@ -17,23 +17,26 @@ export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null
   }
 
   function getStateColor() {
-    if (isDisputed)
+    if (isDisputed || (!isCurrentPRMerged && isFinished === true))
       return `danger`
 
+    if (isDisputed === false && isFinished === true && isCurrentPRMerged)
+      return 'success'
+
     if (isDisputed === false)
-      return `success`;
+      return `purple`;
 
     return `white-50`;
   }
 
   function getStateText() {
-    if (isDisputed === true)
+    if (isDisputed === true || (!isCurrentPRMerged && isFinished === true))
       return `Failed`
 
     if (isDisputed === false && isFinished === false)
       return `Open for dispute`;
     
-    if (isDisputed === false && isFinished === true)
+    if (isDisputed === false && isFinished === true && isCurrentPRMerged)
       return `Accepted`;
 
     return `Waiting`;
