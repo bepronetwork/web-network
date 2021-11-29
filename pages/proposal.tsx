@@ -175,6 +175,7 @@ export default function PageProposal() {
         issueId={issueId as string}
         mergeId={mergeId as string}
         handleBeproService={getProposal}
+        handleMicroService={loadProposalData}
         isDisputed={proposalBepro?.isDisputed}
         githubId={prGithubId}
         repoPath={issueMicroService?.repo}
