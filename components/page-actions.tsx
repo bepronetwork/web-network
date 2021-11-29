@@ -18,7 +18,6 @@ import {useRouter} from 'next/router';
 import useApi from '@x-hooks/use-api';
 import useTransactions from '@x-hooks/useTransactions';
 import LockedIcon from "@assets/icons/locked-icon";
-import { find } from "lodash";
 
 interface pageActions {
   issueId: string;
