@@ -365,7 +365,7 @@ export default function PageActions({
           handleBeproService(true);
 
         if (handleMicroService)
-          handleMicroService(true);
+          handleMicroService();
       })
 
     await BeproService.network
