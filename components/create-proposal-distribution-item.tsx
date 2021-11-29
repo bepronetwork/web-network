@@ -10,15 +10,17 @@ interface Props extends InputNumberProps {
   by: string;
   onChangeDistribution(params: { [key: string]: number }): void;
   address: string;
+  defaultPercentage?: number;
 }
 
 export default function CreateProposalDistributionItem({
   by = "",
   address = "",
   onChangeDistribution = (params = { key: 0 }) => {},
+  defaultPercentage = 0,
   ...params
 }: Props) {
-  const [value, setValue] = useState<number>(0);
+  const [value, setValue] = useState<number>();
   const [githubLogin, setGithubLogin] = useState<string>();
   const {getUserOf} = useApi();
 
@@ -56,6 +58,8 @@ export default function CreateProposalDistributionItem({
       <div className="flex-shrink-0 w-25">
         <InputNumber
           value={value}
+          suffix="%"
+          defaultValue={defaultPercentage}
           onValueChange={handleValueChange}
           onBlur={handleBlur}
           {...params}

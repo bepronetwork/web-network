@@ -30,7 +30,7 @@ export default function NotMergeableModal({
   function handleModalVisibility() {
     if (!pullRequest || !issuePRs?.length || mergeState === 'success') return
 
-    if (hasPRMerged || pullRequest.isMergeable || !(isIssueOwner || isPullRequestOwner || isCouncil || isProposer)) {
+    if (hasPRMerged || (pullRequest.isMergeable && !isFinalized) || !(isIssueOwner || isPullRequestOwner || isCouncil || isProposer)) {
       setVisible(false)
     } else if (isIssueOwner || isPullRequestOwner || isCouncil || isProposer)
       setVisible(pullRequest.state === 'open')
@@ -90,6 +90,7 @@ export default function NotMergeableModal({
       show={isVisible}
       title="Merging Issue"
       titlePosition="center"
+      onCloseClick={() => setVisible(false)}
       centerTitle
     >
       <div>
@@ -122,13 +123,13 @@ export default function NotMergeableModal({
               )}
             </Button>
           )}
-          <Button color="dark-gray" onClick={() => setVisible(false)}>Close</Button>
           <GithubLink
             forcePath={issue?.repo}
             hrefPath={`pull/${pullRequest?.githubId || ''}/conflicts`}
             color="primary">
             Go to Pull Request
           </GithubLink>
+          <Button color="dark-gray" onClick={() => setVisible(false)}>Close</Button>
         </div>
       </div>
     </Modal>
