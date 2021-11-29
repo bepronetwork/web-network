@@ -18,5 +18,7 @@ export enum ReduceActionName {
   ChangeMicroServiceReadyState = `ChangeMicroServiceReadyState`,
   ChangeNetwork = `ChangeNetwork`,
   GithubLogin = `GithubLogin`,
-  ChangeAccessToken = `ChangeAccessToken`
+  ChangeAccessToken = `ChangeAccessToken`,
+  ChangeTransactionalTokenApproval = `ChangeTransactionalTokenApproval`,
+  ChangeSettlerTokenApproval = `ChangeSettlerTokenApproval`,
 }

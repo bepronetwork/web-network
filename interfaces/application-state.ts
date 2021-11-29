@@ -20,4 +20,6 @@ export interface ApplicationState {
   network: string;
   githubLogin: string;
   accessToken?: string;
+  isTransactionalTokenApproved?: boolean;
+  isSettlerTokenApproved?: boolean;
 }
