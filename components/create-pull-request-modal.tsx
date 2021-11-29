@@ -16,7 +16,7 @@ export default function CreatePullRequestModal({
   const [title, setTitle] = useState(``);
   const [description, setDescription] = useState(``);
   const [options, setOptions] = useState([]);
-  const [branch, setBranch] = useState([]);
+  const [branch, setBranch] = useState();
   const octo = useOctokit();
   const {state: {accessToken,}} = useContext(ApplicationContext);
 
@@ -31,6 +31,7 @@ export default function CreatePullRequestModal({
   function setDefaults() {
     setTitle(prTitle);
     setDescription(prDescription)
+    setBranch(undefined)
   }
 
 
@@ -68,7 +69,7 @@ export default function CreatePullRequestModal({
           </div>
         </div>
         <div className="d-flex justify-content-center">
-          <Button className='mr-2 pull-request-button' disabled={isButtonDisabled()} onClick={() => onConfirm({title, description, branch})}>{isButtonDisabled() && <LockedIcon className='me-2'/>}Create pull request</Button>
+          <Button className='mr-2' disabled={isButtonDisabled()} onClick={() => onConfirm({title, description, branch})}>{isButtonDisabled() && <LockedIcon className='me-2'/>}Create pull request</Button>
           <Button color='dark-gray' onClick={onCloseClick}>cancel</Button>
         </div>
       </div>
