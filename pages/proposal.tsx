@@ -88,13 +88,13 @@ export default function PageProposal() {
       const pullRequests = [];
 
       for (const pullRequest of issueMicroService?.pullRequests) {
-        const {data: {merged, mergeable, number, state}} = await getPullRequest(+pullRequest.githubId, issueMicroService.repo);
+        const {data: {merged, mergeable, mergeable_state, number, state}} = await getPullRequest(+pullRequest.githubId, issueMicroService.repo);
         if (number === +prGithubId) {
-          setIsMergiable(mergeable);
-          setPullRequestGh({...pullRequest, merged, isMergeable: mergeable, state});
+          setIsMergiable(mergeable && mergeable_state === 'clean');
+          setPullRequestGh({...pullRequest, merged, isMergeable: mergeable && mergeable_state === 'clean', state});
         }
 
-        pullRequests.push({...pullRequest, merged, isMergeable: mergeable, state})
+        pullRequests.push({...pullRequest, merged, isMergeable: mergeable && mergeable_state === 'clean', state})
       }
 
       setIssuePRs(pullRequests)
