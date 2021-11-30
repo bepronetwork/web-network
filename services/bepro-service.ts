@@ -161,6 +161,14 @@ class BeproFacet {
     }
   }
 
+  async isApprovedTransactionalToken() {
+    return this.network.isApprovedTransactionalToken({address: this.address, amount: 1})
+  }
+
+  async isApprovedSettlerToken() {
+    return this.network.isApprovedSettlerToken({address: this.address, amount: 1})
+  }
+
   fromWei(wei: string) {
     return this.bepro.web3.utils.fromWei(wei, 'ether')
   }
