@@ -19,7 +19,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     where.issueId = issue.id
   }
 
-  let prs = await models.pullRequest.findAndCountAll(paginate({where, raw: true, order: [[req.query.sortBy || 'updatedAt', req.query.order || 'DESC']]}));
+  let prs = await models.pullRequest.findAndCountAll(paginate({where, raw: true}, req.query, [[req.query.sortBy || 'updatedAt', req.query.order || 'DESC']]));
 
   if (!issueId)
     for(const pr of prs.rows) {

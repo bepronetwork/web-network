@@ -9,19 +9,46 @@ import InternalLink from '@components/internal-link'
 import useMergeData from '@x-hooks/use-merge-data'
 import { ApplicationContext } from '@contexts/application'
 import usePage from '@x-hooks/use-page'
+import useCount from '@x-hooks/use-count'
+import { changeLoadState } from '@contexts/reducers/change-load-state'
 
 export default function MyPullRequests() {
-	const {dispatch, state: {githubLogin, currentAddress}} = useContext(ApplicationContext)
+  const {
+    dispatch,
+    state: { loading, githubLogin, currentAddress }
+  } = useContext(ApplicationContext)
+
   const [issues, setIssues] = useState([])
-	const router = useRouter()
-	const {getIssuesOfUserPullRequests} = useMergeData()
-	const page = usePage()
+  const { getIssuesOfUserPullRequests } = useMergeData()
 
-	function getIssues() {
-		getIssuesOfUserPullRequests(page, githubLogin).then(data => setIssues(data))
-	}
+  const page = usePage()
+  const router = useRouter()
+  const results = useCount()
 
-	useEffect(getIssues, [page, githubLogin, currentAddress])
+  function setListIssues(rows) {
+    setIssues(rows.map(row => row.issue))
+  }
+
+  function getIssues() {
+    if (!githubLogin || !currentAddress) return
+
+    dispatch(changeLoadState(true))
+
+    getIssuesOfUserPullRequests(page, githubLogin)
+      .then(({ rows, count }) => {
+        results.setCount(count)
+        return rows
+      })
+      .then(setListIssues)
+      .catch((error) => {
+        console.error('Error fetching issues', error)
+      })
+      .finally(() => {
+        dispatch(changeLoadState(false))
+      })
+  }
+
+  useEffect(getIssues, [page, githubLogin, currentAddress])
 
   return (
     <Account>
@@ -31,15 +58,15 @@ export default function MyPullRequests() {
           <ListIssues listIssues={issues} />
           {issues?.length !== 0 && (
             <Paginate
-              count={issues.length}
+              count={results.count}
               onChange={(page) =>
                 router.push({ pathname: `/`, query: { page } })
               }
             />
           )}
-          {issues?.length === 0 ? (
+          {issues?.length === 0 && !loading.isLoading ? (
             <div className="col-md-10 pt-3">
-              <NothingFound description={"No pull requests"}>
+              <NothingFound description={'No pull requests'}>
                 <InternalLink
                   href="/developers"
                   label="Find an issue to work on"
