@@ -10,4 +10,5 @@ export interface Proposal {
   pullRequestGithubId?: string;
   owner?: string;
   scMergeId: string;
+  isMerged?: boolean;
 }

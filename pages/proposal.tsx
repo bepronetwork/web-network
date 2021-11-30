@@ -163,7 +163,7 @@ export default function PageProposal() {
       <ProposalProgress developers={usersAddresses}/>
       <CustomContainer className="mgt-20 mgb-20">
         <div className="col-6">
-          <ProposalProgressBar issueDisputeAmount={+proposalBepro?.disputes} isDisputed={proposalBepro?.isDisputed} stakedAmount={+beproStaked} isFinished={isFinalized} isCurrentPRMerged={issueMicroService?.merged === prId} />
+          <ProposalProgressBar issueDisputeAmount={+proposalBepro?.disputes} isDisputed={proposalBepro?.isDisputed} stakedAmount={+beproStaked} isFinished={isFinalized} isCurrentPRMerged={issueMicroService?.merged === mergeId} />
         </div>
       </CustomContainer>
       <PageActions

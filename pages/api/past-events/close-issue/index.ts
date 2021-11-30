@@ -3,7 +3,6 @@ import {NextApiRequest, NextApiResponse} from 'next';
 import {CONTRACT_ADDRESS, WEB3_CONNECTION} from '../../../../env';
 import {Network} from 'bepro-js';
 import {Octokit} from 'octokit';
-import {Bus} from '@helpers/bus';
 import readCloseIssues from '@helpers/api/read-close-issues';
 
 async function post(req: NextApiRequest, res: NextApiResponse) {

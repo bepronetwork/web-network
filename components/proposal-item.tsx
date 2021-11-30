@@ -21,6 +21,7 @@ interface Options {
   beproStaked: number;
   isFinalized: boolean;
   owner?: string;
+  isMerged: boolean;
   onDispute: (error?: boolean) => void;
 }
 
@@ -32,6 +33,7 @@ export default function ProposalItem({
                                        beproStaked,
                                        isFinalized,
                                        owner,
+                                       isMerged = false,
                                        onDispute = () => {}
                                      }: Options) {
   const {dispatch,} = useContext(ApplicationContext);
@@ -68,11 +70,11 @@ export default function ProposalItem({
   }
 
   function getColors() {
-    if (isFinalized && !proposal.isDisputed) {
+    if (isFinalized && !proposal.isDisputed && isMerged) {
       return `success`
     }
 
-    if (proposal.isDisputed) {
+    if (proposal.isDisputed || (isFinalized && !isMerged)) {
       return `danger`
     }
 
@@ -80,11 +82,11 @@ export default function ProposalItem({
   }
 
   function getLabel() {
-    if (isFinalized && !proposal.isDisputed) {
+    if (isFinalized && !proposal.isDisputed && isMerged) {
       return `Accepted`
     }
 
-    if (proposal.isDisputed) {
+    if (proposal.isDisputed || (isFinalized && !isMerged)) {
       return `Failed`
     }
 
@@ -98,10 +100,10 @@ export default function ProposalItem({
         <a className="text-decoration-none text-white">
           <div className="rounded row align-items-top">
             <div
-              className={`col-2 p-small mt-2 text-uppercase text-${getColors() === 'purple' ? 'white' : getColors()}`}>
+              className={`col-3 p-small mt-2 text-uppercase text-${getColors() === 'purple' ? 'white' : getColors()}`}>
               PR #{proposal.pullRequestGithubId} {owner && `BY @${owner}`}
             </div>
-            <div className="col-6 d-flex justify-content-start mb-2">
+            <div className="col-5 d-flex justify-content-start mb-2">
               {proposal.prAmounts.map((value, i) =>
                                         <PercentageProgressBar textClass={`smallCaption p-small text-${getColors()}`}
                                                                pgClass={`bg-${getColors()}`}
