@@ -6,11 +6,8 @@ import { BeproService } from "@services/bepro-service";
 import { ApplicationContext } from "@contexts/application";
 import ProposalItem from '@components/proposal-item';
 import {Proposal} from '@interfaces/proposal';
-import useApi from '@x-hooks/use-api';
-import useOctokit from "@x-hooks/use-octokit";
 
-
-export default function IssueProposals({ metaProposals, metaRequests, numberProposals, issueId, amount, dbId, isFinalized = false, mergedPrId = `` }) {
+export default function IssueProposals({ metaProposals, metaRequests, numberProposals, issueId, amount, dbId, isFinalized = false, mergedProposal }) {
   const { state: {beproStaked, currentAddress} } = useContext(ApplicationContext);
   const [proposals, setProposals] = useState<Proposal[]>([]);
   async function loadProposalsMeta() {
@@ -25,10 +22,10 @@ export default function IssueProposals({ metaProposals, metaRequests, numberProp
       if (scMergeId) {
         // if we don't have a scMergeId then something broke on the BE side and we should have a log - but we lost its connection to a PR
         const merge = await BeproService.network.getMergeById({merge_id: scMergeId, issue_id: scIssueId});
-        const isDisputed = mergedPrId ? +mergedPrId !== pullRequestId : await BeproService.network.isMergeDisputed({issueId: scIssueId, mergeId: scMergeId});
+        const isDisputed = mergedProposal ? mergedProposal !== scMergeId : await BeproService.network.isMergeDisputed({issueId: scIssueId, mergeId: scMergeId});
         const pr = metaRequests.find(({id}) => meta.pullRequestId === id);
 
-        pool.push({...merge, scMergeId, isDisputed, pullRequestId, pullRequestGithubId: pr?.githubId } as Proposal)
+        pool.push({...merge, scMergeId, isDisputed, pullRequestId, pullRequestGithubId: pr?.githubId, owner: pr?.githubLogin, isMerged: mergedProposal === scMergeId } as Proposal)
       }
     }
 
@@ -52,6 +49,7 @@ export default function IssueProposals({ metaProposals, metaRequests, numberProp
                                            beproStaked={beproStaked}
                                            onDispute={loadProposalsMeta}
                                            isFinalized={isFinalized}
+                                           isMerged={proposal.isMerged}
                                            owner={proposal.owner}/>)}
           </div>
         </div>
