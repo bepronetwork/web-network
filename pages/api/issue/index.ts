@@ -13,7 +13,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     return res.status(422).json(`repository not found`)
 
   const octokit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
-  console.log(process.env.NEXT_GITHUB_TOKEN)
+
   const [owner, repo] = repository.githubPath.split(`/`);
 
   const githubId = req.body.githubIssueId || (await octokit.rest.issues.create({owner,repo, title, body, labels: ['draft']}))?.data?.number?.toString()

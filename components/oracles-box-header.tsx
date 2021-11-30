@@ -8,11 +8,13 @@ function OraclesBoxHeader({
   available,
   onChange = () => {},
   currentAction = "",
+  delegatedBox = false,
 }: {
   actions: string | string[];
   available?: number | undefined;
   onChange?(action: string): void;
   currentAction?: string;
+  delegatedBox?: boolean;
 }): JSX.Element {
   return (
     <div className="d-flex justify-content-between align-items-center mb-3">
@@ -34,7 +36,7 @@ function OraclesBoxHeader({
         )}
       </div>
       {typeof available !== "undefined" && (
-        <span className="badge-opac bg-dark-gray text-white text-opacity-100 smallCaption py-1 px-3">{formatNumberToCurrency(available)} Available</span>
+        <span className="border-radius-4 bg-dark-gray text-white text-opacity-100 smallCaption py-1 px-3">{formatNumberToCurrency(available)} {delegatedBox && 'Delegated' || 'Available'}</span>
       )}
     </div>
   );

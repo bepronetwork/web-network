@@ -68,8 +68,12 @@ export default function NewProposal({
         }))
       })
       .then((participantsPr) => {
+        const tmpParticipants = participantsPr.filter(({address}) => !!address);
+        const amountPerParticipant = 100 / tmpParticipants.length
+    
+        setDistrib(Object.fromEntries(tmpParticipants.map(participant => [participant.githubHandle, amountPerParticipant])))
         setCurrentGithubId(githubId);
-        setParticipants(participantsPr);
+        setParticipants(tmpParticipants);
       })
       .catch((err) => {
         console.error('Error fetching pullRequestsParticipants', err)
@@ -102,8 +106,7 @@ export default function NewProposal({
     dispatch(proposeMergeTx);
 
     waitForMerge(githubLogin, issue_id, currentGithubId)
-                      .then(data => {
-                        console.log(`GOT`, data);
+                      .then(() => {
                         if (handleBeproService)
                           handleBeproService(true);
 
@@ -153,7 +156,6 @@ export default function NewProposal({
 
     BeproService.network.getIssueByCID({issueCID: issueId})
                 .then((_issue) => {
-                  console.log(`Issue`, _issue)
                   return BeproService.network.recognizeAsFinished({issueId: +_issue._id})
                 })
                 .then(txInfo => {
@@ -243,6 +245,7 @@ export default function NewProposal({
                                                                 by={item.githubHandle}
                                                                 address={item.address}
                                                                 onChangeDistribution={handleChangeDistrib}
+                                                                defaultPercentage={participants?.length > 1 && (100 / participants.length) || 100}
                                                                 error={error}/>
                               )
             )}

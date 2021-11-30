@@ -25,6 +25,7 @@ export interface IssueData {
   repository_id?: number;
   mergeProposals: ProposalData[];
   working: string[];
+  merged: string;
 }
 
 export interface pullRequest {

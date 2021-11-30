@@ -274,12 +274,9 @@ export default class GithubMicroService {
 
   static async waitForMerge(login, scId, ghPrId) {
     return client.get(`/merge/created/for/${login}/${scId}/${ghPrId}`)
-                 .then(({data}) => {
-                   console.log(data);
-                   return data;
-                 })
+                 .then(({data}) => data)
                  .catch(e => {
-                   console.log(`E`, e);
+                   console.log(`Failed waiting for merge`, e);
                  })
   }
 

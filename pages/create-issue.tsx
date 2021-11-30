@@ -19,6 +19,7 @@ import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
 import {User} from '@services/github-microservice';
 import useTransactions from '@x-hooks/useTransactions';
+import { changeTransactionalTokenApproval } from '@contexts/reducers/change-transactional-token-approval';
 
 interface Amount {
   value?: string,
@@ -29,10 +30,9 @@ interface Amount {
 export default function PageCreateIssue() {
   const [issueTitle, setIssueTitle] = useState('');
   const [issueDescription, setIssueDescription] = useState('');
-  const [issueAmount, setIssueAmount] = useState<Amount>({value: '0', formattedValue: '0', floatValue: 0});
+  const [issueAmount, setIssueAmount] = useState<Amount>({value: '', formattedValue: '', floatValue: 0});
   const [balance, setBalance] = useState(0);
-  const [allowedTransaction, setAllowedTransaction] = useState<boolean>(false);
-  const {dispatch, state: {currentAddress, githubHandle, myTransactions}} = useContext(ApplicationContext);
+  const {dispatch, state: {currentAddress, githubHandle, myTransactions, isTransactionalTokenApproved}} = useContext(ApplicationContext);
   const [currentUser, setCurrentUser] = useState<User>();
   const [repository_id, setRepositoryId] = useState(``);
   const [redirecting, setRedirecting] = useState(false);
@@ -59,13 +59,11 @@ export default function PageCreateIssue() {
                 .then(txInfo => {
                   txWindow.updateItem(tmpTransactional.payload.id, BeproService.parseTransaction(txInfo, tmpTransactional.payload));
 
-                  BeproService.network.isApprovedTransactionalToken({address: BeproService.address, amount: issueAmount.floatValue})
-                              .then(setAllowedTransaction)
-                              .catch(() => setAllowedTransaction(false))
-                              .finally(() => {
-                                // BeproService.parseTransaction(txInfo, tmpTransactional.payload)
-                                //             .then((info) => dispatch(updateTransaction(info)))
-                              });
+                  BeproService.isApprovedTransactionalToken()
+                              .then(approval => {
+                                dispatch(changeTransactionalTokenApproval(approval))
+                              })
+                              .catch(error => console.log('error', error))
                 })
                 .catch(e => {
                   console.error(e);
@@ -80,7 +78,6 @@ export default function PageCreateIssue() {
     setIssueTitle('')
     setIssueDescription('')
     setIssueAmount({value: '0', formattedValue: '0', floatValue: 0})
-    setAllowedTransaction(false)
   }
 
   async function createIssue() {
@@ -140,7 +137,7 @@ export default function PageCreateIssue() {
 
   function isCreateButtonDisabled() {
     return [
-      allowedTransaction,
+      isTransactionalTokenApproved,
       issueContentIsValid(),
       verifyAmountBiggerThanBalance(),
       issueAmount.floatValue > 0,
@@ -152,7 +149,7 @@ export default function PageCreateIssue() {
   }
 
   const isApproveButtonDisable = (): boolean =>[
-    issueAmount.floatValue > 0,
+    !isTransactionalTokenApproved,
     !verifyTransactionState(TransactionTypes.approveTransactionalERC20Token),
   ].some(value => value === false)
 
@@ -214,17 +211,18 @@ export default function PageCreateIssue() {
                   <InputNumber
                     thousandSeparator
                     max={balance}
-                    className={clsx({'text-muted': allowedTransaction})}
+                    className={clsx({'text-muted': isTransactionalTokenApproved})}
                     label="SET $BEPRO VALUE"
                     symbol="$BEPRO"
                     value={issueAmount.formattedValue}
-                    disabled={allowedTransaction}
+                    placeholder="0"
+                    disabled={!isTransactionalTokenApproved}
                     onValueChange={handleIssueAmountOnValueChange}
                     onBlur={handleIssueAmountBlurChange}
                     helperText={
                       <>
-                        {formatNumberToCurrency(balance)} $BEPRO Available
-                        {!allowedTransaction && (
+                        {formatNumberToCurrency(balance, { maximumFractionDigits: 18 })} $BEPRO Available
+                        {isTransactionalTokenApproved && (
                           <span
                             className="smallCaption text-blue ml-1 cursor-pointer text-uppercase"
                             onClick={() => setIssueAmount({formattedValue: balance.toString()})}>
@@ -247,7 +245,7 @@ export default function PageCreateIssue() {
                   </div>
                 ) : (
                   <>
-                    {!allowedTransaction ?
+                    {!isTransactionalTokenApproved ?
                       <Button className="me-3" disabled={isApproveButtonDisable()} onClick={allowCreateIssue}>Approve</Button>
                       : null
                     }
