@@ -60,7 +60,7 @@ export default function MyPullRequests() {
             <Paginate
               count={results.count}
               onChange={(page) =>
-                router.push({ pathname: `/`, query: { page } })
+                router.push({ pathname: `/account/my-pull-requests`, query: { page } })
               }
             />
           )}
