@@ -23,6 +23,8 @@ import useApi from '@x-hooks/use-api';
 import {changeAccessToken} from '@reducers/change-access-token';
 import {updateTransaction} from '@reducers/update-transaction';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
+import { changeTransactionalTokenApproval } from './reducers/change-transactional-token-approval';
+import { changeSettlerTokenApproval } from './reducers/change-settler-token-approval';
 
 interface GlobalState {
   state: ApplicationState,
@@ -56,7 +58,9 @@ const defaultState: GlobalState = {
     myTransactions: [],
     network: ``,
     githubLogin: ``,
-    accessToken: ``
+    accessToken: ``,
+    isTransactionalTokenApproved: false,
+    isSettlerTokenApproved: false
   },
   dispatch: () => undefined
 };
@@ -96,6 +100,9 @@ export default function ApplicationContextProvider({children}) {
     BeproService.getOraclesSummary()
                 .then(oracles => dispatch(changeOraclesState(changeOraclesParse(address, oracles))))
 
+    BeproService.isApprovedTransactionalToken().then(approval => dispatch(changeTransactionalTokenApproval(approval)))
+    BeproService.isApprovedSettlerToken().then(approval => dispatch(changeSettlerTokenApproval(approval)))
+    
     BeproService.getBalance('bepro').then(bepro => dispatch(changeBalance({bepro})));
     BeproService.getBalance('eth').then(eth => dispatch(changeBalance({eth})));
     BeproService.getBalance('staked').then(staked => dispatch(changeBalance({staked})));

@@ -18,12 +18,12 @@ export default function IssueComments({ comments, repo, issueId }) {
               </a>
             </div>
             {comments?.map((comment) => (
-              <div className="content-wrapper child mb-3" key={comment?.id}>
-                <p className="p-small trans">
+              <div className="mb-3" key={comment?.id}>
+                <p className="p-small trans text-uppercase mb-1 text-bold">
                   @{comment?.user.login}{" "}
                   {comment?.updated_at && formatDate(comment?.updated_at)}
                 </p>
-                <p className="p-small"><MarkedRender source={comment?.body || `_No comment available_`} /></p>
+                <p className="p-small content-wrapper child mb-0"><MarkedRender source={comment?.body || `_No comment available_`} /></p>
               </div>
             ))}
           </div>
