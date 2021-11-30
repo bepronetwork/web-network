@@ -13,7 +13,7 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
   const router = useRouter();
 
   function handleColorState(state: IssueState) {
-    switch (state.toLowerCase()) {
+    switch (state?.toLowerCase()) {
       case "draft": {
         return "bg-white-50";
       }

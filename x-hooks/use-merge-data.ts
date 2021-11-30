@@ -3,6 +3,7 @@ import useOctokit from '@x-hooks/use-octokit';
 import {IssueData, pullRequest} from '@interfaces/issue-data';
 import useRepos from '@x-hooks/use-repos';
 import {useEffect} from 'react';
+import { PaginatedData } from '@interfaces/paginated-data';
 
 interface MergeProps {
   repoId: string;
@@ -72,12 +73,12 @@ export default function useMergeData() {
   }
 
   async function getIssuesOfUserPullRequests(page, githubLogin: string) {
-    const pullRequestsWithIssueData = (await db.getUserPullRequests(page, githubLogin)) as pullRequest[]
-    const issues = pullRequestsWithIssueData.map(pullRequest => pullRequest.issue)
+    const pullRequestsWithIssueData = (await db.getUserPullRequests(page, githubLogin)) as PaginatedData<pullRequest>
+    const issues = pullRequestsWithIssueData.rows.map(pullRequest => pullRequest.issue)
 
     await mergeData(issues)
 
-    return issues
+    return pullRequestsWithIssueData
   }
 
   return {getIssue, getIssues, getPendingFor, getIssuesOfUserPullRequests}
