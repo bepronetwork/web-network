@@ -1,6 +1,6 @@
 import useApi from '@x-hooks/use-api';
 import useOctokit from '@x-hooks/use-octokit';
-import {IssueData} from '@interfaces/issue-data';
+import {IssueData, pullRequest} from '@interfaces/issue-data';
 import useRepos from '@x-hooks/use-repos';
 import {useEffect} from 'react';
 
@@ -71,5 +71,14 @@ export default function useMergeData() {
     return data;
   }
 
-  return {getIssue, getIssues, getPendingFor}
+  async function getIssuesOfUserPullRequests(page, githubLogin: string) {
+    const pullRequestsWithIssueData = (await db.getUserPullRequests(page, githubLogin)) as pullRequest[]
+    const issues = pullRequestsWithIssueData.map(pullRequest => pullRequest.issue)
+
+    await mergeData(issues)
+
+    return issues
+  }
+
+  return {getIssue, getIssues, getPendingFor, getIssuesOfUserPullRequests}
 }
