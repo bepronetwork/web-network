@@ -184,7 +184,7 @@ export default function PageIssue() {
           dbId={issue?.id}
           amount={networkIssue?.tokensStaked}
           isFinalized={networkIssue?.finalized}
-          mergedPrId={issue?.merged}
+          mergedProposal={issue?.merged}
         />
       )}
       {networkIssue && <IssueProposalProgressBar
