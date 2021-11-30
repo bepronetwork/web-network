@@ -5,7 +5,7 @@ import {getSession} from 'next-auth/react';
 import useOctokit from '@x-hooks/use-octokit';
 
 export default function Home() {
-  return <PageDevelopers;
+  return <PageDevelopers />;
 }
 
 // export const getStaticProps: GetStaticProps = async () => {
