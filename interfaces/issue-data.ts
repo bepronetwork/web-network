@@ -38,6 +38,7 @@ export interface pullRequest {
   state: string;
   merged: boolean;
   updatedAt: Date;
+  issue?: IssueData;
 }
 
 export interface developer {

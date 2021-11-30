@@ -13,6 +13,7 @@ interface InternalLinkProps {
   icon?: ReactNode
   uppercase?: boolean
   iconBefore?: boolean
+  activeClass?: string
 }
 
 export default function InternalLink({
@@ -22,6 +23,7 @@ export default function InternalLink({
   active = false,
   iconBefore = false,
   uppercase = false,
+  activeClass,
   ...props
 }: InternalLinkProps) {
   const { asPath } = useRouter()
@@ -33,6 +35,9 @@ export default function InternalLink({
 
     if (!isActive && nav)
       classes += ' opacity-75 opacity-100-hover '
+
+    if (isActive && nav && activeClass)
+      classes += ' ' + activeClass
 
     if (transparent || nav)
       classes += ' bg-transparent border-transparent '
