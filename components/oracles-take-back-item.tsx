@@ -63,14 +63,14 @@ export default function OraclesTakeBackItem({
 
   return (
     <>
-      <div className="bg-opac w-100 mb-1 p-3">
+      <div className="bg-dark-gray w-100 mb-1 p-3 border-radius-8">
         <div className="row align-items-center">
           <div className="col-md-6">
             <p className="largeCaption text-bold text-purple mb-1 text-uppercase">{formatNumberToString(amount, 2)} ORACLES</p>
             <p className="smallCaption text-white mb-0">{address}</p>
           </div>
           <div className="col-md-6 d-flex justify-content-end">
-            <Button color='purple text-white-hover' outline onClick={handleShow}>
+            <Button color='purple' outline onClick={handleShow}>
               Take Back
             </Button>
           </div>

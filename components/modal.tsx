@@ -39,7 +39,7 @@ export default function Modal({
                     {...params}>
       <ModalBootstrap.Header className={`relative d-flex w-100 justify-content-${titlePosition} `}>
         <ModalBootstrap.Title className={`text-white ${titleClass || ``} ${centerTitle ? `text-center w-100` : ``}`}>
-          <span className={centerTitle && `h3`}>{title}</span>
+          <span className={centerTitle && `h3` || ''}>{title}</span>
         </ModalBootstrap.Title>
         {onCloseClick && <Button transparent className="p-1 position-absolute end-90" onClick={onCloseClick}><CloseIcon color='text-gray' /></Button>}
       </ModalBootstrap.Header>

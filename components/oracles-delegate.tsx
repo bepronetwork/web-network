@@ -77,7 +77,7 @@ function OraclesDelegate(): JSX.Element {
                             status === TransactionStatus.pending && type === TransactionTypes.delegateOracles)
     ].some(values => values)
 
-  const isAddressesEqual = () => delegatedTo?.toLowerCase() === currentAddress?.toLowerCase()
+  const isAddressesEqual = () => currentAddress && delegatedTo?.toLowerCase() === currentAddress?.toLowerCase()
 
   useEffect(updateAmounts, [beproInit, metaMaskWallet, oracles, beproBalance, staked]);
 
@@ -87,7 +87,7 @@ function OraclesDelegate(): JSX.Element {
         <OraclesBoxHeader actions="Delegate oracles" available={delegatedAmount} />
         <p className="smallCaption text-white text-uppercase mt-2 mb-3">Delegate Oracles to use them in issues</p>
         <InputNumber
-          label="Oracles Ammout"
+          label="Oracles Amount"
           value={tokenAmount}
           symbol="ORACLES"
           classSymbol="text-purple"
@@ -98,7 +98,7 @@ function OraclesDelegate(): JSX.Element {
           error={error}
           helperText={(
             <>
-              {formatNumberToCurrency(delegatedAmount)} Oracles Available
+              {formatNumberToCurrency(delegatedAmount, { maximumFractionDigits: 18 })} Oracles Available
               <span
                   className="smallCaption ml-1 cursor-pointer text-uppercase text-purple"
                   onClick={setMaxAmmount}
@@ -117,7 +117,7 @@ function OraclesDelegate(): JSX.Element {
             className={`form-control ${isAddressesEqual() && 'is-invalid' || ''}`}
             placeholder="Type an address"
             />
-            {isAddressesEqual() && <span className="text-danger smallCaption">You can't delegate coins to yourself</span> || ''}
+            {isAddressesEqual() && <small className="text-danger text-italic">You can't delegate Oracles to your own address.</small> || ''}
         </div>
 
         {error && <p className="p-small text-danger mt-2">{error}</p>}

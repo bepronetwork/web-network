@@ -46,6 +46,7 @@ interface pageActions {
   issueCreator?: string;
   repoPath?: string;
   addNewComment?: (comment: any) => void;
+  issueRepo?: string;
 }
 
 export default function PageActions({
@@ -218,9 +219,9 @@ export default function PageActions({
       !finished &&
       !finalized &&
       githubLogin &&
-      <GithubLink 
-        repoId={String(repoId)} 
-        forcePath={repoPath} 
+      <GithubLink
+        repoId={String(repoId)}
+        forcePath={repoPath}
         hrefPath="fork"
         color="primary"
       >
@@ -237,8 +238,8 @@ export default function PageActions({
       !finished &&
       !finalized &&
       githubLogin &&
-      <Button 
-        color="primary" 
+      <Button
+        color="primary"
         onClick={handleStartWorking}
         disabled={isExecuting}
       >
@@ -253,13 +254,13 @@ export default function PageActions({
       !isIssueinDraft &&
       hasOpenPR &&
       githubLogin &&
-      <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`pull/${pullRequests[0]?.githubId || ""}`} color="primary">View Pull Request</GithubLink>
+      <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`pull/${pullRequests?.find(pr => pr.githubLogin === githubLogin)?.githubId || ""}`} color="primary">View Pull Request</GithubLink>
     )
   }
 
-  async function handlePullrequest({title: prTitle, description: prDescription,}) {
+  async function handlePullrequest({title: prTitle, description: prDescription, branch}) {
 
-    createPullRequestIssue(repoId as string, githubId, {title: prTitle, description: prDescription, username: githubLogin,})
+    createPullRequestIssue(repoId as string, githubId, {title: prTitle, description: prDescription, username: githubLogin, branch})
       .then(() => {
         dispatch(
           addToast({
@@ -315,7 +316,7 @@ export default function PageActions({
 
         if (addNewComment)
           addNewComment(response.data)
-        
+
         setIsExecuting(false)
       })
       .catch((error) => {
@@ -364,7 +365,7 @@ export default function PageActions({
           handleBeproService(true);
 
         if (handleMicroService)
-          handleMicroService(true);
+          handleMicroService();
       })
 
     await BeproService.network
@@ -389,8 +390,9 @@ export default function PageActions({
       <div className="row justify-content-center">
         <div className="col-md-10">
           <div className="d-flex align-items-center justify-content-between mb-4">
-            <h4 className="h4">Details</h4>
+            <h4 className="h4 d-flex align-items-center">Details</h4>
             <div className="d-flex align-items-center">
+              {!canClose && !finalized && <span className="mr-2 text-uppercase smallCaption text-danger">Pull request has merge conflicts and can't be merged</span> || ``}
               {renderIssueAvatars()}
               {forks && renderForkAvatars()}
 
@@ -405,13 +407,13 @@ export default function PageActions({
                   { (!isDisputed && !finalized ) && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>Dispute</Button> || ``}
                   {!finalized && <Button disabled={!canClose} onClick={handleClose}>
                   {!canClose && <LockedIcon width={12} height={12} className="mr-1"/>}
-                    Close
+                    Merge
                     </Button> || ``}
                 </>
               )}
 
               {renderViewPullrequest()}
-              
+
               <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`${state?.toLowerCase() === 'pull request' && 'pull' || 'issues' }/${githubId || ""}`}>view on github</GithubLink>
 
             </div>
@@ -423,6 +425,7 @@ export default function PageActions({
         title={title}
         description={description}
         onConfirm={handlePullrequest}
+        repo={githubLogin && repoPath && [githubLogin, repoPath.split(`/`)[1]].join(`/`) || ``}
         onCloseClick={() => setShowPRModal(false)}
       />
     </div>

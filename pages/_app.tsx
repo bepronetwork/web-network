@@ -23,7 +23,6 @@ export default function App({ Component, pageProps: {session, ...pageProps} }: A
 
   useEffect(() => {
     setLoaded(!!repos?.length)
-    console.log(loaded, repos,)
   }, [repos])
 
   return (<SessionProvider session={session}>
