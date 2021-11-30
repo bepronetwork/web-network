@@ -21,6 +21,11 @@ li {
   cursor: not-allowed;
 }
 
+.account-link-active {
+  border-bottom: 3px solid $blue !important;
+  border-radius: 0;
+}
+
 .pull-request-button {
   height: 40px;
   width: 215px;
