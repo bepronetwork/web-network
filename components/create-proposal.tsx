@@ -172,7 +172,7 @@ export default function NewProposal({
                   if (e?.message?.search(`User denied`) > -1)
                     dispatch(updateTransaction({...recognizeAsFinished.payload as any, remove: true}))
                   else dispatch(updateTransaction({...recognizeAsFinished.payload as any, status: TransactionStatus.failed}));
-                  dispatch(toastWarning(`Failed to mark issue as finished!`));
+                  dispatch(toastWarning(`Failed to mark bounty as finished!`));
                   console.error(`Failed to mark as finished`, e);
                 })
   }
