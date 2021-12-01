@@ -405,8 +405,8 @@ export default function ParityPage() {
         <div className="row mt-3">
           <div className="col d-flex justify-content-end">
             {issuesList.length && <span className="fs-small me-2">Will cost <span className={getCostClass()}>{formatNumberToString(getSumOfTokenAmount())} BEPRO </span> / {formatNumberToString(balance.bepro)} BEPRO</span> || ``}
-            {issuesList.length && <Button className="mr-2" outline onClick={() => createIssuesFromList()}>Create Issues</Button> || ``}
-            { githubToken && reposList.length && <Button className="mr-2" disabled={isValidForm()} onClick={() => listIssues()}>List issues</Button> || `` }
+            {issuesList.length && <Button className="mr-2" outline onClick={() => createIssuesFromList()}>Create Bounties</Button> || ``}
+            { githubToken && reposList.length && <Button className="mr-2" disabled={isValidForm()} onClick={() => listIssues()}>List Bounties</Button> || `` }
             { githubToken && !availReposList.length && <Button onClick={getSelfRepos}>load repos</Button> || `` }
           </div>
         </div>
