@@ -69,7 +69,7 @@ export default function MyPullRequests() {
               <NothingFound description={'No pull requests'}>
                 <InternalLink
                   href="/developers"
-                  label="Find an issue to work on"
+                  label="Find an bounty to work on"
                   uppercase
                 />
               </NothingFound>
