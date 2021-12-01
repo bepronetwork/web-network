@@ -4,11 +4,11 @@ import { formatDate } from '@helpers/formatDate'
 import Avatar from './avatar'
 import LockedIcon from '@assets/icons/locked-icon'
 
-export default function PullRequestItem({ canReview = false, pullRequest }) {
+export default function PullRequestItem({ repoId, issueId, canReview = false, pullRequest }) {
   return (
     <>
       <div className="content-list-item proposal">
-        <Link passHref href={{ pathname: '/proposal', query: {} }}>
+        <Link passHref href={{ pathname: '/pull-request', query: {repoId, issueId, prId: pullRequest.githubId} }}>
           <a className="text-decoration-none text-white">
             <div className="row align-items-center pl-1 pr-1">
               <div className="col-7 smallCaption text-uppercase text-white">
@@ -23,7 +23,7 @@ export default function PullRequestItem({ canReview = false, pullRequest }) {
               </div>
 
               <div className="col-2 smallCaption text-uppercase text-white d-flex justify-content-center">
-                {pullRequest?.reviews} Reviews
+                {pullRequest?.reviews?.length} Review{pullRequest?.reviews?.length !== 1 && 's' || ''}
               </div>
 
               <div className="col-1 d-flex justify-content-center">
