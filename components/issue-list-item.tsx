@@ -57,7 +57,7 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
           return xClick();
 
         router.push({
-          pathname: "/issue",
+          pathname: "/bounty",
           query: { id: issue?.githubId, repoId: issue?.repository_id },
         });
       }}

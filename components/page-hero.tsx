@@ -4,7 +4,7 @@ import {ApplicationContext} from '@contexts/application';
 import {formatNumberToCurrency} from 'helpers/formatNumber'
 import {BeproService} from '@services/bepro-service';
 
-export default function PageHero({title = "Find issues to work",}) {
+export default function PageHero({title = "Find bounties to work",}) {
 
   const {state: {beproInit}} = useContext(ApplicationContext)
   const [inProgress, setInProgress] = useState(0)
@@ -41,7 +41,7 @@ export default function PageHero({title = "Find issues to work",}) {
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4 className="h4 mb-0">{closed}</h4>
-                    <span className="smallCaption">Issues closed</span>
+                    <span className="smallCaption">Bounties closed</span>
                   </div>
                 </div>
                 <div className="col-md-6">
