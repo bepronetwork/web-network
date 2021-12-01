@@ -105,7 +105,7 @@ export default function MainNav() {
           <Button transparent className="opacity-75 opacity-100-hover"><span>Get Started</span><ExternalLinkIcon className="ml-1"/></Button>
         </a>
 
-        <InternalLink href="/create-issue" icon={<PlusIcon />} label="Create issue" iconBefore nav uppercase />
+        <InternalLink href="/create-bounty" icon={<PlusIcon />} label="Create Bounty" iconBefore nav uppercase />
 
         <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 opacity-75 opacity-100-hover" transparent rounded><HelpIcon /></Button>
 
