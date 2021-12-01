@@ -17,6 +17,7 @@ import {toastError} from '@reducers/add-toast';
 import useApi from '@x-hooks/use-api';
 import useMergeData from '@x-hooks/use-merge-data';
 import InternalLink from '@components/internal-link';
+import { changeLoadState } from '@contexts/reducers/change-load-state';
 
 export default function MyIssues() {
 
@@ -38,6 +39,8 @@ export default function MyIssues() {
     if (!currentAddress)
       return;
 
+    dispatch(changeLoadState(true))
+
     getUserOf(currentAddress)
                       .then((user) => {
                         if (user)
@@ -55,6 +58,9 @@ export default function MyIssues() {
                         else return [];
                       })
                       .then(setIssues)
+                      .finally(() => {
+                        dispatch(changeLoadState(false))
+                      })
   }
 
   function getPendingIssues() {
