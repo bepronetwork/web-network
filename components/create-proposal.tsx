@@ -210,6 +210,8 @@ export default function NewProposal({
 
       <Modal show={show}
              title="Create Proposal"
+             titlePosition="center"
+             onCloseClick={handleClose}
              footer={
                <>
                  <Button color='dark-gray' onClick={handleClose}>
