@@ -38,10 +38,10 @@ export default function Modal({
                     backdrop={backdrop}
                     {...params}>
       <ModalBootstrap.Header className={`relative d-flex w-100 justify-content-${titlePosition} `}>
-        <ModalBootstrap.Title className={`text-white ${titleClass || ``} ${centerTitle ? `text-center w-100` : ``}`}>
-          <span className={centerTitle && `h3`}>{title}</span>
+        <ModalBootstrap.Title className={`pt-3 text-white ${titleClass || ``} ${centerTitle ? `text-center w-100` : ``}`}>
+          <p className="h3">{title}</p>
         </ModalBootstrap.Title>
-        {onCloseClick && <Button transparent className="p-1 position-absolute end-90" onClick={onCloseClick}><CloseIcon color='text-gray' /></Button>}
+        {onCloseClick && <Button transparent className="close-button p-1 position-absolute end-95" onClick={onCloseClick}><CloseIcon color='text-gray' /></Button>}
       </ModalBootstrap.Header>
       <ModalBootstrap.Body>{children}</ModalBootstrap.Body>
       <ModalBootstrap.Footer>{renderFooter()}</ModalBootstrap.Footer>
