@@ -4,7 +4,7 @@ import React, { ReactNode } from "react";
 
 type NothingFoundProps = {
   description: string;
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 export default function NothingFound({ description, children }: NothingFoundProps) {
