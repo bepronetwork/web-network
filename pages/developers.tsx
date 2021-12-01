@@ -25,24 +25,24 @@ type FiltersByIssueState = Filter[];
 
 const filtersByIssueState: FiltersByIssueState = [
   {
-    label: "All issues",
+    label: "All bounties",
     value: 'all',
-    emptyState: 'Issues not found'
+    emptyState: 'Bounties not found'
   },
   {
-    label: 'Open issues',
+    label: 'Open bounties',
     value: 'open',
-    emptyState: 'Open issues not found'
+    emptyState: 'Open bounties not found'
   },
   {
-    label: 'Draft issues',
+    label: 'Draft bounties',
     value: 'draft',
-    emptyState: 'Draft issues not found'
+    emptyState: 'Draft bounties not found'
   },
   {
-    label: 'Closed issues',
+    label: 'Closed bounties',
     value: 'closed',
-    emptyState: 'Closed issues not found'
+    emptyState: 'Closed bounties not found'
   }
 ];
 
@@ -89,7 +89,7 @@ export default function PageDevelopers() {
 
   return (<>
     <div>
-      <PageHero title="Find issues to work on"/>
+      <PageHero title="Find bounties to work on"/>
       <div className="container p-footer">
         <div className="row justify-content-center">
           <div className="col-md-10">
@@ -105,7 +105,7 @@ export default function PageDevelopers() {
             <div className="col-md-10">
               <NothingFound
                 description={filterByState.emptyState}>
-                <InternalLink href="/create-issue" label="create one" uppercase />
+                <InternalLink href="/create-bounty" label="create one" uppercase />
               </NothingFound>
             </div>
           ) : null}

@@ -1,23 +1,30 @@
 import models from '@db/models';
+import paginate from '@helpers/paginate';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Octokit} from 'octokit';
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {login, issueId} = req.query;
+  let where = {} as any
+
+  if (login)
+    where.githubLogin = login
+
+  if (issueId) {
+    const issue = await models.issue.findOne({where: {issueId}});
+
+    if (!issue)
+      return res.status(404).json('Issue not found');
+    
+    where.issueId = issue.id
+  }
+
+  let prs = await models.pullRequest.findAndCountAll(paginate({where, raw: true}, req.query, [[req.query.sortBy || 'updatedAt', req.query.order || 'DESC']]));
 
   if (!issueId)
-    return res.status(422);
-
-  const find = await models.issue.findOne({where: {issueId}});
-  if (!find)
-    return res.status(422);
-
-  const where = {
-    issueId: find.id,
-    ... login && {githubLogin: login} || {}
-  };
-
-  const prs = await models.pullRequest.findOne({where, raw: true});
+    for(const pr of prs.rows) {
+      pr.issue = await models.issue.findOne({where: {id: pr.issueId}})
+    } 
 
   return res.status(200).json(prs)
 }
