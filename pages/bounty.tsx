@@ -17,6 +17,8 @@ import useRepos from '@x-hooks/use-repos';
 import useOctokit from '@x-hooks/use-octokit';
 import useApi from '@x-hooks/use-api';
 import TabbedNavigation from '@components/tabbed-navigation';
+import IssuePullRequests from '@components/issue-pull-requests';
+import CustomContainer from '@components/custom-container';
 interface NetworkIssue {
   recognizedAsFinished: boolean;
 }
@@ -34,11 +36,34 @@ export default function PageIssue() {
   const [isRepoForked, setIsRepoForked] = useState(false);
   const [isWorking, setIsWorking] = useState(false);
   const [hasOpenPR, setHasOpenPR] = useState(false);
+  const [mergedPullRequests, setMergedPullRequests] = useState([]);
   const [currentUser, setCurrentUser] = useState<User>();
-  const {getIssue} = useMergeData();
+  const {getIssue, getMergedDataFromPullRequests} = useMergeData();
   const {getIssueComments, getForksOf, getUserRepos,} = useOctokit();
   const [[activeRepo, reposList]] = useRepos();
   const {getUserOf, moveIssueToOpen, userHasPR} = useApi();
+
+  const tabs = [
+    {
+      eventKey: 'proposals',
+      title: `${networkIssue?.mergeProposalsAmount} Proposal${networkIssue?.mergeProposalsAmount !== 1 && 's' || ''}`,
+      component: <IssueProposals
+        metaProposals={issue?.mergeProposals}
+        metaRequests={issue?.pullRequests}
+        numberProposals={networkIssue?.mergeProposalsAmount}
+        issueId={issue?.issueId}
+        dbId={issue?.id}
+        amount={networkIssue?.tokensStaked}
+        isFinalized={networkIssue?.finalized}
+        mergedProposal={issue?.merged}
+      />
+    },
+    {
+      eventKey: 'pull-requests',
+      title: `${mergedPullRequests.length} Pull Request${mergedPullRequests.length !== 1 && 's' || ''}`,
+      component: <IssuePullRequests isIssueFinalized={networkIssue?.finalized} pullResquests={mergedPullRequests} />
+    }
+  ]
 
   function getIssueCID() {
     return [repoId, id].join(`/`)
@@ -129,10 +154,16 @@ export default function PageIssue() {
       setIsWorking(issue.working.some(el => el === githubLogin))
   }
 
+  function loadMergedPullRequests() {
+    if (issue)
+      getMergedDataFromPullRequests(issue.repo, issue.pullRequests).then(setMergedPullRequests)
+  }
+
   useEffect(loadIssueData, [githubLogin, currentAddress, id, activeRepo]);
   useEffect(getsIssueMicroService, [activeRepo, reposList])
   useEffect(checkIsWorking, [issue, githubLogin])
   useEffect(getRepoForked, [issue, githubLogin])
+  useEffect(loadMergedPullRequests, [issue])
 
   const handleStateissue = () => {
     if (issue?.state) return issue?.state;
@@ -176,22 +207,9 @@ export default function PageIssue() {
         githubId={issue?.githubId}
         addNewComment={addNewComment}
         finished={networkIssue?.recognizedAsFinished} />
-        {networkIssue?.mergeProposalsAmount > 0 && <TabbedNavigation defaultActiveKey="proposals" tabs={[
-          {
-            eventKey: 'proposals',
-            title: `${networkIssue?.mergeProposalsAmount} Proposal${networkIssue?.mergeProposalsAmount > 1 && 's' || ''}`,
-            component: <IssueProposals
-              metaProposals={issue?.mergeProposals}
-              metaRequests={issue?.pullRequests}
-              numberProposals={networkIssue?.mergeProposalsAmount}
-              issueId={issue?.issueId}
-              dbId={issue?.id}
-              amount={networkIssue?.tokensStaked}
-              isFinalized={networkIssue?.finalized}
-              mergedProposal={issue?.merged}
-            />
-          }
-        ]} />}
+        {networkIssue?.mergeProposalsAmount > 0 && <CustomContainer>
+          <TabbedNavigation defaultActiveKey="proposals" className="issue-tabs" tabs={tabs} />
+        </CustomContainer>}
       {networkIssue && <IssueProposalProgressBar
         isFinalized={networkIssue?.finalized}
         isIssueinDraft={isIssueinDraft}
