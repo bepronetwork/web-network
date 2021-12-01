@@ -68,7 +68,7 @@ export default function MyIssues() {
     treatPendingIssue()
       .then(result => {
         if (!result)
-          return dispatch(toastError(`Failed to update issue`));
+          return dispatch(toastError(`Failed to update bounty`));
 
         updatePendingIssue(null);
         getIssueList();
@@ -86,8 +86,8 @@ export default function MyIssues() {
       <div className="col-md-10">
         <div className="mt-4">
           <NothingFound
-            description="No issues">
-            <InternalLink href="/create-issue" label="create one" uppercase />
+            description="No bounties">
+            <InternalLink href="/create-bounty" label="create one" uppercase />
           </NothingFound>
         </div>
       </div>)
@@ -102,10 +102,10 @@ export default function MyIssues() {
         <div className="row justify-content-center">
           {pendingIssues?.length &&
           <div className="col-md-10">
-            <div className="h4 mb-4">Pending issues</div>
+            <div className="h4 mb-4">Pending bounties</div>
             {pendingIssues.map(issue => <IssueListItem issue={issue} xClick={() => updatePendingIssue(issue)}/>)}
             <hr/>
-            <Modal title="Set issue as draft" show={!!pendingIssue}
+            <Modal title="Set bounty as draft" show={!!pendingIssue}
                    centerTitle={true}
                    okLabel="update"
                    cancelLabel="cancel"

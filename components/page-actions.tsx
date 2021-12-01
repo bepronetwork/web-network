@@ -307,7 +307,7 @@ export default function PageActions({
           addToast({
             type: "success",
             title: "Success",
-            content: "To start working on this issue",
+            content: "To start working on this bounty",
           })
         )
 
@@ -324,7 +324,7 @@ export default function PageActions({
           addToast({
             type: "danger",
             title: "Failed",
-            content: "To start working on this issue",
+            content: "To start working on this bounty",
           })
         )
 

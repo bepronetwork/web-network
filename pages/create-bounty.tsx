@@ -114,8 +114,8 @@ export default function PageCreateIssue() {
                         patchIssueWithScId(repository_id, githubId, issueId)
                           .then(async(result) => {
                             if (!result)
-                                return dispatch(toastError(`Error creating issue`));;
-                            await router.push(`/issue?id=${githubId}&repoId=${repository_id}`)
+                                return dispatch(toastError(`Error creating bounty`));;
+                            await router.push(`/bounty?id=${githubId}&repoId=${repository_id}`)
                           }))
                       .catch(e => {
                         console.error(`Failed to createIssue`, e);
@@ -124,7 +124,7 @@ export default function PageCreateIssue() {
                           dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
                         else dispatch(updateTransaction({...openIssueTx.payload as any, status: TransactionStatus.failed}));
 
-                        dispatch(toastError(e.message || `Error creating issue`));
+                        dispatch(toastError(e.message || `Error creating bounty`));
                         return false;
                       }).finally(()=> setRedirecting(false))
   }
@@ -179,7 +179,7 @@ export default function PageCreateIssue() {
           <div className="row justify-content-center">
             <div className="col-md-10">
               <div className="d-flex justify-content-center">
-                <h1 className="h1 mb-0">Create new issue</h1>
+                <h1 className="h1 mb-0">Create new bounty</h1>
               </div>
             </div>
           </div>
@@ -192,9 +192,9 @@ export default function PageCreateIssue() {
             <div className="content-wrapper mt-up mb-5">
               <h3 className="h3 mr-2 mb-4 text-white text-opacity-1">Details</h3>
               <div className="form-group mb-4">
-                <label className="smallCaption mb-2 text-uppercase">Issue title</label>
+                <label className="smallCaption mb-2 text-uppercase">Bounty title</label>
                 <input type="text"
-                       className="form-control rounded-lg" placeholder="Your issue title"
+                       className="form-control rounded-lg" placeholder="Your bounty title"
                        value={issueTitle}
                        onChange={e => setIssueTitle(e.target.value)}
                 />
@@ -250,7 +250,7 @@ export default function PageCreateIssue() {
                       : null
                     }
                     <Button disabled={isCreateButtonDisabled()}
-                            onClick={createIssue}>{isCreateButtonDisabled() && <LockedIcon className="mr-1" width={13} height={13}/>}<span>Create Issue</span>
+                            onClick={createIssue}>{isCreateButtonDisabled() && <LockedIcon className="mr-1" width={13} height={13}/>}<span>Create Bounty</span>
                     </Button>
                   </>
                 )}
