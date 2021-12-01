@@ -39,6 +39,7 @@ export interface pullRequest {
   merged: boolean;
   updatedAt: Date;
   issue?: IssueData;
+  reviews?: []
 }
 
 export interface developer {

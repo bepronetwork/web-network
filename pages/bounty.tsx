@@ -46,7 +46,7 @@ export default function PageIssue() {
   const tabs = [
     {
       eventKey: 'proposals',
-      title: `${networkIssue?.mergeProposalsAmount} Proposal${networkIssue?.mergeProposalsAmount !== 1 && 's' || ''}`,
+      title: `${networkIssue?.mergeProposalsAmount || 0} Proposal${networkIssue?.mergeProposalsAmount !== 1 && 's' || ''}`,
       component: <IssueProposals
         metaProposals={issue?.mergeProposals}
         metaRequests={issue?.pullRequests}
@@ -61,7 +61,7 @@ export default function PageIssue() {
     {
       eventKey: 'pull-requests',
       title: `${mergedPullRequests.length} Pull Request${mergedPullRequests.length !== 1 && 's' || ''}`,
-      component: <IssuePullRequests isIssueFinalized={networkIssue?.finalized} pullResquests={mergedPullRequests} />
+      component: <IssuePullRequests repoId={issue?.repository_id} issueId={issue?.issueId} isIssueFinalized={networkIssue?.finalized} pullResquests={mergedPullRequests} />
     }
   ]
 
@@ -155,7 +155,7 @@ export default function PageIssue() {
   }
 
   function loadMergedPullRequests() {
-    if (issue)
+    if (issue && currentAddress)
       getMergedDataFromPullRequests(issue.repo, issue.pullRequests).then(setMergedPullRequests)
   }
 
@@ -163,7 +163,7 @@ export default function PageIssue() {
   useEffect(getsIssueMicroService, [activeRepo, reposList])
   useEffect(checkIsWorking, [issue, githubLogin])
   useEffect(getRepoForked, [issue, githubLogin])
-  useEffect(loadMergedPullRequests, [issue])
+  useEffect(loadMergedPullRequests, [issue, currentAddress])
 
   const handleStateissue = () => {
     if (issue?.state) return issue?.state;
@@ -179,6 +179,7 @@ export default function PageIssue() {
 
   return (
     <>
+      {console.log('mergedPullRequests', mergedPullRequests)}
       <IssueHero
         amount={formatNumberToCurrency(issue?.amount || networkIssue?.tokensStaked)}
         state={handleStateissue()}
@@ -207,7 +208,7 @@ export default function PageIssue() {
         githubId={issue?.githubId}
         addNewComment={addNewComment}
         finished={networkIssue?.recognizedAsFinished} />
-        {networkIssue?.mergeProposalsAmount > 0 && <CustomContainer>
+        {((networkIssue?.mergeProposalsAmount > 0 || mergedPullRequests.length > 0) && currentAddress) && <CustomContainer>
           <TabbedNavigation defaultActiveKey="proposals" className="issue-tabs" tabs={tabs} />
         </CustomContainer>}
       {networkIssue && <IssueProposalProgressBar
