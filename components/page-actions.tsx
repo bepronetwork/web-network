@@ -407,7 +407,7 @@ export default function PageActions({
                   { (!isDisputed && !finalized ) && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>Dispute</Button> || ``}
                   {!finalized && <Button disabled={!canClose} onClick={handleClose}>
                   {!canClose && <LockedIcon width={12} height={12} className="mr-1"/>}
-                    Merge
+                    <span> Merge </span>
                     </Button> || ``}
                 </>
               )}
