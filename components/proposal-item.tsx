@@ -95,12 +95,12 @@ export default function ProposalItem({
 
 
   return <>
-    <div className="content-list-item proposal">
+    <div className="content-list-item proposal" key={`${proposal.pullRequestId}${proposal.scMergeId}`}>
       <Link passHref href={{pathname: '/proposal', query: {prId: proposal.pullRequestId, mergeId: proposal.scMergeId, dbId, issueId},}}>
         <a className="text-decoration-none text-white">
           <div className="rounded row align-items-top">
             <div
-              className={`col-3 p-small mt-2 text-uppercase text-${getColors() === 'purple' ? 'white' : getColors()}`}>
+              className={`col-3 smallCaption mt-2 text-uppercase text-${getColors() === 'purple' ? 'white' : getColors()}`}>
               PR #{proposal.pullRequestGithubId} {owner && `BY @${owner}`}
             </div>
             <div className="col-5 d-flex justify-content-start mb-2">
