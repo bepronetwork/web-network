@@ -16,6 +16,7 @@ import useMergeData from '@x-hooks/use-merge-data';
 import useRepos from '@x-hooks/use-repos';
 import useOctokit from '@x-hooks/use-octokit';
 import useApi from '@x-hooks/use-api';
+import TabbedNavigation from '@components/tabbed-navigation';
 interface NetworkIssue {
   recognizedAsFinished: boolean;
 }
@@ -175,18 +176,22 @@ export default function PageIssue() {
         githubId={issue?.githubId}
         addNewComment={addNewComment}
         finished={networkIssue?.recognizedAsFinished} />
-      {networkIssue?.mergeProposalsAmount > 0 && (
-        <IssueProposals
-          metaProposals={issue?.mergeProposals}
-          metaRequests={issue?.pullRequests}
-          numberProposals={networkIssue?.mergeProposalsAmount}
-          issueId={issue?.issueId}
-          dbId={issue?.id}
-          amount={networkIssue?.tokensStaked}
-          isFinalized={networkIssue?.finalized}
-          mergedProposal={issue?.merged}
-        />
-      )}
+        {networkIssue?.mergeProposalsAmount > 0 && <TabbedNavigation defaultActiveKey="proposals" tabs={[
+          {
+            eventKey: 'proposals',
+            title: `${networkIssue?.mergeProposalsAmount} Proposal${networkIssue?.mergeProposalsAmount > 1 && 's' || ''}`,
+            component: <IssueProposals
+              metaProposals={issue?.mergeProposals}
+              metaRequests={issue?.pullRequests}
+              numberProposals={networkIssue?.mergeProposalsAmount}
+              issueId={issue?.issueId}
+              dbId={issue?.id}
+              amount={networkIssue?.tokensStaked}
+              isFinalized={networkIssue?.finalized}
+              mergedProposal={issue?.merged}
+            />
+          }
+        ]} />}
       {networkIssue && <IssueProposalProgressBar
         isFinalized={networkIssue?.finalized}
         isIssueinDraft={isIssueinDraft}
