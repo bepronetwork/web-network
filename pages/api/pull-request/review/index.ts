@@ -34,6 +34,12 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       body: `<p>@${githubLogin} reviewed this with the following message:</p><p>${body}</p>`
     })
 
+    if (!pullRequest.reviewers.find(el => el === String(githubLogin))) {
+      pullRequest.reviewers = [...pullRequest.reviewers, githubLogin]
+      
+      await pullRequest.save()
+    }
+
     return res.status(octoResponse.status).json(octoResponse.data)
   } catch (error) {
     return res.status(error.status || 500).json(error.response?.data || error)
