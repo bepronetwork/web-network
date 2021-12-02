@@ -19,6 +19,7 @@ import useApi from '@x-hooks/use-api';
 import TabbedNavigation from '@components/tabbed-navigation';
 import IssuePullRequests from '@components/issue-pull-requests';
 import CustomContainer from '@components/custom-container';
+import { head } from 'lodash';
 interface NetworkIssue {
   recognizedAsFinished: boolean;
 }
@@ -209,7 +210,7 @@ export default function PageIssue() {
         addNewComment={addNewComment}
         finished={networkIssue?.recognizedAsFinished} />
         {((networkIssue?.mergeProposalsAmount > 0 || mergedPullRequests.length > 0) && currentAddress) && <CustomContainer>
-          <TabbedNavigation defaultActiveKey="proposals" className="issue-tabs" tabs={tabs} />
+          <TabbedNavigation defaultActiveKey={head(tabs).eventKey} className="issue-tabs" tabs={tabs} />
         </CustomContainer>}
       {networkIssue && <IssueProposalProgressBar
         isFinalized={networkIssue?.finalized}
