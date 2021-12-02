@@ -10,7 +10,7 @@ export default function IssuePullRequests({ repoId, issueId, isIssueFinalized = 
     >
       {(pullResquests.length > 0 &&
         pullResquests.map((pullRequest) => (
-          <PullRequestItem key={pullRequest.id} repoId={repoId} pullRequest={pullRequest} issueId={issueId} canReview={!isIssueFinalized} />
+          <PullRequestItem key={pullRequest.id} repoId={repoId} pullRequest={pullRequest} issueId={issueId} canReview={pullRequest.state === 'open'} />
         ))) || <NothingFound description={'No pull requests found'} />}
     </div>
   )

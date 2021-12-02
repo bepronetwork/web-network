@@ -180,7 +180,6 @@ export default function PageIssue() {
 
   return (
     <>
-      {console.log('mergedPullRequests', mergedPullRequests)}
       <IssueHero
         amount={formatNumberToCurrency(issue?.amount || networkIssue?.tokensStaked)}
         state={handleStateissue()}

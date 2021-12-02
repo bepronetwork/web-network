@@ -20,6 +20,7 @@ import { formatDate } from '@helpers/formatDate'
 import { formatNumberToCurrency } from '@helpers/formatNumber'
 
 import { IssueData, pullRequest } from '@interfaces/issue-data'
+import LockedIcon from '@assets/icons/locked-icon'
 
 export default function PullRequest() {
   const {
@@ -110,8 +111,10 @@ export default function PullRequest() {
           </div>
 
           <div className="col-2 p-0 d-flex justify-content-center">
-            {currentAddress && githubLogin && (
-              <Button onClick={handleShowModal}>Make a Review</Button>
+            {currentAddress && githubLogin && pullRequest?.state === 'open' && (
+              <Button onClick={handleShowModal}>
+                <span>Make a Review</span>
+              </Button>
             )}
           </div>
 
