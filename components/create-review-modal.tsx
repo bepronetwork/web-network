@@ -57,7 +57,7 @@ export default function CreateReviewModal({
 
           <div className="d-flex align-items-center flex-wrap justify-content-center justify-content-md-start">
             <span className="smallCaption trans mr-2">
-              Created at {formatDate(pullRequest?.createdAt)}
+              Created at {pullRequest && formatDate(pullRequest?.createdAt)}
             </span>
 
             <GithubInfo
