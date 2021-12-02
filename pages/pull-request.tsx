@@ -21,6 +21,8 @@ import { formatNumberToCurrency } from '@helpers/formatNumber'
 
 import { IssueData, pullRequest } from '@interfaces/issue-data'
 import LockedIcon from '@assets/icons/locked-icon'
+import useApi from '@x-hooks/use-api'
+import { addToast } from '@contexts/reducers/add-toast'
 
 export default function PullRequest() {
   const {
@@ -30,8 +32,10 @@ export default function PullRequest() {
 
   const router = useRouter()
   const [[activeRepo]] = useRepos()
+  const { createReviewForPR } = useApi()
   const [issue, setIssue] = useState<IssueData>()
   const [showModal, setShowModal] = useState(false)
+  const [isExecuting, setIsExecuting] = useState(false)
   const [pullRequest, setPullRequest] = useState<pullRequest>()
   const { getIssue, getMergedDataFromPullRequests } = useMergeData()
 
@@ -60,21 +64,35 @@ export default function PullRequest() {
       .finally(() => dispatch(changeLoadState(false)))
   }
 
-  function renderReviews() {
-    return (
-      <>
-        {pullRequest?.reviews?.map((review) => (
-          <Comment
-            comment={{
-              id: review.id,
-              user: review.user,
-              body: review.body,
-              updated_at: review.submitted_at
-            }}
-          />
-        ))}
-      </>
-    )
+  function handleCreateReview({ body }) {
+    setIsExecuting(true)
+
+    createReviewForPR(String(issueId), String(prId), githubLogin, body)
+      .then((response) => {
+        dispatch(
+          addToast({
+            type: 'success',
+            title: 'Success',
+            content: 'Review submitted'
+          })
+        )
+
+        setPullRequest({...pullRequest, comments: [...pullRequest.comments, response.data]})
+        
+        setIsExecuting(false)
+        handleCloseModal()
+      })
+      .catch((error) => {
+        dispatch(
+          addToast({
+            type: 'danger',
+            title: 'Failed',
+            content: 'To submit review'
+          })
+        )
+
+        setIsExecuting(false)
+      })
   }
 
   function handleShowModal() {
@@ -105,8 +123,8 @@ export default function PullRequest() {
         <div className="row align-items-center bg-shadow border-radius-8 px-3 py-4">
           <div className="col-8">
             <span className="largeCaption text-uppercase">
-              {pullRequest?.reviews?.length} Review
-              {(pullRequest?.reviews?.length !== 1 && 's') || ''}
+              {pullRequest?.comments?.length} Review
+              {(pullRequest?.comments?.length !== 1 && 's') || ''}
             </span>
           </div>
 
@@ -129,9 +147,10 @@ export default function PullRequest() {
           </div>
 
           <div className="col-12 mt-4">
-            {(pullRequest?.reviews?.length > 0 && renderReviews()) || (
-              <NothingFound description="No reviews found" />
-            )}
+            {(pullRequest?.comments?.length > 0 &&
+              pullRequest?.comments?.map((comment, index) => (
+                <Comment comment={comment} key={index} />
+              ))) || <NothingFound description="No reviews found" />}
           </div>
         </div>
       </CustomContainer>
@@ -141,6 +160,8 @@ export default function PullRequest() {
         onCloseClick={handleCloseModal}
         issue={issue}
         pullRequest={pullRequest}
+        onConfirm={handleCreateReview}
+        isExecuting={isExecuting}
       />
     </>
   )

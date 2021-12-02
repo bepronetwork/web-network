@@ -44,8 +44,8 @@ export default function PullRequestItem({
               </div>
 
               <div className="col-2 smallCaption text-uppercase text-white d-flex justify-content-center">
-                {pullRequest?.reviews?.length} Review
-                {(pullRequest?.reviews?.length !== 1 && 's') || ''}
+                {pullRequest?.comments?.length} Review
+                {(pullRequest?.comments?.length !== 1 && 's') || ''}
               </div>
 
               <div className="col-1 d-flex justify-content-center">
