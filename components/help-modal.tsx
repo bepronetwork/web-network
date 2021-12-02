@@ -11,8 +11,8 @@ export default function HelpModal({ show = false, onCloseClick = () => { } }) {
   const helpItems = [
     helpItem(`help center`, `Know more about Bepro Network and how to use it.`, <HelpIcon />, `http://support.bepro.network`),
     helpItem(`api documentation`, `Develop with bepro-js and create your next web3 app.`, <PageIcon />, `http://docs.bepro.network`),
-    helpItem(`live chat`, `Explore tutorials and help articles`, <ChatIcon />, `https://discord.gg/RQMAu2DZFA`),
-    helpItem(`provide feedback`, `Explore tutorials and help articles`, <FeedbackIcon />, `https://discord.gg/RQMAu2DZFA`),
+    helpItem(`live chat`, `Explore tutorials and help articles`, <ChatIcon />, `https://discord.gg/bepronetwork`),
+    helpItem(`provide feedback`, `Explore tutorials and help articles`, <FeedbackIcon />, `https://discord.gg/bepronetwork`),
   ];
 
   function HelpItemRow(item, i) {
