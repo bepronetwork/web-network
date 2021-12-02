@@ -20,7 +20,7 @@ export default function CreateProposalDistributionItem({
   defaultPercentage = 0,
   ...params
 }: Props) {
-  const [value, setValue] = useState<number>();
+  const [value, setValue] = useState<number>(defaultPercentage);
   const [githubLogin, setGithubLogin] = useState<string>();
   const {getUserOf} = useApi();
 
@@ -59,7 +59,6 @@ export default function CreateProposalDistributionItem({
         <InputNumber
           value={value}
           suffix="%"
-          defaultValue={defaultPercentage}
           onValueChange={handleValueChange}
           onBlur={handleBlur}
           {...params}
