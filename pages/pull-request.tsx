@@ -15,6 +15,11 @@ import { formatNumberToCurrency } from '@helpers/formatNumber'
 
 import { IssueData, pullRequest } from '@interfaces/issue-data'
 import CustomContainer from '@components/custom-container'
+import Button from '@components/button'
+import LockedIcon from '@assets/icons/locked-icon'
+import GithubLink from '@components/github-link'
+import NothingFound from '@components/nothing-found'
+import Comment from '@components/comment'
 
 export default function PullRequest() {
   const {
@@ -28,16 +33,16 @@ export default function PullRequest() {
   const [pullRequest, setPullRequest] = useState<pullRequest>()
   const { getIssue, getMergedDataFromPullRequests } = useMergeData()
 
-  const { issueId, prId } = router.query
+  const { repoId, issueId, prId } = router.query
 
   function loadData() {
-    const [repoId, githubId] = String(issueId).split('/')
+    const [repo, githubId] = String(issueId).split('/')
 
     if (!activeRepo) return
 
     dispatch(changeLoadState(true))
 
-    getIssue(repoId, githubId, activeRepo?.githubPath)
+    getIssue(String(repoId), githubId, activeRepo?.githubPath)
       .then((issue) => {
         setIssue(issue)
 
@@ -53,6 +58,23 @@ export default function PullRequest() {
       .finally(() => dispatch(changeLoadState(false)))
   }
 
+  function renderReviews() {
+    return (
+      <>
+        {pullRequest?.reviews?.map((review) => (
+          <Comment
+            comment={{
+              id: review.id,
+              user: review.user,
+              body: review.body,
+              updated_at: review.submitted_at
+            }}
+          />
+        ))}
+      </>
+    )
+  }
+
   useEffect(loadData, [activeRepo, issueId, prId])
 
   return (
@@ -65,9 +87,36 @@ export default function PullRequest() {
         createdAt={pullRequest && formatDate(pullRequest.createdAt)}
         beproStaked={formatNumberToCurrency(issue?.amount)}
       />
-      
+
       <CustomContainer>
-        <span>Pull Requests</span>
+        <div className="row align-items-center bg-shadow border-radius-8 px-3 py-4">
+          <div className="col-8">
+            <span className="largeCaption text-uppercase">
+              {pullRequest?.reviews?.length} Review
+              {(pullRequest?.reviews?.length !== 1 && 's') || ''}
+            </span>
+          </div>
+
+          <div className="col-2 p-0 d-flex justify-content-center">
+            {currentAddress && githubLogin && <Button>Make a Review</Button>}
+          </div>
+
+          <div className="col-2 p-0">
+            <GithubLink
+              repoId={String(repoId)}
+              forcePath={activeRepo?.githubPath}
+              hrefPath={`pull/${pullRequest?.githubId || ''}`}
+            >
+              view on github
+            </GithubLink>
+          </div>
+
+          <div className="col-12 mt-4">
+            {(pullRequest?.reviews?.length > 0 && renderReviews()) || (
+              <NothingFound description="No reviews found" />
+            )}
+          </div>
+        </div>
       </CustomContainer>
     </>
   )
