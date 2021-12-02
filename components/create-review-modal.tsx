@@ -8,29 +8,29 @@ import GithubInfo from '@components/github-info'
 
 import { ApplicationContext } from '@contexts/application'
 
+import Avatar from '@components/avatar'
+
 import { formatDate } from '@helpers/formatDate'
 
-import useOctokit from '@x-hooks/use-octokit'
 import useRepos from '@x-hooks/use-repos'
-import Avatar from './avatar'
 
 export default function CreateReviewModal({
   show = false,
-  onConfirm = ({ title, description, branch }) => {},
+  isExecuting = false,
+  onConfirm = ({ body }) => {},
   onCloseClick = () => {},
   issue,
   pullRequest
 }) {
   const [body, setBody] = useState('')
   const [[activeRepo]] = useRepos()
-  const octo = useOctokit()
 
   const {
-    state: { accessToken }
+    state: { githubLogin }
   } = useContext(ApplicationContext)
 
   function isButtonDisabled(): boolean {
-    return body.trim() === ''
+    return body.trim() === '' || isExecuting
   }
 
   function setDefaults() {
@@ -93,9 +93,14 @@ export default function CreateReviewModal({
           </div>
         </div>
         <div className="d-flex pt-2 justify-content-center">
-          <Button className="mr-2" disabled={isButtonDisabled()}>
-            {isButtonDisabled() && <LockedIcon className="me-2" />}
+          <Button
+            className="mr-2"
+            disabled={isButtonDisabled()}
+            onClick={() => onConfirm({ body })}
+          >
+            {isButtonDisabled() && !isExecuting && <LockedIcon className="me-2" />}
             <span>Create Review</span>
+            {isExecuting ? <span className="spinner-border spinner-border-xs ml-1"/> : ''}
           </Button>
           <Button color="dark-gray" onClick={onCloseClick}>
             cancel

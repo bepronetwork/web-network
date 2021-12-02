@@ -39,7 +39,7 @@ export interface pullRequest {
   merged: boolean;
   updatedAt: Date;
   issue?: IssueData;
-  reviews?: Review[];
+  comments?: Comment[];
 }
 
 export interface developer {
@@ -50,16 +50,9 @@ export interface developer {
   type?: string;
 }
 
-export interface Review {
-  author_association: string;
+export interface Comment {
   body: string;
-  commit_id: number;
-  html_url: string;
-  id: number;
-  node_id: string;
-  pull_request_url: string;
-  state: string;
-  submitted_at: string;
+  created_at: string;
   user: GithubUser;
 }
 
