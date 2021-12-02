@@ -60,6 +60,17 @@ li {
     justify-content: center;
     border: 0;
   }
+  .close-button{
+    width: 20px;
+    top: 1%;
+  }
+
+  .modal-lg {
+    .modal-content > .modal-header > .close-button {
+      left: 97%;
+      top: 1%;
+    }
+  }
 }
 .react-select {
   &-container &{
@@ -600,9 +611,8 @@ label {
 // .pb-2 { padding-bottom: $m }
 // .pb-3 { padding-bottom: $m*2 }
 
-
-.end-90{
-  left: 90%;
+.end-95{
+  left: 95%;
 }
 .circle-1 {
   width: 64px;
