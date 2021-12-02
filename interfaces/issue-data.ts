@@ -40,6 +40,7 @@ export interface pullRequest {
   updatedAt: Date;
   issue?: IssueData;
   comments?: Comment[];
+  reviewers?: string[];
 }
 
 export interface developer {
