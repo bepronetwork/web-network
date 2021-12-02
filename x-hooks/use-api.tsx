@@ -270,6 +270,12 @@ export default function useApi() {
       })
   }
 
+  async function createReviewForPR(issueId: string, pullRequestId: string,  githubLogin: string, body:string) {
+    return client.put('/api/pull-request/review', {issueId, pullRequestId, githubLogin, body})
+      .then(response => response)
+      .catch(error => { throw error })
+  }
+
   return {
     getIssue,
     getReposList,
@@ -297,6 +303,7 @@ export default function useApi() {
     userHasPR,
     startWorking,
     mergeClosedIssue,
-    getUserPullRequests
+    getUserPullRequests,
+    createReviewForPR
   }
 }
