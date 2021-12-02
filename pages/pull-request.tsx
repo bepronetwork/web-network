@@ -2,7 +2,13 @@ import { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { head } from 'lodash'
 
+import Button from '@components/button'
+import Comment from '@components/comment'
+import GithubLink from '@components/github-link'
+import NothingFound from '@components/nothing-found'
+import CustomContainer from '@components/custom-container'
 import PullRequestHero from '@components/pull-request-hero'
+import CreateReviewModal from '@components/create-review-modal'
 
 import { ApplicationContext } from '@contexts/application'
 import { changeLoadState } from '@contexts/reducers/change-load-state'
@@ -14,12 +20,6 @@ import { formatDate } from '@helpers/formatDate'
 import { formatNumberToCurrency } from '@helpers/formatNumber'
 
 import { IssueData, pullRequest } from '@interfaces/issue-data'
-import CustomContainer from '@components/custom-container'
-import Button from '@components/button'
-import LockedIcon from '@assets/icons/locked-icon'
-import GithubLink from '@components/github-link'
-import NothingFound from '@components/nothing-found'
-import Comment from '@components/comment'
 
 export default function PullRequest() {
   const {
@@ -30,6 +30,7 @@ export default function PullRequest() {
   const router = useRouter()
   const [[activeRepo]] = useRepos()
   const [issue, setIssue] = useState<IssueData>()
+  const [showModal, setShowModal] = useState(false)
   const [pullRequest, setPullRequest] = useState<pullRequest>()
   const { getIssue, getMergedDataFromPullRequests } = useMergeData()
 
@@ -75,6 +76,14 @@ export default function PullRequest() {
     )
   }
 
+  function handleShowModal() {
+    setShowModal(true)
+  }
+
+  function handleCloseModal() {
+    setShowModal(false)
+  }
+
   useEffect(loadData, [activeRepo, issueId, prId])
 
   return (
@@ -98,7 +107,7 @@ export default function PullRequest() {
           </div>
 
           <div className="col-2 p-0 d-flex justify-content-center">
-            {currentAddress && githubLogin && <Button>Make a Review</Button>}
+            {currentAddress && githubLogin && <Button onClick={handleShowModal}>Make a Review</Button>}
           </div>
 
           <div className="col-2 p-0">
@@ -118,6 +127,8 @@ export default function PullRequest() {
           </div>
         </div>
       </CustomContainer>
+
+      <CreateReviewModal show={showModal} onCloseClick={handleCloseModal} issue={issue} pullRequest={pullRequest} />
     </>
   )
 }
