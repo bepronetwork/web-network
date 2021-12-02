@@ -89,11 +89,12 @@ export default function useMergeData() {
 
       if (!OctoData[key]) {
         try {
-          const { data } = await octokit.getPullRequestReviews(pr.githubId, repo)
+          const { data: reviews } = await octokit.getPullRequestReviews(pr.githubId, repo)
+          const { data: pullRequest } = await octokit.getPullRequest(pr.githubId, repo)
 
-          OctoData[key] = { reviews: data }
+          OctoData[key] = { reviews: reviews, state: pullRequest.state }
         } catch(error) {
-          OctoData[key] = { reviews: [] }
+          OctoData[key] = { reviews: [], state: '' }
         }
       }
       
