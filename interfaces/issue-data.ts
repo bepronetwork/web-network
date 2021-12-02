@@ -39,7 +39,7 @@ export interface pullRequest {
   merged: boolean;
   updatedAt: Date;
   issue?: IssueData;
-  reviews?: []
+  reviews?: Review[];
 }
 
 export interface developer {
@@ -48,4 +48,21 @@ export interface developer {
   avatar_url?: string;
   url?: string;
   type?: string;
+}
+
+export interface Review {
+  author_association: string;
+  body: string;
+  commit_id: number;
+  html_url: string;
+  id: number;
+  node_id: string;
+  pull_request_url: string;
+  state: string;
+  submitted_at: string;
+  user: GithubUser;
+}
+
+export interface GithubUser {
+  login: string;
 }
