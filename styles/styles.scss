@@ -1101,3 +1101,8 @@ a.row-button svg {
 .github-link {
   width: max-content;
 }
+
+textarea.form-control {
+  resize: none;
+  border-radius: $m / 2;
+}
