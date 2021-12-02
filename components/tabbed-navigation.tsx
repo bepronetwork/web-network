@@ -8,7 +8,7 @@ export default function TabbedNavigation(props: TabbedNavigationProps) {
       className={`${props.className}`}
     >
       {props.tabs.map((tab) => (
-        <Tab eventKey={tab.eventKey} title={tab.title}>
+        <Tab eventKey={tab.eventKey} title={tab.title} key={tab.eventKey}>
           {tab.component}
         </Tab>
       ))}

@@ -4,7 +4,7 @@ import MarkedRender from './MarkedRender'
 
 export default function Comment({ comment }) {
   return (
-    <div className="mb-3" key={comment?.id}>
+    <div className="mb-3">
       <p className="p-small text-uppercase mb-2 text-bold">
         <Avatar userLogin={comment?.user.login} />
 

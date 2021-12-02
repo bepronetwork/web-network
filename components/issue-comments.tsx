@@ -18,7 +18,7 @@ export default function IssueComments({ comments, repo, issueId }) {
                   <Button transparent outline color="primary">Reply on github <ExternalLinkIcon className="ml-1" color="primary"/></Button>
               </a>
             </div>
-            {comments?.map((comment) => <Comment comment={comment} />)}
+            {comments?.map((comment) => <Comment comment={comment} key={comment.id} />)}
           </div>
         </div>
       </div>
