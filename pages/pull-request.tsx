@@ -14,6 +14,7 @@ import { formatDate } from '@helpers/formatDate'
 import { formatNumberToCurrency } from '@helpers/formatNumber'
 
 import { IssueData, pullRequest } from '@interfaces/issue-data'
+import CustomContainer from '@components/custom-container'
 
 export default function PullRequest() {
   const {
@@ -33,7 +34,7 @@ export default function PullRequest() {
     const [repoId, githubId] = String(issueId).split('/')
 
     if (!activeRepo) return
-    
+
     dispatch(changeLoadState(true))
 
     getIssue(repoId, githubId, activeRepo?.githubPath)
@@ -64,7 +65,10 @@ export default function PullRequest() {
         createdAt={pullRequest && formatDate(pullRequest.createdAt)}
         beproStaked={formatNumberToCurrency(issue?.amount)}
       />
-      <span>Pull Requests</span>
+      
+      <CustomContainer>
+        <span>Pull Requests</span>
+      </CustomContainer>
     </>
   )
 }
