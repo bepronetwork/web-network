@@ -34,7 +34,7 @@ export default function PullRequest() {
   const [pullRequest, setPullRequest] = useState<pullRequest>()
   const { getIssue, getMergedDataFromPullRequests } = useMergeData()
 
-  const { repoId, issueId, prId } = router.query
+  const { repoId, issueId, prId, review } = router.query
 
   function loadData() {
     const [repo, githubId] = String(issueId).split('/')
@@ -85,6 +85,9 @@ export default function PullRequest() {
   }
 
   useEffect(loadData, [activeRepo, issueId, prId])
+  useEffect(() => {
+    if (review) setShowModal(true)
+  }, [review])
 
   return (
     <>
@@ -107,7 +110,9 @@ export default function PullRequest() {
           </div>
 
           <div className="col-2 p-0 d-flex justify-content-center">
-            {currentAddress && githubLogin && <Button onClick={handleShowModal}>Make a Review</Button>}
+            {currentAddress && githubLogin && (
+              <Button onClick={handleShowModal}>Make a Review</Button>
+            )}
           </div>
 
           <div className="col-2 p-0">
@@ -128,7 +133,12 @@ export default function PullRequest() {
         </div>
       </CustomContainer>
 
-      <CreateReviewModal show={showModal} onCloseClick={handleCloseModal} issue={issue} pullRequest={pullRequest} />
+      <CreateReviewModal
+        show={showModal}
+        onCloseClick={handleCloseModal}
+        issue={issue}
+        pullRequest={pullRequest}
+      />
     </>
   )
 }
