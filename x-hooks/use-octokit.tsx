@@ -60,6 +60,10 @@ export default function useOctokit() {
     return octokit.rest.pulls.get({...getOwnerRepoFrom(path), pull_number,})
   }
 
+  async function getPullRequestComments(pull_number: number, path: string) {
+    return octokit.rest.issues.listComments({...getOwnerRepoFrom(path), issue_number: pull_number})
+  }
+
   async function listBranches(path: string,) {
     return octokit.rest.repos.listBranches({...getOwnerRepoFrom(path)});
   }
@@ -73,6 +77,6 @@ export default function useOctokit() {
 
   useEffect(() => { authenticate(accessToken) }, [accessToken])
 
-  return {getIssue, getIssueComments, getCommitsOfPr, getForksOf, getUserRepos, getStargazers, authenticate, getParticipants, listBranches, getPullRequest};
+  return {getIssue, getIssueComments, getCommitsOfPr, getForksOf, getUserRepos, getStargazers, authenticate, getParticipants, listBranches, getPullRequest, getPullRequestComments};
 
 }

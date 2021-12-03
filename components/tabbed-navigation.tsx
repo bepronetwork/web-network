@@ -1,0 +1,17 @@
+import { Tab, Tabs } from 'react-bootstrap'
+import { TabbedNavigationProps } from '@interfaces/tabbed-navigation'
+
+export default function TabbedNavigation(props: TabbedNavigationProps) {
+  return (
+    <Tabs
+      defaultActiveKey={props.defaultActiveKey}
+      className={`${props.className}`}
+    >
+      {props.tabs.map((tab) => (
+        <Tab eventKey={tab.eventKey} title={tab.title} key={tab.eventKey}>
+          {tab.component}
+        </Tab>
+      ))}
+    </Tabs>
+  )
+}

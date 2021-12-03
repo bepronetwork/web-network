@@ -427,6 +427,7 @@ p {
     padding: $m;
     margin-top: $m;
     text-align: center;
+    border-radius: math.div($m, 2);
   }
 }
 
@@ -479,7 +480,7 @@ p {
     margin-right: -$m*2;
     padding: $m $m * 2;
     background-color: $dark-gray;
-    border-top: 2px solid rgba($black, 0.2);
+    //border-top: 2px solid rgba($black, 0.2);
   }
 
   .rounded.row {
@@ -491,11 +492,11 @@ p {
 }
 
 .proposal {
-  &:nth-child(odd){
+  &:nth-child(even){
     background-color: $bg-shadow;
   }
 
-  &:nth-child(even){
+  &:nth-child(odd){
     background-color: $dark-gray;
   }
 }
@@ -1066,4 +1067,42 @@ a.row-button svg {
 
 .text-danger {
   color: rgba($danger, 1) !important;
+}
+
+.issue-tabs {
+  border: 0;
+  border-radius: math.div($m, 2) math.div($m, 2) 0 0;
+
+  background-color: $bg-shadow;
+
+  .nav-item {
+    .nav-link {
+      font-family: 'fontBold', sans-serif;
+      font-size: 16px;
+      line-height: 160%;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+
+      border: 0;
+      border-radius: math.div($m, 2) math.div($m, 2) 0 0;
+      padding: 20px;
+
+      color: rgba($white, .4);
+      background-color: $bg-shadow;
+      
+      &.active {
+        color: $white;
+        background-color: $dark-gray;
+      }
+    }
+  }
+}
+
+.github-link {
+  width: max-content;
+}
+
+textarea.form-control {
+  resize: none;
+  border-radius: math.div($m, 2);
 }

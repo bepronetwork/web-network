@@ -81,5 +81,28 @@ export default function useMergeData() {
     return pullRequestsWithIssueData
   }
 
-  return {getIssue, getIssues, getPendingFor, getIssuesOfUserPullRequests}
+  async function getMergedDataFromPullRequests(repo, pullRequests) {
+    const mergedPRs = []
+
+    for (const pr of pullRequests) {
+      const key = `${repo}/${pr.issueId}/${pr.githubId}`
+
+      if (!OctoData[key]) {
+        try {
+          const { data: comments } = await octokit.getPullRequestComments(pr.githubId, repo)
+          const { data: pullRequest } = await octokit.getPullRequest(pr.githubId, repo)
+
+          OctoData[key] = { comments: comments, state: pullRequest.state }
+        } catch(error) {
+          OctoData[key] = { comments: [], state: '' }
+        }
+      }
+      
+      mergedPRs.push(Object.assign(pr, OctoData[key]))
+    }
+
+    return mergedPRs
+  }
+
+  return {getIssue, getIssues, getPendingFor, getIssuesOfUserPullRequests, getMergedDataFromPullRequests}
 }
