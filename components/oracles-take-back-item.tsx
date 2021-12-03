@@ -79,6 +79,7 @@ export default function OraclesTakeBackItem({
       <Modal
         show={show}
         title="Take Back"
+        titlePosition="center"
         onCloseClick={handleCancel}
         footer={
           <>
