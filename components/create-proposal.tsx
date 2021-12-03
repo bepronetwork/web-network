@@ -62,7 +62,13 @@ export default function NewProposal({
 
     getParticipants(+githubId, activeRepo.githubPath)
       .then(participants => {
-        return Promise.all(participants.map(async login => {
+        const tmpParticipants = [...participants]
+        
+        pullRequests?.find(pr => pr.githubId === githubId)?.reviewers?.forEach(participant => {
+          if (!tmpParticipants.includes(participant)) tmpParticipants.push(participant)
+        })
+
+        return Promise.all(tmpParticipants.map(async login => {
           const {address, githubLogin, githubHandle} = await getUserWith(login);
           return {address, githubLogin, githubHandle};
         }))
@@ -207,21 +213,21 @@ export default function NewProposal({
         isCouncil && isFinished && <Button onClick={() => setShow(true)}>Create Proposal</Button>
         || isIssueOwner && !isFinished && renderRecognizeAsFinished()
       }
-
       <Modal show={show}
              title="Create Proposal"
              titlePosition="center"
              onCloseClick={handleClose}
              footer={
                <>
-                 <Button color='dark-gray' onClick={handleClose}>
-                   Cancel
-                 </Button>
                  <Button
                    onClick={handleClickCreate}
                    disabled={!currentAddress || participants.length === 0}>
                    {participants.length === 0 && <LockedIcon width={12} height={12} className="mr-1"/>}
                    Create Proposal
+                 </Button>
+
+                 <Button color='dark-gray' onClick={handleClose}>
+                   Cancel
                  </Button>
                </>
              }>

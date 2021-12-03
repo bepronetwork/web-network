@@ -24,6 +24,10 @@ module.exports = (sequelize,) => {
     issueId: DataTypes.INTEGER,
     githubLogin: DataTypes.STRING,
     branch: DataTypes.STRING,
+    reviewers: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      defaultValue: []
+    },
   }, {
     sequelize,
     modelName: 'pullRequest',
