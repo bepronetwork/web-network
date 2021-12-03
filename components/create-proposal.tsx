@@ -139,7 +139,13 @@ export default function NewProposal({
 
     getParticipants(+githubId, activeRepo.githubPath)
       .then(participants => {
-        return Promise.all(participants.map(async login => {
+        const tmpParticipants = [...participants]
+        
+        pullRequests?.find(pr => pr.githubId === githubId)?.reviewers?.forEach(participant => {
+          if (!tmpParticipants.includes(participant)) tmpParticipants.push(participant)
+        })
+
+        return Promise.all(tmpParticipants.map(async login => {
           const {address, githubLogin, githubHandle} = await getUserWith(login);
           return {address, githubLogin, githubHandle};
         }))
@@ -244,7 +250,7 @@ export default function NewProposal({
                   if (e?.message?.search(`User denied`) > -1)
                     dispatch(updateTransaction({...recognizeAsFinished.payload as any, remove: true}))
                   else dispatch(updateTransaction({...recognizeAsFinished.payload as any, status: TransactionStatus.failed}));
-                  dispatch(toastWarning(`Failed to mark issue as finished!`));
+                  dispatch(toastWarning(`Failed to mark bounty as finished!`));
                   console.error(`Failed to mark as finished`, e);
                 })
   }
@@ -280,7 +286,6 @@ export default function NewProposal({
         isCouncil && isFinished && <Button className="mx-2" onClick={() => setShow(true)}>Create Proposal</Button>
         || isIssueOwner && !isFinished && renderRecognizeAsFinished()
       }
-
       <Modal show={show}
              title="New Proposal"
              titlePosition="center"
@@ -293,6 +298,10 @@ export default function NewProposal({
                    {!currentAddress || participants.length === 0 || !success && <LockedIcon width={12} height={12} className="mr-1"/>}
                    <span >Create Proposal</span>
                  </Button>
+                 <Button color='dark-gray' onClick={handleClose}>
+                   Cancel
+                 </Button>
+
                  <Button color='dark-gray' onClick={handleClose}>
                    Cancel
                  </Button>

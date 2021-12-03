@@ -44,8 +44,8 @@ export default function ReadyToMergeIssues() {
         issues?.length === 0 &&
         <div className="mt-4">
           <NothingFound
-          description="No issues ready to merge">
-          <InternalLink href="/create-issue" label="create one" uppercase />
+          description="No bounties ready to merge">
+          <InternalLink href="/create-bounty" label="create one" uppercase />
         </NothingFound>
         </div>
       }

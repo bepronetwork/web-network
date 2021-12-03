@@ -51,9 +51,9 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
 
     setStateFilters([
                       makeFilterOption(`All`, `allstates`, !state),
-                      makeFilterOption(`Open Issues`, `open`, state === `ready` || state === `open`),
-                      makeFilterOption(`Draft Issues`, `draft`, state === `draft`),
-                      makeFilterOption(`Closed Issues`, `closed`, state === `closed`)])
+                      makeFilterOption(`Open Bounties`, `open`, state === `ready` || state === `open`),
+                      makeFilterOption(`Draft Bounties`, `draft`, state === `draft`),
+                      makeFilterOption(`Closed Bounties`, `closed`, state === `closed`)])
 
     setTimeFilters([
                      makeFilterOption(`All`, `alltime`, !time),

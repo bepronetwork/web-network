@@ -1,8 +1,9 @@
 import useApi from '@x-hooks/use-api';
 import useOctokit from '@x-hooks/use-octokit';
-import {IssueData} from '@interfaces/issue-data';
+import {IssueData, pullRequest} from '@interfaces/issue-data';
 import useRepos from '@x-hooks/use-repos';
 import {useEffect} from 'react';
+import { PaginatedData } from '@interfaces/paginated-data';
 
 interface MergeProps {
   repoId: string;
@@ -71,5 +72,37 @@ export default function useMergeData() {
     return data;
   }
 
-  return {getIssue, getIssues, getPendingFor}
+  async function getIssuesOfUserPullRequests(page, githubLogin: string) {
+    const pullRequestsWithIssueData = (await db.getUserPullRequests(page, githubLogin)) as PaginatedData<pullRequest>
+    const issues = pullRequestsWithIssueData.rows.map(pullRequest => pullRequest.issue)
+
+    await mergeData(issues)
+
+    return pullRequestsWithIssueData
+  }
+
+  async function getMergedDataFromPullRequests(repo, pullRequests) {
+    const mergedPRs = []
+
+    for (const pr of pullRequests) {
+      const key = `${repo}/${pr.issueId}/${pr.githubId}`
+
+      if (!OctoData[key]) {
+        try {
+          const { data: comments } = await octokit.getPullRequestComments(pr.githubId, repo)
+          const { data: pullRequest } = await octokit.getPullRequest(pr.githubId, repo)
+
+          OctoData[key] = { comments: comments, state: pullRequest.state }
+        } catch(error) {
+          OctoData[key] = { comments: [], state: '' }
+        }
+      }
+      
+      mergedPRs.push(Object.assign(pr, OctoData[key]))
+    }
+
+    return mergedPRs
+  }
+
+  return {getIssue, getIssues, getPendingFor, getIssuesOfUserPullRequests, getMergedDataFromPullRequests}
 }

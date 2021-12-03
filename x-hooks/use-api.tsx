@@ -2,6 +2,8 @@ import axios from 'axios';
 import {IssueData, pullRequest} from '@interfaces/issue-data';
 import {ProposalData, User} from '@services/github-microservice';
 import {ReposList} from '@interfaces/repos-list';
+import { head } from 'lodash';
+import { PaginatedData } from '@interfaces/paginated-data';
 
 const client = axios.create({baseURL: process.env.NEXT_API_HOST});
 client.interceptors.response.use(
@@ -92,10 +94,10 @@ export default function useApi() {
                    throw error
                  })
   }
-  async function getPullRequestIssue(issueId: string) {
-    const search = new URLSearchParams({issueId}).toString();
-    return client.get<pullRequest>(`/api/pull-request?${search}`)
-                 .then(({data}) => data)
+  async function getPullRequestIssue(issueId: string, page = '1') {
+    const search = new URLSearchParams({issueId, page}).toString();
+    return client.get<PaginatedData<pullRequest>>(`/api/pull-request?${search}`)
+                 .then(({data: {rows}}) => head(rows))
                  .catch(e => {
                    console.log(`Failed to fetch PR information`, e);
                    return null;
@@ -230,15 +232,26 @@ export default function useApi() {
                  });
   }
 
-  async function userHasPR(issueId: string, login: string) {
-    const search = new URLSearchParams({issueId, login}).toString();
-    return client.get<boolean>(`/api/pull-request?${search}`)
-                 .then(({data}) => !!data)
+  async function userHasPR(issueId: string, login: string, page = '1') {
+    const search = new URLSearchParams({issueId, login, page}).toString();
+    return client.get<PaginatedData<pullRequest>>(`/api/pull-request?${search}`)
+                 .then(({data: {count}}) => count > 0)
                  .catch(e => {
                    console.log(`Failed to fetch PR information`, e);
                    return false;
                  });
 
+  }
+
+  async function getUserPullRequests(page= '1', login: string) {
+    const search = new URLSearchParams({page, login}).toString();
+    
+    return client.get<PaginatedData<pullRequest>>(`/api/pull-request?${search}`)
+                 .then(({data}) => data)
+                 .catch(e => {
+                   console.log(`Failed to fetch PR information`, e);
+                   return false;
+                 });
   }
 
   async function startWorking(issueId: string, githubLogin: string) {
@@ -255,6 +268,11 @@ export default function useApi() {
       .catch(error => {
         throw error
       })
+  }
+
+  async function createReviewForPR(issueId: string, pullRequestId: string,  githubLogin: string, body:string) {
+    return client.put('/api/pull-request/review', {issueId, pullRequestId, githubLogin, body})
+      .then(response => response)
   }
 
   return {
@@ -283,6 +301,8 @@ export default function useApi() {
     waitForRedeem,
     userHasPR,
     startWorking,
-    mergeClosedIssue
+    mergeClosedIssue,
+    getUserPullRequests,
+    createReviewForPR
   }
 }

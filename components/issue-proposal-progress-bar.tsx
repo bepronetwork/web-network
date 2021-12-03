@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 
 import { getTimeDifferenceInWords } from '@helpers/formatDate';
 import { addSeconds } from 'date-fns';
@@ -121,7 +121,7 @@ export default function IssueProposalProgressBar({
     const style = { left: index === 0 ? `1%` : `${index * 24}%` };
     const dotStyle = { width: `20px`, height: `20px` };
 
-    return <>
+    return <Fragment key={index}>
       <div className="position-absolute d-flex align-items-center flex-column" style={style}>
         <div className={dotClass} style={dotStyle}>
           <div className='position-relative d-flex align-items-start flex-column'>
@@ -133,7 +133,7 @@ export default function IssueProposalProgressBar({
           </div>
         </div>
       </div>
-    </>
+    </Fragment>
   }
 
   useEffect(loadDisputeState, [isFinalized, isIssueinDraft, isCanceled, mergeProposalsAmount, isFinished]);
