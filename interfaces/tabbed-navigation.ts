@@ -9,5 +9,6 @@ export interface TabbedNavigationItem {
 export interface TabbedNavigationProps {
   defaultActiveKey: string
   className?: string
+  collapsable?: boolean
   tabs: TabbedNavigationItem[]
 }

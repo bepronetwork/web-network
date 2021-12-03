@@ -208,8 +208,8 @@ export default function PageIssue() {
         githubId={issue?.githubId}
         addNewComment={addNewComment}
         finished={networkIssue?.recognizedAsFinished} />
-        {((networkIssue?.mergeProposalsAmount > 0 || mergedPullRequests.length > 0) && currentAddress) && <CustomContainer>
-          <TabbedNavigation defaultActiveKey={head(tabs).eventKey} className="issue-tabs" tabs={tabs} />
+        {((networkIssue?.mergeProposalsAmount > 0 || mergedPullRequests.length > 0) && currentAddress) && <CustomContainer className="mb-4">
+          <TabbedNavigation defaultActiveKey={head(tabs).eventKey} className="issue-tabs" tabs={tabs} collapsable />
         </CustomContainer>}
       {networkIssue && <IssueProposalProgressBar
         isFinalized={networkIssue?.finalized}

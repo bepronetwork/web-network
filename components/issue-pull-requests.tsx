@@ -4,7 +4,7 @@ import PullRequestItem from './pull-request-item'
 export default function IssuePullRequests({ repoId, issueId, pullResquests = [] }) {
   return (
     <div
-      className={`content-wrapper mb-4 pt-0 ${
+      className={`content-wrapper pt-0 ${
         (pullResquests.length > 0 && 'pb-0') || 'pb-3'
       }`}
     >

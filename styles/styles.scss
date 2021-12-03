@@ -1096,6 +1096,18 @@ a.row-button svg {
       }
     }
   }
+
+  &.collapsed {
+    border-radius: math.div($m, 2);
+
+    .nav-item {
+      &:first-child {
+        .nav-link {
+          border-bottom-left-radius: math.div($m, 2);
+        }
+      }
+    }
+  }
 }
 
 .github-link {
