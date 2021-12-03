@@ -105,7 +105,7 @@ export default function PullRequest() {
 
   useEffect(loadData, [activeRepo, issueId, prId])
   useEffect(() => {
-    if (review && issue && pullRequest) setShowModal(true)
+    if (review && issue && pullRequest && githubLogin) setShowModal(true)
   }, [review, issue, pullRequest])
 
   return (
