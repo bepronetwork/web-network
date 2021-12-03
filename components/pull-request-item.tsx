@@ -4,20 +4,28 @@ import { formatDate } from '@helpers/formatDate'
 import Avatar from './avatar'
 import LockedIcon from '@assets/icons/locked-icon'
 import { useRouter } from 'next/router'
+import { useContext } from 'react'
+import { ApplicationContext } from '@contexts/application'
 
 export default function PullRequestItem({
   repoId,
   issueId,
-  canReview = false,
   pullRequest
 }) {
   const router = useRouter()
+  const {
+    state: { currentAddress, githubLogin }
+  } = useContext(ApplicationContext)
 
   function handleReviewClick() {
     router.push({
       pathname: '/pull-request',
       query: { repoId, issueId, prId: pullRequest.githubId, review: true }
     })
+  }
+
+  function canReview() {
+    return pullRequest?.state === 'open' && !!githubLogin
   }
 
   return (
@@ -50,13 +58,13 @@ export default function PullRequestItem({
 
               <div className="col-1 d-flex justify-content-center">
                 <Button
-                  disabled={!canReview}
+                  disabled={!canReview()}
                   onClick={(ev) => {
                     ev.preventDefault()
                     handleReviewClick()
                   }}
                 >
-                  {!canReview && <LockedIcon className="me-2" />}
+                  {!canReview() && <LockedIcon className="me-2" />}
                   <span>Review</span>
                 </Button>
               </div>
