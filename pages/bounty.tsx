@@ -62,7 +62,7 @@ export default function PageIssue() {
     {
       eventKey: 'pull-requests',
       title: `${mergedPullRequests.length} Pull Request${mergedPullRequests.length !== 1 && 's' || ''}`,
-      component: <IssuePullRequests repoId={issue?.repository_id} issueId={issue?.issueId} isIssueFinalized={networkIssue?.finalized} pullResquests={mergedPullRequests} />
+      component: <IssuePullRequests repoId={issue?.repository_id} issueId={issue?.issueId} pullResquests={mergedPullRequests} />
     }
   ]
 
