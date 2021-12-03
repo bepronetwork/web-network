@@ -32,7 +32,7 @@ export default function HelpModal({ show = false, onCloseClick = () => { } }) {
   }
 
   return <>
-    <Modal show={show} title="Help" onCloseClick={onCloseClick} backdrop={true}>
+    <Modal show={show} title="Help" titlePosition="center" onCloseClick={onCloseClick} backdrop={true}>
       {helpItems.map(HelpItemRow)}
     </Modal>
   </>
