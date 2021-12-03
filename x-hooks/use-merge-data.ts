@@ -82,7 +82,7 @@ export default function useMergeData() {
   }
 
   async function getMergedDataFromPullRequests(repo, pullRequests) {
-    let mergedPRs = []
+    const mergedPRs = []
 
     for (const pr of pullRequests) {
       const key = `${repo}/${pr.issueId}/${pr.githubId}`
