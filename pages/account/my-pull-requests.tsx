@@ -11,6 +11,9 @@ import { ApplicationContext } from '@contexts/application'
 import usePage from '@x-hooks/use-page'
 import useCount from '@x-hooks/use-count'
 import { changeLoadState } from '@contexts/reducers/change-load-state'
+import {GetServerSideProps} from 'next';
+import {getSession} from 'next-auth/react';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 
 export default function MyPullRequests() {
   const {
@@ -80,3 +83,12 @@ export default function MyPullRequests() {
     </Account>
   )
 }
+
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
+  return {
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common',])),
+    },
+  };
+};

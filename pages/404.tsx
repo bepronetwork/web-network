@@ -1,5 +1,8 @@
 import InternalLink from '@components/internal-link';
 import NotFoundIcon from '../assets/icons/not-found-icon';
+import {GetServerSideProps} from 'next';
+import {getSession} from 'next-auth/react';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 
 export default function NotFound() {
   return <div className="pt-5">
@@ -24,3 +27,12 @@ export default function NotFound() {
     </div>
   </div>
 }
+
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
+  return {
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common',])),
+    },
+  };
+};
