@@ -13,10 +13,14 @@ export default function InputNumber({
   helperText = "",
   className = "",
   error = "",
+  success= "",
+  warning= "",
   ...params
 }: InputNumberProps): JSX.Element {
   const id = kebabCase(label);
   const errorStyle = { "text-danger bg-opacity-100": error };
+  const successStyle = { "text-success bg-opacity-100": success };
+  const warningStyle = { "text-warning bg-opacity-100": warning };
   const shouldBeWrapped = label || helperText;
   const Component = shouldBeWrapped ? "div" : Fragment;
 
@@ -30,10 +34,18 @@ export default function InputNumber({
       <div
         className={clsx("input-group", {
           ...errorStyle,
-          "border border-1 border-danger rounded": error,
+          ...successStyle,
+          ...warningStyle,
         })}>
         <NumberFormat
-          className={clsx("form-control", { ...errorStyle }, className)}
+          className={clsx("form-control", {
+            "border border-1 border-success rounded-4": success,
+            "border border-1 border-danger rounded-4": error,
+            "border border-1 border-warning rounded-4": warning,  
+            ...successStyle, 
+            ...warningStyle,
+            ...errorStyle,
+          }, className)}
           htmlFor={id}
           min={min}
           placeholder={placeholder}
@@ -58,7 +70,7 @@ export default function InputNumber({
           {helperText}
         </div>
       )}
-      {error && (
+      {error && error != ' ' && (
         <p
         className={clsx("p-small my-2", {
           trans: !error,
