@@ -36,7 +36,7 @@ export default function IssueProposals({ metaProposals, metaRequests, numberProp
   useEffect(() => { loadProposalsMeta() }, [issueId, numberProposals, currentAddress]);
 
   return (
-    <div className={`content-wrapper mb-4 pt-0 ${proposals.length > 0 && 'pb-0' || 'pb-3'}`}>
+    <div className={`content-wrapper pt-0 ${proposals.length > 0 && 'pb-0' || 'pb-3'}`}>
       {metaProposals?.length > 0 && proposals.map(proposal =>
                         <ProposalItem key={proposal._id}
                                       proposal={proposal}
