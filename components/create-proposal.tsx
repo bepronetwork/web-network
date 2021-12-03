@@ -18,6 +18,9 @@ import useApi from '@x-hooks/use-api';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import useTransactions from '@x-hooks/useTransactions';
 import LockedIcon from '@assets/icons/locked-icon';
+import clsx from 'clsx';
+import { Proposal } from '@interfaces/proposal';
+import { ProposalData } from '@services/github-microservice';
 
 interface participants {
   githubHandle: string;
@@ -27,7 +30,7 @@ interface participants {
 export default function NewProposal({
                                       issueId,
                                       amountTotal,
-                                      numberMergeProposals,
+                                      mergeProposals,
                                       pullRequests = [],
                                       handleBeproService,
                                       handleMicroService,
@@ -37,11 +40,14 @@ export default function NewProposal({
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>();
   const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
+  const [warning, setWarning] = useState<string>('');
   const [show, setShow] = useState<boolean>(false);
   const [participants, setParticipants] = useState<participants[]>([]);
   const [isCouncil, setIsCouncil] = useState(false);
   const [councilAmount, setCouncilAmount] = useState(0);
   const [currentGithubId, setCurrentGithubId] = useState<string>();
+  const [proposals, setProposals] = useState<Proposal[]>([]);
   const router = useRouter();
   const [[activeRepo]] = useRepos();
   const {getParticipants} = useOctokit();
@@ -50,10 +56,81 @@ export default function NewProposal({
 
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
-    setDistrib((prevState) => ({
+    setDistrib((prevState) => {
+      handleCheckDistrib({
+        ...prevState,
+        ...params,
+        })
+      return({
       ...prevState,
       ...params,
-    }));
+      })
+  });
+  }
+
+  async function loadProposalsMeta() {
+    if (!issueId)
+      return;
+
+    const scIssueId = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    const pool = [];
+
+    for (const meta of mergeProposals as ProposalData[]) {
+      const { scMergeId, pullRequestId } = meta;
+      if (scMergeId) {
+        const merge = await BeproService.network.getMergeById({merge_id: scMergeId, issue_id: scIssueId});
+        pool.push({...merge, pullRequestId } as Proposal)
+      }
+    }
+
+    setProposals(pool);
+  }
+
+  function handleCheckDistrib(obj: object) {
+    var currentAmount = sumObj(obj)
+    if (currentAmount === 100){
+     const { id }  = pullRequests.find(
+        (data) => data.githubId === currentGithubId
+      )
+      var currentDistrbuition = {
+        currentPrId: id,
+        prAmounts: participants.map(
+          (items) =>  ((amountTotal * obj[items.githubHandle])/100).toString()
+        )
+      }
+      const equals = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+      if(
+        proposals.find(
+          (data) =>
+            equals(currentDistrbuition.prAmounts, data.prAmounts) === true &&
+            data.pullRequestId === currentDistrbuition.currentPrId
+        )
+      ){
+        setWarning(' ')
+        setError('')
+        setSuccess('')
+      }else {
+        setError('')
+        setSuccess(' ')
+        setWarning('')
+      } 
+   }
+   if (currentAmount > 0 && currentAmount < 100){
+      //setError(`${100 - currentAmount}% is missing!`);
+     setError(' ')
+     setSuccess('')
+     setWarning('')
+   }
+   if (currentAmount === 0){
+      setError('');
+      setSuccess('')
+      setWarning('')
+   }
+   if (currentAmount > 100){
+      setError(' ') 
+      setSuccess('')
+      setWarning('')
+   }
   }
 
   function getParticipantsPullRequest(id: string, githubId: string) {
@@ -70,7 +147,6 @@ export default function NewProposal({
       .then((participantsPr) => {
         const tmpParticipants = participantsPr.filter(({address}) => !!address);
         const amountPerParticipant = 100 / tmpParticipants.length
-    
         setDistrib(Object.fromEntries(tmpParticipants.map(participant => [participant.githubHandle, amountPerParticipant])))
         setCurrentGithubId(githubId);
         setParticipants(tmpParticipants);
@@ -81,15 +157,6 @@ export default function NewProposal({
   }
 
   async function handleClickCreate(): Promise<void> {
-    if (amount > 0 && amount < 100)
-      return setError(`${100 - amount}% is missing!`);
-
-    if (amount === 0)
-      return setError('Distribution must be equal to 100%.');
-
-    if (amount > 100)
-      return setError('Distribution exceed 100%.');
-
     const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
 
     const payload = {
@@ -99,7 +166,6 @@ export default function NewProposal({
         (items) => (amountTotal * distrib[items.githubHandle]) / 100
       ),
     };
-
     setShow(false);
 
     const proposeMergeTx = addTransaction({type: TransactionTypes.proposeMerge})
@@ -131,7 +197,7 @@ export default function NewProposal({
                         else dispatch(updateTransaction({...proposeMergeTx.payload as any, status: TransactionStatus.failed}));
                         setError('Error to create proposal in Smart Contract')
                         handleClose();
-                      })
+                      })                    
   }
 
   function handleClose() {
@@ -142,12 +208,18 @@ export default function NewProposal({
     setShow(false);
     setAmount(0);
     setDistrib({});
+    setError('');
+    setSuccess('');
+    setWarning('');
   }
 
   function handleChangeSelect({ value, githubId }) {
     setDistrib({});
     setAmount(0);
     getParticipantsPullRequest(value, githubId);
+    setError('');
+    setSuccess('');
+    setWarning('');
   }
 
   function recognizeAsFinished() {
@@ -190,42 +262,43 @@ export default function NewProposal({
   }
 
   useEffect(() => {
-    setError('');
     setAmount(sumObj(distrib));
   }, [distrib]);
 
   useEffect(() => {
-    if (pullRequests.length && activeRepo)
+    if (pullRequests.length && activeRepo){
       getParticipantsPullRequest(pullRequests[0]?.id, pullRequests[0]?.githubId);
+      loadProposalsMeta()
+    }
   }, [pullRequests, activeRepo]);
 
   useEffect(updateCreateProposalHideState, [currentAddress]);
 
   return (
-    <>
+    <div className="d-flex">
       {
-        isCouncil && isFinished && <Button onClick={() => setShow(true)}>Create Proposal</Button>
+        isCouncil && isFinished && <Button className="mx-2" onClick={() => setShow(true)}>Create Proposal</Button>
         || isIssueOwner && !isFinished && renderRecognizeAsFinished()
       }
 
       <Modal show={show}
-             title="Create Proposal"
+             title="New Proposal"
              titlePosition="center"
              onCloseClick={handleClose}
              footer={
                <>
+                 <Button
+                   onClick={handleClickCreate}
+                   disabled={!currentAddress || participants.length === 0 || !success}>
+                   {!currentAddress || participants.length === 0 || !success && <LockedIcon width={12} height={12} className="mr-1"/>}
+                   <span >Create Proposal</span>
+                 </Button>
                  <Button color='dark-gray' onClick={handleClose}>
                    Cancel
                  </Button>
-                 <Button
-                   onClick={handleClickCreate}
-                   disabled={!currentAddress || participants.length === 0}>
-                   {participants.length === 0 && <LockedIcon width={12} height={12} className="mr-1"/>}
-                   Create Proposal
-                 </Button>
                </>
              }>
-        <p className="p-small text-50">Select a pull request </p>
+        <p className="smallCaption text-white-50 text-uppercase">Select a pull request </p>
         <ReactSelect id="pullRequestSelect"
                       isDisabled={participants.length === 0}
                      defaultValue={{
@@ -240,22 +313,42 @@ export default function NewProposal({
                      }))}
                      onChange={handleChangeSelect}/>
         {participants.length === 0 && <p className="text-uppercase text-danger text-center w-100 caption mt-4 mb-0">Network Congestion</p> || <>
-          <p className="p-small mt-3">Propose distribution</p>
+          <p className="smallCaption mt-3 text-white-50 text-uppercase">Propose distribution</p>
           <ul className="mb-0">
             {participants.map((item) => (
                                 <CreateProposalDistributionItem key={item.githubHandle}
                                                                 by={item.githubHandle}
                                                                 address={item.address}
                                                                 onChangeDistribution={handleChangeDistrib}
-                                                                defaultPercentage={participants?.length > 1 && (100 / participants.length) || 100}
-                                                                error={error}/>
+                                                                defaultPercentage={0}
+                                                                error={error}
+                                                                success={success}
+                                                                warning={warning}
+                                                                />
                               )
             )}
           </ul>
-          {error && <p className="p error mt-3 mb-0 text-danger">{error}</p> ||
-          <p className="mt-3 mb-0 text-white-50">Distribute reward percentage</p>}
+          <div className="d-flex" style={{ justifyContent: "flex-end" }}>
+              {warning ? (
+                <p className="smallCaption pr-3 mt-3 mb-0 text-uppercase text-warning">
+                  This distribution already existis on another proposal
+                </p>
+              ) : (
+                <p
+                  className={clsx(
+                    "smallCaption pr-3 mt-3 mb-0  text-uppercase",
+                    {
+                      "text-success": success,
+                      "text-danger": error,
+                    }
+                  )}
+                >
+                  Distribution {success ? "is" : "Must be"} 100%
+                </p>
+              )}
+            </div>
         </>}
       </Modal>
-    </>
+    </div>
   );
 }
