@@ -179,7 +179,7 @@ export default function PageCreateIssue() {
           <div className="row justify-content-center">
             <div className="col-md-10">
               <div className="d-flex justify-content-center">
-                <h1 className="h1 mb-0">Create new bounty</h1>
+                <h1 className="h1 mb-0">Create new Bounty</h1>
               </div>
             </div>
           </div>
