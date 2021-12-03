@@ -5,6 +5,7 @@ import ExternalLinkIcon from '@assets/icons/external-link-icon';
 import useApi from '@x-hooks/use-api';
 import {useTranslation} from 'next-i18next';
 import Translation from '@components/translation';
+import LanguageSelector from '@components/language-selector';
 
 export default function StatusBar() {
   const {dispatch, state: {microServiceReady}} = useContext(ApplicationContext);
@@ -52,6 +53,7 @@ export default function StatusBar() {
           <Translation label="status.tagline" />
           <a href="https://www.bepro.network/terms-and-conditions" target="_blank" className="ms-2 text-decoration-none text-blue"><Translation label="status.terms-and-conditions"/></a>
         </div>
+        <LanguageSelector />
         <div className="ms-3">|</div>
         <a className="ms-3 text-decoration-none smallCaption fs-7 text-white" target="_blank" href="https://support.bepro.network/"><Translation label="status.support" /> <ExternalLinkIcon className="ml-1" height={11} width={11} color="text-white"/></a>
       </div>
