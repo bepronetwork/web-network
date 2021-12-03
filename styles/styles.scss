@@ -1034,6 +1034,10 @@ $c_props: ('m': 'margin') !default;
   border-radius: .5rem;
 }
 
+.w-20 {
+  width: 20%;
+}
+
 .main-nav {
   .btn:not(.brand) svg:only-child {
     width: 24px;
