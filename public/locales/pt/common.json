@@ -50,42 +50,42 @@
   "help-modal": {
     "help-center": {
       "title": "centro de ajuda",
-      "content": "Know more about Bepro Network and how to use it."
+      "content": "Saiba mais sobre a Rede Bepro e como usá-la."
     },
     "api-documentation": {
-      "title": "api documentation",
-      "content": "Develop with bepro-js and create your next web3 app."
+      "title": "documentação da API",
+      "content": "Desenvolva com bepro-js e crie a sua próxima aplicação web3. "
     },
     "live-chat": {
       "title": "live chat",
-      "content": "Explore tutorials and help articles"
+      "content": "Explore tutoriais e artigos de ajuda"
     },
     "provide-feedback": {
-      "title": "provide feedback",
-      "content": "Provide feedback"
+      "title": "fornecer feedback",
+      "content": "fornecer feedback"
     }
   },
   "main-nav": {
     "developers": "Developers",
     "council": "Council",
     "Oracle": "Oracle",
-    "create-bounty": "Create bounty"
+    "create-bounty": "criar bounty"
   },
   "mobile-information": {},
   "nation-dialog": {
-    "at-the-moment": "At the moment BEPRO services and BEPRO Token (BEPRO) are not available in Your Country",
-    "excluded": "Excluded Jurisdictions.",
-    "further": "For further information please contact us on",
+    "at-the-moment": "De momento, os serviços BEPRO e o token BEPRO (BEPRO) não estão disponíveis no seu país ",
+    "excluded": "Jurisdições excluídas .",
+    "further": "Para mais informações contacte-nos em ",
     "email": "general@bepro.network"
   },
-  "select-a-repository": "Select a repository",
+  "select-a-repository": "escolha um repositório ",
   "status": {
-    "network-problems": "network problems",
-    "waiting": "waiting",
-    "operational": "operational",
-    "network-congestion": "network congestion",
-    "tagline": "Bepro Network Services and BEPRO Token ($BEPRO) are not available in Excluded Jurisdictions. By accessing and using the interface you agree with our",
-    "terms-and-conditions": "Terms & Conditions",
+    "network-problems": "problemas de rede ",
+    "waiting": "à espera",
+    "operational": "operacional ",
+    "network-congestion": "congestionamento na rede",
+    "tagline": "Os serviços de rede Bepro e o token BEPRO ($ BEPRO) não estão disponíveis em jurisdições excluídas. Ao acessar e usar a interface, você concorda com nosso ",
+    "terms-and-conditions": "termos e condições",
     "support": "suporte"
   }
 }
