@@ -105,8 +105,8 @@ export default function PullRequest() {
 
   useEffect(loadData, [activeRepo, issueId, prId])
   useEffect(() => {
-    if (review) setShowModal(true)
-  }, [review])
+    if (review && issue && pullRequest) setShowModal(true)
+  }, [review, issue, pullRequest])
 
   return (
     <>
