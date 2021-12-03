@@ -271,7 +271,7 @@ export default function useApi() {
   }
 
   async function createReviewForPR(issueId: string, pullRequestId: string,  githubLogin: string, body:string) {
-    return client.put('/api/pull-request/review', {issueId: '', pullRequestId, githubLogin, body})
+    return client.put('/api/pull-request/review', {issueId, pullRequestId, githubLogin, body})
       .then(response => response)
   }
 
