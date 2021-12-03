@@ -3,6 +3,7 @@ import { formatDate } from '@helpers/formatDate';
 import MarkedRender from '@components/MarkedRender';
 import Button from "./button";
 import ExternalLinkIcon from "@assets/icons/external-link-icon";
+import Comment from "./comment";
 
 export default function IssueComments({ comments, repo, issueId }) {
   const replyRef = comments?.length > 0 && comments[0]?.html_url || `https://github.com/${repo}/issues/${issueId}`
@@ -17,15 +18,7 @@ export default function IssueComments({ comments, repo, issueId }) {
                   <Button transparent outline color="primary">Reply on github <ExternalLinkIcon className="ml-1" color="primary"/></Button>
               </a>
             </div>
-            {comments?.map((comment) => (
-              <div className="mb-3" key={comment?.id}>
-                <p className="p-small trans text-uppercase mb-1 text-bold">
-                  @{comment?.user.login}{" "}
-                  {comment?.updated_at && formatDate(comment?.updated_at)}
-                </p>
-                <p className="p-small content-wrapper child mb-0"><MarkedRender source={comment?.body || `_No comment available_`} /></p>
-              </div>
-            ))}
+            {comments?.map((comment) => <Comment comment={comment} key={comment.id} />)}
           </div>
         </div>
       </div>

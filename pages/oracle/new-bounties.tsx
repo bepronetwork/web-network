@@ -45,8 +45,8 @@ export default function Newissues() {
           issues?.length === 0 &&
           <div className="mt-4">
             <NothingFound
-              description="No issues in draft">
-              <InternalLink href="/create-issue" label="create one" uppercase />
+              description="No bounties in draft">
+              <InternalLink href="/create-bounty" label="create one" uppercase />
             </NothingFound>
           </div>
           || ``

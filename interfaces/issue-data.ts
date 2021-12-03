@@ -38,6 +38,9 @@ export interface pullRequest {
   state: string;
   merged: boolean;
   updatedAt: Date;
+  issue?: IssueData;
+  comments?: Comment[];
+  reviewers?: string[];
 }
 
 export interface developer {
@@ -46,4 +49,14 @@ export interface developer {
   avatar_url?: string;
   url?: string;
   type?: string;
+}
+
+export interface Comment {
+  body: string;
+  created_at: string;
+  user: GithubUser;
+}
+
+export interface GithubUser {
+  login: string;
 }

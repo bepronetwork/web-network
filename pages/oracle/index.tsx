@@ -1,6 +1,6 @@
 import { GetStaticProps } from 'next/types';
 import React from 'react';
-import Newissues from './new-issues';
+import Newissues from './new-bounties';
 
 export default function PageOracle() {
   return <Newissues />;
