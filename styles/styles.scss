@@ -427,7 +427,7 @@ p {
     padding: $m;
     margin-top: $m;
     text-align: center;
-    border-radius: $m / 2;
+    border-radius: math.div($m, 2);
   }
 }
 
@@ -1071,7 +1071,7 @@ a.row-button svg {
 
 .issue-tabs {
   border: 0;
-  border-radius: $m /2 $m / 2 0 0;
+  border-radius: math.div($m, 2) math.div($m, 2) 0 0;
 
   background-color: $bg-shadow;
 
@@ -1084,7 +1084,7 @@ a.row-button svg {
       text-transform: uppercase;
 
       border: 0;
-      border-radius: $m /2 $m / 2 0 0;
+      border-radius: math.div($m, 2) math.div($m, 2) 0 0;
       padding: 20px;
 
       color: rgba($white, .4);
@@ -1104,5 +1104,5 @@ a.row-button svg {
 
 textarea.form-control {
   resize: none;
-  border-radius: $m / 2;
+  border-radius: math.div($m, 2);
 }
