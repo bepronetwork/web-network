@@ -41,8 +41,8 @@ export default function PageCouncil() {
             issues?.length === 0 &&
             <div className="mt-4">
               <NothingFound
-              description="No issues ready to propose">
-                <InternalLink href="/create-issue" label="create one" uppercase />
+              description="No bounties ready to propose">
+                <InternalLink href="/create-bounty" label="create one" uppercase />
               </NothingFound>
             </div>
           }

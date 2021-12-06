@@ -88,7 +88,7 @@ export default function NotMergeableModal({
   return (
     <Modal
       show={isVisible}
-      title="Merging Issue"
+      title="Merging bounty"
       titlePosition="center"
       onCloseClick={() => setVisible(false)}
       centerTitle
@@ -97,7 +97,7 @@ export default function NotMergeableModal({
         <div className="d-flex justify-content-center m-2 text-center">
           <p className="h4 mb-2 text-white">
             {(isFinalized &&
-              'This issue was closed and distributed but the code was unable to be merged.') ||
+              'This bounty was closed and distributed but the code was unable to be merged.') ||
               ''}
 
             {(!isFinalized &&

@@ -6,8 +6,9 @@ import { BeproService } from "@services/bepro-service";
 import { ApplicationContext } from "@contexts/application";
 import ProposalItem from '@components/proposal-item';
 import {Proposal} from '@interfaces/proposal';
+import NothingFound from "./nothing-found";
 
-export default function IssueProposals({ metaProposals, metaRequests, numberProposals, issueId, amount, dbId, isFinalized = false, mergedProposal }) {
+export default function IssueProposals({ metaProposals, className='', metaRequests, numberProposals, issueId, amount, dbId, isFinalized = false, mergedProposal }) {
   const { state: {beproStaked, currentAddress} } = useContext(ApplicationContext);
   const [proposals, setProposals] = useState<Proposal[]>([]);
   async function loadProposalsMeta() {
@@ -35,25 +36,18 @@ export default function IssueProposals({ metaProposals, metaRequests, numberProp
   useEffect(() => { loadProposalsMeta() }, [issueId, numberProposals, currentAddress]);
 
   return (
-    <div className="container">
-      <div className="row justify-content-center">
-        <div className="col-md-10">
-          <div className="content-wrapper mb-4 pb-0">
-            <h3 className="smallCaption pb-3">{numberProposals} {numberProposals > 1 ? 'Proposals' : 'Proposal'}</h3>
-            {proposals.map(proposal =>
-                             <ProposalItem key={proposal._id}
-                                           proposal={proposal}
-                                           issueId={issueId}
-                                           dbId={dbId}
-                                           amount={amount}
-                                           beproStaked={beproStaked}
-                                           onDispute={loadProposalsMeta}
-                                           isFinalized={isFinalized}
-                                           isMerged={proposal.isMerged}
-                                           owner={proposal.owner}/>)}
-          </div>
-        </div>
-      </div>
+    <div className={`content-wrapper ${className} pt-0 ${proposals.length > 0 && 'pb-0' || 'pb-3'}`}>
+      {metaProposals?.length > 0 && proposals.map(proposal =>
+                        <ProposalItem key={proposal._id}
+                                      proposal={proposal}
+                                      issueId={issueId}
+                                      dbId={dbId}
+                                      amount={amount}
+                                      beproStaked={beproStaked}
+                                      onDispute={loadProposalsMeta}
+                                      isFinalized={isFinalized}
+                                      isMerged={proposal.isMerged}
+                                      owner={proposal.owner}/>) || <NothingFound description={'No proposals found'} /> }
     </div>
   );
 }

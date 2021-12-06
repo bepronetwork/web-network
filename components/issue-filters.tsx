@@ -49,7 +49,7 @@ export default function IssueFilters() {
       <div>
         <IssueFilterBox title="timeframe" options={timeOptions}
                         onChange={(opt, checked) => updateOptions(timeOptions, opt, checked, 'time')}/>
-        <IssueFilterBox title="issue state" options={stateOptions}
+        <IssueFilterBox title="bounty state" options={stateOptions}
                         onChange={(opt, checked) => updateOptions(stateOptions, opt, checked, 'state')}/>
       </div>
     </div>
