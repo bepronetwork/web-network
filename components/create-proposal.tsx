@@ -27,6 +27,14 @@ interface participants {
   address?: string;
 }
 
+interface SameProposal {
+  currentPrId: number;
+  prAddressAmount: {
+    amount: number;
+    address: string;
+  }[];
+}
+
 export default function NewProposal({
                                       issueId,
                                       amountTotal,
@@ -86,51 +94,88 @@ export default function NewProposal({
     setProposals(pool);
   }
 
+  function isSameProposal(
+    currentDistrbuition: SameProposal,
+    currentProposals: SameProposal[]
+  ) {
+    return currentProposals.some((activeProposal) => {
+      if (
+        activeProposal.currentPrId === currentDistrbuition.currentPrId
+      ) {
+        return activeProposal.prAddressAmount.every((ap) =>
+          currentDistrbuition.prAddressAmount.find(
+            (p) => ap.amount === p.amount && ap.address === p.address
+          )
+        );
+      } else {
+        return false;
+      }
+    });
+  }
+
   function handleCheckDistrib(obj: object) {
     var currentAmount = sumObj(obj)
+
     if (currentAmount === 100){
      const { id }  = pullRequests.find(
         (data) => data.githubId === currentGithubId
       )
+
       var currentDistrbuition = {
         currentPrId: id,
-        prAmounts: participants.map(
-          (items) =>  ((amountTotal * obj[items.githubHandle])/100).toString()
+        prAddressAmount: participants.map(
+          (item) =>  ({
+            amount: ((amountTotal * obj[item.githubHandle])/100),
+            address: item.address.toLowerCase()
+          })
         )
       }
-      const equals = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-      if(
-        proposals.find(
-          (data) =>
-            equals(currentDistrbuition.prAmounts, data.prAmounts) === true &&
-            data.pullRequestId === currentDistrbuition.currentPrId
-        )
-      ){
-        setWarning(' ')
-        setError('')
-        setSuccess('')
+      
+      var currentProposals = proposals.map((item) => {
+        return ({
+            currentPrId: Number(item.pullRequestId),
+            prAddressAmount: item.prAddresses.map((value, key) => ({
+              amount: Number(item.prAmounts[key]),
+              address: value.toLowerCase()
+            }))
+          })
+         })
+
+      if(isSameProposal(currentDistrbuition, currentProposals)){
+        handleInputColor("warning")
       }else {
-        setError('')
-        setSuccess(' ')
-        setWarning('')
+        handleInputColor("success")
       } 
    }
-   if (currentAmount > 0 && currentAmount < 100){
-      //setError(`${100 - currentAmount}% is missing!`);
-     setError(' ')
-     setSuccess('')
-     setWarning('')
+   if (currentAmount > 0 && currentAmount < 100 || currentAmount > 100){
+    handleInputColor("error")
    }
    if (currentAmount === 0){
-      setError('');
+    handleInputColor("normal")
+   }
+  }
+
+  function handleInputColor ( name: string ) {
+    if(name === "success"){
+      setError('')
+      setSuccess(' ')
+      setWarning('')
+    }
+    if(name === "error"){
+      setError(' ')
       setSuccess('')
       setWarning('')
-   }
-   if (currentAmount > 100){
-      setError(' ') 
+    }
+    if(name === "warning"){
+      setError('')
+      setSuccess('')
+      setWarning(' ')
+    }
+    if(name === "normal"){
+      setError('')
       setSuccess('')
       setWarning('')
-   }
+    }
   }
 
   function getParticipantsPullRequest(id: string, githubId: string) {
@@ -154,7 +199,7 @@ export default function NewProposal({
         const tmpParticipants = participantsPr.filter(({address}) => !!address);
         const amountPerParticipant = 100 / tmpParticipants.length
         setDistrib(Object.fromEntries(tmpParticipants.map(participant => [participant.githubHandle, amountPerParticipant])))
-        setCurrentGithubId(githubId);
+        setCurrentGithubId(githubId);        
         setParticipants(tmpParticipants);
       })
       .catch((err) => {
@@ -214,18 +259,14 @@ export default function NewProposal({
     setShow(false);
     setAmount(0);
     setDistrib({});
-    setError('');
-    setSuccess('');
-    setWarning('');
+    handleInputColor("normal")
   }
 
   function handleChangeSelect({ value, githubId }) {
     setDistrib({});
     setAmount(0);
     getParticipantsPullRequest(value, githubId);
-    setError('');
-    setSuccess('');
-    setWarning('');
+    handleInputColor("normal")
   }
 
   function recognizeAsFinished() {
@@ -298,10 +339,6 @@ export default function NewProposal({
                    {!currentAddress || participants.length === 0 || !success && <LockedIcon width={12} height={12} className="mr-1"/>}
                    <span >Create Proposal</span>
                  </Button>
-                 <Button color='dark-gray' onClick={handleClose}>
-                   Cancel
-                 </Button>
-
                  <Button color='dark-gray' onClick={handleClose}>
                    Cancel
                  </Button>
