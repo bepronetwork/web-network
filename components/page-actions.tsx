@@ -307,7 +307,7 @@ export default function PageActions({
           addToast({
             type: "success",
             title: "Success",
-            content: "To start working on this issue",
+            content: "To start working on this bounty",
           })
         )
 
@@ -324,7 +324,7 @@ export default function PageActions({
           addToast({
             type: "danger",
             title: "Failed",
-            content: "To start working on this issue",
+            content: "To start working on this bounty",
           })
         )
 
@@ -407,7 +407,7 @@ export default function PageActions({
                   { (!isDisputed && !finalized ) && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>Dispute</Button> || ``}
                   {!finalized && <Button disabled={!canClose} onClick={handleClose}>
                   {!canClose && <LockedIcon width={12} height={12} className="mr-1"/>}
-                    Merge
+                    <span> Merge </span>
                     </Button> || ``}
                 </>
               )}

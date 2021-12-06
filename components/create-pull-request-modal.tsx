@@ -46,12 +46,12 @@ export default function CreatePullRequestModal({
   }, [accessToken, repo]);
 
   return (
-    <Modal show={show} onCloseClick={onCloseClick} title="Create Pull Request" titlePosition="center">
-      <div>
+    <Modal size="lg" show={show} onCloseClick={onCloseClick} title="Create pull request" titlePosition="center">
+      <div className="container">
         <div>
           <div className="form-group">
-            <label className="smallCaption trans mb-2 text-white-50 text-uppercase">Issue Title</label>
-            <input value={title} onChange={e => setTitle(e.target.value)} type="text" className="form-control" placeholder="Your Issue Title"/>
+            <label className="smallCaption trans mb-2 text-white-50 text-uppercase">Bounty Title</label>
+            <input value={title} onChange={e => setTitle(e.target.value)} type="text" className="form-control" placeholder="Your Bounty Title"/>
           </div>
         </div>
         <div>
@@ -68,8 +68,8 @@ export default function CreatePullRequestModal({
             <ReactSelect options={options} onChange={onSelectedBranch} />
           </div>
         </div>
-        <div className="d-flex justify-content-center">
-          <Button className='mr-2' disabled={isButtonDisabled()} onClick={() => onConfirm({title, description, branch})}>{isButtonDisabled() && <LockedIcon className='me-2'/>}Create pull request</Button>
+        <div className="d-flex pt-2 justify-content-center">
+          <Button className='mr-2' disabled={isButtonDisabled()} onClick={() => onConfirm({title, description, branch})}>{isButtonDisabled() && <LockedIcon className='me-2'/>}<span>Create pull request</span></Button>
           <Button color='dark-gray' onClick={onCloseClick}>cancel</Button>
         </div>
       </div>

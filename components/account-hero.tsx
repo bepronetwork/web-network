@@ -47,7 +47,7 @@ export default function AccountHero() {
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4 className="h4 mb-0">{formatNumberToCurrency(myIssues.length || 0)}</h4>
-                    <span className="smallCaption">Issues</span>
+                    <span className="smallCaption">Bounties</span>
                   </div>
                 </div>
                 <div className="col-md-3">

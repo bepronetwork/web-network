@@ -21,7 +21,7 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
   const {state: {network: activeNetwork}} = useContext(ApplicationContext);
 
   function showModal() {
-    return activeNetwork && requiredNetwork && activeNetwork !== requiredNetwork;
+    return !!activeNetwork && !!requiredNetwork && activeNetwork !== requiredNetwork;
   }
 
   function getColor() {
