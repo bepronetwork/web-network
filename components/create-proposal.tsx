@@ -47,9 +47,9 @@ export default function NewProposal({
   const {dispatch, state: {balance, currentAddress, beproInit, oracles, githubLogin},} = useContext(ApplicationContext);
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>();
-  const [error, setError] = useState<string>('');
-  const [success, setSuccess] = useState<string>('');
-  const [warning, setWarning] = useState<string>('');
+  const [error, setError] = useState<boolean>(false);
+  const [success, setSuccess] = useState<boolean>(false);
+  const [warning, setWarning] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
   const [participants, setParticipants] = useState<participants[]>([]);
   const [isCouncil, setIsCouncil] = useState(false);
@@ -157,24 +157,24 @@ export default function NewProposal({
 
   function handleInputColor ( name: string ) {
     if(name === "success"){
-      setError('')
-      setSuccess(' ')
-      setWarning('')
+      setError(false)
+      setSuccess(true)
+      setWarning(false)
     }
     if(name === "error"){
-      setError(' ')
-      setSuccess('')
-      setWarning('')
+      setError(true)
+      setSuccess(false)
+      setWarning(false)
     }
     if(name === "warning"){
-      setError('')
-      setSuccess('')
-      setWarning(' ')
+      setError(false)
+      setSuccess(false)
+      setWarning(true)
     }
     if(name === "normal"){
-      setError('')
-      setSuccess('')
-      setWarning('')
+      setError(false)
+      setSuccess(false)
+      setWarning(false)
     }
   }
 
@@ -199,7 +199,7 @@ export default function NewProposal({
         const tmpParticipants = participantsPr.filter(({address}) => !!address);
         const amountPerParticipant = 100 / tmpParticipants.length
         setDistrib(Object.fromEntries(tmpParticipants.map(participant => [participant.githubHandle, amountPerParticipant])))
-        setCurrentGithubId(githubId);        
+        setCurrentGithubId(githubId);       
         setParticipants(tmpParticipants);
       })
       .catch((err) => {
@@ -246,7 +246,6 @@ export default function NewProposal({
                         if (e?.message?.search(`User denied`) > -1)
                           dispatch(updateTransaction({...proposeMergeTx.payload as any, remove: true}))
                         else dispatch(updateTransaction({...proposeMergeTx.payload as any, status: TransactionStatus.failed}));
-                        setError('Error to create proposal in Smart Contract')
                         handleClose();
                       })                    
   }

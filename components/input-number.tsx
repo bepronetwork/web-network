@@ -12,9 +12,9 @@ export default function InputNumber({
   min = "0",
   helperText = "",
   className = "",
-  error = "",
-  success= "",
-  warning= "",
+  error = false,
+  success= false,
+  warning= false,
   ...params
 }: InputNumberProps): JSX.Element {
   const id = kebabCase(label);
@@ -69,15 +69,6 @@ export default function InputNumber({
           })}>
           {helperText}
         </div>
-      )}
-      {error && error != ' ' && (
-        <p
-        className={clsx("p-small my-2", {
-          trans: !error,
-          ...errorStyle,
-        })}>
-        {error}
-      </p>
       )}
     </Component>
   );
