@@ -470,6 +470,10 @@ p {
   padding: $m * 2;
   border-radius: math.div($m, 2);
 
+  &.border-top-0 {
+    border-radius: 0  0 math.div($m, 2) math.div($m, 2);
+  }
+
   &.child {
     padding: $m;
     background-color: $dark-gray;
@@ -479,8 +483,10 @@ p {
     margin-left: -$m*2;
     margin-right: -$m*2;
     padding: $m $m * 2;
-    background-color: $dark-gray;
-    //border-top: 2px solid rgba($black, 0.2);
+    background-color: $dark-gray;    
+    &:last-child {
+      border-radius: 0 0 math.div($m, 2) math.div($m, 2);
+    }
   }
 
   .rounded.row {

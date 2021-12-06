@@ -114,7 +114,8 @@ export default function ConnectWalletButton({children = null, forceLogin = false
       <Modal
       title="Connect your MetaMask Wallet"
       titlePosition="center"
-      titleClass="h4 text-white bg-opacity-100"
+      centerTitle
+      titleClass="h3 text-white bg-opacity-100"
       show={!currentAddress || !metaMaskWallet}>
         <div className="d-flex flex-column text-center align-items-center">
         <strong className="smallCaption d-block text-uppercase text-white-50 mb-3 pb-1">

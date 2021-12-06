@@ -120,7 +120,7 @@ function networkTxButton({
       {disabled && <LockedIcon width={12} height={12} className="mr-1"/>} <span>{buttonLabel}</span>
     </Button>
 
-    <Modal show={showModal} title={modalTitle} footer={modalFooter}>
+    <Modal show={showModal} title={modalTitle} footer={modalFooter} titlePosition="center">
       <p className="p-small text-white-50 text-center">{modalDescription}</p>
       <div className={getDivClass()}>
         <Icon className="md-larger">{txSuccess ? `check_circle` : `error`}</Icon>

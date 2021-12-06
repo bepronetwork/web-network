@@ -19,7 +19,7 @@ import useApi from '@x-hooks/use-api';
 import TabbedNavigation from '@components/tabbed-navigation';
 import IssuePullRequests from '@components/issue-pull-requests';
 import CustomContainer from '@components/custom-container';
-import { head } from 'lodash';
+
 interface NetworkIssue {
   recognizedAsFinished: boolean;
 }
@@ -48,6 +48,7 @@ export default function PageIssue() {
     {
       eventKey: 'proposals',
       title: `${networkIssue?.mergeProposalsAmount || 0} Proposal${networkIssue?.mergeProposalsAmount !== 1 && 's' || ''}`,
+      isEmpty: !(networkIssue?.mergeProposalsAmount > 0),
       component: <IssueProposals
         metaProposals={issue?.mergeProposals}
         metaRequests={issue?.pullRequests}
@@ -57,14 +58,20 @@ export default function PageIssue() {
         amount={networkIssue?.tokensStaked}
         isFinalized={networkIssue?.finalized}
         mergedProposal={issue?.merged}
+        className="border-top-0"
       />
     },
     {
       eventKey: 'pull-requests',
+      isEmpty: !(mergedPullRequests.length > 0),
       title: `${mergedPullRequests.length} Pull Request${mergedPullRequests.length !== 1 && 's' || ''}`,
-      component: <IssuePullRequests repoId={issue?.repository_id} issueId={issue?.issueId} pullResquests={mergedPullRequests} />
+      component: <IssuePullRequests className="border-top-0" repoId={issue?.repository_id} issueId={issue?.issueId} pullResquests={mergedPullRequests} />
     }
   ]
+
+  function getDefaultActiveTab() {
+    return  tabs.find(tab => tab.isEmpty === false)?.eventKey
+  }
 
   function getIssueCID() {
     return [repoId, id].join(`/`)
@@ -209,7 +216,7 @@ export default function PageIssue() {
         addNewComment={addNewComment}
         finished={networkIssue?.recognizedAsFinished} />
         {((networkIssue?.mergeProposalsAmount > 0 || mergedPullRequests.length > 0) && currentAddress) && <CustomContainer className="mb-4">
-          <TabbedNavigation defaultActiveKey={head(tabs).eventKey} className="issue-tabs" tabs={tabs} collapsable />
+          <TabbedNavigation defaultActiveKey={getDefaultActiveTab()} className="issue-tabs" tabs={tabs} collapsable />
         </CustomContainer>}
       {networkIssue && <IssueProposalProgressBar
         isFinalized={networkIssue?.finalized}

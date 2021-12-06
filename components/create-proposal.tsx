@@ -341,6 +341,10 @@ export default function NewProposal({
                  <Button color='dark-gray' onClick={handleClose}>
                    Cancel
                  </Button>
+
+                 <Button color='dark-gray' onClick={handleClose}>
+                   Cancel
+                 </Button>
                </>
              }>
         <p className="smallCaption text-white-50 text-uppercase">Select a pull request </p>
