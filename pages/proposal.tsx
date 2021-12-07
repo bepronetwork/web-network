@@ -1,4 +1,4 @@
-import {GetStaticProps} from 'next/types';
+import {GetServerSideProps, GetStaticProps} from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
 import PageActions from '@components/page-actions';
 import ProposalAddresses from '@components/proposal-addresses';
@@ -21,6 +21,8 @@ import useApi from '@x-hooks/use-api';
 import useMergeData from '@x-hooks/use-merge-data';
 import NotMergeableModal from '@components/not-mergeable-modal';
 import useOctokit from '@x-hooks/use-octokit';
+import {getSession} from 'next-auth/react';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 
 interface ProposalBepro {
   disputes: string;
@@ -197,8 +199,11 @@ export default function PageProposal() {
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
-    props: {},
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common',])),
+    },
   };
 };

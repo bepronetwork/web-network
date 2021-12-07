@@ -1,0 +1,91 @@
+{
+  "title": "Hello world",
+  "$oracles": "Oracles",
+  "$bepro": "$BEPRO",
+  "please-wait": "Please wait",
+  "close": "Close",
+  "filters": {
+    "search-repositories": "Search repositories",
+    "repository": "repository",
+    "all": "All",
+    "bounties": {
+      "title": "bounty state",
+      "open": "Open bounties",
+      "draft": "Draft bounties",
+      "closed": "Closed bounties"
+    },
+    "timeframe": {
+      "title": "timeframe",
+      "week": "Past week",
+      "month": "Past month",
+      "year": "Past year"
+    }
+  },
+  "account": {
+    "hero": {}
+  },
+  "connect-states": {
+    "github": "",
+    "wallet": {}
+  },
+  "issue": {
+    "no-comments-available": "_No comments available_",
+    "description": "description",
+    "view-all-addresses": "view all address",
+    "steps": {
+      "draft": "Draft",
+      "development": "Development",
+      "finalized": "Finalized",
+      "validation": "validation & disputes",
+      "closed": "closed & distributed"
+    },
+    "status": {
+      "completed": "completed",
+      "canceled": "canceled",
+      "until-done": "{{distance}} until done",
+      "pending": "pending",
+      "in-progress": "in progress"
+    }
+  },
+  "help-modal": {
+    "help-center": {
+      "title": "help center",
+      "content": "Know more about Bepro Network and how to use it."
+    },
+    "api-documentation": {
+      "title": "api documentation",
+      "content": "Develop with bepro-js and create your next web3 app."
+    },
+    "live-chat": {
+      "title": "live chat",
+      "content": "Explore tutorials and help articles"
+    },
+    "provide-feedback": {
+      "title": "provide feedback",
+      "content": "Provide feedback"
+    }
+  },
+  "main-nav": {
+    "developers": "Developers",
+    "council": "Council",
+    "Oracle": "Oracle",
+    "create-bounty": "Create bounty"
+  },
+  "mobile-information": {},
+  "nation-dialog": {
+    "at-the-moment": "At the moment BEPRO services and BEPRO Token (BEPRO) are not available in Your Country",
+    "excluded": "Excluded Jurisdictions.",
+    "further": "For further information please contact us on",
+    "email": "general@bepro.network"
+  },
+  "select-a-repository": "Select a repository",
+  "status": {
+    "network-problems": "network problems",
+    "waiting": "waiting",
+    "operational": "operational",
+    "network-congestion": "network congestion",
+    "tagline": "Bepro Network Services and BEPRO Token ($BEPRO) are not available in Excluded Jurisdictions. By accessing and using the interface you agree with our",
+    "terms-and-conditions": "Terms & Conditions",
+    "support": "support"
+  }
+}
