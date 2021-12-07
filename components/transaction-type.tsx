@@ -18,5 +18,5 @@ export default function TransactionType({type}) {
     [TransactionTypes.recognizedAsFinish]: `Recognize bounty as finished`,
   }
 
-  return (<span className="d-block smallCaption text-white-50 text-uppercase fs-small">{[TypeMaps[type]] || `Missing map`}</span>)
+  return (<span className="d-block caption-small text-white-50 text-uppercase fs-small">{[TypeMaps[type]] || `Missing map`}</span>)
 }

@@ -7,7 +7,7 @@ export default function IssueDescription({ description }) {
             <div className="row justify-content-center">
                 <div className="col-md-10">
                     <div className="content-wrapper mb-3">
-                        <h3 className="smallCaption mb-3">DESCRIPTION</h3>
+                        <h3 className="caption-large mb-3">DESCRIPTION</h3>
                         <div className="bg-dark-gray p-3 rounded">
                             <div className="p p-1">
                                 <MarkedRender source={description} />

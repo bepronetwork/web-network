@@ -8,3 +8,9 @@
     max-width: 660px;
   }
 }
+
+.modal-footer {
+  &:empty {
+    padding: 0;
+  }
+}

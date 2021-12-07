@@ -18,13 +18,13 @@ export default function IssueHero({ issue, state, amount }) {
         <div className="row justify-content-center">
           <div className="col-md-10">
             <div className="d-flex flex-column">
-              <h3 className="h4 text-capitalize mb-0">{state} bounty</h3>
+              <h3 className="text-capitalize">{state} bounty</h3>
               <div className="row">
                 <div className="col-md-9">
                   <div className="top-border">
-                    <h1 className="h4 mb-2">
+                    <h4 className="mb-2">
                       #{issue?.githubId} {issue?.title}
-                    </h1>
+                    </h4>
                     <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start">
                       <span className="p-small mr-3 mt-1 text-white-50">
                         {issue && formatDate(issue?.createdAt)}
@@ -46,7 +46,7 @@ export default function IssueHero({ issue, state, amount }) {
                 <div className="col-md-3">
                   <div className="banner-highlight">
                     {amount && (
-                      <h4 className="h4 mb-0">
+                      <h4 className="mb-0">
                         {amount || `&infin;`}
                         <span className="p-small"> $BEPRO</span>
                       </h4>

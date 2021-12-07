@@ -49,14 +49,14 @@ export default function CreateReviewModal({
     >
       <div className="container">
         <div className="mb-2">
-          <p className="smallCaption trans mb-2">
+          <p className="caption-small trans mb-2">
             #{issue?.githubId} {issue?.title}
           </p>
 
           <p className="h4 mb-2">Pull Request #{pullRequest?.githubId}</p>
 
           <div className="d-flex align-items-center flex-wrap justify-content-center justify-content-md-start">
-            <span className="smallCaption trans mr-2">
+            <span className="caption-small trans mr-2">
               Created at {pullRequest && formatDate(pullRequest?.createdAt)}
             </span>
 
@@ -80,7 +80,7 @@ export default function CreateReviewModal({
         </div>
         <div>
           <div className="form-group">
-            <label className="smallCaption trans mb-2 text-white-50 text-uppercase">
+            <label className="caption-small trans mb-2 text-white-50 text-uppercase">
               Review
             </label>
             <textarea

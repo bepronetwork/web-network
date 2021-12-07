@@ -52,7 +52,7 @@ $more-bg: (
         'danger-opac-25': rgba($warning, 0.25),
 );
 
-$more-colors: ('blue-dark': $blue-dark, 'dark-gray': $dark-gray, 'ligth-gray': $ligth-gray, 'black': $black, 'white': #fff);
+$more-colors: ('blue-dark': $blue-dark, 'gray': $gray, 'dark-gray': $dark-gray, 'ligth-gray': $ligth-gray, 'black': $black, 'white': #fff);
 
 
 
@@ -100,6 +100,8 @@ $form-check-input-checked-bg-color:     $primary;
 $form-check-input-checked-border-color: $primary;
 
 $enable-validation-icons: false;
+
+$modal-content-border-radius: math.div($m, 2);
 
 @import "~bootstrap/scss/variables";
 @import "~bootstrap/scss/utilities";

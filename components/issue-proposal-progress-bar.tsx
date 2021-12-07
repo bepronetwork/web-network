@@ -127,7 +127,7 @@ export default function IssueProposalProgressBar({
           <div className='position-relative d-flex align-items-start flex-column'>
             <div className={`rounded-circle bg-${currentItem && !isCanceled && !isLastItem && 'white'}`} style={{ width: `10px`, height: `10px` }} ></div>
             <div className='position-absolute mt-4 d-flex align-items-start flex-column'>
-              <label className={`text-uppercase mediumCaption mb-1 text-${currentItem ? stepColor : 'gray'}`}>{stepLabel}</label>
+              <label className={`text-uppercase caption mb-1 text-${currentItem ? stepColor : 'gray'}`}>{stepLabel}</label>
               {renderStepStatus(stepLabel, index)}
             </div>
           </div>

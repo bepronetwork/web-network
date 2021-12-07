@@ -100,12 +100,12 @@ export default function ProposalItem({
         <a className="text-decoration-none text-white">
           <div className="rounded row align-items-top">
             <div
-              className={`col-3 smallCaption mt-2 text-uppercase text-${getColors() === 'purple' ? 'white' : getColors()}`}>
+              className={`col-3 caption-small mt-2 text-uppercase text-${getColors() === 'purple' ? 'white' : getColors()}`}>
               PR #{proposal.pullRequestGithubId} {owner && `BY @${owner}`}
             </div>
             <div className="col-5 d-flex justify-content-start mb-2">
               {proposal.prAmounts.map((value, i) =>
-                                        <PercentageProgressBar textClass={`smallCaption p-small text-${getColors()}`}
+                                        <PercentageProgressBar textClass={`caption-small p-small text-${getColors()}`}
                                                                pgClass={`bg-${getColors()}`}
                                                                className={i + 1 < proposal.prAmounts.length && `me-2` || ``}
                                                                value={value} total={amount}/>)}
