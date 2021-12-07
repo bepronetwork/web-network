@@ -1,9 +1,12 @@
 import InternalLink from '@components/internal-link';
 import NotFoundIcon from '../assets/icons/not-found-icon';
+import {GetServerSideProps} from 'next';
+import {getSession} from 'next-auth/react';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 
 export default function NotFound() {
-  return <>
-    <div className="row mt-5 pt-5">
+  return <div className="pt-5">
+    <div className="row pt-5 mt-5">
       <div className="col d-flex justify-content-center mt-5 pt-5">
         <NotFoundIcon height={131} width={118}/>
       </div>
@@ -22,5 +25,14 @@ export default function NotFound() {
         </div>
       </div>
     </div>
-  </>
+  </div>
 }
+
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
+  return {
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common',])),
+    },
+  };
+};

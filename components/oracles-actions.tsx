@@ -206,7 +206,7 @@ function OraclesActions(): JSX.Element {
             symbol={`${getCurrentLabel()}`}
             classSymbol={`${getCurrentLabel() === 'Oracles' ? "text-purple" : "text-blue"}`}
             max={balance.bepro}
-            error={error}
+            error={!!error}
             value={tokenAmount}
             min={0}
             placeholder={`Insert an amount of ${getCurrentLabel()}`}
@@ -222,6 +222,7 @@ function OraclesActions(): JSX.Element {
                     onClick={setMaxAmmount}>
                     Max
                 </span>
+                {error && <p className="p-small my-2">{error}</p>}
               </>)
             }
             />

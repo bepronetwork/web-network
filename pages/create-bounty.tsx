@@ -1,6 +1,6 @@
 import {useRouter} from 'next/router';
 import clsx from 'clsx';
-import {GetStaticProps} from 'next/types'
+import {GetServerSideProps, GetStaticProps} from 'next/types'
 import React, {useContext, useEffect, useState} from 'react';
 import {BeproService} from '@services/bepro-service';
 import InputNumber from '@components/input-number';
@@ -20,6 +20,8 @@ import useApi from '@x-hooks/use-api';
 import {User} from '@services/github-microservice';
 import useTransactions from '@x-hooks/useTransactions';
 import { changeTransactionalTokenApproval } from '@contexts/reducers/change-transactional-token-approval';
+import {getSession} from 'next-auth/react';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 
 interface Amount {
   value?: string,
@@ -263,8 +265,11 @@ export default function PageCreateIssue() {
   )
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
-    props: {}
-  }
-}
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common',])),
+    },
+  };
+};

@@ -17,6 +17,9 @@ import ConnectGithub from '@components/connect-github';
 import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
+import {GetServerSideProps} from 'next';
+import {getSession} from 'next-auth/react';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 
 export default function ParityPage() {
   const {state: {currentAddress, balance,}, dispatch} = useContext(ApplicationContext);
@@ -415,3 +418,12 @@ export default function ParityPage() {
     </div>
   </>
 }
+
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
+  return {
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common',])),
+    },
+  };
+};
