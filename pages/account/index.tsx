@@ -1,4 +1,4 @@
-import {GetStaticProps} from 'next/types';
+import {GetServerSideProps, GetStaticProps} from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
 import IssueListItem from '@components/issue-list-item';
 import Account from '@components/account';
@@ -18,6 +18,8 @@ import useApi from '@x-hooks/use-api';
 import useMergeData from '@x-hooks/use-merge-data';
 import InternalLink from '@components/internal-link';
 import { changeLoadState } from '@contexts/reducers/change-load-state';
+import {getSession} from 'next-auth/react';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 
 export default function MyIssues() {
 
@@ -137,8 +139,11 @@ export default function MyIssues() {
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
-    props: {},
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common',])),
+    },
   };
 };

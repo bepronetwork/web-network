@@ -95,7 +95,7 @@ function OraclesDelegate(): JSX.Element {
           min={0}
           placeholder="Insert an amount of Oracles"
           thousandSeparator
-          error={error}
+          error={!!error}
           helperText={(
             <>
               {formatNumberToCurrency(delegatedAmount, { maximumFractionDigits: 18 })} Oracles Available
@@ -105,6 +105,7 @@ function OraclesDelegate(): JSX.Element {
                   >
                   Max
               </span>
+              {error && <p className="p-small my-2">{error}</p>}
             </>)
           }/>
 

@@ -12,8 +12,9 @@ import MobileNotSupported from '@components/mobile-not-supported';
 import {getSession, SessionProvider} from 'next-auth/react'
 import {GetServerSideProps} from 'next';
 import useRepos from '@x-hooks/use-repos';
+import {appWithTranslation} from 'next-i18next';
 
-export default function App({ Component, pageProps: {session, ...pageProps} }: AppProps) {
+function App({ Component, pageProps: {session, ...pageProps} }: AppProps) {
   const [[, repos]] = useRepos();
   const [loaded, setLoaded] = useState(false);
 
@@ -45,6 +46,7 @@ export default function App({ Component, pageProps: {session, ...pageProps} }: A
   );
 }
 
+export default appWithTranslation(App);
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
