@@ -57,7 +57,7 @@ export default function TransactionsList({onActiveTransaction = (transaction) =>
   }
 
   function emptyTransaction (){
-    return <div className="text-center"><span className="smallCaption text-ligth-gray text-uppercase fs-8 family-Medium">you have no transactions.</span></div>
+    return <div className="text-center"><span className="caption-small text-ligth-gray text-uppercase fs-8 family-Medium">you have no transactions.</span></div>
   }
 
   return (

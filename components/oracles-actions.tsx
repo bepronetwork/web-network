@@ -198,7 +198,7 @@ function OraclesActions(): JSX.Element {
         <div className="content-wrapper h-100">
           <OraclesBoxHeader actions={actions} onChange={setAction} currentAction={action} available={getMaxAmmount()} />
 
-          <p className="smallCaption text-white text-uppercase mt-2 mb-3">{renderInfo.description}</p>
+          <p className="caption-small text-white text-uppercase mt-2 mb-3">{renderInfo.description}</p>
 
           <InputNumber
             disabled={!isSettlerTokenApproved || !metaMaskWallet}
@@ -218,7 +218,7 @@ function OraclesActions(): JSX.Element {
               <>
                 {formatNumberToCurrency(getMaxAmmount(), { maximumFractionDigits: 18 })} {getCurrentLabel()} Available
                 <span
-                    className={`smallCaption ml-1 cursor-pointer text-uppercase ${`${getCurrentLabel() === 'Oracles' ? "text-purple" : "text-blue"}`}`}
+                    className={`caption-small ml-1 cursor-pointer text-uppercase ${`${getCurrentLabel() === 'Oracles' ? "text-purple" : "text-blue"}`}`}
                     onClick={setMaxAmmount}>
                     Max
                 </span>
@@ -282,7 +282,7 @@ function OraclesActions(): JSX.Element {
             </Button>
           </>
         }>
-        <p className="smallCaption text-uppercase text-center">
+        <p className="caption-small text-uppercase text-center">
           {renderInfo.caption}
         </p>
         <p className="text-center text-bold fs-4">

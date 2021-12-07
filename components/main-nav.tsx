@@ -101,13 +101,14 @@ export default function MainNav() {
       </div>
 
       <div className="d-flex flex-row align-items-center">
-        <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" className='text-decoration-none' target="_blank">
-          <Button transparent className="opacity-75 opacity-100-hover"><span>Get Started</span><ExternalLinkIcon className="ml-1"/></Button>
+        <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" className='d-flex align-items-center mr-3 text-decoration-none text-white text-uppercase main-nav-link opacity-75 opacity-100-hover' target="_blank">
+          <span>Get Started</span>
+          <ExternalLinkIcon className="ml-1"/>
         </a>
 
-        <InternalLink href="/create-bounty" icon={<PlusIcon />} label="Create Bounty" iconBefore nav uppercase />
+        <InternalLink href="/create-bounty" icon={<PlusIcon />} label="Create Bounty" className="mr-2" iconBefore nav uppercase />
 
-        <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 opacity-75 opacity-100-hover" transparent rounded><HelpIcon /></Button>
+        <Button onClick={() => setShowHelp(true)}  className="ms-2 me-4 opacity-75 opacity-100-hover" transparent rounded><HelpIcon /></Button>
 
         <WrongNetworkModal requiredNetwork={REQUIRED_NETWORK} />
 
@@ -118,7 +119,7 @@ export default function MainNav() {
 
             <NetworkIdentifier />
 
-            <InternalLink href="/account" icon={<BeproSmallLogo />} label={formatNumberToNScale(beproBalance)} transparent nav />
+            <InternalLink href="/account" icon={<BeproSmallLogo />} label={formatNumberToNScale(beproBalance)} className="mx-3" transparent nav />
 
             <InternalLink href="/account" icon={<BalanceAddressAvatar address={address} balance={ethBalance} currency={CURRENCY} />} className="meta-info d-flex align-items-center" />
           </div>

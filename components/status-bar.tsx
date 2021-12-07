@@ -38,16 +38,17 @@ export default function StatusBar() {
 
     return <a className="text-decoration-none text-white-50" href="https://bepronetwork.statuspage.io/" target="_blank">
       <span className={indicatorClass} style={indicatorStyle} />
-      <span className="text-uppercase fs-7">{info[1]} {ms}ms</span>
+      <span className="caption-small">{info[1]} {ms}ms</span>
     </a>
   }
 
   useEffect(neverEndingUpdate, []);
 
   return (<>
-    <div className="position-fixed bg-dark bottom-0 w-100 px-3 py-1 d-flex" id="status-bar">
+    <div className="position-fixed bg-shadow bottom-0 w-100 px-3 py-1 d-flex" id="status-bar">
       <div className="d-flex align-items-center w-100">
         {renderNetworkStatus()}
+        <div className="ms-3 text-gray">|</div>
         <div className="ms-3">|</div>
         <div className="ms-3 flex-grow-1 text-center fs-7 text-uppercase family-Regular text-ligth-gray">
           <Translation label="status.tagline" />

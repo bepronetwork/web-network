@@ -12,8 +12,7 @@ $only-child: 14px;
   }
 }
 
-button.btn,a.btn:not(.brand) {
-  letter-spacing: .06rem;
+button.btn,a.btn:not(.brand), .main-nav-link:not(.brand) {
   svg,i {
     &:not(:only-child) {
       &:not(:last-child) {

@@ -69,7 +69,7 @@ export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null
     <div className="row mb-2 proposal-progress-bar">
       <div className="col d-flex justify-content-between">
         <h4 className={`h4 text-capitalize text-${issueColor}`}>{issueState}</h4>
-        <div className="fs-small smallCaption d-flex align-items-center">
+        <div className="fs-small caption-small d-flex align-items-center">
           <span className={`text-${issueColor}`}>{formatNumberToString(issueDisputeAmount, 2)} </span> /{formatNumberToNScale(stakedAmount)} ORACLES <span className={`text-${issueColor}`}> ({percentage}%)</span>
         </div>
       </div>

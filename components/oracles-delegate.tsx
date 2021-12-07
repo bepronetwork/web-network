@@ -85,7 +85,7 @@ function OraclesDelegate(): JSX.Element {
     <div className="col-md-5">
       <div className="content-wrapper h-100">
         <OraclesBoxHeader actions="Delegate oracles" available={delegatedAmount} />
-        <p className="smallCaption text-white text-uppercase mt-2 mb-3">Delegate Oracles to use them in bounties</p>
+        <p className="caption-small text-white text-uppercase mt-2 mb-3">Delegate Oracles to use them in bounties</p>
         <InputNumber
           label="Oracles Amount"
           value={tokenAmount}
@@ -100,7 +100,7 @@ function OraclesDelegate(): JSX.Element {
             <>
               {formatNumberToCurrency(delegatedAmount, { maximumFractionDigits: 18 })} Oracles Available
               <span
-                  className="smallCaption ml-1 cursor-pointer text-uppercase text-purple"
+                  className="caption-small ml-1 cursor-pointer text-uppercase text-purple"
                   onClick={setMaxAmmount}
                   >
                   Max
@@ -110,7 +110,7 @@ function OraclesDelegate(): JSX.Element {
           }/>
 
         <div className="form-group mt-2">
-          <label className="smallCaption text-uppercase text-white bg-opacity-100 mb-2">Delegation address</label>
+          <label className="caption-small text-uppercase text-white bg-opacity-100 mb-2">Delegation address</label>
           <input
             value={delegatedTo}
             onChange={handleChangeAddress}

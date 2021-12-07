@@ -40,18 +40,18 @@ export default function PullRequestItem({
         >
           <a className="text-decoration-none text-white">
             <div className="row align-items-center pl-1 pr-1">
-              <div className="col-7 smallCaption text-uppercase text-white">
+              <div className="col-7 caption-small text-uppercase text-white">
                 <Avatar userLogin={pullRequest?.githubLogin} />
                 <span className="ml-2">
                   #{pullRequest?.githubId} BY @{pullRequest?.githubLogin}
                 </span>
               </div>
 
-              <div className="col-2 smallCaption text-uppercase text-white d-flex justify-content-center">
+              <div className="col-2 caption-small text-uppercase text-white d-flex justify-content-center">
                 {formatDate(pullRequest?.createdAt)}
               </div>
 
-              <div className="col-2 smallCaption text-uppercase text-white d-flex justify-content-center">
+              <div className="col-2 caption-small text-uppercase text-white d-flex justify-content-center">
                 {pullRequest?.comments?.length} Review
                 {(pullRequest?.comments?.length !== 1 && 's') || ''}
               </div>

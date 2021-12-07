@@ -181,7 +181,7 @@ export default function PageCreateIssue() {
           <div className="row justify-content-center">
             <div className="col-md-10">
               <div className="d-flex justify-content-center">
-                <h1 className="h1 mb-0">Create new Bounty</h1>
+                <h2>Create new Bounty</h2>
               </div>
             </div>
           </div>
@@ -192,18 +192,18 @@ export default function PageCreateIssue() {
           <div className="col-md-10">
             <ConnectWalletButton asModal={true} />
             <div className="content-wrapper mt-up mb-5">
-              <h3 className="h3 mr-2 mb-4 text-white text-opacity-1">Details</h3>
+              <h3 className="mb-4 text-white">Details</h3>
               <div className="form-group mb-4">
-                <label className="smallCaption mb-2 text-uppercase">Bounty title</label>
+                <label className="caption-small mb-2">Bounty title</label>
                 <input type="text"
                        className="form-control rounded-lg" placeholder="Your bounty title"
                        value={issueTitle}
                        onChange={e => setIssueTitle(e.target.value)}
                 />
-                <p className="p-small trans my-2">Tip: Try to be as descriptive as possible</p>
+                <p className="p-small text-gray trans my-2">Tip: Try to be as descriptive as possible</p>
               </div>
               <div className="form-group">
-                <label className="smallCaption mb-2 text-uppercase">Description</label>
+                <label className="caption-small mb-2">Description</label>
                 <textarea className="form-control" rows={6} placeholder="Type a description..."
                           value={issueDescription}
                           onChange={e => setIssueDescription(e.target.value)}/>
@@ -226,7 +226,7 @@ export default function PageCreateIssue() {
                         {formatNumberToCurrency(balance, { maximumFractionDigits: 18 })} $BEPRO Available
                         {isTransactionalTokenApproved && (
                           <span
-                            className="smallCaption text-blue ml-1 cursor-pointer text-uppercase"
+                            className="caption-small text-blue ml-1 cursor-pointer text-uppercase"
                             onClick={() => setIssueAmount({formattedValue: balance.toString()})}>
                         Max
                       </span>

@@ -47,13 +47,13 @@ export default function AccountHero() {
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4 className="h4 mb-0">{formatNumberToCurrency(myIssues.length || 0)}</h4>
-                    <span className="smallCaption">Bounties</span>
+                    <span className="caption-small">Bounties</span>
                   </div>
                 </div>
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4 className="h4 mb-0">{formatNumberToCurrency(+oracles?.tokensLocked + +oracles?.oraclesDelegatedByOthers || 0)}</h4>
-                    <span className="smallCaption">Oracles</span>
+                    <span className="caption-small">Oracles</span>
                   </div>
                 </div>
                 <div className="col-md-3">
@@ -61,7 +61,7 @@ export default function AccountHero() {
                     <h4 className="h4 mb-0">
                       {formatNumberToCurrency(oracles?.delegatedToOthers || 0)}
                     </h4>
-                    <span className="smallCaption">Delegated oracles</span>
+                    <span className="caption-small">Delegated oracles</span>
                   </div>
                 </div>
                 <div className="col-md-3">
@@ -69,7 +69,7 @@ export default function AccountHero() {
                     <h4 className="h4 mb-0">
                       {formatNumberToCurrency(+oracles?.oraclesDelegatedByOthers || 0)}
                     </h4>
-                    <span className="smallCaption">Delegated by Others</span>
+                    <span className="caption-small">Delegated by Others</span>
                   </div>
                 </div>
               </div>

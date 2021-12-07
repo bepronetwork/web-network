@@ -30,7 +30,7 @@ export default function PullRequestHero({
                   href={{ pathname: '/bounty', query: { id: issueId, repoId } }}
                   icon={<i className="ico-back me-2" />}
                   label={`#${githubId} ${title}`}
-                  className="p-nm mediumCaption"
+                  className="p-nm caption"
                   transparent
                 />
               </div>

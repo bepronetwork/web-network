@@ -81,7 +81,7 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
       show={showModal()}
     >
       <div className="d-flex flex-column text-center align-items-center">
-        <strong className="smallCaption d-block text-uppercase text-white-50 mb-3 pb-1">
+        <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
           please, connect to the  <span style={{color: networkMap[requiredNetwork.toLowerCase()]}}><span>{requiredNetwork}</span> network</span><br/> on your metamask wallet
         </strong>
         {isAddingNetwork && <Spinner className="text-blue align-self-center p-2 mt-1 mb-2" style={{width: `5rem`, height: `5rem`}} animation="border" /> || ``}

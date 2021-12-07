@@ -50,13 +50,13 @@ export default function CreatePullRequestModal({
       <div className="container">
         <div>
           <div className="form-group">
-            <label className="smallCaption trans mb-2 text-white-50 text-uppercase">Title</label>
-            <input value={title} onChange={e => setTitle(e.target.value)} type="text" className="form-control" placeholder="Your Issue Title"/>
+            <label className="caption-small trans mb-2 text-white-50 text-uppercase">Bounty Title</label>
+            <input value={title} onChange={e => setTitle(e.target.value)} type="text" className="form-control" placeholder="Your Bounty Title"/>
           </div>
         </div>
         <div>
           <div className="form-group">
-            <label className="smallCaption trans mb-2 text-white-50 text-uppercase">Description</label>
+            <label className="caption-small trans mb-2 text-white-50 text-uppercase">Description</label>
             <textarea value={description}
                       rows={5}
                       onChange={e => setDescription(e.target.value)}
@@ -64,7 +64,7 @@ export default function CreatePullRequestModal({
                       placeholder="Type a description..." />
           </div>
           <div className="form-group">
-            <label className="smallCaption trans mb-2 text-white-50 text-uppercase">Select a branch</label>
+            <label className="caption-small trans mb-2 text-white-50 text-uppercase">Select a branch</label>
             <ReactSelect options={options} onChange={onSelectedBranch} />
           </div>
         </div>

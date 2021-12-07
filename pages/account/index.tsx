@@ -126,7 +126,7 @@ export default function MyIssues() {
                 <MarkedRender source={pendingIssue?.body} />
               </div>
               <div className="bg-dark-gray w-100 text-center mt-4 rounded-4 py-3">
-                <div className="smallCaption fs-smallest text-uppercase text-white">reward</div>
+                <div className="caption-small fs-smallest text-uppercase text-white">reward</div>
                 <div className="h4 mb-0 text-uppercase"><span className="text-white">{formatNumberToCurrency(pendingIssue?.amount)}</span> <span className="text-blue">$BEPRO</span></div>
               </div>
             </Modal>

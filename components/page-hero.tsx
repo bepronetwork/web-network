@@ -30,27 +30,27 @@ export default function PageHero({title = "Find bounties to work",}) {
         <div className="row justify-content-center">
           <div className="col-md-10">
             <div className="d-flex flex-column">
-              <h1 className="h1 mb-0">{title}</h1>
+              <h2>{title}</h2>
               <div className="row">
                 <div className="col-md-3">
                   <div className="top-border">
-                    <h4 className="h4 mb-0">{inProgress}</h4>
-                    <span className="smallCaption">In progress</span>
+                    <h4>{inProgress}</h4>
+                    <span className="caption-small">In progress</span>
                   </div>
                 </div>
                 <div className="col-md-3">
                   <div className="top-border">
-                    <h4 className="h4 mb-0">{closed}</h4>
-                    <span className="smallCaption">Bounties closed</span>
+                    <h4>{closed}</h4>
+                    <span className="caption-small">Bounties closed</span>
                   </div>
                 </div>
                 <div className="col-md-6">
                   <div className="top-border">
-                    <h4 className="h4 mb-0">
+                    <h4>
                       {formatNumberToCurrency(onNetwork)}{" "}
-                      <span className="smallCaption trans">$BEPRO</span>
+                      <span className="caption-small trans">$BEPRO</span>
                     </h4>
-                    <span className="smallCaption">Bounties in the Network</span>
+                    <span className="caption-small">Bounties in the Network</span>
                   </div>
                 </div>
               </div>

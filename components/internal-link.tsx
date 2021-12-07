@@ -20,7 +20,7 @@ export default function InternalLink({
   className = '',
   nav = false,
   transparent = false,
-  active = false,
+  active = undefined,
   iconBefore = false,
   uppercase = false,
   activeClass,
@@ -29,7 +29,7 @@ export default function InternalLink({
   const { asPath } = useRouter()
 
   function getClasses(): string {
-    const isActive = asPath === props.href || active
+    const isActive = active || asPath === props.href
 
     let classes = `${className}`
 
@@ -45,7 +45,7 @@ export default function InternalLink({
     if (uppercase)
       classes += ' text-uppercase '
 
-    return `btn btn-primary text-white bg-opacity-100 d-flex align-items-center justify-content-center text-decoration-none shadow-none ${classes}`
+    return `${!nav && 'btn btn-primary ' || ' main-nav-link '}text-white bg-opacity-100 d-flex align-items-center justify-content-center text-decoration-none shadow-none ${classes}`
   }
 
   return (

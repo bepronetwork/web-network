@@ -174,7 +174,7 @@ export default function ConnectAccount() {
             <div className="row gx-3">
               <div className="col-6">
                 <div className={`button-connect border bg-${githubLogin? `dark border-dark`: `black border-black border-primary-hover cursor-pointer`} rounded d-flex justify-content-between p-3 align-items-center`} onClick={connectGithub}>
-                  {!githubLogin && <div className="mx-auto d-flex align-items-center"><GithubImage width={15} height={15} opacity={1}/> <span className="ms-2 text-uppercase smallCaption">github</span></div>}
+                  {!githubLogin && <div className="mx-auto d-flex align-items-center"><GithubImage width={15} height={15} opacity={1}/> <span className="ms-2 text-uppercase caption-small">github</span></div>}
                   {githubLogin && (
                     <>
                     <div><Avatar src={session?.user?.image} userLogin={githubLogin || `null`} /> <span className="ms-2">{session?.user?.name}</span></div>
@@ -186,7 +186,7 @@ export default function ConnectAccount() {
               </div>
               <div className="col-6">
                 <div className={`button-connect border bg-${currentAddress ? `dark border-dark` : `black border-black border-primary-hover cursor-pointer`} rounded d-flex justify-content-between p-3 align-items-center ${getValidClass()}`} onClick={connectWallet}>
-                  {!currentAddress && <div className="mx-auto d-flex align-items-center">{renderMetamaskLogo()} <span className="ms-2 text-uppercase smallCaption">metamask</span></div>}
+                  {!currentAddress && <div className="mx-auto d-flex align-items-center">{renderMetamaskLogo()} <span className="ms-2 text-uppercase caption-small">metamask</span></div>}
                   {currentAddress && (
                     <>
                     <div>{renderMetamaskLogo()} <span className="ms-2">{currentAddress && truncateAddress(currentAddress) || `Connect wallet`}</span></div>
@@ -197,7 +197,7 @@ export default function ConnectAccount() {
                 </div>
               </div>
             </div>
-            <div className="smallCaption text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-4">
+            <div className="caption-small text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-4">
               By connecting, you accept <a href="https://www.bepro.network/terms-and-conditions" target="_blank" className="text-decoration-none">Terms & Conditions</a> & <a href="https://www.bepro.network/privacy" target="_blank" className="text-decoration-none">PRIVACY POLICY</a>
             </div>
             <div className="d-flex justify-content-center mt-4">

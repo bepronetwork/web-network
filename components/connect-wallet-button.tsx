@@ -118,7 +118,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
       titleClass="h3 text-white bg-opacity-100"
       show={!currentAddress || !metaMaskWallet}>
         <div className="d-flex flex-column text-center align-items-center">
-        <strong className="smallCaption d-block text-uppercase text-white-50 mb-3 pb-1">
+        <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
           to access this page please, connect to the <br/><span style={{color: networkMap[REQUIRED_NETWORK.toLowerCase()]}}><span>{REQUIRED_NETWORK}</span> network</span> on your metamask wallet
         </strong>
           <div className="d-flex justify-content-center align-items-center w-100">

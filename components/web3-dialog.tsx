@@ -25,7 +25,7 @@ export default function WebThreeDialog() {
         <Modal.Title>MetaMask not detected</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p className="smallCaption text-warning text-center">
+        <p className="caption-small text-warning text-center">
           No ETH account available
         </p>
         <div className="d-flex flex-column align-items-center">

@@ -1,0 +1,141 @@
+@font-face {
+  font-family: 'fontRegular';
+  src: url('../assets/fonts/SpaceGrotesk-Regular.ttf') format('ttf'),
+       url('../assets/fonts/SpaceGrotesk-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'fontSemiBold';
+  src: url('../assets/fonts/SpaceGrotesk-SemiBold.ttf') format('ttf'),
+       url('../assets/fonts/SpaceGrotesk-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'fontBold';
+  src: url('../assets/fonts/SpaceGrotesk-Bold.ttf') format('ttf'),
+       url('../assets/fonts/SpaceGrotesk-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inter-Regular';
+  src: url('../assets/fonts/Inter-Regular.ttf') format('ttf'),
+       url('../assets/fonts/Inter-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inter-SemiBold';
+  src: url('../assets/fonts/Inter-SemiBold.ttf') format('ttf'),
+       url('../assets/fonts/Inter-SemiBold.ttf') format('truetype');
+}
+
+
+body {
+  font-family: 'fontRegular', sans-serif;
+  font-feature-settings: 'tnum' on, 'lnum' on, 'ss02' on, 'ss03' on, 'ss04' on;
+}
+
+@mixin heading() {
+  font-family: 'fontBold', sans-serif;
+  font-weight: 400;
+  line-height: 120%;
+  margin: 0;
+}
+
+@for $index from 1 through 4 {
+  h#{$index} {
+    @include heading;
+  }
+}
+
+.caption,
+.caption-small,
+.caption-large {
+  @include heading;
+  letter-spacing: 0.1rem;
+  text-transform: uppercase;
+}
+
+.caption {
+  line-height: 140%;
+  &-small {
+    line-height: 120%;
+  }
+  &-large {
+    line-height: 160%;
+  }
+}
+
+p,
+.p,
+.p-small {
+  font-family: 'Inter-Regular', sans-serif;
+  line-height: 140%;
+  &-bold {
+    font-family: 'Inter-SemiBold', sans-serif;
+    line-height: 160%;
+    letter-spacing: 0.02rem;
+  }
+}
+
+button,
+.btn,
+.small-info {
+  font-family: 'fontSemiBold', sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1rem;
+}
+
+button,
+.btn {
+  line-height: 71%;
+}
+
+.small-info {
+  line-height: 130%;
+}
+
+h1 {
+  font-size: 54px;
+}
+
+h2 {
+  font-size: 42px;
+}
+
+h3 {
+  font-size: 32px;
+}
+
+.h3 {
+  font-size: 32px !important;
+  line-height: 120% !important;
+  letter-spacing: normal !important;
+}
+
+h4 {
+  font-size: 21px;
+  letter-spacing: 0.01rem;
+}
+
+.caption-large {
+  font-size: 16px;
+}
+
+p,
+.p,
+.caption {
+  font-size: 14px;
+}
+
+.caption-small,
+.p-small,
+.p-small-bold,
+button,
+.button {
+  font-size: 12px;
+}
+
+.small-info {
+  font-size: 9px;
+}

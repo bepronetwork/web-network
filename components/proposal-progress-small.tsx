@@ -17,7 +17,7 @@ export default function ProposalProgressSmall({pgClass = ``, value, total, textC
   const percent = ((value / total)* 100).toFixed(2);
 
   return <div className="text-center position-relative d-inline-block col">
-    <div className={`smallCaption`}>
+    <div className={`caption-small`}>
       <span className={textClass}>{formatNumberToNScale(value)}</span>
       <span>/{formatNumberToNScale(total)} oracles</span>
     </div>
@@ -30,6 +30,6 @@ export default function ProposalProgressSmall({pgClass = ``, value, total, textC
         <div style={{...dotStyle, right: 0}} className={`rounded-circle position-absolute ${+percent >= 3 ? `bg-${pgClass}` : `empty-dot`}`}/>
       </div>
     </div>
-    <div className={`smallCaption ${textClass}`}>{percent}%</div>
+    <div className={`caption-small ${textClass}`}>{percent}%</div>
   </div>
 }

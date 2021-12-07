@@ -84,7 +84,7 @@ export default function PageDevelopers() {
 
   return (<>
     <div>
-      <PageHero title="Find bounties to work on"/>
+      <PageHero title="Find Bounties to work"/>
       <div className="container p-footer">
         <div className="row justify-content-center">
           <div className="col-md-10">

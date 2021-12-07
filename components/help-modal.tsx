@@ -16,16 +16,16 @@ export default function HelpModal({ show = false, onCloseClick = () => { } }) {
   ];
 
   function HelpItemRow(item, i) {
-    const rowClassName = `row row-button ${i + 1 !== helpItems.length && `mb-2` || ``} d-flex align-items-center cursor-pointer bg-opac-hover mxn-3 px-3 py-2 text-decoration-none`;
+    const rowClassName = `row row-button d-flex align-items-center cursor-pointer bg-opac-hover mxn-3 px-3 text-decoration-none`;
 
     return (
-      <a className={rowClassName} key={item.title} href={`${item.href}`} target="_blank" style={{ height: 90 }}>
-        <div className="col-2 text-center">
+      <a className={rowClassName} key={item.title} href={`${item.href}`} target="_blank" style={{ height: 70 }}>
+        <div className="col-1 text-center">
           {item.icon}
         </div>
-        <div className="col">
-          <strong className="d-block text-uppercase text-white">{item.title}</strong>
-          <span className="d-block text-white-50">{item.tagline}</span>
+        <div className="col-11">
+          <strong className="d-block caption-small text-white">{item.title}</strong>
+          <span className="d-block text-white-50 p-small">{item.tagline}</span>
         </div>
       </a>
     )
