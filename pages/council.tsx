@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {GetStaticProps} from 'next';
+import {GetServerSideProps, GetStaticProps} from 'next';
 import {IssueData} from '@interfaces/issue-data';
 import ListIssues from '@components/list-issues';
 import PageHero from '@components/page-hero';
@@ -9,6 +9,8 @@ import NothingFound from '@components/nothing-found';
 import InternalLink from '@components/internal-link';
 import useMergeData from '@x-hooks/use-merge-data';
 import usePage from '@x-hooks/use-page';
+import {getSession} from 'next-auth/react';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 
 export default function PageCouncil() {
   const {dispatch} = useContext(ApplicationContext);
@@ -52,8 +54,11 @@ export default function PageCouncil() {
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
-    props: {},
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common',])),
+    },
   };
 };
