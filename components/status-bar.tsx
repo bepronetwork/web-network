@@ -49,14 +49,13 @@ export default function StatusBar() {
       <div className="d-flex align-items-center w-100">
         {renderNetworkStatus()}
         <div className="ms-3 text-gray">|</div>
-        <div className="ms-3">|</div>
-        <div className="ms-3 flex-grow-1 text-center fs-7 text-uppercase family-Regular text-ligth-gray">
+        <div className="ms-3 flex-grow-1 text-center text-uppercase family-Regular status-bar-text text-ligth-gray">
           <Translation label="status.tagline" />
           <a href="https://www.bepro.network/terms-and-conditions" target="_blank" className="ms-2 text-decoration-none text-blue"><Translation label="status.terms-and-conditions"/></a>
         </div>
         <LanguageSelector />
-        <div className="ms-3">|</div>
-        <a className="ms-3 text-decoration-none smallCaption fs-7 text-white" target="_blank" href="https://support.bepro.network/"><Translation label="status.support" /> <ExternalLinkIcon className="ml-1" height={11} width={11} color="text-white"/></a>
+        <div className="ms-3 text-gray">|</div>
+        <a className="ms-3 text-decoration-none caption-small text-white" target="_blank" href="https://support.bepro.network/"><Translation label="status.support" /> <ExternalLinkIcon className="ml-1" height={11} width={11} color="text-white"/></a>
       </div>
     </div>
   </>)

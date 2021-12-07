@@ -10,6 +10,7 @@ import { changeNetwork } from '@contexts/reducers/change-network';
 import { NetworkIds } from '@interfaces/enums/network-ids';
 import Button from './button';
 import { NETWORKS } from '@helpers/networks';
+import Translation from './translation';
 
 const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
 const networkMap = {
@@ -151,7 +152,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
     )
 
   if (!metaMaskWallet)
-    return <Button color='white' className='text-primary bg-opacity-100' onClick={connectWallet}><span>Connect</span> <i className="ico-metamask" /></Button>
+    return <Button color='white' className='text-primary bg-opacity-100' onClick={connectWallet}><span><Translation label={'main-nav.connect'} /></span> <i className="ico-metamask" /></Button>
 
   return children;
 

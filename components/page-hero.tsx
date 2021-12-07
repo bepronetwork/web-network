@@ -1,10 +1,15 @@
 import { GetStaticProps } from "next";
-import {useContext, useEffect, useState} from 'react';
+import {ReactElement, useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
 import {formatNumberToCurrency} from 'helpers/formatNumber'
 import {BeproService} from '@services/bepro-service';
+import Translation from "@components/translation";
 
-export default function PageHero({title = "Find bounties to work",}) {
+interface PageHeroProps {
+  title?: string | ReactElement
+}
+
+export default function PageHero({ title = <Translation label={'heroes.find-bounties-to-work'} /> } : PageHeroProps) {
 
   const {state: {beproInit}} = useContext(ApplicationContext)
   const [inProgress, setInProgress] = useState(0)
@@ -35,22 +40,22 @@ export default function PageHero({title = "Find bounties to work",}) {
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4>{inProgress}</h4>
-                    <span className="caption-small">In progress</span>
+                    <span className="caption-small"><Translation label={'issue.status.in-progress'} /></span>
                   </div>
                 </div>
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4>{closed}</h4>
-                    <span className="caption-small">Bounties closed</span>
+                    <span className="caption-small"><Translation label={'heroes.bounties-closed'} /></span>
                   </div>
                 </div>
                 <div className="col-md-6">
                   <div className="top-border">
                     <h4>
                       {formatNumberToCurrency(onNetwork)}{" "}
-                      <span className="caption-small trans">$BEPRO</span>
+                      <span className="caption-small trans"><Translation label={'$bepro'} /></span>
                     </h4>
-                    <span className="caption-small">Bounties in the Network</span>
+                    <span className="caption-small"><Translation label={'heroes.bounties-in-network'} /></span>
                   </div>
                 </div>
               </div>

@@ -1,11 +1,11 @@
-import { ReactNode } from 'react'
+import { ReactElement, ReactNode } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { UrlObject } from 'url'
 
 interface InternalLinkProps {
   href: string | UrlObject
-  label?: string | number
+  label?: string | number | ReactElement
   className?: string
   transparent?: boolean
   nav?: boolean

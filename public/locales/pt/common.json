@@ -24,6 +24,11 @@
   "account": {
     "hero": {}
   },
+  "heroes": {
+    "find-bounties-to-work": "Encontre recompensas para trabalhar",
+    "bounties-closed": "Recompensas finalizadas",
+    "bounties-in-network": "Recompensas na rede"
+  },
   "connect-states": {
     "github": "",
     "wallet": {}
@@ -69,7 +74,9 @@
     "developers": "Developers",
     "council": "Council",
     "Oracle": "Oracle",
-    "create-bounty": "criar bounty"
+    "create-bounty": "criar bounty",
+    "get-started": "Get Started",
+    "connect": "Conectar"
   },
   "mobile-information": {},
   "nation-dialog": {
