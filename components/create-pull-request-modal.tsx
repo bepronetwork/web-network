@@ -50,8 +50,8 @@ export default function CreatePullRequestModal({
       <div className="container">
         <div>
           <div className="form-group">
-            <label className="smallCaption trans mb-2 text-white-50 text-uppercase">Bounty Title</label>
-            <input value={title} onChange={e => setTitle(e.target.value)} type="text" className="form-control" placeholder="Your Bounty Title"/>
+            <label className="smallCaption trans mb-2 text-white-50 text-uppercase">Title</label>
+            <input value={title} onChange={e => setTitle(e.target.value)} type="text" className="form-control" placeholder="Your Issue Title"/>
           </div>
         </div>
         <div>

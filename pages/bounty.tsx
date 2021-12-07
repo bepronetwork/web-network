@@ -19,6 +19,7 @@ import useApi from '@x-hooks/use-api';
 import TabbedNavigation from '@components/tabbed-navigation';
 import IssuePullRequests from '@components/issue-pull-requests';
 import CustomContainer from '@components/custom-container';
+
 interface NetworkIssue {
   recognizedAsFinished: boolean;
 }
@@ -202,7 +203,7 @@ export default function PageIssue() {
         handleBeproService={getsIssueBeproService}
         handleMicroService={getsIssueMicroService}
         pullRequests={issue?.pullRequests || []}
-        mergeProposals={issue?.mergeProposals?.length}
+        mergeProposals={issue?.mergeProposals}
         amountIssue={networkIssue?.tokensStaked}
         forks={forks}
         githubLogin={currentUser?.githubLogin}
