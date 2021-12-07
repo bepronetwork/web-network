@@ -30,6 +30,6 @@ export default function LanguageSelector() {
                          show={show}
                          onToggle={(n) => setShow(n) }
                          placement="auto">
-    <span className="smallCaption fs-7 text-white cursor-pointer">{locale.toUpperCase()}</span>
+    <span className="caption-small fs-7 text-white cursor-pointer">{locale.toUpperCase()}</span>
   </OverlayTrigger>
 }

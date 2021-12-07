@@ -304,7 +304,7 @@ export default function NewProposal({
   }
 
   function renderRecognizeAsFinished() {
-    return <Button onClick={recognizeAsFinished}>Recognize as finished</Button>;
+    return <Button onClick={recognizeAsFinished} className="mr-1">Recognize as finished</Button>;
   }
 
   useEffect(() => {
