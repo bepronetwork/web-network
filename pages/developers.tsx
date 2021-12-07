@@ -1,4 +1,4 @@
-import { GetStaticProps } from 'next/types';
+import {GetServerSideProps, GetStaticProps} from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
 import PageHero from "@components/page-hero";
 import ListIssues from '@components/list-issues';
@@ -14,6 +14,8 @@ import IssueFilters from '@components/issue-filters';
 import useMergeData from '@x-hooks/use-merge-data';
 import useRepos from '@x-hooks/use-repos';
 import InternalLink from '@components/internal-link';
+import {getSession} from 'next-auth/react';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 
 type Filter = {
   label: string;
@@ -130,8 +132,11 @@ export default function PageDevelopers() {
   </>);
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
-    props: {},
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common',])),
+    },
   };
 };

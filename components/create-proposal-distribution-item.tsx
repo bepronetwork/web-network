@@ -34,12 +34,12 @@ export default function CreateProposalDistributionItem({
 
   function handleValueChange(params: NumberFormatValues) {
     setValue(params.floatValue);
+    onChangeDistribution({ [by]: params.floatValue });
   }
   // Wasted logic.
   // todo: move within InputNumber itself.
   function handleBlur() {
     let enhancedValue = value;
-
     if (value > 100) {
       enhancedValue = 100;
     }
@@ -52,15 +52,16 @@ export default function CreateProposalDistributionItem({
   }
 
   return (
-    <li className="d-flex align-items-center px-3 py-1 my-1 rounded-3">
+    <li className="d-flex align-items-center px-3 py-1 my-1 rounded-3 bg-dark-gray">
       {githubLogin && <Avatar userLogin={githubLogin} className="me-2 mt-1"/>}
-      <span className="flex-grow-1">{by}</span>
-      <div className="flex-shrink-0 w-25">
+      <span className="flex-grow-1 text-uppercase">{by}</span>
+      <div className="flex-shrink-0 w-20">
         <InputNumber
           value={value}
           suffix="%"
           onValueChange={handleValueChange}
           onBlur={handleBlur}
+          className="text-center"
           {...params}
         />
       </div>

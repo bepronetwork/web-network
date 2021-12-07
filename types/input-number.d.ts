@@ -5,5 +5,7 @@ export interface InputNumber extends NumberFormatProps {
   label?: string;
   symbol?: string;
   helperText?: string | ReactElement;
-  error?: string;
+  error?: boolean;
+  success?: boolean;
+  warning?: boolean;
 }

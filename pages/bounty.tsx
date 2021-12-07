@@ -1,4 +1,4 @@
-import { GetStaticProps } from 'next/types';
+import {GetServerSideProps, GetStaticProps} from 'next/types';
 import React, { useContext, useEffect, useState } from 'react';
 import IssueComments from '@components/issue-comments';
 import IssueDescription from '@components/issue-description';
@@ -19,6 +19,9 @@ import useApi from '@x-hooks/use-api';
 import TabbedNavigation from '@components/tabbed-navigation';
 import IssuePullRequests from '@components/issue-pull-requests';
 import CustomContainer from '@components/custom-container';
+import {getSession} from 'next-auth/react';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
+
 interface NetworkIssue {
   recognizedAsFinished: boolean;
 }
@@ -202,7 +205,7 @@ export default function PageIssue() {
         handleBeproService={getsIssueBeproService}
         handleMicroService={getsIssueMicroService}
         pullRequests={issue?.pullRequests || []}
-        mergeProposals={issue?.mergeProposals?.length}
+        mergeProposals={issue?.mergeProposals}
         amountIssue={networkIssue?.tokensStaked}
         forks={forks}
         githubLogin={currentUser?.githubLogin}
@@ -232,8 +235,11 @@ export default function PageIssue() {
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
-    props: {},
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common',])),
+    },
   };
 };
