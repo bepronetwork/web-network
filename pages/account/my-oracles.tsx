@@ -5,6 +5,9 @@ import OraclesTakeBack from '@components/oracles-take-back';
 import Account from '@components/account';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import ExternalLinkIcon from '@assets/icons/external-link-icon';
+import {GetServerSideProps} from 'next';
+import {getSession} from 'next-auth/react';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 
 export default function MyOracles() {
 
@@ -48,3 +51,12 @@ export default function MyOracles() {
     </Account>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
+  return {
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common',])),
+    },
+  };
+};

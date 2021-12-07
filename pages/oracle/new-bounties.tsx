@@ -1,4 +1,4 @@
-import { GetStaticProps } from 'next/types';
+import {GetServerSideProps, GetStaticProps} from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
 import ListIssues from '@components/list-issues';
 import Oracle from '@components/oracle';
@@ -11,6 +11,8 @@ import useCount from '@x-hooks/use-count';
 import Paginate from '@components/paginate';
 import useMergeData from '@x-hooks/use-merge-data';
 import InternalLink from '@components/internal-link';
+import {getSession} from 'next-auth/react';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 
 export default function Newissues() {
   const {dispatch} = useContext(ApplicationContext);
@@ -56,8 +58,11 @@ export default function Newissues() {
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
-    props: {},
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common',])),
+    },
   };
 };

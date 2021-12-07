@@ -3,7 +3,7 @@ import metamaskLogo from '@assets/metamask.png';
 import Image from 'next/image';
 import React, {useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
-import {signOut, useSession, signIn} from 'next-auth/react';
+import {signOut, useSession, signIn, getSession} from 'next-auth/react';
 import {changeGithubHandle} from '@reducers/change-github-handle';
 import {changeGithubLogin} from '@reducers/change-github-login';
 import GithubImage from '@components/github-image';
@@ -22,6 +22,8 @@ import {NetworkIds} from '@interfaces/enums/network-ids';
 import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
 import { CustomSession } from '@interfaces/custom-session';
+import {GetServerSideProps} from 'next';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 
 
 export default function ConnectAccount() {
@@ -218,3 +220,12 @@ export default function ConnectAccount() {
     </div>
   </>
 }
+
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
+  return {
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common',])),
+    },
+  };
+};
