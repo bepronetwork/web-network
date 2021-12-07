@@ -8,7 +8,7 @@ import ProposalItem from '@components/proposal-item';
 import {Proposal} from '@interfaces/proposal';
 import NothingFound from "./nothing-found";
 
-export default function IssueProposals({ metaProposals, metaRequests, numberProposals, issueId, amount, dbId, isFinalized = false, mergedProposal }) {
+export default function IssueProposals({ metaProposals, className='', metaRequests, numberProposals, issueId, amount, dbId, isFinalized = false, mergedProposal }) {
   const { state: {beproStaked, currentAddress} } = useContext(ApplicationContext);
   const [proposals, setProposals] = useState<Proposal[]>([]);
   async function loadProposalsMeta() {
@@ -36,7 +36,7 @@ export default function IssueProposals({ metaProposals, metaRequests, numberProp
   useEffect(() => { loadProposalsMeta() }, [issueId, numberProposals, currentAddress]);
 
   return (
-    <div className={`content-wrapper pt-0 ${proposals.length > 0 && 'pb-0' || 'pb-3'}`}>
+    <div className={`content-wrapper ${className} pt-0 ${proposals.length > 0 && 'pb-0' || 'pb-3'}`}>
       {metaProposals?.length > 0 && proposals.map(proposal =>
                         <ProposalItem key={proposal._id}
                                       proposal={proposal}

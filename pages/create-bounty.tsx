@@ -179,7 +179,7 @@ export default function PageCreateIssue() {
           <div className="row justify-content-center">
             <div className="col-md-10">
               <div className="d-flex justify-content-center">
-                <h1 className="h1 mb-0">Create new bounty</h1>
+                <h1 className="h1 mb-0">Create new Bounty</h1>
               </div>
             </div>
           </div>
@@ -198,7 +198,7 @@ export default function PageCreateIssue() {
                        value={issueTitle}
                        onChange={e => setIssueTitle(e.target.value)}
                 />
-                <p className="p-small trans my-2">Tip: Try to be as much descriptive as possible</p>
+                <p className="p-small trans my-2">Tip: Try to be as descriptive as possible</p>
               </div>
               <div className="form-group">
                 <label className="smallCaption mb-2 text-uppercase">Description</label>

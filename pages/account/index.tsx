@@ -115,6 +115,7 @@ export default function MyIssues() {
                    centerTitle={true}
                    okLabel="update"
                    cancelLabel="cancel"
+                   titlePosition="center"
                    className="max-height-body modal-md"
                    onOkClick={() => createPendingIssue()}
                    onCloseClick={() => updatePendingIssue(null)}>
