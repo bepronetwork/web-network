@@ -46,13 +46,6 @@ const filtersByIssueState: FiltersByIssueState = [
   }
 ];
 
-const options_time = [
-  {
-    value: "All time",
-    label: "All time",
-  },
-];
-
 export default function PageDevelopers() {
   const {dispatch, state: {loading, currentAddress}} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
