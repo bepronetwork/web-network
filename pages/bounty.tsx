@@ -21,7 +21,6 @@ import IssuePullRequests from '@components/issue-pull-requests';
 import CustomContainer from '@components/custom-container';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
-
 interface NetworkIssue {
   recognizedAsFinished: boolean;
 }
