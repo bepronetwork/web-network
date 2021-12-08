@@ -18,6 +18,7 @@ import {useRouter} from 'next/router';
 import useApi from '@x-hooks/use-api';
 import useTransactions from '@x-hooks/useTransactions';
 import LockedIcon from "@assets/icons/locked-icon";
+import { ProposalData } from "@services/github-microservice";
 
 interface pageActions {
   issueId: string;
@@ -27,7 +28,7 @@ interface pageActions {
   isIssueinDraft: boolean;
   state?: IssueState | string;
   pullRequests?: pullRequest[];
-  mergeProposals?: number;
+  mergeProposals?: ProposalData[];
   amountIssue?: string | number;
   forks?: { owner: developer }[];
   title?: string;
@@ -188,7 +189,7 @@ export default function PageActions({
                                   isFinished={finished}
                                   isIssueOwner={issueCreator == currentAddress}
                                   amountTotal={amountIssue}
-                                  numberMergeProposals={mergeProposals}
+                                  mergeProposals={mergeProposals}
                                   pullRequests={pullRequests}
                                   handleBeproService={handleBeproService}
                                   handleMicroService={handleMicroService}/>
