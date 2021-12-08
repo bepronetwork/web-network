@@ -49,7 +49,7 @@ const filtersByIssueState: FiltersByIssueState = [
 ];
 
 export default function PageDevelopers() {
-  const {dispatch, state: {loading, currentAddress}} = useContext(ApplicationContext);
+  const {dispatch, state: { loading }} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
   const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
   const mergedData = useMergeData();
