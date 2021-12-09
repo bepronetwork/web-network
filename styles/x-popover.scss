@@ -3,7 +3,7 @@
 .popover {
   border-radius: 7px;
   border: solid 1px $ligth-gray;
-  div {
+  div:not(.stats) {
     font-family: Inter-Regular, sans-serif;
     color: $gray;
     font-size: 12px;

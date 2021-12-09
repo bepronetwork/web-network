@@ -123,13 +123,13 @@ export default function ConnectWalletButton({children = null, forceLogin = false
           to access this page please, connect to the <br/><span style={{color: networkMap[REQUIRED_NETWORK.toLowerCase()]}}><span>{REQUIRED_NETWORK}</span> network</span> on your metamask wallet
         </strong>
           <div className="d-flex justify-content-center align-items-center w-100">
-              <div className="rounded-3 bg-dark-gray text-white p-3 d-flex text-center justify-content-center align-items-center w-75 cursor-pointer" onClick={connectWallet}>
+              <div className="rounded-8 bg-dark-gray text-white p-3 d-flex text-center justify-content-center align-items-center w-75 cursor-pointer" onClick={connectWallet}>
                   <Image src={metamaskLogo} width={15} height={15}/>
-                  <span className="text-white text-uppercase ms-2">metamask</span>
+                  <span className="text-white text-uppercase ms-2 caption-large">metamask</span>
               </div>
         </div>
 
-        <div className="smallInfo text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-1 pt-1">
+        <div className="small-info text-ligth-gray text-center text-dark text-uppercase mt-1 pt-1">
         by connecting, you accept{" "}
           <a
             href="https://www.bepro.network/terms-and-conditions"

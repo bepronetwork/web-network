@@ -21,7 +21,7 @@ export default function MobileInformation() {
               If you want to use it you must connect to our web application via
               desktop.
             </p>
-            <p className="text-white-50 mb-0 mt-4 text-center">
+            <p className="text-white mb-0 mt-4 text-center">
               Stay updated on
             </p>
             <a href="https://www.bepro.network/">@bepronet</a>

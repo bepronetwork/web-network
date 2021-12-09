@@ -86,7 +86,7 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
         </strong>
         {isAddingNetwork && <Spinner className="text-blue align-self-center p-2 mt-1 mb-2" style={{width: `5rem`, height: `5rem`}} animation="border" /> || ``}
         <Button className='my-3' disabled={isButtonDisabled()} onClick={handleAddNetwork}>Change network</Button>
-        <div className="smallInfo text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-1 pt-1">
+        <div className="small-info text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-1 pt-1">
         by connecting, you accept{" "}
           <a
             href="https://www.bepro.network/terms-and-conditions"

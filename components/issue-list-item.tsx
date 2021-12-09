@@ -72,7 +72,7 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
           </h4>
           <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2">
             <span
-              className={`status caption-small ${handleColorState(issue?.state)} mr-2 mt-1`}
+              className={`status caption-small ${handleColorState(issue?.state)} mr-2`}
             >
               {issue?.state}
             </span>

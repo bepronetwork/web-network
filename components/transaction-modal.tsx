@@ -43,9 +43,9 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
 
   function renderDetailRow(item): any {
     return <>
-      <div className="d-flex align-items-center justify-content-between bg-dark-gray py-3 mt-2 px-3 rounded">
-        <span className="caption-small text-white-50 fs-smallest text-uppercase">{item.span}</span>
-        <span className=".p text-white fs-small">{item.content}</span>
+      <div className="d-flex align-items-center justify-content-between bg-dark-gray py-2 mt-2 px-3 rounded-8">
+        <span className="caption-small text-white-50">{item.span}</span>
+        <span className="p text-white">{item.content}</span>
       </div>
     </>
   }
@@ -88,7 +88,7 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
           </a>
         </div>
       </div>
-      <div className="d-flex py-2 mb-1 caption-small text-white bg-opacity-100 fs-smallest">
+      <div className="d-flex py-2 mb-3 caption-small text-white bg-opacity-100 fs-smallest">
         <span>From: {addressFrom}</span>
         <div className="mx-auto"><ArrowRightSmall/></div>
         <span>To: {addressTo}</span>
