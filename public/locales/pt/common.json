@@ -5,8 +5,9 @@
   "please-wait": "Só um momento",
   "close": "fechar",
   "filters": {
-    "search-repositories": "procurar repositorios",
-    "repository": "repositorio",
+    "filters": "Filtros",
+    "search-repositories": "Procurar Repositórios",
+    "repository": "Repositório",
     "all": "Todos",
     "bounties": {
       "title": "estado da bounty",
@@ -25,9 +26,9 @@
     "hero": {}
   },
   "heroes": {
-    "find-bounties-to-work": "Encontre recompensas para trabalhar",
-    "bounties-closed": "Recompensas finalizadas",
-    "bounties-in-network": "Recompensas na rede"
+    "find-bounties-to-work": "Encontre bounties para trabalhar",
+    "bounties-closed": "Bounties finalizadas",
+    "bounties-in-network": "Bounties na rede"
   },
   "connect-states": {
     "github": "",
@@ -74,8 +75,8 @@
     "developers": "Developers",
     "council": "Council",
     "Oracle": "Oracle",
-    "create-bounty": "criar bounty",
-    "get-started": "Get Started",
+    "create-bounty": "Criar Bounty",
+    "get-started": "Comece Agora",
     "connect": "Conectar"
   },
   "mobile-information": {},

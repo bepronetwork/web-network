@@ -28,6 +28,10 @@
        url('../assets/fonts/Inter-SemiBold.ttf') format('truetype');
 }
 
+@function is-important($important){
+  @return #{if($important, '!important', '')};
+}
+
 .family-Regular {
   font-family: 'Inter-SemiBold', sans-serif;
 }
@@ -37,16 +41,20 @@ body {
   font-feature-settings: 'tnum' on, 'lnum' on, 'ss02' on, 'ss03' on, 'ss04' on;
 }
 
-@mixin heading() {
-  font-family: 'fontBold', sans-serif;
-  font-weight: 400;
-  line-height: 120%;
+@mixin heading($important: false) {
+  font-family: 'fontBold', sans-serif is-important($important);
+  font-weight: 400 is-important($important);
+  line-height: 120% is-important($important);
   margin: 0;
 }
 
 @for $index from 1 through 4 {
   h#{$index} {
     @include heading;
+  }
+
+  .h#{$index} {
+    @include heading(true);
   }
 }
 
@@ -78,6 +86,12 @@ p,
     line-height: 160%;
     letter-spacing: 0.02rem;
   }
+}
+
+.p,
+.p-small {
+  font-family: 'Inter-Regular', sans-serif !important;
+  line-height: 140% !important;
 }
 
 button,
@@ -112,13 +126,17 @@ h3 {
 
 .h3 {
   font-size: 32px !important;
-  line-height: 120% !important;
   letter-spacing: normal !important;
 }
 
 h4 {
   font-size: 21px;
   letter-spacing: 0.01rem;
+}
+
+.h4 {
+  font-size: 21px !important;
+  letter-spacing: 0.01rem !important;
 }
 
 .caption-large {

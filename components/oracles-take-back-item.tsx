@@ -66,7 +66,7 @@ export default function OraclesTakeBackItem({
       <div className="bg-dark-gray w-100 mb-1 p-3 border-radius-8">
         <div className="row align-items-center">
           <div className="col-md-6">
-            <p className="largeCaption text-bold text-purple mb-1 text-uppercase">{formatNumberToString(amount, 2)} ORACLES</p>
+            <p className="caption-large text-bold text-purple mb-1 text-uppercase">{formatNumberToString(amount, 2)} ORACLES</p>
             <p className="caption-small text-white mb-0">{address}</p>
           </div>
           <div className="col-md-6 d-flex justify-content-end">

@@ -13,7 +13,7 @@ export default function IssueComments({ comments, repo, issueId }) {
         <div className="col-md-10">
           <div className="content-wrapper">
             <div className="d-flex justify-content-between align-items-center mb-3">
-              <h3 className="caption-small mb-0">{comments?.length} comments</h3>
+              <h3 className="caption-large mb-0">{comments?.length} comments</h3>
               <a href={replyRef} className="text-decoration-none" target="_blank">
                   <Button transparent outline color="primary">Reply on github <ExternalLinkIcon className="ml-1" color="primary"/></Button>
               </a>

@@ -110,7 +110,7 @@ export default function MyIssues() {
         <div className="row justify-content-center">
           {pendingIssues?.length &&
           <div className="col-md-10">
-            <div className="h4 mb-4">Pending bounties</div>
+            <h4 className="mb-4">Pending bounties</h4>
             {pendingIssues.map(issue => <IssueListItem issue={issue} xClick={() => updatePendingIssue(issue)}/>)}
             <hr/>
             <Modal title="Set bounty as draft" show={!!pendingIssue}
@@ -121,13 +121,13 @@ export default function MyIssues() {
                    className="max-height-body modal-md"
                    onOkClick={() => createPendingIssue()}
                    onCloseClick={() => updatePendingIssue(null)}>
-              <div className="h4 text-white mb-4">{pendingIssue?.title}</div>
+              <h4 className="text-white mb-4">{pendingIssue?.title}</h4>
               <div className="bg-dark-gray p-3 rounded-4 height-body">
                 <MarkedRender source={pendingIssue?.body} />
               </div>
               <div className="bg-dark-gray w-100 text-center mt-4 rounded-4 py-3">
                 <div className="caption-small fs-smallest text-uppercase text-white">reward</div>
-                <div className="h4 mb-0 text-uppercase"><span className="text-white">{formatNumberToCurrency(pendingIssue?.amount)}</span> <span className="text-blue">$BEPRO</span></div>
+                <h4 className="mb-0 text-uppercase"><span className="text-white">{formatNumberToCurrency(pendingIssue?.amount)}</span> <span className="text-blue">$BEPRO</span></h4>
               </div>
             </Modal>
           </div> || ``

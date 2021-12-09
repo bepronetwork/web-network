@@ -13,14 +13,14 @@ export default function ProposalHero({githubId, title, pullRequestId, authorPull
                     <div className="col-md-10">
                         <div className="d-flex flex-column">
                             <div className="d-flex align-items-center cursor-pointer text-truncate">
-                                <InternalLink iconBefore={true} href={{ pathname:"/bounty", query: { id: issueId, repoId }}} icon={<i className="ico-back me-2" />} label={`#${githubId} ${title}`} className="p-nm trans" transparent />
+                                <InternalLink iconBefore={true} href={{ pathname:"/bounty", query: { id: issueId, repoId }}} icon={<i className="ico-back me-2" />} label={`#${githubId} ${title}`} className="p trans pl-0" transparent nav />
                             </div>
                             <div className="row">
                                 <div className="col-md-9">
                                     <div className="top-border">
                                         <h1 className="h4 mb-0">Pull Request #{pullRequestId} by @{authorPullRequest}</h1>
                                         <div className="d-flex align-center flex-wrap justify-content-center justify-content-md-start">
-                                            <span className="p-small mr-3 mt-1">Created at {createdAt}</span>
+                                            <span className="p-small mr-3 mt-1 text-gray">Created at {createdAt}</span>
                                         </div>
                                     </div>
                                 </div>

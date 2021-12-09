@@ -106,7 +106,7 @@ export default function PageActions({
           target="_blank"
         >
           <IssueAvatars users={forks.map((item) => item.owner)} />
-          <span className="me-3 fs-small">Forks</span>
+          <span className="me-3 caption-small">Forks</span>
         </a>
       );
     }
@@ -393,7 +393,7 @@ export default function PageActions({
           <div className="d-flex align-items-center justify-content-between mb-4">
             <h4 className="h4 d-flex align-items-center">Details</h4>
             <div className="d-flex align-items-center">
-              {!canClose && !finalized && <span className="mr-2 text-uppercase caption-small text-danger">Pull request has merge conflicts and can't be merged</span> || ``}
+              {!canClose && !finalized && <span className="mr-2 caption-small text-danger">Pull request has merge conflicts and can't be merged</span> || ``}
               {renderIssueAvatars()}
               {forks && renderForkAvatars()}
 

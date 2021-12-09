@@ -4,6 +4,7 @@ import useFilters from '@x-hooks/use-filters';
 import Button from '@components/button';
 import FilterIcon from '@assets/icons/filter-icon';
 import { useRouter } from 'next/router';
+import Translation from './translation';
 
 export default function IssueFilters() {
   const node = useRef()
@@ -40,7 +41,7 @@ export default function IssueFilters() {
   useEffect(loadOutsideClick, [show]);
 
   return <div className="position-relative d-flex justify-content-end" ref={node}>
-    <Button color="outline-dark bg-blue-hover" className={show && `border-blue` || ``} onClick={() => setShow(!show)}>{countFilters()} <span>Filters</span></Button>
+    <Button color="outline-dark bg-blue-hover" className={show && `border-blue` || ``} onClick={() => setShow(!show)}>{countFilters()} <span><Translation label="filters.filters" /></span></Button>
     <div className={`filter-wrapper d-${show ? `flex` : `none`} justify-content-start align-items-stretch position-absolute`}>
       <div>
         <IssueFilterBox className="h-100" title="repository" options={repoOptions} filterPlaceholder="Search repositories"
