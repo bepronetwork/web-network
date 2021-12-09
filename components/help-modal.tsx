@@ -4,15 +4,17 @@ import ChatIcon from '@assets/icons/chat-icon';
 import FeedbackIcon from '@assets/icons/feedback-icon';
 import Modal from '@components/modal';
 import PageIcon from '@assets/icons/page-icon';
+import { useTranslation } from 'next-i18next';
 
 export default function HelpModal({ show = false, onCloseClick = () => { } }) {
+  const { t } = useTranslation('modals')
   const helpItem = (title = ``, tagline = ``, icon, href = ``) => ({ title, tagline, icon, href });
 
   const helpItems = [
-    helpItem(`help center`, `Know more about Bepro Network and how to use it.`, <HelpIcon />, `http://support.bepro.network`),
-    helpItem(`api documentation`, `Develop with bepro-js and create your next web3 app.`, <PageIcon />, `http://docs.bepro.network`),
-    helpItem(`live chat`, `Chat with the community and get live support.`, <ChatIcon />, `https://discord.gg/bepronetwork`),
-    helpItem(`provide feedback`, `Product feedback and requests.`, <FeedbackIcon />, `https://discord.gg/bepronetwork`),
+    helpItem(`help-modal.help-center.title`, `help-modal.help-center.content`, <HelpIcon />, `http://support.bepro.network`),
+    helpItem(`help-modal.api-documentation.title`, `help-modal.api-documentation.content`, <PageIcon />, `http://docs.bepro.network`),
+    helpItem(`help-modal.live-chat.title`, `help-modal.live-chat.content`, <ChatIcon />, `https://discord.gg/bepronetwork`),
+    helpItem(`help-modal.provide-feedback.title`, `help-modal.provide-feedback.content`, <FeedbackIcon />, `https://discord.gg/bepronetwork`),
   ];
 
   function HelpItemRow(item, i) {
@@ -24,15 +26,15 @@ export default function HelpModal({ show = false, onCloseClick = () => { } }) {
           {item.icon}
         </div>
         <div className="col-10">
-          <strong className="d-block caption-small text-white">{item.title}</strong>
-          <span className="d-block text-white-50 p-small">{item.tagline}</span>
+          <strong className="d-block caption-small text-white">{t(item.title)}</strong>
+          <span className="d-block text-white-50 p-small">{t(item.tagline)}</span>
         </div>
       </a>
     )
   }
 
   return <>
-    <Modal show={show} title="Help" titlePosition="center" onCloseClick={onCloseClick} backdrop={true} >
+    <Modal show={show} title={String(t('help-modal.title'))} titlePosition="center" onCloseClick={onCloseClick} backdrop={true} >
       {helpItems.map(HelpItemRow)}
     </Modal>
   </>
