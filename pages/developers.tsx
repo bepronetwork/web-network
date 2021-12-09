@@ -48,15 +48,8 @@ const filtersByIssueState: FiltersByIssueState = [
   }
 ];
 
-const options_time = [
-  {
-    value: "All time",
-    label: "All time",
-  },
-];
-
 export default function PageDevelopers() {
-  const {dispatch, state: {loading, currentAddress}} = useContext(ApplicationContext);
+  const {dispatch, state: { loading }} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
   const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
   const mergedData = useMergeData();
@@ -102,7 +95,22 @@ export default function PageDevelopers() {
             </div>
           </div>
           <ListIssues listIssues={issues} />
-          {issues?.length !== 0 && <Paginate count={results.count} onChange={(page) => router.push({pathname: `/`, query:{page}})} />}
+          {issues?.length !== 0 && (
+              <Paginate
+                count={results.count}
+                onChange={(page) =>
+                  router.push({
+                    pathname: router.pathname,
+                    query: {
+                      page,
+                      state,
+                      time,
+                      repoId,
+                    },
+                  })
+                }
+              />
+            )}
           {issues?.length === 0 && !loading.isLoading ? (
             <div className="col-md-10">
               <NothingFound
