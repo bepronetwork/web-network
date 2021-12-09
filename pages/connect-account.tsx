@@ -170,11 +170,11 @@ export default function ConnectAccount() {
       <div className="row justify-content-center">
         <div className="col-md-8 d-flex justify-content-center">
           <div className="content-wrapper mt-up mb-5">
-            <strong className="capition d-block text-uppercase mb-4">To access and use our network please connect your github account and web3 wallet</strong>
+            <strong className="caption-large d-block text-uppercase mb-4">To access and use our network please connect your github account and web3 wallet</strong>
             <div className="row gx-3">
               <div className="col-6">
-                <div className={`button-connect border bg-${githubLogin? `dark border-dark`: `black border-black border-primary-hover cursor-pointer`} rounded d-flex justify-content-between p-3 align-items-center`} onClick={connectGithub}>
-                  {!githubLogin && <div className="mx-auto d-flex align-items-center"><GithubImage width={15} height={15} opacity={1}/> <span className="ms-2 text-uppercase caption-small">github</span></div>}
+                <div className={`button-connect border bg-${githubLogin? `dark border-dark`: `black border-black border-primary-hover cursor-pointer`} d-flex justify-content-between p-3 align-items-center`} onClick={connectGithub}>
+                  {!githubLogin && <div className="mx-auto d-flex align-items-center"><GithubImage width={15} height={15} opacity={1}/> <span className="ms-2 text-uppercase caption-large">github</span></div>}
                   {githubLogin && (
                     <>
                     <div><Avatar src={session?.user?.image} userLogin={githubLogin || `null`} /> <span className="ms-2">{session?.user?.name}</span></div>
@@ -185,8 +185,8 @@ export default function ConnectAccount() {
                 </div>
               </div>
               <div className="col-6">
-                <div className={`button-connect border bg-${currentAddress ? `dark border-dark` : `black border-black border-primary-hover cursor-pointer`} rounded d-flex justify-content-between p-3 align-items-center ${getValidClass()}`} onClick={connectWallet}>
-                  {!currentAddress && <div className="mx-auto d-flex align-items-center">{renderMetamaskLogo()} <span className="ms-2 text-uppercase caption-small">metamask</span></div>}
+                <div className={`button-connect border bg-${currentAddress ? `dark border-dark` : `black border-black border-primary-hover cursor-pointer`} d-flex justify-content-between p-3 align-items-center ${getValidClass()}`} onClick={connectWallet}>
+                  {!currentAddress && <div className="mx-auto d-flex align-items-center">{renderMetamaskLogo()} <span className="ms-2 text-uppercase caption-large">metamask</span></div>}
                   {currentAddress && (
                     <>
                     <div>{renderMetamaskLogo()} <span className="ms-2">{currentAddress && truncateAddress(currentAddress) || `Connect wallet`}</span></div>

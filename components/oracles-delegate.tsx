@@ -84,7 +84,7 @@ function OraclesDelegate(): JSX.Element {
   return (
     <div className="col-md-5">
       <div className="content-wrapper h-100">
-        <OraclesBoxHeader actions="Delegate oracles" available={delegatedAmount} />
+        <OraclesBoxHeader actions="Delegate Oracles" available={delegatedAmount} />
         <p className="caption-small text-white text-uppercase mt-2 mb-3">Delegate Oracles to use them in bounties</p>
         <InputNumber
           label="Oracles Amount"

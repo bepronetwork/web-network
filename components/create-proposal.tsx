@@ -338,31 +338,28 @@ export default function NewProposal({
                    {!currentAddress || participants.length === 0 || !success && <LockedIcon width={12} height={12} className="mr-1"/>}
                    <span >Create Proposal</span>
                  </Button>
-                 <Button color='dark-gray' onClick={handleClose}>
-                   Cancel
-                 </Button>
 
                  <Button color='dark-gray' onClick={handleClose}>
                    Cancel
                  </Button>
                </>
              }>
-        <p className="smallCaption text-white-50 text-uppercase">Select a pull request </p>
+        <p className="caption-small text-white-50 mb-2 mt-2">Select a pull request </p>
         <ReactSelect id="pullRequestSelect"
                       isDisabled={participants.length === 0}
                      defaultValue={{
                        value: pullRequests[0]?.id,
-                       label: `#${pullRequests[0]?.githubId} Pull Request`,
+                       label: `#${pullRequests[0]?.githubId} by @${pullRequests[0].githubLogin}`,
                        githubId: pullRequests[0]?.githubId,
                      }}
                      options={pullRequests?.map((items: pullRequest) => ({
                        value: items.id,
-                       label: `#${items.githubId} Pull Request`,
+                       label: `#${items.githubId} by @${items.githubLogin}`,
                        githubId: items.githubId,
                      }))}
                      onChange={handleChangeSelect}/>
         {participants.length === 0 && <p className="text-uppercase text-danger text-center w-100 caption mt-4 mb-0">Network Congestion</p> || <>
-          <p className="smallCaption mt-3 text-white-50 text-uppercase">Propose distribution</p>
+          <p className="caption-small mt-3 text-white-50 text-uppercase mb-2 mt-3">Propose distribution</p>
           <ul className="mb-0">
             {participants.map((item) => (
                                 <CreateProposalDistributionItem key={item.githubHandle}
@@ -379,13 +376,13 @@ export default function NewProposal({
           </ul>
           <div className="d-flex" style={{ justifyContent: "flex-end" }}>
               {warning ? (
-                <p className="smallCaption pr-3 mt-3 mb-0 text-uppercase text-warning">
+                <p className="caption-small pr-3 mt-3 mb-0 text-uppercase text-warning">
                   This distribution already existis on another proposal
                 </p>
               ) : (
                 <p
                   className={clsx(
-                    "smallCaption pr-3 mt-3 mb-0  text-uppercase",
+                    "caption-small pr-3 mt-3 mb-0  text-uppercase",
                     {
                       "text-success": success,
                       "text-danger": error,

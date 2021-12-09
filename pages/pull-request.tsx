@@ -1,6 +1,10 @@
 import { useContext, useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
+
 import { head } from 'lodash'
+import { useRouter } from 'next/router'
+import { getSession } from 'next-auth/react'
+import { GetServerSideProps } from 'next/types'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 import Button from '@components/button'
 import Comment from '@components/comment'
@@ -125,7 +129,7 @@ export default function PullRequest() {
       <CustomContainer>
         <div className="row align-items-center bg-shadow border-radius-8 px-3 py-4">
           <div className="col-8">
-            <span className="largeCaption text-uppercase">
+            <span className="caption-large text-uppercase">
               {pullRequest?.comments?.length} Review
               {(pullRequest?.comments?.length !== 1 && 's') || ''}
             </span>

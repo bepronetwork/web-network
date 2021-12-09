@@ -39,7 +39,7 @@ export default function PullRequestHero({
                   <div className="top-border">
                     <h1 className="h4 mb-3">Pull Request #{pullRequestId}</h1>
                     <div className="d-flex align-items-center flex-wrap justify-content-center justify-content-md-start">
-                      <span className="p-small mr-2">
+                      <span className="caption-small text-gray mr-2">
                         Created at {createdAt}
                       </span>
 
@@ -49,7 +49,7 @@ export default function PullRequestHero({
                         value={activeRepo?.githubPath?.split('/')[1]}
                       />
 
-                      <span className="p-small ml-2 mr-2">BY</span>
+                      <span className="caption-small text-gray ml-2 mr-2">BY</span>
 
                       <GithubInfo
                         color="white"

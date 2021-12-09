@@ -56,7 +56,7 @@ export default function CreateReviewModal({
           <p className="h4 mb-2">Pull Request #{pullRequest?.githubId}</p>
 
           <div className="d-flex align-items-center flex-wrap justify-content-center justify-content-md-start">
-            <span className="caption-small trans mr-2">
+            <span className="caption-small text-gray mr-2">
               Created at {pullRequest && formatDate(pullRequest?.createdAt)}
             </span>
 
@@ -67,7 +67,7 @@ export default function CreateReviewModal({
               value={activeRepo?.githubPath?.split('/')[1]}
             />
 
-            <span className="p-small ml-2 mr-2">BY</span>
+            <span className="caption-small text-gray ml-2 mr-2">BY</span>
 
             <GithubInfo
               color="white"
@@ -80,7 +80,7 @@ export default function CreateReviewModal({
         </div>
         <div>
           <div className="form-group">
-            <label className="caption-small trans mb-2 text-white-50 text-uppercase">
+            <label className="caption-small mb-2 text-gray">
               Review
             </label>
             <textarea

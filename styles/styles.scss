@@ -109,6 +109,7 @@ li {
       color: $gray;
     }
     &__single-value {
+      @extend .p-small;
       color: $white;
     }
     &__control--is-focused &__single-value {
@@ -901,6 +902,11 @@ $c_props: ('m': 'margin') !default;
   path {
     fill: map-get($theme-colors, 'primary')
   }
+
+  svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
 }
 
 .bg-black {
@@ -917,6 +923,7 @@ $c_props: ('m': 'margin') !default;
 .connect-account{
   .button-connect{
     height: 60px;
+    border-radius: math.div($m, 2);
   }
 }
 

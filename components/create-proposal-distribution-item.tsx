@@ -54,7 +54,7 @@ export default function CreateProposalDistributionItem({
   return (
     <li className="d-flex align-items-center px-3 py-1 my-1 rounded-3 bg-dark-gray">
       {githubLogin && <Avatar userLogin={githubLogin} className="me-2 mt-1"/>}
-      <span className="flex-grow-1 text-uppercase">{by}</span>
+      <span className="flex-grow-1 caption-small">@{by}</span>
       <div className="flex-shrink-0 w-20">
         <InputNumber
           value={value}

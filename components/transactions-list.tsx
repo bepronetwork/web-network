@@ -43,7 +43,7 @@ export default function TransactionsList({onActiveTransaction = (transaction) =>
           {IconMaps[item.type] || <HelpIcon/>}
 
           <div className="ms-3 me-auto">
-            {item.amount && <h6 className="caption text-white text-uppercase">{formatNumberToCurrency(item.amount)} {item.currency}</h6> || ``}
+            {item.amount && <span className="caption-large text-white text-uppercase">{formatNumberToCurrency(item.amount)} {item.currency}</span> || ``}
             <TransactionType type={item.type}/>
           </div>
 

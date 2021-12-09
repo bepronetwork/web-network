@@ -5,6 +5,7 @@
   "please-wait": "Please wait",
   "close": "Close",
   "filters": {
+    "filters": "Filters",
     "search-repositories": "Search repositories",
     "repository": "repository",
     "all": "All",

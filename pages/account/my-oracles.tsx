@@ -40,7 +40,7 @@ export default function MyOracles() {
                   <h4 className="h4 mb-0 text-white bg-opacity-100">How to use Oracles?</h4>
                   <ExternalLinkIcon className="ml-1" color="text-white-50"/>
                 </div>
-                <p>
+                <p className="caption-small text-gray">
                   Oracles can be used for Curators or as a requirement to create Distributions in the Network
                 </p>
               </div>
