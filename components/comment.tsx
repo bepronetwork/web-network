@@ -15,7 +15,7 @@ export default function Comment({ comment }) {
         </span>
       </p>
 
-      <p className="p-small content-wrapper child mb-0">
+      <p className="p-small content-wrapper child mb-0 comment">
         <MarkedRender source={comment?.body || `_No comment available_`} />
       </p>
     </div>
