@@ -25,14 +25,5 @@ export default function NotFound() {
         </div>
       </div>
     </div>
-  </div>
+  </div>  
 }
-
-export const getServerSideProps: GetServerSideProps = async ({locale}) => {
-  return {
-    props: {
-      session: await getSession(),
-      ...(await serverSideTranslations(locale, ['common',])),
-    },
-  };
-};
