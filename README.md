@@ -24,3 +24,13 @@ npm run migrate
 ```bash
 npm run dev
 ```
+
+### Deploying new contracts and connect repos for local host development
+- Change the `NEXT_PUBLIC_ADMIN_WALLET_ADDRESS` to contain yours
+- issue `$ npm run dev`
+- hop on `localhost:3000/parity`
+
+### Deploying new contracts and connect repos for local host development
+- Change the `NEXT_PUBLIC_ADMIN_WALLET_ADDRESS` to contain yours
+- issue `$ npm run dev`
+- hop on `localhost:3000/parity`
