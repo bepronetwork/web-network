@@ -46,17 +46,17 @@ export default function CreatePullRequestModal({
   }, [accessToken, repo]);
 
   return (
-    <Modal size="lg" show={show} onCloseClick={onCloseClick} title="Create pull request" titlePosition="center">
+    <Modal size="lg" show={show} onCloseClick={onCloseClick} title="Create Pull request" titlePosition="center">
       <div className="container">
         <div>
           <div className="form-group">
-            <label className="caption-small trans mb-2 text-white-50 text-uppercase">Bounty Title</label>
+            <label className="caption-small mb-2 text-gray">Title</label>
             <input value={title} onChange={e => setTitle(e.target.value)} type="text" className="form-control" placeholder="Your Bounty Title"/>
           </div>
         </div>
         <div>
           <div className="form-group">
-            <label className="caption-small trans mb-2 text-white-50 text-uppercase">Description</label>
+            <label className="caption-small mb-2 text-gray">Description</label>
             <textarea value={description}
                       rows={5}
                       onChange={e => setDescription(e.target.value)}
@@ -64,7 +64,7 @@ export default function CreatePullRequestModal({
                       placeholder="Type a description..." />
           </div>
           <div className="form-group">
-            <label className="caption-small trans mb-2 text-white-50 text-uppercase">Select a branch</label>
+            <label className="caption-small mb-2 text-gray">Select a branch</label>
             <ReactSelect options={options} onChange={onSelectedBranch} />
           </div>
         </div>

@@ -47,9 +47,7 @@ export default function TransactionsList({onActiveTransaction = (transaction) =>
             <TransactionType type={item.type}/>
           </div>
 
-          <div>
-            <TransactionStats status={item.status}/>
-          </div>
+          <TransactionStats status={item.status}/>
 
         </div>
       </div>

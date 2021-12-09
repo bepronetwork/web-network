@@ -17,7 +17,7 @@ export default function TransactionStats({status = null}: {status: TransactionSt
   }
 
   function rowClassName() {
-    return `bg-transparent caption-small text-uppercase px-2 py-1 rounded border border-2 border-${ColorMap[status]} text-${ColorMap[status]} text-uppercase fs-small`
+    return `bg-transparent stats caption-small text-uppercase px-2 py-1 rounded border border-2 border-${ColorMap[status]} text-${ColorMap[status]}`
   }
 
   return <><div className={rowClassName()}><strong>{StatusMap[status]}</strong></div></>
