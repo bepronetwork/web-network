@@ -5,6 +5,7 @@ import Button from '@components/button';
 import FilterIcon from '@assets/icons/filter-icon';
 import { useRouter } from 'next/router';
 import Translation from './translation';
+import { useTranslation } from 'next-i18next';
 
 export default function IssueFilters() {
   const node = useRef()
@@ -12,6 +13,7 @@ export default function IssueFilters() {
   const [[repoOptions, stateOptions, timeOptions], updateOptions] = useFilters();
   const router = useRouter();
   const { state, time, repoId } = router.query
+  const { t } = useTranslation('common')
 
   function countFilters() {
     const value = +!!state + +!!time + +!!repoId;
@@ -44,13 +46,13 @@ export default function IssueFilters() {
     <Button color="outline-dark bg-blue-hover" className={show && `border-blue` || ``} onClick={() => setShow(!show)}>{countFilters()} <span><Translation label="filters.filters" /></span></Button>
     <div className={`filter-wrapper d-${show ? `flex` : `none`} justify-content-start align-items-stretch position-absolute`}>
       <div>
-        <IssueFilterBox className="h-100" title="repository" options={repoOptions} filterPlaceholder="Search repositories"
+        <IssueFilterBox className="h-100" title={t('filters.repository')} options={repoOptions} filterPlaceholder={t('filters.search-repositories')}
                         onChange={(opt, checked) => updateOptions(repoOptions, opt, checked, 'repo')}/>
       </div>
       <div>
-        <IssueFilterBox title="timeframe" options={timeOptions}
+        <IssueFilterBox title={t('filters.timeframe.title')} options={timeOptions}
                         onChange={(opt, checked) => updateOptions(timeOptions, opt, checked, 'time')}/>
-        <IssueFilterBox title="bounty state" options={stateOptions}
+        <IssueFilterBox title={t('filters.bounties.title')} options={stateOptions}
                         onChange={(opt, checked) => updateOptions(stateOptions, opt, checked, 'state')}/>
       </div>
     </div>

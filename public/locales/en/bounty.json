@@ -1,0 +1,29 @@
+{
+  "label": {
+    "singular": "bounty",
+    "plural": "bounties"
+  },
+  "no-comments-available": "_No comments available_",
+  "description": "description",
+  "view-all-addresses": "view all address",
+  "steps": {
+    "draft": "Draft",
+    "development": "Development",
+    "finalized": "Finalized",
+    "validation": "validation & disputes",
+    "closed": "closed & distributed"
+  },
+  "status": {
+    "ready": "ready",
+    "draft": "draft",
+    "closed": "closed",
+    "completed": "completed",
+    "canceled": "canceled",
+    "until-done": "{{distance}} until done",
+    "pending": "pending",
+    "in-progress": "in progress"
+  },
+  "errors": {
+    "fetching": "Error fetching bounty"
+  }
+}

@@ -11,9 +11,14 @@
     "all": "All",
     "bounties": {
       "title": "bounty state",
+      "all": "All bounties",
       "open": "Open bounties",
       "draft": "Draft bounties",
-      "closed": "Closed bounties"
+      "closed": "Closed bounties",
+      "not-found": "Bounties not found",
+      "open-not-found": "Open bounties not found",
+      "draft-not-found": "Draft bounties not found",
+      "closed-not-found": "Closed bounties not found"
     },
     "timeframe": {
       "title": "timeframe",
@@ -33,43 +38,6 @@
   "connect-states": {
     "github": "",
     "wallet": {}
-  },
-  "issue": {
-    "no-comments-available": "_No comments available_",
-    "description": "description",
-    "view-all-addresses": "view all address",
-    "steps": {
-      "draft": "Draft",
-      "development": "Development",
-      "finalized": "Finalized",
-      "validation": "validation & disputes",
-      "closed": "closed & distributed"
-    },
-    "status": {
-      "completed": "completed",
-      "canceled": "canceled",
-      "until-done": "{{distance}} until done",
-      "pending": "pending",
-      "in-progress": "in progress"
-    }
-  },
-  "help-modal": {
-    "help-center": {
-      "title": "help center",
-      "content": "Know more about Bepro Network and how to use it."
-    },
-    "api-documentation": {
-      "title": "api documentation",
-      "content": "Develop with bepro-js and create your next web3 app."
-    },
-    "live-chat": {
-      "title": "live chat",
-      "content": "Explore tutorials and help articles"
-    },
-    "provide-feedback": {
-      "title": "provide feedback",
-      "content": "Provide feedback"
-    }
   },
   "main-nav": {
     "developers": "Developers",
@@ -95,5 +63,16 @@
     "tagline": "Bepro Network Services and BEPRO Token ($BEPRO) are not available in Excluded Jurisdictions. By accessing and using the interface you agree with our",
     "terms-and-conditions": "Terms & Conditions",
     "support": "support"
+  },
+  "actions": {
+    "create-one": "Create one",
+    "view-on-github": "View on Github",
+    "reply-on-github": "Reply on Github",
+    "view-pull-request": "View Pull Request"
+  },
+  "misc": {
+    "comments": "comments",
+    "comment": "comment",
+    "by": "by"
   }
 }
