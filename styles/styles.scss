@@ -1129,3 +1129,9 @@ textarea.form-control {
   resize: none;
   border-radius: math.div($m, 2);
 }
+
+.comment {
+  img {
+    width: 100%;
+  }
+}

@@ -23,6 +23,9 @@ import { IssueData, pullRequest } from '@interfaces/issue-data'
 import LockedIcon from '@assets/icons/locked-icon'
 import useApi from '@x-hooks/use-api'
 import { addToast } from '@contexts/reducers/add-toast'
+import { GetServerSideProps } from 'next'
+import { getSession } from 'next-auth/react'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 export default function PullRequest() {
   const {
@@ -166,3 +169,12 @@ export default function PullRequest() {
     </>
   )
 }
+
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
+  return {
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common',])),
+    },
+  };
+};
