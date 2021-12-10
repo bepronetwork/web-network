@@ -10,7 +10,7 @@
     "migrate": "sequelize db:migrate",
     "migrate:undo": "sequelize db:migrate:undo",
     "clean": "npm cache clean --force && rm -rf .next",
-    "dev": "next dev",
+    "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
     "prebuild": "next telemetry disable",
     "build": "next build",
     "start": "next start",

@@ -1,4 +1,5 @@
 import {formatNumberToNScale} from '@helpers/formatNumber';
+import Translation from '@components/translation';
 
 interface Options {
   pgClass: string;
@@ -19,7 +20,7 @@ export default function ProposalProgressSmall({pgClass = ``, value, total, textC
   return <div className="text-center position-relative d-inline-block col">
     <div className={`caption-small`}>
       <span className={textClass}>{formatNumberToNScale(value)}</span>
-      <span>/{formatNumberToNScale(total)} oracles</span>
+      <span>/{formatNumberToNScale(total)} <Translation label={'oracles'} /></span>
     </div>
     <div className={`progress bg-gray w-100`}>
       <div className={`wrapper wrapper-${pgClass} w-100`} />

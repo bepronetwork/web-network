@@ -12,6 +12,7 @@ import {ApplicationContext} from '@contexts/application';
 import Button from './button';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import useTransactions from '@x-hooks/useTransactions';
+import Translation from './translation';
 
 interface Options {
   proposal: Proposal,
@@ -82,15 +83,17 @@ export default function ProposalItem({
   }
 
   function getLabel() {
+    let action = 'dispute'
+
     if (isFinalized && !proposal.isDisputed && isMerged) {
-      return `Accepted`
+      action = 'accepted'
     }
 
     if (proposal.isDisputed || (isFinalized && !isMerged)) {
-      return `Failed`
+      action = 'failed'
     }
 
-    return `Dispute`
+    return <Translation label={`actions.${action}`} />
   }
 
 
@@ -101,7 +104,7 @@ export default function ProposalItem({
           <div className="rounded row align-items-top">
             <div
               className={`col-3 caption-small mt-2 text-uppercase text-${getColors() === 'purple' ? 'white' : getColors()}`}>
-              PR #{proposal.pullRequestGithubId} {owner && `BY @${owner}`}
+              <Translation label={'pull-request.abbreviation'} /> #{proposal.pullRequestGithubId} <Translation label={'misc.by'} /> {owner && ` @${owner}`}
             </div>
             <div className="col-5 d-flex justify-content-start mb-2">
               {proposal.prAmounts.map((value, i) =>
