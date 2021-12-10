@@ -2,13 +2,14 @@ import Avatar from "components/avatar";
 import { GetStaticProps } from "next";
 import { formatDate } from '@helpers/formatDate';
 import GithubInfo from '@components/github-info';
+import Translation from "./translation";
 
 export default function IssueHero({ issue, state, amount }) {
 
   function renderCreator() {
     if(issue?.creatorGithub)
     return <div className="d-flex align-items-center">
-          <span className="mr-2 text-white-50">by</span> <GithubInfo color="white" value={[`@`, issue.creatorGithub].join(``)} /> <Avatar className="mx-2" userLogin={issue.creatorGithub} />
+          <span className="mr-2 text-white-50"><Translation label={'misc.by'} /></span> <GithubInfo color="white" value={[`@`, issue.creatorGithub].join(``)} /> <Avatar className="mx-2" userLogin={issue.creatorGithub} />
         </div>
   }
 
@@ -18,7 +19,7 @@ export default function IssueHero({ issue, state, amount }) {
         <div className="row justify-content-center">
           <div className="col-md-10">
             <div className="d-flex flex-column">
-              <h1 className="text-capitalize h3">{state} bounty</h1>
+              <h1 className="text-capitalize h3"><Translation label={`bounty.status.${state}`} /> <Translation label={`bounty.label`} /></h1>
               <div className="row">
                 <div className="col-md-9">
                   <div className="top-border">
@@ -48,7 +49,7 @@ export default function IssueHero({ issue, state, amount }) {
                     {amount && (
                       <h4 className="mb-0">
                         {amount || `&infin;`}
-                        <span className="p-small"> $BEPRO</span>
+                        <span className="p-small"> <Translation label={`$bepro`} /></span>
                       </h4>
                     )}
                   </div>

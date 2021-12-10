@@ -21,6 +21,7 @@ import IssuePullRequests from '@components/issue-pull-requests';
 import CustomContainer from '@components/custom-container';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
+import Translation from '@components/translation';
 interface NetworkIssue {
   recognizedAsFinished: boolean;
 }
@@ -48,7 +49,7 @@ export default function PageIssue() {
   const tabs = [
     {
       eventKey: 'proposals',
-      title: `${networkIssue?.mergeProposalsAmount || 0} Proposal${networkIssue?.mergeProposalsAmount !== 1 && 's' || ''}`,
+      title: <Translation label={'proposal.labelWithCount'} params={{count: networkIssue?.mergeProposalsAmount || 0}} />,
       isEmpty: !(networkIssue?.mergeProposalsAmount > 0),
       component: <IssueProposals
         metaProposals={issue?.mergeProposals}
@@ -65,7 +66,7 @@ export default function PageIssue() {
     {
       eventKey: 'pull-requests',
       isEmpty: !(mergedPullRequests.length > 0),
-      title: `${mergedPullRequests.length} Pull Request${mergedPullRequests.length !== 1 && 's' || ''}`,
+      title: <Translation label={'pull-request.labelWithCount'} params={{count: mergedPullRequests.length || 0}} />,
       component: <IssuePullRequests className="border-top-0" repoId={issue?.repository_id} issueId={issue?.issueId} pullResquests={mergedPullRequests} />
     }
   ]
