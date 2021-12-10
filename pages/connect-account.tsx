@@ -31,6 +31,7 @@ export default function ConnectAccount() {
   const [lastAddressBeforeConnect, setLastAddressBeforeConnect] = useState(``);
   const [isGhValid, setIsGhValid] = useState(null)
   const [githubLogin, setGithubLogin] = useState(null)
+  const [userAcessToken, setUserAcessToken] = useState<string>("")
   const {data: session} = useSession();
   const router = useRouter();
   const { migrate } = router.query;
@@ -61,6 +62,9 @@ export default function ConnectAccount() {
                         if (user?.githubLogin)
                           setGithubLogin(user.githubLogin);
 
+                        if (user?.accessToken)
+                          setUserAcessToken(user.accessToken)
+
                         if (!user)
                           return;
 
@@ -81,7 +85,8 @@ export default function ConnectAccount() {
 
     const user = await getUserOf(currentAddress);
 
-    if (user && (user.githubHandle || user.githubLogin.toLowerCase() !== githubLogin.toLowerCase())) {
+    if (user && (user.githubHandle || user.accessToken.toLowerCase() !== userAcessToken.toLowerCase())) {
+
       dispatch(changeLoadState(false));
       return dispatch(toastError(`Migration not possible or already happened`));
     }
