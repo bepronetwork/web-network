@@ -1,15 +1,29 @@
 import models from "@db/models";
 import { NextApiRequest, NextApiResponse } from "next";
-import NextCors from 'nextjs-cors';
+import Cors from "cors";
 
-async function getTotal(req: NextApiRequest , res: NextApiResponse) {
+function initMiddleware(middleware) {
+  return (req, res) =>
+    new Promise((resolve, reject) => {
+      middleware(req, res, (result) => {
+        if (result instanceof Error) {
+          return reject(result);
+        }
+        return resolve(result);
+      });
+    });
+}
+
+const cors = initMiddleware(
+  Cors({
+    methods: ["GET", "POST", "OPTIONS"],
+    origin: process.env.NEXT_PUBLIC_API_HOST,
+  })
+);
+
+async function getTotal(req: NextApiRequest, res: NextApiResponse) {
   // Run the cors middleware
-  await NextCors(req, res, {
-    // Options
-    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-    origin: '*',
-    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
- });
+  cors(req, res);
 
   const userCount = await models.user.count();
 
