@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react';
 import {formatNumberToNScale, formatNumberToString} from '@helpers/formatNumber';
+import Translation from './translation';
 
 export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null, issueDisputeAmount = 0, isFinished = false, isCurrentPRMerged=false}) {
   const [issueState, setIssueState] = useState<string>(``);
@@ -70,7 +71,7 @@ export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null
       <div className="col d-flex justify-content-between">
         <h4 className={`h4 text-capitalize text-${issueColor} mb-4`}>{issueState}</h4>
         <div className="fs-small caption d-flex align-items-center mb-4">
-          <span className={`text-${issueColor}`}>{formatNumberToString(issueDisputeAmount, 2)} </span> /{formatNumberToNScale(stakedAmount)} ORACLES <span className={`text-${issueColor}`}> ({percentage}%)</span>
+          <span className={`text-${issueColor} text-uppercase`}>{formatNumberToString(issueDisputeAmount, 2)} </span> /{formatNumberToNScale(stakedAmount)} <Translation label="$oracles" /> <span className={`text-${issueColor}`}> ({percentage}%)</span>
         </div>
       </div>
     </div>

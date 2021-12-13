@@ -19,7 +19,7 @@ export default function IssueHero({ issue, state, amount }) {
         <div className="row justify-content-center">
           <div className="col-md-10">
             <div className="d-flex flex-column">
-              <h1 className="text-capitalize h3"><Translation label={`bounty.status.${state}`} /> <Translation label={`bounty.label`} /></h1>
+              <h1 className="text-capitalize h3"><Translation ns="bounty" label={`status.${state}`} /> <Translation ns="bounty" label={`label`} /></h1>
               <div className="row">
                 <div className="col-md-9">
                   <div className="top-border">

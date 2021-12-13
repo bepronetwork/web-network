@@ -30,7 +30,7 @@ export default function PageDevelopers() {
   const {dispatch, state: { loading }} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
   const mergedData = useMergeData();
-  const { t } = useTranslation(['common', 'bounty']);
+  const { t } = useTranslation(['common']);
   
   const filtersByIssueState: FiltersByIssueState = [
     {
@@ -132,7 +132,7 @@ export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
       session: await getSession(),
-      ...(await serverSideTranslations(locale, ['common'])),
+      ...(await serverSideTranslations(locale, ['common', 'bounty'])),
     },
   };
 };

@@ -69,13 +69,13 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
             <span className="text-gray trans me-2">#{issue?.githubId}</span>
             {(issue?.title || ``).length > 61
               ? (issue?.title || ``).substring(0, 61) + "..."
-              : issue?.title || <Translation label={`bounty.errors.fetching`} />}
+              : issue?.title || <Translation ns="bounty" label={`errors.fetching`} />}
           </h4>
           <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2">
             <span
               className={`status caption-small ${handleColorState(issue?.state)} mr-2`}
             >
-              {issue && <Translation label={`bounty.status.${issue.state}`} />}
+              {issue && <Translation ns="bounty" label={`status.${issue.state}`} />}
             </span>
             <span className="p-small mr-2 mt-1 text-gray trans">
               <Translation label={`misc.comments`} params={{

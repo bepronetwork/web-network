@@ -62,7 +62,7 @@ export default function NewProposal({
   const {getParticipants} = useOctokit();
   const {getUserWith, waitForMerge, processMergeProposal, processEvent} = useApi();
   const txWindow = useTransactions();
-  const { t } = useTranslation('common')
+  const { t } = useTranslation(['common', 'bounty', 'proposal', 'pull-request'])
 
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
@@ -292,7 +292,7 @@ export default function NewProposal({
                   if (e?.message?.search(`User denied`) > -1)
                     dispatch(updateTransaction({...recognizeAsFinished.payload as any, remove: true}))
                   else dispatch(updateTransaction({...recognizeAsFinished.payload as any, status: TransactionStatus.failed}));
-                  dispatch(toastWarning(t('bounty.errors.recognize-finished')));
+                  dispatch(toastWarning(t('bounty:errors.recognize-finished')));
                   console.error(`Failed to mark as finished`, e);
                 })
   }
@@ -306,7 +306,7 @@ export default function NewProposal({
   }
 
   function renderRecognizeAsFinished() {
-    return <Button onClick={recognizeAsFinished} className="mr-1">{t('bounty.actions.recognize-finished.title')}</Button>;
+    return <Button onClick={recognizeAsFinished} className="mr-1">{t('bounty:actions.recognize-finished.title')}</Button>;
   }
 
   useEffect(() => {
@@ -329,7 +329,7 @@ export default function NewProposal({
         || isIssueOwner && !isFinished && renderRecognizeAsFinished()
       }
       <Modal show={show}
-             title={t('proposal.new')}
+             title={t('proposal:title')}
              titlePosition="center"
              onCloseClick={handleClose}
              footer={
@@ -338,7 +338,7 @@ export default function NewProposal({
                    onClick={handleClickCreate}
                    disabled={!currentAddress || participants.length === 0 || !success}>
                    {!currentAddress || participants.length === 0 || !success && <LockedIcon width={12} height={12} className="mr-1"/>}
-                   <span >{t('proposal.actions.create')}</span>
+                   <span >{t('proposal:actions.create')}</span>
                  </Button>
 
                  <Button color='dark-gray' onClick={handleClose}>
@@ -346,9 +346,10 @@ export default function NewProposal({
                  </Button>
                </>
              }>
-        <p className="caption-small text-white-50 mb-2 mt-2">{t('pull-request.select')}</p>
+        <p className="caption-small text-white-50 mb-2 mt-2">{t('pull-request:select')}</p>
         <ReactSelect id="pullRequestSelect"
                       isDisabled={participants.length === 0}
+                      placeholder={t('forms.select-placeholder')}
                      defaultValue={{
                        value: pullRequests[0]?.id,
                        label: `#${pullRequests[0]?.githubId} ${t('misc.by')} @${pullRequests[0].githubLogin}`,
@@ -361,7 +362,7 @@ export default function NewProposal({
                      }))}
                      onChange={handleChangeSelect}/>
         {participants.length === 0 && <p className="text-uppercase text-danger text-center w-100 caption mt-4 mb-0">{t('status.network-congestion')}</p> || <>
-          <p className="caption-small mt-3 text-white-50 text-uppercase mb-2 mt-3">{t('proposal.actions.propose-distribution')}</p>
+          <p className="caption-small mt-3 text-white-50 text-uppercase mb-2 mt-3">{t('proposal:actions.propose-distribution')}</p>
           <ul className="mb-0">
             {participants.map((item) => (
                                 <CreateProposalDistributionItem key={item.githubHandle}
@@ -379,7 +380,7 @@ export default function NewProposal({
           <div className="d-flex" style={{ justifyContent: "flex-end" }}>
               {warning ? (
                 <p className="caption-small pr-3 mt-3 mb-0 text-uppercase text-warning">
-                  {t('proposal.errors.distribution-already-exists')}
+                  {t('proposal:errors.distribution-already-exists')}
                 </p>
               ) : (
                 <p
@@ -391,7 +392,7 @@ export default function NewProposal({
                     }
                   )}
                 >
-                  {t(`proposal.messages.distribution-${success ? "is" : "must-be"}-100`)}
+                  {t(`proposal:messages.distribution-${success ? "is" : "must-be"}-100`)}
                 </p>
               )}
             </div>

@@ -7,14 +7,14 @@ import PageIcon from '@assets/icons/page-icon';
 import { useTranslation } from 'next-i18next';
 
 export default function HelpModal({ show = false, onCloseClick = () => { } }) {
-  const { t } = useTranslation('modals')
+  const { t } = useTranslation('common')
   const helpItem = (title = ``, tagline = ``, icon, href = ``) => ({ title, tagline, icon, href });
 
   const helpItems = [
-    helpItem(`help-modal.help-center.title`, `help-modal.help-center.content`, <HelpIcon />, `http://support.bepro.network`),
-    helpItem(`help-modal.api-documentation.title`, `help-modal.api-documentation.content`, <PageIcon />, `http://docs.bepro.network`),
-    helpItem(`help-modal.live-chat.title`, `help-modal.live-chat.content`, <ChatIcon />, `https://discord.gg/bepronetwork`),
-    helpItem(`help-modal.provide-feedback.title`, `help-modal.provide-feedback.content`, <FeedbackIcon />, `https://discord.gg/bepronetwork`),
+    helpItem(`modals.help-modal.help-center.title`, `modals.help-modal.help-center.content`, <HelpIcon />, `http://support.bepro.network`),
+    helpItem(`modals.help-modal.api-documentation.title`, `modals.help-modal.api-documentation.content`, <PageIcon />, `http://docs.bepro.network`),
+    helpItem(`modals.help-modal.live-chat.title`, `modals.help-modal.live-chat.content`, <ChatIcon />, `https://discord.gg/bepronetwork`),
+    helpItem(`modals.help-modal.provide-feedback.title`, `modals.help-modal.provide-feedback.content`, <FeedbackIcon />, `https://discord.gg/bepronetwork`),
   ];
 
   function HelpItemRow(item, i) {
@@ -34,7 +34,7 @@ export default function HelpModal({ show = false, onCloseClick = () => { } }) {
   }
 
   return <>
-    <Modal show={show} title={String(t('help-modal.title'))} titlePosition="center" onCloseClick={onCloseClick} backdrop={true} >
+    <Modal show={show} title={String(t('modals.help-modal.title'))} titlePosition="center" onCloseClick={onCloseClick} backdrop={true} >
       {helpItems.map(HelpItemRow)}
     </Modal>
   </>

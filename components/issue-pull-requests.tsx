@@ -8,7 +8,7 @@ export default function IssuePullRequests({
   issueId,
   pullResquests = []
 }) {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('pull-request')
 
   return (
     <div
@@ -24,7 +24,7 @@ export default function IssuePullRequests({
             pullRequest={pullRequest}
             issueId={issueId}
           />
-        ))) || <NothingFound description={t('pull-request.errors.not-found')} />}
+        ))) || <NothingFound description={t('errors.not-found')} />}
     </div>
   )
 }

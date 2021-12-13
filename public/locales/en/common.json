@@ -2,6 +2,7 @@
   "title": "Hello world",
   "$oracles": "Oracles",
   "$bepro": "$BEPRO",
+  "bepro": "BEPRO",
   "please-wait": "Please wait",
   "close": "Close",
   "filters": {
@@ -29,95 +30,6 @@
   },
   "account": {
     "hero": {}
-  },
-  "bounty": {
-    "label": "bounty",
-    "label_one": "bounty",
-    "label_other": "bounties",
-    "labelWithCount_one": "{{count}} bounty",
-    "labelWithCount_other": "{{count}} bounties",
-    "no-comments-available": "_No comments available_",
-    "description": "description",
-    "view-all-addresses": "view all address",
-    "steps": {
-      "draft": "Draft",
-      "development": "Development",
-      "finalized": "Finalized",
-      "validation": "validation & disputes",
-      "closed": "closed & distributed"
-    },
-    "status": {
-      "ready": "ready",
-      "draft": "draft",
-      "closed": "closed",
-      "completed": "completed",
-      "canceled": "canceled",
-      "until-done": "{{distance}} until done",
-      "pending": "pending",
-      "in-progress": "in progress"
-    },
-    "actions": {
-      "redeem": "Redeem",
-      "recognize-finished": {
-        "title": "Recognize as finished",
-        "error": "Failed to mark bounty as finished"
-      },
-      "start-working": {
-        "title": "Start Working",
-        "success": "To start working on this bounty",
-        "error": "To start working on this bounty"
-      }
-    },
-    "errors": {
-      "fetching": "Error fetching bounty",
-      "no-workers": "No one is working"
-    }
-  },
-  "proposal": {
-    "label_one": "proposal",
-    "label_other": "proposals",
-    "labelWithCount_one": "{{count}} proposal",
-    "labelWithCount_other": "{{count}} proposals",
-    "new": "New Proposal",
-    "actions": {
-      "create": "Create Proposal",
-      "propose-distribution": "Propose Distribution"
-    },
-    "messages": {
-      "distribution-is-100": "Distribution is 100%",
-      "distribution-must-be-100": "Distribution Must be 100%"
-    },
-    "errors": {
-      "not-found": "No proposals found",
-      "distribution-already-exists": "This distribution already exists no another proposal"
-    }
-  },
-  "pull-request": {
-    "label_one": "pull request",
-    "label_other": "pull requests",
-    "labelWithCount_one": "{{count}} pull request",
-    "labelWithCount_other": "{{count}} pull requests",
-    "abbreviation": "PR",
-    "select": "Select a Pull Request",
-    "review_one": "{{count}} review",
-    "review_other": "{{count}} reviews",
-    "actions": {
-      "create": {
-        "title": "Create Pull Request",
-        "success": "Created Pull Request",
-        "error": "To create pull request"
-      },
-      "merge": {
-        "title": "Merge",
-        "success": "",
-        "error": ""
-      },
-      "view": "View Pull Request"
-    },
-    "errors": {
-      "not-found": "No pull requests found",
-      "merge-conflicts": "Pull request has merge conflicts and can't be merged"
-    }
   },
   "heroes": {
     "find-bounties-to-work": "Find Bounties to work",
@@ -155,14 +67,21 @@
   },
   "actions": {
     "accepted": "Accepted",
+    "approve": "Approve",
     "cancel": "Cancel",
+    "close": "Close",
+    "connect": "Connect",
+    "connect-github": "Connect your GitHub account!",
+    "connect-wallet": "Connect Wallet",
     "create-one": "Create one",
     "dispute": "Dispute",
+    "done": "Done",
     "failed": "Failed",
     "fork-repository": "Fork this Repository",
     "redeem": "Redeem",
     "reply-on-github": "Reply on Github",
     "review": "Review",
+    "make-a-review": "Make a Review",
     "success": "Success",
     "view-on-github": "View on Github"
   },
@@ -170,12 +89,59 @@
     "by": "by",
     "comments_one": "{{count}} comment",
     "comments_other": "{{count}} comments",
+    "created-at": "Created at",
     "description": "Description",
     "details": "Details",
     "forks": "Forks",
-    "title": "Title"
+    "title": "Title",
+    "github": "Github",
+    "metamask": "Metamask",
+    "by-connecting": "By connecting, you accept",
+    "terms-and-conditions": "Terms & Conditions",
+    "privacy-policy": "Privacy Policy"
+  },
+  "modals": {
+    "help-modal": {
+      "title": "Help",
+      "help-center": {
+        "title": "help center",
+        "content": "Know more about Bepro Network and how to use it."
+      },
+      "api-documentation": {
+        "title": "api documentation",
+        "content": "Develop with bepro-js and create your next web3 app."
+      },
+      "live-chat": {
+        "title": "live chat",
+        "content": "Explore tutorials and help articles."
+      },
+      "provide-feedback": {
+        "title": "provide feedback",
+        "content": "Provide feedback."
+      }
+    },
+    "not-mergeable": {
+      "title": "Merging bounty",
+      "closed-bounty": "This bounty was closed and distributed but the code was unable to be merged.",
+      "open-bounty": "This proposal has github conflicts and cannot be merged. Please, fix it before doing so.",
+      "go-to-pr": "Go to Pull Request",
+      "success-message": "Pull Request merged",
+      "merge-failed": "Merge Failed",
+      "retry-merge": "Retry Merge"
+    },
+    "create-review": {
+      "title": "Review",
+      "fields": {
+        "review": {
+          "label": "Review",
+          "placeholder": "Type a review..."
+        }
+      },
+      "create-review": "Create Review"
+    }
   },
   "forms": {
+    "select-placeholder": "Select...",
     "create-pull-request": {
       "title": {
         "label": "Title",
@@ -189,5 +155,15 @@
         "label": "Select a branch"
       }
     }
+  },
+  "errors": {
+    "approve-transaction": "Failed to approve transaction",
+    "creating-issue": "Failed to create github issue!"
+  },
+  "404": {
+    "the-page": "The page you looking for was",
+    "not-found": "not found.",
+    "the-link-may-be-moved": "The link you followed may be broken or the page may have been moved.",
+    "back-to-home": "Back to homepage"
   }
 }

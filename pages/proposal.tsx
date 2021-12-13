@@ -23,6 +23,7 @@ import NotMergeableModal from '@components/not-mergeable-modal';
 import useOctokit from '@x-hooks/use-octokit';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 
 interface ProposalBepro {
   disputes: string;
@@ -64,6 +65,7 @@ export default function PageProposal() {
   const {getUserOf,} = useApi();
   const {getIssue,} = useMergeData();
   const {getPullRequest} = useOctokit();
+  const { t } = useTranslation('common')
 
   async function getProposalData() {
     const [repoId, ghId] = String(issueId).split(`/`);
@@ -183,7 +185,7 @@ export default function PageProposal() {
         repoPath={issueMicroService?.repo}
         canClose={isMergiable}
         finished={isFinished} />
-      <ProposalAddresses addresses={usersAddresses} currency="$BEPRO" />
+      <ProposalAddresses addresses={usersAddresses} currency={t('$bepro')} />
       <NotMergeableModal
         currentGithubLogin={githubLogin}
         issuePRs={issuePRs}
@@ -203,7 +205,7 @@ export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
       session: await getSession(),
-      ...(await serverSideTranslations(locale, ['common',])),
+      ...(await serverSideTranslations(locale, ['common', 'proposal', 'pull-request', 'connect-wallet-button'])),
     },
   };
 };

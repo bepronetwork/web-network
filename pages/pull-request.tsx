@@ -24,12 +24,9 @@ import { formatDate } from '@helpers/formatDate'
 import { formatNumberToCurrency } from '@helpers/formatNumber'
 
 import { IssueData, pullRequest } from '@interfaces/issue-data'
-import LockedIcon from '@assets/icons/locked-icon'
 import useApi from '@x-hooks/use-api'
 import { addToast } from '@contexts/reducers/add-toast'
-import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/react'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useTranslation } from 'next-i18next'
 
 export default function PullRequest() {
   const {
@@ -45,6 +42,7 @@ export default function PullRequest() {
   const [isExecuting, setIsExecuting] = useState(false)
   const [pullRequest, setPullRequest] = useState<pullRequest>()
   const { getIssue, getMergedDataFromPullRequests } = useMergeData()
+  const { t } = useTranslation(['common', 'pull-request'])
 
   const { repoId, issueId, prId, review } = router.query
 
@@ -79,8 +77,8 @@ export default function PullRequest() {
         dispatch(
           addToast({
             type: 'success',
-            title: 'Success',
-            content: 'Review submitted'
+            title: t('actions.success'),
+            content: t('pull-request:actions.review.success')
           })
         )
 
@@ -93,8 +91,8 @@ export default function PullRequest() {
         dispatch(
           addToast({
             type: 'danger',
-            title: 'Failed',
-            content: 'To submit review'
+            title: t('actions.failed'),
+            content: t('pull-request:actions.review.error')
           })
         )
 
@@ -130,15 +128,14 @@ export default function PullRequest() {
         <div className="row align-items-center bg-shadow border-radius-8 px-3 py-4">
           <div className="col-8">
             <span className="caption-large text-uppercase">
-              {pullRequest?.comments?.length} Review
-              {(pullRequest?.comments?.length !== 1 && 's') || ''}
+              {t('pull-request:review', { count: pullRequest?.comments?.length })}
             </span>
           </div>
 
           <div className="col-2 p-0 d-flex justify-content-center">
             {currentAddress && githubLogin && pullRequest?.state === 'open' && (
               <Button onClick={handleShowModal}>
-                <span>Make a Review</span>
+                {t('actions.make-a-review')}
               </Button>
             )}
           </div>
@@ -149,7 +146,7 @@ export default function PullRequest() {
               forcePath={activeRepo?.githubPath}
               hrefPath={`pull/${pullRequest?.githubId || ''}`}
             >
-              view on github
+              {t('actions.view-on-github')}
             </GithubLink>
           </div>
 
@@ -157,7 +154,7 @@ export default function PullRequest() {
             {(pullRequest?.comments?.length > 0 &&
               pullRequest?.comments?.map((comment, index) => (
                 <Comment comment={comment} key={index} />
-              ))) || <NothingFound description="No reviews found" />}
+              ))) || <NothingFound description={t('pull-request:errors.no-reviews-found')} />}
           </div>
         </div>
       </CustomContainer>
@@ -178,7 +175,7 @@ export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
       session: await getSession(),
-      ...(await serverSideTranslations(locale, ['common',])),
+      ...(await serverSideTranslations(locale, ['common', 'pull-request'])),
     },
   };
 };

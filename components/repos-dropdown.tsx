@@ -23,8 +23,8 @@ export default function ReposDropdown({onSelected = (opt: {value}) => {}}) {
 
   return <div>
     <label className="caption-small mb-2 text-uppercase">
-      {t('select-repository')}
+      {t('select-a-repository')}
     </label>
-    <ReactSelect options={options} onChange={onSelected} />
+    <ReactSelect options={options} onChange={onSelected} placeholder={t('forms.select-placeholder')} />
     </div>
 }
