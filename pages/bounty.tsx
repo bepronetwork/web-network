@@ -49,7 +49,7 @@ export default function PageIssue() {
   const tabs = [
     {
       eventKey: 'proposals',
-      title: <Translation label={'proposal.labelWithCount'} params={{count: networkIssue?.mergeProposalsAmount || 0}} />,
+      title: <Translation ns="proposal" label={'labelWithCount'} params={{count: networkIssue?.mergeProposalsAmount || 0}} />,
       isEmpty: !(networkIssue?.mergeProposalsAmount > 0),
       component: <IssueProposals
         metaProposals={issue?.mergeProposals}
@@ -66,7 +66,7 @@ export default function PageIssue() {
     {
       eventKey: 'pull-requests',
       isEmpty: !(mergedPullRequests.length > 0),
-      title: <Translation label={'pull-request.labelWithCount'} params={{count: mergedPullRequests.length || 0}} />,
+      title: <Translation ns="pull-request" label={'labelWithCount'} params={{count: mergedPullRequests.length || 0}} />,
       component: <IssuePullRequests className="border-top-0" repoId={issue?.repository_id} issueId={issue?.issueId} pullResquests={mergedPullRequests} />
     }
   ]
@@ -239,7 +239,7 @@ export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
       session: await getSession(),
-      ...(await serverSideTranslations(locale, ['common', 'modals'])),
+      ...(await serverSideTranslations(locale, ['common', 'bounty', 'proposal', 'pull-request'])),
     },
   };
 };

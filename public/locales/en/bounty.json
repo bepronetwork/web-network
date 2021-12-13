@@ -1,0 +1,43 @@
+{
+  "label": "bounty",
+  "label_one": "bounty",
+  "label_other": "bounties",
+  "labelWithCount_one": "{{count}} bounty",
+  "labelWithCount_other": "{{count}} bounties",
+  "no-comments-available": "_No comments available_",
+  "description": "description",
+  "view-all-addresses": "view all address",
+  "steps": {
+    "draft": "Draft",
+    "development": "Development",
+    "finalized": "Finalized",
+    "validation": "validation & disputes",
+    "closed": "closed & distributed"
+  },
+  "status": {
+    "ready": "ready",
+    "draft": "draft",
+    "closed": "closed",
+    "completed": "completed",
+    "canceled": "canceled",
+    "until-done": "{{distance}} until done",
+    "pending": "pending",
+    "in-progress": "in progress"
+  },
+  "actions": {
+    "redeem": "Redeem",
+    "recognize-finished": {
+      "title": "Recognize as finished",
+      "error": "Failed to mark bounty as finished"
+    },
+    "start-working": {
+      "title": "Start Working",
+      "success": "To start working on this bounty",
+      "error": "To start working on this bounty"
+    }
+  },
+  "errors": {
+    "fetching": "Error fetching bounty",
+    "no-workers": "No one is working"
+  }
+}

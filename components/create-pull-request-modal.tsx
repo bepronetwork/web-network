@@ -20,7 +20,7 @@ export default function CreatePullRequestModal({
   const [branch, setBranch] = useState();
   const octo = useOctokit();
   const {state: {accessToken,}} = useContext(ApplicationContext);
-  const { t } = useTranslation('common')
+  const { t } = useTranslation(['common', 'pull-request'])
 
   function onSelectedBranch(option) {
     setBranch(option.value);
@@ -48,7 +48,7 @@ export default function CreatePullRequestModal({
   }, [accessToken, repo]);
 
   return (
-    <Modal size="lg" show={show} onCloseClick={onCloseClick} title={t('pull-request.actions.create.title')} titlePosition="center">
+    <Modal size="lg" show={show} onCloseClick={onCloseClick} title={t('pull-request:actions.create.title')} titlePosition="center">
       <div className="container">
         <div>
           <div className="form-group">
@@ -71,7 +71,7 @@ export default function CreatePullRequestModal({
           </div>
         </div>
         <div className="d-flex pt-2 justify-content-center">
-          <Button className='mr-2' disabled={isButtonDisabled()} onClick={() => onConfirm({title, description, branch})}>{isButtonDisabled() && <LockedIcon className='me-2'/>}<span>{t('pull-request.actions.create.title')}</span></Button>
+          <Button className='mr-2' disabled={isButtonDisabled()} onClick={() => onConfirm({title, description, branch})}>{isButtonDisabled() && <LockedIcon className='me-2'/>}<span>{t('pull-request:actions.create.title')}</span></Button>
           <Button color='dark-gray' onClick={onCloseClick}>{t('actions.cancel')}</Button>
         </div>
       </div>

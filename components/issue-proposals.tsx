@@ -12,7 +12,7 @@ import { useTranslation } from "next-i18next";
 export default function IssueProposals({ metaProposals, className='', metaRequests, numberProposals, issueId, amount, dbId, isFinalized = false, mergedProposal }) {
   const { state: {beproStaked, currentAddress} } = useContext(ApplicationContext);
   const [proposals, setProposals] = useState<Proposal[]>([]);
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('proposal')
   async function loadProposalsMeta() {
     if (!issueId)
       return;
@@ -49,7 +49,7 @@ export default function IssueProposals({ metaProposals, className='', metaReques
                                       onDispute={loadProposalsMeta}
                                       isFinalized={isFinalized}
                                       isMerged={proposal.isMerged}
-                                      owner={proposal.owner}/>) || <NothingFound description={t('proposal.errors.not-found')} /> }
+                                      owner={proposal.owner}/>) || <NothingFound description={t('errors.not-found')} /> }
     </div>
   );
 }

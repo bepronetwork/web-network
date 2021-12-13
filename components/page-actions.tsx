@@ -86,7 +86,7 @@ export default function PageActions({
   } = useContext(ApplicationContext);
   const {query: {repoId, id}} = useRouter();
   const {createPullRequestIssue, waitForRedeem, waitForClose, processEvent, startWorking} = useApi();
-  const { t } = useTranslation('common')
+  const { t } = useTranslation(['common', 'pull-request', 'bounty'])
 
   const [showPRModal, setShowPRModal] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
@@ -97,7 +97,7 @@ export default function PageActions({
     if (developers?.length > 0) return <IssueAvatars users={developers} />;
 
     if (developers?.length && state.toLowerCase() !== "draft")
-      return <p className="p-small me-2 mt-3"><Translation label="bounty.errors.no-workers" /></p>;
+      return <p className="p-small me-2 mt-3"><Translation ns="bounty" label="errors.no-workers" /></p>;
   }
 
   function renderForkAvatars() {
@@ -178,7 +178,7 @@ export default function PageActions({
           disabled={isReedemButtonDisable()}
           onClick={handleRedeem}
         >
-            <Translation label="bounty.actions.redeem" />
+            <Translation ns="bounty" label="actions.redeem" />
         </Button>
       )
     );
@@ -210,7 +210,7 @@ export default function PageActions({
       isWorking &&
       githubLogin && (
         <Button onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || hasOpenPR}>
-          <Translation label="pull-request.actions.create.title" />
+          <Translation ns="pull-request" label="actions.create.title" />
         </Button>
       )
     );
@@ -247,7 +247,7 @@ export default function PageActions({
         onClick={handleStartWorking}
         disabled={isExecuting}
       >
-        <span><Translation label="bounty.actions.start-working.title" /></span>
+        <span><Translation ns="bounty" label="actions.start-working.title" /></span>
         {isExecuting ? <span className="spinner-border spinner-border-xs ml-1"/> : ''}
       </Button>
     )
@@ -258,7 +258,7 @@ export default function PageActions({
       !isIssueinDraft &&
       hasOpenPR &&
       githubLogin &&
-      <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`pull/${pullRequests?.find(pr => pr.githubLogin === githubLogin)?.githubId || ""}`} color="primary"><Translation label="pull-request.actions.view" /></GithubLink>
+      <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`pull/${pullRequests?.find(pr => pr.githubLogin === githubLogin)?.githubId || ""}`} color="primary"><Translation ns="pull-request" label="actions.view" /></GithubLink>
     )
   }
 
@@ -270,7 +270,7 @@ export default function PageActions({
           addToast({
             type: "success",
             title: t('actions.success'),
-            content: t('pull-request.actions.create.success'),
+            content: t('pull-request:actions.create.success'),
           })
         );
 
@@ -295,7 +295,7 @@ export default function PageActions({
             addToast({
               type: "danger",
               title: t('actions.failed'),
-              content: t('pull-request.actions.create.error'),
+              content: t('pull-request:actions.create.error'),
             })
           );
         }
@@ -311,7 +311,7 @@ export default function PageActions({
           addToast({
             type: "success",
             title: t('actions.success'),
-            content: t('bounty.actions.start-working.success'),
+            content: t('bounty:actions.start-working.success'),
           })
         )
 
@@ -328,7 +328,7 @@ export default function PageActions({
           addToast({
             type: "danger",
             title: t('actions.failed'),
-            content: t('bounty.actions.start-working.error'),
+            content: t('bounty:actions.start-working.error'),
           })
         )
 
@@ -396,7 +396,7 @@ export default function PageActions({
           <div className="d-flex align-items-center justify-content-between mb-4">
             <h4 className="h4 d-flex align-items-center">{t('misc.details')}</h4>
             <div className="d-flex align-items-center">
-              {!canClose && !finalized && <span className="mr-2 caption-small text-danger">{t('pull-request.errors.merge-conflicts')}</span> || ``}
+              {!canClose && !finalized && <span className="mr-2 caption-small text-danger">{t('pull-request:errors.merge-conflicts')}</span> || ``}
               {renderIssueAvatars()}
               {forks && renderForkAvatars()}
 
@@ -411,7 +411,7 @@ export default function PageActions({
                   { (!isDisputed && !finalized ) && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>{t('actions.dispute')}</Button> || ``}
                   {!finalized && <Button disabled={!canClose} onClick={handleClose}>
                   {!canClose && <LockedIcon width={12} height={12} className="mr-1"/>}
-                    <span>{t('pull-request.actions.merge.title')}</span>
+                    <span>{t('pull-request:actions.merge.title')}</span>
                     </Button> || ``}
                 </>
               )}
