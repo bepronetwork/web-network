@@ -17,7 +17,7 @@ function initMiddleware(middleware) {
 const cors = initMiddleware(
   Cors({
     methods: ["GET", "POST", "OPTIONS"],
-    origin: process.env.NEXT_PUBLIC_API_HOST,
+    origin: process.env.NEXT_PUBLIC_HOST_LANDING_PAGE,
   })
 );
 
