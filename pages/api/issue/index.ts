@@ -22,7 +22,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     return res.status(409).json(`issueId already exists on database`);
 
   await models.issue.create({
-                              // issueId: `${repository_id}/${githubId}`,
+                              title,
+                              body,
                               githubId,
                               repository_id,
                               creatorAddress,

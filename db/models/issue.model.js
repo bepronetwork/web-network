@@ -26,6 +26,8 @@ module.exports = (sequelize) => {
   Issue.init({
     issueId: DataTypes.INTEGER,
     githubId: DataTypes.STRING,
+    title: DataTypes.STRING,
+    body: DataTypes.STRING,
     state: DataTypes.STRING,
     creatorAddress: DataTypes.STRING,
     creatorGithub: DataTypes.STRING,
