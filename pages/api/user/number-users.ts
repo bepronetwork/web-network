@@ -1,22 +1,11 @@
 import models from "@db/models";
 import { NextApiRequest, NextApiResponse } from "next";
 import Cors from "cors";
-
-function initMiddleware(middleware) {
-  return (req, res) =>
-    new Promise((resolve, reject) => {
-      middleware(req, res, (result) => {
-        if (result instanceof Error) {
-          return reject(result);
-        }
-        return resolve(result);
-      });
-    });
-}
+import initMiddleware from "@helpers/middlewareCors";
 
 const cors = initMiddleware(
   Cors({
-    methods: ["GET", "POST", "OPTIONS"],
+    methods: ["GET", "OPTIONS"],
     origin: process.env.NEXT_PUBLIC_HOST_LANDING_PAGE,
   })
 );
