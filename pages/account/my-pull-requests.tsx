@@ -88,7 +88,7 @@ export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
       session: await getSession(),
-      ...(await serverSideTranslations(locale, ['common',])),
+      ...(await serverSideTranslations(locale, ['common', 'bounty', 'connect-wallet-button', 'pull-request'])),
     },
   };
 };

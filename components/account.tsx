@@ -4,6 +4,7 @@ import ConnectGithub from "./connect-github";
 import { ApplicationContext } from "@contexts/application";
 import clsx from "clsx";
 import InternalLink from "./internal-link";
+import { useTranslation } from "next-i18next";
 
 export default function Account({
   children
@@ -11,6 +12,7 @@ export default function Account({
   const {
     state: { githubHandle },
   } = useContext(ApplicationContext);
+  const { t } = useTranslation(['common', 'bounty', 'pull-request'])
 
   return (
     <div>
@@ -21,11 +23,11 @@ export default function Account({
       <div className="container">
         <div className="row">
           <div className="d-flex justify-content-center mb-3">
-            <InternalLink href="/account" label="Bounties" className={clsx("mr-3 h4 p-0")} activeClass="account-link-active" nav />
+            <InternalLink href="/account" label={String(t('bounty:label_other'))} className={clsx("mr-3 h4 p-0 text-capitalize")} activeClass="account-link-active" nav />
 
-            <InternalLink href="/account/my-pull-requests" label="Pull Requests" className={clsx("mr-3 h4 p-0")} activeClass="account-link-active" nav />
+            <InternalLink href="/account/my-pull-requests" label={String(t('pull-request:label_other'))} className={clsx("mr-3 h4 p-0 text-capitalize")} activeClass="account-link-active" nav />
 
-            <InternalLink href="/account/my-oracles" label="Oracles" className={clsx("h4 p-0")} activeClass="account-link-active" nav />
+            <InternalLink href="/account/my-oracles" label={String(t('$oracles'))} className={clsx("h4 p-0")} activeClass="account-link-active" nav />
           </div>
         </div>
       </div>

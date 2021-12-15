@@ -13,12 +13,14 @@ import { format } from 'date-fns';
 import Button from './button';
 import LinkIcon from '@assets/icons/link-icon';
 import { truncateAddress } from '@helpers/truncate-address';
+import { useTranslation } from 'next-i18next';
 
 export default function TransactionModal({ transaction = null, onCloseClick = () => {}}: { transaction: Transaction, onCloseClick: () => void }) {
   const {dispatch, state: {network}} = useContext(ApplicationContext);
   const [addressFrom, setAddressFrom] = useState(`...`);
   const [addressTo, setAddressTo] = useState(`...`);
   const [details, setDetails] = useState<any>([]);
+  const { t } = useTranslation('common')
 
   function updateAddresses() {
     if (!transaction)
@@ -32,9 +34,9 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
     const makeDetail = (span, content) => ({span, content})
     setDetails(
       [
-        makeDetail(`Amount`, [formatNumberToString(blockTransaction.amount), blockTransaction.currency].join(` `)),
-        makeDetail(`Confirmations`, [blockTransaction.confirmations, 23].join(`/`).concat(` Confirmations`)),
-        makeDetail(`Date`, format(new Date(blockTransaction.date), "MMMM dd yyyy hh:mm:ss a")),
+        makeDetail(t('transactions.amount'), [formatNumberToString(blockTransaction.amount), blockTransaction.currency].join(` `)),
+        makeDetail(t('transactions.confirmations'), [blockTransaction.confirmations, 23].join(`/`).concat(` ${t('transactions.confirmations')}`)),
+        makeDetail(t('transactions.date'), format(new Date(blockTransaction.date), "MMMM dd yyyy hh:mm:ss a")),
       ]
     )
   }
@@ -43,16 +45,16 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
 
   function renderDetailRow(item): any {
     return <>
-      <div className="d-flex align-items-center justify-content-between bg-dark-gray py-3 mt-2 px-3 rounded">
-        <span className="smallCaption text-white-50 fs-smallest text-uppercase">{item.span}</span>
-        <span className=".p text-white fs-small">{item.content}</span>
+      <div className="d-flex align-items-center justify-content-between bg-dark-gray py-2 mt-2 px-3 rounded-8">
+        <span className="caption-small text-white-50">{item.span}</span>
+        <span className="p text-white">{item.content}</span>
       </div>
     </>
   }
 
   function copyValue(value: string) {
     CopyValue(value);
-    dispatch(toastInfo(`Copied ${value}`));
+    dispatch(toastInfo(t('transactions.copied', { value })));
   }
 
   function getTransactionId() {
@@ -70,13 +72,13 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
   return <>
     <Modal
     id="transaction-modal"
-    title="Transaction Details"
+    title={t('transactions.modal')}
     show={!!transaction}
     onCloseClick={onCloseClick}
     titlePosition="center"
     titleClass="h3 text-white bg-opacity-100 fs-2"
     >
-      <span className="d-block smallCaption text-white-50 text-uppercase">Status</span>
+      <span className="d-block caption-small text-white-50 text-uppercase">{t('misc.status')}</span>
       <div className="d-flex justify-content-between align-items-center py-2 mb-3">
         <TransactionStats status={transaction?.status} />
         <div className="d-flex">
@@ -88,10 +90,10 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
           </a>
         </div>
       </div>
-      <div className="d-flex py-2 mb-1 smallCaption text-white bg-opacity-100 fs-smallest">
-        <span>From: {addressFrom}</span>
+      <div className="d-flex py-2 mb-3 caption-small text-white bg-opacity-100 fs-smallest">
+        <span>{t('misc.from')}: {addressFrom}</span>
         <div className="mx-auto"><ArrowRightSmall/></div>
-        <span>To: {addressTo}</span>
+        <span>{t('misc.to')}: {addressTo}</span>
       </div>
       {details.map(renderDetailRow)}
     </Modal>

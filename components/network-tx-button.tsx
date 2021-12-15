@@ -12,6 +12,7 @@ import LockedIcon from '@assets/icons/locked-icon';
 import Button from './button';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import useTransactions from '@x-hooks/useTransactions';
+import { useTranslation } from 'next-i18next';
 
 interface NetworkTxButtonParams {
   txMethod: string;
@@ -47,6 +48,7 @@ function networkTxButton({
   const [showModal, setShowModal] = useState(false);
   const [txSuccess, setTxSuccess] = useState(false);
   const txWindow = useTransactions();
+  const { t } = useTranslation(['common'])
 
   function checkForTxMethod() {
     if (!beproInit || !metaMaskWallet)
@@ -79,7 +81,7 @@ function networkTxButton({
           onSuccess && onSuccess();
           dispatch(addToast({
                               type: 'success',
-                              title: 'Success',
+                              title: t('actions.success'),
                               content: `${txMethod} ${txParams?.tokenAmount} ${txCurrency}`
                             }));
 
@@ -88,7 +90,7 @@ function networkTxButton({
 
         } else {
           onFail(answer.message)
-          dispatch(addToast({type: 'danger', title: 'Failed', content: answer?.message}));
+          dispatch(addToast({type: 'danger', title: t('actions.failed'), content: answer?.message}));
         }
       })
       .catch(e => {
@@ -109,7 +111,7 @@ function networkTxButton({
     return `d-flex flex-column align-items-center text-${txSuccess ? `success` : `danger`}`;
   }
 
-  const modalFooter = (<Button color='dark-gray' onClick={() => setShowModal(false)}>Close</Button>)
+  const modalFooter = (<Button color='dark-gray' onClick={() => setShowModal(false)}>{t('actions.close')}</Button>)
 
   useEffect(checkForTxMethod, [beproInit, metaMaskWallet])
 
@@ -125,7 +127,7 @@ function networkTxButton({
       <div className={getDivClass()}>
         <Icon className="md-larger">{txSuccess ? `check_circle` : `error`}</Icon>
         <p className="text-center fs-4 mb-0 mt-2">
-          Transaction {txSuccess ? `completed` : `failed`}
+          {t('transactions.title')} {txSuccess ? t('actions.completed') : t('actions.failed')}
         </p>
       </div>
     </Modal>

@@ -8,6 +8,7 @@ import { IssueState } from "@interfaces/issue-data";
 import { formatNumberToNScale } from "@helpers/formatNumber";
 import Avatar from "components/avatar";
 import GithubInfo from '@components/github-info';
+import Translation from "./translation";
 
 export default function IssueListItem({ issue = null, xClick }: { issue?: IssueData, xClick?: () => void; }) {
   const router = useRouter();
@@ -51,7 +52,7 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
 
   return (
     <div
-      className="bg-shadow list-item rounded p-4 mb-3"
+      className="bg-shadow list-item p-4 mb-3"
       onClick={() => {
         if (xClick)
           return xClick();
@@ -65,21 +66,24 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
       <div className="row align-center">
         <div className="col-md-10 mb-3 mb-md-0">
           <h4 className="h4 text-truncate">
-            <span className="trans me-1">#{issue?.githubId}</span>
+            <span className="text-gray trans me-2">#{issue?.githubId}</span>
             {(issue?.title || ``).length > 61
               ? (issue?.title || ``).substring(0, 61) + "..."
-              : issue?.title || `Error fetching issue`}
+              : issue?.title || <Translation ns="bounty" label={`errors.fetching`} />}
           </h4>
-          <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start">
+          <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2">
             <span
-              className={`status ${handleColorState(issue?.state)} mr-2 mt-1`}
+              className={`status caption-small ${handleColorState(issue?.state)} mr-2`}
             >
-              {issue?.state}
+              {issue && <Translation ns="bounty" label={`status.${issue.state}`} />}
             </span>
-            <span className="p-small mr-2 mt-1 text-white-50">
-              {issue?.numberOfComments || 0} comment{issue?.numberOfComments !== 1 && 's' || ''}
+            <span className="p-small mr-2 mt-1 text-gray trans">
+              <Translation label={`misc.comments`} params={{
+                  count: issue?.numberOfComments || 0
+                }} 
+              />
             </span>
-            <span className="p-small mr-2 mt-1 text-white-50">
+            <span className="p-small mr-2 mt-1 text-gray trans">
               {issue != null && formatDate(issue?.createdAt)}
             </span>
             {issue?.repo && (
@@ -87,7 +91,7 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
                 <GithubInfo color="blue" value={issue?.repo} hoverTextColor="white" onClicked={() => router.push({pathname: `/`, query: {repoId: issue?.repository_id}})} />
               </span>
             )}
-            <span className="p-small mr-2 mt-1 text-white-50">by</span>
+            <span className="p-small mr-2 mt-1 text-gray trans"><Translation label={`misc.by`} /></span>
             <span className="p-small mr-2 mt-1">
               <GithubInfo color="gray" value={[`@`, issue?.creatorGithub].join(``)} />
             </span>
@@ -100,9 +104,9 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
           </div>
         </div>
         <div className="col-md-2 my-auto text-center">
-          <span className="caption text-white text-opacity-1">
+          <span className="caption-large text-white text-opacity-1">
             {formatNumberToNScale(issue?.amount || 0)}{" "}
-            <label className="text-uppercase text-blue">$BEPRO</label>
+            <label className="text-uppercase text-blue"><Translation label={`$bepro`} /></label>
           </span>
           {issue?.developers?.length > 0 && (
             <IssueAvatars users={issue?.developers}></IssueAvatars>

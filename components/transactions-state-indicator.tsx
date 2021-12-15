@@ -30,7 +30,7 @@ export default function TransactionsStateIndicator() {
 
   const overlay = (
     <Popover id="transactions-indicator">
-      <Popover.Body className="bg-shadow">
+      <Popover.Body className="bg-shadow p-3">
         <TransactionsList onActiveTransaction={onActiveTransactionChange}/>
       </Popover.Body>
     </Popover>
