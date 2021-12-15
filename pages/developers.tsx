@@ -30,7 +30,7 @@ export default function PageDevelopers() {
   const {dispatch, state: { loading }} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
   const mergedData = useMergeData();
-  const { t } = useTranslation(['common']);
+  const { t } = useTranslation(['common', 'bounty']);
   
   const filtersByIssueState: FiltersByIssueState = [
     {

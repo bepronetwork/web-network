@@ -13,7 +13,7 @@ export default function LanguageSelector() {
   function makeOption(label: string, value: string) { return ({value, label}); }
   const options = [
     makeOption(`English`, `en`),
-    makeOption(`Português`, `pt`),
+    /*makeOption(`Português`, `pt`),*/
   ];
 
   const overlay =

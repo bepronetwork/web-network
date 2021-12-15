@@ -11,6 +11,7 @@ import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import useTransactions from '@x-hooks/useTransactions';
 import { formatNumberToString } from '@helpers/formatNumber';
 import { truncateAddress } from '@helpers/truncate-address';
+import { useTranslation } from 'next-i18next';
 
 interface Props extends ComponentPropsWithoutRef<"div"> {
   amount: string;
@@ -26,6 +27,7 @@ export default function OraclesTakeBackItem({
   const [show, setShow] = useState<boolean>(false);
   const {dispatch} = useContext(ApplicationContext);
   const txWindow = useTransactions();
+  const { t } = useTranslation('common')
 
   function handleShow() {
     setShow(true);
@@ -66,35 +68,35 @@ export default function OraclesTakeBackItem({
       <div className="bg-dark-gray w-100 mb-1 p-3 border-radius-8">
         <div className="row align-items-center">
           <div className="col-md-6">
-            <p className="caption-large text-bold text-purple mb-1 text-uppercase">{formatNumberToString(amount, 2)} ORACLES</p>
+            <p className="caption-large text-bold text-purple mb-1 text-uppercase">{formatNumberToString(amount, 2)} {t('$oracles')}</p>
             <p className="caption-small text-white mb-0">{address}</p>
           </div>
           <div className="col-md-6 d-flex justify-content-end">
             <Button color='purple' outline onClick={handleShow}>
-              Take Back
+              {t('actions.take-back')}
             </Button>
           </div>
         </div>
       </div>
       <Modal
         show={show}
-        title="Take Back"
+        title={t('actions.take-back')}
         titlePosition="center"
         onCloseClick={handleCancel}
         footer={
           <>
             <Button onClick={handleTakeBack}>
-              Confirm
+              {t('actions.confirm')}
             </Button>
             <Button color='dark-gray' onClick={handleCancel}>
-              Cancel
+              {t('actions.cancel')}
             </Button>
           </>
         }>
         <p className="text-center fs-4">
-          <span className="me-2">Take back</span>
-          <span className="text-bold text-purple me-2">{formatNumberToString(amount, 2)} Oracles</span>
-          <span className="text-bold">from {truncateAddress(address, 12, 3)}</span>
+          <span className="me-2">{t('actions.take-back')}</span>
+          <span className="text-bold text-purple me-2">{formatNumberToString(amount, 2)} {t('$oracles')}</span>
+          <span className="text-bold">{t('misc.from')} {truncateAddress(address, 12, 3)}</span>
         </p>
       </Modal>
     </>

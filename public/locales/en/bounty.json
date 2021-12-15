@@ -38,6 +38,9 @@
   },
   "errors": {
     "fetching": "Error fetching bounty",
-    "no-workers": "No one is working"
+    "no-workers": "No one is working",
+    "no-bounties": "No bounties",
+    "no-bounties-in-draft": "No bounties in draft",
+    "no-bounties-to-merge": "No bounties ready to merge"
   }
 }
