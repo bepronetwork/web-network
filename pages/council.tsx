@@ -11,12 +11,14 @@ import useMergeData from '@x-hooks/use-merge-data';
 import usePage from '@x-hooks/use-page';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 
 export default function PageCouncil() {
   const {dispatch} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
   const page = usePage();
   const {getIssues: getIssuesWith} = useMergeData();
+  const { t } = useTranslation(['common', 'council'])
 
   function getIssues() {
     dispatch(changeLoadState(true))
@@ -35,7 +37,7 @@ export default function PageCouncil() {
 
   return (
     <div>
-      <PageHero title="Create Bounty Distributions" />
+      <PageHero title={t('council:title')} />
       <div className="container p-footer">
         <div className="row justify-content-center">
           <ListIssues listIssues={issues}/>
@@ -43,8 +45,8 @@ export default function PageCouncil() {
             issues?.length === 0 &&
             <div className="mt-4">
               <NothingFound
-              description="No bounties ready to propose">
-                <InternalLink href="/create-bounty" label="create one" uppercase />
+              description={t('council:empty')}>
+                <InternalLink href="/create-bounty" label={String(t('actions.create-one'))} uppercase />
               </NothingFound>
             </div>
           }
@@ -58,7 +60,7 @@ export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
       session: await getSession(),
-      ...(await serverSideTranslations(locale, ['common',])),
+      ...(await serverSideTranslations(locale, ['common', 'council'])),
     },
   };
 };

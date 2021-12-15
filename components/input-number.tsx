@@ -27,7 +27,7 @@ export default function InputNumber({
   return (
     <Component {...(shouldBeWrapped && { className: "form-group" })}>
       {label && (
-        <label className="smallCaption mb-2 text-uppercase" id={id}>
+        <label className="caption-small mb-2 text-uppercase" id={id}>
           {label}
         </label>
       )}
@@ -53,7 +53,7 @@ export default function InputNumber({
         />
         {symbol && (
           <span
-            className={clsx("input-group-text smallCaption text-uppercase", classSymbol, {
+            className={clsx("input-group-text caption-small text-uppercase", classSymbol, {
               ...errorStyle,
             })}>
             {symbol}
@@ -62,13 +62,22 @@ export default function InputNumber({
       </div>
       {helperText && (
         <div
-          className={clsx("p-small my-2", {
+          className={clsx("p-small text-gray my-2", {
             trans: !error,
             className,
             ...errorStyle,
           })}>
           {helperText}
         </div>
+      )}
+      {error && (
+        <p
+        className={clsx("p-small text-gray my-2", {
+          trans: !error,
+          ...errorStyle,
+        })}>
+        {error}
+      </p>
       )}
     </Component>
   );
