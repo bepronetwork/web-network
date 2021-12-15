@@ -4,6 +4,8 @@
   "labelWithCount_one": "{{count}} proposal",
   "labelWithCount_other": "{{count}} proposals",
   "title": "New Proposal",
+  "addresses_one": "{{count}} Address",
+  "addresses_other": "{{count}} Addresses",
   "actions": {
     "create": "Create Proposal",
     "propose-distribution": "Propose Distribution"
