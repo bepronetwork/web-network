@@ -13,6 +13,7 @@ import Avatar from '@components/avatar'
 import { formatDate } from '@helpers/formatDate'
 
 import useRepos from '@x-hooks/use-repos'
+import { useTranslation } from 'next-i18next'
 
 export default function CreateReviewModal({
   show = false,
@@ -24,6 +25,7 @@ export default function CreateReviewModal({
 }) {
   const [body, setBody] = useState('')
   const [[activeRepo]] = useRepos()
+  const { t } = useTranslation(['common', 'pull-request'])
 
   const {
     state: { githubLogin }
@@ -44,20 +46,20 @@ export default function CreateReviewModal({
       size="lg"
       show={show}
       onCloseClick={onCloseClick}
-      title="Review"
+      title={t('modals.create-review.title')}
       titlePosition="center"
     >
       <div className="container">
         <div className="mb-2">
-          <p className="smallCaption trans mb-2">
+          <p className="caption-small trans mb-2">
             #{issue?.githubId} {issue?.title}
           </p>
 
-          <p className="h4 mb-2">Pull Request #{pullRequest?.githubId}</p>
+          <p className="h4 mb-2">{t('pull-request:label')} #{pullRequest?.githubId}</p>
 
           <div className="d-flex align-items-center flex-wrap justify-content-center justify-content-md-start">
-            <span className="smallCaption trans mr-2">
-              Created at {pullRequest && formatDate(pullRequest?.createdAt)}
+            <span className="caption-small text-gray mr-2">
+              {t('misc.created-at')} {pullRequest && formatDate(pullRequest?.createdAt)}
             </span>
 
             <GithubInfo
@@ -67,7 +69,7 @@ export default function CreateReviewModal({
               value={activeRepo?.githubPath?.split('/')[1]}
             />
 
-            <span className="p-small ml-2 mr-2">BY</span>
+            <span className="caption-small text-gray ml-2 mr-2">{t('misc.by')}</span>
 
             <GithubInfo
               color="white"
@@ -80,15 +82,15 @@ export default function CreateReviewModal({
         </div>
         <div>
           <div className="form-group">
-            <label className="smallCaption trans mb-2 text-white-50 text-uppercase">
-              Review
+            <label className="caption-small mb-2 text-gray">
+              {t('modals.create-review.fields.review.label')}
             </label>
             <textarea
               value={body}
               rows={5}
               onChange={(e) => setBody(e.target.value)}
               className="form-control"
-              placeholder="Type a review..."
+              placeholder={t('modals.create-review.fields.review.placeholder')}
             />
           </div>
         </div>
@@ -99,11 +101,11 @@ export default function CreateReviewModal({
             onClick={() => onConfirm({ body })}
           >
             {isButtonDisabled() && !isExecuting && <LockedIcon className="me-2" />}
-            <span>Create Review</span>
+            <span>{t('modals.create-review.create-review')}</span>
             {isExecuting ? <span className="spinner-border spinner-border-xs ml-1"/> : ''}
           </Button>
           <Button color="dark-gray" onClick={onCloseClick}>
-            cancel
+            {t('actions.cancel')}
           </Button>
         </div>
       </div>

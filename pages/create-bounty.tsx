@@ -22,6 +22,7 @@ import useTransactions from '@x-hooks/useTransactions';
 import { changeTransactionalTokenApproval } from '@contexts/reducers/change-transactional-token-approval';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 
 interface Amount {
   value?: string,
@@ -41,6 +42,7 @@ export default function PageCreateIssue() {
   const router = useRouter();
   const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId} = useApi();
   const txWindow = useTransactions();
+  const { t } = useTranslation(['common', 'create-bounty'])
 
   async function allowCreateIssue() {
     const loggedIn = await BeproService.login();
@@ -55,7 +57,7 @@ export default function PageCreateIssue() {
     BeproService.network.approveTransactionalERC20Token()
                 .then(txInfo => {
                   if (!txInfo)
-                    throw new Error(`Failed to approve transaction`);
+                    throw new Error(t('errors.approve-transaction'));
                   return txInfo;
                 })
                 .then(txInfo => {
@@ -99,7 +101,7 @@ export default function PageCreateIssue() {
     apiCreateIssue(payload)
                       .then(cid => {
                         if (!cid)
-                          throw new Error(`Failed to create github issue!`);
+                          throw new Error(t('errors.creating-issue'));
                         dispatch(openIssueTx);
                         return BeproService.network.openIssue({...contractPayload, cid: [repository_id, cid].join(`/`)})
                                            .then(txInfo => {
@@ -116,7 +118,7 @@ export default function PageCreateIssue() {
                         patchIssueWithScId(repository_id, githubId, issueId)
                           .then(async(result) => {
                             if (!result)
-                                return dispatch(toastError(`Error creating bounty`));;
+                                return dispatch(toastError(t('create-bounty:errors.creating-bounty')));;
                             await router.push(`/bounty?id=${githubId}&repoId=${repository_id}`)
                           }))
                       .catch(e => {
@@ -126,7 +128,7 @@ export default function PageCreateIssue() {
                           dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
                         else dispatch(updateTransaction({...openIssueTx.payload as any, status: TransactionStatus.failed}));
 
-                        dispatch(toastError(e.message || `Error creating bounty`));
+                        dispatch(toastError(e.message || t('create-bounty:errors.creating-bounty')));
                         return false;
                       }).finally(()=> setRedirecting(false))
   }
@@ -181,7 +183,7 @@ export default function PageCreateIssue() {
           <div className="row justify-content-center">
             <div className="col-md-10">
               <div className="d-flex justify-content-center">
-                <h1 className="h1 mb-0">Create new Bounty</h1>
+                <h2>{t('create-bounty:title')}</h2>
               </div>
             </div>
           </div>
@@ -192,19 +194,19 @@ export default function PageCreateIssue() {
           <div className="col-md-10">
             <ConnectWalletButton asModal={true} />
             <div className="content-wrapper mt-up mb-5">
-              <h3 className="h3 mr-2 mb-4 text-white text-opacity-1">Details</h3>
+              <h3 className="mb-4 text-white">{t('misc.details')}</h3>
               <div className="form-group mb-4">
-                <label className="smallCaption mb-2 text-uppercase">Bounty title</label>
+                <label className="caption-small mb-2">{t('create-bounty:fields.title.label')}</label>
                 <input type="text"
-                       className="form-control rounded-lg" placeholder="Your bounty title"
+                       className="form-control rounded-lg" placeholder={t('create-bounty:fields.title.placeholder')}
                        value={issueTitle}
                        onChange={e => setIssueTitle(e.target.value)}
                 />
-                <p className="p-small trans my-2">Tip: Try to be as descriptive as possible</p>
+                <p className="p-small text-gray trans my-2">{t('create-bounty:fields.title.tip')}</p>
               </div>
               <div className="form-group">
-                <label className="smallCaption mb-2 text-uppercase">Description</label>
-                <textarea className="form-control" rows={6} placeholder="Type a description..."
+                <label className="caption-small mb-2">{t('create-bounty:fields.description.label')}</label>
+                <textarea className="form-control" rows={6} placeholder={t('create-bounty:fields.description.placeholder')}
                           value={issueDescription}
                           onChange={e => setIssueDescription(e.target.value)}/>
               </div>
@@ -214,8 +216,8 @@ export default function PageCreateIssue() {
                     thousandSeparator
                     max={balance}
                     className={clsx({'text-muted': isTransactionalTokenApproved})}
-                    label="SET $BEPRO VALUE"
-                    symbol="$BEPRO"
+                    label={t('create-bounty:fields.amount.label')}
+                    symbol={t('$bepro')}
                     value={issueAmount.formattedValue}
                     placeholder="0"
                     disabled={!isTransactionalTokenApproved}
@@ -223,12 +225,12 @@ export default function PageCreateIssue() {
                     onBlur={handleIssueAmountBlurChange}
                     helperText={
                       <>
-                        {formatNumberToCurrency(balance, { maximumFractionDigits: 18 })} $BEPRO Available
+                        {t('create-bounty:fields.amount.info', { amount: formatNumberToCurrency(balance, { maximumFractionDigits: 18 }) })}
                         {isTransactionalTokenApproved && (
                           <span
-                            className="smallCaption text-blue ml-1 cursor-pointer text-uppercase"
+                            className="caption-small text-blue ml-1 cursor-pointer text-uppercase"
                             onClick={() => setIssueAmount({formattedValue: balance.toString()})}>
-                        Max
+                          {t('create-bounty:fields.amount.max')}
                       </span>
                         )}
                       </>
@@ -248,11 +250,11 @@ export default function PageCreateIssue() {
                 ) : (
                   <>
                     {!isTransactionalTokenApproved ?
-                      <Button className="me-3" disabled={isApproveButtonDisable()} onClick={allowCreateIssue}>Approve</Button>
+                      <Button className="me-3" disabled={isApproveButtonDisable()} onClick={allowCreateIssue}>{t('actions.approve')}</Button>
                       : null
                     }
                     <Button disabled={isCreateButtonDisabled()}
-                            onClick={createIssue}>{isCreateButtonDisabled() && <LockedIcon className="mr-1" width={13} height={13}/>}<span>Create Bounty</span>
+                            onClick={createIssue}>{isCreateButtonDisabled() && <LockedIcon className="mr-1" width={13} height={13}/>}<span>{t('create-bounty:create-bounty')}</span>
                     </Button>
                   </>
                 )}
@@ -269,7 +271,7 @@ export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
       session: await getSession(),
-      ...(await serverSideTranslations(locale, ['common',])),
+      ...(await serverSideTranslations(locale, ['common', 'create-bounty', 'connect-wallet-button'])),
     },
   };
 };
