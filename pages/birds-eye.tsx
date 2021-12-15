@@ -75,7 +75,11 @@ export default function FalconPunchPage() {
   return <>
     <div className="container mb-5">
       <ConnectWalletButton asModal={true} />
-      <div className="mt-3 content-wrapper">
+      <br />
+      <br />
+      <br />
+      <br />
+      <div className="content-wrapper">
         <div className="row mb-3">
           <div className="col">
             <label className="p-small mb-2">Github Token</label>

@@ -18,10 +18,10 @@ export default function ProposalProgress({ developers = [] }) {
                 >
                   <Avatar
                     key={index}
-                    className="mb-1"
+                    className="mb-2"
                     userLogin={developer.githubLogin}
                   />
-                  <p className="p-small mb-0">
+                  <p className="caption-small mb-0">
                     {formatNumberToString(developer.percentage, 0)}% @{developer.githubLogin}
                   </p>
                 </div>
