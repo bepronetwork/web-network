@@ -87,7 +87,8 @@
     "update": "Update",
     "take-back": "Take Back",
     "install": "Install",
-    "try-again": "Try Again"
+    "try-again": "Try Again",
+    "reconnect-account": "Reconnect account"
   },
   "misc": {
     "by": "by",
@@ -176,6 +177,10 @@
       "network": "network",
       "on-your-wallet": "on your metamask wallet",
       "change-network": "Change Network"
+    },
+    "user-missing-information": {
+      "title": "Your account is missing some information",
+      "content": "We need you to reconnect your Github Account"
     }
   },
   "forms": {

@@ -1,6 +1,7 @@
 import { ApplicationContext } from "@contexts/application";
 import { changeGithubHandle } from "@contexts/reducers/change-github-handle";
 import useApi from "@x-hooks/use-api";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 
@@ -15,6 +16,7 @@ export default function UserMissingModal({ show }: { show: boolean }) {
   } = useContext(ApplicationContext);
   const { removeUser } = useApi();
   const router = useRouter();
+  const { t } = useTranslation("common");
 
   function handleReconnectAcount() {
     removeUser(currentAddress)
@@ -37,18 +39,18 @@ export default function UserMissingModal({ show }: { show: boolean }) {
   return (
     <Modal
       show={isVisible}
-      title="Your account is missing some information"
+      title={t("modals.user-missing-information.title")}
       centerTitle
     >
       <div>
         <div className="d-flex justify-content-center mb-2 mx-2 text-center">
           <p className="h5 mb-2 text-white">
-            We need you to reconnect your Github Account
+            {t("modals.user-missing-information.content")}
           </p>
         </div>
         <div className="d-flex justify-content-center">
           <Button color="primary" onClick={handleReconnectAcount}>
-            <span>Reconnect account</span>
+            <span>{t("actions.reconnect-account")}</span>
           </Button>
         </div>
       </div>
