@@ -4,6 +4,7 @@ import {ApplicationContext} from '@contexts/application';
 import {NETWORKS} from '@helpers/networks'
 import Button from './button';
 import {Spinner} from 'react-bootstrap';
+import { useTranslation } from "next-i18next";
 
 const networkMap = {
   mainnet: `#29b6af`,
@@ -17,6 +18,7 @@ const networkMap = {
 
 export default function WrongNetworkModal({requiredNetwork = ``}) {
   const [isAddingNetwork, setIsAddingNetwork] = useState(false);
+  const { t } = useTranslation('common')
 
   const {state: {network: activeNetwork}} = useContext(ApplicationContext);
 
@@ -75,33 +77,33 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
 
   return (
     <Modal
-      title="Change network"
+      title={t('modals.wrong-network.change-network')}
       titlePosition="center"
       titleClass="h4 text-white bg-opacity-100"
       show={showModal()}
     >
       <div className="d-flex flex-column text-center align-items-center">
         <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
-          please, connect to the  <span style={{color: networkMap[requiredNetwork.toLowerCase()]}}><span>{requiredNetwork}</span> network</span><br/> on your metamask wallet
+        {t('modals.wrong-network.please-connect')}  <span style={{color: networkMap[requiredNetwork.toLowerCase()]}}><span>{requiredNetwork}</span> {t('modals.wrong-network.network')}</span><br/> {t('modals.wrong-network.on-your-wallet')}
         </strong>
         {isAddingNetwork && <Spinner className="text-blue align-self-center p-2 mt-1 mb-2" style={{width: `5rem`, height: `5rem`}} animation="border" /> || ``}
-        <Button className='my-3' disabled={isButtonDisabled()} onClick={handleAddNetwork}>Change network</Button>
+        <Button className='my-3' disabled={isButtonDisabled()} onClick={handleAddNetwork}>{t('modals.wrong-network.change-network')}</Button>
         <div className="small-info text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-1 pt-1">
-        by connecting, you accept{" "}
+        {t('misc.by-connecting')}{" "}
           <a
             href="https://www.bepro.network/terms-and-conditions"
             target="_blank"
             className="text-decoration-none"
           >
-            Terms & Conditions
+            {t('misc.terms-and-conditions')}
           </a>{" "}
-          <br /> and{" "}
+          <br /> {t('misc.and')}{" "}
           <a
             href="https://www.bepro.network/privacy"
             target="_blank"
             className="text-decoration-none"
           >
-            PRIVACY POLICY
+            {t('misc.privacy-policy')}
           </a>
         </div>
       </div>

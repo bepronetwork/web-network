@@ -17,8 +17,11 @@ import {formatNumberToCurrency} from 'helpers/formatNumber'
 import { TransactionStatus } from '@interfaces/enums/transaction-status';
 import CloseIssueIcon from '@assets/icons/close-issue';
 import RecognizeFinishedIcon from '@assets/icons/recognize-finished-icon';
+import { useTranslation } from 'next-i18next';
+
 export default function TransactionsList({onActiveTransaction = (transaction) => {}}) {
   const {state: {myTransactions}} = useContext(ApplicationContext);
+  const { t } = useTranslation('common')
 
   const IconMaps = {
     [TransactionTypes.openIssue]: <InformationChatBubble />,
@@ -55,14 +58,14 @@ export default function TransactionsList({onActiveTransaction = (transaction) =>
   }
 
   function emptyTransaction (){
-    return <div className="text-center"><span className="caption-small text-ligth-gray text-uppercase fs-8 family-Medium">you have no transactions.</span></div>
+    return <div className="text-center"><span className="caption-small text-ligth-gray text-uppercase fs-8 family-Medium">{t('transactions.no-transactions')}</span></div>
   }
 
   return (
     <div className="transaction-list w-100">
       <div className="row">
         <div className="col mb-3">
-          <h4 className="h4 m-0 text-white">Transactions</h4>
+          <h4 className="h4 m-0 text-white">{t('transactions.title_other')}</h4>
         </div>
       </div>
       <div className="overflow-auto tx-container">

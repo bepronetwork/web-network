@@ -32,9 +32,13 @@
     "hero": {}
   },
   "heroes": {
+    "in-progress": "In Progress",
     "find-bounties-to-work": "Find Bounties to work",
     "bounties-closed": "Bounties Closed",
-    "bounties-in-network": "Bounties In the Network"
+    "bounties-in-network": "Bounties In the Network",
+    "my-account": "My account",
+    "delegated-oracles": "Delegated Oracles",
+    "delegated-by-others": "Delegated by Other"
   },
   "connect-states": {
     "github": "",
@@ -47,13 +51,6 @@
     "create-bounty": "Create bounty",
     "get-started": "Get Started",
     "connect": "Connect"
-  },
-  "mobile-information": {},
-  "nation-dialog": {
-    "at-the-moment": "At the moment BEPRO services and BEPRO Token (BEPRO) are not available in Your Country",
-    "excluded": "Excluded Jurisdictions.",
-    "further": "For further information please contact us on",
-    "email": "general@bepro.network"
   },
   "select-a-repository": "Select a repository",
   "status": {
@@ -70,9 +67,12 @@
     "approve": "Approve",
     "cancel": "Cancel",
     "close": "Close",
+    "completed": "Completed",
+    "confirm": "Confirm",
     "connect": "Connect",
     "connect-github": "Connect your GitHub account!",
     "connect-wallet": "Connect Wallet",
+    "connect-your-wallet": "Connect your Wallet",
     "create-one": "Create one",
     "dispute": "Dispute",
     "done": "Done",
@@ -83,10 +83,15 @@
     "review": "Review",
     "make-a-review": "Make a Review",
     "success": "Success",
-    "view-on-github": "View on Github"
+    "view-on-github": "View on Github",
+    "update": "Update",
+    "take-back": "Take Back",
+    "install": "Install",
+    "try-again": "Try Again"
   },
   "misc": {
     "by": "by",
+    "and": "and",
     "comments_one": "{{count}} comment",
     "comments_other": "{{count}} comments",
     "created-at": "Created at",
@@ -98,7 +103,14 @@
     "metamask": "Metamask",
     "by-connecting": "By connecting, you accept",
     "terms-and-conditions": "Terms & Conditions",
-    "privacy-policy": "Privacy Policy"
+    "privacy-policy": "Privacy Policy",
+    "loading": "Loading",
+    "reward": "Reward",
+    "max": "Max",
+    "get": "Get",
+    "from": "From",
+    "to": "To",
+    "status": "Status"
   },
   "modals": {
     "help-modal": {
@@ -138,6 +150,32 @@
         }
       },
       "create-review": "Create Review"
+    },
+    "set-bounty-draft": {
+      "title": "Set bounty as draft"
+    },
+    "mobile-information": {
+      "our-web-application": "Our web application currently does not support a mobile version.",
+      "if-you-want": "If you want to use it you must connect to our web application via desktop.",
+      "stay-updated": "Stay updated on"
+    },
+    "nation-dialog": {
+      "your-country": "Your country",
+      "at-the-moment": "At the moment BEPRO services and BEPRO Token (BEPRO) are not available in Your Country",
+      "excluded": "Excluded Jurisdictions.",
+      "further": "For further information please contact us on",
+      "email": "general@bepro.network"
+    },
+    "web3-dialog": {
+      "title": "MetaMask not detected.",
+      "eth-not-available": "No ETH account available",
+      "message": "It seems that you don't have a MetaMask account selected. If using MetaMask, please make sure that your wallet is unlocked and that you have at least one account in your accounts list."
+    },
+    "wrong-network": {
+      "please-connect": "please, connect to the",
+      "network": "network",
+      "on-your-wallet": "on your metamask wallet",
+      "change-network": "Change Network"
     }
   },
   "forms": {
@@ -158,12 +196,44 @@
   },
   "errors": {
     "approve-transaction": "Failed to approve transaction",
-    "creating-issue": "Failed to create github issue!"
+    "creating-issue": "Failed to create github issue!",
+    "failed-update-bounty": "Failed to update bounty!"
   },
   "404": {
     "the-page": "The page you looking for was",
     "not-found": "not found.",
     "the-link-may-be-moved": "The link you followed may be broken or the page may have been moved.",
     "back-to-home": "Back to homepage"
+  },
+  "transactions": {
+    "title": "Transaction",
+    "title_other": "Transactions",
+    "modal": "Transaction Details",
+    "amount": "Amount",
+    "confirmations": "Confirmations",
+    "date": "Date",
+    "copied": "Copied {{value}}",
+    "no-transactions": "You have no transactions",
+    "stats": {
+      "pending": "Pending",
+      "processing": "Processing",
+      "rejected": "Rejected",
+      "completed": "Completed"
+    },
+    "types": {
+      "unkown": "Unknown",
+      "lock": "Lock",
+      "unlock": "Unlock",
+      "approval": "Approval",
+      "open-bounty": "Open bounty",
+      "delegate": "Delegate",
+      "removing-delegation": "Removing Delegation",
+      "dispute": "Dispute bounty",
+      "propose": "Propose merge request",
+      "close-bounty": "Close bounty",
+      "redeem-bounty": "Redeem bounty",
+      "approve-settler": "Approve settler token",
+      "recognize-finished": "Recognize bounty as finished"
+    }
   }
 }

@@ -40,7 +40,7 @@ export default function PageHero({ title = <Translation label={'heroes.find-boun
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4>{inProgress}</h4>
-                    <span className="caption-small"><Translation ns="bounty" label={'status.in-progress'} /></span>
+                    <span className="caption-small"><Translation label={'heroes.in-progress'} /></span>
                   </div>
                 </div>
                 <div className="col-md-3">

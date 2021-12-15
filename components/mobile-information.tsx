@@ -1,7 +1,10 @@
 import { kebabCase } from "lodash";
+import { useTranslation } from "next-i18next";
 import { Modal } from "react-bootstrap";
 
 export default function MobileInformation() {
+  const { t } = useTranslation('common')
+
   return (
     <div>
       <Modal centered backdrop={false}
@@ -15,14 +18,13 @@ export default function MobileInformation() {
           <div className="d-flex flex-column align-items-center">
             <span className="material-icons text-blue">info</span>
             <p className="text-white mb-0 mt-4 text-center">
-              Our web application currently does not support a mobile version.
+              {t('modals.mobile-information.our-web-application')}
             </p>
             <p className="text-white mb-0 mt-4 text-center">
-              If you want to use it you must connect to our web application via
-              desktop.
+              {t('modals.mobile-information.if-you-want')}
             </p>
             <p className="text-white mb-0 mt-4 text-center">
-              Stay updated on
+              {t('modals.mobile-information.stay-updated')}
             </p>
             <a href="https://www.bepro.network/">@bepronet</a>
           </div>
