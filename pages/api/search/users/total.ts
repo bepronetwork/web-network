@@ -12,7 +12,7 @@ const cors = initMiddleware(
 
 async function getTotal(req: NextApiRequest, res: NextApiResponse) {
   // Run the cors middleware
-  await cors(req, res);
+  // await cors(req, res);
 
   const userCount = await models.user.count();
 
