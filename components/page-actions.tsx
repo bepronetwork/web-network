@@ -19,6 +19,8 @@ import useApi from '@x-hooks/use-api';
 import useTransactions from '@x-hooks/useTransactions';
 import LockedIcon from "@assets/icons/locked-icon";
 import { ProposalData } from "@services/github-microservice";
+import Translation from "./translation";
+import { useTranslation } from "next-i18next";
 
 interface pageActions {
   issueId: string;
@@ -84,6 +86,7 @@ export default function PageActions({
   } = useContext(ApplicationContext);
   const {query: {repoId, id}} = useRouter();
   const {createPullRequestIssue, waitForRedeem, waitForClose, processEvent, startWorking} = useApi();
+  const { t } = useTranslation(['common', 'pull-request', 'bounty'])
 
   const [showPRModal, setShowPRModal] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
@@ -94,7 +97,7 @@ export default function PageActions({
     if (developers?.length > 0) return <IssueAvatars users={developers} />;
 
     if (developers?.length && state.toLowerCase() !== "draft")
-      return <p className="p-small me-2 mt-3">no one is working </p>;
+      return <p className="p-small me-2 mt-3"><Translation ns="bounty" label="errors.no-workers" /></p>;
   }
 
   function renderForkAvatars() {
@@ -106,7 +109,7 @@ export default function PageActions({
           target="_blank"
         >
           <IssueAvatars users={forks.map((item) => item.owner)} />
-          <span className="me-3 fs-small">Forks</span>
+          <span className="me-3 caption-small"><Translation label="misc.forks" /></span>
         </a>
       );
     }
@@ -175,7 +178,7 @@ export default function PageActions({
           disabled={isReedemButtonDisable()}
           onClick={handleRedeem}
         >
-          Redeem
+            <Translation ns="bounty" label="actions.redeem" />
         </Button>
       )
     );
@@ -207,7 +210,7 @@ export default function PageActions({
       isWorking &&
       githubLogin && (
         <Button onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || hasOpenPR}>
-          Create Pull Request
+          <Translation ns="pull-request" label="actions.create.title" />
         </Button>
       )
     );
@@ -226,7 +229,7 @@ export default function PageActions({
         hrefPath="fork"
         color="primary"
       >
-        Fork this repository
+        <Translation label="actions.fork-repository" />
       </GithubLink>
     )
   }
@@ -244,7 +247,7 @@ export default function PageActions({
         onClick={handleStartWorking}
         disabled={isExecuting}
       >
-        <span>Start Working</span>
+        <span><Translation ns="bounty" label="actions.start-working.title" /></span>
         {isExecuting ? <span className="spinner-border spinner-border-xs ml-1"/> : ''}
       </Button>
     )
@@ -255,7 +258,7 @@ export default function PageActions({
       !isIssueinDraft &&
       hasOpenPR &&
       githubLogin &&
-      <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`pull/${pullRequests?.find(pr => pr.githubLogin === githubLogin)?.githubId || ""}`} color="primary">View Pull Request</GithubLink>
+      <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`pull/${pullRequests?.find(pr => pr.githubLogin === githubLogin)?.githubId || ""}`} color="primary"><Translation ns="pull-request" label="actions.view" /></GithubLink>
     )
   }
 
@@ -266,8 +269,8 @@ export default function PageActions({
         dispatch(
           addToast({
             type: "success",
-            title: "Success",
-            content: "Created pull request",
+            title: t('actions.success'),
+            content: t('pull-request:actions.create.success'),
           })
         );
 
@@ -282,7 +285,7 @@ export default function PageActions({
             dispatch(
               addToast({
                 type: "danger",
-                title: "Failed",
+                title: t('actions.failed'),
                 content: item.message,
               })
             )
@@ -291,8 +294,8 @@ export default function PageActions({
           dispatch(
             addToast({
               type: "danger",
-              title: "Failed",
-              content: "To create pull request",
+              title: t('actions.failed'),
+              content: t('pull-request:actions.create.error'),
             })
           );
         }
@@ -307,8 +310,8 @@ export default function PageActions({
         dispatch(
           addToast({
             type: "success",
-            title: "Success",
-            content: "To start working on this bounty",
+            title: t('actions.success'),
+            content: t('bounty:actions.start-working.success'),
           })
         )
 
@@ -324,8 +327,8 @@ export default function PageActions({
         dispatch(
           addToast({
             type: "danger",
-            title: "Failed",
-            content: "To start working on this bounty",
+            title: t('actions.failed'),
+            content: t('bounty:actions.start-working.error'),
           })
         )
 
@@ -391,9 +394,9 @@ export default function PageActions({
       <div className="row justify-content-center">
         <div className="col-md-10">
           <div className="d-flex align-items-center justify-content-between mb-4">
-            <h4 className="h4 d-flex align-items-center">Details</h4>
+            <h4 className="h4 d-flex align-items-center">{t('misc.details')}</h4>
             <div className="d-flex align-items-center">
-              {!canClose && !finalized && <span className="mr-2 text-uppercase smallCaption text-danger">Pull request has merge conflicts and can't be merged</span> || ``}
+              {!canClose && !finalized && <span className="mr-2 caption-small text-danger">{t('pull-request:errors.merge-conflicts')}</span> || ``}
               {renderIssueAvatars()}
               {forks && renderForkAvatars()}
 
@@ -405,17 +408,17 @@ export default function PageActions({
               {renderProposeDestribution()}
               {state?.toLowerCase() == "pull request" && (
                 <>
-                  { (!isDisputed && !finalized ) && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>Dispute</Button> || ``}
+                  { (!isDisputed && !finalized ) && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>{t('actions.dispute')}</Button> || ``}
                   {!finalized && <Button disabled={!canClose} onClick={handleClose}>
                   {!canClose && <LockedIcon width={12} height={12} className="mr-1"/>}
-                    <span> Merge </span>
+                    <span>{t('pull-request:actions.merge.title')}</span>
                     </Button> || ``}
                 </>
               )}
 
               {renderViewPullrequest()}
 
-              <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`${state?.toLowerCase() === 'pull request' && 'pull' || 'issues' }/${githubId || ""}`}>view on github</GithubLink>
+              <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`${state?.toLowerCase() === 'pull request' && 'pull' || 'issues' }/${githubId || ""}`}>{t('actions.view-on-github')}</GithubLink>
 
             </div>
           </div>

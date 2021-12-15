@@ -13,6 +13,7 @@ import useMergeData from '@x-hooks/use-merge-data';
 import InternalLink from '@components/internal-link';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 
 export default function Newissues() {
   const {dispatch} = useContext(ApplicationContext);
@@ -20,6 +21,7 @@ export default function Newissues() {
   const page = usePage();
   const results = useCount();
   const {getIssues: getIssuesWith} = useMergeData();
+  const { t } = useTranslation(['common', 'bounty'])
 
   function getIssues() {
     dispatch(changeLoadState(true))
@@ -47,8 +49,8 @@ export default function Newissues() {
           issues?.length === 0 &&
           <div className="mt-4">
             <NothingFound
-              description="No bounties in draft">
-              <InternalLink href="/create-bounty" label="create one" uppercase />
+              description={t('bounty:errors.no-bounties-in-draft')}>
+              <InternalLink href="/create-bounty" label={String(t('actions.create-one'))} uppercase />
             </NothingFound>
           </div>
           || ``
@@ -62,7 +64,7 @@ export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
       session: await getSession(),
-      ...(await serverSideTranslations(locale, ['common',])),
+      ...(await serverSideTranslations(locale, ['common', 'bounty', 'oracle'])),
     },
   };
 };

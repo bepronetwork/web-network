@@ -7,8 +7,9 @@ ul.pagination .page-item {
   }
 
   .page-link {
+    font-family: 'fontBold', sans-serif;
     border-radius: $pagination-border-radius;
     font-size: 14px;
-    line-height: 150%;
+    line-height: 140%;
   }
 }
