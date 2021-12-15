@@ -22,7 +22,8 @@
     "canceled": "canceled",
     "until-done": "{{distance}} until done",
     "pending": "pending",
-    "in-progress": "in progress"
+    "in-progress": "in progress",
+    "open": "open"
   },
   "actions": {
     "redeem": "Redeem",
