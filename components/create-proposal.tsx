@@ -21,6 +21,7 @@ import LockedIcon from '@assets/icons/locked-icon';
 import clsx from 'clsx';
 import { Proposal } from '@interfaces/proposal';
 import { ProposalData } from '@services/github-microservice';
+import { useTranslation } from 'next-i18next';
 
 interface participants {
   githubHandle: string;
@@ -61,6 +62,7 @@ export default function NewProposal({
   const {getParticipants} = useOctokit();
   const {getUserWith, waitForMerge, processMergeProposal, processEvent} = useApi();
   const txWindow = useTransactions();
+  const { t } = useTranslation(['common', 'bounty', 'proposal', 'pull-request'])
 
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
@@ -290,7 +292,7 @@ export default function NewProposal({
                   if (e?.message?.search(`User denied`) > -1)
                     dispatch(updateTransaction({...recognizeAsFinished.payload as any, remove: true}))
                   else dispatch(updateTransaction({...recognizeAsFinished.payload as any, status: TransactionStatus.failed}));
-                  dispatch(toastWarning(`Failed to mark bounty as finished!`));
+                  dispatch(toastWarning(t('bounty:errors.recognize-finished')));
                   console.error(`Failed to mark as finished`, e);
                 })
   }
@@ -304,7 +306,7 @@ export default function NewProposal({
   }
 
   function renderRecognizeAsFinished() {
-    return <Button onClick={recognizeAsFinished}>Recognize as finished</Button>;
+    return <Button onClick={recognizeAsFinished} className="mr-1">{t('bounty:actions.recognize-finished.title')}</Button>;
   }
 
   useEffect(() => {
@@ -327,7 +329,7 @@ export default function NewProposal({
         || isIssueOwner && !isFinished && renderRecognizeAsFinished()
       }
       <Modal show={show}
-             title="New Proposal"
+             title={t('proposal:title')}
              titlePosition="center"
              onCloseClick={handleClose}
              footer={
@@ -336,33 +338,31 @@ export default function NewProposal({
                    onClick={handleClickCreate}
                    disabled={!currentAddress || participants.length === 0 || !success}>
                    {!currentAddress || participants.length === 0 || !success && <LockedIcon width={12} height={12} className="mr-1"/>}
-                   <span >Create Proposal</span>
-                 </Button>
-                 <Button color='dark-gray' onClick={handleClose}>
-                   Cancel
+                   <span >{t('proposal:actions.create')}</span>
                  </Button>
 
                  <Button color='dark-gray' onClick={handleClose}>
-                   Cancel
+                   {t('actions.cancel')}
                  </Button>
                </>
              }>
-        <p className="smallCaption text-white-50 text-uppercase">Select a pull request </p>
+        <p className="caption-small text-white-50 mb-2 mt-2">{t('pull-request:select')}</p>
         <ReactSelect id="pullRequestSelect"
                       isDisabled={participants.length === 0}
+                      placeholder={t('forms.select-placeholder')}
                      defaultValue={{
                        value: pullRequests[0]?.id,
-                       label: `#${pullRequests[0]?.githubId} Pull Request`,
+                       label: `#${pullRequests[0]?.githubId} ${t('misc.by')} @${pullRequests[0].githubLogin}`,
                        githubId: pullRequests[0]?.githubId,
                      }}
                      options={pullRequests?.map((items: pullRequest) => ({
                        value: items.id,
-                       label: `#${items.githubId} Pull Request`,
+                       label: `#${items.githubId} ${t('misc.by')} @${items.githubLogin}`,
                        githubId: items.githubId,
                      }))}
                      onChange={handleChangeSelect}/>
-        {participants.length === 0 && <p className="text-uppercase text-danger text-center w-100 caption mt-4 mb-0">Network Congestion</p> || <>
-          <p className="smallCaption mt-3 text-white-50 text-uppercase">Propose distribution</p>
+        {participants.length === 0 && <p className="text-uppercase text-danger text-center w-100 caption mt-4 mb-0">{t('status.network-congestion')}</p> || <>
+          <p className="caption-small mt-3 text-white-50 text-uppercase mb-2 mt-3">{t('proposal:actions.propose-distribution')}</p>
           <ul className="mb-0">
             {participants.map((item) => (
                                 <CreateProposalDistributionItem key={item.githubHandle}
@@ -379,20 +379,20 @@ export default function NewProposal({
           </ul>
           <div className="d-flex" style={{ justifyContent: "flex-end" }}>
               {warning ? (
-                <p className="smallCaption pr-3 mt-3 mb-0 text-uppercase text-warning">
-                  This distribution already existis on another proposal
+                <p className="caption-small pr-3 mt-3 mb-0 text-uppercase text-warning">
+                  {t('proposal:errors.distribution-already-exists')}
                 </p>
               ) : (
                 <p
                   className={clsx(
-                    "smallCaption pr-3 mt-3 mb-0  text-uppercase",
+                    "caption-small pr-3 mt-3 mb-0  text-uppercase",
                     {
                       "text-success": success,
                       "text-danger": error,
                     }
                   )}
                 >
-                  Distribution {success ? "is" : "Must be"} 100%
+                  {t(`proposal:messages.distribution-${success ? "is" : "must-be"}-100`)}
                 </p>
               )}
             </div>

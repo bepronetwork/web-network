@@ -28,8 +28,8 @@ export default function TypographyTest() {
                     </div>
                     <div className="mb-3">
                         <p className="p-small mb-0">
-                            Small Caption / Use .smallCaption</p>
-                        <p className="smallCaption">Build the future of DeFi Gaming</p>
+                            Small Caption / Use .caption-small</p>
+                        <p className="caption-small">Build the future of DeFi Gaming</p>
                     </div>
                     <div className="mb-3">
                         <p className="p-small mb-0">Paragraph / Use .p</p>

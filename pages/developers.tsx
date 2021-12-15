@@ -16,6 +16,7 @@ import useRepos from '@x-hooks/use-repos';
 import InternalLink from '@components/internal-link';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 
 type Filter = {
   label: string;
@@ -25,34 +26,36 @@ type Filter = {
 
 type FiltersByIssueState = Filter[];
 
-const filtersByIssueState: FiltersByIssueState = [
-  {
-    label: "All bounties",
-    value: 'all',
-    emptyState: 'Bounties not found'
-  },
-  {
-    label: 'Open bounties',
-    value: 'open',
-    emptyState: 'Open bounties not found'
-  },
-  {
-    label: 'Draft bounties',
-    value: 'draft',
-    emptyState: 'Draft bounties not found'
-  },
-  {
-    label: 'Closed bounties',
-    value: 'closed',
-    emptyState: 'Closed bounties not found'
-  }
-];
-
 export default function PageDevelopers() {
   const {dispatch, state: { loading }} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
-  const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
   const mergedData = useMergeData();
+  const { t } = useTranslation(['common', 'bounty']);
+  
+  const filtersByIssueState: FiltersByIssueState = [
+    {
+      label: t('filters.bounties.all'),
+      value: 'all',
+      emptyState: t('filters.bounties.not-found')
+    },
+    {
+      label: t('filters.bounties.open'),
+      value: 'open',
+      emptyState: t('filters.bounties.open-not-found')
+    },
+    {
+      label: t('filters.bounties.draft'),
+      value: 'draft',
+      emptyState: t('filters.bounties.draft-not-found')
+    },
+    {
+      label: t('filters.bounties.closed'),
+      value: 'closed',
+      emptyState: t('filters.bounties.closed-not-found')
+    }
+  ];
+  
+  const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
 
   const page = usePage();
   const results = useCount();
@@ -84,7 +87,7 @@ export default function PageDevelopers() {
 
   return (<>
     <div>
-      <PageHero title="Find bounties to work on"/>
+      <PageHero />
       <div className="container p-footer">
         <div className="row justify-content-center">
           <div className="col-md-10">
@@ -115,7 +118,7 @@ export default function PageDevelopers() {
             <div className="col-md-10">
               <NothingFound
                 description={filterByState.emptyState}>
-                <InternalLink href="/create-bounty" label="create one" uppercase />
+                <InternalLink href="/create-bounty" label={String(t('actions.create-one'))} uppercase />
               </NothingFound>
             </div>
           ) : null}
@@ -129,7 +132,7 @@ export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
       session: await getSession(),
-      ...(await serverSideTranslations(locale, ['common',])),
+      ...(await serverSideTranslations(locale, ['common', 'bounty'])),
     },
   };
 };

@@ -1,11 +1,14 @@
 import { formatDate } from '@helpers/formatDate'
+import { useTranslation } from 'next-i18next'
 import Avatar from './avatar'
 import MarkedRender from './MarkedRender'
 
 export default function Comment({ comment }) {
+  const { t } = useTranslation('bounty')
+
   return (
     <div className="mb-3">
-      <p className="p-small text-uppercase mb-2 text-bold">
+      <p className="caption-small text-uppercase mb-2 text-bold">
         <Avatar userLogin={comment?.user.login} />
 
         <span className="ml-1">@{comment?.user.login} </span>
@@ -16,7 +19,7 @@ export default function Comment({ comment }) {
       </p>
 
       <p className="p-small content-wrapper child mb-0 comment">
-        <MarkedRender source={comment?.body || `_No comment available_`} />
+        <MarkedRender source={comment?.body || t('no-comments-available')} />
       </p>
     </div>
   )

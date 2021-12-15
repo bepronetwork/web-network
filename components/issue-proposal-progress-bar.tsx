@@ -3,15 +3,8 @@ import { Fragment, useEffect, useState } from 'react';
 import { getTimeDifferenceInWords } from '@helpers/formatDate';
 import { addSeconds } from 'date-fns';
 import { BeproService } from '@services/bepro-service';
+import { useTranslation } from 'next-i18next';
 
-export enum StatusIds {
-  Completed = 'Completed',
-  Canceled = 'Canceled',
-  UntilDone = '[DISTANCE] until done',
-  Distribution = 'Distribution',
-  Pending = 'Pending',
-  InProgress = 'In Progress'
-}
 export default function IssueProposalProgressBar({
   isFinalized = false,
   isIssueinDraft = true,
@@ -23,7 +16,8 @@ export default function IssueProposalProgressBar({
   const [stepColor, setStepColor] = useState<string>('');
   const [currentStep, setCurrentStep] = useState<number>();
   const [redeemTime, setRedeemTime] = useState(0);
-  const steps = ['Draft', 'Development', 'Finalized', 'Validation & Disputes', 'Closed & Distributed']
+  const { t } = useTranslation(['common', 'bounty'])
+  const steps = [t('bounty:steps.draft'), t('bounty:steps.development'), t('bounty:steps.finalized'), t('bounty:steps.validation'), t('bounty:steps.closed')]
 
   function toRepresentationPercent() {
     return currentStep === 0 ? `1` : `${currentStep * 25}`
@@ -61,35 +55,33 @@ export default function IssueProposalProgressBar({
   function renderStepStatus(stepLabel, index) {
     let item = {
       Completed: {
-        text: StatusIds.Completed,
+        text: t('bounty:status.completed'),
         color: 'primary',
         bgColor: 'primary',
       },
       Canceled: {
-        text: StatusIds.Canceled,
+        text: t('bounty:status.canceled'),
         color: 'danger',
         bgColor: 'danger-opac-25',
       },
       Warning: {
-        text: StatusIds.UntilDone.replace('[DISTANCE]', getTimeDifferenceInWords(addSeconds(creationDate, redeemTime), new Date())) as StatusIds,
+        text: t('bounty:status.until-done', {distance: getTimeDifferenceInWords(addSeconds(creationDate, redeemTime), new Date())}),
         color: 'warning',
         bgColor: 'warning-opac-25',
       },
       Pending: {
-        text: StatusIds.Pending,
+        text: t('bounty:status.pending'),
         color: 'gray',
         bgColor: 'dark-gray',
       },
       InProgress: {
-        text: StatusIds.InProgress,
+        text: t('bounty:status.in-progress'),
         color: 'white',
         bgColor: 'primary',
       }
     }
 
     let currentValue = item.Pending;
-
-
 
     if (index === currentStep) {
       currentValue = item.InProgress;
@@ -127,7 +119,7 @@ export default function IssueProposalProgressBar({
           <div className='position-relative d-flex align-items-start flex-column'>
             <div className={`rounded-circle bg-${currentItem && !isCanceled && !isLastItem && 'white'}`} style={{ width: `10px`, height: `10px` }} ></div>
             <div className='position-absolute mt-4 d-flex align-items-start flex-column'>
-              <label className={`text-uppercase mediumCaption mb-1 text-${currentItem ? stepColor : 'gray'}`}>{stepLabel}</label>
+              <label className={`text-uppercase caption mb-1 text-${currentItem ? stepColor : 'gray'}`}>{stepLabel}</label>
               {renderStepStatus(stepLabel, index)}
             </div>
           </div>

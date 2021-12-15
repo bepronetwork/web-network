@@ -1,5 +1,4 @@
 import {GetStaticProps} from 'next'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, {useContext} from 'react';
 import {useEffect, useState} from 'react';
@@ -7,7 +6,7 @@ import {BeproService} from '@services/bepro-service';
 import ConnectWalletButton from './connect-wallet-button';
 import {ApplicationContext} from '@contexts/application';
 import {changeStakedState} from '@reducers/change-staked-amount';
-import { formatNumberToNScale, formatNumberToString } from 'helpers/formatNumber';
+import { formatNumberToNScale } from 'helpers/formatNumber';
 import NetworkIdentifier from '@components/network-identifier';
 import BeproLogo from '@assets/icons/bepro-logo';
 import HelpIcon from '@assets/icons/help-icon';
@@ -24,6 +23,7 @@ import BalanceAddressAvatar from './balance-address-avatar';
 import useApi from '@x-hooks/use-api';
 import { User } from '@services/github-microservice';
 import UserMissingModal from './user-missing-information';
+import Translation from './translation';
 
 const CURRENCY = process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME;
 const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
@@ -94,27 +94,28 @@ export default function MainNav() {
         <InternalLink href="/" icon={<BeproLogo aria-hidden={true} />} className="brand" nav active />
         <ul className="nav-links">
           <li>
-            <InternalLink href="/developers" label="Developers" nav uppercase />
+            <InternalLink href="/developers" label={<Translation label={'main-nav.developers'} />} nav uppercase />
           </li>
 
           <li>
-            <InternalLink href="/council" label="Council" nav uppercase />
+            <InternalLink href="/council" label={<Translation label={'main-nav.council'} />} nav uppercase />
           </li>
 
           <li>
-            <InternalLink href="/oracle" label="Oracle" nav uppercase />
+            <InternalLink href="/oracle" label={<Translation label={'main-nav.Oracle'} />} nav uppercase />
           </li>
         </ul>
       </div>
 
       <div className="d-flex flex-row align-items-center">
-        <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" className='text-decoration-none' target="_blank">
-          <Button transparent className="opacity-75 opacity-100-hover"><span>Get Started</span><ExternalLinkIcon className="ml-1"/></Button>
+        <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" className='d-flex align-items-center mr-3 text-decoration-none text-white text-uppercase main-nav-link opacity-75 opacity-100-hover' target="_blank">
+          <span><Translation label={'main-nav.get-started'} /></span>
+          <ExternalLinkIcon className="ml-1"/>
         </a>
 
-        <InternalLink href="/create-bounty" icon={<PlusIcon />} label="Create Bounty" iconBefore nav uppercase />
+        <InternalLink href="/create-bounty" icon={<PlusIcon />} label={<Translation label={'main-nav.create-bounty'} />} className="mr-2" iconBefore nav uppercase />
 
-        <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 opacity-75 opacity-100-hover" transparent rounded><HelpIcon /></Button>
+        <Button onClick={() => setShowHelp(true)}  className="ms-2 me-4 opacity-75 opacity-100-hover" transparent rounded><HelpIcon /></Button>
 
         <WrongNetworkModal requiredNetwork={REQUIRED_NETWORK} />
 
@@ -125,7 +126,7 @@ export default function MainNav() {
 
             <NetworkIdentifier />
 
-            <InternalLink href="/account" icon={<BeproSmallLogo />} label={formatNumberToNScale(beproBalance)} transparent nav />
+            <InternalLink href="/account" icon={<BeproSmallLogo />} label={formatNumberToNScale(beproBalance)} className="mx-3" transparent nav />
 
             <InternalLink href="/account" icon={<BalanceAddressAvatar address={address} balance={ethBalance} currency={CURRENCY} />} className="meta-info d-flex align-items-center" />
           </div>
