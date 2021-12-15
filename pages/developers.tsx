@@ -16,6 +16,10 @@ import useRepos from '@x-hooks/use-repos';
 import InternalLink from '@components/internal-link';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
+import LockedIcon from '@assets/icons/locked-icon';
+import ReactSelect from '@components/react-select';
+import Button from '@components/button';
+import CloseIcon from '@assets/icons/close-icon';
 
 type Filter = {
   label: string;
@@ -88,12 +92,26 @@ export default function PageDevelopers() {
       <div className="container p-footer">
         <div className="row justify-content-center">
           <div className="col-md-10">
-            <div className="d-flex justify-content-end mb-4">
-              <div className="col-md-3">
-                <IssueFilters />
-              </div>
-            </div>
-          </div>
+            <div className="input-group  mb-3">
+              <span className="input-group-text rounded-4 " id="inputGroup-sizing-sm"><LockedIcon/></span>
+              <input type="text" className="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm"/>
+              <button className="bg-black border-transparent pe-3"  style={{
+                borderTopRightRadius: ".5rem",
+                borderBottomRightRadius: ".5rem",
+              }}><CloseIcon width={10} height={10}/></button>  
+              
+                    
+              <div className="d-flex flex-row ms-3">
+                <span className="mediumInfo mr-1 mt-2 text-white-50">sort by</span>
+                <ReactSelect />
+              </div> 
+              <Button transparent applyTextColor textClass="text-blue">
+                Clear
+              </Button>
+              <IssueFilters />
+              </div> 
+            </div>   
+
           <ListIssues listIssues={issues} />
           {issues?.length !== 0 && (
               <Paginate

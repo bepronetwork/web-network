@@ -66,6 +66,10 @@ li {
     top: 1%;
   }
 
+  .close-icon-search{
+      color:blue !important;
+ }
+
   .modal-lg {
     .modal-content > .modal-header > .close-button {
       left: 97%;
@@ -221,6 +225,14 @@ body {
   font-size: 14px;
   line-height: 160%;
   letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.mediumInfo{
+  font-family: 'fontBold', sans-serif;
+  font-size: 12px;
+  line-height: 140%;
+  letter-spacing: 10%;
   text-transform: uppercase;
 }
 
@@ -998,6 +1010,10 @@ $c_props: ('m': 'margin') !default;
 
 .bg-black {
   background-color: $black;
+}
+
+.color-blue {
+  color: $blue-dark;
 }
 
 .bg-main-image {
