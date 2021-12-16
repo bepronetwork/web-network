@@ -133,8 +133,6 @@ export default function ApplicationContextProvider({children}) {
       if (!cheatAddress || !waitingForTx || !waitingForTx?.transactionHash) return
 
       web3.eth.getTransaction(waitingForTx.transactionHash).then(transaction => {  
-        console.log('[Transaction Found]', transaction)
-        
         dispatch(updateTransaction({
           ...waitingForTx,
           addressFrom: transaction.from,

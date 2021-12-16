@@ -11,7 +11,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const include = [
     { association: 'developers' },
     { association: 'pullRequests' },
-    { association: 'merges' }
+    { association: 'mergeProposals' }
   ]
 
   const issue = await models.issue.findOne({
