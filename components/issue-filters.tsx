@@ -47,10 +47,10 @@ export default function IssueFilters() {
                         onChange={(opt, checked) => updateOptions(repoOptions, opt, checked, 'repo')}/>
       </div>
       <div>
+      <IssueFilterBox title="bounty state" options={stateOptions}
+                        onChange={(opt, checked) => updateOptions(stateOptions, opt, checked, 'state')}/>
         <IssueFilterBox title="timeframe" options={timeOptions}
                         onChange={(opt, checked) => updateOptions(timeOptions, opt, checked, 'time')}/>
-        <IssueFilterBox title="bounty state" options={stateOptions}
-                        onChange={(opt, checked) => updateOptions(stateOptions, opt, checked, 'state')}/>
       </div>
     </div>
   </div>
