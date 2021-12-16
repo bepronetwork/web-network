@@ -1,29 +1,26 @@
 'use strict';
-const {Model, DataTypes, Sequelize} = require("sequelize");
+const {Model, DataTypes} = require("sequelize");
 
-function User(sequelize) {
-  class User extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-    }
+class User extends Model {
+  /**
+   * Helper method for defining associations.
+   * This method is not a part of Sequelize lifecycle.
+   * The `models/index` file will call this method automatically.
+   */
+  static init(sequelize){
+    super.init({
+      githubHandle: DataTypes.STRING,
+      githubLogin: DataTypes.STRING,
+      address: {type: DataTypes.STRING, unique: true},
+      accessToken: DataTypes.STRING
+    }, {
+      sequelize,
+      modelName: 'user',
+    });
   }
-
-  User.init({
-    githubHandle: DataTypes.STRING,
-    githubLogin: DataTypes.STRING,
-    address: {type: DataTypes.STRING, unique: true},
-    accessToken: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'user',
-  });
-
-  return User;
+  static associate(models) {
+    // define association here
+  }
 }
 
 module.exports = User;
