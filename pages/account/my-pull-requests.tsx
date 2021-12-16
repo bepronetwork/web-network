@@ -14,6 +14,7 @@ import { changeLoadState } from '@contexts/reducers/change-load-state'
 import {GetServerSideProps} from 'next';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next'
 
 export default function MyPullRequests() {
   const {
@@ -22,6 +23,7 @@ export default function MyPullRequests() {
   } = useContext(ApplicationContext)
 
   const [issues, setIssues] = useState([])
+  const { t } = useTranslation('pull-request')
   const { getIssuesOfUserPullRequests } = useMergeData()
 
   const page = usePage()
@@ -69,10 +71,10 @@ export default function MyPullRequests() {
           )}
           {issues?.length === 0 && !loading.isLoading ? (
             <div className="col-md-10 pt-3">
-              <NothingFound description={'No pull requests'}>
+              <NothingFound description={t('errors.not-found')}>
                 <InternalLink
                   href="/developers"
-                  label="Find an bounty to work on"
+                  label={String(t('find-a-bounty'))}
                   uppercase
                 />
               </NothingFound>
