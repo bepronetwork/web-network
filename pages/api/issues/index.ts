@@ -43,7 +43,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   }
   const include = [
     { association: 'developers' },
-    { association: 'pullrequests' },
+    { association: 'pullRequests' },
     { association: 'merges' }
   ]
   
