@@ -90,6 +90,8 @@ export default function PageIssue() {
 
         setIssue(issue);
 
+        console.log('issue', issue)
+
         if (!commentsIssue)
           getIssueComments(+issue.githubId, activeRepo.githubPath)
             .then((comments) => {
