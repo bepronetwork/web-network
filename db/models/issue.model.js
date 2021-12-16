@@ -40,7 +40,7 @@ class Issue extends Model {
     this.hasMany(models.mergeProposal, {
       foreignKey: 'issueId',
       sourceKey: 'id',
-      as: 'merges'
+      as: 'mergeProposals'
     });
   }
 };
