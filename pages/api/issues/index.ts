@@ -41,9 +41,14 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     whereCondition.createdAt = {[Op.gt]: fn(+new Date(), 1)}
   }
-
-  const issues = await models.issue.findAndCountAll(paginate({ where: whereCondition, raw: true, nest: true }, req.query, [[req.query.sortBy || 'updatedAt', req.query.order || 'DESC']]));
-  await composeIssues(issues.rows);
+  const include = [
+    { association: 'developers' },
+    { association: 'pullrequests' },
+    { association: 'merges' }
+  ]
+  
+  const issues = await models.issue.findAndCountAll(paginate({ where: whereCondition, include, nest: true }, req.query, [[req.query.sortBy || 'updatedAt', req.query.order || 'DESC']]));
+  // await composeIssues(issues.rows);
 
   return res.status(200).json(issues);
 }
