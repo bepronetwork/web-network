@@ -22,6 +22,7 @@ import LockedIcon from '@assets/icons/locked-icon';
 import ReactSelect from '@components/react-select';
 import Button from '@components/button';
 import CloseIcon from '@assets/icons/close-icon';
+import SearchIcon from '@assets/icons/search-icon';
 
 type Filter = {
   label: string;
@@ -95,9 +96,11 @@ export default function PageDevelopers() {
       <div className="container p-footer">
         <div className="row justify-content-center">
           <div className="col-md-10">
-            <div className="input-group  mb-3">
-              <span className="input-group-text rounded-4 " id="inputGroup-sizing-sm"><LockedIcon/></span>
-              <input type="text" className="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm"/>
+            <div className="input-group mb-3">
+              <span className="input-group-text rounded-4 " id="inputGroup-sizing-sm"><SearchIcon /></span>
+              <input type="text" className="form-control" aria-label="Sizing example input" 
+              aria-describedby="inputGroup-sizing-sm"
+              placeholder='Search for a Bounty'/>
               <button className="bg-black border-transparent pe-3"  style={{
                 borderTopRightRadius: ".5rem",
                 borderBottomRightRadius: ".5rem",
@@ -106,7 +109,7 @@ export default function PageDevelopers() {
                     
               <div className="d-flex flex-row ms-3">
                 <span className="mediumInfo mr-1 mt-2 text-white-50">sort by</span>
-                <ReactSelect />
+                <ReactSelect options={[{label:'Newest'}, {label:'Highest Bounty'}, {label:'Oldest'}, {label:'Lowest Bounty'}]}/>
               </div> 
               <Button transparent applyTextColor textClass="text-blue">
                 Clear
