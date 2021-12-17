@@ -12,14 +12,14 @@ export default function UserMissingModal({ show }: { show: boolean }) {
   const [isVisible, setVisible] = useState<boolean>(show);
   const {
     dispatch,
-    state: { currentAddress },
+    state: { currentAddress, githubLogin },
   } = useContext(ApplicationContext);
   const { removeUser } = useApi();
   const router = useRouter();
   const { t } = useTranslation("common");
 
   function handleReconnectAcount() {
-    removeUser(currentAddress)
+    removeUser(currentAddress, githubLogin)
       .then(() => {
         setVisible(false);
         dispatch(changeGithubHandle(""));

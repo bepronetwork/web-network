@@ -2,10 +2,15 @@ import { NextApiRequest, NextApiResponse } from "next";
 import models from "@db/models";
 
 async function remove(req: NextApiRequest, res: NextApiResponse) {
-  const { address } = req.query;
+  const {
+    addressLogin: [address, githubLogin],
+  } = req.query;
 
   let user = await models.user.findOne({
-    where: { address: address.toString().toLowerCase() },
+    where: {
+      address: address.toString().toLowerCase(),
+      githubLogin: githubLogin,
+    },
   });
 
   if (!user) return res.status(404).json(`address not found`);
