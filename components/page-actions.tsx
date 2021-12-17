@@ -245,6 +245,7 @@ export default function PageActions({
       <Button
         color="primary"
         onClick={handleStartWorking}
+        className="mr-1"
         disabled={isExecuting}
       >
         <span><Translation ns="bounty" label="actions.start-working.title" /></span>
