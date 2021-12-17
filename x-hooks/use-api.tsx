@@ -275,8 +275,8 @@ export default function useApi() {
       .then(response => response)
   }
   
-  async function removeUser(address: string) {
-    return client.delete(`/api/user/${address}`)
+  async function removeUser(address: string, githubLogin: string) {
+    return client.delete(`/api/user/${address}/${githubLogin}`)
                  .then(({status}) => status === 200)
                  .catch(() => false);
   }
