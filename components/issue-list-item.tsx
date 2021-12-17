@@ -63,7 +63,6 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
         });
       }}
     >
-      {console.log('issues', issue)}
       <div className="row align-center">
         <div className="col-md-10 mb-3 mb-md-0">
           <h4 className="h4 text-truncate">
@@ -88,7 +87,7 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
               {issue != null && formatDate(issue?.createdAt)}
             </span>
             {issue?.repo && (
-              <span className="p-small mr-1 mt-1 text-uppercase">
+              <span className="p-small mr-2 mt-1 text-uppercase">
                 <GithubInfo color="blue" value={issue?.repo} hoverTextColor="white" onClicked={() => router.push({pathname: `/`, query: {repoId: issue?.repository_id}})} />
               </span>
             )}
@@ -97,39 +96,11 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
               <GithubInfo color="gray" value={[`@`, issue?.creatorGithub].join(``)} />
             </span>
             <Avatar className="mr-2" userLogin={issue?.creatorGithub} />
-           { /*what this? 
             {issue?.dueDate && (
               <span className="p-small text-warning mr-2 mt-1">
                 {issue?.dueDate}
               </span>
-            )}*/}
-            <div className="flex mr-1 mt-1 flex-row">
-              <span className="mediumInfo  mr-1 text-white-50">
-                {issue != null && issue.working.length+10 || 0}
-              </span>
-              <span className="mediumInfo text-ligth-gray">
-              working
-              </span>
-            </div>
-            <div className="flex mr-1 mt-1 flex-row">
-              <span className="mediumInfo  mr-1 text-white-50 ">
-                {issue != null && issue.pullRequests.length+10 || 0}
-              </span>
-              <span className="mediumInfo text-ligth-gray">
-              pr's
-              </span>
-            </div>
-            <div className="flex mr-1 mt-1 flex-row">
-              <span className="mediumInfo  mr-1 text-white-50">
-                {issue != null && issue.mergeProposals.length+40 || 0}
-              </span>
-              <span className="mediumInfo text-ligth-gray">
-              proposals
-              </span>
-            </div>
-            <span className="smallInfo mt-2 text-white-50">
-              {issue != null && formatDate(issue?.createdAt)}
-            </span>
+            )}
           </div>
         </div>
         <div className="col-md-2 my-auto text-center">
