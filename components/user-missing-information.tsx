@@ -1,5 +1,6 @@
 import { ApplicationContext } from "@contexts/application";
 import { changeGithubHandle } from "@contexts/reducers/change-github-handle";
+import { BeproService } from "@services/bepro-service";
 import useApi from "@x-hooks/use-api";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
@@ -19,6 +20,7 @@ export default function UserMissingModal({ show }: { show: boolean }) {
   const { t } = useTranslation("common");
 
   function handleReconnectAcount() {
+    test();
     removeUser(currentAddress, githubLogin)
       .then(() => {
         setVisible(false);
@@ -34,7 +36,24 @@ export default function UserMissingModal({ show }: { show: boolean }) {
     setVisible(show);
   }
 
+  function test() {
+    console.log('trest', BeproService.network)
+    BeproService.network
+      .getOraclesByAddress({ address: currentAddress })
+      .then((res) => console.log("res de verdade", res))
+      .catch((err) => console.log("err de vdd", err));
+
+/*    BeproService.network
+      .redeemIssue({ issueId: 1 })
+      .then((res) => console.log("res de verdade 2", res))
+      .catch((err) => console.log("err de vdd 2", err));*/
+
+  }
+
   useEffect(changeSetVisible, [show]);
+  useEffect(() => {
+    currentAddress && test();
+  }, [currentAddress]);
 
   return (
     <Modal
