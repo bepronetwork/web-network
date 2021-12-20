@@ -50,11 +50,37 @@ class BeproFacet {
     return true;
   }
 
-  public async login(force?: boolean): Promise<boolean> {
+  public async startInApi() {
+    // this._bepro.test = true;
+
+    const opt: {opt: {web3Connection: string}, privateKey?: string} = {opt: {web3Connection: this.web3Connection}};
+    opt.privateKey = process.env.NEXT_PRIVATE_KEY
+
+    console.log('i am here ->',opt )
+    //this._bepro = new Application(opt);
+    this._network = new Network({contractAddress: this.contractAddress, ...opt});
+    this._network.test = true;
+
+    try {
+      await this._network.start();
+    } catch (e) {
+      console.log(`Failed to start`, e);
+      return false;
+    }
+
+    return true;
+  }
+
+
+
+  public async login(force?: boolean, key?: boolean): Promise<boolean> {
     if (!force && this._loggedIn) return true;
 
     if (force || this._network.test) {
-      const opt = {opt: {web3Connection: this.web3Connection}};
+      const opt: {opt: {web3Connection: string}, privateKey?: string} = {opt: {web3Connection: this.web3Connection}};
+      if(key) opt.privateKey = process.env.NEXT_PRIVATE_KEY
+
+      console.log('i am here ->',opt )
       this._bepro = new Application(opt);
       this._network = new Network({contractAddress: this.contractAddress, useLastBlockGasPriceWhenMetaSend: 10000000000, ...opt});
       this._ERC20 = new ERC20Contract({contractAddress: this.settlerAddress, useLastBlockGasPriceWhenMetaSend: 10000000000, ...opt});
@@ -68,7 +94,7 @@ class BeproFacet {
       const erc20 = await this.ERC20.login();
 
       success = ![bepro, network, erc20].some(bool => !bool);
-
+      console.log('sucesso try catch', success,bepro,network,erc20 )
       if (success) {
         await this.ERC20.__assert();
         await this.network.__assert();
@@ -78,6 +104,7 @@ class BeproFacet {
 
     } catch (e) {
       success = false;
+      console.log('error', e)
       console.error(`Error logging in,`, e);
     }
 
