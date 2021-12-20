@@ -15,6 +15,8 @@ class Issue extends Model {
       creatorGithub: DataTypes.STRING,
       amount: DataTypes.INTEGER,
       repository_id: DataTypes.STRING,
+      title: DataTypes.STRING,
+      body: DataTypes.STRING,
       working: {
         type: DataTypes.ARRAY(DataTypes.STRING)
       },
@@ -41,6 +43,11 @@ class Issue extends Model {
       foreignKey: 'issueId',
       sourceKey: 'id',
       as: 'mergeProposals'
+    });
+    this.belongsTo(models.repositories, {
+      foreignKey: 'repository_id',
+      sourceKey: 'id',
+      as: 'repository'
     });
   }
 };
