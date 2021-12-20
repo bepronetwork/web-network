@@ -22,6 +22,7 @@ import CustomContainer from '@components/custom-container';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import Translation from '@components/translation';
+import { NextSeo } from 'next-seo'
 interface NetworkIssue {
   recognizedAsFinished: boolean;
 }

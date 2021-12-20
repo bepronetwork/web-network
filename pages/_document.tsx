@@ -11,7 +11,6 @@ class MyDocument extends Document {
       <Html>
         <Head>
           <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-          <title>App | Web3 Decentralized Development</title>
           <link href="/favicon.ico" rel="shortcut icon"  />
         </Head>
         <body>
