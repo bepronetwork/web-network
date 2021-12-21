@@ -88,7 +88,8 @@
     "take-back": "Take Back",
     "install": "Install",
     "try-again": "Try Again",
-    "reconnect-account": "Reconnect account"
+    "reconnect-account": "Reconnect account",
+    "my-account-unlock": "My account > unlock"
   },
   "misc": {
     "by": "by",
@@ -180,7 +181,8 @@
     },
     "user-missing-information": {
       "title": "Your account is missing some information",
-      "content": "We need you to reconnect your Github Account"
+      "content": "We need you to reconnect your Github Account",
+      "error-message": "You need to unlock all your BEPRO before doing this"
     }
   },
   "forms": {
