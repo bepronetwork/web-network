@@ -9,4 +9,5 @@ export interface InputNumber extends NumberFormatProps {
   success?: boolean;
   warning?: boolean;
   value?: number | string | null;
+  suffix?: string;
 }
