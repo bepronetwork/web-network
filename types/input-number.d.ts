@@ -1,5 +1,5 @@
 import { ReactElement } from "react";
-import { NumberFormat } from "react-number-format";
+import { NumberFormatProps } from "react-number-format";
 
 export interface InputNumber extends NumberFormatProps {
   label?: string;
@@ -13,4 +13,6 @@ export interface InputNumber extends NumberFormatProps {
   onValueChange?: (values: NumberFormatValues) => void;
   onBlur?: (values: Number) => void;
   className?: string;
+  classSymbol?: string;
+  placeholder?: string;
 }
