@@ -24,6 +24,7 @@ import useOctokit from '@x-hooks/use-octokit';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
+import { addSeconds } from 'date-fns';
 
 interface ProposalBepro {
   disputes: string;
@@ -41,6 +42,23 @@ interface usersAddresses {
   githubLogin: string;
   oracles: string;
   percentage: number;
+}
+
+export function isProposalDisputable(createdAt: string, disputableTime: number): boolean {
+  const now = new Date()
+
+  if (now <= addSeconds(Date.parse(createdAt), disputableTime))
+    return true
+
+  return false
+}
+
+export function isProposalMergeable(isDisputable: boolean, ghMergeable: boolean, ghMergeableState: string): boolean {
+
+  if (!isDisputable && ghMergeable && ghMergeableState === 'clean' )
+    return true
+  
+  return false
 }
 
 export default function PageProposal() {
@@ -61,6 +79,7 @@ export default function PageProposal() {
   const [isCouncil, setIsCouncil] = useState(false);
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
+  const [disputableTime, setDisputableTime] = useState(0)
   const [[], {loadRepos}] = useRepos();
   const {getUserOf,} = useApi();
   const {getIssue,} = useMergeData();
@@ -138,6 +157,7 @@ export default function PageProposal() {
 
   function loadProposalData() {
     if (issueId && currentAddress) {
+      BeproService.getDisputableTime().then(setDisputableTime)
       BeproService.network.isCouncil({address: currentAddress})
         .then(isCouncil => setIsCouncil(isCouncil))
 
@@ -184,7 +204,8 @@ export default function PageProposal() {
         githubId={prGithubId}
         repoPath={issueMicroService?.repo}
         canClose={isMergiable}
-        finished={isFinished} />
+        finished={isFinished}
+        isDisputable={isProposalDisputable(proposalMicroService.createdAt, disputableTime) && !proposalMicroService.isDisputed} />
       <ProposalAddresses addresses={usersAddresses} currency={t('$bepro')} />
       <NotMergeableModal
         currentGithubLogin={githubLogin}
