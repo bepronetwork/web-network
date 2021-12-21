@@ -5,7 +5,7 @@ import BeproLogo from "@assets/icons/bepro-blue";
 
 interface CardBountyProps {
   state: IssueState;
-  issueId: number;
+  issueId: string;
   title: String;
   repo: string;
   ammount: number;
