@@ -17,5 +17,9 @@ export interface InputNumber extends NumberFormatProps {
   className?: string;
   min?: string | number;
   htmlFor?: string;
-  disabled?: boolean
+  disabled?: boolean;
+  max?: string | number;
+  thousandSeparator?: boolean | string;
+  decimalSeparator?: string;
+  decimalScale?: number;
 }
