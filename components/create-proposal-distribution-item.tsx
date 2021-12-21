@@ -6,11 +6,14 @@ import { NumberFormatValues } from "react-number-format";
 import { InputNumber as InputNumberProps } from "types/input-number";
 import useApi from '@x-hooks/use-api';
 
-interface Props extends InputNumberProps {
+interface Props {
   by: string;
   onChangeDistribution(params: { [key: string]: number }): void;
   address: string;
   defaultPercentage?: number;
+  error?: boolean;
+  success?: boolean;
+  warning?: boolean;
 }
 
 export default function CreateProposalDistributionItem({
