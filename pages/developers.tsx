@@ -24,45 +24,12 @@ import Button from '@components/button';
 import CloseIcon from '@assets/icons/close-icon';
 import SearchIcon from '@assets/icons/search-icon';
 
-type Filter = {
-  label: string;
-  value: string;
-  emptyState: string;
-};
-
-type FiltersByIssueState = Filter[];
-
 export default function PageDevelopers() {
   const {dispatch, state: { loading }} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
   const mergedData = useMergeData();
   const { t } = useTranslation(['common', 'bounty']);
   
-  const filtersByIssueState: FiltersByIssueState = [
-    {
-      label: t('filters.bounties.all'),
-      value: 'all',
-      emptyState: t('filters.bounties.not-found')
-    },
-    {
-      label: t('filters.bounties.open'),
-      value: 'open',
-      emptyState: t('filters.bounties.open-not-found')
-    },
-    {
-      label: t('filters.bounties.draft'),
-      value: 'draft',
-      emptyState: t('filters.bounties.draft-not-found')
-    },
-    {
-      label: t('filters.bounties.closed'),
-      value: 'closed',
-      emptyState: t('filters.bounties.closed-not-found')
-    }
-  ];
-  
-  const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
-
   const page = usePage();
   const results = useCount();
   const router = useRouter();
@@ -94,56 +61,7 @@ export default function PageDevelopers() {
     <div>
       <PageHero />
       <div className="container p-footer">
-        <div className="row justify-content-center">
-          <div className="col-md-10">
-            <div className="input-group mb-3">
-              <span className="input-group-text rounded-4 " id="inputGroup-sizing-sm"><SearchIcon /></span>
-              <input type="text" className="form-control" aria-label="Sizing example input" 
-              aria-describedby="inputGroup-sizing-sm"
-              placeholder='Search for a Bounty'/>
-              <button className="bg-black border-transparent pe-3"  style={{
-                borderTopRightRadius: ".5rem",
-                borderBottomRightRadius: ".5rem",
-              }}><CloseIcon width={10} height={10}/></button>  
-              
-                    
-              <div className="d-flex flex-row ms-3">
-                <span className="mediumInfo mr-1 mt-2 text-white-50">sort by</span>
-                <ReactSelect options={[{label:'Newest'}, {label:'Highest Bounty'}, {label:'Oldest'}, {label:'Lowest Bounty'}]}/>
-              </div> 
-              <Button transparent applyTextColor textClass="text-blue">
-                Clear
-              </Button>
-              <IssueFilters />
-              </div> 
-            </div>   
-
-          <ListIssues listIssues={issues} />
-          {issues?.length !== 0 && (
-              <Paginate
-                count={results.count}
-                onChange={(page) =>
-                  router.push({
-                    pathname: router.pathname,
-                    query: {
-                      page,
-                      state,
-                      time,
-                      repoId,
-                    },
-                  })
-                }
-              />
-            )}
-          {issues?.length === 0 && !loading.isLoading ? (
-            <div className="col-md-10">
-              <NothingFound
-                description={filterByState.emptyState}>
-                <InternalLink href="/create-bounty" label={String(t('actions.create-one'))} uppercase />
-              </NothingFound>
-            </div>
-          ) : null}
-        </div>
+        <ListIssues listIssues={issues} />
       </div>
     </div>
   </>);
