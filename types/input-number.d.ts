@@ -13,5 +13,6 @@ export interface InputNumber extends NumberFormatProps {
   suffix?: string;
   classSymbol?: string;
   placeholder?: string;
-  
+  onBlur?: () => void;
+
 }
