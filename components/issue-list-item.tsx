@@ -39,16 +39,11 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
       case "disputed": {
         return "bg-danger text-white";
       }
-      // REVIEW: redeem not exist in figma
-      case "redeemed": {
-        return "blue";
-      }
       default: {
         return "blue";
       }
     }
   }
-
 
   return (
     <div
