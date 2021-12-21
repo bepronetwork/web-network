@@ -14,5 +14,5 @@ export interface InputNumber extends NumberFormatProps {
   classSymbol?: string;
   placeholder?: string;
   onBlur?: () => void;
-
+  className?: string;
 }
