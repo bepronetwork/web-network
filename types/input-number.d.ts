@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
-import { NumberFormatProps } from "react-number-format";
+import { NumberFormatPropsBase } from "react-number-format";
 
-export interface InputNumber extends NumberFormatProps {
+export interface InputNumber extends NumberFormatPropsBase {
   label?: string;
   symbol?: string;
   helperText?: string | ReactElement;
