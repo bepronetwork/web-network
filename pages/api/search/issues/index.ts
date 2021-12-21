@@ -3,11 +3,13 @@ import { Op, WhereOptions } from 'sequelize'
 import { subHours, subMonths, subWeeks, subYears } from 'date-fns'
 
 import models from '@db/models'
-import paginate from '@helpers/paginate'
+import { paginateArray } from '@helpers/paginate'
+import { searchPatternInText } from '@helpers/string'
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = { state: { [Op.not]: `pending` } }
-  const { state, issueId, repoId, time, creator, address, title, body } = req.query || {}
+  const { state, issueId, repoId, time, creator, address, search, page } =
+    req.query || {}
 
   if (state) whereCondition.state = state
 
@@ -36,14 +38,21 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: 'mergeProposals' }
   ]
 
-  const issues = await models.issue.findAndCountAll(
-    paginate({ where: whereCondition, include, nest: true }, req.query, [
-      [req.query.sortBy || 'updatedAt', req.query.order || 'DESC']
-    ])
-  )
-  // await composeIssues(issues.rows);
+  let issues = await models.issue.findAll({
+    where: whereCondition,
+    include,
+    nest: true,
+    order: [[req.query.sortBy || 'updatedAt', req.query.order || 'DESC']]
+  })
 
-  return res.status(200).json(issues)
+  if (search)
+    issues = issues.filter(
+      (issue) =>
+        searchPatternInText(issue.title, String(search)) ||
+        searchPatternInText(issue.body, String(search))
+    )
+
+  return res.status(200).json({ count: issues.length, rows: paginateArray(issues, 10, page || 1) })
 }
 
 export default async function SearchIssues(
