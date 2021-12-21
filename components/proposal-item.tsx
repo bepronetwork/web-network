@@ -13,6 +13,7 @@ import Button from './button';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import useTransactions from '@x-hooks/useTransactions';
 import Translation from './translation';
+import LockedIcon from '@assets/icons/locked-icon';
 
 interface Options {
   proposal: Proposal,
@@ -23,6 +24,7 @@ interface Options {
   isFinalized: boolean;
   owner?: string;
   isMerged: boolean;
+  isDisputable?: boolean;
   onDispute: (error?: boolean) => void;
 }
 
@@ -35,13 +37,14 @@ export default function ProposalItem({
                                        isFinalized,
                                        owner,
                                        isMerged = false,
+                                       isDisputable = false,
                                        onDispute = () => {}
                                      }: Options) {
   const {dispatch,} = useContext(ApplicationContext);
   const txWindow = useTransactions();
 
   async function handleDispute(mergeId) {
-    if (proposal.isDisputed || isFinalized)
+    if (!isDisputable || isFinalized)
       return;
 
     const disputeTx = addTransaction({type: TransactionTypes.dispute});
@@ -100,13 +103,13 @@ export default function ProposalItem({
   return <>
     <div className="content-list-item proposal" key={`${proposal.pullRequestId}${proposal.scMergeId}`}>
       <Link passHref href={{pathname: '/proposal', query: {prId: proposal.pullRequestId, mergeId: proposal.scMergeId, dbId, issueId},}}>
-        <a className="text-decoration-none text-white">
+        <a className="text-decoration-none">
           <div className="rounded row align-items-top">
             <div
               className={`col-3 caption-small mt-2 text-uppercase text-${getColors() === 'purple' ? 'white' : getColors()}`}>
               <Translation ns="pull-request" label={'abbreviation'} /> #{proposal.pullRequestGithubId} <Translation label={'misc.by'} /> {owner && ` @${owner}`}
             </div>
-            <div className="col-5 d-flex justify-content-start mb-2">
+            <div className="col-5 d-flex justify-content-start mb-2 text-white">
               {proposal.prAmounts.map((value, i) =>
                                         <PercentageProgressBar textClass={`caption-small p-small text-${getColors()}`}
                                                                pgClass={`bg-${getColors()}`}
@@ -115,7 +118,7 @@ export default function ProposalItem({
             </div>
 
             <div className="col-4 d-flex">              
-              <div className="col-9 offset-1">
+              <div className="col-9 offset-1 text-white">
               <ProposalProgressSmall pgClass={`${getColors()}`}
                                      value={+proposal.disputes}
                                      total={beproStaked}
@@ -124,13 +127,14 @@ export default function ProposalItem({
 
               <div className="col-1 offset-1 justify-content-end d-flex">
                 <Button color={getColors()}
-                        disabled={proposal.isDisputed}
-                        outline={proposal.isDisputed} className={`align-self-center mb-2 ms-3`}
+                        disabled={!isDisputable}
+                        outline={!isDisputable} className={`align-self-center mb-2 ms-3`}
                         onClick={(ev) => {
                           ev.stopPropagation();
                           handleDispute(+proposal._id)
                         }}>
-                  {getLabel()}
+                  {!isDisputable && <LockedIcon className={`me-2 text-${getColors()}`}/>}
+                  <span>{getLabel()}</span>
                 </Button>
               </div>
 

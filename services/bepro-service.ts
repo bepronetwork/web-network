@@ -150,6 +150,10 @@ class BeproFacet {
     return this._network.params.contract.getContract().methods.redeemTime().call()
   }
 
+  async getDisputableTime() {
+    return this._network.params.contract.getContract().methods.disputableTime().call()
+  }
+
   async getOraclesSummary() {
     const summary = await this.network.params.contract.getContract().methods.getOraclesSummary(this.address).call()
 
