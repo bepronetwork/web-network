@@ -10,4 +10,6 @@ export interface InputNumber extends NumberFormatProps {
   warning?: boolean;
   value?: number | string | null;
   suffix?: string;
+  onValueChange?: (values: NumberFormatValues) => void;
+  
 }
