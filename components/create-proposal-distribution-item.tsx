@@ -11,6 +11,9 @@ interface Props {
   onChangeDistribution(params: { [key: string]: number }): void;
   address: string;
   defaultPercentage?: number;
+  error?: boolean;
+  success?: boolean;
+  warning?: boolean;
 }
 
 export default function CreateProposalDistributionItem({
