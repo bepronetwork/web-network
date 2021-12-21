@@ -11,4 +11,5 @@ export interface Proposal {
   owner?: string;
   scMergeId: string;
   isMerged?: boolean;
+  createdAt: string;
 }
