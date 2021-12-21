@@ -342,6 +342,12 @@ export default function ParityPage() {
                 .then(console.log)
   }
 
+  function changeDisputableTime() {
+    BeproService.network.params.contract.getContract()
+                .methods.changeDisputableTime(60).send({from: currentAddress})
+                .then(console.log)
+  }
+
   useEffect(() => {
     if (!currentAddress)
       return;
@@ -389,7 +395,7 @@ export default function ParityPage() {
             <Button className="me-2" disabled={!councilAmount} onClick={() => updateCouncilAmount()}>{t('parity:update-council-amount')}</Button>
             <Button disabled={!settlerTokenName || !settlerTokenSymbol} onClick={() => deploySettlerToken()}>{t('parity:deploy-settler-token')}</Button>
             <Button onClick={() => changeRedeem()}>{t('parity:change-redeem-time')}</Button>
-
+            <Button onClick={() => changeDisputableTime()}>{t('parity:change-disputable-time')}</Button>
           </div>
         </div>
       </div>
