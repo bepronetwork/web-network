@@ -15,4 +15,5 @@ export interface InputNumber extends NumberFormatProps {
   placeholder?: string;
   onBlur?: () => void;
   className?: string;
+  min?: string;
 }
