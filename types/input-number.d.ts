@@ -8,4 +8,5 @@ export interface InputNumber extends NumberFormatProps {
   error?: boolean;
   success?: boolean;
   warning?: boolean;
+  value?: number;
 }
