@@ -412,8 +412,8 @@ export default function PageActions({
               {state?.toLowerCase() == "pull request" && (
                 <>
                   { (!isDisputed && !finalized && isDisputable ) && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>{t('actions.dispute')}</Button> || ``}
-                  {!finalized && <Button disabled={!canClose} onClick={handleClose}>
-                  {!canClose && <LockedIcon width={12} height={12} className="mr-1"/>}
+                  {!finalized && <Button disabled={!canClose || isDisputable} onClick={handleClose}>
+                  {!canClose || isDisputable && <LockedIcon width={12} height={12} className="mr-1"/>}
                     <span>{t('pull-request:actions.merge.title')}</span>
                     </Button> || ``}
                 </>

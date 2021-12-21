@@ -53,14 +53,6 @@ export function isProposalDisputable(createdAt: string, disputableTime: number):
   return false
 }
 
-export function isProposalMergeable(isDisputable: boolean, ghMergeable: boolean, ghMergeableState: string): boolean {
-
-  if (!isDisputable && ghMergeable && ghMergeableState === 'clean' )
-    return true
-  
-  return false
-}
-
 export default function PageProposal() {
   const router = useRouter();
   const {prId, mergeId, dbId, issueId} = router.query;
@@ -205,7 +197,7 @@ export default function PageProposal() {
         repoPath={issueMicroService?.repo}
         canClose={isMergiable}
         finished={isFinished}
-        isDisputable={isProposalDisputable(proposalMicroService.createdAt, disputableTime) && !proposalMicroService.isDisputed} />
+        isDisputable={isProposalDisputable(proposalMicroService?.createdAt, disputableTime)} />
       <ProposalAddresses addresses={usersAddresses} currency={t('$bepro')} />
       <NotMergeableModal
         currentGithubLogin={githubLogin}
