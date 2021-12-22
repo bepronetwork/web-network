@@ -8,7 +8,7 @@ import ProposalItem from '@components/proposal-item';
 import {Proposal} from '@interfaces/proposal';
 import NothingFound from "./nothing-found";
 import { useTranslation } from "next-i18next";
-import { isProposalDisputable } from "@pages/proposal";
+import { isProposalDisputable } from "@helpers/proposal";
 
 export default function IssueProposals({ metaProposals, className='', metaRequests, numberProposals, issueId, amount, dbId, isFinalized = false, mergedProposal }) {
   const { state: {beproStaked, currentAddress} } = useContext(ApplicationContext);

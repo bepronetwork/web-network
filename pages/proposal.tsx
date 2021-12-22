@@ -24,7 +24,7 @@ import useOctokit from '@x-hooks/use-octokit';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
-import { addSeconds } from 'date-fns';
+import { isProposalDisputable } from '@helpers/proposal';
 
 interface ProposalBepro {
   disputes: string;
@@ -42,15 +42,6 @@ interface usersAddresses {
   githubLogin: string;
   oracles: string;
   percentage: number;
-}
-
-export function isProposalDisputable(createdAt: string, disputableTime: number): boolean {
-  const now = new Date()
-
-  if (now <= addSeconds(Date.parse(createdAt), disputableTime))
-    return true
-
-  return false
 }
 
 export default function PageProposal() {
