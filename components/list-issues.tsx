@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { FormControl, InputGroup } from 'react-bootstrap'
@@ -6,7 +6,7 @@ import { FormControl, InputGroup } from 'react-bootstrap'
 import CloseIcon from '@assets/icons/close-icon'
 import SearchIcon from '@assets/icons/search-icon'
 
-import ReactSelect from '@components/react-select'
+import ListSort from '@components/list-sort'
 import NothingFound from '@components/nothing-found'
 import InternalLink from '@components/internal-link'
 import IssueFilters from '@components/issue-filters'
@@ -14,8 +14,13 @@ import IssueListItem from '@components/issue-list-item'
 import CustomContainer from '@components/custom-container'
 
 import { ApplicationContext } from '@contexts/application'
+import { changeLoadState } from '@contexts/reducers/change-load-state'
 
 import { IssueData } from '@interfaces/issue-data'
+
+import useApi from '@x-hooks/use-api'
+import usePage from '@x-hooks/use-page'
+import useCount from '@x-hooks/use-count'
 
 type Filter = {
   label: string
@@ -25,23 +30,21 @@ type Filter = {
 
 type FiltersByIssueState = Filter[]
 
-export default function ListIssues({
-  listIssues = [],
-  className = 'col-md-10',
-  handleSearch = (search: string) => {}
-}: {
-  listIssues: IssueData[]
-  className?: string
-  handleSearch?: (search: string) => void
-}): JSX.Element {
+export default function ListIssues(): JSX.Element {
   const {
     dispatch,
     state: { loading }
   } = useContext(ApplicationContext)
-  const { t } = useTranslation(['common', 'bounty'])
-  const [search, setSearch] = useState('')
+
+  const page = usePage()
   const router = useRouter()
-  const { state, time, repoId } = router.query
+  const results = useCount()
+  const { searchIssues } = useApi()
+  const [search, setSearch] = useState('')
+  const { t } = useTranslation(['common', 'bounty'])
+  const [issues, setIssues] = useState<IssueData[]>([])
+
+  const { repoId, time, state, sortBy, order } = router.query as { repoId: string, time: string, state: string, sortBy: string, order: string }
 
   const filtersByIssueState: FiltersByIssueState = [
     {
@@ -84,7 +87,37 @@ export default function ListIssues({
 
   function handleClearSearch(): void {
     setSearch('')
+
+    getIssues()
   }
+
+  function updateIssuesList(issues: IssueData[]) {
+    setIssues(issues)
+  }
+
+  function getIssues() {
+    dispatch(changeLoadState(true))
+    searchIssues({ page, repoId, time, state, sortBy, order, search })
+      .then(({ rows, count }) => {
+        results.setCount(count)
+        return rows
+      })
+      .then(updateIssuesList)
+      .catch((error) => {
+        console.error('Error fetching issues', error)
+      })
+      .finally(() => {
+        dispatch(changeLoadState(false))
+      })
+  }
+
+  function handleSearch(event) {
+    if (event.key !== 'Enter' || loading.isLoading) return
+
+    getIssues()
+  }
+
+  useEffect(getIssues, [page, repoId, time, state, sortBy, order])
 
   return (
     <CustomContainer>
@@ -100,6 +133,7 @@ export default function ListIssues({
               onChange={(e) => setSearch(e.target.value)}
               className="rounded-8 p-2"
               placeholder={t('bounty:search')}
+              onKeyDown={handleSearch}
             />
 
             {showClearButton() && (
@@ -119,15 +153,36 @@ export default function ListIssues({
           } d-flex align-items-center justify-content-between pl-0 pr-1`}
         >
           <div className="d-flex align-items-center">
-            <span className="caption-small text-white-50 mr-1">{t('sort.label')}</span>
+            <span className="caption-small text-white-50 mr-1">
+              {t('sort.label')}
+            </span>
 
-            <ReactSelect
-              defaultValue={{ value: 'newest', label: t('sort.types.newest') }}
+            <ListSort
               options={[
-                { value: 'newest', label: t('sort.types.newest') },
-                { value: 'highest-bounty', label: t('sort.types.highest-bounty') },
-                { value: 'oldest', label: t('sort.types.oldest') },
-                { value: 'lowest-bounty', label: t('sort.types.lowest-bounty') }
+                {
+                  value: 'newest',
+                  sortBy: 'createdAt',
+                  order: 'DESC',
+                  label: t('sort.types.newest')
+                },
+                {
+                  value: 'highest-bounty',
+                  sortBy: 'amount',
+                  order: 'DESC',
+                  label: t('sort.types.highest-bounty')
+                },
+                {
+                  value: 'oldest',
+                  sortBy: 'createdAt',
+                  order: 'ASC',
+                  label: t('sort.types.oldest')
+                },
+                {
+                  value: 'lowest-bounty',
+                  sortBy: 'amount',
+                  order: 'ASC',
+                  label: t('sort.types.lowest-bounty')
+                }
               ]}
             />
           </div>
@@ -136,7 +191,7 @@ export default function ListIssues({
         </div>
       </div>
 
-      {listIssues?.length === 0 && !loading.isLoading ? (
+      {issues?.length === 0 && !loading.isLoading ? (
         <NothingFound description={filterByState.emptyState}>
           <InternalLink
             href="/create-bounty"
@@ -146,7 +201,7 @@ export default function ListIssues({
         </NothingFound>
       ) : null}
 
-      {listIssues?.map((issue) => (
+      {issues?.map((issue) => (
         <div key={issue.githubId}>
           <IssueListItem issue={issue} />
         </div>

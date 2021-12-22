@@ -25,6 +25,7 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
     const repoId = getActiveFiltersOf(repoFilters);
 
     const query = {
+      ... router.query,
       ... state ? {state} : {},
       ... time ? {time} : {},
       ... repoId ? {repoId} : {},
@@ -84,9 +85,12 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
   }
 
   function clearFilters() {
-    updateOpt(repoFilters, makeFilterOption(`All`, `allrepos`, true), true, 'repo')
-    updateOpt(stateFilters, makeFilterOption(`All`, `allstates`, true), true, 'state')
-    updateOpt(timeFilters, makeFilterOption(`All`, `alltime`, true), true, 'time')
+    const query = {
+      ... router.query.sortBy ? {sortBy: router.query.sortBy}: {},
+      ... router.query.order ? {order: router.query.order}: {}
+    }
+
+    router.push({pathname: './', query});
   }
 
   return [[repoFilters, stateFilters, timeFilters], updateOpt, clearFilters]
