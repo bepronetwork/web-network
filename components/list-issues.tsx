@@ -12,6 +12,7 @@ import ReactSelect from './react-select'
 import Button from './button'
 import IssueFilters from './issue-filters'
 import SearchIcon from '@assets/icons/search-icon'
+import { FormControl, InputGroup } from 'react-bootstrap'
 
 type Filter = {
   label: string
@@ -23,16 +24,19 @@ type FiltersByIssueState = Filter[]
 
 export default function ListIssues({
   listIssues = [],
-  className = 'col-md-10'
+  className = 'col-md-10',
+  handleSearch = (search: string) => {}
 }: {
   listIssues: IssueData[]
   className?: string
+  handleSearch?: (search: string) => void
 }): JSX.Element {
   const {
     dispatch,
     state: { loading }
   } = useContext(ApplicationContext)
   const { t } = useTranslation('common')
+  const [search, setSearch] = useState('')
 
   const filtersByIssueState: FiltersByIssueState = [
     {
@@ -61,51 +65,57 @@ export default function ListIssues({
     filtersByIssueState[0]
   )
 
+  function showClearButton(): boolean {
+    if (search.trim() !== '') return true
+
+    return false
+  }
+
+  function handleClearSearch(): void {
+    setSearch('')
+  }
+
   return (
     <CustomContainer>
-      <div className="row">
-        <div className="input-group mb-3">
-          <span
-            className="input-group-text rounded-4 "
-            id="inputGroup-sizing-sm"
-          >
-            <SearchIcon />
-          </span>
+      <div className="row mb-3 align-items-center list-actions">
+        <div className="col-7 m-0">
+          <InputGroup>
+            <InputGroup.Text className="rounded-8">
+              <SearchIcon />
+            </InputGroup.Text>
 
-          <input
-            type="text"
-            className="form-control"
-            aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-sm"
-            placeholder="Search for a Bounty"
-          />
-
-          <button
-            className="bg-black border-transparent pe-3"
-            style={{
-              borderTopRightRadius: '.5rem',
-              borderBottomRightRadius: '.5rem'
-            }}
-          >
-            <CloseIcon width={10} height={10} />
-          </button>
-
-          <div className="d-flex flex-row ms-3">
-            <span className="mediumInfo mr-1 mt-2 text-white-50">sort by</span>
-            <ReactSelect
-              options={[
-                { label: 'Newest' },
-                { label: 'Highest Bounty' },
-                { label: 'Oldest' },
-                { label: 'Lowest Bounty' }
-              ]}
+            <FormControl
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="rounded-8 p-2"
+              placeholder="Search for a Bounty"
             />
-          </div>
-          
-          <Button transparent applyTextColor textClass="text-blue">
-            Clear
-          </Button>
 
+            {showClearButton() && (
+              <button
+                className="btn bg-black border-0 rounded-8 py-0 px-3"
+                onClick={handleClearSearch}
+              >
+                <CloseIcon width={10} height={10} />
+              </button>
+            )}
+          </InputGroup>
+        </div>
+
+        <div className="col-3 p-0 m-0 d-flex align-items-center pr-1">
+          <span className="caption-small text-white-50 mr-1">sort by</span>
+
+          <ReactSelect
+            options={[
+              { label: 'Newest' },
+              { label: 'Highest Bounty' },
+              { label: 'Oldest' },
+              { label: 'Lowest Bounty' }
+            ]}
+          />
+        </div>
+
+        <div className="col-2 py-0 pl-0 pr-1 m-0">
           <IssueFilters />
         </div>
       </div>

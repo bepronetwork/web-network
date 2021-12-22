@@ -60,9 +60,8 @@ export default function PageDevelopers() {
   return (<>
     <div>
       <PageHero />
-      <div className="container p-footer">
-        <ListIssues listIssues={issues} />
-      </div>
+        
+      <ListIssues listIssues={issues} />
     </div>
   </>);
 }
