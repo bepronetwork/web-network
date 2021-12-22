@@ -81,7 +81,9 @@ export default function MainNav() {
     setLoggedIn(true);
     dispatch(changeStakedState(await BeproService.network.getBEPROStaked()));
     getUserOf(BeproService.address)
-      .then((user: User) => !user.accessToken && setModalUserMissing(true))
+      .then((user: User) => {
+        if(!user?.accessToken && user?.githubLogin) setModalUserMissing(true)
+      })
   }
 
   useEffect(updateState, [currentAddress]);
