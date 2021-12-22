@@ -6,7 +6,7 @@ import useRepos from '@x-hooks/use-repos';
 
 type FilterStateUpdater = (opts: IssueFilterBoxOption[], opt: IssueFilterBoxOption, checked: boolean, type: ('time' | 'repo' | 'state'), multi?: boolean) => void;
 
-export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpdater] {
+export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpdater, () => void] {
   const [stateFilters, setStateFilters] = useState<IssueFilterBoxOption[]>([]);
   const [timeFilters, setTimeFilters] = useState<IssueFilterBoxOption[]>([]);
   const [repoFilters, setRepoFilters] = useState<IssueFilterBoxOption[]>([]);
@@ -83,5 +83,11 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
     updateRouterQuery()
   }
 
-  return [[repoFilters, stateFilters, timeFilters], updateOpt]
+  function clearFilters() {
+    updateOpt(repoFilters, makeFilterOption(`All`, `allrepos`, true), true, 'repo')
+    updateOpt(stateFilters, makeFilterOption(`All`, `allstates`, true), true, 'state')
+    updateOpt(timeFilters, makeFilterOption(`All`, `alltime`, true), true, 'time')
+  }
+
+  return [[repoFilters, stateFilters, timeFilters], updateOpt, clearFilters]
 }

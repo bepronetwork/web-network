@@ -10,15 +10,20 @@ import { useTranslation } from 'next-i18next';
 export default function IssueFilters() {
   const node = useRef()
   const [show, setShow] = useState(false);
-  const [[repoOptions, stateOptions, timeOptions], updateOptions] = useFilters();
+  const [[repoOptions, stateOptions, timeOptions], updateOptions, clearFilters] = useFilters();
   const router = useRouter();
   const { state, time, repoId } = router.query
   const { t } = useTranslation('common')
 
   function countFilters() {
-    const value = +!!state + +!!time + +!!repoId;
-    if (value > 0)
-      return <div className='mr-1 bg-primary rounded-4 p-1 myn-1'>{value}</div>
+    return +!!state + +!!time + +!!repoId
+  }
+
+  function countFiltersLabel() {
+    const quantity = countFilters()
+
+    if (quantity > 0)
+      return <div className='mr-1 bg-primary rounded-4 p-1 myn-1'>{quantity}</div>
 
     return <FilterIcon />
   }
@@ -40,10 +45,26 @@ export default function IssueFilters() {
     return () => document.removeEventListener(`mousedown`, handleClick)
   }
 
+  function handleClearFilters() {
+    clearFilters()
+  }
+
   useEffect(loadOutsideClick, [show]);
 
   return <div className="position-relative d-flex justify-content-end" ref={node}>
-    <Button color="outline-dark bg-blue-hover" className={show && `border-blue` || ``} onClick={() => setShow(!show)}>{countFilters()} <span><Translation label="filters.filters" /></span></Button>
+
+    {countFilters() > 0 && <Button
+            transparent
+            applyTextColor
+            textClass="text-blue"
+            className="p-0 mr-1"
+            onClick={handleClearFilters}
+          >
+            Clear
+          </Button>}
+
+    <Button color="black" className={`${show && `border-blue` || ``} rounded-8 m-0`} onClick={() => setShow(!show)}>{countFiltersLabel()} <span><Translation label="filters.filters" /></span></Button>
+    
     <div className={`filter-wrapper d-${show ? `flex` : `none`} justify-content-start align-items-stretch position-absolute`}>
       <div>
         <IssueFilterBox className="h-100" title={t('filters.repository')} options={repoOptions} filterPlaceholder={t('filters.search-repositories')}

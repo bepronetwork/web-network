@@ -1073,3 +1073,48 @@ textarea.form-control {
   line-height: 130%;
   letter-spacing: 0.1em;
 }
+
+.list-actions {
+  .input-group {
+    border: 2px solid transparent;
+    border-radius: math.div($m, 2);
+
+    &:hover {
+      border: 2px solid $ligth-gray;
+    }
+
+    &:focus-within {
+      border-color: $primary;
+    }
+
+    input {
+      border: 0;
+
+      &:focus {
+        border: 0;
+        background-color: $black;
+      }
+    }
+
+    button {
+      background-color: $black;
+
+      svg {
+        color: $primary;
+        width: 10px;
+      }
+    }
+  }
+
+  button {
+    border: 2px solid transparent;
+
+    &:hover {
+      border-color: $ligth-gray;
+    }
+  }
+
+  .react-select-container, .react-select__control {
+    min-width: 190px !important;
+  }
+}
