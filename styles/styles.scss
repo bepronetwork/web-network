@@ -1106,6 +1106,10 @@ textarea.form-control {
     }
   }
 
+  .pl-0 {
+    padding-left: 0 !important;
+  }
+
   button {
     border: 2px solid transparent;
 
@@ -1115,6 +1119,15 @@ textarea.form-control {
   }
 
   .react-select-container, .react-select__control {
-    min-width: 190px !important;
+    min-width: 170px !important;
+  }
+
+  .react-select__single-value {
+    font-family: 'fontSemiBold', sans-serif !important;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+    font-size: 12px;
+    text-align: center;
   }
 }

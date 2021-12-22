@@ -1,18 +1,21 @@
-import { GetStaticProps } from 'next'
 import React, { useContext, useState } from 'react'
-import IssueListItem from '@components/issue-list-item'
-import { IssueData } from '@interfaces/issue-data'
-import CustomContainer from './custom-container'
-import NothingFound from './nothing-found'
-import { ApplicationContext } from '@contexts/application'
-import InternalLink from './internal-link'
+import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
-import CloseIcon from '@assets/icons/close-icon'
-import ReactSelect from './react-select'
-import Button from './button'
-import IssueFilters from './issue-filters'
-import SearchIcon from '@assets/icons/search-icon'
 import { FormControl, InputGroup } from 'react-bootstrap'
+
+import CloseIcon from '@assets/icons/close-icon'
+import SearchIcon from '@assets/icons/search-icon'
+
+import ReactSelect from '@components/react-select'
+import NothingFound from '@components/nothing-found'
+import InternalLink from '@components/internal-link'
+import IssueFilters from '@components/issue-filters'
+import IssueListItem from '@components/issue-list-item'
+import CustomContainer from '@components/custom-container'
+
+import { ApplicationContext } from '@contexts/application'
+
+import { IssueData } from '@interfaces/issue-data'
 
 type Filter = {
   label: string
@@ -35,8 +38,10 @@ export default function ListIssues({
     dispatch,
     state: { loading }
   } = useContext(ApplicationContext)
-  const { t } = useTranslation('common')
+  const { t } = useTranslation(['common', 'bounty'])
   const [search, setSearch] = useState('')
+  const router = useRouter()
+  const { state, time, repoId } = router.query
 
   const filtersByIssueState: FiltersByIssueState = [
     {
@@ -65,6 +70,12 @@ export default function ListIssues({
     filtersByIssueState[0]
   )
 
+  function hasFilter(): boolean {
+    if (state || time || repoId) return true
+
+    return false
+  }
+
   function showClearButton(): boolean {
     if (search.trim() !== '') return true
 
@@ -78,7 +89,7 @@ export default function ListIssues({
   return (
     <CustomContainer>
       <div className="row mb-3 align-items-center list-actions">
-        <div className="col-7 m-0">
+        <div className={`col-${(hasFilter() && '7') || '8'} m-0`}>
           <InputGroup>
             <InputGroup.Text className="rounded-8">
               <SearchIcon />
@@ -88,7 +99,7 @@ export default function ListIssues({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="rounded-8 p-2"
-              placeholder="Search for a Bounty"
+              placeholder={t('bounty:search')}
             />
 
             {showClearButton() && (
@@ -102,20 +113,25 @@ export default function ListIssues({
           </InputGroup>
         </div>
 
-        <div className="col-3 p-0 m-0 d-flex align-items-center pr-1">
-          <span className="caption-small text-white-50 mr-1">sort by</span>
+        <div
+          className={`col-${
+            (hasFilter() && '5') || '4'
+          } d-flex align-items-center justify-content-between pl-0 pr-1`}
+        >
+          <div className="d-flex align-items-center">
+            <span className="caption-small text-white-50 mr-1">{t('sort.label')}</span>
 
-          <ReactSelect
-            options={[
-              { label: 'Newest' },
-              { label: 'Highest Bounty' },
-              { label: 'Oldest' },
-              { label: 'Lowest Bounty' }
-            ]}
-          />
-        </div>
+            <ReactSelect
+              defaultValue={{ value: 'newest', label: t('sort.types.newest') }}
+              options={[
+                { value: 'newest', label: t('sort.types.newest') },
+                { value: 'highest-bounty', label: t('sort.types.highest-bounty') },
+                { value: 'oldest', label: t('sort.types.oldest') },
+                { value: 'lowest-bounty', label: t('sort.types.lowest-bounty') }
+              ]}
+            />
+          </div>
 
-        <div className="col-2 py-0 pl-0 pr-1 m-0">
           <IssueFilters />
         </div>
       </div>

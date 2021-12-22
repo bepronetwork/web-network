@@ -242,5 +242,14 @@
       "approve-settler": "Approve settler token",
       "recognize-finished": "Recognize bounty as finished"
     }
+  },
+  "sort": {
+    "label": "Sort by",
+    "types": {
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "highest-bounty": "Highest Bounty",
+      "lowest-bounty": "Lowest Bounty"
+    }
   }
 }
