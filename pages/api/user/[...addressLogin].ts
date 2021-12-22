@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import models from "@db/models";
-import { CONTRACT_ADDRESS, WEB3_CONNECTION } from "../../../env";
-import { Network } from "bepro-js";
+import networkBeproJs from "@helpers/api/handle-network-bepro";
 
 async function remove(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -16,16 +15,7 @@ async function remove(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (user) {
-    const opt = {
-      opt: {
-        web3Connection: WEB3_CONNECTION,
-        privateKey: process.env.NEXT_PRIVATE_KEY,
-      },
-      test: true,
-    };
-
-    const network = new Network({ contractAddress: CONTRACT_ADDRESS, ...opt });
-
+    const network = networkBeproJs({ test: true });
     await network.start();
     const contract = network.params.contract.getContract();
     const beproLocked = await contract.methods
