@@ -42,7 +42,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     where: whereCondition,
     include,
     nest: true,
-    order: [[req.query.sortBy || 'updatedAt', req.query.order || 'DESC']]
+    order: [[req.query.sortBy || 'createdAt', req.query.order || 'DESC']]
   })
 
   if (search)
