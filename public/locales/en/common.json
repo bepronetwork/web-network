@@ -89,7 +89,7 @@
     "install": "Install",
     "try-again": "Try Again",
     "reconnect-account": "Reconnect account",
-    "my-account-unlock": "My account > unlock"
+    "unlock-all": "Unlock all"
   },
   "misc": {
     "by": "by",
