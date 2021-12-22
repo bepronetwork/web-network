@@ -68,8 +68,6 @@ export default function PageDevelopers() {
   }
 
   function getIssues() {
-    BeproService.getDisputableTime().then(console.log)
-
     dispatch(changeLoadState(true))
     mergedData.getIssues({page, repoId, time, state})
                       .then(({rows, count}) => {
