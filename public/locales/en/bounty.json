@@ -7,6 +7,7 @@
   "no-comments-available": "_No comments available_",
   "description": "description",
   "view-all-addresses": "view all address",
+  "search": "Search for a bounty",
   "steps": {
     "draft": "Draft",
     "development": "Development",

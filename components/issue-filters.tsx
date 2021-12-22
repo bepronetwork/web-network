@@ -57,7 +57,7 @@ export default function IssueFilters() {
             transparent
             applyTextColor
             textClass="text-blue"
-            className="p-0 mr-1"
+            className="p-0 mr-2"
             onClick={handleClearFilters}
           >
             Clear
