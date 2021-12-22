@@ -42,6 +42,11 @@ class Issue extends Model {
       sourceKey: 'id',
       as: 'merges'
     });
+    this.hasOne(models.repositories, {
+      foreignKey: 'id',
+      sourceKey: 'id',
+      as: 'repository'
+    });
   }
 };
   
