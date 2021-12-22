@@ -24,6 +24,7 @@ import useOctokit from '@x-hooks/use-octokit';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
+import { isProposalDisputable } from '@helpers/proposal';
 
 interface ProposalBepro {
   disputes: string;
@@ -61,6 +62,7 @@ export default function PageProposal() {
   const [isCouncil, setIsCouncil] = useState(false);
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
+  const [disputableTime, setDisputableTime] = useState(0)
   const [[], {loadRepos}] = useRepos();
   const {getUserOf,} = useApi();
   const {getIssue,} = useMergeData();
@@ -138,6 +140,7 @@ export default function PageProposal() {
 
   function loadProposalData() {
     if (issueId && currentAddress) {
+      BeproService.getDisputableTime().then(setDisputableTime)
       BeproService.network.isCouncil({address: currentAddress})
         .then(isCouncil => setIsCouncil(isCouncil))
 
@@ -184,7 +187,8 @@ export default function PageProposal() {
         githubId={prGithubId}
         repoPath={issueMicroService?.repo}
         canClose={isMergiable}
-        finished={isFinished} />
+        finished={isFinished}
+        isDisputable={isProposalDisputable(proposalMicroService?.createdAt, disputableTime)} />
       <ProposalAddresses addresses={usersAddresses} currency={t('$bepro')} />
       <NotMergeableModal
         currentGithubLogin={githubLogin}
