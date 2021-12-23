@@ -27,19 +27,35 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const {data} = await octokit.rest.issues.get({ owner, repo, issue_number: issue.githubId })
 
   const card = await generateCard({
-    state: issue.state,
-    issueId,
-    title: data.title,
+    state: 'CLOSED',
+    issueId: '404',
+    title: 'Remove all getContract functions from Application and instead calling the Object directly',
     repo,
-    ammount: '1000',
-    working: issue.working.length,
-    pr: issue.working.length,
-    proposal: issue.merges.length,
+    ammount: '10000',
+    working: 6,
+    pr: 10,
+    proposal: 8,
   })
+
+  // const card = await generateCard({
+  //   state: 'CLOSED',
+  //   issueId: ghId,
+  //   title: data.title,
+  //   repo,
+  //   ammount: '1000',
+  //   working: issue.working.length,
+  //   pr: issue.working.length,
+  //   proposal: issue.merges.length,
+  // })
   
-  const img = new Jimp(card.data);
-  
-  return res.status(200).json(card);
+  var img = Buffer.from(card.buffer, 'base64');
+
+  res.writeHead(200, {
+    'Content-Type': 'image/png',
+    'Content-Length': img.length
+  });
+  res.end(img); 
+  // return res.status(200).json(card);
 }
 
 export default async function GetIssues(req: NextApiRequest, res: NextApiResponse) {
