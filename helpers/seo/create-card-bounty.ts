@@ -4,18 +4,53 @@ import { position, write } from "../jimp-tools";
 const bg = `${process.env.NEXT_HOME_URL}/images/bg-bounty-card.png`;
 const icon = `${process.env.NEXT_HOME_URL}/images/bepro-icon.png`;
 
-async function doHeding({ ghId, state }: { ghId: string; state: string }) {
-  var headerContainer = new Jimp(232, 48);
-
+async function doHeding({ issueId, state }: { issueId: string; state: string }) {
   async function doState() {
-    var statusContainer = new Jimp(109, 48, "#4250E4");
-    const statusText = await write(state, 35, "white", "bold");
+    const padding = 8;
+    function getColorState(state) {
+      switch (state?.toLowerCase()) {
+        case "draft": {
+          return "#c4c7d3";
+        }
+        case "open": {
+          return "#4250E4";
+        }
+        case "in progress": {
+          return "#4250E4";
+        }
+        case "canceled": {
+          return "#20222b";
+        }
+        case "closed": {
+          return "#20222b";
+        }
+        case "ready": {
+          return "#35e0ad";
+        }
+        case "done": {
+          return "#35e0ad";
+        }
+        case "disputed": {
+          return "#eb5757";
+        }
+        default: {
+          return "#4250E4";
+        }
+      }
+    }
+    const statusText = await write(state.toUpperCase(), 35, "white", "bold");
+
+    var statusContainer = new Jimp(statusText.bitmap.width + padding, statusText.bitmap.height + padding, getColorState(state));
+    
     return await position(statusContainer, statusText, 50, 50);
   }
 
   const status = await doState();
-  const idText = await write(ghId, 33, "#6E6F75", "semi");
-
+  const idText = await write(`#${issueId}`, 33, "#6E6F75", "semi");
+  const margin = 10;
+  const width = status.bitmap.width + idText.bitmap.width + margin
+  const height = Math.max(status.bitmap.height, idText.bitmap.height);
+  var headerContainer = new Jimp(width, height);
   headerContainer = await position(headerContainer, status, 0, 0);
   headerContainer = await position(headerContainer, idText, 100, 50);
 
@@ -53,9 +88,13 @@ async function doSubTitle({
   }
 
   async function doAmmount() {
-    var ammountContainer = new Jimp(503, 84);
     const ammountText = await write(ammoutValue, 70, "white");
     const statusText = await write("$BEPRO", 38, "#4250E4");
+    const margin = 10;
+    const width = ammountText.bitmap.width + statusText.bitmap.width + margin
+    const height = Math.max(ammountText.bitmap.height, statusText.bitmap.height);
+    var ammountContainer = new Jimp(width, height);
+
     ammountContainer = await position(ammountContainer, ammountText, 0, 50);
     ammountContainer = await position(ammountContainer, statusText, 100, 50);
     return ammountContainer;
@@ -63,8 +102,9 @@ async function doSubTitle({
 
   const repo = await doRepo();
   const ammount = await doAmmount();
-  const width = repo.bitmap.width + ammount.bitmap.width + 20;
-  const height = repo.bitmap.height + ammount.bitmap.height + 20;
+  const margin = 50;
+  const width =  Math.max(repo.bitmap.width, ammount.bitmap.width)
+  const height = repo.bitmap.height + ammount.bitmap.height + margin;
 
   var container = new Jimp(width, height);
 
@@ -75,10 +115,12 @@ async function doSubTitle({
 }
 
 async function doTitle(title: string) {
-  // const title = `Remove all getContract functions from \nApplication and instead calling the Object \ndirectly`;
-  var titleContainer = new Jimp(1080, 174);
-  const statusText = await write(title, 48, "white", "bold");
+  title = title.split(' ')
+  //Wrap lines size between 26 and 35 words
+  .reduce((p, c) => p.length % 35 > 26 && p.length % 35 < 35?`${p} \n${c}`:`${p} ${c}`)
 
+  const statusText = await write(title, 48, "white", "bold");
+  var titleContainer = new Jimp(1080, 174);
   titleContainer = await position(titleContainer, statusText, 0, 0);
 
   return titleContainer;
@@ -151,13 +193,14 @@ interface IGenerateResp{
   width: number,
   heigth: number,
   data: Buffer,
+  buffer: any;
 }
 
 export async function generateCard(issue: IGenerateCard): Promise<IGenerateResp> {
   var container = await Jimp.read(bg);
   var contain = new Jimp(1080, 510);
 
-  const heading = await doHeding({ghId: issue.issueId, state: issue.state});
+  const heading = await doHeding({issueId: issue.issueId, state: issue.state});
   const title = await doTitle(issue.title);
   const subTitle = await doSubTitle({repoName: issue.repo, ammoutValue: issue.ammount});
   const footer = await doFooter({working: issue.working, pr: issue.pr, proposal: issue.proposal});
@@ -186,15 +229,16 @@ export async function generateCard(issue: IGenerateCard): Promise<IGenerateResp>
   ];
 
   contain = await position(contain, heading, 0, 0);
-  contain = await position(contain, title, 0, 35);
-  contain = await position(contain, subTitle, 0, 65);
+  contain = await position(contain, title, 0, 30);
+  contain = await position(contain, subTitle, 0, 60);
   contain = await position(contain, footer, 0, 100);
 
-  var { bitmap } = await position(container, contain, 50, 50);
-
+  var image = await position(container, contain, 50, 50);
+  var buffer = await image.getBufferAsync(Jimp.MIME_JPEG)
   return {
-    width: bitmap.width,
-    heigth: bitmap.height,
-    data: bitmap.data,
+    width: image.bitmap.width,
+    heigth: image.bitmap.height,
+    data: image.bitmap.data,
+    buffer,
   };
 }
