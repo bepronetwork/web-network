@@ -2,7 +2,8 @@ import models from '@db/models';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Octokit} from 'octokit';
 import {generateCard} from '@helpers/seo/create-card-bounty'
-import Jimp from 'jimp'
+import IpfsStorage from '@services/ipfs-service';
+
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {ids: [repoId, ghId]} = req.query;
   const issueId = [repoId, ghId].join(`/`);
@@ -36,7 +37,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     pr: 10,
     proposal: 8,
   })
-
   // const card = await generateCard({
   //   state: 'CLOSED',
   //   issueId: ghId,
@@ -47,9 +47,14 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   //   pr: issue.working.length,
   //   proposal: issue.merges.length,
   // })
-  
+
+  const storage = new IpfsStorage()
   var img = Buffer.from(card.buffer, 'base64');
 
+  const resp = await storage.add({data: img})
+  
+  // const toWrite = await Jimp.read(img)
+  // toWrite.writeAsync(`public/images/${issueId}.png`)
   res.writeHead(200, {
     'Content-Type': 'image/png',
     'Content-Length': img.length
