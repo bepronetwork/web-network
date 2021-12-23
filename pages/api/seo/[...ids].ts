@@ -27,11 +27,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const {data} = await octokit.rest.issues.get({ owner, repo, issue_number: issue.githubId })
 
   const card = await generateCard({
-    state: 'CLOSED',
-    issueId: '404',
+    state: 'open',
+    issueId: '9999',
     title: 'Remove all getContract functions from Application and instead calling the Object directly',
     repo,
-    ammount: '10000',
+    ammount: 100000,
     working: 6,
     pr: 10,
     proposal: 8,

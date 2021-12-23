@@ -38,7 +38,9 @@ async function doHeding({ issueId, state }: { issueId: string; state: string }) 
         }
       }
     }
-    const statusText = await write(state.toUpperCase(), 35, "white", "bold");
+    const statusText = await write(state.toUpperCase(), 35, "white", "bold",{
+      // lineSpacing: 3.5,
+    });
 
     var statusContainer = new Jimp(statusText.bitmap.width + padding, statusText.bitmap.height + padding, getColorState(state));
     
@@ -46,7 +48,7 @@ async function doHeding({ issueId, state }: { issueId: string; state: string }) 
   }
 
   const status = await doState();
-  const idText = await write(`#${issueId}`, 33, "#6E6F75", "semi");
+  const idText = await write(`#${issueId}`, 33, "#6E6F75", "regular");
   const margin = 10;
   const width = status.bitmap.width + idText.bitmap.width + margin
   const height = Math.max(status.bitmap.height, idText.bitmap.height);
@@ -62,13 +64,13 @@ async function doSubTitle({
   ammoutValue,
 }: {
   repoName: string;
-  ammoutValue: string;
+  ammoutValue: number;
 }) {
   async function doRepo() {
     const borderSize = 2;
     const padding = 10;
     const color = "#4250E4";
-    const repoText = await write(repoName, 25, color);
+    const repoText = await write(repoName.toUpperCase(), 24, color, 'semi');
 
     var repoContainer = new Jimp(
       repoText.bitmap.width + padding,
@@ -88,15 +90,18 @@ async function doSubTitle({
   }
 
   async function doAmmount() {
-    const ammountText = await write(ammoutValue, 70, "white");
-    const statusText = await write("$BEPRO", 38, "#4250E4");
+    const value = new Intl.NumberFormat('en-IN', { maximumSignificantDigits: 3 }).format(ammoutValue)
+    const ammountText = await write(value, 70, "white", "semi",{
+    });
+    const currencyText = await write("$BEPRO", 38, "#4250E4",'regular',{
+    });
     const margin = 10;
-    const width = ammountText.bitmap.width + statusText.bitmap.width + margin
-    const height = Math.max(ammountText.bitmap.height, statusText.bitmap.height);
+    const width = ammountText.bitmap.width + currencyText.bitmap.width + margin
+    const height = Math.max(ammountText.bitmap.height, currencyText.bitmap.height);
     var ammountContainer = new Jimp(width, height);
 
     ammountContainer = await position(ammountContainer, ammountText, 0, 50);
-    ammountContainer = await position(ammountContainer, statusText, 100, 50);
+    ammountContainer = await position(ammountContainer, currencyText, 100, 50);
     return ammountContainer;
   }
 
@@ -119,9 +124,9 @@ async function doTitle(title: string) {
   //Wrap lines size between 26 and 35 words
   .reduce((p, c) => p.length % 35 > 26 && p.length % 35 < 35?`${p} \n${c}`:`${p} ${c}`)
 
-  const statusText = await write(title, 48, "white", "bold");
+  const titleText = await write(title, 48, "white", "semi");
   var titleContainer = new Jimp(1080, 174);
-  titleContainer = await position(titleContainer, statusText, 0, 0);
+  titleContainer = await position(titleContainer, titleText, 0, 0);
 
   return titleContainer;
 }
@@ -140,8 +145,8 @@ async function doFooter({
 
   async function doLabel(value = "", label = "") {
     const margin = 24;
-    const valueText = await write(value.toString(), 38, "white", "semi");
-    const labelText = await write(label.toString(), 38, "#6E6F75");
+    const valueText = await write(value.toString(), 38, "white", "bold");
+    const labelText = await write(label.toString(), 38, "#6E6F75", "semi");
     const width = Math.max(labelText.bitmap.width, valueText.bitmap.width);
     const height = labelText.bitmap.height + valueText.bitmap.height + margin;
 
@@ -183,7 +188,7 @@ export interface IGenerateCard {
   issueId: string;
   title: string;
   repo: string;
-  ammount: string;
+  ammount: number;
   working: number;
   pr: number;
   proposal: number;
@@ -205,36 +210,14 @@ export async function generateCard(issue: IGenerateCard): Promise<IGenerateResp>
   const subTitle = await doSubTitle({repoName: issue.repo, ammoutValue: issue.ammount});
   const footer = await doFooter({working: issue.working, pr: issue.pr, proposal: issue.proposal});
 
-  const elements = [
-    {
-      item: heading,
-      x: 0,
-      y: 0,
-    },
-    {
-      item: title,
-      x: 0,
-      y: 35,
-    },
-    {
-      item: subTitle,
-      x: 0,
-      y: 65,
-    },
-    {
-      item: footer,
-      x: 0,
-      y: 100,
-    },
-  ];
-
   contain = await position(contain, heading, 0, 0);
   contain = await position(contain, title, 0, 30);
   contain = await position(contain, subTitle, 0, 60);
   contain = await position(contain, footer, 0, 100);
 
-  var image = await position(container, contain, 50, 50);
+  var image = await position(container, contain, 50, 50)
   var buffer = await image.getBufferAsync(Jimp.MIME_JPEG)
+
   return {
     width: image.bitmap.width,
     heigth: image.bitmap.height,

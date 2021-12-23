@@ -2,27 +2,27 @@ import text2png from 'text2png'
 import Jimp from 'jimp'
 
 interface OptiosProps{
- font:string;
- textAlign:string;
- color:string;
- backgroundColor: string;
- lineSpacing: number;
- strokeWidth: number;
- strokeColor: string;
- padding: number;
- paddingLeft: number;
- paddingTop: number;
- paddingRight: number;
- paddingBottom: number;
- borderWidth: number;
- borderLeftWidth: number;
- borderTopWidth: number;
- borderRightWidth: number;
- borderBottomWidth: number;
- borderColor:string;
- localFontPath: string;
- localFontName: string;
- output:string;
+ font?:string;
+ textAlign?:string;
+ color?:string;
+ backgroundColor?: string;
+ lineSpacing?: number;
+ strokeWidth?: number;
+ strokeColor?: string;
+ padding?: number;
+ paddingLeft?: number;
+ paddingTop?: number;
+ paddingRight?: number;
+ paddingBottom?: number;
+ borderWidth?: number;
+ borderLeftWidth?: number;
+ borderTopWidth?: number;
+ borderRightWidth?: number;
+ borderBottomWidth?: number;
+ borderColor?:string;
+ localFontPath?: string;
+ localFontName?: string;
+ output?:string;
 }
 
 const fontBold = `assets/fonts/SpaceGrotesk-Bold.ttf`;
@@ -73,12 +73,13 @@ export async function write(
   else if (fontFamily === "semi") {
     localFontPath = fontSemiBold;
   }
-
+  
   const buffer = text2png(text, {
-    font: `${fontSize}px SpaceGrotesk`,
+    font: `${fontSize}px SpaceGrotesk-${fontFamily}`,
     textColor,
     localFontPath,
-    localFontName: "SpaceGrotesk",
+    localFontName: `SpaceGrotesk-${fontFamily}`,
+    padding: 2,
     ...options,
   });
 
