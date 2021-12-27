@@ -5,13 +5,24 @@ class IpfsStorage {
   
   private ipfs;
 
-  constructor({ipfsClientHTTP}={ipfsClientHTTP : { host: 'ipfs.infura.io', port: 5001, protocol: 'https' }}) {
+  constructor() {
 
-    if(!ipfsClientHTTP){
-      throw new Error("Please provide a valid ipfsClientHTTP, you can find one at infura.io")
+    if(!process.env.NEXT_IPFS_PROJECT_ID || !process.env.NEXT_IPFS_PROJECT_SECRET){
+      throw new Error("Please provide a valid IPFS Project Env, you can find one at infura.io")
     }
 
-    this.ipfs = create(ipfsClientHTTP);
+    const auth = 'Basic ' + Buffer.from(process.env.NEXT_IPFS_PROJECT_ID + ':' + process.env.NEXT_IPFS_PROJECT_SECRET).toString('base64')
+    
+    const headers = {
+        authorization: auth
+    }
+
+    this.ipfs = create({
+      host: process.env.NEXT_IPFS_HOST|| 'ipfs.infura.io',
+      port: Number(process.env.NEXT_IPFS_PORT)||5001,
+      protocol:  process.env.NEXT_IPFS_PROTOCOL|| 'https',
+      headers
+    });
   }
 
   async add({data}):Promise<{path:string, cid:string, size: string}>{
