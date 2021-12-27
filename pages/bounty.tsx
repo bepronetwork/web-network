@@ -190,6 +190,28 @@ export default function PageIssue() {
 
   return (
     <>
+      <NextSeo
+        title={issue?.title}
+        openGraph={{
+          url: `${process.env.NEXT_PUBLIC_HOME_URL}/bounty?id=${issue?.id}&repoId=${issue?.repository_id}`,
+          title: issue?.title,
+          description: issue?.body,
+          images: [
+            {
+              url: issue?.seoImage,
+              width: 1200,
+              height: 670,
+              alt: 'Bounty Info',
+              type: 'image/jpeg',
+            }
+          ],
+          site_name: 'bepro',
+        }}
+        twitter={{
+          handle: '@bepronet',
+          cardType: issue?.seoImage,
+        }}
+      />
       <IssueHero
         amount={formatNumberToCurrency(issue?.amount || networkIssue?.tokensStaked)}
         state={handleStateissue()}

@@ -1,8 +1,8 @@
 import Jimp from "jimp";
 import { position, write } from "../jimp-tools";
 
-const bg = `${process.env.NEXT_HOME_URL}/images/bg-bounty-card.png`;
-const icon = `${process.env.NEXT_HOME_URL}/images/bepro-icon.png`;
+const bg = `${process.env.NEXT_PUBLIC_HOME_URL}/images/bg-bounty-card.png`;
+const icon = `${process.env.NEXT_PUBLIC_HOME_URL}/images/bepro-icon.png`;
 
 async function doHeding({ issueId, state }: { issueId: string; state: string }) {
   async function doState() {

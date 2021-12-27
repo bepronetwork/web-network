@@ -1,5 +1,6 @@
 const title = 'App | Web3 Decentralized Development'
 const description = 'Autonomous Protocol for Decentralized Development'
+const url = process.env.NEXT_PUBLIC_HOME_URL || 'https://development.bepro.network'
 
 export default {
   title,
@@ -7,12 +8,12 @@ export default {
   openGraph: {
     type: 'website',
     locale: 'en',
-    url: 'https://development.bepro.network/',
+    url,
     title,
     description,
     images: [
       {
-        url: 'meta-thumbnail.jpeg'
+        url: `${url}/images/meta-thumbnail.jpeg`
       },
     ],
     site_name: 'Bepro.network',
