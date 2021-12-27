@@ -2,6 +2,7 @@ import models from '@db/models';
 import paginate from '@helpers/paginate';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Octokit} from 'octokit';
+import api from 'services/api'
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {login, issueId} = req.query;
@@ -60,6 +61,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     await octoKit.rest.issues.createComment({owner, repo, issue_number: issue.githubId, body});
 
     await issue.save();
+    await api.get(`seo/${issue?.issueId}`)
 
     return res.json(`ok`);
   } catch(error) {

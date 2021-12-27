@@ -49,7 +49,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     seoImage: url,
   })
 
-  return res.status(200).json(issue);
+  return res.status(200).json(url);
 }
 
 export default async function GetIssues(req: NextApiRequest, res: NextApiResponse) {
