@@ -23,8 +23,6 @@ export default function ListSort({
   const { sortBy, order } = router.query
 
   function handleSelectChange(newValue) {
-    console.log(newValue)
-
     const query = {
       ...router.query,
       sortBy: newValue.sortBy,

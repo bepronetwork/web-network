@@ -51,8 +51,10 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         searchPatternInText(issue.title, String(search)) ||
         searchPatternInText(issue.body, String(search))
     )
+  
+  const paginatedData = paginateArray(issues, 4, page || 1)
 
-  return res.status(200).json({ count: issues.length, rows: paginateArray(issues, 10, page || 1) })
+  return res.status(200).json({ count: issues.length, rows: paginatedData.data, pages: paginatedData.pages, currentDage: paginatedData.page })
 }
 
 export default async function SearchIssues(

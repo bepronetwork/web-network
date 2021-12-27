@@ -52,9 +52,9 @@ export default function useApi() {
                            creator = ``,
                            search = ''}) {
     const params = new URLSearchParams({address, page, repoId, time, state, sortBy, order, creator, search}).toString();
-    return client.get<{rows: IssueData[], count: number}>(`/api/search/issues/?${params}`)
+    return client.get<{rows: IssueData[], count: number, pages: number, currentPage: number}>(`/api/search/issues/?${params}`)
                  .then(({data}) => data)
-                 .catch(() => ({rows: [], count: 0}));
+                 .catch(() => ({rows: [], count: 0, pages: 0, currentPage: 1}));
   }
 
   async function getIssue(repoId: string, ghId: string) {
