@@ -7,7 +7,7 @@ import PageActions from '@components/page-actions';
 import IssueProposals from '@components/issue-proposals';
 import { useRouter } from 'next/router';
 import { BeproService } from '@services/bepro-service';
-import { User } from '@services/github-microservice';
+import { User } from '@interfaces/api-response';
 import { ApplicationContext } from '@contexts/application';
 import { IssueData } from '@interfaces/issue-data';
 import { formatNumberToCurrency } from '@helpers/formatNumber';

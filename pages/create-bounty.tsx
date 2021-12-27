@@ -17,7 +17,7 @@ import LockedIcon from '@assets/icons/locked-icon';
 import ReposDropdown from '@components/repos-dropdown';
 import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
-import {User} from '@services/github-microservice';
+import {User} from '@interfaces/api-response';
 import useTransactions from '@x-hooks/useTransactions';
 import { changeTransactionalTokenApproval } from '@contexts/reducers/change-transactional-token-approval';
 import {getSession} from 'next-auth/react';
