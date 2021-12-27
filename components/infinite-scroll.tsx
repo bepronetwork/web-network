@@ -54,8 +54,11 @@ export default function InfiniteScroll({
   function handleScrolling(event) {
     if (!event.path.find(el => el.id === 'infinite-scroll')) return
 
-    if (event.deltaY < 0) handlePreviousPage()
-    else handleNextPage()
+    if (event.deltaY < 0) {
+      if (window.scrollY === 0 ) handlePreviousPage()
+    } else {
+      if (((window.innerHeight + window.scrollY) >= document.body.offsetHeight)) handleNextPage()
+    } 
   }
 
   useEffect(() => {
