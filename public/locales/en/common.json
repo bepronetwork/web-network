@@ -6,7 +6,7 @@
   "please-wait": "Please wait",
   "close": "Close",
   "filters": {
-    "filters": "Filters",
+    "filters": "Filter",
     "search-repositories": "Search repositories",
     "repository": "repository",
     "all": "All",
@@ -241,6 +241,15 @@
       "redeem-bounty": "Redeem bounty",
       "approve-settler": "Approve settler token",
       "recognize-finished": "Recognize bounty as finished"
+    }
+  },
+  "sort": {
+    "label": "Sort by",
+    "types": {
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "highest-bounty": "Highest Bounty",
+      "lowest-bounty": "Lowest Bounty"
     }
   }
 }
