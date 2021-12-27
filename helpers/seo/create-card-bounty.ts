@@ -4,7 +4,7 @@ import { position, write } from "../jimp-tools";
 const bg = `${process.env.NEXT_PUBLIC_HOME_URL}/images/bg-bounty-card.png`;
 const icon = `${process.env.NEXT_PUBLIC_HOME_URL}/images/bepro-icon.png`;
 
-async function doHeding({ issueId, state }: { issueId: string; state: string }) {
+async function doHeading({ issueId, state }: { issueId: string; state: string }) {
   async function doState() {
     const padding = 8;
     function getColorState(state) {
@@ -205,7 +205,7 @@ export async function generateCard(issue: IGenerateCard): Promise<IGenerateResp>
   var container = await Jimp.read(bg);
   var contain = new Jimp(1080, 510);
 
-  const heading = await doHeding({issueId: issue.issueId, state: issue.state});
+  const heading = await doHeading({issueId: issue.issueId, state: issue.state});
   const title = await doTitle(issue.title);
   const subTitle = await doSubTitle({repoName: issue.repo, ammoutValue: issue.ammount});
   const footer = await doFooter({working: issue.working, pr: issue.pr, proposal: issue.proposal});
