@@ -43,7 +43,7 @@ export default function Newissues() {
   return (
     <Oracle buttonPrimaryActive={true}>
       <>
-        <ListIssues listIssues={issues} />
+        <ListIssues />
         {issues?.length !== 0 && <Paginate count={results.count} />}
         {
           issues?.length === 0 &&

@@ -7,6 +7,14 @@
   "no-comments-available": "_No comments available_",
   "description": "description",
   "view-all-addresses": "view all address",
+  "search": "Search for a bounty",
+  "info": {
+    "working": "Working",
+    "pull-requests_one": "pull request",
+    "pull-requests_other": "pull requests",
+    "proposals_one": "proposal",
+    "proposals_other": "proposals"
+  },
   "steps": {
     "draft": "Draft",
     "development": "Development",
