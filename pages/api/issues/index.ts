@@ -43,8 +43,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   }
   const include = [
     { association: 'developers' },
-    { association: 'pullrequests' },
-    { association: 'merges' }
+    { association: 'pullRequests' },
+    { association: 'mergeProposals' }
   ]
   
   const issues = await models.issue.findAndCountAll(paginate({ where: whereCondition, include, nest: true }, req.query, [[req.query.sortBy || 'updatedAt', req.query.order || 'DESC']]));

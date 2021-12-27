@@ -50,6 +50,7 @@ interface pageActions {
   repoPath?: string;
   addNewComment?: (comment: any) => void;
   issueRepo?: string;
+  isDisputable?: boolean;
 }
 
 export default function PageActions({
@@ -79,6 +80,7 @@ export default function PageActions({
   repoPath = ``,
   addNewComment,
   issueCreator,
+  isDisputable = false
 }: pageActions) {
   const {
     dispatch,
@@ -245,6 +247,7 @@ export default function PageActions({
       <Button
         color="primary"
         onClick={handleStartWorking}
+        className="mr-1"
         disabled={isExecuting}
       >
         <span><Translation ns="bounty" label="actions.start-working.title" /></span>
@@ -408,9 +411,9 @@ export default function PageActions({
               {renderProposeDestribution()}
               {state?.toLowerCase() == "pull request" && (
                 <>
-                  { (!isDisputed && !finalized ) && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>{t('actions.dispute')}</Button> || ``}
-                  {!finalized && <Button disabled={!canClose} onClick={handleClose}>
-                  {!canClose && <LockedIcon width={12} height={12} className="mr-1"/>}
+                  { (!isDisputed && !finalized && isDisputable ) && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>{t('actions.dispute')}</Button> || ``}
+                  {!finalized && <Button disabled={!canClose || isDisputable} onClick={handleClose}>
+                  {!canClose || isDisputable && <LockedIcon width={12} height={12} className="mr-1"/>}
                     <span>{t('pull-request:actions.merge.title')}</span>
                     </Button> || ``}
                 </>

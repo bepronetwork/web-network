@@ -16,13 +16,15 @@ export default function ProposalProgress({ developers = [] }) {
                   className={`user-block-progress d-flex flex-column align-items-center`}
                   style={{ width: `${developer.percentage}%` }}
                 >
-                  <Avatar
-                    key={index}
-                    className="mb-2"
-                    userLogin={developer.githubLogin}
-                  />
+                    <Avatar
+                      key={index}
+                      className="mb-2"
+                      userLogin={developer.githubLogin}
+                      tooltip
+                      />
+                  
                   <p className="caption-small mb-0">
-                    {formatNumberToString(developer.percentage, 0)}% @{developer.githubLogin}
+                    {formatNumberToString(developer.percentage, 0)}%
                   </p>
                 </div>
               ))}

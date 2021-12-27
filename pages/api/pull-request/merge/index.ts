@@ -1,9 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { Octokit } from 'octokit'
-import { Network } from 'bepro-js'
-
 import models from '@db/models'
-import { CONTRACT_ADDRESS, WEB3_CONNECTION } from '../../../../env'
+import networkBeproJs from '@helpers/api/handle-network-bepro'
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, pullRequestId, mergeProposalId, address } = req.body
@@ -21,14 +19,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     if (!pullRequest) return res.status(404).json('Pull Request not found')
 
-    const opt = {
-      opt: {
-        web3Connection: WEB3_CONNECTION,
-        privateKey: process.env.NEXT_PRIVATE_KEY
-      },
-      test: true
-    }
-    const network = new Network({ contractAddress: CONTRACT_ADDRESS, ...opt })
+    const network = networkBeproJs({ test: true });
 
     await network.start()
 
