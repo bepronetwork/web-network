@@ -60,7 +60,7 @@ export default function MyPullRequests() {
       <ConnectWalletButton asModal={true} />
       <div className="container p-footer">
         <div className="row justify-content-center">
-          <ListIssues listIssues={issues} />
+          <ListIssues />
           {issues?.length !== 0 && (
             <Paginate
               count={results.count}

@@ -40,7 +40,7 @@ export default function PageCouncil() {
       <PageHero title={t('council:title')} />
       <div className="container p-footer">
         <div className="row justify-content-center">
-          <ListIssues listIssues={issues}/>
+          <ListIssues />
           {
             issues?.length === 0 &&
             <div className="mt-4">

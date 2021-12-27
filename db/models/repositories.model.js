@@ -29,10 +29,10 @@ class Repositories extends Model {
     //   sourceKey: 'id'
     // });
     //
-    // this.hasMany(models.mergeProposal, {
-    //   foreignKey: 'pullRequestId',
-    //   sourceKey: 'id'
-    // });
+    this.hasMany(models.issue, {
+      foreignKey: 'repository_id',
+      sourceKey: 'id'
+    });
   }
 }
 

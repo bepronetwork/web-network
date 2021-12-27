@@ -52,7 +52,7 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
 
   return (
     <div
-      className="bg-shadow list-item p-4 mb-3"
+      className="bg-shadow list-item p-4"
       onClick={() => {
         if (xClick)
           return xClick();
@@ -73,34 +73,43 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
           </h4>
           <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2">
             <span
-              className={`status caption-small ${handleColorState(issue?.state)} mr-2`}
+              className={`status caption-small ${handleColorState(issue?.state)} mr-3`}
             >
               {issue && <Translation ns="bounty" label={`status.${issue.state}`} />}
             </span>
-            <span className="p-small mr-2 mt-1 text-gray trans">
-              <Translation label={`misc.comments`} params={{
-                  count: issue?.numberOfComments || 0
-                }} 
-              />
-            </span>
-            <span className="p-small mr-2 mt-1 text-gray trans">
-              {issue != null && formatDate(issue?.createdAt)}
-            </span>
-            {issue?.repo && (
-              <span className="p-small mr-2 mt-1 text-uppercase">
-                <GithubInfo color="blue" value={issue?.repo} hoverTextColor="white" onClicked={() => router.push({pathname: `/`, query: {repoId: issue?.repository_id}})} />
-              </span>
-            )}
-            <span className="p-small mr-2 mt-1 text-gray trans"><Translation label={`misc.by`} /></span>
+
+            <Avatar className="mr-1" userLogin={issue?.creatorGithub} />
+
             <span className="p-small mr-2 mt-1">
               <GithubInfo color="gray" value={[`@`, issue?.creatorGithub].join(``)} />
             </span>
-            <Avatar className="mr-2" userLogin={issue?.creatorGithub} />
-            {issue?.dueDate && (
-              <span className="p-small text-warning mr-2 mt-1">
-                {issue?.dueDate}
+
+            {issue?.repository && (
+              <span className="p-small mr-2 mt-1 text-uppercase">
+                <GithubInfo color="blue" value={issue?.repository.githubPath} hoverTextColor="white" onClicked={() => router.push({pathname: `/`, query: {repoId: issue?.repository_id}})} />
               </span>
             )}
+          </div>
+            
+          <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2">
+            <span className="caption-small mr-2">
+              <span className="text-white">{issue?.working.length}{' '}</span>
+              <span className="text-gray"><Translation ns="bounty" label={`info.working`} /></span>
+            </span>
+
+            <span className="caption-small mr-2">
+              <span className="text-white">{issue?.pullRequests.length}{' '}</span>
+              <span className="text-gray"><Translation ns="bounty" label={`info.pull-requests`} params={{count: issue?.pullRequests.length}} /></span>
+            </span>
+
+            <span className="caption-small mr-2">
+              <span className="text-white">{issue?.mergeProposals.length}{' '}</span>
+              <span className="text-gray"><Translation ns="bounty" label={`info.proposals`} params={{count: issue?.mergeProposals.length}} /></span>
+            </span>
+
+            <span className="caption-small text-gray">
+              {issue != null && formatDate(issue?.createdAt)}
+            </span>
           </div>
         </div>
         <div className="col-md-2 my-auto text-center">
