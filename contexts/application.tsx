@@ -125,43 +125,29 @@ export default function ApplicationContextProvider({children}) {
     });
 
     if (txListener)
-      txListener.unsubscribe((err, success) => { console.log(`unsub`, err, success); });
+      clearInterval(txListener)
 
     const web3 = (window as any).web3;
 
-    setTxListener(web3.eth.subscribe(`pendingTransactions`, error => {error && console.log(error)})
-                      .on(`data`, (transactionHash) => {
-                        if (!cheatAddress || !waitingForTx)
-                          return;
+    const getPendingBlock = () => {
+      if (!cheatAddress || !waitingForTx || !waitingForTx?.transactionHash) return
 
-                        const getTx = (txHash) => web3.eth.getTransaction(transactionHash)
-                                                      .then(result => {
-                                                        if (!result)
-                                                          return getTx(transactionHash);
-                                                        return {
-                                                          ...waitingForTx,
-                                                          addressFrom: result.from,
-                                                          addressTo: result.to,
-                                                          transactionHash: result.transactionHash || transactionHash,
-                                                          blockHash: result.blockHash,
-                                                          confirmations: result?.nonce,
-                                                          status: TransactionStatus.pending,
-                                                        }
-                                                      })
-                                                      .catch((error) => {
-                                                        console.log(`Failed to getTransaction`, error);
-                                                      })
-                        getTx(transactionHash)
-                            .then(tx => {
-                              if (tx?.addressFrom === cheatAddress) {
-                                dispatch(updateTransaction(tx));
-                                waitingForTx = null;
-                              }
-                            })
-                            .catch(_ => {
-                              console.log(`Failed to subscribe to pastEvents`, _);
-                            });
-                      }))
+      web3.eth.getTransaction(waitingForTx.transactionHash).then(transaction => {  
+        dispatch(updateTransaction({
+          ...waitingForTx,
+          addressFrom: transaction.from,
+          addressTo: transaction.to,
+          transactionHash: transaction.hash,
+          blockHash: transaction.blockHash,
+          confirmations: transaction?.nonce,
+          status: transaction.blockNumber ? TransactionStatus.completed : TransactionStatus.pending
+        }))
+  
+        if (transaction.blockNumber) waitingForTx = null
+      })
+    }
+
+    setTxListener(setInterval(getPendingBlock, 1000))
   }
 
   LoadApplicationReducers();
@@ -176,12 +162,17 @@ export default function ApplicationContextProvider({children}) {
   }, [authError])
 
   useEffect(() => {
-    if (waitingForTx)
-      return;
+    if (!waitingForTx)
+      waitingForTx = state.myTransactions.find(({status}) => status === TransactionStatus.pending) || null;
 
-    const pending = state.myTransactions.find(({status}) => status === 0);
-    if (pending)
-      waitingForTx = pending;
+    if(waitingForTx?.transactionHash) return
+
+    const transactionWithHash = state.myTransactions.find(({id}) => id === waitingForTx?.id);
+
+    if (!transactionWithHash || transactionWithHash?.status === TransactionStatus.failed)
+      waitingForTx = null
+    else
+      waitingForTx = transactionWithHash
 
   }, [state.myTransactions])
 
