@@ -35,7 +35,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const include = [
     { association: 'developers' },
     { association: 'pullRequests' },
-    { association: 'mergeProposals' }
+    { association: 'mergeProposals' },
+    { association: 'repository' }
   ]
 
   let issues = await models.issue.findAll({
@@ -52,7 +53,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         searchPatternInText(issue.body, String(search))
     )
   
-  const paginatedData = paginateArray(issues, 4, page || 1)
+  const paginatedData = paginateArray(issues, 10, page || 1)
 
   return res.status(200).json({ count: issues.length, rows: paginatedData.data, pages: paginatedData.pages, currentDage: paginatedData.page })
 }
