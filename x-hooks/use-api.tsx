@@ -274,8 +274,14 @@ export default function useApi() {
     return client.put('/api/pull-request/review', {issueId, pullRequestId, githubLogin, body})
       .then(response => response)
   }
+  
+  async function removeUser(address: string, githubLogin: string) {
+    return client.delete(`/api/user/${address}/${githubLogin}`)
+                 .then(({status}) => status === 200)
+  }
 
   return {
+    removeUser,
     getIssue,
     getReposList,
     getIssues,
