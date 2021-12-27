@@ -17,6 +17,7 @@ import InternalLink from '@components/internal-link';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
+import { BeproService } from '@services/bepro-service';
 
 type Filter = {
   label: string;
@@ -67,7 +68,6 @@ export default function PageDevelopers() {
   }
 
   function getIssues() {
-
     dispatch(changeLoadState(true))
     mergedData.getIssues({page, repoId, time, state})
                       .then(({rows, count}) => {

@@ -1,14 +1,12 @@
 import {NextApiRequest, NextApiResponse} from 'next';
-import {CONTRACT_ADDRESS, WEB3_CONNECTION} from '../../../../env';
-import {Network} from 'bepro-js';
 import models from '@db/models';
 import readMergeProposalCreated from '@helpers/api/read-merge-proposal-created';
+import networkBeproJs from '@helpers/api/handle-network-bepro';
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {fromBlock, id, pullRequestId: githubId} = req.body;
 
-  const opt = {opt: {web3Connection: WEB3_CONNECTION,  privateKey: process.env.NEXT_PRIVATE_KEY}, test: true,};
-  const network = new Network({contractAddress: CONTRACT_ADDRESS, ...opt});
+  const network = networkBeproJs({ test: true });
 
   await network.start();
   const contract = network.getWeb3Contract();

@@ -55,6 +55,7 @@ class BeproFacet {
 
     if (force || this._network.test) {
       const opt = {opt: {web3Connection: this.web3Connection}};
+
       this._bepro = new Application(opt);
       this._network = new Network({contractAddress: this.contractAddress, useLastBlockGasPriceWhenMetaSend: 10000000000, ...opt});
       this._ERC20 = new ERC20Contract({contractAddress: this.settlerAddress, useLastBlockGasPriceWhenMetaSend: 10000000000, ...opt});
@@ -148,6 +149,10 @@ class BeproFacet {
 
   async getRedeemTime() {
     return this._network.params.contract.getContract().methods.redeemTime().call()
+  }
+
+  async getDisputableTime() {
+    return this._network.params.contract.getContract().methods.disputableTime().call()
   }
 
   async getOraclesSummary() {
