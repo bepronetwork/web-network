@@ -1,6 +1,5 @@
 import models from '@db/models';
 import {NextApiRequest, NextApiResponse} from 'next';
-import {Octokit} from 'octokit';
 import {generateCard} from '@helpers/seo/create-card-bounty'
 import IpfsStorage from '@services/ipfs-service';
 
@@ -10,8 +9,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   const include = [
     { association: 'developers' },
-    { association: 'pullrequests' },
-    { association: 'merges' },
+    { association: 'pullRequests' },
+    { association: 'mergeProposals' },
     { association: 'repository' },
   ]
 
@@ -23,29 +22,28 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if (!issue)
     return res.status(404).json(null);
 
-  const octokit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
-  const [owner, repo] = issue.repository.githubPath.split(`/`);
-  const {data} = await octokit.rest.issues.get({ owner, repo, issue_number: issue.githubId })
-
-  if (!data)
-    return res.status(404).json(null);
+  const [, repo] = issue.repository.githubPath.split(`/`);
 
   const card = await generateCard({
     state: issue.state,
     issueId: ghId,
-    title: data.title,
+    title: issue.title,
     repo,
     ammount: issue.amount,
-    working: issue.working.length,
-    pr: issue.working.length,
-    proposal: issue.merges.length,
+    working: issue.working?.length || 0,
+    pr: issue.pullRequests?.length || 0,
+    proposal: issue.mergeProposals?.length || 0,
   })
 
   const storage = new IpfsStorage()
   var img = Buffer.from(card.buffer, 'base64');
-
   const {path} = await storage.add({data: img})
   const url = `${process.env.NEXT_PUBLIC_IPFS_BASE}/${path}`
+
+  // if(issue?.seoImage != path){
+  //   const url = issue.seoImage.split('/')
+  //   await storage.unpin(url[url.length - 1]);
+  // }
 
   await issue.update({
     seoImage: url,

@@ -29,6 +29,11 @@ class IpfsStorage {
     const { path, cid, size } = await this.ipfs.add(data);
     return { path, cid, size };
   }
+  
+  async unpin(hash:string):Promise<any>{
+    const rm = await this.ipfs.pin.rm(hash);
+    return rm;
+  }
 
   async get({cid}):Promise<any>{
     return new Promise( async (resolve, reject) => {
