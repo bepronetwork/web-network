@@ -20,13 +20,16 @@ import BeproSmallLogo from '@assets/icons/bepro-small-logo';
 import { truncateAddress } from '@helpers/truncate-address';
 import InternalLink from './internal-link';
 import BalanceAddressAvatar from './balance-address-avatar';
+import useApi from '@x-hooks/use-api';
+import { User } from '@services/github-microservice';
+import UserMissingModal from './user-missing-information';
 import Translation from './translation';
 
 const CURRENCY = process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME;
 const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
 
 export default function MainNav() {
-  const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
+  const {dispatch, state: {currentAddress, balance, accessToken}} = useContext(ApplicationContext);
   const {asPath} = useRouter()
 
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
@@ -34,6 +37,8 @@ export default function MainNav() {
   const [ethBalance, setEthBalance] = useState(0);
   const [beproBalance, setBeproBalance] = useState(0);
   const [showHelp, setShowHelp] = useState(false);
+  const [modalUserMissing, setModalUserMissing] = useState<boolean>(false);
+  const {getUserOf,} = useApi();
 
   useEffect(() => {
     checkLogin();
@@ -75,6 +80,10 @@ export default function MainNav() {
     setBeproBalance(await BeproService.getBalance('bepro'))
     setLoggedIn(true);
     dispatch(changeStakedState(await BeproService.network.getBEPROStaked()));
+    getUserOf(BeproService.address)
+      .then((user: User) => {
+        if(!user?.accessToken && user?.githubLogin) setModalUserMissing(true)
+      })
   }
 
   useEffect(updateState, [currentAddress]);
@@ -127,7 +136,7 @@ export default function MainNav() {
       </div>
 
       <HelpModal show={showHelp} onCloseClick={() => setShowHelp(false)} />
-
+      <UserMissingModal show={modalUserMissing} />
     </div>
   )
 }
