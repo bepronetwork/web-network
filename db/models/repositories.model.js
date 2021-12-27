@@ -24,9 +24,14 @@ class Repositories extends Model {
   
   }
   static associate(models) {
-    this.belongsTo(models.issue, {
-      foreignKey: 'id',
-      as: 'repository'
+    // this.belongsTo(models.issue, {
+    //   foreignKey: 'issueId',
+    //   sourceKey: 'id'
+    // });
+    //
+    this.hasMany(models.issue, {
+      foreignKey: 'repository_id',
+      sourceKey: 'id'
     });
   }
 }

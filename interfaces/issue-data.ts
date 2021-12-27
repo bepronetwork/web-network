@@ -27,6 +27,12 @@ export interface IssueData {
   working: string[];
   merged: string;
   seoImage?: string;
+  repository?: Repository
+}
+
+export interface Repository {
+  id: number,
+  githubPath: string
 }
 
 export interface pullRequest {
