@@ -18,7 +18,7 @@ import {useRouter} from 'next/router';
 import useApi from '@x-hooks/use-api';
 import useTransactions from '@x-hooks/useTransactions';
 import LockedIcon from "@assets/icons/locked-icon";
-import { ProposalData } from "@services/github-microservice";
+import { ProposalData } from "@interfaces/api-response";
 import Translation from "./translation";
 import { useTranslation } from "next-i18next";
 

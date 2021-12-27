@@ -1,4 +1,4 @@
-import {ProposalData} from '@services/github-microservice';
+import {ProposalData} from './api-response';
 
 export type IssueState =  'pending' |  'draft' | 'open' | 'in progress' | 'canceled' | 'closed' | 'ready' | 'done' | 'disputed'
 
