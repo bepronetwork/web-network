@@ -55,7 +55,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     issue.state = `ready`;
 
-    const issueLink = `${process.env.NEXT_HOME_URL}/bounty?id=${issue.githubId}&repoId=${issue.repository_id}`
+    const issueLink = `${process.env.NEXT_PUBLIC_HOME_URL}/bounty?id=${issue?.githubId}&repoId=${issue?.repository_id}`
     const body = `@${issue.creatorGithub}, @${username} has a solution - [check your bounty](${issueLink})`;
     await octoKit.rest.issues.createComment({owner, repo, issue_number: issue.githubId, body});
 

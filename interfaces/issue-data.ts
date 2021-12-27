@@ -26,6 +26,7 @@ export interface IssueData {
   mergeProposals: ProposalData[];
   working: string[];
   merged: string;
+  seoImage?: string;
 }
 
 export interface pullRequest {
