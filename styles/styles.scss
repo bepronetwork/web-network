@@ -358,8 +358,13 @@ body {
   background-color: $bg-shadow;
   padding: $m * 2;
   border-radius: math.div($m, 2);
-  margin-bottom: $m;
   transition: 0.8 ease-in-out;
+  margin-bottom: $m;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
   &:hover {
     background-color: lighten($bg-shadow, 5);
     cursor: pointer;

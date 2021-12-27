@@ -52,7 +52,7 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
 
   return (
     <div
-      className="bg-shadow list-item p-4 mb-3"
+      className="bg-shadow list-item p-4"
       onClick={() => {
         if (xClick)
           return xClick();
