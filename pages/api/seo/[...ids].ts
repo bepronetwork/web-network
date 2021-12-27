@@ -27,40 +27,31 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const [owner, repo] = issue.repository.githubPath.split(`/`);
   const {data} = await octokit.rest.issues.get({ owner, repo, issue_number: issue.githubId })
 
+  if (!data)
+    return res.status(404).json(null);
+
   const card = await generateCard({
-    state: 'open',
-    issueId: '9999',
-    title: 'Remove all getContract functions from Application and instead calling the Object directly',
+    state: issue.state,
+    issueId: ghId,
+    title: data.title,
     repo,
-    ammount: 100000,
-    working: 6,
-    pr: 10,
-    proposal: 8,
+    ammount: issue.amount,
+    working: issue.working.length,
+    pr: issue.working.length,
+    proposal: issue.merges.length,
   })
-  // const card = await generateCard({
-  //   state: 'CLOSED',
-  //   issueId: ghId,
-  //   title: data.title,
-  //   repo,
-  //   ammount: '1000',
-  //   working: issue.working.length,
-  //   pr: issue.working.length,
-  //   proposal: issue.merges.length,
-  // })
 
   const storage = new IpfsStorage()
   var img = Buffer.from(card.buffer, 'base64');
 
-  const resp = await storage.add({data: img})
-  
-  // const toWrite = await Jimp.read(img)
-  // toWrite.writeAsync(`public/images/${issueId}.png`)
-  res.writeHead(200, {
-    'Content-Type': 'image/png',
-    'Content-Length': img.length
-  });
-  res.end(img); 
-  // return res.status(200).json(card);
+  const {path} = await storage.add({data: img})
+  const url = `${process.env.NEXT_PUBLIC_IPFS_BASE}/${path}`
+
+  await issue.update({
+    seoImage: url,
+  })
+
+  return res.status(200).json(issue);
 }
 
 export default async function GetIssues(req: NextApiRequest, res: NextApiResponse) {
