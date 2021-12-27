@@ -8,6 +8,7 @@
   "select": "Select a Pull Request",
   "review_one": "{{count}} review",
   "review_other": "{{count}} reviews",
+  "find-a-bounty": "Find a bounty to work on",
   "actions": {
     "create": {
       "title": "Create Pull Request",
