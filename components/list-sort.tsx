@@ -29,17 +29,17 @@ export default function ListSort({
       order: newValue.order
     }
 
-    router.push({pathname: './', query});
+    router.push({ pathname: `.${router.pathname}`, query }, router.pathname)
   }
 
   function getDefaultValue(): Option {
-    
     if (sortBy && order) {
-      const optionExists = options.find(option => option.sortBy === sortBy && option.order === order)
+      const optionExists = options.find(
+        (option) => option.sortBy === sortBy && option.order === order
+      )
 
       if (optionExists) return optionExists
     }
-
 
     return options[defaultOptionIndex]
   }

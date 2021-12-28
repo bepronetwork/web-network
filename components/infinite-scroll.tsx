@@ -1,7 +1,5 @@
 import { ReactNode, useEffect } from 'react'
-import { useRouter } from 'next/router'
 
-import UpDoubleArrow from '@assets/icons/up-double-arrow'
 import DownDoubleArrow from '@assets/icons/down-double-arrow'
 
 import Button from '@components/button'
@@ -11,54 +9,36 @@ interface InfiniteScrollProps {
   page: number
   isLoading: boolean
   children: ReactNode | ReactNode[]
+  handlePageChanged: (newPage: number) => void
 }
 
 export default function InfiniteScroll({
   pages,
   page,
   isLoading,
-  children
+  children,
+  handlePageChanged
 }: InfiniteScrollProps) {
-  const router = useRouter()
 
   function handlePreviousPage() {
     const newPage = page - 1
 
-    if (newPage < 1 || isLoading) return
+    if (newPage < 1 || isLoading || window.scrollY > 0) return
 
-    router.push({
-      pathname: './',
-      query: {
-        ...router.query,
-        page: newPage
-      }
-    })
+    handlePageChanged(newPage)
   }
 
   function handleNextPage() {
     const newPage = page + 1
 
-    if (newPage > pages || isLoading) return
+    if (newPage > pages || isLoading || (window.innerHeight + window.scrollY < document.body.offsetHeight)) return
 
-    const query = {
-      ...router.query,
-      page: newPage
-    }
-
-    router.push({
-      pathname: './',
-      query
-    })
+    handlePageChanged(newPage)
   }
 
   function handleScrolling(event) {
-    if (!event.path.find(el => el.id === 'infinite-scroll')) return
-
-    if (event.deltaY < 0) {
-      if (window.scrollY === 0 ) handlePreviousPage()
-    } else {
-      if (((window.innerHeight + window.scrollY) >= document.body.offsetHeight)) handleNextPage()
-    } 
+    if (event.deltaY < 0) return //handlePreviousPage()
+    else handleNextPage()
   }
 
   useEffect(() => {
@@ -71,23 +51,8 @@ export default function InfiniteScroll({
 
   return (
     <div id="infinite-scroll">
-      {(page > 1 && (
-        <div className="row justify-content-center">
-          <Button transparent onClick={handlePreviousPage}>
-            <UpDoubleArrow />
-          </Button>
-        </div>
-      )) || <></>}
-
+      {console.log({pages, page})}
       {children}
-
-      {(page < pages && (
-        <div className="row justify-content-center">
-          <Button transparent onClick={handleNextPage}>
-            <DownDoubleArrow />
-          </Button>
-        </div>
-      )) || <></>}
     </div>
   )
 }
