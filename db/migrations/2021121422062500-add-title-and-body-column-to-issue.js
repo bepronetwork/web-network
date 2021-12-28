@@ -5,11 +5,29 @@ require('dotenv').config()
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('issues', 'title', {
-      type: DataTypes.STRING
-    })
+    const columns = await queryInterface.describeTable('issues')
 
-    await queryInterface.addColumn('issues', 'body', { type: DataTypes.STRING })
+    if (!columns.hasOwnProperty('title'))
+      await queryInterface.addColumn('issues', 'title', {
+        type: DataTypes.TEXT
+      })
+    else {
+      if (columns.title.type !== 'TEXT')
+        await queryInterface.changeColumn('issues', 'title', {
+          type: DataTypes.TEXT
+        })
+    }
+
+    if (!columns.hasOwnProperty('body'))
+      await queryInterface.addColumn('issues', 'body', {
+        type: DataTypes.TEXT
+      })
+    else {
+      if (columns.body.type !== 'TEXT')
+        await queryInterface.changeColumn('issues', 'body', {
+          type: DataTypes.TEXT
+        })
+    }
 
     const repositories = await queryInterface.sequelize.query(
       'SELECT * FROM repositories',
