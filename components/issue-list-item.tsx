@@ -185,7 +185,7 @@ export default function IssueListItem({
 
     if (!["draft", "pending", "canceled"].includes(state?.toLowerCase())) {
       return (
-        <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2">
+        <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start">
           {handleFirstChildren()}
           <div className="flex mr-1 mt-1 flex-row">
             <span className="caption-small mr-1 text-white">
