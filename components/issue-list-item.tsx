@@ -1,7 +1,6 @@
 import { GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import React, { useContext } from "react";
-import { formatDate } from "@helpers/formatDate";
 import IssueAvatars from "./issue-avatars";
 import { IssueData, pullRequest } from "@interfaces/issue-data";
 import { IssueState } from "@interfaces/issue-data";
@@ -9,6 +8,8 @@ import { formatNumberToNScale } from "@helpers/formatNumber";
 import Avatar from "components/avatar";
 import GithubInfo from "@components/github-info";
 import Translation from "./translation";
+import { useTranslation } from "next-i18next";
+import { intervalToDuration } from "date-fns";
 
 export default function IssueListItem({
   issue = null,
@@ -18,6 +19,7 @@ export default function IssueListItem({
   xClick?: () => void;
 }) {
   const router = useRouter();
+  const { t } = useTranslation("common");
 
   function handleColorState(state: IssueState) {
     switch (state?.toLowerCase()) {
@@ -55,10 +57,73 @@ export default function IssueListItem({
     }
   }
 
+  function handleReviewsPr(pullRequests: pullRequest[]) {
+    var numberAllReviewers = 0;
+
+    const allReviewers = pullRequests.map((pr) => {
+      return pr.reviewers.length;
+    });
+    allReviewers.map((num) => (numberAllReviewers = numberAllReviewers + num));
+    return numberAllReviewers;
+  }
+
+  function handleBiggerName(name: string, maxSize: number) {
+    if (name.length > maxSize) {
+      return [name.substring(0, maxSize), "..."].join("");
+    } else {
+      return name;
+    }
+  }
+
   function renderData(data: Date) {
+    const duration = intervalToDuration({
+      start: new Date(data),
+      end: new Date(),
+    });
+
+    function handleDurationTranslation() {
+      if (duration.years > 0) {
+        return {
+          value: `${duration.years} ${
+            duration.years === 1 ? t(`data.year`) : t(`data.years`)
+          }`,
+        };
+      } else if (duration.months > 0) {
+        return {
+          value: `${duration.months} ${
+            duration.months === 1 ? t(`data.month`) : t(`data.months`)
+          }`,
+        };
+      } else if (duration.days > 0) {
+        return {
+          value: `${duration.days} ${
+            duration.days === 1 ? t(`data.day`) : t(`data.days`)
+          }`,
+        };
+      } else if (duration.hours > 0) {
+        return {
+          value: `${duration.hours} ${
+            duration.hours === 1 ? t(`data.hour`) : t(`data.hours`)
+          }`,
+        };
+      } else if (duration.minutes > 0) {
+        return {
+          value: `${duration.minutes} ${
+            duration.minutes === 1 ? t(`data.minute`) : t(`data.minutes`)
+          }`,
+        };
+      } else if (duration.seconds > 0) {
+        return {
+          value: `${duration.seconds} ${
+            duration.seconds === 1 ? t(`data.second`) : t(`data.seconds`)
+          }`,
+        };
+      }
+    }
+
     return (
-      <span className="p-small mr-2 mt-1 text-white-50">
-        {issue != null && formatDate(data)}
+      <span className="fs-7 mr-2 mt-1 text-uppercase">
+        {data && t(`data.text-data`, handleDurationTranslation())}
       </span>
     );
   }
@@ -66,24 +131,70 @@ export default function IssueListItem({
   function renderProposals() {
     return (
       <div className="flex me-3 mt-1 flex-row">
-        <span className="mediumInfo  mr-1 text-white-50">
-          {(issue != null && issue.mergeProposals.length + 40) || 0}
+        <span className="fs-9 text-bold  mr-1 text-white-50">
+          {(issue != null && issue.mergeProposals.length) || 0}
         </span>
-        <span className="mediumInfo text-ligth-gray">proposals</span>
+        <span className="fs-9 text-bold text-ligth-gray text-uppercase">
+          {t("issue.proposals")}
+        </span>
       </div>
     );
   }
 
-  function handleReviewsPr(pullRequests: pullRequest[]) {
-    var numberAllReviewers = 0;
+  function renderReviews() {
+    return (
+      <div className="flex me-3 mt-1 flex-row">
+        <span className="fs-9  text-bold mr-1 text-white-50">
+          {(issue != null && handleReviewsPr(issue?.pullRequests)) || 0}
+        </span>
+        <span className="fs-9 text-bold text-ligth-gray text-uppercase">
+          {t("issue.reviews")}
+        </span>
+      </div>
+    );
+  }
 
-    const allReviewers = pullRequests.map((pr) => {
-      return pr.reviewers.length;
-    });
+  function renderIssueData(state: IssueState) {
+    function handleFirstChildren() {
+      if (state?.toLowerCase() === "ready") {
+        return renderProposals();
+      } else if (state?.toLowerCase() === "closed") {
+        return renderReviews();
+      } else {
+        return (
+          <div className="flex mr-1 mt-1 flex-row">
+            <span className="fs-9  text-bold mr-1 text-white-50">
+              {(issue != null && issue.working.length) || 0}
+            </span>
+            <span className="fs-9 text-bold text-ligth-gray text-uppercase">
+              {t("issue.working")}
+            </span>
+          </div>
+        );
+      }
+    }
 
-    allReviewers.map((num) => (numberAllReviewers = numberAllReviewers + num));
-
-    return numberAllReviewers;
+    if (!["draft", "pending", "canceled"].includes(state?.toLowerCase())) {
+      return (
+        <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2">
+          {handleFirstChildren()}
+          <div className="flex mr-1 mt-1 flex-row">
+            <span className="fs-9 text-bold mr-1 text-white-50 ">
+              {(issue != null && issue.pullRequests.length) || 0}
+            </span>
+            <span className="fs-9 text-bold text-ligth-gray text-uppercase">
+              {t("issue.pull-requests")}
+            </span>
+          </div>
+          {state?.toLowerCase() === "ready"
+            ? renderReviews()
+            : renderProposals()}
+          {state?.toLowerCase() !== "draft" && renderData(issue?.createdAt)}
+        </div>
+      );
+    } else {
+      return;
+    }
   }
 
   return (
@@ -102,11 +213,9 @@ export default function IssueListItem({
         <div className="col-md-10 mb-3 mb-md-0">
           <h4 className="h4 text-truncate">
             <span className="text-gray trans me-2">#{issue?.githubId}</span>
-            {(issue?.title || ``).length > 61
-              ? (issue?.title || ``).substring(0, 61) + "..."
-              : issue?.title || (
-                  <Translation ns="bounty" label={`errors.fetching`} />
-                )}
+            {handleBiggerName(issue?.title, 61) || (
+              <Translation ns="bounty" label={`errors.fetching`} />
+            )}
           </h4>
           <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2">
             <span
@@ -118,18 +227,20 @@ export default function IssueListItem({
                 <Translation ns="bounty" label={`status.${issue.state}`} />
               )}
             </span>
-            <Avatar className="mx-2" userLogin={issue?.creatorGithub} />
+            <Avatar className="mx-2" userLogin={issue?.creatorGithub} border />
             <span className="p-small mr-2 mt-1">
               <GithubInfo
                 color="gray"
-                value={[`@`, issue?.creatorGithub].join(``)}
+                value={[`@`, handleBiggerName(issue?.creatorGithub, 30)].join(
+                  ``
+                )}
               />
             </span>
             {issue?.repo && (
               <span className="p-small mr-2 mt-1 text-uppercase">
                 <GithubInfo
                   color="blue"
-                  value={issue?.repo}
+                  value={handleBiggerName(issue?.repo, 30)}
                   hoverTextColor="white"
                   onClicked={() =>
                     router.push({
@@ -142,40 +253,7 @@ export default function IssueListItem({
             )}
             {issue?.state === "draft" && renderData(issue?.createdAt)}
           </div>
-          {!["draft", "pending", "canceled"].includes(issue?.state) && (
-            <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2">
-              {issue?.state === "ready" ? (
-                renderProposals()
-              ) : (
-                <div className="flex mr-1 mt-1 flex-row">
-                  <span className="mediumInfo  mr-1 text-white-50">
-                    {(issue != null && issue.working.length + 10) || 0}
-                  </span>
-                  <span className="mediumInfo text-ligth-gray">working</span>
-                </div>
-              )}
-              <div className="flex mr-1 mt-1 flex-row">
-                <span className="mediumInfo  mr-1 text-white-50 ">
-                  {(issue != null && issue.pullRequests.length + 10) || 0}
-                </span>
-                <span className="mediumInfo text-ligth-gray">pr's</span>
-              </div>
-              {issue?.state === "ready" ? (
-                <div className="flex me-3 mt-1 flex-row">
-                  <span className="mediumInfo  mr-1 text-white-50">
-                    {(issue != null &&
-                      handleReviewsPr(issue?.pullRequests) + 40) ||
-                      0}
-                  </span>
-                  <span className="mediumInfo text-ligth-gray">Reviews</span>
-                </div>
-              ) : (
-                renderProposals()
-              )}
-
-              {issue?.state !== "draft" && renderData(issue?.createdAt)}
-            </div>
-          )}
+          {renderIssueData(issue?.state)}
         </div>
         <div className="col-md-2 my-auto text-center">
           <span className="caption-large text-white text-opacity-1">
