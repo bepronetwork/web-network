@@ -35,6 +35,10 @@ interface ListIssuesProps {
   emptyMessage?: string
 }
 
+interface IssuesPage {
+  page: number
+  issues: IssueData[]
+}
 export default function ListIssues({
   filterState,
   emptyMessage
@@ -48,11 +52,11 @@ export default function ListIssues({
   const { searchIssues } = useApi()
   const [search, setSearch] = useState('')
   const { t } = useTranslation(['common', 'bounty'])
-  const [issues, setIssues] = useState<IssueData[]>([])
+  const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([])
   const [totalPages, setTotalPages] = useState<number>(0)
-  const page = useRef(1)
 
-  const { repoId, time, state, sortBy, order } = router.query as {
+  const { page, repoId, time, state, sortBy, order } = router.query as {
+    page: string
     repoId: string
     time: string
     state: string
@@ -105,10 +109,12 @@ export default function ListIssues({
     getIssues(true)
   }
 
-  function getIssues(forceEmptySearch = false, usePage = false) {
+  function getIssues(forceEmptySearch = false) {
+    if (!page) return
+
     dispatch(changeLoadState(true))
     searchIssues({
-      page: usePage ? String(page.current) : '1',
+      page,
       repoId,
       time,
       state: filterState || state,
@@ -116,11 +122,11 @@ export default function ListIssues({
       order,
       search: forceEmptySearch ? '' : search
     })
-      .then(({ rows, pages }) => {
+      .then(({ rows, pages, currentPage }) => {
         setTotalPages(pages)
-        
-        if (usePage) setIssues(issues.concat(rows))
-        else setIssues(rows)
+
+        if (!issuesPages.find(el => el.page === currentPage)) 
+          setIssuesPages([...issuesPages, {page: currentPage, issues: rows}])
       })
       .catch((error) => {
         console.error('Error fetching issues', error)
@@ -136,12 +142,21 @@ export default function ListIssues({
     getIssues()
   }
 
-  function handleNewPage(newPage: number) {
-    page.current = newPage
-    getIssues(false, true)
-  }
+  useEffect(() => {
+    router.push(
+      {
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          page: 1
+        }
+      },
+      router.pathname,
+      { shallow: true }
+    )
+  }, [])
 
-  useEffect(getIssues, [repoId, time, state, sortBy, order])
+  useEffect(getIssues, [page, repoId, time, state, sortBy, order])
 
   return (
     <CustomContainer>
@@ -223,11 +238,10 @@ export default function ListIssues({
 
       <InfiniteScroll
         pages={totalPages}
-        page={page.current}
+        page={parseInt(page)}
         isLoading={loading.isLoading}
-        handlePageChanged={handleNewPage}
       >
-        {issues?.length === 0 && !loading.isLoading ? (
+        {issuesPages?.every(el => el.issues.length === 0) && !loading.isLoading ? (
           <NothingFound description={emptyMessage || filterByState.emptyState}>
             <InternalLink
               href="/create-bounty"
@@ -238,8 +252,8 @@ export default function ListIssues({
         ) : null}
 
         <div>
-          {issues?.map((issue) => (
-            <IssueListItem issue={issue} key={issue.githubId} />
+          {issuesPages?.map(({issues}) => (
+            issues.map(issue => <IssueListItem issue={issue} key={issue.githubId} />)
           ))}
         </div>
       </InfiniteScroll>
