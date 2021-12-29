@@ -10,6 +10,7 @@ import GithubInfo from "@components/github-info";
 import Translation from "./translation";
 import { useTranslation } from "next-i18next";
 import { intervalToDuration } from "date-fns";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 export default function IssueListItem({
   issue = null,
@@ -221,12 +222,23 @@ export default function IssueListItem({
     >
       <div className="row align-center">
         <div className="col-md-10 mb-3 mb-md-0">
-          <h4 className="h4 text-truncate">
-            <span className="text-gray trans me-2">#{issue?.githubId}</span>
-            {(issue?.title !== null && handleBiggerName(issue?.title, 61)) || (
-              <Translation ns="bounty" label={`errors.fetching`} />
-            )}
-          </h4>
+          <OverlayTrigger
+            key="bottom"
+            placement="bottom"
+            overlay={
+              (issue?.title.length > 61 && (
+                <Tooltip id={`tooltip-bottom`}>{issue?.title}</Tooltip>
+              )) || <></>
+            }
+          >
+            <h4 className="h4 text-truncate">
+              <span className="text-gray trans me-2">#{issue?.githubId}</span>
+              {(issue?.title !== null &&
+                handleBiggerName(issue?.title, 61)) || (
+                <Translation ns="bounty" label={`errors.fetching`} />
+              )}
+            </h4>
+          </OverlayTrigger>
           <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2">
             <span
               className={`status caption-small ${handleColorState(
@@ -238,28 +250,52 @@ export default function IssueListItem({
               )}
             </span>
             <Avatar className="mx-2" userLogin={issue?.creatorGithub} border />
-            <span className="p-small mr-2 mt-1">
-              <GithubInfo
-                color="gray"
-                value={[`@`, handleBiggerName(issue?.creatorGithub, 30)].join(
-                  ``
-                )}
-              />
-            </span>
-            {issue?.repository && (
-              <span className="p-small mr-2 mt-1 text-uppercase">
+            <OverlayTrigger
+              key="bottom"
+              placement="bottom"
+              overlay={
+                (issue?.creatorGithub.length > 30 && (
+                  <Tooltip id={`tooltip-bottom`}>
+                    @{issue?.creatorGithub}
+                  </Tooltip>
+                )) || <></>
+              }
+            >
+              <span className="p-small mr-2 mt-1">
                 <GithubInfo
-                  color="blue"
-                  value={handleBiggerName(issue?.repository?.githubPath, 30)}
-                  hoverTextColor="white"
-                  onClicked={() =>
-                    router.push({
-                      pathname: `/`,
-                      query: { repoId: issue?.repository_id },
-                    })
-                  }
+                  color="gray"
+                  value={[`@`, handleBiggerName(issue?.creatorGithub, 30)].join(
+                    ``
+                  )}
                 />
               </span>
+            </OverlayTrigger>
+            {issue?.repository && (
+              <OverlayTrigger
+                key="bottom"
+                placement="bottom"
+                overlay={
+                  (issue?.repository?.githubPath.length > 30 && (
+                    <Tooltip id={`tooltip-bottom`}>
+                      {issue?.repository?.githubPath}
+                    </Tooltip>
+                  )) || <></>
+                }
+              >
+                <span className="p-small mr-2 mt-1 text-uppercase">
+                  <GithubInfo
+                    color="blue"
+                    value={handleBiggerName(issue?.repository?.githubPath, 30)}
+                    hoverTextColor="white"
+                    onClicked={() =>
+                      router.push({
+                        pathname: `/`,
+                        query: { repoId: issue?.repository_id },
+                      })
+                    }
+                  />
+                </span>
+              </OverlayTrigger>
             )}
             {issue?.state === "draft" && renderData(issue?.createdAt)}
           </div>
