@@ -1,10 +1,9 @@
 import models from '@db/models';
-import {Network} from 'bepro-js';
 import {NextApiRequest, NextApiResponse} from 'next';
-import {CONTRACT_ADDRESS, WEB3_CONNECTION} from '../../../env';
 import {Octokit} from 'octokit';
 import readCloseIssues from '@helpers/api/read-close-issues';
 import readRedeemIssue from '@helpers/api/read-redeem-issue';
+import networkBeproJs from '@helpers/api/handle-network-bepro';
 
 const octokit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
 
@@ -12,8 +11,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const bulk = await models.chainEvents.findOne({where: {name: `Bulk`}});
   const fromBlock = bulk?.dataValues?.lastBlock || 1731488;
 
-  const opt = {opt: {web3Connection: WEB3_CONNECTION,  privateKey: process.env.NEXT_PRIVATE_KEY}, test: true,};
-  const network = new Network({contractAddress: CONTRACT_ADDRESS, ...opt});
+  const network = networkBeproJs({ test: true });
 
   await network.start();
   const contract = network.getWeb3Contract();

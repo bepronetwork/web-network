@@ -67,6 +67,10 @@ li {
     top: 1.5%;
   }
 
+  .close-icon-search{
+      color:blue !important;
+ }
+
   .modal-lg {
     .modal-content > .modal-header > .close-button {
       left: 96%;
@@ -354,8 +358,13 @@ body {
   background-color: $bg-shadow;
   padding: $m * 2;
   border-radius: math.div($m, 2);
-  margin-bottom: $m;
   transition: 0.8 ease-in-out;
+  margin-bottom: $m;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
   &:hover {
     background-color: lighten($bg-shadow, 5);
     cursor: pointer;
@@ -919,6 +928,10 @@ $c_props: ('m': 'margin') !default;
   background-color: $black;
 }
 
+.color-blue {
+  color: $blue-dark;
+}
+
 .bg-main-image {
   background: url('/images/bg-main.png') no-repeat center center fixed;
   -webkit-background-size: cover;
@@ -1070,4 +1083,62 @@ textarea.form-control {
   font-size: 10px;
   line-height: 130%;
   letter-spacing: 0.1em;
+}
+
+.list-actions {
+  .input-group {
+    border: 2px solid transparent;
+    border-radius: math.div($m, 2);
+
+    &:hover {
+      border: 2px solid $ligth-gray;
+    }
+
+    &:focus-within {
+      border-color: $primary;
+    }
+
+    input {
+      border: 0;
+
+      &:focus {
+        border: 0;
+        background-color: $black;
+      }
+    }
+
+    button {
+      background-color: $black;
+
+      svg {
+        color: $primary;
+        width: 10px;
+      }
+    }
+  }
+
+  .pl-0 {
+    padding-left: 0 !important;
+  }
+
+  button {
+    border: 2px solid transparent;
+
+    &:hover {
+      border-color: $ligth-gray;
+    }
+  }
+
+  .react-select-container, .react-select__control {
+    min-width: 170px !important;
+  }
+
+  .react-select__single-value {
+    font-family: 'fontSemiBold', sans-serif !important;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+    font-size: 12px;
+    text-align: center;
+  }
 }

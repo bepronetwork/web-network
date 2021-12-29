@@ -26,6 +26,12 @@ export interface IssueData {
   mergeProposals: ProposalData[];
   working: string[];
   merged: string;
+  repository?: Repository
+}
+
+export interface Repository {
+  id: number,
+  githubPath: string
 }
 
 export interface pullRequest {

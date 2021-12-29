@@ -42,6 +42,21 @@ export default function useApi() {
                  .catch(() => ({rows: [], count: 0}));
   }
 
+  async function searchIssues({page = '1',
+                           repoId = '',
+                           time = ``,
+                           state = ``,
+                           sortBy = 'updatedAt',
+                           order = 'DESC',
+                           address = ``,
+                           creator = ``,
+                           search = ''}) {
+    const params = new URLSearchParams({address, page, repoId, time, state, sortBy, order, creator, search}).toString();
+    return client.get<{rows: IssueData[], count: number, pages: number, currentPage: number}>(`/api/search/issues/?${params}`)
+                 .then(({data}) => data)
+                 .catch(() => ({rows: [], count: 0, pages: 0, currentPage: 1}));
+  }
+
   async function getIssue(repoId: string, ghId: string) {
     return client.get<IssueData>(`/api/issue/${repoId}/${ghId}`)
                  .then(({data}) => data)
@@ -274,8 +289,14 @@ export default function useApi() {
     return client.put('/api/pull-request/review', {issueId, pullRequestId, githubLogin, body})
       .then(response => response)
   }
+  
+  async function removeUser(address: string, githubLogin: string) {
+    return client.delete(`/api/user/${address}/${githubLogin}`)
+                 .then(({status}) => status === 200)
+  }
 
   return {
+    removeUser,
     getIssue,
     getReposList,
     getIssues,
@@ -303,6 +324,7 @@ export default function useApi() {
     startWorking,
     mergeClosedIssue,
     getUserPullRequests,
-    createReviewForPR
+    createReviewForPR,
+    searchIssues
   }
 }
