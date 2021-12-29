@@ -5,6 +5,27 @@
   "bepro": "BEPRO",
   "please-wait": "Please wait",
   "close": "Close",
+  "issue": {
+    "proposals": "Proposals",
+    "pull-requests": "Pull requests",
+    "reviews": "Reviews",
+    "working": "Working"
+  },
+  "data": {
+    "seconds": "seconds",
+    "second": "second",
+    "minutes": "minutes",
+    "minute": "minute",
+    "hours": "hours",
+    "hour": "hour",
+    "month": "month",
+    "months": "months",
+    "year": "year",
+    "years": "years",
+    "day": "day",
+    "days": "days",
+    "text-data": "Opened {{value}} Ago"
+  },
   "filters": {
     "filters": "Filters",
     "search-repositories": "Search repositories",
