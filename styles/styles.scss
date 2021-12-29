@@ -546,6 +546,12 @@ label {
   border-radius: 14px;
 }
 
+.border-avatar {
+  border: solid;
+  border-width: 2px;
+  border-color: $white;
+}
+
 .ico-metamask {
   display: inline-block;
   width: 18px;
