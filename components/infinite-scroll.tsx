@@ -2,42 +2,55 @@ import { ReactNode, useEffect } from 'react'
 
 import DownDoubleArrow from '@assets/icons/down-double-arrow'
 
-import Button from '@components/button'
+import { useRouter } from 'next/router'
 
 interface InfiniteScrollProps {
   pages: number
   page: number
   isLoading: boolean
   children: ReactNode | ReactNode[]
-  handlePageChanged: (newPage: number) => void
 }
 
 export default function InfiniteScroll({
   pages,
   page,
   isLoading,
-  children,
-  handlePageChanged
+  children
 }: InfiniteScrollProps) {
+  const router = useRouter()
 
   function handlePreviousPage() {
     const newPage = page - 1
 
     if (newPage < 1 || isLoading || window.scrollY > 0) return
-
-    handlePageChanged(newPage)
   }
 
   function handleNextPage() {
     const newPage = page + 1
 
-    if (newPage > pages || isLoading || (window.innerHeight + window.scrollY < document.body.offsetHeight)) return
+    if (
+      newPage > pages ||
+      isLoading ||
+      window.innerHeight + window.scrollY < document.body.offsetHeight
+    )
+      return
 
-    handlePageChanged(newPage)
+    router.push(
+      {
+        pathname: `.${router.pathname}`,
+        query: {
+          ...router.query,
+          page: newPage
+        }
+      },
+      router.pathname,
+      { shallow: true }
+    )
   }
 
   function handleScrolling(event) {
-    if (event.deltaY < 0) return //handlePreviousPage()
+    if (event.deltaY < 0) return
+    //handlePreviousPage()
     else handleNextPage()
   }
 
@@ -51,7 +64,6 @@ export default function InfiniteScroll({
 
   return (
     <div id="infinite-scroll">
-      {console.log({pages, page})}
       {children}
     </div>
   )

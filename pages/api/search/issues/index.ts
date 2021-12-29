@@ -55,7 +55,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   
   const paginatedData = paginateArray(issues, 10, page || 1)
 
-  return res.status(200).json({ count: issues.length, rows: paginatedData.data, pages: paginatedData.pages, currentDage: paginatedData.page })
+  return res.status(200).json({ count: issues.length, rows: paginatedData.data, pages: paginatedData.pages, currentPage: paginatedData.page })
 }
 
 export default async function SearchIssues(
