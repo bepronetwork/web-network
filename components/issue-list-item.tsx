@@ -19,7 +19,7 @@ export default function IssueListItem({
   xClick?: () => void;
 }) {
   const router = useRouter();
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("bounty");
 
   function handleColorState(state: IssueState) {
     switch (state?.toLowerCase()) {
@@ -85,37 +85,41 @@ export default function IssueListItem({
       if (duration.years > 0) {
         return {
           value: `${duration.years} ${
-            duration.years === 1 ? t(`data.year`) : t(`data.years`)
+            duration.years === 1 ? t(`info-data.year`) : t(`info-data.years`)
           }`,
         };
       } else if (duration.months > 0) {
         return {
           value: `${duration.months} ${
-            duration.months === 1 ? t(`data.month`) : t(`data.months`)
+            duration.months === 1 ? t(`info-data.month`) : t(`info-data.months`)
           }`,
         };
       } else if (duration.days > 0) {
         return {
           value: `${duration.days} ${
-            duration.days === 1 ? t(`data.day`) : t(`data.days`)
+            duration.days === 1 ? t(`info-data.day`) : t(`info-data.days`)
           }`,
         };
       } else if (duration.hours > 0) {
         return {
           value: `${duration.hours} ${
-            duration.hours === 1 ? t(`data.hour`) : t(`data.hours`)
+            duration.hours === 1 ? t(`info-data.hour`) : t(`info-data.hours`)
           }`,
         };
       } else if (duration.minutes > 0) {
         return {
           value: `${duration.minutes} ${
-            duration.minutes === 1 ? t(`data.minute`) : t(`data.minutes`)
+            duration.minutes === 1
+              ? t(`info-data.minute`)
+              : t(`info-data.minutes`)
           }`,
         };
       } else if (duration.seconds > 0) {
         return {
           value: `${duration.seconds} ${
-            duration.seconds === 1 ? t(`data.second`) : t(`data.seconds`)
+            duration.seconds === 1
+              ? t(`info-data.second`)
+              : t(`info-data.seconds`)
           }`,
         };
       }
@@ -123,7 +127,7 @@ export default function IssueListItem({
 
     return (
       <span className="small-info mr-2 mt-2 text-uppercase">
-        {data && t(`data.text-data`, handleDurationTranslation())}
+        {data && t(`info-data.text-data`, handleDurationTranslation())}
       </span>
     );
   }
@@ -135,7 +139,9 @@ export default function IssueListItem({
           {(issue != null && issue.mergeProposals.length) || 0}
         </span>
         <span className="caption-small text-ligth-gray text-uppercase">
-          {t("issue.proposals")}
+          {issue?.mergeProposals?.length === 1
+            ? t("info.proposals_one")
+            : t("info.proposals_other")}
         </span>
       </div>
     );
@@ -148,7 +154,9 @@ export default function IssueListItem({
           {(issue != null && handleReviewsPr(issue?.pullRequests)) || 0}
         </span>
         <span className="caption-small text-ligth-gray text-uppercase">
-          {t("issue.reviews")}
+          {handleReviewsPr(issue?.pullRequests) === 1
+            ? t("info.reviews_one")
+            : t("info.reviews_other")}
         </span>
       </div>
     );
@@ -167,7 +175,7 @@ export default function IssueListItem({
               {(issue != null && issue.working.length) || 0}
             </span>
             <span className="caption-small text-ligth-gray text-uppercase">
-              {t("issue.working")}
+              {t("info.working")}
             </span>
           </div>
         );
@@ -183,7 +191,9 @@ export default function IssueListItem({
               {(issue != null && issue.pullRequests.length) || 0}
             </span>
             <span className="caption-small text-ligth-gray text-uppercase">
-              {t("issue.pull-requests")}
+              {issue?.pullRequests?.length === 1
+                ? t("info.pull-requests_one")
+                : t("info.pull-requests_other")}
             </span>
           </div>
           {state?.toLowerCase() === "ready"
@@ -213,7 +223,6 @@ export default function IssueListItem({
         <div className="col-md-10 mb-3 mb-md-0">
           <h4 className="h4 text-truncate">
             <span className="text-gray trans me-2">#{issue?.githubId}</span>
-            {console.log("issue", issue)}
             {(issue?.title !== null && handleBiggerName(issue?.title, 61)) || (
               <Translation ns="bounty" label={`errors.fetching`} />
             )}
@@ -255,27 +264,6 @@ export default function IssueListItem({
             {issue?.state === "draft" && renderData(issue?.createdAt)}
           </div>
           {renderIssueData(issue?.state)}
-
-          {/* <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2">
-            <span className="caption-small mr-2">
-              <span className="text-white">{issue?.working.length}{' '}</span>
-              <span className="text-gray"><Translation ns="bounty" label={`info.working`} /></span>
-            </span>
-
-            <span className="caption-small mr-2">
-              <span className="text-white">{issue?.pullRequests.length}{' '}</span>
-              <span className="text-gray"><Translation ns="bounty" label={`info.pull-requests`} params={{count: issue?.pullRequests.length}} /></span>
-            </span>
-
-            <span className="caption-small mr-2">
-              <span className="text-white">{issue?.mergeProposals.length}{' '}</span>
-              <span className="text-gray"><Translation ns="bounty" label={`info.proposals`} params={{count: issue?.mergeProposals.length}} /></span>
-            </span>
-
-            <span className="caption-small text-gray">
-              {issue != null && formatDate(issue?.createdAt)}
-            </span>
-          </div>*/}
         </div>
         <div className="col-md-2 my-auto text-center">
           <span className="caption-large text-white text-opacity-1">
