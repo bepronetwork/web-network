@@ -122,7 +122,7 @@ export default function IssueListItem({
     }
 
     return (
-      <span className="fs-7 mr-2 mt-1 text-uppercase">
+      <span className="small-info mr-2 mt-2 text-uppercase">
         {data && t(`data.text-data`, handleDurationTranslation())}
       </span>
     );
@@ -131,10 +131,10 @@ export default function IssueListItem({
   function renderProposals() {
     return (
       <div className="flex me-3 mt-1 flex-row">
-        <span className="fs-9 text-bold  mr-1 text-white-50">
+        <span className="caption-small  mr-1 text-white">
           {(issue != null && issue.mergeProposals.length) || 0}
         </span>
-        <span className="fs-9 text-bold text-ligth-gray text-uppercase">
+        <span className="caption-small text-ligth-gray text-uppercase">
           {t("issue.proposals")}
         </span>
       </div>
@@ -144,10 +144,10 @@ export default function IssueListItem({
   function renderReviews() {
     return (
       <div className="flex me-3 mt-1 flex-row">
-        <span className="fs-9  text-bold mr-1 text-white-50">
+        <span className="caption-small mr-1 text-white">
           {(issue != null && handleReviewsPr(issue?.pullRequests)) || 0}
         </span>
-        <span className="fs-9 text-bold text-ligth-gray text-uppercase">
+        <span className="caption-small text-ligth-gray text-uppercase">
           {t("issue.reviews")}
         </span>
       </div>
@@ -163,10 +163,10 @@ export default function IssueListItem({
       } else {
         return (
           <div className="flex mr-1 mt-1 flex-row">
-            <span className="fs-9  text-bold mr-1 text-white-50">
+            <span className="caption-small mr-1 text-white">
               {(issue != null && issue.working.length) || 0}
             </span>
-            <span className="fs-9 text-bold text-ligth-gray text-uppercase">
+            <span className="caption-small text-ligth-gray text-uppercase">
               {t("issue.working")}
             </span>
           </div>
@@ -179,10 +179,10 @@ export default function IssueListItem({
         <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2">
           {handleFirstChildren()}
           <div className="flex mr-1 mt-1 flex-row">
-            <span className="fs-9 text-bold mr-1 text-white-50 ">
+            <span className="caption-small mr-1 text-white">
               {(issue != null && issue.pullRequests.length) || 0}
             </span>
-            <span className="fs-9 text-bold text-ligth-gray text-uppercase">
+            <span className="caption-small text-ligth-gray text-uppercase">
               {t("issue.pull-requests")}
             </span>
           </div>
@@ -199,7 +199,7 @@ export default function IssueListItem({
 
   return (
     <div
-      className="bg-shadow list-item p-4 mb-3"
+      className="bg-shadow list-item p-4"
       onClick={() => {
         if (xClick) return xClick();
 
@@ -213,7 +213,8 @@ export default function IssueListItem({
         <div className="col-md-10 mb-3 mb-md-0">
           <h4 className="h4 text-truncate">
             <span className="text-gray trans me-2">#{issue?.githubId}</span>
-            {handleBiggerName(issue?.title, 61) || (
+            {console.log("issue", issue)}
+            {(issue?.title !== null && handleBiggerName(issue?.title, 61)) || (
               <Translation ns="bounty" label={`errors.fetching`} />
             )}
           </h4>
@@ -236,11 +237,11 @@ export default function IssueListItem({
                 )}
               />
             </span>
-            {issue?.repo && (
+            {issue?.repository && (
               <span className="p-small mr-2 mt-1 text-uppercase">
                 <GithubInfo
                   color="blue"
-                  value={handleBiggerName(issue?.repo, 30)}
+                  value={handleBiggerName(issue?.repository?.githubPath, 30)}
                   hoverTextColor="white"
                   onClicked={() =>
                     router.push({
@@ -254,6 +255,27 @@ export default function IssueListItem({
             {issue?.state === "draft" && renderData(issue?.createdAt)}
           </div>
           {renderIssueData(issue?.state)}
+
+          {/* <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2">
+            <span className="caption-small mr-2">
+              <span className="text-white">{issue?.working.length}{' '}</span>
+              <span className="text-gray"><Translation ns="bounty" label={`info.working`} /></span>
+            </span>
+
+            <span className="caption-small mr-2">
+              <span className="text-white">{issue?.pullRequests.length}{' '}</span>
+              <span className="text-gray"><Translation ns="bounty" label={`info.pull-requests`} params={{count: issue?.pullRequests.length}} /></span>
+            </span>
+
+            <span className="caption-small mr-2">
+              <span className="text-white">{issue?.mergeProposals.length}{' '}</span>
+              <span className="text-gray"><Translation ns="bounty" label={`info.proposals`} params={{count: issue?.mergeProposals.length}} /></span>
+            </span>
+
+            <span className="caption-small text-gray">
+              {issue != null && formatDate(issue?.createdAt)}
+            </span>
+          </div>*/}
         </div>
         <div className="col-md-2 my-auto text-center">
           <span className="caption-large text-white text-opacity-1">

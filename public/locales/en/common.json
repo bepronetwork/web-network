@@ -27,7 +27,7 @@
     "text-data": "Opened {{value}} Ago"
   },
   "filters": {
-    "filters": "Filters",
+    "filters": "Filter",
     "search-repositories": "Search repositories",
     "repository": "repository",
     "all": "All",
@@ -108,7 +108,9 @@
     "update": "Update",
     "take-back": "Take Back",
     "install": "Install",
-    "try-again": "Try Again"
+    "try-again": "Try Again",
+    "reconnect-account": "Reconnect account",
+    "unlock-all": "Unlock all"
   },
   "misc": {
     "by": "by",
@@ -197,6 +199,11 @@
       "network": "network",
       "on-your-wallet": "on your metamask wallet",
       "change-network": "Change Network"
+    },
+    "user-missing-information": {
+      "title": "Your account is missing some information",
+      "content": "We need you to reconnect your Github Account",
+      "error-message": "You need to unlock all your BEPRO before doing this"
     }
   },
   "forms": {
@@ -255,6 +262,15 @@
       "redeem-bounty": "Redeem bounty",
       "approve-settler": "Approve settler token",
       "recognize-finished": "Recognize bounty as finished"
+    }
+  },
+  "sort": {
+    "label": "Sort by",
+    "types": {
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "highest-bounty": "Highest Bounty",
+      "lowest-bounty": "Lowest Bounty"
     }
   }
 }
