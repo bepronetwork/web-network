@@ -4,7 +4,7 @@ import InputNumber from "components/input-number";
 import { useEffect, useState } from "react";
 import { NumberFormatValues } from "react-number-format";
 import { InputNumber as InputNumberProps } from "types/input-number";
-import useApi from '@x-hooks/use-api';
+import useApi from "@x-hooks/use-api";
 
 interface Props {
   by: string;
@@ -25,12 +25,12 @@ export default function CreateProposalDistributionItem({
 }: Props) {
   const [value, setValue] = useState<number>(defaultPercentage);
   const [githubLogin, setGithubLogin] = useState<string>();
-  const {getUserOf} = useApi();
+  const { getUserOf } = useApi();
 
   function getGithubLogin() {
-      getUserOf(address).then((handle: User) =>
-        setGithubLogin(handle?.githubLogin)
-      );
+    getUserOf(address).then((handle: User) =>
+      setGithubLogin(handle?.githubLogin)
+    );
   }
 
   useEffect(getGithubLogin, [by]);
@@ -56,7 +56,9 @@ export default function CreateProposalDistributionItem({
 
   return (
     <li className="d-flex align-items-center px-3 py-1 my-1 rounded-3 bg-dark-gray">
-      {githubLogin && <Avatar userLogin={githubLogin} className="me-2 mt-1"/>}
+      {githubLogin && (
+        <Avatar userLogin={githubLogin} className="me-2 mt-1" border />
+      )}
       <span className="flex-grow-1 caption-small">@{by}</span>
       <div className="flex-shrink-0 w-20">
         <InputNumber
