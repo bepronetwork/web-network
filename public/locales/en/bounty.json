@@ -18,18 +18,16 @@
     "reviews_other": "reviews"
   },
   "info-data": {
-    "seconds": "seconds",
-    "second": "second",
-    "minutes": "minutes",
-    "minute": "minute",
-    "hours": "hours",
-    "hour": "hour",
-    "month": "month",
-    "months": "months",
-    "year": "year",
-    "years": "years",
-    "day": "day",
-    "days": "days",
+    "minutes_other": "minutes",
+    "minutes": "minute",
+    "hours_other": "hours",
+    "hours": "hour",
+    "months": "month",
+    "months_other": "months",
+    "years": "year",
+    "years_other": "years",
+    "days": "day",
+    "days_other": "days",
     "text-data": "Opened {{value}} Ago"
   },
   "steps": {

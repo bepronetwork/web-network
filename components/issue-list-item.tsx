@@ -82,53 +82,39 @@ export default function IssueListItem({
       end: new Date(),
     });
 
+    const translated = (measure: string, amount: number = 0) =>
+      `${amount} ${t(`info-data.${measure}${amount > 1 ? "_other" : ""}`)}`;
+
+    const groups: string[][] = [
+      ["years", "months"],
+      ["months", "days"],
+      ["days", "hours"],
+      ["hours", "minutes"],
+      ["minutes"],
+    ];
+
     function handleDurationTranslation() {
-      if (duration.years > 0) {
-        return {
-          value: `${duration.years} ${
-            duration.years === 1 ? t(`info-data.year`) : t(`info-data.years`)
-          }`,
-        };
-      } else if (duration.months > 0) {
-        return {
-          value: `${duration.months} ${
-            duration.months === 1 ? t(`info-data.month`) : t(`info-data.months`)
-          }`,
-        };
-      } else if (duration.days > 0) {
-        return {
-          value: `${duration.days} ${
-            duration.days === 1 ? t(`info-data.day`) : t(`info-data.days`)
-          }`,
-        };
-      } else if (duration.hours > 0) {
-        return {
-          value: `${duration.hours} ${
-            duration.hours === 1 ? t(`info-data.hour`) : t(`info-data.hours`)
-          }`,
-        };
-      } else if (duration.minutes > 0) {
-        return {
-          value: `${duration.minutes} ${
-            duration.minutes === 1
-              ? t(`info-data.minute`)
-              : t(`info-data.minutes`)
-          }`,
-        };
-      } else if (duration.seconds > 0) {
-        return {
-          value: `${duration.seconds} ${
-            duration.seconds === 1
-              ? t(`info-data.second`)
-              : t(`info-data.seconds`)
-          }`,
-        };
+      const _string: string[] = [];
+      let i = 0;
+      for (i; i <= groups.length - 1; i++) {
+        const [m1, m2] = groups[i] as string[];
+
+        if (duration[m1]) {
+          _string.push(translated(m1, duration[m1]));
+          if (duration[m2]) _string.push(translated(m2, duration[m2]));
+        }
+
+        if (_string.length) i = groups.length;
       }
+      return _string;
     }
 
     return (
       <span className="small-info mr-2 mt-2 text-uppercase">
-        {data && t(`info-data.text-data`, handleDurationTranslation())}
+        {data &&
+          t(`info-data.text-data`, {
+            value: handleDurationTranslation().join(" "),
+          })}
       </span>
     );
   }
@@ -223,10 +209,10 @@ export default function IssueListItem({
       <div className="row align-center">
         <div className="col-md-10 mb-3 mb-md-0">
           <OverlayTrigger
-            key="bottom"
+            key="bottom-title"
             placement="bottom"
             overlay={
-              (issue?.title.length > 61 && (
+              (issue?.title?.length > 61 && (
                 <Tooltip id={`tooltip-bottom`}>{issue?.title}</Tooltip>
               )) || <></>
             }
@@ -251,10 +237,10 @@ export default function IssueListItem({
             </span>
             <Avatar className="mx-2" userLogin={issue?.creatorGithub} border />
             <OverlayTrigger
-              key="bottom"
+              key="bottom-creator"
               placement="bottom"
               overlay={
-                (issue?.creatorGithub.length > 30 && (
+                (issue?.creatorGithub?.length > 30 && (
                   <Tooltip id={`tooltip-bottom`}>
                     @{issue?.creatorGithub}
                   </Tooltip>
@@ -272,10 +258,10 @@ export default function IssueListItem({
             </OverlayTrigger>
             {issue?.repository && (
               <OverlayTrigger
-                key="bottom"
+                key="bottom-githubPath"
                 placement="bottom"
                 overlay={
-                  (issue?.repository?.githubPath.length > 30 && (
+                  (issue?.repository?.githubPath?.length > 30 && (
                     <Tooltip id={`tooltip-bottom`}>
                       {issue?.repository?.githubPath}
                     </Tooltip>
