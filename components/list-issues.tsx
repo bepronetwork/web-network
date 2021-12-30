@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { FormControl, InputGroup } from 'react-bootstrap'
@@ -13,6 +13,7 @@ import IssueFilters from '@components/issue-filters'
 import IssueListItem from '@components/issue-list-item'
 import InfiniteScroll from '@components/infinite-scroll'
 import CustomContainer from '@components/custom-container'
+import ScrollTopButton from '@components/scroll-top-button'
 
 import { ApplicationContext } from '@contexts/application'
 import { changeLoadState } from '@contexts/reducers/change-load-state'
@@ -20,7 +21,6 @@ import { changeLoadState } from '@contexts/reducers/change-load-state'
 import { IssueData } from '@interfaces/issue-data'
 
 import useApi from '@x-hooks/use-api'
-import usePage from '@x-hooks/use-page'
 
 type Filter = {
   label: string
@@ -39,6 +39,7 @@ interface IssuesPage {
   page: number
   issues: IssueData[]
 }
+
 export default function ListIssues({
   filterState,
   emptyMessage
@@ -53,7 +54,7 @@ export default function ListIssues({
   const [search, setSearch] = useState('')
   const { t } = useTranslation(['common', 'bounty'])
   const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([])
-  const [totalPages, setTotalPages] = useState<number>(0)
+  const [hasMore, setHasMore] = useState(false)
 
   const { page, repoId, time, state, sortBy, order } = router.query as {
     page: string
@@ -118,15 +119,31 @@ export default function ListIssues({
       repoId,
       time,
       state: filterState || state,
+      search: forceEmptySearch ? '' : search,
       sortBy,
-      order,
-      search: forceEmptySearch ? '' : search
+      order
     })
       .then(({ rows, pages, currentPage }) => {
-        setTotalPages(pages)
+        if (!rows.length) return
 
-        if (!issuesPages.find(el => el.page === currentPage)) 
-          setIssuesPages([...issuesPages, {page: currentPage, issues: rows}])
+        if (currentPage > 1) {
+          if (issuesPages.find((el) => el.page === currentPage)) return
+
+          const tmp = [...issuesPages, { page: currentPage, issues: rows }]
+
+          tmp.sort((pageA, pageB) => {
+            if (pageA.page < pageB.page) return -1
+            if (pageA.page > pageB.page) return 1
+
+            return 0
+          })
+
+          setIssuesPages(tmp)
+        } else {
+          setIssuesPages([{ page: currentPage, issues: rows }])
+        }
+
+        setHasMore(currentPage < pages)
       })
       .catch((error) => {
         console.error('Error fetching issues', error)
@@ -142,27 +159,37 @@ export default function ListIssues({
     getIssues()
   }
 
-  useEffect(() => {
+  function handleNextPage() {
     router.push(
       {
         pathname: router.pathname,
-        query: {
-          ...router.query,
-          page: 1
-        }
+        query: { ...router.query, page: +page + 1 }
       },
       router.pathname,
       { shallow: true }
     )
+  }
+
+  useEffect(() => {
+    if (!page)
+      router.push(
+        {
+          pathname: router.pathname,
+          query: { ...router.query, page: 1 }
+        },
+        router.pathname,
+        { shallow: true }
+      )
   }, [])
 
-  useEffect(getIssues, [page, repoId, time, state, sortBy, order])
+  useEffect(() => {
+    if (!router.isFallback && router.isReady)
+      getIssues()
+  }, [page, repoId, time, state, sortBy, order])
 
   return (
     <CustomContainer>
-      <div
-        className={`row mb-3 align-items-center list-actions`}
-      >
+      <div className={`row mb-3 align-items-center list-actions`}>
         <div
           className={`col-${
             (filterState && '9') || (hasFilter() && '7') || '8'
@@ -195,7 +222,9 @@ export default function ListIssues({
         <div
           className={`col-${
             (filterState && '3') || (hasFilter() && '5') || '4'
-          } d-flex align-items-center justify-content-${ filterState && 'end' || 'between'} pl-0 pr-1`}
+          } d-flex align-items-center justify-content-${
+            (filterState && 'end') || 'between'
+          } pl-0 pr-1`}
         >
           <div className="d-flex align-items-center">
             <span className="caption-small text-white-50 mr-1">
@@ -236,27 +265,32 @@ export default function ListIssues({
         </div>
       </div>
 
-      <InfiniteScroll
-        pages={totalPages}
-        page={parseInt(page)}
-        isLoading={loading.isLoading}
-      >
-        {issuesPages?.every(el => el.issues.length === 0) && !loading.isLoading ? (
-          <NothingFound description={emptyMessage || filterByState.emptyState}>
-            <InternalLink
-              href="/create-bounty"
-              label={String(t('actions.create-one'))}
-              uppercase
-            />
-          </NothingFound>
-        ) : null}
+      {issuesPages.every((el) => el.issues?.length === 0) &&
+      !loading.isLoading ? (
+        <NothingFound description={emptyMessage || filterByState.emptyState}>
+          <InternalLink
+            href="/create-bounty"
+            label={String(t('actions.create-one'))}
+            uppercase
+          />
+        </NothingFound>
+      ) : null}
 
-        <div>
-          {issuesPages?.map(({issues}) => (
-            issues.map(issue => <IssueListItem issue={issue} key={issue.githubId} />)
-          ))}
-        </div>
-      </InfiniteScroll>
+      {(issuesPages.some((el) => el.issues?.length > 0) && (
+        <InfiniteScroll
+          handleNewPage={handleNextPage}
+          isLoading={loading.isLoading}
+          hasMore={hasMore}
+        >
+          {issuesPages.map(({ issues }) => {
+            return issues?.map((issue) => (
+              <IssueListItem issue={issue} key={issue.githubId} />
+            ))
+          })}
+        </InfiniteScroll>
+      )) || <></>}
+
+      <ScrollTopButton />
     </CustomContainer>
   )
 }

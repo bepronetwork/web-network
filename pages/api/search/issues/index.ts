@@ -39,23 +39,26 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: 'repository' }
   ]
 
-  let issues = await models.issue.findAll({
+  const issues = await models.issue.findAll({
     where: whereCondition,
     include,
     nest: true,
     order: [[req.query.sortBy || 'createdAt', req.query.order || 'DESC']]
   })
 
+  const result = []
+
   if (search)
-    issues = issues.filter(
+    result.push(...issues.filter(
       (issue) =>
         searchPatternInText(issue.title, String(search)) ||
         searchPatternInText(issue.body, String(search))
-    )
-  
-  const paginatedData = paginateArray(issues, 10, page || 1)
+    ))
 
-  return res.status(200).json({ count: issues.length, rows: paginatedData.data, pages: paginatedData.pages, currentPage: paginatedData.page })
+  
+  const paginatedData = paginateArray(result.length && result || issues , 10, page || 1)
+
+  return res.status(200).json({ count: paginatedData.data.length, rows: paginatedData.data, pages: paginatedData.pages, currentPage: paginatedData.page })
 }
 
 export default async function SearchIssues(

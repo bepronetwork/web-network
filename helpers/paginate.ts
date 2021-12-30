@@ -6,6 +6,7 @@ function paginate(query = {}, {page = 1,} = {page: 1,}, order = []) {
   const offset = (page - 1) * limit;
   return ({
     ...query,
+    distinct: true,
     offset,
     limit,
     order,

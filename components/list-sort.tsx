@@ -16,8 +16,7 @@ interface ListSortProps {
 
 export default function ListSort({
   defaultOptionIndex = 0,
-  options,
-  ...props
+  options
 }: ListSortProps) {
   const router = useRouter()
   const { sortBy, order } = router.query
@@ -25,11 +24,12 @@ export default function ListSort({
   function handleSelectChange(newValue) {
     const query = {
       ...router.query,
+      page: 1,
       sortBy: newValue.sortBy,
       order: newValue.order
     }
 
-    router.push({ pathname: `.${router.pathname}`, query }, router.pathname)
+    router.push({ pathname: `${router.pathname}`, query }, router.pathname, { shallow: true })
   }
 
   function getDefaultValue(): Option {
