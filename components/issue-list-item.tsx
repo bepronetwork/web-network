@@ -68,14 +68,6 @@ export default function IssueListItem({
     return numberAllReviewers;
   }
 
-  function handleBiggerName(name: string, maxSize: number) {
-    if (name.length > maxSize) {
-      return [name.substring(0, maxSize), "..."].join("");
-    } else {
-      return name;
-    }
-  }
-
   function renderData(data: Date) {
     const duration = intervalToDuration({
       start: new Date(data),
@@ -239,19 +231,18 @@ export default function IssueListItem({
               key="bottom-creator"
               placement="bottom"
               overlay={
-                (issue?.creatorGithub?.length > 30 && (
+                (issue?.creatorGithub?.length > 25 && (
                   <Tooltip id={`tooltip-bottom`}>
                     @{issue?.creatorGithub}
                   </Tooltip>
                 )) || <></>
               }
             >
-              <span className="p-small mr-2 mt-1">
+              <span className="p-small mr-2 mt-1 mw-github-info">
                 <GithubInfo
                   color="gray"
-                  value={[`@`, handleBiggerName(issue?.creatorGithub, 30)].join(
-                    ``
-                  )}
+                  value={[`@`, issue?.creatorGithub].join(``)}
+                  textTruncate
                 />
               </span>
             </OverlayTrigger>
@@ -260,17 +251,17 @@ export default function IssueListItem({
                 key="bottom-githubPath"
                 placement="bottom"
                 overlay={
-                  (issue?.repository?.githubPath?.length > 30 && (
+                  (issue?.repository?.githubPath?.length > 26 && (
                     <Tooltip id={`tooltip-bottom`}>
                       {issue?.repository?.githubPath}
                     </Tooltip>
                   )) || <></>
                 }
               >
-                <span className="p-small mr-2 mt-1 text-uppercase">
+                <span className="p-small mr-2 mt-1 text-uppercase mw-github-info">
                   <GithubInfo
                     color="blue"
-                    value={handleBiggerName(issue?.repository?.githubPath, 30)}
+                    value={issue?.repository?.githubPath}
                     hoverTextColor="white"
                     onClicked={() =>
                       router.push({
@@ -278,6 +269,7 @@ export default function IssueListItem({
                         query: { repoId: issue?.repository_id },
                       })
                     }
+                    textTruncate
                   />
                 </span>
               </OverlayTrigger>
