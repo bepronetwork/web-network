@@ -112,7 +112,7 @@ export default function ListIssues({
 
   function getIssues(forceEmptySearch = false) {
     if (!page) return
-
+    
     dispatch(changeLoadState(true))
     searchIssues({
       page,
@@ -124,7 +124,7 @@ export default function ListIssues({
       order
     })
       .then(({ rows, pages, currentPage }) => {
-        if (!rows.length) return
+        //if (!rows.length) return
 
         if (currentPage > 1) {
           if (issuesPages.find((el) => el.page === currentPage)) return
@@ -156,7 +156,14 @@ export default function ListIssues({
   function handleSearch(event) {
     if (event.key !== 'Enter' || loading.isLoading) return
 
-    getIssues()
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, page: 1 }
+      },
+      router.pathname,
+      { shallow: true }
+    )
   }
 
   function handleNextPage() {

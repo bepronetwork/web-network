@@ -1,10 +1,10 @@
-import React from 'react'
 import { GetServerSideProps } from 'next'
-import ListIssues from '@components/list-issues'
-import PageHero from '@components/page-hero'
 import { getSession } from 'next-auth/react'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useTranslation } from 'next-i18next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+
+import PageHero from '@components/page-hero'
+import ListIssues from '@components/list-issues'
 
 export default function PageCouncil() {
   const { t } = useTranslation(['common', 'council'])
@@ -12,7 +12,7 @@ export default function PageCouncil() {
   return (
     <div>
       <PageHero title={t('council:title')} />
-      
+
       <ListIssues filterState="ready" emptyMessage={t('council:empty')} />
     </div>
   )
