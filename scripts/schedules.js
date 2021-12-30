@@ -17,6 +17,13 @@ async function moveToReady() {
     .finally(() => setTimeout(async () => await moveToReady(), 10*60*1000));
 }
 
+async function makeSeoBountyCards() {
+  return client.post(`past-events/seo-bounty-cards/`)
+    .then(({data}) => console.log(`done.`, data))
+    .catch(error => console.log(`error`, error?.message || error));
+}
+
+makeSeoBountyCards()
 moveToReady();
 processPastEvents();
 

@@ -40,11 +40,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const {path} = await storage.add({data: img})
   const url = `${process.env.NEXT_PUBLIC_IPFS_BASE}/${path}`
 
-  // if(issue?.seoImage != path){
-  //   const url = issue.seoImage.split('/')
-  //   await storage.unpin(url[url.length - 1]);
-  // }
-
   await issue.update({
     seoImage: url,
   })
