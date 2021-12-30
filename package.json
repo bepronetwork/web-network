@@ -14,7 +14,7 @@
     "prebuild": "next telemetry disable",
     "build": "next build",
     "start": "next start",
-    "schedules": "node schedules.js"
+    "schedules": "node ./scripts/schedules.js"
   },
   "dependencies": {
     "@octokit/types": "^6.26.0",

@@ -120,11 +120,15 @@ async function doSubTitle({
 }
 
 async function doTitle(title: string) {
-  title = title.split(' ')
+ try{
   //Wrap lines size between 26 and 35 words
+  title = title?.split(' ')
   .reduce((p, c) => p.length % 35 > 26 && p.length % 35 < 35?`${p} \n${c}`:`${p} ${c}`)
+ }catch{
+   title = title
+ }
 
-  const titleText = await write(title, 48, "white", "semi");
+  const titleText = await write(title||'', 48, "white", "semi");
   var titleContainer = new Jimp(1080, 174);
   titleContainer = await position(titleContainer, titleText, 0, 0);
 
