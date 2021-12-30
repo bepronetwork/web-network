@@ -1137,3 +1137,13 @@ textarea.form-control {
     text-align: center;
   }
 }
+
+.scroll-top-button {
+  position: fixed;
+  bottom: 50px;
+  right: 20px;
+  z-index: 99;
+
+  background-color: transparent;
+  border: none;
+}

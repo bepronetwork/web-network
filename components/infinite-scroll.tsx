@@ -1,70 +1,44 @@
 import { ReactNode, useEffect } from 'react'
-
-import DownDoubleArrow from '@assets/icons/down-double-arrow'
-
-import { useRouter } from 'next/router'
-
 interface InfiniteScrollProps {
-  pages: number
-  page: number
+  handleNewPage: () => void
   isLoading: boolean
+  hasMore: boolean
   children: ReactNode | ReactNode[]
 }
 
 export default function InfiniteScroll({
-  pages,
-  page,
+  handleNewPage,
+  hasMore,
   isLoading,
   children
 }: InfiniteScrollProps) {
-  const router = useRouter()
+  function handleScrolling(entries, observer) {
+    if (!hasMore || isLoading) return
 
-  function handlePreviousPage() {
-    const newPage = page - 1
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        handleNewPage()
 
-    if (newPage < 1 || isLoading || window.scrollY > 0) return
+        observer.disconnect()
+      }
+    })
   }
 
-  function handleNextPage() {
-    const newPage = page + 1
-
-    if (
-      newPage > pages ||
-      isLoading ||
-      window.innerHeight + window.scrollY < document.body.offsetHeight
-    )
-      return
-
-    router.push(
-      {
-        pathname: `.${router.pathname}`,
-        query: {
-          ...router.query,
-          page: newPage
-        }
-      },
-      router.pathname,
-      { shallow: true }
-    )
-  }
-
-  function handleScrolling(event) {
-    if (event.deltaY < 0) return
-    //handlePreviousPage()
-    else handleNextPage()
-  }
+  const observer = new IntersectionObserver(handleScrolling, {
+    root: null,
+    rootMargin: '0px',
+    threshold: 1.0
+  })
 
   useEffect(() => {
-    window.addEventListener('wheel', handleScrolling, true)
+    const childs = document.getElementById('infinite-scroll').children
+
+    if (childs.length) observer.observe(childs[childs.length - 1])
 
     return () => {
-      window.removeEventListener('wheel', handleScrolling)
+      observer.unobserve(childs[childs.length - 1])
     }
-  }, [page, pages, isLoading])
+  }, [hasMore, isLoading])
 
-  return (
-    <div id="infinite-scroll">
-      {children}
-    </div>
-  )
+  return <div id="infinite-scroll">{children}</div>
 }

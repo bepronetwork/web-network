@@ -20,7 +20,7 @@ export default function LanguageSelector() {
     <Popover id="language-selector">
       <Popover.Body className="bg-shadow">
         {options.map(({value, label}) =>
-                       <div onClick={() => changeLocale(value)} className={`${locale === value ? `active` : `cursor-pointer`}`}>{label}</div>)}
+                       <div key={label} onClick={() => changeLocale(value)} className={`${locale === value ? `active` : `cursor-pointer`}`}>{label}</div>)}
       </Popover.Body>
     </Popover>
 
