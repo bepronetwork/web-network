@@ -18,7 +18,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   })
 
   if (issues?.length < 1)
-    return res.status(400).json(null);
+    return res.status(400).json('issues not find');
 
 
   const storage = new IpfsStorage()
@@ -47,7 +47,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       seoImage: url,
     })
 
-    return issue;
+    return {...issue, seoImage: url};
   }))
 
   return res.status(200).json(create);
