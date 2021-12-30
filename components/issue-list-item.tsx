@@ -219,8 +219,7 @@ export default function IssueListItem({
           >
             <h4 className="h4 text-truncate">
               <span className="text-gray trans me-2">#{issue?.githubId}</span>
-              {(issue?.title !== null &&
-                handleBiggerName(issue?.title, 61)) || (
+              {(issue?.title !== null && issue?.title) || (
                 <Translation ns="bounty" label={`errors.fetching`} />
               )}
             </h4>
