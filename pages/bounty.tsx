@@ -7,7 +7,7 @@ import PageActions from '@components/page-actions';
 import IssueProposals from '@components/issue-proposals';
 import { useRouter } from 'next/router';
 import { BeproService } from '@services/bepro-service';
-import { User } from '@services/github-microservice';
+import { User } from '@interfaces/api-response';
 import { ApplicationContext } from '@contexts/application';
 import { IssueData } from '@interfaces/issue-data';
 import { formatNumberToCurrency } from '@helpers/formatNumber';
@@ -22,6 +22,7 @@ import CustomContainer from '@components/custom-container';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import Translation from '@components/translation';
+import { NextSeo } from 'next-seo'
 interface NetworkIssue {
   recognizedAsFinished: boolean;
 }
@@ -189,6 +190,28 @@ export default function PageIssue() {
 
   return (
     <>
+      <NextSeo
+        title={issue?.title}
+        openGraph={{
+          url: `${process.env.NEXT_PUBLIC_HOME_URL}/bounty?id=${issue?.id}&repoId=${issue?.repository_id}`,
+          title: issue?.title,
+          description: issue?.body,
+          images: [
+            {
+              url: issue?.seoImage,
+              width: 1200,
+              height: 670,
+              alt: 'Bounty Info',
+              type: 'image/jpeg',
+            }
+          ],
+          site_name: 'bepro',
+        }}
+        twitter={{
+          handle: '@bepronet',
+          cardType: issue?.seoImage,
+        }}
+      />
       <IssueHero
         amount={formatNumberToCurrency(issue?.amount || networkIssue?.tokensStaked)}
         state={handleStateissue()}

@@ -3,7 +3,7 @@ import {NextApiRequest, NextApiResponse} from 'next';
 import {Octokit} from 'octokit';
 import {Bus} from '@helpers/bus';
 import networkBeproJs from '@helpers/api/handle-network-bepro';
-
+import api from 'services/api'
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {fromBlock, id} = req.body;
   const octokit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
@@ -31,6 +31,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
                     await octokit.rest.issues.update({owner, repo, issue_number: issueId, state: 'closed',});
                     issue.state = 'canceled';
                     await issue.save();
+
+                    await api.get(`seo/${issueId}`)
 
                     console.log(`Emitting redeemIssue:created:${issueId}`);
                     Bus.emit(`redeemIssue:created:${issueId}`, issue)

@@ -48,10 +48,6 @@ export default function IssueListItem({
       case "disputed": {
         return "bg-danger text-white";
       }
-      // REVIEW: redeem not exist in figma
-      case "redeemed": {
-        return "blue";
-      }
       default: {
         return "blue";
       }
