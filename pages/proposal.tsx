@@ -7,7 +7,7 @@ import ProposalProgress from '@components/proposal-progress';
 import {useRouter} from 'next/router';
 import {ApplicationContext} from '@contexts/application';
 import {BeproService} from '@services/bepro-service';
-import {ProposalData} from '@services/github-microservice';
+import {ProposalData} from '@interfaces/api-response';
 import {formatDate} from '@helpers/formatDate';
 import {handlePercentage} from '@helpers/handlePercentage';
 import {IssueData, pullRequest} from '@interfaces/issue-data';

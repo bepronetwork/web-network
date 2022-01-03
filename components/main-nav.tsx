@@ -21,7 +21,7 @@ import { truncateAddress } from '@helpers/truncate-address';
 import InternalLink from './internal-link';
 import BalanceAddressAvatar from './balance-address-avatar';
 import useApi from '@x-hooks/use-api';
-import { User } from '@services/github-microservice';
+import { User } from '@interfaces/api-response';
 import UserMissingModal from './user-missing-information';
 import Translation from './translation';
 

@@ -21,6 +21,7 @@ class Issue extends Model {
         type: DataTypes.ARRAY(DataTypes.STRING)
       },
       merged: DataTypes.STRING,
+      seoImage: DataTypes.STRING
     }, {
       sequelize,
       modelName: 'issue',

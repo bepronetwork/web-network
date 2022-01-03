@@ -1,4 +1,4 @@
-import {User} from '@services/github-microservice';
+import {User} from '@interfaces/api-response';
 import {BeproService} from '@services/bepro-service';
 import React, {useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';

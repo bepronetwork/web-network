@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { GetStaticProps } from "next";
 import { useEffect, useState } from "react";
-import {ProposalData,} from "@services/github-microservice";
+import {ProposalData,} from '@interfaces/api-response';
 import { BeproService } from "@services/bepro-service";
 import { ApplicationContext } from "@contexts/application";
 import ProposalItem from '@components/proposal-item';
