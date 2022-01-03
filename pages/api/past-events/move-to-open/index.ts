@@ -4,7 +4,7 @@ import {Op} from 'sequelize';
 import models from '@db/models';
 import {Octokit} from 'octokit';
 import networkBeproJs from '@helpers/api/handle-network-bepro';
-
+import api from 'services/api'
 async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const network = networkBeproJs({ test: true });
@@ -31,6 +31,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     issue.state = 'open';
     console.log(`Moved ${issue.issueId} to open`);
     await issue.save();
+    await api.get(`seo/${issue.issueId}`)
   }
 
   return res.status(200).json(issues);
