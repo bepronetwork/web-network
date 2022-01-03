@@ -33,6 +33,8 @@ type FiltersByIssueState = Filter[]
 interface ListIssuesProps {
   filterState?: string
   emptyMessage?: string
+  creator?: string
+  pullRequester?: string
 }
 
 interface IssuesPage {
@@ -42,7 +44,9 @@ interface IssuesPage {
 
 export default function ListIssues({
   filterState,
-  emptyMessage
+  emptyMessage,
+  creator,
+  pullRequester
 }: ListIssuesProps): JSX.Element {
   const {
     dispatch,
@@ -55,9 +59,9 @@ export default function ListIssues({
   const { t } = useTranslation(['common', 'bounty'])
   const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([])
   const [hasMore, setHasMore] = useState(false)
+  const [page, setPage] = useState(1)
 
-  const { page, repoId, time, state, sortBy, order } = router.query as {
-    page: string
+  const { repoId, time, state, sortBy, order } = router.query as {
     repoId: string
     time: string
     state: string
@@ -112,20 +116,20 @@ export default function ListIssues({
 
   function getIssues(forceEmptySearch = false) {
     if (!page) return
-    
+
     dispatch(changeLoadState(true))
     searchIssues({
-      page,
+      page: String(page),
       repoId,
       time,
       state: filterState || state,
       search: forceEmptySearch ? '' : search,
       sortBy,
-      order
+      order,
+      creator,
+      pullRequester
     })
       .then(({ rows, pages, currentPage }) => {
-        //if (!rows.length) return
-
         if (currentPage > 1) {
           if (issuesPages.find((el) => el.page === currentPage)) return
 
@@ -156,43 +160,17 @@ export default function ListIssues({
   function handleSearch(event) {
     if (event.key !== 'Enter' || loading.isLoading) return
 
-    router.push(
-      {
-        pathname: router.pathname,
-        query: { ...router.query, page: 1 }
-      },
-      router.pathname,
-      { shallow: true }
-    )
+    setPage(1)
   }
 
   function handleNextPage() {
-    router.push(
-      {
-        pathname: router.pathname,
-        query: { ...router.query, page: +page + 1 }
-      },
-      router.pathname,
-      { shallow: true }
-    )
+    setPage(page + 1)
   }
 
+  useEffect(getIssues, [page, repoId, time, state, sortBy, order])
   useEffect(() => {
-    if (!page)
-      router.push(
-        {
-          pathname: router.pathname,
-          query: { ...router.query, page: 1 }
-        },
-        router.pathname,
-        { shallow: true }
-      )
-  }, [])
-
-  useEffect(() => {
-    if (!router.isFallback && router.isReady)
-      getIssues()
-  }, [page, repoId, time, state, sortBy, order])
+    setPage(1)
+  }, [repoId, time, state, sortBy, order])
 
   return (
     <CustomContainer>

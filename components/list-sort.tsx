@@ -24,12 +24,11 @@ export default function ListSort({
   function handleSelectChange(newValue) {
     const query = {
       ...router.query,
-      page: 1,
       sortBy: newValue.sortBy,
       order: newValue.order
     }
 
-    router.push({ pathname: `${router.pathname}`, query }, router.pathname, { shallow: true })
+    router.push({ pathname: `${router.pathname}`, query }, router.pathname)
   }
 
   function getDefaultValue(): Option {
