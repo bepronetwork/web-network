@@ -115,9 +115,8 @@ export default function ListIssues({
   }
 
   function getIssues(forceEmptySearch = false) {
-    if (!page) return
-
     dispatch(changeLoadState(true))
+
     searchIssues({
       page: String(page),
       repoId,
@@ -158,9 +157,11 @@ export default function ListIssues({
   }
 
   function handleSearch(event) {
-    if (event.key !== 'Enter' || loading.isLoading) return
-
+    if (event.key !== 'Enter') return
+    
     setPage(1)
+
+    getIssues()
   }
 
   function handleNextPage() {
@@ -174,7 +175,7 @@ export default function ListIssues({
 
   return (
     <CustomContainer>
-      <div className={`row mb-3 align-items-center list-actions`}>
+      <div className={`row mb-3 align-items-center list-actions sticky-top`}>
         <div
           className={`col-${
             (filterState && '9') || (hasFilter() && '7') || '8'
