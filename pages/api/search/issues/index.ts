@@ -1,15 +1,25 @@
-import { NextApiRequest, NextApiResponse } from 'next'
 import { Op, WhereOptions } from 'sequelize'
+import { NextApiRequest, NextApiResponse } from 'next'
 import { subHours, subMonths, subWeeks, subYears } from 'date-fns'
 
 import models from '@db/models'
+
 import { paginateArray } from '@helpers/paginate'
 import { searchPatternInText } from '@helpers/string'
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = { state: { [Op.not]: `pending` } }
-  const { state, issueId, repoId, time, creator, address, search, page } =
-    req.query || {}
+  const {
+    state,
+    issueId,
+    repoId,
+    time,
+    creator,
+    address,
+    search,
+    page,
+    pullRequester
+  } = req.query || {}
 
   if (state) whereCondition.state = state
 
@@ -34,7 +44,10 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   }
   const include = [
     { association: 'developers' },
-    { association: 'pullRequests' },
+    {
+      association: 'pullRequests',
+      ...(pullRequester ? { where: { githubLogin: pullRequester } } : {})
+    },
     { association: 'mergeProposals' },
     { association: 'repository' }
   ]
@@ -49,16 +62,23 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const result = []
 
   if (search)
-    result.push(...issues.filter(
-      (issue) =>
-        searchPatternInText(issue.title, String(search)) ||
-        searchPatternInText(issue.body, String(search))
-    ))
+    result.push(
+      ...issues.filter(
+        (issue) =>
+          searchPatternInText(issue.title, String(search)) ||
+          searchPatternInText(issue.body, String(search))
+      )
+    )
+  else result.push(...issues)
 
-  
-  const paginatedData = paginateArray(result.length && result || issues , 10, page || 1)
+  const paginatedData = paginateArray(result, 10, page || 1)
 
-  return res.status(200).json({ count: paginatedData.data.length, rows: paginatedData.data, pages: paginatedData.pages, currentPage: paginatedData.page })
+  return res.status(200).json({
+    count: result.length,
+    rows: paginatedData.data,
+    pages: paginatedData.pages,
+    currentPage: paginatedData.page
+  })
 }
 
 export default async function SearchIssues(
