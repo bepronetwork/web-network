@@ -14,8 +14,8 @@
     "prebuild": "next telemetry disable",
     "build": "next build",
     "start": "next start",
-    "make-seo": "node ./scripts/seo.js",
-    "schedules": "node ./scripts/schedules.js"
+    "make-seo": "node make-seo.js",
+    "schedules": "node schedules.js"
   },
   "dependencies": {
     "@octokit/types": "^6.26.0",
