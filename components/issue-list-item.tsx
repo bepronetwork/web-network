@@ -247,7 +247,7 @@ export default function IssueListItem({
                 key="bottom-githubPath"
                 placement="bottom"
                 overlay={
-                  (issue?.repository?.githubPath?.length > 26 && (
+                  (issue?.repository?.githubPath?.length > 25 && (
                     <Tooltip id={`tooltip-bottom`}>
                       {issue?.repository?.githubPath}
                     </Tooltip>
