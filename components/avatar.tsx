@@ -5,12 +5,14 @@ export default function Avatar({
   userLogin,
   className,
   src,
-  tooltip = false
+  tooltip = false,
+  border = false
 }: {
   userLogin: string
   className?: string
   src?: string;
   tooltip?: boolean;
+  border?: boolean;
 }): JSX.Element {
   return (
     <OverlayTrigger
@@ -19,7 +21,7 @@ export default function Avatar({
       overlay={tooltip && <Tooltip id={`tooltip-right`}>@{userLogin}</Tooltip> || <></>}
     >
       <img
-        className={`avatar circle-3 ${className}`}
+        className={`avatar circle-3 ${border && `border-avatar`} ${className}`}
         src={src || `https://github.com/${userLogin}.png`}
       />
     </OverlayTrigger>
