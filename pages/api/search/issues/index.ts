@@ -63,10 +63,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   if (search)
     result.push(
-      ...issues.filter(
-        (issue) =>
-          searchPatternInText(issue.title, String(search)) ||
-          searchPatternInText(issue.body, String(search))
+      ...issues.filter(({ title, body }) =>
+        [title, body].some((text) => searchPatternInText(text, String(search)))
       )
     )
   else result.push(...issues)
