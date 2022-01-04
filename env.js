@@ -14,3 +14,5 @@ export const COUNTRY_CODE_BLOCKED = process.env.COUNTRY_CODE_BLOCKED || ["US", "
 // Visite https://chainlist.org/ to see more ChainID
 export const CURRENT_NETWORK_CHAINID = process.env.CURRENT_NETWORK_CHAINID || "42"
 
+export const IS_PRODUCTION_ENVIRONMENT = process.env.NODE_ENV === 'production'
+

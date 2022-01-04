@@ -88,18 +88,18 @@ export default function IssueListItem({ issue = null, xClick }: { issue?: IssueD
             
           <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2">
             <span className="caption-small mr-2">
-              <span className="text-white">{issue?.working.length}{' '}</span>
+              <span className="text-white">{issue?.working?.length}{' '}</span>
               <span className="text-gray"><Translation ns="bounty" label={`info.working`} /></span>
             </span>
 
             <span className="caption-small mr-2">
-              <span className="text-white">{issue?.pullRequests.length}{' '}</span>
-              <span className="text-gray"><Translation ns="bounty" label={`info.pull-requests`} params={{count: issue?.pullRequests.length}} /></span>
+              <span className="text-white">{issue?.pullRequests?.length}{' '}</span>
+              <span className="text-gray"><Translation ns="bounty" label={`info.pull-requests`} params={{count: issue?.pullRequests?.length}} /></span>
             </span>
 
             <span className="caption-small mr-2">
-              <span className="text-white">{issue?.mergeProposals.length}{' '}</span>
-              <span className="text-gray"><Translation ns="bounty" label={`info.proposals`} params={{count: issue?.mergeProposals.length}} /></span>
+              <span className="text-white">{issue?.mergeProposals?.length}{' '}</span>
+              <span className="text-gray"><Translation ns="bounty" label={`info.proposals`} params={{count: issue?.mergeProposals?.length}} /></span>
             </span>
 
             <span className="caption-small text-gray">
