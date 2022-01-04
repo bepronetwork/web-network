@@ -28,10 +28,10 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
       ... router.query,
       ... state ? {state} : {},
       ... time ? {time} : {},
-      ... repoId ? {repoId} : {},
+      ... repoId ? {repoId} : {}
     }
 
-    router.push({pathname: './', query});
+    router.push({pathname: router.pathname, query}, router.pathname);
   }
 
   function makeFilterOption(label, value, checked = false) {
@@ -90,7 +90,7 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
       ... router.query.order ? {order: router.query.order}: {}
     }
 
-    router.push({pathname: './', query});
+    router.push({pathname: router.pathname, query}, router.pathname);
   }
 
   return [[repoFilters, stateFilters, timeFilters], updateOpt, clearFilters]

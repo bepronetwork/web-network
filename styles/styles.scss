@@ -1091,6 +1091,13 @@ textarea.form-control {
 }
 
 .list-actions {
+  background-color: $bg;
+  border-radius: math.div($m, 2);
+
+  &.sticky-top {
+    top: 4.35em;
+  }
+
   .input-group {
     border: 2px solid transparent;
     border-radius: math.div($m, 2);
@@ -1146,4 +1153,14 @@ textarea.form-control {
     font-size: 12px;
     text-align: center;
   }
+}
+
+.scroll-top-button {
+  position: fixed;
+  bottom: 50px;
+  right: 20px;
+  z-index: 99;
+
+  background-color: transparent;
+  border: none;
 }
