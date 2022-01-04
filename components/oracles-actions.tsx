@@ -283,10 +283,10 @@ function OraclesActions(): JSX.Element {
             </Button>
           </>
         }>
-        <p className="caption-small text-uppercase text-center">
+        <p className="caption-small text-uppercase text-center mb-2">
           {renderInfo.caption}
         </p>
-        <p className="text-center text-bold fs-4">
+        <p className="text-center h4">
           {renderInfo.body?.split("/").map((sentence: string) => {
             const Component =
               ((sentence.startsWith("oracles") || sentence.startsWith("bepro")) && "span") || Fragment;
@@ -295,10 +295,10 @@ function OraclesActions(): JSX.Element {
               <Fragment key={sentence}>
                 <Component
                   {...(sentence.startsWith("oracles") && {
-                    className: "text-bold text-purple",
+                    className: "text-purple",
                   })}
                   {...(sentence.startsWith("bepro") && {
-                    className: "text-bold text-blue",
+                    className: "text-blue",
                   })}
                 >
                   {sentence.replace(/bepro|oracles|br/, "")}

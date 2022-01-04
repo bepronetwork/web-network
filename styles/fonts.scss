@@ -5,27 +5,9 @@
 }
 
 @font-face {
-  font-family: 'fontSemiBold';
-  src: url('../assets/fonts/SpaceGrotesk-SemiBold.ttf') format('ttf'),
-       url('../assets/fonts/SpaceGrotesk-SemiBold.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'fontBold';
-  src: url('../assets/fonts/SpaceGrotesk-Bold.ttf') format('ttf'),
-       url('../assets/fonts/SpaceGrotesk-Bold.ttf') format('truetype');
-}
-
-@font-face {
   font-family: 'Inter-Regular';
   src: url('../assets/fonts/Inter-Regular.ttf') format('ttf'),
        url('../assets/fonts/Inter-Regular.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'Inter-SemiBold';
-  src: url('../assets/fonts/Inter-SemiBold.ttf') format('ttf'),
-       url('../assets/fonts/Inter-SemiBold.ttf') format('truetype');
 }
 
 @function is-important($important){
@@ -33,7 +15,7 @@
 }
 
 .family-Regular {
-  font-family: 'Inter-SemiBold', sans-serif;
+  font-family: 'fontRegular', sans-serif;
 }
 
 body {
@@ -42,8 +24,8 @@ body {
 }
 
 @mixin heading($important: false) {
-  font-family: 'fontBold', sans-serif is-important($important);
-  font-weight: 400 is-important($important);
+  font-family: 'fontRegular', sans-serif is-important($important);
+  font-weight: 700 is-important($important);
   line-height: 120% is-important($important);
   margin: 0;
 }
@@ -60,6 +42,7 @@ body {
 
 .caption,
 .caption-small,
+.caption-medium,
 .caption-large {
   @include heading;
   letter-spacing: 0.1rem;
@@ -70,6 +53,9 @@ body {
   line-height: 140%;
   &-small {
     line-height: 120%;
+  }
+  &-medium {
+    line-height: 140%;
   }
   &-large {
     line-height: 160%;
@@ -82,7 +68,8 @@ p,
   font-family: 'Inter-Regular', sans-serif;
   line-height: 140%;
   &-bold {
-    font-family: 'Inter-SemiBold', sans-serif;
+    font-family: 'Inter-Regular', sans-serif;
+    font-weight: 600;
     line-height: 160%;
     letter-spacing: 0.02rem;
   }
@@ -97,10 +84,10 @@ p,
 button,
 .btn,
 .small-info {
-  font-family: 'fontSemiBold', sans-serif;
-  font-weight: 400;
+  font-family: 'fontRegular', sans-serif;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1rem;
+  letter-spacing: 0.1rem; 
 }
 
 button,

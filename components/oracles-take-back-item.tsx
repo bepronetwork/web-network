@@ -68,7 +68,7 @@ export default function OraclesTakeBackItem({
       <div className="bg-dark-gray w-100 mb-1 p-3 border-radius-8">
         <div className="row align-items-center">
           <div className="col-md-6">
-            <p className="caption-large text-bold text-purple mb-1 text-uppercase">{formatNumberToString(amount, 2)} {t('$oracles')}</p>
+            <p className="caption-large text-purple mb-1 text-uppercase">{formatNumberToString(amount, 2)} {t('$oracles')}</p>
             <p className="caption-small text-white mb-0">{address}</p>
           </div>
           <div className="col-md-6 d-flex justify-content-end">
@@ -93,10 +93,10 @@ export default function OraclesTakeBackItem({
             </Button>
           </>
         }>
-        <p className="text-center fs-4">
+        <p className="text-center h4">
           <span className="me-2">{t('actions.take-back')}</span>
-          <span className="text-bold text-purple me-2">{formatNumberToString(amount, 2)} {t('$oracles')}</span>
-          <span className="text-bold">{t('misc.from')} {truncateAddress(address, 12, 3)}</span>
+          <span className="text-purple me-2">{formatNumberToString(amount, 2)} {t('$oracles')}</span>
+          <span>{t('misc.from')} {truncateAddress(address, 12, 3)}</span>
         </p>
       </Modal>
     </>
