@@ -58,7 +58,7 @@ export default function IssueListItem({
     var numberAllReviewers = 0;
 
     const allReviewers = pullRequests.map((pr) => {
-      return pr.reviewers.length;
+      return pr.reviewers?.length;
     });
     allReviewers.map((num) => (numberAllReviewers = numberAllReviewers + num));
     return numberAllReviewers;
@@ -111,7 +111,7 @@ export default function IssueListItem({
     return (
       <div className="flex me-3 mt-1 flex-row">
         <span className="caption-small  mr-1 text-white">
-          {(issue != null && issue.mergeProposals.length) || 0}
+          {(issue != null && issue.mergeProposals?.length) || 0}
         </span>
         <span className="caption-small text-ligth-gray text-uppercase">
           {issue?.mergeProposals?.length === 1
@@ -147,7 +147,7 @@ export default function IssueListItem({
         return (
           <div className="flex mr-1 mt-1 flex-row">
             <span className="caption-small mr-1 text-white">
-              {(issue != null && issue.working.length) || 0}
+              {(issue != null && issue.working?.length) || 0}
             </span>
             <span className="caption-small text-ligth-gray text-uppercase">
               {t("info.working")}
@@ -163,7 +163,7 @@ export default function IssueListItem({
           {handleFirstChildren()}
           <div className="flex mr-1 mt-1 flex-row">
             <span className="caption-small mr-1 text-white">
-              {(issue != null && issue.pullRequests.length) || 0}
+              {(issue != null && issue.pullRequests?.length) || 0}
             </span>
             <span className="caption-small text-ligth-gray text-uppercase">
               {issue?.pullRequests?.length === 1
