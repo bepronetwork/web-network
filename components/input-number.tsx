@@ -12,7 +12,7 @@ export default function InputNumber({
   min = "0",
   helperText = "",
   className = "",
-  error = "",
+  error = false,
   ...params
 }: InputNumberProps): JSX.Element {
   const id = kebabCase(label);
