@@ -4,7 +4,7 @@ import { subHours, subMonths, subWeeks, subYears } from 'date-fns'
 
 import models from '@db/models'
 
-import { paginateArray } from '@helpers/paginate'
+import paginate, { calculateTotalPages, paginateArray } from '@helpers/paginate'
 import { searchPatternInText } from '@helpers/string'
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
@@ -42,6 +42,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     whereCondition.createdAt = { [Op.gt]: fn(+new Date(), 1) }
   }
+
   const include = [
     { association: 'developers' },
     {
@@ -52,31 +53,43 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: 'repository' }
   ]
 
-  const issues = await models.issue.findAll({
-    where: whereCondition,
-    include,
-    nest: true,
-    order: [[req.query.sortBy || 'createdAt', req.query.order || 'DESC']]
-  })
+  if (search) {
+    const issues = await models.issue.findAll({
+      where: whereCondition,
+      include,
+      nest: true,
+      order: [[req.query.sortBy || 'createdAt', req.query.order || 'DESC']]
+    })
 
-  const result = []
+    const result = []
 
-  if (search)
     result.push(
       ...issues.filter(({ title, body }) =>
         [title, body].some((text) => searchPatternInText(text, String(search)))
       )
     )
-  else result.push(...issues)
 
-  const paginatedData = paginateArray(result, 10, page || 1)
+    const paginatedData = paginateArray(result, 10, page || 1)
 
-  return res.status(200).json({
-    count: result.length,
-    rows: paginatedData.data,
-    pages: paginatedData.pages,
-    currentPage: paginatedData.page
-  })
+    return res.status(200).json({
+      count: result.length,
+      rows: paginatedData.data,
+      pages: paginatedData.pages,
+      currentPage: +paginatedData.page
+    })
+  } else {
+    const issues = await models.issue.findAndCountAll(
+      paginate({ where: whereCondition, include, nest: true }, req.query, [
+        [req.query.sortBy || 'updatedAt', req.query.order || 'DESC']
+      ])
+    )
+
+    return res.status(200).json({
+      ...issues,
+      currentPage: +page || 1,
+      pages: calculateTotalPages(issues.count),
+    })
+  }
 }
 
 export default async function SearchIssues(
