@@ -370,7 +370,7 @@ export default function NewProposal({
                                                                 address={item.address}
                                                                 onChangeDistribution={handleChangeDistrib}
                                                                 defaultPercentage={0}
-                                                                error={error}
+                                                                error={!!error}
                                                                 success={success}
                                                                 warning={warning}
                                                                 />

@@ -41,6 +41,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     whereCondition.createdAt = {[Op.gt]: fn(+new Date(), 1)}
   }
+
   const include = [
     { association: 'developers' },
     { association: 'pullRequests' },

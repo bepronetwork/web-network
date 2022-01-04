@@ -46,8 +46,9 @@ export default function useApi() {
                            order = 'DESC',
                            address = ``,
                            creator = ``,
-                           search = ''}) {
-    const params = new URLSearchParams({address, page, repoId, time, state, sortBy, order, creator, search}).toString();
+                           search = '',
+                           pullRequester = ''}) {
+    const params = new URLSearchParams({address, page, repoId, time, state, sortBy, order, creator, search, pullRequester}).toString();
     return client.get<{rows: IssueData[], count: number, pages: number, currentPage: number}>(`/search/issues/?${params}`)
                  .then(({data}) => data)
                  .catch(() => ({rows: [], count: 0, pages: 0, currentPage: 1}));
