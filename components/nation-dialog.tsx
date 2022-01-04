@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import BeProBlue from "@assets/icons/bepro-blue";
 import Loading from 'components/loading'
-import { COUNTRY_CODE_BLOCKED } from "../env";
+import { COUNTRY_CODE_BLOCKED, IS_PRODUCTION_ENVIRONMENT } from "../env";
 import useApi from '@x-hooks/use-api';
 import { useTranslation } from "next-i18next";
 
@@ -12,16 +12,16 @@ export default function NationDialog({ children }) {
   const [isBlock, setBlock] = useState<boolean>(false);
   const {getClientNation} = useApi();
   const { t } = useTranslation('common')
-  const [country, setCountry] = useState<string>(String(t('modals.nation-dialog.your-country')));
+  const [country, setCountry] = useState<string>();
 
   useEffect(() => {
     setIsLoading(true);
     getClientNation()
       .then((data)=>{
-        if (COUNTRY_CODE_BLOCKED.indexOf(data.countryCode) === -1)
+        if ((data.countryCode && COUNTRY_CODE_BLOCKED.indexOf(data.countryCode) === -1) || !IS_PRODUCTION_ENVIRONMENT )
           return;
 
-        setCountry(data.country || '');
+        setCountry(data.country || String(t('modals.nation-dialog.your-country')));
         setBlock(true);
 
       })
@@ -44,7 +44,7 @@ export default function NationDialog({ children }) {
           <Modal.Body>
             <div className="d-flex flex-column mt-2 align-items-center text-whit">
               <p className="p text-white mb-2 text-center fs-9 white-space-wrap">
-                {t('modals.nation-dialog.at-the-moment')}
+                {t('modals.nation-dialog.at-the-moment', { country })}
               </p>
               <a target="_blank" href="https://www.bepro.network/terms-and-conditions"
                 className="mb-2 text-center text-white-50 text-decoration-none text-uppercase fs-8">
