@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import BeProBlue from "@assets/icons/bepro-blue";
 import Loading from 'components/loading'
-import { COUNTRY_CODE_BLOCKED, IS_PRODUCTION_ENVIRONMENT } from "../env";
+import { COUNTRY_CODE_BLOCKED } from "../env";
 import useApi from '@x-hooks/use-api';
 import { useTranslation } from "next-i18next";
 
@@ -18,7 +18,7 @@ export default function NationDialog({ children }) {
     setIsLoading(true);
     getClientNation()
       .then((data)=>{
-        if ((data.countryCode && COUNTRY_CODE_BLOCKED.indexOf(data.countryCode) === -1) || !IS_PRODUCTION_ENVIRONMENT )
+        if (data.countryCode && COUNTRY_CODE_BLOCKED.indexOf(data.countryCode) === -1)
           return;
 
         setCountry(data.country || String(t('modals.nation-dialog.your-country')));
