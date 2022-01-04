@@ -179,7 +179,8 @@ body {
 }
 
 .family-bold{
-  font-family: 'fontBold', sans-serif;
+  font-family: 'fontRegular', sans-serif;
+  font-weight: 700;
 }
 
 .family-inter{
@@ -197,10 +198,6 @@ body {
   line-height: 140%;
   padding-left: 0;
   font-weight: 400;
-}
-
-.text-bold {
-  font-family: 'fontBold', sans-serif;
 }
 
 .text-italic {
@@ -285,7 +282,8 @@ body {
         font-size: 12px;
         text-transform: uppercase;
         margin-bottom: 0px;
-        font-family: 'fontBold', sans-serif;
+        font-family: 'fontRegular', sans-serif;
+        font-weight: 700;
         text-align: right;
       }
       .short-address {
@@ -1019,7 +1017,8 @@ a.row-button svg {
 
   .nav-item {
     .nav-link {
-      font-family: 'fontBold', sans-serif;
+      font-family: 'fontRegular', sans-serif;
+      font-weight: 700;
       font-size: 16px;
       line-height: 160%;
       letter-spacing: 0.03em;
@@ -1128,7 +1127,7 @@ textarea.form-control {
   }
 
   .react-select__single-value {
-    font-family: 'fontSemiBold', sans-serif !important;
+    font-family: 'fontRegular', sans-serif !important;
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.1rem;
