@@ -52,7 +52,6 @@ export default function IssueFilters() {
   useEffect(loadOutsideClick, [show]);
 
   return <div className="position-relative d-flex justify-content-end" ref={node}>
-
     {countFilters() > 0 && <Button
             transparent
             applyTextColor

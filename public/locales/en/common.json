@@ -163,7 +163,7 @@
     },
     "nation-dialog": {
       "your-country": "Your country",
-      "at-the-moment": "At the moment BEPRO services and BEPRO Token (BEPRO) are not available in Your Country",
+      "at-the-moment": "At the moment BEPRO services and BEPRO Token (BEPRO) are not available in {{country}}",
       "excluded": "Excluded Jurisdictions.",
       "further": "For further information please contact us on",
       "email": "general@bepro.network"
