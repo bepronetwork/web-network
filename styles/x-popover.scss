@@ -13,8 +13,10 @@
     }
     .active {
       color: $blue;
+      font-family: 'Inter-Regular', sans-serif;
       font-weight: 600;
-      font-family: 'Inter-SemiBold', sans-serif;
+      line-height: 160%;
+      letter-spacing: 0.02rem;
     }
   }
   .popover-body {

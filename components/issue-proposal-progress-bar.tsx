@@ -110,7 +110,7 @@ export default function IssueProposalProgressBar({
     const currentItem = currentStep === index
     const isLastItem = currentStep === steps.length - 1;
     const dotClass = `d-flex align-items-center justify-content-center rounded-circle bg-${currentStep >= index ? stepColor : `dark`}`;
-    const style = { left: index === 0 ? `1%` : `${index * 24}%` };
+    const style = { left: index === 0 ? `1%` : `${(index * 24)+1}%` };
     const dotStyle = { width: `20px`, height: `20px` };
 
     return <Fragment key={index}>
@@ -140,7 +140,7 @@ export default function IssueProposalProgressBar({
       <div className="row justify-content-center">
         <div className=' col-md-10'>
           <div className="content-wrapper mb-4 pb-0">
-            <div className="issue-proposal-progress col-9">
+            <div className="issue-proposal-progress col-10">
               <div className="row">
                 <div className="ms-2 col-12 position-relative">
                   <div className="progress bg-dark" style={{ height: '6px' }}>

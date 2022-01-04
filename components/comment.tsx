@@ -8,7 +8,7 @@ export default function Comment({ comment }) {
 
   return (
     <div className="mb-3">
-      <p className="caption-small text-uppercase mb-2 text-bold">
+      <p className="caption-small text-uppercase mb-2">
         <Avatar userLogin={comment?.user.login} />
 
         <span className="ml-1">@{comment?.user.login} </span>
