@@ -206,7 +206,7 @@ function OraclesActions(): JSX.Element {
             symbol={`${getCurrentLabel()}`}
             classSymbol={`${getCurrentLabel() === 'Oracles' ? "text-purple" : "text-blue"}`}
             max={balance.bepro}
-            error={error}
+            error={!!error}
             value={tokenAmount}
             min={0}
             placeholder={`Insert an amount of ${getCurrentLabel()}`}
@@ -228,19 +228,19 @@ function OraclesActions(): JSX.Element {
 
           <div className="mt-5 d-grid gap-3">
 
-          {action === 'Lock' && 
-            <Button 
+          {action === 'Lock' &&
+            <Button
               disabled={isApproveButtonDisabled()}
-              className="ms-0" 
+              className="ms-0"
               onClick={approveSettlerToken}
             >
                 {isApproveButtonDisabled() && <LockedIcon width={12} height={12} className="mr-1"/>}
                 <span>Approve {currentAddress && verifyTransactionState(TransactionTypes.approveSettlerToken) ? <Spinner size={"xs" as unknown as 'sm'} className="align-self-center ml-1" animation="border" /> : ``}</span>
             </Button>}
 
-            <Button 
-              color={action === 'Lock' ? 'purple' : 'primary'} 
-              className="ms-0" 
+            <Button
+              color={action === 'Lock' ? 'purple' : 'primary'}
+              className="ms-0"
               disabled={isButtonDisabled()}
               onClick={checkLockedAmount}
             >
