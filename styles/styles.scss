@@ -192,6 +192,10 @@ body {
   font-family: "Inter-bold", sans-serif;;
 }
 
+.mw-github-info{
+  max-width: 235px;
+}
+
 .p-nm {
   font-size: 14px;
   line-height: 140%;
@@ -553,6 +557,12 @@ label {
   width: 28px;
   height: 28px;
   border-radius: 14px;
+}
+
+.border-avatar {
+  border: solid;
+  border-width: 2px;
+  border-color: $white;
 }
 
 .ico-metamask {
