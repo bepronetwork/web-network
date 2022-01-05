@@ -25,7 +25,8 @@ export default function ListSort({
     const query = {
       ...router.query,
       sortBy: newValue.sortBy,
-      order: newValue.order
+      order: newValue.order,
+      page: '1'
     }
 
     router.push({ pathname: `${router.pathname}`, query }, router.pathname)
