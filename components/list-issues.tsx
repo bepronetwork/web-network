@@ -167,7 +167,15 @@ export default function ListIssues({
   }
 
   useEffect(() => {
-    if (page) setTruncatedData(!issuesPages.find((el) => el.page === +page))
+    if (page) {
+      const pagesToValidate = [...Array(+page).keys()].map((i) => i + 1)
+
+      setTruncatedData(
+        !pagesToValidate.every((pageV) =>
+          issuesPages.find((el) => el.page === pageV)
+        )
+      )
+    }
   }, [page, issuesPages])
 
   useEffect(getIssues, [page, search, repoId, time, state, sortBy, order])
@@ -253,10 +261,8 @@ export default function ListIssues({
       {(truncatedData && (
         <div className="row justify-content-center mb-3">
           <div className="d-flex col-6 align-items-center justify-content-center">
-          <span className="caption-small mr-1">
-            results truncated
-          </span>
-          <Button onClick={goToFirstPage}>back to top</Button>
+            <span className="caption-small mr-1">results truncated</span>
+            <Button onClick={goToFirstPage}>back to top</Button>
           </div>
         </div>
       )) || <></>}
