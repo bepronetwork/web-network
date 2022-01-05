@@ -27,7 +27,7 @@ interface NetworkIssue {
   recognizedAsFinished: boolean;
 }
 
-export default function PageIssue() {
+export default function PageIssue({initialIssue}) {
   const router = useRouter();
   const { id, repoId } = router.query;
   const { state: { currentAddress, githubLogin }, } = useContext(ApplicationContext);
@@ -106,7 +106,6 @@ export default function PageIssue() {
     if (!currentAddress || (networkIssue && !force))
       return;
 
-    // bepro.network.getIssueByCID({ issueCID: getIssueCID() })
     const issueCID = getIssueCID()
     BeproService.network.getIssueByCID({ issueCID })
       .then(netIssue => {
@@ -191,14 +190,14 @@ export default function PageIssue() {
   return (
     <>
       <NextSeo
-        title={issue?.title}
+        title={initialIssue?.title || issue?.title}
         openGraph={{
-          url: `${process.env.NEXT_PUBLIC_HOME_URL}/bounty?id=${issue?.id}&repoId=${issue?.repository_id}`,
-          title: issue?.title,
-          description: issue?.body,
+          url: `${process.env.NEXT_PUBLIC_HOME_URL}/bounty?id=${initialIssue?.id||issue?.id}&repoId=${initialIssue?.repository_id||issue?.repository_id}`,
+          title: initialIssue?.title||issue?.title,
+          description: initialIssue?.body||issue?.body,
           images: [
             {
-              url: issue?.seoImage,
+              url: initialIssue?.seoImage||issue?.seoImage,
               width: 1200,
               height: 670,
               alt: 'Bounty Info',
@@ -209,7 +208,7 @@ export default function PageIssue() {
         }}
         twitter={{
           handle: '@bepronet',
-          cardType: issue?.seoImage,
+          cardType: initialIssue?.seoImage||issue?.seoImage,
         }}
       />
       <IssueHero
@@ -258,10 +257,15 @@ export default function PageIssue() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({locale}) => {
+export const getServerSideProps: GetServerSideProps = async ({query, locale}) => {
+  const { id, repoId } = query;
+  const {getIssue} = useApi()
+  const initialIssue = await getIssue(repoId as string, id as string)
+
   return {
     props: {
       session: await getSession(),
+      initialIssue,
       ...(await serverSideTranslations(locale, ['common', 'bounty', 'proposal', 'pull-request'])),
     },
   };
