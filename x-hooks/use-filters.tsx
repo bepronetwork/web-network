@@ -28,7 +28,8 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
       ... router.query,
       ... state ? {state} : {},
       ... time ? {time} : {},
-      ... repoId ? {repoId} : {}
+      ... repoId ? {repoId} : {},
+      page: '1'
     }
 
     router.push({pathname: router.pathname, query}, router.pathname);
@@ -87,7 +88,9 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
   function clearFilters() {
     const query = {
       ... router.query.sortBy ? {sortBy: router.query.sortBy}: {},
-      ... router.query.order ? {order: router.query.order}: {}
+      ... router.query.order ? {order: router.query.order}: {},
+      ... router.query.search ? {search: router.query.search}: {},
+      page: '1'
     }
 
     router.push({pathname: router.pathname, query}, router.pathname);

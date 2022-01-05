@@ -6,6 +6,7 @@ import { FormControl, InputGroup } from 'react-bootstrap'
 import CloseIcon from '@assets/icons/close-icon'
 import SearchIcon from '@assets/icons/search-icon'
 
+import Button from '@components/button'
 import ListSort from '@components/list-sort'
 import NothingFound from '@components/nothing-found'
 import InternalLink from '@components/internal-link'
@@ -21,6 +22,8 @@ import { changeLoadState } from '@contexts/reducers/change-load-state'
 import { IssueData } from '@interfaces/issue-data'
 
 import useApi from '@x-hooks/use-api'
+import usePage from '@x-hooks/use-page'
+import useSearch from '@x-hooks/use-search'
 
 type Filter = {
   label: string
@@ -55,11 +58,13 @@ export default function ListIssues({
 
   const router = useRouter()
   const { searchIssues } = useApi()
-  const [search, setSearch] = useState('')
   const { t } = useTranslation(['common', 'bounty'])
   const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([])
   const [hasMore, setHasMore] = useState(false)
-  const [page, setPage] = useState(1)
+  const { page, nextPage, goToFirstPage } = usePage()
+  const { search, setSearch, clearSearch } = useSearch()
+  const [searchState, setSearchState] = useState(search)
+  const [truncatedData, setTruncatedData] = useState(false)
 
   const { repoId, time, state, sortBy, order } = router.query as {
     repoId: string
@@ -109,20 +114,19 @@ export default function ListIssues({
   }
 
   function handleClearSearch(): void {
-    setSearch('')
-
-    getIssues(true)
+    setSearchState('')
+    clearSearch()
   }
 
-  function getIssues(forceEmptySearch = false) {
+  function getIssues() {
     dispatch(changeLoadState(true))
 
     searchIssues({
-      page: String(page),
+      page,
       repoId,
       time,
       state: filterState || state,
-      search: forceEmptySearch ? '' : search,
+      search,
       sortBy,
       order,
       creator,
@@ -158,20 +162,15 @@ export default function ListIssues({
 
   function handleSearch(event) {
     if (event.key !== 'Enter') return
-    
-    setPage(1)
 
-    getIssues()
+    setSearch(searchState)
   }
 
-  function handleNextPage() {
-    setPage(page + 1)
-  }
-
-  useEffect(getIssues, [page, repoId, time, state, sortBy, order])
   useEffect(() => {
-    setPage(1)
-  }, [repoId, time, state, sortBy, order])
+    if (page) setTruncatedData(!issuesPages.find((el) => el.page === +page))
+  }, [page, issuesPages])
+
+  useEffect(getIssues, [page, search, repoId, time, state, sortBy, order])
 
   return (
     <CustomContainer>
@@ -187,8 +186,8 @@ export default function ListIssues({
             </InputGroup.Text>
 
             <FormControl
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={searchState}
+              onChange={(e) => setSearchState(e.target.value)}
               className="rounded-8 p-2"
               placeholder={t('bounty:search')}
               onKeyDown={handleSearch}
@@ -251,6 +250,17 @@ export default function ListIssues({
         </div>
       </div>
 
+      {(truncatedData && (
+        <div className="row justify-content-center mb-3">
+          <div className="d-flex col-6 align-items-center justify-content-center">
+          <span className="caption-small mr-1">
+            results truncated
+          </span>
+          <Button onClick={goToFirstPage}>back to top</Button>
+          </div>
+        </div>
+      )) || <></>}
+
       {issuesPages.every((el) => el.issues?.length === 0) &&
       !loading.isLoading ? (
         <NothingFound description={emptyMessage || filterByState.emptyState}>
@@ -264,7 +274,7 @@ export default function ListIssues({
 
       {(issuesPages.some((el) => el.issues?.length > 0) && (
         <InfiniteScroll
-          handleNewPage={handleNextPage}
+          handleNewPage={nextPage}
           isLoading={loading.isLoading}
           hasMore={hasMore}
         >
