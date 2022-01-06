@@ -41,7 +41,11 @@ li {
   margin-bottom: 50px !important;
 }
 
-.border-radius {
+.border-radius, 
+.border-radius-top-left, 
+.border-radius-top-right,
+.border-radius-bottom-left,
+.borde-radius-bottom-right {
   &-4 {
     border-radius: 4px;
   }
@@ -198,7 +202,7 @@ body {
 }
 
 .github-info {
-  padding: 2px;
+  padding: 2px 3px;
   border: 1px solid;
   border-radius: 3px;
 }
