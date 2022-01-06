@@ -118,8 +118,7 @@ $utilities: map-merge(
                 'border-color': map-merge(map-get($utilities, 'border-color'), (state: hover, values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-colors))),
                 'color': map-merge(map-get($utilities, 'color'), (state: hover , values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-colors))),
                 'background-color': map-merge(map-get($utilities, 'background-color'), (state: hover, values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-bg))),
-                "opacity": map-merge(map-get($utilities, 'opacity'),(state: hover, values: map-get(map-get($utilities, 'opacity'), 'values')),
-                )
+                "opacity": map-merge(map-get($utilities, 'opacity'),(state: hover, values: map-get(map-get($utilities, 'opacity'), 'values'))),
         )
 )
 

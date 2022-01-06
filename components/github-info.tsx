@@ -4,7 +4,7 @@ export default function GithubInfo({bgColor = `transparent`, color, value, onCli
 
   function getClassName() {
     return [
-      `bg-${bgColor} caption-small px-1 rounded border border-2 text-uppercase fs-smallest`,
+      `bg-${bgColor} caption-small github-info text-uppercase fs-smallest`,
       hoverTextColor ? `bg-${color}-hover text-${hoverTextColor}-hover` : ``,
       `border-${borderColor && borderColor || color} text-${color}`,
       textTruncate ? `text-truncate`: ``

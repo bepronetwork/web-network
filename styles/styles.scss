@@ -197,6 +197,12 @@ body {
   max-width: 235px;
 }
 
+.github-info {
+  padding: 2px;
+  border: 1px solid;
+  border-radius: 3px;
+}
+
 .p-nm {
   font-size: 14px;
   line-height: 140%;
@@ -1100,9 +1106,10 @@ textarea.form-control {
 
 .list-actions {
   background-color: $bg;
-  border-radius: math.div($m, 2);
+  border-radius: 0;
 
   &.sticky-top {
+    padding: 20px 0;
     top: 4.35em;
   }
 
@@ -1149,7 +1156,8 @@ textarea.form-control {
     }
   }
 
-  .react-select-container, .react-select__control {
+  .react-select-container, .react-select__control, .react-select__menu {
+    color: $gray;
     min-width: 170px !important;
   }
 
@@ -1171,6 +1179,10 @@ textarea.form-control {
 
   background-color: transparent;
   border: none;
+}
+
+.gap-20 {
+  gap: 20px;
 }
 
 .sticky-bounty {
