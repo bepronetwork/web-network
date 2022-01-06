@@ -30,7 +30,7 @@ export default function PageHero({ title = <Translation label={'heroes.find-boun
   useEffect(loadTotals, [beproInit]);
 
   return (
-    <div className="banner bg-bepro-blue mb-4">
+    <div className={`banner bg-bepro-blue mb-0`}>
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10">
