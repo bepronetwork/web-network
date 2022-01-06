@@ -64,9 +64,9 @@ export default function IssueFilters() {
 
     <Button color="black" className={`${show && `border-blue` || ``} rounded-8 m-0`} onClick={() => setShow(!show)}>{countFiltersLabel()} <span><Translation label="filters.filters" /></span></Button>
     
-    <div className={`filter-wrapper d-${show ? `flex` : `none`} justify-content-start align-items-stretch position-absolute`}>
+    <div className={`border border-dark-gray rounded rounded-3 filter-wrapper d-${show ? `flex` : `none`} justify-content-start align-items-stretch position-absolute`}>
       <div>
-        <IssueFilterBox className="h-100" title={t('filters.repository')} options={repoOptions} filterPlaceholder={t('filters.search-repositories')}
+        <IssueFilterBox className="h-100 border border-right border-dark-gray" title={t('filters.repository')} options={repoOptions} filterPlaceholder={t('filters.search-repositories')}
                         onChange={(opt, checked) => updateOptions(repoOptions, opt, checked, 'repo')}/>
       </div>
       <div>

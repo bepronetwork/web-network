@@ -63,18 +63,17 @@ export default function CreateReviewModal({
             </span>
 
             <GithubInfo
-              color="primary"
-              bgColor="white"
-              borderColor="transparent"
-              value={activeRepo?.githubPath?.split('/')[1]}
+              parent="modal"
+              variant="repository"
+              label={activeRepo?.githubPath?.split('/')[1]}
             />
 
             <span className="caption-small text-gray ml-2 mr-2">{t('misc.by')}</span>
 
             <GithubInfo
-              color="white"
-              bgColor="transparent"
-              value={`@${pullRequest?.githubLogin}`}
+              parent="modal"
+              variant="user"
+              label={`@${pullRequest?.githubLogin}`}
             />
 
             <Avatar className="ml-2" userLogin={pullRequest?.githubLogin} />

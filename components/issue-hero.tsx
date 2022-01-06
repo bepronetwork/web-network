@@ -9,7 +9,7 @@ export default function IssueHero({ issue, state, amount }) {
   function renderCreator() {
     if(issue?.creatorGithub)
     return <div className="d-flex align-items-center">
-          <span className="mr-2 text-white-50"><Translation label={'misc.by'} /></span> <GithubInfo color="white" value={[`@`, issue.creatorGithub].join(``)} /> <Avatar className="mx-2" userLogin={issue.creatorGithub} />
+          <span className="mr-2 text-white-50"><Translation label={'misc.by'} /></span> <GithubInfo parent="hero" variant="user" label={[`@`, issue.creatorGithub].join(``)} /> <Avatar className="mx-2" userLogin={issue.creatorGithub} />
         </div>
   }
 
@@ -31,7 +31,7 @@ export default function IssueHero({ issue, state, amount }) {
                         {issue && formatDate(issue?.createdAt)}
                       </span>
                       <span className="p-small mr-2 mt-1">
-                        {issue?.repo && <GithubInfo color="blue" bgColor="white" value={issue?.repo} /> || ``}
+                        {issue?.repo && <GithubInfo parent="hero" variant="repository" label={issue?.repo} /> || ``}
                       </span>
                       <span className="p-small mr-3 mt-1">
                         {renderCreator()}

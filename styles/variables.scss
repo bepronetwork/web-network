@@ -51,6 +51,9 @@ $more-bg: (
         'warning': $warning,
         'warning-opac-25': rgba($warning, 0.25),
         'danger-opac-25': rgba($warning, 0.25),
+        'white-40': rgba($white, 0.4),
+        'white-10': rgba($white, 0.1),
+        'primary-30': rgba($primary, 0.3)
 );
 
 $more-colors: ('blue-dark': $blue-dark, 'gray': $gray, 'dark-gray': $dark-gray, 'ligth-gray': $ligth-gray, 'black': $black, 'white': #fff);
