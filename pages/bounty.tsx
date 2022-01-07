@@ -243,16 +243,39 @@ export default function PageIssue() {
         {((networkIssue?.mergeProposalsAmount > 0 || mergedPullRequests.length > 0) && currentAddress) && <CustomContainer className="mb-4">
           <TabbedNavigation defaultActiveKey={getDefaultActiveTab()} className="issue-tabs" tabs={tabs} collapsable />
         </CustomContainer>}
-      {networkIssue && <IssueProposalProgressBar
-        isFinalized={networkIssue?.finalized}
-        isIssueinDraft={isIssueinDraft}
-        mergeProposalsAmount={networkIssue?.mergeProposalsAmount}
-        isFinished={networkIssue?.recognizedAsFinished}
-        isCanceled={issue?.state === `canceled` || networkIssue?.canceled}
-        creationDate={networkIssue.creationDate}
-      />}
-
-      <IssueDescription description={issue?.body} />
+        {networkIssue ? (
+        <div className="container mb-1">
+          <div className="d-flex bd-highlight justify-content-center mx-2 px-4">
+            <div className="ps-3 pe-0 ms-0 me-2 w-65 bd-highlight">
+              <div className="container">
+                <IssueDescription description={issue?.body} />
+              </div>
+            </div>
+            <div className="p-0 me-3 flex-shrink-0 w-25 bd-highlight">
+              <div className="sticky-bounty">
+                <IssueProposalProgressBar
+                  isFinalized={networkIssue?.finalized}
+                  isIssueinDraft={isIssueinDraft}
+                  mergeProposalsAmount={networkIssue?.mergeProposalsAmount}
+                  isFinished={networkIssue?.recognizedAsFinished}
+                  isCanceled={
+                    issue?.state === `canceled` || networkIssue?.canceled
+                  }
+                  creationDate={networkIssue.creationDate}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-md-10">
+              <IssueDescription description={issue?.body} />
+            </div>
+          </div>
+        </div>
+      )}
       <IssueComments comments={commentsIssue} repo={issue?.repo} issueId={id} />
     </>
   );

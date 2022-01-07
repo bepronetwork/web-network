@@ -691,7 +691,12 @@ label {
 }
 
 .issue-proposal-progress{
-  min-height: 125px;
+  min-height: 360px;
+}
+
+.issue-progress-horizontal {
+  height: 240px;
+  width: 2px;
 }
 
 .progress-ball{
@@ -991,6 +996,10 @@ $c_props: ('m': 'margin') !default;
   width: 20%;
 }
 
+.w-65 {
+  width: 65%;
+}
+
 .main-nav {
   .btn:not(.brand) svg:only-child {
     width: 24px;
@@ -1162,4 +1171,9 @@ textarea.form-control {
 
   background-color: transparent;
   border: none;
+}
+
+.sticky-bounty {
+  position: sticky;
+  top: 90px;
 }
