@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from 'react';
 
-import { getTimeDifferenceInWords } from '@helpers/formatDate';
+import { formatDate, getTimeDifferenceInWords } from '@helpers/formatDate';
 import { addSeconds } from 'date-fns';
 import { BeproService } from '@services/bepro-service';
 import { useTranslation } from 'next-i18next';
@@ -30,7 +30,7 @@ export default function IssueProposalProgressBar({
     return `primary`;
   }
 
-  function loadDisputeState() {
+  function loadDisputeState() { 
     //Draft -> isIssueInDraft()
     //Development -> estado inicial
     //Finalized -> recognizedAsFinished == true
@@ -52,89 +52,74 @@ export default function IssueProposalProgressBar({
     setStepColor(getStepColor());
   }
 
-  function renderStepStatus(stepLabel, index) {
+
+  function renderSecondaryText(stepLabel, index) {
+    const secondaryTextStyle = { top: "20px" };
+
     let item = {
-      Completed: {
-        text: t('bounty:status.completed'),
-        color: 'primary',
-        bgColor: 'primary',
-      },
-      Canceled: {
-        text: t('bounty:status.canceled'),
-        color: 'danger',
-        bgColor: 'danger-opac-25',
-      },
       Warning: {
-        text: t('bounty:status.until-done', {distance: getTimeDifferenceInWords(addSeconds(creationDate, redeemTime), new Date())}),
-        color: 'warning',
-        bgColor: 'warning-opac-25',
+        text: t("bounty:status.until-done", {
+          distance: getTimeDifferenceInWords(
+            addSeconds(creationDate, redeemTime),
+            new Date()
+          ),
+        }),
+        color: "warning",
+        bgColor: "warning-opac-25",
       },
-      Pending: {
-        text: t('bounty:status.pending'),
-        color: 'gray',
-        bgColor: 'dark-gray',
+      Started: {
+        text: t("bounty:status.started-time", {
+          distance: getTimeDifferenceInWords(creationDate, new Date()),
+        }),
+        color: "ligth-gray",
       },
-      InProgress: {
-        text: t('bounty:status.in-progress'),
-        color: 'white',
-        bgColor: 'primary',
-      }
-    }
+      At: {
+        text: t("bounty:status.end-time", { data: formatDate(creationDate) }),
+        color: "ligth-gray",
+      },
+    };
 
-    let currentValue = item.Pending;
+    let currentValue: { text: string; color?: string; bgColor?: string } = {
+      text: "",
+    };
 
-    if (index === currentStep) {
-      currentValue = item.InProgress;
+    if (
+      index === currentStep &&
+      [steps[1], steps[3]].includes(steps[currentStep])
+    ) {
+      currentValue = item.Started;
     }
 
     if (index === currentStep && isIssueinDraft) {
       currentValue = item.Warning;
     }
 
-    if (index < currentStep || currentStep === steps.length - 1) {
-      currentValue = item.Completed;
+    if (
+      index === currentStep &&
+      [steps[2], steps[4]].includes(steps[currentStep])
+    ) {
+      currentValue = item.At;
     }
 
-    if (isCanceled) {
-      currentValue = item.Canceled;
-    }
-
-    return (
-      <div className={`bg-${currentValue.bgColor} bg-opacity-25 py-1 px-2  rounded-pill mt-2`}>
-        <span className={`text-${currentValue.color} bg-opacity-100 text-uppercase`}>{currentValue.text}</span>
-      </div>
-    )
-  }
-
-  function renderColumn(stepLabel, index) {
-    const currentItem = currentStep === index
-    const isLastItem = currentStep === steps.length - 1;
-    const dotClass = `d-flex align-items-center justify-content-center rounded-circle bg-${currentStep >= index ? stepColor : `dark`}`;
-    const style = { left: index === 0 ? `1%` : `${(index * 24)+1}%` };
-    const dotStyle = { width: `20px`, height: `20px` };
-
-    return <Fragment key={index}>
-      <div className="position-absolute d-flex align-items-center flex-column" style={style}>
-        <div className={dotClass} style={dotStyle}>
-          <div className='position-relative d-flex align-items-start flex-column'>
-            <div className={`rounded-circle bg-${currentItem && !isCanceled && !isLastItem && 'white'}`} style={{ width: `10px`, height: `10px` }} ></div>
-            <div className='position-absolute mt-4 d-flex align-items-start flex-column'>
-              <label className={`text-uppercase caption mb-1 text-${currentItem ? stepColor : 'gray'}`}>{stepLabel}</label>
-              {renderStepStatus(stepLabel, index)}
-            </div>
-          </div>
+    if (currentValue)
+      return (
+        <div className="position-absolute" style={secondaryTextStyle}>
+          <span
+            className={`text-${
+              currentValue.color && currentValue.color
+            } text-uppercase caption-small `}
+          >
+            {currentValue.text}
+          </span>
         </div>
-      </div>
-    </Fragment>
+      );
   }
   
-  function renderColumnT(stepLabel, index) {
-
+  function renderColumn(stepLabel, index) {
     const style = { top: index === 0 ? "0" : `${index * 60}px`, left: "7.5px"}
     const dotClass = `d-flex align-items-center justify-content-center rounded-circle bg-${currentStep >= index ? stepColor : `dark`}`;
     const dotStyle = { width: `12px`, height: `12px` }
     const labelStyle = { left: "40px" }
-    const secondaryText = { top: '20px' }
     const currentItem = currentStep === index
     const isLastItem = currentStep === steps.length - 1;
 
@@ -143,13 +128,8 @@ export default function IssueProposalProgressBar({
          <div className={dotClass} style={dotStyle}>
          <div className={`rounded-circle bg-${currentItem && !isCanceled && !isLastItem && 'white'}`} style={{ width: `6px`, height: `6px` }} ></div>
             <div className='position-absolute d-flex align-items-start flex-column mt-1' style={labelStyle}>
-              <label className={`text-uppercase caption mb-1 text-${currentItem ? stepColor : 'gray'}`}>{stepLabel}</label>
-              {currentItem && 
-                             <div className='position-absolute' style={secondaryText}>
-                             <span className={`text-warning bg-opacity-100 text-uppercase`}>3 Days Until Done</span>
-                          </div>
-                          }
-
+              <label className={`text-uppercase caption mb-1 text-${isCanceled ? `danger`: `${currentItem ? stepColor : 'gray'}`}`}>{stepLabel}</label>
+              {currentItem && renderSecondaryText(stepLabel, index)}
             </div>
         </div>
      </div>
@@ -181,7 +161,7 @@ export default function IssueProposalProgressBar({
                       height: `${toRepresentationPercent()}%`,
                     }}
                   >
-                    {steps.map(renderColumnT)}
+                    {steps.map(renderColumn)}
                   </div>
                 </div>
               </div>
