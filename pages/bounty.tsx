@@ -22,12 +22,11 @@ import CustomContainer from '@components/custom-container';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import Translation from '@components/translation';
-import { NextSeo } from 'next-seo'
 interface NetworkIssue {
   recognizedAsFinished: boolean;
 }
 
-export default function PageIssue({initialIssue}) {
+export default function PageIssue() {
   const router = useRouter();
   const { id, repoId } = router.query;
   const { state: { currentAddress, githubLogin }, } = useContext(ApplicationContext);
@@ -189,28 +188,6 @@ export default function PageIssue({initialIssue}) {
 
   return (
     <>
-      <NextSeo
-        title={initialIssue?.title || issue?.title}
-        openGraph={{
-          url: `${process.env.NEXT_PUBLIC_HOME_URL}/bounty?id=${initialIssue?.id||issue?.id}&repoId=${initialIssue?.repository_id||issue?.repository_id}`,
-          title: initialIssue?.title||issue?.title,
-          description: initialIssue?.body||issue?.body,
-          images: [
-            {
-              url: initialIssue?.seoImage||issue?.seoImage,
-              width: 1200,
-              height: 670,
-              alt: 'Bounty Info',
-              type: 'image/jpeg',
-            }
-          ],
-          site_name: 'bepro',
-        }}
-        twitter={{
-          handle: '@bepronet',
-          cardType: initialIssue?.seoImage||issue?.seoImage,
-        }}
-      />
       <IssueHero
         amount={formatNumberToCurrency(issue?.amount || networkIssue?.tokensStaked)}
         state={handleStateissue()}
@@ -260,12 +237,12 @@ export default function PageIssue({initialIssue}) {
 export const getServerSideProps: GetServerSideProps = async ({query, locale}) => {
   const { id, repoId } = query;
   const {getIssue} = useApi()
-  const initialIssue = await getIssue(repoId as string, id as string)
+  const currentIssue = await getIssue(repoId as string, id as string)
 
   return {
     props: {
       session: await getSession(),
-      initialIssue,
+      currentIssue,
       ...(await serverSideTranslations(locale, ['common', 'bounty', 'proposal', 'pull-request'])),
     },
   };

@@ -12,9 +12,8 @@ import { getSession, SessionProvider } from "next-auth/react";
 import { GetServerSideProps } from "next";
 import useRepos from "@x-hooks/use-repos";
 import { appWithTranslation } from "next-i18next";
-import { DefaultSeo } from "next-seo";
-import SEO_CONFIG from "../next-seo-config";
-function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
+import Seo from "@components/seo";
+function App({ Component, pageProps: { session, currentIssue,...pageProps } }: AppProps) {
   const [[, repos]] = useRepos();
   const [loaded, setLoaded] = useState(false);
 
@@ -28,7 +27,7 @@ function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 
   return (
     <>
-      <DefaultSeo {...SEO_CONFIG} />
+      <Seo issueMeta={currentIssue} />
       <SessionProvider session={session}>
         <ApplicationContextProvider>
           <NationDialog>
