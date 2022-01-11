@@ -3,6 +3,8 @@ import { position, write } from "../jimp-tools";
 
 const bg = `${process.env.NEXT_PUBLIC_HOME_URL}/images/bg-bounty-card.png`;
 const icon = `${process.env.NEXT_PUBLIC_HOME_URL}/images/bepro-icon.png`;
+const repoMask = `${process.env.NEXT_PUBLIC_HOME_URL}/images/mask-issue-repo.png`;
+const stateMask = `${process.env.NEXT_PUBLIC_HOME_URL}/images/mask-issue-state.png`;
 
 async function doHeading({ issueId, state }: { issueId: string; state: string }) {
   async function doState() {
@@ -43,8 +45,11 @@ async function doHeading({ issueId, state }: { issueId: string; state: string })
     });
 
     var statusContainer = new Jimp(statusText.bitmap.width + padding, statusText.bitmap.height + padding, getColorState(state));
-    
-    return await position(statusContainer, statusText, 50, 50);
+    const mask = await Jimp.read(stateMask)
+    mask.resize(statusContainer.bitmap.width, statusContainer.bitmap.height, Jimp.RESIZE_BEZIER)
+    statusContainer = await position(statusContainer, statusText, 50, 50);
+    statusContainer.mask(mask,0,0)
+    return statusContainer;
   }
 
   const status = await doState();
@@ -67,7 +72,7 @@ async function doSubTitle({
   ammoutValue: number;
 }) {
   async function doRepo() {
-    const borderSize = 2;
+    const borderSize = 4;
     const padding = 10;
     const color = "#4250E4";
     const repoText = await write(repoName.toUpperCase(), 24, color, 'semi');
@@ -83,9 +88,13 @@ async function doSubTitle({
       color
     );
     repoBorder = await position(repoBorder, repoContainer, 50, 50);
-    repoBorder.mask(repoContainer, borderSize / 2, borderSize / 2);
+    const mask = await Jimp.read(repoMask)
+    mask.resize(repoBorder.bitmap.width, repoBorder.bitmap.height, Jimp.RESIZE_BEZIER);
+    repoBorder.mask(mask,0,0)
+    // repoBorder.mask(repoContainer, borderSize / 2, borderSize / 2);
     repoBorder = await position(repoBorder, repoText, 50, 50);
-
+    
+    
     return repoBorder;
   }
 
