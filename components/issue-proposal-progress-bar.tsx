@@ -25,7 +25,9 @@ export default function IssueProposalProgressBar({
 
   function getStepColor() {
     if (isCanceled)
-      return `danger`
+      return `danger`;
+    if(isFinalized)
+      return `success`;
 
     return `primary`;
   }
