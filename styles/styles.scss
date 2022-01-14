@@ -10,6 +10,7 @@
 @import "x-form-check";
 @import "x-button";
 @import "x-popover";
+@import "x-tooltip";
 
 //bootstrap-overrides
 ul,
@@ -41,7 +42,11 @@ li {
   margin-bottom: 50px !important;
 }
 
-.border-radius {
+.border-radius, 
+.border-radius-top-left, 
+.border-radius-top-right,
+.border-radius-bottom-left,
+.borde-radius-bottom-right {
   &-4 {
     border-radius: 4px;
   }
@@ -171,30 +176,37 @@ body {
 
 // familys
 .family-Regular{
-  font-family: 'fontRegular', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 .family-medium{
-  font-family: 'fontMedium', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 .family-bold{
-  font-family: 'fontRegular', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
 }
 
 .family-inter{
-  font-family: "Inter-Regular", sans-serif;
+  font-family: "Inter", sans-serif;
 }
 .family-inter-medium{
-  font-family: "Inter-Medium", sans-serif;;
+  font-family: "Inter", sans-serif;;
 }
 .family-inter-bold{
-  font-family: "Inter-bold", sans-serif;;
+  font-family: "Inter", sans-serif;;
+  font-weight: 600;
 }
 
 .mw-github-info{
   max-width: 235px;
+}
+
+.github-info {
+  padding: 2px 3px;
+  border: 1px solid;
+  border-radius: 3px;
 }
 
 .p-nm {
@@ -286,7 +298,7 @@ body {
         font-size: 12px;
         text-transform: uppercase;
         margin-bottom: 0px;
-        font-family: 'fontRegular', sans-serif;
+        font-family: 'Space Grotesk', sans-serif;
         font-weight: 700;
         text-align: right;
       }
@@ -310,6 +322,12 @@ body {
   &.active, &:hover {
     color: $white;
     opacity: 1;
+  }
+  &.active {
+     h4 {
+      border-bottom: 3px solid $blue !important;
+      border-radius: 0;
+     }
   }
 }
 
@@ -625,19 +643,19 @@ label {
   }
 
   &.bg-purple {
-    background-color: #3e345b;
-    .progress-bar {
-      background-color: rgba($purple, 1);
+    background-color: #3e345b !important;
+    &.progress-bar {
+      background-color: rgba($purple, 1) !important;
     }
     .empty-dot {
-      background-color: #3e345b;
+      background-color: #3e345b !important;
     }
   }
 
   &.bg-danger {
-    background-color: #895151;
+    background-color: #895151 !important;
     .progress-bar {
-      background-color: rgba($danger, 1);
+      background-color: rgba($danger, 1) !important;
     }
 
     .empty-dot {
@@ -646,11 +664,11 @@ label {
   }
 
   &.bg-success {
-    background-color: #4c8473;
+    background-color: #4c8473 !important;
     .progress-bar {
-      background-color: rgba($success, 1);
+      background-color: rgba($success, 1) !important;
       .empty-dot {
-        background-color: #4c8473;
+        background-color: #4c8473 !important;
       }
     }
   }
@@ -1037,7 +1055,7 @@ a.row-button svg {
 
   .nav-item {
     .nav-link {
-      font-family: 'fontRegular', sans-serif;
+      font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
       font-size: 16px;
       line-height: 160%;
@@ -1100,9 +1118,10 @@ textarea.form-control {
 
 .list-actions {
   background-color: $bg;
-  border-radius: math.div($m, 2);
+  border-radius: 0;
 
   &.sticky-top {
+    padding: 20px 0;
     top: 4.35em;
   }
 
@@ -1149,12 +1168,13 @@ textarea.form-control {
     }
   }
 
-  .react-select-container, .react-select__control {
+  .react-select-container, .react-select__control, .react-select__menu {
+    color: $gray;
     min-width: 170px !important;
   }
 
   .react-select__single-value {
-    font-family: 'fontRegular', sans-serif !important;
+    font-family: 'Space Grotesk', sans-serif !important;
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.1rem;
@@ -1171,6 +1191,10 @@ textarea.form-control {
 
   background-color: transparent;
   border: none;
+}
+
+.gap-20 {
+  gap: 20px;
 }
 
 .sticky-bounty {

@@ -46,17 +46,17 @@ export default function PullRequestHero({
                       </span>
 
                       <GithubInfo
-                        color="primary"
-                        bgColor="white"
-                        value={activeRepo?.githubPath?.split('/')[1]}
+                        parent="hero"
+                        variant="repository"
+                        label={activeRepo?.githubPath?.split('/')[1]}
                       />
 
                       <span className="caption-small text-gray ml-2 mr-2">{t('misc.by')}</span>
 
                       <GithubInfo
-                        color="white"
-                        bgColor="primary"
-                        value={`@${authorPullRequest}`}
+                        parent="hero"
+                        variant="user"
+                        label={`@${authorPullRequest}`}
                       />
 
                       <Avatar className="ml-2" userLogin={authorPullRequest} />

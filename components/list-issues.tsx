@@ -182,12 +182,10 @@ export default function ListIssues({
 
   return (
     <CustomContainer>
-      <div className={`row mb-3 align-items-center list-actions sticky-top`}>
-        <div
-          className={`col-${
-            (filterState && '9') || (hasFilter() && '7') || '8'
-          } m-0`}
-        >
+      <div
+        className={`d-flex align-items-center gap-20 list-actions sticky-top`}
+      >
+        <div className="w-100">
           <InputGroup>
             <InputGroup.Text className="rounded-8" onClick={(e) => getIssues()}>
               <SearchIcon />
@@ -212,50 +210,42 @@ export default function ListIssues({
           </InputGroup>
         </div>
 
-        <div
-          className={`col-${
-            (filterState && '3') || (hasFilter() && '5') || '4'
-          } d-flex align-items-center justify-content-${
-            (filterState && 'end') || 'between'
-          } pl-0 pr-1`}
-        >
-          <div className="d-flex align-items-center">
-            <span className="caption-small text-white-50 mr-1">
-              {t('sort.label')}
-            </span>
+        <div className="d-flex align-items-center">
+          <span className="caption-small text-white-50 text-nowrap mr-1">
+            {t('sort.label')}
+          </span>
 
-            <ListSort
-              options={[
-                {
-                  value: 'newest',
-                  sortBy: 'createdAt',
-                  order: 'DESC',
-                  label: t('sort.types.newest')
-                },
-                {
-                  value: 'highest-bounty',
-                  sortBy: 'amount',
-                  order: 'DESC',
-                  label: t('sort.types.highest-bounty')
-                },
-                {
-                  value: 'oldest',
-                  sortBy: 'createdAt',
-                  order: 'ASC',
-                  label: t('sort.types.oldest')
-                },
-                {
-                  value: 'lowest-bounty',
-                  sortBy: 'amount',
-                  order: 'ASC',
-                  label: t('sort.types.lowest-bounty')
-                }
-              ]}
-            />
-          </div>
-
-          {!filterState && <IssueFilters />}
+          <ListSort
+            options={[
+              {
+                value: 'newest',
+                sortBy: 'createdAt',
+                order: 'DESC',
+                label: t('sort.types.newest')
+              },
+              {
+                value: 'oldest',
+                sortBy: 'createdAt',
+                order: 'ASC',
+                label: t('sort.types.oldest')
+              },
+              {
+                value: 'highest-bounty',
+                sortBy: 'amount',
+                order: 'DESC',
+                label: t('sort.types.highest-bounty')
+              },
+              {
+                value: 'lowest-bounty',
+                sortBy: 'amount',
+                order: 'ASC',
+                label: t('sort.types.lowest-bounty')
+              }
+            ]}
+          />
         </div>
+
+        {!filterState && <IssueFilters />}
       </div>
 
       {(truncatedData && (

@@ -19,9 +19,9 @@ export default function Oracle({
   return (
     <div>
       <PageHero title={t('title')} />
-      <div className="container">
+      <div className="container pt-3">
         <div className="row">
-          <div className="d-flex justify-content-center mb-3">
+          <div className="d-flex justify-content-center">
             <InternalLink href="/oracle/new-bounties" label={String(t('new-bounties'))} className={clsx("mr-3 h3 p-0")} active={asPath === '/oracle' && true || undefined} nav transparent />
 
             <InternalLink href="/oracle/ready-to-merge" label={String(t('ready-to-merge'))} className={clsx("h3 p-0")} nav transparent />

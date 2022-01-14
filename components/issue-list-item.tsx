@@ -98,7 +98,7 @@ export default function IssueListItem({
     }
 
     return (
-      <span className="small-info mr-2 mt-2 text-uppercase">
+      <span className="caption-small text-ligth-gray">
         {data &&
           t(`info-data.text-data`, {
             value: handleDurationTranslation().join(" "),
@@ -109,11 +109,11 @@ export default function IssueListItem({
 
   function renderProposals() {
     return (
-      <div className="flex me-3 mt-1 flex-row">
+      <div className="d-flex align-items-center">
         <span className="caption-small  mr-1 text-white">
           {(issue != null && issue.mergeProposals?.length) || 0}
         </span>
-        <span className="caption-small text-ligth-gray text-uppercase">
+        <span className="caption-small text-white-40 text-uppercase">
           {issue?.mergeProposals?.length === 1
             ? t("info.proposals_one")
             : t("info.proposals_other")}
@@ -124,11 +124,11 @@ export default function IssueListItem({
 
   function renderReviews() {
     return (
-      <div className="flex me-3 mt-1 flex-row">
+      <div className="d-flex align-items-center">
         <span className="caption-small mr-1 text-white">
           {(issue != null && handleReviewsPr(issue?.pullRequests)) || 0}
         </span>
-        <span className="caption-small text-ligth-gray text-uppercase">
+        <span className="caption-small text-white-40 text-uppercase">
           {handleReviewsPr(issue?.pullRequests) === 1
             ? t("info.reviews_one")
             : t("info.reviews_other")}
@@ -145,11 +145,11 @@ export default function IssueListItem({
         return renderReviews();
       } else {
         return (
-          <div className="flex mr-1 mt-1 flex-row">
+          <div className="d-flex align-items-center">
             <span className="caption-small mr-1 text-white">
               {(issue != null && issue.working?.length) || 0}
             </span>
-            <span className="caption-small text-ligth-gray text-uppercase">
+            <span className="caption-small text-white-40 text-uppercase">
               {t("info.working")}
             </span>
           </div>
@@ -159,13 +159,13 @@ export default function IssueListItem({
 
     if (!["draft", "pending", "canceled"].includes(state?.toLowerCase())) {
       return (
-        <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start">
+        <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2 gap-20">
           {handleFirstChildren()}
-          <div className="flex mr-1 mt-1 flex-row">
+          <div className="d-flex align-items-center">
             <span className="caption-small mr-1 text-white">
               {(issue != null && issue.pullRequests?.length) || 0}
             </span>
-            <span className="caption-small text-ligth-gray text-uppercase">
+            <span className="caption-small text-white-40 text-uppercase">
               {issue?.pullRequests?.length === 1
                 ? t("info.pull-requests_one")
                 : t("info.pull-requests_other")}
@@ -212,36 +212,38 @@ export default function IssueListItem({
               )}
             </h4>
           </OverlayTrigger>
-          <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2">
+          <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2 gap-20">
             <span
               className={`status caption-small ${handleColorState(
                 issue?.state
-              )} mr-2`}
+              )}`}
             >
               {issue && (
                 <Translation ns="bounty" label={`status.${issue.state}`} />
               )}
             </span>
-            <Avatar className="mx-2" userLogin={issue?.creatorGithub} border />
-            <OverlayTrigger
-              key="bottom-creator"
-              placement="bottom"
-              overlay={
-                (issue?.creatorGithub?.length > 25 && (
-                  <Tooltip id={`tooltip-bottom`}>
-                    @{issue?.creatorGithub}
-                  </Tooltip>
-                )) || <></>
-              }
-            >
-              <span className="p-small mr-2 mt-1 mw-github-info">
-                <GithubInfo
-                  color="gray"
-                  value={[`@`, issue?.creatorGithub].join(``)}
-                  textTruncate
-                />
-              </span>
-            </OverlayTrigger>
+            <div className="d-flex align-items-center">
+              <Avatar className="mr-1" userLogin={issue?.creatorGithub} border />
+              <OverlayTrigger
+                key="bottom-creator"
+                placement="bottom"
+                overlay={
+                  (issue?.creatorGithub?.length > 25 && (
+                    <Tooltip id={`tooltip-bottom`}>
+                      @{issue?.creatorGithub}
+                    </Tooltip>
+                  )) || <></>
+                }
+                >
+                <span className="p-small mw-github-info">
+                  <GithubInfo
+                    parent="list"
+                    variant="user"
+                    label={[`@`, issue?.creatorGithub].join(``)}
+                    />
+                </span>
+              </OverlayTrigger>
+            </div>
             {issue?.repository && (
               <OverlayTrigger
                 key="bottom-githubPath"
@@ -254,18 +256,17 @@ export default function IssueListItem({
                   )) || <></>
                 }
               >
-                <span className="p-small mr-2 mt-1 text-uppercase mw-github-info">
+                <span className="p-small text-uppercase mw-github-info">
                   <GithubInfo
-                    color="blue"
-                    value={issue?.repository?.githubPath}
-                    hoverTextColor="white"
-                    onClicked={() =>
+                    parent="list"
+                    variant="repository"
+                    label={issue?.repository?.githubPath}
+                    onClick={() =>
                       router.push({
                         pathname: `/`,
                         query: { repoId: issue?.repository_id },
                       })
                     }
-                    textTruncate
                   />
                 </span>
               </OverlayTrigger>
