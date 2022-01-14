@@ -1,15 +1,33 @@
 import React from "react";
 
-export default function GithubInfo({bgColor = `transparent`, color, value, onClicked = () => {}, hoverTextColor = ``, borderColor = undefined, textTruncate = false}) {
+interface GithubInfoProps {
+  parent: 'list' | 'modal' | 'hero'
+  variant: 'user' | 'repository'
+  label: string
+  onClick?: () => void 
+}
 
+export default function GithubInfo({
+  parent,
+  variant,
+  label,
+  onClick
+} : GithubInfoProps) {
   function getClassName() {
-    return [
-      `bg-${bgColor} caption-small px-1 rounded border border-2 text-uppercase fs-smallest`,
-      hoverTextColor ? `bg-${color}-hover text-${hoverTextColor}-hover` : ``,
-      `border-${borderColor && borderColor || color} text-${color}`,
-      textTruncate ? `text-truncate`: ``
-    ].join(` `);
+    let append = ''
+
+    if (['list', 'modal'].includes(parent)) {
+      append += ' bg-transparent text-truncate '
+
+      if (variant === 'user') append += ' text-white text-white-hover border-gray border-white-hover bg-white-10-hover ' 
+
+      if (variant === 'repository') append += ' text-primary text-white-hover border-primary bg-primary-30-hover ' 
+    } else if (parent === 'hero') {
+      if (variant === 'repository') append += ' bg-white text-primary ' 
+    }
+
+    return ' github-info caption-small ' + append
   }
 
-  return <div className={getClassName()} onClick={(e) => hoverTextColor && (e.stopPropagation(), onClicked())}><span>{value}</span></div>
+  return <div className={getClassName()} onClick={(e) => (e.stopPropagation(), onClick())}><span>{label}</span></div>
 }

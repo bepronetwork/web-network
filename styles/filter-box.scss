@@ -4,7 +4,9 @@
   width: 294px;
 
   &.h-100 {
-    border-right: none!important;
+    border-left: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
     border-top-right-radius: 0!important;
     border-bottom-right-radius: 0!important;
 

@@ -111,7 +111,8 @@ export default function ProposalItem({
             </div>
             <div className="col-5 d-flex justify-content-start mb-2 text-white">
               {proposal.prAmounts.map((value, i) =>
-                                        <PercentageProgressBar textClass={`caption-small p-small text-${getColors()}`}
+                                        <PercentageProgressBar key={`pg-${i}`}
+                                                               textClass={`caption-small p-small text-${getColors()}`}
                                                                pgClass={`bg-${getColors()}`}
                                                                className={i + 1 < proposal.prAmounts.length && `me-2` || ``}
                                                                value={value} total={amount}/>)}
