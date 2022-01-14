@@ -107,6 +107,12 @@ $enable-validation-icons: false;
 
 $modal-content-border-radius: math.div($m, 2);
 
+// Tooltip
+$tooltip-opacity: 1;
+$tooltip-bg: $white;
+$tooltip-color: $ligth-gray;
+$tooltip-arrow-color: $white;
+
 @import "~bootstrap/scss/variables";
 @import "~bootstrap/scss/utilities";
 

@@ -19,7 +19,7 @@ export default function GithubInfo({
     if (['list', 'modal'].includes(parent)) {
       append += ' bg-transparent text-truncate '
 
-      if (variant === 'user') append += ' text-gray text-white-hover border-gray border-white-hover bg-white-10-hover ' 
+      if (variant === 'user') append += ' text-white text-white-hover border-gray border-white-hover bg-white-10-hover ' 
 
       if (variant === 'repository') append += ' text-primary text-white-hover border-primary bg-primary-30-hover ' 
     } else if (parent === 'hero') {

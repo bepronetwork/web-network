@@ -1,13 +1,14 @@
 @font-face {
-  font-family: 'fontRegular';
-  src: url('../assets/fonts/SpaceGrotesk-Regular.ttf') format('ttf'),
-       url('../assets/fonts/SpaceGrotesk-Regular.ttf') format('truetype');
+  font-family: 'Space Grotesk';
+  src: url('../assets/fonts/SpaceGrotesk.woff2') format('woff2'),
+       url('../assets/fonts/SpaceGrotesk.ttf') format('truetype');
+  font-weight: 300 700;
 }
 
 @font-face {
-  font-family: 'Inter-Regular';
-  src: url('../assets/fonts/Inter-Regular.ttf') format('ttf'),
-       url('../assets/fonts/Inter-Regular.ttf') format('truetype');
+  font-family: 'Inter';
+  src: url('../assets/fonts/Inter.woff2') format('woff2'),
+       url('../assets/fonts/Inter.ttf') format('truetype');
 }
 
 @function is-important($important){
@@ -15,20 +16,16 @@
 }
 
 .family-Regular {
-  font-family: 'fontRegular', sans-serif;
-}
-
-.family-SemiBold {
-  font-family: 'fontSemiBold', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 body {
-  font-family: 'fontRegular', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-feature-settings: 'tnum' on, 'lnum' on, 'ss02' on, 'ss03' on, 'ss04' on;
 }
 
 @mixin heading($important: false) {
-  font-family: 'fontRegular', sans-serif is-important($important);
+  font-family: 'Space Grotesk', sans-serif is-important($important);
   font-weight: 700 is-important($important);
   line-height: 120% is-important($important);
   margin: 0;
@@ -69,26 +66,21 @@ body {
 p,
 .p,
 .p-small {
-  font-family: 'Inter-Regular', sans-serif;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
   line-height: 140%;
   &-bold {
-    font-family: 'Inter-Regular', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-weight: 600;
     line-height: 160%;
     letter-spacing: 0.02rem;
   }
 }
 
-.p,
-.p-small {
-  font-family: 'Inter-Regular', sans-serif !important;
-  line-height: 140% !important;
-}
-
 button,
 .btn,
 .small-info {
-  font-family: 'fontRegular', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1rem; 
