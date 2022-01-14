@@ -31,6 +31,7 @@
     "text-data": "Opened {{value}} Ago"
   },
   "steps": {
+    "title": "Bounty State",
     "draft": "Draft",
     "development": "Development",
     "finalized": "Finalized",
@@ -44,6 +45,8 @@
     "completed": "completed",
     "canceled": "canceled",
     "until-done": "{{distance}} until done",
+    "started-time": "started {{distance}} ago",
+    "end-time": "at {{data}}",
     "pending": "pending",
     "in-progress": "in progress",
     "open": "open"
