@@ -64,8 +64,7 @@ export default function PageProposal() {
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
   const [disputableTime, setDisputableTime] = useState(0)
   const [[], {loadRepos}] = useRepos();
-  const {getUserOf,} = useApi();
-  const {getIssue,} = useMergeData();
+  const {getUserOf, getIssue} = useApi();
   const {getPullRequest} = useOctokit();
   const { t } = useTranslation('common')
 
@@ -74,7 +73,7 @@ export default function PageProposal() {
     const repos = await loadRepos();
     const _repo = repos.find(({id}) => id === +repoId);
 
-    const issueData = await getIssue(repoId, ghId, _repo?.githubPath);
+    const issueData = await getIssue(repoId, ghId);
 
     setIssueMicroService(issueData);
     setPrGithubId(issueData.pullRequests?.find(el => el.id === +prId).githubId);
@@ -94,7 +93,7 @@ export default function PageProposal() {
       const pullRequests = [];
 
       for (const pullRequest of issueMicroService?.pullRequests) {
-        const {data: {merged, mergeable, mergeable_state, number, state}} = await getPullRequest(+pullRequest.githubId, issueMicroService.repo);
+        const {data: {merged, mergeable, mergeable_state, number, state}} = await getPullRequest(+pullRequest.githubId, issueMicroService.repository.githubPath);
         if (number === +prGithubId) {
           setIsMergiable(mergeable && mergeable_state === 'clean');
           setPullRequestGh({...pullRequest, merged, isMergeable: mergeable && mergeable_state === 'clean', state});
