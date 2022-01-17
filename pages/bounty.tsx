@@ -41,10 +41,10 @@ export default function PageIssue() {
   const [hasOpenPR, setHasOpenPR] = useState(false);
   const [mergedPullRequests, setMergedPullRequests] = useState([]);
   const [currentUser, setCurrentUser] = useState<User>();
-  const {getIssue, getMergedDataFromPullRequests} = useMergeData();
+  const {getMergedDataFromPullRequests} = useMergeData();
   const {getIssueComments, getForksOf, getUserRepos,} = useOctokit();
   const [[activeRepo, reposList]] = useRepos();
-  const {getUserOf, moveIssueToOpen, userHasPR} = useApi();
+  const {getUserOf, getIssue, userHasPR} = useApi();
 
   const tabs = [
     {
@@ -84,7 +84,7 @@ export default function PageIssue() {
     if (!activeRepo || (!force && issue))
       return;
 
-    getIssue(repoId as string, id as string, activeRepo.githubPath)
+    getIssue(repoId as string, id as string)
       .then((issue) => {
         if (!issue)
           return;
@@ -225,7 +225,7 @@ export default function PageIssue() {
           <div className="d-flex bd-highlight justify-content-center mx-2 px-4">
             <div className="ps-3 pe-0 ms-0 me-2 w-65 bd-highlight">
               <div className="container">
-                <IssueDescription description={issue?.body} />
+                <IssueDescription description={issue?.body || ''} />
               </div>
             </div>
             <div className="p-0 me-3 flex-shrink-0 w-25 bd-highlight">
@@ -248,7 +248,7 @@ export default function PageIssue() {
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-md-10">
-              <IssueDescription description={issue?.body} />
+              <IssueDescription description={issue?.body || ''} />
             </div>
           </div>
         </div>
