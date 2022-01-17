@@ -126,7 +126,7 @@ export default function NotMergeableModal({
             </Button>
           )}
           <GithubLink
-            forcePath={issue?.repo}
+            forcePath={issue?.repository?.githubPath}
             hrefPath={`pull/${pullRequest?.githubId || ''}/conflicts`}
             color="primary">
             {t('modals.not-mergeable.go-to-pr')}

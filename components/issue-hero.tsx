@@ -31,7 +31,7 @@ export default function IssueHero({ issue, state, amount }) {
                         {issue && formatDate(issue?.createdAt)}
                       </span>
                       <span className="p-small mr-2 mt-1">
-                        {issue?.repo && <GithubInfo parent="hero" variant="repository" label={issue?.repo} /> || ``}
+                        {issue?.repository && <GithubInfo parent="hero" variant="repository" label={issue?.repository?.githubPath} /> || ``}
                       </span>
                       <span className="p-small mr-3 mt-1">
                         {renderCreator()}

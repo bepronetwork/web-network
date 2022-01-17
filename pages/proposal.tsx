@@ -93,7 +93,7 @@ export default function PageProposal() {
       const pullRequests = [];
 
       for (const pullRequest of issueMicroService?.pullRequests) {
-        const {data: {merged, mergeable, mergeable_state, number, state}} = await getPullRequest(+pullRequest.githubId, issueMicroService.repository.githubPath);
+        const {data: {merged, mergeable, mergeable_state, number, state}} = await getPullRequest(+pullRequest.githubId, issueMicroService.repository?.githubPath);
         if (number === +prGithubId) {
           setIsMergiable(mergeable && mergeable_state === 'clean');
           setPullRequestGh({...pullRequest, merged, isMergeable: mergeable && mergeable_state === 'clean', state});
@@ -184,7 +184,7 @@ export default function PageProposal() {
         handleMicroService={loadProposalData}
         isDisputed={proposalBepro?.isDisputed}
         githubId={prGithubId}
-        repoPath={issueMicroService?.repo}
+        repoPath={issueMicroService?.repository?.githubPath}
         canClose={isMergiable}
         finished={isFinished}
         isDisputable={isProposalDisputable(proposalMicroService?.createdAt, disputableTime)} />
