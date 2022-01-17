@@ -29,6 +29,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
                               creatorGithub,
                               amount,
                               state: 'pending',
+                              title,
+                              body
                             });
 
   return res.json(githubId);
