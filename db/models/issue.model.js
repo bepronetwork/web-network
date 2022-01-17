@@ -22,7 +22,8 @@ class Issue extends Model {
         type: DataTypes.ARRAY(DataTypes.STRING)
       },
       merged: DataTypes.STRING,
-      seoImage: DataTypes.STRING
+      seoImage: DataTypes.STRING,
+      network_id: DataTypes.INTEGER
     }, {
       sequelize,
       modelName: 'issue',
@@ -50,6 +51,10 @@ class Issue extends Model {
       foreignKey: 'repository_id',
       sourceKey: 'id',
       as: 'repository'
+    });
+    this.belongsTo(models.network, {
+      foreignKey: 'network_id',
+      sourceKey: 'id'
     });
   }
 };
