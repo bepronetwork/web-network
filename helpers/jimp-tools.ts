@@ -25,9 +25,9 @@ interface OptiosProps{
  output?:string;
 }
 
-const fontBold = `assets/fonts/SpaceGrotesk-Bold.ttf`;
-const fontSemiBold = `assets/fonts/SpaceGrotesk-SemiBold.ttf`;
-const fontRegular = `assets/fonts/SpaceGrotesk-Regular.ttf`;
+const fontBold = `assets/fonts/seo/SpaceGrotesk-Bold.ttf`;
+const fontSemiBold = `assets/fonts/seo/SpaceGrotesk-SemiBold.ttf`;
+const fontRegular = `assets/fonts/seo/SpaceGrotesk-Regular.ttf`;
 
 export async function position(base: Jimp, image: Jimp, x = 0, y = 0) {
   const baseIMG = new Jimp(base);
