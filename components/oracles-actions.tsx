@@ -233,7 +233,7 @@ function OraclesActions(): JSX.Element {
           {action === t('my-oracles:actions.lock.label') && 
             <Button 
               disabled={isApproveButtonDisabled()}
-              className="ms-0" 
+              className="ms-0"
               onClick={approveSettlerToken}
             >
                 {isApproveButtonDisabled() && <LockedIcon width={12} height={12} className="mr-1"/>}

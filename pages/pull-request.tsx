@@ -36,12 +36,12 @@ export default function PullRequest() {
 
   const router = useRouter()
   const [[activeRepo]] = useRepos()
-  const { createReviewForPR } = useApi()
+  const { createReviewForPR, getIssue } = useApi()
   const [issue, setIssue] = useState<IssueData>()
   const [showModal, setShowModal] = useState(false)
   const [isExecuting, setIsExecuting] = useState(false)
   const [pullRequest, setPullRequest] = useState<pullRequest>()
-  const { getIssue, getMergedDataFromPullRequests } = useMergeData()
+  const { getMergedDataFromPullRequests } = useMergeData()
   const { t } = useTranslation(['common', 'pull-request'])
 
   const { repoId, issueId, prId, review } = router.query
@@ -53,7 +53,7 @@ export default function PullRequest() {
 
     dispatch(changeLoadState(true))
 
-    getIssue(String(repoId), githubId, activeRepo?.githubPath)
+    getIssue(String(repoId), githubId)
       .then((issue) => {
         setIssue(issue)
 
