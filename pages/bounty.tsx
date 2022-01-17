@@ -166,7 +166,7 @@ export default function PageIssue() {
 
   function loadMergedPullRequests() {
     if (issue && currentAddress)
-      getMergedDataFromPullRequests(issue.repo, issue.pullRequests).then(setMergedPullRequests)
+      getMergedDataFromPullRequests(issue.repository?.githubPath, issue.pullRequests).then(setMergedPullRequests)
   }
 
   useEffect(loadIssueData, [githubLogin, currentAddress, id, activeRepo]);
@@ -213,7 +213,7 @@ export default function PageIssue() {
         isRepoForked={isRepoForked}
         isWorking={isWorking}
         issueCreator={networkIssue?.issueGenerator}
-        repoPath={issue?.repo}
+        repoPath={issue?.repository?.githubPath}
         githubId={issue?.githubId}
         addNewComment={addNewComment}
         finished={networkIssue?.recognizedAsFinished} />
@@ -253,7 +253,7 @@ export default function PageIssue() {
           </div>
         </div>
       )}
-      <IssueComments comments={commentsIssue} repo={issue?.repo} issueId={id} />
+      <IssueComments comments={commentsIssue} repo={issue?.repository?.githubPath} issueId={id} />
     </>
   );
 }
