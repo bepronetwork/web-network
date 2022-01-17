@@ -13,7 +13,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   ]
 
   const issues = await models.issue.findAll({
-    where: {seoImage: null},
     include,
   })
 
@@ -41,10 +40,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     const data = Buffer.from(card.buffer);
     const response = await storage.add({data});
-
+    console.log(response)
     if (response && response.path) {
-      await issue.update({seoImage: response.path});
-      created.push({issueId: issue?.issueId, seoImage: response.path})
+      const seoImage = `${process.env.NEXT_PUBLIC_IPFS_BASE}/${response.path}`
+      await issue.update({seoImage});
+      created.push({issueId: issue?.issueId, seoImage})
     }
 
   }
