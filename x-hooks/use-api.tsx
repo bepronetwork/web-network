@@ -2,6 +2,7 @@ import axios from 'axios';
 import {IssueData, pullRequest} from '@interfaces/issue-data';
 import {ProposalData, User} from '@interfaces/api-response';
 import {ReposList} from '@interfaces/repos-list';
+import {BranchInfo, BranchsList} from '@interfaces/branchs-list';
 import { head } from 'lodash';
 import { PaginatedData } from '@interfaces/paginated-data';
 import client from '@services/api'
@@ -21,6 +22,7 @@ interface NewIssueParams {
 }
 
 const repoList: ReposList = [];
+const branchsList: BranchsList = {};
 
 export default function useApi() {
 
@@ -194,6 +196,18 @@ export default function useApi() {
                  .catch(() => []);
   }
 
+  async function getBranchsList(repoId: string | number, force = false) {
+    if (!force && branchsList[repoId]?.length)
+      return Promise.resolve(branchsList[repoId] as BranchInfo[]);
+
+    return client.get<BranchInfo[]>(`/repos/branchs/${repoId}`)
+                 .then(({data}) => {
+                  branchsList[repoId] = data;
+                   return data
+                  })
+                 .catch(() => []);
+  }
+
   async function removeRepo(id: string) {
     return client.delete(`/repos/${id}`)
                  .then(({status}) => status === 200)
@@ -296,6 +310,7 @@ export default function useApi() {
     removeUser,
     getIssue,
     getReposList,
+    getBranchsList,
     getIssues,
     getHealth,
     getClientNation,
