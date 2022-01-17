@@ -46,6 +46,7 @@
     "canceled": "canceled",
     "until-done": "{{distance}} until done",
     "started-time": "started {{distance}} ago",
+    "opened-time": "opened {{distance}} ago",
     "end-time": "at {{data}}",
     "pending": "pending",
     "in-progress": "in progress",
