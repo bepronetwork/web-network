@@ -15,6 +15,7 @@ import {formatNumberToCurrency} from '@helpers/formatNumber'
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import LockedIcon from '@assets/icons/locked-icon';
 import ReposDropdown from '@components/repos-dropdown';
+import BranchsDropdown from '@components/branchs-dropdown';
 import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
 import {User} from '@interfaces/api-response';
@@ -38,6 +39,7 @@ export default function PageCreateIssue() {
   const {dispatch, state: {currentAddress, githubHandle, myTransactions, isTransactionalTokenApproved}} = useContext(ApplicationContext);
   const [currentUser, setCurrentUser] = useState<User>();
   const [repository_id, setRepositoryId] = useState(``);
+  const [branch, setBranch] = useState(``);
   const [redirecting, setRedirecting] = useState(false);
   const router = useRouter();
   const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId} = useApi();
@@ -92,6 +94,7 @@ export default function PageCreateIssue() {
       creatorAddress: BeproService.address,
       creatorGithub: currentUser?.githubLogin,
       repository_id,
+      branch
     }
     const contractPayload = {tokenAmount: issueAmount.floatValue,};
 
@@ -148,6 +151,7 @@ export default function PageCreateIssue() {
       !!issueAmount.formattedValue,
       !verifyTransactionState(TransactionTypes.openIssue),
       !!repository_id,
+      !!branch,
       !redirecting,
     ].some(value => value === false);
   }
@@ -210,6 +214,17 @@ export default function PageCreateIssue() {
                           value={issueDescription}
                           onChange={e => setIssueDescription(e.target.value)}/>
               </div>
+              <div className="row mb-4">
+                <div className="col">
+                  <ReposDropdown onSelected={opt => {
+                    setRepositoryId(opt.value) 
+                    setBranch(null)
+                  }} />
+                </div>
+                <div className="col">
+                  <BranchsDropdown repoId={repository_id} onSelected={opt => setBranch(opt.value)} />
+                </div>
+              </div>
               <div className="row">
                 <div className="col">
                   <InputNumber
@@ -238,7 +253,6 @@ export default function PageCreateIssue() {
                   />
                 </div>
                 <div className="col">
-                  <ReposDropdown onSelected={opt => setRepositoryId(opt.value)} />
                 </div>
               </div>
 

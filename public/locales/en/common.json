@@ -53,6 +53,7 @@
     "connect": "Connect"
   },
   "select-a-repository": "Select a repository",
+  "select-a-branch": "Select a branch",
   "status": {
     "network-problems": "network problems",
     "waiting": "waiting",
