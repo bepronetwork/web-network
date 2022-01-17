@@ -30,6 +30,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
                               amount,
                               branch,
                               state: 'pending',
+                              title,
+                              body
                             });
 
   return res.json(githubId);
