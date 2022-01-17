@@ -20,37 +20,36 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if (issues?.length < 1)
     return res.status(400).json('issues not find');
 
+  const storage = new IpfsStorage();
+  const created = [];
 
-  const storage = new IpfsStorage()
-
-  const create = Promise.all(issues.map(async (issue)=>{
-    console.log(issue?.issueId.split(`/`))
+  for (const issue of issues) {
     const [, repo] = issue?.repository.githubPath.split(`/`);
     const [, ghId] = issue?.issueId.split(`/`);
-    console.log(issue.title)
+
+    console.log(`Parsing issue`, issue?.issueId, repo, issue?.title);
+
     const card = await generateCard({
-      state: issue?.state,
-      issueId: ghId,
-      title: issue?.title,
-      repo,
-      ammount: issue?.amount,
-      working: issue?.working?.length || 0,
-      pr: issue?.pullRequests?.length || 0,
-      proposal: issue?.mergeProposals?.length || 0,
-    })
-    
-    var img = Buffer.from(card.buffer, 'base64');
-    const {path} = await storage.add({data: img})
-    const url = `${process.env.NEXT_PUBLIC_IPFS_BASE}/${path}`
+        state: issue?.state,
+        issueId: ghId,
+        title: issue?.title,
+        repo,
+        ammount: issue?.amount,
+        working: issue?.working?.length || 0,
+        pr: issue?.pullRequests?.length || 0,
+        proposal: issue?.mergeProposals?.length || 0,});
 
-    await issue.update({
-      seoImage: url,
-    })
+    const data = Buffer.from(card.buffer);
+    const response = await storage.add({data});
 
-    return {...issue, seoImage: url};
-  }))
+    if (response && response.path) {
+      await issue.update({seoImage: response.path});
+      created.push({issueId: issue?.issueId, seoImage: response.path})
+    }
 
-  return res.status(200).json(create);
+  }
+
+  return res.status(200).json(created);
 }
 
 export default async function GetIssues(req: NextApiRequest, res: NextApiResponse) {
