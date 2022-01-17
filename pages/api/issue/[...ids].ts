@@ -1,8 +1,5 @@
-import { developer } from '@interfaces/issue-data';
 import models from '@db/models';
 import {NextApiRequest, NextApiResponse} from 'next';
-import {composeIssues} from '@db/middlewares/compose-issues';
-import {Octokit} from 'octokit';
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {ids: [repoId, ghId]} = req.query;
@@ -11,7 +8,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const include = [
     { association: 'developers' },
     { association: 'pullRequests' },
-    { association: 'mergeProposals' }
+    { association: 'mergeProposals' },
+    { association: 'repository' }
   ]
 
   const issue = await models.issue.findOne({
