@@ -8,6 +8,7 @@ import MergeProposals from './mergeproposal';
 import PullRequests from './pullRequest.model';
 import Repositories from './repositories.model';
 import ChainEvents from './chain-events.model';
+import Network from './network.model';
 
 const Database = {sequelize: null,};
 
@@ -20,6 +21,7 @@ Database.mergeProposal = MergeProposals;
 Database.repositories = Repositories;
 Database.pullRequest = PullRequests;
 Database.chainEvents = ChainEvents;
+Database.network = Network;
 
 Object.values(Database).forEach((model) => {
   if(model?.init){
