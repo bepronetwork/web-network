@@ -1,29 +1,37 @@
 import {GetStaticProps} from 'next'
 import { useRouter } from 'next/router'
-import React, {useContext} from 'react';
-import {useEffect, useState} from 'react';
-import {BeproService} from '@services/bepro-service';
-import ConnectWalletButton from './connect-wallet-button';
-import {ApplicationContext} from '@contexts/application';
-import {changeStakedState} from '@reducers/change-staked-amount';
-import { formatNumberToNScale } from 'helpers/formatNumber';
-import NetworkIdentifier from '@components/network-identifier';
-import BeproLogo from '@assets/icons/bepro-logo';
+import React, {useContext, useEffect, useState} from 'react';
+
 import HelpIcon from '@assets/icons/help-icon';
-import HelpModal from '@components/help-modal';
-import ExternalLinkIcon from '@assets/icons/external-link-icon';
-import TransactionsStateIndicator from '@components/transactions-state-indicator';
-import WrongNetworkModal from '@components/wrong-network-modal';
-import Button from './button';
 import PlusIcon from '@assets/icons/plus-icon';
+import BeproLogo from '@assets/icons/bepro-logo';
 import BeproSmallLogo from '@assets/icons/bepro-small-logo';
+import ExternalLinkIcon from '@assets/icons/external-link-icon';
+
+import Button from '@components/button';
+import HelpModal from '@components/help-modal';
+import Translation from '@components/translation';
+import InternalLink from '@components/internal-link';
+import NetworkIdentifier from '@components/network-identifier';
+import WrongNetworkModal from '@components/wrong-network-modal';
+import ConnectWalletButton from '@components/connect-wallet-button';
+import UserMissingModal from '@components/user-missing-information';
+import BalanceAddressAvatar from '@components/balance-address-avatar';
+import TransactionsStateIndicator from '@components/transactions-state-indicator';
+
+import { ApplicationContext } from '@contexts/application';
+
 import { truncateAddress } from '@helpers/truncate-address';
-import InternalLink from './internal-link';
-import BalanceAddressAvatar from './balance-address-avatar';
-import useApi from '@x-hooks/use-api';
+import { formatNumberToNScale } from '@helpers/formatNumber';
+
 import { User } from '@interfaces/api-response';
-import UserMissingModal from './user-missing-information';
-import Translation from './translation';
+
+import { changeStakedState } from '@reducers/change-staked-amount';
+
+import { BeproService } from '@services/bepro-service';
+
+import useApi from '@x-hooks/use-api';
+import useNetwork from '@x-hooks/use-network';
 
 const CURRENCY = process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME;
 const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
@@ -39,6 +47,7 @@ export default function MainNav() {
   const [showHelp, setShowHelp] = useState(false);
   const [modalUserMissing, setModalUserMissing] = useState<boolean>(false);
   const {getUserOf,} = useApi();
+  const { getURLWithNetwork } = useNetwork()
 
   useEffect(() => {
     checkLogin();
@@ -96,15 +105,15 @@ export default function MainNav() {
         <InternalLink href="/" icon={<BeproLogo aria-hidden={true} />} className="brand" nav active />
         <ul className="nav-links">
           <li>
-            <InternalLink href="/developers" label={<Translation label={'main-nav.developers'} />} nav uppercase />
+            <InternalLink href={getURLWithNetwork('/developers')} label={<Translation label={'main-nav.developers'} />} nav uppercase />
           </li>
 
           <li>
-            <InternalLink href="/council" label={<Translation label={'main-nav.council'} />} nav uppercase />
+            <InternalLink href={getURLWithNetwork('/council')} label={<Translation label={'main-nav.council'} />} nav uppercase />
           </li>
 
           <li>
-            <InternalLink href="/oracle" label={<Translation label={'main-nav.Oracle'} />} nav uppercase />
+            <InternalLink href={getURLWithNetwork('/oracle')} label={<Translation label={'main-nav.Oracle'} />} nav uppercase />
           </li>
         </ul>
       </div>
@@ -115,7 +124,7 @@ export default function MainNav() {
           <ExternalLinkIcon className="ml-1"/>
         </a>
 
-        <InternalLink href="/create-bounty" icon={<PlusIcon />} label={<Translation label={'main-nav.create-bounty'} />} className="mr-2" iconBefore nav uppercase />
+        <InternalLink href={getURLWithNetwork('/create-bounty')} icon={<PlusIcon />} label={<Translation label={'main-nav.create-bounty'} />} className="mr-2" iconBefore nav uppercase />
 
         <Button onClick={() => setShowHelp(true)}  className="ms-2 me-4 opacity-75 opacity-100-hover" transparent rounded><HelpIcon /></Button>
 
@@ -128,9 +137,9 @@ export default function MainNav() {
 
             <NetworkIdentifier />
 
-            <InternalLink href="/account" icon={<BeproSmallLogo />} label={formatNumberToNScale(beproBalance)} className="mx-3" transparent nav />
+            <InternalLink href={getURLWithNetwork('/account')} icon={<BeproSmallLogo />} label={formatNumberToNScale(beproBalance)} className="mx-3" transparent nav />
 
-            <InternalLink href="/account" icon={<BalanceAddressAvatar address={address} balance={ethBalance} currency={CURRENCY} />} className="meta-info d-flex align-items-center" />
+            <InternalLink href={getURLWithNetwork('/account')} icon={<BalanceAddressAvatar address={address} balance={ethBalance} currency={CURRENCY} />} className="meta-info d-flex align-items-center" />
           </div>
         </ConnectWalletButton>
       </div>

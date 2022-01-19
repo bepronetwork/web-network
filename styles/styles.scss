@@ -25,7 +25,7 @@ li {
 }
 
 .account-link-active {
-  border-bottom: 3px solid $blue !important;
+  border-bottom: 3px solid var(--bs-primary) !important;
   border-radius: 0;
 }
 
@@ -97,10 +97,10 @@ li {
         border-color: $ligth-gray;
       }
       &--is-focused {
-        border-color: $blue
+        border-color: var(--bs-primary)
       }
       &--menu-is-open{
-        border-color: $blue !important;
+        border-color: var(--bs-primary) !important;
         background: $black;
       }
       &--is-disabled{
@@ -138,7 +138,7 @@ li {
       background-color: transparent;
       color: $gray;
       &--is-selected {
-        color: $blue;
+        color: var(--bs-primary);
       }
       &:hover{
         color: $white;
@@ -163,7 +163,7 @@ li {
     background-color: $bg;
   }
   &:focus {
-    border-color: $blue;
+    border-color: var(--bs-primary);
     color: $white;
   }
 }
@@ -208,6 +208,10 @@ body {
   padding: 2px 3px;
   border: 1px solid;
   border-radius: 3px;
+
+  &.bg-30-hover:hover {
+    background-color: rgba(var(--bs-primary-rgb), .3) !important;
+  } 
 }
 
 .p-nm {
@@ -248,7 +252,7 @@ body {
   position: fixed;
   z-index: 5;
   height: $navbar-height;
-  background-color: $blue;
+  background-color: var(--bs-primary);
   padding: 0px $m;
 
   .brand {
@@ -326,7 +330,7 @@ body {
   }
   &.active {
      h4 {
-      border-bottom: 3px solid $blue !important;
+      border-bottom: 3px solid var(--bs-primary) !important;
       border-radius: 0;
      }
   }
@@ -357,7 +361,7 @@ body {
 .banner {
   width: 100%;
   min-height: 240px;
-  background-color: $blue;
+  background-color: var(--bs-primary);
   color: $white;
   padding: ($navbar-height + $m * 3) $m * 3 $m * 3 $m * 3;
   .banner-highlight {
@@ -955,7 +959,7 @@ $c_props: ('m': 'margin') !default;
 }
 
 .color-blue {
-  color: $blue-dark;
+  color: var(--bs-primary)-dark;
 }
 
 .bg-main-image {
@@ -981,7 +985,7 @@ $c_props: ('m': 'margin') !default;
 
   &-blue:hover {
     svg {
-      color: $blue;
+      color: var(--bs-primary);
     }
   }
 }
@@ -1107,6 +1111,10 @@ textarea.form-control {
 }
 
 .comment {
+  a {
+    color: var(--bs-primary);
+  }
+  
   img {
     max-width: 100%;
   }
@@ -1142,7 +1150,7 @@ textarea.form-control {
     }
 
     &:focus-within {
-      border-color: $primary;
+      border-color: var(--bs-primary);
     }
 
     input {
@@ -1158,7 +1166,7 @@ textarea.form-control {
       background-color: $black;
 
       svg {
-        color: $primary;
+        color: var(--bs-primary);
         width: 10px;
       }
     }
@@ -1199,6 +1207,12 @@ textarea.form-control {
 
   background-color: transparent;
   border: none;
+
+  svg {
+    circle {
+      stroke: var(--bs-primary);
+    }
+  }
 }
 
 .gap-20 {

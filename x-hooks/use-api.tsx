@@ -4,8 +4,10 @@ import {ReposList} from '@interfaces/repos-list';
 import {BranchInfo, BranchsList} from '@interfaces/branchs-list';
 import { head } from 'lodash';
 import { PaginatedData } from '@interfaces/paginated-data';
-import client from '@services/api'
+import {ProposalData, User} from '@interfaces/api-response';
+import {IssueData, pullRequest} from '@interfaces/issue-data';
 
+import client from '@services/api'
 interface Paginated<T = any> {
   count: number;
   rows: T[]
@@ -325,6 +327,16 @@ export default function useApi() {
     return client.post("/files", form).then(({ data }) => data);
   }
 
+  async function getNetwork(name: string) {
+    const search = new URLSearchParams({name}).toString();
+
+    return client.get<Network>(`/network?${search}`)
+      .then(response => response)
+      .catch(error => {
+        throw error
+      })
+  }
+
   return {
     removeUser,
     getIssue,
@@ -358,6 +370,7 @@ export default function useApi() {
     mergeClosedIssue,
     getUserPullRequests,
     createReviewForPR,
-    searchIssues
+    searchIssues,
+    getNetwork
   }
 }

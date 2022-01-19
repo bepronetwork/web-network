@@ -21,7 +21,7 @@ export default function GithubInfo({
 
       if (variant === 'user') append += ' text-white text-white-hover border-gray border-white-hover bg-white-10-hover ' 
 
-      if (variant === 'repository') append += ' text-primary text-white-hover border-primary bg-primary-30-hover ' 
+      if (variant === 'repository') append += ' text-primary text-white-hover border-primary bg-30-hover ' 
     } else if (parent === 'hero') {
       if (variant === 'repository') append += ' bg-white text-primary ' 
     }

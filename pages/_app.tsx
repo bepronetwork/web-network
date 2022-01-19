@@ -1,21 +1,28 @@
-import "../styles/styles.scss";
 import { AppProps } from "next/app";
+import { GetServerSideProps } from "next";
+import { isMobile } from "react-device-detect";
+import { appWithTranslation } from "next-i18next";
 import React, { useEffect, useState } from "react";
+import { getSession, SessionProvider } from "next-auth/react";
+
+import "../styles/styles.scss";
+
+import Seo from "@components/seo";
+import MainNav from "@components/main-nav";
+import StatusBar from "@components/status-bar";
 import NationDialog from "@components/nation-dialog";
 import WebThreeDialog from "@components/web3-dialog";
-import MainNav from "@components/main-nav";
-import ApplicationContextProvider from "@contexts/application";
-import StatusBar from "@components/status-bar";
-import { isMobile } from "react-device-detect";
 import MobileNotSupported from "@components/mobile-not-supported";
-import { getSession, SessionProvider } from "next-auth/react";
-import { GetServerSideProps } from "next";
+
+import ApplicationContextProvider from "@contexts/application";
+
 import useRepos from "@x-hooks/use-repos";
-import { appWithTranslation } from "next-i18next";
-import Seo from "@components/seo";
+import useNetwork from "@x-hooks/use-network";
+
 function App({ Component, pageProps: { session, currentIssue,...pageProps } }: AppProps) {
   const [[, repos]] = useRepos();
   const [loaded, setLoaded] = useState(false);
+  const { network, colorsToCSS } = useNetwork()
 
   if (isMobile) {
     return <MobileNotSupported />;
@@ -27,6 +34,10 @@ function App({ Component, pageProps: { session, currentIssue,...pageProps } }: A
 
   return (
     <>
+      <style>
+        {colorsToCSS()}
+      </style>
+
       <Seo issueMeta={currentIssue} />
       <SessionProvider session={session}>
         <ApplicationContextProvider>

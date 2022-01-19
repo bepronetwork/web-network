@@ -51,7 +51,7 @@ export default function StatusBar() {
         <div className="ms-3 text-gray">|</div>
         <div className="ms-3 flex-grow-1 text-center text-uppercase family-Regular status-bar-text text-ligth-gray">
           <Translation label="status.tagline" />
-          <a href="https://www.bepro.network/terms-and-conditions" target="_blank" className="ms-2 text-decoration-none text-blue"><Translation label="status.terms-and-conditions"/></a>
+          <a href="https://www.bepro.network/terms-and-conditions" target="_blank" className="ms-2 text-decoration-none text-primary"><Translation label="status.terms-and-conditions"/></a>
         </div>
         <LanguageSelector />
         <div className="ms-3 text-gray">|</div>

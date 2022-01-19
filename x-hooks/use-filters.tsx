@@ -3,6 +3,7 @@ import {IssueFilterBoxOption} from '@interfaces/filters';
 import {RepoInfo} from '@interfaces/repos-list';
 import {useRouter} from 'next/router';
 import useRepos from '@x-hooks/use-repos';
+import useNetwork from './use-network';
 
 type FilterStateUpdater = (opts: IssueFilterBoxOption[], opt: IssueFilterBoxOption, checked: boolean, type: ('time' | 'repo' | 'state'), multi?: boolean) => void;
 
@@ -13,6 +14,7 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
   const [[, repoList]] = useRepos();
 
   const router = useRouter()
+  const { network } = useNetwork()
 
 
   function getActiveFiltersOf(opts: IssueFilterBoxOption[]) {
@@ -32,7 +34,7 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
       page: '1'
     }
 
-    router.push({pathname: router.pathname, query}, router.pathname);
+    router.push({pathname: router.pathname, query}, router.asPath);
   }
 
   function makeFilterOption(label, value, checked = false) {
@@ -90,10 +92,11 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
       ... router.query.sortBy ? {sortBy: router.query.sortBy}: {},
       ... router.query.order ? {order: router.query.order}: {},
       ... router.query.search ? {search: router.query.search}: {},
+      network: network.name,
       page: '1'
     }
 
-    router.push({pathname: router.pathname, query}, router.pathname);
+    router.push({pathname: router.pathname, query}, router.asPath);
   }
 
   return [[repoFilters, stateFilters, timeFilters], updateOpt, clearFilters]

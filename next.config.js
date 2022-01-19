@@ -7,4 +7,14 @@ module.exports = {
     includePaths: [path.join(__dirname, 'styles')],
   },
   webpack5: true,
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/bepro',
+        permanent: true,
+        locale: false
+      }
+    ]
+  }
 };

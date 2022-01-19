@@ -9,7 +9,7 @@ function ScrollTopIcon(props: SVGProps<SVGSVGElement>) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <circle cx="14" cy="14" r="13.5" fill="#151720" stroke="#4250E4" />
+      <circle cx="14" cy="14" r="13.5" fill="#151720" />
       <path
         fillRule="evenodd"
         clipRule="evenodd"

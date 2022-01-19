@@ -1,11 +1,18 @@
-import useRepos from '@x-hooks/use-repos'
 import { GetStaticProps } from 'next'
+import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import Avatar from './avatar'
 import GithubInfo from './github-info'
 import InternalLink from './internal-link'
 import PullRequestLabels, { PRLabel } from './pull-request-labels'
+
+import Avatar from '@components/avatar'
+import GithubInfo from '@components/github-info'
+import InternalLink from '@components/internal-link'
+
+import useNetwork from '@x-hooks/use-network'
+import useRepos from '@x-hooks/use-repos'
 
 export default function PullRequestHero({
   githubId,
@@ -21,6 +28,7 @@ export default function PullRequestHero({
   const [repoId, issueId] = (issueCID as string).split(`/`)
   const [[activeRepo]] = useRepos()
   const { t } = useTranslation(['common', 'pull-request'])
+  const { getURLWithNetwork } = useNetwork()
 
   function getLabel(): PRLabel{
     if(pullRequest?.merged) return 'merged';
@@ -40,7 +48,7 @@ export default function PullRequestHero({
               <div className="d-flex align-items-center cursor-pointer text-truncate">
                 <InternalLink
                   iconBefore={true}
-                  href={{ pathname: '/bounty', query: { id: issueId, repoId } }}
+                  href={getURLWithNetwork('/bounty', { id: issueId, repoId })}
                   icon={<i className="ico-back me-2" />}
                   label={`#${githubId} ${title}`}
                   className="p-nm caption"
