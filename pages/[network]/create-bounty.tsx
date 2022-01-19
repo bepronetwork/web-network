@@ -256,7 +256,7 @@ export default function PageCreateIssue() {
                         {t('create-bounty:fields.amount.info', { amount: formatNumberToCurrency(balance, { maximumFractionDigits: 18 }) })}
                         {isTransactionalTokenApproved && (
                           <span
-                            className="caption-small text-blue ml-1 cursor-pointer text-uppercase"
+                            className="caption-small text-primary ml-1 cursor-pointer text-uppercase"
                             onClick={() => setIssueAmount({formattedValue: balance.toString()})}>
                           {t('create-bounty:fields.amount.max')}
                       </span>

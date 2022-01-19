@@ -44,7 +44,7 @@ function OraclesActions(): JSX.Element {
       title: t('my-oracles:actions.lock.title'),
       description: t('my-oracles:actions.lock.description'),
       label: t('my-oracles:actions.lock.get-amount-oracles', { amount: renderAmount }),
-      caption: <>{t('misc.get')} <span className="text-purple">{t('$oracles')}</span> {t('misc.from')} <span className="text-blue">{t('$bepro')}</span></>,
+      caption: <>{t('misc.get')} <span className="text-purple">{t('$oracles')}</span> {t('misc.from')} <span className="text-primary">{t('$bepro')}</span></>,
       body: t('my-oracles:actions.lock.body', { amount: renderAmount }),
       params() {
         return { tokenAmount };
@@ -54,7 +54,7 @@ function OraclesActions(): JSX.Element {
       title: t('my-oracles:actions.unlock.title'),
       description: t('my-oracles:actions.unlock.description'),
       label: t('my-oracles:actions.unlock.get-amount-bepro', { amount: renderAmount }),
-      caption: <>{t('misc.get')} <span className="text-blue">{t('$bepro')}</span> {t('misc.from')} <span className="text-purple">{t('$oracles')}</span></>,
+      caption: <>{t('misc.get')} <span className="text-primary">{t('$bepro')}</span> {t('misc.from')} <span className="text-purple">{t('$oracles')}</span></>,
       body: t('my-oracles:actions.unlock.body', { amount: renderAmount }),
       params(from: string) {
         return { tokenAmount, from };
@@ -205,7 +205,7 @@ function OraclesActions(): JSX.Element {
             disabled={!isSettlerTokenApproved || !metaMaskWallet}
             label={t('my-oracles:fields.amount.label', { currency: getCurrentLabel() })}
             symbol={`${getCurrentLabel()}`}
-            classSymbol={`${getCurrentLabel() === t('$oracles') ? "text-purple" : "text-blue"}`}
+            classSymbol={`${getCurrentLabel() === t('$oracles') ? "text-purple" : "text-primary"}`}
             max={balance.bepro}
             error={!!error}
             value={tokenAmount}
@@ -219,7 +219,7 @@ function OraclesActions(): JSX.Element {
               <>
                 {formatNumberToCurrency(getMaxAmmount(), { maximumFractionDigits: 18 })} {getCurrentLabel()} Available
                 <span
-                    className={`caption-small ml-1 cursor-pointer text-uppercase ${`${getCurrentLabel() === t('$oracles') ? "text-purple" : "text-blue"}`}`}
+                    className={`caption-small ml-1 cursor-pointer text-uppercase ${`${getCurrentLabel() === t('$oracles') ? "text-purple" : "text-primary"}`}`}
                     onClick={setMaxAmmount}>
                     {t('misc.max')}
                 </span>
@@ -298,7 +298,7 @@ function OraclesActions(): JSX.Element {
                     className: "text-purple",
                   })}
                   {...(sentence.startsWith("bepro") && {
-                    className: "text-blue",
+                    className: "text-primary",
                   })}
                 >
                   {sentence.replace(/bepro|oracles|br/, "")}

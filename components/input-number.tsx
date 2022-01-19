@@ -7,7 +7,7 @@ import { InputNumber as InputNumberProps } from "types/input-number";
 export default function InputNumber({
   label = "",
   symbol = "",
-  classSymbol = "text-blue",
+  classSymbol = "text-primary",
   placeholder = "0",
   min = "0",
   helperText = "",

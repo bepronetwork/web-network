@@ -19,7 +19,7 @@ export default function usePage() {
           page: String(newPage)
         }
       },
-      router.pathname,
+      router.asPath,
       { shallow: false, scroll: false }
     )
   }

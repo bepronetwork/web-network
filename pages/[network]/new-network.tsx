@@ -1,20 +1,18 @@
-import React from 'react'
+import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
-import { GetServerSideProps } from 'next/types'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
-import PageHero from '@components/page-hero'
-import ListIssues from '@components/list-issues'
+import CustomContainer from '@components/custom-container'
 
-export default function PageDevelopers() {
+export default function NewNetwork() {
   return (
-    <>
-      <div>
-        <PageHero />
-
-        <ListIssues />
+    <div>
+      <CustomContainer>
+      <div className="mt-5 pt-4">
+        <h1>New Network</h1>
       </div>
-    </>
+    </CustomContainer>
+    </div>
   )
 }
 

@@ -11,6 +11,7 @@ import Translation from "./translation";
 import { useTranslation } from "next-i18next";
 import { intervalToDuration } from "date-fns";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import useNetwork from "@x-hooks/use-network";
 
 export default function IssueListItem({
   issue = null,
@@ -20,6 +21,7 @@ export default function IssueListItem({
   xClick?: () => void;
 }) {
   const router = useRouter();
+  const { network } = useNetwork()
   const { t } = useTranslation("bounty");
 
   function handleColorState(state: IssueState) {
@@ -28,10 +30,10 @@ export default function IssueListItem({
         return "bg-white-50";
       }
       case "open": {
-        return "bg-blue text-white";
+        return "bg-primary text-white";
       }
       case "in progress": {
-        return "bg-blue text-white";
+        return "bg-primary text-white";
       }
       case "canceled": {
         return "bg-dark-gray text-white";
@@ -49,7 +51,7 @@ export default function IssueListItem({
         return "bg-danger text-white";
       }
       default: {
-        return "blue";
+        return "primary";
       }
     }
   }
@@ -189,8 +191,8 @@ export default function IssueListItem({
         if (xClick) return xClick();
 
         router.push({
-          pathname: "/bounty",
-          query: { id: issue?.githubId, repoId: issue?.repository_id },
+          pathname: "/[network]/bounty",
+          query: { id: issue?.githubId, repoId: issue?.repository_id, network: network.name },
         });
       }}
     >
@@ -268,7 +270,7 @@ export default function IssueListItem({
         <div className="col-md-2 my-auto text-center">
           <span className="caption-large text-white text-opacity-1">
             {formatNumberToNScale(issue?.amount || 0)}{" "}
-            <label className="text-uppercase text-blue">
+            <label className="text-uppercase text-primary">
               <Translation label={`$bepro`} />
             </label>
           </span>

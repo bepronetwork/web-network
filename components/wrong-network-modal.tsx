@@ -86,7 +86,7 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
         <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
         {t('modals.wrong-network.please-connect')}  <span style={{color: networkMap[requiredNetwork.toLowerCase()]}}><span>{requiredNetwork}</span> {t('modals.wrong-network.network')}</span><br/> {t('modals.wrong-network.on-your-wallet')}
         </strong>
-        {isAddingNetwork && <Spinner className="text-blue align-self-center p-2 mt-1 mb-2" style={{width: `5rem`, height: `5rem`}} animation="border" /> || ``}
+        {isAddingNetwork && <Spinner className="text-primary align-self-center p-2 mt-1 mb-2" style={{width: `5rem`, height: `5rem`}} animation="border" /> || ``}
         <Button className='my-3' disabled={isButtonDisabled()} onClick={handleAddNetwork}>{t('modals.wrong-network.change-network')}</Button>
         <div className="small-info text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-1 pt-1">
         {t('misc.by-connecting')}{" "}

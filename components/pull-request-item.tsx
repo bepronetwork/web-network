@@ -10,6 +10,7 @@ import Translation from './translation'
 import PullRequestLabels, { PRLabel } from './pull-request-labels'
 import useOctokit from '@x-hooks/use-octokit'
 import { formatNumberToNScale } from '@helpers/formatNumber'
+import useNetwork from '@x-hooks/use-network'
 
 export default function PullRequestItem({
   repoId,
@@ -17,18 +18,26 @@ export default function PullRequestItem({
   pullRequest,
   repositoryPath
 }) {
+
   const router = useRouter()
   const { getCommitsOfPr, getCommit } = useOctokit()
   const [linesOfCode, setLinesOfCode] = useState(0)
+
+  const { getURLWithNetwork } = useNetwork()
+
   const {
-    state: { currentAddress, githubLogin }
+    state: { githubLogin }
   } = useContext(ApplicationContext)
 
   function handleReviewClick() {
-    router.push({
-      pathname: '/pull-request',
-      query: { repoId, issueId, prId: pullRequest.githubId, review: true }
-    })
+    router.push(
+      getURLWithNetwork('/pull-request', {
+        repoId,
+        issueId,
+        prId: pullRequest.githubId,
+        review: true
+      })
+    )
   }
 
   function canReview() {
@@ -73,17 +82,19 @@ export default function PullRequestItem({
       <div className="content-list-item proposal">
         <Link
           passHref
-          href={{
-            pathname: '/pull-request',
-            query: { repoId, issueId, prId: pullRequest.githubId }
-          }}
+          href={getURLWithNetwork('/pull-request', {
+            repoId,
+            issueId,
+            prId: pullRequest.githubId
+          })}
         >
           <a className="text-decoration-none text-white">
             <div className="row align-items-center pl-1 pr-1">
               <div className="col-6 d-flex align-items-center caption-small text-uppercase text-white">
                 <Avatar userLogin={pullRequest?.githubLogin} />
-                <span className="ml-2 me-1">
-                  #{pullRequest?.githubId} <Translation label={'misc.by'} /> @{pullRequest?.githubLogin}
+                <span className="ml-2">
+                  #{pullRequest?.githubId} <Translation label={'misc.by'} /> @
+                  {pullRequest?.githubLogin}
                 </span>
                 <div className='ml-3 d-flex'>
                   {label && <PullRequestLabels label={label}/>}
@@ -95,8 +106,11 @@ export default function PullRequestItem({
               </div>
 
               <div className="col-2 caption-small text-uppercase text-white d-flex justify-content-center">
-                {pullRequest?.comments?.length || 0}
-                <span className="text-gray ml-1"><Translation ns="pull-request" label="review" params={{ count: pullRequest?.comments?.length || 0 }} /></span>
+                <Translation
+                  ns="pull-request"
+                  label="review"
+                  params={{ count: pullRequest?.comments?.length || 0 }}
+                />
               </div>
 
               <div className="col-2 caption-small text-uppercase text-gray d-flex justify-content-start">
@@ -113,7 +127,9 @@ export default function PullRequestItem({
                   }}
                 >
                   {!canReview() && <LockedIcon className="me-2" />}
-                  <span><Translation label="actions.review" /></span>
+                  <span>
+                    <Translation label="actions.review" />
+                  </span>
                 </Button>
               </div>
             </div>

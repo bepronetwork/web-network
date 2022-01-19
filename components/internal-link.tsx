@@ -1,8 +1,7 @@
-import { ReactElement, ReactNode } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { UrlObject } from 'url'
-
+import { useRouter } from 'next/router'
+import { ReactElement, ReactNode } from 'react'
 interface InternalLinkProps {
   href: string | UrlObject
   label?: string | number | ReactElement
@@ -29,7 +28,7 @@ export default function InternalLink({
   const { asPath } = useRouter()
 
   function getClasses(): string {
-    const isActive = active || asPath === props.href
+    const isActive = active || asPath.endsWith(String(props.href))
 
     let classes = `${className}`
 

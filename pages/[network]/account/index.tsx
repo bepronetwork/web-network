@@ -91,7 +91,7 @@ export default function MyIssues() {
                     <span className="text-white">
                       {formatNumberToCurrency(pendingIssue?.amount)}
                     </span>{' '}
-                    <span className="text-blue">{t('$bepro')}</span>
+                    <span className="text-primary">{t('$bepro')}</span>
                   </h4>
                 </div>
               </Modal>
