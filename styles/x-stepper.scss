@@ -1,0 +1,19 @@
+.stepper {
+  .step + .step {
+   margin-top: 20px; 
+  }
+
+  .step {
+    background-color: $bg-shadow;
+
+    .progress {
+      padding-left: 0;
+      padding-right: 0;
+      height: 10px;
+
+      &, .progress-bar {
+        border-radius: 10px;
+      }
+    }
+  }
+}
