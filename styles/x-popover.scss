@@ -10,7 +10,7 @@
 
     div:not(.stats) {
       font-family: 'Inter', sans-serif;
-      color: $gray;
+      color: var(--bs-gray);
       font-size: 12px;
       line-height: 140%;
       &:hover {

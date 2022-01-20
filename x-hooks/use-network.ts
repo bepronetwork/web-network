@@ -19,7 +19,7 @@ export default function useNetwork() {
   const { dispatch } = useContext(ApplicationContext)
 
   useEffect(() => {
-    handleNetworkChange()
+    if (router.query.network) handleNetworkChange()
   }, [router.query.network])
 
   function handleNetworkChange(): void {
@@ -37,6 +37,11 @@ export default function useNetwork() {
           localStorage.setItem(newNetwork, JSON.stringify(data))
 
           setNetwork(data)
+        })
+        .catch(() => {
+          router.push({
+            pathname: '/networks'
+          })
         })
         .finally(() => {
           dispatch(changeLoadState(false))

@@ -135,7 +135,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
           <a
             href="https://www.bepro.network/terms-and-conditions"
             target="_blank"
-            className="text-decoration-none"
+            className="text-decoration-none text-primary"
           >
             {t('misc.terms-and-conditions')}
           </a>{" "}
@@ -143,7 +143,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
           <a
             href="https://www.bepro.network/privacy"
             target="_blank"
-            className="text-decoration-none"
+            className="text-decoration-none text-primary"
           >
             {t('misc.privacy-policy')}
           </a>

@@ -25,10 +25,10 @@ export default function InternalLink({
   activeClass,
   ...props
 }: InternalLinkProps) {
-  const { asPath } = useRouter()
+  const { asPath, pathname } = useRouter()
 
   function getClasses(): string {
-    const isActive = active || asPath.endsWith(String(props.href))
+    const isActive = active || asPath.endsWith(String(props.href)) || pathname === (props.href as UrlObject).pathname
 
     let classes = `${className}`
 

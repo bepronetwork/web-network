@@ -11,6 +11,7 @@
 @import "x-button";
 @import "x-popover";
 @import "x-tooltip";
+@import "x-stepper";
 
 //bootstrap-overrides
 ul,
@@ -115,7 +116,7 @@ li {
     }
     &__indicator {
       font-size: 12px;
-      color: $gray;
+      color: var(--bs-gray);
     }
     &__single-value {
       @extend .p-small;
@@ -226,7 +227,7 @@ body {
 }
 
 .is-invalid {
-  border: 2px solid $danger;
+  border: 2px solid var(--bs-danger);
 }
 
 .trans {
@@ -322,7 +323,7 @@ body {
 
 .subnav-item {
   text-decoration: none;
-  color: $gray;
+  color: var(--bs-gray);
   opacity: 0.7;
   &.active, &:hover {
     color: $white;
@@ -473,12 +474,12 @@ body {
 }
 
 label {
-  color: $gray;
+  color: var(--bs-gray);
 }
 .form-control {
   background-color: $black;
   border: 1px solid $black;
-  color: $gray;
+  color: var(--bs-gray);
   &:disabled, &[readonly] {
     background-color: $black;
     opacity: 0.4;
@@ -488,7 +489,7 @@ label {
   .input-group-text {
     background-color: $black;
     border: 1px solid $black;
-    color: $gray;
+    color: var(--bs-gray);
   }
   input[type=number]::-webkit-inner-spin-button,
   input[type=number]::-webkit-outer-spin-button {
@@ -615,16 +616,16 @@ label {
 
 .proposal, .proposal-progress-bar {
   .text-danger {
-    color: rgba($danger, 1) !important;
+    color: rgba(var(--bs-success-rgb), 1) !important;
   }
 
   .text-success {
-    color: rgba($success, 1);
+    color: rgba(var(--bs-success-rgb), 1);
   }
 
   .btn-success {
-    background-color: rgba($success, 0.3);
-    color: $success !important;
+    background-color: rgba(var(--bs-success-rgb), 0.3);
+    color: var(--bs-success) !important;
   }
 }
 
@@ -660,7 +661,7 @@ label {
   &.bg-danger {
     background-color: #895151 !important;
     .progress-bar {
-      background-color: rgba($danger, 1) !important;
+      background-color: rgba(var(--bs-success-rgb), 1) !important;
     }
 
     .empty-dot {
@@ -671,7 +672,7 @@ label {
   &.bg-success {
     background-color: #4c8473 !important;
     .progress-bar {
-      background-color: rgba($success, 1) !important;
+      background-color: rgba(var(--bs-success-rgb), 1) !important;
       .empty-dot {
         background-color: #4c8473 !important;
       }
@@ -820,7 +821,7 @@ label {
     &.header {
       p {
         font-size: 14px;;
-        color: $gray;
+        color: var(--bs-gray);
       }
     }
   }
@@ -945,7 +946,7 @@ $c_props: ('m': 'margin') !default;
   }
 
   path {
-    fill: map-get($theme-colors, 'primary')
+    fill: var(--bs-primary);
   }
 
   svg {
@@ -992,7 +993,7 @@ $c_props: ('m': 'margin') !default;
 
 .list-group-item-shadow {
   background-color: $black;
-  color: $gray;
+  color: var(--bs-gray);
   border-bottom-color: $dark-gray;
 
   &:last-child {
@@ -1049,7 +1050,7 @@ a.row-button svg {
 }
 
 .text-danger {
-  color: rgba($danger, 1) !important;
+  color: rgba(var(--bs-danger-rgb), 1) !important;
 }
 
 .issue-tabs {
@@ -1185,7 +1186,7 @@ textarea.form-control {
   }
 
   .react-select-container, .react-select__control, .react-select__menu {
-    color: $gray;
+    color: var(--bs-gray);
     min-width: 170px !important;
   }
 
@@ -1239,4 +1240,40 @@ textarea.form-control {
       color: $value !important;
     }
   }
+}
+
+.image-uploader {
+  height: 120px;
+  width: 120px;
+
+  color: $ligth-gray;
+  cursor: pointer;
+
+  svg {
+    width: 14px;
+    height: 14px;
+
+    path {
+      fill: $ligth-gray;
+    }
+  }
+}
+
+.custom-color-input {
+  width: 38px;
+  height: 38px;
+
+  border-radius: 38px;
+  border: none;
+
+  overflow: hidden;
+}
+
+input[type="color"] {
+  padding: 0;
+  width: 150%;
+  height: 150%;
+  margin: -25%;
+
+  border: none;
 }
