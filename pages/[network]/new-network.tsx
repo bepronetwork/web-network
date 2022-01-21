@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
 import { ProgressBar } from 'react-bootstrap'
@@ -10,7 +11,19 @@ import CustomContainer from '@components/custom-container'
 import ConnectWalletButton from '@components/connect-wallet-button'
 import ColorInput from '@components/color-input'
 
+import { ThemeColors } from '@interfaces/network'
+
+import useNetwork from '@x-hooks/use-network'
+import GithubInfo from '@components/github-info'
+
 export default function NewNetwork() {
+  const { network } = useNetwork()
+  const [colors, setColors] = useState<ThemeColors>()
+
+  useEffect(() => {
+    if (!colors && network) setColors(network.colors)
+  }, [network])
+
   return (
     <div>
       <ConnectWalletButton asModal={true} />
@@ -20,7 +33,9 @@ export default function NewNetwork() {
           <Stepper>
             <LockBepro />
 
-            <NetworkInformation />
+            <NetworkInformation colors={colors} setColors={setColors} />
+
+            <SelectRepositories />
           </Stepper>
         </div>
       </CustomContainer>
@@ -83,7 +98,7 @@ function LockBepro() {
   )
 }
 
-function NetworkInformation() {
+function NetworkInformation({ colors, setColors }) {
   return (
     <Step title="Network Information" index={2} activeStep={2}>
       <div className="d-flex gap-20 mb-5 align-items-center">
@@ -161,39 +176,41 @@ function NetworkInformation() {
           </label>
 
           <div className="row justify-space-between">
-            <div className="col">
-              <ColorInput />
-            </div>
-
-            <div className="col">
-              <ColorInput />
-            </div>
-
-            <div className="col">
-              <ColorInput />
-            </div>
-
-            <div className="col">
-              <ColorInput />
-            </div>
-
-            <div className="col">
-              <ColorInput />
-            </div>
-
-            <div className="col">
-              <ColorInput />
-            </div>
-
-            <div className="col">
-              <ColorInput />
-            </div>
-
-            <div className="col">
-              <ColorInput />
-            </div>
+            {colors &&
+              Object.entries(colors).map((color) => (
+                <div className="col">
+                  <ColorInput label={color[0]} value={color[1]} />
+                </div>
+              ))}
           </div>
         </div>
+      </div>
+    </Step>
+  )
+}
+
+function SelectRepositories() {
+  return (
+    <Step title="Select Repositories " index={3} activeStep={3}>
+      <div className="row mb-4 justify-content-start repositories-list">
+        <GithubInfo label="repository-1" variant="repository" parent="list" />
+        <GithubInfo label="bigger-name-repository-1" variant="repository" parent="list" />
+        <GithubInfo label="repository-1" variant="repository" parent="list" />
+        <GithubInfo label="reposry-1" variant="repository" parent="list" />
+        <GithubInfo label="another-repository-1" variant="repository" parent="list" />
+        <GithubInfo label="repository-1" variant="repository" parent="list" />
+        <GithubInfo label="repository-1" variant="repository" parent="list" />
+        <GithubInfo label="reposczxcxitory-1" variant="repository" parent="list" />
+        <GithubInfo label="repositoczxcry-1" variant="repository" parent="list" />
+        <GithubInfo label="repository-1" variant="repository" parent="list" />
+        <GithubInfo label="repository-1" variant="repository" parent="list" />
+        <GithubInfo label="repositoryzxcz-1" variant="repository" parent="list" />
+        <GithubInfo label="repository-1czcx" variant="repository" parent="list" />
+        <GithubInfo label="repository-1" variant="repository" parent="list" />
+        <GithubInfo label="repository-1" variant="repository" parent="list" />
+        <GithubInfo label="repository-1" variant="repository" parent="list" />
+        <GithubInfo label="repositoczcxry-1" variant="repository" parent="list" />
+        <GithubInfo label="rep-1" variant="repository" parent="list" />
       </div>
     </Step>
   )
