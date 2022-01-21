@@ -21,6 +21,7 @@ import {GetServerSideProps} from 'next';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
+import MakeBountySeo from '@components/make-bounty-seo';
 
 export default function ParityPage() {
   const {state: {currentAddress, balance,}, dispatch} = useContext(ApplicationContext);
@@ -401,6 +402,9 @@ export default function ParityPage() {
       </div>
       <div className="div mt-3 mb-4 content-wrapper">
         {formMaker.map(renderFormItems)}
+      </div>
+      <div className="content-wrapper mt-3">
+        <MakeBountySeo/>
       </div>
       <div className="content-wrapper mt-3">
         <div className="row">

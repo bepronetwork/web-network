@@ -71,7 +71,23 @@ export default function useApi() {
                  .then(({data}) => data)
                  .catch(() => null);
   }
+  
+  async function getSeoCard(scIssueId?: string, responseArray?: boolean) {
+    let options = {};
+    
+    if(responseArray) options = {responseType: 'arraybuffer'}
 
+    return client.get(`/seo/${scIssueId}`, options)
+                 .then(({data}) => data)
+                 .catch(() => null);
+  }
+
+
+  async function updateIssue(scId: string, body = {}) {
+    return client.put(`/issue/${scId}`, {...body})
+                 .then(({data}) => data)
+                 .catch(_ => false)
+  }
 
   async function patchIssueWithScId(repoId, githubId, scId) {
     return client.patch(`/issue`, {repoId, githubId, scId})
@@ -306,6 +322,8 @@ export default function useApi() {
     getPullRequestIssue,
     createIssue,
     moveIssueToOpen,
+    getSeoCard,
+    updateIssue,
     patchIssueWithScId,
     waitForMerge,
     processMergeProposal,

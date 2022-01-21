@@ -4,25 +4,28 @@ import {create} from 'ipfs-http-client';
 class IpfsStorage {
   
   private ipfs;
+  public baseUrl;
 
   constructor() {
 
-    if(!process.env.NEXT_IPFS_PROJECT_ID || !process.env.NEXT_IPFS_PROJECT_SECRET){
+    if(!process.env.NEXT_PUBLIC_IPFS_PROJECT_ID || !process.env.NEXT_PUBLIC_IPFS_PROJECT_SECRET){
       throw new Error("Please provide a valid IPFS Project Env, you can find one at infura.io")
     }
 
-    const auth = 'Basic ' + Buffer.from(process.env.NEXT_IPFS_PROJECT_ID + ':' + process.env.NEXT_IPFS_PROJECT_SECRET).toString('base64')
+    const auth = 'Basic ' + Buffer.from(process.env.NEXT_PUBLIC_IPFS_PROJECT_ID + ':' + process.env.NEXT_PUBLIC_IPFS_PROJECT_SECRET).toString('base64')
     
     const headers = {
         authorization: auth
     }
 
     this.ipfs = create({
-      host: process.env.NEXT_IPFS_HOST|| 'ipfs.infura.io',
-      port: Number(process.env.NEXT_IPFS_PORT)||5001,
-      protocol:  process.env.NEXT_IPFS_PROTOCOL|| 'https',
+      host: process.env.NEXT_PUBLIC_IPFS_HOST|| 'ipfs.infura.io',
+      port: Number(process.env.NEXT_PUBLIC_IPFS_PORT)||5001,
+      protocol:  process.env.NEXT_PUBLIC_IPFS_PROTOCOL|| 'https',
       headers
     });
+
+    this.baseUrl = process.env.NEXT_PUBLIC_IPFS_BASE || 'https://ipfs.infura.io/ipfs';
   }
 
   async add({data}):Promise<{path:string, cid:string, size: string}>{

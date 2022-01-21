@@ -1,7 +1,6 @@
 import models from '@db/models';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {generateCard} from '@helpers/seo/create-card-bounty'
-import IpfsStorage from '@services/ipfs-service';
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {ids: [repoId, ghId]} = req.query;
@@ -35,16 +34,14 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     proposal: issue.mergeProposals?.length || 0,
   })
 
-  const storage = new IpfsStorage()
   var img = Buffer.from(card.buffer, 'base64');
-  const {path} = await storage.add({data: img})
-  const url = `${process.env.NEXT_PUBLIC_IPFS_BASE}/${path}`
 
-  await issue.update({
-    seoImage: url,
-  })
+  res.writeHead(200, {
+    'Content-Type': 'image/png',
+    'Content-Length': img.length
+  });
 
-  return res.status(200).json(url);
+  return res.status(200).end(img); 
 }
 
 export default async function GetIssues(req: NextApiRequest, res: NextApiResponse) {

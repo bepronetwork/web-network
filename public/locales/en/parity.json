@@ -8,10 +8,14 @@
   "change-redeem-time": "Change redeem time to 1min",
   "change-disputable-time": "Change disputable time to 1min",
   "select-a-repository": "Select a repository to add it to the microservice list",
+  "create-bountys-seo": "Create bountys SEO",
+  "warning-bountys-seo": "Do not refresh the page while uploading seo!",
+  "finished-bountys-seo": "Seos concluded",
   "will=cost": "Will cost",
   "create-bounties": "Create Bounties",
   "list-bounties": "List Bounties",
   "load-repos": "Load repos",
+  "make-seo": "Make Seo",
   "fields": {
     "github-token": {
       "label": "Github Token",
@@ -20,6 +24,12 @@
     "github-login": {
       "label": "Github Login",
       "placeholder": "Login handle of the owner of the token"
+    },
+    "make-seo": {
+      "current": "{{bounty}} current",
+      "last": "{{bounty}} last",
+      "bountys": "{{current}}/{{total}} bountys",
+      "pages": "{{current}}/{{total}} pages"
     },
     "contract-address": {
       "label": "New contract address",
