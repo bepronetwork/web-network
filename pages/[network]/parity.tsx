@@ -10,7 +10,7 @@ import {formatNumberToString} from '@helpers/formatNumber';
 import {changeLoadState} from '@reducers/change-load-state';
 import router from 'next/router';
 import {toastError, toastInfo} from '@reducers/add-toast';
-import {SETTLER_ADDRESS, TRANSACTION_ADDRESS} from '../env';
+import {SETTLER_ADDRESS, TRANSACTION_ADDRESS} from '../../env';
 import {ReposList} from '@interfaces/repos-list';
 import {ListGroup} from 'react-bootstrap';
 import ConnectGithub from '@components/connect-github';

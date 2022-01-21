@@ -209,6 +209,7 @@ body {
   padding: 2px 3px;
   border: 1px solid;
   border-radius: 3px;
+  width: max-content;
 
   &.bg-30-hover:hover {
     background-color: rgba(var(--bs-primary-rgb), .3) !important;
@@ -1276,4 +1277,8 @@ input[type="color"] {
   margin: -25%;
 
   border: none;
+}
+
+.repositories-list {
+  gap: 10px;
 }
