@@ -28,7 +28,8 @@
       "@reducers/*": ["contexts/reducers/*"],
       "@styles/*": ["styles/*"],
       "@x-hooks/*": ["x-hooks/*"]
-    }
+    },
+    "incremental": true
   },
   "exclude": ["node_modules"],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
