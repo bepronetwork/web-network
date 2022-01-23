@@ -211,7 +211,7 @@ body {
   border-radius: 3px;
   width: max-content;
 
-  &.bg-30-hover:hover {
+  &.bg-30, &.bg-30-hover:hover {
     background-color: rgba(var(--bs-primary-rgb), .3) !important;
   } 
 }

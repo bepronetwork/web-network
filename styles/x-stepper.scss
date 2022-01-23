@@ -6,6 +6,10 @@
   .step {
     background-color: $bg-shadow;
 
+    svg {
+      color: var(--bs-success);
+    }
+
     .progress {
       padding-left: 0;
       padding-right: 0;
