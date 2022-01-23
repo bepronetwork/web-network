@@ -9,6 +9,7 @@ export interface IStep {
   index: number
   completed?: boolean
   activeStep: number
+  validated?: boolean
   children: ReactNode | ReactNode[]
   handleClick?: () => void
 }

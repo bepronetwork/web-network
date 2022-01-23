@@ -1,28 +1,171 @@
-import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
 import { ProgressBar } from 'react-bootstrap'
+import { useContext, useEffect, useState } from 'react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 import Step from '@components/step'
 import Stepper from '@components/stepper'
+import ColorInput from '@components/color-input'
+import GithubInfo from '@components/github-info'
 import ImageUploader from '@components/image-uploader'
+import ConnectGithub from '@components/connect-github'
 import CustomContainer from '@components/custom-container'
 import ConnectWalletButton from '@components/connect-wallet-button'
-import ColorInput from '@components/color-input'
 
-import { ThemeColors } from '@interfaces/network'
+import { ApplicationContext } from '@contexts/application'
+
+import { getQueryableText } from '@helpers/string'
 
 import useNetwork from '@x-hooks/use-network'
-import GithubInfo from '@components/github-info'
+import useOctokit from '@x-hooks/use-octokit'
 
 export default function NewNetwork() {
   const { network } = useNetwork()
-  const [colors, setColors] = useState<ThemeColors>()
+  const { listUserRepos } = useOctokit()
+
+  const {
+    state: { githubLogin }
+  } = useContext(ApplicationContext)
+
+  const [currentStep, setCurrentStep] = useState(1)
+  const [steps, setSteps] = useState({
+    lock: {
+      validated: true
+    },
+    network: {
+      validated: false,
+      data: {
+        logoIcon: {
+          preview: '',
+          raw: ''
+        },
+        fullLogo: {
+          preview: '',
+          raw: ''
+        },
+        displayName: '',
+        networkDescription: '',
+        colors: {}
+      }
+    },
+    repositories: {
+      validated: false,
+      data: []
+    }
+  })
+
+  function changeColor(newColor) {
+    const tmpSteps = Object.assign({}, steps)
+
+    tmpSteps.network.data.colors[newColor.label] = newColor.value
+
+    setSteps(tmpSteps)
+  }
+
+  function handleNetworkDataChange(newData) {
+    const tmpSteps = Object.assign({}, steps)
+
+    tmpSteps.network.data[newData.label] = newData.value
+
+    setSteps(tmpSteps)
+  }
+
+  function handleCheckRepository(repositoryName) {
+    const tmpSteps = Object.assign({}, steps)
+
+    const repositoryIndex = tmpSteps.repositories.data.findIndex(
+      (repo) => repo.name === repositoryName
+    )
+
+    tmpSteps.repositories.data[repositoryIndex].checked =
+      !tmpSteps.repositories.data[repositoryIndex].checked
+
+    setSteps(tmpSteps)
+  }
+
+  function handleChangeStep(stepToGo: number) {
+    const stepsNames = {
+      1: 'lock',
+      2: 'network',
+      3: 'repositories'
+    }
+
+    let canGo = false
+
+    if (stepToGo !== currentStep) {
+      if (stepToGo < currentStep) canGo = true
+      else if (steps[stepsNames[stepToGo-1]].validated) canGo = true
+    }
+
+    if (canGo) setCurrentStep(stepToGo)
+  }
 
   useEffect(() => {
-    if (!colors && network) setColors(network.colors)
+    if (!steps.network.data.colors && network) {
+      const tmpSteps = Object.assign({}, steps)
+
+      tmpSteps.network.data.colors = network.colors
+
+      setSteps(tmpSteps)
+    }
   }, [network])
+
+  useEffect(() => {
+    if (githubLogin)
+      listUserRepos(githubLogin).then(({ data }) => {
+        const repositories = data.items.map((repo) => ({
+          checked: false,
+          name: repo.name,
+          fullName: repo.full_name
+        }))
+
+        const tmpSteps = Object.assign({}, steps)
+
+        tmpSteps.repositories.data = repositories
+
+        setSteps(tmpSteps)
+      })
+  }, [githubLogin])
+
+  useEffect(() => {
+    // Validate Network informations
+    const networkData = steps.network.data
+
+    const networkValidated = [
+      networkData.fullLogo.preview !== '',
+      networkData.logoIcon.preview !== '',
+      networkData.displayName.trim() !== '',
+      networkData.networkDescription.trim() !== '',
+      new Set(
+        Object.entries(networkData.colors).map((color) =>
+          String(color[1]).toUpperCase()
+        )
+      ).size === Object.keys(networkData.colors).length // All colors should be different
+    ].every((condition) => condition === true)
+
+    if (networkValidated !== steps.network.validated) {
+      const tmpSteps = Object.assign({}, steps)
+
+      tmpSteps.network.validated = networkValidated
+
+      setSteps(tmpSteps)
+    }
+
+    // Validate Repositories
+    const repositoriesData = steps.repositories.data
+    const repositoriesValidated = repositoriesData.some(
+      (repository) => repository.checked
+    )
+
+    if (repositoriesValidated !== steps.repositories.validated) {
+      const tmpSteps = Object.assign({}, steps)
+
+      tmpSteps.repositories.validated = repositoriesValidated
+
+      setSteps(tmpSteps)
+    }
+  }, [steps])
 
   return (
     <div>
@@ -31,11 +174,32 @@ export default function NewNetwork() {
       <CustomContainer>
         <div className="mt-5 pt-5">
           <Stepper>
-            <LockBepro />
+            <LockBepro
+              validated={steps.lock.validated}
+              step={1}
+              currentStep={currentStep}
+              handleClick={() => handleChangeStep(1)}
+            />
 
-            <NetworkInformation colors={colors} setColors={setColors} />
+            <NetworkInformation
+              data={steps.network.data}
+              setColor={changeColor}
+              changedDataHandler={handleNetworkDataChange}
+              validated={steps.network.validated}
+              step={2}
+              currentStep={currentStep}
+              handleClick={() => handleChangeStep(2)}
+            />
 
-            <SelectRepositories />
+            <SelectRepositories
+              repositories={steps.repositories.data}
+              onClick={handleCheckRepository}
+              githubLogin={githubLogin}
+              validated={steps.repositories.validated}
+              step={3}
+              currentStep={currentStep}
+              handleClick={() => handleChangeStep(3)}
+            />
           </Stepper>
         </div>
       </CustomContainer>
@@ -57,9 +221,15 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 }
 
 // Create Network flow steps
-function LockBepro() {
+function LockBepro({ validated, step, currentStep, handleClick }) {
   return (
-    <Step title="Network " index={1} activeStep={1}>
+    <Step
+      title="Network "
+      index={step}
+      activeStep={currentStep}
+      validated={validated}
+      handleClick={handleClick}
+    >
       <div className="row mb-4">
         <span className="caption-small text-gray">
           To create a network you will nedd to lock 1M $BEPRO
@@ -98,12 +268,31 @@ function LockBepro() {
   )
 }
 
-function NetworkInformation({ colors, setColors }) {
+function NetworkInformation({
+  data,
+  setColor,
+  changedDataHandler,
+  validated,
+  step,
+  currentStep,
+  handleClick
+}) {
+  function showTextOrDefault(text: string, defaultText: string) {
+    return text.trim() === '' ? defaultText : text
+  }
+
   return (
-    <Step title="Network Information" index={2} activeStep={2}>
+    <Step
+      title="Network Information"
+      index={step}
+      activeStep={currentStep}
+      validated={validated}
+      handleClick={handleClick}
+    >
       <div className="d-flex gap-20 mb-5 align-items-center">
         <ImageUploader
-          name="logo-icon"
+          name="logoIcon"
+          onChange={changedDataHandler}
           description={
             <>
               upload <br /> logo icon
@@ -112,7 +301,8 @@ function NetworkInformation({ colors, setColors }) {
         />
 
         <ImageUploader
-          name="full-logo"
+          name="fullLogo"
+          onChange={changedDataHandler}
           description={
             <>
               upload <br /> full logo
@@ -121,13 +311,20 @@ function NetworkInformation({ colors, setColors }) {
         />
 
         <div className="col ml-2">
-          <p className="h3 text-white mb-3">Network name</p>
+          <p className="h3 text-white mb-3">
+            {showTextOrDefault(data.displayName, 'Network name')}
+          </p>
           <p className="caption-small text-ligth-gray mb-2">
             temporary query url
           </p>
           <p className="caption-small text-gray">
             development.bepro.network/
-            <span className="text-primary">network-name</span>
+            <span className="text-primary">
+              {showTextOrDefault(
+                getQueryableText(data.displayName),
+                'network-name'
+              )}
+            </span>
           </p>
         </div>
       </div>
@@ -144,6 +341,13 @@ function NetworkInformation({ colors, setColors }) {
             id="display-name"
             placeholder="Network Name"
             className="form-control"
+            value={data.displayName}
+            onChange={(e) =>
+              changedDataHandler({
+                label: 'displayName',
+                value: e.target.value
+              })
+            }
           />
 
           <p className="p-small text-gray opacity-75 mt-2 mb-0">
@@ -165,6 +369,13 @@ function NetworkInformation({ colors, setColors }) {
             cols={30}
             rows={5}
             className="form-control"
+            value={data.networkDescription}
+            onChange={(e) =>
+              changedDataHandler({
+                label: 'networkDescription',
+                value: e.target.value
+              })
+            }
           ></textarea>
         </div>
       </div>
@@ -176,10 +387,14 @@ function NetworkInformation({ colors, setColors }) {
           </label>
 
           <div className="row justify-space-between">
-            {colors &&
-              Object.entries(colors).map((color) => (
+            {data.colors &&
+              Object.entries(data.colors).map((color) => (
                 <div className="col">
-                  <ColorInput label={color[0]} value={color[1]} />
+                  <ColorInput
+                    label={color[0]}
+                    value={color[1]}
+                    onChange={setColor}
+                  />
                 </div>
               ))}
           </div>
@@ -189,29 +404,40 @@ function NetworkInformation({ colors, setColors }) {
   )
 }
 
-function SelectRepositories() {
+function SelectRepositories({
+  repositories,
+  onClick,
+  githubLogin,
+  validated,
+  step,
+  currentStep,
+  handleClick
+}) {
   return (
-    <Step title="Select Repositories " index={3} activeStep={3}>
-      <div className="row mb-4 justify-content-start repositories-list">
-        <GithubInfo label="repository-1" variant="repository" parent="list" />
-        <GithubInfo label="bigger-name-repository-1" variant="repository" parent="list" />
-        <GithubInfo label="repository-1" variant="repository" parent="list" />
-        <GithubInfo label="reposry-1" variant="repository" parent="list" />
-        <GithubInfo label="another-repository-1" variant="repository" parent="list" />
-        <GithubInfo label="repository-1" variant="repository" parent="list" />
-        <GithubInfo label="repository-1" variant="repository" parent="list" />
-        <GithubInfo label="reposczxcxitory-1" variant="repository" parent="list" />
-        <GithubInfo label="repositoczxcry-1" variant="repository" parent="list" />
-        <GithubInfo label="repository-1" variant="repository" parent="list" />
-        <GithubInfo label="repository-1" variant="repository" parent="list" />
-        <GithubInfo label="repositoryzxcz-1" variant="repository" parent="list" />
-        <GithubInfo label="repository-1czcx" variant="repository" parent="list" />
-        <GithubInfo label="repository-1" variant="repository" parent="list" />
-        <GithubInfo label="repository-1" variant="repository" parent="list" />
-        <GithubInfo label="repository-1" variant="repository" parent="list" />
-        <GithubInfo label="repositoczcxry-1" variant="repository" parent="list" />
-        <GithubInfo label="rep-1" variant="repository" parent="list" />
-      </div>
+    <Step
+      title="Select Repositories "
+      index={step}
+      activeStep={currentStep}
+      validated={validated}
+      handleClick={handleClick}
+    >
+      {(githubLogin && (
+        <div className="row mb-4 justify-content-start repositories-list">
+          {repositories.map((repository) => (
+            <GithubInfo
+              label={repository.name}
+              active={repository.checked}
+              onClick={() => onClick(repository.name)}
+              variant="repository"
+              parent="list"
+            />
+          ))}
+        </div>
+      )) || (
+        <div className="pt-3">
+          <ConnectGithub />
+        </div>
+      )}
     </Step>
   )
 }

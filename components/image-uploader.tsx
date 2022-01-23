@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import UploadIcon from '@assets/icons/upload'
 
-export default function ImageUploader({ name, description }) {
+export default function ImageUploader({ name, description, onChange }) {
   const [image, setImage] = useState({ preview: '', raw: '' })
 
   function handleChange(event) {
@@ -13,7 +13,9 @@ export default function ImageUploader({ name, description }) {
       })
   }
 
-  function handleUpload() {}
+  useEffect(() => {
+    onChange({label: name, value: image})
+  }, [image])
 
   return (
     <div>

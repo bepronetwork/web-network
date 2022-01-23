@@ -21,7 +21,7 @@ export default function ConnectGithub() {
     <div className="container-fluid">
       <div className="row mtn-4 mb-2">
         <div className="col text-center px-0">
-          <div className="content-wrapper py-3 rounded-0 bg-dark-gray">
+          <div className="content-wrapper py-3 border-radius-8 bg-dark-gray">
             <GithubImage/> <span className="caption-small mx-3">{t('actions.connect-github')}</span>
               <button className="btn btn-primary text-uppercase" onClick={() => clickSignIn()}>{t('actions.connect')}</button>
           </div>

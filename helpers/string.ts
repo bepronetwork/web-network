@@ -36,5 +36,17 @@ export const hexadecimalToRGB = (hexadecimal: string): string => {
     )
     .substring(1)
     .match(/.{2}/g)
-    .map((x) => parseInt(x, 16)).join(',')
+    .map((x) => parseInt(x, 16))
+    .join(',')
+}
+
+export const getQueryableText = (text: string): string => {
+  return text
+    .toLowerCase()
+    .trimStart()
+    .trimEnd()
+    .replaceAll(' ', '-')
+    .replaceAll('--', '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
 }
