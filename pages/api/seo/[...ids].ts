@@ -35,16 +35,15 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     proposal: issue.mergeProposals?.length || 0,
   })
 
-  const storage = new IpfsStorage()
   var img = Buffer.from(card.buffer, 'base64');
-  const {path} = await storage.add({data: img})
-  const url = `${process.env.NEXT_PUBLIC_IPFS_BASE}/${path}`
+  const {hash} = await IpfsStorage.add(img)
+  const seoImage = `${process.env.NEXT_PUBLIC_IPFS_BASE}/${hash}`
 
   await issue.update({
-    seoImage: url,
+    seoImage,
   })
 
-  return res.status(200).json(url);
+  return res.status(200).json({seoImage});
 }
 
 export default async function GetIssues(req: NextApiRequest, res: NextApiResponse) {

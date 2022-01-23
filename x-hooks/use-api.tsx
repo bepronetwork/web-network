@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {IssueData, pullRequest} from '@interfaces/issue-data';
 import {ProposalData, User} from '@interfaces/api-response';
 import {ReposList} from '@interfaces/repos-list';
