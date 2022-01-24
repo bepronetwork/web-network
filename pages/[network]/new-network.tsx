@@ -16,6 +16,9 @@ import ConnectWalletButton from '@components/connect-wallet-button'
 import { ApplicationContext } from '@contexts/application'
 
 import { getQueryableText } from '@helpers/string'
+import { formatNumberToCurrency } from '@helpers/formatNumber'
+
+import { BeproService } from '@services/bepro-service'
 
 import useNetwork from '@x-hooks/use-network'
 import useOctokit from '@x-hooks/use-octokit'
@@ -25,10 +28,11 @@ export default function NewNetwork() {
   const { listUserRepos } = useOctokit()
 
   const {
-    state: { githubLogin }
+    state: { currentAddress, githubLogin, balance, oracles }
   } = useContext(ApplicationContext)
 
   const [currentStep, setCurrentStep] = useState(1)
+  const [tokensLocked, setTokensLocked] = useState(0)
   const [steps, setSteps] = useState({
     lock: {
       validated: true
@@ -95,7 +99,7 @@ export default function NewNetwork() {
 
     if (stepToGo !== currentStep) {
       if (stepToGo < currentStep) canGo = true
-      else if (steps[stepsNames[stepToGo-1]].validated) canGo = true
+      else if (steps[stepsNames[stepToGo - 1]].validated) canGo = true
     }
 
     if (canGo) setCurrentStep(stepToGo)
@@ -127,6 +131,10 @@ export default function NewNetwork() {
         setSteps(tmpSteps)
       })
   }, [githubLogin])
+
+  useEffect(() => {
+    //BeproService.getTokensLockedByAddress(currentAddress).then(console.log)
+  }, [currentAddress])
 
   useEffect(() => {
     // Validate Network informations
@@ -179,6 +187,12 @@ export default function NewNetwork() {
               step={1}
               currentStep={currentStep}
               handleClick={() => handleChangeStep(1)}
+              balance={{
+                beproAvailable: balance.bepro,
+                oraclesAvailable:
+                  +oracles.tokensLocked - oracles.delegatedToOthers,
+                tokensLocked: oracles.tokensLocked
+              }}
             />
 
             <NetworkInformation
@@ -221,7 +235,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 }
 
 // Create Network flow steps
-function LockBepro({ validated, step, currentStep, handleClick }) {
+function LockBepro({ validated, step, currentStep, handleClick, balance }) {
   return (
     <Step
       title="Network "
@@ -241,14 +255,22 @@ function LockBepro({ validated, step, currentStep, handleClick }) {
           <p className="caption-medium text-gray">
             <span className="text-primary">$BEPRO</span> available
           </p>
-          <p className="h4 text-white">304,403</p>
+          <p className="h4 text-white">
+            {formatNumberToCurrency(balance.beproAvailable || 0, {
+              maximumFractionDigits: 18
+            })}
+          </p>
         </div>
 
         <div className="col bg-dark-gray border-radius-8 p-4 text-center">
           <p className="caption-medium text-gray">
             <span className="text-purple">ORACLES</span> available
           </p>
-          <p className="h4 text-white">304,403</p>
+          <p className="h4 text-white">
+            {formatNumberToCurrency(balance.oraclesAvailable || 0, {
+              maximumFractionDigits: 18
+            })}
+          </p>
         </div>
       </div>
 
@@ -258,7 +280,11 @@ function LockBepro({ validated, step, currentStep, handleClick }) {
 
       <div className="row mx-0">
         <div className="col p-0 text-center">
-          <p className="h3 text-white mb-1">304,403</p>
+          <p className="h3 text-white mb-1">
+            {formatNumberToCurrency(balance.tokensLocked || 0, {
+              maximumFractionDigits: 18
+            })}
+          </p>
           <p className="caption-medium text-gray">
             <span className="text-primary">$BEPRO</span> locked
           </p>
