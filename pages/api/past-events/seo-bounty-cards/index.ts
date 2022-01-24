@@ -41,9 +41,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     const response = await IpfsStorage.add(data);
 
     if (response && response.hash) {
-      const seoImage = `${process.env.NEXT_PUBLIC_IPFS_BASE}/${response.hash}`
-      await issue.update({seoImage});
-      created.push({issueId: issue?.issueId, seoImage})
+      await issue.update({seoImage: response.hash});
+      created.push({issueId: issue?.issueId, seoImage: response.hash})
     }
   }
 

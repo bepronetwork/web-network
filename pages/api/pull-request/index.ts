@@ -61,7 +61,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     await octoKit.rest.issues.createComment({owner, repo, issue_number: issue.githubId, body});
 
     await issue.save();
-    await api.get(`seo/${issue?.issueId}`)
+    await api.post(`seo/${issue?.issueId}`)
 
     return res.json(`ok`);
   } catch(error) {
