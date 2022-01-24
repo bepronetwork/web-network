@@ -17,12 +17,20 @@ class BeproFacet {
   }
 
   async start() {
-    await this.bepro.start();
-    this.network = new Network(this.bepro, CONTRACT_ADDRESS);
-    this.erc20 = new ERC20(this.bepro, SETTLER_ADDRESS);
+    try {
+      await this.bepro.start();
+      this.network = new Network(this.bepro, CONTRACT_ADDRESS);
+      this.erc20 = new ERC20(this.bepro, SETTLER_ADDRESS);
 
-    await this.network.loadContract();
-    await this.erc20.loadContract();
+      await this.network.loadContract();
+      await this.erc20.loadContract();
+    } catch (error) {
+      console.log(`Failed to start Bepro Service`, error)
+
+      return false
+    }
+
+    return true
   }
 
   async login() {

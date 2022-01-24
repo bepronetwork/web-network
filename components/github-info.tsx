@@ -32,5 +32,5 @@ export default function GithubInfo({
     return ' github-info caption-small cursor-pointer ' + append
   }
 
-  return <div className={getClassName()} onClick={(e) => (e.stopPropagation(), onClick())}><span>{label}</span></div>
+  return <div key={label} className={getClassName()} onClick={(e) => (e.stopPropagation(), onClick())}><span>{label}</span></div>
 }

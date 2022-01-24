@@ -415,7 +415,7 @@ function NetworkInformation({
           <div className="row justify-space-between">
             {data.colors &&
               Object.entries(data.colors).map((color) => (
-                <div className="col">
+                <div className="col" key={color[0]}>
                   <ColorInput
                     label={color[0]}
                     value={color[1]}
