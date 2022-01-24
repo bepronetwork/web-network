@@ -17,7 +17,7 @@ const Seo: React.FC<ISeoProps> = ({issueMeta}) => {
       openGraph={{
         url: `${process.env.NEXT_PUBLIC_HOME_URL}/bounty?id=${ghId}&repoId=${repoId}`,
         title: issueMeta?.title,
-        description: issueMeta?.body,
+        description: issueMeta?.body?.substring(0, 160).trimEnd() || '',
         images: [
           {
             url: `${process.env.NEXT_PUBLIC_HOME_URL}/api/seo/${issueMeta?.issueId}`,
