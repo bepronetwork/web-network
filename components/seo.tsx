@@ -17,10 +17,10 @@ const Seo: React.FC<ISeoProps> = ({issueMeta}) => {
       openGraph={{
         url: `${process.env.NEXT_PUBLIC_HOME_URL}/bounty?id=${ghId}&repoId=${repoId}`,
         title: issueMeta?.title,
-        description: issueMeta?.body,
+        description: `${issueMeta?.body?.substring(0, 160).trimEnd()}...` || '',
         images: [
           {
-            url: issueMeta?.seoImage,
+            url: `${process.env.NEXT_PUBLIC_HOME_URL}/api/seo/${issueMeta?.issueId}`,
             width: 1200,
             height: 670,
             alt: 'Bounty Info',
@@ -31,7 +31,7 @@ const Seo: React.FC<ISeoProps> = ({issueMeta}) => {
       }}
       twitter={{
         handle: '@bepronet',
-        cardType: issueMeta?.seoImage,
+        cardType: 'summary_large_image'
       }}
     />
   }
