@@ -134,7 +134,7 @@ export default function PageActions({
   async function handleRedeem() {
     const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue });
     dispatch(redeemTx);
-    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
 
     waitForRedeem(issueId)
       .then(() => {
@@ -147,7 +147,7 @@ export default function PageActions({
 
     await BeproService.login()
       .then(() => {
-        BeproService.network.redeemIssue({ issueId: issue_id })
+        BeproService.network.redeemIssue(issue_id)
                     .then((txInfo) => {
                       processEvent(`redeem-issue`, txInfo.blockNumber, issue_id);
                       txWindow.updateItem(redeemTx.payload.id, BeproService.parseTransaction(txInfo, redeemTx.payload));
@@ -346,10 +346,10 @@ export default function PageActions({
     const disputeTx = addTransaction({ type: TransactionTypes.dispute });
     dispatch(disputeTx);
 
-    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
 
     await BeproService.network
-      .disputeMerge({ issueID: issue_id, mergeID: mergeId })
+      .disputeMerge(issue_id, +mergeId)
       .then((txInfo) => {
         processEvent(`dispute-proposal`, txInfo.blockNumber, issue_id);
         txWindow.updateItem(disputeTx.payload.id, BeproService.parseTransaction(txInfo, disputeTx.payload));
@@ -369,10 +369,10 @@ export default function PageActions({
     const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue });
     dispatch(closeIssueTx);
 
-    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
 
     await BeproService.network
-      .closeIssue({ issueID: issue_id, mergeID: mergeId })
+      .closeIssue(issue_id, +mergeId)
       .then((txInfo) => {
         processEvent(`close-issue`, txInfo.blockNumber, issue_id).then(async () =>{
           await onCloseEvent?.()

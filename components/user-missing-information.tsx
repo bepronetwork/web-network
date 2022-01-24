@@ -51,7 +51,7 @@ export default function UserMissingModal({ show }: { show: boolean }) {
 
   function handleUnlockAll() {
     BeproService.network
-      .getOraclesByAddress({ address: currentAddress })
+      .getOraclesByAddress(currentAddress)
       .then((value) => {
         setLoadingUnlock(true);
 
@@ -63,7 +63,7 @@ export default function UserMissingModal({ show }: { show: boolean }) {
         dispatch(tmpTransaction);
 
         BeproService.network
-          .unlock({ tokenAmount: value, from: currentAddress })
+          .unlock(value, currentAddress)
           .then((answer) => {
             if (answer.status) {
               setError(false);
@@ -84,7 +84,7 @@ export default function UserMissingModal({ show }: { show: boolean }) {
                 addToast({
                   type: "danger",
                   title: t("actions.failed"),
-                  content: answer?.message,
+                  content: t("actions.failed"),
                 })
               );
             }
