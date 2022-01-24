@@ -44,8 +44,8 @@ const defaultState: GlobalState = {
     oracles: {
       addresses: [],
       amounts: [],
-      oraclesDelegatedByOthers: ``,
-      tokensLocked: ``
+      oraclesDelegatedByOthers: 0,
+      tokensLocked: 0
     },
     myIssues: [],
     balance: {
@@ -79,7 +79,7 @@ export default function ApplicationContextProvider({children}) {
   const {getUserOf} = useApi();
 
   function updateSteFor(newAddress: string) {
-    BeproService.login(true)
+    BeproService.login()
                 .then(() => dispatch(changeCurrentAddress(newAddress)))
   }
 
@@ -112,7 +112,7 @@ export default function ApplicationContextProvider({children}) {
 
   const Initialize = () => {
     BeproService.start()
-                .then(state => {
+                .then((state) => {
                   dispatch(changeBeproInitState(state))
                 });
 

@@ -36,7 +36,10 @@ export default function ConnectWalletButton({children = null, forceLogin = false
       if (+process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID !== +chainId) {
         dispatch(changeNetwork((NetworkIds[+chainId] || `unknown`)?.toLowerCase()))
         return;
-      } else loggedIn = await BeproService.login();
+      } else {
+         await BeproService.login();
+         loggedIn = BeproService.isLoggedIn
+      }
     } catch (e) {
       console.error(`Failed to login on BeproService`, e);
     }
@@ -53,17 +56,15 @@ export default function ConnectWalletButton({children = null, forceLogin = false
     if (!beproInit)
       return;
 
-    let action: () => Promise<boolean|string>;
 
     if (forceLogin)
-      action = BeproService.login;
-    else action = () => Promise.resolve(BeproService.address);
-
-    action().then((state: string|boolean) =>
-                    dispatch(changeWalletState(!!state)))
-            .catch(e => {
-              console.error(`Error changing wallet state`, e);
-            });
+      BeproService.login()
+      .then(() => {
+        dispatch(changeWalletState(BeproService.isLoggedIn))
+      })
+      .catch(e => {
+        console.error(`Error changing wallet state`, e);
+      })
 
   }, [beproInit]);
 
