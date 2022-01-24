@@ -31,7 +31,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     issue.state = 'open';
     console.log(`Moved ${issue.issueId} to open`);
     await issue.save();
-    await api.post(`seo/${issue.issueId}`)
+    await api.post(`/seo/${issue.issueId}`)
   }
 
   return res.status(200).json(issues);
