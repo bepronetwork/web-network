@@ -106,7 +106,7 @@ export default function NewNetwork() {
   }
 
   useEffect(() => {
-    if (!steps.network.data.colors && network) {
+    if (!Object.keys(steps.network.data.colors).length && network) {
       const tmpSteps = Object.assign({}, steps)
 
       tmpSteps.network.data.colors = network.colors
