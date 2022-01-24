@@ -32,7 +32,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
                     issue.state = 'canceled';
                     await issue.save();
 
-                    await api.get(`seo/${issueId}`)
+                    await api.post(`/seo/${issueId}`)
 
                     console.log(`Emitting redeemIssue:created:${issueId}`);
                     Bus.emit(`redeemIssue:created:${issueId}`, issue)
