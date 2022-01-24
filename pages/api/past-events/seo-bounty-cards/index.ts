@@ -19,7 +19,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if (issues?.length < 1)
     return res.status(400).json('issues not find');
 
-  const storage = new IpfsStorage();
   const created = [];
 
   for (const issue of issues) {
@@ -39,14 +38,13 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         proposal: issue?.mergeProposals?.length || 0,});
 
     const data = Buffer.from(card.buffer);
-    const response = await storage.add({data});
-    console.log(response)
-    if (response && response.path) {
-      const seoImage = `${process.env.NEXT_PUBLIC_IPFS_BASE}/${response.path}`
+    const response = await IpfsStorage.add(data);
+
+    if (response && response.hash) {
+      const seoImage = `${process.env.NEXT_PUBLIC_IPFS_BASE}/${response.hash}`
       await issue.update({seoImage});
       created.push({issueId: issue?.issueId, seoImage})
     }
-
   }
 
   return res.status(200).json(created);
