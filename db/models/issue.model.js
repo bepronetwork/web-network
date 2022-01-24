@@ -17,6 +17,7 @@ class Issue extends Model {
       repository_id: DataTypes.STRING,
       title: DataTypes.TEXT,
       body: DataTypes.TEXT,
+      branch: DataTypes.STRING,
       working: {
         type: DataTypes.ARRAY(DataTypes.STRING)
       },

@@ -22,6 +22,7 @@ export interface IssueData {
   pullRequests: pullRequest[];
   owner?: string;
   repo?: string;
+  branch?: string;
   repository_id?: number;
   mergeProposals: ProposalData[];
   working: string[];
