@@ -24,7 +24,7 @@ export default function AccountHero() {
                 .then(issuesList => {
                   dispatch(changeMyIssuesState(issuesList));
                 })
-                .then(_ => BeproService.network.getOraclesSummary({address}))
+                .then(_ => BeproService.network.getOraclesSummary(address))
                 .then(oracles => {
                   dispatch(changeOraclesState(changeOraclesParse(address, oracles)));
                 })

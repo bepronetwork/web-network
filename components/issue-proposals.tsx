@@ -20,15 +20,15 @@ export default function IssueProposals({ metaProposals, className='', metaReques
     if (!issueId)
       return;
 
-    const scIssueId = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    const scIssueId = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
     const pool = [];
 
     for (const meta of metaProposals as ProposalData[]) {
       const {scMergeId, pullRequestId} = meta;
       if (scMergeId) {
         // if we don't have a scMergeId then something broke on the BE side and we should have a log - but we lost its connection to a PR
-        const merge = await BeproService.network.getMergeById({merge_id: scMergeId, issue_id: scIssueId});
-        const isDisputed = mergedProposal ? mergedProposal !== scMergeId : await BeproService.network.isMergeDisputed({issueId: scIssueId, mergeId: scMergeId});
+        const merge = await BeproService.network.getMergeById(scMergeId, +scIssueId);
+        const isDisputed = mergedProposal ? mergedProposal !== scMergeId : await BeproService.network.isMergeDisputed(scIssueId, +scMergeId);
         const pr = metaRequests.find(({id}) => meta.pullRequestId === id);
 
         pool.push({...merge, createdAt: meta.createdAt, scMergeId, isDisputed, pullRequestId, pullRequestGithubId: pr?.githubId, owner: pr?.githubLogin, isMerged: mergedProposal === scMergeId } as Proposal)

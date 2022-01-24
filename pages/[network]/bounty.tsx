@@ -124,12 +124,12 @@ export default function PageIssue() {
       return;
 
     const issueCID = getIssueCID()
-    BeproService.network.getIssueByCID({ issueCID })
+    BeproService.network.getIssueByCID(issueCID)
       .then(netIssue => {
         setNetworkIssue(netIssue);
         return netIssue._id;
       })
-      .then(issueId => BeproService.network.isIssueInDraft({ issueId }))
+      .then(issueId => BeproService.network.isIssueInDraft(issueId))
       .then((isIssueInDraft) => setIsIssueinDraft(isIssueInDraft))
       .catch(e => {
         console.error(`Failed to fetch network issue or draft state`, e);

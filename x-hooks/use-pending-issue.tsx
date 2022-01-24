@@ -38,24 +38,26 @@ export default function usePendingIssue<S = IssueData>(): usePendingIssueReturn 
     const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount})
     dispatch(openIssueTx);
 
-    return BeproService.network.openIssue({tokenAmount, cid})
-                       .then(txInfo => {
+    return BeproService.network.openIssue(cid, +tokenAmount)
+                       .then(async (txInfo) => {
                          txWindow.updateItem(openIssueTx.payload.id, BeproService.parseTransaction(txInfo, openIssueTx.payload));
                          // BeproService.parseTransaction(txInfo, openIssueTx.payload)
                          //             .then(block => dispatch(updateTransaction(block)))
-                         return {githubId: pendingIssue.githubId, issueId: txInfo.events?.OpenIssue?.returnValues?.id};
+                         const events = await BeproService.network.getOpenIssueEvents({fromBlock: txInfo.blockNumber, address: BeproService.address})
+
+                         return {githubId: pendingIssue.githubId, issueId: events[0]?.returnValues?.id};
                        })
                        .catch(e => {
                          console.error(`Failed to createIssue`, e);
                          if (e?.message?.search(`User denied`) > -1)
                           dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
                          else dispatch(updateTransaction({...openIssueTx.payload as any, status: TransactionStatus.failed}));
-                         return {};
+                         return {} as any;
                        });
   }
 
   async function pendingIssueExistsOnSC(issue: IssueData): Promise<boolean> {
-    return (await BeproService.network.getIssueByCID({issueCID: `${issue.repository_id}/${issue.githubId}`}))?.cid
+    return !!(await BeproService.network.getIssueByCID(`${issue.repository_id}/${issue.githubId}`))?.cid
   }
 
   async function updatePendingIssue(issue: IssueData) {
