@@ -11,7 +11,7 @@ export default function GithubInfo({
   parent,
   variant,
   label,
-  onClick
+  onClick = () => {}
 } : GithubInfoProps) {
   function getClassName() {
     let append = ''

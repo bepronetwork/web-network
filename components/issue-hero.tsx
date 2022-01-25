@@ -15,6 +15,7 @@ export default function IssueHero({ issue, state, amount }) {
 
   return (
     <div className="banner bg-bepro-blue mb-4">
+      {console.log({issue})}
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10">
@@ -33,23 +34,23 @@ export default function IssueHero({ issue, state, amount }) {
                         {renderCreator()}
                       </span>
                       <span className="caption-small mr-2 mt-1">
-                        {(issue?.repo && (
+                        {(issue?.repository && (
                           <GithubInfo
                             parent="hero"
                             variant="repository"
-                            label={issue?.repo}
+                            label={issue?.repository?.githubPath}
                           />
                         )) ||
                           ``}
                       </span>
-                      <span className="caption-small mr-2 mt-1 text-white-50 text-uppercase">
-                        {issue && (
-                          <>
-                            <Translation label={`branch`} />
-                            <span className="text-white">:{issue.branch}</span>
-                          </>
+                        {issue.branch && (
+                        <span className="caption-small mr-2 mt-1 text-white-50 text-uppercase">
+                            <>
+                              <Translation label={`branch`} />
+                              <span className="text-white">:{issue.branch}</span>
+                            </>
+                        </span>
                         )}
-                      </span>
                       <span className="caption-small mr-2 mt-1 text-white-50">
                         {issue && (
                           <>
