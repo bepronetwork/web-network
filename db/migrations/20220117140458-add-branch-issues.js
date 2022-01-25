@@ -7,34 +7,16 @@ module.exports = {
     queryInterface.addColumn('issues', 'branch', {
       type: Sequelize.STRING
     }).then(async ()=>{
-      const issues = await queryInterface.sequelize.query(
-        'SELECT * FROM issues',
+      const [results, metadata] = await queryInterface.sequelize.query(
+        'UPDATE issues SET branch = $branch WHERE branch IS NULL',
         {
-          model: Issue,
-          mapToModel: true,
-          type: QueryTypes.SELECT
+          bind: {
+            branch: process.env.NEXT_GITHUB_MAINBRANCH || 'master'
+          }
         }
       )
-      if (!issues.length) return
-      
-      let issuesUpdated = 0
 
-      for (const issue of issues) {
-  
-        const [results, metadata] = await queryInterface.sequelize.query(
-          'UPDATE issues SET branch = $branch WHERE id = $id',
-          {
-            bind: {
-              branch: process.env.NEXT_GITHUB_MAINBRANCH || 'master',
-              id: issue.id
-            }
-          }
-        )
-  
-        console.log('.')
-  
-        issuesUpdated += metadata.rowCount
-      }
+      console.log({results, metadata})
     })
 
   },
