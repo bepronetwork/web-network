@@ -10,5 +10,5 @@ export default function MarkedRender({source = `_loading..._`}) {
     })})
   }, [source])
 
-  return <div dangerouslySetInnerHTML={innerHtml}></div>
+  return <div className="marked-render" dangerouslySetInnerHTML={innerHtml}></div>
 }

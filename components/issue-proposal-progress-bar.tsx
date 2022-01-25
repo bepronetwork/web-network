@@ -118,8 +118,8 @@ export default function IssueProposalProgressBar({
   }
   
   function renderColumn(stepLabel, index) {
-    const style = { top: index === 0 ? "0" : `${index * 60}px`, left: "7.5px"}
-    const dotClass = `d-flex align-items-center justify-content-center rounded-circle bg-${currentStep >= index ? stepColor : `dark`}`;
+    const style = { top: index === 0 ? "0" : `${index * 60}px`, left: "7px"}
+    const dotClass = `d-flex align-items-center justify-content-center rounded-circle bg-${currentStep >= index ? stepColor : `ligth-gray`}`;
     const dotStyle = { width: `12px`, height: `12px` }
     const labelStyle = { left: "40px" }
     const currentItem = currentStep === index
@@ -155,7 +155,7 @@ export default function IssueProposalProgressBar({
             </div>
             <div className="row">
               <div className="position-relative">
-                <div className="progress bg-dark issue-progress-horizontal">
+                <div className="progress bg-ligth-gray issue-progress-horizontal">
                   <div
                     className={`progress-bar w-100 bg-${stepColor}`}
                     role="progressbar"
