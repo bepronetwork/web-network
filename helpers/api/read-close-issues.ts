@@ -1,4 +1,5 @@
 import {Bus} from '@helpers/bus';
+import api from '@services/api';
 import {Op} from 'sequelize';
 
 export default async function readCloseIssues(events, {network, models, octokit, res}) {
@@ -39,7 +40,7 @@ export default async function readCloseIssues(events, {network, models, octokit,
     issue.merged = mergeProposal.scMergeId;
     issue.state = 'closed';
     await issue.save();
-
+    await api.post(`/seo/${issueId}`);
     console.log(`Emitting closeIssue:created:${issueId}`);
     Bus.emit(`closeIssue:created:${issueId}`, issue)
   }
