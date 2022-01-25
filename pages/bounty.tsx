@@ -87,7 +87,7 @@ export default function PageIssue() {
     getIssue(repoId as string, id as string)
       .then((issue) => {
         if (!issue)
-          return;
+          return router.push('/404')
 
         setIssue(issue);
 
@@ -96,7 +96,7 @@ export default function PageIssue() {
             .then((comments) => {
               setCommentsIssue(comments.data as any)
             });
-      });
+      })
 
     if (!forks)
       getForksOf(activeRepo.githubPath).then((frk) => setForks(frk.data as any));
