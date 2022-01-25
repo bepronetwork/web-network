@@ -1098,6 +1098,12 @@ textarea.form-control {
   border-radius: math.div($m, 2);
 }
 
+.marked-render{
+  img{
+    width: 100%;
+  }
+}
+
 .comment {
   img {
     width: 100%;
