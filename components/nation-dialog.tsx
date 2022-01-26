@@ -18,8 +18,10 @@ export default function NationDialog({ children }) {
   useEffect(() => {
     setIsLoading(true);
     
-    axios.get(`http://ip-api.com/json`).then(result => {
-      getClientNation(result.data.query)
+    axios.get(`https://www.cloudflare.com/cdn-cgi/trace`).then(result => {
+      const ip = Object.fromEntries(result.data.trim().split('\n').map(e => e.split('='))).ip
+
+      getClientNation(ip)
       .then((data)=>{
         if (data.countryCode && COUNTRY_CODE_BLOCKED.indexOf(data.countryCode) === -1)
           return;
