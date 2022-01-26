@@ -1,0 +1,99 @@
+{
+  "title": "Hello world",
+  "$oracles": "Oracles",
+  "$bepro": "$BEPRO",
+  "please-wait": "Só um momento",
+  "close": "fechar",
+  "filters": {
+    "filters": "Filtros",
+    "search-repositories": "Procurar Repositórios",
+    "repository": "Repositório",
+    "all": "Todos",
+    "bounties": {
+      "title": "estado da bounty",
+      "open": "abertas",
+      "draft": "rascunho",
+      "closed": "fechadas"
+    },
+    "timeframe": {
+      "title": "prazo",
+      "week": "ultima semana",
+      "month": "ultimo mês",
+      "year": "ultimo ano"
+    }
+  },
+  "account": {
+    "hero": {}
+  },
+  "heroes": {
+    "find-bounties-to-work": "Encontre bounties para trabalhar",
+    "bounties-closed": "Bounties finalizadas",
+    "bounties-in-network": "Na rede"
+  },
+  "connect-states": {
+    "github": "",
+    "wallet": {}
+  },
+  "issue": {
+    "no-comments-available": "_não há comentários_",
+    "description": "descrição",
+    "view-all-addresses": "ver todos os endereços",
+    "steps": {
+      "draft": "rascunho",
+      "development": "desenvolvimento",
+      "finalized": "finalizado",
+      "validation": "validação e disputa",
+      "closed": "fechado e distribuido"
+    },
+    "status": {
+      "completed": "completo",
+      "canceled": "cancelada",
+      "until-done": "{{distance}} até estar pronto",
+      "pending": "pendente",
+      "in-progress": "em progresso"
+    }
+  },
+  "help-modal": {
+    "help-center": {
+      "title": "centro de ajuda",
+      "content": "Saiba mais sobre a Rede Bepro e como usá-la."
+    },
+    "api-documentation": {
+      "title": "documentação da API",
+      "content": "Desenvolva com bepro-js e crie a sua próxima aplicação web3. "
+    },
+    "live-chat": {
+      "title": "live chat",
+      "content": "Explore tutoriais e artigos de ajuda"
+    },
+    "provide-feedback": {
+      "title": "fornecer feedback",
+      "content": "fornecer feedback"
+    }
+  },
+  "main-nav": {
+    "developers": "Developers",
+    "council": "Council",
+    "Oracle": "Oracle",
+    "create-bounty": "Criar Bounty",
+    "get-started": "Comece Agora",
+    "connect": "Conectar"
+  },
+  "mobile-information": {},
+  "nation-dialog": {
+    "at-the-moment": "De momento, os serviços BEPRO e o token BEPRO (BEPRO) não estão disponíveis no seu país ",
+    "excluded": "Jurisdições excluídas .",
+    "further": "Para mais informações contacte-nos em ",
+    "email": "general@bepro.network"
+  },
+  "select-a-repository": "escolha um repositório ",
+  "status": {
+    "network-problems": "problemas de rede ",
+    "waiting": "à espera",
+    "operational": "operacional ",
+    "network-congestion": "congestionamento na rede",
+    "tagline": "Os serviços de rede Bepro e o token BEPRO ($ BEPRO) não estão disponíveis em jurisdições excluídas. Ao acessar e usar a interface, você concorda com nosso ",
+    "terms-and-conditions": "termos e condições",
+    "support": "suporte"
+  }
+}

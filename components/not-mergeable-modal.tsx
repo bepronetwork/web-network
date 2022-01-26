@@ -1,6 +1,7 @@
 import { ApplicationContext } from '@contexts/application'
 import { addToast } from '@contexts/reducers/add-toast'
 import useApi from '@x-hooks/use-api'
+import { useTranslation } from 'next-i18next'
 import { useContext, useEffect, useState } from 'react'
 
 import Button from './button'
@@ -26,6 +27,7 @@ export default function NotMergeableModal({
     mergeProposal?.proposalAddress?.toLowerCase() === currentAddress
   const hasPRMerged = !!issuePRs?.find((pr) => pr.merged === true)
   const { mergeClosedIssue } = useApi()
+  const { t } = useTranslation('common')
 
   function handleModalVisibility() {
     if (!pullRequest || !issuePRs?.length || mergeState === 'success') return
@@ -52,8 +54,8 @@ export default function NotMergeableModal({
         dispatch(
           addToast({
             type: 'success',
-            title: 'Success',
-            content: 'Pull Request merged'
+            title: t('actions.success'),
+            content: t('modals.not-mergeable.success-message')
           })
         )
 
@@ -64,7 +66,7 @@ export default function NotMergeableModal({
         dispatch(
           addToast({
             type: 'danger',
-            title: 'Failed',
+            title: t('actions.failed'),
             content: error.response.data.message
           })
         )
@@ -88,7 +90,7 @@ export default function NotMergeableModal({
   return (
     <Modal
       show={isVisible}
-      title="Merging bounty"
+      title={t('modals.not-mergeable.title')}
       titlePosition="center"
       onCloseClick={() => setVisible(false)}
       centerTitle
@@ -97,11 +99,11 @@ export default function NotMergeableModal({
         <div className="d-flex justify-content-center m-2 text-center">
           <p className="h4 mb-2 text-white">
             {(isFinalized &&
-              'This bounty was closed and distributed but the code was unable to be merged.') ||
+              t('modals.not-mergeable.closed-bounty')) ||
               ''}
 
             {(!isFinalized &&
-              'This proposal has github conflicts and cannot be merged. Please, fix it before doing so.') ||
+              t('modals.not-mergeable.open-bounty')) ||
               ''}
           </p>
         </div>
@@ -117,19 +119,19 @@ export default function NotMergeableModal({
               disabled={mergeState !== ''}
               onClick={handleRetryMerge}
             >
-              {mergeState === 'error' ? 'Merge failed' : 'Retry Merge'}
+              {mergeState === 'error' ? t('modals.not-mergeable.merge-failed') : t('modals.not-mergeable.retry-merge')}
               {mergeState === 'loading' && (
                 <span className="spinner-border spinner-border-xs ml-1" />
               )}
             </Button>
           )}
           <GithubLink
-            forcePath={issue?.repo}
+            forcePath={issue?.repository?.githubPath}
             hrefPath={`pull/${pullRequest?.githubId || ''}/conflicts`}
             color="primary">
-            Go to Pull Request
+            {t('modals.not-mergeable.go-to-pr')}
           </GithubLink>
-          <Button color="dark-gray" onClick={() => setVisible(false)}>Close</Button>
+          <Button color="dark-gray" onClick={() => setVisible(false)}>{t('actions.close')}</Button>
         </div>
       </div>
     </Modal>

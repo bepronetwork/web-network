@@ -17,6 +17,10 @@ import ConnectGithub from '@components/connect-github';
 import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
+import {GetServerSideProps} from 'next';
+import {getSession} from 'next-auth/react';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 
 export default function ParityPage() {
   const {state: {currentAddress, balance,}, dispatch} = useContext(ApplicationContext);
@@ -34,13 +38,14 @@ export default function ParityPage() {
   const [reposList, setReposList] = useState<ReposList>([]);
   const [availReposList, setAvailableList] = useState<string[]>([]);
   const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId, createRepo, getReposList, removeRepo: apiRemoveRepo} = useApi();
+  const { t } = useTranslation(['common', 'parity'])
 
   const formItem = (label = ``, placeholder = ``, value = ``, onChange = (ev) => {}) =>
     ({label, placeholder, value, onChange})
 
   const formMaker = [
-    formItem(`Github Token`, `Token to be able to login and act`, githubToken, (ev) => setGithubToken(ev?.target?.value)),
-    formItem(`Github Login`, `Login handle of the owner of the token`, githubLogin, (ev) => setGithubLogin(ev?.target?.value)),
+    formItem(t('parity:fields.github-token.label'), t('parity:fields.github-token.placeholder'), githubToken, (ev) => setGithubToken(ev?.target?.value)),
+    formItem(t('parity:fields.github-login.label'), t('parity:fields.github-login.placeholder'), githubLogin, (ev) => setGithubLogin(ev?.target?.value)),
     // formItem(`Read Repo`, `Github repo name to read from (pex bepro-js)`, readRepoName, (ev) => setReadRepoName(ev?.target?.value)),
   ]
 
@@ -132,7 +137,7 @@ export default function ParityPage() {
 
   }
 
-  function createIssue({title, body: description = `No description`, tokenAmount, number, repository_id, creatorGithub = githubLogin}) {
+  function createIssue({title, body: description = String(t('parity:no-description')), tokenAmount, number, repository_id, creatorGithub = githubLogin}) {
 
     const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount: +tokenAmount})
     dispatch(openIssueTx);
@@ -150,7 +155,7 @@ export default function ParityPage() {
     return apiCreateIssue(msPayload)
                              .then(cid => {
                                if (!cid)
-                                 throw new Error(`Failed to create github issue!`);
+                                 throw new Error(t('errors.creating-issue'));
                                return BeproService.network.openIssue({...scPayload, cid: [repository_id, cid].join(`/`)})
                                                   .then(txInfo => {
                                                     // BeproService.parseTransaction(txInfo, openIssueTx.payload)
@@ -160,7 +165,7 @@ export default function ParityPage() {
                              })
                              .then(({githubId, issueId}) => {
                                if (!issueId)
-                                 throw new Error(`Failed to create issue on SC!`);
+                                 throw new Error(t('parity:errors.creating-issue-on-sc'));
 
                                return patchIssueWithScId(repository_id, githubId, issueId)
                              })
@@ -204,7 +209,7 @@ export default function ParityPage() {
                 .then(info => {
                   console.debug(`Deployed!`)
                   console.table(info);
-                  dispatch(toastInfo(`Deployed!`));
+                  dispatch(toastInfo(t('parity:deployed')));
                   setDeployedContract(info.contractAddress);
                   return true;
                 })
@@ -213,7 +218,7 @@ export default function ParityPage() {
   function updateCouncilAmount() {
     BeproService.network.changeCouncilAmount(+councilAmount)
                 .then(info => {
-                  dispatch(toastInfo(`Council amount changed!`));
+                  dispatch(toastInfo(t('parity:council-amount-changed')));
                   console.debug(`Council Changed!`);
                   console.table(info);
                 })
@@ -276,7 +281,7 @@ export default function ParityPage() {
     const created = await createRepo(owner, repo);
 
     if (!created)
-      return dispatch(toastError(`Failed to create repo`));
+      return dispatch(toastError(t('parity:erros.creating-repo')));
 
     setReposList(await getReposList(true));
   }
@@ -285,7 +290,7 @@ export default function ParityPage() {
     return apiRemoveRepo(id)
                              .then(async (result) => {
                                if (!result)
-                                 return dispatch(toastError(`Couldn't remove repo`));
+                                 return dispatch(toastError(t('parity:erros.removing-repo')));
 
                                setReposList(await getReposList(true))
                              });
@@ -303,10 +308,10 @@ export default function ParityPage() {
     return (
       <div className="mt-4" key={i}>
         <div className="content-wrapper">
-          <strong className="mb-2">Title:</strong> {title}
+          <strong className="mb-2">{t('misc.title')}:</strong> {title}
 
           <span className="fs-small d-block mb-1">
-            {(body || `No body?`).substr(0, 500).concat(`...`)}
+            {(body || t('parity:erros.no-body')).substr(0, 500).concat(`...`)}
           </span>
           <hr />
           <span className="fs-smallest d-block mbn-2">{formatNumberToString(tokenAmount)} BEPRO</span>
@@ -337,6 +342,12 @@ export default function ParityPage() {
                 .then(console.log)
   }
 
+  function changeDisputableTime() {
+    BeproService.network.params.contract.getContract()
+                .methods.changeDisputableTime(60).send({from: currentAddress})
+                .then(console.log)
+  }
+
   useEffect(() => {
     if (!currentAddress)
       return;
@@ -349,40 +360,42 @@ export default function ParityPage() {
   }, [currentAddress])
 
   return <>
-    <div className="container mb-5">
+    <div className="container mb-5 pt-5">
       <ConnectWalletButton asModal={true} />
-      <div className="mt-3 content-wrapper">
+      <br />
+      <br />
+      <div className="content-wrapper">
         <div className="row mb-3">
-          <label className="p-small trans mb-2">New contract address</label>
-          <input value={deployedContract} readOnly={true} type="text" className="form-control" placeholder={`Address will appear here`}/>
+          <label className="p-small trans mb-2">{t('parity:fields.contract-address.label')}</label>
+          <input value={deployedContract} readOnly={true} type="text" className="form-control" placeholder={t('parity:fields.contract-address.placeholder')}/>
         </div>
         <div className="row mb-3">
-          <label className="p-small trans mb-2">New council amount</label>
-          <input className="form-control" value={councilAmount} onChange={(e) => setCouncilAmount(e?.target?.value)} type="text" placeholder={`Amount needed to be a council member`}/>
+          <label className="p-small trans mb-2">{t('parity:fields.council-amount.label')}</label>
+          <input className="form-control" value={councilAmount} onChange={(e) => setCouncilAmount(e?.target?.value)} type="text" placeholder={t('parity:fields.council-amount.placeholder')}/>
         </div>
         <hr />
         <div className="row mb-3 mxn-4">
           <div className="col">
-            <label className="p-small trans mb-2 ml-2">New settler token name</label>
-            <input className="form-control" placeholder="pex BEPRO" value={settlerTokenName} onChange={(e) => setSettlerTokenName(e?.target.value)}/>
+            <label className="p-small trans mb-2 ml-2">{t('parity:fields.settler-token-name.label')}</label>
+            <input className="form-control" placeholder={t('parity:fields.settler-token-name.placeholder')} value={settlerTokenName} onChange={(e) => setSettlerTokenName(e?.target.value)}/>
           </div>
           <div className="col">
-            <label className="p-small trans mb-2 ml-2">New settler token symbol</label>
-            <input className="form-control" placeholder="pex $BEPRO" value={settlerTokenSymbol} onChange={(e) => setSettlerTokenSymbol(e?.target.value)}/>
+            <label className="p-small trans mb-2 ml-2">{t('parity:fields.settler-token-symbol.label')}</label>
+            <input className="form-control" placeholder={t('parity:fields.settler-token-symbol.placeholder')} value={settlerTokenSymbol} onChange={(e) => setSettlerTokenSymbol(e?.target.value)}/>
           </div>
         </div>
         <div className="row mb-3">
-          <label className="p-small trans mb-2">Settler token address</label>
+          <label className="p-small trans mb-2">{t('parity:fields.settler-token-address.label')}</label>
           <input className="form-control" value={settlerTokenAddress} readOnly={true}/>
         </div>
 
         <div className="row">
           <div className="col d-flex justify-content-end align-items-center">
-            <Button className="me-2" onClick={() => deployNewContract()}>Deploy contract</Button>
-            <Button className="me-2" disabled={!councilAmount} onClick={() => updateCouncilAmount()}>Update council amount</Button>
-            <Button disabled={!settlerTokenName || !settlerTokenSymbol} onClick={() => deploySettlerToken()}>Deploy settler token</Button>
-            <Button onClick={() => changeRedeem()}>Change redeem to 2mins</Button>
-
+            <Button className="me-2" onClick={() => deployNewContract()}>{t('parity:deploy-contract')}</Button>
+            <Button className="me-2" disabled={!councilAmount} onClick={() => updateCouncilAmount()}>{t('parity:update-council-amount')}</Button>
+            <Button disabled={!settlerTokenName || !settlerTokenSymbol} onClick={() => deploySettlerToken()}>{t('parity:deploy-settler-token')}</Button>
+            <Button onClick={() => changeRedeem()}>{t('parity:change-redeem-time')}</Button>
+            <Button onClick={() => changeDisputableTime()}>{t('parity:change-disputable-time')}</Button>
           </div>
         </div>
       </div>
@@ -392,7 +405,7 @@ export default function ParityPage() {
       <div className="content-wrapper mt-3">
         <div className="row">
           <div className="col text-center">
-              { githubToken && <span className="d-block mb-2">Select a repository to add it to the microservice list</span> || <ConnectGithub /> }
+              { githubToken && <span className="d-block mb-2">{t('parity:select-a-repository')}</span> || <ConnectGithub /> }
           </div>
         </div>
         <div className="row">
@@ -404,10 +417,10 @@ export default function ParityPage() {
         </div>
         <div className="row mt-3">
           <div className="col d-flex justify-content-end">
-            {issuesList.length && <span className="fs-small me-2">Will cost <span className={getCostClass()}>{formatNumberToString(getSumOfTokenAmount())} BEPRO </span> / {formatNumberToString(balance.bepro)} BEPRO</span> || ``}
-            {issuesList.length && <Button className="mr-2" outline onClick={() => createIssuesFromList()}>Create Bounties</Button> || ``}
-            { githubToken && reposList.length && <Button className="mr-2" disabled={isValidForm()} onClick={() => listIssues()}>List Bounties</Button> || `` }
-            { githubToken && !availReposList.length && <Button onClick={getSelfRepos}>load repos</Button> || `` }
+            {issuesList.length && <span className="fs-small me-2">{t('parity:will-cost')} <span className={getCostClass()}>{formatNumberToString(getSumOfTokenAmount())} {t('bepro')} </span> / {formatNumberToString(balance.bepro)} {t('bepro')}</span> || ``}
+            {issuesList.length && <Button className="mr-2" outline onClick={() => createIssuesFromList()}>{t('parity:create-bounties')}</Button> || ``}
+            { githubToken && reposList.length && <Button className="mr-2" disabled={isValidForm()} onClick={() => listIssues()}>{t('parity:list-bounties')}</Button> || `` }
+            { githubToken && !availReposList.length && <Button onClick={getSelfRepos}>{t('parity:load-repos')}</Button> || `` }
           </div>
         </div>
       </div>
@@ -415,3 +428,12 @@ export default function ParityPage() {
     </div>
   </>
 }
+
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
+  return {
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common', 'connect-wallet-button', 'parity'])),
+    },
+  };
+};

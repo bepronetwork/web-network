@@ -1,59 +1,28 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {GetStaticProps} from 'next';
-import {IssueData} from '@interfaces/issue-data';
-import ListIssues from '@components/list-issues';
-import PageHero from '@components/page-hero';
-import {ApplicationContext} from '@contexts/application';
-import {changeLoadState} from '@reducers/change-load-state';
-import NothingFound from '@components/nothing-found';
-import InternalLink from '@components/internal-link';
-import useMergeData from '@x-hooks/use-merge-data';
-import usePage from '@x-hooks/use-page';
+import { GetServerSideProps } from 'next'
+import { getSession } from 'next-auth/react'
+import { useTranslation } from 'next-i18next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+
+import PageHero from '@components/page-hero'
+import ListIssues from '@components/list-issues'
 
 export default function PageCouncil() {
-  const {dispatch} = useContext(ApplicationContext);
-  const [issues, setIssues] = useState<IssueData[]>([]);
-  const page = usePage();
-  const {getIssues: getIssuesWith} = useMergeData();
-
-  function getIssues() {
-    dispatch(changeLoadState(true))
-    getIssuesWith({state: 'ready', page})
-                      .then(data => data.rows)
-                      .then(setIssues)
-                      .catch((error) => {
-                        console.error('getIssuesState Error', error)
-                      })
-                      .finally(() => {
-                        dispatch(changeLoadState(false))
-                      });
-  }
-
-  useEffect(getIssues, []);
+  const { t } = useTranslation(['common', 'council'])
 
   return (
     <div>
-      <PageHero title="Create Bounty Distributions" />
-      <div className="container p-footer">
-        <div className="row justify-content-center">
-          <ListIssues listIssues={issues}/>
-          {
-            issues?.length === 0 &&
-            <div className="mt-4">
-              <NothingFound
-              description="No bounties ready to propose">
-                <InternalLink href="/create-bounty" label="create one" uppercase />
-              </NothingFound>
-            </div>
-          }
-        </div>
-      </div>
+      <PageHero title={t('council:title')} />
+
+      <ListIssues filterState="ready" emptyMessage={t('council:empty')} />
     </div>
-  );
+  )
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
-    props: {},
-  };
-};
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common', 'bounty', 'council']))
+    }
+  }
+}

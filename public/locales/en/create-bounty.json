@@ -1,0 +1,23 @@
+{
+  "title": "Create new Bounty",
+  "fields": {
+    "title": {
+      "label": "Bounty title",
+      "placeholder": "Your bounty title",
+      "tip": "Tip: Try to be as descriptive as possible"
+    },
+    "description": {
+      "label": "Description",
+      "placeholder": "Type a description..."
+    },
+    "amount": {
+      "label": "Set $BEPRO value",
+      "info": "{{amount}} $BEPRO Available",
+      "max": "Max"
+    }
+  },
+  "create-bounty": "Create Bounty",
+  "errors": {
+    "creating-bounty": "Error creating bounty"
+  }
+}

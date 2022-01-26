@@ -3,13 +3,11 @@ import {subMilliseconds} from 'date-fns';
 import {Op} from 'sequelize';
 import models from '@db/models';
 import {Octokit} from 'octokit';
-import {CONTRACT_ADDRESS, WEB3_CONNECTION} from '../../../../env';
-import {Network} from 'bepro-js';
-
+import networkBeproJs from '@helpers/api/handle-network-bepro';
+import api from 'services/api'
 async function post(req: NextApiRequest, res: NextApiResponse) {
 
-  const opt = {opt: {web3Connection: WEB3_CONNECTION,  privateKey: process.env.NEXT_PRIVATE_KEY}, test: true,};
-  const network = new Network({contractAddress: CONTRACT_ADDRESS, ...opt});
+  const network = networkBeproJs({ test: true });
 
   await network.start();
   const redeemTime = (await network.params.contract.getContract().methods.redeemTime().call()) * 1000;
@@ -33,6 +31,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     issue.state = 'open';
     console.log(`Moved ${issue.issueId} to open`);
     await issue.save();
+    await api.post(`/seo/${issue.issueId}`)
   }
 
   return res.status(200).json(issues);

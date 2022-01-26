@@ -2,6 +2,7 @@ import models from '@db/models';
 import paginate from '@helpers/paginate';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Octokit} from 'octokit';
+import api from 'services/api'
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {login, issueId} = req.query;
@@ -33,6 +34,9 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   const {repoId: repository_id, githubId, title, description: body, username, branch} = req.body;
 
   const issue = await models.issue.findOne({where: {githubId, repository_id,},});
+  
+  if (!issue) return res.status(404)
+
   const repoInfo = await models.repositories.findOne({where: {id: repository_id}, raw: true});
 
   const [owner, repo] = repoInfo.githubPath.split(`/`);
@@ -43,7 +47,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     accept: 'application/vnd.github.v3+json',
     owner, repo, title, body,
     head: `${username}:${branch}`,
-    base: process.env.NEXT_GITHUB_MAINBRANCH,
+    base: issue.branch || process.env.NEXT_GITHUB_MAINBRANCH,
     maintainer_can_modify: false,
     draft: false
   }
@@ -55,11 +59,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     issue.state = `ready`;
 
-    const issueLink = `${process.env.NEXT_HOME_URL}/bounty?id=${issue.githubId}&repoId=${issue.repository_id}`
+    const issueLink = `${process.env.NEXT_PUBLIC_HOME_URL}/bounty?id=${issue?.githubId}&repoId=${issue?.repository_id}`
     const body = `@${issue.creatorGithub}, @${username} has a solution - [check your bounty](${issueLink})`;
     await octoKit.rest.issues.createComment({owner, repo, issue_number: issue.githubId, body});
 
     await issue.save();
+    await api.post(`/seo/${issue?.issueId}`)
 
     return res.json(`ok`);
   } catch(error) {

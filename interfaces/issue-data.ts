@@ -1,4 +1,4 @@
-import {ProposalData} from '@services/github-microservice';
+import {ProposalData} from './api-response';
 
 export type IssueState =  'pending' |  'draft' | 'open' | 'in progress' | 'canceled' | 'closed' | 'ready' | 'done' | 'disputed'
 
@@ -22,10 +22,18 @@ export interface IssueData {
   pullRequests: pullRequest[];
   owner?: string;
   repo?: string;
+  branch?: string;
   repository_id?: number;
   mergeProposals: ProposalData[];
   working: string[];
   merged: string;
+  seoImage?: string;
+  repository?: Repository
+}
+
+export interface Repository {
+  id: number,
+  githubPath: string
 }
 
 export interface pullRequest {

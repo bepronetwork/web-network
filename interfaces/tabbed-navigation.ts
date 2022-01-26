@@ -1,8 +1,8 @@
-import { ReactNode } from 'react'
+import { ReactElement, ReactNode } from 'react'
 
 export interface TabbedNavigationItem {
   eventKey: string
-  title: string
+  title: string | ReactElement
   component: ReactNode
 }
 

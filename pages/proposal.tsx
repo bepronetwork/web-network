@@ -1,4 +1,4 @@
-import {GetStaticProps} from 'next/types';
+import {GetServerSideProps, GetStaticProps} from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
 import PageActions from '@components/page-actions';
 import ProposalAddresses from '@components/proposal-addresses';
@@ -7,7 +7,7 @@ import ProposalProgress from '@components/proposal-progress';
 import {useRouter} from 'next/router';
 import {ApplicationContext} from '@contexts/application';
 import {BeproService} from '@services/bepro-service';
-import {ProposalData} from '@services/github-microservice';
+import {ProposalData} from '@interfaces/api-response';
 import {formatDate} from '@helpers/formatDate';
 import {handlePercentage} from '@helpers/handlePercentage';
 import {IssueData, pullRequest} from '@interfaces/issue-data';
@@ -21,6 +21,10 @@ import useApi from '@x-hooks/use-api';
 import useMergeData from '@x-hooks/use-merge-data';
 import NotMergeableModal from '@components/not-mergeable-modal';
 import useOctokit from '@x-hooks/use-octokit';
+import {getSession} from 'next-auth/react';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
+import { isProposalDisputable } from '@helpers/proposal';
 
 interface ProposalBepro {
   disputes: string;
@@ -58,17 +62,18 @@ export default function PageProposal() {
   const [isCouncil, setIsCouncil] = useState(false);
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
+  const [disputableTime, setDisputableTime] = useState(0)
   const [[], {loadRepos}] = useRepos();
-  const {getUserOf,} = useApi();
-  const {getIssue,} = useMergeData();
+  const {getUserOf, getIssue} = useApi();
   const {getPullRequest} = useOctokit();
+  const { t } = useTranslation('common')
 
   async function getProposalData() {
     const [repoId, ghId] = String(issueId).split(`/`);
     const repos = await loadRepos();
     const _repo = repos.find(({id}) => id === +repoId);
 
-    const issueData = await getIssue(repoId, ghId, _repo?.githubPath);
+    const issueData = await getIssue(repoId, ghId);
 
     setIssueMicroService(issueData);
     setPrGithubId(issueData.pullRequests?.find(el => el.id === +prId).githubId);
@@ -88,7 +93,7 @@ export default function PageProposal() {
       const pullRequests = [];
 
       for (const pullRequest of issueMicroService?.pullRequests) {
-        const {data: {merged, mergeable, mergeable_state, number, state}} = await getPullRequest(+pullRequest.githubId, issueMicroService.repo);
+        const {data: {merged, mergeable, mergeable_state, number, state}} = await getPullRequest(+pullRequest.githubId, issueMicroService.repository?.githubPath);
         if (number === +prGithubId) {
           setIsMergiable(mergeable && mergeable_state === 'clean');
           setPullRequestGh({...pullRequest, merged, isMergeable: mergeable && mergeable_state === 'clean', state});
@@ -134,6 +139,7 @@ export default function PageProposal() {
 
   function loadProposalData() {
     if (issueId && currentAddress) {
+      BeproService.getDisputableTime().then(setDisputableTime)
       BeproService.network.isCouncil({address: currentAddress})
         .then(isCouncil => setIsCouncil(isCouncil))
 
@@ -178,10 +184,11 @@ export default function PageProposal() {
         handleMicroService={loadProposalData}
         isDisputed={proposalBepro?.isDisputed}
         githubId={prGithubId}
-        repoPath={issueMicroService?.repo}
+        repoPath={issueMicroService?.repository?.githubPath}
         canClose={isMergiable}
-        finished={isFinished} />
-      <ProposalAddresses addresses={usersAddresses} currency="$BEPRO" />
+        finished={isFinished}
+        isDisputable={isProposalDisputable(proposalMicroService?.createdAt, disputableTime)} />
+      <ProposalAddresses addresses={usersAddresses} currency={t('$bepro')} />
       <NotMergeableModal
         currentGithubLogin={githubLogin}
         issuePRs={issuePRs}
@@ -197,8 +204,11 @@ export default function PageProposal() {
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
-    props: {},
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common', 'proposal', 'pull-request', 'connect-wallet-button'])),
+    },
   };
 };

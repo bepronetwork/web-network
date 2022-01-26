@@ -5,6 +5,7 @@ import Button from './button';
 import ReactSelect from '@components/react-select';
 import useOctokit from '@x-hooks/use-octokit';
 import {ApplicationContext} from '@contexts/application';
+import { useTranslation } from 'next-i18next';
 
 export default function CreatePullRequestModal({
                                                  show = false,
@@ -19,6 +20,7 @@ export default function CreatePullRequestModal({
   const [branch, setBranch] = useState();
   const octo = useOctokit();
   const {state: {accessToken,}} = useContext(ApplicationContext);
+  const { t } = useTranslation(['common', 'pull-request'])
 
   function onSelectedBranch(option) {
     setBranch(option.value);
@@ -46,31 +48,31 @@ export default function CreatePullRequestModal({
   }, [accessToken, repo]);
 
   return (
-    <Modal size="lg" show={show} onCloseClick={onCloseClick} title="Create pull request" titlePosition="center">
+    <Modal size="lg" show={show} onCloseClick={onCloseClick} title={t('pull-request:actions.create.title')} titlePosition="center">
       <div className="container">
         <div>
           <div className="form-group">
-            <label className="smallCaption trans mb-2 text-white-50 text-uppercase">Bounty Title</label>
-            <input value={title} onChange={e => setTitle(e.target.value)} type="text" className="form-control" placeholder="Your Bounty Title"/>
+            <label className="caption-small mb-2 text-gray">{t('forms.create-pull-request.title.label')}</label>
+            <input value={title} onChange={e => setTitle(e.target.value)} type="text" className="form-control" placeholder={t('forms.create-pull-request.title.placeholder')}/>
           </div>
         </div>
         <div>
           <div className="form-group">
-            <label className="smallCaption trans mb-2 text-white-50 text-uppercase">Description</label>
+            <label className="caption-small mb-2 text-gray">{t('forms.create-pull-request.description.label')}</label>
             <textarea value={description}
                       rows={5}
                       onChange={e => setDescription(e.target.value)}
                       className="form-control"
-                      placeholder="Type a description..." />
+                      placeholder={t('forms.create-pull-request.description.placeholder')} />
           </div>
           <div className="form-group">
-            <label className="smallCaption trans mb-2 text-white-50 text-uppercase">Select a branch</label>
+            <label className="caption-small mb-2 text-gray">{t('forms.create-pull-request.branch.label')}</label>
             <ReactSelect options={options} onChange={onSelectedBranch} />
           </div>
         </div>
         <div className="d-flex pt-2 justify-content-center">
-          <Button className='mr-2' disabled={isButtonDisabled()} onClick={() => onConfirm({title, description, branch})}>{isButtonDisabled() && <LockedIcon className='me-2'/>}<span>Create pull request</span></Button>
-          <Button color='dark-gray' onClick={onCloseClick}>cancel</Button>
+          <Button className='mr-2' disabled={isButtonDisabled()} onClick={() => onConfirm({title, description, branch})}>{isButtonDisabled() && <LockedIcon className='me-2'/>}<span>{t('pull-request:actions.create.title')}</span></Button>
+          <Button color='dark-gray' onClick={onCloseClick}>{t('actions.cancel')}</Button>
         </div>
       </div>
     </Modal>
