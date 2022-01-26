@@ -1,17 +1,10 @@
 import { Fragment, useEffect, useState } from 'react';
 
-import { getTimeDifferenceInWords } from '@helpers/formatDate';
+import { formatDate, getTimeDifferenceInWords } from '@helpers/formatDate';
 import { addSeconds } from 'date-fns';
 import { BeproService } from '@services/bepro-service';
+import { useTranslation } from 'next-i18next';
 
-export enum StatusIds {
-  Completed = 'Completed',
-  Canceled = 'Canceled',
-  UntilDone = '[DISTANCE] until done',
-  Distribution = 'Distribution',
-  Pending = 'Pending',
-  InProgress = 'In Progress'
-}
 export default function IssueProposalProgressBar({
   isFinalized = false,
   isIssueinDraft = true,
@@ -23,7 +16,8 @@ export default function IssueProposalProgressBar({
   const [stepColor, setStepColor] = useState<string>('');
   const [currentStep, setCurrentStep] = useState<number>();
   const [redeemTime, setRedeemTime] = useState(0);
-  const steps = ['Draft', 'Development', 'Finalized', 'Validation & Disputes', 'Closed & Distributed']
+  const { t } = useTranslation(['common', 'bounty'])
+  const steps = [t('bounty:steps.draft'), t('bounty:steps.development'), t('bounty:steps.finalized'), t('bounty:steps.validation'), t('bounty:steps.closed')]
 
   function toRepresentationPercent() {
     return currentStep === 0 ? `1` : `${currentStep * 25}`
@@ -31,12 +25,14 @@ export default function IssueProposalProgressBar({
 
   function getStepColor() {
     if (isCanceled)
-      return `danger`
+      return `danger`;
+    if(isFinalized)
+      return `success`;
 
     return `primary`;
   }
 
-  function loadDisputeState() {
+  function loadDisputeState() { 
     //Draft -> isIssueInDraft()
     //Development -> estado inicial
     //Finalized -> recognizedAsFinished == true
@@ -58,81 +54,87 @@ export default function IssueProposalProgressBar({
     setStepColor(getStepColor());
   }
 
-  function renderStepStatus(stepLabel, index) {
+
+  function renderSecondaryText(stepLabel, index) {
+    const secondaryTextStyle = { top: "20px" };
+
     let item = {
-      Completed: {
-        text: StatusIds.Completed,
-        color: 'primary',
-        bgColor: 'primary',
-      },
-      Canceled: {
-        text: StatusIds.Canceled,
-        color: 'danger',
-        bgColor: 'danger-opac-25',
-      },
       Warning: {
-        text: StatusIds.UntilDone.replace('[DISTANCE]', getTimeDifferenceInWords(addSeconds(creationDate, redeemTime), new Date())) as StatusIds,
-        color: 'warning',
-        bgColor: 'warning-opac-25',
+        text: t("bounty:status.until-done", {
+          distance: getTimeDifferenceInWords(
+            addSeconds(creationDate, redeemTime),
+            new Date()
+          ),
+        }),
+        color: "warning",
+        bgColor: "warning-opac-25",
       },
-      Pending: {
-        text: StatusIds.Pending,
-        color: 'gray',
-        bgColor: 'dark-gray',
+      Started: {
+        text: t("bounty:status.started-time", {
+          distance: getTimeDifferenceInWords(creationDate, new Date()),
+        }),
+        color: "ligth-gray",
       },
-      InProgress: {
-        text: StatusIds.InProgress,
-        color: 'white',
-        bgColor: 'primary',
-      }
-    }
+      At: {
+        text: t("bounty:status.end-time", { data: formatDate(creationDate) }),
+        color: "ligth-gray",
+      },
+    };
 
-    let currentValue = item.Pending;
+    let currentValue: { text: string; color?: string; bgColor?: string } = {
+      text: "",
+    };
 
-
-
-    if (index === currentStep) {
-      currentValue = item.InProgress;
+    if (
+      index === currentStep &&
+      [steps[1], steps[3]].includes(steps[currentStep])
+    ) {
+      currentValue = item.Started;
     }
 
     if (index === currentStep && isIssueinDraft) {
       currentValue = item.Warning;
     }
 
-    if (index < currentStep || currentStep === steps.length - 1) {
-      currentValue = item.Completed;
+    if (
+      index === currentStep &&
+      [steps[2], steps[4]].includes(steps[currentStep])
+    ) {
+      currentValue = item.At;
     }
 
-    if (isCanceled) {
-      currentValue = item.Canceled;
-    }
-
-    return (
-      <div className={`bg-${currentValue.bgColor} bg-opacity-25 py-1 px-2  rounded-pill mt-2`}>
-        <span className={`text-${currentValue.color} bg-opacity-100 text-uppercase`}>{currentValue.text}</span>
-      </div>
-    )
+    if (currentValue)
+      return (
+        <div className="position-absolute" style={secondaryTextStyle}>
+          <span
+            className={`text-${
+              currentValue.color && currentValue.color
+            } text-uppercase caption-small `}
+          >
+            {currentValue.text}
+          </span>
+        </div>
+      );
   }
-
+  
   function renderColumn(stepLabel, index) {
+    const style = { top: index === 0 ? "0" : `${index * 60}px`, left: "7px"}
+    const dotClass = `d-flex align-items-center justify-content-center rounded-circle bg-${currentStep >= index ? stepColor : `ligth-gray`}`;
+    const dotStyle = { width: `12px`, height: `12px` }
+    const labelStyle = { left: "40px" }
     const currentItem = currentStep === index
     const isLastItem = currentStep === steps.length - 1;
-    const dotClass = `d-flex align-items-center justify-content-center rounded-circle bg-${currentStep >= index ? stepColor : `dark`}`;
-    const style = { left: index === 0 ? `1%` : `${index * 24}%` };
-    const dotStyle = { width: `20px`, height: `20px` };
 
     return <Fragment key={index}>
-      <div className="position-absolute d-flex align-items-center flex-column" style={style}>
-        <div className={dotClass} style={dotStyle}>
-          <div className='position-relative d-flex align-items-start flex-column'>
-            <div className={`rounded-circle bg-${currentItem && !isCanceled && !isLastItem && 'white'}`} style={{ width: `10px`, height: `10px` }} ></div>
-            <div className='position-absolute mt-4 d-flex align-items-start flex-column'>
-              <label className={`text-uppercase mediumCaption mb-1 text-${currentItem ? stepColor : 'gray'}`}>{stepLabel}</label>
-              {renderStepStatus(stepLabel, index)}
+      <div className='position-absolute d-flex align-items-center flex-column' style={style}>
+         <div className={dotClass} style={dotStyle}>
+         <div className={`rounded-circle bg-${currentItem && !isCanceled && !isLastItem && 'white'}`} style={{ width: `6px`, height: `6px` }} ></div>
+            <div className='position-absolute d-flex align-items-start flex-column mt-1' style={labelStyle}>
+              <label className={`text-uppercase caption mb-1 text-${isCanceled ? `danger`: `${currentItem ? stepColor : 'gray'}`}`}>{stepLabel}</label>
+              {currentItem && renderSecondaryText(stepLabel, index)}
             </div>
-          </div>
         </div>
-      </div>
+     </div>
     </Fragment>
   }
 
@@ -145,16 +147,23 @@ export default function IssueProposalProgressBar({
 
   return (
     <div className="container">
-      <div className="row justify-content-center">
-        <div className=' col-md-10'>
-          <div className="content-wrapper mb-4 pb-0">
-            <div className="issue-proposal-progress col-9">
-              <div className="row">
-                <div className="ms-2 col-12 position-relative">
-                  <div className="progress bg-dark" style={{ height: '6px' }}>
-                    <div className={`progress-bar bg-${stepColor}`} role="progressbar" style={{ width: `${toRepresentationPercent()}%` }}>
-                      {steps.map(renderColumn)}
-                    </div>
+      <div className="row">
+        <div className="ps-0 col-md-12">
+          <div className="content-wrapper mb-4 pb-0 pt-0 issue-proposal-progress">
+            <div className="d-flex justify-content-start mb-3 pt-4">
+              <span className="caption-large">{t('bounty:steps.title')}</span>
+            </div>
+            <div className="row">
+              <div className="position-relative">
+                <div className="progress bg-ligth-gray issue-progress-horizontal">
+                  <div
+                    className={`progress-bar w-100 bg-${stepColor}`}
+                    role="progressbar"
+                    style={{
+                      height: `${toRepresentationPercent()}%`,
+                    }}
+                  >
+                    {steps.map(renderColumn)}
                   </div>
                 </div>
               </div>
@@ -163,5 +172,5 @@ export default function IssueProposalProgressBar({
         </div>
       </div>
     </div>
-  )
+  );
 }

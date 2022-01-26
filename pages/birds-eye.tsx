@@ -1,4 +1,4 @@
-import {User} from '@services/github-microservice';
+import {User} from '@interfaces/api-response';
 import {BeproService} from '@services/bepro-service';
 import React, {useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
@@ -6,6 +6,9 @@ import {Octokit} from 'octokit';
 import router from 'next/router';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import useApi from '@x-hooks/use-api';
+import {GetServerSideProps} from 'next';
+import {getSession} from 'next-auth/react';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 
 export default function FalconPunchPage() {
   const {state: {currentAddress}} = useContext(ApplicationContext);
@@ -72,7 +75,11 @@ export default function FalconPunchPage() {
   return <>
     <div className="container mb-5">
       <ConnectWalletButton asModal={true} />
-      <div className="mt-3 content-wrapper">
+      <br />
+      <br />
+      <br />
+      <br />
+      <div className="content-wrapper">
         <div className="row mb-3">
           <div className="col">
             <label className="p-small mb-2">Github Token</label>
@@ -91,3 +98,12 @@ export default function FalconPunchPage() {
     </div>
   </>
 }
+
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
+  return {
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common',])),
+    },
+  };
+};

@@ -1,4 +1,4 @@
-import { GetStaticProps } from 'next/types';
+import {GetServerSideProps, GetStaticProps} from 'next/types';
 import React, { useContext, useEffect, useState } from 'react';
 import IssueComments from '@components/issue-comments';
 import IssueDescription from '@components/issue-description';
@@ -7,7 +7,7 @@ import PageActions from '@components/page-actions';
 import IssueProposals from '@components/issue-proposals';
 import { useRouter } from 'next/router';
 import { BeproService } from '@services/bepro-service';
-import { User } from '@services/github-microservice';
+import { User } from '@interfaces/api-response';
 import { ApplicationContext } from '@contexts/application';
 import { IssueData } from '@interfaces/issue-data';
 import { formatNumberToCurrency } from '@helpers/formatNumber';
@@ -19,6 +19,9 @@ import useApi from '@x-hooks/use-api';
 import TabbedNavigation from '@components/tabbed-navigation';
 import IssuePullRequests from '@components/issue-pull-requests';
 import CustomContainer from '@components/custom-container';
+import {getSession} from 'next-auth/react';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
+import Translation from '@components/translation';
 interface NetworkIssue {
   recognizedAsFinished: boolean;
 }
@@ -38,17 +41,18 @@ export default function PageIssue() {
   const [hasOpenPR, setHasOpenPR] = useState(false);
   const [mergedPullRequests, setMergedPullRequests] = useState([]);
   const [currentUser, setCurrentUser] = useState<User>();
-  const {getIssue, getMergedDataFromPullRequests} = useMergeData();
+  const {getMergedDataFromPullRequests} = useMergeData();
   const {getIssueComments, getForksOf, getUserRepos,} = useOctokit();
   const [[activeRepo, reposList]] = useRepos();
-  const {getUserOf, moveIssueToOpen, userHasPR} = useApi();
+  const {getUserOf, getIssue, userHasPR} = useApi();
 
   const tabs = [
     {
       eventKey: 'proposals',
-      title: `${networkIssue?.mergeProposalsAmount || 0} Proposal${networkIssue?.mergeProposalsAmount !== 1 && 's' || ''}`,
+      title: <Translation ns="proposal" label={'labelWithCount'} params={{count: networkIssue?.mergeProposalsAmount || 0}} />,
       isEmpty: !(networkIssue?.mergeProposalsAmount > 0),
       component: <IssueProposals
+        key="tab-proposals"
         metaProposals={issue?.mergeProposals}
         metaRequests={issue?.pullRequests}
         numberProposals={networkIssue?.mergeProposalsAmount}
@@ -63,8 +67,8 @@ export default function PageIssue() {
     {
       eventKey: 'pull-requests',
       isEmpty: !(mergedPullRequests.length > 0),
-      title: `${mergedPullRequests.length} Pull Request${mergedPullRequests.length !== 1 && 's' || ''}`,
-      component: <IssuePullRequests className="border-top-0" repoId={issue?.repository_id} issueId={issue?.issueId} pullResquests={mergedPullRequests} />
+      title: <Translation ns="pull-request" label={'labelWithCount'} params={{count: mergedPullRequests.length || 0}} />,
+      component: <IssuePullRequests key="tab-pull-requests" className="border-top-0" repoId={issue?.repository_id} issueId={issue?.issueId} pullResquests={mergedPullRequests} />
     }
   ]
 
@@ -80,10 +84,10 @@ export default function PageIssue() {
     if (!activeRepo || (!force && issue))
       return;
 
-    getIssue(repoId as string, id as string, activeRepo.githubPath)
+    getIssue(repoId as string, id as string)
       .then((issue) => {
         if (!issue)
-          return;
+          return router.push('/404')
 
         setIssue(issue);
 
@@ -92,7 +96,7 @@ export default function PageIssue() {
             .then((comments) => {
               setCommentsIssue(comments.data as any)
             });
-      });
+      })
 
     if (!forks)
       getForksOf(activeRepo.githubPath).then((frk) => setForks(frk.data as any));
@@ -102,7 +106,6 @@ export default function PageIssue() {
     if (!currentAddress || (networkIssue && !force))
       return;
 
-    // bepro.network.getIssueByCID({ issueCID: getIssueCID() })
     const issueCID = getIssueCID()
     BeproService.network.getIssueByCID({ issueCID })
       .then(netIssue => {
@@ -163,7 +166,7 @@ export default function PageIssue() {
 
   function loadMergedPullRequests() {
     if (issue && currentAddress)
-      getMergedDataFromPullRequests(issue.repo, issue.pullRequests).then(setMergedPullRequests)
+      getMergedDataFromPullRequests(issue.repository?.githubPath, issue.pullRequests).then(setMergedPullRequests)
   }
 
   useEffect(loadIssueData, [githubLogin, currentAddress, id, activeRepo]);
@@ -202,7 +205,7 @@ export default function PageIssue() {
         handleBeproService={getsIssueBeproService}
         handleMicroService={getsIssueMicroService}
         pullRequests={issue?.pullRequests || []}
-        mergeProposals={issue?.mergeProposals?.length}
+        mergeProposals={issue?.mergeProposals}
         amountIssue={networkIssue?.tokensStaked}
         forks={forks}
         githubLogin={currentUser?.githubLogin}
@@ -210,30 +213,61 @@ export default function PageIssue() {
         isRepoForked={isRepoForked}
         isWorking={isWorking}
         issueCreator={networkIssue?.issueGenerator}
-        repoPath={issue?.repo}
+        repoPath={issue?.repository?.githubPath}
         githubId={issue?.githubId}
         addNewComment={addNewComment}
         finished={networkIssue?.recognizedAsFinished} />
         {((networkIssue?.mergeProposalsAmount > 0 || mergedPullRequests.length > 0) && currentAddress) && <CustomContainer className="mb-4">
           <TabbedNavigation defaultActiveKey={getDefaultActiveTab()} className="issue-tabs" tabs={tabs} collapsable />
         </CustomContainer>}
-      {networkIssue && <IssueProposalProgressBar
-        isFinalized={networkIssue?.finalized}
-        isIssueinDraft={isIssueinDraft}
-        mergeProposalsAmount={networkIssue?.mergeProposalsAmount}
-        isFinished={networkIssue?.recognizedAsFinished}
-        isCanceled={issue?.state === `canceled` || networkIssue?.canceled}
-        creationDate={networkIssue.creationDate}
-      />}
-
-      <IssueDescription description={issue?.body} />
-      <IssueComments comments={commentsIssue} repo={issue?.repo} issueId={id} />
+        {networkIssue ? (
+        <div className="container mb-1">
+          <div className="d-flex bd-highlight justify-content-center mx-2 px-4">
+            <div className="ps-3 pe-0 ms-0 me-2 w-65 bd-highlight">
+              <div className="container">
+                <IssueDescription description={issue?.body || ''} />
+              </div>
+            </div>
+            <div className="p-0 me-3 flex-shrink-0 w-25 bd-highlight">
+              <div className="sticky-bounty">
+                <IssueProposalProgressBar
+                  isFinalized={networkIssue?.finalized}
+                  isIssueinDraft={isIssueinDraft}
+                  mergeProposalsAmount={networkIssue?.mergeProposalsAmount}
+                  isFinished={networkIssue?.recognizedAsFinished}
+                  isCanceled={
+                    issue?.state === `canceled` || networkIssue?.canceled
+                  }
+                  creationDate={networkIssue.creationDate}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-md-10">
+              <IssueDescription description={issue?.body || ''} />
+            </div>
+          </div>
+        </div>
+      )}
+      <IssueComments comments={commentsIssue} repo={issue?.repository?.githubPath} issueId={id} />
     </>
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({query, locale}) => {
+  const { id, repoId } = query;
+  const {getIssue} = useApi()
+  const currentIssue = await getIssue(repoId as string, id as string)
+
   return {
-    props: {},
+    props: {
+      session: await getSession(),
+      currentIssue,
+      ...(await serverSideTranslations(locale, ['common', 'bounty', 'proposal', 'pull-request'])),
+    },
   };
 };

@@ -6,6 +6,7 @@ import LockedIcon from '@assets/icons/locked-icon'
 import { useRouter } from 'next/router'
 import { useContext } from 'react'
 import { ApplicationContext } from '@contexts/application'
+import Translation from './translation'
 
 export default function PullRequestItem({
   repoId,
@@ -40,20 +41,19 @@ export default function PullRequestItem({
         >
           <a className="text-decoration-none text-white">
             <div className="row align-items-center pl-1 pr-1">
-              <div className="col-7 smallCaption text-uppercase text-white">
+              <div className="col-7 caption-small text-uppercase text-white">
                 <Avatar userLogin={pullRequest?.githubLogin} />
                 <span className="ml-2">
-                  #{pullRequest?.githubId} BY @{pullRequest?.githubLogin}
+                  #{pullRequest?.githubId} <Translation label={'misc.by'} /> @{pullRequest?.githubLogin}
                 </span>
               </div>
 
-              <div className="col-2 smallCaption text-uppercase text-white d-flex justify-content-center">
+              <div className="col-2 caption-small text-uppercase text-white d-flex justify-content-center">
                 {formatDate(pullRequest?.createdAt)}
               </div>
 
-              <div className="col-2 smallCaption text-uppercase text-white d-flex justify-content-center">
-                {pullRequest?.comments?.length} Review
-                {(pullRequest?.comments?.length !== 1 && 's') || ''}
+              <div className="col-2 caption-small text-uppercase text-white d-flex justify-content-center">
+                <Translation ns="pull-request" label="review" params={{ count: pullRequest?.comments?.length || 0 }} />
               </div>
 
               <div className="col-1 d-flex justify-content-center">
@@ -65,7 +65,7 @@ export default function PullRequestItem({
                   }}
                 >
                   {!canReview() && <LockedIcon className="me-2" />}
-                  <span>Review</span>
+                  <span><Translation label="actions.review" /></span>
                 </Button>
               </div>
             </div>

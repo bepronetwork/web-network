@@ -3,7 +3,7 @@ import metamaskLogo from '@assets/metamask.png';
 import Image from 'next/image';
 import React, {useContext, useEffect, useState} from 'react';
 import {ApplicationContext} from '@contexts/application';
-import {signOut, useSession, signIn} from 'next-auth/react';
+import {signOut, useSession, signIn, getSession} from 'next-auth/react';
 import {changeGithubHandle} from '@reducers/change-github-handle';
 import {changeGithubLogin} from '@reducers/change-github-login';
 import GithubImage from '@components/github-image';
@@ -22,6 +22,9 @@ import {NetworkIds} from '@interfaces/enums/network-ids';
 import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
 import { CustomSession } from '@interfaces/custom-session';
+import {GetServerSideProps} from 'next';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 
 
 export default function ConnectAccount() {
@@ -29,10 +32,12 @@ export default function ConnectAccount() {
   const [lastAddressBeforeConnect, setLastAddressBeforeConnect] = useState(``);
   const [isGhValid, setIsGhValid] = useState(null)
   const [githubLogin, setGithubLogin] = useState(null)
+  const [userAcessToken, setUserAcessToken] = useState<string>("")
   const {data: session} = useSession();
   const router = useRouter();
   const { migrate } = router.query;
   const {getUserOf, joinAddressToUser, getUserWith} = useApi();
+  const { t } = useTranslation(['common', 'connect-account'])
 
 
   function updateLastUsedAddress() {
@@ -47,7 +52,7 @@ export default function ConnectAccount() {
     const user = await getUserWith(githubLogin);
 
     if (user && user.address && user.address !== currentAddress.toLowerCase()) {
-      dispatch(toastError(`When migrating, address must match ${truncateAddress(user.address)}.`, undefined, {delay: 10000}));
+      dispatch(toastError(t('connect-account:errors.migrating-address-not-match', { address: truncateAddress(user.address)}), undefined, {delay: 10000}));
       setIsGhValid(false)
       return;
     }
@@ -58,6 +63,9 @@ export default function ConnectAccount() {
 
                         if (user?.githubLogin)
                           setGithubLogin(user.githubLogin);
+
+                        if (user?.accessToken)
+                          setUserAcessToken(user.accessToken)
 
                         if (!user)
                           return;
@@ -79,15 +87,16 @@ export default function ConnectAccount() {
 
     const user = await getUserOf(currentAddress);
 
-    if (user && (user.githubHandle || user.githubLogin.toLowerCase() !== githubLogin.toLowerCase())) {
+    if (user && (user.githubHandle || user.accessToken.toLowerCase() !== userAcessToken.toLowerCase())) {
+
       dispatch(changeLoadState(false));
-      return dispatch(toastError(`Migration not possible or already happened`));
+      return dispatch(toastError(t('connect-account:errors.migrating-already-happened')));
     }
 
     joinAddressToUser(session.user.name||githubLogin,{ address: currentAddress.toLowerCase(), migrate: !!migrate })
                       .then((result) => {
                         if (result === true) {
-                          dispatch(toastSuccess(`Connected accounts!`))
+                          dispatch(toastSuccess(t('connect-account:connect-accounts')))
                           dispatch(changeLoadState(false));
                           dispatch(changeGithubHandle(session.user.name||githubLogin))
                           dispatch(changeGithubLogin(githubLogin))
@@ -159,7 +168,7 @@ export default function ConnectAccount() {
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10 d-flex justify-content-center">
-            <h1 className="h2 text-white text-center">Connect your GitHub account and MetaMask wallet</h1>
+            <h1 className="h2 text-white text-center">{t('connect-account:connect-github-and-wallet')}</h1>
           </div>
         </div>
       </div>
@@ -168,11 +177,11 @@ export default function ConnectAccount() {
       <div className="row justify-content-center">
         <div className="col-md-8 d-flex justify-content-center">
           <div className="content-wrapper mt-up mb-5">
-            <strong className="capition d-block text-uppercase mb-4">To access and use our network please connect your github account and web3 wallet</strong>
+            <strong className="caption-large d-block text-uppercase mb-4">{t('connect-account:connect-to-use')}</strong>
             <div className="row gx-3">
               <div className="col-6">
-                <div className={`button-connect border bg-${githubLogin? `dark border-dark`: `black border-black border-primary-hover cursor-pointer`} rounded d-flex justify-content-between p-3 align-items-center`} onClick={connectGithub}>
-                  {!githubLogin && <div className="mx-auto d-flex align-items-center"><GithubImage width={15} height={15} opacity={1}/> <span className="ms-2 text-uppercase smallCaption">github</span></div>}
+                <div className={`button-connect border bg-${githubLogin? `dark border-dark`: `black border-black border-primary-hover cursor-pointer`} d-flex justify-content-between p-3 align-items-center`} onClick={connectGithub}>
+                  {!githubLogin && <div className="mx-auto d-flex align-items-center"><GithubImage width={15} height={15} opacity={1}/> <span className="ms-2 text-uppercase caption-large">{t('misc.github')}</span></div>}
                   {githubLogin && (
                     <>
                     <div><Avatar src={session?.user?.image} userLogin={githubLogin || `null`} /> <span className="ms-2">{session?.user?.name}</span></div>
@@ -183,11 +192,11 @@ export default function ConnectAccount() {
                 </div>
               </div>
               <div className="col-6">
-                <div className={`button-connect border bg-${currentAddress ? `dark border-dark` : `black border-black border-primary-hover cursor-pointer`} rounded d-flex justify-content-between p-3 align-items-center ${getValidClass()}`} onClick={connectWallet}>
-                  {!currentAddress && <div className="mx-auto d-flex align-items-center">{renderMetamaskLogo()} <span className="ms-2 text-uppercase smallCaption">metamask</span></div>}
+                <div className={`button-connect border bg-${currentAddress ? `dark border-dark` : `black border-black border-primary-hover cursor-pointer`} d-flex justify-content-between p-3 align-items-center ${getValidClass()}`} onClick={connectWallet}>
+                  {!currentAddress && <div className="mx-auto d-flex align-items-center">{renderMetamaskLogo()} <span className="ms-2 text-uppercase caption-large">{t('misc.metamask')}</span></div>}
                   {currentAddress && (
                     <>
-                    <div>{renderMetamaskLogo()} <span className="ms-2">{currentAddress && truncateAddress(currentAddress) || `Connect wallet`}</span></div>
+                    <div>{renderMetamaskLogo()} <span className="ms-2">{currentAddress && truncateAddress(currentAddress) || t('actions.connect-wallet')}</span></div>
                     {isGhValid ? <CheckMarkIcon /> : <ErrorMarkIcon/>}
                     </>
                     )}
@@ -195,8 +204,8 @@ export default function ConnectAccount() {
                 </div>
               </div>
             </div>
-            <div className="smallCaption text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-4">
-              By connecting, you accept <a href="https://www.bepro.network/terms-and-conditions" target="_blank" className="text-decoration-none">Terms & Conditions</a> & <a href="https://www.bepro.network/privacy" target="_blank" className="text-decoration-none">PRIVACY POLICY</a>
+            <div className="caption-small text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-4">
+              {t('misc.by-connecting')} <a href="https://www.bepro.network/terms-and-conditions" target="_blank" className="text-decoration-none">{t('misc.terms-and-conditions')}</a> & <a href="https://www.bepro.network/privacy" target="_blank" className="text-decoration-none">{t('misc.privacy-policy')}</a>
             </div>
             <div className="d-flex justify-content-center mt-4">
               <Button
@@ -204,11 +213,11 @@ export default function ConnectAccount() {
                 disabled={!isGhValid}
                 onClick={joinAddressToGh}>
                 {!isGhValid && <LockedIcon  className="mr-1" width={14} height={14}/>}
-                DONE
+                {t('actions.done')}
               </Button>
               <Button color='dark-gray'
                       onClick={cancelAndSignOut}>
-                CANCEL
+                {t('actions.cancel')}
               </Button>
 
             </div>
@@ -218,3 +227,11 @@ export default function ConnectAccount() {
     </div>
   </>
 }
+
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common', 'connect-account'])),
+    },
+  };
+};

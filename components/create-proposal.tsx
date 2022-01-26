@@ -18,16 +18,28 @@ import useApi from '@x-hooks/use-api';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import useTransactions from '@x-hooks/useTransactions';
 import LockedIcon from '@assets/icons/locked-icon';
+import clsx from 'clsx';
+import { Proposal } from '@interfaces/proposal';
+import { ProposalData } from '@interfaces/api-response';
+import { useTranslation } from 'next-i18next';
 
 interface participants {
   githubHandle: string;
   address?: string;
 }
 
+interface SameProposal {
+  currentPrId: number;
+  prAddressAmount: {
+    amount: number;
+    address: string;
+  }[];
+}
+
 export default function NewProposal({
                                       issueId,
                                       amountTotal,
-                                      numberMergeProposals,
+                                      mergeProposals,
                                       pullRequests = [],
                                       handleBeproService,
                                       handleMicroService,
@@ -36,24 +48,136 @@ export default function NewProposal({
   const {dispatch, state: {balance, currentAddress, beproInit, oracles, githubLogin},} = useContext(ApplicationContext);
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>();
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<boolean>(false);
+  const [success, setSuccess] = useState<boolean>(false);
+  const [warning, setWarning] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
   const [participants, setParticipants] = useState<participants[]>([]);
   const [isCouncil, setIsCouncil] = useState(false);
   const [councilAmount, setCouncilAmount] = useState(0);
   const [currentGithubId, setCurrentGithubId] = useState<string>();
+  const [proposals, setProposals] = useState<Proposal[]>([]);
   const router = useRouter();
   const [[activeRepo]] = useRepos();
   const {getParticipants} = useOctokit();
   const {getUserWith, waitForMerge, processMergeProposal, processEvent} = useApi();
   const txWindow = useTransactions();
+  const { t } = useTranslation(['common', 'bounty', 'proposal', 'pull-request'])
 
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
-    setDistrib((prevState) => ({
+    setDistrib((prevState) => {
+      handleCheckDistrib({
+        ...prevState,
+        ...params,
+        })
+      return({
       ...prevState,
       ...params,
-    }));
+      })
+  });
+  }
+
+  async function loadProposalsMeta() {
+    if (!issueId)
+      return;
+
+    const scIssueId = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    const pool = [];
+
+    for (const meta of mergeProposals as ProposalData[]) {
+      const { scMergeId, pullRequestId } = meta;
+      if (scMergeId) {
+        const merge = await BeproService.network.getMergeById({merge_id: scMergeId, issue_id: scIssueId});
+        pool.push({...merge, pullRequestId } as Proposal)
+      }
+    }
+
+    setProposals(pool);
+  }
+
+  function isSameProposal(
+    currentDistrbuition: SameProposal,
+    currentProposals: SameProposal[]
+  ) {
+    return currentProposals.some((activeProposal) => {
+      if (
+        activeProposal.currentPrId === currentDistrbuition.currentPrId
+      ) {
+        return activeProposal.prAddressAmount.every((ap) =>
+          currentDistrbuition.prAddressAmount.find(
+            (p) => ap.amount === p.amount && ap.address === p.address
+          )
+        );
+      } else {
+        return false;
+      }
+    });
+  }
+
+  function handleCheckDistrib(obj: object) {
+    var currentAmount = sumObj(obj)
+
+    if (currentAmount === 100){
+     const { id }  = pullRequests.find(
+        (data) => data.githubId === currentGithubId
+      )
+
+      var currentDistrbuition = {
+        currentPrId: id,
+        prAddressAmount: participants.map(
+          (item) =>  ({
+            amount: ((amountTotal * obj[item.githubHandle])/100),
+            address: item.address.toLowerCase()
+          })
+        )
+      }
+      
+      var currentProposals = proposals.map((item) => {
+        return ({
+            currentPrId: Number(item.pullRequestId),
+            prAddressAmount: item.prAddresses.map((value, key) => ({
+              amount: Number(item.prAmounts[key]),
+              address: value.toLowerCase()
+            }))
+          })
+         })
+
+      if(isSameProposal(currentDistrbuition, currentProposals)){
+        handleInputColor("warning")
+      }else {
+        handleInputColor("success")
+      } 
+   }
+   if (currentAmount > 0 && currentAmount < 100 || currentAmount > 100){
+    handleInputColor("error")
+   }
+   if (currentAmount === 0){
+    handleInputColor("normal")
+   }
+  }
+
+  function handleInputColor ( name: string ) {
+    if(name === "success"){
+      setError(false)
+      setSuccess(true)
+      setWarning(false)
+    }
+    if(name === "error"){
+      setError(true)
+      setSuccess(false)
+      setWarning(false)
+    }
+    if(name === "warning"){
+      setError(false)
+      setSuccess(false)
+      setWarning(true)
+    }
+    if(name === "normal"){
+      setError(false)
+      setSuccess(false)
+      setWarning(false)
+    }
   }
 
   function getParticipantsPullRequest(id: string, githubId: string) {
@@ -76,9 +200,8 @@ export default function NewProposal({
       .then((participantsPr) => {
         const tmpParticipants = participantsPr.filter(({address}) => !!address);
         const amountPerParticipant = 100 / tmpParticipants.length
-
         setDistrib(Object.fromEntries(tmpParticipants.map(participant => [participant.githubHandle, amountPerParticipant])))
-        setCurrentGithubId(githubId);
+        setCurrentGithubId(githubId);       
         setParticipants(tmpParticipants);
       })
       .catch((err) => {
@@ -87,15 +210,6 @@ export default function NewProposal({
   }
 
   async function handleClickCreate(): Promise<void> {
-    if (amount > 0 && amount < 100)
-      return setError(`${100 - amount}% is missing!`);
-
-    if (amount === 0)
-      return setError('Distribution must be equal to 100%.');
-
-    if (amount > 100)
-      return setError('Distribution exceed 100%.');
-
     const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
 
     const payload = {
@@ -105,7 +219,6 @@ export default function NewProposal({
         (items) => (amountTotal * distrib[items.githubHandle]) / 100
       ),
     };
-
     setShow(false);
 
     const proposeMergeTx = addTransaction({type: TransactionTypes.proposeMerge})
@@ -135,9 +248,8 @@ export default function NewProposal({
                         if (e?.message?.search(`User denied`) > -1)
                           dispatch(updateTransaction({...proposeMergeTx.payload as any, remove: true}))
                         else dispatch(updateTransaction({...proposeMergeTx.payload as any, status: TransactionStatus.failed}));
-                        setError('Error to create proposal in Smart Contract')
                         handleClose();
-                      })
+                      })                    
   }
 
   function handleClose() {
@@ -148,12 +260,14 @@ export default function NewProposal({
     setShow(false);
     setAmount(0);
     setDistrib({});
+    handleInputColor("normal")
   }
 
   function handleChangeSelect({ value, githubId }) {
     setDistrib({});
     setAmount(0);
     getParticipantsPullRequest(value, githubId);
+    handleInputColor("normal")
   }
 
   function recognizeAsFinished() {
@@ -178,7 +292,7 @@ export default function NewProposal({
                   if (e?.message?.search(`User denied`) > -1)
                     dispatch(updateTransaction({...recognizeAsFinished.payload as any, remove: true}))
                   else dispatch(updateTransaction({...recognizeAsFinished.payload as any, status: TransactionStatus.failed}));
-                  dispatch(toastWarning(`Failed to mark bounty as finished!`));
+                  dispatch(toastWarning(t('bounty:errors.recognize-finished')));
                   console.error(`Failed to mark as finished`, e);
                 })
   }
@@ -192,76 +306,98 @@ export default function NewProposal({
   }
 
   function renderRecognizeAsFinished() {
-    return <Button onClick={recognizeAsFinished}>Recognize as finished</Button>;
+    return <Button onClick={recognizeAsFinished} className="mr-1">{t('bounty:actions.recognize-finished.title')}</Button>;
   }
 
   useEffect(() => {
-    setError('');
     setAmount(sumObj(distrib));
   }, [distrib]);
 
   useEffect(() => {
-    if (pullRequests.length && activeRepo)
+    if (pullRequests.length && activeRepo){
       getParticipantsPullRequest(pullRequests[0]?.id, pullRequests[0]?.githubId);
+      loadProposalsMeta()
+    }
   }, [pullRequests, activeRepo]);
 
   useEffect(updateCreateProposalHideState, [currentAddress]);
 
   return (
-    <>
+    <div className="d-flex">
       {
-        isCouncil && isFinished && <Button onClick={() => setShow(true)}>Create Proposal</Button>
+        isCouncil && isFinished && <Button className="mx-2" onClick={() => setShow(true)}>Create Proposal</Button>
         || isIssueOwner && !isFinished && renderRecognizeAsFinished()
       }
       <Modal show={show}
-             title="Create Proposal"
+             title={t('proposal:title')}
              titlePosition="center"
              onCloseClick={handleClose}
              footer={
                <>
                  <Button
                    onClick={handleClickCreate}
-                   disabled={!currentAddress || participants.length === 0}>
-                   {participants.length === 0 && <LockedIcon width={12} height={12} className="mr-1"/>}
-                   Create Proposal
+                   disabled={!currentAddress || participants.length === 0 || !success}>
+                   {!currentAddress || participants.length === 0 || !success && <LockedIcon width={12} height={12} className="mr-1"/>}
+                   <span >{t('proposal:actions.create')}</span>
                  </Button>
 
                  <Button color='dark-gray' onClick={handleClose}>
-                   Cancel
+                   {t('actions.cancel')}
                  </Button>
                </>
              }>
-        <p className="p-small text-50">Select a pull request </p>
+        <p className="caption-small text-white-50 mb-2 mt-2">{t('pull-request:select')}</p>
         <ReactSelect id="pullRequestSelect"
                       isDisabled={participants.length === 0}
+                      placeholder={t('forms.select-placeholder')}
                      defaultValue={{
                        value: pullRequests[0]?.id,
-                       label: `#${pullRequests[0]?.githubId} Pull Request`,
+                       label: `#${pullRequests[0]?.githubId} ${t('misc.by')} @${pullRequests[0].githubLogin}`,
                        githubId: pullRequests[0]?.githubId,
                      }}
                      options={pullRequests?.map((items: pullRequest) => ({
                        value: items.id,
-                       label: `#${items.githubId} Pull Request`,
+                       label: `#${items.githubId} ${t('misc.by')} @${items.githubLogin}`,
                        githubId: items.githubId,
                      }))}
                      onChange={handleChangeSelect}/>
-        {participants.length === 0 && <p className="text-uppercase text-danger text-center w-100 caption mt-4 mb-0">Network Congestion</p> || <>
-          <p className="p-small mt-3">Propose distribution</p>
+        {participants.length === 0 && <p className="text-uppercase text-danger text-center w-100 caption mt-4 mb-0">{t('status.network-congestion')}</p> || <>
+          <p className="caption-small mt-3 text-white-50 text-uppercase mb-2 mt-3">{t('proposal:actions.propose-distribution')}</p>
           <ul className="mb-0">
             {participants.map((item) => (
                                 <CreateProposalDistributionItem key={item.githubHandle}
                                                                 by={item.githubHandle}
                                                                 address={item.address}
                                                                 onChangeDistribution={handleChangeDistrib}
-                                                                defaultPercentage={participants?.length > 1 && (100 / participants.length) || 100}
-                                                                error={!!error}/>
+                                                                defaultPercentage={0}
+                                                                error={!!error}
+                                                                success={success}
+                                                                warning={warning}
+                                                                />
                               )
             )}
           </ul>
-          {error && <p className="p error mt-3 mb-0 text-danger">{error}</p> ||
-          <p className="mt-3 mb-0 text-white-50">Distribute reward percentage</p>}
+          <div className="d-flex" style={{ justifyContent: "flex-end" }}>
+              {warning ? (
+                <p className="caption-small pr-3 mt-3 mb-0 text-uppercase text-warning">
+                  {t('proposal:errors.distribution-already-exists')}
+                </p>
+              ) : (
+                <p
+                  className={clsx(
+                    "caption-small pr-3 mt-3 mb-0  text-uppercase",
+                    {
+                      "text-success": success,
+                      "text-danger": error,
+                    }
+                  )}
+                >
+                  {t(`proposal:messages.distribution-${success ? "is" : "must-be"}-100`)}
+                </p>
+              )}
+            </div>
         </>}
       </Modal>
-    </>
+    </div>
   );
 }

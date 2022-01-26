@@ -1,9 +1,10 @@
 import models from '@db/models';
+import api from '@services/api';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Octokit} from 'octokit';
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const {title, description: body, amount, repository_id, creatorAddress, creatorGithub,} = req.body;
+  const {title, description: body, amount, repository_id, branch, creatorAddress, creatorGithub,} = req.body;
 
   if(!creatorGithub)
     return res.status(422).json(`creatorGithub is required`);
@@ -28,7 +29,10 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
                               creatorAddress,
                               creatorGithub,
                               amount,
+                              branch,
                               state: 'pending',
+                              title,
+                              body
                             });
 
   return res.json(githubId);
@@ -38,10 +42,10 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
   const {repoId: repository_id, githubId, scId: issueId} = req.body;
 
   return models.issue.update({issueId, state: `draft`}, {where: {githubId: githubId, repository_id, issueId: null}})
-               .then(result => {
+               .then(async(result) => {
                  if (!result[0])
                    return res.status(422).json(`nok`)
-
+                  await api.post(`/seo/${issueId}`)
                  return res.status(200).json(`ok`)
                })
                .catch(_ => res.status(422).json(`nok`));

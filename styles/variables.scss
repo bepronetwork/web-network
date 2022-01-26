@@ -37,6 +37,7 @@ $navbar-height: 70px;
 
 
 $more-bg: (
+        'dark': $bg,
         'white-50': $gray,
         'shadow': $bg-shadow,
         'opac': $bg-opac,
@@ -50,9 +51,12 @@ $more-bg: (
         'warning': $warning,
         'warning-opac-25': rgba($warning, 0.25),
         'danger-opac-25': rgba($warning, 0.25),
+        'white-40': rgba($white, 0.4),
+        'white-10': rgba($white, 0.1),
+        'primary-30': rgba($primary, 0.3)
 );
 
-$more-colors: ('blue-dark': $blue-dark, 'dark-gray': $dark-gray, 'ligth-gray': $ligth-gray, 'black': $black, 'white': #fff);
+$more-colors: ('blue-dark': $blue-dark, 'gray': $gray, 'dark-gray': $dark-gray, 'ligth-gray': $ligth-gray, 'black': $black, 'white': #fff);
 
 
 
@@ -101,6 +105,14 @@ $form-check-input-checked-border-color: $primary;
 
 $enable-validation-icons: false;
 
+$modal-content-border-radius: math.div($m, 2);
+
+// Tooltip
+$tooltip-opacity: 1;
+$tooltip-bg: $white;
+$tooltip-color: $ligth-gray;
+$tooltip-arrow-color: $white;
+
 @import "~bootstrap/scss/variables";
 @import "~bootstrap/scss/utilities";
 
@@ -115,8 +127,7 @@ $utilities: map-merge(
                 'border-color': map-merge(map-get($utilities, 'border-color'), (state: hover, values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-colors))),
                 'color': map-merge(map-get($utilities, 'color'), (state: hover , values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-colors))),
                 'background-color': map-merge(map-get($utilities, 'background-color'), (state: hover, values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-bg))),
-                "opacity": map-merge(map-get($utilities, 'opacity'),(state: hover, values: map-get(map-get($utilities, 'opacity'), 'values')),
-                )
+                "opacity": map-merge(map-get($utilities, 'opacity'),(state: hover, values: map-get(map-get($utilities, 'opacity'), 'values'))),
         )
 )
 

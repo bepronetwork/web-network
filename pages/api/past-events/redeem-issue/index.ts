@@ -1,16 +1,14 @@
 import models from '@db/models';
 import {NextApiRequest, NextApiResponse} from 'next';
-import {CONTRACT_ADDRESS, WEB3_CONNECTION} from '../../../../env';
-import {Network} from 'bepro-js';
 import {Octokit} from 'octokit';
 import {Bus} from '@helpers/bus';
-
+import networkBeproJs from '@helpers/api/handle-network-bepro';
+import api from 'services/api'
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {fromBlock, id} = req.body;
   const octokit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
 
-  const opt = {opt: {web3Connection: WEB3_CONNECTION,  privateKey: process.env.NEXT_PRIVATE_KEY}, test: true,};
-  const network = new Network({contractAddress: CONTRACT_ADDRESS, ...opt});
+  const network = networkBeproJs({ test: true });
 
   await network.start();
   const contract = network.getWeb3Contract();
@@ -33,6 +31,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
                     await octokit.rest.issues.update({owner, repo, issue_number: issueId, state: 'closed',});
                     issue.state = 'canceled';
                     await issue.save();
+
+                    await api.post(`/seo/${issueId}`)
 
                     console.log(`Emitting redeemIssue:created:${issueId}`);
                     Bus.emit(`redeemIssue:created:${issueId}`, issue)

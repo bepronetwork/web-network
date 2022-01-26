@@ -1,40 +1,39 @@
 'use strict';
 const {Model, DataTypes} = require('sequelize');
-module.exports = (sequelize) => {
-  class RepositoriesModel extends Model {
+class Repositories extends Model {
 
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // models.pullRequest.belongsTo(models.issue, {
-      //   foreignKey: 'issueId',
-      //   sourceKey: 'id'
-      // });
-      //
-      // models.pullRequest.hasMany(models.mergeProposal, {
-      //   foreignKey: 'pullRequestId',
-      //   sourceKey: 'id'
-      // });
-    }
+  /**
+   * Helper method for defining associations.
+   * This method is not a part of Sequelize lifecycle.
+   * The `models/index` file will call this method automatically.
+   */
+  static init(sequelize){
+    super.init({
+      id: {type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true, unique: true},
+      githubPath: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      }
+    }, {
+      sequelize,
+      modelName: 'repositories',
+      tableName: 'repositories',
+      timestamps: false,
+    });
+  
   }
+  static associate(models) {
+    // this.belongsTo(models.issue, {
+    //   foreignKey: 'issueId',
+    //   sourceKey: 'id'
+    // });
+    //
+    this.hasMany(models.issue, {
+      foreignKey: 'repository_id',
+      sourceKey: 'id'
+    });
+  }
+}
 
-  RepositoriesModel.init({
-    id: {type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true, unique: true},
-    githubPath: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    }
-  }, {
-    sequelize,
-    modelName: 'repositories',
-    tableName: 'repositories',
-    timestamps: false,
-  });
-
-
-  return RepositoriesModel;
-};
+module.exports = Repositories;

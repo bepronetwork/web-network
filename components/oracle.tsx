@@ -3,6 +3,8 @@ import React, { ReactNode, ReactNodeArray, useState } from "react";
 import PageHero from "./page-hero";
 import clsx from "clsx";
 import InternalLink from "./internal-link";
+import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
 
 export default function Oracle({
   children,
@@ -11,15 +13,18 @@ export default function Oracle({
   children?: ReactNode | ReactNodeArray;
   buttonPrimaryActive: boolean;
 }) {
+  const { asPath } = useRouter()
+  const { t } = useTranslation(['oracle'])
+
   return (
     <div>
-      <PageHero title="Curate the Network" />
-      <div className="container">
+      <PageHero title={t('title')} />
+      <div className="container pt-3">
         <div className="row">
-          <div className="d-flex justify-content-center mb-3">
-            <InternalLink href="/oracle/new-bounties" label="New bounties" className={clsx("mr-3 h3 p-0")} nav transparent />
+          <div className="d-flex justify-content-center">
+            <InternalLink href="/oracle/new-bounties" label={String(t('new-bounties'))} className={clsx("mr-3 h3 p-0")} active={asPath === '/oracle' && true || undefined} nav transparent />
 
-            <InternalLink href="/oracle/ready-to-merge" label="Ready to merge" className={clsx("h3 p-0")} nav transparent />
+            <InternalLink href="/oracle/ready-to-merge" label={String(t('ready-to-merge'))} className={clsx("h3 p-0")} nav transparent />
           </div>
         </div>
       </div>
@@ -29,9 +34,3 @@ export default function Oracle({
     </div>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {},
-  };
-};
