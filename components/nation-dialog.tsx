@@ -6,6 +6,7 @@ import Loading from 'components/loading'
 import { COUNTRY_CODE_BLOCKED } from "../env";
 import useApi from '@x-hooks/use-api';
 import { useTranslation } from "next-i18next";
+import axios from 'axios';
 
 export default function NationDialog({ children }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -16,7 +17,9 @@ export default function NationDialog({ children }) {
 
   useEffect(() => {
     setIsLoading(true);
-    getClientNation()
+    
+    axios.get(`http://ip-api.com/json`).then(result => {
+      getClientNation(result.data.query)
       .then((data)=>{
         if (data.countryCode && COUNTRY_CODE_BLOCKED.indexOf(data.countryCode) === -1)
           return;
@@ -26,6 +29,11 @@ export default function NationDialog({ children }) {
 
       })
       .finally(() => setIsLoading(false));
+    }).catch(error => {
+      setCountry(String(t('modals.nation-dialog.your-country')))
+      setBlock(true)
+      setIsLoading(false)
+    })
   }, []);
 
   if (isBlock) {
