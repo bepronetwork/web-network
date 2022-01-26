@@ -249,8 +249,10 @@ export default function useApi() {
                  .catch(e => false);
   }
 
-  async function getClientNation() {
-    return client.get(`/ip`)
+  async function getClientNation(ip: string) {
+    const search = new URLSearchParams({ip}).toString();
+
+    return client.get(`/ip?${search}`)
                  .then(({data}) => data || ({countryCode: `US`, country: ``}))
                  .catch(e => {
                    return ({countryCode: `US`, country: ``})
