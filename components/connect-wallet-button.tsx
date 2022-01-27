@@ -24,7 +24,7 @@ const networkMap = {
 }
 
 export default function ConnectWalletButton({children = null, forceLogin = false, onSuccess = () => null, onFail = () => console.error("Failed to login"), asModal = false, btnColor = `white`}) {
-  const { state: {metaMaskWallet, beproInit, currentAddress, network: activeNetwork}, dispatch } = useContext(ApplicationContext);
+  const { state: {loading, metaMaskWallet, beproInit, currentAddress, network: activeNetwork}, dispatch } = useContext(ApplicationContext);
   const [isAddingNetwork, setIsAddingNetwork] = useState(false);
   const { t } = useTranslation(['common', 'connect-wallet-button'])
 
@@ -112,7 +112,9 @@ export default function ConnectWalletButton({children = null, forceLogin = false
     ].some(values => values)
   }
 
-  if (asModal)
+  if (asModal) {
+    if (loading.isLoading) return <></>
+
     return (
       <Modal
       title={t('connect-wallet-button:title')}
@@ -152,7 +154,8 @@ export default function ConnectWalletButton({children = null, forceLogin = false
       </div>
       </Modal>
     )
-
+  }
+  
   if (!metaMaskWallet)
     return <Button color='white' className='text-primary bg-opacity-100' onClick={connectWallet}><span>{t('main-nav.connect')}</span> <i className="ico-metamask" /></Button>
 

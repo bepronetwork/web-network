@@ -1,16 +1,18 @@
-import {Web3Connection, Network, ERC20} from 'bepro-js/dist';
-import {CONTRACT_ADDRESS, SETTLER_ADDRESS, WEB3_CONNECTION} from '../env';
+import {Web3Connection, Network, ERC20, NetworkFactory} from 'bepro-js/dist';
+import {CONTRACT_ADDRESS, SETTLER_ADDRESS, WEB3_CONNECTION, NETWORK_FACTORY_ADDRESS} from '../env';
 import {BlockTransaction, SimpleBlockTransactionPayload} from '@interfaces/transaction';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 
 class BeproFacet {
 
-  readonly bepro: Web3Connection = new Web3Connection({web3Host: WEB3_CONNECTION,});
+  readonly bepro: Web3Connection = new Web3Connection({web3Host: WEB3_CONNECTION, privateKey: process.env.NEXT_PUBLIC_WALLET_PRIVATE_KEY});
 
   address: string = ``;
   connected: boolean = false;
   network: Network;
+  networkFactory: NetworkFactory;
   erc20: ERC20;
+  operatorAmount: number;
 
   get isLoggedIn() {
     return this.connected;
@@ -21,9 +23,13 @@ class BeproFacet {
       await this.bepro.start();
       this.network = new Network(this.bepro, CONTRACT_ADDRESS);
       this.erc20 = new ERC20(this.bepro, SETTLER_ADDRESS);
-
+      this.networkFactory = new NetworkFactory(this.bepro, NETWORK_FACTORY_ADDRESS);
+      
       await this.network.loadContract();
       await this.erc20.loadContract();
+      await this.networkFactory.loadContract();
+
+      this.operatorAmount = await this.getOperatorAmount();
     } catch (error) {
       console.log(`Failed to start Bepro Service`, error)
 
@@ -36,7 +42,7 @@ class BeproFacet {
   async login() {
     this.connected = false;
     await this.bepro.connect();
-    this.address = this.bepro.Account.address;
+    this.address = await this.bepro.getAddress();
     this.connected = true;
   }
 
@@ -85,6 +91,16 @@ class BeproFacet {
 
   async isApprovedSettlerToken() {
     return this.network.isApprovedSettlerToken(1, this.address);
+  }
+
+  async getTokensLockedByAddress(address: string) {
+    const amount = await this.networkFactory.getLockedStakedByAddress(address)
+
+    return this.fromWei(`${amount}`)
+  }
+
+  async getOperatorAmount() {
+    return this.networkFactory.OPERATOR_AMOUNT()
   }
 
   fromWei(wei: string) {

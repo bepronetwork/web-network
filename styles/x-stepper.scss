@@ -6,7 +6,7 @@
   .step {
     background-color: $bg-shadow;
 
-    svg {
+    svg:not(button svg) {
       color: var(--bs-success);
     }
 
@@ -17,6 +17,12 @@
 
       &, .progress-bar {
         border-radius: 10px;
+      }
+
+      .progress-bar:nth-child(2) {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        background-color: rgba(var(--bs-success-rgb), .3);
       }
     }
   }
