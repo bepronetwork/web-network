@@ -25,6 +25,7 @@ import { changeTransactionalTokenApproval } from './reducers/change-transactiona
 import { changeSettlerTokenApproval } from './reducers/change-settler-token-approval';
 import {setCookie, parseCookies} from 'nookies'
 import { addTransaction } from './reducers/add-transaction';
+import { changeLoadState } from './reducers/change-load-state';
 
 interface GlobalState {
   state: ApplicationState,
@@ -111,10 +112,12 @@ export default function ApplicationContextProvider({children}) {
   }
 
   const Initialize = () => {
+    dispatch(changeLoadState(true))
+
     BeproService.start()
                 .then((state) => {
                   dispatch(changeBeproInitState(state))
-                });
+                }).finally(() => dispatch(changeLoadState(false)))
 
     if (!window.ethereum)
       return;

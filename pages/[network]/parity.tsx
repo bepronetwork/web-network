@@ -21,6 +21,7 @@ import {GetServerSideProps} from 'next';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
+import {NetworkFactory} from 'bepro-js/dist';
 
 export default function ParityPage() {
   const {state: {currentAddress, balance,}, dispatch} = useContext(ApplicationContext);
@@ -215,6 +216,17 @@ export default function ParityPage() {
                 })
   }
 
+  async function deployNetworkFactory() {
+    const factory = new NetworkFactory(BeproService.bepro)
+
+    await factory.loadAbi()
+
+    const receipt = await factory.deployJsonAbi(SETTLER_ADDRESS);
+
+    console.log({receipt})
+    console.log(receipt.contractAddress)
+  }
+
   function updateCouncilAmount() {
     BeproService.network.changeCouncilAmount(+councilAmount)
                 .then(info => {
@@ -390,12 +402,16 @@ export default function ParityPage() {
         </div>
 
         <div className="row">
-          <div className="col d-flex justify-content-end align-items-center">
+          <div className="d-flex flex-row px-0 justify-content-center align-items-center mb-3">
             <Button className="me-2" onClick={() => deployNewContract()}>{t('parity:deploy-contract')}</Button>
             <Button className="me-2" disabled={!councilAmount} onClick={() => updateCouncilAmount()}>{t('parity:update-council-amount')}</Button>
             <Button disabled={!settlerTokenName || !settlerTokenSymbol} onClick={() => deploySettlerToken()}>{t('parity:deploy-settler-token')}</Button>
             <Button onClick={() => changeRedeem()}>{t('parity:change-redeem-time')}</Button>
             <Button onClick={() => changeDisputableTime()}>{t('parity:change-disputable-time')}</Button>
+          </div>
+
+          <div className="d-flex flex-row px-0 justify-content-center align-items-center">
+            <Button className="me-2" onClick={() => deployNetworkFactory()}>Deploy Network Factory</Button>
           </div>
         </div>
       </div>

@@ -4,10 +4,15 @@ import { ProgressBar } from 'react-bootstrap'
 import { useContext, useEffect, useState } from 'react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
+import LockedIcon from '@assets/icons/locked-icon'
+import ArrowRightLine from '@assets/icons/arrow-right-line'
+
 import Step from '@components/step'
+import Button from '@components/button'
 import Stepper from '@components/stepper'
 import ColorInput from '@components/color-input'
 import GithubInfo from '@components/github-info'
+import InputNumber from '@components/input-number'
 import ImageUploader from '@components/image-uploader'
 import ConnectGithub from '@components/connect-github'
 import CustomContainer from '@components/custom-container'
@@ -16,7 +21,10 @@ import ConnectWalletButton from '@components/connect-wallet-button'
 import { ApplicationContext } from '@contexts/application'
 
 import { getQueryableText } from '@helpers/string'
-import { formatNumberToCurrency } from '@helpers/formatNumber'
+import {
+  formatNumberToCurrency,
+  formatNumberToString
+} from '@helpers/formatNumber'
 
 import { BeproService } from '@services/bepro-service'
 
@@ -28,14 +36,16 @@ export default function NewNetwork() {
   const { listUserRepos } = useOctokit()
 
   const {
-    state: { currentAddress, githubLogin, balance, oracles }
+    state: { currentAddress, githubLogin, balance, oracles, beproInit }
   } = useContext(ApplicationContext)
 
   const [currentStep, setCurrentStep] = useState(1)
-  const [tokensLocked, setTokensLocked] = useState(0)
   const [steps, setSteps] = useState({
     lock: {
-      validated: true
+      validated: false,
+      amount: 0,
+      amountLocked: 0,
+      amountNeeded: 0
     },
     network: {
       validated: false,
@@ -88,6 +98,14 @@ export default function NewNetwork() {
     setSteps(tmpSteps)
   }
 
+  function handleLockDataChange(newData) {
+    const tmpSteps = Object.assign({}, steps)
+
+    tmpSteps.lock[newData.label] = newData.value
+
+    setSteps(tmpSteps)
+  }
+
   function handleChangeStep(stepToGo: number) {
     const stepsNames = {
       1: 'lock',
@@ -133,8 +151,14 @@ export default function NewNetwork() {
   }, [githubLogin])
 
   useEffect(() => {
-    //BeproService.getTokensLockedByAddress(currentAddress).then(console.log)
-  }, [currentAddress])
+    if (currentAddress && beproInit) {
+      BeproService.getTokensLockedByAddress(currentAddress)
+        .then((value) => handleLockDataChange({ label: 'amountLocked', value }))
+        .catch(console.log)
+
+        handleLockDataChange({ label: 'amountNeeded', value: BeproService.operatorAmount })
+    }
+  }, [currentAddress, beproInit])
 
   useEffect(() => {
     // Validate Network informations
@@ -176,17 +200,18 @@ export default function NewNetwork() {
   }, [steps])
 
   return (
-    <div>
+    <div className="new-network">
       <ConnectWalletButton asModal={true} />
 
       <CustomContainer>
         <div className="mt-5 pt-5">
           <Stepper>
             <LockBepro
-              validated={steps.lock.validated}
+              data={steps.lock}
               step={1}
               currentStep={currentStep}
               handleClick={() => handleChangeStep(1)}
+              handleChange={handleLockDataChange}
               balance={{
                 beproAvailable: balance.bepro,
                 oraclesAvailable:
@@ -235,13 +260,35 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 }
 
 // Create Network flow steps
-function LockBepro({ validated, step, currentStep, handleClick, balance }) {
+function LockBepro({
+  data,
+  step,
+  currentStep,
+  handleClick,
+  balance,
+  handleChange
+}) {
+  const lockedPercent = ((data.amountLocked || 0) / (data.amountNeeded || 0)) * 100
+  const lockingPercent = ((data.amount || 0) / (data.amountNeeded || 0)) * 100
+  const maxPercent = 100 - lockedPercent
+
+  function handleLock() {
+    BeproService.networkFactory.approveSettlerERC20Token().then((result) => {
+      console.log({ result })
+
+      BeproService.networkFactory
+        .unlock()
+        .then(console.log)
+        .catch(console.log)
+    })
+  }
+
   return (
     <Step
       title="Network "
       index={step}
       activeStep={currentStep}
-      validated={validated}
+      validated={data.validated}
       handleClick={handleClick}
     >
       <div className="row mb-4">
@@ -251,30 +298,144 @@ function LockBepro({ validated, step, currentStep, handleClick, balance }) {
       </div>
 
       <div className="row mx-0 mb-4">
-        <div className="col bg-dark-gray border-radius-8 p-4 text-center mr-3">
-          <p className="caption-medium text-gray">
-            <span className="text-primary">$BEPRO</span> available
-          </p>
-          <p className="h4 text-white">
-            {formatNumberToCurrency(balance.beproAvailable || 0, {
-              maximumFractionDigits: 18
-            })}
-          </p>
+        <div className="col mr-3">
+          <div className="row">
+            <div className="col px-0">
+              <div className="row mb-2">
+                <label htmlFor="" className="caption-medium text-gray">
+                  <span className="text-primary">$BEPRO</span> amount
+                </label>
+              </div>
+
+              <div className="row mx-0 bg-dark-gray border-radius-8">
+                <InputNumber
+                  classSymbol={`text-primary`}
+                  max={balance.bepro}
+                  value={data.amount}
+                  min={0}
+                  placeholder={'0'}
+                  thousandSeparator
+                  decimalSeparator="."
+                  decimalScale={18}
+                  onValueChange={(params) =>
+                    handleChange({ label: 'amount', value: params.floatValue })
+                  }
+                />
+
+                <div className="d-flex caption-small justify-content-between p-4">
+                  <span className="text-ligth-gray">
+                    <span className="text-primary">$BEPRO</span> available
+                  </span>
+
+                  <span className="text-gray">
+                    {formatNumberToCurrency(balance.beproAvailable || 0, {
+                      maximumFractionDigits: 18
+                    })}
+                  </span>
+                </div>
+              </div>
+
+              <div className="row mt-4">
+                <p className="caption-small text-gray">
+                  unlock <span className="text-primary">$BEPRO</span> by giving
+                  away <span className="text-purple">oracles</span>
+                </p>
+              </div>
+
+              <div className="row mt-2 bg-dark-gray bg-dark-hover cursor-pointer border-radius-8 caption-small p-4">
+                <div className="d-flex justify-content-between px-0">
+                  <span className="text-ligth-gray">
+                    <span className="text-purple">ORACLES</span> available
+                  </span>
+
+                  <span className="text-gray">
+                    {formatNumberToCurrency(balance.oraclesAvailable || 0, {
+                      maximumFractionDigits: 18
+                    })}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="col bg-dark-gray border-radius-8 p-4 text-center">
-          <p className="caption-medium text-gray">
-            <span className="text-purple">ORACLES</span> available
+        <div className="col bg-dark-gray border-radius-8 p-4">
+          <p className="caption-medium text-gray mb-4">
+            <span className="text-primary">$BEPRO</span> locked
           </p>
-          <p className="h4 text-white">
-            {formatNumberToCurrency(balance.oraclesAvailable || 0, {
-              maximumFractionDigits: 18
-            })}
-          </p>
+
+          <div className="d-flex justify-content-between caption-large mb-3">
+            <div className="d-flex align-items-center">
+              <span className="text-white mr-1">
+                {formatNumberToCurrency(data.amountLocked || 0, {
+                  maximumFractionDigits: 18
+                })}
+              </span>
+
+              {data.amount > 0 && (
+                <>
+                  <ArrowRightLine />
+
+                  <span className="text-success ml-1">
+                    {formatNumberToCurrency(parseFloat(data.amountLocked) + parseFloat(data.amount))}
+                  </span>
+                </>
+              )}
+            </div>
+
+            <span className="text-gray">
+              {formatNumberToCurrency(data.amountNeeded || 0, {
+                maximumFractionDigits: 18
+              })}
+            </span>
+          </div>
+
+          <div className="row justify-content-between caption-large mb-3">
+            <ProgressBar>
+              <ProgressBar variant="success" now={lockedPercent} isChild />
+
+              <ProgressBar
+                min={0}
+                now={lockingPercent > maxPercent ? maxPercent : lockingPercent}
+                isChild
+              />
+            </ProgressBar>
+          </div>
+
+          <div className="d-flex align-items-center caption-large text-white">
+            <span className="text-white mr-1">
+              {formatNumberToCurrency(lockedPercent, {
+                maximumFractionDigits: 2
+              })}
+              %
+            </span>
+
+            {data.amount > 0 && (
+              <>
+                <ArrowRightLine />
+
+                <span className="text-success ml-1">
+                  {formatNumberToCurrency(lockingPercent + lockedPercent, {
+                    maximumFractionDigits: 2
+                  })}
+                  %
+                </span>
+              </>
+            )}
+          </div>
+
+          <div className="d-flex justify-content-center mt-4 pt-3">
+            <Button disabled={!(data.amount > 0)} onClick={() => handleLock()}>
+              {!(data.amount > 0) && (
+                <LockedIcon width={12} height={12} className="mr-1" />
+              )}
+              <span>lock $bepro</span>
+            </Button>
+          </div>
         </div>
       </div>
 
-      <div className="row mx-0 mb-2">
+      {/* <div className="row mx-0 mb-2">
         <ProgressBar variant="success" now={40} />
       </div>
 
@@ -289,7 +450,7 @@ function LockBepro({ validated, step, currentStep, handleClick, balance }) {
             <span className="text-primary">$BEPRO</span> locked
           </p>
         </div>
-      </div>
+      </div> */}
     </Step>
   )
 }

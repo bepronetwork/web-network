@@ -12,8 +12,7 @@ module.exports = {
       {
         source: '/',
         destination: '/bepro',
-        permanent: true,
-        locale: false
+        permanent: true
       }
     ]
   }

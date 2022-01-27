@@ -1282,3 +1282,18 @@ input[type="color"] {
 .repositories-list {
   gap: 10px;
 }
+
+.new-network {
+  .input-group {
+    padding-left: 0;
+    padding-right: 0;
+    
+    &, > input {
+      border-radius: math.div($m, 2);
+    }
+
+    > input {
+      padding: 18px 20px;
+    }
+  }
+}
