@@ -15,7 +15,6 @@ export default function IssueHero({ issue, state, amount }) {
 
   return (
     <div className="banner bg-bepro-blue mb-4">
-      {console.log({issue})}
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10">
@@ -43,11 +42,11 @@ export default function IssueHero({ issue, state, amount }) {
                         )) ||
                           ``}
                       </span>
-                        {issue.branch && (
+                        {issue?.branch && (
                         <span className="caption-small mr-2 mt-1 text-white-50 text-uppercase">
                             <>
                               <Translation label={`branch`} />
-                              <span className="text-white">:{issue.branch}</span>
+                              <span className="text-white">:{issue?.branch}</span>
                             </>
                         </span>
                         )}
