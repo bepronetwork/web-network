@@ -34,6 +34,9 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   const {repoId: repository_id, githubId, title, description: body, username, branch} = req.body;
 
   const issue = await models.issue.findOne({where: {githubId, repository_id,},});
+  
+  if (!issue) return res.status(404)
+
   const repoInfo = await models.repositories.findOne({where: {id: repository_id}, raw: true});
 
   const [owner, repo] = repoInfo.githubPath.split(`/`);
@@ -44,7 +47,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     accept: 'application/vnd.github.v3+json',
     owner, repo, title, body,
     head: `${username}:${branch}`,
-    base: process.env.NEXT_GITHUB_MAINBRANCH,
+    base: issue.branch || process.env.NEXT_GITHUB_MAINBRANCH,
     maintainer_can_modify: false,
     draft: false
   }

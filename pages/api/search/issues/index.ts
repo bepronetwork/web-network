@@ -65,7 +65,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     result.push(
       ...issues.filter(({ title, body }) =>
-        [title, body].some((text) => searchPatternInText(text, String(search)))
+        [title, body].some((text) => searchPatternInText(text || '', String(search)))
       )
     )
 
