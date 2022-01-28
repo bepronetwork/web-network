@@ -99,7 +99,7 @@ async function doSubTitle({
   }
 
   async function doAmmount() {
-    const value = new Intl.NumberFormat('en-IN', { maximumSignificantDigits: 3 }).format(ammoutValue)
+    const value = new Intl.NumberFormat('en').format(ammoutValue)
     const ammountText = await write(value, 70, "white", "semi",{
     });
     const currencyText = await write("$BEPRO", 38, "#4250E4",'regular',{
