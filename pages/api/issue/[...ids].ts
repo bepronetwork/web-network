@@ -21,13 +21,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if (!issue)
     return res.status(404).json(null);
   
-  // Update PullRequest Status
-  if(!issue.merged){
-    for(const pr of issue.pullRequests) {
-      if(!pr.merged) await api.patch(`/pull-request/${pr?.githubId}`)
-    } 
-  }
-
   return res.status(200).json(issue);
 }
 

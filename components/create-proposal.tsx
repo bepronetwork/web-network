@@ -56,8 +56,9 @@ function SelectValueComponent({ innerProps, innerRef, ...rest }){
 function SelectOptionComponent({ innerProps, innerRef, data }) {
   function getLabel(): PRLabel{
     if(data.merged) return 'merged';
-    if(data.mergeable) return 'ready to merge';
-    if(!data.mergeable) return 'conflicts';
+    if(data.isMergeable) return 'ready to merge';
+    //isMergeable can be null;
+    if(data.isMergeable === false) return 'conflicts';
   }
 
   const label = getLabel()
@@ -418,7 +419,7 @@ export default function NewProposal({
             githubId: pullRequests[0]?.githubId,
             githubLogin: pullRequests[0]?.githubLogin,
             marged:  pullRequests[0]?.merged,
-            mergeable:  pullRequests[0]?.mergeable,
+            isMergeable:  pullRequests[0]?.isMergeable,
             isDisable: false
           }}
           options={pullRequests?.map((items: pullRequest) => ({
@@ -427,8 +428,8 @@ export default function NewProposal({
             githubId: items.githubId,
             githubLogin: items.githubLogin,
             marged: items.merged,
-            mergeable: items.mergeable,
-            isDisable: items.merged || !items.mergeable
+            isMergeable: items.isMergeable,
+            isDisable: items.merged || !items.isMergeable
           }))}
           isOptionDisabled={(option) => option.isDisable}
           onChange={handleChangeSelect}

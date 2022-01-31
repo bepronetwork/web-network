@@ -87,9 +87,22 @@ export default function PageIssue() {
       return;
 
     getIssue(repoId as string, id as string)
-      .then((issue) => {
+      .then(async (issue) => {
         if (!issue)
           return router.push('/404')
+
+        if(issue?.pullRequests?.length > 0){
+          const mapPr = issue.pullRequests.map(async(pr)=>{
+            const {data} = await getPullRequest(Number(pr.githubId), issue?.repository?.githubPath)
+            pr.isMergeable = data.mergeable;
+            pr.merged = data.merged;
+            return pr;
+          })
+  
+          const pullRequests = await Promise.all(mapPr);
+          issue.pullRequests = pullRequests;
+        }
+
         setIssue(issue);
 
         if (!commentsIssue)
