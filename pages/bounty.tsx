@@ -42,7 +42,7 @@ export default function PageIssue() {
   const [mergedPullRequests, setMergedPullRequests] = useState([]);
   const [currentUser, setCurrentUser] = useState<User>();
   const {getMergedDataFromPullRequests} = useMergeData();
-  const {getIssueComments, getForksOf, getUserRepos,} = useOctokit();
+  const {getIssueComments, getForksOf, getUserRepos, getPullRequest} = useOctokit();
   const [[activeRepo, reposList]] = useRepos();
   const {getUserOf, getIssue, userHasPR} = useApi();
 
@@ -90,7 +90,6 @@ export default function PageIssue() {
       .then((issue) => {
         if (!issue)
           return router.push('/404')
-
         setIssue(issue);
 
         if (!commentsIssue)
