@@ -11,5 +11,7 @@ export interface IStep {
   activeStep: number
   validated?: boolean
   children: ReactNode | ReactNode[]
-  handleClick?: () => void
+  finishLabel?: string
+  handleClick?: (index) => void
+  handleFinish?: () => void
 }
