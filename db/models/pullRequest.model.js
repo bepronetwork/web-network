@@ -16,6 +16,8 @@ class PullRequest extends Model {
         type: DataTypes.ARRAY(DataTypes.STRING),
         defaultValue: []
       },
+      mergeable: DataTypes.BOOLEAN,
+      merged: DataTypes.BOOLEAN,
     }, {
       sequelize,
       modelName: 'pullRequest',

@@ -41,7 +41,8 @@ export interface pullRequest {
   githubId: string;
   githubLogin: string;
   id: number;
-  isMergeable: boolean;
+  isMergeable: boolean; // Remove
+  mergeable: boolean;
   issueId: number;
   state: string;
   merged: boolean;
