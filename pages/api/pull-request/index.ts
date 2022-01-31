@@ -20,7 +20,13 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     where.issueId = issue.id
   }
 
-  let prs = await models.pullRequest.findAndCountAll(paginate({where, raw: true}, req.query, [[req.query.sortBy || 'updatedAt', req.query.order || 'DESC']]));
+  const include = [
+    { association: 'issue' },
+  ]
+  let prs = await models.pullRequest.findAndCountAll({
+    ...paginate({where}, req.query, [[req.query.sortBy || 'updatedAt', req.query.order || 'DESC']]),
+    // include
+  });
 
   if (!issueId)
     for(const pr of prs.rows) {

@@ -22,6 +22,8 @@ import clsx from 'clsx';
 import { Proposal } from '@interfaces/proposal';
 import { ProposalData } from '@interfaces/api-response';
 import { useTranslation } from 'next-i18next';
+import Avatar from './avatar';
+import PullRequestLabels, {PRLabel} from './pull-request-labels';
 
 interface participants {
   githubHandle: string;
@@ -34,6 +36,47 @@ interface SameProposal {
     amount: number;
     address: string;
   }[];
+}
+
+function SelectValueComponent({ innerProps, innerRef, ...rest }){
+  const data = rest.getValue();
+  return (
+    <div
+      ref={innerRef}
+      {...innerProps}
+      className="proposal__select-options d-flex align-items-center text-center p-small p-1"
+    >
+      <Avatar userLogin={data[0]?.githubLogin} />
+      <span className={`ml-1 text-nowrap text-gray `}>
+        {data[0]?.label}
+      </span>
+    </div>
+  )
+}
+function SelectOptionComponent({ innerProps, innerRef, data }) {
+  function getLabel(): PRLabel{
+    if(data.merged) return 'merged';
+    if(data.isMergeable) return 'ready to merge';
+    //isMergeable can be null;
+    if(data.isMergeable === false) return 'conflicts';
+  }
+
+  const label = getLabel()
+  return (
+    <div
+      ref={innerRef}
+      {...innerProps}
+      className="proposal__select-options d-flex align-items-center text-center p-small p-1"
+    >
+      <Avatar userLogin={data?.githubLogin} />
+      <span className={`ml-1 text-nowrap ${data.isDisable ? 'text-ligth-gray': 'text-gray hover-primary'}`}>
+        {data?.label}
+      </span>
+      <div className="d-flex flex-grow-1 justify-content-end">
+        {label && <PullRequestLabels label={label}/>}
+      </div>
+    </div>
+  );
 }
 
 export default function NewProposal({
@@ -324,60 +367,97 @@ export default function NewProposal({
 
   return (
     <div className="d-flex">
-      {
-        isCouncil && isFinished && <Button className="mx-2" onClick={() => setShow(true)}>Create Proposal</Button>
-        || isIssueOwner && !isFinished && renderRecognizeAsFinished()
-      }
-      <Modal show={show}
-             title={t('proposal:title')}
-             titlePosition="center"
-             onCloseClick={handleClose}
-             footer={
-               <>
-                 <Button
-                   onClick={handleClickCreate}
-                   disabled={!currentAddress || participants.length === 0 || !success}>
-                   {!currentAddress || participants.length === 0 || !success && <LockedIcon width={12} height={12} className="mr-1"/>}
-                   <span >{t('proposal:actions.create')}</span>
-                 </Button>
+      {(isCouncil && isFinished && (
+        <Button className="mx-2" onClick={() => setShow(true)}>
+          Create Proposal
+        </Button>
+      )) ||
+        (isIssueOwner && !isFinished && renderRecognizeAsFinished())}
+      <Modal
+        show={show}
+        title={t('proposal:title')}
+        titlePosition="center"
+        onCloseClick={handleClose}
+        footer={
+          <>
+            <Button
+              onClick={handleClickCreate}
+              disabled={
+                !currentAddress || participants.length === 0 || !success
+              }
+            >
+              {!currentAddress ||
+                participants.length === 0 ||
+                (!success && (
+                  <LockedIcon width={12} height={12} className="mr-1" />
+                ))}
+              <span>{t('proposal:actions.create')}</span>
+            </Button>
 
-                 <Button color='dark-gray' onClick={handleClose}>
-                   {t('actions.cancel')}
-                 </Button>
-               </>
-             }>
-        <p className="caption-small text-white-50 mb-2 mt-2">{t('pull-request:select')}</p>
-        <ReactSelect id="pullRequestSelect"
-                      isDisabled={participants.length === 0}
-                      placeholder={t('forms.select-placeholder')}
-                     defaultValue={{
-                       value: pullRequests[0]?.id,
-                       label: `#${pullRequests[0]?.githubId} ${t('misc.by')} @${pullRequests[0].githubLogin}`,
-                       githubId: pullRequests[0]?.githubId,
-                     }}
-                     options={pullRequests?.map((items: pullRequest) => ({
-                       value: items.id,
-                       label: `#${items.githubId} ${t('misc.by')} @${items.githubLogin}`,
-                       githubId: items.githubId,
-                     }))}
-                     onChange={handleChangeSelect}/>
-        {participants.length === 0 && <p className="text-uppercase text-danger text-center w-100 caption mt-4 mb-0">{t('status.network-congestion')}</p> || <>
-          <p className="caption-small mt-3 text-white-50 text-uppercase mb-2 mt-3">{t('proposal:actions.propose-distribution')}</p>
-          <ul className="mb-0">
-            {participants.map((item) => (
-                                <CreateProposalDistributionItem key={item.githubHandle}
-                                                                by={item.githubHandle}
-                                                                address={item.address}
-                                                                onChangeDistribution={handleChangeDistrib}
-                                                                defaultPercentage={0}
-                                                                error={!!error}
-                                                                success={success}
-                                                                warning={warning}
-                                                                />
-                              )
-            )}
-          </ul>
-          <div className="d-flex" style={{ justifyContent: "flex-end" }}>
+            <Button color="dark-gray" onClick={handleClose}>
+              {t('actions.cancel')}
+            </Button>
+          </>
+        }
+      >
+        <p className="caption-small text-white-50 mb-2 mt-2">
+          {t('pull-request:select')}
+        </p>
+        <ReactSelect
+          id="pullRequestSelect"
+          isDisabled={participants.length === 0}
+          components={{
+            Option: SelectOptionComponent,
+            ValueContainer: SelectValueComponent
+          }}
+          placeholder={t('forms.select-placeholder')}
+          defaultValue={{
+            value: pullRequests[0]?.id,
+            label: `PR#${pullRequests[0]?.id} ${t("misc.by")} @${
+              pullRequests[0].githubLogin
+            }`,
+            githubId: pullRequests[0]?.githubId,
+            githubLogin: pullRequests[0]?.githubLogin,
+            marged:  pullRequests[0]?.merged,
+            isMergeable:  pullRequests[0]?.isMergeable,
+            isDisable: false
+          }}
+          options={pullRequests?.map((items: pullRequest) => ({
+            value: items.id,
+            label: `#${items.githubId} ${t("misc.by")} @${items.githubLogin}`,
+            githubId: items.githubId,
+            githubLogin: items.githubLogin,
+            marged: items.merged,
+            isMergeable: items.isMergeable,
+            isDisable: items.merged || !items.isMergeable
+          }))}
+          isOptionDisabled={(option) => option.isDisable}
+          onChange={handleChangeSelect}
+        />
+        {(participants.length === 0 && (
+          <p className="text-uppercase text-danger text-center w-100 caption mt-4 mb-0">
+            {t('status.network-congestion')}
+          </p>
+        )) || (
+          <>
+            <p className="caption-small mt-3 text-white-50 text-uppercase mb-2 mt-3">
+              {t("proposal:actions.propose-distribution")}
+            </p>
+            <ul className="mb-0">
+              {participants.map((item) => (
+                <CreateProposalDistributionItem
+                  key={item.githubHandle}
+                  by={item.githubHandle}
+                  address={item.address}
+                  onChangeDistribution={handleChangeDistrib}
+                  defaultPercentage={0}
+                  error={!!error}
+                  success={success}
+                  warning={warning}
+                />
+              ))}
+            </ul>
+            <div className="d-flex" style={{ justifyContent: "flex-end" }}>
               {warning ? (
                 <p className="caption-small pr-3 mt-3 mb-0 text-uppercase text-warning">
                   {t('proposal:errors.distribution-already-exists')}
@@ -396,7 +476,8 @@ export default function NewProposal({
                 </p>
               )}
             </div>
-        </>}
+          </> 
+        )}
       </Modal>
     </div>
   );
