@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from 'react'
 import { ApplicationContext } from '@contexts/application'
 import { changeLoadState } from '@contexts/reducers/change-load-state'
 
-import { hexadecimalToRGB } from '@helpers/string'
+import { hexadecimalToRGB } from '@helpers/colors'
 
 import { Network } from '@interfaces/network'
 
@@ -55,21 +55,21 @@ export default function useNetwork() {
     return `:root {
       --bs-bg-opacity: 1;
       --bs-primary: ${network.colors.primary};
-      --bs-primary-rgb: ${hexadecimalToRGB(network.colors.primary)};
+      --bs-primary-rgb: ${hexadecimalToRGB(network.colors.primary).join(',')};
       --bs-secondary: ${network.colors.secondary};
-      --bs-secondary-rgb: ${hexadecimalToRGB(network.colors.secondary)};
+      --bs-secondary-rgb: ${hexadecimalToRGB(network.colors.secondary).join(',')};
       --bs-background: ${network.colors.background};
-      --bs-background-rgb: ${hexadecimalToRGB(network.colors.background)};
+      --bs-background-rgb: ${hexadecimalToRGB(network.colors.background).join(',')};
       --bs-success: ${network.colors.success};
-      --bs-success-rgb: ${hexadecimalToRGB(network.colors.success)};
+      --bs-success-rgb: ${hexadecimalToRGB(network.colors.success).join(',')};
       --bs-warning: ${network.colors.warning};
-      --bs-warning-rgb: ${hexadecimalToRGB(network.colors.warning)};
+      --bs-warning-rgb: ${hexadecimalToRGB(network.colors.warning).join(',')};
       --bs-danger: ${network.colors.fail};
-      --bs-danger-rgb: ${hexadecimalToRGB(network.colors.fail)};
+      --bs-danger-rgb: ${hexadecimalToRGB(network.colors.fail).join(',')};
       --bs-shadow: ${network.colors.shadow};
-      --bs-shadow-rgb: ${hexadecimalToRGB(network.colors.shadow)};
+      --bs-shadow-rgb: ${hexadecimalToRGB(network.colors.shadow).join(',')};
       --bs-gray: ${network.colors.gray};
-      --bs-gray-rgb: ${hexadecimalToRGB(network.colors.gray)};
+      --bs-gray-rgb: ${hexadecimalToRGB(network.colors.gray).join(',')};
     }`
   }
 

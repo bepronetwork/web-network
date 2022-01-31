@@ -1,9 +1,10 @@
 import { Op } from 'sequelize'
-import models from '@db/models'
 import { NextApiRequest, NextApiResponse } from 'next'
 
+import models from '@db/models'
+
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const { name: networkName} = req.query
+  const { name: networkName } = req.query
 
   const network = await models.network.findOne({
     where: {
@@ -18,6 +19,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(network)
 }
 
+async function post(req: NextApiRequest, res: NextApiResponse) {}
+
 export default async function NetworkEndPoint(
   req: NextApiRequest,
   res: NextApiResponse
@@ -25,6 +28,10 @@ export default async function NetworkEndPoint(
   switch (req.method.toLowerCase()) {
     case 'get':
       await get(req, res)
+      break
+
+    case 'post':
+      await post(req, res)
       break
 
     default:

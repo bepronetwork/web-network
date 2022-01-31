@@ -21,10 +21,7 @@ import ConnectWalletButton from '@components/connect-wallet-button'
 import { ApplicationContext } from '@contexts/application'
 
 import { getQueryableText } from '@helpers/string'
-import {
-  formatNumberToCurrency,
-  formatNumberToString
-} from '@helpers/formatNumber'
+import { formatNumberToCurrency } from '@helpers/formatNumber'
 
 import { BeproService } from '@services/bepro-service'
 
@@ -52,11 +49,11 @@ export default function NewNetwork() {
       data: {
         logoIcon: {
           preview: '',
-          raw: ''
+          raw: undefined as File
         },
         fullLogo: {
           preview: '',
-          raw: ''
+          raw: undefined as File
         },
         displayName: '',
         networkDescription: '',
@@ -123,6 +120,10 @@ export default function NewNetwork() {
     if (canGo) setCurrentStep(stepToGo)
   }
 
+  function handleCreateNetwork() {
+    BeproService.createNetwork().then(console.log).catch(console.log)
+  }
+
   useEffect(() => {
     if (!Object.keys(steps.network.data.colors).length && network) {
       const tmpSteps = Object.assign({}, steps)
@@ -153,20 +154,46 @@ export default function NewNetwork() {
   useEffect(() => {
     if (currentAddress && beproInit) {
       BeproService.getTokensLockedByAddress(currentAddress)
-        .then((value) => handleLockDataChange({ label: 'amountLocked', value }))
+        .then((value) => {
+          handleLockDataChange({ label: 'amountLocked', value })
+        })
         .catch(console.log)
 
-        handleLockDataChange({ label: 'amountNeeded', value: BeproService.operatorAmount })
+      handleLockDataChange({
+        label: 'amountNeeded',
+        value: BeproService.operatorAmount
+      })
     }
   }, [currentAddress, beproInit])
 
   useEffect(() => {
+    //BeproService.networkFactory.getAmountOfNetworksForked().then(result => console.log('getAmountOfNetworksForked', result)).catch(console.log)
+    //BeproService.networkFactory.getNetworkById(0).then(result => console.log('getNetworkById', result)).catch(console.log)
+    //BeproService.networkFactory.getNetworkByAddress(BeproService.address).then(result => console.log('getNetworkByAddress', result)).catch(console.log)
+    
+    BeproService.networkFactory.contract.methods.networks(3).call().then(result => console.log('networksArray', result)).catch(console.log)
+
+    //Validate Locked Tokens
+    const lockData = steps.lock
+
+    const lockValidated = lockData.amountLocked >= BeproService.operatorAmount
+
+    if (lockValidated !== steps.lock.validated) {
+      const tmpSteps = Object.assign({}, steps)
+
+      tmpSteps.lock.validated = lockValidated
+
+      setSteps(tmpSteps)
+    }
+
     // Validate Network informations
     const networkData = steps.network.data
 
     const networkValidated = [
       networkData.fullLogo.preview !== '',
       networkData.logoIcon.preview !== '',
+      networkData.fullLogo.raw?.type?.includes('image/svg'),
+      networkData.logoIcon.raw?.type?.includes('image/svg'),
       networkData.displayName.trim() !== '',
       networkData.networkDescription.trim() !== '',
       new Set(
@@ -210,7 +237,7 @@ export default function NewNetwork() {
               data={steps.lock}
               step={1}
               currentStep={currentStep}
-              handleClick={() => handleChangeStep(1)}
+              handleChangeStep={handleChangeStep}
               handleChange={handleLockDataChange}
               balance={{
                 beproAvailable: balance.bepro,
@@ -227,7 +254,7 @@ export default function NewNetwork() {
               validated={steps.network.validated}
               step={2}
               currentStep={currentStep}
-              handleClick={() => handleChangeStep(2)}
+              handleChangeStep={handleChangeStep}
             />
 
             <SelectRepositories
@@ -237,7 +264,8 @@ export default function NewNetwork() {
               validated={steps.repositories.validated}
               step={3}
               currentStep={currentStep}
-              handleClick={() => handleChangeStep(3)}
+              handleChangeStep={handleChangeStep}
+              handleFinish={handleCreateNetwork}
             />
           </Stepper>
         </div>
@@ -264,18 +292,26 @@ function LockBepro({
   data,
   step,
   currentStep,
-  handleClick,
+  handleChangeStep,
   balance,
   handleChange
 }) {
-  const lockedPercent = ((data.amountLocked || 0) / (data.amountNeeded || 0)) * 100
+  const lockedPercent =
+    ((data.amountLocked || 0) / (data.amountNeeded || 0)) * 100
   const lockingPercent = ((data.amount || 0) / (data.amountNeeded || 0)) * 100
   const maxPercent = 100 - lockedPercent
 
   function handleLock() {
     BeproService.networkFactory.approveSettlerERC20Token().then((result) => {
-      console.log({ result })
+      BeproService.networkFactory
+        .lock(data.amount)
+        .then(() => handleChange({ label: 'amountLocked', value: data.amount }))
+        .catch(console.log)
+    })
+  }
 
+  function handleUnLock() {
+    BeproService.networkFactory.approveSettlerERC20Token().then((result) => {
       BeproService.networkFactory
         .unlock()
         .then(console.log)
@@ -289,7 +325,7 @@ function LockBepro({
       index={step}
       activeStep={currentStep}
       validated={data.validated}
-      handleClick={handleClick}
+      handleClick={handleChangeStep}
     >
       <div className="row mb-4">
         <span className="caption-small text-gray">
@@ -312,6 +348,7 @@ function LockBepro({
                   classSymbol={`text-primary`}
                   max={balance.bepro}
                   value={data.amount}
+                  disabled={data.amountLocked >= 100}
                   min={0}
                   placeholder={'0'}
                   thousandSeparator
@@ -366,7 +403,11 @@ function LockBepro({
 
           <div className="d-flex justify-content-between caption-large mb-3">
             <div className="d-flex align-items-center">
-              <span className="text-white mr-1">
+              <span
+                className={`text-${
+                  (lockedPercent >= 100 && 'success') || 'white'
+                } mr-1`}
+              >
                 {formatNumberToCurrency(data.amountLocked || 0, {
                   maximumFractionDigits: 18
                 })}
@@ -377,16 +418,23 @@ function LockBepro({
                   <ArrowRightLine />
 
                   <span className="text-success ml-1">
-                    {formatNumberToCurrency(parseFloat(data.amountLocked) + parseFloat(data.amount))}
+                    {formatNumberToCurrency(
+                      parseFloat(data.amountLocked) + parseFloat(data.amount)
+                    )}
                   </span>
                 </>
               )}
             </div>
 
-            <span className="text-gray">
-              {formatNumberToCurrency(data.amountNeeded || 0, {
-                maximumFractionDigits: 18
-              })}
+            <span
+              className={`text-${
+                (lockedPercent >= 100 && 'success') || 'gray'
+              }`}
+            >
+              {(lockedPercent >= 100 && 'full') ||
+                formatNumberToCurrency(data.amountNeeded || 0, {
+                  maximumFractionDigits: 18
+                })}
             </span>
           </div>
 
@@ -403,7 +451,11 @@ function LockBepro({
           </div>
 
           <div className="d-flex align-items-center caption-large text-white">
-            <span className="text-white mr-1">
+            <span
+              className={`text-${
+                (lockedPercent >= 100 && 'success') || 'white'
+              } mr-1`}
+            >
               {formatNumberToCurrency(lockedPercent, {
                 maximumFractionDigits: 2
               })}
@@ -425,32 +477,20 @@ function LockBepro({
           </div>
 
           <div className="d-flex justify-content-center mt-4 pt-3">
-            <Button disabled={!(data.amount > 0)} onClick={() => handleLock()}>
-              {!(data.amount > 0) && (
+            <Button
+              disabled={!(data.amount > 0) || lockedPercent >= 100}
+              onClick={() => handleLock()}
+            >
+              {(!(data.amount > 0) || lockedPercent >= 100) && (
                 <LockedIcon width={12} height={12} className="mr-1" />
               )}
               <span>lock $bepro</span>
             </Button>
+
+            <Button onClick={handleUnLock}>Unlock</Button>
           </div>
         </div>
       </div>
-
-      {/* <div className="row mx-0 mb-2">
-        <ProgressBar variant="success" now={40} />
-      </div>
-
-      <div className="row mx-0">
-        <div className="col p-0 text-center">
-          <p className="h3 text-white mb-1">
-            {formatNumberToCurrency(balance.tokensLocked || 0, {
-              maximumFractionDigits: 18
-            })}
-          </p>
-          <p className="caption-medium text-gray">
-            <span className="text-primary">$BEPRO</span> locked
-          </p>
-        </div>
-      </div> */}
     </Step>
   )
 }
@@ -462,7 +502,7 @@ function NetworkInformation({
   validated,
   step,
   currentStep,
-  handleClick
+  handleChangeStep
 }) {
   function showTextOrDefault(text: string, defaultText: string) {
     return text.trim() === '' ? defaultText : text
@@ -474,28 +514,45 @@ function NetworkInformation({
       index={step}
       activeStep={currentStep}
       validated={validated}
-      handleClick={handleClick}
+      handleClick={handleChangeStep}
     >
-      <div className="d-flex gap-20 mb-5 align-items-center">
-        <ImageUploader
-          name="logoIcon"
-          onChange={changedDataHandler}
-          description={
-            <>
-              upload <br /> logo icon
-            </>
-          }
-        />
+      <span className="caption-small text-gray mb-4">
+        You can change this information later in your Network Settings page.
+      </span>
 
-        <ImageUploader
-          name="fullLogo"
-          onChange={changedDataHandler}
-          description={
-            <>
-              upload <br /> full logo
-            </>
-          }
-        />
+      <div className="d-flex gap-20 mb-5 align-items-center">
+        <div className="d-flex flex-column">
+          <div className="d-flex gap-20">
+            <ImageUploader
+              name="logoIcon"
+              error={
+                data.logoIcon.raw &&
+                !data.logoIcon.raw?.type?.includes('image/svg')
+              }
+              onChange={changedDataHandler}
+              description={
+                <>
+                  upload <br /> logo icon
+                </>
+              }
+            />
+
+            <ImageUploader
+              name="fullLogo"
+              error={
+                data.fullLogo.raw &&
+                !data.fullLogo.raw?.type?.includes('image/svg')
+              }
+              onChange={changedDataHandler}
+              description="upload full logo"
+              lg
+            />
+          </div>
+
+          <p className="p-small text-gray mb-0 mt-2">
+            The logos must be in .svg format
+          </p>
+        </div>
 
         <div className="col ml-2">
           <p className="h3 text-white mb-3">
@@ -567,7 +624,7 @@ function NetworkInformation({
         </div>
       </div>
 
-      <div className="row mx-0 px-0">
+      <div className="row mx-0 px-0 mb-3">
         <div className="col">
           <label htmlFor="colors" className="caption-small mb-2">
             colors
@@ -598,7 +655,8 @@ function SelectRepositories({
   validated,
   step,
   currentStep,
-  handleClick
+  handleChangeStep,
+  handleFinish
 }) {
   return (
     <Step
@@ -606,12 +664,15 @@ function SelectRepositories({
       index={step}
       activeStep={currentStep}
       validated={validated}
-      handleClick={handleClick}
+      handleClick={handleChangeStep}
+      finishLabel="Create Network"
+      handleFinish={handleFinish}
     >
       {(githubLogin && (
         <div className="row mb-4 justify-content-start repositories-list">
           {repositories.map((repository) => (
             <GithubInfo
+              key={repository.name}
               label={repository.name}
               active={repository.checked}
               onClick={() => onClick(repository.name)}

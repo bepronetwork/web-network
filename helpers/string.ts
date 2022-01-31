@@ -28,18 +28,6 @@ export const searchPatternInText = (txt: string, pattern: string): boolean => {
   return false
 }
 
-export const hexadecimalToRGB = (hexadecimal: string): string => {
-  return hexadecimal
-    .replace(
-      /^#?([a-f\d])([a-f\d])([a-f\d])$/i,
-      (m, r, g, b) => '#' + r + r + g + g + b + b
-    )
-    .substring(1)
-    .match(/.{2}/g)
-    .map((x) => parseInt(x, 16))
-    .join(',')
-}
-
 export const getQueryableText = (text: string): string => {
   return text
     .toLowerCase()

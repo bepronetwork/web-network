@@ -1244,8 +1244,17 @@ textarea.form-control {
 }
 
 .image-uploader {
-  height: 120px;
-  width: 120px;
+  height: 100px;
+  width: 100px;
+
+  &.lg {
+    width: 200px;
+    height: 100px;
+  }
+
+  &.error {
+    border: 1px solid var(--bs-danger);
+  }
 
   color: $ligth-gray;
   cursor: pointer;
@@ -1265,7 +1274,7 @@ textarea.form-control {
   height: 38px;
 
   border-radius: 38px;
-  border: none;
+  border: 2px solid $white;
 
   overflow: hidden;
 }

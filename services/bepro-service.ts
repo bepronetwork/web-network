@@ -103,6 +103,10 @@ class BeproFacet {
     return this.networkFactory.OPERATOR_AMOUNT()
   }
 
+  async createNetwork() {
+    return this.networkFactory.createNetwork(SETTLER_ADDRESS, SETTLER_ADDRESS)
+  }
+
   fromWei(wei: string) {
     return this.bepro.Web3.utils.fromWei(wei)
   }
