@@ -32,8 +32,9 @@ export default function PullRequestItem({
 
   function getLabel(): PRLabel{
     if(pullRequest.merged) return 'merged';
-    if(pullRequest.mergeable) return 'ready to merge';
-    if(!pullRequest.mergeable) return 'conflicts';
+    if(pullRequest.isMergeable) return 'ready to merge';
+    //isMergeable can be null;
+    if(pullRequest.isMergeable === false) return 'conflicts';
   }
 
   const label = getLabel()
