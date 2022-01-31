@@ -42,7 +42,7 @@ export default function PageIssue() {
   const [mergedPullRequests, setMergedPullRequests] = useState([]);
   const [currentUser, setCurrentUser] = useState<User>();
   const {getMergedDataFromPullRequests} = useMergeData();
-  const {getIssueComments, getForksOf, getUserRepos,} = useOctokit();
+  const {getIssueComments, getForksOf, getUserRepos, getPullRequest} = useOctokit();
   const [[activeRepo, reposList]] = useRepos();
   const {getUserOf, getIssue, userHasPR} = useApi();
 
@@ -62,13 +62,15 @@ export default function PageIssue() {
         isFinalized={networkIssue?.finalized}
         mergedProposal={issue?.merged}
         className="border-top-0"
-      />
+      />,
+      description: 'its a proposal'
     },
     {
       eventKey: 'pull-requests',
       isEmpty: !(mergedPullRequests.length > 0),
       title: <Translation ns="pull-request" label={'labelWithCount'} params={{count: mergedPullRequests.length || 0}} />,
-      component: <IssuePullRequests key="tab-pull-requests" className="border-top-0" repoId={issue?.repository_id} issueId={issue?.issueId} pullResquests={mergedPullRequests} />
+      component: <IssuePullRequests key="tab-pull-requests" className="border-top-0" repoId={issue?.repository_id} issueId={issue?.issueId} pullResquests={mergedPullRequests} />,
+      description: 'its a pr'
     }
   ]
 
@@ -85,9 +87,21 @@ export default function PageIssue() {
       return;
 
     getIssue(repoId as string, id as string)
-      .then((issue) => {
+      .then(async (issue) => {
         if (!issue)
           return router.push('/404')
+
+        if(issue?.pullRequests?.length > 0){
+          const mapPr = issue.pullRequests.map(async(pr)=>{
+            const {data} = await getPullRequest(Number(pr.githubId), issue?.repository?.githubPath)
+            pr.isMergeable = data.mergeable;
+            pr.merged = data.merged;
+            return pr;
+          })
+  
+          const pullRequests = await Promise.all(mapPr);
+          issue.pullRequests = pullRequests;
+        }
 
         setIssue(issue);
 
