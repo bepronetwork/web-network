@@ -129,13 +129,17 @@ async function doSubTitle({
 }
 
 async function doTitle(title: string) {
- try{
-  //Wrap lines size between 26 and 35 words
-  title = title?.split(' ')
-  .reduce((p, c) => p.length % 35 > 26 && p.length % 35 < 35?`${p} \n${c}`:`${p} ${c}`)
- }catch{
-   title = title
- }
+  try{ 
+    //Wrap lines size between 26 and 35 words
+    title = title?.split(' ')
+    .reduce((p, c) => {
+      const lines = p.split('\n');
+      const currentLine = lines[lines.length - 1].length;
+      return currentLine + c.length % 35 > 26 ? `${p} \n${c}`:`${p} ${c}`;
+    })
+  } catch {
+    title = title
+  }
 
   const titleText = await write(title||'', 48, "white", "semi");
   var titleContainer = new Jimp(1080, 174);
