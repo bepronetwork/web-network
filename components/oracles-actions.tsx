@@ -79,9 +79,8 @@ function OraclesActions(): JSX.Element {
   function updateValues() {
     BeproService.getBalance('bepro')
                 .then(amount => {
-                  BeproService?.network
-                              ?.isApprovedSettlerToken({address: currentAddress, amount})
-                              ?.then(updateErrorsAndApproval)
+                  BeproService.isApprovedSettlerToken()
+                              .then(updateErrorsAndApproval)
                 })
   }
 
@@ -168,11 +167,9 @@ function OraclesActions(): JSX.Element {
 
   function checkLockedAmount() {
     if (!currentAddress)
-      return;
+      return
 
-    BeproService.network
-                ?.isApprovedSettlerToken({address: BeproService.address, amount: tokenAmount})
-                ?.then(handleCheck);
+    BeproService.isApprovedSettlerToken().then(handleCheck)
   }
 
   function getCurrentLabel(): TransactionCurrency {
@@ -262,7 +259,6 @@ function OraclesActions(): JSX.Element {
             onSuccess={onSuccess}
             onFail={setError}
             ref={networkTxRef}
-            useContract
             />
 
         </div>

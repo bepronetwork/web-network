@@ -11,7 +11,11 @@ class Network extends Model {
           unique: true
         },
         colors: DataTypes.JSON,
-        network_id: DataTypes.INTEGER
+        networkAddress: DataTypes.STRING,
+        logoIcon: DataTypes.STRING,
+        fullLogo: DataTypes.STRING,
+        createdAt: DataTypes.DATE,
+        updatedAt: DataTypes.DATE
       },
       {
         sequelize,

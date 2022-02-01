@@ -68,11 +68,11 @@ function networkTxButton({
     let transactionMethod
 
     if(!useContract)
-      transactionMethod = BeproService.network[txMethod](txParams)
+      transactionMethod = BeproService.network[txMethod](txParams.tokenAmount, txParams.from)
     else {
       const weiAmount = BeproService.toWei(txParams?.tokenAmount.toString())
   
-      transactionMethod = BeproService.network.params.contract.getContract().methods[txMethod]
+      transactionMethod = BeproService.network.contract.methods[txMethod]
       transactionMethod = txMethod === 'lock' ? transactionMethod(weiAmount).send({from: currentAddress}) : transactionMethod(weiAmount, txParams?.from).send({from: currentAddress})
     }
 

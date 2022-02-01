@@ -22,7 +22,7 @@ export default function OraclesTakeBack(): JSX.Element {
   }
 
   function updateOracles() {
-    BeproService.network.getOraclesSummary({address: currentAddress})
+    BeproService.network.getOraclesSummary(currentAddress)
                 .then(oracles => dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles))));
   }
 

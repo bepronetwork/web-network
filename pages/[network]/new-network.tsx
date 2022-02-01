@@ -16,6 +16,7 @@ import InputNumber from '@components/input-number'
 import ImageUploader from '@components/image-uploader'
 import ConnectGithub from '@components/connect-github'
 import CustomContainer from '@components/custom-container'
+import UnlockBeproModal from '@components/unlock-bepro-modal'
 import ConnectWalletButton from '@components/connect-wallet-button'
 
 import { ApplicationContext } from '@contexts/application'
@@ -170,8 +171,8 @@ export default function NewNetwork() {
     //BeproService.networkFactory.getAmountOfNetworksForked().then(result => console.log('getAmountOfNetworksForked', result)).catch(console.log)
     //BeproService.networkFactory.getNetworkById(0).then(result => console.log('getNetworkById', result)).catch(console.log)
     //BeproService.networkFactory.getNetworkByAddress(BeproService.address).then(result => console.log('getNetworkByAddress', result)).catch(console.log)
-    
-    BeproService.networkFactory.contract.methods.networks(3).call().then(result => console.log('networksArray', result)).catch(console.log)
+
+    //BeproService.networkFactory.contract.methods.networks(3).call().then(result => console.log('networksArray', result)).catch(console.log)
 
     //Validate Locked Tokens
     const lockData = steps.lock
@@ -296,27 +297,48 @@ function LockBepro({
   balance,
   handleChange
 }) {
+  const [isLocking, setIsLocking] = useState(false)
+  const [showUnlockBepro, setShowUnlockBepro] = useState(false)
+
   const lockedPercent =
     ((data.amountLocked || 0) / (data.amountNeeded || 0)) * 100
   const lockingPercent = ((data.amount || 0) / (data.amountNeeded || 0)) * 100
   const maxPercent = 100 - lockedPercent
+  const maxValue = Math.min(
+    balance.beproAvailable,
+    data.amountNeeded - data.amountLocked
+  )
+  const textAmountClass =
+    data.amount > balance.beproAvailable ? 'text-danger' : 'text-primary'
+  const amountsClass = data.amount > maxValue ? 'danger' : 'success'
 
   function handleLock() {
-    BeproService.networkFactory.approveSettlerERC20Token().then((result) => {
-      BeproService.networkFactory
-        .lock(data.amount)
-        .then(() => handleChange({ label: 'amountLocked', value: data.amount }))
-        .catch(console.log)
-    })
+    setIsLocking(true)
+
+    BeproService.networkFactory
+      .approveSettlerERC20Token()
+      .then((result) => {
+        BeproService.networkFactory
+          .lock(data.amount)
+          .then(() =>
+            handleChange({ label: 'amountLocked', value: data.amount })
+          )
+          .catch(console.log)
+          .finally(() => setIsLocking(false))
+      })
+      .catch(() => setIsLocking(false))
   }
 
   function handleUnLock() {
-    BeproService.networkFactory.approveSettlerERC20Token().then((result) => {
-      BeproService.networkFactory
-        .unlock()
-        .then(console.log)
-        .catch(console.log)
-    })
+    BeproService.networkFactory.unlock().then(console.log).catch(console.log)
+  }
+
+  function handleShowUnlockModal() {
+    setShowUnlockBepro(true)
+  }
+
+  function handleCloseUnlockModal() {
+    setShowUnlockBepro(false)
   }
 
   return (
@@ -343,12 +365,15 @@ function LockBepro({
                 </label>
               </div>
 
-              <div className="row mx-0 bg-dark-gray border-radius-8">
+              <div className="row mx-0 bg-dark-gray border-radius-8 amount-input">
                 <InputNumber
                   classSymbol={`text-primary`}
-                  max={balance.bepro}
+                  max={maxValue}
                   value={data.amount}
-                  disabled={data.amountLocked >= 100}
+                  disabled={data.amountLocked >= data.amountNeeded}
+                  setMaxValue={() =>
+                    handleChange({ label: 'amount', value: maxValue })
+                  }
                   min={0}
                   placeholder={'0'}
                   thousandSeparator
@@ -359,44 +384,67 @@ function LockBepro({
                   }
                 />
 
-                <div className="d-flex caption-small justify-content-between p-4">
+                <div className="d-flex caption-small justify-content-between align-items-center p-20">
                   <span className="text-ligth-gray">
                     <span className="text-primary">$BEPRO</span> available
                   </span>
 
-                  <span className="text-gray">
-                    {formatNumberToCurrency(balance.beproAvailable || 0, {
-                      maximumFractionDigits: 18
-                    })}
-                  </span>
+                  <div className="d-flex align-items-center">
+                    <span className="text-gray">
+                      {formatNumberToCurrency(balance.beproAvailable || 0, {
+                        maximumFractionDigits: 18
+                      })}
+                    </span>
+
+                    {data.amount > 0 && (
+                      <>
+                        <span
+                          className={`${textAmountClass} ml-1 d-flex align-items-center`}
+                        >
+                          <ArrowRightLine />
+                        </span>
+
+                        <span className={`${textAmountClass} ml-1`}>
+                          {formatNumberToCurrency(
+                            parseFloat(balance.beproAvailable) -
+                              parseFloat(data.amount)
+                          )}
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <div className="row mt-4">
-                <p className="caption-small text-gray">
-                  unlock <span className="text-primary">$BEPRO</span> by giving
-                  away <span className="text-purple">oracles</span>
-                </p>
-              </div>
+              {balance.oraclesAvailable > 0 && (
+                <>
+                  <div className="row mt-4">
+                    <p className="caption-small text-gray">
+                      unlock <span className="text-primary">$BEPRO</span> by
+                      giving away <span className="text-purple">oracles</span>
+                    </p>
+                  </div>
 
-              <div className="row mt-2 bg-dark-gray bg-dark-hover cursor-pointer border-radius-8 caption-small p-4">
-                <div className="d-flex justify-content-between px-0">
-                  <span className="text-ligth-gray">
-                    <span className="text-purple">ORACLES</span> available
-                  </span>
+                  <div className="row mt-2 bg-dark-gray bg-dark-hover cursor-pointer border-radius-8 caption-small p-20" onClick={handleShowUnlockModal}>
+                    <div className="d-flex justify-content-between px-0">
+                      <span className="text-ligth-gray">
+                        <span className="text-purple">ORACLES</span> available
+                      </span>
 
-                  <span className="text-gray">
-                    {formatNumberToCurrency(balance.oraclesAvailable || 0, {
-                      maximumFractionDigits: 18
-                    })}
-                  </span>
-                </div>
-              </div>
+                      <span className="text-gray">
+                        {formatNumberToCurrency(balance.oraclesAvailable || 0, {
+                          maximumFractionDigits: 18
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
 
-        <div className="col bg-dark-gray border-radius-8 p-4">
+        <div className="col bg-dark-gray border-radius-8 p-20">
           <p className="caption-medium text-gray mb-4">
             <span className="text-primary">$BEPRO</span> locked
           </p>
@@ -414,15 +462,15 @@ function LockBepro({
               </span>
 
               {data.amount > 0 && (
-                <>
+                <div className={`text-${amountsClass}`}>
                   <ArrowRightLine />
 
-                  <span className="text-success ml-1">
+                  <span className="ml-1">
                     {formatNumberToCurrency(
                       parseFloat(data.amountLocked) + parseFloat(data.amount)
                     )}
                   </span>
-                </>
+                </div>
               )}
             </div>
 
@@ -440,11 +488,15 @@ function LockBepro({
 
           <div className="row justify-content-between caption-large mb-3">
             <ProgressBar>
-              <ProgressBar variant="success" now={lockedPercent} isChild />
+              <ProgressBar
+                variant={amountsClass}
+                now={lockingPercent > maxPercent ? 100 : lockedPercent}
+                isChild
+              />
 
               <ProgressBar
                 min={0}
-                now={lockingPercent > maxPercent ? maxPercent : lockingPercent}
+                now={lockingPercent > maxPercent ? 0 : lockingPercent}
                 isChild
               />
             </ProgressBar>
@@ -463,34 +515,49 @@ function LockBepro({
             </span>
 
             {data.amount > 0 && (
-              <>
+              <div className={`text-${amountsClass}`}>
                 <ArrowRightLine />
 
-                <span className="text-success ml-1">
+                <span className="ml-1">
                   {formatNumberToCurrency(lockingPercent + lockedPercent, {
                     maximumFractionDigits: 2
                   })}
                   %
                 </span>
-              </>
+              </div>
             )}
           </div>
 
           <div className="d-flex justify-content-center mt-4 pt-3">
             <Button
-              disabled={!(data.amount > 0) || lockedPercent >= 100}
+              disabled={
+                !(data.amount > 0) ||
+                lockedPercent >= 100 ||
+                data.amount > maxValue ||
+                isLocking
+              }
               onClick={() => handleLock()}
             >
-              {(!(data.amount > 0) || lockedPercent >= 100) && (
-                <LockedIcon width={12} height={12} className="mr-1" />
-              )}
+              {!isLocking &&
+                (!(data.amount > 0) ||
+                  lockedPercent >= 100 ||
+                  data.amount > maxValue) && (
+                  <LockedIcon width={12} height={12} className="mr-1" />
+                )}
               <span>lock $bepro</span>
+              {isLocking ? (
+                <span className="spinner-border spinner-border-xs ml-1" />
+              ) : (
+                ''
+              )}
             </Button>
 
             <Button onClick={handleUnLock}>Unlock</Button>
           </div>
         </div>
       </div>
+
+      <UnlockBeproModal show={showUnlockBepro} onCloseClick={handleCloseUnlockModal} />
     </Step>
   )
 }

@@ -1,5 +1,3 @@
-import {IssueData, pullRequest} from '@interfaces/issue-data';
-import {ProposalData, User} from '@interfaces/api-response';
 import {ReposList} from '@interfaces/repos-list';
 import {BranchInfo, BranchsList} from '@interfaces/branchs-list';
 import { head } from 'lodash';
@@ -8,6 +6,7 @@ import {ProposalData, User} from '@interfaces/api-response';
 import {IssueData, pullRequest} from '@interfaces/issue-data';
 
 import client from '@services/api'
+import { Network } from '@interfaces/network';
 interface Paginated<T = any> {
   count: number;
   rows: T[]
