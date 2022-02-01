@@ -15,6 +15,8 @@ export default function InputNumber({
   error = false,
   success= false,
   warning= false,
+  errorMessage,
+  setMaxValue,
   ...params
 }: InputNumberProps): JSX.Element {
   const id = kebabCase(label);
@@ -59,6 +61,15 @@ export default function InputNumber({
             {symbol}
           </span>
         )}
+        { setMaxValue && (
+          <span
+          className={clsx("input-group-text caption-medium border-radius-8 cursor-pointer", classSymbol, {
+            ...errorStyle,
+          })}
+          onClick={setMaxValue}>
+          Max
+        </span>
+        )}
       </div>
       {helperText && (
         <div
@@ -70,7 +81,7 @@ export default function InputNumber({
           {helperText}
         </div>
       )}
-      {error && (
+      {(error && errorMessage) && (
         <p
         className={clsx("p-small text-gray my-2", {
           trans: !error,

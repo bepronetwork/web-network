@@ -25,11 +25,15 @@ module.exports = {
           type: Sequelize.JSON,
           allowNull: true
         },
-        network_id: {
-          type: Sequelize.INTEGER,
+        networkAddress: {
+          type: Sequelize.STRING,
           allowNull: true
         },
-        logo: {
+        logoIcon: {
+          type: Sequelize.STRING,
+          allowNull: true
+        },
+        fullLogo: {
           type: Sequelize.STRING,
           allowNull: true
         },
@@ -57,8 +61,9 @@ module.exports = {
             fail: '#EB5757',
             warning: '#EE9240'
           },
-          network_id: null,
-          logo: null,
+          networkAddress: null,
+          logoIcon: null,
+          fullLogo: null,
           createdAt: new Date(),
           updatedAt: new Date()
         })

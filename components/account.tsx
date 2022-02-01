@@ -48,6 +48,14 @@ export default function Account({ children }): JSX.Element {
             <InternalLink
               href={getURLWithNetwork('/account/my-oracles')}
               label={String(t('$oracles'))}
+              className={clsx('h4 p-0 mr-3')}
+              activeClass="account-link-active"
+              nav
+            />
+
+            <InternalLink
+              href={getURLWithNetwork('/account/my-network')}
+              label="Custom Network"
               className={clsx('h4 p-0')}
               activeClass="account-link-active"
               nav

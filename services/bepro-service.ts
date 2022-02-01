@@ -5,7 +5,11 @@ import {TransactionStatus} from '@interfaces/enums/transaction-status';
 
 class BeproFacet {
 
-  readonly bepro: Web3Connection = new Web3Connection({web3Host: WEB3_CONNECTION, privateKey: process.env.NEXT_PUBLIC_WALLET_PRIVATE_KEY});
+  readonly bepro: Web3Connection = new Web3Connection({
+    web3Host: WEB3_CONNECTION, 
+    privateKey: process.env.NEXT_PUBLIC_WALLET_PRIVATE_KEY, 
+    debug: true
+  });
 
   address: string = ``;
   connected: boolean = false;
@@ -90,7 +94,13 @@ class BeproFacet {
   }
 
   async isApprovedSettlerToken() {
-    return this.network.isApprovedSettlerToken(1, this.address);
+    try {
+      const allowed = await BeproService.erc20.allowance(BeproService.address, BeproService.network.contractAddress)
+
+      return allowed > 0
+    } catch (error) {
+      return false
+    }
   }
 
   async getTokensLockedByAddress(address: string) {

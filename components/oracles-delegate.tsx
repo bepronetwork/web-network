@@ -57,7 +57,7 @@ function OraclesDelegate(): JSX.Element {
     BeproService.network.getBEPROStaked()
                 .then(staked => dispatch(changeBalance({staked})))
 
-                BeproService.network.getOraclesSummary({address: currentAddress})
+                BeproService.network.getOraclesSummary(currentAddress)
                 .then(oracles => {
                   dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles)))
                 });
