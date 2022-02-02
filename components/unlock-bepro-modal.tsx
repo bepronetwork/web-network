@@ -1,30 +1,33 @@
 import { useTranslation } from 'next-i18next'
-import { useContext, useState } from 'react'
+import { useContext, useRef, useState } from 'react'
 
 import LockedIcon from '@assets/icons/locked-icon'
+import ArrowRightLine from '@assets/icons/arrow-right-line'
 
 import Modal from '@components/modal'
 import Button from '@components/button'
 import InputNumber from '@components/input-number'
+import NetworkTxButton from '@components/network-tx-button'
 
 import { ApplicationContext } from '@contexts/application'
 
 import { formatNumberToCurrency } from '@helpers/formatNumber'
-import ArrowRightLine from '@assets/icons/arrow-right-line'
+
+import { TransactionTypes } from '@interfaces/enums/transaction-types'
 
 export default function UnlockBeproModal({
   show = false,
-  isExecuting = false,
-  onConfirm = (amount) => {},
   onCloseClick = () => {}
 }) {
   const { t } = useTranslation(['common', 'pull-request'])
 
   const [amountToUnlock, setAmountToUnlock] = useState(0)
   const [isUnlocking, setIsUnlocking] = useState(false)
+  const networkTxRef = useRef<HTMLButtonElement>(null)
 
   const {
-    state: { balance, oracles }
+    state: { currentAddress, balance, oracles },
+    methods: { updateWalletBalance }
   } = useContext(ApplicationContext)
 
   const oraclesAvailable = oracles.tokensLocked - oracles.delegatedToOthers
@@ -40,6 +43,7 @@ export default function UnlockBeproModal({
   }
 
   function setDefaults() {
+    updateWalletBalance()
     onCloseClick()
     setAmountToUnlock(0)
     setIsUnlocking(false)
@@ -51,6 +55,11 @@ export default function UnlockBeproModal({
 
   function handleChange({ floatValue }) {
     setAmountToUnlock(floatValue)
+  }
+
+  function handleUnlock() {
+    setIsUnlocking(true)
+    networkTxRef.current.click()
   }
 
   return (
@@ -151,20 +160,21 @@ export default function UnlockBeproModal({
           <Button
             className="mr-2"
             disabled={isButtonDisabled()}
-            onClick={() => {}}
+            onClick={handleUnlock}
           >
-            {isButtonDisabled() && !isExecuting && (
+            {isButtonDisabled() && !isUnlocking && (
               <LockedIcon className="me-2" />
             )}
             <span>
               Unlock{' '}
-              {(!isButtonDisabled() && amountToUnlock > 0) &&
+              {!isButtonDisabled() &&
+                amountToUnlock > 0 &&
                 formatNumberToCurrency(amountToUnlock, {
                   maximumFractionDigits: 2
                 })}{' '}
               $BEPRO
             </span>
-            {isExecuting ? (
+            {isUnlocking ? (
               <span className="spinner-border spinner-border-xs ml-1" />
             ) : (
               ''
@@ -172,6 +182,22 @@ export default function UnlockBeproModal({
           </Button>
         </div>
       </div>
+
+      <NetworkTxButton
+        txMethod="unlock"
+        txType={TransactionTypes.unlock}
+        txCurrency="Oracles"
+        txParams={{
+          tokenAmount: amountToUnlock,
+          from: currentAddress
+        }}
+        buttonLabel=""
+        modalTitle={t('my-oracles:actions.unlock.title')}
+        modalDescription={t('my-oracles:actions.unlock.description')}
+        onSuccess={setDefaults}
+        onFail={(() => {})}
+        ref={networkTxRef}
+      />
     </Modal>
   )
 }

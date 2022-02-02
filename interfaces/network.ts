@@ -10,12 +10,14 @@ export interface Network {
 }
 
 export interface ThemeColors {
-  primary: string
-  secondary: string
+  text: string
   background: string
-  success: string
-  warning: string
-  fail: string
   shadow: string
   gray: string
+  primary: string
+  secondary: string
+  oracle: string
+  success: string
+  fail: string
+  warning: string
 }
