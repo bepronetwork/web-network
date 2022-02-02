@@ -133,8 +133,11 @@ export default function ConnectWalletButton({children = null, forceLogin = false
               </div>
         </div>
 
-        <div className="small-info text-ligth-gray text-center text-dark text-uppercase mt-1 pt-1">
-          {t('misc.by-connecting')}{" "}
+        <div className="small-info text-center text-uppercase mt-1 pt-1">
+          <span className="text-ligth-gray">
+            {t('misc.by-connecting')}{" "}
+          </span>  
+          
           <a
             href="https://www.bepro.network/terms-and-conditions"
             target="_blank"

@@ -29,6 +29,7 @@ import { changeLoadState } from './reducers/change-load-state';
 
 interface GlobalState {
   state: ApplicationState,
+  methods?: any,
   dispatch: (action: ReduceActor<any>) => Dispatch<ReduceActor<any>>,
 }
 
@@ -98,17 +99,32 @@ export default function ApplicationContextProvider({children}) {
         dispatch(changeAccessToken(user?.accessToken));
       })
 
+    BeproService.isApprovedTransactionalToken().then(approval => dispatch(changeTransactionalTokenApproval(approval)))
+    BeproService.isApprovedSettlerToken().then(approval => dispatch(changeSettlerTokenApproval(approval)))
+
+    updateWalletBalance(address)
+    
+    cheatBepro = BeproService;
+    cheatDispatcher = updateTransaction;
+  }
+
+  function updateWalletBalance(cheatAddress = undefined) {
+    if (!state.currentAddress)
+      return
+
+    const address = cheatAddress || state.currentAddress
+    
     BeproService.getOraclesSummary()
                 .then(oracles => dispatch(changeOraclesState(changeOraclesParse(address, oracles))))
 
-    BeproService.isApprovedTransactionalToken().then(approval => dispatch(changeTransactionalTokenApproval(approval)))
-    BeproService.isApprovedSettlerToken().then(approval => dispatch(changeSettlerTokenApproval(approval)))
-    
-    BeproService.getBalance('bepro').then(bepro => dispatch(changeBalance({bepro})));
-    BeproService.getBalance('eth').then(eth => dispatch(changeBalance({eth})));
-    BeproService.getBalance('staked').then(staked => dispatch(changeBalance({staked})));
-    cheatBepro = BeproService;
-    cheatDispatcher = updateTransaction;
+    BeproService.getBalance('bepro')
+                .then(bepro => dispatch(changeBalance({bepro})))
+
+    BeproService.getBalance('eth')
+                .then(eth => dispatch(changeBalance({eth})))
+
+    BeproService.getBalance('staked')
+                .then(staked => dispatch(changeBalance({staked})))
   }
 
   const Initialize = () => {

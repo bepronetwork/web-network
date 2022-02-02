@@ -64,6 +64,9 @@ export default function InputNumber({
         { setMaxValue && (
           <span
           className={clsx("input-group-text caption-medium border-radius-8 cursor-pointer", classSymbol, {
+            "border border-1 border-success": success,
+            "border border-1 border-danger": error,
+            "border border-1 border-warning": warning,  
             ...errorStyle,
           })}
           onClick={setMaxValue}>

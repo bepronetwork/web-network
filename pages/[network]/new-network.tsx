@@ -24,13 +24,15 @@ import { ApplicationContext } from '@contexts/application'
 import { getQueryableText } from '@helpers/string'
 import { formatNumberToCurrency } from '@helpers/formatNumber'
 
+import { ThemeColors } from '@interfaces/network'
+
 import { BeproService } from '@services/bepro-service'
 
 import useNetwork from '@x-hooks/use-network'
 import useOctokit from '@x-hooks/use-octokit'
 
 export default function NewNetwork() {
-  const { network } = useNetwork()
+  const { network, colorsToCSS, DefaultTheme } = useNetwork()
   const { listUserRepos } = useOctokit()
 
   const {
@@ -58,7 +60,7 @@ export default function NewNetwork() {
         },
         displayName: '',
         networkDescription: '',
-        colors: {}
+        colors: {} as ThemeColors
       }
     },
     repositories: {
@@ -129,7 +131,7 @@ export default function NewNetwork() {
     if (!Object.keys(steps.network.data.colors).length && network) {
       const tmpSteps = Object.assign({}, steps)
 
-      tmpSteps.network.data.colors = network.colors
+      tmpSteps.network.data.colors = network.colors || DefaultTheme()
 
       setSteps(tmpSteps)
     }
@@ -229,6 +231,9 @@ export default function NewNetwork() {
 
   return (
     <div className="new-network">
+      <style>
+        {colorsToCSS(steps.network.data.colors)}
+      </style>
       <ConnectWalletButton asModal={true} />
 
       <CustomContainer>
@@ -300,6 +305,10 @@ function LockBepro({
   const [isLocking, setIsLocking] = useState(false)
   const [showUnlockBepro, setShowUnlockBepro] = useState(false)
 
+  const {
+    methods: { updateWalletBalance }
+  } = useContext(ApplicationContext)
+
   const lockedPercent =
     ((data.amountLocked || 0) / (data.amountNeeded || 0)) * 100
   const lockingPercent = ((data.amount || 0) / (data.amountNeeded || 0)) * 100
@@ -315,14 +324,18 @@ function LockBepro({
   function handleLock() {
     setIsLocking(true)
 
+    const amount = data.amount
+
     BeproService.networkFactory
       .approveSettlerERC20Token()
       .then((result) => {
         BeproService.networkFactory
-          .lock(data.amount)
-          .then(() =>
-            handleChange({ label: 'amountLocked', value: data.amount })
-          )
+          .lock(amount)
+          .then(() => {
+            handleChange({ label: 'amountLocked', value: amount })
+            handleChange({ label: 'amount', value: 0 })
+            updateWalletBalance()
+          })
           .catch(console.log)
           .finally(() => setIsLocking(false))
       })
@@ -370,7 +383,7 @@ function LockBepro({
                   classSymbol={`text-primary`}
                   max={maxValue}
                   value={data.amount}
-                  disabled={data.amountLocked >= data.amountNeeded}
+                  error={data.amount > maxValue}
                   setMaxValue={() =>
                     handleChange({ label: 'amount', value: maxValue })
                   }
@@ -425,7 +438,10 @@ function LockBepro({
                     </p>
                   </div>
 
-                  <div className="row mt-2 bg-dark-gray bg-dark-hover cursor-pointer border-radius-8 caption-small p-20" onClick={handleShowUnlockModal}>
+                  <div
+                    className="row mt-2 bg-dark-gray bg-dark-hover cursor-pointer border-radius-8 caption-small p-20"
+                    onClick={handleShowUnlockModal}
+                  >
                     <div className="d-flex justify-content-between px-0">
                       <span className="text-ligth-gray">
                         <span className="text-purple">ORACLES</span> available
@@ -449,7 +465,7 @@ function LockBepro({
             <span className="text-primary">$BEPRO</span> locked
           </p>
 
-          <div className="d-flex justify-content-between caption-large mb-3">
+          <div className="d-flex justify-content-between caption-large mb-3 amount-input">
             <div className="d-flex align-items-center">
               <span
                 className={`text-${
@@ -502,7 +518,7 @@ function LockBepro({
             </ProgressBar>
           </div>
 
-          <div className="d-flex align-items-center caption-large text-white">
+          <div className="d-flex align-items-center caption-large text-white amount-input">
             <span
               className={`text-${
                 (lockedPercent >= 100 && 'success') || 'white'
@@ -557,7 +573,10 @@ function LockBepro({
         </div>
       </div>
 
-      <UnlockBeproModal show={showUnlockBepro} onCloseClick={handleCloseUnlockModal} />
+      <UnlockBeproModal
+        show={showUnlockBepro}
+        onCloseClick={handleCloseUnlockModal}
+      />
     </Step>
   )
 }
