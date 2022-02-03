@@ -210,7 +210,7 @@ export default function ApplicationContextProvider({children}) {
     else {
       const value = JSON.stringify(state.myTransactions.slice(0, 5));
       setCookie(null, `bepro.transactions:${state.currentAddress}`, value, {
-        maxAge: 60 * 60 * 24, // 24 hour
+        maxAge: 24 * 60 * 60, // 24 hour
         path: "/",
       });
     }
