@@ -5,7 +5,6 @@ import {ReduceActor} from '@interfaces/reduce-action';
 import LoadApplicationReducers from './reducers';
 import {BeproService} from '@services/bepro-service';
 import {changeBeproInitState} from '@reducers/change-bepro-init-state';
-import {getSession} from 'next-auth/react';
 import {changeGithubHandle} from '@reducers/change-github-handle';
 import {changeCurrentAddress} from '@reducers/change-current-address'
 import Loading from '../components/loading';
@@ -17,7 +16,6 @@ import {changeNetwork} from '@reducers/change-network';
 import {useRouter} from 'next/router';
 import {toastError} from '@reducers/add-toast';
 import sanitizeHtml from 'sanitize-html';
-import {GetServerSideProps} from 'next';
 import {NetworkIds} from '@interfaces/enums/network-ids';
 import useApi from '@x-hooks/use-api';
 import {changeAccessToken} from '@reducers/change-access-token';
@@ -25,6 +23,8 @@ import {updateTransaction} from '@reducers/update-transaction';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import { changeTransactionalTokenApproval } from './reducers/change-transactional-token-approval';
 import { changeSettlerTokenApproval } from './reducers/change-settler-token-approval';
+import {setCookie, parseCookies} from 'nookies'
+import { addTransaction } from './reducers/add-transaction';
 
 interface GlobalState {
   state: ApplicationState,
@@ -176,15 +176,52 @@ export default function ApplicationContextProvider({children}) {
 
   }, [state.myTransactions])
 
-  return <ApplicationContext.Provider value={{state, dispatch: dispatch as any}}>
-    <Loading show={state.loading.isLoading} text={state.loading.text}/>
-    <Toaster/>
-    {children}
-  </ApplicationContext.Provider>
-}
+  const restoreTransactions = async (address)=>{
+    const cookie = parseCookies()
+    const transactions = JSON.parse(cookie[`bepro.transactions:${address}`])
+    const web3 = (window as any).web3;
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  return {
-    props: {session: await getSession(ctx)},
-  };
-};
+    const getStatusFromBlock = async (tx) => {
+      let transaction = {...tx}
+      if(tx?.transactionHash){
+        const block = await web3.eth.getTransaction(tx.transactionHash);
+        if(block){
+          transaction.addressFrom = block.from;
+          transaction.addressTo = block.to,
+          transaction.transactionHash = block.hash,
+          transaction.blockHash = block.blockHash,
+          transaction.confirmations = block?.nonce,
+          transaction.status = block.blockNumber ? TransactionStatus.completed : TransactionStatus.pending
+        }
+      }
+      
+      dispatch(addTransaction(transaction))
+
+      return transaction;
+    }
+
+    transactions.forEach(getStatusFromBlock)
+  }
+
+
+  useEffect(()=>{
+    if (!state.currentAddress) return;
+    if (state.myTransactions.length < 1) restoreTransactions(state.currentAddress)
+    else {
+      const value = JSON.stringify(state.myTransactions.slice(0, 5));
+      setCookie(null, `bepro.transactions:${state.currentAddress}`, value, {
+        maxAge: 60 * 60 * 24, // 24 hour
+        path: "/",
+      });
+    }
+
+  },[state.myTransactions, state.currentAddress])
+
+  return (
+    <ApplicationContext.Provider value={{ state, dispatch: dispatch as any }}>
+      <Loading show={state.loading.isLoading} text={state.loading.text} />
+      <Toaster />
+      {children}
+    </ApplicationContext.Provider>
+  );
+}
