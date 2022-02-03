@@ -19,7 +19,7 @@ export default function Toaster() {
     dispatch,
   } = useContext(ApplicationContext);
 
-  function onClose(i: number) {
+  function onClose(i: string) {
     dispatch(removeToast(i));
   }
 
