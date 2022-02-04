@@ -38,8 +38,8 @@
   --bs-warning-rgb:#{toRGB($warning)};
   --bs-secondary:#{$secondary};
   --bs-secondary-rgb:#{toRGB($secondary)};
-  --bs-background:#{$bg};
-  --bs-background-rgb:#{toRGB($bg)};
+  --bs-body-bg:#{$bg};
+  --bs-body-bg-rgb:#{toRGB($bg)};
 }
 
 //bootstrap-overrides
@@ -1297,6 +1297,10 @@ textarea.form-control {
 
   border-radius: 38px;
   border: 2px solid $white;
+
+  &.is-invalid {
+    border: 2px solid var(--bs-fail);
+  }
 
   overflow: hidden;
 }

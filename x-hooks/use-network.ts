@@ -22,7 +22,7 @@ export default function useNetwork() {
     if (router.query.network) handleNetworkChange()
   }, [router.query.network])
 
-  function handleNetworkChange(): void {
+  function handleNetworkChange() {
     const newNetwork = String(router.query.network)
 
     const networkFromStorage = localStorage.getItem(newNetwork)
@@ -49,10 +49,20 @@ export default function useNetwork() {
     }
   }
 
+  async function networkExists(networkName: string) {
+    try {
+      await getNetwork(networkName)
+      
+      return true
+    } catch (error) {
+      return false
+    }
+  }
+
   function DefaultTheme() : ThemeColors {
     return {
       text: getComputedStyle(document.documentElement).getPropertyValue('--bs-body-color'),
-      background: getComputedStyle(document.documentElement).getPropertyValue('--bs-background'),
+      background: getComputedStyle(document.documentElement).getPropertyValue('--bs-body-bg'),
       shadow: getComputedStyle(document.documentElement).getPropertyValue('--bs-shadow'),
       gray: getComputedStyle(document.documentElement).getPropertyValue('--bs-gray'),
       primary: getComputedStyle(document.documentElement).getPropertyValue('--bs-primary'),
@@ -91,7 +101,7 @@ export default function useNetwork() {
       ${colors.success && `--bs-success: ${colors.success}; --bs-success-rgb: ${hexadecimalToRGB(colors.success).join(',')};` || ''}
       ${colors.warning && `--bs-warning: ${colors.warning}; --bs-warning-rgb: ${hexadecimalToRGB(colors.warning).join(',')};` || ''}
       ${colors.secondary && `--bs-secondary: ${colors.secondary}; --bs-secondary-rgb: ${hexadecimalToRGB(colors.secondary).join(',')};` || ''}
-      ${colors.background && `--bs-background: ${colors.background}; --bs-background-rgb: ${hexadecimalToRGB(colors.background).join(',')};` || ''}
+      ${colors.background && `--bs-body-bg: ${colors.background}; --bs-body-bg-rgb: ${hexadecimalToRGB(colors.background).join(',')};` || ''}
     }`
   }
 
@@ -119,6 +129,7 @@ export default function useNetwork() {
     network,
     setNetwork: changeNetwork,
     getURLWithNetwork,
+    networkExists,
     colorsToCSS,
     DefaultTheme
   }
