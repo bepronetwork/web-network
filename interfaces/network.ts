@@ -21,3 +21,8 @@ export interface ThemeColors {
   fail: string
   warning: string
 }
+
+export interface Color {
+  label: string
+  code: string
+}

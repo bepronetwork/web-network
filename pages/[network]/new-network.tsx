@@ -21,10 +21,11 @@ import ConnectWalletButton from '@components/connect-wallet-button'
 
 import { ApplicationContext } from '@contexts/application'
 
+import { isSameSet } from '@helpers/array'
+import { isColorsSimilar } from '@helpers/colors'
 import { getQueryableText } from '@helpers/string'
 import { formatNumberToCurrency } from '@helpers/formatNumber'
-
-import { ThemeColors } from '@interfaces/network'
+import { DefaultNetworkInformation } from '@helpers/custom-network'
 
 import { BeproService } from '@services/bepro-service'
 
@@ -40,39 +41,12 @@ export default function NewNetwork() {
   } = useContext(ApplicationContext)
 
   const [currentStep, setCurrentStep] = useState(1)
-  const [steps, setSteps] = useState({
-    lock: {
-      validated: false,
-      amount: 0,
-      amountLocked: 0,
-      amountNeeded: 0
-    },
-    network: {
-      validated: false,
-      data: {
-        logoIcon: {
-          preview: '',
-          raw: undefined as File
-        },
-        fullLogo: {
-          preview: '',
-          raw: undefined as File
-        },
-        displayName: '',
-        networkDescription: '',
-        colors: {} as ThemeColors
-      }
-    },
-    repositories: {
-      validated: false,
-      data: []
-    }
-  })
+  const [steps, setSteps] = useState(DefaultNetworkInformation)
 
   function changeColor(newColor) {
     const tmpSteps = Object.assign({}, steps)
 
-    tmpSteps.network.data.colors[newColor.label] = newColor.value
+    tmpSteps.network.data.colors.data[newColor.label] = newColor.value
 
     setSteps(tmpSteps)
   }
@@ -128,10 +102,10 @@ export default function NewNetwork() {
   }
 
   useEffect(() => {
-    if (!Object.keys(steps.network.data.colors).length && network) {
+    if (!Object.keys(steps.network.data.colors.data).length && network) {
       const tmpSteps = Object.assign({}, steps)
 
-      tmpSteps.network.data.colors = network.colors || DefaultTheme()
+      tmpSteps.network.data.colors.data = network.colors || DefaultTheme()
 
       setSteps(tmpSteps)
     }
@@ -170,12 +144,6 @@ export default function NewNetwork() {
   }, [currentAddress, beproInit])
 
   useEffect(() => {
-    //BeproService.networkFactory.getAmountOfNetworksForked().then(result => console.log('getAmountOfNetworksForked', result)).catch(console.log)
-    //BeproService.networkFactory.getNetworkById(0).then(result => console.log('getNetworkById', result)).catch(console.log)
-    //BeproService.networkFactory.getNetworkByAddress(BeproService.address).then(result => console.log('getNetworkByAddress', result)).catch(console.log)
-
-    //BeproService.networkFactory.contract.methods.networks(3).call().then(result => console.log('networksArray', result)).catch(console.log)
-
     //Validate Locked Tokens
     const lockData = steps.lock
 
@@ -197,13 +165,9 @@ export default function NewNetwork() {
       networkData.logoIcon.preview !== '',
       networkData.fullLogo.raw?.type?.includes('image/svg'),
       networkData.logoIcon.raw?.type?.includes('image/svg'),
-      networkData.displayName.trim() !== '',
+      networkData.displayName.validated,
       networkData.networkDescription.trim() !== '',
-      new Set(
-        Object.entries(networkData.colors).map((color) =>
-          String(color[1]).toUpperCase()
-        )
-      ).size === Object.keys(networkData.colors).length // All colors should be different
+      !networkData.colors.similar.length // All colors should be different
     ].every((condition) => condition === true)
 
     if (networkValidated !== steps.network.validated) {
@@ -229,11 +193,43 @@ export default function NewNetwork() {
     }
   }, [steps])
 
+  useEffect(() => {
+    const networkData = steps.network.data
+
+    if (networkData.colors.data.primary) {
+      const similarColors = []
+      const colors = networkData.colors.data
+
+      similarColors.push(
+        ...isColorsSimilar({ label: 'text', code: colors.text }, [
+          { label: 'primary', code: colors.primary },
+          { label: 'secondary', code: colors.secondary },
+          { label: 'background', code: colors.background },
+          { label: 'shadow', code: colors.shadow }
+        ])
+      )
+
+      similarColors.push(
+        ...isColorsSimilar({ label: 'background', code: colors.background }, [
+          { label: 'success', code: colors.success },
+          { label: 'fail', code: colors.fail },
+          { label: 'warning', code: colors.warning }
+        ])
+      )
+
+      if (!isSameSet(new Set(similarColors), new Set(networkData.colors.similar))) {
+        const tmpSteps = Object.assign({}, steps)
+
+        tmpSteps.network.data.colors.similar = similarColors
+  
+        setSteps(tmpSteps)
+      }
+    }
+  }, [steps])
+
   return (
     <div className="new-network">
-      <style>
-        {colorsToCSS(steps.network.data.colors)}
-      </style>
+      <style>{colorsToCSS(steps.network.data.colors.data)}</style>
       <ConnectWalletButton asModal={true} />
 
       <CustomContainer>
@@ -590,8 +586,38 @@ function NetworkInformation({
   currentStep,
   handleChangeStep
 }) {
+  const { networkExists } = useNetwork()
+
   function showTextOrDefault(text: string, defaultText: string) {
     return text.trim() === '' ? defaultText : text
+  }
+
+  function handleInputChange(e) {
+    changedDataHandler({
+      label: 'displayName',
+      value: {
+        data: e.target.value,
+        validated: undefined
+      }
+    })
+  }
+
+  async function handleBlur(e) {
+    const name = e.target.value
+    const exists =
+      name.trim() !== ''
+        ? name.toLowerCase().includes('bepro')
+          ? false
+          : !(await networkExists(name))
+        : undefined
+
+    changedDataHandler({
+      label: 'displayName',
+      value: {
+        data: name,
+        validated: exists
+      }
+    })
   }
 
   return (
@@ -642,7 +668,7 @@ function NetworkInformation({
 
         <div className="col ml-2">
           <p className="h3 text-white mb-3">
-            {showTextOrDefault(data.displayName, 'Network name')}
+            {showTextOrDefault(data.displayName.data, 'Network name')}
           </p>
           <p className="caption-small text-ligth-gray mb-2">
             temporary query url
@@ -651,7 +677,7 @@ function NetworkInformation({
             development.bepro.network/
             <span className="text-primary">
               {showTextOrDefault(
-                getQueryableText(data.displayName),
+                getQueryableText(data.displayName.data),
                 'network-name'
               )}
             </span>
@@ -670,19 +696,31 @@ function NetworkInformation({
             name="display-name"
             id="display-name"
             placeholder="Network Name"
-            className="form-control"
-            value={data.displayName}
-            onChange={(e) =>
-              changedDataHandler({
-                label: 'displayName',
-                value: e.target.value
-              })
-            }
+            className={`form-control ${
+              data.displayName.validated !== undefined
+                ? (data.displayName.validated === true && 'is-valid') ||
+                  'is-invalid'
+                : ''
+            }`}
+            value={data.displayName.data}
+            onChange={handleInputChange}
+            onBlur={handleBlur}
           />
 
-          <p className="p-small text-gray opacity-75 mt-2 mb-0">
-            This will be your network name, it also affects your query URL.
-          </p>
+          {(data.displayName.validated === undefined && (
+            <p className="p-small text-gray opacity-75 mt-2 mb-0">
+              This will be your network name, it also affects your query URL.
+            </p>
+          )) || (
+            <>
+              <p className="valid-feedback p-small mt-2 mb-0">
+                This network name is available.
+              </p>
+              <p className="invalid-feedback p-small mt-2 mb-0">
+                This network name is not available. Please pick a different name
+              </p>
+            </>
+          )}
         </div>
       </div>
 
@@ -716,18 +754,21 @@ function NetworkInformation({
             colors
           </label>
 
-          <div className="row justify-space-between">
-            {data.colors &&
-              Object.entries(data.colors).map((color) => (
-                <div className="col" key={color[0]}>
+          <div className="row bg-dark-gray p-3 border-radius-8 justify-content-center text-center mx-0 gap-20">
+            {data.colors.data &&
+              Object.entries(data.colors.data).map((color) => (
+                <div className="col-2" key={color[0]}>
                   <ColorInput
                     label={color[0]}
                     value={color[1]}
                     onChange={setColor}
+                    error={data.colors.similar.includes(color[0])}
                   />
                 </div>
               ))}
           </div>
+
+          {data.colors.similar.length && <p className="p-small text-danger mt-2">These colours are very similar. Please pick a different colour.</p> || '' }
         </div>
       </div>
     </Step>
@@ -746,7 +787,7 @@ function SelectRepositories({
 }) {
   return (
     <Step
-      title="Select Repositories "
+      title="Add Repositories"
       index={step}
       activeStep={currentStep}
       validated={validated}
