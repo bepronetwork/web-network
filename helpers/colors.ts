@@ -58,7 +58,7 @@ export const isColorsSimilar = (base: Color, colors: Color[]) => {
 
   colors.forEach((color) => {
     if (
-      deltaE(hexadecimalToRGB(color.code), hexadecimalToRGB(base.code)) < 50 &&
+      deltaE(hexadecimalToRGB(color.code), hexadecimalToRGB(base.code)) < 40 &&
       color.label !== base.label
     ) {
       similars.add(color.label).add(base.label)
