@@ -32,6 +32,7 @@ export const DefaultNetworkInformation = {
   },
   repositories: {
     validated: false,
-    data: []
+    data: [],
+    permission: false
   }
 }

@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
-import { ProgressBar } from 'react-bootstrap'
 import { useContext, useEffect, useState } from 'react'
+import { FormCheck, ProgressBar } from 'react-bootstrap'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 import LockedIcon from '@assets/icons/locked-icon'
@@ -72,6 +72,14 @@ export default function NewNetwork() {
     setSteps(tmpSteps)
   }
 
+  function handleCheckPermission(check) {
+    const tmpSteps = Object.assign({}, steps)
+
+    tmpSteps.repositories.permission = check
+
+    setSteps(tmpSteps)
+  }
+
   function handleLockDataChange(newData) {
     const tmpSteps = Object.assign({}, steps)
 
@@ -98,7 +106,12 @@ export default function NewNetwork() {
   }
 
   function handleCreateNetwork() {
-    BeproService.createNetwork().then(console.log).catch(console.log)
+    //BeproService.createNetwork().then(console.log).catch(console.log)
+    console.log(steps)
+  }
+
+  function handleSubmit() {
+    console.log(steps)
   }
 
   useEffect(() => {
@@ -180,7 +193,7 @@ export default function NewNetwork() {
 
     // Validate Repositories
     const repositoriesData = steps.repositories.data
-    const repositoriesValidated = repositoriesData.some(
+    const repositoriesValidated = steps.repositories.permission && repositoriesData.some(
       (repository) => repository.checked
     )
 
@@ -203,7 +216,7 @@ export default function NewNetwork() {
       similarColors.push(
         ...isColorsSimilar({ label: 'text', code: colors.text }, [
           { label: 'primary', code: colors.primary },
-          { label: 'secondary', code: colors.secondary },
+          //{ label: 'secondary', code: colors.secondary },
           { label: 'background', code: colors.background },
           { label: 'shadow', code: colors.shadow }
         ])
@@ -217,11 +230,13 @@ export default function NewNetwork() {
         ])
       )
 
-      if (!isSameSet(new Set(similarColors), new Set(networkData.colors.similar))) {
+      if (
+        !isSameSet(new Set(similarColors), new Set(networkData.colors.similar))
+      ) {
         const tmpSteps = Object.assign({}, steps)
 
         tmpSteps.network.data.colors.similar = similarColors
-  
+
         setSteps(tmpSteps)
       }
     }
@@ -260,7 +275,7 @@ export default function NewNetwork() {
             />
 
             <SelectRepositories
-              repositories={steps.repositories.data}
+              data={steps.repositories}
               onClick={handleCheckRepository}
               githubLogin={githubLogin}
               validated={steps.repositories.validated}
@@ -268,6 +283,7 @@ export default function NewNetwork() {
               currentStep={currentStep}
               handleChangeStep={handleChangeStep}
               handleFinish={handleCreateNetwork}
+              handleCheckPermission={handleCheckPermission}
             />
           </Stepper>
         </div>
@@ -756,19 +772,29 @@ function NetworkInformation({
 
           <div className="row bg-dark-gray p-3 border-radius-8 justify-content-center text-center mx-0 gap-20">
             {data.colors.data &&
-              Object.entries(data.colors.data).map((color) => (
-                <div className="col-2" key={color[0]}>
-                  <ColorInput
-                    label={color[0]}
-                    value={color[1]}
-                    onChange={setColor}
-                    error={data.colors.similar.includes(color[0])}
-                  />
-                </div>
-              ))}
+              Object.entries(data.colors.data).map((color) => {
+                return (
+                  (color[0] !== 'secondary' && (
+                    <div className="col-2" key={color[0]}>
+                      <ColorInput
+                        label={color[0]}
+                        value={color[1]}
+                        onChange={setColor}
+                        error={data.colors.similar.includes(color[0])}
+                      />
+                    </div>
+                  )) ||
+                  ''
+                )
+              })}
           </div>
 
-          {data.colors.similar.length && <p className="p-small text-danger mt-2">These colours are very similar. Please pick a different colour.</p> || '' }
+          {(data.colors.similar.length && (
+            <p className="p-small text-danger mt-2">
+              These colours are very similar. Please pick a different colour.
+            </p>
+          )) ||
+            ''}
         </div>
       </div>
     </Step>
@@ -776,15 +802,20 @@ function NetworkInformation({
 }
 
 function SelectRepositories({
-  repositories,
+  data,
   onClick,
   githubLogin,
   validated,
   step,
   currentStep,
   handleChangeStep,
-  handleFinish
+  handleFinish,
+  handleCheckPermission
 }) {
+  function handleCheck(e) {
+    handleCheckPermission(e.target.checked)
+  }
+
   return (
     <Step
       title="Add Repositories"
@@ -796,17 +827,38 @@ function SelectRepositories({
       handleFinish={handleFinish}
     >
       {(githubLogin && (
-        <div className="row mb-4 justify-content-start repositories-list">
-          {repositories.map((repository) => (
-            <GithubInfo
-              key={repository.name}
-              label={repository.name}
-              active={repository.checked}
-              onClick={() => onClick(repository.name)}
-              variant="repository"
-              parent="list"
+        <div>
+          <div className="row mx-0 mb-4 justify-content-start repositories-list">
+            <span className="caption-small text-gray px-0">Repositories</span>
+
+            {data.data.map((repository) => (
+              <GithubInfo
+                key={repository.name}
+                label={repository.name}
+                active={repository.checked}
+                onClick={() => onClick(repository.name)}
+                variant="repository"
+                parent="list"
+              />
+            ))}
+          </div>
+
+          <span className="caption-small text-gray px-0 mt-3">Bepro-bot</span>
+
+          <div className="d-flex align-items-center p-small text-white px-0 m-0 p-0">
+            <FormCheck
+              className="form-control-lg px-0 pb-0 mr-1"
+              type="checkbox"
+              value={data.permission}
+              onChange={handleCheck}
             />
-          ))}
+            <span>Give access to the bepro-bot as an org member.</span>
+          </div>
+          
+          <p className="p-small text-gray-70 px-0">
+            You need to accept this so the bot can interact with the
+            repositories.
+          </p>
         </div>
       )) || (
         <div className="pt-3">
