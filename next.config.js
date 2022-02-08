@@ -6,6 +6,9 @@ module.exports = {
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],
   },
+  images: {
+    domains: ['ipfs.infura.io'],
+  },
   webpack5: true,
   async redirects() {
     return [

@@ -302,6 +302,16 @@ export default function useApi() {
       })
   }
 
+  async function createReviewForPR(issueId: string, pullRequestId: string,  githubLogin: string, body:string) {
+    return client.put('/pull-request/review', {issueId, pullRequestId, githubLogin, body})
+    .then(response => response)
+  }
+  
+  async function removeUser(address: string, githubLogin: string) {
+    return client.delete(`/user/${address}/${githubLogin}`)
+    .then(({status}) => status === 200)
+  }
+  
   async function createNetwork(networkInfo) {
     return client.post('/network', {...networkInfo})
     .then(response => response)
@@ -344,6 +354,20 @@ export default function useApi() {
       })
   }
 
+  async function searchNetworks({page = '1',
+                           name = ``,
+                           creatorAddress = ``,
+                           networkAddress = ``,
+                           sortBy = 'updatedAt',
+                           order = 'DESC',
+                           search = ''}) {
+    const params = new URLSearchParams({page, name, creatorAddress, networkAddress, sortBy, order, search}).toString()
+
+    return client.get<{rows: Network[], count: number, pages: number, currentPage: number}>(`/search/networks/?${params}`)
+                 .then(({data}) => data)
+                 .catch(() => ({rows: [], count: 0, pages: 0, currentPage: 1}));
+  }
+
   return {
     removeUser,
     getIssue,
@@ -378,7 +402,8 @@ export default function useApi() {
     getUserPullRequests,
     createReviewForPR,
     searchIssues,
+    createNetwork,
     getNetwork,
-    createNetwork
+    searchNetworks
   }
 }

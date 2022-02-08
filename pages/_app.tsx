@@ -5,7 +5,6 @@ import { appWithTranslation } from "next-i18next";
 import React, { useEffect, useState } from "react";
 import { getSession, SessionProvider } from "next-auth/react";
 
-import "../styles/styles.scss";
 
 import Seo from "@components/seo";
 import MainNav from "@components/main-nav";
@@ -19,6 +18,8 @@ import ApplicationContextProvider from "@contexts/application";
 import useRepos from "@x-hooks/use-repos";
 import useNetwork from "@x-hooks/use-network";
 
+import "../styles/styles.scss";
+
 function App({ Component, pageProps: { session, currentIssue,...pageProps } }: AppProps) {
   const [[, repos]] = useRepos();
   const [loaded, setLoaded] = useState(false);
@@ -29,8 +30,8 @@ function App({ Component, pageProps: { session, currentIssue,...pageProps } }: A
   }
 
   useEffect(() => {
-    setLoaded(!!repos?.length);
-  }, [repos]);
+    setLoaded(!!repos?.length && !!network);
+  }, [repos, network]);
 
   return (
     <>
