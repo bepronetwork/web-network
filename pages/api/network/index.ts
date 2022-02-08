@@ -48,6 +48,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     if (!user) return res.status(403).json('Invalid user provided')
     if (!user.accessToken) return res.status(401).json('Unauthorized user')
+    if (!botPermission) return res.status(403).json('Bepro-bot authorization needed')
 
     const repos = JSON.parse(repositories)
 

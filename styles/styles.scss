@@ -16,12 +16,14 @@
 @import "pages/new-network";
 
 @import "components/creating-network-loader";
+@import "components/network-logo";
 
 @function toRGB ($color) {
   @return "" + red($color) + ", " + green($color) + ", " + blue($color);
 }
 
 :root {
+  --bs-bg-opacity: 1;
   --bs-body-color:#{$white};
   --bs-body-color-rgb:#{toRGB($white)};
   --bs-gray:#{$gray};
@@ -1318,6 +1320,39 @@ input[type="color"] {
 
 .repositories-list {
   gap: 10px;
+}
+
+.svg-with-text-color {
+  .text {
+    &-primary {
+      svg {
+        path {
+          fill: var(--bs-primary);
+        }
+      }
+    }
+    &-danger {
+      svg {
+        path {
+          fill: var(--bs-danger);
+        }
+      }
+    }
+    &-purple {
+      svg {
+        path {
+          fill: $purple;
+        }
+      }
+    }
+    &-ligth-gray {
+      svg {
+        path {
+          fill: $ligth-gray;
+        }
+      }
+    }
+  }
 }
 
 .amount-input {

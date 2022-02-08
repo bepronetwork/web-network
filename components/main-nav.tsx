@@ -1,6 +1,7 @@
-import {GetStaticProps} from 'next'
+import Image from 'next/image'
+import { GetStaticProps } from 'next'
 import { useRouter } from 'next/router'
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import HelpIcon from '@assets/icons/help-icon';
 import PlusIcon from '@assets/icons/plus-icon';
@@ -20,6 +21,8 @@ import BalanceAddressAvatar from '@components/balance-address-avatar';
 import TransactionsStateIndicator from '@components/transactions-state-indicator';
 
 import { ApplicationContext } from '@contexts/application';
+
+import { IPFS_BASE } from 'env';
 
 import { truncateAddress } from '@helpers/truncate-address';
 import { formatNumberToNScale } from '@helpers/formatNumber';
@@ -47,7 +50,7 @@ export default function MainNav() {
   const [showHelp, setShowHelp] = useState(false);
   const [modalUserMissing, setModalUserMissing] = useState<boolean>(false);
   const {getUserOf,} = useApi();
-  const { getURLWithNetwork } = useNetwork()
+  const { network, getURLWithNetwork } = useNetwork()
 
   useEffect(() => {
     checkLogin();
@@ -102,7 +105,7 @@ export default function MainNav() {
     <div className="main-nav d-flex align-items-center justify-content-between">
 
       <div className="d-flex">
-        <InternalLink href="/" icon={<BeproLogo aria-hidden={true} />} className="brand" nav active />
+        <InternalLink href="/" icon={network?.fullLogo ? <Image src={`${IPFS_BASE}/${network?.fullLogo}`} width={104} height={32} /> : <BeproLogo aria-hidden={true} />} className="brand" nav active />
         <ul className="nav-links">
           <li>
             <InternalLink href={getURLWithNetwork('/developers')} label={<Translation label={'main-nav.developers'} />} nav uppercase />

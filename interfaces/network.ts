@@ -5,7 +5,8 @@ export interface Network {
   networkAddress: string
   colors?: ThemeColors
   network_id?: number
-  logo?: string
+  logoIcon?: string
+  fullLogo?: string
   createdAt: Date
   updatedAt: Date
 }

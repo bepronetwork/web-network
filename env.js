@@ -8,6 +8,8 @@ export const TRANSACTION_ADDRESS = process.env.NEXT_PUBLIC_TRANSACTION_ADDRESS;
 
 export const NETWORK_FACTORY_ADDRESS = process.env.NEXT_PUBLIC_NETWORK_FACTORY_ADDRESS;
 
+export const IPFS_BASE = process.env.NEXT_PUBLIC_IPFS_BASE
+
 export const WEB3_CONNECTION = process.env.NEXT_PUBLIC_WEB3_CONNECTION;
 
 // Set ISO CODES Countrys in UpperCase: https://countrycode.org/
