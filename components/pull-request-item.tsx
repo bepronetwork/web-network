@@ -7,6 +7,7 @@ import { useRouter } from 'next/router'
 import { useContext } from 'react'
 import { ApplicationContext } from '@contexts/application'
 import Translation from './translation'
+import PullRequestLabels, { PRLabel } from './pull-request-labels'
 
 export default function PullRequestItem({
   repoId,
@@ -29,6 +30,15 @@ export default function PullRequestItem({
     return pullRequest?.state === 'open' && !!githubLogin
   }
 
+  function getLabel(): PRLabel{
+    if(pullRequest.merged) return 'merged';
+    if(pullRequest.isMergeable) return 'ready to merge';
+    //isMergeable can be null;
+    if(pullRequest.isMergeable === false) return 'conflicts';
+  }
+
+  const label = getLabel()
+  
   return (
     <>
       <div className="content-list-item proposal">
@@ -41,11 +51,14 @@ export default function PullRequestItem({
         >
           <a className="text-decoration-none text-white">
             <div className="row align-items-center pl-1 pr-1">
-              <div className="col-7 caption-small text-uppercase text-white">
+              <div className="col-7 d-flex align-items-center caption-small text-uppercase text-white">
                 <Avatar userLogin={pullRequest?.githubLogin} />
-                <span className="ml-2">
+                <span className="ml-2 me-1">
                   #{pullRequest?.githubId} <Translation label={'misc.by'} /> @{pullRequest?.githubLogin}
                 </span>
+                <div className='ml-3 d-flex'>
+                  {label && <PullRequestLabels label={label}/>}
+                </div>
               </div>
 
               <div className="col-2 caption-small text-uppercase text-white d-flex justify-content-center">

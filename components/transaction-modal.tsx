@@ -4,7 +4,6 @@ import TransactionStats from '@components/transaction-stats';
 import CopyIcon from '@assets/icons/copy';
 import {BlockTransaction, Transaction} from '@interfaces/transaction';
 import ArrowRightSmall from '@assets/icons/arrow-ritght-small';
-import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import {formatNumberToString} from '@helpers/formatNumber';
 import {CopyValue} from '@helpers/copy-value';
 import {ApplicationContext} from '@contexts/application';
@@ -16,7 +15,7 @@ import { truncateAddress } from '@helpers/truncate-address';
 import { useTranslation } from 'next-i18next';
 
 export default function TransactionModal({ transaction = null, onCloseClick = () => {}}: { transaction: Transaction, onCloseClick: () => void }) {
-  const {dispatch, state: {network}} = useContext(ApplicationContext);
+  const {dispatch} = useContext(ApplicationContext);
   const [addressFrom, setAddressFrom] = useState(`...`);
   const [addressTo, setAddressTo] = useState(`...`);
   const [details, setDetails] = useState<any>([]);

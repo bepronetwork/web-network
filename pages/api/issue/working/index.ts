@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { Octokit } from 'octokit'
 
 import models from '@db/models'
+import api from '@services/api'
 
 async function put(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, githubLogin } = req.body
@@ -28,6 +29,8 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         issue_number: issue.githubId,
         body: `@${githubLogin} is working on this.`
       })
+
+      await api.post(`/seo/${issue?.issueId}`)
 
       return res.status(response.status).json(response.data)
     }

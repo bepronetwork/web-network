@@ -1,7 +1,7 @@
 import {ApplicationState} from '@interfaces/application-state';
 import {ReduceAction, ReduceActor} from '@interfaces/reduce-action';
 import {ReduceActionName} from '@interfaces/enums/reduce-action-names';
-import {BlockTransaction, UpdateBlockTransaction} from '@interfaces/transaction';
+import {UpdateBlockTransaction} from '@interfaces/transaction';
 
 
 const reducer = (state: ApplicationState, payload: UpdateBlockTransaction): ApplicationState => {

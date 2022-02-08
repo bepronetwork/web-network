@@ -1207,3 +1207,15 @@ textarea.form-control {
   position: sticky;
   top: 90px;
 }
+
+.pullrequest-labels + .pullrequest-labels{
+  margin-left: math.div($m,2);
+}
+
+@each $color, $value in $theme-colors {
+  .hover-#{$color}{
+    &:hover{
+      color: $value !important;
+    }
+  }
+}
