@@ -22,6 +22,8 @@ import CustomContainer from '@components/custom-container';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import Translation from '@components/translation';
+import { useTranslation } from 'next-i18next';
+
 interface NetworkIssue {
   recognizedAsFinished: boolean;
 }
@@ -45,6 +47,7 @@ export default function PageIssue() {
   const {getIssueComments, getForksOf, getUserRepos, getPullRequest} = useOctokit();
   const [[activeRepo, reposList]] = useRepos();
   const {getUserOf, getIssue, userHasPR} = useApi();
+  const { t } = useTranslation('bounty')
 
   const tabs = [
     {
@@ -63,14 +66,14 @@ export default function PageIssue() {
         mergedProposal={issue?.merged}
         className="border-top-0"
       />,
-      description: 'its a proposal'
+      description: t('description_proposal')
     },
     {
       eventKey: 'pull-requests',
       isEmpty: !(mergedPullRequests.length > 0),
       title: <Translation ns="pull-request" label={'labelWithCount'} params={{count: mergedPullRequests.length || 0}} />,
       component: <IssuePullRequests key="tab-pull-requests" className="border-top-0" repoId={issue?.repository_id} issueId={issue?.issueId} pullResquests={mergedPullRequests} />,
-      description: 'its a pr'
+      description: t('description_pull-request')
     }
   ]
 
