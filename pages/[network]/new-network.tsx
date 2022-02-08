@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
 import { useContext, useEffect, useState } from 'react'
@@ -18,7 +19,9 @@ import ConnectGithub from '@components/connect-github'
 import CustomContainer from '@components/custom-container'
 import UnlockBeproModal from '@components/unlock-bepro-modal'
 import ConnectWalletButton from '@components/connect-wallet-button'
+import CreatingNetworkLoader from '@components/creating-network-loader'
 
+import { addToast } from '@contexts/reducers/add-toast'
 import { ApplicationContext } from '@contexts/application'
 
 import { isSameSet } from '@helpers/array'
@@ -29,18 +32,24 @@ import { DefaultNetworkInformation } from '@helpers/custom-network'
 
 import { BeproService } from '@services/bepro-service'
 
+import useApi from '@x-hooks/use-api'
 import useNetwork from '@x-hooks/use-network'
 import useOctokit from '@x-hooks/use-octokit'
+import { psReadAsText } from '@helpers/file-reader'
 
 export default function NewNetwork() {
-  const { network, colorsToCSS, DefaultTheme } = useNetwork()
+  const router = useRouter()
+  const { createNetwork } = useApi()
   const { listUserRepos } = useOctokit()
+  const { network, getURLWithNetwork, colorsToCSS, DefaultTheme } = useNetwork()
 
   const {
+    dispatch,
     state: { currentAddress, githubLogin, balance, oracles, beproInit }
   } = useContext(ApplicationContext)
 
   const [currentStep, setCurrentStep] = useState(1)
+  const [creatingNetwork, setCreatingNetwork] = useState(false)
   const [steps, setSteps] = useState(DefaultNetworkInformation)
 
   function changeColor(newColor) {
@@ -106,12 +115,59 @@ export default function NewNetwork() {
   }
 
   function handleCreateNetwork() {
-    //BeproService.createNetwork().then(console.log).catch(console.log)
-    console.log(steps)
-  }
+    if (!githubLogin || !currentAddress) return
 
-  function handleSubmit() {
-    console.log(steps)
+    setCreatingNetwork(true)
+
+    const networkData = steps.network.data
+    const repositoriesData = steps.repositories
+
+    BeproService.createNetwork()
+      .then((receipt) => {
+        BeproService.getNetworkAdressByCreator(currentAddress).then(
+          async (networkAddress) => {
+            const networkData = steps.network.data
+            const repositoriesData = steps.repositories
+
+            const json = {
+              name: networkData.displayName.data,
+              description: networkData.networkDescription,
+              colors: JSON.stringify(networkData.colors.data),
+              logoIcon: await psReadAsText(networkData.logoIcon.raw),
+              fullLogo: await psReadAsText(networkData.fullLogo.raw),
+              repositories: JSON.stringify(
+                repositoriesData.data
+                  .filter((repo) => repo.checked)
+                  .map(({ name, fullName }) => ({ name, fullName }))
+              ),
+              botPermission: repositoriesData.permission,
+              creator: currentAddress,
+              githubLogin,
+              networkAddress
+            }
+
+            createNetwork(json).then((result) => {
+              router.push(
+                getURLWithNetwork('/account/my-network', { network: json.name })
+              )
+              
+              setCreatingNetwork(false)
+            })
+          }
+        )
+      })
+      .catch((error) => {
+        dispatch(
+          addToast({
+            type: 'danger',
+            title: 'Fail',
+            content: `Fail to create network ${error}`
+          })
+        )
+
+        setCreatingNetwork(false)
+        console.log(error)
+      })
   }
 
   useEffect(() => {
@@ -193,9 +249,9 @@ export default function NewNetwork() {
 
     // Validate Repositories
     const repositoriesData = steps.repositories.data
-    const repositoriesValidated = steps.repositories.permission && repositoriesData.some(
-      (repository) => repository.checked
-    )
+    const repositoriesValidated =
+      steps.repositories.permission &&
+      repositoriesData.some((repository) => repository.checked)
 
     if (repositoriesValidated !== steps.repositories.validated) {
       const tmpSteps = Object.assign({}, steps)
@@ -246,6 +302,8 @@ export default function NewNetwork() {
     <div className="new-network">
       <style>{colorsToCSS(steps.network.data.colors.data)}</style>
       <ConnectWalletButton asModal={true} />
+
+      {(creatingNetwork && <CreatingNetworkLoader />) || ''}
 
       <CustomContainer>
         <div className="mt-5 pt-5">
@@ -854,7 +912,7 @@ function SelectRepositories({
             />
             <span>Give access to the bepro-bot as an org member.</span>
           </div>
-          
+
           <p className="p-small text-gray-70 px-0">
             You need to accept this so the bot can interact with the
             repositories.

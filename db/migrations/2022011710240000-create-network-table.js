@@ -21,6 +21,10 @@ module.exports = {
           unique: true,
           allowNull: false
         },
+        description: {
+          type: Sequelize.STRING,
+          allowNull: false
+        },
         colors: {
           type: Sequelize.JSON,
           allowNull: true
@@ -46,21 +50,13 @@ module.exports = {
           type: Sequelize.DATE
         }
       })
-      .then(() => {
-        queryInterface.insert(Network, 'networks', {
+      .then(async () => {
+        await queryInterface.insert(Network, 'networks', {
           creatorAddress:
             `${process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS}`.toLowerCase(),
           name: 'bepro',
-          colors: {
-            primary: '#4250E4',
-            secondary: '#FD8B2A',
-            gray: '#C4C7D3',
-            background: '#434758',
-            shadow: '#20222B',
-            success: '#35E0AD',
-            fail: '#EB5757',
-            warning: '#EE9240'
-          },
+          description: 'bepro',
+          colors: null,
           networkAddress: null,
           logoIcon: null,
           fullLogo: null,

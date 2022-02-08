@@ -115,12 +115,12 @@ export default function useNetwork() {
     })
   }
 
-  function getURLWithNetwork(href: string, query = {}) : UrlObject {
+  function getURLWithNetwork(href: string, query = {} as any) : UrlObject {
     return {
       pathname: `/[network]/${href}`.replace('//', '/'),
       query: {
         ...query,
-        network: network?.name
+        network: query.network || network?.name
       }
     }
   }

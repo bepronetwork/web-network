@@ -13,6 +13,7 @@ class BeproFacet {
 
   address: string = ``;
   connected: boolean = false;
+  started: boolean = false;
   network: Network;
   networkFactory: NetworkFactory;
   erc20: ERC20;
@@ -22,10 +23,14 @@ class BeproFacet {
     return this.connected;
   }
 
-  async start() {
+  get isStarted() {
+    return this.started;
+  }
+
+  async start(customNetworkAddress = undefined) {
     try {
       await this.bepro.start();
-      this.network = new Network(this.bepro, CONTRACT_ADDRESS);
+      this.network = new Network(this.bepro, customNetworkAddress || CONTRACT_ADDRESS);
       this.erc20 = new ERC20(this.bepro, SETTLER_ADDRESS);
       this.networkFactory = new NetworkFactory(this.bepro, NETWORK_FACTORY_ADDRESS);
       
@@ -36,11 +41,15 @@ class BeproFacet {
       this.operatorAmount = await this.getOperatorAmount();
     } catch (error) {
       console.log(`Failed to start Bepro Service`, error)
+      
+      this.started = false
 
-      return false
+      return this.started
     }
 
-    return true
+    this.started = true
+
+    return this.started
   }
 
   async login() {
@@ -51,7 +60,7 @@ class BeproFacet {
   }
 
   async getBalance(kind: `eth`|`bepro`|`staked`): Promise<number> {
-    if (!this.connected)
+    if (!this.connected || !this.started)
       return 0;
 
     let n = 0;
@@ -66,31 +75,51 @@ class BeproFacet {
   }
 
   async getClosedIssues() {
-    return this.network.getAmountOfIssuesClosed();
+    if (this.isStarted) return this.network.getAmountOfIssuesClosed();
+
+    return 0
   }
 
   async getOpenIssues() {
-    return this.network.getAmountOfIssuesOpened();
+    if (this.isStarted) return this.network.getAmountOfIssuesOpened();
+
+    return 0
   }
 
   async getTokensStaked() {
-    return this.network.getTokensStaked();
+    if (this.isStarted) return this.network.getTokensStaked();
+
+    return 0
   }
 
   async getRedeemTime() {
-    return this.network.redeemTime();
+    if (this.isStarted) return this.network.redeemTime();
+
+    return 0
   }
 
   async getDisputableTime() {
-    return this.network.disputableTime();
+    if (this.isStarted) return this.network.disputableTime();
+
+    return 0
   }
 
   async getOraclesSummary() {
-    return this.network.getOraclesSummary(this.address);
+    if (this.isStarted) return this.network.getOraclesSummary(this.address);
+
+    return {
+      oraclesDelegatedByOthers: 0,
+      amounts: [],
+      addresses: [],
+      tokensLocked: 0,
+      delegatedToOthers: 0
+    }
   }
 
   async isApprovedTransactionalToken() {
-    return this.network.isApprovedTransactionalToken(1, this.address);
+    if (this.isStarted) return this.network.isApprovedTransactionalToken(1, this.address)
+
+    return false
   }
 
   async isApprovedSettlerToken() {
@@ -115,6 +144,10 @@ class BeproFacet {
 
   async createNetwork() {
     return this.networkFactory.createNetwork(SETTLER_ADDRESS, SETTLER_ADDRESS)
+  }
+
+  getNetworkAdressByCreator(creatorAddress: string) {
+    return this.networkFactory.getNetworkByAddress(creatorAddress)
   }
 
   fromWei(wei: string) {

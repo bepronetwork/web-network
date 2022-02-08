@@ -2,6 +2,7 @@ export interface Network {
   id: number
   name: string
   creatorAddress: string
+  networkAddress: string
   colors?: ThemeColors
   network_id?: number
   logo?: string
