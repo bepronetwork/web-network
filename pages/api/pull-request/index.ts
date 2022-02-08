@@ -1,4 +1,5 @@
 import models from '@db/models';
+import twitterTweet from '@helpers/api/handle-twitter-tweet';
 import paginate from '@helpers/paginate';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Octokit} from 'octokit';
@@ -34,6 +35,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   const {repoId: repository_id, githubId, title, description: body, username, branch} = req.body;
 
   const issue = await models.issue.findOne({where: {githubId, repository_id,},});
+
+  //const issuePreviousState = issue.state;
   
   if (!issue) return res.status(404)
 
@@ -64,6 +67,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     await octoKit.rest.issues.createComment({owner, repo, issue_number: issue.githubId, body});
 
     await issue.save();
+    /*twitterTweet({
+      type: 'bounty',
+      action: 'changes',
+      issuePreviousState,
+      issue
+    })*/
     await api.post(`/seo/${issue?.issueId}`)
 
     return res.json(`ok`);
