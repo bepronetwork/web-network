@@ -79,6 +79,12 @@ export default function useApi() {
                  .then(({data}) => data === `ok`)
                  .catch(_ => false)
   }
+  
+  async function patchPrStatus(prId) {
+    return client.patch(`/pull-request/${prId}`)
+                 .then(({data}) => data )
+                 .catch(_ => false)
+  }
 
   async function getIssuesOfLogin(login: string, page = '1') {
     const search = new URLSearchParams({page, creator: login}).toString();
@@ -321,6 +327,7 @@ export default function useApi() {
     createIssue,
     moveIssueToOpen,
     patchIssueWithScId,
+    patchPrStatus,
     waitForMerge,
     processMergeProposal,
     processEvent,

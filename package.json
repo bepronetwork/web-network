@@ -30,11 +30,13 @@
     "form-data": "^4.0.0",
     "jimp": "^0.16.1",
     "lodash": "^4.17.21",
+    "markdown-to-text": "^0.1.1",
     "marked": "^3.0.4",
     "next": "11.1.2",
     "next-auth": "4.0.0-beta.2",
     "next-i18next": "^9.2.0",
     "next-seo": "^4.28.1",
+    "nookies": "^2.5.2",
     "octokit": "1.0.5",
     "pg": "^8.7.1",
     "pg-hstore": "^2.3.4",
@@ -53,10 +55,12 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@types/cookie": "^0.4.1",
     "@types/lodash": "^4.14.171",
     "@types/node": "^13.13.52",
     "@types/react": "^17.0.6",
     "@types/react-select": "^4.0.15",
+    "@types/uuid": "^8.3.4",
     "typescript": "^4.3.2"
   }
 }
