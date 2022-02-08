@@ -10,6 +10,7 @@ class Network extends Model {
           type: DataTypes.STRING,
           unique: true
         },
+        description: DataTypes.STRING,
         colors: DataTypes.JSON,
         networkAddress: DataTypes.STRING,
         logoIcon: DataTypes.STRING,

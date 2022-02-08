@@ -25,6 +25,7 @@ import { CustomSession } from '@interfaces/custom-session';
 import {GetServerSideProps} from 'next';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
+import useNetwork from '@x-hooks/use-network';
 
 
 export default function ConnectAccount() {
@@ -38,6 +39,7 @@ export default function ConnectAccount() {
   const { migrate } = router.query;
   const {getUserOf, joinAddressToUser, getUserWith} = useApi();
   const { t } = useTranslation(['common', 'connect-account'])
+  const { network, getURLWithNetwork } = useNetwork()
 
 
   function updateLastUsedAddress() {
@@ -74,7 +76,7 @@ export default function ConnectAccount() {
                           return;
 
                         if(user.address === currentAddress )
-                          return router.push('/account')
+                          return router.push(getURLWithNetwork('/account'))
                       })
   }
 
@@ -100,7 +102,7 @@ export default function ConnectAccount() {
                           dispatch(changeLoadState(false));
                           dispatch(changeGithubHandle(session.user.name||githubLogin))
                           dispatch(changeGithubLogin(githubLogin))
-                          return router.push(`/account`)
+                          return router.push(getURLWithNetwork('/account'))
                         }
 
                         dispatch(toastError(result as unknown as string));
@@ -126,7 +128,10 @@ export default function ConnectAccount() {
       if (+process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID !== +chainId) {
         dispatch(changeNetwork((NetworkIds[+chainId] || `unknown`)?.toLowerCase()))
         return;
-      } else loggedIn = await BeproService.login();
+      } else {
+        await BeproService.login()
+        loggedIn = BeproService.isLoggedIn
+      }
     } catch (e) {
       console.error(`Failed to login on BeproService`, e);
     }
@@ -144,7 +149,7 @@ export default function ConnectAccount() {
 
   function connectGithub(){
     localStorage.setItem(`lastAddressBeforeConnect`, currentAddress);
-    return signIn('github', {callbackUrl: `${window.location.protocol}//${window.location.host}/connect-account`})
+    return signIn('github', {callbackUrl: `${window.location.protocol}//${window.location.host}/${network.name.toLowerCase()}/connect-account`})
   }
 
   function renderMetamaskLogo() {

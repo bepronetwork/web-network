@@ -18,6 +18,7 @@ import {toastError} from '@reducers/add-toast';
 import sanitizeHtml from 'sanitize-html';
 import {NetworkIds} from '@interfaces/enums/network-ids';
 import useApi from '@x-hooks/use-api';
+import useNetwork from '@x-hooks/use-network';
 import {changeAccessToken} from '@reducers/change-access-token';
 import {updateTransaction} from '@reducers/update-transaction';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
@@ -79,6 +80,7 @@ export default function ApplicationContextProvider({children}) {
   const [txListener, setTxListener] = useState<any>();
   const {authError} = useRouter().query;
   const {getUserOf} = useApi();
+  const { network } = useNetwork()
 
   function updateSteFor(newAddress: string) {
     BeproService.login()
@@ -127,12 +129,13 @@ export default function ApplicationContextProvider({children}) {
                 .then(staked => dispatch(changeBalance({staked})))
   }
 
-  const Initialize = () => {
+  const Initialize = () => {    
     dispatch(changeLoadState(true))
 
-    BeproService.start()
+    BeproService.start(network?.networkAddress)
                 .then((state) => {
                   dispatch(changeBeproInitState(state))
+                  updateWalletBalance()
                 }).finally(() => dispatch(changeLoadState(false)))
 
     if (!window.ethereum)
@@ -171,7 +174,7 @@ export default function ApplicationContextProvider({children}) {
 
   LoadApplicationReducers();
 
-  useEffect(Initialize, []);
+  useEffect(Initialize, [network?.networkAddress]);
   useEffect(onAddressChanged, [state.currentAddress]);
   useEffect(() => {
     if (!authError)
