@@ -67,7 +67,7 @@ export default function NetworksList({
           <NetworkListBar hideOrder={hasSpecificFilter} />
 
           {networks.map((network) => (
-            <NetworkListItem network={network} />
+            <NetworkListItem key={network.id} network={network} />
           ))}
         </>
       )}

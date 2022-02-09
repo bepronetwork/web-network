@@ -119,9 +119,6 @@ export default function NewNetwork() {
 
     setCreatingNetwork(true)
 
-    const networkData = steps.network.data
-    const repositoriesData = steps.repositories
-
     BeproService.createNetwork()
       .then((receipt) => {
         BeproService.getNetworkAdressByCreator(currentAddress).then(

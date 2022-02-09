@@ -40,8 +40,7 @@ const CURRENCY = process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME;
 const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
 
 export default function MainNav() {
-  const {dispatch, state: {currentAddress, balance, accessToken}} = useContext(ApplicationContext);
-  const {asPath} = useRouter()
+  const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
 
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [address, setAddress] = useState<string>(null);
@@ -105,7 +104,7 @@ export default function MainNav() {
     <div className="main-nav d-flex align-items-center justify-content-between">
 
       <div className="d-flex">
-        <InternalLink href="/" icon={network?.fullLogo ? <Image src={`${IPFS_BASE}/${network?.fullLogo}`} width={104} height={32} /> : <BeproLogo aria-hidden={true} />} className="brand" nav active />
+        <InternalLink href={getURLWithNetwork('/')} icon={network?.fullLogo ? <Image src={`${IPFS_BASE}/${network?.fullLogo}`} width={104} height={32} /> : <BeproLogo aria-hidden={true} />} className="brand" nav active />
         <ul className="nav-links">
           <li>
             <InternalLink href={getURLWithNetwork('/developers')} label={<Translation label={'main-nav.developers'} />} nav uppercase />
