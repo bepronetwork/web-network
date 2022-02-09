@@ -1,3 +1,4 @@
+import { formatNumberToNScale } from "@helpers/formatNumber";
 import { IssueState } from "@interfaces/issue-data";
 import { TwitterApi } from "twitter-api-v2";
 
@@ -14,7 +15,6 @@ export default function twitterTweet({
     | "changes"
     | "solution"
     | "failed"
-    | "accepted"
     | "distributed"
     | "working";
   issuePreviousState?: IssueState;
@@ -38,10 +38,11 @@ export default function twitterTweet({
   var body: string;
   const issueTitle =
     issue.title.length > 30 ? issue.title.slice(0, 30) + `...` : issue.title;
+  const amount: string | number = formatNumberToNScale(issue.amount);
 
   if (type === "bounty" && action === "created") {
     title = "Alert";
-    body = `${issueTitle} and earn up to ${issue.amount} $BEPRO`;
+    body = `${issueTitle} and earn up to ${amount} $BEPRO`;
   }
   if (type === "bounty" && action === "changes") {
     title = "Status Update";
@@ -57,7 +58,7 @@ export default function twitterTweet({
   }
   if (type === "bounty" && action === "distributed") {
     title = "Fully Distributed";
-    body = `${issueTitle} was closed and fully distributed with ${issue.amount} $BEPRO.`;
+    body = `${issueTitle} was closed and fully distributed with ${amount} $BEPRO.`;
   }
   if (type === "proposal") {
     title = "Proposal Status";
@@ -77,12 +78,12 @@ export default function twitterTweet({
   `;
 
   if (Tweet.length < 280 && title && body) {
-    return twitterClient.v2
+    twitterClient.v2
       .tweet(Tweet)
       .then(() => console.log("Tweet created successfully"))
       .catch((err) => console.log("Error creating Tweet ->", err));
   } else {
-    return console.error(
+    console.log(
       "This tweet cannot be created. Because it contains more than 280 characters"
     );
   }
