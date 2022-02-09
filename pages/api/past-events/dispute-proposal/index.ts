@@ -9,7 +9,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   const network = networkBeproJs({ test: true });
 
   await network.start();
-  const contract = network.getWeb3Contract();
+  const contract = await network.getWeb3Contract();
 
   await contract
     .getPastEvents(`DisputeMerge`, {
