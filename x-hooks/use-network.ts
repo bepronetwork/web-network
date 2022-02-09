@@ -33,7 +33,7 @@ export default function useNetwork() {
 
     getNetwork(newNetwork)
       .then(({ data }) => {
-        localStorage.setItem(newNetwork, JSON.stringify(data))
+        localStorage.setItem(newNetwork.toLowerCase(), JSON.stringify(data))
 
         setNetwork(data)
       })
