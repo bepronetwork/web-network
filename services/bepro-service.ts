@@ -117,19 +117,15 @@ class BeproFacet {
   }
 
   async isApprovedTransactionalToken() {
-    if (this.isStarted) return this.network.isApprovedTransactionalToken(1, this.address)
+    if (this.isStarted) return this.network.isApprovedTransactionalToken(1)
 
     return false
   }
 
   async isApprovedSettlerToken() {
-    try {
-      const allowed = await BeproService.erc20.allowance(BeproService.address, BeproService.network.contractAddress)
+    if (this.isStarted) return this.network.isApprovedSettlerToken(1)
 
-      return allowed > 0
-    } catch (error) {
-      return false
-    }
+    return false
   }
 
   async getTokensLockedByAddress(address: string) {
