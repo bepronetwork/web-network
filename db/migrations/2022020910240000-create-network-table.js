@@ -4,7 +4,7 @@ const { Network } = require(`../models/network.model`)
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    queryInterface
+    await queryInterface
       .createTable('networks', {
         id: {
           allowNull: false,
@@ -50,19 +50,18 @@ module.exports = {
           type: Sequelize.DATE
         }
       })
-      .then(async () => {
-        await queryInterface.insert(Network, 'networks', {
-          creatorAddress:
-            `${process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS}`.toLowerCase(),
-          name: 'bepro',
-          description: 'bepro',
-          colors: null,
-          networkAddress: null,
-          logoIcon: null,
-          fullLogo: null,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        })
+      
+      await queryInterface.insert(Network, 'networks', {
+        creatorAddress:
+          `${process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS}`.toLowerCase(),
+        name: 'bepro',
+        description: 'bepro',
+        colors: null,
+        networkAddress: null,
+        logoIcon: null,
+        fullLogo: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
       })
   },
   down: async (queryInterface, Sequelize) => {
