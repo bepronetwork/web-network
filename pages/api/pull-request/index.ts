@@ -35,8 +35,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   const {repoId: repository_id, githubId, title, description: body, username, branch} = req.body;
 
   const issue = await models.issue.findOne({where: {githubId, repository_id,},});
-
-  //const issuePreviousState = issue.state;
   
   if (!issue) return res.status(404)
 
@@ -69,8 +67,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     await issue.save();
     /*twitterTweet({
       type: 'bounty',
-      action: 'changes',
-      issuePreviousState,
+      action: 'solution',
+      username: username,
       issue
     })*/
     await api.post(`/seo/${issue?.issueId}`)
