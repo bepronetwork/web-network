@@ -74,20 +74,66 @@ class BeproFacet {
     return n;
   }
 
-  async getClosedIssues() {
-    if (this.isStarted) return this.network.getAmountOfIssuesClosed();
+  async getClosedIssues(networkAddress = undefined) {
+    try {
+      if (networkAddress) {
+        const customNetwork = new Network(this.bepro, networkAddress)
+
+        await customNetwork.loadContract()
+
+        return customNetwork.getAmountOfIssuesClosed()
+      } else if (this.isStarted) return this.network.getAmountOfIssuesClosed()
+    } catch (error) {
+      console.log(error)
+    }
 
     return 0
   }
 
-  async getOpenIssues() {
-    if (this.isStarted) return this.network.getAmountOfIssuesOpened();
+  async getOpenIssues(networkAddress = undefined) {
+    try {
+      if (networkAddress) {
+        const customNetwork = new Network(this.bepro, networkAddress)
+
+        await customNetwork.loadContract()
+
+        return customNetwork.getAmountOfIssuesOpened()
+      } else if (this.isStarted) return this.network.getAmountOfIssuesOpened()
+    } catch (error) {
+      console.log(error)
+    }
 
     return 0
   }
 
-  async getTokensStaked() {
-    if (this.isStarted) return this.network.getTokensStaked();
+  async getBeproLocked(networkAddress = undefined) {
+    try {
+      if (networkAddress) {
+        const customNetwork = new Network(this.bepro, networkAddress)
+
+        await customNetwork.loadContract()
+
+        return customNetwork.getBEPROStaked()
+      } else if (this.isStarted) return this.network.getBEPROStaked()
+    } catch (error) {
+      console.log(error)
+    }
+
+    return 0
+  }
+
+  async getTokensStaked(networkAddress = undefined) {
+    try {
+      if (networkAddress) {
+        const customNetwork = new Network(this.bepro, networkAddress)
+
+        await customNetwork.loadContract()
+
+        return customNetwork.getTokensStaked()
+      } else if (this.isStarted) return this.network.getTokensStaked()
+    } catch (error) {
+      console.log(error)
+    }
 
     return 0
   }
