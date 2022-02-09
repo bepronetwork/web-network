@@ -1,7 +1,7 @@
 import { formatDistanceStrict } from "date-fns";
 
-export const formatDate = (date: string|Date, joiner = '/') => {
-  const d = typeof date === 'string' ? new Date(date) : date;
+export const formatDate = (date: number|string|Date, joiner = '/') => {
+  const d = ['string', 'number'].includes(typeof date) ? new Date(date) : date as Date;
   return [d.getDate(), d.getMonth()+1, d.getFullYear()].join(joiner);
 }
 
