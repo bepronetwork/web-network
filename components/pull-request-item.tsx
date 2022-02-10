@@ -4,10 +4,16 @@ import { getTimeDifferenceInWords } from '@helpers/formatDate'
 import Avatar from './avatar'
 import LockedIcon from '@assets/icons/locked-icon'
 import { useRouter } from 'next/router'
+
+import LockedIcon from '@assets/icons/locked-icon'
+
+import Button from '@components/button'
+import Avatar from '@components/avatar'
+import Translation from '@components/translation'
+import PullRequestLabels, { PRLabel } from '@components/pull-request-labels'
+
 import { useContext, useEffect, useState } from 'react'
 import { ApplicationContext } from '@contexts/application'
-import Translation from './translation'
-import PullRequestLabels, { PRLabel } from './pull-request-labels'
 import useOctokit from '@x-hooks/use-octokit'
 import { formatNumberToNScale } from '@helpers/formatNumber'
 import useNetwork from '@x-hooks/use-network'

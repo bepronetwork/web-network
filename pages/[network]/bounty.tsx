@@ -24,6 +24,7 @@ import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import Translation from '@components/translation';
 import { useTranslation } from 'next-i18next';
 
+import useNetwork from '@x-hooks/use-network';
 interface NetworkIssue {
   recognizedAsFinished: boolean;
 }
@@ -48,6 +49,7 @@ export default function PageIssue() {
   const [[activeRepo, reposList]] = useRepos();
   const {getUserOf, getIssue, userHasPR} = useApi();
   const { t } = useTranslation('bounty')
+  const { network } = useNetwork()
 
   const tabs = [
     {
@@ -89,7 +91,7 @@ export default function PageIssue() {
     if (!activeRepo || (!force && issue))
       return;
 
-    getIssue(repoId as string, id as string)
+    getIssue(repoId as string, id as string, network?.name)
       .then(async (issue) => {
         if (!issue)
           return router.push('/404')
@@ -155,7 +157,7 @@ export default function PageIssue() {
         console.log(`Failed to get users repositories: `, e)
       })
 
-    userHasPR(`${repoId}/${id}`, githubLogin)
+    userHasPR(`${repoId}/${id}`, githubLogin, network?.name)
       .then((result) => {
         setHasOpenPR(!!result)
       })
@@ -186,7 +188,7 @@ export default function PageIssue() {
       getMergedDataFromPullRequests(issue.repository?.githubPath, issue.pullRequests).then(setMergedPullRequests)
   }
 
-  useEffect(loadIssueData, [githubLogin, currentAddress, id, activeRepo]);
+  useEffect(loadIssueData, [githubLogin, currentAddress, id, activeRepo, network]);
   useEffect(getsIssueMicroService, [activeRepo, reposList])
   useEffect(checkIsWorking, [issue, githubLogin])
   useEffect(getRepoForked, [issue, githubLogin])
@@ -276,9 +278,9 @@ export default function PageIssue() {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({query, locale}) => {
-  const { id, repoId } = query;
+  const { id, repoId, network } = query;
   const {getIssue} = useApi()
-  const currentIssue = await getIssue(repoId as string, id as string)
+  const currentIssue = await getIssue(repoId as string, id as string, network as string)
 
   return {
     props: {

@@ -8,6 +8,7 @@ import {IssueData} from '@interfaces/issue-data';
 import useApi from '@x-hooks/use-api';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import useTransactions from '@x-hooks/useTransactions';
+import useNetwork from './use-network';
 
 interface usePendingIssueActions {
   treatPendingIssue(): Promise<boolean>,
@@ -22,9 +23,10 @@ export default function usePendingIssue<S = IssueData>(): usePendingIssueReturn 
   const {dispatch,} = useContext(ApplicationContext);
   const {patchIssueWithScId} = useApi();
   const txWindow = useTransactions();
+  const { network } = useNetwork()
 
   async function updateIssueWithCID(repoId, githubId, issueId): Promise<boolean> {
-    return patchIssueWithScId(repoId, githubId, issueId)
+    return patchIssueWithScId(repoId, githubId, issueId, network?.name)
   }
 
   async function createPendingIssue(): Promise<{githubId?: string; repoId?: string; issueId}> {

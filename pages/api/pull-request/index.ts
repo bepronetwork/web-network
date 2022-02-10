@@ -4,16 +4,27 @@ import paginate from '@helpers/paginate';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Octokit} from 'octokit';
 import api from 'services/api'
+import {Op} from 'sequelize';
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const {login, issueId} = req.query;
+  const {login, issueId, networkName} = req.query;
   let where = {} as any
 
   if (login)
     where.githubLogin = login
 
   if (issueId) {
-    const issue = await models.issue.findOne({where: {issueId}});
+    const network = await models.network.findOne({
+      where: {
+        name: {
+          [Op.iLike]: String(networkName)
+        }
+      }
+    })
+  
+    if (!network) return res.status(404).json('Invalid network')
+
+    const issue = await models.issue.findOne({where: {issueId, network_id: network.id}});
 
     if (!issue)
       return res.status(404).json('Issue not found');
@@ -24,6 +35,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const include = [
     { association: 'issue' },
   ]
+  
   let prs = await models.pullRequest.findAndCountAll({
     ...paginate({where}, req.query, [[req.query.sortBy || 'updatedAt', req.query.order || 'DESC']]),
     // include

@@ -24,6 +24,7 @@ import { ProposalData } from '@interfaces/api-response';
 import { useTranslation } from 'next-i18next';
 import Avatar from './avatar';
 import PullRequestLabels, {PRLabel} from './pull-request-labels';
+import useNetwork from '@x-hooks/use-network';
 
 interface participants {
   githubHandle: string;
@@ -107,6 +108,7 @@ export default function NewProposal({
   const {getUserWith, waitForMerge, processMergeProposal, processEvent} = useApi();
   const txWindow = useTransactions();
   const { t } = useTranslation(['common', 'bounty', 'proposal', 'pull-request'])
+  const { network } = useNetwork()
 
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
@@ -126,13 +128,13 @@ export default function NewProposal({
     if (!issueId)
       return;
 
-    const scIssueId = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    const scIssueId = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
     const pool = [];
 
     for (const meta of mergeProposals as ProposalData[]) {
       const { scMergeId, pullRequestId } = meta;
       if (scMergeId) {
-        const merge = await BeproService.network.getMergeById({merge_id: scMergeId, issue_id: scIssueId});
+        const merge = await BeproService.network.getMergeById(scIssueId, +scMergeId);
         pool.push({...merge, pullRequestId } as Proposal)
       }
     }
@@ -253,11 +255,7 @@ export default function NewProposal({
   }
 
   async function handleClickCreate(): Promise<void> {
-    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
-    
-    // NOTE:
-    //`payload.prAmmounts` need be Intenger number, because the contract remove numbers after dot using `toFix(0)`;
-    // To fix it, we check the difference between amount distributed and amount total, and attributed the rest to last participant;
+    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
 
     const payload = {
       issueID: issue_id,
@@ -276,7 +274,7 @@ export default function NewProposal({
     const proposeMergeTx = addTransaction({type: TransactionTypes.proposeMerge})
     dispatch(proposeMergeTx);
 
-    waitForMerge(githubLogin, issue_id, currentGithubId)
+    waitForMerge(githubLogin, issue_id, currentGithubId, network?.name)
                       .then(() => {
                         if (handleBeproService)
                           handleBeproService(true);
@@ -288,9 +286,9 @@ export default function NewProposal({
                       })
 
     await BeproService.network
-                      .proposeIssueMerge(payload)
+                      .proposeIssueMerge(payload.issueID, payload.prAddresses, payload.prAmounts)
                       .then(txInfo => {
-                        processEvent(`merge-proposal`, txInfo.blockNumber, issue_id, currentGithubId);
+                        processEvent(`merge-proposal`, txInfo.blockNumber, issue_id, currentGithubId, network?.name);
 
                         txWindow.updateItem(proposeMergeTx.payload.id, BeproService.parseTransaction(txInfo, proposeMergeTx.payload));
 
@@ -330,9 +328,9 @@ export default function NewProposal({
     const recognizeAsFinished = addTransaction({type: TransactionTypes.recognizedAsFinish})
     dispatch(recognizeAsFinished);
 
-    BeproService.network.getIssueByCID({issueCID: issueId})
+    BeproService.network.getIssueByCID(issueId)
                 .then((_issue) => {
-                  return BeproService.network.recognizeAsFinished({issueId: +_issue._id})
+                  return BeproService.network.recognizeAsFinished(_issue._id)
                 })
                 .then(txInfo => {
                   txWindow.updateItem(recognizeAsFinished.payload.id, BeproService.parseTransaction(txInfo, recognizeAsFinished.payload));
@@ -357,7 +355,7 @@ export default function NewProposal({
     if (!beproInit) return;
 
     BeproService.network.COUNCIL_AMOUNT().then(setCouncilAmount)
-                .then(() => BeproService.network.isCouncil({address: currentAddress}))
+                .then(() => BeproService.network.isCouncil(currentAddress))
                 .then(isCouncil => setIsCouncil(isCouncil));
   }
 

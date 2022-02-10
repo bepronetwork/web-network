@@ -22,6 +22,8 @@ import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import {NetworkFactory} from 'bepro-js/dist';
+import {toSmartContractDecimals} from 'bepro-js/dist/utils/numbers';
+import useNetwork from '@x-hooks/use-network';
 
 export default function ParityPage() {
   const {state: {currentAddress, balance,}, dispatch} = useContext(ApplicationContext);
@@ -40,6 +42,7 @@ export default function ParityPage() {
   const [availReposList, setAvailableList] = useState<string[]>([]);
   const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId, createRepo, getReposList, removeRepo: apiRemoveRepo} = useApi();
   const { t } = useTranslation(['common', 'parity'])
+  const { network } = useNetwork()
 
   const formItem = (label = ``, placeholder = ``, value = ``, onChange = (ev) => {}) =>
     ({label, placeholder, value, onChange})
@@ -122,7 +125,7 @@ export default function ParityPage() {
              const openIssues = [];
              for (const issue of issues) {
                console.debug(`(SC) Checking ${issue.title}`);
-               if (!(await BeproService.network.getIssueByCID({issueCID: `${issue.repository_id}/${issue.number}`}))?.cid)
+               if (!(await BeproService.network.getIssueByCID(`${issue.repository_id}/${issue.number}`))?.cid)
                  openIssues.push(issue);
              }
 
@@ -153,22 +156,22 @@ export default function ParityPage() {
 
     console.debug(`scPayload,`, scPayload, `msPayload`, msPayload);
 
-    return apiCreateIssue(msPayload)
+    return apiCreateIssue(msPayload, network?.name)
                              .then(cid => {
                                if (!cid)
                                  throw new Error(t('errors.creating-issue'));
-                               return BeproService.network.openIssue({...scPayload, cid: [repository_id, cid].join(`/`)})
+                               return BeproService.network.openIssue([repository_id, cid].join(`/`), msPayload.amount)
                                                   .then(txInfo => {
                                                     // BeproService.parseTransaction(txInfo, openIssueTx.payload)
                                                     //             .then(block => dispatch(updateTransaction(block)))
-                                                    return {githubId: cid, issueId: txInfo.events?.OpenIssue?.returnValues?.id && [repository_id, cid].join(`/`)};
+                                                    return {githubId: cid, issueId: (txInfo as any).events?.OpenIssue?.returnValues?.id && [repository_id, cid].join(`/`)};
                                                   })
                              })
                              .then(({githubId, issueId}) => {
                                if (!issueId)
                                  throw new Error(t('parity:errors.creating-issue-on-sc'));
 
-                               return patchIssueWithScId(repository_id, githubId, issueId)
+                               return patchIssueWithScId(repository_id, githubId, issueId, network?.name)
                              })
                              .then(result => {
                                if (!result)
@@ -202,11 +205,7 @@ export default function ParityPage() {
 
   function deployNewContract() {
     BeproService.network
-                .deploy({
-                          settlerTokenAddress: SETTLER_ADDRESS,
-                          transactionTokenAddress: TRANSACTION_ADDRESS,
-                          governanceAddress: currentAddress,
-                        })
+                .deployJsonAbi(SETTLER_ADDRESS, TRANSACTION_ADDRESS, currentAddress)
                 .then(info => {
                   console.debug(`Deployed!`)
                   console.table(info);
@@ -228,7 +227,7 @@ export default function ParityPage() {
   }
 
   function updateCouncilAmount() {
-    BeproService.network.changeCouncilAmount(+councilAmount)
+    BeproService.network.changeCouncilAmount(councilAmount)
                 .then(info => {
                   dispatch(toastInfo(t('parity:council-amount-changed')));
                   console.debug(`Council Changed!`);
@@ -240,12 +239,7 @@ export default function ParityPage() {
   }
 
   function deploySettlerToken() {
-    BeproService.ERC20.deploy({
-                                name: settlerTokenName,
-                                symbol: settlerTokenSymbol,
-                                cap: "10000000000000000000000000000",
-                                distributionAddress: currentAddress
-                              })
+    BeproService.erc20.deployJsonAbi(settlerTokenName, settlerTokenSymbol, +toSmartContractDecimals(10, 18), currentAddress)
                 .then(txInfo => {
                   console.debug(txInfo);
                   dispatch(toastInfo(`Deployed!`));
@@ -281,7 +275,7 @@ export default function ParityPage() {
                                })
                       })
                       .then(async (repos) => {
-                        setReposList(await getReposList(true));
+                        setReposList(await getReposList(true, network?.name));
                         setAvailableList(repos.filter(repo => repo.has_issues && !repo.fork).map(repo => repo.full_name))
                       })
                       .catch(e => {
@@ -290,12 +284,12 @@ export default function ParityPage() {
   }
 
   async function addNewRepo(owner, repo) {
-    const created = await createRepo(owner, repo);
+    const created = await createRepo(owner, repo, network?.name);
 
     if (!created)
       return dispatch(toastError(t('parity:erros.creating-repo')));
 
-    setReposList(await getReposList(true));
+    setReposList(await getReposList(true, network?.name));
   }
 
   async function removeRepo(id: string) {
@@ -304,7 +298,7 @@ export default function ParityPage() {
                                if (!result)
                                  return dispatch(toastError(t('parity:erros.removing-repo')));
 
-                               setReposList(await getReposList(true))
+                               setReposList(await getReposList(true, network?.name))
                              });
   }
 
@@ -349,13 +343,13 @@ export default function ParityPage() {
   }
 
   function changeRedeem() {
-    BeproService.network.params.contract.getContract()
+    BeproService.network.contract
                 .methods.changeRedeemTime(60).send({from: currentAddress})
                 .then(console.log)
   }
 
   function changeDisputableTime() {
-    BeproService.network.params.contract.getContract()
+    BeproService.network.contract
                 .methods.changeDisputableTime(60).send({from: currentAddress})
                 .then(console.log)
   }

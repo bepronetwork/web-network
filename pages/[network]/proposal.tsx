@@ -25,6 +25,7 @@ import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import { isProposalDisputable } from '@helpers/proposal';
+import useNetwork from '@x-hooks/use-network';
 
 interface ProposalBepro {
   disputes: string;
@@ -51,7 +52,7 @@ export default function PageProposal() {
 
   const [proposalBepro, setProposalBepro] = useState<ProposalBepro>();
   const [proposalMicroService, setProposalMicroService] = useState<ProposalData>();
-  const [amountIssue, setAmountIssue] = useState<string>();
+  const [amountIssue, setAmountIssue] = useState<number>();
   const [networkCid, setNetworkCid] = useState<string>();
   const [isFinalized, setIsFinalized] = useState<boolean>();
   const [isFinished, setIsFinished] = useState<boolean>();
@@ -67,13 +68,14 @@ export default function PageProposal() {
   const {getUserOf, getIssue} = useApi();
   const {getPullRequest} = useOctokit();
   const { t } = useTranslation('common')
+  const { network } = useNetwork()
 
   async function getProposalData() {
     const [repoId, ghId] = String(issueId).split(`/`);
     const repos = await loadRepos();
     const _repo = repos.find(({id}) => id === +repoId);
 
-    const issueData = await getIssue(repoId, ghId);
+    const issueData = await getIssue(repoId, ghId, network?.name);
 
     setIssueMicroService(issueData);
     setPrGithubId(issueData.pullRequests?.find(el => el.id === +prId).githubId);
@@ -86,9 +88,9 @@ export default function PageProposal() {
       return;
 
     try {
-      const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
-      const merge = await BeproService.network.getMergeById({issue_id: issue_id, merge_id: mergeId});
-      const isDisputed = await BeproService.network.isMergeDisputed({issueId: issue_id, mergeId});
+      const issue_id = await BeproService.network.getIssueByCID(String(issueId)).then(({_id}) => _id);
+      const merge = await BeproService.network.getMergeById(issue_id, +mergeId);
+      const isDisputed = await BeproService.network.isMergeDisputed(issue_id, +mergeId);
       const author = (await getUserOf(merge.proposalAddress))?.githubHandle;
       const pullRequests = [];
 
@@ -113,8 +115,8 @@ export default function PageProposal() {
   }
 
   function getIssueAmount() {
-    return BeproService.network.getIssueByCID({issueCID: issueId})
-//                      .then(({_id}) => BeproService.network.getIssueById({issueId: _id}))
+    return BeproService.network.getIssueByCID(String(issueId))
+                       .then(({_id}) => BeproService.network.getIssueById(_id))
                        .then(issue => {
                          setAmountIssue(issue.tokensStaked);
                          setNetworkCid(issue.cid);
@@ -140,11 +142,11 @@ export default function PageProposal() {
 
  async function loadProposalData() {
     if (issueId && currentAddress) {
-    await  BeproService.getDisputableTime().then(setDisputableTime)
-    await  BeproService.network.isCouncil({address: currentAddress})
+      BeproService.getDisputableTime().then(setDisputableTime)
+      BeproService.network.isCouncil(currentAddress)
         .then(isCouncil => setIsCouncil(isCouncil))
 
-    await  BeproService.network.getOraclesSummary({address: currentAddress})
+      BeproService.network.getOraclesSummary(currentAddress)
                   .then(oracles => dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles))))
                   .then(async () => {
                     await getProposal()
