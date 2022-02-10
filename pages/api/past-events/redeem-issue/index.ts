@@ -4,6 +4,7 @@ import {Octokit} from 'octokit';
 import {Bus} from '@helpers/bus';
 import networkBeproJs from '@helpers/api/handle-network-bepro';
 import api from 'services/api'
+import twitterTweet from '@helpers/api/handle-twitter-tweet';
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {fromBlock, id} = req.body;
   const octokit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
@@ -30,6 +31,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
                     const [owner, repo] = repoInfo.githubPath.split(`/`);
                     await octokit.rest.issues.update({owner, repo, issue_number: issueId, state: 'closed',});
                     issue.state = 'canceled';
+                    twitterTweet({
+                      type: 'bounty',
+                      action: 'changes',
+                      issuePreviousState: 'draft',
+                      issue
+                    })
                     await issue.save();
 
                     await api.post(`/seo/${issueId}`)

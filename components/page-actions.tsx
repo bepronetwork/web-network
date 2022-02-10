@@ -348,6 +348,7 @@ export default function PageActions({
     await BeproService.network
       .disputeMerge({ issueID: issue_id, mergeID: mergeId })
       .then((txInfo) => {
+        processEvent(`dispute-proposal`, txInfo.blockNumber, issue_id);
         txWindow.updateItem(disputeTx.payload.id, BeproService.parseTransaction(txInfo, disputeTx.payload));
       })
       .then(() => handleBeproService())
