@@ -28,6 +28,7 @@ import useApi from '@x-hooks/use-api'
 import { addToast } from '@contexts/reducers/add-toast'
 import { useTranslation } from 'next-i18next'
 import { PRLabel } from '@components/pull-request-labels'
+import useNetwork from '@x-hooks/use-network'
 
 export default function PullRequest() {
   const {
@@ -44,6 +45,7 @@ export default function PullRequest() {
   const [pullRequest, setPullRequest] = useState<pullRequest>()
   const { getMergedDataFromPullRequests } = useMergeData()
   const { t } = useTranslation(['common', 'pull-request'])
+  const { network } = useNetwork()
 
   const { repoId, issueId, prId, review } = router.query
 
@@ -54,7 +56,7 @@ export default function PullRequest() {
 
     dispatch(changeLoadState(true))
 
-    getIssue(String(repoId), githubId)
+    getIssue(String(repoId), githubId, network?.name)
       .then((issue) => {
         setIssue(issue)
 
@@ -74,7 +76,7 @@ export default function PullRequest() {
   function handleCreateReview({ body }) {
     setIsExecuting(true)
 
-    createReviewForPR(String(issueId), String(prId), githubLogin, body)
+    createReviewForPR(String(issueId), String(prId), githubLogin, body, network?.name)
       .then((response) => {
         dispatch(
           addToast({

@@ -34,8 +34,8 @@ export default function useMergeData() {
     }
   }
 
-  async function getIssue(repoId: string, githubId: string, path: string): Promise<IssueData> {
-    const apiData = await db.getIssue(repoId, githubId);
+  async function getIssue(repoId: string, githubId: string, path: string, networkName = 'bepro'): Promise<IssueData> {
+    const apiData = await db.getIssue(repoId, githubId, networkName);
 
     if (OctoData[`${apiData.githubId}/${apiData.repository_id}`])
       Object.assign(apiData, OctoData[`${apiData.githubId}/${apiData.repository_id}`]);
@@ -54,26 +54,27 @@ export default function useMergeData() {
                              sortBy = 'updatedAt',
                              order = 'DESC',
                              address = ``,
-                             creator = ``
+                             creator = ``,
+                             networkName = 'bepro'
                            }) {
 
-    const data = await db.getIssues(page, repoId, time, state, sortBy, order, address, creator);
+    const data = await db.getIssues(page, repoId, time, state, sortBy, order, address, creator, networkName);
 
     await mergeData(data.rows);
 
     return data;
   }
 
-  async function getPendingFor(address: string) {
-    const data = await getIssues({address, state: `pending`});
+  async function getPendingFor(address: string, networkName = 'bepro') {
+    const data = await getIssues({address, state: `pending`, networkName});
 
     await mergeData(data.rows);
 
     return data;
   }
 
-  async function getIssuesOfUserPullRequests(page, githubLogin: string) {
-    const pullRequestsWithIssueData = (await db.getUserPullRequests(page, githubLogin)) as PaginatedData<pullRequest>
+  async function getIssuesOfUserPullRequests(page, githubLogin: string, networkName = 'bepro') {
+    const pullRequestsWithIssueData = (await db.getUserPullRequests(page, githubLogin, networkName)) as PaginatedData<pullRequest>
     const issues = pullRequestsWithIssueData.rows.map(pullRequest => pullRequest.issue)
 
     await mergeData(issues)

@@ -3,11 +3,10 @@ import models from '@db/models';
 import {Op, WhereOptions} from 'sequelize';
 import {subHours, subMonths, subWeeks, subYears} from 'date-fns';
 import paginate from '@helpers/paginate';
-import {composeIssues} from '@db/middlewares/compose-issues';
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {state: {[Op.not]: `pending`}};
-  const {state, issueId, repoId, time, creator, address} = req.query || {};
+  const {state, issueId, repoId, time, creator, address, networkName} = req.query || {};
 
   if (state)
     whereCondition.state = state;
@@ -23,6 +22,20 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   if (address)
     whereCondition.creatorAddress = address;
+
+  if (networkName) {
+    const network = await models.network.findOne({
+      where: {
+        name: {
+          [Op.iLike]: String(networkName)
+        }
+      }
+    })
+
+    if (!network) return res.status(404).json('Invalid network')
+
+    whereCondition.network_id = network?.id
+  }
 
   if (time) {
 

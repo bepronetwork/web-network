@@ -20,6 +20,7 @@ import { toastError } from '@reducers/add-toast'
 
 import useMergeData from '@x-hooks/use-merge-data'
 import usePendingIssue from '@x-hooks/use-pending-issue'
+import useNetwork from '@x-hooks/use-network'
 
 export default function MyIssues() {
   const {
@@ -32,11 +33,12 @@ export default function MyIssues() {
   const { t } = useTranslation(['common', 'bounty'])
 
   const { getPendingFor } = useMergeData()
+  const { network } = useNetwork()
 
   function getPendingIssues() {
     if (!currentAddress) return
 
-    getPendingFor(currentAddress).then((pending) =>
+    getPendingFor(currentAddress, network?.name).then((pending) =>
       setPendingIssues(pending.rows)
     )
   }

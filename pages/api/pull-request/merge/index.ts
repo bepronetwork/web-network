@@ -1,14 +1,27 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { Op } from 'sequelize'
 import { Octokit } from 'octokit'
+import { NextApiRequest, NextApiResponse } from 'next'
+
 import models from '@db/models'
+
 import networkBeproJs from '@helpers/api/handle-network-bepro'
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const { issueId, pullRequestId, mergeProposalId, address } = req.body
+  const { issueId, pullRequestId, mergeProposalId, address, networkName } = req.body
 
   try {
+    const customNetwork = await models.network.findOne({
+      where: {
+        name: {
+          [Op.iLike]: String(networkName)
+        }
+      }
+    })
+  
+    if (!customNetwork) return res.status(404).json('Invalid network')
+
     const issue = await models.issue.findOne({
-      where: { issueId: issueId }
+      where: { issueId, network_id: customNetwork.id }
     })
 
     if (!issue) return res.status(404).json('Issue not found')

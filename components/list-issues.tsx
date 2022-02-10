@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { FormControl, InputGroup } from 'react-bootstrap'
+import React, { useContext, useEffect, useState } from 'react'
 
 import CloseIcon from '@assets/icons/close-icon'
 import SearchIcon from '@assets/icons/search-icon'
@@ -24,6 +24,7 @@ import { IssueData } from '@interfaces/issue-data'
 import useApi from '@x-hooks/use-api'
 import usePage from '@x-hooks/use-page'
 import useSearch from '@x-hooks/use-search'
+import useNetwork from '@x-hooks/use-network'
 
 type Filter = {
   label: string
@@ -61,14 +62,17 @@ export default function ListIssues({
   } = useContext(ApplicationContext)
 
   const router = useRouter()
-  const { searchIssues } = useApi()
   const { t } = useTranslation(['common', 'bounty'])
-  const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([])
+  
   const [hasMore, setHasMore] = useState(false)
+  const [truncatedData, setTruncatedData] = useState(false)
+  const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([])
+  
+  const { network, getURLWithNetwork } = useNetwork()
+  const { searchIssues } = useApi()
   const { page, nextPage, goToFirstPage } = usePage()
   const { search, setSearch, clearSearch } = useSearch()
   const [searchState, setSearchState] = useState(search)
-  const [truncatedData, setTruncatedData] = useState(false)
 
   const { repoId, time, state, sortBy, order } = router.query as {
     repoId: string
@@ -127,6 +131,8 @@ export default function ListIssues({
   }
 
   function getIssues() {
+    if (!network) return
+
     dispatch(changeLoadState(true))
 
     searchIssues({
@@ -138,7 +144,8 @@ export default function ListIssues({
       sortBy,
       order,
       creator,
-      pullRequester
+      pullRequester,
+      networkName: network?.name
     })
       .then(({ rows, pages, currentPage }) => {
         if (currentPage > 1) {
@@ -186,7 +193,7 @@ export default function ListIssues({
     }
   }, [page, issuesPages])
 
-  useEffect(getIssues, [page, search, repoId, time, state, sortBy, order, creator])
+  useEffect(getIssues, [page, search, repoId, time, state, sortBy, order, creator, network])
 
   return (
     <CustomContainer>
@@ -270,8 +277,8 @@ export default function ListIssues({
       !loading.isLoading ? (
         <NothingFound description={emptyMessage || filterByState.emptyState}>
           <InternalLink
-            href={redirect ||"/create-bounty"}
             label={buttonMessage || String(t('actions.create-one'))}
+            href={redirect || getURLWithNetwork('/create-bounty')}
             uppercase
           />
         </NothingFound>

@@ -108,7 +108,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const network = await Database.network.create({
       creatorAddress: creator,
-      name,
+      name: name.toLowerCase(),
       description,
       colors: JSON.parse(colors),
       networkAddress,

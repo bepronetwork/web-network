@@ -21,6 +21,7 @@ import LockedIcon from "@assets/icons/locked-icon";
 import { ProposalData } from "@interfaces/api-response";
 import Translation from "./translation";
 import { useTranslation } from "next-i18next";
+import useNetwork from "@x-hooks/use-network";
 
 interface pageActions {
   issueId: string;
@@ -96,6 +97,7 @@ export default function PageActions({
   const [isExecuting, setIsExecuting] = useState(false);
 
   const txWindow = useTransactions();
+  const { network } = useNetwork()
 
   function renderIssueAvatars() {
     if (developers?.length > 0) return <IssueAvatars users={developers} />;
@@ -136,7 +138,7 @@ export default function PageActions({
     dispatch(redeemTx);
     const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
 
-    waitForRedeem(issueId)
+    waitForRedeem(issueId, network?.name)
       .then(() => {
         if (handleBeproService)
           handleBeproService(true);
@@ -269,7 +271,7 @@ export default function PageActions({
 
   async function handlePullrequest({title: prTitle, description: prDescription, branch}) {
 
-    createPullRequestIssue(repoId as string, githubId, {title: prTitle, description: prDescription, username: githubLogin, branch})
+    createPullRequestIssue(repoId as string, githubId, {title: prTitle, description: prDescription, username: githubLogin, branch}, network?.name)
       .then(() => {
         dispatch(
           addToast({
@@ -310,7 +312,7 @@ export default function PageActions({
   async function handleStartWorking() {
     setIsExecuting(true)
 
-    startWorking(networkCID, githubLogin)
+    startWorking(networkCID, githubLogin, network?.name)
       .then((response) => {
         dispatch(
           addToast({
@@ -370,6 +372,15 @@ export default function PageActions({
     dispatch(closeIssueTx);
 
     const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
+
+    waitForClose(issueId, network?.name)
+      .then(() => {
+        if (handleBeproService)
+          handleBeproService(true);
+
+        if (handleMicroService)
+          handleMicroService();
+      })
 
     await BeproService.network
       .closeIssue(issue_id, +mergeId)

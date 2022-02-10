@@ -1,9 +1,24 @@
 import models from "@db/models";
 import {NextApiRequest, NextApiResponse} from 'next';
+import {Op} from 'sequelize';
 
 
 async function getAllRepos(req, res) {
-  return res.status(200).json(await models.repositories.findAll({raw: true}));
+  const { networkName } = req.query
+
+  const network = await models.network.findOne({
+    where: {
+      name: {
+        [Op.iLike]: String(networkName)
+      }
+    }
+  })
+
+  if (!network) return res.status(404).json('Invalid network')
+
+  return res.status(200).json(await models.repositories.findAll({where: {
+    network_id: network.id
+  }}, {raw: true}));
 }
 
 async function addNewRepo(req, res) {
@@ -14,13 +29,23 @@ async function addNewRepo(req, res) {
   if (!req.body?.owner || !req.body?.repo)
     return res.status(422).json(`wrong payload`);
 
-  const {owner, repo} = req.body;
+  const {owner, repo, networkName} = req.body;
 
   const found = await models.repositories.findOne({where: {githubPath: `${owner}/${repo}`}})
   if (found)
     return res.status(409).json(`Path already exists`);
 
-  const created = await models.repositories.create({githubPath: `${owner}/${repo}`})
+  const network = await models.network.findOne({
+      where: {
+        name: {
+          [Op.iLike]: String(networkName)
+        }
+      }
+    })
+  
+  if (!network) return res.status(404).json('Invalid network')
+
+  const created = await models.repositories.create({githubPath: `${owner}/${repo}`, network_id: network.id})
                               .then(() => ({error: false}))
                               .catch(e => ({error: e.message}));
 

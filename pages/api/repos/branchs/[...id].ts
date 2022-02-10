@@ -1,12 +1,23 @@
 import models from '@db/models';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Octokit} from 'octokit';
+import {Op} from 'sequelize';
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const {id} = req.query;
+  const {id: [repoId, networkName]} = req.query;
+
+  const network = await models.network.findOne({
+    where: {
+      name: {
+        [Op.iLike]: String(networkName)
+      }
+    }
+  })
+
+  if (!network) return res.status(404).json('Invalid network')
 
   const repository = await models.repositories.findOne({
-    where: {id},
+    where: {id: repoId, network_id: network.id},
   })
 
   if (!repository)
