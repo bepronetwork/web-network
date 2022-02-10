@@ -1,6 +1,7 @@
 import {Bus} from '@helpers/bus';
 import api from '@services/api';
 import {Op} from 'sequelize';
+import twitterTweet from './handle-twitter-tweet';
 
 export default async function readCloseIssues(events, {network, models, octokit, res}) {
   for (const event of events) {
@@ -40,6 +41,12 @@ export default async function readCloseIssues(events, {network, models, octokit,
     issue.merged = mergeProposal.scMergeId;
     issue.state = 'closed';
     await issue.save();
+
+    twitterTweet({
+      type: 'bounty',
+      action: 'distributed',
+      issue
+    })
     await api.post(`/seo/${issueId}`);
     console.log(`Emitting closeIssue:created:${issueId}`);
     Bus.emit(`closeIssue:created:${issueId}`, issue)
