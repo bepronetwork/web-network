@@ -34,9 +34,9 @@ export default function NotMergeableModal({
 
     if (hasPRMerged || (pullRequest.isMergeable && !isFinalized) || !(isIssueOwner || isPullRequestOwner || isCouncil || isProposer)) {
       setVisible(false)
-    } else if (isIssueOwner || isPullRequestOwner || isCouncil || isProposer)
+    } else if (isIssueOwner || isPullRequestOwner || isCouncil || isProposer){
       setVisible(pullRequest.state === 'open')
-
+    }  
   }
 
   function handleRetryMerge() {
