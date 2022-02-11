@@ -80,7 +80,7 @@ export default function MyIssues() {
                 onCloseClick={() => updatePendingIssue(null)}
               >
                 <h4 className="text-white mb-4">{pendingIssue?.title}</h4>
-                <div className="bg-dark-gray p-3 rounded-4 height-body">
+                <div className="bg-dark-gray p-3 rounded-4 ">
                   <MarkedRender source={pendingIssue?.body} />
                 </div>
                 <div className="bg-dark-gray w-100 text-center mt-4 rounded-4 py-3">
@@ -99,7 +99,7 @@ export default function MyIssues() {
           )) ||
             ``}
 
-          <ListIssues creator={githubLogin} />
+          <ListIssues creator={githubLogin || 'not-connected'} />
         </div>
       </div>
     </Account>

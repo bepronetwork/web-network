@@ -6,8 +6,8 @@
   "labelWithCount_other": "{{count}} pull requests",
   "abbreviation": "PR",
   "select": "Select a Pull Request",
-  "review_one": "{{count}} review",
-  "review_other": "{{count}} reviews",
+  "review_one": "review",
+  "review_other": "reviews",
   "find-a-bounty": "Find a bounty to work on",
   "actions": {
     "create": {
