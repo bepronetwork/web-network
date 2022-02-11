@@ -244,11 +244,7 @@ export default function NewProposal({
         const tmpParticipants = participantsPr.filter(({address}) => !!address);
         setDistrib(Object.fromEntries(tmpParticipants.map(participant => [participant.githubHandle, 0])))
         setCurrentGithubId(githubId);       
-        setParticipants([...tmpParticipants, {
-          address: "0x8e3c42fa292a187865b466f05d7ebbfe77f1cf5f",
-githubHandle: "Marcus Vinícius1",
-githubLogin: "MarcusviniciusLsantos"
-        }]);
+        setParticipants(tmpParticipants);
       })
       .catch((err) => {
         console.error('Error fetching pullRequestsParticipants', err)
