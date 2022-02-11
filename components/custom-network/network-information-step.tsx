@@ -66,6 +66,7 @@ export default function NetworkInformationStep({
           <div className="d-flex gap-20">
             <ImageUploader
               name="logoIcon"
+              value={data.logoIcon}
               error={
                 data.logoIcon.raw &&
                 !data.logoIcon.raw?.type?.includes('image/svg')
@@ -80,6 +81,7 @@ export default function NetworkInformationStep({
 
             <ImageUploader
               name="fullLogo"
+              value={data.fullLogo}
               error={
                 data.fullLogo.raw &&
                 !data.fullLogo.raw?.type?.includes('image/svg')

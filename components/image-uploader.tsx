@@ -5,11 +5,13 @@ import UploadIcon from '@assets/icons/upload'
 export default function ImageUploader({
   name,
   description,
+  value,
   onChange,
   lg = false,
-  error = false
+  error = false,
+  className = ''
 }) {
-  const [image, setImage] = useState({ preview: '', raw: '' })
+  const [image, setImage] = useState(value)
   const dimensions = {
     width: (lg && '150') || '80',
     height: '80'
@@ -28,13 +30,13 @@ export default function ImageUploader({
   }, [image])
 
   return (
-    <div>
+    <>
       <label
         className={`bg-black image-uploader ${
           (lg && 'lg') || ''
         } border-radius-8 d-flex flex-column text-center align-items-center justify-content-center ${
           (error && 'error') || ''
-        }`}
+        } ${className}`}
         htmlFor={name}
       >
         {image.preview ? (
@@ -60,6 +62,6 @@ export default function ImageUploader({
         accept=".svg"
         onChange={handleChange}
       />
-    </div>
+    </>
   )
 }
