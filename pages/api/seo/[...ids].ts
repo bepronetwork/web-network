@@ -74,7 +74,10 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     return;
 
   var img = Buffer.from(card.buffer, 'base64');
-  const {hash} = await IpfsStorage.add(img)
+  const {hash} = await IpfsStorage.add(img).catch(e => {
+    console.log(`Failed to upload to IPFS`, e);
+    return null;
+  })
 
   await issue.update({seoImage: hash,})
 
