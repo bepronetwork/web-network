@@ -1,5 +1,5 @@
 import { CONTRACT_ADDRESS, WEB3_CONNECTION } from "env";
-import { Network } from "bepro-js";
+import { Network } from "bepro-js/dist";
 
 export default function networkBeproJs({
   test = true,

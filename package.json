@@ -21,7 +21,7 @@
     "@vlsergey/react-bootstrap-pagination": "^3.0.2",
     "abort-controller": "^3.0.0",
     "axios": "^0.21.1",
-    "bepro-js": "github:moshmage/bepro-js#a97de486be037698fbb0efe550679ff2f424ae8e",
+    "bepro-js": "github:moshmage/bepro-js#2.0.0-alpha.0",
     "bootstrap": "^5.1.3",
     "clsx": "^1.1.1",
     "cron": "^1.8.2",
