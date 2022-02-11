@@ -159,6 +159,7 @@ export default function NewProposal({
   }
 
   function handleCheckDistrib(obj: object) {
+    console.log('obj', obj)
     var currentAmount = sumObj(obj)
 
     if (currentAmount === 100){
@@ -242,10 +243,13 @@ export default function NewProposal({
       })
       .then((participantsPr) => {
         const tmpParticipants = participantsPr.filter(({address}) => !!address);
-        const amountPerParticipant = 100 / tmpParticipants.length
-        setDistrib(Object.fromEntries(tmpParticipants.map(participant => [participant.githubHandle, amountPerParticipant])))
+        setDistrib(Object.fromEntries(tmpParticipants.map(participant => [participant.githubHandle, 0])))
         setCurrentGithubId(githubId);       
-        setParticipants(tmpParticipants);
+        setParticipants([...tmpParticipants, {
+          address: "0x8e3c42fa292a187865b466f05d7ebbfe77f1cf5f",
+githubHandle: "Marcus Vinícius1",
+githubLogin: "MarcusviniciusLsantos"
+        }]);
       })
       .catch((err) => {
         console.error('Error fetching pullRequestsParticipants', err)
