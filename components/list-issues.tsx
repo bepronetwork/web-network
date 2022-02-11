@@ -34,9 +34,11 @@ type Filter = {
 type FiltersByIssueState = Filter[]
 
 interface ListIssuesProps {
+  creator?: string
+  redirect?: string
   filterState?: string
   emptyMessage?: string
-  creator?: string
+  buttonMessage?: string
   pullRequester?: string
 }
 
@@ -46,9 +48,11 @@ interface IssuesPage {
 }
 
 export default function ListIssues({
+  creator,
+  redirect,
   filterState,
   emptyMessage,
-  creator,
+  buttonMessage,
   pullRequester
 }: ListIssuesProps): JSX.Element {
   const {
@@ -261,8 +265,8 @@ export default function ListIssues({
       !loading.isLoading ? (
         <NothingFound description={emptyMessage || filterByState.emptyState}>
           <InternalLink
-            href="/create-bounty"
-            label={String(t('actions.create-one'))}
+            href={redirect ||"/create-bounty"}
+            label={buttonMessage || String(t('actions.create-one'))}
             uppercase
           />
         </NothingFound>
