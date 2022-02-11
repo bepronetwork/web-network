@@ -27,6 +27,7 @@ import { IssueData, pullRequest } from '@interfaces/issue-data'
 import useApi from '@x-hooks/use-api'
 import { addToast } from '@contexts/reducers/add-toast'
 import { useTranslation } from 'next-i18next'
+import { PRLabel } from '@components/pull-request-labels'
 
 export default function PullRequest() {
   const {
@@ -66,6 +67,7 @@ export default function PullRequest() {
         )
       )
       .then((merged) => setPullRequest(head(merged)))
+      .catch(console.log)
       .finally(() => dispatch(changeLoadState(false)))
   }
 
@@ -122,8 +124,8 @@ export default function PullRequest() {
         authorPullRequest={pullRequest?.githubLogin || ''}
         createdAt={pullRequest && formatDate(pullRequest.createdAt)}
         beproStaked={formatNumberToCurrency(issue?.amount)}
+        pullRequest={pullRequest}
       />
-
       <CustomContainer>
         <div className="row align-items-center bg-shadow border-radius-8 px-3 py-4">
           <div className="col-8">

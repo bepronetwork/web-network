@@ -8,7 +8,7 @@ import ConnectGithub from '@components/connect-github';
 import {ApplicationContext} from '@contexts/application';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import {addTransaction} from '@reducers/add-transaction';
-import {toastError} from '@contexts/reducers/add-toast'
+import {toastError, toastSuccess} from '@contexts/reducers/add-toast'
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import {formatNumberToCurrency} from '@helpers/formatNumber'
@@ -121,7 +121,9 @@ export default function PageCreateIssue() {
                         patchIssueWithScId(repository_id, githubId, issueId)
                           .then(async(result) => {
                             if (!result)
-                                return dispatch(toastError(t('create-bounty:errors.creating-bounty')));;
+                                return dispatch(toastError(t('create-bounty:errors.creating-bounty')))
+
+                                dispatch(toastSuccess(t('create-bounty:bounty-created')))
                             await router.push(`/bounty?id=${githubId}&repoId=${repository_id}`)
                           }))
                       .catch(e => {

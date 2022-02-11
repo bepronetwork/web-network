@@ -196,22 +196,12 @@ export default function IssueListItem({
     >
       <div className="row align-center">
         <div className="col-md-10 mb-3 mb-md-0">
-          <OverlayTrigger
-            key="bottom-title"
-            placement="bottom"
-            overlay={
-              (issue?.title?.length > 61 && (
-                <Tooltip id={`tooltip-bottom`}>{issue?.title}</Tooltip>
-              )) || <></>
-            }
-          >
-            <h4 className="h4 text-truncate">
+        <h4 className="h4 text-truncate">
               <span className="text-gray trans me-2">#{issue?.githubId}</span>
               {(issue?.title !== null && issue?.title) || (
                 <Translation ns="bounty" label={`errors.fetching`} />
               )}
             </h4>
-          </OverlayTrigger>
           <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2 gap-20">
             <span
               className={`status caption-small ${handleColorState(

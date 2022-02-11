@@ -26,7 +26,7 @@ export default function IssueHero({ issue, state, amount }) {
                 <div className="col-md-9">
                   <div className="top-border">
                     <h4 className="mb-2">
-                      #{issue?.githubId} {issue?.title}
+                      #{issue?.githubId} {issue?.title.length > 100 ? `${issue?.title.substring(0, 97)}...` : issue?.title}
                     </h4>
                     <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start">
                       <span className="caption-small mr-2 mt-1">

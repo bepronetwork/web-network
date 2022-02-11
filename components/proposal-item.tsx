@@ -137,7 +137,7 @@ export default function ProposalItem({
                           ev.stopPropagation();
                           handleDispute(+proposal._id)
                         }}>
-                  {!isDisputable && <LockedIcon className={`me-2 text-${getColors()}`}/>}
+                  {!isDisputable && getColors() !== 'success' && <LockedIcon className={`me-2 text-${getColors()}`}/>}
                   <span>{getLabel()}</span>
                 </Button>
               </div>
