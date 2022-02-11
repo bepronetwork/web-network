@@ -23,7 +23,7 @@ export default function MyPullRequests() {
           <ListIssues
             redirect="/developers"
             buttonMessage={t('bounty:label_other')}
-            pullRequester={githubLogin}
+            pullRequester={githubLogin || 'not-connected'}
             emptyMessage={String(t('errors.you-dont-have-pull-requests'))}
           />
         </div>
