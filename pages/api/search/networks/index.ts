@@ -13,7 +13,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   if (name) whereCondition.name = name
 
-  if (creatorAddress) whereCondition.creatorAddress = creatorAddress
+  if (creatorAddress) whereCondition.creatorAddress = { [Op.iLike]: String(creatorAddress) }
 
   if (networkAddress) whereCondition.repository_id = networkAddress
 

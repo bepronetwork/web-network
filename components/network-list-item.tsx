@@ -30,13 +30,23 @@ export default function NetworkListItem({
   const { getURLWithNetwork } = useNetwork()
 
   function handleRedirect() {
-    router.push(getURLWithNetwork('/account/my-network/settings'))
+    router.push(
+      getURLWithNetwork('/account/my-network/settings', {
+        network: network.name
+      })
+    )
   }
 
   useEffect(() => {
-    BeproService.getBeproLocked(network.networkAddress).then(setTokenLock).catch(console.log)
-    BeproService.getOpenIssues(network.networkAddress).then(setBountiesQuantity).catch(console.log)
-    BeproService.getTokensStaked(network.networkAddress).then(setOpenBountiesAmount).catch(console.log)
+    BeproService.getBeproLocked(network.networkAddress)
+      .then(setTokenLock)
+      .catch(console.log)
+    BeproService.getOpenIssues(network.networkAddress)
+      .then(setBountiesQuantity)
+      .catch(console.log)
+    BeproService.getTokensStaked(network.networkAddress)
+      .then(setOpenBountiesAmount)
+      .catch(console.log)
   }, [])
 
   return (
@@ -53,15 +63,25 @@ export default function NetworkListItem({
       </div>
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center">
-        <span className="caption-medium text-white">{bountiesQuantity !== undefined ? formatNumberToNScale(bountiesQuantity) : '-'}</span>
+        <span className="caption-medium text-white">
+          {bountiesQuantity !== undefined
+            ? formatNumberToNScale(bountiesQuantity)
+            : '-'}
+        </span>
       </div>
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center">
-        <span className="caption-medium text-white">{tokenLocked !== undefined ? formatNumberToNScale(tokenLocked) : '-'}</span>
+        <span className="caption-medium text-white">
+          {tokenLocked !== undefined ? formatNumberToNScale(tokenLocked) : '-'}
+        </span>
       </div>
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-end gap-20">
-        <span className="caption-medium text-white">{openBountiesAmount !== undefined ? formatNumberToNScale(openBountiesAmount) : '-'}</span>
+        <span className="caption-medium text-white">
+          {openBountiesAmount !== undefined
+            ? formatNumberToNScale(openBountiesAmount)
+            : '-'}
+        </span>
         <span className="caption-medium mr-2 text-primary">$BEPRO</span>
       </div>
     </div>

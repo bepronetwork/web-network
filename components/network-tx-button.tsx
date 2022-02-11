@@ -76,6 +76,9 @@ function networkTxButton({
       transactionMethod = txMethod === 'lock' ? transactionMethod(weiAmount).send({from: currentAddress}) : transactionMethod(weiAmount, txParams?.from).send({from: currentAddress})
     }
 
+    console.log('Account', BeproService.bepro.Account)
+    BeproService.bepro.getAddress().then(address => console.log('getAddress', address)).catch(error => console.log('getAddress', error))
+
     transactionMethod.then((answer) => {
         if (answer.status) {
           onSuccess && onSuccess();
