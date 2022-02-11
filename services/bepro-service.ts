@@ -6,8 +6,8 @@ import {TransactionStatus} from '@interfaces/enums/transaction-status';
 class BeproFacet {
 
   readonly bepro: Web3Connection = new Web3Connection({
-    web3Host: WEB3_CONNECTION, 
-    privateKey: process.env.NEXT_PUBLIC_WALLET_PRIVATE_KEY, 
+    web3Host: WEB3_CONNECTION,
+    privateKey: process.env.NEXT_PUBLIC_WALLET_PRIVATE_KEY,
     debug: true
   });
 
@@ -29,11 +29,12 @@ class BeproFacet {
 
   async start(customNetworkAddress = undefined) {
     try {
-      await this.bepro.start();
+      if (!this.bepro.started)
+        await this.bepro.start();
       this.network = new Network(this.bepro, customNetworkAddress || CONTRACT_ADDRESS);
       this.erc20 = new ERC20(this.bepro, SETTLER_ADDRESS);
       this.networkFactory = new NetworkFactory(this.bepro, NETWORK_FACTORY_ADDRESS);
-      
+
       await this.network.loadContract();
       await this.erc20.loadContract();
       await this.networkFactory.loadContract();
@@ -41,7 +42,7 @@ class BeproFacet {
       this.operatorAmount = await this.getOperatorAmount();
     } catch (error) {
       console.log(`Failed to start Bepro Service`, error)
-      
+
       this.started = false
 
       return this.started
@@ -55,6 +56,7 @@ class BeproFacet {
   async login() {
     this.connected = false;
     await this.bepro.connect();
+    await this.start();
     this.address = await this.bepro.getAddress();
     this.connected = true;
   }
