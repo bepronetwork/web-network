@@ -6,7 +6,8 @@ export default function IssuePullRequests({
   repoId,
   className = '',
   issueId,
-  pullResquests = []
+  pullResquests = [],
+  repositoryPath
 }) {
   const { t } = useTranslation('pull-request')
 
@@ -23,6 +24,7 @@ export default function IssuePullRequests({
             repoId={repoId}
             pullRequest={pullRequest}
             issueId={issueId}
+            repositoryPath={repositoryPath}
           />
         ))) || <NothingFound description={t('errors.not-found')} />}
     </div>

@@ -4,9 +4,10 @@ export type PRLabel = 'ready to merge' | 'broken tests' | 'conflicts' | 'merged'
 interface IPRLabel{
   label: PRLabel;
   className?: string;
+  hero?: boolean;
 }
 
-function PullRequestLabels({label, className }: IPRLabel) {
+function PullRequestLabels({label, className, hero = false }: IPRLabel) {
   if(!label) return <></>
   
   function getColorLabel() {
@@ -21,14 +22,14 @@ function PullRequestLabels({label, className }: IPRLabel) {
         return "danger";
       }
       default: {
-        return "primary";
+        return hero ? 'white' : 'primary';
       }
     }
   }
 
   return(
-    <div className={`pullrequest-labels bg-${getColorLabel()}-30 rounded-pill p-1 ${className || ''}`}>
-      <span className={`text-uppercase text-${getColorLabel()} mx-1 text-nowrap`}>{label}</span>
+    <div className={`pullrequest-labels d-flex justify-content-center align-items-center bg-${getColorLabel()}-30 rounded-pill p-1 ${className || ''}`}>
+      <span className={`caption-small text-uppercase text-${getColorLabel()} mx-1 text-nowrap`}>{label}</span>
     </div>
   )
 }
