@@ -79,7 +79,7 @@ export default function useApi() {
                  .then(({data}) => data === `ok`)
                  .catch(_ => false)
   }
-  
+
   async function patchPrStatus(prId) {
     return client.patch(`/pull-request/${prId}`)
                  .then(({data}) => data )
@@ -220,7 +220,7 @@ export default function useApi() {
   }
 
   async function poll(eventName: string, rest) {
-    return client.post(`/poll/`, {eventName, ...rest})
+    return client.post(`/poll/`, {eventName, ...rest}, {timeout: 2 * 60 * 1000})
   }
 
   async function waitForMerge(githubLogin, issue_id, currentGithubId) {
@@ -276,7 +276,7 @@ export default function useApi() {
 
   async function getUserPullRequests(page= '1', login: string) {
     const search = new URLSearchParams({page, login}).toString();
-    
+
     return client.get<PaginatedData<pullRequest>>(`/pull-request?${search}`)
                  .then(({data}) => data)
                  .catch(e => {
@@ -305,7 +305,7 @@ export default function useApi() {
     return client.put('/pull-request/review', {issueId, pullRequestId, githubLogin, body})
       .then(response => response)
   }
-  
+
   async function removeUser(address: string, githubLogin: string) {
     return client.delete(`/user/${address}/${githubLogin}`)
                  .then(({status}) => status === 200)
