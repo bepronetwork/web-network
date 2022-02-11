@@ -159,7 +159,6 @@ export default function NewProposal({
   }
 
   function handleCheckDistrib(obj: object) {
-    console.log('obj', obj)
     var currentAmount = sumObj(obj)
 
     if (currentAmount === 100){
