@@ -28,7 +28,7 @@ function PullRequestLabels({label, className }: IPRLabel) {
 
   return(
     <div className={`pullrequest-labels bg-${getColorLabel()}-30 rounded-pill p-1 ${className || ''}`}>
-      <span className={`text-uppercase text-${getColorLabel()} mx-1 text-nowrap`}>{label}</span>
+      <span className={`caption-small text-uppercase text-${getColorLabel()} mx-1 text-nowrap`}>{label}</span>
     </div>
   )
 }
