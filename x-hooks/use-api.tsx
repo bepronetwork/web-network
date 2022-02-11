@@ -58,6 +58,17 @@ export default function useApi() {
                  .catch(() => ({rows: [], count: 0, pages: 0, currentPage: 1}));
   }
 
+  async function searchRepositories({page = '1',
+                           owner = '',
+                           name = ``,
+                           path = ``,
+                           networkName = 'bepro'}) {
+    const params = new URLSearchParams({page, owner, name, path, networkName}).toString();
+    return client.get<{rows, count: number, pages: number, currentPage: number}>(`/search/repositories?${params}`)
+                 .then(({data}) => data)
+                 .catch(() => ({rows: [], count: 0, pages: 0, currentPage: 1}));
+  }
+
   async function getIssue(repoId: string, ghId: string, networkName = 'bepro') {
     return client.get<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`)
                  .then(({data}) => data)
@@ -399,6 +410,7 @@ export default function useApi() {
     searchIssues,
     createNetwork,
     getNetwork,
-    searchNetworks
+    searchNetworks,
+    searchRepositories
   }
 }

@@ -1,4 +1,4 @@
-import { Op, WhereOptions } from 'sequelize'
+import { Op, WhereOptions, Sequelize } from 'sequelize'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import models from '@db/models'
@@ -10,9 +10,16 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   const { owner, name, path, networkName, page } = req.query || {}
 
-  if (path) whereCondition.githubPath = path
-  if (name) whereCondition.githubPath = { [Op.like]: `%${name}%` }
-  if (owner) whereCondition.githubPath = { [Op.like]: `%${owner}%` }
+  console.log(path)
+
+  if (path)
+    (whereCondition.githubPath = Sequelize.fn('lower', Sequelize.col('githubPath'))),
+      {
+        [Op.in]: String(path).split(',')
+      }
+      
+  if (name) whereCondition.githubPath = { [Op.iLike]: `%${name}%` }
+  if (owner) whereCondition.githubPath = { [Op.iLike]: `%${owner}%` }
 
   const repositories = await models.repositories.findAndCountAll(
     paginate({ where: whereCondition, nest: true }, req.query, [])
