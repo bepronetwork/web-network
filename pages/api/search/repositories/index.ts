@@ -10,8 +10,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   const { owner, name, path, networkName, page } = req.query || {}
 
-  console.log(path)
-
   if (path)
     (whereCondition.githubPath = Sequelize.fn('lower', Sequelize.col('githubPath'))),
       {
@@ -20,6 +18,19 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       
   if (name) whereCondition.githubPath = { [Op.iLike]: `%${name}%` }
   if (owner) whereCondition.githubPath = { [Op.iLike]: `%${owner}%` }
+  if (networkName) {
+    const network = await models.network.findOne({
+      where: {
+        name: {
+          [Op.iLike]: String(networkName)
+        }
+      }
+    })
+
+    if (!network) return res.status(404).json('Invalid network')
+
+    whereCondition.network_id = network.id
+  }
 
   const repositories = await models.repositories.findAndCountAll(
     paginate({ where: whereCondition, nest: true }, req.query, [])
