@@ -136,6 +136,7 @@ li {
     &__option {
       @extend .p-small;
       background-color: transparent;
+      color: $gray;
       &--is-selected {
         color: $blue;
       }
@@ -1206,6 +1207,11 @@ textarea.form-control {
 .sticky-bounty {
   position: sticky;
   top: 90px;
+}
+
+.pullrequest-labels {
+  width: max-content;
+  height: max-content;
 }
 
 .pullrequest-labels + .pullrequest-labels{
