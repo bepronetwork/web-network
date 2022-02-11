@@ -242,8 +242,7 @@ export default function NewProposal({
       })
       .then((participantsPr) => {
         const tmpParticipants = participantsPr.filter(({address}) => !!address);
-        const amountPerParticipant = 100 / tmpParticipants.length
-        setDistrib(Object.fromEntries(tmpParticipants.map(participant => [participant.githubHandle, amountPerParticipant])))
+        setDistrib(Object.fromEntries(tmpParticipants.map(participant => [participant.githubHandle, 0])))
         setCurrentGithubId(githubId);       
         setParticipants(tmpParticipants);
       })
