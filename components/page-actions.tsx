@@ -51,6 +51,7 @@ interface pageActions {
   addNewComment?: (comment: any) => void;
   issueRepo?: string;
   isDisputable?: boolean;
+  onCloseEvent?: () => Promise<any>;
 }
 
 export default function PageActions({
@@ -80,7 +81,8 @@ export default function PageActions({
   repoPath = ``,
   addNewComment,
   issueCreator,
-  isDisputable = false
+  isDisputable = false,
+  onCloseEvent,
 }: pageActions) {
   const {
     dispatch,
@@ -162,7 +164,7 @@ export default function PageActions({
                         dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
                       else dispatch(updateTransaction({...redeemTx.payload as any, status: TransactionStatus.failed}));
                       console.error(`Error redeeming`, err);
-                    });
+                    })
       }).catch((err) => {
         if (err?.message?.search(`User denied`) > -1)
           dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
@@ -363,24 +365,18 @@ export default function PageActions({
   }
 
   async function handleClose() {
+   
     const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue });
     dispatch(closeIssueTx);
 
     const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
 
-    waitForClose(issueId)
-      .then(() => {
-        if (handleBeproService)
-          handleBeproService(true);
-
-        if (handleMicroService)
-          handleMicroService();
-      })
-
     await BeproService.network
       .closeIssue({ issueID: issue_id, mergeID: mergeId })
       .then((txInfo) => {
-        processEvent(`close-issue`, txInfo.blockNumber, issue_id);
+        processEvent(`close-issue`, txInfo.blockNumber, issue_id).then(async () =>{
+          await onCloseEvent?.()
+        })
         txWindow.updateItem(closeIssueTx.payload.id, BeproService.parseTransaction(txInfo, closeIssueTx.payload));
         // return BeproService.parseTransaction(txInfo, closeIssueTx.payload).then(
         //   (block) => dispatch(updateTransaction(block))
