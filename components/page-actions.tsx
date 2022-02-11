@@ -327,6 +327,7 @@ export default function PageActions({
         setIsExecuting(false)
       })
       .catch((error) => {
+        console.log(`Failed to start working`, error)
         dispatch(
           addToast({
             type: "danger",
