@@ -31,6 +31,9 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       })
 
       await api.post(`/seo/${issue?.issueId}`)
+      .catch(e => {
+        console.log(`Error creating SEO`, e);
+      })
 
       return res.status(response.status).json(response.data)
     }

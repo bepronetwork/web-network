@@ -47,7 +47,10 @@ export default async function readCloseIssues(events, {network, models, octokit,
       action: 'distributed',
       issue
     })
-    await api.post(`/seo/${issueId}`);
+    await api.post(`/seo/${issueId}`)
+    .catch(e => {
+      console.log(`Error creating SEO`, e);
+    })
     console.log(`Emitting closeIssue:created:${issueId}`);
     Bus.emit(`closeIssue:created:${issueId}`, issue)
   }
