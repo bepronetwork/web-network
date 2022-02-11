@@ -18,7 +18,10 @@ export default async function readRedeemIssue(events, {network, models, res, oct
     await octokit.rest.issues.update({owner, repo, issue_number: issueId, state: 'closed',});
     issue.state = 'canceled';
     await issue.save();
-    await api.post(`/seo/${issueId}`);
+    await api.post(`/seo/${issueId}`)
+    .catch(e => {
+      console.log(`Error creating SEO`, e);
+    })
 
     console.log(`Emitting redeemIssue:created:${issueId}`);
     Bus.emit(`redeemIssue:created:${issueId}`, issue)

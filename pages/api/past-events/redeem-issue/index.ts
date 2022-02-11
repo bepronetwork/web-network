@@ -40,6 +40,9 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
                     await issue.save();
 
                     await api.post(`/seo/${issueId}`)
+                    .catch(e => {
+                      console.log(`Error creating SEO`, e);
+                    })
 
                     console.log(`Emitting redeemIssue:created:${issueId}`);
                     Bus.emit(`redeemIssue:created:${issueId}`, issue)
