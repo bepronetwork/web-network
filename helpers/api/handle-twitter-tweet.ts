@@ -80,8 +80,12 @@ export default function twitterTweet({
   if (Tweet.length < 280 && title && body) {
     twitterClient.v2
       .tweet(Tweet)
-      .then(() => console.log("Tweet created successfully"))
-      .catch((err) => console.log("Error creating Tweet ->", err));
+      .then(() => {
+        console.log("Tweet created successfully");
+      })
+      .catch((err) => {
+        console.log("Error creating Tweet ->", err);
+      });
   } else {
     console.log(
       "This tweet cannot be created. Because it contains more than 280 characters"
