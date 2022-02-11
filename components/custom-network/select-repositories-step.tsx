@@ -1,8 +1,8 @@
 import { FormCheck } from 'react-bootstrap'
 
 import Step from '@components/step'
-import GithubInfo from '@components/github-info'
 import ConnectGithub from '@components/connect-github'
+import RepositoriesList from '@components/custom-network/repositories-list'
 
 export default function SelectRepositoriesStep({
   data,
@@ -31,20 +31,7 @@ export default function SelectRepositoriesStep({
     >
       {(githubLogin && (
         <div>
-          <div className="row mx-0 mb-4 justify-content-start repositories-list">
-            <span className="caption-small text-gray px-0">Repositories</span>
-
-            {data.data.map((repository) => (
-              <GithubInfo
-                key={repository.name}
-                label={repository.name}
-                active={repository.checked}
-                onClick={() => onClick(repository.name)}
-                variant="repository"
-                parent="list"
-              />
-            ))}
-          </div>
+          <RepositoriesList repositories={data.data} onClick={onClick} />
 
           <span className="caption-small text-gray px-0 mt-3">Bepro-bot</span>
 

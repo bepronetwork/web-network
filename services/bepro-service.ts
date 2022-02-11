@@ -7,7 +7,7 @@ class BeproFacet {
 
   readonly bepro: Web3Connection = new Web3Connection({
     web3Host: WEB3_CONNECTION, 
-    //privateKey: process.env.NEXT_PUBLIC_WALLET_PRIVATE_KEY, 
+    privateKey: process.env.NEXT_PUBLIC_WALLET_PRIVATE_KEY, 
     debug: true
   });
 
