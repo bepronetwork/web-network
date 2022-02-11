@@ -39,6 +39,9 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       issue
     })
     await api.post(`/seo/${issue.issueId}`)
+    .catch(e => {
+      console.log(`Error creating SEO`, e);
+    })
   }
 
   return res.status(200).json(issues);

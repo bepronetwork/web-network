@@ -56,6 +56,9 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
                     issue
                   })
                   await api.post(`/seo/${issueId}`)
+                  .catch(e => {
+                    console.log(`Error creating SEO`, e);
+                  })
                  return res.status(200).json(`ok`)
                })
                .catch(_ => res.status(422).json(`nok`));
