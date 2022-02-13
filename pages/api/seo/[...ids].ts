@@ -66,7 +66,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     proposal: issue.mergeProposals?.length || 0,
   })
 
-  var img = Buffer.from(card.buffer, 'base64');
+  var img = Buffer.from(card.buffer);
   const {hash} = await IpfsStorage.add(img)
 
   await issue.update({
@@ -76,7 +76,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json({seoImage: hash});
 }
 
-export default async function GetIssues(req: NextApiRequest, res: NextApiResponse) {
+export default async function Seo(req: NextApiRequest, res: NextApiResponse) {
 
   switch (req.method.toLowerCase()) {
     case 'get':
