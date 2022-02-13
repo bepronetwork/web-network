@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import Avatar from './avatar'
 import GithubInfo from './github-info'
 import InternalLink from './internal-link'
+import PullRequestLabels, { PRLabel } from './pull-request-labels'
 
 export default function PullRequestHero({
   githubId,
@@ -12,7 +13,8 @@ export default function PullRequestHero({
   pullRequestId,
   authorPullRequest,
   createdAt,
-  beproStaked
+  beproStaked,
+  pullRequest
 }) {
   const router = useRouter()
   const { issueId: issueCID } = router.query
@@ -20,8 +22,17 @@ export default function PullRequestHero({
   const [[activeRepo]] = useRepos()
   const { t } = useTranslation(['common', 'pull-request'])
 
+  function getLabel(): PRLabel{
+    if(pullRequest?.merged) return 'merged';
+    if(pullRequest?.isMergeable) return 'ready to merge';
+    //isMergeable can be null;
+    return 'conflicts'
+  }
+
   return (
     <div className="banner bg-bepro-blue mb-4">
+      {console.log({pullRequest})}
+      {console.log(getLabel())}
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10">
@@ -39,7 +50,10 @@ export default function PullRequestHero({
               <div className="row">
                 <div className="col-md-9">
                   <div className="top-border">
-                    <h1 className="h4 mb-3">{t('pull-request:label')} #{pullRequestId}</h1>
+                    <div className="d-flex flex-row align-items-center mb-3 gap-20">
+                      <h1 className="h4">{t('pull-request:label')} #{pullRequestId}</h1> 
+                      <PullRequestLabels label={getLabel()} hero />
+                    </div>
                     <div className="d-flex align-items-center flex-wrap justify-content-center justify-content-md-start">
                       <span className="caption-small text-gray mr-2">
                         {t('misc.created-at')} {createdAt}

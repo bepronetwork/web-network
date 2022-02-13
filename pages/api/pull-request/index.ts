@@ -1,4 +1,5 @@
 import models from '@db/models';
+import twitterTweet from '@helpers/api/handle-twitter-tweet';
 import paginate from '@helpers/paginate';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Octokit} from 'octokit';
@@ -70,7 +71,16 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     await octoKit.rest.issues.createComment({owner, repo, issue_number: issue.githubId, body});
 
     await issue.save();
+    /*twitterTweet({
+      type: 'bounty',
+      action: 'solution',
+      username: username,
+      issue
+    })*/
     await api.post(`/seo/${issue?.issueId}`)
+    .catch(e => {
+      console.log(`Error creating SEO`, e);
+    })
 
     return res.json(`ok`);
   } catch(error) {

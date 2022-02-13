@@ -15,7 +15,7 @@ export default function GithubLink({repoId, hrefPath, children, forcePath, color
 
   return <a href={`https://github.com/${githubPath}/${hrefPath}`} target="_blank"
             className={`btn btn-${color} text-uppercase d-flex align-items-center github-link`}>
-    <span>{children}</span>
+    <span className="text-nowrap">{children}</span>
     <ExternalLinkIcon className="ml-1" height={10} width={10} color="text-white-50"/>
   </a>
 }
