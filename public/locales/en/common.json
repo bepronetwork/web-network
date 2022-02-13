@@ -252,5 +252,9 @@
       "highest-bounty": "Highest Bounty",
       "lowest-bounty": "Lowest Bounty"
     }
+  },
+  "drag-and-drop":{
+    "attach-file": "Attach File",
+    "drag-reject": "Some files will be rejected"
   }
 }
