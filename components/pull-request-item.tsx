@@ -1,20 +1,25 @@
 import Link from 'next/link'
 import Button from './button'
-import { formatDate } from '@helpers/formatDate'
+import { getTimeDifferenceInWords } from '@helpers/formatDate'
 import Avatar from './avatar'
 import LockedIcon from '@assets/icons/locked-icon'
 import { useRouter } from 'next/router'
-import { useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { ApplicationContext } from '@contexts/application'
 import Translation from './translation'
 import PullRequestLabels, { PRLabel } from './pull-request-labels'
+import useOctokit from '@x-hooks/use-octokit'
+import { formatNumberToNScale } from '@helpers/formatNumber'
 
 export default function PullRequestItem({
   repoId,
   issueId,
-  pullRequest
+  pullRequest,
+  repositoryPath
 }) {
   const router = useRouter()
+  const { getCommitsOfPr, getCommit } = useOctokit()
+  const [linesOfCode, setLinesOfCode] = useState(0)
   const {
     state: { currentAddress, githubLogin }
   } = useContext(ApplicationContext)
@@ -38,6 +43,30 @@ export default function PullRequestItem({
   }
 
   const label = getLabel()
+
+  async function getPullRequestInfo() {
+    try {
+      const [owner, repo] = repositoryPath.split('/')
+      let lines = 0
+      
+      const { data } = await getCommitsOfPr(pullRequest?.githubId, repositoryPath)
+      
+      for(const commit of data) {
+        const {data: { stats }} = await getCommit(owner, repo, commit.sha)
+        lines += stats.total
+      }
+
+      setLinesOfCode(lines)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    if (!pullRequest || !repositoryPath) return
+    
+    getPullRequestInfo()
+  }, [repositoryPath])
   
   return (
     <>
@@ -51,7 +80,7 @@ export default function PullRequestItem({
         >
           <a className="text-decoration-none text-white">
             <div className="row align-items-center pl-1 pr-1">
-              <div className="col-7 d-flex align-items-center caption-small text-uppercase text-white">
+              <div className="col-6 d-flex align-items-center caption-small text-uppercase text-white">
                 <Avatar userLogin={pullRequest?.githubLogin} />
                 <span className="ml-2 me-1">
                   #{pullRequest?.githubId} <Translation label={'misc.by'} /> @{pullRequest?.githubLogin}
@@ -61,16 +90,22 @@ export default function PullRequestItem({
                 </div>
               </div>
 
-              <div className="col-2 caption-small text-uppercase text-white d-flex justify-content-center">
-                {formatDate(pullRequest?.createdAt)}
+              <div className="col-1 caption-small text-uppercase text-white d-flex justify-content-center">
+                {formatNumberToNScale(linesOfCode)} <span className="text-gray ml-1">LOC</span>
               </div>
 
               <div className="col-2 caption-small text-uppercase text-white d-flex justify-content-center">
-                <Translation ns="pull-request" label="review" params={{ count: pullRequest?.comments?.length || 0 }} />
+                {pullRequest?.comments?.length || 0}
+                <span className="text-gray ml-1"><Translation ns="pull-request" label="review" params={{ count: pullRequest?.comments?.length || 0 }} /></span>
+              </div>
+
+              <div className="col-2 caption-small text-uppercase text-gray d-flex justify-content-start">
+                {getTimeDifferenceInWords(new Date(pullRequest?.createdAt), new Date())} ago
               </div>
 
               <div className="col-1 d-flex justify-content-center">
                 <Button
+                  className="mr-3"
                   disabled={!canReview()}
                   onClick={(ev) => {
                     ev.preventDefault()

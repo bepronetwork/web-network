@@ -1,4 +1,5 @@
 import models from '@db/models';
+import twitterTweet from '@helpers/api/handle-twitter-tweet';
 import api from '@services/api';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Octokit} from 'octokit';
@@ -45,7 +46,19 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
                .then(async(result) => {
                  if (!result[0])
                    return res.status(422).json(`nok`)
+
+                 const issue = await models.issue.findOne({
+                    where: {issueId}
+                  })
+                 twitterTweet({
+                    type: 'bounty',
+                    action: 'created',
+                    issue
+                  })
                   await api.post(`/seo/${issueId}`)
+                  .catch(e => {
+                    console.log(`Error creating SEO`, e);
+                  })
                  return res.status(200).json(`ok`)
                })
                .catch(_ => res.status(422).json(`nok`));

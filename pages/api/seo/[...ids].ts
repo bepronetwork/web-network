@@ -18,40 +18,41 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   if (!issue)
     return res.status(404).json(null);
-  
+
   const url = `${process.env.NEXT_PUBLIC_IPFS_BASE}/${issue.seoImage}`
-  
+
   const {data} = await axios.get(url,{
     responseType: 'arraybuffer'
   })
-  
+
   res.writeHead(200, {
     'Content-Type': 'image/png',
     'Content-Length': data?.length
   });
 
-  return res.status(200).end(data); 
+  return res.status(200).end(data);
 }
 
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const {ids: [repoId, ghId]} = req.query;
+  const {
+    ids: [repoId, ghId],
+  } = req.query;
   const issueId = [repoId, ghId].join(`/`);
 
   const include = [
-    { association: 'developers' },
-    { association: 'pullRequests' },
-    { association: 'mergeProposals' },
-    { association: 'repository' },
-  ]
+    { association: "developers" },
+    { association: "pullRequests" },
+    { association: "mergeProposals" },
+    { association: "repository" },
+  ];
 
   const issue = await models.issue.findOne({
-    where: {issueId},
-    include
-  })
+    where: { issueId },
+    include,
+  });
 
-  if (!issue)
-    return res.status(404).json(null);
+  if (!issue) return res.status(404).json(null);
 
   const [, repo] = issue.repository.githubPath.split(`/`);
 
@@ -64,16 +65,22 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     working: issue.working?.length || 0,
     pr: issue.pullRequests?.length || 0,
     proposal: issue.mergeProposals?.length || 0,
-  })
+  }).catch((e) => {
+    console.log(`Error generating card`, e);
+    return null;
+  });
+
+  if (!card) return;
 
   var img = Buffer.from(card.buffer);
-  const {hash} = await IpfsStorage.add(img)
+  const { hash } = await IpfsStorage.add(img).catch((e) => {
+    console.log(`Failed to upload to IPFS`, e);
+    return { hash: null };
+  });
 
-  await issue.update({
-    seoImage: hash,
-  })
+  await issue.update({ seoImage: hash });
 
-  return res.status(200).json({seoImage: hash});
+  return res.status(200).json({ seoImage: hash });
 }
 
 export default async function Seo(req: NextApiRequest, res: NextApiResponse) {
@@ -82,9 +89,9 @@ export default async function Seo(req: NextApiRequest, res: NextApiResponse) {
     case 'get':
       await get(req, res);
       break;
-    
+
     case 'post':
-      await post(req, res);
+      await post(req, res).catch(e => { console.log(`Error POST GetIssues`, e); });
       break;
 
     default:

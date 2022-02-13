@@ -14,6 +14,7 @@ import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import useTransactions from '@x-hooks/useTransactions';
 import Translation from './translation';
 import LockedIcon from '@assets/icons/locked-icon';
+import useApi from '@x-hooks/use-api';
 
 interface Options {
   proposal: Proposal,
@@ -42,6 +43,7 @@ export default function ProposalItem({
                                      }: Options) {
   const {dispatch,} = useContext(ApplicationContext);
   const txWindow = useTransactions();
+  const { processEvent } = useApi();
 
   async function handleDispute(mergeId) {
     if (!isDisputable || isFinalized)
@@ -53,6 +55,7 @@ export default function ProposalItem({
     const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
     await BeproService.network.disputeMerge({issueID: issue_id, mergeID: mergeId,})
                       .then(txInfo => {
+                        processEvent(`dispute-proposal`, txInfo.blockNumber, issue_id);
                         txWindow.updateItem(disputeTx.payload.id, BeproService.parseTransaction(txInfo, disputeTx.payload));
                         // BeproService.parseTransaction(txInfo, disputeTx.payload)
                         //             .then(block => {
@@ -134,7 +137,7 @@ export default function ProposalItem({
                           ev.stopPropagation();
                           handleDispute(+proposal._id)
                         }}>
-                  {!isDisputable && <LockedIcon className={`me-2 text-${getColors()}`}/>}
+                  {!isDisputable && getColors() !== 'success' && <LockedIcon className={`me-2 text-${getColors()}`}/>}
                   <span>{getLabel()}</span>
                 </Button>
               </div>

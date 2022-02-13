@@ -34,9 +34,11 @@ type Filter = {
 type FiltersByIssueState = Filter[]
 
 interface ListIssuesProps {
+  creator?: string
+  redirect?: string
   filterState?: string
   emptyMessage?: string
-  creator?: string
+  buttonMessage?: string
   pullRequester?: string
 }
 
@@ -46,9 +48,11 @@ interface IssuesPage {
 }
 
 export default function ListIssues({
+  creator,
+  redirect,
   filterState,
   emptyMessage,
-  creator,
+  buttonMessage,
   pullRequester
 }: ListIssuesProps): JSX.Element {
   const {
@@ -100,6 +104,10 @@ export default function ListIssues({
   const [filterByState, setFilterByState] = useState<Filter>(
     filtersByIssueState[0]
   )
+
+  function isListEmpy(): boolean {
+    return issuesPages.every((el) => el.issues?.length === 0)
+  }
 
   function hasFilter(): boolean {
     if (state || time || repoId) return true
@@ -178,10 +186,11 @@ export default function ListIssues({
     }
   }, [page, issuesPages])
 
-  useEffect(getIssues, [page, search, repoId, time, state, sortBy, order])
+  useEffect(getIssues, [page, search, repoId, time, state, sortBy, order, creator])
 
   return (
     <CustomContainer>
+      {!isListEmpy() || (isListEmpy() && hasFilter()) ?
       <div
         className={`d-flex align-items-center gap-20 list-actions sticky-top`}
       >
@@ -246,7 +255,7 @@ export default function ListIssues({
         </div>
 
         {!filterState && <IssueFilters />}
-      </div>
+      </div> : ''}
 
       {(truncatedData && (
         <div className="row justify-content-center mb-3">
@@ -261,8 +270,8 @@ export default function ListIssues({
       !loading.isLoading ? (
         <NothingFound description={emptyMessage || filterByState.emptyState}>
           <InternalLink
-            href="/create-bounty"
-            label={String(t('actions.create-one'))}
+            href={redirect ||"/create-bounty"}
+            label={buttonMessage || String(t('actions.create-one'))}
             uppercase
           />
         </NothingFound>

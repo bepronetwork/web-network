@@ -18,11 +18,11 @@ export default function ProposalProgressSmall({pgClass = ``, value, total, textC
   const percent = ((value / total)* 100).toFixed(2);
 
   return <div className="text-center position-relative d-inline-block col">
-    <div className={`caption-small`}>
+    <div className={`caption-small mb-1`}>
       <span className={textClass}>{formatNumberToNScale(value)}</span>
       <span>/{formatNumberToNScale(total)} <Translation label={'oracles'} /></span>
     </div>
-    <div className={`progress bg-gray w-100`}>
+    <div className={`progress bg-gray w-100 mb-1`}>
       <div className={`wrapper wrapper-${pgClass} w-100`} />
       <div className={`progress-bar bg-${pgClass}`}
            role="progressbar"
