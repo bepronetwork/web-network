@@ -42,6 +42,25 @@ export default function twitterTweet({
 
     var title: string;
     var body: string;
+    var state: string;
+    var previousState: string;
+
+    if(issue.state === 'draft'){
+      state = '𝘿𝙍𝘼𝙁𝙏'
+    }
+    if(issue.state === 'open'){
+      state = '𝙊𝙋𝙀𝙉'
+    }
+    if(issue.state === 'ready'){
+      state = '𝙍𝙀𝘼𝘿𝙔'
+    }
+    if(issue.state === 'canceled'){
+      state = '𝘾𝘼𝙉𝘾𝙀𝙇𝙀𝘿'
+    }
+    if(issue.state === 'closed'){
+      state = '𝘾𝙇𝙊𝙎𝙀𝘿'
+    }
+
     const issueTitle =
       issue.title.length > 30 ? issue.title.slice(0, 30) + `...` : issue.title;
     const amount: string | number = formatNumberToNScale(issue.amount);
