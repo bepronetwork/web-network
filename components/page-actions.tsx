@@ -213,7 +213,7 @@ export default function PageActions({
       isRepoForked &&
       isWorking &&
       githubLogin && (
-        <Button onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || hasOpenPR}>
+        <Button className="mr-1" onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || hasOpenPR}>
           <Translation ns="pull-request" label="actions.create.title" />
         </Button>
       )
