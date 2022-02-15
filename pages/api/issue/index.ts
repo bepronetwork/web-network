@@ -50,15 +50,15 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
                  const issue = await models.issue.findOne({
                     where: {issueId}
                   })
-                 twitterTweet({
-                    type: 'bounty',
-                    action: 'created',
-                    issue
-                  })
                   await api.post(`/seo/${issueId}`)
                   .catch(e => {
                     console.log(`Error creating SEO`, e);
                   })
+                  twitterTweet({
+                   type: 'bounty',
+                   action: 'created',
+                   issue
+                 })
                  return res.status(200).json(`ok`)
                })
                .catch(_ => res.status(422).json(`nok`));
