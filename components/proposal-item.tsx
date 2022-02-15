@@ -112,7 +112,7 @@ export default function ProposalItem({
               className={`col-3 caption-small mt-2 text-uppercase text-${getColors() === 'purple' ? 'white' : getColors()}`}>
               <Translation ns="pull-request" label={'abbreviation'} /> #{proposal.pullRequestGithubId} <Translation label={'misc.by'} /> {owner && ` @${owner}`}
             </div>
-            <div className="col-5 d-flex justify-content-start mb-2 text-white">
+            <div className="col-5 d-flex justify-content-between mb-2 text-white">
               {proposal.prAmounts.map((value, i) =>
                                         <PercentageProgressBar key={`pg-${i}`}
                                                                textClass={`caption-small p-small text-${getColors()}`}
