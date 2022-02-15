@@ -42,25 +42,32 @@ export default function twitterTweet({
 
     var title: string;
     var body: string;
-    var state: string;
-    var previousState: string;
 
-    if(issue.state === 'draft'){
-      state = '𝘿𝙍𝘼𝙁𝙏'
-    }
-    if(issue.state === 'open'){
-      state = '𝙊𝙋𝙀𝙉'
-    }
-    if(issue.state === 'ready'){
-      state = '𝙍𝙀𝘼𝘿𝙔'
-    }
-    if(issue.state === 'canceled'){
-      state = '𝘾𝘼𝙉𝘾𝙀𝙇𝙀𝘿'
-    }
-    if(issue.state === 'closed'){
-      state = '𝘾𝙇𝙊𝙎𝙀𝘿'
+    function handleState(currentState: IssueState) {
+      switch (currentState) {
+        case "draft": {
+          return "𝘿𝙍𝘼𝙁𝙏";
+        }
+        case "open": {
+          return "𝙊𝙋𝙀𝙉";
+        }
+        case "ready": {
+          return "𝙍𝙀𝘼𝘿𝙔";
+        }
+        case "closed": {
+          return "𝘾𝙇𝙊𝙎𝙀𝘿";
+        }
+        case "canceled": {
+          return "𝘾𝘼𝙉𝘾𝙀𝙇𝙀𝘿";
+        }
+        default: {
+          return;
+        }
+      }
     }
 
+    const currentState: string = handleState(issue.state);
+    const previousState: string = handleState(issuePreviousState);
     const issueTitle =
       issue.title.length > 30 ? issue.title.slice(0, 30) + `...` : issue.title;
     const amount: string | number = formatNumberToNScale(issue.amount);
@@ -72,9 +79,9 @@ export default function twitterTweet({
     if (type === "bounty" && action === "changes") {
       title = "Status Update";
       body = `${issueTitle} has changed its status from ${
-        issuePreviousState
-          ? `${issuePreviousState} to ${issue.state}`
-          : issue.state
+        previousState && currentState
+          ? `${previousState} to ${currentState}`
+          : currentState
       }`;
     }
     if (type === "bounty" && action === "solution") {
