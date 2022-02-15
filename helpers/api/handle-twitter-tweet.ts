@@ -8,13 +8,13 @@ function handleState(currentState: IssueState) {
       return "𝗗𝗥𝗔𝗙𝗧";
     }
     case "open": {
-      return "𝙊𝙋𝙀𝙉";
+      return "𝐎𝐏𝐄𝐍";
     }
     case "ready": {
-      return "𝙍𝙀𝘼𝘿𝙔";
+      return "𝐑𝐄𝐀𝐃𝐘";
     }
     case "closed": {
-      return "𝘾𝙇𝙊𝙎𝙀𝘿";
+      return "𝐂𝐋𝐎𝐒𝐄𝐃";
     }
     case "canceled": {
       return "𝗖𝗔𝗡𝗖𝗘𝗟𝗘𝗗";
