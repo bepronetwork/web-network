@@ -17,7 +17,7 @@ function handleState(currentState: IssueState) {
       return "𝘾𝙇𝙊𝙎𝙀𝘿";
     }
     case "canceled": {
-      return "𝘾𝘼𝙉𝘾𝙀𝙇𝙀𝘿";
+      return "𝗖𝗔𝗡𝗖𝗘𝗟𝗘𝗗";
     }
     default: {
       return;
