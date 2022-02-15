@@ -254,14 +254,23 @@ export default function NewProposal({
 
   async function handleClickCreate(): Promise<void> {
     const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    
+    // NOTE:
+    //`payload.prAmmounts` need be Intenger number, because the contract remove numbers after dot using `toFix(0)`;
+    // To fix it, we check the difference between amount distributed and amount total, and attributed the rest to last participant;
 
     const payload = {
       issueID: issue_id,
       prAddresses: participants.map((items) => items.address),
       prAmounts: participants.map(
-        (items) => (amountTotal * distrib[items.githubHandle]) / 100
+        (items) => Math.floor((amountTotal * distrib[items.githubHandle]) / 100)
       ),
     };
+    //Chcking diff between total Distributed and total Ammount;
+    const totalDistributed = payload.prAmounts.reduce((p,c)=> p+c)
+    // Assigning the rest to last participant;
+    payload.prAmounts[payload.prAmounts.length - 1] += Math.ceil((amountTotal - totalDistributed))
+    
     setShow(false);
 
     const proposeMergeTx = addTransaction({type: TransactionTypes.proposeMerge})
