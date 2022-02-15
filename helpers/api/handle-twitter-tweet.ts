@@ -105,7 +105,7 @@ export default function twitterTweet({
 
   ${body}
  
-  ${process.env.NEXT_PUBLIC_HOME_URL}/bounty?id=${issue.githubId}&repoId=${
+  - ${process.env.NEXT_PUBLIC_HOME_URL}/bounty?id=${issue.githubId}&repoId=${
       issue.repository_id
     }
   `;
