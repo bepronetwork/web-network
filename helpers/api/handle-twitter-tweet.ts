@@ -5,7 +5,7 @@ import { TwitterApi } from "twitter-api-v2";
 function handleState(currentState: IssueState) {
   switch (currentState) {
     case "draft": {
-      return "𝘿𝙍𝘼𝙁𝙏";
+      return "𝗗𝗥𝗔𝗙𝗧";
     }
     case "open": {
       return "𝙊𝙋𝙀𝙉";
