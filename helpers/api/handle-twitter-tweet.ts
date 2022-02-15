@@ -2,6 +2,29 @@ import { formatNumberToNScale } from "@helpers/formatNumber";
 import { IssueState } from "@interfaces/issue-data";
 import { TwitterApi } from "twitter-api-v2";
 
+function handleState(currentState: IssueState) {
+  switch (currentState) {
+    case "draft": {
+      return "𝘿𝙍𝘼𝙁𝙏";
+    }
+    case "open": {
+      return "𝙊𝙋𝙀𝙉";
+    }
+    case "ready": {
+      return "𝙍𝙀𝘼𝘿𝙔";
+    }
+    case "closed": {
+      return "𝘾𝙇𝙊𝙎𝙀𝘿";
+    }
+    case "canceled": {
+      return "𝘾𝘼𝙉𝘾𝙀𝙇𝙀𝘿";
+    }
+    default: {
+      return;
+    }
+  }
+}
+
 export default function twitterTweet({
   type,
   action,
@@ -25,6 +48,7 @@ export default function twitterTweet({
     title: string;
     amount: number;
     state: IssueState;
+    githubId: string;
   };
 }) {
   if (
@@ -42,6 +66,9 @@ export default function twitterTweet({
 
     var title: string;
     var body: string;
+
+    const currentState: string = handleState(issue.state);
+    const previousState: string = handleState(issuePreviousState);
     const issueTitle =
       issue.title.length > 30 ? issue.title.slice(0, 30) + `...` : issue.title;
     const amount: string | number = formatNumberToNScale(issue.amount);
@@ -53,9 +80,9 @@ export default function twitterTweet({
     if (type === "bounty" && action === "changes") {
       title = "Status Update";
       body = `${issueTitle} has changed its status from ${
-        issuePreviousState
-          ? `${issuePreviousState} to ${issue.state}`
-          : issue.state
+        previousState && currentState
+          ? `${previousState} to ${currentState}`
+          : currentState
       }`;
     }
     if (type === "bounty" && action === "solution") {
@@ -78,7 +105,7 @@ export default function twitterTweet({
 
   ${body}
  
-  - ${process.env.NEXT_PUBLIC_HOME_URL}/bounty?id=${issue.id}&repoId=${
+  ${process.env.NEXT_PUBLIC_HOME_URL}/bounty?id=${issue.githubId}&repoId=${
       issue.repository_id
     }
   `;
