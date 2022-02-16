@@ -12,13 +12,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   const network = networkBeproJs({ test: true });
 
   await network.start();
-  const contract = network.getWeb3Contract();
 
-  await contract.getPastEvents(`RedeemIssue`, {fromBlock, toBlock: +fromBlock+1, filter: {id},})
+  await network.getRedeemIssueEvents({fromBlock, toBlock: +fromBlock+1, filter: {id},})
                 .then(async function redeemIssues(events) {
                   for (const event of events) {
                     const eventData = event.returnValues;
-                    const issueId = await network.getIssueById({issueId: eventData.id}).then(({cid}) => cid);
+                    const issueId = await network.getIssueById(eventData.id).then(({cid}) => cid);
                     const issue = await models.issue.findOne({where: {issueId,}});
 
                     if (!issue || issue?.state === `canceled`) {
@@ -29,7 +28,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
                     const repoInfo = await models.repositories.findOne({where: {id: issue?.repository_id}})
                     const [owner, repo] = repoInfo.githubPath.split(`/`);
-                    await octokit.rest.issues.update({owner, repo, issue_number: issueId, state: 'closed',});
+                    await octokit.rest.issues.update({owner, repo, issue_number: +issueId, state: 'closed',});
                     issue.state = 'canceled';
                     twitterTweet({
                       type: 'bounty',

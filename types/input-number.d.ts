@@ -24,4 +24,5 @@ export interface InputNumber extends NumberFormatProps {
   decimalScale?: number;
   setMaxValue?: () => void;
   errorMessage?: string;
+  description?: string;
 }

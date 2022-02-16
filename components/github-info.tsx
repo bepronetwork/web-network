@@ -2,6 +2,7 @@ import React from "react";
 
 interface GithubInfoProps {
   label: string
+  color?: string
   active?: boolean
   disabled?: boolean
   onClick?: () => void
@@ -11,6 +12,7 @@ interface GithubInfoProps {
 
 export default function GithubInfo({
   label,
+  color,
   parent,
   variant,
   disabled,
@@ -28,7 +30,8 @@ export default function GithubInfo({
     const hover = active ? '' : '-hover'
     let append = ''
 
-    if (disabled) append += ' text-white border-danger bg-danger-10 cursor-now-allowed'
+    if (disabled) append += ' text-danger border-danger bg-danger-10 cursor-now-allowed'
+    else if (color) append += ` text-${color} border-${color} bg-${color}-10 cursor-now-allowed`
     else if (['list', 'modal'].includes(parent)) {
       append += ' cursor-pointer bg-transparent text-truncate '
 

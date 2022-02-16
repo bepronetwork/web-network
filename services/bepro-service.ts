@@ -1,4 +1,4 @@
-import {Web3Connection, Network, ERC20, NetworkFactory} from 'bepro-js/dist';
+import {Web3Connection, Network, ERC20, NetworkFactory} from 'bepro-js';
 import {CONTRACT_ADDRESS, SETTLER_ADDRESS, WEB3_CONNECTION, NETWORK_FACTORY_ADDRESS} from '../env';
 import {BlockTransaction, SimpleBlockTransactionPayload} from '@interfaces/transaction';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
@@ -7,7 +7,7 @@ class BeproFacet {
 
   readonly bepro: Web3Connection = new Web3Connection({
     web3Host: WEB3_CONNECTION,
-    privateKey: process.env.NEXT_PUBLIC_WALLET_PRIVATE_KEY,
+    //privateKey: process.env.NEXT_PUBLIC_WALLET_PRIVATE_KEY,
     debug: true
   });
 
@@ -56,7 +56,6 @@ class BeproFacet {
   async login() {
     this.connected = false;
     await this.bepro.connect();
-    await this.start();
     this.address = await this.bepro.getAddress();
     this.connected = true;
   }
@@ -183,7 +182,21 @@ class BeproFacet {
   }
 
   async getOperatorAmount() {
-    return this.networkFactory.OPERATOR_AMOUNT()
+    if (this.isStarted) return this.networkFactory.OPERATOR_AMOUNT()
+
+    return 0
+  }
+
+  async getCouncilAmount() {
+    if (this.isStarted) return this.network.COUNCIL_AMOUNT()
+
+    return 0
+  }
+
+  async getPercentageNeededForDispute() {
+    if (this.isStarted) return this.network.percentageNeededForDispute()
+
+    return 0
   }
 
   async createNetwork() {

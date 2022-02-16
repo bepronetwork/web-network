@@ -6,7 +6,7 @@ import paginate from '@helpers/paginate';
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {state: {[Op.not]: `pending`}};
-  const {state, issueId, repoId, time, creator, address, networkName} = req.query || {};
+  const {state, issueId, repoId, time, creator, address, networkName, repoPath} = req.query || {};
 
   if (state)
     whereCondition.state = state;
@@ -34,7 +34,19 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     if (!network) return res.status(404).json('Invalid network')
 
-    whereCondition.network_id = network?.id
+    whereCondition.network_id = network.id
+  }
+
+  if (repoPath) {
+    const repository = await models.repositories.findOne({
+      where: {
+        githubPath: repoPath
+      }
+    })
+
+    if (!repository) return res.status(404).json('Invalid repository')
+
+    whereCondition.repository_id = repository.id
   }
 
   if (time) {

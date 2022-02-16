@@ -21,7 +21,7 @@ export default function PageDevelopers() {
     //BeproService.network.redeemTime().then(time => console.log('redeemTime', time)).catch(error => console.log('redeemTime', error))
     //BeproService.network.changeRedeemTime(60).then(console.log).catch(error => console.log('redeem', error))
     //BeproService.network.changeDisputableTime(60).then(console.log).catch(error => console.log('disputable', error))
-    BeproService.network.callTx(BeproService.network.contract.methods._governor()).then(console.log).catch(console.log)
+    //BeproService.network.callTx(BeproService.network.contract.methods._governor()).then(console.log).catch(console.log)
     //BeproService.network.sendTx(BeproService.network.contract.methods.claimGovernor()).then(console.log).catch(console.log)
   }, [BeproService.isStarted, currentAddress])
 

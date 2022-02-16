@@ -36,21 +36,18 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     await network.start()
 
-    const issueBepro = await network.getIssueByCID({ issueCID: issueId })
+    const issueBepro = await network.getIssueByCID(issueId)
 
     if (!issueBepro) return res.status(404).json('Issue not found on network')
 
     if (issueBepro.canceled || !issueBepro.finalized)
       return res.status(400).json('Issue canceled or not closed yet')
 
-    const mergeBepro = await network.getMergeById({
-      issue_id: issueBepro._id,
-      merge_id: mergeProposalId
-    })
+    const mergeBepro = await network.getMergeById(issueBepro._id, mergeProposalId)
 
     if (!mergeBepro) return res.status(404).json('Merge proposal not found')
 
-    const isCouncil = await network.isCouncil({ address })
+    const isCouncil = await network.isCouncil(address)
 
     if (
       address.toLowerCase() !== issueBepro.issueGenerator.toLowerCase() &&

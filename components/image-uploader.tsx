@@ -53,7 +53,7 @@ export default function ImageUploader({
           </>
         )}
       </label>
-      {error && <small className="text-danger small-info">Invalid format</small>}
+      {error && <small className="text-danger small-info mt-1">Invalid format</small>}
 
       <input
         type="file"

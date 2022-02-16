@@ -13,14 +13,23 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   if (name) whereCondition.name = name
 
-  if (creatorAddress) whereCondition.creatorAddress = { [Op.iLike]: String(creatorAddress) }
+  if (creatorAddress)
+    whereCondition.creatorAddress = { [Op.iLike]: String(creatorAddress) }
 
   if (networkAddress) whereCondition.repository_id = networkAddress
 
   const networks = await models.network.findAndCountAll(
-    paginate({ where: whereCondition, nest: true }, req.query, [
-      [req.query.sortBy || 'updatedAt', req.query.order || 'DESC']
-    ])
+    paginate(
+      {
+        attributes: {
+          exclude: ['id', 'creatorAddress', 'createdAt', 'updatedAt']
+        },
+        where: whereCondition,
+        nest: true
+      },
+      req.query,
+      [[req.query.sortBy || 'updatedAt', req.query.order || 'DESC']]
+    )
   )
 
   return res.status(200).json({

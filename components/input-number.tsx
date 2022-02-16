@@ -3,6 +3,7 @@ import { kebabCase } from "lodash";
 import { Fragment } from "react";
 import NumberFormat from "react-number-format";
 import { InputNumber as InputNumberProps } from "types/input-number";
+import InfoTooltip from "./info-tooltip";
 
 export default function InputNumber({
   label = "",
@@ -17,6 +18,8 @@ export default function InputNumber({
   warning= false,
   errorMessage,
   setMaxValue,
+  max,
+  description,
   ...params
 }: InputNumberProps): JSX.Element {
   const id = kebabCase(label);
@@ -29,21 +32,21 @@ export default function InputNumber({
   return (
     <Component {...(shouldBeWrapped && { className: "form-group" })}>
       {label && (
-        <label className="caption-small mb-2 text-uppercase" id={id}>
-          {label}
+        <label className="caption-small mb-2 text-gray d-flex align-items-center" id={id}>
+          <span className="mr-1">{label}</span> {description ? <InfoTooltip description={description} /> : ''}
         </label>
       )}
       <div
-        className={clsx("input-group", {
+        className={clsx("input-group border-radius-8", {
           ...errorStyle,
           ...successStyle,
           ...warningStyle,
         })}>
         <NumberFormat
-          className={clsx("form-control", {
-            "border border-1 border-success rounded-4": success,
-            "border border-1 border-danger rounded-4": error,
-            "border border-1 border-warning rounded-4": warning,  
+          className={clsx("form-control border-radius-8", {
+            "border border-1 border-success border-radius-8": success,
+            "border border-1 border-danger border-radius-8": error,
+            "border border-1 border-warning border-radius-8": warning,  
             ...successStyle, 
             ...warningStyle,
             ...errorStyle,
@@ -55,7 +58,10 @@ export default function InputNumber({
         />
         {symbol && (
           <span
-            className={clsx("input-group-text caption-small text-uppercase", classSymbol, {
+            className={clsx("input-group-text caption-small border-radius-8", classSymbol, {
+              "border border-1 border-success border-radius-8": success,
+              "border border-1 border-danger border-radius-8": error,
+              "border border-1 border-warning border-radius-8": warning,  
               ...errorStyle,
             })}>
             {symbol}

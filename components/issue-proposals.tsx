@@ -27,7 +27,7 @@ export default function IssueProposals({ metaProposals, className='', metaReques
       const {scMergeId, pullRequestId} = meta;
       if (scMergeId) {
         // if we don't have a scMergeId then something broke on the BE side and we should have a log - but we lost its connection to a PR
-        const merge = await BeproService.network.getMergeById(scMergeId, +scIssueId);
+        const merge = await BeproService.network.getMergeById(+scIssueId, +scMergeId);
         const isDisputed = mergedProposal ? mergedProposal !== scMergeId : await BeproService.network.isMergeDisputed(scIssueId, +scMergeId);
         const pr = metaRequests.find(({id}) => meta.pullRequestId === id);
 

@@ -1,5 +1,5 @@
-import { Octokit } from 'octokit'
 import { Op } from 'sequelize'
+import { Octokit } from 'octokit'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import Database from '@db/models'
@@ -12,6 +12,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const { name: networkName } = req.query
 
   const network = await Database.network.findOne({
+    attributes: { exclude: ['id', 'creatorAddress', 'createdAt', 'updatedAt'] },
     where: {
       name: {
         [Op.iLike]: String(networkName)
@@ -28,15 +29,15 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   try {
     const {
       name,
-      description,
       colors,
+      creator,
+      fullLogo,
+      logoIcon,
+      description,
+      githubLogin,
       repositories,
       botPermission,
-      creator,
-      githubLogin,
-      networkAddress,
-      fullLogo,
-      logoIcon
+      networkAddress
     } = req.body
 
     const user = await Database.user.findOne({
@@ -48,9 +49,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     if (!user) return res.status(403).json('Invalid user provided')
     if (!user.accessToken) return res.status(401).json('Unauthorized user')
-    if (!botPermission) return res.status(403).json('Bepro-bot authorization needed')
-
-    const repos = JSON.parse(repositories)
+    if (!botPermission)
+      return res.status(403).json('Bepro-bot authorization needed')
 
     // Contract Validations
     const BEPRO = new Bepro()
@@ -81,6 +81,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       auth: user.accessToken
     })
 
+    const repos = JSON.parse(repositories)
+    
     const invitations = []
 
     for (const repository of repos) {
@@ -123,7 +125,122 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       })
     }
 
-    return res.status(200).json('For now, its okay')
+    return res.status(200).json('Network created')
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json(error)
+  }
+}
+
+async function put(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    const {
+      colors,
+      creator,
+      logoIcon,
+      fullLogo,
+      description,
+      githubLogin,
+      repositoriesToAdd,
+      repositoriesToRemove,
+      networkAddress
+    } = req.body
+
+    const user = await Database.user.findOne({
+      where: {
+        githubLogin,
+        address: creator.toLowerCase()
+      }
+    })
+
+    if (!user) return res.status(403).json('Invalid user provided')
+    if (!user.accessToken) return res.status(401).json('Unauthorized user')
+    
+    // Contract Validations
+    const BEPRO = new Bepro()
+    await BEPRO.init(false, false, true)
+    
+    const checkingNetworkAddress =
+    await BEPRO.networkFactory.getNetworkByAddress(creator)
+    
+    if (checkingNetworkAddress !== networkAddress)
+    return res.status(403).json('Creator and network addresses do not match')
+    
+    // Uploading logos to IPFS
+    const fullLogoHash = fullLogo ? (await IpfsStorage.add(fullLogo, 'svg')).hash : undefined
+    const logoIconHash = logoIcon ? (await IpfsStorage.add(logoIcon, 'svg')).hash : undefined
+    
+    const network = await Database.network.findOne({
+      where: {
+        creatorAddress: creator,
+        networkAddress
+      },
+      include: [{ association: 'repositories' }]
+    })
+
+    if (!network) return res.status(404).json('Invalid network')
+
+    const addingRepos = JSON.parse(repositoriesToAdd)
+
+    if(addingRepos.length)
+      for (const repository of addingRepos) {
+        const exists = await Database.repositories.findOne({
+          where: {
+            githubPath: { [Op.iLike]: String(repository.fullName) }
+          }
+        })
+
+        if (exists) return res.status(403).json(`Repository ${repository.fullName} is already in use by another network `)
+      }
+
+    const removingRepos = JSON.parse(repositoriesToRemove)
+
+    if(removingRepos.length)
+      for (const repository of removingRepos) {
+        const exists = await Database.repositories.findOne({
+          where: {
+            githubPath: { [Op.iLike]: String(repository.fullName) }
+          }
+        })
+
+        if (!exists) return res.status(404).json(`Invalid repository`)
+
+        const hasIssues = await Database.issue.findOne({
+          where: {
+            repository_id: exists.id
+          }
+        })
+
+        if(hasIssues) return res.status(403).json(`Repository ${repository.fullName} already has bounties and cannot be removed`)
+      }
+
+    network.description = description
+    network.colors = JSON.parse(colors)
+    if (logoIconHash) network.logoIcon = logoIconHash
+    if (fullLogoHash) network.fullLogo = fullLogoHash
+
+    network.save()
+
+    if(addingRepos.length)
+      for (const repository of addingRepos) {
+        await Database.repositories.create({
+          githubPath: repository.fullName,
+          network_id: network.id
+        })
+      }
+
+    if(removingRepos.length)
+      for (const repository of removingRepos) {
+        const exists = await Database.repositories.findOne({
+          where: {
+            githubPath: { [Op.iLike]: String(repository.fullName) }
+          }
+        })
+
+        if (exists) await exists.destroy()
+      }
+
+    return res.status(200).json('Network updated')
   } catch (error) {
     console.log(error)
     return res.status(500).json(error)
@@ -141,6 +258,10 @@ export default async function NetworkEndPoint(
 
     case 'post':
       await post(req, res)
+      break
+
+    case 'put':
+      await put(req, res)
       break
 
     default:

@@ -45,10 +45,10 @@ export default function OraclesTakeBackItem({
 
     try {
 
-      BeproService.network.unlock({tokenAmount: amount, from: address,})
+      BeproService.network.unlock(+amount, address)
                   .then(txInfo => {
                     txWindow.updateItem(delegateTx.payload.id, BeproService.parseTransaction(txInfo, delegateTx.payload));
-                    onConfirm(txInfo.status);
+                    onConfirm(!!txInfo.status);
                   })
                           // BeproService.parseTransaction(txInfo, delegateTx.payload)
                           //             .then((block) => {

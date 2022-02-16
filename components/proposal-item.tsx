@@ -54,8 +54,8 @@ export default function ProposalItem({
     const disputeTx = addTransaction({type: TransactionTypes.dispute});
     dispatch(disputeTx);
 
-    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
-    await BeproService.network.disputeMerge({issueID: issue_id, mergeID: mergeId,})
+    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
+    await BeproService.network.disputeMerge(issue_id, mergeId)
                       .then(txInfo => {
                         processEvent(`dispute-proposal`, txInfo.blockNumber, issue_id);
                         txWindow.updateItem(disputeTx.payload.id, BeproService.parseTransaction(txInfo, disputeTx.payload));

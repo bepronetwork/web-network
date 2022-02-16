@@ -14,8 +14,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const network = networkBeproJs({ test: true });
 
   await network.start();
-  const contract = network.getWeb3Contract();
-  const web3 = network.web3Connection.web3;
+  const web3 = network.web3;
   const lastBlock = await web3.eth.getBlockNumber();
 
   const PER_PAGE = 1500;
@@ -28,13 +27,13 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     end = nextEnd > lastBlock ? lastBlock : nextEnd;
 
     console.log(`Reading from ${start} to ${end}; page: ${page} of ${pages}`);
-    await contract.getPastEvents(`RedeemIssue`, {fromBlock: start, toBlock: end})
+    await network.getRedeemIssueEvents({fromBlock: start, toBlock: end})
                   .then(events => readRedeemIssue(events, {network, models, res, octokit}))
                   .catch(error => {
                     console.log(`Error reading RedeemIssue`, error);
                   });
 
-    await contract.getPastEvents(`CloseIssue`, {fromBlock: start, toBlock: end})
+    await network.getCloseIssueEvents({fromBlock: start, toBlock: end})
                   .then(events => readCloseIssues(events, {network, models, res, octokit}))
                   .catch(error => {
                     console.log(`Error reading CloseIssue`, error);

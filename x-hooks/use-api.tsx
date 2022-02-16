@@ -351,6 +351,14 @@ export default function useApi() {
     return client.post("/files", form).then(({ data }) => data);
   }
 
+  async function updateNetwork(networkInfo) {
+    return client.put('/network', {...networkInfo})
+    .then(response => response)
+      .catch(error => {
+        throw error
+      })
+  }
+
   async function getNetwork(name: string) {
     const search = new URLSearchParams({name}).toString();
 
@@ -360,6 +368,7 @@ export default function useApi() {
         throw error
       })
   }
+  
 
   async function searchNetworks({page = '1',
                            name = ``,
@@ -373,6 +382,14 @@ export default function useApi() {
     return client.get<{rows: Network[], count: number, pages: number, currentPage: number}>(`/search/networks/?${params}`)
                  .then(({data}) => data)
                  .catch(() => ({rows: [], count: 0, pages: 0, currentPage: 1}));
+  }
+
+  async function repositoryHasIssues(repoPath) {
+    const search = new URLSearchParams({repoPath}).toString()
+
+    return client.get<{rows: IssueData[], count: number}>(`/search/issues/?${search}`)
+                 .then(({data}) => !!data.count)
+                 .catch(() => false)
   }
 
   return {
@@ -411,6 +428,8 @@ export default function useApi() {
     createNetwork,
     getNetwork,
     searchNetworks,
-    searchRepositories
+    searchRepositories,
+    repositoryHasIssues,
+    updateNetwork
   }
 }

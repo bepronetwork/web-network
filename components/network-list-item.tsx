@@ -27,7 +27,7 @@ export default function NetworkListItem({
   const [bountiesQuantity, setBountiesQuantity] = useState<number>()
   const [openBountiesAmount, setOpenBountiesAmount] = useState<number>()
 
-  const { getURLWithNetwork } = useNetwork()
+  const { network: currentNetwork, getURLWithNetwork } = useNetwork()
 
   function handleRedirect() {
     router.push(
@@ -47,7 +47,7 @@ export default function NetworkListItem({
     BeproService.getTokensStaked(network.networkAddress)
       .then(setOpenBountiesAmount)
       .catch(console.log)
-  }, [])
+  }, [currentNetwork])
 
   return (
     <div className="list-item p-20 d-flex flex-row" onClick={handleRedirect}>

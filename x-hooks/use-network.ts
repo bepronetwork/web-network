@@ -218,10 +218,11 @@ export default function useNetwork() {
 
   return {
     network,
-    setNetwork: changeNetwork,
-    getURLWithNetwork,
-    networkExists,
     colorsToCSS,
-    DefaultTheme
+    DefaultTheme,
+    networkExists,
+    getURLWithNetwork,
+    handleNetworkChange,
+    setNetwork: changeNetwork
   }
 }

@@ -11,9 +11,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   const network = networkBeproJs({ test: true });
 
   await network.start();
-  const contract = network.getWeb3Contract();
 
-  await contract.getPastEvents(`CloseIssue`, {fromBlock, toBlock: +fromBlock+1, filter: {id},})
+  await network.getCloseIssueEvents({fromBlock, toBlock: +fromBlock+1, filter: {id},})
                 .then(events => readCloseIssues(events, {network, models, octokit, res}))
                 .catch(error => {
                   console.log(`Error reading CloseIssue`, error);
