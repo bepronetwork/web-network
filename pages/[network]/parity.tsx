@@ -21,7 +21,7 @@ import {GetServerSideProps} from 'next';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
-import {NetworkFactory, toSmartContractDecimals} from 'bepro-js/dist';
+import {NetworkFactory, toSmartContractDecimals} from 'bepro-js';
 import useNetwork from '@x-hooks/use-network';
 
 export default function ParityPage() {

@@ -9,12 +9,14 @@ import useApi from '@x-hooks/use-api';
 import {GetServerSideProps} from 'next';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
+import useNetwork from '@x-hooks/use-network';
 
 export default function FalconPunchPage() {
   const {state: {currentAddress}} = useContext(ApplicationContext);
   const [githubToken, setGithubToken] = useState(``);
   const [userList, setUserList] = useState<{created_at: string; login: string; public_repos: number; eth: number}[]>([])
   const {getAllUsers} = useApi();
+  const { network } = useNetwork()
 
   function toDays(date = ``) {
     return +new Date(date) / (24 * 60 * 60 * 1000)
@@ -32,7 +34,7 @@ export default function FalconPunchPage() {
 
     async function hasEthBalance(address: string) {
       return BeproService.login()
-                         .then(() => BeproService.bepro.web3.eth.getBalance(address as any))
+                         .then(() => BeproService.bepro.Web3.eth.getBalance(address as any))
                          .then(eth => +eth)
                          .catch(e => {
                            console.error(`Error on get eth`, e);

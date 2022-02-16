@@ -1,4 +1,4 @@
-import { NetworkFactory, Web3Connection } from 'bepro-js/dist'
+import { NetworkFactory, Web3Connection } from 'bepro-js'
 
 import { NETWORK_FACTORY_ADDRESS, WEB3_CONNECTION } from 'env'
 

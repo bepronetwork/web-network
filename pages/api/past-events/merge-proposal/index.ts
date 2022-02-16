@@ -9,9 +9,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   const network = networkBeproJs({ test: true });
 
   await network.start();
-  const contract = network.getWeb3Contract();
 
-  await contract.getPastEvents(`MergeProposalCreated`, {fromBlock, toBlock: +fromBlock+1, filter: {id},})
+  await network.getMergeProposalCreatedEvents({fromBlock, toBlock: +fromBlock+1, filter: {id},})
   // await contract.getPastEvents(`MergeProposalCreated`, {fromBlock, toBlock: +fromBlock+1,})
                 .then(events => {readMergeProposalCreated(events, {network, models, res, githubId})})
                 .catch(error => {

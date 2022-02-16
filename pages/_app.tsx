@@ -19,37 +19,35 @@ import useRepos from "@x-hooks/use-repos";
 import useNetwork from "@x-hooks/use-network";
 
 import "../styles/styles.scss";
+import NetworkThemeInjector from "@components/custom-network/network-theme-injector";
 
 function App({ Component, pageProps: { session, currentIssue,...pageProps } }: AppProps) {
   const [[, repos]] = useRepos();
   const [loaded, setLoaded] = useState(false);
-  const { network, colorsToCSS } = useNetwork()
+  const { network } = useNetwork()
 
   if (isMobile) {
     return <MobileNotSupported />;
   }
 
   useEffect(() => {
-    setLoaded(!!repos?.length && !!network);
-  }, [repos, network]);
+    setLoaded(!!repos?.length && !!network)
+  }, [repos, network, network?.colors]);
 
   return (
     <>
-      <style>
-        {colorsToCSS()}
-      </style>
-
       <Seo issueMeta={currentIssue} />
       <SessionProvider session={session}>
         <ApplicationContextProvider>
-          <NationDialog>
-            <MainNav />
-            <WebThreeDialog />
-            <div className="pb-5">
-              {!loaded ? `` : <Component {...pageProps} />}
-            </div>
-            <StatusBar />
-          </NationDialog>
+            <NationDialog>
+              <NetworkThemeInjector />
+              <MainNav />
+              <WebThreeDialog />
+              <div className="pb-5">
+                {!loaded ? `` : <Component {...pageProps} />}
+              </div>
+              <StatusBar />
+            </NationDialog>
         </ApplicationContextProvider>
       </SessionProvider>
     </>

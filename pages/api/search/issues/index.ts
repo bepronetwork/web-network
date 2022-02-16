@@ -19,7 +19,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     search,
     page,
     pullRequester,
-    networkName
+    networkName,
+    repoPath
   } = req.query || {}
 
   if (state) whereCondition.state = state
@@ -44,6 +45,20 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     if (!network) return res.status(404).json('Invalid network')
 
     whereCondition.network_id = network?.id
+  }
+
+  if (repoPath) {
+    const repository = await models.repositories.findOne({
+      where: {
+        githubPath: {
+          [Op.in]: String(repoPath).split(',')
+        }
+      }
+    })
+
+    if (!repository) return res.status(404).json('Invalid repository')
+
+    whereCondition.repository_id = repository.id
   }
 
   if (time) {

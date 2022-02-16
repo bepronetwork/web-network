@@ -1,13 +1,13 @@
 import Button from '@components/button'
 import InfoTooltip from '@components/info-tooltip'
 
-import { formatNumberToNScale } from '@helpers/formatNumber'
+import { formatNumberToCurrency } from '@helpers/formatNumber'
 
 interface AmountCardProps {
   title: string
   amount?: number
   description: string
-  currency: 'token' | 'oracles'
+  currency?: 'token' | 'oracles'
   action?: {
     label: string
     fn: () => void
@@ -31,18 +31,21 @@ export default function AmountCard({
 
       <div className="d-flex flex-row align-items-center mt-3">
         <span className="h3 text-white mr-2">
-          {formatNumberToNScale(amount)}
+          {formatNumberToCurrency(amount)}
         </span>
         {action ? (
           <Button color="warning">{action.label}</Button>
         ) : (
-          <span
-            className={`caption-small text-${
-              currency === 'token' ? `primary` : 'purple'
-            }`}
-          >
-            {currency === 'token' ? `$BEPRO` : 'oracles'}
-          </span>
+          (currency && (
+            <span
+              className={`caption-small text-${
+                currency === 'token' ? `primary` : 'purple'
+              }`}
+            >
+              {currency === 'token' ? `$BEPRO` : 'oracles'}
+            </span>
+          )) ||
+          ''
         )}
       </div>
     </div>

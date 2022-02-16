@@ -17,3 +17,12 @@ export const COUNTRY_CODE_BLOCKED = process.env.COUNTRY_CODE_BLOCKED || ["US", "
 
 // Visite https://chainlist.org/ to see more ChainID
 export const CURRENT_NETWORK_CHAINID = process.env.CURRENT_NETWORK_CHAINID || "42"
+
+// Default parameters to network
+export const DISPUTABLE_TIME_MIN = process.env.NEXT_PUBLIC_DISPUTABLE_TIME_MIN || 60
+export const DISPUTABLE_TIME_MAX = eval(process.env.NEXT_PUBLIC_DISPUTABLE_TIME_MAX) || 20*24*60*60
+export const REDEEM_TIME_MIN = process.env.NEXT_PUBLIC_REDEEM_TIME_MIN || 60
+export const REDEEM_TIME_MAX = eval(process.env.NEXT_PUBLIC_REDEEM_TIME_MAX) || 20*24*60*60
+export const COUNCIL_AMOUNT_MIN = process.env.NEXT_PUBLIC_COUNCIL_AMOUNT_MIN || 100000
+export const COUNCIL_AMOUNT_MAX = process.env.NEXT_PUBLIC_COUNCIL_AMOUNT_MAX || 50000000
+export const DISPUTE_PERCENTAGE_MAX = process.env.NEXT_PUBLIC_DISPUTE_PERCENTAGE_MAX || 15
