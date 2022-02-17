@@ -311,6 +311,20 @@ export default function useApi() {
                  .then(({status}) => status === 200)
   }
 
+  async function uploadFiles(files: File | File[]): Promise<any[]> {
+    const form = new FormData();
+    const isArray = Array.isArray(files);
+    if (isArray) {
+      files?.forEach(async (file, index) => {
+        form.append(`file${index + 1}`, file);
+      });
+    } else {
+      form.append(`file`, files);
+    }
+
+    return client.post("/files", form).then(({ data }) => data);
+  }
+
   return {
     removeUser,
     getIssue,
@@ -337,6 +351,7 @@ export default function useApi() {
     createRepo,
     removeRepo,
     waitForClose,
+    uploadFiles,
     waitForRedeem,
     userHasPR,
     startWorking,

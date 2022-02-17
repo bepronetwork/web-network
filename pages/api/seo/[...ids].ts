@@ -35,23 +35,24 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const {ids: [repoId, ghId]} = req.query;
+  const {
+    ids: [repoId, ghId],
+  } = req.query;
   const issueId = [repoId, ghId].join(`/`);
 
   const include = [
-    { association: 'developers' },
-    { association: 'pullRequests' },
-    { association: 'mergeProposals' },
-    { association: 'repository' },
-  ]
+    { association: "developers" },
+    { association: "pullRequests" },
+    { association: "mergeProposals" },
+    { association: "repository" },
+  ];
 
   const issue = await models.issue.findOne({
-    where: {issueId},
-    include
-  })
+    where: { issueId },
+    include,
+  });
 
-  if (!issue)
-    return res.status(404).json(null);
+  if (!issue) return res.status(404).json(null);
 
   const [, repo] = issue.repository.githubPath.split(`/`);
 
@@ -64,27 +65,25 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     working: issue.working?.length || 0,
     pr: issue.pullRequests?.length || 0,
     proposal: issue.mergeProposals?.length || 0,
-  })
-    .catch(e => {
-      console.log(`Error generating card`, e);
-      return null;
-    })
+  }).catch((e) => {
+    console.log(`Error generating card`, e);
+    return null;
+  });
 
-  if (!card)
-    return;
+  if (!card) return;
 
-  var img = Buffer.from(card.buffer, 'base64');
-  const {hash} = await IpfsStorage.add(img).catch(e => {
+  var img = Buffer.from(card.buffer);
+  const { hash } = await IpfsStorage.add(img).catch((e) => {
     console.log(`Failed to upload to IPFS`, e);
-    return {hash: null};
-  })
+    return { hash: null };
+  });
 
-  await issue.update({seoImage: hash,})
+  await issue.update({ seoImage: hash });
 
-  return res.status(200).json({seoImage: hash});
+  return res.status(200).json({ seoImage: hash });
 }
 
-export default async function GetIssues(req: NextApiRequest, res: NextApiResponse) {
+export default async function Seo(req: NextApiRequest, res: NextApiResponse) {
 
   switch (req.method.toLowerCase()) {
     case 'get':

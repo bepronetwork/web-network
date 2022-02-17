@@ -1,5 +1,4 @@
 import models from '@db/models';
-import api from '@services/api';
 import {NextApiRequest, NextApiResponse} from 'next';
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
