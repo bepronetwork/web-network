@@ -45,7 +45,7 @@ export default function IssueProposals({ metaProposals, className='', metaReques
 
   return (
     <div className={`content-wrapper ${className} pt-0 ${proposals.length > 0 && 'pb-0' || 'pb-3'}`}>
-      {metaProposals?.length > 0 && proposals.map(proposal =>
+      {metaProposals && proposals.map(proposal =>
                         <ProposalItem key={proposal._id}
                                       proposal={proposal}
                                       issueId={issueId}

@@ -129,13 +129,14 @@ async function doSubTitle({
 }
 
 async function doTitle(title: string) {
+  title = `${title.substring(0, 115).trimEnd()}`
+  title = title.length > 105 ?`${title}...` : title;
   try{ 
-    //Wrap lines size between 26 and 35 words
     title = title?.split(' ')
     .reduce((p, c) => {
       const lines = p.split('\n');
-      const currentLine = lines[lines.length - 1].length;
-      return currentLine + c.length % 35 > 26 ? `${p} \n${c}`:`${p} ${c}`;
+      const currentLine = lines[lines.length - 1].length || 0;
+      return currentLine + c.length % 48 > 40 ? `${p} \n${c}`:`${p} ${c}`;
     })
   } catch {
     title = title
@@ -228,8 +229,8 @@ export async function generateCard(issue: IGenerateCard): Promise<IGenerateResp>
   const footer = await doFooter({working: issue.working, pr: issue.pr, proposal: issue.proposal});
 
   contain = await position(contain, heading, 0, 0);
-  contain = await position(contain, title, 0, 30);
-  contain = await position(contain, subTitle, 0, 60);
+  contain = await position(contain, title, 0, 28);
+  contain = await position(contain, subTitle, 0, 63);
   contain = await position(contain, footer, 0, 100);
 
   var image = await position(container, contain, 50, 50)

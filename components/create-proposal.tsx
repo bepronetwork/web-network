@@ -91,6 +91,7 @@ export default function NewProposal({
   const {dispatch, state: {balance, currentAddress, beproInit, oracles, githubLogin},} = useContext(ApplicationContext);
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>();
+  const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest)
   const [error, setError] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
   const [warning, setWarning] = useState<boolean>(false);
@@ -253,14 +254,23 @@ export default function NewProposal({
 
   async function handleClickCreate(): Promise<void> {
     const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    
+    // NOTE:
+    //`payload.prAmmounts` need be Intenger number, because the contract remove numbers after dot using `toFix(0)`;
+    // To fix it, we check the difference between amount distributed and amount total, and attributed the rest to last participant;
 
     const payload = {
       issueID: issue_id,
       prAddresses: participants.map((items) => items.address),
       prAmounts: participants.map(
-        (items) => (amountTotal * distrib[items.githubHandle]) / 100
+        (items) => Math.floor((amountTotal * distrib[items.githubHandle]) / 100)
       ),
     };
+    //Chcking diff between total Distributed and total Ammount;
+    const totalDistributed = payload.prAmounts.reduce((p,c)=> p+c)
+    // Assigning the rest to last participant;
+    payload.prAmounts[payload.prAmounts.length - 1] += Math.ceil((amountTotal - totalDistributed))
+    
     setShow(false);
 
     const proposeMergeTx = addTransaction({type: TransactionTypes.proposeMerge})
@@ -308,6 +318,10 @@ export default function NewProposal({
   function handleChangeSelect({ value, githubId }) {
     setDistrib({});
     setAmount(0);
+    const newPr = pullRequests.find(el=> el.id === value);
+    if(newPr){
+      setCurrentPullRequest(newPr)
+    }
     getParticipantsPullRequest(value, githubId);
     handleInputColor("normal")
   }
@@ -350,6 +364,7 @@ export default function NewProposal({
   function renderRecognizeAsFinished() {
     return <Button onClick={recognizeAsFinished} className="mr-1">{t('bounty:actions.recognize-finished.title')}</Button>;
   }
+  const cantBeMergeable = () => !currentPullRequest.isMergeable || currentPullRequest.merged;
 
   useEffect(() => {
     setAmount(sumObj(distrib));
@@ -357,7 +372,9 @@ export default function NewProposal({
 
   useEffect(() => {
     if (pullRequests.length && activeRepo){
-      getParticipantsPullRequest(pullRequests[0]?.id, pullRequests[0]?.githubId);
+      const defaultPr = pullRequests.find(el=> el.isMergeable) || pullRequests[0];
+      setCurrentPullRequest(defaultPr)
+      getParticipantsPullRequest(defaultPr?.id, defaultPr?.githubId);
       loadProposalsMeta()
     }
   }, [pullRequests, activeRepo]);
@@ -382,7 +399,10 @@ export default function NewProposal({
             <Button
               onClick={handleClickCreate}
               disabled={
-                !currentAddress || participants.length === 0 || !success
+                !currentAddress ||
+                participants.length === 0 ||
+                !success ||
+                cantBeMergeable()
               }
             >
               {!currentAddress ||
@@ -411,15 +431,15 @@ export default function NewProposal({
           }}
           placeholder={t('forms.select-placeholder')}
           defaultValue={{
-            value: pullRequests[0]?.id,
-            label: `PR#${pullRequests[0]?.id} ${t("misc.by")} @${
-              pullRequests[0].githubLogin
+            value: currentPullRequest?.id,
+            label: `PR#${currentPullRequest?.id} ${t("misc.by")} @${
+              currentPullRequest?.githubLogin
             }`,
-            githubId: pullRequests[0]?.githubId,
-            githubLogin: pullRequests[0]?.githubLogin,
-            marged:  pullRequests[0]?.merged,
-            isMergeable:  pullRequests[0]?.isMergeable,
-            isDisable: false
+            githubId: currentPullRequest?.githubId,
+            githubLogin: currentPullRequest?.githubLogin,
+            marged: currentPullRequest?.merged,
+            isMergeable: currentPullRequest?.isMergeable,
+            isDisable: false,
           }}
           options={pullRequests?.map((items: pullRequest) => ({
             value: items.id,
@@ -428,7 +448,7 @@ export default function NewProposal({
             githubLogin: items.githubLogin,
             marged: items.merged,
             isMergeable: items.isMergeable,
-            isDisable: items.merged || !items.isMergeable
+            isDisable: items.merged || !items.isMergeable,
           }))}
           isOptionDisabled={(option) => option.isDisable}
           onChange={handleChangeSelect}
@@ -453,13 +473,24 @@ export default function NewProposal({
                   error={!!error}
                   success={success}
                   warning={warning}
+                  isDisable={cantBeMergeable()}
                 />
               ))}
             </ul>
             <div className="d-flex" style={{ justifyContent: "flex-end" }}>
-              {warning ? (
-                <p className="caption-small pr-3 mt-3 mb-0 text-uppercase text-warning">
-                  {t('proposal:errors.distribution-already-exists')}
+              {warning || cantBeMergeable() ? (
+                <p
+                  className={`caption-small pr-3 mt-3 mb-0 text-uppercase text-${
+                    warning ? "warning" : "danger"
+                  }`}
+                >
+                  {t(
+                    `proposal:errors.${
+                      warning
+                        ? "distribution-already-exists"
+                        : "pr-cant-mergeble"
+                    }`
+                  )}
                 </p>
               ) : (
                 <p
@@ -471,11 +502,15 @@ export default function NewProposal({
                     }
                   )}
                 >
-                  {t(`proposal:messages.distribution-${success ? "is" : "must-be"}-100`)}
+                  {t(
+                    `proposal:messages.distribution-${
+                      success ? "is" : "must-be"
+                    }-100`
+                  )}
                 </p>
               )}
             </div>
-          </> 
+          </>
         )}
       </Modal>
     </div>
