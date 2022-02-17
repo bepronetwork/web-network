@@ -1100,6 +1100,7 @@ textarea.form-control {
 }
 
 .marked-render{
+  word-wrap: break-word;
   img{
     max-width: 100%;
   }

@@ -11,6 +11,7 @@ interface Props {
   onChangeDistribution(params: { [key: string]: number }): void;
   address: string;
   defaultPercentage?: number;
+  isDisable?: boolean;
   error?: boolean;
   success?: boolean;
   warning?: boolean;
@@ -21,6 +22,7 @@ export default function CreateProposalDistributionItem({
   address = "",
   onChangeDistribution = (params = { key: 0 }) => {},
   defaultPercentage = 0,
+  isDisable = false,
   ...params
 }: Props) {
   const [value, setValue] = useState<number>(defaultPercentage);
@@ -67,6 +69,7 @@ export default function CreateProposalDistributionItem({
           onValueChange={handleValueChange}
           onBlur={handleBlur}
           className="text-center"
+          disabled={isDisable}
           {...params}
         />
       </div>
