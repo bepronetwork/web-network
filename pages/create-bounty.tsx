@@ -1,6 +1,6 @@
 import {useRouter} from 'next/router';
 import clsx from 'clsx';
-import {GetServerSideProps, GetStaticProps} from 'next/types'
+import {GetServerSideProps} from 'next/types'
 import React, {useContext, useEffect, useState} from 'react';
 import {BeproService} from '@services/bepro-service';
 import InputNumber from '@components/input-number';
@@ -24,7 +24,7 @@ import { changeTransactionalTokenApproval } from '@contexts/reducers/change-tran
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
-
+import DragAndDrop,{IFilesProps} from '@components/drag-and-drop'
 interface Amount {
   value?: string,
   formattedValue: string,
@@ -39,6 +39,7 @@ export default function PageCreateIssue() {
   const {dispatch, state: {currentAddress, githubHandle, myTransactions, isTransactionalTokenApproved}} = useContext(ApplicationContext);
   const [currentUser, setCurrentUser] = useState<User>();
   const [repository_id, setRepositoryId] = useState(``);
+  const [files, setFiles] = useState<IFilesProps[]>([]);
   const [branch, setBranch] = useState(``);
   const [redirecting, setRedirecting] = useState(false);
   const router = useRouter();
@@ -85,17 +86,22 @@ export default function PageCreateIssue() {
     setIssueDescription('')
     setIssueAmount({value: '0', formattedValue: '0', floatValue: 0})
   }
+  function addFilesInDescription(str){
+    const strFiles = files?.map(file=> file.uploaded && `${file?.type?.split('/')[0] === 'image' ? '!': ''}[${file.name}](${process.env.NEXT_PUBLIC_IPFS_BASE}/${file.hash}) \n\n`)
+    return `${str}\n\n${strFiles.toString().replace(",![","![").replace(",[","[")}`
+  }
 
   async function createIssue() {
     const payload = {
       title: issueTitle,
-      description: issueDescription,
+      description: addFilesInDescription(issueDescription),
       amount: issueAmount.floatValue,
       creatorAddress: BeproService.address,
       creatorGithub: currentUser?.githubLogin,
       repository_id,
       branch
     }
+
     const contractPayload = {tokenAmount: issueAmount.floatValue,};
 
     const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount: payload.amount});
@@ -177,6 +183,8 @@ export default function PageCreateIssue() {
     }
   }
 
+  const onUpdateFiles = (files:IFilesProps[]) => setFiles(files)
+
   useEffect(() => {
     BeproService.getBalance('bepro').then(setBalance);
     getUserOf(currentAddress).then(setCurrentUser);
@@ -215,6 +223,9 @@ export default function PageCreateIssue() {
                 <textarea className="form-control" rows={6} placeholder={t('create-bounty:fields.description.placeholder')}
                           value={issueDescription}
                           onChange={e => setIssueDescription(e.target.value)}/>
+              </div>
+              <div className='mb-2'>
+                <DragAndDrop onUpdateFiles={onUpdateFiles} />
               </div>
               <div className="row mb-4">
                 <div className="col">
