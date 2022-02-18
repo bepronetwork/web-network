@@ -54,12 +54,12 @@ module.exports = {
       await queryInterface.insert(Network, 'networks', {
         creatorAddress:
           `${process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS}`.toLowerCase(),
-        name: 'bepro',
-        description: 'bepro',
+        name: `${process.env.NEXT_PUBLIC_BEPRO_NETWORK_NAME}`,
+        description: `${process.env.NEXT_PUBLIC_BEPRO_NETWORK_NAME}`,
         colors: null,
-        networkAddress: null,
-        logoIcon: null,
-        fullLogo: null,
+        networkAddress: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}`,
+        logoIcon: 'QmQs5F8eyQGen6PPgXTG9Kg5gqCPMMBEaz8jfwSw386Vmh',
+        fullLogo: 'QmP3BahDdkjjiBmHTLPDbEoH4dgRuCd95rGBtH4DhQQwx3',
         createdAt: new Date(),
         updatedAt: new Date()
       })

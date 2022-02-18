@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 
 import NetworkLogo from '@components/network-logo'
 
-import { IPFS_BASE } from 'env'
+import { BEPRO_NETWORK_NAME, IPFS_BASE } from 'env'
 
 import { formatNumberToNScale } from '@helpers/formatNumber'
 
@@ -12,13 +12,17 @@ import { Network } from '@interfaces/network'
 import { BeproService } from '@services/bepro-service'
 
 import useNetwork from '@x-hooks/use-network'
+import { ApplicationContext } from '@contexts/application'
+import { changeNetworksSummary } from '@contexts/reducers/change-networks-summary'
 
 interface NetworkListItemProps {
-  network: Network
+  network: Network,
+  redirectToHome?: boolean
 }
 
 export default function NetworkListItem({
   network,
+  redirectToHome = false,
   ...props
 }: NetworkListItemProps) {
   const router = useRouter()
@@ -29,9 +33,15 @@ export default function NetworkListItem({
 
   const { network: currentNetwork, getURLWithNetwork } = useNetwork()
 
+  const {
+    dispatch
+  } = useContext(ApplicationContext)
+
   function handleRedirect() {
+    const url = redirectToHome ? '/' : '/account/my-network/settings'
+    
     router.push(
-      getURLWithNetwork('/account/my-network/settings', {
+      getURLWithNetwork(url, {
         network: network.name
       })
     )
@@ -42,10 +52,24 @@ export default function NetworkListItem({
       .then(setTokenLock)
       .catch(console.log)
     BeproService.getOpenIssues(network.networkAddress)
-      .then(setBountiesQuantity)
+      .then(quantity => {
+        setBountiesQuantity(quantity)
+        dispatch(changeNetworksSummary({
+          label: 'bounties',
+          amount: quantity,
+          action: 'add'
+        }))
+      })
       .catch(console.log)
     BeproService.getTokensStaked(network.networkAddress)
-      .then(setOpenBountiesAmount)
+      .then(amount => {
+        setOpenBountiesAmount(amount)
+        dispatch(changeNetworksSummary({
+          label: 'amountInNetwork',
+          amount: amount,
+          action: 'add'
+        }))
+      })
       .catch(console.log)
   }, [currentNetwork])
 
@@ -82,7 +106,8 @@ export default function NetworkListItem({
             ? formatNumberToNScale(openBountiesAmount)
             : '-'}
         </span>
-        <span className="caption-medium mr-2 text-primary">$BEPRO</span>
+
+        <span className={`caption-medium mr-2 ${network?.name === BEPRO_NETWORK_NAME ? 'text-blue' : ''}`} style={{color: `${network?.colors?.primary}`}}>$BEPRO</span>
       </div>
     </div>
   )

@@ -13,6 +13,8 @@ interface InternalLinkProps {
   uppercase?: boolean
   iconBefore?: boolean
   activeClass?: string
+  blank?: boolean
+  brand?: boolean
 }
 
 export default function InternalLink({
@@ -22,6 +24,8 @@ export default function InternalLink({
   active = undefined,
   iconBefore = false,
   uppercase = false,
+  blank = false,
+  brand = false,
   activeClass,
   ...props
 }: InternalLinkProps) {
@@ -44,12 +48,12 @@ export default function InternalLink({
     if (uppercase)
       classes += ' text-uppercase '
 
-    return `${!nav && 'btn btn-primary ' || ' main-nav-link '}text-white bg-opacity-100 d-flex align-items-center justify-content-center text-decoration-none shadow-none ${classes}`
+    return `${!nav && 'btn btn-primary ' || ' main-nav-link '} ${brand ? '' : ' text-white '} bg-opacity-100 d-flex align-items-center justify-content-center text-decoration-none shadow-none ${classes}`
   }
 
   return (
     <Link href={props.href} passHref>
-      <a className={getClasses()}>
+      <a className={getClasses()} target={`${blank ? '_blank' : ''}`}>
         {(iconBefore && props.icon) || ``}
         {props.label && <span>{props.label}</span> || ``}
         {(!iconBefore && props.icon) || ``}

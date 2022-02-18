@@ -6,6 +6,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import HelpIcon from '@assets/icons/help-icon';
 import PlusIcon from '@assets/icons/plus-icon';
 import BeproLogo from '@assets/icons/bepro-logo';
+import BeproLogoBlue from '@assets/icons/bepro-logo-blue';
 import BeproSmallLogo from '@assets/icons/bepro-small-logo';
 import ExternalLinkIcon from '@assets/icons/external-link-icon';
 
@@ -22,7 +23,7 @@ import TransactionsStateIndicator from '@components/transactions-state-indicator
 
 import { ApplicationContext } from '@contexts/application';
 
-import { IPFS_BASE } from 'env';
+import { BEPRO_NETWORK_NAME, IPFS_BASE } from 'env';
 
 import { truncateAddress } from '@helpers/truncate-address';
 import { formatNumberToNScale } from '@helpers/formatNumber';
@@ -50,6 +51,7 @@ export default function MainNav() {
   const [modalUserMissing, setModalUserMissing] = useState<boolean>(false);
   const {getUserOf,} = useApi();
   const { network, getURLWithNetwork } = useNetwork()
+  const router = useRouter()
 
   useEffect(() => {
     checkLogin();
@@ -97,15 +99,17 @@ export default function MainNav() {
       })
   }
 
+  const isNetworksPage = router.pathname === '/networks'
+
   useEffect(updateState, [currentAddress]);
   useEffect(updateBalances, [balance])
 
   return (
-    <div className="main-nav d-flex align-items-center justify-content-between">
+    <div className={`main-nav d-flex align-items-center justify-content-between ${isNetworksPage && 'bg-shadow' || 'bg-primary'}`}>
 
       <div className="d-flex">
-        <InternalLink href={getURLWithNetwork('/')} icon={network?.fullLogo ? <Image src={`${IPFS_BASE}/${network?.fullLogo}`} width={104} height={32} /> : <BeproLogo aria-hidden={true} />} className="brand" nav active />
-        <ul className="nav-links">
+        <InternalLink href={getURLWithNetwork('/', {network: BEPRO_NETWORK_NAME})} icon={isNetworksPage ? <BeproLogoBlue /> : (network?.fullLogo ? <Image src={`${IPFS_BASE}/${network?.fullLogo}`} width={104} height={32} /> : <BeproLogo aria-hidden={true} />)} className="brand" nav active brand />
+        {!isNetworksPage && <ul className="nav-links">
           <li>
             <InternalLink href={getURLWithNetwork('/developers')} label={<Translation label={'main-nav.developers'} />} nav uppercase />
           </li>
@@ -117,7 +121,11 @@ export default function MainNav() {
           <li>
             <InternalLink href={getURLWithNetwork('/oracle')} label={<Translation label={'main-nav.Oracle'} />} nav uppercase />
           </li>
-        </ul>
+
+          <li>
+            <InternalLink href={'/networks'} label={'Networks'} nav uppercase />
+          </li>
+        </ul> || '' }
       </div>
 
       <div className="d-flex flex-row align-items-center">
@@ -126,7 +134,10 @@ export default function MainNav() {
           <ExternalLinkIcon className="ml-1"/>
         </a>
 
+        { !isNetworksPage &&
         <InternalLink href={getURLWithNetwork('/create-bounty')} icon={<PlusIcon />} label={<Translation label={'main-nav.create-bounty'} />} className="mr-2" iconBefore nav uppercase />
+        || <InternalLink href={getURLWithNetwork('/new-network')} icon={<PlusIcon />} label={'New Network'} className="mr-2" iconBefore nav uppercase />
+        }
 
         <Button onClick={() => setShowHelp(true)}  className="ms-2 me-4 opacity-75 opacity-100-hover" transparent rounded><HelpIcon /></Button>
 

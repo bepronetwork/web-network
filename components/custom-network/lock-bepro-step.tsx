@@ -36,7 +36,7 @@ export default function LockBeproStep({
   const maxPercent = 100 - lockedPercent
   const maxValue = Math.min(
     balance.beproAvailable,
-    data.amountNeeded - data.amountLocked
+    +data.amountNeeded - +data.amountLocked
   )
   const textAmountClass =
     data.amount > balance.beproAvailable ? 'text-danger' : 'text-primary'

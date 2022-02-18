@@ -25,6 +25,7 @@ import Translation from '@components/translation';
 import { useTranslation } from 'next-i18next';
 
 import useNetwork from '@x-hooks/use-network';
+import NetworkThemeInjector from '@components/custom-network/network-theme-injector';
 interface NetworkIssue {
   recognizedAsFinished: boolean;
 }

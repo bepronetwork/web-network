@@ -6,6 +6,7 @@ import AccountHero from '@components/account-hero'
 import InternalLink from '@components/internal-link'
 import ConnectGithub from '@components/connect-github'
 import ConnectWalletButton from '@components/connect-wallet-button'
+import NetworkThemeInjector from '@components/custom-network/network-theme-injector'
 
 import { ApplicationContext } from '@contexts/application'
 
@@ -20,6 +21,7 @@ export default function Account({ children }): JSX.Element {
 
   return (
     <div>
+      <NetworkThemeInjector />
       <AccountHero />
 
       <ConnectWalletButton asModal={true} />

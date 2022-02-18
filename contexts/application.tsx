@@ -64,7 +64,12 @@ const defaultState: GlobalState = {
     githubLogin: ``,
     accessToken: ``,
     isTransactionalTokenApproved: false,
-    isSettlerTokenApproved: false
+    isSettlerTokenApproved: false,
+    networksSummary: {
+      bounties: 0, 
+      amountInNetwork: 0,
+      amountDistributed: 0
+    }
   },
   dispatch: () => undefined
 };
