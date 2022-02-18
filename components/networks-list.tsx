@@ -14,24 +14,27 @@ import { Network } from '@interfaces/network'
 import useApi from '@x-hooks/use-api'
 import useNetwork from '@x-hooks/use-network'
 import NetworkListBar from './network-list-bar'
+import { BEPRO_NETWORK_NAME } from 'env'
 
 interface NetworksListProps {
   name?: string
   networkAddress?: string
   creatorAddress?: string
+  redirectToHome?: boolean
 }
 
 export default function NetworksList({
   name,
   networkAddress,
   creatorAddress,
+  redirectToHome = false,
   ...props
 }: NetworksListProps) {
   const { t } = useTranslation(['common'])
   const [networks, setNetworks] = useState<Network[]>([])
 
   const { searchNetworks } = useApi()
-  const { getURLWithNetwork } = useNetwork()
+  const { network, getURLWithNetwork } = useNetwork()
 
   const { dispatch } = useContext(ApplicationContext)
 
@@ -56,18 +59,19 @@ export default function NetworksList({
     <CustomContainer>
       {(!networks.length && (
         <NothingFound description="You don't have a custom network created">
-          <InternalLink
-            href={getURLWithNetwork('/new-network')}
+          {network ? <InternalLink
+            href={getURLWithNetwork('/new-network', network.name === BEPRO_NETWORK_NAME ? {} : {network: BEPRO_NETWORK_NAME})}
             label={String(t('actions.create-one'))}
             uppercase
-          />
+            blank={network.name !== BEPRO_NETWORK_NAME}
+          /> : ''}
         </NothingFound>
       )) || (
         <>
           <NetworkListBar hideOrder={hasSpecificFilter} />
 
           {networks.map((network) => (
-            <NetworkListItem key={network.id} network={network} />
+            <NetworkListItem key={network.id} network={network} redirectToHome={redirectToHome} />
           ))}
         </>
       )}

@@ -29,7 +29,7 @@ class BeproFacet {
 
   async start(customNetworkAddress = undefined) {
     try {
-      if (!this.bepro.started)
+      if(!this.started)
         await this.bepro.start();
       this.network = new Network(this.bepro, customNetworkAddress || CONTRACT_ADDRESS);
       this.erc20 = new ERC20(this.bepro, SETTLER_ADDRESS);
@@ -39,16 +39,14 @@ class BeproFacet {
       await this.erc20.loadContract();
       await this.networkFactory.loadContract();
 
+      this.started = true
+
       this.operatorAmount = await this.getOperatorAmount();
     } catch (error) {
       console.log(`Failed to start Bepro Service`, error)
 
       this.started = false
-
-      return this.started
     }
-
-    this.started = true
 
     return this.started
   }
@@ -56,6 +54,7 @@ class BeproFacet {
   async login() {
     this.connected = false;
     await this.bepro.connect();
+    await this.start(this.network.contractAddress);
     this.address = await this.bepro.getAddress();
     this.connected = true;
   }
@@ -145,10 +144,22 @@ class BeproFacet {
     return 0
   }
 
+  async setRedeemTime(time: number) {
+    if (this.isStarted) return this.network.changeRedeemTime(time)
+
+    return false
+  }
+
   async getDisputableTime() {
     if (this.isStarted) return this.network.disputableTime();
 
     return 0
+  }
+
+  async setDisputeTime(time: number) {
+    if (this.isStarted) return this.network.changeDisputableTime(time)
+
+    return false
   }
 
   async getOraclesSummary() {
@@ -193,14 +204,40 @@ class BeproFacet {
     return 0
   }
 
+  async setCouncilAmount(amount: number) {
+    if (this.isStarted) return this.network.changeCouncilAmount(`${amount}`)
+
+    return false
+  }
+
   async getPercentageNeededForDispute() {
     if (this.isStarted) return this.network.percentageNeededForDispute()
 
     return 0
   }
 
+  async setPercentageForDispute(percentage: number) {
+    if (this.isStarted) return this.network.sendTx(this.network.contract.methods.changePercentageNeededForDispute(percentage))
+
+    return 0
+  }
+
   async createNetwork() {
     return this.networkFactory.createNetwork(SETTLER_ADDRESS, SETTLER_ADDRESS)
+  }
+
+  async claimNetworkGovernor(networkAddress) {
+    const network = new Network(this.bepro, networkAddress)
+
+    await network.loadContract()
+
+    return network.sendTx(network.contract.methods.claimGovernor())
+  }
+
+  async getNetworksQuantity() {
+    if (this.isStarted) return this.networkFactory.callTx(this.networkFactory.contract.methods.networksAmount())
+
+    return 0
   }
 
   getNetworkAdressByCreator(creatorAddress: string) {

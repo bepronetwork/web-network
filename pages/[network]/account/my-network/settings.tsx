@@ -31,14 +31,14 @@ import useOctokit from '@x-hooks/use-octokit'
 import useNetwork from '@x-hooks/use-network'
 
 import {
+  IPFS_BASE,
+  REDEEM_TIME_MAX,
+  REDEEM_TIME_MIN,
   COUNCIL_AMOUNT_MIN,
   COUNCIL_AMOUNT_MAX,
   DISPUTABLE_TIME_MAX,
   DISPUTABLE_TIME_MIN,
-  DISPUTE_PERCENTAGE_MAX,
-  IPFS_BASE,
-  REDEEM_TIME_MAX,
-  REDEEM_TIME_MIN
+  DISPUTE_PERCENTAGE_MAX
 } from 'env'
 interface NetworkAmounts {
   tokenStaked: number
@@ -50,9 +50,16 @@ export default function Settings() {
     ...DefaultNetworkInformation,
     redeemTime: 0,
     disputeTime: 0,
+    validated: false,
     councilAmount: 0,
-    percentageForDispute: 0,
-    validated: false
+    percentageForDispute: 0
+  })
+
+  const [currentNetworkParameters, setCurrentNetworkParameters] = useState({
+    redeemTime: 0,
+    disputeTime: 0,
+    councilAmount: 0,
+    percentageForDispute: 0
   })
 
   const [networkAmounts, setNetworkAmounts] = useState<NetworkAmounts>({
@@ -66,7 +73,8 @@ export default function Settings() {
 
   const { listUserRepos } = useOctokit()
   const { searchRepositories, updateNetwork } = useApi()
-  const { network, colorsToCSS, handleNetworkChange } = useNetwork()
+  const { network, colorsToCSS, handleNetworkChange, getURLWithNetwork } =
+    useNetwork()
 
   const {
     dispatch,
@@ -113,6 +121,13 @@ export default function Settings() {
     tmpInfo2.disputeTime = disputeTime
     tmpInfo2.councilAmount = councilAmount
     tmpInfo2.percentageForDispute = percentageForDispute
+
+    setCurrentNetworkParameters({
+      redeemTime,
+      disputeTime,
+      councilAmount,
+      percentageForDispute
+    })
 
     setNewInfo(tmpInfo2)
 
@@ -249,12 +264,25 @@ export default function Settings() {
     }
 
     updateNetwork(json)
-      .then((result) => {
+      .then(async (result) => {
+        if (currentNetworkParameters.redeemTime !== newInfo.redeemTime) 
+          await BeproService.setRedeemTime(newInfo.redeemTime).then(console.log).catch(console.log)
+
+        if (currentNetworkParameters.disputeTime !== newInfo.disputeTime) 
+          await BeproService.setDisputeTime(newInfo.disputeTime).then(console.log).catch(console.log)
+
+        if (currentNetworkParameters.councilAmount !== newInfo.councilAmount) 
+          await BeproService.setCouncilAmount(newInfo.councilAmount).then(console.log).catch(console.log)
+
+        if (currentNetworkParameters.percentageForDispute !== newInfo.percentageForDispute) 
+          await BeproService.setPercentageForDispute(newInfo.percentageForDispute).then(console.log).catch(console.log)
+        
+
         dispatch(
           addToast({
             type: 'success',
             title: 'Success',
-            content: `Network settings updated`
+            content: `Refresh the page for the changes to take effect.`
           })
         )
 
@@ -280,8 +308,21 @@ export default function Settings() {
   useEffect(() => {
     if (!network || !currentAddress || !githubLogin) return
 
-    loadData()
-    loadAmounts()
+    BeproService.networkFactory
+      .getNetworkByAddress(currentAddress)
+      .then((result) => {
+        if (result.toLowerCase() !== network.networkAddress.toLowerCase())
+          router.push(getURLWithNetwork('/account'))
+        else {
+          loadData()
+          loadAmounts()
+        }
+      })
+      .catch((error) => {
+        console.log('Failed to verify network creator', error)
+
+        router.push(getURLWithNetwork('/account'))
+      })
   }, [network, currentAddress, githubLogin])
 
   useEffect(() => {
@@ -588,7 +629,7 @@ export default function Settings() {
             {(newInfo.validated && (
               <div className="d-flex flex-row justify-content-center mt-3 mb-2">
                 <Button onClick={handleSubmit} disabled={updatingNetwork}>
-                  <span >Save Settings</span>
+                  <span>Save Settings</span>
                   {updatingNetwork ? (
                     <span className="spinner-border spinner-border-xs ml-1" />
                   ) : (

@@ -18,6 +18,7 @@ import { ApplicationContext } from '@contexts/application'
 
 import { isSameSet } from '@helpers/array'
 import { isColorsSimilar } from '@helpers/colors'
+import { psReadAsText } from '@helpers/file-reader'
 import { DefaultNetworkInformation } from '@helpers/custom-network'
 
 import { BeproService } from '@services/bepro-service'
@@ -25,7 +26,8 @@ import { BeproService } from '@services/bepro-service'
 import useApi from '@x-hooks/use-api'
 import useNetwork from '@x-hooks/use-network'
 import useOctokit from '@x-hooks/use-octokit'
-import { psReadAsText } from '@helpers/file-reader'
+
+import { BEPRO_NETWORK_NAME } from 'env'
 
 export default function NewNetwork() {
   const router = useRouter()
@@ -111,10 +113,12 @@ export default function NewNetwork() {
 
     BeproService.createNetwork()
       .then((receipt) => {
-        BeproService.getNetworkAdressByCreator(currentAddress).then(
-          async (networkAddress) => {
+        BeproService.getNetworkAdressByCreator(currentAddress)
+          .then(async (networkAddress) => {
             const networkData = steps.network.data
             const repositoriesData = steps.repositories
+
+            await BeproService.claimNetworkGovernor(networkAddress)
 
             const json = {
               name: networkData.displayName.data,
@@ -135,13 +139,14 @@ export default function NewNetwork() {
 
             createNetwork(json).then((result) => {
               router.push(
-                getURLWithNetwork('/account/my-network', { network: json.name })
+                getURLWithNetwork('/account/my-network/settings', {
+                  network: json.name
+                })
               )
-              
+
               setCreatingNetwork(false)
             })
-          }
-        )
+          })
       })
       .catch((error) => {
         dispatch(
@@ -158,7 +163,13 @@ export default function NewNetwork() {
   }
 
   useEffect(() => {
-    if (!Object.keys(steps.network.data.colors.data).length && network) {
+    if (!network) return
+
+    if (network.name !== BEPRO_NETWORK_NAME)
+      router.push(
+        getURLWithNetwork('/account', { network: BEPRO_NETWORK_NAME })
+      )
+    else if (!Object.keys(steps.network.data.colors.data).length) {
       const tmpSteps = Object.assign({}, steps)
 
       tmpSteps.network.data.colors.data = network.colors || DefaultTheme()

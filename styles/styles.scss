@@ -15,8 +15,9 @@
 
 @import "pages/new-network";
 
-@import "components/creating-network-loader";
 @import "components/network-logo";
+@import "components/network-hero";
+@import "components/creating-network-loader";
 
 @function toRGB ($color) {
   @return "" + red($color) + ", " + green($color) + ", " + blue($color);
@@ -280,7 +281,6 @@ li {
   position: fixed;
   z-index: 5;
   height: $navbar-height;
-  background-color: var(--bs-primary);
   padding: 0px $m;
 
   .brand {
@@ -301,7 +301,7 @@ li {
     li {
       margin-left: $m;
     }
-    a {
+    a:not(.brand) {
       color: rgba($white, 0.7);
       padding: math.div($m, 4) 0px;
       transition: 0.2s ease-in-out;

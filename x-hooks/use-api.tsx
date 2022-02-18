@@ -7,6 +7,8 @@ import {IssueData, pullRequest} from '@interfaces/issue-data';
 
 import client from '@services/api'
 import { Network } from '@interfaces/network';
+import axios from 'axios';
+import { CURRENCY_BEPRO_API } from 'env';
 interface Paginated<T = any> {
   count: number;
   rows: T[]
@@ -384,6 +386,12 @@ export default function useApi() {
                  .catch(() => ({rows: [], count: 0, pages: 0, currentPage: 1}));
   }
 
+  async function getBeproCurrency() {
+    const { data } = await axios.get(CURRENCY_BEPRO_API)
+
+    return data.market_data.current_price
+  }
+
   async function repositoryHasIssues(repoPath) {
     const search = new URLSearchParams({repoPath}).toString()
 
@@ -430,6 +438,7 @@ export default function useApi() {
     searchNetworks,
     searchRepositories,
     repositoryHasIssues,
-    updateNetwork
+    updateNetwork,
+    getBeproCurrency
   }
 }
