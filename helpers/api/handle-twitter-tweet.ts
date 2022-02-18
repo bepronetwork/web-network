@@ -8,7 +8,7 @@ function handleState(currentState: IssueState) {
       return "𝗗𝗥𝗔𝗙𝗧";
     }
     case "open": {
-      return "𝐎𝐏𝐄𝐍";
+      return "𝗢𝗣𝗘𝗡";
     }
     case "ready": {
       return "𝐑𝐄𝐀𝐃𝐘";
