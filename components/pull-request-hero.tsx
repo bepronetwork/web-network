@@ -1,10 +1,6 @@
 import { GetStaticProps } from 'next'
-import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
-import Avatar from './avatar'
-import GithubInfo from './github-info'
-import InternalLink from './internal-link'
 import PullRequestLabels, { PRLabel } from './pull-request-labels'
 
 import Avatar from '@components/avatar'

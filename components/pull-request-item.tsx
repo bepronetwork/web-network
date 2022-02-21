@@ -1,8 +1,5 @@
 import Link from 'next/link'
-import Button from './button'
 import { getTimeDifferenceInWords } from '@helpers/formatDate'
-import Avatar from './avatar'
-import LockedIcon from '@assets/icons/locked-icon'
 import { useRouter } from 'next/router'
 
 import LockedIcon from '@assets/icons/locked-icon'
