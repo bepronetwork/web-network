@@ -1,34 +1,49 @@
 import ArrowDown from '@assets/icons/arrow-down'
+import NetworkListBarColumn from './network-list-bar-column'
 
-export default function NetworkListBar({
-  hideOrder = false
-}) {
+export default function NetworkListBar({ hideOrder = false, order, setOrder }) {
   const textClass = hideOrder ? 'text-primary' : ''
+  const invertOrder = order[1] === 'asc' ? 'desc' : 'asc'
+
+  function handleSetOrder(column) {
+    const newOrder = order[0] === column ? invertOrder : 'asc'
+
+    setOrder([column, newOrder])
+  }
 
   return (
     <div className="row py-0 mx-0 mb-2 svg-with-text-color">
-      <div className={`col-3 d-flex flex-row justify-content-center align-items-center ${textClass}`}>
-        <span className="caption-medium mr-1">Network Name</span>
-        { !hideOrder && <ArrowDown width={9.33} height={6.22} /> || <></>}
-      </div>
+      <NetworkListBarColumn
+        label="Network Name"
+        hideOrder={hideOrder}
+        columnOrder={order[1]}
+        isColumnActive={order[0] === 'name'}
+        onClick={() => handleSetOrder('name')}
+      />
 
-      <div className={`col-3 d-flex flex-row justify-content-center align-items-center ${textClass}`}>
-        <span className="caption-medium mr-1">
-          Number of bounties
-        </span>
-        { !hideOrder && <ArrowDown width={9.33} height={6.22} /> || <></>}
-      </div>
+      <NetworkListBarColumn
+        hideOrder={hideOrder}
+        columnOrder={order[1]}
+        label="Number of bounties"
+        isColumnActive={order[0] === 'openBountiesQuantity'}
+        onClick={() => handleSetOrder('openBountiesQuantity')}
+      />
 
-      <div className={`col-3 d-flex flex-row justify-content-center align-items-center ${textClass}`}>
-        <span className="caption-medium mr-1">$BEPRO Locked</span>
-        { !hideOrder && <ArrowDown width={9.33} height={6.22} /> || <></>}
-      </div>
+      <NetworkListBarColumn
+        hideOrder={hideOrder}
+        label="$TOKEN Locked"
+        columnOrder={order[1]}
+        isColumnActive={order[0] === 'tokensLocked'}
+        onClick={() => handleSetOrder('tokensLocked')}
+      />
 
-      <div className={`col-3 d-flex flex-row justify-content-end align-items-center ${textClass}`}>
-        <span className="caption-medium mr-1">Open bounties</span>
-        { !hideOrder && <ArrowDown width={9.33} height={6.22} /> || <></>}
-        <div className="mr-2"></div>
-      </div>
+      <NetworkListBarColumn
+        hideOrder={hideOrder}
+        label="Open bounties"
+        columnOrder={order[1]}
+        isColumnActive={order[0] === 'openBountiesAmount'}
+        onClick={() => handleSetOrder('openBountiesAmount')}
+      />
     </div>
   )
 }

@@ -3,19 +3,15 @@ import { useContext, useEffect, useState } from 'react'
 import InfoTooltip from '@components/info-tooltip'
 import CustomContainer from '@components/custom-container'
 
-import { BeproService } from '@services/bepro-service'
 import { ApplicationContext } from '@contexts/application'
-import { formatNumberToCurrency } from '@helpers/formatNumber'
 import { changeNetworksSummary } from '@contexts/reducers/change-networks-summary'
-import axios from 'axios'
-import { CURRENCY_BEPRO_API } from 'env'
-import useApi from '@x-hooks/use-api'
+
+import { formatNumberToCurrency } from '@helpers/formatNumber'
+
+import { BeproService } from '@services/bepro-service'
 
 export default function NetworksHero() {
   const [networksQuantity, setNetworksQuantity] = useState(0)
-  const [beproCurrency, setBeproCurrency] = useState<number>()
-
-  const { getBeproCurrency } = useApi()
 
   const {
     dispatch,
@@ -23,15 +19,15 @@ export default function NetworksHero() {
   } = useContext(ApplicationContext)
 
   useEffect(() => {
-    dispatch(changeNetworksSummary({
-      action: 'reset'
-    }))
+    dispatch(
+      changeNetworksSummary({
+        action: 'reset'
+      })
+    )
 
     BeproService.getNetworksQuantity()
-      .then(quantity => setNetworksQuantity(++quantity))
+      .then((quantity) => setNetworksQuantity(++quantity))
       .catch(console.log)
-
-    getBeproCurrency().then(({usd}) => setBeproCurrency(usd)).catch(console.log)
   }, [])
 
   return (
@@ -65,7 +61,9 @@ export default function NetworksHero() {
             <div className="col-3 px-2">
               <div className="border-top border-2 mb-2"></div>
               <div className="d-flex flex-row align-items-top">
-                <span className="h4 text-white">{formatNumberToCurrency(networksSummary.amountInNetwork * (beproCurrency || 1))}</span>
+                <span className="h4 text-white">
+                  {formatNumberToCurrency(networksSummary.amountInNetwork)}
+                </span>
                 <span className="caption-medium text-white-70 ml-1">$USD</span>
               </div>
               <span className="caption-small">In the network</span>
@@ -74,7 +72,9 @@ export default function NetworksHero() {
             <div className="col-3 px-2">
               <div className="border-top border-2 mb-2"></div>
               <div className="d-flex flex-row align-items-top">
-                <span className="h4 text-white">{formatNumberToCurrency(networksSummary.amountDistributed * (beproCurrency || 1))}</span>
+                <span className="h4 text-white">
+                  {formatNumberToCurrency(networksSummary.amountDistributed)}
+                </span>
                 <span className="caption-medium text-white-70 ml-1">$USD</span>
               </div>
               <span className="caption-small">Distributed</span>
