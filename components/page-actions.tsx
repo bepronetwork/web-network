@@ -88,7 +88,7 @@ export default function PageActions({
     dispatch,
     state: { githubHandle, currentAddress, myTransactions },
   } = useContext(ApplicationContext);
-  const {query: {repoId, id}} = useRouter();
+  const {query: {repoId}} = useRouter();
   const {createPullRequestIssue, waitForRedeem, waitForClose, processEvent, startWorking} = useApi();
   const { t } = useTranslation(['common', 'pull-request', 'bounty'])
 

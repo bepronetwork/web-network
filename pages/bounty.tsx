@@ -6,10 +6,8 @@ import IssueHero from '@components/issue-hero';
 import PageActions from '@components/page-actions';
 import IssueProposals from '@components/issue-proposals';
 import { useRouter } from 'next/router';
-import { BeproService } from '@services/bepro-service';
 import { User } from '@interfaces/api-response';
 import { ApplicationContext } from '@contexts/application';
-import { IssueData } from '@interfaces/issue-data';
 import { formatNumberToCurrency } from '@helpers/formatNumber';
 import IssueProposalProgressBar from '@components/issue-proposal-progress-bar';
 import useMergeData from '@x-hooks/use-merge-data';
@@ -29,7 +27,7 @@ function PageIssue() {
   const router = useRouter();
   const { id, repoId } = router.query;
   const { state: { currentAddress, githubLogin }} = useContext(ApplicationContext);
-  const {updateIssue, currentIssue: issue, networkIssue} = useIssue()
+  const {currentIssue: issue, networkIssue} = useIssue()
   
   const [isIssueinDraft, setIsIssueinDraft] = useState(false);
   const [commentsIssue, setCommentsIssue] = useState();
@@ -93,6 +91,7 @@ function PageIssue() {
 
     if (!forks)
       getForksOf(activeRepo.githubPath).then((frk) =>{
+        debugger;
           setForks(frk.data as any)
       });
       
@@ -131,21 +130,15 @@ function PageIssue() {
     if (issue && currentAddress)
       getMergedDataFromPullRequests(issue.repository?.githubPath, issue.pullRequests).then(setMergedPullRequests)
   }
+  
+  function syncLocalyState(){
+      setCommentsIssue([...issue?.comments] as any)
+  }
 
-  useEffect(()=>{
-    if(issue?.id !== id){
-      updateIssue(`${repoId}`, `${id}`).then(issue=>{
-        if (!issue)
-            return router.push('/404')
-      })
-    }
-  },[])
+  useEffect(syncLocalyState,[issue])
   useEffect(loadIssueData, [githubLogin, currentAddress, id, activeRepo]);
   useEffect(checkIsWorking, [issue, githubLogin])
   useEffect(loadMergedPullRequests, [issue, currentAddress])
-  // useEffect(getsIssueMicroService, [activeRepo, reposList])
-  // useEffect(getRepoForked, [issue, githubLogin])
-  
   
   return (
     <>
@@ -217,7 +210,7 @@ function PageIssue() {
           </div>
         </div>
       )}
-      <IssueComments comments={commentsIssue} repo={issue?.repository?.githubPath} issueId={id} />
+      <IssueComments comments={issue?.comments} repo={issue?.repository?.githubPath} issueId={id} />
     </>
   );
 }

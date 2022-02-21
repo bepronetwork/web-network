@@ -14,8 +14,9 @@ import useRepos from "@x-hooks/use-repos";
 import { appWithTranslation } from "next-i18next";
 import Seo from "@components/seo";
 
-function App({ Component, pageProps: { session, currentIssue,...pageProps } }: AppProps) {
+function App({ Component, pageProps: { session, currentIssue, ...pageProps } }: AppProps) {
   const [[, repos]] = useRepos();
+  
   const [loaded, setLoaded] = useState(false);
 
   if (isMobile) {

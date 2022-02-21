@@ -12,6 +12,7 @@ import { BeproService } from '@services/bepro-service';
 
 import useApi from '@x-hooks/use-api';
 import useOctokit from '@x-hooks/use-octokit';
+import {useRouter} from 'next/router';
 
 export interface ICurrentIssue extends IssueData{
   comments: Comment[]
@@ -45,6 +46,7 @@ export const IssueProvider: React.FC = function ({ children }) {
 
 
   const {getIssue} = useApi()
+  const {query} = useRouter();
   const {getIssueComments, getPullRequest} = useOctokit();
 
   const updatePullRequests = useCallback(async(prs: pullRequest[], githubPath: string)=>{
@@ -93,6 +95,9 @@ export const IssueProvider: React.FC = function ({ children }) {
   },[currentIssue])
 
   useEffect(()=>{getNetworkIssue},[currentIssue])
+  useEffect(()=>{
+    if(query.id && query.repoId) updateIssue(`${query.repoId}`,`${query.id}`);
+  },[query])
 
   const memorizeValue = useMemo<IssueContextData>(
     () => ({
