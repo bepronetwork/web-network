@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { kebabCase } from "lodash";
+import { useTranslation } from "next-i18next";
 import { Fragment } from "react";
 import NumberFormat from "react-number-format";
 import { InputNumber as InputNumberProps } from "types/input-number";
@@ -22,6 +23,8 @@ export default function InputNumber({
   description,
   ...params
 }: InputNumberProps): JSX.Element {
+  const { t } = useTranslation(['common'])
+
   const id = kebabCase(label);
   const errorStyle = { "text-danger bg-opacity-100": error };
   const successStyle = { "text-success bg-opacity-100": success };
@@ -76,7 +79,7 @@ export default function InputNumber({
             ...errorStyle,
           })}
           onClick={setMaxValue}>
-          Max
+          {t('misc.max')}
         </span>
         )}
       </div>

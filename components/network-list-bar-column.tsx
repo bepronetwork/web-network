@@ -8,7 +8,7 @@ export default function NetworkListBarColumn({
   label,
   onClick = () => {}
 }) {
-  const textClass = hideOrder ? 'text-primary' : ''
+  const textClass = hideOrder ? 'text-primary' : 'text-ligth-gray text-gray-hover'
   const ArrowComponent =
     columnOrder === 'desc' || !isColumnActive ? (
       <ArrowDown width={9.33} height={6.22} />

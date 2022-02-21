@@ -15,6 +15,7 @@ import useNetwork from '@x-hooks/use-network'
 import { ApplicationContext } from '@contexts/application'
 import { changeNetworksSummary } from '@contexts/reducers/change-networks-summary'
 import useApi from '@x-hooks/use-api'
+import { useTranslation } from 'next-i18next'
 
 interface NetworkListItemProps {
   network: Network
@@ -29,9 +30,10 @@ export default function NetworkListItem({
   ...props
 }: NetworkListItemProps) {
   const router = useRouter()
+  const { t } = useTranslation('common')
 
   const { getBeproCurrency } = useApi()
-  const { network: currentNetwork, getURLWithNetwork } = useNetwork()
+  const { getURLWithNetwork } = useNetwork()
 
   const { dispatch } = useContext(ApplicationContext)
 
@@ -96,7 +98,7 @@ export default function NetworkListItem({
         )
       })
       .catch(console.log)
-  }, [currentNetwork])
+  }, [])
 
   return (
     <div className="list-item p-20 d-flex flex-row" onClick={handleRedirect}>
@@ -138,7 +140,7 @@ export default function NetworkListItem({
           }`}
           style={{ color: `${network?.colors?.primary}` }}
         >
-          ${network.tokenName || 'TOKEN'}
+          ${network.tokenName || t('misc.token')}
         </span>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import UploadIcon from '@assets/icons/upload'
+import { useTranslation } from 'next-i18next'
 
 export default function ImageUploader({
   name,
@@ -11,6 +12,7 @@ export default function ImageUploader({
   error = false,
   className = ''
 }) {
+  const { t } = useTranslation('custom-network')
   const [image, setImage] = useState(value)
   const dimensions = {
     width: (lg && '150') || '80',
@@ -30,7 +32,7 @@ export default function ImageUploader({
   }, [image])
 
   return (
-    <>
+    <div className="d-flex flex-column align-items-center justify-content-center">
       <label
         className={`bg-black image-uploader ${
           (lg && 'lg') || ''
@@ -53,7 +55,7 @@ export default function ImageUploader({
           </>
         )}
       </label>
-      {error && <small className="text-danger small-info mt-1">Invalid format</small>}
+      {error && <small className="text-danger small-info mt-1">{t('errors.invalid-format')}</small>}
 
       <input
         type="file"
@@ -62,6 +64,6 @@ export default function ImageUploader({
         accept=".svg"
         onChange={handleChange}
       />
-    </>
+    </div>
   )
 }

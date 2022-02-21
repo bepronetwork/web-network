@@ -28,9 +28,17 @@ import useNetwork from '@x-hooks/use-network'
 import useOctokit from '@x-hooks/use-octokit'
 
 import { BEPRO_NETWORK_NAME } from 'env'
+import { useTranslation } from 'next-i18next'
 
 export default function NewNetwork() {
   const router = useRouter()
+
+  const { t } = useTranslation(['common', 'custom-network'])
+
+  const [currentStep, setCurrentStep] = useState(1)
+  const [creatingNetwork, setCreatingNetwork] = useState(false)
+  const [steps, setSteps] = useState(DefaultNetworkInformation)
+
   const { createNetwork } = useApi()
   const { listUserRepos } = useOctokit()
   const { network, getURLWithNetwork, colorsToCSS, DefaultTheme } = useNetwork()
@@ -40,9 +48,6 @@ export default function NewNetwork() {
     state: { currentAddress, githubLogin, balance, oracles, beproInit }
   } = useContext(ApplicationContext)
 
-  const [currentStep, setCurrentStep] = useState(1)
-  const [creatingNetwork, setCreatingNetwork] = useState(false)
-  const [steps, setSteps] = useState(DefaultNetworkInformation)
 
   function changeColor(newColor) {
     const tmpSteps = Object.assign({}, steps)
@@ -152,8 +157,8 @@ export default function NewNetwork() {
         dispatch(
           addToast({
             type: 'danger',
-            title: 'Fail',
-            content: `Fail to create network ${error}`
+            title: t('actions.failed'),
+            content: t('custom-network:errors.failed-to-create-network', {error})
           })
         )
 
@@ -354,7 +359,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       session: await getSession(),
       ...(await serverSideTranslations(locale, [
         'common',
-        'bounty',
+        'custom-network',
         'connect-wallet-button'
       ]))
     }

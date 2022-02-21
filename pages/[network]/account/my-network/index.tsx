@@ -16,7 +16,7 @@ export default function MyNetwork() {
   return (
     <Account>
       <div className="container pt-2">
-        <NetworksList creatorAddress={currentAddress} />
+        <NetworksList creatorAddress={currentAddress || 'not-found'} />
       </div>
     </Account>
   )
@@ -31,7 +31,8 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'connect-wallet-button',
         'my-oracles',
         'bounty',
-        'pull-request'
+        'pull-request',
+        'custom-network'
       ]))
     }
   }
