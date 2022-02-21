@@ -27,7 +27,7 @@ function PageIssue() {
   const router = useRouter();
   const { id, repoId } = router.query;
   const { state: { currentAddress, githubLogin }} = useContext(ApplicationContext);
-  const {currentIssue: issue, networkIssue} = useIssue()
+  const {activeIssue: issue, networkIssue} = useIssue()
   
   const [isIssueinDraft, setIsIssueinDraft] = useState(false);
   const [commentsIssue, setCommentsIssue] = useState();
@@ -132,6 +132,7 @@ function PageIssue() {
   }
   
   function syncLocalyState(){
+    if(issue?.comments)
       setCommentsIssue([...issue?.comments] as any)
   }
 

@@ -14,7 +14,7 @@ import useApi from '@x-hooks/use-api';
 import useOctokit from '@x-hooks/use-octokit';
 import {useRouter} from 'next/router';
 
-export interface ICurrentIssue extends IssueData{
+export interface IActiveIssue extends IssueData{
   comments: Comment[]
 }
 
@@ -31,9 +31,9 @@ export interface INetworkIssue{
 }
 
 export interface IssueContextData {
-  currentIssue: ICurrentIssue;
+  activeIssue: IActiveIssue;
   networkIssue: INetworkIssue;
-  updateIssue: (repoId: string, ghId: string)=> Promise<ICurrentIssue>
+  updateIssue: (repoId: string, ghId: string)=> Promise<IActiveIssue>
 }
 
 
@@ -41,7 +41,7 @@ const IssueContext = createContext<IssueContextData>({} as IssueContextData);
 
 export const IssueProvider: React.FC = function ({ children }) {
   
-  const [currentIssue, setCurrentIssue] = useState<ICurrentIssue>();
+  const [activeIssue, setActiveIssue] = useState<IActiveIssue>();
   const [networkIssue, setNetworkIssue] = useState<INetworkIssue>();
 
 
@@ -60,8 +60,8 @@ export const IssueProvider: React.FC = function ({ children }) {
     return await Promise.all(mapPr);
   },[])
 
-  async function updateIssue(repoId: string, ghId: string): Promise<ICurrentIssue> {
-    setCurrentIssue(null)
+  async function updateIssue(repoId: string, ghId: string): Promise<IActiveIssue> {
+    setActiveIssue(null)
     
     const issue = await getIssue(repoId, ghId);
     
@@ -77,35 +77,44 @@ export const IssueProvider: React.FC = function ({ children }) {
       );
     }
     const { data: comments } = await getIssueComments(+issue.githubId, ghPath);
-    const newCurrentIssue = {
+    const newActiveIssue = {
       ...issue,
       comments,
-    } as ICurrentIssue;
+    } as IActiveIssue;
 
-    setCurrentIssue(newCurrentIssue);
+    setActiveIssue(newActiveIssue);
 
-    return newCurrentIssue;
+    return newActiveIssue;
   }
 
   const getNetworkIssue = useCallback(async () => {
-    const issueCID = `${currentIssue.repository_id}/${currentIssue.id}`
+    const issueCID = `${activeIssue.repository_id}/${activeIssue.id}`
     const network = await BeproService.network.getIssueByCID({ issueCID })
     setNetworkIssue(network)
     return network;
-  },[currentIssue])
+  },[activeIssue])
 
-  useEffect(()=>{getNetworkIssue},[currentIssue])
+  useEffect(()=>{
+    if(activeIssue){
+      getNetworkIssue()
+    }
+  },[activeIssue])
+
   useEffect(()=>{
     if(query.id && query.repoId) updateIssue(`${query.repoId}`,`${query.id}`);
   },[query])
 
+  useEffect(()=>{
+    console.log('useIssue',{activeIssue, networkIssue})
+  },[activeIssue, networkIssue])
+
   const memorizeValue = useMemo<IssueContextData>(
     () => ({
-      currentIssue,
+      activeIssue,
       networkIssue,
       updateIssue
     }),
-    [currentIssue, updateIssue]
+    [activeIssue, networkIssue, updateIssue]
   );
 
   return (

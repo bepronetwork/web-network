@@ -1,6 +1,8 @@
-import { BranchsList } from '@interfaces/branchs-list';
-import { ReposList, RepoInfo } from '@interfaces/repos-list';
+import { BranchInfo, BranchsList } from '@interfaces/branchs-list';
+import { developer } from '@interfaces/issue-data';
+import { ReposList, RepoInfo, ForksList, ForkInfo} from '@interfaces/repos-list';
 import useApi from '@x-hooks/use-api';
+import useOctokit from '@x-hooks/use-octokit';
 import { useRouter } from 'next/router';
 import React, {
   createContext,
@@ -14,12 +16,14 @@ import React, {
 
 export interface ReposContextData {
   repoList: ReposList;
+  forksList: ForksList;
   branchsList: BranchsList;
   activeRepo: RepoInfo;
   loadRepos: () => Promise<ReposList>;
-  loadBranch: (repoId: string) => Promise<BranchsList>
-  updateActiveRepo: (id: number)=> RepoInfo
-  findRepo: (id?:number, repoId?:number) => RepoInfo
+  updateActiveRepo: (id: number)=> RepoInfo;
+  findForks: (repoId: string) => Promise<ForkInfo[]>;
+  findBranch: (repoId: string) => Promise<BranchInfo[]>;
+  findRepo: (id?:number, repoId?:number) => RepoInfo;
 }
 
 
@@ -29,17 +33,44 @@ export const ReposProvider: React.FC = function ({ children }) {
   
   const [repoList, setRepoList] = useState<ReposList>([]);
   const [branchsList, setBranchsList] = useState<BranchsList>({});
+  const [forksList, setForksList] = useState<ForksList>({});
   const [activeRepo, setActiveRepo] = useState<RepoInfo>(null);
 
   const {getReposList, getBranchsList} = useApi();
+  const { getForksOf } = useOctokit();
   const {query} = useRouter();
   
-  const loadBranch = useCallback(async(repoId: string): Promise<BranchsList>=>{
+  const findForks = useCallback(async(repoId: string): Promise<ForkInfo[]>=>{
+    if (forksList[repoId]) return forksList[repoId];
+    const repo = repoList.find(repo=> repo.id === +repoId);
+    debugger;
+    if(!repo) throw new Error(`Repo not found`);
+
+    const {data} = await getForksOf(repo?.githubPath);
+    
+    const forks = await Promise.all(data.map(({owner}): developer => ({
+      id: owner.id,
+      login: owner?.login,
+      avatar_url: owner.avatar_url,
+      url: owner.url,
+      type: owner.type
+    })))
+
+    setForksList((prevState) => ({
+      ...prevState,
+      [repoId]: forks,
+    }));
+
+    return forks;
+
+  },[repoList, forksList])
+
+  const findBranch = useCallback(async(repoId: string): Promise<BranchInfo[]>=>{
     if (branchsList[repoId]) return branchsList[repoId];
     const branchs = await getBranchsList(repoId);
     setBranchsList((prevState) => ({
       ...prevState,
-      id: branchs,
+      [repoId]: branchs,
     }));
     return branchs;
   },[branchsList])
@@ -61,28 +92,42 @@ export const ReposProvider: React.FC = function ({ children }) {
 
   useEffect(()=>{
     loadRepos()
-    .then(repos => 
-      repos.map(repo => loadBranch(`${repo?.id}`))
+    .then(repos =>
+      repos.map(repo => {
+        findBranch(`${repo?.id}`)
+        findForks(`${repo?.id}`)
+      })
     )
   },[])
 
   useEffect(()=>{
-    if(query.repoId){
-      setActiveRepo(findRepo(null, +query?.repoId))
+    if(activeRepo){
+      findBranch(`${activeRepo?.id}`)
+      findForks(`${activeRepo?.id}`)
     }
+  },[activeRepo])
+
+  useEffect(()=>{
+    if(query.repoId) setActiveRepo(findRepo(null, +query?.repoId))
   },[query])
+
+  useEffect(()=>{
+    console.log('useRepo',{activeRepo, repoList, branchsList, forksList})
+  },[activeRepo, repoList, branchsList, forksList])
 
   const memorizeValue = useMemo<ReposContextData>(
     () => ({
       repoList,
       branchsList,
       activeRepo,
+      forksList,
       loadRepos,
-      loadBranch,
+      findForks,
+      findBranch,
       updateActiveRepo,
       findRepo
     }),
-    [repoList, branchsList, activeRepo]
+    [repoList, branchsList, activeRepo, forksList]
   );
 
   return (
