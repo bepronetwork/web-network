@@ -13,7 +13,6 @@ import {toastWarning} from '@reducers/add-toast';
 import Button from './button';
 import {useRouter} from 'next/router';
 import useOctokit from '@x-hooks/use-octokit';
-import useRepos from '@x-hooks/use-repos';
 import useApi from '@x-hooks/use-api';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import useTransactions from '@x-hooks/useTransactions';
@@ -24,6 +23,7 @@ import { ProposalData } from '@interfaces/api-response';
 import { useTranslation } from 'next-i18next';
 import Avatar from './avatar';
 import PullRequestLabels, {PRLabel} from './pull-request-labels';
+import { useRepos } from '@contexts/repos';
 
 interface participants {
   githubHandle: string;
@@ -88,7 +88,7 @@ export default function NewProposal({
                                       handleMicroService,
                                       isIssueOwner = false, isFinished = false
                                     }) {
-  const {dispatch, state: {balance, currentAddress, beproInit, oracles, githubLogin},} = useContext(ApplicationContext);
+  const {dispatch, state: {currentAddress, beproInit, githubLogin},} = useContext(ApplicationContext);
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>();
   const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest)
@@ -101,8 +101,7 @@ export default function NewProposal({
   const [councilAmount, setCouncilAmount] = useState(0);
   const [currentGithubId, setCurrentGithubId] = useState<string>();
   const [proposals, setProposals] = useState<Proposal[]>([]);
-  const router = useRouter();
-  const [[activeRepo]] = useRepos();
+  const {activeRepo} = useRepos()
   const {getParticipants} = useOctokit();
   const {getUserWith, waitForMerge, processMergeProposal, processEvent} = useApi();
   const txWindow = useTransactions();

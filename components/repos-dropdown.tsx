@@ -1,10 +1,10 @@
 import ReactSelect from '@components/react-select';
 import {useEffect, useState} from 'react';
-import useRepos from '@x-hooks/use-repos';
 import { useTranslation } from 'next-i18next';
+import { useRepos } from '@contexts/repos';
 
 export default function ReposDropdown({onSelected = (opt: {value}) => {}}) {
-  const [[, repoList]] = useRepos();
+  const {repoList} = useRepos()
   const [options, setOptions] = useState<{value: string; label: string}[]>();
   const {t} = useTranslation('common')
 

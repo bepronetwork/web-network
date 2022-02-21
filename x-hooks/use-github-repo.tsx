@@ -1,9 +1,9 @@
+import { useRepos } from '@contexts/repos';
 import {useEffect, useState} from 'react';
-import useRepos from '@x-hooks/use-repos';
 
 export default function useGithubRepo(id: string, path: string) {
   const [githubPath, setGithubPath] = useState(``);
-  const [, {findRepo}] = useRepos();
+  const {findRepo} = useRepos()
 
   function loadRepoId() {
     if (!id)

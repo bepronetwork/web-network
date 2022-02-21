@@ -12,8 +12,8 @@ import Avatar from '@components/avatar'
 
 import { formatDate } from '@helpers/formatDate'
 
-import useRepos from '@x-hooks/use-repos'
 import { useTranslation } from 'next-i18next'
+import { useRepos } from '@contexts/repos'
 
 export default function CreateReviewModal({
   show = false,
@@ -24,7 +24,7 @@ export default function CreateReviewModal({
   pullRequest
 }) {
   const [body, setBody] = useState('')
-  const [[activeRepo]] = useRepos()
+  const {activeRepo} = useRepos()
   const { t } = useTranslation(['common', 'pull-request'])
 
   const {
