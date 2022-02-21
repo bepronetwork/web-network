@@ -23,18 +23,14 @@ import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import Translation from '@components/translation';
 import { useTranslation } from 'next-i18next';
+import { IssueProvider, useIssue } from '@contexts/issue';
 
-interface NetworkIssue {
-  recognizedAsFinished: boolean;
-}
-
-export default function PageIssue() {
+function PageIssue() {
   const router = useRouter();
   const { id, repoId } = router.query;
-  const { state: { currentAddress, githubLogin }, } = useContext(ApplicationContext);
-
-  const [issue, setIssue] = useState<IssueData>();
-  const [networkIssue, setNetworkIssue] = useState<any>();
+  const { state: { currentAddress, githubLogin }} = useContext(ApplicationContext);
+  const {updateIssue, currentIssue: issue, networkIssue} = useIssue()
+  
   const [isIssueinDraft, setIsIssueinDraft] = useState(false);
   const [commentsIssue, setCommentsIssue] = useState();
   const [forks, setForks] = useState();
@@ -44,11 +40,12 @@ export default function PageIssue() {
   const [mergedPullRequests, setMergedPullRequests] = useState([]);
   const [currentUser, setCurrentUser] = useState<User>();
   const {getMergedDataFromPullRequests} = useMergeData();
-  const {getIssueComments, getForksOf, getUserRepos, getPullRequest} = useOctokit();
-  const [[activeRepo, reposList]] = useRepos();
-  const {getUserOf, getIssue, userHasPR} = useApi();
+  const { getForksOf, getUserRepos} = useOctokit();
+  const [[activeRepo]] = useRepos();
+  const {getUserOf, userHasPR} = useApi();
   const { t } = useTranslation('bounty')
-
+  
+  
   const tabs = [
     {
       eventKey: 'proposals',
@@ -81,60 +78,6 @@ export default function PageIssue() {
     return  tabs.find(tab => tab.isEmpty === false)?.eventKey
   }
 
-  function getIssueCID() {
-    return [repoId, id].join(`/`)
-  }
-
-  function getsIssueMicroService(force = false) {
-    if (!activeRepo || (!force && issue))
-      return;
-
-    getIssue(repoId as string, id as string)
-      .then(async (issue) => {
-        if (!issue)
-          return router.push('/404')
-
-        if(issue?.pullRequests?.length > 0){
-          const mapPr = issue.pullRequests.map(async(pr)=>{
-            const {data} = await getPullRequest(Number(pr.githubId), issue?.repository?.githubPath)
-            pr.isMergeable = data.mergeable;
-            pr.merged = data.merged;
-            return pr;
-          })
-  
-          const pullRequests = await Promise.all(mapPr);
-          issue.pullRequests = pullRequests;
-        }
-
-        setIssue(issue);
-
-        if (!commentsIssue)
-          getIssueComments(+issue.githubId, activeRepo.githubPath)
-            .then((comments) => {
-              setCommentsIssue(comments.data as any)
-            });
-      })
-
-    if (!forks)
-      getForksOf(activeRepo.githubPath).then((frk) => setForks(frk.data as any));
-  }
-
-  function getsIssueBeproService(force = false) {
-    if (!currentAddress || (networkIssue && !force))
-      return;
-
-    const issueCID = getIssueCID()
-    BeproService.network.getIssueByCID({ issueCID })
-      .then(netIssue => {
-        setNetworkIssue(netIssue);
-        return netIssue._id;
-      })
-      .then(issueId => BeproService.network.isIssueInDraft({ issueId }))
-      .then((isIssueInDraft) => setIsIssueinDraft(isIssueInDraft))
-      .catch(e => {
-        console.error(`Failed to fetch network issue or draft state`, e);
-      });
-  }
 
   const getCurrentUserMicroService = () => {
     if (currentAddress == currentUser?.address)
@@ -148,6 +91,11 @@ export default function PageIssue() {
     if (!activeRepo || !githubLogin)
       return;
 
+    if (!forks)
+      getForksOf(activeRepo.githubPath).then((frk) =>{
+          setForks(frk.data as any)
+      });
+      
     getUserRepos(githubLogin, activeRepo.githubPath.split(`/`)[1])
       .then((repo) => {
         setIsRepoForked(repo.data?.fork)
@@ -164,10 +112,8 @@ export default function PageIssue() {
 
   function loadIssueData() {
     if (currentAddress && id) {
-      getsIssueMicroService();
-      getsIssueBeproService();
       getCurrentUserMicroService();
-    } else if (id) getsIssueMicroService();
+    } 
 
     if (githubLogin && activeRepo) getRepoForked();
   }
@@ -186,32 +132,29 @@ export default function PageIssue() {
       getMergedDataFromPullRequests(issue.repository?.githubPath, issue.pullRequests).then(setMergedPullRequests)
   }
 
-  useEffect(loadIssueData, [githubLogin, currentAddress, id, activeRepo]);
-  useEffect(getsIssueMicroService, [activeRepo, reposList])
-  useEffect(checkIsWorking, [issue, githubLogin])
-  useEffect(getRepoForked, [issue, githubLogin])
-  useEffect(loadMergedPullRequests, [issue, currentAddress])
-
-  const handleStateissue = () => {
-    if (issue?.state) return issue?.state;
-
-    if (isIssueinDraft) {
-      return 'Draft';
-    } else if (networkIssue?.finalized) {
-      return 'Closed';
-    } else {
-      return 'Open';
+  useEffect(()=>{
+    if(issue?.id !== id){
+      updateIssue(`${repoId}`, `${id}`).then(issue=>{
+        if (!issue)
+            return router.push('/404')
+      })
     }
-  };
-
+  },[])
+  useEffect(loadIssueData, [githubLogin, currentAddress, id, activeRepo]);
+  useEffect(checkIsWorking, [issue, githubLogin])
+  useEffect(loadMergedPullRequests, [issue, currentAddress])
+  // useEffect(getsIssueMicroService, [activeRepo, reposList])
+  // useEffect(getRepoForked, [issue, githubLogin])
+  
+  
   return (
     <>
       <IssueHero
         amount={formatNumberToCurrency(issue?.amount || networkIssue?.tokensStaked)}
-        state={handleStateissue()}
+        state={issue?.state}
         issue={issue} />
       <PageActions
-        state={handleStateissue()}
+        state={issue?.state}
         developers={issue?.developers}
         finalized={networkIssue?.finalized}
         isIssueinDraft={isIssueinDraft}
@@ -219,8 +162,12 @@ export default function PageIssue() {
         issueId={issue?.issueId}
         title={issue?.title}
         description={issue?.body}
-        handleBeproService={getsIssueBeproService}
-        handleMicroService={getsIssueMicroService}
+        handleBeproService={()=>{
+          // getsIssueBeproService
+        }}
+        handleMicroService={()=>{
+          // getsIssueMicroService
+        }}
         pullRequests={issue?.pullRequests || []}
         mergeProposals={issue?.mergeProposals}
         amountIssue={networkIssue?.tokensStaked}
@@ -255,7 +202,7 @@ export default function PageIssue() {
                   isCanceled={
                     issue?.state === `canceled` || networkIssue?.canceled
                   }
-                  creationDate={networkIssue.creationDate}
+                  creationDate={networkIssue?.creationDate}
                 />
               </div>
             </div>
@@ -274,6 +221,12 @@ export default function PageIssue() {
     </>
   );
 }
+
+export default () => (
+  <IssueProvider>
+    <PageIssue/>
+  </IssueProvider>
+)
 
 export const getServerSideProps: GetServerSideProps = async ({query, locale}) => {
   const { id, repoId } = query;

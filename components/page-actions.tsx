@@ -120,8 +120,8 @@ export default function PageActions({
   }
 
   const isClosedIssue = (state: IssueState | string): Boolean =>
-    state.toLocaleLowerCase() === "closed" ||
-    state.toLocaleLowerCase() === "redeemed";
+    state?.toLocaleLowerCase() === "closed" ||
+    state?.toLocaleLowerCase() === "redeemed";
   const isReedemButtonDisable = () =>
     [
       !myTransactions.find(

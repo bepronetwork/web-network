@@ -35,8 +35,6 @@ export default function IssueProposals({ metaProposals, className='', metaReques
       }
     }
 
-    
-
     setProposals(pool);
     BeproService.getDisputableTime().then(setDisputableTime)
   }
@@ -45,7 +43,7 @@ export default function IssueProposals({ metaProposals, className='', metaReques
 
   return (
     <div className={`content-wrapper ${className} pt-0 ${proposals.length > 0 && 'pb-0' || 'pb-3'}`}>
-      {metaProposals && proposals.map(proposal =>
+      {metaProposals?.length > 0 && proposals.map(proposal =>
                         <ProposalItem key={proposal._id}
                                       proposal={proposal}
                                       issueId={issueId}
