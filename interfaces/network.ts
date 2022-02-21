@@ -1,31 +1,36 @@
 export interface Network {
   id: number
   name: string
-  creatorAddress: string
-  networkAddress: string
-  description: string
-  colors?: ThemeColors
-  network_id?: number
+  updatedAt: Date
+  createdAt: Date
   logoIcon?: string
   fullLogo?: string
-  createdAt: Date
-  updatedAt: Date
+  tokenName?: string
+  description: string
+  network_id?: number
+  colors?: ThemeColors
+  tokensStaked?: number
+  tokensLocked?: number
+  networkAddress: string
+  creatorAddress: string
+  openBountiesAmount?: number
+  openBountiesQuantity?: number
 }
 
 export interface ThemeColors {
   text: string
-  background: string
-  shadow: string
   gray: string
-  primary: string
-  secondary: string
-  oracle: string
-  success: string
   fail: string
+  shadow: string
+  oracle: string
+  primary: string
+  success: string
   warning: string
+  secondary: string
+  background: string
 }
 
 export interface Color {
-  label: string
   code: string
+  label: string
 }

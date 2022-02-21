@@ -8,7 +8,7 @@ import {IssueData, pullRequest} from '@interfaces/issue-data';
 import client from '@services/api'
 import { Network } from '@interfaces/network';
 import axios from 'axios';
-import { CURRENCY_BEPRO_API } from 'env';
+import { CURRENCY_BEPRO_API, PRODUCTION_CONTRACT, USE_PRODUCTION_CONTRACT_CONVERSION } from 'env';
 interface Paginated<T = any> {
   count: number;
   rows: T[]
@@ -386,10 +386,14 @@ export default function useApi() {
                  .catch(() => ({rows: [], count: 0, pages: 0, currentPage: 1}));
   }
 
-  async function getBeproCurrency() {
-    const { data } = await axios.get(CURRENCY_BEPRO_API)
+  async function getBeproCurrency(contractAddress = undefined) {
+    try {
+      const { data } = await axios.get(`${CURRENCY_BEPRO_API}/${USE_PRODUCTION_CONTRACT_CONVERSION === '1' ? PRODUCTION_CONTRACT : contractAddress}`)
 
-    return data.market_data.current_price
+      return data.market_data.current_price
+    } catch (error) {
+      return {usd: 1}
+    }
   }
 
   async function repositoryHasIssues(repoPath) {

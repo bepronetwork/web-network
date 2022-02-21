@@ -3,19 +3,21 @@ import { useContext, useEffect, useState } from 'react'
 
 import NothingFound from '@components/nothing-found'
 import InternalLink from '@components/internal-link'
+import NetworkListBar from '@components/network-list-bar'
 import CustomContainer from '@components/custom-container'
 import NetworkListItem from '@components/network-list-item'
 
 import { ApplicationContext } from '@contexts/application'
 import { changeLoadState } from '@contexts/reducers/change-load-state'
 
+import { orderByProperty } from '@helpers/array'
+
 import { Network } from '@interfaces/network'
 
 import useApi from '@x-hooks/use-api'
 import useNetwork from '@x-hooks/use-network'
-import NetworkListBar from './network-list-bar'
-import { BEPRO_NETWORK_NAME } from 'env'
 
+import { BEPRO_NETWORK_NAME } from 'env'
 interface NetworksListProps {
   name?: string
   networkAddress?: string
@@ -31,6 +33,7 @@ export default function NetworksList({
   ...props
 }: NetworksListProps) {
   const { t } = useTranslation(['common'])
+  const [order, setOrder] = useState(['name', 'asc'])
   const [networks, setNetworks] = useState<Network[]>([])
 
   const { searchNetworks } = useApi()
@@ -40,10 +43,30 @@ export default function NetworksList({
 
   const hasSpecificFilter = !!networkAddress || !!creatorAddress
 
+  function updateNetworkParameter(networkName, parameter, value) {
+    const tmpNetworks = [...networks]
+    const index = tmpNetworks.findIndex((el) => el.name === networkName)
+
+    tmpNetworks[index][parameter] = value
+
+    setNetworks(tmpNetworks)
+  }
+
+  function handleOrderChange(newOrder) {
+    setNetworks(orderByProperty(networks, newOrder[0], newOrder[1]))
+    setOrder(newOrder)
+  }
+
   useEffect(() => {
     dispatch(changeLoadState(true))
 
-    searchNetworks({ name, networkAddress, creatorAddress })
+    searchNetworks({
+      name,
+      networkAddress,
+      creatorAddress,
+      sortBy: 'name',
+      order: 'asc'
+    })
       .then(({ count, rows }) => {
         if (count > 0) setNetworks(rows)
       })
@@ -58,20 +81,38 @@ export default function NetworksList({
   return (
     <CustomContainer>
       {(!networks.length && (
-        <NothingFound description="You don't have a custom network created">
-          {network ? <InternalLink
-            href={getURLWithNetwork('/new-network', network.name === BEPRO_NETWORK_NAME ? {} : {network: BEPRO_NETWORK_NAME})}
-            label={String(t('actions.create-one'))}
-            uppercase
-            blank={network.name !== BEPRO_NETWORK_NAME}
-          /> : ''}
+        <NothingFound description="Not found">
+          {network ? (
+            <InternalLink
+              href={getURLWithNetwork(
+                '/new-network',
+                network.name === BEPRO_NETWORK_NAME
+                  ? {}
+                  : { network: BEPRO_NETWORK_NAME }
+              )}
+              label={String(t('actions.create-one'))}
+              uppercase
+              blank={network.name !== BEPRO_NETWORK_NAME}
+            />
+          ) : (
+            ''
+          )}
         </NothingFound>
       )) || (
         <>
-          <NetworkListBar hideOrder={hasSpecificFilter} />
+          <NetworkListBar
+            hideOrder={hasSpecificFilter}
+            order={order}
+            setOrder={handleOrderChange}
+          />
 
           {networks.map((network) => (
-            <NetworkListItem key={network.id} network={network} redirectToHome={redirectToHome} />
+            <NetworkListItem
+              key={network.id}
+              network={network}
+              redirectToHome={redirectToHome}
+              updateNetworkParameter={updateNetworkParameter}
+            />
           ))}
         </>
       )}

@@ -74,68 +74,52 @@ class BeproFacet {
     return n;
   }
 
-  async getClosedIssues(networkAddress = undefined) {
-    try {
-      if (networkAddress) {
-        const customNetwork = new Network(this.bepro, networkAddress)
+  async getNetworkObj(networkAddress = undefined) {
+    if (networkAddress) {
+      const customNetwork = new Network(this.bepro, networkAddress)
 
-        await customNetwork.loadContract()
+      await customNetwork.loadContract()
 
-        return customNetwork.getAmountOfIssuesClosed()
-      } else if (this.isStarted) return this.network.getAmountOfIssuesClosed()
-    } catch (error) {
-      console.log(error)
+      return customNetwork
     }
 
-    return 0
+    return this.network
+  }
+
+  async getClosedIssues(networkAddress = undefined) {
+    const network = await this.getNetworkObj(networkAddress)
+
+    return network.getAmountOfIssuesClosed()
+  }
+
+  async getSettlerTokenName(networkAddress = undefined) {
+    const network = await this.getNetworkObj(networkAddress)
+
+    return network.settlerToken.name()
+  }
+
+  async getTransactionalTokenName(networkAddress = undefined) {
+    const network = await this.getNetworkObj(networkAddress)
+
+    return network.transactionToken.name()
   }
 
   async getOpenIssues(networkAddress = undefined) {
-    try {
-      if (networkAddress) {
-        const customNetwork = new Network(this.bepro, networkAddress)
+    const network = await this.getNetworkObj(networkAddress)
 
-        await customNetwork.loadContract()
-
-        return customNetwork.getAmountOfIssuesOpened()
-      } else if (this.isStarted) return this.network.getAmountOfIssuesOpened()
-    } catch (error) {
-      console.log(error)
-    }
-
-    return 0
+    return network.getAmountOfIssuesOpened()
   }
 
   async getBeproLocked(networkAddress = undefined) {
-    try {
-      if (networkAddress) {
-        const customNetwork = new Network(this.bepro, networkAddress)
+    const network = await this.getNetworkObj(networkAddress)
 
-        await customNetwork.loadContract()
-
-        return customNetwork.getBEPROStaked()
-      } else if (this.isStarted) return this.network.getBEPROStaked()
-    } catch (error) {
-      console.log(error)
-    }
-
-    return 0
+    return network.getBEPROStaked()
   }
 
   async getTokensStaked(networkAddress = undefined) {
-    try {
-      if (networkAddress) {
-        const customNetwork = new Network(this.bepro, networkAddress)
+    const network = await this.getNetworkObj(networkAddress)
 
-        await customNetwork.loadContract()
-
-        return customNetwork.getTokensStaked()
-      } else if (this.isStarted) return this.network.getTokensStaked()
-    } catch (error) {
-      console.log(error)
-    }
-
-    return 0
+    return network.getTokensStaked()
   }
 
   async getRedeemTime() {
