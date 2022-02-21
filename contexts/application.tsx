@@ -246,7 +246,7 @@ export default function ApplicationContextProvider({children}) {
   },[state.myTransactions, state.currentAddress])
 
   return (
-    <ApplicationContext.Provider value={{ state, dispatch: dispatch as any }}>
+    <ApplicationContext.Provider value={{ state, dispatch: dispatch as any, methods: { updateWalletBalance } }}>
       <Loading show={state.loading.isLoading} text={state.loading.text} />
       <Toaster />
       {children}
