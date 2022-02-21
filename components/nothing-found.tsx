@@ -9,7 +9,7 @@ type NothingFoundProps = {
 
 export default function NothingFound({ description, children }: NothingFoundProps) {
   return (
-      <div className="d-flex flex-column align-items-center gap-4">
+      <div className="d-flex flex-column align-items-center gap-4 mt-2">
         <NotFoundIcon  height={52} width={56}/>
         <p className="caption-small text-center text-gray mb-0">{description}</p>
         { children }
