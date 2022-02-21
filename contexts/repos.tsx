@@ -13,17 +13,20 @@ import React, {
   useEffect
 } from 'react';
 
-
+interface IActiveRepo extends RepoInfo{
+  forks: ForkInfo[];
+  branchs: BranchInfo[];
+}
 export interface ReposContextData {
   repoList: ReposList;
   forksList: ForksList;
   branchsList: BranchsList;
-  activeRepo: RepoInfo;
+  activeRepo: IActiveRepo;
   loadRepos: () => Promise<ReposList>;
-  updateActiveRepo: (id: number)=> RepoInfo;
-  findForks: (repoId: string) => Promise<ForkInfo[]>;
-  findBranch: (repoId: string) => Promise<BranchInfo[]>;
-  findRepo: (id?:number, repoId?:number) => RepoInfo;
+  updateActiveRepo: (repoId: number)=> Promise<IActiveRepo>;
+  findForks: (repoId: number) => Promise<ForkInfo[]>;
+  findBranch: (repoId: number) => Promise<BranchInfo[]>;
+  findRepo: (repoId: number) => RepoInfo;
 }
 
 
@@ -34,16 +37,18 @@ export const ReposProvider: React.FC = function ({ children }) {
   const [repoList, setRepoList] = useState<ReposList>([]);
   const [branchsList, setBranchsList] = useState<BranchsList>({});
   const [forksList, setForksList] = useState<ForksList>({});
-  const [activeRepo, setActiveRepo] = useState<RepoInfo>(null);
+  const [activeRepo, setActiveRepo] = useState<IActiveRepo>(null);
 
   const {getReposList, getBranchsList} = useApi();
   const { getForksOf } = useOctokit();
   const {query} = useRouter();
   
-  const findForks = useCallback(async(repoId: string): Promise<ForkInfo[]>=>{
+  const findRepo = (repoId: number): RepoInfo =>  repoList?.find(({id}) => id === repoId)
+
+  const findForks = useCallback(async(repoId: number): Promise<ForkInfo[]>=>{
     if (forksList[repoId]) return forksList[repoId];
-    const repo = repoList.find(repo=> repo.id === +repoId);
-    debugger;
+    const repo = findRepo(repoId);
+    
     if(!repo) throw new Error(`Repo not found`);
 
     const {data} = await getForksOf(repo?.githubPath);
@@ -63,9 +68,9 @@ export const ReposProvider: React.FC = function ({ children }) {
 
     return forks;
 
-  },[repoList, forksList])
+  },[repoList, forksList, findRepo, repoList])
 
-  const findBranch = useCallback(async(repoId: string): Promise<BranchInfo[]>=>{
+  const findBranch = useCallback(async(repoId: number): Promise<BranchInfo[]>=>{
     if (branchsList[repoId]) return branchsList[repoId];
     const branchs = await getBranchsList(repoId);
     setBranchsList((prevState) => ({
@@ -79,36 +84,39 @@ export const ReposProvider: React.FC = function ({ children }) {
     const repos = (await getReposList()) as ReposList;
     setRepoList(repos);
     return repos;
-  },[])
+  },[]) 
 
-  const findRepo = (_id?: number, repoId?: number): RepoInfo =>  repoList?.find(({id}) => id === (_id || repoId))
-
-  const updateActiveRepo = useCallback((id: number): RepoInfo=>{
-    const find = findRepo(id)
+  const updateActiveRepo = useCallback(async(repoId: number): Promise<IActiveRepo>=>{
+    const find = findRepo(repoId)
     if(!find) throw new Error(`Repo not found`);
-    setActiveRepo(find)
-    return find;
-  },[])
+    const forks = forksList[find.id] || await findForks(find?.id);
+    const newActiveRepo = {
+      ...find,
+      forks,
+      branchs: branchsList[find.id]
+    }
+    
+    setActiveRepo(newActiveRepo)
+    return newActiveRepo;
+  },[branchsList, forksList, findForks, findRepo, repoList])
 
   useEffect(()=>{
     loadRepos()
     .then(repos =>
-      repos.map(repo => {
-        findBranch(`${repo?.id}`)
-        findForks(`${repo?.id}`)
-      })
+      repos.map(repo => findBranch(+repo?.id))
     )
   },[])
 
   useEffect(()=>{
-    if(activeRepo){
-      findBranch(`${activeRepo?.id}`)
-      findForks(`${activeRepo?.id}`)
+    if(repoList){
+      repoList.forEach(repo => findForks(+repo?.id))
     }
-  },[activeRepo])
+  },[repoList])
 
   useEffect(()=>{
-    if(query.repoId) setActiveRepo(findRepo(null, +query?.repoId))
+    if(query?.repoId && repoList){
+      updateActiveRepo(+query?.repoId)
+    }
   },[query])
 
   useEffect(()=>{
@@ -127,7 +135,17 @@ export const ReposProvider: React.FC = function ({ children }) {
       updateActiveRepo,
       findRepo
     }),
-    [repoList, branchsList, activeRepo, forksList]
+    [
+      repoList,
+      branchsList,
+      activeRepo,
+      forksList,
+      loadRepos,
+      findForks,
+      findBranch,
+      updateActiveRepo,
+      findRepo
+    ]
   );
 
   return (

@@ -11,7 +11,6 @@ import { ApplicationContext } from '@contexts/application';
 import { formatNumberToCurrency } from '@helpers/formatNumber';
 import IssueProposalProgressBar from '@components/issue-proposal-progress-bar';
 import useMergeData from '@x-hooks/use-merge-data';
-import useRepos from '@x-hooks/use-repos';
 import useOctokit from '@x-hooks/use-octokit';
 import useApi from '@x-hooks/use-api';
 import TabbedNavigation from '@components/tabbed-navigation';
@@ -22,12 +21,14 @@ import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import Translation from '@components/translation';
 import { useTranslation } from 'next-i18next';
 import { IssueProvider, useIssue } from '@contexts/issue';
+import {  useRepos } from '@contexts/repos';
 
 function PageIssue() {
   const router = useRouter();
   const { id, repoId } = router.query;
   const { state: { currentAddress, githubLogin }} = useContext(ApplicationContext);
   const {activeIssue: issue, networkIssue} = useIssue()
+  const {activeRepo} = useRepos()
   
   const [isIssueinDraft, setIsIssueinDraft] = useState(false);
   const [commentsIssue, setCommentsIssue] = useState();
@@ -39,7 +40,6 @@ function PageIssue() {
   const [currentUser, setCurrentUser] = useState<User>();
   const {getMergedDataFromPullRequests} = useMergeData();
   const { getForksOf, getUserRepos} = useOctokit();
-  const [[activeRepo]] = useRepos();
   const {getUserOf, userHasPR} = useApi();
   const { t } = useTranslation('bounty')
   
@@ -89,12 +89,6 @@ function PageIssue() {
     if (!activeRepo || !githubLogin)
       return;
 
-    if (!forks)
-      getForksOf(activeRepo.githubPath).then((frk) =>{
-        debugger;
-          setForks(frk.data as any)
-      });
-      
     getUserRepos(githubLogin, activeRepo.githubPath.split(`/`)[1])
       .then((repo) => {
         setIsRepoForked(repo.data?.fork)
@@ -134,9 +128,11 @@ function PageIssue() {
   function syncLocalyState(){
     if(issue?.comments)
       setCommentsIssue([...issue?.comments] as any)
+    if(activeRepo?.forks)
+      setForks(activeRepo.forks as any)
   }
 
-  useEffect(syncLocalyState,[issue])
+  useEffect(syncLocalyState,[issue, activeRepo])
   useEffect(loadIssueData, [githubLogin, currentAddress, id, activeRepo]);
   useEffect(checkIsWorking, [issue, githubLogin])
   useEffect(loadMergedPullRequests, [issue, currentAddress])
