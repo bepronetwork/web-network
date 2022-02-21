@@ -57,7 +57,7 @@ export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
       session: await getSession(),
-      ...(await serverSideTranslations(locale, ['common', 'connect-wallet-button', 'my-oracles', 'bounty', 'pull-request'])),
+      ...(await serverSideTranslations(locale, ['common', 'connect-wallet-button', 'my-oracles', 'bounty', 'pull-request', 'custom-network'])),
     },
   };
 };

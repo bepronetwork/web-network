@@ -30,3 +30,4 @@ export const BEPRO_NETWORK_NAME = process.env.NEXT_PUBLIC_BEPRO_NETWORK_NAME || 
 export const CURRENCY_BEPRO_API = process.env.NEXT_PUBLIC_CURRENCY_API || 'https://api.coingecko.com/api/v3/coins/ethereum/contract'
 export const PRODUCTION_CONTRACT = process.env.NEXT_PUBLIC_PRODUCTION_CONTRACT
 export const USE_PRODUCTION_CONTRACT_CONVERSION = process.env.NEXT_PUBLIC_USE_PRODUCTION_CONTRACT
+export const BEPRO_GITHUB_USER = process.env.NEXT_PUBLIC_BEPRO_GITHUB_USER

@@ -16,7 +16,7 @@ export default function Account({ children }): JSX.Element {
   const {
     state: { githubHandle, currentAddress }
   } = useContext(ApplicationContext)
-  const { t } = useTranslation(['common', 'bounty', 'pull-request'])
+  const { t } = useTranslation(['common', 'bounty', 'pull-request', 'custom-network'])
   const { getURLWithNetwork } = useNetwork()
 
   return (
@@ -57,7 +57,7 @@ export default function Account({ children }): JSX.Element {
 
             <InternalLink
               href={getURLWithNetwork('/account/my-network')}
-              label="Custom Network"
+              label={String(t('custom-network:title'))}
               className={clsx('h4 p-0')}
               activeClass="account-link-active"
               nav

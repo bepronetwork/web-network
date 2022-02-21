@@ -1,8 +1,10 @@
 import ArrowDown from '@assets/icons/arrow-down'
+import { useTranslation } from 'next-i18next'
 import NetworkListBarColumn from './network-list-bar-column'
 
 export default function NetworkListBar({ hideOrder = false, order, setOrder }) {
-  const textClass = hideOrder ? 'text-primary' : ''
+  const { t } = useTranslation('custom-network')
+
   const invertOrder = order[1] === 'asc' ? 'desc' : 'asc'
 
   function handleSetOrder(column) {
@@ -14,7 +16,7 @@ export default function NetworkListBar({ hideOrder = false, order, setOrder }) {
   return (
     <div className="row py-0 mx-0 mb-2 svg-with-text-color">
       <NetworkListBarColumn
-        label="Network Name"
+        label={t('steps.network-information.fields.name.default')}
         hideOrder={hideOrder}
         columnOrder={order[1]}
         isColumnActive={order[0] === 'name'}
@@ -24,14 +26,14 @@ export default function NetworkListBar({ hideOrder = false, order, setOrder }) {
       <NetworkListBarColumn
         hideOrder={hideOrder}
         columnOrder={order[1]}
-        label="Number of bounties"
+        label={t('network-list-bar.number-of-bounties')}
         isColumnActive={order[0] === 'openBountiesQuantity'}
         onClick={() => handleSetOrder('openBountiesQuantity')}
       />
 
       <NetworkListBarColumn
         hideOrder={hideOrder}
-        label="$TOKEN Locked"
+        label={t('network-list-bar.token-locked')}
         columnOrder={order[1]}
         isColumnActive={order[0] === 'tokensLocked'}
         onClick={() => handleSetOrder('tokensLocked')}
@@ -39,7 +41,7 @@ export default function NetworkListBar({ hideOrder = false, order, setOrder }) {
 
       <NetworkListBarColumn
         hideOrder={hideOrder}
-        label="Open bounties"
+        label={t('network-list-bar.open-bounties')}
         columnOrder={order[1]}
         isColumnActive={order[0] === 'openBountiesAmount'}
         onClick={() => handleSetOrder('openBountiesAmount')}

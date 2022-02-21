@@ -32,7 +32,7 @@ export default function NetworksList({
   redirectToHome = false,
   ...props
 }: NetworksListProps) {
-  const { t } = useTranslation(['common'])
+  const { t } = useTranslation(['common', 'custom-network'])
   const [order, setOrder] = useState(['name', 'asc'])
   const [networks, setNetworks] = useState<Network[]>([])
 
@@ -81,7 +81,7 @@ export default function NetworksList({
   return (
     <CustomContainer>
       {(!networks.length && (
-        <NothingFound description="Not found">
+        <NothingFound description={t('custom-network:errors.not-found')}>
           {network ? (
             <InternalLink
               href={getURLWithNetwork(

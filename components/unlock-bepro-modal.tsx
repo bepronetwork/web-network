@@ -66,7 +66,7 @@ export default function UnlockBeproModal({
     <Modal
       titleComponent={
         <>
-          Unlock <span className="text-primary">$BEPRO</span>
+          {t('transactions.types.unlock')} <span className="text-primary">{t('$bepro')}</span>
         </>
       }
       show={show}
@@ -76,7 +76,7 @@ export default function UnlockBeproModal({
       <div className="container">
         <div className="mb-3">
           <p className="caption-medium text-gray mb-2">
-            <span className="text-purple">Oracles</span> amount
+            <span className="text-purple">{t('$oracles')}</span> {t('transactions.amount')}
           </p>
 
           <div className="row mx-0 bg-dark-gray border-radius-8 amount-input">
@@ -96,7 +96,7 @@ export default function UnlockBeproModal({
 
             <div className="d-flex caption-small justify-content-between align-items-center p-20">
               <span className="text-ligth-gray">
-                <span className="text-purple">Oracles</span> available
+                <span className="text-purple">{t('$oracles')}</span> {t('misc.available')}
               </span>
 
               <div className="d-flex align-items-center">
@@ -128,7 +128,7 @@ export default function UnlockBeproModal({
 
         <div className="d-flex mb-2 caption-small bg-dark-gray justify-content-between border-radius-8 align-items-center p-20 amount-input">
           <span className="text-ligth-gray">
-            <span className="text-primary">$BEPRO</span> available
+            <span className="text-primary">{t('$bepro')}</span> {t('misc.available')}
           </span>
 
           <div className="d-flex align-items-center">
@@ -166,13 +166,13 @@ export default function UnlockBeproModal({
               <LockedIcon className="me-2" />
             )}
             <span>
-              Unlock{' '}
+              {t('transactions.types.unlock')}{' '}
               {!isButtonDisabled() &&
                 amountToUnlock > 0 &&
                 formatNumberToCurrency(amountToUnlock, {
                   maximumFractionDigits: 2
                 })}{' '}
-              $BEPRO
+              {t('$bepro')}
             </span>
             {isUnlocking ? (
               <span className="spinner-border spinner-border-xs ml-1" />
@@ -186,7 +186,7 @@ export default function UnlockBeproModal({
       <NetworkTxButton
         txMethod="unlock"
         txType={TransactionTypes.unlock}
-        txCurrency="Oracles"
+        txCurrency={t('$oracles')}
         txParams={{
           tokenAmount: amountToUnlock,
           from: currentAddress

@@ -1352,6 +1352,13 @@ input[type="color"] {
         }
       }
     }
+    &-gray-hover:hover {
+      svg {
+        path {
+          fill: $gray;
+        }
+      }
+    }
   }
 }
 

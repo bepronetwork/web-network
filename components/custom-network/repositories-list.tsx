@@ -2,8 +2,11 @@ import { useEffect, useState } from 'react'
 
 import GithubInfo from '@components/github-info'
 import useApi from '@x-hooks/use-api'
+import { useTranslation } from 'next-i18next'
 
 export default function RepositoriesList({ repositories, onClick }) {
+  const { t } = useTranslation('custom-network')
+
   const [existingRepos, setExistingRepos] = useState([])
   const [reposWithIssues, setReposWithIssues] = useState([])
 
@@ -49,7 +52,7 @@ export default function RepositoriesList({ repositories, onClick }) {
 
   return (
     <div className="row mx-0 mb-4 justify-content-start repositories-list">
-      <span className="caption-small text-gray px-0">Repositories</span>
+      <span className="caption-small text-gray px-0">{t('steps.repositories.label')}</span>
 
       {repositories.map((repository) => (
         <GithubInfo
@@ -68,8 +71,7 @@ export default function RepositoriesList({ repositories, onClick }) {
 
       {existingRepos.length ? (
         <span className="p-small text-danger px-0">
-          The highlighted repositories are already being used by another
-          network.
+          {t('steps.repositories.used-by-other=network')}
         </span>
       ) : (
         ''
@@ -77,7 +79,7 @@ export default function RepositoriesList({ repositories, onClick }) {
 
       {reposWithIssues.length ? (
         <span className="p-small text-info px-0">
-          The highlighted repositories already have bounties and can't be removed.
+          {t('steps.repositories.has-bounties')}
         </span>
       ) : (
         ''

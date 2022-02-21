@@ -40,12 +40,15 @@ import {
   DISPUTABLE_TIME_MIN,
   DISPUTE_PERCENTAGE_MAX
 } from 'env'
+import { useTranslation } from 'next-i18next'
 interface NetworkAmounts {
   tokenStaked: number
   oraclesStaked: number
 }
 
 export default function Settings() {
+  const { t } = useTranslation(['common', 'custom-network'])
+
   const [newInfo, setNewInfo] = useState({
     ...DefaultNetworkInformation,
     redeemTime: 0,
@@ -281,8 +284,8 @@ export default function Settings() {
         dispatch(
           addToast({
             type: 'success',
-            title: 'Success',
-            content: `Refresh the page for the changes to take effect.`
+            title: t('actions.success'),
+            content: t('custom-network:messages.refresh-the-page')
           })
         )
 
@@ -295,8 +298,8 @@ export default function Settings() {
         dispatch(
           addToast({
             type: 'danger',
-            title: 'Fail',
-            content: `Fail to create network ${error}`
+            title: t('actions.failed'),
+            content: t('custom-network:errors.failed-to-update-network', {error})
           })
         )
 
@@ -402,7 +405,7 @@ export default function Settings() {
                   onChange={handleNetworkDataChange}
                   description={
                     <>
-                      upload <br /> logo icon
+                      {t('misc.upload')} <br /> {t('custom-network:steps.network-information.fields.logo-icon.label')}
                     </>
                   }
                 />
@@ -420,23 +423,23 @@ export default function Settings() {
                     )
                   }
                   onChange={handleNetworkDataChange}
-                  description="upload full logo"
+                  description={`${t('misc.upload')} ${t('custom-network:steps.network-information.fields.full-logo.label')}`}
                   lg
                 />
               </div>
 
               <div className="d-flex flex-column justify-content-center">
                 <p className="h3 text-white mb-3 text-capitalize">
-                  {showTextOrDefault(network?.name, 'Network name')}
+                  {showTextOrDefault(network?.name, t('custom-network:steps.network-information.fields.name.default'))}
                 </p>
 
-                <p className="caption-small text-ligth-gray mb-1">query url</p>
+                <p className="caption-small text-ligth-gray mb-1">{t('custom-network:query-url')}</p>
                 <p className="caption-small text-gray mb-3">
                   development.bepro.network/
                   <span className="text-primary">
                     {showTextOrDefault(
                       getQueryableText(network?.name || ''),
-                      'network-name'
+                      t('custom-network:steps.network-information.fields.name.default')
                     )}
                   </span>
                 </p>
@@ -444,7 +447,7 @@ export default function Settings() {
                 <div className="d-flex flex-row">
                   <div className="d-flex flex-column mr-3">
                     <span className="text-ligth-gray mb-1 caption-small">
-                      creation date
+                      {t('misc.creation-date')}
                     </span>
                     <span className="text-gray caption-small">
                       {network?.createdAt
@@ -454,7 +457,7 @@ export default function Settings() {
                   </div>
 
                   <Button color="dark-gray" disabled outline className="ml-2">
-                    Close Network
+                    {t('custom-network:close-network')}
                   </Button>
                 </div>
               </div>
@@ -463,8 +466,8 @@ export default function Settings() {
             <div className="row mt-4">
               <div className="col-4">
                 <AmountCard
-                  title="$TOKEN staked"
-                  description="The amount of tokens locked into bounties to be paid"
+                  title={t('custom-network:tokens-staked')}
+                  description={t('custom-network:tokens-staked-description')}
                   currency="token"
                   amount={networkAmounts.tokenStaked}
                 />
@@ -472,8 +475,8 @@ export default function Settings() {
 
               <div className="col-4">
                 <AmountCard
-                  title="oracles staked"
-                  description="The amount of tokens locked by users to curate the network"
+                  title={t('custom-network:oracles-staked')}
+                  description={t('custom-network:oracles-staked-description')}
                   currency="oracles"
                   amount={networkAmounts.oraclesStaked}
                 />
@@ -481,8 +484,8 @@ export default function Settings() {
 
               <div className="col-4">
                 <AmountCard
-                  title="TVL"
-                  description="Total locked value"
+                  title={t('custom-network:tvl')}
+                  description={t('custom-network:tvl-description')}
                   amount={
                     networkAmounts.tokenStaked + networkAmounts.oraclesStaked
                   }
@@ -492,19 +495,19 @@ export default function Settings() {
 
             <div className="row mx-0 mt-4 p-20 border-radius-8 bg-shadow">
               <span className="caption-medium text-white mb-4">
-                Network Settings
+                {t('custom-network:network-settings')}
               </span>
 
               <div className="row mx-0 px-0 mb-3">
                 <div className="col">
                   <label htmlFor="description" className="caption-small mb-2">
-                    network description
+                  {t('custom-network:steps.network-information.fields.description.label')}
                   </label>
 
                   <textarea
                     name="description"
                     id="description"
-                    placeholder="Type a description..."
+                    placeholder={t('custom-network:steps.network-information.fields.description.placeholder')}
                     cols={30}
                     rows={5}
                     className={`form-control ${
@@ -536,13 +539,13 @@ export default function Settings() {
                 <div className="col-3">
                   <InputNumber
                     classSymbol={`text-ligth-gray`}
-                    label="Dispute time"
-                    symbol="seconds"
+                    label={t('custom-network:dispute-time')}
+                    symbol={t('misc.seconds')}
                     max={DISPUTABLE_TIME_MAX}
-                    description={`The time that proposals can be disputed. Min. ${DISPUTABLE_TIME_MIN} and Max. ${formatNumberToCurrency(
+                    description={t('custom-network:errors.dispute-time', {min: DISPUTABLE_TIME_MIN, max: formatNumberToCurrency(
                       DISPUTABLE_TIME_MAX,
                       0
-                    )} seconds.`}
+                    )})}
                     value={newInfo.disputeTime}
                     error={!isValidDisputeTime}
                     min={0}
@@ -559,9 +562,9 @@ export default function Settings() {
                 <div className="col-3">
                   <InputNumber
                     classSymbol={`text-ligth-gray`}
-                    label="Percentage for dispute"
+                    label={t('custom-network:percentage-for-dispute')}
                     max={DISPUTE_PERCENTAGE_MAX}
-                    description={`Percentage needed for a proposal to be disputed by the community. Max. ${DISPUTE_PERCENTAGE_MAX}%.`}
+                    description={t('custom-network:errors.percentage-for-dispute', {max: DISPUTE_PERCENTAGE_MAX})}
                     symbol="%"
                     value={newInfo.percentageForDispute}
                     error={!isValidPercentageForDispute}
@@ -578,12 +581,9 @@ export default function Settings() {
                 <div className="col-3">
                   <InputNumber
                     classSymbol={`text-ligth-gray`}
-                    label="Redeem time"
+                    label={t('custom-network:redeem-time')}
                     max={REDEEM_TIME_MAX}
-                    description={`The time after a bounty creation that it can be cancelled. Min. ${REDEEM_TIME_MIN} and Max. ${formatNumberToCurrency(
-                      REDEEM_TIME_MAX,
-                      0
-                    )} seconds.`}
+                    description={t('custom-network:errors.redeem-time', {min: REDEEM_TIME_MIN, max: REDEEM_TIME_MAX})}
                     symbol="seconds"
                     value={newInfo.redeemTime}
                     error={!isValidRedeemTime}
@@ -601,16 +601,16 @@ export default function Settings() {
                 <div className="col-3">
                   <InputNumber
                     classSymbol={`text-primary`}
-                    label="council amount"
-                    symbol="$BEPRO"
+                    label={t('custom-network:council-amount')}
+                    symbol={t('$bepro')}
                     max={COUNCIL_AMOUNT_MAX}
-                    description={`The amount of $BEPRO locked needed to be a council member. Min. ${formatNumberToCurrency(
-                      COUNCIL_AMOUNT_MIN,
-                      0
-                    )} and Max. ${formatNumberToCurrency(
+                    description={t('custom-network:errors.council-amount', {min: formatNumberToCurrency(
                       COUNCIL_AMOUNT_MAX,
                       0
-                    )}.`}
+                    ), max: formatNumberToCurrency(
+                      COUNCIL_AMOUNT_MAX,
+                      0
+                    )})}
                     value={newInfo.councilAmount}
                     error={!isValidCouncilAmount}
                     min={0}
@@ -629,7 +629,7 @@ export default function Settings() {
             {(newInfo.validated && (
               <div className="d-flex flex-row justify-content-center mt-3 mb-2">
                 <Button onClick={handleSubmit} disabled={updatingNetwork}>
-                  <span>Save Settings</span>
+                  <span>{t('custom-network:save-settings')}</span>
                   {updatingNetwork ? (
                     <span className="spinner-border spinner-border-xs ml-1" />
                   ) : (
@@ -655,7 +655,8 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         'connect-wallet-button',
         'my-oracles',
         'bounty',
-        'pull-request'
+        'pull-request',
+        'custom-network'
       ]))
     }
   }

@@ -11,6 +11,8 @@ import { Network, ThemeColors } from '@interfaces/network'
 
 import useApi from '@x-hooks/use-api'
 
+import { BEPRO_NETWORK_NAME } from 'env'
+
 export default function useNetwork() {
   const router = useRouter()
   const [network, setNetwork] = useState<Network>()
@@ -19,11 +21,11 @@ export default function useNetwork() {
   const { dispatch } = useContext(ApplicationContext)
 
   useEffect(() => {
-    if (router.query.network) handleNetworkChange()
+    handleNetworkChange()
   }, [router.query.network])
 
   function handleNetworkChange() {
-    const newNetwork = String(router.query.network)
+    const newNetwork = String(router.query.network || BEPRO_NETWORK_NAME) 
 
     const networkFromStorage = localStorage.getItem(newNetwork)
 
