@@ -329,16 +329,6 @@ export default function useApi() {
       })
   }
 
-  async function createReviewForPR(issueId: string, pullRequestId: string,  githubLogin: string, body:string) {
-    return client.put('/pull-request/review', {issueId, pullRequestId, githubLogin, body})
-      .then(response => response)
-  }
-
-  async function removeUser(address: string, githubLogin: string) {
-    return client.delete(`/user/${address}/${githubLogin}`)
-                 .then(({status}) => status === 200)
-  }
-
   async function uploadFiles(files: File | File[]): Promise<any[]> {
     const form = new FormData();
     const isArray = Array.isArray(files);
