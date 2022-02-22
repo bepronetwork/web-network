@@ -7,23 +7,28 @@ const port = process.env.NEXT_IPFS_PORT|| '5001'
 const auth = 'Basic ' + Buffer.from(process.env.NEXT_IPFS_PROJECT_ID + ':' + process.env.NEXT_IPFS_PROJECT_SECRET).toString('base64')
 const baseURL = `https://${host}:${port}/api/v0`
 
-export async function add(file: Buffer, pin=false, originalFilename?: string): Promise<{hash:string, fileName:string, size: string}>{
+export async function add(file: Buffer | string, pin=false, originalFilename?: string, ext?: string): Promise<{hash:string, fileName:string, size: string}>{
   const form = new FormData();
 
-  const isBuffer = Buffer.isBuffer(file);
-
-  if(!isBuffer){
-    throw new Error('Unidentified file type')
-  }
+  const isBuffer = Buffer.isBuffer(file)
   
-  const content = Buffer.from(file);
-  const fileType = await fileTypeFromBuffer(file);
-  const options = {
-    filename: originalFilename ? `${originalFilename}` :`${uuidv4()}.${fileType.ext || 'png'}`,
-    contentType: fileType?.mime || 'image/jpeg',
+  const content = isBuffer ? Buffer.from(file) : file
+
+  if (isBuffer) {
+    const fileType = await fileTypeFromBuffer(file)
+
+    const options = {
+      filename: originalFilename ? `${originalFilename}` :`${uuidv4()}.${fileType.ext || 'png'}`,
+      contentType: fileType?.mime || 'image/jpeg',
+    }
+
+    console.log({isBuffer, fileType, options})
+
+    form.append(`file`, content, options)
+  } else {
+    form.append('file', content, `${uuidv4()}.${ext}`)
   }
-  console.log({isBuffer, fileType, options})
-  form.append(`file`, content, options);
+
 
   const headers = {
     'Content-Type': `multipart/form-data; boundary=${form.getBoundary()}`,
