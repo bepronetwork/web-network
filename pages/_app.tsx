@@ -19,6 +19,7 @@ import useRepos from "@x-hooks/use-repos";
 import useNetwork from "@x-hooks/use-network";
 
 import "../styles/styles.scss";
+import NetworkThemeInjector from "@components/custom-network/network-theme-injector";
 
 function App({ Component, pageProps: { session, currentIssue,...pageProps } }: AppProps) {
   const [[, repos]] = useRepos();
@@ -38,6 +39,7 @@ function App({ Component, pageProps: { session, currentIssue,...pageProps } }: A
       <Seo issueMeta={currentIssue} />
       <SessionProvider session={session}>
         <ApplicationContextProvider>
+            <NetworkThemeInjector />
             <NationDialog>
               <MainNav />
               <WebThreeDialog />
