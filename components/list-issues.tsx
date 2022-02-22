@@ -114,7 +114,7 @@ export default function ListIssues({
   }
 
   function hasFilter(): boolean {
-    if (state || time || repoId) return true
+    if (state || time || repoId || search) return true
 
     return false
   }
