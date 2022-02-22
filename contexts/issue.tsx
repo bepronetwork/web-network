@@ -95,7 +95,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     if(!currentAddress) return;
     const issueCID = [activeIssue.repository_id, activeIssue.id].join(`/`);
     const network = await BeproService.network.getIssueByCID({ issueCID })
-    debugger;
+    
     let isDraft = null;
     try {
       isDraft = await BeproService.network.isIssueInDraft({ issueId: network?._id })  
