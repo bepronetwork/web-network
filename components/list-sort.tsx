@@ -29,7 +29,7 @@ export default function ListSort({
       page: '1'
     }
 
-    router.push({ pathname: `${router.pathname}`, query }, router.pathname)
+    router.push({ pathname: `${router.pathname}`, query }, router.asPath)
   }
 
   function getDefaultValue(): Option {
