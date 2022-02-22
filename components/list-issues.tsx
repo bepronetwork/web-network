@@ -265,7 +265,7 @@ export default function ListIssues({
       </div> : ''}
 
       {(truncatedData && (
-        <div className="row justify-content-center mb-3">
+        <div className="row justify-content-center mb-3 pt-5">
           <div className="d-flex col-6 align-items-center justify-content-center">
             <span className="caption-small mr-1">results truncated</span>
             <Button onClick={goToFirstPage}>back to top</Button>
