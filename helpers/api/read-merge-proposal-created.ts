@@ -4,7 +4,7 @@ import twitterTweet from './handle-twitter-tweet';
 export default async function readMergeProposalCreated(events, {network, models, res, githubId}) {
   for (const event of events) {
     const {id: scIssueId, mergeID: scMergeId, creator} = event.returnValues;
-    const issueId = await network.getIssueById({issueId: scIssueId}).then(({cid}) => cid);
+    const issueId = await network.getIssueById(scIssueId).then(({cid}) => cid);
 
     const issue = await models.issue.findOne({where: {issueId,}});
     if (!issue)
