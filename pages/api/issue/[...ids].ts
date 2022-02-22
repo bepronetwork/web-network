@@ -2,7 +2,6 @@ import {Op} from 'sequelize';
 import models from '@db/models';
 import {NextApiRequest, NextApiResponse} from 'next';
 
-import models from '@db/models';
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {ids: [repoId, ghId, networkName]} = req.query;
@@ -32,10 +31,10 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     },
     include
   })
-  
+
   if (!issue)
     return res.status(404).json('Issue not found');
-  
+
   return res.status(200).json(issue);
 }
 
