@@ -144,7 +144,7 @@ export default function PageIssue() {
       return;
 
     getUserOf(currentAddress)
-      .then((user: User) => setCurrentUser(user));
+      .then((user: User) => setCurrentUser(user)).catch(console.log)
   };
 
   function getRepoForked() {
