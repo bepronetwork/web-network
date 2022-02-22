@@ -113,19 +113,19 @@ export default function twitterTweet({
     if (Tweet.length < 280 && title && body) {
       twitterClient.v2
         .tweet(Tweet)
-        .then(() => {
-          console.log("Tweet created successfully");
+        .then((value) => {
+          console.log("Tweet created successfully - tweet ID:", value.data.id);
         })
         .catch((err) => {
           console.log("Error creating Tweet ->", err);
         });
     } else {
       console.log(
-        "This tweet cannot be created. Because it contains more than 280 characters"
+        "This Tweet cannot be created. Because it contains more than 280 characters"
       );
     }
   } else {
-    console.log(".env from twitter configuration is missing");
+    console.log(".env from Twitter configuration is missing");
     return;
   }
 }
