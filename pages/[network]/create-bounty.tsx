@@ -111,14 +111,10 @@ export default function PageCreateIssue() {
     setRedirecting(true)
     apiCreateIssue(payload, network?.name)
                       .then(cid => {
-                        console.log({cid})
-
                         if (!cid)
                           throw new Error(t('errors.creating-issue'));
 
                         dispatch(openIssueTx);
-
-                        console.log(payload)
 
                         return BeproService.network.openIssue([repository_id, cid].join(`/`), payload.amount)
                                            .then(txInfo => {

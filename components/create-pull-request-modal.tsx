@@ -50,7 +50,7 @@ export default function CreatePullRequestModal({
       return;
 
     function mapBranches({data: branches}) { return branches.map(({name}) => ({value: name, label: name, isSelected: branch && branch === name}))}
-    octo.listBranches(repo).then(mapBranches).then(setOptions)
+    octo.listBranches(repo).then(mapBranches).then(setOptions).catch(console.log)
 
   }, [accessToken, repo]);
 
