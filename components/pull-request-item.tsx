@@ -112,7 +112,7 @@ export default function PullRequestItem({
                 <span>
                   {pullRequest?.comments?.length || 0}
                 </span>
-                
+
                 <span className="text-gray ml-1">
                   <Translation
                     ns="pull-request"
