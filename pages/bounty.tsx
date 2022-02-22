@@ -27,7 +27,7 @@ export default function PageIssue() {
   const router = useRouter();
   const { id, repoId } = router.query;
   const { state: { currentAddress, githubLogin }} = useContext(ApplicationContext);
-  const {activeIssue: issue, networkIssue} = useIssue()
+  const {activeIssue: issue, networkIssue, updateIssue, getNetworkIssue} = useIssue()
   const {activeRepo} = useRepos()
   
   const [commentsIssue, setCommentsIssue] = useState();
@@ -37,7 +37,7 @@ export default function PageIssue() {
   const [mergedPullRequests, setMergedPullRequests] = useState([]);
   const [currentUser, setCurrentUser] = useState<User>();
   const {getMergedDataFromPullRequests} = useMergeData();
-  const { getForksOf, getUserRepos} = useOctokit();
+  const {getUserRepos} = useOctokit();
   const {getUserOf, userHasPR} = useApi();
   const { t } = useTranslation('bounty')
   
@@ -128,8 +128,13 @@ export default function PageIssue() {
       setCommentsIssue([...issue?.comments] as any)
   }
 
+  function refreshIssue(){
+    updateIssue(`${issue.repository_id}`, issue.githubId)
+    .catch((e)=>router.push('/404'))
+  }
+
   useEffect(syncLocalyState,[issue, activeRepo])
-  useEffect(loadIssueData, [githubLogin, currentAddress, id, activeRepo]);
+  useEffect(loadIssueData, [githubLogin, currentAddress, id, issue, activeRepo]);
   useEffect(checkIsWorking, [issue, githubLogin])
   useEffect(loadMergedPullRequests, [issue, currentAddress])
   
@@ -143,17 +148,13 @@ export default function PageIssue() {
         state={issue?.state}
         developers={issue?.developers}
         finalized={networkIssue?.finalized}
-        isIssueinDraft={issue?.state === `draft` || networkIssue?.isDraft}        
-        networkCID={networkIssue?.cid}
+        isIssueinDraft={networkIssue?.isDraft}
+        networkCID={networkIssue?.cid || issue?.issueId}
         issueId={issue?.issueId}
         title={issue?.title}
         description={issue?.body}
-        handleBeproService={()=>{
-          // getsIssueBeproService
-        }}
-        handleMicroService={()=>{
-          // getsIssueMicroService
-        }}
+        handleBeproService={getNetworkIssue}
+        handleMicroService={refreshIssue}
         pullRequests={issue?.pullRequests || []}
         mergeProposals={issue?.mergeProposals}
         amountIssue={networkIssue?.tokensStaked}
@@ -182,7 +183,7 @@ export default function PageIssue() {
               <div className="sticky-bounty">
                 <IssueProposalProgressBar
                   isFinalized={networkIssue?.finalized}
-                  isIssueinDraft={issue?.state === `draft` || networkIssue?.isDraft}
+                  isIssueinDraft={networkIssue?.isDraft}
                   mergeProposalsAmount={networkIssue?.mergeProposalsAmount}
                   isFinished={networkIssue?.recognizedAsFinished}
                   isCanceled={

@@ -35,7 +35,8 @@ export interface INetworkIssue{
 export interface IssueContextData {
   activeIssue: IActiveIssue;
   networkIssue: INetworkIssue;
-  updateIssue: (repoId: string, ghId: string)=> Promise<IActiveIssue>
+  updateIssue: (repoId: string, ghId: string)=> Promise<IActiveIssue>;
+  getNetworkIssue: ()=> void;
 }
 
 
@@ -65,8 +66,7 @@ export const IssueProvider: React.FC = function ({ children }) {
   },[])
 
   async function updateIssue(repoId: string, ghId: string): Promise<IActiveIssue> {
-    setActiveIssue(null)
-    
+
     const issue = await getIssue(repoId, ghId);
     
     if(!issue) throw new Error(`Issue not found`);
@@ -92,10 +92,8 @@ export const IssueProvider: React.FC = function ({ children }) {
   }
 
   const getNetworkIssue = useCallback(async () => {
-    if(!currentAddress) return;
-    const issueCID = [activeIssue.repository_id, activeIssue.id].join(`/`);
-    const network = await BeproService.network.getIssueByCID({ issueCID })
-    
+    if(!currentAddress || activeIssue?.issueId) return;
+    const network = await BeproService.network.getIssueByCID({ issueCID: activeIssue?.issueId })
     let isDraft = null;
     try {
       isDraft = await BeproService.network.isIssueInDraft({ issueId: network?._id })  
@@ -114,7 +112,10 @@ export const IssueProvider: React.FC = function ({ children }) {
   },[activeIssue, currentAddress])
 
   useEffect(()=>{
-    if(query.id && query.repoId) updateIssue(`${query.repoId}`,`${query.id}`);
+    if(query.id && query.repoId) {
+      setActiveIssue(null);
+      updateIssue(`${query.repoId}`,`${query.id}`)
+    };
   },[query])
 
   useEffect(()=>{
@@ -125,9 +126,10 @@ export const IssueProvider: React.FC = function ({ children }) {
     () => ({
       activeIssue,
       networkIssue,
-      updateIssue
+      updateIssue,
+      getNetworkIssue
     }),
-    [activeIssue, networkIssue, updateIssue]
+    [activeIssue, networkIssue, updateIssue, getNetworkIssue]
   );
 
   return (
