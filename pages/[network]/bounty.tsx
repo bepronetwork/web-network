@@ -55,7 +55,7 @@ export default function PageIssue() {
   const tabs = [
     {
       eventKey: 'proposals',
-      title: <Translation ns="proposal" label={'labelWithCount'} params={{count: networkIssue?.mergeProposalsAmount || 0}} />,
+      title: <Translation ns="proposal" label={'labelWithCount'} params={{count: +networkIssue?.mergeProposalAmount || 0}} />,
       isEmpty: !(networkIssue?.mergeProposalsAmount > 0),
       component: <IssueProposals
         key="tab-proposals"
@@ -115,11 +115,11 @@ export default function PageIssue() {
           getIssueComments(+issue.githubId, activeRepo.githubPath)
             .then((comments) => {
               setCommentsIssue(comments.data as any)
-            });
+            }).catch(console.log)
       })
 
     if (!forks)
-      getForksOf(activeRepo.githubPath).then((frk) => setForks(frk.data as any));
+      getForksOf(activeRepo.githubPath).then((frk) => setForks(frk.data as any)).catch(console.log)
   }
 
   function getsIssueBeproService(force = false) {
