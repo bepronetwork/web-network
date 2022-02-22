@@ -108,16 +108,16 @@ export const ReposProvider: React.FC = function ({ children }) {
   },[])
 
   useEffect(()=>{
-    if(repoList){
+    if(repoList.length > 0){
       repoList.forEach(repo => findForks(+repo?.id))
     }
   },[repoList])
 
   useEffect(()=>{
-    if(query?.repoId && repoList){
+    if(query?.repoId && repoList.length > 0){
       updateActiveRepo(+query?.repoId)
     }
-  },[query])
+  },[repoList, query])
 
   useEffect(()=>{
     console.log('useRepo',{activeRepo, repoList, branchsList, forksList})

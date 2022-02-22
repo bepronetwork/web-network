@@ -20,19 +20,17 @@ import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import Translation from '@components/translation';
 import { useTranslation } from 'next-i18next';
-import { IssueProvider, useIssue } from '@contexts/issue';
-import {  useRepos } from '@contexts/repos';
+import { useIssue } from '@contexts/issue';
+import { useRepos } from '@contexts/repos';
 
-function PageIssue() {
+export default function PageIssue() {
   const router = useRouter();
   const { id, repoId } = router.query;
   const { state: { currentAddress, githubLogin }} = useContext(ApplicationContext);
   const {activeIssue: issue, networkIssue} = useIssue()
   const {activeRepo} = useRepos()
   
-  const [isIssueinDraft, setIsIssueinDraft] = useState(false);
   const [commentsIssue, setCommentsIssue] = useState();
-  const [forks, setForks] = useState();
   const [isRepoForked, setIsRepoForked] = useState(false);
   const [isWorking, setIsWorking] = useState(false);
   const [hasOpenPR, setHasOpenPR] = useState(false);
@@ -128,8 +126,6 @@ function PageIssue() {
   function syncLocalyState(){
     if(issue?.comments)
       setCommentsIssue([...issue?.comments] as any)
-    if(activeRepo?.forks)
-      setForks(activeRepo.forks as any)
   }
 
   useEffect(syncLocalyState,[issue, activeRepo])
@@ -147,7 +143,7 @@ function PageIssue() {
         state={issue?.state}
         developers={issue?.developers}
         finalized={networkIssue?.finalized}
-        isIssueinDraft={isIssueinDraft}
+        isIssueinDraft={issue?.state === `draft` || networkIssue?.isDraft}        
         networkCID={networkIssue?.cid}
         issueId={issue?.issueId}
         title={issue?.title}
@@ -161,7 +157,7 @@ function PageIssue() {
         pullRequests={issue?.pullRequests || []}
         mergeProposals={issue?.mergeProposals}
         amountIssue={networkIssue?.tokensStaked}
-        forks={forks}
+        forks={activeRepo?.forks}
         githubLogin={currentUser?.githubLogin}
         hasOpenPR={hasOpenPR}
         isRepoForked={isRepoForked}
@@ -186,7 +182,7 @@ function PageIssue() {
               <div className="sticky-bounty">
                 <IssueProposalProgressBar
                   isFinalized={networkIssue?.finalized}
-                  isIssueinDraft={isIssueinDraft}
+                  isIssueinDraft={issue?.state === `draft` || networkIssue?.isDraft}
                   mergeProposalsAmount={networkIssue?.mergeProposalsAmount}
                   isFinished={networkIssue?.recognizedAsFinished}
                   isCanceled={
@@ -211,12 +207,6 @@ function PageIssue() {
     </>
   );
 }
-
-export default () => (
-  <IssueProvider>
-    <PageIssue/>
-  </IssueProvider>
-)
 
 export const getServerSideProps: GetServerSideProps = async ({query, locale}) => {
   const { id, repoId } = query;

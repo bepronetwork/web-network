@@ -1,5 +1,4 @@
 import {GetStaticProps} from 'next'
-import { useRouter } from 'next/router'
 import React, {useContext} from 'react';
 import {useEffect, useState} from 'react';
 import {BeproService} from '@services/bepro-service';
@@ -29,10 +28,8 @@ const CURRENCY = process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME;
 const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
 
 export default function MainNav() {
-  const {dispatch, state: {currentAddress, balance, accessToken}} = useContext(ApplicationContext);
-  const {asPath} = useRouter()
+  const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
 
-  const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [address, setAddress] = useState<string>(null);
   const [ethBalance, setEthBalance] = useState(0);
   const [beproBalance, setBeproBalance] = useState(0);
@@ -42,15 +39,11 @@ export default function MainNav() {
 
   useEffect(() => {
     checkLogin();
-  }, []); // initial load
+  }, []);
 
   const checkLogin = async () => {
-    //await login();
     if (BeproService.isLoggedIn) {
       setAddress(BeproService.address);
-      setLoggedIn(true);
-    } else {
-      setLoggedIn(false);
     }
   }
 
@@ -78,7 +71,6 @@ export default function MainNav() {
     updateAddress(BeproService.address);
     setEthBalance(await BeproService.getBalance('eth'))
     setBeproBalance(await BeproService.getBalance('bepro'))
-    setLoggedIn(true);
     dispatch(changeStakedState(await BeproService.network.getBEPROStaked()));
     getUserOf(BeproService.address)
       .then((user: User) => {

@@ -13,6 +13,7 @@ import { BeproService } from '@services/bepro-service';
 import useApi from '@x-hooks/use-api';
 import useOctokit from '@x-hooks/use-octokit';
 import {useRouter} from 'next/router';
+import { ApplicationContext } from './application';
 
 export interface IActiveIssue extends IssueData{
   comments: Comment[]
@@ -27,6 +28,7 @@ export interface INetworkIssue{
   issueGenerator: string;
   mergeProposalsAmount: number
   recognizedAsFinished: boolean;
+  isDraft: boolean;
   tokensStaked: string;
 }
 
@@ -48,6 +50,8 @@ export const IssueProvider: React.FC = function ({ children }) {
   const {getIssue} = useApi()
   const {query} = useRouter();
   const {getIssueComments, getPullRequest} = useOctokit();
+  // Move currentAdress and githubLogin to UserHook
+  const { state: { currentAddress, githubLogin }} = useContext(ApplicationContext);
 
   const updatePullRequests = useCallback(async(prs: pullRequest[], githubPath: string)=>{
     const mapPr = prs.map(async(pr)=>{
@@ -88,17 +92,26 @@ export const IssueProvider: React.FC = function ({ children }) {
   }
 
   const getNetworkIssue = useCallback(async () => {
-    const issueCID = `${activeIssue.repository_id}/${activeIssue.id}`
+    if(!currentAddress) return;
+    const issueCID = [activeIssue.repository_id, activeIssue.id].join(`/`);
     const network = await BeproService.network.getIssueByCID({ issueCID })
-    setNetworkIssue(network)
+    debugger;
+    let isDraft = null;
+    try {
+      isDraft = await BeproService.network.isIssueInDraft({ issueId: network?._id })  
+    } catch (error) {
+      console.error({error})
+    }
+    
+    setNetworkIssue({...network, isDraft})
     return network;
   },[activeIssue])
 
   useEffect(()=>{
-    if(activeIssue){
+    if(activeIssue && currentAddress){
       getNetworkIssue()
     }
-  },[activeIssue])
+  },[activeIssue, currentAddress])
 
   useEffect(()=>{
     if(query.id && query.repoId) updateIssue(`${query.repoId}`,`${query.id}`);
