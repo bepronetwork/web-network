@@ -92,7 +92,7 @@ export const IssueProvider: React.FC = function ({ children }) {
   }
 
   const getNetworkIssue = useCallback(async () => {
-    if(!currentAddress || activeIssue?.issueId) return;
+    if(!currentAddress || !activeIssue?.issueId) return;
     const network = await BeproService.network.getIssueByCID({ issueCID: activeIssue?.issueId })
     let isDraft = null;
     try {
@@ -103,7 +103,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     
     setNetworkIssue({...network, isDraft})
     return network;
-  },[activeIssue])
+  },[activeIssue, currentAddress])
 
   useEffect(()=>{
     if(activeIssue && currentAddress){
