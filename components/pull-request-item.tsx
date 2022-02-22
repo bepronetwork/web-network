@@ -109,11 +109,17 @@ export default function PullRequestItem({
               </div>
 
               <div className="col-2 caption-small text-uppercase text-white d-flex justify-content-center">
-                <Translation
-                  ns="pull-request"
-                  label="reviewWithCount"
-                  params={{ count: pullRequest?.comments?.length || 0 }}
-                />
+                <span>
+                  {pullRequest?.comments?.length || 0}
+                </span>
+                
+                <span className="text-gray ml-1">
+                  <Translation
+                    ns="pull-request"
+                    label="review"
+                    params={{ count: pullRequest?.comments?.length || 0 }}
+                  />
+                </span>
               </div>
 
               <div className="col-2 caption-small text-uppercase text-gray d-flex justify-content-start">
