@@ -38,30 +38,36 @@ interface SameProposal {
   }[];
 }
 
+function getLabel(data): PRLabel{
+  if(data.merged) return 'merged';
+  if(data.isMergeable) return 'ready to merge';
+  //isMergeable can be null;
+  if(data.isMergeable === false) return 'conflicts';
+}
+
 function SelectValueComponent({ innerProps, innerRef, ...rest }){
-  const data = rest.getValue();
+  const data = rest.getValue()[0];
+  const label = getLabel(data)
+
   return (
     <div
       ref={innerRef}
       {...innerProps}
       className="proposal__select-options d-flex align-items-center text-center p-small p-1"
     >
-      <Avatar userLogin={data[0]?.githubLogin} />
-      <span className={`ml-1 text-nowrap text-gray `}>
-        {data[0]?.label}
+      <Avatar userLogin={data?.githubLogin} />
+      <span className="ml-1 text-nowrap">
+        {data?.label}
       </span>
+      <div className="ms-2">
+        {label && <PullRequestLabels label={label}/>}
+      </div>
     </div>
   )
 }
-function SelectOptionComponent({ innerProps, innerRef, data }) {
-  function getLabel(): PRLabel{
-    if(data.merged) return 'merged';
-    if(data.isMergeable) return 'ready to merge';
-    //isMergeable can be null;
-    if(data.isMergeable === false) return 'conflicts';
-  }
 
-  const label = getLabel()
+function SelectOptionComponent({ innerProps, innerRef, data }) {
+  const label = getLabel(data)
   return (
     <div
       ref={innerRef}
@@ -488,7 +494,7 @@ export default function NewProposal({
                     `proposal:errors.${
                       warning
                         ? "distribution-already-exists"
-                        : "pr-cant-mergeble"
+                        : "pr-cant-merged"
                     }`
                   )}
                 </p>
