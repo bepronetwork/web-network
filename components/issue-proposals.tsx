@@ -44,7 +44,7 @@ export default function IssueProposals({ metaProposals, className='', metaReques
   useEffect(() => { loadProposalsMeta() }, [issueId, numberProposals, currentAddress]);
 
   return (
-    <div className={`content-wrapper ${className} pt-0 ${proposals.length > 0 && 'pb-0' || 'pb-3'}`}>
+    <div className={`content-wrapper ${className} pt-0 pb-0`}>
       {metaProposals && proposals.map(proposal =>
                         <ProposalItem key={proposal._id}
                                       proposal={proposal}
@@ -57,6 +57,10 @@ export default function IssueProposals({ metaProposals, className='', metaReques
                                       isMerged={proposal.isMerged}
                                       isDisputable={isProposalDisputable(proposal.createdAt, disputableTime) && !proposal.isDisputed}
                                       owner={proposal.owner}/>) || <NothingFound description={t('errors.not-found')} /> }
+      {proposals.length === 0 && 
+      <div className="content-list-item proposal caption-small text-center text-uppercase p-4 text-ligth-gray">
+        {t('messages.no-proposals-created')}
+      </div>}
     </div>
   );
 }
