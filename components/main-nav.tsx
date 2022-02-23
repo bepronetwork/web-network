@@ -108,7 +108,7 @@ export default function MainNav() {
     <div className={`main-nav d-flex align-items-center justify-content-between ${isNetworksPage && 'bg-shadow' || 'bg-primary'}`}>
 
       <div className="d-flex">
-        <InternalLink href={getURLWithNetwork('/', {network: network?.name})} icon={isNetworksPage ? <BeproLogoBlue /> : (network?.fullLogo ? <Image src={`${IPFS_BASE}/${network?.fullLogo}`} width={104} height={32} /> : <BeproLogo aria-hidden={true} />)} className="brand" nav active brand />
+        <InternalLink href={getURLWithNetwork('/', {network: network?.name})} icon={isNetworksPage ? <BeproLogoBlue /> : (network?.name !== BEPRO_NETWORK_NAME ? <Image src={`${IPFS_BASE}/${network?.fullLogo}`} width={104} height={32} /> : <BeproLogo aria-hidden={true} />)} className="brand" nav active brand />
         {!isNetworksPage && <ul className="nav-links">
           <li>
             <InternalLink href={getURLWithNetwork('/developers')} label={<Translation label={'main-nav.developers'} />} nav uppercase />

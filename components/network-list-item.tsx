@@ -108,6 +108,7 @@ export default function NetworkListItem({
           <NetworkLogo
             src={`${IPFS_BASE}/${network?.logoIcon}`}
             alt={`${network?.name} logo`}
+            isBepro={network?.name === BEPRO_NETWORK_NAME}
           />
 
           <span className="caption-medium text-white">{network?.name}</span>

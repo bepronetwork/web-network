@@ -73,8 +73,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       return res.status(403).json('Creator and network addresses do not match')
 
     // Uploading logos to IPFS
-    const fullLogoHash = (await IpfsStorage.add(fullLogo, false, undefined, 'svg')).hash
-    const logoIconHash = (await IpfsStorage.add(logoIcon, false, undefined, 'svg')).hash
+    const fullLogoHash = (await IpfsStorage.add(fullLogo, true, undefined, 'svg')).hash
+    const logoIconHash = (await IpfsStorage.add(logoIcon, true, undefined, 'svg')).hash
 
     // Adding bepro-bot to repositories organization
     const octokitUser = new Octokit({
@@ -187,8 +187,8 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       return res.status(403).json('Creator and network addresses do not match')
     
     // Uploading logos to IPFS
-    const fullLogoHash = fullLogo ? (await IpfsStorage.add(fullLogo, false, undefined, 'svg')).hash : undefined
-    const logoIconHash = logoIcon ? (await IpfsStorage.add(logoIcon, false, undefined, 'svg')).hash : undefined
+    const fullLogoHash = fullLogo ? (await IpfsStorage.add(fullLogo, true, undefined, 'svg')).hash : undefined
+    const logoIconHash = logoIcon ? (await IpfsStorage.add(logoIcon, true, undefined, 'svg')).hash : undefined
 
     const addingRepos = JSON.parse(repositoriesToAdd)
 
