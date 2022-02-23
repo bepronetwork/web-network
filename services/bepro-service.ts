@@ -107,7 +107,9 @@ class BeproFacet {
   async getOpenIssues(networkAddress = undefined) {
     const network = await this.getNetworkObj(networkAddress)
 
-    return network.getAmountOfIssuesOpened()
+    const quantity = await network.getAmountOfIssuesOpened()
+
+    return (quantity - 1)
   }
 
   async getBeproLocked(networkAddress = undefined) {
@@ -170,10 +172,23 @@ class BeproFacet {
     return false
   }
 
+  async isNetworkAbleToClose(networkAddress = undefined) {
+    const network = await this.getNetworkObj(networkAddress)
+
+    const tokensStaked = await network.getTokensStaked()
+    const beproLocked = await network.getBEPROStaked()
+
+    return tokensStaked === 0 && beproLocked === 0
+  }
+
   async getTokensLockedByAddress(address: string) {
     const amount = await this.networkFactory.getLockedStakedByAddress(address)
 
     return this.fromWei(`${amount}`)
+  }
+
+  async closeNetwork() {
+    return this.networkFactory.unlock()
   }
 
   async getOperatorAmount() {

@@ -351,6 +351,14 @@ export default function useApi() {
       })
   }
 
+  async function isNetworkOwner(creatorAddress, networkAddress) {
+    const params = new URLSearchParams({creatorAddress, networkAddress}).toString()
+
+    return client.get<{rows: Network[], count: number, pages: number, currentPage: number}>(`/search/networks/?${params}`)
+                 .then(({data}) => !!data.rows.length)
+                 .catch(() => false)
+  }
+
   async function getNetwork(name: string) {
     const search = new URLSearchParams({name}).toString();
 
@@ -433,6 +441,7 @@ export default function useApi() {
     searchRepositories,
     repositoryHasIssues,
     updateNetwork,
-    getBeproCurrency
+    getBeproCurrency,
+    isNetworkOwner
   }
 }

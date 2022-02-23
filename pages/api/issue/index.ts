@@ -17,6 +17,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   })
 
   if (!network) return res.status(404).json('Invalid network')
+  if (network.isClosed) return res.status(404).json('Invalid network')
 
   if(!creatorGithub)
     return res.status(422).json(`creatorGithub is required`);
@@ -63,6 +64,7 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
   })
 
   if (!network) return res.status(404).json('Invalid network')
+  if (network.isClosed) return res.status(404).json('Invalid network')
 
   return models.issue.update({issueId, state: `draft`}, {where: {githubId: githubId, repository_id, issueId: null, network_id: network.id}})
                .then(async(result) => {

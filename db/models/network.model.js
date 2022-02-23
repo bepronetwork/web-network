@@ -15,6 +15,10 @@ class Network extends Model {
         networkAddress: DataTypes.STRING,
         logoIcon: DataTypes.STRING,
         fullLogo: DataTypes.STRING,
+        isClosed: {
+          type: DataTypes.BOOLEAN,
+          defaultValue: false
+        },
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE
       },

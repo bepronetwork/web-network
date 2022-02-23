@@ -15,6 +15,7 @@ async function getAllRepos(req, res) {
   })
 
   if (!network) return res.status(404).json('Invalid network')
+  if (network.isClosed) return res.status(404).json('Invalid network')
 
   return res.status(200).json(await models.repositories.findAll({where: {
     network_id: network.id
@@ -44,6 +45,7 @@ async function addNewRepo(req, res) {
     })
   
   if (!network) return res.status(404).json('Invalid network')
+  if (network.isClosed) return res.status(404).json('Invalid network')
 
   const created = await models.repositories.create({githubPath: `${owner}/${repo}`, network_id: network.id})
                               .then(() => ({error: false}))

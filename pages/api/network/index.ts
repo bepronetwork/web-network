@@ -12,7 +12,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const { name: networkName } = req.query
 
   const network = await Database.network.findOne({
-    attributes: { exclude: ['id', 'creatorAddress', 'createdAt', 'updatedAt'] },
+    attributes: { exclude: ['id', 'creatorAddress', 'updatedAt'] },
     where: {
       name: {
         [Op.iLike]: String(networkName)
@@ -139,11 +139,12 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       creator,
       logoIcon,
       fullLogo,
+      isClosed,
       description,
       githubLogin,
+      networkAddress,
       repositoriesToAdd,
-      repositoriesToRemove,
-      networkAddress
+      repositoriesToRemove
     } = req.body
 
     const user = await Database.user.findOne({
@@ -155,21 +156,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     if (!user) return res.status(403).json('Invalid user provided')
     if (!user.accessToken) return res.status(401).json('Unauthorized user')
-    
-    // Contract Validations
-    const BEPRO = new Bepro()
-    await BEPRO.init(false, false, true)
-    
-    const checkingNetworkAddress =
-    await BEPRO.networkFactory.getNetworkByAddress(creator)
-    
-    if (checkingNetworkAddress !== networkAddress)
-    return res.status(403).json('Creator and network addresses do not match')
-    
-    // Uploading logos to IPFS
-    const fullLogoHash = fullLogo ? (await IpfsStorage.add(fullLogo, false, undefined, 'svg')).hash : undefined
-    const logoIconHash = logoIcon ? (await IpfsStorage.add(logoIcon, false, undefined, 'svg')).hash : undefined
-    
+
     const network = await Database.network.findOne({
       where: {
         creatorAddress: creator,
@@ -179,6 +166,29 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     })
 
     if (!network) return res.status(404).json('Invalid network')
+    if (network.isClosed) return res.status(404).json('Invalid network')
+
+    if (isClosed !== undefined) {
+      network.isClosed = isClosed
+
+      await network.save()
+
+      return res.status(200).json('Network closed')
+    }
+
+    // Contract Validations
+    const BEPRO = new Bepro()
+    await BEPRO.init(false, false, true)
+    
+    const checkingNetworkAddress =
+    await BEPRO.networkFactory.getNetworkByAddress(creator)
+    
+    if (checkingNetworkAddress !== networkAddress)
+      return res.status(403).json('Creator and network addresses do not match')
+    
+    // Uploading logos to IPFS
+    const fullLogoHash = fullLogo ? (await IpfsStorage.add(fullLogo, false, undefined, 'svg')).hash : undefined
+    const logoIconHash = logoIcon ? (await IpfsStorage.add(logoIcon, false, undefined, 'svg')).hash : undefined
 
     const addingRepos = JSON.parse(repositoriesToAdd)
 

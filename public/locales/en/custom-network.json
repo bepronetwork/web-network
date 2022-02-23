@@ -77,11 +77,13 @@
     }
   },
   "messages": {
-    "refresh-the-page": "Refresh the page for the changes to take effect."
+    "refresh-the-page": "Refresh the page for the changes to take effect.",
+    "network-closed": "Network closed."
   },
   "errors": {
     "failed-to-create-network": "Failed to create network {{error}}",
     "failed-to-update-network": "Failed to update network {{error}}",
+    "failed-to-close-network": "Failed to close network {{error}}",
     "invalid-format": "Invalid format",
     "not-found": "You don't have a custom network created.",
     "dispute-time": "The time that proposals can be disputed. Min. {{min}} and Max. {{max}} seconds.",

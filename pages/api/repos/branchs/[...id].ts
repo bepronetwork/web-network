@@ -15,6 +15,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   })
 
   if (!network) return res.status(404).json('Invalid network')
+  if (network.isClosed) return res.status(404).json('Invalid network')
 
   const repository = await models.repositories.findOne({
     where: {id: repoId, network_id: network.id},

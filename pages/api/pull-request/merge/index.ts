@@ -19,6 +19,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     })
   
     if (!customNetwork) return res.status(404).json('Invalid network')
+    if (customNetwork.isClosed) return res.status(404).json('Invalid network')
 
     const issue = await models.issue.findOne({
       where: { issueId, network_id: customNetwork.id }

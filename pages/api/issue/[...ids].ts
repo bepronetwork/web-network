@@ -23,6 +23,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   })
 
   if (!network) return res.status(404).json('Invalid network')
+  if (network.isClosed) return res.status(404).json('Invalid network')
 
   const issue = await models.issue.findOne({
     where: {

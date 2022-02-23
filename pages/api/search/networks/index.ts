@@ -1,6 +1,5 @@
 import { Op, WhereOptions } from 'sequelize'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { subHours, subMonths, subWeeks, subYears } from 'date-fns'
 
 import models from '@db/models'
 
@@ -16,13 +15,13 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if (creatorAddress)
     whereCondition.creatorAddress = { [Op.iLike]: String(creatorAddress) }
 
-  if (networkAddress) whereCondition.repository_id = networkAddress
+  if (networkAddress) whereCondition.networkAddress = networkAddress
 
   const networks = await models.network.findAndCountAll(
     paginate(
       {
         attributes: {
-          exclude: ['id', 'creatorAddress', 'createdAt', 'updatedAt']
+          exclude: ['id', 'creatorAddress', 'updatedAt']
         },
         where: whereCondition,
         nest: true
