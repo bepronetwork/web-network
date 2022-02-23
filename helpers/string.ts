@@ -38,3 +38,7 @@ export const getQueryableText = (text: string): string => {
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
 }
+
+export const urlWithoutProtocol = (url: string): string => {
+  return url.toLowerCase().replace('http://', '').replace('https://', '')
+}

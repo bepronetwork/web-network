@@ -1,11 +1,14 @@
+import { useTranslation } from 'next-i18next'
+
 import Step from '@components/step'
 import ImageUploader from '@components/image-uploader'
 import ThemeColors from '@components/custom-network/theme-colors'
 
-import { getQueryableText } from '@helpers/string'
+import { getQueryableText, urlWithoutProtocol } from '@helpers/string'
 
 import useNetwork from '@x-hooks/use-network'
-import { useTranslation } from 'next-i18next'
+
+import { API } from 'env'
 
 export default function NetworkInformationStep({
   data,
@@ -108,7 +111,7 @@ export default function NetworkInformationStep({
             {t('custom-network:steps.network-information.fields.name.temporary')}
           </p>
           <p className="caption-small text-gray">
-            development.bepro.network/
+            {urlWithoutProtocol(API)}/
             <span className="text-primary">
               {getQueryableText(data.displayName.data || t('custom-network:steps.network-information.fields.name.default'))}
             </span>

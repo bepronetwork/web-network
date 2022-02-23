@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
+import { useTranslation } from 'next-i18next'
 import { useContext, useEffect, useState } from 'react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
@@ -19,10 +20,10 @@ import { ApplicationContext } from '@contexts/application'
 import { isSameSet } from '@helpers/array'
 import { formatDate } from '@helpers/formatDate'
 import { isColorsSimilar } from '@helpers/colors'
-import { getQueryableText } from '@helpers/string'
 import { psReadAsText } from '@helpers/file-reader'
 import { formatNumberToCurrency } from '@helpers/formatNumber'
 import { DefaultNetworkInformation } from '@helpers/custom-network'
+import { getQueryableText, urlWithoutProtocol } from '@helpers/string'
 
 import { BeproService } from '@services/bepro-service'
 
@@ -31,6 +32,7 @@ import useOctokit from '@x-hooks/use-octokit'
 import useNetwork from '@x-hooks/use-network'
 
 import {
+  API,
   IPFS_BASE,
   REDEEM_TIME_MAX,
   REDEEM_TIME_MIN,
@@ -40,7 +42,6 @@ import {
   DISPUTABLE_TIME_MIN,
   DISPUTE_PERCENTAGE_MAX
 } from 'env'
-import { useTranslation } from 'next-i18next'
 interface NetworkAmounts {
   tokenStaked: number
   oraclesStaked: number
@@ -435,7 +436,7 @@ export default function Settings() {
 
                 <p className="caption-small text-ligth-gray mb-1">{t('custom-network:query-url')}</p>
                 <p className="caption-small text-gray mb-3">
-                  development.bepro.network/
+                  {urlWithoutProtocol(API)}/
                   <span className="text-primary">
                     {showTextOrDefault(
                       getQueryableText(network?.name || ''),
