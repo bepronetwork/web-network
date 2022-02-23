@@ -1,9 +1,12 @@
-import { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import { useTranslation } from 'next-i18next'
+import { useContext, useEffect } from 'react'
 
 import NetworkLogo from '@components/network-logo'
+import PullRequestLabels from '@components/pull-request-labels'
 
-import { BEPRO_NETWORK_NAME, IPFS_BASE } from 'env'
+import { ApplicationContext } from '@contexts/application'
+import { changeNetworksSummary } from '@contexts/reducers/change-networks-summary'
 
 import { formatNumberToNScale } from '@helpers/formatNumber'
 
@@ -11,12 +14,10 @@ import { Network } from '@interfaces/network'
 
 import { BeproService } from '@services/bepro-service'
 
-import useNetwork from '@x-hooks/use-network'
-import { ApplicationContext } from '@contexts/application'
-import { changeNetworksSummary } from '@contexts/reducers/change-networks-summary'
 import useApi from '@x-hooks/use-api'
-import { useTranslation } from 'next-i18next'
+import useNetwork from '@x-hooks/use-network'
 
+import { BEPRO_NETWORK_NAME, IPFS_BASE } from 'env'
 interface NetworkListItemProps {
   network: Network
   redirectToHome?: boolean
@@ -110,6 +111,8 @@ export default function NetworkListItem({
           />
 
           <span className="caption-medium text-white">{network?.name}</span>
+
+          {network?.isClosed && <PullRequestLabels label="closed" /> || ''}
         </div>
       </div>
 
