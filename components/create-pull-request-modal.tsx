@@ -9,7 +9,7 @@ import { useTranslation } from 'next-i18next';
 
 export default function CreatePullRequestModal({
                                                  show = false,
-                                                 onConfirm = ({title, description, branch}) => {},
+                                                 onConfirm = async ({title, description, branch}):Promise<void> => {},
                                                  onCloseClick = () => {}, repo = ``,
                                                  title: prTitle = ``,
                                                  description: prDescription = ``
@@ -38,9 +38,9 @@ export default function CreatePullRequestModal({
     setIsCreating(false)
   }
 
-  function handleConfirm() {
+   function handleConfirm() {
     setIsCreating(true)
-    onConfirm({title, description, branch})
+    onConfirm({title, description, branch}).finally(()=> setIsCreating(false))
   }
 
 
