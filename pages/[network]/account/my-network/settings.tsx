@@ -5,6 +5,8 @@ import { useTranslation } from 'next-i18next'
 import { useContext, useEffect, useState } from 'react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
+import LockedIcon from '@assets/icons/locked-icon'
+
 import Button from '@components/button'
 import InputNumber from '@components/input-number'
 import ImageUploader from '@components/image-uploader'
@@ -48,7 +50,11 @@ interface NetworkAmounts {
 }
 
 export default function Settings() {
+  const router = useRouter()
   const { t } = useTranslation(['common', 'custom-network'])
+
+  const [isClosing, setIsClosing] = useState(false)
+  const [isAbleToClose, setIsAbleToClose] = useState(false)
 
   const [newInfo, setNewInfo] = useState({
     ...DefaultNetworkInformation,
@@ -73,10 +79,8 @@ export default function Settings() {
 
   const [updatingNetwork, setUpdatingNetwork] = useState(false)
 
-  const router = useRouter()
-
   const { listUserRepos } = useOctokit()
-  const { searchRepositories, updateNetwork } = useApi()
+  const { searchRepositories, updateNetwork, isNetworkOwner } = useApi()
   const { network, colorsToCSS, handleNetworkChange, getURLWithNetwork } =
     useNetwork()
 
@@ -269,18 +273,30 @@ export default function Settings() {
 
     updateNetwork(json)
       .then(async (result) => {
-        if (currentNetworkParameters.redeemTime !== newInfo.redeemTime) 
-          await BeproService.setRedeemTime(newInfo.redeemTime).then(console.log).catch(console.log)
+        if (currentNetworkParameters.redeemTime !== newInfo.redeemTime)
+          await BeproService.setRedeemTime(newInfo.redeemTime)
+            .then(console.log)
+            .catch(console.log)
 
-        if (currentNetworkParameters.disputeTime !== newInfo.disputeTime) 
-          await BeproService.setDisputeTime(newInfo.disputeTime).then(console.log).catch(console.log)
+        if (currentNetworkParameters.disputeTime !== newInfo.disputeTime)
+          await BeproService.setDisputeTime(newInfo.disputeTime)
+            .then(console.log)
+            .catch(console.log)
 
-        if (currentNetworkParameters.councilAmount !== newInfo.councilAmount) 
-          await BeproService.setCouncilAmount(newInfo.councilAmount).then(console.log).catch(console.log)
+        if (currentNetworkParameters.councilAmount !== newInfo.councilAmount)
+          await BeproService.setCouncilAmount(newInfo.councilAmount)
+            .then(console.log)
+            .catch(console.log)
 
-        if (currentNetworkParameters.percentageForDispute !== newInfo.percentageForDispute) 
-          await BeproService.setPercentageForDispute(newInfo.percentageForDispute).then(console.log).catch(console.log)
-        
+        if (
+          currentNetworkParameters.percentageForDispute !==
+          newInfo.percentageForDispute
+        )
+          await BeproService.setPercentageForDispute(
+            newInfo.percentageForDispute
+          )
+            .then(console.log)
+            .catch(console.log)
 
         dispatch(
           addToast({
@@ -300,7 +316,9 @@ export default function Settings() {
           addToast({
             type: 'danger',
             title: t('actions.failed'),
-            content: t('custom-network:errors.failed-to-update-network', {error})
+            content: t('custom-network:errors.failed-to-update-network', {
+              error
+            })
           })
         )
 
@@ -309,14 +327,58 @@ export default function Settings() {
       })
   }
 
-  useEffect(() => {
-    if (!network || !currentAddress || !githubLogin) return
+  function handleCloseNetwork() {
+    if (!network) return
 
-    BeproService.networkFactory
-      .getNetworkByAddress(currentAddress)
+    setIsClosing(true)
+
+    BeproService.closeNetwork()
+      .then(() => {
+        return updateNetwork({
+          githubLogin,
+          isClosed: true,
+          creator: currentAddress,
+          networkAddress: network.networkAddress
+        })
+      })
+      .then(() => {
+        dispatch(
+          addToast({
+            type: 'success',
+            title: t('actions.success'),
+            content: t('custom-network:messages.network-closed')
+          })
+        )
+      })
+      .catch((error) => {
+        dispatch(
+          addToast({
+            type: 'danger',
+            title: t('actions.failed'),
+            content: t('custom-network:errors.failed-to-close-network', {
+              error
+            })
+          })
+        )
+      })
+      .finally(() => {
+        setIsClosing(false)
+      })
+  }
+
+  useEffect(() => {
+    if (!BeproService.isStarted || !network || !currentAddress || !githubLogin)
+      return
+
+    BeproService.isNetworkAbleToClose(network.networkAddress)
       .then((result) => {
-        if (result.toLowerCase() !== network.networkAddress.toLowerCase())
-          router.push(getURLWithNetwork('/account'))
+        setIsAbleToClose(result && !network.isClosed)
+      })
+      .catch(console.log)
+
+    isNetworkOwner(currentAddress, network.networkAddress)
+      .then((result) => {
+        if (!result) router.push(getURLWithNetwork('/account'))
         else {
           loadData()
           loadAmounts()
@@ -327,7 +389,7 @@ export default function Settings() {
 
         router.push(getURLWithNetwork('/account'))
       })
-  }, [network, currentAddress, githubLogin])
+  }, [BeproService.isStarted, network, currentAddress, githubLogin])
 
   useEffect(() => {
     const networkData = newInfo.network.data
@@ -406,7 +468,10 @@ export default function Settings() {
                   onChange={handleNetworkDataChange}
                   description={
                     <>
-                      {t('misc.upload')} <br /> {t('custom-network:steps.network-information.fields.logo-icon.label')}
+                      {t('misc.upload')} <br />{' '}
+                      {t(
+                        'custom-network:steps.network-information.fields.logo-icon.label'
+                      )}
                     </>
                   }
                 />
@@ -424,23 +489,34 @@ export default function Settings() {
                     )
                   }
                   onChange={handleNetworkDataChange}
-                  description={`${t('misc.upload')} ${t('custom-network:steps.network-information.fields.full-logo.label')}`}
+                  description={`${t('misc.upload')} ${t(
+                    'custom-network:steps.network-information.fields.full-logo.label'
+                  )}`}
                   lg
                 />
               </div>
 
               <div className="d-flex flex-column justify-content-center">
                 <p className="h3 text-white mb-3 text-capitalize">
-                  {showTextOrDefault(network?.name, t('custom-network:steps.network-information.fields.name.default'))}
+                  {showTextOrDefault(
+                    network?.name,
+                    t(
+                      'custom-network:steps.network-information.fields.name.default'
+                    )
+                  )}
                 </p>
 
-                <p className="caption-small text-ligth-gray mb-1">{t('custom-network:query-url')}</p>
+                <p className="caption-small text-ligth-gray mb-1">
+                  {t('custom-network:query-url')}
+                </p>
                 <p className="caption-small text-gray mb-3">
                   {urlWithoutProtocol(API)}/
                   <span className="text-primary">
                     {showTextOrDefault(
                       getQueryableText(network?.name || ''),
-                      t('custom-network:steps.network-information.fields.name.default')
+                      t(
+                        'custom-network:steps.network-information.fields.name.default'
+                      )
                     )}
                   </span>
                 </p>
@@ -457,8 +533,19 @@ export default function Settings() {
                     </span>
                   </div>
 
-                  <Button color="dark-gray" disabled outline className="ml-2">
-                    {t('custom-network:close-network')}
+                  <Button
+                    color="dark-gray"
+                    disabled={!isAbleToClose || isClosing}
+                    className="ml-2"
+                    onClick={handleCloseNetwork}
+                  >
+                    {!isAbleToClose && <LockedIcon className="me-2" />}
+                    <span>{t('custom-network:close-network')}</span>
+                    {isClosing ? (
+                      <span className="spinner-border spinner-border-xs ml-1" />
+                    ) : (
+                      ''
+                    )}
                   </Button>
                 </div>
               </div>
@@ -502,13 +589,17 @@ export default function Settings() {
               <div className="row mx-0 px-0 mb-3">
                 <div className="col">
                   <label htmlFor="description" className="caption-small mb-2">
-                  {t('custom-network:steps.network-information.fields.description.label')}
+                    {t(
+                      'custom-network:steps.network-information.fields.description.label'
+                    )}
                   </label>
 
                   <textarea
                     name="description"
                     id="description"
-                    placeholder={t('custom-network:steps.network-information.fields.description.placeholder')}
+                    placeholder={t(
+                      'custom-network:steps.network-information.fields.description.placeholder'
+                    )}
                     cols={30}
                     rows={5}
                     className={`form-control ${
@@ -543,10 +634,10 @@ export default function Settings() {
                     label={t('custom-network:dispute-time')}
                     symbol={t('misc.seconds')}
                     max={DISPUTABLE_TIME_MAX}
-                    description={t('custom-network:errors.dispute-time', {min: DISPUTABLE_TIME_MIN, max: formatNumberToCurrency(
-                      DISPUTABLE_TIME_MAX,
-                      0
-                    )})}
+                    description={t('custom-network:errors.dispute-time', {
+                      min: DISPUTABLE_TIME_MIN,
+                      max: formatNumberToCurrency(DISPUTABLE_TIME_MAX, 0)
+                    })}
                     value={newInfo.disputeTime}
                     error={!isValidDisputeTime}
                     min={0}
@@ -565,7 +656,10 @@ export default function Settings() {
                     classSymbol={`text-ligth-gray`}
                     label={t('custom-network:percentage-for-dispute')}
                     max={DISPUTE_PERCENTAGE_MAX}
-                    description={t('custom-network:errors.percentage-for-dispute', {max: DISPUTE_PERCENTAGE_MAX})}
+                    description={t(
+                      'custom-network:errors.percentage-for-dispute',
+                      { max: DISPUTE_PERCENTAGE_MAX }
+                    )}
                     symbol="%"
                     value={newInfo.percentageForDispute}
                     error={!isValidPercentageForDispute}
@@ -584,7 +678,10 @@ export default function Settings() {
                     classSymbol={`text-ligth-gray`}
                     label={t('custom-network:redeem-time')}
                     max={REDEEM_TIME_MAX}
-                    description={t('custom-network:errors.redeem-time', {min: REDEEM_TIME_MIN, max: REDEEM_TIME_MAX})}
+                    description={t('custom-network:errors.redeem-time', {
+                      min: REDEEM_TIME_MIN,
+                      max: REDEEM_TIME_MAX
+                    })}
                     symbol="seconds"
                     value={newInfo.redeemTime}
                     error={!isValidRedeemTime}
@@ -605,13 +702,10 @@ export default function Settings() {
                     label={t('custom-network:council-amount')}
                     symbol={t('$bepro')}
                     max={COUNCIL_AMOUNT_MAX}
-                    description={t('custom-network:errors.council-amount', {min: formatNumberToCurrency(
-                      COUNCIL_AMOUNT_MAX,
-                      0
-                    ), max: formatNumberToCurrency(
-                      COUNCIL_AMOUNT_MAX,
-                      0
-                    )})}
+                    description={t('custom-network:errors.council-amount', {
+                      min: formatNumberToCurrency(COUNCIL_AMOUNT_MAX, 0),
+                      max: formatNumberToCurrency(COUNCIL_AMOUNT_MAX, 0)
+                    })}
                     value={newInfo.councilAmount}
                     error={!isValidCouncilAmount}
                     min={0}
@@ -627,7 +721,7 @@ export default function Settings() {
               </div>
             </div>
 
-            {(newInfo.validated && (
+            {(newInfo.validated && !network?.isClosed && (
               <div className="d-flex flex-row justify-content-center mt-3 mb-2">
                 <Button onClick={handleSubmit} disabled={updatingNetwork}>
                   <span>{t('custom-network:save-settings')}</span>

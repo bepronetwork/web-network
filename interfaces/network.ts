@@ -6,6 +6,7 @@ export interface Network {
   logoIcon?: string
   fullLogo?: string
   tokenName?: string
+  isClosed?: boolean
   description: string
   network_id?: number
   colors?: ThemeColors

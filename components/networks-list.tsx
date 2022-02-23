@@ -41,8 +41,6 @@ export default function NetworksList({
 
   const { dispatch } = useContext(ApplicationContext)
 
-  const hasSpecificFilter = !!networkAddress || !!creatorAddress
-
   function updateNetworkParameter(networkName, parameter, value) {
     const tmpNetworks = [...networks]
     const index = tmpNetworks.findIndex((el) => el.name === networkName)
@@ -101,7 +99,6 @@ export default function NetworksList({
       )) || (
         <>
           <NetworkListBar
-            hideOrder={hasSpecificFilter}
             order={order}
             setOrder={handleOrderChange}
           />
