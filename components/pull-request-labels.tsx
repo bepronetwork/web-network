@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type PRLabel = 'ready to merge' | 'broken tests' | 'conflicts' | 'merged';
+export type PRLabel = 'ready to merge' | 'broken tests' | 'conflicts' | 'merged' | 'closed';
 interface IPRLabel{
   label: PRLabel;
   className?: string;
@@ -19,6 +19,9 @@ function PullRequestLabels({label, className, hero = false }: IPRLabel) {
         return "warning";
       }
       case 'conflicts': {
+        return "danger";
+      }
+      case 'closed': {
         return "danger";
       }
       default: {
