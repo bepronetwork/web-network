@@ -10,10 +10,11 @@ import {formatNumberToString} from '@helpers/formatNumber';
 import {changeLoadState} from '@reducers/change-load-state';
 import router from 'next/router';
 import {toastError, toastInfo} from '@reducers/add-toast';
-import {SETTLER_ADDRESS, TRANSACTION_ADDRESS} from '../../env';
+import {BEPRO_NETWORK_NAME, IPFS_BASE, SETTLER_ADDRESS, TRANSACTION_ADDRESS} from '../../env';
 import {ReposList} from '@interfaces/repos-list';
-import {ListGroup} from 'react-bootstrap';
+import {ListGroup, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import ConnectGithub from '@components/connect-github';
+import Image from 'next/image'
 import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
@@ -23,6 +24,12 @@ import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import {NetworkFactory, toSmartContractDecimals} from 'bepro-js';
 import useNetwork from '@x-hooks/use-network';
+import NetworksList from '@components/networks-list';
+import { Network } from '@interfaces/network';
+import { formatDate } from '@helpers/formatDate';
+import OverrideNameModal from '@components/custom-network/override-name-modal';
+import { truncateAddress } from '@helpers/truncate-address';
+import NetworkLogo from '@components/network-logo';
 
 export default function ParityPage() {
   const {state: {currentAddress, balance,}, dispatch} = useContext(ApplicationContext);
@@ -36,12 +43,15 @@ export default function ParityPage() {
   const [settlerTokenName, setSettlerTokenName] = useState(``);
   const [settlerTokenSymbol, setSettlerTokenSymbol] = useState(``);
   const [settlerTokenAddress, setSettlerTokenAddress] = useState(``);
+  const [networkToUpdate, setNetworkToUpdate] = useState<Network>()
+  const [showModalName, setShowModalName] = useState(false)
   const [issuesList, setIssuesList] = useState([]);
   const [reposList, setReposList] = useState<ReposList>([]);
   const [availReposList, setAvailableList] = useState<string[]>([]);
-  const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId, createRepo, getReposList, removeRepo: apiRemoveRepo} = useApi();
+  const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId, createRepo, getReposList, removeRepo: apiRemoveRepo, searchNetworks} = useApi();
   const { t } = useTranslation(['common', 'parity'])
   const { network } = useNetwork()
+  const [networks, setNetworks] = useState<Network[]>([])
 
   const formItem = (label = ``, placeholder = ``, value = ``, onChange = (ev) => {}) =>
     ({label, placeholder, value, onChange})
@@ -353,6 +363,11 @@ export default function ParityPage() {
                 .then(console.log)
   }
 
+  function handleNetworkClick(networkItem) {
+    setNetworkToUpdate(networkItem)
+    setShowModalName(true)
+  }
+
   useEffect(() => {
     if (!currentAddress)
       return;
@@ -362,6 +377,13 @@ export default function ParityPage() {
 
     getSelfRepos();
 
+    searchNetworks({})
+      .then(({ count, rows }) => {
+        if (count > 0) setNetworks(rows)
+      })
+      .catch((error) => {
+        console.log('Failed to retrieve networks list', error)
+      })
   }, [currentAddress])
 
   return <>
@@ -434,6 +456,46 @@ export default function ParityPage() {
         </div>
       </div>
       {issuesList.map(renderIssuesList)}
+      <div className="mt-3 mb-4 content-wrapper">
+        <h3 className="text-center">Networks</h3>
+        <div className="row caption-medium mb-2 mt-3 text-white">
+          <div className="col-2">Name</div>
+          <div className="col-3">Description</div>
+          <div className="col-2">Address</div>
+          <div className="col-1 text-center">Icon</div>
+          <div className="col-2 text-center">Logo</div>
+          <div className="col-2 text-center">Created At</div>
+        </div>
+
+        {networks.map(networkItem => <div key={networkItem.name} className="row caption-small mb-1 bg-dark py-3 border-radius-8 text-gray cursor-pointer align-items-center bg-ligth-gray-hover" onClick={() => handleNetworkClick(networkItem)}>
+          <div className="col-2">{networkItem.name}</div>
+          <div className="col-3">{networkItem.description}</div>
+          <div className="col-2">
+            <OverlayTrigger
+                key="bottom-creator"
+                placement="bottom"
+                overlay={
+                  <Tooltip id={`tooltip-bottom`}>
+                      {networkItem.networkAddress}
+                  </Tooltip>
+                }
+                >
+                <span>
+                  {truncateAddress(networkItem.networkAddress)}
+                </span>
+              </OverlayTrigger>
+          </div>
+          <div className="col-1 d-flex align-items-center justify-content-center">
+          <Image src={`${IPFS_BASE}/${networkItem.logoIcon}`} width={30} height={30} />
+          </div>
+          <div className="col-2 d-flex align-items-center justify-content-center">
+            <Image src={`${IPFS_BASE}/${networkItem.fullLogo}`} width={150} height={30} />
+          </div>
+          <div className="col-2 text-center">{formatDate(networkItem.createdAt, '-')}</div>
+        </div>)}
+      </div>
+
+      {networkToUpdate && <OverrideNameModal show={showModalName} network={networkToUpdate} onCloseClick={() => {setShowModalName(false)}} />}
     </div>
   </>
 }
@@ -442,7 +504,7 @@ export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
       session: await getSession(),
-      ...(await serverSideTranslations(locale, ['common', 'connect-wallet-button', 'parity'])),
+      ...(await serverSideTranslations(locale, ['common', 'connect-wallet-button', 'parity', 'custom-network'])),
     },
   };
 };

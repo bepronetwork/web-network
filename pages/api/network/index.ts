@@ -73,8 +73,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       return res.status(403).json('Creator and network addresses do not match')
 
     // Uploading logos to IPFS
-    const fullLogoHash = (await IpfsStorage.add(fullLogo, true, undefined, 'svg')).hash
-    const logoIconHash = (await IpfsStorage.add(logoIcon, true, undefined, 'svg')).hash
+    const fullLogoHash = (
+      await IpfsStorage.add(fullLogo, true, undefined, 'svg')
+    ).hash
+    const logoIconHash = (
+      await IpfsStorage.add(logoIcon, true, undefined, 'svg')
+    ).hash
 
     // Adding bepro-bot to repositories organization
     const octokitUser = new Octokit({
@@ -82,7 +86,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     })
 
     const repos = JSON.parse(repositories)
-    
+
     const invitations = []
 
     for (const repository of repos) {
@@ -135,17 +139,27 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 async function put(req: NextApiRequest, res: NextApiResponse) {
   try {
     const {
+      name,
       colors,
       creator,
       logoIcon,
       fullLogo,
       isClosed,
+      override,
       description,
       githubLogin,
       networkAddress,
       repositoriesToAdd,
       repositoriesToRemove
     } = req.body
+
+    const isAdminOverriding = !!override
+
+    if (
+      isAdminOverriding &&
+      creator !== process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS
+    )
+      return res.status(403).json('Unauthorized')
 
     const user = await Database.user.findOne({
       where: {
@@ -159,14 +173,14 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     const network = await Database.network.findOne({
       where: {
-        creatorAddress: creator,
+        ...(isAdminOverriding ? {} : {creatorAddress: creator}),
         networkAddress
       },
       include: [{ association: 'repositories' }]
     })
 
     if (!network) return res.status(404).json('Invalid network')
-    if (network.isClosed) return res.status(404).json('Invalid network')
+    if (network.isClosed && !isAdminOverriding) return res.status(404).json('Invalid network')
 
     if (isClosed !== undefined) {
       network.isClosed = isClosed
@@ -176,23 +190,31 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       return res.status(200).json('Network closed')
     }
 
-    // Contract Validations
-    const BEPRO = new Bepro()
-    await BEPRO.init(false, false, true)
-    
-    const checkingNetworkAddress =
-    await BEPRO.networkFactory.getNetworkByAddress(creator)
-    
-    if (checkingNetworkAddress !== networkAddress)
-      return res.status(403).json('Creator and network addresses do not match')
-    
+    if (!isAdminOverriding) {
+      // Contract Validations
+      const BEPRO = new Bepro()
+      await BEPRO.init(false, false, true)
+
+      const checkingNetworkAddress =
+        await BEPRO.networkFactory.getNetworkByAddress(creator)
+
+      if (checkingNetworkAddress !== networkAddress)
+        return res
+          .status(403)
+          .json('Creator and network addresses do not match')
+    }
+
     // Uploading logos to IPFS
-    const fullLogoHash = fullLogo ? (await IpfsStorage.add(fullLogo, true, undefined, 'svg')).hash : undefined
-    const logoIconHash = logoIcon ? (await IpfsStorage.add(logoIcon, true, undefined, 'svg')).hash : undefined
+    const fullLogoHash = fullLogo
+      ? (await IpfsStorage.add(fullLogo, true, undefined, 'svg')).hash
+      : undefined
+    const logoIconHash = logoIcon
+      ? (await IpfsStorage.add(logoIcon, true, undefined, 'svg')).hash
+      : undefined
 
-    const addingRepos = JSON.parse(repositoriesToAdd)
+    const addingRepos = repositoriesToAdd ? JSON.parse(repositoriesToAdd) : []
 
-    if(addingRepos.length)
+    if (addingRepos.length && !isAdminOverriding)
       for (const repository of addingRepos) {
         const exists = await Database.repositories.findOne({
           where: {
@@ -200,12 +222,17 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
           }
         })
 
-        if (exists) return res.status(403).json(`Repository ${repository.fullName} is already in use by another network `)
+        if (exists)
+          return res
+            .status(403)
+            .json(
+              `Repository ${repository.fullName} is already in use by another network `
+            )
       }
 
-    const removingRepos = JSON.parse(repositoriesToRemove)
+    const removingRepos = repositoriesToRemove ? JSON.parse(repositoriesToRemove) : []
 
-    if(removingRepos.length)
+    if (removingRepos.length && !isAdminOverriding)
       for (const repository of removingRepos) {
         const exists = await Database.repositories.findOne({
           where: {
@@ -221,17 +248,28 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
           }
         })
 
-        if(hasIssues) return res.status(403).json(`Repository ${repository.fullName} already has bounties and cannot be removed`)
+        if (hasIssues)
+          return res
+            .status(403)
+            .json(
+              `Repository ${repository.fullName} already has bounties and cannot be removed`
+            )
       }
 
+    if (isAdminOverriding && name)
+      network.name = name
+
     network.description = description
-    network.colors = JSON.parse(colors)
+
+    if (!isAdminOverriding)
+      network.colors = JSON.parse(colors)
+
     if (logoIconHash) network.logoIcon = logoIconHash
     if (fullLogoHash) network.fullLogo = fullLogoHash
 
     network.save()
 
-    if(addingRepos.length)
+    if (addingRepos.length && !isAdminOverriding)
       for (const repository of addingRepos) {
         await Database.repositories.create({
           githubPath: repository.fullName,
@@ -239,7 +277,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         })
       }
 
-    if(removingRepos.length)
+    if (removingRepos.length && !isAdminOverriding)
       for (const repository of removingRepos) {
         const exists = await Database.repositories.findOne({
           where: {
