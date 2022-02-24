@@ -15,6 +15,7 @@ import IssueListItem from '@components/issue-list-item'
 import InfiniteScroll from '@components/infinite-scroll'
 import CustomContainer from '@components/custom-container'
 import ScrollTopButton from '@components/scroll-top-button'
+import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper'
 
 import { ApplicationContext } from '@contexts/application'
 import { changeLoadState } from '@contexts/reducers/change-load-state'
@@ -275,13 +276,18 @@ export default function ListIssues({
 
       {issuesPages.every((el) => el.issues?.length === 0) &&
       !loading.isLoading ? (
-        <NothingFound description={emptyMessage || filterByState.emptyState}>
-          <InternalLink
-            label={buttonMessage || String(t('actions.create-one'))}
-            href={redirect || getURLWithNetwork('/create-bounty')}
-            uppercase
-          />
+        <div className="pt-4">
+          <NothingFound description={emptyMessage || filterByState.emptyState}>
+          <ReadOnlyButtonWrapper>
+            <InternalLink
+              className='read-only-button'
+              label={buttonMessage || String(t('actions.create-one'))}
+              href={redirect || getURLWithNetwork('/create-bounty')}
+              uppercase
+            />
+          </ReadOnlyButtonWrapper>
         </NothingFound>
+        </div>
       ) : null}
 
       {(issuesPages.some((el) => el.issues?.length > 0) && (

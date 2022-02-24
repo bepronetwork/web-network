@@ -29,6 +29,7 @@ import { addToast } from '@contexts/reducers/add-toast'
 import { useTranslation } from 'next-i18next'
 import { PRLabel } from '@components/pull-request-labels'
 import useNetwork from '@x-hooks/use-network'
+import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper'
 
 export default function PullRequest() {
   const {
@@ -138,9 +139,11 @@ export default function PullRequest() {
 
           <div className="col-2 p-0 d-flex justify-content-center">
             {currentAddress && githubLogin && pullRequest?.state === 'open' && (
-              <Button onClick={handleShowModal}>
-                {t('actions.make-a-review')}
-              </Button>
+              <ReadOnlyButtonWrapper>
+                <Button className="read-only-button" onClick={handleShowModal}>
+                  {t('actions.make-a-review')}
+                </Button>
+              </ReadOnlyButtonWrapper>
             )}
           </div>
 

@@ -20,6 +20,7 @@ import {Spinner} from 'react-bootstrap';
 import useTransactions from '@x-hooks/useTransactions';
 import { changeSettlerTokenApproval } from '@contexts/reducers/change-settler-token-approval';
 import { useTranslation } from 'next-i18next';
+import ReadOnlyButtonWrapper from './read-only-button-wrapper';
 
 function OraclesActions(): JSX.Element {
   const {state: {metaMaskWallet, currentAddress, balance, oracles, myTransactions, isSettlerTokenApproved}, dispatch} = useContext(ApplicationContext);
@@ -225,28 +226,30 @@ function OraclesActions(): JSX.Element {
             }
             />
 
-          <div className="mt-5 d-grid gap-3">
+          <ReadOnlyButtonWrapper>
+            <div className="mt-5 d-grid gap-3">
+              {action === t('my-oracles:actions.lock.label') &&
+              
+                <Button 
+                  disabled={isApproveButtonDisabled()}
+                  className="ms-0 read-only-button"
+                  onClick={approveSettlerToken}
+                >
+                    {isApproveButtonDisabled() && <LockedIcon width={12} height={12} className="mr-1"/>}
+                    <span>{t('actions.approve')} {currentAddress && verifyTransactionState(TransactionTypes.approveSettlerToken) ? <Spinner size={"xs" as unknown as 'sm'} className="align-self-center ml-1" animation="border" /> : ``}</span>
+                </Button>}
 
-          {action === t('my-oracles:actions.lock.label') && 
-            <Button 
-              disabled={isApproveButtonDisabled()}
-              className="ms-0"
-              onClick={approveSettlerToken}
-            >
-                {isApproveButtonDisabled() && <LockedIcon width={12} height={12} className="mr-1"/>}
-                <span>{t('actions.approve')} {currentAddress && verifyTransactionState(TransactionTypes.approveSettlerToken) ? <Spinner size={"xs" as unknown as 'sm'} className="align-self-center ml-1" animation="border" /> : ``}</span>
-            </Button>}
-
-            <Button 
-              color={action === t('my-oracles:actions.lock.label') ? 'purple' : 'primary'} 
-              className="ms-0" 
-              disabled={isButtonDisabled()}
-              onClick={checkLockedAmount}
-            >
-                  {isButtonDisabled() && <LockedIcon width={12} height={12} className="mr-1"/>}
-                  <span>{renderInfo.label}</span>
-            </Button>
-          </div>
+                <Button 
+                  color={action === t('my-oracles:actions.lock.label') ? 'purple' : 'primary'} 
+                  className="ms-0 read-only-button" 
+                  disabled={isButtonDisabled()}
+                  onClick={checkLockedAmount}
+                >
+                      {isButtonDisabled() && <LockedIcon width={12} height={12} className="mr-1"/>}
+                      <span>{renderInfo.label}</span>
+                </Button>
+            </div>
+            </ReadOnlyButtonWrapper>
 
           <NetworkTxButton
             txMethod={action.toLowerCase()}

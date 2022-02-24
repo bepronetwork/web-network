@@ -29,6 +29,7 @@ interface NetworkTxButtonParams {
   txCurrency: TransactionCurrency;
   fullWidth?: boolean;
   useContract?: boolean;
+  className?: string;
 }
 
 
@@ -41,6 +42,7 @@ function networkTxButton({
                            buttonLabel,
                            modalTitle,
                            modalDescription,
+                           className = '',
                            children = null, fullWidth = false, useContract = false,
                            disabled = false, txType = TransactionTypes.unknown, txCurrency = `$BEPRO`,
                          }: NetworkTxButtonParams, elementRef) {
@@ -104,7 +106,7 @@ function networkTxButton({
   }
 
   function getButtonClass() {
-    return `mt-3 ${fullWidth ? `w-100` : ``} ${!children && !buttonLabel && `visually-hidden` || ``}`
+    return `mt-3 ${fullWidth ? `w-100` : ``} ${!children && !buttonLabel && `visually-hidden` || ``} ${className}`
   }
 
   function getDivClass() {

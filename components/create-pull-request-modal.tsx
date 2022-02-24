@@ -38,9 +38,9 @@ export default function CreatePullRequestModal({
     setIsCreating(false)
   }
 
-  function handleConfirm() {
+  async function handleConfirm() {
     setIsCreating(true)
-    onConfirm({title, description, branch})
+    await onConfirm({title, description, branch})
   }
 
 

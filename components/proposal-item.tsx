@@ -16,6 +16,7 @@ import Translation from './translation';
 import LockedIcon from '@assets/icons/locked-icon';
 import useApi from '@x-hooks/use-api';
 import useNetwork from '@x-hooks/use-network';
+import ReadOnlyButtonWrapper from './read-only-button-wrapper';
 
 interface Options {
   proposal: Proposal,
@@ -131,19 +132,22 @@ export default function ProposalItem({
                                      textClass={`pb-2 text-${getColors()}`}/>
               </div>
 
-              <div className="col-1 offset-1 justify-content-end d-flex">
-                <Button color={getColors()}
-                        disabled={!isDisputable}
-                        outline={!isDisputable} className={`align-self-center mb-2 ms-3`}
-                        onClick={(ev) => {
-                          ev.stopPropagation();
-                          handleDispute(+proposal._id)
-                        }}>
-                  {!isDisputable && getColors() !== 'success' && <LockedIcon className={`me-2 text-${getColors()}`}/>}
-                  <span>{getLabel()}</span>
-                </Button>
-              </div>
-
+              
+                <div className="col-1 offset-1 justify-content-end d-flex">
+                  <ReadOnlyButtonWrapper>
+                    <Button color={getColors()}
+                            disabled={!isDisputable}
+                            outline={!isDisputable} className={`align-self-center mb-2 ms-3 read-only-button`}
+                            onClick={(ev) => {
+                              ev.stopPropagation();
+                              handleDispute(+proposal._id)
+                            }}>
+                      {!isDisputable && getColors() !== 'success' && <LockedIcon className={`me-2 text-${getColors()}`}/>}
+                      <span>{getLabel()}</span>
+                    </Button>
+                  </ReadOnlyButtonWrapper>
+                </div>
+              
             </div>
           </div>
         </a>

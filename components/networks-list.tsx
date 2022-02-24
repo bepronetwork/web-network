@@ -103,10 +103,10 @@ export default function NetworksList({
             setOrder={handleOrderChange}
           />
 
-          {networks.map((network) => (
+          {networks.map((networkItem) => (
             <NetworkListItem
-              key={network.id}
-              network={network}
+              key={`network-list-item-${networkItem.name}`}
+              network={networkItem}
               redirectToHome={redirectToHome}
               updateNetworkParameter={updateNetworkParameter}
             />

@@ -212,7 +212,8 @@
   "errors": {
     "approve-transaction": "Failed to approve transaction",
     "creating-issue": "Failed to create github issue!",
-    "failed-update-bounty": "Failed to update bounty!"
+    "failed-update-bounty": "Failed to update bounty!",
+    "read-only-network": "This network is closed. It is set to read-only mode."
   },
   "404": {
     "the-page": "The page you looking for was",
