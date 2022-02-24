@@ -48,7 +48,7 @@ export default function TabbedNavigation({
           <div className={`col-${(collapsable && '11') || '12'} p-0`}>
             <Nav>
               {props.tabs.map((tab) => (
-                <Nav.Item>
+                <Nav.Item key={`${tab.eventKey}`}>
                   <Nav.Link eventKey={tab.eventKey}>
                     <div className='col'>
                       <span className='mr-2'>{tab.title}</span>
@@ -73,7 +73,7 @@ export default function TabbedNavigation({
         <Accordion.Collapse eventKey={String(collapsed)} className="row">
           <Tab.Content className="">
             {props.tabs.map((tab) => (
-              <Tab.Pane eventKey={tab.eventKey}>{tab.component}</Tab.Pane>
+              <Tab.Pane key={`${tab.eventKey}`} eventKey={tab.eventKey}>{tab.component}</Tab.Pane>
             ))}
           </Tab.Content>
         </Accordion.Collapse>

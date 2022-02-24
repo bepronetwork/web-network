@@ -14,6 +14,7 @@ import { ApplicationContext } from '@contexts/application'
 import useOctokit from '@x-hooks/use-octokit'
 import { formatNumberToNScale } from '@helpers/formatNumber'
 import useNetwork from '@x-hooks/use-network'
+import ReadOnlyButtonWrapper from './read-only-button-wrapper'
 
 export default function PullRequestItem({
   repoId,
@@ -127,19 +128,21 @@ export default function PullRequestItem({
               </div>
 
               <div className="col-1 d-flex justify-content-center">
-                <Button
-                  className="mr-3"
-                  disabled={!canReview()}
-                  onClick={(ev) => {
-                    ev.preventDefault()
-                    handleReviewClick()
-                  }}
-                >
-                  {!canReview() && <LockedIcon className="me-2" />}
-                  <span>
-                    <Translation label="actions.review" />
-                  </span>
-                </Button>
+                <ReadOnlyButtonWrapper>
+                  <Button
+                    className="mr-3 read-only-button"
+                    disabled={!canReview()}
+                    onClick={(ev) => {
+                      ev.preventDefault()
+                      handleReviewClick()
+                    }}
+                  >
+                    {!canReview() && <LockedIcon className="me-2" />}
+                    <span>
+                      <Translation label="actions.review" />
+                    </span>
+                  </Button>
+                </ReadOnlyButtonWrapper>
               </div>
             </div>
           </a>

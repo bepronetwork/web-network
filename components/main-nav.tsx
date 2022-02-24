@@ -36,6 +36,8 @@ import { BeproService } from '@services/bepro-service';
 
 import useApi from '@x-hooks/use-api';
 import useNetwork from '@x-hooks/use-network';
+import ClosedNetworkAlert from './closed-network-alert';
+import ReadOnlyButtonWrapper from './read-only-button-wrapper';
 
 const CURRENCY = process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME;
 const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
@@ -105,61 +107,66 @@ export default function MainNav() {
   useEffect(updateBalances, [balance])
 
   return (
-    <div className={`main-nav d-flex align-items-center justify-content-between ${isNetworksPage && 'bg-shadow' || 'bg-primary'}`}>
+    <div className={`main-nav d-flex flex-column ${isNetworksPage && 'bg-shadow' || 'bg-primary'}`}>
+      {network?.isClosed && <ClosedNetworkAlert />}
+        
+      <div className={`d-flex flex-row align-items-center justify-content-between px-3 ${currentAddress ? 'py-0' : 'py-3'}`}>
+        <div className="d-flex">
+          <InternalLink href={getURLWithNetwork('/', {network: network?.name})} icon={isNetworksPage ? <BeproLogoBlue /> : (network?.name !== BEPRO_NETWORK_NAME ? <Image src={`${IPFS_BASE}/${network?.fullLogo}`} width={104} height={32} /> : <BeproLogo aria-hidden={true} />)} className="brand" nav active brand />
+          {!isNetworksPage && <ul className="nav-links">
+            <li>
+              <InternalLink href={getURLWithNetwork('/developers')} label={<Translation label={'main-nav.developers'} />} nav uppercase />
+            </li>
 
-      <div className="d-flex">
-        <InternalLink href={getURLWithNetwork('/', {network: network?.name})} icon={isNetworksPage ? <BeproLogoBlue /> : (network?.name !== BEPRO_NETWORK_NAME ? <Image src={`${IPFS_BASE}/${network?.fullLogo}`} width={104} height={32} /> : <BeproLogo aria-hidden={true} />)} className="brand" nav active brand />
-        {!isNetworksPage && <ul className="nav-links">
-          <li>
-            <InternalLink href={getURLWithNetwork('/developers')} label={<Translation label={'main-nav.developers'} />} nav uppercase />
-          </li>
+            <li>
+              <InternalLink href={getURLWithNetwork('/council')} label={<Translation label={'main-nav.council'} />} nav uppercase />
+            </li>
 
-          <li>
-            <InternalLink href={getURLWithNetwork('/council')} label={<Translation label={'main-nav.council'} />} nav uppercase />
-          </li>
+            <li>
+              <InternalLink href={getURLWithNetwork('/oracle')} label={<Translation label={'main-nav.Oracle'} />} nav uppercase />
+            </li>
 
-          <li>
-            <InternalLink href={getURLWithNetwork('/oracle')} label={<Translation label={'main-nav.Oracle'} />} nav uppercase />
-          </li>
+            <li>
+              <InternalLink href={'/networks'} label={'Networks'} nav uppercase />
+            </li>
+          </ul> || '' }
+        </div>
 
-          <li>
-            <InternalLink href={'/networks'} label={'Networks'} nav uppercase />
-          </li>
-        </ul> || '' }
+        <div className="d-flex flex-row align-items-center">
+          <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" className='d-flex align-items-center mr-3 text-decoration-none text-white text-uppercase main-nav-link opacity-75 opacity-100-hover' target="_blank">
+            <span><Translation label={'main-nav.get-started'} /></span>
+            <ExternalLinkIcon className="ml-1"/>
+          </a>
+
+          { !isNetworksPage &&
+          <ReadOnlyButtonWrapper>
+            <InternalLink href={getURLWithNetwork('/create-bounty')} icon={<PlusIcon />} label={<Translation label={'main-nav.create-bounty'} />} className="mr-2 read-only-button" iconBefore nav uppercase />
+          </ReadOnlyButtonWrapper>
+          || <InternalLink href={getURLWithNetwork('/new-network')} icon={<PlusIcon />} label={'New Network'} className="mr-2" iconBefore nav uppercase />
+          }
+
+          <Button onClick={() => setShowHelp(true)}  className="ms-2 me-4 opacity-75 opacity-100-hover" transparent rounded><HelpIcon /></Button>
+
+          <WrongNetworkModal requiredNetwork={REQUIRED_NETWORK} />
+
+          <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
+            <div className="d-flex account-info align-items-center">
+
+              <TransactionsStateIndicator />
+
+              <NetworkIdentifier />
+
+              <InternalLink href={getURLWithNetwork('/account')} icon={<BeproSmallLogo />} label={formatNumberToNScale(beproBalance)} className="mx-3" transparent nav />
+
+              <InternalLink href={getURLWithNetwork('/account')} icon={<BalanceAddressAvatar address={address} balance={ethBalance} currency={CURRENCY} />} className="meta-info d-flex align-items-center" />
+            </div>
+          </ConnectWalletButton>
+        </div>
+
+        <HelpModal show={showHelp} onCloseClick={() => setShowHelp(false)} />
+        <UserMissingModal show={modalUserMissing} />
       </div>
-
-      <div className="d-flex flex-row align-items-center">
-        <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" className='d-flex align-items-center mr-3 text-decoration-none text-white text-uppercase main-nav-link opacity-75 opacity-100-hover' target="_blank">
-          <span><Translation label={'main-nav.get-started'} /></span>
-          <ExternalLinkIcon className="ml-1"/>
-        </a>
-
-        { !isNetworksPage &&
-        <InternalLink href={getURLWithNetwork('/create-bounty')} icon={<PlusIcon />} label={<Translation label={'main-nav.create-bounty'} />} className="mr-2" iconBefore nav uppercase />
-        || <InternalLink href={getURLWithNetwork('/new-network')} icon={<PlusIcon />} label={'New Network'} className="mr-2" iconBefore nav uppercase />
-        }
-
-        <Button onClick={() => setShowHelp(true)}  className="ms-2 me-4 opacity-75 opacity-100-hover" transparent rounded><HelpIcon /></Button>
-
-        <WrongNetworkModal requiredNetwork={REQUIRED_NETWORK} />
-
-        <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
-          <div className="d-flex account-info align-items-center">
-
-            <TransactionsStateIndicator />
-
-            <NetworkIdentifier />
-
-            <InternalLink href={getURLWithNetwork('/account')} icon={<BeproSmallLogo />} label={formatNumberToNScale(beproBalance)} className="mx-3" transparent nav />
-
-            <InternalLink href={getURLWithNetwork('/account')} icon={<BalanceAddressAvatar address={address} balance={ethBalance} currency={CURRENCY} />} className="meta-info d-flex align-items-center" />
-          </div>
-        </ConnectWalletButton>
-      </div>
-
-      <HelpModal show={showHelp} onCloseClick={() => setShowHelp(false)} />
-      <UserMissingModal show={modalUserMissing} />
-    </div>
+  </div>
   )
 }
 

@@ -39,15 +39,17 @@ function App({ Component, pageProps: { session, currentIssue,...pageProps } }: A
       <Seo issueMeta={currentIssue} />
       <SessionProvider session={session}>
         <ApplicationContextProvider>
-            <NetworkThemeInjector />
-            <NationDialog>
-              <MainNav />
-              <WebThreeDialog />
-              <div className="pb-5">
-                {!loaded ? `` : <Component {...pageProps} />}
-              </div>
-              <StatusBar />
-            </NationDialog>
+            <div className={`${network?.isClosed && 'read-only-network' || ''}`}>
+              <NetworkThemeInjector />
+              <NationDialog>
+                <MainNav />
+                <WebThreeDialog />
+                <div className="pb-5">
+                  {!loaded ? `` : <Component {...pageProps} />}
+                </div>
+                <StatusBar />
+              </NationDialog>
+            </div>
         </ApplicationContextProvider>
       </SessionProvider>
     </>

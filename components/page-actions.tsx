@@ -22,6 +22,7 @@ import { ProposalData } from "@interfaces/api-response";
 import Translation from "./translation";
 import { useTranslation } from "next-i18next";
 import useNetwork from "@x-hooks/use-network";
+import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 
 interface pageActions {
   issueId: string;
@@ -180,12 +181,15 @@ export default function PageActions({
       isIssueinDraft &&
       issueCreator === currentAddress &&
       !finalized && (
-        <Button
-          disabled={isReedemButtonDisable()}
-          onClick={handleRedeem}
-        >
-            <Translation ns="bounty" label="actions.redeem" />
-        </Button>
+        <ReadOnlyButtonWrapper>
+          <Button
+          className="read-only-button"
+            disabled={isReedemButtonDisable()}
+            onClick={handleRedeem}
+          >
+              <Translation ns="bounty" label="actions.redeem" />
+          </Button>
+        </ReadOnlyButtonWrapper>
       )
     );
   };
@@ -215,9 +219,11 @@ export default function PageActions({
       isRepoForked &&
       isWorking &&
       githubLogin && (
-        <Button className="mr-1" onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || hasOpenPR}>
+        <ReadOnlyButtonWrapper>
+        <Button className="mr-1 read-only-button" onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || hasOpenPR}>
           <Translation ns="pull-request" label="actions.create.title" />
         </Button>
+        </ReadOnlyButtonWrapper>
       )
     );
   }
@@ -248,15 +254,17 @@ export default function PageActions({
       !finished &&
       !finalized &&
       githubLogin &&
+      <ReadOnlyButtonWrapper>
       <Button
         color="primary"
         onClick={handleStartWorking}
-        className="mr-1"
+        className="mr-1 read-only-button"
         disabled={isExecuting}
       >
         <span><Translation ns="bounty" label="actions.start-working.title" /></span>
         {isExecuting ? <span className="spinner-border spinner-border-xs ml-1"/> : ''}
       </Button>
+      </ReadOnlyButtonWrapper>
     )
   }
 
@@ -285,6 +293,8 @@ export default function PageActions({
           handleMicroService(true);
 
         setShowPRModal(false);
+
+        return true
       })
       .catch((err) => {
         if (err.response?.status === 422 && err.response?.data) {
@@ -306,6 +316,8 @@ export default function PageActions({
             })
           );
         }
+
+        return false
       });
   }
 
@@ -420,11 +432,11 @@ export default function PageActions({
               {renderProposeDestribution()}
               {state?.toLowerCase() == "pull request" && (
                 <>
-                  { (!isDisputed && !finalized && isDisputable ) && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>{t('actions.dispute')}</Button> || ``}
-                  {!finalized && <Button disabled={!canClose || isDisputable} onClick={handleClose}>
+                  { (!isDisputed && !finalized && isDisputable ) && <ReadOnlyButtonWrapper><Button color={`${isDisputed ? 'primary': 'purple'}`} className="read-only-button mr-1" onClick={handleDispute}>{t('actions.dispute')}</Button></ReadOnlyButtonWrapper> || ``}
+                  {!finalized && <ReadOnlyButtonWrapper><Button className="read-only-button mr-1" disabled={!canClose || isDisputable} onClick={handleClose}>
                   {!canClose || isDisputable && <LockedIcon width={12} height={12} className="mr-1"/>}
                     <span>{t('pull-request:actions.merge.title')}</span>
-                    </Button> || ``}
+                    </Button></ReadOnlyButtonWrapper> || ``}
                 </>
               )}
 

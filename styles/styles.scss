@@ -281,7 +281,7 @@ li {
   position: fixed;
   z-index: 5;
   height: $navbar-height;
-  padding: 0px $m;
+  
 
   .brand {
     padding: 0;
@@ -1441,4 +1441,14 @@ input[type="color"] {
 
 .p-20 {
   padding: 20px;
+}
+
+.read-only-network {
+  .read-only-wrapper {
+    cursor: not-allowed !important;
+  }
+  
+  .read-only-button {
+    pointer-events: none !important;
+  }
 }

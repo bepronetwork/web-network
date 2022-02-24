@@ -25,6 +25,7 @@ import { useTranslation } from 'next-i18next';
 import Avatar from './avatar';
 import PullRequestLabels, {PRLabel} from './pull-request-labels';
 import useNetwork from '@x-hooks/use-network';
+import ReadOnlyButtonWrapper from './read-only-button-wrapper';
 
 interface participants {
   githubHandle: string;
@@ -360,7 +361,9 @@ export default function NewProposal({
   }
 
   function renderRecognizeAsFinished() {
-    return <Button onClick={recognizeAsFinished} className="mr-1">{t('bounty:actions.recognize-finished.title')}</Button>;
+    return <ReadOnlyButtonWrapper>
+      <Button onClick={recognizeAsFinished} className="mr-1 read-only-button">{t('bounty:actions.recognize-finished.title')}</Button>
+      </ReadOnlyButtonWrapper>;
   }
   const cantBeMergeable = () => !currentPullRequest.isMergeable || currentPullRequest.merged;
 
@@ -382,9 +385,11 @@ export default function NewProposal({
   return (
     <div className="d-flex">
       {(isCouncil && isFinished && (
-        <Button className="mx-2" onClick={() => setShow(true)}>
-          Create Proposal
-        </Button>
+        <ReadOnlyButtonWrapper>
+          <Button className="mx-2 read-only-button" onClick={() => setShow(true)}>
+            {t('proposal:actions.create')}
+          </Button>
+        </ReadOnlyButtonWrapper>
       )) ||
         (isIssueOwner && !isFinished && renderRecognizeAsFinished())}
       <Modal

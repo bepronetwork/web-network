@@ -26,6 +26,7 @@ import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import DragAndDrop,{IFilesProps} from '@components/drag-and-drop'
 import useNetwork from '@x-hooks/use-network';
+import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper';
 
 interface Amount {
   value?: string,
@@ -280,12 +281,17 @@ export default function PageCreateIssue() {
                 ) : (
                   <>
                     {!isTransactionalTokenApproved ?
-                      <Button className="me-3" disabled={isApproveButtonDisable()} onClick={allowCreateIssue}>{t('actions.approve')}</Button>
+                      <ReadOnlyButtonWrapper>
+                        <Button className="me-3 read-only-button" disabled={isApproveButtonDisable()} onClick={allowCreateIssue}>{t('actions.approve')}</Button>
+                      </ReadOnlyButtonWrapper>
                       : null
                     }
-                    <Button disabled={isCreateButtonDisabled()}
-                            onClick={createIssue}>{isCreateButtonDisabled() && <LockedIcon className="mr-1" width={13} height={13}/>}<span>{t('create-bounty:create-bounty')}</span>
-                    </Button>
+                    <ReadOnlyButtonWrapper>
+                      <Button disabled={isCreateButtonDisabled()}
+                              className="read-only-button"
+                              onClick={createIssue}>{isCreateButtonDisabled() && <LockedIcon className="mr-1" width={13} height={13}/>}<span>{t('create-bounty:create-bounty')}</span>
+                      </Button>
+                    </ReadOnlyButtonWrapper>
                   </>
                 )}
               </div>
