@@ -21,7 +21,7 @@ import LockedIcon from "@assets/icons/locked-icon";
 import { ProposalData } from "@interfaces/api-response";
 import Translation from "./translation";
 import { useTranslation } from "next-i18next";
-import useNetwork from "@x-hooks/use-network";
+import { useNetwork } from "@contexts/network";
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 import { IForkInfo } from "@interfaces/repos-list";
 
@@ -99,7 +99,7 @@ export default function PageActions({
   const [isExecuting, setIsExecuting] = useState(false);
 
   const txWindow = useTransactions();
-  const { network } = useNetwork()
+  const { activeNetwork } = useNetwork()
 
   function renderIssueAvatars() {
     if (developers?.length > 0) return <IssueAvatars users={developers} />;
@@ -136,11 +136,11 @@ export default function PageActions({
     ].some((values) => values === false);
 
   async function handleRedeem() {
-    const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue });
+    const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue }, activeNetwork);
     dispatch(redeemTx);
     const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
 
-    waitForRedeem(issueId, network?.name)
+    waitForRedeem(issueId, activeNetwork?.name)
       .then(() => {
         if (handleBeproService)
           handleBeproService(true);
@@ -279,7 +279,7 @@ export default function PageActions({
 
   async function handlePullrequest({title: prTitle, description: prDescription, branch}) {
 
-    createPullRequestIssue(repoId as string, githubId, {title: prTitle, description: prDescription, username: githubLogin, branch}, network?.name)
+    createPullRequestIssue(repoId as string, githubId, {title: prTitle, description: prDescription, username: githubLogin, branch}, activeNetwork?.name)
       .then(() => {
         dispatch(
           addToast({
@@ -324,7 +324,7 @@ export default function PageActions({
   async function handleStartWorking() {
     setIsExecuting(true)
 
-    startWorking(networkCID, githubLogin, network?.name)
+    startWorking(networkCID, githubLogin, activeNetwork?.name)
       .then((response) => {
         dispatch(
           addToast({
@@ -357,7 +357,7 @@ export default function PageActions({
   }
 
   async function handleDispute() {
-    const disputeTx = addTransaction({ type: TransactionTypes.dispute });
+    const disputeTx = addTransaction({ type: TransactionTypes.dispute }, activeNetwork);
     dispatch(disputeTx);
 
     const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
@@ -380,12 +380,12 @@ export default function PageActions({
 
   async function handleClose() {
    
-    const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue });
+    const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue }, activeNetwork);
     dispatch(closeIssueTx);
 
     const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
 
-    waitForClose(issueId, network?.name)
+    waitForClose(issueId, activeNetwork?.name)
       .then(() => {
         if (handleBeproService)
           handleBeproService(true);

@@ -15,7 +15,8 @@ import useTransactions from '@x-hooks/useTransactions';
 import Translation from './translation';
 import LockedIcon from '@assets/icons/locked-icon';
 import useApi from '@x-hooks/use-api';
-import useNetwork from '@x-hooks/use-network';
+import useNetworkTheme from '@x-hooks/use-network';
+import { useNetwork } from '@contexts/network'
 import ReadOnlyButtonWrapper from './read-only-button-wrapper';
 
 interface Options {
@@ -46,13 +47,14 @@ export default function ProposalItem({
   const {dispatch,} = useContext(ApplicationContext);
   const txWindow = useTransactions();
   const { processEvent } = useApi();
-  const { getURLWithNetwork } = useNetwork()
+  const { getURLWithNetwork } = useNetworkTheme()
+  const { activeNetwork } = useNetwork()
 
   async function handleDispute(mergeId) {
     if (!isDisputable || isFinalized)
       return;
 
-    const disputeTx = addTransaction({type: TransactionTypes.dispute});
+    const disputeTx = addTransaction({type: TransactionTypes.dispute}, activeNetwork);
     dispatch(disputeTx);
 
     const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);

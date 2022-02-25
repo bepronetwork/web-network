@@ -11,6 +11,7 @@ import useTransactions from 'x-hooks/useTransactions';
 import { formatNumberToString } from '@helpers/formatNumber';
 import { truncateAddress } from '@helpers/truncate-address';
 import { useTranslation } from 'next-i18next';
+import { useNetwork } from '@contexts/network';
 
 interface Props extends ComponentPropsWithoutRef<"div"> {
   amount: string;
@@ -27,6 +28,7 @@ export default function OraclesTakeBackItem({
   const {dispatch} = useContext(ApplicationContext);
   const txWindow = useTransactions();
   const { t } = useTranslation('common')
+  const { activeNetwork } = useNetwork()
 
   function handleShow() {
     setShow(true);
@@ -39,7 +41,7 @@ export default function OraclesTakeBackItem({
   async function handleTakeBack() {
     handleCancel()
     
-    const delegateTx = addTransaction({type: TransactionTypes.takeBackOracles, amount: +amount, currency: 'Oracles'});
+    const delegateTx = addTransaction({type: TransactionTypes.takeBackOracles, amount: +amount, currency: 'Oracles'}, activeNetwork);
     dispatch(delegateTx);
 
     try {

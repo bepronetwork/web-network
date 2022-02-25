@@ -13,6 +13,7 @@ import Button from './button';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import useTransactions from '@x-hooks/useTransactions';
 import { useTranslation } from 'next-i18next';
+import { useNetwork } from '@contexts/network';
 
 interface NetworkTxButtonParams {
   txMethod: string;
@@ -51,6 +52,7 @@ function networkTxButton({
   const [txSuccess, setTxSuccess] = useState(false);
   const txWindow = useTransactions();
   const { t } = useTranslation(['common'])
+  const { activeNetwork } = useNetwork()
 
   function checkForTxMethod() {
     if (!beproInit || !metaMaskWallet)
@@ -64,7 +66,7 @@ function networkTxButton({
     if (!beproInit || !metaMaskWallet)
       return;
 
-    const tmpTransaction = addTransaction({type: txType, amount: txParams?.tokenAmount || 0, currency: txCurrency});
+    const tmpTransaction = addTransaction({type: txType, amount: txParams?.tokenAmount || 0, currency: txCurrency}, activeNetwork);
     dispatch(tmpTransaction);
 
     let transactionMethod
