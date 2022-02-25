@@ -205,7 +205,6 @@ export default function PageActions({
                                   amountTotal={amountIssue}
                                   mergeProposals={mergeProposals}
                                   pullRequests={pullRequests}
-                                  handleBeproService={handleBeproService}
                                   handleMicroService={handleMicroService}/>
     );
   }

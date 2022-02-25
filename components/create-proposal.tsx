@@ -85,7 +85,6 @@ export default function NewProposal({
                                       amountTotal,
                                       mergeProposals,
                                       pullRequests = [],
-                                      handleBeproService,
                                       handleMicroService,
                                       isIssueOwner = false, isFinished = false
                                     }) {
@@ -276,9 +275,6 @@ export default function NewProposal({
 
     waitForMerge(githubLogin, issue_id, currentGithubId, activeNetwork?.name)
                       .then(() => {
-                        if (handleBeproService)
-                          handleBeproService(true);
-
                         if (handleMicroService)
                           handleMicroService(true);
                         handleClose();
@@ -336,9 +332,6 @@ export default function NewProposal({
                   txWindow.updateItem(recognizeAsFinished.payload.id, BeproService.parseTransaction(txInfo, recognizeAsFinished.payload));
                 })
                 .then(() => {
-                  if (handleBeproService)
-                    handleBeproService(true);
-
                   if (handleMicroService)
                     handleMicroService(true);
                 })
