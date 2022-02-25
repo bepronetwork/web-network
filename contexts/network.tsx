@@ -23,6 +23,7 @@ const NetworkContext = createContext<NetworkContextData>({} as NetworkContextDat
 
 export const NetworkProvider: React.FC = function ({ children }) {
   const [activeNetwork, setActiveNetwork] = useState<INetwork>(null);
+  const [networksList, setNetworkLists] = useState<INetwork>(null);
   
   const {query, push} = useRouter();
   const { getNetwork } = useApi()
@@ -33,14 +34,14 @@ export const NetworkProvider: React.FC = function ({ children }) {
 
     const networkFromStorage = localStorage.getItem(newNetwork)
 
-    if (networkFromStorage) setActiveNetwork(JSON.parse(networkFromStorage))
+    if (networkFromStorage) {
+      return setActiveNetwork(JSON.parse(networkFromStorage))
+    }
 
     if (!!networkFromStorage) dispatch(changeLoadState(true))
-    debugger;
     getNetwork(newNetwork)
       .then(({ data }) => {
         localStorage.setItem(newNetwork.toLowerCase(), JSON.stringify(data))
-        debugger;
         setActiveNetwork(data)
       })
       .catch(error => {
