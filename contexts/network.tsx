@@ -45,7 +45,6 @@ export const NetworkProvider: React.FC = function ({ children }) {
         setActiveNetwork(data)
       })
       .catch(error => {
-        if (!!networkFromStorage)
           push({
             pathname: '/networks'
           })
