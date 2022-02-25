@@ -9,13 +9,14 @@ export interface IssueData {
   id?: string; // database id
   body: string;
   createdAt: Date;
+  updatedAt?: Date;
   developers: developer[];
   dueDate?: string;
   githubId: string;
   issueId: string; // custom id repo/githubid
   creatorGithub?: string;
   creatorAddress?: string;
-  isIssueinDraft?: boolean;
+  isIssueinDraft?: boolean; //Remove, moved to NetworkIssue in Context
   amount?: number;
   url?: string;
   numberOfComments: number;

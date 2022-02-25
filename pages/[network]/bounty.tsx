@@ -1,57 +1,51 @@
 import {GetServerSideProps} from 'next/types';
 import React, { useContext, useEffect, useState } from 'react';
-import IssueComments from '@components/issue-comments';
-import IssueDescription from '@components/issue-description';
-import IssueHero from '@components/issue-hero';
-import PageActions from '@components/page-actions';
-import IssueProposals from '@components/issue-proposals';
+import IssueComments from 'components/issue-comments';
+import IssueDescription from 'components/issue-description';
+import IssueHero from 'components/issue-hero';
+import PageActions from 'components/page-actions';
+import IssueProposals from 'components/issue-proposals';
 import { useRouter } from 'next/router';
-import { BeproService } from '@services/bepro-service';
 import { User } from '@interfaces/api-response';
 import { ApplicationContext } from '@contexts/application';
-import { IssueData } from '@interfaces/issue-data';
 import { formatNumberToCurrency } from '@helpers/formatNumber';
-import IssueProposalProgressBar from '@components/issue-proposal-progress-bar';
-import useMergeData from '@x-hooks/use-merge-data';
-import useRepos from '@x-hooks/use-repos';
-import useOctokit from '@x-hooks/use-octokit';
-import useApi from '@x-hooks/use-api';
-import TabbedNavigation from '@components/tabbed-navigation';
-import IssuePullRequests from '@components/issue-pull-requests';
-import CustomContainer from '@components/custom-container';
+import IssueProposalProgressBar from 'components/issue-proposal-progress-bar';
+import useMergeData from 'x-hooks/use-merge-data';
+import useOctokit from 'x-hooks/use-octokit';
+import useApi from 'x-hooks/use-api';
+import TabbedNavigation from 'components/tabbed-navigation';
+import IssuePullRequests from 'components/issue-pull-requests';
+import CustomContainer from 'components/custom-container';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
-import Translation from '@components/translation';
+import Translation from 'components/translation';
 import { useTranslation } from 'next-i18next';
-
-import useNetwork from '@x-hooks/use-network';
+import { useRepos } from '@contexts/repos';
+import { useIssue } from '@contexts/issue';
 
 export default function PageIssue() {
   const router = useRouter();
   const { id, repoId } = router.query;
-  const { state: { currentAddress, githubLogin }, } = useContext(ApplicationContext);
 
-  const [issue, setIssue] = useState<IssueData>();
-  const [networkIssue, setNetworkIssue] = useState<any>();
-  const [isIssueinDraft, setIsIssueinDraft] = useState(false);
   const [commentsIssue, setCommentsIssue] = useState();
-  const [forks, setForks] = useState();
   const [isRepoForked, setIsRepoForked] = useState(false);
   const [isWorking, setIsWorking] = useState(false);
   const [hasOpenPR, setHasOpenPR] = useState(false);
   const [mergedPullRequests, setMergedPullRequests] = useState([]);
   const [currentUser, setCurrentUser] = useState<User>();
+  
+  const { state: { currentAddress, githubLogin }, } = useContext(ApplicationContext);
+  const {activeRepo}= useRepos();
+  const {activeIssue: issue, networkIssue, updateIssue, getNetworkIssue} = useIssue()
+  const {getUserOf, userHasPR} = useApi();
   const {getMergedDataFromPullRequests} = useMergeData();
-  const {getIssueComments, getForksOf, getUserRepos, getPullRequest} = useOctokit();
-  const [[activeRepo, reposList]] = useRepos();
-  const {getUserOf, getIssue, userHasPR} = useApi();
+  const { getUserRepos} = useOctokit();
   const { t } = useTranslation('bounty')
-  const { network } = useNetwork()
 
   const tabs = [
     {
       eventKey: 'proposals',
-      title: <Translation ns="proposal" label={'labelWithCount'} params={{count: +networkIssue?.mergeProposalAmount || 0}} />,
+      title: <Translation ns="proposal" label={'labelWithCount'} params={{count: +networkIssue?.mergeProposalsAmount || 0}} />,
       isEmpty: !(networkIssue?.mergeProposalsAmount > 0),
       component: <IssueProposals
         key="tab-proposals"
@@ -80,60 +74,6 @@ export default function PageIssue() {
     return  tabs.find(tab => tab.isEmpty === false)?.eventKey
   }
 
-  function getIssueCID() {
-    return [repoId, id].join(`/`)
-  }
-
-  function getsIssueMicroService(force = false) {
-    if (!activeRepo || (!force && issue))
-      return;
-
-    getIssue(repoId as string, id as string, network?.name)
-      .then(async (issue) => {
-        if (!issue)
-          return router.push('/404')
-
-        if(issue?.pullRequests?.length > 0){
-          const mapPr = issue.pullRequests.map(async(pr)=>{
-            const {data} = await getPullRequest(Number(pr.githubId), issue?.repository?.githubPath)
-            pr.isMergeable = data.mergeable;
-            pr.merged = data.merged;
-            return pr;
-          })
-  
-          const pullRequests = await Promise.all(mapPr);
-          issue.pullRequests = pullRequests;
-        }
-
-        setIssue(issue);
-
-        if (!commentsIssue)
-          getIssueComments(+issue.githubId, activeRepo.githubPath)
-            .then((comments) => {
-              setCommentsIssue(comments.data as any)
-            }).catch(console.log)
-      })
-
-    if (!forks)
-      getForksOf(activeRepo.githubPath).then((frk) => setForks(frk.data as any)).catch(console.log)
-  }
-
-  function getsIssueBeproService(force = false) {
-    if (!currentAddress || (networkIssue && !force))
-      return;
-
-    const issueCID = getIssueCID()
-    BeproService.network.getIssueByCID(issueCID)
-      .then(netIssue => {
-        setNetworkIssue(netIssue);
-        return netIssue._id;
-      })
-      .then(issueId => BeproService.network.isIssueInDraft(issueId))
-      .then((isIssueInDraft) => setIsIssueinDraft(isIssueInDraft))
-      .catch(e => {
-        console.error(`Failed to fetch network issue or draft state`, e);
-      });
-  }
 
   const getCurrentUserMicroService = () => {
     if (currentAddress == currentUser?.address)
@@ -154,7 +94,7 @@ export default function PageIssue() {
         console.log(`Failed to get users repositories: `, e)
       })
 
-    userHasPR(`${repoId}/${id}`, githubLogin, network?.name)
+    userHasPR(`${repoId}/${id}`, githubLogin)
       .then((result) => {
         setHasOpenPR(!!result)
       })
@@ -163,10 +103,8 @@ export default function PageIssue() {
 
   function loadIssueData() {
     if (currentAddress && id) {
-      getsIssueMicroService();
-      getsIssueBeproService();
       getCurrentUserMicroService();
-    } else if (id) getsIssueMicroService();
+    } 
 
     if (githubLogin && activeRepo) getRepoForked();
   }
@@ -185,45 +123,42 @@ export default function PageIssue() {
       getMergedDataFromPullRequests(issue.repository?.githubPath, issue.pullRequests).then(setMergedPullRequests)
   }
 
-  useEffect(loadIssueData, [githubLogin, currentAddress, id, activeRepo, network]);
-  useEffect(getsIssueMicroService, [activeRepo, reposList])
+  function syncLocalyState(){
+    if(issue?.comments)
+      setCommentsIssue([...issue?.comments] as any)
+  }
+
+  function refreshIssue(){
+    updateIssue(`${issue.repository_id}`, issue.githubId)
+    .catch((e)=> router.push('/404'))
+  }
+
+  useEffect(syncLocalyState,[issue, activeRepo])
+  useEffect(loadIssueData, [githubLogin, currentAddress, id, issue, activeRepo]);
   useEffect(checkIsWorking, [issue, githubLogin])
-  useEffect(getRepoForked, [issue, githubLogin])
   useEffect(loadMergedPullRequests, [issue, currentAddress])
-
-  const handleStateissue = () => {
-    if (issue?.state) return issue?.state;
-
-    if (isIssueinDraft) {
-      return 'Draft';
-    } else if (networkIssue?.finalized) {
-      return 'Closed';
-    } else {
-      return 'Open';
-    }
-  };
 
   return (
     <>
       <IssueHero
         amount={formatNumberToCurrency(issue?.amount || networkIssue?.tokensStaked)}
-        state={handleStateissue()}
+        state={issue?.state}
         issue={issue} />
       <PageActions
-        state={handleStateissue()}
+        state={issue?.state}
         developers={issue?.developers}
         finalized={networkIssue?.finalized}
-        isIssueinDraft={isIssueinDraft}
+        isIssueinDraft={networkIssue?.isDraft}
         networkCID={networkIssue?.cid}
         issueId={issue?.issueId}
         title={issue?.title}
         description={issue?.body}
-        handleBeproService={getsIssueBeproService}
-        handleMicroService={getsIssueMicroService}
+        handleBeproService={getNetworkIssue}
+        handleMicroService={refreshIssue}
         pullRequests={issue?.pullRequests || []}
         mergeProposals={issue?.mergeProposals}
         amountIssue={networkIssue?.tokensStaked}
-        forks={forks}
+        forks={activeRepo?.forks}
         githubLogin={currentUser?.githubLogin}
         hasOpenPR={hasOpenPR}
         isRepoForked={isRepoForked}
@@ -248,7 +183,7 @@ export default function PageIssue() {
               <div className="sticky-bounty">
                 <IssueProposalProgressBar
                   isFinalized={networkIssue?.finalized}
-                  isIssueinDraft={isIssueinDraft}
+                  isIssueinDraft={networkIssue.isDraft}
                   mergeProposalsAmount={networkIssue?.mergeProposalsAmount}
                   isFinished={networkIssue?.recognizedAsFinished}
                   isCanceled={

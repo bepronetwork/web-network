@@ -3,29 +3,28 @@ import Modal from './modal';
 import ReactSelect from './react-select';
 import CreateProposalDistributionItem from './create-proposal-distribution-item';
 import sumObj from 'helpers/sumObj';
-import {BeproService} from '@services/bepro-service';
+import {BeproService} from 'services/bepro-service';
 import {pullRequest} from 'interfaces/issue-data';
 import {ApplicationContext} from '@contexts/application';
 import {addTransaction} from '@reducers/add-transaction';
-import {TransactionTypes} from '@interfaces/enums/transaction-types';
+import {TransactionTypes} from 'interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import {toastWarning} from '@reducers/add-toast';
 import Button from './button';
-import {useRouter} from 'next/router';
-import useOctokit from '@x-hooks/use-octokit';
-import useRepos from '@x-hooks/use-repos';
-import useApi from '@x-hooks/use-api';
-import {TransactionStatus} from '@interfaces/enums/transaction-status';
-import useTransactions from '@x-hooks/useTransactions';
+import useOctokit from 'x-hooks/use-octokit';
+import useApi from 'x-hooks/use-api';
+import {TransactionStatus} from 'interfaces/enums/transaction-status';
+import useTransactions from 'x-hooks/useTransactions';
 import LockedIcon from '@assets/icons/locked-icon';
 import clsx from 'clsx';
-import { Proposal } from '@interfaces/proposal';
-import { ProposalData } from '@interfaces/api-response';
+import { Proposal } from 'interfaces/proposal';
+import { ProposalData } from 'interfaces/api-response';
 import { useTranslation } from 'next-i18next';
 import Avatar from './avatar';
 import PullRequestLabels, {PRLabel} from './pull-request-labels';
-import useNetwork from '@x-hooks/use-network';
 import ReadOnlyButtonWrapper from './read-only-button-wrapper';
+import {useRepos} from 'contexts/repos'
+import {useNetwork} from 'contexts/network'
 
 interface participants {
   githubHandle: string;
@@ -90,7 +89,7 @@ export default function NewProposal({
                                       handleMicroService,
                                       isIssueOwner = false, isFinished = false
                                     }) {
-  const {dispatch, state: {balance, currentAddress, beproInit, oracles, githubLogin},} = useContext(ApplicationContext);
+  const {dispatch, state: {currentAddress, beproInit, githubLogin},} = useContext(ApplicationContext);
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>();
   const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest)
@@ -103,13 +102,13 @@ export default function NewProposal({
   const [councilAmount, setCouncilAmount] = useState(0);
   const [currentGithubId, setCurrentGithubId] = useState<string>();
   const [proposals, setProposals] = useState<Proposal[]>([]);
-  const router = useRouter();
-  const [[activeRepo]] = useRepos();
   const {getParticipants} = useOctokit();
   const {getUserWith, waitForMerge, processMergeProposal, processEvent} = useApi();
   const txWindow = useTransactions();
   const { t } = useTranslation(['common', 'bounty', 'proposal', 'pull-request'])
-  const { network } = useNetwork()
+  const {activeNetwork} = useNetwork()
+  const {activeRepo} = useRepos();
+
 
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
@@ -275,7 +274,7 @@ export default function NewProposal({
     const proposeMergeTx = addTransaction({type: TransactionTypes.proposeMerge})
     dispatch(proposeMergeTx);
 
-    waitForMerge(githubLogin, issue_id, currentGithubId, network?.name)
+    waitForMerge(githubLogin, issue_id, currentGithubId, activeNetwork?.name)
                       .then(() => {
                         if (handleBeproService)
                           handleBeproService(true);
@@ -289,7 +288,7 @@ export default function NewProposal({
     await BeproService.network
                       .proposeIssueMerge(payload.issueID, payload.prAddresses, payload.prAmounts)
                       .then(txInfo => {
-                        processEvent(`merge-proposal`, txInfo.blockNumber, issue_id, currentGithubId, network?.name);
+                        processEvent(`merge-proposal`, txInfo.blockNumber, issue_id, currentGithubId, activeNetwork?.name);
 
                         txWindow.updateItem(proposeMergeTx.payload.id, BeproService.parseTransaction(txInfo, proposeMergeTx.payload));
 
