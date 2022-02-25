@@ -24,12 +24,10 @@ import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import {NetworkFactory, toSmartContractDecimals} from 'bepro-js';
 import useNetwork from '@x-hooks/use-network';
-import NetworksList from '@components/networks-list';
-import { Network } from '@interfaces/network';
+import { INetwork } from '@interfaces/network';
 import { formatDate } from '@helpers/formatDate';
 import OverrideNameModal from '@components/custom-network/override-name-modal';
 import { truncateAddress } from '@helpers/truncate-address';
-import NetworkLogo from '@components/network-logo';
 
 export default function ParityPage() {
   const {state: {currentAddress, balance,}, dispatch} = useContext(ApplicationContext);
@@ -43,7 +41,7 @@ export default function ParityPage() {
   const [settlerTokenName, setSettlerTokenName] = useState(``);
   const [settlerTokenSymbol, setSettlerTokenSymbol] = useState(``);
   const [settlerTokenAddress, setSettlerTokenAddress] = useState(``);
-  const [networkToUpdate, setNetworkToUpdate] = useState<Network>()
+  const [networkToUpdate, setNetworkToUpdate] = useState<INetwork>()
   const [showModalName, setShowModalName] = useState(false)
   const [issuesList, setIssuesList] = useState([]);
   const [reposList, setReposList] = useState<ReposList>([]);
@@ -51,7 +49,7 @@ export default function ParityPage() {
   const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId, createRepo, getReposList, removeRepo: apiRemoveRepo, searchNetworks} = useApi();
   const { t } = useTranslation(['common', 'parity'])
   const { network } = useNetwork()
-  const [networks, setNetworks] = useState<Network[]>([])
+  const [networks, setNetworks] = useState<INetwork[]>([])
 
   const formItem = (label = ``, placeholder = ``, value = ``, onChange = (ev) => {}) =>
     ({label, placeholder, value, onChange})

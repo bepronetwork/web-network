@@ -7,7 +7,7 @@ import { changeLoadState } from '@contexts/reducers/change-load-state'
 
 import { hexadecimalToRGB } from '@helpers/colors'
 
-import { Network, ThemeColors } from '@interfaces/network'
+import { INetwork, ThemeColors } from '@interfaces/network'
 
 import useApi from '@x-hooks/use-api'
 
@@ -15,7 +15,7 @@ import { BEPRO_NETWORK_NAME } from 'env'
 
 export default function useNetwork() {
   const router = useRouter()
-  const [network, setNetwork] = useState<Network>()
+  const [network, setNetwork] = useState<INetwork>()
 
   const { getNetwork } = useApi()
   const { dispatch } = useContext(ApplicationContext)

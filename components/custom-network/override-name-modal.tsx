@@ -9,7 +9,7 @@ import ImageUploader from '@components/image-uploader'
 
 import { ApplicationContext } from '@contexts/application'
 
-import { Network } from '@interfaces/network'
+import { INetwork } from '@interfaces/network'
 
 import useApi from '@x-hooks/use-api'
 import { addToast } from '@contexts/reducers/add-toast'
@@ -32,7 +32,7 @@ export default function OverrideNameModal({
   const [logoIcon, setLogoIcon] = useState(defaultImage)
   const [fullLogo, setFullLogo] = useState(defaultImage)
   const [isExecuting, setIsExecuting] = useState(false)
-  const [newNetwork, setNewNetwork] = useState<Network>()
+  const [newNetwork, setNewNetwork] = useState<INetwork>()
 
   const { updateNetwork } = useApi()
 

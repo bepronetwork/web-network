@@ -1,4 +1,4 @@
-export interface Network {
+export interface INetwork {
   id: number
   name: string
   updatedAt: Date
