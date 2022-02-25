@@ -40,7 +40,7 @@ async function doHeading({ issueId, state }: { issueId: string; state: string })
         }
       }
     }
-    const statusText = await write(state.toUpperCase(), 35, "white", "bold",{
+    const statusText = await write(state.toUpperCase(), 35, state.toLowerCase() === 'draft' ? "black" : "white", "bold",{
       // lineSpacing: 3.5,
     });
 
