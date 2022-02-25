@@ -7,20 +7,20 @@ import GithubImage from '@components/github-image';
 import {ApplicationContext} from '@contexts/application';
 
 import useApi from '@x-hooks/use-api';
-import useNetwork from '@x-hooks/use-network';
+import { useNetwork } from '@contexts/network';
 
 export default function ConnectGithub() {
   const {state: {currentAddress}} = useContext(ApplicationContext);
   const { t } = useTranslation('common')
   const api = useApi();
-  const { network } = useNetwork()
+  const { activeNetwork } = useNetwork()
 
   async function clickSignIn() {
     await signOut({redirect: false});
     localStorage.setItem(`lastAddressBeforeConnect`, currentAddress);
     const user = await api.getUserOf(currentAddress);
 
-    return signIn('github', {callbackUrl: `${window.location.protocol}//${window.location.host}/${network.name.toLowerCase()}/connect-account${!!user ? `?migrate=1` : ``}`})
+    return signIn('github', {callbackUrl: `${window.location.protocol}//${window.location.host}/${activeNetwork.name.toLowerCase()}/connect-account${!!user ? `?migrate=1` : ``}`})
   }
 
   return (

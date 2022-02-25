@@ -11,7 +11,7 @@ import Translation from "./translation";
 import { useTranslation } from "next-i18next";
 import { intervalToDuration } from "date-fns";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import useNetwork from "@x-hooks/use-network";
+import { useNetwork } from "@contexts/network";
 
 export default function IssueListItem({
   issue = null,
@@ -21,7 +21,7 @@ export default function IssueListItem({
   xClick?: () => void;
 }) {
   const router = useRouter();
-  const { network } = useNetwork()
+  const { activeNetwork } = useNetwork()
   const { t } = useTranslation("bounty");
 
   function handleColorState(state: IssueState) {
@@ -192,7 +192,7 @@ export default function IssueListItem({
 
         router.push({
           pathname: "/[network]/bounty",
-          query: { id: issue?.githubId, repoId: issue?.repository_id, network: network.name },
+          query: { id: issue?.githubId, repoId: issue?.repository_id, network: activeNetwork.name },
         });
       }}
     >
