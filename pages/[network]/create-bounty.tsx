@@ -25,8 +25,9 @@ import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import DragAndDrop,{IFilesProps} from '@components/drag-and-drop'
-import useNetwork from '@x-hooks/use-network';
+import useNetworkTheme from '@x-hooks/use-network';
 import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper';
+import { useNetwork } from '@contexts/network';
 
 interface Amount {
   value?: string,
@@ -49,7 +50,8 @@ export default function PageCreateIssue() {
   const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId} = useApi();
   const txWindow = useTransactions();
   const { t } = useTranslation(['common', 'create-bounty'])
-  const { network, getURLWithNetwork } = useNetwork()
+  const { getURLWithNetwork } = useNetworkTheme()
+  const { activeNetwork } = useNetwork()
 
   async function allowCreateIssue() {
     await BeproService.login();
@@ -59,7 +61,7 @@ export default function PageCreateIssue() {
 
     const tmpTransactional = addTransaction({
                                               type: TransactionTypes.approveTransactionalERC20Token,
-                                            });
+                                            }, activeNetwork);
     dispatch(tmpTransactional);
 
     BeproService.network.approveTransactionalERC20Token()
@@ -107,10 +109,10 @@ export default function PageCreateIssue() {
       branch
     }
 
-    const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount: payload.amount});
+    const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount: payload.amount}, activeNetwork);
 
     setRedirecting(true)
-    apiCreateIssue(payload, network?.name)
+    apiCreateIssue(payload, activeNetwork?.name)
                       .then(cid => {
                         if (!cid)
                           throw new Error(t('errors.creating-issue'));
@@ -129,7 +131,7 @@ export default function PageCreateIssue() {
                                            })
                       })
                       .then(({githubId, issueId}) =>
-                        patchIssueWithScId(repository_id, githubId, issueId, network?.name)
+                        patchIssueWithScId(repository_id, githubId, issueId, activeNetwork?.name)
                           .then(async(result) => {
                             if (!result)
                                 return dispatch(toastError(t('create-bounty:errors.creating-bounty')));
