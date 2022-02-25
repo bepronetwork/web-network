@@ -8,7 +8,7 @@ import {IssueData} from '@interfaces/issue-data';
 import useApi from '@x-hooks/use-api';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import useTransactions from '@x-hooks/useTransactions';
-import useNetwork from './use-network';
+import { useNetwork } from '@contexts/network';
 
 interface usePendingIssueActions {
   treatPendingIssue(): Promise<boolean>,
@@ -23,10 +23,10 @@ export default function usePendingIssue<S = IssueData>(): usePendingIssueReturn 
   const {dispatch,} = useContext(ApplicationContext);
   const {patchIssueWithScId} = useApi();
   const txWindow = useTransactions();
-  const { network } = useNetwork()
+  const { activeNetwork } = useNetwork()
 
   async function updateIssueWithCID(repoId, githubId, issueId): Promise<boolean> {
-    return patchIssueWithScId(repoId, githubId, issueId, network?.name)
+    return patchIssueWithScId(repoId, githubId, issueId, activeNetwork?.name)
   }
 
   async function createPendingIssue(): Promise<{githubId?: string; repoId?: string; issueId}> {
@@ -37,7 +37,7 @@ export default function usePendingIssue<S = IssueData>(): usePendingIssueReturn 
     const cid = [repository_id, githubId].join(`/`)
     const tokenAmount = amount.toString();
 
-    const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount})
+    const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount}, activeNetwork)
     dispatch(openIssueTx);
 
     return BeproService.network.openIssue(cid, +tokenAmount)

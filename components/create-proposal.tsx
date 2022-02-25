@@ -270,7 +270,7 @@ export default function NewProposal({
     
     setShow(false);
 
-    const proposeMergeTx = addTransaction({type: TransactionTypes.proposeMerge})
+    const proposeMergeTx = addTransaction({type: TransactionTypes.proposeMerge}, activeNetwork)
     dispatch(proposeMergeTx);
 
     waitForMerge(githubLogin, issue_id, currentGithubId, activeNetwork?.name)
@@ -321,7 +321,7 @@ export default function NewProposal({
   }
 
   function recognizeAsFinished() {
-    const recognizeAsFinished = addTransaction({type: TransactionTypes.recognizedAsFinish})
+    const recognizeAsFinished = addTransaction({type: TransactionTypes.recognizedAsFinish}, activeNetwork)
     dispatch(recognizeAsFinished);
 
     BeproService.network.getIssueByCID(issueId)

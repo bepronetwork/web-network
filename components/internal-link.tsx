@@ -14,7 +14,8 @@ interface InternalLinkProps {
   iconBefore?: boolean
   activeClass?: string
   blank?: boolean
-  brand?: boolean
+  brand?: boolean,
+  style?: any
 }
 
 export default function InternalLink({
@@ -27,6 +28,7 @@ export default function InternalLink({
   blank = false,
   brand = false,
   activeClass,
+  style,
   ...props
 }: InternalLinkProps) {
   const { asPath, pathname } = useRouter()
@@ -53,7 +55,7 @@ export default function InternalLink({
 
   return (
     <Link href={props.href} passHref>
-      <a className={getClasses()} target={`${blank ? '_blank' : ''}`}>
+      <a className={getClasses()} target={`${blank ? '_blank' : ''}`} style={{...style}}>
         {(iconBefore && props.icon) || ``}
         {props.label && <span>{props.label}</span> || ``}
         {(!iconBefore && props.icon) || ``}

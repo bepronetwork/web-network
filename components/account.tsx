@@ -10,14 +10,14 @@ import NetworkThemeInjector from '@components/custom-network/network-theme-injec
 
 import { ApplicationContext } from '@contexts/application'
 
-import useNetwork from '@x-hooks/use-network'
+import useNetworkTheme from '@x-hooks/use-network'
 
 export default function Account({ children }): JSX.Element {
   const {
     state: { githubHandle, currentAddress }
   } = useContext(ApplicationContext)
   const { t } = useTranslation(['common', 'bounty', 'pull-request', 'custom-network'])
-  const { getURLWithNetwork } = useNetwork()
+  const { getURLWithNetwork } = useNetworkTheme()
 
   return (
     <div>

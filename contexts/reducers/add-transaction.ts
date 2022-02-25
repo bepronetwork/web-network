@@ -5,6 +5,7 @@ import {SimpleBlockTransactionPayload,} from '@interfaces/transaction';
 import {v4 as uuidv4} from 'uuid';
 import {TransactionTypes} from '@interfaces/enums/transaction-types';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
+import { INetwork } from '@interfaces/network';
 
 
 const reducer = (state: ApplicationState, payload: SimpleBlockTransactionPayload): ApplicationState =>
@@ -15,7 +16,7 @@ export const AddTransactions: ReduceAction<SimpleBlockTransactionPayload> = {
   fn: reducer
 }
 
-export const addTransaction = (payload: Partial<SimpleBlockTransactionPayload>): ReduceActor<SimpleBlockTransactionPayload> =>
+export const addTransaction = (payload: Partial<SimpleBlockTransactionPayload>, network: INetwork): ReduceActor<SimpleBlockTransactionPayload> =>
   ({
     name: ReduceActionName.AddTransactions,
     payload: {
@@ -24,6 +25,7 @@ export const addTransaction = (payload: Partial<SimpleBlockTransactionPayload>):
       date: +new Date(),
       amount: 0,
       currency: '$BEPRO',
+      network,
       ...payload,
       id: uuidv4(),
     }});
