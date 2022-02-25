@@ -113,6 +113,7 @@ export default function NewProposal({
   const {getUserWith, waitForMerge, processMergeProposal, processEvent} = useApi();
   const txWindow = useTransactions();
   const { t } = useTranslation(['common', 'bounty', 'proposal', 'pull-request'])
+  const [showExceptionalMessage, setShowExceptionalMessage] = useState<boolean>();
 
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
@@ -205,6 +206,16 @@ export default function NewProposal({
    if (currentAmount === 0){
     handleInputColor("normal")
    }
+
+   if(currentAmount === 100){
+    participants.map(item => {
+      var realValue = (amountTotal * obj[item.githubHandle])/ 100
+      if(amountTotal < participants.length && realValue < 1 && realValue != 0 && realValue < amountTotal){
+        handleInputColor("error")
+        setShowExceptionalMessage(true)
+      }
+    })
+   }
   }
 
   function handleInputColor ( name: string ) {
@@ -265,12 +276,24 @@ export default function NewProposal({
     //`payload.prAmmounts` need be Intenger number, because the contract remove numbers after dot using `toFix(0)`;
     // To fix it, we check the difference between amount distributed and amount total, and attributed the rest to last participant;
 
+    function handleValues(amount, distributed){
+      return Math.floor((amount * distributed) / 100)
+    }
+
+    var prAddresses: string[] = []
+    var prAmounts: number[] = []
+
+    participants.map((items) => {
+      if(handleValues(amountTotal,distrib[items.githubHandle]) > 0){
+        prAddresses.push(items.address)
+        prAmounts.push(handleValues(amountTotal,distrib[items.githubHandle]))
+      }
+    })
+  
     const payload = {
       issueID: issue_id,
-      prAddresses: participants.map((items) => items.address),
-      prAmounts: participants.map(
-        (items) => Math.floor((amountTotal * distrib[items.githubHandle]) / 100)
-      ),
+      prAddresses,
+      prAmounts,
     };
     //Chcking diff between total Distributed and total Ammount;
     const totalDistributed = payload.prAmounts.reduce((p,c)=> p+c)
@@ -508,7 +531,7 @@ export default function NewProposal({
                     }
                   )}
                 >
-                  {t(
+                  {showExceptionalMessage && error ? t(`proposal:messages.distribution-cant-done`): t(
                     `proposal:messages.distribution-${
                       success ? "is" : "must-be"
                     }-100`
