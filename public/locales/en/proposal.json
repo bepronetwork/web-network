@@ -13,7 +13,8 @@
   "messages": {
     "distribution-is-100": "Distribution is 100%",
     "distribution-must-be-100": "Distribution Must be 100%",
-    "no-proposals-created": "There are no proposals created."
+    "no-proposals-created": "There are no proposals created.",
+    "distribution-cant-done": "This distribution can't be done try another one."
   },
   "errors": {
     "not-found": "No proposals found",
