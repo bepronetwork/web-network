@@ -1,4 +1,5 @@
 import { ApplicationContext } from "@contexts/application";
+import { useNetwork } from "@contexts/network";
 import { addToast } from "@contexts/reducers/add-toast";
 import { addTransaction } from "@contexts/reducers/add-transaction";
 import { changeGithubHandle } from "@contexts/reducers/change-github-handle";
@@ -28,6 +29,7 @@ export default function UserMissingModal({ show }: { show: boolean }) {
   const [loadingReconnect, setLoadingReconnect] = useState<boolean>(false);
   const [loadingUnlock, setLoadingUnlock] = useState<boolean>(false);
   const txWindow = useTransactions();
+  const { activeNetwork } = useNetwork()
 
   function handleReconnectAcount() {
     setLoadingReconnect(true);
@@ -59,7 +61,7 @@ export default function UserMissingModal({ show }: { show: boolean }) {
           type: 1,
           amount: value,
           currency: t("$oracles"),
-        });
+        }, activeNetwork);
         dispatch(tmpTransaction);
 
         BeproService.network

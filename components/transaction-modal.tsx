@@ -13,6 +13,9 @@ import Button from './button';
 import LinkIcon from '@assets/icons/link-icon';
 import { truncateAddress } from '@helpers/truncate-address';
 import { useTranslation } from 'next-i18next';
+import InternalLink from './internal-link';
+import useNetworkTheme from '@x-hooks/use-network';
+import { BEPRO_NETWORK_NAME } from 'env';
 
 export default function TransactionModal({ transaction = null, onCloseClick = () => {}}: { transaction: Transaction, onCloseClick: () => void }) {
   const {dispatch} = useContext(ApplicationContext);
@@ -20,6 +23,7 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
   const [addressTo, setAddressTo] = useState(`...`);
   const [details, setDetails] = useState<any>([]);
   const { t } = useTranslation('common')
+  const { getURLWithNetwork } = useNetworkTheme()
 
   function updateAddresses() {
     if (!transaction)
@@ -78,7 +82,7 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
     titleClass="h3 text-white bg-opacity-100 fs-2"
     >
       <span className="d-block caption-small text-white-50 text-uppercase">{t('misc.status')}</span>
-      <div className="d-flex justify-content-between align-items-center py-2 mb-3">
+      <div className="d-flex justify-content-between align-items-center py-2">
         <TransactionStats status={transaction?.status} />
         <div className="d-flex">
            {hasTransactionId() &&
@@ -88,6 +92,11 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
             <Button className="border-dark-gray mr-1 hover-blue" applyTextColor={false} transparent rounded><LinkIcon /></Button>
           </a>
         </div>
+      </div>
+      <div className="caption-small d-flex flex-row mb-3">
+        <span className="text-ligth-gray">ON</span> 
+        {console.log(transaction?.network)}
+        <InternalLink className={`${transaction?.network?.name === BEPRO_NETWORK_NAME ? ' text-primary ' : ''} p-0 ml-1`} label={transaction?.network?.name} href={getURLWithNetwork('/', {network: transaction?.network?.name})} style={{color: `${transaction?.network?.colors?.primary}`}} brand transparent />
       </div>
       <div className="d-flex py-2 mb-3 caption-small text-white bg-opacity-100 fs-smallest">
         <span>{t('misc.from')}: {addressFrom}</span>

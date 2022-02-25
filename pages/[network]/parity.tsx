@@ -23,7 +23,7 @@ import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import {NetworkFactory, toSmartContractDecimals} from 'bepro-js';
-import useNetwork from '@x-hooks/use-network';
+import { useNetwork } from '@contexts/network';
 import { INetwork } from '@interfaces/network';
 import { formatDate } from '@helpers/formatDate';
 import OverrideNameModal from '@components/custom-network/override-name-modal';
@@ -48,7 +48,7 @@ export default function ParityPage() {
   const [availReposList, setAvailableList] = useState<string[]>([]);
   const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId, createRepo, getReposList, removeRepo: apiRemoveRepo, searchNetworks} = useApi();
   const { t } = useTranslation(['common', 'parity'])
-  const { network } = useNetwork()
+  const { activeNetwork } = useNetwork()
   const [networks, setNetworks] = useState<INetwork[]>([])
 
   const formItem = (label = ``, placeholder = ``, value = ``, onChange = (ev) => {}) =>
@@ -150,7 +150,7 @@ export default function ParityPage() {
 
   function createIssue({title, body: description = String(t('parity:no-description')), tokenAmount, number, repository_id, creatorGithub = githubLogin}) {
 
-    const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount: +tokenAmount})
+    const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount: +tokenAmount}, activeNetwork)
     dispatch(openIssueTx);
 
     const msPayload = {
@@ -163,7 +163,7 @@ export default function ParityPage() {
 
     console.debug(`scPayload,`, scPayload, `msPayload`, msPayload);
 
-    return apiCreateIssue(msPayload, network?.name)
+    return apiCreateIssue(msPayload, activeNetwork?.name)
                              .then(cid => {
                                if (!cid)
                                  throw new Error(t('errors.creating-issue'));
@@ -178,7 +178,7 @@ export default function ParityPage() {
                                if (!issueId)
                                  throw new Error(t('parity:errors.creating-issue-on-sc'));
 
-                               return patchIssueWithScId(repository_id, githubId, issueId, network?.name)
+                               return patchIssueWithScId(repository_id, githubId, issueId, activeNetwork?.name)
                              })
                              .then(result => {
                                if (!result)
@@ -282,7 +282,7 @@ export default function ParityPage() {
                                })
                       })
                       .then(async (repos) => {
-                        setReposList(await getReposList(true, network?.name));
+                        setReposList(await getReposList(true, activeNetwork?.name));
                         setAvailableList(repos.filter(repo => repo.has_issues && !repo.fork).map(repo => repo.full_name))
                       })
                       .catch(e => {
@@ -291,12 +291,12 @@ export default function ParityPage() {
   }
 
   async function addNewRepo(owner, repo) {
-    const created = await createRepo(owner, repo, network?.name);
+    const created = await createRepo(owner, repo, activeNetwork?.name);
 
     if (!created)
       return dispatch(toastError(t('parity:erros.creating-repo')));
 
-    setReposList(await getReposList(true, network?.name));
+    setReposList(await getReposList(true, activeNetwork?.name));
   }
 
   async function removeRepo(id: string) {
@@ -305,7 +305,7 @@ export default function ParityPage() {
                                if (!result)
                                  return dispatch(toastError(t('parity:erros.removing-repo')));
 
-                               setReposList(await getReposList(true, network?.name))
+                               setReposList(await getReposList(true, activeNetwork?.name))
                              });
   }
 

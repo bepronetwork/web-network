@@ -25,7 +25,8 @@ import { IssueData } from '@interfaces/issue-data'
 import useApi from '@x-hooks/use-api'
 import usePage from '@x-hooks/use-page'
 import useSearch from '@x-hooks/use-search'
-import useNetwork from '@x-hooks/use-network'
+import useNetworkTheme from '@x-hooks/use-network'
+import { useNetwork } from '@contexts/network'
 
 type Filter = {
   label: string
@@ -69,7 +70,8 @@ export default function ListIssues({
   const [truncatedData, setTruncatedData] = useState(false)
   const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([])
   
-  const { network, getURLWithNetwork } = useNetwork()
+  const { getURLWithNetwork } = useNetworkTheme()
+  const { activeNetwork } = useNetwork()
   const { searchIssues } = useApi()
   const { page, nextPage, goToFirstPage } = usePage()
   const { search, setSearch, clearSearch } = useSearch()
@@ -132,7 +134,7 @@ export default function ListIssues({
   }
 
   function handlerSearch() {
-    if (!network) return
+    if (!activeNetwork) return
 
     dispatch(changeLoadState(true))
 
@@ -146,7 +148,7 @@ export default function ListIssues({
       order,
       creator,
       pullRequester,
-      networkName: network?.name
+      networkName: activeNetwork?.name
     })
       .then(({ rows, pages, currentPage }) => {
         if (currentPage > 1) {
@@ -194,7 +196,7 @@ export default function ListIssues({
     }
   }, [page, issuesPages])
 
-  useEffect(handlerSearch, [page, search, repoId, time, state, sortBy, order, creator, network])
+  useEffect(handlerSearch, [page, search, repoId, time, state, sortBy, order, creator, activeNetwork])
 
   return (
     <CustomContainer>

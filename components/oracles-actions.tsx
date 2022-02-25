@@ -21,6 +21,7 @@ import useTransactions from '@x-hooks/useTransactions';
 import { changeSettlerTokenApproval } from '@contexts/reducers/change-settler-token-approval';
 import { useTranslation } from 'next-i18next';
 import ReadOnlyButtonWrapper from './read-only-button-wrapper';
+import { useNetwork } from '@contexts/network';
 
 function OraclesActions(): JSX.Element {
   const {state: {metaMaskWallet, currentAddress, balance, oracles, myTransactions, isSettlerTokenApproved}, dispatch} = useContext(ApplicationContext);
@@ -37,6 +38,7 @@ function OraclesActions(): JSX.Element {
   const renderAmount = tokenAmount ? `${formatNumberToCurrency(tokenAmount)} ` : "0";
 
   const txWindow = useTransactions();
+  const { activeNetwork } = useNetwork()
 
   const verifyTransactionState = (type: TransactionTypes): boolean => !!myTransactions.find(transactions=> transactions.type === type && transactions.status === TransactionStatus.pending);
 
@@ -149,7 +151,7 @@ function OraclesActions(): JSX.Element {
     if (!currentAddress)
       return;
 
-    const approveTx = addTransaction({type: TransactionTypes.approveSettlerToken});
+    const approveTx = addTransaction({type: TransactionTypes.approveSettlerToken}, activeNetwork);
     dispatch(approveTx);
     BeproService.network.approveSettlerERC20Token()
                 .then((txInfo) => {
