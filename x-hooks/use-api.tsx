@@ -6,7 +6,7 @@ import {ProposalData, User} from '@interfaces/api-response';
 import {IssueData, pullRequest} from '@interfaces/issue-data';
 
 import client from '@services/api'
-import { Network } from '@interfaces/network';
+import { INetwork } from '@interfaces/network';
 import axios from 'axios';
 import { CURRENCY_BEPRO_API, PRODUCTION_CONTRACT, USE_PRODUCTION_CONTRACT_CONVERSION } from 'env';
 interface Paginated<T = any> {
@@ -354,7 +354,7 @@ export default function useApi() {
   async function isNetworkOwner(creatorAddress, networkAddress) {
     const params = new URLSearchParams({creatorAddress, networkAddress}).toString()
 
-    return client.get<{rows: Network[], count: number, pages: number, currentPage: number}>(`/search/networks/?${params}`)
+    return client.get<{rows: INetwork[], count: number, pages: number, currentPage: number}>(`/search/networks/?${params}`)
                  .then(({data}) => !!data.rows.length)
                  .catch(() => false)
   }
@@ -362,7 +362,7 @@ export default function useApi() {
   async function getNetwork(name: string) {
     const search = new URLSearchParams({name}).toString();
 
-    return client.get<Network>(`/network?${search}`)
+    return client.get<INetwork>(`/network?${search}`)
       .then(response => response)
       .catch(error => {
         throw error
@@ -379,7 +379,7 @@ export default function useApi() {
                            search = ''}) {
     const params = new URLSearchParams({page, name, creatorAddress, networkAddress, sortBy, order, search}).toString()
 
-    return client.get<{rows: Network[], count: number, pages: number, currentPage: number}>(`/search/networks/?${params}`)
+    return client.get<{rows: INetwork[], count: number, pages: number, currentPage: number}>(`/search/networks/?${params}`)
                  .then(({data}) => data)
                  .catch(() => ({rows: [], count: 0, pages: 0, currentPage: 1}));
   }

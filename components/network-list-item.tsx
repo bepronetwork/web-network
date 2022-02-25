@@ -10,7 +10,7 @@ import { changeNetworksSummary } from '@contexts/reducers/change-networks-summar
 
 import { formatNumberToNScale } from '@helpers/formatNumber'
 
-import { Network } from '@interfaces/network'
+import { INetwork } from '@interfaces/network'
 
 import { BeproService } from '@services/bepro-service'
 
@@ -19,7 +19,7 @@ import useNetwork from '@x-hooks/use-network'
 
 import { BEPRO_NETWORK_NAME, IPFS_BASE } from 'env'
 interface NetworkListItemProps {
-  network: Network
+  network: INetwork
   redirectToHome?: boolean
   updateNetworkParameter?: (networkName, parameter, value) => void
 }
