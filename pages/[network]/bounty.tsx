@@ -45,13 +45,13 @@ export default function PageIssue() {
   const tabs = [
     {
       eventKey: 'proposals',
-      title: <Translation ns="proposal" label={'labelWithCount'} params={{count: +networkIssue?.mergeProposalsAmount || 0}} />,
-      isEmpty: !(networkIssue?.mergeProposalsAmount > 0),
+      title: <Translation ns="proposal" label={'labelWithCount'} params={{count: +networkIssue?.mergeProposalAmount || 0}} />,
+      isEmpty: !(networkIssue?.mergeProposalAmount > 0),
       component: <IssueProposals
         key="tab-proposals"
         metaProposals={issue?.mergeProposals}
         metaRequests={issue?.pullRequests}
-        numberProposals={networkIssue?.mergeProposalsAmount}
+        numberProposals={networkIssue?.mergeProposalAmount}
         issueId={issue?.issueId}
         dbId={issue?.id}
         amount={networkIssue?.tokensStaked}
@@ -168,7 +168,7 @@ export default function PageIssue() {
         githubId={issue?.githubId}
         addNewComment={addNewComment}
         finished={networkIssue?.recognizedAsFinished} />
-        {((networkIssue?.mergeProposalsAmount > 0 || mergedPullRequests.length > 0) && currentAddress) && <CustomContainer className="mb-4">
+        {((networkIssue?.mergeProposalAmount > 0 || mergedPullRequests.length > 0) && currentAddress) && <CustomContainer className="mb-4">
           <TabbedNavigation defaultActiveKey={getDefaultActiveTab()} className="issue-tabs" tabs={tabs} collapsable />
         </CustomContainer>}
         {networkIssue ? (
@@ -184,7 +184,7 @@ export default function PageIssue() {
                 <IssueProposalProgressBar
                   isFinalized={networkIssue?.finalized}
                   isIssueinDraft={networkIssue.isDraft}
-                  mergeProposalsAmount={networkIssue?.mergeProposalsAmount}
+                  mergeProposalAmount={networkIssue?.mergeProposalAmount}
                   isFinished={networkIssue?.recognizedAsFinished}
                   isCanceled={
                     issue?.state === `canceled` || networkIssue?.canceled

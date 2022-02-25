@@ -71,3 +71,16 @@ export interface Comment {
 export interface GithubUser {
   login: string;
 }
+
+export interface INetworkIssue{
+  _id: string
+  canceled: boolean;
+  cid: CID;
+  creationDate: Date;
+  finalized: boolean;
+  issueGenerator: string;
+  mergeProposalAmount: number
+  recognizedAsFinished: boolean;
+  isDraft: boolean;
+  tokensStaked: string;
+}
