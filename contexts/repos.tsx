@@ -36,7 +36,7 @@ export interface ReposContextData {
   findBranch: (repoId: number) => Promise<BranchInfo[]>;
   findRepo: (repoId: number) => RepoInfo;
 }
-
+const TTL =  60 * 3 * 100;// 3 Min
 
 const ReposContext = createContext<ReposContextData>({} as ReposContextData);
 
@@ -46,6 +46,7 @@ export const ReposProvider: React.FC = function ({ children }) {
   const [branchsList, setBranchsList] = useState<BranchsList>({});
   const [forksList, setForksList] = useState<ForksList>({});
   const [activeRepo, setActiveRepo] = useState<IActiveRepo>(null);
+  const [lastUpdated, setlastUpdated] = useState<number>(0)
 
   const {getReposList, getBranchsList} = useApi();
   const { dispatch } = useContext(ApplicationContext)
@@ -92,7 +93,9 @@ export const ReposProvider: React.FC = function ({ children }) {
 
   const loadRepos = useCallback(async (): Promise<ReposList> => {
     if(!activeNetwork?.name) throw new Error(`Network not exists`);
-    if(repoList[activeNetwork?.name]) return repoList[activeNetwork?.name]
+    const noExpired = +new Date() - lastUpdated <= TTL;
+    if(repoList[activeNetwork?.name] && noExpired) return repoList[activeNetwork?.name]
+    setlastUpdated(+new Date())
     dispatch(changeLoadState(true))
     const repos = (await getReposList(false, activeNetwork?.name)) as ReposList;
     if(!repos) throw new Error(`Repos not found`);
@@ -100,9 +103,10 @@ export const ReposProvider: React.FC = function ({ children }) {
       ...prevState,
       [activeNetwork?.name]: repos
     }));
+    
     dispatch(changeLoadState(false))
     return repos;
-  },[activeNetwork, repoList]) 
+  },[activeNetwork, repoList, lastUpdated]) 
 
   const updateActiveRepo = useCallback(async(repoId: number): Promise<IActiveRepo>=>{
     const find = findRepo(repoId)
@@ -139,9 +143,9 @@ export const ReposProvider: React.FC = function ({ children }) {
     }
   },[repoList, query])
 
-  useEffect(()=>{
-    console.warn('useRepo',{activeRepo, repoList, branchsList, forksList})
-  },[activeRepo, repoList, branchsList, forksList])
+  // useEffect(()=>{
+  //   console.warn('useRepo',{activeRepo, repoList, branchsList, forksList})
+  // },[activeRepo, repoList, branchsList, forksList])
 
   const memorizeValue = useMemo<ReposContextData>(
     () => ({
