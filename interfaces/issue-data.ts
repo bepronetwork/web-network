@@ -2,6 +2,8 @@ import {ProposalData} from './api-response';
 
 export type IssueState =  'pending' |  'draft' | 'open' | 'in progress' | 'canceled' | 'closed' | 'ready' | 'done' | 'disputed'
 
+export type CID = `${string}/${string}`;
+
 export interface IssueData {
   _id?: string; // sc id
   id?: string; // database id

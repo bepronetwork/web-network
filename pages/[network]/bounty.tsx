@@ -1,4 +1,4 @@
-import {GetServerSideProps, GetStaticProps} from 'next/types';
+import {GetServerSideProps} from 'next/types';
 import React, { useContext, useEffect, useState } from 'react';
 import IssueComments from '@components/issue-comments';
 import IssueDescription from '@components/issue-description';
@@ -25,10 +25,6 @@ import Translation from '@components/translation';
 import { useTranslation } from 'next-i18next';
 
 import useNetwork from '@x-hooks/use-network';
-import NetworkThemeInjector from '@components/custom-network/network-theme-injector';
-interface NetworkIssue {
-  recognizedAsFinished: boolean;
-}
 
 export default function PageIssue() {
   const router = useRouter();
