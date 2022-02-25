@@ -9,7 +9,6 @@ import React, {
   createContext,
   useCallback,
   useState,
-  useLayoutEffect,
   useContext,
   useMemo,
   useEffect
@@ -113,7 +112,7 @@ export const ReposProvider: React.FC = function ({ children }) {
     return newActiveRepo;
   },[branchsList, forksList, findForks, findRepo, repoList])
 
-  useLayoutEffect(()=>{
+  useEffect(()=>{
     if(activeNetwork?.name){
       loadRepos()
       .then(repos =>

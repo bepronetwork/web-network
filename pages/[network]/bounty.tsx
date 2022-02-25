@@ -88,8 +88,9 @@ export default function PageIssue() {
       return;
 
     getUserRepos(githubLogin, activeRepo.githubPath.split(`/`)[1])
-      .then((repo) => {
-        setIsRepoForked(repo.data?.fork)
+      .then(({data}) => {
+        const isFokerd = data?.fork || data.owner.login === githubLogin
+        setIsRepoForked(isFokerd)
       }).catch(e => {
         console.log(`Failed to get users repositories: `, e)
       })
@@ -149,7 +150,7 @@ export default function PageIssue() {
         developers={issue?.developers}
         finalized={networkIssue?.finalized}
         isIssueinDraft={networkIssue?.isDraft}
-        networkCID={networkIssue?.cid}
+        networkCID={networkIssue?.cid || issue?.issueId}
         issueId={issue?.issueId}
         title={issue?.title}
         description={issue?.body}

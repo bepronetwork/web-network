@@ -4,7 +4,6 @@ import React, {
   useState,
   useContext,
   useMemo,
-  useLayoutEffect,
   useCallback,
   useEffect,
 } from 'react';
@@ -14,6 +13,7 @@ import { ApplicationContext } from './application';
 import useApi from 'x-hooks/use-api';
 import { changeLoadState } from 'contexts/reducers/change-load-state';
 import { INetwork } from 'interfaces/network';
+import NetworkThemeInjector from '@components/custom-network/network-theme-injector';
 
 export interface NetworkContextData {
   activeNetwork: INetwork;
@@ -56,7 +56,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
   },[query])
 
 
-  useLayoutEffect(()=>{
+  useEffect(()=>{
     updateActiveNetwork();
   },[query])
 
@@ -74,7 +74,12 @@ export const NetworkProvider: React.FC = function ({ children }) {
 
   return (
     <NetworkContext.Provider value={memorizeValue}>
-      {children}
+      <div
+        className={`${(activeNetwork?.isClosed && "read-only-network") || ""}`}
+      >
+        <NetworkThemeInjector />
+        {children}
+      </div>
     </NetworkContext.Provider>
   );
 };

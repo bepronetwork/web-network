@@ -1,14 +1,13 @@
 import Modal from './modal';
 import {ComponentPropsWithoutRef, useContext, useState} from 'react';
 import {BeproService} from 'services/bepro-service';
-import {changeLoadState} from '@reducers/change-load-state';
-import {ApplicationContext} from '@contexts/application';
+import {ApplicationContext} from 'contexts/application';
 import {addTransaction} from '@reducers/add-transaction';
-import {TransactionTypes} from '@interfaces/enums/transaction-types';
+import {TransactionTypes} from 'interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import Button from './button';
-import {TransactionStatus} from '@interfaces/enums/transaction-status';
-import useTransactions from '@x-hooks/useTransactions';
+import {TransactionStatus} from 'interfaces/enums/transaction-status';
+import useTransactions from 'x-hooks/useTransactions';
 import { formatNumberToString } from '@helpers/formatNumber';
 import { truncateAddress } from '@helpers/truncate-address';
 import { useTranslation } from 'next-i18next';

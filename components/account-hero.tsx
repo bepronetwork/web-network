@@ -1,12 +1,10 @@
-import {useContext, useEffect, useState} from 'react';
-import {BeproService} from "@services/bepro-service";
-import {changeLoadState} from '@reducers/change-load-state';
-import {ApplicationContext} from '@contexts/application';
+import {useContext, useEffect} from 'react';
+import {BeproService} from "services/bepro-service";
+import {ApplicationContext} from 'contexts/application';
 import {changeMyIssuesState} from '@reducers/change-my-issues';
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import GithubHandle from './github-handle';
-import {formatNumberToCurrency} from '@helpers/formatNumber';
-import {toastPrimary} from '@reducers/add-toast';
+import {formatNumberToCurrency} from 'helpers/formatNumber';
 import { useTranslation } from 'next-i18next';
 
 export default function AccountHero() {
