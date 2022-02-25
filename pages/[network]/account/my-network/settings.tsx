@@ -31,7 +31,8 @@ import { BeproService } from '@services/bepro-service'
 
 import useApi from '@x-hooks/use-api'
 import useOctokit from '@x-hooks/use-octokit'
-import useNetwork from '@x-hooks/use-network'
+import useNetworkTheme from '@x-hooks/use-network'
+
 
 import {
   API,
@@ -44,6 +45,7 @@ import {
   DISPUTABLE_TIME_MIN,
   DISPUTE_PERCENTAGE_MAX
 } from 'env'
+import { useNetwork } from '@contexts/network'
 interface NetworkAmounts {
   tokenStaked: number
   oraclesStaked: number
@@ -81,8 +83,9 @@ export default function Settings() {
 
   const { listUserRepos } = useOctokit()
   const { searchRepositories, updateNetwork, isNetworkOwner } = useApi()
-  const { network, colorsToCSS, handleNetworkChange, getURLWithNetwork } =
-    useNetwork()
+  const { network, colorsToCSS, getURLWithNetwork } =
+    useNetworkTheme()
+    const {updateActiveNetwork} = useNetwork()
 
   const {
     dispatch,
@@ -308,7 +311,7 @@ export default function Settings() {
 
         setUpdatingNetwork(false)
 
-        handleNetworkChange()
+        updateActiveNetwork()
         loadData()
       })
       .catch((error) => {

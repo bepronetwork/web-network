@@ -17,6 +17,7 @@ import { INetwork } from 'interfaces/network';
 
 export interface NetworkContextData {
   activeNetwork: INetwork;
+  updateActiveNetwork: ()=> void;
 }
 
 const NetworkContext = createContext<NetworkContextData>({} as NetworkContextData);
@@ -66,6 +67,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
   const memorizeValue = useMemo<NetworkContextData>(
     () => ({
       activeNetwork,
+      updateActiveNetwork
     }),
     [activeNetwork]
   );

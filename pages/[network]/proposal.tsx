@@ -16,17 +16,14 @@ import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import CustomContainer from '@components/custom-container';
 import {formatNumberToCurrency} from '@helpers/formatNumber';
 import ConnectWalletButton from '@components/connect-wallet-button';
-import useRepos from '@x-hooks/use-repos';
 import useApi from '@x-hooks/use-api';
-import useMergeData from '@x-hooks/use-merge-data';
 import NotMergeableModal from '@components/not-mergeable-modal';
 import useOctokit from '@x-hooks/use-octokit';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import { isProposalDisputable } from '@helpers/proposal';
-import useNetwork from '@x-hooks/use-network';
-
+import {useNetwork} from 'contexts/network'
 interface ProposalBepro {
   disputes: string;
   prAddresses: string[];
@@ -64,18 +61,14 @@ export default function PageProposal() {
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
   const [disputableTime, setDisputableTime] = useState(0)
-  const [[], {loadRepos}] = useRepos();
   const {getUserOf, getIssue} = useApi();
   const {getPullRequest} = useOctokit();
   const { t } = useTranslation('common')
-  const { network } = useNetwork()
+  const { activeNetwork } = useNetwork()
 
   async function getProposalData() {
     const [repoId, ghId] = String(issueId).split(`/`);
-    const repos = await loadRepos();
-    const _repo = repos.find(({id}) => id === +repoId);
-
-    const issueData = await getIssue(repoId, ghId, network?.name);
+    const issueData = await getIssue(repoId, ghId, activeNetwork?.name);
 
     setIssueMicroService(issueData);
     setPrGithubId(issueData.pullRequests?.find(el => el.id === +prId).githubId);

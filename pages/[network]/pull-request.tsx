@@ -17,7 +17,7 @@ import CreateReviewModal from '@components/create-review-modal'
 import { ApplicationContext } from '@contexts/application'
 import { changeLoadState } from '@contexts/reducers/change-load-state'
 
-import useRepos from '@x-hooks/use-repos'
+
 import useMergeData from '@x-hooks/use-merge-data'
 
 import { formatDate } from '@helpers/formatDate'
@@ -27,18 +27,18 @@ import { IssueData, pullRequest } from '@interfaces/issue-data'
 import useApi from '@x-hooks/use-api'
 import { addToast } from '@contexts/reducers/add-toast'
 import { useTranslation } from 'next-i18next'
-import { PRLabel } from '@components/pull-request-labels'
 import useNetwork from '@x-hooks/use-network'
 import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper'
+import { useRepos } from '@contexts/repos'
 
 export default function PullRequest() {
   const {
     dispatch,
-    state: { loading, githubLogin, currentAddress }
+    state: { githubLogin, currentAddress }
   } = useContext(ApplicationContext)
 
   const router = useRouter()
-  const [[activeRepo]] = useRepos()
+  const {activeRepo} = useRepos()
   const { createReviewForPR, getIssue } = useApi()
   const [issue, setIssue] = useState<IssueData>()
   const [showModal, setShowModal] = useState(false)

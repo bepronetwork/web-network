@@ -1,54 +1,19 @@
 import { UrlObject } from 'url'
 import { useRouter } from 'next/router'
-import { useContext, useLayoutEffect,useState } from 'react'
-
-import { ApplicationContext } from '@contexts/application'
-import { changeLoadState } from '@contexts/reducers/change-load-state'
 
 import { hexadecimalToRGB } from '@helpers/colors'
 
-import { INetwork, ThemeColors } from '@interfaces/network'
+import { ThemeColors } from '@interfaces/network'
 
 import useApi from '@x-hooks/use-api'
+import { useNetwork } from '@contexts/network'
 
-import { BEPRO_NETWORK_NAME } from 'env'
+//Todo: useNetwork was moved to context, refactor this hooks to be a theme-hooks
 
-export default function useNetwork() {
+export default function useNetworkTheme() {
   const router = useRouter()
-  const [network, setNetwork] = useState<INetwork>()
-
   const { getNetwork } = useApi()
-  const { dispatch } = useContext(ApplicationContext)
-
-  useLayoutEffect(() => {
-    handleNetworkChange()
-  }, [router.query.network])
-
-  function handleNetworkChange() {
-    const newNetwork = String(router.query.network || BEPRO_NETWORK_NAME) 
-
-    const networkFromStorage = localStorage.getItem(newNetwork)
-
-    if (networkFromStorage) setNetwork(JSON.parse(networkFromStorage))
-
-    if (!!networkFromStorage) dispatch(changeLoadState(true))
-
-    getNetwork(newNetwork)
-      .then(({ data }) => {
-        localStorage.setItem(newNetwork.toLowerCase(), JSON.stringify(data))
-
-        setNetwork(data)
-      })
-      .catch(error => {
-        if (!!networkFromStorage)
-          router.push({
-            pathname: '/networks'
-          })
-      })
-      .finally(() => {
-        dispatch(changeLoadState(false))
-      })
-  }
+  const {activeNetwork: network} = useNetwork()
 
   async function networkExists(networkName: string) {
     try {
@@ -224,7 +189,6 @@ export default function useNetwork() {
     DefaultTheme,
     networkExists,
     getURLWithNetwork,
-    handleNetworkChange,
     setNetwork: changeNetwork
   }
 }
