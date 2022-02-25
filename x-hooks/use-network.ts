@@ -1,6 +1,6 @@
 import { UrlObject } from 'url'
 import { useRouter } from 'next/router'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useLayoutEffect,useState } from 'react'
 
 import { ApplicationContext } from '@contexts/application'
 import { changeLoadState } from '@contexts/reducers/change-load-state'
@@ -20,7 +20,7 @@ export default function useNetwork() {
   const { getNetwork } = useApi()
   const { dispatch } = useContext(ApplicationContext)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     handleNetworkChange()
   }, [router.query.network])
 

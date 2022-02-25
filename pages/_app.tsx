@@ -20,6 +20,7 @@ import useNetwork from "@x-hooks/use-network";
 
 import "../styles/styles.scss";
 import NetworkThemeInjector from "@components/custom-network/network-theme-injector";
+import RootProviders from "contexts";
 
 function App({ Component, pageProps: { session, currentIssue,...pageProps } }: AppProps) {
   const [[, repos]] = useRepos();
@@ -38,19 +39,21 @@ function App({ Component, pageProps: { session, currentIssue,...pageProps } }: A
     <>
       <Seo issueMeta={currentIssue} />
       <SessionProvider session={session}>
-        <ApplicationContextProvider>
-            <div className={`${network?.isClosed && 'read-only-network' || ''}`}>
-              <NetworkThemeInjector />
-              <NationDialog>
-                <MainNav />
-                <WebThreeDialog />
-                <div className="pb-5">
-                  {!loaded ? `` : <Component {...pageProps} />}
-                </div>
-                <StatusBar />
-              </NationDialog>
-            </div>
-        </ApplicationContextProvider>
+        <RootProviders>
+          <div
+            className={`${(network?.isClosed && "read-only-network") || ""}`}
+          >
+            <NetworkThemeInjector />
+            <NationDialog>
+              <MainNav />
+              <WebThreeDialog />
+              <div className="pb-5">
+                {!loaded ? `` : <Component {...pageProps} />}
+              </div>
+              <StatusBar />
+            </NationDialog>
+          </div>
+        </RootProviders>
       </SessionProvider>
     </>
   );
