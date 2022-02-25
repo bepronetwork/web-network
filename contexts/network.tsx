@@ -13,7 +13,7 @@ import { ApplicationContext } from './application';
 import useApi from 'x-hooks/use-api';
 import { changeLoadState } from 'contexts/reducers/change-load-state';
 import { INetwork } from 'interfaces/network';
-import NetworkThemeInjector from '@components/custom-network/network-theme-injector';
+import NetworkThemeInjector from 'components/custom-network/network-theme-injector';
 
 export interface NetworkContextData {
   activeNetwork: INetwork;
@@ -24,8 +24,7 @@ const NetworkContext = createContext<NetworkContextData>({} as NetworkContextDat
 
 export const NetworkProvider: React.FC = function ({ children }) {
   const [activeNetwork, setActiveNetwork] = useState<INetwork>(null);
-  const [networksList, setNetworkLists] = useState<INetwork>(null);
-  
+
   const {query, push} = useRouter();
   const { getNetwork } = useApi()
   const { dispatch } = useContext(ApplicationContext)

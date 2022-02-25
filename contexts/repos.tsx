@@ -5,6 +5,7 @@ import useApi from 'x-hooks/use-api';
 import useOctokit from 'x-hooks/use-octokit';
 import { useRouter } from 'next/router';
 import { useNetwork } from './network';
+import { changeLoadState } from 'contexts/reducers/change-load-state';
 import React, {
   createContext,
   useCallback,
@@ -13,6 +14,7 @@ import React, {
   useMemo,
   useEffect
 } from 'react';
+import { ApplicationContext } from './application';
 
 interface IActiveRepo extends RepoInfo{
   forks: IForkInfo[];
@@ -46,6 +48,7 @@ export const ReposProvider: React.FC = function ({ children }) {
   const [activeRepo, setActiveRepo] = useState<IActiveRepo>(null);
 
   const {getReposList, getBranchsList} = useApi();
+  const { dispatch } = useContext(ApplicationContext)
   const {activeNetwork} = useNetwork()
   const { getForksOf } = useOctokit();
   const {query} = useRouter();
@@ -89,14 +92,17 @@ export const ReposProvider: React.FC = function ({ children }) {
 
   const loadRepos = useCallback(async (): Promise<ReposList> => {
     if(!activeNetwork?.name) throw new Error(`Network not exists`);
+    if(repoList[activeNetwork?.name]) return repoList[activeNetwork?.name]
+    dispatch(changeLoadState(true))
     const repos = (await getReposList(false, activeNetwork?.name)) as ReposList;
     if(!repos) throw new Error(`Repos not found`);
     setRepoList((prevState)=>({
       ...prevState,
       [activeNetwork?.name]: repos
     }));
+    dispatch(changeLoadState(false))
     return repos;
-  },[activeNetwork]) 
+  },[activeNetwork, repoList]) 
 
   const updateActiveRepo = useCallback(async(repoId: number): Promise<IActiveRepo>=>{
     const find = findRepo(repoId)

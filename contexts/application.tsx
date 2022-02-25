@@ -27,7 +27,6 @@ import { changeSettlerTokenApproval } from './reducers/change-settler-token-appr
 import {setCookie, parseCookies} from 'nookies'
 import { addTransaction } from './reducers/add-transaction';
 import { changeLoadState } from './reducers/change-load-state';
-import NetworkThemeInjector from '@components/custom-network/network-theme-injector';
 
 interface GlobalState {
   state: ApplicationState,
