@@ -131,7 +131,7 @@ export default function ListIssues({
     clearSearch()
   }
 
-  function getIssues() {
+  function handlerSearch() {
     if (!network) return
 
     dispatch(changeLoadState(true))
@@ -194,7 +194,7 @@ export default function ListIssues({
     }
   }, [page, issuesPages])
 
-  useEffect(getIssues, [page, search, repoId, time, state, sortBy, order, creator, network])
+  useEffect(handlerSearch, [page, search, repoId, time, state, sortBy, order, creator, network])
 
   return (
     <CustomContainer>
@@ -204,7 +204,7 @@ export default function ListIssues({
       >
         <div className="w-100">
           <InputGroup>
-            <InputGroup.Text className="rounded-8" onClick={(e) => getIssues()}>
+            <InputGroup.Text className="rounded-8" onClick={handlerSearch}>
               <SearchIcon />
             </InputGroup.Text>
 

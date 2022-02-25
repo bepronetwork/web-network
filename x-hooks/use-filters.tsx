@@ -47,7 +47,7 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
       return makeFilterOption(label, value, router.query?.repoId as string === value.toString());
     }
 
-    setRepoFilters([makeFilterOption(`All`, `allrepos`, !router.query?.repoId)].concat(repoList.map(mapRepo)))
+    setRepoFilters([makeFilterOption(`All`, `allrepos`, !router.query?.repoId)].concat(repoList?.map(mapRepo)))
   }
 
   function loadFilters() {
