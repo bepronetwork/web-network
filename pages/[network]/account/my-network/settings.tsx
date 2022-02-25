@@ -703,7 +703,7 @@ export default function Settings() {
                     symbol={t('$bepro')}
                     max={COUNCIL_AMOUNT_MAX}
                     description={t('custom-network:errors.council-amount', {
-                      min: formatNumberToCurrency(COUNCIL_AMOUNT_MAX, 0),
+                      min: formatNumberToCurrency(COUNCIL_AMOUNT_MIN, 0),
                       max: formatNumberToCurrency(COUNCIL_AMOUNT_MAX, 0)
                     })}
                     value={newInfo.councilAmount}
