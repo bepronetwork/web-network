@@ -7,7 +7,7 @@ import React, {
   useEffect
 } from 'react';
 
-import { IssueData, CID ,pullRequest, Comment } from '@interfaces/issue-data';
+import { IssueData, INetworkIssue ,pullRequest, Comment } from '@interfaces/issue-data';
 import { BeproService } from '@services/bepro-service';
 
 import useApi from 'x-hooks/use-api';
@@ -17,19 +17,6 @@ import { ApplicationContext } from './application';
 import { useNetwork } from './network';
 export interface IActiveIssue extends IssueData{
   comments: Comment[]
-}
-
-export interface INetworkIssue{
-  _id: string
-  canceled: boolean;
-  cid: CID;
-  creationDate: Date;
-  finalized: boolean;
-  issueGenerator: string;
-  mergeProposalsAmount: number
-  recognizedAsFinished: boolean;
-  isDraft: boolean;
-  tokensStaked: string;
 }
 
 export interface IssueContextData {
