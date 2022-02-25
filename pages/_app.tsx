@@ -13,8 +13,6 @@ import NationDialog from "@components/nation-dialog";
 import WebThreeDialog from "@components/web3-dialog";
 import MobileNotSupported from "@components/mobile-not-supported";
 
-import ApplicationContextProvider from "@contexts/application";
-
 import useRepos from "@x-hooks/use-repos";
 import useNetwork from "@x-hooks/use-network";
 
