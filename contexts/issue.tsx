@@ -10,12 +10,11 @@ import React, {
 import { IssueData, CID ,pullRequest, Comment } from '@interfaces/issue-data';
 import { BeproService } from '@services/bepro-service';
 
-import useApi from '@x-hooks/use-api';
-import useOctokit from '@x-hooks/use-octokit';
+import useApi from 'x-hooks/use-api';
+import useOctokit from 'x-hooks/use-octokit';
 import {useRouter} from 'next/router';
 import { ApplicationContext } from './application';
-import useNetwork from '@x-hooks/use-network';
-
+import { useNetwork } from './network';
 export interface IActiveIssue extends IssueData{
   comments: Comment[]
 }
@@ -50,7 +49,7 @@ export const IssueProvider: React.FC = function ({ children }) {
 
 
   const {getIssue} = useApi()
-  const {network} = useNetwork()
+  const {activeNetwork} = useNetwork()
   const {query} = useRouter();
   const {getIssueComments, getPullRequest} = useOctokit();
   // Move currentAdress and githubLogin to UserHook
@@ -69,8 +68,7 @@ export const IssueProvider: React.FC = function ({ children }) {
 
   const updateIssue = useCallback(
     async (repoId: string, ghId: string): Promise<IActiveIssue> => {
-      const issue = await getIssue(repoId, ghId, network?.name);
-      debugger;
+      const issue = await getIssue(repoId, ghId, activeNetwork?.name);
       if (!issue) throw new Error(`Issue not found`);
 
       const ghPath = issue.repository.githubPath;
@@ -94,7 +92,7 @@ export const IssueProvider: React.FC = function ({ children }) {
 
       return newActiveIssue;
     },
-    [network]
+    [activeNetwork]
   );
 
   const getNetworkIssue = useCallback(async () => {
@@ -120,11 +118,11 @@ export const IssueProvider: React.FC = function ({ children }) {
   },[activeIssue, currentAddress])
 
   useEffect(()=>{
-    if(query.id && query.repoId && network) {
+    if(query.id && query.repoId && activeNetwork) {
       setActiveIssue(null);
       updateIssue(`${query.repoId}`,`${query.id}`)
     };
-  },[query, network])
+  },[query, activeNetwork])
 
   useEffect(()=>{
     console.warn('useIssue',{activeIssue, networkIssue})

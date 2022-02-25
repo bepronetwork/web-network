@@ -1,10 +1,10 @@
-import { BranchInfo, BranchsList } from '@interfaces/branchs-list';
-import { developer } from '@interfaces/issue-data';
-import { ReposList, RepoInfo, ForksList, ForkInfo} from '@interfaces/repos-list';
-import useApi from '@x-hooks/use-api';
-import useNetwork from '@x-hooks/use-network';
-import useOctokit from '@x-hooks/use-octokit';
+import { BranchInfo, BranchsList } from 'interfaces/branchs-list';
+import { developer } from 'interfaces/issue-data';
+import { ReposList, RepoInfo, ForksList, ForkInfo} from 'interfaces/repos-list';
+import useApi from 'x-hooks/use-api';
+import useOctokit from 'x-hooks/use-octokit';
 import { useRouter } from 'next/router';
+import { useNetwork } from './network';
 import React, {
   createContext,
   useCallback,
@@ -47,11 +47,11 @@ export const ReposProvider: React.FC = function ({ children }) {
   const [activeRepo, setActiveRepo] = useState<IActiveRepo>(null);
 
   const {getReposList, getBranchsList} = useApi();
-  const {network} = useNetwork()
+  const {activeNetwork} = useNetwork()
   const { getForksOf } = useOctokit();
   const {query} = useRouter();
   
-  const findRepo = (repoId: number): RepoInfo =>  repoList[network?.name]?.find(({id}) => id === repoId)
+  const findRepo = (repoId: number): RepoInfo =>  repoList[activeNetwork?.name]?.find(({id}) => id === repoId)
 
   const findForks = useCallback(async(repoId: number): Promise<ForkInfo[]>=>{
     if (forksList[repoId]) return forksList[repoId];
@@ -80,24 +80,24 @@ export const ReposProvider: React.FC = function ({ children }) {
 
   const findBranch = useCallback(async(repoId: number): Promise<BranchInfo[]>=>{
     if (branchsList[repoId]) return branchsList[repoId];
-    const branchs = await getBranchsList(repoId, false, network?.name);
+    const branchs = await getBranchsList(repoId, false, activeNetwork?.name);
     setBranchsList((prevState) => ({
       ...prevState,
       [repoId]: branchs,
     }));
     return branchs;
-  },[network, branchsList])
+  },[activeNetwork, branchsList])
 
   const loadRepos = useCallback(async (): Promise<ReposList> => {
-    if(!network?.name) throw new Error(`Network not exists`);
-    const repos = (await getReposList(false, network?.name)) as ReposList;
+    if(!activeNetwork?.name) throw new Error(`Network not exists`);
+    const repos = (await getReposList(false, activeNetwork?.name)) as ReposList;
     if(!repos) throw new Error(`Repos not found`);
     setRepoList((prevState)=>({
       ...prevState,
-      [network?.name]: repos
+      [activeNetwork?.name]: repos
     }));
     return repos;
-  },[network]) 
+  },[activeNetwork]) 
 
   const updateActiveRepo = useCallback(async(repoId: number): Promise<IActiveRepo>=>{
     const find = findRepo(repoId)
@@ -114,22 +114,22 @@ export const ReposProvider: React.FC = function ({ children }) {
   },[branchsList, forksList, findForks, findRepo, repoList])
 
   useLayoutEffect(()=>{
-    if(network?.name){
+    if(activeNetwork?.name){
       loadRepos()
       .then(repos =>
         repos.map(repo => findBranch(+repo?.id))
       )
     }
-  },[network])
+  },[activeNetwork])
 
   useEffect(()=>{
-    if(repoList[network?.name]?.length > 0){
-      repoList[network?.name].forEach(repo => findForks(+repo?.id))
+    if(repoList[activeNetwork?.name]?.length > 0){
+      repoList[activeNetwork?.name].forEach(repo => findForks(+repo?.id))
     }
-  },[repoList, network])
+  },[repoList, activeNetwork])
 
   useEffect(()=>{
-    if(query?.repoId && repoList[network?.name]?.length > 0){
+    if(query?.repoId && repoList[activeNetwork?.name]?.length > 0){
       updateActiveRepo(+query?.repoId)
     }
   },[repoList, query])
@@ -140,7 +140,7 @@ export const ReposProvider: React.FC = function ({ children }) {
 
   const memorizeValue = useMemo<ReposContextData>(
     () => ({
-      repoList: repoList[network?.name],
+      repoList: repoList[activeNetwork?.name],
       branchsList,
       activeRepo,
       forksList,
@@ -151,7 +151,7 @@ export const ReposProvider: React.FC = function ({ children }) {
       findRepo
     }),
     [
-      network,
+      activeNetwork,
       repoList,
       branchsList,
       activeRepo,
