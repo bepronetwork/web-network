@@ -1,6 +1,6 @@
 import { BranchInfo, BranchsList } from 'interfaces/branchs-list';
 import { developer } from 'interfaces/issue-data';
-import { ReposList, RepoInfo, ForksList, ForkInfo} from 'interfaces/repos-list';
+import { ReposList, RepoInfo, ForksList, IForkInfo} from 'interfaces/repos-list';
 import useApi from 'x-hooks/use-api';
 import useOctokit from 'x-hooks/use-octokit';
 import { useRouter } from 'next/router';
@@ -16,7 +16,7 @@ import React, {
 } from 'react';
 
 interface IActiveRepo extends RepoInfo{
-  forks: ForkInfo[];
+  forks: IForkInfo[];
   branchs: BranchInfo[];
 }
 
@@ -31,7 +31,7 @@ export interface ReposContextData {
   activeRepo: IActiveRepo;
   loadRepos: () => Promise<ReposList>;
   updateActiveRepo: (repoId: number)=> Promise<IActiveRepo>;
-  findForks: (repoId: number) => Promise<ForkInfo[]>;
+  findForks: (repoId: number) => Promise<IForkInfo[]>;
   findBranch: (repoId: number) => Promise<BranchInfo[]>;
   findRepo: (repoId: number) => RepoInfo;
 }
@@ -53,7 +53,7 @@ export const ReposProvider: React.FC = function ({ children }) {
   
   const findRepo = (repoId: number): RepoInfo =>  repoList[activeNetwork?.name]?.find(({id}) => id === repoId)
 
-  const findForks = useCallback(async(repoId: number): Promise<ForkInfo[]>=>{
+  const findForks = useCallback(async(repoId: number): Promise<IForkInfo[]>=>{
     if (forksList[repoId]) return forksList[repoId];
     const repo = findRepo(repoId);
     

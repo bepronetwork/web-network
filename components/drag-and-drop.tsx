@@ -25,7 +25,6 @@ export default function DragAndDrop({ onUpdateFiles }: IDragAndDropProps) {
 
   const onDropAccepted = useCallback(
     async (dropedFiles) => {
-      console.log({dropedFiles})
       const createFiles = dropedFiles.map((file) => ({
         name: file?.name,
         hash: null,

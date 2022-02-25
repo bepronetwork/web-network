@@ -23,6 +23,7 @@ import Translation from "./translation";
 import { useTranslation } from "next-i18next";
 import useNetwork from "@x-hooks/use-network";
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
+import { IForkInfo } from "@interfaces/repos-list";
 
 interface pageActions {
   issueId: string;
@@ -34,7 +35,7 @@ interface pageActions {
   pullRequests?: pullRequest[];
   mergeProposals?: ProposalData[];
   amountIssue?: string | number;
-  forks?: { owner: developer }[];
+  forks?: IForkInfo[];
   title?: string;
   description?: string;
   handleMicroService?: (force?: boolean) => void;
@@ -115,7 +116,7 @@ export default function PageActions({
           href={`https://github.com/${repoPath}/network/members`}
           target="_blank"
         >
-          <IssueAvatars users={forks.map((item) => item.owner)} />
+          <IssueAvatars users={forks} />
           <span className="me-3 caption-small"><Translation label="misc.forks" /></span>
         </a>
       );
@@ -123,8 +124,8 @@ export default function PageActions({
   }
 
   const isClosedIssue = (state: IssueState | string): Boolean =>
-    state.toLocaleLowerCase() === "closed" ||
-    state.toLocaleLowerCase() === "redeemed";
+    state?.toLocaleLowerCase() === "closed" ||
+    state?.toLocaleLowerCase() === "redeemed";
   const isReedemButtonDisable = () =>
     [
       !myTransactions.find(

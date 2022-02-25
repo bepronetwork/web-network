@@ -1,10 +1,8 @@
+import { useRepos } from 'contexts/repos';
 import useApi from '@x-hooks/use-api';
 import useOctokit from '@x-hooks/use-octokit';
 import {IssueData, pullRequest} from '@interfaces/issue-data';
-import useRepos from '@x-hooks/use-repos';
-import {useEffect} from 'react';
 import { PaginatedData } from '@interfaces/paginated-data';
-
 interface MergeProps {
   repoId: string;
   githubId: string;
@@ -14,7 +12,7 @@ interface MergeProps {
 const OctoData = {};
 
 export default function useMergeData() {
-  const [[, repoList], {loadRepos}] = useRepos();
+  const {loadRepos,repoList} = useRepos();
   const db = useApi();
   const octokit = useOctokit();
 

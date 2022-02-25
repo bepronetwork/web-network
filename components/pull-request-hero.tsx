@@ -3,12 +3,11 @@ import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import PullRequestLabels, { PRLabel } from './pull-request-labels'
 
-import Avatar from '@components/avatar'
-import GithubInfo from '@components/github-info'
-import InternalLink from '@components/internal-link'
-
-import useNetwork from '@x-hooks/use-network'
-import useRepos from '@x-hooks/use-repos'
+import Avatar from 'components/avatar'
+import GithubInfo from 'components/github-info'
+import InternalLink from 'components/internal-link'
+import { useRepos } from '@contexts/repos'
+import useNetwork from 'x-hooks/use-network'
 
 export default function PullRequestHero({
   githubId,
@@ -22,7 +21,7 @@ export default function PullRequestHero({
   const router = useRouter()
   const { issueId: issueCID } = router.query
   const [repoId, issueId] = (issueCID as string).split(`/`)
-  const [[activeRepo]] = useRepos()
+  const {activeRepo} = useRepos()
   const { t } = useTranslation(['common', 'pull-request'])
   const { getURLWithNetwork } = useNetwork()
 
