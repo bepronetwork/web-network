@@ -41,7 +41,7 @@ export default function IssueProposals({ metaProposals, className='', metaReques
     BeproService.getDisputableTime().then(setDisputableTime)
   }
 
-  useEffect(() => { loadProposalsMeta() }, [issueId, numberProposals, currentAddress]);
+  useEffect(() => { loadProposalsMeta() }, [issueId, numberProposals, currentAddress, metaRequests]);
 
   return (
     <div className={`content-wrapper ${className} pt-0 pb-0`}>
