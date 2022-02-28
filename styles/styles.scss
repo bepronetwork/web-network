@@ -136,6 +136,7 @@ li {
     &__option {
       @extend .p-small;
       background-color: transparent;
+      color: $gray;
       &--is-selected {
         color: $blue;
       }
@@ -1099,14 +1100,15 @@ textarea.form-control {
 }
 
 .marked-render{
+  word-wrap: break-word;
   img{
-    width: 100%;
+    max-width: 100%;
   }
 }
 
 .comment {
   img {
-    width: 100%;
+    max-width: 100%;
   }
 }
 
@@ -1206,4 +1208,21 @@ textarea.form-control {
 .sticky-bounty {
   position: sticky;
   top: 90px;
+}
+
+.pullrequest-labels {
+  width: max-content;
+  height: max-content;
+}
+
+.pullrequest-labels + .pullrequest-labels{
+  margin-left: math.div($m,2);
+}
+
+@each $color, $value in $theme-colors {
+  .hover-#{$color}{
+    &:hover{
+      color: $value !important;
+    }
+  }
 }

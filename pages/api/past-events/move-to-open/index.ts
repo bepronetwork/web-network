@@ -5,6 +5,7 @@ import models from '@db/models';
 import {Octokit} from 'octokit';
 import networkBeproJs from '@helpers/api/handle-network-bepro';
 import api from 'services/api'
+import twitterTweet from '@helpers/api/handle-twitter-tweet';
 async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const network = networkBeproJs({ test: true });
@@ -31,7 +32,16 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     issue.state = 'open';
     console.log(`Moved ${issue.issueId} to open`);
     await issue.save();
+    twitterTweet({
+      type: 'bounty',
+      action: 'changes',
+      issuePreviousState: 'draft',
+      issue
+    })
     await api.post(`/seo/${issue.issueId}`)
+    .catch(e => {
+      console.log(`Error creating SEO`, e);
+    })
   }
 
   return res.status(200).json(issues);

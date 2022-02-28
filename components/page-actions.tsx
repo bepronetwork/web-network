@@ -51,6 +51,7 @@ interface pageActions {
   addNewComment?: (comment: any) => void;
   issueRepo?: string;
   isDisputable?: boolean;
+  onCloseEvent?: () => Promise<any>;
 }
 
 export default function PageActions({
@@ -80,7 +81,8 @@ export default function PageActions({
   repoPath = ``,
   addNewComment,
   issueCreator,
-  isDisputable = false
+  isDisputable = false,
+  onCloseEvent,
 }: pageActions) {
   const {
     dispatch,
@@ -162,7 +164,7 @@ export default function PageActions({
                         dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
                       else dispatch(updateTransaction({...redeemTx.payload as any, status: TransactionStatus.failed}));
                       console.error(`Error redeeming`, err);
-                    });
+                    })
       }).catch((err) => {
         if (err?.message?.search(`User denied`) > -1)
           dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
@@ -211,7 +213,7 @@ export default function PageActions({
       isRepoForked &&
       isWorking &&
       githubLogin && (
-        <Button onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || hasOpenPR}>
+        <Button className="mr-1" onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || hasOpenPR}>
           <Translation ns="pull-request" label="actions.create.title" />
         </Button>
       )
@@ -265,44 +267,48 @@ export default function PageActions({
     )
   }
 
-  async function handlePullrequest({title: prTitle, description: prDescription, branch}) {
+  async function handlePullrequest({title: prTitle, description: prDescription, branch}): Promise<void> {
+    return new Promise((resolve, reject) => {
+        createPullRequestIssue(repoId as string, githubId, {title: prTitle, description: prDescription, username: githubLogin, branch})
+        .then(() => {
+          dispatch(
+            addToast({
+              type: "success",
+              title: t('actions.success'),
+              content: t('pull-request:actions.create.success'),
+            })
+          );
 
-    createPullRequestIssue(repoId as string, githubId, {title: prTitle, description: prDescription, username: githubLogin, branch})
-      .then(() => {
-        dispatch(
-          addToast({
-            type: "success",
-            title: t('actions.success'),
-            content: t('pull-request:actions.create.success'),
-          })
-        );
+          if (handleMicroService)
+            handleMicroService(true);
 
-        if (handleMicroService)
-          handleMicroService(true);
-
-        setShowPRModal(false);
-      })
-      .catch((err) => {
-        if (err.response?.status === 422 && err.response?.data) {
-          err.response?.data.errors?.map((item) =>
+          setShowPRModal(false);
+          resolve()
+        })
+        .catch((err) => {
+          if (err.response?.status === 422 && err.response?.data) {
+            err.response?.data.errors?.map((item) =>
+              dispatch(
+                addToast({
+                  type: "danger",
+                  title: t('actions.failed'),
+                  content: item.message,
+                })
+              )
+            );
+            reject(err)
+          } else {
             dispatch(
               addToast({
                 type: "danger",
                 title: t('actions.failed'),
-                content: item.message,
+                content: t('pull-request:actions.create.error'),
               })
-            )
-          );
-        } else {
-          dispatch(
-            addToast({
-              type: "danger",
-              title: t('actions.failed'),
-              content: t('pull-request:actions.create.error'),
-            })
-          );
-        }
-      });
+            );
+            reject()
+          }
+        });
+    }) 
   }
 
   async function handleStartWorking() {
@@ -327,6 +333,7 @@ export default function PageActions({
         setIsExecuting(false)
       })
       .catch((error) => {
+        console.log(`Failed to start working`, error)
         dispatch(
           addToast({
             type: "danger",
@@ -348,6 +355,7 @@ export default function PageActions({
     await BeproService.network
       .disputeMerge({ issueID: issue_id, mergeID: mergeId })
       .then((txInfo) => {
+        processEvent(`dispute-proposal`, txInfo.blockNumber, issue_id);
         txWindow.updateItem(disputeTx.payload.id, BeproService.parseTransaction(txInfo, disputeTx.payload));
       })
       .then(() => handleBeproService())
@@ -361,24 +369,18 @@ export default function PageActions({
   }
 
   async function handleClose() {
+   
     const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue });
     dispatch(closeIssueTx);
 
     const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
 
-    waitForClose(issueId)
-      .then(() => {
-        if (handleBeproService)
-          handleBeproService(true);
-
-        if (handleMicroService)
-          handleMicroService();
-      })
-
     await BeproService.network
       .closeIssue({ issueID: issue_id, mergeID: mergeId })
       .then((txInfo) => {
-        processEvent(`close-issue`, txInfo.blockNumber, issue_id);
+        processEvent(`close-issue`, txInfo.blockNumber, issue_id).then(async () =>{
+          await onCloseEvent?.()
+        })
         txWindow.updateItem(closeIssueTx.payload.id, BeproService.parseTransaction(txInfo, closeIssueTx.payload));
         // return BeproService.parseTransaction(txInfo, closeIssueTx.payload).then(
         //   (block) => dispatch(updateTransaction(block))

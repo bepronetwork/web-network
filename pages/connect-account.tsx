@@ -96,7 +96,7 @@ export default function ConnectAccount() {
     joinAddressToUser(session.user.name||githubLogin,{ address: currentAddress.toLowerCase(), migrate: !!migrate })
                       .then((result) => {
                         if (result === true) {
-                          dispatch(toastSuccess(t('connect-account:connect-accounts')))
+                          dispatch(toastSuccess(t('connect-account:connected-accounts')))
                           dispatch(changeLoadState(false));
                           dispatch(changeGithubHandle(session.user.name||githubLogin))
                           dispatch(changeGithubLogin(githubLogin))

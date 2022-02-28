@@ -1,4 +1,5 @@
 import models from '@db/models';
+import twitterTweet from '@helpers/api/handle-twitter-tweet';
 import paginate from '@helpers/paginate';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Octokit} from 'octokit';
@@ -20,7 +21,13 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     where.issueId = issue.id
   }
 
-  let prs = await models.pullRequest.findAndCountAll(paginate({where, raw: true}, req.query, [[req.query.sortBy || 'updatedAt', req.query.order || 'DESC']]));
+  const include = [
+    { association: 'issue' },
+  ]
+  let prs = await models.pullRequest.findAndCountAll({
+    ...paginate({where}, req.query, [[req.query.sortBy || 'updatedAt', req.query.order || 'DESC']]),
+    // include
+  });
 
   if (!issueId)
     for(const pr of prs.rows) {
@@ -64,7 +71,16 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     await octoKit.rest.issues.createComment({owner, repo, issue_number: issue.githubId, body});
 
     await issue.save();
+    /*twitterTweet({
+      type: 'bounty',
+      action: 'solution',
+      username: username,
+      issue
+    })*/
     await api.post(`/seo/${issue?.issueId}`)
+    .catch(e => {
+      console.log(`Error creating SEO`, e);
+    })
 
     return res.json(`ok`);
   } catch(error) {

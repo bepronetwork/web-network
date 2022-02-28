@@ -23,7 +23,7 @@ export default function Modal({
     if (okLabel || cancelLabel)
       return <div className="mb-3">
         {okLabel && <button className="btn btn-primary mr-2" onClick={() => onOkClick()}>{okLabel}</button>}
-        {cancelLabel && <button className="btn btn-secondary" onClick={() => onCloseClick()}>{cancelLabel}</button>}
+        {cancelLabel && <button className="btn btn-gray" onClick={() => onCloseClick()}>{cancelLabel}</button>}
         </div>
     return <></>
   }

@@ -17,6 +17,7 @@
     }
   },
   "create-bounty": "Create Bounty",
+  "bounty-created": "Bounty created",
   "errors": {
     "creating-bounty": "Error creating bounty"
   }

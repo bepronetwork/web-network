@@ -8,6 +8,8 @@
   "description": "description",
   "view-all-addresses": "view all address",
   "search": "Search for a bounty",
+  "description_proposal": "Reviewed implementations by the network council members ready to be approved by the network curators or council members.",
+  "description_pull-request": "Raw implementations from the network developers ready to be reviewed by anyone and approved into proposals by the network council members",
   "info": {
     "working": "Working",
     "pull-requests_one": "pull request",
@@ -34,7 +36,7 @@
     "title": "Bounty State",
     "draft": "Draft",
     "development": "Development",
-    "finalized": "Finalized",
+    "finalized": "Finished",
     "validation": "validation & disputes",
     "closed": "closed & distributed"
   },

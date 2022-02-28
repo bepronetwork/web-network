@@ -92,7 +92,7 @@ export default function useMergeData() {
           const { data: comments } = await octokit.getPullRequestComments(pr.githubId, repo)
           const { data: pullRequest } = await octokit.getPullRequest(pr.githubId, repo)
 
-          OctoData[key] = { comments: comments, state: pullRequest.state }
+          OctoData[key] = { comments: comments, state: pullRequest.state, merged: pullRequest.merged, isMergeable: pullRequest.mergeable }
         } catch(error) {
           OctoData[key] = { comments: [], state: '' }
         }

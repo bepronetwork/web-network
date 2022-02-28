@@ -80,6 +80,12 @@ export default function useApi() {
                  .catch(_ => false)
   }
 
+  async function patchPrStatus(prId) {
+    return client.patch(`/pull-request/${prId}`)
+                 .then(({data}) => data )
+                 .catch(_ => false)
+  }
+
   async function getIssuesOfLogin(login: string, page = '1') {
     const search = new URLSearchParams({page, creator: login}).toString();
     return client.get<IssueData>(`/issues/?${search}`)
@@ -214,7 +220,7 @@ export default function useApi() {
   }
 
   async function poll(eventName: string, rest) {
-    return client.post(`/poll/`, {eventName, ...rest})
+    return client.post(`/poll/`, {eventName, ...rest}, {timeout: 2 * 60 * 1000})
   }
 
   async function waitForMerge(githubLogin, issue_id, currentGithubId) {
@@ -270,7 +276,7 @@ export default function useApi() {
 
   async function getUserPullRequests(page= '1', login: string) {
     const search = new URLSearchParams({page, login}).toString();
-    
+
     return client.get<PaginatedData<pullRequest>>(`/pull-request?${search}`)
                  .then(({data}) => data)
                  .catch(e => {
@@ -299,10 +305,24 @@ export default function useApi() {
     return client.put('/pull-request/review', {issueId, pullRequestId, githubLogin, body})
       .then(response => response)
   }
-  
+
   async function removeUser(address: string, githubLogin: string) {
     return client.delete(`/user/${address}/${githubLogin}`)
                  .then(({status}) => status === 200)
+  }
+
+  async function uploadFiles(files: File | File[]): Promise<any[]> {
+    const form = new FormData();
+    const isArray = Array.isArray(files);
+    if (isArray) {
+      files?.forEach(async (file, index) => {
+        form.append(`file${index + 1}`, file);
+      });
+    } else {
+      form.append(`file`, files);
+    }
+
+    return client.post("/files", form).then(({ data }) => data);
   }
 
   return {
@@ -321,6 +341,7 @@ export default function useApi() {
     createIssue,
     moveIssueToOpen,
     patchIssueWithScId,
+    patchPrStatus,
     waitForMerge,
     processMergeProposal,
     processEvent,
@@ -330,6 +351,7 @@ export default function useApi() {
     createRepo,
     removeRepo,
     waitForClose,
+    uploadFiles,
     waitForRedeem,
     userHasPR,
     startWorking,

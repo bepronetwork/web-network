@@ -4,6 +4,7 @@ export interface TabbedNavigationItem {
   eventKey: string
   title: string | ReactElement
   component: ReactNode
+  description?: string;
 }
 
 export interface TabbedNavigationProps {

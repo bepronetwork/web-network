@@ -14,15 +14,17 @@ export default function MyPullRequests() {
     state: { githubLogin }
   } = useContext(ApplicationContext)
 
-  const { t } = useTranslation('pull-request')
+  const { t } = useTranslation(['pull-request', 'bounty'])
 
   return (
     <Account>
       <div className="container p-footer">
         <div className="row justify-content-center">
           <ListIssues
-            emptyMessage={String(t('find-a-bounty'))}
-            pullRequester={githubLogin}
+            redirect="/developers"
+            buttonMessage={t('bounty:label_other')}
+            pullRequester={githubLogin || 'not-connected'}
+            emptyMessage={String(t('errors.you-dont-have-pull-requests'))}
           />
         </div>
       </div>

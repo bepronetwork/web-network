@@ -34,9 +34,9 @@ export default function NotMergeableModal({
 
     if (hasPRMerged || (pullRequest.isMergeable && !isFinalized) || !(isIssueOwner || isPullRequestOwner || isCouncil || isProposer)) {
       setVisible(false)
-    } else if (isIssueOwner || isPullRequestOwner || isCouncil || isProposer)
+    } else if (isIssueOwner || isPullRequestOwner || isCouncil || isProposer){
       setVisible(pullRequest.state === 'open')
-
+    }  
   }
 
   function handleRetryMerge() {
@@ -119,7 +119,7 @@ export default function NotMergeableModal({
               disabled={mergeState !== ''}
               onClick={handleRetryMerge}
             >
-              {mergeState === 'error' ? t('modals.not-mergeable.merge-failed') : t('modals.not-mergeable.retry-merge')}
+              <span className="text-nowrap">{mergeState === 'error' ? t('modals.not-mergeable.merge-failed') : t('modals.not-mergeable.retry-merge')}</span>
               {mergeState === 'loading' && (
                 <span className="spinner-border spinner-border-xs ml-1" />
               )}
