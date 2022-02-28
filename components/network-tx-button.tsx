@@ -13,6 +13,7 @@ import Button from './button';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import useTransactions from '@x-hooks/useTransactions';
 import { useTranslation } from 'next-i18next';
+import { useNetwork } from '@contexts/network';
 
 interface NetworkTxButtonParams {
   txMethod: string;
@@ -29,6 +30,7 @@ interface NetworkTxButtonParams {
   txCurrency: TransactionCurrency;
   fullWidth?: boolean;
   useContract?: boolean;
+  className?: string;
 }
 
 
@@ -41,6 +43,7 @@ function networkTxButton({
                            buttonLabel,
                            modalTitle,
                            modalDescription,
+                           className = '',
                            children = null, fullWidth = false, useContract = false,
                            disabled = false, txType = TransactionTypes.unknown, txCurrency = `$BEPRO`,
                          }: NetworkTxButtonParams, elementRef) {
@@ -49,6 +52,7 @@ function networkTxButton({
   const [txSuccess, setTxSuccess] = useState(false);
   const txWindow = useTransactions();
   const { t } = useTranslation(['common'])
+  const { activeNetwork } = useNetwork()
 
   function checkForTxMethod() {
     if (!beproInit || !metaMaskWallet)
@@ -62,17 +66,17 @@ function networkTxButton({
     if (!beproInit || !metaMaskWallet)
       return;
 
-    const tmpTransaction = addTransaction({type: txType, amount: txParams?.tokenAmount || 0, currency: txCurrency});
+    const tmpTransaction = addTransaction({type: txType, amount: txParams?.tokenAmount || 0, currency: txCurrency}, activeNetwork);
     dispatch(tmpTransaction);
 
     let transactionMethod
 
     if(!useContract)
-      transactionMethod = BeproService.network[txMethod](txParams)
+      transactionMethod = BeproService.network[txMethod](txParams.tokenAmount, txParams.from)
     else {
       const weiAmount = BeproService.toWei(txParams?.tokenAmount.toString())
   
-      transactionMethod = BeproService.network.params.contract.getContract().methods[txMethod]
+      transactionMethod = BeproService.network.contract.methods[txMethod]
       transactionMethod = txMethod === 'lock' ? transactionMethod(weiAmount).send({from: currentAddress}) : transactionMethod(weiAmount, txParams?.from).send({from: currentAddress})
     }
 
@@ -104,7 +108,7 @@ function networkTxButton({
   }
 
   function getButtonClass() {
-    return `mt-3 ${fullWidth ? `w-100` : ``} ${!children && !buttonLabel && `visually-hidden` || ``}`
+    return `mt-3 ${fullWidth ? `w-100` : ``} ${!children && !buttonLabel && `visually-hidden` || ``} ${className}`
   }
 
   function getDivClass() {

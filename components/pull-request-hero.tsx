@@ -1,11 +1,13 @@
-import useRepos from '@x-hooks/use-repos'
 import { GetStaticProps } from 'next'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
-import Avatar from './avatar'
-import GithubInfo from './github-info'
-import InternalLink from './internal-link'
 import PullRequestLabels, { PRLabel } from './pull-request-labels'
+
+import Avatar from 'components/avatar'
+import GithubInfo from 'components/github-info'
+import InternalLink from 'components/internal-link'
+import { useRepos } from '@contexts/repos'
+import useNetwork from 'x-hooks/use-network'
 
 export default function PullRequestHero({
   githubId,
@@ -19,8 +21,9 @@ export default function PullRequestHero({
   const router = useRouter()
   const { issueId: issueCID } = router.query
   const [repoId, issueId] = (issueCID as string).split(`/`)
-  const [[activeRepo]] = useRepos()
+  const {activeRepo} = useRepos()
   const { t } = useTranslation(['common', 'pull-request'])
+  const { getURLWithNetwork } = useNetwork()
 
   function getLabel(): PRLabel{
     if(pullRequest?.merged) return 'merged';
@@ -31,8 +34,6 @@ export default function PullRequestHero({
 
   return (
     <div className="banner bg-bepro-blue mb-4">
-      {console.log({pullRequest})}
-      {console.log(getLabel())}
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10">
@@ -40,7 +41,7 @@ export default function PullRequestHero({
               <div className="d-flex align-items-center cursor-pointer text-truncate">
                 <InternalLink
                   iconBefore={true}
-                  href={{ pathname: '/bounty', query: { id: issueId, repoId } }}
+                  href={getURLWithNetwork('/bounty', { id: issueId, repoId })}
                   icon={<i className="ico-back me-2" />}
                   label={`#${githubId} ${title}`}
                   className="p-nm caption"

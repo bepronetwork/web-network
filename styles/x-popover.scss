@@ -10,14 +10,14 @@
 
     div:not(.stats) {
       font-family: 'Inter', sans-serif;
-      color: $gray;
+      color: var(--bs-gray);
       font-size: 12px;
       line-height: 140%;
       &:hover {
         color: $white;
       }
       .active {
-        color: $blue;
+        color: var(--bs-primary);
         font-family: 'Inter', sans-serif;
         font-weight: 600;
         line-height: 160%;

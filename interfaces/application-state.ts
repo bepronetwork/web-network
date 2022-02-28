@@ -22,4 +22,17 @@ export interface ApplicationState {
   accessToken?: string;
   isTransactionalTokenApproved?: boolean;
   isSettlerTokenApproved?: boolean;
+  networksSummary?: NetworksSummary;
+}
+
+export interface NetworksSummary {
+  bounties: number;
+  amountInNetwork: number;
+  amountDistributed: number;
+}
+
+export interface ChangeNetworkSummaryProps {
+  label?: 'bounties' | 'amountInNetwork' | 'amountDistributed'
+  amount?: number,
+  action?: 'add' | 'reset'
 }

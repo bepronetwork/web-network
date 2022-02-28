@@ -3,27 +3,28 @@ import Modal from './modal';
 import ReactSelect from './react-select';
 import CreateProposalDistributionItem from './create-proposal-distribution-item';
 import sumObj from 'helpers/sumObj';
-import {BeproService} from '@services/bepro-service';
+import {BeproService} from 'services/bepro-service';
 import {pullRequest} from 'interfaces/issue-data';
 import {ApplicationContext} from '@contexts/application';
 import {addTransaction} from '@reducers/add-transaction';
-import {TransactionTypes} from '@interfaces/enums/transaction-types';
+import {TransactionTypes} from 'interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import {toastWarning} from '@reducers/add-toast';
 import Button from './button';
-import {useRouter} from 'next/router';
-import useOctokit from '@x-hooks/use-octokit';
-import useRepos from '@x-hooks/use-repos';
-import useApi from '@x-hooks/use-api';
-import {TransactionStatus} from '@interfaces/enums/transaction-status';
-import useTransactions from '@x-hooks/useTransactions';
+import useOctokit from 'x-hooks/use-octokit';
+import useApi from 'x-hooks/use-api';
+import {TransactionStatus} from 'interfaces/enums/transaction-status';
+import useTransactions from 'x-hooks/useTransactions';
 import LockedIcon from '@assets/icons/locked-icon';
 import clsx from 'clsx';
-import { Proposal } from '@interfaces/proposal';
-import { ProposalData } from '@interfaces/api-response';
+import { Proposal } from 'interfaces/proposal';
+import { ProposalData } from 'interfaces/api-response';
 import { useTranslation } from 'next-i18next';
 import Avatar from './avatar';
 import PullRequestLabels, {PRLabel} from './pull-request-labels';
+import ReadOnlyButtonWrapper from './read-only-button-wrapper';
+import {useRepos} from 'contexts/repos'
+import {useNetwork} from 'contexts/network'
 
 interface participants {
   githubHandle: string;
@@ -90,11 +91,10 @@ export default function NewProposal({
                                       amountTotal,
                                       mergeProposals,
                                       pullRequests = [],
-                                      handleBeproService,
                                       handleMicroService,
                                       isIssueOwner = false, isFinished = false
                                     }) {
-  const {dispatch, state: {balance, currentAddress, beproInit, oracles, githubLogin},} = useContext(ApplicationContext);
+  const {dispatch, state: {currentAddress, beproInit, githubLogin},} = useContext(ApplicationContext);
   const [distrib, setDistrib] = useState<Object>({});
   const [amount, setAmount] = useState<number>();
   const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest)
@@ -107,12 +107,13 @@ export default function NewProposal({
   const [councilAmount, setCouncilAmount] = useState(0);
   const [currentGithubId, setCurrentGithubId] = useState<string>();
   const [proposals, setProposals] = useState<Proposal[]>([]);
-  const router = useRouter();
-  const [[activeRepo]] = useRepos();
   const {getParticipants} = useOctokit();
   const {getUserWith, waitForMerge, processMergeProposal, processEvent} = useApi();
   const txWindow = useTransactions();
   const { t } = useTranslation(['common', 'bounty', 'proposal', 'pull-request'])
+  const {activeNetwork} = useNetwork()
+  const {activeRepo} = useRepos();
+
   const [showExceptionalMessage, setShowExceptionalMessage] = useState<boolean>();
 
 
@@ -133,13 +134,13 @@ export default function NewProposal({
     if (!issueId)
       return;
 
-    const scIssueId = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    const scIssueId = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
     const pool = [];
 
     for (const meta of mergeProposals as ProposalData[]) {
       const { scMergeId, pullRequestId } = meta;
       if (scMergeId) {
-        const merge = await BeproService.network.getMergeById({merge_id: scMergeId, issue_id: scIssueId});
+        const merge = await BeproService.network.getMergeById(scIssueId, +scMergeId);
         pool.push({...merge, pullRequestId } as Proposal)
       }
     }
@@ -270,11 +271,7 @@ export default function NewProposal({
   }
 
   async function handleClickCreate(): Promise<void> {
-    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
-    
-    // NOTE:
-    //`payload.prAmmounts` need be Intenger number, because the contract remove numbers after dot using `toFix(0)`;
-    // To fix it, we check the difference between amount distributed and amount total, and attributed the rest to last participant;
+    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
 
     function handleValues(amount, distributed){
       return Math.floor((amount * distributed) / 100)
@@ -302,14 +299,11 @@ export default function NewProposal({
     
     setShow(false);
 
-    const proposeMergeTx = addTransaction({type: TransactionTypes.proposeMerge})
+    const proposeMergeTx = addTransaction({type: TransactionTypes.proposeMerge}, activeNetwork)
     dispatch(proposeMergeTx);
 
-    waitForMerge(githubLogin, issue_id, currentGithubId)
+    waitForMerge(githubLogin, issue_id, currentGithubId, activeNetwork?.name)
                       .then(() => {
-                        if (handleBeproService)
-                          handleBeproService(true);
-
                         if (handleMicroService)
                           handleMicroService(true);
                         handleClose();
@@ -317,9 +311,9 @@ export default function NewProposal({
                       })
 
     await BeproService.network
-                      .proposeIssueMerge(payload)
+                      .proposeIssueMerge(payload.issueID, payload.prAddresses, payload.prAmounts)
                       .then(txInfo => {
-                        processEvent(`merge-proposal`, txInfo.blockNumber, issue_id, currentGithubId);
+                        processEvent(`merge-proposal`, txInfo.blockNumber, issue_id, currentGithubId, activeNetwork?.name);
 
                         txWindow.updateItem(proposeMergeTx.payload.id, BeproService.parseTransaction(txInfo, proposeMergeTx.payload));
 
@@ -356,20 +350,17 @@ export default function NewProposal({
   }
 
   function recognizeAsFinished() {
-    const recognizeAsFinished = addTransaction({type: TransactionTypes.recognizedAsFinish})
+    const recognizeAsFinished = addTransaction({type: TransactionTypes.recognizedAsFinish}, activeNetwork)
     dispatch(recognizeAsFinished);
 
-    BeproService.network.getIssueByCID({issueCID: issueId})
+    BeproService.network.getIssueByCID(issueId)
                 .then((_issue) => {
-                  return BeproService.network.recognizeAsFinished({issueId: +_issue._id})
+                  return BeproService.network.recognizeAsFinished(_issue._id)
                 })
                 .then(txInfo => {
                   txWindow.updateItem(recognizeAsFinished.payload.id, BeproService.parseTransaction(txInfo, recognizeAsFinished.payload));
                 })
                 .then(() => {
-                  if (handleBeproService)
-                    handleBeproService(true);
-
                   if (handleMicroService)
                     handleMicroService(true);
                 })
@@ -386,12 +377,14 @@ export default function NewProposal({
     if (!beproInit) return;
 
     BeproService.network.COUNCIL_AMOUNT().then(setCouncilAmount)
-                .then(() => BeproService.network.isCouncil({address: currentAddress}))
+                .then(() => BeproService.network.isCouncil(currentAddress))
                 .then(isCouncil => setIsCouncil(isCouncil));
   }
 
   function renderRecognizeAsFinished() {
-    return <Button onClick={recognizeAsFinished} className="mr-1">{t('bounty:actions.recognize-finished.title')}</Button>;
+    return <ReadOnlyButtonWrapper>
+      <Button onClick={recognizeAsFinished} className="mr-1 read-only-button">{t('bounty:actions.recognize-finished.title')}</Button>
+      </ReadOnlyButtonWrapper>;
   }
   const cantBeMergeable = () => !currentPullRequest.isMergeable || currentPullRequest.merged;
 
@@ -413,9 +406,11 @@ export default function NewProposal({
   return (
     <div className="d-flex">
       {(isCouncil && isFinished && (
-        <Button className="mx-2" onClick={() => setShow(true)}>
-          Create Proposal
-        </Button>
+        <ReadOnlyButtonWrapper>
+          <Button className="mx-2 read-only-button" onClick={() => setShow(true)}>
+            {t('proposal:actions.create')}
+          </Button>
+        </ReadOnlyButtonWrapper>
       )) ||
         (isIssueOwner && !isFinished && renderRecognizeAsFinished())}
       <Modal

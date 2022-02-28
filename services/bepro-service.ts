@@ -1,106 +1,254 @@
-import {Application, ERC20Contract, Network} from 'bepro-js';
+import {Web3Connection, Network, ERC20, NetworkFactory} from 'bepro-js';
+import {CONTRACT_ADDRESS, SETTLER_ADDRESS, WEB3_CONNECTION, NETWORK_FACTORY_ADDRESS} from '../env';
 import {BlockTransaction, SimpleBlockTransactionPayload} from '@interfaces/transaction';
-import {CONTRACT_ADDRESS, SETTLER_ADDRESS, TRANSACTION_ADDRESS, WEB3_CONNECTION} from '../env';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 
 class BeproFacet {
-  private _bepro: Application;
-  public get bepro(): Application { return this._bepro }
 
-  private _network: Network;
-  public get network(): Application { return this._network }
+  readonly bepro: Web3Connection = new Web3Connection({
+    web3Host: WEB3_CONNECTION,
+    //privateKey: process.env.NEXT_PUBLIC_WALLET_PRIVATE_KEY,
+    //debug: true
+  });
 
-  private _ERC20: ERC20Contract
-  public get ERC20(): Application { return this._ERC20 }
+  address: string = ``;
+  connected: boolean = false;
+  started: boolean = false;
+  network: Network;
+  networkFactory: NetworkFactory;
+  erc20: ERC20;
+  operatorAmount: number;
 
-  private _loggedIn = false;
-  get isLoggedIn(): boolean { return this._loggedIn; }
-
-  private _address = ``;
-  get address(): string { return this._address; }
-
-  constructor(
-      public readonly web3Connection = WEB3_CONNECTION,
-      public readonly contractAddress = CONTRACT_ADDRESS,
-      public readonly settlerAddress = SETTLER_ADDRESS,
-      public readonly transactionAddress = TRANSACTION_ADDRESS, ) {
-
-    console.table({web3: WEB3_CONNECTION, contract: CONTRACT_ADDRESS, settler: SETTLER_ADDRESS, transaction: TRANSACTION_ADDRESS})
-
-    const opt = {opt: {web3Connection}};
-    this._bepro = new Application(opt);
-    this._network = new Network({contractAddress, ...opt});
-    this._ERC20 = new ERC20Contract({contractAddress: settlerAddress, ...opt});
-
+  get isLoggedIn() {
+    return this.connected;
   }
 
-  public async start() {
-    // this._bepro.test = true;
-    this._network.test = true;
-    this._ERC20.test = true;
+  get isStarted() {
+    return this.started;
+  }
 
+  async start(customNetworkAddress = undefined) {
     try {
-      await this._network.start();
-      await this._ERC20.start();
-    } catch (e) {
-      console.log(`Failed to start`, e);
-      return false;
+      if(!this.started)
+        await this.bepro.start();
+      this.network = new Network(this.bepro, customNetworkAddress || CONTRACT_ADDRESS);
+      this.erc20 = new ERC20(this.bepro, SETTLER_ADDRESS);
+      this.networkFactory = new NetworkFactory(this.bepro, NETWORK_FACTORY_ADDRESS);
+
+      await this.network.loadContract();
+      await this.erc20.loadContract();
+      await this.networkFactory.loadContract();
+
+      this.started = true
+
+      this.operatorAmount = await this.getOperatorAmount();
+    } catch (error) {
+      console.log(`Failed to start Bepro Service`, error)
+
+      this.started = false
     }
 
-    return true;
+    return this.started
   }
 
-  public async login(force?: boolean): Promise<boolean> {
-    if (!force && this._loggedIn) return true;
-
-    if (force || this._network.test) {
-      const opt = {opt: {web3Connection: this.web3Connection}};
-
-      this._bepro = new Application(opt);
-      this._network = new Network({contractAddress: this.contractAddress, useLastBlockGasPriceWhenMetaSend: 10000000000, ...opt});
-      this._ERC20 = new ERC20Contract({contractAddress: this.settlerAddress, useLastBlockGasPriceWhenMetaSend: 10000000000, ...opt});
-    }
-
-    let success = false;
-
-    try {
-      const bepro = await this.bepro.login();
-      const network = await this.network.login();
-      const erc20 = await this.ERC20.login();
-
-      success = ![bepro, network, erc20].some(bool => !bool);
-
-      if (success) {
-        await this.ERC20.__assert();
-        await this.network.__assert();
-
-        this._address = await this.bepro.getAddress();
-      }
-
-    } catch (e) {
-      success = false;
-      console.error(`Error logging in,`, e);
-    }
-
-    return this._loggedIn = success;
+  async login() {
+    this.connected = false;
+    await this.bepro.connect();
+    await this.start(this.network.contractAddress);
+    this.address = await this.bepro.getAddress();
+    this.connected = true;
   }
 
-  public async getBalance(kind: `eth`|`bepro`|`staked`) {
-    if (!this.isLoggedIn)
+  async getBalance(kind: `eth`|`bepro`|`staked`): Promise<number> {
+    if (!this.connected || !this.started)
       return 0;
 
-    if (kind === 'bepro')
-      return this.fromWei((await this.ERC20.getContract().methods.balanceOf(this.address).call()))
-    if (kind === 'eth')
-      return this.fromWei((await this.bepro.web3.eth.getBalance(this.address)));
-    if (kind === 'staked')
-      return this.network.getBEPROStaked();
+    let n = 0;
+    if (kind === `bepro`)
+      n = await this.erc20.getTokenAmount(this.address);
+    if (kind === `eth`)
+      n = +this.bepro.Web3.utils.fromWei(await this.bepro.getBalance());
+    if (kind === `staked`)
+      n = await this.network.getBEPROStaked();
 
-    throw new Error(`Wrong kind, must be eth|bepro|staked`);
+    return n;
   }
 
-  public async getAddress() {
-    return await this._bepro.getAddress();
+  async getNetworkObj(networkAddress = undefined) {
+    if (networkAddress) {
+      const customNetwork = new Network(this.bepro, networkAddress)
+
+      await customNetwork.loadContract()
+
+      return customNetwork
+    }
+
+    return this.network
+  }
+
+  async getClosedIssues(networkAddress = undefined) {
+    const network = await this.getNetworkObj(networkAddress)
+
+    return network.getAmountOfIssuesClosed()
+  }
+
+  async getSettlerTokenName(networkAddress = undefined) {
+    const network = await this.getNetworkObj(networkAddress)
+
+    return network.settlerToken.name()
+  }
+
+  async getTransactionalTokenName(networkAddress = undefined) {
+    const network = await this.getNetworkObj(networkAddress)
+
+    return network.transactionToken.name()
+  }
+
+  async getOpenIssues(networkAddress = undefined) {
+    const network = await this.getNetworkObj(networkAddress)
+
+    const quantity = await network.getAmountOfIssuesOpened()
+
+    return (quantity - 1)
+  }
+
+  async getBeproLocked(networkAddress = undefined) {
+    const network = await this.getNetworkObj(networkAddress)
+
+    return network.getBEPROStaked()
+  }
+
+  async getTokensStaked(networkAddress = undefined) {
+    const network = await this.getNetworkObj(networkAddress)
+
+    return network.getTokensStaked()
+  }
+
+  async getRedeemTime() {
+    if (this.isStarted) return this.network.redeemTime();
+
+    return 0
+  }
+
+  async setRedeemTime(time: number) {
+    if (this.isStarted) return this.network.changeRedeemTime(time)
+
+    return false
+  }
+
+  async getDisputableTime() {
+    if (this.isStarted) return this.network.disputableTime();
+
+    return 0
+  }
+
+  async setDisputeTime(time: number) {
+    if (this.isStarted) return this.network.changeDisputableTime(time)
+
+    return false
+  }
+
+  async getOraclesSummary() {
+    if (this.isStarted) return this.network.getOraclesSummary(this.address);
+
+    return {
+      oraclesDelegatedByOthers: 0,
+      amounts: [],
+      addresses: [],
+      tokensLocked: 0,
+      delegatedToOthers: 0
+    }
+  }
+
+  async isApprovedTransactionalToken() {
+    if (this.isStarted) return this.network.isApprovedTransactionalToken(1)
+
+    return false
+  }
+
+  async isApprovedSettlerToken() {
+    if (this.isStarted) return this.network.isApprovedSettlerToken(1)
+
+    return false
+  }
+
+  async isNetworkAbleToClose(networkAddress = undefined) {
+    const network = await this.getNetworkObj(networkAddress)
+
+    const tokensStaked = await network.getTokensStaked()
+    const beproLocked = await network.getBEPROStaked()
+
+    return tokensStaked === 0 && beproLocked === 0
+  }
+
+  async getTokensLockedByAddress(address: string) {
+    const amount = await this.networkFactory.getLockedStakedByAddress(address)
+
+    return this.fromWei(`${amount}`)
+  }
+
+  async closeNetwork() {
+    return this.networkFactory.unlock()
+  }
+
+  async getOperatorAmount() {
+    if (this.isStarted) return this.networkFactory.OPERATOR_AMOUNT()
+
+    return 0
+  }
+
+  async getCouncilAmount() {
+    if (this.isStarted) return this.network.COUNCIL_AMOUNT()
+
+    return 0
+  }
+
+  async setCouncilAmount(amount: number) {
+    if (this.isStarted) return this.network.changeCouncilAmount(`${amount}`)
+
+    return false
+  }
+
+  async getPercentageNeededForDispute() {
+    if (this.isStarted) return this.network.percentageNeededForDispute()
+
+    return 0
+  }
+
+  async setPercentageForDispute(percentage: number) {
+    if (this.isStarted) return this.network.sendTx(this.network.contract.methods.changePercentageNeededForDispute(percentage))
+
+    return 0
+  }
+
+  async createNetwork() {
+    return this.networkFactory.createNetwork(SETTLER_ADDRESS, SETTLER_ADDRESS)
+  }
+
+  async claimNetworkGovernor(networkAddress) {
+    const network = new Network(this.bepro, networkAddress)
+
+    await network.loadContract()
+
+    return network.sendTx(network.contract.methods.claimGovernor())
+  }
+
+  async getNetworksQuantity() {
+    if (this.isStarted) return this.networkFactory.callTx(this.networkFactory.contract.methods.networksAmount())
+
+    return 0
+  }
+
+  getNetworkAdressByCreator(creatorAddress: string) {
+    return this.networkFactory.getNetworkByAddress(creatorAddress)
+  }
+
+  fromWei(wei: string) {
+    return this.bepro.Web3.utils.fromWei(wei)
+  }
+
+  toWei(n: string|number) {
+    return this.bepro.Web3.utils.toWei(n.toString(), `ether`);
   }
 
   public parseTransaction(transaction, simpleTx?: SimpleBlockTransactionPayload) {
@@ -115,74 +263,6 @@ class BeproFacet {
     }
   }
 
-  async getClosedIssues() {
-    return this._network.getAmountofIssuesClosed()
-               .catch(e => {
-                 console.log(`Error while getClosedIssued`, e)
-                 return 0;
-               });
-  }
-
-  async getOpenIssues() {
-    return this._network.getAmountofIssuesOpened()
-                       .catch(e => {
-                         console.log(`Error while getOpenIssues`, e)
-                         return 0;
-                       });
-  }
-
-  async getBEPROStaked() {
-    return this._network.getBEPROStaked()
-                       .catch(e => {
-                         console.log(`Error while getBEPROStaked`, e)
-                         return 0;
-                       });
-  }
-
-  async getTokensStaked() {
-    return this._network.getTokensStaked()
-                       .catch(e => {
-                         console.log(`Error while getBEPROStaked`, e)
-                         return 0;
-                       });
-  }
-
-  async getRedeemTime() {
-    return this._network.params.contract.getContract().methods.redeemTime().call()
-  }
-
-  async getDisputableTime() {
-    return this._network.params.contract.getContract().methods.disputableTime().call()
-  }
-
-  async getOraclesSummary() {
-    const summary = await this.network.params.contract.getContract().methods.getOraclesSummary(this.address).call()
-
-    return {
-      oraclesDelegatedByOthers: this.fromWei(summary[0]),
-      amounts: summary[1] ? summary[1].map(a => this.fromWei(a)) : [],
-      addresses: summary[2] ? summary[2].map(a => a) : [],
-      tokensLocked: this.fromWei(summary[3]),
-    }
-  }
-
-  async isApprovedTransactionalToken() {
-    return this.network.isApprovedTransactionalToken({address: this.address, amount: 1})
-  }
-
-  async isApprovedSettlerToken() {
-    return this.network.isApprovedSettlerToken({address: this.address, amount: 1})
-  }
-
-  fromWei(wei: string) {
-    return this.bepro.web3.utils.fromWei(wei, 'ether')
-  }
-
-  toWei(number: string | number) {
-    return this.bepro.web3.utils.toWei(number.toString(), 'ether')
-  }
-
 }
 
-// todo: complete this beast
 export const BeproService = new BeproFacet();

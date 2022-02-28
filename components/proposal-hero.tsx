@@ -3,10 +3,14 @@ import { useRouter } from 'next/router';
 import InternalLink from './internal-link';
 import Translation from './translation';
 
+import useNetwork from '@x-hooks/use-network'
+
 export default function ProposalHero({githubId, title, pullRequestId, authorPullRequest, createdAt, beproStaked}) {
     const router = useRouter();
     const { issueId: issueCID } = router.query;
     const [repoId, issueId] = (issueCID as string).split(`/`);
+    const { getURLWithNetwork } = useNetwork()
+
     return (
         <div className="banner bg-bepro-blue mb-4">
             <div className="container">
@@ -14,7 +18,7 @@ export default function ProposalHero({githubId, title, pullRequestId, authorPull
                     <div className="col-md-10">
                         <div className="d-flex flex-column">
                             <div className="d-flex align-items-center cursor-pointer text-truncate">
-                                <InternalLink iconBefore={true} href={{ pathname:"/bounty", query: { id: issueId, repoId }}} icon={<i className="ico-back me-2" />} label={`#${githubId} ${title}`} className="p trans pl-0" transparent nav />
+                                <InternalLink iconBefore={true} href={getURLWithNetwork('/bounty', { id: issueId, repoId })} icon={<i className="ico-back me-2" />} label={`#${githubId} ${title}`} className="p trans pl-0" transparent nav />
                             </div>
                             <div className="row">
                                 <div className="col-md-9">

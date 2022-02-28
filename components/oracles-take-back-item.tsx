@@ -1,17 +1,17 @@
 import Modal from './modal';
 import {ComponentPropsWithoutRef, useContext, useState} from 'react';
 import {BeproService} from 'services/bepro-service';
-import {changeLoadState} from '@reducers/change-load-state';
-import {ApplicationContext} from '@contexts/application';
+import {ApplicationContext} from 'contexts/application';
 import {addTransaction} from '@reducers/add-transaction';
-import {TransactionTypes} from '@interfaces/enums/transaction-types';
+import {TransactionTypes} from 'interfaces/enums/transaction-types';
 import {updateTransaction} from '@reducers/update-transaction';
 import Button from './button';
-import {TransactionStatus} from '@interfaces/enums/transaction-status';
-import useTransactions from '@x-hooks/useTransactions';
+import {TransactionStatus} from 'interfaces/enums/transaction-status';
+import useTransactions from 'x-hooks/useTransactions';
 import { formatNumberToString } from '@helpers/formatNumber';
 import { truncateAddress } from '@helpers/truncate-address';
 import { useTranslation } from 'next-i18next';
+import { useNetwork } from '@contexts/network';
 
 interface Props extends ComponentPropsWithoutRef<"div"> {
   amount: string;
@@ -28,6 +28,7 @@ export default function OraclesTakeBackItem({
   const {dispatch} = useContext(ApplicationContext);
   const txWindow = useTransactions();
   const { t } = useTranslation('common')
+  const { activeNetwork } = useNetwork()
 
   function handleShow() {
     setShow(true);
@@ -40,15 +41,15 @@ export default function OraclesTakeBackItem({
   async function handleTakeBack() {
     handleCancel()
     
-    const delegateTx = addTransaction({type: TransactionTypes.takeBackOracles, amount: +amount, currency: 'Oracles'});
+    const delegateTx = addTransaction({type: TransactionTypes.takeBackOracles, amount: +amount, currency: 'Oracles'}, activeNetwork);
     dispatch(delegateTx);
 
     try {
 
-      BeproService.network.unlock({tokenAmount: amount, from: address,})
+      BeproService.network.unlock(+amount, address)
                   .then(txInfo => {
                     txWindow.updateItem(delegateTx.payload.id, BeproService.parseTransaction(txInfo, delegateTx.payload));
-                    onConfirm(txInfo.status);
+                    onConfirm(!!txInfo.status);
                   })
                           // BeproService.parseTransaction(txInfo, delegateTx.payload)
                           //             .then((block) => {

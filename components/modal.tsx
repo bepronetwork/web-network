@@ -13,6 +13,7 @@ export default function Modal({
                                 backdrop = `static`,
                                 titlePosition = `start`,
                                 titleClass, okLabel = ``, cancelLabel = ``, onOkClick = () => {},
+                                titleComponent,
                                 ...params
                               }: ModalProps): JSX.Element {
   const modalTitle = `${kebabCase(key || title)}-modal`;
@@ -39,7 +40,7 @@ export default function Modal({
                     {...params}>
       <ModalBootstrap.Header className={`relative d-flex w-100 justify-content-${titlePosition} `}>
         <ModalBootstrap.Title className={`pt-3 text-white ${titleClass || ``} ${centerTitle ? `text-center w-100` : ``}`}>
-          <h3>{title}</h3>
+          <h3>{titleComponent || title}</h3>
         </ModalBootstrap.Title>
         {onCloseClick && <Button transparent className="close-button p-1 position-absolute end-94 text-gray" onClick={onCloseClick}><CloseIcon /></Button>}
       </ModalBootstrap.Header>

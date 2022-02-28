@@ -3,17 +3,17 @@ import React, {useState} from 'react';
 import {useRouter} from 'next/router';
 
 export default function LanguageSelector() {
-  const {locale, asPath, push,} = useRouter();
+  const {locale, pathname, asPath, push,} = useRouter();
   const [show, setShow] = useState(false);
 
   function changeLocale(locale: string) {
-    return push(asPath, asPath, {locale});
+    return push(pathname, asPath, {locale});
   }
 
   function makeOption(label: string, value: string) { return ({value, label}); }
   const options = [
     makeOption(`English`, `en`),
-    /*makeOption(`Português`, `pt`),*/
+    makeOption(`Português`, `pt`),
   ];
 
   const overlay =

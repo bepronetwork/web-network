@@ -12,6 +12,22 @@ $only-child: 14px;
   }
 }
 
+.btn-primary {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+
+  &:hover {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    filter: brightness(0.85);
+  }
+
+  &:disabled, &:focus {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+  }
+}
+
 button.btn,a.btn:not(.brand), .main-nav-link:not(.brand) {
   svg,i {
     &:not(:only-child) {

@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 module.exports = {
   dialect: process.env.NEXT_DB_DIALECT || 'postgres',
   username: process.env.NEXT_DB_USERNAME || 'github',

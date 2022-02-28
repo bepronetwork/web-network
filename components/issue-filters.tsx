@@ -55,14 +55,14 @@ export default function IssueFilters() {
     {countFilters() > 0 && <Button
             transparent
             applyTextColor
-            textClass="text-blue"
+            textClass="text-primary"
             className="p-0 mr-2"
             onClick={handleClearFilters}
           >
             Clear
           </Button>}
 
-    <Button color="black" className={`${show && `border-blue` || ``} rounded-8 m-0`} onClick={() => setShow(!show)}>{countFiltersLabel()} <span><Translation label="filters.filters" /></span></Button>
+    <Button color="black" className={`${show && `border-primary` || ``} rounded-8 m-0`} onClick={() => setShow(!show)}>{countFiltersLabel()} <span><Translation label="filters.filters" /></span></Button>
     
     <div className={`border border-dark-gray rounded rounded-3 filter-wrapper d-${show ? `flex` : `none`} justify-content-start align-items-stretch position-absolute`}>
       <div>

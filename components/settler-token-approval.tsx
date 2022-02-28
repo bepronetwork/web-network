@@ -20,7 +20,7 @@ const SettlerTokenApproval = forwardRef<HTMLButtonElement, Props>(
         dispatch(changeLoadState(true));
         const response = await BeproService.network.approveSettlerERC20Token();
 
-        onApprove(response.status);
+        onApprove(!!response.status);
         dispatch(changeLoadState(false));
       } catch (error) {
         console.error("SettlerTokenApproval", error);

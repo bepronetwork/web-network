@@ -1,11 +1,14 @@
-import {IssueData, pullRequest} from '@interfaces/issue-data';
-import {ProposalData, User} from '@interfaces/api-response';
 import {ReposList} from '@interfaces/repos-list';
 import {BranchInfo, BranchsList} from '@interfaces/branchs-list';
 import { head } from 'lodash';
 import { PaginatedData } from '@interfaces/paginated-data';
-import client from '@services/api'
+import {ProposalData, User} from '@interfaces/api-response';
+import {IssueData, pullRequest} from '@interfaces/issue-data';
 
+import client from '@services/api'
+import { INetwork } from '@interfaces/network';
+import axios from 'axios';
+import { CURRENCY_BEPRO_API, PRODUCTION_CONTRACT, USE_PRODUCTION_CONTRACT_CONVERSION } from 'env';
 interface Paginated<T = any> {
   count: number;
   rows: T[]
@@ -32,8 +35,9 @@ export default function useApi() {
                            sortBy = 'updatedAt',
                            order = 'DESC',
                            address = ``,
-                           creator = ``) {
-    const search = new URLSearchParams({address, page, repoId, time, state, sortBy, order, creator}).toString();
+                           creator = ``,
+                           networkName = 'bepro') {
+    const search = new URLSearchParams({address, page, repoId, time, state, sortBy, order, creator, networkName}).toString();
     return client.get<{rows: IssueData[], count: number}>(`/issues/?${search}`)
                  .then(({data}) => data)
                  .catch(() => ({rows: [], count: 0}));
@@ -48,21 +52,33 @@ export default function useApi() {
                            address = ``,
                            creator = ``,
                            search = '',
-                           pullRequester = ''}) {
-    const params = new URLSearchParams({address, page, repoId, time, state, sortBy, order, creator, search, pullRequester}).toString();
+                           pullRequester = '',
+                           networkName = 'bepro'}) {
+    const params = new URLSearchParams({address, page, repoId, time, state, sortBy, order, creator, search, pullRequester, networkName}).toString();
     return client.get<{rows: IssueData[], count: number, pages: number, currentPage: number}>(`/search/issues/?${params}`)
                  .then(({data}) => data)
                  .catch(() => ({rows: [], count: 0, pages: 0, currentPage: 1}));
   }
 
-  async function getIssue(repoId: string, ghId: string) {
-    return client.get<IssueData>(`/issue/${repoId}/${ghId}`)
+  async function searchRepositories({page = '1',
+                           owner = '',
+                           name = ``,
+                           path = ``,
+                           networkName = 'bepro'}) {
+    const params = new URLSearchParams({page, owner, name, path, networkName}).toString();
+    return client.get<{rows, count: number, pages: number, currentPage: number}>(`/search/repositories?${params}`)
+                 .then(({data}) => data)
+                 .catch(() => ({rows: [], count: 0, pages: 0, currentPage: 1}));
+  }
+
+  async function getIssue(repoId: string, ghId: string, networkName = 'bepro') {
+    return client.get<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`)
                  .then(({data}) => data)
                  .catch(() => null);
   }
 
-  async function createIssue(payload: NewIssueParams) {
-    return client.post<number>(`/issue`, payload)
+  async function createIssue(payload: NewIssueParams, networkName = 'bepro') {
+    return client.post<number>(`/issue`, {...payload, networkName})
                  .then(({data}) => data)
                  .catch(() => null);
   }
@@ -73,9 +89,8 @@ export default function useApi() {
                  .catch(() => null);
   }
 
-
-  async function patchIssueWithScId(repoId, githubId, scId) {
-    return client.patch(`/issue`, {repoId, githubId, scId})
+  async function patchIssueWithScId(repoId, githubId, scId, networkName = 'bepro') {
+    return client.patch(`/issue`, {repoId, githubId, scId, networkName})
                  .then(({data}) => data === `ok`)
                  .catch(_ => false)
   }
@@ -86,15 +101,8 @@ export default function useApi() {
                  .catch(_ => false)
   }
 
-  async function getIssuesOfLogin(login: string, page = '1') {
-    const search = new URLSearchParams({page, creator: login}).toString();
-    return client.get<IssueData>(`/issues/?${search}`)
-                 .then(({data}) => data)
-                 .catch(() => null);
-  }
-
-  async function getPendingFor(address: string, page = '1') {
-    const search = new URLSearchParams({address, page, state: `pending`}).toString()
+  async function getPendingFor(address: string, page = '1', networkName = 'bepro') {
+    const search = new URLSearchParams({address, page, state: `pending`, networkName}).toString()
     return client.get<IssueData[]>(`/issues/?${search}`)
                  .then(({data}) => data)
                  .catch(() => null);
@@ -106,8 +114,8 @@ export default function useApi() {
                  .catch(() => ({scMergeId: '', pullRequestId: '', issueId: '', id: ''}))
   }
 
-  async function createPullRequestIssue(repoId: string, githubId: string, payload: {title: string; description: string; username: string; branch: string}) {
-    return client.post(`/pull-request/`, {...payload, repoId, githubId})
+  async function createPullRequestIssue(repoId: string, githubId: string, payload: {title: string; description: string; username: string; branch: string}, networkName = 'bepro') {
+    return client.post(`/pull-request/`, {...payload, repoId, githubId, networkName})
                  .then(() => true)
                  .catch((error) => {
                    throw error
@@ -183,7 +191,7 @@ export default function useApi() {
                  .catch(() => []);
   }
 
-  async function createRepo(owner, repo) {
+  async function createRepo(owner, repo, networkName = 'bepro') {
     return client.post(`/repos/`, {owner, repo})
                  .then(({status}) => status === 200)
                  .catch((e) => {
@@ -192,20 +200,22 @@ export default function useApi() {
                  })
   }
 
-  async function getReposList(force = false) {
+  async function getReposList(force = false, networkName = 'bepro') {
+    const search = new URLSearchParams({networkName}).toString();
+
     if (!force && repoList.length)
       return Promise.resolve(repoList as ReposList);
 
-    return client.get<ReposList>(`/repos/`)
+    return client.get<ReposList>(`/repos?${search}`)
                  .then(({data}) => data)
                  .catch(() => []);
   }
 
-  async function getBranchsList(repoId: string | number, force = false) {
+  async function getBranchsList(repoId: string | number, force = false, networkName = 'bepro') {
     if (!force && branchsList[repoId]?.length)
       return Promise.resolve(branchsList[repoId] as BranchInfo[]);
 
-    return client.get<BranchInfo[]>(`/repos/branchs/${repoId}`)
+    return client.get<BranchInfo[]>(`/repos/branchs/${repoId}/${networkName}`)
                  .then(({data}) => {
                   branchsList[repoId] = data;
                    return data
@@ -219,30 +229,30 @@ export default function useApi() {
                  .catch(() => false);
   }
 
-  async function poll(eventName: string, rest) {
-    return client.post(`/poll/`, {eventName, ...rest}, {timeout: 2 * 60 * 1000})
+  async function poll(eventName: string, rest, networkName = 'bepro') {
+    return client.post(`/poll/`, {eventName, ...rest, networkName}, {timeout: 2 * 60 * 1000})
   }
 
-  async function waitForMerge(githubLogin, issue_id, currentGithubId) {
-    return poll('mergeProposal', {githubLogin, issue_id, currentGithubId})
+  async function waitForMerge(githubLogin, issue_id, currentGithubId, networkName = 'bepro') {
+    return poll('mergeProposal', {githubLogin, issue_id, currentGithubId}, networkName)
                  .then(({data}) => data)
                  .catch(() => null)
   }
 
-  async function waitForClose(currentGithubId) {
-    return poll(`closeIssue`, {currentGithubId})
+  async function waitForClose(currentGithubId, networkName = 'bepro') {
+    return poll(`closeIssue`, {currentGithubId}, networkName)
                  .then(({data}) => data)
                  .catch(() => null)
   }
 
-  async function waitForRedeem(currentGithubId) {
-    return poll(`redeemIssue`, {currentGithubId})
+  async function waitForRedeem(currentGithubId, networkName = 'bepro') {
+    return poll(`redeemIssue`, {currentGithubId}, networkName)
                  .then(({data}) => data)
                  .catch(() => null)
   }
 
-  async function processEvent(eventName, fromBlock: number, id: number, pullRequestId = '') {
-    return client.post(`/past-events/${eventName}/`, {fromBlock, id, pullRequestId})
+  async function processEvent(eventName, fromBlock: number, id: number, pullRequestId = '', networkName = 'bepro') {
+    return client.post(`/past-events/${eventName}/`, {fromBlock, id, pullRequestId, networkName})
   }
 
   async function processMergeProposal(fromBlock, id) {
@@ -263,8 +273,8 @@ export default function useApi() {
                  });
   }
 
-  async function userHasPR(issueId: string, login: string, page = '1') {
-    const search = new URLSearchParams({issueId, login, page}).toString();
+  async function userHasPR(issueId: string, login: string, networkName = 'bepro') {
+    const search = new URLSearchParams({issueId, login, page: '1', networkName}).toString();
     return client.get<PaginatedData<pullRequest>>(`/pull-request?${search}`)
                  .then(({data: {count}}) => count > 0)
                  .catch(e => {
@@ -274,9 +284,9 @@ export default function useApi() {
 
   }
 
-  async function getUserPullRequests(page= '1', login: string) {
-    const search = new URLSearchParams({page, login}).toString();
-
+  async function getUserPullRequests(page= '1', login: string, networkName = 'bepro') {
+    const search = new URLSearchParams({page, login, networkName}).toString();
+    
     return client.get<PaginatedData<pullRequest>>(`/pull-request?${search}`)
                  .then(({data}) => data)
                  .catch(e => {
@@ -285,30 +295,38 @@ export default function useApi() {
                  });
   }
 
-  async function startWorking(issueId: string, githubLogin: string) {
-    return client.put('/issue/working',  { issueId, githubLogin })
+  async function startWorking(issueId: string, githubLogin: string, networkName = 'bepro') {
+    return client.put('/issue/working',  { issueId, githubLogin, networkName })
                 .then((response) => response)
                 .catch(error => {
                   throw error
                 })
   }
 
-  async function mergeClosedIssue(issueId: string, pullRequestId: string, mergeProposalId: string, address: string) {
-    return client.post('/pull-request/merge', { issueId, pullRequestId, mergeProposalId, address })
+  async function mergeClosedIssue(issueId: string, pullRequestId: string, mergeProposalId: string, address: string, networkName = 'bepro') {
+    return client.post('/pull-request/merge', { issueId, pullRequestId, mergeProposalId, address, networkName })
       .then(response => response)
       .catch(error => {
         throw error
       })
   }
 
-  async function createReviewForPR(issueId: string, pullRequestId: string,  githubLogin: string, body:string) {
-    return client.put('/pull-request/review', {issueId, pullRequestId, githubLogin, body})
-      .then(response => response)
+  async function createReviewForPR(issueId: string, pullRequestId: string,  githubLogin: string, body:string, networkName = 'bepro') {
+    return client.put('/pull-request/review', {issueId, pullRequestId, githubLogin, body, networkName})
+    .then(response => response)
   }
-
+  
   async function removeUser(address: string, githubLogin: string) {
     return client.delete(`/user/${address}/${githubLogin}`)
-                 .then(({status}) => status === 200)
+    .then(({status}) => status === 200)
+  }
+  
+  async function createNetwork(networkInfo) {
+    return client.post('/network', {...networkInfo})
+    .then(response => response)
+      .catch(error => {
+        throw error
+      })
   }
 
   async function uploadFiles(files: File | File[]): Promise<any[]> {
@@ -323,6 +341,65 @@ export default function useApi() {
     }
 
     return client.post("/files", form).then(({ data }) => data);
+  }
+
+  async function updateNetwork(networkInfo) {
+    return client.put('/network', {...networkInfo})
+    .then(response => response)
+      .catch(error => {
+        throw error
+      })
+  }
+
+  async function isNetworkOwner(creatorAddress, networkAddress) {
+    const params = new URLSearchParams({creatorAddress, networkAddress}).toString()
+
+    return client.get<{rows: INetwork[], count: number, pages: number, currentPage: number}>(`/search/networks/?${params}`)
+                 .then(({data}) => !!data.rows.length)
+                 .catch(() => false)
+  }
+
+  async function getNetwork(name: string) {
+    const search = new URLSearchParams({name}).toString();
+
+    return client.get<INetwork>(`/network?${search}`)
+      .then(response => response)
+      .catch(error => {
+        throw error
+      })
+  }
+  
+
+  async function searchNetworks({page = '1',
+                           name = ``,
+                           creatorAddress = ``,
+                           networkAddress = ``,
+                           sortBy = 'updatedAt',
+                           order = 'DESC',
+                           search = ''}) {
+    const params = new URLSearchParams({page, name, creatorAddress, networkAddress, sortBy, order, search}).toString()
+
+    return client.get<{rows: INetwork[], count: number, pages: number, currentPage: number}>(`/search/networks/?${params}`)
+                 .then(({data}) => data)
+                 .catch(() => ({rows: [], count: 0, pages: 0, currentPage: 1}));
+  }
+
+  async function getBeproCurrency(contractAddress = undefined) {
+    try {
+      const { data } = await axios.get(`${CURRENCY_BEPRO_API}/${USE_PRODUCTION_CONTRACT_CONVERSION === '1' ? PRODUCTION_CONTRACT : contractAddress}`)
+
+      return data.market_data.current_price
+    } catch (error) {
+      return {usd: 1}
+    }
+  }
+
+  async function repositoryHasIssues(repoPath) {
+    const search = new URLSearchParams({repoPath}).toString()
+
+    return client.get<{rows: IssueData[], count: number}>(`/search/issues/?${search}`)
+                 .then(({data}) => !!data.count)
+                 .catch(() => false)
   }
 
   return {
@@ -341,7 +418,6 @@ export default function useApi() {
     createIssue,
     moveIssueToOpen,
     patchIssueWithScId,
-    patchPrStatus,
     waitForMerge,
     processMergeProposal,
     processEvent,
@@ -358,6 +434,14 @@ export default function useApi() {
     mergeClosedIssue,
     getUserPullRequests,
     createReviewForPR,
-    searchIssues
+    searchIssues,
+    createNetwork,
+    getNetwork,
+    searchNetworks,
+    searchRepositories,
+    repositoryHasIssues,
+    updateNetwork,
+    getBeproCurrency,
+    isNetworkOwner
   }
 }

@@ -8,7 +8,7 @@ import { useTranslation } from 'next-i18next';
 export default function IssueProposalProgressBar({
   isFinalized = false,
   isIssueinDraft = true,
-  mergeProposalsAmount = 0,
+  mergeProposalAmount = 0,
   isFinished = false,
   isCanceled = false,
   creationDate
@@ -36,14 +36,14 @@ export default function IssueProposalProgressBar({
     //Draft -> isIssueInDraft()
     //Development -> estado inicial
     //Finalized -> recognizedAsFinished == true
-    //Dispute Window -> mergeProposalsAmount > 0
+    //Dispute Window -> mergeProposalAmount > 0
     //Closed and Distributed -> finalized == true
     let value = 0
     if (!isIssueinDraft) {
       value = 1
       if (isFinished) {
         value = 2
-        if (mergeProposalsAmount > 0)
+        if (mergeProposalAmount > 0)
           value = 3;
         if(isFinalized){
           value = 4;
@@ -138,7 +138,7 @@ export default function IssueProposalProgressBar({
     </Fragment>
   }
 
-  useEffect(loadDisputeState, [isFinalized, isIssueinDraft, isCanceled, mergeProposalsAmount, isFinished]);
+  useEffect(loadDisputeState, [isFinalized, isIssueinDraft, isCanceled, mergeProposalAmount, isFinished]);
   useEffect(() => {
     BeproService.getRedeemTime()
       .then(time => setRedeemTime(time))

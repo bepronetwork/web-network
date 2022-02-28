@@ -1,14 +1,25 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { Op } from 'sequelize'
 import { Octokit } from 'octokit'
+import { NextApiRequest, NextApiResponse } from 'next'
 
-import models from '@db/models'
 import api from '@services/api'
+import models from '@db/models'
 
 async function put(req: NextApiRequest, res: NextApiResponse) {
-  const { issueId, githubLogin } = req.body
+  const { issueId, githubLogin, networkName } = req.body
 
   try{
-    const issue = await models.issue.findOne({ where: { issueId } })
+    const network = await models.network.findOne({
+      where: {
+        name: {
+          [Op.iLike]: String(networkName)
+        }
+      }
+    })
+  
+    if (!network) return res.status(404).json('Invalid network')
+
+    const issue = await models.issue.findOne({ where: { issueId, network_id: network.id } })
 
     if (!issue)
       return res.status(404).json('Issue not found')

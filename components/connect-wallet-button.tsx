@@ -24,7 +24,7 @@ const networkMap = {
 }
 
 export default function ConnectWalletButton({children = null, forceLogin = false, onSuccess = () => null, onFail = () => console.error("Failed to login"), asModal = false, btnColor = `white`}) {
-  const { state: {metaMaskWallet, beproInit, currentAddress, network: activeNetwork}, dispatch } = useContext(ApplicationContext);
+  const { state: {loading, metaMaskWallet, beproInit, currentAddress, network: activeNetwork}, dispatch } = useContext(ApplicationContext);
   const [isAddingNetwork, setIsAddingNetwork] = useState(false);
   const { t } = useTranslation(['common', 'connect-wallet-button'])
 
@@ -36,7 +36,10 @@ export default function ConnectWalletButton({children = null, forceLogin = false
       if (+process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID !== +chainId) {
         dispatch(changeNetwork((NetworkIds[+chainId] || `unknown`)?.toLowerCase()))
         return;
-      } else loggedIn = await BeproService.login();
+      } else {
+         await BeproService.login();
+         loggedIn = BeproService.isLoggedIn
+      }
     } catch (e) {
       console.error(`Failed to login on BeproService`, e);
     }
@@ -53,17 +56,15 @@ export default function ConnectWalletButton({children = null, forceLogin = false
     if (!beproInit)
       return;
 
-    let action: () => Promise<boolean|string>;
 
     if (forceLogin)
-      action = BeproService.login;
-    else action = () => Promise.resolve(BeproService.address);
-
-    action().then((state: string|boolean) =>
-                    dispatch(changeWalletState(!!state)))
-            .catch(e => {
-              console.error(`Error changing wallet state`, e);
-            });
+      BeproService.login()
+      .then(() => {
+        dispatch(changeWalletState(BeproService.isLoggedIn))
+      })
+      .catch(e => {
+        console.error(`Error changing wallet state`, e);
+      })
 
   }, [beproInit]);
 
@@ -111,7 +112,9 @@ export default function ConnectWalletButton({children = null, forceLogin = false
     ].some(values => values)
   }
 
-  if (asModal)
+  if (asModal) {
+    if (loading.isLoading) return <></>
+
     return (
       <Modal
       title={t('connect-wallet-button:title')}
@@ -130,12 +133,15 @@ export default function ConnectWalletButton({children = null, forceLogin = false
               </div>
         </div>
 
-        <div className="small-info text-ligth-gray text-center text-dark text-uppercase mt-1 pt-1">
-          {t('misc.by-connecting')}{" "}
+        <div className="small-info text-center text-uppercase mt-1 pt-1">
+          <span className="text-ligth-gray">
+            {t('misc.by-connecting')}{" "}
+          </span>  
+          
           <a
             href="https://www.bepro.network/terms-and-conditions"
             target="_blank"
-            className="text-decoration-none"
+            className="text-decoration-none text-primary"
           >
             {t('misc.terms-and-conditions')}
           </a>{" "}
@@ -143,7 +149,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
           <a
             href="https://www.bepro.network/privacy"
             target="_blank"
-            className="text-decoration-none"
+            className="text-decoration-none text-primary"
           >
             {t('misc.privacy-policy')}
           </a>
@@ -151,7 +157,8 @@ export default function ConnectWalletButton({children = null, forceLogin = false
       </div>
       </Modal>
     )
-
+  }
+  
   if (!metaMaskWallet)
     return <Button color='white' className='text-primary bg-opacity-100' onClick={connectWallet}><span>{t('main-nav.connect')}</span> <i className="ico-metamask" /></Button>
 

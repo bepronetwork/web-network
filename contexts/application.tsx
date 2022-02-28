@@ -18,6 +18,7 @@ import {toastError} from '@reducers/add-toast';
 import sanitizeHtml from 'sanitize-html';
 import {NetworkIds} from '@interfaces/enums/network-ids';
 import useApi from '@x-hooks/use-api';
+import { useNetwork } from 'contexts/network';
 import {changeAccessToken} from '@reducers/change-access-token';
 import {updateTransaction} from '@reducers/update-transaction';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
@@ -25,9 +26,11 @@ import { changeTransactionalTokenApproval } from './reducers/change-transactiona
 import { changeSettlerTokenApproval } from './reducers/change-settler-token-approval';
 import {setCookie, parseCookies} from 'nookies'
 import { addTransaction } from './reducers/add-transaction';
+import { changeLoadState } from './reducers/change-load-state';
 
 interface GlobalState {
   state: ApplicationState,
+  methods?: any,
   dispatch: (action: ReduceActor<any>) => Dispatch<ReduceActor<any>>,
 }
 
@@ -44,8 +47,8 @@ const defaultState: GlobalState = {
     oracles: {
       addresses: [],
       amounts: [],
-      oraclesDelegatedByOthers: ``,
-      tokensLocked: ``
+      oraclesDelegatedByOthers: 0,
+      tokensLocked: 0
     },
     myIssues: [],
     balance: {
@@ -60,7 +63,12 @@ const defaultState: GlobalState = {
     githubLogin: ``,
     accessToken: ``,
     isTransactionalTokenApproved: false,
-    isSettlerTokenApproved: false
+    isSettlerTokenApproved: false,
+    networksSummary: {
+      bounties: 0, 
+      amountInNetwork: 0,
+      amountDistributed: 0
+    }
   },
   dispatch: () => undefined
 };
@@ -77,9 +85,10 @@ export default function ApplicationContextProvider({children}) {
   const [txListener, setTxListener] = useState<any>();
   const {authError} = useRouter().query;
   const {getUserOf} = useApi();
+  const { activeNetwork } = useNetwork()
 
   function updateSteFor(newAddress: string) {
-    BeproService.login(true)
+    BeproService.login()
                 .then(() => dispatch(changeCurrentAddress(newAddress)))
   }
 
@@ -97,24 +106,42 @@ export default function ApplicationContextProvider({children}) {
         dispatch(changeAccessToken(user?.accessToken));
       })
 
-    BeproService.getOraclesSummary()
-                .then(oracles => dispatch(changeOraclesState(changeOraclesParse(address, oracles))))
-
     BeproService.isApprovedTransactionalToken().then(approval => dispatch(changeTransactionalTokenApproval(approval)))
     BeproService.isApprovedSettlerToken().then(approval => dispatch(changeSettlerTokenApproval(approval)))
+
+    updateWalletBalance(address)
     
-    BeproService.getBalance('bepro').then(bepro => dispatch(changeBalance({bepro})));
-    BeproService.getBalance('eth').then(eth => dispatch(changeBalance({eth})));
-    BeproService.getBalance('staked').then(staked => dispatch(changeBalance({staked})));
     cheatBepro = BeproService;
     cheatDispatcher = updateTransaction;
   }
 
-  const Initialize = () => {
-    BeproService.start()
-                .then(state => {
+  function updateWalletBalance(cheatAddress = undefined) {
+    if (!state.currentAddress)
+      return
+
+    const address = cheatAddress || state.currentAddress
+    
+    BeproService.getOraclesSummary()
+                .then(oracles => dispatch(changeOraclesState(changeOraclesParse(address, oracles))))
+
+    BeproService.getBalance('bepro')
+                .then(bepro => dispatch(changeBalance({bepro})))
+
+    BeproService.getBalance('eth')
+                .then(eth => dispatch(changeBalance({eth})))
+
+    BeproService.getBalance('staked')
+                .then(staked => dispatch(changeBalance({staked})))
+  }
+
+  const Initialize = () => {    
+    dispatch(changeLoadState(true))
+
+    BeproService.start(activeNetwork?.networkAddress)
+                .then((state) => {
                   dispatch(changeBeproInitState(state))
-                });
+                  updateWalletBalance()
+                }).finally(() => dispatch(changeLoadState(false)))
 
     if (!window.ethereum)
       return;
@@ -152,7 +179,7 @@ export default function ApplicationContextProvider({children}) {
 
   LoadApplicationReducers();
 
-  useEffect(Initialize, []);
+  useEffect(Initialize, [activeNetwork]);
   useEffect(onAddressChanged, [state.currentAddress]);
   useEffect(() => {
     if (!authError)
@@ -195,7 +222,7 @@ export default function ApplicationContextProvider({children}) {
         }
       }
       
-      dispatch(addTransaction(transaction))
+      dispatch(addTransaction(transaction, activeNetwork))
 
       return transaction;
     }
@@ -218,7 +245,7 @@ export default function ApplicationContextProvider({children}) {
   },[state.myTransactions, state.currentAddress])
 
   return (
-    <ApplicationContext.Provider value={{ state, dispatch: dispatch as any }}>
+    <ApplicationContext.Provider value={{ state, dispatch: dispatch as any, methods: { updateWalletBalance } }}>
       <Loading show={state.loading.isLoading} text={state.loading.text} />
       <Toaster />
       {children}

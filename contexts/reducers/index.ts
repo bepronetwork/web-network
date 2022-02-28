@@ -18,6 +18,7 @@ import {ChangeGithubLogin} from '@reducers/change-github-login';
 import {ChangeAccessToken} from '@reducers/change-access-token';
 import { ChangeTransactionalTokenApproval } from './change-transactional-token-approval';
 import { ChangeSettlerTokenApproval } from './change-settler-token-approval';
+import { ChangeNetworksSummary } from './change-networks-summary';
 
 export default function LoadApplicationReducers() {
   [
@@ -39,6 +40,7 @@ export default function LoadApplicationReducers() {
     ChangeGithubLogin,
     ChangeAccessToken,
     ChangeTransactionalTokenApproval,
-    ChangeSettlerTokenApproval
+    ChangeSettlerTokenApproval,
+    ChangeNetworksSummary
   ].forEach(addReducer);
 }

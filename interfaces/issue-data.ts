@@ -2,18 +2,21 @@ import {ProposalData} from './api-response';
 
 export type IssueState =  'pending' |  'draft' | 'open' | 'in progress' | 'canceled' | 'closed' | 'ready' | 'done' | 'disputed'
 
+export type CID = `${string}/${string}`;
+
 export interface IssueData {
   _id?: string; // sc id
   id?: string; // database id
   body: string;
   createdAt: Date;
+  updatedAt?: Date;
   developers: developer[];
   dueDate?: string;
   githubId: string;
   issueId: string; // custom id repo/githubid
   creatorGithub?: string;
   creatorAddress?: string;
-  isIssueinDraft?: boolean;
+  isIssueinDraft?: boolean; //Remove, moved to NetworkIssue in Context
   amount?: number;
   url?: string;
   numberOfComments: number;
@@ -67,4 +70,17 @@ export interface Comment {
 
 export interface GithubUser {
   login: string;
+}
+
+export interface INetworkIssue{
+  _id: number
+  canceled: boolean;
+  cid: CID | string;
+  creationDate: Date | number;
+  finalized: boolean;
+  issueGenerator: string;
+  mergeProposalAmount: number
+  recognizedAsFinished: boolean;
+  isDraft: boolean;
+  tokensStaked: number;
 }

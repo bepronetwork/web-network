@@ -21,6 +21,9 @@ import LockedIcon from "@assets/icons/locked-icon";
 import { ProposalData } from "@interfaces/api-response";
 import Translation from "./translation";
 import { useTranslation } from "next-i18next";
+import { useNetwork } from "@contexts/network";
+import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
+import { IForkInfo } from "@interfaces/repos-list";
 
 interface pageActions {
   issueId: string;
@@ -32,7 +35,7 @@ interface pageActions {
   pullRequests?: pullRequest[];
   mergeProposals?: ProposalData[];
   amountIssue?: string | number;
-  forks?: { owner: developer }[];
+  forks?: IForkInfo[];
   title?: string;
   description?: string;
   handleMicroService?: (force?: boolean) => void;
@@ -96,6 +99,7 @@ export default function PageActions({
   const [isExecuting, setIsExecuting] = useState(false);
 
   const txWindow = useTransactions();
+  const { activeNetwork } = useNetwork()
 
   function renderIssueAvatars() {
     if (developers?.length > 0) return <IssueAvatars users={developers} />;
@@ -112,7 +116,7 @@ export default function PageActions({
           href={`https://github.com/${repoPath}/network/members`}
           target="_blank"
         >
-          <IssueAvatars users={forks.map((item) => item.owner)} />
+          <IssueAvatars users={forks} />
           <span className="me-3 caption-small"><Translation label="misc.forks" /></span>
         </a>
       );
@@ -120,8 +124,8 @@ export default function PageActions({
   }
 
   const isClosedIssue = (state: IssueState | string): Boolean =>
-    state.toLocaleLowerCase() === "closed" ||
-    state.toLocaleLowerCase() === "redeemed";
+    state?.toLocaleLowerCase() === "closed" ||
+    state?.toLocaleLowerCase() === "redeemed";
   const isReedemButtonDisable = () =>
     [
       !myTransactions.find(
@@ -132,11 +136,11 @@ export default function PageActions({
     ].some((values) => values === false);
 
   async function handleRedeem() {
-    const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue });
+    const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue }, activeNetwork);
     dispatch(redeemTx);
-    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
 
-    waitForRedeem(issueId)
+    waitForRedeem(issueId, activeNetwork?.name)
       .then(() => {
         if (handleBeproService)
           handleBeproService(true);
@@ -147,7 +151,7 @@ export default function PageActions({
 
     await BeproService.login()
       .then(() => {
-        BeproService.network.redeemIssue({ issueId: issue_id })
+        BeproService.network.redeemIssue(issue_id)
                     .then((txInfo) => {
                       processEvent(`redeem-issue`, txInfo.blockNumber, issue_id);
                       txWindow.updateItem(redeemTx.payload.id, BeproService.parseTransaction(txInfo, redeemTx.payload));
@@ -178,12 +182,15 @@ export default function PageActions({
       isIssueinDraft &&
       issueCreator === currentAddress &&
       !finalized && (
-        <Button
-          disabled={isReedemButtonDisable()}
-          onClick={handleRedeem}
-        >
-            <Translation ns="bounty" label="actions.redeem" />
-        </Button>
+        <ReadOnlyButtonWrapper>
+          <Button
+          className="read-only-button"
+            disabled={isReedemButtonDisable()}
+            onClick={handleRedeem}
+          >
+              <Translation ns="bounty" label="actions.redeem" />
+          </Button>
+        </ReadOnlyButtonWrapper>
       )
     );
   };
@@ -198,7 +205,6 @@ export default function PageActions({
                                   amountTotal={amountIssue}
                                   mergeProposals={mergeProposals}
                                   pullRequests={pullRequests}
-                                  handleBeproService={handleBeproService}
                                   handleMicroService={handleMicroService}/>
     );
   }
@@ -213,9 +219,11 @@ export default function PageActions({
       isRepoForked &&
       isWorking &&
       githubLogin && (
-        <Button className="mr-1" onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || hasOpenPR}>
+        <ReadOnlyButtonWrapper>
+        <Button className="mr-1 read-only-button" onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || hasOpenPR}>
           <Translation ns="pull-request" label="actions.create.title" />
         </Button>
+        </ReadOnlyButtonWrapper>
       )
     );
   }
@@ -246,15 +254,17 @@ export default function PageActions({
       !finished &&
       !finalized &&
       githubLogin &&
+      <ReadOnlyButtonWrapper>
       <Button
         color="primary"
         onClick={handleStartWorking}
-        className="mr-1"
+        className="mr-1 read-only-button"
         disabled={isExecuting}
       >
         <span><Translation ns="bounty" label="actions.start-working.title" /></span>
         {isExecuting ? <span className="spinner-border spinner-border-xs ml-1"/> : ''}
       </Button>
+      </ReadOnlyButtonWrapper>
     )
   }
 
@@ -314,7 +324,7 @@ export default function PageActions({
   async function handleStartWorking() {
     setIsExecuting(true)
 
-    startWorking(networkCID, githubLogin)
+    startWorking(networkCID, githubLogin, activeNetwork?.name)
       .then((response) => {
         dispatch(
           addToast({
@@ -347,13 +357,13 @@ export default function PageActions({
   }
 
   async function handleDispute() {
-    const disputeTx = addTransaction({ type: TransactionTypes.dispute });
+    const disputeTx = addTransaction({ type: TransactionTypes.dispute }, activeNetwork);
     dispatch(disputeTx);
 
-    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
 
     await BeproService.network
-      .disputeMerge({ issueID: issue_id, mergeID: mergeId })
+      .disputeMerge(issue_id, +mergeId)
       .then((txInfo) => {
         processEvent(`dispute-proposal`, txInfo.blockNumber, issue_id);
         txWindow.updateItem(disputeTx.payload.id, BeproService.parseTransaction(txInfo, disputeTx.payload));
@@ -370,13 +380,22 @@ export default function PageActions({
 
   async function handleClose() {
    
-    const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue });
+    const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue }, activeNetwork);
     dispatch(closeIssueTx);
 
-    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
+
+    waitForClose(issueId, activeNetwork?.name)
+      .then(() => {
+        if (handleBeproService)
+          handleBeproService(true);
+
+        if (handleMicroService)
+          handleMicroService();
+      })
 
     await BeproService.network
-      .closeIssue({ issueID: issue_id, mergeID: mergeId })
+      .closeIssue(issue_id, +mergeId)
       .then((txInfo) => {
         processEvent(`close-issue`, txInfo.blockNumber, issue_id).then(async () =>{
           await onCloseEvent?.()
@@ -413,11 +432,11 @@ export default function PageActions({
               {renderProposeDestribution()}
               {state?.toLowerCase() == "pull request" && (
                 <>
-                  { (!isDisputed && !finalized && isDisputable ) && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>{t('actions.dispute')}</Button> || ``}
-                  {!finalized && <Button disabled={!canClose || isDisputable} onClick={handleClose}>
+                  { (!isDisputed && !finalized && isDisputable ) && <ReadOnlyButtonWrapper><Button color={`${isDisputed ? 'primary': 'purple'}`} className="read-only-button mr-1" onClick={handleDispute}>{t('actions.dispute')}</Button></ReadOnlyButtonWrapper> || ``}
+                  {!finalized && <ReadOnlyButtonWrapper><Button className="read-only-button mr-1" disabled={!canClose || isDisputable} onClick={handleClose}>
                   {!canClose || isDisputable && <LockedIcon width={12} height={12} className="mr-1"/>}
                     <span>{t('pull-request:actions.merge.title')}</span>
-                    </Button> || ``}
+                    </Button></ReadOnlyButtonWrapper> || ``}
                 </>
               )}
 
