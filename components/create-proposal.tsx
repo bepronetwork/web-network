@@ -39,30 +39,36 @@ interface SameProposal {
   }[];
 }
 
+function getLabel(data): PRLabel{
+  if(data.merged) return 'merged';
+  if(data.isMergeable) return 'ready to merge';
+  //isMergeable can be null;
+  if(data.isMergeable === false) return 'conflicts';
+}
+
 function SelectValueComponent({ innerProps, innerRef, ...rest }){
-  const data = rest.getValue();
+  const data = rest.getValue()[0];
+  const label = getLabel(data)
+
   return (
     <div
       ref={innerRef}
       {...innerProps}
       className="proposal__select-options d-flex align-items-center text-center p-small p-1"
     >
-      <Avatar userLogin={data[0]?.githubLogin} />
-      <span className={`ml-1 text-nowrap text-gray `}>
-        {data[0]?.label}
+      <Avatar userLogin={data?.githubLogin} />
+      <span className="ml-1 text-nowrap">
+        {data?.label}
       </span>
+      <div className="ms-2">
+        {label && <PullRequestLabels label={label}/>}
+      </div>
     </div>
   )
 }
-function SelectOptionComponent({ innerProps, innerRef, data }) {
-  function getLabel(): PRLabel{
-    if(data.merged) return 'merged';
-    if(data.isMergeable) return 'ready to merge';
-    //isMergeable can be null;
-    if(data.isMergeable === false) return 'conflicts';
-  }
 
-  const label = getLabel()
+function SelectOptionComponent({ innerProps, innerRef, data }) {
+  const label = getLabel(data)
   return (
     <div
       ref={innerRef}
@@ -108,6 +114,7 @@ export default function NewProposal({
   const {activeNetwork} = useNetwork()
   const {activeRepo} = useRepos();
 
+  const [showExceptionalMessage, setShowExceptionalMessage] = useState<boolean>();
 
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
@@ -200,6 +207,16 @@ export default function NewProposal({
    if (currentAmount === 0){
     handleInputColor("normal")
    }
+
+   if(currentAmount === 100){
+    participants.map(item => {
+      var realValue = (amountTotal * obj[item.githubHandle])/ 100
+      if(amountTotal < participants.length && realValue < 1 && realValue != 0 && realValue < amountTotal){
+        handleInputColor("error")
+        setShowExceptionalMessage(true)
+      }
+    })
+   }
   }
 
   function handleInputColor ( name: string ) {
@@ -256,12 +273,24 @@ export default function NewProposal({
   async function handleClickCreate(): Promise<void> {
     const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
 
+    function handleValues(amount, distributed){
+      return Math.floor((amount * distributed) / 100)
+    }
+
+    var prAddresses: string[] = []
+    var prAmounts: number[] = []
+
+    participants.map((items) => {
+      if(handleValues(amountTotal,distrib[items.githubHandle]) > 0){
+        prAddresses.push(items.address)
+        prAmounts.push(handleValues(amountTotal,distrib[items.githubHandle]))
+      }
+    })
+  
     const payload = {
       issueID: issue_id,
-      prAddresses: participants.map((items) => items.address),
-      prAmounts: participants.map(
-        (items) => Math.floor((amountTotal * distrib[items.githubHandle]) / 100)
-      ),
+      prAddresses,
+      prAmounts,
     };
     //Chcking diff between total Distributed and total Ammount;
     const totalDistributed = payload.prAmounts.reduce((p,c)=> p+c)
@@ -483,7 +512,7 @@ export default function NewProposal({
                     `proposal:errors.${
                       warning
                         ? "distribution-already-exists"
-                        : "pr-cant-mergeble"
+                        : "pr-cant-merged"
                     }`
                   )}
                 </p>
@@ -497,7 +526,7 @@ export default function NewProposal({
                     }
                   )}
                 >
-                  {t(
+                  {showExceptionalMessage && error ? t(`proposal:messages.distribution-cant-done`): t(
                     `proposal:messages.distribution-${
                       success ? "is" : "must-be"
                     }-100`
