@@ -230,7 +230,7 @@ export default function PageCreateIssue() {
                           value={issueDescription}
                           onChange={e => setIssueDescription(e.target.value)}/>
               </div>
-              <div className='mb-2'>
+              <div className='mb-4'>
                 <DragAndDrop onUpdateFiles={onUpdateFiles} />
               </div>
               <div className="row mb-4">
