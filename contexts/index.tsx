@@ -6,16 +6,14 @@ import { NetworkProvider } from './network';
 
 const RootProviders: React.FC = ({children}) => {
   return (
-    <ApplicationContextProvider>
-      <NetworkProvider>
+    <NetworkProvider>
+      <ApplicationContextProvider>
         <ReposProvider>
-          <IssueProvider>
-            {children}
-          </IssueProvider>
+          <IssueProvider>{children}</IssueProvider>
         </ReposProvider>
-      </NetworkProvider>
-    </ApplicationContextProvider>
-  )
+      </ApplicationContextProvider>
+    </NetworkProvider>
+  );
 }
 
 export default RootProviders;

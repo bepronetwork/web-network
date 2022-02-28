@@ -9,9 +9,7 @@ import React, {
 } from 'react';
 
 import { BEPRO_NETWORK_NAME } from 'env'
-import { ApplicationContext } from './application';
 import useApi from 'x-hooks/use-api';
-import { changeLoadState } from 'contexts/reducers/change-load-state';
 import { INetwork } from 'interfaces/network';
 import NetworkThemeInjector from 'components/custom-network/network-theme-injector';
 
@@ -27,18 +25,17 @@ export const NetworkProvider: React.FC = function ({ children }) {
 
   const {query, push} = useRouter();
   const { getNetwork } = useApi()
-  const { dispatch } = useContext(ApplicationContext)
   
   const updateActiveNetwork = useCallback(()=>{
     const newNetwork = String(query.network || BEPRO_NETWORK_NAME) 
+    if(activeNetwork?.name === newNetwork) return activeNetwork;
 
     const networkFromStorage = localStorage.getItem(newNetwork)
 
     if (networkFromStorage) {
       return setActiveNetwork(JSON.parse(networkFromStorage))
     }
-
-    if (!!networkFromStorage) dispatch(changeLoadState(true))
+    
     getNetwork(newNetwork)
       .then(({ data }) => {
         localStorage.setItem(newNetwork.toLowerCase(), JSON.stringify(data))
@@ -49,10 +46,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
             pathname: '/networks'
           })
       })
-      .finally(() => {
-        dispatch(changeLoadState(false))
-      })
-  },[query])
+  },[query, activeNetwork])
 
 
   useEffect(()=>{
