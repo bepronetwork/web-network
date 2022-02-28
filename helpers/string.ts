@@ -27,3 +27,18 @@ export const searchPatternInText = (txt: string, pattern: string): boolean => {
 
   return false
 }
+
+export const getQueryableText = (text: string): string => {
+  return text
+    .toLowerCase()
+    .trimStart()
+    .trimEnd()
+    .replaceAll(' ', '-')
+    .replaceAll('--', '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+}
+
+export const urlWithoutProtocol = (url: string): string => {
+  return url.toLowerCase().replace('http://', '').replace('https://', '')
+}

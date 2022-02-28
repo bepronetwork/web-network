@@ -4,6 +4,7 @@ import {ApplicationContext} from '@contexts/application';
 import {formatNumberToCurrency} from 'helpers/formatNumber'
 import {BeproService} from '@services/bepro-service';
 import Translation from "@components/translation";
+import useNetwork from "@x-hooks/use-network";
 
 interface PageHeroProps {
   title?: string | ReactElement
@@ -15,19 +16,20 @@ export default function PageHero({ title = <Translation label={'heroes.find-boun
   const [inProgress, setInProgress] = useState(0)
   const [closed, setClosed] = useState(0)
   const [onNetwork, setOnNetwork] = useState(0)
+  const { network } = useNetwork()
 
   function loadTotals() {
-    if (!beproInit)
+    if (!beproInit || !network)
       return;
 
 
-    BeproService.getClosedIssues().then(setClosed);
-    BeproService.getOpenIssues().then(setInProgress);
-    BeproService.getTokensStaked().then(setOnNetwork);
+    BeproService.getClosedIssues(network.networkAddress).then(setClosed);
+    BeproService.getOpenIssues(network.networkAddress).then(setInProgress);
+    BeproService.getTokensStaked(network.networkAddress).then(setOnNetwork);
 
   }
 
-  useEffect(loadTotals, [beproInit]);
+  useEffect(loadTotals, [beproInit, network]);
 
   return (
     <div className={`banner bg-bepro-blue mb-0`}>

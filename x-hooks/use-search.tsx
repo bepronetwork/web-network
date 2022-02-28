@@ -20,7 +20,7 @@ export default function useSearch() {
           search: String(newSearch)
         }
       },
-      router.pathname
+      router.asPath
     )
   }
 

@@ -20,7 +20,7 @@ export default function NotFound() {
       <div className="col text-center">
         <h2 className="h2 text-white text-opacity-1 mb-2">
           {t('404.the-page')}{" "}
-          <span className="text-blue">{t('404.not-found')}</span>
+          <span className="text-primary">{t('404.not-found')}</span>
         </h2>
         <p className="mb-2">
           {t('404.the-link-may-be-moved')}

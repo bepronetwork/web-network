@@ -2,8 +2,8 @@
 
 ul.pagination .page-item {
   &:not(.disabled) {
-    &:first-child .page-link { color: $primary;  }
-    &:last-child .page-link {color: $primary; }
+    &:first-child .page-link { color: var(--bs-primary);  }
+    &:last-child .page-link {color: var(--bs-primary); }
   }
 
   .page-link {

@@ -1,13 +1,15 @@
 import clsx from "clsx";
 import { kebabCase } from "lodash";
+import { useTranslation } from "next-i18next";
 import { Fragment } from "react";
 import NumberFormat from "react-number-format";
 import { InputNumber as InputNumberProps } from "types/input-number";
+import InfoTooltip from "./info-tooltip";
 
 export default function InputNumber({
   label = "",
   symbol = "",
-  classSymbol = "text-blue",
+  classSymbol = "text-primary",
   placeholder = "0",
   min = "0",
   helperText = "",
@@ -15,8 +17,14 @@ export default function InputNumber({
   error = false,
   success= false,
   warning= false,
+  errorMessage,
+  setMaxValue,
+  max,
+  description,
   ...params
 }: InputNumberProps): JSX.Element {
+  const { t } = useTranslation(['common'])
+
   const id = kebabCase(label);
   const errorStyle = { "text-danger bg-opacity-100": error };
   const successStyle = { "text-success bg-opacity-100": success };
@@ -27,21 +35,21 @@ export default function InputNumber({
   return (
     <Component {...(shouldBeWrapped && { className: "form-group" })}>
       {label && (
-        <label className="caption-small mb-2 text-uppercase" id={id}>
-          {label}
+        <label className="caption-small mb-2 text-gray d-flex align-items-center" id={id}>
+          <span className="mr-1">{label}</span> {description ? <InfoTooltip description={description} /> : ''}
         </label>
       )}
       <div
-        className={clsx("input-group", {
+        className={clsx("input-group border-radius-8", {
           ...errorStyle,
           ...successStyle,
           ...warningStyle,
         })}>
         <NumberFormat
-          className={clsx("form-control", {
-            "border border-1 border-success rounded-4": success,
-            "border border-1 border-danger rounded-4": error,
-            "border border-1 border-warning rounded-4": warning,  
+          className={clsx("form-control border-radius-8", {
+            "border border-1 border-success border-radius-8": success,
+            "border border-1 border-danger border-radius-8": error,
+            "border border-1 border-warning border-radius-8": warning,  
             ...successStyle, 
             ...warningStyle,
             ...errorStyle,
@@ -53,11 +61,26 @@ export default function InputNumber({
         />
         {symbol && (
           <span
-            className={clsx("input-group-text caption-small text-uppercase", classSymbol, {
+            className={clsx("input-group-text caption-small border-radius-8", classSymbol, {
+              "border border-1 border-success border-radius-8": success,
+              "border border-1 border-danger border-radius-8": error,
+              "border border-1 border-warning border-radius-8": warning,  
               ...errorStyle,
             })}>
             {symbol}
           </span>
+        )}
+        { setMaxValue && (
+          <span
+          className={clsx("input-group-text caption-medium border-radius-8 cursor-pointer", classSymbol, {
+            "border border-1 border-success": success,
+            "border border-1 border-danger": error,
+            "border border-1 border-warning": warning,  
+            ...errorStyle,
+          })}
+          onClick={setMaxValue}>
+          {t('misc.max')}
+        </span>
         )}
       </div>
       {helperText && (
@@ -70,7 +93,7 @@ export default function InputNumber({
           {helperText}
         </div>
       )}
-      {error && (
+      {(error && errorMessage) && (
         <p
         className={clsx("p-small text-gray my-2", {
           trans: !error,

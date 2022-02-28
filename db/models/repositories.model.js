@@ -14,7 +14,8 @@ class Repositories extends Model {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
-      }
+      },
+      network_id: DataTypes.INTEGER
     }, {
       sequelize,
       modelName: 'repositories',
@@ -31,6 +32,10 @@ class Repositories extends Model {
     //
     this.hasMany(models.issue, {
       foreignKey: 'repository_id',
+      sourceKey: 'id'
+    });
+    this.belongsTo(models.network, {
+      foreignKey: 'network_id',
       sourceKey: 'id'
     });
   }

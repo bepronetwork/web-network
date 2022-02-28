@@ -7,7 +7,7 @@ export default async function readCloseIssues(events, {network, models, octokit,
   for (const event of events) {
     const eventData = event.returnValues;
     // Merge PR and close issue on github
-    const issueId = await network.getIssueById({issueId: eventData.id}).then(({cid}) => cid);
+    const issueId = await network.getIssueById(eventData.id).then(({cid}) => cid);
     const issue = await models.issue.findOne({where: {issueId,}, include: ['mergeProposals'],});
 
     if (!issue || issue?.state === `closed`) {

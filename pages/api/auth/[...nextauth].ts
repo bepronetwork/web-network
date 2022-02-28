@@ -8,6 +8,7 @@ export default NextAuth({
     GithubProvider({
       clientId: process.env.NEXT_PUBLIC_GH_CLIENT_ID,
       clientSecret: process.env.GH_SECRET,
+      authorization: "https://github.com/login/oauth/authorize?scope=read:user+user:email+repo",
       profile(profile: {id, name, login, email, avatar_url}) {
         return {
           id: profile.id,

@@ -1,0 +1,94 @@
+{
+  "title": "Custom Network",
+  "query-url": "Query url",
+  "close-network": "Close network",
+  "tokens-staked": "$TOKEN staked",
+  "tokens-staked-description": "$TOKEN staked",
+  "oracles-staked": "Oracles staked",
+  "oracles-staked-description": "The amount of tokens locked by users to curate the network",
+  "tvl": "TVL",
+  "tvl-description": "Total locekd value",
+  "network-settings": "Network Settings",
+  "dispute-time": "Dispute time",
+  "percentage-for-dispute": "Percentage for dispute",
+  "redeem-time": "Redeem time",
+  "council-amount": "Council Amount",
+  "save-settings": "Save settings",
+  "hero": {
+    "title": "Networks",
+    "explanatory-text": "A list of all the networks using BEPRO network for their development",
+    "number-of-networks": "Number of networks",
+    "number-of-bounties": "Total number of bounties",
+    "in-the-network": "In the network"
+  },
+  "network-list-bar": {
+    "number-of-bounties": "Number of bounties",
+    "token-locked": "$TOKEN locked",
+    "open-bounties": "Open bounties"
+  },
+  "steps": {
+    "lock": {
+      "title": "Lock $BEPRO",
+      "you-need-to-lock": "To create a network you will need to lock 1M $BEPRO"
+    },
+    "network-information": {
+      "title": "Network information",
+      "you-can-change": "You can change this information later in your Network Settings page.",
+      "fields": {
+        "logo-icon": {
+          "label": "logo icon"
+        },
+        "full-logo": {
+          "label": "full logo"
+        },
+        "name": {
+          "label": "Display name",
+          "default": "Network name",
+          "temporary": "temporary query url",
+          "helper": "This will be you network name, it also affects your query URL.",
+          "available": "This network name is available.",
+          "unavailable": "This network name is not available. Please pick a different name."
+        },
+        "description": {
+          "label": "Network Description",
+          "placeholder": "Type a description..."
+        },
+        "colors": {
+          "label": "Colours",
+          "similar-colors": "These colours are very similar. Please pick a different colour."
+        }
+      },
+      "logo-helper": "The logos must be in .svg format"
+    },
+    "repositories": {
+      "title": "Add Repositories",
+      "submit-label": "Create Network",
+      "give-access": "Give access to the {{user}} as an org member.",
+      "you-need-to-accept": "You need to accept this so the bot can interact with the repositories.",
+      "label": "Repositories",
+      "used-by-other-network": "The highlighted repositories are already being used by another network.",
+      "has-bounties": "The highlighted repositories already have bounties and can't be removed."
+    }
+  },
+  "modals": {
+    "loader": {
+      "being-prepared": "Your network is being prepared",
+      "dont-close-window": "Please, don't close this window"
+    }
+  },
+  "messages": {
+    "refresh-the-page": "Refresh the page for the changes to take effect.",
+    "network-closed": "Network closed."
+  },
+  "errors": {
+    "failed-to-create-network": "Failed to create network {{error}}",
+    "failed-to-update-network": "Failed to update network {{error}}",
+    "failed-to-close-network": "Failed to close network {{error}}",
+    "invalid-format": "Invalid format",
+    "not-found": "You don't have a custom network created.",
+    "dispute-time": "The time that proposals can be disputed. Min. {{min}} and Max. {{max}} seconds.",
+    "percentage-for-dispute": "`Percentage needed for a proposal to be disputed by the community. Max. {{max}}%.`",
+    "redeem-time": "The time after a bounty creation that it can be cancelled. Min. {{min}} and Max. {{max}} seconds.",
+    "council-amount": "The amount of $BEPRO locked needed to be a council member. Min. {{min}} and Max. {{max}}."
+  }
+}

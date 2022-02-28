@@ -1,6 +1,7 @@
 import { ApplicationContext } from '@contexts/application'
 import { addToast } from '@contexts/reducers/add-toast'
 import useApi from '@x-hooks/use-api'
+import useNetwork from '@x-hooks/use-network'
 import { useTranslation } from 'next-i18next'
 import { useContext, useEffect, useState } from 'react'
 
@@ -28,6 +29,7 @@ export default function NotMergeableModal({
   const hasPRMerged = !!issuePRs?.find((pr) => pr.merged === true)
   const { mergeClosedIssue } = useApi()
   const { t } = useTranslation('common')
+  const { network } = useNetwork()
 
   function handleModalVisibility() {
     if (!pullRequest || !issuePRs?.length || mergeState === 'success') return
@@ -48,7 +50,8 @@ export default function NotMergeableModal({
       issue?.issueId,
       pullRequest.githubId,
       mergeProposal._id,
-      currentAddress
+      currentAddress,
+      network?.name
     )
       .then((response) => {
         dispatch(

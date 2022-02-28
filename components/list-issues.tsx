@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { FormControl, InputGroup } from 'react-bootstrap'
+import React, { useContext, useEffect, useState } from 'react'
 
 import CloseIcon from '@assets/icons/close-icon'
 import SearchIcon from '@assets/icons/search-icon'
@@ -15,6 +15,7 @@ import IssueListItem from '@components/issue-list-item'
 import InfiniteScroll from '@components/infinite-scroll'
 import CustomContainer from '@components/custom-container'
 import ScrollTopButton from '@components/scroll-top-button'
+import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper'
 
 import { ApplicationContext } from '@contexts/application'
 import { changeLoadState } from '@contexts/reducers/change-load-state'
@@ -24,6 +25,8 @@ import { IssueData } from '@interfaces/issue-data'
 import useApi from '@x-hooks/use-api'
 import usePage from '@x-hooks/use-page'
 import useSearch from '@x-hooks/use-search'
+import useNetworkTheme from '@x-hooks/use-network'
+import { useNetwork } from '@contexts/network'
 
 type Filter = {
   label: string
@@ -61,14 +64,18 @@ export default function ListIssues({
   } = useContext(ApplicationContext)
 
   const router = useRouter()
-  const { searchIssues } = useApi()
   const { t } = useTranslation(['common', 'bounty'])
-  const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([])
+  
   const [hasMore, setHasMore] = useState(false)
+  const [truncatedData, setTruncatedData] = useState(false)
+  const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([])
+  
+  const { getURLWithNetwork } = useNetworkTheme()
+  const { activeNetwork } = useNetwork()
+  const { searchIssues } = useApi()
   const { page, nextPage, goToFirstPage } = usePage()
   const { search, setSearch, clearSearch } = useSearch()
   const [searchState, setSearchState] = useState(search)
-  const [truncatedData, setTruncatedData] = useState(false)
 
   const { repoId, time, state, sortBy, order } = router.query as {
     repoId: string
@@ -110,7 +117,7 @@ export default function ListIssues({
   }
 
   function hasFilter(): boolean {
-    if (state || time || repoId) return true
+    if (state || time || repoId || search) return true
 
     return false
   }
@@ -126,7 +133,9 @@ export default function ListIssues({
     clearSearch()
   }
 
-  function getIssues() {
+  function handlerSearch() {
+    if (!activeNetwork) return
+
     dispatch(changeLoadState(true))
 
     searchIssues({
@@ -138,7 +147,8 @@ export default function ListIssues({
       sortBy,
       order,
       creator,
-      pullRequester
+      pullRequester,
+      networkName: activeNetwork?.name
     })
       .then(({ rows, pages, currentPage }) => {
         if (currentPage > 1) {
@@ -186,7 +196,7 @@ export default function ListIssues({
     }
   }, [page, issuesPages])
 
-  useEffect(getIssues, [page, search, repoId, time, state, sortBy, order, creator])
+  useEffect(handlerSearch, [page, search, repoId, time, state, sortBy, order, creator, activeNetwork])
 
   return (
     <CustomContainer>
@@ -196,7 +206,7 @@ export default function ListIssues({
       >
         <div className="w-100">
           <InputGroup>
-            <InputGroup.Text className="rounded-8" onClick={(e) => getIssues()}>
+            <InputGroup.Text className="rounded-8" onClick={handlerSearch}>
               <SearchIcon />
             </InputGroup.Text>
 
@@ -258,7 +268,7 @@ export default function ListIssues({
       </div> : ''}
 
       {(truncatedData && (
-        <div className="row justify-content-center mb-3">
+        <div className="row justify-content-center mb-3 pt-5">
           <div className="d-flex col-6 align-items-center justify-content-center">
             <span className="caption-small mr-1">results truncated</span>
             <Button onClick={goToFirstPage}>back to top</Button>
@@ -268,13 +278,18 @@ export default function ListIssues({
 
       {issuesPages.every((el) => el.issues?.length === 0) &&
       !loading.isLoading ? (
-        <NothingFound description={emptyMessage || filterByState.emptyState}>
-          <InternalLink
-            href={redirect ||"/create-bounty"}
-            label={buttonMessage || String(t('actions.create-one'))}
-            uppercase
-          />
+        <div className="pt-4">
+          <NothingFound description={emptyMessage || filterByState.emptyState}>
+          <ReadOnlyButtonWrapper>
+            <InternalLink
+              className='read-only-button'
+              label={buttonMessage || String(t('actions.create-one'))}
+              href={redirect || getURLWithNetwork('/create-bounty')}
+              uppercase
+            />
+          </ReadOnlyButtonWrapper>
         </NothingFound>
+        </div>
       ) : null}
 
       {(issuesPages.some((el) => el.issues?.length > 0) && (

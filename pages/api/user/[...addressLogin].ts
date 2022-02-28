@@ -17,10 +17,8 @@ async function remove(req: NextApiRequest, res: NextApiResponse) {
   if (user) {
     const network = networkBeproJs({ test: true });
     await network.start();
-    const contract = network.params.contract.getContract();
-    const beproLocked = await contract.methods
-      .getOraclesByAddress(address)
-      .call();
+    const beproLocked = await network
+      .getOraclesByAddress(address);
 
     if (beproLocked > 0)
       return res.status(409).json({ message: "User contains locked $Bepros" });

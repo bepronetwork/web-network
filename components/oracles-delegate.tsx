@@ -11,6 +11,7 @@ import { TransactionStatus } from '@interfaces/enums/transaction-status';
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import {formatNumberToCurrency} from 'helpers/formatNumber'
 import { useTranslation } from 'next-i18next';
+import ReadOnlyButtonWrapper from './read-only-button-wrapper';
 
 function OraclesDelegate(): JSX.Element {
   const {dispatch, state: {oracles, currentAddress, beproInit, metaMaskWallet,myTransactions, balance: {bepro: beproBalance, staked}}} = useContext(ApplicationContext);
@@ -57,7 +58,7 @@ function OraclesDelegate(): JSX.Element {
     BeproService.network.getBEPROStaked()
                 .then(staked => dispatch(changeBalance({staked})))
 
-                BeproService.network.getOraclesSummary({address: currentAddress})
+                BeproService.network.getOraclesSummary(currentAddress)
                 .then(oracles => {
                   dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles)))
                 });
@@ -125,21 +126,23 @@ function OraclesDelegate(): JSX.Element {
 
         {error && <p className="p-small text-danger mt-2">{error}</p>}
 
-        <NetworkTxButton
-          txMethod="delegateOracles"
-          txParams={{tokenAmount, delegatedTo}}
-          txType={TransactionTypes.delegateOracles}
-          txCurrency={t('$oracles')}
-          modalTitle={t('my-oracles:actions.delegate.title')}
-          modalDescription={t('my-oracles:actions.delegate.delegate-to-address')}
-          onTxStart={handleClickVerification}
-          onSuccess={handleTransition}
-          onFail={setError}
-          buttonLabel={t('my-oracles:actions.delegate.label')}
-          fullWidth={true}
-          disabled={isButtonDisabled()}
-          />
-
+        <ReadOnlyButtonWrapper>
+          <NetworkTxButton
+            txMethod="delegateOracles"
+            className="read-only-button"
+            txParams={{tokenAmount, delegatedTo}}
+            txType={TransactionTypes.delegateOracles}
+            txCurrency={t('$oracles')}
+            modalTitle={t('my-oracles:actions.delegate.title')}
+            modalDescription={t('my-oracles:actions.delegate.delegate-to-address')}
+            onTxStart={handleClickVerification}
+            onSuccess={handleTransition}
+            onFail={setError}
+            buttonLabel={t('my-oracles:actions.delegate.label')}
+            fullWidth={true}
+            disabled={isButtonDisabled()}
+            />
+          </ReadOnlyButtonWrapper>
       </div>
     </div>
   );

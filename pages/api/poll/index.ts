@@ -2,7 +2,7 @@ import {NextApiRequest, NextApiResponse} from 'next';
 import {Bus} from '@helpers/bus';
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const {eventName, ...rest} = req.body;
+  const {eventName, networkName, ...rest} = req.body;
 
   return new Promise((resolve) => {
     if (eventName === `mergeProposal`) {

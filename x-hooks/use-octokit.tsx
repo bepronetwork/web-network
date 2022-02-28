@@ -31,6 +31,13 @@ export default function useOctokit() {
     return octokit.rest.repos.get({owner: githubLogin, repo: repoName})
   }
 
+  async function listUserRepos(githubLogin: string) {
+    return octokit.rest.search.repos({
+      q: `user:${githubLogin}`,
+      per_page: 100
+    })
+  }
+
   async function getIssueComments(issue_number: number, path: string,) {
     return octokit.rest.issues.listComments({ ...getOwnerRepoFrom(path), issue_number })
   }
@@ -85,6 +92,6 @@ export default function useOctokit() {
 
   useEffect(() => { authenticate(accessToken) }, [accessToken])
 
-  return {getIssue, getCommit, getIssueComments, getCommitsOfPr, getForksOf, getUserRepos, getStargazers, authenticate, getParticipants, listBranches, getPullRequest, getPullRequestComments};
+  return {getIssue, getCommit, getIssueComments, getCommitsOfPr, getForksOf, getUserRepos, getStargazers, authenticate, getParticipants, listBranches, getPullRequest, getPullRequestComments, listUserRepos};
 
 }

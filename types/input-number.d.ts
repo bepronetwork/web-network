@@ -22,4 +22,7 @@ export interface InputNumber extends NumberFormatProps {
   thousandSeparator?: boolean | string;
   decimalSeparator?: string;
   decimalScale?: number;
+  setMaxValue?: () => void;
+  errorMessage?: string;
+  description?: string;
 }

@@ -3,7 +3,7 @@
 .form-check {
   [type=radio],[type=radio] {
     &:hover {
-      border-color: $primary;
+      border-color: var(--bs-primary);
       cursor: pointer;
       + label {
         color: $white;
@@ -11,8 +11,13 @@
     }
 
     &:checked + label {
-      color: $primary;
+      color: var(--bs-primary);
     }
     + label { cursor: pointer }
+  }
+
+  &-input:checked {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
   }
 }

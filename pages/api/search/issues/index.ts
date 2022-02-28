@@ -4,8 +4,8 @@ import { subHours, subMonths, subWeeks, subYears } from 'date-fns'
 
 import models from '@db/models'
 
-import paginate, { calculateTotalPages, paginateArray } from '@helpers/paginate'
 import { searchPatternInText } from '@helpers/string'
+import paginate, { calculateTotalPages, paginateArray } from '@helpers/paginate'
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = { state: { [Op.not]: `pending` } }
@@ -18,7 +18,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     address,
     search,
     page,
-    pullRequester
+    pullRequester,
+    networkName,
+    repoPath
   } = req.query || {}
 
   if (state) whereCondition.state = state
@@ -30,6 +32,34 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if (creator) whereCondition.creatorGithub = creator
 
   if (address) whereCondition.creatorAddress = address
+
+  if (networkName) {
+    const network = await models.network.findOne({
+      where: {
+        name: {
+          [Op.iLike]: String(networkName)
+        }
+      }
+    })
+
+    if (!network) return res.status(404).json('Invalid network')
+
+    whereCondition.network_id = network?.id
+  }
+
+  if (repoPath) {
+    const repository = await models.repositories.findOne({
+      where: {
+        githubPath: {
+          [Op.in]: String(repoPath).split(',')
+        }
+      }
+    })
+
+    if (!repository) return res.status(404).json('Invalid repository')
+
+    whereCondition.repository_id = repository.id
+  }
 
   if (time) {
     let fn

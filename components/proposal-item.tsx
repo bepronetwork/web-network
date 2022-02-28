@@ -15,6 +15,9 @@ import useTransactions from '@x-hooks/useTransactions';
 import Translation from './translation';
 import LockedIcon from '@assets/icons/locked-icon';
 import useApi from '@x-hooks/use-api';
+import useNetworkTheme from '@x-hooks/use-network';
+import { useNetwork } from '@contexts/network'
+import ReadOnlyButtonWrapper from './read-only-button-wrapper';
 
 interface Options {
   proposal: Proposal,
@@ -44,16 +47,18 @@ export default function ProposalItem({
   const {dispatch,} = useContext(ApplicationContext);
   const txWindow = useTransactions();
   const { processEvent } = useApi();
+  const { getURLWithNetwork } = useNetworkTheme()
+  const { activeNetwork } = useNetwork()
 
   async function handleDispute(mergeId) {
     if (!isDisputable || isFinalized)
       return;
 
-    const disputeTx = addTransaction({type: TransactionTypes.dispute});
+    const disputeTx = addTransaction({type: TransactionTypes.dispute}, activeNetwork);
     dispatch(disputeTx);
 
-    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
-    await BeproService.network.disputeMerge({issueID: issue_id, mergeID: mergeId,})
+    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
+    await BeproService.network.disputeMerge(issue_id, mergeId)
                       .then(txInfo => {
                         processEvent(`dispute-proposal`, txInfo.blockNumber, issue_id);
                         txWindow.updateItem(disputeTx.payload.id, BeproService.parseTransaction(txInfo, disputeTx.payload));
@@ -105,7 +110,7 @@ export default function ProposalItem({
 
   return <>
     <div className="content-list-item proposal" key={`${proposal.pullRequestId}${proposal.scMergeId}`}>
-      <Link passHref href={{pathname: '/proposal', query: {prId: proposal.pullRequestId, mergeId: proposal.scMergeId, dbId, issueId},}}>
+      <Link passHref href={getURLWithNetwork('/proposal', {prId: proposal.pullRequestId, mergeId: proposal.scMergeId, dbId, issueId})}>
         <a className="text-decoration-none">
           <div className="rounded row align-items-center">
             <div
@@ -129,19 +134,22 @@ export default function ProposalItem({
                                      textClass={`pb-2 text-${getColors()}`}/>
               </div>
 
-              <div className="col-1 offset-1 justify-content-end d-flex">
-                <Button color={getColors()}
-                        disabled={!isDisputable}
-                        outline={!isDisputable} className={`align-self-center mb-2 ms-3`}
-                        onClick={(ev) => {
-                          ev.stopPropagation();
-                          handleDispute(+proposal._id)
-                        }}>
-                  {!isDisputable && getColors() !== 'success' && <LockedIcon className={`me-2 text-${getColors()}`}/>}
-                  <span>{getLabel()}</span>
-                </Button>
-              </div>
-
+              
+                <div className="col-1 offset-1 justify-content-end d-flex">
+                  <ReadOnlyButtonWrapper>
+                    <Button color={getColors()}
+                            disabled={!isDisputable}
+                            outline={!isDisputable} className={`align-self-center mb-2 ms-3 read-only-button`}
+                            onClick={(ev) => {
+                              ev.stopPropagation();
+                              handleDispute(+proposal._id)
+                            }}>
+                      {!isDisputable && getColors() !== 'success' && <LockedIcon className={`me-2 text-${getColors()}`}/>}
+                      <span>{getLabel()}</span>
+                    </Button>
+                  </ReadOnlyButtonWrapper>
+                </div>
+              
             </div>
           </div>
         </a>
