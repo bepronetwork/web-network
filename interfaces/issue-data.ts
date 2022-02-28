@@ -73,14 +73,14 @@ export interface GithubUser {
 }
 
 export interface INetworkIssue{
-  _id: string
+  _id: number
   canceled: boolean;
-  cid: CID;
-  creationDate: Date;
+  cid: CID | string;
+  creationDate: Date | number;
   finalized: boolean;
   issueGenerator: string;
   mergeProposalAmount: number
   recognizedAsFinished: boolean;
   isDraft: boolean;
-  tokensStaked: string;
+  tokensStaked: number;
 }

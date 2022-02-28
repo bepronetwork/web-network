@@ -36,7 +36,7 @@ export interface ReposContextData {
   findBranch: (repoId: number) => Promise<BranchInfo[]>;
   findRepo: (repoId: number) => RepoInfo;
 }
-const TTL =  60 * 3 * 100;// 3 Min
+const TTL =  60 * 5 * 100;// 5 Min
 
 const ReposContext = createContext<ReposContextData>({} as ReposContextData);
 
@@ -143,9 +143,9 @@ export const ReposProvider: React.FC = function ({ children }) {
     }
   },[repoList, query])
 
-  // useEffect(()=>{
-  //   console.warn('useRepo',{activeRepo, repoList, branchsList, forksList})
-  // },[activeRepo, repoList, branchsList, forksList])
+  useEffect(()=>{
+    console.warn('useRepo',{activeRepo, repoList, branchsList, forksList})
+  },[activeRepo, repoList, branchsList, forksList])
 
   const memorizeValue = useMemo<ReposContextData>(
     () => ({

@@ -18,7 +18,7 @@ import {toastError} from '@reducers/add-toast';
 import sanitizeHtml from 'sanitize-html';
 import {NetworkIds} from '@interfaces/enums/network-ids';
 import useApi from '@x-hooks/use-api';
-import { useNetwork } from '@contexts/network';
+import { useNetwork } from 'contexts/network';
 import {changeAccessToken} from '@reducers/change-access-token';
 import {updateTransaction} from '@reducers/update-transaction';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
