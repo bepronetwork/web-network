@@ -40,7 +40,7 @@ async function doHeading({ issueId, state }: { issueId: string; state: string })
         }
       }
     }
-    const statusText = await write(state.toUpperCase(), 35, "white", "bold",{
+    const statusText = await write(state.toUpperCase(), 35, state.toLowerCase() === 'draft' ? "black" : "white", "bold",{
       // lineSpacing: 3.5,
     });
 
@@ -99,7 +99,7 @@ async function doSubTitle({
   }
 
   async function doAmmount() {
-    const value = new Intl.NumberFormat('en-IN', { maximumSignificantDigits: 3 }).format(ammoutValue)
+    const value = new Intl.NumberFormat('en').format(ammoutValue)
     const ammountText = await write(value, 70, "white", "semi",{
     });
     const currencyText = await write("$BEPRO", 38, "#4250E4",'regular',{
@@ -129,13 +129,18 @@ async function doSubTitle({
 }
 
 async function doTitle(title: string) {
- try{
-  //Wrap lines size between 26 and 35 words
-  title = title?.split(' ')
-  .reduce((p, c) => p.length % 35 > 26 && p.length % 35 < 35?`${p} \n${c}`:`${p} ${c}`)
- }catch{
-   title = title
- }
+  title = `${title.substring(0, 115).trimEnd()}`
+  title = title.length > 105 ?`${title}...` : title;
+  try{ 
+    title = title?.split(' ')
+    .reduce((p, c) => {
+      const lines = p.split('\n');
+      const currentLine = lines[lines.length - 1].length || 0;
+      return currentLine + c.length % 48 > 40 ? `${p} \n${c}`:`${p} ${c}`;
+    })
+  } catch {
+    title = title
+  }
 
   const titleText = await write(title||'', 48, "white", "semi");
   var titleContainer = new Jimp(1080, 174);
@@ -224,8 +229,8 @@ export async function generateCard(issue: IGenerateCard): Promise<IGenerateResp>
   const footer = await doFooter({working: issue.working, pr: issue.pr, proposal: issue.proposal});
 
   contain = await position(contain, heading, 0, 0);
-  contain = await position(contain, title, 0, 30);
-  contain = await position(contain, subTitle, 0, 60);
+  contain = await position(contain, title, 0, 28);
+  contain = await position(contain, subTitle, 0, 63);
   contain = await position(contain, footer, 0, 100);
 
   var image = await position(container, contain, 50, 50)

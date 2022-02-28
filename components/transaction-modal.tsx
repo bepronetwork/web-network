@@ -3,8 +3,7 @@ import Modal from '@components/modal';
 import TransactionStats from '@components/transaction-stats';
 import CopyIcon from '@assets/icons/copy';
 import {BlockTransaction, Transaction} from '@interfaces/transaction';
-import ArrowRightSmall from '@assets/icons/arrow-ritght-small';
-import {TransactionStatus} from '@interfaces/enums/transaction-status';
+import ArrowRight from '@assets/icons/arrow-right';
 import {formatNumberToString} from '@helpers/formatNumber';
 import {CopyValue} from '@helpers/copy-value';
 import {ApplicationContext} from '@contexts/application';
@@ -16,7 +15,7 @@ import { truncateAddress } from '@helpers/truncate-address';
 import { useTranslation } from 'next-i18next';
 
 export default function TransactionModal({ transaction = null, onCloseClick = () => {}}: { transaction: Transaction, onCloseClick: () => void }) {
-  const {dispatch, state: {network}} = useContext(ApplicationContext);
+  const {dispatch} = useContext(ApplicationContext);
   const [addressFrom, setAddressFrom] = useState(`...`);
   const [addressTo, setAddressTo] = useState(`...`);
   const [details, setDetails] = useState<any>([]);
@@ -34,8 +33,8 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
     const makeDetail = (span, content) => ({span, content})
     setDetails(
       [
-        makeDetail(t('transactions.amount'), [formatNumberToString(blockTransaction.amount), blockTransaction.currency].join(` `)),
-        makeDetail(t('transactions.confirmations'), [blockTransaction.confirmations, 23].join(`/`).concat(` ${t('transactions.confirmations')}`)),
+        makeDetail(t('transactions.amount'), <><span>{formatNumberToString(blockTransaction.amount)}</span> <span className={`${blockTransaction.currency.toLowerCase() === 'oralces' ? 'text-purple' : 'text-primary'}`}>{blockTransaction.currency}</span> </>),
+        makeDetail(t('transactions.confirmations'), [blockTransaction.confirmations, 23].join(`/`)),
         makeDetail(t('transactions.date'), format(new Date(blockTransaction.date), "MMMM dd yyyy hh:mm:ss a")),
       ]
     )
@@ -47,7 +46,7 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
     return <>
       <div className="d-flex align-items-center justify-content-between bg-dark-gray py-2 mt-2 px-3 rounded-8">
         <span className="caption-small text-white-50">{item.span}</span>
-        <span className="p text-white">{item.content}</span>
+        <span className="caption-medium text-white">{item.content}</span>
       </div>
     </>
   }
@@ -90,9 +89,9 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
           </a>
         </div>
       </div>
-      <div className="d-flex py-2 mb-3 caption-small text-white bg-opacity-100 fs-smallest">
+      <div className="d-flex py-2 mb-3 caption-small text-white bg-opacity-100">
         <span>{t('misc.from')}: {addressFrom}</span>
-        <div className="mx-auto"><ArrowRightSmall/></div>
+        <div className="mx-auto"><ArrowRight/></div>
         <span>{t('misc.to')}: {addressTo}</span>
       </div>
       {details.map(renderDetailRow)}

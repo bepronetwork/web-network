@@ -7,5 +7,5 @@ export interface ToastNotification {
   content?: string;
   link?: string;
   linkName?: string;
-  id?: number;
+  id?: string;
 }

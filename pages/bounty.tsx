@@ -22,6 +22,8 @@ import CustomContainer from '@components/custom-container';
 import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import Translation from '@components/translation';
+import { useTranslation } from 'next-i18next';
+
 interface NetworkIssue {
   recognizedAsFinished: boolean;
 }
@@ -42,9 +44,10 @@ export default function PageIssue() {
   const [mergedPullRequests, setMergedPullRequests] = useState([]);
   const [currentUser, setCurrentUser] = useState<User>();
   const {getMergedDataFromPullRequests} = useMergeData();
-  const {getIssueComments, getForksOf, getUserRepos,} = useOctokit();
+  const {getIssueComments, getForksOf, getUserRepos, getPullRequest} = useOctokit();
   const [[activeRepo, reposList]] = useRepos();
   const {getUserOf, getIssue, userHasPR} = useApi();
+  const { t } = useTranslation('bounty')
 
   const tabs = [
     {
@@ -62,13 +65,15 @@ export default function PageIssue() {
         isFinalized={networkIssue?.finalized}
         mergedProposal={issue?.merged}
         className="border-top-0"
-      />
+      />,
+      description: t('description_proposal')
     },
     {
       eventKey: 'pull-requests',
       isEmpty: !(mergedPullRequests.length > 0),
       title: <Translation ns="pull-request" label={'labelWithCount'} params={{count: mergedPullRequests.length || 0}} />,
-      component: <IssuePullRequests key="tab-pull-requests" className="border-top-0" repoId={issue?.repository_id} issueId={issue?.issueId} pullResquests={mergedPullRequests} />
+      component: <IssuePullRequests key="tab-pull-requests" repositoryPath={issue?.repository?.githubPath} className="border-top-0" repoId={issue?.repository_id} issueId={issue?.issueId} pullResquests={mergedPullRequests} />,
+      description: t('description_pull-request')
     }
   ]
 
@@ -85,9 +90,21 @@ export default function PageIssue() {
       return;
 
     getIssue(repoId as string, id as string)
-      .then((issue) => {
+      .then(async (issue) => {
         if (!issue)
           return router.push('/404')
+
+        if(issue?.pullRequests?.length > 0){
+          const mapPr = issue.pullRequests.map(async(pr)=>{
+            const {data} = await getPullRequest(Number(pr.githubId), issue?.repository?.githubPath)
+            pr.isMergeable = data.mergeable;
+            pr.merged = data.merged;
+            return pr;
+          })
+  
+          const pullRequests = await Promise.all(mapPr);
+          issue.pullRequests = pullRequests;
+        }
 
         setIssue(issue);
 

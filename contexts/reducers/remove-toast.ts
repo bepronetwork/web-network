@@ -17,5 +17,5 @@ export const RemoveToast: ReduceAction<string> = {
   fn: reducer
 }
 
-export const removeToast = (payload: number): ReduceActor<number> =>
+export const removeToast = (payload: string): ReduceActor<string> =>
   ({name: ReduceActionName.RemoveToast, payload});
