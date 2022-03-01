@@ -115,9 +115,9 @@ export const IssueProvider: React.FC = function ({ children }) {
     }
   }, [query, activeNetwork]);
 
-  useEffect(() => {
-    console.warn("useIssue", { activeIssue, networkIssue });
-  }, [activeIssue, networkIssue]);
+  useEffect(()=>{
+    //console.warn('useIssue',{activeIssue, networkIssue})
+  },[activeIssue, networkIssue])
 
   const memorizeValue = useMemo<IssueContextData>(
     () => ({
