@@ -11,6 +11,7 @@ import { NetworkIds } from '@interfaces/enums/network-ids';
 import Button from './button';
 import { NETWORKS } from '@helpers/networks';
 import { useTranslation } from 'next-i18next';
+import { useAuthentication } from '@contexts/authentication';
 
 const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
 const networkMap = {
@@ -27,6 +28,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
   const { state: {loading, metaMaskWallet, beproInit, currentAddress, network: activeNetwork}, dispatch } = useContext(ApplicationContext);
   const [isAddingNetwork, setIsAddingNetwork] = useState(false);
   const { t } = useTranslation(['common', 'connect-wallet-button'])
+  const { login } = useAuthentication()
 
   async function connectWallet() {
     let loggedIn = false;
@@ -163,7 +165,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
   }
   
   if (!metaMaskWallet)
-    return <Button color='white' className='text-primary bg-opacity-100' onClick={connectWallet}><span>{t('main-nav.connect')}</span> <i className="ico-metamask" /></Button>
+    return <Button color='white' className='text-primary bg-opacity-100' onClick={login}><span>{t('main-nav.connect')}</span> <i className="ico-metamask" /></Button>
 
   return children;
 
