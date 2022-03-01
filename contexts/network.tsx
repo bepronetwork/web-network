@@ -7,7 +7,7 @@ import React, {
   useCallback,
   useEffect,
 } from 'react';
-
+import {setCookie, parseCookies} from 'nookies'
 import { BEPRO_NETWORK_NAME } from 'env'
 import useApi from 'x-hooks/use-api';
 import { INetwork } from 'interfaces/network';
@@ -20,6 +20,7 @@ export interface NetworkContextData {
 
 const NetworkContext = createContext<NetworkContextData>({} as NetworkContextData);
 
+const cookieKey = `bepro.network`
 export const NetworkProvider: React.FC = function ({ children }) {
   const [activeNetwork, setActiveNetwork] = useState<INetwork>(null);
 
@@ -27,18 +28,21 @@ export const NetworkProvider: React.FC = function ({ children }) {
   const { getNetwork } = useApi()
   
   const updateActiveNetwork = useCallback(()=>{
-    const newNetwork = String(query.network || BEPRO_NETWORK_NAME) 
-    if(activeNetwork?.name === newNetwork) return activeNetwork;
+    const networkName = String(query.network || BEPRO_NETWORK_NAME) 
+    if(activeNetwork?.name === networkName) return activeNetwork;
 
-    const networkFromStorage = localStorage.getItem(newNetwork)
-
+    const networkFromStorage = parseCookies()[`${cookieKey}:${networkName}`]
     if (networkFromStorage) {
       return setActiveNetwork(JSON.parse(networkFromStorage))
     }
     
-    getNetwork(newNetwork)
+    getNetwork(networkName)
       .then(({ data }) => {
-        localStorage.setItem(newNetwork.toLowerCase(), JSON.stringify(data))
+        localStorage.setItem(networkName.toLowerCase(), JSON.stringify(data))
+        setCookie(null, `${cookieKey}:${networkName}`, JSON.stringify(data), {
+          maxAge: 60 * 60 * 12, // 12 hour
+          path: "/",
+        })
         setActiveNetwork(data)
       })
       .catch(error => {
