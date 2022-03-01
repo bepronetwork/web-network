@@ -84,6 +84,7 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
       <span className="d-block caption-small text-white-50 text-uppercase">{t('misc.status')}</span>
       <div className="d-flex justify-content-between align-items-center py-2">
         <TransactionStats status={transaction?.status} />
+
         <div className="d-flex">
            {hasTransactionId() &&
                 <Button onClick={() => copyValue(getTransactionId())} className="border-dark-gray mr-1 hover-blue" applyTextColor={false} transparent rounded><CopyIcon /></Button>
@@ -93,6 +94,13 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
           </a>
         </div>
       </div>
+
+      <div className="caption-small d-flex flex-row mb-3">
+        <span className="text-ligth-gray">ON</span> 
+        {console.log(transaction?.network)}
+        <InternalLink className={`${transaction?.network?.name === BEPRO_NETWORK_NAME ? ' text-primary ' : ''} p-0 ml-1`} label={transaction?.network?.name} href={getURLWithNetwork('/', {network: transaction?.network?.name})} style={{color: `${transaction?.network?.colors?.primary}`}} brand transparent />
+      </div>
+
       <div className="d-flex py-2 mb-3 caption-small text-white bg-opacity-100">
         <span>{t('misc.from')}: {addressFrom}</span>
         <div className="mx-auto"><ArrowRight/></div>
