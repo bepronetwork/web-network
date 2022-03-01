@@ -1,40 +1,52 @@
-import { ApplicationContext } from '@contexts/application'
-import { addToast } from '@contexts/reducers/add-toast'
-import useApi from '@x-hooks/use-api'
-import useNetwork from '@x-hooks/use-network'
 import { useTranslation } from 'next-i18next'
 import { useContext, useEffect, useState } from 'react'
 
-import Button from './button'
-import GithubLink from './github-link'
-import Modal from './modal'
+import Modal from '@components/modal'
+import Button from '@components/button'
+import GithubLink from '@components/github-link'
+
+import { addToast } from '@contexts/reducers/add-toast'
+import { ApplicationContext } from '@contexts/application'
+
+import useApi from '@x-hooks/use-api'
+import useNetwork from '@x-hooks/use-network'
 
 export default function NotMergeableModal({
-  currentGithubLogin,
-  currentAddress,
   issue,
+  issuePRs,
   pullRequest,
   mergeProposal,
-  issuePRs,
-  isFinalized = false,
-  isCouncil = false
+  currentAddress,
+  isCouncil = false,
+  currentGithubLogin,
+  isFinalized = false
 }) {
+  const { t } = useTranslation('common')
+  
   const { dispatch } = useContext(ApplicationContext)
+
   const [isVisible, setVisible] = useState(false)
   const [mergeState, setMergeState] = useState('')
+  
+  const { network } = useNetwork()
+  const { mergeClosedIssue } = useApi()
+  
   const isIssueOwner = issue?.creatorGithub === currentGithubLogin
   const isPullRequestOwner = pullRequest?.githubLogin === currentGithubLogin
   const isProposer =
     mergeProposal?.proposalAddress?.toLowerCase() === currentAddress
   const hasPRMerged = !!issuePRs?.find((pr) => pr.merged === true)
-  const { mergeClosedIssue } = useApi()
-  const { t } = useTranslation('common')
-  const { network } = useNetwork()
 
   function handleModalVisibility() {
     if (!pullRequest || !issuePRs?.length || mergeState === 'success') return
 
-    if (hasPRMerged || (pullRequest.isMergeable && !isFinalized) || !(isIssueOwner || isPullRequestOwner || isCouncil || isProposer)) {
+    if (
+      hasPRMerged || // Already exists a Pull Request merged to this bounty.
+      (pullRequest.isMergeable && !isFinalized) || // The Pull Request was not merged year and the bounty is open.
+      !(isIssueOwner || isPullRequestOwner || isCouncil || isProposer) ||  // The user is not the bounty creator, nor the pull request creator, 
+                                                                           // nor the proposal creator and is not a council member.
+      ((isIssueOwner || isCouncil || isProposer) && !isPullRequestOwner && !isFinalized) // The bounty creator, proposal creator and council members can view only if the bounty was closed.
+      ) {
       setVisible(false)
     } else if (isIssueOwner || isPullRequestOwner || isCouncil || isProposer){
       setVisible(pullRequest.state === 'open')
@@ -79,15 +91,15 @@ export default function NotMergeableModal({
   }
 
   useEffect(handleModalVisibility, [
-    currentGithubLogin,
-    currentAddress,
     issue,
-    pullRequest,
-    mergeProposal,
-    isFinalized,
+    issuePRs,
     isCouncil,
     mergeState,
-    issuePRs
+    isFinalized,
+    pullRequest,
+    mergeProposal,
+    currentAddress,
+    currentGithubLogin
   ])
 
   return (
@@ -128,12 +140,12 @@ export default function NotMergeableModal({
               )}
             </Button>
           )}
-          <GithubLink
+          {isPullRequestOwner && <GithubLink
             forcePath={issue?.repository?.githubPath}
             hrefPath={`pull/${pullRequest?.githubId || ''}/conflicts`}
             color="primary">
             {t('modals.not-mergeable.go-to-pr')}
-          </GithubLink>
+          </GithubLink> }
           <Button color="dark-gray" onClick={() => setVisible(false)}>{t('actions.close')}</Button>
         </div>
       </div>

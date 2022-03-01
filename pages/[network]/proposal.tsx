@@ -1,29 +1,37 @@
-import {GetServerSideProps, GetStaticProps} from 'next/types';
-import React, {useContext, useEffect, useState} from 'react';
-import PageActions from '@components/page-actions';
-import ProposalAddresses from '@components/proposal-addresses';
-import ProposalHero from '@components/proposal-hero';
-import ProposalProgress from '@components/proposal-progress';
 import {useRouter} from 'next/router';
-import {ApplicationContext} from '@contexts/application';
-import {BeproService} from '@services/bepro-service';
-import {ProposalData} from '@interfaces/api-response';
-import {formatDate} from '@helpers/formatDate';
-import {handlePercentage} from '@helpers/handlePercentage';
-import {IssueData, pullRequest} from '@interfaces/issue-data';
-import ProposalProgressBar from '@components/proposal-progress-bar';
-import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
-import CustomContainer from '@components/custom-container';
-import {formatNumberToCurrency} from '@helpers/formatNumber';
-import ConnectWalletButton from '@components/connect-wallet-button';
-import useApi from '@x-hooks/use-api';
-import NotMergeableModal from '@components/not-mergeable-modal';
-import useOctokit from '@x-hooks/use-octokit';
 import {getSession} from 'next-auth/react';
-import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
-import { isProposalDisputable } from '@helpers/proposal';
+import React, {useContext, useEffect, useState} from 'react';
+import {GetServerSideProps, GetStaticProps} from 'next/types';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
+
+import PageActions from '@components/page-actions';
+import ProposalHero from '@components/proposal-hero';
+import CustomContainer from '@components/custom-container';
+import ProposalProgress from '@components/proposal-progress';
+import ProposalAddresses from '@components/proposal-addresses';
+import NotMergeableModal from '@components/not-mergeable-modal';
+import ProposalProgressBar from '@components/proposal-progress-bar';
+import ConnectWalletButton from '@components/connect-wallet-button';
+
 import {useNetwork} from 'contexts/network'
+import { useRepos } from '@contexts/repos';
+import {ApplicationContext} from '@contexts/application';
+
+import {BeproService} from '@services/bepro-service';
+
+import {formatDate} from '@helpers/formatDate';
+import { isProposalDisputable } from '@helpers/proposal';
+import {handlePercentage} from '@helpers/handlePercentage';
+import {formatNumberToCurrency} from '@helpers/formatNumber';
+
+import {ProposalData} from '@interfaces/api-response';
+import {IssueData, pullRequest} from '@interfaces/issue-data';
+
+import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
+
+import useApi from '@x-hooks/use-api';
+import useOctokit from '@x-hooks/use-octokit';
 interface ProposalBepro {
   disputes: string;
   prAddresses: string[];
@@ -44,27 +52,32 @@ interface usersAddresses {
 
 export default function PageProposal() {
   const router = useRouter();
+  const { t } = useTranslation('common')
+
   const {prId, mergeId, dbId, issueId} = router.query;
+  
   const { dispatch, state: {currentAddress, beproStaked, githubLogin}, } = useContext(ApplicationContext);
 
-  const [proposalBepro, setProposalBepro] = useState<ProposalBepro>();
-  const [proposalMicroService, setProposalMicroService] = useState<ProposalData>();
-  const [amountIssue, setAmountIssue] = useState<number>();
-  const [networkCid, setNetworkCid] = useState<string>();
-  const [isFinalized, setIsFinalized] = useState<boolean>();
-  const [isFinished, setIsFinished] = useState<boolean>();
-  const [prGithubId, setPrGithubId] = useState<string>();
-  const [isMergiable, setIsMergiable] = useState<boolean>();
-  const [pullRequestGh, setPullRequestGh] = useState<pullRequest>();
-  const [issuePRs, setIssuePRs] = useState<pullRequest[]>();
   const [isCouncil, setIsCouncil] = useState(false);
+  const [networkCid, setNetworkCid] = useState<string>();
+  const [prGithubId, setPrGithubId] = useState<string>();
+  const [disputableTime, setDisputableTime] = useState(0)
+  const [isFinished, setIsFinished] = useState<boolean>();
+  const [amountIssue, setAmountIssue] = useState<number>();
+  const [isMergiable, setIsMergiable] = useState<boolean>();
+  const [isFinalized, setIsFinalized] = useState<boolean>();
+  const [issuePRs, setIssuePRs] = useState<pullRequest[]>();
+  const [pullRequestGh, setPullRequestGh] = useState<pullRequest>();
+  const [proposalBepro, setProposalBepro] = useState<ProposalBepro>();
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
-  const [disputableTime, setDisputableTime] = useState(0)
+  const [proposalMicroService, setProposalMicroService] = useState<ProposalData>();
+  
+  const { activeRepo } = useRepos()
+  const { activeNetwork } = useNetwork()
+  
   const {getUserOf, getIssue} = useApi();
   const {getPullRequest} = useOctokit();
-  const { t } = useTranslation('common')
-  const { activeNetwork } = useNetwork()
 
   async function getProposalData() {
     const [repoId, ghId] = String(issueId).split(`/`);
@@ -154,7 +167,6 @@ export default function PageProposal() {
   }, [currentAddress, issueId,]);
   useEffect(() => { updateUsersAddresses(proposalBepro) }, [proposalBepro, currentAddress]);
   useEffect(() => { getProposal() }, [issueMicroService, prGithubId])
-
 
   return (
     <>
