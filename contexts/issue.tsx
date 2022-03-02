@@ -7,8 +7,8 @@ import React, {
   useEffect
 } from 'react';
 
-import { IssueData, INetworkIssue ,pullRequest, Comment } from '@interfaces/issue-data';
-import { BeproService } from '@services/bepro-service';
+import { IssueData, INetworkIssue ,pullRequest, Comment } from 'interfaces/issue-data';
+import { BeproService } from 'services/bepro-service';
 
 import useApi from 'x-hooks/use-api';
 import useOctokit from 'x-hooks/use-octokit';
@@ -25,7 +25,6 @@ export interface IssueContextData {
   updateIssue: (repoId: string, ghId: string)=> Promise<IActiveIssue>;
   getNetworkIssue: ()=> void;
 }
-
 
 const IssueContext = createContext<IssueContextData>({} as IssueContextData);
 
