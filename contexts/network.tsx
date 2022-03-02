@@ -20,7 +20,9 @@ export interface NetworkContextData {
 
 const NetworkContext = createContext<NetworkContextData>({} as NetworkContextData);
 
-const cookieKey = `bepro.network`
+const cookieKey = `bepro.network`;
+const expiresCookie = 60 * 60 * 12; // 12 hour
+
 export const NetworkProvider: React.FC = function ({ children }) {
   const [activeNetwork, setActiveNetwork] = useState<INetwork>(null);
 
@@ -40,7 +42,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
       .then(({ data }) => {
         localStorage.setItem(networkName.toLowerCase(), JSON.stringify(data))
         setCookie(null, `${cookieKey}:${networkName}`, JSON.stringify(data), {
-          maxAge: 60 * 60 * 12, // 12 hour
+          maxAge: expiresCookie, // 12 hour
           path: "/",
         })
         setActiveNetwork(data)
