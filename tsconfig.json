@@ -27,7 +27,8 @@
       "@contexts/*": ["contexts/*"],
       "@reducers/*": ["contexts/reducers/*"],
       "@styles/*": ["styles/*"],
-      "@x-hooks/*": ["x-hooks/*"]
+      "@x-hooks/*": ["x-hooks/*"],
+      "bepro-js": ["node_modules/bepro-js/dist/index.js"]
     }
   },
   "exclude": ["node_modules"],

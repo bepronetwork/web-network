@@ -1,11 +1,13 @@
 import {Bus} from '@helpers/bus';
+import api from '@services/api';
 import {Op} from 'sequelize';
+import twitterTweet from './handle-twitter-tweet';
 
 export default async function readCloseIssues(events, {network, models, octokit, res}) {
   for (const event of events) {
     const eventData = event.returnValues;
     // Merge PR and close issue on github
-    const issueId = await network.getIssueById({issueId: eventData.id}).then(({cid}) => cid);
+    const issueId = await network.getIssueById(eventData.id).then(({cid}) => cid);
     const issue = await models.issue.findOne({where: {issueId,}, include: ['mergeProposals'],});
 
     if (!issue || issue?.state === `closed`) {
@@ -15,9 +17,10 @@ export default async function readCloseIssues(events, {network, models, octokit,
       return res.status(204);
     }
 
-    const mergeProposal = issue.mergeProposals.find((mp) => mp.scMergeId == eventData.mergeID);
+    const merge = issue.mergeProposals.find((mp) => mp.scMergeId == eventData.mergeID);
+    const mergeProposal = await models.mergeProposal.findOne({where: {id: merge.id,}, include: ['pullrequest'],})
 
-    const pullRequest = await mergeProposal.getPullRequest();
+    const pullRequest = mergeProposal.pullrequest;
 
     const repoInfo = await models.repositories.findOne({where: {id: issue?.repository_id}})
     const [owner, repo] = repoInfo.githubPath.split(`/`);
@@ -39,6 +42,15 @@ export default async function readCloseIssues(events, {network, models, octokit,
     issue.state = 'closed';
     await issue.save();
 
+    twitterTweet({
+      type: 'bounty',
+      action: 'distributed',
+      issue
+    })
+    await api.post(`/seo/${issueId}`)
+    .catch(e => {
+      console.log(`Error creating SEO`, e);
+    })
     console.log(`Emitting closeIssue:created:${issueId}`);
     Bus.emit(`closeIssue:created:${issueId}`, issue)
   }

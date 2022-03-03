@@ -20,10 +20,7 @@ const SettlerTokenCheck = forwardRef<HTMLButtonElement, Props>(
         dispatch(changeLoadState(true));
         const address: string = BeproService.address;
         const isApprovedSettlerToken: boolean =
-          await BeproService.network.isApprovedSettlerToken({
-            address,
-            amount,
-          });
+          await BeproService.network.isApprovedSettlerToken(amount, address);
 
         onCheck(isApprovedSettlerToken);
         dispatch(changeLoadState(false));

@@ -1,18 +1,20 @@
 import {useEffect, useState} from 'react';
 import {IssueFilterBoxOption} from '@interfaces/filters';
-import {RepoInfo} from '@interfaces/repos-list';
+import {RepoInfo} from 'interfaces/repos-list';
 import {useRouter} from 'next/router';
-import useRepos from '@x-hooks/use-repos';
+import {useRepos} from 'contexts/repos';
+import {useNetwork} from 'contexts/network';
 
 type FilterStateUpdater = (opts: IssueFilterBoxOption[], opt: IssueFilterBoxOption, checked: boolean, type: ('time' | 'repo' | 'state'), multi?: boolean) => void;
 
-export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpdater] {
+export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpdater, () => void] {
   const [stateFilters, setStateFilters] = useState<IssueFilterBoxOption[]>([]);
   const [timeFilters, setTimeFilters] = useState<IssueFilterBoxOption[]>([]);
   const [repoFilters, setRepoFilters] = useState<IssueFilterBoxOption[]>([]);
-  const [[, repoList]] = useRepos();
+  const {repoList} = useRepos();
 
   const router = useRouter()
+  const { activeNetwork } = useNetwork()
 
 
   function getActiveFiltersOf(opts: IssueFilterBoxOption[]) {
@@ -25,12 +27,14 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
     const repoId = getActiveFiltersOf(repoFilters);
 
     const query = {
+      ... router.query,
       ... state ? {state} : {},
       ... time ? {time} : {},
       ... repoId ? {repoId} : {},
+      page: '1'
     }
 
-    router.push({pathname: './', query});
+    router.push({pathname: router.pathname, query}, router.asPath);
   }
 
   function makeFilterOption(label, value, checked = false) {
@@ -43,7 +47,7 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
       return makeFilterOption(label, value, router.query?.repoId as string === value.toString());
     }
 
-    setRepoFilters([makeFilterOption(`All`, `allrepos`, !router.query?.repoId)].concat(repoList.map(mapRepo)))
+    setRepoFilters([makeFilterOption(`All`, `allrepos`, !router.query?.repoId)].concat(repoList?.map(mapRepo)))
   }
 
   function loadFilters() {
@@ -83,5 +87,17 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
     updateRouterQuery()
   }
 
-  return [[repoFilters, stateFilters, timeFilters], updateOpt]
+  function clearFilters() {
+    const query = {
+      ... router.query.sortBy ? {sortBy: router.query.sortBy}: {},
+      ... router.query.order ? {order: router.query.order}: {},
+      ... router.query.search ? {search: router.query.search}: {},
+      network: activeNetwork.name,
+      page: '1'
+    }
+
+    router.push({pathname: router.pathname, query}, router.asPath);
+  }
+
+  return [[repoFilters, stateFilters, timeFilters], updateOpt, clearFilters]
 }

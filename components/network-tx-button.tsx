@@ -12,6 +12,8 @@ import LockedIcon from '@assets/icons/locked-icon';
 import Button from './button';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import useTransactions from '@x-hooks/useTransactions';
+import { useTranslation } from 'next-i18next';
+import { useNetwork } from '@contexts/network';
 
 interface NetworkTxButtonParams {
   txMethod: string;
@@ -28,6 +30,7 @@ interface NetworkTxButtonParams {
   txCurrency: TransactionCurrency;
   fullWidth?: boolean;
   useContract?: boolean;
+  className?: string;
 }
 
 
@@ -40,6 +43,7 @@ function networkTxButton({
                            buttonLabel,
                            modalTitle,
                            modalDescription,
+                           className = '',
                            children = null, fullWidth = false, useContract = false,
                            disabled = false, txType = TransactionTypes.unknown, txCurrency = `$BEPRO`,
                          }: NetworkTxButtonParams, elementRef) {
@@ -47,6 +51,8 @@ function networkTxButton({
   const [showModal, setShowModal] = useState(false);
   const [txSuccess, setTxSuccess] = useState(false);
   const txWindow = useTransactions();
+  const { t } = useTranslation(['common'])
+  const { activeNetwork } = useNetwork()
 
   function checkForTxMethod() {
     if (!beproInit || !metaMaskWallet)
@@ -60,17 +66,17 @@ function networkTxButton({
     if (!beproInit || !metaMaskWallet)
       return;
 
-    const tmpTransaction = addTransaction({type: txType, amount: txParams?.tokenAmount || 0, currency: txCurrency});
+    const tmpTransaction = addTransaction({type: txType, amount: txParams?.tokenAmount || 0, currency: txCurrency}, activeNetwork);
     dispatch(tmpTransaction);
 
     let transactionMethod
 
     if(!useContract)
-      transactionMethod = BeproService.network[txMethod](txParams)
+      transactionMethod = BeproService.network[txMethod](txParams.tokenAmount, txParams.from)
     else {
       const weiAmount = BeproService.toWei(txParams?.tokenAmount.toString())
   
-      transactionMethod = BeproService.network.params.contract.getContract().methods[txMethod]
+      transactionMethod = BeproService.network.contract.methods[txMethod]
       transactionMethod = txMethod === 'lock' ? transactionMethod(weiAmount).send({from: currentAddress}) : transactionMethod(weiAmount, txParams?.from).send({from: currentAddress})
     }
 
@@ -79,7 +85,7 @@ function networkTxButton({
           onSuccess && onSuccess();
           dispatch(addToast({
                               type: 'success',
-                              title: 'Success',
+                              title: t('actions.success'),
                               content: `${txMethod} ${txParams?.tokenAmount} ${txCurrency}`
                             }));
 
@@ -88,7 +94,7 @@ function networkTxButton({
 
         } else {
           onFail(answer.message)
-          dispatch(addToast({type: 'danger', title: 'Failed', content: answer?.message}));
+          dispatch(addToast({type: 'danger', title: t('actions.failed'), content: answer?.message}));
         }
       })
       .catch(e => {
@@ -102,14 +108,14 @@ function networkTxButton({
   }
 
   function getButtonClass() {
-    return `mt-3 ${fullWidth ? `w-100` : ``} ${!children && !buttonLabel && `visually-hidden` || ``}`
+    return `mt-3 ${fullWidth ? `w-100` : ``} ${!children && !buttonLabel && `visually-hidden` || ``} ${className}`
   }
 
   function getDivClass() {
     return `d-flex flex-column align-items-center text-${txSuccess ? `success` : `danger`}`;
   }
 
-  const modalFooter = (<Button color='dark-gray' onClick={() => setShowModal(false)}>Close</Button>)
+  const modalFooter = (<Button color='dark-gray' onClick={() => setShowModal(false)}>{t('actions.close')}</Button>)
 
   useEffect(checkForTxMethod, [beproInit, metaMaskWallet])
 
@@ -125,7 +131,7 @@ function networkTxButton({
       <div className={getDivClass()}>
         <Icon className="md-larger">{txSuccess ? `check_circle` : `error`}</Icon>
         <p className="text-center fs-4 mb-0 mt-2">
-          Transaction {txSuccess ? `completed` : `failed`}
+          {t('transactions.title')} {txSuccess ? t('actions.completed') : t('actions.failed')}
         </p>
       </div>
     </Modal>

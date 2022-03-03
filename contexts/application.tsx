@@ -5,7 +5,6 @@ import {ReduceActor} from '@interfaces/reduce-action';
 import LoadApplicationReducers from './reducers';
 import {BeproService} from '@services/bepro-service';
 import {changeBeproInitState} from '@reducers/change-bepro-init-state';
-import {getSession} from 'next-auth/react';
 import {changeGithubHandle} from '@reducers/change-github-handle';
 import {changeCurrentAddress} from '@reducers/change-current-address'
 import Loading from '../components/loading';
@@ -17,17 +16,23 @@ import {changeNetwork} from '@reducers/change-network';
 import {useRouter} from 'next/router';
 import {toastError} from '@reducers/add-toast';
 import sanitizeHtml from 'sanitize-html';
-import {GetServerSideProps} from 'next';
 import {NetworkIds} from '@interfaces/enums/network-ids';
 import useApi from '@x-hooks/use-api';
+import { useNetwork } from 'contexts/network';
 import {changeAccessToken} from '@reducers/change-access-token';
 import {updateTransaction} from '@reducers/update-transaction';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import { changeTransactionalTokenApproval } from './reducers/change-transactional-token-approval';
 import { changeSettlerTokenApproval } from './reducers/change-settler-token-approval';
+import {setCookie, parseCookies} from 'nookies'
+import { addTransaction } from './reducers/add-transaction';
+import { changeLoadState } from './reducers/change-load-state';
+import { BEPRO_NETWORK_NAME } from 'env';
+import { handleNetworkAddress } from '@helpers/custom-network';
 
 interface GlobalState {
   state: ApplicationState,
+  methods?: any,
   dispatch: (action: ReduceActor<any>) => Dispatch<ReduceActor<any>>,
 }
 
@@ -44,8 +49,8 @@ const defaultState: GlobalState = {
     oracles: {
       addresses: [],
       amounts: [],
-      oraclesDelegatedByOthers: ``,
-      tokensLocked: ``
+      oraclesDelegatedByOthers: 0,
+      tokensLocked: 0
     },
     myIssues: [],
     balance: {
@@ -60,7 +65,12 @@ const defaultState: GlobalState = {
     githubLogin: ``,
     accessToken: ``,
     isTransactionalTokenApproved: false,
-    isSettlerTokenApproved: false
+    isSettlerTokenApproved: false,
+    networksSummary: {
+      bounties: 0, 
+      amountInNetwork: 0,
+      amountDistributed: 0
+    }
   },
   dispatch: () => undefined
 };
@@ -77,9 +87,10 @@ export default function ApplicationContextProvider({children}) {
   const [txListener, setTxListener] = useState<any>();
   const {authError} = useRouter().query;
   const {getUserOf} = useApi();
+  const { activeNetwork } = useNetwork()
 
   function updateSteFor(newAddress: string) {
-    BeproService.login(true)
+    BeproService.login()
                 .then(() => dispatch(changeCurrentAddress(newAddress)))
   }
 
@@ -97,24 +108,42 @@ export default function ApplicationContextProvider({children}) {
         dispatch(changeAccessToken(user?.accessToken));
       })
 
-    BeproService.getOraclesSummary()
-                .then(oracles => dispatch(changeOraclesState(changeOraclesParse(address, oracles))))
-
     BeproService.isApprovedTransactionalToken().then(approval => dispatch(changeTransactionalTokenApproval(approval)))
     BeproService.isApprovedSettlerToken().then(approval => dispatch(changeSettlerTokenApproval(approval)))
+
+    updateWalletBalance(address)
     
-    BeproService.getBalance('bepro').then(bepro => dispatch(changeBalance({bepro})));
-    BeproService.getBalance('eth').then(eth => dispatch(changeBalance({eth})));
-    BeproService.getBalance('staked').then(staked => dispatch(changeBalance({staked})));
     cheatBepro = BeproService;
     cheatDispatcher = updateTransaction;
   }
 
-  const Initialize = () => {
-    BeproService.start()
-                .then(state => {
+  function updateWalletBalance(cheatAddress = undefined) {
+    if (!state.currentAddress)
+      return
+
+    const address = cheatAddress || state.currentAddress
+    
+    BeproService.getOraclesSummary()
+                .then(oracles => dispatch(changeOraclesState(changeOraclesParse(address, oracles))))
+
+    BeproService.getBalance('bepro')
+                .then(bepro => dispatch(changeBalance({bepro})))
+
+    BeproService.getBalance('eth')
+                .then(eth => dispatch(changeBalance({eth})))
+
+    BeproService.getBalance('staked')
+                .then(staked => dispatch(changeBalance({staked})))
+  }
+
+  const Initialize = () => {    
+    dispatch(changeLoadState(true))
+
+    BeproService.start(handleNetworkAddress(activeNetwork))
+                .then((state) => {
                   dispatch(changeBeproInitState(state))
-                });
+                  updateWalletBalance()
+                }).finally(() => dispatch(changeLoadState(false)))
 
     if (!window.ethereum)
       return;
@@ -125,48 +154,34 @@ export default function ApplicationContextProvider({children}) {
     });
 
     if (txListener)
-      txListener.unsubscribe((err, success) => { console.log(`unsub`, err, success); });
+      clearInterval(txListener)
 
     const web3 = (window as any).web3;
 
-    setTxListener(web3.eth.subscribe(`pendingTransactions`, error => {error && console.log(error)})
-                      .on(`data`, (transactionHash) => {
-                        if (!cheatAddress || !waitingForTx)
-                          return;
+    const getPendingBlock = () => {
+      if (!cheatAddress || !waitingForTx || !waitingForTx?.transactionHash) return
 
-                        const getTx = (txHash) => web3.eth.getTransaction(transactionHash)
-                                                      .then(result => {
-                                                        if (!result)
-                                                          return getTx(transactionHash);
-                                                        return {
-                                                          ...waitingForTx,
-                                                          addressFrom: result.from,
-                                                          addressTo: result.to,
-                                                          transactionHash: result.transactionHash || transactionHash,
-                                                          blockHash: result.blockHash,
-                                                          confirmations: result?.nonce,
-                                                          status: TransactionStatus.pending,
-                                                        }
-                                                      })
-                                                      .catch((error) => {
-                                                        console.log(`Failed to getTransaction`, error);
-                                                      })
-                        getTx(transactionHash)
-                            .then(tx => {
-                              if (tx?.addressFrom === cheatAddress) {
-                                dispatch(updateTransaction(tx));
-                                waitingForTx = null;
-                              }
-                            })
-                            .catch(_ => {
-                              console.log(`Failed to subscribe to pastEvents`, _);
-                            });
-                      }))
+      web3.eth.getTransaction(waitingForTx.transactionHash).then(transaction => {  
+        dispatch(updateTransaction({
+          ...waitingForTx,
+          addressFrom: transaction.from,
+          addressTo: transaction.to,
+          transactionHash: transaction.hash,
+          blockHash: transaction.blockHash,
+          confirmations: transaction?.nonce,
+          status: transaction.blockNumber ? TransactionStatus.completed : TransactionStatus.pending
+        }))
+  
+        if (transaction.blockNumber) waitingForTx = null
+      })
+    }
+
+    setTxListener(setInterval(getPendingBlock, 1000))
   }
 
   LoadApplicationReducers();
 
-  useEffect(Initialize, []);
+  useEffect(Initialize, [activeNetwork]);
   useEffect(onAddressChanged, [state.currentAddress]);
   useEffect(() => {
     if (!authError)
@@ -176,24 +191,66 @@ export default function ApplicationContextProvider({children}) {
   }, [authError])
 
   useEffect(() => {
-    if (waitingForTx)
-      return;
+    if (!waitingForTx)
+      waitingForTx = state.myTransactions.find(({status}) => status === TransactionStatus.pending) || null;
 
-    const pending = state.myTransactions.find(({status}) => status === 0);
-    if (pending)
-      waitingForTx = pending;
+    if(waitingForTx?.transactionHash) return
+
+    const transactionWithHash = state.myTransactions.find(({id}) => id === waitingForTx?.id);
+
+    if (!transactionWithHash || transactionWithHash?.status === TransactionStatus.failed)
+      waitingForTx = null
+    else
+      waitingForTx = transactionWithHash
 
   }, [state.myTransactions])
 
-  return <ApplicationContext.Provider value={{state, dispatch: dispatch as any}}>
-    <Loading show={state.loading.isLoading} text={state.loading.text}/>
-    <Toaster/>
-    {children}
-  </ApplicationContext.Provider>
-}
+  const restoreTransactions = async (address)=>{
+    const cookie = parseCookies()
+    const transactions = JSON.parse(cookie[`bepro.transactions:${address}`] ? cookie[`bepro.transactions:${address}`] : '[]')
+    const web3 = (window as any).web3;
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  return {
-    props: {session: await getSession(ctx)},
-  };
-};
+    const getStatusFromBlock = async (tx) => {
+      let transaction = {...tx}
+      if(tx?.transactionHash){
+        const block = await web3.eth.getTransaction(tx.transactionHash);
+        if(block){
+          transaction.addressFrom = block.from;
+          transaction.addressTo = block.to,
+          transaction.transactionHash = block.hash,
+          transaction.blockHash = block.blockHash,
+          transaction.confirmations = block?.nonce,
+          transaction.status = block.blockNumber ? TransactionStatus.completed : TransactionStatus.pending
+        }
+      }
+      
+      dispatch(addTransaction(transaction, activeNetwork))
+
+      return transaction;
+    }
+
+    transactions.forEach(getStatusFromBlock)
+  }
+
+
+  useEffect(()=>{
+    if (!state.currentAddress) return;
+    if (state.myTransactions.length < 1) restoreTransactions(state.currentAddress)
+    else {
+      const value = JSON.stringify(state.myTransactions.slice(0, 5));
+      setCookie(null, `bepro.transactions:${state.currentAddress}`, value, {
+        maxAge: 24 * 60 * 60, // 24 hour
+        path: "/",
+      });
+    }
+
+  },[state.myTransactions, state.currentAddress])
+
+  return (
+    <ApplicationContext.Provider value={{ state, dispatch: dispatch as any, methods: { updateWalletBalance } }}>
+      <Loading show={state.loading.isLoading} text={state.loading.text} />
+      <Toaster />
+      {children}
+    </ApplicationContext.Provider>
+  );
+}

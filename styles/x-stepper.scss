@@ -1,0 +1,29 @@
+.stepper {
+  .step + .step {
+   margin-top: 20px; 
+  }
+
+  .step {
+    background-color: $bg-shadow;
+
+    svg:not(button svg) {
+      color: var(--bs-success);
+    }
+
+    .progress {
+      padding-left: 0;
+      padding-right: 0;
+      height: 10px;
+
+      &, .progress-bar {
+        border-radius: 10px;
+      }
+
+      .progress-bar:nth-child(2) {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        background-color: rgba(var(--bs-success-rgb), .3);
+      }
+    }
+  }
+}

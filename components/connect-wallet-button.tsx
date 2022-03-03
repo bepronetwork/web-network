@@ -10,6 +10,7 @@ import { changeNetwork } from '@contexts/reducers/change-network';
 import { NetworkIds } from '@interfaces/enums/network-ids';
 import Button from './button';
 import { NETWORKS } from '@helpers/networks';
+import { useTranslation } from 'next-i18next';
 
 const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
 const networkMap = {
@@ -23,8 +24,9 @@ const networkMap = {
 }
 
 export default function ConnectWalletButton({children = null, forceLogin = false, onSuccess = () => null, onFail = () => console.error("Failed to login"), asModal = false, btnColor = `white`}) {
-  const { state: {metaMaskWallet, beproInit, currentAddress, network: activeNetwork}, dispatch } = useContext(ApplicationContext);
+  const { state: {loading, metaMaskWallet, beproInit, currentAddress, network: activeNetwork}, dispatch } = useContext(ApplicationContext);
   const [isAddingNetwork, setIsAddingNetwork] = useState(false);
+  const { t } = useTranslation(['common', 'connect-wallet-button'])
 
   async function connectWallet() {
     let loggedIn = false;
@@ -34,7 +36,10 @@ export default function ConnectWalletButton({children = null, forceLogin = false
       if (+process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID !== +chainId) {
         dispatch(changeNetwork((NetworkIds[+chainId] || `unknown`)?.toLowerCase()))
         return;
-      } else loggedIn = await BeproService.login();
+      } else {
+         await BeproService.login();
+         loggedIn = BeproService.isLoggedIn
+      }
     } catch (e) {
       console.error(`Failed to login on BeproService`, e);
     }
@@ -51,17 +56,15 @@ export default function ConnectWalletButton({children = null, forceLogin = false
     if (!beproInit)
       return;
 
-    let action: () => Promise<boolean|string>;
 
     if (forceLogin)
-      action = BeproService.login;
-    else action = () => Promise.resolve(BeproService.address);
-
-    action().then((state: string|boolean) =>
-                    dispatch(changeWalletState(!!state)))
-            .catch(e => {
-              console.error(`Error changing wallet state`, e);
-            });
+      BeproService.login()
+      .then(() => {
+        dispatch(changeWalletState(BeproService.isLoggedIn))
+      })
+      .catch(e => {
+        console.error(`Error changing wallet state`, e);
+      })
 
   }, [beproInit]);
 
@@ -109,49 +112,55 @@ export default function ConnectWalletButton({children = null, forceLogin = false
     ].some(values => values)
   }
 
-  if (asModal)
+  if (asModal) {
+    if (loading.isLoading) return <></>
+
     return (
       <Modal
-      title="Connect your MetaMask Wallet"
+      title={t('connect-wallet-button:title')}
       titlePosition="center"
       centerTitle
       titleClass="h3 text-white bg-opacity-100"
       show={!currentAddress || !metaMaskWallet}>
         <div className="d-flex flex-column text-center align-items-center">
-        <strong className="smallCaption d-block text-uppercase text-white-50 mb-3 pb-1">
-          to access this page please, connect to the <br/><span style={{color: networkMap[REQUIRED_NETWORK.toLowerCase()]}}><span>{REQUIRED_NETWORK}</span> network</span> on your metamask wallet
+        <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
+          {t('connect-wallet-button:to-access-this-page')}<br/><span style={{color: networkMap[REQUIRED_NETWORK.toLowerCase()]}}><span>{REQUIRED_NETWORK}</span> {t('connect-wallet-button:network')}</span> {t('connect-wallet-button:on-your-wallet')}
         </strong>
           <div className="d-flex justify-content-center align-items-center w-100">
-              <div className="rounded-3 bg-dark-gray text-white p-3 d-flex text-center justify-content-center align-items-center w-75 cursor-pointer" onClick={connectWallet}>
+              <div className="rounded-8 bg-dark-gray text-white p-3 d-flex text-center justify-content-center align-items-center w-75 cursor-pointer" onClick={connectWallet}>
                   <Image src={metamaskLogo} width={15} height={15}/>
-                  <span className="text-white text-uppercase ms-2">metamask</span>
+                  <span className="text-white text-uppercase ms-2 caption-large">{t('misc.metamask')}</span>
               </div>
         </div>
 
-        <div className="smallInfo text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-1 pt-1">
-        by connecting, you accept{" "}
+        <div className="small-info text-center text-uppercase mt-1 pt-1">
+          <span className="text-ligth-gray">
+            {t('misc.by-connecting')}{" "}
+          </span>  
+          
           <a
             href="https://www.bepro.network/terms-and-conditions"
             target="_blank"
-            className="text-decoration-none"
+            className="text-decoration-none text-primary"
           >
-            Terms & Conditions
+            {t('misc.terms-and-conditions')}
           </a>{" "}
-          <br /> and{" "}
+          <br /> &{" "}
           <a
             href="https://www.bepro.network/privacy"
             target="_blank"
-            className="text-decoration-none"
+            className="text-decoration-none text-primary"
           >
-            PRIVACY POLICY
+            {t('misc.privacy-policy')}
           </a>
         </div>
       </div>
       </Modal>
     )
-
+  }
+  
   if (!metaMaskWallet)
-    return <Button color='white' className='text-primary bg-opacity-100' onClick={connectWallet}><span>Connect</span> <i className="ico-metamask" /></Button>
+    return <Button color='white' className='text-primary bg-opacity-100' onClick={connectWallet}><span>{t('main-nav.connect')}</span> <i className="ico-metamask" /></Button>
 
   return children;
 

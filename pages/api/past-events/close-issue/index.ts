@@ -1,21 +1,18 @@
 import models from '@db/models';
 import {NextApiRequest, NextApiResponse} from 'next';
-import {CONTRACT_ADDRESS, WEB3_CONNECTION} from '../../../../env';
-import {Network} from 'bepro-js';
 import {Octokit} from 'octokit';
 import readCloseIssues from '@helpers/api/read-close-issues';
+import networkBeproJs from '@helpers/api/handle-network-bepro';
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {fromBlock, id} = req.body;
   const octokit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
 
-  const opt = {opt: {web3Connection: WEB3_CONNECTION,  privateKey: process.env.NEXT_PRIVATE_KEY}, test: true,};
-  const network = new Network({contractAddress: CONTRACT_ADDRESS, ...opt});
+  const network = networkBeproJs({ test: true });
 
   await network.start();
-  const contract = network.getWeb3Contract();
 
-  await contract.getPastEvents(`CloseIssue`, {fromBlock, toBlock: +fromBlock+1, filter: {id},})
+  await network.getCloseIssueEvents({fromBlock, toBlock: +fromBlock+1, filter: {id},})
                 .then(events => readCloseIssues(events, {network, models, octokit, res}))
                 .catch(error => {
                   console.log(`Error reading CloseIssue`, error);

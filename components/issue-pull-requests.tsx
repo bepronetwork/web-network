@@ -1,3 +1,4 @@
+import { useTranslation } from 'next-i18next'
 import NothingFound from './nothing-found'
 import PullRequestItem from './pull-request-item'
 
@@ -5,8 +6,11 @@ export default function IssuePullRequests({
   repoId,
   className = '',
   issueId,
-  pullResquests = []
+  pullResquests = [],
+  repositoryPath
 }) {
+  const { t } = useTranslation('pull-request')
+
   return (
     <div
       className={`content-wrapper ${className} pt-0 ${
@@ -20,8 +24,9 @@ export default function IssuePullRequests({
             repoId={repoId}
             pullRequest={pullRequest}
             issueId={issueId}
+            repositoryPath={repositoryPath}
           />
-        ))) || <NothingFound description={'No pull requests found'} />}
+        ))) || <NothingFound description={t('errors.not-found')} />}
     </div>
   )
 }
