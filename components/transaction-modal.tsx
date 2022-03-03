@@ -97,7 +97,6 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
 
       <div className="caption-small d-flex flex-row mb-3">
         <span className="text-ligth-gray">ON</span> 
-        {console.log(transaction?.network)}
         <InternalLink className={`${transaction?.network?.name === BEPRO_NETWORK_NAME ? ' text-primary ' : ''} p-0 ml-1`} label={transaction?.network?.name} href={getURLWithNetwork('/', {network: transaction?.network?.name})} style={{color: `${transaction?.network?.colors?.primary}`}} brand transparent />
       </div>
 
