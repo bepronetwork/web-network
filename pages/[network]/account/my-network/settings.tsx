@@ -90,6 +90,7 @@ export default function Settings() {
 
   const {
     dispatch,
+    methods: { updateWalletBalance },
     state: { currentAddress, githubLogin }
   } = useContext(ApplicationContext)
 
@@ -353,6 +354,8 @@ export default function Settings() {
             content: t('custom-network:messages.network-closed')
           })
         )
+
+        updateWalletBalance()
 
         router.push(getURLWithNetwork('/account/my-network'))
       })
