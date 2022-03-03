@@ -15,7 +15,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if (creatorAddress)
     whereCondition.creatorAddress = { [Op.iLike]: String(creatorAddress) }
 
-  if (networkAddress) whereCondition.networkAddress = networkAddress
+  if (networkAddress) whereCondition.networkAddress = { [Op.iLike]: String(networkAddress) }
 
   const networks = await models.network.findAndCountAll(
     paginate(
