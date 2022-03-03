@@ -71,7 +71,7 @@ export default function RepositoriesList({ repositories, onClick }) {
 
       {existingRepos.length ? (
         <span className="p-small text-danger px-0">
-          {t('steps.repositories.used-by-other=network')}
+          {t('steps.repositories.used-by-other-network')}
         </span>
       ) : (
         ''
