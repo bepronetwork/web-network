@@ -28,7 +28,8 @@ export default function RepositoriesList({ repositories, onClick }) {
 
     if (paths.length)
       searchRepositories({
-        path: paths
+        path: paths,
+        networkName: ''
       })
         .then(({ rows }) => {
           setExistingRepos(rows.map((repo) => repo.githubPath))
