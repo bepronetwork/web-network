@@ -95,7 +95,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       const { data } = await octokitUser.rest.repos.addCollaborator({
         owner,
         repo,
-        username: process.env.NEXT_PUBLIC_GITHUB_LOGIN
+        username: process.env.NEXT_PUBLIC_BEPRO_GITHUB_USER
       })
 
       if (data?.id) invitations.push(data?.id)
