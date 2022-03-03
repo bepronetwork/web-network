@@ -9,8 +9,8 @@ interface BalanceAddressAvatarProps {
 export default function BalanceAddressAvatar(props: BalanceAddressAvatarProps) {
   return (
     <div className="d-flex flex-column text-right">
-      <p className="p-small mb-0">{props.address}</p>
-      <p className="p-small mb-0 trans">
+      <p className="caption-small mb-1 mt-1">{props.address}</p>
+      <p className="caption-small mb-0 trans">
         {formatNumberToString(props.balance)} {props.currency}
       </p>
     </div>

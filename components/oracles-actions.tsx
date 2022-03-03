@@ -19,42 +19,46 @@ import LockedIcon from "@assets/icons/locked-icon"
 import {Spinner} from 'react-bootstrap';
 import useTransactions from '@x-hooks/useTransactions';
 import { changeSettlerTokenApproval } from '@contexts/reducers/change-settler-token-approval';
-
-const actions: string[] = ["Lock", "Unlock"];
+import { useTranslation } from 'next-i18next';
+import ReadOnlyButtonWrapper from './read-only-button-wrapper';
+import { useNetwork } from '@contexts/network';
 
 function OraclesActions(): JSX.Element {
   const {state: {metaMaskWallet, currentAddress, balance, oracles, myTransactions, isSettlerTokenApproved}, dispatch} = useContext(ApplicationContext);
 
   const [show, setShow] = useState<boolean>(false);
-  const [action, setAction] = useState<string>(actions[0]);
   const [tokenAmount, setTokenAmount] = useState<number | undefined>();
   const [error, setError] = useState<string>("");
   const [walletAddress, setWalletAddress] = useState(``);
+  const { t } = useTranslation(['common', 'my-oracles']);
+  const actions: string[] = [String(t('my-oracles:actions.lock.label')), String(t('my-oracles:actions.unlock.label'))];
+  const [action, setAction] = useState<string>(actions[0]);
 
   const networkTxRef = useRef<HTMLButtonElement>(null);
   const renderAmount = tokenAmount ? `${formatNumberToCurrency(tokenAmount)} ` : "0";
 
   const txWindow = useTransactions();
+  const { activeNetwork } = useNetwork()
 
   const verifyTransactionState = (type: TransactionTypes): boolean => !!myTransactions.find(transactions=> transactions.type === type && transactions.status === TransactionStatus.pending);
 
   const renderInfo = {
     Lock: {
-      title: "Lock $BEPRO",
-      description: "Lock $BEPRO to receive ORACLES",
-      label: `Get ${renderAmount} ORACLES`,
-      caption: <>Get <span className="text-purple">Oracles</span> from <span className="text-blue">$BEPRO</span></>,
-      body: `You are locking /bepro${renderAmount} $BEPRO /br/ to get /oracles${renderAmount} Oracles`,
+      title: t('my-oracles:actions.lock.title'),
+      description: t('my-oracles:actions.lock.description'),
+      label: t('my-oracles:actions.lock.get-amount-oracles', { amount: renderAmount }),
+      caption: <>{t('misc.get')} <span className="text-purple">{t('$oracles')}</span> {t('misc.from')} <span className="text-primary">{t('$bepro')}</span></>,
+      body: t('my-oracles:actions.lock.body', { amount: renderAmount }),
       params() {
         return { tokenAmount };
       },
     },
     Unlock: {
-      title: "Unlock $BEPRO",
-      description: "Get $BEPRO from ORACLES",
-      label: `Get ${renderAmount} $BEPRO`,
-      caption: <>Get <span className="text-blue">$BEPRO</span> from <span className="text-purple">Oracles</span></>,
-      body: `Give away /oracles${renderAmount} Oracles/ /br/ to get back /bepro${renderAmount} $BEPRO`,
+      title: t('my-oracles:actions.unlock.title'),
+      description: t('my-oracles:actions.unlock.description'),
+      label: t('my-oracles:actions.unlock.get-amount-bepro', { amount: renderAmount }),
+      caption: <>{t('misc.get')} <span className="text-primary">{t('$bepro')}</span> {t('misc.from')} <span className="text-purple">{t('$oracles')}</span></>,
+      body: t('my-oracles:actions.unlock.body', { amount: renderAmount }),
       params(from: string) {
         return { tokenAmount, from };
       },
@@ -63,13 +67,13 @@ function OraclesActions(): JSX.Element {
 
   function updateErrorsAndApproval(bool: boolean) {
     setError(
-      !bool ? "Please approve BEPRO Transactions First. Check it and try again." : "",
+      !bool ? t('my-oracles:errors.approve-transactions') : "",
     );
   }
 
   function handleCheck(isChecked: boolean) {
     if (!tokenAmount) {
-      return setError("$BEPRO amount needs to be higher than 0.");
+      return setError(t('my-oracles:errors.amount-higher-0'));
     }
     setShow(isChecked);
     updateErrorsAndApproval(isChecked)
@@ -78,9 +82,8 @@ function OraclesActions(): JSX.Element {
   function updateValues() {
     BeproService.getBalance('bepro')
                 .then(amount => {
-                  BeproService?.network
-                              ?.isApprovedSettlerToken({address: currentAddress, amount})
-                              ?.then(updateErrorsAndApproval)
+                  BeproService.isApprovedSettlerToken()
+                              .then(updateErrorsAndApproval)
                 })
   }
 
@@ -115,7 +118,7 @@ function OraclesActions(): JSX.Element {
       return setTokenAmount(0)
 
     if (params.floatValue > getMaxAmmount())
-      setError(`Amount is greater than your ${getCurrentLabel()} amount`)
+      setError(t('my-oracles:errors.amount-greater', { amount: getCurrentLabel() }))
 
     setTokenAmount(params.floatValue);
   }
@@ -133,7 +136,7 @@ function OraclesActions(): JSX.Element {
 
   const isButtonDisabled = (): boolean => [
     tokenAmount < 1,
-    action === 'Lock' && !isSettlerTokenApproved,
+    action === t('my-oracles:actions.lock.label') && !isSettlerTokenApproved,
     !currentAddress,
     tokenAmount > getMaxAmmount(),
     myTransactions.find(({status, type}) =>
@@ -148,7 +151,7 @@ function OraclesActions(): JSX.Element {
     if (!currentAddress)
       return;
 
-    const approveTx = addTransaction({type: TransactionTypes.approveSettlerToken});
+    const approveTx = addTransaction({type: TransactionTypes.approveSettlerToken}, activeNetwork);
     dispatch(approveTx);
     BeproService.network.approveSettlerERC20Token()
                 .then((txInfo) => {
@@ -167,19 +170,17 @@ function OraclesActions(): JSX.Element {
 
   function checkLockedAmount() {
     if (!currentAddress)
-      return;
+      return
 
-    BeproService.network
-                ?.isApprovedSettlerToken({address: BeproService.address, amount: tokenAmount})
-                ?.then(handleCheck);
+    BeproService.isApprovedSettlerToken().then(handleCheck)
   }
 
   function getCurrentLabel(): TransactionCurrency {
-    return action === `Lock` && `$BEPRO` || `Oracles`
+    return action === t('my-oracles:actions.lock.label') && t('$bepro') || t('$oracles')
   }
 
   function getMaxAmmount(): number {
-    return action === `Lock` && balance.bepro || (+oracles.tokensLocked - oracles.delegatedToOthers);
+    return action === t('my-oracles:actions.lock.label') && balance.bepro || (+oracles.tokensLocked - oracles.delegatedToOthers);
   }
 
   function setMaxAmmount() {
@@ -187,7 +188,7 @@ function OraclesActions(): JSX.Element {
   }
 
   function getTxType() {
-    return action === `Lock` ? TransactionTypes.lock : TransactionTypes.unlock;
+    return action === t('my-oracles:actions.lock.label') ? TransactionTypes.lock : TransactionTypes.unlock;
   }
 
   useEffect(updateWalletAddress, [currentAddress])
@@ -198,18 +199,18 @@ function OraclesActions(): JSX.Element {
         <div className="content-wrapper h-100">
           <OraclesBoxHeader actions={actions} onChange={setAction} currentAction={action} available={getMaxAmmount()} />
 
-          <p className="smallCaption text-white text-uppercase mt-2 mb-3">{renderInfo.description}</p>
+          <p className="caption-small text-white text-uppercase mt-2 mb-3">{renderInfo.description}</p>
 
           <InputNumber
             disabled={!isSettlerTokenApproved || !metaMaskWallet}
-            label={`${getCurrentLabel()} Amount`}
+            label={t('my-oracles:fields.amount.label', { currency: getCurrentLabel() })}
             symbol={`${getCurrentLabel()}`}
-            classSymbol={`${getCurrentLabel() === 'Oracles' ? "text-purple" : "text-blue"}`}
+            classSymbol={`${getCurrentLabel() === t('$oracles') ? "text-purple" : "text-primary"}`}
             max={balance.bepro}
             error={!!error}
             value={tokenAmount}
             min={0}
-            placeholder={`Insert an amount of ${getCurrentLabel()}`}
+            placeholder={t('my-oracles:fields.amount.placeholder', { currency: getCurrentLabel() })}
             onValueChange={handleChangeToken}
             thousandSeparator
             decimalSeparator="."
@@ -218,37 +219,39 @@ function OraclesActions(): JSX.Element {
               <>
                 {formatNumberToCurrency(getMaxAmmount(), { maximumFractionDigits: 18 })} {getCurrentLabel()} Available
                 <span
-                    className={`smallCaption ml-1 cursor-pointer text-uppercase ${`${getCurrentLabel() === 'Oracles' ? "text-purple" : "text-blue"}`}`}
+                    className={`caption-small ml-1 cursor-pointer text-uppercase ${`${getCurrentLabel() === t('$oracles') ? "text-purple" : "text-primary"}`}`}
                     onClick={setMaxAmmount}>
-                    Max
+                    {t('misc.max')}
                 </span>
                 {error && <p className="p-small my-2">{error}</p>}
               </>)
             }
             />
 
-          <div className="mt-5 d-grid gap-3">
+          <ReadOnlyButtonWrapper>
+            <div className="mt-5 d-grid gap-3">
+              {action === t('my-oracles:actions.lock.label') &&
+              
+                <Button 
+                  disabled={isApproveButtonDisabled()}
+                  className="ms-0 read-only-button"
+                  onClick={approveSettlerToken}
+                >
+                    {isApproveButtonDisabled() && <LockedIcon width={12} height={12} className="mr-1"/>}
+                    <span>{t('actions.approve')} {currentAddress && verifyTransactionState(TransactionTypes.approveSettlerToken) ? <Spinner size={"xs" as unknown as 'sm'} className="align-self-center ml-1" animation="border" /> : ``}</span>
+                </Button>}
 
-          {action === 'Lock' && 
-            <Button 
-              disabled={isApproveButtonDisabled()}
-              className="ms-0" 
-              onClick={approveSettlerToken}
-            >
-                {isApproveButtonDisabled() && <LockedIcon width={12} height={12} className="mr-1"/>}
-                <span>Approve {currentAddress && verifyTransactionState(TransactionTypes.approveSettlerToken) ? <Spinner size={"xs" as unknown as 'sm'} className="align-self-center ml-1" animation="border" /> : ``}</span>
-            </Button>}
-
-            <Button 
-              color={action === 'Lock' ? 'purple' : 'primary'} 
-              className="ms-0" 
-              disabled={isButtonDisabled()}
-              onClick={checkLockedAmount}
-            >
-                  {isButtonDisabled() && <LockedIcon width={12} height={12} className="mr-1"/>}
-                  <span>{renderInfo.label}</span>
-            </Button>
-          </div>
+                <Button 
+                  color={action === t('my-oracles:actions.lock.label') ? 'purple' : 'primary'} 
+                  className="ms-0 read-only-button" 
+                  disabled={isButtonDisabled()}
+                  onClick={checkLockedAmount}
+                >
+                      {isButtonDisabled() && <LockedIcon width={12} height={12} className="mr-1"/>}
+                      <span>{renderInfo.label}</span>
+                </Button>
+            </div>
+            </ReadOnlyButtonWrapper>
 
           <NetworkTxButton
             txMethod={action.toLowerCase()}
@@ -261,7 +264,6 @@ function OraclesActions(): JSX.Element {
             onSuccess={onSuccess}
             onFail={setError}
             ref={networkTxRef}
-            useContract
             />
 
         </div>
@@ -275,17 +277,17 @@ function OraclesActions(): JSX.Element {
         footer={
           <>
             <Button onClick={handleConfirm}>
-              Confirm
+            {t('actions.confirm')}
             </Button>
             <Button color='dark-gray' onClick={handleCancel}>
-              Cancel
+            {t('actions.cancel')}
             </Button>
           </>
         }>
-        <p className="smallCaption text-uppercase text-center">
+        <p className="caption-small text-uppercase text-center mb-2">
           {renderInfo.caption}
         </p>
-        <p className="text-center text-bold fs-4">
+        <p className="text-center h4">
           {renderInfo.body?.split("/").map((sentence: string) => {
             const Component =
               ((sentence.startsWith("oracles") || sentence.startsWith("bepro")) && "span") || Fragment;
@@ -294,10 +296,10 @@ function OraclesActions(): JSX.Element {
               <Fragment key={sentence}>
                 <Component
                   {...(sentence.startsWith("oracles") && {
-                    className: "text-bold text-purple",
+                    className: "text-purple",
                   })}
                   {...(sentence.startsWith("bepro") && {
-                    className: "text-bold text-blue",
+                    className: "text-primary",
                   })}
                 >
                   {sentence.replace(/bepro|oracles|br/, "")}

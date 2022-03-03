@@ -1,14 +1,49 @@
 import React from "react";
 
-export default function GithubInfo({bgColor = `transparent`, color, value, onClicked = () => {}, hoverTextColor = ``, borderColor = undefined}) {
+interface GithubInfoProps {
+  label: string
+  color?: string
+  active?: boolean
+  disabled?: boolean
+  onClick?: () => void
+  variant: 'user' | 'repository'
+  parent: 'list' | 'modal' | 'hero'
+}
 
-  function getClassName() {
-    return [
-      `bg-${bgColor} smallCaption text-uppercase px-1 rounded border border-2 text-uppercase fs-smallest`,
-      hoverTextColor ? `bg-${color}-hover text-${hoverTextColor}-hover` : ``,
-      `border-${borderColor && borderColor || color} text-${color}`
-    ].join(` `);
+export default function GithubInfo({
+  label,
+  color,
+  parent,
+  variant,
+  disabled,
+  active = false,
+  onClick = () => {}
+} : GithubInfoProps) {
+
+  function handleClick(event) {
+    event.stopPropagation()
+
+    if(!disabled) onClick()
   }
 
-  return <div className={getClassName()} onClick={(e) => hoverTextColor && (e.stopPropagation(), onClicked())}><span>{value}</span></div>
+  function getClassName() {
+    const hover = active ? '' : '-hover'
+    let append = ''
+
+    if (disabled) append += ' text-danger border-danger bg-danger-10 cursor-now-allowed'
+    else if (color) append += ` text-${color} border-${color} bg-${color}-10 cursor-now-allowed`
+    else if (['list', 'modal'].includes(parent)) {
+      append += ' cursor-pointer bg-transparent text-truncate '
+
+      if (variant === 'user') append += ' text-white text-white-hover border-gray border-white-hover bg-white-10-hover ' 
+
+      if (variant === 'repository') append += ` text-primary border-primary text-white${hover} bg-30${hover} `
+    } else if (parent === 'hero') {
+      if (variant === 'repository') append += ' cursor-pointer bg-white text-primary ' 
+    }
+
+    return ' github-info caption-small ' + append
+  }
+
+  return <div key={label} className={getClassName()} onClick={handleClick}><span>{label}</span></div>
 }

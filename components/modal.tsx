@@ -13,6 +13,7 @@ export default function Modal({
                                 backdrop = `static`,
                                 titlePosition = `start`,
                                 titleClass, okLabel = ``, cancelLabel = ``, onOkClick = () => {},
+                                titleComponent,
                                 ...params
                               }: ModalProps): JSX.Element {
   const modalTitle = `${kebabCase(key || title)}-modal`;
@@ -23,7 +24,7 @@ export default function Modal({
     if (okLabel || cancelLabel)
       return <div className="mb-3">
         {okLabel && <button className="btn btn-primary mr-2" onClick={() => onOkClick()}>{okLabel}</button>}
-        {cancelLabel && <button className="btn btn-secondary" onClick={() => onCloseClick()}>{cancelLabel}</button>}
+        {cancelLabel && <button className="btn btn-gray" onClick={() => onCloseClick()}>{cancelLabel}</button>}
         </div>
     return <></>
   }
@@ -39,9 +40,9 @@ export default function Modal({
                     {...params}>
       <ModalBootstrap.Header className={`relative d-flex w-100 justify-content-${titlePosition} `}>
         <ModalBootstrap.Title className={`pt-3 text-white ${titleClass || ``} ${centerTitle ? `text-center w-100` : ``}`}>
-          <p className="h3">{title}</p>
+          <h3>{titleComponent || title}</h3>
         </ModalBootstrap.Title>
-        {onCloseClick && <Button transparent className="close-button p-1 position-absolute end-95" onClick={onCloseClick}><CloseIcon color='text-gray' /></Button>}
+        {onCloseClick && <Button transparent className="close-button p-1 position-absolute end-94 text-gray" onClick={onCloseClick}><CloseIcon /></Button>}
       </ModalBootstrap.Header>
       <ModalBootstrap.Body>{children}</ModalBootstrap.Body>
       <ModalBootstrap.Footer>{renderFooter()}</ModalBootstrap.Footer>

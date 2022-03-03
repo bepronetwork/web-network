@@ -1,9 +1,9 @@
 export type OraclesActionLabel = "Lock" | "Unlock"
 export interface OraclesState {
-  oraclesDelegatedByOthers: string;
-  amounts: string[];
+  oraclesDelegatedByOthers: number;
+  amounts: number[];
   addresses: string[];
-  tokensLocked: string;
+  tokensLocked: number;
   delegatedToOthers?: number;
   delegatedEntries?: [string, number][]
 }

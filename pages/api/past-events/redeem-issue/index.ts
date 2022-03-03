@@ -1,25 +1,23 @@
 import models from '@db/models';
 import {NextApiRequest, NextApiResponse} from 'next';
-import {CONTRACT_ADDRESS, WEB3_CONNECTION} from '../../../../env';
-import {Network} from 'bepro-js';
 import {Octokit} from 'octokit';
 import {Bus} from '@helpers/bus';
-
+import networkBeproJs from '@helpers/api/handle-network-bepro';
+import api from 'services/api'
+import twitterTweet from '@helpers/api/handle-twitter-tweet';
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {fromBlock, id} = req.body;
   const octokit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
 
-  const opt = {opt: {web3Connection: WEB3_CONNECTION,  privateKey: process.env.NEXT_PRIVATE_KEY}, test: true,};
-  const network = new Network({contractAddress: CONTRACT_ADDRESS, ...opt});
+  const network = networkBeproJs({ test: true });
 
   await network.start();
-  const contract = network.getWeb3Contract();
 
-  await contract.getPastEvents(`RedeemIssue`, {fromBlock, toBlock: +fromBlock+1, filter: {id},})
+  await network.getRedeemIssueEvents({fromBlock, toBlock: +fromBlock+1, filter: {id},})
                 .then(async function redeemIssues(events) {
                   for (const event of events) {
                     const eventData = event.returnValues;
-                    const issueId = await network.getIssueById({issueId: eventData.id}).then(({cid}) => cid);
+                    const issueId = await network.getIssueById(eventData.id).then(({cid}) => cid);
                     const issue = await models.issue.findOne({where: {issueId,}});
 
                     if (!issue || issue?.state === `canceled`) {
@@ -30,9 +28,20 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
                     const repoInfo = await models.repositories.findOne({where: {id: issue?.repository_id}})
                     const [owner, repo] = repoInfo.githubPath.split(`/`);
-                    await octokit.rest.issues.update({owner, repo, issue_number: issueId, state: 'closed',});
+                    await octokit.rest.issues.update({owner, repo, issue_number: +issueId, state: 'closed',});
                     issue.state = 'canceled';
+                    twitterTweet({
+                      type: 'bounty',
+                      action: 'changes',
+                      issuePreviousState: 'draft',
+                      issue
+                    })
                     await issue.save();
+
+                    await api.post(`/seo/${issueId}`)
+                    .catch(e => {
+                      console.log(`Error creating SEO`, e);
+                    })
 
                     console.log(`Emitting redeemIssue:created:${issueId}`);
                     Bus.emit(`redeemIssue:created:${issueId}`, issue)

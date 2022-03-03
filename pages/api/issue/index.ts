@@ -1,14 +1,28 @@
 import models from '@db/models';
+import twitterTweet from '@helpers/api/handle-twitter-tweet';
+import api from '@services/api';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Octokit} from 'octokit';
+import {Op} from 'sequelize';
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const {title, description: body, amount, repository_id, creatorAddress, creatorGithub,} = req.body;
+  const {title, description: body, amount, repository_id, branch, creatorAddress, creatorGithub, networkName} = req.body;
+
+  const network = await models.network.findOne({
+    where: {
+      name: {
+        [Op.iLike]: String(networkName)
+      }
+    }
+  })
+
+  if (!network) return res.status(404).json('Invalid network')
+  if (network.isClosed) return res.status(404).json('Invalid network')
 
   if(!creatorGithub)
     return res.status(422).json(`creatorGithub is required`);
 
-  const repository = await models.repositories.findOne({where: {id: req.body.repository_id}});
+  const repository = await models.repositories.findOne({where: {id: req.body.repository_id, network_id: network.id}});
   if (!repository)
     return res.status(422).json(`repository not found`)
 
@@ -28,20 +42,47 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
                               creatorAddress,
                               creatorGithub,
                               amount,
+                              branch,
                               state: 'pending',
+                              title,
+                              body,
+                              network_id: network.id
                             });
 
-  return res.json(githubId);
+  return res.status(200).json(githubId);
 }
 
 async function patch(req: NextApiRequest, res: NextApiResponse) {
-  const {repoId: repository_id, githubId, scId: issueId} = req.body;
+  const {repoId: repository_id, githubId, scId: issueId, networkName} = req.body;
 
-  return models.issue.update({issueId, state: `draft`}, {where: {githubId: githubId, repository_id, issueId: null}})
-               .then(result => {
+  const network = await models.network.findOne({
+    where: {
+      name: {
+        [Op.iLike]: String(networkName)
+      }
+    }
+  })
+
+  if (!network) return res.status(404).json('Invalid network')
+  if (network.isClosed) return res.status(404).json('Invalid network')
+
+  return models.issue.update({issueId, state: `draft`}, {where: {githubId: githubId, repository_id, issueId: null, network_id: network.id}})
+               .then(async(result) => {
                  if (!result[0])
                    return res.status(422).json(`nok`)
 
+                 const issue = await models.issue.findOne({
+                    where: {issueId}
+                  })
+                  await api.post(`/seo/${issueId}`)
+                  .catch(e => {
+                    console.log(`Error creating SEO`, e);
+                  })
+                  twitterTweet({
+                   type: 'bounty',
+                   action: 'created',
+                   issue
+                 })
                  return res.status(200).json(`ok`)
                })
                .catch(_ => res.status(422).json(`nok`));

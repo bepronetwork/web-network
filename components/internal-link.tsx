@@ -1,11 +1,10 @@
-import { ReactNode } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { UrlObject } from 'url'
-
+import { useRouter } from 'next/router'
+import { ReactElement, ReactNode } from 'react'
 interface InternalLinkProps {
   href: string | UrlObject
-  label?: string | number
+  label?: string | number | ReactElement
   className?: string
   transparent?: boolean
   nav?: boolean
@@ -14,22 +13,28 @@ interface InternalLinkProps {
   uppercase?: boolean
   iconBefore?: boolean
   activeClass?: string
+  blank?: boolean
+  brand?: boolean,
+  style?: any
 }
 
 export default function InternalLink({
   className = '',
   nav = false,
   transparent = false,
-  active = false,
+  active = undefined,
   iconBefore = false,
   uppercase = false,
+  blank = false,
+  brand = false,
   activeClass,
+  style,
   ...props
 }: InternalLinkProps) {
-  const { asPath } = useRouter()
+  const { asPath, pathname } = useRouter()
 
   function getClasses(): string {
-    const isActive = asPath === props.href || active
+    const isActive = active || asPath.endsWith(String(props.href)) || pathname === (props.href as UrlObject).pathname
 
     let classes = `${className}`
 
@@ -45,12 +50,12 @@ export default function InternalLink({
     if (uppercase)
       classes += ' text-uppercase '
 
-    return `btn btn-primary text-white bg-opacity-100 d-flex align-items-center justify-content-center text-decoration-none shadow-none ${classes}`
+    return `${!nav && 'btn btn-primary ' || ' main-nav-link '} ${brand ? '' : ' text-white '} bg-opacity-100 d-flex align-items-center justify-content-center text-decoration-none shadow-none ${classes}`
   }
 
   return (
     <Link href={props.href} passHref>
-      <a className={getClasses()}>
+      <a className={getClasses()} target={`${blank ? '_blank' : ''}`} style={{...style}}>
         {(iconBefore && props.icon) || ``}
         {props.label && <span>{props.label}</span> || ``}
         {(!iconBefore && props.icon) || ``}

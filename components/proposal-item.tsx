@@ -12,6 +12,12 @@ import {ApplicationContext} from '@contexts/application';
 import Button from './button';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import useTransactions from '@x-hooks/useTransactions';
+import Translation from './translation';
+import LockedIcon from '@assets/icons/locked-icon';
+import useApi from '@x-hooks/use-api';
+import useNetworkTheme from '@x-hooks/use-network';
+import { useNetwork } from '@contexts/network'
+import ReadOnlyButtonWrapper from './read-only-button-wrapper';
 
 interface Options {
   proposal: Proposal,
@@ -22,6 +28,7 @@ interface Options {
   isFinalized: boolean;
   owner?: string;
   isMerged: boolean;
+  isDisputable?: boolean;
   onDispute: (error?: boolean) => void;
 }
 
@@ -34,21 +41,26 @@ export default function ProposalItem({
                                        isFinalized,
                                        owner,
                                        isMerged = false,
+                                       isDisputable = false,
                                        onDispute = () => {}
                                      }: Options) {
   const {dispatch,} = useContext(ApplicationContext);
   const txWindow = useTransactions();
+  const { processEvent } = useApi();
+  const { getURLWithNetwork } = useNetworkTheme()
+  const { activeNetwork } = useNetwork()
 
   async function handleDispute(mergeId) {
-    if (proposal.isDisputed || isFinalized)
+    if (!isDisputable || isFinalized)
       return;
 
-    const disputeTx = addTransaction({type: TransactionTypes.dispute});
+    const disputeTx = addTransaction({type: TransactionTypes.dispute}, activeNetwork);
     dispatch(disputeTx);
 
-    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
-    await BeproService.network.disputeMerge({issueID: issue_id, mergeID: mergeId,})
+    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
+    await BeproService.network.disputeMerge(issue_id, mergeId)
                       .then(txInfo => {
+                        processEvent(`dispute-proposal`, txInfo.blockNumber, issue_id);
                         txWindow.updateItem(disputeTx.payload.id, BeproService.parseTransaction(txInfo, disputeTx.payload));
                         // BeproService.parseTransaction(txInfo, disputeTx.payload)
                         //             .then(block => {
@@ -82,55 +94,62 @@ export default function ProposalItem({
   }
 
   function getLabel() {
+    let action = 'dispute'
+
     if (isFinalized && !proposal.isDisputed && isMerged) {
-      return `Accepted`
+      action = 'accepted'
     }
 
     if (proposal.isDisputed || (isFinalized && !isMerged)) {
-      return `Failed`
+      action = 'failed'
     }
 
-    return `Dispute`
+    return <Translation label={`actions.${action}`} />
   }
 
 
   return <>
     <div className="content-list-item proposal" key={`${proposal.pullRequestId}${proposal.scMergeId}`}>
-      <Link passHref href={{pathname: '/proposal', query: {prId: proposal.pullRequestId, mergeId: proposal.scMergeId, dbId, issueId},}}>
-        <a className="text-decoration-none text-white">
-          <div className="rounded row align-items-top">
+      <Link passHref href={getURLWithNetwork('/proposal', {prId: proposal.pullRequestId, mergeId: proposal.scMergeId, dbId, issueId})}>
+        <a className="text-decoration-none">
+          <div className="rounded row align-items-center">
             <div
-              className={`col-3 smallCaption mt-2 text-uppercase text-${getColors() === 'purple' ? 'white' : getColors()}`}>
-              PR #{proposal.pullRequestGithubId} {owner && `BY @${owner}`}
+              className={`col-3 caption-small mt-2 text-uppercase text-${getColors() === 'purple' ? 'white' : getColors()}`}>
+              <Translation ns="pull-request" label={'abbreviation'} /> #{proposal.pullRequestGithubId} <Translation label={'misc.by'} /> {owner && ` @${owner}`}
             </div>
-            <div className="col-5 d-flex justify-content-start mb-2">
+            <div className="col-5 d-flex justify-content-between mb-2 text-white">
               {proposal.prAmounts.map((value, i) =>
-                                        <PercentageProgressBar textClass={`smallCaption p-small text-${getColors()}`}
+                                        <PercentageProgressBar key={`pg-${i}`}
+                                                               textClass={`caption-small p-small text-${getColors()}`}
                                                                pgClass={`bg-${getColors()}`}
                                                                className={i + 1 < proposal.prAmounts.length && `me-2` || ``}
                                                                value={value} total={amount}/>)}
             </div>
 
             <div className="col-4 d-flex">              
-              <div className="col-9 offset-1">
+              <div className="col-9 offset-1 text-white">
               <ProposalProgressSmall pgClass={`${getColors()}`}
                                      value={+proposal.disputes}
                                      total={beproStaked}
                                      textClass={`pb-2 text-${getColors()}`}/>
               </div>
 
-              <div className="col-1 offset-1 justify-content-end d-flex">
-                <Button color={getColors()}
-                        disabled={proposal.isDisputed}
-                        outline={proposal.isDisputed} className={`align-self-center mb-2 ms-3`}
-                        onClick={(ev) => {
-                          ev.stopPropagation();
-                          handleDispute(+proposal._id)
-                        }}>
-                  {getLabel()}
-                </Button>
-              </div>
-
+              
+                <div className="col-1 offset-1 justify-content-end d-flex">
+                  <ReadOnlyButtonWrapper>
+                    <Button color={getColors()}
+                            disabled={!isDisputable}
+                            outline={!isDisputable} className={`align-self-center mb-2 ms-3 read-only-button`}
+                            onClick={(ev) => {
+                              ev.stopPropagation();
+                              handleDispute(+proposal._id)
+                            }}>
+                      {!isDisputable && getColors() !== 'success' && <LockedIcon className={`me-2 text-${getColors()}`}/>}
+                      <span>{getLabel()}</span>
+                    </Button>
+                  </ReadOnlyButtonWrapper>
+                </div>
+              
             </div>
           </div>
         </a>

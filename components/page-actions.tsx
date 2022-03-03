@@ -18,7 +18,12 @@ import {useRouter} from 'next/router';
 import useApi from '@x-hooks/use-api';
 import useTransactions from '@x-hooks/useTransactions';
 import LockedIcon from "@assets/icons/locked-icon";
-import { ProposalData } from "@services/github-microservice";
+import { ProposalData } from "@interfaces/api-response";
+import Translation from "./translation";
+import { useTranslation } from "next-i18next";
+import { useNetwork } from "@contexts/network";
+import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
+import { IForkInfo } from "@interfaces/repos-list";
 
 interface pageActions {
   issueId: string;
@@ -30,7 +35,7 @@ interface pageActions {
   pullRequests?: pullRequest[];
   mergeProposals?: ProposalData[];
   amountIssue?: string | number;
-  forks?: { owner: developer }[];
+  forks?: IForkInfo[];
   title?: string;
   description?: string;
   handleMicroService?: (force?: boolean) => void;
@@ -48,6 +53,8 @@ interface pageActions {
   repoPath?: string;
   addNewComment?: (comment: any) => void;
   issueRepo?: string;
+  isDisputable?: boolean;
+  onCloseEvent?: () => Promise<any>;
 }
 
 export default function PageActions({
@@ -77,6 +84,8 @@ export default function PageActions({
   repoPath = ``,
   addNewComment,
   issueCreator,
+  isDisputable = false,
+  onCloseEvent,
 }: pageActions) {
   const {
     dispatch,
@@ -84,17 +93,19 @@ export default function PageActions({
   } = useContext(ApplicationContext);
   const {query: {repoId, id}} = useRouter();
   const {createPullRequestIssue, waitForRedeem, waitForClose, processEvent, startWorking} = useApi();
+  const { t } = useTranslation(['common', 'pull-request', 'bounty'])
 
   const [showPRModal, setShowPRModal] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
 
   const txWindow = useTransactions();
+  const { activeNetwork } = useNetwork()
 
   function renderIssueAvatars() {
     if (developers?.length > 0) return <IssueAvatars users={developers} />;
 
     if (developers?.length && state.toLowerCase() !== "draft")
-      return <p className="p-small me-2 mt-3">no one is working </p>;
+      return <p className="p-small me-2 mt-3"><Translation ns="bounty" label="errors.no-workers" /></p>;
   }
 
   function renderForkAvatars() {
@@ -105,16 +116,16 @@ export default function PageActions({
           href={`https://github.com/${repoPath}/network/members`}
           target="_blank"
         >
-          <IssueAvatars users={forks.map((item) => item.owner)} />
-          <span className="me-3 fs-small">Forks</span>
+          <IssueAvatars users={forks} />
+          <span className="me-3 caption-small"><Translation label="misc.forks" /></span>
         </a>
       );
     }
   }
 
   const isClosedIssue = (state: IssueState | string): Boolean =>
-    state.toLocaleLowerCase() === "closed" ||
-    state.toLocaleLowerCase() === "redeemed";
+    state?.toLocaleLowerCase() === "closed" ||
+    state?.toLocaleLowerCase() === "redeemed";
   const isReedemButtonDisable = () =>
     [
       !myTransactions.find(
@@ -125,11 +136,11 @@ export default function PageActions({
     ].some((values) => values === false);
 
   async function handleRedeem() {
-    const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue });
+    const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue }, activeNetwork);
     dispatch(redeemTx);
-    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
 
-    waitForRedeem(issueId)
+    waitForRedeem(issueId, activeNetwork?.name)
       .then(() => {
         if (handleBeproService)
           handleBeproService(true);
@@ -140,7 +151,7 @@ export default function PageActions({
 
     await BeproService.login()
       .then(() => {
-        BeproService.network.redeemIssue({ issueId: issue_id })
+        BeproService.network.redeemIssue(issue_id)
                     .then((txInfo) => {
                       processEvent(`redeem-issue`, txInfo.blockNumber, issue_id);
                       txWindow.updateItem(redeemTx.payload.id, BeproService.parseTransaction(txInfo, redeemTx.payload));
@@ -157,7 +168,7 @@ export default function PageActions({
                         dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
                       else dispatch(updateTransaction({...redeemTx.payload as any, status: TransactionStatus.failed}));
                       console.error(`Error redeeming`, err);
-                    });
+                    })
       }).catch((err) => {
         if (err?.message?.search(`User denied`) > -1)
           dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
@@ -171,12 +182,15 @@ export default function PageActions({
       isIssueinDraft &&
       issueCreator === currentAddress &&
       !finalized && (
-        <Button
-          disabled={isReedemButtonDisable()}
-          onClick={handleRedeem}
-        >
-          Redeem
-        </Button>
+        <ReadOnlyButtonWrapper>
+          <Button
+          className="read-only-button"
+            disabled={isReedemButtonDisable()}
+            onClick={handleRedeem}
+          >
+              <Translation ns="bounty" label="actions.redeem" />
+          </Button>
+        </ReadOnlyButtonWrapper>
       )
     );
   };
@@ -191,7 +205,6 @@ export default function PageActions({
                                   amountTotal={amountIssue}
                                   mergeProposals={mergeProposals}
                                   pullRequests={pullRequests}
-                                  handleBeproService={handleBeproService}
                                   handleMicroService={handleMicroService}/>
     );
   }
@@ -206,9 +219,11 @@ export default function PageActions({
       isRepoForked &&
       isWorking &&
       githubLogin && (
-        <Button onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || hasOpenPR}>
-          Create Pull Request
+        <ReadOnlyButtonWrapper>
+        <Button className="mr-1 read-only-button" onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || hasOpenPR}>
+          <Translation ns="pull-request" label="actions.create.title" />
         </Button>
+        </ReadOnlyButtonWrapper>
       )
     );
   }
@@ -226,7 +241,7 @@ export default function PageActions({
         hrefPath="fork"
         color="primary"
       >
-        Fork this repository
+        <Translation label="actions.fork-repository" />
       </GithubLink>
     )
   }
@@ -239,14 +254,17 @@ export default function PageActions({
       !finished &&
       !finalized &&
       githubLogin &&
+      <ReadOnlyButtonWrapper>
       <Button
         color="primary"
         onClick={handleStartWorking}
+        className="mr-1 read-only-button"
         disabled={isExecuting}
       >
-        <span>Start Working</span>
+        <span><Translation ns="bounty" label="actions.start-working.title" /></span>
         {isExecuting ? <span className="spinner-border spinner-border-xs ml-1"/> : ''}
       </Button>
+      </ReadOnlyButtonWrapper>
     )
   }
 
@@ -255,60 +273,64 @@ export default function PageActions({
       !isIssueinDraft &&
       hasOpenPR &&
       githubLogin &&
-      <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`pull/${pullRequests?.find(pr => pr.githubLogin === githubLogin)?.githubId || ""}`} color="primary">View Pull Request</GithubLink>
+      <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`pull/${pullRequests?.find(pr => pr.githubLogin === githubLogin)?.githubId || ""}`} color="primary"><Translation ns="pull-request" label="actions.view" /></GithubLink>
     )
   }
 
-  async function handlePullrequest({title: prTitle, description: prDescription, branch}) {
+  async function handlePullrequest({title: prTitle, description: prDescription, branch}): Promise<void> {
+    return new Promise((resolve, reject) => {
+        createPullRequestIssue(repoId as string, githubId, {title: prTitle, description: prDescription, username: githubLogin, branch})
+        .then(() => {
+          dispatch(
+            addToast({
+              type: "success",
+              title: t('actions.success'),
+              content: t('pull-request:actions.create.success'),
+            })
+          );
 
-    createPullRequestIssue(repoId as string, githubId, {title: prTitle, description: prDescription, username: githubLogin, branch})
-      .then(() => {
-        dispatch(
-          addToast({
-            type: "success",
-            title: "Success",
-            content: "Created pull request",
-          })
-        );
+          if (handleMicroService)
+            handleMicroService(true);
 
-        if (handleMicroService)
-          handleMicroService(true);
-
-        setShowPRModal(false);
-      })
-      .catch((err) => {
-        if (err.response?.status === 422 && err.response?.data) {
-          err.response?.data.errors?.map((item) =>
+          setShowPRModal(false);
+          resolve()
+        })
+        .catch((err) => {
+          if (err.response?.status === 422 && err.response?.data) {
+            err.response?.data.errors?.map((item) =>
+              dispatch(
+                addToast({
+                  type: "danger",
+                  title: t('actions.failed'),
+                  content: item.message,
+                })
+              )
+            );
+            reject(err)
+          } else {
             dispatch(
               addToast({
                 type: "danger",
-                title: "Failed",
-                content: item.message,
+                title: t('actions.failed'),
+                content: t('pull-request:actions.create.error'),
               })
-            )
-          );
-        } else {
-          dispatch(
-            addToast({
-              type: "danger",
-              title: "Failed",
-              content: "To create pull request",
-            })
-          );
-        }
-      });
+            );
+            reject()
+          }
+        });
+    }) 
   }
 
   async function handleStartWorking() {
     setIsExecuting(true)
 
-    startWorking(networkCID, githubLogin)
+    startWorking(networkCID, githubLogin, activeNetwork?.name)
       .then((response) => {
         dispatch(
           addToast({
             type: "success",
-            title: "Success",
-            content: "To start working on this bounty",
+            title: t('actions.success'),
+            content: t('bounty:actions.start-working.success'),
           })
         )
 
@@ -321,11 +343,12 @@ export default function PageActions({
         setIsExecuting(false)
       })
       .catch((error) => {
+        console.log(`Failed to start working`, error)
         dispatch(
           addToast({
             type: "danger",
-            title: "Failed",
-            content: "To start working on this bounty",
+            title: t('actions.failed'),
+            content: t('bounty:actions.start-working.error'),
           })
         )
 
@@ -334,14 +357,15 @@ export default function PageActions({
   }
 
   async function handleDispute() {
-    const disputeTx = addTransaction({ type: TransactionTypes.dispute });
+    const disputeTx = addTransaction({ type: TransactionTypes.dispute }, activeNetwork);
     dispatch(disputeTx);
 
-    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
 
     await BeproService.network
-      .disputeMerge({ issueID: issue_id, mergeID: mergeId })
+      .disputeMerge(issue_id, +mergeId)
       .then((txInfo) => {
+        processEvent(`dispute-proposal`, txInfo.blockNumber, issue_id);
         txWindow.updateItem(disputeTx.payload.id, BeproService.parseTransaction(txInfo, disputeTx.payload));
       })
       .then(() => handleBeproService())
@@ -355,12 +379,13 @@ export default function PageActions({
   }
 
   async function handleClose() {
-    const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue });
+   
+    const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue }, activeNetwork);
     dispatch(closeIssueTx);
 
-    const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
+    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
 
-    waitForClose(issueId)
+    waitForClose(issueId, activeNetwork?.name)
       .then(() => {
         if (handleBeproService)
           handleBeproService(true);
@@ -370,9 +395,11 @@ export default function PageActions({
       })
 
     await BeproService.network
-      .closeIssue({ issueID: issue_id, mergeID: mergeId })
+      .closeIssue(issue_id, +mergeId)
       .then((txInfo) => {
-        processEvent(`close-issue`, txInfo.blockNumber, issue_id);
+        processEvent(`close-issue`, txInfo.blockNumber, issue_id).then(async () =>{
+          await onCloseEvent?.()
+        })
         txWindow.updateItem(closeIssueTx.payload.id, BeproService.parseTransaction(txInfo, closeIssueTx.payload));
         // return BeproService.parseTransaction(txInfo, closeIssueTx.payload).then(
         //   (block) => dispatch(updateTransaction(block))
@@ -391,9 +418,9 @@ export default function PageActions({
       <div className="row justify-content-center">
         <div className="col-md-10">
           <div className="d-flex align-items-center justify-content-between mb-4">
-            <h4 className="h4 d-flex align-items-center">Details</h4>
+            <h4 className="h4 d-flex align-items-center">{t('misc.details')}</h4>
             <div className="d-flex align-items-center">
-              {!canClose && !finalized && <span className="mr-2 text-uppercase smallCaption text-danger">Pull request has merge conflicts and can't be merged</span> || ``}
+              {!canClose && !finalized && <span className="mr-2 caption-small text-danger">{t('pull-request:errors.merge-conflicts')}</span> || ``}
               {renderIssueAvatars()}
               {forks && renderForkAvatars()}
 
@@ -405,17 +432,17 @@ export default function PageActions({
               {renderProposeDestribution()}
               {state?.toLowerCase() == "pull request" && (
                 <>
-                  { (!isDisputed && !finalized ) && <Button color={`${isDisputed ? 'primary': 'purple'}`} onClick={handleDispute}>Dispute</Button> || ``}
-                  {!finalized && <Button disabled={!canClose} onClick={handleClose}>
-                  {!canClose && <LockedIcon width={12} height={12} className="mr-1"/>}
-                    <span> Merge </span>
-                    </Button> || ``}
+                  { (!isDisputed && !finalized && isDisputable ) && <ReadOnlyButtonWrapper><Button color={`${isDisputed ? 'primary': 'purple'}`} className="read-only-button mr-1" onClick={handleDispute}>{t('actions.dispute')}</Button></ReadOnlyButtonWrapper> || ``}
+                  {!finalized && <ReadOnlyButtonWrapper><Button className="read-only-button mr-1" disabled={!canClose || isDisputable} onClick={handleClose}>
+                  {!canClose || isDisputable && <LockedIcon width={12} height={12} className="mr-1"/>}
+                    <span>{t('pull-request:actions.merge.title')}</span>
+                    </Button></ReadOnlyButtonWrapper> || ``}
                 </>
               )}
 
               {renderViewPullrequest()}
 
-              <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`${state?.toLowerCase() === 'pull request' && 'pull' || 'issues' }/${githubId || ""}`}>view on github</GithubLink>
+              <GithubLink repoId={String(repoId)} forcePath={repoPath} hrefPath={`${state?.toLowerCase() === 'pull request' && 'pull' || 'issues' }/${githubId || ""}`}>{t('actions.view-on-github')}</GithubLink>
 
             </div>
           </div>

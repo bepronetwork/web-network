@@ -1,13 +1,41 @@
-import {useRouter} from 'next/router';
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 
 export default function usePage() {
-  const [page, setPage] = useState('1');
-  const {query} = useRouter();
+  const [pageState, setPageState] = useState('1')
+  const router = useRouter()
+  const { page } = router.query
 
   useEffect(() => {
-    setPage(query?.page as string || '1');
-  }, [query])
+    setPageState(String(page || 1))
+  }, [page])
 
-  return page;
+  function setPage(newPage: number) {
+    router.push(
+      {
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          page: String(newPage)
+        }
+      },
+      router.asPath,
+      { shallow: false, scroll: false }
+    )
+  }
+
+  function nextPage() {
+    setPage(+(page || 1) + 1)
+  }
+
+  function goToFirstPage() {
+    setPage(1)
+  }
+
+  return {
+    page: pageState,
+    setPage,
+    nextPage,
+    goToFirstPage
+  }
 }

@@ -1,9 +1,13 @@
-import useRepos from '@x-hooks/use-repos'
 import { GetStaticProps } from 'next'
+import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
-import Avatar from './avatar'
-import GithubInfo from './github-info'
-import InternalLink from './internal-link'
+import PullRequestLabels, { PRLabel } from './pull-request-labels'
+
+import Avatar from 'components/avatar'
+import GithubInfo from 'components/github-info'
+import InternalLink from 'components/internal-link'
+import { useRepos } from '@contexts/repos'
+import useNetwork from 'x-hooks/use-network'
 
 export default function PullRequestHero({
   githubId,
@@ -11,12 +15,22 @@ export default function PullRequestHero({
   pullRequestId,
   authorPullRequest,
   createdAt,
-  beproStaked
+  beproStaked,
+  pullRequest
 }) {
   const router = useRouter()
   const { issueId: issueCID } = router.query
   const [repoId, issueId] = (issueCID as string).split(`/`)
-  const [[activeRepo]] = useRepos()
+  const {activeRepo} = useRepos()
+  const { t } = useTranslation(['common', 'pull-request'])
+  const { getURLWithNetwork } = useNetwork()
+
+  function getLabel(): PRLabel{
+    if(pullRequest?.merged) return 'merged';
+    if(pullRequest?.isMergeable) return 'ready to merge';
+    //isMergeable can be null;
+    return 'conflicts'
+  }
 
   return (
     <div className="banner bg-bepro-blue mb-4">
@@ -27,34 +41,37 @@ export default function PullRequestHero({
               <div className="d-flex align-items-center cursor-pointer text-truncate">
                 <InternalLink
                   iconBefore={true}
-                  href={{ pathname: '/bounty', query: { id: issueId, repoId } }}
+                  href={getURLWithNetwork('/bounty', { id: issueId, repoId })}
                   icon={<i className="ico-back me-2" />}
                   label={`#${githubId} ${title}`}
-                  className="p-nm mediumCaption"
+                  className="p-nm caption"
                   transparent
                 />
               </div>
               <div className="row">
                 <div className="col-md-9">
                   <div className="top-border">
-                    <h1 className="h4 mb-3">Pull Request #{pullRequestId}</h1>
+                    <div className="d-flex flex-row align-items-center mb-3 gap-20">
+                      <h1 className="h4">{t('pull-request:label')} #{pullRequestId}</h1> 
+                      <PullRequestLabels label={getLabel()} hero />
+                    </div>
                     <div className="d-flex align-items-center flex-wrap justify-content-center justify-content-md-start">
-                      <span className="p-small mr-2">
-                        Created at {createdAt}
+                      <span className="caption-small text-gray mr-2">
+                        {t('misc.created-at')} {createdAt}
                       </span>
 
                       <GithubInfo
-                        color="primary"
-                        bgColor="white"
-                        value={activeRepo?.githubPath?.split('/')[1]}
+                        parent="hero"
+                        variant="repository"
+                        label={activeRepo?.githubPath?.split('/')[1]}
                       />
 
-                      <span className="p-small ml-2 mr-2">BY</span>
+                      <span className="caption-small text-gray ml-2 mr-2">{t('misc.by')}</span>
 
                       <GithubInfo
-                        color="white"
-                        bgColor="primary"
-                        value={`@${authorPullRequest}`}
+                        parent="hero"
+                        variant="user"
+                        label={`@${authorPullRequest}`}
                       />
 
                       <Avatar className="ml-2" userLogin={authorPullRequest} />
@@ -65,7 +82,7 @@ export default function PullRequestHero({
                   <div className="banner-highlight">
                     <h4 className="h4 mb-0">
                       {beproStaked}{' '}
-                      <span className="p-small trans">$BEPRO</span>
+                      <span className="p-small trans">{t('$bepro')}</span>
                     </h4>
                   </div>
                 </div>
