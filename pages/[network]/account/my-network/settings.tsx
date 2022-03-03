@@ -24,7 +24,7 @@ import { formatDate } from '@helpers/formatDate'
 import { isColorsSimilar } from '@helpers/colors'
 import { psReadAsText } from '@helpers/file-reader'
 import { formatNumberToCurrency } from '@helpers/formatNumber'
-import { DefaultNetworkInformation } from '@helpers/custom-network'
+import { DefaultNetworkInformation, handleNetworkAddress } from '@helpers/custom-network'
 import { getQueryableText, urlWithoutProtocol } from '@helpers/string'
 
 import { BeproService } from '@services/bepro-service'
@@ -43,7 +43,8 @@ import {
   COUNCIL_AMOUNT_MAX,
   DISPUTABLE_TIME_MAX,
   DISPUTABLE_TIME_MIN,
-  DISPUTE_PERCENTAGE_MAX
+  DISPUTE_PERCENTAGE_MAX,
+  BEPRO_NETWORK_NAME
 } from 'env'
 import { useNetwork } from '@contexts/network'
 interface NetworkAmounts {
@@ -151,10 +152,10 @@ export default function Settings() {
     setNewInfo(tmpInfo3)
   }
 
-  async function loadAmounts() {
+  async function loadAmounts(networkArg) {
     try {
-      const tokenStaked = await BeproService.getTokensStaked()
-      const oraclesStaked = await BeproService.getBeproLocked()
+      const tokenStaked = await BeproService.getTokensStaked(handleNetworkAddress(networkArg))
+      const oraclesStaked = await BeproService.getBeproLocked(handleNetworkAddress(networkArg))
 
       setNetworkAmounts({
         tokenStaked,
@@ -370,7 +371,7 @@ export default function Settings() {
   }
 
   useEffect(() => {
-    if (!BeproService.isStarted || !network || !currentAddress || !githubLogin)
+    if (!BeproService.isStarted || !network || !currentAddress || !githubLogin || network?.name?.toLowerCase() === BEPRO_NETWORK_NAME)
       return
 
     BeproService.isNetworkAbleToClose(network.networkAddress)
@@ -384,7 +385,7 @@ export default function Settings() {
         if (!result) router.push(getURLWithNetwork('/account'))
         else {
           loadData()
-          loadAmounts()
+          loadAmounts(network)
         }
       })
       .catch((error) => {
