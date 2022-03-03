@@ -353,6 +353,8 @@ export default function Settings() {
             content: t('custom-network:messages.network-closed')
           })
         )
+
+        router.push(getURLWithNetwork('/account/my-network'))
       })
       .catch((error) => {
         dispatch(
