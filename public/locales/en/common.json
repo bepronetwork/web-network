@@ -120,7 +120,8 @@
     "upload": "upload",
     "token": "token",
     "creation-date": "creation date",
-    "seconds": "seconds"
+    "seconds": "seconds",
+    "on": "on"
   },
   "modals": {
     "help-modal": {
