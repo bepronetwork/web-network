@@ -5,6 +5,7 @@ import {formatNumberToCurrency} from 'helpers/formatNumber'
 import {BeproService} from '@services/bepro-service';
 import Translation from "@components/translation";
 import useNetwork from "@x-hooks/use-network";
+import { handleNetworkAddress } from "@helpers/custom-network";
 
 interface PageHeroProps {
   title?: string | ReactElement
@@ -22,10 +23,9 @@ export default function PageHero({ title = <Translation label={'heroes.find-boun
     if (!beproInit || !network)
       return;
 
-
-    BeproService.getClosedIssues(network.networkAddress).then(setClosed);
-    BeproService.getOpenIssues(network.networkAddress).then(setInProgress);
-    BeproService.getTokensStaked(network.networkAddress).then(setOnNetwork);
+    BeproService.getClosedIssues(handleNetworkAddress(network)).then(setClosed);
+    BeproService.getOpenIssues(handleNetworkAddress(network)).then(setInProgress);
+    BeproService.getTokensStaked(handleNetworkAddress(network)).then(setOnNetwork);
 
   }
 
