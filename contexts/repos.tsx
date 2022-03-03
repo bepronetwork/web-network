@@ -110,14 +110,14 @@ export const ReposProvider: React.FC = function ({ children }) {
 
     const noExpired =
       +new Date() - repoList[activeNetwork?.name]?.lastUpdated <= TTL;
-    debugger;
+  
     if (repoList[activeNetwork?.name] && noExpired)
       return repoList[activeNetwork?.name].repos;
 
     dispatch(changeLoadState(true));
 
     const repos = (await getReposList(false, activeNetwork?.name)) as ReposList;
-    debugger;
+
     if (!repos) throw new Error(`Repos not found`);
 
     setRepoList((prevState) => ({
