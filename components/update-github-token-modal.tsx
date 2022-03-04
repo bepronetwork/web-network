@@ -1,5 +1,6 @@
 import { setCookie } from 'nookies'
 import { signIn } from 'next-auth/react'
+import { useTranslation } from 'next-i18next'
 
 import Modal from '@components/modal'
 import Button from '@components/button'
@@ -12,6 +13,8 @@ export default function UpdateGithubTokenModal({
   isVisible = false,
   setVisible = (show: boolean) => {}
 }) {
+  const { t } = useTranslation(['common', 'custom-network'])
+
   const {
     state: { currentAddress }
   } = useContext(ApplicationContext)
@@ -32,7 +35,7 @@ export default function UpdateGithubTokenModal({
   return (
     <Modal
       show={isVisible}
-      title={`Update your Github Token`}
+      title={t('custom-network:modals.update-github-token.title')}
       centerTitle
       onCloseClick={handleClose}
     >
@@ -42,11 +45,11 @@ export default function UpdateGithubTokenModal({
         </div>
         <div className="d-flex justify-content-center mt-3">
           <Button color="primary" onClick={handleConfirm}>
-            <span>Update now</span>
+            <span>{t('custom-network:modals.update-github-token.update-now')}</span>
           </Button>
 
           <Button color="dark-gray" onClick={handleClose}>
-            <span>Cancel</span>
+            <span>{t('actions.cancel')}</span>
           </Button>
         </div>
       </div>

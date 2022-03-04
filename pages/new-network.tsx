@@ -321,7 +321,7 @@ export default function NewNetwork() {
       <UpdateGithubTokenModal
         isVisible={isModalTokenVisible}
         setVisible={setIsModalTokenVisible}
-        description="To create your custom network we need permission to access your repositories"
+        description={t('custom-network:modals.update-github-token.description')}
         redirectTo={`${window.location.protocol}//${window.location.host}/new-network`}
       />
 
