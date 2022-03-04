@@ -1,5 +1,6 @@
 import { INetwork, ThemeColors } from '@interfaces/network'
-import { BEPRO_NETWORK_NAME } from 'env'
+
+import { BEPRO_NETWORK_NAME, CONTRACT_ADDRESS } from 'env'
 
 export const DefaultNetworkInformation = {
   lock: {
@@ -39,5 +40,7 @@ export const DefaultNetworkInformation = {
 }
 
 export const handleNetworkAddress = (network: INetwork) => {
-  return network?.name === BEPRO_NETWORK_NAME ? undefined : network?.networkAddress
+  return network?.name === BEPRO_NETWORK_NAME
+    ? CONTRACT_ADDRESS
+    : network?.networkAddress
 }
