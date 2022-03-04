@@ -74,6 +74,11 @@
     "loader": {
       "being-prepared": "Your network is being prepared",
       "dont-close-window": "Please, don't close this window"
+    },
+    "update-github-token": {
+      "title": "Update your Github Token",
+      "description": "To create your custom network we need permission to access your repositories",
+      "update-now": "Update now"
     }
   },
   "messages": {
