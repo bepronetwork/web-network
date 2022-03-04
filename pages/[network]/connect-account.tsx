@@ -157,7 +157,6 @@ export default function ConnectAccount() {
   }
 
   function setGhLoginBySession() {
-    console.log(`session`, session, githubLogin);
     if((session?.user.name || (session?.user as any)?.login) !== githubLogin){
       setGithubLogin(session?.user?.name || (session?.user as any)?.login)
     }

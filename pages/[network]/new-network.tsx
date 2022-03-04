@@ -1,6 +1,8 @@
+import { parseCookies } from 'nookies'
 import { useRouter } from 'next/router'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
+import { useTranslation } from 'next-i18next'
 import { useContext, useEffect, useState } from 'react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
@@ -8,6 +10,7 @@ import Stepper from '@components/stepper'
 import CustomContainer from '@components/custom-container'
 import ConnectWalletButton from '@components/connect-wallet-button'
 import CreatingNetworkLoader from '@components/creating-network-loader'
+import UpdateGithubTokenModal from '@components/update-github-token-modal'
 
 import LockBeproStep from '@components/custom-network/lock-bepro-step'
 import NetworkInformationStep from '@components/custom-network/network-information-step'
@@ -28,7 +31,6 @@ import useNetwork from '@x-hooks/use-network'
 import useOctokit from '@x-hooks/use-octokit'
 
 import { BEPRO_NETWORK_NAME } from 'env'
-import { useTranslation } from 'next-i18next'
 
 export default function NewNetwork() {
   const router = useRouter()
@@ -38,6 +40,7 @@ export default function NewNetwork() {
   const [currentStep, setCurrentStep] = useState(1)
   const [creatingNetwork, setCreatingNetwork] = useState(false)
   const [steps, setSteps] = useState(DefaultNetworkInformation)
+  const [isModalTokenVisible, setIsModalTokenVisible] = useState(false)
 
   const { createNetwork } = useApi()
   const { listUserRepos } = useOctokit()
@@ -47,7 +50,6 @@ export default function NewNetwork() {
     dispatch,
     state: { currentAddress, githubLogin, balance, oracles, beproInit }
   } = useContext(ApplicationContext)
-
 
   function changeColor(newColor) {
     const tmpSteps = Object.assign({}, steps)
@@ -118,8 +120,8 @@ export default function NewNetwork() {
 
     BeproService.createNetwork()
       .then((receipt) => {
-        BeproService.getNetworkAdressByCreator(currentAddress)
-          .then(async (networkAddress) => {
+        BeproService.getNetworkAdressByCreator(currentAddress).then(
+          async (networkAddress) => {
             const networkData = steps.network.data
             const repositoriesData = steps.repositories
 
@@ -151,14 +153,17 @@ export default function NewNetwork() {
 
               setCreatingNetwork(false)
             })
-          })
+          }
+        )
       })
       .catch((error) => {
         dispatch(
           addToast({
             type: 'danger',
             title: t('actions.failed'),
-            content: t('custom-network:errors.failed-to-create-network', {error})
+            content: t('custom-network:errors.failed-to-create-network', {
+              error
+            })
           })
         )
 
@@ -212,6 +217,11 @@ export default function NewNetwork() {
         label: 'amountNeeded',
         value: BeproService.operatorAmount
       })
+
+      const cookies = parseCookies()
+
+      if (!cookies[`updated-github-token:${currentAddress}`])
+        setIsModalTokenVisible(true)
     }
   }, [currentAddress, beproInit])
 
@@ -307,6 +317,15 @@ export default function NewNetwork() {
       <ConnectWalletButton asModal={true} />
 
       {(creatingNetwork && <CreatingNetworkLoader />) || ''}
+
+      <UpdateGithubTokenModal
+        isVisible={isModalTokenVisible}
+        setVisible={setIsModalTokenVisible}
+        description="To create your custom network we need permission to access your repositories"
+        redirectTo={`${window.location.protocol}//${
+          window.location.host
+        }/${network.name.toLowerCase()}/new-network`}
+      />
 
       <CustomContainer>
         <div className="mt-5 pt-5">

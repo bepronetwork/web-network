@@ -307,7 +307,7 @@ export default function LockBeproStep({
               )}
             </Button>
 
-            {/* <Button onClick={handleUnLock}>Unlock</Button> */}
+            <Button onClick={handleUnLock}>Unlock</Button>
           </div>
         </div>
       </div>

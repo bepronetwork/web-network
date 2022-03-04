@@ -27,6 +27,8 @@ import { changeSettlerTokenApproval } from './reducers/change-settler-token-appr
 import {setCookie, parseCookies} from 'nookies'
 import { addTransaction } from './reducers/add-transaction';
 import { changeLoadState } from './reducers/change-load-state';
+import { BEPRO_NETWORK_NAME } from 'env';
+import { handleNetworkAddress } from '@helpers/custom-network';
 
 interface GlobalState {
   state: ApplicationState,
@@ -137,7 +139,7 @@ export default function ApplicationContextProvider({children}) {
   const Initialize = () => {    
     dispatch(changeLoadState(true))
 
-    BeproService.start(activeNetwork?.networkAddress)
+    BeproService.start(handleNetworkAddress(activeNetwork))
                 .then((state) => {
                   dispatch(changeBeproInitState(state))
                   updateWalletBalance()
@@ -205,7 +207,7 @@ export default function ApplicationContextProvider({children}) {
 
   const restoreTransactions = async (address)=>{
     const cookie = parseCookies()
-    const transactions = JSON.parse(cookie[`bepro.transactions:${address}`])
+    const transactions = JSON.parse(cookie[`bepro.transactions:${address}`] ? cookie[`bepro.transactions:${address}`] : '[]')
     const web3 = (window as any).web3;
 
     const getStatusFromBlock = async (tx) => {

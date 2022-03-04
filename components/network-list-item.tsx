@@ -18,6 +18,7 @@ import useApi from '@x-hooks/use-api'
 import useNetwork from '@x-hooks/use-network'
 
 import { BEPRO_NETWORK_NAME, IPFS_BASE } from 'env'
+import { handleNetworkAddress } from '@helpers/custom-network'
 interface NetworkListItemProps {
   network: INetwork
   redirectToHome?: boolean
@@ -49,19 +50,19 @@ export default function NetworkListItem({
   }
 
   useEffect(() => {
-    BeproService.getTransactionalTokenName(network.networkAddress)
+    BeproService.getTransactionalTokenName(handleNetworkAddress(network))
       .then(name => {
         updateNetworkParameter(network.name, 'tokenName', name)
       })
       .catch(console.log)
 
-    BeproService.getBeproLocked(network.networkAddress)
+    BeproService.getBeproLocked(handleNetworkAddress(network))
       .then(amount => {
         updateNetworkParameter(network.name, 'tokensLocked', amount)
       })
       .catch(console.log)
 
-    BeproService.getOpenIssues(network.networkAddress)
+    BeproService.getOpenIssues(handleNetworkAddress(network))
       .then((quantity) => {
         updateNetworkParameter(network.name, 'openBountiesQuantity', quantity)
 
@@ -75,14 +76,14 @@ export default function NetworkListItem({
       })
       .catch(console.log)
 
-    BeproService.getTokensStaked(network.networkAddress)
+    BeproService.getTokensStaked(handleNetworkAddress(network))
       .then((amount) => {
         updateNetworkParameter(network.name, 'openBountiesAmount', amount)
 
         return amount
       })
       .then((amount) => {
-        BeproService.getNetworkObj(network.networkAddress).then(
+        BeproService.getNetworkObj(handleNetworkAddress(network)).then(
           (networkObj) => {
             getBeproCurrency(networkObj.transactionToken.contractAddress).then(
               ({ usd }) => {
