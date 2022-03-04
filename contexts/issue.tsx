@@ -7,8 +7,8 @@ import React, {
   useEffect
 } from 'react';
 
-import { IssueData, INetworkIssue ,pullRequest, Comment } from '@interfaces/issue-data';
-import { BeproService } from '@services/bepro-service';
+import { IssueData, INetworkIssue ,pullRequest, Comment } from 'interfaces/issue-data';
+import { BeproService } from 'services/bepro-service';
 
 import useApi from 'x-hooks/use-api';
 import useOctokit from 'x-hooks/use-octokit';
@@ -26,7 +26,6 @@ export interface IssueContextData {
   getNetworkIssue: ()=> void;
 }
 
-
 const IssueContext = createContext<IssueContextData>({} as IssueContextData);
 
 export const IssueProvider: React.FC = function ({ children }) {
@@ -42,16 +41,19 @@ export const IssueProvider: React.FC = function ({ children }) {
   // Move currentAdress and githubLogin to UserHook
   const { state: { currentAddress, githubLogin }} = useContext(ApplicationContext);
 
-  const updatePullRequests = useCallback(async(prs: pullRequest[], githubPath: string)=>{
-    const mapPr = prs.map(async(pr)=>{
-      const {data} = await getPullRequest(Number(pr.githubId), githubPath)
-      pr.isMergeable = data.mergeable;
-      pr.merged = data.merged;
-      return pr;
-    })
+  const updatePullRequests = useCallback(
+    async (prs: pullRequest[], githubPath: string) => {
+      const mapPr = prs.map(async (pr) => {
+        const { data } = await getPullRequest(Number(pr.githubId), githubPath);
+        pr.isMergeable = data.mergeable;
+        pr.merged = data.merged;
+        return pr;
+      });
 
-    return await Promise.all(mapPr);
-  },[])
+      return await Promise.all(mapPr);
+    },
+    []
+  );
 
   const updateIssue = useCallback(
     async (repoId: string, ghId: string): Promise<IActiveIssue> => {
@@ -83,37 +85,39 @@ export const IssueProvider: React.FC = function ({ children }) {
   );
 
   const getNetworkIssue = useCallback(async () => {
-    if(!currentAddress || !activeIssue?.issueId) return;
-    
-    const network = await BeproService.network.getIssueByCID(activeIssue?.issueId)
-    
+    if (!currentAddress || !activeIssue?.issueId) return;
+
+    const network = await BeproService.network.getIssueByCID(
+      activeIssue?.issueId
+    );
+
     let isDraft = null;
     try {
-      isDraft = await BeproService.network.isIssueInDraft(network?._id)  
+      isDraft = await BeproService.network.isIssueInDraft(network?._id);
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
 
-    setNetworkIssue({...network, isDraft})
+    setNetworkIssue({ ...network, isDraft });
     return network;
-  },[activeIssue, currentAddress])
+  }, [activeIssue, currentAddress]);
 
-  useEffect(()=>{
-    if(activeIssue && currentAddress){
-      getNetworkIssue()
+  useEffect(() => {
+    if (activeIssue && currentAddress) {
+      getNetworkIssue();
     }
-  },[activeIssue, currentAddress])
+  }, [activeIssue, currentAddress]);
 
-  useEffect(()=>{
-    if(query.id && query.repoId && activeNetwork) {
+  useEffect(() => {
+    if (query.id && query.repoId && activeNetwork) {
       setActiveIssue(null);
-      updateIssue(`${query.repoId}`,`${query.id}`)
-    };
-  },[query, activeNetwork])
+      updateIssue(`${query.repoId}`, `${query.id}`);
+    }
+  }, [query, activeNetwork]);
 
-  useEffect(()=>{
-    console.warn('useIssue',{activeIssue, networkIssue})
-  },[activeIssue, networkIssue])
+  useEffect(() => {
+    console.warn("useIssue", { activeIssue, networkIssue });
+  }, [activeIssue, networkIssue]);
 
   const memorizeValue = useMemo<IssueContextData>(
     () => ({

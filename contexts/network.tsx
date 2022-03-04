@@ -7,7 +7,7 @@ import React, {
   useCallback,
   useEffect,
 } from 'react';
-
+import {setCookie, parseCookies} from 'nookies'
 import { BEPRO_NETWORK_NAME } from 'env'
 import useApi from 'x-hooks/use-api';
 import { INetwork } from 'interfaces/network';
@@ -20,42 +20,50 @@ export interface NetworkContextData {
 
 const NetworkContext = createContext<NetworkContextData>({} as NetworkContextData);
 
+const cookieKey = `bepro.network`;
+const expiresCookie = 60 * 60 * 1; // 1 hour
+
 export const NetworkProvider: React.FC = function ({ children }) {
   const [activeNetwork, setActiveNetwork] = useState<INetwork>(null);
 
   const {query, push} = useRouter();
   const { getNetwork } = useApi()
   
-  const updateActiveNetwork = useCallback(()=>{
-    const newNetwork = String(query.network || BEPRO_NETWORK_NAME) 
-    if(activeNetwork?.name === newNetwork) return activeNetwork;
+  const updateActiveNetwork = useCallback(
+    (forced?: boolean) => {
+      const networkName = String(query.network || BEPRO_NETWORK_NAME);
+      if (activeNetwork?.name === networkName && !forced) return activeNetwork;
 
-    const networkFromStorage = localStorage.getItem(newNetwork)
+      const networkFromStorage = parseCookies()[`${cookieKey}:${networkName}`];
+      if (networkFromStorage && !forced) {
+        return setActiveNetwork(JSON.parse(networkFromStorage));
+      }
 
-    if (networkFromStorage) {
-      return setActiveNetwork(JSON.parse(networkFromStorage))
-    }
-    
-    getNetwork(newNetwork)
-      .then(({ data }) => {
-        localStorage.setItem(newNetwork.toLowerCase(), JSON.stringify(data))
-        setActiveNetwork(data)
-      })
-      .catch(error => {
+      getNetwork(networkName)
+        .then(({ data }) => {
+          localStorage.setItem(networkName.toLowerCase(), JSON.stringify(data));
+          setCookie(null, `${cookieKey}:${networkName}`, JSON.stringify(data), {
+            maxAge: expiresCookie, // 1 hour
+            path: "/",
+          });
+          setActiveNetwork(data);
+        })
+        .catch((error) => {
           push({
-            pathname: '/networks'
-          })
-      })
-  },[query, activeNetwork])
+            pathname: "/networks",
+          });
+        });
+    },
+    [query, activeNetwork]
+  );
 
-
-  useEffect(()=>{
+  useEffect(() => {
     updateActiveNetwork();
-  },[query])
+  }, [query]);
 
-  useEffect(()=>{
-    console.warn('useNetwork',{activeNetwork})
-  },[activeNetwork])
+  useEffect(() => {
+    console.warn("useNetwork", { activeNetwork });
+  }, [activeNetwork]);
 
   const memorizeValue = useMemo<NetworkContextData>(
     () => ({

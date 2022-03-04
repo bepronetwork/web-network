@@ -33,15 +33,18 @@ class BeproFacet {
         await this.bepro.start();
       this.network = new Network(this.bepro, customNetworkAddress || CONTRACT_ADDRESS);
       this.erc20 = new ERC20(this.bepro, SETTLER_ADDRESS);
-      this.networkFactory = new NetworkFactory(this.bepro, NETWORK_FACTORY_ADDRESS);
 
       await this.network.loadContract();
       await this.erc20.loadContract();
-      await this.networkFactory.loadContract();
+
+      if (NETWORK_FACTORY_ADDRESS) {
+        this.networkFactory = new NetworkFactory(this.bepro, NETWORK_FACTORY_ADDRESS);
+        await this.networkFactory.loadContract();
+        this.operatorAmount = await this.getOperatorAmount();
+      }
 
       this.started = true
 
-      this.operatorAmount = await this.getOperatorAmount();
     } catch (error) {
       console.log(`Failed to start Bepro Service`, error)
 
