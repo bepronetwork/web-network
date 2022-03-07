@@ -11,24 +11,17 @@ import { signIn, signOut, useSession } from 'next-auth/react'
 
 import InvalidAccountWalletModal from '@components/invalid-account-wallet-modal'
 
-import { IBalance } from '@interfaces/balance-state'
+import { IUser } from '@interfaces/authentication'
+import { IWallet } from '@interfaces/authentication'
 
 import { BeproService } from '@services/bepro-service'
 
 import useApi from '@x-hooks/use-api'
-
-export interface IUser {
-  name?: string
-  login?: string
-  email?: string
-  image?: string
-  address?: string
-  accessToken?: string
-  balance?: IBalance
-}
+import useNetworkTheme from '@x-hooks/use-network'
 
 export interface IAuthenticationContext {
   user?: IUser
+  wallet?: IWallet
   isGithubAndWalletMatched?: boolean
   login: () => void
 }
@@ -37,54 +30,122 @@ const AuthenticationContext = createContext<IAuthenticationContext>(
   {} as IAuthenticationContext
 )
 
+const EXCLUDED_PAGES = ['/networks', '/[network]/connect-account']
+
 export const AuthenticationProvider = ({ children }) => {
   const session = useSession()
-  const { asPath } = useRouter()
+  const { push, asPath, pathname } = useRouter()
 
   const [user, setUser] = useState<IUser>()
+  const [wallet, setWallet] = useState<IWallet>()
+  const [beproServiceStarted, setBeproServiceStarted] = useState(false)
   const [isGithubAndWalletMatched, setIsGithubAndWalletMatched] =
     useState<boolean>()
 
   const { getUserOf } = useApi()
+  const { getURLWithNetwork } = useNetworkTheme()
 
   const login = useCallback(async () => {
-    await signOut({ redirect: false })
+    if (!BeproService.isStarted) return
 
-    await signIn('github', {
-      callbackUrl: `${window.location.protocol}//${window.location.host}/${asPath}`
-    })
+    try {
+      await signOut({ redirect: false })
+
+      await BeproService.login()
+
+      setWallet((previousWallet) => ({
+        ...previousWallet,
+        address: BeproService.address
+      }))
+
+      const savedUser = await getUserOf(BeproService.address)
+
+      if (!savedUser) return push(getURLWithNetwork('/connect-account'))
+
+      return signIn('github', {
+        callbackUrl: `${window.location.protocol}//${window.location.host}/${asPath}`
+      })
+    } catch (error) {
+      console.log('Failed to login', error)
+    }
   }, [asPath])
 
-  const validateWalletAndGithub = useCallback(() => {
-    getUserOf(user.address).then(({ githubLogin }) => {
-      if (githubLogin === user.login) 
-        setIsGithubAndWalletMatched(true)
-      else 
-        setIsGithubAndWalletMatched(false)
-    }).catch(error => {
-      setIsGithubAndWalletMatched(false)
-      console.log(error)
-    })
-  }, [user])
+  const validateWalletAndGithub = useCallback(
+    (address: string) => {
+      getUserOf(address)
+        .then(async (data) => {
+          if (!data) {
+            await signOut({ redirect: false })
+
+            push(getURLWithNetwork('/connect-account'))
+          } else if (data?.githubLogin === user.login)
+            setIsGithubAndWalletMatched(true)
+          else setIsGithubAndWalletMatched(false)
+        })
+        .catch((error) => {
+          setIsGithubAndWalletMatched(false)
+          console.log(error)
+        })
+    },
+    [user]
+  )
 
   // Side effects needed to the context work
   useEffect(() => {
-    if (session.status === 'authenticated') setUser({ ...session.data.user })
+    if (
+      session.status === 'authenticated' &&
+      !EXCLUDED_PAGES.includes(String(pathname))
+    )
+      setUser({ ...session.data.user })
   }, [session])
 
   useEffect(() => {
-    console.log(user)
-    if (user?.address) validateWalletAndGithub()
+    console.log('user', user)
+    console.log('wallet', wallet)
 
-    if (!user?.address && BeproService.isStarted && !BeproService.isLoggedIn) {
-      BeproService.login().then(() => {
-        setUser(previousUser => ({
-          ...previousUser,
-          address: BeproService.address
-        }))
-      }).catch(console.log)
-    }
-  }, [user, BeproService.isStarted])
+    if (user && wallet && !EXCLUDED_PAGES.includes(String(pathname)))
+      validateWalletAndGithub(wallet.address)
+
+    if (
+      user &&
+      !wallet &&
+      beproServiceStarted &&
+      !EXCLUDED_PAGES.includes(String(pathname))
+    )
+      BeproService.login()
+        .then(() =>
+          setWallet((previousWallet) => ({
+            ...previousWallet,
+            address: BeproService.address
+          }))
+        )
+        .catch(console.log)
+  }, [user, wallet, beproServiceStarted])
+
+  useEffect(() => {
+    window.ethereum.on(`accountsChanged`, (accounts) => {
+      if (BeproService.isStarted)
+        BeproService.login().then(() =>
+          setWallet((previousWallet) => ({
+            ...previousWallet,
+            address: accounts[0]
+          }))
+        )
+    })
+  }, [])
+
+  useEffect(() => {
+    const checkBeproServiceStarted = setInterval(() => {
+      if (BeproService.isStarted) {
+        setBeproServiceStarted(true)
+        clearInterval(checkBeproServiceStarted)
+      }
+    }, 1000)
+
+    return(() => {
+      clearInterval(checkBeproServiceStarted)
+    })
+  }, [])
   // Side effects needed to the context work
 
   const memorized = useMemo<IAuthenticationContext>(
@@ -99,7 +160,14 @@ export const AuthenticationProvider = ({ children }) => {
 
   return (
     <AuthenticationContext.Provider value={memorized}>
-      <InvalidAccountWalletModal isVisible={isGithubAndWalletMatched === false} user={user} />
+      <InvalidAccountWalletModal
+        user={user}
+        wallet={wallet}
+        isVisible={
+          isGithubAndWalletMatched === false &&
+          !EXCLUDED_PAGES.includes(String(pathname))
+        }
+      />
       {children}
     </AuthenticationContext.Provider>
   )

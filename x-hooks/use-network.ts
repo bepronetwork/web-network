@@ -178,7 +178,7 @@ export default function useNetworkTheme() {
       pathname: `/[network]/${href}`.replace('//', '/'),
       query: {
         ...query,
-        network: query.network || network?.name
+        network: query.network || router?.query?.network
       }
     }
   }
