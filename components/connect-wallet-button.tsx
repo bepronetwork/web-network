@@ -1,17 +1,24 @@
-import {BeproService} from '@services/bepro-service';
-import React, {useContext, useEffect, useState,} from 'react';
-import {ApplicationContext} from '@contexts/application';
-import {changeWalletState} from '@reducers/change-wallet-connect';
-import {changeCurrentAddress} from '@reducers/change-current-address';
-import Modal from '@components/modal';
 import Image from 'next/image';
-import metamaskLogo from '@assets/metamask.png';
-import { changeNetwork } from '@contexts/reducers/change-network';
-import { NetworkIds } from '@interfaces/enums/network-ids';
-import Button from './button';
-import { NETWORKS } from '@helpers/networks';
 import { useTranslation } from 'next-i18next';
+import React, { useContext, useEffect, useState } from 'react';
+
+import metamaskLogo from '@assets/metamask.png';
+
+import Button from '@components/button';
+import Modal from '@components/modal';
+
+import { ApplicationContext } from '@contexts/application';
 import { useAuthentication } from '@contexts/authentication';
+import { changeNetwork } from '@contexts/reducers/change-network';
+
+import { NETWORKS } from '@helpers/networks';
+
+import { NetworkIds } from '@interfaces/enums/network-ids';
+
+import { changeWalletState } from '@reducers/change-wallet-connect';
+import { changeCurrentAddress } from '@reducers/change-current-address';
+
+import { BeproService } from '@services/bepro-service';
 
 const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
 const networkMap = {
