@@ -10,5 +10,5 @@ export interface IUser {
 
 export interface IWallet {
   address: string
-  balance: IBalance
+  balance?: IBalance
 }
