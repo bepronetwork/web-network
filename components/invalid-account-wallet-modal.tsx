@@ -48,7 +48,7 @@ export default function InvalidAccountWalletModal({
             >
               <div>
                 <Avatar src={user?.image} userLogin={user?.login || `null`} />{' '}
-                <span className="ms-2">{user?.name}</span>
+                <span className="ms-2">{user?.name || user?.login}</span>
               </div>
 
               <ErrorMarkIcon />
