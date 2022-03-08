@@ -125,12 +125,11 @@ function OraclesDelegate(): JSX.Element {
         </div>
 
         {error && <p className="p-small text-danger mt-2">{error}</p>}
-
         <ReadOnlyButtonWrapper>
           <NetworkTxButton
             txMethod="delegateOracles"
             className="read-only-button"
-            txParams={{tokenAmount, delegatedTo}}
+            txParams={{tokenAmount, from: delegatedTo}}
             txType={TransactionTypes.delegateOracles}
             txCurrency={t('$oracles')}
             modalTitle={t('my-oracles:actions.delegate.title')}
