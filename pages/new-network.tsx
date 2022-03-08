@@ -1,7 +1,5 @@
-import { parseCookies } from 'nookies'
 import { useRouter } from 'next/router'
 import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { useContext, useEffect, useState } from 'react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -10,7 +8,6 @@ import Stepper from '@components/stepper'
 import CustomContainer from '@components/custom-container'
 import ConnectWalletButton from '@components/connect-wallet-button'
 import CreatingNetworkLoader from '@components/creating-network-loader'
-import UpdateGithubTokenModal from '@components/update-github-token-modal'
 
 import LockBeproStep from '@components/custom-network/lock-bepro-step'
 import NetworkInformationStep from '@components/custom-network/network-information-step'
@@ -40,7 +37,6 @@ export default function NewNetwork() {
   const [currentStep, setCurrentStep] = useState(1)
   const [creatingNetwork, setCreatingNetwork] = useState(false)
   const [steps, setSteps] = useState(DefaultNetworkInformation)
-  const [isModalTokenVisible, setIsModalTokenVisible] = useState(false)
 
   const { createNetwork } = useApi()
   const { listUserRepos } = useOctokit()
@@ -217,11 +213,6 @@ export default function NewNetwork() {
         label: 'amountNeeded',
         value: BeproService.operatorAmount
       })
-
-      const cookies = parseCookies()
-
-      if (!cookies[`updated-github-token:${currentAddress}`])
-        setIsModalTokenVisible(true)
     }
   }, [currentAddress, beproInit])
 
@@ -324,13 +315,6 @@ export default function NewNetwork() {
 
       {(creatingNetwork && <CreatingNetworkLoader />) || ''}
 
-      <UpdateGithubTokenModal
-        isVisible={isModalTokenVisible}
-        setVisible={setIsModalTokenVisible}
-        description={t('custom-network:modals.update-github-token.description')}
-        redirectTo={`${window.location.protocol}//${window.location.host}/new-network`}
-      />
-
       <CustomContainer>
         <div className="mt-5 pt-5">
           <Stepper>
@@ -379,7 +363,6 @@ export default function NewNetwork() {
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, [
         'common',
         'custom-network',
