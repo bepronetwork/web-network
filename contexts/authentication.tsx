@@ -93,8 +93,7 @@ export const AuthenticationProvider = ({ children }) => {
   // Side effects needed to the context work
   useEffect(() => {
     if (
-      session.status === 'authenticated' &&
-      !EXCLUDED_PAGES.includes(String(pathname))
+      session.status === 'authenticated'
     )
       setUser({ ...session.data.user })
   }, [session])
@@ -103,14 +102,18 @@ export const AuthenticationProvider = ({ children }) => {
     console.log('user', user)
     console.log('wallet', wallet)
 
-    if (user && wallet && !EXCLUDED_PAGES.includes(String(pathname)))
+    if (
+      user &&
+      wallet &&
+      isGithubAndWalletMatched === undefined &&
+      !EXCLUDED_PAGES.includes(String(pathname))
+    )
       validateWalletAndGithub(wallet.address)
 
     if (
       user &&
       !wallet &&
-      beproServiceStarted &&
-      !EXCLUDED_PAGES.includes(String(pathname))
+      beproServiceStarted
     )
       BeproService.login()
         .then(() =>
@@ -123,14 +126,55 @@ export const AuthenticationProvider = ({ children }) => {
   }, [user, wallet, beproServiceStarted])
 
   useEffect(() => {
+    if (wallet && wallet?.address && beproServiceStarted) {
+      setIsGithubAndWalletMatched(undefined)
+
+      BeproService.getOraclesSummary().then((oracles) =>
+        setWallet((previousWallet) => ({
+          ...previousWallet,
+          balance: {
+            ...previousWallet.balance,
+            oracles
+          }
+        }))
+      )
+
+      BeproService.getBalance('bepro').then((bepro) =>
+        setWallet((previousWallet) => ({
+          ...previousWallet,
+          balance: {
+            ...previousWallet.balance,
+            bepro
+          }
+        }))
+      )
+
+      BeproService.getBalance('eth').then((eth) =>
+        setWallet((previousWallet) => ({
+          ...previousWallet,
+          balance: {
+            ...previousWallet.balance,
+            eth
+          }
+        }))
+      )
+
+      BeproService.getBalance('staked').then((staked) =>
+        setWallet((previousWallet) => ({
+          ...previousWallet,
+          balance: {
+            ...previousWallet.balance,
+            staked
+          }
+        }))
+      )
+    }
+  }, [wallet?.address, beproServiceStarted])
+
+  useEffect(() => {
     window.ethereum.on(`accountsChanged`, (accounts) => {
       if (BeproService.isStarted)
-        BeproService.login().then(() =>
-          setWallet((previousWallet) => ({
-            ...previousWallet,
-            address: accounts[0]
-          }))
-        )
+        BeproService.login().then(() => setWallet({ address: accounts[0] }))
     })
   }, [])
 
@@ -142,20 +186,20 @@ export const AuthenticationProvider = ({ children }) => {
       }
     }, 1000)
 
-    return(() => {
+    return () => {
       clearInterval(checkBeproServiceStarted)
-    })
+    }
   }, [])
   // Side effects needed to the context work
 
   const memorized = useMemo<IAuthenticationContext>(
     () => ({
       user,
+      wallet,
       isGithubAndWalletMatched,
-      login,
-      validateWalletAndGithub
+      login
     }),
-    []
+    [user, wallet, isGithubAndWalletMatched]
   )
 
   return (

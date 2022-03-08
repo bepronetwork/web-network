@@ -35,7 +35,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
   const { state: {loading, metaMaskWallet, beproInit, currentAddress, network: activeNetwork}, dispatch } = useContext(ApplicationContext);
   const [isAddingNetwork, setIsAddingNetwork] = useState(false);
   const { t } = useTranslation(['common', 'connect-wallet-button'])
-  const { login } = useAuthentication()
+  const { wallet, login } = useAuthentication()
 
   async function connectWallet() {
     let loggedIn = false;
@@ -130,13 +130,13 @@ export default function ConnectWalletButton({children = null, forceLogin = false
       titlePosition="center"
       centerTitle
       titleClass="h3 text-white bg-opacity-100"
-      show={!currentAddress || !metaMaskWallet}>
+      show={!wallet?.address}>
         <div className="d-flex flex-column text-center align-items-center">
         <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
           {t('connect-wallet-button:to-access-this-page')}<br/><span style={{color: networkMap[REQUIRED_NETWORK.toLowerCase()]}}><span>{REQUIRED_NETWORK}</span> {t('connect-wallet-button:network')}</span> {t('connect-wallet-button:on-your-wallet')}
         </strong>
           <div className="d-flex justify-content-center align-items-center w-100">
-              <div className="rounded-8 bg-dark-gray text-white p-3 d-flex text-center justify-content-center align-items-center w-75 cursor-pointer" onClick={connectWallet}>
+              <div className="rounded-8 bg-dark-gray text-white p-3 d-flex text-center justify-content-center align-items-center w-75 cursor-pointer" onClick={login}>
                   <Image src={metamaskLogo} width={15} height={15}/>
                   <span className="text-white text-uppercase ms-2 caption-large">{t('misc.metamask')}</span>
               </div>
@@ -171,7 +171,7 @@ export default function ConnectWalletButton({children = null, forceLogin = false
     )
   }
   
-  if (!metaMaskWallet)
+  if (!wallet)
     return <Button color='white' className='text-primary bg-opacity-100' onClick={login}><span>{t('main-nav.connect')}</span> <i className="ico-metamask" /></Button>
 
   return children;

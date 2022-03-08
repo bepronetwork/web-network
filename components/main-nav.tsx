@@ -16,12 +16,15 @@ import Translation from '@components/translation';
 import InternalLink from '@components/internal-link';
 import NetworkIdentifier from '@components/network-identifier';
 import WrongNetworkModal from '@components/wrong-network-modal';
+import ClosedNetworkAlert from '@components/closed-network-alert';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import UserMissingModal from '@components/user-missing-information';
 import BalanceAddressAvatar from '@components/balance-address-avatar';
+import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper';
 import TransactionsStateIndicator from '@components/transactions-state-indicator';
 
 import { ApplicationContext } from '@contexts/application';
+import { useAuthentication } from '@contexts/authentication';
 
 import { BEPRO_NETWORK_NAME, IPFS_BASE } from 'env';
 
@@ -36,13 +39,12 @@ import { BeproService } from '@services/bepro-service';
 
 import useApi from '@x-hooks/use-api';
 import useNetwork from '@x-hooks/use-network';
-import ClosedNetworkAlert from './closed-network-alert';
-import ReadOnlyButtonWrapper from './read-only-button-wrapper';
 
 const CURRENCY = process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME;
 const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
 
 export default function MainNav() {
+  const { wallet } = useAuthentication()
   const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
 
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
@@ -110,7 +112,7 @@ export default function MainNav() {
     <div className={`main-nav d-flex flex-column ${isNetworksPage && 'bg-shadow' || 'bg-primary'}`}>
       {network?.isClosed && <ClosedNetworkAlert />}
         
-      <div className={`d-flex flex-row align-items-center justify-content-between px-3 ${currentAddress ? 'py-0' : 'py-3'}`}>
+      <div className={`d-flex flex-row align-items-center justify-content-between px-3 ${wallet?.address ? 'py-0' : 'py-3'}`}>
         <div className="d-flex">
           <InternalLink href={getURLWithNetwork('/', {network: network?.name})} icon={isNetworksPage ? <BeproLogoBlue /> : (network?.name !== BEPRO_NETWORK_NAME ? <Image src={`${IPFS_BASE}/${network?.fullLogo}`} width={104} height={32} /> : <BeproLogo aria-hidden={true} />)} className="brand" nav active brand />
           {!isNetworksPage && <ul className="nav-links">
@@ -156,9 +158,9 @@ export default function MainNav() {
 
               <NetworkIdentifier />
 
-              <InternalLink href={getURLWithNetwork('/account')} icon={<BeproSmallLogo />} label={formatNumberToNScale(beproBalance)} className="mx-3" transparent nav />
+              <InternalLink href={getURLWithNetwork('/account')} icon={<BeproSmallLogo />} label={formatNumberToNScale(wallet?.balance?.bepro || 0)} className="mx-3" transparent nav />
 
-              <InternalLink href={getURLWithNetwork('/account')} icon={<BalanceAddressAvatar address={address} balance={ethBalance} currency={CURRENCY} />} className="meta-info d-flex align-items-center" />
+              <InternalLink href={getURLWithNetwork('/account')} icon={<BalanceAddressAvatar address={truncateAddress(wallet?.address || '', 4)} balance={wallet?.balance?.eth} currency={CURRENCY} />} className="meta-info d-flex align-items-center" />
             </div>
           </ConnectWalletButton>
         </div>
