@@ -49,7 +49,7 @@ export default function LockBeproStep({
     setIsLocking(true)
 
     try {
-      const isApproved = await BeproService.isApprovedSettlerToken()
+      const isApproved = await BeproService.networkFactory.isApprovedSettlerToken(BeproService.address, 1)
 
       if (!isApproved)
         await BeproService.networkFactory.approveSettlerERC20Token()
