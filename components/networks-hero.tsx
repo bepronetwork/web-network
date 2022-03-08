@@ -29,11 +29,10 @@ export default function NetworksHero() {
   }, [])
 
   useEffect(() => {
-    if (BeproService.isStarted)
-      BeproService.getNetworksQuantity()
+    BeproService.getNetworksQuantity()
         .then(setNetworksQuantity)
         .catch(console.log)
-  }, [BeproService.isStarted])
+  }, [BeproService.networkFactoryStarted])
 
   return (
     <div className="banner bg-shadow network-hero">

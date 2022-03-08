@@ -311,6 +311,12 @@ export default function NewNetwork() {
     }
   }, [steps])
 
+  useEffect(() => {
+    BeproService.startNetworkFactory().catch((error) =>
+      console.log('Failed to start the Network Factory', error)
+    )
+  }, [])
+
   return (
     <div className="new-network">
       <style>{colorsToCSS(steps.network.data.colors.data)}</style>
