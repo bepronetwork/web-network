@@ -64,7 +64,9 @@ class BeproFacet {
 
   async startNetworkFactory() {
     try {
-      if (NETWORK_FACTORY_ADDRESS && !this.networkFactoryStarted) {
+      if (!NETWORK_FACTORY_ADDRESS)
+        console.error('Network Factory Contract is Missing')
+      if (!this.networkFactoryStarted) {
         this.networkFactory = new NetworkFactory(
           this.bepro,
           NETWORK_FACTORY_ADDRESS
@@ -75,8 +77,6 @@ class BeproFacet {
         this.operatorAmount = await this.getOperatorAmount()
 
         this.networkFactoryStarted = true
-      } else {
-        console.error('Network Factory Contract is Missing')
       }
     } catch (error) {
       console.error(error)
