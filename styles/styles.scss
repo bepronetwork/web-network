@@ -18,6 +18,7 @@
 @import "components/network-logo";
 @import "components/network-hero";
 @import "components/creating-network-loader";
+@import "components/counter-badge";
 
 @function toRGB ($color) {
   @return "" + red($color) + ", " + green($color) + ", " + blue($color);
