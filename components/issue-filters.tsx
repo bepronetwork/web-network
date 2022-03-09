@@ -23,7 +23,7 @@ export default function IssueFilters() {
     const quantity = countFilters()
 
     if (quantity > 0)
-      return <div className='mr-1 bg-primary rounded-4 p-1 myn-1'>{quantity}</div>
+      return <div className='mr-1 bg-primary rounded-5 p-1 myn-1'>{quantity}</div>
 
     return <FilterIcon />
   }

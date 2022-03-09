@@ -68,6 +68,14 @@ $more-bg: (
 $more-colors: ('blue-dark': $blue-dark, 'gray': $gray, 'dark-gray': $dark-gray, 'ligth-gray': $ligth-gray, 'black': $black, 'white': #fff);
 
 
+$more-roundend: (
+  '4': 0.4rem,
+  '5': 0.5rem,
+  '6': 0.6rem,
+  '7': 0.7rem,
+  '8': 0.8rem,
+);
+
 
 //buttons
 $btn-font-family: 'fontRegular', sans-serif;
@@ -128,7 +136,7 @@ $tooltip-arrow-color: $white;
 $theme-colors: map-merge($theme-colors, map-merge($more-bg, $more-colors));
 
 $utilities: map-merge(
-  $utilities, (
+        $utilities, (
                 'shadow': map-merge(map-get($utilities, 'shadow'), (state: hover)),
                 'border': map-merge(map-get($utilities, 'border'), (state: hover)),
                 'border-bottom': map-merge(map-get($utilities, 'border-bottom'), (state: hover)),
@@ -137,7 +145,7 @@ $utilities: map-merge(
                 'color': map-merge(map-get($utilities, 'color'), (state: hover , values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-colors))),
                 'background-color': map-merge(map-get($utilities, 'background-color'), (state: hover, values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-bg))),
                 "opacity": map-merge(map-get($utilities, 'opacity'),(state: hover, values: map-get(map-get($utilities, 'opacity'), 'values'))),
-        )
+                'rounded':map-merge(map-get($utilities, 'rounded'),(values:map-merge(map-get(map-get($utilities, 'rounded'), 'values'),$more-roundend))))
 )
 
 
