@@ -145,7 +145,10 @@ export default function ConnectWalletButton({children = null, forceLogin = false
           >
             {t('misc.terms-and-conditions')}
           </a>{" "}
-          <br /> &{" "}
+          <br />
+          <span className="text-ligth-gray">
+            {t('misc.and')}{" "}
+          </span>
           <a
             href="https://www.bepro.network/privacy"
             target="_blank"

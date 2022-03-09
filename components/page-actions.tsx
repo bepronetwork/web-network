@@ -105,14 +105,14 @@ export default function PageActions({
     if (developers?.length > 0) return <IssueAvatars users={developers} />;
 
     if (developers?.length && state.toLowerCase() !== "draft")
-      return <p className="p-small me-2 mt-3"><Translation ns="bounty" label="errors.no-workers" /></p>;
+      return <p className="p-small mt-3"><Translation ns="bounty" label="errors.no-workers" /></p>
   }
 
   function renderForkAvatars() {
     if (forks?.length > 0) {
       return (
         <a
-          className="d-flex align-items-center text-decoration-none text-white-50 mx-1"
+          className="d-flex align-items-center text-decoration-none text-white-50"
           href={`https://github.com/${repoPath}/network/members`}
           target="_blank"
         >
@@ -220,7 +220,7 @@ export default function PageActions({
       isWorking &&
       githubLogin && (
         <ReadOnlyButtonWrapper>
-        <Button className="mr-1 read-only-button" onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || hasOpenPR}>
+        <Button className="read-only-button" onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || hasOpenPR}>
           <Translation ns="pull-request" label="actions.create.title" />
         </Button>
         </ReadOnlyButtonWrapper>
@@ -258,7 +258,7 @@ export default function PageActions({
       <Button
         color="primary"
         onClick={handleStartWorking}
-        className="mr-1 read-only-button"
+        className="read-only-button"
         disabled={isExecuting}
       >
         <span><Translation ns="bounty" label="actions.start-working.title" /></span>
@@ -419,8 +419,8 @@ export default function PageActions({
         <div className="col-md-10">
           <div className="d-flex align-items-center justify-content-between mb-4">
             <h4 className="h4 d-flex align-items-center">{t('misc.details')}</h4>
-            <div className="d-flex align-items-center">
-              {!canClose && !finalized && <span className="mr-2 caption-small text-danger">{t('pull-request:errors.merge-conflicts')}</span> || ``}
+            <div className="d-flex flex-row align-items-center gap-20">
+              {!canClose && !finalized && <span className="caption-small text-danger">{t('pull-request:errors.merge-conflicts')}</span> || ``}
               {renderIssueAvatars()}
               {forks && renderForkAvatars()}
 
@@ -432,9 +432,9 @@ export default function PageActions({
               {renderProposeDestribution()}
               {state?.toLowerCase() == "pull request" && (
                 <>
-                  { (!isDisputed && !finalized && isDisputable ) && <ReadOnlyButtonWrapper><Button color={`${isDisputed ? 'primary': 'purple'}`} className="read-only-button mr-1" onClick={handleDispute}>{t('actions.dispute')}</Button></ReadOnlyButtonWrapper> || ``}
-                  {!finalized && <ReadOnlyButtonWrapper><Button className="read-only-button mr-1" disabled={!canClose || isDisputable} onClick={handleClose}>
-                  {!canClose || isDisputable && <LockedIcon width={12} height={12} className="mr-1"/>}
+                  { (!isDisputed && !finalized && isDisputable ) && <ReadOnlyButtonWrapper><Button color={`${isDisputed ? 'primary': 'purple'}`} className="read-only-button" onClick={handleDispute}>{t('actions.dispute')}</Button></ReadOnlyButtonWrapper> || ``}
+                  {!finalized && <ReadOnlyButtonWrapper><Button className="read-only-button" disabled={!canClose || isDisputable} onClick={handleClose}>
+                  {!canClose || isDisputable && <LockedIcon width={12} height={12} />}
                     <span>{t('pull-request:actions.merge.title')}</span>
                     </Button></ReadOnlyButtonWrapper> || ``}
                 </>

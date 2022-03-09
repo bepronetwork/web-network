@@ -27,6 +27,7 @@ export default function LockBeproStep({
   const { t } = useTranslation(['common', 'custom-network'])
 
   const [isLocking, setIsLocking] = useState(false)
+  const [isUnlocking, setIsUnlocking] = useState(false)
   const [showUnlockBepro, setShowUnlockBepro] = useState(false)
 
   const {
@@ -72,7 +73,15 @@ export default function LockBeproStep({
   }
 
   function handleUnLock() {
-    BeproService.networkFactory.unlock().then(console.log).catch(console.log)
+    setIsUnlocking(true)
+    BeproService.networkFactory.unlock().then(() => {
+      handleChange({ label: 'amountLocked', value: 0 })
+      handleChange({ label: 'amount', value: 0 })
+      updateWalletBalance()
+    })
+    .catch(error => {
+      console.log('Failed to Unlock', error)
+    }).finally(() => setIsUnlocking(false))
   }
 
   function handleShowUnlockModal() {
@@ -307,7 +316,17 @@ export default function LockBeproStep({
               )}
             </Button>
 
-            <Button onClick={handleUnLock}>Unlock</Button>
+            <Button disabled={lockedPercent === 0 || isUnlocking} color="ligth-gray" onClick={handleUnLock}>
+              {!isUnlocking || lockedPercent === 0 && (
+                <LockedIcon width={12} height={12} className="mr-1" />
+              )}
+                {t('transactions.types.unlock')}
+              {isUnlocking ? (
+                <span className="spinner-border spinner-border-xs ml-1" />
+              ) : (
+                ''
+              )}
+            </Button>
           </div>
         </div>
       </div>

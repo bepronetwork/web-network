@@ -101,7 +101,7 @@ export default function MainNav() {
       })
   }
 
-  const isNetworksPage = router.pathname === '/networks'
+  const isNetworksPage = router.pathname === '/networks' || router.pathname === '/new-network'
 
   useEffect(updateState, [currentAddress]);
   useEffect(updateBalances, [balance])
@@ -142,7 +142,7 @@ export default function MainNav() {
           <ReadOnlyButtonWrapper>
             <InternalLink href={getURLWithNetwork('/create-bounty')} icon={<PlusIcon />} label={<Translation label={'main-nav.create-bounty'} />} className="mr-2 read-only-button" iconBefore nav uppercase />
           </ReadOnlyButtonWrapper>
-          || <InternalLink href={getURLWithNetwork('/new-network')} icon={<PlusIcon />} label={'New Network'} className="mr-2" iconBefore nav uppercase />
+          || <InternalLink href="/new-network" icon={<PlusIcon />} label={'New Network'} className="mr-2" iconBefore nav uppercase />
           }
 
           <Button onClick={() => setShowHelp(true)}  className="ms-2 me-4 opacity-75 opacity-100-hover" transparent rounded><HelpIcon /></Button>
