@@ -1246,6 +1246,10 @@ textarea.form-control {
 
 .gap-20 {
   gap: 20px;
+
+  .btn + .btn {
+    margin: 0;
+  }
 }
 
 .sticky-bounty {
