@@ -82,10 +82,10 @@ export default function MyIssues() {
                 onCloseClick={() => updatePendingIssue(null)}
               >
                 <h4 className="text-white mb-4">{pendingIssue?.title}</h4>
-                <div className="bg-dark-gray p-3 rounded-4 ">
+                <div className="bg-dark-gray p-3 rounded-5 ">
                   <MarkedRender source={pendingIssue?.body} />
                 </div>
-                <div className="bg-dark-gray w-100 text-center mt-4 rounded-4 py-3">
+                <div className="bg-dark-gray w-100 text-center mt-4 rounded-5 py-3">
                   <div className="caption-small fs-smallest text-uppercase text-white">
                     {t('misc.reward')}
                   </div>

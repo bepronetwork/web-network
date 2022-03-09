@@ -18,7 +18,7 @@ export default function ProposalHero({githubId, title, pullRequestId, authorPull
                     <div className="col-md-10">
                         <div className="d-flex flex-column">
                             <div className="d-flex align-items-center cursor-pointer text-truncate">
-                                <InternalLink iconBefore={true} href={getURLWithNetwork('/bounty', { id: issueId, repoId })} icon={<i className="ico-back me-2" />} label={`#${githubId} ${title}`} className="p trans pl-0" transparent nav />
+                                <InternalLink iconBefore={true} href={getURLWithNetwork('/bounty', { id: issueId, repoId })} icon={<i className="ico-back me-2" />} label={`#${githubId} ${title}`} className="p trans pe-0" transparent nav />
                             </div>
                             <div className="row">
                                 <div className="col-md-9">
