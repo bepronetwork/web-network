@@ -383,7 +383,7 @@ export default function NewProposal({
 
   function renderRecognizeAsFinished() {
     return <ReadOnlyButtonWrapper>
-      <Button onClick={recognizeAsFinished} className="mr-1 read-only-button">{t('bounty:actions.recognize-finished.title')}</Button>
+      <Button onClick={recognizeAsFinished} className="read-only-button">{t('bounty:actions.recognize-finished.title')}</Button>
       </ReadOnlyButtonWrapper>;
   }
   const cantBeMergeable = () => !currentPullRequest.isMergeable || currentPullRequest.merged;
@@ -407,7 +407,7 @@ export default function NewProposal({
     <div className="d-flex">
       {(isCouncil && isFinished && (
         <ReadOnlyButtonWrapper>
-          <Button className="mx-2 read-only-button" onClick={() => setShow(true)}>
+          <Button className="read-only-button" onClick={() => setShow(true)}>
             {t('proposal:actions.create')}
           </Button>
         </ReadOnlyButtonWrapper>
