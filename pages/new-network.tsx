@@ -322,9 +322,7 @@ export default function NewNetwork() {
         isVisible={isModalTokenVisible}
         setVisible={setIsModalTokenVisible}
         description="To create your custom network we need permission to access your repositories"
-        redirectTo={`${window.location.protocol}//${
-          window.location.host
-        }/${BEPRO_NETWORK_NAME}/new-network`}
+        redirectTo={`${window.location.protocol}//${window.location.host}/new-network`}
       />
 
       <CustomContainer>
