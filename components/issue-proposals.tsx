@@ -1,20 +1,27 @@
-import { useContext } from "react";
-import { GetStaticProps } from "next";
-import { useEffect, useState } from "react";
-import {ProposalData,} from '@interfaces/api-response';
-import { BeproService } from "@services/bepro-service";
-import { ApplicationContext } from "@contexts/application";
-import ProposalItem from '@components/proposal-item';
-import {Proposal} from '@interfaces/proposal';
-import NothingFound from "./nothing-found";
+import { useContext, useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
+
+import NothingFound from "@components/nothing-found";
+import ProposalItem from '@components/proposal-item';
+
+import { ApplicationContext } from "@contexts/application";
+import { useAuthentication } from "@contexts/authentication";
+
 import { isProposalDisputable } from "@helpers/proposal";
 
+import { Proposal } from '@interfaces/proposal';
+import { ProposalData } from '@interfaces/api-response';
+
+import { BeproService } from "@services/bepro-service";
+
 export default function IssueProposals({ metaProposals, className='', metaRequests, numberProposals, issueId, amount, dbId, isFinalized = false, mergedProposal }) {
-  const { state: {beproStaked, currentAddress} } = useContext(ApplicationContext);
-  const [proposals, setProposals] = useState<Proposal[]>([]);
-  const [disputableTime, setDisputableTime] = useState(0)
   const { t } = useTranslation('proposal')
+
+  const [disputableTime, setDisputableTime] = useState(0)
+  const [proposals, setProposals] = useState<Proposal[]>([]);
+  
+  const { wallet } = useAuthentication()
+  const { state: { beproStaked } } = useContext(ApplicationContext)
 
   async function loadProposalsMeta() {
     if (!issueId)
@@ -41,7 +48,7 @@ export default function IssueProposals({ metaProposals, className='', metaReques
     BeproService.getDisputableTime().then(setDisputableTime)
   }
 
-  useEffect(() => { loadProposalsMeta() }, [issueId, numberProposals, currentAddress, metaRequests]);
+  useEffect(() => { loadProposalsMeta() }, [issueId, numberProposals, wallet?.address, metaRequests]);
 
   return (
     <div className={`content-wrapper ${className} pt-0 pb-0`}>
@@ -64,9 +71,3 @@ export default function IssueProposals({ metaProposals, className='', metaReques
     </div>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {},
-  };
-};

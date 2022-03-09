@@ -25,6 +25,7 @@ import PullRequestLabels, {PRLabel} from './pull-request-labels';
 import ReadOnlyButtonWrapper from './read-only-button-wrapper';
 import {useRepos} from 'contexts/repos'
 import {useNetwork} from 'contexts/network'
+import { useAuthentication } from '@contexts/authentication';
 
 interface participants {
   githubHandle: string;
@@ -87,35 +88,37 @@ function SelectOptionComponent({ innerProps, innerRef, data }) {
 }
 
 export default function NewProposal({
-                                      issueId,
-                                      amountTotal,
-                                      mergeProposals,
-                                      pullRequests = [],
-                                      handleMicroService,
-                                      isIssueOwner = false, isFinished = false
-                                    }) {
-  const {dispatch, state: {currentAddress, beproInit, githubLogin},} = useContext(ApplicationContext);
-  const [distrib, setDistrib] = useState<Object>({});
-  const [amount, setAmount] = useState<number>();
-  const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest)
-  const [error, setError] = useState<boolean>(false);
-  const [success, setSuccess] = useState<boolean>(false);
-  const [warning, setWarning] = useState<boolean>(false);
-  const [show, setShow] = useState<boolean>(false);
-  const [participants, setParticipants] = useState<participants[]>([]);
-  const [isCouncil, setIsCouncil] = useState(false);
-  const [councilAmount, setCouncilAmount] = useState(0);
-  const [currentGithubId, setCurrentGithubId] = useState<string>();
-  const [proposals, setProposals] = useState<Proposal[]>([]);
-  const {getParticipants} = useOctokit();
-  const {getUserWith, waitForMerge, processMergeProposal, processEvent} = useApi();
-  const txWindow = useTransactions();
+  issueId,
+  amountTotal,
+  mergeProposals,
+  pullRequests = [],
+  handleMicroService,
+  isIssueOwner = false, isFinished = false
+}) {
   const { t } = useTranslation(['common', 'bounty', 'proposal', 'pull-request'])
+
+  const [amount, setAmount] = useState<number>()
+  const [show, setShow] = useState<boolean>(false)
+  const [isCouncil, setIsCouncil] = useState(false)
+  const [error, setError] = useState<boolean>(false)
+  const [distrib, setDistrib] = useState<Object>({})
+  const [councilAmount, setCouncilAmount] = useState(0)
+  const [success, setSuccess] = useState<boolean>(false)
+  const [warning, setWarning] = useState<boolean>(false)
+  const [proposals, setProposals] = useState<Proposal[]>([])
+  const [currentGithubId, setCurrentGithubId] = useState<string>()
+  const [participants, setParticipants] = useState<participants[]>([])
+  const [showExceptionalMessage, setShowExceptionalMessage] = useState<boolean>()
+  const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest)
+
+  const {activeRepo} = useRepos()
   const {activeNetwork} = useNetwork()
-  const {activeRepo} = useRepos();
+  const { dispatch } = useContext(ApplicationContext);
+  const { wallet, user, beproServiceStarted } = useAuthentication()
 
-  const [showExceptionalMessage, setShowExceptionalMessage] = useState<boolean>();
-
+  const txWindow = useTransactions()
+  const { getParticipants } = useOctokit()
+  const {getUserWith, waitForMerge, processMergeProposal, processEvent} = useApi()
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
     setDistrib((prevState) => {
@@ -302,7 +305,7 @@ export default function NewProposal({
     const proposeMergeTx = addTransaction({type: TransactionTypes.proposeMerge}, activeNetwork)
     dispatch(proposeMergeTx);
 
-    waitForMerge(githubLogin, issue_id, currentGithubId, activeNetwork?.name)
+    waitForMerge(user?.login, issue_id, currentGithubId, activeNetwork?.name)
                       .then(() => {
                         if (handleMicroService)
                           handleMicroService(true);
@@ -374,10 +377,10 @@ export default function NewProposal({
   }
 
   function updateCreateProposalHideState() {
-    if (!beproInit) return;
+    if (!beproServiceStarted) return;
 
     BeproService.network.COUNCIL_AMOUNT().then(setCouncilAmount)
-                .then(() => BeproService.network.isCouncil(currentAddress))
+                .then(() => BeproService.network.isCouncil(wallet?.address))
                 .then(isCouncil => setIsCouncil(isCouncil));
   }
 
@@ -401,7 +404,7 @@ export default function NewProposal({
     }
   }, [pullRequests, activeRepo]);
 
-  useEffect(updateCreateProposalHideState, [currentAddress]);
+  useEffect(updateCreateProposalHideState, [wallet?.address])
 
   return (
     <div className="d-flex">
@@ -423,13 +426,13 @@ export default function NewProposal({
             <Button
               onClick={handleClickCreate}
               disabled={
-                !currentAddress ||
+                !wallet?.address ||
                 participants.length === 0 ||
                 !success ||
                 cantBeMergeable()
               }
             >
-              {!currentAddress ||
+              {!wallet?.address ||
                 participants.length === 0 ||
                 (!success && (
                   <LockedIcon width={12} height={12} className="mr-1" />

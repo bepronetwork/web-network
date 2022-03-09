@@ -1,29 +1,37 @@
 import { GetStaticProps } from "next";
+import { useRouter } from 'next/router';
+import { useTranslation } from "next-i18next";
 import React, { useContext, useState } from "react";
-import IssueAvatars from "./issue-avatars";
-import { BeproService } from "@services/bepro-service";
-import NewProposal from "./create-proposal";
-import { ApplicationContext } from "@contexts/application";
-import { developer, IssueState, pullRequest } from "@interfaces/issue-data";
-import { changeBalance } from "@contexts/reducers/change-balance";
-import { addToast } from "@contexts/reducers/add-toast";
-import { addTransaction } from "@reducers/add-transaction";
-import { TransactionTypes } from "@interfaces/enums/transaction-types";
-import { updateTransaction } from "@reducers/update-transaction";
-import CreatePullRequestModal from "@components/create-pull-request-modal";
-import { TransactionStatus } from "@interfaces/enums/transaction-status";
-import Button from "./button";
+
+import LockedIcon from "@assets/icons/locked-icon";
+
+import Button from "@components/button";
 import GithubLink from '@components/github-link';
-import {useRouter} from 'next/router';
+import Translation from "@components/translation";
+import IssueAvatars from "@components/issue-avatars";
+import NewProposal from "@components/create-proposal";
+import ReadOnlyButtonWrapper from "@components/read-only-button-wrapper";
+import CreatePullRequestModal from "@components/create-pull-request-modal";
+
+import { useNetwork } from "@contexts/network";
+import { addToast } from "@contexts/reducers/add-toast";
+import { ApplicationContext } from "@contexts/application";
+import { useAuthentication } from "@contexts/authentication";
+import { changeBalance } from "@contexts/reducers/change-balance";
+
+import { IForkInfo } from "@interfaces/repos-list";
+import { ProposalData } from "@interfaces/api-response";
+import { TransactionTypes } from "@interfaces/enums/transaction-types";
+import { TransactionStatus } from "@interfaces/enums/transaction-status";
+import { developer, IssueState, pullRequest } from "@interfaces/issue-data";
+
+import { addTransaction } from "@reducers/add-transaction";
+import { updateTransaction } from "@reducers/update-transaction";
+
+import { BeproService } from "@services/bepro-service";
+
 import useApi from '@x-hooks/use-api';
 import useTransactions from '@x-hooks/useTransactions';
-import LockedIcon from "@assets/icons/locked-icon";
-import { ProposalData } from "@interfaces/api-response";
-import Translation from "./translation";
-import { useTranslation } from "next-i18next";
-import { useNetwork } from "@contexts/network";
-import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
-import { IForkInfo } from "@interfaces/repos-list";
 
 interface pageActions {
   issueId: string;
@@ -87,19 +95,23 @@ export default function PageActions({
   isDisputable = false,
   onCloseEvent,
 }: pageActions) {
-  const {
-    dispatch,
-    state: { githubHandle, currentAddress, myTransactions },
-  } = useContext(ApplicationContext);
   const {query: {repoId, id}} = useRouter();
-  const {createPullRequestIssue, waitForRedeem, waitForClose, processEvent, startWorking} = useApi();
   const { t } = useTranslation(['common', 'pull-request', 'bounty'])
 
-  const [showPRModal, setShowPRModal] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
-
-  const txWindow = useTransactions();
+  const [showPRModal, setShowPRModal] = useState(false);
+  
+  const {
+    dispatch,
+    state: { myTransactions },
+  } = useContext(ApplicationContext)
   const { activeNetwork } = useNetwork()
+  const { wallet, user } = useAuthentication()
+  
+  const txWindow = useTransactions();
+  const {createPullRequestIssue, waitForRedeem, waitForClose, processEvent, startWorking} = useApi();
+
+
 
   function renderIssueAvatars() {
     if (developers?.length > 0) return <IssueAvatars users={developers} />;
@@ -180,7 +192,7 @@ export default function PageActions({
   const renderRedeem = () => {
     return (
       isIssueinDraft &&
-      issueCreator === currentAddress &&
+      issueCreator === wallet?.address &&
       !finalized && (
         <ReadOnlyButtonWrapper>
           <Button
@@ -201,7 +213,7 @@ export default function PageActions({
       pullRequests?.length > 0 &&
       githubLogin && <NewProposal issueId={issueId}
                                   isFinished={finished}
-                                  isIssueOwner={issueCreator == currentAddress}
+                                  isIssueOwner={issueCreator == wallet?.address}
                                   amountTotal={amountIssue}
                                   mergeProposals={mergeProposals}
                                   pullRequests={pullRequests}
@@ -220,7 +232,7 @@ export default function PageActions({
       isWorking &&
       githubLogin && (
         <ReadOnlyButtonWrapper>
-        <Button className="read-only-button" onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || hasOpenPR}>
+        <Button className="read-only-button" onClick={() => setShowPRModal(true)} disabled={!user?.login || !wallet?.address || hasOpenPR}>
           <Translation ns="pull-request" label="actions.create.title" />
         </Button>
         </ReadOnlyButtonWrapper>

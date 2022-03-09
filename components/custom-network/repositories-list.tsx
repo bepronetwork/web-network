@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'next-i18next'
 
 import GithubInfo from '@components/github-info'
+
 import useApi from '@x-hooks/use-api'
-import { useTranslation } from 'next-i18next'
 
 export default function RepositoriesList({ repositories, onClick }) {
   const { t } = useTranslation('custom-network')

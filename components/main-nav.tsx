@@ -1,7 +1,6 @@
 import Image from 'next/image'
-import { GetStaticProps } from 'next'
 import { useRouter } from 'next/router'
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import HelpIcon from '@assets/icons/help-icon';
 import PlusIcon from '@assets/icons/plus-icon';
@@ -18,95 +17,31 @@ import NetworkIdentifier from '@components/network-identifier';
 import WrongNetworkModal from '@components/wrong-network-modal';
 import ClosedNetworkAlert from '@components/closed-network-alert';
 import ConnectWalletButton from '@components/connect-wallet-button';
-import UserMissingModal from '@components/user-missing-information';
 import BalanceAddressAvatar from '@components/balance-address-avatar';
 import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper';
 import TransactionsStateIndicator from '@components/transactions-state-indicator';
 
-import { ApplicationContext } from '@contexts/application';
 import { useAuthentication } from '@contexts/authentication';
-
-import { BEPRO_NETWORK_NAME, IPFS_BASE } from 'env';
 
 import { truncateAddress } from '@helpers/truncate-address';
 import { formatNumberToNScale } from '@helpers/formatNumber';
 
-import { User } from '@interfaces/api-response';
-
-import { changeStakedState } from '@reducers/change-staked-amount';
-
-import { BeproService } from '@services/bepro-service';
-
-import useApi from '@x-hooks/use-api';
 import useNetwork from '@x-hooks/use-network';
+
+import { BEPRO_NETWORK_NAME, IPFS_BASE } from 'env';
 
 const CURRENCY = process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME;
 const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
 
 export default function MainNav() {
+  const { pathname } = useRouter()
+
+  const [showHelp, setShowHelp] = useState(false)
+  
   const { wallet } = useAuthentication()
-  const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
-
-  const [loggedIn, setLoggedIn] = useState<boolean>(false);
-  const [address, setAddress] = useState<string>(null);
-  const [ethBalance, setEthBalance] = useState(0);
-  const [beproBalance, setBeproBalance] = useState(0);
-  const [showHelp, setShowHelp] = useState(false);
-  const [modalUserMissing, setModalUserMissing] = useState<boolean>(false);
-  const {getUserOf,} = useApi();
   const { network, getURLWithNetwork } = useNetwork()
-  const router = useRouter()
 
-  useEffect(() => {
-    checkLogin();
-  }, []); // initial load
-
-  const checkLogin = async () => {
-    //await login();
-    if (BeproService.isLoggedIn) {
-      setAddress(BeproService.address);
-      setLoggedIn(true);
-    } else {
-      setLoggedIn(false);
-    }
-  }
-
-  function updateAddress(address) {
-    setAddress(truncateAddress(address, 4));
-  }
-
-  function updateBalances() {
-    setBeproBalance(balance.bepro);
-    setEthBalance(balance.eth);
-    changeStakedState(balance.staked);
-  }
-
-  function updateState() {
-    if (!currentAddress)
-      return;
-
-    updateAddress(BeproService.address);
-    BeproService.getBalance('eth').then(setEthBalance);
-    BeproService.getBalance('bepro').then(setBeproBalance);
-    BeproService.network.getBEPROStaked().then(amount => dispatch(changeStakedState(amount)));
-  }
-
-  const login = async () => {
-    updateAddress(BeproService.address);
-    setEthBalance(await BeproService.getBalance('eth'))
-    setBeproBalance(await BeproService.getBalance('bepro'))
-    setLoggedIn(true);
-    dispatch(changeStakedState(await BeproService.network.getBEPROStaked()));
-    getUserOf(BeproService.address)
-      .then((user: User) => {
-        if(!user?.accessToken && user?.githubLogin) setModalUserMissing(true)
-      })
-  }
-
-  const isNetworksPage = router.pathname === '/networks' || router.pathname === '/new-network'
-
-  useEffect(updateState, [currentAddress]);
-  useEffect(updateBalances, [balance])
+  const isNetworksPage = ['/networks', '/new-network'].includes(pathname)
 
   return (
     <div className={`main-nav d-flex flex-column ${isNetworksPage && 'bg-shadow' || 'bg-primary'}`}>
@@ -151,7 +86,7 @@ export default function MainNav() {
 
           <WrongNetworkModal requiredNetwork={REQUIRED_NETWORK} />
 
-          <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
+          <ConnectWalletButton>
             <div className="d-flex account-info align-items-center">
 
               <TransactionsStateIndicator />
@@ -166,15 +101,8 @@ export default function MainNav() {
         </div>
 
         <HelpModal show={showHelp} onCloseClick={() => setShowHelp(false)} />
-        <UserMissingModal show={modalUserMissing} />
       </div>
   </div>
   )
-}
-
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {}
-  }
 }
 
