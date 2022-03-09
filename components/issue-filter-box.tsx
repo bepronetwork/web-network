@@ -5,8 +5,8 @@ import {useState} from 'react';
 export default function IssueFilterBox({title, options = [], onChange, type = "radio", className = ``, filterPlaceholder = ``}: IssueFilterBoxParams) {
   const [search, setSearch] = useState(``)
 
-  function filterSearch({label}) {
-    return label.search(search) > -1;
+  function filterSearch(option) {
+    return option?.label?.search(search) > -1;
   }
 
   function getKey(title, value) { return title.replace(` `, ``).toLowerCase().concat(value) }
