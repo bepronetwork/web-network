@@ -90,7 +90,8 @@
     "install": "Install",
     "try-again": "Try Again",
     "reconnect-account": "Reconnect account",
-    "unlock-all": "Unlock all"
+    "unlock-all": "Unlock all",
+    "back-to-top": "Back to Top"
   },
   "misc": {
     "by": "by",
@@ -214,7 +215,8 @@
     "approve-transaction": "Failed to approve transaction",
     "creating-issue": "Failed to create github issue!",
     "failed-update-bounty": "Failed to update bounty!",
-    "read-only-network": "This network is closed. It is set to read-only mode."
+    "read-only-network": "This network is closed. It is set to read-only mode.",
+    "results-truncated": "Results Truncated"
   },
   "404": {
     "the-page": "The page you looking for was",
