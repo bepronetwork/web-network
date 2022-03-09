@@ -90,7 +90,7 @@ export default function TransactionModal({ transaction = null, onCloseClick = ()
                 <Button onClick={() => copyValue(getTransactionId())} className="border-dark-gray mr-1 hover-blue" applyTextColor={false} transparent rounded><CopyIcon /></Button>
           || ``}
           <a href={getEtherScanHref(getTransactionId())} className='text-decoration-none' target="_blank">
-            <Button className="border-dark-gray mr-1 hover-blue" applyTextColor={false} transparent rounded><LinkIcon /></Button>
+            <Button className="border-dark-gray mr-1 hover-blue not-svg" applyTextColor={false} transparent rounded><LinkIcon width="9.33" height="9.33" /></Button>
           </a>
         </div>
       </div>
