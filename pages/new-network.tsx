@@ -15,6 +15,7 @@ import SelectRepositoriesStep from '@components/custom-network/select-repositori
 
 import { addToast } from '@contexts/reducers/add-toast'
 import { ApplicationContext } from '@contexts/application'
+import { useAuthentication } from '@contexts/authentication'
 
 import { isSameSet } from '@helpers/array'
 import { isColorsSimilar } from '@helpers/colors'
@@ -43,9 +44,10 @@ export default function NewNetwork() {
   const { network, getURLWithNetwork, colorsToCSS, DefaultTheme } = useNetwork()
 
   const {
-    dispatch,
-    state: { currentAddress, githubLogin, balance, oracles, beproInit }
+    dispatch
   } = useContext(ApplicationContext)
+
+  const { user, wallet, beproServiceStarted } = useAuthentication()
 
   function changeColor(newColor) {
     const tmpSteps = Object.assign({}, steps)
@@ -110,13 +112,13 @@ export default function NewNetwork() {
   }
 
   function handleCreateNetwork() {
-    if (!githubLogin || !currentAddress) return
+    if (!user?.login || !wallet?.address) return
 
     setCreatingNetwork(true)
 
     BeproService.createNetwork()
       .then((receipt) => {
-        BeproService.getNetworkAdressByCreator(currentAddress).then(
+        BeproService.getNetworkAdressByCreator(wallet.address).then(
           async (networkAddress) => {
             const networkData = steps.network.data
             const repositoriesData = steps.repositories
@@ -135,8 +137,8 @@ export default function NewNetwork() {
                   .map(({ name, fullName }) => ({ name, fullName }))
               ),
               botPermission: repositoriesData.permission,
-              creator: currentAddress,
-              githubLogin,
+              creator: wallet.address,
+              githubLogin: user.login,
               networkAddress
             }
 
@@ -185,8 +187,8 @@ export default function NewNetwork() {
   }, [network])
 
   useEffect(() => {
-    if (githubLogin)
-      listUserRepos(githubLogin).then(({ data }) => {
+    if (user?.login)
+      listUserRepos(user.login).then(({ data }) => {
         const repositories = data.items.map((repo) => ({
           checked: false,
           name: repo.name,
@@ -199,11 +201,11 @@ export default function NewNetwork() {
 
         setSteps(tmpSteps)
       })
-  }, [githubLogin])
+  }, [user?.login])
 
   useEffect(() => {
-    if (currentAddress && beproInit) {
-      BeproService.getTokensLockedByAddress(currentAddress)
+    if (wallet?.address && beproServiceStarted) {
+      BeproService.getTokensLockedByAddress(wallet.address)
         .then((value) => {
           handleLockDataChange({ label: 'amountLocked', value })
         })
@@ -214,7 +216,7 @@ export default function NewNetwork() {
         value: BeproService.operatorAmount
       })
     }
-  }, [currentAddress, beproInit])
+  }, [wallet?.address, beproServiceStarted])
 
   useEffect(() => {
     //Validate Locked Tokens
@@ -325,10 +327,10 @@ export default function NewNetwork() {
               handleChangeStep={handleChangeStep}
               handleChange={handleLockDataChange}
               balance={{
-                beproAvailable: balance.bepro,
+                beproAvailable: wallet?.balance?.bepro,
                 oraclesAvailable:
-                  +oracles.tokensLocked - oracles.delegatedToOthers,
-                tokensLocked: oracles.tokensLocked
+                  +wallet?.balance?.oracles?.tokensLocked - wallet?.balance?.oracles?.delegatedToOthers,
+                tokensLocked: wallet?.balance?.oracles?.tokensLocked
               }}
             />
 
@@ -345,7 +347,7 @@ export default function NewNetwork() {
             <SelectRepositoriesStep
               data={steps.repositories}
               onClick={handleCheckRepository}
-              githubLogin={githubLogin}
+              githubLogin={user?.login}
               validated={steps.repositories.validated}
               step={3}
               currentStep={currentStep}

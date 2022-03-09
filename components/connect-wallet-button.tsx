@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { useTranslation } from 'next-i18next';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 
 import metamaskLogo from '@assets/metamask.png';
 
@@ -9,16 +9,6 @@ import Modal from '@components/modal';
 
 import { ApplicationContext } from '@contexts/application';
 import { useAuthentication } from '@contexts/authentication';
-import { changeNetwork } from '@contexts/reducers/change-network';
-
-import { NETWORKS } from '@helpers/networks';
-
-import { NetworkIds } from '@interfaces/enums/network-ids';
-
-import { changeWalletState } from '@reducers/change-wallet-connect';
-import { changeCurrentAddress } from '@reducers/change-current-address';
-
-import { BeproService } from '@services/bepro-service';
 
 const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
 const networkMap = {
@@ -31,95 +21,24 @@ const networkMap = {
   moonriver: `#f6c343`,
 }
 
-export default function ConnectWalletButton({children = null, forceLogin = false, onSuccess = () => null, onFail = () => console.error("Failed to login"), asModal = false, btnColor = `white`}) {
-  const { state: {loading, metaMaskWallet, beproInit, currentAddress, network: activeNetwork}, dispatch } = useContext(ApplicationContext);
-  const [isAddingNetwork, setIsAddingNetwork] = useState(false);
+export default function ConnectWalletButton({
+  children = null, 
+  asModal = false,
+  forceLogin = false
+}) {
   const { t } = useTranslation(['common', 'connect-wallet-button'])
-  const { wallet, login } = useAuthentication()
 
-  async function connectWallet() {
-    let loggedIn = false;
-
-    try {
-      const chainId = (window as any)?.ethereum?.chainId;
-      if (+process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID !== +chainId) {
-        dispatch(changeNetwork((NetworkIds[+chainId] || `unknown`)?.toLowerCase()))
-        return;
-      } else {
-         await BeproService.login();
-         loggedIn = BeproService.isLoggedIn
-      }
-    } catch (e) {
-      console.error(`Failed to login on BeproService`, e);
-    }
-
-    if (!loggedIn)
-      onFail()
-    else onSuccess();
-
-    dispatch(changeWalletState(loggedIn))
-    dispatch(changeCurrentAddress(BeproService.address));
-  }
+  const { state: { loading } } = useContext(ApplicationContext)
+  const { wallet, beproServiceStarted, login } = useAuthentication()
 
   useEffect(() => {
-    if (!beproInit)
+    if (!beproServiceStarted)
       return;
 
 
-    if (forceLogin)
-      BeproService.login()
-      .then(() => {
-        dispatch(changeWalletState(BeproService.isLoggedIn))
-      })
-      .catch(e => {
-        console.error(`Error changing wallet state`, e);
-      })
+    if (forceLogin) login()
 
-  }, [beproInit]);
-
-  async function handleAddNetwork() {
-    setIsAddingNetwork(true);
-    const chainId = `0x${Number(process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID).toString(16)}`;
-    const currencyNetwork = NETWORKS[chainId]
-    try {
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [
-          {
-            chainId: chainId,
-          }
-        ]
-      });
-    } catch (error: any) {
-      if (error.code === 4902) {
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [
-            {
-              chainId: chainId,
-              chainName: currencyNetwork.name,
-              nativeCurrency: {
-                name: currencyNetwork.currency.name,
-                symbol: currencyNetwork.currency.symbol,
-                decimals: currencyNetwork.decimals,
-              },
-              rpcUrls: currencyNetwork.rpcUrls,
-              blockExplorerUrls: [currencyNetwork.explorerURL]
-            }
-          ]
-        });
-      }
-    }finally{
-      setIsAddingNetwork(false);
-    }
-  }
-
-  function isButtonDisabled() {
-    return [
-      isAddingNetwork,
-      activeNetwork === process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME
-    ].some(values => values)
-  }
+  }, [beproServiceStarted])
 
   if (asModal) {
     if (loading.isLoading) return <></>

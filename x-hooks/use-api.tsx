@@ -185,8 +185,8 @@ export default function useApi() {
                  .catch(() => false)
   }
 
-  async function getAllUsers(payload: {page: number,} = {page: 1}) {
-    return client.post<User[]>(`/search/users/`, payload)
+  async function getAllUsers(payload: {page: number} = {page: 1}) {
+    return client.post<User[]>(`/search/users/all`, payload)
                  .then(({data}) => data)
                  .catch(() => []);
   }

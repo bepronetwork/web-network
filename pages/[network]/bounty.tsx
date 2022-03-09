@@ -1,46 +1,49 @@
-import {GetServerSideProps} from 'next/types';
-import React, { useContext, useEffect, useState } from 'react';
-import IssueComments from 'components/issue-comments';
-import IssueDescription from 'components/issue-description';
-import IssueHero from 'components/issue-hero';
-import PageActions from 'components/page-actions';
-import IssueProposals from 'components/issue-proposals';
 import { useRouter } from 'next/router';
-import { User } from '@interfaces/api-response';
-import { ApplicationContext } from '@contexts/application';
-import { formatNumberToCurrency } from '@helpers/formatNumber';
-import IssueProposalProgressBar from 'components/issue-proposal-progress-bar';
-import useMergeData from 'x-hooks/use-merge-data';
-import useOctokit from 'x-hooks/use-octokit';
-import useApi from 'x-hooks/use-api';
-import TabbedNavigation from 'components/tabbed-navigation';
-import IssuePullRequests from 'components/issue-pull-requests';
-import CustomContainer from 'components/custom-container';
-import {getSession} from 'next-auth/react';
-import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
-import Translation from 'components/translation';
 import { useTranslation } from 'next-i18next';
+import { GetServerSideProps } from 'next/types';
+import React, { useEffect, useState } from 'react';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
+import IssueHero from '@components/issue-hero';
+import Translation from '@components/translation';
+import PageActions from '@components/page-actions';
+import IssueComments from '@components/issue-comments';
+import IssueProposals from '@components/issue-proposals';
+import CustomContainer from '@components/custom-container';
+import TabbedNavigation from '@components/tabbed-navigation';
+import IssueDescription from '@components/issue-description';
+import IssuePullRequests from '@components/issue-pull-requests';
+import IssueProposalProgressBar from '@components/issue-proposal-progress-bar';
+
 import { useRepos } from '@contexts/repos';
 import { useIssue } from '@contexts/issue';
+import { useAuthentication } from '@contexts/authentication';
+
+import { formatNumberToCurrency } from '@helpers/formatNumber';
+
+import useApi from '@x-hooks/use-api';
+import useOctokit from '@x-hooks/use-octokit';
+import useMergeData from '@x-hooks/use-merge-data';
 
 export default function PageIssue() {
   const router = useRouter();
-  const { id, repoId } = router.query;
-
-  const [commentsIssue, setCommentsIssue] = useState();
-  const [isRepoForked, setIsRepoForked] = useState(false);
+  const { t } = useTranslation('bounty')
+  
   const [isWorking, setIsWorking] = useState(false);
   const [hasOpenPR, setHasOpenPR] = useState(false);
+  const [commentsIssue, setCommentsIssue] = useState();
+  const [isRepoForked, setIsRepoForked] = useState(false);
   const [mergedPullRequests, setMergedPullRequests] = useState([]);
-  const [currentUser, setCurrentUser] = useState<User>();
   
-  const { state: { currentAddress, githubLogin }, } = useContext(ApplicationContext);
-  const {activeRepo}= useRepos();
-  const {activeIssue: issue, networkIssue, updateIssue, getNetworkIssue} = useIssue()
-  const {getUserOf, userHasPR} = useApi();
-  const {getMergedDataFromPullRequests} = useMergeData();
+  const { wallet, user } = useAuthentication()
+  
+  const { activeRepo }= useRepos();
   const { getUserRepos} = useOctokit();
-  const { t } = useTranslation('bounty')
+  const { userHasPR } = useApi();
+  const { getMergedDataFromPullRequests } = useMergeData();
+  const { activeIssue: issue, networkIssue, updateIssue, getNetworkIssue } = useIssue()
+
+  const { id, repoId } = router.query;
 
   const tabs = [
     {
@@ -74,28 +77,19 @@ export default function PageIssue() {
     return  tabs.find(tab => tab.isEmpty === false)?.eventKey
   }
 
-
-  const getCurrentUserMicroService = () => {
-    if (currentAddress == currentUser?.address)
-      return;
-
-    getUserOf(currentAddress)
-      .then((user: User) => setCurrentUser(user)).catch(console.log)
-  };
-
   function getRepoForked() {
-    if (!activeRepo || !githubLogin)
+    if (!activeRepo || !user?.login)
       return;
 
-    getUserRepos(githubLogin, activeRepo.githubPath.split(`/`)[1])
+    getUserRepos(user?.login, activeRepo.githubPath.split(`/`)[1])
       .then(({data}) => {
-        const isFokerd = data?.fork || data.owner.login === githubLogin
+        const isFokerd = data?.fork || data.owner.login === user?.login
         setIsRepoForked(isFokerd)
       }).catch(e => {
         console.log(`Failed to get users repositories: `, e)
       })
 
-    userHasPR(`${repoId}/${id}`, githubLogin)
+    userHasPR(`${repoId}/${id}`, user?.login)
       .then((result) => {
         setHasOpenPR(!!result)
       })
@@ -103,11 +97,7 @@ export default function PageIssue() {
   }
 
   function loadIssueData() {
-    if (currentAddress && id) {
-      getCurrentUserMicroService();
-    } 
-
-    if (githubLogin && activeRepo) getRepoForked();
+    if (user?.login && activeRepo) getRepoForked();
   }
 
   function addNewComment(comment) {
@@ -115,12 +105,12 @@ export default function PageIssue() {
   }
 
   function checkIsWorking() {
-    if (issue?.working && githubLogin)
-      setIsWorking(issue.working.some(el => el === githubLogin))
+    if (issue?.working && user?.login)
+      setIsWorking(issue.working.some(el => el === user?.login))
   }
 
   function loadMergedPullRequests() {
-    if (issue && currentAddress)
+    if (issue && wallet?.address)
       getMergedDataFromPullRequests(issue.repository?.githubPath, issue.pullRequests).then(setMergedPullRequests)
   }
 
@@ -135,9 +125,9 @@ export default function PageIssue() {
   }
 
   useEffect(syncLocalyState,[issue, activeRepo])
-  useEffect(loadIssueData, [githubLogin, currentAddress, id, issue, activeRepo]);
-  useEffect(checkIsWorking, [issue, githubLogin])
-  useEffect(loadMergedPullRequests, [issue, currentAddress])
+  useEffect(checkIsWorking, [issue, user?.login])
+  useEffect(loadMergedPullRequests, [issue, wallet?.address])
+  useEffect(loadIssueData, [user?.login, wallet?.address, id, issue, activeRepo])
 
   return (
     <>
@@ -160,7 +150,7 @@ export default function PageIssue() {
         mergeProposals={issue?.mergeProposals}
         amountIssue={networkIssue?.tokensStaked}
         forks={activeRepo?.forks}
-        githubLogin={currentUser?.githubLogin}
+        githubLogin={user?.login}
         hasOpenPR={hasOpenPR}
         isRepoForked={isRepoForked}
         isWorking={isWorking}
@@ -169,7 +159,7 @@ export default function PageIssue() {
         githubId={issue?.githubId}
         addNewComment={addNewComment}
         finished={networkIssue?.recognizedAsFinished} />
-        {((networkIssue?.mergeProposalAmount > 0 || mergedPullRequests.length > 0) && currentAddress) && <CustomContainer className="mb-4">
+        {((networkIssue?.mergeProposalAmount > 0 || mergedPullRequests.length > 0) && wallet?.address) && <CustomContainer className="mb-4">
           <TabbedNavigation defaultActiveKey={getDefaultActiveTab()} className="issue-tabs" tabs={tabs} collapsable />
         </CustomContainer>}
         {networkIssue ? (
@@ -217,7 +207,6 @@ export const getServerSideProps: GetServerSideProps = async ({query, locale}) =>
 
   return {
     props: {
-      session: await getSession(),
       currentIssue,
       ...(await serverSideTranslations(locale, ['common', 'bounty', 'proposal', 'pull-request'])),
     },

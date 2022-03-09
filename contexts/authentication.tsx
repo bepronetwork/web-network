@@ -23,7 +23,9 @@ export interface IAuthenticationContext {
   user?: IUser
   wallet?: IWallet
   isGithubAndWalletMatched?: boolean
+  beproServiceStarted?: boolean
   login: () => void
+  updateWalletBalance: () => void
 }
 
 const AuthenticationContext = createContext<IAuthenticationContext>(
@@ -90,12 +92,51 @@ export const AuthenticationProvider = ({ children }) => {
     [user]
   )
 
+  const updateWalletBalance = useCallback(() => {
+    BeproService.getOraclesSummary().then((oracles) =>
+      setWallet((previousWallet) => ({
+        ...previousWallet,
+        balance: {
+          ...previousWallet.balance,
+          oracles
+        }
+      }))
+    )
+
+    BeproService.getBalance('bepro').then((bepro) =>
+      setWallet((previousWallet) => ({
+        ...previousWallet,
+        balance: {
+          ...previousWallet.balance,
+          bepro
+        }
+      }))
+    )
+
+    BeproService.getBalance('eth').then((eth) =>
+      setWallet((previousWallet) => ({
+        ...previousWallet,
+        balance: {
+          ...previousWallet.balance,
+          eth
+        }
+      }))
+    )
+
+    BeproService.getBalance('staked').then((staked) =>
+      setWallet((previousWallet) => ({
+        ...previousWallet,
+        balance: {
+          ...previousWallet.balance,
+          staked
+        }
+      }))
+    )
+  }, [wallet?.address])
+
   // Side effects needed to the context work
   useEffect(() => {
-    if (
-      session.status === 'authenticated'
-    )
-      setUser({ ...session.data.user })
+    if (session.status === 'authenticated') setUser({ ...session.data.user })
   }, [session])
 
   useEffect(() => {
@@ -110,11 +151,7 @@ export const AuthenticationProvider = ({ children }) => {
     )
       validateWalletAndGithub(wallet.address)
 
-    if (
-      user &&
-      !wallet &&
-      beproServiceStarted
-    )
+    if (user && !wallet && beproServiceStarted)
       BeproService.login()
         .then(() =>
           setWallet((previousWallet) => ({
@@ -128,46 +165,7 @@ export const AuthenticationProvider = ({ children }) => {
   useEffect(() => {
     if (wallet && wallet?.address && beproServiceStarted) {
       setIsGithubAndWalletMatched(undefined)
-
-      BeproService.getOraclesSummary().then((oracles) =>
-        setWallet((previousWallet) => ({
-          ...previousWallet,
-          balance: {
-            ...previousWallet.balance,
-            oracles
-          }
-        }))
-      )
-
-      BeproService.getBalance('bepro').then((bepro) =>
-        setWallet((previousWallet) => ({
-          ...previousWallet,
-          balance: {
-            ...previousWallet.balance,
-            bepro
-          }
-        }))
-      )
-
-      BeproService.getBalance('eth').then((eth) =>
-        setWallet((previousWallet) => ({
-          ...previousWallet,
-          balance: {
-            ...previousWallet.balance,
-            eth
-          }
-        }))
-      )
-
-      BeproService.getBalance('staked').then((staked) =>
-        setWallet((previousWallet) => ({
-          ...previousWallet,
-          balance: {
-            ...previousWallet.balance,
-            staked
-          }
-        }))
-      )
+      updateWalletBalance()
     }
   }, [wallet?.address, beproServiceStarted])
 
@@ -196,10 +194,12 @@ export const AuthenticationProvider = ({ children }) => {
     () => ({
       user,
       wallet,
+      beproServiceStarted,
       isGithubAndWalletMatched,
-      login
+      login,
+      updateWalletBalance
     }),
-    [user, wallet, isGithubAndWalletMatched]
+    [user, wallet, beproServiceStarted, isGithubAndWalletMatched]
   )
 
   return (

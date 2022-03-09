@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useState } from 'react'
 import { ProgressBar } from 'react-bootstrap'
 
 import LockedIcon from '@assets/icons/locked-icon'
@@ -9,7 +9,7 @@ import Button from '@components/button'
 import InputNumber from '@components/input-number'
 import UnlockBeproModal from '@components/unlock-bepro-modal'
 
-import { ApplicationContext } from '@contexts/application'
+import { useAuthentication } from '@contexts/authentication'
 
 import { formatNumberToCurrency } from '@helpers/formatNumber'
 
@@ -30,9 +30,7 @@ export default function LockBeproStep({
   const [isUnlocking, setIsUnlocking] = useState(false)
   const [showUnlockBepro, setShowUnlockBepro] = useState(false)
 
-  const {
-    methods: { updateWalletBalance }
-  } = useContext(ApplicationContext)
+  const { updateWalletBalance } = useAuthentication()
 
   const lockedPercent =
     ((data.amountLocked || 0) / (data.amountNeeded || 0)) * 100

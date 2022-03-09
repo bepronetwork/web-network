@@ -1,19 +1,27 @@
-import {BeproService} from '@services/bepro-service';
-import {forwardRef, useContext, useEffect, useState} from 'react';
-import {ApplicationContext} from '@contexts/application';
-import Modal from './modal';
-import Icon from './icon';
-import {addTransaction} from '@reducers/add-transaction'
-import {addToast} from '@reducers/add-toast';
-import {TransactionTypes} from '@interfaces/enums/transaction-types';
-import {TransactionCurrency} from '@interfaces/transaction';
-import {updateTransaction} from '@reducers/update-transaction';
-import LockedIcon from '@assets/icons/locked-icon';
-import Button from './button';
-import {TransactionStatus} from '@interfaces/enums/transaction-status';
-import useTransactions from '@x-hooks/useTransactions';
 import { useTranslation } from 'next-i18next';
+import { forwardRef, useContext, useEffect, useState } from 'react';
+
+import LockedIcon from '@assets/icons/locked-icon';
+
+import Icon from '@components/icon';
+import Modal from '@components/modal';
+import Button from '@components/button';
+
 import { useNetwork } from '@contexts/network';
+import { ApplicationContext } from '@contexts/application';
+import { useAuthentication } from '@contexts/authentication';
+
+import { TransactionCurrency } from '@interfaces/transaction';
+import { TransactionTypes } from '@interfaces/enums/transaction-types';
+import { TransactionStatus } from '@interfaces/enums/transaction-status';
+
+import { addToast } from '@reducers/add-toast';
+import { addTransaction } from '@reducers/add-transaction'
+import { updateTransaction } from '@reducers/update-transaction';
+
+import { BeproService } from '@services/bepro-service';
+
+import useTransactions from '@x-hooks/useTransactions';
 
 interface NetworkTxButtonParams {
   txMethod: string;
@@ -33,29 +41,32 @@ interface NetworkTxButtonParams {
   className?: string;
 }
 
-
 function networkTxButton({
-                           txMethod,
-                           txParams,
-                           onTxStart = () => {},
-                           onSuccess,
-                           onFail,
-                           buttonLabel,
-                           modalTitle,
-                           modalDescription,
-                           className = '',
-                           children = null, fullWidth = false, useContract = false,
-                           disabled = false, txType = TransactionTypes.unknown, txCurrency = `$BEPRO`,
-                         }: NetworkTxButtonParams, elementRef) {
-  const {dispatch, state: {beproInit, metaMaskWallet, currentAddress}} = useContext(ApplicationContext);
+  txMethod,
+  txParams,
+  onTxStart = () => {},
+  onSuccess,
+  onFail,
+  buttonLabel,
+  modalTitle,
+  modalDescription,
+  className = '',
+  children = null, fullWidth = false, useContract = false,
+  disabled = false, txType = TransactionTypes.unknown, txCurrency = `$BEPRO`,
+}: NetworkTxButtonParams, elementRef) {
+  const { t } = useTranslation(['common'])
+  
   const [showModal, setShowModal] = useState(false);
   const [txSuccess, setTxSuccess] = useState(false);
+
+  const { dispatch } = useContext(ApplicationContext);
+  const { wallet, beproServiceStarted } = useAuthentication()
+  
   const txWindow = useTransactions();
-  const { t } = useTranslation(['common'])
   const { activeNetwork } = useNetwork()
 
   function checkForTxMethod() {
-    if (!beproInit || !metaMaskWallet)
+    if (!beproServiceStarted || !wallet)
       return;
 
     if (!txMethod || typeof BeproService.network[txMethod] !== `function`)
@@ -63,7 +74,7 @@ function networkTxButton({
   }
 
   function makeTx() {
-    if (!beproInit || !metaMaskWallet)
+    if (!beproServiceStarted || !wallet)
       return;
 
     const tmpTransaction = addTransaction({type: txType, amount: txParams?.tokenAmount || 0, currency: txCurrency}, activeNetwork);
@@ -77,7 +88,7 @@ function networkTxButton({
       const weiAmount = BeproService.toWei(txParams?.tokenAmount.toString())
   
       transactionMethod = BeproService.network.contract.methods[txMethod]
-      transactionMethod = txMethod === 'lock' ? transactionMethod(weiAmount).send({from: currentAddress}) : transactionMethod(weiAmount, txParams?.from).send({from: currentAddress})
+      transactionMethod = txMethod === 'lock' ? transactionMethod(weiAmount).send({from: wallet.address}) : transactionMethod(weiAmount, txParams?.from).send({from: wallet.address})
     }
 
     transactionMethod.then((answer) => {
@@ -117,7 +128,7 @@ function networkTxButton({
 
   const modalFooter = (<Button color='dark-gray' onClick={() => setShowModal(false)}>{t('actions.close')}</Button>)
 
-  useEffect(checkForTxMethod, [beproInit, metaMaskWallet])
+  useEffect(checkForTxMethod, [beproServiceStarted, wallet])
 
   return (<>
     <button className='d-none' ref={elementRef} onClick={makeTx} disabled={disabled}/>
