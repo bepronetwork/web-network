@@ -324,7 +324,7 @@ export default function NewNetwork() {
         description="To create your custom network we need permission to access your repositories"
         redirectTo={`${window.location.protocol}//${
           window.location.host
-        }/${network.name.toLowerCase()}/new-network`}
+        }/${BEPRO_NETWORK_NAME}/new-network`}
       />
 
       <CustomContainer>
