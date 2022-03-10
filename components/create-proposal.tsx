@@ -415,7 +415,7 @@ export default function NewProposal({
         (isIssueOwner && !isFinished && renderRecognizeAsFinished())}
       <Modal
         show={show}
-        title={t('proposal:title')}
+        title={t('proposal:actions.new')}
         titlePosition="center"
         onCloseClick={handleClose}
         footer={

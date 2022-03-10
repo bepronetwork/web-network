@@ -1,72 +1,106 @@
 import { useContext } from "react";
-import { GetStaticProps } from "next";
 import { useEffect, useState } from "react";
-import {ProposalData,} from '@interfaces/api-response';
+import { ProposalData } from "@interfaces/api-response";
 import { BeproService } from "@services/bepro-service";
 import { ApplicationContext } from "@contexts/application";
-import ProposalItem from '@components/proposal-item';
-import {Proposal} from '@interfaces/proposal';
+import ProposalItem from "@components/proposal-item";
+import { INetworkProposal, Proposal } from "@interfaces/proposal";
 import NothingFound from "./nothing-found";
 import { useTranslation } from "next-i18next";
 import { isProposalDisputable } from "@helpers/proposal";
+import useApi from "@x-hooks/use-api";
+import { IssueData } from "@interfaces/issue-data";
+import React from "react";
 
-export default function IssueProposals({ metaProposals, className='', metaRequests, numberProposals, issueId, amount, dbId, isFinalized = false, mergedProposal }) {
-  const { state: {beproStaked, currentAddress} } = useContext(ApplicationContext);
-  const [proposals, setProposals] = useState<Proposal[]>([]);
-  const [disputableTime, setDisputableTime] = useState(0)
-  const { t } = useTranslation('proposal')
+interface IProposalList {
+  networkProposal: INetworkProposal;
+  proposal: Proposal;
+}
+interface IIssueProposalProps {
+  issue: IssueData;
+  networkIssueId: number;
+  isFinalized: boolean;
+  className: string;
+}
+export default function IssueProposals({
+  issue,
+  networkIssueId,
+  className = "",
+  isFinalized = false,
+}: IIssueProposalProps) {
+  const {
+    state: { currentAddress },
+  } = useContext(ApplicationContext);
+  const [proposals, setProposals] = useState<IProposalList[]>([]);
+  const [disputableTime, setDisputableTime] = useState(0);
+  const { getProposal } = useApi();
+  const { t } = useTranslation("proposal");
 
   async function loadProposalsMeta() {
-    if (!issueId)
-      return;
+    if (!issue.issueId) return;
 
-    const scIssueId = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
-    const pool = [];
+    const pool: IProposalList[] = [];
 
-    for (const meta of metaProposals as ProposalData[]) {
-      const {scMergeId, pullRequestId} = meta;
+    for (const meta of issue.mergeProposals as ProposalData[]) {
+      const { id: proposalId, scMergeId } = meta;
+
       if (scMergeId) {
-        // if we don't have a scMergeId then something broke on the BE side and we should have a log - but we lost its connection to a PR
-        const merge = await BeproService.network.getMergeById(+scIssueId, +scMergeId);
-        const isDisputed = mergedProposal ? mergedProposal !== scMergeId : await BeproService.network.isMergeDisputed(scIssueId, +scMergeId);
-        const pr = metaRequests.find(({id}) => meta.pullRequestId === id);
+        const merge = await BeproService.network.getMergeById(
+          +networkIssueId,
+          +scMergeId
+        );
 
-        pool.push({...merge, createdAt: meta.createdAt, scMergeId, isDisputed, pullRequestId, pullRequestGithubId: pr?.githubId, owner: pr?.githubLogin, isMerged: mergedProposal === scMergeId } as Proposal)
+        const isDisputed = issue.merged
+          ? issue.merged !== scMergeId
+          : await BeproService.network.isMergeDisputed(
+              +networkIssueId,
+              +scMergeId
+            );
+
+        const proposal = await getProposal(proposalId);
+
+        pool.push({
+          networkProposal: {
+            ...merge,
+            isDisputed,
+          },
+          proposal,
+        });
       }
     }
 
-    
-
     setProposals(pool);
-    BeproService.getDisputableTime().then(setDisputableTime)
+    BeproService.getDisputableTime().then(setDisputableTime);
   }
 
-  useEffect(() => { loadProposalsMeta() }, [issueId, numberProposals, currentAddress, metaRequests]);
+  useEffect(() => {
+    loadProposalsMeta();
+  }, [issue, currentAddress]);
 
   return (
-    <div className={`content-wrapper ${className} pt-0 pb-0`}>
-      {metaProposals && proposals.map(proposal =>
-                        <ProposalItem key={proposal._id}
-                                      proposal={proposal}
-                                      issueId={issueId}
-                                      dbId={dbId}
-                                      amount={amount}
-                                      beproStaked={beproStaked}
-                                      onDispute={loadProposalsMeta}
-                                      isFinalized={isFinalized}
-                                      isMerged={proposal.isMerged}
-                                      isDisputable={isProposalDisputable(proposal.createdAt, disputableTime) && !proposal.isDisputed}
-                                      owner={proposal.owner}/>) || <NothingFound description={t('errors.not-found')} /> }
-      {proposals.length === 0 && 
-      <div className="content-list-item proposal caption-small text-center text-uppercase p-4 text-ligth-gray">
-        {t('messages.no-proposals-created')}
-      </div>}
+    <div className={`content-wrapper ${className || ""} pt-0 pb-0`}>
+      {React.Children.toArray(
+        proposals?.map(({ proposal, networkProposal }) => (
+          <ProposalItem
+            key={proposal.id}
+            proposal={proposal}
+            networkProposal={networkProposal}
+            issue={issue}
+            networkIssueId={networkIssueId}
+            onDispute={loadProposalsMeta}
+            isFinalized={isFinalized}
+            isDisputable={
+              isProposalDisputable(proposal.createdAt, disputableTime) &&
+              !proposal.isDisputed
+            }
+          />
+        ))
+      ) || <NothingFound description={t("errors.not-found")} />}
+      {proposals?.length === 0 && (
+        <div className="content-list-item proposal caption-small text-center text-uppercase p-4 text-ligth-gray">
+          {t("messages.no-proposals-created")}
+        </div>
+      )}
     </div>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {},
-  };
-};

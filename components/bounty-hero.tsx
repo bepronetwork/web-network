@@ -15,7 +15,7 @@ export default function BountyHero() {
     <div className="banner-shadow">
       <CustomContainer>
         <div className="d-flex flex-row">
-          <div>
+          <div className="col-10 row">
             <div className="d-flex flex-row">
               <h4 className="me-2 text-white-70">#{activeIssue?.githubId}</h4>
               <h4>{activeIssue?.title}</h4>
@@ -87,7 +87,7 @@ export default function BountyHero() {
               )}
             </div>
           </div>
-          <div className="d-flex align-items-center justify-content-center">
+          <div className="col-2 d-flex align-items-center justify-content-center">
               <PriceConversor currentValue={activeIssue?.amount || 0} currency="BEPRO"/>
           </div>
         </div>
