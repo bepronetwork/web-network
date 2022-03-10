@@ -2,13 +2,12 @@ import {GetServerSideProps} from 'next/types';
 import React, { useContext, useEffect, useState } from 'react';
 import IssueComments from 'components/issue-comments';
 import IssueDescription from 'components/issue-description';
-import IssueHero from 'components/issue-hero';
+import BountyHero from 'components/bounty-hero';
 import PageActions from 'components/page-actions';
 import IssueProposals from 'components/issue-proposals';
 import { useRouter } from 'next/router';
 import { User } from '@interfaces/api-response';
 import { ApplicationContext } from '@contexts/application';
-import { formatNumberToCurrency } from '@helpers/formatNumber';
 import IssueProposalProgressBar from 'components/issue-proposal-progress-bar';
 import useMergeData from 'x-hooks/use-merge-data';
 import useOctokit from 'x-hooks/use-octokit';
@@ -141,10 +140,7 @@ export default function PageIssue() {
 
   return (
     <>
-      <IssueHero
-        amount={formatNumberToCurrency(issue?.amount || networkIssue?.tokensStaked)}
-        state={issue?.state}
-        issue={issue} />
+      <BountyHero/>
       <PageActions
         state={issue?.state}
         developers={issue?.developers}
