@@ -139,7 +139,8 @@ export default function NewNetwork() {
               botPermission: repositoriesData.permission,
               creator: wallet.address,
               githubLogin: user.login,
-              networkAddress
+              networkAddress,
+              accessToken: user?.accessToken
             }
 
             createNetwork(json).then((result) => {
