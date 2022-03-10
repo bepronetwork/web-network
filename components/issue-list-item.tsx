@@ -1,6 +1,6 @@
 import { GetStaticProps } from "next";
 import { useRouter } from "next/router";
-import React, { useContext } from "react";
+import React from "react";
 import IssueAvatars from "./issue-avatars";
 import { IssueData, pullRequest } from "@interfaces/issue-data";
 import { IssueState } from "@interfaces/issue-data";
@@ -9,9 +9,10 @@ import Avatar from "components/avatar";
 import GithubInfo from "@components/github-info";
 import Translation from "./translation";
 import { useTranslation } from "next-i18next";
-import { intervalToDuration } from "date-fns";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useNetwork } from "@contexts/network";
+import BountyStatusInfo from "./bounty-status-info";
+import DateLabel from "./date-label";
 
 export default function IssueListItem({
   issue = null,
@@ -24,38 +25,6 @@ export default function IssueListItem({
   const { activeNetwork } = useNetwork()
   const { t } = useTranslation("bounty");
 
-  function handleColorState(state: IssueState) {
-    switch (state?.toLowerCase()) {
-      case "draft": {
-        return "bg-white-50";
-      }
-      case "open": {
-        return "bg-primary text-white";
-      }
-      case "in progress": {
-        return "bg-primary text-white";
-      }
-      case "canceled": {
-        return "bg-dark-gray text-white";
-      }
-      case "closed": {
-        return "bg-dark-gray text-white";
-      }
-      case "ready": {
-        return "bg-success";
-      }
-      case "done": {
-        return "bg-success";
-      }
-      case "disputed": {
-        return "bg-danger text-white";
-      }
-      default: {
-        return "primary";
-      }
-    }
-  }
-
   function handleReviewsPr(pullRequests: pullRequest[]) {
     var numberAllReviewers = 0;
 
@@ -66,53 +35,10 @@ export default function IssueListItem({
     return numberAllReviewers;
   }
 
-  function renderData(data: Date) {
-    const duration = intervalToDuration({
-      start: new Date(data),
-      end: new Date(),
-    });
-
-    const translated = (measure: string, amount: number = 0) =>
-      `${amount} ${t(`info-data.${measure}${amount > 1 ? "_other" : ""}`)}`;
-
-    const groups: string[][] = [
-      ["years", "months"],
-      ["months", "days"],
-      ["days", "hours"],
-      ["hours", "minutes"],
-      ["minutes"],
-    ];
-
-    function handleDurationTranslation() {
-      const _string: string[] = [];
-      let i = 0;
-      for (i; i <= groups.length - 1; i++) {
-        const [m1, m2] = groups[i] as string[];
-
-        if (duration[m1]) {
-          _string.push(translated(m1, duration[m1]));
-          if (duration[m2]) _string.push(translated(m2, duration[m2]));
-        }
-
-        if (_string.length) i = groups.length;
-      }
-      return _string;
-    }
-
-    return (
-      <span className="caption-small text-ligth-gray">
-        {data &&
-          t(`info-data.text-data`, {
-            value: handleDurationTranslation().join(" "),
-          })}
-      </span>
-    );
-  }
-
   function renderProposals() {
     return (
       <div className="d-flex align-items-center">
-        <span className="caption-small  mr-1 text-white">
+        <span className="caption-small mr-1 text-white">
           {(issue != null && issue.mergeProposals?.length) || 0}
         </span>
         <span className="caption-small text-white-40 text-uppercase">
@@ -176,7 +102,7 @@ export default function IssueListItem({
           {state?.toLowerCase() === "ready"
             ? renderReviews()
             : renderProposals()}
-          {state?.toLowerCase() !== "draft" && renderData(issue?.createdAt)}
+          {state?.toLowerCase() !== "draft" && <DateLabel date={issue?.createdAt}/>}
         </div>
       );
     } else {
@@ -205,15 +131,7 @@ export default function IssueListItem({
               )}
             </h4>
           <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2 gap-20">
-            <span
-              className={`status caption-small ${handleColorState(
-                issue?.state
-              )}`}
-            >
-              {issue && (
-                <Translation ns="bounty" label={`status.${issue.state}`} />
-              )}
-            </span>
+            <BountyStatusInfo issueState={issue.state}/>
             <div className="d-flex align-items-center">
               <Avatar className="mr-1" userLogin={issue?.creatorGithub} border />
               <OverlayTrigger
@@ -263,7 +181,7 @@ export default function IssueListItem({
                 </span>
               </OverlayTrigger>
             )}
-            {issue?.state === "draft" && renderData(issue?.createdAt)}
+            {issue?.state === "draft" && <DateLabel date={issue?.createdAt}/>}
           </div>
           {renderIssueData(issue?.state)}
         </div>

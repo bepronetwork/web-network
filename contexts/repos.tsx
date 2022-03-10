@@ -57,7 +57,7 @@ export const ReposProvider: React.FC = function ({ children }) {
   const { getForksOf } = useOctokit();
   const {query} = useRouter();
   
-  const findRepo = (repoId: number): RepoInfo =>  repoList[activeNetwork?.name].repos?.find(({id}) => id === repoId)
+  const findRepo = (repoId: number): RepoInfo =>  repoList[activeNetwork?.name]?.repos?.find(({id}) => id === repoId)
   const isLoadedReposByNetwork = (): Boolean => repoList[activeNetwork?.name]?.repos?.length > 0;
 
   const findForks = useCallback(

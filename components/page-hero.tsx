@@ -15,7 +15,6 @@ export interface IPageHeroProps {
 }
 
 function InfoComponent(info: IInfosHero) {
-  debugger;
   if (info.currency) {
     return (
       <div className="col px-2">
