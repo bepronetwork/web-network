@@ -5,7 +5,7 @@ import Button from "./button";
 
 export default function IssueDraftProgress({ amountUsed, amountTotal }) {
   return (
-    <div className="container mt-up">
+    <div className="container mt-n5">
       <div className="row justify-content-center">
         <div className="col-md-10">
           <div className="content-wrapper mb-4">

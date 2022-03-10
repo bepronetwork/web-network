@@ -5,7 +5,7 @@ import Avatar from "./avatar";
 
 export default function ProposalProgress({ developers = [] }) {
   return (
-    <div className="container mt-up">
+    <div className="container mt-n5">
       <div className="row justify-content-center">
         <div className="col-md-10">
           <div className="content-wrapper p-0 overflow-hidden">

@@ -554,9 +554,7 @@ label {
   }
 }
 
-// Utils
-.mt-up { margin-top: -$m*3; }
-
+// Todo: Update to boostrap class and remove these
 .mr-0 { margin-right: 0px !important }
 .mr-1 { margin-right: math.div($m, 2) }
 .mr-2 { margin-right: $m }
@@ -617,7 +615,6 @@ label {
 }
 
 // Overrides
-
 .proposal, .proposal-progress-bar {
   .text-danger {
     color: rgba(var(--bs-danger-rgb), 1) !important;
