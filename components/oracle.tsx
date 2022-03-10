@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { ReactNode, ReactNodeArray, useContext, useEffect, useState } from 'react'
 
 import PageHero, { IInfosHero } from '@components/page-hero'
 import InternalLink from '@components/internal-link'
@@ -14,18 +14,18 @@ export default function Oracle({children}) {
   const { asPath } = useRouter()
   const {state: {beproInit}} = useContext(ApplicationContext)
   const { network: activeNetwork, getURLWithNetwork } = useNetwork()
-  const { t } = useTranslation(['oracle'])
+  const { t } = useTranslation(['oracle', 'common'])
 
   const [infos, setInfos] = useState<IInfosHero[]>([
     {
       value: 0,
-      label: t('heroes.in-progress')
+      label: t('common:heroes.in-progress')
     },{
       value: 0,
-      label: t('heroes.bounties-closed')
+      label: t('common:heroes.bounties-closed')
     },{
       value: 0,
-      label: t('heroes.bounties-in-network'),
+      label: t('common:heroes.bounties-in-network'),
       currency: 'BEPRO'
     }
   ])
@@ -42,17 +42,17 @@ export default function Oracle({children}) {
     setInfos([
       {
         value: inProgress,
-        label: t('heroes.in-progress')
+        label: t('common:heroes.in-progress')
       },{
         value: closed,
-        label: t('heroes.bounties-closed')
+        label: t('common:heroes.bounties-closed')
       },{
         value: onNetwork,
-        label: t('heroes.bounties-in-network'),
+        label: t('common:heroes.bounties-in-network'),
         currency: 'BEPRO'
       },{
         value: 0,
-        label: t('heroes.protocol-members'),
+        label: t('common:heroes.protocol-members'),
       }
     ])
   }
@@ -61,7 +61,7 @@ export default function Oracle({children}) {
 
   return (
     <div>
-      <PageHero title={t('title')} subtitle={t('subtitle')}  infos={infos} />
+      <PageHero title={t('oracle:title')} subtitle={t('oracle:subtitle')}  infos={infos} />
       <div className="container pt-3">
         <div className="row">
           <div className="d-flex justify-content-center">
