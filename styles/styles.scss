@@ -385,7 +385,7 @@ li {
     cursor: pointer;
   }
 }
-
+// Remove: After update all headers
 .banner {
   width: 100%;
   min-height: 240px;
@@ -401,6 +401,16 @@ li {
   }
 }
 
+.banner-shadow{
+  width: 100%;
+  min-height: 191px;
+  background-color: var(--bs-shadow);
+  color: $white;
+  padding-top: ($navbar-height + $m + 4);
+  padding-bottom: $m+4;
+}
+
+// Remove: After update all headers
 .top-border {
   padding-top: $m;
   margin-top: $m;
