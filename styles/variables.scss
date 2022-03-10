@@ -29,6 +29,8 @@ $toast-font-size: 1rem;
 $m: 16px;
 
 $navbar-height: 70px;
+//Enable negative margins
+$enable-negative-margins: true;
 
 // NOTE Attention, the variables colors change need be before boostrap imports or not work.
 // to check see on console `@debug $theme-colors;`

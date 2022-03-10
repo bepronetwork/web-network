@@ -4,13 +4,15 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 import PageHero from '@components/page-hero'
 import ListIssues from '@components/list-issues'
+import { useTranslation } from 'next-i18next'
 
 export default function PageDevelopers() {
+  const { t } = useTranslation(['common'])
 
   return (
     <>
       <div>  
-        <PageHero />
+        <PageHero title={t('heroes.bounties.title')}  subtitle={t('heroes.bounties.subtitle')}/>
 
         <ListIssues />
       </div>

@@ -34,7 +34,7 @@ export default function AccountHero() {
   useEffect(loadBeproNetworkInformation, [beproInit, metaMaskWallet, currentAddress])
 
   return (
-    <div className="banner bg-bepro-blue mb-4">
+    <div className="banner">
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10">
