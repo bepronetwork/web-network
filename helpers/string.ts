@@ -42,3 +42,20 @@ export const getQueryableText = (text: string): string => {
 export const urlWithoutProtocol = (url: string): string => {
   return url.toLowerCase().replace('http://', '').replace('https://', '')
 }
+
+/**
+ * Replace string between *value* to a span styled
+ * @param str string to be replaced
+ * @param className class to style span
+ * @returns string inner html
+ */
+
+export const formatTextToBold = (str: string, className?: string ) => {
+  if (!str) {
+    return ''
+  }
+
+  const regex = /\*([\0-9a-zA-Z\u00C0-\u024F\u1E00-\u1EFF]*?)\*/g;
+  const subst = `<span class='text-purple text-uppercase ${className || ''}'>$1</span>`;
+  return str.replaceAll(regex, subst);
+};

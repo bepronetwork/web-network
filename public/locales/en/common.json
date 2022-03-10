@@ -33,7 +33,10 @@
   },
   "heroes": {
     "in-progress": "In Progress",
-    "find-bounties-to-work": "Find Bounties to work",
+    "bounties": {
+      "title": "Bounties",
+      "subtitle": "find a bounty that you *want* to work on, create a solution and *get paid*"
+    },
     "bounties-closed": "Bounties Closed",
     "bounties-in-network": "In the Network",
     "my-account": "My account",

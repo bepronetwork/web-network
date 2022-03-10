@@ -26,7 +26,10 @@
     "hero": {}
   },
   "heroes": {
-    "find-bounties-to-work": "Encontre bounties para trabalhar",
+    "bounties": {
+      "title": "Bounties",
+      "subtitle": "find a bounty that you want to work on, create a solution and get paid"
+    },
     "bounties-closed": "Bounties finalizadas",
     "bounties-in-network": "Na rede"
   },
