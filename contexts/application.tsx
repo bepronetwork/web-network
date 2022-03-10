@@ -109,30 +109,9 @@ export default function ApplicationContextProvider({children}) {
 
     BeproService.isApprovedTransactionalToken().then(approval => dispatch(changeTransactionalTokenApproval(approval)))
     BeproService.isApprovedSettlerToken().then(approval => dispatch(changeSettlerTokenApproval(approval)))
-
-    updateWalletBalance(address)
     
     cheatBepro = BeproService;
     cheatDispatcher = updateTransaction;
-  }
-
-  function updateWalletBalance(cheatAddress = undefined) {
-    if (!state.currentAddress)
-      return
-
-    const address = cheatAddress || state.currentAddress
-    
-    BeproService.getOraclesSummary()
-                .then(oracles => dispatch(changeOraclesState(changeOraclesParse(address, oracles))))
-
-    BeproService.getBalance('bepro')
-                .then(bepro => dispatch(changeBalance({bepro})))
-
-    BeproService.getBalance('eth')
-                .then(eth => dispatch(changeBalance({eth})))
-
-    BeproService.getBalance('staked')
-                .then(staked => dispatch(changeBalance({staked})))
   }
 
   const Initialize = () => {    
@@ -141,7 +120,6 @@ export default function ApplicationContextProvider({children}) {
     BeproService.start(handleNetworkAddress(activeNetwork))
                 .then((state) => {
                   dispatch(changeBeproInitState(state))
-                  updateWalletBalance()
                 }).finally(() => dispatch(changeLoadState(false)))
 
     if (!window.ethereum)
@@ -246,7 +224,7 @@ export default function ApplicationContextProvider({children}) {
   },[state.myTransactions, state.currentAddress])
 
   return (
-    <ApplicationContext.Provider value={{ state, dispatch: dispatch as any, methods: { updateWalletBalance } }}>
+    <ApplicationContext.Provider value={{ state, dispatch: dispatch as any }}>
       <Loading show={state.loading.isLoading} text={state.loading.text} />
       <Toaster />
       {children}
