@@ -15,35 +15,23 @@ import { formatNumberToCurrency } from '@helpers/formatNumber'
 import { TransactionTypes } from '@interfaces/enums/transaction-types'
 import { TransactionStatus } from '@interfaces/enums/transaction-status'
 
-import {
-  changeOraclesParse,
-  changeOraclesState
-} from '@reducers/change-oracles'
-import { changeBalance } from '@reducers/change-balance'
-
-import { BeproService } from '@services/bepro-service'
-
 function OraclesDelegate(): JSX.Element {
   const { t } = useTranslation(['common', 'my-oracles'])
   
   const [error, setError] = useState<string>('')
-  const [delegatedAmount, setDelegatedAmount] = useState(0)
+  const [availableAmount, setAvailableAmount] = useState(0)
   const [delegatedTo, setDelegatedTo] = useState<string>('')
   const [tokenAmount, setTokenAmount] = useState<number | undefined>()
-
-  const {
-    dispatch,
-    state: { myTransactions }
-  } = useContext(ApplicationContext)
   
   const { wallet, beproServiceStarted } = useAuthentication()
+  const { state: { myTransactions } } = useContext(ApplicationContext)
 
   function handleChangeOracles(params: NumberFormatValues) {
     if (params.value === '') return setTokenAmount(undefined)
 
     if (params.floatValue < 1 || !params.floatValue) return setTokenAmount(0)
 
-    if (params.floatValue > delegatedAmount)
+    if (params.floatValue > availableAmount)
       setError(t('my-oracles:errors.amount-greater', { amount: 'total' }))
     else setError(``)
 
@@ -51,7 +39,7 @@ function OraclesDelegate(): JSX.Element {
   }
 
   function setMaxAmmount() {
-    return setTokenAmount(delegatedAmount)
+    return setTokenAmount(availableAmount)
   }
 
   function handleChangeAddress(params: ChangeEvent<HTMLInputElement>) {
@@ -69,20 +57,6 @@ function OraclesDelegate(): JSX.Element {
     handleChangeOracles({ floatValue: 0, formattedValue: '0', value: '0' })
     setDelegatedTo('')
     setError('')
-
-    BeproService.network
-      .getBEPROStaked()
-      .then((staked) => dispatch(changeBalance({ staked })))
-
-    BeproService.network.getOraclesSummary(wallet?.address).then((oracles) => {
-      dispatch(changeOraclesState(changeOraclesParse(wallet?.address, oracles)))
-    })
-  }
-
-  function updateAmounts() {
-    if (!beproServiceStarted || !wallet?.address) return
-
-    setDelegatedAmount(+wallet?.balance?.oracles?.tokensLocked - wallet?.balance?.oracles?.delegatedToOthers)
   }
 
   const isButtonDisabled = (): boolean =>
@@ -102,18 +76,18 @@ function OraclesDelegate(): JSX.Element {
     wallet?.address &&
     delegatedTo?.toLowerCase() === wallet?.address?.toLowerCase()
 
-  useEffect(updateAmounts, [
-    beproServiceStarted,
-    wallet?.address,
-    wallet?.balance
-  ])
+  useEffect(() => {
+    if (!beproServiceStarted || !wallet?.balance) return
+    
+    setAvailableAmount(+wallet?.balance?.oracles?.tokensLocked - wallet?.balance?.oracles?.delegatedToOthers)
+  }, [ beproServiceStarted, wallet?.balance ])
 
   return (
     <div className="col-md-5">
       <div className="content-wrapper h-100">
         <OraclesBoxHeader
           actions={t('my-oracles:actions.delegate.title')}
-          available={delegatedAmount}
+          available={availableAmount}
         />
         <p className="caption-small text-white text-uppercase mt-2 mb-3">
           {t('my-oracles:actions.delegate.description')}
@@ -130,7 +104,7 @@ function OraclesDelegate(): JSX.Element {
           error={!!error}
           helperText={
             <>
-              {formatNumberToCurrency(delegatedAmount, {
+              {formatNumberToCurrency(availableAmount, {
                 maximumFractionDigits: 18
               })}{' '}
               {`${t('$oracles')} ${t('my-oracles:available')}`}

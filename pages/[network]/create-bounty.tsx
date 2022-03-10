@@ -48,24 +48,24 @@ export default function PageCreateIssue() {
   const { t } = useTranslation(['common', 'create-bounty'])
   
   const [branch, setBranch] = useState(``)
-  const [balance, setBalance] = useState(0)
   const [issueTitle, setIssueTitle] = useState('')
   const [redirecting, setRedirecting] = useState(false)
   const [repository_id, setRepositoryId] = useState(``)
   const [files, setFiles] = useState<IFilesProps[]>([])
   const [issueDescription, setIssueDescription] = useState('')
   const [issueAmount, setIssueAmount] = useState<Amount>({value: '', formattedValue: '', floatValue: 0})
+  const [isTransactionalTokenApproved, setIsTransactionalTokenApproved] = useState(false)
   
   const { activeNetwork } = useNetwork()
-  const { wallet, user } = useAuthentication()
+  const { wallet, user, beproServiceStarted } = useAuthentication()
   const { 
     dispatch, 
-    state: { myTransactions, isTransactionalTokenApproved } 
+    state: { myTransactions } 
   } = useContext(ApplicationContext)
   
   const txWindow = useTransactions()
   const { getURLWithNetwork } = useNetworkTheme()
-  const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId} = useApi()
+  const { createIssue: apiCreateIssue, patchIssueWithScId} = useApi()
 
   async function allowCreateIssue() {
     await BeproService.login();
@@ -166,7 +166,7 @@ export default function PageCreateIssue() {
 
   const issueContentIsValid = (): boolean => !!issueTitle && !!issueDescription;
 
-  const verifyAmountBiggerThanBalance = (): boolean => !(issueAmount.floatValue > Number(balance))
+  const verifyAmountBiggerThanBalance = (): boolean => !(issueAmount.floatValue > Number(wallet?.balance?.bepro))
 
   const verifyTransactionState = (type: TransactionTypes): boolean => !!myTransactions.find(transactions=> transactions.type === type && transactions.status === TransactionStatus.pending);
 
@@ -190,8 +190,8 @@ export default function PageCreateIssue() {
   ].some(value => value === false)
 
   const handleIssueAmountBlurChange = () => {
-    if (issueAmount.floatValue > Number(balance)) {
-      setIssueAmount({formattedValue: balance.toString()});
+    if (issueAmount.floatValue > Number(wallet?.balance?.bepro)) {
+      setIssueAmount({formattedValue: wallet?.balance?.bepro?.toString()});
     }
   }
 
@@ -204,6 +204,10 @@ export default function PageCreateIssue() {
   }
 
   const onUpdateFiles = (files:IFilesProps[]) => setFiles(files)
+
+  useEffect(() => {
+    if (beproServiceStarted) BeproService.isApprovedTransactionalToken().then(setIsTransactionalTokenApproved).catch(console.log)
+  }, [beproServiceStarted])
   
   return (
     <>
@@ -257,7 +261,7 @@ export default function PageCreateIssue() {
                 <div className="col">
                   <InputNumber
                     thousandSeparator
-                    max={balance}
+                    max={wallet?.balance?.bepro}
                     className={clsx({'text-muted': isTransactionalTokenApproved})}
                     label={t('create-bounty:fields.amount.label')}
                     symbol={t('$bepro')}
@@ -268,11 +272,11 @@ export default function PageCreateIssue() {
                     onBlur={handleIssueAmountBlurChange}
                     helperText={
                       <>
-                        {t('create-bounty:fields.amount.info', { amount: formatNumberToCurrency(balance, { maximumFractionDigits: 18 }) })}
+                        {t('create-bounty:fields.amount.info', { amount: formatNumberToCurrency(wallet?.balance?.bepro, { maximumFractionDigits: 18 }) })}
                         {isTransactionalTokenApproved && (
                           <span
                             className="caption-small text-primary ml-1 cursor-pointer text-uppercase"
-                            onClick={() => setIssueAmount({formattedValue: balance.toString()})}>
+                            onClick={() => setIssueAmount({formattedValue: wallet?.balance?.bepro?.toString()})}>
                           {t('create-bounty:fields.amount.max')}
                       </span>
                         )}
