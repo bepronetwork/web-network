@@ -1,55 +1,71 @@
-import {useContext, useEffect, useState} from 'react';
-import {ApplicationContext} from '@contexts/application';
-import {Octokit} from 'octokit';
-import {addTransaction} from '@reducers/add-transaction';
-import {TransactionTypes} from '@interfaces/enums/transaction-types';
-import {BeproService} from '@services/bepro-service';
-import {updateTransaction} from '@reducers/update-transaction';
-import ConnectWalletButton from '@components/connect-wallet-button';
-import {formatNumberToString} from '@helpers/formatNumber';
-import {changeLoadState} from '@reducers/change-load-state';
-import router from 'next/router';
-import {toastError, toastInfo} from '@reducers/add-toast';
-import {BEPRO_NETWORK_NAME, IPFS_BASE, SETTLER_ADDRESS, TRANSACTION_ADDRESS} from '../../env';
-import {ReposList} from '@interfaces/repos-list';
-import {ListGroup, OverlayTrigger, Tooltip} from 'react-bootstrap';
-import ConnectGithub from '@components/connect-github';
 import Image from 'next/image'
-import Button from '@components/button';
-import useApi from '@x-hooks/use-api';
-import {TransactionStatus} from '@interfaces/enums/transaction-status';
-import {GetServerSideProps} from 'next';
-import {getSession} from 'next-auth/react';
-import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
-import { useTranslation } from 'next-i18next';
-import {NetworkFactory, toSmartContractDecimals} from 'bepro-js';
-import { useNetwork } from '@contexts/network';
-import { INetwork } from '@interfaces/network';
-import { formatDate } from '@helpers/formatDate';
-import OverrideNameModal from '@components/custom-network/override-name-modal';
-import { truncateAddress } from '@helpers/truncate-address';
+import router from 'next/router'
+import { Octokit } from 'octokit'
+import { GetServerSideProps } from 'next'
+import { useTranslation } from 'next-i18next'
+import { useContext, useEffect, useState } from 'react'
+import { NetworkFactory, toSmartContractDecimals } from 'bepro-js'
+import { ListGroup, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+
+import Button from '@components/button'
+import ConnectGithub from '@components/connect-github'
+import ConnectWalletButton from '@components/connect-wallet-button'
+import OverrideNameModal from '@components/custom-network/override-name-modal'
+
+import { useNetwork } from '@contexts/network'
+import { ApplicationContext } from '@contexts/application'
+import { useAuthentication } from '@contexts/authentication'
+
+import { formatDate } from '@helpers/formatDate'
+import { truncateAddress } from '@helpers/truncate-address'
+import { formatNumberToString } from '@helpers/formatNumber'
+
+import { INetwork } from '@interfaces/network'
+import { ReposList } from '@interfaces/repos-list'
+import { TransactionTypes } from '@interfaces/enums/transaction-types'
+import { TransactionStatus } from '@interfaces/enums/transaction-status'
+
+import { addTransaction } from '@reducers/add-transaction'
+import { toastError, toastInfo } from '@reducers/add-toast'
+import { changeLoadState } from '@reducers/change-load-state'
+import { updateTransaction } from '@reducers/update-transaction'
+
+import { BeproService } from '@services/bepro-service'
+
+import useApi from '@x-hooks/use-api'
+
+import {
+  IPFS_BASE,
+  SETTLER_ADDRESS,
+  TRANSACTION_ADDRESS
+} from '../../env'
 
 export default function ParityPage() {
-  const {state: {currentAddress, balance,}, dispatch} = useContext(ApplicationContext);
-  const [githubToken, setGithubToken] = useState(``);
-  const [githubLogin, setGithubLogin] = useState(``);
-  const [readRepoName, setReadRepoName] = useState(``);
-  const [outputRepoName, setOutputRepoName] = useState(``);
-  const [githubCreator, setGithubCreator] = useState(``);
-  const [deployedContract, setDeployedContract] = useState(``);
-  const [councilAmount, setCouncilAmount] = useState(``);
-  const [settlerTokenName, setSettlerTokenName] = useState(``);
-  const [settlerTokenSymbol, setSettlerTokenSymbol] = useState(``);
-  const [settlerTokenAddress, setSettlerTokenAddress] = useState(``);
-  const [networkToUpdate, setNetworkToUpdate] = useState<INetwork>()
-  const [showModalName, setShowModalName] = useState(false)
-  const [issuesList, setIssuesList] = useState([]);
-  const [reposList, setReposList] = useState<ReposList>([]);
-  const [availReposList, setAvailableList] = useState<string[]>([]);
-  const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId, createRepo, getReposList, removeRepo: apiRemoveRepo, searchNetworks} = useApi();
   const { t } = useTranslation(['common', 'parity'])
-  const { activeNetwork } = useNetwork()
+
+  const [issuesList, setIssuesList] = useState([])
+  const [githubToken, setGithubToken] = useState(``)
+  const [githubLogin, setGithubLogin] = useState(``)
+  const [readRepoName, setReadRepoName] = useState(``)
+  const [githubCreator, setGithubCreator] = useState(``)
+  const [councilAmount, setCouncilAmount] = useState(``)
+  const [outputRepoName, setOutputRepoName] = useState(``)
   const [networks, setNetworks] = useState<INetwork[]>([])
+  const [reposList, setReposList] = useState<ReposList>([])
+  const [showModalName, setShowModalName] = useState(false)
+  const [settlerTokenName, setSettlerTokenName] = useState(``)
+  const [deployedContract, setDeployedContract] = useState(``)
+  const [settlerTokenSymbol, setSettlerTokenSymbol] = useState(``)
+  const [availReposList, setAvailableList] = useState<string[]>([])
+  const [settlerTokenAddress, setSettlerTokenAddress] = useState(``)
+  const [networkToUpdate, setNetworkToUpdate] = useState<INetwork>()
+
+  const { activeNetwork } = useNetwork()
+  const { wallet, user } = useAuthentication()
+  const { dispatch } = useContext(ApplicationContext)
+
+  const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId, createRepo, getReposList, removeRepo: apiRemoveRepo, searchNetworks} = useApi()
 
   const formItem = (label = ``, placeholder = ``, value = ``, onChange = (ev) => {}) =>
     ({label, placeholder, value, onChange})
@@ -61,66 +77,66 @@ export default function ParityPage() {
   ]
 
   function isValidForm() {
-    return formMaker.some(({value}) => !value);
+    return formMaker.some(({value}) => !value)
   }
 
   async function createComments(issue_number, out_issue_number) {
-    const octokit = new Octokit({auth: githubToken});
-    const readRepoInfo = {owner: githubLogin, repo: readRepoName};
-    const outRepoInfo = {owner: githubLogin, repo: outputRepoName};
+    const octokit = new Octokit({auth: githubToken})
+    const readRepoInfo = {owner: githubLogin, repo: readRepoName}
+    const outRepoInfo = {owner: githubLogin, repo: outputRepoName}
 
     async function getComments(page = 1, comments = []) {
       const mapComment = ({user: {login = ``,}, created_at = ``, updated_at = ``, body = ``}) =>
-        ({login, createdAt: created_at, updatedAt: updated_at, body,});
+        ({login, createdAt: created_at, updatedAt: updated_at, body,})
 
       return octokit.rest.issues.listComments({...readRepoInfo, issue_number, page})
                     .then(({data}) => {
                       if (data.length === 100)
                         return getComments(page + 1, [...comments, ...data.map(mapComment)])
-                      return [...comments, ...data.map(mapComment)];
+                      return [...comments, ...data.map(mapComment)]
                     })
     }
 
     function createComment({login = ``, body = ``, createdAt = ``, updatedAt = ``, issue_number}) {
-      body = `> Created by ${login} at ${new Date(createdAt).toISOString()} ${updatedAt ? `and updated at ${new Date(updatedAt).toISOString()}` : ``}\n\n`.concat(body);
+      body = `> Created by ${login} at ${new Date(createdAt).toISOString()} ${updatedAt ? `and updated at ${new Date(updatedAt).toISOString()}` : ``}\n\n`.concat(body)
       return octokit.rest.issues.createComment({...outRepoInfo, issue_number: out_issue_number, body})
     }
 
-    const comments = await getComments();
+    const comments = await getComments()
 
     for (const comment of comments)
-      await createComment(comment);
+      await createComment(comment)
 
   }
 
   function listIssues() {
-    const octokit = new Octokit({auth: githubToken});
+    const octokit = new Octokit({auth: githubToken})
 
     function getRepoId(path: string) {
       return reposList.find(({githubPath}) => {
         return githubPath === path
-      }).id;
+      }).id
     }
 
     function mapOpenIssue({title = ``, number = 0, body = ``, labels = [], tokenAmount, repository_url, user: {login: creatorGithub}}) {
-      const getTokenAmount = (lbls) => +lbls.find((label = ``) => label.search(/k \$?(BEPRO|USDC)/) > -1)?.replace(/k \$?(BEPRO|USDC)/, `000`) || 100000;
+      const getTokenAmount = (lbls) => +lbls.find((label = ``) => label.search(/k \$?(BEPRO|USDC)/) > -1)?.replace(/k \$?(BEPRO|USDC)/, `000`) || 100000
 
       if (labels.length && !tokenAmount)
-        tokenAmount = getTokenAmount(labels.map(({name}) => name));
+        tokenAmount = getTokenAmount(labels.map(({name}) => name))
       if (!tokenAmount)
-        tokenAmount = 50000;
+        tokenAmount = 50000
 
-      return ({title, number, body, tokenAmount, creatorGithub, repository_id: getRepoId(repository_url?.split(`/`)?.slice(-2)?.join(`/`))});
+      return ({title, number, body, tokenAmount, creatorGithub, repository_id: getRepoId(repository_url?.split(`/`)?.slice(-2)?.join(`/`))})
     }
 
     async function getAllIssuesRecursive({githubPath}, page = 1, pool = []) {
-      const [owner, repo] = githubPath.split(`/`);
+      const [owner, repo] = githubPath.split(`/`)
       return octokit.rest.issues.listForRepo({owner, repo, state: `open`, per_page: 100, page})
                     .then(({data}) =>
                             data.length === 100 ? getAllIssuesRecursive({githubPath}, page+1, pool.concat(data)) : pool.concat(data))
                     .catch(e => {
-                      console.error(`Failed to get issues for`, githubPath, page, e);
-                      return pool;
+                      console.error(`Failed to get issues for`, githubPath, page, e)
+                      return pool
                     })
     }
 
@@ -129,18 +145,18 @@ export default function ParityPage() {
     Promise.all(reposList.map(repo => getAllIssuesRecursive(repo)))
            .then(allIssues => allIssues.flat().map(mapOpenIssue))
            .then(async issues => {
-             const openIssues = [];
+             const openIssues = []
              for (const issue of issues) {
-               console.debug(`(SC) Checking ${issue.title}`);
+               console.debug(`(SC) Checking ${issue.title}`)
                if (!(await BeproService.network.getIssueByCID(`${issue.repository_id}/${issue.number}`))?.cid)
-                 openIssues.push(issue);
+                 openIssues.push(issue)
              }
 
-             return openIssues;
+             return openIssues
             })
             .then(setIssuesList)
             .catch(e => {
-              console.error(`Found error`, e);
+              console.error(`Found error`, e)
             })
             .finally(() => {
               dispatch(changeLoadState(false))
@@ -151,47 +167,47 @@ export default function ParityPage() {
   function createIssue({title, body: description = String(t('parity:no-description')), tokenAmount, number, repository_id, creatorGithub = githubLogin}) {
 
     const openIssueTx = addTransaction({type: TransactionTypes.openIssue, amount: +tokenAmount}, activeNetwork)
-    dispatch(openIssueTx);
+    dispatch(openIssueTx)
 
     const msPayload = {
       title, description, amount: tokenAmount,
-      creatorAddress: currentAddress, creatorGithub,
+      creatorAddress: wallet?.address, creatorGithub,
       githubIssueId: number.toString(), repository_id,
     }
 
-    const scPayload = {tokenAmount: tokenAmount.toString(),};
+    const scPayload = {tokenAmount: tokenAmount.toString(),}
 
-    console.debug(`scPayload,`, scPayload, `msPayload`, msPayload);
+    console.debug(`scPayload,`, scPayload, `msPayload`, msPayload)
 
     return apiCreateIssue(msPayload, activeNetwork?.name)
                              .then(cid => {
                                if (!cid)
-                                 throw new Error(t('errors.creating-issue'));
+                                 throw new Error(t('errors.creating-issue'))
                                return BeproService.network.openIssue([repository_id, cid].join(`/`), msPayload.amount)
                                                   .then(txInfo => {
                                                     // BeproService.parseTransaction(txInfo, openIssueTx.payload)
                                                     //             .then(block => dispatch(updateTransaction(block)))
-                                                    return {githubId: cid, issueId: (txInfo as any).events?.OpenIssue?.returnValues?.id && [repository_id, cid].join(`/`)};
+                                                    return {githubId: cid, issueId: (txInfo as any).events?.OpenIssue?.returnValues?.id && [repository_id, cid].join(`/`)}
                                                   })
                              })
                              .then(({githubId, issueId}) => {
                                if (!issueId)
-                                 throw new Error(t('parity:errors.creating-issue-on-sc'));
+                                 throw new Error(t('parity:errors.creating-issue-on-sc'))
 
                                return patchIssueWithScId(repository_id, githubId, issueId, activeNetwork?.name)
                              })
                              .then(result => {
                                if (!result)
-                                 // return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
-                               return true;
+                                 // return dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}))
+                               return true
                              })
                              .catch(e => {
-                               console.error(`Failed to createIssue`, e);
+                               console.error(`Failed to createIssue`, e)
                                if (e?.message?.search(`User denied`) > -1)
-                                dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}));
-                               else dispatch(updateTransaction({...openIssueTx.payload as any, status: TransactionStatus.failed}));
+                                dispatch(updateTransaction({...openIssueTx.payload as any, remove: true}))
+                               else dispatch(updateTransaction({...openIssueTx.payload as any, status: TransactionStatus.failed}))
 
-                               return false;
+                               return false
                              })
 
   }
@@ -200,25 +216,25 @@ export default function ParityPage() {
 
     return Promise.all(issuesList.map(createIssue))
                   .then(okList => {
-                    console.debug(`All true?`, !okList.some(b => !b));
+                    console.debug(`All true?`, !okList.some(b => !b))
                     console.debug(`How many trues vs falses?`, okList.reduce((p, c) => p += c && 1 || -1, 0))
-                    console.debug(`Length of issuesList,`, issuesList.length);
-                    console.debug(`okList`, okList);
+                    console.debug(`Length of issuesList,`, issuesList.length)
+                    console.debug(`okList`, okList)
                   })
                   .catch(e => {
-                    console.error(`Some error occurred while trying to open issues,`, e);
+                    console.error(`Some error occurred while trying to open issues,`, e)
                   })
   }
 
   function deployNewContract() {
     BeproService.network
-                .deployJsonAbi(SETTLER_ADDRESS, TRANSACTION_ADDRESS, currentAddress)
+                .deployJsonAbi(SETTLER_ADDRESS, TRANSACTION_ADDRESS, wallet?.address)
                 .then(info => {
                   console.debug(`Deployed!`)
-                  console.table(info);
-                  dispatch(toastInfo(t('parity:deployed')));
-                  setDeployedContract(info.contractAddress);
-                  return true;
+                  console.table(info)
+                  dispatch(toastInfo(t('parity:deployed')))
+                  setDeployedContract(info.contractAddress)
+                  return true
                 })
   }
 
@@ -227,7 +243,7 @@ export default function ParityPage() {
 
     await factory.loadAbi()
 
-    const receipt = await factory.deployJsonAbi(SETTLER_ADDRESS);
+    const receipt = await factory.deployJsonAbi(SETTLER_ADDRESS)
 
     console.log({receipt})
     console.log(receipt.contractAddress)
@@ -236,41 +252,41 @@ export default function ParityPage() {
   function updateCouncilAmount() {
     BeproService.network.changeCouncilAmount(councilAmount)
                 .then(info => {
-                  dispatch(toastInfo(t('parity:council-amount-changed')));
-                  console.debug(`Council Changed!`);
-                  console.table(info);
+                  dispatch(toastInfo(t('parity:council-amount-changed')))
+                  console.debug(`Council Changed!`)
+                  console.table(info)
                 })
                 .catch(e => {
-                  console.error(`Error deploying`, e);
+                  console.error(`Error deploying`, e)
                 })
   }
 
   function deploySettlerToken() {
-    BeproService.erc20.deployJsonAbi(settlerTokenName, settlerTokenSymbol, +toSmartContractDecimals(10, 18), currentAddress)
+    BeproService.erc20.deployJsonAbi(settlerTokenName, settlerTokenSymbol, +toSmartContractDecimals(10, 18), wallet?.address)
                 .then(txInfo => {
-                  console.debug(txInfo);
-                  dispatch(toastInfo(`Deployed!`));
-                  setSettlerTokenAddress(txInfo.contractAddress);
+                  console.debug(txInfo)
+                  dispatch(toastInfo(`Deployed!`))
+                  setSettlerTokenAddress(txInfo.contractAddress)
                 })
   }
 
   function getSelfRepos() {
-    getUserOf(currentAddress)
+    getUserOf(wallet?.address)
                       .then((user) => {
-                        setGithubLogin(user?.githubLogin);
-                        setGithubToken(user?.accessToken);
+                        setGithubLogin(user?.githubLogin)
+                        setGithubToken(user?.accessToken)
                       })
                       .then(() => {
                         if (!githubToken)
-                          return [];
-                        const octokit = new Octokit({auth: githubToken});
+                          return []
+                        const octokit = new Octokit({auth: githubToken})
 
                         return octokit.rest.orgs.listForUser({username: githubLogin})
                                .then(({data}) => data)
                                .then(orgs => orgs.map(org => org.login))
                                .then(orgs => {
                                  function listReposOf(username: string) {
-                                   return octokit.rest.repos.listForUser({username}).then(({data}) => data);
+                                   return octokit.rest.repos.listForUser({username}).then(({data}) => data)
                                  }
                                  return Promise.all(orgs.map(listReposOf))
                                                .then(allOrgs => allOrgs.flat())
@@ -282,39 +298,39 @@ export default function ParityPage() {
                                })
                       })
                       .then(async (repos) => {
-                        setReposList(await getReposList(true, activeNetwork?.name));
+                        setReposList(await getReposList(true, activeNetwork?.name))
                         setAvailableList(repos.filter(repo => repo.has_issues && !repo.fork).map(repo => repo.full_name))
                       })
                       .catch(e => {
-                        console.error(`Failed to grep user`, e);
+                        console.error(`Failed to grep user`, e)
                       })
   }
 
   async function addNewRepo(owner, repo) {
-    const created = await createRepo(owner, repo, activeNetwork?.name);
+    const created = await createRepo(owner, repo, activeNetwork?.name)
 
     if (!created)
-      return dispatch(toastError(t('parity:erros.creating-repo')));
+      return dispatch(toastError(t('parity:erros.creating-repo')))
 
-    setReposList(await getReposList(true, activeNetwork?.name));
+    setReposList(await getReposList(true, activeNetwork?.name))
   }
 
   async function removeRepo(id: string) {
     return apiRemoveRepo(id)
                              .then(async (result) => {
                                if (!result)
-                                 return dispatch(toastError(t('parity:erros.removing-repo')));
+                                 return dispatch(toastError(t('parity:erros.removing-repo')))
 
                                setReposList(await getReposList(true, activeNetwork?.name))
-                             });
+                             })
   }
 
   function getSumOfTokenAmount() {
-    return issuesList.reduce((p, c) => p += +(c.tokenAmount || 50000), 0);
+    return issuesList.reduce((p, c) => p += +(c.tokenAmount || 50000), 0)
   }
 
   function getCostClass() {
-    return `text-${getSumOfTokenAmount() > balance.bepro ? `danger` : `white`}`;
+    return `text-${getSumOfTokenAmount() > wallet?.balance?.bepro ? `danger` : `white`}`
   }
 
   function renderIssuesList({title = ``, body = ``, tokenAmount = 50000, repository_id = null}, i: number) {
@@ -343,7 +359,7 @@ export default function ParityPage() {
 
   function renderAvailListItem(repoPath: string) {
     const [owner, repo] = repoPath.split(`/`)
-    const isActive = reposList.find(({githubPath}) => githubPath === repoPath);
+    const isActive = reposList.find(({githubPath}) => githubPath === repoPath)
     return <ListGroup.Item active={!!isActive}
                            variant={isActive ? `success` : `shadow`} action={true}
                            onClick={() => !isActive ? addNewRepo(owner, repo) : removeRepo(isActive.id.toString())}>{repoPath}</ListGroup.Item>
@@ -351,13 +367,13 @@ export default function ParityPage() {
 
   function changeRedeem() {
     BeproService.network.contract
-                .methods.changeRedeemTime(60).send({from: currentAddress})
+                .methods.changeRedeemTime(60).send({from: wallet?.address})
                 .then(console.log)
   }
 
   function changeDisputableTime() {
     BeproService.network.contract
-                .methods.changeDisputableTime(60).send({from: currentAddress})
+                .methods.changeDisputableTime(60).send({from: wallet?.address})
                 .then(console.log)
   }
 
@@ -367,13 +383,13 @@ export default function ParityPage() {
   }
 
   useEffect(() => {
-    if (!currentAddress)
-      return;
+    if (!wallet?.address)
+      return
 
-    if (currentAddress !== process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS)
-      router.push(`/account`);
+    if (wallet?.address !== process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS)
+      router.push(`/account`)
 
-    getSelfRepos();
+    getSelfRepos()
 
     searchNetworks({})
       .then(({ count, rows }) => {
@@ -382,7 +398,7 @@ export default function ParityPage() {
       .catch((error) => {
         console.log('Failed to retrieve networks list', error)
       })
-  }, [currentAddress])
+  }, [wallet?.address])
 
   return <>
     <div className="container mb-5 pt-5">
@@ -446,7 +462,7 @@ export default function ParityPage() {
         </div>
         <div className="row mt-3">
           <div className="col d-flex justify-content-end">
-            {issuesList.length && <span className="fs-small me-2">{t('parity:will-cost')} <span className={getCostClass()}>{formatNumberToString(getSumOfTokenAmount())} {t('bepro')} </span> / {formatNumberToString(balance.bepro)} {t('bepro')}</span> || ``}
+            {issuesList.length && <span className="fs-small me-2">{t('parity:will-cost')} <span className={getCostClass()}>{formatNumberToString(getSumOfTokenAmount())} {t('bepro')} </span> / {formatNumberToString(wallet?.balance?.bepro)} {t('bepro')}</span> || ``}
             {issuesList.length && <Button className="mr-2" outline onClick={() => createIssuesFromList()}>{t('parity:create-bounties')}</Button> || ``}
             { githubToken && reposList.length && <Button className="mr-2" disabled={isValidForm()} onClick={() => listIssues()}>{t('parity:list-bounties')}</Button> || `` }
             { githubToken && !availReposList.length && <Button onClick={getSelfRepos}>{t('parity:load-repos')}</Button> || `` }
@@ -501,8 +517,7 @@ export default function ParityPage() {
 export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, ['common', 'connect-wallet-button', 'parity', 'custom-network'])),
     },
-  };
-};
+  }
+}

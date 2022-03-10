@@ -1,9 +1,8 @@
-import { useContext, useEffect, useState } from 'react'
-
 import { head } from 'lodash'
 import { useRouter } from 'next/router'
-import { getSession } from 'next-auth/react'
+import { useTranslation } from 'next-i18next'
 import { GetServerSideProps } from 'next/types'
+import { useContext, useEffect, useState } from 'react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 import Button from '@components/button'
@@ -13,40 +12,39 @@ import NothingFound from '@components/nothing-found'
 import CustomContainer from '@components/custom-container'
 import PullRequestHero from '@components/pull-request-hero'
 import CreateReviewModal from '@components/create-review-modal'
+import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper'
 
+import { useRepos } from '@contexts/repos'
+import { addToast } from '@contexts/reducers/add-toast'
 import { ApplicationContext } from '@contexts/application'
+import { useAuthentication } from '@contexts/authentication'
 import { changeLoadState } from '@contexts/reducers/change-load-state'
-
-
-import useMergeData from '@x-hooks/use-merge-data'
 
 import { formatDate } from '@helpers/formatDate'
 import { formatNumberToCurrency } from '@helpers/formatNumber'
 
 import { IssueData, pullRequest } from '@interfaces/issue-data'
+
 import useApi from '@x-hooks/use-api'
-import { addToast } from '@contexts/reducers/add-toast'
-import { useTranslation } from 'next-i18next'
 import useNetwork from '@x-hooks/use-network'
-import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper'
-import { useRepos } from '@contexts/repos'
+import useMergeData from '@x-hooks/use-merge-data'
 
 export default function PullRequest() {
-  const {
-    dispatch,
-    state: { githubLogin, currentAddress }
-  } = useContext(ApplicationContext)
-
   const router = useRouter()
-  const {activeRepo} = useRepos()
-  const { createReviewForPR, getIssue } = useApi()
+  const { t } = useTranslation(['common', 'pull-request'])
+  
   const [issue, setIssue] = useState<IssueData>()
   const [showModal, setShowModal] = useState(false)
   const [isExecuting, setIsExecuting] = useState(false)
   const [pullRequest, setPullRequest] = useState<pullRequest>()
-  const { getMergedDataFromPullRequests } = useMergeData()
-  const { t } = useTranslation(['common', 'pull-request'])
+  
   const { network } = useNetwork()
+  const { activeRepo } = useRepos()
+  const { wallet, user } = useAuthentication()
+  const { dispatch } = useContext(ApplicationContext)
+
+  const { createReviewForPR, getIssue } = useApi()
+  const { getMergedDataFromPullRequests } = useMergeData()
 
   const { repoId, issueId, prId, review } = router.query
 
@@ -75,9 +73,11 @@ export default function PullRequest() {
   }
 
   function handleCreateReview({ body }) {
+    if (!user?.login) return
+
     setIsExecuting(true)
 
-    createReviewForPR(String(issueId), String(prId), githubLogin, body, network?.name)
+    createReviewForPR(String(issueId), String(prId), user.login, body, network?.name)
       .then((response) => {
         dispatch(
           addToast({
@@ -115,7 +115,7 @@ export default function PullRequest() {
 
   useEffect(loadData, [activeRepo, issueId, prId])
   useEffect(() => {
-    if (review && issue && pullRequest && githubLogin) setShowModal(true)
+    if (review && issue && pullRequest && user?.login) setShowModal(true)
   }, [review, issue, pullRequest])
 
   return (
@@ -138,7 +138,7 @@ export default function PullRequest() {
           </div>
 
           <div className="col-2 p-0 d-flex justify-content-center">
-            {currentAddress && githubLogin && pullRequest?.state === 'open' && (
+            {wallet?.address && user?.login && pullRequest?.state === 'open' && (
               <ReadOnlyButtonWrapper>
                 <Button className="read-only-button" onClick={handleShowModal}>
                   {t('actions.make-a-review')}
@@ -181,7 +181,6 @@ export default function PullRequest() {
 export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, ['common', 'pull-request'])),
     },
   };

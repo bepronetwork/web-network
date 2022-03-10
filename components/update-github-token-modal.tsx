@@ -4,8 +4,8 @@ import { useTranslation } from 'next-i18next'
 
 import Modal from '@components/modal'
 import Button from '@components/button'
-import { useContext } from 'react'
-import { ApplicationContext } from '@contexts/application'
+
+import { useAuthentication } from '@contexts/authentication'
 
 export default function UpdateGithubTokenModal({
   redirectTo,
@@ -15,16 +15,14 @@ export default function UpdateGithubTokenModal({
 }) {
   const { t } = useTranslation(['common', 'custom-network'])
 
-  const {
-    state: { currentAddress }
-  } = useContext(ApplicationContext)
+  const { wallet } = useAuthentication()
 
   function handleClose() {
     setVisible(false)
   }
 
   function handleConfirm() {
-    setCookie(null, `updated-github-token:${currentAddress}`, 'true', {
+    setCookie(null, `updated-github-token:${wallet?.address}`, 'true', {
       maxAge: 24 * 60 * 60,
       path: '/'
     })
