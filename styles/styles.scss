@@ -417,6 +417,18 @@ li {
   border-top: 4px solid $white;
 }
 
+
+// Todo: check if can move to boostrap
+.price-conversor{
+  min-width: 213px;
+  &:hover{
+    background-color: var(--bs-primary)!important;;
+    >span{
+      color: var(--bs-white)!important;
+    }
+  }
+}
+
 .list-item {
   background-color: $bg-shadow;
   padding: $m * 2;
