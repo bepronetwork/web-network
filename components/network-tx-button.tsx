@@ -60,7 +60,7 @@ function networkTxButton({
   const [txSuccess, setTxSuccess] = useState(false);
 
   const { dispatch } = useContext(ApplicationContext);
-  const { wallet, beproServiceStarted } = useAuthentication()
+  const { wallet, beproServiceStarted, updateWalletBalance } = useAuthentication()
   
   const txWindow = useTransactions();
   const { activeNetwork } = useNetwork()
@@ -114,6 +114,8 @@ function networkTxButton({
           dispatch(updateTransaction({...tmpTransaction.payload as any, remove: true}));
         else dispatch(updateTransaction({...tmpTransaction.payload as any, status: TransactionStatus.failed}));
         console.error(e);
+      }).finally(() => {
+        updateWalletBalance()
       })
 
   }
