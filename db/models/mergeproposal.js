@@ -29,7 +29,7 @@ class MergeProposal extends Model {
     this.belongsTo(models.pullRequest, {
       foreignKey: 'pullRequestId',
       sourceKey: 'id',
-      as: 'pullrequest'
+      as: 'pullRequest'
     });
   }
 };

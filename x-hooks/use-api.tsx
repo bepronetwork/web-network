@@ -2,7 +2,7 @@ import { ReposList } from "interfaces/repos-list";
 import { BranchInfo, BranchsList } from "interfaces/branchs-list";
 import { head } from "lodash";
 import { PaginatedData } from "interfaces/paginated-data";
-import { ProposalData, User } from "interfaces/api-response";
+import { User } from "interfaces/api-response";
 import { IssueData, pullRequest } from "interfaces/issue-data";
 
 import client from "services/api";
@@ -13,6 +13,7 @@ import {
   PRODUCTION_CONTRACT,
   USE_PRODUCTION_CONTRACT_CONVERSION,
 } from "env";
+import { Proposal } from "@interfaces/proposal";
 interface Paginated<T = any> {
   count: number;
   rows: T[];
@@ -168,11 +169,11 @@ export default function useApi() {
       .catch(() => null);
   }
 
-  async function getMergeProposal(dbId: string) {
+  async function getProposal(dbId: string | number) {
     return client
-      .get<ProposalData>(`/merge-proposal/${dbId}/`)
+      .get<Proposal>(`/merge-proposal/${dbId}`)
       .then(({ data }) => data)
-      .catch(() => ({ scMergeId: "", pullRequestId: "", issueId: "", id: "" }));
+      .catch(()=> null);
   }
 
   async function createPullRequestIssue(
@@ -581,9 +582,9 @@ export default function useApi() {
     getHealth,
     getIssue,
     getIssues,
-    getMergeProposal,
     getNetwork,
     getPendingFor,
+    getProposal,
     getPullRequestIssue,
     getReposList,
     getTotalUsers,

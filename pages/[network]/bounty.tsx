@@ -48,14 +48,9 @@ export default function PageIssue() {
       isEmpty: !(networkIssue?.mergeProposalAmount > 0),
       component: <IssueProposals
         key="tab-proposals"
-        metaProposals={issue?.mergeProposals}
-        metaRequests={issue?.pullRequests}
-        numberProposals={networkIssue?.mergeProposalAmount}
-        issueId={issue?.issueId}
-        dbId={issue?.id}
-        amount={networkIssue?.tokensStaked}
+        issue={issue}
+        networkIssueId={+networkIssue?._id}
         isFinalized={networkIssue?.finalized}
-        mergedProposal={issue?.merged}
         className="border-top-0"
       />,
       description: t('description_proposal')
