@@ -8,18 +8,18 @@ import ListIssues from '@components/list-issues'
 import { useState } from 'react'
 
 export default function PageCouncil() {
-  const { t } = useTranslation(['common', 'council'])
+  const { t } = useTranslation(['council'])
 
   const [infos, setInfos] = useState<IInfosHero[]>([
     {
       value: 0,
-      label: t('council.ready-bountys')
+      label: t('council:ready-bountys')
     },{
       value: 0,
-      label: t('council.council-members')
+      label: t('council:council-members')
     },{
       value: 0,
-      label: t('distributed-developers'),
+      label: t('council:distributed-developers'),
       currency: 'BEPRO'
     }
   ])
