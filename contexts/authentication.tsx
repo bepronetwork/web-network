@@ -11,6 +11,8 @@ import { signIn, signOut, useSession } from 'next-auth/react'
 
 import InvalidAccountWalletModal from '@components/invalid-account-wallet-modal'
 
+import { changeOraclesParse } from '@contexts/reducers/change-oracles'
+
 import { IUser } from '@interfaces/authentication'
 import { IWallet } from '@interfaces/authentication'
 
@@ -98,7 +100,7 @@ export const AuthenticationProvider = ({ children }) => {
         ...previousWallet,
         balance: {
           ...previousWallet.balance,
-          oracles
+          oracles: changeOraclesParse(previousWallet.address, oracles)
         }
       }))
     )
