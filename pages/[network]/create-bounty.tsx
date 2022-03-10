@@ -198,7 +198,7 @@ export default function PageCreateIssue() {
   
   return (
     <>
-      <div className="banner bg-bepro-blue mb-4">
+      <div className="banner">
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-md-10">
@@ -213,7 +213,7 @@ export default function PageCreateIssue() {
         <div className="row justify-content-center">
           <div className="col-md-10">
             <ConnectWalletButton asModal={true} />
-            <div className="content-wrapper mt-up mb-5">
+            <div className="content-wrapper mt-n4 mb-5">
               <h3 className="mb-4 text-white">{t('misc.details')}</h3>
               <div className="form-group mb-4">
                 <label className="caption-small mb-2">{t('create-bounty:fields.title.label')}</label>

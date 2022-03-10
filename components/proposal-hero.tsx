@@ -12,7 +12,7 @@ export default function ProposalHero({githubId, title, pullRequestId, authorPull
     const { getURLWithNetwork } = useNetwork()
 
     return (
-        <div className="banner bg-bepro-blue mb-4">
+        <div className="banner mb-4">
             <div className="container">
                 <div className="row justify-content-center">
                     <div className="col-md-10">

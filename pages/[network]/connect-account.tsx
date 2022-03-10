@@ -168,7 +168,7 @@ export default function ConnectAccount() {
 
 
   return <>
-    <div className="banner bg-bepro-blue mb-4">
+    <div className="banner">
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-10 d-flex justify-content-center">
@@ -180,7 +180,7 @@ export default function ConnectAccount() {
     <div className="container connect-account">
       <div className="row justify-content-center">
         <div className="col-md-8 d-flex justify-content-center">
-          <div className="content-wrapper mt-up mb-5">
+          <div className="content-wrapper mt-n4 mb-5">
             <strong className="caption-large d-block text-uppercase mb-4">{t('connect-account:connect-to-use')}</strong>
             <div className="row gx-3">
               <div className="col-6">
