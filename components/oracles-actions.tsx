@@ -44,13 +44,14 @@ function OraclesActions(): JSX.Element {
   const [show, setShow] = useState<boolean>(false)
   const [action, setAction] = useState<string>(actions[0])
   const [tokenAmount, setTokenAmount] = useState<number | undefined>()
+  const [isSettlerTokenApproved, setIsSettlerTokenApproved] = useState(false)
 
   const networkTxRef = useRef<HTMLButtonElement>(null)
   
   const txWindow = useTransactions()
   const { activeNetwork } = useNetwork()
-  const { wallet, user } = useAuthentication()
-  const {state: { myTransactions, isSettlerTokenApproved }, dispatch} = useContext(ApplicationContext)
+  const { wallet } = useAuthentication()
+  const {state: { myTransactions }, dispatch} = useContext(ApplicationContext)
 
   const renderAmount = tokenAmount ? `${formatNumberToCurrency(tokenAmount)} ` : "0"
 
@@ -196,6 +197,10 @@ function OraclesActions(): JSX.Element {
   function getTxType() {
     return action === t('my-oracles:actions.lock.label') ? TransactionTypes.lock : TransactionTypes.unlock
   }
+
+  useEffect(() => {
+    if (BeproService.isStarted) BeproService.isApprovedSettlerToken().then(setIsSettlerTokenApproved).catch(console.log)
+  }, [BeproService.isStarted])
 
   return (
     <>
