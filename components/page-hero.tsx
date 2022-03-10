@@ -1,3 +1,4 @@
+import { Currency } from "interfaces/currency";
 import { formatNumberToCurrency } from "helpers/formatNumber";
 import { formatTextToBold } from "helpers/string";
 import CustomContainer from "./custom-container";
@@ -5,7 +6,7 @@ import CustomContainer from "./custom-container";
 export interface IInfosHero {
   value: number;
   label: string;
-  currency?: "USD" | "BEPRO" | "ORACLES";
+  currency?: Currency
 }
 
 export interface IPageHeroProps {
