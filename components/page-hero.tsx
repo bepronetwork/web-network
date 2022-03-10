@@ -1,6 +1,6 @@
 import { Currency } from "interfaces/currency";
 import { formatNumberToCurrency } from "helpers/formatNumber";
-import { formatTextToBold } from "helpers/string";
+import { highlightText } from "helpers/string";
 import CustomContainer from "./custom-container";
 
 export interface IInfosHero {
@@ -56,7 +56,7 @@ export default function PageHero({ title, subtitle, infos }: IPageHeroProps) {
             <span
               className="mt-1 caption-medium text-white-70"
               dangerouslySetInnerHTML={{
-                __html: formatTextToBold(subtitle),
+                __html: highlightText(subtitle),
               }}
             />
           )}

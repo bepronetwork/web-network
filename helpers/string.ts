@@ -50,7 +50,7 @@ export const urlWithoutProtocol = (url: string): string => {
  * @returns string inner html
  */
 
-export const formatTextToBold = (str: string, className?: string ) => {
+export const highlightText = (str: string, className?: string ) => {
   if (!str) {
     return ''
   }
