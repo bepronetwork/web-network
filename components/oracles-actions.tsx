@@ -50,7 +50,7 @@ function OraclesActions(): JSX.Element {
   
   const txWindow = useTransactions()
   const { activeNetwork } = useNetwork()
-  const { wallet } = useAuthentication()
+  const { wallet, beproServiceStarted } = useAuthentication()
   const {state: { myTransactions }, dispatch} = useContext(ApplicationContext)
 
   const renderAmount = tokenAmount ? `${formatNumberToCurrency(tokenAmount)} ` : "0"
@@ -199,8 +199,8 @@ function OraclesActions(): JSX.Element {
   }
 
   useEffect(() => {
-    if (BeproService.isStarted) BeproService.isApprovedSettlerToken().then(setIsSettlerTokenApproved).catch(console.log)
-  }, [BeproService.isStarted])
+    if (beproServiceStarted) BeproService.isApprovedSettlerToken().then(setIsSettlerTokenApproved).catch(console.log)
+  }, [beproServiceStarted])
 
   return (
     <>
