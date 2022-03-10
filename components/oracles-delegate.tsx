@@ -82,13 +82,13 @@ function OraclesDelegate(): JSX.Element {
   function updateAmounts() {
     if (!beproServiceStarted || !wallet?.address) return
 
-    setDelegatedAmount(+wallet?.balance?.oracles.tokensLocked - wallet?.balance?.oracles.delegatedToOthers)
+    setDelegatedAmount(+wallet?.balance?.oracles?.tokensLocked - wallet?.balance?.oracles?.delegatedToOthers)
   }
 
   const isButtonDisabled = (): boolean =>
     [
       tokenAmount < 1,
-      tokenAmount > +wallet?.balance?.oracles.tokensLocked,
+      tokenAmount > +wallet?.balance?.oracles?.tokensLocked,
       !delegatedTo,
       isAddressesEqual(),
       myTransactions.find(
