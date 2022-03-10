@@ -8,8 +8,7 @@ import { ThemeColors } from '@interfaces/network'
 import useApi from '@x-hooks/use-api'
 import { useNetwork } from '@contexts/network'
 
-//Todo: useNetwork was moved to context, refactor this hooks to be a theme-hooks
-
+// Todo: useNetwork was moved to context, refactor this hooks to be a theme-hooks
 export default function useNetworkTheme() {
   const router = useRouter()
   const { getNetwork } = useApi()
