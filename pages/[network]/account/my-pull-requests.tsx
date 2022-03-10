@@ -1,18 +1,15 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 import Account from '@components/account'
 import ListIssues from '@components/list-issues'
 
-import { ApplicationContext } from '@contexts/application'
+import { useAuthentication } from '@contexts/authentication'
 
 export default function MyPullRequests() {
-  const {
-    state: { githubLogin }
-  } = useContext(ApplicationContext)
+  const { user } = useAuthentication()
 
   const { t } = useTranslation(['pull-request', 'bounty'])
 
@@ -23,7 +20,7 @@ export default function MyPullRequests() {
           <ListIssues
             redirect="/developers"
             buttonMessage={t('bounty:label_other')}
-            pullRequester={githubLogin || 'not-connected'}
+            pullRequester={user?.login || 'not-connected'}
             emptyMessage={String(t('errors.you-dont-have-pull-requests'))}
           />
         </div>
@@ -35,7 +32,6 @@ export default function MyPullRequests() {
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, [
         'common',
         'bounty',

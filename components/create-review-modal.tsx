@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import LockedIcon from '@assets/icons/locked-icon'
 
@@ -6,9 +6,6 @@ import Modal from 'components/modal'
 import Button from 'components/button'
 import Avatar from 'components/avatar'
 import GithubInfo from 'components/github-info'
-
-import { ApplicationContext } from 'contexts/application'
-
 
 import {formatDate} from 'helpers/formatDate'
 import {useRepos} from 'contexts/repos'
@@ -25,10 +22,6 @@ export default function CreateReviewModal({
   const [body, setBody] = useState('')
   const {activeRepo} = useRepos()
   const { t } = useTranslation(['common', 'pull-request'])
-
-  const {
-    state: { githubLogin }
-  } = useContext(ApplicationContext)
 
   function isButtonDisabled(): boolean {
     return body.trim() === '' || isExecuting

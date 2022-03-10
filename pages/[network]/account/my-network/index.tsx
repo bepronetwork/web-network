@@ -1,22 +1,18 @@
-import { useContext } from 'react'
 import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 import Account from '@components/account'
 import NetworksList from '@components/networks-list'
 
-import { ApplicationContext } from '@contexts/application'
+import { useAuthentication } from '@contexts/authentication'
 
 export default function MyNetwork() {
-  const {
-    state: { currentAddress }
-  } = useContext(ApplicationContext)
+  const { wallet } = useAuthentication()
 
   return (
     <Account>
       <div className="container pt-2">
-        <NetworksList creatorAddress={currentAddress || 'not-found'} />
+        <NetworksList creatorAddress={wallet?.address || 'not-found'} />
       </div>
     </Account>
   )
@@ -25,7 +21,6 @@ export default function MyNetwork() {
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, [
         'common',
         'connect-wallet-button',
