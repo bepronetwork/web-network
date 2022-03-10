@@ -275,7 +275,8 @@ export default function Settings() {
       ),
       creator: wallet?.address,
       githubLogin: user?.login,
-      networkAddress: network.networkAddress
+      networkAddress: network.networkAddress,
+      accessToken: user?.accessToken
     }
 
     updateNetwork(json)
