@@ -170,6 +170,10 @@ export const AuthenticationProvider = ({ children }) => {
   }, [wallet?.address, beproServiceStarted])
 
   useEffect(() => {
+    if (wallet && wallet?.address && beproServiceStarted) updateWalletBalance()
+  }, [pathname, beproServiceStarted])
+
+  useEffect(() => {
     window.ethereum.on(`accountsChanged`, (accounts) => {
       if (BeproService.isStarted)
         BeproService.login().then(() => setWallet({ address: accounts[0] }))
