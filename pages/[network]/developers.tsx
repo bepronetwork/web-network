@@ -9,12 +9,15 @@ import { useTranslation } from 'next-i18next'
 import { useNetwork } from "contexts/network";
 import {ApplicationContext} from 'contexts/application';
 import {BeproService} from 'services/bepro-service';
+import useApi from '@x-hooks/use-api';
 
 
 export default function PageDevelopers() {
   const { t } = useTranslation(['common'])
 
   const {state: {beproInit}} = useContext(ApplicationContext)
+  const {getTotalUsers} = useApi();
+
   const [infos, setInfos] = useState<IInfosHero[]>([
     {
       value: 0,
@@ -38,10 +41,11 @@ export default function PageDevelopers() {
     if (!beproInit || !activeNetwork)
       return;
 
-    const [closed, inProgress, onNetwork] = await Promise.all([
+    const [closed, inProgress, onNetwork, totalUsers] = await Promise.all([
       BeproService.getClosedIssues(activeNetwork.networkAddress),
       BeproService.getOpenIssues(activeNetwork.networkAddress),
-      BeproService.getTokensStaked(activeNetwork.networkAddress)
+      BeproService.getTokensStaked(activeNetwork.networkAddress),
+      getTotalUsers(),
     ])
     setInfos([
       {
@@ -55,7 +59,7 @@ export default function PageDevelopers() {
         label: t('heroes.bounties-in-network'),
         currency: 'BEPRO'
       },{
-        value: 0,
+        value: totalUsers,
         label: t('heroes.protocol-members'),
       }
     ])

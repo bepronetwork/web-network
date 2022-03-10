@@ -1,3 +1,4 @@
+import React from 'react'
 import { Currency } from "interfaces/currency";
 import { formatNumberToCurrency } from "helpers/formatNumber";
 import { highlightText } from "helpers/string";
@@ -62,7 +63,7 @@ export default function PageHero({ title, subtitle, infos }: IPageHeroProps) {
           )}
 
           <div className="row mt-3 pt-1">
-            {infos.map(InfoComponent)}
+            {React.Children.toArray(infos.map(InfoComponent))}
           </div>
         </div>
       </CustomContainer>

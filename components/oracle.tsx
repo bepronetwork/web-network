@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
-import React, { ReactNode, ReactNodeArray, useContext, useEffect, useState } from 'react'
+import React, {useContext, useEffect, useState } from 'react'
 
 import PageHero, { IInfosHero } from '@components/page-hero'
 import InternalLink from '@components/internal-link'
@@ -9,13 +9,14 @@ import InternalLink from '@components/internal-link'
 import useNetwork from '@x-hooks/use-network'
 import { BeproService } from '@services/bepro-service'
 import { ApplicationContext } from '@contexts/application'
+import useApi from '@x-hooks/use-api'
 
 export default function Oracle({children}) {
   const { asPath } = useRouter()
   const {state: {beproInit}} = useContext(ApplicationContext)
   const { network: activeNetwork, getURLWithNetwork } = useNetwork()
   const { t } = useTranslation(['oracle', 'common'])
-
+  const {getTotalUsers} = useApi();
   const [infos, setInfos] = useState<IInfosHero[]>([
     {
       value: 0,
@@ -34,10 +35,11 @@ export default function Oracle({children}) {
     if (!beproInit || !activeNetwork)
       return;
 
-    const [closed, inProgress, onNetwork] = await Promise.all([
+    const [closed, inProgress, onNetwork, totalUsers] = await Promise.all([
       BeproService.getClosedIssues(activeNetwork.networkAddress),
       BeproService.getOpenIssues(activeNetwork.networkAddress),
-      BeproService.getTokensStaked(activeNetwork.networkAddress)
+      BeproService.getTokensStaked(activeNetwork.networkAddress),
+      getTotalUsers(),
     ])
     setInfos([
       {
@@ -51,7 +53,7 @@ export default function Oracle({children}) {
         label: t('common:heroes.bounties-in-network'),
         currency: 'BEPRO'
       },{
-        value: 0,
+        value: totalUsers,
         label: t('common:heroes.protocol-members'),
       }
     ])
