@@ -5,12 +5,13 @@ import { useIssue } from "contexts/issue";
 import DateLabel from "./date-label";
 import { useTranslation } from "next-i18next";
 import PriceConversor from "./price-conversor";
-import {Proposal} from 'interfaces/proposal'
+import {INetworkProposal, Proposal} from 'interfaces/proposal'
 interface IProposalHeroProps{
   proposal: Proposal;
+  networkProposal: INetworkProposal
 }
 
-export default function ProposalHero({proposal}: IProposalHeroProps) {
+export default function ProposalHero({proposal, networkProposal}: IProposalHeroProps) {
   const { activeIssue } = useIssue();
   const { t } = useTranslation(['proposal'])
   return (
@@ -20,8 +21,8 @@ export default function ProposalHero({proposal}: IProposalHeroProps) {
           <div className="col-10 row">
 
             <div className="d-flex flex-row">
-              <h4 className="me-2 text-white-70">#{proposal?.issue?.id}</h4>
-              <h4>{proposal?.issue?.title}</h4>
+              <h4 className="me-2 text-white-70">#{activeIssue?.id}</h4>
+              <h4>{activeIssue?.title}</h4>
             </div>
 
             <div className="mt-3 pt-1 d-inline-flex align-items-center justify-content-md-start gap-20">
@@ -42,9 +43,9 @@ export default function ProposalHero({proposal}: IProposalHeroProps) {
                 />
               </div>
 
-              {activeIssue?.createdAt && (
+              {proposal?.createdAt && (
                 <DateLabel
-                  date={activeIssue?.createdAt}
+                  date={proposal?.createdAt}
                   className="text-white"
                 />
               )}
@@ -53,7 +54,7 @@ export default function ProposalHero({proposal}: IProposalHeroProps) {
 
           <div className="col-2 d-flex align-items-center justify-content-center">
             <PriceConversor
-              currentValue={proposal?.issue?.amount || 0}
+              currentValue={activeIssue?.amount || 0}
               currency="BEPRO"
             />
           </div>

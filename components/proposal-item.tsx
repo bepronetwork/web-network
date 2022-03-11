@@ -40,12 +40,12 @@ export default function ProposalItem({
     state: { beproStaked },
   } = useContext(ApplicationContext);
   const txWindow = useTransactions();
-  const {networkIssue} = useIssue()
+  const { networkIssue } = useIssue();
   const { processEvent } = useApi();
   const { getURLWithNetwork } = useNetworkTheme();
   const { activeNetwork } = useNetwork();
-  const networkProposals =  networkIssue?.networkProposals?.[proposal?.id] || [];
-  
+  const networkProposals = networkIssue?.networkProposals?.[proposal?.id] || [];
+
   async function handleDispute(mergeId) {
     if (!isDisputable || isFinalized) return;
 
@@ -58,7 +58,11 @@ export default function ProposalItem({
     await BeproService.network
       .disputeMerge(networkIssue?._id, mergeId)
       .then((txInfo) => {
-        processEvent(`dispute-proposal`, txInfo.blockNumber, +networkIssue?._id);
+        processEvent(
+          `dispute-proposal`,
+          txInfo.blockNumber,
+          +networkIssue?._id
+        );
         txWindow.updateItem(
           disputeTx.payload.id,
           BeproService.parseTransaction(txInfo, disputeTx.payload)
@@ -107,32 +111,29 @@ export default function ProposalItem({
 
     return <Translation label={`actions.${action}`} />;
   }
-  debugger;
+
   return (
-    <>
-      <div
-        className="content-list-item proposal"
-        key={`${proposal?.pullRequestId}${proposal?.scMergeId}`}
-      >
-        <Link
-          passHref
-          href={getURLWithNetwork("/proposal", {
-            proposalId: proposal?.scMergeId,
-          })}
-        >
-          <a className="text-decoration-none">
-            <div className="rounded row align-items-center">
-              <div
-                className={`col-3 caption-small mt-2 text-uppercase text-${
-                  getColors() === "purple" ? "white" : getColors()
-                }`}
-              >
-                <Translation ns="pull-request" label={"abbreviation"} /> #
-                {proposal?.githubLogin} <Translation label={"misc.by"} />{" "}
-                {proposal?.githubLogin && ` @${proposal?.githubLogin}`}
-              </div>
-              <div className="col-5 d-flex justify-content-between mb-2 text-white">
-                {networkProposals?.prAmounts && networkProposals?.prAmounts?.map((value, i) => (
+    <Link
+      passHref
+      key={`${proposal?.pullRequestId}${proposal?.scMergeId}`}
+      href={getURLWithNetwork("/proposal", {
+        proposalId: proposal?.id,
+      })}
+    >
+      <div className="content-list-item proposal cursor-pointer">
+          <div className="rounded row align-items-center">
+            <div
+              className={`col-3 caption-small mt-2 text-uppercase text-${
+                getColors() === "purple" ? "white" : getColors()
+              }`}
+            >
+              <Translation ns="pull-request" label={"abbreviation"} /> #
+              {proposal?.githubLogin} <Translation label={"misc.by"} />{" "}
+              {proposal?.githubLogin && ` @${proposal?.githubLogin}`}
+            </div>
+            <div className="col-5 d-flex justify-content-between mb-2 text-white">
+              {networkProposals?.prAmounts &&
+                networkProposals?.prAmounts?.map((value, i) => (
                   <PercentageProgressBar
                     key={`pg-${i}`}
                     textClass={`caption-small p-small text-${getColors()}`}
@@ -145,42 +146,40 @@ export default function ProposalItem({
                     total={issue.amount}
                   />
                 ))}
+            </div>
+
+            <div className="col-4 d-flex">
+              <div className="col-9 offset-1 text-white">
+                <ProposalProgressSmall
+                  pgClass={`${getColors()}`}
+                  value={+networkProposals.disputes}
+                  total={beproStaked}
+                  textClass={`pb-2 text-${getColors()}`}
+                />
               </div>
 
-              <div className="col-4 d-flex">
-                <div className="col-9 offset-1 text-white">
-                  <ProposalProgressSmall
-                    pgClass={`${getColors()}`}
-                    value={+networkProposals.disputes}
-                    total={beproStaked}
-                    textClass={`pb-2 text-${getColors()}`}
-                  />
-                </div>
-
-                <div className="col-1 offset-1 justify-content-end d-flex">
-                  <ReadOnlyButtonWrapper>
-                    <Button
-                      color={getColors()}
-                      disabled={!isDisputable}
-                      outline={!isDisputable}
-                      className={`align-self-center mb-2 ms-3 read-only-button`}
-                      onClick={(ev) => {
-                        ev.stopPropagation();
-                        handleDispute(+proposal.id);
-                      }}
-                    >
-                      {!isDisputable && getColors() !== "success" && (
-                        <LockedIcon className={`me-2 text-${getColors()}`} />
-                      )}
-                      <span>{getLabel()}</span>
-                    </Button>
-                  </ReadOnlyButtonWrapper>
-                </div>
+              <div className="col-1 offset-1 justify-content-end d-flex">
+                <ReadOnlyButtonWrapper>
+                  <Button
+                    color={getColors()}
+                    disabled={!isDisputable}
+                    outline={!isDisputable}
+                    className={`align-self-center mb-2 ms-3 read-only-button`}
+                    onClick={(ev) => {
+                      ev.stopPropagation();
+                      handleDispute(+proposal.id);
+                    }}
+                  >
+                    {!isDisputable && getColors() !== "success" && (
+                      <LockedIcon className={`me-2 text-${getColors()}`} />
+                    )}
+                    <span>{getLabel()}</span>
+                  </Button>
+                </ReadOnlyButtonWrapper>
               </div>
             </div>
-          </a>
-        </Link>
+          </div>
       </div>
-    </>
+    </Link>
   );
 }
