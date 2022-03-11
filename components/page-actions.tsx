@@ -129,7 +129,7 @@ export default function PageActions({
           target="_blank"
         >
           <IssueAvatars users={forks} />
-          <span className="me-3 caption-small"><Translation label="misc.forks" /></span>
+          <span className="caption-small"><Translation label="misc.forks" /></span>
         </a>
       );
     }
