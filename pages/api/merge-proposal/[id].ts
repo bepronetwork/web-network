@@ -4,12 +4,7 @@ import {NextApiRequest, NextApiResponse} from 'next';
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {id} = req.query;
 
-  const include = [
-    { association: 'issue' },
-    { association: 'pullRequest' },
-  ]
-
-  const merge = await models.mergeProposal.findOne({where: {id}, include});
+  const merge = await models.mergeProposal.findOne({where: {id}});
   if (!merge)
     return res.status(404);
   

@@ -1,5 +1,5 @@
 import Avatar from "components/avatar";
-import GithubInfo from "@components/github-info";
+import GithubInfo from "components/github-info";
 import CustomContainer from "./custom-container";
 import { useIssue } from "contexts/issue";
 import DateLabel from "./date-label";
@@ -9,6 +9,7 @@ import {Proposal} from 'interfaces/proposal'
 interface IProposalHeroProps{
   proposal: Proposal;
 }
+
 export default function ProposalHero({proposal}: IProposalHeroProps) {
   const { activeIssue } = useIssue();
   const { t } = useTranslation(['proposal'])

@@ -49,8 +49,7 @@ export default function PageIssue() {
       component: <IssueProposals
         key="tab-proposals"
         issue={issue}
-        networkIssueId={+networkIssue?._id}
-        isFinalized={networkIssue?.finalized}
+        networkIssue={networkIssue}
         className="border-top-0"
       />,
       description: t('description_proposal')

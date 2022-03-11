@@ -1,37 +1,35 @@
-import {ProposalData} from './api-response';
+import { Proposal, INetworkProposal } from '@interfaces/proposal';
 
 export type IssueState =  'pending' |  'draft' | 'open' | 'in progress' | 'canceled' | 'closed' | 'ready' | 'done' | 'disputed'
 
 export type CID = `${string}/${string}`;
 
 export interface IssueData {
-  _id?: string; // sc id
   id?: string; // database id
+  amount?: number;
   body: string;
+  branch?: string;
   createdAt: Date;
-  updatedAt?: Date;
+  creatorAddress?: string;
+  creatorGithub?: string;
   developers: developer[];
   dueDate?: string;
   githubId: string;
   issueId: string; // custom id repo/githubid
-  creatorGithub?: string;
-  creatorAddress?: string;
-  isIssueinDraft?: boolean; //Remove, moved to NetworkIssue in Context
-  amount?: number;
-  url?: string;
+  mergeProposals: Proposal[];
+  merged: string;
   numberOfComments: number;
+  owner?: string;
+  pullRequests: pullRequest[];
+  repo?: string;
+  repository?: Repository
+  repository_id?: number;
+  seoImage: string;
   state: IssueState;
   title: string;
-  pullRequests: pullRequest[];
-  owner?: string;
-  repo?: string;
-  branch?: string;
-  repository_id?: number;
-  mergeProposals: ProposalData[];
+  updatedAt?: Date;
+  url?: string;
   working: string[];
-  merged: string;
-  seoImage?: string;
-  repository?: Repository
 }
 
 export interface Repository {
@@ -83,4 +81,5 @@ export interface INetworkIssue{
   recognizedAsFinished: boolean;
   isDraft: boolean;
   tokensStaked: number;
+  networkProposals: INetworkProposal[];
 }

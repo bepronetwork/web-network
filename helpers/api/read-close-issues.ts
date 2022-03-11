@@ -17,7 +17,7 @@ export default async function readCloseIssues(events, {network, models, octokit,
       return res.status(204);
     }
 
-    const merge = issue.mergeProposals.find((mp) => mp.scMergeId == eventData.mergeID);
+    const merge = issue?.mergeProposals?.find((mp) => mp.scMergeId == eventData.mergeID);
     const mergeProposal = await models.mergeProposal.findOne({where: {id: merge.id,}, include: ['pullrequest'],})
 
     const pullRequest = mergeProposal.pullrequest;

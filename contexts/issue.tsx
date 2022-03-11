@@ -15,6 +15,7 @@ import useOctokit from 'x-hooks/use-octokit';
 import {useRouter} from 'next/router';
 import { ApplicationContext } from './application';
 import { useNetwork } from './network';
+import { INetworkProposal } from '@interfaces/proposal';
 export interface IActiveIssue extends IssueData{
   comments: Comment[]
 }
@@ -33,13 +34,13 @@ export const IssueProvider: React.FC = function ({ children }) {
   const [activeIssue, setActiveIssue] = useState<IActiveIssue>();
   const [networkIssue, setNetworkIssue] = useState<INetworkIssue>();
 
-
   const {getIssue} = useApi()
   const {activeNetwork} = useNetwork()
   const {query} = useRouter();
   const {getIssueComments, getPullRequest} = useOctokit();
-  // Move currentAdress and githubLogin to UserHook
-  const { state: { currentAddress, githubLogin }} = useContext(ApplicationContext);
+
+  // Todo: Move currentAdress and githubLogin to UserHook
+  const { state: { currentAddress }} = useContext(ApplicationContext);
 
   const updatePullRequests = useCallback(
     async (prs: pullRequest[], githubPath: string) => {
@@ -84,7 +85,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     [activeNetwork]
   );
 
-  const getNetworkIssue = useCallback(async () => {
+  const getNetworkIssue = useCallback(async (): Promise<INetworkIssue> => {
     if (!currentAddress || !activeIssue?.issueId) return;
 
     const network = await BeproService.network.getIssueByCID(
@@ -92,14 +93,39 @@ export const IssueProvider: React.FC = function ({ children }) {
     );
 
     let isDraft = null;
+
     try {
       isDraft = await BeproService.network.isIssueInDraft(network?._id);
     } catch (error) {
       console.error(error);
     }
+    const networkProposals: INetworkProposal[] = [];
 
-    setNetworkIssue({ ...network, isDraft });
-    return network;
+    for (const meta of activeIssue?.mergeProposals) {
+      const { scMergeId, id: proposalId } = meta;
+
+      if (scMergeId) {
+        const merge = await BeproService.network.getMergeById(
+          +network?._id,
+          +scMergeId
+        );
+
+        const isDisputed = activeIssue.merged
+          ? activeIssue.merged !== scMergeId
+          : await BeproService.network.isMergeDisputed(
+              +network?._id,
+              +scMergeId
+            );
+
+        networkProposals[proposalId] = {
+          ...merge,
+          isDisputed,
+        }
+      }
+    }
+    
+    setNetworkIssue({ ...network, isDraft, networkProposals});
+    return { ...network, isDraft, networkProposals};
   }, [activeIssue, currentAddress]);
 
   useEffect(() => {
