@@ -32,7 +32,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const githubId = req.body.githubIssueId || (await octokit.rest.issues.create({owner,repo, title, body, labels: ['draft']}))?.data?.number?.toString()
 
-  if (await models.issue.findOne({where: {githubId}}))
+  if (await models.issue.findOne({where: {githubId, repository_id}}))
     return res.status(409).json(`issueId already exists on database`);
 
   await models.issue.create({
