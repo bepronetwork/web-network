@@ -139,6 +139,7 @@ export const AuthenticationProvider = ({ children }) => {
   // Side effects needed to the context work
   useEffect(() => {
     if (session.status === 'authenticated') setUser({ ...session.data.user })
+    else if (session.status === 'unauthenticated') setUser(undefined)
   }, [session])
 
   useEffect(() => {
