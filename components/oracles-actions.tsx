@@ -15,7 +15,6 @@ import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper'
 import { useNetwork } from '@contexts/network'
 import { ApplicationContext } from '@contexts/application'
 import { useAuthentication } from '@contexts/authentication'
-import { changeSettlerTokenApproval } from '@contexts/reducers/change-settler-token-approval'
 
 import { formatNumberToCurrency } from 'helpers/formatNumber'
 
@@ -163,7 +162,7 @@ function OraclesActions(): JSX.Element {
     BeproService.network.approveSettlerERC20Token()
                 .then((txInfo) => {
                   txWindow.updateItem(approveTx.payload.id, BeproService.parseTransaction(txInfo, approveTx.payload))
-                  dispatch(changeSettlerTokenApproval(true))
+                  setIsSettlerTokenApproved(true)
                   setError(``)
                 })
                 .catch(e => {
