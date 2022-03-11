@@ -72,8 +72,11 @@ export default function LockBeproStep({
     }
   }
 
-  function handleUnLock() {
+  async function handleUnLock() {
     setIsUnlocking(true)
+
+    await BeproService.startNetworkFactory()
+
     BeproService.networkFactory.unlock().then(() => {
       handleChange({ label: 'amountLocked', value: 0 })
       handleChange({ label: 'amount', value: 0 })
@@ -316,7 +319,7 @@ export default function LockBeproStep({
               )}
             </Button>
 
-            <Button disabled={lockedPercent === 0 || isUnlocking} color="ligth-gray" onClick={handleUnLock}>
+            {/* <Button disabled={lockedPercent === 0 || isUnlocking} color="ligth-gray" onClick={handleUnLock}>
               {!isUnlocking || lockedPercent === 0 && (
                 <LockedIcon width={12} height={12} className="mr-1" />
               )}
@@ -326,7 +329,7 @@ export default function LockBeproStep({
               ) : (
                 ''
               )}
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>
