@@ -33,6 +33,7 @@ import { updateTransaction } from '@reducers/update-transaction'
 import { changeBeproInitState } from '@reducers/change-bepro-init-state'
 
 import { BeproService } from '@services/bepro-service'
+import { changeStakedState } from './reducers/change-staked-amount'
 
 interface GlobalState {
   state: ApplicationState,
@@ -89,10 +90,10 @@ let cheatDispatcher = null;
 export default function ApplicationContextProvider({children}) {
   const [state, dispatch] = useReducer(mainReducer, defaultState.state);
   const [txListener, setTxListener] = useState<any>();
-  const {authError} = useRouter().query;
+  const {query: { authError }, pathname} = useRouter();
 
   const { activeNetwork } = useNetwork()
-  const { wallet } = useAuthentication()
+  const { wallet, beproServiceStarted } = useAuthentication()
 
   const Initialize = () => {    
     dispatch(changeLoadState(true))
@@ -159,6 +160,10 @@ export default function ApplicationContextProvider({children}) {
       waitingForTx = transactionWithHash
 
   }, [state.myTransactions])
+
+  useEffect(() => {
+    if (beproServiceStarted) BeproService.getBeproLocked().then(amount => dispatch(changeStakedState(amount))).catch(console.log)
+  }, [pathname, beproServiceStarted])
 
   const restoreTransactions = async (address)=>{
     const cookie = parseCookies()
