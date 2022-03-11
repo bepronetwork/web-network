@@ -110,10 +110,12 @@ export default function NewNetwork() {
     if (canGo) setCurrentStep(stepToGo)
   }
 
-  function handleCreateNetwork() {
+  async function handleCreateNetwork() {
     if (!user?.login || !wallet?.address) return
 
     setCreatingNetwork(true)
+
+    await BeproService.startNetworkFactory()
 
     BeproService.createNetwork()
       .then((receipt) => {
