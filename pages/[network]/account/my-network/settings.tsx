@@ -282,19 +282,19 @@ export default function Settings() {
     updateNetwork(json)
       .then(async (result) => {
         if (currentNetworkParameters.redeemTime !== newInfo.redeemTime)
-          await BeproService.setRedeemTime(newInfo.redeemTime)
-            .then(console.log)
-            .catch(console.log)
+          await BeproService.setRedeemTime(newInfo.redeemTime).catch(
+            console.log
+          )
 
         if (currentNetworkParameters.disputeTime !== newInfo.disputeTime)
-          await BeproService.setDisputeTime(newInfo.disputeTime)
-            .then(console.log)
-            .catch(console.log)
+          await BeproService.setDisputeTime(newInfo.disputeTime).catch(
+            console.log
+          )
 
         if (currentNetworkParameters.councilAmount !== newInfo.councilAmount)
-          await BeproService.setCouncilAmount(newInfo.councilAmount)
-            .then(console.log)
-            .catch(console.log)
+          await BeproService.setCouncilAmount(newInfo.councilAmount).catch(
+            console.log
+          )
 
         if (
           currentNetworkParameters.percentageForDispute !==
@@ -302,9 +302,7 @@ export default function Settings() {
         )
           await BeproService.setPercentageForDispute(
             newInfo.percentageForDispute
-          )
-            .then(console.log)
-            .catch(console.log)
+          ).catch(console.log)
 
         dispatch(
           addToast({
