@@ -74,9 +74,9 @@ class BeproFacet {
 
         await this.networkFactory.loadContract()
 
-        this.operatorAmount = await this.getOperatorAmount()
-
         this.networkFactoryStarted = true
+
+        this.operatorAmount = await this.getOperatorAmount()
       }
     } catch (error) {
       console.error(error)
@@ -223,7 +223,7 @@ class BeproFacet {
   }
 
   async getOperatorAmount() {
-    if (this.isStarted) return this.networkFactory.OPERATOR_AMOUNT()
+    if (this.networkFactoryStarted) return this.networkFactory.OPERATOR_AMOUNT()
 
     return 0
   }
