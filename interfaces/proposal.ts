@@ -1,5 +1,5 @@
 export interface Proposal{
-  createdAt: string;
+  createdAt: Date | number;
   githubLogin: string;
   id: string;
   isMerged?: boolean;

@@ -2,30 +2,34 @@ import {getSession} from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
 import {GetServerSideProps} from 'next/types';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
-import useApi from '@x-hooks/use-api';
 import { useIssue } from '@contexts/issue';
 import { useRouter } from 'next/router';
-import { Proposal } from '@interfaces/proposal';
+import { INetworkProposal, Proposal } from '@interfaces/proposal';
 import ProposalHero from '@components/proposal-hero';
 
 export default function PageProposal() {
   const router = useRouter()
-  const {getProposal} = useApi()
-
+  const {activeIssue, networkIssue} = useIssue()
   const [proposal, setProposal] = useState<Proposal>({} as Proposal)
+  const [networkProposal, setNetworkProposal] = useState<INetworkProposal>({} as INetworkProposal)
 
   async function loadData(){
     const {proposalId} = router.query
-    if(!proposalId) return;
-    getProposal(`${proposalId}`)
-    .then((data)=> setProposal(data))
+    const mergeProposal = await activeIssue?.mergeProposals.find(p=> +p.id === +proposalId)
+    const networkProposals = networkIssue?.networkProposals?.[+proposalId];
+    
+    if(!proposalId || !mergeProposal || !networkProposals) return router.push('/404');
+    debugger;
+    setProposal(mergeProposal)
+    setNetworkProposal(networkProposals)
   }
+
   useEffect(()=>{
     loadData();
-  },[router.query])
+  },[router.query, activeIssue, networkIssue])
   return (
     <>
-      <ProposalHero proposal={proposal} />
+      <ProposalHero proposal={proposal}  networkProposal={networkProposal}/>
       {/* <ProposalProgress developers={usersAddresses}/>
       <CustomContainer className="mgt-20 mgb-20">
         <div className="col-6">
