@@ -1,29 +1,28 @@
-import { INetworkProposal, Proposal } from "@interfaces/proposal";
+import { Proposal } from "interfaces/proposal";
 import Link from "next/link";
-import PercentageProgressBar from "@components/percentage-progress-bar";
-import ProposalProgressSmall from "@components/proposal-progress-small";
+import PercentageProgressBar from "components/percentage-progress-bar";
+import ProposalProgressSmall from "components/proposal-progress-small";
 import { addTransaction } from "@reducers/add-transaction";
-import { TransactionTypes } from "@interfaces/enums/transaction-types";
-import { BeproService } from "@services/bepro-service";
+import { TransactionTypes } from "interfaces/enums/transaction-types";
+import { BeproService } from "services/bepro-service";
 import { updateTransaction } from "@reducers/update-transaction";
 import { useContext } from "react";
-import { ApplicationContext } from "@contexts/application";
+import { ApplicationContext } from "contexts/application";
 import Button from "./button";
-import { TransactionStatus } from "@interfaces/enums/transaction-status";
-import useTransactions from "@x-hooks/useTransactions";
+import { TransactionStatus } from "interfaces/enums/transaction-status";
+import useTransactions from "x-hooks/useTransactions";
 import Translation from "./translation";
-import LockedIcon from "@assets/icons/locked-icon";
-import useApi from "@x-hooks/use-api";
-import useNetworkTheme from "@x-hooks/use-network";
-import { useNetwork } from "@contexts/network";
+import LockedIcon from "assets/icons/locked-icon";
+import useApi from "x-hooks/use-api";
+import useNetworkTheme from "x-hooks/use-network";
+import { useNetwork } from "contexts/network";
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
-import { IssueData } from "@interfaces/issue-data";
+import { IssueData } from "interfaces/issue-data";
+import { useIssue } from "contexts/issue";
 
 interface Options {
   proposal: Proposal;
-  networkProposal: INetworkProposal;
   issue: IssueData;
-  networkIssueId: number;
   isFinalized: boolean;
   isDisputable?: boolean;
   onDispute: (error?: boolean) => void;
@@ -31,9 +30,7 @@ interface Options {
 
 export default function ProposalItem({
   proposal,
-  networkProposal,
   issue,
-  networkIssueId,
   isFinalized,
   isDisputable = false,
   onDispute = () => {},
@@ -43,10 +40,12 @@ export default function ProposalItem({
     state: { beproStaked },
   } = useContext(ApplicationContext);
   const txWindow = useTransactions();
+  const {networkIssue} = useIssue()
   const { processEvent } = useApi();
   const { getURLWithNetwork } = useNetworkTheme();
   const { activeNetwork } = useNetwork();
-
+  const networkProposals =  networkIssue?.networkProposals?.[proposal?.id] || [];
+  
   async function handleDispute(mergeId) {
     if (!isDisputable || isFinalized) return;
 
@@ -57,15 +56,15 @@ export default function ProposalItem({
     dispatch(disputeTx);
 
     await BeproService.network
-      .disputeMerge(networkIssueId, mergeId)
+      .disputeMerge(networkIssue?._id, mergeId)
       .then((txInfo) => {
-        processEvent(`dispute-proposal`, txInfo.blockNumber, +networkIssueId);
+        processEvent(`dispute-proposal`, txInfo.blockNumber, +networkIssue?._id);
         txWindow.updateItem(
           disputeTx.payload.id,
           BeproService.parseTransaction(txInfo, disputeTx.payload)
         );
       })
-      .then(() => onDispute())
+      .then(() => onDispute?.())
       .catch((err) => {
         if (err?.message?.search(`User denied`) > -1)
           dispatch(
@@ -78,17 +77,17 @@ export default function ProposalItem({
               status: TransactionStatus.failed,
             })
           );
-        onDispute(true);
+        onDispute?.();
         console.error("Error creating dispute", err);
       });
   }
 
   function getColors() {
-    if (isFinalized && !proposal.isDisputed && proposal.isMerged) {
+    if (isFinalized && !networkProposals?.isDisputed && proposal.isMerged) {
       return `success`;
     }
 
-    if (proposal.isDisputed || (isFinalized && !proposal.isMerged)) {
+    if (networkProposals?.isDisputed || (isFinalized && !proposal.isMerged)) {
       return `danger`;
     }
 
@@ -98,22 +97,22 @@ export default function ProposalItem({
   function getLabel() {
     let action = "dispute";
 
-    if (isFinalized && !proposal.isDisputed && proposal.isMerged) {
+    if (isFinalized && !networkProposals?.isDisputed && proposal.isMerged) {
       action = "accepted";
     }
 
-    if (proposal.isDisputed || (isFinalized && !proposal.isMerged)) {
+    if (networkProposals?.isDisputed || (isFinalized && !proposal.isMerged)) {
       action = "failed";
     }
 
     return <Translation label={`actions.${action}`} />;
   }
-
+  debugger;
   return (
     <>
       <div
         className="content-list-item proposal"
-        key={`${proposal?.pullRequest?.id}${proposal?.scMergeId}`}
+        key={`${proposal?.pullRequestId}${proposal?.scMergeId}`}
       >
         <Link
           passHref
@@ -133,13 +132,13 @@ export default function ProposalItem({
                 {proposal?.githubLogin && ` @${proposal?.githubLogin}`}
               </div>
               <div className="col-5 d-flex justify-content-between mb-2 text-white">
-                {networkProposal?.prAmounts.map((value, i) => (
+                {networkProposals?.prAmounts && networkProposals?.prAmounts?.map((value, i) => (
                   <PercentageProgressBar
                     key={`pg-${i}`}
                     textClass={`caption-small p-small text-${getColors()}`}
                     pgClass={`bg-${getColors()}`}
                     className={
-                      (i + 1 < networkProposal.prAmounts?.length && `me-2`) ||
+                      (i + 1 < networkProposals?.prAmounts?.length && `me-2`) ||
                       ``
                     }
                     value={value}
@@ -152,7 +151,7 @@ export default function ProposalItem({
                 <div className="col-9 offset-1 text-white">
                   <ProposalProgressSmall
                     pgClass={`${getColors()}`}
-                    value={+networkProposal.disputes}
+                    value={+networkProposals.disputes}
                     total={beproStaked}
                     textClass={`pb-2 text-${getColors()}`}
                   />

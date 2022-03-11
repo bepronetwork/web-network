@@ -1,22 +1,10 @@
-import {IssueData} from './issue-data'
-
-
-export interface IPullRequest{
-  id: number;
-  githubId: number;
-  issueId: number;
-  githubLogin: string;
-  branch: string;
-  reviewers: [];
-}
-export interface Proposal {
-  id: string;
+export interface Proposal{
   createdAt: string;
   githubLogin: string;
-  isDisputed?: boolean;
+  id: string;
   isMerged?: boolean;
-  issue: IssueData;
-  pullRequest:IPullRequest;
+  issueId?: number;
+  pullRequestId?: number;
   scMergeId: string;
 }
 

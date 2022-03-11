@@ -7,23 +7,6 @@ import { useIssue } from '@contexts/issue';
 import { useRouter } from 'next/router';
 import { Proposal } from '@interfaces/proposal';
 import ProposalHero from '@components/proposal-hero';
-interface ProposalBepro {
-  disputes: string;
-  prAddresses: string[];
-  prAmounts: number[];
-  proposalAddress: string;
-  votes: string;
-  _id: string;
-  isDisputed?: boolean;
-  author?: string;
-}
-
-interface usersAddresses {
-  address: string;
-  githubLogin: string;
-  oracles: string;
-  percentage: number;
-}
 
 export default function PageProposal() {
   const router = useRouter()

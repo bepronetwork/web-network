@@ -449,18 +449,6 @@ li {
 
 }
 
-.list-item-proposal {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  transition: 0.8 ease-in-out;
-  &:hover {
-    background-color: lighten($bg-shadow, 2);
-    .h4 {
-      color: $white;
-    }
-  }
-}
-
 .content-wrapper {
   background-color: $bg-shadow;
   padding: $m * 2;
@@ -500,20 +488,6 @@ li {
 
   &:nth-child(odd){
     background-color: $dark-gray;
-  }
-}
-
-.content-proposals {
-  padding: $m * 2;
-  border-radius: math.div($m, 2);
-  &.child {
-    padding: $m;
-  }
-  .content-list-item {
-    margin-left: -$m*2;
-    margin-right: -$m*2;
-    padding: $m $m * 2;
-    border-top: 2px solid rgba($black, 0.2);
   }
 }
 
@@ -1174,6 +1148,7 @@ textarea.form-control {
 .gap-20 {
   gap: 20px;
 }
+
 
 .sticky-bounty {
   position: sticky;

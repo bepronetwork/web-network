@@ -8,7 +8,7 @@ interface Options {
   textClass: string;
 }
 
-export default function ProposalProgressSmall({pgClass = ``, value, total, textClass}: Options) {
+export default function ProposalProgressSmall({pgClass = ``, value = 0, total, textClass}: Options) {
   const dotStyle = {width: `10px`, height: `10px`};
 
   function toRepresentationPercent(value = 0, total = 5) {

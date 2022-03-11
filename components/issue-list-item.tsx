@@ -39,7 +39,7 @@ export default function IssueListItem({
     return (
       <div className="d-flex align-items-center">
         <span className="caption-small mr-1 text-white">
-          {(issue != null && issue.mergeProposals?.length) || 0}
+          {(issue != null && issue?.mergeProposals?.length) || 0}
         </span>
         <span className="caption-small text-white-40 text-uppercase">
           {issue?.mergeProposals?.length === 1
