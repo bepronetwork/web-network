@@ -44,9 +44,7 @@ export default function NewNetwork() {
   const { listUserRepos } = useOctokit()
   const { network, getURLWithNetwork, colorsToCSS, DefaultTheme } = useNetwork()
 
-  const {
-    dispatch
-  } = useContext(ApplicationContext)
+  const { dispatch } = useContext(ApplicationContext)
 
   const { user, wallet, beproServiceStarted } = useAuthentication()
 
@@ -218,7 +216,12 @@ export default function NewNetwork() {
         value: BeproService.operatorAmount
       })
     }
-  }, [wallet?.address, beproServiceStarted, networkFactoryStarted])
+  }, [
+    wallet?.address,
+    wallet?.balance,
+    beproServiceStarted,
+    networkFactoryStarted
+  ])
 
   useEffect(() => {
     //Validate Locked Tokens
@@ -307,10 +310,13 @@ export default function NewNetwork() {
   }, [steps])
 
   useEffect(() => {
-    BeproService.startNetworkFactory().then(setNetworkFactoryStarted).catch((error) =>
-      console.log('Failed to start the Network Factory', error)
-    )
-  }, [])
+    if (beproServiceStarted)
+      BeproService.startNetworkFactory()
+        .then(setNetworkFactoryStarted)
+        .catch((error) =>
+          console.log('Failed to start the Network Factory', error)
+        )
+  }, [beproServiceStarted])
 
   return (
     <div className="new-network">
@@ -331,7 +337,8 @@ export default function NewNetwork() {
               balance={{
                 beproAvailable: wallet?.balance?.bepro,
                 oraclesAvailable:
-                  +wallet?.balance?.oracles?.tokensLocked - wallet?.balance?.oracles?.delegatedToOthers,
+                  +wallet?.balance?.oracles?.tokensLocked -
+                  wallet?.balance?.oracles?.delegatedToOthers,
                 tokensLocked: wallet?.balance?.oracles?.tokensLocked
               }}
             />

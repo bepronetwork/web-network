@@ -48,12 +48,14 @@ export default function LockBeproStep({
     setIsLocking(true)
 
     try {
-      const isApproved = await BeproService.networkFactory.isApprovedSettlerToken(BeproService.address, 1)
+      const isApproved = await BeproService.networkFactory.isApprovedSettlerToken(undefined, 1)
 
       if (!isApproved)
         await BeproService.networkFactory.approveSettlerERC20Token()
 
       const amount = data.amount
+
+      await BeproService.startNetworkFactory()
 
       BeproService.networkFactory
         .lock(amount)

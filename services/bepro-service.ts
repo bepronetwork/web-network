@@ -66,7 +66,9 @@ class BeproFacet {
     try {
       if (!NETWORK_FACTORY_ADDRESS)
         console.error('Network Factory Contract is Missing')
-      if (!this.networkFactoryStarted) {
+      else {
+        this.networkFactoryStarted = false
+        
         this.networkFactory = new NetworkFactory(
           this.bepro,
           NETWORK_FACTORY_ADDRESS
