@@ -38,6 +38,7 @@ export default function NewNetwork() {
   const [currentStep, setCurrentStep] = useState(1)
   const [creatingNetwork, setCreatingNetwork] = useState(false)
   const [steps, setSteps] = useState(DefaultNetworkInformation)
+  const [networkFactoryStarted, setNetworkFactoryStarted] = useState(false)
 
   const { createNetwork } = useApi()
   const { listUserRepos } = useOctokit()
@@ -205,7 +206,7 @@ export default function NewNetwork() {
   }, [user?.login])
 
   useEffect(() => {
-    if (wallet?.address && beproServiceStarted) {
+    if (wallet?.address && beproServiceStarted && networkFactoryStarted) {
       BeproService.getTokensLockedByAddress(wallet.address)
         .then((value) => {
           handleLockDataChange({ label: 'amountLocked', value })
@@ -217,7 +218,7 @@ export default function NewNetwork() {
         value: BeproService.operatorAmount
       })
     }
-  }, [wallet?.address, beproServiceStarted])
+  }, [wallet?.address, beproServiceStarted, networkFactoryStarted])
 
   useEffect(() => {
     //Validate Locked Tokens
@@ -306,7 +307,7 @@ export default function NewNetwork() {
   }, [steps])
 
   useEffect(() => {
-    BeproService.startNetworkFactory().catch((error) =>
+    BeproService.startNetworkFactory().then(setNetworkFactoryStarted).catch((error) =>
       console.log('Failed to start the Network Factory', error)
     )
   }, [])
