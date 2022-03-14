@@ -2,20 +2,24 @@ import {getSession} from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
 import {GetServerSideProps} from 'next/types';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
-import { useIssue } from '@contexts/issue';
+import { useIssue } from 'contexts/issue';
 import { useRouter } from 'next/router';
-import { INetworkProposal, Proposal } from '@interfaces/proposal';
-import ProposalHero from '@components/proposal-hero';
+import { INetworkProposal, Proposal } from 'interfaces/proposal';
+import ProposalHero from 'components/proposal-hero';
+import useNetworkTheme from 'x-hooks/use-network';
+import ProposalProgress from 'components/proposal-progress';
+import { handlePercentage } from 'helpers/handlePercentage';
 import useApi from '@x-hooks/use-api';
-import useNetworkTheme from '@x-hooks/use-network';
 
 export default function PageProposal() {
   const router = useRouter()
+  const {getUserOf} = useApi()
   const {activeIssue, networkIssue} = useIssue()
   const { getURLWithNetwork } = useNetworkTheme();
   const [proposal, setProposal] = useState<Proposal>({} as Proposal)
   const [networkProposal, setNetworkProposal] = useState<INetworkProposal>({} as INetworkProposal)
 
+  const [usersAddresses, setUserAddress] = useState([])
   async function loadData(){
     const {proposalId, id: issueId, repoId} = router.query
     const mergeProposal = activeIssue?.mergeProposals.find(p=> +p.id === +proposalId)
@@ -36,14 +40,16 @@ export default function PageProposal() {
     setNetworkProposal(networkProposals)
   }
 
+  
   useEffect(()=>{
     loadData();
   },[router.query, activeIssue, networkIssue])
+
   return (
     <>
       <ProposalHero proposal={proposal}  networkProposal={networkProposal}/>
-      {/* <ProposalProgress developers={usersAddresses}/>
-      <CustomContainer className="mgt-20 mgb-20">
+      <ProposalProgress proposalAddress={networkProposal.prAddresses} proposalAmount={networkProposal.prAmounts} totalAmounts={activeIssue?.amount}/>
+      {/* <CustomContainer className="mgt-20 mgb-20">
         <div className="col-6">
           <ProposalProgressBar issueDisputeAmount={+proposalBepro?.disputes} isDisputed={proposalBepro?.isDisputed} stakedAmount={+beproStaked} isFinished={isFinalized} isCurrentPRMerged={issueMicroService?.merged === mergeId} />
         </div>
