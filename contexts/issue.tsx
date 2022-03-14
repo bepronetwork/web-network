@@ -135,9 +135,11 @@ export const IssueProvider: React.FC = function ({ children }) {
   }, [activeIssue, currentAddress]);
 
   useEffect(() => {
-    if (query.id && query.repoId && activeNetwork) {
-      setActiveIssue(null);
-      updateIssue(`${query.repoId}`, `${query.id}`);
+    if (query.id && query.repoId) {
+      if(query.id !== activeIssue?.githubId || +query.repoId !== +activeIssue?.repository_id){
+        setActiveIssue(null);
+        updateIssue(`${query.repoId}`, `${query.id}`);
+      }
     }
   }, [query, activeNetwork]);
 

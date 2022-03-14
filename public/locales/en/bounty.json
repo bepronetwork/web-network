@@ -19,19 +19,6 @@
     "reviews_one": "review",
     "reviews_other": "reviews"
   },
-  "info-data": {
-    "minutes_other": "minutes",
-    "minutes": "minute",
-    "hours_other": "hours",
-    "hours": "hour",
-    "months": "month",
-    "months_other": "months",
-    "years": "year",
-    "years_other": "years",
-    "days": "day",
-    "days_other": "days",
-    "text-data": "Opened {{value}} Ago"
-  },
   "steps": {
     "title": "Bounty State",
     "draft": "Draft",

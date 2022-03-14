@@ -117,6 +117,8 @@ export default function ProposalItem({
       passHref
       key={`${proposal?.pullRequestId}${proposal?.scMergeId}`}
       href={getURLWithNetwork("/proposal", {
+        id: issue.githubId,
+        repoId: issue.repository_id,
         proposalId: proposal?.id,
       })}
     >

@@ -269,5 +269,18 @@
   "drag-and-drop":{
     "attach-file": "Attach File",
     "drag-reject": "Some files will be rejected"
+  },
+  "info-data": {
+    "minutes_other": "minutes",
+    "minutes": "minute",
+    "hours_other": "hours",
+    "hours": "hour",
+    "months": "month",
+    "months_other": "months",
+    "years": "year",
+    "years_other": "years",
+    "days": "day",
+    "days_other": "days",
+    "text-data": "Opened {{value}} Ago"
   }
 }
