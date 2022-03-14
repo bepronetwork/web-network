@@ -39,7 +39,7 @@ export const IssueProvider: React.FC = function ({ children }) {
   const {query} = useRouter();
   const {getIssueComments, getPullRequest} = useOctokit();
   // Move currentAdress and githubLogin to UserHook
-  const { wallet } = useAuthentication()
+  const { wallet, beproServiceStarted } = useAuthentication()
 
   const updatePullRequests = useCallback(
     async (prs: pullRequest[], githubPath: string) => {
@@ -85,7 +85,7 @@ export const IssueProvider: React.FC = function ({ children }) {
   );
 
   const getNetworkIssue = useCallback(async () => {
-    if (!wallet?.address || !activeIssue?.issueId) return;
+    if (!wallet?.address || !activeIssue?.issueId || !beproServiceStarted) return;
 
     const network = await BeproService.network.getIssueByCID(
       activeIssue?.issueId
@@ -100,13 +100,13 @@ export const IssueProvider: React.FC = function ({ children }) {
 
     setNetworkIssue({ ...network, isDraft });
     return network;
-  }, [activeIssue, wallet?.address]);
+  }, [activeIssue, wallet?.address, beproServiceStarted]);
 
   useEffect(() => {
-    if (activeIssue && wallet?.address) {
+    if (activeIssue && wallet?.address && beproServiceStarted) {
       getNetworkIssue();
     }
-  }, [activeIssue, wallet?.address]);
+  }, [activeIssue, wallet?.address, beproServiceStarted]);
 
   useEffect(() => {
     if (query.id && query.repoId && activeNetwork) {
