@@ -719,26 +719,6 @@ label {
   width: 2px;
 }
 
-.progress-ball{
-  position: absolute;
-  height: 10px;
-  width: 10px;
-  border-radius: 10px;
-  background-color: $dark-gray;
-  &.left {
-    left: 0;
-  }
-  &.right {
-    right: 1rem;
-  }
-}
-
-.user-block-progress {
-  padding: $m;
-  border-bottom: 6px solid $purple;
-  border-radius: 6px;
-}
-
 .material-icons {
   &.md-small { font-size: 16px; }
   &.md-medium { font-size: 24px; }

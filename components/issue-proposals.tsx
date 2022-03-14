@@ -40,8 +40,8 @@ export default function IssueProposals({
             onDispute={()=>{}}
             isFinalized={networkIssue?.finalized}
             isDisputable={
-              isProposalDisputable(proposal.createdAt, disputableTime) &&
-              !networkIssue.networkProposals[proposal.id].isDisputed
+              isProposalDisputable(proposal?.createdAt, disputableTime) &&
+              !networkIssue?.networkProposals[proposal.id]?.isDisputed
             }
           />
         ))
