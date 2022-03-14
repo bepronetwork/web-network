@@ -6,7 +6,7 @@ interface IDataLabelProps{
   className?: string;
 }
 export default function DateLabel({date, className}: IDataLabelProps){
-  const { t } = useTranslation("bounty");
+  const { t } = useTranslation("common");
   
   const duration = intervalToDuration({
     start: new Date(date),

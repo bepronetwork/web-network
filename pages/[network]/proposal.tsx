@@ -6,20 +6,32 @@ import { useIssue } from '@contexts/issue';
 import { useRouter } from 'next/router';
 import { INetworkProposal, Proposal } from '@interfaces/proposal';
 import ProposalHero from '@components/proposal-hero';
+import useApi from '@x-hooks/use-api';
+import useNetworkTheme from '@x-hooks/use-network';
 
 export default function PageProposal() {
   const router = useRouter()
   const {activeIssue, networkIssue} = useIssue()
+  const { getURLWithNetwork } = useNetworkTheme();
   const [proposal, setProposal] = useState<Proposal>({} as Proposal)
   const [networkProposal, setNetworkProposal] = useState<INetworkProposal>({} as INetworkProposal)
 
   async function loadData(){
-    const {proposalId} = router.query
-    const mergeProposal = await activeIssue?.mergeProposals.find(p=> +p.id === +proposalId)
+    const {proposalId, id: issueId, repoId} = router.query
+    const mergeProposal = activeIssue?.mergeProposals.find(p=> +p.id === +proposalId)
     const networkProposals = networkIssue?.networkProposals?.[+proposalId];
     
-    if(!proposalId || !mergeProposal || !networkProposals) return router.push('/404');
-    debugger;
+    if(!mergeProposal || !networkProposals){
+      if(issueId && repoId){
+        return router.push(getURLWithNetwork('/bounty',{
+          id: issueId,
+          repoId: repoId
+        }))
+      }
+      
+      return router.push('/404');
+    }
+
     setProposal(mergeProposal)
     setNetworkProposal(networkProposals)
   }

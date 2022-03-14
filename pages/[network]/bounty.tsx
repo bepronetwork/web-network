@@ -124,7 +124,7 @@ export default function PageIssue() {
 
   function refreshIssue(){
     updateIssue(`${issue.repository_id}`, issue.githubId)
-    .catch((e)=> router.push('/404'))
+    .catch(()=> router.push('/404'))
   }
 
   useEffect(syncLocalyState,[issue, activeRepo])

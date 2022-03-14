@@ -169,7 +169,7 @@ export default function useApi() {
       .catch(() => null);
   }
 
-  async function getProposal(dbId: string | number) {
+  async function getProposal(dbId: string | number): Promise<Proposal> {
     return client
       .get<Proposal>(`/merge-proposal/${dbId}`)
       .then(({ data }) => data)

@@ -6,6 +6,8 @@ import DateLabel from "./date-label";
 import { useTranslation } from "next-i18next";
 import PriceConversor from "./price-conversor";
 import {INetworkProposal, Proposal} from 'interfaces/proposal'
+import ArrowLeft from "assets/icons/arrow-left";
+import { useRouter } from "next/router";
 interface IProposalHeroProps{
   proposal: Proposal;
   networkProposal: INetworkProposal
@@ -13,21 +15,27 @@ interface IProposalHeroProps{
 
 export default function ProposalHero({proposal, networkProposal}: IProposalHeroProps) {
   const { activeIssue } = useIssue();
+  const router = useRouter()
   const { t } = useTranslation(['proposal'])
+
   return (
     <div className="banner-shadow">
       <CustomContainer>
         <div className="d-flex flex-row">
           <div className="col-10 row">
-
             <div className="d-flex flex-row">
-              <h4 className="me-2 text-white-70">#{activeIssue?.id}</h4>
-              <h4>{activeIssue?.title}</h4>
+              <div className="me-2 cursor-pointer" onClick={()=> router.back()}>
+                <ArrowLeft width={16} height={16} className="border rounded-circle border-primary p-1"/>
+              </div>
+              <div>
+                <span className="me-2 text-white-40 caption-large">#{activeIssue?.id}</span>
+                <span className="text-gray caption-medium">{activeIssue?.title}</span>
+              </div>
             </div>
 
             <div className="mt-3 pt-1 d-inline-flex align-items-center justify-content-md-start gap-20">
               <h4>{t('proposal:title')}</h4>
-              <h4 className="me-2 text-white-70">#{proposal?.id}</h4>
+              <h4 className="me-2 text-white-40">#{proposal?.id}</h4>
             </div>
 
             <div className="mt-3 pt-1 d-inline-flex align-items-center justify-content-md-start gap-20">
