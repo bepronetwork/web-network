@@ -165,7 +165,7 @@ export default function PageActions({
       .then(() => {
         BeproService.network.redeemIssue(issue_id)
                     .then((txInfo) => {
-                      processEvent(`redeem-issue`, txInfo.blockNumber, issue_id);
+                      processEvent(`redeem-issue`, txInfo.blockNumber, issue_id, undefined, activeNetwork?.name);
                       txWindow.updateItem(redeemTx.payload.id, BeproService.parseTransaction(txInfo, redeemTx.payload));
                       // return BeproService.parseTransaction(txInfo, redeemTx.payload)
                       //                    .then((block) => dispatch(updateTransaction(block)))
@@ -377,7 +377,7 @@ export default function PageActions({
     await BeproService.network
       .disputeMerge(issue_id, +mergeId)
       .then((txInfo) => {
-        processEvent(`dispute-proposal`, txInfo.blockNumber, issue_id);
+        processEvent(`dispute-proposal`, txInfo.blockNumber, issue_id, undefined, activeNetwork?.name);
         txWindow.updateItem(disputeTx.payload.id, BeproService.parseTransaction(txInfo, disputeTx.payload));
       })
       .then(() => handleBeproService())
@@ -409,7 +409,7 @@ export default function PageActions({
     await BeproService.network
       .closeIssue(issue_id, +mergeId)
       .then((txInfo) => {
-        processEvent(`close-issue`, txInfo.blockNumber, issue_id).then(async () =>{
+        processEvent(`close-issue`, txInfo.blockNumber, issue_id, undefined, activeNetwork?.name).then(async () =>{
           await onCloseEvent?.()
         })
         txWindow.updateItem(closeIssueTx.payload.id, BeproService.parseTransaction(txInfo, closeIssueTx.payload));

@@ -69,7 +69,7 @@ export default function PageProposal() {
   const [proposalMicroService, setProposalMicroService] = useState<ProposalData>()
   
   const { activeNetwork } = useNetwork()
-  const { wallet, user } = useAuthentication()
+  const { wallet, user, beproServiceStarted } = useAuthentication()
   const { dispatch, state: { beproStaked } } = useContext(ApplicationContext)
   
   const { getPullRequest } = useOctokit()
@@ -88,7 +88,7 @@ export default function PageProposal() {
   }
 
   async function getProposal(force = false) {
-    if (!issueMicroService || !prGithubId)
+    if (!issueMicroService || !prGithubId || !beproServiceStarted)
       return
 
     try {
@@ -145,7 +145,7 @@ export default function PageProposal() {
   }
 
  async function loadProposalData() {
-    if (issueId && wallet?.address) {
+    if (issueId && wallet?.address && beproServiceStarted) {
       BeproService.getDisputableTime().then(setDisputableTime)
       BeproService.network.isCouncil(wallet?.address)
         .then(isCouncil => setIsCouncil(isCouncil))
@@ -162,8 +162,8 @@ export default function PageProposal() {
 
   useEffect(() => { 
     loadProposalData() 
-  }, [wallet?.address, issueId,])
-  useEffect(() => { getProposal() }, [issueMicroService, prGithubId])
+  }, [wallet?.address, issueId, beproServiceStarted])
+  useEffect(() => { getProposal() }, [issueMicroService, prGithubId, beproServiceStarted])
   useEffect(() => { updateUsersAddresses(proposalBepro) }, [proposalBepro, wallet?.address])
 
   return (

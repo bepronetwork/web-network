@@ -1,6 +1,7 @@
 import models from '@db/models';
 import twitterTweet from '@helpers/api/handle-twitter-tweet';
 import api from '@services/api';
+import { CONTRACT_ADDRESS } from 'env';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Octokit} from 'octokit';
 import {Op} from 'sequelize';
@@ -78,11 +79,13 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
                   .catch(e => {
                     console.log(`Error creating SEO`, e);
                   })
-                  twitterTweet({
-                   type: 'bounty',
-                   action: 'created',
-                   issue
-                 })
+                  if (network.contractAddress === CONTRACT_ADDRESS)
+                    twitterTweet({
+                      type: 'bounty',
+                      action: 'created',
+                      issue
+                    })
+
                  return res.status(200).json(`ok`)
                })
                .catch(_ => res.status(422).json(`nok`));
