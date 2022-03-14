@@ -8,7 +8,7 @@ import {IssueData, pullRequest} from '@interfaces/issue-data';
 import client from '@services/api'
 import { INetwork } from '@interfaces/network';
 import axios from 'axios';
-import { CURRENCY_BEPRO_API, PRODUCTION_CONTRACT, USE_PRODUCTION_CONTRACT_CONVERSION } from 'env';
+import { BEPRO_NETWORK_NAME, CURRENCY_BEPRO_API, PRODUCTION_CONTRACT, USE_PRODUCTION_CONTRACT_CONVERSION } from 'env';
 interface Paginated<T = any> {
   count: number;
   rows: T[]
@@ -36,7 +36,7 @@ export default function useApi() {
                            order = 'DESC',
                            address = ``,
                            creator = ``,
-                           networkName = 'bepro') {
+                           networkName = BEPRO_NETWORK_NAME) {
     const search = new URLSearchParams({address, page, repoId, time, state, sortBy, order, creator, networkName}).toString();
     return client.get<{rows: IssueData[], count: number}>(`/issues/?${search}`)
                  .then(({data}) => data)
@@ -53,7 +53,7 @@ export default function useApi() {
                            creator = ``,
                            search = '',
                            pullRequester = '',
-                           networkName = 'bepro'}) {
+                           networkName = BEPRO_NETWORK_NAME}) {
     const params = new URLSearchParams({address, page, repoId, time, state, sortBy, order, creator, search, pullRequester, networkName}).toString();
     return client.get<{rows: IssueData[], count: number, pages: number, currentPage: number}>(`/search/issues/?${params}`)
                  .then(({data}) => data)
@@ -64,20 +64,20 @@ export default function useApi() {
                            owner = '',
                            name = ``,
                            path = ``,
-                           networkName = 'bepro'}) {
+                           networkName = BEPRO_NETWORK_NAME}) {
     const params = new URLSearchParams({page, owner, name, path, networkName}).toString();
     return client.get<{rows, count: number, pages: number, currentPage: number}>(`/search/repositories?${params}`)
                  .then(({data}) => data)
                  .catch(() => ({rows: [], count: 0, pages: 0, currentPage: 1}));
   }
 
-  async function getIssue(repoId: string, ghId: string, networkName = 'bepro') {
+  async function getIssue(repoId: string, ghId: string, networkName = BEPRO_NETWORK_NAME) {
     return client.get<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`)
                  .then(({data}) => data)
                  .catch(() => null);
   }
 
-  async function createIssue(payload: NewIssueParams, networkName = 'bepro') {
+  async function createIssue(payload: NewIssueParams, networkName = BEPRO_NETWORK_NAME) {
     return client.post<number>(`/issue`, {...payload, networkName})
                  .then(({data}) => data)
                  .catch(() => null);
@@ -89,7 +89,7 @@ export default function useApi() {
                  .catch(() => null);
   }
 
-  async function patchIssueWithScId(repoId, githubId, scId, networkName = 'bepro') {
+  async function patchIssueWithScId(repoId, githubId, scId, networkName = BEPRO_NETWORK_NAME) {
     return client.patch(`/issue`, {repoId, githubId, scId, networkName})
                  .then(({data}) => data === `ok`)
                  .catch(_ => false)
@@ -101,7 +101,7 @@ export default function useApi() {
                  .catch(_ => false)
   }
 
-  async function getPendingFor(address: string, page = '1', networkName = 'bepro') {
+  async function getPendingFor(address: string, page = '1', networkName = BEPRO_NETWORK_NAME) {
     const search = new URLSearchParams({address, page, state: `pending`, networkName}).toString()
     return client.get<IssueData[]>(`/issues/?${search}`)
                  .then(({data}) => data)
@@ -114,7 +114,7 @@ export default function useApi() {
                  .catch(() => ({scMergeId: '', pullRequestId: '', issueId: '', id: ''}))
   }
 
-  async function createPullRequestIssue(repoId: string, githubId: string, payload: {title: string; description: string; username: string; branch: string}, networkName = 'bepro') {
+  async function createPullRequestIssue(repoId: string, githubId: string, payload: {title: string; description: string; username: string; branch: string}, networkName = BEPRO_NETWORK_NAME) {
     return client.post(`/pull-request/`, {...payload, repoId, githubId, networkName})
                  .then(() => true)
                  .catch((error) => {
@@ -191,7 +191,7 @@ export default function useApi() {
                  .catch(() => []);
   }
 
-  async function createRepo(owner, repo, networkName = 'bepro') {
+  async function createRepo(owner, repo, networkName = BEPRO_NETWORK_NAME) {
     return client.post(`/repos/`, {owner, repo})
                  .then(({status}) => status === 200)
                  .catch((e) => {
@@ -200,7 +200,7 @@ export default function useApi() {
                  })
   }
 
-  async function getReposList(force = false, networkName = 'bepro') {
+  async function getReposList(force = false, networkName = BEPRO_NETWORK_NAME) {
     const search = new URLSearchParams({networkName}).toString();
 
     if (!force && repoList.length)
@@ -211,7 +211,7 @@ export default function useApi() {
                  .catch(() => []);
   }
 
-  async function getBranchsList(repoId: string | number, force = false, networkName = 'bepro') {
+  async function getBranchsList(repoId: string | number, force = false, networkName = BEPRO_NETWORK_NAME) {
     if (!force && branchsList[repoId]?.length)
       return Promise.resolve(branchsList[repoId] as BranchInfo[]);
 
@@ -229,29 +229,29 @@ export default function useApi() {
                  .catch(() => false);
   }
 
-  async function poll(eventName: string, rest, networkName = 'bepro') {
+  async function poll(eventName: string, rest, networkName = BEPRO_NETWORK_NAME) {
     return client.post(`/poll/`, {eventName, ...rest, networkName}, {timeout: 2 * 60 * 1000})
   }
 
-  async function waitForMerge(githubLogin, issue_id, currentGithubId, networkName = 'bepro') {
+  async function waitForMerge(githubLogin, issue_id, currentGithubId, networkName = BEPRO_NETWORK_NAME) {
     return poll('mergeProposal', {githubLogin, issue_id, currentGithubId}, networkName)
                  .then(({data}) => data)
                  .catch(() => null)
   }
 
-  async function waitForClose(currentGithubId, networkName = 'bepro') {
+  async function waitForClose(currentGithubId, networkName = BEPRO_NETWORK_NAME) {
     return poll(`closeIssue`, {currentGithubId}, networkName)
                  .then(({data}) => data)
                  .catch(() => null)
   }
 
-  async function waitForRedeem(currentGithubId, networkName = 'bepro') {
+  async function waitForRedeem(currentGithubId, networkName = BEPRO_NETWORK_NAME) {
     return poll(`redeemIssue`, {currentGithubId}, networkName)
                  .then(({data}) => data)
                  .catch(() => null)
   }
 
-  async function processEvent(eventName, fromBlock: number, id: number, pullRequestId = '', networkName = 'bepro') {
+  async function processEvent(eventName, fromBlock: number, id: number, pullRequestId = '', networkName = BEPRO_NETWORK_NAME) {
     return client.post(`/past-events/${eventName}/`, {fromBlock, id, pullRequestId, networkName})
   }
 
@@ -273,7 +273,7 @@ export default function useApi() {
                  });
   }
 
-  async function userHasPR(issueId: string, login: string, networkName = 'bepro') {
+  async function userHasPR(issueId: string, login: string, networkName = BEPRO_NETWORK_NAME) {
     const search = new URLSearchParams({issueId, login, page: '1', networkName}).toString();
     return client.get<PaginatedData<pullRequest>>(`/pull-request?${search}`)
                  .then(({data: {count}}) => count > 0)
@@ -284,7 +284,7 @@ export default function useApi() {
 
   }
 
-  async function getUserPullRequests(page= '1', login: string, networkName = 'bepro') {
+  async function getUserPullRequests(page= '1', login: string, networkName = BEPRO_NETWORK_NAME) {
     const search = new URLSearchParams({page, login, networkName}).toString();
     
     return client.get<PaginatedData<pullRequest>>(`/pull-request?${search}`)
@@ -295,7 +295,7 @@ export default function useApi() {
                  });
   }
 
-  async function startWorking(issueId: string, githubLogin: string, networkName = 'bepro') {
+  async function startWorking(issueId: string, githubLogin: string, networkName = BEPRO_NETWORK_NAME) {
     return client.put('/issue/working',  { issueId, githubLogin, networkName })
                 .then((response) => response)
                 .catch(error => {
@@ -303,7 +303,7 @@ export default function useApi() {
                 })
   }
 
-  async function mergeClosedIssue(issueId: string, pullRequestId: string, mergeProposalId: string, address: string, networkName = 'bepro') {
+  async function mergeClosedIssue(issueId: string, pullRequestId: string, mergeProposalId: string, address: string, networkName = BEPRO_NETWORK_NAME) {
     return client.post('/pull-request/merge', { issueId, pullRequestId, mergeProposalId, address, networkName })
       .then(response => response)
       .catch(error => {
@@ -311,7 +311,7 @@ export default function useApi() {
       })
   }
 
-  async function createReviewForPR(issueId: string, pullRequestId: string,  githubLogin: string, body:string, networkName = 'bepro') {
+  async function createReviewForPR(issueId: string, pullRequestId: string,  githubLogin: string, body:string, networkName = BEPRO_NETWORK_NAME) {
     return client.put('/pull-request/review', {issueId, pullRequestId, githubLogin, body, networkName})
     .then(response => response)
   }
