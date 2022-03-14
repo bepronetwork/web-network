@@ -20,11 +20,11 @@ export default function IssueProposals({ metaProposals, className='', metaReques
   const [disputableTime, setDisputableTime] = useState(0)
   const [proposals, setProposals] = useState<Proposal[]>([]);
   
-  const { wallet } = useAuthentication()
+  const { wallet, beproServiceStarted } = useAuthentication()
   const { state: { beproStaked } } = useContext(ApplicationContext)
 
   async function loadProposalsMeta() {
-    if (!issueId)
+    if (!issueId || !beproServiceStarted)
       return;
 
     const scIssueId = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
@@ -48,7 +48,7 @@ export default function IssueProposals({ metaProposals, className='', metaReques
     BeproService.getDisputableTime().then(setDisputableTime)
   }
 
-  useEffect(() => { loadProposalsMeta() }, [issueId, numberProposals, wallet?.address, metaRequests]);
+  useEffect(() => { loadProposalsMeta() }, [issueId, numberProposals, wallet?.address, metaRequests, beproServiceStarted]);
 
   return (
     <div className={`content-wrapper ${className} pt-0 pb-0`}>

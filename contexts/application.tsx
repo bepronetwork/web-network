@@ -96,6 +96,8 @@ export default function ApplicationContextProvider({children}) {
   const { wallet, beproServiceStarted } = useAuthentication()
 
   const Initialize = () => {    
+    if (!activeNetwork) return
+    
     dispatch(changeLoadState(true))
 
     BeproService.start(handleNetworkAddress(activeNetwork))

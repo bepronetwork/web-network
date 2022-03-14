@@ -60,7 +60,7 @@ export default function ProposalItem({
     const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
     await BeproService.network.disputeMerge(issue_id, mergeId)
                       .then(txInfo => {
-                        processEvent(`dispute-proposal`, txInfo.blockNumber, issue_id);
+                        processEvent(`dispute-proposal`, txInfo.blockNumber, issue_id, undefined, activeNetwork?.name);
                         txWindow.updateItem(disputeTx.payload.id, BeproService.parseTransaction(txInfo, disputeTx.payload));
                         // BeproService.parseTransaction(txInfo, disputeTx.payload)
                         //             .then(block => {

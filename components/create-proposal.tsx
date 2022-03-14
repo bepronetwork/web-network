@@ -134,7 +134,7 @@ export default function NewProposal({
   }
 
   async function loadProposalsMeta() {
-    if (!issueId)
+    if (!issueId || !beproServiceStarted)
       return;
 
     const scIssueId = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
@@ -396,13 +396,13 @@ export default function NewProposal({
   }, [distrib]);
 
   useEffect(() => {
-    if (pullRequests.length && activeRepo){
+    if (pullRequests.length && activeRepo && beproServiceStarted){
       const defaultPr = pullRequests.find(el=> el.isMergeable) || pullRequests[0];
       setCurrentPullRequest(defaultPr)
       getParticipantsPullRequest(defaultPr?.id, defaultPr?.githubId);
       loadProposalsMeta()
     }
-  }, [pullRequests, activeRepo]);
+  }, [pullRequests, activeRepo, beproServiceStarted]);
 
   useEffect(updateCreateProposalHideState, [wallet?.address])
 
