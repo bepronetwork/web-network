@@ -28,17 +28,17 @@ export default function ProposalHero({proposal, networkProposal}: IProposalHeroP
                 <ArrowLeft width={16} height={16} className="border rounded-circle border-primary p-1"/>
               </div>
               <div>
-                <span className="me-2 text-white-40 caption-large">#{activeIssue?.id}</span>
+                <span className="me-2 text-white-40 caption-large">#{activeIssue?.githubId}</span>
                 <span className="text-gray caption-medium">{activeIssue?.title}</span>
               </div>
             </div>
 
-            <div className="mt-3 pt-1 d-inline-flex align-items-center justify-content-md-start gap-20">
+            <div className="mt-3 pt-1 d-inline-flex align-items-center justify-content-md-start gap-2">
               <h4>{t('proposal:title')}</h4>
-              <h4 className="me-2 text-white-40">#{proposal?.id}</h4>
+              <h4 className="text-white-40">#{proposal?.scMergeId}</h4>
             </div>
 
-            <div className="mt-3 pt-1 d-inline-flex align-items-center justify-content-md-start gap-20">
+            <div className="mt-3 pt-1 d-inline-flex align-items-center justify-content-md-start gap-2">
               <div className="d-flex align-items-center">
                 <Avatar
                   className="me-2"
