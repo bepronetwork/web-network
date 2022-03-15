@@ -24,6 +24,7 @@ export interface IssueContextData {
   activeIssue: IActiveIssue;
   networkIssue: INetworkIssue;
   updateIssue: (repoId: string, ghId: string)=> Promise<IActiveIssue>;
+  addNewComment: (prId: number, comment: string) => void;
   getNetworkIssue: ()=> void;
 }
 
@@ -37,17 +38,27 @@ export const IssueProvider: React.FC = function ({ children }) {
   const {getIssue} = useApi()
   const {activeNetwork} = useNetwork()
   const {query} = useRouter();
-  const {getIssueComments, getPullRequest} = useOctokit();
+  const {getIssueComments, getPullRequest, getPullRequestComments} = useOctokit();
 
   // Todo: Move currentAdress and githubLogin to UserHook
   const { state: { currentAddress }} = useContext(ApplicationContext);
 
+  const addNewComment = useCallback((prId: number, comment: string)=>{
+    let pullRequests = [...activeIssue.pullRequests];
+    const prIndex =  pullRequests.findIndex(pr=> pr.id === prId)
+    const newPr = {...pullRequests[prIndex], comments: [...pullRequests[prIndex].comments, comment]} as pullRequest;
+    pullRequests[prIndex] = newPr;
+    debugger;
+    setActiveIssue((oldState)=>({...oldState, pullRequests}))
+  },[activeIssue])
+
   const updatePullRequests = useCallback(
     async (prs: pullRequest[], githubPath: string) => {
       const mapPr = prs.map(async (pr) => {
-        const { data } = await getPullRequest(Number(pr.githubId), githubPath);
-        pr.isMergeable = (data.mergeable &&  data.mergeable_state === 'clean');
-        pr.merged = data.merged;
+        const [getPr, getComments]  = await Promise.all([getPullRequest(Number(pr.githubId), githubPath), getPullRequestComments(Number(pr.githubId), githubPath)])
+        pr.isMergeable = (getPr?.data?.mergeable &&  getPr?.data?.mergeable_state === 'clean');
+        pr.merged = getPr?.data?.merged;
+        pr.comments = getComments?.data as any; 
         return pr;
       });
 
@@ -151,10 +162,11 @@ export const IssueProvider: React.FC = function ({ children }) {
     () => ({
       activeIssue,
       networkIssue,
+      addNewComment,
       updateIssue,
       getNetworkIssue
     }),
-    [activeIssue, networkIssue, updateIssue, getNetworkIssue]
+    [activeIssue, networkIssue, addNewComment, updateIssue, getNetworkIssue]
   );
 
   return (
