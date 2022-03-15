@@ -1,4 +1,4 @@
-import { IssueData } from "@interfaces/issue-data";
+import { pullRequest } from "@interfaces/issue-data";
 import { useIssue } from "contexts/issue";
 import { INetworkProposal, Proposal } from "interfaces/proposal";
 import { useTranslation } from "next-i18next";
@@ -13,30 +13,31 @@ import Translation from "./translation";
 interface IProposalPRDetailsProps{
   proposal: Proposal,
   networkProposal: INetworkProposal,
+  currentPullRequest: pullRequest
 }
-export default function ProposalPullRequestDetail({proposal, networkProposal}:IProposalPRDetailsProps) {
+export default function ProposalPullRequestDetail({proposal, networkProposal, currentPullRequest}:IProposalPRDetailsProps) {
   const { t } = useTranslation('pull-request');
   const { activeIssue } = useIssue();
 
   return (
-    <CustomContainer className="bg-shadow rounded-5">
-      <div className="row">
-        <div className="mt-3 pt-1 d-inline-flex align-items-center justify-content-md-start gap-2">
+    <CustomContainer>
+      <div className="bg-shadow rounded-5 row gap-2 p-3">
+        <div className="pt-1 d-inline-flex align-items-center justify-content-md-start gap-2">
           <span className="caption-large text-uppercase text-white">
             {t("pull-request:label")}
           </span>
           <span className="caption-large text-uppercase text-white-40">
-            #{proposal?.pullRequestId}
+            #{currentPullRequest?.githubId}
           </span>
-          <PullRequestLabels merged={proposal.isMerged} isMergeable={true}/>
+          <PullRequestLabels merged={currentPullRequest?.merged} isMergeable={currentPullRequest?.isMergeable}/>
         </div>
-        <div className="mt-3 pt-1 d-inline-flex align-items-center justify-content-md-start gap-4">
+        <div className="pt-1 d-inline-flex align-items-center justify-content-md-start gap-3">
           <div className="d-flex align-items-center">
-            <Avatar className="me-2" userLogin={proposal?.githubLogin} />{" "}
+            <Avatar className="me-2" userLogin={currentPullRequest?.githubLogin} />{" "}
             <GithubInfo
               parent="hero"
               variant="user"
-              label={[`@`, proposal?.githubLogin].join(``)}
+              label={[`@`, currentPullRequest?.githubLogin].join(``)}
             />
           </div>
 
@@ -53,11 +54,11 @@ export default function ProposalPullRequestDetail({proposal, networkProposal}:IP
 
           <span className="caption-small text-ligth-gray text-uppercase">
             <Translation label={`branch`} />
-            <span className="text-primary">:{activeIssue?.branch}</span>
+            <span className="text-primary">:{currentPullRequest?.branch}</span>
           </span>
 
           {proposal?.createdAt && <DateLabel
-            date={proposal?.createdAt}
+            date={currentPullRequest?.createdAt}
             className="text-white"
           />}
         </div>
