@@ -1,7 +1,7 @@
 import { GetStaticProps } from 'next'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
-import PullRequestLabels, { PRLabel } from './pull-request-labels'
+import PullRequestLabels from './pull-request-labels'
 
 import Avatar from 'components/avatar'
 import GithubInfo from 'components/github-info'
@@ -25,13 +25,6 @@ export default function PullRequestHero({
   const { t } = useTranslation(['common', 'pull-request'])
   const { getURLWithNetwork } = useNetwork()
 
-  function getLabel(): PRLabel{
-    if(pullRequest?.merged) return 'merged';
-    if(pullRequest?.isMergeable) return 'ready to merge';
-    //isMergeable can be null;
-    return 'conflicts'
-  }
-
   return (
     <div className="banner mb-4">
       <div className="container">
@@ -53,7 +46,7 @@ export default function PullRequestHero({
                   <div className="top-border">
                     <div className="d-flex flex-row align-items-center mb-3 gap-20">
                       <h1 className="h4">{t('pull-request:label')} #{pullRequestId}</h1> 
-                      <PullRequestLabels label={getLabel()} hero />
+                      <PullRequestLabels merged={pullRequest?.merged} isMergeable={pullRequest?.isMergeable} hero />
                     </div>
                     <div className="d-flex align-items-center flex-wrap justify-content-center justify-content-md-start">
                       <span className="caption-small text-gray mr-2">
