@@ -1,9 +1,10 @@
 import React from "react";
-import { formatNumberToCurrency } from "@helpers/formatNumber";
+import { formatNumberToNScale } from "helpers/formatNumber";
 import { useTranslation } from "next-i18next";
-import { truncateAddress } from "@helpers/truncate-address";
-import { IDistribuitonPerUser } from "@interfaces/proposal";
-import { Currency } from "@interfaces/currency";
+import { truncateAddress } from "helpers/truncate-address";
+import { IDistribuitonPerUser } from "interfaces/proposal";
+import { Currency } from "interfaces/currency";
+import ArrowRight from "assets/icons/arrow-right";
 
 interface IProposalListAddressProps {
   usersDistribution: IDistribuitonPerUser[];
@@ -32,8 +33,9 @@ export default function ProposalListAddresses({
                     {truncateAddress(item.address)}
                   </span>
                   <div className="caption-medium color-purple mb-0">
-                    <span>{formatNumberToCurrency(item.oracles)}</span>
-                    <span className="text-primary">{currency}</span>
+                    <span className="text-gray">{item.percentage}%</span>
+                    <ArrowRight className="text-gray mx-2" width={10} height={10}/>
+                    <span>{formatNumberToNScale(+item.oracles)}  <span className="text-primary">${currency}</span></span>
                   </div>
                 </div>
               ))
