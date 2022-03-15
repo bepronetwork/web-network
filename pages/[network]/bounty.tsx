@@ -58,7 +58,7 @@ export default function PageIssue() {
       eventKey: 'pull-requests',
       isEmpty: !(mergedPullRequests.length > 0),
       title: <Translation ns="pull-request" label={'labelWithCount'} params={{count: mergedPullRequests.length || 0}} />,
-      component: <IssuePullRequests key="tab-pull-requests" repositoryPath={issue?.repository?.githubPath} className="border-top-0" repoId={issue?.repository_id} issueId={issue?.issueId} pullResquests={mergedPullRequests} />,
+      component: <IssuePullRequests key="tab-pull-requests" className="border-top-0"  issue={issue}/>,
       description: t('description_pull-request')
     }
   ]

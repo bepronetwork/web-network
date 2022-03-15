@@ -1,35 +1,33 @@
-import { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
-import { head } from 'lodash'
 import { useRouter } from 'next/router'
 import { getSession } from 'next-auth/react'
 import { GetServerSideProps } from 'next/types'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
-import Button from '@components/button'
-import Comment from '@components/comment'
-import GithubLink from '@components/github-link'
-import NothingFound from '@components/nothing-found'
-import CustomContainer from '@components/custom-container'
-import PullRequestHero from '@components/pull-request-hero'
-import CreateReviewModal from '@components/create-review-modal'
+import Button from 'components/button'
+import Comment from 'components/comment'
+import GithubLink from 'components/github-link'
+import NothingFound from 'components/nothing-found'
+import CustomContainer from 'components/custom-container'
+import PullRequestHero from 'components/pull-request-hero'
+import CreateReviewModal from 'components/create-review-modal'
 
-import { ApplicationContext } from '@contexts/application'
-import { changeLoadState } from '@contexts/reducers/change-load-state'
+import { ApplicationContext } from 'contexts/application'
+import { changeLoadState } from 'contexts/reducers/change-load-state'
 
 
-import useMergeData from '@x-hooks/use-merge-data'
+import useMergeData from 'x-hooks/use-merge-data'
 
-import { formatDate } from '@helpers/formatDate'
-import { formatNumberToCurrency } from '@helpers/formatNumber'
 
-import { IssueData, pullRequest } from '@interfaces/issue-data'
-import useApi from '@x-hooks/use-api'
-import { addToast } from '@contexts/reducers/add-toast'
+import { IssueData, pullRequest } from 'interfaces/issue-data'
+import useApi from 'x-hooks/use-api'
+import { addToast } from 'contexts/reducers/add-toast'
 import { useTranslation } from 'next-i18next'
-import useNetwork from '@x-hooks/use-network'
-import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper'
-import { useRepos } from '@contexts/repos'
+import useNetwork from 'x-hooks/use-network'
+import ReadOnlyButtonWrapper from 'components/read-only-button-wrapper'
+import { useRepos } from 'contexts/repos'
+import { useIssue } from 'contexts/issue'
 
 export default function PullRequest() {
   const {
@@ -39,70 +37,54 @@ export default function PullRequest() {
 
   const router = useRouter()
   const {activeRepo} = useRepos()
-  const { createReviewForPR, getIssue } = useApi()
-  const [issue, setIssue] = useState<IssueData>()
+  const {activeIssue} = useIssue()
+  
+  const { createReviewForPR } = useApi()
   const [showModal, setShowModal] = useState(false)
   const [isExecuting, setIsExecuting] = useState(false)
   const [pullRequest, setPullRequest] = useState<pullRequest>()
   const { getMergedDataFromPullRequests } = useMergeData()
   const { t } = useTranslation(['common', 'pull-request'])
   const { network } = useNetwork()
-
-  const { repoId, issueId, prId, review } = router.query
+  const { prId, review } = router.query;
 
   function loadData() {
-    const [repo, githubId] = String(issueId).split('/')
-
-    if (!activeRepo) return
-
     dispatch(changeLoadState(true))
-
-    getIssue(String(repoId), githubId, network?.name)
-      .then((issue) => {
-        setIssue(issue)
-
-        return issue
-      })
-      .then((issue) =>
-        getMergedDataFromPullRequests(
-          activeRepo?.githubPath,
-          issue.pullRequests.filter((pr) => pr.githubId === prId)
-        )
-      )
-      .then((merged) => setPullRequest(head(merged)))
-      .catch(console.log)
-      .finally(() => dispatch(changeLoadState(false)))
+    if (!prId) return;
+    const currentPR = activeIssue?.pullRequests.find((pr) => +pr?.githubId === +prId);
+    setPullRequest(currentPR)
+    dispatch(changeLoadState(false))
   }
 
   function handleCreateReview({ body }) {
-    setIsExecuting(true)
+    // setIsExecuting(true)
 
-    createReviewForPR(String(issueId), String(prId), githubLogin, body, network?.name)
-      .then((response) => {
-        dispatch(
-          addToast({
-            type: 'success',
-            title: t('actions.success'),
-            content: t('pull-request:actions.review.success')
-          })
-        )
+    // createReviewForPR(String(issueId), String(prId), githubLogin, body, network?.name)
+    //   .then((response) => {
+    //     dispatch(
+    //       addToast({
+    //         type: 'success',
+    //         title: t('actions.success'),
+    //         content: t('pull-request:actions.review.success')
+    //       })
+    //     )
 
-        setPullRequest({...pullRequest, comments: [...pullRequest.comments, response.data]})
+    //     setPullRequest({...pullRequest, comments: [...pullRequest.comments, response.data]})
         
-        setIsExecuting(false)
-        handleCloseModal()
-      })
-      .catch((error) => {
-        dispatch(
-          addToast({
-            type: 'danger',
-            title: t('actions.failed'),
-            content: t('pull-request:actions.review.error')
-          })
-        )
+    //     setIsExecuting(false)
+    //     handleCloseModal()
+    //   })
+    //   .catch((error) => {
+    //     dispatch(
+    //       addToast({
+    //         type: 'danger',
+    //         title: t('actions.failed'),
+    //         content: t('pull-request:actions.review.error')
+    //       })
+    //     )
 
-        setIsExecuting(false)
-      })
+    //     setIsExecuting(false)
+    //   })
   }
 
   function handleShowModal() {
@@ -113,55 +95,61 @@ export default function PullRequest() {
     setShowModal(false)
   }
 
-  useEffect(loadData, [activeRepo, issueId, prId])
+  useEffect(()=>{loadData()}, [])
+
   useEffect(() => {
-    if (review && issue && pullRequest && githubLogin) setShowModal(true)
-  }, [review, issue, pullRequest])
+    if (review && pullRequest){
+      setShowModal(true)
+    }
+  }, [review, pullRequest])
 
   return (
     <>
-      <PullRequestHero
-        githubId={issue?.githubId}
-        title={issue?.title}
-        pullRequestId={prId}
-        authorPullRequest={pullRequest?.githubLogin || ''}
-        createdAt={pullRequest && formatDate(pullRequest.createdAt)}
-        beproStaked={formatNumberToCurrency(issue?.amount)}
-        pullRequest={pullRequest}
-      />
+      <PullRequestHero currentPullRequest={pullRequest} />
       <CustomContainer>
-        <div className="row align-items-center bg-shadow border-radius-8 px-3 py-4">
-          <div className="col-8">
-            <span className="caption-large text-uppercase">
-              {t('pull-request:review', { count: pullRequest?.comments?.length })}
-            </span>
-          </div>
+        <div className="mt-3">
+          <div className="row align-items-center bg-shadow border-radius-8 px-3 py-4">
+            <div className="col-8">
+              <span className="caption-large text-uppercase">
+                {t("pull-request:review", {
+                  count: pullRequest?.comments?.length,
+                })}
+              </span>
+            </div>
 
-          <div className="col-2 p-0 d-flex justify-content-center">
-            {currentAddress && githubLogin && pullRequest?.state === 'open' && (
-              <ReadOnlyButtonWrapper>
-                <Button className="read-only-button" onClick={handleShowModal}>
-                  {t('actions.make-a-review')}
-                </Button>
-              </ReadOnlyButtonWrapper>
-            )}
-          </div>
+            <div className="col-2 p-0 d-flex justify-content-center">
+              {currentAddress && githubLogin && pullRequest?.state === "open" && (
+                <ReadOnlyButtonWrapper>
+                  <Button
+                    className="read-only-button"
+                    onClick={handleShowModal}
+                  >
+                    {t("actions.make-a-review")}
+                  </Button>
+                </ReadOnlyButtonWrapper>
+              )}
+            </div>
 
-          <div className="col-2 p-0">
-            <GithubLink
-              repoId={String(repoId)}
-              forcePath={activeRepo?.githubPath}
-              hrefPath={`pull/${pullRequest?.githubId || ''}`}
-            >
-              {t('actions.view-on-github')}
-            </GithubLink>
-          </div>
+            <div className="col-2 p-0">
+              <GithubLink
+                repoId={String(activeRepo?.id)}
+                forcePath={activeRepo?.githubPath}
+                hrefPath={`pull/${pullRequest?.githubId || ""}`}
+              >
+                {t("actions.view-on-github")}
+              </GithubLink>
+            </div>
 
-          <div className="col-12 mt-4">
-            {(pullRequest?.comments?.length > 0 &&
-              pullRequest?.comments?.map((comment, index) => (
-                <Comment comment={comment} key={index} />
-              ))) || <NothingFound description={t('pull-request:errors.no-reviews-found')} />}
+            <div className="col-12 mt-4">
+              {(pullRequest?.comments?.length > 0 &&
+                React.Children.toArray(pullRequest?.comments?.map((comment, index) => (
+                  <Comment comment={comment} key={index} />
+                )))) || (
+                <NothingFound
+                  description={t("pull-request:errors.no-reviews-found")}
+                />
+              )}
+            </div>
           </div>
         </div>
       </CustomContainer>
@@ -169,13 +157,13 @@ export default function PullRequest() {
       <CreateReviewModal
         show={showModal}
         onCloseClick={handleCloseModal}
-        issue={issue}
+        issue={activeIssue}
         pullRequest={pullRequest}
         onConfirm={handleCreateReview}
         isExecuting={isExecuting}
       />
     </>
-  )
+  );
 }
 
 export const getServerSideProps: GetServerSideProps = async ({locale}) => {

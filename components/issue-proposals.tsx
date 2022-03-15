@@ -1,19 +1,21 @@
+import React from "react";
 import { useContext } from "react";
 import { useEffect, useState } from "react";
 import { BeproService } from "services/bepro-service";
+import { IActiveIssue } from "contexts/issue";
 import { ApplicationContext } from "contexts/application";
 import ProposalItem from "components/proposal-item";
 import NothingFound from "./nothing-found";
 import { useTranslation } from "next-i18next";
 import { isProposalDisputable } from "helpers/proposal";
-import { INetworkIssue, IssueData } from "interfaces/issue-data";
-import React from "react";
+import { INetworkIssue } from "interfaces/issue-data";
 
 interface IIssueProposalProps {
-  issue: IssueData;
+  issue: IActiveIssue;
   networkIssue: INetworkIssue;
   className: string;
 }
+
 export default function IssueProposals({
   issue,
   networkIssue,
@@ -31,7 +33,7 @@ export default function IssueProposals({
 
   return (
     <div className={`content-wrapper ${className || ""} pt-0 pb-0`}>
-      {React.Children.toArray(
+      {issue?.mergeProposals.length > 0 && React.Children.toArray(
         issue?.mergeProposals?.map((proposal) => (
           <ProposalItem
             key={proposal.id}
