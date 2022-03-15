@@ -46,7 +46,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     async (prs: pullRequest[], githubPath: string) => {
       const mapPr = prs.map(async (pr) => {
         const { data } = await getPullRequest(Number(pr.githubId), githubPath);
-        pr.isMergeable = data.mergeable;
+        pr.isMergeable = (data.mergeable &&  data.mergeable_state === 'clean');
         pr.merged = data.merged;
         return pr;
       });

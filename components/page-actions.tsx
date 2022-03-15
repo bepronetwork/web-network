@@ -42,7 +42,6 @@ interface pageActions {
   handleBeproService?: (force?: boolean) => void;
   githubLogin?: string;
   mergeId?: string;
-  isDisputed?: boolean;
   hasOpenPR?: boolean;
   isRepoForked?: boolean;
   isWorking?: boolean;
@@ -74,7 +73,6 @@ export default function PageActions({
   handleBeproService,
   githubLogin,
   mergeId,
-  isDisputed,
   hasOpenPR = false,
   isRepoForked = false,
   isWorking = false,
@@ -356,63 +354,6 @@ export default function PageActions({
       })
   }
 
-  async function handleDispute() {
-    const disputeTx = addTransaction({ type: TransactionTypes.dispute }, activeNetwork);
-    dispatch(disputeTx);
-
-    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
-
-    await BeproService.network
-      .disputeMerge(issue_id, +mergeId)
-      .then((txInfo) => {
-        processEvent(`dispute-proposal`, txInfo.blockNumber, issue_id);
-        txWindow.updateItem(disputeTx.payload.id, BeproService.parseTransaction(txInfo, disputeTx.payload));
-      })
-      .then(() => handleBeproService())
-      .catch((err) => {
-        if (err?.message?.search(`User denied`) > -1)
-          dispatch(updateTransaction({ ...(disputeTx.payload as any), remove: true }));
-        else dispatch(updateTransaction({...disputeTx.payload as any, status: TransactionStatus.failed}));
-
-        console.error("Error creating dispute", err);
-      });
-  }
-
-  async function handleClose() {
-   
-    const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue }, activeNetwork);
-    dispatch(closeIssueTx);
-
-    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
-
-    waitForClose(issueId, activeNetwork?.name)
-      .then(() => {
-        if (handleBeproService)
-          handleBeproService(true);
-
-        if (handleMicroService)
-          handleMicroService();
-      })
-
-    await BeproService.network
-      .closeIssue(issue_id, +mergeId)
-      .then((txInfo) => {
-        processEvent(`close-issue`, txInfo.blockNumber, issue_id).then(async () =>{
-          await onCloseEvent?.()
-        })
-        txWindow.updateItem(closeIssueTx.payload.id, BeproService.parseTransaction(txInfo, closeIssueTx.payload));
-        // return BeproService.parseTransaction(txInfo, closeIssueTx.payload).then(
-        //   (block) => dispatch(updateTransaction(block))
-        // );
-      })
-      .catch((err) => {
-        if (err?.message?.search(`User denied`) > -1)
-          dispatch(updateTransaction({ ...(closeIssueTx.payload as any), remove: true }));
-        else dispatch(updateTransaction({...closeIssueTx.payload as any, status: TransactionStatus.failed}));
-        console.error(`Error closing issue`, err);
-      });
-  }
-
   return (
     <div className="container mt-4">
       <div className="row justify-content-center">
@@ -432,7 +373,6 @@ export default function PageActions({
               {renderProposeDestribution()}
               {state?.toLowerCase() == "pull request" && (
                 <>
-                  { (!isDisputed && !finalized && isDisputable ) && <ReadOnlyButtonWrapper><Button color={`${isDisputed ? 'primary': 'purple'}`} className="read-only-button mr-1" onClick={handleDispute}>{t('actions.dispute')}</Button></ReadOnlyButtonWrapper> || ``}
                   {!finalized && <ReadOnlyButtonWrapper><Button className="read-only-button mr-1" disabled={!canClose || isDisputable} onClick={handleClose}>
                   {!canClose || isDisputable && <LockedIcon width={12} height={12} className="mr-1"/>}
                     <span>{t('pull-request:actions.merge.title')}</span>
