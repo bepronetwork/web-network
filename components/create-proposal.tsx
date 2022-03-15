@@ -21,7 +21,7 @@ import { Proposal } from 'interfaces/proposal';
 import { ProposalData } from 'interfaces/api-response';
 import { useTranslation } from 'next-i18next';
 import Avatar from './avatar';
-import PullRequestLabels, {PRLabel} from './pull-request-labels';
+import PullRequestLabels from './pull-request-labels';
 import ReadOnlyButtonWrapper from './read-only-button-wrapper';
 import {useRepos} from 'contexts/repos'
 import {useNetwork} from 'contexts/network'
@@ -39,16 +39,8 @@ interface SameProposal {
   }[];
 }
 
-function getLabel(data): PRLabel{
-  if(data.merged) return 'merged';
-  if(data.isMergeable) return 'ready to merge';
-  //isMergeable can be null;
-  if(data.isMergeable === false) return 'conflicts';
-}
-
 function SelectValueComponent({ innerProps, innerRef, ...rest }){
   const data = rest.getValue()[0];
-  const label = getLabel(data)
 
   return (
     <div
@@ -61,14 +53,13 @@ function SelectValueComponent({ innerProps, innerRef, ...rest }){
         {data?.label}
       </span>
       <div className="ms-2">
-        {label && <PullRequestLabels label={label}/>}
+        <PullRequestLabels isMergeable={data.isMergeable} merged={data.merged}/>
       </div>
     </div>
   )
 }
 
 function SelectOptionComponent({ innerProps, innerRef, data }) {
-  const label = getLabel(data)
   return (
     <div
       ref={innerRef}
@@ -80,7 +71,7 @@ function SelectOptionComponent({ innerProps, innerRef, data }) {
         {data?.label}
       </span>
       <div className="d-flex flex-grow-1 justify-content-end">
-        {label && <PullRequestLabels label={label}/>}
+        <PullRequestLabels isMergeable={data.isMergeable} merged={data.merged}/>
       </div>
     </div>
   );

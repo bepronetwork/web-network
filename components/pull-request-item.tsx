@@ -48,15 +48,6 @@ export default function PullRequestItem({
     return pullRequest?.state === 'open' && !!githubLogin
   }
 
-  function getLabel(): PRLabel{
-    if(pullRequest.merged) return 'merged';
-    if(pullRequest.isMergeable) return 'ready to merge';
-    //isMergeable can be null;
-    if(pullRequest.isMergeable === false) return 'conflicts';
-  }
-
-  const label = getLabel()
-
   async function getPullRequestInfo() {
     try {
       const [owner, repo] = repositoryPath.split('/')
@@ -101,7 +92,7 @@ export default function PullRequestItem({
                   {pullRequest?.githubLogin}
                 </span>
                 <div className='ml-3 d-flex'>
-                  {label && <PullRequestLabels label={label}/>}
+                  <PullRequestLabels merged={pullRequest.merged} isMergeable={pullRequest.isMergeable} />
                 </div>
               </div>
 
