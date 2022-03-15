@@ -18,7 +18,7 @@ export default function ProposalActionCard({
   onMerge,
   onDispute,
 }: IProposalActionCardProps) {
-  const { t } = useTranslation("proposal");
+  const { t } = useTranslation("common");
   const { networkIssue } = useIssue();
 
   return (
@@ -26,7 +26,7 @@ export default function ProposalActionCard({
       <div className="bg-shadow rounded-5 p-3">
         <div className="mb-5">
           <ProposalProgressBar
-            issueDisputeAmount={100}
+            issueDisputeAmount={+networkProposal.disputes}
             isDisputed={networkProposal?.isDisputed}
             isFinished={networkIssue?.finalized}
             isCurrentPRMerged={proposal?.isMerged}

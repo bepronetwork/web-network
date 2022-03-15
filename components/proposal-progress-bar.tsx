@@ -9,7 +9,7 @@ export default function ProposalProgressBar({isDisputed = null, issueDisputeAmou
   const [issueColor, setIssueColor] = useState<string>(``);
   const [percentage, setPercentage] = useState<number>(0);
 
-  const columns = [0, 1, 2, 3, 3,]
+  const columns = [0, 1, 2, 3, 3]
 
   function toPercent(value = 0, total = 0, decimals = 2) {
     return ((value / total) * 100).toFixed(decimals);
