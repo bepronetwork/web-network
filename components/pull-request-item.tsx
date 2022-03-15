@@ -1,27 +1,31 @@
 import Link from 'next/link'
-import { getTimeDifferenceInWords } from '@helpers/formatDate'
+import { getTimeDifferenceInWords } from 'helpers/formatDate'
 import { useRouter } from 'next/router'
 
-import LockedIcon from '@assets/icons/locked-icon'
+import LockedIcon from 'assets/icons/locked-icon'
 
-import Button from '@components/button'
-import Avatar from '@components/avatar'
-import Translation from '@components/translation'
-import PullRequestLabels, { PRLabel } from '@components/pull-request-labels'
+import Button from 'components/button'
+import Avatar from 'components/avatar'
+import Translation from 'components/translation'
+import PullRequestLabels from 'components/pull-request-labels'
 
 import { useContext, useEffect, useState } from 'react'
-import { ApplicationContext } from '@contexts/application'
-import useOctokit from '@x-hooks/use-octokit'
-import { formatNumberToNScale } from '@helpers/formatNumber'
-import useNetwork from '@x-hooks/use-network'
+import { ApplicationContext } from 'contexts/application'
+import useOctokit from 'x-hooks/use-octokit'
+import { formatNumberToNScale } from 'helpers/formatNumber'
+import useNetwork from 'x-hooks/use-network'
 import ReadOnlyButtonWrapper from './read-only-button-wrapper'
+import { IActiveIssue } from 'contexts/issue'
+import { pullRequest } from 'interfaces/issue-data'
+interface IPullRequestItem {
+  issue: IActiveIssue;
+  pullRequest: pullRequest;
+}
 
 export default function PullRequestItem({
-  repoId,
-  issueId,
+  issue,
   pullRequest,
-  repositoryPath
-}) {
+}:IPullRequestItem) {
 
   const router = useRouter()
   const { getCommitsOfPr, getCommit } = useOctokit()
@@ -36,9 +40,9 @@ export default function PullRequestItem({
   function handleReviewClick() {
     router.push(
       getURLWithNetwork('/pull-request', {
-        repoId,
-        issueId,
-        prId: pullRequest.githubId,
+        id: issue?.githubId,
+        repoId: issue?.repository_id,
+        prId: pullRequest?.githubId,
         review: true
       })
     )
@@ -50,10 +54,11 @@ export default function PullRequestItem({
 
   async function getPullRequestInfo() {
     try {
+      const repositoryPath = issue.repository.githubPath
       const [owner, repo] = repositoryPath.split('/')
       let lines = 0
       
-      const { data } = await getCommitsOfPr(pullRequest?.githubId, repositoryPath)
+      const { data } = await getCommitsOfPr(+pullRequest?.githubId, repositoryPath)
       
       for(const commit of data) {
         const {data: { stats }} = await getCommit(owner, repo, commit.sha)
@@ -67,10 +72,11 @@ export default function PullRequestItem({
   }
 
   useEffect(() => {
-    if (!pullRequest || !repositoryPath) return
+    if (pullRequest){
+      getPullRequestInfo()
+    }
     
-    getPullRequestInfo()
-  }, [repositoryPath])
+  }, [pullRequest])
   
   return (
     <>
@@ -78,9 +84,9 @@ export default function PullRequestItem({
         <Link
           passHref
           href={getURLWithNetwork('/pull-request', {
-            repoId,
-            issueId,
-            prId: pullRequest.githubId
+            id: issue?.githubId,
+            repoId: issue?.repository_id,
+            prId: pullRequest?.githubId,
           })}
         >
           <a className="text-decoration-none text-white">
