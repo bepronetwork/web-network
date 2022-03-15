@@ -105,13 +105,6 @@ export default function ConnectWalletButton({children = null, forceLogin = false
     }
   }
 
-  function isButtonDisabled() {
-    return [
-      isAddingNetwork,
-      activeNetwork === process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME
-    ].some(values => values)
-  }
-
   if (asModal) {
     if (loading.isLoading) return <></>
 

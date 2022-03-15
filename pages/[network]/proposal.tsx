@@ -1,5 +1,5 @@
 import { getSession } from "next-auth/react";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { GetServerSideProps } from "next/types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useIssue } from "contexts/issue";
@@ -10,7 +10,6 @@ import {
   IDistribuitonPerUser,
 } from "interfaces/proposal";
 import ProposalHero from "components/proposal-hero";
-import useNetworkTheme from "x-hooks/use-network";
 import useApi from "x-hooks/use-api";
 import ProposalPullRequestDetail from "components/proposal-pullrequest-details";
 import { pullRequest } from "interfaces/issue-data";
@@ -18,17 +17,60 @@ import CustomContainer from "components/custom-container";
 import { handlePercentage } from "helpers/handlePercentage";
 import ProposalListAddresses from "components/proposal-list-addresses";
 import ProposalActionCard from "components/proposal-action-card";
+import useBepro from "x-hooks/use-bepro";
+import ConnectWalletButton from "components/connect-wallet-button";
+import NotMergeableModal from "components/not-mergeable-modal";
+import { useNetwork } from "contexts/network";
+import { ApplicationContext } from "contexts/application";
+import { addToast } from "contexts/reducers/add-toast";
+import { useTranslation } from "next-i18next";
 
 export default function PageProposal() {
   const router = useRouter();
-  const { getUserOf } = useApi();
+  const {
+    dispatch,
+    state: { currentAddress },
+  } = useContext(ApplicationContext);
+  const {t} = useTranslation();
+  const { getUserOf, mergeClosedIssue } = useApi();
+  const {handlerDisputeProposal, handleCloseIssue} = useBepro()
   const { activeIssue, networkIssue } = useIssue();
-  const { getURLWithNetwork } = useNetworkTheme();
+  const {activeNetwork} = useNetwork()
   const [proposal, setProposal] = useState<Proposal>({} as Proposal);
   const [networkProposal, setNetworkProposal] = useState<INetworkProposal>({} as INetworkProposal);
   const [pullRequest, setPullRequest] = useState<pullRequest>({} as pullRequest);
   const [usersDistribution, setUsersDistribution] = useState<IDistribuitonPerUser[]>([]);
 
+  async function closeIssue() {
+    handleCloseIssue(+networkIssue._id, activeIssue?.issueId, +proposal.scMergeId)
+    .then(()=>
+      mergeClosedIssue(
+        activeIssue?.issueId,
+        pullRequest.githubId,
+        proposal?.scMergeId,
+        currentAddress,
+        activeNetwork?.name
+      )
+    ).then(() => {
+        dispatch(
+          addToast({
+            type: "success",
+            title: t("actions.success"),
+            content: t("modals.not-mergeable.success-message"),
+          })
+        );
+      })
+      .catch((error) => {
+        dispatch(
+          addToast({
+            type: "danger",
+            title: t("actions.failed"),
+            content: error.response.data.message,
+          })
+        );
+      });
+    
+  }
   async function loadUsersDistribution() {
     if (networkProposal?.prAddresses?.length < 1 || networkProposal?.prAmounts?.length < 1)
       return;
@@ -43,28 +85,19 @@ export default function PageProposal() {
     const maping = networkProposal?.prAddresses?.map(mapUser) || [];
     await Promise.all(maping).then(setUsersDistribution);
   }
+
   async function loadData() {
-    const { proposalId, id: issueId, repoId } = router.query;
+    const { proposalId } = router.query;
     const mergeProposal = activeIssue?.mergeProposals.find(
       (p) => +p.id === +proposalId
     );
     const networkProposals = networkIssue?.networkProposals?.[+proposalId];
 
-    if (!mergeProposal || !networkProposals) {
-      if (issueId && repoId) {
-        const path = await getURLWithNetwork("/bounty", {
-          id: issueId,
-          repoId: repoId,
-        })
-        return router?.push(path);
-      }
-
-      return router?.push("/404");
-    }
 
     const PR = activeIssue?.pullRequests.find(
       (pr) => pr.id === mergeProposal?.pullRequestId
     );
+
     setPullRequest(PR);
     setProposal(mergeProposal);
     setNetworkProposal(networkProposals);
@@ -93,23 +126,21 @@ export default function PageProposal() {
           <ProposalActionCard
             proposal={proposal}
             networkProposal={networkProposal}
-            onMerge={() => console.log("merge")}
-            onDispute={() => console.log("dispute")}
+            currentPullRequest={pullRequest}
+            onMerge={() => closeIssue()}
+            onDispute={() => handlerDisputeProposal(+networkProposal?._id, +proposal?.scMergeId)}
           />
         </div>
       </CustomContainer>
-      {/*
+      
       <NotMergeableModal
-        currentGithubLogin={githubLogin}
-        issuePRs={issuePRs}
-        currentAddress={currentAddress}
-        issue={issueMicroService}
-        pullRequest={pullRequestGh}
-        mergeProposal={proposalBepro}
-        isFinalized={isFinalized}
-        isCouncil={isCouncil}
+        issuePRs={activeIssue?.pullRequests}
+        issue={activeIssue}
+        pullRequest={pullRequest}
+        proposal={proposal}
+        networkProposal={networkProposal}
       />
-      <ConnectWalletButton asModal={true} /> */}
+      <ConnectWalletButton asModal={true} />
     </>
   );
 }
