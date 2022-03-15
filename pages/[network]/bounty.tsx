@@ -187,13 +187,9 @@ export default function PageIssue() {
           </div>
         </div>
       ) : (
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col-md-10">
-              <IssueDescription description={issue?.body || ''} />
-            </div>
-          </div>
-        </div>
+        <CustomContainer>
+          <IssueDescription description={issue?.body || ''} />
+        </CustomContainer>
       )}
       <IssueComments comments={commentsIssue} repo={issue?.repository?.githubPath} issueId={id} />
     </>

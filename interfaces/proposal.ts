@@ -17,3 +17,10 @@ export interface INetworkProposal{
   proposalAddress: string;
   votes: number;
 }
+
+export interface IDistribuitonPerUser {
+  githubLogin: string;
+  address: string;
+  oracles: string;
+  percentage: number;
+}

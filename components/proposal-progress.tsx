@@ -1,56 +1,22 @@
 import { formatNumberToString } from "helpers/formatNumber";
-import { handlePercentage } from "helpers/handlePercentage";
-import useApi from "x-hooks/use-api";
-import { GetStaticProps } from "next";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Avatar from "./avatar";
+import { IDistribuitonPerUser } from "@interfaces/proposal";
 
-interface Item {
-  githubLogin: string;
-  address: string;
-  oracles: string;
-  percentage: number;
-}
 interface IProposalProgressProps {
-  proposalAddress: string[];
-  proposalAmount: number[];
-  totalAmounts: number;
+  usersDistribution: IDistribuitonPerUser[];
 }
 
 export default function ProposalProgress({
-  proposalAddress = [],
-  proposalAmount = [],
-  totalAmounts,
+  usersDistribution
 }: IProposalProgressProps) {
-  const { getUserOf } = useApi();
-  const [items, setItems] = useState<Item[]>([]);
-
-  function updateUsersAddresses() {
-    if (proposalAddress?.length < 1 || proposalAmount?.length < 1) return;
-
-    async function mapUser(address: string, i: number): Promise<Item> {
-      const { githubLogin } = await getUserOf(address);
-      const oracles = proposalAmount[i].toString();
-      const percentage = handlePercentage(+oracles, +totalAmounts, 2);
-
-      return { githubLogin, percentage, address, oracles };
-    }
-
-    Promise.all(proposalAddress?.map(mapUser)).then(setItems);
-  }
-
-  useEffect(updateUsersAddresses, [
-    proposalAddress,
-    proposalAmount,
-    totalAmounts,
-  ]);
-
+  
   return (
     <div className="container bg-shadow p-2">
       <div className="d-flex justify-content-center align-items-center gap-2">
-        {items.length > 0 &&
+        {usersDistribution.length > 0 &&
           React.Children.toArray(
-            items.map((item, index) => (
+            usersDistribution.map((item, index) => (
               <div
                 key={index}
                 className={`rounded-bottom d-flex flex-column align-items-center gap-2`}

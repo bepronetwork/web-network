@@ -1,8 +1,10 @@
-import {useEffect, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {formatNumberToNScale, formatNumberToString} from '@helpers/formatNumber';
 import Translation from './translation';
+import { ApplicationContext } from '@contexts/application';
 
-export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null, issueDisputeAmount = 0, isFinished = false, isCurrentPRMerged=false}) {
+export default function ProposalProgressBar({isDisputed = null, issueDisputeAmount = 0, isFinished = false, isCurrentPRMerged=false}) {
+  const { state: {beproStaked: stakedAmount}, } = useContext(ApplicationContext);
   const [issueState, setIssueState] = useState<string>(``);
   const [issueColor, setIssueColor] = useState<string>(``);
   const [percentage, setPercentage] = useState<number>(0);
@@ -68,9 +70,9 @@ export default function ProposalProgressBar({stakedAmount = 0, isDisputed = null
   return <>
     <div className="row mb-2 proposal-progress-bar">
       <div className="col d-flex justify-content-between">
-        <h4 className={`h4 text-capitalize text-${issueColor} mb-4`}>{issueState}</h4>
-        <div className="fs-small caption d-flex align-items-center mb-4">
-          <span className={`text-${issueColor} text-uppercase`}>{formatNumberToString(issueDisputeAmount, 2)} </span> /{formatNumberToNScale(stakedAmount)} <Translation label="$oracles" /> <span className={`text-${issueColor}`}> ({percentage}%)</span>
+        <h4 className={`caption-large text-uppercase text-${issueColor} mb-4`}>{issueState}</h4>
+        <div className="caption-small d-flex align-items-center mb-4">
+          <span className={`text-${issueColor} text-uppercase`}>{formatNumberToString(issueDisputeAmount, 0)} </span> /{formatNumberToNScale(stakedAmount)} <Translation label="$oracles" /> <span className={`text-${issueColor}`}> ({percentage}%)</span>
         </div>
       </div>
     </div>
