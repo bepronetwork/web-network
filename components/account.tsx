@@ -8,15 +8,15 @@ import ConnectGithub from '@components/connect-github'
 import ConnectWalletButton from '@components/connect-wallet-button'
 import NetworkThemeInjector from '@components/custom-network/network-theme-injector'
 
-import { ApplicationContext } from '@contexts/application'
+import { useAuthentication } from '@contexts/authentication'
 
 import useNetworkTheme from '@x-hooks/use-network'
 
 export default function Account({ children }): JSX.Element {
-  const {
-    state: { githubHandle, currentAddress }
-  } = useContext(ApplicationContext)
   const { t } = useTranslation(['common', 'bounty', 'pull-request', 'custom-network'])
+  
+  const { wallet, user } = useAuthentication()
+  
   const { getURLWithNetwork } = useNetworkTheme()
 
   return (
@@ -26,7 +26,7 @@ export default function Account({ children }): JSX.Element {
 
       <ConnectWalletButton asModal={true} />
 
-      {(!githubHandle && <ConnectGithub />) || ``}
+      {(!user?.login && <ConnectGithub />) || ``}
 
       <div className="container">
         <div className="row">
@@ -66,7 +66,7 @@ export default function Account({ children }): JSX.Element {
         </div>
       </div>
 
-      {(currentAddress && children) || <></>}
+      {(wallet?.address && children) || <></>}
     </div>
   )
 }

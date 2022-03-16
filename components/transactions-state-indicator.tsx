@@ -1,37 +1,49 @@
-import {OverlayTrigger, Popover} from 'react-bootstrap';
-import TransactionsList from '@components/transactions-list';
-import React, {useContext, useEffect, useRef, useState} from 'react';
-import {ApplicationContext} from '@contexts/application';
-import TransactionIcon from '@assets/icons/transaction';
-import {TransactionStatus} from '@interfaces/enums/transaction-status';
-import TransactionModal from '@components/transaction-modal';
-import {Transaction} from '@interfaces/transaction';
-import Button from './button';
+import { OverlayTrigger, Popover } from 'react-bootstrap'
+import React, { useContext, useEffect, useState } from 'react'
+
+import TransactionIcon from '@assets/icons/transaction'
+
+import Button from '@components/button'
+import TransactionModal from '@components/transaction-modal'
+import TransactionsList from '@components/transactions-list'
+
+import { ApplicationContext } from '@contexts/application'
+
+import { Transaction } from '@interfaces/transaction'
+import { TransactionStatus } from '@interfaces/enums/transaction-status'
 
 export default function TransactionsStateIndicator() {
-  const {state: {myTransactions}} = useContext(ApplicationContext);
-  const [loading, setLoading] = useState(false);
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [activeTransaction, setActiveTransaction] = useState<Transaction | null>(null)
+  const {
+    state: { myTransactions }
+  } = useContext(ApplicationContext)
+
+  const [loading, setLoading] = useState(false)
+  const [showOverlay, setShowOverlay] = useState(false)
+  const [activeTransaction, setActiveTransaction] =
+    useState<Transaction | null>(null)
 
   function updateLoadingState() {
-    const loading = myTransactions.some(({status}) => status === TransactionStatus.pending)
-    setLoading(loading);
-    setShowOverlay(loading);
+    const loading = myTransactions.some(
+      ({ status }) => status === TransactionStatus.pending
+    )
+
+    setLoading(loading)
+    setShowOverlay(loading)
+    
     if (activeTransaction) {
-      const tx = myTransactions.find(({id}) => id === activeTransaction.id);
-      setActiveTransaction(tx);
+      const tx = myTransactions.find(({ id }) => id === activeTransaction.id)
+      setActiveTransaction(tx)
     }
   }
 
   function onActiveTransactionChange(transaction) {
-    setActiveTransaction(transaction);
+    setActiveTransaction(transaction)
   }
 
   const overlay = (
     <Popover id="transactions-indicator">
       <Popover.Body className="bg-shadow p-3">
-        <TransactionsList onActiveTransaction={onActiveTransactionChange}/>
+        <TransactionsList onActiveTransaction={onActiveTransactionChange} />
       </Popover.Body>
     </Popover>
   )
@@ -46,12 +58,25 @@ export default function TransactionsStateIndicator() {
         show={showOverlay}
         rootClose={true}
         onToggle={(next) => setShowOverlay(next)}
-        overlay={overlay}>
-          <div className="me-3">
-            <Button className='opacity-75 opacity-100-hover' transparent rounded onClick={() => setShowOverlay(!showOverlay)}>{loading && <span className="spinner-border spinner-border-sm"/> || <TransactionIcon color="bg-opac"/>}</Button>
-          </div>
-    </OverlayTrigger>
-    <TransactionModal transaction={activeTransaction} onCloseClick={() => setActiveTransaction(null)}/>
+        overlay={overlay}
+      >
+        <div className="me-3">
+          <Button
+            className="opacity-75 opacity-100-hover"
+            transparent
+            rounded
+            onClick={() => setShowOverlay(!showOverlay)}
+          >
+            {(loading && (
+              <span className="spinner-border spinner-border-sm" />
+            )) || <TransactionIcon color="bg-opac" />}
+          </Button>
+        </div>
+      </OverlayTrigger>
+      <TransactionModal
+        transaction={activeTransaction}
+        onCloseClick={() => setActiveTransaction(null)}
+      />
     </span>
   )
 }

@@ -2,11 +2,24 @@ import { NextApiRequest, NextApiResponse } from "next";
 import networkBeproJs from "@helpers/api/handle-network-bepro";
 import models from "@db/models";
 import twitterTweet from "@helpers/api/handle-twitter-tweet";
+import { Op } from 'sequelize'
+import { CONTRACT_ADDRESS } from "env";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const { fromBlock, id } = req.body;
+  const { fromBlock, id, networkName } = req.body;
 
-  const network = networkBeproJs({ test: true });
+  const customNetwork = await models.network.findOne({
+    where: {
+      name: {
+        [Op.iLike]: String(networkName)
+      }
+    }
+  })
+
+  if (!customNetwork) return res.status(404).json('Invalid network')
+  if (customNetwork.isClosed) return res.status(404).json('Invalid network')
+
+  const network = networkBeproJs({ test: true, contractAddress: customNetwork.networkAddress });
 
   await network.start();
   const contract = await network.getWeb3Contract();
@@ -30,11 +43,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
             "Error creating tweet proposal failed because the issue was not found"
           );
 
-        twitterTweet({
-          type: "proposal",
-          action: "failed",
-          issue,
-        });
+        if (network.contractAddress === CONTRACT_ADDRESS)
+          twitterTweet({
+            type: "proposal",
+            action: "failed",
+            issue,
+          });
       }
     })
     .catch((error) => {

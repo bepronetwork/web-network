@@ -1,9 +1,9 @@
 import {Octokit} from 'octokit';
-import {useContext, useEffect, useState} from 'react';
-import {ApplicationContext} from '@contexts/application';
+import {useEffect, useState} from 'react';
+import { useAuthentication } from '@contexts/authentication';
 
 export default function useOctokit() {
-  const {state:{accessToken}} = useContext(ApplicationContext);
+  const { user } = useAuthentication()
   const [octokit, setOctokit] = useState<Octokit>(new Octokit());
 
   function getOwnerRepoFrom(path: string) {
@@ -90,7 +90,7 @@ export default function useOctokit() {
     setOctokit(new Octokit({auth}));
   }
 
-  useEffect(() => { authenticate(accessToken) }, [accessToken])
+  useEffect(() => { authenticate(user?.accessToken) }, [user?.accessToken])
 
   return {getIssue, getCommit, getIssueComments, getCommitsOfPr, getForksOf, getUserRepos, getStargazers, authenticate, getParticipants, listBranches, getPullRequest, getPullRequestComments, listUserRepos};
 

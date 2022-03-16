@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router'
 import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { useContext, useEffect, useState } from 'react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -16,23 +15,27 @@ import ThemeColors from '@components/custom-network/theme-colors'
 import ConnectWalletButton from '@components/connect-wallet-button'
 import RepositoriesList from '@components/custom-network/repositories-list'
 
+import { useNetwork } from '@contexts/network'
 import { addToast } from '@contexts/reducers/add-toast'
 import { ApplicationContext } from '@contexts/application'
+import { useAuthentication } from '@contexts/authentication'
 
 import { isSameSet } from '@helpers/array'
 import { formatDate } from '@helpers/formatDate'
 import { isColorsSimilar } from '@helpers/colors'
 import { psReadAsText } from '@helpers/file-reader'
 import { formatNumberToCurrency } from '@helpers/formatNumber'
-import { DefaultNetworkInformation, handleNetworkAddress } from '@helpers/custom-network'
 import { getQueryableText, urlWithoutProtocol } from '@helpers/string'
+import {
+  DefaultNetworkInformation,
+  handleNetworkAddress
+} from '@helpers/custom-network'
 
 import { BeproService } from '@services/bepro-service'
 
 import useApi from '@x-hooks/use-api'
 import useOctokit from '@x-hooks/use-octokit'
 import useNetworkTheme from '@x-hooks/use-network'
-
 
 import {
   API,
@@ -46,7 +49,6 @@ import {
   DISPUTE_PERCENTAGE_MAX,
   BEPRO_NETWORK_NAME
 } from 'env'
-import { useNetwork } from '@contexts/network'
 interface NetworkAmounts {
   tokenStaked: number
   oraclesStaked: number
@@ -84,15 +86,11 @@ export default function Settings() {
 
   const { listUserRepos } = useOctokit()
   const { searchRepositories, updateNetwork, isNetworkOwner } = useApi()
-  const { network, colorsToCSS, getURLWithNetwork } =
-    useNetworkTheme()
-    const {updateActiveNetwork} = useNetwork()
+  const { network, colorsToCSS, getURLWithNetwork } = useNetworkTheme()
+  const { updateActiveNetwork } = useNetwork()
 
-  const {
-    dispatch,
-    methods: { updateWalletBalance },
-    state: { currentAddress, githubLogin }
-  } = useContext(ApplicationContext)
+  const { dispatch } = useContext(ApplicationContext)
+  const { wallet, user, updateWalletBalance } = useAuthentication()
 
   const isValidDescription =
     newInfo.network.data.networkDescription.trim() !== ''
@@ -155,8 +153,12 @@ export default function Settings() {
 
   async function loadAmounts(networkArg) {
     try {
-      const tokenStaked = await BeproService.getTokensStaked(handleNetworkAddress(networkArg))
-      const oraclesStaked = await BeproService.getBeproLocked(handleNetworkAddress(networkArg))
+      const tokenStaked = await BeproService.getTokensStaked(
+        handleNetworkAddress(networkArg)
+      )
+      const oraclesStaked = await BeproService.getBeproLocked(
+        handleNetworkAddress(networkArg)
+      )
 
       setNetworkAmounts({
         tokenStaked,
@@ -178,10 +180,10 @@ export default function Settings() {
         fullName: row.githubPath
       }))
 
-      if (githubLogin) {
+      if (user?.login) {
         const {
           data: { items: githubRepos }
-        } = await listUserRepos(githubLogin)
+        } = await listUserRepos(user?.login)
 
         const repos = githubRepos.map((repo) => ({
           checked: false,
@@ -245,7 +247,7 @@ export default function Settings() {
   }
 
   async function handleSubmit() {
-    if (!githubLogin || !currentAddress) return
+    if (!user?.login || !wallet?.address) return
 
     setUpdatingNetwork(true)
 
@@ -271,27 +273,28 @@ export default function Settings() {
           .filter((repo) => !repo.checked && repo.isSaved)
           .map(({ name, fullName }) => ({ name, fullName }))
       ),
-      creator: currentAddress,
-      githubLogin,
-      networkAddress: network.networkAddress
+      creator: wallet?.address,
+      githubLogin: user?.login,
+      networkAddress: network.networkAddress,
+      accessToken: user?.accessToken
     }
 
     updateNetwork(json)
       .then(async (result) => {
         if (currentNetworkParameters.redeemTime !== newInfo.redeemTime)
-          await BeproService.setRedeemTime(newInfo.redeemTime)
-            .then(console.log)
-            .catch(console.log)
+          await BeproService.setRedeemTime(newInfo.redeemTime).catch(
+            console.log
+          )
 
         if (currentNetworkParameters.disputeTime !== newInfo.disputeTime)
-          await BeproService.setDisputeTime(newInfo.disputeTime)
-            .then(console.log)
-            .catch(console.log)
+          await BeproService.setDisputeTime(newInfo.disputeTime).catch(
+            console.log
+          )
 
         if (currentNetworkParameters.councilAmount !== newInfo.councilAmount)
-          await BeproService.setCouncilAmount(newInfo.councilAmount)
-            .then(console.log)
-            .catch(console.log)
+          await BeproService.setCouncilAmount(newInfo.councilAmount).catch(
+            console.log
+          )
 
         if (
           currentNetworkParameters.percentageForDispute !==
@@ -299,9 +302,7 @@ export default function Settings() {
         )
           await BeproService.setPercentageForDispute(
             newInfo.percentageForDispute
-          )
-            .then(console.log)
-            .catch(console.log)
+          ).catch(console.log)
 
         dispatch(
           addToast({
@@ -333,16 +334,16 @@ export default function Settings() {
   }
 
   function handleCloseNetwork() {
-    if (!network) return
+    if (!network || !user?.login || !wallet?.address) return
 
     setIsClosing(true)
 
     BeproService.closeNetwork()
       .then(() => {
         return updateNetwork({
-          githubLogin,
+          githubLogin: user?.login,
           isClosed: true,
-          creator: currentAddress,
+          creator: wallet?.address,
           networkAddress: network.networkAddress
         })
       })
@@ -376,7 +377,13 @@ export default function Settings() {
   }
 
   useEffect(() => {
-    if (!BeproService.isStarted || !network || !currentAddress || !githubLogin || network?.name?.toLowerCase() === BEPRO_NETWORK_NAME)
+    if (
+      !BeproService.isStarted ||
+      !network ||
+      !wallet?.address ||
+      !user?.login ||
+      network?.name?.toLowerCase() === BEPRO_NETWORK_NAME
+    )
       return
 
     BeproService.isNetworkAbleToClose(network.networkAddress)
@@ -385,7 +392,7 @@ export default function Settings() {
       })
       .catch(console.log)
 
-    isNetworkOwner(currentAddress, network.networkAddress)
+    isNetworkOwner(wallet?.address, network.networkAddress)
       .then((result) => {
         if (!result) router.push(getURLWithNetwork('/account'))
         else {
@@ -398,7 +405,7 @@ export default function Settings() {
 
         router.push(getURLWithNetwork('/account'))
       })
-  }, [BeproService.isStarted, network, currentAddress, githubLogin])
+  }, [BeproService.isStarted, network, wallet?.address, user?.login])
 
   useEffect(() => {
     const networkData = newInfo.network.data
@@ -753,7 +760,6 @@ export default function Settings() {
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, [
         'common',
         'connect-wallet-button',

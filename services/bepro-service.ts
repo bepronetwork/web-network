@@ -1,50 +1,58 @@
-import {Web3Connection, Network, ERC20, NetworkFactory} from 'bepro-js';
-import {CONTRACT_ADDRESS, SETTLER_ADDRESS, WEB3_CONNECTION, NETWORK_FACTORY_ADDRESS} from '../env';
-import {BlockTransaction, SimpleBlockTransactionPayload} from '@interfaces/transaction';
-import {TransactionStatus} from '@interfaces/enums/transaction-status';
+import { Web3Connection, Network, ERC20, NetworkFactory } from 'bepro-js'
+
+import {
+  BlockTransaction,
+  SimpleBlockTransactionPayload
+} from '@interfaces/transaction'
+import { TransactionStatus } from '@interfaces/enums/transaction-status'
+
+import {
+  CONTRACT_ADDRESS,
+  SETTLER_ADDRESS,
+  WEB3_CONNECTION,
+  NETWORK_FACTORY_ADDRESS
+} from '../env'
 
 class BeproFacet {
-
   readonly bepro: Web3Connection = new Web3Connection({
-    web3Host: WEB3_CONNECTION,
+    web3Host: WEB3_CONNECTION
     //privateKey: process.env.NEXT_PUBLIC_WALLET_PRIVATE_KEY,
     //debug: true
-  });
+  })
 
-  address: string = ``;
-  connected: boolean = false;
-  started: boolean = false;
-  network: Network;
-  networkFactory: NetworkFactory;
-  erc20: ERC20;
-  operatorAmount: number;
+  erc20: ERC20
+  network: Network
+  address: string = ``
+  operatorAmount: number
+  started: boolean = false
+  connected: boolean = false
+  networkFactory: NetworkFactory
+  networkFactoryStarted: boolean = false
 
   get isLoggedIn() {
-    return this.connected;
+    return this.connected
   }
 
   get isStarted() {
-    return this.started;
+    return this.started
   }
 
   async start(customNetworkAddress = undefined) {
     try {
-      if(!this.started)
-        await this.bepro.start();
-      this.network = new Network(this.bepro, customNetworkAddress || CONTRACT_ADDRESS);
-      this.erc20 = new ERC20(this.bepro, SETTLER_ADDRESS);
+      if (!this.started) await this.bepro.start()
 
-      await this.network.loadContract();
-      await this.erc20.loadContract();
+      this.network = new Network(
+        this.bepro,
+        customNetworkAddress || CONTRACT_ADDRESS
+      )
 
-      if (NETWORK_FACTORY_ADDRESS) {
-        this.networkFactory = new NetworkFactory(this.bepro, NETWORK_FACTORY_ADDRESS);
-        await this.networkFactory.loadContract();
-        this.operatorAmount = await this.getOperatorAmount();
-      }
+      this.erc20 = new ERC20(this.bepro, SETTLER_ADDRESS)
+
+      await this.network.loadContract()
 
       this.started = true
 
+      await this.erc20.loadContract()
     } catch (error) {
       console.log(`Failed to start Bepro Service`, error)
 
@@ -54,27 +62,49 @@ class BeproFacet {
     return this.started
   }
 
-  async login() {
-    this.connected = false;
-    await this.bepro.connect();
-    await this.start(this.network.contractAddress);
-    this.address = await this.bepro.getAddress();
-    this.connected = true;
+  async startNetworkFactory() {
+    try {
+      if (!NETWORK_FACTORY_ADDRESS)
+        console.error('Network Factory Contract is Missing')
+      else {
+        this.networkFactoryStarted = false
+        
+        this.networkFactory = new NetworkFactory(
+          this.bepro,
+          NETWORK_FACTORY_ADDRESS
+        )
+
+        await this.networkFactory.loadContract()
+
+        this.networkFactoryStarted = true
+
+        this.operatorAmount = await this.getOperatorAmount()
+      }
+    } catch (error) {
+      console.error(error)
+    }
+
+    return this.networkFactoryStarted
   }
 
-  async getBalance(kind: `eth`|`bepro`|`staked`): Promise<number> {
-    if (!this.connected || !this.started)
-      return 0;
+  async login() {
+    this.connected = false
+    await this.bepro.connect()
+    await this.start(this.network.contractAddress)
+    this.address = await this.bepro.getAddress()
+    this.connected = true
+  }
 
-    let n = 0;
-    if (kind === `bepro`)
-      n = await this.erc20.getTokenAmount(this.address);
+  async getBalance(kind: `eth` | `bepro` | `staked`): Promise<number> {
+    if (!this.connected || !this.started) return 0
+
+    let n = 0
+    if (kind === `bepro`) n = await this.erc20.getTokenAmount(this.address)
     if (kind === `eth`)
-      n = +this.bepro.Web3.utils.fromWei(await this.bepro.getBalance());
-    if (kind === `staked`)
-      n = await this.network.getBEPROStaked();
+      n = +this.bepro.Web3.utils.fromWei(await this.bepro.getBalance())
+    if (kind === `staked`) n = await this.network.getBEPROStaked()
 
-    return n;
+    return n
   }
 
   async getNetworkObj(networkAddress = undefined) {
@@ -112,7 +142,7 @@ class BeproFacet {
 
     const quantity = await network.getAmountOfIssuesOpened()
 
-    return (quantity - 1)
+    return quantity - 1
   }
 
   async getBeproLocked(networkAddress = undefined) {
@@ -128,7 +158,7 @@ class BeproFacet {
   }
 
   async getRedeemTime() {
-    if (this.isStarted) return this.network.redeemTime();
+    if (this.isStarted) return this.network.redeemTime()
 
     return 0
   }
@@ -140,7 +170,7 @@ class BeproFacet {
   }
 
   async getDisputableTime() {
-    if (this.isStarted) return this.network.disputableTime();
+    if (this.isStarted) return this.network.disputableTime()
 
     return 0
   }
@@ -152,7 +182,7 @@ class BeproFacet {
   }
 
   async getOraclesSummary() {
-    if (this.isStarted) return this.network.getOraclesSummary(this.address);
+    if (this.isStarted) return this.network.getOraclesSummary(this.address)
 
     return {
       oraclesDelegatedByOthers: 0,
@@ -195,7 +225,7 @@ class BeproFacet {
   }
 
   async getOperatorAmount() {
-    if (this.isStarted) return this.networkFactory.OPERATOR_AMOUNT()
+    if (this.networkFactoryStarted) return this.networkFactory.OPERATOR_AMOUNT()
 
     return 0
   }
@@ -219,7 +249,12 @@ class BeproFacet {
   }
 
   async setPercentageForDispute(percentage: number) {
-    if (this.isStarted) return this.network.sendTx(this.network.contract.methods.changePercentageNeededForDispute(percentage))
+    if (this.isStarted)
+      return this.network.sendTx(
+        this.network.contract.methods.changePercentageNeededForDispute(
+          percentage
+        )
+      )
 
     return 0
   }
@@ -237,7 +272,10 @@ class BeproFacet {
   }
 
   async getNetworksQuantity() {
-    if (this.isStarted) return this.networkFactory.callTx(this.networkFactory.contract.methods.networksAmount())
+    if (this.networkFactoryStarted)
+      return this.networkFactory.callTx(
+        this.networkFactory.contract.methods.networksAmount()
+      )
 
     return 0
   }
@@ -250,22 +288,26 @@ class BeproFacet {
     return this.bepro.Web3.utils.fromWei(wei)
   }
 
-  toWei(n: string|number) {
-    return this.bepro.Web3.utils.toWei(n.toString(), `ether`);
+  toWei(n: string | number) {
+    return this.bepro.Web3.utils.toWei(n.toString(), `ether`)
   }
 
-  public parseTransaction(transaction, simpleTx?: SimpleBlockTransactionPayload) {
+  public parseTransaction(
+    transaction,
+    simpleTx?: SimpleBlockTransactionPayload
+  ) {
     return {
       ...simpleTx,
-      addressFrom: (transaction).from,
-      addressTo: (transaction).to,
-      transactionHash: (transaction).transactionHash,
-      blockHash: (transaction).blockHash,
+      addressFrom: transaction.from,
+      addressTo: transaction.to,
+      transactionHash: transaction.transactionHash,
+      blockHash: transaction.blockHash,
       confirmations: (simpleTx as BlockTransaction)?.confirmations,
-      status: (transaction).status ? TransactionStatus.completed : TransactionStatus.failed,
+      status: transaction.status
+        ? TransactionStatus.completed
+        : TransactionStatus.failed
     }
   }
-
 }
 
-export const BeproService = new BeproFacet();
+export const BeproService = new BeproFacet()

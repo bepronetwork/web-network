@@ -13,8 +13,8 @@ import { BeproService } from 'services/bepro-service';
 import useApi from 'x-hooks/use-api';
 import useOctokit from 'x-hooks/use-octokit';
 import {useRouter} from 'next/router';
-import { ApplicationContext } from './application';
-import { useNetwork } from './network';
+import { useNetwork } from '@contexts/network';
+import { useAuthentication } from '@contexts/authentication';
 export interface IActiveIssue extends IssueData{
   comments: Comment[]
 }
@@ -39,7 +39,7 @@ export const IssueProvider: React.FC = function ({ children }) {
   const {query} = useRouter();
   const {getIssueComments, getPullRequest} = useOctokit();
   // Move currentAdress and githubLogin to UserHook
-  const { state: { currentAddress, githubLogin }} = useContext(ApplicationContext);
+  const { wallet, beproServiceStarted } = useAuthentication()
 
   const updatePullRequests = useCallback(
     async (prs: pullRequest[], githubPath: string) => {
@@ -85,7 +85,7 @@ export const IssueProvider: React.FC = function ({ children }) {
   );
 
   const getNetworkIssue = useCallback(async () => {
-    if (!currentAddress || !activeIssue?.issueId) return;
+    if (!wallet?.address || !activeIssue?.issueId || !beproServiceStarted) return;
 
     const network = await BeproService.network.getIssueByCID(
       activeIssue?.issueId
@@ -100,13 +100,13 @@ export const IssueProvider: React.FC = function ({ children }) {
 
     setNetworkIssue({ ...network, isDraft });
     return network;
-  }, [activeIssue, currentAddress]);
+  }, [activeIssue, wallet?.address, beproServiceStarted]);
 
   useEffect(() => {
-    if (activeIssue && currentAddress) {
+    if (activeIssue && wallet?.address && beproServiceStarted) {
       getNetworkIssue();
     }
-  }, [activeIssue, currentAddress]);
+  }, [activeIssue, wallet?.address, beproServiceStarted]);
 
   useEffect(() => {
     if (query.id && query.repoId && activeNetwork) {
@@ -115,9 +115,9 @@ export const IssueProvider: React.FC = function ({ children }) {
     }
   }, [query, activeNetwork]);
 
-  useEffect(() => {
-    console.warn("useIssue", { activeIssue, networkIssue });
-  }, [activeIssue, networkIssue]);
+  useEffect(()=>{
+    //console.warn('useIssue',{activeIssue, networkIssue})
+  },[activeIssue, networkIssue])
 
   const memorizeValue = useMemo<IssueContextData>(
     () => ({

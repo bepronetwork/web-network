@@ -1,7 +1,5 @@
-import { parseCookies } from 'nookies'
 import { useRouter } from 'next/router'
 import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { useContext, useEffect, useState } from 'react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -10,7 +8,6 @@ import Stepper from '@components/stepper'
 import CustomContainer from '@components/custom-container'
 import ConnectWalletButton from '@components/connect-wallet-button'
 import CreatingNetworkLoader from '@components/creating-network-loader'
-import UpdateGithubTokenModal from '@components/update-github-token-modal'
 
 import LockBeproStep from '@components/custom-network/lock-bepro-step'
 import NetworkInformationStep from '@components/custom-network/network-information-step'
@@ -18,6 +15,7 @@ import SelectRepositoriesStep from '@components/custom-network/select-repositori
 
 import { addToast } from '@contexts/reducers/add-toast'
 import { ApplicationContext } from '@contexts/application'
+import { useAuthentication } from '@contexts/authentication'
 
 import { isSameSet } from '@helpers/array'
 import { isColorsSimilar } from '@helpers/colors'
@@ -40,16 +38,15 @@ export default function NewNetwork() {
   const [currentStep, setCurrentStep] = useState(1)
   const [creatingNetwork, setCreatingNetwork] = useState(false)
   const [steps, setSteps] = useState(DefaultNetworkInformation)
-  const [isModalTokenVisible, setIsModalTokenVisible] = useState(false)
+  const [networkFactoryStarted, setNetworkFactoryStarted] = useState(false)
 
   const { createNetwork } = useApi()
   const { listUserRepos } = useOctokit()
   const { network, getURLWithNetwork, colorsToCSS, DefaultTheme } = useNetwork()
 
-  const {
-    dispatch,
-    state: { currentAddress, githubLogin, balance, oracles, beproInit }
-  } = useContext(ApplicationContext)
+  const { dispatch } = useContext(ApplicationContext)
+
+  const { user, wallet, beproServiceStarted } = useAuthentication()
 
   function changeColor(newColor) {
     const tmpSteps = Object.assign({}, steps)
@@ -113,14 +110,16 @@ export default function NewNetwork() {
     if (canGo) setCurrentStep(stepToGo)
   }
 
-  function handleCreateNetwork() {
-    if (!githubLogin || !currentAddress) return
+  async function handleCreateNetwork() {
+    if (!user?.login || !wallet?.address) return
 
     setCreatingNetwork(true)
 
+    await BeproService.startNetworkFactory()
+
     BeproService.createNetwork()
       .then((receipt) => {
-        BeproService.getNetworkAdressByCreator(currentAddress).then(
+        BeproService.getNetworkAdressByCreator(wallet.address).then(
           async (networkAddress) => {
             const networkData = steps.network.data
             const repositoriesData = steps.repositories
@@ -139,9 +138,10 @@ export default function NewNetwork() {
                   .map(({ name, fullName }) => ({ name, fullName }))
               ),
               botPermission: repositoriesData.permission,
-              creator: currentAddress,
-              githubLogin,
-              networkAddress
+              creator: wallet.address,
+              githubLogin: user.login,
+              networkAddress,
+              accessToken: user?.accessToken
             }
 
             createNetwork(json).then((result) => {
@@ -189,8 +189,8 @@ export default function NewNetwork() {
   }, [network])
 
   useEffect(() => {
-    if (githubLogin)
-      listUserRepos(githubLogin).then(({ data }) => {
+    if (user?.login)
+      listUserRepos(user.login).then(({ data }) => {
         const repositories = data.items.map((repo) => ({
           checked: false,
           name: repo.name,
@@ -203,11 +203,11 @@ export default function NewNetwork() {
 
         setSteps(tmpSteps)
       })
-  }, [githubLogin])
+  }, [user?.login])
 
   useEffect(() => {
-    if (currentAddress && beproInit) {
-      BeproService.getTokensLockedByAddress(currentAddress)
+    if (wallet?.address && beproServiceStarted && networkFactoryStarted) {
+      BeproService.getTokensLockedByAddress(wallet.address)
         .then((value) => {
           handleLockDataChange({ label: 'amountLocked', value })
         })
@@ -217,13 +217,13 @@ export default function NewNetwork() {
         label: 'amountNeeded',
         value: BeproService.operatorAmount
       })
-
-      const cookies = parseCookies()
-
-      if (!cookies[`updated-github-token:${currentAddress}`])
-        setIsModalTokenVisible(true)
     }
-  }, [currentAddress, beproInit])
+  }, [
+    wallet?.address,
+    wallet?.balance,
+    beproServiceStarted,
+    networkFactoryStarted
+  ])
 
   useEffect(() => {
     //Validate Locked Tokens
@@ -311,19 +311,21 @@ export default function NewNetwork() {
     }
   }, [steps])
 
+  useEffect(() => {
+    if (beproServiceStarted)
+      BeproService.startNetworkFactory()
+        .then(setNetworkFactoryStarted)
+        .catch((error) =>
+          console.log('Failed to start the Network Factory', error)
+        )
+  }, [beproServiceStarted])
+
   return (
     <div className="new-network">
       <style>{colorsToCSS(steps.network.data.colors.data)}</style>
       <ConnectWalletButton asModal={true} />
 
       {(creatingNetwork && <CreatingNetworkLoader />) || ''}
-
-      <UpdateGithubTokenModal
-        isVisible={isModalTokenVisible}
-        setVisible={setIsModalTokenVisible}
-        description="To create your custom network we need permission to access your repositories"
-        redirectTo={`${window.location.protocol}//${window.location.host}/new-network`}
-      />
 
       <CustomContainer>
         <div className="mt-5 pt-5">
@@ -335,10 +337,11 @@ export default function NewNetwork() {
               handleChangeStep={handleChangeStep}
               handleChange={handleLockDataChange}
               balance={{
-                beproAvailable: balance.bepro,
+                beproAvailable: wallet?.balance?.bepro,
                 oraclesAvailable:
-                  +oracles.tokensLocked - oracles.delegatedToOthers,
-                tokensLocked: oracles.tokensLocked
+                  +wallet?.balance?.oracles?.tokensLocked -
+                  wallet?.balance?.oracles?.delegatedToOthers,
+                tokensLocked: wallet?.balance?.oracles?.tokensLocked
               }}
             />
 
@@ -355,7 +358,7 @@ export default function NewNetwork() {
             <SelectRepositoriesStep
               data={steps.repositories}
               onClick={handleCheckRepository}
-              githubLogin={githubLogin}
+              githubLogin={user?.login}
               validated={steps.repositories.validated}
               step={3}
               currentStep={currentStep}
@@ -373,7 +376,6 @@ export default function NewNetwork() {
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, [
         'common',
         'custom-network',

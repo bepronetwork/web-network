@@ -1,12 +1,13 @@
 import {Bus} from '@helpers/bus';
+import { CONTRACT_ADDRESS } from 'env';
 import twitterTweet from './handle-twitter-tweet';
 
-export default async function readMergeProposalCreated(events, {network, models, res, githubId}) {
+export default async function readMergeProposalCreated(events, {network, models, res, githubId, networkId}) {
   for (const event of events) {
     const {id: scIssueId, mergeID: scMergeId, creator} = event.returnValues;
     const issueId = await network.getIssueById(scIssueId).then(({cid}) => cid);
 
-    const issue = await models.issue.findOne({where: {issueId,}});
+    const issue = await models.issue.findOne({where: {issueId, network_id: networkId}});
     if (!issue)
       return console.log(`Failed to find an issue to add merge proposal`, event);
 
@@ -25,11 +26,14 @@ export default async function readMergeProposalCreated(events, {network, models,
     }
 
     const merge = await models.mergeProposal.create({scMergeId, issueId: issue?.id, pullRequestId: pr?.id, githubLogin: user?.githubLogin});
-    twitterTweet({
-      type: 'proposal',
-      action: 'created',
-      issue
-    })
+    
+    if (network.contractAddress === CONTRACT_ADDRESS)
+      twitterTweet({
+        type: 'proposal',
+        action: 'created',
+        issue
+      })
+      
     console.log(`Emitting `, `mergeProposal:created:${user?.githubLogin}:${scIssueId}:${pr?.githubId}`);
     Bus.emit(`mergeProposal:created:${user?.githubLogin}:${scIssueId}:${pr?.githubId}`, merge)
     res.status(204);
