@@ -1,14 +1,15 @@
 import {Bus} from '@helpers/bus';
 import api from '@services/api';
+import { CONTRACT_ADDRESS } from 'env';
 import {Op} from 'sequelize';
 import twitterTweet from './handle-twitter-tweet';
 
-export default async function readCloseIssues(events, {network, models, octokit, res}) {
+export default async function readCloseIssues(events, {network, models, octokit, res, customNetworkId}) {
   for (const event of events) {
     const eventData = event.returnValues;
     // Merge PR and close issue on github
     const issueId = await network.getIssueById(eventData.id).then(({cid}) => cid);
-    const issue = await models.issue.findOne({where: {issueId,}, include: ['mergeProposals'],});
+    const issue = await models.issue.findOne({where: {issueId, network_id: customNetworkId}, include: ['mergeProposals'],});
 
     if (!issue || issue?.state === `closed`) {
       console.log(`Emitting closeIssue:created:${issueId}`);
@@ -42,11 +43,13 @@ export default async function readCloseIssues(events, {network, models, octokit,
     issue.state = 'closed';
     await issue.save();
 
-    twitterTweet({
-      type: 'bounty',
-      action: 'distributed',
-      issue
-    })
+    if (network.contractAddress === CONTRACT_ADDRESS)
+      twitterTweet({
+        type: 'bounty',
+        action: 'distributed',
+        issue
+      })
+      
     await api.post(`/seo/${issueId}`)
     .catch(e => {
       console.log(`Error creating SEO`, e);

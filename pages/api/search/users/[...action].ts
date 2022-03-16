@@ -6,7 +6,7 @@ import paginate from '@helpers/paginate';
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {action: [action,]} = req.query;
 
-  if (!action)
+  if (action === 'all')
     return res.status(200).json(await models.user.findAll(paginate({raw: true,}, req.body, [[req.body.sortBy || 'updatedAt', req.body.order || 'DESC']])));
 
   if (action === `login`)

@@ -1,7 +1,6 @@
 import Image from 'next/image'
-import { GetStaticProps } from 'next'
 import { useRouter } from 'next/router'
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import HelpIcon from '@assets/icons/help-icon';
 import PlusIcon from '@assets/icons/plus-icon';
@@ -16,101 +15,39 @@ import Translation from '@components/translation';
 import InternalLink from '@components/internal-link';
 import NetworkIdentifier from '@components/network-identifier';
 import WrongNetworkModal from '@components/wrong-network-modal';
+import ClosedNetworkAlert from '@components/closed-network-alert';
 import ConnectWalletButton from '@components/connect-wallet-button';
-import UserMissingModal from '@components/user-missing-information';
 import BalanceAddressAvatar from '@components/balance-address-avatar';
+import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper';
 import TransactionsStateIndicator from '@components/transactions-state-indicator';
 
-import { ApplicationContext } from '@contexts/application';
-
-import { BEPRO_NETWORK_NAME, IPFS_BASE } from 'env';
+import { useAuthentication } from '@contexts/authentication';
 
 import { truncateAddress } from '@helpers/truncate-address';
 import { formatNumberToNScale } from '@helpers/formatNumber';
 
-import { User } from '@interfaces/api-response';
-
-import { changeStakedState } from '@reducers/change-staked-amount';
-
-import { BeproService } from '@services/bepro-service';
-
-import useApi from '@x-hooks/use-api';
 import useNetwork from '@x-hooks/use-network';
-import ClosedNetworkAlert from './closed-network-alert';
-import ReadOnlyButtonWrapper from './read-only-button-wrapper';
+
+import { BEPRO_NETWORK_NAME, IPFS_BASE } from 'env';
 
 const CURRENCY = process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME;
 const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
 
 export default function MainNav() {
-  const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
+  const { pathname } = useRouter()
 
-  const [loggedIn, setLoggedIn] = useState<boolean>(false);
-  const [address, setAddress] = useState<string>(null);
-  const [ethBalance, setEthBalance] = useState(0);
-  const [beproBalance, setBeproBalance] = useState(0);
-  const [showHelp, setShowHelp] = useState(false);
-  const [modalUserMissing, setModalUserMissing] = useState<boolean>(false);
-  const {getUserOf,} = useApi();
+  const [showHelp, setShowHelp] = useState(false)
+  
+  const { wallet } = useAuthentication()
   const { network, getURLWithNetwork } = useNetwork()
-  const router = useRouter()
 
-  useEffect(() => {
-    checkLogin();
-  }, []); // initial load
-
-  const checkLogin = async () => {
-    //await login();
-    if (BeproService.isLoggedIn) {
-      setAddress(BeproService.address);
-      setLoggedIn(true);
-    } else {
-      setLoggedIn(false);
-    }
-  }
-
-  function updateAddress(address) {
-    setAddress(truncateAddress(address, 4));
-  }
-
-  function updateBalances() {
-    setBeproBalance(balance.bepro);
-    setEthBalance(balance.eth);
-    changeStakedState(balance.staked);
-  }
-
-  function updateState() {
-    if (!currentAddress)
-      return;
-
-    updateAddress(BeproService.address);
-    BeproService.getBalance('eth').then(setEthBalance);
-    BeproService.getBalance('bepro').then(setBeproBalance);
-    BeproService.network.getBEPROStaked().then(amount => dispatch(changeStakedState(amount)));
-  }
-
-  const login = async () => {
-    updateAddress(BeproService.address);
-    setEthBalance(await BeproService.getBalance('eth'))
-    setBeproBalance(await BeproService.getBalance('bepro'))
-    setLoggedIn(true);
-    dispatch(changeStakedState(await BeproService.network.getBEPROStaked()));
-    getUserOf(BeproService.address)
-      .then((user: User) => {
-        if(!user?.accessToken && user?.githubLogin) setModalUserMissing(true)
-      })
-  }
-
-  const isNetworksPage = router.pathname === '/networks'
-
-  useEffect(updateState, [currentAddress]);
-  useEffect(updateBalances, [balance])
+  const isNetworksPage = ['/networks', '/new-network'].includes(pathname)
 
   return (
     <div className={`main-nav d-flex flex-column ${isNetworksPage && 'bg-shadow' || 'bg-primary'}`}>
       {network?.isClosed && <ClosedNetworkAlert />}
         
-      <div className={`d-flex flex-row align-items-center justify-content-between px-3 ${currentAddress ? 'py-0' : 'py-3'}`}>
+      <div className={`d-flex flex-row align-items-center justify-content-between px-3 ${wallet?.address ? 'py-0' : 'py-3'}`}>
         <div className="d-flex">
           <InternalLink href={getURLWithNetwork('/', {network: network?.name})} icon={isNetworksPage ? <BeproLogoBlue /> : (network?.name !== BEPRO_NETWORK_NAME ? <Image src={`${IPFS_BASE}/${network?.fullLogo}`} width={104} height={32} /> : <BeproLogo aria-hidden={true} />)} className="brand" nav active brand />
           {!isNetworksPage && <ul className="nav-links">
@@ -142,37 +79,30 @@ export default function MainNav() {
           <ReadOnlyButtonWrapper>
             <InternalLink href={getURLWithNetwork('/create-bounty')} icon={<PlusIcon />} label={<Translation label={'main-nav.create-bounty'} />} className="mr-2 read-only-button" iconBefore nav uppercase />
           </ReadOnlyButtonWrapper>
-          || <InternalLink href={getURLWithNetwork('/new-network')} icon={<PlusIcon />} label={'New Network'} className="mr-2" iconBefore nav uppercase />
+          || <InternalLink href="/new-network" icon={<PlusIcon />} label={'New Network'} className="mr-2" iconBefore nav uppercase />
           }
 
           <Button onClick={() => setShowHelp(true)}  className="ms-2 me-4 opacity-75 opacity-100-hover" transparent rounded><HelpIcon /></Button>
 
           <WrongNetworkModal requiredNetwork={REQUIRED_NETWORK} />
 
-          <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
+          <ConnectWalletButton>
             <div className="d-flex account-info align-items-center">
 
               <TransactionsStateIndicator />
 
               <NetworkIdentifier />
 
-              <InternalLink href={getURLWithNetwork('/account')} icon={<BeproSmallLogo />} label={formatNumberToNScale(beproBalance)} className="mx-3" transparent nav />
+              <InternalLink href={getURLWithNetwork('/account')} icon={<BeproSmallLogo />} label={formatNumberToNScale(wallet?.balance?.bepro || 0)} className="mx-3" transparent nav />
 
-              <InternalLink href={getURLWithNetwork('/account')} icon={<BalanceAddressAvatar address={address} balance={ethBalance} currency={CURRENCY} />} className="meta-info d-flex align-items-center" />
+              <InternalLink href={getURLWithNetwork('/account')} icon={<BalanceAddressAvatar address={truncateAddress(wallet?.address || '', 4)} balance={wallet?.balance?.eth} currency={CURRENCY} />} className="meta-info d-flex align-items-center" />
             </div>
           </ConnectWalletButton>
         </div>
 
         <HelpModal show={showHelp} onCloseClick={() => setShowHelp(false)} />
-        <UserMissingModal show={modalUserMissing} />
       </div>
   </div>
   )
-}
-
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {}
-  }
 }
 

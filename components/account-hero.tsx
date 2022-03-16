@@ -1,37 +1,50 @@
-import {useContext, useEffect} from 'react';
-import {BeproService} from "services/bepro-service";
-import {ApplicationContext} from 'contexts/application';
-import {changeMyIssuesState} from '@reducers/change-my-issues';
-import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
-import GithubHandle from './github-handle';
-import {formatNumberToCurrency} from 'helpers/formatNumber';
-import { useTranslation } from 'next-i18next';
+import { useContext, useEffect } from 'react'
+import { useTranslation } from 'next-i18next'
+
+import GithubHandle from '@components/github-handle'
+
+import { ApplicationContext } from '@contexts/application'
+import { useAuthentication } from '@contexts/authentication'
+
+import { formatNumberToCurrency } from '@helpers/formatNumber'
+
+import {
+  changeOraclesParse,
+  changeOraclesState
+} from '@reducers/change-oracles'
+import { changeMyIssuesState } from '@reducers/change-my-issues'
+
+import { BeproService } from '@services/bepro-service'
 
 export default function AccountHero() {
-  const {dispatch, state: {beproInit, oracles, metaMaskWallet, currentAddress, balance, myIssues}} = useContext(ApplicationContext);
-  const { t } = useTranslation(['common', 'bounty']) 
+  const { t } = useTranslation(['common', 'bounty'])
+
+  const {
+    dispatch,
+    state: { myIssues }
+  } = useContext(ApplicationContext)
+  const { wallet, beproServiceStarted } = useAuthentication()
 
   function loadBeproNetworkInformation() {
-    if (!beproInit || !metaMaskWallet || !currentAddress)
-      return;
+    if (!beproServiceStarted || !wallet?.address) return
 
-    const address = currentAddress;
+    const address = wallet?.address
 
     BeproService.network
-                .getIssuesByAddress(address)
-                .then(issuesList => {
-                  dispatch(changeMyIssuesState(issuesList));
-                })
-                .then(_ => BeproService.network.getOraclesSummary(address))
-                .then(oracles => {
-                  dispatch(changeOraclesState(changeOraclesParse(address, oracles)));
-                })
-                .catch(e => {
-                  console.error(e);
-                })
+      .getIssuesByAddress(address)
+      .then((issuesList) => {
+        dispatch(changeMyIssuesState(issuesList))
+      })
+      .then((_) => BeproService.network.getOraclesSummary(address))
+      .then((oracles) => {
+        dispatch(changeOraclesState(changeOraclesParse(address, oracles)))
+      })
+      .catch((e) => {
+        console.error(e)
+      })
   }
 
-  useEffect(loadBeproNetworkInformation, [beproInit, metaMaskWallet, currentAddress])
+  useEffect(loadBeproNetworkInformation, [beproServiceStarted, wallet?.address])
 
   return (
     <div className="banner">
@@ -46,30 +59,45 @@ export default function AccountHero() {
               <div className="row">
                 <div className="col-md-3">
                   <div className="top-border">
-                    <h4 className="h4 mb-0">{formatNumberToCurrency(myIssues.length || 0)}</h4>
-                    <span className="caption-small">{t('bounty:label_other')}</span>
+                    <h4 className="h4 mb-0">
+                      {formatNumberToCurrency(myIssues.length || 0)}
+                    </h4>
+                    <span className="caption-small">
+                      {t('bounty:label_other')}
+                    </span>
                   </div>
                 </div>
                 <div className="col-md-3">
                   <div className="top-border">
-                    <h4 className="h4 mb-0">{formatNumberToCurrency(+oracles?.tokensLocked + +oracles?.oraclesDelegatedByOthers || 0)}</h4>
+                    <h4 className="h4 mb-0">
+                      {formatNumberToCurrency(
+                        +wallet?.balance?.oracles?.tokensLocked +
+                          +wallet?.balance?.oracles?.oraclesDelegatedByOthers || 0
+                      )}
+                    </h4>
                     <span className="caption-small">{t('$oracles')}</span>
                   </div>
                 </div>
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4 className="h4 mb-0">
-                      {formatNumberToCurrency(oracles?.delegatedToOthers || 0)}
+                      {formatNumberToCurrency(wallet?.balance?.oracles?.delegatedToOthers || 0)}
                     </h4>
-                    <span className="caption-small">{t('heroes.delegated-oracles')}</span>
+                    <span className="caption-small">
+                      {t('heroes.delegated-oracles')}
+                    </span>
                   </div>
                 </div>
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4 className="h4 mb-0">
-                      {formatNumberToCurrency(+oracles?.oraclesDelegatedByOthers || 0)}
+                      {formatNumberToCurrency(
+                        +wallet?.balance?.oracles?.oraclesDelegatedByOthers || 0
+                      )}
                     </h4>
-                    <span className="caption-small">{t('heroes.delegated-by-others')}</span>
+                    <span className="caption-small">
+                      {t('heroes.delegated-by-others')}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -78,5 +106,5 @@ export default function AccountHero() {
         </div>
       </div>
     </div>
-  );
+  )
 }

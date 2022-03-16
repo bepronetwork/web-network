@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
-
 import { useRouter } from 'next/router'
-import { getSession } from 'next-auth/react'
+import { useTranslation } from 'next-i18next'
 import { GetServerSideProps } from 'next/types'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
@@ -20,18 +19,13 @@ import { changeLoadState } from 'contexts/reducers/change-load-state'
 import { pullRequest } from 'interfaces/issue-data'
 import useApi from 'x-hooks/use-api'
 import { addToast } from 'contexts/reducers/add-toast'
-import { useTranslation } from 'next-i18next'
 import useNetwork from 'x-hooks/use-network'
 import ReadOnlyButtonWrapper from 'components/read-only-button-wrapper'
 import { useRepos } from 'contexts/repos'
 import { useIssue } from 'contexts/issue'
+import { useAuthentication } from '@contexts/authentication'
 
 export default function PullRequest() {
-  const {
-    dispatch,
-    state: { githubLogin, currentAddress }
-  } = useContext(ApplicationContext)
-
   const router = useRouter()
   const {activeRepo} = useRepos()
   const {activeIssue, addNewComment} = useIssue()
@@ -42,6 +36,8 @@ export default function PullRequest() {
   const [pullRequest, setPullRequest] = useState<pullRequest>()
   const { t } = useTranslation(['common', 'pull-request'])
   const { network } = useNetwork()
+  const { wallet, user } = useAuthentication()
+  const { dispatch } = useContext(ApplicationContext)
   const { prId, review} = router.query;
 
   function loadData() {
@@ -53,9 +49,11 @@ export default function PullRequest() {
   }
 
   function handleCreateReview({ body }) {
+    if (!user?.login) return
+
     setIsExecuting(true)
 
-    createReviewForPR(String(activeIssue?.issueId), String(prId), githubLogin, body, network?.name)
+    createReviewForPR(String(activeIssue?.issueId), String(prId), user?.login, body, network?.name)
       .then((response) => {
         dispatch(
           addToast({
@@ -95,10 +93,10 @@ export default function PullRequest() {
   useEffect(()=>{loadData()}, [activeIssue])
 
   useEffect(() => {
-    if (review && pullRequest){
+    if (review && pullRequest && user?.login){
       setShowModal(true)
     }
-  }, [review, pullRequest])
+  }, [review, pullRequest, user?.login])
 
   return (
     <>
@@ -115,7 +113,7 @@ export default function PullRequest() {
             </div>
 
             <div className="col-2 p-0 d-flex justify-content-center">
-              {currentAddress && githubLogin && pullRequest?.state === "open" && (
+              {wallet?.address && user?.login && pullRequest?.state === "open" && (
                 <ReadOnlyButtonWrapper>
                   <Button
                     className="read-only-button"
@@ -168,7 +166,6 @@ export default function PullRequest() {
 export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, ['common', 'pull-request', 'connect-wallet-button'])),
     },
   };

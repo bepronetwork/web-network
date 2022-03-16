@@ -1,10 +1,10 @@
+import { useContext, useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 import NetworksList from '@components/networks-list'
 import { useTranslation } from 'next-i18next'
-import { useContext, useEffect, useState } from 'react'
+
 import { changeNetworksSummary } from '@contexts/reducers/change-networks-summary'
 import { BeproService } from '@services/bepro-service'
 import { ApplicationContext } from '@contexts/application'
@@ -35,6 +35,12 @@ export default function NetworksPage() {
     state: { networksSummary }
   } = useContext(ApplicationContext)
 
+  useEffect(() => {
+    BeproService.startNetworkFactory().catch((error) =>
+      console.log('Failed to start the Network Factory', error)
+    )
+  }, [])
+  
   useEffect(() => {
     dispatch(
       changeNetworksSummary({
@@ -81,7 +87,6 @@ export default function NetworksPage() {
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, ['common', 'custom-network']))
     }
   }

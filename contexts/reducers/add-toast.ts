@@ -13,7 +13,7 @@ export const AddToast: ReduceAction<string> = {
 }
 
 export const addToast = (payload: ToastNotification): ReduceActor<ToastNotification> =>
-  ({name: ReduceActionName.AddToast, payload: {type: 'primary', delay: 3000, ...payload, id: uuidv4() }});
+  ({name: ReduceActionName.AddToast, payload: {type: 'primary', delay: 10000, ...payload, id: uuidv4() }});
 
 export const toastError = (content: string, title = `Error`, ...rest) => addToast({title, content, type: 'danger', ...rest})
 export const toastSuccess = (content: string, title = `Success`) => addToast({title, content, type: 'success'})

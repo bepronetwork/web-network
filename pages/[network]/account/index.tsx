@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react'
 import { getSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { GetServerSideProps } from 'next/types'
+import React, { useContext, useEffect, useState } from 'react'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 import Modal from '@components/modal'
@@ -11,6 +11,7 @@ import MarkedRender from '@components/MarkedRender'
 import IssueListItem from '@components/issue-list-item'
 
 import { ApplicationContext } from '@contexts/application'
+import { useAuthentication } from '@contexts/authentication'
 
 import { formatNumberToCurrency } from '@helpers/formatNumber'
 
@@ -18,27 +19,27 @@ import { IssueData } from '@interfaces/issue-data'
 
 import { toastError } from '@reducers/add-toast'
 
+import useNetwork from '@x-hooks/use-network'
 import useMergeData from '@x-hooks/use-merge-data'
 import usePendingIssue from '@x-hooks/use-pending-issue'
-import useNetwork from '@x-hooks/use-network'
 
 export default function MyIssues() {
-  const {
-    dispatch,
-    state: { githubLogin, currentAddress }
-  } = useContext(ApplicationContext)
+  const { t } = useTranslation(['common', 'bounty'])
+  
   const [pendingIssues, setPendingIssues] = useState<IssueData[]>([])
+  
+  const { network } = useNetwork()
+  const { wallet, user} = useAuthentication()
+  const { dispatch } = useContext(ApplicationContext)
   const [pendingIssue, { updatePendingIssue, treatPendingIssue }] =
     usePendingIssue()
-  const { t } = useTranslation(['common', 'bounty'])
 
-  const { getPendingFor } = useMergeData()
-  const { network } = useNetwork()
+    const { getPendingFor } = useMergeData()
 
   function getPendingIssues() {
-    if (!currentAddress) return
+    if (!wallet?.address) return
 
-    getPendingFor(currentAddress, network?.name).then((pending) =>
+    getPendingFor(wallet?.address, network?.name).then((pending) =>
       setPendingIssues(pending.rows)
     )
   }
@@ -52,7 +53,7 @@ export default function MyIssues() {
     })
   }
 
-  useEffect(getPendingIssues, [currentAddress])
+  useEffect(getPendingIssues, [wallet?.address])
 
   return (
     <Account>
@@ -101,7 +102,7 @@ export default function MyIssues() {
           )) ||
             ``}
 
-          <ListIssues creator={githubLogin || 'not-connected'} />
+          <ListIssues creator={user?.login || 'not-connected'} />
         </div>
       </div>
     </Account>
@@ -111,7 +112,6 @@ export default function MyIssues() {
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, [
         'common',
         'bounty',

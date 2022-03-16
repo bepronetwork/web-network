@@ -1,4 +1,4 @@
-import { ReposList } from "interfaces/repos-list";
+import { ReposList } from "@interfaces/repos-list";
 import { BranchInfo, BranchsList } from "interfaces/branchs-list";
 import { head } from "lodash";
 import { PaginatedData } from "interfaces/paginated-data";
@@ -9,6 +9,7 @@ import client from "services/api";
 import { INetwork } from "interfaces/network";
 import axios from "axios";
 import {
+  BEPRO_NETWORK_NAME,
   CURRENCY_BEPRO_API,
   PRODUCTION_CONTRACT,
   USE_PRODUCTION_CONTRACT_CONVERSION,
@@ -41,7 +42,7 @@ export default function useApi() {
     order = "DESC",
     address = ``,
     creator = ``,
-    networkName = "bepro"
+    networkName = BEPRO_NETWORK_NAME
   ) {
     const search = new URLSearchParams({
       address,
@@ -71,7 +72,7 @@ export default function useApi() {
     creator = ``,
     search = "",
     pullRequester = "",
-    networkName = "bepro",
+    networkName = BEPRO_NETWORK_NAME,
   }) {
     const params = new URLSearchParams({
       address,
@@ -102,7 +103,7 @@ export default function useApi() {
     owner = "",
     name = ``,
     path = ``,
-    networkName = "bepro",
+    networkName = BEPRO_NETWORK_NAME,
   }) {
     const params = new URLSearchParams({
       page,
@@ -119,14 +120,21 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
-  async function getIssue(repoId: string, ghId: string, networkName = "bepro") {
+  async function getIssue(
+    repoId: string,
+    ghId: string,
+    networkName = BEPRO_NETWORK_NAME
+  ) {
     return client
       .get<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`)
       .then(({ data }) => data)
       .catch(() => null);
   }
 
-  async function createIssue(payload: NewIssueParams, networkName = "bepro") {
+  async function createIssue(
+    payload: NewIssueParams,
+    networkName = BEPRO_NETWORK_NAME
+  ) {
     return client
       .post<number>(`/issue`, { ...payload, networkName })
       .then(({ data }) => data)
@@ -144,7 +152,7 @@ export default function useApi() {
     repoId,
     githubId,
     scId,
-    networkName = "bepro"
+    networkName = BEPRO_NETWORK_NAME
   ) {
     return client
       .patch(`/issue`, { repoId, githubId, scId, networkName })
@@ -152,10 +160,17 @@ export default function useApi() {
       .catch((_) => false);
   }
 
+  async function patchPrStatus(prId) {
+    return client
+      .patch(`/pull-request/${prId}`)
+      .then(({ data }) => data)
+      .catch((_) => false);
+  }
+
   async function getPendingFor(
     address: string,
     page = "1",
-    networkName = "bepro"
+    networkName = BEPRO_NETWORK_NAME
   ) {
     const search = new URLSearchParams({
       address,
@@ -169,13 +184,6 @@ export default function useApi() {
       .catch(() => null);
   }
 
-  async function getProposal(dbId: string | number): Promise<Proposal> {
-    return client
-      .get<Proposal>(`/merge-proposal/${dbId}`)
-      .then(({ data }) => data)
-      .catch(()=> null);
-  }
-
   async function createPullRequestIssue(
     repoId: string,
     githubId: string,
@@ -185,7 +193,7 @@ export default function useApi() {
       username: string;
       branch: string;
     },
-    networkName = "bepro"
+    networkName = BEPRO_NETWORK_NAME
   ) {
     return client
       .post(`/pull-request/`, { ...payload, repoId, githubId, networkName })
@@ -194,6 +202,7 @@ export default function useApi() {
         throw error;
       });
   }
+
   async function getPullRequestIssue(issueId: string, page = "1") {
     const search = new URLSearchParams({ issueId, page }).toString();
     return client
@@ -230,23 +239,16 @@ export default function useApi() {
     return client.get<number>(`/search/users/total`).then(({ data }) => data);
   }
 
-  async function getUserOf(address: string): Promise<User> {
-    return client
-      .post<User[]>(`/search/users/address/`, [address])
-      .then(({ data }) => data[0])
-      .catch(() => ({} as User));
-  }
-
   async function getAllUsers(payload: { page: number } = { page: 1 }) {
     return client
-      .post<User[]>(`/search/users/`, payload)
+      .post<User[]>(`/search/users/all`, payload)
       .then(({ data }) => data)
       .catch(() => []);
   }
 
-  async function createRepo(owner, repo, networkName = "bepro") {
+  async function createRepo(owner, repo, networkName = BEPRO_NETWORK_NAME) {
     return client
-      .post(`/repos/`, { owner, repo })
+      .post(`/repos/`, { owner, repo, networkName })
       .then(({ status }) => status === 200)
       .catch((e) => {
         console.error(`Failed to create repo`, e);
@@ -254,7 +256,7 @@ export default function useApi() {
       });
   }
 
-  async function getReposList(force = false, networkName = "bepro") {
+  async function getReposList(force = false, networkName = BEPRO_NETWORK_NAME) {
     const search = new URLSearchParams({ networkName }).toString();
 
     if (!force && repoList.length)
@@ -269,7 +271,7 @@ export default function useApi() {
   async function getBranchsList(
     repoId: string | number,
     force = false,
-    networkName = "bepro"
+    networkName = BEPRO_NETWORK_NAME
   ) {
     if (!force && branchsList[repoId]?.length)
       return Promise.resolve(branchsList[repoId] as BranchInfo[]);
@@ -290,7 +292,11 @@ export default function useApi() {
       .catch(() => false);
   }
 
-  async function poll(eventName: string, rest, networkName = "bepro") {
+  async function poll(
+    eventName: string,
+    rest,
+    networkName = BEPRO_NETWORK_NAME
+  ) {
     return client.post(
       `/poll/`,
       { eventName, ...rest, networkName },
@@ -302,7 +308,7 @@ export default function useApi() {
     githubLogin,
     issue_id,
     currentGithubId,
-    networkName = "bepro"
+    networkName = BEPRO_NETWORK_NAME
   ) {
     return poll(
       "mergeProposal",
@@ -313,13 +319,19 @@ export default function useApi() {
       .catch(() => null);
   }
 
-  async function waitForClose(currentGithubId, networkName = "bepro") {
+  async function waitForClose(
+    currentGithubId,
+    networkName = BEPRO_NETWORK_NAME
+  ) {
     return poll(`closeIssue`, { currentGithubId }, networkName)
       .then(({ data }) => data)
       .catch(() => null);
   }
 
-  async function waitForRedeem(currentGithubId, networkName = "bepro") {
+  async function waitForRedeem(
+    currentGithubId,
+    networkName = BEPRO_NETWORK_NAME
+  ) {
     return poll(`redeemIssue`, { currentGithubId }, networkName)
       .then(({ data }) => data)
       .catch(() => null);
@@ -330,7 +342,7 @@ export default function useApi() {
     fromBlock: number,
     id: number,
     pullRequestId = "",
-    networkName = "bepro"
+    networkName = BEPRO_NETWORK_NAME
   ) {
     return client.post(`/past-events/${eventName}/`, {
       fromBlock,
@@ -363,7 +375,7 @@ export default function useApi() {
   async function userHasPR(
     issueId: string,
     login: string,
-    networkName = "bepro"
+    networkName = BEPRO_NETWORK_NAME
   ) {
     const search = new URLSearchParams({
       issueId,
@@ -383,7 +395,7 @@ export default function useApi() {
   async function getUserPullRequests(
     page = "1",
     login: string,
-    networkName = "bepro"
+    networkName = BEPRO_NETWORK_NAME
   ) {
     const search = new URLSearchParams({ page, login, networkName }).toString();
 
@@ -399,7 +411,7 @@ export default function useApi() {
   async function startWorking(
     issueId: string,
     githubLogin: string,
-    networkName = "bepro"
+    networkName = BEPRO_NETWORK_NAME
   ) {
     return client
       .put("/issue/working", { issueId, githubLogin, networkName })
@@ -414,7 +426,7 @@ export default function useApi() {
     pullRequestId: string,
     mergeProposalId: string,
     address: string,
-    networkName = "bepro"
+    networkName = BEPRO_NETWORK_NAME
   ) {
     return client
       .post("/pull-request/merge", {
@@ -435,7 +447,7 @@ export default function useApi() {
     pullRequestId: string,
     githubLogin: string,
     body: string,
-    networkName = "bepro"
+    networkName = BEPRO_NETWORK_NAME
   ) {
     return client
       .put("/pull-request/review", {
@@ -484,6 +496,20 @@ export default function useApi() {
       .catch((error) => {
         throw error;
       });
+  }
+
+  async function getProposal(dbId: string | number): Promise<Proposal> {
+    return client
+      .get<Proposal>(`/merge-proposal/${dbId}`)
+      .then(({ data }) => data)
+      .catch(() => null);
+  }
+
+  async function getUserOf(address: string): Promise<User> {
+    return client
+      .post<User[]>(`/search/users/address/`, [address])
+      .then(({ data }) => data[0])
+      .catch(() => ({} as User));
   }
 
   async function isNetworkOwner(creatorAddress, networkAddress) {

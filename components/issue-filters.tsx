@@ -1,11 +1,15 @@
-import IssueFilterBox from '@components/issue-filter-box';
-import React, {useEffect, useRef, useState} from 'react';
-import useFilters from '@x-hooks/use-filters';
-import Button from '@components/button';
-import FilterIcon from '@assets/icons/filter-icon';
 import { useRouter } from 'next/router';
-import Translation from './translation';
 import { useTranslation } from 'next-i18next';
+import React, {useEffect, useRef, useState} from 'react';
+
+import FilterIcon from '@assets/icons/filter-icon';
+
+import Button from '@components/button';
+import Translation from '@components/translation';
+import CounterBadge from '@components/counter-badge';
+import IssueFilterBox from '@components/issue-filter-box';
+
+import useFilters from '@x-hooks/use-filters';
 
 export default function IssueFilters() {
   const node = useRef()
@@ -23,7 +27,7 @@ export default function IssueFilters() {
     const quantity = countFilters()
 
     if (quantity > 0)
-      return <div className='mr-1 bg-primary rounded-5 p-1 myn-1'>{quantity}</div>
+      return <CounterBadge value={quantity} className="mr-1" />
 
     return <FilterIcon />
   }

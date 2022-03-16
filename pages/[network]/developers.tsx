@@ -1,5 +1,4 @@
-import {useContext, useEffect, useState} from 'react';
-import { getSession } from 'next-auth/react'
+import { useEffect, useState} from 'react';
 import { GetServerSideProps } from 'next/types'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
@@ -10,12 +9,12 @@ import { useNetwork } from "contexts/network";
 import {ApplicationContext} from 'contexts/application';
 import {BeproService} from 'services/bepro-service';
 import useApi from '@x-hooks/use-api';
+import { useAuthentication } from '@contexts/authentication';
 
 
 export default function PageDevelopers() {
   const { t } = useTranslation(['common'])
-
-  const {state: {beproInit}} = useContext(ApplicationContext)
+  const {beproServiceStarted} = useAuthentication()
   const {getTotalUsers} = useApi();
 
   const [infos, setInfos] = useState<IInfosHero[]>([
@@ -38,7 +37,7 @@ export default function PageDevelopers() {
   const { activeNetwork } = useNetwork()
 
   async function loadTotals() {
-    if (!beproInit || !activeNetwork)
+    if (!beproServiceStarted || !activeNetwork)
       return;
 
     const [closed, inProgress, onNetwork, totalUsers] = await Promise.all([
@@ -65,7 +64,7 @@ export default function PageDevelopers() {
     ])
   }
 
-  useEffect(()=>{loadTotals()}, [beproInit, activeNetwork]);
+  useEffect(()=>{loadTotals()}, [beproServiceStarted, activeNetwork]);
 
   return (
     <>
@@ -85,7 +84,6 @@ export default function PageDevelopers() {
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, ['common', 'bounty']))
     }
   }

@@ -33,6 +33,7 @@ function InfoComponent(info: IInfosHero) {
       </div>
     );
   }
+
   return (
     <div className="col px-2">
       <div className="border-top border-2 mb-2"></div>
