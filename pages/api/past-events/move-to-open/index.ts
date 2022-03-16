@@ -8,7 +8,7 @@ import api from 'services/api'
 import twitterTweet from '@helpers/api/handle-twitter-tweet';
 async function post(req: NextApiRequest, res: NextApiResponse) {
 
-  const network = networkBeproJs({ test: true });
+  const network = networkBeproJs({});
 
   await network.start();
   const redeemTime = (await network.redeemTime()) * 1000;

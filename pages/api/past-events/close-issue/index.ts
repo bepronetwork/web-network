@@ -8,7 +8,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   const {fromBlock, id} = req.body;
   const octokit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
 
-  const network = networkBeproJs({ test: true });
+  const network = networkBeproJs({});
 
   await network.start();
 

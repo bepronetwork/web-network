@@ -62,13 +62,12 @@ export default function NotMergeableModal({
 
   function handleModalVisibility() {
     if (!pullRequest || !issuePRs?.length || mergeState === "success") return;
-    debugger;
+    
     if (whenNotShow) {
       setVisible(false);
     } else if (isIssueOwner || isPullRequestOwner || isCouncil || isProposer) {
       setVisible(pullRequest.state === "open");
     }
-    debugger;
   }
 
   function handleRetryMerge() {

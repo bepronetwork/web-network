@@ -15,7 +15,7 @@ async function remove(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (user) {
-    const network = networkBeproJs({ test: true });
+    const network = networkBeproJs({});
     await network.start();
     const beproLocked = await network
       .getOraclesByAddress(address);

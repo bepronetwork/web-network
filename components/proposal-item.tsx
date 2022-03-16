@@ -2,30 +2,22 @@ import { Proposal } from "interfaces/proposal";
 import Link from "next/link";
 import PercentageProgressBar from "components/percentage-progress-bar";
 import ProposalProgressSmall from "components/proposal-progress-small";
-import { addTransaction } from "@reducers/add-transaction";
-import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { BeproService } from "services/bepro-service";
-import { updateTransaction } from "@reducers/update-transaction";
 import { useContext } from "react";
 import { ApplicationContext } from "contexts/application";
 import Button from "./button";
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import useTransactions from "x-hooks/useTransactions";
 import Translation from "./translation";
 import LockedIcon from "assets/icons/locked-icon";
-import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
-import { useNetwork } from "contexts/network";
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 import { IssueData } from "interfaces/issue-data";
 import { useIssue } from "contexts/issue";
+import useBepro from "@x-hooks/use-bepro";
 
 interface Options {
   proposal: Proposal;
   issue: IssueData;
   isFinalized: boolean;
   isDisputable?: boolean;
-  onDispute: (error?: boolean) => void;
 }
 
 export default function ProposalItem({
@@ -33,57 +25,19 @@ export default function ProposalItem({
   issue,
   isFinalized,
   isDisputable = false,
-  onDispute = () => {},
 }: Options) {
   const {
-    dispatch,
     state: { beproStaked },
   } = useContext(ApplicationContext);
-  const txWindow = useTransactions();
-  const { networkIssue } = useIssue();
-  const { processEvent } = useApi();
+  const { networkIssue, getNetworkIssue } = useIssue();
+  const {handlerDisputeProposal} = useBepro()
   const { getURLWithNetwork } = useNetworkTheme();
-  const { activeNetwork } = useNetwork();
   const networkProposals = networkIssue?.networkProposals?.[proposal?.id] || [];
 
-  async function handleDispute(mergeId) {
+  async function handleDispute() {
     if (!isDisputable || isFinalized) return;
-
-    const disputeTx = addTransaction(
-      { type: TransactionTypes.dispute },
-      activeNetwork
-    );
-    dispatch(disputeTx);
-
-    await BeproService.network
-      .disputeMerge(networkIssue?._id, mergeId)
-      .then((txInfo) => {
-        processEvent(
-          `dispute-proposal`,
-          txInfo.blockNumber,
-          +networkIssue?._id
-        );
-        txWindow.updateItem(
-          disputeTx.payload.id,
-          BeproService.parseTransaction(txInfo, disputeTx.payload)
-        );
-      })
-      .then(() => onDispute?.())
-      .catch((err) => {
-        if (err?.message?.search(`User denied`) > -1)
-          dispatch(
-            updateTransaction({ ...(disputeTx.payload as any), remove: true })
-          );
-        else
-          dispatch(
-            updateTransaction({
-              ...(disputeTx.payload as any),
-              status: TransactionStatus.failed,
-            })
-          );
-        onDispute?.();
-        console.error("Error creating dispute", err);
-      });
+    handlerDisputeProposal(networkIssue?._id, +proposal.scMergeId)
+    .then(()=> getNetworkIssue())
   }
 
   function getColors() {
@@ -169,7 +123,7 @@ export default function ProposalItem({
                     className={`align-self-center mb-2 ms-3 read-only-button`}
                     onClick={(ev) => {
                       ev.stopPropagation();
-                      handleDispute(+proposal.id);
+                      handleDispute();
                     }}
                   >
                     {!isDisputable && getColors() !== "success" && (
