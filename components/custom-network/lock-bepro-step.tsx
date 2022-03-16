@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useState } from 'react'
 import { ProgressBar } from 'react-bootstrap'
 
 import LockedIcon from '@assets/icons/locked-icon'
@@ -9,7 +9,7 @@ import Button from '@components/button'
 import InputNumber from '@components/input-number'
 import UnlockBeproModal from '@components/unlock-bepro-modal'
 
-import { ApplicationContext } from '@contexts/application'
+import { useAuthentication } from '@contexts/authentication'
 
 import { formatNumberToCurrency } from '@helpers/formatNumber'
 
@@ -30,9 +30,7 @@ export default function LockBeproStep({
   const [isUnlocking, setIsUnlocking] = useState(false)
   const [showUnlockBepro, setShowUnlockBepro] = useState(false)
 
-  const {
-    methods: { updateWalletBalance }
-  } = useContext(ApplicationContext)
+  const { updateWalletBalance } = useAuthentication()
 
   const lockedPercent =
     ((data.amountLocked || 0) / (data.amountNeeded || 0)) * 100
@@ -50,12 +48,14 @@ export default function LockBeproStep({
     setIsLocking(true)
 
     try {
-      const isApproved = await BeproService.networkFactory.isApprovedSettlerToken(BeproService.address, 1)
+      const isApproved = await BeproService.networkFactory.isApprovedSettlerToken(undefined, 1)
 
       if (!isApproved)
         await BeproService.networkFactory.approveSettlerERC20Token()
 
       const amount = data.amount
+
+      await BeproService.startNetworkFactory()
 
       BeproService.networkFactory
         .lock(amount)
@@ -72,8 +72,11 @@ export default function LockBeproStep({
     }
   }
 
-  function handleUnLock() {
+  async function handleUnLock() {
     setIsUnlocking(true)
+
+    await BeproService.startNetworkFactory()
+
     BeproService.networkFactory.unlock().then(() => {
       handleChange({ label: 'amountLocked', value: 0 })
       handleChange({ label: 'amount', value: 0 })
@@ -316,7 +319,7 @@ export default function LockBeproStep({
               )}
             </Button>
 
-            <Button disabled={lockedPercent === 0 || isUnlocking} color="ligth-gray" onClick={handleUnLock}>
+            {/* <Button disabled={lockedPercent === 0 || isUnlocking} color="ligth-gray" onClick={handleUnLock}>
               {!isUnlocking || lockedPercent === 0 && (
                 <LockedIcon width={12} height={12} className="mr-1" />
               )}
@@ -326,7 +329,7 @@ export default function LockBeproStep({
               ) : (
                 ''
               )}
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>

@@ -33,6 +33,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       creator,
       fullLogo,
       logoIcon,
+      accessToken,
       description,
       githubLogin,
       repositories,
@@ -48,7 +49,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     })
 
     if (!user) return res.status(403).json('Invalid user provided')
-    if (!user.accessToken) return res.status(401).json('Unauthorized user')
+    if (!accessToken) return res.status(401).json('Unauthorized user')
     if (!botPermission)
       return res.status(403).json('Bepro-bot authorization needed')
 
@@ -82,7 +83,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     // Adding bepro-bot to repositories organization
     const octokitUser = new Octokit({
-      auth: user.accessToken
+      auth: accessToken
     })
 
     const repos = JSON.parse(repositories)
@@ -146,6 +147,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       fullLogo,
       isClosed,
       override,
+      accessToken,
       description,
       githubLogin,
       networkAddress,
@@ -169,18 +171,19 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     })
 
     if (!user) return res.status(403).json('Invalid user provided')
-    if (!user.accessToken) return res.status(401).json('Unauthorized user')
+    if (!accessToken) return res.status(401).json('Unauthorized user')
 
     const network = await Database.network.findOne({
       where: {
-        ...(isAdminOverriding ? {} : {creatorAddress: creator}),
+        ...(isAdminOverriding ? {} : { creatorAddress: creator }),
         networkAddress
       },
       include: [{ association: 'repositories' }]
     })
 
     if (!network) return res.status(404).json('Invalid network')
-    if (network.isClosed && !isAdminOverriding) return res.status(404).json('Invalid network')
+    if (network.isClosed && !isAdminOverriding)
+      return res.status(404).json('Invalid network')
 
     if (isClosed !== undefined) {
       network.isClosed = isClosed
@@ -230,7 +233,9 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
             )
       }
 
-    const removingRepos = repositoriesToRemove ? JSON.parse(repositoriesToRemove) : []
+    const removingRepos = repositoriesToRemove
+      ? JSON.parse(repositoriesToRemove)
+      : []
 
     if (removingRepos.length && !isAdminOverriding)
       for (const repository of removingRepos) {
@@ -256,26 +261,54 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
             )
       }
 
-    if (isAdminOverriding && name)
-      network.name = name
+    if (isAdminOverriding && name) network.name = name
 
     network.description = description
 
-    if (!isAdminOverriding)
-      network.colors = JSON.parse(colors)
+    if (!isAdminOverriding) network.colors = JSON.parse(colors)
 
     if (logoIconHash) network.logoIcon = logoIconHash
     if (fullLogoHash) network.fullLogo = fullLogoHash
 
     network.save()
 
-    if (addingRepos.length && !isAdminOverriding)
+    if (addingRepos.length && !isAdminOverriding) {
+      const octokitUser = new Octokit({
+        auth: accessToken
+      })
+
+      const invitations = []
+
       for (const repository of addingRepos) {
+        const [owner, repo] = repository.fullName.split('/')
+
+        const { data } = await octokitUser.rest.repos.addCollaborator({
+          owner,
+          repo,
+          username: process.env.NEXT_PUBLIC_BEPRO_GITHUB_USER
+        })
+
+        if (data?.id) invitations.push(data?.id)
+
         await Database.repositories.create({
           githubPath: repository.fullName,
           network_id: network.id
         })
       }
+
+      if (invitations.length) {
+        const octokitBot = new Octokit({
+          auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN
+        })
+
+        for (const invitation_id of invitations) {
+          if (invitation_id)
+            await octokitBot.rest.repos.acceptInvitationForAuthenticatedUser({
+              invitation_id
+            })
+        }
+      }
+    }
 
     if (removingRepos.length && !isAdminOverriding)
       for (const repository of removingRepos) {

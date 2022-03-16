@@ -5,11 +5,26 @@ import {Bus} from '@helpers/bus';
 import networkBeproJs from '@helpers/api/handle-network-bepro';
 import api from 'services/api'
 import twitterTweet from '@helpers/api/handle-twitter-tweet';
+import { Op } from 'sequelize'
+import { CONTRACT_ADDRESS } from 'env';
+
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const {fromBlock, id} = req.body;
+  const {fromBlock, id, networkName} = req.body;
+
+  const customNetwork = await models.network.findOne({
+    where: {
+      name: {
+        [Op.iLike]: String(networkName)
+      }
+    }
+  })
+
+  if (!customNetwork) return res.status(404).json('Invalid network')
+  if (customNetwork.isClosed) return res.status(404).json('Invalid network')
+
   const octokit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
 
-  const network = networkBeproJs({ test: true });
+  const network = networkBeproJs({ test: true, contractAddress: customNetwork.networkAddress });
 
   await network.start();
 
@@ -28,14 +43,17 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
                     const repoInfo = await models.repositories.findOne({where: {id: issue?.repository_id}})
                     const [owner, repo] = repoInfo.githubPath.split(`/`);
-                    await octokit.rest.issues.update({owner, repo, issue_number: +issueId, state: 'closed',});
+                    await octokit.rest.issues.update({owner, repo, issue_number: +issue.githubId, state: 'closed',});
                     issue.state = 'canceled';
-                    twitterTweet({
-                      type: 'bounty',
-                      action: 'changes',
-                      issuePreviousState: 'draft',
-                      issue
-                    })
+
+                    if (network.contractAddress === CONTRACT_ADDRESS)
+                      twitterTweet({
+                        type: 'bounty',
+                        action: 'changes',
+                        issuePreviousState: 'draft',
+                        issue
+                      })
+
                     await issue.save();
 
                     await api.post(`/seo/${issueId}`)

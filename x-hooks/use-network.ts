@@ -8,6 +8,8 @@ import { ThemeColors } from '@interfaces/network'
 import useApi from '@x-hooks/use-api'
 import { useNetwork } from '@contexts/network'
 
+import { BEPRO_NETWORK_NAME } from 'env'
+
 //Todo: useNetwork was moved to context, refactor this hooks to be a theme-hooks
 
 export default function useNetworkTheme() {
@@ -178,7 +180,7 @@ export default function useNetworkTheme() {
       pathname: `/[network]/${href}`.replace('//', '/'),
       query: {
         ...query,
-        network: query.network || network?.name
+        network: query.network || router?.query?.network || BEPRO_NETWORK_NAME
       }
     }
   }
