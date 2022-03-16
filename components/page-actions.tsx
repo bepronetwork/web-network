@@ -7,25 +7,21 @@ import { ApplicationContext } from "contexts/application";
 import { developer, IssueState, pullRequest } from "interfaces/issue-data";
 import { changeBalance } from "contexts/reducers/change-balance";
 import { addToast } from "contexts/reducers/add-toast";
-import { addTransaction } from "@reducers/add-transaction";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { updateTransaction } from "@reducers/update-transaction";
 import CreatePullRequestModal from "components/create-pull-request-modal";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import Button from "./button";
 import GithubLink from 'components/github-link';
 import {useRouter} from 'next/router';
 import useApi from 'x-hooks/use-api';
-import useTransactions from 'x-hooks/useTransactions';
-import LockedIcon from "assets/icons/locked-icon";
 import Translation from "./translation";
 import { useTranslation } from "next-i18next";
 import { useNetwork } from "contexts/network";
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 import { IForkInfo } from "interfaces/repos-list";
 import { Proposal } from "interfaces/proposal";
-import useBepro from "@x-hooks/use-bepro";
-import { useIssue } from "@contexts/issue";
+import useBepro from "x-hooks/use-bepro";
+import { useIssue } from "contexts/issue";
 
 interface pageActions {
   issueId: string;
@@ -91,16 +87,14 @@ export default function PageActions({
     dispatch,
     state: { githubHandle, currentAddress, myTransactions },
   } = useContext(ApplicationContext);
-  const {query: {repoId, id}} = useRouter();
-  const {createPullRequestIssue, waitForRedeem, waitForClose, processEvent, startWorking} = useApi();
-  const { t } = useTranslation(['common', 'pull-request', 'bounty'])
-  const {handleReedemIssue} = useBepro()
-  const {networkIssue} = useIssue()
   const [showPRModal, setShowPRModal] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
-
-  const txWindow = useTransactions();
+  const { t } = useTranslation(['common', 'pull-request', 'bounty'])
+  const {query: {repoId}} = useRouter();
   const { activeNetwork } = useNetwork()
+  const {handleReedemIssue} = useBepro()
+  const {createPullRequestIssue, startWorking} = useApi();
+  const {networkIssue} = useIssue()
 
   function renderIssueAvatars() {
     if (developers?.length > 0) return <IssueAvatars users={developers} />;
@@ -340,14 +334,6 @@ export default function PageActions({
 
               {renderRedeem()}
               {renderProposeDestribution()}
-              {state?.toLowerCase() == "pull request" && (
-                <>
-                  {!finalized && <ReadOnlyButtonWrapper><Button className="read-only-button mr-1" disabled={!canClose || isDisputable} onClick={handleClose}>
-                  {!canClose || isDisputable && <LockedIcon width={12} height={12} className="mr-1"/>}
-                    <span>{t('pull-request:actions.merge.title')}</span>
-                    </Button></ReadOnlyButtonWrapper> || ``}
-                </>
-              )}
 
               {renderViewPullrequest()}
 

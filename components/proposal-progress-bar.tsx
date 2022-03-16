@@ -3,7 +3,7 @@ import {formatNumberToNScale, formatNumberToString} from '@helpers/formatNumber'
 import Translation from './translation';
 import { ApplicationContext } from '@contexts/application';
 
-export default function ProposalProgressBar({isDisputed = null, issueDisputeAmount = 0, isFinished = false, isCurrentPRMerged=false}) {
+export default function ProposalProgressBar({isDisputed = null, issueDisputeAmount = 0, isFinished = false, isMerged=false}) {
   const { state: {beproStaked: stakedAmount}, } = useContext(ApplicationContext);
   const [issueState, setIssueState] = useState<string>(``);
   const [issueColor, setIssueColor] = useState<string>(``);
@@ -21,10 +21,10 @@ export default function ProposalProgressBar({isDisputed = null, issueDisputeAmou
 
   function getStateColor() {
 
-    if (isDisputed || (!isCurrentPRMerged && isFinished === true))
+    if (isDisputed || (!isMerged && isFinished === true))
       return `danger`
 
-    if (isDisputed === false && isFinished === true && isCurrentPRMerged)
+    if (isDisputed === false && isFinished === true && isMerged)
       return 'success'
 
     if (isDisputed === false)
@@ -34,13 +34,13 @@ export default function ProposalProgressBar({isDisputed = null, issueDisputeAmou
   }
 
   function getStateText() {
-    if (isDisputed === true || (!isCurrentPRMerged && isFinished === true))
+    if (isDisputed === true || (!isMerged && isFinished === true))
       return `Failed`
 
     if (isDisputed === false && isFinished === false)
       return `Open for dispute`;
     
-    if (isDisputed === false && isFinished === true && isCurrentPRMerged)
+    if (isDisputed === false && isFinished === true && isMerged)
       return `Accepted`;
 
     return `Waiting`;
