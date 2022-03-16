@@ -24,6 +24,8 @@ import { useNetwork } from "contexts/network";
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 import { IForkInfo } from "interfaces/repos-list";
 import { Proposal } from "interfaces/proposal";
+import useBepro from "@x-hooks/use-bepro";
+import { useIssue } from "@contexts/issue";
 
 interface pageActions {
   issueId: string;
@@ -92,7 +94,8 @@ export default function PageActions({
   const {query: {repoId, id}} = useRouter();
   const {createPullRequestIssue, waitForRedeem, waitForClose, processEvent, startWorking} = useApi();
   const { t } = useTranslation(['common', 'pull-request', 'bounty'])
-
+  const {handleReedemIssue} = useBepro()
+  const {networkIssue} = useIssue()
   const [showPRModal, setShowPRModal] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
 
@@ -134,45 +137,11 @@ export default function PageActions({
     ].some((values) => values === false);
 
   async function handleRedeem() {
-    const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue }, activeNetwork);
-    dispatch(redeemTx);
-    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
-
-    waitForRedeem(issueId, activeNetwork?.name)
-      .then(() => {
-        if (handleBeproService)
-          handleBeproService(true);
-
-        if (handleMicroService)
-          handleMicroService(true);
-      })
-
-    await BeproService.login()
-      .then(() => {
-        BeproService.network.redeemIssue(issue_id)
-                    .then((txInfo) => {
-                      processEvent(`redeem-issue`, txInfo.blockNumber, issue_id);
-                      txWindow.updateItem(redeemTx.payload.id, BeproService.parseTransaction(txInfo, redeemTx.payload));
-                      // return BeproService.parseTransaction(txInfo, redeemTx.payload)
-                      //                    .then((block) => dispatch(updateTransaction(block)))
-                    })
-                    .then(() => {
-                      BeproService.getBalance("bepro")
+    handleReedemIssue(networkIssue._id).then(()=>{
+      //TODO: Move to useAuth balance;
+      BeproService.getBalance("bepro")
                                   .then((bepro) => dispatch(changeBalance({ bepro })))
-                    })
-                    // .then(() => { handleBeproService(); handleMicroService(); })
-                    .catch((err) => {
-                      if (err?.message?.search(`User denied`) > -1)
-                        dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
-                      else dispatch(updateTransaction({...redeemTx.payload as any, status: TransactionStatus.failed}));
-                      console.error(`Error redeeming`, err);
-                    })
-      }).catch((err) => {
-        if (err?.message?.search(`User denied`) > -1)
-          dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
-        else dispatch(updateTransaction({...redeemTx.payload as any, status: TransactionStatus.failed}));
-        console.error(`Error logging in`, err);
-      })
+    })
   }
 
   const renderRedeem = () => {
@@ -182,7 +151,7 @@ export default function PageActions({
       !finalized && (
         <ReadOnlyButtonWrapper>
           <Button
-          className="read-only-button"
+          className="read-only-button me-1"
             disabled={isReedemButtonDisable()}
             onClick={handleRedeem}
           >

@@ -39,7 +39,6 @@ export default function IssueProposals({
             key={proposal.id}
             proposal={proposal}
             issue={issue}
-            onDispute={()=>{}}
             isFinalized={networkIssue?.finalized}
             isDisputable={
               isProposalDisputable(proposal?.createdAt, disputableTime) &&

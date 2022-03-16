@@ -6,12 +6,11 @@ import networkBeproJs from '@helpers/api/handle-network-bepro';
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {fromBlock, id, pullRequestId: githubId} = req.body;
 
-  const network = networkBeproJs({ test: true });
+  const network = networkBeproJs({});
 
   await network.start();
 
   await network.getMergeProposalCreatedEvents({fromBlock, toBlock: +fromBlock+1, filter: {id},})
-  // await contract.getPastEvents(`MergeProposalCreated`, {fromBlock, toBlock: +fromBlock+1,})
                 .then(events => {readMergeProposalCreated(events, {network, models, res, githubId})})
                 .catch(error => {
                   console.log(`Error reading MergeProposalCreated`, error);

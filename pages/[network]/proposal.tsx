@@ -34,7 +34,7 @@ export default function PageProposal() {
   const {t} = useTranslation();
   const { getUserOf, mergeClosedIssue } = useApi();
   const {handlerDisputeProposal, handleCloseIssue} = useBepro()
-  const { activeIssue, networkIssue } = useIssue();
+  const { activeIssue, networkIssue, getNetworkIssue } = useIssue();
   const {activeNetwork} = useNetwork()
   const [proposal, setProposal] = useState<Proposal>({} as Proposal);
   const [networkProposal, setNetworkProposal] = useState<INetworkProposal>({} as INetworkProposal);
@@ -71,6 +71,14 @@ export default function PageProposal() {
       });
     
   }
+
+  async function disputeProposal() {
+    handlerDisputeProposal(+networkProposal?._id, +proposal?.scMergeId)
+    .then(()=>{
+      getNetworkIssue();
+    })
+  }
+
   async function loadUsersDistribution() {
     if (networkProposal?.prAddresses?.length < 1 || networkProposal?.prAmounts?.length < 1)
       return;
@@ -127,8 +135,8 @@ export default function PageProposal() {
             proposal={proposal}
             networkProposal={networkProposal}
             currentPullRequest={pullRequest}
-            onMerge={() => closeIssue()}
-            onDispute={() => handlerDisputeProposal(+networkProposal?._id, +proposal?.scMergeId)}
+            onMerge={closeIssue}
+            onDispute={disputeProposal}
           />
         </div>
       </CustomContainer>

@@ -48,7 +48,6 @@ export const IssueProvider: React.FC = function ({ children }) {
     const prIndex =  pullRequests.findIndex(pr=> pr.id === prId)
     const newPr = {...pullRequests[prIndex], comments: [...pullRequests[prIndex].comments, comment]} as pullRequest;
     pullRequests[prIndex] = newPr;
-    debugger;
     setActiveIssue((oldState)=>({...oldState, pullRequests}))
   },[activeIssue])
 

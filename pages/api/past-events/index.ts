@@ -11,7 +11,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const bulk = await models.chainEvents.findOne({where: {name: `Bulk`}});
   const fromBlock = bulk?.dataValues?.lastBlock || 1731488;
 
-  const network = networkBeproJs({ test: true });
+  const network = networkBeproJs({});
 
   await network.start();
   const web3 = network.web3;
