@@ -33,7 +33,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     if (!pullRequest) return res.status(404).json('Pull Request not found')
 
-    const network = networkBeproJs({ test: true, contractAddress: customNetwork.networkAddress });
+    const network = networkBeproJs({ contractAddress: customNetwork.networkAddress });
 
     await network.start()
 

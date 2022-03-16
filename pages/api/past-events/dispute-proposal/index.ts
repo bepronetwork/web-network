@@ -19,12 +19,11 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   if (!customNetwork) return res.status(404).json('Invalid network')
   if (customNetwork.isClosed) return res.status(404).json('Invalid network')
 
-  const network = networkBeproJs({ test: true, contractAddress: customNetwork.networkAddress });
+  const network = networkBeproJs({contractAddress: customNetwork.networkAddress });
 
   await network.start();
-  const contract = await network.getWeb3Contract();
 
-  await contract
+  await network.contract.self
     .getPastEvents(`DisputeMerge`, {
       fromBlock,
       toBlock: +fromBlock + 1,
@@ -34,7 +33,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       for (const event of events) {
         const eventData = event.returnValues;
         const issueId = await network
-          .getIssueById({ issueId: eventData.id })
+          .getIssueById(eventData.id)
           .then(({ cid }) => cid);
         const issue = await models.issue.findOne({ where: { issueId } });
 

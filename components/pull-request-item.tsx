@@ -3,13 +3,13 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { getTimeDifferenceInWords } from '@helpers/formatDate'
 
-import LockedIcon from '@assets/icons/locked-icon'
+import LockedIcon from 'assets/icons/locked-icon'
 
 import Button from '@components/button'
 import Avatar from '@components/avatar'
 import Translation from '@components/translation'
 import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper'
-import PullRequestLabels, { PRLabel } from '@components/pull-request-labels'
+import PullRequestLabels from '@components/pull-request-labels'
 
 import { useAuthentication } from '@contexts/authentication'
 
@@ -17,13 +17,18 @@ import { formatNumberToNScale } from '@helpers/formatNumber'
 
 import useOctokit from '@x-hooks/use-octokit'
 import useNetwork from '@x-hooks/use-network'
+import { IActiveIssue } from '@contexts/issue'
+import { pullRequest } from '@interfaces/issue-data'
+
+interface IPullRequestItem {
+  issue: IActiveIssue;
+  pullRequest: pullRequest;
+}
 
 export default function PullRequestItem({
-  repoId,
-  issueId,
+  issue,
   pullRequest,
-  repositoryPath
-}) {
+}:IPullRequestItem) {
 
   const router = useRouter()
   const { getCommitsOfPr, getCommit } = useOctokit()
@@ -36,9 +41,9 @@ export default function PullRequestItem({
   function handleReviewClick() {
     router.push(
       getURLWithNetwork('/pull-request', {
-        repoId,
-        issueId,
-        prId: pullRequest.githubId,
+        id: issue?.githubId,
+        repoId: issue?.repository_id,
+        prId: pullRequest?.githubId,
         review: true
       })
     )
@@ -48,21 +53,13 @@ export default function PullRequestItem({
     return pullRequest?.state === 'open' && !!user?.login
   }
 
-  function getLabel(): PRLabel{
-    if(pullRequest.merged) return 'merged';
-    if(pullRequest.isMergeable) return 'ready to merge';
-    //isMergeable can be null;
-    if(pullRequest.isMergeable === false) return 'conflicts';
-  }
-
-  const label = getLabel()
-
   async function getPullRequestInfo() {
     try {
+      const repositoryPath = issue.repository.githubPath
       const [owner, repo] = repositoryPath.split('/')
       let lines = 0
       
-      const { data } = await getCommitsOfPr(pullRequest?.githubId, repositoryPath)
+      const { data } = await getCommitsOfPr(+pullRequest?.githubId, repositoryPath)
       
       for(const commit of data) {
         const {data: { stats }} = await getCommit(owner, repo, commit.sha)
@@ -76,10 +73,11 @@ export default function PullRequestItem({
   }
 
   useEffect(() => {
-    if (!pullRequest || !repositoryPath) return
+    if (pullRequest){
+      getPullRequestInfo()
+    }
     
-    getPullRequestInfo()
-  }, [repositoryPath])
+  }, [pullRequest])
   
   return (
     <>
@@ -87,9 +85,9 @@ export default function PullRequestItem({
         <Link
           passHref
           href={getURLWithNetwork('/pull-request', {
-            repoId,
-            issueId,
-            prId: pullRequest.githubId
+            id: issue?.githubId,
+            repoId: issue?.repository_id,
+            prId: pullRequest?.githubId,
           })}
         >
           <a className="text-decoration-none text-white">
@@ -101,7 +99,7 @@ export default function PullRequestItem({
                   {pullRequest?.githubLogin}
                 </span>
                 <div className='ml-3 d-flex'>
-                  {label && <PullRequestLabels label={label}/>}
+                  <PullRequestLabels merged={pullRequest.merged} isMergeable={pullRequest.isMergeable} />
                 </div>
               </div>
 

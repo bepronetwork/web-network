@@ -24,7 +24,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     if (!customNetwork.name) return
 
     console.log(`Moving issues of ${customNetwork.name} - ${customNetwork.networkAddress} to OPEN`)
-    const network = networkBeproJs({ test: true, contractAddress: customNetwork.networkAddress });
+    const network = networkBeproJs({ contractAddress: customNetwork.networkAddress });
 
     await network.start();
     const redeemTime = (await network.redeemTime()) * 1000;

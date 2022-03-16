@@ -1,4 +1,4 @@
-export const handlePercentage = (value: number, total: number) => (value * 100) / total;
+export const handlePercentage = (value: number, total: number, fixValue = 0): number => +((value / total)* 100).toFixed(fixValue);;
 
 export const handlePercentToRange = (ammount: number, total: number, percentage: number) => (ammount / (total * (percentage/100))) * 100;
 

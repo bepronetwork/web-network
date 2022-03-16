@@ -386,7 +386,7 @@ li {
     cursor: pointer;
   }
 }
-
+// Remove: After update all headers
 .banner {
   width: 100%;
   min-height: 240px;
@@ -402,10 +402,31 @@ li {
   }
 }
 
+.banner-shadow{
+  width: 100%;
+  min-height: 164px;
+  background-color: var(--bs-shadow);
+  color: $white;
+  padding-top: ($navbar-height + $m + 4);
+  padding-bottom: $m+4;
+}
+
+// Remove: After update all headers
 .top-border {
   padding-top: $m;
   margin-top: $m;
   border-top: 4px solid $white;
+}
+
+
+// Todo: check if can move to boostrap
+.price-conversor{
+  &:hover{
+    background-color: var(--bs-primary)!important;;
+    >span{
+      color: var(--bs-white)!important;
+    }
+  }
 }
 
 .list-item {
@@ -427,18 +448,6 @@ li {
     }
   }
 
-}
-
-.list-item-proposal {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  transition: 0.8 ease-in-out;
-  &:hover {
-    background-color: lighten($bg-shadow, 2);
-    .h4 {
-      color: $white;
-    }
-  }
 }
 
 .content-wrapper {
@@ -480,20 +489,6 @@ li {
 
   &:nth-child(odd){
     background-color: $dark-gray;
-  }
-}
-
-.content-proposals {
-  padding: $m * 2;
-  border-radius: math.div($m, 2);
-  &.child {
-    padding: $m;
-  }
-  .content-list-item {
-    margin-left: -$m*2;
-    margin-right: -$m*2;
-    padding: $m $m * 2;
-    border-top: 2px solid rgba($black, 0.2);
   }
 }
 
@@ -555,9 +550,7 @@ label {
   }
 }
 
-// Utils
-.mt-up { margin-top: -$m*3; }
-
+// Todo: Update to boostrap class and remove these
 .mr-0 { margin-right: 0px !important }
 .mr-1 { margin-right: math.div($m, 2) }
 .mr-2 { margin-right: $m }
@@ -566,29 +559,6 @@ label {
 .ml-1 { margin-left: math.div($m, 2) }
 .ml-2 { margin-left: $m }
 .ml-3 { margin-left: $m*2 }
-
-// .mt-0 { margin-top: 0px !important }
-// .mt-1 { margin-top: math.div($m, 2) }
-// .mt-2 { margin-top: $m }
-// .mt-3 { margin-top: $m*2 }
-// .mb-0 { margin-bottom: 0px !important }
-// .mb-1 { margin-bottom: math.div($m, 2) }
-// .mb-2 { margin-bottom: $m }
-// .mb-3 { margin-bottom: $m*2 }
-
-// .pr-1 { padding-right: math.div($m, 2) }
-// .pr-2 { padding-right: $m }
-// .pr-3 { padding-right: $m*2 }
-// .pl-1 { padding-left: math.div($m, 2) }
-// .pl-2 { padding-left: $m }
-// .pl-3 { padding-left: $m*2 }
-
-// .pt-1 { padding-top: math.div($m, 2) }
-// .pt-2 { padding-top: $m }
-// .pt-3 { padding-top: $m*2 }
-// .pb-1 { padding-bottom: math.div($m, 2) }
-// .pb-2 { padding-bottom: $m }
-// .pb-3 { padding-bottom: $m*2 }
 
 .end-94{
   left: 94%;
@@ -641,7 +611,6 @@ label {
 }
 
 // Overrides
-
 .proposal, .proposal-progress-bar {
   .text-danger {
     color: rgba(var(--bs-danger-rgb), 1) !important;
@@ -751,65 +720,14 @@ label {
   width: 2px;
 }
 
-.progress-ball{
-  position: absolute;
-  height: 10px;
-  width: 10px;
-  border-radius: 10px;
-  background-color: $dark-gray;
-  &.left {
-    left: 0;
-  }
-  &.right {
-    right: 1rem;
-  }
-}
-
-
-.step{
-  top: -10%;
- &-0{
-   left: 0% !important;
- }
- &-20{
-   left: 25% !important;
- }
- &-40{
-   left: 50% !important;
-   right: 50% !important;
- }
- &-80{
-   right: 25% !important;
- }
- &-100{
-   right: 0% !important;
- }
-
-}
-
-.step-dots{
-  width: 20px;
-  height: 20px;
-}
-
-.content-relative {
-  position: relative;
-}
-
-.user-block-progress {
-  padding: $m;
-  border-bottom: 6px solid $purple;
-  border-radius: 6px;
-}
-
 .material-icons {
   &.md-small { font-size: 16px; }
   &.md-medium { font-size: 24px; }
   &.md-large { font-size: 44px; }
   &.md-larger { font-size: 64px; }
 }
-// Popovers
 
+// Popovers
 #transaction-popover{
   border:none;
   background-color: transparent;
@@ -854,6 +772,7 @@ label {
     }
   }
 }
+
 #change-network-modal{
   .modal-content{
     background-color: $bg-shadow;
@@ -983,14 +902,6 @@ $c_props: ('m': 'margin') !default;
   }
 }
 
-.bg-black {
-  background-color: $black;
-}
-
-.color-blue {
-  color: var(--bs-primary)-dark;
-}
-
 .bg-main-image {
   background: url('/images/bg-main.png') no-repeat center center fixed;
   -webkit-background-size: cover;
@@ -1017,31 +928,6 @@ $c_props: ('m': 'margin') !default;
       color: var(--bs-primary);
     }
   }
-}
-
-.list-group-item-shadow {
-  background-color: $black;
-  color: var(--bs-gray);
-  border-bottom-color: $dark-gray;
-
-  &:last-child {
-    border-bottom-color: $black;
-  }
-
-  &.list-group-item-action {
-    &:hover,&:focus {
-      color: $white;
-      background-color: $dark-gray;
-    }
-  }
-}
-
-.rounded-4 {
-  border-radius: .5rem;
-}
-
-.rounded-8 {
-  border-radius: math.div($m, 2);
 }
 
 .w-20 {
@@ -1201,10 +1087,6 @@ textarea.form-control {
     }
   }
 
-  .pl-0 {
-    padding-left: 0 !important;
-  }
-
   button {
     border: 2px solid transparent;
 
@@ -1251,6 +1133,7 @@ textarea.form-control {
     margin: 0;
   }
 }
+
 
 .sticky-bounty {
   position: sticky;

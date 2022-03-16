@@ -1,4 +1,8 @@
 {
-  "title": "Create Bounty Distributions",
+  "title": "Bounties ready to propose",
+  "subtitle": "Use your *ORACLES* to create bounty distributions within the Network",
+  "ready-bountys": "Ready Bounties",
+  "council-members": "Council Members",
+  "distributed-developers": "Distributed to developers",
   "empty": "No bounties ready to propose"
 }

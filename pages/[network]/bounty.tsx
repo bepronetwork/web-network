@@ -4,26 +4,24 @@ import { GetServerSideProps } from 'next/types';
 import React, { useEffect, useState } from 'react';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
-import IssueHero from '@components/issue-hero';
-import Translation from '@components/translation';
-import PageActions from '@components/page-actions';
-import IssueComments from '@components/issue-comments';
-import IssueProposals from '@components/issue-proposals';
-import CustomContainer from '@components/custom-container';
-import TabbedNavigation from '@components/tabbed-navigation';
-import IssueDescription from '@components/issue-description';
-import IssuePullRequests from '@components/issue-pull-requests';
-import IssueProposalProgressBar from '@components/issue-proposal-progress-bar';
+import BountyHero from 'components/bounty-hero';
+import Translation from 'components/translation';
+import PageActions from 'components/page-actions';
+import IssueComments from 'components/issue-comments';
+import IssueProposals from 'components/issue-proposals';
+import CustomContainer from 'components/custom-container';
+import TabbedNavigation from 'components/tabbed-navigation';
+import IssueDescription from 'components/issue-description';
+import IssuePullRequests from 'components/issue-pull-requests';
+import IssueProposalProgressBar from 'components/issue-proposal-progress-bar';
 
-import { useRepos } from '@contexts/repos';
-import { useIssue } from '@contexts/issue';
-import { useAuthentication } from '@contexts/authentication';
+import { useRepos } from 'contexts/repos';
+import { useIssue } from 'contexts/issue';
+import { useAuthentication } from 'contexts/authentication';
 
-import { formatNumberToCurrency } from '@helpers/formatNumber';
-
-import useApi from '@x-hooks/use-api';
-import useOctokit from '@x-hooks/use-octokit';
-import useMergeData from '@x-hooks/use-merge-data';
+import useApi from 'x-hooks/use-api';
+import useOctokit from 'x-hooks/use-octokit';
+import useMergeData from 'x-hooks/use-merge-data';
 
 export default function PageIssue() {
   const router = useRouter();
@@ -52,14 +50,8 @@ export default function PageIssue() {
       isEmpty: !(networkIssue?.mergeProposalAmount > 0),
       component: <IssueProposals
         key="tab-proposals"
-        metaProposals={issue?.mergeProposals}
-        metaRequests={issue?.pullRequests}
-        numberProposals={networkIssue?.mergeProposalAmount}
-        issueId={issue?.issueId}
-        dbId={issue?.id}
-        amount={networkIssue?.tokensStaked}
-        isFinalized={networkIssue?.finalized}
-        mergedProposal={issue?.merged}
+        issue={issue}
+        networkIssue={networkIssue}
         className="border-top-0"
       />,
       description: t('description_proposal')
@@ -68,7 +60,7 @@ export default function PageIssue() {
       eventKey: 'pull-requests',
       isEmpty: !(mergedPullRequests.length > 0),
       title: <Translation ns="pull-request" label={'labelWithCount'} params={{count: mergedPullRequests.length || 0}} />,
-      component: <IssuePullRequests key="tab-pull-requests" repositoryPath={issue?.repository?.githubPath} className="border-top-0" repoId={issue?.repository_id} issueId={issue?.issueId} pullResquests={mergedPullRequests} />,
+      component: <IssuePullRequests key="tab-pull-requests" className="border-top-0"  issue={issue}/>,
       description: t('description_pull-request')
     }
   ]
@@ -121,7 +113,7 @@ export default function PageIssue() {
 
   function refreshIssue(){
     updateIssue(`${issue.repository_id}`, issue.githubId)
-    .catch((e)=> router.push('/404'))
+    .catch(()=> router.push('/404'))
   }
 
   useEffect(syncLocalyState,[issue, activeRepo])
@@ -131,10 +123,7 @@ export default function PageIssue() {
 
   return (
     <>
-      <IssueHero
-        amount={formatNumberToCurrency(issue?.amount || networkIssue?.tokensStaked)}
-        state={issue?.state}
-        issue={issue} />
+      <BountyHero/>
       <PageActions
         state={issue?.state}
         developers={issue?.developers}
@@ -187,13 +176,9 @@ export default function PageIssue() {
           </div>
         </div>
       ) : (
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col-md-10">
-              <IssueDescription description={issue?.body || ''} />
-            </div>
-          </div>
-        </div>
+        <CustomContainer>
+          <IssueDescription description={issue?.body || ''} />
+        </CustomContainer>
       )}
       <IssueComments comments={commentsIssue} repo={issue?.repository?.githubPath} issueId={id} />
     </>

@@ -1,5 +1,6 @@
 {
   "label": "Pull Request",
+  "title": "Pull Request",
   "label_one": "pull request",
   "label_other": "pull requests",
   "labelWithCount_one": "{{count}} pull request",

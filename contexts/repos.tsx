@@ -144,7 +144,7 @@ export const ReposProvider: React.FC = function ({ children }) {
       
       const [branchs, forks] = await Promise.all([
         findBranch(+findedRepo?.id, !noExpired),
-        findForks(findedRepo?.id, !noExpired),
+        findForks(+findedRepo?.id, !noExpired),
       ]);
 
       const newActiveRepo = {

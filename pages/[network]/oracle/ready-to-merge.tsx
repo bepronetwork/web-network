@@ -9,7 +9,7 @@ export default function ReadyToMergeIssues() {
   const { t } = useTranslation(['common', 'bounty'])
 
   return (
-    <Oracle buttonPrimaryActive={false}>
+    <Oracle>
       <ListIssues
         filterState="ready"
         emptyMessage={t('bounty:errors.no-bounties-to-merge')}

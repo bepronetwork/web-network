@@ -32,7 +32,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     let cEnd = 0
 
     console.log(`Reading past events of ${customNetwork.name} - ${customNetwork.networkAddress}`)
-    const network = networkBeproJs({ test: true, contractAddress: customNetwork.networkAddress });
+    const network = networkBeproJs({ contractAddress: customNetwork.networkAddress });
 
     await network.start();
     const web3 = network.web3;
