@@ -97,7 +97,7 @@ export default function NewProposal({
   const [isCouncil, setIsCouncil] = useState(false);
   const [councilAmount, setCouncilAmount] = useState(0);
   const [currentGithubId, setCurrentGithubId] = useState<string>();
-  const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [proposals, setProposals] = useState<any[]>([]);
   const {getParticipants} = useOctokit();
   const {getUserWith, waitForMerge, processMergeProposal, processEvent} = useApi();
   const txWindow = useTransactions();
@@ -184,7 +184,7 @@ export default function NewProposal({
               address: value.toLowerCase()
             }))
           })
-         })
+        })
 
       if(isSameProposal(currentDistrbuition, currentProposals)){
         handleInputColor("warning")
