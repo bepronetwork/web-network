@@ -73,7 +73,7 @@ export default function PageProposal() {
   }
 
   async function disputeProposal() {
-    handlerDisputeProposal(+networkProposal?._id, +proposal?.scMergeId)
+    handlerDisputeProposal(+networkIssue?._id, +proposal?.scMergeId)
     .then(()=>{
       getNetworkIssue();
     })

@@ -32,7 +32,7 @@ export default function ProposalItem({
   const { networkIssue, getNetworkIssue } = useIssue();
   const {handlerDisputeProposal} = useBepro()
   const { getURLWithNetwork } = useNetworkTheme();
-  const networkProposals = networkIssue?.networkProposals?.[proposal?.id] || [];
+  const networkProposals = networkIssue?.networkProposals?.[proposal?.id];
 
   async function handleDispute() {
     if (!isDisputable || isFinalized) return;
@@ -108,7 +108,7 @@ export default function ProposalItem({
               <div className="col-9 offset-1 text-white">
                 <ProposalProgressSmall
                   pgClass={`${getColors()}`}
-                  value={+networkProposals.disputes}
+                  value={+networkProposals?.disputes}
                   total={beproStaked}
                   textClass={`pb-2 text-${getColors()}`}
                 />
@@ -118,7 +118,7 @@ export default function ProposalItem({
                 <ReadOnlyButtonWrapper>
                   <Button
                     color={getColors()}
-                    disabled={!isDisputable}
+                    disabled={!isDisputable || !networkProposals}
                     outline={!isDisputable}
                     className={`align-self-center mb-2 ms-3 read-only-button`}
                     onClick={(ev) => {

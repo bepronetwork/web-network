@@ -33,7 +33,7 @@ export default function IssueProposals({
 
   return (
     <div className={`content-wrapper ${className || ""} pt-0 pb-0`}>
-      {issue?.mergeProposals.length > 0 && React.Children.toArray(
+      {issue?.mergeProposals?.length > 0  && networkIssue?.networkProposals?.length > 0 && React.Children.toArray(
         issue?.mergeProposals?.map((proposal) => (
           <ProposalItem
             key={proposal.id}
