@@ -17,6 +17,7 @@ import CustomContainer from '@components/custom-container'
 import ScrollTopButton from '@components/scroll-top-button'
 import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper'
 
+import { useNetwork } from '@contexts/network'
 import { ApplicationContext } from '@contexts/application'
 import { changeLoadState } from '@contexts/reducers/change-load-state'
 
@@ -26,7 +27,6 @@ import useApi from '@x-hooks/use-api'
 import usePage from '@x-hooks/use-page'
 import useSearch from '@x-hooks/use-search'
 import useNetworkTheme from '@x-hooks/use-network'
-import { useNetwork } from '@contexts/network'
 
 type Filter = {
   label: string
@@ -270,8 +270,8 @@ export default function ListIssues({
       {(truncatedData && (
         <div className="row justify-content-center mb-3 pt-5">
           <div className="d-flex col-6 align-items-center justify-content-center">
-            <span className="caption-small mr-1">results truncated</span>
-            <Button onClick={goToFirstPage}>back to top</Button>
+            <span className="caption-small mr-1">{t('errors.results-truncated')}</span>
+            <Button onClick={goToFirstPage}>{t('actions.back-to-top')}</Button>
           </div>
         </div>
       )) || <></>}

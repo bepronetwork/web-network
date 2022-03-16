@@ -1,46 +1,56 @@
-import Avatar from '@components/avatar';
-import metamaskLogo from '@assets/metamask.png';
-import Image from 'next/image';
-import React, {useContext, useEffect, useState} from 'react';
-import {ApplicationContext} from '@contexts/application';
-import {signOut, useSession, signIn, getSession} from 'next-auth/react';
-import {changeGithubHandle} from '@reducers/change-github-handle';
-import {changeGithubLogin} from '@reducers/change-github-login';
-import GithubImage from '@components/github-image';
-import {changeLoadState} from '@reducers/change-load-state';
-import {toastError, toastSuccess} from '@reducers/add-toast';
-import {useRouter} from 'next/router';
-import {truncateAddress} from '@helpers/truncate-address';
-import {BeproService} from '@services/bepro-service';
-import {changeWalletState} from '@reducers/change-wallet-connect';
-import {changeCurrentAddress} from '@reducers/change-current-address';
-import CheckMarkIcon from '@assets/icons/checkmark-icon';
-import LockedIcon from '@assets/icons/locked-icon'
-import ErrorMarkIcon from '@assets/icons/errormark-icon';
-import {changeNetwork} from '@reducers/change-network';
-import {NetworkIds} from '@interfaces/enums/network-ids';
-import Button from '@components/button';
-import useApi from '@x-hooks/use-api';
-import { CustomSession } from '@interfaces/custom-session';
-import {GetServerSideProps} from 'next';
-import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
-import { useTranslation } from 'next-i18next';
-import useNetwork from '@x-hooks/use-network';
+import Image from 'next/image'
+import { useRouter } from 'next/router'
+import { GetServerSideProps } from 'next'
+import { useTranslation } from 'next-i18next'
+import React, { useContext, useEffect, useState } from 'react'
+import { signOut, useSession, signIn } from 'next-auth/react'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
+import metamaskLogo from '@assets/metamask.png'
+import LockedIcon from '@assets/icons/locked-icon'
+import CheckMarkIcon from '@assets/icons/checkmark-icon'
+import ErrorMarkIcon from '@assets/icons/errormark-icon'
+
+import Button from '@components/button'
+import Avatar from '@components/avatar'
+import GithubImage from '@components/github-image'
+
+import { ApplicationContext } from '@contexts/application'
+import { useAuthentication } from '@contexts/authentication'
+
+import { truncateAddress } from '@helpers/truncate-address'
+
+import { NetworkIds } from '@interfaces/enums/network-ids'
+
+import { changeNetwork } from '@reducers/change-network'
+import { changeLoadState } from '@reducers/change-load-state'
+import { toastError, toastSuccess } from '@reducers/add-toast'
+import { changeGithubLogin } from '@reducers/change-github-login'
+import { changeGithubHandle } from '@reducers/change-github-handle'
+import { changeWalletState } from '@reducers/change-wallet-connect'
+import { changeCurrentAddress } from '@reducers/change-current-address'
+
+
+import { BeproService } from '@services/bepro-service'
+
+import useApi from '@x-hooks/use-api'
+import useNetwork from '@x-hooks/use-network'
 
 export default function ConnectAccount() {
-  const {state: {currentAddress}, dispatch} = useContext(ApplicationContext);
-  const [lastAddressBeforeConnect, setLastAddressBeforeConnect] = useState(``);
-  const [isGhValid, setIsGhValid] = useState(null)
-  const [githubLogin, setGithubLogin] = useState(null)
-  const [userAcessToken, setUserAcessToken] = useState<string>("")
-  const {data: session} = useSession();
-  const router = useRouter();
-  const { migrate } = router.query;
-  const {getUserOf, joinAddressToUser, getUserWith} = useApi();
+  const router = useRouter()
+  const {data: session} = useSession()
   const { t } = useTranslation(['common', 'connect-account'])
-  const { network, getURLWithNetwork } = useNetwork()
 
+  const [isGhValid, setIsGhValid] = useState(null)
+  const [lastAddressBeforeConnect, setLastAddressBeforeConnect] = useState(``)
+  
+  const {getUserOf, joinAddressToUser, getUserWith} = useApi()
+
+  const { wallet, user } = useAuthentication()
+  const { network, getURLWithNetwork } = useNetwork()
+  const { dispatch } = useContext(ApplicationContext)
+  
+  const { migrate } = router.query
 
   function updateLastUsedAddress() {
     dispatch(changeLoadState(false));
@@ -48,26 +58,21 @@ export default function ConnectAccount() {
   }
 
   async function checkAddressVsGh() {
-    if (!currentAddress)
+    if (!wallet?.address || !user?.login)
       return;
 
-    const user = await getUserWith(githubLogin);
+    const validatingUser = await getUserWith(user?.login);
 
-    if (user && user.address && user.address !== currentAddress.toLowerCase()) {
-      dispatch(toastError(t('connect-account:errors.migrating-address-not-match', { address: truncateAddress(user.address)}), undefined, {delay: 10000}));
+    if (validatingUser && validatingUser.address && validatingUser.address !== wallet?.address.toLowerCase()) {
+      dispatch(toastError(t('connect-account:errors.migrating-address-not-match', { address: truncateAddress(validatingUser.address)}), undefined, {delay: 10000}));
       setIsGhValid(false)
       return;
     }
 
-    getUserOf(currentAddress)
+    getUserOf(wallet?.address)
                       .then(user => {
                         setIsGhValid(user && user.githubHandle === (session?.user.name || (session?.user as any)?.login) || true)
 
-                        if (user?.githubLogin)
-                          setGithubLogin(user.githubLogin);
-
-                        if (user?.accessToken)
-                          setUserAcessToken(user.accessToken)
 
                         if (!user)
                           return;
@@ -75,7 +80,7 @@ export default function ConnectAccount() {
                         if (!isGhValid)
                           return;
 
-                        if(user.address === currentAddress )
+                        if(user.address === wallet?.address )
                           return router.push(getURLWithNetwork('/account'))
                       })
   }
@@ -87,21 +92,21 @@ export default function ConnectAccount() {
   async function joinAddressToGh() {
     dispatch(changeLoadState(true));
 
-    const user = await getUserOf(currentAddress);
+    const validatingUser = await getUserOf(wallet?.address);
 
-    if (user && (user.githubHandle || user.accessToken.toLowerCase() !== userAcessToken.toLowerCase())) {
+    if (validatingUser && (validatingUser.githubHandle || validatingUser.accessToken.toLowerCase() !== user?.accessToken.toLowerCase())) {
 
       dispatch(changeLoadState(false));
       return dispatch(toastError(t('connect-account:errors.migrating-already-happened')));
     }
 
-    joinAddressToUser(session.user.name||githubLogin,{ address: currentAddress.toLowerCase(), migrate: !!migrate })
+    joinAddressToUser(session.user.name || user?.login,{ address: wallet?.address.toLowerCase(), migrate: !!migrate })
                       .then((result) => {
                         if (result === true) {
                           dispatch(toastSuccess(t('connect-account:connected-accounts')))
                           dispatch(changeLoadState(false));
-                          dispatch(changeGithubHandle(session.user.name||githubLogin))
-                          dispatch(changeGithubLogin(githubLogin))
+                          dispatch(changeGithubHandle(session.user.name || user?.login))
+                          dispatch(changeGithubLogin(user?.login))
                           return router.push(getURLWithNetwork('/account'))
                         }
 
@@ -118,7 +123,7 @@ export default function ConnectAccount() {
   }
 
   async function connectWallet() {
-    if (currentAddress)
+    if (wallet?.address)
       return;
 
     let loggedIn = false;
@@ -148,7 +153,7 @@ export default function ConnectAccount() {
   }
 
   function connectGithub(){
-    localStorage.setItem(`lastAddressBeforeConnect`, currentAddress);
+    localStorage.setItem(`lastAddressBeforeConnect`, wallet?.address);
     return signIn('github', {callbackUrl: `${window.location.protocol}//${window.location.host}/${network.name.toLowerCase()}/connect-account`})
   }
 
@@ -156,15 +161,8 @@ export default function ConnectAccount() {
     return <Image src={metamaskLogo} width={15} height={15}/>;
   }
 
-  function setGhLoginBySession() {
-    if((session?.user.name || (session?.user as any)?.login) !== githubLogin){
-      setGithubLogin(session?.user?.name || (session?.user as any)?.login)
-    }
-  }
-
   useEffect(updateLastUsedAddress, [])
-  useEffect(() => { checkAddressVsGh() }, [currentAddress])
-  useEffect(setGhLoginBySession,[session])
+  useEffect(() => { checkAddressVsGh() }, [wallet?.address])
 
 
   return <>
@@ -184,11 +182,11 @@ export default function ConnectAccount() {
             <strong className="caption-large d-block text-uppercase mb-4">{t('connect-account:connect-to-use')}</strong>
             <div className="row gx-3">
               <div className="col-6">
-                <div className={`button-connect border bg-${githubLogin? `dark border-dark`: `black border-black border-primary-hover cursor-pointer`} d-flex justify-content-between p-3 align-items-center`} onClick={connectGithub}>
-                  {!githubLogin && <div className="mx-auto d-flex align-items-center"><GithubImage width={15} height={15} opacity={1}/> <span className="ms-2 text-uppercase caption-large">{t('misc.github')}</span></div>}
-                  {githubLogin && (
+                <div className={`button-connect border bg-${user?.login? `dark border-dark`: `black border-black border-primary-hover cursor-pointer`} d-flex justify-content-between p-3 align-items-center`} onClick={connectGithub}>
+                  {!user?.login && <div className="mx-auto d-flex align-items-center"><GithubImage width={15} height={15} opacity={1}/> <span className="ms-2 text-uppercase caption-large">{t('misc.github')}</span></div>}
+                  {user?.login && (
                     <>
-                    <div><Avatar src={session?.user?.image} userLogin={githubLogin || `null`} /> <span className="ms-2">{session?.user?.name}</span></div>
+                    <div><Avatar src={session?.user?.image} userLogin={user?.login || `null`} /> <span className="ms-2">{session?.user?.name}</span></div>
                     <CheckMarkIcon />
                     </>
                   )}
@@ -196,11 +194,11 @@ export default function ConnectAccount() {
                 </div>
               </div>
               <div className="col-6">
-                <div className={`button-connect border bg-${currentAddress ? `dark border-dark` : `black border-black border-primary-hover cursor-pointer`} d-flex justify-content-between p-3 align-items-center ${getValidClass()}`} onClick={connectWallet}>
-                  {!currentAddress && <div className="mx-auto d-flex align-items-center">{renderMetamaskLogo()} <span className="ms-2 text-uppercase caption-large">{t('misc.metamask')}</span></div>}
-                  {currentAddress && (
+                <div className={`button-connect border bg-${wallet?.address ? `dark border-dark` : `black border-black border-primary-hover cursor-pointer`} d-flex justify-content-between p-3 align-items-center ${getValidClass()}`} onClick={connectWallet}>
+                  {!wallet?.address && <div className="mx-auto d-flex align-items-center">{renderMetamaskLogo()} <span className="ms-2 text-uppercase caption-large">{t('misc.metamask')}</span></div>}
+                  {wallet?.address && (
                     <>
-                    <div>{renderMetamaskLogo()} <span className="ms-2">{currentAddress && truncateAddress(currentAddress) || t('actions.connect-wallet')}</span></div>
+                    <div>{renderMetamaskLogo()} <span className="ms-2">{wallet?.address && truncateAddress(wallet?.address) || t('actions.connect-wallet')}</span></div>
                     {isGhValid ? <CheckMarkIcon /> : <ErrorMarkIcon/>}
                     </>
                     )}

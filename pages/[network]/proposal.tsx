@@ -1,4 +1,3 @@
-import { getSession } from "next-auth/react";
 import React, { useContext, useEffect, useState } from "react";
 import { GetServerSideProps } from "next/types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -24,17 +23,18 @@ import { useNetwork } from "contexts/network";
 import { ApplicationContext } from "contexts/application";
 import { addToast } from "contexts/reducers/add-toast";
 import { useTranslation } from "next-i18next";
+import { useAuthentication } from "@contexts/authentication";
 
 export default function PageProposal() {
   const router = useRouter();
   const {
     dispatch,
-    state: { currentAddress },
   } = useContext(ApplicationContext);
   const {t} = useTranslation();
   const { getUserOf, mergeClosedIssue } = useApi();
   const {handlerDisputeProposal, handleCloseIssue} = useBepro()
   const { activeIssue, networkIssue, getNetworkIssue } = useIssue();
+  const { wallet } = useAuthentication()
   const {activeNetwork} = useNetwork()
   const [proposal, setProposal] = useState<Proposal>({} as Proposal);
   const [networkProposal, setNetworkProposal] = useState<INetworkProposal>({} as INetworkProposal);
@@ -48,7 +48,7 @@ export default function PageProposal() {
         activeIssue?.issueId,
         pullRequest.githubId,
         proposal?.scMergeId,
-        currentAddress,
+        wallet?.address,
         activeNetwork?.name
       )
     ).then(() => {
@@ -150,13 +150,12 @@ export default function PageProposal() {
       />
       <ConnectWalletButton asModal={true} />
     </>
-  );
+  )
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, [
         "common",
         "proposal",
@@ -164,5 +163,5 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         "connect-wallet-button",
       ])),
     },
-  };
-};
+  }
+}

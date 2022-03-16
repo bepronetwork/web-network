@@ -1,27 +1,33 @@
 import { GetStaticProps } from "next";
-import React, { useContext, useState } from "react";
-import IssueAvatars from "./issue-avatars";
-import { BeproService } from "services/bepro-service";
-import NewProposal from "./create-proposal";
-import { ApplicationContext } from "contexts/application";
-import { developer, IssueState, pullRequest } from "interfaces/issue-data";
-import { changeBalance } from "contexts/reducers/change-balance";
-import { addToast } from "contexts/reducers/add-toast";
-import { TransactionTypes } from "interfaces/enums/transaction-types";
-import CreatePullRequestModal from "components/create-pull-request-modal";
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import Button from "./button";
-import GithubLink from 'components/github-link';
-import {useRouter} from 'next/router';
-import useApi from 'x-hooks/use-api';
-import Translation from "./translation";
+import { useRouter } from 'next/router';
 import { useTranslation } from "next-i18next";
-import { useNetwork } from "contexts/network";
-import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
-import { IForkInfo } from "interfaces/repos-list";
-import { Proposal } from "interfaces/proposal";
-import useBepro from "x-hooks/use-bepro";
-import { useIssue } from "contexts/issue";
+import React, { useContext, useState } from "react";
+
+import Button from "@components/button";
+import GithubLink from '@components/github-link';
+import Translation from "@components/translation";
+import IssueAvatars from "@components/issue-avatars";
+import NewProposal from "@components/create-proposal";
+import ReadOnlyButtonWrapper from "@components/read-only-button-wrapper";
+import CreatePullRequestModal from "@components/create-pull-request-modal";
+
+import { useNetwork } from "@contexts/network";
+import { addToast } from "@contexts/reducers/add-toast";
+import { ApplicationContext } from "@contexts/application";
+import { useAuthentication } from "@contexts/authentication";
+import { changeBalance } from "@contexts/reducers/change-balance";
+
+import { IForkInfo } from "@interfaces/repos-list";
+import { TransactionTypes } from "@interfaces/enums/transaction-types";
+import { TransactionStatus } from "@interfaces/enums/transaction-status";
+import { developer, IssueState, pullRequest } from "@interfaces/issue-data";
+
+import { BeproService } from "@services/bepro-service";
+
+import useApi from '@x-hooks/use-api';
+import useBepro from "@x-hooks/use-bepro";
+import { useIssue } from "@contexts/issue";
+import { Proposal } from "@interfaces/proposal";
 
 interface pageActions {
   issueId: string;
@@ -68,9 +74,7 @@ export default function PageActions({
   description,
   mergeProposals,
   handleMicroService,
-  handleBeproService,
   githubLogin,
-  mergeId,
   hasOpenPR = false,
   isRepoForked = false,
   isWorking = false,
@@ -80,39 +84,41 @@ export default function PageActions({
   repoPath = ``,
   addNewComment,
   issueCreator,
-  isDisputable = false,
-  onCloseEvent,
 }: pageActions) {
+  const {query: {repoId, id}} = useRouter();
+  const { t } = useTranslation(['common', 'pull-request', 'bounty'])
+
+  const [isExecuting, setIsExecuting] = useState(false);
+  const [showPRModal, setShowPRModal] = useState(false);
+  
   const {
     dispatch,
-    state: { githubHandle, currentAddress, myTransactions },
-  } = useContext(ApplicationContext);
-  const [showPRModal, setShowPRModal] = useState(false);
-  const [isExecuting, setIsExecuting] = useState(false);
-  const { t } = useTranslation(['common', 'pull-request', 'bounty'])
-  const {query: {repoId}} = useRouter();
+    state: { myTransactions },
+  } = useContext(ApplicationContext)
   const { activeNetwork } = useNetwork()
+  const { wallet, user } = useAuthentication()
   const {handleReedemIssue} = useBepro()
-  const {createPullRequestIssue, startWorking} = useApi();
   const {networkIssue} = useIssue()
+  
+  const {createPullRequestIssue, startWorking} = useApi();
 
   function renderIssueAvatars() {
     if (developers?.length > 0) return <IssueAvatars users={developers} />;
 
     if (developers?.length && state.toLowerCase() !== "draft")
-      return <p className="p-small me-2 mt-3"><Translation ns="bounty" label="errors.no-workers" /></p>;
+      return <p className="p-small mt-3"><Translation ns="bounty" label="errors.no-workers" /></p>
   }
 
   function renderForkAvatars() {
     if (forks?.length > 0) {
       return (
         <a
-          className="d-flex align-items-center text-decoration-none text-white-50 mx-1"
+          className="d-flex align-items-center text-decoration-none text-white-50"
           href={`https://github.com/${repoPath}/network/members`}
           target="_blank"
         >
           <IssueAvatars users={forks} />
-          <span className="me-3 caption-small"><Translation label="misc.forks" /></span>
+          <span className="caption-small"><Translation label="misc.forks" /></span>
         </a>
       );
     }
@@ -141,7 +147,7 @@ export default function PageActions({
   const renderRedeem = () => {
     return (
       isIssueinDraft &&
-      issueCreator === currentAddress &&
+      issueCreator === wallet?.address &&
       !finalized && (
         <ReadOnlyButtonWrapper>
           <Button
@@ -162,7 +168,7 @@ export default function PageActions({
       pullRequests?.length > 0 &&
       githubLogin && <NewProposal issueId={issueId}
                                   isFinished={finished}
-                                  isIssueOwner={issueCreator == currentAddress}
+                                  isIssueOwner={issueCreator == wallet?.address}
                                   amountTotal={amountIssue}
                                   mergeProposals={mergeProposals}
                                   pullRequests={pullRequests}
@@ -181,7 +187,7 @@ export default function PageActions({
       isWorking &&
       githubLogin && (
         <ReadOnlyButtonWrapper>
-        <Button className="mr-1 read-only-button" onClick={() => setShowPRModal(true)} disabled={!githubHandle || !currentAddress || hasOpenPR}>
+        <Button className="read-only-button" onClick={() => setShowPRModal(true)} disabled={!user?.login || !wallet?.address || hasOpenPR}>
           <Translation ns="pull-request" label="actions.create.title" />
         </Button>
         </ReadOnlyButtonWrapper>
@@ -219,7 +225,7 @@ export default function PageActions({
       <Button
         color="primary"
         onClick={handleStartWorking}
-        className="mr-1 read-only-button"
+        className="read-only-button"
         disabled={isExecuting}
       >
         <span><Translation ns="bounty" label="actions.start-working.title" /></span>
@@ -323,8 +329,8 @@ export default function PageActions({
         <div className="col-md-10">
           <div className="d-flex align-items-center justify-content-between mb-4">
             <h4 className="h4 d-flex align-items-center">{t('misc.details')}</h4>
-            <div className="d-flex align-items-center">
-              {!canClose && !finalized && <span className="mr-2 caption-small text-danger">{t('pull-request:errors.merge-conflicts')}</span> || ``}
+            <div className="d-flex flex-row align-items-center gap-20">
+              {!canClose && !finalized && <span className="caption-small text-danger">{t('pull-request:errors.merge-conflicts')}</span> || ``}
               {renderIssueAvatars()}
               {forks && renderForkAvatars()}
 

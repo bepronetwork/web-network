@@ -82,12 +82,7 @@ export default function NetworksList({
         <NothingFound description={t('custom-network:errors.not-found')}>
           {network ? (
             <InternalLink
-              href={getURLWithNetwork(
-                '/new-network',
-                network.name === BEPRO_NETWORK_NAME
-                  ? {}
-                  : { network: BEPRO_NETWORK_NAME }
-              )}
+              href="/new-network"
               label={String(t('actions.create-one'))}
               uppercase
               blank={network.name !== BEPRO_NETWORK_NAME}

@@ -1,18 +1,23 @@
 import React from 'react';
-import ApplicationContextProvider from './application';
-import { IssueProvider } from './issue';
-import { ReposProvider } from './repos';
-import { NetworkProvider } from './network';
+
+import ApplicationContextProvider from '@contexts/application';
+
+import { IssueProvider } from '@contexts/issue';
+import { ReposProvider } from '@contexts/repos';
+import { NetworkProvider } from '@contexts/network';
+import { AuthenticationProvider } from '@contexts/authentication';
 
 const RootProviders: React.FC = ({children}) => {
   return (
-    <NetworkProvider>
-      <ApplicationContextProvider>
-        <ReposProvider>
-          <IssueProvider>{children}</IssueProvider>
-        </ReposProvider>
-      </ApplicationContextProvider>
-    </NetworkProvider>
+    <AuthenticationProvider>
+      <NetworkProvider>
+        <ApplicationContextProvider>
+          <ReposProvider>
+            <IssueProvider>{children}</IssueProvider>
+          </ReposProvider>
+        </ApplicationContextProvider>
+      </NetworkProvider>
+    </AuthenticationProvider>
   );
 }
 

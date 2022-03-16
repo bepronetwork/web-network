@@ -1,33 +1,41 @@
-import {useRouter} from 'next/router';
-import clsx from 'clsx';
-import {GetServerSideProps} from 'next/types'
-import React, {useContext, useEffect, useState} from 'react';
-import {BeproService} from '@services/bepro-service';
-import InputNumber from '@components/input-number';
-import ConnectGithub from '@components/connect-github';
-import {ApplicationContext} from '@contexts/application';
-import ConnectWalletButton from '@components/connect-wallet-button';
-import {addTransaction} from '@reducers/add-transaction';
-import {toastError, toastSuccess} from '@contexts/reducers/add-toast'
-import {TransactionTypes} from '@interfaces/enums/transaction-types';
-import {updateTransaction} from '@reducers/update-transaction';
-import {formatNumberToCurrency} from '@helpers/formatNumber'
-import {TransactionStatus} from '@interfaces/enums/transaction-status';
-import LockedIcon from '@assets/icons/locked-icon';
-import ReposDropdown from '@components/repos-dropdown';
-import BranchsDropdown from '@components/branchs-dropdown';
-import Button from '@components/button';
-import useApi from '@x-hooks/use-api';
-import {User} from '@interfaces/api-response';
-import useTransactions from '@x-hooks/useTransactions';
-import { changeTransactionalTokenApproval } from '@contexts/reducers/change-transactional-token-approval';
-import {getSession} from 'next-auth/react';
-import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
-import { useTranslation } from 'next-i18next';
-import DragAndDrop,{IFilesProps} from '@components/drag-and-drop'
-import useNetworkTheme from '@x-hooks/use-network';
-import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper';
-import { useNetwork } from '@contexts/network';
+import clsx from 'clsx'
+import { useRouter } from 'next/router'
+import { useTranslation } from 'next-i18next'
+import { GetServerSideProps } from 'next/types'
+import React, { useContext, useEffect, useState } from 'react'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+
+import LockedIcon from '@assets/icons/locked-icon'
+
+import Button from '@components/button'
+import InputNumber from '@components/input-number'
+import ConnectGithub from '@components/connect-github'
+import ReposDropdown from '@components/repos-dropdown'
+import BranchsDropdown from '@components/branchs-dropdown'
+import ConnectWalletButton from '@components/connect-wallet-button'
+import DragAndDrop, { IFilesProps } from '@components/drag-and-drop'
+import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper'
+
+import { useNetwork } from '@contexts/network'
+import { toastError } from '@contexts/reducers/add-toast'
+import { ApplicationContext } from '@contexts/application'
+import { useAuthentication } from '@contexts/authentication'
+import { changeTransactionalTokenApproval } from '@contexts/reducers/change-transactional-token-approval'
+
+import { formatNumberToCurrency } from '@helpers/formatNumber'
+
+import { User } from '@interfaces/api-response'
+import { TransactionTypes } from '@interfaces/enums/transaction-types'
+import { TransactionStatus } from '@interfaces/enums/transaction-status'
+
+import { addTransaction } from '@reducers/add-transaction'
+import { updateTransaction } from '@reducers/update-transaction'
+
+import { BeproService } from '@services/bepro-service'
+
+import useApi from '@x-hooks/use-api'
+import useTransactions from '@x-hooks/useTransactions'
+import useNetworkTheme from '@x-hooks/use-network'
 
 interface Amount {
   value?: string,
@@ -36,22 +44,28 @@ interface Amount {
 }
 
 export default function PageCreateIssue() {
-  const [issueTitle, setIssueTitle] = useState('');
-  const [issueDescription, setIssueDescription] = useState('');
-  const [issueAmount, setIssueAmount] = useState<Amount>({value: '', formattedValue: '', floatValue: 0});
-  const [balance, setBalance] = useState(0);
-  const {dispatch, state: {currentAddress, githubHandle, myTransactions, isTransactionalTokenApproved}} = useContext(ApplicationContext);
-  const [currentUser, setCurrentUser] = useState<User>();
-  const [repository_id, setRepositoryId] = useState(``);
-  const [files, setFiles] = useState<IFilesProps[]>([]);
-  const [branch, setBranch] = useState(``);
-  const [redirecting, setRedirecting] = useState(false);
-  const router = useRouter();
-  const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId} = useApi();
-  const txWindow = useTransactions();
+  const router = useRouter()
   const { t } = useTranslation(['common', 'create-bounty'])
-  const { getURLWithNetwork } = useNetworkTheme()
+  
+  const [branch, setBranch] = useState(``)
+  const [issueTitle, setIssueTitle] = useState('')
+  const [redirecting, setRedirecting] = useState(false)
+  const [repository_id, setRepositoryId] = useState(``)
+  const [files, setFiles] = useState<IFilesProps[]>([])
+  const [issueDescription, setIssueDescription] = useState('')
+  const [issueAmount, setIssueAmount] = useState<Amount>({value: '', formattedValue: '', floatValue: 0})
+  const [isTransactionalTokenApproved, setIsTransactionalTokenApproved] = useState(false)
+  
   const { activeNetwork } = useNetwork()
+  const { wallet, user, beproServiceStarted } = useAuthentication()
+  const { 
+    dispatch, 
+    state: { myTransactions } 
+  } = useContext(ApplicationContext)
+  
+  const txWindow = useTransactions()
+  const { getURLWithNetwork } = useNetworkTheme()
+  const { createIssue: apiCreateIssue, patchIssueWithScId} = useApi()
 
   async function allowCreateIssue() {
     await BeproService.login();
@@ -104,7 +118,7 @@ export default function PageCreateIssue() {
       description: addFilesInDescription(issueDescription),
       amount: issueAmount.floatValue,
       creatorAddress: BeproService.address,
-      creatorGithub: currentUser?.githubLogin,
+      creatorGithub: user?.login,
       repository_id,
       branch
     }
@@ -152,7 +166,7 @@ export default function PageCreateIssue() {
 
   const issueContentIsValid = (): boolean => !!issueTitle && !!issueDescription;
 
-  const verifyAmountBiggerThanBalance = (): boolean => !(issueAmount.floatValue > Number(balance))
+  const verifyAmountBiggerThanBalance = (): boolean => !(issueAmount.floatValue > Number(wallet?.balance?.bepro))
 
   const verifyTransactionState = (type: TransactionTypes): boolean => !!myTransactions.find(transactions=> transactions.type === type && transactions.status === TransactionStatus.pending);
 
@@ -176,8 +190,8 @@ export default function PageCreateIssue() {
   ].some(value => value === false)
 
   const handleIssueAmountBlurChange = () => {
-    if (issueAmount.floatValue > Number(balance)) {
-      setIssueAmount({formattedValue: balance.toString()});
+    if (issueAmount.floatValue > Number(wallet?.balance?.bepro)) {
+      setIssueAmount({formattedValue: wallet?.balance?.bepro?.toString()});
     }
   }
 
@@ -192,9 +206,8 @@ export default function PageCreateIssue() {
   const onUpdateFiles = (files:IFilesProps[]) => setFiles(files)
 
   useEffect(() => {
-    BeproService.getBalance('bepro').then(setBalance);
-    getUserOf(currentAddress).then(setCurrentUser);
-  }, [currentAddress])
+    if (beproServiceStarted) BeproService.isApprovedTransactionalToken().then(setIsTransactionalTokenApproved).catch(console.log)
+  }, [beproServiceStarted])
   
   return (
     <>
@@ -248,7 +261,7 @@ export default function PageCreateIssue() {
                 <div className="col">
                   <InputNumber
                     thousandSeparator
-                    max={balance}
+                    max={wallet?.balance?.bepro}
                     className={clsx({'text-muted': isTransactionalTokenApproved})}
                     label={t('create-bounty:fields.amount.label')}
                     symbol={t('$bepro')}
@@ -259,11 +272,11 @@ export default function PageCreateIssue() {
                     onBlur={handleIssueAmountBlurChange}
                     helperText={
                       <>
-                        {t('create-bounty:fields.amount.info', { amount: formatNumberToCurrency(balance, { maximumFractionDigits: 18 }) })}
+                        {t('create-bounty:fields.amount.info', { amount: formatNumberToCurrency(wallet?.balance?.bepro, { maximumFractionDigits: 18 }) })}
                         {isTransactionalTokenApproved && (
                           <span
                             className="caption-small text-primary ml-1 cursor-pointer text-uppercase"
-                            onClick={() => setIssueAmount({formattedValue: balance.toString()})}>
+                            onClick={() => setIssueAmount({formattedValue: wallet?.balance?.bepro?.toString()})}>
                           {t('create-bounty:fields.amount.max')}
                       </span>
                         )}
@@ -276,7 +289,7 @@ export default function PageCreateIssue() {
               </div>
 
               <div className="d-flex justify-content-center align-items-center mt-4">
-                {!githubHandle ? (
+                {!user?.login ? (
                   <div className="mt-3 mb-0">
                     <ConnectGithub />
                   </div>
@@ -308,7 +321,6 @@ export default function PageCreateIssue() {
 export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, ['common', 'create-bounty', 'connect-wallet-button'])),
     },
   };

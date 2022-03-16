@@ -61,9 +61,9 @@ export const NetworkProvider: React.FC = function ({ children }) {
     updateActiveNetwork();
   }, [query]);
 
-  useEffect(() => {
-    console.warn("useNetwork", { activeNetwork });
-  }, [activeNetwork]);
+  useEffect(()=>{
+    //console.warn('useNetwork',{activeNetwork})
+  },[activeNetwork])
 
   const memorizeValue = useMemo<NetworkContextData>(
     () => ({

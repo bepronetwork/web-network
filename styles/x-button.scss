@@ -28,7 +28,7 @@ $only-child: 14px;
   }
 }
 
-button.btn,a.btn:not(.brand), .main-nav-link:not(.brand) {
+button.btn:not(.not-svg),a.btn:not(.brand), .main-nav-link:not(.brand) {
   svg,i {
     &:not(:only-child) {
       &:not(:last-child) {

@@ -18,6 +18,7 @@
 @import "components/network-logo";
 @import "components/network-hero";
 @import "components/creating-network-loader";
+@import "components/counter-badge";
 
 @function toRGB ($color) {
   @return "" + red($color) + ", " + green($color) + ", " + blue($color);
@@ -1127,6 +1128,10 @@ textarea.form-control {
 
 .gap-20 {
   gap: 20px;
+
+  .btn + .btn {
+    margin: 0;
+  }
 }
 
 

@@ -1,22 +1,25 @@
 import Link from 'next/link'
-import { getTimeDifferenceInWords } from 'helpers/formatDate'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { getTimeDifferenceInWords } from '@helpers/formatDate'
 
 import LockedIcon from 'assets/icons/locked-icon'
 
-import Button from 'components/button'
-import Avatar from 'components/avatar'
-import Translation from 'components/translation'
-import PullRequestLabels from 'components/pull-request-labels'
+import Button from '@components/button'
+import Avatar from '@components/avatar'
+import Translation from '@components/translation'
+import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper'
+import PullRequestLabels from '@components/pull-request-labels'
 
-import { useContext, useEffect, useState } from 'react'
-import { ApplicationContext } from 'contexts/application'
-import useOctokit from 'x-hooks/use-octokit'
-import { formatNumberToNScale } from 'helpers/formatNumber'
-import useNetwork from 'x-hooks/use-network'
-import ReadOnlyButtonWrapper from './read-only-button-wrapper'
-import { IActiveIssue } from 'contexts/issue'
-import { pullRequest } from 'interfaces/issue-data'
+import { useAuthentication } from '@contexts/authentication'
+
+import { formatNumberToNScale } from '@helpers/formatNumber'
+
+import useOctokit from '@x-hooks/use-octokit'
+import useNetwork from '@x-hooks/use-network'
+import { IActiveIssue } from '@contexts/issue'
+import { pullRequest } from '@interfaces/issue-data'
+
 interface IPullRequestItem {
   issue: IActiveIssue;
   pullRequest: pullRequest;
@@ -33,9 +36,7 @@ export default function PullRequestItem({
 
   const { getURLWithNetwork } = useNetwork()
 
-  const {
-    state: { githubLogin }
-  } = useContext(ApplicationContext)
+  const { user } = useAuthentication()
 
   function handleReviewClick() {
     router.push(
@@ -49,7 +50,7 @@ export default function PullRequestItem({
   }
 
   function canReview() {
-    return pullRequest?.state === 'open' && !!githubLogin
+    return pullRequest?.state === 'open' && !!user?.login
   }
 
   async function getPullRequestInfo() {

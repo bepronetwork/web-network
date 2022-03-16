@@ -1,6 +1,7 @@
 import models from '@db/models';
 import twitterTweet from '@helpers/api/handle-twitter-tweet';
 import api from '@services/api';
+import { CONTRACT_ADDRESS } from 'env';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Octokit} from 'octokit';
 import {Op} from 'sequelize';
@@ -32,7 +33,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const githubId = req.body.githubIssueId || (await octokit.rest.issues.create({owner,repo, title, body, labels: ['draft']}))?.data?.number?.toString()
 
-  if (await models.issue.findOne({where: {githubId}}))
+  if (await models.issue.findOne({where: {githubId, repository_id}}))
     return res.status(409).json(`issueId already exists on database`);
 
   await models.issue.create({
@@ -78,11 +79,13 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
                   .catch(e => {
                     console.log(`Error creating SEO`, e);
                   })
-                  twitterTweet({
-                   type: 'bounty',
-                   action: 'created',
-                   issue
-                 })
+                  if (network.contractAddress === CONTRACT_ADDRESS)
+                    twitterTweet({
+                      type: 'bounty',
+                      action: 'created',
+                      issue
+                    })
+
                  return res.status(200).json(`ok`)
                })
                .catch(_ => res.status(422).json(`nok`));

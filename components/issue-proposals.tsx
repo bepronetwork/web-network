@@ -1,14 +1,13 @@
 import React from "react";
-import { useContext } from "react";
 import { useEffect, useState } from "react";
 import { BeproService } from "services/bepro-service";
 import { IActiveIssue } from "contexts/issue";
-import { ApplicationContext } from "contexts/application";
 import ProposalItem from "components/proposal-item";
 import NothingFound from "./nothing-found";
 import { useTranslation } from "next-i18next";
 import { isProposalDisputable } from "helpers/proposal";
 import { INetworkIssue } from "interfaces/issue-data";
+import { useAuthentication } from "@contexts/authentication";
 
 interface IIssueProposalProps {
   issue: IActiveIssue;
@@ -21,15 +20,15 @@ export default function IssueProposals({
   networkIssue,
   className = "",
 }: IIssueProposalProps) {
-  const {
-    state: { currentAddress },
-  } = useContext(ApplicationContext);
+  const { wallet, beproServiceStarted } = useAuthentication()
   const [disputableTime, setDisputableTime] = useState(0);
   const { t } = useTranslation("proposal");
 
   useEffect(() => {
-    BeproService.getDisputableTime().then(setDisputableTime);
-  }, [issue, currentAddress]);
+    if(beproServiceStarted){
+      BeproService.getDisputableTime().then(setDisputableTime);
+    }
+  }, [issue, wallet?.address, beproServiceStarted]);
 
   return (
     <div className={`content-wrapper ${className || ""} pt-0 pb-0`}>

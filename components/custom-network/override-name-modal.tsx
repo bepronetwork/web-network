@@ -8,6 +8,7 @@ import Button from '@components/button'
 import ImageUploader from '@components/image-uploader'
 
 import { ApplicationContext } from '@contexts/application'
+import { useAuthentication } from '@contexts/authentication'
 
 import { INetwork } from '@interfaces/network'
 
@@ -36,10 +37,8 @@ export default function OverrideNameModal({
 
   const { updateNetwork } = useApi()
 
-  const {
-    dispatch,
-    state: { currentAddress, githubLogin }
-  } = useContext(ApplicationContext)
+  const { wallet, user } = useAuthentication()
+  const { dispatch } = useContext(ApplicationContext)
 
   function isButtonDisabled(): boolean {
     return (
@@ -68,14 +67,14 @@ export default function OverrideNameModal({
   }
 
   async function handleSubmit() {
-    if (!currentAddress || !githubLogin) return
+    if (!wallet?.address || !user?.login) return
 
     setIsExecuting(true)
     
     const json = {
-      githubLogin,
+      githubLogin: user?.login,
       override: true,
-      creator: currentAddress,
+      creator: wallet?.address,
       networkAddress: newNetwork.networkAddress,
       name: differentOrUndefined(newNetwork, network, 'name'),
       description: differentOrUndefined(newNetwork, network, 'description'),
