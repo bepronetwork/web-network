@@ -18,12 +18,11 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   if (!customNetwork) return res.status(404).json('Invalid network')
   if (customNetwork.isClosed) return res.status(404).json('Invalid network')
 
-  const network = networkBeproJs({ test: true, contractAddress: customNetwork.networkAddress });
+  const network = networkBeproJs({ contractAddress: customNetwork.networkAddress });
 
   await network.start();
 
   await network.getMergeProposalCreatedEvents({fromBlock, toBlock: +fromBlock+1, filter: {id},})
-  // await contract.getPastEvents(`MergeProposalCreated`, {fromBlock, toBlock: +fromBlock+1,})
                 .then(events => {readMergeProposalCreated(events, {network, models, res, githubId, networkId: customNetwork.id})})
                 .catch(error => {
                   console.log(`Error reading MergeProposalCreated`, error);

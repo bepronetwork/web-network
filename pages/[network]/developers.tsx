@@ -1,14 +1,79 @@
+import { useEffect, useState} from 'react';
 import { GetServerSideProps } from 'next/types'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
-import PageHero from '@components/page-hero'
-import ListIssues from '@components/list-issues'
+import PageHero, {IInfosHero} from 'components/page-hero'
+import ListIssues from 'components/list-issues'
+import { useTranslation } from 'next-i18next'
+import { useNetwork } from "contexts/network";
+import {ApplicationContext} from 'contexts/application';
+import {BeproService} from 'services/bepro-service';
+import useApi from '@x-hooks/use-api';
+import { useAuthentication } from '@contexts/authentication';
+
 
 export default function PageDevelopers() {
+  const { t } = useTranslation(['common'])
+  const {beproServiceStarted} = useAuthentication()
+  const {getTotalUsers} = useApi();
+
+  const [infos, setInfos] = useState<IInfosHero[]>([
+    {
+      value: 0,
+      label: t('heroes.in-progress')
+    },{
+      value: 0,
+      label: t('heroes.bounties-closed')
+    },{
+      value: 0,
+      label: t('heroes.bounties-in-network'),
+      currency: 'BEPRO'
+    },{
+      value: 0,
+      label: t('heroes.protocol-members'),
+    }
+  ])
+
+  const { activeNetwork } = useNetwork()
+
+  async function loadTotals() {
+    if (!beproServiceStarted || !activeNetwork)
+      return;
+
+    const [closed, inProgress, onNetwork, totalUsers] = await Promise.all([
+      BeproService.getClosedIssues(activeNetwork.networkAddress),
+      BeproService.getOpenIssues(activeNetwork.networkAddress),
+      BeproService.getTokensStaked(activeNetwork.networkAddress),
+      getTotalUsers(),
+    ])
+    setInfos([
+      {
+        value: inProgress,
+        label: t('heroes.in-progress')
+      },{
+        value: closed,
+        label: t('heroes.bounties-closed')
+      },{
+        value: onNetwork,
+        label: t('heroes.bounties-in-network'),
+        currency: 'BEPRO'
+      },{
+        value: totalUsers,
+        label: t('heroes.protocol-members'),
+      }
+    ])
+  }
+
+  useEffect(()=>{loadTotals()}, [beproServiceStarted, activeNetwork]);
+
   return (
     <>
       <div>  
-        <PageHero />
+        <PageHero
+        title={t('heroes.bounties.title')}  
+        subtitle={t('heroes.bounties.subtitle')}
+        infos={infos}
+        />
 
         <ListIssues />
       </div>

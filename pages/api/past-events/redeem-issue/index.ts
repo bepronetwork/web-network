@@ -24,7 +24,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const octokit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
 
-  const network = networkBeproJs({ test: true, contractAddress: customNetwork.networkAddress });
+  const network = networkBeproJs({ contractAddress: customNetwork.networkAddress });
 
   await network.start();
 

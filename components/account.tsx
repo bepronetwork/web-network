@@ -28,7 +28,7 @@ export default function Account({ children }): JSX.Element {
 
       {(!user?.login && <ConnectGithub />) || ``}
 
-      <div className="container">
+      <div className="container mt-4">
         <div className="row">
           <div className="d-flex justify-content-center mb-3">
             <InternalLink

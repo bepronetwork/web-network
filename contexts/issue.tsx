@@ -13,8 +13,10 @@ import { BeproService } from 'services/bepro-service';
 import useApi from 'x-hooks/use-api';
 import useOctokit from 'x-hooks/use-octokit';
 import {useRouter} from 'next/router';
-import { useNetwork } from '@contexts/network';
-import { useAuthentication } from '@contexts/authentication';
+import { ApplicationContext } from './application';
+import { useNetwork } from './network';
+import { INetworkProposal } from '@interfaces/proposal';
+import { useAuthentication } from './authentication';
 export interface IActiveIssue extends IssueData{
   comments: Comment[]
 }
@@ -23,6 +25,7 @@ export interface IssueContextData {
   activeIssue: IActiveIssue;
   networkIssue: INetworkIssue;
   updateIssue: (repoId: string, ghId: string)=> Promise<IActiveIssue>;
+  addNewComment: (prId: number, comment: string) => void;
   getNetworkIssue: ()=> void;
 }
 
@@ -33,20 +36,28 @@ export const IssueProvider: React.FC = function ({ children }) {
   const [activeIssue, setActiveIssue] = useState<IActiveIssue>();
   const [networkIssue, setNetworkIssue] = useState<INetworkIssue>();
 
-
   const {getIssue} = useApi()
   const {activeNetwork} = useNetwork()
   const {query} = useRouter();
-  const {getIssueComments, getPullRequest} = useOctokit();
-  // Move currentAdress and githubLogin to UserHook
+  const {getIssueComments, getPullRequest, getPullRequestComments} = useOctokit();
+
   const { wallet, beproServiceStarted } = useAuthentication()
+
+  const addNewComment = useCallback((prId: number, comment: string)=>{
+    let pullRequests = [...activeIssue.pullRequests];
+    const prIndex =  pullRequests.findIndex(pr=> pr.id === prId)
+    const newPr = {...pullRequests[prIndex], comments: [...pullRequests[prIndex].comments, comment]} as pullRequest;
+    pullRequests[prIndex] = newPr;
+    setActiveIssue((oldState)=>({...oldState, pullRequests}))
+  },[activeIssue])
 
   const updatePullRequests = useCallback(
     async (prs: pullRequest[], githubPath: string) => {
       const mapPr = prs.map(async (pr) => {
-        const { data } = await getPullRequest(Number(pr.githubId), githubPath);
-        pr.isMergeable = data.mergeable;
-        pr.merged = data.merged;
+        const [getPr, getComments]  = await Promise.all([getPullRequest(Number(pr.githubId), githubPath), getPullRequestComments(Number(pr.githubId), githubPath)])
+        pr.isMergeable = (getPr?.data?.mergeable &&  getPr?.data?.mergeable_state === 'clean');
+        pr.merged = getPr?.data?.merged;
+        pr.comments = getComments?.data as any; 
         return pr;
       });
 
@@ -92,14 +103,39 @@ export const IssueProvider: React.FC = function ({ children }) {
     );
 
     let isDraft = null;
+
     try {
       isDraft = await BeproService.network.isIssueInDraft(network?._id);
     } catch (error) {
       console.error(error);
     }
+    const networkProposals: INetworkProposal[] = [];
 
-    setNetworkIssue({ ...network, isDraft });
-    return network;
+    for (const meta of activeIssue?.mergeProposals) {
+      const { scMergeId, id: proposalId } = meta;
+
+      if (scMergeId) {
+        const merge = await BeproService.network.getMergeById(
+          +network?._id,
+          +scMergeId
+        );
+
+        const isDisputed = activeIssue.merged
+          ? activeIssue.merged !== scMergeId
+          : await BeproService.network.isMergeDisputed(
+              +network?._id,
+              +scMergeId
+            );
+
+        networkProposals[proposalId] = {
+          ...merge,
+          isDisputed,
+        }
+      }
+    }
+    
+    setNetworkIssue({ ...network, isDraft, networkProposals});
+    return { ...network, isDraft, networkProposals};
   }, [activeIssue, wallet?.address, beproServiceStarted]);
 
   useEffect(() => {
@@ -109,9 +145,11 @@ export const IssueProvider: React.FC = function ({ children }) {
   }, [activeIssue, wallet?.address, beproServiceStarted]);
 
   useEffect(() => {
-    if (query.id && query.repoId && activeNetwork) {
-      setActiveIssue(null);
-      updateIssue(`${query.repoId}`, `${query.id}`);
+    if (query.id && query.repoId) {
+      if(query.id !== activeIssue?.githubId || +query.repoId !== +activeIssue?.repository_id){
+        setActiveIssue(null);
+        updateIssue(`${query.repoId}`, `${query.id}`);
+      }
     }
   }, [query, activeNetwork]);
 
@@ -123,10 +161,11 @@ export const IssueProvider: React.FC = function ({ children }) {
     () => ({
       activeIssue,
       networkIssue,
+      addNewComment,
       updateIssue,
       getNetworkIssue
     }),
-    [activeIssue, networkIssue, updateIssue, getNetworkIssue]
+    [activeIssue, networkIssue, addNewComment, updateIssue, getNetworkIssue]
   );
 
   return (

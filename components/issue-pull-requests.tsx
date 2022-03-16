@@ -1,32 +1,34 @@
+import React from "react";
+import { IActiveIssue } from 'contexts/issue';
 import { useTranslation } from 'next-i18next'
 import NothingFound from './nothing-found'
 import PullRequestItem from './pull-request-item'
 
+interface IIssuePullRequestProps {
+  issue: IActiveIssue;
+  className: string;
+}
+
 export default function IssuePullRequests({
-  repoId,
-  className = '',
-  issueId,
-  pullResquests = [],
-  repositoryPath
-}) {
+  issue,
+  className
+}:IIssuePullRequestProps) {
   const { t } = useTranslation('pull-request')
 
   return (
     <div
-      className={`content-wrapper ${className} pt-0 ${
-        (pullResquests.length > 0 && 'pb-0') || 'pb-3'
+      className={`content-wrapper ${className || ''} pt-0 ${
+        (issue?.pullRequests?.length > 0 && 'pb-0') || 'pb-3'
       }`}
     >
-      {(pullResquests.length > 0 &&
-        pullResquests.map((pullRequest) => (
+      {(issue?.pullRequests?.length > 0 &&
+        React.Children.toArray(issue?.pullRequests?.map((pullRequest) => (
           <PullRequestItem
             key={pullRequest.id}
-            repoId={repoId}
+            issue={issue}
             pullRequest={pullRequest}
-            issueId={issueId}
-            repositoryPath={repositoryPath}
           />
-        ))) || <NothingFound description={t('errors.not-found')} />}
+        )))) || <NothingFound description={t('errors.not-found')} />}
     </div>
   )
 }

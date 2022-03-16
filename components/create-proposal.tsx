@@ -21,7 +21,7 @@ import { Proposal } from 'interfaces/proposal';
 import { ProposalData } from 'interfaces/api-response';
 import { useTranslation } from 'next-i18next';
 import Avatar from './avatar';
-import PullRequestLabels, {PRLabel} from './pull-request-labels';
+import PullRequestLabels from './pull-request-labels';
 import ReadOnlyButtonWrapper from './read-only-button-wrapper';
 import {useRepos} from 'contexts/repos'
 import {useNetwork} from 'contexts/network'
@@ -40,16 +40,8 @@ interface SameProposal {
   }[];
 }
 
-function getLabel(data): PRLabel{
-  if(data.merged) return 'merged';
-  if(data.isMergeable) return 'ready to merge';
-  //isMergeable can be null;
-  if(data.isMergeable === false) return 'conflicts';
-}
-
 function SelectValueComponent({ innerProps, innerRef, ...rest }){
   const data = rest.getValue()[0];
-  const label = getLabel(data)
 
   return (
     <div
@@ -62,14 +54,13 @@ function SelectValueComponent({ innerProps, innerRef, ...rest }){
         {data?.label}
       </span>
       <div className="ms-2">
-        {label && <PullRequestLabels label={label}/>}
+        <PullRequestLabels isMergeable={data.isMergeable} merged={data.merged}/>
       </div>
     </div>
   )
 }
 
 function SelectOptionComponent({ innerProps, innerRef, data }) {
-  const label = getLabel(data)
   return (
     <div
       ref={innerRef}
@@ -81,7 +72,7 @@ function SelectOptionComponent({ innerProps, innerRef, data }) {
         {data?.label}
       </span>
       <div className="d-flex flex-grow-1 justify-content-end">
-        {label && <PullRequestLabels label={label}/>}
+        <PullRequestLabels isMergeable={data.isMergeable} merged={data.merged}/>
       </div>
     </div>
   );
@@ -105,7 +96,7 @@ export default function NewProposal({
   const [councilAmount, setCouncilAmount] = useState(0)
   const [success, setSuccess] = useState<boolean>(false)
   const [warning, setWarning] = useState<boolean>(false)
-  const [proposals, setProposals] = useState<Proposal[]>([])
+  const [proposals, setProposals] = useState<any[]>([])
   const [currentGithubId, setCurrentGithubId] = useState<string>()
   const [participants, setParticipants] = useState<participants[]>([])
   const [showExceptionalMessage, setShowExceptionalMessage] = useState<boolean>()
@@ -196,7 +187,7 @@ export default function NewProposal({
               address: value.toLowerCase()
             }))
           })
-         })
+        })
 
       if(isSameProposal(currentDistrbuition, currentProposals)){
         handleInputColor("warning")
@@ -418,7 +409,7 @@ export default function NewProposal({
         (isIssueOwner && !isFinished && renderRecognizeAsFinished())}
       <Modal
         show={show}
-        title={t('proposal:title')}
+        title={t('proposal:actions.new')}
         titlePosition="center"
         onCloseClick={handleClose}
         footer={

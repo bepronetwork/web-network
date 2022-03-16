@@ -1,5 +1,6 @@
 import {formatNumberToNScale} from '@helpers/formatNumber';
 import Translation from '@components/translation';
+import { handlePercentage } from '@helpers/handlePercentage';
 
 interface Options {
   pgClass: string;
@@ -8,14 +9,14 @@ interface Options {
   textClass: string;
 }
 
-export default function ProposalProgressSmall({pgClass = ``, value, total, textClass}: Options) {
+export default function ProposalProgressSmall({pgClass = ``, value = 0, total, textClass}: Options) {
   const dotStyle = {width: `10px`, height: `10px`};
 
   function toRepresentationPercent(value = 0, total = 5) {
     return (value * 100) / total;
   }
 
-  const percent = ((value / total)* 100).toFixed(2);
+  const percent = handlePercentage(value, total, 2);
 
   return <div className="text-center position-relative d-inline-block col">
     <div className={`caption-small mb-1`}>

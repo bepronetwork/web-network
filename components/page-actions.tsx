@@ -3,8 +3,6 @@ import { useRouter } from 'next/router';
 import { useTranslation } from "next-i18next";
 import React, { useContext, useState } from "react";
 
-import LockedIcon from "@assets/icons/locked-icon";
-
 import Button from "@components/button";
 import GithubLink from '@components/github-link';
 import Translation from "@components/translation";
@@ -20,18 +18,16 @@ import { useAuthentication } from "@contexts/authentication";
 import { changeBalance } from "@contexts/reducers/change-balance";
 
 import { IForkInfo } from "@interfaces/repos-list";
-import { ProposalData } from "@interfaces/api-response";
 import { TransactionTypes } from "@interfaces/enums/transaction-types";
 import { TransactionStatus } from "@interfaces/enums/transaction-status";
 import { developer, IssueState, pullRequest } from "@interfaces/issue-data";
 
-import { addTransaction } from "@reducers/add-transaction";
-import { updateTransaction } from "@reducers/update-transaction";
-
 import { BeproService } from "@services/bepro-service";
 
 import useApi from '@x-hooks/use-api';
-import useTransactions from '@x-hooks/useTransactions';
+import useBepro from "@x-hooks/use-bepro";
+import { useIssue } from "@contexts/issue";
+import { Proposal } from "@interfaces/proposal";
 
 interface pageActions {
   issueId: string;
@@ -41,7 +37,7 @@ interface pageActions {
   isIssueinDraft: boolean;
   state?: IssueState | string;
   pullRequests?: pullRequest[];
-  mergeProposals?: ProposalData[];
+  mergeProposals?: Proposal[];
   amountIssue?: string | number;
   forks?: IForkInfo[];
   title?: string;
@@ -50,7 +46,6 @@ interface pageActions {
   handleBeproService?: (force?: boolean) => void;
   githubLogin?: string;
   mergeId?: string;
-  isDisputed?: boolean;
   hasOpenPR?: boolean;
   isRepoForked?: boolean;
   isWorking?: boolean;
@@ -79,10 +74,7 @@ export default function PageActions({
   description,
   mergeProposals,
   handleMicroService,
-  handleBeproService,
   githubLogin,
-  mergeId,
-  isDisputed,
   hasOpenPR = false,
   isRepoForked = false,
   isWorking = false,
@@ -92,8 +84,6 @@ export default function PageActions({
   repoPath = ``,
   addNewComment,
   issueCreator,
-  isDisputable = false,
-  onCloseEvent,
 }: pageActions) {
   const {query: {repoId, id}} = useRouter();
   const { t } = useTranslation(['common', 'pull-request', 'bounty'])
@@ -107,11 +97,10 @@ export default function PageActions({
   } = useContext(ApplicationContext)
   const { activeNetwork } = useNetwork()
   const { wallet, user } = useAuthentication()
+  const {handleReedemIssue} = useBepro()
+  const {networkIssue} = useIssue()
   
-  const txWindow = useTransactions();
-  const {createPullRequestIssue, waitForRedeem, waitForClose, processEvent, startWorking} = useApi();
-
-
+  const {createPullRequestIssue, startWorking} = useApi();
 
   function renderIssueAvatars() {
     if (developers?.length > 0) return <IssueAvatars users={developers} />;
@@ -148,45 +137,11 @@ export default function PageActions({
     ].some((values) => values === false);
 
   async function handleRedeem() {
-    const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue }, activeNetwork);
-    dispatch(redeemTx);
-    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
-
-    waitForRedeem(issueId, activeNetwork?.name)
-      .then(() => {
-        if (handleBeproService)
-          handleBeproService(true);
-
-        if (handleMicroService)
-          handleMicroService(true);
-      })
-
-    await BeproService.login()
-      .then(() => {
-        BeproService.network.redeemIssue(issue_id)
-                    .then((txInfo) => {
-                      processEvent(`redeem-issue`, txInfo.blockNumber, issue_id, undefined, activeNetwork?.name);
-                      txWindow.updateItem(redeemTx.payload.id, BeproService.parseTransaction(txInfo, redeemTx.payload));
-                      // return BeproService.parseTransaction(txInfo, redeemTx.payload)
-                      //                    .then((block) => dispatch(updateTransaction(block)))
-                    })
-                    .then(() => {
-                      BeproService.getBalance("bepro")
+    handleReedemIssue(networkIssue._id).then(()=>{
+      //TODO: Move to useAuth balance;
+      BeproService.getBalance("bepro")
                                   .then((bepro) => dispatch(changeBalance({ bepro })))
-                    })
-                    // .then(() => { handleBeproService(); handleMicroService(); })
-                    .catch((err) => {
-                      if (err?.message?.search(`User denied`) > -1)
-                        dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
-                      else dispatch(updateTransaction({...redeemTx.payload as any, status: TransactionStatus.failed}));
-                      console.error(`Error redeeming`, err);
-                    })
-      }).catch((err) => {
-        if (err?.message?.search(`User denied`) > -1)
-          dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
-        else dispatch(updateTransaction({...redeemTx.payload as any, status: TransactionStatus.failed}));
-        console.error(`Error logging in`, err);
-      })
+    })
   }
 
   const renderRedeem = () => {
@@ -196,7 +151,7 @@ export default function PageActions({
       !finalized && (
         <ReadOnlyButtonWrapper>
           <Button
-          className="read-only-button"
+          className="read-only-button me-1"
             disabled={isReedemButtonDisable()}
             onClick={handleRedeem}
           >
@@ -368,65 +323,8 @@ export default function PageActions({
       })
   }
 
-  async function handleDispute() {
-    const disputeTx = addTransaction({ type: TransactionTypes.dispute }, activeNetwork);
-    dispatch(disputeTx);
-
-    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
-
-    await BeproService.network
-      .disputeMerge(issue_id, +mergeId)
-      .then((txInfo) => {
-        processEvent(`dispute-proposal`, txInfo.blockNumber, issue_id, undefined, activeNetwork?.name);
-        txWindow.updateItem(disputeTx.payload.id, BeproService.parseTransaction(txInfo, disputeTx.payload));
-      })
-      .then(() => handleBeproService())
-      .catch((err) => {
-        if (err?.message?.search(`User denied`) > -1)
-          dispatch(updateTransaction({ ...(disputeTx.payload as any), remove: true }));
-        else dispatch(updateTransaction({...disputeTx.payload as any, status: TransactionStatus.failed}));
-
-        console.error("Error creating dispute", err);
-      });
-  }
-
-  async function handleClose() {
-   
-    const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue }, activeNetwork);
-    dispatch(closeIssueTx);
-
-    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
-
-    waitForClose(issueId, activeNetwork?.name)
-      .then(() => {
-        if (handleBeproService)
-          handleBeproService(true);
-
-        if (handleMicroService)
-          handleMicroService();
-      })
-
-    await BeproService.network
-      .closeIssue(issue_id, +mergeId)
-      .then((txInfo) => {
-        processEvent(`close-issue`, txInfo.blockNumber, issue_id, undefined, activeNetwork?.name).then(async () =>{
-          await onCloseEvent?.()
-        })
-        txWindow.updateItem(closeIssueTx.payload.id, BeproService.parseTransaction(txInfo, closeIssueTx.payload));
-        // return BeproService.parseTransaction(txInfo, closeIssueTx.payload).then(
-        //   (block) => dispatch(updateTransaction(block))
-        // );
-      })
-      .catch((err) => {
-        if (err?.message?.search(`User denied`) > -1)
-          dispatch(updateTransaction({ ...(closeIssueTx.payload as any), remove: true }));
-        else dispatch(updateTransaction({...closeIssueTx.payload as any, status: TransactionStatus.failed}));
-        console.error(`Error closing issue`, err);
-      });
-  }
-
   return (
-    <div className="container">
+    <div className="container mt-4">
       <div className="row justify-content-center">
         <div className="col-md-10">
           <div className="d-flex align-items-center justify-content-between mb-4">
@@ -442,15 +340,6 @@ export default function PageActions({
 
               {renderRedeem()}
               {renderProposeDestribution()}
-              {state?.toLowerCase() == "pull request" && (
-                <>
-                  { (!isDisputed && !finalized && isDisputable ) && <ReadOnlyButtonWrapper><Button color={`${isDisputed ? 'primary': 'purple'}`} className="read-only-button" onClick={handleDispute}>{t('actions.dispute')}</Button></ReadOnlyButtonWrapper> || ``}
-                  {!finalized && <ReadOnlyButtonWrapper><Button className="read-only-button" disabled={!canClose || isDisputable} onClick={handleClose}>
-                  {!canClose || isDisputable && <LockedIcon width={12} height={12} />}
-                    <span>{t('pull-request:actions.merge.title')}</span>
-                    </Button></ReadOnlyButtonWrapper> || ``}
-                </>
-              )}
 
               {renderViewPullrequest()}
 

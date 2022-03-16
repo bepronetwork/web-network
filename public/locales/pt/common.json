@@ -26,7 +26,10 @@
     "hero": {}
   },
   "heroes": {
-    "find-bounties-to-work": "Encontre bounties para trabalhar",
+    "bounties": {
+      "title": "Bounties",
+      "subtitle": "find a bounty that you want to work on, create a solution and get paid"
+    },
     "bounties-closed": "Bounties finalizadas",
     "bounties-in-network": "Na rede"
   },
@@ -95,5 +98,18 @@
     "tagline": "Os serviços de rede Bepro e o token BEPRO ($ BEPRO) não estão disponíveis em jurisdições excluídas. Ao acessar e usar a interface, você concorda com nosso ",
     "terms-and-conditions": "termos e condições",
     "support": "suporte"
+  },
+  "info-data": {
+    "minutes_other": "minuto",
+    "minutes": "minutos",
+    "hours_other": "hora",
+    "hours": "horas",
+    "months": "mes",
+    "months_other": "meses",
+    "years": "ano",
+    "years_other": "anos",
+    "days": "dia",
+    "days_other": "dias",
+    "text-data": "Aberto {{value}} atrás"
   }
 }

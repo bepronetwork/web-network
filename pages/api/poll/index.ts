@@ -7,19 +7,19 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   return new Promise((resolve) => {
     if (eventName === `mergeProposal`) {
       const {githubLogin: login, issue_id: scId, currentGithubId: ghPrId} = rest;
-      console.log(`Listening `, `mergeProposal:created:${login}:${scId}:${ghPrId}`);
+      console.warn(`Listening `, `mergeProposal:created:${login}:${scId}:${ghPrId}`);
       Bus.once(`mergeProposal:created:${login}:${scId}:${ghPrId}`, (merge) => resolve(res.json(merge)));
     }
 
     if (eventName === `closeIssue`) {
       const {currentGithubId: issueId} = rest;
-      console.log(`Listening `, `closeIssue:created:${issueId}`);
+      console.warn(`Listening `, `closeIssue:created:${issueId}`);
       Bus.once(`closeIssue:created:${issueId}`, (issue) => resolve(res.json(issue)));
     }
 
     if (eventName === `redeemIssue`) {
       const {currentGithubId: issueId} = rest;
-      console.log(`Listening redeemIssue:created:${issueId}`);
+      console.warn(`Listening redeemIssue:created:${issueId}`);
       Bus.once(`redeemIssue:created:${issueId}`, (issue) => resolve(res.json(issue)));
     }
 

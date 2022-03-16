@@ -9,7 +9,7 @@ export default function Newissues() {
   const { t } = useTranslation()
 
   return (
-    <Oracle buttonPrimaryActive={true}>
+    <Oracle>
       <>
         <ListIssues
           filterState="draft"
