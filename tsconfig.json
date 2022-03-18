@@ -3,34 +3,19 @@
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
-    "downlevelIteration": true,
     "skipLibCheck": true,
-    "strict": false,
+    "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
+    "baseUrl": ".",
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "baseUrl": ".",
-    "paths": {
-      "@db/*": ["db/*"],
-      "@assets/*": ["assets/*"],
-      "@components/*": ["components/*"],
-      "@helpers/*": ["helpers/*"],
-      "@pages/*": ["pages/*"],
-      "@providers/*": ["providers/*"],
-      "@services/*": ["services/*"],
-      "@interfaces/*": ["interfaces/*"],
-      "@contexts/*": ["contexts/*"],
-      "@reducers/*": ["contexts/reducers/*"],
-      "@styles/*": ["styles/*"],
-      "@x-hooks/*": ["x-hooks/*"],
-      "bepro-js": ["node_modules/bepro-js/dist/index.js"]
-    }
+    "incremental": true
   },
-  "exclude": ["node_modules"],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
 }
