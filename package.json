@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "17.3.1"
+    "node": "16.13.2"
   },
   "scripts": {
     "prestart": "npm run migrate",
@@ -15,7 +15,8 @@
     "build": "next build",
     "start": "next start",
     "make-seo": "node make-seo.js",
-    "schedules": "node schedules.js"
+    "schedules": "node schedules.js",
+    "lint": "npx eslint . --fix --ext .js,.jsx ."
   },
   "dependencies": {
     "@vlsergey/react-bootstrap-pagination": "^3.2.1",
