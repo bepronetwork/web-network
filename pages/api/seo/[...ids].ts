@@ -87,18 +87,18 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
 export default async function Seo(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "get":
-      await get(req, res);
-      break;
+  case "get":
+    await get(req, res);
+    break;
 
-    case "post":
-      await post(req, res).catch((e) => {
-        console.log("Error POST GetIssues", e);
-      });
-      break;
+  case "post":
+    await post(req, res).catch((e) => {
+      console.log("Error POST GetIssues", e);
+    });
+    break;
 
-    default:
-      res.status(405).json("Method not allowed");
+  default:
+    res.status(405).json("Method not allowed");
   }
 
   res.end();

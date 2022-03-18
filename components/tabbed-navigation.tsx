@@ -47,8 +47,7 @@ export default function TabbedNavigation({
 }: TabbedNavigationProps) {
   const [collapsed, setCollapsed] = useState(false);
   const toggleOnClick = useAccordionButton(String(!collapsed), () =>
-    setCollapsed(!collapsed)
-  );
+    setCollapsed(!collapsed));
 
   return (
     <Tab.Container defaultActiveKey={props.defaultActiveKey}>

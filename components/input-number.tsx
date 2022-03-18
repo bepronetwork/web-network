@@ -53,18 +53,16 @@ export default function InputNumber({
         })}
       >
         <NumberFormat
-          className={clsx(
-            "form-control border-radius-8",
-            {
+          className={clsx("form-control border-radius-8",
+                          {
               "border border-1 border-success border-radius-8": success,
               "border border-1 border-danger border-radius-8": error,
               "border border-1 border-warning border-radius-8": warning,
               ...successStyle,
               ...warningStyle,
               ...errorStyle
-            },
-            className
-          )}
+                          },
+                          className)}
           htmlFor={id}
           min={min}
           placeholder={placeholder}
@@ -72,32 +70,28 @@ export default function InputNumber({
         />
         {symbol && (
           <span
-            className={clsx(
-              "input-group-text caption-small border-radius-8",
-              classSymbol,
-              {
+            className={clsx("input-group-text caption-small border-radius-8",
+                            classSymbol,
+                            {
                 "border border-1 border-success border-radius-8": success,
                 "border border-1 border-danger border-radius-8": error,
                 "border border-1 border-warning border-radius-8": warning,
                 ...errorStyle
-              }
-            )}
+                            })}
           >
             {symbol}
           </span>
         )}
         {setMaxValue && (
           <span
-            className={clsx(
-              "input-group-text caption-medium border-radius-8 cursor-pointer",
-              classSymbol,
-              {
+            className={clsx("input-group-text caption-medium border-radius-8 cursor-pointer",
+                            classSymbol,
+                            {
                 "border border-1 border-success": success,
                 "border border-1 border-danger": error,
                 "border border-1 border-warning": warning,
                 ...errorStyle
-              }
-            )}
+                            })}
             onClick={setMaxValue}
           >
             {t("misc.max")}

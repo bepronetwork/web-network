@@ -1,7 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 
-import { psReadAsText } from "helpers/file-reader";
-import useApi from "x-hooks/use-api";
 import { useTranslation } from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
@@ -14,7 +12,11 @@ import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { addToast } from "contexts/reducers/add-toast";
 
+import { psReadAsText } from "helpers/file-reader";
+
 import { INetwork } from "interfaces/network";
+
+import useApi from "x-hooks/use-api";
 
 const defaultImage = {
   preview: undefined,
@@ -91,26 +93,22 @@ export default function OverrideNameModal({
 
     updateNetwork(json)
       .then((result) => {
-        dispatch(
-          addToast({
+        dispatch(addToast({
             type: "success",
             title: t("actions.success"),
             content: t("custom-network:messages.refresh-the-page")
-          })
-        );
+        }));
 
         setIsExecuting(false);
       })
       .catch((error) => {
-        dispatch(
-          addToast({
+        dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
             content: t("custom-network:errors.failed-to-update-network", {
               error
             })
-          })
-        );
+        }));
 
         setIsExecuting(false);
         console.log(error);
@@ -171,9 +169,7 @@ export default function OverrideNameModal({
             description={
               <>
                 {t("misc.upload")} <br />{" "}
-                {t(
-                  "custom-network:steps.network-information.fields.logo-icon.label"
-                )}
+                {t("custom-network:steps.network-information.fields.logo-icon.label")}
               </>
             }
           />
@@ -183,9 +179,7 @@ export default function OverrideNameModal({
             value={fullLogo}
             error={fullLogo.raw && !fullLogo.raw?.type?.includes("image/svg")}
             onChange={(image) => setFullLogo(image.value)}
-            description={`${t("misc.upload")} ${t(
-              "custom-network:steps.network-information.fields.full-logo.label"
-            )}`}
+            description={`${t("misc.upload")} ${t("custom-network:steps.network-information.fields.full-logo.label")}`}
             lg
           />
         </div>

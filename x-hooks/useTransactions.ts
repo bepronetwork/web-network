@@ -1,8 +1,9 @@
 import { useContext } from "react";
 
 import { ApplicationContext } from "contexts/application";
-import { BlockTransaction } from "interfaces/transaction";
 import { updateTransaction } from "contexts/reducers/update-transaction";
+
+import { BlockTransaction } from "interfaces/transaction";
 
 export default function useTransactions() {
   const {

@@ -12,9 +12,7 @@ export const ChangeSettlerTokenApproval: ReduceAction<boolean> = {
   fn: reducer
 };
 
-export const changeSettlerTokenApproval = (
-  payload: boolean
-): ReduceActor<boolean> => ({
+export const changeSettlerTokenApproval = (payload: boolean): ReduceActor<boolean> => ({
   name: ReduceActionName.ChangeSettlerTokenApproval,
   payload
 });

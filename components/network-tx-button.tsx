@@ -41,8 +41,7 @@ interface NetworkTxButtonParams {
   className?: string;
 }
 
-function networkTxButton(
-  {
+function networkTxButton({
     txMethod,
     txParams,
     onTxStart = () => {},
@@ -59,8 +58,7 @@ function networkTxButton(
     txType = TransactionTypes.unknown,
     txCurrency = "$BEPRO"
   }: NetworkTxButtonParams,
-  elementRef
-) {
+                         elementRef) {
   const { t } = useTranslation(["common"]);
 
   const [showModal, setShowModal] = useState(false);
@@ -83,23 +81,19 @@ function networkTxButton(
   function makeTx() {
     if (!beproServiceStarted || !wallet) return;
 
-    const tmpTransaction = addTransaction(
-      {
+    const tmpTransaction = addTransaction({
         type: txType,
         amount: txParams?.tokenAmount || 0,
         currency: txCurrency
-      },
-      activeNetwork
-    );
+    },
+                                          activeNetwork);
     dispatch(tmpTransaction);
 
     let transactionMethod;
 
     if (!useContract)
-      transactionMethod = BeproService.network[txMethod](
-        txParams.tokenAmount,
-        txParams.from
-      );
+      transactionMethod = BeproService.network[txMethod](txParams.tokenAmount,
+                                                         txParams.from);
     else {
       const weiAmount = BeproService.toWei(txParams?.tokenAmount.toString());
 
@@ -109,52 +103,42 @@ function networkTxButton(
           ? transactionMethod(weiAmount).send({ from: wallet.address })
           : transactionMethod(weiAmount, txParams?.from).send({
               from: wallet.address
-            });
+          });
     }
 
     transactionMethod
       .then((answer) => {
         if (answer.status) {
           onSuccess && onSuccess();
-          dispatch(
-            addToast({
+          dispatch(addToast({
               type: "success",
               title: t("actions.success"),
               content: `${txMethod} ${txParams?.tokenAmount} ${txCurrency}`
-            })
-          );
+          }));
 
-          txWindow.updateItem(
-            tmpTransaction.payload.id,
-            BeproService.parseTransaction(answer, tmpTransaction.payload)
-          );
+          txWindow.updateItem(tmpTransaction.payload.id,
+                              BeproService.parseTransaction(answer, tmpTransaction.payload));
         } else {
           onFail(answer.message);
-          dispatch(
-            addToast({
+          dispatch(addToast({
               type: "danger",
               title: t("actions.failed"),
               content: answer?.message
-            })
-          );
+          }));
         }
       })
       .catch((e) => {
         onFail(e.message);
         if (e?.message?.search("User denied") > -1)
-          dispatch(
-            updateTransaction({
+          dispatch(updateTransaction({
               ...(tmpTransaction.payload as any),
               remove: true
-            })
-          );
+          }));
         else
-          dispatch(
-            updateTransaction({
+          dispatch(updateTransaction({
               ...(tmpTransaction.payload as any),
               status: TransactionStatus.failed
-            })
-          );
+          }));
         console.error(e);
       })
       .finally(() => {

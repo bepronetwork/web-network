@@ -23,9 +23,7 @@ export default function TransactionsStateIndicator() {
     useState<Transaction | null>(null);
 
   function updateLoadingState() {
-    const loading = myTransactions.some(
-      ({ status }) => status === TransactionStatus.pending
-    );
+    const loading = myTransactions.some(({ status }) => status === TransactionStatus.pending);
 
     setLoading(loading);
     setShowOverlay(loading);

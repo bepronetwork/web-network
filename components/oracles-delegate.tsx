@@ -1,7 +1,6 @@
 import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { NumberFormatValues } from "react-number-format";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
 import { useTranslation } from "next-i18next";
 
 import InputNumber from "components/input-number";
@@ -11,6 +10,8 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
+
+import { formatNumberToCurrency } from "helpers/formatNumber";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
@@ -67,11 +68,9 @@ function OraclesDelegate(): JSX.Element {
       tokenAmount > +wallet?.balance?.oracles?.tokensLocked,
       !delegatedTo,
       isAddressesEqual(),
-      myTransactions.find(
-        ({ status, type }) =>
+      myTransactions.find(({ status, type }) =>
           status === TransactionStatus.pending &&
-          type === TransactionTypes.delegateOracles
-      )
+          type === TransactionTypes.delegateOracles)
     ].some((values) => values);
 
   const isAddressesEqual = () =>
@@ -81,10 +80,8 @@ function OraclesDelegate(): JSX.Element {
   useEffect(() => {
     if (!beproServiceStarted || !wallet?.balance) return;
 
-    setAvailableAmount(
-      +wallet?.balance?.oracles?.tokensLocked -
-        wallet?.balance?.oracles?.delegatedToOthers
-    );
+    setAvailableAmount(+wallet?.balance?.oracles?.tokensLocked -
+        wallet?.balance?.oracles?.delegatedToOthers);
   }, [beproServiceStarted, wallet?.balance]);
 
   return (
@@ -154,9 +151,7 @@ function OraclesDelegate(): JSX.Element {
             txType={TransactionTypes.delegateOracles}
             txCurrency={t("$oracles")}
             modalTitle={t("my-oracles:actions.delegate.title")}
-            modalDescription={t(
-              "my-oracles:actions.delegate.delegate-to-address"
-            )}
+            modalDescription={t("my-oracles:actions.delegate.delegate-to-address")}
             onTxStart={handleClickVerification}
             onSuccess={handleTransition}
             onFail={setError}

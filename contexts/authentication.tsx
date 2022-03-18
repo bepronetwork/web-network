@@ -7,15 +7,20 @@ import {
   createContext
 } from "react";
 
-import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
-import { changeOraclesParse } from "contexts/reducers/change-oracles";
-import { IUser } from "interfaces/authentication";
-import { IWallet } from "interfaces/authentication";
-import { BeproService } from "services/bepro-service";
-import useApi from "x-hooks/use-api";
-import useNetworkTheme from "x-hooks/use-network";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+
+import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
+
+import { changeOraclesParse } from "contexts/reducers/change-oracles";
+
+import { IUser } from "interfaces/authentication";
+import { IWallet } from "interfaces/authentication";
+
+import { BeproService } from "services/bepro-service";
+
+import useApi from "x-hooks/use-api";
+import useNetworkTheme from "x-hooks/use-network";
 
 export interface IAuthenticationContext {
   user?: IUser;
@@ -26,9 +31,7 @@ export interface IAuthenticationContext {
   updateWalletBalance: () => void;
 }
 
-const AuthenticationContext = createContext<IAuthenticationContext>(
-  {} as IAuthenticationContext
-);
+const AuthenticationContext = createContext<IAuthenticationContext>({} as IAuthenticationContext);
 
 const EXCLUDED_PAGES = ["/networks", "/[network]/connect-account"];
 
@@ -70,9 +73,8 @@ export const AuthenticationProvider = ({ children }) => {
     }
   }, [asPath]);
 
-  const validateWalletAndGithub = useCallback(
-    (address: string) => {
-      getUserOf(address)
+  const validateWalletAndGithub = useCallback((address: string) => {
+    getUserOf(address)
         .then(async (data) => {
           if (!data) {
             await signOut({ redirect: false });
@@ -86,9 +88,8 @@ export const AuthenticationProvider = ({ children }) => {
           setIsGithubAndWalletMatched(false);
           console.log(error);
         });
-    },
-    [user]
-  );
+  },
+    [user]);
 
   const updateWalletBalance = useCallback(() => {
     BeproService.getOraclesSummary().then((oracles) =>
@@ -98,8 +99,7 @@ export const AuthenticationProvider = ({ children }) => {
           ...previousWallet.balance,
           oracles: changeOraclesParse(previousWallet.address, oracles)
         }
-      }))
-    );
+      })));
 
     BeproService.getBalance("bepro").then((bepro) =>
       setWallet((previousWallet) => ({
@@ -108,8 +108,7 @@ export const AuthenticationProvider = ({ children }) => {
           ...previousWallet.balance,
           bepro
         }
-      }))
-    );
+      })));
 
     BeproService.getBalance("eth").then((eth) =>
       setWallet((previousWallet) => ({
@@ -118,8 +117,7 @@ export const AuthenticationProvider = ({ children }) => {
           ...previousWallet.balance,
           eth
         }
-      }))
-    );
+      })));
 
     BeproService.getBalance("staked").then((staked) =>
       setWallet((previousWallet) => ({
@@ -128,8 +126,7 @@ export const AuthenticationProvider = ({ children }) => {
           ...previousWallet.balance,
           staked
         }
-      }))
-    );
+      })));
   }, [wallet?.address]);
 
   // Side effects needed to the context work
@@ -153,8 +150,7 @@ export const AuthenticationProvider = ({ children }) => {
           setWallet((previousWallet) => ({
             ...previousWallet,
             address: BeproService.address
-          }))
-        )
+          })))
         .catch(console.log);
   }, [user, wallet, beproServiceStarted]);
 
@@ -190,17 +186,15 @@ export const AuthenticationProvider = ({ children }) => {
   }, []);
   // Side effects needed to the context work
 
-  const memorized = useMemo<IAuthenticationContext>(
-    () => ({
+  const memorized = useMemo<IAuthenticationContext>(() => ({
       user,
       wallet,
       beproServiceStarted,
       isGithubAndWalletMatched,
       login,
       updateWalletBalance
-    }),
-    [user, wallet, beproServiceStarted, isGithubAndWalletMatched]
-  );
+  }),
+    [user, wallet, beproServiceStarted, isGithubAndWalletMatched]);
 
   return (
     <AuthenticationContext.Provider value={memorized}>
@@ -221,9 +215,7 @@ export const useAuthentication = (): IAuthenticationContext => {
   const context = useContext(AuthenticationContext);
 
   if (!context) {
-    throw new Error(
-      "useAuthentication must be used within an AuthenticationProvider"
-    );
+    throw new Error("useAuthentication must be used within an AuthenticationProvider");
   }
 
   return context;

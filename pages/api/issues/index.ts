@@ -73,27 +73,23 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: "mergeProposals" }
   ];
 
-  const issues = await models.issue.findAndCountAll(
-    paginate({ where: whereCondition, include, nest: true }, req.query, [
+  const issues = await models.issue.findAndCountAll(paginate({ where: whereCondition, include, nest: true }, req.query, [
       [req.query.sortBy || "updatedAt", req.query.order || "DESC"]
-    ])
-  );
+  ]));
   // await composeIssues(issues.rows);
 
   return res.status(200).json(issues);
 }
 
-export default async function SearchIssues(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function SearchIssues(req: NextApiRequest,
+                                           res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "get":
-      await get(req, res);
-      break;
+  case "get":
+    await get(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 
   res.end();

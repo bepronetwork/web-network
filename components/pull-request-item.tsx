@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 
-import { getTimeDifferenceInWords } from "helpers/formatDate";
-import { formatNumberToNScale } from "helpers/formatNumber";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -15,6 +13,9 @@ import Translation from "components/translation";
 
 import { useAuthentication } from "contexts/authentication";
 import { IActiveIssue } from "contexts/issue";
+
+import { getTimeDifferenceInWords } from "helpers/formatDate";
+import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { pullRequest } from "interfaces/issue-data";
 
@@ -39,14 +40,12 @@ export default function PullRequestItem({
   const { user } = useAuthentication();
 
   function handleReviewClick() {
-    router.push(
-      getURLWithNetwork("/pull-request", {
+    router.push(getURLWithNetwork("/pull-request", {
         id: issue?.githubId,
         repoId: issue?.repository_id,
         prId: pullRequest?.githubId,
         review: true
-      })
-    );
+    }));
   }
 
   function canReview() {
@@ -59,10 +58,8 @@ export default function PullRequestItem({
       const [owner, repo] = repositoryPath.split("/");
       let lines = 0;
 
-      const { data } = await getCommitsOfPr(
-        +pullRequest?.githubId,
-        repositoryPath
-      );
+      const { data } = await getCommitsOfPr(+pullRequest?.githubId,
+                                            repositoryPath);
 
       for (const commit of data) {
         const {
@@ -128,10 +125,8 @@ export default function PullRequestItem({
               </div>
 
               <div className="col-2 caption-small text-uppercase text-gray d-flex justify-content-start">
-                {getTimeDifferenceInWords(
-                  new Date(pullRequest?.createdAt),
-                  new Date()
-                )}{" "}
+                {getTimeDifferenceInWords(new Date(pullRequest?.createdAt),
+                                          new Date())}{" "}
                 ago
               </div>
 

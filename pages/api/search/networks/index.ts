@@ -17,19 +17,15 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if (networkAddress)
     whereCondition.networkAddress = { [Op.iLike]: String(networkAddress) };
 
-  const networks = await models.network.findAndCountAll(
-    paginate(
-      {
+  const networks = await models.network.findAndCountAll(paginate({
         attributes: {
           exclude: ["id", "creatorAddress", "updatedAt"]
         },
         where: whereCondition,
         nest: true
-      },
-      req.query,
-      [[req.query.sortBy || "updatedAt", req.query.order || "DESC"]]
-    )
-  );
+  },
+                                                                 req.query,
+      [[req.query.sortBy || "updatedAt", req.query.order || "DESC"]]));
 
   return res.status(200).json({
     ...networks,
@@ -38,17 +34,15 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   });
 }
 
-export default async function SearchNetworks(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function SearchNetworks(req: NextApiRequest,
+                                             res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "get":
-      await get(req, res);
-      break;
+  case "get":
+    await get(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 
   res.end();

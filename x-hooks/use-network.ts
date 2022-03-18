@@ -1,10 +1,14 @@
-import { useNetwork } from "contexts/network";
-import { hexadecimalToRGB } from "helpers/colors";
-import { ThemeColors } from "interfaces/network";
-import useApi from "x-hooks/use-api";
 import { BEPRO_NETWORK_NAME } from "env";
 import { useRouter } from "next/router";
 import { UrlObject } from "url";
+
+import { useNetwork } from "contexts/network";
+
+import { hexadecimalToRGB } from "helpers/colors";
+
+import { ThemeColors } from "interfaces/network";
+
+import useApi from "x-hooks/use-api";
 
 //Todo: useNetwork was moved to context, refactor this hooks to be a theme-hooks
 
@@ -25,36 +29,16 @@ export default function useNetworkTheme() {
 
   function DefaultTheme(): ThemeColors {
     return {
-      text: getComputedStyle(document.documentElement).getPropertyValue(
-        "--bs-body-color"
-      ),
-      background: getComputedStyle(document.documentElement).getPropertyValue(
-        "--bs-body-bg"
-      ),
-      shadow: getComputedStyle(document.documentElement).getPropertyValue(
-        "--bs-shadow"
-      ),
-      gray: getComputedStyle(document.documentElement).getPropertyValue(
-        "--bs-gray"
-      ),
-      primary: getComputedStyle(document.documentElement).getPropertyValue(
-        "--bs-primary"
-      ),
-      secondary: getComputedStyle(document.documentElement).getPropertyValue(
-        "--bs-secondary"
-      ),
-      oracle: getComputedStyle(document.documentElement).getPropertyValue(
-        "--bs-oracle"
-      ),
-      success: getComputedStyle(document.documentElement).getPropertyValue(
-        "--bs-success"
-      ),
-      fail: getComputedStyle(document.documentElement).getPropertyValue(
-        "--bs-fail"
-      ),
-      warning: getComputedStyle(document.documentElement).getPropertyValue(
-        "--bs-warning"
-      )
+      text: getComputedStyle(document.documentElement).getPropertyValue("--bs-body-color"),
+      background: getComputedStyle(document.documentElement).getPropertyValue("--bs-body-bg"),
+      shadow: getComputedStyle(document.documentElement).getPropertyValue("--bs-shadow"),
+      gray: getComputedStyle(document.documentElement).getPropertyValue("--bs-gray"),
+      primary: getComputedStyle(document.documentElement).getPropertyValue("--bs-primary"),
+      secondary: getComputedStyle(document.documentElement).getPropertyValue("--bs-secondary"),
+      oracle: getComputedStyle(document.documentElement).getPropertyValue("--bs-oracle"),
+      success: getComputedStyle(document.documentElement).getPropertyValue("--bs-success"),
+      fail: getComputedStyle(document.documentElement).getPropertyValue("--bs-fail"),
+      warning: getComputedStyle(document.documentElement).getPropertyValue("--bs-warning")
     };
   }
 
@@ -78,84 +62,64 @@ export default function useNetworkTheme() {
       --bs-bg-opacity: 1;
       ${
         (colors.gray &&
-          `--bs-gray: ${colors.gray}; --bs-gray-rgb: ${hexadecimalToRGB(
-            colors.gray
-          ).join(",")};`) ||
+          `--bs-gray: ${colors.gray}; --bs-gray-rgb: ${hexadecimalToRGB(colors.gray).join(",")};`) ||
         ""
       }
       ${
         (colors.fail &&
-          `--bs-fail: ${colors.fail}; --bs-fail-rgb: ${hexadecimalToRGB(
-            colors.fail
-          ).join(",")};`) ||
+          `--bs-fail: ${colors.fail}; --bs-fail-rgb: ${hexadecimalToRGB(colors.fail).join(",")};`) ||
         ""
       }
       ${
         (colors.shadow &&
-          `--bs-shadow: ${colors.shadow}; --bs-shadow-rgb: ${hexadecimalToRGB(
-            colors.shadow
-          ).join(",")};`) ||
+          `--bs-shadow: ${colors.shadow}; --bs-shadow-rgb: ${hexadecimalToRGB(colors.shadow).join(",")};`) ||
         ""
       }
       ${
         (colors.oracle &&
-          `--bs-oracle: ${colors.oracle}; --bs-oracle-rgb: ${hexadecimalToRGB(
-            colors.oracle
-          ).join(",")};`) ||
+          `--bs-oracle: ${colors.oracle}; --bs-oracle-rgb: ${hexadecimalToRGB(colors.oracle).join(",")};`) ||
         ""
       }
       ${
         (colors.text &&
           `--bs-body-color: ${
             colors.text
-          }; --bs-body-color-rgb: ${hexadecimalToRGB(colors.text).join(
-            ","
-          )};`) ||
+          }; --bs-body-color-rgb: ${hexadecimalToRGB(colors.text).join(",")};`) ||
         ""
       }
       ${
         (colors.primary &&
           `--bs-primary: ${
             colors.primary
-          }; --bs-primary-rgb: ${hexadecimalToRGB(colors.primary).join(
-            ","
-          )};`) ||
+          }; --bs-primary-rgb: ${hexadecimalToRGB(colors.primary).join(",")};`) ||
         ""
       }
       ${
         (colors.success &&
           `--bs-success: ${
             colors.success
-          }; --bs-success-rgb: ${hexadecimalToRGB(colors.success).join(
-            ","
-          )};`) ||
+          }; --bs-success-rgb: ${hexadecimalToRGB(colors.success).join(",")};`) ||
         ""
       }
       ${
         (colors.warning &&
           `--bs-warning: ${
             colors.warning
-          }; --bs-warning-rgb: ${hexadecimalToRGB(colors.warning).join(
-            ","
-          )};`) ||
+          }; --bs-warning-rgb: ${hexadecimalToRGB(colors.warning).join(",")};`) ||
         ""
       }
       ${
         (colors.secondary &&
           `--bs-secondary: ${
             colors.secondary
-          }; --bs-secondary-rgb: ${hexadecimalToRGB(colors.secondary).join(
-            ","
-          )};`) ||
+          }; --bs-secondary-rgb: ${hexadecimalToRGB(colors.secondary).join(",")};`) ||
         ""
       }
       ${
         (colors.background &&
           `--bs-body-bg: ${
             colors.background
-          }; --bs-body-bg-rgb: ${hexadecimalToRGB(colors.background).join(
-            ","
-          )};`) ||
+          }; --bs-body-bg-rgb: ${hexadecimalToRGB(colors.background).join(",")};`) ||
         ""
       }
     }`;

@@ -1,7 +1,5 @@
 import { useContext, useEffect } from "react";
 
-import { handleNetworkAddress } from "helpers/custom-network";
-import { formatNumberToNScale } from "helpers/formatNumber";
 import { BEPRO_NETWORK_NAME, IPFS_BASE } from "env";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
@@ -11,6 +9,9 @@ import PullRequestLabels from "components/pull-request-labels";
 
 import { ApplicationContext } from "contexts/application";
 import { changeNetworksSummary } from "contexts/reducers/change-networks-summary";
+
+import { handleNetworkAddress } from "helpers/custom-network";
+import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { INetwork } from "interfaces/network";
 
@@ -41,11 +42,9 @@ export default function NetworkListItem({
   function handleRedirect() {
     const url = redirectToHome ? "/" : "/account/my-network/settings";
 
-    router.push(
-      getURLWithNetwork(url, {
+    router.push(getURLWithNetwork(url, {
         network: network.name
-      })
-    );
+    }));
   }
 
   useEffect(() => {
@@ -65,13 +64,11 @@ export default function NetworkListItem({
       .then((quantity) => {
         updateNetworkParameter(network.name, "openBountiesQuantity", quantity);
 
-        dispatch(
-          changeNetworksSummary({
+        dispatch(changeNetworksSummary({
             label: "bounties",
             amount: quantity,
             action: "add"
-          })
-        );
+        }));
       })
       .catch(console.log);
 
@@ -82,21 +79,15 @@ export default function NetworkListItem({
         return amount;
       })
       .then((amount) => {
-        BeproService.getNetworkObj(handleNetworkAddress(network)).then(
-          (networkObj) => {
-            getBeproCurrency(networkObj.transactionToken.contractAddress).then(
-              ({ usd }) => {
-                dispatch(
-                  changeNetworksSummary({
+        BeproService.getNetworkObj(handleNetworkAddress(network)).then((networkObj) => {
+          getBeproCurrency(networkObj.transactionToken.contractAddress).then(({ usd }) => {
+            dispatch(changeNetworksSummary({
                     label: "amountInNetwork",
                     amount: amount * usd,
                     action: "add"
-                  })
-                );
-              }
-            );
-          }
-        );
+            }));
+          });
+        });
       })
       .catch(console.log);
   }, []);

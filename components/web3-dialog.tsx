@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 
-import WebThreeUnavailable from "assets/web3-unavailable";
 import { kebabCase } from "lodash";
 import { useTranslation } from "next-i18next";
+
+import WebThreeUnavailable from "assets/web3-unavailable";
 
 import Button from "./button";
 

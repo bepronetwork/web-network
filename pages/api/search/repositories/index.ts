@@ -30,9 +30,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     whereCondition.network_id = network.id;
   }
 
-  const repositories = await models.repositories.findAndCountAll(
-    paginate({ where: whereCondition, nest: true }, req.query, [])
-  );
+  const repositories = await models.repositories.findAndCountAll(paginate({ where: whereCondition, nest: true }, req.query, []));
 
   return res.status(200).json({
     ...repositories,
@@ -41,17 +39,15 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   });
 }
 
-export default async function SearchRepositories(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function SearchRepositories(req: NextApiRequest,
+                                                 res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "get":
-      await get(req, res);
-      break;
+  case "get":
+    await get(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 
   res.end();

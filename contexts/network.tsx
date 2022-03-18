@@ -22,9 +22,7 @@ export interface NetworkContextData {
   updateActiveNetwork: () => void;
 }
 
-const NetworkContext = createContext<NetworkContextData>(
-  {} as NetworkContextData
-);
+const NetworkContext = createContext<NetworkContextData>({} as NetworkContextData);
 
 const cookieKey = "bepro.network";
 const expiresCookie = 60 * 60 * 1; // 1 hour
@@ -35,17 +33,16 @@ export const NetworkProvider: React.FC = function ({ children }) {
   const { query, push } = useRouter();
   const { getNetwork } = useApi();
 
-  const updateActiveNetwork = useCallback(
-    (forced?: boolean) => {
-      const networkName = String(query.network || BEPRO_NETWORK_NAME);
-      if (activeNetwork?.name === networkName && !forced) return activeNetwork;
+  const updateActiveNetwork = useCallback((forced?: boolean) => {
+    const networkName = String(query.network || BEPRO_NETWORK_NAME);
+    if (activeNetwork?.name === networkName && !forced) return activeNetwork;
 
-      const networkFromStorage = parseCookies()[`${cookieKey}:${networkName}`];
-      if (networkFromStorage && !forced) {
-        return setActiveNetwork(JSON.parse(networkFromStorage));
-      }
+    const networkFromStorage = parseCookies()[`${cookieKey}:${networkName}`];
+    if (networkFromStorage && !forced) {
+      return setActiveNetwork(JSON.parse(networkFromStorage));
+    }
 
-      getNetwork(networkName)
+    getNetwork(networkName)
         .then(({ data }) => {
           localStorage.setItem(networkName.toLowerCase(), JSON.stringify(data));
           setCookie(null, `${cookieKey}:${networkName}`, JSON.stringify(data), {
@@ -59,9 +56,8 @@ export const NetworkProvider: React.FC = function ({ children }) {
             pathname: "/networks"
           });
         });
-    },
-    [query, activeNetwork]
-  );
+  },
+    [query, activeNetwork]);
 
   useEffect(() => {
     updateActiveNetwork();
@@ -71,13 +67,11 @@ export const NetworkProvider: React.FC = function ({ children }) {
     //console.warn('useNetwork',{activeNetwork})
   }, [activeNetwork]);
 
-  const memorizeValue = useMemo<NetworkContextData>(
-    () => ({
+  const memorizeValue = useMemo<NetworkContextData>(() => ({
       activeNetwork,
       updateActiveNetwork
-    }),
-    [activeNetwork]
-  );
+  }),
+    [activeNetwork]);
 
   return (
     <NetworkContext.Provider value={memorizeValue}>

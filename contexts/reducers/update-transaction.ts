@@ -3,10 +3,8 @@ import { ReduceActionName } from "interfaces/enums/reduce-action-names";
 import { ReduceAction, ReduceActor } from "interfaces/reduce-action";
 import { UpdateBlockTransaction } from "interfaces/transaction";
 
-const reducer = (
-  state: ApplicationState,
-  payload: UpdateBlockTransaction
-): ApplicationState => {
+const reducer = (state: ApplicationState,
+  payload: UpdateBlockTransaction): ApplicationState => {
   const index = state.myTransactions.findIndex(({ id }) => id === payload.id);
 
   if (index === -1) return { ...state };
@@ -21,9 +19,7 @@ export const UpdateTransaction: ReduceAction<UpdateBlockTransaction> = {
   fn: reducer
 };
 
-export const updateTransaction = (
-  payload: UpdateBlockTransaction
-): ReduceActor<UpdateBlockTransaction> => ({
+export const updateTransaction = (payload: UpdateBlockTransaction): ReduceActor<UpdateBlockTransaction> => ({
   name: ReduceActionName.UpdateTransaction,
   payload
 });

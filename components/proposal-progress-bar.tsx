@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 
 import { ApplicationContext } from "contexts/application";
+
 import {
   formatNumberToNScale,
   formatNumberToString

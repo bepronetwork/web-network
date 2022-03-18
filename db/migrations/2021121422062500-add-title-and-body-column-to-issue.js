@@ -31,21 +31,17 @@ module.exports = {
         });
     }
 
-    const repositories = await queryInterface.sequelize.query(
-      "SELECT * FROM repositories",
-      {
+    const repositories = await queryInterface.sequelize.query("SELECT * FROM repositories",
+                                                              {
         type: QueryTypes.SELECT
-      }
-    );
+                                                              });
 
-    const issues = await queryInterface.sequelize.query(
-      "SELECT * FROM issues",
-      {
+    const issues = await queryInterface.sequelize.query("SELECT * FROM issues",
+                                                        {
         model: Issue,
         mapToModel: true,
         type: QueryTypes.SELECT
-      }
-    );
+                                                        });
 
     if (!issues.length) return;
 
@@ -59,9 +55,7 @@ module.exports = {
     let issuesUpdated = 0;
 
     for (const issue of issues) {
-      const repository = repositories.find(
-        (repo) => repo.id === issue.repository_id
-      );
+      const repository = repositories.find((repo) => repo.id === issue.repository_id);
 
       if (!repository) break;
 
@@ -75,16 +69,14 @@ module.exports = {
         issue_number: issue.githubId
       });
 
-      const [results, metadata] = await queryInterface.sequelize.query(
-        "UPDATE issues SET title = $title, body = $body WHERE id = $id",
-        {
+      const [results, metadata] = await queryInterface.sequelize.query("UPDATE issues SET title = $title, body = $body WHERE id = $id",
+                                                                       {
           bind: {
             title,
             body,
             id: issue.id
           }
-        }
-      );
+                                                                       });
 
       console.log(".");
 

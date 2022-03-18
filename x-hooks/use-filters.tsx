@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 
-import { IssueFilterBoxOption } from "interfaces/filters";
 import { useRouter } from "next/router";
 
 import { useNetwork } from "contexts/network";
 import { useRepos } from "contexts/repos";
 
+import { IssueFilterBoxOption } from "interfaces/filters";
 import { RepoInfo } from "interfaces/repos-list";
 
 type FilterStateUpdater = (
@@ -58,18 +58,12 @@ export default function useFilters(): [
 
   function loadRepos() {
     function mapRepo({ id: value, githubPath: label }: RepoInfo) {
-      return makeFilterOption(
-        label,
-        value,
-        (router.query?.repoId as string) === value.toString()
-      );
+      return makeFilterOption(label,
+                              value,
+                              (router.query?.repoId as string) === value.toString());
     }
 
-    setRepoFilters(
-      [makeFilterOption("All", "allrepos", !router.query?.repoId)].concat(
-        repoList?.map(mapRepo)
-      )
-    );
+    setRepoFilters([makeFilterOption("All", "allrepos", !router.query?.repoId)].concat(repoList?.map(mapRepo)));
   }
 
   function loadFilters() {
@@ -96,13 +90,11 @@ export default function useFilters(): [
   useEffect(loadFilters, [router.query]);
   useEffect(loadRepos, [repoList]);
 
-  function updateOpt(
-    opts: IssueFilterBoxOption[],
-    opt: IssueFilterBoxOption,
-    checked: boolean,
-    type: "time" | "repo" | "state",
-    multi = false
-  ): void {
+  function updateOpt(opts: IssueFilterBoxOption[],
+                     opt: IssueFilterBoxOption,
+                     checked: boolean,
+                     type: "time" | "repo" | "state",
+                     multi = false): void {
     const tmp: IssueFilterBoxOption[] = [...opts];
 
     if (multi) tmp.find((o) => o.value === opt.value).checked = checked;

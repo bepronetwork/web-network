@@ -127,20 +127,18 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function PullRequest(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function PullRequest(req: NextApiRequest,
+                                          res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "get":
-      await get(req, res);
-      break;
-    case "post":
-      await post(req, res);
-      break;
+  case "get":
+    await get(req, res);
+    break;
+  case "post":
+    await post(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 
   res.end();

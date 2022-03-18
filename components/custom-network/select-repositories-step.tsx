@@ -1,10 +1,11 @@
 import { FormCheck } from "react-bootstrap";
 
+import { BEPRO_GITHUB_USER } from "env";
+import { useTranslation } from "next-i18next";
+
 import ConnectGithub from "components/connect-github";
 import RepositoriesList from "components/custom-network/repositories-list";
 import Step from "components/step";
-import { BEPRO_GITHUB_USER } from "env";
-import { useTranslation } from "next-i18next";
 
 export default function SelectRepositoriesStep({
   data,

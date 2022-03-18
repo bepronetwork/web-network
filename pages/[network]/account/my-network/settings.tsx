@@ -1,15 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 
-import { isSameSet } from "helpers/array";
-import { isColorsSimilar } from "helpers/colors";
-import {
-  DefaultNetworkInformation,
-  handleNetworkAddress
-} from "helpers/custom-network";
-import { psReadAsText } from "helpers/file-reader";
-import { formatDate } from "helpers/formatDate";
-import { formatNumberToCurrency } from "helpers/formatNumber";
-import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 import {
   API,
   IPFS_BASE,
@@ -42,6 +32,17 @@ import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/add-toast";
+
+import { isSameSet } from "helpers/array";
+import { isColorsSimilar } from "helpers/colors";
+import {
+  DefaultNetworkInformation,
+  handleNetworkAddress
+} from "helpers/custom-network";
+import { psReadAsText } from "helpers/file-reader";
+import { formatDate } from "helpers/formatDate";
+import { formatNumberToCurrency } from "helpers/formatNumber";
+import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
 import { BeproService } from "services/bepro-service";
 
@@ -152,12 +153,8 @@ export default function Settings() {
 
   async function loadAmounts(networkArg) {
     try {
-      const tokenStaked = await BeproService.getTokensStaked(
-        handleNetworkAddress(networkArg)
-      );
-      const oraclesStaked = await BeproService.getBeproLocked(
-        handleNetworkAddress(networkArg)
-      );
+      const tokenStaked = await BeproService.getTokensStaked(handleNetworkAddress(networkArg));
+      const oraclesStaked = await BeproService.getBeproLocked(handleNetworkAddress(networkArg));
 
       setNetworkAmounts({
         tokenStaked,
@@ -192,12 +189,8 @@ export default function Settings() {
           fullName: repo.full_name
         }));
 
-        tmpRepos.push(
-          ...repos.filter(
-            (repo) =>
-              !tmpRepos.map((repoB) => repoB.fullName).includes(repo.fullName)
-          )
-        );
+        tmpRepos.push(...repos.filter((repo) =>
+              !tmpRepos.map((repoB) => repoB.fullName).includes(repo.fullName)));
       }
 
       return tmpRepos;
@@ -235,9 +228,7 @@ export default function Settings() {
   function handleCheckRepository(repositoryName) {
     const tmpSteps = Object.assign({}, newInfo);
 
-    const repositoryIndex = tmpSteps.repositories.data.findIndex(
-      (repo) => repo.name === repositoryName
-    );
+    const repositoryIndex = tmpSteps.repositories.data.findIndex((repo) => repo.name === repositoryName);
 
     tmpSteps.repositories.data[repositoryIndex].checked =
       !tmpSteps.repositories.data[repositoryIndex].checked;
@@ -262,16 +253,12 @@ export default function Settings() {
       fullLogo: networkData.fullLogo.raw
         ? await psReadAsText(networkData.fullLogo.raw)
         : undefined,
-      repositoriesToAdd: JSON.stringify(
-        repositoriesData.data
+      repositoriesToAdd: JSON.stringify(repositoriesData.data
           .filter((repo) => repo.checked && !repo.isSaved)
-          .map(({ name, fullName }) => ({ name, fullName }))
-      ),
-      repositoriesToRemove: JSON.stringify(
-        repositoriesData.data
+          .map(({ name, fullName }) => ({ name, fullName }))),
+      repositoriesToRemove: JSON.stringify(repositoriesData.data
           .filter((repo) => !repo.checked && repo.isSaved)
-          .map(({ name, fullName }) => ({ name, fullName }))
-      ),
+          .map(({ name, fullName }) => ({ name, fullName }))),
       creator: wallet?.address,
       githubLogin: user?.login,
       networkAddress: network.networkAddress,
@@ -281,35 +268,25 @@ export default function Settings() {
     updateNetwork(json)
       .then(async (result) => {
         if (currentNetworkParameters.redeemTime !== newInfo.redeemTime)
-          await BeproService.setRedeemTime(newInfo.redeemTime).catch(
-            console.log
-          );
+          await BeproService.setRedeemTime(newInfo.redeemTime).catch(console.log);
 
         if (currentNetworkParameters.disputeTime !== newInfo.disputeTime)
-          await BeproService.setDisputeTime(newInfo.disputeTime).catch(
-            console.log
-          );
+          await BeproService.setDisputeTime(newInfo.disputeTime).catch(console.log);
 
         if (currentNetworkParameters.councilAmount !== newInfo.councilAmount)
-          await BeproService.setCouncilAmount(newInfo.councilAmount).catch(
-            console.log
-          );
+          await BeproService.setCouncilAmount(newInfo.councilAmount).catch(console.log);
 
         if (
           currentNetworkParameters.percentageForDispute !==
           newInfo.percentageForDispute
         )
-          await BeproService.setPercentageForDispute(
-            newInfo.percentageForDispute
-          ).catch(console.log);
+          await BeproService.setPercentageForDispute(newInfo.percentageForDispute).catch(console.log);
 
-        dispatch(
-          addToast({
+        dispatch(addToast({
             type: "success",
             title: t("actions.success"),
             content: t("custom-network:messages.refresh-the-page")
-          })
-        );
+        }));
 
         setUpdatingNetwork(false);
 
@@ -317,15 +294,13 @@ export default function Settings() {
         loadData();
       })
       .catch((error) => {
-        dispatch(
-          addToast({
+        dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
             content: t("custom-network:errors.failed-to-update-network", {
               error
             })
-          })
-        );
+        }));
 
         setUpdatingNetwork(false);
         console.log(error);
@@ -347,28 +322,24 @@ export default function Settings() {
         });
       })
       .then(() => {
-        dispatch(
-          addToast({
+        dispatch(addToast({
             type: "success",
             title: t("actions.success"),
             content: t("custom-network:messages.network-closed")
-          })
-        );
+        }));
 
         updateWalletBalance();
 
         router.push(getURLWithNetwork("/account/my-network"));
       })
       .catch((error) => {
-        dispatch(
-          addToast({
+        dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
             content: t("custom-network:errors.failed-to-close-network", {
               error
             })
-          })
-        );
+        }));
       })
       .finally(() => {
         setIsClosing(false);
@@ -413,22 +384,18 @@ export default function Settings() {
       const similarColors = [];
       const colors = networkData.colors.data;
 
-      similarColors.push(
-        ...isColorsSimilar({ label: "text", code: colors.text }, [
+      similarColors.push(...isColorsSimilar({ label: "text", code: colors.text }, [
           { label: "primary", code: colors.primary },
           //{ label: 'secondary', code: colors.secondary },
           { label: "background", code: colors.background },
           { label: "shadow", code: colors.shadow }
-        ])
-      );
+      ]));
 
-      similarColors.push(
-        ...isColorsSimilar({ label: "background", code: colors.background }, [
+      similarColors.push(...isColorsSimilar({ label: "background", code: colors.background }, [
           { label: "success", code: colors.success },
           { label: "fail", code: colors.fail },
           { label: "warning", code: colors.warning }
-        ])
-      );
+      ]));
 
       if (
         !isSameSet(new Set(similarColors), new Set(networkData.colors.similar))
@@ -476,17 +443,13 @@ export default function Settings() {
                   className="bg-shadow"
                   error={
                     newInfo.network.data.logoIcon.raw &&
-                    !newInfo.network.data.logoIcon.raw?.type?.includes(
-                      "image/svg"
-                    )
+                    !newInfo.network.data.logoIcon.raw?.type?.includes("image/svg")
                   }
                   onChange={handleNetworkDataChange}
                   description={
                     <>
                       {t("misc.upload")} <br />{" "}
-                      {t(
-                        "custom-network:steps.network-information.fields.logo-icon.label"
-                      )}
+                      {t("custom-network:steps.network-information.fields.logo-icon.label")}
                     </>
                   }
                 />
@@ -499,26 +462,18 @@ export default function Settings() {
                   className="bg-shadow"
                   error={
                     newInfo.network.data.fullLogo.raw &&
-                    !newInfo.network.data.fullLogo.raw?.type?.includes(
-                      "image/svg"
-                    )
+                    !newInfo.network.data.fullLogo.raw?.type?.includes("image/svg")
                   }
                   onChange={handleNetworkDataChange}
-                  description={`${t("misc.upload")} ${t(
-                    "custom-network:steps.network-information.fields.full-logo.label"
-                  )}`}
+                  description={`${t("misc.upload")} ${t("custom-network:steps.network-information.fields.full-logo.label")}`}
                   lg
                 />
               </div>
 
               <div className="d-flex flex-column justify-content-center">
                 <p className="h3 text-white mb-3 text-capitalize">
-                  {showTextOrDefault(
-                    network?.name,
-                    t(
-                      "custom-network:steps.network-information.fields.name.default"
-                    )
-                  )}
+                  {showTextOrDefault(network?.name,
+                                     t("custom-network:steps.network-information.fields.name.default"))}
                 </p>
 
                 <p className="caption-small text-ligth-gray mb-1">
@@ -527,12 +482,8 @@ export default function Settings() {
                 <p className="caption-small text-gray mb-3">
                   {urlWithoutProtocol(API)}/
                   <span className="text-primary">
-                    {showTextOrDefault(
-                      getQueryableText(network?.name || ""),
-                      t(
-                        "custom-network:steps.network-information.fields.name.default"
-                      )
-                    )}
+                    {showTextOrDefault(getQueryableText(network?.name || ""),
+                                       t("custom-network:steps.network-information.fields.name.default"))}
                   </span>
                 </p>
 
@@ -604,17 +555,13 @@ export default function Settings() {
               <div className="row mx-0 px-0 mb-3">
                 <div className="col">
                   <label htmlFor="description" className="caption-small mb-2">
-                    {t(
-                      "custom-network:steps.network-information.fields.description.label"
-                    )}
+                    {t("custom-network:steps.network-information.fields.description.label")}
                   </label>
 
                   <textarea
                     name="description"
                     id="description"
-                    placeholder={t(
-                      "custom-network:steps.network-information.fields.description.placeholder"
-                    )}
+                    placeholder={t("custom-network:steps.network-information.fields.description.placeholder")}
                     cols={30}
                     rows={5}
                     className={`form-control ${
@@ -671,10 +618,8 @@ export default function Settings() {
                     classSymbol={"text-ligth-gray"}
                     label={t("custom-network:percentage-for-dispute")}
                     max={DISPUTE_PERCENTAGE_MAX}
-                    description={t(
-                      "custom-network:errors.percentage-for-dispute",
-                      { max: DISPUTE_PERCENTAGE_MAX }
-                    )}
+                    description={t("custom-network:errors.percentage-for-dispute",
+                      { max: DISPUTE_PERCENTAGE_MAX })}
                     symbol="%"
                     value={newInfo.percentageForDispute}
                     error={!isValidPercentageForDispute}

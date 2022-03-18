@@ -1,12 +1,13 @@
 import React from "react";
 
-import Modal from "components/modal";
 import { useTranslation } from "next-i18next";
 
 import ChatIcon from "assets/icons/chat-icon";
 import FeedbackIcon from "assets/icons/feedback-icon";
 import HelpIcon from "assets/icons/help-icon";
 import PageIcon from "assets/icons/page-icon";
+
+import Modal from "components/modal";
 
 export default function HelpModal({ show = false, onCloseClick = () => {} }) {
   const { t } = useTranslation("common");
@@ -18,30 +19,22 @@ export default function HelpModal({ show = false, onCloseClick = () => {} }) {
   });
 
   const helpItems = [
-    helpItem(
-      "modals.help-modal.help-center.title",
-      "modals.help-modal.help-center.content",
-      <HelpIcon />,
-      "http://support.bepro.network"
-    ),
-    helpItem(
-      "modals.help-modal.api-documentation.title",
-      "modals.help-modal.api-documentation.content",
-      <PageIcon />,
-      "http://docs.bepro.network"
-    ),
-    helpItem(
-      "modals.help-modal.live-chat.title",
-      "modals.help-modal.live-chat.content",
-      <ChatIcon />,
-      "https://discord.gg/bepronetwork"
-    ),
-    helpItem(
-      "modals.help-modal.provide-feedback.title",
-      "modals.help-modal.provide-feedback.content",
-      <FeedbackIcon />,
-      "https://discord.gg/bepronetwork"
-    )
+    helpItem("modals.help-modal.help-center.title",
+             "modals.help-modal.help-center.content",
+             <HelpIcon />,
+             "http://support.bepro.network"),
+    helpItem("modals.help-modal.api-documentation.title",
+             "modals.help-modal.api-documentation.content",
+             <PageIcon />,
+             "http://docs.bepro.network"),
+    helpItem("modals.help-modal.live-chat.title",
+             "modals.help-modal.live-chat.content",
+             <ChatIcon />,
+             "https://discord.gg/bepronetwork"),
+    helpItem("modals.help-modal.provide-feedback.title",
+             "modals.help-modal.provide-feedback.content",
+             <FeedbackIcon />,
+             "https://discord.gg/bepronetwork")
   ];
 
   function HelpItemRow(item, i) {

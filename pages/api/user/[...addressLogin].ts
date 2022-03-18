@@ -35,12 +35,12 @@ async function remove(req: NextApiRequest, res: NextApiResponse) {
 
 export default async function User(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "delete":
-      await remove(req, res);
-      break;
+  case "delete":
+    await remove(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 
   res.end();

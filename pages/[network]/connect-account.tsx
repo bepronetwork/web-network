@@ -53,9 +53,7 @@ export default function ConnectAccount() {
 
   function updateLastUsedAddress() {
     dispatch(changeLoadState(false));
-    setLastAddressBeforeConnect(
-      localStorage.getItem("lastAddressBeforeConnect")
-    );
+    setLastAddressBeforeConnect(localStorage.getItem("lastAddressBeforeConnect"));
   }
 
   async function checkAddressVsGh() {
@@ -68,26 +66,20 @@ export default function ConnectAccount() {
       validatingUser.address &&
       validatingUser.address !== wallet?.address.toLowerCase()
     ) {
-      dispatch(
-        toastError(
-          t("connect-account:errors.migrating-address-not-match", {
+      dispatch(toastError(t("connect-account:errors.migrating-address-not-match", {
             address: truncateAddress(validatingUser.address)
-          }),
-          undefined,
-          { delay: 10000 }
-        )
-      );
+      }),
+                          undefined,
+          { delay: 10000 }));
       setIsGhValid(false);
       return;
     }
 
     getUserOf(wallet?.address).then((user) => {
-      setIsGhValid(
-        (user &&
+      setIsGhValid((user &&
           user.githubHandle ===
             (session?.user.name || (session?.user as any)?.login)) ||
-          true
-      );
+          true);
 
       if (!user) return;
 
@@ -116,9 +108,7 @@ export default function ConnectAccount() {
           user?.accessToken.toLowerCase())
     ) {
       dispatch(changeLoadState(false));
-      return dispatch(
-        toastError(t("connect-account:errors.migrating-already-happened"))
-      );
+      return dispatch(toastError(t("connect-account:errors.migrating-already-happened")));
     }
 
     joinAddressToUser(session.user.name || user?.login, {
@@ -152,9 +142,7 @@ export default function ConnectAccount() {
     try {
       const chainId = (window as any)?.ethereum?.chainId;
       if (+process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID !== +chainId) {
-        dispatch(
-          changeNetwork((NetworkIds[+chainId] || "unknown")?.toLowerCase())
-        );
+        dispatch(changeNetwork((NetworkIds[+chainId] || "unknown")?.toLowerCase()));
         return;
       } else {
         await BeproService.login();

@@ -35,8 +35,7 @@ export default function CreateProposalDistributionItem({
 
   function getGithubLogin() {
     getUserOf(address).then((handle: User) =>
-      setGithubLogin(handle?.githubLogin)
-    );
+      setGithubLogin(handle?.githubLogin));
   }
 
   useEffect(getGithubLogin, [by]);

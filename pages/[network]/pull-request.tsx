@@ -45,9 +45,7 @@ export default function PullRequest() {
   function loadData() {
     dispatch(changeLoadState(true));
     if (!prId) return;
-    const currentPR = activeIssue?.pullRequests.find(
-      (pr) => +pr?.githubId === +prId
-    );
+    const currentPR = activeIssue?.pullRequests.find((pr) => +pr?.githubId === +prId);
     setPullRequest(currentPR);
     dispatch(changeLoadState(false));
   }
@@ -57,21 +55,17 @@ export default function PullRequest() {
 
     setIsExecuting(true);
 
-    createReviewForPR(
-      String(activeIssue?.issueId),
-      String(prId),
-      user?.login,
-      body,
-      network?.name
-    )
+    createReviewForPR(String(activeIssue?.issueId),
+                      String(prId),
+                      user?.login,
+                      body,
+                      network?.name)
       .then((response) => {
-        dispatch(
-          addToast({
+        dispatch(addToast({
             type: "success",
             title: t("actions.success"),
             content: t("pull-request:actions.review.success")
-          })
-        );
+        }));
 
         setPullRequest({
           ...pullRequest,
@@ -83,13 +77,11 @@ export default function PullRequest() {
         handleCloseModal();
       })
       .catch((error) => {
-        dispatch(
-          addToast({
+        dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
             content: t("pull-request:actions.review.error")
-          })
-        );
+        }));
 
         setIsExecuting(false);
       });
@@ -152,11 +144,9 @@ export default function PullRequest() {
 
             <div className="col-12 mt-4">
               {(pullRequest?.comments?.length > 0 &&
-                React.Children.toArray(
-                  pullRequest?.comments?.map((comment, index) => (
+                React.Children.toArray(pullRequest?.comments?.map((comment, index) => (
                     <Comment comment={comment} key={index} />
-                  ))
-                )) || (
+                  )))) || (
                 <NothingFound
                   description={t("pull-request:errors.no-reviews-found")}
                 />

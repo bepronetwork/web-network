@@ -41,57 +41,42 @@ export default function PageProposal() {
   const { wallet } = useAuthentication();
   const { activeNetwork } = useNetwork();
   const [proposal, setProposal] = useState<Proposal>({} as Proposal);
-  const [networkProposal, setNetworkProposal] = useState<INetworkProposal>(
-    {} as INetworkProposal
-  );
-  const [pullRequest, setPullRequest] = useState<pullRequest>(
-    {} as pullRequest
-  );
+  const [networkProposal, setNetworkProposal] = useState<INetworkProposal>({} as INetworkProposal);
+  const [pullRequest, setPullRequest] = useState<pullRequest>({} as pullRequest);
   const [usersDistribution, setUsersDistribution] = useState<
     IDistribuitonPerUser[]
   >([]);
 
   async function closeIssue() {
-    handleCloseIssue(
-      +networkIssue._id,
-      activeIssue?.issueId,
-      +proposal.scMergeId
-    )
+    handleCloseIssue(+networkIssue._id,
+                     activeIssue?.issueId,
+                     +proposal.scMergeId)
       .then(() =>
-        mergeClosedIssue(
-          activeIssue?.issueId,
-          pullRequest.githubId,
-          proposal?.scMergeId,
-          wallet?.address,
-          activeNetwork?.name
-        )
-      )
+        mergeClosedIssue(activeIssue?.issueId,
+                         pullRequest.githubId,
+                         proposal?.scMergeId,
+                         wallet?.address,
+                         activeNetwork?.name))
       .then(() => {
-        dispatch(
-          addToast({
+        dispatch(addToast({
             type: "success",
             title: t("actions.success"),
             content: t("modals.not-mergeable.success-message")
-          })
-        );
+        }));
       })
       .catch((error) => {
-        dispatch(
-          addToast({
+        dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
             content: error.response.data.message
-          })
-        );
+        }));
       });
   }
 
   async function disputeProposal() {
-    handlerDisputeProposal(+networkIssue?._id, +proposal?.scMergeId).then(
-      () => {
-        getNetworkIssue();
-      }
-    );
+    handlerDisputeProposal(+networkIssue?._id, +proposal?.scMergeId).then(() => {
+      getNetworkIssue();
+    });
   }
 
   async function loadUsersDistribution() {
@@ -101,10 +86,8 @@ export default function PageProposal() {
     )
       return;
 
-    async function mapUser(
-      address: string,
-      i: number
-    ): Promise<IDistribuitonPerUser> {
+    async function mapUser(address: string,
+                           i: number): Promise<IDistribuitonPerUser> {
       const { githubLogin } = await getUserOf(address);
       const oracles = networkProposal?.prAmounts[i].toString();
       const percentage = handlePercentage(+oracles, +activeIssue?.amount, 2);
@@ -117,14 +100,10 @@ export default function PageProposal() {
 
   async function loadData() {
     const { proposalId } = router.query;
-    const mergeProposal = activeIssue?.mergeProposals.find(
-      (p) => +p.id === +proposalId
-    );
+    const mergeProposal = activeIssue?.mergeProposals.find((p) => +p.id === +proposalId);
     const networkProposals = networkIssue?.networkProposals?.[+proposalId];
 
-    const PR = activeIssue?.pullRequests.find(
-      (pr) => pr.id === mergeProposal?.pullRequestId
-    );
+    const PR = activeIssue?.pullRequests.find((pr) => pr.id === mergeProposal?.pullRequestId);
 
     setPullRequest(PR);
     setProposal(mergeProposal);

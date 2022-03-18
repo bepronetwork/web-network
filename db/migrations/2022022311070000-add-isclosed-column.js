@@ -7,11 +7,9 @@ module.exports = {
       defaultValue: false
     });
 
-    await queryInterface.bulkUpdate(
-      "networks",
+    await queryInterface.bulkUpdate("networks",
       { isClosed: false },
-      { isClosed: null }
-    );
+      { isClosed: null });
   },
   down: async (queryInterface, Sequelize) => {
     await queryInterface.removeColumn("networks", "isClosed");

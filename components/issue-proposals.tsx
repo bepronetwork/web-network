@@ -1,11 +1,11 @@
 import React from "react";
 import { useEffect, useState } from "react";
 
-import { useAuthentication } from "contexts/authentication";
 import { useTranslation } from "next-i18next";
 
 import ProposalItem from "components/proposal-item";
 
+import { useAuthentication } from "contexts/authentication";
 import { IActiveIssue } from "contexts/issue";
 
 import { isProposalDisputable } from "helpers/proposal";
@@ -41,8 +41,7 @@ export default function IssueProposals({
     <div className={`content-wrapper ${className || ""} pt-0 pb-0`}>
       {(issue?.mergeProposals?.length > 0 &&
         networkIssue?.networkProposals?.length > 0 &&
-        React.Children.toArray(
-          issue?.mergeProposals?.map((proposal) => (
+        React.Children.toArray(issue?.mergeProposals?.map((proposal) => (
             <ProposalItem
               key={proposal.id}
               proposal={proposal}
@@ -53,8 +52,7 @@ export default function IssueProposals({
                 !networkIssue?.networkProposals[proposal.id]?.isDisputed
               }
             />
-          ))
-        )) || <NothingFound description={t("errors.not-found")} />}
+          )))) || <NothingFound description={t("errors.not-found")} />}
       {issue?.mergeProposals?.length === 0 && (
         <div className="content-list-item proposal caption-small text-center text-uppercase p-4 text-ligth-gray">
           {t("messages.no-proposals-created")}

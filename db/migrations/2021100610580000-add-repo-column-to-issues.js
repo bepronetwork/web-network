@@ -16,11 +16,9 @@ module.exports = {
         }
       })
       .then(() => {
-        queryInterface.bulkUpdate(
-          "issues",
+        queryInterface.bulkUpdate("issues",
           { repository_id: 1 },
-          { repository_id: null }
-        );
+          { repository_id: null });
       });
   },
 

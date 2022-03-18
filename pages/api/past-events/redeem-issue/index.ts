@@ -49,10 +49,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         if (!issue || issue?.state === "canceled") {
           console.log(`Emitting redeemIssue:created:${issueId}`);
           Bus.emit(`redeemIssue:created:${issueId}`, issue);
-          return console.log(
-            "Failed to find an issue to redeem or already redeemed",
-            event
-          );
+          return console.log("Failed to find an issue to redeem or already redeemed",
+                             event);
         }
 
         const repoInfo = await models.repositories.findOne({
@@ -92,17 +90,15 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     });
 }
 
-export default async function ParseRedeemIssue(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function ParseRedeemIssue(req: NextApiRequest,
+                                               res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "post":
-      await post(req, res);
-      break;
+  case "post":
+    await post(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 
   res.end();

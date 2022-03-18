@@ -1,5 +1,6 @@
-import ColorInput from "components/color-input";
 import { useTranslation } from "next-i18next";
+
+import ColorInput from "components/color-input";
 
 export default function ThemeColors({ colors, similar, setColor }) {
   const { t } = useTranslation("custom-network");

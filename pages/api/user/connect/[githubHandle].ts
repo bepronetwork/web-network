@@ -33,17 +33,15 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
   return res.status(204).json("ok");
 }
 
-export default async function ConnectUser(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function ConnectUser(req: NextApiRequest,
+                                          res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "patch":
-      await patch(req, res);
-      break;
+  case "patch":
+    await patch(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 
   res.end();

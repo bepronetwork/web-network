@@ -39,9 +39,7 @@ export const ChangeNetworksSummary: ReduceAction<ChangeNetworkSummaryProps> = {
   fn: reducer
 };
 
-export const changeNetworksSummary = (
-  payload: ChangeNetworkSummaryProps
-): ReduceActor<ChangeNetworkSummaryProps> => ({
+export const changeNetworksSummary = (payload: ChangeNetworkSummaryProps): ReduceActor<ChangeNetworkSummaryProps> => ({
   name: ReduceActionName.ChangeNetworksSummary,
   payload
 });

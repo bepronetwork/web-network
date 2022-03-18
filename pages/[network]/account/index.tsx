@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
 import { getSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -15,6 +14,8 @@ import Modal from "components/modal";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { toastError } from "contexts/reducers/add-toast";
+
+import { formatNumberToCurrency } from "helpers/formatNumber";
 
 import { IssueData } from "interfaces/issue-data";
 
@@ -39,8 +40,7 @@ export default function MyIssues() {
     if (!wallet?.address) return;
 
     getPendingFor(wallet?.address, network?.name).then((pending) =>
-      setPendingIssues(pending.rows)
-    );
+      setPendingIssues(pending.rows));
   }
 
   function createPendingIssue() {
@@ -61,9 +61,7 @@ export default function MyIssues() {
         <div className="row justify-content-center">
           {(pendingIssues?.length && (
             <div className="col-md-10">
-              <h4 className="mb-4 text-capitalize">{`${t(
-                "bounty:status.pending"
-              )} ${t("bounty:label_other")}`}</h4>
+              <h4 className="mb-4 text-capitalize">{`${t("bounty:status.pending")} ${t("bounty:label_other")}`}</h4>
               {pendingIssues.map((issue) => (
                 <IssueListItem
                   issue={issue}

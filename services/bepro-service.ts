@@ -41,10 +41,8 @@ class BeproFacet {
     try {
       if (!this.started) await this.bepro.start();
 
-      this.network = new Network(
-        this.bepro,
-        customNetworkAddress || CONTRACT_ADDRESS
-      );
+      this.network = new Network(this.bepro,
+        customNetworkAddress || CONTRACT_ADDRESS);
 
       this.erc20 = new ERC20(this.bepro, SETTLER_ADDRESS);
 
@@ -69,10 +67,8 @@ class BeproFacet {
       else {
         this.networkFactoryStarted = false;
 
-        this.networkFactory = new NetworkFactory(
-          this.bepro,
-          NETWORK_FACTORY_ADDRESS
-        );
+        this.networkFactory = new NetworkFactory(this.bepro,
+          NETWORK_FACTORY_ADDRESS);
 
         await this.networkFactory.loadContract();
 
@@ -251,11 +247,7 @@ class BeproFacet {
 
   async setPercentageForDispute(percentage: number) {
     if (this.isStarted)
-      return this.network.sendTx(
-        this.network.contract.methods.changePercentageNeededForDispute(
-          percentage
-        )
-      );
+      return this.network.sendTx(this.network.contract.methods.changePercentageNeededForDispute(percentage));
 
     return 0;
   }
@@ -274,9 +266,7 @@ class BeproFacet {
 
   async getNetworksQuantity() {
     if (this.networkFactoryStarted)
-      return this.networkFactory.callTx(
-        this.networkFactory.contract.methods.networksAmount()
-      );
+      return this.networkFactory.callTx(this.networkFactory.contract.methods.networksAmount());
 
     return 0;
   }
@@ -293,10 +283,8 @@ class BeproFacet {
     return this.bepro.Web3.utils.toWei(n.toString(), "ether");
   }
 
-  public parseTransaction(
-    transaction,
-    simpleTx?: SimpleBlockTransactionPayload
-  ) {
+  public parseTransaction(transaction,
+    simpleTx?: SimpleBlockTransactionPayload) {
     return {
       ...simpleTx,
       addressFrom: transaction.from,

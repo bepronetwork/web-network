@@ -36,25 +36,22 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         octokit,
         res,
         customNetworkId: customNetwork.id
-      })
-    )
+      }))
     .catch((error) => {
       console.log("Error reading CloseIssue", error);
       return res.status(400);
     });
 }
 
-export default async function ParseCloseIssue(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function ParseCloseIssue(req: NextApiRequest,
+                                              res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "post":
-      await post(req, res);
-      break;
+  case "post":
+    await post(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 
   res.end();

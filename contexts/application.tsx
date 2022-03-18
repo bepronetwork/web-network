@@ -6,14 +6,15 @@ import React, {
   useState
 } from "react";
 
+import { useRouter } from "next/router";
+import { setCookie, parseCookies } from "nookies";
+import sanitizeHtml from "sanitize-html";
+
 import Loading from "components/loading";
 import Toaster from "components/toaster";
+
 import { useAuthentication } from "contexts/authentication";
-import { handleNetworkAddress } from "helpers/custom-network";
-import { ApplicationState } from "interfaces/application-state";
-import { NetworkIds } from "interfaces/enums/network-ids";
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import { ReduceActor } from "interfaces/reduce-action";
+import { useNetwork } from "contexts/network";
 import { toastError } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { changeBeproInitState } from "contexts/reducers/change-bepro-init-state";
@@ -22,12 +23,16 @@ import { changeNetwork } from "contexts/reducers/change-network";
 import LoadApplicationReducers from "contexts/reducers/index";
 import { mainReducer } from "contexts/reducers/main";
 import { updateTransaction } from "contexts/reducers/update-transaction";
-import { BeproService } from "services/bepro-service";
-import { useRouter } from "next/router";
-import { setCookie, parseCookies } from "nookies";
-import sanitizeHtml from "sanitize-html";
 
-import { useNetwork } from "contexts/network";
+import { handleNetworkAddress } from "helpers/custom-network";
+
+import { ApplicationState } from "interfaces/application-state";
+import { NetworkIds } from "interfaces/enums/network-ids";
+import { TransactionStatus } from "interfaces/enums/transaction-status";
+import { ReduceActor } from "interfaces/reduce-action";
+
+import { BeproService } from "services/bepro-service";
+
 
 import { changeStakedState } from "./reducers/change-staked-amount";
 
@@ -108,11 +113,7 @@ export default function ApplicationContextProvider({ children }) {
     if (!window.ethereum) return;
 
     window.ethereum.on("chainChanged", (evt) => {
-      dispatch(
-        changeNetwork(
-          (NetworkIds[+evt?.toString()] || "unknown")?.toLowerCase()
-        )
-      );
+      dispatch(changeNetwork((NetworkIds[+evt?.toString()] || "unknown")?.toLowerCase()));
     });
 
     if (txListener) clearInterval(txListener);
@@ -126,8 +127,7 @@ export default function ApplicationContextProvider({ children }) {
       web3.eth
         .getTransaction(waitingForTx.transactionHash)
         .then((transaction) => {
-          dispatch(
-            updateTransaction({
+          dispatch(updateTransaction({
               ...waitingForTx,
               addressFrom: transaction.from,
               addressTo: transaction.to,
@@ -137,8 +137,7 @@ export default function ApplicationContextProvider({ children }) {
               status: transaction.blockNumber
                 ? TransactionStatus.completed
                 : TransactionStatus.pending
-            })
-          );
+          }));
 
           if (transaction.blockNumber) waitingForTx = null;
         });
@@ -153,25 +152,17 @@ export default function ApplicationContextProvider({ children }) {
   useEffect(() => {
     if (!authError) return;
 
-    dispatch(
-      toastError(
-        sanitizeHtml(authError, { allowedTags: [], allowedAttributes: {} })
-      )
-    );
+    dispatch(toastError(sanitizeHtml(authError, { allowedTags: [], allowedAttributes: {} })));
   }, [authError]);
 
   useEffect(() => {
     if (!waitingForTx)
       waitingForTx =
-        state.myTransactions.find(
-          ({ status }) => status === TransactionStatus.pending
-        ) || null;
+        state.myTransactions.find(({ status }) => status === TransactionStatus.pending) || null;
 
     if (waitingForTx?.transactionHash) return;
 
-    const transactionWithHash = state.myTransactions.find(
-      ({ id }) => id === waitingForTx?.id
-    );
+    const transactionWithHash = state.myTransactions.find(({ id }) => id === waitingForTx?.id);
 
     if (
       !transactionWithHash ||
@@ -190,11 +181,9 @@ export default function ApplicationContextProvider({ children }) {
 
   const restoreTransactions = async (address) => {
     const cookie = parseCookies();
-    const transactions = JSON.parse(
-      cookie[`bepro.transactions:${address}`]
+    const transactions = JSON.parse(cookie[`bepro.transactions:${address}`]
         ? cookie[`bepro.transactions:${address}`]
-        : "[]"
-    );
+        : "[]");
     const web3 = (window as any).web3;
 
     const getStatusFromBlock = async (tx) => {
@@ -228,15 +217,13 @@ export default function ApplicationContextProvider({ children }) {
       restoreTransactions(wallet?.address?.toLowerCase());
     else {
       const value = JSON.stringify(state.myTransactions.slice(0, 5));
-      setCookie(
-        null,
-        `bepro.transactions:${wallet?.address.toLowerCase()}`,
-        value,
-        {
+      setCookie(null,
+                `bepro.transactions:${wallet?.address.toLowerCase()}`,
+                value,
+                {
           maxAge: 24 * 60 * 60, // 24 hour
           path: "/"
-        }
-      );
+                });
     }
   }, [state.myTransactions, wallet]);
 

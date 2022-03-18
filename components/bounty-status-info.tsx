@@ -10,33 +10,33 @@ interface IBountyStatusInfo {
 export default function BountyStatusInfo({ issueState }: IBountyStatusInfo) {
   function handleColorState() {
     switch (issueState?.toLowerCase()) {
-      case "draft": {
-        return "bg-white-50";
-      }
-      case "open": {
-        return "bg-primary text-white";
-      }
-      case "in progress": {
-        return "bg-primary text-white";
-      }
-      case "canceled": {
-        return "bg-dark-gray text-white";
-      }
-      case "closed": {
-        return "bg-dark-gray text-white";
-      }
-      case "ready": {
-        return "bg-success";
-      }
-      case "done": {
-        return "bg-success";
-      }
-      case "disputed": {
-        return "bg-danger text-white";
-      }
-      default: {
-        return "primary";
-      }
+    case "draft": {
+      return "bg-white-50";
+    }
+    case "open": {
+      return "bg-primary text-white";
+    }
+    case "in progress": {
+      return "bg-primary text-white";
+    }
+    case "canceled": {
+      return "bg-dark-gray text-white";
+    }
+    case "closed": {
+      return "bg-dark-gray text-white";
+    }
+    case "ready": {
+      return "bg-success";
+    }
+    case "done": {
+      return "bg-success";
+    }
+    case "disputed": {
+      return "bg-danger text-white";
+    }
+    default: {
+      return "primary";
+    }
     }
   }
 

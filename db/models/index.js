@@ -12,12 +12,10 @@ import User from "./user";
 
 const Database = { sequelize: null };
 
-const sequelize = new Sequelize(
-  DatabaseConfig.database,
+const sequelize = new Sequelize(DatabaseConfig.database,
   DatabaseConfig.username,
   DatabaseConfig.password,
-  DatabaseConfig
-);
+  DatabaseConfig);
 
 Database.user = User;
 Database.developer = Developers;

@@ -69,11 +69,9 @@ function OraclesActions(): JSX.Element {
     : "0";
 
   const verifyTransactionState = (type: TransactionTypes): boolean =>
-    !!myTransactions.find(
-      (transactions) =>
+    !!myTransactions.find((transactions) =>
         transactions.type === type &&
-        transactions.status === TransactionStatus.pending
-    );
+        transactions.status === TransactionStatus.pending);
 
   const renderInfo = {
     Lock: {
@@ -134,13 +132,10 @@ function OraclesActions(): JSX.Element {
     setError("");
 
     BeproService.getBalance("bepro").then((bepro) =>
-      dispatch(changeBalance({ bepro }))
-    );
+      dispatch(changeBalance({ bepro })));
 
     BeproService.getOraclesSummary().then((oracles) => {
-      dispatch(
-        changeOraclesState(changeOraclesParse(wallet?.address, oracles))
-      );
+      dispatch(changeOraclesState(changeOraclesParse(wallet?.address, oracles)));
     });
   }
 
@@ -152,9 +147,7 @@ function OraclesActions(): JSX.Element {
     if (params.floatValue < 1 || !params.floatValue) return setTokenAmount(0);
 
     if (params.floatValue > getMaxAmmount())
-      setError(
-        t("my-oracles:errors.amount-greater", { amount: getCurrentLabel() })
-      );
+      setError(t("my-oracles:errors.amount-greater", { amount: getCurrentLabel() }));
 
     setTokenAmount(params.floatValue);
   }
@@ -176,10 +169,8 @@ function OraclesActions(): JSX.Element {
       action === t("my-oracles:actions.lock.label") && !isSettlerTokenApproved,
       !wallet?.address,
       tokenAmount > getMaxAmmount(),
-      myTransactions.find(
-        ({ status, type }) =>
-          status === TransactionStatus.pending && type === getTxType()
-      )
+      myTransactions.find(({ status, type }) =>
+          status === TransactionStatus.pending && type === getTxType())
     ].some((values) => values);
 
   const isApproveButtonDisabled = (): boolean =>
@@ -188,33 +179,25 @@ function OraclesActions(): JSX.Element {
   function approveSettlerToken() {
     if (!wallet?.address) return;
 
-    const approveTx = addTransaction(
-      { type: TransactionTypes.approveSettlerToken },
-      activeNetwork
-    );
+    const approveTx = addTransaction({ type: TransactionTypes.approveSettlerToken },
+                                     activeNetwork);
     dispatch(approveTx);
     BeproService.network
       .approveSettlerERC20Token()
       .then((txInfo) => {
-        txWindow.updateItem(
-          approveTx.payload.id,
-          BeproService.parseTransaction(txInfo, approveTx.payload)
-        );
+        txWindow.updateItem(approveTx.payload.id,
+                            BeproService.parseTransaction(txInfo, approveTx.payload));
         setIsSettlerTokenApproved(true);
         setError("");
       })
       .catch((e) => {
         if (e?.message?.search("User denied") > -1)
-          dispatch(
-            updateTransaction({ ...(approveTx.payload as any), remove: true })
-          );
+          dispatch(updateTransaction({ ...(approveTx.payload as any), remove: true }));
         else
-          dispatch(
-            updateTransaction({
+          dispatch(updateTransaction({
               ...(approveTx.payload as any),
               status: TransactionStatus.failed
-            })
-          );
+          }));
 
         console.error("Failed to approve settler token", e);
       });
@@ -331,9 +314,7 @@ function OraclesActions(): JSX.Element {
                   <span>
                     {t("actions.approve")}{" "}
                     {wallet?.address &&
-                    verifyTransactionState(
-                      TransactionTypes.approveSettlerToken
-                    ) ? (
+                    verifyTransactionState(TransactionTypes.approveSettlerToken) ? (
                       <Spinner
                         size={"xs" as unknown as "sm"}
                         className="align-self-center ml-1"

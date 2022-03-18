@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 
-import { useAuthentication } from "contexts/authentication";
 import { Octokit } from "octokit";
+
+import { useAuthentication } from "contexts/authentication";
 
 export default function useOctokit() {
   const { user } = useAuthentication();

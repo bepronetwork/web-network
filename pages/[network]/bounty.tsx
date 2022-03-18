@@ -131,10 +131,8 @@ export default function PageIssue() {
 
   function loadMergedPullRequests() {
     if (issue && wallet?.address)
-      getMergedDataFromPullRequests(
-        issue.repository?.githubPath,
-        issue.pullRequests
-      ).then(setMergedPullRequests);
+      getMergedDataFromPullRequests(issue.repository?.githubPath,
+                                    issue.pullRequests).then(setMergedPullRequests);
   }
 
   function syncLocalyState() {
@@ -143,8 +141,7 @@ export default function PageIssue() {
 
   function refreshIssue() {
     updateIssue(`${issue.repository_id}`, issue.githubId).catch(() =>
-      router.push("/404")
-    );
+      router.push("/404"));
   }
 
   useEffect(syncLocalyState, [issue, activeRepo]);
@@ -242,11 +239,9 @@ export const getServerSideProps: GetServerSideProps = async ({
 }) => {
   const { id, repoId, network } = query;
   const { getIssue } = useApi();
-  const currentIssue = await getIssue(
-    repoId as string,
-    id as string,
-    network as string
-  );
+  const currentIssue = await getIssue(repoId as string,
+                                      id as string,
+                                      network as string);
 
   return {
     props: {

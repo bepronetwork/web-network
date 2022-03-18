@@ -1,6 +1,5 @@
 import { useContext, useEffect } from "react";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
 import { useTranslation } from "next-i18next";
 
 import GithubHandle from "components/github-handle";
@@ -10,8 +9,10 @@ import { useAuthentication } from "contexts/authentication";
 import { changeMyIssuesState } from "contexts/reducers/change-my-issues";
 import {
   changeOraclesParse,
-  changeOraclesState
+  changeOraclesState,
 } from "contexts/reducers/change-oracles";
+
+import { formatNumberToCurrency } from "helpers/formatNumber";
 
 import { BeproService } from "services/bepro-service";
 
@@ -20,7 +21,7 @@ export default function AccountHero() {
 
   const {
     dispatch,
-    state: { myIssues }
+    state: { myIssues },
   } = useContext(ApplicationContext);
   const { wallet, beproServiceStarted } = useAuthentication();
 
@@ -45,7 +46,7 @@ export default function AccountHero() {
 
   useEffect(loadBeproNetworkInformation, [
     beproServiceStarted,
-    wallet?.address
+    wallet?.address,
   ]);
 
   return (
@@ -72,11 +73,9 @@ export default function AccountHero() {
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4 className="h4 mb-0">
-                      {formatNumberToCurrency(
-                        +wallet?.balance?.oracles?.tokensLocked +
+                      {formatNumberToCurrency(+wallet?.balance?.oracles?.tokensLocked +
                           +wallet?.balance?.oracles?.oraclesDelegatedByOthers ||
-                          0
-                      )}
+                          0)}
                     </h4>
                     <span className="caption-small">{t("$oracles")}</span>
                   </div>
@@ -84,9 +83,7 @@ export default function AccountHero() {
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4 className="h4 mb-0">
-                      {formatNumberToCurrency(
-                        wallet?.balance?.oracles?.delegatedToOthers || 0
-                      )}
+                      {formatNumberToCurrency(wallet?.balance?.oracles?.delegatedToOthers || 0)}
                     </h4>
                     <span className="caption-small">
                       {t("heroes.delegated-oracles")}
@@ -96,9 +93,7 @@ export default function AccountHero() {
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4 className="h4 mb-0">
-                      {formatNumberToCurrency(
-                        +wallet?.balance?.oracles?.oraclesDelegatedByOthers || 0
-                      )}
+                      {formatNumberToCurrency(+wallet?.balance?.oracles?.oraclesDelegatedByOthers || 0)}
                     </h4>
                     <span className="caption-small">
                       {t("heroes.delegated-by-others")}

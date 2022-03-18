@@ -1,8 +1,9 @@
+import { v4 as uuidv4 } from "uuid";
+
 import { ApplicationState } from "interfaces/application-state";
 import { ReduceActionName } from "interfaces/enums/reduce-action-names";
 import { ReduceAction, ReduceActor } from "interfaces/reduce-action";
 import { ToastNotification } from "interfaces/toast-notification";
-import { v4 as uuidv4 } from "uuid";
 
 const reducer = (state: ApplicationState, payload): ApplicationState => ({
   ...state,
@@ -14,9 +15,7 @@ export const AddToast: ReduceAction<string> = {
   fn: reducer
 };
 
-export const addToast = (
-  payload: ToastNotification
-): ReduceActor<ToastNotification> => ({
+export const addToast = (payload: ToastNotification): ReduceActor<ToastNotification> => ({
   name: ReduceActionName.AddToast,
   payload: { type: "primary", delay: 10000, ...payload, id: uuidv4() }
 });

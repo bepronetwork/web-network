@@ -25,15 +25,13 @@ export default function IssuePullRequests({
       }`}
     >
       {(issue?.pullRequests?.length > 0 &&
-        React.Children.toArray(
-          issue?.pullRequests?.map((pullRequest) => (
+        React.Children.toArray(issue?.pullRequests?.map((pullRequest) => (
             <PullRequestItem
               key={pullRequest.id}
               issue={issue}
               pullRequest={pullRequest}
             />
-          ))
-        )) || <NothingFound description={t("errors.not-found")} />}
+          )))) || <NothingFound description={t("errors.not-found")} />}
     </div>
   );
 }

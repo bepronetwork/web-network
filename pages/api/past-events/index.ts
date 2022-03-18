@@ -35,9 +35,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     let start = +fromBlock;
     let cEnd = 0;
 
-    console.log(
-      `Reading past events of ${customNetwork.name} - ${customNetwork.networkAddress}`
-    );
+    console.log(`Reading past events of ${customNetwork.name} - ${customNetwork.networkAddress}`);
     const network = networkBeproJs({
       contractAddress: customNetwork.networkAddress
     });
@@ -54,9 +52,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       end = lastBlock;
       cEnd = nextEnd > lastBlock ? lastBlock : nextEnd;
 
-      console.log(
-        `[${customNetwork.name}] Reading from ${start} to ${cEnd}; page: ${page} of ${pages}`
-      );
+      console.log(`[${customNetwork.name}] Reading from ${start} to ${cEnd}; page: ${page} of ${pages}`);
       await network
         .getRedeemIssueEvents({ fromBlock: start, toBlock: cEnd })
         .then((events) =>
@@ -66,8 +62,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
             res,
             octokit,
             customNetworkId: customNetwork.id
-          })
-        )
+          }))
         .catch((error) => {
           console.log("Error reading RedeemIssue", error);
         });
@@ -81,8 +76,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
             res,
             octokit,
             customNetworkId: customNetwork.id
-          })
-        )
+          }))
         .catch((error) => {
           console.log("Error reading CloseIssue", error);
         });
@@ -99,17 +93,15 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(end);
 }
 
-export default async function PastEvents(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function PastEvents(req: NextApiRequest,
+                                         res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "get":
-      await get(req, res);
-      break;
+  case "get":
+    await get(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 
   res.end();

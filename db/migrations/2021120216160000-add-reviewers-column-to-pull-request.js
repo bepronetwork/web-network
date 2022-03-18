@@ -13,12 +13,9 @@ module.exports = {
         defaultValue: []
       })
       .then(() =>
-        queryInterface.bulkUpdate(
-          "pull_requests",
+        queryInterface.bulkUpdate("pull_requests",
           { reviewers: [] },
-          { reviewers: null }
-        )
-      );
+          { reviewers: null }));
   },
 
   down: async (queryInterface, Sequelize) => {

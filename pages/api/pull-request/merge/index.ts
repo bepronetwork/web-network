@@ -46,10 +46,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     if (issueBepro.canceled || !issueBepro.finalized)
       return res.status(400).json("Issue canceled or not closed yet");
 
-    const mergeBepro = await network.getMergeById(
-      issueBepro._id,
-      mergeProposalId
-    );
+    const mergeBepro = await network.getMergeById(issueBepro._id,
+                                                  mergeProposalId);
 
     if (!mergeBepro) return res.status(404).json("Merge proposal not found");
 
@@ -59,9 +57,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       address.toLowerCase() !== issueBepro.issueGenerator.toLowerCase() &&
       address.toLowerCase() !== mergeBepro.proposalAddress.toLowerCase() &&
       !isCouncil &&
-      !mergeBepro.prAddresses.find(
-        (el) => el.toLowerCase() === address.toLowerCase()
-      )
+      !mergeBepro.prAddresses.find((el) => el.toLowerCase() === address.toLowerCase())
     )
       return res.status(403).json("Not authorized");
 
@@ -86,17 +82,15 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function PullRequest(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function PullRequest(req: NextApiRequest,
+                                          res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "post":
-      await post(req, res);
-      break;
+  case "post":
+    await post(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 
   res.end();

@@ -1,13 +1,15 @@
-import Avatar from "components/avatar";
-import Button from "components/button";
-import Modal from "components/modal";
-import { truncateAddress } from "helpers/truncate-address";
 import { signIn, signOut } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
 import ErrorMarkIcon from "assets/icons/errormark-icon";
 import metamaskLogo from "assets/metamask.png";
+
+import Avatar from "components/avatar";
+import Button from "components/button";
+import Modal from "components/modal";
+
+import { truncateAddress } from "helpers/truncate-address";
 
 export default function InvalidAccountWalletModal({ user, wallet, isVisible }) {
   const { asPath } = useRouter();
