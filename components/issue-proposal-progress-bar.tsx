@@ -1,8 +1,9 @@
 import { Fragment, useEffect, useState } from "react";
 
-import { formatDate, getTimeDifferenceInWords } from "helpers/formatDate";
 import { addSeconds } from "date-fns";
 import { useTranslation } from "next-i18next";
+
+import { formatDate, getTimeDifferenceInWords } from "helpers/formatDate";
 
 import { BeproService } from "services/bepro-service";
 
@@ -64,10 +65,8 @@ export default function IssueProposalProgressBar({
     const item = {
       Warning: {
         text: t("bounty:status.until-done", {
-          distance: getTimeDifferenceInWords(
-            addSeconds(creationDate, redeemTime),
-            new Date()
-          )
+          distance: getTimeDifferenceInWords(addSeconds(creationDate, redeemTime),
+                                             new Date())
         }),
         color: "warning",
         bgColor: "warning-opac-25"

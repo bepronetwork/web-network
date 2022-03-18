@@ -10,11 +10,10 @@ async function processPastEvents() {
     .get("past-events/")
     .then(({ data }) => console.log("Ran past events.", data))
     .catch((error) =>
-      console.log("Error on past events", error?.message || error)
-    )
-    .finally(() =>
-      setTimeout(async () => await processPastEvents(), 1 * 60 * 60 * 1000)
-    );
+      console.log("Error on past events", error?.message || error))
+    .finally(() =>{
+      return setTimeout(async () => await processPastEvents(), 1 * 60 * 60 * 1000)
+    });
 }
 
 async function moveToReady() {
@@ -22,8 +21,7 @@ async function moveToReady() {
     .post("past-events/move-to-open/")
     .then(({ data }) => console.log("Ran move to open.", data))
     .catch((error) =>
-      console.log("Error move to open", error?.message || error)
-    )
+      console.log("Error move to open", error?.message || error))
     .finally(() => setTimeout(async () => await moveToReady(), 10 * 60 * 1000));
 }
 

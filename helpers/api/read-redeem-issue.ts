@@ -2,10 +2,8 @@ import { Bus } from "helpers/bus";
 
 import api from "services/api";
 
-export default async function readRedeemIssue(
-  events,
-  { network, models, res, octokit, customNetworkId }
-) {
+export default async function readRedeemIssue(events,
+                                              { network, models, res, octokit, customNetworkId }) {
   for (const event of events) {
     const eventData = event.returnValues;
     const issueId = await network
@@ -18,12 +16,10 @@ export default async function readRedeemIssue(
     if (!issue || issue?.state === "canceled") {
       console.log(`Emitting redeemIssue:created:${issueId}`);
       Bus.emit(`redeemIssue:created:${issueId}`, issue);
-      return console.log(
-        "Failed to find an issue to redeem or already redeemed",
-        event,
-        issue,
-        customNetworkId
-      );
+      return console.log("Failed to find an issue to redeem or already redeemed",
+                         event,
+                         issue,
+                         customNetworkId);
     }
 
     const repoInfo = await models.repositories.findOne({

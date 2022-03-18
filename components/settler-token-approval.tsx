@@ -11,28 +11,25 @@ interface Props extends ComponentPropsWithRef<"button"> {
   onApprove: (isApproved: boolean) => void;
 }
 
-const SettlerTokenApproval = forwardRef<HTMLButtonElement, Props>(
-  function SettlerTokenApproval(
-    { onApprove, className, ...props },
-    ref
-  ): JSX.Element {
-    const { dispatch } = useContext(ApplicationContext);
+const SettlerTokenApproval = forwardRef<HTMLButtonElement, Props>(function SettlerTokenApproval({ onApprove, className, ...props },
+    ref): JSX.Element {
+  const { dispatch } = useContext(ApplicationContext);
 
-    async function handleClick() {
-      try {
-        dispatch(changeLoadState(true));
-        const response = await BeproService.network.approveSettlerERC20Token();
+  async function handleClick() {
+    try {
+      dispatch(changeLoadState(true));
+      const response = await BeproService.network.approveSettlerERC20Token();
 
-        onApprove(!!response.status);
-        dispatch(changeLoadState(false));
-      } catch (error) {
-        console.error("SettlerTokenApproval", error);
-        dispatch(changeLoadState(false));
-        onApprove(false);
-      }
+      onApprove(!!response.status);
+      dispatch(changeLoadState(false));
+    } catch (error) {
+      console.error("SettlerTokenApproval", error);
+      dispatch(changeLoadState(false));
+      onApprove(false);
     }
+  }
 
-    return (
+  return (
       <button
         ref={ref}
         className={clsx("btn btn-md btn-lg btn-opac w-100", className)}
@@ -41,9 +38,8 @@ const SettlerTokenApproval = forwardRef<HTMLButtonElement, Props>(
       >
         Approve
       </button>
-    );
-  }
-);
+  );
+});
 
 SettlerTokenApproval.displayName = "SettlerTokenApproval";
 export default SettlerTokenApproval;

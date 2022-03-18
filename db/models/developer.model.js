@@ -7,17 +7,15 @@ class Developer extends Model {
    * The `models/index` file will call this method automatically.
    */
   static init(sequelize) {
-    super.init(
-      {
+    super.init({
         githubHandle: DataTypes.STRING,
         address: DataTypes.STRING,
         issueId: DataTypes.INTEGER
-      },
-      {
+    },
+               {
         sequelize,
         modelName: "developer"
-      }
-    );
+               });
   }
 
   static associate(models) {

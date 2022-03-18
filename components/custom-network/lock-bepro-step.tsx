@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ProgressBar } from "react-bootstrap";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
 import { useTranslation } from "next-i18next";
 
 import ArrowRightLine from "assets/icons/arrow-right-line";
@@ -13,6 +12,8 @@ import Step from "components/step";
 import UnlockBeproModal from "components/unlock-bepro-modal";
 
 import { useAuthentication } from "contexts/authentication";
+
+import { formatNumberToCurrency } from "helpers/formatNumber";
 
 import { BeproService } from "services/bepro-service";
 
@@ -36,10 +37,8 @@ export default function LockBeproStep({
     ((data.amountLocked || 0) / (data.amountNeeded || 0)) * 100;
   const lockingPercent = ((data.amount || 0) / (data.amountNeeded || 0)) * 100;
   const maxPercent = 100 - lockedPercent;
-  const maxValue = Math.min(
-    balance.beproAvailable,
-    +data.amountNeeded - +data.amountLocked
-  );
+  const maxValue = Math.min(balance.beproAvailable,
+                            +data.amountNeeded - +data.amountLocked);
   const textAmountClass =
     data.amount > balance.beproAvailable ? "text-danger" : "text-primary";
   const amountsClass = data.amount > maxValue ? "danger" : "success";
@@ -165,10 +164,8 @@ export default function LockBeproStep({
                         </span>
 
                         <span className={`${textAmountClass} ml-1`}>
-                          {formatNumberToCurrency(
-                            parseFloat(balance.beproAvailable) -
-                              parseFloat(data.amount)
-                          )}
+                          {formatNumberToCurrency(parseFloat(balance.beproAvailable) -
+                              parseFloat(data.amount))}
                         </span>
                       </>
                     )}
@@ -235,9 +232,7 @@ export default function LockBeproStep({
                   <ArrowRightLine />
 
                   <span className="ml-1">
-                    {formatNumberToCurrency(
-                      parseFloat(data.amountLocked) + parseFloat(data.amount)
-                    )}
+                    {formatNumberToCurrency(parseFloat(data.amountLocked) + parseFloat(data.amount))}
                   </span>
                 </div>
               )}

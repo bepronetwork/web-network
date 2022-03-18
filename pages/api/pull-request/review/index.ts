@@ -57,17 +57,15 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function PullRequestReview(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function PullRequestReview(req: NextApiRequest,
+                                                res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "put":
-      await put(req, res);
-      break;
+  case "put":
+    await put(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 
   res.end();

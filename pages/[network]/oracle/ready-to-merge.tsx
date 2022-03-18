@@ -1,8 +1,9 @@
-import ListIssues from "components/list-issues";
-import Oracle from "components/oracle";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next/types";
+
+import ListIssues from "components/list-issues";
+import Oracle from "components/oracle";
 
 export default function ReadyToMergeIssues() {
   const { t } = useTranslation(["common", "bounty"]);

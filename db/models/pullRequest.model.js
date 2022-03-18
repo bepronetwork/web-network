@@ -7,8 +7,7 @@ class PullRequest extends Model {
    * The `models/index` file will call this method automatically.
    */
   static init(sequelize) {
-    super.init(
-      {
+    super.init({
         githubId: DataTypes.STRING,
         issueId: DataTypes.INTEGER,
         githubLogin: DataTypes.STRING,
@@ -17,13 +16,12 @@ class PullRequest extends Model {
           type: DataTypes.ARRAY(DataTypes.STRING),
           defaultValue: []
         }
-      },
-      {
+    },
+               {
         sequelize,
         modelName: "pullRequest",
         tableName: "pull_requests"
-      }
-    );
+               });
   }
 
   static associate(models) {

@@ -42,16 +42,13 @@ export default function NetworksPage() {
 
   useEffect(() => {
     BeproService.startNetworkFactory().catch((error) =>
-      console.log("Failed to start the Network Factory", error)
-    );
+      console.log("Failed to start the Network Factory", error));
   }, []);
 
   useEffect(() => {
-    dispatch(
-      changeNetworksSummary({
+    dispatch(changeNetworksSummary({
         action: "reset"
-      })
-    );
+    }));
   }, []);
 
   async function loadTotals() {

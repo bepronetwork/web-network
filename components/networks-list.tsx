@@ -1,18 +1,23 @@
 import { useContext, useEffect, useState } from "react";
 
+import { BEPRO_NETWORK_NAME } from "env";
+import { useTranslation } from "next-i18next";
+
 import CustomContainer from "components/custom-container";
 import InternalLink from "components/internal-link";
 import NetworkListBar from "components/network-list-bar";
 import NetworkListItem from "components/network-list-item";
 import NothingFound from "components/nothing-found";
+
 import { ApplicationContext } from "contexts/application";
 import { changeLoadState } from "contexts/reducers/change-load-state";
+
 import { orderByProperty } from "helpers/array";
+
 import { INetwork } from "interfaces/network";
+
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
-import { BEPRO_NETWORK_NAME } from "env";
-import { useTranslation } from "next-i18next";
 interface NetworksListProps {
   name?: string;
   networkAddress?: string;

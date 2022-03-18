@@ -7,10 +7,8 @@ import api from "services/api";
 
 import twitterTweet from "./handle-twitter-tweet";
 
-export default async function readCloseIssues(
-  events,
-  { network, models, octokit, res, customNetworkId }
-) {
+export default async function readCloseIssues(events,
+                                              { network, models, octokit, res, customNetworkId }) {
   for (const event of events) {
     const eventData = event.returnValues;
     // Merge PR and close issue on github
@@ -29,9 +27,7 @@ export default async function readCloseIssues(
       return res.status(204);
     }
 
-    const merge = issue?.mergeProposals?.find(
-      (mp) => mp.scMergeId == eventData.mergeID
-    );
+    const merge = issue?.mergeProposals?.find((mp) => mp.scMergeId == eventData.mergeID);
     const mergeProposal = await models.mergeProposal.findOne({
       where: { id: merge.id },
       include: ["pullrequest"]

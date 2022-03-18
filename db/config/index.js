@@ -15,6 +15,6 @@ module.exports = {
             rejectUnauthorized: false
           }
         }
-      }
+    }
     : {})
 };

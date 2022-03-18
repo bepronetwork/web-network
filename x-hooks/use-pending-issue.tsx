@@ -1,10 +1,10 @@
 import { Dispatch, SetStateAction, useContext, useState } from "react";
 
+import { ApplicationContext } from "contexts/application";
+import { useNetwork } from "contexts/network";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { updateTransaction } from "contexts/reducers/update-transaction";
 
-import { ApplicationContext } from "contexts/application";
-import { useNetwork } from "contexts/network";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
@@ -32,11 +32,9 @@ export default function usePendingIssue<
   const txWindow = useTransactions();
   const { activeNetwork } = useNetwork();
 
-  async function updateIssueWithCID(
-    repoId,
-    githubId,
-    issueId
-  ): Promise<boolean> {
+  async function updateIssueWithCID(repoId,
+                                    githubId,
+                                    issueId): Promise<boolean> {
     return patchIssueWithScId(repoId, githubId, issueId, activeNetwork?.name);
   }
 
@@ -51,19 +49,15 @@ export default function usePendingIssue<
     const cid = [repository_id, githubId].join("/");
     const tokenAmount = amount.toString();
 
-    const openIssueTx = addTransaction(
-      { type: TransactionTypes.openIssue, amount },
-      activeNetwork
-    );
+    const openIssueTx = addTransaction({ type: TransactionTypes.openIssue, amount },
+                                       activeNetwork);
     dispatch(openIssueTx);
 
     return BeproService.network
       .openIssue(cid, +tokenAmount)
       .then(async (txInfo) => {
-        txWindow.updateItem(
-          openIssueTx.payload.id,
-          BeproService.parseTransaction(txInfo, openIssueTx.payload)
-        );
+        txWindow.updateItem(openIssueTx.payload.id,
+                            BeproService.parseTransaction(txInfo, openIssueTx.payload));
         // BeproService.parseTransaction(txInfo, openIssueTx.payload)
         //             .then(block => dispatch(updateTransaction(block)))
         const events = await BeproService.network.getOpenIssueEvents({
@@ -79,25 +73,19 @@ export default function usePendingIssue<
       .catch((e) => {
         console.error("Failed to createIssue", e);
         if (e?.message?.search("User denied") > -1)
-          dispatch(
-            updateTransaction({ ...(openIssueTx.payload as any), remove: true })
-          );
+          dispatch(updateTransaction({ ...(openIssueTx.payload as any), remove: true }));
         else
-          dispatch(
-            updateTransaction({
+          dispatch(updateTransaction({
               ...(openIssueTx.payload as any),
               status: TransactionStatus.failed
-            })
-          );
+          }));
         return {} as any;
       });
   }
 
   async function pendingIssueExistsOnSC(issue: IssueData): Promise<boolean> {
     return !!(
-      await BeproService.network.getIssueByCID(
-        `${issue.repository_id}/${issue.githubId}`
-      )
+      await BeproService.network.getIssueByCID(`${issue.repository_id}/${issue.githubId}`)
     )?.cid;
   }
 
@@ -111,20 +99,16 @@ export default function usePendingIssue<
 
   async function treatPendingIssue(): Promise<boolean> {
     if (issueExistsOnSc)
-      return updateIssueWithCID(
-        pendingIssue.repository_id,
-        pendingIssue.githubId,
-        pendingIssue.issueId ||
-          [pendingIssue.repository_id, pendingIssue.githubId].join("/")
-      );
+      return updateIssueWithCID(pendingIssue.repository_id,
+                                pendingIssue.githubId,
+                                pendingIssue.issueId ||
+          [pendingIssue.repository_id, pendingIssue.githubId].join("/"));
 
     return createPendingIssue().then((_issue) => {
       if (!_issue.issueId) return false;
-      return updateIssueWithCID(
-        _issue?.repoId,
-        _issue?.githubId,
-        _issue?.issueId
-      );
+      return updateIssueWithCID(_issue?.repoId,
+                                _issue?.githubId,
+                                _issue?.issueId);
     });
   }
 

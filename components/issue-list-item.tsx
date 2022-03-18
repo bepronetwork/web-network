@@ -1,7 +1,6 @@
 import React from "react";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
-import { formatNumberToNScale } from "helpers/formatNumber";
 import { GetStaticProps } from "next";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
@@ -10,6 +9,8 @@ import Avatar from "components/avatar";
 import GithubInfo from "components/github-info";
 
 import { useNetwork } from "contexts/network";
+
+import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { IssueData, pullRequest } from "interfaces/issue-data";
 import { IssueState } from "interfaces/issue-data";

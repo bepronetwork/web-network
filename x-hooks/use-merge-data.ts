@@ -1,9 +1,11 @@
+import { useRepos } from "contexts/repos";
+
 import { IssueData, pullRequest } from "interfaces/issue-data";
 import { PaginatedData } from "interfaces/paginated-data";
+
 import useApi from "x-hooks/use-api";
 import useOctokit from "x-hooks/use-octokit";
 
-import { useRepos } from "contexts/repos";
 interface MergeProps {
   repoId: string;
   githubId: string;
@@ -23,14 +25,10 @@ export default function useMergeData() {
     for (let i = 0; i < data.length; i++) {
       const issue = data[i];
       if (OctoData[`${issue.githubId}/${issue.repository_id}`])
-        Object.assign(
-          issue,
-          OctoData[`${issue.githubId}/${issue.repository_id}`]
-        );
+        Object.assign(issue,
+                      OctoData[`${issue.githubId}/${issue.repository_id}`]);
       else {
-        const { githubPath: repo } = list.find(
-          ({ id }) => id === issue.repository_id
-        );
+        const { githubPath: repo } = list.find(({ id }) => id === issue.repository_id);
         const {
           data: { title, body, comments }
         } = await octokit.getIssue(+issue.githubId, repo);
@@ -45,19 +43,15 @@ export default function useMergeData() {
     }
   }
 
-  async function getIssue(
-    repoId: string,
-    githubId: string,
-    path: string,
-    networkName = "bepro"
-  ): Promise<IssueData> {
+  async function getIssue(repoId: string,
+                          githubId: string,
+                          path: string,
+                          networkName = "bepro"): Promise<IssueData> {
     const apiData = await db.getIssue(repoId, githubId, networkName);
 
     if (OctoData[`${apiData.githubId}/${apiData.repository_id}`])
-      Object.assign(
-        apiData,
-        OctoData[`${apiData.githubId}/${apiData.repository_id}`]
-      );
+      Object.assign(apiData,
+                    OctoData[`${apiData.githubId}/${apiData.repository_id}`]);
 
     const {
       data: { title, body }
@@ -82,17 +76,15 @@ export default function useMergeData() {
     creator = "",
     networkName = "bepro"
   }) {
-    const data = await db.getIssues(
-      page,
-      repoId,
-      time,
-      state,
-      sortBy,
-      order,
-      address,
-      creator,
-      networkName
-    );
+    const data = await db.getIssues(page,
+                                    repoId,
+                                    time,
+                                    state,
+                                    sortBy,
+                                    order,
+                                    address,
+                                    creator,
+                                    networkName);
 
     await mergeData(data.rows);
 
@@ -107,19 +99,13 @@ export default function useMergeData() {
     return data;
   }
 
-  async function getIssuesOfUserPullRequests(
-    page,
-    githubLogin: string,
-    networkName = "bepro"
-  ) {
-    const pullRequestsWithIssueData = (await db.getUserPullRequests(
-      page,
-      githubLogin,
-      networkName
-    )) as PaginatedData<pullRequest>;
-    const issues = pullRequestsWithIssueData.rows.map(
-      (pullRequest) => pullRequest.issue
-    );
+  async function getIssuesOfUserPullRequests(page,
+                                             githubLogin: string,
+                                             networkName = "bepro") {
+    const pullRequestsWithIssueData = (await db.getUserPullRequests(page,
+                                                                    githubLogin,
+                                                                    networkName)) as PaginatedData<pullRequest>;
+    const issues = pullRequestsWithIssueData.rows.map((pullRequest) => pullRequest.issue);
 
     await mergeData(issues);
 
@@ -134,14 +120,10 @@ export default function useMergeData() {
 
       if (!OctoData[key]) {
         try {
-          const { data: comments } = await octokit.getPullRequestComments(
-            pr.githubId,
-            repo
-          );
-          const { data: pullRequest } = await octokit.getPullRequest(
-            pr.githubId,
-            repo
-          );
+          const { data: comments } = await octokit.getPullRequestComments(pr.githubId,
+                                                                          repo);
+          const { data: pullRequest } = await octokit.getPullRequest(pr.githubId,
+                                                                     repo);
 
           OctoData[key] = {
             comments: comments,

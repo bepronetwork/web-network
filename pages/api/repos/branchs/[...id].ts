@@ -42,17 +42,15 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(listBranchs);
 }
 
-export default async function GetBranchs(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function GetBranchs(req: NextApiRequest,
+                                         res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "get":
-      await get(req, res);
-      break;
+  case "get":
+    await get(req, res);
+    break;
 
-    default:
-      res.status(405).json("Method not allowed");
+  default:
+    res.status(405).json("Method not allowed");
   }
 
   res.end();

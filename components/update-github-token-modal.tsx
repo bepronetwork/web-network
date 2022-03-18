@@ -1,9 +1,11 @@
-import Button from "components/button";
-import Modal from "components/modal";
-import { useAuthentication } from "contexts/authentication";
 import { signIn } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import { setCookie } from "nookies";
+
+import Button from "components/button";
+import Modal from "components/modal";
+
+import { useAuthentication } from "contexts/authentication";
 
 export default function UpdateGithubTokenModal({
   redirectTo,

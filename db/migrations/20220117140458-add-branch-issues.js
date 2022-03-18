@@ -10,14 +10,12 @@ module.exports = {
         type: Sequelize.STRING
       })
       .then(async () => {
-        const [results, metadata] = await queryInterface.sequelize.query(
-          "UPDATE issues SET branch = $branch WHERE branch IS NULL",
-          {
+        const [results, metadata] = await queryInterface.sequelize.query("UPDATE issues SET branch = $branch WHERE branch IS NULL",
+                                                                         {
             bind: {
               branch: process.env.NEXT_GITHUB_MAINBRANCH || "master"
             }
-          }
-        );
+                                                                         });
 
         console.log({ results, metadata });
       });

@@ -1,5 +1,6 @@
-import ReactSelect from "components/react-select";
 import { useRouter } from "next/router";
+
+import ReactSelect from "components/react-select";
 
 interface Option {
   value: string;
@@ -33,9 +34,7 @@ export default function ListSort({
 
   function getDefaultValue(): Option {
     if (sortBy && order) {
-      const optionExists = options.find(
-        (option) => option.sortBy === sortBy && option.order === order
-      );
+      const optionExists = options.find((option) => option.sortBy === sortBy && option.order === order);
 
       if (optionExists) return optionExists;
     }

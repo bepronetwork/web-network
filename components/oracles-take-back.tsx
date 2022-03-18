@@ -35,10 +35,7 @@ export default function OraclesTakeBack(): JSX.Element {
     BeproService.network
       .getOraclesSummary(wallet?.address)
       .then((oracles) =>
-        dispatch(
-          changeOraclesState(changeOraclesParse(wallet?.address, oracles))
-        )
-      );
+        dispatch(changeOraclesState(changeOraclesParse(wallet?.address, oracles))));
   }
 
   useEffect(setMappedSummaryItems, [

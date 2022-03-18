@@ -2,9 +2,11 @@ import React, { useContext, useEffect } from "react";
 
 import Button from "components/button";
 import Indicator from "components/indicator";
+
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { changeNetwork } from "contexts/reducers/change-network";
+
 import { NetworkIds, NetworkColors } from "interfaces/enums/network-ids";
 
 export default function NetworkIdentifier() {

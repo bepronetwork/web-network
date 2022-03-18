@@ -1,10 +1,11 @@
-import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 import { API } from "env";
 import { useTranslation } from "next-i18next";
 
 import ThemeColors from "components/custom-network/theme-colors";
 import ImageUploader from "components/image-uploader";
 import Step from "components/step";
+
+import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
 import useNetwork from "x-hooks/use-network";
 
@@ -79,9 +80,7 @@ export default function NetworkInformationStep({
               description={
                 <>
                   {t("misc.upload")} <br />{" "}
-                  {t(
-                    "custom-network:steps.network-information.fields.logo-icon.label"
-                  )}
+                  {t("custom-network:steps.network-information.fields.logo-icon.label")}
                 </>
               }
             />
@@ -94,9 +93,7 @@ export default function NetworkInformationStep({
                 !data.fullLogo.raw?.type?.includes("image/svg")
               }
               onChange={changedDataHandler}
-              description={`${t("misc.upload")} ${t(
-                "custom-network:steps.network-information.fields.full-logo.label"
-              )}`}
+              description={`${t("misc.upload")} ${t("custom-network:steps.network-information.fields.full-logo.label")}`}
               lg
             />
           </div>
@@ -108,25 +105,17 @@ export default function NetworkInformationStep({
 
         <div className="col ml-2">
           <p className="h3 text-white mb-3">
-            {showTextOrDefault(
-              data.displayName.data,
-              t("custom-network:steps.network-information.fields.name.default")
-            )}
+            {showTextOrDefault(data.displayName.data,
+                               t("custom-network:steps.network-information.fields.name.default"))}
           </p>
           <p className="caption-small text-ligth-gray mb-2">
-            {t(
-              "custom-network:steps.network-information.fields.name.temporary"
-            )}
+            {t("custom-network:steps.network-information.fields.name.temporary")}
           </p>
           <p className="caption-small text-gray">
             {urlWithoutProtocol(API)}/
             <span className="text-primary">
-              {getQueryableText(
-                data.displayName.data ||
-                  t(
-                    "custom-network:steps.network-information.fields.name.default"
-                  )
-              )}
+              {getQueryableText(data.displayName.data ||
+                  t("custom-network:steps.network-information.fields.name.default"))}
             </span>
           </p>
         </div>
@@ -142,9 +131,7 @@ export default function NetworkInformationStep({
             type="text"
             name="display-name"
             id="display-name"
-            placeholder={t(
-              "custom-network:steps.network-information.fields.name.default"
-            )}
+            placeholder={t("custom-network:steps.network-information.fields.name.default")}
             className={`form-control ${
               data.displayName.validated !== undefined
                 ? (data.displayName.validated === true && "is-valid") ||
@@ -163,14 +150,10 @@ export default function NetworkInformationStep({
           )) || (
             <>
               <p className="valid-feedback p-small mt-2 mb-0">
-                {t(
-                  "custom-network:steps.network-information.fields.name.available"
-                )}
+                {t("custom-network:steps.network-information.fields.name.available")}
               </p>
               <p className="invalid-feedback p-small mt-2 mb-0">
-                {t(
-                  "custom-network:steps.network-information.fields.name.unavailable"
-                )}
+                {t("custom-network:steps.network-information.fields.name.unavailable")}
               </p>
             </>
           )}
@@ -180,17 +163,13 @@ export default function NetworkInformationStep({
       <div className="row mx-0 px-0 mb-3">
         <div className="col">
           <label htmlFor="description" className="caption-small mb-2">
-            {t(
-              "custom-network:steps.network-information.fields.description.label"
-            )}
+            {t("custom-network:steps.network-information.fields.description.label")}
           </label>
 
           <textarea
             name="description"
             id="description"
-            placeholder={t(
-              "custom-network:steps.network-information.fields.description.placeholder"
-            )}
+            placeholder={t("custom-network:steps.network-information.fields.description.placeholder")}
             cols={30}
             rows={5}
             className="form-control"

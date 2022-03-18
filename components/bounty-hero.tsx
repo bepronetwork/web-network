@@ -1,7 +1,7 @@
-import GithubInfo from "components/github-info";
 import { useTranslation } from "next-i18next";
 
 import Avatar from "components/avatar";
+import GithubInfo from "components/github-info";
 
 import { useIssue } from "contexts/issue";
 

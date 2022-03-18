@@ -13,10 +13,8 @@ export default class Bepro {
 
     await this.bepro.start();
 
-    this.networkFactory = new NetworkFactory(
-      this.bepro,
-      NETWORK_FACTORY_ADDRESS
-    );
+    this.networkFactory = new NetworkFactory(this.bepro,
+      NETWORK_FACTORY_ADDRESS);
 
     if (factory) await this.networkFactory.loadContract();
   }

@@ -1,5 +1,3 @@
-import { Proposal } from "interfaces/proposal";
-import { ReposList } from "interfaces/repos-list";
 import axios from "axios";
 import {
   BEPRO_NETWORK_NAME,
@@ -14,6 +12,8 @@ import { BranchInfo, BranchsList } from "interfaces/branchs-list";
 import { IssueData, pullRequest } from "interfaces/issue-data";
 import { INetwork } from "interfaces/network";
 import { PaginatedData } from "interfaces/paginated-data";
+import { Proposal } from "interfaces/proposal";
+import { ReposList } from "interfaces/repos-list";
 
 import client from "services/api";
 
@@ -35,17 +35,15 @@ const repoList: ReposList = [];
 const branchsList: BranchsList = {};
 
 export default function useApi() {
-  async function getIssues(
-    page = "1",
-    repoId = "",
-    time = "",
-    state = "",
-    sortBy = "updatedAt",
-    order = "DESC",
-    address = "",
-    creator = "",
-    networkName = BEPRO_NETWORK_NAME
-  ) {
+  async function getIssues(page = "1",
+                           repoId = "",
+                           time = "",
+                           state = "",
+                           sortBy = "updatedAt",
+                           order = "DESC",
+                           address = "",
+                           creator = "",
+                           networkName = BEPRO_NETWORK_NAME) {
     const search = new URLSearchParams({
       address,
       page,
@@ -115,28 +113,22 @@ export default function useApi() {
       networkName
     }).toString();
     return client
-      .get<{ rows; count: number; pages: number; currentPage: number }>(
-        `/search/repositories?${params}`
-      )
+      .get<{ rows; count: number; pages: number; currentPage: number }>(`/search/repositories?${params}`)
       .then(({ data }) => data)
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
-  async function getIssue(
-    repoId: string,
-    ghId: string,
-    networkName = BEPRO_NETWORK_NAME
-  ) {
+  async function getIssue(repoId: string,
+                          ghId: string,
+                          networkName = BEPRO_NETWORK_NAME) {
     return client
       .get<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`)
       .then(({ data }) => data)
       .catch(() => null);
   }
 
-  async function createIssue(
-    payload: NewIssueParams,
-    networkName = BEPRO_NETWORK_NAME
-  ) {
+  async function createIssue(payload: NewIssueParams,
+                             networkName = BEPRO_NETWORK_NAME) {
     return client
       .post<number>("/issue", { ...payload, networkName })
       .then(({ data }) => data)
@@ -150,12 +142,10 @@ export default function useApi() {
       .catch(() => null);
   }
 
-  async function patchIssueWithScId(
-    repoId,
-    githubId,
-    scId,
-    networkName = BEPRO_NETWORK_NAME
-  ) {
+  async function patchIssueWithScId(repoId,
+                                    githubId,
+                                    scId,
+                                    networkName = BEPRO_NETWORK_NAME) {
     return client
       .patch("/issue", { repoId, githubId, scId, networkName })
       .then(({ data }) => data === "ok")
@@ -169,11 +159,9 @@ export default function useApi() {
       .catch((_) => false);
   }
 
-  async function getPendingFor(
-    address: string,
-    page = "1",
-    networkName = BEPRO_NETWORK_NAME
-  ) {
+  async function getPendingFor(address: string,
+                               page = "1",
+                               networkName = BEPRO_NETWORK_NAME) {
     const search = new URLSearchParams({
       address,
       page,
@@ -186,17 +174,15 @@ export default function useApi() {
       .catch(() => null);
   }
 
-  async function createPullRequestIssue(
-    repoId: string,
-    githubId: string,
-    payload: {
+  async function createPullRequestIssue(repoId: string,
+                                        githubId: string,
+                                        payload: {
       title: string;
       description: string;
       username: string;
       branch: string;
     },
-    networkName = BEPRO_NETWORK_NAME
-  ) {
+                                        networkName = BEPRO_NETWORK_NAME) {
     return client
       .post("/pull-request/", { ...payload, repoId, githubId, networkName })
       .then(() => true)
@@ -216,10 +202,8 @@ export default function useApi() {
       });
   }
 
-  async function joinAddressToUser(
-    githubHandle: string,
-    payload: { address: string; migrate?: boolean }
-  ): Promise<boolean> {
+  async function joinAddressToUser(githubHandle: string,
+                                   payload: { address: string; migrate?: boolean }): Promise<boolean> {
     return client
       .patch<string>(`/user/connect/${githubHandle}`, payload)
       .then(() => true)
@@ -270,11 +254,9 @@ export default function useApi() {
       .catch(() => []);
   }
 
-  async function getBranchsList(
-    repoId: string | number,
-    force = false,
-    networkName = BEPRO_NETWORK_NAME
-  ) {
+  async function getBranchsList(repoId: string | number,
+                                force = false,
+                                networkName = BEPRO_NETWORK_NAME) {
     if (!force && branchsList[repoId]?.length)
       return Promise.resolve(branchsList[repoId] as BranchInfo[]);
 
@@ -294,58 +276,44 @@ export default function useApi() {
       .catch(() => false);
   }
 
-  async function poll(
-    eventName: string,
-    rest,
-    networkName = BEPRO_NETWORK_NAME
-  ) {
-    return client.post(
-      "/poll/",
+  async function poll(eventName: string,
+                      rest,
+                      networkName = BEPRO_NETWORK_NAME) {
+    return client.post("/poll/",
       { eventName, ...rest, networkName },
-      { timeout: 2 * 60 * 1000 }
-    );
+      { timeout: 2 * 60 * 1000 });
   }
 
-  async function waitForMerge(
-    githubLogin,
-    issue_id,
-    currentGithubId,
-    networkName = BEPRO_NETWORK_NAME
-  ) {
-    return poll(
-      "mergeProposal",
+  async function waitForMerge(githubLogin,
+                              issue_id,
+                              currentGithubId,
+                              networkName = BEPRO_NETWORK_NAME) {
+    return poll("mergeProposal",
       { githubLogin, issue_id, currentGithubId },
-      networkName
-    )
+                networkName)
       .then(({ data }) => data)
       .catch(() => null);
   }
 
-  async function waitForClose(
-    currentGithubId,
-    networkName = BEPRO_NETWORK_NAME
-  ) {
+  async function waitForClose(currentGithubId,
+                              networkName = BEPRO_NETWORK_NAME) {
     return poll("closeIssue", { currentGithubId }, networkName)
       .then(({ data }) => data)
       .catch(() => null);
   }
 
-  async function waitForRedeem(
-    currentGithubId,
-    networkName = BEPRO_NETWORK_NAME
-  ) {
+  async function waitForRedeem(currentGithubId,
+                               networkName = BEPRO_NETWORK_NAME) {
     return poll("redeemIssue", { currentGithubId }, networkName)
       .then(({ data }) => data)
       .catch(() => null);
   }
 
-  async function processEvent(
-    eventName,
-    fromBlock: number,
-    id: number,
-    pullRequestId = "",
-    networkName = BEPRO_NETWORK_NAME
-  ) {
+  async function processEvent(eventName,
+                              fromBlock: number,
+                              id: number,
+                              pullRequestId = "",
+                              networkName = BEPRO_NETWORK_NAME) {
     return client.post(`/past-events/${eventName}/`, {
       fromBlock,
       id,
@@ -374,11 +342,9 @@ export default function useApi() {
       });
   }
 
-  async function userHasPR(
-    issueId: string,
-    login: string,
-    networkName = BEPRO_NETWORK_NAME
-  ) {
+  async function userHasPR(issueId: string,
+                           login: string,
+                           networkName = BEPRO_NETWORK_NAME) {
     const search = new URLSearchParams({
       issueId,
       login,
@@ -394,11 +360,9 @@ export default function useApi() {
       });
   }
 
-  async function getUserPullRequests(
-    page = "1",
-    login: string,
-    networkName = BEPRO_NETWORK_NAME
-  ) {
+  async function getUserPullRequests(page = "1",
+                                     login: string,
+                                     networkName = BEPRO_NETWORK_NAME) {
     const search = new URLSearchParams({ page, login, networkName }).toString();
 
     return client
@@ -410,11 +374,9 @@ export default function useApi() {
       });
   }
 
-  async function startWorking(
-    issueId: string,
-    githubLogin: string,
-    networkName = BEPRO_NETWORK_NAME
-  ) {
+  async function startWorking(issueId: string,
+                              githubLogin: string,
+                              networkName = BEPRO_NETWORK_NAME) {
     return client
       .put("/issue/working", { issueId, githubLogin, networkName })
       .then((response) => response)
@@ -423,13 +385,11 @@ export default function useApi() {
       });
   }
 
-  async function mergeClosedIssue(
-    issueId: string,
-    pullRequestId: string,
-    mergeProposalId: string,
-    address: string,
-    networkName = BEPRO_NETWORK_NAME
-  ) {
+  async function mergeClosedIssue(issueId: string,
+                                  pullRequestId: string,
+                                  mergeProposalId: string,
+                                  address: string,
+                                  networkName = BEPRO_NETWORK_NAME) {
     return client
       .post("/pull-request/merge", {
         issueId,
@@ -444,13 +404,11 @@ export default function useApi() {
       });
   }
 
-  async function createReviewForPR(
-    issueId: string,
-    pullRequestId: string,
-    githubLogin: string,
-    body: string,
-    networkName = BEPRO_NETWORK_NAME
-  ) {
+  async function createReviewForPR(issueId: string,
+                                   pullRequestId: string,
+                                   githubLogin: string,
+                                   body: string,
+                                   networkName = BEPRO_NETWORK_NAME) {
     return client
       .put("/pull-request/review", {
         issueId,
@@ -574,13 +532,11 @@ export default function useApi() {
 
   async function getBeproCurrency(contractAddress = undefined) {
     try {
-      const { data } = await axios.get(
-        `${CURRENCY_BEPRO_API}/${
+      const { data } = await axios.get(`${CURRENCY_BEPRO_API}/${
           USE_PRODUCTION_CONTRACT_CONVERSION === "1"
             ? PRODUCTION_CONTRACT
             : contractAddress
-        }`
-      );
+        }`);
 
       return data.market_data.current_price;
     } catch (error) {

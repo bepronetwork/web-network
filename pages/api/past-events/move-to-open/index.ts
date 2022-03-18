@@ -28,9 +28,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   ].forEach(async (customNetwork) => {
     if (!customNetwork.name) return;
 
-    console.log(
-      `Moving issues of ${customNetwork.name} - ${customNetwork.networkAddress} to OPEN`
-    );
+    console.log(`Moving issues of ${customNetwork.name} - ${customNetwork.networkAddress} to OPEN`);
     const network = networkBeproJs({
       contractAddress: customNetwork.networkAddress
     });
@@ -83,17 +81,15 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json("Issues Moved to Open");
 }
 
-export default async function MoveToOpen(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function MoveToOpen(req: NextApiRequest,
+                                         res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "post":
-      await post(req, res);
-      break;
+  case "post":
+    await post(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 
   res.end();

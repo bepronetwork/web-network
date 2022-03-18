@@ -123,9 +123,7 @@ export default function NewProposal({
   const [participants, setParticipants] = useState<participants[]>([]);
   const [showExceptionalMessage, setShowExceptionalMessage] =
     useState<boolean>();
-  const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>(
-    {} as pullRequest
-  );
+  const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest);
 
   const { activeRepo } = useRepos();
   const { activeNetwork } = useNetwork();
@@ -161,10 +159,8 @@ export default function NewProposal({
     for (const meta of mergeProposals as ProposalData[]) {
       const { scMergeId, pullRequestId } = meta;
       if (scMergeId) {
-        const merge = await BeproService.network.getMergeById(
-          scIssueId,
-          +scMergeId
-        );
+        const merge = await BeproService.network.getMergeById(scIssueId,
+                                                              +scMergeId);
         pool.push({ ...merge, pullRequestId } as Proposal);
       }
     }
@@ -172,17 +168,12 @@ export default function NewProposal({
     setProposals(pool);
   }
 
-  function isSameProposal(
-    currentDistrbuition: SameProposal,
-    currentProposals: SameProposal[]
-  ) {
+  function isSameProposal(currentDistrbuition: SameProposal,
+                          currentProposals: SameProposal[]) {
     return currentProposals.some((activeProposal) => {
       if (activeProposal.currentPrId === currentDistrbuition.currentPrId) {
         return activeProposal.prAddressAmount.every((ap) =>
-          currentDistrbuition.prAddressAmount.find(
-            (p) => ap.amount === p.amount && ap.address === p.address
-          )
-        );
+          currentDistrbuition.prAddressAmount.find((p) => ap.amount === p.amount && ap.address === p.address));
       } else {
         return false;
       }
@@ -193,9 +184,7 @@ export default function NewProposal({
     const currentAmount = sumObj(obj);
 
     if (currentAmount === 100) {
-      const { id } = pullRequests.find(
-        (data) => data.githubId === currentGithubId
-      );
+      const { id } = pullRequests.find((data) => data.githubId === currentGithubId);
 
       const currentDistrbuition = {
         currentPrId: id,
@@ -281,24 +270,14 @@ export default function NewProposal({
               tmpParticipants.push(participant);
           });
 
-        return Promise.all(
-          tmpParticipants.map(async (login) => {
-            const { address, githubLogin, githubHandle } = await getUserWith(
-              login
-            );
-            return { address, githubLogin, githubHandle };
-          })
-        );
+        return Promise.all(tmpParticipants.map(async (login) => {
+          const { address, githubLogin, githubHandle } = await getUserWith(login);
+          return { address, githubLogin, githubHandle };
+        }));
       })
       .then((participantsPr) => {
-        const tmpParticipants = participantsPr.filter(
-          ({ address }) => !!address
-        );
-        setDistrib(
-          Object.fromEntries(
-            tmpParticipants.map((participant) => [participant.githubHandle, 0])
-          )
-        );
+        const tmpParticipants = participantsPr.filter(({ address }) => !!address);
+        setDistrib(Object.fromEntries(tmpParticipants.map((participant) => [participant.githubHandle, 0])));
         setCurrentGithubId(githubId);
         setParticipants(tmpParticipants);
       })
@@ -334,76 +313,58 @@ export default function NewProposal({
     //Chcking diff between total Distributed and total Ammount;
     const totalDistributed = payload.prAmounts.reduce((p, c) => p + c);
     // Assigning the rest to last participant;
-    payload.prAmounts[payload.prAmounts.length - 1] += Math.ceil(
-      amountTotal - totalDistributed
-    );
+    payload.prAmounts[payload.prAmounts.length - 1] += Math.ceil(amountTotal - totalDistributed);
 
     setShow(false);
 
-    const proposeMergeTx = addTransaction(
-      { type: TransactionTypes.proposeMerge },
-      activeNetwork
-    );
+    const proposeMergeTx = addTransaction({ type: TransactionTypes.proposeMerge },
+                                          activeNetwork);
     dispatch(proposeMergeTx);
 
-    waitForMerge(
-      user?.login,
-      issue_id,
-      currentGithubId,
-      activeNetwork?.name
-    ).then(() => {
-      if (handleMicroService) handleMicroService(true);
-      handleClose();
-      setDistrib({});
-    });
+    waitForMerge(user?.login,
+                 issue_id,
+                 currentGithubId,
+                 activeNetwork?.name).then(() => {
+                   if (handleMicroService) handleMicroService(true);
+                   handleClose();
+                   setDistrib({});
+                 });
 
     await BeproService.network
-      .proposeIssueMerge(
-        payload.issueID,
-        payload.prAddresses,
-        payload.prAmounts
-      )
+      .proposeIssueMerge(payload.issueID,
+                         payload.prAddresses,
+                         payload.prAmounts)
       .then((txInfo) => {
-        processEvent(
-          "merge-proposal",
-          txInfo.blockNumber,
-          issue_id,
-          currentGithubId,
-          activeNetwork?.name
-        );
+        processEvent("merge-proposal",
+                     txInfo.blockNumber,
+                     issue_id,
+                     currentGithubId,
+                     activeNetwork?.name);
 
-        txWindow.updateItem(
-          proposeMergeTx.payload.id,
-          BeproService.parseTransaction(txInfo, proposeMergeTx.payload)
-        );
+        txWindow.updateItem(proposeMergeTx.payload.id,
+                            BeproService.parseTransaction(txInfo, proposeMergeTx.payload));
 
         handleClose();
       })
       .catch((e) => {
         if (e?.message?.search("User denied") > -1)
-          dispatch(
-            updateTransaction({
+          dispatch(updateTransaction({
               ...(proposeMergeTx.payload as any),
               remove: true
-            })
-          );
+          }));
         else
-          dispatch(
-            updateTransaction({
+          dispatch(updateTransaction({
               ...(proposeMergeTx.payload as any),
               status: TransactionStatus.failed
-            })
-          );
+          }));
         handleClose();
       });
   }
 
   function handleClose() {
     if (pullRequests.length && activeRepo)
-      getParticipantsPullRequest(
-        pullRequests[0]?.id,
-        pullRequests[0]?.githubId
-      );
+      getParticipantsPullRequest(pullRequests[0]?.id,
+                                 pullRequests[0]?.githubId);
     setCurrentGithubId(pullRequests[0]?.githubId);
 
     setShow(false);
@@ -424,10 +385,8 @@ export default function NewProposal({
   }
 
   function recognizeAsFinished() {
-    const recognizeAsFinished = addTransaction(
-      { type: TransactionTypes.recognizedAsFinish },
-      activeNetwork
-    );
+    const recognizeAsFinished = addTransaction({ type: TransactionTypes.recognizedAsFinish },
+                                               activeNetwork);
     dispatch(recognizeAsFinished);
 
     BeproService.network
@@ -436,29 +395,23 @@ export default function NewProposal({
         return BeproService.network.recognizeAsFinished(_issue._id);
       })
       .then((txInfo) => {
-        txWindow.updateItem(
-          recognizeAsFinished.payload.id,
-          BeproService.parseTransaction(txInfo, recognizeAsFinished.payload)
-        );
+        txWindow.updateItem(recognizeAsFinished.payload.id,
+                            BeproService.parseTransaction(txInfo, recognizeAsFinished.payload));
       })
       .then(() => {
         if (handleMicroService) handleMicroService(true);
       })
       .catch((e) => {
         if (e?.message?.search("User denied") > -1)
-          dispatch(
-            updateTransaction({
+          dispatch(updateTransaction({
               ...(recognizeAsFinished.payload as any),
               remove: true
-            })
-          );
+          }));
         else
-          dispatch(
-            updateTransaction({
+          dispatch(updateTransaction({
               ...(recognizeAsFinished.payload as any),
               status: TransactionStatus.failed
-            })
-          );
+          }));
         dispatch(toastWarning(t("bounty:errors.recognize-finished")));
         console.error("Failed to mark as finished", e);
       });
@@ -607,29 +560,23 @@ export default function NewProposal({
                     warning ? "warning" : "danger"
                   }`}
                 >
-                  {t(
-                    `proposal:errors.${
+                  {t(`proposal:errors.${
                       warning ? "distribution-already-exists" : "pr-cant-merged"
-                    }`
-                  )}
+                    }`)}
                 </p>
               ) : (
                 <p
-                  className={clsx(
-                    "caption-small pr-3 mt-3 mb-0  text-uppercase",
-                    {
+                  className={clsx("caption-small pr-3 mt-3 mb-0  text-uppercase",
+                                  {
                       "text-success": success,
                       "text-danger": error
-                    }
-                  )}
+                                  })}
                 >
                   {showExceptionalMessage && error
                     ? t("proposal:messages.distribution-cant-done")
-                    : t(
-                        `proposal:messages.distribution-${
+                    : t(`proposal:messages.distribution-${
                           success ? "is" : "must-be"
-                        }-100`
-                      )}
+                        }-100`)}
                 </p>
               )}
             </div>

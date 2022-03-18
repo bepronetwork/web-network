@@ -1,8 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 
-import { CopyValue } from "helpers/copy-value";
-import { formatNumberToString } from "helpers/formatNumber";
-import { truncateAddress } from "helpers/truncate-address";
 import { format } from "date-fns";
 import { BEPRO_NETWORK_NAME } from "env";
 import { useTranslation } from "next-i18next";
@@ -16,6 +13,10 @@ import TransactionStats from "components/transaction-stats";
 
 import { ApplicationContext } from "contexts/application";
 import { toastInfo } from "contexts/reducers/add-toast";
+
+import { CopyValue } from "helpers/copy-value";
+import { formatNumberToString } from "helpers/formatNumber";
+import { truncateAddress } from "helpers/truncate-address";
 
 import { BlockTransaction, Transaction } from "interfaces/transaction";
 
@@ -43,16 +44,13 @@ export default function TransactionModal({
 
     const blockTransaction = transaction as BlockTransaction;
 
-    setAddressFrom(
-      truncateAddress(blockTransaction?.addressFrom, 12, 3, "...")
-    );
+    setAddressFrom(truncateAddress(blockTransaction?.addressFrom, 12, 3, "..."));
     setAddressTo(truncateAddress(blockTransaction?.addressTo, 12, 3, "..."));
 
     const makeDetail = (span, content) => ({ span, content });
     setDetails([
-      makeDetail(
-        t("transactions.amount"),
-        <>
+      makeDetail(t("transactions.amount"),
+                 <>
           <span>{formatNumberToString(blockTransaction.amount)}</span>{" "}
           <span
             className={`${
@@ -63,16 +61,11 @@ export default function TransactionModal({
           >
             {blockTransaction.currency}
           </span>{" "}
-        </>
-      ),
-      makeDetail(
-        t("transactions.confirmations"),
-        [blockTransaction.confirmations, 23].join("/")
-      ),
-      makeDetail(
-        t("transactions.date"),
-        format(new Date(blockTransaction.date), "MMMM dd yyyy hh:mm:ss a")
-      )
+        </>),
+      makeDetail(t("transactions.confirmations"),
+                 [blockTransaction.confirmations, 23].join("/")),
+      makeDetail(t("transactions.date"),
+                 format(new Date(blockTransaction.date), "MMMM dd yyyy hh:mm:ss a"))
     ]);
   }
 

@@ -12,17 +12,15 @@ export default function useSearch() {
   }, [search]);
 
   function setSearch(newSearch: string) {
-    router.push(
-      {
+    router.push({
         pathname: router.pathname,
         query: {
           ...router.query,
           page: "1",
           search: String(newSearch)
         }
-      },
-      router.asPath
-    );
+    },
+                router.asPath);
   }
 
   function clearSearch() {

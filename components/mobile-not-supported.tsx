@@ -1,8 +1,9 @@
 import React from "react";
 
+import BeproLogo from "assets/icons/bepro-logo";
+
 import MobileInformation from "components/mobile-information";
 
-import BeproLogo from "assets/icons/bepro-logo";
 
 export default function MobileNotSupported() {
   return (

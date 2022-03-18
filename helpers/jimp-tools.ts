@@ -57,13 +57,11 @@ export async function position(base: Jimp, image: Jimp, x = 0, y = 0) {
   return baseIMG.composite(positionIMG, x_axis, y_axis);
 }
 
-export async function write(
-  text: string,
-  fontSize = 16,
-  textColor = "white",
-  fontFamily?: string,
-  options?: OptiosProps
-) {
+export async function write(text: string,
+                            fontSize = 16,
+                            textColor = "white",
+                            fontFamily?: string,
+                            options?: OptiosProps) {
   let localFontPath = fontRegular;
 
   if (fontFamily === "bold") {

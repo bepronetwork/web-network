@@ -6,19 +6,15 @@ const host = process.env.NEXT_IPFS_HOST || "ipfs.infura.io";
 const port = process.env.NEXT_IPFS_PORT || "5001";
 const auth =
   "Basic " +
-  Buffer.from(
-    process.env.NEXT_IPFS_PROJECT_ID +
+  Buffer.from(process.env.NEXT_IPFS_PROJECT_ID +
       ":" +
-      process.env.NEXT_IPFS_PROJECT_SECRET
-  ).toString("base64");
+      process.env.NEXT_IPFS_PROJECT_SECRET).toString("base64");
 const baseURL = `https://${host}:${port}/api/v0`;
 
-export async function add(
-  file: Buffer | string,
-  pin = false,
-  originalFilename?: string,
-  ext?: string
-): Promise<{ hash: string; fileName: string; size: string }> {
+export async function add(file: Buffer | string,
+                          pin = false,
+                          originalFilename?: string,
+                          ext?: string): Promise<{ hash: string; fileName: string; size: string }> {
   const form = new FormData();
 
   const isBuffer = Buffer.isBuffer(file);
@@ -49,20 +45,16 @@ export async function add(
     authorization: auth
   };
 
-  const { data } = await axios.post(
-    `${baseURL}/add?stream-channels=true&progress=false&pin=${pin}`,
-    form,
-    {
+  const { data } = await axios.post(`${baseURL}/add?stream-channels=true&progress=false&pin=${pin}`,
+                                    form,
+                                    {
       headers
-    }
-  );
+                                    });
   console.log({ data });
   return { hash: data.Hash, fileName: data.Name, size: data.Size };
 }
 
-export async function addAll(
-  files: Buffer[]
-): Promise<{ hash: string; fileName: string; size: string }> {
+export async function addAll(files: Buffer[]): Promise<{ hash: string; fileName: string; size: string }> {
   if (files.length < 1) {
     throw new Error("Unidentified files");
   }
@@ -86,13 +78,11 @@ export async function addAll(
     authorization: auth
   };
 
-  const { data } = await axios.post(
-    `${baseURL}/add?wrap-with-directory=true&only-hash=true`,
-    form,
-    {
+  const { data } = await axios.post(`${baseURL}/add?wrap-with-directory=true&only-hash=true`,
+                                    form,
+                                    {
       headers
-    }
-  );
+                                    });
 
   return { hash: data.Hash, fileName: data.Name, size: data.Size };
 }

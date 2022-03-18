@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
 import clsx from "clsx";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -25,6 +24,8 @@ import { toastError } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { changeTransactionalTokenApproval } from "contexts/reducers/change-transactional-token-approval";
 import { updateTransaction } from "contexts/reducers/update-transaction";
+
+import { formatNumberToCurrency } from "helpers/formatNumber";
 
 import { User } from "interfaces/api-response";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
@@ -76,12 +77,10 @@ export default function PageCreateIssue() {
 
     if (!BeproService.isLoggedIn) return;
 
-    const tmpTransactional = addTransaction(
-      {
+    const tmpTransactional = addTransaction({
         type: TransactionTypes.approveTransactionalERC20Token
-      },
-      activeNetwork
-    );
+    },
+                                            activeNetwork);
     dispatch(tmpTransactional);
 
     BeproService.network
@@ -91,10 +90,8 @@ export default function PageCreateIssue() {
         return txInfo;
       })
       .then((txInfo) => {
-        txWindow.updateItem(
-          tmpTransactional.payload.id,
-          BeproService.parseTransaction(txInfo, tmpTransactional.payload)
-        );
+        txWindow.updateItem(tmpTransactional.payload.id,
+                            BeproService.parseTransaction(txInfo, tmpTransactional.payload));
 
         BeproService.isApprovedTransactionalToken()
           .then((approval) => {
@@ -105,19 +102,15 @@ export default function PageCreateIssue() {
       .catch((e) => {
         console.error(e);
         if (e?.message?.search("User denied") > -1)
-          dispatch(
-            updateTransaction({
+          dispatch(updateTransaction({
               ...(tmpTransactional.payload as any),
               remove: true
-            })
-          );
+          }));
         else
-          dispatch(
-            updateTransaction({
+          dispatch(updateTransaction({
               ...(tmpTransactional.payload as any),
               status: TransactionStatus.failed
-            })
-          );
+          }));
       });
   }
 
@@ -127,13 +120,11 @@ export default function PageCreateIssue() {
     setIssueAmount({ value: "0", formattedValue: "0", floatValue: 0 });
   }
   function addFilesInDescription(str) {
-    const strFiles = files?.map(
-      (file) =>
+    const strFiles = files?.map((file) =>
         file.uploaded &&
         `${file?.type?.split("/")[0] === "image" ? "!" : ""}[${file.name}](${
           process.env.NEXT_PUBLIC_IPFS_BASE
-        }/${file.hash}) \n\n`
-    );
+        }/${file.hash}) \n\n`);
     return `${str}\n\n${strFiles
       .toString()
       .replace(",![", "![")
@@ -151,10 +142,8 @@ export default function PageCreateIssue() {
       branch
     };
 
-    const openIssueTx = addTransaction(
-      { type: TransactionTypes.openIssue, amount: payload.amount },
-      activeNetwork
-    );
+    const openIssueTx = addTransaction({ type: TransactionTypes.openIssue, amount: payload.amount },
+                                       activeNetwork);
 
     setRedirecting(true);
     apiCreateIssue(payload, activeNetwork?.name)
@@ -166,10 +155,8 @@ export default function PageCreateIssue() {
         return BeproService.network
           .openIssue([repository_id, cid].join("/"), payload.amount)
           .then((txInfo) => {
-            txWindow.updateItem(
-              openIssueTx.payload.id,
-              BeproService.parseTransaction(txInfo, openIssueTx.payload)
-            );
+            txWindow.updateItem(openIssueTx.payload.id,
+                                BeproService.parseTransaction(txInfo, openIssueTx.payload));
             // BeproService.parseTransaction(txInfo, openIssueTx.payload)
             //             .then(block => dispatch(updateTransaction(block)))
             return {
@@ -179,43 +166,30 @@ export default function PageCreateIssue() {
           });
       })
       .then(({ githubId, issueId }) =>
-        patchIssueWithScId(
-          repository_id,
-          githubId,
-          issueId,
-          activeNetwork?.name
-        ).then(async (result) => {
-          if (!result)
-            return dispatch(
-              toastError(t("create-bounty:errors.creating-bounty"))
-            );
+        patchIssueWithScId(repository_id,
+                           githubId,
+                           issueId,
+                           activeNetwork?.name).then(async (result) => {
+                             if (!result)
+                               return dispatch(toastError(t("create-bounty:errors.creating-bounty")));
 
-          await router.push(
-            getURLWithNetwork("/bounty", {
+                             await router.push(getURLWithNetwork("/bounty", {
               id: githubId,
               repoId: repository_id
-            })
-          );
-        })
-      )
+                             }));
+                           }))
       .catch((e) => {
         console.error("Failed to createIssue", e);
         cleanFields();
         if (e?.message?.search("User denied") > -1)
-          dispatch(
-            updateTransaction({ ...(openIssueTx.payload as any), remove: true })
-          );
+          dispatch(updateTransaction({ ...(openIssueTx.payload as any), remove: true }));
         else
-          dispatch(
-            updateTransaction({
+          dispatch(updateTransaction({
               ...(openIssueTx.payload as any),
               status: TransactionStatus.failed
-            })
-          );
+          }));
 
-        dispatch(
-          toastError(e.message || t("create-bounty:errors.creating-bounty"))
-        );
+        dispatch(toastError(e.message || t("create-bounty:errors.creating-bounty")));
         return false;
       })
       .finally(() => setRedirecting(false));
@@ -227,11 +201,9 @@ export default function PageCreateIssue() {
     !(issueAmount.floatValue > Number(wallet?.balance?.bepro));
 
   const verifyTransactionState = (type: TransactionTypes): boolean =>
-    !!myTransactions.find(
-      (transactions) =>
+    !!myTransactions.find((transactions) =>
         transactions.type === type &&
-        transactions.status === TransactionStatus.pending
-    );
+        transactions.status === TransactionStatus.pending);
 
   function isCreateButtonDisabled() {
     return [
@@ -317,9 +289,7 @@ export default function PageCreateIssue() {
                 <textarea
                   className="form-control"
                   rows={6}
-                  placeholder={t(
-                    "create-bounty:fields.description.placeholder"
-                  )}
+                  placeholder={t("create-bounty:fields.description.placeholder")}
                   value={issueDescription}
                   onChange={(e) => setIssueDescription(e.target.value)}
                 />
@@ -361,10 +331,8 @@ export default function PageCreateIssue() {
                     helperText={
                       <>
                         {t("create-bounty:fields.amount.info", {
-                          amount: formatNumberToCurrency(
-                            wallet?.balance?.bepro,
-                            { maximumFractionDigits: 18 }
-                          )
+                          amount: formatNumberToCurrency(wallet?.balance?.bepro,
+                            { maximumFractionDigits: 18 })
                         })}
                         {isTransactionalTokenApproved && (
                           <span

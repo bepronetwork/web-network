@@ -1,14 +1,18 @@
 import React, { useContext, useEffect } from "react";
 
-import Button from "components/button";
-import Modal from "components/modal";
-import { ApplicationContext } from "contexts/application";
-import { useAuthentication } from "contexts/authentication";
-import { NetworkColors } from "interfaces/enums/network-ids";
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
 
 import metamaskLogo from "assets/metamask.png";
+
+import Button from "components/button";
+import Modal from "components/modal";
+
+import { ApplicationContext } from "contexts/application";
+import { useAuthentication } from "contexts/authentication";
+
+import { NetworkColors } from "interfaces/enums/network-ids";
+
 
 const REQUIRED_NETWORK =
   process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME?.toLowerCase();

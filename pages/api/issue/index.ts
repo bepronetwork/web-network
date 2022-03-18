@@ -1,9 +1,10 @@
 import models from "db/models";
-import twitterTweet from "helpers/api/handle-twitter-tweet";
 import { CONTRACT_ADDRESS } from "env";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
+
+import twitterTweet from "helpers/api/handle-twitter-tweet";
 
 import api from "services/api";
 
@@ -93,17 +94,15 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
   if (network.isClosed) return res.status(404).json("Invalid network");
 
   return models.issue
-    .update(
-      { issueId, state: "draft" },
-      {
+    .update({ issueId, state: "draft" },
+            {
         where: {
           githubId: githubId,
           repository_id,
           issueId: null,
           network_id: network.id
         }
-      }
-    )
+            })
     .then(async (result) => {
       if (!result[0]) return res.status(422).json("nok");
 
@@ -127,16 +126,16 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
 
 export default async function Issue(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "post":
-      await post(req, res);
-      break;
+  case "post":
+    await post(req, res);
+    break;
 
-    case "patch":
-      await patch(req, res);
-      break;
+  case "patch":
+    await patch(req, res);
+    break;
 
-    default:
-      res.status(405).json("Method not allowed");
+  default:
+    res.status(405).json("Method not allowed");
   }
 
   res.end();

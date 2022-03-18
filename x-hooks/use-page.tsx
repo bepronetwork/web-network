@@ -12,17 +12,15 @@ export default function usePage() {
   }, [page]);
 
   function setPage(newPage: number) {
-    router.push(
-      {
+    router.push({
         pathname: router.pathname,
         query: {
           ...router.query,
           page: String(newPage)
         }
-      },
-      router.asPath,
-      { shallow: false, scroll: false }
-    );
+    },
+                router.asPath,
+      { shallow: false, scroll: false });
   }
 
   function nextPage() {

@@ -62,14 +62,12 @@ export default function UserMissingModal({ show }: { show: boolean }) {
       .then((value) => {
         setLoadingUnlock(true);
 
-        const tmpTransaction = addTransaction(
-          {
+        const tmpTransaction = addTransaction({
             type: 1,
             amount: value,
             currency: t("$oracles")
-          },
-          activeNetwork
-        );
+        },
+                                              activeNetwork);
         dispatch(tmpTransaction);
 
         BeproService.network
@@ -77,43 +75,33 @@ export default function UserMissingModal({ show }: { show: boolean }) {
           .then((answer) => {
             if (answer.status) {
               setError(false);
-              dispatch(
-                addToast({
+              dispatch(addToast({
                   type: "success",
                   title: t("actions.success"),
                   content: `${t("unlock")} ${value} ${t("$oracles")}`
-                })
-              );
+              }));
 
-              txWindow.updateItem(
-                tmpTransaction.payload.id,
-                BeproService.parseTransaction(answer, tmpTransaction.payload)
-              );
+              txWindow.updateItem(tmpTransaction.payload.id,
+                                  BeproService.parseTransaction(answer, tmpTransaction.payload));
             } else {
-              dispatch(
-                addToast({
+              dispatch(addToast({
                   type: "danger",
                   title: t("actions.failed"),
                   content: t("actions.failed")
-                })
-              );
+              }));
             }
           })
           .catch((err) => {
             if (err?.message?.search("User denied") > -1)
-              dispatch(
-                updateTransaction({
+              dispatch(updateTransaction({
                   ...(tmpTransaction.payload as any),
                   remove: true
-                })
-              );
+              }));
             else
-              dispatch(
-                updateTransaction({
+              dispatch(updateTransaction({
                   ...(tmpTransaction.payload as any),
                   status: TransactionStatus.failed
-                })
-              );
+              }));
             console.error(err);
           })
           .finally(() => setLoadingUnlock(false));

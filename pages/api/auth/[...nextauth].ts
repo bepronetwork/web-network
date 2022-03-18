@@ -1,5 +1,4 @@
 import models from "db/models";
-import { Timers } from "helpers/timers";
 import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 
@@ -16,10 +15,10 @@ export default NextAuth({
           name: profile.name,
           login: profile.login,
           email: profile.email,
-          image: profile.avatar_url
+          image: profile.avatar_url,
         };
-      }
-    })
+      },
+    }),
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
@@ -30,29 +29,27 @@ export default NextAuth({
 
       const find = await models.user.findOne({
         where: { githubLogin: profile.login },
-        raw: true
+        raw: true,
       });
       const name = profile?.name || profile.login;
       if (!find)
         await models.user.create({
           githubHandle: name,
           githubLogin: profile.login?.toString(),
-          accessToken: account?.access_token
+          accessToken: account?.access_token,
         });
       else
-        await models.user.update(
-          { accessToken: account?.access_token },
-          { where: { githubLogin: profile.login?.toString() } }
-        );
+        await models.user.update({ accessToken: account?.access_token },
+          { where: { githubLogin: profile.login?.toString() } });
 
       setTimeout(async () => {
         const user = await models.user.findOne({
           where: { githubLogin: profile.login },
-          raw: true
+          raw: true,
         });
         if (!user.address)
           await models.user.destroy({
-            where: { githubLogin: profile.login?.toString() }
+            where: { githubLogin: profile.login?.toString() },
           });
       }, 60 * 1000);
 
@@ -69,9 +66,9 @@ export default NextAuth({
         user: {
           ...session.user,
           login: token.login,
-          accessToken: token?.access_token
-        }
+          accessToken: token?.access_token,
+        },
       };
-    }
-  }
+    },
+  },
 });

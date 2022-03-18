@@ -1,5 +1,6 @@
 import Button from "components/button";
 import InfoTooltip from "components/info-tooltip";
+
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
 interface AmountCardProps {

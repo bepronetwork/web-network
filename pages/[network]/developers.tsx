@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-import { handleNetworkAddress } from "helpers/custom-network";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next/types";
@@ -10,6 +9,8 @@ import PageHero, { IInfosHero } from "components/page-hero";
 
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
+
+import { handleNetworkAddress } from "helpers/custom-network";
 
 import { BeproService } from "services/bepro-service";
 

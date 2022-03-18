@@ -71,50 +71,42 @@ export const ReposProvider: React.FC = function ({ children }) {
   const isLoadedReposByNetwork = (): boolean =>
     repoList[activeNetwork?.name]?.repos?.length > 0;
 
-  const findForks = useCallback(
-    async (repoId: number, forced?: boolean): Promise<IForkInfo[]> => {
-      if (forksList[repoId] && !forced) return forksList[repoId];
-      const repo = findRepo(repoId);
+  const findForks = useCallback(async (repoId: number, forced?: boolean): Promise<IForkInfo[]> => {
+    if (forksList[repoId] && !forced) return forksList[repoId];
+    const repo = findRepo(repoId);
 
-      if (!repo) throw new Error("Repo not found");
+    if (!repo) throw new Error("Repo not found");
 
-      const { data } = await getForksOf(repo?.githubPath);
+    const { data } = await getForksOf(repo?.githubPath);
 
-      const forks = await Promise.all(
-        data.map(
-          ({ owner }): developer => ({
+    const forks = await Promise.all(data.map(({ owner }): developer => ({
             id: owner.id,
             login: owner?.login,
             avatar_url: owner.avatar_url,
             url: owner.url,
             type: owner.type
-          })
-        )
-      );
+    })));
 
-      setForksList((prevState) => ({
+    setForksList((prevState) => ({
         ...prevState,
         [repoId]: forks
-      }));
+    }));
 
-      return forks;
-    },
-    [forksList, findRepo]
-  );
+    return forks;
+  },
+    [forksList, findRepo]);
 
-  const findBranch = useCallback(
-    async (repoId: number, forced?: boolean): Promise<BranchInfo[]> => {
-      if (branchsList[repoId] && !forced) return branchsList[repoId];
+  const findBranch = useCallback(async (repoId: number, forced?: boolean): Promise<BranchInfo[]> => {
+    if (branchsList[repoId] && !forced) return branchsList[repoId];
 
-      const branchs = await getBranchsList(repoId, false, activeNetwork?.name);
-      setBranchsList((prevState) => ({
+    const branchs = await getBranchsList(repoId, false, activeNetwork?.name);
+    setBranchsList((prevState) => ({
         ...prevState,
         [repoId]: branchs
-      }));
-      return branchs;
-    },
-    [activeNetwork, branchsList]
-  );
+    }));
+    return branchs;
+  },
+    [activeNetwork, branchsList]);
 
   const loadRepos = useCallback(async (): Promise<ReposList> => {
     if (!activeNetwork?.name) throw new Error("Network not exists");
@@ -143,31 +135,29 @@ export const ReposProvider: React.FC = function ({ children }) {
     return repos;
   }, [activeNetwork, repoList]);
 
-  const updateActiveRepo = useCallback(
-    async (repoId: number): Promise<IActiveRepo> => {
-      if (activeRepo?.id === repoId) return activeRepo;
+  const updateActiveRepo = useCallback(async (repoId: number): Promise<IActiveRepo> => {
+    if (activeRepo?.id === repoId) return activeRepo;
 
-      const findedRepo = findRepo(repoId);
-      if (!findedRepo) throw new Error("Repo not found");
+    const findedRepo = findRepo(repoId);
+    if (!findedRepo) throw new Error("Repo not found");
 
-      const noExpired =
+    const noExpired =
         +new Date() - repoList[activeNetwork?.name].lastUpdated <= TTL;
 
-      const [branchs, forks] = await Promise.all([
+    const [branchs, forks] = await Promise.all([
         findBranch(+findedRepo?.id, !noExpired),
         findForks(+findedRepo?.id, !noExpired)
-      ]);
+    ]);
 
-      const newActiveRepo = {
+    const newActiveRepo = {
         ...findedRepo,
         forks,
         branchs
-      };
-      setActiveRepo(newActiveRepo);
-      return newActiveRepo;
-    },
-    [findForks, findRepo, repoList, activeNetwork, activeRepo]
-  );
+    };
+    setActiveRepo(newActiveRepo);
+    return newActiveRepo;
+  },
+    [findForks, findRepo, repoList, activeNetwork, activeRepo]);
 
   useEffect(() => {
     if (query?.repoId && isLoadedReposByNetwork()) {
@@ -188,8 +178,7 @@ export const ReposProvider: React.FC = function ({ children }) {
     //console.warn('useRepo',{activeRepo, repoList, branchsList, forksList})
   }, [activeRepo, repoList, branchsList, forksList]);
 
-  const memorizeValue = useMemo<ReposContextData>(
-    () => ({
+  const memorizeValue = useMemo<ReposContextData>(() => ({
       repoList: repoList[activeNetwork?.name]?.repos,
       branchsList,
       activeRepo,
@@ -199,8 +188,8 @@ export const ReposProvider: React.FC = function ({ children }) {
       findBranch,
       updateActiveRepo,
       findRepo
-    }),
-    [
+  }),
+                                                  [
       activeNetwork,
       repoList,
       branchsList,
@@ -211,8 +200,7 @@ export const ReposProvider: React.FC = function ({ children }) {
       findBranch,
       updateActiveRepo,
       findRepo
-    ]
-  );
+                                                  ]);
 
   return (
     <ReposContext.Provider value={memorizeValue}>

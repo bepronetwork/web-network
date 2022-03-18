@@ -24,21 +24,21 @@ function PullRequestLabels({
   const [state, setState] = useState<PRLabel>(label || null);
   function getColorLabel() {
     switch (state?.toLowerCase()) {
-      case "ready to merge": {
-        return "success";
-      }
-      case "broken tests": {
-        return "warning";
-      }
-      case "conflicts": {
-        return "danger";
-      }
-      case "closed": {
-        return "danger";
-      }
-      default: {
-        return hero ? "white" : "primary";
-      }
+    case "ready to merge": {
+      return "success";
+    }
+    case "broken tests": {
+      return "warning";
+    }
+    case "conflicts": {
+      return "danger";
+    }
+    case "closed": {
+      return "danger";
+    }
+    default: {
+      return hero ? "white" : "primary";
+    }
     }
   }
 

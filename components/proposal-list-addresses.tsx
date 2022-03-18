@@ -29,8 +29,7 @@ export default function ProposalListAddresses({
         </div>
         <div className="overflow-auto">
           {usersDistribution?.length > 0 &&
-            React.Children.toArray(
-              usersDistribution.map((item, index) => (
+            React.Children.toArray(usersDistribution.map((item, index) => (
                 <div
                   key={index}
                   className="bg-dark-gray px-3 py-3 d-flex justify-content-between mt-1"
@@ -51,8 +50,7 @@ export default function ProposalListAddresses({
                     </span>
                   </div>
                 </div>
-              ))
-            )}
+              )))}
         </div>
       </div>
     </div>

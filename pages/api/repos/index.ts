@@ -15,16 +15,12 @@ async function getAllRepos(req, res) {
 
   if (!network) return res.status(404).json("Invalid network");
 
-  return res.status(200).json(
-    await models.repositories.findAll(
-      {
+  return res.status(200).json(await models.repositories.findAll({
         where: {
           network_id: network.id
         }
-      },
-      { raw: true }
-    )
-  );
+  },
+      { raw: true }));
 }
 
 async function addNewRepo(req, res) {
@@ -84,25 +80,23 @@ async function removeRepo(req: NextApiRequest, res: NextApiResponse) {
     .json(!deleted ? `Couldn't delete entry ${id}` : "ok");
 }
 
-export default async function RepoRoute(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function RepoRoute(req: NextApiRequest,
+                                        res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "get":
-      await getAllRepos(req, res);
-      break;
+  case "get":
+    await getAllRepos(req, res);
+    break;
 
-    case "post":
-      await addNewRepo(req, res);
-      break;
+  case "post":
+    await addNewRepo(req, res);
+    break;
 
-    case "delete":
-      await removeRepo(req, res);
-      break;
+  case "delete":
+    await removeRepo(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 
   res.end();

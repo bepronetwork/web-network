@@ -1,9 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { ListGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
 
-import { formatDate } from "helpers/formatDate";
-import { formatNumberToString } from "helpers/formatNumber";
-import { truncateAddress } from "helpers/truncate-address";
 import { NetworkFactory, toSmartContractDecimals } from "bepro-js";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
@@ -24,6 +21,10 @@ import { toastError, toastInfo } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 import { updateTransaction } from "contexts/reducers/update-transaction";
+
+import { formatDate } from "helpers/formatDate";
+import { formatNumberToString } from "helpers/formatNumber";
+import { truncateAddress } from "helpers/truncate-address";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
@@ -70,26 +71,20 @@ export default function ParityPage() {
     searchNetworks
   } = useApi();
 
-  const formItem = (
-    label = "",
+  const formItem = (label = "",
     placeholder = "",
     value = "",
-    onChange = (ev) => {}
-  ) => ({ label, placeholder, value, onChange });
+    onChange = (ev) => {}) => ({ label, placeholder, value, onChange });
 
   const formMaker = [
-    formItem(
-      t("parity:fields.github-token.label"),
-      t("parity:fields.github-token.placeholder"),
-      githubToken,
-      (ev) => setGithubToken(ev?.target?.value)
-    ),
-    formItem(
-      t("parity:fields.github-login.label"),
-      t("parity:fields.github-login.placeholder"),
-      githubLogin,
-      (ev) => setGithubLogin(ev?.target?.value)
-    )
+    formItem(t("parity:fields.github-token.label"),
+             t("parity:fields.github-token.placeholder"),
+             githubToken,
+             (ev) => setGithubToken(ev?.target?.value)),
+    formItem(t("parity:fields.github-login.label"),
+             t("parity:fields.github-login.placeholder"),
+             githubLogin,
+             (ev) => setGithubLogin(ev?.target?.value))
     // formItem(`Read Repo`, `Github repo name to read from (pex bepro-js)`, readRepoName, (ev) => setReadRepoName(ev?.target?.value)),
   ];
 
@@ -177,9 +172,7 @@ export default function ParityPage() {
         body,
         tokenAmount,
         creatorGithub,
-        repository_id: getRepoId(
-          repository_url?.split("/")?.slice(-2)?.join("/")
-        )
+        repository_id: getRepoId(repository_url?.split("/")?.slice(-2)?.join("/"))
       };
     }
 
@@ -190,8 +183,7 @@ export default function ParityPage() {
         .then(({ data }) =>
           data.length === 100
             ? getAllIssuesRecursive({ githubPath }, page + 1, pool.concat(data))
-            : pool.concat(data)
-        )
+            : pool.concat(data))
         .catch((e) => {
           console.error("Failed to get issues for", githubPath, page, e);
           return pool;
@@ -208,9 +200,7 @@ export default function ParityPage() {
           console.debug(`(SC) Checking ${issue.title}`);
           if (
             !(
-              await BeproService.network.getIssueByCID(
-                `${issue.repository_id}/${issue.number}`
-              )
+              await BeproService.network.getIssueByCID(`${issue.repository_id}/${issue.number}`)
             )?.cid
           )
             openIssues.push(issue);
@@ -235,10 +225,8 @@ export default function ParityPage() {
     repository_id,
     creatorGithub = githubLogin
   }) {
-    const openIssueTx = addTransaction(
-      { type: TransactionTypes.openIssue, amount: +tokenAmount },
-      activeNetwork
-    );
+    const openIssueTx = addTransaction({ type: TransactionTypes.openIssue, amount: +tokenAmount },
+                                       activeNetwork);
     dispatch(openIssueTx);
 
     const msPayload = {
@@ -274,12 +262,10 @@ export default function ParityPage() {
       .then(({ githubId, issueId }) => {
         if (!issueId) throw new Error(t("parity:errors.creating-issue-on-sc"));
 
-        return patchIssueWithScId(
-          repository_id,
-          githubId,
-          issueId,
-          activeNetwork?.name
-        );
+        return patchIssueWithScId(repository_id,
+                                  githubId,
+                                  issueId,
+                                  activeNetwork?.name);
       })
       .then((result) => {
         if (!result)
@@ -289,16 +275,12 @@ export default function ParityPage() {
       .catch((e) => {
         console.error("Failed to createIssue", e);
         if (e?.message?.search("User denied") > -1)
-          dispatch(
-            updateTransaction({ ...(openIssueTx.payload as any), remove: true })
-          );
+          dispatch(updateTransaction({ ...(openIssueTx.payload as any), remove: true }));
         else
-          dispatch(
-            updateTransaction({
+          dispatch(updateTransaction({
               ...(openIssueTx.payload as any),
               status: TransactionStatus.failed
-            })
-          );
+          }));
 
         return false;
       });
@@ -308,10 +290,8 @@ export default function ParityPage() {
     return Promise.all(issuesList.map(createIssue))
       .then((okList) => {
         console.debug("All true?", !okList.some((b) => !b));
-        console.debug(
-          "How many trues vs falses?",
-          okList.reduce((p, c) => (p += (c && 1) || -1), 0)
-        );
+        console.debug("How many trues vs falses?",
+                      okList.reduce((p, c) => (p += (c && 1) || -1), 0));
         console.debug("Length of issuesList,", issuesList.length);
         console.debug("okList", okList);
       })
@@ -358,12 +338,10 @@ export default function ParityPage() {
 
   function deploySettlerToken() {
     BeproService.erc20
-      .deployJsonAbi(
-        settlerTokenName,
-        settlerTokenSymbol,
-        +toSmartContractDecimals(10, 18),
-        wallet?.address
-      )
+      .deployJsonAbi(settlerTokenName,
+                     settlerTokenSymbol,
+                     +toSmartContractDecimals(10, 18),
+                     wallet?.address)
       .then((txInfo) => {
         console.debug(txInfo);
         dispatch(toastInfo("Deployed!"));
@@ -394,8 +372,7 @@ export default function ParityPage() {
             return Promise.all(orgs.map(listReposOf))
               .then((allOrgs) => allOrgs.flat())
               .then((allOrgsRepos) =>
-                allOrgsRepos.filter((repo) => repo.permissions.admin)
-              );
+                allOrgsRepos.filter((repo) => repo.permissions.admin));
           })
           .then((orgRepos) => {
             return octokit.rest.repos
@@ -406,11 +383,9 @@ export default function ParityPage() {
       })
       .then(async (repos) => {
         setReposList(await getReposList(true, activeNetwork?.name));
-        setAvailableList(
-          repos
+        setAvailableList(repos
             .filter((repo) => repo.has_issues && !repo.fork)
-            .map((repo) => repo.full_name)
-        );
+            .map((repo) => repo.full_name));
       })
       .catch((e) => {
         console.error("Failed to grep user", e);
@@ -443,10 +418,8 @@ export default function ParityPage() {
     }`;
   }
 
-  function renderIssuesList(
-    { title = "", body = "", tokenAmount = 50000, repository_id = null },
-    i: number
-  ) {
+  function renderIssuesList({ title = "", body = "", tokenAmount = 50000, repository_id = null },
+                            i: number) {
     return (
       <div className="mt-4" key={i}>
         <div className="content-wrapper">
@@ -483,9 +456,7 @@ export default function ParityPage() {
 
   function renderAvailListItem(repoPath: string) {
     const [owner, repo] = repoPath.split("/");
-    const isActive = reposList.find(
-      ({ githubPath }) => githubPath === repoPath
-    );
+    const isActive = reposList.find(({ githubPath }) => githubPath === repoPath);
     return (
       <ListGroup.Item
         active={!!isActive}
@@ -588,9 +559,7 @@ export default function ParityPage() {
               </label>
               <input
                 className="form-control"
-                placeholder={t(
-                  "parity:fields.settler-token-symbol.placeholder"
-                )}
+                placeholder={t("parity:fields.settler-token-symbol.placeholder")}
                 value={settlerTokenSymbol}
                 onChange={(e) => setSettlerTokenSymbol(e?.target.value)}
               />

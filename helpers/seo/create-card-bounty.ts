@@ -18,56 +18,50 @@ async function doHeading({
     const padding = 8;
     function getColorState(state) {
       switch (state?.toLowerCase()) {
-        case "draft": {
-          return "#c4c7d3";
-        }
-        case "open": {
-          return "#4250E4";
-        }
-        case "in progress": {
-          return "#4250E4";
-        }
-        case "canceled": {
-          return "#20222b";
-        }
-        case "closed": {
-          return "#20222b";
-        }
-        case "ready": {
-          return "#35e0ad";
-        }
-        case "done": {
-          return "#35e0ad";
-        }
-        case "disputed": {
-          return "#eb5757";
-        }
-        default: {
-          return "#4250E4";
-        }
+      case "draft": {
+        return "#c4c7d3";
+      }
+      case "open": {
+        return "#4250E4";
+      }
+      case "in progress": {
+        return "#4250E4";
+      }
+      case "canceled": {
+        return "#20222b";
+      }
+      case "closed": {
+        return "#20222b";
+      }
+      case "ready": {
+        return "#35e0ad";
+      }
+      case "done": {
+        return "#35e0ad";
+      }
+      case "disputed": {
+        return "#eb5757";
+      }
+      default: {
+        return "#4250E4";
+      }
       }
     }
-    const statusText = await write(
-      state.toUpperCase(),
-      35,
-      state.toLowerCase() === "draft" ? "black" : "white",
-      "bold",
-      {
+    const statusText = await write(state.toUpperCase(),
+                                   35,
+                                   state.toLowerCase() === "draft" ? "black" : "white",
+                                   "bold",
+                                   {
         // lineSpacing: 3.5,
-      }
-    );
+                                   });
 
-    let statusContainer = new Jimp(
-      statusText.bitmap.width + padding,
+    let statusContainer = new Jimp(statusText.bitmap.width + padding,
       statusText.bitmap.height + padding,
-      getColorState(state)
-    );
+      getColorState(state));
     const mask = await Jimp.read(stateMask);
-    mask.resize(
-      statusContainer.bitmap.width,
-      statusContainer.bitmap.height,
-      Jimp.RESIZE_BEZIER
-    );
+    mask.resize(statusContainer.bitmap.width,
+                statusContainer.bitmap.height,
+                Jimp.RESIZE_BEZIER);
     statusContainer = await position(statusContainer, statusText, 50, 50);
     statusContainer.mask(mask, 0, 0);
     return statusContainer;
@@ -98,23 +92,17 @@ async function doSubTitle({
     const color = "#4250E4";
     const repoText = await write(repoName.toUpperCase(), 24, color, "semi");
 
-    const repoContainer = new Jimp(
-      repoText.bitmap.width + padding,
-      repoText.bitmap.height + padding
-    );
+    const repoContainer = new Jimp(repoText.bitmap.width + padding,
+      repoText.bitmap.height + padding);
 
-    let repoBorder = new Jimp(
-      repoContainer.bitmap.width + borderSize,
+    let repoBorder = new Jimp(repoContainer.bitmap.width + borderSize,
       repoContainer.bitmap.height + borderSize,
-      color
-    );
+      color);
     repoBorder = await position(repoBorder, repoContainer, 50, 50);
     const mask = await Jimp.read(repoMask);
-    mask.resize(
-      repoBorder.bitmap.width,
-      repoBorder.bitmap.height,
-      Jimp.RESIZE_BEZIER
-    );
+    mask.resize(repoBorder.bitmap.width,
+                repoBorder.bitmap.height,
+                Jimp.RESIZE_BEZIER);
     repoBorder.mask(mask, 0, 0);
     // repoBorder.mask(repoContainer, borderSize / 2, borderSize / 2);
     repoBorder = await position(repoBorder, repoText, 50, 50);
@@ -128,10 +116,8 @@ async function doSubTitle({
     const currencyText = await write("$BEPRO", 38, "#4250E4", "regular", {});
     const margin = 10;
     const width = ammountText.bitmap.width + currencyText.bitmap.width + margin;
-    const height = Math.max(
-      ammountText.bitmap.height,
-      currencyText.bitmap.height
-    );
+    const height = Math.max(ammountText.bitmap.height,
+                            currencyText.bitmap.height);
     let ammountContainer = new Jimp(width, height);
 
     ammountContainer = await position(ammountContainer, ammountText, 0, 50);
@@ -215,12 +201,10 @@ async function doFooter({
 
   container = await position(container, logo, 100, 50);
 
-  await Promise.all(
-    labels.map(async (element, i) => {
-      const label = await doLabel(`${element.value}`, element.label);
-      container = await position(container, label, i * 35, 50);
-    })
-  );
+  await Promise.all(labels.map(async (element, i) => {
+    const label = await doLabel(`${element.value}`, element.label);
+    container = await position(container, label, i * 35, 50);
+  }));
 
   return container;
 }
@@ -243,9 +227,7 @@ interface IGenerateResp {
   buffer: any;
 }
 
-export async function generateCard(
-  issue: IGenerateCard
-): Promise<IGenerateResp> {
+export async function generateCard(issue: IGenerateCard): Promise<IGenerateResp> {
   const container = await Jimp.read(bg);
   let contain = new Jimp(1080, 510);
 

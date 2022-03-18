@@ -46,17 +46,15 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     });
 }
 
-export default async function ParseMergeCreateProposal(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function ParseMergeCreateProposal(req: NextApiRequest,
+                                                       res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "post":
-      await post(req, res);
-      break;
+  case "post":
+    await post(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 
   res.end();

@@ -52,22 +52,18 @@ export default function OraclesTakeBackItem({
   async function handleTakeBack() {
     handleCancel();
 
-    const delegateTx = addTransaction(
-      {
+    const delegateTx = addTransaction({
         type: TransactionTypes.takeBackOracles,
         amount: +amount,
         currency: "Oracles"
-      },
-      activeNetwork
-    );
+    },
+                                      activeNetwork);
     dispatch(delegateTx);
 
     try {
       BeproService.network.unlock(+amount, address).then((txInfo) => {
-        txWindow.updateItem(
-          delegateTx.payload.id,
-          BeproService.parseTransaction(txInfo, delegateTx.payload)
-        );
+        txWindow.updateItem(delegateTx.payload.id,
+                            BeproService.parseTransaction(txInfo, delegateTx.payload));
 
         onConfirm(!!txInfo.status);
         updateWalletBalance();
@@ -83,12 +79,10 @@ export default function OraclesTakeBackItem({
       if (error?.message?.search("User denied") > -1)
         dispatch(updateTransaction({ ...(delegateTx as any), remove: true }));
       else
-        dispatch(
-          updateTransaction({
+        dispatch(updateTransaction({
             ...(delegateTx.payload as any),
             status: TransactionStatus.failed
-          })
-        );
+        }));
     }
   }
 

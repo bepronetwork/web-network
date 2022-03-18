@@ -1,8 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 
-import { IActiveIssue, useIssue } from "contexts/issue";
-import { pullRequest } from "interfaces/issue-data";
-import { INetworkProposal, Proposal } from "interfaces/proposal";
 import { useTranslation } from "next-i18next";
 
 import Button from "components/button";
@@ -10,7 +7,11 @@ import GithubLink from "components/github-link";
 import Modal from "components/modal";
 
 import { ApplicationContext } from "contexts/application";
+import { IActiveIssue, useIssue } from "contexts/issue";
 import { addToast } from "contexts/reducers/add-toast";
+
+import { pullRequest } from "interfaces/issue-data";
+import { INetworkProposal, Proposal } from "interfaces/proposal";
 
 import { BeproService } from "services/bepro-service";
 
@@ -77,33 +78,27 @@ export default function NotMergeableModal({
 
     setMergeState("loading");
 
-    mergeClosedIssue(
-      activeIssue?.issueId,
-      pullRequest?.githubId,
-      proposal?.scMergeId,
-      currentAddress,
-      network?.name
-    )
+    mergeClosedIssue(activeIssue?.issueId,
+                     pullRequest?.githubId,
+                     proposal?.scMergeId,
+                     currentAddress,
+                     network?.name)
       .then(() => {
-        dispatch(
-          addToast({
+        dispatch(addToast({
             type: "success",
             title: t("actions.success"),
             content: t("modals.not-mergeable.success-message")
-          })
-        );
+        }));
 
         setMergeState("success");
         setVisible(false);
       })
       .catch((error) => {
-        dispatch(
-          addToast({
+        dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
             content: error.response.data.message
-          })
-        );
+        }));
 
         setMergeState("error");
       });

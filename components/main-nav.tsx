@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 
-import { formatNumberToNScale } from "helpers/formatNumber";
-import { truncateAddress } from "helpers/truncate-address";
 import { BEPRO_NETWORK_NAME, IPFS_BASE } from "env";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -11,8 +9,8 @@ import BeproLogoBlue from "assets/icons/bepro-logo-blue";
 import BeproSmallLogo from "assets/icons/bepro-small-logo";
 import ExternalLinkIcon from "assets/icons/external-link-icon";
 import HelpIcon from "assets/icons/help-icon";
-
 import PlusIcon from "assets/icons/plus-icon";
+
 import BalanceAddressAvatar from "components/balance-address-avatar";
 import Button from "components/button";
 import ClosedNetworkAlert from "components/closed-network-alert";
@@ -24,7 +22,11 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import TransactionsStateIndicator from "components/transactions-state-indicator";
 import Translation from "components/translation";
 import WrongNetworkModal from "components/wrong-network-modal";
+
 import { useAuthentication } from "contexts/authentication";
+
+import { formatNumberToNScale } from "helpers/formatNumber";
+import { truncateAddress } from "helpers/truncate-address";
 
 import useNetwork from "x-hooks/use-network";
 

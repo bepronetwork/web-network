@@ -37,9 +37,7 @@ export default function MyOracles() {
             <div
               className="content-wrapper mb-5 cursor-pointer shadow-lg-hover"
               onClick={() =>
-                navigateOut(
-                  "https://support.bepro.network/en/collections/3143296-bepro-holder#bepro-protocol"
-                )
+                navigateOut("https://support.bepro.network/en/collections/3143296-bepro-holder#bepro-protocol")
               }
             >
               <div className="row">

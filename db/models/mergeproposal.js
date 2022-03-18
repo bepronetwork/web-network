@@ -7,19 +7,17 @@ class MergeProposal extends Model {
    * The `models/index` file will call this method automatically.
    */
   static init(sequelize) {
-    super.init(
-      {
+    super.init({
         scMergeId: DataTypes.STRING,
         issueId: DataTypes.INTEGER,
         pullRequestId: DataTypes.INTEGER,
         githubLogin: DataTypes.STRING
-      },
-      {
+    },
+               {
         sequelize,
         modelName: "mergeProposal",
         tableName: "merge_proposals"
-      }
-    );
+               });
   }
 
   static associate(models) {

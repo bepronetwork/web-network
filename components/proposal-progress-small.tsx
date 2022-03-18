@@ -1,4 +1,5 @@
 import Translation from "components/translation";
+
 import { formatNumberToNScale } from "helpers/formatNumber";
 import { handlePercentage } from "helpers/handlePercentage";
 

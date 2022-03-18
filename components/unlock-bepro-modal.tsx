@@ -1,6 +1,5 @@
 import { useRef, useState } from "react";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
 import { useTranslation } from "next-i18next";
 
 import ArrowRightLine from "assets/icons/arrow-right-line";
@@ -12,6 +11,8 @@ import Modal from "components/modal";
 import NetworkTxButton from "components/network-tx-button";
 
 import { useAuthentication } from "contexts/authentication";
+
+import { formatNumberToCurrency } from "helpers/formatNumber";
 
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 
@@ -50,10 +51,8 @@ export default function UnlockBeproModal({
   }
 
   function setToMax() {
-    setAmountToUnlock(
-      wallet?.balance?.oracles?.tokensLocked -
-        wallet?.balance?.oracles?.delegatedToOthers
-    );
+    setAmountToUnlock(wallet?.balance?.oracles?.tokensLocked -
+        wallet?.balance?.oracles?.delegatedToOthers);
   }
 
   function handleChange({ floatValue }) {
@@ -121,9 +120,7 @@ export default function UnlockBeproModal({
                     </span>
 
                     <span className={`${textOracleClass} ml-1`}>
-                      {formatNumberToCurrency(
-                        oraclesAvailable - amountToUnlock
-                      )}
+                      {formatNumberToCurrency(oraclesAvailable - amountToUnlock)}
                     </span>
                   </>
                 )}
@@ -154,12 +151,10 @@ export default function UnlockBeproModal({
                 </span>
 
                 <span className={`${textBeproClass} ml-1`}>
-                  {formatNumberToCurrency(
-                    wallet?.balance?.bepro + amountToUnlock,
-                    {
+                  {formatNumberToCurrency(wallet?.balance?.bepro + amountToUnlock,
+                                          {
                       maximumFractionDigits: 2
-                    }
-                  )}
+                                          })}
                 </span>
               </>
             )}

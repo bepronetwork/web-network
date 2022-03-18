@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 
-import GithubInfo from "components/github-info";
-import useApi from "x-hooks/use-api";
 import { useTranslation } from "next-i18next";
+
+import GithubInfo from "components/github-info";
+
+import useApi from "x-hooks/use-api";
 
 export default function RepositoriesList({ repositories, onClick }) {
   const { t } = useTranslation("custom-network");
@@ -40,9 +42,7 @@ export default function RepositoriesList({ repositories, onClick }) {
       .filter((repository) => repository.isSaved)
       .map((repository) => repository.fullName);
 
-    Promise.allSettled(
-      savedPaths.map((path) => repositoryHasIssues(path))
-    ).then((result) => {
+    Promise.allSettled(savedPaths.map((path) => repositoryHasIssues(path))).then((result) => {
       const tmpRepos = [];
 
       result.forEach((item, index) => {

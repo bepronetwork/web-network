@@ -3,8 +3,7 @@ const { Model, DataTypes } = require("sequelize");
 
 class ChainEvents extends Model {
   static init(sequelize) {
-    super.init(
-      {
+    super.init({
         id: {
           type: DataTypes.INTEGER,
           autoIncrement: true,
@@ -19,14 +18,13 @@ class ChainEvents extends Model {
         lastBlock: {
           type: DataTypes.INTEGER
         }
-      },
-      {
+    },
+               {
         sequelize,
         modelName: "chainEvents",
         tableName: "chainEvents",
         timestamps: false
-      }
-    );
+               });
   }
 }
 

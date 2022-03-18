@@ -1,12 +1,14 @@
 import { useState, useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 
-import { truncateAddress } from "helpers/truncate-address";
-import useApi from "x-hooks/use-api";
 import { useTranslation } from "next-i18next";
 
 import ClipIcon from "assets/icons/clip-icon";
 import CloseIcon from "assets/icons/close-icon";
+
+import { truncateAddress } from "helpers/truncate-address";
+
+import useApi from "x-hooks/use-api";
 
 export interface IFilesProps {
   name: string;
@@ -24,39 +26,33 @@ export default function DragAndDrop({ onUpdateFiles }: IDragAndDropProps) {
   const { t } = useTranslation(["common"]);
   const { uploadFiles } = useApi();
 
-  const onDropAccepted = useCallback(
-    async (dropedFiles) => {
-      const createFiles = dropedFiles.map((file) => ({
+  const onDropAccepted = useCallback(async (dropedFiles) => {
+    const createFiles = dropedFiles.map((file) => ({
         name: file?.name,
         hash: null,
         uploaded: false,
         type: file?.type
-      }));
-      const arrFiles = [...files, ...createFiles];
-      setFiles([...files, ...createFiles]);
+    }));
+    const arrFiles = [...files, ...createFiles];
+    setFiles([...files, ...createFiles]);
 
-      uploadFiles(dropedFiles)
+    uploadFiles(dropedFiles)
         .then(async (updateData) => {
-          const updatefiles = await Promise.all(
-            arrFiles.map(async (currentFile) => {
-              const find = updateData?.find(
-                (el) => el.fileName === currentFile.name
-              );
-              return {
+          const updatefiles = await Promise.all(arrFiles.map(async (currentFile) => {
+            const find = updateData?.find((el) => el.fileName === currentFile.name);
+            return {
                 ...currentFile,
                 uploaded: true,
                 hash: find?.hash
-              } as IFilesProps;
-            })
-          );
+            } as IFilesProps;
+          }));
           setFiles(updatefiles);
         })
         .catch((e) => {
           setFiles(files.filter((file) => file.uploaded));
         });
-    },
-    [files]
-  );
+  },
+    [files]);
 
   useEffect(() => {
     onUpdateFiles?.(files);

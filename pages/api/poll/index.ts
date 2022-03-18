@@ -1,5 +1,6 @@
-import { Bus } from "helpers/bus";
 import { NextApiRequest, NextApiResponse } from "next";
+
+import { Bus } from "helpers/bus";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { eventName, networkName, ...rest } = req.body;
@@ -11,43 +12,36 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         issue_id: scId,
         currentGithubId: ghPrId
       } = rest;
-      console.warn(
-        "Listening ",
-        `mergeProposal:created:${login}:${scId}:${ghPrId}`
-      );
+      console.warn("Listening ",
+                   `mergeProposal:created:${login}:${scId}:${ghPrId}`);
       Bus.once(`mergeProposal:created:${login}:${scId}:${ghPrId}`, (merge) =>
-        resolve(res.json(merge))
-      );
+        resolve(res.json(merge)));
     }
 
     if (eventName === "closeIssue") {
       const { currentGithubId: issueId } = rest;
       console.warn("Listening ", `closeIssue:created:${issueId}`);
       Bus.once(`closeIssue:created:${issueId}`, (issue) =>
-        resolve(res.json(issue))
-      );
+        resolve(res.json(issue)));
     }
 
     if (eventName === "redeemIssue") {
       const { currentGithubId: issueId } = rest;
       console.warn(`Listening redeemIssue:created:${issueId}`);
       Bus.once(`redeemIssue:created:${issueId}`, (issue) =>
-        resolve(res.json(issue))
-      );
+        resolve(res.json(issue)));
     }
   });
 }
 
-export default async function PollBody(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function PollBody(req: NextApiRequest,
+                                       res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "post":
-      await post(req, res);
-      break;
+  case "post":
+    await post(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 }

@@ -7,8 +7,7 @@ class Issue extends Model {
    * The `models/index` file will call this method automatically.
    */
   static init(sequelize) {
-    super.init(
-      {
+    super.init({
         issueId: DataTypes.INTEGER,
         githubId: DataTypes.STRING,
         state: DataTypes.STRING,
@@ -25,12 +24,11 @@ class Issue extends Model {
         merged: DataTypes.STRING,
         seoImage: DataTypes.STRING,
         network_id: DataTypes.INTEGER
-      },
-      {
+    },
+               {
         sequelize,
         modelName: "issue"
-      }
-    );
+               });
   }
 
   static associate(models) {

@@ -139,19 +139,16 @@ export default function PageActions({
     state?.toLocaleLowerCase() === "redeemed";
   const isReedemButtonDisable = () =>
     [
-      !myTransactions.find(
-        (transactions) =>
+      !myTransactions.find((transactions) =>
           transactions.type === TransactionTypes.redeemIssue &&
-          transactions.status === TransactionStatus.pending
-      )
+          transactions.status === TransactionStatus.pending)
     ].some((values) => values === false);
 
   async function handleRedeem() {
     handleReedemIssue(networkIssue._id).then(() => {
       //TODO: Move to useAuth balance;
       BeproService.getBalance("bepro").then((bepro) =>
-        dispatch(changeBalance({ bepro }))
-      );
+        dispatch(changeBalance({ bepro })));
     });
   }
 
@@ -295,13 +292,11 @@ export default function PageActions({
         branch
       })
         .then(() => {
-          dispatch(
-            addToast({
+          dispatch(addToast({
               type: "success",
               title: t("actions.success"),
               content: t("pull-request:actions.create.success")
-            })
-          );
+          }));
 
           if (handleMicroService) handleMicroService(true);
 
@@ -311,23 +306,18 @@ export default function PageActions({
         .catch((err) => {
           if (err.response?.status === 422 && err.response?.data) {
             err.response?.data.errors?.map((item) =>
-              dispatch(
-                addToast({
+              dispatch(addToast({
                   type: "danger",
                   title: t("actions.failed"),
                   content: item.message
-                })
-              )
-            );
+              })));
             reject(err);
           } else {
-            dispatch(
-              addToast({
+            dispatch(addToast({
                 type: "danger",
                 title: t("actions.failed"),
                 content: t("pull-request:actions.create.error")
-              })
-            );
+            }));
             reject();
           }
         });
@@ -339,13 +329,11 @@ export default function PageActions({
 
     startWorking(networkCID, githubLogin, activeNetwork?.name)
       .then((response) => {
-        dispatch(
-          addToast({
+        dispatch(addToast({
             type: "success",
             title: t("actions.success"),
             content: t("bounty:actions.start-working.success")
-          })
-        );
+        }));
 
         if (handleMicroService) handleMicroService(true);
 
@@ -355,13 +343,11 @@ export default function PageActions({
       })
       .catch((error) => {
         console.log("Failed to start working", error);
-        dispatch(
-          addToast({
+        dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
             content: t("bounty:actions.start-working.error")
-          })
-        );
+        }));
 
         setIsExecuting(false);
       });

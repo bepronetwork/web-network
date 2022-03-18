@@ -1,5 +1,6 @@
-import { formatDate } from "helpers/formatDate";
 import { useTranslation } from "next-i18next";
+
+import { formatDate } from "helpers/formatDate";
 
 import Avatar from "./avatar";
 import MarkedRender from "./MarkedRender";

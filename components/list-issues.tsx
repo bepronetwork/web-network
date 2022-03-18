@@ -109,9 +109,7 @@ export default function ListIssues({
     }
   ];
 
-  const [filterByState, setFilterByState] = useState<Filter>(
-    filtersByIssueState[0]
-  );
+  const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
 
   function isListEmpy(): boolean {
     return issuesPages.every((el) => el.issues?.length === 0);
@@ -189,11 +187,8 @@ export default function ListIssues({
     if (page) {
       const pagesToValidate = [...Array(+page).keys()].map((i) => i + 1);
 
-      setTruncatedData(
-        !pagesToValidate.every((pageV) =>
-          issuesPages.find((el) => el.page === pageV)
-        )
-      );
+      setTruncatedData(!pagesToValidate.every((pageV) =>
+          issuesPages.find((el) => el.page === pageV)));
     }
   }, [page, issuesPages]);
 

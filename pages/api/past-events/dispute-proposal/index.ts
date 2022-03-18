@@ -41,9 +41,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         const issue = await models.issue.findOne({ where: { issueId } });
 
         if (!issue)
-          return console.log(
-            "Error creating tweet proposal failed because the issue was not found"
-          );
+          return console.log("Error creating tweet proposal failed because the issue was not found");
 
         if (network.contractAddress === CONTRACT_ADDRESS)
           twitterTweet({
@@ -59,17 +57,15 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     });
 }
 
-export default async function ParseMergeCreateProposal(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function ParseMergeCreateProposal(req: NextApiRequest,
+                                                       res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "post":
-      await post(req, res);
-      break;
+  case "post":
+    await post(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 
   res.end();

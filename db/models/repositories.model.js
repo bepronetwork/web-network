@@ -7,8 +7,7 @@ class Repositories extends Model {
    * The `models/index` file will call this method automatically.
    */
   static init(sequelize) {
-    super.init(
-      {
+    super.init({
         id: {
           type: DataTypes.INTEGER,
           autoIncrement: true,
@@ -21,14 +20,13 @@ class Repositories extends Model {
           unique: true
         },
         network_id: DataTypes.INTEGER
-      },
-      {
+    },
+               {
         sequelize,
         modelName: "repositories",
         tableName: "repositories",
         timestamps: false
-      }
-    );
+               });
   }
   static associate(models) {
     // this.belongsTo(models.issue, {

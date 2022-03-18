@@ -92,13 +92,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     const result = [];
 
-    result.push(
-      ...issues.filter(({ title, body }) =>
+    result.push(...issues.filter(({ title, body }) =>
         [title, body].some((text) =>
-          searchPatternInText(text || "", String(search))
-        )
-      )
-    );
+          searchPatternInText(text || "", String(search)))));
 
     const paginatedData = paginateArray(result, 10, page || 1);
 
@@ -109,11 +105,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       currentPage: +paginatedData.page
     });
   } else {
-    const issues = await models.issue.findAndCountAll(
-      paginate({ where: whereCondition, include, nest: true }, req.query, [
+    const issues = await models.issue.findAndCountAll(paginate({ where: whereCondition, include, nest: true }, req.query, [
         [req.query.sortBy || "updatedAt", req.query.order || "DESC"]
-      ])
-    );
+    ]));
 
     return res.status(200).json({
       ...issues,
@@ -123,17 +117,15 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function SearchIssues(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function SearchIssues(req: NextApiRequest,
+                                           res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "get":
-      await get(req, res);
-      break;
+  case "get":
+    await get(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 
   res.end();

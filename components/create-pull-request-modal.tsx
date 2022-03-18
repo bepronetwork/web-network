@@ -50,8 +50,7 @@ export default function CreatePullRequestModal({
   function handleConfirm() {
     setIsCreating(true);
     onConfirm({ title, description, branch }).finally(() =>
-      setIsCreating(false)
-    );
+      setIsCreating(false));
   }
 
   useEffect(setDefaults, [show]);
@@ -105,9 +104,7 @@ export default function CreatePullRequestModal({
               rows={5}
               onChange={(e) => setDescription(e.target.value)}
               className="form-control"
-              placeholder={t(
-                "forms.create-pull-request.description.placeholder"
-              )}
+              placeholder={t("forms.create-pull-request.description.placeholder")}
             />
           </div>
           <div className="form-group">

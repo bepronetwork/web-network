@@ -29,9 +29,7 @@ export default function NationDialog({ children }) {
         )
           return;
 
-        setCountry(
-          data.country || String(t("modals.nation-dialog.your-country"))
-        );
+        setCountry(data.country || String(t("modals.nation-dialog.your-country")));
         setBlock(true);
       })
       .finally(() => setIsLoading(false));

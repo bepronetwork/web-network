@@ -12,6 +12,4 @@ export const ChangeBeproInit: ReduceAction<boolean> = {
   fn: reducer
 };
 
-export const changeBeproInitState = (
-  payload: boolean
-): ReduceActor<boolean> => ({ name: ReduceActionName.BeproInit, payload });
+export const changeBeproInitState = (payload: boolean): ReduceActor<boolean> => ({ name: ReduceActionName.BeproInit, payload });

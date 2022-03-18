@@ -8,18 +8,16 @@ class User extends Model {
    * The `models/index` file will call this method automatically.
    */
   static init(sequelize) {
-    super.init(
-      {
+    super.init({
         githubHandle: DataTypes.STRING,
         githubLogin: DataTypes.STRING,
         address: { type: DataTypes.STRING, unique: true },
         accessToken: DataTypes.STRING
-      },
-      {
+    },
+               {
         sequelize,
         modelName: "user"
-      }
-    );
+               });
   }
   static associate(models) {
     // define association here

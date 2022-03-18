@@ -33,8 +33,7 @@ const DeployERC20andNetwork = async (tokenName, tokenSymbol, capital) => {
       await network
         .deployJsonAbi(tx.contractAddress, tx.contractAddress, address)
         .then((txNetwork) =>
-          console.log("Network Contract Address", txNetwork.contractAddress)
-        );
+          console.log("Network Contract Address", txNetwork.contractAddress));
     })
     .catch(console.log);
 };

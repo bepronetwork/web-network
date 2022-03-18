@@ -1,8 +1,9 @@
 import Database from "db/models";
-import Bepro from "helpers/api/bepro-initializer";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
+
+import Bepro from "helpers/api/bepro-initializer";
 
 import IpfsStorage from "services/ipfs-service";
 
@@ -56,9 +57,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     await BEPRO.init(false, false, true);
 
     const OPERATOR_AMOUNT = await BEPRO.networkFactory.OPERATOR_AMOUNT();
-    const amountStaked = await BEPRO.networkFactory.getLockedStakedByAddress(
-      creator
-    );
+    const amountStaked = await BEPRO.networkFactory.getLockedStakedByAddress(creator);
     const checkingNetworkAddress =
       await BEPRO.networkFactory.getNetworkByAddress(creator);
 
@@ -226,9 +225,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         if (exists)
           return res
             .status(403)
-            .json(
-              `Repository ${repository.fullName} is already in use by another network `
-            );
+            .json(`Repository ${repository.fullName} is already in use by another network `);
       }
 
     const removingRepos = repositoriesToRemove
@@ -254,9 +251,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         if (hasIssues)
           return res
             .status(403)
-            .json(
-              `Repository ${repository.fullName} already has bounties and cannot be removed`
-            );
+            .json(`Repository ${repository.fullName} already has bounties and cannot be removed`);
       }
 
     if (isAdminOverriding && name) network.name = name;
@@ -326,25 +321,23 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function NetworkEndPoint(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function NetworkEndPoint(req: NextApiRequest,
+                                              res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-    case "get":
-      await get(req, res);
-      break;
+  case "get":
+    await get(req, res);
+    break;
 
-    case "post":
-      await post(req, res);
-      break;
+  case "post":
+    await post(req, res);
+    break;
 
-    case "put":
-      await put(req, res);
-      break;
+  case "put":
+    await put(req, res);
+    break;
 
-    default:
-      res.status(405).json("Method not allowed");
+  default:
+    res.status(405).json("Method not allowed");
   }
 
   res.end();
