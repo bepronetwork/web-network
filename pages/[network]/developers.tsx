@@ -10,6 +10,7 @@ import {ApplicationContext} from 'contexts/application';
 import {BeproService} from 'services/bepro-service';
 import useApi from '@x-hooks/use-api';
 import { useAuthentication } from '@contexts/authentication';
+import { handleNetworkAddress } from '@helpers/custom-network';
 
 
 export default function PageDevelopers() {
@@ -41,9 +42,9 @@ export default function PageDevelopers() {
       return;
 
     const [closed, inProgress, onNetwork, totalUsers] = await Promise.all([
-      BeproService.getClosedIssues(activeNetwork.networkAddress),
-      BeproService.getOpenIssues(activeNetwork.networkAddress),
-      BeproService.getTokensStaked(activeNetwork.networkAddress),
+      BeproService.getClosedIssues(handleNetworkAddress(activeNetwork)),
+      BeproService.getOpenIssues(handleNetworkAddress(activeNetwork)),
+      BeproService.getTokensStaked(handleNetworkAddress(activeNetwork)),
       getTotalUsers(),
     ])
     setInfos([
