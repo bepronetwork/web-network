@@ -2,7 +2,7 @@ const {
   Web3Connection,
   ERC20,
   toSmartContractDecimals,
-  Network,
+  Network
 } = require("bepro-js");
 
 const cap = toSmartContractDecimals("50000000", 18);
@@ -12,7 +12,7 @@ const connection = new Web3Connection({
   privateKey:
     "6dee9544733125f879bdf1f5c51638d0dbaceb579e15c49ac52348d39019b9ab",
   debug: true,
-  skipWindowAssignment: true,
+  skipWindowAssignment: true
 });
 
 const DeployERC20andNetwork = async (tokenName, tokenSymbol, capital) => {

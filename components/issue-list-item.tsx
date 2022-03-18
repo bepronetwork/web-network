@@ -1,32 +1,37 @@
-import { GetStaticProps } from "next";
-import { useRouter } from "next/router";
 import React from "react";
-import IssueAvatars from "./issue-avatars";
-import { IssueData, pullRequest } from "@interfaces/issue-data";
-import { IssueState } from "@interfaces/issue-data";
-import { formatNumberToNScale } from "@helpers/formatNumber";
-import Avatar from "components/avatar";
-import GithubInfo from "@components/github-info";
-import Translation from "./translation";
-import { useTranslation } from "next-i18next";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { useNetwork } from "@contexts/network";
+
+import { formatNumberToNScale } from "helpers/formatNumber";
+import { GetStaticProps } from "next";
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
+
+import Avatar from "components/avatar";
+import GithubInfo from "components/github-info";
+
+import { useNetwork } from "contexts/network";
+
+import { IssueData, pullRequest } from "interfaces/issue-data";
+import { IssueState } from "interfaces/issue-data";
+
 import BountyStatusInfo from "./bounty-status-info";
 import DateLabel from "./date-label";
+import IssueAvatars from "./issue-avatars";
+import Translation from "./translation";
 
 export default function IssueListItem({
   issue = null,
-  xClick,
+  xClick
 }: {
   issue?: IssueData;
   xClick?: () => void;
 }) {
   const router = useRouter();
-  const { activeNetwork } = useNetwork()
+  const { activeNetwork } = useNetwork();
   const { t } = useTranslation("bounty");
 
   function handleReviewsPr(pullRequests: pullRequest[]) {
-    var numberAllReviewers = 0;
+    let numberAllReviewers = 0;
 
     const allReviewers = pullRequests.map((pr) => {
       return pr.reviewers?.length;
@@ -102,7 +107,9 @@ export default function IssueListItem({
           {state?.toLowerCase() === "ready"
             ? renderReviews()
             : renderProposals()}
-          {state?.toLowerCase() !== "draft" && <DateLabel date={issue?.createdAt}/>}
+          {state?.toLowerCase() !== "draft" && (
+            <DateLabel date={issue?.createdAt} />
+          )}
         </div>
       );
     } else {
@@ -118,39 +125,47 @@ export default function IssueListItem({
 
         router.push({
           pathname: "/[network]/bounty",
-          query: { id: issue?.githubId, repoId: issue?.repository_id, network: activeNetwork.name },
+          query: {
+            id: issue?.githubId,
+            repoId: issue?.repository_id,
+            network: activeNetwork.name
+          }
         });
       }}
     >
       <div className="row align-center">
         <div className="col-md-10 mb-3 mb-md-0">
-        <h4 className="h4 text-truncate">
-              <span className="text-gray trans me-2">#{issue?.githubId}</span>
-              {(issue?.title !== null && issue?.title) || (
-                <Translation ns="bounty" label={`errors.fetching`} />
-              )}
-            </h4>
+          <h4 className="h4 text-truncate">
+            <span className="text-gray trans me-2">#{issue?.githubId}</span>
+            {(issue?.title !== null && issue?.title) || (
+              <Translation ns="bounty" label={"errors.fetching"} />
+            )}
+          </h4>
           <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2 gap-20">
-            <BountyStatusInfo issueState={issue.state}/>
+            <BountyStatusInfo issueState={issue.state} />
             <div className="d-flex align-items-center">
-              <Avatar className="mr-1" userLogin={issue?.creatorGithub} border />
+              <Avatar
+                className="mr-1"
+                userLogin={issue?.creatorGithub}
+                border
+              />
               <OverlayTrigger
                 key="bottom-creator"
                 placement="bottom"
                 overlay={
                   (issue?.creatorGithub?.length > 25 && (
-                    <Tooltip id={`tooltip-bottom`}>
+                    <Tooltip id={"tooltip-bottom"}>
                       @{issue?.creatorGithub}
                     </Tooltip>
                   )) || <></>
                 }
-                >
+              >
                 <span className="p-small mw-github-info">
                   <GithubInfo
                     parent="list"
                     variant="user"
-                    label={[`@`, issue?.creatorGithub].join(``)}
-                    />
+                    label={["@", issue?.creatorGithub].join("")}
+                  />
                 </span>
               </OverlayTrigger>
             </div>
@@ -160,7 +175,7 @@ export default function IssueListItem({
                 placement="bottom"
                 overlay={
                   (issue?.repository?.githubPath?.length > 25 && (
-                    <Tooltip id={`tooltip-bottom`}>
+                    <Tooltip id={"tooltip-bottom"}>
                       {issue?.repository?.githubPath}
                     </Tooltip>
                   )) || <></>
@@ -173,15 +188,15 @@ export default function IssueListItem({
                     label={issue?.repository?.githubPath}
                     onClick={() =>
                       router.push({
-                        pathname: `/`,
-                        query: { repoId: issue?.repository_id },
+                        pathname: "/",
+                        query: { repoId: issue?.repository_id }
                       })
                     }
                   />
                 </span>
               </OverlayTrigger>
             )}
-            {issue?.state === "draft" && <DateLabel date={issue?.createdAt}/>}
+            {issue?.state === "draft" && <DateLabel date={issue?.createdAt} />}
           </div>
           {renderIssueData(issue?.state)}
         </div>
@@ -189,13 +204,13 @@ export default function IssueListItem({
           <span className="caption-large text-white text-opacity-1">
             {formatNumberToNScale(issue?.amount || 0)}{" "}
             <label className="text-uppercase text-primary">
-              <Translation label={`$bepro`} />
+              <Translation label={"$bepro"} />
             </label>
           </span>
           {(issue?.developers?.length > 0 && (
             <IssueAvatars users={issue?.developers}></IssueAvatars>
           )) ||
-            ``}
+            ""}
         </div>
       </div>
     </div>
@@ -204,6 +219,6 @@ export default function IssueListItem({
 
 export const getStaticProps: GetStaticProps = async () => {
   return {
-    props: {},
+    props: {}
   };
 };

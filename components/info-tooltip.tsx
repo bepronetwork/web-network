@@ -1,10 +1,8 @@
-import { OverlayTrigger, Popover } from 'react-bootstrap'
+import { OverlayTrigger, Popover } from "react-bootstrap";
 
-import InfoIcon from '@assets/icons/info-icon'
+import InfoIcon from "assets/icons/info-icon";
 
-export default function InfoTooltip({
-  description = ''
-}) {
+export default function InfoTooltip({ description = "" }) {
   const popover = (
     <Popover id="popover-tabbed-description" className="p-2 bg-white">
       <Popover.Body
@@ -14,7 +12,7 @@ export default function InfoTooltip({
         {description}
       </Popover.Body>
     </Popover>
-  )
+  );
 
   return (
     <>
@@ -24,5 +22,5 @@ export default function InfoTooltip({
         </span>
       </OverlayTrigger>
     </>
-  )
+  );
 }

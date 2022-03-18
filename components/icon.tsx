@@ -1,11 +1,12 @@
-import clsx from "clsx";
 import { ComponentPropsWithRef, forwardRef } from "react";
 
-interface Props extends ComponentPropsWithRef<"span"> {}
+import clsx from "clsx";
+
+type Props = ComponentPropsWithRef<"span">;
 
 const Icon = forwardRef<HTMLSpanElement, Props>(function Icon(
   { className, ...props },
-  ref,
+  ref
 ) {
   return (
     <span ref={ref} className={clsx("material-icons", className)} {...props} />

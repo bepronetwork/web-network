@@ -1,13 +1,13 @@
-import { Op } from 'sequelize'
-import { Octokit } from 'octokit'
-import { NextApiRequest, NextApiResponse } from 'next'
+import models from "db/models";
+import { NextApiRequest, NextApiResponse } from "next";
+import { Octokit } from "octokit";
+import { Op } from "sequelize";
 
-import models from '@db/models'
-
-import networkBeproJs from '@helpers/api/handle-network-bepro'
+import networkBeproJs from "helpers/api/handle-network-bepro";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const { issueId, pullRequestId, mergeProposalId, address, networkName } = req.body
+  const { issueId, pullRequestId, mergeProposalId, address, networkName } =
+    req.body;
 
   try {
     const customNetwork = await models.network.findOne({
@@ -16,39 +16,44 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
           [Op.iLike]: String(networkName)
         }
       }
-    })
-  
-    if (!customNetwork) return res.status(404).json('Invalid network')
-    if (customNetwork.isClosed) return res.status(404).json('Invalid network')
+    });
+
+    if (!customNetwork) return res.status(404).json("Invalid network");
+    if (customNetwork.isClosed) return res.status(404).json("Invalid network");
 
     const issue = await models.issue.findOne({
       where: { issueId, network_id: customNetwork.id }
-    })
+    });
 
-    if (!issue) return res.status(404).json('Issue not found')
+    if (!issue) return res.status(404).json("Issue not found");
 
     const pullRequest = await models.pullRequest.findOne({
       where: { githubId: pullRequestId, issueId: issue.id }
-    })
+    });
 
-    if (!pullRequest) return res.status(404).json('Pull Request not found')
+    if (!pullRequest) return res.status(404).json("Pull Request not found");
 
-    const network = networkBeproJs({ contractAddress: customNetwork.networkAddress });
+    const network = networkBeproJs({
+      contractAddress: customNetwork.networkAddress
+    });
 
-    await network.start()
+    await network.start();
 
-    const issueBepro = await network.getIssueByCID(issueId)
+    const issueBepro = await network.getIssueByCID(issueId);
 
-    if (!issueBepro) return res.status(404).json('Issue not found on network')
+    if (!issueBepro) return res.status(404).json("Issue not found on network");
 
     if (issueBepro.canceled || !issueBepro.finalized)
-      return res.status(400).json('Issue canceled or not closed yet')
+      return res.status(400).json("Issue canceled or not closed yet");
 
-    const mergeBepro = await network.getMergeById(issueBepro._id, mergeProposalId)
+    const mergeBepro = await network.getMergeById(
+      issueBepro._id,
+      mergeProposalId
+    );
 
-    if (!mergeBepro) return res.status(404).json('Merge proposal not found')
+    if (!mergeBepro) return res.status(404).json("Merge proposal not found");
 
-    const isCouncil = await network.isCouncil(address)
+    const isCouncil = await network.isCouncil(address);
 
     if (
       address.toLowerCase() !== issueBepro.issueGenerator.toLowerCase() &&
@@ -58,26 +63,26 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         (el) => el.toLowerCase() === address.toLowerCase()
       )
     )
-      return res.status(403).json('Not authorized')
+      return res.status(403).json("Not authorized");
 
     const repository = await models.repositories.findOne({
       where: { id: issue.repository_id },
       raw: true
-    })
+    });
 
-    const [owner, repo] = repository.githubPath.split(`/`)
+    const [owner, repo] = repository.githubPath.split("/");
 
-    const octoKit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN })
+    const octoKit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
 
     const octoResponse = await octoKit.rest.pulls.merge({
       owner,
       repo,
       pull_number: pullRequest.githubId
-    })
+    });
 
-    return res.status(octoResponse.status).json(octoResponse.data)
+    return res.status(octoResponse.status).json(octoResponse.data);
   } catch (error) {
-    return res.status(error.status || 500).json(error.response?.data || error)
+    return res.status(error.status || 500).json(error.response?.data || error);
   }
 }
 
@@ -86,13 +91,13 @@ export default async function PullRequest(
   res: NextApiResponse
 ) {
   switch (req.method.toLowerCase()) {
-    case 'post':
-      await post(req, res)
-      break
+    case "post":
+      await post(req, res);
+      break;
 
     default:
-      res.status(405)
+      res.status(405);
   }
 
-  res.end()
+  res.end();
 }

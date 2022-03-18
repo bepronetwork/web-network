@@ -1,10 +1,10 @@
-import { Collapse } from 'react-bootstrap'
+import { Collapse } from "react-bootstrap";
 
-import SuccessIcon from '@assets/icons/success-icon'
+import SuccessIcon from "assets/icons/success-icon";
 
-import Button from '@components/button'
+import Button from "components/button";
 
-import { IStep } from '@interfaces/stepper'
+import { IStep } from "interfaces/stepper";
 
 export default function Step({
   title,
@@ -18,11 +18,11 @@ export default function Step({
   handleFinish = () => {},
   ...props
 }: IStep) {
-  const isActive = activeStep === index
+  const isActive = activeStep === index;
 
   function handleAction() {
-    if (finishLabel) handleFinish()
-    else handleClick(index + 1)
+    if (finishLabel) handleFinish();
+    else handleClick(index + 1);
   }
 
   return (
@@ -33,11 +33,11 @@ export default function Step({
       >
         <span
           className={`caption-medium mr-1 ${
-            isActive ? 'text-white' : 'text-ligth-gray'
+            isActive ? "text-white" : "text-ligth-gray"
           }`}
         >{`${index}. ${title}`}</span>
 
-        {(validated && <SuccessIcon />) || ''}
+        {(validated && <SuccessIcon />) || ""}
       </div>
 
       <Collapse in={isActive}>
@@ -46,11 +46,13 @@ export default function Step({
 
           {(validated && (
             <div className="d-flex flex-row justify-content-center">
-              <Button onClick={handleAction}>{ finishLabel || 'Next Step'}</Button>
+              <Button onClick={handleAction}>
+                {finishLabel || "Next Step"}
+              </Button>
             </div>
           )) || <></>}
         </div>
       </Collapse>
     </div>
-  )
+  );
 }

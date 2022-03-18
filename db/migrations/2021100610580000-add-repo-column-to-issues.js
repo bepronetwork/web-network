@@ -7,15 +7,21 @@ module.exports = {
      * await queryInterface.createTable('merge_proposals', { id: Sequelize.INTEGER });
      */
 
-    queryInterface.addColumn('issues', 'repository_id', {
-      type: Sequelize.INTEGER,
-      references: {
-        model: `repositories`,
-        key: `id`
-      }
-    }).then(() => {
-      queryInterface.bulkUpdate(`issues`, {repository_id: 1}, {repository_id: null})
-    });
+    queryInterface
+      .addColumn("issues", "repository_id", {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "repositories",
+          key: "id"
+        }
+      })
+      .then(() => {
+        queryInterface.bulkUpdate(
+          "issues",
+          { repository_id: 1 },
+          { repository_id: null }
+        );
+      });
   },
 
   down: async (queryInterface, Sequelize) => {
@@ -25,6 +31,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('merge_proposals');
      */
-    queryInterface.removeColumn('issues', 'repository_id');
+    queryInterface.removeColumn("issues", "repository_id");
   }
 };

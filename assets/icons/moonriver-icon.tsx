@@ -19,6 +19,5 @@ export default function MoonRiverIcon(props: SVGProps<SVGSVGElement>) {
         fill="#F2B705"
       />
     </svg>
-  )
+  );
 }
-

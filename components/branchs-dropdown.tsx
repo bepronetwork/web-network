@@ -1,11 +1,13 @@
-import ReactSelect from "components/react-select";
 import { useEffect, useState } from "react";
+
+import { useRepos } from "contexts/repos";
 import { useTranslation } from "next-i18next";
-import { useRepos } from "@contexts/repos";
+
+import ReactSelect from "components/react-select";
 
 export default function BranchsDropdown({
   repoId,
-  onSelected = (opt: { value }) => {},
+  onSelected = (opt: { value }) => {}
 }) {
   const { findBranch } = useRepos();
   const [options, setOptions] = useState<{ value: string; label: string }[]>();

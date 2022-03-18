@@ -1,21 +1,20 @@
-import { useTranslation } from 'next-i18next'
-
-import ColorInput from '@components/color-input'
+import ColorInput from "components/color-input";
+import { useTranslation } from "next-i18next";
 
 export default function ThemeColors({ colors, similar, setColor }) {
-  const { t } = useTranslation('custom-network')
+  const { t } = useTranslation("custom-network");
 
   return (
     <>
       <label htmlFor="colors" className="caption-small mb-2">
-        {t('steps.network-information.fields.colors.label')}
+        {t("steps.network-information.fields.colors.label")}
       </label>
 
       <div className="row bg-dark-gray p-3 border-radius-8 justify-content-center text-center mx-0 gap-20">
         {colors &&
           Object.entries(colors).map((color) => {
             return (
-              (color[0] !== 'secondary' && (
+              (color[0] !== "secondary" && (
                 <div className="col-2" key={color[0]}>
                   <ColorInput
                     label={color[0]}
@@ -25,17 +24,17 @@ export default function ThemeColors({ colors, similar, setColor }) {
                   />
                 </div>
               )) ||
-              ''
-            )
+              ""
+            );
           })}
       </div>
 
       {(similar.length && (
         <p className="p-small text-danger mt-2">
-          {t('steps.network-information.fields.colors.similar-colors')}
+          {t("steps.network-information.fields.colors.similar-colors")}
         </p>
       )) ||
-        ''}
+        ""}
     </>
-  )
+  );
 }

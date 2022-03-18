@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode } from "react";
 
 export type Currency = {
   name: string;
@@ -17,53 +17,52 @@ export type Network = {
   rpcUrls: Array<string>;
 };
 
-
 const DEV: Currency = {
-  name: 'Dev',
-  ticker: 'DEV',
-  symbol: 'Ξ',
+  name: "Dev",
+  ticker: "DEV",
+  symbol: "Ξ"
 };
 
 const ETH: Currency = {
-  name: 'Ethereum',
-  ticker: 'ETH',
-  symbol: 'Ξ',
+  name: "Ethereum",
+  ticker: "ETH",
+  symbol: "Ξ"
 };
 
 const MOVR: Currency = {
-  name: 'MOVR',
-  ticker: 'MOVR',
-  symbol: 'MOVR',
+  name: "MOVR",
+  ticker: "MOVR",
+  symbol: "MOVR"
 };
 
-export const NETWORKS : {
+export const NETWORKS: {
   [key: string]: Network;
 } = {
-  '0x1': {
-    id: '1',
-    name: 'Ethereum Mainnet',
-    key: 'mainnet',
+  "0x1": {
+    id: "1",
+    name: "Ethereum Mainnet",
+    key: "mainnet",
     currency: ETH,
     decimals: 18,
-    explorerURL: 'https://etherscan.io',
+    explorerURL: "https://etherscan.io",
     rpcUrls: []
   },
-  '0x2a': {
-    id: '42',
-    name: 'Kovan Testnet',
-    key: 'kovan',
+  "0x2a": {
+    id: "42",
+    name: "Kovan Testnet",
+    key: "kovan",
     currency: ETH,
     decimals: 18,
-    explorerURL: 'https://kovan.etherscan.io',
+    explorerURL: "https://kovan.etherscan.io",
     rpcUrls: []
   },
-  '0x505': {
-    id: '1285',
-    name: 'Moonriver',
-    key: 'moonriver',
+  "0x505": {
+    id: "1285",
+    name: "Moonriver",
+    key: "moonriver",
     currency: MOVR,
     decimals: 18,
-    explorerURL: 'https://blockscout.moonriver.moonbeam.network',
-    rpcUrls: ['https://rpc.moonriver.moonbeam.network']
+    explorerURL: "https://blockscout.moonriver.moonbeam.network",
+    rpcUrls: ["https://rpc.moonriver.moonbeam.network"]
   }
 };

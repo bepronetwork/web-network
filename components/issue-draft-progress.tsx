@@ -1,6 +1,8 @@
-import { GetStaticProps } from "next";
 import React from "react";
 import { ProgressBar } from "react-bootstrap";
+
+import { GetStaticProps } from "next";
+
 import Button from "./button";
 
 export default function IssueDraftProgress({ amountUsed, amountTotal }) {
@@ -37,6 +39,6 @@ export default function IssueDraftProgress({ amountUsed, amountTotal }) {
 
 export const getStaticProps: GetStaticProps = async () => {
   return {
-    props: {},
+    props: {}
   };
 };

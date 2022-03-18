@@ -1,8 +1,11 @@
+import { ComponentPropsWithRef, forwardRef, useContext } from "react";
+
 import clsx from "clsx";
-import {ComponentPropsWithRef, forwardRef, useContext} from 'react';
-import {BeproService} from "@services/bepro-service";
-import {changeLoadState} from '@reducers/change-load-state';
-import {ApplicationContext} from '@contexts/application';
+
+import { ApplicationContext } from "contexts/application";
+import { changeLoadState } from "contexts/reducers/change-load-state";
+
+import { BeproService } from "services/bepro-service";
 
 interface Props extends ComponentPropsWithRef<"button"> {
   onApprove: (isApproved: boolean) => void;
@@ -11,9 +14,9 @@ interface Props extends ComponentPropsWithRef<"button"> {
 const SettlerTokenApproval = forwardRef<HTMLButtonElement, Props>(
   function SettlerTokenApproval(
     { onApprove, className, ...props },
-    ref,
+    ref
   ): JSX.Element {
-    const {dispatch} = useContext(ApplicationContext);
+    const { dispatch } = useContext(ApplicationContext);
 
     async function handleClick() {
       try {
@@ -34,11 +37,12 @@ const SettlerTokenApproval = forwardRef<HTMLButtonElement, Props>(
         ref={ref}
         className={clsx("btn btn-md btn-lg btn-opac w-100", className)}
         onClick={handleClick}
-        {...props}>
+        {...props}
+      >
         Approve
       </button>
     );
-  },
+  }
 );
 
 SettlerTokenApproval.displayName = "SettlerTokenApproval";

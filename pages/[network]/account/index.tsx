@@ -1,59 +1,59 @@
-import { getSession } from 'next-auth/react'
-import { useTranslation } from 'next-i18next'
-import { GetServerSideProps } from 'next/types'
-import React, { useContext, useEffect, useState } from 'react'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import React, { useContext, useEffect, useState } from "react";
 
-import Modal from '@components/modal'
-import Account from '@components/account'
-import ListIssues from '@components/list-issues'
-import MarkedRender from '@components/MarkedRender'
-import IssueListItem from '@components/issue-list-item'
+import { formatNumberToCurrency } from "helpers/formatNumber";
+import { getSession } from "next-auth/react";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { GetServerSideProps } from "next/types";
 
-import { ApplicationContext } from '@contexts/application'
-import { useAuthentication } from '@contexts/authentication'
+import Account from "components/account";
+import IssueListItem from "components/issue-list-item";
+import ListIssues from "components/list-issues";
+import MarkedRender from "components/MarkedRender";
+import Modal from "components/modal";
 
-import { formatNumberToCurrency } from '@helpers/formatNumber'
+import { ApplicationContext } from "contexts/application";
+import { useAuthentication } from "contexts/authentication";
+import { toastError } from "contexts/reducers/add-toast";
 
-import { IssueData } from '@interfaces/issue-data'
+import { IssueData } from "interfaces/issue-data";
 
-import { toastError } from '@reducers/add-toast'
-
-import useNetwork from '@x-hooks/use-network'
-import useMergeData from '@x-hooks/use-merge-data'
-import usePendingIssue from '@x-hooks/use-pending-issue'
+import useMergeData from "x-hooks/use-merge-data";
+import useNetwork from "x-hooks/use-network";
+import usePendingIssue from "x-hooks/use-pending-issue";
 
 export default function MyIssues() {
-  const { t } = useTranslation(['common', 'bounty'])
-  
-  const [pendingIssues, setPendingIssues] = useState<IssueData[]>([])
-  
-  const { network } = useNetwork()
-  const { wallet, user} = useAuthentication()
-  const { dispatch } = useContext(ApplicationContext)
-  const [pendingIssue, { updatePendingIssue, treatPendingIssue }] =
-    usePendingIssue()
+  const { t } = useTranslation(["common", "bounty"]);
 
-    const { getPendingFor } = useMergeData()
+  const [pendingIssues, setPendingIssues] = useState<IssueData[]>([]);
+
+  const { network } = useNetwork();
+  const { wallet, user } = useAuthentication();
+  const { dispatch } = useContext(ApplicationContext);
+  const [pendingIssue, { updatePendingIssue, treatPendingIssue }] =
+    usePendingIssue();
+
+  const { getPendingFor } = useMergeData();
 
   function getPendingIssues() {
-    if (!wallet?.address) return
+    if (!wallet?.address) return;
 
     getPendingFor(wallet?.address, network?.name).then((pending) =>
       setPendingIssues(pending.rows)
-    )
+    );
   }
 
   function createPendingIssue() {
     treatPendingIssue().then((result) => {
-      if (!result) return dispatch(toastError(t('errors.failed-update-bounty')))
+      if (!result)
+        return dispatch(toastError(t("errors.failed-update-bounty")));
 
-      updatePendingIssue(null)
-      getPendingIssues()
-    })
+      updatePendingIssue(null);
+      getPendingIssues();
+    });
   }
 
-  useEffect(getPendingIssues, [wallet?.address])
+  useEffect(getPendingIssues, [wallet?.address]);
 
   return (
     <Account>
@@ -62,8 +62,8 @@ export default function MyIssues() {
           {(pendingIssues?.length && (
             <div className="col-md-10">
               <h4 className="mb-4 text-capitalize">{`${t(
-                'bounty:status.pending'
-              )} ${t('bounty:label_other')}`}</h4>
+                "bounty:status.pending"
+              )} ${t("bounty:label_other")}`}</h4>
               {pendingIssues.map((issue) => (
                 <IssueListItem
                   issue={issue}
@@ -72,11 +72,11 @@ export default function MyIssues() {
               ))}
               <hr />
               <Modal
-                title={t('modals.set-bounty-draft.title')}
+                title={t("modals.set-bounty-draft.title")}
                 show={!!pendingIssue}
                 centerTitle={true}
-                okLabel={t('actions.update')}
-                cancelLabel={t('actions.cancel')}
+                okLabel={t("actions.update")}
+                cancelLabel={t("actions.cancel")}
                 titlePosition="center"
                 className="max-height-body modal-md"
                 onOkClick={() => createPendingIssue()}
@@ -88,37 +88,37 @@ export default function MyIssues() {
                 </div>
                 <div className="bg-dark-gray w-100 text-center mt-4 rounded-5 py-3">
                   <div className="caption-small fs-smallest text-uppercase text-white">
-                    {t('misc.reward')}
+                    {t("misc.reward")}
                   </div>
                   <h4 className="mb-0 text-uppercase">
                     <span className="text-white">
                       {formatNumberToCurrency(pendingIssue?.amount)}
-                    </span>{' '}
-                    <span className="text-primary">{t('$bepro')}</span>
+                    </span>{" "}
+                    <span className="text-primary">{t("$bepro")}</span>
                   </h4>
                 </div>
               </Modal>
             </div>
           )) ||
-            ``}
+            ""}
 
-          <ListIssues creator={user?.login || 'not-connected'} />
+          <ListIssues creator={user?.login || "not-connected"} />
         </div>
       </div>
     </Account>
-  )
+  );
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       ...(await serverSideTranslations(locale, [
-        'common',
-        'bounty',
-        'pull-request',
-        'connect-wallet-button',
-        'custom-network'
+        "common",
+        "bounty",
+        "pull-request",
+        "connect-wallet-button",
+        "custom-network"
       ]))
     }
-  }
-}
+  };
+};

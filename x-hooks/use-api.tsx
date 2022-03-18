@@ -1,20 +1,22 @@
-import { ReposList } from "@interfaces/repos-list";
-import { BranchInfo, BranchsList } from "interfaces/branchs-list";
-import { head } from "lodash";
-import { PaginatedData } from "interfaces/paginated-data";
-import { User } from "interfaces/api-response";
-import { IssueData, pullRequest } from "interfaces/issue-data";
-
-import client from "services/api";
-import { INetwork } from "interfaces/network";
+import { Proposal } from "interfaces/proposal";
+import { ReposList } from "interfaces/repos-list";
 import axios from "axios";
 import {
   BEPRO_NETWORK_NAME,
   CURRENCY_BEPRO_API,
   PRODUCTION_CONTRACT,
-  USE_PRODUCTION_CONTRACT_CONVERSION,
+  USE_PRODUCTION_CONTRACT_CONVERSION
 } from "env";
-import { Proposal } from "@interfaces/proposal";
+import { head } from "lodash";
+
+import { User } from "interfaces/api-response";
+import { BranchInfo, BranchsList } from "interfaces/branchs-list";
+import { IssueData, pullRequest } from "interfaces/issue-data";
+import { INetwork } from "interfaces/network";
+import { PaginatedData } from "interfaces/paginated-data";
+
+import client from "services/api";
+
 interface Paginated<T = any> {
   count: number;
   rows: T[];
@@ -36,12 +38,12 @@ export default function useApi() {
   async function getIssues(
     page = "1",
     repoId = "",
-    time = ``,
-    state = ``,
+    time = "",
+    state = "",
     sortBy = "updatedAt",
     order = "DESC",
-    address = ``,
-    creator = ``,
+    address = "",
+    creator = "",
     networkName = BEPRO_NETWORK_NAME
   ) {
     const search = new URLSearchParams({
@@ -53,7 +55,7 @@ export default function useApi() {
       sortBy,
       order,
       creator,
-      networkName,
+      networkName
     }).toString();
     return client
       .get<{ rows: IssueData[]; count: number }>(`/issues/?${search}`)
@@ -64,15 +66,15 @@ export default function useApi() {
   async function searchIssues({
     page = "1",
     repoId = "",
-    time = ``,
-    state = ``,
+    time = "",
+    state = "",
     sortBy = "updatedAt",
     order = "DESC",
-    address = ``,
-    creator = ``,
+    address = "",
+    creator = "",
     search = "",
     pullRequester = "",
-    networkName = BEPRO_NETWORK_NAME,
+    networkName = BEPRO_NETWORK_NAME
   }) {
     const params = new URLSearchParams({
       address,
@@ -85,7 +87,7 @@ export default function useApi() {
       creator,
       search,
       pullRequester,
-      networkName,
+      networkName
     }).toString();
     return client
       .get<{
@@ -101,16 +103,16 @@ export default function useApi() {
   async function searchRepositories({
     page = "1",
     owner = "",
-    name = ``,
-    path = ``,
-    networkName = BEPRO_NETWORK_NAME,
+    name = "",
+    path = "",
+    networkName = BEPRO_NETWORK_NAME
   }) {
     const params = new URLSearchParams({
       page,
       owner,
       name,
       path,
-      networkName,
+      networkName
     }).toString();
     return client
       .get<{ rows; count: number; pages: number; currentPage: number }>(
@@ -136,14 +138,14 @@ export default function useApi() {
     networkName = BEPRO_NETWORK_NAME
   ) {
     return client
-      .post<number>(`/issue`, { ...payload, networkName })
+      .post<number>("/issue", { ...payload, networkName })
       .then(({ data }) => data)
       .catch(() => null);
   }
 
   async function moveIssueToOpen(scIssueId?: string) {
     return client
-      .post(`/past-events/move-to-open`, { scIssueId })
+      .post("/past-events/move-to-open", { scIssueId })
       .then(({ data }) => data)
       .catch(() => null);
   }
@@ -155,8 +157,8 @@ export default function useApi() {
     networkName = BEPRO_NETWORK_NAME
   ) {
     return client
-      .patch(`/issue`, { repoId, githubId, scId, networkName })
-      .then(({ data }) => data === `ok`)
+      .patch("/issue", { repoId, githubId, scId, networkName })
+      .then(({ data }) => data === "ok")
       .catch((_) => false);
   }
 
@@ -175,8 +177,8 @@ export default function useApi() {
     const search = new URLSearchParams({
       address,
       page,
-      state: `pending`,
-      networkName,
+      state: "pending",
+      networkName
     }).toString();
     return client
       .get<IssueData[]>(`/issues/?${search}`)
@@ -196,7 +198,7 @@ export default function useApi() {
     networkName = BEPRO_NETWORK_NAME
   ) {
     return client
-      .post(`/pull-request/`, { ...payload, repoId, githubId, networkName })
+      .post("/pull-request/", { ...payload, repoId, githubId, networkName })
       .then(() => true)
       .catch((error) => {
         throw error;
@@ -209,7 +211,7 @@ export default function useApi() {
       .get<PaginatedData<pullRequest>>(`/pull-request?${search}`)
       .then(({ data: { rows } }) => head(rows))
       .catch((e) => {
-        console.log(`Failed to fetch PR information`, e);
+        console.log("Failed to fetch PR information", e);
         return null;
       });
   }
@@ -224,34 +226,34 @@ export default function useApi() {
       .catch((error) => {
         if (error.response) return error.response.data;
 
-        return `Unknown error. Check logs.`;
+        return "Unknown error. Check logs.";
       });
   }
 
   async function getUserWith(login: string): Promise<User> {
     return client
-      .post<User[]>(`/search/users/login/`, [login])
+      .post<User[]>("/search/users/login/", [login])
       .then(({ data }) => data[0] || ({} as User))
       .catch(() => ({} as User));
   }
 
   async function getTotalUsers(): Promise<number> {
-    return client.get<number>(`/search/users/total`).then(({ data }) => data);
+    return client.get<number>("/search/users/total").then(({ data }) => data);
   }
 
   async function getAllUsers(payload: { page: number } = { page: 1 }) {
     return client
-      .post<User[]>(`/search/users/all`, payload)
+      .post<User[]>("/search/users/all", payload)
       .then(({ data }) => data)
       .catch(() => []);
   }
 
   async function createRepo(owner, repo, networkName = BEPRO_NETWORK_NAME) {
     return client
-      .post(`/repos/`, { owner, repo, networkName })
+      .post("/repos/", { owner, repo, networkName })
       .then(({ status }) => status === 200)
       .catch((e) => {
-        console.error(`Failed to create repo`, e);
+        console.error("Failed to create repo", e);
         return false;
       });
   }
@@ -298,7 +300,7 @@ export default function useApi() {
     networkName = BEPRO_NETWORK_NAME
   ) {
     return client.post(
-      `/poll/`,
+      "/poll/",
       { eventName, ...rest, networkName },
       { timeout: 2 * 60 * 1000 }
     );
@@ -323,7 +325,7 @@ export default function useApi() {
     currentGithubId,
     networkName = BEPRO_NETWORK_NAME
   ) {
-    return poll(`closeIssue`, { currentGithubId }, networkName)
+    return poll("closeIssue", { currentGithubId }, networkName)
       .then(({ data }) => data)
       .catch(() => null);
   }
@@ -332,7 +334,7 @@ export default function useApi() {
     currentGithubId,
     networkName = BEPRO_NETWORK_NAME
   ) {
-    return poll(`redeemIssue`, { currentGithubId }, networkName)
+    return poll("redeemIssue", { currentGithubId }, networkName)
       .then(({ data }) => data)
       .catch(() => null);
   }
@@ -348,27 +350,27 @@ export default function useApi() {
       fromBlock,
       id,
       pullRequestId,
-      networkName,
+      networkName
     });
   }
 
   async function processMergeProposal(fromBlock, id) {
-    return client.post(`/past-events/merge-proposal/`, { fromBlock, id });
+    return client.post("/past-events/merge-proposal/", { fromBlock, id });
   }
 
   async function getHealth() {
     return client
-      .get(`/health`)
+      .get("/health")
       .then(({ status }) => status === 204)
       .catch((e) => false);
   }
 
   async function getClientNation() {
     return client
-      .get(`/ip`)
-      .then(({ data }) => data || { countryCode: `US`, country: `` })
+      .get("/ip")
+      .then(({ data }) => data || { countryCode: "US", country: "" })
       .catch((e) => {
-        return { countryCode: `US`, country: `` };
+        return { countryCode: "US", country: "" };
       });
   }
 
@@ -381,13 +383,13 @@ export default function useApi() {
       issueId,
       login,
       page: "1",
-      networkName,
+      networkName
     }).toString();
     return client
       .get<PaginatedData<pullRequest>>(`/pull-request?${search}`)
       .then(({ data: { count } }) => count > 0)
       .catch((e) => {
-        console.log(`Failed to fetch PR information`, e);
+        console.log("Failed to fetch PR information", e);
         return false;
       });
   }
@@ -403,7 +405,7 @@ export default function useApi() {
       .get<PaginatedData<pullRequest>>(`/pull-request?${search}`)
       .then(({ data }) => data)
       .catch((e) => {
-        console.log(`Failed to fetch PR information`, e);
+        console.log("Failed to fetch PR information", e);
         return false;
       });
   }
@@ -434,7 +436,7 @@ export default function useApi() {
         pullRequestId,
         mergeProposalId,
         address,
-        networkName,
+        networkName
       })
       .then((response) => response)
       .catch((error) => {
@@ -455,7 +457,7 @@ export default function useApi() {
         pullRequestId,
         githubLogin,
         body,
-        networkName,
+        networkName
       })
       .then((response) => response);
   }
@@ -483,7 +485,7 @@ export default function useApi() {
         form.append(`file${index + 1}`, file);
       });
     } else {
-      form.append(`file`, files);
+      form.append("file", files);
     }
 
     return client.post("/files", form).then(({ data }) => data);
@@ -507,7 +509,7 @@ export default function useApi() {
 
   async function getUserOf(address: string): Promise<User> {
     return client
-      .post<User[]>(`/search/users/address/`, [address])
+      .post<User[]>("/search/users/address/", [address])
       .then(({ data }) => data[0])
       .catch(() => ({} as User));
   }
@@ -515,7 +517,7 @@ export default function useApi() {
   async function isNetworkOwner(creatorAddress, networkAddress) {
     const params = new URLSearchParams({
       creatorAddress,
-      networkAddress,
+      networkAddress
     }).toString();
 
     return client
@@ -542,12 +544,12 @@ export default function useApi() {
 
   async function searchNetworks({
     page = "1",
-    name = ``,
-    creatorAddress = ``,
-    networkAddress = ``,
+    name = "",
+    creatorAddress = "",
+    networkAddress = "",
     sortBy = "updatedAt",
     order = "DESC",
-    search = "",
+    search = ""
   }) {
     const params = new URLSearchParams({
       page,
@@ -556,7 +558,7 @@ export default function useApi() {
       networkAddress,
       sortBy,
       order,
-      search,
+      search
     }).toString();
 
     return client
@@ -636,6 +638,6 @@ export default function useApi() {
     userHasPR,
     waitForClose,
     waitForMerge,
-    waitForRedeem,
+    waitForRedeem
   };
 }

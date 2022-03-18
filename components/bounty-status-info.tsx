@@ -1,12 +1,13 @@
-import { IssueState } from "@interfaces/issue-data";
 import React from "react";
+
+import { IssueState } from "interfaces/issue-data";
+
 import Translation from "./translation";
 
-interface IBountyStatusInfo{
-  issueState: IssueState
+interface IBountyStatusInfo {
+  issueState: IssueState;
 }
-export default function BountyStatusInfo({issueState}: IBountyStatusInfo) {
-
+export default function BountyStatusInfo({ issueState }: IBountyStatusInfo) {
   function handleColorState() {
     switch (issueState?.toLowerCase()) {
       case "draft": {

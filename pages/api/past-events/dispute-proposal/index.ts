@@ -1,9 +1,10 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import networkBeproJs from "@helpers/api/handle-network-bepro";
-import models from "@db/models";
-import twitterTweet from "@helpers/api/handle-twitter-tweet";
-import { Op } from 'sequelize'
+import models from "db/models";
 import { CONTRACT_ADDRESS } from "env";
+import { NextApiRequest, NextApiResponse } from "next";
+import { Op } from "sequelize";
+
+import networkBeproJs from "helpers/api/handle-network-bepro";
+import twitterTweet from "helpers/api/handle-twitter-tweet";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { fromBlock, id, networkName } = req.body;
@@ -14,20 +15,22 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         [Op.iLike]: String(networkName)
       }
     }
-  })
+  });
 
-  if (!customNetwork) return res.status(404).json('Invalid network')
-  if (customNetwork.isClosed) return res.status(404).json('Invalid network')
+  if (!customNetwork) return res.status(404).json("Invalid network");
+  if (customNetwork.isClosed) return res.status(404).json("Invalid network");
 
-  const network = networkBeproJs({contractAddress: customNetwork.networkAddress });
+  const network = networkBeproJs({
+    contractAddress: customNetwork.networkAddress
+  });
 
   await network.start();
 
   await network.contract.self
-    .getPastEvents(`DisputeMerge`, {
+    .getPastEvents("DisputeMerge", {
       fromBlock,
       toBlock: +fromBlock + 1,
-      filter: { id },
+      filter: { id }
     })
     .then(async function tweet(events) {
       for (const event of events) {
@@ -46,12 +49,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
           twitterTweet({
             type: "proposal",
             action: "failed",
-            issue,
+            issue
           });
       }
     })
     .catch((error) => {
-      console.log(`Error reading DisputeMerge`, error);
+      console.log("Error reading DisputeMerge", error);
       res.status(400);
     });
 }

@@ -1,4 +1,4 @@
-import React, { SVGProps, memo } from 'react'
+import React, { SVGProps, memo } from "react";
 
 function ScrollTopIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -17,7 +17,7 @@ function ScrollTopIcon(props: SVGProps<SVGSVGElement>) {
         fill="white"
       />
     </svg>
-  )
+  );
 }
 
-export default memo(ScrollTopIcon)
+export default memo(ScrollTopIcon);

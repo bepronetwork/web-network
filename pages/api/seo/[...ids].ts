@@ -1,60 +1,62 @@
-import models from '@db/models';
-import {Op} from 'sequelize';
-import {NextApiRequest, NextApiResponse} from 'next';
-import {generateCard} from '@helpers/seo/create-card-bounty'
-import IpfsStorage from '@services/ipfs-service';
-import axios from 'axios';
+import axios from "axios";
+import models from "db/models";
+import { NextApiRequest, NextApiResponse } from "next";
+import { Op } from "sequelize";
+
+import { generateCard } from "helpers/seo/create-card-bounty";
+
+import IpfsStorage from "services/ipfs-service";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const {ids: [repoId, ghId]} = req.query;
-  const issueId = [repoId, ghId].join(`/`);
+  const {
+    ids: [repoId, ghId]
+  } = req.query;
+  const issueId = [repoId, ghId].join("/");
 
   const issue = await models.issue.findOne({
     where: {
       issueId,
-      seoImage: {[Op.not]: null}
+      seoImage: { [Op.not]: null }
     }
-  })
+  });
 
-  if (!issue)
-    return res.status(404).json(null);
+  if (!issue) return res.status(404).json(null);
 
-  const url = `${process.env.NEXT_PUBLIC_IPFS_BASE}/${issue.seoImage}`
+  const url = `${process.env.NEXT_PUBLIC_IPFS_BASE}/${issue.seoImage}`;
 
-  const {data} = await axios.get(url,{
-    responseType: 'arraybuffer'
-  })
+  const { data } = await axios.get(url, {
+    responseType: "arraybuffer"
+  });
 
   res.writeHead(200, {
-    'Content-Type': 'image/png',
-    'Content-Length': data?.length
+    "Content-Type": "image/png",
+    "Content-Length": data?.length
   });
 
   return res.status(200).end(data);
 }
 
-
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {
-    ids: [repoId, ghId],
+    ids: [repoId, ghId]
   } = req.query;
-  const issueId = [repoId, ghId].join(`/`);
+  const issueId = [repoId, ghId].join("/");
 
   const include = [
     { association: "developers" },
     { association: "pullRequests" },
     { association: "mergeProposals" },
-    { association: "repository" },
+    { association: "repository" }
   ];
 
   const issue = await models.issue.findOne({
     where: { issueId },
-    include,
+    include
   });
 
   if (!issue) return res.status(404).json(null);
 
-  const [, repo] = issue.repository.githubPath.split(`/`);
+  const [, repo] = issue.repository.githubPath.split("/");
 
   const card = await generateCard({
     state: issue.state,
@@ -64,17 +66,17 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     ammount: issue.amount,
     working: issue.working?.length || 0,
     pr: issue.pullRequests?.length || 0,
-    proposal: issue?.mergeProposals?.length || 0,
+    proposal: issue?.mergeProposals?.length || 0
   }).catch((e) => {
-    console.log(`Error generating card`, e);
+    console.log("Error generating card", e);
     return null;
   });
 
   if (!card) return;
 
-  var img = Buffer.from(card.buffer);
+  const img = Buffer.from(card.buffer);
   const { hash } = await IpfsStorage.add(img).catch((e) => {
-    console.log(`Failed to upload to IPFS`, e);
+    console.log("Failed to upload to IPFS", e);
     return { hash: null };
   });
 
@@ -84,18 +86,19 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export default async function Seo(req: NextApiRequest, res: NextApiResponse) {
-
   switch (req.method.toLowerCase()) {
-    case 'get':
+    case "get":
       await get(req, res);
       break;
 
-    case 'post':
-      await post(req, res).catch(e => { console.log(`Error POST GetIssues`, e); });
+    case "post":
+      await post(req, res).catch((e) => {
+        console.log("Error POST GetIssues", e);
+      });
       break;
 
     default:
-      res.status(405).json(`Method not allowed`);
+      res.status(405).json("Method not allowed");
   }
 
   res.end();

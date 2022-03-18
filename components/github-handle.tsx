@@ -1,10 +1,10 @@
-import Button from '@components/button'
-import Avatar from '@components/avatar'
+import Avatar from "components/avatar";
+import Button from "components/button";
 
-import { useAuthentication } from '@contexts/authentication'
+import { useAuthentication } from "contexts/authentication";
 
 export default function GithubHandle() {
-  const { user } = useAuthentication()
+  const { user } = useAuthentication();
 
   if (user?.login)
     return (
@@ -12,7 +12,7 @@ export default function GithubHandle() {
         <span>{user?.name} </span>
         <Avatar src={user?.image} userLogin={user?.login} className="ms-2" />
       </Button>
-    )
+    );
 
-  return <></>
+  return <></>;
 }

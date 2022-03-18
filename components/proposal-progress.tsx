@@ -1,7 +1,10 @@
-import { formatNumberToString } from "helpers/formatNumber";
 import React from "react";
+
+import { IDistribuitonPerUser } from "interfaces/proposal";
+
+import { formatNumberToString } from "helpers/formatNumber";
+
 import Avatar from "./avatar";
-import { IDistribuitonPerUser } from "@interfaces/proposal";
 
 interface IProposalProgressProps {
   usersDistribution: IDistribuitonPerUser[];
@@ -10,7 +13,6 @@ interface IProposalProgressProps {
 export default function ProposalProgress({
   usersDistribution
 }: IProposalProgressProps) {
-  
   return (
     <div className="container bg-shadow p-2">
       <div className="d-flex justify-content-center align-items-center gap-2">
@@ -19,7 +21,9 @@ export default function ProposalProgress({
             usersDistribution.map((item, index) => (
               <div
                 key={index}
-                className={`rounded-bottom d-flex flex-column align-items-center gap-2`}
+                className={
+                  "rounded-bottom d-flex flex-column align-items-center gap-2"
+                }
                 style={{ width: `${item.percentage}%` }}
               >
                 <Avatar key={index} userLogin={item.githubLogin} tooltip />

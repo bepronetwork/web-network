@@ -1,28 +1,27 @@
-import { useRouter } from 'next/router'
-import { useTranslation } from 'next-i18next'
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect } from "react";
 
-import NetworkLogo from '@components/network-logo'
-import PullRequestLabels from '@components/pull-request-labels'
+import { handleNetworkAddress } from "helpers/custom-network";
+import { formatNumberToNScale } from "helpers/formatNumber";
+import { BEPRO_NETWORK_NAME, IPFS_BASE } from "env";
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
-import { ApplicationContext } from '@contexts/application'
-import { changeNetworksSummary } from '@contexts/reducers/change-networks-summary'
+import NetworkLogo from "components/network-logo";
+import PullRequestLabels from "components/pull-request-labels";
 
-import { formatNumberToNScale } from '@helpers/formatNumber'
+import { ApplicationContext } from "contexts/application";
+import { changeNetworksSummary } from "contexts/reducers/change-networks-summary";
 
-import { INetwork } from '@interfaces/network'
+import { INetwork } from "interfaces/network";
 
-import { BeproService } from '@services/bepro-service'
+import { BeproService } from "services/bepro-service";
 
-import useApi from '@x-hooks/use-api'
-import useNetwork from '@x-hooks/use-network'
-
-import { BEPRO_NETWORK_NAME, IPFS_BASE } from 'env'
-import { handleNetworkAddress } from '@helpers/custom-network'
+import useApi from "x-hooks/use-api";
+import useNetwork from "x-hooks/use-network";
 interface NetworkListItemProps {
-  network: INetwork
-  redirectToHome?: boolean
-  updateNetworkParameter?: (networkName, parameter, value) => void
+  network: INetwork;
+  redirectToHome?: boolean;
+  updateNetworkParameter?: (networkName, parameter, value) => void;
 }
 
 export default function NetworkListItem({
@@ -31,56 +30,56 @@ export default function NetworkListItem({
   updateNetworkParameter = (networkName, parameter, value) => {},
   ...props
 }: NetworkListItemProps) {
-  const router = useRouter()
-  const { t } = useTranslation('common')
+  const router = useRouter();
+  const { t } = useTranslation("common");
 
-  const { getBeproCurrency } = useApi()
-  const { getURLWithNetwork } = useNetwork()
+  const { getBeproCurrency } = useApi();
+  const { getURLWithNetwork } = useNetwork();
 
-  const { dispatch } = useContext(ApplicationContext)
+  const { dispatch } = useContext(ApplicationContext);
 
   function handleRedirect() {
-    const url = redirectToHome ? '/' : '/account/my-network/settings'
+    const url = redirectToHome ? "/" : "/account/my-network/settings";
 
     router.push(
       getURLWithNetwork(url, {
         network: network.name
       })
-    )
+    );
   }
 
   useEffect(() => {
     BeproService.getTransactionalTokenName(handleNetworkAddress(network))
-      .then(name => {
-        updateNetworkParameter(network.name, 'tokenName', name)
+      .then((name) => {
+        updateNetworkParameter(network.name, "tokenName", name);
       })
-      .catch(console.log)
+      .catch(console.log);
 
     BeproService.getBeproLocked(handleNetworkAddress(network))
-      .then(amount => {
-        updateNetworkParameter(network.name, 'tokensLocked', amount)
+      .then((amount) => {
+        updateNetworkParameter(network.name, "tokensLocked", amount);
       })
-      .catch(console.log)
+      .catch(console.log);
 
     BeproService.getOpenIssues(handleNetworkAddress(network))
       .then((quantity) => {
-        updateNetworkParameter(network.name, 'openBountiesQuantity', quantity)
+        updateNetworkParameter(network.name, "openBountiesQuantity", quantity);
 
         dispatch(
           changeNetworksSummary({
-            label: 'bounties',
+            label: "bounties",
             amount: quantity,
-            action: 'add'
+            action: "add"
           })
-        )
+        );
       })
-      .catch(console.log)
+      .catch(console.log);
 
     BeproService.getTokensStaked(handleNetworkAddress(network))
       .then((amount) => {
-        updateNetworkParameter(network.name, 'openBountiesAmount', amount)
+        updateNetworkParameter(network.name, "openBountiesAmount", amount);
 
-        return amount
+        return amount;
       })
       .then((amount) => {
         BeproService.getNetworkObj(handleNetworkAddress(network)).then(
@@ -89,18 +88,18 @@ export default function NetworkListItem({
               ({ usd }) => {
                 dispatch(
                   changeNetworksSummary({
-                    label: 'amountInNetwork',
+                    label: "amountInNetwork",
                     amount: amount * usd,
-                    action: 'add'
+                    action: "add"
                   })
-                )
+                );
               }
-            )
+            );
           }
-        )
+        );
       })
-      .catch(console.log)
-  }, [])
+      .catch(console.log);
+  }, []);
 
   return (
     <div className="list-item p-20 d-flex flex-row" onClick={handleRedirect}>
@@ -114,21 +113,23 @@ export default function NetworkListItem({
 
           <span className="caption-medium text-white">{network?.name}</span>
 
-          {network?.isClosed && <PullRequestLabels label="closed" /> || ''}
+          {(network?.isClosed && <PullRequestLabels label="closed" />) || ""}
         </div>
       </div>
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center">
         <span className="caption-medium text-white">
-        {network.openBountiesQuantity !== undefined
+          {network.openBountiesQuantity !== undefined
             ? formatNumberToNScale(network.openBountiesQuantity)
-            : '-'}
+            : "-"}
         </span>
       </div>
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center">
         <span className="caption-medium text-white">
-          {network.tokensLocked !== undefined ? formatNumberToNScale(network.tokensLocked) : '-'}
+          {network.tokensLocked !== undefined
+            ? formatNumberToNScale(network.tokensLocked)
+            : "-"}
         </span>
       </div>
 
@@ -136,18 +137,18 @@ export default function NetworkListItem({
         <span className="caption-medium text-white">
           {network.openBountiesAmount !== undefined
             ? formatNumberToNScale(network.openBountiesAmount)
-            : '-'}
+            : "-"}
         </span>
 
         <span
           className={`caption-medium mr-2 ${
-            network?.name === BEPRO_NETWORK_NAME ? 'text-blue' : ''
+            network?.name === BEPRO_NETWORK_NAME ? "text-blue" : ""
           }`}
           style={{ color: `${network?.colors?.primary}` }}
         >
-          ${network.tokenName || t('misc.token')}
+          ${network.tokenName || t("misc.token")}
         </span>
       </div>
     </div>
-  )
+  );
 }

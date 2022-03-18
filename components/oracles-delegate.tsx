@@ -1,62 +1,64 @@
-import { useTranslation } from 'next-i18next'
-import { NumberFormatValues } from 'react-number-format'
-import { ChangeEvent, useContext, useEffect, useState } from 'react'
+import { ChangeEvent, useContext, useEffect, useState } from "react";
+import { NumberFormatValues } from "react-number-format";
 
-import InputNumber from '@components/input-number'
-import NetworkTxButton from '@components/network-tx-button'
-import OraclesBoxHeader from '@components/oracles-box-header'
-import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper'
+import { formatNumberToCurrency } from "helpers/formatNumber";
+import { useTranslation } from "next-i18next";
 
-import { ApplicationContext } from '@contexts/application'
-import { useAuthentication } from '@contexts/authentication'
+import InputNumber from "components/input-number";
+import NetworkTxButton from "components/network-tx-button";
+import OraclesBoxHeader from "components/oracles-box-header";
+import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
-import { formatNumberToCurrency } from '@helpers/formatNumber'
+import { ApplicationContext } from "contexts/application";
+import { useAuthentication } from "contexts/authentication";
 
-import { TransactionTypes } from '@interfaces/enums/transaction-types'
-import { TransactionStatus } from '@interfaces/enums/transaction-status'
+import { TransactionStatus } from "interfaces/enums/transaction-status";
+import { TransactionTypes } from "interfaces/enums/transaction-types";
 
 function OraclesDelegate(): JSX.Element {
-  const { t } = useTranslation(['common', 'my-oracles'])
-  
-  const [error, setError] = useState<string>('')
-  const [availableAmount, setAvailableAmount] = useState(0)
-  const [delegatedTo, setDelegatedTo] = useState<string>('')
-  const [tokenAmount, setTokenAmount] = useState<number | undefined>()
-  
-  const { wallet, beproServiceStarted } = useAuthentication()
-  const { state: { myTransactions } } = useContext(ApplicationContext)
+  const { t } = useTranslation(["common", "my-oracles"]);
+
+  const [error, setError] = useState<string>("");
+  const [availableAmount, setAvailableAmount] = useState(0);
+  const [delegatedTo, setDelegatedTo] = useState<string>("");
+  const [tokenAmount, setTokenAmount] = useState<number | undefined>();
+
+  const { wallet, beproServiceStarted } = useAuthentication();
+  const {
+    state: { myTransactions }
+  } = useContext(ApplicationContext);
 
   function handleChangeOracles(params: NumberFormatValues) {
-    if (params.value === '') return setTokenAmount(undefined)
+    if (params.value === "") return setTokenAmount(undefined);
 
-    if (params.floatValue < 1 || !params.floatValue) return setTokenAmount(0)
+    if (params.floatValue < 1 || !params.floatValue) return setTokenAmount(0);
 
     if (params.floatValue > availableAmount)
-      setError(t('my-oracles:errors.amount-greater', { amount: 'total' }))
-    else setError(``)
+      setError(t("my-oracles:errors.amount-greater", { amount: "total" }));
+    else setError("");
 
-    setTokenAmount(params.floatValue)
+    setTokenAmount(params.floatValue);
   }
 
   function setMaxAmmount() {
-    return setTokenAmount(availableAmount)
+    return setTokenAmount(availableAmount);
   }
 
   function handleChangeAddress(params: ChangeEvent<HTMLInputElement>) {
-    if (error) setError(``)
-    setDelegatedTo(params.target.value)
+    if (error) setError("");
+    setDelegatedTo(params.target.value);
   }
 
   function handleClickVerification() {
     if (!tokenAmount || !delegatedTo) {
-      return setError(t('my-oracles:errors.fill-required-fields'))
+      return setError(t("my-oracles:errors.fill-required-fields"));
     }
   }
 
   function handleTransition() {
-    handleChangeOracles({ floatValue: 0, formattedValue: '0', value: '0' })
-    setDelegatedTo('')
-    setError('')
+    handleChangeOracles({ floatValue: 0, formattedValue: "0", value: "0" });
+    setDelegatedTo("");
+    setError("");
   }
 
   const isButtonDisabled = (): boolean =>
@@ -70,49 +72,52 @@ function OraclesDelegate(): JSX.Element {
           status === TransactionStatus.pending &&
           type === TransactionTypes.delegateOracles
       )
-    ].some((values) => values)
+    ].some((values) => values);
 
   const isAddressesEqual = () =>
     wallet?.address &&
-    delegatedTo?.toLowerCase() === wallet?.address?.toLowerCase()
+    delegatedTo?.toLowerCase() === wallet?.address?.toLowerCase();
 
   useEffect(() => {
-    if (!beproServiceStarted || !wallet?.balance) return
-    
-    setAvailableAmount(+wallet?.balance?.oracles?.tokensLocked - wallet?.balance?.oracles?.delegatedToOthers)
-  }, [ beproServiceStarted, wallet?.balance ])
+    if (!beproServiceStarted || !wallet?.balance) return;
+
+    setAvailableAmount(
+      +wallet?.balance?.oracles?.tokensLocked -
+        wallet?.balance?.oracles?.delegatedToOthers
+    );
+  }, [beproServiceStarted, wallet?.balance]);
 
   return (
     <div className="col-md-5">
       <div className="content-wrapper h-100">
         <OraclesBoxHeader
-          actions={t('my-oracles:actions.delegate.title')}
+          actions={t("my-oracles:actions.delegate.title")}
           available={availableAmount}
         />
         <p className="caption-small text-white text-uppercase mt-2 mb-3">
-          {t('my-oracles:actions.delegate.description')}
+          {t("my-oracles:actions.delegate.description")}
         </p>
         <InputNumber
-          label={t('my-oracles:fields.oracles.label')}
+          label={t("my-oracles:fields.oracles.label")}
           value={tokenAmount}
-          symbol={t('$oracles')}
+          symbol={t("$oracles")}
           classSymbol="text-purple"
           onValueChange={handleChangeOracles}
           min={0}
-          placeholder={t('my-oracles:fields.oracles.placeholder')}
+          placeholder={t("my-oracles:fields.oracles.placeholder")}
           thousandSeparator
           error={!!error}
           helperText={
             <>
               {formatNumberToCurrency(availableAmount, {
                 maximumFractionDigits: 18
-              })}{' '}
-              {`${t('$oracles')} ${t('my-oracles:available')}`}
+              })}{" "}
+              {`${t("$oracles")} ${t("my-oracles:available")}`}
               <span
                 className="caption-small ml-1 cursor-pointer text-uppercase text-purple"
                 onClick={setMaxAmmount}
               >
-                {t('misc.max')}
+                {t("misc.max")}
               </span>
               {error && <p className="p-small my-2">{error}</p>}
             </>
@@ -121,23 +126,23 @@ function OraclesDelegate(): JSX.Element {
 
         <div className="form-group mt-2">
           <label className="caption-small text-uppercase text-white bg-opacity-100 mb-2">
-            {t('my-oracles:fields.address.label')}
+            {t("my-oracles:fields.address.label")}
           </label>
           <input
             value={delegatedTo}
             onChange={handleChangeAddress}
             type="text"
             className={`form-control ${
-              (isAddressesEqual() && 'is-invalid') || ''
+              (isAddressesEqual() && "is-invalid") || ""
             }`}
-            placeholder={t('my-oracles:fields.address.placeholder')}
+            placeholder={t("my-oracles:fields.address.placeholder")}
           />
           {(isAddressesEqual() && (
             <small className="text-danger text-italic">
-              {t('my-oracles:errors.self-delegate')}
+              {t("my-oracles:errors.self-delegate")}
             </small>
           )) ||
-            ''}
+            ""}
         </div>
 
         {error && <p className="p-small text-danger mt-2">{error}</p>}
@@ -147,22 +152,22 @@ function OraclesDelegate(): JSX.Element {
             className="read-only-button"
             txParams={{ tokenAmount, from: delegatedTo }}
             txType={TransactionTypes.delegateOracles}
-            txCurrency={t('$oracles')}
-            modalTitle={t('my-oracles:actions.delegate.title')}
+            txCurrency={t("$oracles")}
+            modalTitle={t("my-oracles:actions.delegate.title")}
             modalDescription={t(
-              'my-oracles:actions.delegate.delegate-to-address'
+              "my-oracles:actions.delegate.delegate-to-address"
             )}
             onTxStart={handleClickVerification}
             onSuccess={handleTransition}
             onFail={setError}
-            buttonLabel={t('my-oracles:actions.delegate.label')}
+            buttonLabel={t("my-oracles:actions.delegate.label")}
             fullWidth={true}
             disabled={isButtonDisabled()}
           />
         </ReadOnlyButtonWrapper>
       </div>
     </div>
-  )
+  );
 }
 
-export default OraclesDelegate
+export default OraclesDelegate;
