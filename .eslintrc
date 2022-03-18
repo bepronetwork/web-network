@@ -4,30 +4,49 @@
     "es2021": true,
     "node": true
   },
-  "extends": [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier"
-  ],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   "parser": "@typescript-eslint/parser",
   "plugins": [
     "react",
     "react-hooks",
     "@typescript-eslint",
     "eslint-plugin-import-helpers",
-    "prettier",
     "import"
   ],
   "rules": {
-    "linebreak-style": ["error", "unix"],
-    "quotes": ["error", "double"],
-    "react/react-in-jsx-scope": "off",
-    "@typescript-eslint/no-explicit-any": ["warn"],
-    "@typescript-eslint/no-var-requires": "off",
-    "react/prop-types": "off",
-    "prettier/prettier": "error",
-    "import/prefer-default-export": "off",
+    "indent-legacy": [
+      "error",
+      2,
+      {
+        "FunctionDeclaration": {
+          "parameters": "first"
+        },
+        "ObjectExpression": "first",
+        "ArrayExpression": "first",
+        "CallExpression": {
+          "arguments": "first"
+        }
+      }
+    ],
+    "no-prototype-builtins": 0,
+    "no-return-await": 2,
+    "camelcase": 0,
+    "no-underscore-dangle": 0,
+    "class-methods-use-this": 1,
+    "no-unused-vars": 1,
+    "complexity": ["error", 4],
+    "max-len": [
+      "error",
+      {
+        "code": 120,
+        "ignoreComments": true
+      }
+    ],
+    "no-console": ["error", { "allow": ["error", "log"] }],
+    "no-undef": 1,
+    "eqeqeq": 1,
+    "function-paren-newline": ["error", "never"],
+    "function-call-argument-newline": ["error", "consistent"],
     "import-helpers/order-imports": [
       "warn",
       {
