@@ -1,4 +1,4 @@
-import text2png from 'text2png'
+// import text2png from 'text2png'
 import Jimp from 'jimp'
 
 interface OptiosProps{
@@ -74,14 +74,16 @@ export async function write(
     localFontPath = fontSemiBold;
   }
   
-  const buffer = text2png(text, {
-    font: `${fontSize}px SpaceGrotesk-${fontFamily}`,
-    textColor,
-    localFontPath,
-    localFontName: `SpaceGrotesk-${fontFamily}`,
-    padding: 2,
-    ...options,
-  });
+  const buffer = ''
+  // TODO: Find other choice to text2png
+  // const buffer = text2png(text, {
+  //   font: `${fontSize}px SpaceGrotesk-${fontFamily}`,
+  //   textColor,
+  //   localFontPath,
+  //   localFontName: `SpaceGrotesk-${fontFamily}`,
+  //   padding: 2,
+  //   ...options,
+  // });
 
   return await Jimp.read(Buffer.from(buffer, "base64"));
 }
