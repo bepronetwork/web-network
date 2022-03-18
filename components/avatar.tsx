@@ -1,5 +1,5 @@
-import React from 'react'
-import { OverlayTrigger, Tooltip } from 'react-bootstrap'
+import React from "react";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 export default function Avatar({
   userLogin,
@@ -8,8 +8,8 @@ export default function Avatar({
   tooltip = false,
   border = false
 }: {
-  userLogin: string
-  className?: string
+  userLogin: string;
+  className?: string;
   src?: string;
   tooltip?: boolean;
   border?: boolean;
@@ -18,12 +18,16 @@ export default function Avatar({
     <OverlayTrigger
       key="right"
       placement="right"
-      overlay={tooltip && <Tooltip id={`tooltip-right`}>@{userLogin}</Tooltip> || <></>}
+      overlay={
+        (tooltip && <Tooltip id={"tooltip-right"}>@{userLogin}</Tooltip>) || (
+          <></>
+        )
+      }
     >
       <img
-        className={`avatar circle-3 ${border && `border-avatar`} ${className}`}
+        className={`avatar circle-3 ${border && "border-avatar"} ${className}`}
         src={src || `https://github.com/${userLogin}.png`}
       />
     </OverlayTrigger>
-  )
+  );
 }

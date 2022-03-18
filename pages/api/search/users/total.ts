@@ -1,4 +1,4 @@
-import models from "@db/models";
+import models from "db/models";
 import { NextApiRequest, NextApiResponse } from "next";
 
 async function getTotal(req: NextApiRequest, res: NextApiResponse) {

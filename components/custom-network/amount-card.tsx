@@ -1,17 +1,16 @@
-import Button from '@components/button'
-import InfoTooltip from '@components/info-tooltip'
-
-import { formatNumberToCurrency } from '@helpers/formatNumber'
+import Button from "components/button";
+import InfoTooltip from "components/info-tooltip";
+import { formatNumberToCurrency } from "helpers/formatNumber";
 
 interface AmountCardProps {
-  title: string
-  amount?: number
-  description: string
-  currency?: 'token' | 'oracles'
+  title: string;
+  amount?: number;
+  description: string;
+  currency?: "token" | "oracles";
   action?: {
-    label: string
-    fn: () => void
-  }
+    label: string;
+    fn: () => void;
+  };
 }
 
 export default function AmountCard({
@@ -39,15 +38,15 @@ export default function AmountCard({
           (currency && (
             <span
               className={`caption-small text-${
-                currency === 'token' ? `primary` : 'purple'
+                currency === "token" ? "primary" : "purple"
               }`}
             >
-              {currency === 'token' ? `$BEPRO` : 'oracles'}
+              {currency === "token" ? "$BEPRO" : "oracles"}
             </span>
           )) ||
-          ''
+          ""
         )}
       </div>
     </div>
-  )
+  );
 }

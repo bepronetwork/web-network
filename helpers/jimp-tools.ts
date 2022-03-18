@@ -1,40 +1,40 @@
 // import text2png from 'text2png'
-import Jimp from 'jimp'
+import Jimp from "jimp";
 
-interface OptiosProps{
- font?:string;
- textAlign?:string;
- color?:string;
- backgroundColor?: string;
- lineSpacing?: number;
- strokeWidth?: number;
- strokeColor?: string;
- padding?: number;
- paddingLeft?: number;
- paddingTop?: number;
- paddingRight?: number;
- paddingBottom?: number;
- borderWidth?: number;
- borderLeftWidth?: number;
- borderTopWidth?: number;
- borderRightWidth?: number;
- borderBottomWidth?: number;
- borderColor?:string;
- localFontPath?: string;
- localFontName?: string;
- output?:string;
+interface OptiosProps {
+  font?: string;
+  textAlign?: string;
+  color?: string;
+  backgroundColor?: string;
+  lineSpacing?: number;
+  strokeWidth?: number;
+  strokeColor?: string;
+  padding?: number;
+  paddingLeft?: number;
+  paddingTop?: number;
+  paddingRight?: number;
+  paddingBottom?: number;
+  borderWidth?: number;
+  borderLeftWidth?: number;
+  borderTopWidth?: number;
+  borderRightWidth?: number;
+  borderBottomWidth?: number;
+  borderColor?: string;
+  localFontPath?: string;
+  localFontName?: string;
+  output?: string;
 }
 
-const fontBold = `assets/fonts/seo/SpaceGrotesk-Bold.ttf`;
-const fontSemiBold = `assets/fonts/seo/SpaceGrotesk-SemiBold.ttf`;
-const fontRegular = `assets/fonts/seo/SpaceGrotesk-Regular.ttf`;
+const fontBold = "assets/fonts/seo/SpaceGrotesk-Bold.ttf";
+const fontSemiBold = "assets/fonts/seo/SpaceGrotesk-SemiBold.ttf";
+const fontRegular = "assets/fonts/seo/SpaceGrotesk-Regular.ttf";
 
 export async function position(base: Jimp, image: Jimp, x = 0, y = 0) {
   const baseIMG = new Jimp(base);
   const positionIMG = new Jimp(image);
 
-  var x_axis = 0;
-  var y_axis = 0;
+  let x_axis = 0;
+  let y_axis = 0;
 
   x = x / 100;
   y = y / 100;
@@ -64,17 +64,15 @@ export async function write(
   fontFamily?: string,
   options?: OptiosProps
 ) {
+  let localFontPath = fontRegular;
 
-  var localFontPath = fontRegular;
-  
   if (fontFamily === "bold") {
     localFontPath = fontBold;
-  } 
-  else if (fontFamily === "semi") {
+  } else if (fontFamily === "semi") {
     localFontPath = fontSemiBold;
   }
-  
-  const buffer = ''
+
+  const buffer = "";
   // TODO: Find other choice to text2png
   // const buffer = text2png(text, {
   //   font: `${fontSize}px SpaceGrotesk-${fontFamily}`,

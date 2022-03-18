@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
+import { useEffect, useState } from "react";
+
+import { useRouter } from "next/router";
 
 export default function usePage() {
-  const [pageState, setPageState] = useState('1')
-  const router = useRouter()
-  const { page } = router.query
+  const [pageState, setPageState] = useState("1");
+  const router = useRouter();
+  const { page } = router.query;
 
   useEffect(() => {
-    setPageState(String(page || 1))
-  }, [page])
+    setPageState(String(page || 1));
+  }, [page]);
 
   function setPage(newPage: number) {
     router.push(
@@ -21,15 +22,15 @@ export default function usePage() {
       },
       router.asPath,
       { shallow: false, scroll: false }
-    )
+    );
   }
 
   function nextPage() {
-    setPage(+(page || 1) + 1)
+    setPage(+(page || 1) + 1);
   }
 
   function goToFirstPage() {
-    setPage(1)
+    setPage(1);
   }
 
   return {
@@ -37,5 +38,5 @@ export default function usePage() {
     setPage,
     nextPage,
     goToFirstPage
-  }
+  };
 }

@@ -1,6 +1,6 @@
 .stepper {
   .step + .step {
-   margin-top: 20px; 
+    margin-top: 20px;
   }
 
   .step {
@@ -15,14 +15,15 @@
       padding-right: 0;
       height: 10px;
 
-      &, .progress-bar {
+      &,
+      .progress-bar {
         border-radius: 10px;
       }
 
       .progress-bar:nth-child(2) {
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
-        background-color: rgba(var(--bs-success-rgb), .3);
+        background-color: rgba(var(--bs-success-rgb), 0.3);
       }
     }
   }

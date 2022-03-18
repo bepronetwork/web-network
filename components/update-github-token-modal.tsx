@@ -1,11 +1,9 @@
-import { setCookie } from 'nookies'
-import { signIn } from 'next-auth/react'
-import { useTranslation } from 'next-i18next'
-
-import Modal from '@components/modal'
-import Button from '@components/button'
-
-import { useAuthentication } from '@contexts/authentication'
+import Button from "components/button";
+import Modal from "components/modal";
+import { useAuthentication } from "contexts/authentication";
+import { signIn } from "next-auth/react";
+import { useTranslation } from "next-i18next";
+import { setCookie } from "nookies";
 
 export default function UpdateGithubTokenModal({
   redirectTo,
@@ -13,27 +11,27 @@ export default function UpdateGithubTokenModal({
   isVisible = false,
   setVisible = (show: boolean) => {}
 }) {
-  const { t } = useTranslation(['common', 'custom-network'])
+  const { t } = useTranslation(["common", "custom-network"]);
 
-  const { wallet } = useAuthentication()
+  const { wallet } = useAuthentication();
 
   function handleClose() {
-    setVisible(false)
+    setVisible(false);
   }
 
   function handleConfirm() {
-    setCookie(null, `updated-github-token:${wallet?.address}`, 'true', {
+    setCookie(null, `updated-github-token:${wallet?.address}`, "true", {
       maxAge: 24 * 60 * 60,
-      path: '/'
-    })
+      path: "/"
+    });
 
-    return signIn('github', { callbackUrl: redirectTo })
+    return signIn("github", { callbackUrl: redirectTo });
   }
 
   return (
     <Modal
       show={isVisible}
-      title={t('custom-network:modals.update-github-token.title')}
+      title={t("custom-network:modals.update-github-token.title")}
       centerTitle
       onCloseClick={handleClose}
     >
@@ -43,14 +41,16 @@ export default function UpdateGithubTokenModal({
         </div>
         <div className="d-flex justify-content-center mt-3">
           <Button color="primary" onClick={handleConfirm}>
-            <span>{t('custom-network:modals.update-github-token.update-now')}</span>
+            <span>
+              {t("custom-network:modals.update-github-token.update-now")}
+            </span>
           </Button>
 
           <Button color="dark-gray" onClick={handleClose}>
-            <span>{t('actions.cancel')}</span>
+            <span>{t("actions.cancel")}</span>
           </Button>
         </div>
       </div>
     </Modal>
-  )
+  );
 }

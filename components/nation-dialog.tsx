@@ -1,29 +1,38 @@
-import { kebabCase } from "lodash";
 import { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
-import BeProBlue from "@assets/icons/bepro-blue";
-import Loading from 'components/loading'
-import { COUNTRY_CODE_BLOCKED } from "../env";
-import useApi from '@x-hooks/use-api';
+
+import { kebabCase } from "lodash";
 import { useTranslation } from "next-i18next";
+
+import BeProBlue from "assets/icons/bepro-blue";
+
+import Loading from "components/loading";
+
+import useApi from "x-hooks/use-api";
+
+import { COUNTRY_CODE_BLOCKED } from "../env";
 
 export default function NationDialog({ children }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isBlock, setBlock] = useState<boolean>(false);
-  const {getClientNation} = useApi();
-  const { t } = useTranslation('common')
+  const { getClientNation } = useApi();
+  const { t } = useTranslation("common");
   const [country, setCountry] = useState<string>();
 
   useEffect(() => {
     setIsLoading(true);
     getClientNation()
-      .then((data)=>{
-        if (data.countryCode && COUNTRY_CODE_BLOCKED.indexOf(data.countryCode) === -1)
+      .then((data) => {
+        if (
+          data.countryCode &&
+          COUNTRY_CODE_BLOCKED.indexOf(data.countryCode) === -1
+        )
           return;
 
-        setCountry(data.country || String(t('modals.nation-dialog.your-country')));
+        setCountry(
+          data.country || String(t("modals.nation-dialog.your-country"))
+        );
         setBlock(true);
-
       })
       .finally(() => setIsLoading(false));
   }, []);
@@ -31,30 +40,39 @@ export default function NationDialog({ children }) {
   if (isBlock) {
     return (
       <div className="container-fluid vw-100 vh-100 bg-image bg-main-image">
-        <Modal centered
-               aria-labelledby={`${kebabCase("NationDialog")}-modal`}
-               aria-describedby={`${kebabCase("NationDialog")}-modal`}
-               id="nation-dialog-modal"
-               show={true}>
+        <Modal
+          centered
+          aria-labelledby={`${kebabCase("NationDialog")}-modal`}
+          aria-describedby={`${kebabCase("NationDialog")}-modal`}
+          id="nation-dialog-modal"
+          show={true}
+        >
           <Modal.Header>
             <Modal.Title>
-              <BeProBlue width={40} height={40}/>
+              <BeProBlue width={40} height={40} />
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div className="d-flex flex-column mt-2 align-items-center text-whit">
               <p className="p text-white mb-2 text-center fs-9 white-space-wrap">
-                {t('modals.nation-dialog.at-the-moment', { country })}
+                {t("modals.nation-dialog.at-the-moment", { country })}
               </p>
-              <a target="_blank" href="https://www.bepro.network/terms-and-conditions"
-                className="mb-2 text-center text-white-50 text-decoration-none text-uppercase fs-8">
-                {t('modals.nation-dialog.excluded')}
+              <a
+                target="_blank"
+                href="https://www.bepro.network/terms-and-conditions"
+                className="mb-2 text-center text-white-50 text-decoration-none text-uppercase fs-8"
+                rel="noreferrer"
+              >
+                {t("modals.nation-dialog.excluded")}
               </a>
               <p className="p text-wrap mb-2 text-center fs-8">
-                {t('modals.nation-dialog.further')}
+                {t("modals.nation-dialog.further")}
               </p>
-              <a className="family-inter text-uppercase text-blue-dark text-decoration-none fs-8" href="mailto: general@bepro.network">
-              {t('modals.nation-dialog.email')}
+              <a
+                className="family-inter text-uppercase text-blue-dark text-decoration-none fs-8"
+                href="mailto: general@bepro.network"
+              >
+                {t("modals.nation-dialog.email")}
               </a>
             </div>
           </Modal.Body>
@@ -63,7 +81,7 @@ export default function NationDialog({ children }) {
     );
   }
 
-  if(isLoading) return <Loading show={isLoading} text={t('please-wait')} />
+  if (isLoading) return <Loading show={isLoading} text={t("please-wait")} />;
 
   return <>{children}</>;
 }

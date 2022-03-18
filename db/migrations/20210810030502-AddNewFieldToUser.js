@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -9,10 +9,10 @@ module.exports = {
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
 
-    queryInterface.addColumn('users', 'githubLogin', {
+    queryInterface.addColumn("users", "githubLogin", {
       type: Sequelize.STRING,
       allowNull: true,
-      unique: true,
+      unique: true
     });
   },
 
@@ -23,6 +23,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-     queryInterface.removeColumn('users', 'githubLogin');
+    queryInterface.removeColumn("users", "githubLogin");
   }
 };

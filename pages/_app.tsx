@@ -1,21 +1,25 @@
-import { AppProps } from "next/app";
-import { GetServerSideProps } from "next";
 import { isMobile } from "react-device-detect";
-import { appWithTranslation } from "next-i18next";
+
+import { GetServerSideProps } from "next";
 import { getSession, SessionProvider } from "next-auth/react";
+import { appWithTranslation } from "next-i18next";
+import { AppProps } from "next/app";
+
+import MainNav from "components/main-nav";
+import MobileNotSupported from "components/mobile-not-supported";
+import NationDialog from "components/nation-dialog";
+import Seo from "components/seo";
+import StatusBar from "components/status-bar";
+import WebThreeDialog from "components/web3-dialog";
 
 import RootProviders from "contexts";
 
-import Seo from "components/seo";
-import MainNav from "components/main-nav";
-import StatusBar from "components/status-bar";
-import NationDialog from "components/nation-dialog";
-import WebThreeDialog from "components/web3-dialog";
-import MobileNotSupported from "components/mobile-not-supported";
-
 import "../styles/styles.scss";
 
-function App({ Component, pageProps: { session, currentIssue,...pageProps } }: AppProps) {
+function App({
+  Component,
+  pageProps: { session, currentIssue, ...pageProps }
+}: AppProps) {
   if (isMobile) {
     return <MobileNotSupported />;
   }
@@ -43,6 +47,6 @@ export default appWithTranslation(App);
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
-    props: { session: await getSession(ctx) },
+    props: { session: await getSession(ctx) }
   };
 };

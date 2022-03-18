@@ -1,91 +1,119 @@
-import { useRouter } from 'next/router';
-import { useTranslation } from 'next-i18next';
-import { GetServerSideProps } from 'next/types';
-import React, { useEffect, useState } from 'react';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import React, { useEffect, useState } from "react";
 
-import BountyHero from 'components/bounty-hero';
-import Translation from 'components/translation';
-import PageActions from 'components/page-actions';
-import IssueComments from 'components/issue-comments';
-import IssueProposals from 'components/issue-proposals';
-import CustomContainer from 'components/custom-container';
-import TabbedNavigation from 'components/tabbed-navigation';
-import IssueDescription from 'components/issue-description';
-import IssuePullRequests from 'components/issue-pull-requests';
-import IssueProposalProgressBar from 'components/issue-proposal-progress-bar';
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useRouter } from "next/router";
+import { GetServerSideProps } from "next/types";
 
-import { useRepos } from 'contexts/repos';
-import { useIssue } from 'contexts/issue';
-import { useAuthentication } from 'contexts/authentication';
+import BountyHero from "components/bounty-hero";
+import CustomContainer from "components/custom-container";
+import IssueComments from "components/issue-comments";
+import IssueDescription from "components/issue-description";
+import IssueProposalProgressBar from "components/issue-proposal-progress-bar";
+import IssueProposals from "components/issue-proposals";
+import IssuePullRequests from "components/issue-pull-requests";
+import PageActions from "components/page-actions";
+import TabbedNavigation from "components/tabbed-navigation";
+import Translation from "components/translation";
 
-import useApi from 'x-hooks/use-api';
-import useOctokit from 'x-hooks/use-octokit';
-import useMergeData from 'x-hooks/use-merge-data';
+import { useAuthentication } from "contexts/authentication";
+import { useIssue } from "contexts/issue";
+import { useRepos } from "contexts/repos";
+
+import useApi from "x-hooks/use-api";
+import useMergeData from "x-hooks/use-merge-data";
+import useOctokit from "x-hooks/use-octokit";
 
 export default function PageIssue() {
   const router = useRouter();
-  const { t } = useTranslation('bounty')
-  
+  const { t } = useTranslation("bounty");
+
   const [isWorking, setIsWorking] = useState(false);
   const [hasOpenPR, setHasOpenPR] = useState(false);
   const [commentsIssue, setCommentsIssue] = useState();
   const [isRepoForked, setIsRepoForked] = useState(false);
   const [mergedPullRequests, setMergedPullRequests] = useState([]);
-  
-  const { wallet, user } = useAuthentication()
-  
-  const { activeRepo }= useRepos();
-  const { getUserRepos} = useOctokit();
+
+  const { wallet, user } = useAuthentication();
+
+  const { activeRepo } = useRepos();
+  const { getUserRepos } = useOctokit();
   const { userHasPR } = useApi();
   const { getMergedDataFromPullRequests } = useMergeData();
-  const { activeIssue: issue, networkIssue, updateIssue, getNetworkIssue } = useIssue()
+  const {
+    activeIssue: issue,
+    networkIssue,
+    updateIssue,
+    getNetworkIssue
+  } = useIssue();
 
   const { id, repoId } = router.query;
 
   const tabs = [
     {
-      eventKey: 'proposals',
-      title: <Translation ns="proposal" label={'labelWithCount'} params={{count: +networkIssue?.mergeProposalAmount || 0}} />,
+      eventKey: "proposals",
+      title: (
+        <Translation
+          ns="proposal"
+          label={"labelWithCount"}
+          params={{ count: +networkIssue?.mergeProposalAmount || 0 }}
+        />
+      ),
       isEmpty: !(networkIssue?.mergeProposalAmount > 0),
-      component: <IssueProposals
-        key="tab-proposals"
-        issue={issue}
-        networkIssue={networkIssue}
-        className="border-top-0"
-      />,
-      description: t('description_proposal')
+      component: (
+        <IssueProposals
+          key="tab-proposals"
+          issue={issue}
+          networkIssue={networkIssue}
+          className="border-top-0"
+        />
+      ),
+      description: t("description_proposal")
     },
     {
-      eventKey: 'pull-requests',
+      eventKey: "pull-requests",
       isEmpty: !(mergedPullRequests.length > 0),
-      title: <Translation ns="pull-request" label={'labelWithCount'} params={{count: mergedPullRequests.length || 0}} />,
-      component: <IssuePullRequests key="tab-pull-requests" className="border-top-0"  issue={issue}/>,
-      description: t('description_pull-request')
+      title: (
+        <Translation
+          ns="pull-request"
+          label={"labelWithCount"}
+          params={{ count: mergedPullRequests.length || 0 }}
+        />
+      ),
+      component: (
+        <IssuePullRequests
+          key="tab-pull-requests"
+          className="border-top-0"
+          issue={issue}
+        />
+      ),
+      description: t("description_pull-request")
     }
-  ]
+  ];
 
   function getDefaultActiveTab() {
-    return  tabs.find(tab => tab.isEmpty === false)?.eventKey
+    return tabs.find((tab) => tab.isEmpty === false)?.eventKey;
   }
 
   function getRepoForked() {
-    if (!activeRepo || !user?.login)
-      return;
+    if (!activeRepo || !user?.login) return;
 
-    getUserRepos(user?.login, activeRepo.githubPath.split(`/`)[1])
-      .then(({data}) => {
-        const isFokerd = data?.fork || data.owner.login === user?.login
-        setIsRepoForked(isFokerd)
-      }).catch(e => {
-        console.log(`Failed to get users repositories: `, e)
+    getUserRepos(user?.login, activeRepo.githubPath.split("/")[1])
+      .then(({ data }) => {
+        const isFokerd = data?.fork || data.owner.login === user?.login;
+        setIsRepoForked(isFokerd);
       })
+      .catch((e) => {
+        console.log("Failed to get users repositories: ", e);
+      });
 
     userHasPR(`${repoId}/${id}`, user?.login)
       .then((result) => {
-        setHasOpenPR(!!result)
+        setHasOpenPR(!!result);
       })
-      .catch(e => {console.log(`Failed to list PRs`, e)});
+      .catch((e) => {
+        console.log("Failed to list PRs", e);
+      });
   }
 
   function loadIssueData() {
@@ -93,37 +121,46 @@ export default function PageIssue() {
   }
 
   function addNewComment(comment) {
-    setCommentsIssue([...(commentsIssue as any), comment] as any)
+    setCommentsIssue([...(commentsIssue as any), comment] as any);
   }
 
   function checkIsWorking() {
     if (issue?.working && user?.login)
-      setIsWorking(issue.working.some(el => el === user?.login))
+      setIsWorking(issue.working.some((el) => el === user?.login));
   }
 
   function loadMergedPullRequests() {
     if (issue && wallet?.address)
-      getMergedDataFromPullRequests(issue.repository?.githubPath, issue.pullRequests).then(setMergedPullRequests)
+      getMergedDataFromPullRequests(
+        issue.repository?.githubPath,
+        issue.pullRequests
+      ).then(setMergedPullRequests);
   }
 
-  function syncLocalyState(){
-    if(issue?.comments)
-      setCommentsIssue([...issue?.comments] as any)
+  function syncLocalyState() {
+    if (issue?.comments) setCommentsIssue([...issue?.comments] as any);
   }
 
-  function refreshIssue(){
-    updateIssue(`${issue.repository_id}`, issue.githubId)
-    .catch(()=> router.push('/404'))
+  function refreshIssue() {
+    updateIssue(`${issue.repository_id}`, issue.githubId).catch(() =>
+      router.push("/404")
+    );
   }
 
-  useEffect(syncLocalyState,[issue, activeRepo])
-  useEffect(checkIsWorking, [issue, user?.login])
-  useEffect(loadMergedPullRequests, [issue, wallet?.address])
-  useEffect(loadIssueData, [user?.login, wallet?.address, id, issue, activeRepo])
+  useEffect(syncLocalyState, [issue, activeRepo]);
+  useEffect(checkIsWorking, [issue, user?.login]);
+  useEffect(loadMergedPullRequests, [issue, wallet?.address]);
+  useEffect(loadIssueData, [
+    user?.login,
+    wallet?.address,
+    id,
+    issue,
+    activeRepo
+  ]);
 
   return (
     <>
-      <BountyHero/>
+      <BountyHero />
       <PageActions
         state={issue?.state}
         developers={issue?.developers}
@@ -147,16 +184,26 @@ export default function PageIssue() {
         repoPath={issue?.repository?.githubPath}
         githubId={issue?.githubId}
         addNewComment={addNewComment}
-        finished={networkIssue?.recognizedAsFinished} />
-        {((networkIssue?.mergeProposalAmount > 0 || mergedPullRequests.length > 0) && wallet?.address) && <CustomContainer className="mb-4">
-          <TabbedNavigation defaultActiveKey={getDefaultActiveTab()} className="issue-tabs" tabs={tabs} collapsable />
-        </CustomContainer>}
-        {networkIssue ? (
+        finished={networkIssue?.recognizedAsFinished}
+      />
+      {(networkIssue?.mergeProposalAmount > 0 ||
+        mergedPullRequests.length > 0) &&
+        wallet?.address && (
+          <CustomContainer className="mb-4">
+            <TabbedNavigation
+              defaultActiveKey={getDefaultActiveTab()}
+              className="issue-tabs"
+              tabs={tabs}
+              collapsable
+            />
+          </CustomContainer>
+        )}
+      {networkIssue ? (
         <div className="container mb-1">
           <div className="d-flex bd-highlight justify-content-center mx-2 px-4">
             <div className="ps-3 pe-0 ms-0 me-2 w-65 bd-highlight">
               <div className="container">
-                <IssueDescription description={issue?.body || ''} />
+                <IssueDescription description={issue?.body || ""} />
               </div>
             </div>
             <div className="p-0 me-3 flex-shrink-0 w-25 bd-highlight">
@@ -167,7 +214,7 @@ export default function PageIssue() {
                   mergeProposalAmount={networkIssue?.mergeProposalAmount}
                   isFinished={networkIssue?.recognizedAsFinished}
                   isCanceled={
-                    issue?.state === `canceled` || networkIssue?.canceled
+                    issue?.state === "canceled" || networkIssue?.canceled
                   }
                   creationDate={networkIssue.creationDate}
                 />
@@ -177,23 +224,39 @@ export default function PageIssue() {
         </div>
       ) : (
         <CustomContainer>
-          <IssueDescription description={issue?.body || ''} />
+          <IssueDescription description={issue?.body || ""} />
         </CustomContainer>
       )}
-      <IssueComments comments={commentsIssue} repo={issue?.repository?.githubPath} issueId={id} />
+      <IssueComments
+        comments={commentsIssue}
+        repo={issue?.repository?.githubPath}
+        issueId={id}
+      />
     </>
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({query, locale}) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  query,
+  locale
+}) => {
   const { id, repoId, network } = query;
-  const {getIssue} = useApi()
-  const currentIssue = await getIssue(repoId as string, id as string, network as string)
+  const { getIssue } = useApi();
+  const currentIssue = await getIssue(
+    repoId as string,
+    id as string,
+    network as string
+  );
 
   return {
     props: {
       currentIssue,
-      ...(await serverSideTranslations(locale, ['common', 'bounty', 'proposal', 'pull-request'])),
-    },
+      ...(await serverSideTranslations(locale, [
+        "common",
+        "bounty",
+        "proposal",
+        "pull-request"
+      ]))
+    }
   };
 };

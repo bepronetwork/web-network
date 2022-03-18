@@ -1,39 +1,52 @@
-import Modal from '@components/modal';
-import React, {useContext, useState} from 'react';
-import {ApplicationContext} from '@contexts/application';
-import {NETWORKS} from '@helpers/networks'
-import Button from './button';
-import {Spinner} from 'react-bootstrap';
+import React, { useContext, useState } from "react";
+import { Spinner } from "react-bootstrap";
+
+import { NETWORKS } from "helpers/networks";
 import { useTranslation } from "next-i18next";
-import { NetworkColors } from '@interfaces/enums/network-ids';
 
-export default function WrongNetworkModal({requiredNetwork = ``}) {
+import Modal from "components/modal";
+
+import { ApplicationContext } from "contexts/application";
+
+import { NetworkColors } from "interfaces/enums/network-ids";
+
+import Button from "./button";
+
+export default function WrongNetworkModal({ requiredNetwork = "" }) {
   const [isAddingNetwork, setIsAddingNetwork] = useState(false);
-  const { t } = useTranslation('common')
+  const { t } = useTranslation("common");
 
-  const {state: {network: activeNetwork}} = useContext(ApplicationContext);
+  const {
+    state: { network: activeNetwork }
+  } = useContext(ApplicationContext);
 
   function showModal() {
-    return !!activeNetwork && !!requiredNetwork && activeNetwork.toLocaleLowerCase() !== requiredNetwork.toLocaleLowerCase();
+    return (
+      !!activeNetwork &&
+      !!requiredNetwork &&
+      activeNetwork.toLocaleLowerCase() !== requiredNetwork.toLocaleLowerCase()
+    );
   }
 
   async function handleAddNetwork() {
     setIsAddingNetwork(true);
-    const chainId = `0x${Number(process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID).toString(16)}`;
-    const currencyNetwork = NETWORKS[chainId]
+    const chainId = `0x${Number(
+      process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID
+    ).toString(16)}`;
+    const currencyNetwork = NETWORKS[chainId];
     try {
       await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
+        method: "wallet_switchEthereumChain",
         params: [
           {
-            chainId: chainId,
+            chainId: chainId
           }
         ]
       });
     } catch (error: any) {
       if (error.code === 4902) {
         await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
+          method: "wallet_addEthereumChain",
           params: [
             {
               chainId: chainId,
@@ -41,7 +54,7 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
               nativeCurrency: {
                 name: currencyNetwork.currency.name,
                 symbol: currencyNetwork.currency.symbol,
-                decimals: currencyNetwork.decimals,
+                decimals: currencyNetwork.decimals
               },
               rpcUrls: currencyNetwork.rpcUrls,
               blockExplorerUrls: [currencyNetwork.explorerURL]
@@ -49,42 +62,62 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
           ]
         });
       }
-    }finally{
+    } finally {
       setIsAddingNetwork(false);
     }
   }
 
-  const isButtonDisabled = (): boolean => [isAddingNetwork].some(values => values)
+  const isButtonDisabled = (): boolean =>
+    [isAddingNetwork].some((values) => values);
 
   return (
     <Modal
-      title={t('modals.wrong-network.change-network')}
+      title={t("modals.wrong-network.change-network")}
       titlePosition="center"
       titleClass="h4 text-white bg-opacity-100"
       show={showModal()}
     >
       <div className="d-flex flex-column text-center align-items-center">
         <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
-        {t('modals.wrong-network.please-connect')}  <span style={{color: NetworkColors[requiredNetwork]}}><span>{requiredNetwork}</span> {t('modals.wrong-network.network')}</span><br/> {t('modals.wrong-network.on-your-wallet')}
+          {t("modals.wrong-network.please-connect")}{" "}
+          <span style={{ color: NetworkColors[requiredNetwork] }}>
+            <span>{requiredNetwork}</span> {t("modals.wrong-network.network")}
+          </span>
+          <br /> {t("modals.wrong-network.on-your-wallet")}
         </strong>
-        {isAddingNetwork && <Spinner className="text-primary align-self-center p-2 mt-1 mb-2" style={{width: `5rem`, height: `5rem`}} animation="border" /> || ``}
-        <Button className='my-3' disabled={isButtonDisabled()} onClick={handleAddNetwork}>{t('modals.wrong-network.change-network')}</Button>
+        {(isAddingNetwork && (
+          <Spinner
+            className="text-primary align-self-center p-2 mt-1 mb-2"
+            style={{ width: "5rem", height: "5rem" }}
+            animation="border"
+          />
+        )) ||
+          ""}
+        <Button
+          className="my-3"
+          disabled={isButtonDisabled()}
+          onClick={handleAddNetwork}
+        >
+          {t("modals.wrong-network.change-network")}
+        </Button>
         <div className="small-info text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-1 pt-1">
-        {t('misc.by-connecting')}{" "}
+          {t("misc.by-connecting")}{" "}
           <a
             href="https://www.bepro.network/terms-and-conditions"
             target="_blank"
             className="text-decoration-none"
+            rel="noreferrer"
           >
-            {t('misc.terms-and-conditions')}
+            {t("misc.terms-and-conditions")}
           </a>{" "}
-          <br /> {t('misc.and')}{" "}
+          <br /> {t("misc.and")}{" "}
           <a
             href="https://www.bepro.network/privacy"
             target="_blank"
             className="text-decoration-none"
+            rel="noreferrer"
           >
-            {t('misc.privacy-policy')}
+            {t("misc.privacy-policy")}
           </a>
         </div>
       </div>

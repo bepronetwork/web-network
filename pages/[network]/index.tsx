@@ -1,17 +1,18 @@
-import React from 'react'
-import { GetServerSideProps } from 'next/types'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import React from "react";
 
-import PageDevelopers from '@pages/[network]/developers'
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { GetServerSideProps } from "next/types";
+
+import PageDevelopers from "pages/[network]/developers";
 
 export default function Home() {
-  return <PageDevelopers />
+  return <PageDevelopers />;
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ['common', 'bounty']))
+      ...(await serverSideTranslations(locale, ["common", "bounty"]))
     }
-  }
-}
+  };
+};

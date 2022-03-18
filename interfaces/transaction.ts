@@ -1,9 +1,9 @@
-import {TransactionTypes} from '@interfaces/enums/transaction-types';
-import {TransactionStatus} from '@interfaces/enums/transaction-status';
-import { INetwork } from './network';
+import { TransactionStatus } from "interfaces/enums/transaction-status";
+import { TransactionTypes } from "interfaces/enums/transaction-types";
 
-export type TransactionCurrency = `Oracles` | `$BEPRO`;
+import { INetwork } from "./network";
 
+export type TransactionCurrency = "Oracles" | "$BEPRO";
 
 export interface SimpleBlockTransactionPayload {
   date: number;
@@ -27,4 +27,7 @@ export interface UpdateBlockTransaction extends BlockTransaction {
   remove?: boolean;
 }
 
-export type Transaction = SimpleBlockTransactionPayload|BlockTransaction|UpdateBlockTransaction;
+export type Transaction =
+  | SimpleBlockTransactionPayload
+  | BlockTransaction
+  | UpdateBlockTransaction;

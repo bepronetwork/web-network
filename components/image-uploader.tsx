@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 
-import UploadIcon from '@assets/icons/upload'
-import { useTranslation } from 'next-i18next'
+import { useTranslation } from "next-i18next";
+
+import UploadIcon from "assets/icons/upload";
 
 export default function ImageUploader({
   name,
@@ -10,34 +11,34 @@ export default function ImageUploader({
   onChange,
   lg = false,
   error = false,
-  className = ''
+  className = ""
 }) {
-  const { t } = useTranslation('custom-network')
-  const [image, setImage] = useState(value)
+  const { t } = useTranslation("custom-network");
+  const [image, setImage] = useState(value);
   const dimensions = {
-    width: (lg && '150') || '80',
-    height: '80'
-  }
+    width: (lg && "150") || "80",
+    height: "80"
+  };
 
   function handleChange(event) {
     if (event.target.files.length)
       setImage({
         preview: URL.createObjectURL(event.target.files[0]),
         raw: event.target.files[0]
-      })
+      });
   }
 
   useEffect(() => {
-    onChange({ label: name, value: image })
-  }, [image])
+    onChange({ label: name, value: image });
+  }, [image]);
 
   return (
     <div className="d-flex flex-column align-items-center justify-content-center">
       <label
         className={`bg-black image-uploader ${
-          (lg && 'lg') || ''
+          (lg && "lg") || ""
         } border-radius-8 d-flex flex-column text-center align-items-center justify-content-center ${
-          (error && 'error') || ''
+          (error && "error") || ""
         } ${className}`}
         htmlFor={name}
       >
@@ -55,15 +56,19 @@ export default function ImageUploader({
           </>
         )}
       </label>
-      {error && <small className="text-danger small-info mt-1">{t('errors.invalid-format')}</small>}
+      {error && (
+        <small className="text-danger small-info mt-1">
+          {t("errors.invalid-format")}
+        </small>
+      )}
 
       <input
         type="file"
         id={name}
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
         accept=".svg"
         onChange={handleChange}
       />
     </div>
-  )
+  );
 }

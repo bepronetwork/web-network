@@ -1,8 +1,11 @@
+import { ComponentPropsWithRef, forwardRef, useContext } from "react";
+
 import clsx from "clsx";
-import {ComponentPropsWithRef, forwardRef, useContext} from 'react';
-import {BeproService} from "@services/bepro-service";
-import {changeLoadState} from '@reducers/change-load-state';
-import {ApplicationContext} from '@contexts/application';
+
+import { ApplicationContext } from "contexts/application";
+import { changeLoadState } from "contexts/reducers/change-load-state";
+
+import { BeproService } from "services/bepro-service";
 
 interface Props extends ComponentPropsWithRef<"button"> {
   onCheck(isChecked: boolean): void;
@@ -12,9 +15,9 @@ interface Props extends ComponentPropsWithRef<"button"> {
 const SettlerTokenCheck = forwardRef<HTMLButtonElement, Props>(
   function SettlerTokenCheck(
     { onCheck, amount, className, ...props },
-    ref,
+    ref
   ): JSX.Element {
-    const {dispatch} = useContext(ApplicationContext);
+    const { dispatch } = useContext(ApplicationContext);
     async function handleClick() {
       try {
         dispatch(changeLoadState(true));
@@ -38,7 +41,7 @@ const SettlerTokenCheck = forwardRef<HTMLButtonElement, Props>(
         {...props}
       />
     );
-  },
+  }
 );
 
 SettlerTokenCheck.displayName = "SettlerTokenCheck";

@@ -1,17 +1,18 @@
-import models from '@db/models';
-import twitterTweet from '@helpers/api/handle-twitter-tweet';
-import paginate from '@helpers/paginate';
-import {NextApiRequest, NextApiResponse} from 'next';
-import {Octokit} from 'octokit';
-import api from 'services/api'
-import {Op} from 'sequelize';
+import models from "db/models";
+import { NextApiRequest, NextApiResponse } from "next";
+import { Octokit } from "octokit";
+import { Op } from "sequelize";
+
+import twitterTweet from "helpers/api/handle-twitter-tweet";
+import paginate from "helpers/paginate";
+
+import api from "services/api";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const {login, issueId, networkName} = req.query;
-  let where = {} as any
+  const { login, issueId, networkName } = req.query;
+  const where = {} as any;
 
-  if (login)
-    where.githubLogin = login
+  if (login) where.githubLogin = login;
 
   if (issueId) {
     const network = await models.network.findOne({
@@ -20,68 +21,94 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
           [Op.iLike]: String(networkName)
         }
       }
-    })
-  
-    if (!network) return res.status(404).json('Invalid network')
-    if (network.isClosed) return res.status(404).json('Invalid network')
+    });
 
-    const issue = await models.issue.findOne({where: {issueId, network_id: network.id}});
+    if (!network) return res.status(404).json("Invalid network");
+    if (network.isClosed) return res.status(404).json("Invalid network");
 
-    if (!issue)
-      return res.status(404).json('Issue not found');
-    
-    where.issueId = issue.id
+    const issue = await models.issue.findOne({
+      where: { issueId, network_id: network.id }
+    });
+
+    if (!issue) return res.status(404).json("Issue not found");
+
+    where.issueId = issue.id;
   }
 
-  const include = [
-    { association: 'issue' },
-  ]
-  
-  let prs = await models.pullRequest.findAndCountAll({
-    ...paginate({where}, req.query, [[req.query.sortBy || 'updatedAt', req.query.order || 'DESC']]),
+  const include = [{ association: "issue" }];
+
+  const prs = await models.pullRequest.findAndCountAll({
+    ...paginate({ where }, req.query, [
+      [req.query.sortBy || "updatedAt", req.query.order || "DESC"]
+    ])
     // include
   });
 
   if (!issueId)
-    for(const pr of prs.rows) {
-      pr.issue = await models.issue.findOne({where: {id: pr.issueId}})
-    } 
+    for (const pr of prs.rows) {
+      pr.issue = await models.issue.findOne({ where: { id: pr.issueId } });
+    }
 
-  return res.status(200).json(prs)
+  return res.status(200).json(prs);
 }
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const {repoId: repository_id, githubId, title, description: body, username, branch} = req.body;
+  const {
+    repoId: repository_id,
+    githubId,
+    title,
+    description: body,
+    username,
+    branch
+  } = req.body;
 
-  const issue = await models.issue.findOne({where: {githubId, repository_id,},});
-  
-  if (!issue) return res.status(404)
+  const issue = await models.issue.findOne({
+    where: { githubId, repository_id }
+  });
 
-  const repoInfo = await models.repositories.findOne({where: {id: repository_id}, raw: true});
+  if (!issue) return res.status(404);
 
-  const [owner, repo] = repoInfo.githubPath.split(`/`);
+  const repoInfo = await models.repositories.findOne({
+    where: { id: repository_id },
+    raw: true
+  });
 
-  const octoKit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
+  const [owner, repo] = repoInfo.githubPath.split("/");
+
+  const octoKit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
 
   const options = {
-    accept: 'application/vnd.github.v3+json',
-    owner, repo, title, body,
+    accept: "application/vnd.github.v3+json",
+    owner,
+    repo,
+    title,
+    body,
     head: `${username}:${branch}`,
     base: issue.branch || process.env.NEXT_GITHUB_MAINBRANCH,
     maintainer_can_modify: false,
     draft: false
-  }
+  };
 
   try {
     const created = await octoKit.rest.pulls.create(options);
 
-    await models.pullRequest.create({issueId: issue.id, githubId: created.data?.number, githubLogin: username, branch});
+    await models.pullRequest.create({
+      issueId: issue.id,
+      githubId: created.data?.number,
+      githubLogin: username,
+      branch
+    });
 
-    issue.state = `ready`;
+    issue.state = "ready";
 
-    const issueLink = `${process.env.NEXT_PUBLIC_HOME_URL}/bounty?id=${issue?.githubId}&repoId=${issue?.repository_id}`
+    const issueLink = `${process.env.NEXT_PUBLIC_HOME_URL}/bounty?id=${issue?.githubId}&repoId=${issue?.repository_id}`;
     const body = `@${issue.creatorGithub}, @${username} has a solution - [check your bounty](${issueLink})`;
-    await octoKit.rest.issues.createComment({owner, repo, issue_number: issue.githubId, body});
+    await octoKit.rest.issues.createComment({
+      owner,
+      repo,
+      issue_number: issue.githubId,
+      body
+    });
 
     await issue.save();
     /*twitterTweet({
@@ -90,24 +117,25 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       username: username,
       issue
     })*/
-    await api.post(`/seo/${issue?.issueId}`)
-    .catch(e => {
-      console.log(`Error creating SEO`, e);
-    })
+    await api.post(`/seo/${issue?.issueId}`).catch((e) => {
+      console.log("Error creating SEO", e);
+    });
 
-    return res.json(`ok`);
-  } catch(error) {
-    return res.status(error.response.status).json(error.response.data)
+    return res.json("ok");
+  } catch (error) {
+    return res.status(error.response.status).json(error.response.data);
   }
 }
 
-export default async function PullRequest(req: NextApiRequest, res: NextApiResponse) {
-
+export default async function PullRequest(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   switch (req.method.toLowerCase()) {
-    case 'get':
+    case "get":
       await get(req, res);
       break;
-    case 'post':
+    case "post":
       await post(req, res);
       break;
 

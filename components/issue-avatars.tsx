@@ -27,7 +27,9 @@ export default function IssueAvatars({ users }) {
             .filter((_users, index) => index > 2)
             .map((nextUser) => ` ${nextUser.login}`)}
         >
-          <span className="p-1 avatar-number circle-3">+{users.length > 99 ? `99` : users.length - 3}</span>
+          <span className="p-1 avatar-number circle-3">
+            +{users.length > 99 ? "99" : users.length - 3}
+          </span>
         </div>
       )}
     </div>
@@ -36,6 +38,6 @@ export default function IssueAvatars({ users }) {
 
 export const getStaticProps: GetStaticProps = async () => {
   return {
-    props: {},
+    props: {}
   };
 };

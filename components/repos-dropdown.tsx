@@ -1,30 +1,37 @@
-import ReactSelect from 'components/react-select';
-import {useEffect, useState} from 'react';
-import { useTranslation } from 'next-i18next';
-import { useRepos } from '@contexts/repos';
+import { useEffect, useState } from "react";
 
-export default function ReposDropdown({onSelected = (opt: {value}) => {}}) {
-  const {repoList} = useRepos();
-  const [options, setOptions] = useState<{value: string; label: string}[]>();
-  const {t} = useTranslation('common')
+import { useRepos } from "contexts/repos";
+import { useTranslation } from "next-i18next";
+
+import ReactSelect from "components/react-select";
+
+export default function ReposDropdown({ onSelected = (opt: { value }) => {} }) {
+  const { repoList } = useRepos();
+  const [options, setOptions] = useState<{ value: string; label: string }[]>();
+  const { t } = useTranslation("common");
 
   function loadReposFromBackend() {
-    if (!repoList)
-      return;
+    if (!repoList) return;
 
-    function mapRepo({id: value, githubPath: label}) {
-      return ({value, label})
+    function mapRepo({ id: value, githubPath: label }) {
+      return { value, label };
     }
 
     setOptions(repoList.map(mapRepo));
   }
 
-  useEffect(loadReposFromBackend, [repoList])
+  useEffect(loadReposFromBackend, [repoList]);
 
-  return <div>
-    <label className="caption-small mb-2 text-uppercase">
-      {t('select-a-repository')}
-    </label>
-    <ReactSelect options={options} onChange={onSelected} placeholder={t('forms.select-placeholder')} />
+  return (
+    <div>
+      <label className="caption-small mb-2 text-uppercase">
+        {t("select-a-repository")}
+      </label>
+      <ReactSelect
+        options={options}
+        onChange={onSelected}
+        placeholder={t("forms.select-placeholder")}
+      />
     </div>
+  );
 }

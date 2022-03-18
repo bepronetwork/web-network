@@ -1,69 +1,65 @@
-import { UrlObject } from 'url'
-import { useRouter } from 'next/router'
-
-import { hexadecimalToRGB } from '@helpers/colors'
-
-import { ThemeColors } from '@interfaces/network'
-
-import useApi from '@x-hooks/use-api'
-import { useNetwork } from '@contexts/network'
-
-import { BEPRO_NETWORK_NAME } from 'env'
+import { useNetwork } from "contexts/network";
+import { hexadecimalToRGB } from "helpers/colors";
+import { ThemeColors } from "interfaces/network";
+import useApi from "x-hooks/use-api";
+import { BEPRO_NETWORK_NAME } from "env";
+import { useRouter } from "next/router";
+import { UrlObject } from "url";
 
 //Todo: useNetwork was moved to context, refactor this hooks to be a theme-hooks
 
 export default function useNetworkTheme() {
-  const router = useRouter()
-  const { getNetwork } = useApi()
-  const {activeNetwork: network} = useNetwork()
+  const router = useRouter();
+  const { getNetwork } = useApi();
+  const { activeNetwork: network } = useNetwork();
 
   async function networkExists(networkName: string) {
     try {
-      await getNetwork(networkName)
+      await getNetwork(networkName);
 
-      return true
+      return true;
     } catch (error) {
-      return false
+      return false;
     }
   }
 
   function DefaultTheme(): ThemeColors {
     return {
       text: getComputedStyle(document.documentElement).getPropertyValue(
-        '--bs-body-color'
+        "--bs-body-color"
       ),
       background: getComputedStyle(document.documentElement).getPropertyValue(
-        '--bs-body-bg'
+        "--bs-body-bg"
       ),
       shadow: getComputedStyle(document.documentElement).getPropertyValue(
-        '--bs-shadow'
+        "--bs-shadow"
       ),
       gray: getComputedStyle(document.documentElement).getPropertyValue(
-        '--bs-gray'
+        "--bs-gray"
       ),
       primary: getComputedStyle(document.documentElement).getPropertyValue(
-        '--bs-primary'
+        "--bs-primary"
       ),
       secondary: getComputedStyle(document.documentElement).getPropertyValue(
-        '--bs-secondary'
+        "--bs-secondary"
       ),
       oracle: getComputedStyle(document.documentElement).getPropertyValue(
-        '--bs-oracle'
+        "--bs-oracle"
       ),
       success: getComputedStyle(document.documentElement).getPropertyValue(
-        '--bs-success'
+        "--bs-success"
       ),
       fail: getComputedStyle(document.documentElement).getPropertyValue(
-        '--bs-fail'
+        "--bs-fail"
       ),
       warning: getComputedStyle(document.documentElement).getPropertyValue(
-        '--bs-warning'
+        "--bs-warning"
       )
-    }
+    };
   }
 
   function colorsToCSS(overrideColors = undefined as ThemeColors): string {
-    if (!network || (!network?.colors && !overrideColors)) return ''
+    if (!network || (!network?.colors && !overrideColors)) return "";
 
     const colors = {
       text: overrideColors?.text || network.colors?.text,
@@ -76,7 +72,7 @@ export default function useNetworkTheme() {
       success: overrideColors?.success || network.colors?.success,
       fail: overrideColors?.fail || network.colors?.fail,
       warning: overrideColors?.warning || network.colors?.warning
-    }
+    };
 
     return `:root {
       --bs-bg-opacity: 1;
@@ -84,85 +80,85 @@ export default function useNetworkTheme() {
         (colors.gray &&
           `--bs-gray: ${colors.gray}; --bs-gray-rgb: ${hexadecimalToRGB(
             colors.gray
-          ).join(',')};`) ||
-        ''
+          ).join(",")};`) ||
+        ""
       }
       ${
         (colors.fail &&
           `--bs-fail: ${colors.fail}; --bs-fail-rgb: ${hexadecimalToRGB(
             colors.fail
-          ).join(',')};`) ||
-        ''
+          ).join(",")};`) ||
+        ""
       }
       ${
         (colors.shadow &&
           `--bs-shadow: ${colors.shadow}; --bs-shadow-rgb: ${hexadecimalToRGB(
             colors.shadow
-          ).join(',')};`) ||
-        ''
+          ).join(",")};`) ||
+        ""
       }
       ${
         (colors.oracle &&
           `--bs-oracle: ${colors.oracle}; --bs-oracle-rgb: ${hexadecimalToRGB(
             colors.oracle
-          ).join(',')};`) ||
-        ''
+          ).join(",")};`) ||
+        ""
       }
       ${
         (colors.text &&
           `--bs-body-color: ${
             colors.text
           }; --bs-body-color-rgb: ${hexadecimalToRGB(colors.text).join(
-            ','
+            ","
           )};`) ||
-        ''
+        ""
       }
       ${
         (colors.primary &&
           `--bs-primary: ${
             colors.primary
           }; --bs-primary-rgb: ${hexadecimalToRGB(colors.primary).join(
-            ','
+            ","
           )};`) ||
-        ''
+        ""
       }
       ${
         (colors.success &&
           `--bs-success: ${
             colors.success
           }; --bs-success-rgb: ${hexadecimalToRGB(colors.success).join(
-            ','
+            ","
           )};`) ||
-        ''
+        ""
       }
       ${
         (colors.warning &&
           `--bs-warning: ${
             colors.warning
           }; --bs-warning-rgb: ${hexadecimalToRGB(colors.warning).join(
-            ','
+            ","
           )};`) ||
-        ''
+        ""
       }
       ${
         (colors.secondary &&
           `--bs-secondary: ${
             colors.secondary
           }; --bs-secondary-rgb: ${hexadecimalToRGB(colors.secondary).join(
-            ','
+            ","
           )};`) ||
-        ''
+        ""
       }
       ${
         (colors.background &&
           `--bs-body-bg: ${
             colors.background
           }; --bs-body-bg-rgb: ${hexadecimalToRGB(colors.background).join(
-            ','
+            ","
           )};`) ||
-        ''
+        ""
       }
-    }`
+    }`;
   }
 
   function changeNetwork(newNetwork: string): void {
@@ -172,17 +168,17 @@ export default function useNetworkTheme() {
         ...router.query,
         network: newNetwork
       }
-    })
+    });
   }
 
   function getURLWithNetwork(href: string, query = {} as any): UrlObject {
     return {
-      pathname: `/[network]/${href}`.replace('//', '/'),
+      pathname: `/[network]/${href}`.replace("//", "/"),
       query: {
         ...query,
         network: query.network || router?.query?.network || BEPRO_NETWORK_NAME
       }
-    }
+    };
   }
 
   return {
@@ -192,5 +188,5 @@ export default function useNetworkTheme() {
     networkExists,
     getURLWithNetwork,
     setNetwork: changeNetwork
-  }
+  };
 }

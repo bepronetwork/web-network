@@ -1,4 +1,4 @@
-import { SVGProps } from 'react'
+import { SVGProps } from "react";
 
 export default function ArrowUp(props: SVGProps<SVGSVGElement>) {
   return (
@@ -16,5 +16,5 @@ export default function ArrowUp(props: SVGProps<SVGSVGElement>) {
         fill="white"
       />
     </svg>
-  )
+  );
 }

@@ -1,31 +1,39 @@
-import {useContext, useEffect, useState} from 'react';
-import Modal from './modal';
-import ReactSelect from './react-select';
-import CreateProposalDistributionItem from './create-proposal-distribution-item';
-import sumObj from 'helpers/sumObj';
-import {BeproService} from 'services/bepro-service';
-import {pullRequest} from 'interfaces/issue-data';
-import {ApplicationContext} from '@contexts/application';
-import {addTransaction} from '@reducers/add-transaction';
-import {TransactionTypes} from 'interfaces/enums/transaction-types';
-import {updateTransaction} from '@reducers/update-transaction';
-import {toastWarning} from '@reducers/add-toast';
-import Button from './button';
-import useOctokit from 'x-hooks/use-octokit';
-import useApi from 'x-hooks/use-api';
-import {TransactionStatus} from 'interfaces/enums/transaction-status';
-import useTransactions from 'x-hooks/useTransactions';
-import LockedIcon from '@assets/icons/locked-icon';
-import clsx from 'clsx';
-import { Proposal } from 'interfaces/proposal';
-import { ProposalData } from 'interfaces/api-response';
-import { useTranslation } from 'next-i18next';
-import Avatar from './avatar';
-import PullRequestLabels from './pull-request-labels';
-import ReadOnlyButtonWrapper from './read-only-button-wrapper';
-import {useRepos} from 'contexts/repos'
-import {useNetwork} from 'contexts/network'
-import { useAuthentication } from '@contexts/authentication';
+import { useContext, useEffect, useState } from "react";
+
+import clsx from "clsx";
+import { useTranslation } from "next-i18next";
+
+import LockedIcon from "assets/icons/locked-icon";
+
+import { ApplicationContext } from "contexts/application";
+import { useAuthentication } from "contexts/authentication";
+import { useNetwork } from "contexts/network";
+import { toastWarning } from "contexts/reducers/add-toast";
+import { addTransaction } from "contexts/reducers/add-transaction";
+import { updateTransaction } from "contexts/reducers/update-transaction";
+import { useRepos } from "contexts/repos";
+
+import sumObj from "helpers/sumObj";
+
+import { ProposalData } from "interfaces/api-response";
+import { TransactionStatus } from "interfaces/enums/transaction-status";
+import { TransactionTypes } from "interfaces/enums/transaction-types";
+import { pullRequest } from "interfaces/issue-data";
+import { Proposal } from "interfaces/proposal";
+
+import { BeproService } from "services/bepro-service";
+
+import useApi from "x-hooks/use-api";
+import useOctokit from "x-hooks/use-octokit";
+import useTransactions from "x-hooks/useTransactions";
+
+import Avatar from "./avatar";
+import Button from "./button";
+import CreateProposalDistributionItem from "./create-proposal-distribution-item";
+import Modal from "./modal";
+import PullRequestLabels from "./pull-request-labels";
+import ReactSelect from "./react-select";
+import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 
 interface participants {
   githubHandle: string;
@@ -40,7 +48,7 @@ interface SameProposal {
   }[];
 }
 
-function SelectValueComponent({ innerProps, innerRef, ...rest }){
+function SelectValueComponent({ innerProps, innerRef, ...rest }) {
   const data = rest.getValue()[0];
 
   return (
@@ -50,14 +58,15 @@ function SelectValueComponent({ innerProps, innerRef, ...rest }){
       className="proposal__select-options d-flex align-items-center text-center p-small p-1"
     >
       <Avatar userLogin={data?.githubLogin} />
-      <span className="ml-1 text-nowrap">
-        {data?.label}
-      </span>
+      <span className="ml-1 text-nowrap">{data?.label}</span>
       <div className="ms-2">
-        <PullRequestLabels isMergeable={data.isMergeable} merged={data.merged}/>
+        <PullRequestLabels
+          isMergeable={data.isMergeable}
+          merged={data.merged}
+        />
       </div>
     </div>
-  )
+  );
 }
 
 function SelectOptionComponent({ innerProps, innerRef, data }) {
@@ -68,11 +77,18 @@ function SelectOptionComponent({ innerProps, innerRef, data }) {
       className="proposal__select-options d-flex align-items-center text-center p-small p-1"
     >
       <Avatar userLogin={data?.githubLogin} />
-      <span className={`ml-1 text-nowrap ${data.isDisable ? 'text-ligth-gray': 'text-gray hover-primary'}`}>
+      <span
+        className={`ml-1 text-nowrap ${
+          data.isDisable ? "text-ligth-gray" : "text-gray hover-primary"
+        }`}
+      >
         {data?.label}
       </span>
       <div className="d-flex flex-grow-1 justify-content-end">
-        <PullRequestLabels isMergeable={data.isMergeable} merged={data.merged}/>
+        <PullRequestLabels
+          isMergeable={data.isMergeable}
+          merged={data.merged}
+        />
       </div>
     </div>
   );
@@ -84,58 +100,72 @@ export default function NewProposal({
   mergeProposals,
   pullRequests = [],
   handleMicroService,
-  isIssueOwner = false, isFinished = false
+  isIssueOwner = false,
+  isFinished = false
 }) {
-  const { t } = useTranslation(['common', 'bounty', 'proposal', 'pull-request'])
+  const { t } = useTranslation([
+    "common",
+    "bounty",
+    "proposal",
+    "pull-request"
+  ]);
 
-  const [amount, setAmount] = useState<number>()
-  const [show, setShow] = useState<boolean>(false)
-  const [isCouncil, setIsCouncil] = useState(false)
-  const [error, setError] = useState<boolean>(false)
-  const [distrib, setDistrib] = useState<Object>({})
-  const [councilAmount, setCouncilAmount] = useState(0)
-  const [success, setSuccess] = useState<boolean>(false)
-  const [warning, setWarning] = useState<boolean>(false)
-  const [proposals, setProposals] = useState<any[]>([])
-  const [currentGithubId, setCurrentGithubId] = useState<string>()
-  const [participants, setParticipants] = useState<participants[]>([])
-  const [showExceptionalMessage, setShowExceptionalMessage] = useState<boolean>()
-  const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest)
+  const [amount, setAmount] = useState<number>();
+  const [show, setShow] = useState<boolean>(false);
+  const [isCouncil, setIsCouncil] = useState(false);
+  const [error, setError] = useState<boolean>(false);
+  const [distrib, setDistrib] = useState<Object>({});
+  const [councilAmount, setCouncilAmount] = useState(0);
+  const [success, setSuccess] = useState<boolean>(false);
+  const [warning, setWarning] = useState<boolean>(false);
+  const [proposals, setProposals] = useState<any[]>([]);
+  const [currentGithubId, setCurrentGithubId] = useState<string>();
+  const [participants, setParticipants] = useState<participants[]>([]);
+  const [showExceptionalMessage, setShowExceptionalMessage] =
+    useState<boolean>();
+  const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>(
+    {} as pullRequest
+  );
 
-  const {activeRepo} = useRepos()
-  const {activeNetwork} = useNetwork()
+  const { activeRepo } = useRepos();
+  const { activeNetwork } = useNetwork();
   const { dispatch } = useContext(ApplicationContext);
-  const { wallet, user, beproServiceStarted } = useAuthentication()
+  const { wallet, user, beproServiceStarted } = useAuthentication();
 
-  const txWindow = useTransactions()
-  const { getParticipants } = useOctokit()
-  const {getUserWith, waitForMerge, processMergeProposal, processEvent} = useApi()
+  const txWindow = useTransactions();
+  const { getParticipants } = useOctokit();
+  const { getUserWith, waitForMerge, processMergeProposal, processEvent } =
+    useApi();
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
     setDistrib((prevState) => {
       handleCheckDistrib({
         ...prevState,
-        ...params,
-        })
-      return({
-      ...prevState,
-      ...params,
-      })
-  });
+        ...params
+      });
+      return {
+        ...prevState,
+        ...params
+      };
+    });
   }
 
   async function loadProposalsMeta() {
-    if (!issueId || !beproServiceStarted)
-      return;
+    if (!issueId || !beproServiceStarted) return;
 
-    const scIssueId = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
+    const scIssueId = await BeproService.network
+      .getIssueByCID(issueId)
+      .then(({ _id }) => _id);
     const pool = [];
 
     for (const meta of mergeProposals as ProposalData[]) {
       const { scMergeId, pullRequestId } = meta;
       if (scMergeId) {
-        const merge = await BeproService.network.getMergeById(scIssueId, +scMergeId);
-        pool.push({...merge, pullRequestId } as Proposal)
+        const merge = await BeproService.network.getMergeById(
+          scIssueId,
+          +scMergeId
+        );
+        pool.push({ ...merge, pullRequestId } as Proposal);
       }
     }
 
@@ -147,9 +177,7 @@ export default function NewProposal({
     currentProposals: SameProposal[]
   ) {
     return currentProposals.some((activeProposal) => {
-      if (
-        activeProposal.currentPrId === currentDistrbuition.currentPrId
-      ) {
+      if (activeProposal.currentPrId === currentDistrbuition.currentPrId) {
         return activeProposal.prAddressAmount.every((ap) =>
           currentDistrbuition.prAddressAmount.find(
             (p) => ap.amount === p.amount && ap.address === p.address
@@ -162,254 +190,331 @@ export default function NewProposal({
   }
 
   function handleCheckDistrib(obj: object) {
-    var currentAmount = sumObj(obj)
+    const currentAmount = sumObj(obj);
 
-    if (currentAmount === 100){
-     const { id }  = pullRequests.find(
+    if (currentAmount === 100) {
+      const { id } = pullRequests.find(
         (data) => data.githubId === currentGithubId
-      )
+      );
 
-      var currentDistrbuition = {
+      const currentDistrbuition = {
         currentPrId: id,
-        prAddressAmount: participants.map(
-          (item) =>  ({
-            amount: ((amountTotal * obj[item.githubHandle])/100),
-            address: item.address.toLowerCase()
-          })
-        )
-      }
-      
-      var currentProposals = proposals.map((item) => {
-        return ({
-            currentPrId: Number(item.pullRequestId),
-            prAddressAmount: item.prAddresses.map((value, key) => ({
-              amount: Number(item.prAmounts[key]),
-              address: value.toLowerCase()
-            }))
-          })
-        })
+        prAddressAmount: participants.map((item) => ({
+          amount: (amountTotal * obj[item.githubHandle]) / 100,
+          address: item.address.toLowerCase()
+        }))
+      };
 
-      if(isSameProposal(currentDistrbuition, currentProposals)){
-        handleInputColor("warning")
-      }else {
-        handleInputColor("success")
-      } 
-   }
-   if (currentAmount > 0 && currentAmount < 100 || currentAmount > 100){
-    handleInputColor("error")
-   }
-   if (currentAmount === 0){
-    handleInputColor("normal")
-   }
+      const currentProposals = proposals.map((item) => {
+        return {
+          currentPrId: Number(item.pullRequestId),
+          prAddressAmount: item.prAddresses.map((value, key) => ({
+            amount: Number(item.prAmounts[key]),
+            address: value.toLowerCase()
+          }))
+        };
+      });
 
-   if(currentAmount === 100){
-    participants.map(item => {
-      var realValue = (amountTotal * obj[item.githubHandle])/ 100
-      if(amountTotal < participants.length && realValue < 1 && realValue != 0 && realValue < amountTotal){
-        handleInputColor("error")
-        setShowExceptionalMessage(true)
+      if (isSameProposal(currentDistrbuition, currentProposals)) {
+        handleInputColor("warning");
+      } else {
+        handleInputColor("success");
       }
-    })
-   }
+    }
+    if ((currentAmount > 0 && currentAmount < 100) || currentAmount > 100) {
+      handleInputColor("error");
+    }
+    if (currentAmount === 0) {
+      handleInputColor("normal");
+    }
+
+    if (currentAmount === 100) {
+      participants.map((item) => {
+        const realValue = (amountTotal * obj[item.githubHandle]) / 100;
+        if (
+          amountTotal < participants.length &&
+          realValue < 1 &&
+          realValue != 0 &&
+          realValue < amountTotal
+        ) {
+          handleInputColor("error");
+          setShowExceptionalMessage(true);
+        }
+      });
+    }
   }
 
-  function handleInputColor ( name: string ) {
-    if(name === "success"){
-      setError(false)
-      setSuccess(true)
-      setWarning(false)
+  function handleInputColor(name: string) {
+    if (name === "success") {
+      setError(false);
+      setSuccess(true);
+      setWarning(false);
     }
-    if(name === "error"){
-      setError(true)
-      setSuccess(false)
-      setWarning(false)
+    if (name === "error") {
+      setError(true);
+      setSuccess(false);
+      setWarning(false);
     }
-    if(name === "warning"){
-      setError(false)
-      setSuccess(false)
-      setWarning(true)
+    if (name === "warning") {
+      setError(false);
+      setSuccess(false);
+      setWarning(true);
     }
-    if(name === "normal"){
-      setError(false)
-      setSuccess(false)
-      setWarning(false)
+    if (name === "normal") {
+      setError(false);
+      setSuccess(false);
+      setWarning(false);
     }
   }
 
   function getParticipantsPullRequest(id: string, githubId: string) {
-    if (!activeRepo)
-      return;
+    if (!activeRepo) return;
 
     getParticipants(+githubId, activeRepo.githubPath)
-      .then(participants => {
-        const tmpParticipants = [...participants]
+      .then((participants) => {
+        const tmpParticipants = [...participants];
 
-        pullRequests?.find(pr => pr.githubId === githubId)?.reviewers?.forEach(participant => {
-          if (!tmpParticipants.includes(participant)) tmpParticipants.push(participant)
-        })
+        pullRequests
+          ?.find((pr) => pr.githubId === githubId)
+          ?.reviewers?.forEach((participant) => {
+            if (!tmpParticipants.includes(participant))
+              tmpParticipants.push(participant);
+          });
 
-        return Promise.all(tmpParticipants.map(async login => {
-          const {address, githubLogin, githubHandle} = await getUserWith(login);
-          return {address, githubLogin, githubHandle};
-        }))
+        return Promise.all(
+          tmpParticipants.map(async (login) => {
+            const { address, githubLogin, githubHandle } = await getUserWith(
+              login
+            );
+            return { address, githubLogin, githubHandle };
+          })
+        );
       })
       .then((participantsPr) => {
-        const tmpParticipants = participantsPr.filter(({address}) => !!address);
-        setDistrib(Object.fromEntries(tmpParticipants.map(participant => [participant.githubHandle, 0])))
-        setCurrentGithubId(githubId);       
+        const tmpParticipants = participantsPr.filter(
+          ({ address }) => !!address
+        );
+        setDistrib(
+          Object.fromEntries(
+            tmpParticipants.map((participant) => [participant.githubHandle, 0])
+          )
+        );
+        setCurrentGithubId(githubId);
         setParticipants(tmpParticipants);
       })
       .catch((err) => {
-        console.error('Error fetching pullRequestsParticipants', err)
+        console.error("Error fetching pullRequestsParticipants", err);
       });
   }
 
   async function handleClickCreate(): Promise<void> {
-    const issue_id = await BeproService.network.getIssueByCID(issueId).then(({_id}) => _id);
+    const issue_id = await BeproService.network
+      .getIssueByCID(issueId)
+      .then(({ _id }) => _id);
 
-    function handleValues(amount, distributed){
-      return Math.floor((amount * distributed) / 100)
+    function handleValues(amount, distributed) {
+      return Math.floor((amount * distributed) / 100);
     }
 
-    var prAddresses: string[] = []
-    var prAmounts: number[] = []
+    const prAddresses: string[] = [];
+    const prAmounts: number[] = [];
 
     participants.map((items) => {
-      if(handleValues(amountTotal,distrib[items.githubHandle]) > 0){
-        prAddresses.push(items.address)
-        prAmounts.push(handleValues(amountTotal,distrib[items.githubHandle]))
+      if (handleValues(amountTotal, distrib[items.githubHandle]) > 0) {
+        prAddresses.push(items.address);
+        prAmounts.push(handleValues(amountTotal, distrib[items.githubHandle]));
       }
-    })
-  
+    });
+
     const payload = {
       issueID: issue_id,
       prAddresses,
-      prAmounts,
+      prAmounts
     };
     //Chcking diff between total Distributed and total Ammount;
-    const totalDistributed = payload.prAmounts.reduce((p,c)=> p+c)
+    const totalDistributed = payload.prAmounts.reduce((p, c) => p + c);
     // Assigning the rest to last participant;
-    payload.prAmounts[payload.prAmounts.length - 1] += Math.ceil((amountTotal - totalDistributed))
-    
+    payload.prAmounts[payload.prAmounts.length - 1] += Math.ceil(
+      amountTotal - totalDistributed
+    );
+
     setShow(false);
 
-    const proposeMergeTx = addTransaction({type: TransactionTypes.proposeMerge}, activeNetwork)
+    const proposeMergeTx = addTransaction(
+      { type: TransactionTypes.proposeMerge },
+      activeNetwork
+    );
     dispatch(proposeMergeTx);
 
-    waitForMerge(user?.login, issue_id, currentGithubId, activeNetwork?.name)
-                      .then(() => {
-                        if (handleMicroService)
-                          handleMicroService(true);
-                        handleClose();
-                        setDistrib({});
-                      })
+    waitForMerge(
+      user?.login,
+      issue_id,
+      currentGithubId,
+      activeNetwork?.name
+    ).then(() => {
+      if (handleMicroService) handleMicroService(true);
+      handleClose();
+      setDistrib({});
+    });
 
     await BeproService.network
-                      .proposeIssueMerge(payload.issueID, payload.prAddresses, payload.prAmounts)
-                      .then(txInfo => {
-                        processEvent(`merge-proposal`, txInfo.blockNumber, issue_id, currentGithubId, activeNetwork?.name);
+      .proposeIssueMerge(
+        payload.issueID,
+        payload.prAddresses,
+        payload.prAmounts
+      )
+      .then((txInfo) => {
+        processEvent(
+          "merge-proposal",
+          txInfo.blockNumber,
+          issue_id,
+          currentGithubId,
+          activeNetwork?.name
+        );
 
-                        txWindow.updateItem(proposeMergeTx.payload.id, BeproService.parseTransaction(txInfo, proposeMergeTx.payload));
+        txWindow.updateItem(
+          proposeMergeTx.payload.id,
+          BeproService.parseTransaction(txInfo, proposeMergeTx.payload)
+        );
 
-                        handleClose();
-                      })
-                      .catch((e) => {
-                        if (e?.message?.search(`User denied`) > -1)
-                          dispatch(updateTransaction({...proposeMergeTx.payload as any, remove: true}))
-                        else dispatch(updateTransaction({...proposeMergeTx.payload as any, status: TransactionStatus.failed}));
-                        handleClose();
-                      })                    
+        handleClose();
+      })
+      .catch((e) => {
+        if (e?.message?.search("User denied") > -1)
+          dispatch(
+            updateTransaction({
+              ...(proposeMergeTx.payload as any),
+              remove: true
+            })
+          );
+        else
+          dispatch(
+            updateTransaction({
+              ...(proposeMergeTx.payload as any),
+              status: TransactionStatus.failed
+            })
+          );
+        handleClose();
+      });
   }
 
   function handleClose() {
     if (pullRequests.length && activeRepo)
-      getParticipantsPullRequest(pullRequests[0]?.id, pullRequests[0]?.githubId)
-      setCurrentGithubId(pullRequests[0]?.githubId)
+      getParticipantsPullRequest(
+        pullRequests[0]?.id,
+        pullRequests[0]?.githubId
+      );
+    setCurrentGithubId(pullRequests[0]?.githubId);
 
     setShow(false);
     setAmount(0);
     setDistrib({});
-    handleInputColor("normal")
+    handleInputColor("normal");
   }
 
   function handleChangeSelect({ value, githubId }) {
     setDistrib({});
     setAmount(0);
-    const newPr = pullRequests.find(el=> el.id === value);
-    if(newPr){
-      setCurrentPullRequest(newPr)
+    const newPr = pullRequests.find((el) => el.id === value);
+    if (newPr) {
+      setCurrentPullRequest(newPr);
     }
     getParticipantsPullRequest(value, githubId);
-    handleInputColor("normal")
+    handleInputColor("normal");
   }
 
   function recognizeAsFinished() {
-    const recognizeAsFinished = addTransaction({type: TransactionTypes.recognizedAsFinish}, activeNetwork)
+    const recognizeAsFinished = addTransaction(
+      { type: TransactionTypes.recognizedAsFinish },
+      activeNetwork
+    );
     dispatch(recognizeAsFinished);
 
-    BeproService.network.getIssueByCID(issueId)
-                .then((_issue) => {
-                  return BeproService.network.recognizeAsFinished(_issue._id)
-                })
-                .then(txInfo => {
-                  txWindow.updateItem(recognizeAsFinished.payload.id, BeproService.parseTransaction(txInfo, recognizeAsFinished.payload));
-                })
-                .then(() => {
-                  if (handleMicroService)
-                    handleMicroService(true);
-                })
-                .catch((e) => {
-                  if (e?.message?.search(`User denied`) > -1)
-                    dispatch(updateTransaction({...recognizeAsFinished.payload as any, remove: true}))
-                  else dispatch(updateTransaction({...recognizeAsFinished.payload as any, status: TransactionStatus.failed}));
-                  dispatch(toastWarning(t('bounty:errors.recognize-finished')));
-                  console.error(`Failed to mark as finished`, e);
-                })
+    BeproService.network
+      .getIssueByCID(issueId)
+      .then((_issue) => {
+        return BeproService.network.recognizeAsFinished(_issue._id);
+      })
+      .then((txInfo) => {
+        txWindow.updateItem(
+          recognizeAsFinished.payload.id,
+          BeproService.parseTransaction(txInfo, recognizeAsFinished.payload)
+        );
+      })
+      .then(() => {
+        if (handleMicroService) handleMicroService(true);
+      })
+      .catch((e) => {
+        if (e?.message?.search("User denied") > -1)
+          dispatch(
+            updateTransaction({
+              ...(recognizeAsFinished.payload as any),
+              remove: true
+            })
+          );
+        else
+          dispatch(
+            updateTransaction({
+              ...(recognizeAsFinished.payload as any),
+              status: TransactionStatus.failed
+            })
+          );
+        dispatch(toastWarning(t("bounty:errors.recognize-finished")));
+        console.error("Failed to mark as finished", e);
+      });
   }
 
   function updateCreateProposalHideState() {
     if (!beproServiceStarted) return;
 
-    BeproService.network.COUNCIL_AMOUNT().then(setCouncilAmount)
-                .then(() => BeproService.network.isCouncil(wallet?.address))
-                .then(isCouncil => setIsCouncil(isCouncil));
+    BeproService.network
+      .COUNCIL_AMOUNT()
+      .then(setCouncilAmount)
+      .then(() => BeproService.network.isCouncil(wallet?.address))
+      .then((isCouncil) => setIsCouncil(isCouncil));
   }
 
   function renderRecognizeAsFinished() {
-    return <ReadOnlyButtonWrapper>
-      <Button onClick={recognizeAsFinished} className="read-only-button">{t('bounty:actions.recognize-finished.title')}</Button>
-      </ReadOnlyButtonWrapper>;
+    return (
+      <ReadOnlyButtonWrapper>
+        <Button onClick={recognizeAsFinished} className="read-only-button">
+          {t("bounty:actions.recognize-finished.title")}
+        </Button>
+      </ReadOnlyButtonWrapper>
+    );
   }
-  const cantBeMergeable = () => !currentPullRequest.isMergeable || currentPullRequest.merged;
+  const cantBeMergeable = () =>
+    !currentPullRequest.isMergeable || currentPullRequest.merged;
 
   useEffect(() => {
     setAmount(sumObj(distrib));
   }, [distrib]);
 
   useEffect(() => {
-    if (pullRequests.length && activeRepo && beproServiceStarted){
-      const defaultPr = pullRequests.find(el=> el.isMergeable) || pullRequests[0];
-      setCurrentPullRequest(defaultPr)
+    if (pullRequests.length && activeRepo && beproServiceStarted) {
+      const defaultPr =
+        pullRequests.find((el) => el.isMergeable) || pullRequests[0];
+      setCurrentPullRequest(defaultPr);
       getParticipantsPullRequest(defaultPr?.id, defaultPr?.githubId);
-      loadProposalsMeta()
+      loadProposalsMeta();
     }
   }, [pullRequests, activeRepo, beproServiceStarted]);
 
-  useEffect(updateCreateProposalHideState, [wallet?.address])
+  useEffect(updateCreateProposalHideState, [wallet?.address]);
 
   return (
     <div className="d-flex">
       {(isCouncil && isFinished && (
         <ReadOnlyButtonWrapper>
           <Button className="read-only-button" onClick={() => setShow(true)}>
-            {t('proposal:actions.create')}
+            {t("proposal:actions.create")}
           </Button>
         </ReadOnlyButtonWrapper>
       )) ||
         (isIssueOwner && !isFinished && renderRecognizeAsFinished())}
       <Modal
         show={show}
-        title={t('proposal:actions.new')}
+        title={t("proposal:actions.new")}
         titlePosition="center"
         onCloseClick={handleClose}
         footer={
@@ -428,17 +533,17 @@ export default function NewProposal({
                 (!success && (
                   <LockedIcon width={12} height={12} className="mr-1" />
                 ))}
-              <span>{t('proposal:actions.create')}</span>
+              <span>{t("proposal:actions.create")}</span>
             </Button>
 
             <Button color="dark-gray" onClick={handleClose}>
-              {t('actions.cancel')}
+              {t("actions.cancel")}
             </Button>
           </>
         }
       >
         <p className="caption-small text-white-50 mb-2 mt-2">
-          {t('pull-request:select')}
+          {t("pull-request:select")}
         </p>
         <ReactSelect
           id="pullRequestSelect"
@@ -447,7 +552,7 @@ export default function NewProposal({
             Option: SelectOptionComponent,
             ValueContainer: SelectValueComponent
           }}
-          placeholder={t('forms.select-placeholder')}
+          placeholder={t("forms.select-placeholder")}
           defaultValue={{
             value: currentPullRequest?.id,
             label: `PR#${currentPullRequest?.id} ${t("misc.by")} @${
@@ -457,7 +562,7 @@ export default function NewProposal({
             githubLogin: currentPullRequest?.githubLogin,
             marged: currentPullRequest?.merged,
             isMergeable: currentPullRequest?.isMergeable,
-            isDisable: false,
+            isDisable: false
           }}
           options={pullRequests?.map((items: pullRequest) => ({
             value: items.id,
@@ -466,14 +571,14 @@ export default function NewProposal({
             githubLogin: items.githubLogin,
             marged: items.merged,
             isMergeable: items.isMergeable,
-            isDisable: items.merged || !items.isMergeable,
+            isDisable: items.merged || !items.isMergeable
           }))}
           isOptionDisabled={(option) => option.isDisable}
           onChange={handleChangeSelect}
         />
         {(participants.length === 0 && (
           <p className="text-uppercase text-danger text-center w-100 caption mt-4 mb-0">
-            {t('status.network-congestion')}
+            {t("status.network-congestion")}
           </p>
         )) || (
           <>
@@ -504,9 +609,7 @@ export default function NewProposal({
                 >
                   {t(
                     `proposal:errors.${
-                      warning
-                        ? "distribution-already-exists"
-                        : "pr-cant-merged"
+                      warning ? "distribution-already-exists" : "pr-cant-merged"
                     }`
                   )}
                 </p>
@@ -516,15 +619,17 @@ export default function NewProposal({
                     "caption-small pr-3 mt-3 mb-0  text-uppercase",
                     {
                       "text-success": success,
-                      "text-danger": error,
+                      "text-danger": error
                     }
                   )}
                 >
-                  {showExceptionalMessage && error ? t(`proposal:messages.distribution-cant-done`): t(
-                    `proposal:messages.distribution-${
-                      success ? "is" : "must-be"
-                    }-100`
-                  )}
+                  {showExceptionalMessage && error
+                    ? t("proposal:messages.distribution-cant-done")
+                    : t(
+                        `proposal:messages.distribution-${
+                          success ? "is" : "must-be"
+                        }-100`
+                      )}
                 </p>
               )}
             </div>

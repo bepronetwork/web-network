@@ -1,20 +1,21 @@
-import React from 'react'
-import { GetServerSideProps } from 'next'
-import { useTranslation } from 'next-i18next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import React from "react";
 
-import ExternalLinkIcon from '@assets/icons/external-link-icon'
+import { GetServerSideProps } from "next";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
-import Account from '@components/account'
-import OraclesActions from '@components/oracles-actions'
-import OraclesDelegate from '@components/oracles-delegate'
-import OraclesTakeBack from '@components/oracles-take-back'
+import ExternalLinkIcon from "assets/icons/external-link-icon";
+
+import Account from "components/account";
+import OraclesActions from "components/oracles-actions";
+import OraclesDelegate from "components/oracles-delegate";
+import OraclesTakeBack from "components/oracles-take-back";
 
 export default function MyOracles() {
-  const { t } = useTranslation(['common', 'my-oracles'])
+  const { t } = useTranslation(["common", "my-oracles"]);
 
   function navigateOut(href) {
-    window.open(href)
+    window.open(href);
   }
 
   return (
@@ -37,19 +38,19 @@ export default function MyOracles() {
               className="content-wrapper mb-5 cursor-pointer shadow-lg-hover"
               onClick={() =>
                 navigateOut(
-                  'https://support.bepro.network/en/collections/3143296-bepro-holder#bepro-protocol'
+                  "https://support.bepro.network/en/collections/3143296-bepro-holder#bepro-protocol"
                 )
               }
             >
               <div className="row">
                 <div className="d-flex align-items-center mb-1">
                   <h4 className="h4 mb-0 text-white bg-opacity-100">
-                    {t('my-oracles:how-to-use')}
+                    {t("my-oracles:how-to-use")}
                   </h4>
                   <ExternalLinkIcon className="ml-1" color="text-white-50" />
                 </div>
                 <p className="caption-small text-gray">
-                  {t('my-oracles:oracles-usage')}
+                  {t("my-oracles:oracles-usage")}
                 </p>
               </div>
             </div>
@@ -57,20 +58,20 @@ export default function MyOracles() {
         </div>
       </div>
     </Account>
-  )
+  );
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       ...(await serverSideTranslations(locale, [
-        'common',
-        'connect-wallet-button',
-        'my-oracles',
-        'bounty',
-        'pull-request',
-        'custom-network'
+        "common",
+        "connect-wallet-button",
+        "my-oracles",
+        "bounty",
+        "pull-request",
+        "custom-network"
       ]))
     }
-  }
-}
+  };
+};

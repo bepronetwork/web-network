@@ -6,7 +6,8 @@ export default function WebThreeUnavailable() {
       xmlns="http://www.w3.org/2000/svg"
       width="64"
       height="60"
-      viewBox="0 0 64 60">
+      viewBox="0 0 64 60"
+    >
       <title>Metamask unavailable</title>
       <path
         d="M60.81,0l-25,18.76L40.46,7.69ZM3.16,0,27.93,18.93,23.54,7.69ZM51.83,43.48l-6.65,10.3,14.23,4,4.09-14Zm-51.3.23,4.06,14,14.23-4-6.65-10.3ZM18,26.07l-4,6.06,14.14.64-.51-15.36Zm27.93,0-9.78-8.84-.33,15.54L50,32.13ZM18.82,53.78l8.49-4.19L20,43.81Zm17.85-4.19,8.51,4.19L44,43.81Z"
