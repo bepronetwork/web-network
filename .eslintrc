@@ -13,7 +13,6 @@
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
     "prettier",
-    "prettier/@typescript-eslint",
     "plugin:prettier/recommended"
   ],
   "env": {
@@ -23,24 +22,24 @@
     "node": true
   },
   "rules": {
-    "comma-dangle": ["error", "always-multiline"],
-    "semi": "error",
     "prettier/prettier": "error",
-    "react-hooks/rules-of-hooks": "error",
+    "comma-dangle": ["error", "never"],
+    "react-hooks/rules-of-hooks": "warn",
     "react-hooks/exhaustive-deps": "warn",
     "react/react-in-jsx-scope": 0,
+    "@typescript-eslint/no-var-requires": "off",
     "react/display-name": 0,
     "react/prop-types": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/camelcase": "off",
-    "@typescript-eslint/no-empty-interface": "off",
-    "@typescript-eslint/explicit-function-return-type": 0,
-    "@typescript-eslint/explicit-member-accessibility": 0,
-    "@typescript-eslint/indent": 0,
-    "@typescript-eslint/member-delimiter-style": 0,
+    // "@typescript-eslint/no-empty-interface": "off",
+    // "@typescript-eslint/explicit-function-return-type": 0,
+    // "@typescript-eslint/explicit-member-accessibility": 0,
+    // "@typescript-eslint/indent": 0,
+    // "@typescript-eslint/member-delimiter-style": 0,
     "@typescript-eslint/no-explicit-any": 0,
-    "@typescript-eslint/no-var-requires": 0,
     "@typescript-eslint/no-use-before-define": 0,
+    "@typescript-eslint/no-unused-imports":["warn"],
     "@typescript-eslint/no-unused-vars": [
       "warn",
       {
