@@ -29,12 +29,12 @@
       }
     ],
     "no-prototype-builtins": 0,
-    "no-return-await": 2,
+    "no-return-await": 1,
     "camelcase": 0,
     "no-underscore-dangle": 0,
     "class-methods-use-this": 1,
     "no-unused-vars": 1,
-    "complexity": ["error", 4],
+    "complexity": ["error", 9],
     "max-len": [
       "error",
       {
