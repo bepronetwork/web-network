@@ -9,17 +9,9 @@ import Modal from '@components/modal';
 
 import { ApplicationContext } from '@contexts/application';
 import { useAuthentication } from '@contexts/authentication';
+import { NetworkColors } from '@interfaces/enums/network-ids';
 
-const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
-const networkMap = {
-  mainnet: `#29b6af`,
-  ethereum: `#29b6af`,
-  ropsten: `#ff4a8d`,
-  kovan: `#9064ff`,
-  rinkeby: `#f6c343`,
-  goerli: `#f6c343`,
-  moonriver: `#f6c343`,
-}
+const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME?.toLowerCase();
 
 export default function ConnectWalletButton({
   children = null, 
@@ -52,7 +44,7 @@ export default function ConnectWalletButton({
       show={!wallet?.address}>
         <div className="d-flex flex-column text-center align-items-center">
         <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
-          {t('connect-wallet-button:to-access-this-page')}<br/><span style={{color: networkMap[REQUIRED_NETWORK.toLowerCase()]}}><span>{REQUIRED_NETWORK}</span> {t('connect-wallet-button:network')}</span> {t('connect-wallet-button:on-your-wallet')}
+          {t('connect-wallet-button:to-access-this-page')}<br/><span style={{color: NetworkColors[REQUIRED_NETWORK.toLowerCase()]}}><span>{REQUIRED_NETWORK}</span> {t('connect-wallet-button:network')}</span> {t('connect-wallet-button:on-your-wallet')}
         </strong>
           <div className="d-flex justify-content-center align-items-center w-100">
               <div className="rounded-8 bg-dark-gray text-white p-3 d-flex text-center justify-content-center align-items-center w-75 cursor-pointer" onClick={login}>

@@ -30,3 +30,7 @@ npm run dev
 - issue `$ npm run dev`
 - hop on `localhost:3000/parity`
 
+
+
+# Ganache Steps
+Soon

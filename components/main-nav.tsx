@@ -31,7 +31,7 @@ import useNetwork from '@x-hooks/use-network';
 import { BEPRO_NETWORK_NAME, IPFS_BASE } from 'env';
 
 const CURRENCY = process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME;
-const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
+const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME?.toLowerCase();
 
 export default function MainNav() {
   const { pathname } = useRouter()

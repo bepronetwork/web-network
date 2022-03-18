@@ -5,16 +5,7 @@ import {NETWORKS} from '@helpers/networks'
 import Button from './button';
 import {Spinner} from 'react-bootstrap';
 import { useTranslation } from "next-i18next";
-
-const networkMap = {
-  mainnet: `#29b6af`,
-  ethereum: `#29b6af`,
-  ropsten: `#ff4a8d`,
-  kovan: `#9064ff`,
-  rinkeby: `#f6c343`,
-  goerli: `#f6c343`,
-  moonriver: `#f6c343`,
-}
+import { NetworkColors } from '@interfaces/enums/network-ids';
 
 export default function WrongNetworkModal({requiredNetwork = ``}) {
   const [isAddingNetwork, setIsAddingNetwork] = useState(false);
@@ -23,17 +14,7 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
   const {state: {network: activeNetwork}} = useContext(ApplicationContext);
 
   function showModal() {
-    return !!activeNetwork && !!requiredNetwork && activeNetwork !== requiredNetwork;
-  }
-
-  function getColor() {
-    if (!activeNetwork || !requiredNetwork)
-      return `primary`
-
-    if (activeNetwork === requiredNetwork)
-      return `success`
-
-    return `danger`
+    return !!activeNetwork && !!requiredNetwork && activeNetwork.toLocaleLowerCase() !== requiredNetwork.toLocaleLowerCase();
   }
 
   async function handleAddNetwork() {
@@ -84,7 +65,7 @@ export default function WrongNetworkModal({requiredNetwork = ``}) {
     >
       <div className="d-flex flex-column text-center align-items-center">
         <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
-        {t('modals.wrong-network.please-connect')}  <span style={{color: networkMap[requiredNetwork.toLowerCase()]}}><span>{requiredNetwork}</span> {t('modals.wrong-network.network')}</span><br/> {t('modals.wrong-network.on-your-wallet')}
+        {t('modals.wrong-network.please-connect')}  <span style={{color: NetworkColors[requiredNetwork]}}><span>{requiredNetwork}</span> {t('modals.wrong-network.network')}</span><br/> {t('modals.wrong-network.on-your-wallet')}
         </strong>
         {isAddingNetwork && <Spinner className="text-primary align-self-center p-2 mt-1 mb-2" style={{width: `5rem`, height: `5rem`}} animation="border" /> || ``}
         <Button className='my-3' disabled={isButtonDisabled()} onClick={handleAddNetwork}>{t('modals.wrong-network.change-network')}</Button>
