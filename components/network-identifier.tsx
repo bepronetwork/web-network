@@ -7,17 +7,7 @@ import { ApplicationContext } from '@contexts/application'
 import { useAuthentication } from '@contexts/authentication'
 import { changeNetwork } from '@contexts/reducers/change-network'
 
-import { NetworkIds } from '@interfaces/enums/network-ids'
-
-const networkMap = {
-  mainnet: `#29b6af`,
-  ethereum: `#29b6af`,
-  ropsten: `#ff4a8d`,
-  kovan: `#9064ff`,
-  rinkeby: `#f6c343`,
-  goerli: `#f6c343`,
-  moonriver: `#f6c343`
-}
+import { NetworkIds, NetworkColors } from '@interfaces/enums/network-ids'
 
 export default function NetworkIdentifier() {
   const {
@@ -41,10 +31,10 @@ export default function NetworkIdentifier() {
     (network && (
       <>
         <Button className="px-3 py-2 rounded pe-none bg-white bg-opacity-10">
-          <Indicator bg={networkMap[network]} />{' '}
+          <Indicator bg={NetworkColors[network]} />{' '}
           <span>
             {network}{' '}
-            {(network !== process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME &&
+            {(network !== process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME?.toLowerCase() &&
               `testnet`) ||
               ``}
           </span>
