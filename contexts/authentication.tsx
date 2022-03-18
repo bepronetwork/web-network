@@ -143,9 +143,6 @@ export const AuthenticationProvider = ({ children }) => {
   }, [session])
 
   useEffect(() => {
-    // console.log('user', user)
-    // console.log('wallet', wallet)
-
     if (
       user &&
       wallet &&

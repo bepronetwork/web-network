@@ -13,7 +13,6 @@ import { BeproService } from 'services/bepro-service';
 import useApi from 'x-hooks/use-api';
 import useOctokit from 'x-hooks/use-octokit';
 import {useRouter} from 'next/router';
-import { ApplicationContext } from './application';
 import { useNetwork } from './network';
 import { INetworkProposal } from '@interfaces/proposal';
 import { useAuthentication } from './authentication';
