@@ -7,6 +7,7 @@ import api from 'services/api'
 import twitterTweet from '@helpers/api/handle-twitter-tweet';
 import { Op } from 'sequelize'
 import { CONTRACT_ADDRESS } from 'env';
+import { handleNetworkAddress } from '@helpers/custom-network';
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {fromBlock, id, networkName} = req.body;
@@ -24,7 +25,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const octokit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
 
-  const network = networkBeproJs({ contractAddress: customNetwork.networkAddress });
+  const network = networkBeproJs({ contractAddress: handleNetworkAddress(customNetwork.networkAddress) });
 
   await network.start();
 
