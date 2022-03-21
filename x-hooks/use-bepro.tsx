@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { TransactionReceipt } from "bepro-js/dist/interfaces/web3-core";
 
 import { ApplicationContext } from "contexts/application";
+import { IActiveIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { updateTransaction } from "contexts/reducers/update-transaction";
@@ -102,26 +103,25 @@ export default function useBepro(props?: IUseBeProDefault) {
         });
     });
   }
-
-  async function handleReedemIssue(networkIssueId: number): Promise<TransactionReceipt | Error> {
-    return new Promise(async (resolve, reject) => {
-      const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue },
-                                      activeNetwork);
+  
+  async function handleReedemIssue(networkIssueId: number, 
+                                   repoId: string,
+                                   ghId: string,
+                                   updateIssue: (repoId: string, ghId: string) => Promise<IActiveIssue>): 
+                                   Promise<TransactionReceipt | Error> {
+    return new Promise(async(resolve, reject)=>{
+      const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue }, activeNetwork);
       dispatch(redeemTx);
-
-      waitForRedeem(networkIssueId, activeNetwork?.name).then(() =>
-        onSuccess?.());
+      waitForRedeem(networkIssueId, activeNetwork?.name)
+        .then(() => onSuccess?.() )
 
       await BeproService.network
-        .redeemIssue(networkIssueId)
-        .then((txInfo) => {
-          // Review: Review processEnvets are working correctly
-          processEvent("redeem-issue", txInfo.blockNumber, networkIssueId).then(() => {
-            onSuccess?.();
-          });
-          txWindow.updateItem(redeemTx.payload.id,
-                              BeproService.parseTransaction(txInfo, redeemTx.payload));
-          resolve(txInfo);
+      .redeemIssue(networkIssueId)
+      .then((txInfo) => {
+        // Review: Review processEnvets are working correctly
+        processEvent(`redeem-issue`, txInfo.blockNumber, networkIssueId).then(()=> {
+          updateIssue(repoId, ghId) 
+          onSuccess?.()
         })
         .catch((err) => {
           if (err?.message?.search("User denied") > -1)
@@ -135,8 +135,8 @@ export default function useBepro(props?: IUseBeProDefault) {
           reject(err);
           console.error("Error closing issue", err);
         });
-    });
-  }
+      });
+    })}
 
   return {
     handlerDisputeProposal,

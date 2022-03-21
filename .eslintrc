@@ -34,7 +34,7 @@
     "no-underscore-dangle": 0,
     "class-methods-use-this": 1,
     "no-unused-vars": 1,
-    "complexity": ["error", 9],
+    "complexity": ["error", 20],
     "max-len": [
       "error",
       {
