@@ -1,9 +1,9 @@
 import models from "db/models";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { generateCard } from "helpers/seo/create-card-bounty";
+// import { generateCard } from "helpers/seo/create-card-bounty";
 
-import IpfsStorage from "services/ipfs-service";
+// import IpfsStorage from "services/ipfs-service";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const include = [
@@ -27,24 +27,24 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     console.log("Parsing issue", issue?.issueId, repo, issue?.title);
 
-    const card = await generateCard({
-      state: issue?.state,
-      issueId: ghId,
-      title: issue?.title,
-      repo,
-      ammount: issue?.amount,
-      working: issue?.working?.length || 0,
-      pr: issue?.pullRequests?.length || 0,
-      proposal: issue?.mergeProposals?.length || 0
-    });
+    // const card = await generateCard({
+    //   state: issue?.state,
+    //   issueId: ghId,
+    //   title: issue?.title,
+    //   repo,
+    //   ammount: issue?.amount,
+    //   working: issue?.working?.length || 0,
+    //   pr: issue?.pullRequests?.length || 0,
+    //   proposal: issue?.mergeProposals?.length || 0
+    // });
 
-    const data = Buffer.from(card.buffer);
-    const response = await IpfsStorage.add(data);
+    // const data = Buffer.from(card.buffer);
+    // const response = await IpfsStorage.add(data);
 
-    if (response && response.hash) {
-      await issue.update({ seoImage: response.hash });
-      created.push({ issueId: issue?.issueId, seoImage: response.hash });
-    }
+    // if (response && response.hash) {
+    //   await issue.update({ seoImage: response.hash });
+    //   created.push({ issueId: issue?.issueId, seoImage: response.hash });
+    // }
   }
 
   return res.status(200).json(created);
