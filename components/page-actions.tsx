@@ -101,7 +101,7 @@ export default function PageActions({
   const { activeNetwork } = useNetwork();
   const { wallet, user } = useAuthentication();
   const { handleReedemIssue } = useBepro();
-  const { networkIssue } = useIssue();
+  const { networkIssue, updateIssue } = useIssue();
 
   const { createPullRequestIssue, startWorking } = useApi();
 
@@ -145,17 +145,20 @@ export default function PageActions({
     ].some((values) => values === false);
 
   async function handleRedeem() {
-    handleReedemIssue(networkIssue._id).then(() => {
-      //TODO: Move to useAuth balance;
-      BeproService.getBalance("bepro").then((bepro) =>
-        dispatch(changeBalance({ bepro })));
-    });
+    handleReedemIssue(networkIssue._id,
+                      typeof repoId === "string" && repoId,
+                      typeof id === "string" && id,
+                      updateIssue).then(() => {
+        //TODO: Move to useAuth balance;
+                        BeproService.getBalance("bepro").then((bepro) =>
+          dispatch(changeBalance({ bepro })));
+                      });
   }
 
   const renderRedeem = () => {
     return (
       isIssueinDraft &&
-      issueCreator === wallet?.address &&
+      (issueCreator.toLowerCase() === wallet?.address.toLowerCase()) &&
       !finalized && (
         <ReadOnlyButtonWrapper>
           <Button
@@ -178,7 +181,7 @@ export default function PageActions({
         <NewProposal
           issueId={issueId}
           isFinished={finished}
-          isIssueOwner={issueCreator == wallet?.address}
+          isIssueOwner={issueCreator === wallet?.address}
           amountTotal={amountIssue}
           mergeProposals={mergeProposals}
           pullRequests={pullRequests}
