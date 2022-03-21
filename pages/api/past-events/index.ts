@@ -21,11 +21,13 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   var end = 0
 
-  Array({
+  const networks = Array({
     id: 1,
     name: process.env.NEXT_PUBLIC_BEPRO_NETWORK_NAME, 
     networkAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS
-  }, ...customNetworks).forEach(async (customNetwork) => {
+  }, ...customNetworks)
+
+  for (const customNetwork of networks) {
     if (!customNetwork.networkAddress) return
     
     let start = +fromBlock
@@ -43,7 +45,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     for (let page = 1; page <= pages; page++) {
       const nextEnd = start + PER_PAGE;
-      end = lastBlock
+      if (end === 0) end = lastBlock
       cEnd = nextEnd > lastBlock ? lastBlock : nextEnd
 
       console.log(`[${customNetwork.name}] Reading from ${start} to ${cEnd}; page: ${page} of ${pages}`);
@@ -64,11 +66,12 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     }
 
     start = +fromBlock
+  }
 
-  })
-
-  bulk.lastBlock = +end;
-  await bulk.save();
+  if (end > 0) {
+    bulk.lastBlock = +end;
+    await bulk.save();
+  }
 
   return res.status(200).json(end);
 }
