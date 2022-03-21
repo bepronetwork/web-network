@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import * as marked from "marked";
+import { marked } from "marked";
 import sanitizeHtml from "sanitize-html";
 export default function MarkedRender({ source = "_loading..._" }) {
   const [innerHtml, setInnerHtml] = useState<{ __html: string }>(null);
