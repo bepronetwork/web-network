@@ -3,9 +3,9 @@ import models from "db/models";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op } from "sequelize";
 
-import { generateCard } from "helpers/seo/create-card-bounty";
+// import { generateCard } from "helpers/seo/create-card-bounty";
 
-import IpfsStorage from "services/ipfs-service";
+// import IpfsStorage from "services/ipfs-service";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -58,31 +58,31 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const [, repo] = issue.repository.githubPath.split("/");
 
-  const card = await generateCard({
-    state: issue.state,
-    issueId: ghId,
-    title: issue.title,
-    repo,
-    ammount: issue.amount,
-    working: issue.working?.length || 0,
-    pr: issue.pullRequests?.length || 0,
-    proposal: issue?.mergeProposals?.length || 0
-  }).catch((e) => {
-    console.log("Error generating card", e);
-    return null;
-  });
+  // const card = await generateCard({
+  //   state: issue.state,
+  //   issueId: ghId,
+  //   title: issue.title,
+  //   repo,
+  //   ammount: issue.amount,
+  //   working: issue.working?.length || 0,
+  //   pr: issue.pullRequests?.length || 0,
+  //   proposal: issue?.mergeProposals?.length || 0
+  // }).catch((e) => {
+  //   console.log("Error generating card", e);
+  //   return null;
+  // });
 
-  if (!card) return;
+  // if (!card) return;
 
-  const img = Buffer.from(card.buffer);
-  const { hash } = await IpfsStorage.add(img).catch((e) => {
-    console.log("Failed to upload to IPFS", e);
-    return { hash: null };
-  });
+  // const img = Buffer.from(card.buffer);
+  // const { hash } = await IpfsStorage.add(img).catch((e) => {
+  //   console.log("Failed to upload to IPFS", e);
+  //   return { hash: null };
+  // });
 
-  await issue.update({ seoImage: hash });
+  // await issue.update({ seoImage: hash });
 
-  return res.status(200).json({ seoImage: hash });
+  return res.status(200).json({ seoImage: 'hash' });
 }
 
 export default async function Seo(req: NextApiRequest, res: NextApiResponse) {
