@@ -13,6 +13,7 @@ import { updateTransaction } from "@reducers/update-transaction";
 import useTransactions from "./useTransactions";
 import useApi from "./use-api";
 import { TransactionReceipt } from "bepro-js/dist/interfaces/web3-core";
+import { IActiveIssue } from "@contexts/issue";
 
 interface IUseBeProDefault{
   onSuccess?: (data?: any)=> void;
@@ -95,19 +96,25 @@ export default function useBepro(props?: IUseBeProDefault){
     })
   }
   
-  async function handleReedemIssue(networkIssueId: number): Promise<TransactionReceipt | Error> {
+  async function handleReedemIssue(networkIssueId: number, 
+      repoId: string,
+      ghId: string,
+      updateIssue: (repoId: string, ghId: string) => Promise<IActiveIssue>
+  ): Promise<TransactionReceipt | Error> {
     return new Promise(async(resolve, reject)=>{
       const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue }, activeNetwork);
       dispatch(redeemTx);
-
       waitForRedeem(networkIssueId, activeNetwork?.name)
-        .then(()=> onSuccess?.())
+        .then(() => {
+          onSuccess?.()
+        })
 
       await BeproService.network
       .redeemIssue(networkIssueId)
       .then((txInfo) => {
         // Review: Review processEnvets are working correctly
         processEvent(`redeem-issue`, txInfo.blockNumber, networkIssueId).then(()=> {
+          updateIssue(repoId, ghId) 
           onSuccess?.()
         })
         txWindow.updateItem(redeemTx.payload.id, BeproService.parseTransaction(txInfo, redeemTx.payload));
