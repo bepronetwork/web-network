@@ -105,9 +105,7 @@ export default function useBepro(props?: IUseBeProDefault){
       const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue }, activeNetwork);
       dispatch(redeemTx);
       waitForRedeem(networkIssueId, activeNetwork?.name)
-        .then(() => {
-          onSuccess?.()
-        })
+        .then(() => onSuccess?.() )
 
       await BeproService.network
       .redeemIssue(networkIssueId)
