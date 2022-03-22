@@ -30,7 +30,7 @@ import useNetwork from "x-hooks/use-network";
 export default function PullRequest() {
   const router = useRouter();
   const { activeRepo } = useRepos();
-  const { activeIssue, addNewComment } = useIssue();
+  const { activeIssue, addNewComment, updateIssue } = useIssue();
 
   const { createReviewForPR } = useApi();
   const [showModal, setShowModal] = useState(false);
@@ -64,26 +64,24 @@ export default function PullRequest() {
         dispatch(addToast({
             type: "success",
             title: t("actions.success"),
-            content: t("pull-request:actions.review.success")
+            content: t("pull-request:actions.review.success"),
         }));
 
         setPullRequest({
           ...pullRequest,
-          comments: [...pullRequest.comments, response.data]
+          comments: [...pullRequest.comments, response.data],
         });
         addNewComment(pullRequest?.id, response.data);
 
         setIsExecuting(false);
-        handleCloseModal();
+        setShowModal(false);
       })
-      .catch((error) => {
+      .catch(() => {
         dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
-            content: t("pull-request:actions.review.error")
+            content: t("pull-request:actions.review.error"),
         }));
-
-        setIsExecuting(false);
       });
   }
 
@@ -103,7 +101,7 @@ export default function PullRequest() {
     if (review && pullRequest && user?.login) {
       setShowModal(true);
     }
-  }, [review, pullRequest, user?.login]);
+  }, []);
 
   return (
     <>
@@ -111,37 +109,38 @@ export default function PullRequest() {
       <CustomContainer>
         <div className="mt-3">
           <div className="row align-items-center bg-shadow border-radius-8 px-3 py-4">
-            <div className="col-8">
-              <span className="caption-large text-uppercase">
-                {t("pull-request:review", {
-                  count: pullRequest?.comments?.length
-                })}
-              </span>
-            </div>
+            <div className="row">
+              <div className="col-8">
+                <span className="caption-large text-uppercase">
+                  {t("pull-request:review", {
+                    count: pullRequest?.comments?.length,
+                  })}
+                </span>
+              </div>
 
-            <div className="col-2 p-0 d-flex justify-content-center">
-              {wallet?.address && user?.login && pullRequest?.state === "open" && (
-                <ReadOnlyButtonWrapper>
-                  <Button
-                    className="read-only-button"
-                    onClick={handleShowModal}
+              <div className="col-4 gap-2 p-0 d-flex justify-content-center">
+                {wallet?.address &&
+                  user?.login &&
+                  pullRequest?.state === "open" && (
+                    <ReadOnlyButtonWrapper>
+                      <Button
+                        className="read-only-button text-nowrap"
+                        onClick={handleShowModal}
+                      >
+                        {t("actions.make-a-review")}
+                      </Button>
+                    </ReadOnlyButtonWrapper>
+                  )}
+                
+                  <GithubLink
+                    repoId={String(activeRepo?.id)}
+                    forcePath={activeRepo?.githubPath}
+                    hrefPath={`pull/${pullRequest?.githubId || ""}`}
                   >
-                    {t("actions.make-a-review")}
-                  </Button>
-                </ReadOnlyButtonWrapper>
-              )}
+                    {t("actions.view-on-github")}
+                  </GithubLink>
+              </div>
             </div>
-
-            <div className="col-2 p-0">
-              <GithubLink
-                repoId={String(activeRepo?.id)}
-                forcePath={activeRepo?.githubPath}
-                hrefPath={`pull/${pullRequest?.githubId || ""}`}
-              >
-                {t("actions.view-on-github")}
-              </GithubLink>
-            </div>
-
             <div className="col-12 mt-4">
               {(pullRequest?.comments?.length > 0 &&
                 React.Children.toArray(pullRequest?.comments?.map((comment, index) => (
@@ -176,8 +175,8 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       ...(await serverSideTranslations(locale, [
         "common",
         "pull-request",
-        "connect-wallet-button"
-      ]))
-    }
+        "connect-wallet-button",
+      ])),
+    },
   };
 };
