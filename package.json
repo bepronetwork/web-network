@@ -16,7 +16,7 @@
     "start": "next start",
     "make-seo": "node make-seo.js",
     "schedules": "node schedules.js",
-    "lint": "npx eslint . --fix --ext .js,.jsx"
+    "lint": "npx eslint . --fix --ext .ts,.tsx"
   },
   "dependencies": {
     "@vlsergey/react-bootstrap-pagination": "^3.2.1",
