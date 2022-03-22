@@ -33,9 +33,9 @@
     "camelcase": 0,
     "no-underscore-dangle": 0,
     "class-methods-use-this": 1,
-    "no-unused-vars": 1,
     "@typescript-eslint/no-empty-function": 1,
     "@typescript-eslint/ban-ts-comment": 0,
+    "no-async-promise-executor": 0,
     "complexity": ["warn", 5],
     "max-len": [
       "warn",
@@ -44,6 +44,7 @@
         "ignoreComments": true
       }
     ],
+    // "@typescript-eslint/no-var-requires":["warn"],
     "no-console": ["error", { "allow": ["error", "log", "warn", "table", "debug"] }],
     "no-undef": 1,
     "eqeqeq": 1,
@@ -70,5 +71,6 @@
         "alphabetize": { "order": "asc", "ignoreCase": true }
       }
     ]
-  }
+  },
+  "ignorePatterns": ["**/*.js"]
 }

@@ -5,7 +5,6 @@ import { ToastNotification } from "./toast-notification";
 import {
   BlockTransaction,
   SimpleBlockTransactionPayload,
-  Transaction,
   UpdateBlockTransaction
 } from "./transaction";
 
