@@ -120,6 +120,7 @@ export default function useBepro(props?: IUseBeProDefault) {
       .then((txInfo) => {
         // Review: Review processEnvets are working correctly
         processEvent(`redeem-issue`, txInfo.blockNumber, networkIssueId).then(()=> {
+          txWindow.updateItem(redeemTx.payload.id, BeproService.parseTransaction(txInfo, redeemTx.payload));
           updateIssue(repoId, ghId) 
           onSuccess?.()
         })

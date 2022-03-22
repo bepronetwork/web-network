@@ -36,7 +36,7 @@
     "@typescript-eslint/no-empty-function": 1,
     "@typescript-eslint/ban-ts-comment": 0,
     "no-async-promise-executor": 0,
-    "complexity": ["warn", 5],
+    // "complexity": ["warn", 5],
     "max-len": [
       "warn",
       {

@@ -118,8 +118,8 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
-  async function getIssue(repoId: string,
-                          ghId: string,
+  async function getIssue(repoId: string | number, 
+                          ghId: string | number,
                           networkName = BEPRO_NETWORK_NAME) {
     return client
       .get<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`)

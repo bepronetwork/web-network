@@ -20,6 +20,8 @@ import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
 import { useRepos } from "contexts/repos";
 
+import { TabbedNavigationItem } from "interfaces/tabbed-navigation";
+
 import useApi from "x-hooks/use-api";
 import useMergeData from "x-hooks/use-merge-data";
 import useOctokit from "x-hooks/use-octokit";
@@ -49,7 +51,7 @@ export default function PageIssue() {
 
   const { id, repoId } = router.query;
 
-  const tabs = [
+  const tabs: TabbedNavigationItem[] = [
     {
       eventKey: "proposals",
       title: (
@@ -90,10 +92,6 @@ export default function PageIssue() {
       description: t("description_pull-request")
     }
   ];
-
-  function getDefaultActiveTab() {
-    return tabs.find((tab) => tab.isEmpty === false)?.eventKey;
-  }
 
   function getRepoForked() {
     if (!activeRepo || !user?.login) return;
@@ -189,7 +187,6 @@ export default function PageIssue() {
         wallet?.address && (
           <CustomContainer className="mb-4">
             <TabbedNavigation
-              defaultActiveKey={getDefaultActiveTab()}
               className="issue-tabs"
               tabs={tabs}
               collapsable
