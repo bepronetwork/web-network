@@ -1,27 +1,29 @@
-import { formatNumberToNScale } from "@helpers/formatNumber";
-import { IssueState } from "@interfaces/issue-data";
 import { TwitterApi } from "twitter-api-v2";
+
+import { formatNumberToNScale } from "helpers/formatNumber";
+
+import { IssueState } from "interfaces/issue-data";
 
 function handleState(currentState: IssueState) {
   switch (currentState) {
-    case "draft": {
-      return "𝗗𝗥𝗔𝗙𝗧";
-    }
-    case "open": {
-      return "𝗢𝗣𝗘𝗡";
-    }
-    case "ready": {
-      return "𝐑𝐄𝐀𝐃𝐘";
-    }
-    case "closed": {
-      return "𝐂𝐋𝐎𝐒𝐄𝐃";
-    }
-    case "canceled": {
-      return "𝗖𝗔𝗡𝗖𝗘𝗟𝗘𝗗";
-    }
-    default: {
-      return;
-    }
+  case "draft": {
+    return "𝗗𝗥𝗔𝗙𝗧";
+  }
+  case "open": {
+    return "𝗢𝗣𝗘𝗡";
+  }
+  case "ready": {
+    return "𝐑𝐄𝐀𝐃𝐘";
+  }
+  case "closed": {
+    return "𝐂𝐋𝐎𝐒𝐄𝐃";
+  }
+  case "canceled": {
+    return "𝗖𝗔𝗡𝗖𝗘𝗟𝗘𝗗";
+  }
+  default: {
+    return;
+  }
   }
 }
 
@@ -30,7 +32,7 @@ export default function twitterTweet({
   action,
   issue,
   issuePreviousState,
-  username,
+  username
 }: {
   type: "bounty" | "proposal";
   action:
@@ -61,16 +63,16 @@ export default function twitterTweet({
       appKey: process.env.NEXT_TWITTER_APIKEY,
       appSecret: process.env.NEXT_TWITTER_APIKEY_SECRET,
       accessToken: process.env.NEXT_TWITTER_ACCESS_TOKEN,
-      accessSecret: process.env.NEXT_TWITTER_ACCESS_SECRET,
+      accessSecret: process.env.NEXT_TWITTER_ACCESS_SECRET
     });
 
-    var title: string;
-    var body: string;
+    let title: string;
+    let body: string;
 
     const currentState: string = handleState(issue.state);
     const previousState: string = handleState(issuePreviousState);
     const issueTitle =
-      issue.title.length > 30 ? issue.title.slice(0, 30) + `...` : issue.title;
+      issue.title.length > 30 ? issue.title.slice(0, 30) + "..." : issue.title;
     const amount: string | number = formatNumberToNScale(issue.amount);
 
     if (type === "bounty" && action === "created") {
@@ -100,7 +102,7 @@ export default function twitterTweet({
       } regarding the bounty ${issueTitle}`;
     }
 
-    var Tweet = `
+    const Tweet = `
   ♾ Protocol Bounty ${title && title + "!"}
 
   ${body}
@@ -120,9 +122,7 @@ export default function twitterTweet({
           console.log("Error creating Tweet ->", err);
         });
     } else {
-      console.log(
-        "This Tweet cannot be created. Because it contains more than 280 characters"
-      );
+      console.log("This Tweet cannot be created. Because it contains more than 280 characters");
     }
   } else {
     console.log(".env from Twitter configuration is missing");

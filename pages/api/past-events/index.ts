@@ -1,10 +1,11 @@
-import models from '@db/models';
+import models from 'db/models';
 import {NextApiRequest, NextApiResponse} from 'next';
 import {Octokit} from 'octokit';
-import readCloseIssues from '@helpers/api/read-close-issues';
-import readRedeemIssue from '@helpers/api/read-redeem-issue';
-import networkBeproJs from '@helpers/api/handle-network-bepro';
 import { Op } from 'sequelize'
+
+import networkBeproJs from 'helpers/api/handle-network-bepro';
+import readCloseIssues from 'helpers/api/read-close-issues';
+import readRedeemIssue from 'helpers/api/read-redeem-issue';
 
 const octokit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
 
@@ -19,13 +20,13 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     }
   })
 
-  var end = 0
+  let end = 0
 
-  const networks = Array({
+  const networks = [{
     id: 1,
     name: process.env.NEXT_PUBLIC_BEPRO_NETWORK_NAME, 
     networkAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS
-  }, ...customNetworks)
+  }, ...customNetworks]
 
   for (const customNetwork of networks) {
     if (!customNetwork.networkAddress) return
@@ -50,13 +51,15 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
       console.log(`[${customNetwork.name}] Reading from ${start} to ${cEnd}; page: ${page} of ${pages}`);
       await network.getRedeemIssueEvents({fromBlock: start, toBlock: cEnd})
-                    .then(events => readRedeemIssue(events, {network, models, res, octokit, customNetworkId: customNetwork.id}))
+                    .then(events => 
+                      readRedeemIssue(events, {network, models, res, octokit, customNetworkId: customNetwork.id}))
                     .catch(error => {
                       console.log(`Error reading RedeemIssue`, error);
                     });
 
       await network.getCloseIssueEvents({fromBlock: start, toBlock: cEnd})
-                    .then(events => readCloseIssues(events, {network, models, res, octokit, customNetworkId: customNetwork.id}))
+                    .then(events => 
+                      readCloseIssues(events, {network, models, res, octokit, customNetworkId: customNetwork.id}))
                     .catch(error => {
                       console.log(`Error reading CloseIssue`, error);
                     });
@@ -79,12 +82,12 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 export default async function PastEvents(req: NextApiRequest, res: NextApiResponse) {
 
   switch (req.method.toLowerCase()) {
-    case 'get':
-      await get(req, res);
-      break;
+  case 'get':
+    await get(req, res);
+    break;
 
-    default:
-      res.status(405);
+  default:
+    res.status(405);
   }
 
   res.end();

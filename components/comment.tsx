@@ -1,10 +1,12 @@
-import { formatDate } from '@helpers/formatDate'
-import { useTranslation } from 'next-i18next'
-import Avatar from './avatar'
-import MarkedRender from './MarkedRender'
+import { useTranslation } from "next-i18next";
+
+import { formatDate } from "helpers/formatDate";
+
+import Avatar from "./avatar";
+import MarkedRender from "./MarkedRender";
 
 export default function Comment({ comment }) {
-  const { t } = useTranslation('bounty')
+  const { t } = useTranslation("bounty");
 
   return (
     <div className="mb-3">
@@ -19,8 +21,8 @@ export default function Comment({ comment }) {
       </p>
 
       <p className="p-small content-wrapper child mb-0 comment">
-        <MarkedRender source={comment?.body || t('no-comments-available')} />
+        <MarkedRender source={comment?.body || t("no-comments-available")} />
       </p>
     </div>
-  )
+  );
 }

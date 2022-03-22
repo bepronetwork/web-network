@@ -1,24 +1,26 @@
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { getTimeDifferenceInWords } from '@helpers/formatDate'
+import { useEffect, useState } from "react";
 
-import LockedIcon from 'assets/icons/locked-icon'
+import Link from "next/link";
+import { useRouter } from "next/router";
 
-import Button from '@components/button'
-import Avatar from '@components/avatar'
-import Translation from '@components/translation'
-import ReadOnlyButtonWrapper from '@components/read-only-button-wrapper'
-import PullRequestLabels from '@components/pull-request-labels'
+import LockedIcon from "assets/icons/locked-icon";
 
-import { useAuthentication } from '@contexts/authentication'
+import Avatar from "components/avatar";
+import Button from "components/button";
+import PullRequestLabels from "components/pull-request-labels";
+import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
+import Translation from "components/translation";
 
-import { formatNumberToNScale } from '@helpers/formatNumber'
+import { useAuthentication } from "contexts/authentication";
+import { IActiveIssue } from "contexts/issue";
 
-import useOctokit from '@x-hooks/use-octokit'
-import useNetwork from '@x-hooks/use-network'
-import { IActiveIssue } from '@contexts/issue'
-import { pullRequest } from '@interfaces/issue-data'
+import { getTimeDifferenceInWords } from "helpers/formatDate";
+import { formatNumberToNScale } from "helpers/formatNumber";
+
+import { pullRequest } from "interfaces/issue-data";
+
+import useNetwork from "x-hooks/use-network";
+import useOctokit from "x-hooks/use-octokit";
 
 interface IPullRequestItem {
   issue: IActiveIssue;
@@ -27,67 +29,66 @@ interface IPullRequestItem {
 
 export default function PullRequestItem({
   issue,
-  pullRequest,
-}:IPullRequestItem) {
+  pullRequest
+}: IPullRequestItem) {
+  const router = useRouter();
+  const { getCommitsOfPr, getCommit } = useOctokit();
+  const [linesOfCode, setLinesOfCode] = useState(0);
 
-  const router = useRouter()
-  const { getCommitsOfPr, getCommit } = useOctokit()
-  const [linesOfCode, setLinesOfCode] = useState(0)
+  const { getURLWithNetwork } = useNetwork();
 
-  const { getURLWithNetwork } = useNetwork()
-
-  const { user } = useAuthentication()
+  const { user } = useAuthentication();
 
   function handleReviewClick() {
-    router.push(
-      getURLWithNetwork('/pull-request', {
+    router.push(getURLWithNetwork("/pull-request", {
         id: issue?.githubId,
         repoId: issue?.repository_id,
         prId: pullRequest?.githubId,
         review: true
-      })
-    )
+    }));
   }
 
   function canReview() {
-    return pullRequest?.state === 'open' && !!user?.login
+    return pullRequest?.state === "open" && !!user?.login;
   }
 
   async function getPullRequestInfo() {
     try {
-      const repositoryPath = issue.repository.githubPath
-      const [owner, repo] = repositoryPath.split('/')
-      let lines = 0
-      
-      const { data } = await getCommitsOfPr(+pullRequest?.githubId, repositoryPath)
-      
-      for(const commit of data) {
-        const {data: { stats }} = await getCommit(owner, repo, commit.sha)
-        lines += stats.total
+      const repositoryPath = issue.repository.githubPath;
+      const [owner, repo] = repositoryPath.split("/");
+      let lines = 0;
+
+      const { data } = await getCommitsOfPr(+pullRequest?.githubId,
+                                            repositoryPath);
+
+      for (const commit of data) {
+        const {
+          data: { stats }
+        } = await getCommit(owner, repo, commit.sha);
+        lines += stats.total;
       }
 
-      setLinesOfCode(lines)
+      setLinesOfCode(lines);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 
   useEffect(() => {
-    if (pullRequest){
-      getPullRequestInfo()
+    if (pullRequest) {
+      getPullRequestInfo();
     }
-    
-  }, [pullRequest])
-  
+  }, [pullRequest]);
+
   return (
     <>
       <div className="content-list-item proposal">
         <Link
           passHref
-          href={getURLWithNetwork('/pull-request', {
+          href={getURLWithNetwork("/pull-request", {
             id: issue?.githubId,
             repoId: issue?.repository_id,
-            prId: pullRequest?.githubId,
+            prId: pullRequest?.githubId
           })}
         >
           <a className="text-decoration-none text-white">
@@ -95,22 +96,24 @@ export default function PullRequestItem({
               <div className="col-6 d-flex align-items-center caption-small text-uppercase text-white">
                 <Avatar userLogin={pullRequest?.githubLogin} />
                 <span className="ml-2">
-                  #{pullRequest?.githubId} <Translation label={'misc.by'} /> @
+                  #{pullRequest?.githubId} <Translation label={"misc.by"} /> @
                   {pullRequest?.githubLogin}
                 </span>
-                <div className='ml-3 d-flex'>
-                  <PullRequestLabels merged={pullRequest.merged} isMergeable={pullRequest.isMergeable} />
+                <div className="ml-3 d-flex">
+                  <PullRequestLabels
+                    merged={pullRequest.merged}
+                    isMergeable={pullRequest.isMergeable}
+                  />
                 </div>
               </div>
 
               <div className="col-1 caption-small text-uppercase text-white d-flex justify-content-center">
-                {formatNumberToNScale(linesOfCode)} <span className="text-gray ml-1">LOC</span>
+                {formatNumberToNScale(linesOfCode)}{" "}
+                <span className="text-gray ml-1">LOC</span>
               </div>
 
               <div className="col-2 caption-small text-uppercase text-white d-flex justify-content-center">
-                <span>
-                  {pullRequest?.comments?.length || 0}
-                </span>
+                <span>{pullRequest?.comments?.length || 0}</span>
 
                 <span className="text-gray ml-1">
                   <Translation
@@ -122,7 +125,9 @@ export default function PullRequestItem({
               </div>
 
               <div className="col-2 caption-small text-uppercase text-gray d-flex justify-content-start">
-                {getTimeDifferenceInWords(new Date(pullRequest?.createdAt), new Date())} ago
+                {getTimeDifferenceInWords(new Date(pullRequest?.createdAt),
+                                          new Date())}{" "}
+                ago
               </div>
 
               <div className="col-1 d-flex justify-content-center">
@@ -131,8 +136,8 @@ export default function PullRequestItem({
                     className="mr-3 read-only-button"
                     disabled={!canReview()}
                     onClick={(ev) => {
-                      ev.preventDefault()
-                      handleReviewClick()
+                      ev.preventDefault();
+                      handleReviewClick();
                     }}
                   >
                     {!canReview() && <LockedIcon className="me-2" />}
@@ -147,5 +152,5 @@ export default function PullRequestItem({
         </Link>
       </div>
     </>
-  )
+  );
 }

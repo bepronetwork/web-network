@@ -17,7 +17,7 @@ export default function Button({
   outline,
   transparent,
   rounded,
-  className = ``,
+  className = "",
   asAnchor = false,
   applyTextColor = true,
   textClass,
@@ -26,14 +26,14 @@ export default function Button({
   function getClass(): string {
     const type = `btn-${outline ? `outline-${color}` : color}`;
     const textColor =
-      textClass || (!outline && color !== "white" && "text-white") || ``;
+      textClass || (!outline && color !== "white" && "text-white") || "";
     let append = className;
 
     if (transparent) append += " bg-transparent border-transparent";
 
-    if (rounded) append += ` circle-2 p-0`;
+    if (rounded) append += " circle-2 p-0";
 
-    if (outline) append += ` bg-opac-hover-25`;
+    if (outline) append += " bg-opac-hover-25";
 
     return `btn ${type} ${
       applyTextColor ? textColor : ""

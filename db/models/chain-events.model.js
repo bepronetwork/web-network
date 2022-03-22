@@ -1,26 +1,31 @@
-'use strict';
-const {Model, DataTypes} = require('sequelize');
+"use strict";
+const { Model, DataTypes } = require("sequelize");
 
 class ChainEvents extends Model {
-  static init(sequelize){
+  static init(sequelize) {
     super.init({
-      id: {type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true, unique: true},
-      name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      lastBlock: {
-        type: DataTypes.INTEGER,
-      },
-    }, {
-      sequelize,
-      modelName: 'chainEvents',
-      tableName: 'chainEvents',
-      timestamps: false,
-    });
+        id: {
+          type: DataTypes.INTEGER,
+          autoIncrement: true,
+          primaryKey: true,
+          unique: true
+        },
+        name: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          unique: true
+        },
+        lastBlock: {
+          type: DataTypes.INTEGER
+        }
+    },
+               {
+        sequelize,
+        modelName: "chainEvents",
+        tableName: "chainEvents",
+        timestamps: false
+               });
   }
-  static associate(models) {}
 }
 
 module.exports = ChainEvents;

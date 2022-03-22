@@ -1,20 +1,21 @@
-import { useState } from 'react'
-import { ProgressBar } from 'react-bootstrap'
+import { useState } from "react";
+import { ProgressBar } from "react-bootstrap";
 
-import LockedIcon from '@assets/icons/locked-icon'
-import ArrowRightLine from '@assets/icons/arrow-right-line'
+import { useTranslation } from "next-i18next";
 
-import Step from '@components/step'
-import Button from '@components/button'
-import InputNumber from '@components/input-number'
-import UnlockBeproModal from '@components/unlock-bepro-modal'
+import ArrowRightLine from "assets/icons/arrow-right-line";
+import LockedIcon from "assets/icons/locked-icon";
 
-import { useAuthentication } from '@contexts/authentication'
+import Button from "components/button";
+import InputNumber from "components/input-number";
+import Step from "components/step";
+import UnlockBeproModal from "components/unlock-bepro-modal";
 
-import { formatNumberToCurrency } from '@helpers/formatNumber'
+import { useAuthentication } from "contexts/authentication";
 
-import { BeproService } from '@services/bepro-service'
-import { useTranslation } from 'next-i18next'
+import { formatNumberToCurrency } from "helpers/formatNumber";
+
+import { BeproService } from "services/bepro-service";
 
 export default function LockBeproStep({
   data,
@@ -24,80 +25,82 @@ export default function LockBeproStep({
   handleChange,
   handleChangeStep
 }) {
-  const { t } = useTranslation(['common', 'custom-network'])
+  const { t } = useTranslation(["common", "custom-network"]);
 
-  const [isLocking, setIsLocking] = useState(false)
-  const [isUnlocking, setIsUnlocking] = useState(false)
-  const [showUnlockBepro, setShowUnlockBepro] = useState(false)
+  const [isLocking, setIsLocking] = useState(false);
+  const [isUnlocking, setIsUnlocking] = useState(false);
+  const [showUnlockBepro, setShowUnlockBepro] = useState(false);
 
-  const { updateWalletBalance } = useAuthentication()
+  const { updateWalletBalance } = useAuthentication();
 
   const lockedPercent =
-    ((data.amountLocked || 0) / (data.amountNeeded || 0)) * 100
-  const lockingPercent = ((data.amount || 0) / (data.amountNeeded || 0)) * 100
-  const maxPercent = 100 - lockedPercent
-  const maxValue = Math.min(
-    balance.beproAvailable,
-    +data.amountNeeded - +data.amountLocked
-  )
+    ((data.amountLocked || 0) / (data.amountNeeded || 0)) * 100;
+  const lockingPercent = ((data.amount || 0) / (data.amountNeeded || 0)) * 100;
+  const maxPercent = 100 - lockedPercent;
+  const maxValue = Math.min(balance.beproAvailable,
+                            +data.amountNeeded - +data.amountLocked);
   const textAmountClass =
-    data.amount > balance.beproAvailable ? 'text-danger' : 'text-primary'
-  const amountsClass = data.amount > maxValue ? 'danger' : 'success'
+    data.amount > balance.beproAvailable ? "text-danger" : "text-primary";
+  const amountsClass = data.amount > maxValue ? "danger" : "success";
 
   async function handleLock() {
-    setIsLocking(true)
+    setIsLocking(true);
 
     try {
-      const isApproved = await BeproService.networkFactory.isApprovedSettlerToken(undefined, 1)
+      const isApproved =
+        await BeproService.networkFactory.isApprovedSettlerToken(undefined, 1);
 
       if (!isApproved)
-        await BeproService.networkFactory.approveSettlerERC20Token()
+        await BeproService.networkFactory.approveSettlerERC20Token();
 
-      const amount = data.amount
+      const amount = data.amount;
 
-      await BeproService.startNetworkFactory()
+      await BeproService.startNetworkFactory();
 
       BeproService.networkFactory
         .lock(amount)
         .then(() => {
-          handleChange({ label: 'amountLocked', value: amount })
-          handleChange({ label: 'amount', value: 0 })
-          updateWalletBalance()
+          handleChange({ label: "amountLocked", value: amount });
+          handleChange({ label: "amount", value: 0 });
+          updateWalletBalance();
         })
         .catch(console.log)
-        .finally(() => setIsLocking(false))
+        .finally(() => setIsLocking(false));
     } catch (error) {
-      console.log(error)
-      setIsLocking(false)
+      console.log(error);
+      setIsLocking(false);
     }
   }
 
   async function handleUnLock() {
-    setIsUnlocking(true)
+    setIsUnlocking(true);
 
-    await BeproService.startNetworkFactory()
+    await BeproService.startNetworkFactory();
 
-    BeproService.networkFactory.unlock().then(() => {
-      handleChange({ label: 'amountLocked', value: 0 })
-      handleChange({ label: 'amount', value: 0 })
-      updateWalletBalance()
-    })
-    .catch(error => {
-      console.log('Failed to Unlock', error)
-    }).finally(() => setIsUnlocking(false))
+    BeproService.networkFactory
+      .unlock()
+      .then(() => {
+        handleChange({ label: "amountLocked", value: 0 });
+        handleChange({ label: "amount", value: 0 });
+        updateWalletBalance();
+      })
+      .catch((error) => {
+        console.log("Failed to Unlock", error);
+      })
+      .finally(() => setIsUnlocking(false));
   }
 
   function handleShowUnlockModal() {
-    setShowUnlockBepro(true)
+    setShowUnlockBepro(true);
   }
 
   function handleCloseUnlockModal() {
-    setShowUnlockBepro(false)
+    setShowUnlockBepro(false);
   }
 
   return (
     <Step
-      title={t('custom-network:steps.lock.title')}
+      title={t("custom-network:steps.lock.title")}
       index={step}
       activeStep={currentStep}
       validated={data.validated}
@@ -105,7 +108,7 @@ export default function LockBeproStep({
     >
       <div className="row mb-4">
         <span className="caption-small text-gray">
-          {t('custom-network:steps.lock.you-need-to-lock')}
+          {t("custom-network:steps.lock.you-need-to-lock")}
         </span>
       </div>
 
@@ -115,34 +118,34 @@ export default function LockBeproStep({
             <div className="col px-0">
               <div className="row mb-2">
                 <label htmlFor="" className="caption-medium text-gray">
-                  <span className="text-primary">{t('$bepro')}</span>{' '}
-                  {t('transactions.amount')}
+                  <span className="text-primary">{t("$bepro")}</span>{" "}
+                  {t("transactions.amount")}
                 </label>
               </div>
 
               <div className="row mx-0 bg-dark-gray border-radius-8 amount-input">
                 <InputNumber
-                  classSymbol={`text-primary`}
+                  classSymbol={"text-primary"}
                   max={maxValue}
                   value={data.amount}
                   error={data.amount > maxValue}
                   setMaxValue={() =>
-                    handleChange({ label: 'amount', value: maxValue })
+                    handleChange({ label: "amount", value: maxValue })
                   }
                   min={0}
-                  placeholder={'0'}
+                  placeholder={"0"}
                   thousandSeparator
                   decimalSeparator="."
                   decimalScale={18}
                   onValueChange={(params) =>
-                    handleChange({ label: 'amount', value: params.floatValue })
+                    handleChange({ label: "amount", value: params.floatValue })
                   }
                 />
 
                 <div className="d-flex caption-small justify-content-between align-items-center p-20">
                   <span className="text-ligth-gray">
-                    <span className="text-primary">{t('$bepro')}</span>{' '}
-                    {t('misc.available')}
+                    <span className="text-primary">{t("$bepro")}</span>{" "}
+                    {t("misc.available")}
                   </span>
 
                   <div className="d-flex align-items-center">
@@ -161,10 +164,8 @@ export default function LockBeproStep({
                         </span>
 
                         <span className={`${textAmountClass} ml-1`}>
-                          {formatNumberToCurrency(
-                            parseFloat(balance.beproAvailable) -
-                              parseFloat(data.amount)
-                          )}
+                          {formatNumberToCurrency(parseFloat(balance.beproAvailable) -
+                              parseFloat(data.amount))}
                         </span>
                       </>
                     )}
@@ -176,10 +177,10 @@ export default function LockBeproStep({
                 <>
                   <div className="row mt-4">
                     <p className="caption-small text-gray">
-                      {t('transactions.types.unlock')}{' '}
-                      <span className="text-primary">{t('$bepro')}</span>{' '}
-                      {t('misc.by')} {t('misc.giving-away')}{' '}
-                      <span className="text-purple">{t('$oracles')}</span>
+                      {t("transactions.types.unlock")}{" "}
+                      <span className="text-primary">{t("$bepro")}</span>{" "}
+                      {t("misc.by")} {t("misc.giving-away")}{" "}
+                      <span className="text-purple">{t("$oracles")}</span>
                     </p>
                   </div>
 
@@ -190,9 +191,9 @@ export default function LockBeproStep({
                     <div className="d-flex justify-content-between px-0">
                       <span className="text-ligth-gray">
                         <span className="text-purple text-uppercase">
-                          {t('$oracles')}
-                        </span>{' '}
-                        {t('misc.available')}
+                          {t("$oracles")}
+                        </span>{" "}
+                        {t("misc.available")}
                       </span>
 
                       <span className="text-gray">
@@ -210,15 +211,15 @@ export default function LockBeproStep({
 
         <div className="col bg-dark-gray border-radius-8 p-20">
           <p className="caption-medium text-gray mb-4">
-            <span className="text-primary">{t('$bepro')}</span>{' '}
-            {t('misc.locked')}
+            <span className="text-primary">{t("$bepro")}</span>{" "}
+            {t("misc.locked")}
           </p>
 
           <div className="d-flex justify-content-between caption-large mb-3 amount-input">
             <div className="d-flex align-items-center">
               <span
                 className={`text-${
-                  (lockedPercent >= 100 && 'success') || 'white'
+                  (lockedPercent >= 100 && "success") || "white"
                 } mr-1`}
               >
                 {formatNumberToCurrency(data.amountLocked || 0, {
@@ -231,9 +232,7 @@ export default function LockBeproStep({
                   <ArrowRightLine />
 
                   <span className="ml-1">
-                    {formatNumberToCurrency(
-                      parseFloat(data.amountLocked) + parseFloat(data.amount)
-                    )}
+                    {formatNumberToCurrency(parseFloat(data.amountLocked) + parseFloat(data.amount))}
                   </span>
                 </div>
               )}
@@ -241,10 +240,10 @@ export default function LockBeproStep({
 
             <span
               className={`text-${
-                (lockedPercent >= 100 && 'success') || 'gray'
+                (lockedPercent >= 100 && "success") || "gray"
               }`}
             >
-              {(lockedPercent >= 100 && 'full') ||
+              {(lockedPercent >= 100 && "full") ||
                 formatNumberToCurrency(data.amountNeeded || 0, {
                   maximumFractionDigits: 18
                 })}
@@ -270,7 +269,7 @@ export default function LockBeproStep({
           <div className="d-flex align-items-center caption-large text-white amount-input">
             <span
               className={`text-${
-                (lockedPercent >= 100 && 'success') || 'white'
+                (lockedPercent >= 100 && "success") || "white"
               } mr-1`}
             >
               {formatNumberToCurrency(lockedPercent, {
@@ -310,12 +309,12 @@ export default function LockBeproStep({
                   <LockedIcon width={12} height={12} className="mr-1" />
                 )}
               <span>
-                {t('transactions.types.lock')} {t('$bepro')}
+                {t("transactions.types.lock")} {t("$bepro")}
               </span>
               {isLocking ? (
                 <span className="spinner-border spinner-border-xs ml-1" />
               ) : (
-                ''
+                ""
               )}
             </Button>
 
@@ -339,5 +338,5 @@ export default function LockBeproStep({
         onCloseClick={handleCloseUnlockModal}
       />
     </Step>
-  )
+  );
 }

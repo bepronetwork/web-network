@@ -1,13 +1,13 @@
 export function psReadAsText(file: File) {
   return new Promise((resolve, reject) => {
-    const fr = new FileReader()
+    const fr = new FileReader();
 
     fr.onload = () => {
-      resolve(fr.result)
-    }
+      resolve(fr.result);
+    };
 
-    fr.onerror = reject
+    fr.onerror = reject;
 
-    fr.readAsText(file)
-  })
+    fr.readAsText(file);
+  });
 }

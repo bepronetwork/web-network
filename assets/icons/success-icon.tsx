@@ -1,4 +1,4 @@
-import { SVGProps } from 'react'
+import { SVGProps } from "react";
 
 export default function SuccessIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -16,5 +16,5 @@ export default function SuccessIcon(props: SVGProps<SVGSVGElement>) {
         fill="#35E0AD"
       />
     </svg>
-  )
+  );
 }

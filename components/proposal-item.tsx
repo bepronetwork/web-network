@@ -1,17 +1,24 @@
-import { Proposal } from "interfaces/proposal";
+import { useContext } from "react";
+
 import Link from "next/link";
+
+import LockedIcon from "assets/icons/locked-icon";
+
 import PercentageProgressBar from "components/percentage-progress-bar";
 import ProposalProgressSmall from "components/proposal-progress-small";
-import { useContext } from "react";
+
 import { ApplicationContext } from "contexts/application";
-import Button from "./button";
-import Translation from "./translation";
-import LockedIcon from "assets/icons/locked-icon";
-import useNetworkTheme from "x-hooks/use-network";
-import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
-import { IssueData } from "interfaces/issue-data";
 import { useIssue } from "contexts/issue";
-import useBepro from "@x-hooks/use-bepro";
+
+import { IssueData } from "interfaces/issue-data";
+import { Proposal } from "interfaces/proposal";
+
+import useBepro from "x-hooks/use-bepro";
+import useNetworkTheme from "x-hooks/use-network";
+
+import Button from "./button";
+import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
+import Translation from "./translation";
 
 interface Options {
   proposal: Proposal;
@@ -24,32 +31,32 @@ export default function ProposalItem({
   proposal,
   issue,
   isFinalized,
-  isDisputable = false,
+  isDisputable = false
 }: Options) {
   const {
-    state: { beproStaked },
+    state: { beproStaked }
   } = useContext(ApplicationContext);
   const { networkIssue, getNetworkIssue } = useIssue();
-  const {handlerDisputeProposal} = useBepro()
+  const { handlerDisputeProposal } = useBepro();
   const { getURLWithNetwork } = useNetworkTheme();
   const networkProposals = networkIssue?.networkProposals?.[proposal?.id];
 
   async function handleDispute() {
     if (!isDisputable || isFinalized) return;
-    handlerDisputeProposal(networkIssue?._id, +proposal.scMergeId)
-    .then(()=> getNetworkIssue())
+    handlerDisputeProposal(networkIssue?._id, +proposal.scMergeId).then(() =>
+      getNetworkIssue());
   }
 
   function getColors() {
     if (isFinalized && !networkProposals?.isDisputed && proposal.isMerged) {
-      return `success`;
+      return "success";
     }
 
     if (networkProposals?.isDisputed || (isFinalized && !proposal.isMerged)) {
-      return `danger`;
+      return "danger";
     }
 
-    return `purple`;
+    return "purple";
   }
 
   function getLabel() {
@@ -73,68 +80,68 @@ export default function ProposalItem({
       href={getURLWithNetwork("/proposal", {
         id: issue.githubId,
         repoId: issue.repository_id,
-        proposalId: proposal?.id,
+        proposalId: proposal?.id
       })}
     >
       <div className="content-list-item proposal cursor-pointer">
-          <div className="rounded row align-items-center">
-            <div
-              className={`col-3 caption-small mt-2 text-uppercase text-${
-                getColors() === "purple" ? "white" : getColors()
-              }`}
-            >
-              <Translation ns="pull-request" label={"abbreviation"} /> #
-              {proposal?.githubLogin} <Translation label={"misc.by"} />{" "}
-              {proposal?.githubLogin && ` @${proposal?.githubLogin}`}
-            </div>
-            <div className="col-5 d-flex justify-content-between mb-2 text-white">
-              {networkProposals?.prAmounts &&
-                networkProposals?.prAmounts?.map((value, i) => (
-                  <PercentageProgressBar
-                    key={`pg-${i}`}
-                    textClass={`caption-small p-small text-${getColors()}`}
-                    pgClass={`bg-${getColors()}`}
-                    className={
-                      (i + 1 < networkProposals?.prAmounts?.length && `me-2`) ||
-                      ``
-                    }
-                    value={value}
-                    total={issue.amount}
-                  />
-                ))}
-            </div>
-
-            <div className="col-4 d-flex">
-              <div className="col-9 offset-1 text-white">
-                <ProposalProgressSmall
-                  pgClass={`${getColors()}`}
-                  value={+networkProposals?.disputes}
-                  total={beproStaked}
-                  textClass={`pb-2 text-${getColors()}`}
+        <div className="rounded row align-items-center">
+          <div
+            className={`col-3 caption-small mt-2 text-uppercase text-${
+              getColors() === "purple" ? "white" : getColors()
+            }`}
+          >
+            <Translation ns="pull-request" label={"abbreviation"} /> #
+            {proposal?.githubLogin} <Translation label={"misc.by"} />{" "}
+            {proposal?.githubLogin && ` @${proposal?.githubLogin}`}
+          </div>
+          <div className="col-5 d-flex justify-content-between mb-2 text-white">
+            {networkProposals?.prAmounts &&
+              networkProposals?.prAmounts?.map((value, i) => (
+                <PercentageProgressBar
+                  key={`pg-${i}`}
+                  textClass={`caption-small p-small text-${getColors()}`}
+                  pgClass={`bg-${getColors()}`}
+                  className={
+                    (i + 1 < networkProposals?.prAmounts?.length && "me-2") ||
+                    ""
+                  }
+                  value={value}
+                  total={issue.amount}
                 />
-              </div>
+              ))}
+          </div>
 
-              <div className="col-1 offset-1 justify-content-end d-flex">
-                <ReadOnlyButtonWrapper>
-                  <Button
-                    color={getColors()}
-                    disabled={!isDisputable || !networkProposals}
-                    outline={!isDisputable}
-                    className={`align-self-center mb-2 ms-3 read-only-button`}
-                    onClick={(ev) => {
-                      ev.stopPropagation();
-                      handleDispute();
-                    }}
-                  >
-                    {!isDisputable && getColors() !== "success" && (
-                      <LockedIcon className={`me-2 text-${getColors()}`} />
-                    )}
-                    <span>{getLabel()}</span>
-                  </Button>
-                </ReadOnlyButtonWrapper>
-              </div>
+          <div className="col-4 d-flex">
+            <div className="col-9 offset-1 text-white">
+              <ProposalProgressSmall
+                pgClass={`${getColors()}`}
+                value={+networkProposals?.disputes}
+                total={beproStaked}
+                textClass={`pb-2 text-${getColors()}`}
+              />
+            </div>
+
+            <div className="col-1 offset-1 justify-content-end d-flex">
+              <ReadOnlyButtonWrapper>
+                <Button
+                  color={getColors()}
+                  disabled={!isDisputable || !networkProposals}
+                  outline={!isDisputable}
+                  className={"align-self-center mb-2 ms-3 read-only-button"}
+                  onClick={(ev) => {
+                    ev.stopPropagation();
+                    handleDispute();
+                  }}
+                >
+                  {!isDisputable && getColors() !== "success" && (
+                    <LockedIcon className={`me-2 text-${getColors()}`} />
+                  )}
+                  <span>{getLabel()}</span>
+                </Button>
+              </ReadOnlyButtonWrapper>
             </div>
           </div>
+        </div>
       </div>
     </Link>
   );

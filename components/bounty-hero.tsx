@@ -1,12 +1,15 @@
-import Avatar from "components/avatar";
-import GithubInfo from "@components/github-info";
-import Translation from "./translation";
-import CustomContainer from "./custom-container";
-import { useIssue } from "contexts/issue";
-import BountyStatusInfo from "./bounty-status-info";
-import DateLabel from "./date-label";
 import { useTranslation } from "next-i18next";
+
+import Avatar from "components/avatar";
+import GithubInfo from "components/github-info";
+
+import { useIssue } from "contexts/issue";
+
+import BountyStatusInfo from "./bounty-status-info";
+import CustomContainer from "./custom-container";
+import DateLabel from "./date-label";
 import PriceConversor from "./price-conversor";
+import Translation from "./translation";
 
 export default function BountyHero() {
   const { t } = useTranslation("bounty");
@@ -25,11 +28,14 @@ export default function BountyHero() {
               <BountyStatusInfo issueState={activeIssue?.state} />
 
               <div className="d-flex align-items-center">
-                <Avatar className="me-2" userLogin={activeIssue?.creatorGithub} />{" "}
+                <Avatar
+                  className="me-2"
+                  userLogin={activeIssue?.creatorGithub}
+                />{" "}
                 <GithubInfo
                   parent="hero"
                   variant="user"
-                  label={[`@`, activeIssue?.creatorGithub].join(``)}
+                  label={["@", activeIssue?.creatorGithub].join("")}
                 />
               </div>
 
@@ -41,11 +47,11 @@ export default function BountyHero() {
                     label={activeIssue?.repository?.githubPath}
                   />
                 )) ||
-                  ``}
+                  ""}
               </span>
 
               <span className="caption-small text-ligth-gray text-uppercase">
-                <Translation label={`branch`} />
+                <Translation label={"branch"} />
                 <span className="text-primary">:{activeIssue?.branch}</span>
               </span>
             </div>
@@ -83,12 +89,18 @@ export default function BountyHero() {
               </div>
 
               {activeIssue?.createdAt && (
-                <DateLabel date={activeIssue?.createdAt} className="text-white" />
+                <DateLabel
+                  date={activeIssue?.createdAt}
+                  className="text-white"
+                />
               )}
             </div>
           </div>
           <div className="col-2 d-flex align-items-center justify-content-center">
-              <PriceConversor currentValue={activeIssue?.amount || 0} currency="BEPRO"/>
+            <PriceConversor
+              currentValue={activeIssue?.amount || 0}
+              currency="BEPRO"
+            />
           </div>
         </div>
       </CustomContainer>

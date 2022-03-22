@@ -1,9 +1,9 @@
-import { formatNumberToString } from '@helpers/formatNumber'
+import { formatNumberToString } from "helpers/formatNumber";
 
 interface BalanceAddressAvatarProps {
-  address: string
-  balance: number
-  currency: string
+  address: string;
+  balance: number;
+  currency: string;
 }
 
 export default function BalanceAddressAvatar(props: BalanceAddressAvatarProps) {
@@ -14,5 +14,5 @@ export default function BalanceAddressAvatar(props: BalanceAddressAvatarProps) {
         {formatNumberToString(props.balance)} {props.currency}
       </p>
     </div>
-  )
+  );
 }

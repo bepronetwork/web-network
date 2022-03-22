@@ -11,5 +11,5 @@ export enum TransactionTypes {
   closeIssue,
   redeemIssue,
   approveSettlerToken,
-  recognizedAsFinish,
+  recognizedAsFinish
 }

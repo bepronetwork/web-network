@@ -1,13 +1,16 @@
 import { useState, useCallback, useEffect } from "react";
-import ClipIcon from "@assets/icons/clip-icon";
 import { useDropzone } from "react-dropzone";
-import {truncateAddress} from '@helpers/truncate-address'
-import CloseIcon from "@assets/icons/close-icon";
-import useApi from "@x-hooks/use-api";
 
 import { useTranslation } from "next-i18next";
 
-export interface IFilesProps{
+import ClipIcon from "assets/icons/clip-icon";
+import CloseIcon from "assets/icons/close-icon";
+
+import { truncateAddress } from "helpers/truncate-address";
+
+import useApi from "x-hooks/use-api";
+
+export interface IFilesProps {
   name: string;
   hash?: string;
   uploaded: boolean;
@@ -23,37 +26,33 @@ export default function DragAndDrop({ onUpdateFiles }: IDragAndDropProps) {
   const { t } = useTranslation(["common"]);
   const { uploadFiles } = useApi();
 
-  const onDropAccepted = useCallback(
-    async (dropedFiles) => {
-      const createFiles = dropedFiles.map((file) => ({
+  const onDropAccepted = useCallback(async (dropedFiles) => {
+    const createFiles = dropedFiles.map((file) => ({
         name: file?.name,
         hash: null,
         uploaded: false,
         type: file?.type
-      }));
-      const arrFiles = [...files, ...createFiles];
-      setFiles([...files, ...createFiles]);
+    }));
+    const arrFiles = [...files, ...createFiles];
+    setFiles([...files, ...createFiles]);
 
-      uploadFiles(dropedFiles).then(async (updateData) => {
-        const updatefiles = await Promise.all(
-          arrFiles.map(async (currentFile) => {
-            const find = updateData?.find(
-              (el) => (el.fileName === currentFile.name)
-            );
+    uploadFiles(dropedFiles)
+        .then(async (updateData) => {
+          const updatefiles = await Promise.all(arrFiles.map(async (currentFile) => {
+            const find = updateData?.find((el) => el.fileName === currentFile.name);
             return {
-              ...currentFile,
-              uploaded: true,
-              hash: find?.hash,
+                ...currentFile,
+                uploaded: true,
+                hash: find?.hash
             } as IFilesProps;
-          })
-        );
-        setFiles(updatefiles);
-      }).catch(e=>{
-        setFiles(files.filter((file)=> file.uploaded))
-      })
-    },
-    [files]
-  );
+          }));
+          setFiles(updatefiles);
+        })
+        .catch((e) => {
+          setFiles(files.filter((file) => file.uploaded));
+        });
+  },
+    [files]);
 
   useEffect(() => {
     onUpdateFiles?.(files);
@@ -61,7 +60,7 @@ export default function DragAndDrop({ onUpdateFiles }: IDragAndDropProps) {
   const useDrop = {
     accept: "image/jpeg, image/png, application/pdf",
     maxSize: 32000000, //32mb (max size ipfs)
-    onDropAccepted,
+    onDropAccepted
   };
   const { getRootProps, getInputProps, isDragActive, isDragReject } =
     useDropzone(useDrop);
@@ -95,7 +94,7 @@ export default function DragAndDrop({ onUpdateFiles }: IDragAndDropProps) {
         <button
           {...getRootProps({
             className:
-              "dropzone border border-dark-gray bg-transparent rounded-pill p-2 mr-2",
+              "dropzone border border-dark-gray bg-transparent rounded-pill p-2 mr-2"
           })}
         >
           <input {...getInputProps()} />

@@ -1,77 +1,77 @@
-import { useRouter } from 'next/router';
 import React, {
   createContext,
   useState,
   useContext,
   useMemo,
   useCallback,
-  useEffect,
-} from 'react';
-import {setCookie, parseCookies} from 'nookies'
-import { BEPRO_NETWORK_NAME } from 'env'
-import useApi from 'x-hooks/use-api';
-import { INetwork } from 'interfaces/network';
-import NetworkThemeInjector from 'components/custom-network/network-theme-injector';
+  useEffect
+} from "react";
+
+import { BEPRO_NETWORK_NAME } from "env";
+import { useRouter } from "next/router";
+import { setCookie, parseCookies } from "nookies";
+
+import NetworkThemeInjector from "components/custom-network/network-theme-injector";
+
+import { INetwork } from "interfaces/network";
+
+import useApi from "x-hooks/use-api";
 
 export interface NetworkContextData {
   activeNetwork: INetwork;
-  updateActiveNetwork: ()=> void;
+  updateActiveNetwork: () => void;
 }
 
 const NetworkContext = createContext<NetworkContextData>({} as NetworkContextData);
 
-const cookieKey = `bepro.network`;
+const cookieKey = "bepro.network";
 const expiresCookie = 60 * 60 * 1; // 1 hour
 
 export const NetworkProvider: React.FC = function ({ children }) {
   const [activeNetwork, setActiveNetwork] = useState<INetwork>(null);
 
-  const {query, push} = useRouter();
-  const { getNetwork } = useApi()
-  
-  const updateActiveNetwork = useCallback(
-    (forced?: boolean) => {
-      const networkName = String(query.network || BEPRO_NETWORK_NAME);
-      if (activeNetwork?.name === networkName && !forced) return activeNetwork;
+  const { query, push } = useRouter();
+  const { getNetwork } = useApi();
 
-      const networkFromStorage = parseCookies()[`${cookieKey}:${networkName}`];
-      if (networkFromStorage && !forced) {
-        return setActiveNetwork(JSON.parse(networkFromStorage));
-      }
+  const updateActiveNetwork = useCallback((forced?: boolean) => {
+    const networkName = String(query.network || BEPRO_NETWORK_NAME);
+    if (activeNetwork?.name === networkName && !forced) return activeNetwork;
 
-      getNetwork(networkName)
+    const networkFromStorage = parseCookies()[`${cookieKey}:${networkName}`];
+    if (networkFromStorage && !forced) {
+      return setActiveNetwork(JSON.parse(networkFromStorage));
+    }
+
+    getNetwork(networkName)
         .then(({ data }) => {
           localStorage.setItem(networkName.toLowerCase(), JSON.stringify(data));
           setCookie(null, `${cookieKey}:${networkName}`, JSON.stringify(data), {
             maxAge: expiresCookie, // 1 hour
-            path: "/",
+            path: "/"
           });
           setActiveNetwork(data);
         })
         .catch((error) => {
           push({
-            pathname: "/networks",
+            pathname: "/networks"
           });
         });
-    },
-    [query, activeNetwork]
-  );
+  },
+    [query, activeNetwork]);
 
   useEffect(() => {
     updateActiveNetwork();
   }, [query]);
 
-  useEffect(()=>{
+  useEffect(() => {
     //console.warn('useNetwork',{activeNetwork})
-  },[activeNetwork])
+  }, [activeNetwork]);
 
-  const memorizeValue = useMemo<NetworkContextData>(
-    () => ({
+  const memorizeValue = useMemo<NetworkContextData>(() => ({
       activeNetwork,
       updateActiveNetwork
-    }),
-    [activeNetwork]
-  );
+  }),
+    [activeNetwork]);
 
   return (
     <NetworkContext.Provider value={memorizeValue}>
@@ -89,7 +89,7 @@ export function useNetwork(): NetworkContextData {
   const context = useContext(NetworkContext);
 
   if (!context) {
-    throw new Error('useNetwork must be used within an NetworkProvider');
+    throw new Error("useNetwork must be used within an NetworkProvider");
   }
 
   return context;

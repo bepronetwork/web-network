@@ -1,6 +1,6 @@
-import { INetwork, ThemeColors } from '@interfaces/network'
+import { BEPRO_NETWORK_NAME, CONTRACT_ADDRESS } from "env";
 
-import { BEPRO_NETWORK_NAME, CONTRACT_ADDRESS } from 'env'
+import { INetwork, ThemeColors } from "interfaces/network";
 
 export const DefaultNetworkInformation = {
   lock: {
@@ -13,18 +13,18 @@ export const DefaultNetworkInformation = {
     validated: false,
     data: {
       logoIcon: {
-        preview: '',
+        preview: "",
         raw: undefined as File
       },
       fullLogo: {
-        preview: '',
+        preview: "",
         raw: undefined as File
       },
       displayName: {
-        data: '',
+        data: "",
         validated: undefined
       },
-      networkDescription: '',
+      networkDescription: "",
       colors: {
         data: {} as ThemeColors,
         similar: [] as string[],
@@ -37,10 +37,10 @@ export const DefaultNetworkInformation = {
     data: [],
     permission: false
   }
-}
+};
 
 export const handleNetworkAddress = (network: INetwork) => {
   return network?.name === BEPRO_NETWORK_NAME
     ? CONTRACT_ADDRESS
-    : network?.networkAddress
-}
+    : network?.networkAddress;
+};

@@ -1,17 +1,22 @@
-import { ApplicationContext } from "@contexts/application";
-import { useNetwork } from "@contexts/network";
-import { addToast } from "@contexts/reducers/add-toast";
-import { addTransaction } from "@contexts/reducers/add-transaction";
-import { changeGithubHandle } from "@contexts/reducers/change-github-handle";
-import { updateTransaction } from "@contexts/reducers/update-transaction";
-import { TransactionStatus } from "@interfaces/enums/transaction-status";
-import { BeproService } from "@services/bepro-service";
-import useApi from "@x-hooks/use-api";
-import useTransactions from "@x-hooks/useTransactions";
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap";
+
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
+
+import { ApplicationContext } from "contexts/application";
+import { useNetwork } from "contexts/network";
+import { addToast } from "contexts/reducers/add-toast";
+import { addTransaction } from "contexts/reducers/add-transaction";
+import { changeGithubHandle } from "contexts/reducers/change-github-handle";
+import { updateTransaction } from "contexts/reducers/update-transaction";
+
+import { TransactionStatus } from "interfaces/enums/transaction-status";
+
+import { BeproService } from "services/bepro-service";
+
+import useApi from "x-hooks/use-api";
+import useTransactions from "x-hooks/useTransactions";
 
 import Button from "./button";
 import Modal from "./modal";
@@ -20,7 +25,7 @@ export default function UserMissingModal({ show }: { show: boolean }) {
   const [isVisible, setVisible] = useState<boolean>(show);
   const {
     dispatch,
-    state: { currentAddress, githubLogin },
+    state: { currentAddress, githubLogin }
   } = useContext(ApplicationContext);
   const { removeUser } = useApi();
   const router = useRouter();
@@ -29,7 +34,7 @@ export default function UserMissingModal({ show }: { show: boolean }) {
   const [loadingReconnect, setLoadingReconnect] = useState<boolean>(false);
   const [loadingUnlock, setLoadingUnlock] = useState<boolean>(false);
   const txWindow = useTransactions();
-  const { activeNetwork } = useNetwork()
+  const { activeNetwork } = useNetwork();
 
   function handleReconnectAcount() {
     setLoadingReconnect(true);
@@ -58,10 +63,11 @@ export default function UserMissingModal({ show }: { show: boolean }) {
         setLoadingUnlock(true);
 
         const tmpTransaction = addTransaction({
-          type: 1,
-          amount: value,
-          currency: t("$oracles"),
-        }, activeNetwork);
+            type: 1,
+            amount: value,
+            currency: t("$oracles")
+        },
+                                              activeNetwork);
         dispatch(tmpTransaction);
 
         BeproService.network
@@ -69,43 +75,33 @@ export default function UserMissingModal({ show }: { show: boolean }) {
           .then((answer) => {
             if (answer.status) {
               setError(false);
-              dispatch(
-                addToast({
+              dispatch(addToast({
                   type: "success",
                   title: t("actions.success"),
-                  content: `${t("unlock")} ${value} ${t("$oracles")}`,
-                })
-              );
+                  content: `${t("unlock")} ${value} ${t("$oracles")}`
+              }));
 
-              txWindow.updateItem(
-                tmpTransaction.payload.id,
-                BeproService.parseTransaction(answer, tmpTransaction.payload)
-              );
+              txWindow.updateItem(tmpTransaction.payload.id,
+                                  BeproService.parseTransaction(answer, tmpTransaction.payload));
             } else {
-              dispatch(
-                addToast({
+              dispatch(addToast({
                   type: "danger",
                   title: t("actions.failed"),
-                  content: t("actions.failed"),
-                })
-              );
+                  content: t("actions.failed")
+              }));
             }
           })
           .catch((err) => {
-            if (err?.message?.search(`User denied`) > -1)
-              dispatch(
-                updateTransaction({
+            if (err?.message?.search("User denied") > -1)
+              dispatch(updateTransaction({
                   ...(tmpTransaction.payload as any),
-                  remove: true,
-                })
-              );
+                  remove: true
+              }));
             else
-              dispatch(
-                updateTransaction({
+              dispatch(updateTransaction({
                   ...(tmpTransaction.payload as any),
-                  status: TransactionStatus.failed,
-                })
-              );
+                  status: TransactionStatus.failed
+              }));
             console.error(err);
           })
           .finally(() => setLoadingUnlock(false));

@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from "react";
+
 import { useTranslation } from "next-i18next";
-import { INetworkProposal, Proposal } from "@interfaces/proposal";
-import ProposalProgressBar from "./proposal-progress-bar";
-import Button from "./button";
-import { useIssue } from "contexts/issue";
-import { pullRequest } from "interfaces/issue-data";
-import { isProposalDisputable } from "helpers/proposal";
-import { BeproService } from "services/bepro-service";
+
 import LockedIcon from "assets/icons/locked-icon";
+
+import { useIssue } from "contexts/issue";
+
+import { isProposalDisputable } from "helpers/proposal";
+
+import { pullRequest } from "interfaces/issue-data";
+import { INetworkProposal, Proposal } from "interfaces/proposal";
+
+import { BeproService } from "services/bepro-service";
+
+import Button from "./button";
+import ProposalProgressBar from "./proposal-progress-bar";
 
 interface IProposalActionCardProps {
   proposal: Proposal;
@@ -22,20 +29,20 @@ export default function ProposalActionCard({
   networkProposal,
   currentPullRequest,
   onMerge,
-  onDispute,
+  onDispute
 }: IProposalActionCardProps) {
   const [disputableTime, setDisputableTime] = useState(0);
-  const { t } = useTranslation(['common', 'pull-request']);
+  const { t } = useTranslation(["common", "pull-request"]);
   const { networkIssue } = useIssue();
 
   const isDisputable = [
     !networkProposal?.isDisputed,
     !networkIssue?.finalized,
-    isProposalDisputable(proposal?.createdAt, disputableTime),
+    isProposalDisputable(proposal?.createdAt, disputableTime)
   ].every((v) => v);
   const isSuccess = [
     networkIssue?.finalized,
-    !networkProposal?.isDisputed && proposal?.isMerged,
+    !networkProposal?.isDisputed && proposal?.isMerged
   ].every((v) => v);
 
   useEffect(() => {
@@ -55,7 +62,9 @@ export default function ProposalActionCard({
         </div>
         <div className="mt-2 py-2 text-center">
           {!currentPullRequest?.isMergeable && !proposal?.isMerged && (
-            <span className="text-uppercase text-danger caption-small">{t('pull-request:errors.merge-conflicts')}</span>
+            <span className="text-uppercase text-danger caption-small">
+              {t("pull-request:errors.merge-conflicts")}
+            </span>
           )}
           <div className="d-flex flex-row justify-content-between mt-3">
             <Button

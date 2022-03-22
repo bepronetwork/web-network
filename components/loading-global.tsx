@@ -1,5 +1,6 @@
 import { ReactNode, ReactNodeArray } from "react";
 import { Modal, Spinner } from "react-bootstrap";
+
 import Translation from "./translation";
 
 export default function LoadingGlobal({

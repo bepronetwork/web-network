@@ -1,106 +1,114 @@
 import { useContext } from "react";
 
-import { addTransaction } from "contexts/reducers/add-transaction";
+import { TransactionReceipt } from "bepro-js/dist/interfaces/web3-core";
+
 import { ApplicationContext } from "contexts/application";
+import { IActiveIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
-import { BeproService } from "services/bepro-service";
+import { addTransaction } from "contexts/reducers/add-transaction";
+import { updateTransaction } from "contexts/reducers/update-transaction";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 
-import { updateTransaction } from "@reducers/update-transaction";
+import { BeproService } from "services/bepro-service";
 
-import useTransactions from "./useTransactions";
 import useApi from "./use-api";
-import { TransactionReceipt } from "bepro-js/dist/interfaces/web3-core";
-import { IActiveIssue } from "@contexts/issue";
+import useTransactions from "./useTransactions";
 
-interface IUseBeProDefault{
-  onSuccess?: (data?: any)=> void;
-  onError?: (err?: any)=> void;
+interface IUseBeProDefault {
+  onSuccess?: (data?: any) => void;
+  onError?: (err?: any) => void;
 }
 
-export default function useBepro(props?: IUseBeProDefault){
-  const onSuccess =  props?.onSuccess
-  const onError =  props?.onError
+export default function useBepro(props?: IUseBeProDefault) {
+  const onSuccess = props?.onSuccess;
+  const onError = props?.onError;
 
   const {
     dispatch,
-    state: { githubHandle, currentAddress, myTransactions },
+    state: { githubHandle, currentAddress, myTransactions }
   } = useContext(ApplicationContext);
-  const {activeNetwork} = useNetwork()
+  const { activeNetwork } = useNetwork();
 
-  const {processEvent, waitForClose, waitForRedeem} = useApi()
+  const { processEvent, waitForClose, waitForRedeem } = useApi();
   const txWindow = useTransactions();
 
-  async function handlerDisputeProposal(networkIssueID: number, proposalscMergeId: number): Promise<TransactionReceipt | Error> {
-    return new Promise(async(resolve, reject)=>{ 
-      const disputeTx = addTransaction({ type: TransactionTypes.dispute },activeNetwork)
+  async function handlerDisputeProposal(networkIssueID: number,
+                                        proposalscMergeId: number): Promise<TransactionReceipt | Error> {
+    return new Promise(async (resolve, reject) => {
+      const disputeTx = addTransaction({ type: TransactionTypes.dispute },
+                                       activeNetwork);
       dispatch(disputeTx);
       await BeproService.network
-      .disputeMerge(networkIssueID, +proposalscMergeId)
-      .then((txInfo) => {
-        processEvent(`dispute-proposal`, txInfo.blockNumber, networkIssueID);
-        txWindow.updateItem(
-          disputeTx.payload.id,
-          BeproService.parseTransaction(txInfo, disputeTx.payload)
-        );
-        onSuccess?.(txInfo)
-        resolve?.(txInfo)
-      })
-      .catch((err) => {
-        if (err?.message?.search(`User denied`) > -1)
-          dispatch(
-            updateTransaction({ ...(disputeTx.payload as any), remove: true })
-          );
-        else {
-          dispatch(
-            updateTransaction({
-              ...(disputeTx.payload as any),
-              status: TransactionStatus.failed,
-            })
-          );
-        }
-        onError?.(err);
-        reject?.(err);
-        console.error("Error creating dispute", err);
-      })
-    })
+        .disputeMerge(networkIssueID, +proposalscMergeId)
+        .then((txInfo) => {
+          processEvent("dispute-proposal", txInfo.blockNumber, networkIssueID);
+          txWindow.updateItem(disputeTx.payload.id,
+                              BeproService.parseTransaction(txInfo, disputeTx.payload));
+          onSuccess?.(txInfo);
+          resolve?.(txInfo);
+        })
+        .catch((err) => {
+          if (err?.message?.search("User denied") > -1)
+            dispatch(updateTransaction({ ...(disputeTx.payload as any), remove: true }));
+          else {
+            dispatch(updateTransaction({
+                ...(disputeTx.payload as any),
+                status: TransactionStatus.failed
+            }));
+          }
+          onError?.(err);
+          reject?.(err);
+          console.error("Error creating dispute", err);
+        });
+    });
   }
 
-  async function handleCloseIssue(networkIssueID: number, issueId: string, proposalscMergeId: number): Promise<TransactionReceipt | Error> {
-    return new Promise(async(resolve, reject)=>{
-      const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue }, activeNetwork);
+  async function handleCloseIssue(networkIssueID: number,
+                                  issueId: string,
+                                  proposalscMergeId: number): Promise<TransactionReceipt | Error> {
+    return new Promise(async (resolve, reject) => {
+      const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue },
+                                          activeNetwork);
       dispatch(closeIssueTx);
 
-      waitForClose(issueId, activeNetwork?.name)
-        .then(()=> onSuccess?.())
-      
+      waitForClose(issueId, activeNetwork?.name).then(() => onSuccess?.());
+
       await BeproService.network
-      .closeIssue(networkIssueID, proposalscMergeId)
-      .then((txInfo) => {
-        // Review: Review processEnvets are working correctly
-        processEvent(`close-issue`, txInfo.blockNumber, networkIssueID).then(()=> {
-          onSuccess?.()
+        .closeIssue(networkIssueID, proposalscMergeId)
+        .then((txInfo) => {
+          // Review: Review processEnvets are working correctly
+          processEvent("close-issue", txInfo.blockNumber, networkIssueID).then(() => {
+            onSuccess?.();
+          });
+          txWindow.updateItem(closeIssueTx.payload.id,
+                              BeproService.parseTransaction(txInfo, closeIssueTx.payload));
+          resolve(txInfo);
         })
-        txWindow.updateItem(closeIssueTx.payload.id, BeproService.parseTransaction(txInfo, closeIssueTx.payload));
-        resolve(txInfo)
-      })
-      .catch((err) => {
-        if (err?.message?.search(`User denied`) > -1) dispatch(updateTransaction({ ...(closeIssueTx.payload as any), remove: true }));
-        else dispatch(updateTransaction({...closeIssueTx.payload as any, status: TransactionStatus.failed}));
-        onError?.(err)
-        reject(err)
-        console.error(`Error closing issue`, err);
-      });
-    })
+        .catch((err) => {
+          if (err?.message?.search("User denied") > -1)
+            dispatch(updateTransaction({
+                ...(closeIssueTx.payload as any),
+                remove: true
+            }));
+          else
+            dispatch(updateTransaction({
+                ...(closeIssueTx.payload as any),
+                status: TransactionStatus.failed
+            }));
+          onError?.(err);
+          reject(err);
+          console.error("Error closing issue", err);
+        });
+    });
   }
   
   async function handleReedemIssue(networkIssueId: number, 
-      repoId: string,
-      ghId: string,
-      updateIssue: (repoId: string, ghId: string) => Promise<IActiveIssue>
-  ): Promise<TransactionReceipt | Error> {
+                                   repoId: string,
+                                   ghId: string,
+                                   updateIssue: (repoId: string, ghId: string) => Promise<IActiveIssue>): 
+                                   Promise<TransactionReceipt | Error> {
     return new Promise(async(resolve, reject)=>{
       const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue }, activeNetwork);
       dispatch(redeemTx);
@@ -115,20 +123,20 @@ export default function useBepro(props?: IUseBeProDefault){
           updateIssue(repoId, ghId) 
           onSuccess?.()
         })
-        txWindow.updateItem(redeemTx.payload.id, BeproService.parseTransaction(txInfo, redeemTx.payload));
-        resolve(txInfo)
-      })
-      .catch((err) => {
-        if (err?.message?.search(`User denied`) > -1) dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
-        else dispatch(updateTransaction({...redeemTx.payload as any, status: TransactionStatus.failed}));
-        onError?.(err)
-        reject(err)
-        console.error(`Error closing issue`, err);
+        .catch((err) => {
+          if (err?.message?.search("User denied") > -1)
+            dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
+          else
+            dispatch(updateTransaction({
+                ...(redeemTx.payload as any),
+                status: TransactionStatus.failed
+            }));
+          onError?.(err);
+          reject(err);
+          console.error("Error closing issue", err);
+        });
       });
-    })
-  }
-
-  
+    })}
 
   return {
     handlerDisputeProposal,
@@ -136,4 +144,3 @@ export default function useBepro(props?: IUseBeProDefault){
     handleReedemIssue
   };
 }
-

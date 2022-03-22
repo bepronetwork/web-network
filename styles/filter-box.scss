@@ -7,8 +7,8 @@
     border-left: none !important;
     border-top: none !important;
     border-bottom: none !important;
-    border-top-right-radius: 0!important;
-    border-bottom-right-radius: 0!important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
 
     .filter-content {
       height: calc(100% - 30px);
@@ -19,8 +19,8 @@
   }
 
   &:not(.h-100) {
-    border-top-left-radius: 0!important;
-    border-bottom-left-radius: 0!important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
   }
 
   .filter-header {
@@ -28,17 +28,18 @@
   }
 
   &:not(:last-child) {
-    &,.filter-content {
-      border-bottom-left-radius: 0!important;
-      border-bottom-right-radius: 0!important;
+    &,
+    .filter-content {
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
     }
     .filter-content {
-      border-bottom: none!important;
+      border-bottom: none !important;
     }
   }
   &:not(:first-child) {
-    border-top-right-radius: 0!important;
-    border-top-left-radius: 0!important;
+    border-top-right-radius: 0 !important;
+    border-top-left-radius: 0 !important;
     margin-top: -2px;
   }
 }

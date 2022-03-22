@@ -2,12 +2,16 @@
 
 ul.pagination .page-item {
   &:not(.disabled) {
-    &:first-child .page-link { color: var(--bs-primary);  }
-    &:last-child .page-link {color: var(--bs-primary); }
+    &:first-child .page-link {
+      color: var(--bs-primary);
+    }
+    &:last-child .page-link {
+      color: var(--bs-primary);
+    }
   }
 
   .page-link {
-    font-family: 'fontRegular', sans-serif;
+    font-family: "fontRegular", sans-serif;
     font-weight: 700;
     border-radius: $pagination-border-radius;
     font-size: 14px;

@@ -1,1 +1,1 @@
-export const Timers: {[k: string]: any} = {};
+export const Timers: { [k: string]: any } = {};

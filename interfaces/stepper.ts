@@ -1,17 +1,17 @@
-import { ReactNode, ReactElement } from 'react'
+import { ReactNode, ReactElement } from "react";
 
 export interface IStepper {
-  children: ReactElement<IStep> | ReactElement<IStep>[]
+  children: ReactElement<IStep> | ReactElement<IStep>[];
 }
 
 export interface IStep {
-  title: string
-  index: number
-  completed?: boolean
-  activeStep: number
-  validated?: boolean
-  children: ReactNode | ReactNode[]
-  finishLabel?: string
-  handleClick?: (index) => void
-  handleFinish?: () => void
+  title: string;
+  index: number;
+  completed?: boolean;
+  activeStep: number;
+  validated?: boolean;
+  children: ReactNode | ReactNode[];
+  finishLabel?: string;
+  handleClick?: (index) => void;
+  handleFinish?: () => void;
 }

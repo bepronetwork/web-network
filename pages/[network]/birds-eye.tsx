@@ -1,53 +1,54 @@
-import router from 'next/router'
-import { Octokit } from 'octokit'
-import { GetServerSideProps } from 'next'
-import React, { useEffect, useState } from 'react'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import React, { useEffect, useState } from "react";
 
-import ConnectWalletButton from '@components/connect-wallet-button'
+import { GetServerSideProps } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import router from "next/router";
+import { Octokit } from "octokit";
 
-import { useAuthentication } from '@contexts/authentication'
+import ConnectWalletButton from "components/connect-wallet-button";
 
-import { User } from '@interfaces/api-response'
+import { useAuthentication } from "contexts/authentication";
 
-import { BeproService } from '@services/bepro-service'
+import { User } from "interfaces/api-response";
 
-import useApi from '@x-hooks/use-api'
+import { BeproService } from "services/bepro-service";
+
+import useApi from "x-hooks/use-api";
 
 export default function FalconPunchPage() {
   const [userList, setUserList] = useState<
-  { created_at: string; login: string; public_repos: number; eth: number }[]
-  >([])
-  
-  const { getAllUsers } = useApi()
-  const { wallet, user, beproServiceStarted } = useAuthentication()
+    { created_at: string; login: string; public_repos: number; eth: number }[]
+  >([]);
 
-  function toDays(date = ``) {
-    return +new Date(date) / (24 * 60 * 60 * 1000)
+  const { getAllUsers } = useApi();
+  const { wallet, user, beproServiceStarted } = useAuthentication();
+
+  function toDays(date = "") {
+    return +new Date(date) / (24 * 60 * 60 * 1000);
   }
 
   function listAllUsers() {
     async function getGithubInfo(ghlogin: string) {
-      if (!user) return
+      if (!user) return;
 
-      const octokit = new Octokit({ auth: user.accessToken })
+      const octokit = new Octokit({ auth: user.accessToken });
 
       return octokit.rest.users
         .getByUsername({ username: ghlogin })
         .then(({ data }) => data)
-        .catch(() => ({ created_at: '0', login: ghlogin, public_repos: 0 }))
+        .catch(() => ({ created_at: "0", login: ghlogin, public_repos: 0 }));
     }
 
     async function hasEthBalance(address: string) {
-      if (!beproServiceStarted) return 0
-      
+      if (!beproServiceStarted) return 0;
+
       return BeproService.login()
         .then(() => BeproService.bepro.Web3.eth.getBalance(address as any))
         .then((eth) => +eth)
         .catch((e) => {
-          console.error(`Error on get eth`, e)
-          return 0
-        })
+          console.error("Error on get eth", e);
+          return 0;
+        });
     }
 
     async function getInfo({
@@ -57,17 +58,17 @@ export default function FalconPunchPage() {
       updatedAt,
       id
     }: Partial<User>) {
-      const ghInfo = await getGithubInfo(githubLogin)
-      const eth = await hasEthBalance(address)
+      const ghInfo = await getGithubInfo(githubLogin);
+      const eth = await hasEthBalance(address);
 
-      setUserList((prev) => [...(prev as any), { ...ghInfo, eth }])
+      setUserList((prev) => [...(prev as any), { ...ghInfo, eth }]);
     }
 
     getAllUsers()
       .then((users) => Promise.all(users.map(getInfo)))
       .catch((e) => {
-        console.error(`Failed to get users`, e)
-      })
+        console.error("Failed to get users", e);
+      });
   }
 
   function renderUserRow({ created_at, login, public_repos, eth }) {
@@ -76,27 +77,27 @@ export default function FalconPunchPage() {
         <div className="col">@{login}</div>
         <div
           className={`col text-${
-            toDays(created_at) >= 7 ? `success` : `danger`
+            toDays(created_at) >= 7 ? "success" : "danger"
           }`}
         >
-          &gt; 7 {toDays(created_at) > 7 ? `yes` : `no`}{' '}
+          &gt; 7 {toDays(created_at) > 7 ? "yes" : "no"}{" "}
         </div>
-        <div className={`col text-${!!public_repos ? `success` : `danger`}`}>
-          &gt; 0 repos {!!public_repos ? `yes` : `no`}{' '}
+        <div className={`col text-${public_repos ? "success" : "danger"}`}>
+          &gt; 0 repos {public_repos ? "yes" : "no"}{" "}
         </div>
-        <div className={`col text-${!!eth ? `success` : `danger`}`}>
-          &gt; 0 eth {!!eth ? `yes` : `no`}{' '}
+        <div className={`col text-${eth ? "success" : "danger"}`}>
+          &gt; 0 eth {eth ? "yes" : "no"}{" "}
         </div>
       </div>
-    )
+    );
   }
 
   useEffect(() => {
-    if (!wallet?.address) return
+    if (!wallet?.address) return;
 
     if (wallet.address !== process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS)
-      router.push(`/`)
-  }, [wallet?.address])
+      router.push("/");
+  }, [wallet?.address]);
 
   return (
     <>
@@ -114,7 +115,7 @@ export default function FalconPunchPage() {
                 value={user?.accessToken}
                 type="text"
                 className="form-control"
-                placeholder={`Github token`}
+                placeholder={"Github token"}
                 readOnly
               />
             </div>
@@ -129,7 +130,7 @@ export default function FalconPunchPage() {
                   list all users
                 </button>
               )) ||
-                ``}
+                ""}
             </div>
           </div>
         </div>
@@ -138,16 +139,16 @@ export default function FalconPunchPage() {
         </div>
       </div>
     </>
-  )
+  );
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       ...(await serverSideTranslations(locale, [
-        'common',
-        'connect-wallet-button'
+        "common",
+        "connect-wallet-button"
       ]))
     }
-  }
-}
+  };
+};

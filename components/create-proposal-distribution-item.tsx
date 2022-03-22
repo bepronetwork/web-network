@@ -1,10 +1,14 @@
-import { User } from "interfaces/api-response";
-import Avatar from "components/avatar";
-import InputNumber from "components/input-number";
 import { useEffect, useState } from "react";
 import { NumberFormatValues } from "react-number-format";
+
 import { InputNumber as InputNumberProps } from "types/input-number";
-import useApi from "@x-hooks/use-api";
+
+import Avatar from "components/avatar";
+import InputNumber from "components/input-number";
+
+import { User } from "interfaces/api-response";
+
+import useApi from "x-hooks/use-api";
 
 interface Props {
   by: string;
@@ -31,8 +35,7 @@ export default function CreateProposalDistributionItem({
 
   function getGithubLogin() {
     getUserOf(address).then((handle: User) =>
-      setGithubLogin(handle?.githubLogin)
-    );
+      setGithubLogin(handle?.githubLogin));
   }
 
   useEffect(getGithubLogin, [by]);

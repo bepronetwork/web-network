@@ -1,4 +1,4 @@
-import { IStepper } from '@interfaces/stepper'
+import { IStepper } from "interfaces/stepper";
 
 export default function Stepper({ children, ...props }: IStepper) {
   return (
@@ -7,5 +7,5 @@ export default function Stepper({ children, ...props }: IStepper) {
         <div className="stepper">{children}</div>
       </div>
     </div>
-  )
+  );
 }

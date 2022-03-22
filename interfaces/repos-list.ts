@@ -5,8 +5,7 @@ export interface RepoInfo {
   githubPath: string;
 }
 
-export interface IForkInfo extends developer{
-}
+export type IForkInfo = developer;
 
 export type ForksList = {
   [repoId: number]: IForkInfo[];
