@@ -17,7 +17,7 @@ import useTransactions from "x-hooks/useTransactions";
 
 interface usePendingIssueActions {
   treatPendingIssue(): Promise<boolean>;
-  updatePendingIssue: Dispatch<SetStateAction<IssueData>>;
+  updatePendingIssue: (issue: IssueData) => void
 }
 
 type usePendingIssueReturn = [IssueData, usePendingIssueActions];
@@ -94,7 +94,8 @@ export default function usePendingIssue<
     if (issue) exists = await pendingIssueExistsOnSC(issue);
 
     setIssueExistsOnSc(exists);
-    return setPendingIssue(issue);
+    setPendingIssue(issue);
+    return issue;
   }
 
   async function treatPendingIssue(): Promise<boolean> {

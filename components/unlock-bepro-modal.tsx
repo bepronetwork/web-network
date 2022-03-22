@@ -18,7 +18,7 @@ import { TransactionTypes } from "interfaces/enums/transaction-types";
 
 export default function UnlockBeproModal({
   show = false,
-  onCloseClick = () => {}
+  onCloseClick,
 }) {
   const { t } = useTranslation(["common", "pull-request"]);
 
@@ -45,7 +45,7 @@ export default function UnlockBeproModal({
 
   function setDefaults() {
     updateWalletBalance();
-    onCloseClick();
+    onCloseClick?.();
     setAmountToUnlock(0);
     setIsUnlocking(false);
   }
@@ -200,7 +200,7 @@ export default function UnlockBeproModal({
         modalTitle={t("my-oracles:actions.unlock.title")}
         modalDescription={t("my-oracles:actions.unlock.description")}
         onSuccess={setDefaults}
-        onFail={() => {}}
+        onFail={(e) => {console.error('error', e)}}
         ref={networkTxRef}
       />
     </Modal>

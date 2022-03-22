@@ -34,15 +34,17 @@
     "no-underscore-dangle": 0,
     "class-methods-use-this": 1,
     "no-unused-vars": 1,
-    "complexity": ["error", 20],
+    "@typescript-eslint/no-empty-function": 1,
+    "@typescript-eslint/ban-ts-comment": 0,
+    "complexity": ["warn", 5],
     "max-len": [
-      "error",
+      "warn",
       {
         "code": 120,
         "ignoreComments": true
       }
     ],
-    "no-console": ["error", { "allow": ["error", "log"] }],
+    "no-console": ["error", { "allow": ["error", "log", "warn", "table", "debug"] }],
     "no-undef": 1,
     "eqeqeq": 1,
     "function-paren-newline": ["error", "never"],

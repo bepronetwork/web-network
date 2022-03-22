@@ -12,7 +12,8 @@ interface ISeoProps {
 
 const Seo: React.FC<ISeoProps> = ({ issueMeta }) => {
   if (issueMeta) {
-    const [repoId, ghId] = issueMeta?.issueId.split("/");
+    // eslint-disable-next-line no-unsafe-optional-chaining
+    const [repoId, ghId] = issueMeta?.issueId?.split("/");
     const description = removeMarkdown(issueMeta?.body?.substring(0, 160).trimEnd());
     return (
       <NextSeo

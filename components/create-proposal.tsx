@@ -114,7 +114,7 @@ export default function NewProposal({
   const [show, setShow] = useState<boolean>(false);
   const [isCouncil, setIsCouncil] = useState(false);
   const [error, setError] = useState<boolean>(false);
-  const [distrib, setDistrib] = useState<Object>({});
+  const [distrib, setDistrib] = useState<object>({});
   const [councilAmount, setCouncilAmount] = useState(0);
   const [success, setSuccess] = useState<boolean>(false);
   const [warning, setWarning] = useState<boolean>(false);

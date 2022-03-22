@@ -11,14 +11,14 @@ export default function UpdateGithubTokenModal({
   redirectTo,
   description,
   isVisible = false,
-  setVisible = (show: boolean) => {}
+  setVisible,
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
 
   const { wallet } = useAuthentication();
 
   function handleClose() {
-    setVisible(false);
+    setVisible?.(false);
   }
 
   function handleConfirm() {
