@@ -1,30 +1,32 @@
-import ArrowUp from '@assets/icons/arrow-up'
-import ArrowDown from '@assets/icons/arrow-down'
+import ArrowDown from "assets/icons/arrow-down";
+import ArrowUp from "assets/icons/arrow-up";
 
 export default function NetworkListBarColumn({
   hideOrder = false,
   isColumnActive,
-  columnOrder = 'asc',
+  columnOrder = "asc",
   label,
   onClick = () => {}
 }) {
-  const textClass = hideOrder ? 'text-primary' : 'text-ligth-gray text-gray-hover'
+  const textClass = hideOrder
+    ? "text-primary"
+    : "text-ligth-gray text-gray-hover";
   const ArrowComponent =
-    columnOrder === 'desc' || !isColumnActive ? (
+    columnOrder === "desc" || !isColumnActive ? (
       <ArrowDown width={9.33} height={6.22} />
     ) : (
       <ArrowUp width={9.33} height={6.22} />
-    )
+    );
 
   return (
     <div
       className={`col-3 d-flex flex-row justify-content-center cursor-pointer align-items-center ${
-        isColumnActive ? 'text-primary' : textClass
+        isColumnActive ? "text-primary" : textClass
       }`}
       onClick={onClick}
     >
       <span className="caption-medium mr-1">{label}</span>
       {(!hideOrder && ArrowComponent) || <></>}
     </div>
-  )
+  );
 }

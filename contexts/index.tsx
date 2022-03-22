@@ -1,13 +1,12 @@
-import React from 'react';
+import React from "react";
 
-import ApplicationContextProvider from '@contexts/application';
+import ApplicationContextProvider from "contexts/application";
+import { AuthenticationProvider } from "contexts/authentication";
+import { IssueProvider } from "contexts/issue";
+import { NetworkProvider } from "contexts/network";
+import { ReposProvider } from "contexts/repos";
 
-import { IssueProvider } from '@contexts/issue';
-import { ReposProvider } from '@contexts/repos';
-import { NetworkProvider } from '@contexts/network';
-import { AuthenticationProvider } from '@contexts/authentication';
-
-const RootProviders: React.FC = ({children}) => {
+const RootProviders: React.FC = ({ children }) => {
   return (
     <AuthenticationProvider>
       <NetworkProvider>
@@ -19,6 +18,6 @@ const RootProviders: React.FC = ({children}) => {
       </NetworkProvider>
     </AuthenticationProvider>
   );
-}
+};
 
 export default RootProviders;

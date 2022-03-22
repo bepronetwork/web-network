@@ -18,5 +18,5 @@ export default function ArrowRightLine(props: SVGProps<SVGSVGElement>) {
         fill="currentColor"
       />
     </svg>
-  )
+  );
 }

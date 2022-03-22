@@ -1,19 +1,22 @@
-import { useTranslation } from "next-i18next";
 import { useContext, useEffect, useState } from "react";
 
-import Modal from "components/modal";
+import { useTranslation } from "next-i18next";
+
 import Button from "components/button";
 import GithubLink from "components/github-link";
+import Modal from "components/modal";
 
-import { addToast } from "contexts/reducers/add-toast";
 import { ApplicationContext } from "contexts/application";
+import { IActiveIssue, useIssue } from "contexts/issue";
+import { addToast } from "contexts/reducers/add-toast";
+
+import { pullRequest } from "interfaces/issue-data";
+import { INetworkProposal, Proposal } from "interfaces/proposal";
+
+import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
-import { BeproService } from "services/bepro-service";
-import { IActiveIssue, useIssue } from "@contexts/issue";
-import { pullRequest } from "@interfaces/issue-data";
-import { INetworkProposal, Proposal } from "@interfaces/proposal";
 
 interface IMergeableModalProps {
   issue: IActiveIssue;
@@ -26,7 +29,7 @@ export default function NotMergeableModal({
   proposal,
   issuePRs,
   pullRequest,
-  networkProposal,
+  networkProposal
 }: IMergeableModalProps) {
   const { t } = useTranslation("common");
   const { activeIssue, networkIssue } = useIssue();
@@ -35,7 +38,7 @@ export default function NotMergeableModal({
 
   const {
     dispatch,
-    state: { currentAddress, githubLogin },
+    state: { currentAddress, githubLogin }
   } = useContext(ApplicationContext);
 
   const [isVisible, setVisible] = useState(false);
@@ -57,12 +60,12 @@ export default function NotMergeableModal({
     // nor the proposal creator and is not a council member.
     (isIssueOwner || isCouncil || isProposer) &&
       !isPullRequestOwner &&
-      !networkIssue?.finalized, // The bounty creator, proposal creator and council members can view only if the bounty was closed.
+      !networkIssue?.finalized // The bounty creator, proposal creator and council members can view only if the bounty was closed.
   ].some((values) => values);
 
   function handleModalVisibility() {
     if (!pullRequest || !issuePRs?.length || mergeState === "success") return;
-    
+
     if (whenNotShow) {
       setVisible(false);
     } else if (isIssueOwner || isPullRequestOwner || isCouncil || isProposer) {
@@ -75,33 +78,27 @@ export default function NotMergeableModal({
 
     setMergeState("loading");
 
-    mergeClosedIssue(
-      activeIssue?.issueId,
-      pullRequest?.githubId,
-      proposal?.scMergeId,
-      currentAddress,
-      network?.name
-    )
+    mergeClosedIssue(activeIssue?.issueId,
+                     pullRequest?.githubId,
+                     proposal?.scMergeId,
+                     currentAddress,
+                     network?.name)
       .then(() => {
-        dispatch(
-          addToast({
+        dispatch(addToast({
             type: "success",
             title: t("actions.success"),
-            content: t("modals.not-mergeable.success-message"),
-          })
-        );
+            content: t("modals.not-mergeable.success-message")
+        }));
 
         setMergeState("success");
         setVisible(false);
       })
       .catch((error) => {
-        dispatch(
-          addToast({
+        dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
-            content: error.response.data.message,
-          })
-        );
+            content: error.response.data.message
+        }));
 
         setMergeState("error");
       });
@@ -113,7 +110,7 @@ export default function NotMergeableModal({
       .isCouncil(currentAddress)
       .then((isCouncil) => setIsCouncil(isCouncil));
   }, [currentAddress]);
-  
+
   useEffect(handleModalVisibility, [
     activeIssue,
     issuePRs,
@@ -123,7 +120,7 @@ export default function NotMergeableModal({
     networkProposal,
     networkIssue,
     currentAddress,
-    githubLogin,
+    githubLogin
   ]);
 
   return (

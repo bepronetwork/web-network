@@ -1,21 +1,29 @@
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
+
+import ArrowLeft from "assets/icons/arrow-left";
+
 import Avatar from "components/avatar";
 import GithubInfo from "components/github-info";
-import CustomContainer from "./custom-container";
+
 import { useIssue } from "contexts/issue";
-import DateLabel from "./date-label";
-import { useTranslation } from "next-i18next";
-import PriceConversor from "./price-conversor";
-import ArrowLeft from "assets/icons/arrow-left";
-import { useRouter } from "next/router";
+
 import { pullRequest } from "interfaces/issue-data";
-interface IPullRequestHeroProps{
+
+import CustomContainer from "./custom-container";
+import DateLabel from "./date-label";
+import PriceConversor from "./price-conversor";
+
+interface IPullRequestHeroProps {
   currentPullRequest: pullRequest;
 }
 
-export default function PullRequestHero({currentPullRequest}: IPullRequestHeroProps) {
+export default function PullRequestHero({
+  currentPullRequest
+}: IPullRequestHeroProps) {
   const { activeIssue } = useIssue();
-  const router = useRouter()
-  const { t } = useTranslation(['common', 'pull-request'])
+  const router = useRouter();
+  const { t } = useTranslation(["common", "pull-request"]);
 
   return (
     <div className="banner-shadow">
@@ -23,17 +31,28 @@ export default function PullRequestHero({currentPullRequest}: IPullRequestHeroPr
         <div className="d-flex flex-row">
           <div className="col-10 row">
             <div className="d-flex flex-row">
-              <div className="me-2 cursor-pointer" onClick={()=> router.back()}>
-                <ArrowLeft width={16} height={16} className="border rounded-circle border-primary p-1"/>
+              <div
+                className="me-2 cursor-pointer"
+                onClick={() => router.back()}
+              >
+                <ArrowLeft
+                  width={16}
+                  height={16}
+                  className="border rounded-circle border-primary p-1"
+                />
               </div>
               <div>
-                <span className="me-2 text-white-40 caption-large">#{activeIssue?.githubId}</span>
-                <span className="text-gray caption-medium">{activeIssue?.title}</span>
+                <span className="me-2 text-white-40 caption-large">
+                  #{activeIssue?.githubId}
+                </span>
+                <span className="text-gray caption-medium">
+                  {activeIssue?.title}
+                </span>
               </div>
             </div>
 
             <div className="mt-3 pt-1 d-inline-flex align-items-center justify-content-md-start gap-2">
-              <h4>{t('pull-request:title')}</h4>
+              <h4>{t("pull-request:title")}</h4>
               <h4 className="text-white-40">#{currentPullRequest?.githubId}</h4>
             </div>
 
@@ -46,7 +65,7 @@ export default function PullRequestHero({currentPullRequest}: IPullRequestHeroPr
                 <GithubInfo
                   parent="hero"
                   variant="user"
-                  label={[`@`, currentPullRequest?.githubLogin].join(``)}
+                  label={["@", currentPullRequest?.githubLogin].join("")}
                 />
               </div>
 
@@ -65,7 +84,6 @@ export default function PullRequestHero({currentPullRequest}: IPullRequestHeroPr
               currency="BEPRO"
             />
           </div>
-
         </div>
       </CustomContainer>
     </div>

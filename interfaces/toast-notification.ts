@@ -1,4 +1,10 @@
-export type ToastNotificationType = `primary` | `secondary` | `success` | `danger` | `warning` | `info`;
+export type ToastNotificationType =
+  | "primary"
+  | "secondary"
+  | "success"
+  | "danger"
+  | "warning"
+  | "info";
 
 export interface ToastNotification {
   type?: ToastNotificationType;

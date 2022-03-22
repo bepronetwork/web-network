@@ -1,35 +1,39 @@
 @import "variables";
 
 .popover {
-    border-radius: 7px;
-    border: solid 1px $ligth-gray;
+  border-radius: 7px;
+  border: solid 1px $ligth-gray;
 
-    &#language-selector {
-      margin-bottom: 10px;
-    }
+  &#language-selector {
+    margin-bottom: 10px;
+  }
 
-    div:not(.stats) {
-      font-family: 'Inter', sans-serif;
-      color: var(--bs-gray);
-      font-size: 12px;
-      line-height: 140%;
-      &:hover {
-        color: $white;
-      }
-      .active {
-        color: var(--bs-primary);
-        font-family: 'Inter', sans-serif;
-        font-weight: 600;
-        line-height: 160%;
-        letter-spacing: 0.02rem;
-      }
+  div:not(.stats) {
+    font-family: "Inter", sans-serif;
+    color: var(--bs-gray);
+    font-size: 12px;
+    line-height: 140%;
+    &:hover {
+      color: $white;
     }
-    .popover-body {
-      padding: 9px 14px;
-      border-radius: 6px;
+    .active {
+      color: var(--bs-primary);
+      font-family: "Inter", sans-serif;
+      font-weight: 600;
+      line-height: 160%;
+      letter-spacing: 0.02rem;
     }
-    .popover-arrow {
-      &::after {border-top-color: $bg-shadow;}
-      &::before {border-top-color: $ligth-gray;}
+  }
+  .popover-body {
+    padding: 9px 14px;
+    border-radius: 6px;
+  }
+  .popover-arrow {
+    &::after {
+      border-top-color: $bg-shadow;
     }
+    &::before {
+      border-top-color: $ligth-gray;
+    }
+  }
 }

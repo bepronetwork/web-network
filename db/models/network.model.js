@@ -1,10 +1,9 @@
-'use strict'
-const { Model, DataTypes } = require('sequelize')
+"use strict";
+const { Model, DataTypes } = require("sequelize");
 
 class Network extends Model {
   static init(sequelize) {
-    super.init(
-      {
+    super.init({
         creatorAddress: DataTypes.STRING,
         name: {
           type: DataTypes.STRING,
@@ -21,24 +20,23 @@ class Network extends Model {
         },
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE
-      },
-      {
+    },
+               {
         sequelize,
-        modelName: 'network'
-      }
-    )
+        modelName: "network"
+               });
   }
 
   static associate(models) {
     this.hasMany(models.issue, {
-      foreignKey: 'network_id',
-      sourceKey: 'id'
-    })
+      foreignKey: "network_id",
+      sourceKey: "id"
+    });
     this.hasMany(models.repositories, {
-      foreignKey: 'network_id',
-      sourceKey: 'id'
-    })
+      foreignKey: "network_id",
+      sourceKey: "id"
+    });
   }
 }
 
-module.exports = Network
+module.exports = Network;

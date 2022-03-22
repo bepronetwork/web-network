@@ -1,3 +1,3 @@
 export enum Errors {
-  WalletNotConnected = `Wallet not connected`,
+  WalletNotConnected = "Wallet not connected"
 }

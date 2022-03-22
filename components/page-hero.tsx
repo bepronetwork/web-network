@@ -1,13 +1,16 @@
-import React from 'react'
-import { Currency } from "interfaces/currency";
+import React from "react";
+
 import { formatNumberToCurrency } from "helpers/formatNumber";
 import { highlightText } from "helpers/string";
+
+import { Currency } from "interfaces/currency";
+
 import CustomContainer from "./custom-container";
 
 export interface IInfosHero {
   value: number;
   label: string;
-  currency?: Currency
+  currency?: Currency;
 }
 
 export interface IPageHeroProps {
@@ -25,11 +28,11 @@ function InfoComponent(info: IInfosHero) {
           <span className="h4 text-white">
             {formatNumberToCurrency(info.value)}
           </span>
-          <span className="caption-medium text-white-70 ml-1">${info.currency}</span>
+          <span className="caption-medium text-white-70 ml-1">
+            ${info.currency}
+          </span>
         </div>
-        <span className="caption-small text-gray">
-          {info.label}
-        </span>
+        <span className="caption-small text-gray">{info.label}</span>
       </div>
     );
   }
@@ -38,9 +41,7 @@ function InfoComponent(info: IInfosHero) {
     <div className="col px-2">
       <div className="border-top border-2 mb-2"></div>
       <h4 className="text-white">{info.value}</h4>
-      <span className="caption-small text-gray">
-        {info.label}
-      </span>
+      <span className="caption-small text-gray">{info.label}</span>
     </div>
   );
 }
@@ -58,7 +59,7 @@ export default function PageHero({ title, subtitle, infos }: IPageHeroProps) {
             <span
               className="mt-1 caption-medium text-white-70"
               dangerouslySetInnerHTML={{
-                __html: highlightText(subtitle),
+                __html: highlightText(subtitle)
               }}
             />
           )}

@@ -1,7 +1,9 @@
 # Contributing
 
 ### Setting up
+
 First, fork the project on github and clone it on your machine and add bepronetwork as a remote
+
 ```
 $ git clone git@github.com:[your-handle]/web-network.git
 $ cd web-network
@@ -9,10 +11,11 @@ $ git remote add bepronetwork git@github.com:bepronetwork/web-network.git
 ```
 
 ### Creating changes
+
 First checkout `bepronetwork/main` and then create a branch from that identifying the issue,
 
 ```
-$ git checkout -b network/main bepronetwork/main 
+$ git checkout -b network/main bepronetwork/main
 $ git pull
 $ git checkout -b [feature|hotfix|fix]/[issue-number]
 ```

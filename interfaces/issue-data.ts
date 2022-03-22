@@ -1,6 +1,15 @@
-import { Proposal, INetworkProposal } from '@interfaces/proposal';
+import { Proposal, INetworkProposal } from "interfaces/proposal";
 
-export type IssueState =  'pending' |  'draft' | 'open' | 'in progress' | 'canceled' | 'closed' | 'ready' | 'done' | 'disputed'
+export type IssueState =
+  | "pending"
+  | "draft"
+  | "open"
+  | "in progress"
+  | "canceled"
+  | "closed"
+  | "ready"
+  | "done"
+  | "disputed";
 
 export type CID = `${string}/${string}`;
 
@@ -22,7 +31,7 @@ export interface IssueData {
   owner?: string;
   pullRequests: pullRequest[];
   repo?: string;
-  repository?: Repository
+  repository?: Repository;
   repository_id?: number;
   seoImage: string;
   state: IssueState;
@@ -33,8 +42,8 @@ export interface IssueData {
 }
 
 export interface Repository {
-  id: number,
-  githubPath: string
+  id: number;
+  githubPath: string;
 }
 
 export interface pullRequest {
@@ -71,14 +80,14 @@ export interface GithubUser {
   login: string;
 }
 
-export interface INetworkIssue{
-  _id: number
+export interface INetworkIssue {
+  _id: number;
   canceled: boolean;
   cid: CID | string;
   creationDate: Date | number;
   finalized: boolean;
   issueGenerator: string;
-  mergeProposalAmount: number
+  mergeProposalAmount: number;
   recognizedAsFinished: boolean;
   isDraft: boolean;
   tokensStaked: number;

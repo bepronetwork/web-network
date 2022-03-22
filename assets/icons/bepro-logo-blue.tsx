@@ -1,4 +1,4 @@
-import { SVGProps, memo } from 'react'
+import { SVGProps, memo } from "react";
 
 function BeproLogoBlue(props: SVGProps<SVGSVGElement>) {
   return (
@@ -38,7 +38,7 @@ function BeproLogoBlue(props: SVGProps<SVGSVGElement>) {
         fill="white"
       />
     </svg>
-  )
+  );
 }
 
-export default memo(BeproLogoBlue)
+export default memo(BeproLogoBlue);

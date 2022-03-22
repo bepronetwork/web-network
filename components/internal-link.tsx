@@ -1,25 +1,26 @@
-import Link from 'next/link'
-import { UrlObject } from 'url'
-import { useRouter } from 'next/router'
-import { ReactElement, ReactNode } from 'react'
+import { ReactElement, ReactNode } from "react";
+
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { UrlObject } from "url";
 interface InternalLinkProps {
-  href: string | UrlObject
-  label?: string | number | ReactElement
-  className?: string
-  transparent?: boolean
-  nav?: boolean
-  active?: boolean
-  icon?: ReactNode
-  uppercase?: boolean
-  iconBefore?: boolean
-  activeClass?: string
-  blank?: boolean
-  brand?: boolean,
-  style?: any
+  href: string | UrlObject;
+  label?: string | number | ReactElement;
+  className?: string;
+  transparent?: boolean;
+  nav?: boolean;
+  active?: boolean;
+  icon?: ReactNode;
+  uppercase?: boolean;
+  iconBefore?: boolean;
+  activeClass?: string;
+  blank?: boolean;
+  brand?: boolean;
+  style?: any;
 }
 
 export default function InternalLink({
-  className = '',
+  className = "",
   nav = false,
   transparent = false,
   active = undefined,
@@ -31,35 +32,40 @@ export default function InternalLink({
   style,
   ...props
 }: InternalLinkProps) {
-  const { asPath, pathname } = useRouter()
+  const { asPath, pathname } = useRouter();
 
   function getClasses(): string {
-    const isActive = active || asPath.endsWith(String(props.href)) || pathname === (props.href as UrlObject).pathname
+    const isActive =
+      active ||
+      asPath.endsWith(String(props.href)) ||
+      pathname === (props.href as UrlObject).pathname;
 
-    let classes = `${className}`
+    let classes = `${className}`;
 
-    if (!isActive && nav)
-      classes += ' opacity-75 opacity-100-hover '
+    if (!isActive && nav) classes += " opacity-75 opacity-100-hover ";
 
-    if (isActive && nav && activeClass)
-      classes += ' ' + activeClass
+    if (isActive && nav && activeClass) classes += " " + activeClass;
 
-    if (transparent || nav)
-      classes += ' bg-transparent border-transparent '
+    if (transparent || nav) classes += " bg-transparent border-transparent ";
 
-    if (uppercase)
-      classes += ' text-uppercase '
+    if (uppercase) classes += " text-uppercase ";
 
-    return `${!nav && 'btn btn-primary ' || ' main-nav-link '} ${brand ? '' : ' text-white '} bg-opacity-100 d-flex align-items-center justify-content-center text-decoration-none shadow-none ${classes}`
+    return `${(!nav && "btn btn-primary ") || " main-nav-link "} ${
+      brand ? "" : " text-white "
+    } bg-opacity-100 d-flex align-items-center justify-content-center text-decoration-none shadow-none ${classes}`;
   }
 
   return (
     <Link href={props.href} passHref>
-      <a className={getClasses()} target={`${blank ? '_blank' : ''}`} style={{...style}}>
-        {(iconBefore && props.icon) || ``}
-        {props.label && <span>{props.label}</span> || ``}
-        {(!iconBefore && props.icon) || ``}
+      <a
+        className={getClasses()}
+        target={`${blank ? "_blank" : ""}`}
+        style={{ ...style }}
+      >
+        {(iconBefore && props.icon) || ""}
+        {(props.label && <span>{props.label}</span>) || ""}
+        {(!iconBefore && props.icon) || ""}
       </a>
     </Link>
-  )
+  );
 }

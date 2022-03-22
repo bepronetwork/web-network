@@ -1,7 +1,11 @@
-import { formatNumberToString } from "helpers/formatNumber";
 import React from "react";
+
+import { formatNumberToString } from "helpers/formatNumber";
+
+import { IDistribuitonPerUser } from "interfaces/proposal";
+
+
 import Avatar from "./avatar";
-import { IDistribuitonPerUser } from "@interfaces/proposal";
 
 interface IProposalProgressProps {
   usersDistribution: IDistribuitonPerUser[];
@@ -10,16 +14,16 @@ interface IProposalProgressProps {
 export default function ProposalProgress({
   usersDistribution
 }: IProposalProgressProps) {
-  
   return (
     <div className="container bg-shadow p-2">
       <div className="d-flex justify-content-center align-items-center gap-2">
         {usersDistribution.length > 0 &&
-          React.Children.toArray(
-            usersDistribution.map((item, index) => (
+          React.Children.toArray(usersDistribution.map((item, index) => (
               <div
                 key={index}
-                className={`rounded-bottom d-flex flex-column align-items-center gap-2`}
+                className={
+                  "rounded-bottom d-flex flex-column align-items-center gap-2"
+                }
                 style={{ width: `${item.percentage}%` }}
               >
                 <Avatar key={index} userLogin={item.githubLogin} tooltip />
@@ -30,8 +34,7 @@ export default function ProposalProgress({
 
                 <span className="w-100 bg-primary p-1 rounded" />
               </div>
-            ))
-          )}
+            )))}
       </div>
     </div>
   );

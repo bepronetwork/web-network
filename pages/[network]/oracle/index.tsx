@@ -1,16 +1,18 @@
-import {GetServerSideProps} from 'next/types';
-import React from 'react';
-import Newissues from './new-bounties';
-import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
+import React from "react";
+
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { GetServerSideProps } from "next/types";
+
+import Newissues from "./new-bounties";
 
 export default function PageOracle() {
   return <Newissues />;
 }
 
-export const getServerSideProps: GetServerSideProps = async ({locale}) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ['common', 'bounty', 'oracle'])),
-    },
+      ...(await serverSideTranslations(locale, ["common", "bounty", "oracle"]))
+    }
   };
 };

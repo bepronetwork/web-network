@@ -40,6 +40,5 @@ export default function EthereumIcon(props: SVGProps<SVGSVGElement>) {
         fillOpacity="0.602"
       />
     </svg>
-  )
+  );
 }
-

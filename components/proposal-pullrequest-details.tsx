@@ -1,7 +1,10 @@
-import { pullRequest } from "@interfaces/issue-data";
-import { useIssue } from "contexts/issue";
-import { IDistribuitonPerUser } from "interfaces/proposal";
 import { useTranslation } from "next-i18next";
+
+import { useIssue } from "contexts/issue";
+
+import { pullRequest } from "interfaces/issue-data";
+import { IDistribuitonPerUser } from "interfaces/proposal";
+
 import Avatar from "./avatar";
 import DateLabel from "./date-label";
 import GithubInfo from "./github-info";
@@ -15,7 +18,7 @@ interface IProposalPRDetailsProps {
 }
 export default function ProposalPullRequestDetail({
   currentPullRequest,
-  usersDistribution,
+  usersDistribution
 }: IProposalPRDetailsProps) {
   const { t } = useTranslation("pull-request");
   const { activeIssue } = useIssue();
@@ -43,7 +46,7 @@ export default function ProposalPullRequestDetail({
           <GithubInfo
             parent="hero"
             variant="user"
-            label={[`@`, currentPullRequest?.githubLogin].join(``)}
+            label={["@", currentPullRequest?.githubLogin].join("")}
           />
         </div>
 
@@ -55,11 +58,11 @@ export default function ProposalPullRequestDetail({
               label={activeIssue?.repository?.githubPath}
             />
           )) ||
-            ``}
+            ""}
         </span>
 
         <span className="caption-small text-ligth-gray text-uppercase">
-          <Translation label={`branch`} />
+          <Translation label={"branch"} />
           <span className="text-primary">:{currentPullRequest?.branch}</span>
         </span>
 

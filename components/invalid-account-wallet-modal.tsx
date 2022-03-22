@@ -1,29 +1,25 @@
-import Image from 'next/image'
-import { useRouter } from 'next/router'
-import { signIn, signOut } from 'next-auth/react'
+import { signIn, signOut } from "next-auth/react";
+import Image from "next/image";
+import { useRouter } from "next/router";
 
-import metamaskLogo from '@assets/metamask.png'
-import ErrorMarkIcon from '@assets/icons/errormark-icon'
+import ErrorMarkIcon from "assets/icons/errormark-icon";
+import metamaskLogo from "assets/metamask.png";
 
-import Modal from '@components/modal'
-import Avatar from '@components/avatar'
-import Button from '@components/button'
+import Avatar from "components/avatar";
+import Button from "components/button";
+import Modal from "components/modal";
 
-import { truncateAddress } from '@helpers/truncate-address'
+import { truncateAddress } from "helpers/truncate-address";
 
-export default function InvalidAccountWalletModal({
-  user,
-  wallet,
-  isVisible
-}) {
-  const { asPath } = useRouter()
+export default function InvalidAccountWalletModal({ user, wallet, isVisible }) {
+  const { asPath } = useRouter();
 
   async function handleSubmit() {
-    await signOut({ redirect: false })
+    await signOut({ redirect: false });
 
-    return signIn('github', {
+    return signIn("github", {
       callbackUrl: `${window.location.protocol}//${window.location.host}/${asPath}`
-    })
+    });
   }
 
   return (
@@ -44,10 +40,12 @@ export default function InvalidAccountWalletModal({
         <div className="row gx-3 connect-account">
           <div className="col-6">
             <div
-              className={`button-connect border bg-dark border-danger d-flex justify-content-between p-3 align-items-center`}
+              className={
+                "button-connect border bg-dark border-danger d-flex justify-content-between p-3 align-items-center"
+              }
             >
               <div>
-                <Avatar src={user?.image} userLogin={user?.login || `null`} />{' '}
+                <Avatar src={user?.image} userLogin={user?.login || "null"} />{" "}
                 <span className="ms-2">{user?.name || user?.login}</span>
               </div>
 
@@ -56,10 +54,12 @@ export default function InvalidAccountWalletModal({
           </div>
           <div className="col-6">
             <div
-              className={`button-connect border bg-dark border-danger d-flex justify-content-between p-3 align-items-center`}
+              className={
+                "button-connect border bg-dark border-danger d-flex justify-content-between p-3 align-items-center"
+              }
             >
               <div>
-                <Image src={metamaskLogo} width={15} height={15} />{' '}
+                <Image src={metamaskLogo} width={15} height={15} />{" "}
                 <span className="ms-2">
                   {wallet?.address && truncateAddress(wallet?.address)}
                 </span>
@@ -76,5 +76,5 @@ export default function InvalidAccountWalletModal({
         </div>
       </div>
     </Modal>
-  )
+  );
 }

@@ -1,17 +1,17 @@
-$white: #FFFFFF;
+$white: #ffffff;
 $black: #000000;
 
 //Brand Colors
-$primary: #4250E4;
-$secondary: #FD8B2A;
+$primary: #4250e4;
+$secondary: #fd8b2a;
 
 //Buttons, Label and States
-$info: #87C7EC;
+$info: #87c7ec;
 $purple: #9669ed;
 $success: #35e0ad;
 $danger: #eb5757;
-$warning: #EE9240;
-$light-warning: #FFD646;
+$warning: #ee9240;
+$light-warning: #ffd646;
 //Specials
 $dark-gray: #20222b;
 $gray: #c4c7d3;
@@ -19,12 +19,12 @@ $ligth-gray: #434758;
 $blue: #4250e4;
 $blue-dark: #3b49e0;
 // Fix-ME: Remove disabled color
-$disabled:#423B51;
+$disabled: #423b51;
 
 $bg: #0d0f19;
 $bg-opac: rgba($white, 0.1);
 $bg-shadow: #151720;
-$bg-blue-shadow: #1825AD;
+$bg-blue-shadow: #1825ad;
 $toast-font-size: 1rem;
 $m: 16px;
 
@@ -37,50 +37,54 @@ $enable-negative-margins: true;
 
 @import "~bootstrap/scss/functions";
 
-
 $more-bg: (
-        'dark': $bg,
-        'white-50': $gray,
-        'shadow': $bg-shadow,
-        'opac': $bg-opac,
-        'purple': $purple,
-        'blue': $blue,
-        'success': $success,
-        'dark-gray': $dark-gray,
-        'ligth-gray': $ligth-gray,
-        'disabled': $disabled,
-        'danger': $danger,
-        'warning': $warning,
-        'warning-opac-25': rgba($warning, 0.25),
-        'danger-opac-25': rgba($warning, 0.25),
-        'white-40': rgba($white, 0.4),
-        'white-70': rgba($white, 0.7),
-        'white-30': rgba($white, 0.3),
-        'white-10': rgba($white, 0.1),
-        'danger-10': rgba($danger, 0.1),
-        'info-10': rgba($info, 0.1),
-        'primary-30': rgba($primary, 0.3),
-        'info-30': rgba($info, 0.3),
-        'success-30': rgba($success, 0.3),
-        'danger-30': rgba($danger, 0.3),
-        'warning-30': rgba($warning, 0.3),
-        'gray-70': rgba($gray, 0.7),
+  "dark": $bg,
+  "white-50": $gray,
+  "shadow": $bg-shadow,
+  "opac": $bg-opac,
+  "purple": $purple,
+  "blue": $blue,
+  "success": $success,
+  "dark-gray": $dark-gray,
+  "ligth-gray": $ligth-gray,
+  "disabled": $disabled,
+  "danger": $danger,
+  "warning": $warning,
+  "warning-opac-25": rgba($warning, 0.25),
+  "danger-opac-25": rgba($warning, 0.25),
+  "white-40": rgba($white, 0.4),
+  "white-70": rgba($white, 0.7),
+  "white-30": rgba($white, 0.3),
+  "white-10": rgba($white, 0.1),
+  "danger-10": rgba($danger, 0.1),
+  "info-10": rgba($info, 0.1),
+  "primary-30": rgba($primary, 0.3),
+  "info-30": rgba($info, 0.3),
+  "success-30": rgba($success, 0.3),
+  "danger-30": rgba($danger, 0.3),
+  "warning-30": rgba($warning, 0.3),
+  "gray-70": rgba($gray, 0.7)
 );
 
-$more-colors: ('blue-dark': $blue-dark, 'gray': $gray, 'dark-gray': $dark-gray, 'ligth-gray': $ligth-gray, 'black': $black, 'white': #fff);
-
+$more-colors: (
+  "blue-dark": $blue-dark,
+  "gray": $gray,
+  "dark-gray": $dark-gray,
+  "ligth-gray": $ligth-gray,
+  "black": $black,
+  "white": #fff
+);
 
 $more-roundend: (
-  '4': 0.4rem,
-  '5': 0.5rem,
-  '6': 0.6rem,
-  '7': 0.7rem,
-  '8': 0.8rem,
+  "4": 0.4rem,
+  "5": 0.5rem,
+  "6": 0.6rem,
+  "7": 0.7rem,
+  "8": 0.8rem
 );
 
-
 //buttons
-$btn-font-family: 'fontRegular', sans-serif;
+$btn-font-family: "fontRegular", sans-serif;
 $btn-font-weight: 600;
 $btn-line-height: 71%;
 
@@ -100,26 +104,25 @@ $btn-border-radius: 1.25rem;
 $btn-border-radius-sm: $btn-border-radius;
 $btn-border-radius-lg: $btn-border-radius;
 
-
 //pagination
-$pagination-color:                  $gray;
-$pagination-bg:                     $bg;
-$pagination-border-color:           $bg;
-$pagination-disabled-bg:            $bg;
-$pagination-disabled-border-color:  $bg;
-$pagination-active-bg:              $primary;
-$pagination-active-border-color:    $primary;
-$pagination-border-radius:          8px;
-$pagination-hover-bg:               $bg;
-$pagination-hover-border-color:     $bg;
-$pagination-hover-color:            $white;
-$pagination-focus-bg:               $bg;
-$pagination-focus-outline:          $bg;
+$pagination-color: $gray;
+$pagination-bg: $bg;
+$pagination-border-color: $bg;
+$pagination-disabled-bg: $bg;
+$pagination-disabled-border-color: $bg;
+$pagination-active-bg: $primary;
+$pagination-active-border-color: $primary;
+$pagination-border-radius: 8px;
+$pagination-hover-bg: $bg;
+$pagination-hover-border-color: $bg;
+$pagination-hover-color: $white;
+$pagination-focus-bg: $bg;
+$pagination-focus-outline: $bg;
 
-$form-check-input-bg:                   $bg-shadow;
-$form-check-input-border:               1px solid $gray;
-$form-check-input-focus-border:         $primary;
-$form-check-input-checked-bg-color:     $primary;
+$form-check-input-bg: $bg-shadow;
+$form-check-input-border: 1px solid $gray;
+$form-check-input-focus-border: $primary;
+$form-check-input-checked-bg-color: $primary;
 $form-check-input-checked-border-color: $primary;
 
 $enable-validation-icons: false;
@@ -138,17 +141,90 @@ $tooltip-arrow-color: $white;
 $theme-colors: map-merge($theme-colors, map-merge($more-bg, $more-colors));
 
 $utilities: map-merge(
-        $utilities, (
-                'shadow': map-merge(map-get($utilities, 'shadow'), (state: hover)),
-                'border': map-merge(map-get($utilities, 'border'), (state: hover)),
-                'border-bottom': map-merge(map-get($utilities, 'border-bottom'), (state: hover)),
-                'border-top': map-merge(map-get($utilities, 'border-top'), (state: hover)),
-                'border-color': map-merge(map-get($utilities, 'border-color'), (state: hover, values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-colors))),
-                'color': map-merge(map-get($utilities, 'color'), (state: hover , values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-colors))),
-                'background-color': map-merge(map-get($utilities, 'background-color'), (state: hover, values: map-merge(map-get(map-get($utilities, 'background-color'), 'values'), $more-bg))),
-                "opacity": map-merge(map-get($utilities, 'opacity'),(state: hover, values: map-get(map-get($utilities, 'opacity'), 'values'))),
-                'rounded':map-merge(map-get($utilities, 'rounded'),(values:map-merge(map-get(map-get($utilities, 'rounded'), 'values'),$more-roundend))))
-)
-
-
-
+  $utilities,
+  (
+    "shadow":
+      map-merge(
+        map-get($utilities, "shadow"),
+        (
+          state: hover
+        )
+      ),
+    "border":
+      map-merge(
+        map-get($utilities, "border"),
+        (
+          state: hover
+        )
+      ),
+    "border-bottom":
+      map-merge(
+        map-get($utilities, "border-bottom"),
+        (
+          state: hover
+        )
+      ),
+    "border-top":
+      map-merge(
+        map-get($utilities, "border-top"),
+        (
+          state: hover
+        )
+      ),
+    "border-color":
+      map-merge(
+        map-get($utilities, "border-color"),
+        (
+          state: hover,
+          values:
+            map-merge(
+              map-get(map-get($utilities, "background-color"), "values"),
+              $more-colors
+            )
+        )
+      ),
+    "color":
+      map-merge(
+        map-get($utilities, "color"),
+        (
+          state: hover,
+          values:
+            map-merge(
+              map-get(map-get($utilities, "background-color"), "values"),
+              $more-colors
+            )
+        )
+      ),
+    "background-color":
+      map-merge(
+        map-get($utilities, "background-color"),
+        (
+          state: hover,
+          values:
+            map-merge(
+              map-get(map-get($utilities, "background-color"), "values"),
+              $more-bg
+            )
+        )
+      ),
+    "opacity":
+      map-merge(
+        map-get($utilities, "opacity"),
+        (
+          state: hover,
+          values: map-get(map-get($utilities, "opacity"), "values")
+        )
+      ),
+    "rounded":
+      map-merge(
+        map-get($utilities, "rounded"),
+        (
+          values:
+            map-merge(
+              map-get(map-get($utilities, "rounded"), "values"),
+              $more-roundend
+            )
+        )
+      )
+  )
+);
