@@ -14,22 +14,22 @@ export default function Step({
   children,
   validated = false,
   finishLabel,
-  handleClick = (index) => {},
-  handleFinish = () => {},
+  handleClick,
+  handleFinish,
   ...props
 }: IStep) {
   const isActive = activeStep === index;
 
   function handleAction() {
-    if (finishLabel) handleFinish();
-    else handleClick(index + 1);
+    if (finishLabel) handleFinish?.();
+    else handleClick?.(index + 1);
   }
 
   return (
     <div className="step border-radius-8 p-4">
       <div
         className="d-flex flex-row align-items-center cursor-pointer"
-        onClick={() => handleClick(index)}
+        onClick={() => handleClick?.(index)}
       >
         <span
           className={`caption-medium mr-1 ${

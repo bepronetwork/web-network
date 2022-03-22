@@ -136,6 +136,7 @@ export default function PageIssue() {
   }
 
   function syncLocalyState() {
+    // eslint-disable-next-line no-unsafe-optional-chaining
     if (issue?.comments) setCommentsIssue([...issue?.comments] as any);
   }
 

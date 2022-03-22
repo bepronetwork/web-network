@@ -19,13 +19,13 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   if (issues?.length < 1) return res.status(400).json("issues not find");
 
-  const created = [];
+  // const created = [];
 
-  for (const issue of issues) {
-    const [, repo] = issue?.repository.githubPath.split("/");
-    const [, ghId] = issue?.issueId.split("/");
+  // for (const issue of issues) {
+    // const [, repo] = issue?.repository.githubPath.split("/");
+    // const [, ghId] = issue?.issueId.split("/");
 
-    console.log("Parsing issue", issue?.issueId, repo, issue?.title);
+    // console.log("Parsing issue", issue?.issueId, repo, issue?.title);
 
     // const card = await generateCard({
     //   state: issue?.state,
@@ -45,9 +45,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     //   await issue.update({ seoImage: response.hash });
     //   created.push({ issueId: issue?.issueId, seoImage: response.hash });
     // }
-  }
+  // }
 
-  return res.status(200).json(created);
+  return res.status(200).json('created');
 }
 
 export default async function GetIssues(req: NextApiRequest,

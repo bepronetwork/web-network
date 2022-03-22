@@ -4,12 +4,12 @@ import usePage from "../x-hooks/use-page";
 
 export default function Paginate({
   count = 1,
-  onChange = (evt: string) => {}
+  onChange,
 }) {
   const page = usePage();
 
   function handleOnChange({ target: { value } }) {
-    onChange(value + 1);
+    onChange?.(value + 1);
   }
 
   if (!count || count <= 10) return <></>;

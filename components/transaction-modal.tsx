@@ -27,7 +27,7 @@ import InternalLink from "./internal-link";
 
 export default function TransactionModal({
   transaction = null,
-  onCloseClick = () => {}
+  onCloseClick,
 }: {
   transaction: Transaction;
   onCloseClick: () => void;
