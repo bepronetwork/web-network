@@ -224,6 +224,11 @@ export default function useApi() {
   async function getTotalUsers(): Promise<number> {
     return client.get<number>("/search/users/total").then(({ data }) => data);
   }
+  
+  async function getTotalBounties(state: string, networkName = BEPRO_NETWORK_NAME): Promise<number> {
+    const search = new URLSearchParams({ state, networkName }).toString();
+    return client.get<number>(`/search/issues/total?${search}`).then(({ data }) => data);
+  }
 
   async function getAllUsers(payload: { page: number } = { page: 1 }) {
     return client
@@ -572,6 +577,7 @@ export default function useApi() {
     getPullRequestIssue,
     getReposList,
     getTotalUsers,
+    getTotalBounties,
     getUserOf,
     getUserPullRequests,
     getUserWith,
