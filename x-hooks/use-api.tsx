@@ -312,12 +312,12 @@ export default function useApi() {
   async function processEvent(eventName,
                               fromBlock: number,
                               id: number,
-                              pullRequestId = "",
+                              params?: object,
                               networkName = BEPRO_NETWORK_NAME) {
     return client.post(`/past-events/${eventName}/`, {
       fromBlock,
       id,
-      pullRequestId,
+      ...params,
       networkName
     });
   }

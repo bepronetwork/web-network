@@ -4,6 +4,7 @@ import { useTranslation } from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
 
+import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
 
 import { isProposalDisputable } from "helpers/proposal";
@@ -34,6 +35,7 @@ export default function ProposalActionCard({
   const [disputableTime, setDisputableTime] = useState(0);
   const { t } = useTranslation(["common", "pull-request"]);
   const { networkIssue } = useIssue();
+  const {beproServiceStarted} =useAuthentication()
 
   const isDisputable = [
     !networkProposal?.isDisputed,
@@ -46,7 +48,8 @@ export default function ProposalActionCard({
   ].every((v) => v);
 
   useEffect(() => {
-    BeproService.getDisputableTime().then(setDisputableTime);
+    if(!beproServiceStarted) return;
+    BeproService?.getDisputableTime().then(setDisputableTime);
   }, [proposal, networkIssue]);
 
   return (
