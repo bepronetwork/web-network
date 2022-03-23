@@ -29,6 +29,7 @@ export interface IAuthenticationContext {
   beproServiceStarted?: boolean;
   login: () => void;
   updateWalletBalance: () => void;
+  updateIsApprovedSettlerToken: () => void;
 }
 
 const AuthenticationContext = createContext<IAuthenticationContext>({} as IAuthenticationContext);
@@ -110,7 +111,7 @@ export const AuthenticationProvider = ({ children }) => {
       BeproService.getBalance("bepro"),
       BeproService.getBalance("eth"),
       BeproService.getBalance("staked"),
-      BeproService.network.isCouncil(wallet?.address)
+      BeproService.network.isCouncil(wallet?.address),
     ])
     setWallet((previousWallet) => ({
       ...previousWallet,
@@ -123,6 +124,16 @@ export const AuthenticationProvider = ({ children }) => {
         staked,
       }}))
   }, [wallet?.address]);
+
+  const updateIsApprovedSettlerToken = useCallback(async ()=>{
+    const [isApprovedSettlerToken] = await Promise.all([
+      BeproService.isApprovedSettlerToken()
+    ])
+    setWallet(previousWallet =>({
+      ...previousWallet,
+      isApprovedSettlerToken
+    }))
+  },[wallet])
 
   // Side effects needed to the context work
   useEffect(() => {
@@ -141,11 +152,17 @@ export const AuthenticationProvider = ({ children }) => {
 
     if (user && !wallet && beproServiceStarted)
       BeproService.login()
-        .then(() =>
+        .then(async() =>{
+          const [isCouncil, isApprovedSettlerToken] = await Promise.all([
+            BeproService.network.isCouncil(BeproService.address),
+            BeproService.isApprovedSettlerToken()
+          ])
           setWallet((previousWallet) => ({
             ...previousWallet,
+            isCouncil,
+            isApprovedSettlerToken,
             address: BeproService.address
-          })))
+          }))})
         .catch(console.log);
   }, [user, wallet, beproServiceStarted]);
 
@@ -182,13 +199,18 @@ export const AuthenticationProvider = ({ children }) => {
     };
   }, []);
 
+  // useEffect(() => {
+  //   console.table({wallet, user})
+  // }, [wallet, user]);
+  
   const memorized = useMemo<IAuthenticationContext>(() => ({
       user,
       wallet,
       beproServiceStarted,
       isGithubAndWalletMatched,
       login,
-      updateWalletBalance
+      updateWalletBalance,
+      updateIsApprovedSettlerToken
   }),
     [user, wallet, beproServiceStarted, isGithubAndWalletMatched]);
 
