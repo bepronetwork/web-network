@@ -68,6 +68,7 @@ export default function useBepro(props?: IUseBeProDefault) {
   }
 
   async function handleCloseIssue(issueId: string,
+                                  pullRequestId: string,
                                   proposalscMergeId: number): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue },
@@ -80,7 +81,7 @@ export default function useBepro(props?: IUseBeProDefault) {
         .closeIssue(networkIssue?._id, proposalscMergeId)
         .then((txInfo) => {
           // Review: Review processEnvets are working correctly
-          processEvent("close-issue", txInfo.blockNumber, networkIssue?._id).then(() => {
+          processEvent("close-issue", txInfo.blockNumber, networkIssue?._id, {pullRequestId}).then(() => {
             onSuccess?.();
           });
           txWindow.updateItem(closeIssueTx.payload.id,
@@ -191,7 +192,7 @@ export default function useBepro(props?: IUseBeProDefault) {
                      processEvent("merge-proposal",
                                   txInfo.blockNumber,
                                   networkIssue?._id,
-                                  prGhId,
+                                  {pullRequestId: prGhId},
                                   activeNetwork?.name);
              
                      txWindow.updateItem(tx.payload.id,
