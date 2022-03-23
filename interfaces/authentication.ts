@@ -10,5 +10,7 @@ export interface IUser {
 
 export interface IWallet {
   address: string;
+  isCouncil: boolean;
+  isApprovedSettlerToken: boolean;
   balance?: IBalance;
 }
