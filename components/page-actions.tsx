@@ -55,14 +55,13 @@ interface pageActions {
   finished?: boolean;
   issueCreator?: string;
   repoPath?: string;
-  addNewComment?: (comment: any) => void;
+  addNewComment?: (comment: string) => void;
   issueRepo?: string;
   isDisputable?: boolean;
-  onCloseEvent?: () => Promise<any>;
+  onCloseEvent?: () => void;
 }
 
 export default function PageActions({
-  issueId,
   developers,
   finalized,
   networkCID,
@@ -73,7 +72,6 @@ export default function PageActions({
   forks,
   title,
   description,
-  mergeProposals,
   handleMicroService,
   githubLogin,
   hasOpenPR = false,
@@ -101,7 +99,7 @@ export default function PageActions({
   const { activeNetwork } = useNetwork();
   const { wallet, user } = useAuthentication();
   const { handleReedemIssue } = useBepro();
-  const { networkIssue, updateIssue } = useIssue();
+  const { updateIssue } = useIssue();
 
   const { createPullRequestIssue, startWorking } = useApi();
 
@@ -145,9 +143,8 @@ export default function PageActions({
     ].some((values) => values === false);
 
   async function handleRedeem() {
-    handleReedemIssue(networkIssue._id,
-                      typeof repoId === "string" && repoId,
-                      typeof id === "string" && id,
+    handleReedemIssue(`${repoId}`,
+                      `${id}`,
                       updateIssue).then(() => {
         //TODO: Move to useAuth balance;
                         BeproService.getBalance("bepro").then((bepro) =>
@@ -179,13 +176,10 @@ export default function PageActions({
       pullRequests?.length > 0 &&
       githubLogin && (
         <NewProposal
-          issueId={issueId}
           isFinished={finished}
           isIssueOwner={issueCreator === wallet?.address}
           amountTotal={amountIssue}
-          mergeProposals={mergeProposals}
           pullRequests={pullRequests}
-          handleMicroService={handleMicroService}
         />
       )
     );

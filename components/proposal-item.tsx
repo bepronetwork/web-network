@@ -43,7 +43,7 @@ export default function ProposalItem({
 
   async function handleDispute() {
     if (!isDisputable || isFinalized) return;
-    handlerDisputeProposal(networkIssue?._id, +proposal.scMergeId).then(() =>
+    handlerDisputeProposal(+proposal.scMergeId).then(() =>
       getNetworkIssue());
   }
 

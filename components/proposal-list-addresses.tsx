@@ -35,17 +35,17 @@ export default function ProposalListAddresses({
                   className="bg-dark-gray px-3 py-3 d-flex justify-content-between mt-1"
                 >
                   <span className="caption-medium text-gray">
-                    {truncateAddress(item.address)}
+                    {truncateAddress(item?.address)}
                   </span>
                   <div className="caption-medium color-purple mb-0">
-                    <span className="text-gray">{item.percentage}%</span>
+                    <span className="text-gray">{item?.percentage}%</span>
                     <ArrowRight
                       className="text-gray mx-2"
                       width={10}
                       height={10}
                     />
                     <span>
-                      {formatNumberToNScale(+item.oracles)}{" "}
+                      {formatNumberToNScale(+item?.oracles)}{" "}
                       <span className="text-primary">${currency}</span>
                     </span>
                   </div>
