@@ -30,7 +30,7 @@ export default async function readCloseIssues(events,
     const merge = issue?.mergeProposals?.find((mp) => mp.scMergeId == eventData.mergeID);
     const mergeProposal = await models.mergeProposal.findOne({
       where: { id: merge.id },
-      include: ["pullrequest"]
+      include: ["pullRequest"]
     });
 
     const pullRequest = mergeProposal.pullrequest;
@@ -39,11 +39,13 @@ export default async function readCloseIssues(events,
       where: { id: issue?.repository_id }
     });
     const [owner, repo] = repoInfo.githubPath.split("/");
+    
     await octokit.rest.pulls.merge({
       owner,
       repo,
-      pull_number: pullRequest.githubId
+      pull_number: pullRequest?.githubId
     });
+    
     await octokit.rest.issues.update({
       owner,
       repo,

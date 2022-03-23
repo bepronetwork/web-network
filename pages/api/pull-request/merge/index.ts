@@ -73,7 +73,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const octoResponse = await octoKit.rest.pulls.merge({
       owner,
       repo,
-      pull_number: pullRequest.githubId
+      pull_number: pullRequest?.githubId
     });
 
     return res.status(octoResponse.status).json(octoResponse.data);
