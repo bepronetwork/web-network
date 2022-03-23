@@ -29,6 +29,7 @@ import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 
 interface participants {
   githubHandle: string;
+  githubLogin: string;
   address?: string;
 }
 
@@ -423,8 +424,8 @@ export default function NewProposal({
               {participants.map((item) => (
                 <CreateProposalDistributionItem
                   key={item.githubHandle}
-                  by={item.githubHandle}
-                  address={item.address}
+                  githubHandle={item.githubHandle}
+                  githubLogin={item.githubLogin}
                   onChangeDistribution={handleChangeDistrib}
                   defaultPercentage={0}
                   error={!!error}
