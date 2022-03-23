@@ -49,7 +49,6 @@ export default function PageProposal() {
 
   async function closeIssue() {
     handleCloseIssue(activeIssue?.issueId,
-                     `${pullRequest?.githubId}`,
                      +proposal.scMergeId)
       .then(() =>
         mergeClosedIssue(activeIssue?.issueId,

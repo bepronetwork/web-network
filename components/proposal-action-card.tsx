@@ -35,7 +35,7 @@ export default function ProposalActionCard({
   const [disputableTime, setDisputableTime] = useState(0);
   const { t } = useTranslation(["common", "pull-request"]);
   const { networkIssue } = useIssue();
-  const {beproServiceStarted} =useAuthentication()
+  const { beproServiceStarted } = useAuthentication()
 
   const isDisputable = [
     !networkProposal?.isDisputed,
