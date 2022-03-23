@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { NumberFormatValues } from "react-number-format";
 
-import { InputNumber as InputNumberProps } from "types/input-number";
-
 import Avatar from "components/avatar";
 import InputNumber from "components/input-number";
 

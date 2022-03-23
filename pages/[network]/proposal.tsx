@@ -48,8 +48,7 @@ export default function PageProposal() {
   >([]);
 
   async function closeIssue() {
-    handleCloseIssue(+networkIssue._id,
-                     activeIssue?.issueId,
+    handleCloseIssue(activeIssue?.issueId,
                      +proposal.scMergeId)
       .then(() =>
         mergeClosedIssue(activeIssue?.issueId,
@@ -74,7 +73,7 @@ export default function PageProposal() {
   }
 
   async function disputeProposal() {
-    handlerDisputeProposal(+networkIssue?._id, +proposal?.scMergeId).then(() => {
+    handlerDisputeProposal(+proposal?.scMergeId).then(() => {
       getNetworkIssue();
     });
   }
@@ -85,9 +84,9 @@ export default function PageProposal() {
       networkProposal?.prAmounts?.length < 1
     )
       return;
-
-    async function mapUser(address: string,
-                           i: number): Promise<IDistribuitonPerUser> {
+  
+    async function mapUser(address: string, i: number): Promise<IDistribuitonPerUser> {
+      if(!address) return;
       const { githubLogin } = await getUserOf(address);
       const oracles = networkProposal?.prAmounts[i].toString();
       const percentage = handlePercentage(+oracles, +activeIssue?.amount, 2);

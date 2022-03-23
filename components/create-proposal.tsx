@@ -1,31 +1,23 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import clsx from "clsx";
 import { useTranslation } from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
 
-import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
-import { useNetwork } from "contexts/network";
-import { toastWarning } from "contexts/reducers/add-toast";
-import { addTransaction } from "contexts/reducers/add-transaction";
-import { updateTransaction } from "contexts/reducers/update-transaction";
+import { useIssue } from "contexts/issue";
 import { useRepos } from "contexts/repos";
 
 import sumObj from "helpers/sumObj";
 
-import { ProposalData } from "interfaces/api-response";
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { pullRequest } from "interfaces/issue-data";
-import { Proposal } from "interfaces/proposal";
 
 import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
+import useBepro from "x-hooks/use-bepro";
 import useOctokit from "x-hooks/use-octokit";
-import useTransactions from "x-hooks/useTransactions";
 
 import Avatar from "./avatar";
 import Button from "./button";
@@ -95,11 +87,8 @@ function SelectOptionComponent({ innerProps, innerRef, data }) {
 }
 
 export default function NewProposal({
-  issueId,
   amountTotal,
-  mergeProposals,
   pullRequests = [],
-  handleMicroService,
   isIssueOwner = false,
   isFinished = false
 }) {
@@ -110,15 +99,12 @@ export default function NewProposal({
     "pull-request"
   ]);
 
-  const [amount, setAmount] = useState<number>();
   const [show, setShow] = useState<boolean>(false);
   const [isCouncil, setIsCouncil] = useState(false);
   const [error, setError] = useState<boolean>(false);
   const [distrib, setDistrib] = useState<object>({});
-  const [councilAmount, setCouncilAmount] = useState(0);
   const [success, setSuccess] = useState<boolean>(false);
   const [warning, setWarning] = useState<boolean>(false);
-  const [proposals, setProposals] = useState<any[]>([]);
   const [currentGithubId, setCurrentGithubId] = useState<string>();
   const [participants, setParticipants] = useState<participants[]>([]);
   const [showExceptionalMessage, setShowExceptionalMessage] =
@@ -126,14 +112,16 @@ export default function NewProposal({
   const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest);
 
   const { activeRepo } = useRepos();
-  const { activeNetwork } = useNetwork();
-  const { dispatch } = useContext(ApplicationContext);
-  const { wallet, user, beproServiceStarted } = useAuthentication();
+  const { wallet, beproServiceStarted } = useAuthentication();
 
-  const txWindow = useTransactions();
+  const { handleRecognizeAsFinished, handleProposeMerge } = useBepro({onSuccess})
+  const { updateIssue, activeIssue, networkIssue } = useIssue()
   const { getParticipants } = useOctokit();
-  const { getUserWith, waitForMerge, processMergeProposal, processEvent } =
-    useApi();
+  const { getUserWith } = useApi();
+
+  function onSuccess(){
+    updateIssue(activeIssue.repository.id,activeIssue.githubId)
+  }
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
     setDistrib((prevState) => {
@@ -146,26 +134,6 @@ export default function NewProposal({
         ...params
       };
     });
-  }
-
-  async function loadProposalsMeta() {
-    if (!issueId || !beproServiceStarted) return;
-
-    const scIssueId = await BeproService.network
-      .getIssueByCID(issueId)
-      .then(({ _id }) => _id);
-    const pool = [];
-
-    for (const meta of mergeProposals as ProposalData[]) {
-      const { scMergeId, pullRequestId } = meta;
-      if (scMergeId) {
-        const merge = await BeproService.network.getMergeById(scIssueId,
-                                                              +scMergeId);
-        pool.push({ ...merge, pullRequestId } as Proposal);
-      }
-    }
-
-    setProposals(pool);
   }
 
   function isSameProposal(currentDistrbuition: SameProposal,
@@ -194,9 +162,9 @@ export default function NewProposal({
         }))
       };
 
-      const currentProposals = proposals.map((item) => {
+      const currentProposals = networkIssue?.networkProposals?.map((item) => {
         return {
-          currentPrId: Number(item.pullRequestId),
+          currentPrId: Number(activeIssue?.mergeProposals.find(mp=> mp.scMergeId === item._id).pullRequestId),
           prAddressAmount: item.prAddresses.map((value, key) => ({
             amount: Number(item.prAmounts[key]),
             address: value.toLowerCase()
@@ -223,7 +191,7 @@ export default function NewProposal({
         if (
           amountTotal < participants.length &&
           realValue < 1 &&
-          realValue != 0 &&
+          realValue !== 0 &&
           realValue < amountTotal
         ) {
           handleInputColor("error");
@@ -256,7 +224,7 @@ export default function NewProposal({
     }
   }
 
-  function getParticipantsPullRequest(id: string, githubId: string) {
+  function getParticipantsPullRequest(githubId: string) {
     if (!activeRepo) return;
 
     getParticipants(+githubId, activeRepo.githubPath)
@@ -287,10 +255,6 @@ export default function NewProposal({
   }
 
   async function handleClickCreate(): Promise<void> {
-    const issue_id = await BeproService.network
-      .getIssueByCID(issueId)
-      .then(({ _id }) => _id);
-
     function handleValues(amount, distributed) {
       return Math.floor((amount * distributed) / 100);
     }
@@ -305,116 +269,39 @@ export default function NewProposal({
       }
     });
 
-    const payload = {
-      issueID: issue_id,
-      prAddresses,
-      prAmounts
-    };
     //Chcking diff between total Distributed and total Ammount;
-    const totalDistributed = payload.prAmounts.reduce((p, c) => p + c);
+    const totalDistributed = prAmounts.reduce((p, c) => p + c);
     // Assigning the rest to last participant;
-    payload.prAmounts[payload.prAmounts.length - 1] += Math.ceil(amountTotal - totalDistributed);
+    prAmounts[prAmounts.length - 1] += Math.ceil(amountTotal - totalDistributed);
 
-    setShow(false);
-
-    const proposeMergeTx = addTransaction({ type: TransactionTypes.proposeMerge },
-                                          activeNetwork);
-    dispatch(proposeMergeTx);
-
-    waitForMerge(user?.login,
-                 issue_id,
-                 currentGithubId,
-                 activeNetwork?.name).then(() => {
-                   if (handleMicroService) handleMicroService(true);
-                   handleClose();
-                   setDistrib({});
-                 });
-
-    await BeproService.network
-      .proposeIssueMerge(payload.issueID,
-                         payload.prAddresses,
-                         payload.prAmounts)
-      .then((txInfo) => {
-        processEvent("merge-proposal",
-                     txInfo.blockNumber,
-                     issue_id,
-                     currentGithubId,
-                     activeNetwork?.name);
-
-        txWindow.updateItem(proposeMergeTx.payload.id,
-                            BeproService.parseTransaction(txInfo, proposeMergeTx.payload));
-
-        handleClose();
-      })
-      .catch((e) => {
-        if (e?.message?.search("User denied") > -1)
-          dispatch(updateTransaction({
-              ...(proposeMergeTx.payload as any),
-              remove: true
-          }));
-        else
-          dispatch(updateTransaction({
-              ...(proposeMergeTx.payload as any),
-              status: TransactionStatus.failed
-          }));
-        handleClose();
-      });
+    handleProposeMerge(currentPullRequest.githubId, prAddresses, prAmounts)
+    .finally(handleClose)
   }
 
   function handleClose() {
     if (pullRequests.length && activeRepo)
-      getParticipantsPullRequest(pullRequests[0]?.id,
-                                 pullRequests[0]?.githubId);
+      getParticipantsPullRequest(pullRequests[0]?.githubId);
     setCurrentGithubId(pullRequests[0]?.githubId);
 
     setShow(false);
-    setAmount(0);
     setDistrib({});
     handleInputColor("normal");
   }
 
   function handleChangeSelect({ value, githubId }) {
     setDistrib({});
-    setAmount(0);
     const newPr = pullRequests.find((el) => el.id === value);
     if (newPr) {
       setCurrentPullRequest(newPr);
     }
-    getParticipantsPullRequest(value, githubId);
+    getParticipantsPullRequest(githubId);
     handleInputColor("normal");
   }
 
   function recognizeAsFinished() {
-    const recognizeAsFinished = addTransaction({ type: TransactionTypes.recognizedAsFinish },
-                                               activeNetwork);
-    dispatch(recognizeAsFinished);
-
-    BeproService.network
-      .getIssueByCID(issueId)
-      .then((_issue) => {
-        return BeproService.network.recognizeAsFinished(_issue._id);
-      })
-      .then((txInfo) => {
-        txWindow.updateItem(recognizeAsFinished.payload.id,
-                            BeproService.parseTransaction(txInfo, recognizeAsFinished.payload));
-      })
-      .then(() => {
-        if (handleMicroService) handleMicroService(true);
-      })
-      .catch((e) => {
-        if (e?.message?.search("User denied") > -1)
-          dispatch(updateTransaction({
-              ...(recognizeAsFinished.payload as any),
-              remove: true
-          }));
-        else
-          dispatch(updateTransaction({
-              ...(recognizeAsFinished.payload as any),
-              status: TransactionStatus.failed
-          }));
-        dispatch(toastWarning(t("bounty:errors.recognize-finished")));
-        console.error("Failed to mark as finished", e);
-      });
+    handleRecognizeAsFinished().then(()=>{
+      updateIssue(activeIssue.repository.id, activeIssue.githubId)
+    })
   }
 
   function updateCreateProposalHideState() {
@@ -422,7 +309,6 @@ export default function NewProposal({
 
     BeproService.network
       .COUNCIL_AMOUNT()
-      .then(setCouncilAmount)
       .then(() => BeproService.network.isCouncil(wallet?.address))
       .then((isCouncil) => setIsCouncil(isCouncil));
   }
@@ -440,16 +326,11 @@ export default function NewProposal({
     !currentPullRequest.isMergeable || currentPullRequest.merged;
 
   useEffect(() => {
-    setAmount(sumObj(distrib));
-  }, [distrib]);
-
-  useEffect(() => {
     if (pullRequests.length && activeRepo && beproServiceStarted) {
       const defaultPr =
         pullRequests.find((el) => el.isMergeable) || pullRequests[0];
       setCurrentPullRequest(defaultPr);
-      getParticipantsPullRequest(defaultPr?.id, defaultPr?.githubId);
-      loadProposalsMeta();
+      getParticipantsPullRequest(defaultPr?.githubId);
     }
   }, [pullRequests, activeRepo, beproServiceStarted]);
 

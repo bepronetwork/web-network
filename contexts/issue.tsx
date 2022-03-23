@@ -27,8 +27,9 @@ import { useNetwork } from "./network";
 
 export interface IActiveIssue extends IssueData {
   comments: Comment[];
+  lastUpdated: number;
 }
-
+const TTL = 60 * 2 * 100; // 2 Min
 export interface IssueContextData {
   activeIssue: IActiveIssue;
   networkIssue: INetworkIssue;
@@ -79,7 +80,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     return Promise.all(mapPr);
   },
     []);
- 
+
   const updateIssue = useCallback(async (repoId: string | number, ghId: string | number): Promise<IActiveIssue> => {
     const issue = await getIssue(repoId, ghId, activeNetwork?.name);
     if (!issue) throw new Error("Issue not found");
@@ -94,7 +95,8 @@ export const IssueProvider: React.FC = function ({ children }) {
                                                       ghPath);
     const newActiveIssue = {
         ...issue,
-        comments
+        comments,
+        lastUpdated: +new Date()
     } as IActiveIssue;
 
     setActiveIssue(newActiveIssue);
@@ -148,10 +150,11 @@ export const IssueProvider: React.FC = function ({ children }) {
   }, [activeIssue, wallet?.address, beproServiceStarted]);
 
   useEffect(() => {
+    const noExpired = +new Date() - activeIssue?.lastUpdated <= TTL;
     if (query.id && query.repoId) {
       if (
         query.id !== activeIssue?.githubId ||
-        +query.repoId !== +activeIssue?.repository_id
+        +query.repoId !== +activeIssue?.repository_id && !noExpired
       ) {
         setActiveIssue(null);
         updateIssue(`${query.repoId}`, `${query.id}`);
@@ -160,7 +163,7 @@ export const IssueProvider: React.FC = function ({ children }) {
   }, [query, activeNetwork]);
 
   useEffect(() => {
-    //console.warn('useIssue',{activeIssue, networkIssue})
+    console.warn('useIssue',{activeIssue, networkIssue})
   }, [activeIssue, networkIssue]);
 
   const memorizeValue = useMemo<IssueContextData>(() => ({
