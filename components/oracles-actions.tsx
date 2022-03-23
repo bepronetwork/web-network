@@ -1,7 +1,6 @@
 import React, {
   Fragment,
   useContext,
-  useEffect,
   useRef,
   useState
 } from "react";
@@ -97,6 +96,15 @@ function OraclesActions() {
     }
   }[action];
 
+  const isButtonDisabled = (): boolean =>
+    [
+      tokenAmount < 1,
+      action === t("my-oracles:actions.lock.label") && !wallet.isApprovedSettlerToken,
+      !wallet?.address,
+      tokenAmount > getMaxAmmount(),
+      myTransactions.find(({ status, type }) =>
+          status === TransactionStatus.pending && type === getTxType())
+    ].some((values) => values);
 
   function handleCheck() {
     if (!tokenAmount) {
@@ -134,16 +142,6 @@ function OraclesActions() {
     setTokenAmount(0);
     setShow(false);
   }
-
-  const isButtonDisabled = (): boolean =>
-    [
-      tokenAmount < 1,
-      action === t("my-oracles:actions.lock.label") && !wallet.isApprovedSettlerToken,
-      !wallet?.address,
-      tokenAmount > getMaxAmmount(),
-      myTransactions.find(({ status, type }) =>
-          status === TransactionStatus.pending && type === getTxType())
-    ].some((values) => values);
 
   function approveSettlerToken() {
     if (!wallet?.address && !beproServiceStarted) return;

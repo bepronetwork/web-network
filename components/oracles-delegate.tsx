@@ -16,7 +16,7 @@ import { formatNumberToCurrency } from "helpers/formatNumber";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 
-function OraclesDelegate(): JSX.Element {
+function OraclesDelegate() {
   const { t } = useTranslation(["common", "my-oracles"]);
 
   const [error, setError] = useState<string>("");
