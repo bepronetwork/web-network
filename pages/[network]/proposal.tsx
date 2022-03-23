@@ -119,7 +119,7 @@ export default function PageProposal() {
 
   return (
     <>
-      <ProposalHero proposal={proposal} networkProposal={networkProposal} />
+      <ProposalHero proposal={proposal} />
       <CustomContainer>
         <div className="mt-3">
           <ProposalPullRequestDetail

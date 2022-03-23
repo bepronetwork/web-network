@@ -4,7 +4,7 @@ import { TransactionReceipt } from "bepro-js/dist/interfaces/web3-core";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
-import { IActiveIssue, useIssue } from "contexts/issue";
+import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { updateTransaction } from "contexts/reducers/update-transaction";
@@ -102,10 +102,7 @@ export default function useBepro(props?: IUseBeProDefault) {
     });
   }
 
-  async function handleReedemIssue(repoId: string,
-                                   ghId: string,
-                                   updateIssue: (repoId: string, ghId: string) => Promise<IActiveIssue>):
-    Promise<TransactionReceipt | Error> {
+  async function handleReedemIssue(): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue }, activeNetwork);
       dispatch(redeemTx);
@@ -118,7 +115,6 @@ export default function useBepro(props?: IUseBeProDefault) {
           // Review: Review processEnvets are working correctly
           processEvent(`redeem-issue`, txInfo.blockNumber, networkIssue?._id).then(() => {
             txWindow.updateItem(redeemTx.payload.id, BeproService.parseTransaction(txInfo, redeemTx.payload));
-            updateIssue(repoId, ghId)
             onSuccess?.()
           })
             .catch((err) => {
