@@ -1,6 +1,7 @@
 import { useContext } from "react";
 
 import { TransactionReceipt } from "bepro-js/dist/interfaces/web3-core";
+import { useTranslation } from "next-i18next";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
@@ -30,6 +31,7 @@ export default function useBepro(props?: IUseBeProDefault) {
   const { activeNetwork } = useNetwork();
   const { user }  = useAuthentication()
   const { networkIssue } = useIssue()
+  const { t } = useTranslation();
 
   const { processEvent, waitForClose, waitForRedeem, waitForMerge } = useApi();
   const txWindow = useTransactions();
@@ -164,7 +166,7 @@ export default function useBepro(props?: IUseBeProDefault) {
         });
     });
   }
-  
+
   async function handleProposeMerge(prGhId: string,
                                     addresses: string[],
                                     amounts: number[]): Promise<TransactionReceipt | Error> {
@@ -214,11 +216,48 @@ export default function useBepro(props?: IUseBeProDefault) {
     });
   }
 
+  async function handleApproveTransactionalToken(): Promise<TransactionReceipt | Error> {
+
+    return new Promise(async (resolve, reject) => {
+      
+      const tx = addTransaction({ type: TransactionTypes.approveTransactionalERC20Token },
+                                activeNetwork);
+      dispatch(tx);
+
+      await BeproService.network
+                   .approveTransactionalERC20Token()
+                   .then((txInfo) => {
+                     if (!txInfo) throw new Error(t("errors.approve-transaction"));
+             
+                     txWindow.updateItem(tx.payload.id,
+                                         BeproService.parseTransaction(txInfo, tx.payload));
+                     onSuccess?.(txInfo);
+                     resolve(txInfo);
+                   })
+        .catch((err) => {
+          if (err?.message?.search("User denied") > -1)
+            dispatch(updateTransaction({
+              ...(tx.payload as any),
+              remove: true
+            }));
+          else
+            dispatch(updateTransaction({
+              ...(tx.payload as any),
+              status: TransactionStatus.failed
+            }));
+          onError?.(err);
+          reject(err);
+          console.error("Error closing issue", err);
+        });
+    });
+  }
+
   return {
     handlerDisputeProposal,
     handleCloseIssue,
     handleReedemIssue,
     handleRecognizeAsFinished,
-    handleProposeMerge
+    handleProposeMerge,
+    handleApproveTransactionalToken
   };
 }
