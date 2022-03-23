@@ -44,7 +44,6 @@ interface NetworkTxButtonParams {
 function networkTxButton({
     txMethod,
     txParams,
-    onTxStart = () => {},
     onSuccess,
     onFail,
     buttonLabel,

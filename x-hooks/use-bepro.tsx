@@ -12,6 +12,7 @@ import { updateTransaction } from "contexts/reducers/update-transaction";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
+import { TransactionCurrency } from "interfaces/transaction";
 
 import { BeproService } from "services/bepro-service";
 
@@ -225,15 +226,54 @@ export default function useBepro(props?: IUseBeProDefault) {
       dispatch(tx);
 
       await BeproService.network
-                   .approveTransactionalERC20Token()
-                   .then((txInfo) => {
-                     if (!txInfo) throw new Error(t("errors.approve-transaction"));
-             
-                     txWindow.updateItem(tx.payload.id,
-                                         BeproService.parseTransaction(txInfo, tx.payload));
-                     onSuccess?.(txInfo);
-                     resolve(txInfo);
-                   })
+                    .approveTransactionalERC20Token()
+                    .then((txInfo) => {
+                      if (!txInfo) throw new Error(t("errors.approve-transaction"));
+              
+                      txWindow.updateItem(tx.payload.id,
+                                          BeproService.parseTransaction(txInfo, tx.payload));
+                      onSuccess?.(txInfo);
+                      resolve(txInfo);
+                    })
+        .catch((err) => {
+          if (err?.message?.search("User denied") > -1)
+            dispatch(updateTransaction({
+              ...(tx.payload as any),
+              remove: true
+            }));
+          else
+            dispatch(updateTransaction({
+              ...(tx.payload as any),
+              status: TransactionStatus.failed
+            }));
+          onError?.(err);
+          reject(err);
+          console.error("Error closing issue", err);
+        });
+    });
+  }
+
+  async function handleTakeBack(amount: number, 
+                                currency: TransactionCurrency, 
+                                address: string): Promise<TransactionReceipt | Error> {
+
+    return new Promise(async (resolve, reject) => {
+      const tx = addTransaction({ type: TransactionTypes.takeBackOracles,
+                                  amount,
+                                  currency },
+                                activeNetwork);
+      dispatch(tx);
+
+      await BeproService.network
+                    .unlock(amount, address)
+                    .then((txInfo) => {
+                      if (!txInfo) throw new Error(t("errors.approve-transaction"));
+              
+                      txWindow.updateItem(tx.payload.id,
+                                          BeproService.parseTransaction(txInfo, tx.payload));
+                      onSuccess?.(txInfo);
+                      resolve(txInfo);
+                    })
         .catch((err) => {
           if (err?.message?.search("User denied") > -1)
             dispatch(updateTransaction({
@@ -258,6 +298,7 @@ export default function useBepro(props?: IUseBeProDefault) {
     handleReedemIssue,
     handleRecognizeAsFinished,
     handleProposeMerge,
-    handleApproveTransactionalToken
+    handleApproveTransactionalToken,
+    handleTakeBack
   };
 }
