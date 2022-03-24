@@ -17,15 +17,12 @@ import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/add-toast";
-import { changeBalance } from "contexts/reducers/change-balance";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { developer, IssueState, pullRequest } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 import { IForkInfo } from "interfaces/repos-list";
-
-import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
@@ -55,14 +52,13 @@ interface pageActions {
   finished?: boolean;
   issueCreator?: string;
   repoPath?: string;
-  addNewComment?: (comment: any) => void;
+  addNewComment?: (comment: string) => void;
   issueRepo?: string;
   isDisputable?: boolean;
-  onCloseEvent?: () => Promise<any>;
+  onCloseEvent?: () => void;
 }
 
 export default function PageActions({
-  issueId,
   developers,
   finalized,
   networkCID,
@@ -73,7 +69,6 @@ export default function PageActions({
   forks,
   title,
   description,
-  mergeProposals,
   handleMicroService,
   githubLogin,
   hasOpenPR = false,
@@ -99,9 +94,9 @@ export default function PageActions({
     state: { myTransactions }
   } = useContext(ApplicationContext);
   const { activeNetwork } = useNetwork();
-  const { wallet, user } = useAuthentication();
+  const { wallet, user, updateWalletBalance } = useAuthentication();
   const { handleReedemIssue } = useBepro();
-  const { networkIssue, updateIssue } = useIssue();
+  const { updateIssue } = useIssue();
 
   const { createPullRequestIssue, startWorking } = useApi();
 
@@ -145,13 +140,10 @@ export default function PageActions({
     ].some((values) => values === false);
 
   async function handleRedeem() {
-    handleReedemIssue(networkIssue._id,
-                      typeof repoId === "string" && repoId,
-                      typeof id === "string" && id,
-                      updateIssue).then(() => {
-        //TODO: Move to useAuth balance;
-                        BeproService.getBalance("bepro").then((bepro) =>
-          dispatch(changeBalance({ bepro })));
+    handleReedemIssue()
+                      .then(()=>{
+                        updateIssue(`${repoId}`, `${id}`);
+                        updateWalletBalance()
                       });
   }
 
@@ -179,13 +171,10 @@ export default function PageActions({
       pullRequests?.length > 0 &&
       githubLogin && (
         <NewProposal
-          issueId={issueId}
           isFinished={finished}
           isIssueOwner={issueCreator === wallet?.address}
           amountTotal={amountIssue}
-          mergeProposals={mergeProposals}
           pullRequests={pullRequests}
-          handleMicroService={handleMicroService}
         />
       )
     );

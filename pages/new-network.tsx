@@ -116,7 +116,7 @@ export default function NewNetwork() {
     await BeproService.startNetworkFactory();
 
     BeproService.createNetwork()
-      .then((receipt) => {
+      .then(() => {
         BeproService.getNetworkAdressByCreator(wallet.address).then(async (networkAddress) => {
           const networkData = steps.network.data;
           const repositoriesData = steps.repositories;
@@ -139,7 +139,7 @@ export default function NewNetwork() {
               accessToken: user?.accessToken,
           };
 
-          createNetwork(json).then((result) => {
+          createNetwork(json).then(() => {
             router.push(getURLWithNetwork("/account/my-network/settings", {
                   network: json.name,
             }));

@@ -29,6 +29,7 @@ export interface IAuthenticationContext {
   beproServiceStarted?: boolean;
   login: () => void;
   updateWalletBalance: () => void;
+  updateIsApprovedSettlerToken: () => void;
 }
 
 const AuthenticationContext = createContext<IAuthenticationContext>({} as IAuthenticationContext);
@@ -56,12 +57,19 @@ export const AuthenticationProvider = ({ children }) => {
 
       await BeproService.login();
 
+      const [isCouncil, isApprovedSettlerToken] = await Promise.all([
+        BeproService.network.isCouncil(BeproService?.address),
+        BeproService.isApprovedSettlerToken()
+      ])
+
       setWallet((previousWallet) => ({
         ...previousWallet,
-        address: BeproService.address
+        isApprovedSettlerToken,
+        isCouncil,
+        address: BeproService?.address
       }));
 
-      const savedUser = await getUserOf(BeproService.address);
+      const savedUser = await getUserOf(BeproService?.address);
 
       if (!savedUser) return push(getURLWithNetwork("/connect-account"));
 
@@ -74,6 +82,7 @@ export const AuthenticationProvider = ({ children }) => {
   }, [asPath]);
 
   const validateWalletAndGithub = useCallback((address: string) => {
+    if(!address) return setIsGithubAndWalletMatched(false);
     getUserOf(address)
         .then(async (data) => {
           if (!data) {
@@ -91,43 +100,41 @@ export const AuthenticationProvider = ({ children }) => {
   },
     [user]);
 
-  const updateWalletBalance = useCallback(() => {
-    BeproService.getOraclesSummary().then((oracles) =>
-      setWallet((previousWallet) => ({
-        ...previousWallet,
-        balance: {
-          ...previousWallet.balance,
-          oracles: changeOraclesParse(previousWallet.address, oracles)
-        }
-      })));
+  const updateWalletBalance = useCallback(async () => {
+    const [
+      oracles,
+      bepro,
+      eth,
+      staked,
+      isCouncil,
+    ] = await Promise.all([
+      BeproService.getOraclesSummary(),
+      BeproService.getBalance("bepro"),
+      BeproService.getBalance("eth"),
+      BeproService.getBalance("staked"),
+      BeproService.network.isCouncil(BeproService.address),
+    ])
+    setWallet((previousWallet) => ({
+      ...previousWallet,
+      isCouncil,
+      balance: {
+        ...previousWallet.balance,
+        oracles: changeOraclesParse(BeproService.address, oracles),
+        bepro,
+        eth,
+        staked,
+      }}))
+  }, []);
 
-    BeproService.getBalance("bepro").then((bepro) =>
-      setWallet((previousWallet) => ({
-        ...previousWallet,
-        balance: {
-          ...previousWallet.balance,
-          bepro
-        }
-      })));
-
-    BeproService.getBalance("eth").then((eth) =>
-      setWallet((previousWallet) => ({
-        ...previousWallet,
-        balance: {
-          ...previousWallet.balance,
-          eth
-        }
-      })));
-
-    BeproService.getBalance("staked").then((staked) =>
-      setWallet((previousWallet) => ({
-        ...previousWallet,
-        balance: {
-          ...previousWallet.balance,
-          staked
-        }
-      })));
-  }, [wallet?.address]);
+  const updateIsApprovedSettlerToken = useCallback(async ()=>{
+    const [isApprovedSettlerToken] = await Promise.all([
+      BeproService.isApprovedSettlerToken()
+    ])
+    setWallet(previousWallet =>({
+      ...previousWallet,
+      isApprovedSettlerToken
+    }))
+  },[wallet])
 
   // Side effects needed to the context work
   useEffect(() => {
@@ -142,33 +149,41 @@ export const AuthenticationProvider = ({ children }) => {
       isGithubAndWalletMatched === undefined &&
       !EXCLUDED_PAGES.includes(String(pathname))
     )
-      validateWalletAndGithub(wallet.address);
+      validateWalletAndGithub(wallet?.address);
 
     if (user && !wallet && beproServiceStarted)
       BeproService.login()
-        .then(() =>
+        .then(async() =>{
+          const [isCouncil, isApprovedSettlerToken] = await Promise.all([
+            BeproService.network.isCouncil(BeproService?.address),
+            BeproService.isApprovedSettlerToken()
+          ])
           setWallet((previousWallet) => ({
             ...previousWallet,
-            address: BeproService.address
-          })))
+            isCouncil,
+            isApprovedSettlerToken,
+            address: BeproService?.address
+          }))})
         .catch(console.log);
   }, [user, wallet, beproServiceStarted]);
 
   useEffect(() => {
-    if (wallet && wallet?.address && beproServiceStarted) {
-      setIsGithubAndWalletMatched(undefined);
-      updateWalletBalance();
-    }
-  }, [wallet?.address, beproServiceStarted]);
-
-  useEffect(() => {
     if (wallet && wallet?.address && beproServiceStarted) updateWalletBalance();
-  }, [pathname, beproServiceStarted]);
+  }, [pathname, wallet?.address]);
 
   useEffect(() => {
     window.ethereum.on("accountsChanged", (accounts) => {
-      if (BeproService.isStarted)
-        BeproService.login().then(() => setWallet({ address: accounts[0] }));
+      if (BeproService.isStarted){
+        const address = accounts[0];
+        BeproService.login()
+        .then(async () =>{
+          const [isCouncil, isApprovedSettlerToken] = await Promise.all([
+            BeproService.network.isCouncil(address),
+            BeproService.isApprovedSettlerToken()
+          ])
+          setWallet({ address, isCouncil, isApprovedSettlerToken })
+        });
+      }
     });
   }, []);
 
@@ -184,15 +199,19 @@ export const AuthenticationProvider = ({ children }) => {
       clearInterval(checkBeproServiceStarted);
     };
   }, []);
-  // Side effects needed to the context work
 
+  // useEffect(() => {
+  //   console.table({wallet, user})
+  // }, [wallet, user]);
+  
   const memorized = useMemo<IAuthenticationContext>(() => ({
       user,
       wallet,
       beproServiceStarted,
       isGithubAndWalletMatched,
       login,
-      updateWalletBalance
+      updateWalletBalance,
+      updateIsApprovedSettlerToken
   }),
     [user, wallet, beproServiceStarted, isGithubAndWalletMatched]);
 

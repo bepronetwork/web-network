@@ -43,14 +43,18 @@ function renderDescription(description: string) {
 
 export default function TabbedNavigation({
   collapsable = false,
+  tabs,
   ...props
 }: TabbedNavigationProps) {
   const [collapsed, setCollapsed] = useState(false);
   const toggleOnClick = useAccordionButton(String(!collapsed), () =>
     setCollapsed(!collapsed));
 
+  function getDefaultActiveTab() {
+    return tabs.find((tab) => tab.isEmpty === false)?.eventKey;
+  }
   return (
-    <Tab.Container defaultActiveKey={props.defaultActiveKey}>
+    <Tab.Container defaultActiveKey={getDefaultActiveTab()}>
       <Accordion defaultActiveKey="false">
         <div
           className={`row ${props.className} align-items-center m-0 ${
@@ -59,7 +63,7 @@ export default function TabbedNavigation({
         >
           <div className={`col-${(collapsable && "11") || "12"} p-0`}>
             <Nav>
-              {props.tabs.map((tab) => (
+              {tabs.map((tab) => (
                 <Nav.Item key={`${tab.eventKey}`}>
                   <Nav.Link eventKey={tab.eventKey}>
                     <div className="col">
@@ -84,7 +88,7 @@ export default function TabbedNavigation({
 
         <Accordion.Collapse eventKey={String(collapsed)} className="row">
           <Tab.Content className="">
-            {props.tabs.map((tab) => (
+            {tabs.map((tab) => (
               <Tab.Pane key={`${tab.eventKey}`} eventKey={tab.eventKey}>
                 {tab.component}
               </Tab.Pane>

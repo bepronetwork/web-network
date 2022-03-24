@@ -1,19 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NumberFormatValues } from "react-number-format";
-
-import { InputNumber as InputNumberProps } from "types/input-number";
 
 import Avatar from "components/avatar";
 import InputNumber from "components/input-number";
 
-import { User } from "interfaces/api-response";
-
-import useApi from "x-hooks/use-api";
-
 interface Props {
-  by: string;
+  githubHandle: string;
+  githubLogin: string;
   onChangeDistribution(params: { [key: string]: number }): void;
-  address: string;
   defaultPercentage?: number;
   isDisable?: boolean;
   error?: boolean;
@@ -22,27 +16,18 @@ interface Props {
 }
 
 export default function CreateProposalDistributionItem({
-  by = "",
-  address = "",
-  onChangeDistribution = (params = { key: 0 }) => {},
+  githubHandle,
+  githubLogin,
+  onChangeDistribution,
   defaultPercentage = 0,
   isDisable = false,
   ...params
 }: Props) {
   const [value, setValue] = useState<number>(defaultPercentage);
-  const [githubLogin, setGithubLogin] = useState<string>();
-  const { getUserOf } = useApi();
-
-  function getGithubLogin() {
-    getUserOf(address).then((handle: User) =>
-      setGithubLogin(handle?.githubLogin));
-  }
-
-  useEffect(getGithubLogin, [by]);
 
   function handleValueChange(params: NumberFormatValues) {
     setValue(params.floatValue);
-    onChangeDistribution({ [by]: params.floatValue });
+    onChangeDistribution({ [githubHandle]: params.floatValue });
   }
   // Wasted logic.
   // todo: move within InputNumber itself.
@@ -56,7 +41,7 @@ export default function CreateProposalDistributionItem({
     }
 
     setValue(enhancedValue);
-    onChangeDistribution({ [by]: enhancedValue });
+    onChangeDistribution({ [githubHandle]: enhancedValue });
   }
 
   return (
@@ -64,7 +49,7 @@ export default function CreateProposalDistributionItem({
       {githubLogin && (
         <Avatar userLogin={githubLogin} className="me-2 mt-1" border />
       )}
-      <span className="flex-grow-1 caption-small">@{by}</span>
+      <span className="flex-grow-1 caption-small">@{githubHandle}</span>
       <div className="flex-shrink-0 w-20">
         <InputNumber
           value={value}

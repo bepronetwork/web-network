@@ -118,8 +118,8 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
-  async function getIssue(repoId: string,
-                          ghId: string,
+  async function getIssue(repoId: string | number, 
+                          ghId: string | number,
                           networkName = BEPRO_NETWORK_NAME) {
     return client
       .get<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`)
@@ -224,6 +224,11 @@ export default function useApi() {
   async function getTotalUsers(): Promise<number> {
     return client.get<number>("/search/users/total").then(({ data }) => data);
   }
+  
+  async function getTotalBounties(state: string, networkName = BEPRO_NETWORK_NAME): Promise<number> {
+    const search = new URLSearchParams({ state, networkName }).toString();
+    return client.get<number>(`/search/issues/total?${search}`).then(({ data }) => data);
+  }
 
   async function getAllUsers(payload: { page: number } = { page: 1 }) {
     return client
@@ -312,12 +317,12 @@ export default function useApi() {
   async function processEvent(eventName,
                               fromBlock: number,
                               id: number,
-                              pullRequestId = "",
+                              params?: object,
                               networkName = BEPRO_NETWORK_NAME) {
     return client.post(`/past-events/${eventName}/`, {
       fromBlock,
       id,
-      pullRequestId,
+      ...params,
       networkName
     });
   }
@@ -572,6 +577,7 @@ export default function useApi() {
     getPullRequestIssue,
     getReposList,
     getTotalUsers,
+    getTotalBounties,
     getUserOf,
     getUserPullRequests,
     getUserWith,

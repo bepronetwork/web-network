@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 
 import clsx from "clsx";
 import { useTranslation } from "next-i18next";
@@ -22,18 +22,17 @@ import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 import { toastError } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
-import { changeTransactionalTokenApproval } from "contexts/reducers/change-transactional-token-approval";
 import { updateTransaction } from "contexts/reducers/update-transaction";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
-import { User } from "interfaces/api-response";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 
 import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
+import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network";
 import useTransactions from "x-hooks/useTransactions";
 
@@ -58,11 +57,10 @@ export default function PageCreateIssue() {
     formattedValue: "",
     floatValue: 0
   });
-  const [isTransactionalTokenApproved, setIsTransactionalTokenApproved] =
-    useState(false);
 
   const { activeNetwork } = useNetwork();
-  const { wallet, user, beproServiceStarted } = useAuthentication();
+  const { handleApproveTransactionalToken } = useBepro()
+  const { wallet, user, beproServiceStarted, updateIsApprovedSettlerToken } = useAuthentication();
   const {
     dispatch,
     state: { myTransactions }
@@ -73,45 +71,9 @@ export default function PageCreateIssue() {
   const { createIssue: apiCreateIssue, patchIssueWithScId } = useApi();
 
   async function allowCreateIssue() {
-    await BeproService.login();
-
-    if (!BeproService.isLoggedIn) return;
-
-    const tmpTransactional = addTransaction({
-        type: TransactionTypes.approveTransactionalERC20Token
-    },
-                                            activeNetwork);
-    dispatch(tmpTransactional);
-
-    BeproService.network
-      .approveTransactionalERC20Token()
-      .then((txInfo) => {
-        if (!txInfo) throw new Error(t("errors.approve-transaction"));
-        return txInfo;
-      })
-      .then((txInfo) => {
-        txWindow.updateItem(tmpTransactional.payload.id,
-                            BeproService.parseTransaction(txInfo, tmpTransactional.payload));
-
-        BeproService.isApprovedTransactionalToken()
-          .then((approval) => {
-            dispatch(changeTransactionalTokenApproval(approval));
-          })
-          .catch((error) => console.log("error", error));
-      })
-      .catch((e) => {
-        console.error(e);
-        if (e?.message?.search("User denied") > -1)
-          dispatch(updateTransaction({
-              ...(tmpTransactional.payload as any),
-              remove: true
-          }));
-        else
-          dispatch(updateTransaction({
-              ...(tmpTransactional.payload as any),
-              status: TransactionStatus.failed
-          }));
-      });
+    if (!beproServiceStarted) return;
+    handleApproveTransactionalToken()
+      .then(updateIsApprovedSettlerToken)
   }
 
   function cleanFields() {
@@ -119,6 +81,7 @@ export default function PageCreateIssue() {
     setIssueDescription("");
     setIssueAmount({ value: "0", formattedValue: "0", floatValue: 0 });
   }
+  
   function addFilesInDescription(str) {
     const strFiles = files?.map((file) =>
         file.uploaded &&
@@ -157,8 +120,6 @@ export default function PageCreateIssue() {
           .then((txInfo) => {
             txWindow.updateItem(openIssueTx.payload.id,
                                 BeproService.parseTransaction(txInfo, openIssueTx.payload));
-            // BeproService.parseTransaction(txInfo, openIssueTx.payload)
-            //             .then(block => dispatch(updateTransaction(block)))
             return {
               githubId: cid,
               issueId: [repository_id, cid].join("/")
@@ -207,7 +168,7 @@ export default function PageCreateIssue() {
 
   function isCreateButtonDisabled() {
     return [
-      isTransactionalTokenApproved,
+      wallet?.isApprovedSettlerToken,
       issueContentIsValid(),
       verifyAmountBiggerThanBalance(),
       issueAmount.floatValue > 0,
@@ -221,7 +182,7 @@ export default function PageCreateIssue() {
 
   const isApproveButtonDisable = (): boolean =>
     [
-      !isTransactionalTokenApproved,
+      !wallet?.isApprovedSettlerToken,
       !verifyTransactionState(TransactionTypes.approveTransactionalERC20Token)
     ].some((value) => value === false);
 
@@ -240,13 +201,6 @@ export default function PageCreateIssue() {
   };
 
   const onUpdateFiles = (files: IFilesProps[]) => setFiles(files);
-
-  useEffect(() => {
-    if (beproServiceStarted)
-      BeproService.isApprovedTransactionalToken()
-        .then(setIsTransactionalTokenApproved)
-        .catch(console.log);
-  }, [beproServiceStarted]);
 
   return (
     <>
@@ -319,13 +273,13 @@ export default function PageCreateIssue() {
                     thousandSeparator
                     max={wallet?.balance?.bepro}
                     className={clsx({
-                      "text-muted": isTransactionalTokenApproved
+                      "text-muted": wallet?.isApprovedSettlerToken
                     })}
                     label={t("create-bounty:fields.amount.label")}
                     symbol={t("$bepro")}
                     value={issueAmount.formattedValue}
                     placeholder="0"
-                    disabled={!isTransactionalTokenApproved}
+                    disabled={!wallet?.isApprovedSettlerToken}
                     onValueChange={handleIssueAmountOnValueChange}
                     onBlur={handleIssueAmountBlurChange}
                     helperText={
@@ -334,7 +288,7 @@ export default function PageCreateIssue() {
                           amount: formatNumberToCurrency(wallet?.balance?.bepro,
                             { maximumFractionDigits: 18 })
                         })}
-                        {isTransactionalTokenApproved && (
+                        {wallet?.isApprovedSettlerToken && (
                           <span
                             className="caption-small text-primary ml-1 cursor-pointer text-uppercase"
                             onClick={() =>
@@ -361,7 +315,7 @@ export default function PageCreateIssue() {
                   </div>
                 ) : (
                   <>
-                    {!isTransactionalTokenApproved ? (
+                    {!wallet?.isApprovedSettlerToken ? (
                       <ReadOnlyButtonWrapper>
                         <Button
                           className="me-3 read-only-button"

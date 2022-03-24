@@ -105,9 +105,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       currentPage: +paginatedData.page
     });
   } else {
-    const issues = await models.issue.findAndCountAll(paginate({ where: whereCondition, include, nest: true }, req.query, [
+    const issues = await models.issue.findAndCountAll(paginate({ 
+      where: whereCondition, 
+      include, nest: true }, req.query, [
         [req.query.sortBy || "updatedAt", req.query.order || "DESC"]
-    ]));
+      ]));
 
     return res.status(200).json({
       ...issues,

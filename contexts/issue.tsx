@@ -27,12 +27,13 @@ import { useNetwork } from "./network";
 
 export interface IActiveIssue extends IssueData {
   comments: Comment[];
+  lastUpdated: number;
 }
-
+const TTL = 60 * 2 * 100; // 2 Min
 export interface IssueContextData {
   activeIssue: IActiveIssue;
   networkIssue: INetworkIssue;
-  updateIssue: (repoId: string, ghId: string) => Promise<IActiveIssue>;
+  updateIssue: (repoId: string | number, ghId: string | number) => Promise<IActiveIssue>;
   addNewComment: (prId: number, comment: string) => void;
   getNetworkIssue: () => void;
 }
@@ -66,21 +67,21 @@ export const IssueProvider: React.FC = function ({ children }) {
   const updatePullRequests = useCallback(async (prs: pullRequest[], githubPath: string) => {
     const mapPr = prs.map(async (pr) => {
       const [getPr, getComments] = await Promise.all([
-          getPullRequest(Number(pr.githubId), githubPath),
-          getPullRequestComments(Number(pr.githubId), githubPath)
+            getPullRequest(Number(pr.githubId), githubPath),
+            getPullRequestComments(Number(pr.githubId), githubPath)
       ]);
       pr.isMergeable =
-          getPr?.data?.mergeable && getPr?.data?.mergeable_state === "clean";
+            getPr?.data?.mergeable && getPr?.data?.mergeable_state === "clean";
       pr.merged = getPr?.data?.merged;
       pr.comments = getComments?.data as any;
       return pr;
     });
 
-    return await Promise.all(mapPr);
+    return Promise.all(mapPr);
   },
     []);
 
-  const updateIssue = useCallback(async (repoId: string, ghId: string): Promise<IActiveIssue> => {
+  const updateIssue = useCallback(async (repoId: string | number, ghId: string | number): Promise<IActiveIssue> => {
     const issue = await getIssue(repoId, ghId, activeNetwork?.name);
     if (!issue) throw new Error("Issue not found");
 
@@ -94,7 +95,8 @@ export const IssueProvider: React.FC = function ({ children }) {
                                                       ghPath);
     const newActiveIssue = {
         ...issue,
-        comments
+        comments,
+        lastUpdated: +new Date()
     } as IActiveIssue;
 
     setActiveIssue(newActiveIssue);
@@ -118,15 +120,15 @@ export const IssueProvider: React.FC = function ({ children }) {
     }
     const networkProposals: INetworkProposal[] = [];
 
-    for (const meta of activeIssue?.mergeProposals) {
+    for (const meta of activeIssue.mergeProposals) {
       const { scMergeId, id: proposalId } = meta;
 
       if (scMergeId) {
         const merge = await BeproService.network.getMergeById(+network?._id,
                                                               +scMergeId);
 
-        const isDisputed = activeIssue.merged
-          ? activeIssue.merged !== scMergeId
+        const isDisputed = activeIssue?.merged
+          ? activeIssue?.merged !== scMergeId
           : await BeproService.network.isMergeDisputed(+network?._id,
                                                        +scMergeId);
 
@@ -148,10 +150,11 @@ export const IssueProvider: React.FC = function ({ children }) {
   }, [activeIssue, wallet?.address, beproServiceStarted]);
 
   useEffect(() => {
+    const noExpired = +new Date() - activeIssue?.lastUpdated <= TTL;
     if (query.id && query.repoId) {
       if (
         query.id !== activeIssue?.githubId ||
-        +query.repoId !== +activeIssue?.repository_id
+        +query.repoId !== +activeIssue?.repository_id && !noExpired
       ) {
         setActiveIssue(null);
         updateIssue(`${query.repoId}`, `${query.id}`);
@@ -160,7 +163,7 @@ export const IssueProvider: React.FC = function ({ children }) {
   }, [query, activeNetwork]);
 
   useEffect(() => {
-    //console.warn('useIssue',{activeIssue, networkIssue})
+    console.warn('useIssue',{activeIssue, networkIssue})
   }, [activeIssue, networkIssue]);
 
   const memorizeValue = useMemo<IssueContextData>(() => ({
