@@ -173,11 +173,8 @@ export default function ApplicationContextProvider({ children }) {
   }, [state.myTransactions]);
 
   useEffect(() => {
-    if (beproServiceStarted)
-      BeproService.getBeproLocked()
-        .then((amount) => dispatch(changeStakedState(amount)))
-        .catch(console.log);
-  }, [pathname, beproServiceStarted]);
+    if (beproServiceStarted) BeproService.getTotalSettlerLocked().then(amount => dispatch(changeStakedState(amount))).catch(console.log)
+  }, [pathname, beproServiceStarted])
 
   const restoreTransactions = async (address) => {
     const cookie = parseCookies();

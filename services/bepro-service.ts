@@ -5,7 +5,8 @@ import { TransactionStatus } from "interfaces/enums/transaction-status";
 import {
   BlockTransaction,
   SimpleBlockTransactionPayload
-} from "interfaces/transaction";
+} from "@interfaces/transaction";
+import { Web3Connection, Network_v2, ERC20, NetworkFactory } from "bepro-js";
 
 
 const { publicRuntimeConfig } = getConfig()
@@ -14,26 +15,20 @@ class BeproFacet {
     web3Host: publicRuntimeConfig.web3ProviderConnection
   });
 
-  erc20: ERC20;
-  network: Network;
-  address = "";
-  operatorAmount: number;
-  started = false;
-  connected = false;
+  network: Network_v2;
   networkFactory: NetworkFactory;
-  networkFactoryStarted = false;
 
-  get isLoggedIn() {
-    return this.connected;
-  }
+  address: string;
 
-  get isStarted() {
-    return this.started;
-  }
+  isStarted: boolean = false;
+  isLoggedIn: boolean = false;
+  isNetworkFactoryStarted: boolean = false;
 
-  async start(customNetworkAddress = undefined) {
+  operatorAmount: number;
+
+  async start(networkAddress = CONTRACT_ADDRESS) {
     try {
-      if (!this.started) await this.bepro.start();
+      if (!this.isStarted) await this.bepro.start();
 
       this.network = new Network(this.bepro,
         customNetworkAddress || publicRuntimeConfig.contract.address);
@@ -42,16 +37,20 @@ class BeproFacet {
 
       await this.network.loadContract();
 
-      this.started = true;
+      this.isStarted = true;
 
-      await this.erc20.loadContract();
+      console.table({
+        web3: WEB3_CONNECTION,
+        contract: networkAddress,
+        settler: this.network.settlerToken.contractAddress,
+        nft: this.network.nftToken.contractAddress,
+        started: this.isStarted
+      });
     } catch (error) {
-      console.log("Failed to start Bepro Service", error);
-
-      this.started = false;
+      console.log("Failed to Start BeproService", error);
     }
 
-    return this.started;
+    return this.isStarted;
   }
 
   async startNetworkFactory() {
@@ -59,47 +58,50 @@ class BeproFacet {
       if (!publicRuntimeConfig.networkConfig.factoryAddress)
         console.error("Network Factory Contract is Missing");
       else {
-        this.networkFactoryStarted = false;
+        this.isNetworkFactoryStarted = false;
 
         this.networkFactory = new NetworkFactory(this.bepro,
           publicRuntimeConfig.networkConfig.factoryAddress);
 
         await this.networkFactory.loadContract();
 
-        this.networkFactoryStarted = true;
+        this.isNetworkFactoryStarted = true;
 
         this.operatorAmount = await this.getOperatorAmount();
       }
     } catch (error) {
-      console.error(error);
+      console.log("Failed to Start the Network Factory", error);
     }
 
-    return this.networkFactoryStarted;
+    return this.isNetworkFactoryStarted;
   }
 
   async login() {
-    this.connected = false;
-    await this.bepro.connect();
-    await this.start(this.network.contractAddress);
-    this.address = await this.bepro.getAddress();
-    this.connected = true;
+    try {
+      this.isLoggedIn = false;
+
+      await this.bepro.connect();
+      await this.start(this.network.contractAddress);
+
+      this.address = await this.bepro.getAddress();
+      this.isLoggedIn = true;
+    } catch (error) {
+      console.log("Failed to login", error);
+    }
+
+    return this.isLoggedIn;
   }
 
-  async getBalance(kind: "eth" | "bepro" | "staked"): Promise<number> {
-    if (!this.connected || !this.started) return 0;
+  async getOperatorAmount() {
+    if (this.isNetworkFactoryStarted)
+      return this.networkFactory.OPERATOR_AMOUNT();
 
-    let n = 0;
-    if (kind === "bepro") n = await this.erc20.getTokenAmount(this.address);
-    if (kind === "eth")
-      n = +this.bepro.Web3.utils.fromWei(await this.bepro.getBalance());
-    if (kind === "staked") n = await this.network.getBEPROStaked();
-
-    return n;
+    return 0;
   }
 
-  async getNetworkObj(networkAddress = undefined) {
+  async getNetworkObj(networkAddress = undefined): Promise<Network_v2> {
     if (networkAddress) {
-      const customNetwork = new Network(this.bepro, networkAddress);
+      const customNetwork = new Network_v2(this.bepro, networkAddress);
 
       await customNetwork.loadContract();
 
@@ -109,10 +111,17 @@ class BeproFacet {
     return this.network;
   }
 
-  async getClosedIssues(networkAddress = undefined) {
-    const network = await this.getNetworkObj(networkAddress);
+  async getBalance(kind: `eth` | `bepro` | `staked`): Promise<number> {
+    if (!this.isLoggedIn || !this.isStarted) return 0;
 
-    return network.getAmountOfIssuesClosed();
+    let n = 0;
+    if (kind === `bepro`)
+      n = await this.network.settlerToken.getTokenAmount(this.address);
+    if (kind === `eth`)
+      n = +this.bepro.Web3.utils.fromWei(await this.bepro.getBalance());
+    if (kind === `staked`) n = await this.network.totalSettlerLocked();
+
+    return n;
   }
 
   async getSettlerTokenName(networkAddress = undefined) {
@@ -121,40 +130,50 @@ class BeproFacet {
     return network.settlerToken.name();
   }
 
-  async getTransactionalTokenName(networkAddress = undefined) {
+  async getClosedBounties(networkAddress = undefined) {
     const network = await this.getNetworkObj(networkAddress);
 
-    return network.transactionToken.name();
+    return network.closedBounties();
   }
 
-  async getOpenIssues(networkAddress = undefined) {
-    const network = await this.getNetworkObj(networkAddress);
+  async getOpenBounties(networkAddress = undefined) {
+    try {
+      const network = await this.getNetworkObj(networkAddress);
 
-    const quantity = await network.getAmountOfIssuesOpened();
-
-    return quantity - 1;
-  }
-
-  async getBeproLocked(networkAddress = undefined) {
-    const network = await this.getNetworkObj(networkAddress);
-
-    return network.getBEPROStaked();
-  }
-
-  async getTokensStaked(networkAddress = undefined) {
-    const network = await this.getNetworkObj(networkAddress);
-
-    return network.getTokensStaked();
-  }
-
-  async getRedeemTime() {
-    if (this.isStarted) return this.network.redeemTime();
+      await Promise.all([
+        network.bountiesTotal(),
+        network.canceledBounties(),
+        network.closedBounties()
+      ]).then((values) => {
+        return values[0] - values[1] - values[2];
+      });
+    } catch (error) {
+      console.log("Failed to getOpenBounties", error);
+    }
 
     return 0;
   }
 
-  async setRedeemTime(time: number) {
-    if (this.isStarted) return this.network.changeRedeemTime(time);
+  async getTotalSettlerLocked(networkAddress = undefined) {
+    try {
+      const network = await this.getNetworkObj(networkAddress);
+
+      return network.totalSettlerLocked();
+    } catch (error) {
+      console.log("Failed to getTotalSettlerLocked", error);
+    }
+
+    return 0;
+  }
+
+  async getDraftTime() {
+    if (this.isStarted) return this.network.draftTime();
+
+    return 0;
+  }
+
+  async setDraftTime(time: number) {
+    if (this.isStarted) return this.network.changeDraftTime(time);
 
     return false;
   }
@@ -165,32 +184,18 @@ class BeproFacet {
     return 0;
   }
 
-  async setDisputeTime(time: number) {
+  async setDisputableTime(time: number) {
     if (this.isStarted) return this.network.changeDisputableTime(time);
 
     return false;
   }
 
-  async getOraclesSummary() {
-    if (this.isStarted) return this.network.getOraclesSummary(this.address);
-
-    return {
-      oraclesDelegatedByOthers: 0,
-      amounts: [],
-      addresses: [],
-      tokensLocked: 0,
-      delegatedToOthers: 0
-    };
-  }
-
-  async isApprovedTransactionalToken() {
-    if (this.isStarted) return this.network.isApprovedTransactionalToken(1);
-
-    return false;
-  }
-
   async isApprovedSettlerToken() {
-    if (this.isStarted) return this.network.isApprovedSettlerToken(1);
+    if (this.isStarted) {
+      const settler = this.network.settlerToken;
+
+      return settler.isApproved(settler.contractAddress, 1);
+    }
 
     return false;
   }
@@ -198,37 +203,25 @@ class BeproFacet {
   async isNetworkAbleToClose(networkAddress = undefined) {
     const network = await this.getNetworkObj(networkAddress);
 
-    const tokensStaked = await network.getTokensStaked();
-    const beproLocked = await network.getBEPROStaked();
+    const totalSettlerLocked = await network.totalSettlerLocked();
+    const closedBounties = await network.closedBounties();
+    const canceledBounties = await network.canceledBounties();
+    const bountiesTotal = await network.bountiesTotal();
 
-    return tokensStaked === 0 && beproLocked === 0;
-  }
-
-  async getTokensLockedByAddress(address: string) {
-    const amount = await this.networkFactory.getLockedStakedByAddress(address);
-
-    return this.fromWei(`${amount}`);
-  }
-
-  async closeNetwork() {
-    return this.networkFactory.unlock();
-  }
-
-  async getOperatorAmount() {
-    if (this.networkFactoryStarted)
-      return this.networkFactory.OPERATOR_AMOUNT();
-
-    return 0;
+    return (
+      totalSettlerLocked === 0 &&
+      closedBounties + canceledBounties === bountiesTotal
+    );
   }
 
   async getCouncilAmount() {
-    if (this.isStarted) return this.network.COUNCIL_AMOUNT();
+    if (this.isStarted) return this.network.councilAmount();
 
     return 0;
   }
 
   async setCouncilAmount(amount: number) {
-    if (this.isStarted) return this.network.changeCouncilAmount(`${amount}`);
+    if (this.isStarted) return this.network.changeCouncilAmount(amount);
 
     return false;
   }
@@ -239,9 +232,9 @@ class BeproFacet {
     return 0;
   }
 
-  async setPercentageForDispute(percentage: number) {
+  async setPercentageNeededForDispute(percentage: number) {
     if (this.isStarted)
-      return this.network.sendTx(this.network.contract.methods.changePercentageNeededForDispute(percentage));
+      return this.network.changePercentageNeededForDispute(percentage);
 
     return 0;
   }
@@ -251,34 +244,73 @@ class BeproFacet {
   }
 
   async claimNetworkGovernor(networkAddress) {
-    const network = new Network(this.bepro, networkAddress);
+    const network = new Network_v2(this.bepro, networkAddress);
 
     await network.loadContract();
 
     return network.sendTx(network.contract.methods.claimGovernor());
   }
 
-  async getNetworksQuantity() {
-    if (this.networkFactoryStarted)
-      return this.networkFactory.callTx(this.networkFactory.contract.methods.networksAmount());
+  // TODO getOraclesSummary
+  async getOraclesSummary() {
+    //if (this.isStarted) return this.network.getOraclesSummary(this.address)
 
-    return 0;
+    return {
+      oraclesDelegatedByOthers: 0,
+      amounts: [],
+      addresses: [],
+      tokensLocked: 0,
+      delegatedToOthers: 0
+    };
   }
 
-  getNetworkAdressByCreator(creatorAddress: string) {
-    return this.networkFactory.getNetworkByAddress(creatorAddress);
-  }
+  // TODO getTokensStacked
+  // TODO isApprovedTransactionalToken
+  // TODO getTokensLockedByAddress
+  // TODO closeNetwork
+  // TODO getOperatorAmount
+  // TODO createNetwork
+  // TODO getNetworksQuantity
+  // TODO getNetworkAdressByCreator
 
   fromWei(wei: string) {
     return this.bepro.Web3.utils.fromWei(wei);
   }
 
   toWei(n: string | number) {
-    return this.bepro.Web3.utils.toWei(n.toString(), "ether");
+    return this.bepro.Web3.utils.toWei(n.toString(), `ether`);
   }
 
-  public parseTransaction(transaction,
-    simpleTx?: SimpleBlockTransactionPayload) {
+  async openBounty({
+    cid,
+    title,
+    repoPath,
+    branch,
+    transactional,
+    rewardToken,
+    tokenAmount = 0,
+    rewardAmount = 0,
+    fundingAmount = 0
+  }) {
+    if (!this.isStarted) return new Error("BeproService is not started.");
+
+    return this.network.openBounty(
+      tokenAmount,
+      transactional,
+      rewardToken,
+      rewardAmount,
+      fundingAmount,
+      cid,
+      title,
+      repoPath,
+      branch
+    );
+  }
+
+  public parseTransaction(
+    transaction,
+    simpleTx?: SimpleBlockTransactionPayload
+  ) {
     return {
       ...simpleTx,
       addressFrom: transaction.from,

@@ -46,12 +46,14 @@ export default function PageDevelopers() {
   async function loadTotals() {
     if (!beproServiceStarted || !activeNetwork) return;
 
+    console.log(BeproService.network);
+
     const [closed, inProgress, onNetwork, totalUsers] = await Promise.all([
-      BeproService.getClosedIssues(handleNetworkAddress(activeNetwork)),
-      BeproService.getOpenIssues(handleNetworkAddress(activeNetwork)),
-      BeproService.getTokensStaked(handleNetworkAddress(activeNetwork)),
-      getTotalUsers()
-    ]);
+      BeproService.getClosedBounties(handleNetworkAddress(activeNetwork)),
+      0,//BeproService.getOpenBounties(handleNetworkAddress(activeNetwork)),
+      BeproService.getTotalSettlerLocked(handleNetworkAddress(activeNetwork)),
+      getTotalUsers(),
+    ])
     setInfos([
       {
         value: inProgress,
