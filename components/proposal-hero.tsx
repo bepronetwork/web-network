@@ -8,7 +8,7 @@ import GithubInfo from "components/github-info";
 
 import { useIssue } from "contexts/issue";
 
-import { INetworkProposal, Proposal } from "interfaces/proposal";
+import { Proposal } from "interfaces/proposal";
 
 import CustomContainer from "./custom-container";
 import DateLabel from "./date-label";
@@ -16,12 +16,10 @@ import PriceConversor from "./price-conversor";
 
 interface IProposalHeroProps {
   proposal: Proposal;
-  networkProposal: INetworkProposal;
 }
 
 export default function ProposalHero({
   proposal,
-  networkProposal
 }: IProposalHeroProps) {
   const { activeIssue } = useIssue();
   const router = useRouter();

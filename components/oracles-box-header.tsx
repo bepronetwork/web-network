@@ -6,19 +6,21 @@ import { formatNumberToCurrency } from "helpers/formatNumber";
 import Button from "./button";
 // This has to be generic.
 // todo: create something like <Tabs /> <TabContainer />
+
+interface IOraclesBoxProps{
+    actions: string | string[];
+    available?: number | undefined;
+    onChange?(action: string): void;
+    currentAction?: string;
+    delegatedBox?: boolean;
+}
 function OraclesBoxHeader({
   actions = null,
   available,
-  onChange = () => {},
+  onChange,
   currentAction = "",
   delegatedBox = false
-}: {
-  actions: string | string[];
-  available?: number | undefined;
-  onChange?(action: string): void;
-  currentAction?: string;
-  delegatedBox?: boolean;
-}): JSX.Element {
+}: IOraclesBoxProps) {
   const { t } = useTranslation("my-oracles");
 
   return (

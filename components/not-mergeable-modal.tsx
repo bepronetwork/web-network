@@ -7,13 +7,13 @@ import GithubLink from "components/github-link";
 import Modal from "components/modal";
 
 import { ApplicationContext } from "contexts/application";
+import { useAuthentication } from "contexts/authentication";
 import { IActiveIssue, useIssue } from "contexts/issue";
 import { addToast } from "contexts/reducers/add-toast";
 
 import { pullRequest } from "interfaces/issue-data";
 import { INetworkProposal, Proposal } from "interfaces/proposal";
 
-import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
@@ -34,7 +34,6 @@ export default function NotMergeableModal({
   const { t } = useTranslation("common");
   const { activeIssue, networkIssue } = useIssue();
   //TODO: Move to AuthContext
-  const [isCouncil, setIsCouncil] = useState<boolean>(false);
 
   const {
     dispatch,
@@ -43,6 +42,7 @@ export default function NotMergeableModal({
 
   const [isVisible, setVisible] = useState(false);
   const [mergeState, setMergeState] = useState("");
+  const { wallet } = useAuthentication()
 
   const { network } = useNetwork();
   const { mergeClosedIssue } = useApi();
@@ -56,9 +56,9 @@ export default function NotMergeableModal({
   const whenNotShow = [
     hasPRMerged, // Already exists a Pull Request merged to this bounty.
     pullRequest?.isMergeable && !networkIssue?.finalized, // The Pull Request was not merged year and the bounty is open.
-    !(isIssueOwner || isPullRequestOwner || isCouncil || isProposer), // The user is not the bounty creator, nor the pull request creator,
+    !(isIssueOwner || isPullRequestOwner || wallet?.isCouncil || isProposer), // The user is not the bounty creator, nor the pull request creator,
     // nor the proposal creator and is not a council member.
-    (isIssueOwner || isCouncil || isProposer) &&
+    (isIssueOwner || wallet?.isCouncil || isProposer) &&
       !isPullRequestOwner &&
       !networkIssue?.finalized // The bounty creator, proposal creator and council members can view only if the bounty was closed.
   ].some((values) => values);
@@ -68,13 +68,13 @@ export default function NotMergeableModal({
 
     if (whenNotShow) {
       setVisible(false);
-    } else if (isIssueOwner || isPullRequestOwner || isCouncil || isProposer) {
+    } else if (isIssueOwner || isPullRequestOwner || wallet?.isCouncil || isProposer) {
       setVisible(pullRequest.state === "open");
     }
   }
 
   function handleRetryMerge() {
-    if (mergeState == "error") return false;
+    if (mergeState === "error") return false;
 
     setMergeState("loading");
 
@@ -104,23 +104,16 @@ export default function NotMergeableModal({
       });
   }
 
-  useEffect(() => {
-    //TODO: Move to AuthContext
-    BeproService.network
-      .isCouncil(currentAddress)
-      .then((isCouncil) => setIsCouncil(isCouncil));
-  }, [currentAddress]);
-
   useEffect(handleModalVisibility, [
     activeIssue,
     issuePRs,
-    isCouncil,
     mergeState,
     pullRequest,
     networkProposal,
     networkIssue,
     currentAddress,
-    githubLogin
+    githubLogin,
+    wallet?.isCouncil
   ]);
 
   return (
@@ -144,7 +137,7 @@ export default function NotMergeableModal({
           </p>
         </div>
         <div className="d-flex justify-content-center">
-          {isCouncil && networkIssue?.finalized && (
+          {wallet?.isCouncil && networkIssue?.finalized && (
             <Button
               color={`${
                 (mergeState === "error" && "transparent") || "primary"
