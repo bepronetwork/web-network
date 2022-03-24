@@ -1,5 +1,6 @@
 import { useContext, useState } from "react";
 
+import { ERC20 } from "bepro-js";
 import clsx from "clsx";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -11,6 +12,7 @@ import LockedIcon from "assets/icons/locked-icon";
 
 import BranchsDropdown from "components/branchs-dropdown";
 import Button from "components/button";
+import ChangeTokenModal from "components/change-token-modal";
 import ConnectGithub from "components/connect-github";
 import ConnectWalletButton from "components/connect-wallet-button";
 import DragAndDrop, { IFilesProps } from "components/drag-and-drop";
@@ -26,6 +28,7 @@ import { addTransaction } from "contexts/reducers/add-transaction";
 import { updateTransaction } from "contexts/reducers/update-transaction";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
+import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
@@ -43,6 +46,12 @@ interface Amount {
   floatValue?: number;
 }
 
+interface CustomToken {
+  address: string;
+  name: string;
+  symbol: string;
+}
+
 export default function PageCreateIssue() {
   const router = useRouter();
   const { t } = useTranslation(["common", "create-bounty"]);
@@ -58,6 +67,10 @@ export default function PageCreateIssue() {
     formattedValue: "",
     floatValue: 0
   });
+  const [isTransactionalTokenApproved, setIsTransactionalTokenApproved] =
+    useState(false);
+  const [customToken, setCustomToken] = useState<CustomToken>();
+  const [isChangeTokenVisible, setIsChangeTokenVisible] = useState(false);
 
   const { activeNetwork } = useNetwork();
   const { handleApproveTransactionalToken } = useBepro()
@@ -120,7 +133,9 @@ export default function PageCreateIssue() {
           .openIssue([repository_id, cid].join("/"), payload.amount)
           .then((txInfo) => {
             txWindow.updateItem(openIssueTx.payload.id,
-                                BeproService.parseTransaction(txInfo, openIssueTx.payload));
+                                parseTransaction(txInfo, openIssueTx.payload));
+            // BeproService.parseTransaction(txInfo, openIssueTx.payload)
+            //             .then(block => dispatch(updateTransaction(block)))
             return {
               githubId: cid,
               issueId: [repository_id, cid].join("/")
@@ -302,10 +317,17 @@ export default function PageCreateIssue() {
                             {t("create-bounty:fields.amount.max")}
                           </span>
                         )}
+                        <span
+                            className="caption-small text-primary ml-1 cursor-pointer text-uppercase"
+                            onClick={() => setIsChangeTokenVisible(true)}
+                          >
+                            Change Token
+                          </span>
                       </>
                     }
                   />
                 </div>
+                <ChangeTokenModal show={isChangeTokenVisible} setToken={setCustomToken} setClose={() => setIsChangeTokenVisible(false)} />
                 <div className="col"></div>
               </div>
 

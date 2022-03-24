@@ -20,9 +20,9 @@ class BeproFacet {
 
   address: string;
 
-  isStarted: boolean = false;
-  isLoggedIn: boolean = false;
-  isNetworkFactoryStarted: boolean = false;
+  isStarted = false;
+  isLoggedIn = false;
+  isNetworkFactoryStarted = false;
 
   operatorAmount: number;
 
@@ -112,16 +112,25 @@ class BeproFacet {
   }
 
   async getBalance(kind: `eth` | `bepro` | `staked`): Promise<number> {
-    if (!this.isLoggedIn || !this.isStarted) return 0;
+    try {
+      let n = 0;
 
-    let n = 0;
-    if (kind === `bepro`)
-      n = await this.network.settlerToken.getTokenAmount(this.address);
-    if (kind === `eth`)
-      n = +this.bepro.Web3.utils.fromWei(await this.bepro.getBalance());
-    if (kind === `staked`) n = await this.network.totalSettlerLocked();
-
-    return n;
+      switch (kind) {
+      case 'bepro':
+        n = await this.network.settlerToken.getTokenAmount(this.address);
+        break;
+      case 'eth':
+        n = +this.bepro.Web3.utils.fromWei(await this.bepro.getBalance());
+        break;
+      case 'staked':
+        n = await this.network.totalSettlerLocked();
+        break;
+      }
+      
+      return n;
+    } catch (error) {
+      return 0;
+    }
   }
 
   async getSettlerTokenName(networkAddress = undefined) {
@@ -263,9 +272,13 @@ class BeproFacet {
       delegatedToOthers: 0
     };
   }
+  
+  // TODO isApprovedTransactionalToken
+  async isApprovedTransactionalToken(): Promise<boolean> {
+    return false;
+  }
 
   // TODO getTokensStacked
-  // TODO isApprovedTransactionalToken
   // TODO getTokensLockedByAddress
   // TODO closeNetwork
   // TODO getOperatorAmount
@@ -294,34 +307,15 @@ class BeproFacet {
   }) {
     if (!this.isStarted) return new Error("BeproService is not started.");
 
-    return this.network.openBounty(
-      tokenAmount,
-      transactional,
-      rewardToken,
-      rewardAmount,
-      fundingAmount,
-      cid,
-      title,
-      repoPath,
-      branch
-    );
-  }
-
-  public parseTransaction(
-    transaction,
-    simpleTx?: SimpleBlockTransactionPayload
-  ) {
-    return {
-      ...simpleTx,
-      addressFrom: transaction.from,
-      addressTo: transaction.to,
-      transactionHash: transaction.transactionHash,
-      blockHash: transaction.blockHash,
-      confirmations: (simpleTx as BlockTransaction)?.confirmations,
-      status: transaction.status
-        ? TransactionStatus.completed
-        : TransactionStatus.failed
-    };
+    return this.network.openBounty(tokenAmount,
+                                   transactional,
+                                   rewardToken,
+                                   rewardAmount,
+                                   fundingAmount,
+                                   cid,
+                                   title,
+                                   repoPath,
+                                   branch);
   }
 }
 
