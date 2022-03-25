@@ -72,7 +72,8 @@ export interface developer {
 
 export interface Comment {
   body: string;
-  created_at: string;
+  created_at: string | number | Date;
+  updated_at: string | number | Date;
   user: GithubUser;
 }
 
