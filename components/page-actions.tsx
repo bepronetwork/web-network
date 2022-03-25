@@ -169,6 +169,7 @@ export default function PageActions({
     return (
       !finalized &&
       pullRequests?.length > 0 &&
+      wallet?.address &&
       githubLogin && (
         <NewProposal
           isFinished={finished}
