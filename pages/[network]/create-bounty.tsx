@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 
 import { ERC20 } from "bepro-js";
 import clsx from "clsx";
+import { SETTLER_ADDRESS } from "env";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import getConfig from "next/config";
@@ -19,6 +20,7 @@ import DragAndDrop, { IFilesProps } from "components/drag-and-drop";
 import InputNumber from "components/input-number";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import ReposDropdown from "components/repos-dropdown";
+import TokensDropdown from "components/tokens-dropdown";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
@@ -32,6 +34,7 @@ import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
+import { Token } from "interfaces/token";
 
 import { BeproService } from "services/bepro-service";
 
@@ -46,11 +49,11 @@ interface Amount {
   floatValue?: number;
 }
 
-interface CustomToken {
-  address: string;
-  name: string;
-  symbol: string;
-}
+const BEPRO_TOKEN: Token = {
+  address: SETTLER_ADDRESS,
+  name: "BEPRO",
+  symbol: "$BEPRO"
+};
 
 export default function PageCreateIssue() {
   const router = useRouter();
@@ -67,11 +70,10 @@ export default function PageCreateIssue() {
     formattedValue: "",
     floatValue: 0
   });
-  const [isTransactionalTokenApproved, setIsTransactionalTokenApproved] =
-    useState(false);
-  const [customToken, setCustomToken] = useState<CustomToken>();
-  const [isChangeTokenVisible, setIsChangeTokenVisible] = useState(false);
-
+  const [isTransactionalTokenApproved, setIsTransactionalTokenApproved] = useState(false);
+  const [transactionalToken, setTransactionalToken] = useState<Token>();
+  const [customTokens, setCustomTokens] = useState<Token[]>([BEPRO_TOKEN]);
+  
   const { activeNetwork } = useNetwork();
   const { handleApproveTransactionalToken } = useBepro()
   const { wallet, user, beproServiceStarted, updateIsApprovedSettlerToken } = useAuthentication();
@@ -79,14 +81,16 @@ export default function PageCreateIssue() {
     dispatch,
     state: { myTransactions }
   } = useContext(ApplicationContext);
+  
+  const [tokenBalance, setTokenBalance] = useState(0);
 
   const txWindow = useTransactions();
   const { getURLWithNetwork } = useNetworkTheme();
   const { createIssue: apiCreateIssue, patchIssueWithScId } = useApi();
 
   async function allowCreateIssue() {
-    if (!beproServiceStarted) return;
-    handleApproveTransactionalToken()
+    if (!beproServiceStarted || !transactionalToken) return;
+    handleApproveTransactionalToken(transactionalToken.address)
       .then(updateIsApprovedSettlerToken)
   }
 
@@ -94,6 +98,13 @@ export default function PageCreateIssue() {
     setIssueTitle("");
     setIssueDescription("");
     setIssueAmount({ value: "0", formattedValue: "0", floatValue: 0 });
+  }
+
+  function addToken(newToken: Token) {
+    setCustomTokens([
+      ...customTokens,
+      newToken
+    ]);
   }
   
   function addFilesInDescription(str) {
@@ -196,7 +207,7 @@ export default function PageCreateIssue() {
     ].some((value) => value === false);
   }
 
-  const isApproveButtonDisable = (): boolean =>
+  const isApproveButtonDisabled = (): boolean =>
     [
       !wallet?.isApprovedSettlerToken,
       !verifyTransactionState(TransactionTypes.approveTransactionalERC20Token)
@@ -217,6 +228,23 @@ export default function PageCreateIssue() {
   };
 
   const onUpdateFiles = (files: IFilesProps[]) => setFiles(files);
+
+  const updateWalletByToken = async (token: Token) => {
+    if (token.address === BEPRO_TOKEN.address) {
+      setTokenBalance(wallet?.balance?.bepro);
+      setIsTransactionalTokenApproved(wallet?.isApprovedSettlerToken);
+    } else {
+      setTokenBalance(await BeproService.getTokenBalance(token.address, wallet.address));
+      setIsTransactionalTokenApproved(await BeproService.isTokenApproved(token.address));
+    }
+  }
+
+  useEffect(() => {
+    if (!wallet?.balance) return;
+    if (!transactionalToken) return setTransactionalToken(BEPRO_TOKEN);
+
+    updateWalletByToken(transactionalToken);
+  }, [transactionalToken, wallet]);
 
   return (
     <>
@@ -284,51 +312,53 @@ export default function PageCreateIssue() {
                 </div>
               </div>
               <div className="row">
-                <div className="col">
+                <div className="col-6">
                   <InputNumber
                     thousandSeparator
-                    max={wallet?.balance?.bepro}
+                    max={tokenBalance}
                     className={clsx({
-                      "text-muted": wallet?.isApprovedSettlerToken
+                      "text-muted": isTransactionalTokenApproved
                     })}
-                    label={t("create-bounty:fields.amount.label")}
-                    symbol={t("$bepro")}
+                    label={t("create-bounty:fields.amount.label", {token: transactionalToken?.symbol})}
+                    symbol={transactionalToken?.symbol}
                     value={issueAmount.formattedValue}
                     placeholder="0"
-                    disabled={!wallet?.isApprovedSettlerToken}
+                    disabled={!isTransactionalTokenApproved}
                     onValueChange={handleIssueAmountOnValueChange}
                     onBlur={handleIssueAmountBlurChange}
                     helperText={
                       <>
                         {t("create-bounty:fields.amount.info", {
-                          amount: formatNumberToCurrency(wallet?.balance?.bepro,
+                          token: transactionalToken?.symbol,
+                          amount: formatNumberToCurrency(tokenBalance,
                             { maximumFractionDigits: 18 })
                         })}
-                        {wallet?.isApprovedSettlerToken && (
+                        {isTransactionalTokenApproved && (
                           <span
                             className="caption-small text-primary ml-1 cursor-pointer text-uppercase"
                             onClick={() =>
                               setIssueAmount({
                                 formattedValue:
-                                  wallet?.balance?.bepro?.toString()
+                                tokenBalance.toString()
                               })
                             }
                           >
                             {t("create-bounty:fields.amount.max")}
                           </span>
                         )}
-                        <span
-                            className="caption-small text-primary ml-1 cursor-pointer text-uppercase"
-                            onClick={() => setIsChangeTokenVisible(true)}
-                          >
-                            Change Token
-                          </span>
                       </>
                     }
                   />
                 </div>
-                <ChangeTokenModal show={isChangeTokenVisible} setToken={setCustomToken} setClose={() => setIsChangeTokenVisible(false)} />
-                <div className="col"></div>
+                
+                <div className="col-6 mt-n2">
+                  <TokensDropdown 
+                    defaultToken={BEPRO_TOKEN} 
+                    tokens={customTokens} 
+                    addToken={addToken} 
+                    setToken={setTransactionalToken} 
+                  />
+                </div>
               </div>
 
               <div className="d-flex justify-content-center align-items-center mt-4">
@@ -338,11 +368,11 @@ export default function PageCreateIssue() {
                   </div>
                 ) : (
                   <>
-                    {!wallet?.isApprovedSettlerToken ? (
+                    {!isTransactionalTokenApproved ? (
                       <ReadOnlyButtonWrapper>
                         <Button
                           className="me-3 read-only-button"
-                          disabled={isApproveButtonDisable()}
+                          disabled={isApproveButtonDisabled()}
                           onClick={allowCreateIssue}
                         >
                           {t("actions.approve")}

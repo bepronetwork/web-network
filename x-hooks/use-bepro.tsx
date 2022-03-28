@@ -10,6 +10,8 @@ import { useNetwork } from "contexts/network";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { updateTransaction } from "contexts/reducers/update-transaction";
 
+import { parseTransaction } from "helpers/transactions";
+
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { TransactionCurrency } from "interfaces/transaction";
@@ -47,7 +49,7 @@ export default function useBepro(props?: IUseBeProDefault) {
         .then((txInfo) => {
           processEvent("dispute-proposal", txInfo.blockNumber, networkIssue._id);
           txWindow.updateItem(disputeTx.payload.id,
-                              BeproService.parseTransaction(txInfo, disputeTx.payload));
+                              parseTransaction(txInfo, disputeTx.payload));
           onSuccess?.(txInfo);
           resolve?.(txInfo);
         })
@@ -84,7 +86,7 @@ export default function useBepro(props?: IUseBeProDefault) {
             onSuccess?.();
           });
           txWindow.updateItem(closeIssueTx.payload.id,
-                              BeproService.parseTransaction(txInfo, closeIssueTx.payload));
+                              parseTransaction(txInfo, closeIssueTx.payload));
           resolve(txInfo);
         })
         .catch((err) => {
@@ -117,7 +119,7 @@ export default function useBepro(props?: IUseBeProDefault) {
         .then((txInfo) => {
           // Review: Review processEnvets are working correctly
           processEvent(`redeem-issue`, txInfo.blockNumber, networkIssue?._id).then(() => {
-            txWindow.updateItem(redeemTx.payload.id, BeproService.parseTransaction(txInfo, redeemTx.payload));
+            txWindow.updateItem(redeemTx.payload.id, parseTransaction(txInfo, redeemTx.payload));
             resolve(txInfo)
             onSuccess?.()
             resolve(txInfo)
@@ -148,7 +150,7 @@ export default function useBepro(props?: IUseBeProDefault) {
         .recognizeAsFinished(networkIssue?._id)
         .then((txInfo) => {
           txWindow.updateItem(tx.payload.id,
-                              BeproService.parseTransaction(txInfo, tx.payload));
+                              parseTransaction(txInfo, tx.payload));
           onSuccess?.();
           resolve(txInfo);
         })
@@ -197,7 +199,7 @@ export default function useBepro(props?: IUseBeProDefault) {
                                   activeNetwork?.name);
              
                      txWindow.updateItem(tx.payload.id,
-                                         BeproService.parseTransaction(txInfo, tx.payload));
+                                         parseTransaction(txInfo, tx.payload));
                      onSuccess?.();
                      resolve(txInfo);
                    })
@@ -219,7 +221,8 @@ export default function useBepro(props?: IUseBeProDefault) {
     });
   }
 
-  async function handleApproveTransactionalToken(): Promise<TransactionReceipt | Error> {
+  async function handleApproveTransactionalToken(tokenAddress: string = undefined): 
+    Promise<TransactionReceipt | Error> {
 
     return new Promise(async (resolve, reject) => {
       
@@ -227,16 +230,15 @@ export default function useBepro(props?: IUseBeProDefault) {
                                 activeNetwork);
       dispatch(tx);
 
-      await BeproService.network
-                    .approveTransactionalERC20Token()
-                    .then((txInfo) => {
-                      if (!txInfo) throw new Error(t("errors.approve-transaction"));
+      await BeproService.approveToken(tokenAddress)
+      .then((txInfo) => {
+        if (!txInfo) throw new Error(t("errors.approve-transaction"));
               
-                      txWindow.updateItem(tx.payload.id,
-                                          BeproService.parseTransaction(txInfo, tx.payload));
-                      onSuccess?.(txInfo);
-                      resolve(txInfo);
-                    })
+        txWindow.updateItem(tx.payload.id,
+                            parseTransaction(txInfo, tx.payload));
+        onSuccess?.(txInfo);
+        resolve(txInfo);
+      })
         .catch((err) => {
           if (err?.message?.search("User denied") > -1)
             dispatch(updateTransaction({
@@ -272,7 +274,7 @@ export default function useBepro(props?: IUseBeProDefault) {
                       if (!txInfo) throw new Error(t("errors.approve-transaction"));
               
                       txWindow.updateItem(tx.payload.id,
-                                          BeproService.parseTransaction(txInfo, tx.payload));
+                                          parseTransaction(txInfo, tx.payload));
                       onSuccess?.(txInfo);
                       resolve(txInfo);
                     })

@@ -8,17 +8,20 @@ import LockedIcon from "assets/icons/locked-icon";
 import Button from "components/button";
 import Modal from "components/modal";
 
+import { Token } from "interfaces/token";
+
 import { BeproService } from "services/bepro-service";
 
 export default function ChangeTokenModal({
   show,
   setClose,
-  setToken
+  setToken = (newToken: Token) => {}
 }) {
   const { t } = useTranslation("common");
   const [address, setAddress] = useState('');
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
+  const [contract, setContract] = useState<ERC20>();
   const [isExecuting, setIsExecuting] = useState(false);
   const [isValidAddress, setIsValidAddress] = useState<boolean>();
 
@@ -43,8 +46,10 @@ export default function ChangeTokenModal({
 
       setName(await erc20.name());
       setSymbol(await erc20.symbol());
+      setContract(erc20);
       setIsValidAddress(true);
     } catch (error) {
+      setIsValidAddress(false);
       console.log("Failed to load contract", error);
     } finally {
       setIsExecuting(false);
@@ -65,6 +70,9 @@ export default function ChangeTokenModal({
   }
 
   function handleConfirm() {
+    if (!(isValidAddress === true)) return;
+    
+    setClose();
     setToken({
       address,
       name,
@@ -74,14 +82,14 @@ export default function ChangeTokenModal({
 
   function handleInputchange(value) {
     setAddress(value);
-    setIsValidAddress(false);
+    setIsValidAddress(undefined);
   }
 
   return (
-    <Modal show={show} onCloseClick={handleClose} title="Change the Token" titlePosition="center">
+    <Modal show={show} onCloseClick={handleClose} title="Add Token" titlePosition="center">
       <div className="container">
         <p className="caption-small trans mb-2 text-center">
-            Use your preferred ERC20 Token for this bounty
+            Add an ERC20 token to use on this Bounty
         </p>
 
         <div className="form-group mt-3">
@@ -93,6 +101,12 @@ export default function ChangeTokenModal({
             onChange={e => handleInputchange(e.target.value)} 
             onBlur={() => loadContract()} 
           />
+
+          {
+            isValidAddress === false ? 
+            <small className="small-info text-danger">Invalid address provided!</small> : 
+            <></>
+          }
         </div>
 
         <div className="row">

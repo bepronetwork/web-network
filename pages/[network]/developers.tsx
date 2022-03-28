@@ -46,8 +46,6 @@ export default function PageDevelopers() {
   async function loadTotals() {
     if (!beproServiceStarted || !activeNetwork) return;
 
-    console.log(BeproService.network);
-
     const [closed, inProgress, onNetwork, totalUsers] = await Promise.all([
       BeproService.getClosedBounties(handleNetworkAddress(activeNetwork)),
       0,//BeproService.getOpenBounties(handleNetworkAddress(activeNetwork)),

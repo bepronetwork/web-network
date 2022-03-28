@@ -58,7 +58,7 @@ export const AuthenticationProvider = ({ children }) => {
       await BeproService.login();
 
       const [isCouncil, isApprovedSettlerToken] = await Promise.all([
-        BeproService.network.isCouncil(BeproService?.address),
+        BeproService.isCouncil(),
         BeproService.isApprovedSettlerToken()
       ])
 
@@ -112,7 +112,7 @@ export const AuthenticationProvider = ({ children }) => {
       BeproService.getBalance("bepro"),
       BeproService.getBalance("eth"),
       BeproService.getBalance("staked"),
-      BeproService.network.isCouncil(BeproService.address),
+      BeproService.isCouncil(),
     ])
     setWallet((previousWallet) => ({
       ...previousWallet,
@@ -155,7 +155,7 @@ export const AuthenticationProvider = ({ children }) => {
       BeproService.login()
         .then(async() =>{
           const [isCouncil, isApprovedSettlerToken] = await Promise.all([
-            BeproService.network.isCouncil(BeproService?.address),
+            BeproService.isCouncil(),
             BeproService.isApprovedSettlerToken()
           ])
           setWallet((previousWallet) => ({
@@ -178,7 +178,7 @@ export const AuthenticationProvider = ({ children }) => {
         BeproService.login()
         .then(async () =>{
           const [isCouncil, isApprovedSettlerToken] = await Promise.all([
-            BeproService.network.isCouncil(address),
+            BeproService.isCouncil(),
             BeproService.isApprovedSettlerToken()
           ])
           setWallet({ address, isCouncil, isApprovedSettlerToken })

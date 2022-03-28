@@ -111,6 +111,16 @@ class BeproFacet {
     return this.network;
   }
 
+  async getERC20Obj(tokenAddress = undefined): Promise<ERC20> {
+    if (!tokenAddress) return this.network.settlerToken;
+
+    const erc20 = new ERC20(this.bepro, tokenAddress);
+
+    await erc20.loadContract();
+
+    return erc20;
+  }
+
   async getBalance(kind: `eth` | `bepro` | `staked`): Promise<number> {
     try {
       let n = 0;
@@ -131,6 +141,34 @@ class BeproFacet {
     } catch (error) {
       return 0;
     }
+  }
+
+  async getTokenBalance(tokenAddress: string = undefined, walletAddress = this.address): Promise<number> {
+    try {
+      const erc20 = await this.getERC20Obj(tokenAddress);
+
+      return erc20.getTokenAmount(walletAddress);
+    } catch (error) {
+      console.log('Failed to get token balance: ', error);
+      return 0;
+    }
+  }
+
+  async isTokenApproved(tokenAddress: string = undefined): Promise<boolean> {
+    try {
+      const erc20 = await this.getERC20Obj(tokenAddress);
+
+      return erc20.isApproved(undefined, 1);
+    } catch (error) {
+      console.log('Failed to get token approval: ', error);
+      return false;
+    }
+  }
+
+  async approveToken(tokenAddress: string = undefined) {
+    const erc20 = await this.getERC20Obj(tokenAddress);
+
+    return erc20.approve(erc20.contractAddress, await erc20.totalSupply());
   }
 
   async getSettlerTokenName(networkAddress = undefined) {
@@ -221,6 +259,23 @@ class BeproFacet {
       totalSettlerLocked === 0 &&
       closedBounties + canceledBounties === bountiesTotal
     );
+  }
+
+  async isCouncil(address = this.address) {
+    if (this.isStarted) {
+      const councilAmount = await this.getCouncilAmount();
+      const oraclesOf = await this.getOraclesOf(address);
+
+      return oraclesOf >= councilAmount;
+    }
+
+    return false;
+  }
+
+  async getOraclesOf(address: string) {
+    if (this.isStarted) return this.network.getOraclesOf(address);
+
+    return 0;
   }
 
   async getCouncilAmount() {
