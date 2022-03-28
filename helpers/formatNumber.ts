@@ -1,4 +1,3 @@
-import { toNumber } from "lodash";
 export const formatNumberToString = (number: number | string, decimals = 4) => {
   return parseFloat(`${number}`)
     .toFixed(decimals)
@@ -14,4 +13,4 @@ export const formatNumberToNScale = (number: number) => {
 };
 
 export const formatNumberToCurrency = (number: number | string, options = {}) =>
-  new Intl.NumberFormat("en", options).format(toNumber(number));
+  new Intl.NumberFormat("en", options).format(Number(number));
