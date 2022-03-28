@@ -1,26 +1,79 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-import { useTranslation } from "next-i18next";
-
+import axios from "axios";
+import {CURRENCY_API, CURRENCY_ID, CURRENCY_VSLIST} from 'env'
 
 import TransactionIcon from "assets/icons/transaction";
 
 import Modal from "components/modal";
 
-
-import useNetworkTheme from "x-hooks/use-network";
+import { formatNumberToNScale } from "helpers/formatNumber";
 
 import InputNumber from "./input-number";
 import ReactSelect from "./react-select";
-
 interface IProps{
   show: boolean;
   onClose: ()=> void;
 }
+
+const defaultValue = [{value: "usd", label: "US Dollar"}, {value: "eur", label: "Euro"}]
+
 export default function PriceConversorModal({
   show,
   onClose
 }:IProps) {
+  const [currentValue, setValue] = useState<number>(1);
+  const [currentPrice, setCurrentPrice] = useState<number>(0)
+  const [currentCurrency, setCurrentCurrency] = useState<{label: string, value: string}>(null)
+  const [options, setOptions] = useState([])
+  
+
+  async function handlerChange({value, label}){
+    const {data} = await axios.get(`${CURRENCY_API}/simple/price?ids=${CURRENCY_ID}&vs_currencies=${value}`)
+    setCurrentCurrency({value, label})
+    setCurrentPrice(data[CURRENCY_ID][value])
+  }
+  useEffect(()=>{
+    let currencyList;
+    console.log(CURRENCY_VSLIST)
+    try {
+      const list = JSON.parse(CURRENCY_VSLIST)
+      currencyList = Array.isArray(list) ? list : defaultValue;
+    } catch (error) {
+      currencyList = defaultValue;
+    }
+    const opt = currencyList.map(currency=>({value: currency?.value, label: currency?.label}))
+    setOptions(opt)
+    handlerChange(opt[0])
+  },[])
+
+  function SelectValueComponent({ innerProps, innerRef, ...rest }) {
+    const data = rest.getValue()[0];
+    return (
+      <div
+        ref={innerRef}
+        {...innerProps}
+        className="proposal__select_currency cursor-pointer d-inline-flex align-items-center flex-grow-1 justify-content-between text-center caption-large text-white p-1"
+      >
+        <span>{formatNumberToNScale(currentPrice)}</span>
+        <span>{data?.value}</span>
+      </div>
+    );
+  }
+  
+  function SelectOptionComponent({ innerProps, innerRef, data }) {
+    const current = currentCurrency?.value === data?.value
+    return (
+      <div
+        ref={innerRef}
+        {...innerProps}
+        className={`react-select__option p-small text-white p-2 d-flex justify-content-between hover-primary cursor-pointer text-${current? 'white' : 'gray'}`}
+      >
+        <span className="">{data?.label}</span>
+        <span className="text-uppercase">{data?.value}</span>
+      </div>
+    );
+  }
 
   return (
     <Modal
@@ -30,11 +83,22 @@ export default function PriceConversorModal({
     onCloseClick={onClose}
   >
     <div className="d-flex flex-row gap-2">
-      <InputNumber symbol="$Bepro"/>
+      <InputNumber className="caption-large" symbol="$Bepro" value={currentValue} onValueChange={setValue}/>
       <div className="d-flex justify-center align-items-center bg-dark-gray circle-2 p-2">
         <TransactionIcon width={14} height={10}/>
       </div>
-      <ReactSelect key={`select_currency`} options={[]} onChange={()=>{}} />
+      <ReactSelect key='select_currency'
+      isSearchable={false} 
+      components={{
+        Option: SelectOptionComponent,
+        ValueContainer: SelectValueComponent
+      }}
+      defaultValue={{
+        value: options[0]?.value,
+        label: options[0]?.label,
+      }}
+      options={options} 
+      onChange={handlerChange} />
     </div>
   </Modal>
   );
