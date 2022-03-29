@@ -8,8 +8,6 @@ import ProposalItem from "components/proposal-item";
 import { useAuthentication } from "contexts/authentication";
 import { IActiveIssue } from "contexts/issue";
 
-import { isProposalDisputable } from "helpers/proposal";
-
 import { INetworkIssue } from "interfaces/issue-data";
 
 import { BeproService } from "services/bepro-service";
@@ -47,10 +45,7 @@ export default function IssueProposals({
               proposal={proposal}
               issue={issue}
               isFinalized={networkIssue?.finalized}
-              isDisputable={
-                isProposalDisputable(proposal?.createdAt, disputableTime) &&
-                !networkIssue?.networkProposals[proposal.id]?.isDisputed
-              }
+              disputableTime={disputableTime}
             />
           )))) || <NothingFound description={t("errors.not-found")} />}
       {issue?.mergeProposals?.length === 0 && (

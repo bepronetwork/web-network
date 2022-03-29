@@ -10,7 +10,7 @@ const cap = toSmartContractDecimals("50000000", 18);
 const connection = new Web3Connection({
   web3Host: "http://127.0.0.1:7545",
   privateKey:
-    "6dee9544733125f879bdf1f5c51638d0dbaceb579e15c49ac52348d39019b9ab",
+    "b63dee68541bf87ae8fec87b0db060883dfe04a4472e407e5d890abaf837c85d",
   debug: true,
   skipWindowAssignment: true
 });

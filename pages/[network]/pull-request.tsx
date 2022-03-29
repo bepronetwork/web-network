@@ -50,7 +50,7 @@ export default function PullRequest() {
     dispatch(changeLoadState(false));
   }
 
-  function handleCreateReview({ body }) {
+  function handleCreateReview(body) {
     if (!user?.login) return;
 
     setIsExecuting(true);

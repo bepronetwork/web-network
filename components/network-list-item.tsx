@@ -28,13 +28,12 @@ interface NetworkListItemProps {
 export default function NetworkListItem({
   network,
   redirectToHome = false,
-  updateNetworkParameter = (networkName, parameter, value) => {},
-  ...props
+  updateNetworkParameter,
 }: NetworkListItemProps) {
   const router = useRouter();
   const { t } = useTranslation("common");
 
-  const { getBeproCurrency } = useApi();
+  const { getBeproCurrencyByContract } = useApi();
   const { getURLWithNetwork } = useNetwork();
 
   const { dispatch } = useContext(ApplicationContext);
@@ -80,7 +79,7 @@ export default function NetworkListItem({
       })
       .then((amount) => {
         BeproService.getNetworkObj(handleNetworkAddress(network)).then((networkObj) => {
-          getBeproCurrency(networkObj.transactionToken.contractAddress).then(({ usd }) => {
+          getBeproCurrencyByContract(networkObj.transactionToken.contractAddress).then(({ usd }) => {
             dispatch(changeNetworksSummary({
                     label: "amountInNetwork",
                     amount: amount * usd,
