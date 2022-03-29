@@ -8,6 +8,7 @@ import { Token } from "interfaces/token";
 interface TokensDropdownProps {
   defaultToken: Token;
   tokens: Token[];
+  canAddToken?: boolean;
   addToken: (value: Token) => void;
   setToken?: (value: Token) => void;
 }
@@ -21,18 +22,20 @@ export default function TokensDropdown({
   defaultToken,
   tokens,
   addToken,
-  setToken
+  setToken,
+  canAddToken
 } : TokensDropdownProps) {
   const [options, setOptions] = useState<Option[]>();
   const [option, setOption] = useState<Option>();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const formatCreateLabel = (inputValue: string) => `Add ${inputValue} token`;
+  const formatCreateLabel = (inputValue: string) => canAddToken ? `Add ${inputValue} token` : undefined;
   const tokenToOption = (token: Token): Option => ({ label: `${token.symbol} ${token.name}`, value: token });
 
   const handleChange = (newValue) => {
     const { value, __isNew__ } = newValue;
 
+    if (__isNew__ && !canAddToken) return;
     if (__isNew__) return setIsModalVisible(true);
     
     setToken(value); 

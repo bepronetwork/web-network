@@ -39,11 +39,13 @@ class BeproFacet {
 
       this.isStarted = true;
 
+      (window as any).network = this.network;
+
       console.table({
         web3: WEB3_CONNECTION,
         contract: networkAddress,
-        settler: this.network.settlerToken.contractAddress,
-        nft: this.network.nftToken.contractAddress,
+        settler: this.network.settlerToken?.contractAddress,
+        nft: this.network.nftToken?.contractAddress,
         started: this.isStarted
       });
     } catch (error) {
@@ -158,7 +160,7 @@ class BeproFacet {
     try {
       const erc20 = await this.getERC20Obj(tokenAddress);
 
-      return erc20.isApproved(undefined, 1);
+      return erc20.isApproved(this.network.contractAddress, 1);
     } catch (error) {
       console.log('Failed to get token approval: ', error);
       return false;
@@ -168,7 +170,7 @@ class BeproFacet {
   async approveToken(tokenAddress: string = undefined) {
     const erc20 = await this.getERC20Obj(tokenAddress);
 
-    return erc20.approve(erc20.contractAddress, await erc20.totalSupply());
+    return erc20.approve(this.network.contractAddress, await erc20.totalSupply());
   }
 
   async getSettlerTokenName(networkAddress = undefined) {
@@ -355,7 +357,7 @@ class BeproFacet {
     repoPath,
     branch,
     transactional,
-    rewardToken,
+    rewardToken = undefined,
     tokenAmount = 0,
     rewardAmount = 0,
     fundingAmount = 0

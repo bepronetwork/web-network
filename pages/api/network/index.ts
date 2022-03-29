@@ -16,6 +16,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   const network = await Database.network.findOne({
     attributes: { exclude: ["id", "creatorAddress", "updatedAt"] },
+    include: [
+      { association: "tokens" }
+    ],
     where: {
       name: {
         [Op.iLike]: String(networkName)

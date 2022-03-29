@@ -30,8 +30,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  if (!network) return res.status(404).json("Invalid network");
-  if (network.isClosed) return res.status(404).json("Invalid network");
+  if (!network || network?.isClosed) return res.status(404).json("Invalid network");
 
   if (!creatorGithub) return res.status(422).json("creatorGithub is required");
 
@@ -73,7 +72,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     network_id: network.id
   });
 
-  return res.status(200).json(githubId);
+  return res.status(200).json(`${repository_id}/${githubId}`);
 }
 
 async function patch(req: NextApiRequest, res: NextApiResponse) {

@@ -1,3 +1,5 @@
+import { Token } from "interfaces/token";
+
 export interface INetwork {
   id: number;
   name: string;
@@ -16,6 +18,8 @@ export interface INetwork {
   creatorAddress: string;
   openBountiesAmount?: number;
   openBountiesQuantity?: number;
+  allowCustomTokens?: boolean;
+  tokens?: Token[];
 }
 
 export interface ThemeColors {
