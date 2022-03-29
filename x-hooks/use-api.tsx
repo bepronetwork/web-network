@@ -1,7 +1,7 @@
 import axios from "axios";
 import {
   BEPRO_NETWORK_NAME,
-  CURRENCY_BEPRO_API,
+  CURRENCY_API,
   PRODUCTION_CONTRACT,
   USE_PRODUCTION_CONTRACT_CONVERSION
 } from "env";
@@ -149,13 +149,6 @@ export default function useApi() {
     return client
       .patch("/issue", { repoId, githubId, scId, networkName })
       .then(({ data }) => data === "ok")
-      .catch((_) => false);
-  }
-
-  async function patchPrStatus(prId) {
-    return client
-      .patch(`/pull-request/${prId}`)
-      .then(({ data }) => data)
       .catch((_) => false);
   }
 
@@ -535,9 +528,9 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
-  async function getBeproCurrency(contractAddress = undefined) {
+  async function getBeproCurrencyByContract(contractAddress = undefined) {
     try {
-      const { data } = await axios.get(`${CURRENCY_BEPRO_API}/${
+      const { data } = await axios.get(`${CURRENCY_API}/coins/ethereum/contract/${
           USE_PRODUCTION_CONTRACT_CONVERSION === "1"
             ? PRODUCTION_CONTRACT
             : contractAddress
@@ -565,7 +558,7 @@ export default function useApi() {
     createRepo,
     createReviewForPR,
     getAllUsers,
-    getBeproCurrency,
+    getBeproCurrencyByContract,
     getBranchsList,
     getClientNation,
     getHealth,

@@ -30,14 +30,13 @@ export default function NetworksList({
   networkAddress,
   creatorAddress,
   redirectToHome = false,
-  ...props
 }: NetworksListProps) {
   const { t } = useTranslation(["common", "custom-network"]);
   const [order, setOrder] = useState(["name", "asc"]);
   const [networks, setNetworks] = useState<INetwork[]>([]);
 
   const { searchNetworks } = useApi();
-  const { network, getURLWithNetwork } = useNetwork();
+  const { network } = useNetwork();
 
   const { dispatch } = useContext(ApplicationContext);
 

@@ -154,7 +154,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     if (query.id && query.repoId) {
       if (
         query.id !== activeIssue?.githubId ||
-        +query.repoId !== +activeIssue?.repository_id && !noExpired
+        +query.repoId !== +activeIssue?.repository_id || !noExpired
       ) {
         setActiveIssue(null);
         updateIssue(`${query.repoId}`, `${query.id}`);
