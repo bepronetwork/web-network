@@ -14,6 +14,7 @@ import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
+import { SearchBounties } from "interfaces/search-bounties";
 import { TransactionCurrency } from "interfaces/transaction";
 
 import { BeproService } from "services/bepro-service";
@@ -296,6 +297,18 @@ export default function useBepro(props?: IUseBeProDefault) {
     });
   }
 
+  async function searchBounties({
+    page = 1,
+    sortBy = 'creation',
+    order = 'desc',
+    partial = 10,
+    ...rest
+  }: SearchBounties) {
+    const bounties = await BeproService.getBounties(page * partial, partial);
+
+    console.log(bounties);
+  }
+
   return {
     handlerDisputeProposal,
     handleCloseIssue,
@@ -303,6 +316,7 @@ export default function useBepro(props?: IUseBeProDefault) {
     handleRecognizeAsFinished,
     handleProposeMerge,
     handleApproveTransactionalToken,
-    handleTakeBack
+    handleTakeBack,
+    searchBounties
   };
 }

@@ -185,12 +185,44 @@ class BeproFacet {
     return network.closedBounties();
   }
 
+  async getBounty(id: number): Promise<Bounty> {
+    if (!this.isStarted) return;
+    
+    const bounty = await this.network.getBounty(id);
+
+    return bountyParser(bounty);
+  }
+
+  async getBounties(start = 1, partial = undefined): Promise<Bounty[]> {
+    if (!this.isStarted) return [];
+
+    const bountiesCount =  await this.getBountiesCount();
+    
+    const size = !partial ? 
+      bountiesCount : 
+      ( (start + partial > bountiesCount) ? ((bountiesCount + 1) - start) : partial );
+
+    const bounties = size < 1 ? 
+      [] : 
+      await Promise.all(Array(size).fill(1).map((value, index) => this.getBounty(index + start)));
+
+    return bounties;
+  }
+
+  async getBountiesCount(networkAddress = undefined): Promise<number> {
+    if (!this.isStarted) return 0;
+
+    const network = await this.getNetworkObj(networkAddress);
+
+    return network.bountiesIndex();
+  }
+
   async getOpenBounties(networkAddress = undefined) {
     try {
       const network = await this.getNetworkObj(networkAddress);
 
       await Promise.all([
-        network.bountiesTotal(),
+        network.bountiesIndex(),
         network.canceledBounties(),
         network.closedBounties()
       ]).then((values) => {
