@@ -5,12 +5,15 @@ on:
     branches:
       - main
       - dev
+  push:
+    branches:
+      - dev
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [14.17.0]
+        node-version: [16.13.2]
     steps:
       - uses: actions/checkout@v1
       - name: Install Node.js ${{ matrix.node-version }}
