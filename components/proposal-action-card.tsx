@@ -35,20 +35,24 @@ export default function ProposalActionCard({
   const [disputableTime, setDisputableTime] = useState(0);
   const { t } = useTranslation(["common", "pull-request"]);
   const { networkIssue } = useIssue();
-  const { beproServiceStarted } = useAuthentication()
+  const { beproServiceStarted, wallet } = useAuthentication()
 
-  const isDisputable = [
-    !networkProposal?.isDisputed,
-    !networkIssue?.finalized,
-    isProposalDisputable(proposal?.createdAt, disputableTime)
-  ].every((v) => v);
+  const isDisable = [
+      networkIssue?.finalized,
+      !isProposalDisputable(proposal?.createdAt, disputableTime),
+      networkProposal?.isDisputed,
+      !networkProposal?.canUserDispute,
+      wallet?.balance?.oracles?.tokensLocked === 0,
+    ].some((v) => v);
+
+  
   const isSuccess = [
     networkIssue?.finalized,
     !networkProposal?.isDisputed && proposal?.isMerged
   ].every((v) => v);
 
   useEffect(() => {
-    if(!beproServiceStarted) return;
+    if (!beproServiceStarted) return;
     BeproService?.getDisputableTime().then(setDisputableTime);
   }, [proposal, networkIssue]);
 
@@ -83,12 +87,12 @@ export default function ProposalActionCard({
               {t("common:actions.merge")}
             </Button>
 
-            {!isSuccess && isDisputable && (
+            {!isSuccess && !isDisable && (
               <Button
                 className="flex-grow-1"
                 textClass="text-uppercase text-white"
                 color="purple"
-                disabled={!isDisputable}
+                disabled={isDisable}
                 onClick={onDispute}
               >
                 {t("common:actions.dispute")}
