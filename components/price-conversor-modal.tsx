@@ -35,7 +35,6 @@ export default function PriceConversorModal({
   }
   useEffect(()=>{
     let currencyList;
-    console.log(CURRENCY_VSLIST)
     try {
       const list = JSON.parse(CURRENCY_VSLIST)
       currencyList = Array.isArray(list) ? list : defaultValue;
