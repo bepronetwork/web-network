@@ -20,7 +20,7 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "bepro-js": ["node_modules/bepro-js/dist/index.js"]
+      "bepro-js": ["node_modules/bepro-js/dist/src/index.js"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
