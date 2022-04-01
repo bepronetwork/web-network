@@ -1,4 +1,3 @@
-// import { useContext, useEffect } from "react";
 
 import Link from "next/link";
 
@@ -15,7 +14,6 @@ import { isProposalDisputable } from "helpers/proposal";
 import { IssueData } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
-// import { BeproService } from "services/bepro-service";
 
 import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network";
@@ -27,40 +25,42 @@ import Translation from "./translation";
 interface Options {
   proposal: Proposal;
   issue: IssueData;
-  isFinalized: boolean;
   disputableTime?: number;
 }
 
 export default function ProposalItem({
   proposal,
   issue,
-  isFinalized,
   disputableTime,
 }: Options) {
 
-  const { wallet, beproServiceStarted } = useAuthentication()
+  const { wallet } = useAuthentication()
   const { networkIssue, getNetworkIssue } = useIssue();
   const { handlerDisputeProposal } = useBepro();
   const { getURLWithNetwork } = useNetworkTheme();
   const networkProposals = networkIssue?.networkProposals?.[proposal?.id];
 
   const isDisable = [
-    !isProposalDisputable(proposal?.createdAt, disputableTime),
-    networkIssue?.networkProposals[proposal.id]?.isDisputed]
+      networkIssue?.finalized,
+      !isProposalDisputable(proposal?.createdAt, disputableTime),
+      networkIssue?.networkProposals[proposal.id]?.isDisputed,
+      !networkIssue?.networkProposals[proposal.id]?.canUserDispute,
+      wallet?.balance?.oracles?.tokensLocked === 0,
+    ]
     .some(v => v)
 
   async function handleDispute() {
-    if (!isDisable || isFinalized) return;
+    if (isDisable || networkIssue?.finalized) return;
     handlerDisputeProposal(+proposal.scMergeId).then(() =>
       getNetworkIssue());
   }
 
   function getColors() {
-    if (isFinalized && !networkProposals?.isDisputed && proposal.isMerged) {
+    if (networkIssue?.finalized && !networkProposals?.isDisputed && proposal.isMerged) {
       return "success";
     }
 
-    if (networkProposals?.isDisputed || (isFinalized && !proposal.isMerged)) {
+    if (networkProposals?.isDisputed || (networkIssue?.finalized && !proposal.isMerged)) {
       return "danger";
     }
 
@@ -70,24 +70,17 @@ export default function ProposalItem({
   function getLabel() {
     let action = "dispute";
 
-    if (isFinalized && !networkProposals?.isDisputed && proposal.isMerged) {
+    if (networkIssue?.finalized && !networkProposals?.isDisputed && proposal.isMerged) {
       action = "accepted";
     }
 
-    if (networkProposals?.isDisputed || (isFinalized && !proposal.isMerged)) {
+    if (networkProposals?.isDisputed || (networkIssue?.finalized && !proposal.isMerged)) {
       action = "failed";
     }
 
     return <Translation label={`actions.${action}`} />;
   }
 
-  // useEffect(()=>{
-  //   if(!beproServiceStarted) return;
-  //   BeproService?.network?.disputes(wallet?.address, issue?.issueId, proposal?.scMergeId)
-  //   .then(val=>{
-  //     console.log(val)
-  //   }).catch(e => console.log(e))
-  // },[beproServiceStarted])
   return (
     <Link
       passHref
@@ -130,7 +123,7 @@ export default function ProposalItem({
               <ProposalProgressSmall
                 pgClass={`${getColors()}`}
                 value={+networkProposals?.disputes}
-                total={wallet.balance.staked}
+                total={wallet?.balance?.staked}
                 textClass={`pb-2 text-${getColors()}`}
               />
             </div>

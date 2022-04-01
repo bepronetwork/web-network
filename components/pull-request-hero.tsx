@@ -13,6 +13,7 @@ import { pullRequest } from "interfaces/issue-data";
 import CustomContainer from "./custom-container";
 import DateLabel from "./date-label";
 import PriceConversor from "./price-conversor";
+import useNetworkTheme from "x-hooks/use-network";
 
 interface IPullRequestHeroProps {
   currentPullRequest: pullRequest;
@@ -23,6 +24,7 @@ export default function PullRequestHero({
 }: IPullRequestHeroProps) {
   const { activeIssue } = useIssue();
   const router = useRouter();
+  const {getURLWithNetwork} = useNetworkTheme()
   const { t } = useTranslation(["common", "pull-request"]);
 
   return (
@@ -33,7 +35,10 @@ export default function PullRequestHero({
             <div className="d-flex flex-row">
               <div
                 className="me-2 cursor-pointer"
-                onClick={() => router.back()}
+                onClick={() => router.push(getURLWithNetwork("/bounty", {
+                  id: activeIssue.githubId,
+                  repoId: activeIssue.repository_id,
+              }))}
               >
                 <ArrowLeft
                   width={16}

@@ -24,6 +24,7 @@ import useOctokit from "x-hooks/use-octokit";
 
 import { useAuthentication } from "./authentication";
 import { useNetwork } from "./network";
+import { fromSmartContractDecimals } from "bepro-js";
 
 export interface IActiveIssue extends IssueData {
   comments: Comment[];
@@ -121,27 +122,37 @@ export const IssueProvider: React.FC = function ({ children }) {
     const networkProposals: INetworkProposal[] = [];
 
     for (const meta of activeIssue.mergeProposals) {
-      const { scMergeId, id: proposalId } = meta;
+      const { scMergeId, id: proposalId, issueId } = meta;
 
       if (scMergeId) {
-        const merge = await BeproService.network.getMergeById(+network?._id,
-                                                              +scMergeId);
-
-        const isDisputed = activeIssue?.merged
-          ? activeIssue?.merged !== scMergeId
-          : await BeproService.network.isMergeDisputed(+network?._id,
-                                                       +scMergeId);
+        const [merge, disputedValue, isMergeDisputed] = await Promise.all([
+          BeproService.network.getMergeById(+network?._id, +scMergeId),
+          fromSmartContractDecimals(await BeproService.network.disputesForMergeByAddress(issueId, +scMergeId, wallet.address)),
+          await BeproService.network.isMergeDisputed(+network?._id, +scMergeId)
+        ])
+        
+        const isDisputed = [
+          activeIssue?.merged && activeIssue?.merged !== scMergeId,
+          isMergeDisputed,
+        ].some(v=>v)
+        
+        const canUserDispute = [
+          disputedValue === 0,
+          isDisputed,
+        ].some(v=>v)
+        debugger;
 
         networkProposals[proposalId] = {
           ...merge,
-          isDisputed
+          isDisputed,
+          canUserDispute
         };
       }
     }
 
     setNetworkIssue({ ...network, isDraft, networkProposals });
     return { ...network, isDraft, networkProposals };
-  }, [activeIssue, wallet?.address, beproServiceStarted]);
+  }, [activeIssue, wallet, beproServiceStarted]);
 
   useEffect(() => {
     if (activeIssue && wallet?.address && beproServiceStarted) {

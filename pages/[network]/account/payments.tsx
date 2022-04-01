@@ -42,7 +42,7 @@ const PaymentItem = function () {
     </div>
   )
 }
-
+// Todo: Finish with Network V2
 export default function Payments() {
   const { t } = useTranslation(["common", "bounty"]);
 
@@ -81,7 +81,7 @@ export default function Payments() {
                   isLoading={loading.isLoading}
                   hasMore={hasMore}
                 >
-                  {payments.map(payment => <PaymentItem />)}
+                  {React.Children.toArray(payments.map(payment => <PaymentItem />))}
                 </InfiniteScroll>
               </div>
             </div>
