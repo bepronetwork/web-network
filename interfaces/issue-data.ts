@@ -38,6 +38,7 @@ export interface IssueData {
   title: string;
   updatedAt?: Date;
   url?: string;
+  contractId?: number;
   working: string[];
 }
 

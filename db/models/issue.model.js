@@ -23,7 +23,8 @@ class Issue extends Model {
         },
         merged: DataTypes.STRING,
         seoImage: DataTypes.STRING,
-        network_id: DataTypes.INTEGER
+        network_id: DataTypes.INTEGER,
+        contractId: DataTypes.INTEGER
     },
                {
         sequelize,
