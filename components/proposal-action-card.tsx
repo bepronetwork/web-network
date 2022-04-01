@@ -43,7 +43,7 @@ export default function ProposalActionCard({
       networkProposal?.isDisputed,
       !networkProposal?.canUserDispute,
       wallet?.balance?.oracles?.tokensLocked === 0,
-    ].some((v) => v);
+  ].some((v) => v);
 
   
   const isSuccess = [

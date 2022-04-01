@@ -7,6 +7,7 @@ import React, {
   useEffect
 } from "react";
 
+import { fromSmartContractDecimals } from "bepro-js";
 import { useRouter } from "next/router";
 
 import {
@@ -24,7 +25,6 @@ import useOctokit from "x-hooks/use-octokit";
 
 import { useAuthentication } from "./authentication";
 import { useNetwork } from "./network";
-import { fromSmartContractDecimals } from "bepro-js";
 
 export interface IActiveIssue extends IssueData {
   comments: Comment[];

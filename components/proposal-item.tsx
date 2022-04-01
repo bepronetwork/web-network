@@ -46,7 +46,7 @@ export default function ProposalItem({
       networkIssue?.networkProposals[proposal.id]?.isDisputed,
       !networkIssue?.networkProposals[proposal.id]?.canUserDispute,
       wallet?.balance?.oracles?.tokensLocked === 0,
-    ]
+  ]
     .some(v => v)
 
   async function handleDispute() {

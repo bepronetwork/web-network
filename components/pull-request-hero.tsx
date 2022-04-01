@@ -10,10 +10,11 @@ import { useIssue } from "contexts/issue";
 
 import { pullRequest } from "interfaces/issue-data";
 
+import useNetworkTheme from "x-hooks/use-network";
+
 import CustomContainer from "./custom-container";
 import DateLabel from "./date-label";
 import PriceConversor from "./price-conversor";
-import useNetworkTheme from "x-hooks/use-network";
 
 interface IPullRequestHeroProps {
   currentPullRequest: pullRequest;
@@ -38,7 +39,7 @@ export default function PullRequestHero({
                 onClick={() => router.push(getURLWithNetwork("/bounty", {
                   id: activeIssue.githubId,
                   repoId: activeIssue.repository_id,
-              }))}
+                }))}
               >
                 <ArrowLeft
                   width={16}
