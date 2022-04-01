@@ -15,13 +15,11 @@ import { handleNetworkAddress } from "helpers/custom-network";
 import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
-import useBepro from "x-hooks/use-bepro";
 
 export default function PageDevelopers() {
   const { t } = useTranslation(["common"]);
   const { beproServiceStarted } = useAuthentication();
   const { getTotalUsers } = useApi();
-  const { searchBounties } = useBepro();
 
   const [infos, setInfos] = useState<IInfosHero[]>([
     {
@@ -47,8 +45,6 @@ export default function PageDevelopers() {
 
   async function loadTotals() {
     if (!beproServiceStarted || !activeNetwork) return;
-
-    searchBounties({}).then(console.log).catch(console.log);
 
     const [closed, inProgress, onNetwork, totalUsers] = await Promise.all([
       BeproService.getClosedBounties(handleNetworkAddress(activeNetwork)),
