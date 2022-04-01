@@ -26,6 +26,13 @@ interface NewIssueParams {
   repository_id: string;
 }
 
+interface CreateBounty {
+  title: string;
+  body: string;
+  creator: string;
+  repositoryId: string;
+}
+
 const repoList: ReposList = [];
 const branchsList: BranchsList = {};
 
@@ -128,6 +135,20 @@ export default function useApi() {
       .post<number>("/issue", { ...payload, networkName })
       .then(({ data }) => data)
       .catch(() => null);
+  }
+
+  /**
+   * Ping the API to create an issue on Github, if succeed returns the CID (Repository ID on database + Issue ID on Github)
+   * @param payload
+   * @param networkName 
+   * @returns string
+   */
+  async function createPreBounty(payload: CreateBounty,
+                                 networkName = BEPRO_NETWORK_NAME): Promise<string> {
+    return client
+        .post("/bounty", { ...payload, networkName })
+        .then(({ data }) => data)
+        .catch((error) => error);
   }
 
   async function moveIssueToOpen(scIssueId?: string) {
@@ -592,6 +613,7 @@ export default function useApi() {
     userHasPR,
     waitForClose,
     waitForMerge,
-    waitForRedeem
+    waitForRedeem,
+    createPreBounty
   };
 }

@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 
 import { ERC20 } from "bepro-js";
+import { TransactionReceipt } from "bepro-js/dist/src/interfaces/web3-core";
 import clsx from "clsx";
 import { ALLOW_CUSTOM_TOKENS, CONTRACT_ADDRESS, SETTLER_ADDRESS } from "env";
 import { useTranslation } from "next-i18next";
@@ -71,7 +72,7 @@ export default function PageCreateIssue() {
   });
   const [isTransactionalTokenApproved, setIsTransactionalTokenApproved] = useState(false);
   const [transactionalToken, setTransactionalToken] = useState<Token>();
-  const [customTokens, setCustomTokens] = useState<Token[]>([]);
+  const [customTokens, setCustomTokens] = useState<Token[]>([BEPRO_TOKEN]);
   
   const { activeNetwork } = useNetwork();
   const { handleApproveTransactionalToken } = useBepro()
@@ -85,7 +86,7 @@ export default function PageCreateIssue() {
 
   const txWindow = useTransactions();
   const { getURLWithNetwork } = useNetworkTheme();
-  const { createIssue: apiCreateIssue, patchIssueWithScId } = useApi();
+  const { createPreBounty, processEvent } = useApi();
 
   async function allowCreateIssue() {
     if (!beproServiceStarted || !transactionalToken) return;
@@ -123,11 +124,11 @@ export default function PageCreateIssue() {
 
     const payload = {
       title: issueTitle,
-      description: addFilesInDescription(issueDescription),
+      body: addFilesInDescription(issueDescription),
       amount: issueAmount.floatValue,
       creatorAddress: BeproService.address,
       creatorGithub: user?.login,
-      repository_id: repository?.id,
+      repositoryId: repository?.id,
       branch
     };
 
@@ -135,9 +136,20 @@ export default function PageCreateIssue() {
                                        activeNetwork);
 
     setRedirecting(true);
-    apiCreateIssue(payload, activeNetwork?.name)
+
+    let issueId = "";
+    let tx = undefined;
+
+    createPreBounty({ 
+      title: payload.title,
+      body: payload.body,
+      creator: payload.creatorGithub,
+      repositoryId: payload.repositoryId
+    }, activeNetwork?.name)
       .then((cid) => {
         if (!cid) throw new Error(t("errors.creating-issue"));
+
+        issueId = cid;
 
         dispatch(openIssueTx);
 
@@ -147,35 +159,30 @@ export default function PageCreateIssue() {
           repoPath: repository.path,
           branch,
           transactional: transactionalToken.address,
-          tokenAmount: payload.amount
+          tokenAmount: payload.amount,
+          githubUser: payload.creatorGithub
         };
 
-        console.log({chainPayload});
-
         return BeproService.openBounty(chainPayload)
-          .then((txInfo) => {
-            txWindow.updateItem(openIssueTx.payload.id,
-                                parseTransaction(txInfo, openIssueTx.payload));
-            const [, githubId] = cid.split('/');
-            return {
-              githubId,
-              issueId: cid
-            };
-          });
       })
-      .then(({ githubId, issueId }) =>
-        patchIssueWithScId(repository.id,
-                           githubId,
-                           issueId,
-                           activeNetwork?.name).then(async (result) => {
-                             if (!result)
-                               return dispatch(toastError(t("create-bounty:errors.creating-bounty")));
+      .then((txInfo) => {
+        tx = txInfo;
 
-              //                await router.push(getURLWithNetwork("/bounty", {
-              // id: githubId,
-              // repoId: repository.id
-              //                }));
-                           }))
+        const { blockNumber } = txInfo as any;
+
+        return processEvent("bounty/created", blockNumber, undefined, undefined, activeNetwork?.name);
+      })
+      .then(({data: createdBounties}) => {
+        if (createdBounties.includes(issueId)) {
+          txWindow.updateItem(openIssueTx.payload.id, parseTransaction(tx, openIssueTx.payload));
+          const [repoId, githubId] = issueId.split('/');
+
+          router.push(getURLWithNetwork('/bounty', {
+            id: githubId,
+            repoId
+          }));
+        } else throw new Error("Bounty not created");
+      })
       .catch((e) => {
         console.error("Failed to createIssue", e);
         cleanFields();

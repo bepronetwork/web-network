@@ -193,18 +193,14 @@ class BeproFacet {
     return bountyParser(bounty);
   }
 
-  async getBounties(start = 1, partial = undefined): Promise<Bounty[]> {
+  async getBounties(ids: number[] = []): Promise<Bounty[]> {
     if (!this.isStarted) return [];
 
     const bountiesCount =  await this.getBountiesCount();
     
-    const size = !partial ? 
-      bountiesCount : 
-      ( (start + partial > bountiesCount) ? ((bountiesCount + 1) - start) : partial );
+    const idsToFind = ids.length ? ids : Array(bountiesCount).fill(1).map((value, index) => value + index);
 
-    const bounties = size < 1 ? 
-      [] : 
-      await Promise.all(Array(size).fill(1).map((value, index) => this.getBounty(index + start)));
+    const bounties = await Promise.all(idsToFind.map(value => this.getBounty(value)));
 
     return bounties;
   }
@@ -287,7 +283,7 @@ class BeproFacet {
     const totalSettlerLocked = await network.totalSettlerLocked();
     const closedBounties = await network.closedBounties();
     const canceledBounties = await network.canceledBounties();
-    const bountiesTotal = await network.bountiesTotal();
+    const bountiesTotal = await network.bountiesIndex();
 
     return (
       totalSettlerLocked === 0 &&
@@ -388,6 +384,7 @@ class BeproFacet {
     title,
     repoPath,
     branch,
+    githubUser,
     transactional,
     rewardToken = undefined,
     tokenAmount = 0,
@@ -404,7 +401,8 @@ class BeproFacet {
                                    cid,
                                    title,
                                    repoPath,
-                                   branch);
+                                   branch,
+                                   githubUser);
   }
 }
 
