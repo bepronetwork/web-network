@@ -11,7 +11,8 @@ import { formatNumberToNScale } from "helpers/formatNumber";
 import InputNumber from "./input-number";
 import ReactSelect from "./react-select";
 import useApi from "x-hooks/use-api";
-interface IProps{
+
+interface IPriceConversiorModalProps{
   show: boolean;
   onClose: ()=> void;
 }
@@ -21,7 +22,7 @@ const defaultValue = [{value: "usd", label: "US Dollar"}, {value: "eur", label: 
 export default function PriceConversorModal({
   show,
   onClose
-}:IProps) {
+}:IPriceConversiorModalProps) {
   const {getCurrencyByToken} = useApi()
   const [currentValue, setValue] = useState<number>(1);
   const [currentPrice, setCurrentPrice] = useState<number>(0)
