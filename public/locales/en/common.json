@@ -138,7 +138,7 @@
       },
       "api-documentation": {
         "title": "api documentation",
-        "content": "Develop with bepro-js and create your next web3 app."
+        "content": "Develop with @taikai/dappkit and create your next web3 app."
       },
       "live-chat": {
         "title": "live chat",

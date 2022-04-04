@@ -1,4 +1,4 @@
-import { Network, Web3Connection } from "bepro-js";
+import { Network, Web3Connection } from "@taikai/dappkit";
 import { CONTRACT_ADDRESS, WEB3_CONNECTION } from "env";
 
 export default function networkBeproJs({

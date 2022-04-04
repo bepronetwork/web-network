@@ -1,4 +1,4 @@
-import { NetworkFactory, Web3Connection } from "bepro-js";
+import { NetworkFactory, Web3Connection } from "@taikai/dappkit";
 import { NETWORK_FACTORY_ADDRESS, WEB3_CONNECTION } from "env";
 
 export default class Bepro {
