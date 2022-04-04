@@ -186,8 +186,8 @@ export default function PageCreateIssue() {
       .catch((e) => {
         console.error("Failed to createIssue", e);
         cleanFields();
-        if (e?.message?.search("User denied") > -1)
-          dispatch(updateTransaction({ ...(openIssueTx.payload as any), remove: true }));
+        if (e?.message?.toLowerCase().search("user denied") > -1)
+          dispatch(updateTransaction({ ...(openIssueTx.payload as any), status: TransactionStatus.rejected }));
         else
           dispatch(updateTransaction({
               ...(openIssueTx.payload as any),

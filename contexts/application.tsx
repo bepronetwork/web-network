@@ -173,7 +173,10 @@ export default function ApplicationContextProvider({ children }) {
   }, [state.myTransactions]);
 
   useEffect(() => {
-    if (beproServiceStarted) BeproService.getTotalSettlerLocked().then(amount => dispatch(changeStakedState(amount))).catch(console.log)
+    if (beproServiceStarted) 
+      BeproService.getTotalSettlerLocked()
+      .then(amount => dispatch(changeStakedState(amount)))
+      .catch(console.log)
   }, [pathname, beproServiceStarted])
 
   const restoreTransactions = async (address) => {
@@ -185,6 +188,7 @@ export default function ApplicationContextProvider({ children }) {
 
     const getStatusFromBlock = async (tx) => {
       const transaction = { ...tx };
+
       if (tx?.transactionHash) {
         const block = await web3.eth.getTransaction(tx.transactionHash);
         if (block) {
@@ -204,7 +208,7 @@ export default function ApplicationContextProvider({ children }) {
       return transaction;
     };
 
-    transactions.forEach(getStatusFromBlock);
+    transactions.filter(transaction => transaction.status === TransactionStatus.rejected).forEach(getStatusFromBlock);
   };
 
   useEffect(() => {
