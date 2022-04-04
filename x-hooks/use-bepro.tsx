@@ -221,7 +221,7 @@ export default function useBepro(props?: IUseBeProDefault) {
     });
   }
 
-  async function handleApproveTransactionalToken(tokenAddress: string = undefined): 
+  async function handleApproveTransactionalToken(tokenAddress: string = undefined, amount: number): 
     Promise<TransactionReceipt | Error> {
 
     return new Promise(async (resolve, reject) => {
@@ -230,7 +230,7 @@ export default function useBepro(props?: IUseBeProDefault) {
                                 activeNetwork);
       dispatch(tx);
 
-      await BeproService.approveToken(tokenAddress)
+      await BeproService.approveToken(tokenAddress, amount)
       .then((txInfo) => {
         if (!txInfo) throw new Error(t("errors.approve-transaction"));
               

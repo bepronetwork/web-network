@@ -72,6 +72,7 @@ export default function PageCreateIssue() {
   });
   const [isTransactionalTokenApproved, setIsTransactionalTokenApproved] = useState(false);
   const [transactionalToken, setTransactionalToken] = useState<Token>();
+  const [transactionalAllowance, setTransactionalAllowance] = useState<number>();
   const [customTokens, setCustomTokens] = useState<Token[]>([BEPRO_TOKEN]);
   
   const { activeNetwork } = useNetwork();
@@ -89,9 +90,13 @@ export default function PageCreateIssue() {
   const { createPreBounty, processEvent } = useApi();
 
   async function allowCreateIssue() {
-    if (!beproServiceStarted || !transactionalToken) return;
-    handleApproveTransactionalToken(transactionalToken.address)
-      .then(updateIsApprovedSettlerToken)
+    if (!beproServiceStarted || !transactionalToken || issueAmount.floatValue <= 0) return;
+
+    handleApproveTransactionalToken(transactionalToken.address, issueAmount.floatValue)
+      .then(approved => {
+        updateIsApprovedSettlerToken();
+        setIsTransactionalTokenApproved(approved);
+      })
   }
 
   function cleanFields() {
@@ -247,14 +252,11 @@ export default function PageCreateIssue() {
   const onUpdateFiles = (files: IFilesProps[]) => setFiles(files);
 
   const updateWalletByToken = async (token: Token) => {
-    if (token.address === BEPRO_TOKEN.address) {
-      setTokenBalance(wallet?.balance?.bepro);
-      setIsTransactionalTokenApproved(wallet?.isApprovedSettlerToken);
-    } else {
-      setTokenBalance(await BeproService.getTokenBalance(token.address, wallet.address));
-      setIsTransactionalTokenApproved(await BeproService.isTokenApproved(token.address));
-    }
+    setTokenBalance(await BeproService.getTokenBalance(token.address));
+    setTransactionalAllowance(await BeproService.getAllowance(token.address));
   }
+
+  const isAmountApproved = () => transactionalAllowance >= issueAmount.floatValue;
 
   useEffect(() => {
     if (!wallet?.balance) return;
@@ -262,6 +264,10 @@ export default function PageCreateIssue() {
 
     updateWalletByToken(transactionalToken);
   }, [transactionalToken, wallet]);
+
+  useEffect(() => {
+    setIsTransactionalTokenApproved(isAmountApproved());
+  }, [transactionalAllowance, issueAmount.floatValue]);
 
   useEffect(() => {
     if (!activeNetwork) return;
@@ -274,11 +280,6 @@ export default function PageCreateIssue() {
 
     setCustomTokens(tmpTokens);
   }, [activeNetwork]);
-
-  useEffect(() => {
-    if (!beproServiceStarted) return;
-
-  }, [beproServiceStarted]);
 
   return (
     <>
@@ -350,14 +351,10 @@ export default function PageCreateIssue() {
                   <InputNumber
                     thousandSeparator
                     max={tokenBalance}
-                    className={clsx({
-                      "text-muted": isTransactionalTokenApproved
-                    })}
                     label={t("create-bounty:fields.amount.label", {token: transactionalToken?.symbol})}
                     symbol={transactionalToken?.symbol}
                     value={issueAmount.formattedValue}
                     placeholder="0"
-                    disabled={!isTransactionalTokenApproved}
                     onValueChange={handleIssueAmountOnValueChange}
                     onBlur={handleIssueAmountBlurChange}
                     helperText={
@@ -391,8 +388,8 @@ export default function PageCreateIssue() {
                     tokens={customTokens} 
                     canAddToken={
                       activeNetwork?.networkAddress === CONTRACT_ADDRESS ? 
-                      !ALLOW_CUSTOM_TOKENS :
-                      activeNetwork?.allowCustomTokens
+                      ALLOW_CUSTOM_TOKENS :
+                      !!activeNetwork?.allowCustomTokens
                     }
                     addToken={addToken} 
                     setToken={setTransactionalToken}
@@ -407,7 +404,7 @@ export default function PageCreateIssue() {
                   </div>
                 ) : (
                   <>
-                    {!isTransactionalTokenApproved ? (
+                    {!isTransactionalTokenApproved && issueAmount.floatValue > 0 ? (
                       <ReadOnlyButtonWrapper>
                         <Button
                           className="me-3 read-only-button"
