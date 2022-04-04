@@ -16,6 +16,7 @@
     "start": "next start",
     "make-seo": "node make-seo.js",
     "schedules": "node schedules.js",
+    "ganache:deploy": "node ganache/deploy.js",
     "lint": "npx eslint . --fix --ext .ts,.tsx"
   },
   "dependencies": {
