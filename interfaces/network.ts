@@ -20,6 +20,12 @@ export interface INetwork {
   openBountiesQuantity?: number;
   allowCustomTokens?: boolean;
   tokens?: Token[];
+  councilAmount?: number;
+  disputabletime?: number;
+  draftTime?: number;
+  oracleExchangeRate?: number;
+  mergeCreatorFeeShare?: number;
+  percentageNeededForDispute?: number;
 }
 
 export interface ThemeColors {

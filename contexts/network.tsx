@@ -11,9 +11,12 @@ import NetworkThemeInjector from "components/custom-network/network-theme-inject
 
 import { INetwork } from "interfaces/network";
 
+import { BeproService } from "services/bepro-service";
+
 import useApi from "x-hooks/use-api";
 
 const { publicRuntimeConfig } = getConfig()
+import { useAuthentication } from "./authentication";
 export interface NetworkContextData {
   activeNetwork: INetwork;
   updateActiveNetwork: () => void;
@@ -27,8 +30,9 @@ const expiresCookie = 60 * 60 * 1; // 1 hour
 export const NetworkProvider: React.FC = function ({ children }) {
   const [activeNetwork, setActiveNetwork] = useState<INetwork>(null);
 
-  const { query, push } = useRouter();
   const { getNetwork } = useApi();
+  const { query, push } = useRouter();
+  const { beproServiceStarted } = useAuthentication();
 
   const updateActiveNetwork = useCallback((forced?: boolean) => {
     const networkName = String(query.network || publicRuntimeConfig.networkConfig.networkName);
@@ -48,25 +52,49 @@ export const NetworkProvider: React.FC = function ({ children }) {
           });
           setActiveNetwork(data);
         })
-        .catch((error) => {
+        .catch(() => {
           push({
             pathname: "/networks"
           });
         });
   },
-    [query, activeNetwork]);
+  [query, activeNetwork]);
+
+  const updateNetworkParameters = useCallback(() => {
+    if (!beproServiceStarted || activeNetwork?.councilAmount) return;
+
+    Promise.all([
+      BeproService.getNetworkParameter("councilAmount"),
+      BeproService.getNetworkParameter("disputableTime"),
+      BeproService.getNetworkParameter("draftTime"),
+      BeproService.getNetworkParameter("oracleExchangeRate"),
+      BeproService.getNetworkParameter("mergeCreatorFeeShare"),
+      BeproService.getNetworkParameter("percentageNeededForDispute")
+    ]).then(values => {
+      setActiveNetwork(previousData => ({
+        ...previousData,
+        councilAmount: values[0],
+        disputableTime: values[1],
+        draftTime: values[2],
+        oracleExchangeRate: values[3],
+        mergeCreatorFeeShare: values[4],
+        percentageNeededForDispute: values[5]
+      }));
+    });
+  }, [activeNetwork, beproServiceStarted]);
 
   useEffect(() => {
     updateActiveNetwork();
   }, [query]);
 
   useEffect(() => {
-    //console.warn('useNetwork',{activeNetwork})
-  }, [activeNetwork]);
+    updateNetworkParameters();
+  }, [beproServiceStarted, activeNetwork]);
 
   const memorizeValue = useMemo<NetworkContextData>(() => ({
       activeNetwork,
-      updateActiveNetwork
+      updateActiveNetwork,
+      updateNetworkParameters
   }),
     [activeNetwork]);
 
