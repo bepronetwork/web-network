@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import axios from "axios";
-import {CURRENCY_API, CURRENCY_ID, CURRENCY_VSLIST} from 'env'
+import {CURRENCY_ID, CURRENCY_VSLIST} from 'env'
 
 import TransactionIcon from "assets/icons/transaction";
 
@@ -11,6 +10,7 @@ import { formatNumberToNScale } from "helpers/formatNumber";
 
 import InputNumber from "./input-number";
 import ReactSelect from "./react-select";
+import useApi from "x-hooks/use-api";
 interface IProps{
   show: boolean;
   onClose: ()=> void;
@@ -22,6 +22,7 @@ export default function PriceConversorModal({
   show,
   onClose
 }:IProps) {
+  const {getCurrencyByToken} = useApi()
   const [currentValue, setValue] = useState<number>(1);
   const [currentPrice, setCurrentPrice] = useState<number>(0)
   const [currentCurrency, setCurrentCurrency] = useState<{label: string, value: string}>(null)
@@ -29,10 +30,11 @@ export default function PriceConversorModal({
   
 
   async function handlerChange({value, label}){
-    const {data} = await axios.get(`${CURRENCY_API}/simple/price?ids=${CURRENCY_ID}&vs_currencies=${value}`)
+    const data = await getCurrencyByToken(CURRENCY_ID, value)
     setCurrentCurrency({value, label})
-    setCurrentPrice(data[CURRENCY_ID][value])
+    setCurrentPrice(data[value])
   }
+
   useEffect(()=>{
     let currencyList;
     try {

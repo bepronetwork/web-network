@@ -2,8 +2,7 @@ import axios from "axios";
 import {
   BEPRO_NETWORK_NAME,
   CURRENCY_API,
-  PRODUCTION_CONTRACT,
-  USE_PRODUCTION_CONTRACT_CONVERSION
+  CURRENCY_ID
 } from "env";
 import { head } from "lodash";
 
@@ -528,17 +527,21 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
-  async function getBeproCurrencyByContract(contractAddress = undefined) {
-    try {
-      const { data } = await axios.get(`${CURRENCY_API}/coins/ethereum/contract/${
-          USE_PRODUCTION_CONTRACT_CONVERSION === "1"
-            ? PRODUCTION_CONTRACT
-            : contractAddress
-        }`);
+  async function getCurrencyByToken(tokenId = CURRENCY_ID, comparedToken?: string) {
+    let params:{ids: string, vs_currencies?: string} = {
+        ids: tokenId,
+    }
+    
+    if(comparedToken) params.vs_currencies = comparedToken
 
-      return data.market_data.current_price;
+    try {
+      const { data } = await axios.get(`${CURRENCY_API}/simple/price`,{
+        params
+      });
+
+      return data[tokenId];
     } catch (error) {
-      return { usd: 1 };
+      return {};
     }
   }
 
@@ -558,7 +561,7 @@ export default function useApi() {
     createRepo,
     createReviewForPR,
     getAllUsers,
-    getBeproCurrencyByContract,
+    getCurrencyByToken,
     getBranchsList,
     getClientNation,
     getHealth,
