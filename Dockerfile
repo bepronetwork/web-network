@@ -7,7 +7,6 @@ RUN mkdir scripts
 RUN npm --silent install --no-audit
 COPY . .
 RUN npm run build
-RUN npm run test -- --silent
 
 FROM node:16.10-alpine AS release
 
