@@ -62,7 +62,7 @@ class Issue extends Model {
       foreignKey: "network_id",
       sourceKey: "id"
     });
-    this.belongsTo(models.token, {
+    this.belongsTo(models.tokens, {
       foreignKey: "tokenId",
       sourceKey: "id"
     });

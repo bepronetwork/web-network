@@ -1,5 +1,5 @@
 
-import { fromSmartContractDecimals, Network_v2 } from "dappkit";
+import { ERC20, fromSmartContractDecimals, Network_v2 } from "dappkit";
 
 import models from "db/models";
 
@@ -35,6 +35,29 @@ export default async function readBountyCreated(events, network: Network_v2, cus
           await bounty.save();
 
           createdBounties.push(cid);
+
+          const token = await models.tokens.findOne({
+            where: {
+              address: networkBounty.transactional
+            }
+          });
+
+          if (token) bounty.tokenId = token.id;
+          else {
+            const erc20 = new ERC20(network.connection, networkBounty.transactional);
+
+            await erc20.loadContract();
+
+            const tokenId = await models.tokens.create({
+              name: await erc20.name(),
+              symbol: await erc20.symbol(),
+              address: networkBounty.transactional
+            });
+
+            bounty.tokenId = tokenId;
+          }
+
+          await bounty.save();
         }
       }
     } catch (error) {
