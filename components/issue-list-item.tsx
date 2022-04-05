@@ -29,7 +29,7 @@ export default function IssueListItem({
 }) {
   const router = useRouter();
   const { activeNetwork } = useNetwork();
-  const { t } = useTranslation("bounty");
+  const { t } = useTranslation(["bounty", "common"]);
 
   function handleReviewsPr(pullRequests: pullRequest[]) {
     let numberAllReviewers = 0;
@@ -205,7 +205,7 @@ export default function IssueListItem({
           <span className="caption-large text-white text-opacity-1">
             {formatNumberToNScale(issue?.amount || 0)}{" "}
             <label className="text-uppercase text-primary">
-              <Translation label={"$bepro"} />
+              {issue?.token?.symbol || t("common:misc.token")}
             </label>
           </span>
           {(issue?.developers?.length > 0 && (
