@@ -16,7 +16,11 @@
     "start": "next start",
     "make-seo": "node make-seo.js",
     "schedules": "node schedules.js",
-    "lint": "npx eslint . --fix --ext .ts,.tsx"
+    "lint": "npx eslint . --fix --ext .ts,.tsx",
+    "deploy:local": "node ./scripts/deploy -n development",
+    "deploy:kovan": "node ./scripts/deploy -n kovan",
+    "deploy:ropsten": "node ./scripts/deploy -n ropsten",
+    "deploy:moonbase": "node ./scripts/deploy -n moonbase"
   },
   "dependencies": {
     "@taikai/dappkit": "^2.0.0-alpha.2",
@@ -57,7 +61,8 @@
     "sequelize-cli": "^6.4.1",
     "tiny-emitter": "^2.1.0",
     "twitter-api-v2": "^1.11.0",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "yargs": "^17.4.0"
   },
   "devDependencies": {
     "@octokit/types": "^6.34.0",
