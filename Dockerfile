@@ -15,5 +15,4 @@ COPY package*.json ./
 COPY . .
 RUN npm install --only=production --silent --no-audit
 COPY --from=builder /app/.next .next
-COPY --from=builder /app/dist dist
 CMD npm run start
