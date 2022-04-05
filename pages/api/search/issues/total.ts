@@ -1,4 +1,6 @@
+import withCors from 'middleware/withCors';
 import models from "db/models";
+import withJwt from "middleware/withJwt";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op, WhereOptions } from "sequelize";
 
@@ -44,7 +46,7 @@ async function getTotal(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(issueCount);
 }
 
-export default async function getAll(req: NextApiRequest,
+async function getAll(req: NextApiRequest,
                                      res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
@@ -57,3 +59,5 @@ export default async function getAll(req: NextApiRequest,
 
   res.end();
 }
+
+export default withCors(withJwt(getAll))
