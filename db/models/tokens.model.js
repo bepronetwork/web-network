@@ -34,6 +34,10 @@ class Tokens extends Model {
   }
   static associate(models) {
     this.belongsToMany(models.network, { through: 'network_tokens' });
+    this.hasMany(models.issue, {
+      foreignKey: "tokenId",
+      sourceKey: "id"
+    });
   }
 }
 

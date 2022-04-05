@@ -64,7 +64,8 @@ class Issue extends Model {
     });
     this.belongsTo(models.tokens, {
       foreignKey: "tokenId",
-      sourceKey: "id"
+      sourceKey: "id",
+      as: "token"
     });
   }
 }

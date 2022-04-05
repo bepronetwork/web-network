@@ -5,7 +5,11 @@ module.exports = {
     await queryInterface
       .addColumn("issues", "tokenId", {
         type: Sequelize.INTEGER,
-        allowNull: true
+        allowNull: true,
+        references: {
+          model: "tokens",
+          key: "id"
+        }
       })
   },
 
