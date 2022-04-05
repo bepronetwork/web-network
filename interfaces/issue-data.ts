@@ -1,4 +1,5 @@
 import { Proposal, INetworkProposal } from "interfaces/proposal";
+import { Token } from "interfaces/token";
 
 export type IssueState =
   | "pending"
@@ -39,6 +40,7 @@ export interface IssueData {
   updatedAt?: Date;
   url?: string;
   contractId?: number;
+  token?: Token;
   working: string[];
 }
 
