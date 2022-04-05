@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { ERC20 } from "dappkit";
+import { ERC20 } from "@taikai/dappkit";
 import { useTranslation } from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
@@ -130,7 +130,7 @@ export default function ChangeTokenModal({
             onClick={handleConfirm}
           >
             {!(isValidAddress === true)  && !isExecuting && (
-              <LockedIcon className="me-2" />
+              <LockedIcon />
             )}
             <span>{t("actions.confirm")}</span>
             {isExecuting ? (

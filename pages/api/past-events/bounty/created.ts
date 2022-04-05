@@ -1,4 +1,4 @@
-import { Network_v2 } from "dappkit";
+import { Network_v2 } from "@taikai/dappkit";
 import { BEPRO_NETWORK_NAME, CONTRACT_ADDRESS } from "env";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op } from "sequelize";
@@ -9,7 +9,7 @@ import readBountyCreated from "helpers/api/bounty/read-created";
 import networkBeproJs from "helpers/api/handle-network-bepro";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const { fromBlock, id, networkName } = req.body;
+  const { fromBlock, id, networkName, toBlock } = req.body;
 
   const customNetwork = await models.network.findOne({
     where: {
@@ -29,7 +29,11 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   await network.start();
 
-  const events = await network.getBountyCreatedEvents({ fromBlock, toBlock: +fromBlock + 1, filter: { id } });
+  const events = await network.getBountyCreatedEvents({ 
+    fromBlock, 
+    toBlock: toBlock || (+fromBlock + 1), 
+    filter: { id } 
+  });
 
   const results = await readBountyCreated(events, network, customNetwork);
 

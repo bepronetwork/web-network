@@ -1,9 +1,10 @@
-import { TransactionStatus } from '@interfaces/enums/transaction-status'
+import { Web3Connection, Network, ERC20, NetworkFactory } from '@taikai/dappkit';
+
+import { TransactionStatus } from 'interfaces/enums/transaction-status'
 import {
   BlockTransaction,
   SimpleBlockTransactionPayload
-} from '@interfaces/transaction'
-import { Web3Connection, Network, ERC20, NetworkFactory } from 'dappkit';
+} from 'interfaces/transaction'
 
 
 import {

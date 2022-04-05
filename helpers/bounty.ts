@@ -1,4 +1,4 @@
-import { Bounty } from "dappkit";
+import { Bounty } from "@taikai/dappkit";
 
 export function bountyParser(bounty: any) : Bounty {
   const parsed = {

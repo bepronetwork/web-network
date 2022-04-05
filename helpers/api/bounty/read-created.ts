@@ -1,5 +1,5 @@
 
-import { ERC20, fromSmartContractDecimals, Network_v2 } from "dappkit";
+import { ERC20, fromSmartContractDecimals, Network_v2 } from "@taikai/dappkit";
 
 import models from "db/models";
 

@@ -1,5 +1,5 @@
-import { Web3Connection, Network_v2, ERC20, NetworkFactory, Bounty } from "dappkit";
 import getConfig from "next/config";
+import { Web3Connection, Network_v2, ERC20, NetworkFactory, Bounty } from "@taikai/dappkit";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import {
