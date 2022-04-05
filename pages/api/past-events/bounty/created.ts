@@ -1,4 +1,4 @@
-import { Network_v2 } from "bepro-js";
+import { Network_v2 } from "dappkit";
 import { BEPRO_NETWORK_NAME, CONTRACT_ADDRESS } from "env";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op } from "sequelize";

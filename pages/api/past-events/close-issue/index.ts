@@ -1,4 +1,4 @@
-import { Network } from "bepro-js";
+import { Network } from "dappkit";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
 import { Octokit } from "octokit";

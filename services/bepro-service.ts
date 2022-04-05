@@ -1,4 +1,4 @@
-import { ERC20, Network, NetworkFactory, Web3Connection } from "@taikai/dappkit";
+import { Web3Connection, Network_v2, ERC20, NetworkFactory, Bounty } from "dappkit";
 import getConfig from "next/config";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
@@ -79,36 +79,34 @@ class BeproFacet {
   }
 
   async login() {
-    try {
-      this.isLoggedIn = false;
+    if (!this.isStarted) return false;
 
-      await this.bepro.connect();
-      await this.start(this.network.contractAddress);
+    this.isLoggedIn = false;
 
-      this.address = await this.bepro.getAddress();
-      this.isLoggedIn = true;
-    } catch (error) {
-      console.log("Failed to login", error);
-    }
+    await this.bepro.connect();
+    await this.start(this.network.contractAddress);
+
+    this.address = await this.bepro.getAddress();
+    this.isLoggedIn = true;
 
     return this.isLoggedIn;
   }
 
-  async isTokenApproved(tokenAddress: string = undefined): Promise<boolean> {
+  async isTokenApproved(tokenAddress: string = undefined, amount: number): Promise<boolean> {
     try {
       const erc20 = await this.getERC20Obj(tokenAddress);
 
-      return erc20.isApproved(this.network.contractAddress, 1);
+      return erc20.isApproved(this.network.contractAddress, amount);
     } catch (error) {
       console.log('Failed to get token approval: ', error);
       return false;
     }
   }
 
-  async approveToken(tokenAddress: string = undefined) {
+  async approveToken(tokenAddress: string = undefined, amount: number) {
     const erc20 = await this.getERC20Obj(tokenAddress);
 
-    return erc20.approve(this.network.contractAddress, await erc20.totalSupply());
+    return erc20.approve(this.network.contractAddress, amount);
   }
 
   async isApprovedSettlerToken() {
@@ -202,6 +200,12 @@ class BeproFacet {
       tokensLocked: 0,
       delegatedToOthers: 0
     };
+  }
+
+  async getAllowance(tokenAddress: string, walletAddress: string = undefined) {
+    const erc20 = await this.getERC20Obj(tokenAddress);
+
+    return erc20.allowance(walletAddress || this.address, this.network.contractAddress);
   }
 
   async getOraclesOf(address: string) {

@@ -1,5 +1,5 @@
 
-import { fromSmartContractDecimals, Network_v2 } from "bepro-js";
+import { fromSmartContractDecimals, Network_v2 } from "dappkit";
 
 import models from "db/models";
 

@@ -1,9 +1,9 @@
-import { Bounty } from "bepro-js";
+import { Bounty } from "dappkit";
 
 export function bountyParser(bounty: any) : Bounty {
   const parsed = {
     id: bounty?.id,
-    creationDate: bounty?.creationDate,
+    creationDate: +bounty?.creationDate * 1000,
     tokenAmount: bounty?.tokenAmount,
     creator: bounty?.creator,
     transactional: bounty?.transactional,
@@ -17,10 +17,11 @@ export function bountyParser(bounty: any) : Bounty {
     repoPath: bounty?.repoPath,
     branch: bounty?.branch,
     cid: bounty?.cid,
-    closedDate: bounty?.closedDate,
+    closedDate: +bounty?.closedDate * 1000,
     pullRequests: bounty?.pullRequests,
     proposals: bounty?.proposals,
-    funding: bounty?.funding
+    funding: bounty?.funding,
+    githubUser: bounty?.githubUser
   };
 
   return parsed;

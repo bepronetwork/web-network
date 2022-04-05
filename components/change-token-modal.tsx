@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { ERC20 } from "bepro-js";
+import { ERC20 } from "dappkit";
 import { useTranslation } from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";

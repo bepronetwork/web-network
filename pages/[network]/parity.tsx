@@ -475,9 +475,7 @@ export default function ParityPage() {
   }
 
   function changeRedeem() {
-    BeproService.network.contract.methods
-      .changeRedeemTime(60)
-      .send({ from: wallet?.address })
+    BeproService.setNetworkParameter("draftTime", 60)
       .then(console.log);
   }
 

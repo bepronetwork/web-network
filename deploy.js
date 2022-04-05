@@ -4,7 +4,7 @@ const {
   NetworkFactory,
   Network_v2,
   toSmartContractDecimals
-} = require("bepro-js");
+} = require("dappkit");
 
 const cap = toSmartContractDecimals("50000000", 18);
 
