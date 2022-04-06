@@ -3,7 +3,7 @@ import Cors from 'cors'
 
 const cors = Cors({
   methods: ['GET', 'PUT', 'POST'],
-  origin: process.env.NEXTAUTH_URL || 'http://localhost:3000',
+  origin: [process.env.NEXT_PUBLIC_HOME_URL || 'http://localhost:3000'],
 })
 
 function runMiddleware(req, res, fn) {
@@ -26,7 +26,6 @@ const withCors = (handler) => {
     }).catch(()=>{
       return res.status(401).write('Unautorized');
     })
-    
   };
 };
 

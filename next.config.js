@@ -1,6 +1,7 @@
 const path = require("path");
 
 const { i18n } = require("./next-i18next.config");
+require("dotenv").config();
 
 module.exports = {
   i18n,
@@ -28,6 +29,17 @@ module.exports = {
           {
             key: "X-Frame-Options",
             value: "DENY"
+          },
+        ]
+      },
+      {
+        source: "/api/(.*)",
+        headers: [
+          { key: "Access-Control-Allow-Credentials", value: "true" },
+          { key: "Access-Control-Allow-Origin", value: process.env.NEXT_PUBLIC_HOME_URL },
+          {
+            key: "Access-Control-Allow-Headers",
+            value: "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
           }
         ]
       }
