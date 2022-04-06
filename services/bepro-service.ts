@@ -1,5 +1,5 @@
 import getConfig from "next/config";
-import { Web3Connection, Network_v2, ERC20, NetworkFactory, Bounty } from "@taikai/dappkit";
+import { Web3Connection, Network_v2, ERC20, NetworkFactory, Bounty, fromSmartContractDecimals } from "@taikai/dappkit";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import {
@@ -230,8 +230,14 @@ class BeproFacet {
     if (!this.isStarted) return;
     
     const bounty = await this.network.getBounty(id);
+    const transactional = new ERC20(this.bepro, bounty.transactional);
 
-    return bountyParser(bounty);
+    await transactional.loadContract();
+
+    return bountyParser({
+      ...bounty,
+      tokenAmount: fromSmartContractDecimals(bounty.tokenAmount, transactional.decimals)
+    });
   }
 
   async getBounties(ids: number[] = []): Promise<Bounty[]> {

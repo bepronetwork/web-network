@@ -1,8 +1,5 @@
 import { useContext, useState } from "react";
 
-import { ERC20 } from "bepro-js";
-import { TransactionReceipt } from "bepro-js/dist/src/interfaces/web3-core";
-import clsx from "clsx";
 import { ALLOW_CUSTOM_TOKENS, CONTRACT_ADDRESS, SETTLER_ADDRESS } from "env";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -92,11 +89,7 @@ export default function PageCreateIssue() {
   async function allowCreateIssue() {
     if (!beproServiceStarted || !transactionalToken || issueAmount.floatValue <= 0) return;
 
-    handleApproveTransactionalToken(transactionalToken.address, issueAmount.floatValue)
-      .then(approved => {
-        updateIsApprovedSettlerToken();
-        setIsTransactionalTokenApproved(approved);
-      })
+    handleApproveTransactionalToken(transactionalToken.address, issueAmount.floatValue);
   }
 
   function cleanFields() {

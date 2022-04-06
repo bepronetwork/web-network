@@ -71,15 +71,15 @@ export const NetworkProvider: React.FC = function ({ children }) {
       BeproService.getNetworkParameter("mergeCreatorFeeShare"),
       BeproService.getNetworkParameter("percentageNeededForDispute")
     ]).then(values => {
-      setActiveNetwork(previousData => ({
-        ...previousData,
+      setActiveNetwork({
+        ...activeNetwork,
         councilAmount: values[0],
         disputableTime: values[1],
         draftTime: values[2],
         oracleExchangeRate: values[3],
         mergeCreatorFeeShare: values[4],
         percentageNeededForDispute: values[5]
-      }));
+      });
     });
   }, [activeNetwork, beproServiceStarted]);
 
@@ -88,7 +88,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
   }, [query]);
 
   useEffect(() => {
-    updateNetworkParameters();
+    //updateNetworkParameters();
   }, [beproServiceStarted, activeNetwork]);
 
   const memorizeValue = useMemo<NetworkContextData>(() => ({
