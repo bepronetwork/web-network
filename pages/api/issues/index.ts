@@ -1,3 +1,4 @@
+import { withCors } from 'middleware';
 import { subHours, subMonths, subWeeks, subYears } from "date-fns";
 import models from "db/models";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -81,7 +82,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(issues);
 }
 
-export default async function SearchIssues(req: NextApiRequest,
+async function SearchIssues(req: NextApiRequest,
                                            res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
@@ -94,3 +95,4 @@ export default async function SearchIssues(req: NextApiRequest,
 
   res.end();
 }
+export default withCors(SearchIssues)

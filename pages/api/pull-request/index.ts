@@ -3,10 +3,10 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
-import twitterTweet from "helpers/api/handle-twitter-tweet";
 import paginate from "helpers/paginate";
 
 import api from "services/api";
+import { withCors } from "middleware";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { login, issueId, networkName } = req.query;
@@ -127,7 +127,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function PullRequest(req: NextApiRequest,
+async function PullRequest(req: NextApiRequest,
                                           res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
@@ -143,3 +143,4 @@ export default async function PullRequest(req: NextApiRequest,
 
   res.end();
 }
+export default  withCors(PullRequest)

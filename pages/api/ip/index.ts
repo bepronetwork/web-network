@@ -1,3 +1,4 @@
+import withCors from 'middleware/withCors';
 import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -24,7 +25,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   return res.status(response.status).json(response.data);
 }
 
-export default async function GetIp(req: NextApiRequest, res: NextApiResponse) {
+async function GetIp(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
@@ -36,3 +37,5 @@ export default async function GetIp(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
+
+export default withCors(GetIp)

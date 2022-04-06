@@ -1,4 +1,4 @@
-import withCors from 'middleware/withCors';
+import {withCors} from 'middleware';
 import models from "db/models";
 import withJwt from "middleware/withJwt";
 import { NextApiRequest, NextApiResponse } from "next";
