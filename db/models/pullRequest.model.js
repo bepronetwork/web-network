@@ -12,6 +12,26 @@ class PullRequest extends Model {
         issueId: DataTypes.INTEGER,
         githubLogin: DataTypes.STRING,
         branch: DataTypes.STRING,
+        userRepo: {
+          type: DataTypes.STRING,
+          allowNull: true
+        },
+        userBranch: {
+          type: DataTypes.STRING,
+          allowNull: true
+        },
+        ready: {
+          type: DataTypes.BOOLEAN,
+          defaultValue: false
+        },
+        canceled: {
+          type: DataTypes.BOOLEAN,
+          defaultValue: false
+        },
+        contractId: {
+          type: DataTypes.INTEGER,
+          allowNull: true
+        },
         reviewers: {
           type: DataTypes.ARRAY(DataTypes.STRING),
           defaultValue: []
