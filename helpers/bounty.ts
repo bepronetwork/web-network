@@ -1,15 +1,15 @@
 import { Bounty } from "@taikai/dappkit";
 
-export function bountyParser(bounty: any) : Bounty {
+export function bountyParser(bounty) : Bounty {
   const parsed = {
     id: bounty?.id,
     creationDate: +bounty?.creationDate * 1000,
-    tokenAmount: bounty?.tokenAmount,
+    tokenAmount: +bounty?.tokenAmount,
     creator: bounty?.creator,
     transactional: bounty?.transactional,
     rewardToken: bounty?.rewardToken,
-    rewardAmount: bounty?.rewardAmount,
-    fundingAmount: bounty?.fundingAmount,
+    rewardAmount: +bounty?.rewardAmount,
+    fundingAmount: +bounty?.fundingAmount,
     closed: bounty?.closed,
     canceled: bounty?.canceled,
     funded: bounty?.funded,

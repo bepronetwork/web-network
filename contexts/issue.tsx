@@ -6,18 +6,21 @@ import React, {
 import { fromSmartContractDecimals } from "@taikai/dappkit";
 import { useRouter } from "next/router";
 
+import { useAuthentication } from "contexts/authentication";
+import { useNetwork } from "contexts/network";
+
+import { BountyExtended, ProposalExtended } from "interfaces/bounty";
 import {
-  Comment, INetworkIssue, IssueData, pullRequest
+  IssueData,
+  pullRequest,
+  Comment
 } from "interfaces/issue-data";
-import { INetworkProposal } from "interfaces/proposal";
 
 import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useOctokit from "x-hooks/use-octokit";
 
-import { useAuthentication } from "./authentication";
-import { useNetwork } from "./network";
 
 export interface IActiveIssue extends IssueData {
   comments: Comment[];
@@ -26,7 +29,7 @@ export interface IActiveIssue extends IssueData {
 const TTL = 60 * 2 * 100; // 2 Min
 export interface IssueContextData {
   activeIssue: IActiveIssue;
-  networkIssue: INetworkIssue;
+  networkIssue: BountyExtended;
   updateIssue: (repoId: string | number, ghId: string | number) => Promise<IActiveIssue>;
   addNewComment: (prId: number, comment: string) => void;
   getNetworkIssue: () => void;
@@ -36,7 +39,7 @@ const IssueContext = createContext<IssueContextData>({} as IssueContextData);
 
 export const IssueProvider: React.FC = function ({ children }) {
   const [activeIssue, setActiveIssue] = useState<IActiveIssue>();
-  const [networkIssue, setNetworkIssue] = useState<INetworkIssue>();
+  const [networkIssue, setNetworkIssue] = useState<BountyExtended>();
 
   const { getIssue } = useApi();
   const { activeNetwork } = useNetwork();
@@ -97,42 +100,34 @@ export const IssueProvider: React.FC = function ({ children }) {
 
     return newActiveIssue;
   },
-    [activeNetwork]);
+    [activeNetwork, query?.repoId, query?.id]);
 
   const getNetworkIssue = useCallback(async () => {
-    if (!wallet?.address || !activeIssue?.issueId || !beproServiceStarted)
+    if (!wallet?.address || !activeIssue?.contractId || !beproServiceStarted)
       return;
 
-    const network = await BeproService.network.getIssueByCID(activeIssue?.issueId);
+    const bounty = await BeproService.getBounty(activeIssue?.contractId);
+
+    const isFinished = bounty.pullRequests.some(pullRequest => pullRequest.ready);
 
     let isDraft = null;
 
     try {
-      isDraft = await BeproService.network.isIssueInDraft(network?._id);
+      isDraft = await BeproService.network.isBountyInDraft(bounty.id);
     } catch (error) {
       console.error(error);
     }
-    const networkProposals: INetworkProposal[] = [];
+    const networkProposals: ProposalExtended[] = [];
 
     for (const meta of activeIssue.mergeProposals) {
       const { scMergeId, id: proposalId, issueId } = meta;
 
       if (scMergeId) {
-        const [merge, disputedValue, isMergeDisputed] = await Promise.all([
-          BeproService.network.getMergeById(+network?._id, +scMergeId),
-          fromSmartContractDecimals(await BeproService.network.disputesForMergeByAddress(issueId, +scMergeId, wallet.address)),
-          await BeproService.network.isMergeDisputed(+network?._id, +scMergeId)
-        ])
-        
-        const isDisputed = [
-          activeIssue?.merged && activeIssue?.merged !== scMergeId,
-          isMergeDisputed,
-        ].some(v=>v)
-        
-        const canUserDispute = [
-          disputedValue === 0,
-          isDisputed,
-        ].some(v=>v)
+        const merge = bounty.proposals[+scMergeId];
+
+        const isDisputed = activeIssue?.merged
+          ? activeIssue?.merged !== scMergeId
+          : await BeproService.network.isProposalDisputed(+bounty.id, +scMergeId);
 
         networkProposals[proposalId] = {
           ...merge,
@@ -141,10 +136,14 @@ export const IssueProvider: React.FC = function ({ children }) {
         };
       }
     }
-
-    setNetworkIssue({ ...network, isDraft, networkProposals });
-    return { ...network, isDraft, networkProposals };
-  }, [activeIssue, wallet, beproServiceStarted]);
+    setNetworkIssue({ 
+      ...bounty, 
+      isDraft, 
+      proposals: networkProposals,
+      isFinished
+    });
+    return { ...bounty, isDraft, networkProposals };
+  }, [activeIssue, wallet?.address, beproServiceStarted]);
 
   useEffect(() => {
     if (activeIssue && wallet?.address && beproServiceStarted) {
@@ -166,7 +165,7 @@ export const IssueProvider: React.FC = function ({ children }) {
   }, [query, activeNetwork]);
 
   useEffect(() => {
-    //console.warn('useIssue',{activeIssue, networkIssue})
+    console.warn('useIssue',{activeIssue, networkIssue})
   }, [activeIssue, networkIssue]);
 
   const memorizeValue = useMemo<IssueContextData>(() => ({

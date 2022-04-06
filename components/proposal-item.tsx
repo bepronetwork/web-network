@@ -38,7 +38,7 @@ export default function ProposalItem({
   const { networkIssue, getNetworkIssue } = useIssue();
   const { handlerDisputeProposal } = useBepro();
   const { getURLWithNetwork } = useNetworkTheme();
-  const networkProposals = networkIssue?.networkProposals?.[proposal?.id];
+  const networkProposals = networkIssue?.proposals?.[proposal?.id];
 
   const isDisable = [
       networkIssue?.finalized,

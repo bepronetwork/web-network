@@ -21,7 +21,7 @@ export interface INetwork {
   allowCustomTokens?: boolean;
   tokens?: Token[];
   councilAmount?: number;
-  disputabletime?: number;
+  disputableTime?: number;
   draftTime?: number;
   oracleExchangeRate?: number;
   mergeCreatorFeeShare?: number;
