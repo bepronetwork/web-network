@@ -88,8 +88,8 @@ export const NetworkProvider: React.FC = function ({ children }) {
   }, [query]);
 
   useEffect(() => {
-    //updateNetworkParameters();
-  }, [beproServiceStarted, activeNetwork]);
+    if (query?.network) updateNetworkParameters();
+  }, [beproServiceStarted, query?.network]);
 
   const memorizeValue = useMemo<NetworkContextData>(() => ({
       activeNetwork,
