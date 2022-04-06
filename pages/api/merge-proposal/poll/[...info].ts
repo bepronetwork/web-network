@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { Bus } from "helpers/bus";
+import { withCors } from "middleware";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -14,7 +15,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   });
 }
 
-export default async function PollMergeProposal(req: NextApiRequest,
+async function PollMergeProposal(req: NextApiRequest,
                                                 res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
@@ -25,3 +26,5 @@ export default async function PollMergeProposal(req: NextApiRequest,
     res.status(405);
   }
 }
+
+export default withCors(PollMergeProposal)

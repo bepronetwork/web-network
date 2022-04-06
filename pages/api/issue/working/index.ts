@@ -1,4 +1,5 @@
 import models from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
@@ -61,7 +62,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function Working(req: NextApiRequest,
+async function Working(req: NextApiRequest,
                                       res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "put":
@@ -74,3 +75,5 @@ export default async function Working(req: NextApiRequest,
 
   res.end();
 }
+
+export default withCors(Working)

@@ -6,6 +6,7 @@ import { Op } from "sequelize";
 import Bepro from "helpers/api/bepro-initializer";
 
 import IpfsStorage from "services/ipfs-service";
+import { withCors } from "middleware";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { name: networkName } = req.query;
@@ -321,7 +322,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function NetworkEndPoint(req: NextApiRequest,
+async function NetworkEndPoint(req: NextApiRequest,
                                               res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
@@ -342,3 +343,4 @@ export default async function NetworkEndPoint(req: NextApiRequest,
 
   res.end();
 }
+export default withCors(NetworkEndPoint)

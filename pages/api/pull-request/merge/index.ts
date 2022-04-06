@@ -4,6 +4,7 @@ import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
 import networkBeproJs from "helpers/api/handle-network-bepro";
+import { withCors } from "middleware";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, pullRequestId, mergeProposalId, address, networkName } =
@@ -82,7 +83,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function PullRequest(req: NextApiRequest,
+async function PullRequest(req: NextApiRequest,
                                           res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "post":
@@ -95,3 +96,6 @@ export default async function PullRequest(req: NextApiRequest,
 
   res.end();
 }
+
+
+export default withCors(PullRequest)

@@ -5,6 +5,7 @@ import { Op, WhereOptions } from "sequelize";
 
 import paginate, { calculateTotalPages, paginateArray } from "helpers/paginate";
 import { searchPatternInText } from "helpers/string";
+import { withCors } from "middleware";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = { state: { [Op.not]: "pending" } };
@@ -119,7 +120,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function SearchIssues(req: NextApiRequest,
+async function SearchIssues(req: NextApiRequest,
                                            res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
@@ -132,3 +133,4 @@ export default async function SearchIssues(req: NextApiRequest,
 
   res.end();
 }
+export default withCors(SearchIssues)

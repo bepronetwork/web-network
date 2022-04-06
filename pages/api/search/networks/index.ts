@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { Op, WhereOptions } from "sequelize";
 
 import paginate, { calculateTotalPages } from "helpers/paginate";
+import { withCors } from "middleware";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
@@ -34,7 +35,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   });
 }
 
-export default async function SearchNetworks(req: NextApiRequest,
+async function SearchNetworks(req: NextApiRequest,
                                              res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
@@ -47,3 +48,4 @@ export default async function SearchNetworks(req: NextApiRequest,
 
   res.end();
 }
+export default withCors(SearchNetworks)
