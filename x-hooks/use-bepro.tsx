@@ -34,7 +34,7 @@ export default function useBepro(props?: IUseBeProDefault) {
   const { dispatch } = useContext(ApplicationContext);
   const { activeNetwork } = useNetwork();
   const { user }  = useAuthentication()
-  const { networkIssue } = useIssue()
+  const { networkIssue, activeIssue, updateIssue } = useIssue()
   const { t } = useTranslation();
 
   const { processEvent, waitForClose, waitForRedeem, waitForMerge } = useApi();
@@ -112,31 +112,33 @@ export default function useBepro(props?: IUseBeProDefault) {
     return new Promise(async (resolve, reject) => {
       const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue }, activeNetwork);
       dispatch(redeemTx);
-      waitForRedeem(networkIssue?._id, activeNetwork?.name)
-        .then(() => onSuccess?.())
+      let tx
 
       await BeproService.network
-        .redeemIssue(networkIssue?._id)
+        .cancelBounty(networkIssue?.id)
         .then((txInfo) => {
+          tx = txInfo;
           // Review: Review processEnvets are working correctly
-          processEvent(`redeem-issue`, txInfo.blockNumber, networkIssue?._id).then(() => {
-            txWindow.updateItem(redeemTx.payload.id, parseTransaction(txInfo, redeemTx.payload));
-            resolve(txInfo)
-            onSuccess?.()
-            resolve(txInfo)
-          })
-            .catch((err) => {
-              if (err?.message?.search("User denied") > -1)
-                dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
-              else
-                dispatch(updateTransaction({
-                  ...(redeemTx.payload as any),
-                  status: TransactionStatus.failed
-                }));
-              onError?.(err);
-              reject(err);
-              console.error("Error closing issue", err);
-            });
+          return processEvent(`bounty/canceled`, txInfo.blockNumber, networkIssue?.id);
+        })
+        .then(({data: canceledBounties}) => {
+          if (!canceledBounties.find(cid => cid === networkIssue?.cid)) throw new Error('Failed');
+
+          txWindow.updateItem(redeemTx.payload.id, parseTransaction(tx, redeemTx.payload));
+          updateIssue(activeIssue.repository_id, activeIssue.githubId);
+          onSuccess?.();
+        })
+        .catch((err) => {
+          if (err?.message?.search("User denied") > -1)
+            dispatch(updateTransaction({ ...(redeemTx.payload as any), remove: true }));
+          else
+            dispatch(updateTransaction({
+              ...(redeemTx.payload as any),
+              status: TransactionStatus.failed
+            }));
+          onError?.(err);
+          reject(err);
+          console.error("Error closing issue", err);
         });
     })
   }

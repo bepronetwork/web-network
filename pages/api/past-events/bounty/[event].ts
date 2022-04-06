@@ -5,10 +5,16 @@ import { Op } from "sequelize";
 
 import models from "db/models";
 
-import readBountyCreated from "helpers/api/bounty/read-created";
+import { BountyHelpers } from "helpers/api/bounty";
 import networkBeproJs from "helpers/api/handle-network-bepro";
 
+const eventsMapping = {
+  "created": ["getBountyCreatedEvents", "readBountyCreated"],
+  "canceled": ["getBountyCanceledEvents", "readBountyCanceled"]
+}
+
 async function post(req: NextApiRequest, res: NextApiResponse) {
+  const { event } = req.query;
   const { fromBlock, id, networkName, toBlock } = req.body;
 
   const customNetwork = await models.network.findOne({
@@ -29,13 +35,17 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   await network.start();
 
-  const events = await network.getBountyCreatedEvents({ 
+  if (!eventsMapping[String(event)]) return res.status(404).json("Invalid event");
+
+  const [contractMethod, apiMethod] = eventsMapping[String(event)];
+
+  const events = await network[contractMethod]({ 
     fromBlock, 
     toBlock: toBlock || (+fromBlock + 1), 
     filter: { id } 
   });
 
-  const results = await readBountyCreated(events, network, customNetwork);
+  const results = await BountyHelpers[apiMethod](events, network, customNetwork);
 
   return res.status(200).json(results);
 }
