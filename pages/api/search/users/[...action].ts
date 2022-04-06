@@ -1,9 +1,9 @@
 import models from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op } from "sequelize";
 
 import paginate from "helpers/paginate";
-import { withCors } from "middleware";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -35,7 +35,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function SearchUsers(req: NextApiRequest,
-                                          res: NextApiResponse) {
+                           res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "post":
     await post(req, res);

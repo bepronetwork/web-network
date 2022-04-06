@@ -1,4 +1,5 @@
 import Database from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
@@ -6,7 +7,6 @@ import { Op } from "sequelize";
 import Bepro from "helpers/api/bepro-initializer";
 
 import IpfsStorage from "services/ipfs-service";
-import { withCors } from "middleware";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { name: networkName } = req.query;
@@ -323,7 +323,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function NetworkEndPoint(req: NextApiRequest,
-                                              res: NextApiResponse) {
+                               res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);

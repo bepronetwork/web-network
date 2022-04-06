@@ -1,4 +1,5 @@
 import models from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
@@ -6,7 +7,6 @@ import { Op } from "sequelize";
 import paginate from "helpers/paginate";
 
 import api from "services/api";
-import { withCors } from "middleware";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { login, issueId, networkName } = req.query;
@@ -128,7 +128,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function PullRequest(req: NextApiRequest,
-                                          res: NextApiResponse) {
+                           res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);

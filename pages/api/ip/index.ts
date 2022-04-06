@@ -1,5 +1,5 @@
-import withCors from 'middleware/withCors';
 import axios from "axios";
+import withCors from 'middleware/withCors';
 import { NextApiRequest, NextApiResponse } from "next";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
