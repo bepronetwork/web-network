@@ -12,7 +12,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function MergeProposal(req: NextApiRequest,
-                                            res: NextApiResponse) {
+                             res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);

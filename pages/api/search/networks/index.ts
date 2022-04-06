@@ -1,9 +1,9 @@
 import models from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op, WhereOptions } from "sequelize";
 
 import paginate, { calculateTotalPages } from "helpers/paginate";
-import { withCors } from "middleware";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
@@ -36,7 +36,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function SearchNetworks(req: NextApiRequest,
-                                             res: NextApiResponse) {
+                              res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);

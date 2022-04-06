@@ -1,10 +1,10 @@
 import models from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
 import networkBeproJs from "helpers/api/handle-network-bepro";
-import { withCors } from "middleware";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, pullRequestId, mergeProposalId, address, networkName } =
@@ -84,7 +84,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function PullRequest(req: NextApiRequest,
-                                          res: NextApiResponse) {
+                           res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "post":
     await post(req, res);

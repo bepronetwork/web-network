@@ -1,5 +1,5 @@
-import {withCors} from 'middleware';
 import models from "db/models";
+import {withCors} from 'middleware';
 import { NextApiRequest, NextApiResponse } from "next";
 
 async function getTotal(req: NextApiRequest, res: NextApiResponse) {
@@ -9,7 +9,7 @@ async function getTotal(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function getAll(req: NextApiRequest,
-                                     res: NextApiResponse) {
+                      res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await getTotal(req, res);

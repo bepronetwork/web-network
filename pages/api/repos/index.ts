@@ -82,7 +82,7 @@ async function removeRepo(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function RepoRoute(req: NextApiRequest,
-                                        res: NextApiResponse) {
+                         res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await getAllRepos(req, res);

@@ -1,11 +1,11 @@
 import { subHours, subMonths, subWeeks, subYears } from "date-fns";
 import models from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op, WhereOptions } from "sequelize";
 
 import paginate, { calculateTotalPages, paginateArray } from "helpers/paginate";
 import { searchPatternInText } from "helpers/string";
-import { withCors } from "middleware";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = { state: { [Op.not]: "pending" } };
@@ -121,7 +121,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function SearchIssues(req: NextApiRequest,
-                                           res: NextApiResponse) {
+                            res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);

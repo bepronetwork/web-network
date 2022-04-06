@@ -1,5 +1,5 @@
-import {withCors} from 'middleware';
 import models from "db/models";
+import {withCors} from 'middleware';
 import withJwt from "middleware/withJwt";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op, WhereOptions } from "sequelize";
@@ -47,7 +47,7 @@ async function getTotal(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function getAll(req: NextApiRequest,
-                                     res: NextApiResponse) {
+                      res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await getTotal(req, res);

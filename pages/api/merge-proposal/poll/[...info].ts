@@ -1,7 +1,7 @@
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { Bus } from "helpers/bus";
-import { withCors } from "middleware";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -16,7 +16,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function PollMergeProposal(req: NextApiRequest,
-                                                res: NextApiResponse) {
+                                 res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
