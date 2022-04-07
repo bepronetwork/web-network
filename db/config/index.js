@@ -14,8 +14,8 @@ module.exports = {
     ? {
         dialectOptions: {     
             ssl: {
-              required: !insecuredDB,
-              rejectUnauthorized: !insecuredDB,
+              required: false,
+              rejectUnauthorized: false,
             }     
         }
     }
