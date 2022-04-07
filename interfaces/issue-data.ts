@@ -64,6 +64,7 @@ export interface pullRequest {
   comments?: Comment[];
   status?: string;
   reviewers?: string[];
+  contractId?: number;
 }
 
 export interface developer {

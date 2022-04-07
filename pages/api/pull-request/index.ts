@@ -95,7 +95,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     head: `${username}:${branch}`,
     base: issue.branch || serverRuntimeConfig.github.mainBranch,
     maintainer_can_modify: false,
-    draft: true
+    draft: false
   };
 
   try {

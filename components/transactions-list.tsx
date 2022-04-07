@@ -37,6 +37,7 @@ export default function TransactionsList({
   const IconMaps = {
     [TransactionTypes.openIssue]: <InformationChatBubble />,
     [TransactionTypes.createPullRequest]: <PullRequestIcon />,
+    [TransactionTypes.makePullRequestReady]: <PullRequestIcon />,
     [TransactionTypes.lock]: <UploadIcon />,
     [TransactionTypes.unlock]: <DownloadIcon />,
     [TransactionTypes.approveTransactionalERC20Token]: <ThumbsUp />,

@@ -21,6 +21,7 @@ export default function TransactionType({ type }) {
     [TransactionTypes.approveSettlerToken]: t("transactions.types.approve-settler"),
     [TransactionTypes.recognizedAsFinish]: t("transactions.types.recognize-finished"),
     [TransactionTypes.createPullRequest]: t("transactions.types.create-pull-request"),
+    [TransactionTypes.makePullRequestReady]: t("transactions.types.make-pull-request-ready"),
   };
 
   return (

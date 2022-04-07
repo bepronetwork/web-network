@@ -265,7 +265,8 @@
       "redeem-bounty": "Redeem bounty",
       "approve-settler": "Approve settler token",
       "recognize-finished": "Recognize bounty as finished",
-      "create-pull-request": "Create Pull Request"
+      "create-pull-request": "Create Pull Request",
+      "make-pull-request-ready": "Make Pull Request Ready"
     }
   },
   "sort": {

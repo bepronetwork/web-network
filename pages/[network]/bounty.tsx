@@ -86,6 +86,7 @@ export default function PageIssue() {
           key="tab-pull-requests"
           className="border-top-0"
           issue={issue}
+          networkIssue={networkIssue}
         />
       ),
       description: t("description_pull-request")

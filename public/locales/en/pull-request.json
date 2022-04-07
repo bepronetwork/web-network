@@ -27,7 +27,12 @@
       "success": "Review submitted",
       "error": "To submit review"
     },
-    "view": "View Pull Request"
+    "view": "View Pull Request",
+    "make-ready": {
+      "title": "Make ready for review",
+      "success": "Pull Request is ready for review",
+      "error": "Failed to make pull request ready for review"
+    }
   },
   "errors": {
     "not-found": "No pull requests found",
