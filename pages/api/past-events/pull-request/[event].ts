@@ -5,12 +5,13 @@ import { Op } from "sequelize";
 
 import models from "db/models";
 
-import { BountyHelpers } from "helpers/api/bounty";
 import networkBeproJs from "helpers/api/handle-network-bepro";
+import { PullRequestHelpers } from "helpers/api/pull-request";
 
 const eventsMapping = {
-  "created": ["getBountyCreatedEvents", "readBountyCreated"],
-  "canceled": ["getBountyCanceledEvents", "readBountyCanceled"]
+    "created": ["getBountyPullRequestCreatedEvents", "readPullRequestCreated"],
+    "canceled": ["getBountyPullRequestCanceledEvents", "readPullRequestCanceled"],
+    "ready": ["getBountyPullRequestReadyForReviewEvents", "readPullRequestReady"]
 }
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
@@ -45,13 +46,13 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     filter: { id } 
   });
 
-  const results = await BountyHelpers[apiMethod](events, network, customNetwork);
+  const results = await PullRequestHelpers[apiMethod](events, network, customNetwork);
 
   return res.status(200).json(results);
 }
 
-export default async function BountyEvents(req: NextApiRequest,
-                                           res: NextApiResponse) {
+export default async function PullRequestEvents(req: NextApiRequest,
+                                                res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "post":
     await post(req, res);

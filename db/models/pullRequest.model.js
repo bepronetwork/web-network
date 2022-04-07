@@ -20,13 +20,9 @@ class PullRequest extends Model {
           type: DataTypes.STRING,
           allowNull: true
         },
-        ready: {
-          type: DataTypes.BOOLEAN,
-          defaultValue: false
-        },
-        canceled: {
-          type: DataTypes.BOOLEAN,
-          defaultValue: false
+        status: {
+          type: DataTypes.STRING,
+          allowNull: true
         },
         contractId: {
           type: DataTypes.INTEGER,

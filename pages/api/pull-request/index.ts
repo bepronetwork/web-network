@@ -1,10 +1,12 @@
-import models from "db/models";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
+import models from "db/models";
+
+import twitterTweet from "helpers/api/handle-twitter-tweet";
 import paginate from "helpers/paginate";
 
 import api from "services/api";
@@ -87,7 +89,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     head: `${username}:${branch}`,
     base: issue.branch || serverRuntimeConfig.github.mainBranch,
     maintainer_can_modify: false,
-    draft: false
+    draft: true
   };
 
   try {
@@ -97,7 +99,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       issueId: issue.id,
       githubId: created.data?.number,
       githubLogin: username,
-      branch
+      branch,
+      status: "pending"
     });
 
     issue.state = "ready";
@@ -122,7 +125,15 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       console.log("Error creating SEO", e);
     });
 
-    return res.json("ok");
+    return res.status(200).json({ 
+      bountyId: issue.contractId,
+      originRepo: repoInfo.githubPath,
+      originBranch: issue.branch,
+      originCID: issue.issueId,
+      userRepo: `${username}/${repo}`,
+      userBranch: branch,
+      cid: created.data?.number 
+    });
   } catch (error) {
     return res.status(error.response.status).json(error.response.data);
   }

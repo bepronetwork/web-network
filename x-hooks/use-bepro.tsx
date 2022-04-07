@@ -299,6 +299,48 @@ export default function useBepro(props?: IUseBeProDefault) {
     });
   }
 
+  async function handleCreatePullRequest(bountyId: number,
+                                         originRepo: string,
+                                         originBranch: string,
+                                         originCID: string,
+                                         userRepo: string,
+                                         userBranch: string,
+                                         cid: number ) {
+    return new Promise(async (resolve, reject) => {
+      const tx = addTransaction({ type: TransactionTypes.createPullRequest, }, activeNetwork);
+      dispatch(tx);
+
+      await BeproService.network.createPullRequest(bountyId,
+                                                   originRepo,
+                                                   originBranch,
+                                                   originCID,
+                                                   userRepo,
+                                                   userBranch,
+                                                   cid)
+                                                   .then(txInfo => {
+                                                     txWindow.updateItem(tx.payload.id,
+                                                                         parseTransaction(txInfo, tx.payload));
+                                                      
+                                                     resolve(txInfo);
+                                                   })
+                                                   .catch(error => {
+                                                     if (error?.message?.search("User denied") > -1)
+                                                       dispatch(updateTransaction({
+                                                      ...(tx.payload as any),
+                                                      status: TransactionStatus.rejected
+                                                       }));
+                                                     else
+                                                      dispatch(updateTransaction({
+                                                        ...(tx.payload as any),
+                                                        status: TransactionStatus.failed
+                                                      }));
+
+                                                     onError?.(error);
+                                                     reject(error);
+                                                   });
+    });
+  }
+
   return {
     handlerDisputeProposal,
     handleCloseIssue,
@@ -306,6 +348,7 @@ export default function useBepro(props?: IUseBeProDefault) {
     handleRecognizeAsFinished,
     handleProposeMerge,
     handleApproveTransactionalToken,
-    handleTakeBack
+    handleTakeBack,
+    handleCreatePullRequest
   };
 }

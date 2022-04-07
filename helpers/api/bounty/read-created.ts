@@ -48,11 +48,11 @@ export default async function readBountyCreated(events, network: Network_v2, cus
 
             await erc20.loadContract();
 
-            const tokenId = await models.tokens.create({
+            const tokenId = (await models.tokens.create({
               name: await erc20.name(),
               symbol: await erc20.symbol(),
               address: networkBounty.transactional
-            });
+            })).id;
 
             bounty.tokenId = tokenId;
           }

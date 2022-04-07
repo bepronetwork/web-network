@@ -1,4 +1,4 @@
-import { Bounty } from "@taikai/dappkit";
+import { Bounty, PullRequest } from "@taikai/dappkit";
 
 export function bountyParser(bounty) : Bounty {
   const parsed = {
@@ -18,11 +18,28 @@ export function bountyParser(bounty) : Bounty {
     branch: bounty?.branch,
     cid: bounty?.cid,
     closedDate: +bounty?.closedDate * 1000,
-    pullRequests: bounty?.pullRequests,
+    pullRequests: bounty?.pullRequests.map(pullRequestParser),
     proposals: bounty?.proposals,
     funding: bounty?.funding,
     githubUser: bounty?.githubUser
   };
+
+  return parsed;
+}
+
+export function pullRequestParser(pullRequest): PullRequest {
+  const parsed = {
+    originRepo: pullRequest.originRepo,
+    originCID: pullRequest.originCID,
+    originBranch: pullRequest.originBranch,
+    userRepo: pullRequest.userRepo,
+    userBranch: pullRequest.userBranch,
+    ready: pullRequest.ready,
+    canceled: pullRequest.canceled,
+    creator: pullRequest.creator,
+    cid: pullRequest.cid,
+    id: pullRequest.id
+  }
 
   return parsed;
 }

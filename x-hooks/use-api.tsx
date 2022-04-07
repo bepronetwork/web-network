@@ -194,7 +194,7 @@ export default function useApi() {
                                         networkName = publicRuntimeConfig.networkConfig.networkName) {
     return client
       .post("/pull-request/", { ...payload, repoId, githubId, networkName })
-      .then(() => true)
+      .then(({ data }) => data)
       .catch((error) => {
         throw error;
       });

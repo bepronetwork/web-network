@@ -17,6 +17,7 @@ import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/add-toast";
+import { addTransaction } from "contexts/reducers/add-transaction";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
@@ -95,7 +96,7 @@ export default function PageActions({
   } = useContext(ApplicationContext);
   const { activeNetwork } = useNetwork();
   const { wallet, user, updateWalletBalance } = useAuthentication();
-  const { handleReedemIssue } = useBepro();
+  const { handleReedemIssue, handleCreatePullRequest } = useBepro();
   const { updateIssue } = useIssue();
 
   const { createPullRequestIssue, startWorking } = useApi();
@@ -283,37 +284,39 @@ export default function PageActions({
         description: prDescription,
         username: githubLogin,
         branch
+      }).then(({bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid}) => {
+        return handleCreatePullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid);
       })
-        .then(() => {
-          dispatch(addToast({
+      .then(() => {
+        dispatch(addToast({
               type: "success",
               title: t("actions.success"),
               content: t("pull-request:actions.create.success")
-          }));
+        }));
 
-          if (handleMicroService) handleMicroService(true);
+        if (handleMicroService) handleMicroService(true);
 
-          setShowPRModal(false);
-          resolve();
-        })
-        .catch((err) => {
-          if (err.response?.status === 422 && err.response?.data) {
-            err.response?.data.errors?.map((item) =>
-              dispatch(addToast({
-                  type: "danger",
-                  title: t("actions.failed"),
-                  content: item.message
-              })));
-            reject(err?.response);
-          } else {
+        setShowPRModal(false);
+        resolve();
+      })
+      .catch((err) => {
+        if (err.response?.status === 422 && err.response?.data) {
+          err.response?.data.errors?.map((item) =>
             dispatch(addToast({
                 type: "danger",
                 title: t("actions.failed"),
-                content: t("pull-request:actions.create.error")
-            }));
-            reject();
-          }
-        });
+                content: item.message
+            })));
+          reject(err);
+        } else {
+          dispatch(addToast({
+              type: "danger",
+              title: t("actions.failed"),
+              content: t("pull-request:actions.create.error")
+          }));
+          reject();
+        }
+      });
     });
   }
 

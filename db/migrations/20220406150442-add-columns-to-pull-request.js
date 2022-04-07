@@ -15,15 +15,9 @@ module.exports = {
       });
 
     await queryInterface
-      .addColumn("pull_requests", "ready", {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
-      });
-
-    await queryInterface
-      .addColumn("pull_requests", "canceled", {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
+      .addColumn("pull_requests", "status", {
+        type: Sequelize.STRING,
+        allowNull: true
       });
 
     await queryInterface
@@ -36,8 +30,7 @@ module.exports = {
   async down (queryInterface, Sequelize) {
     await queryInterface.removeColumn("pull_requests", "userRepo");
     await queryInterface.removeColumn("pull_requests", "userBranch");
-    await queryInterface.removeColumn("pull_requests", "ready");
-    await queryInterface.removeColumn("pull_requests", "canceled");
+    await queryInterface.removeColumn("pull_requests", "status");
     await queryInterface.removeColumn("pull_requests", "contractId");
   }
 };
