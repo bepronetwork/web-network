@@ -33,6 +33,9 @@ const networks = {
   },
   ropsten: {
     url: `https://ropsten.infura.io/v3/${process.env.DEPLOY_INFURA_KEY}`
+  },
+  seneca: {
+    url: 'http://eth-seneca.taikai.network:8545/',
   }
 }
 
