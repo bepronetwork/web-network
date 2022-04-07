@@ -183,9 +183,9 @@ export default function useApi() {
       .catch(() => null);
   }
 
-  async function createPullRequestIssue(repoId: string,
-                                        githubId: string,
-                                        payload: {
+  async function createPrePullRequest(repoId: string,
+                                      githubId: string,
+                                      payload: {
       title: string;
       description: string;
       username: string;
@@ -194,6 +194,35 @@ export default function useApi() {
                                         networkName = publicRuntimeConfig.networkConfig.networkName) {
     return client
       .post("/pull-request/", { ...payload, repoId, githubId, networkName })
+      .then(({ data }) => data)
+      .catch((error) => {
+        throw error;
+      });
+  }
+
+  async function cancelPrePullRequest({
+    repoId, 
+    issueGithubId, 
+    bountyId,
+    issueCid, 
+    pullRequestGithubId,
+    customNetworkName,
+    creator,
+    userBranch,
+    userRepo
+  }) {
+    return client
+      .delete("/pull-request/", {
+        data: { repoId, 
+                issueGithubId, 
+                bountyId,
+                issueCid, 
+                pullRequestGithubId,
+                customNetworkName,
+                creator,
+                userBranch,
+                userRepo }
+      })
       .then(({ data }) => data)
       .catch((error) => {
         throw error;
@@ -574,7 +603,7 @@ export default function useApi() {
   return {
     createIssue,
     createNetwork,
-    createPullRequestIssue,
+    createPrePullRequest,
     createRepo,
     createReviewForPR,
     getAllUsers,
@@ -614,6 +643,7 @@ export default function useApi() {
     waitForClose,
     waitForMerge,
     waitForRedeem,
-    createPreBounty
+    createPreBounty,
+    cancelPrePullRequest
   };
 }

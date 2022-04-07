@@ -264,7 +264,8 @@
       "close-bounty": "Close bounty",
       "redeem-bounty": "Redeem bounty",
       "approve-settler": "Approve settler token",
-      "recognize-finished": "Recognize bounty as finished"
+      "recognize-finished": "Recognize bounty as finished",
+      "create-pull-request": "Create Pull Request"
     }
   },
   "sort": {

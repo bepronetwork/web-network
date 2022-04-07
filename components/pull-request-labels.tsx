@@ -5,12 +5,14 @@ export type PRLabel =
   | "broken tests"
   | "conflicts"
   | "merged"
-  | "closed";
+  | "closed"
+  | "draft";
 interface IPRLabel {
   label?: PRLabel;
   className?: string;
   hero?: boolean;
   merged?: boolean;
+  isDraft?: boolean;
   isMergeable?: boolean | null;
 }
 
@@ -19,6 +21,7 @@ function PullRequestLabels({
   className,
   merged,
   isMergeable,
+  isDraft = false,
   hero = false
 }: IPRLabel) {
   const [state, setState] = useState<PRLabel>(label || null);
@@ -37,12 +40,13 @@ function PullRequestLabels({
       return "danger";
     }
     default: {
-      return hero ? "white" : "primary";
+      return hero || isDraft ? "white" : "primary";
     }
     }
   }
 
   function getLabel(): PRLabel {
+    if (isDraft) return "draft";
     if (merged) return "merged";
     if (isMergeable) return "ready to merge";
     //isMergeable can be null;

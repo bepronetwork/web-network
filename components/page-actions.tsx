@@ -99,7 +99,7 @@ export default function PageActions({
   const { handleReedemIssue, handleCreatePullRequest } = useBepro();
   const { updateIssue } = useIssue();
 
-  const { createPullRequestIssue, startWorking } = useApi();
+  const { createPrePullRequest, cancelPrePullRequest, startWorking, processEvent } = useApi();
 
   function renderIssueAvatars() {
     if (developers?.length > 0) return <IssueAvatars users={developers} />;
@@ -278,45 +278,64 @@ export default function PageActions({
     description: prDescription,
     branch
   }): Promise<void> {
-    return new Promise((resolve, reject) => {
-      createPullRequestIssue(repoId as string, githubId, {
+    let cancelPayload = undefined;
+
+    createPrePullRequest(repoId as string, githubId, {
         title: prTitle,
         description: prDescription,
         username: githubLogin,
         branch
-      }).then(({bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid}) => {
-        return handleCreatePullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid);
-      })
-      .then(() => {
-        dispatch(addToast({
-              type: "success",
-              title: t("actions.success"),
-              content: t("pull-request:actions.create.success")
-        }));
+    }).then(({bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid}) => {
+      cancelPayload = {
+          repoId, 
+          issueGithubId: githubId, 
+          bountyId,
+          issueCid: originCID, 
+          pullRequestGithubId: cid,
+          customNetworkName: activeNetwork.name,
+          creator: userRepo.split("/")[0],
+          userBranch,
+          userRepo
+      };
 
-        if (handleMicroService) handleMicroService(true);
+      return handleCreatePullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid);
+    })
+    .then(txInfo => {
+      return processEvent('pull-request/created', 
+                          (txInfo as any).blockNumber, 
+                          undefined, 
+                          undefined, 
+                          activeNetwork?.name);
+    })
+    .then(() => {
+      dispatch(addToast({
+            type: "success",
+            title: t("actions.success"),
+            content: t("pull-request:actions.create.success")
+      }));
 
-        setShowPRModal(false);
-        resolve();
-      })
-      .catch((err) => {
-        if (err.response?.status === 422 && err.response?.data) {
-          err.response?.data.errors?.map((item) =>
-            dispatch(addToast({
-                type: "danger",
-                title: t("actions.failed"),
-                content: item.message
-            })));
-          reject(err);
-        } else {
+      if (handleMicroService) handleMicroService(true);
+
+      setShowPRModal(false);
+    })
+    .catch((err) => {
+      setShowPRModal(false);
+      if (cancelPayload) cancelPrePullRequest(cancelPayload);
+
+      if (err.response?.status === 422 && err.response?.data) {
+        err.response?.data.errors?.map((item) =>
           dispatch(addToast({
               type: "danger",
               title: t("actions.failed"),
-              content: t("pull-request:actions.create.error")
-          }));
-          reject();
-        }
-      });
+              content: item.message
+          })));
+      } else {
+        dispatch(addToast({
+            type: "danger",
+            title: t("actions.failed"),
+            content: t("pull-request:actions.create.error")
+        }));
+      }
     });
   }
 

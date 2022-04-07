@@ -62,6 +62,7 @@ export interface pullRequest {
   updatedAt: Date;
   issue?: IssueData;
   comments?: Comment[];
+  status?: string;
   reviewers?: string[];
 }
 

@@ -9,6 +9,7 @@ import CrossArrow from "assets/icons/cross-arrow";
 import DownloadIcon from "assets/icons/download";
 import HelpIcon from "assets/icons/help-icon";
 import InformationChatBubble from "assets/icons/information-chat-bubble";
+import PullRequestIcon from "assets/icons/pull-request-icon";
 import RecognizeFinishedIcon from "assets/icons/recognize-finished-icon";
 import ReturnArrow from "assets/icons/return-arrow";
 import ThumbsUp from "assets/icons/thumbs-up";
@@ -35,6 +36,7 @@ export default function TransactionsList({
 
   const IconMaps = {
     [TransactionTypes.openIssue]: <InformationChatBubble />,
+    [TransactionTypes.createPullRequest]: <PullRequestIcon />,
     [TransactionTypes.lock]: <UploadIcon />,
     [TransactionTypes.unlock]: <DownloadIcon />,
     [TransactionTypes.approveTransactionalERC20Token]: <ThumbsUp />,

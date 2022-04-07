@@ -11,7 +11,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   const include = [
     { association: "developers" },
-    { association: "pullRequests" },
+    { association: "pullRequests", where: { status: { [Op.ne]: "pending" } }, required: false },
     { association: "mergeProposals" },
     { association: "repository" },
     { association: "token" }

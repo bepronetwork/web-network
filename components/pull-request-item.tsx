@@ -49,7 +49,7 @@ export default function PullRequestItem({
   }
 
   function canReview() {
-    return pullRequest?.state === "open" && !!user?.login;
+    return pullRequest?.state === "open" && !!user?.login && pullRequest?.status === "ready";
   }
 
   async function getPullRequestInfo() {
@@ -103,6 +103,7 @@ export default function PullRequestItem({
                   <PullRequestLabels
                     merged={pullRequest.merged}
                     isMergeable={pullRequest.isMergeable}
+                    isDraft={pullRequest.status === "draft"}
                   />
                 </div>
               </div>
