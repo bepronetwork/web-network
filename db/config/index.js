@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const dbSecured = process.env.NEXT_DB_SECURE === "true" || true;
+const insecuredDB = process.env.NEXT_DB_INSECURE || false;
 
 module.exports = {
   dialect: process.env.NEXT_DB_DIALECT || "postgres",
@@ -13,10 +13,10 @@ module.exports = {
   ...(process.env.NEXT_DB_HOST
     ? {
         dialectOptions: {
-            ...dbSecured? {
+            ...!insecuredDB? {
             ssl: {
               required: true,
-              rejectUnauthorized: false
+              rejectUnauthorized: true
             }
           }: {}
         }
