@@ -8,7 +8,7 @@ import PriceConversorModal from "./price-conversor-modal";
 
 interface IPriceConversorProps {
   currentValue: number;
-  currency: Currency;
+  currency: Currency | string;
 }
 
 export default function PriceConversor({
