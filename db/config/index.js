@@ -12,13 +12,11 @@ module.exports = {
   port: +process.env.NEXT_DB_PORT || 54320,
   ...(process.env.NEXT_DB_HOST
     ? {
-        dialectOptions: {
-            ...!insecuredDB? {
+        dialectOptions: {     
             ssl: {
-              required: true,
-              rejectUnauthorized: true
-            }
-          }: {}
+              required: !insecuredDB,
+              rejectUnauthorized: !insecuredDB,
+            }     
         }
     }
     : {})
