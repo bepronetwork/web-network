@@ -101,7 +101,6 @@ export default function NewProposal({
   ]);
 
   const [show, setShow] = useState<boolean>(false);
-  const [isCouncil, setIsCouncil] = useState(false);
   const [error, setError] = useState<boolean>(false);
   const [distrib, setDistrib] = useState<object>({});
   const [success, setSuccess] = useState<boolean>(false);
@@ -163,12 +162,12 @@ export default function NewProposal({
         }))
       };
 
-      const currentProposals = networkIssue?.networkProposals?.map((item) => {
+      const currentProposals = networkIssue?.proposals?.map((item) => {
         return {
-          currentPrId: Number(activeIssue?.mergeProposals.find(mp=> mp.scMergeId === item._id).pullRequestId),
-          prAddressAmount: item.prAddresses.map((value, key) => ({
-            amount: Number(item.prAmounts[key]),
-            address: value.toLowerCase()
+          currentPrId: Number(activeIssue?.mergeProposals.find(mp=> +mp.scMergeId === item.id).pullRequestId),
+          prAddressAmount: item.details.map(detail => ({
+            amount: Number(detail.percentage),
+            address: detail.recipient
           }))
         };
       });
@@ -305,15 +304,6 @@ export default function NewProposal({
     })
   }
 
-  function updateCreateProposalHideState() {
-    if (!beproServiceStarted) return;
-
-    BeproService.network
-      .COUNCIL_AMOUNT()
-      .then(() => BeproService.network.isCouncil(wallet?.address))
-      .then((isCouncil) => setIsCouncil(isCouncil));
-  }
-
   function renderRecognizeAsFinished() {
     return (
       <ReadOnlyButtonWrapper>
@@ -335,18 +325,17 @@ export default function NewProposal({
     }
   }, [pullRequests, activeRepo, beproServiceStarted]);
 
-  useEffect(updateCreateProposalHideState, [wallet?.address]);
-
   return (
     <div className="d-flex">
-      {(isCouncil && isFinished && (
+      {(wallet?.isCouncil && isFinished && (
         <ReadOnlyButtonWrapper>
           <Button className="read-only-button" onClick={() => setShow(true)}>
             {t("proposal:actions.create")}
           </Button>
         </ReadOnlyButtonWrapper>
       )) ||
-        (isIssueOwner && !isFinished && renderRecognizeAsFinished())}
+        <></>}
+        {/* (isIssueOwner && !isFinished && renderRecognizeAsFinished())} */}
       <Modal
         show={show}
         title={t("proposal:actions.new")}
