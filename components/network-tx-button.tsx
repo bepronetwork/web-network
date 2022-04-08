@@ -15,6 +15,8 @@ import { addToast } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { updateTransaction } from "contexts/reducers/update-transaction";
 
+import { parseTransaction } from "helpers/transactions";
+
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { TransactionCurrency } from "interfaces/transaction";
@@ -116,7 +118,7 @@ function networkTxButton({
           }));
 
           txWindow.updateItem(tmpTransaction.payload.id,
-                              BeproService.parseTransaction(answer, tmpTransaction.payload));
+                              parseTransaction(answer, tmpTransaction.payload));
         } else {
           onFail(answer.message);
           dispatch(addToast({

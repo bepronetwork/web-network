@@ -1,12 +1,11 @@
 import getConfig from "next/config";
-import { Web3Connection, Network_v2, ERC20, NetworkFactory, Bounty, fromSmartContractDecimals } from "@taikai/dappkit";
+import { Web3Connection, Network_v2, ERC20, NetworkFactory, Bounty, fromSmartContractDecimals, OraclesResume } from "@taikai/dappkit";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import {
   BlockTransaction,
   SimpleBlockTransactionPayload
 } from "@interfaces/transaction";
-import { Web3Connection, Network_v2, ERC20, NetworkFactory } from "bepro-js";
 
 
 const { publicRuntimeConfig } = getConfig()
@@ -189,20 +188,18 @@ class BeproFacet {
     return this.network[`change${param.join('')}`](value);
   }
 
-   // TODO getOraclesSummary
-  async getOraclesSummary() {
-    //if (this.isStarted) return this.network.getOraclesSummary(this.address)
+  async getOraclesResume(): Promise<OraclesResume> {
+    if (this.isStarted) return this.network.getOraclesResume(this.address);
 
     return {
-      oraclesDelegatedByOthers: 0,
-      amounts: [],
-      addresses: [],
-      tokensLocked: 0,
-      delegatedToOthers: 0
+      locked: 0,
+      delegatedToOthers: 0,
+      delegatedByOthers: 0,
+      delegations: []
     };
   }
 
-  async getAllowance(tokenAddress: string, walletAddress: string = undefined) {
+  async getAllowance(tokenAddress: string = SETTLER_ADDRESS, walletAddress: string = undefined) {
     const erc20 = await this.getERC20Obj(tokenAddress);
 
     return erc20.allowance(walletAddress || this.address, this.network.contractAddress);
@@ -264,7 +261,7 @@ class BeproFacet {
     try {
       const network = await this.getNetworkObj(networkAddress);
 
-      await Promise.all([
+      return Promise.all([
         network.bountiesIndex(),
         network.canceledBounties(),
         network.closedBounties()

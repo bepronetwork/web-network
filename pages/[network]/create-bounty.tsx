@@ -73,8 +73,8 @@ export default function PageCreateIssue() {
   const [customTokens, setCustomTokens] = useState<Token[]>([BEPRO_TOKEN]);
   
   const { activeNetwork } = useNetwork();
-  const { handleApproveTransactionalToken } = useBepro()
-  const { wallet, user, beproServiceStarted, updateIsApprovedSettlerToken } = useAuthentication();
+  const { handleApproveToken } = useBepro();
+  const { wallet, user, beproServiceStarted } = useAuthentication();
   const {
     dispatch,
     state: { myTransactions }
@@ -89,7 +89,7 @@ export default function PageCreateIssue() {
   async function allowCreateIssue() {
     if (!beproServiceStarted || !transactionalToken || issueAmount.floatValue <= 0) return;
 
-    handleApproveTransactionalToken(transactionalToken.address, issueAmount.floatValue);
+    handleApproveToken(transactionalToken.address, issueAmount.floatValue);
   }
 
   function cleanFields() {

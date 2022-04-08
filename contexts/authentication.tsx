@@ -12,8 +12,6 @@ import { useRouter } from "next/router";
 
 import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
 
-import { changeOraclesParse } from "contexts/reducers/change-oracles";
-
 import { IUser } from "interfaces/authentication";
 import { IWallet } from "interfaces/authentication";
 
@@ -108,7 +106,7 @@ export const AuthenticationProvider = ({ children }) => {
       staked,
       isCouncil,
     ] = await Promise.all([
-      BeproService.getOraclesSummary(),
+      BeproService.getOraclesResume(),
       BeproService.getBalance("bepro"),
       BeproService.getBalance("eth"),
       BeproService.getBalance("staked"),
@@ -119,12 +117,12 @@ export const AuthenticationProvider = ({ children }) => {
       isCouncil,
       balance: {
         ...previousWallet.balance,
-        oracles: changeOraclesParse(BeproService.address, oracles),
+        oracles,
         bepro,
         eth,
         staked,
       }}))
-  }, []);
+  }, [wallet?.address, beproServiceStarted]);
 
   const updateIsApprovedSettlerToken = useCallback(async ()=>{
     const [isApprovedSettlerToken] = await Promise.all([

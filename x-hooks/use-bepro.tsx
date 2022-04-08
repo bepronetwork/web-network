@@ -224,12 +224,16 @@ export default function useBepro(props?: IUseBeProDefault) {
     });
   }
 
-  async function handleApproveTransactionalToken(tokenAddress: string = undefined, amount: number): 
+  async function handleApproveToken(tokenAddress: string = undefined, 
+                                    amount: number, 
+                                    tokenType: "transactional" | "network" = "transactional"):
     Promise<TransactionReceipt | Error> {
 
     return new Promise(async (resolve, reject) => {
+      const type = tokenType === "transactional" ? 
+        TransactionTypes.approveTransactionalERC20Token : TransactionTypes.approveSettlerToken ;
       
-      const tx = addTransaction({ type: TransactionTypes.approveTransactionalERC20Token },
+      const tx = addTransaction({ type },
                                 activeNetwork);
       dispatch(tx);
 
@@ -260,9 +264,9 @@ export default function useBepro(props?: IUseBeProDefault) {
     });
   }
 
-  async function handleTakeBack(amount: number, 
-                                currency: TransactionCurrency, 
-                                address: string): Promise<TransactionReceipt | Error> {
+  async function handleTakeBack(delegationId: number,
+                                amount: number, 
+                                currency: TransactionCurrency): Promise<TransactionReceipt | Error> {
 
     return new Promise(async (resolve, reject) => {
       const tx = addTransaction({ type: TransactionTypes.takeBackOracles,
@@ -272,7 +276,7 @@ export default function useBepro(props?: IUseBeProDefault) {
       dispatch(tx);
 
       await BeproService.network
-                    .unlock(amount, address)
+                    .takeBackOracles(delegationId)
                     .then((txInfo) => {
                       if (!txInfo) throw new Error(t("errors.approve-transaction"));
               
@@ -341,14 +345,45 @@ export default function useBepro(props?: IUseBeProDefault) {
     });
   }
 
+  async function handleMakePullRequestReady(bountyId: number, pullRequestId: number) {
+    return new Promise(async (resolve, reject) => {
+      const tx = addTransaction({ type: TransactionTypes.makePullRequestReady, }, activeNetwork);
+      dispatch(tx);
+
+      await BeproService.network.markPullRequestReadyForReview(bountyId, pullRequestId)
+      .then(txInfo => {
+        txWindow.updateItem(tx.payload.id,
+                            parseTransaction(txInfo, tx.payload));
+         
+        resolve(txInfo);
+      })
+      .catch(error => {
+        if (error?.message?.search("User denied") > -1)
+          dispatch(updateTransaction({
+         ...(tx.payload as any),
+         status: TransactionStatus.rejected
+          }));
+        else
+         dispatch(updateTransaction({
+           ...(tx.payload as any),
+           status: TransactionStatus.failed
+         }));
+
+        onError?.(error);
+        reject(error);
+      });
+    });
+  }
+
   return {
     handlerDisputeProposal,
     handleCloseIssue,
     handleReedemIssue,
     handleRecognizeAsFinished,
     handleProposeMerge,
-    handleApproveTransactionalToken,
+    handleApproveToken,
     handleTakeBack,
-    handleCreatePullRequest
+    handleCreatePullRequest,
+    handleMakePullRequestReady
   };
 }
