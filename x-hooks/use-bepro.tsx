@@ -118,6 +118,7 @@ export default function useBepro(props?: IUseBeProDefault) {
           // Review: Review processEnvets are working correctly
           processEvent(`redeem-issue`, txInfo.blockNumber, networkIssue?._id).then(() => {
             txWindow.updateItem(redeemTx.payload.id, BeproService.parseTransaction(txInfo, redeemTx.payload));
+            resolve(txInfo)
             onSuccess?.()
           })
             .catch((err) => {
@@ -182,7 +183,7 @@ export default function useBepro(props?: IUseBeProDefault) {
                    networkIssue?._id,
                    prGhId,
                    activeNetwork?.name).then(() => onSuccess?.())
-
+      
       await BeproService.network
                    .proposeIssueMerge(networkIssue?._id,
                                       addresses,
