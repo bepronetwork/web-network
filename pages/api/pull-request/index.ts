@@ -1,9 +1,9 @@
 import models from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
-import twitterTweet from "helpers/api/handle-twitter-tweet";
 import paginate from "helpers/paginate";
 
 import api from "services/api";
@@ -127,8 +127,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function PullRequest(req: NextApiRequest,
-                                          res: NextApiResponse) {
+async function PullRequest(req: NextApiRequest,
+                           res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
@@ -143,3 +143,4 @@ export default async function PullRequest(req: NextApiRequest,
 
   res.end();
 }
+export default  withCors(PullRequest)
