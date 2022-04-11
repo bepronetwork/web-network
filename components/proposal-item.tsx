@@ -1,4 +1,3 @@
-import { useContext } from "react";
 
 import Link from "next/link";
 
@@ -7,11 +6,14 @@ import LockedIcon from "assets/icons/locked-icon";
 import PercentageProgressBar from "components/percentage-progress-bar";
 import ProposalProgressSmall from "components/proposal-progress-small";
 
-import { ApplicationContext } from "contexts/application";
+import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
+
+import { isProposalDisputable } from "helpers/proposal";
 
 import { IssueData } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
+
 
 import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network";
@@ -23,36 +25,42 @@ import Translation from "./translation";
 interface Options {
   proposal: Proposal;
   issue: IssueData;
-  isFinalized: boolean;
-  isDisputable?: boolean;
+  disputableTime?: number;
 }
 
 export default function ProposalItem({
   proposal,
   issue,
-  isFinalized,
-  isDisputable = false
+  disputableTime,
 }: Options) {
-  const {
-    state: { beproStaked }
-  } = useContext(ApplicationContext);
+
+  const { wallet } = useAuthentication()
   const { networkIssue, getNetworkIssue } = useIssue();
   const { handlerDisputeProposal } = useBepro();
   const { getURLWithNetwork } = useNetworkTheme();
   const networkProposals = networkIssue?.networkProposals?.[proposal?.id];
 
+  const isDisable = [
+      networkIssue?.finalized,
+      !isProposalDisputable(proposal?.createdAt, disputableTime),
+      networkIssue?.networkProposals[proposal.id]?.isDisputed,
+      !networkIssue?.networkProposals[proposal.id]?.canUserDispute,
+      wallet?.balance?.oracles?.tokensLocked === 0,
+  ]
+    .some(v => v)
+
   async function handleDispute() {
-    if (!isDisputable || isFinalized) return;
+    if (isDisable || networkIssue?.finalized) return;
     handlerDisputeProposal(+proposal.scMergeId).then(() =>
       getNetworkIssue());
   }
 
   function getColors() {
-    if (isFinalized && !networkProposals?.isDisputed && proposal.isMerged) {
+    if (networkIssue?.finalized && !networkProposals?.isDisputed && proposal.isMerged) {
       return "success";
     }
 
-    if (networkProposals?.isDisputed || (isFinalized && !proposal.isMerged)) {
+    if (networkProposals?.isDisputed || (networkIssue?.finalized && !proposal.isMerged)) {
       return "danger";
     }
 
@@ -62,11 +70,11 @@ export default function ProposalItem({
   function getLabel() {
     let action = "dispute";
 
-    if (isFinalized && !networkProposals?.isDisputed && proposal.isMerged) {
+    if (networkIssue?.finalized && !networkProposals?.isDisputed && proposal.isMerged) {
       action = "accepted";
     }
 
-    if (networkProposals?.isDisputed || (isFinalized && !proposal.isMerged)) {
+    if (networkProposals?.isDisputed || (networkIssue?.finalized && !proposal.isMerged)) {
       action = "failed";
     }
 
@@ -86,9 +94,8 @@ export default function ProposalItem({
       <div className="content-list-item proposal cursor-pointer">
         <div className="rounded row align-items-center">
           <div
-            className={`col-3 caption-small mt-2 text-uppercase text-${
-              getColors() === "purple" ? "white" : getColors()
-            }`}
+            className={`col-3 caption-small mt-2 text-uppercase text-${getColors() === "purple" ? "white" : getColors()
+              }`}
           >
             <Translation ns="pull-request" label={"abbreviation"} /> #
             {proposal?.githubLogin} <Translation label={"misc.by"} />{" "}
@@ -116,7 +123,7 @@ export default function ProposalItem({
               <ProposalProgressSmall
                 pgClass={`${getColors()}`}
                 value={+networkProposals?.disputes}
-                total={beproStaked}
+                total={wallet?.balance?.staked}
                 textClass={`pb-2 text-${getColors()}`}
               />
             </div>
@@ -125,15 +132,15 @@ export default function ProposalItem({
               <ReadOnlyButtonWrapper>
                 <Button
                   color={getColors()}
-                  disabled={!isDisputable || !networkProposals}
-                  outline={!isDisputable}
+                  disabled={isDisable || !networkProposals}
+                  outline={isDisable}
                   className={"align-self-center mb-2 ms-3 read-only-button"}
                   onClick={(ev) => {
                     ev.stopPropagation();
                     handleDispute();
                   }}
                 >
-                  {!isDisputable && getColors() !== "success" && (
+                  {isDisable && getColors() !== "success" && (
                     <LockedIcon className={`me-2 text-${getColors()}`} />
                   )}
                   <span>{getLabel()}</span>

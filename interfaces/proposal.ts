@@ -12,6 +12,7 @@ export interface INetworkProposal {
   _id: string;
   disputes: number;
   isDisputed?: boolean;
+  canUserDispute?: boolean;
   prAddresses: string[];
   prAmounts: number[];
   proposalAddress: string;
