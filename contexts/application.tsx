@@ -208,7 +208,7 @@ export default function ApplicationContextProvider({ children }) {
       return transaction;
     };
 
-    transactions.filter(transaction => transaction.status === TransactionStatus.rejected).forEach(getStatusFromBlock);
+    transactions.filter(transaction => transaction.status !== TransactionStatus.rejected).forEach(getStatusFromBlock);
   };
 
   useEffect(() => {

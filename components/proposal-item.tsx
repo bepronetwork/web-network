@@ -38,7 +38,7 @@ export default function ProposalItem({
   const { networkIssue, getNetworkIssue } = useIssue();
   const { handlerDisputeProposal } = useBepro();
   const { getURLWithNetwork } = useNetworkTheme();
-  const networkProposals = networkIssue?.proposals?.[proposal?.id];
+  const networkProposals = networkIssue?.proposals?.[proposal?.contractId];
 
   const isDisable = [
       networkIssue?.finalized,
@@ -102,18 +102,17 @@ export default function ProposalItem({
             {proposal?.githubLogin && ` @${proposal?.githubLogin}`}
           </div>
           <div className="col-5 d-flex justify-content-between mb-2 text-white">
-            {networkProposals?.prAmounts &&
-              networkProposals?.prAmounts?.map((value, i) => (
+            {networkProposals?.details &&
+              networkProposals?.details?.map((detail, i) => (
                 <PercentageProgressBar
                   key={`pg-${i}`}
                   textClass={`caption-small p-small text-${getColors()}`}
                   pgClass={`bg-${getColors()}`}
                   className={
-                    (i + 1 < networkProposals?.prAmounts?.length && "me-2") ||
+                    (i + 1 < networkProposals?.details?.length && "me-2") ||
                     ""
                   }
-                  value={value}
-                  total={issue.amount}
+                  value={detail.percentage}
                 />
               ))}
           </div>
@@ -122,8 +121,8 @@ export default function ProposalItem({
             <div className="col-9 offset-1 text-white">
               <ProposalProgressSmall
                 pgClass={`${getColors()}`}
-                value={+networkProposals?.disputes}
-                total={wallet?.balance?.staked}
+                value={+networkProposals?.disputeWeight}
+                total={beproStaked}
                 textClass={`pb-2 text-${getColors()}`}
               />
             </div>

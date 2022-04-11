@@ -326,7 +326,7 @@ export default function ParityPage() {
 
   function updateCouncilAmount() {
     BeproService.network
-      .changeCouncilAmount(councilAmount)
+      .changeCouncilAmount(+councilAmount)
       .then((info) => {
         dispatch(toastInfo(t("parity:council-amount-changed")));
         console.debug("Council Changed!");
@@ -480,9 +480,7 @@ export default function ParityPage() {
   }
 
   function changeDisputableTime() {
-    BeproService.network.contract.methods
-      .changeDisputableTime(60)
-      .send({ from: wallet?.address })
+    BeproService.network.changeDisputableTime(60)
       .then(console.log);
   }
 

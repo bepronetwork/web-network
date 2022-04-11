@@ -171,7 +171,7 @@ export default function PageActions({
       !finalized &&
       pullRequests?.length > 0 &&
       wallet?.address &&
-      githubLogin && (
+      user?.login && (
         <NewProposal
           isFinished={finished}
           isIssueOwner={issueCreator?.toLowerCase() === wallet?.address.toLowerCase()}
@@ -191,7 +191,8 @@ export default function PageActions({
       !hasOpenPR &&
       isRepoForked &&
       isWorking &&
-      githubLogin && (
+      wallet?.address &&
+      user?.login && (
         <ReadOnlyButtonWrapper>
           <Button
             className="read-only-button"
@@ -211,7 +212,8 @@ export default function PageActions({
       !isIssueinDraft &&
       !finished &&
       !finalized &&
-      githubLogin && (
+      wallet?.address &&
+      user?.login && (
         <GithubLink
           repoId={String(repoId)}
           forcePath={repoPath}
@@ -231,7 +233,8 @@ export default function PageActions({
       !isIssueinDraft &&
       !finished &&
       !finalized &&
-      githubLogin && (
+      wallet?.address &&
+      user?.login && (
         <ReadOnlyButtonWrapper>
           <Button
             color="primary"

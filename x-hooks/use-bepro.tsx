@@ -143,41 +143,10 @@ export default function useBepro(props?: IUseBeProDefault) {
     })
   }
 
-  async function handleRecognizeAsFinished(): Promise<TransactionReceipt | Error> {
-    return new Promise(async (resolve, reject) => {
-      const tx = addTransaction({ type: TransactionTypes.recognizedAsFinish },
-                                activeNetwork);
-      dispatch(tx);
-
-      await BeproService.network
-        .recognizeAsFinished(networkIssue?._id)
-        .then((txInfo) => {
-          txWindow.updateItem(tx.payload.id,
-                              parseTransaction(txInfo, tx.payload));
-          onSuccess?.();
-          resolve(txInfo);
-        })
-        .catch((err) => {
-          if (err?.message?.search("User denied") > -1)
-            dispatch(updateTransaction({
-              ...(tx.payload as any),
-              remove: true
-            }));
-          else
-            dispatch(updateTransaction({
-              ...(tx.payload as any),
-              status: TransactionStatus.failed
-            }));
-          onError?.(err);
-          reject(err);
-          console.error("Error closing issue", err);
-        });
-    });
-  }
-
-  async function handleProposeMerge(prGhId: string,
+  async function handleProposeMerge(bountyId: number,
+                                    pullRequestId: number,
                                     addresses: string[],
-                                    amounts: number[]): Promise<TransactionReceipt | Error> {
+                                    amounts: number[] ): Promise<TransactionReceipt | Error> {
 
     return new Promise(async (resolve, reject) => {
       
@@ -185,22 +154,12 @@ export default function useBepro(props?: IUseBeProDefault) {
                                 activeNetwork);
       dispatch(tx);
 
-      waitForMerge(user?.login,
-                   networkIssue?._id,
-                   prGhId,
-                   activeNetwork?.name).then(() => onSuccess?.())
-      
       await BeproService.network
-                   .proposeIssueMerge(networkIssue?._id,
-                                      addresses,
-                                      amounts)
-                   .then((txInfo) => {
-                     processEvent("merge-proposal",
-                                  txInfo.blockNumber,
-                                  networkIssue?._id,
-                                  {pullRequestId: prGhId},
-                                  activeNetwork?.name);
-             
+                   .createBountyProposal(bountyId,
+                                         pullRequestId,
+                                         addresses,
+                                         amounts)
+                   .then((txInfo) => {            
                      txWindow.updateItem(tx.payload.id,
                                          parseTransaction(txInfo, tx.payload));
                      onSuccess?.();
@@ -379,7 +338,6 @@ export default function useBepro(props?: IUseBeProDefault) {
     handlerDisputeProposal,
     handleCloseIssue,
     handleReedemIssue,
-    handleRecognizeAsFinished,
     handleProposeMerge,
     handleApproveToken,
     handleTakeBack,

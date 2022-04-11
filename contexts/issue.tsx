@@ -108,7 +108,7 @@ export const IssueProvider: React.FC = function ({ children }) {
 
     const bounty = await BeproService.getBounty(activeIssue?.contractId);
 
-    const isFinished = bounty.pullRequests.some(pullRequest => pullRequest.ready);
+    const isFinished = bounty?.pullRequests?.some(pullRequest => pullRequest.ready);
 
     let isDraft = null;
 
@@ -119,23 +119,17 @@ export const IssueProvider: React.FC = function ({ children }) {
     }
     const networkProposals: ProposalExtended[] = [];
 
-    for (const meta of activeIssue.mergeProposals) {
-      const { scMergeId, id: proposalId, issueId } = meta;
+    for (const proposal of bounty.proposals) {
+      const isDisputed = activeIssue?.merged
+        ? +activeIssue?.merged !== +proposal.id
+        : await BeproService.network.isProposalDisputed(+bounty.id, +proposal.id);
 
-      if (scMergeId) {
-        const merge = bounty.proposals[+scMergeId];
-
-        const isDisputed = activeIssue?.merged
-          ? activeIssue?.merged !== scMergeId
-          : await BeproService.network.isProposalDisputed(+bounty.id, +scMergeId);
-
-        networkProposals[proposalId] = {
-          ...merge,
-          isDisputed,
-          canUserDispute
-        };
-      }
+      networkProposals[+proposal.id] = {
+        ...proposal,
+        isDisputed
+      };
     }
+
     setNetworkIssue({ 
       ...bounty, 
       isDraft, 

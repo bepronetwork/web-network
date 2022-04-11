@@ -19,6 +19,7 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
+import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/add-toast";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 import { useRepos } from "contexts/repos";
@@ -27,20 +28,19 @@ import { pullRequest } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-import useNetwork from "x-hooks/use-network";
 
 export default function PullRequestPage() {
   const router = useRouter();
   const { activeRepo } = useRepos();
   const { activeIssue, networkIssue, addNewComment, updateIssue } = useIssue();
 
-  const { createReviewForPR } = useApi();
+  const { createReviewForPR, processEvent } = useApi();
   const [showModal, setShowModal] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
   const [pullRequest, setPullRequest] = useState<pullRequest>();
   const [networkPullRequest, setNetworkPullRequest] = useState<PullRequest>();
   const { t } = useTranslation(["common", "pull-request"]);
-  const { network } = useNetwork();
+  const { activeNetwork } = useNetwork();
   const { wallet, user } = useAuthentication();
   const { dispatch } = useContext(ApplicationContext);
   const { prId, review } = router.query;
@@ -64,7 +64,7 @@ export default function PullRequestPage() {
                       String(prId),
                       user?.login,
                       body,
-                      network?.name)
+                      activeNetwork?.name)
       .then((response) => {
         dispatch(addToast({
             type: "success",
@@ -95,6 +95,12 @@ export default function PullRequestPage() {
 
     handleMakePullRequestReady(activeIssue?.contractId, pullRequest?.contractId)
     .then(txInfo => {
+      const { blockNumber } = txInfo as any;
+      return processEvent("pull-request/ready", blockNumber, undefined, undefined, activeNetwork?.name);
+    })
+    .then(() => {
+      updateIssue(activeIssue.repository_id, activeIssue.githubId);
+      
       dispatch(addToast({
         type: "success",
         title: t("actions.success"),

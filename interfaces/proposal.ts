@@ -6,6 +6,8 @@ export interface Proposal {
   issueId?: number;
   pullRequestId?: number;
   scMergeId: string;
+  contractId?: number;
+  creator?: string;
 }
 
 export interface INetworkProposal {
