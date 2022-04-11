@@ -1,9 +1,8 @@
 import axios from "axios";
 import {
   BEPRO_NETWORK_NAME,
-  CURRENCY_BEPRO_API,
-  PRODUCTION_CONTRACT,
-  USE_PRODUCTION_CONTRACT_CONVERSION
+  CURRENCY_API,
+  CURRENCY_ID
 } from "env";
 import { head } from "lodash";
 
@@ -149,13 +148,6 @@ export default function useApi() {
     return client
       .patch("/issue", { repoId, githubId, scId, networkName })
       .then(({ data }) => data === "ok")
-      .catch((_) => false);
-  }
-
-  async function patchPrStatus(prId) {
-    return client
-      .patch(`/pull-request/${prId}`)
-      .then(({ data }) => data)
       .catch((_) => false);
   }
 
@@ -535,17 +527,21 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
-  async function getBeproCurrency(contractAddress = undefined) {
-    try {
-      const { data } = await axios.get(`${CURRENCY_BEPRO_API}/${
-          USE_PRODUCTION_CONTRACT_CONVERSION === "1"
-            ? PRODUCTION_CONTRACT
-            : contractAddress
-        }`);
+  async function getCurrencyByToken(tokenId = CURRENCY_ID, comparedToken?: string) {
+    let params:{ids: string, vs_currencies?: string} = {
+        ids: tokenId,
+    }
+    
+    if(comparedToken) params.vs_currencies = comparedToken
 
-      return data.market_data.current_price;
+    try {
+      const { data } = await axios.get(`${CURRENCY_API}/simple/price`,{
+        params
+      });
+
+      return data[tokenId];
     } catch (error) {
-      return { usd: 1 };
+      return {};
     }
   }
 
@@ -565,7 +561,7 @@ export default function useApi() {
     createRepo,
     createReviewForPR,
     getAllUsers,
-    getBeproCurrency,
+    getCurrencyByToken,
     getBranchsList,
     getClientNation,
     getHealth,

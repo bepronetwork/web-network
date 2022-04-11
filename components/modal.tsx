@@ -22,7 +22,7 @@ export default function Modal({
   onOkClick = () => {},
   titleComponent,
   ...params
-}: ModalProps): JSX.Element {
+}: ModalProps) {
   const modalTitle = `${kebabCase(key || title)}-modal`;
 
   function renderFooter() {
