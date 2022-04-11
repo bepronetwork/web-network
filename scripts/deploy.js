@@ -36,6 +36,9 @@ const networks = {
   },
   seneca: {
     url: 'http://eth-seneca.taikai.network:8545/',
+  },
+  afrodite: {
+    url: 'http://eth-afrodite.taikai.network:8545/',
   }
 }
 

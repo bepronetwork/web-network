@@ -21,7 +21,8 @@
     "deploy:kovan": "node ./scripts/deploy -n kovan",
     "deploy:ropsten": "node ./scripts/deploy -n ropsten",
     "deploy:moonbase": "node ./scripts/deploy -n moonbase",
-    "deploy:seneca": "node ./scripts/deploy -n seneca"
+    "deploy:seneca": "node ./scripts/deploy -n seneca",
+    "deploy:afrodite": "node ./scripts/deploy -n afrodite"
   },
   "dependencies": {
     "@taikai/dappkit": "^2.0.0-alpha.2",
