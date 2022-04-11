@@ -1,6 +1,7 @@
 import models from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
-import { Op, WhereOptions, Sequelize } from "sequelize";
+import { Op, WhereOptions } from "sequelize";
 
 import paginate, { calculateTotalPages } from "helpers/paginate";
 
@@ -39,8 +40,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   });
 }
 
-export default async function SearchRepositories(req: NextApiRequest,
-                                                 res: NextApiResponse) {
+async function SearchRepositories(req: NextApiRequest,
+                                  res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
@@ -52,3 +53,5 @@ export default async function SearchRepositories(req: NextApiRequest,
 
   res.end();
 }
+
+export default withCors(SearchRepositories)

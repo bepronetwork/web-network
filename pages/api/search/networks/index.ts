@@ -1,4 +1,5 @@
 import models from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op, WhereOptions } from "sequelize";
 
@@ -34,8 +35,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   });
 }
 
-export default async function SearchNetworks(req: NextApiRequest,
-                                             res: NextApiResponse) {
+async function SearchNetworks(req: NextApiRequest,
+                              res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
@@ -47,3 +48,4 @@ export default async function SearchNetworks(req: NextApiRequest,
 
   res.end();
 }
+export default withCors(SearchNetworks)
