@@ -5,6 +5,7 @@ import { NetworkFactory, toSmartContractDecimals } from "bepro-js";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import getConfig from "next/config";
 import Image from "next/image";
 import router from "next/router";
 import { Octokit } from "octokit";
@@ -35,7 +36,7 @@ import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 
-import { IPFS_BASE, SETTLER_ADDRESS, TRANSACTION_ADDRESS } from "../../env";
+const { publicRuntimeConfig } = getConfig()
 
 export default function ParityPage() {
   const { t } = useTranslation(["common", "parity"]);
@@ -302,7 +303,7 @@ export default function ParityPage() {
 
   function deployNewContract() {
     BeproService.network
-      .deployJsonAbi(SETTLER_ADDRESS, TRANSACTION_ADDRESS, wallet?.address)
+      .deployJsonAbi(publicRuntimeConfig.contract.settler, publicRuntimeConfig.contract.transaction, wallet?.address)
       .then((info) => {
         console.debug("Deployed!");
         console.table(info);
@@ -317,7 +318,7 @@ export default function ParityPage() {
 
     await factory.loadAbi();
 
-    const receipt = await factory.deployJsonAbi(SETTLER_ADDRESS);
+    const receipt = await factory.deployJsonAbi(publicRuntimeConfig.contract.settler);
 
     console.log({ receipt });
     console.log(receipt.contractAddress);
@@ -495,7 +496,7 @@ export default function ParityPage() {
   useEffect(() => {
     if (!wallet?.address) return;
 
-    if (wallet?.address !== process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS)
+    if (wallet?.address !== publicRuntimeConfig.adminWalletAddress)
       router.push("/account");
 
     getSelfRepos();
@@ -701,14 +702,14 @@ export default function ParityPage() {
               </div>
               <div className="col-1 d-flex align-items-center justify-content-center">
                 <Image
-                  src={`${IPFS_BASE}/${networkItem.logoIcon}`}
+                  src={`${publicRuntimeConfig.ipfsUrl}/${networkItem.logoIcon}`}
                   width={30}
                   height={30}
                 />
               </div>
               <div className="col-2 d-flex align-items-center justify-content-center">
                 <Image
-                  src={`${IPFS_BASE}/${networkItem.fullLogo}`}
+                  src={`${publicRuntimeConfig.ipfsUrl}/${networkItem.fullLogo}`}
                   width={150}
                   height={30}
                 />

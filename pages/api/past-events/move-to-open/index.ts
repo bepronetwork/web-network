@@ -1,6 +1,7 @@
 import { subMilliseconds } from "date-fns";
 import models from "db/models";
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
@@ -8,6 +9,8 @@ import networkBeproJs from "helpers/api/handle-network-bepro";
 import twitterTweet from "helpers/api/handle-twitter-tweet";
 
 import api from "services/api";
+
+const { publicRuntimeConfig } = getConfig()
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const customNetworks = await models.network.findAll({
@@ -22,7 +25,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     {
       id: 1,
       name: process.env.NEXT_PUBLIC_BEPRO_NETWORK_NAME,
-      networkAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS
+      networkAddress: publicRuntimeConfig.contract.address,
     },
     ...customNetworks
   ].forEach(async (customNetwork) => {
@@ -64,7 +67,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       console.log(`Moved ${issue.issueId} to open`);
       await issue.save();
 
-      if (network.contractAddress === process.env.NEXT_PUBLIC_CONTRACT_ADDRESS)
+      if (network.contractAddress === publicRuntimeConfig.contract.address)
         twitterTweet({
           type: "bounty",
           action: "changes",
