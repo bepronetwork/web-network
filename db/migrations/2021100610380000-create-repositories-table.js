@@ -16,7 +16,7 @@ module.exports = {
       })
       .then(() => {
         queryInterface.insert(RepositoriesModel, "repositories", {
-          githubPath: `${process.env.NEXT_GITHUB_OWNER}/${process.env.NEXT_GITHUB_REPO}`
+          githubPath: `${process.env.NEXT_GH_OWNER}/${process.env.NEXT_GH_REPO}`
         });
       });
   },
