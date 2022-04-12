@@ -1,5 +1,4 @@
 import { NetworkFactory, Web3Connection } from "bepro-js";
-import { WEB3_CONNECTION } from "env";
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig()
 
@@ -9,7 +8,7 @@ export default class Bepro {
 
   async init(network = false, erc20 = false, factory = false) {
     this.bepro = new Web3Connection({
-      web3Host: WEB3_CONNECTION,
+      web3Host: publicRuntimeConfig.web3ProviderConnection,
       debug: true
     });
 

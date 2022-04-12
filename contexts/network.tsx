@@ -1,15 +1,11 @@
 import React, {
-  createContext,
-  useState,
-  useContext,
-  useMemo,
-  useCallback,
-  useEffect
+  createContext, useCallback, useContext, useEffect, useMemo, useState
 } from "react";
 
-import { BEPRO_NETWORK_NAME } from "env";
+
+import getConfig from "next/config";
 import { useRouter } from "next/router";
-import { setCookie, parseCookies } from "nookies";
+import { parseCookies, setCookie } from "nookies";
 
 import NetworkThemeInjector from "components/custom-network/network-theme-injector";
 
@@ -17,6 +13,7 @@ import { INetwork } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 
+const { publicRuntimeConfig } = getConfig()
 export interface NetworkContextData {
   activeNetwork: INetwork;
   updateActiveNetwork: () => void;
@@ -34,7 +31,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
   const { getNetwork } = useApi();
 
   const updateActiveNetwork = useCallback((forced?: boolean) => {
-    const networkName = String(query.network || BEPRO_NETWORK_NAME);
+    const networkName = String(query.network || publicRuntimeConfig.networkConfig.networkName);
     if (activeNetwork?.name === networkName && !forced) return activeNetwork;
 
     const networkFromStorage = parseCookies()[`${cookieKey}:${networkName}`];

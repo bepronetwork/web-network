@@ -2,7 +2,8 @@ const path = require("path");
 
 const { i18n } = require("./next-i18next.config");
 require("dotenv").config();
-
+// import getConfig from "next/config";
+// const { publicRuntimeConfig } = getConfig()
 // Will be available on both server and client
 const publicRuntimeConfig = {
   adminWalletAddress: process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS,
