@@ -17,7 +17,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const customNetworks = await models.network.findAll({
     where: {
       name: {
-        [Op.notILike]: `%${process.env.NEXT_PUBLIC_BEPRO_NETWORK_NAME}%`
+        [Op.notILike]: `%${publicRuntimeConfig.networkConfig.networkName}%`
       }
     }
   })
@@ -26,7 +26,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   const networks = [{
     id: 1,
-    name: process.env.NEXT_PUBLIC_BEPRO_NETWORK_NAME, 
+    name: publicRuntimeConfig.networkConfig.networkName, 
     networkAddress: publicRuntimeConfig.contract.address
   }, ...customNetworks]
 

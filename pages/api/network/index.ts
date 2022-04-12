@@ -1,12 +1,15 @@
 import Database from "db/models";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
 import Bepro from "helpers/api/bepro-initializer";
 
 import IpfsStorage from "services/ipfs-service";
+
+const { publicRuntimeConfig } = getConfig()
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { name: networkName } = req.query;
@@ -94,7 +97,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       const { data } = await octokitUser.rest.repos.addCollaborator({
         owner,
         repo,
-        username: process.env.NEXT_PUBLIC_BEPRO_GITHUB_USER
+        username: publicRuntimeConfig.github.user
       });
 
       if (data?.id) invitations.push(data?.id);
@@ -279,7 +282,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         const { data } = await octokitUser.rest.repos.addCollaborator({
           owner,
           repo,
-          username: process.env.NEXT_PUBLIC_BEPRO_GITHUB_USER
+          username: publicRuntimeConfig.github.user
         });
 
         if (data?.id) invitations.push(data?.id);

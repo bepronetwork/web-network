@@ -1,11 +1,10 @@
 import { Network, Web3Connection } from "bepro-js";
-import { WEB3_CONNECTION } from "env";
 import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig()
 
 export default function networkBeproJs({
-  web3Connection = WEB3_CONNECTION,
+  web3Connection = publicRuntimeConfig.web3ProviderConnection,
   privateKey = process.env.NEXT_PRIVATE_KEY,
   contractAddress = publicRuntimeConfig.contract.address,
   debug = false

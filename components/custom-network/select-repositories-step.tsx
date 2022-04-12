@@ -1,11 +1,13 @@
 import { FormCheck } from "react-bootstrap";
 
-import { BEPRO_GITHUB_USER } from "env";
 import { useTranslation } from "next-i18next";
+import getConfig from "next/config";
 
 import ConnectGithub from "components/connect-github";
 import RepositoriesList from "components/custom-network/repositories-list";
 import Step from "components/step";
+
+const { publicRuntimeConfig } = getConfig()
 
 export default function SelectRepositoriesStep({
   data,
@@ -39,7 +41,7 @@ export default function SelectRepositoriesStep({
           <RepositoriesList repositories={data.data} onClick={onClick} />
 
           <span className="caption-small text-gray px-0 mt-3">
-            {BEPRO_GITHUB_USER}
+            {publicRuntimeConfig.github.user}
           </span>
 
           <div className="d-flex align-items-center p-small text-white px-0 m-0 p-0">
@@ -50,7 +52,7 @@ export default function SelectRepositoriesStep({
               onChange={handleCheck}
             />
             <span>
-              {t("steps.repositories.give-access", { user: BEPRO_GITHUB_USER })}
+              {t("steps.repositories.give-access", { user: publicRuntimeConfig.github.user })}
             </span>
           </div>
 
