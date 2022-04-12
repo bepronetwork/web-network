@@ -96,7 +96,7 @@ export default function TransactionModal({
   }
 
   function getEtherScanHref(tx: string) {
-    return `//${process.env.NEXT_PUBLIC_BLOCKSCAN_LINK}/tx/${tx}`;
+    return `//${publicRuntimeConfig.metaMask.blockScanUrl}/tx/${tx}`;
   }
 
   return (

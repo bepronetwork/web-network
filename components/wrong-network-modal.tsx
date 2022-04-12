@@ -1,7 +1,8 @@
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { Spinner } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
+import getConfig from "next/config";
 
 import Modal from "components/modal";
 
@@ -12,7 +13,7 @@ import { NETWORKS } from "helpers/networks";
 import { NetworkColors } from "interfaces/enums/network-ids";
 
 import Button from "./button";
-
+const { publicRuntimeConfig } = getConfig()
 export default function WrongNetworkModal({ requiredNetwork = "" }) {
   const [isAddingNetwork, setIsAddingNetwork] = useState(false);
   const { t } = useTranslation("common");
@@ -31,7 +32,7 @@ export default function WrongNetworkModal({ requiredNetwork = "" }) {
 
   async function handleAddNetwork() {
     setIsAddingNetwork(true);
-    const chainId = `0x${Number(process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID).toString(16)}`;
+    const chainId = `0x${Number(publicRuntimeConfig.metaMask.chainId).toString(16)}`;
     const currencyNetwork = NETWORKS[chainId];
     try {
       await window.ethereum.request({

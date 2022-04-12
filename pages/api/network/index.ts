@@ -104,7 +104,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const octokitBot = new Octokit({
-      auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN
+      auth: publicRuntimeConfig.github.token
     });
 
     for (const invitation_id of invitations) {
@@ -160,7 +160,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     if (
       isAdminOverriding &&
-      creator !== process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS
+      creator !== publicRuntimeConfig.adminWalletAddress
     )
       return res.status(403).json("Unauthorized");
 
@@ -295,7 +295,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
       if (invitations.length) {
         const octokitBot = new Octokit({
-          auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN
+          auth: publicRuntimeConfig.github.token
         });
 
         for (const invitation_id of invitations) {
