@@ -8,9 +8,10 @@ import Modal from "components/modal";
 
 import { formatNumberToNScale } from "helpers/formatNumber";
 
+import useApi from "x-hooks/use-api";
+
 import InputNumber from "./input-number";
 import ReactSelect from "./react-select";
-import useApi from "x-hooks/use-api";
 
 interface IPriceConversiorModalProps{
   show: boolean;

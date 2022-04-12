@@ -1,10 +1,12 @@
 import models from "db/models";
-import { CONTRACT_ADDRESS } from "env";
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
 import { Op } from "sequelize";
 
 import networkBeproJs from "helpers/api/handle-network-bepro";
 import twitterTweet from "helpers/api/handle-twitter-tweet";
+
+const { publicRuntimeConfig } = getConfig()
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { fromBlock, id, networkName } = req.body;
@@ -43,7 +45,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         if (!issue)
           return console.log("Error creating tweet proposal failed because the issue was not found");
 
-        if (network.contractAddress === CONTRACT_ADDRESS)
+        if (network.contractAddress === publicRuntimeConfig.contract.address)
           twitterTweet({
             type: "proposal",
             action: "failed",

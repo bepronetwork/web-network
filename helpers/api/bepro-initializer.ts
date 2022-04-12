@@ -1,5 +1,7 @@
 import { NetworkFactory, Web3Connection } from "bepro-js";
-import { NETWORK_FACTORY_ADDRESS, WEB3_CONNECTION } from "env";
+import { WEB3_CONNECTION } from "env";
+import getConfig from "next/config";
+const { publicRuntimeConfig } = getConfig()
 
 export default class Bepro {
   bepro: Web3Connection;
@@ -14,7 +16,7 @@ export default class Bepro {
     await this.bepro.start();
 
     this.networkFactory = new NetworkFactory(this.bepro,
-      NETWORK_FACTORY_ADDRESS);
+      publicRuntimeConfig.networkConfig.factoryAddress);
 
     if (factory) await this.networkFactory.loadContract();
   }

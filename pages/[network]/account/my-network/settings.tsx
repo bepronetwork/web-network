@@ -1,20 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 
-import {
-  API,
-  IPFS_BASE,
-  REDEEM_TIME_MAX,
-  REDEEM_TIME_MIN,
-  COUNCIL_AMOUNT_MIN,
-  COUNCIL_AMOUNT_MAX,
-  DISPUTABLE_TIME_MAX,
-  DISPUTABLE_TIME_MIN,
-  DISPUTE_PERCENTAGE_MAX,
-  BEPRO_NETWORK_NAME
-} from "env";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import getConfig from "next/config";
 import { useRouter } from "next/router";
 
 import LockedIcon from "assets/icons/locked-icon";
@@ -49,6 +38,8 @@ import { BeproService } from "services/bepro-service";
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
 import useOctokit from "x-hooks/use-octokit";
+
+const { publicRuntimeConfig } = getConfig()
 interface NetworkAmounts {
   tokenStaked: number;
   oraclesStaked: number;
@@ -95,16 +86,16 @@ export default function Settings() {
   const isValidDescription =
     newInfo.network.data.networkDescription.trim() !== "";
   const isValidPercentageForDispute =
-    newInfo.percentageForDispute <= DISPUTE_PERCENTAGE_MAX;
+    newInfo.percentageForDispute <= publicRuntimeConfig.networkConfig.disputesPercentage;
   const isValidRedeemTime =
-    newInfo.redeemTime >= REDEEM_TIME_MIN &&
-    newInfo.redeemTime <= REDEEM_TIME_MAX;
+    newInfo.redeemTime >= publicRuntimeConfig.networkConfig.reedemTime.min &&
+    newInfo.redeemTime <= publicRuntimeConfig.networkConfig.reedemTime.max;
   const isValidDisputeTime =
-    newInfo.disputeTime >= DISPUTABLE_TIME_MIN &&
-    newInfo.disputeTime <= DISPUTABLE_TIME_MAX;
+    newInfo.disputeTime >= publicRuntimeConfig.networkConfig.disputableTime.min &&
+    newInfo.disputeTime <= publicRuntimeConfig.networkConfig.disputableTime.max;
   const isValidCouncilAmount =
-    newInfo.councilAmount >= COUNCIL_AMOUNT_MIN &&
-    newInfo.councilAmount <= COUNCIL_AMOUNT_MAX;
+    newInfo.councilAmount >= publicRuntimeConfig.networkConfig.councilAmount.min &&
+    newInfo.councilAmount <= publicRuntimeConfig.networkConfig.councilAmount.max;
 
   function showTextOrDefault(text: string, defaultText: string) {
     return text?.trim() === "" ? defaultText : text;
@@ -115,8 +106,8 @@ export default function Settings() {
 
     tmpInfo.network.data.colors.data = network.colors;
     tmpInfo.network.data.networkDescription = network.description;
-    tmpInfo.network.data.logoIcon.preview = `${IPFS_BASE}/${network.logoIcon}`;
-    tmpInfo.network.data.fullLogo.preview = `${IPFS_BASE}/${network.fullLogo}`;
+    tmpInfo.network.data.logoIcon.preview = `${publicRuntimeConfig.ipfsUrl}/${network.logoIcon}`;
+    tmpInfo.network.data.fullLogo.preview = `${publicRuntimeConfig.ipfsUrl}/${network.fullLogo}`;
 
     setNewInfo(tmpInfo);
 
@@ -352,7 +343,7 @@ export default function Settings() {
       !network ||
       !wallet?.address ||
       !user?.login ||
-      network?.name?.toLowerCase() === BEPRO_NETWORK_NAME
+      network?.name?.toLowerCase() === publicRuntimeConfig.configNetwork.networkName
     )
       return;
 
@@ -480,7 +471,7 @@ export default function Settings() {
                   {t("custom-network:query-url")}
                 </p>
                 <p className="caption-small text-gray mb-3">
-                  {urlWithoutProtocol(API)}/
+                  {urlWithoutProtocol(publicRuntimeConfig.apiUrl)}/
                   <span className="text-primary">
                     {showTextOrDefault(getQueryableText(network?.name || ""),
                                        t("custom-network:steps.network-information.fields.name.default"))}
@@ -595,10 +586,10 @@ export default function Settings() {
                     classSymbol={"text-ligth-gray"}
                     label={t("custom-network:dispute-time")}
                     symbol={t("misc.seconds")}
-                    max={DISPUTABLE_TIME_MAX}
+                    max={publicRuntimeConfig.networkConfig.disputableTime.max}
                     description={t("custom-network:errors.dispute-time", {
-                      min: DISPUTABLE_TIME_MIN,
-                      max: formatNumberToCurrency(DISPUTABLE_TIME_MAX, 0)
+                      min: publicRuntimeConfig.networkConfig.disputableTime.min,
+                      max: formatNumberToCurrency(publicRuntimeConfig.networkConfig.disputableTime.max, 0)
                     })}
                     value={newInfo.disputeTime}
                     error={!isValidDisputeTime}
@@ -617,9 +608,9 @@ export default function Settings() {
                   <InputNumber
                     classSymbol={"text-ligth-gray"}
                     label={t("custom-network:percentage-for-dispute")}
-                    max={DISPUTE_PERCENTAGE_MAX}
+                    max={publicRuntimeConfig.networkConfig.disputesPercentage}
                     description={t("custom-network:errors.percentage-for-dispute",
-                      { max: DISPUTE_PERCENTAGE_MAX })}
+                      { max: publicRuntimeConfig.networkConfig.disputesPercentage })}
                     symbol="%"
                     value={newInfo.percentageForDispute}
                     error={!isValidPercentageForDispute}
@@ -637,10 +628,10 @@ export default function Settings() {
                   <InputNumber
                     classSymbol={"text-ligth-gray"}
                     label={t("custom-network:redeem-time")}
-                    max={REDEEM_TIME_MAX}
+                    max={publicRuntimeConfig.networkConfig.reedemTime.max}
                     description={t("custom-network:errors.redeem-time", {
-                      min: REDEEM_TIME_MIN,
-                      max: REDEEM_TIME_MAX
+                      min: publicRuntimeConfig.networkConfig.reedemTime.min,
+                      max: publicRuntimeConfig.networkConfig.reedemTime.max
                     })}
                     symbol="seconds"
                     value={newInfo.redeemTime}
@@ -661,10 +652,10 @@ export default function Settings() {
                     classSymbol={"text-primary"}
                     label={t("custom-network:council-amount")}
                     symbol={t("$bepro")}
-                    max={COUNCIL_AMOUNT_MAX}
+                    max={publicRuntimeConfig.networkConfig.councilAmount.max}
                     description={t("custom-network:errors.council-amount", {
-                      min: formatNumberToCurrency(COUNCIL_AMOUNT_MIN, 0),
-                      max: formatNumberToCurrency(COUNCIL_AMOUNT_MAX, 0)
+                      min: formatNumberToCurrency(publicRuntimeConfig.networkConfig.councilAmount.min, 0),
+                      max: formatNumberToCurrency(publicRuntimeConfig.networkConfig.councilAmount.max, 0)
                     })}
                     value={newInfo.councilAmount}
                     error={!isValidCouncilAmount}

@@ -1,4 +1,4 @@
-import { CONTRACT_ADDRESS } from "env";
+import getConfig from "next/config";
 import { Op } from "sequelize";
 
 import { Bus } from "helpers/bus";
@@ -6,6 +6,8 @@ import { Bus } from "helpers/bus";
 import api from "services/api";
 
 import twitterTweet from "./handle-twitter-tweet";
+
+const { publicRuntimeConfig } = getConfig()
 
 export default async function readCloseIssues(events,
                                               { network, models, octokit, res, customNetworkId }) {
@@ -78,7 +80,7 @@ export default async function readCloseIssues(events,
     issue.state = "closed";
     await issue.save();
 
-    if (network.contractAddress === CONTRACT_ADDRESS)
+    if (network.contractAddress === publicRuntimeConfig.contract.address)
       twitterTweet({
         type: "bounty",
         action: "distributed",

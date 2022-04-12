@@ -528,7 +528,7 @@ export default function useApi() {
   }
 
   async function getCurrencyByToken(tokenId = CURRENCY_ID, comparedToken?: string) {
-    let params:{ids: string, vs_currencies?: string} = {
+    const params:{ids: string, vs_currencies?: string} = {
         ids: tokenId,
     }
     

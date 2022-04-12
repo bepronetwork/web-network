@@ -1,7 +1,7 @@
 import { useContext, useEffect } from "react";
 
-import { BEPRO_NETWORK_NAME, CURRENCY_ID, IPFS_BASE } from "env";
 import { useTranslation } from "next-i18next";
+import getConfig from "next/config";
 import { useRouter } from "next/router";
 
 import NetworkLogo from "components/network-logo";
@@ -19,6 +19,7 @@ import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
+const { publicRuntimeConfig } = getConfig()
 interface NetworkListItemProps {
   network: INetwork;
   redirectToHome?: boolean;
@@ -79,7 +80,7 @@ export default function NetworkListItem({
       })
       .then((amount) => {
         BeproService.getNetworkObj(handleNetworkAddress(network)).then((networkObj) => {
-          getCurrencyByToken(CURRENCY_ID, 'usd').then(({ usd }) => {
+          getCurrencyByToken(publicRuntimeConfig.currency.currencyId, 'usd').then(({ usd }) => {
             dispatch(changeNetworksSummary({
                     label: "amountInNetwork",
                     amount: amount * usd,
@@ -96,9 +97,9 @@ export default function NetworkListItem({
       <div className="col-3">
         <div className="d-flex flex-row align-items-center gap-20">
           <NetworkLogo
-            src={`${IPFS_BASE}/${network?.logoIcon}`}
+            src={`${publicRuntimeConfig.ipfsUrl}/${network?.logoIcon}`}
             alt={`${network?.name} logo`}
-            isBepro={network?.name === BEPRO_NETWORK_NAME}
+            isBepro={network?.name === publicRuntimeConfig.networkConfig.networkName}
           />
 
           <span className="caption-medium text-white">{network?.name}</span>
@@ -132,7 +133,7 @@ export default function NetworkListItem({
 
         <span
           className={`caption-medium mr-2 ${
-            network?.name === BEPRO_NETWORK_NAME ? "text-blue" : ""
+            network?.name === publicRuntimeConfig.configNetwork.networkName ? "text-blue" : ""
           }`}
           style={{ color: `${network?.colors?.primary}` }}
         >

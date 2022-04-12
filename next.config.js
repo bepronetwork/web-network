@@ -7,7 +7,12 @@ require("dotenv").config();
 const publicRuntimeConfig = {
   adminWalletAddress: process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS,
   homeUrl: process.env.NEXT_PUBLIC_HOME_URL,
-  contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+  apiUrl: process.env.NEXT_PUBLIC_API_HOST,
+  contract:{
+    address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+    settler: process.env.NEXT_PUBLIC_SETTLER_ADDRESS,
+    transaction: process.env.NEXT_PUBLIC_TRANSACTION_ADDRESS
+  },
   web3ProviderConnection: process.env.NEXT_PUBLIC_WEB3_CONNECTION,
   github:{
     token: process.env.NEXT_PUBLIC_GH_TOKEN,
@@ -35,7 +40,7 @@ const publicRuntimeConfig = {
       max: process.env.NEXT_PUBLIC_COUNCIL_AMOUNT_MAX,
     },
     disputesPercentage: process.env.NEXT_PUBLIC_DISPUTE_PERCENTAGE_MAX,
-    netowrkName: process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME,
+    networkName: process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME,
     factoryAddress: process.env.NEXT_PUBLIC_NETWORK_FACTORY_ADDRESS
   },
   currency:{
