@@ -5,7 +5,7 @@ const { publicRuntimeConfig } = getConfig()
 
 export default function networkBeproJs({
   web3Connection = publicRuntimeConfig.web3ProviderConnection,
-  privateKey = process.env.NEXT_PRIVATE_KEY,
+  privateKey = publicRuntimeConfig.walletPrivateKey,
   contractAddress = publicRuntimeConfig.contract.address,
   debug = false
 }: {

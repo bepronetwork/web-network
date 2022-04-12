@@ -1,14 +1,17 @@
 import axios from "axios";
 import { fileTypeFromBuffer } from "file-type";
 import FormData from "form-data";
+import getConfig from "next/config";
 import { v4 as uuidv4 } from "uuid";
-const host = process.env.NEXT_IPFS_HOST || "ipfs.infura.io";
-const port = process.env.NEXT_IPFS_PORT || "5001";
+const { serverRuntimeConfig } = getConfig()
+
+const host = serverRuntimeConfig.infura.host || "ipfs.infura.io";
+const port = serverRuntimeConfig.infura.port || "5001";
 const auth =
   "Basic " +
-  Buffer.from(process.env.NEXT_IPFS_PROJECT_ID +
+  Buffer.from(serverRuntimeConfig.infura.projectId +
       ":" +
-      process.env.NEXT_IPFS_PROJECT_SECRET).toString("base64");
+      serverRuntimeConfig.infura.projectSecret).toString("base64");
 const baseURL = `https://${host}:${port}/api/v0`;
 
 export async function add(file: Buffer | string,

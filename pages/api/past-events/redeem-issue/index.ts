@@ -27,7 +27,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   if (!customNetwork) return res.status(404).json("Invalid network");
   if (customNetwork.isClosed) return res.status(404).json("Invalid network");
 
-  const octokit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
+  const octokit = new Octokit({ auth: publicRuntimeConfig.github.token });
 
   const network = networkBeproJs({ contractAddress: handleNetworkAddress(customNetwork.networkAddress) });
 

@@ -1,9 +1,10 @@
 import models from "db/models";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
-
+const { publicRuntimeConfig } = getConfig()
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {
     id: [repoId, networkName]
@@ -28,7 +29,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   const [owner, repo] = repository.githubPath.split("/");
 
-  const octoKit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
+  const octoKit = new Octokit({ auth:  publicRuntimeConfig.github.token});
 
   const { data } = await octoKit.rest.repos.listBranches({
     repo,
