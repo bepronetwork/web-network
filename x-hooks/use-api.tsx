@@ -531,7 +531,7 @@ export default function useApi() {
     if(comparedToken) params.vs_currencies = comparedToken
 
     try {
-      const { data } = await axios.get(`${publicRuntimeConfig.currency.currencyId}/simple/price`,{
+      const { data } = await axios.get(`${publicRuntimeConfig.currency.apiUrl}/simple/price`,{
         params
       });
 

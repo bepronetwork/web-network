@@ -45,7 +45,7 @@ const publicRuntimeConfig = {
   },
   currency:{
     apiUrl: process.env.NEXT_PUBLIC_CURRENCY_API,
-    currencyId: process.env.NEXT_PUBLIC_CURRENCY_API,
+    currencyId: process.env.NEXT_PUBLIC_CURRENCY_ID,
     currencyCompareList: process.env.NEXT_PUBLIC_CURRENCY_VSLIST,
   }
 }
