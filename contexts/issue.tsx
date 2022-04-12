@@ -1,20 +1,13 @@
 import React, {
   createContext,
-  useCallback,
-  useState,
-  useContext,
-  useMemo,
-  useEffect
+  useCallback, useContext, useEffect, useMemo, useState
 } from "react";
 
 import { fromSmartContractDecimals } from "bepro-js";
 import { useRouter } from "next/router";
 
 import {
-  IssueData,
-  INetworkIssue,
-  pullRequest,
-  Comment
+  Comment, INetworkIssue, IssueData, pullRequest
 } from "interfaces/issue-data";
 import { INetworkProposal } from "interfaces/proposal";
 
@@ -140,7 +133,6 @@ export const IssueProvider: React.FC = function ({ children }) {
           disputedValue === 0,
           isDisputed,
         ].some(v=>v)
-        debugger;
 
         networkProposals[proposalId] = {
           ...merge,

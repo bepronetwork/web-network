@@ -86,16 +86,16 @@ export default function Settings() {
   const isValidDescription =
     newInfo.network.data.networkDescription.trim() !== "";
   const isValidPercentageForDispute =
-    newInfo.percentageForDispute <= publicRuntimeConfig.networkConfig.disputesPercentage;
+    newInfo.percentageForDispute <= +publicRuntimeConfig.networkConfig.disputesPercentage;
   const isValidRedeemTime =
-    newInfo.redeemTime >= publicRuntimeConfig.networkConfig.reedemTime.min &&
-    newInfo.redeemTime <= publicRuntimeConfig.networkConfig.reedemTime.max;
+    newInfo.redeemTime >= +publicRuntimeConfig.networkConfig.reedemTime.min &&
+    newInfo.redeemTime <= +publicRuntimeConfig.networkConfig.reedemTime.max;
   const isValidDisputeTime =
-    newInfo.disputeTime >= publicRuntimeConfig.networkConfig.disputableTime.min &&
-    newInfo.disputeTime <= publicRuntimeConfig.networkConfig.disputableTime.max;
+    newInfo.disputeTime >= +publicRuntimeConfig.networkConfig.disputableTime.min &&
+    newInfo.disputeTime <= +publicRuntimeConfig.networkConfig.disputableTime.max;
   const isValidCouncilAmount =
-    newInfo.councilAmount >= publicRuntimeConfig.networkConfig.councilAmount.min &&
-    newInfo.councilAmount <= publicRuntimeConfig.networkConfig.councilAmount.max;
+    newInfo.councilAmount >= +publicRuntimeConfig.networkConfig.councilAmount.min &&
+    newInfo.councilAmount <= +publicRuntimeConfig.networkConfig.councilAmount.max;
 
   function showTextOrDefault(text: string, defaultText: string) {
     return text?.trim() === "" ? defaultText : text;
@@ -586,10 +586,10 @@ export default function Settings() {
                     classSymbol={"text-ligth-gray"}
                     label={t("custom-network:dispute-time")}
                     symbol={t("misc.seconds")}
-                    max={publicRuntimeConfig.networkConfig.disputableTime.max}
+                    max={+publicRuntimeConfig.networkConfig.disputableTime.max}
                     description={t("custom-network:errors.dispute-time", {
-                      min: publicRuntimeConfig.networkConfig.disputableTime.min,
-                      max: formatNumberToCurrency(publicRuntimeConfig.networkConfig.disputableTime.max, 0)
+                      min: +publicRuntimeConfig.networkConfig.disputableTime.min,
+                      max: formatNumberToCurrency(+publicRuntimeConfig.networkConfig.disputableTime.max, 0)
                     })}
                     value={newInfo.disputeTime}
                     error={!isValidDisputeTime}
@@ -608,9 +608,9 @@ export default function Settings() {
                   <InputNumber
                     classSymbol={"text-ligth-gray"}
                     label={t("custom-network:percentage-for-dispute")}
-                    max={publicRuntimeConfig.networkConfig.disputesPercentage}
+                    max={+publicRuntimeConfig.networkConfig.disputesPercentage}
                     description={t("custom-network:errors.percentage-for-dispute",
-                      { max: publicRuntimeConfig.networkConfig.disputesPercentage })}
+                      { max: +publicRuntimeConfig.networkConfig.disputesPercentage })}
                     symbol="%"
                     value={newInfo.percentageForDispute}
                     error={!isValidPercentageForDispute}
@@ -628,10 +628,10 @@ export default function Settings() {
                   <InputNumber
                     classSymbol={"text-ligth-gray"}
                     label={t("custom-network:redeem-time")}
-                    max={publicRuntimeConfig.networkConfig.reedemTime.max}
+                    max={+publicRuntimeConfig.networkConfig.reedemTime.max}
                     description={t("custom-network:errors.redeem-time", {
-                      min: publicRuntimeConfig.networkConfig.reedemTime.min,
-                      max: publicRuntimeConfig.networkConfig.reedemTime.max
+                      min: +publicRuntimeConfig.networkConfig.reedemTime.min,
+                      max: +publicRuntimeConfig.networkConfig.reedemTime.max
                     })}
                     symbol="seconds"
                     value={newInfo.redeemTime}
@@ -652,10 +652,10 @@ export default function Settings() {
                     classSymbol={"text-primary"}
                     label={t("custom-network:council-amount")}
                     symbol={t("$bepro")}
-                    max={publicRuntimeConfig.networkConfig.councilAmount.max}
+                    max={+publicRuntimeConfig.networkConfig.councilAmount.max}
                     description={t("custom-network:errors.council-amount", {
-                      min: formatNumberToCurrency(publicRuntimeConfig.networkConfig.councilAmount.min, 0),
-                      max: formatNumberToCurrency(publicRuntimeConfig.networkConfig.councilAmount.max, 0)
+                      min: formatNumberToCurrency(+publicRuntimeConfig.networkConfig.councilAmount.min, 0),
+                      max: formatNumberToCurrency(+publicRuntimeConfig.networkConfig.councilAmount.max, 0)
                     })}
                     value={newInfo.councilAmount}
                     error={!isValidCouncilAmount}
