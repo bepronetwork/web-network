@@ -46,9 +46,9 @@ export default function useBepro(props?: IUseBeProDefault) {
                                        activeNetwork);
       dispatch(disputeTx);
       await BeproService.network
-        .disputeMerge(networkIssue._id, +proposalscMergeId)
+        .disputeBountyProposal(+networkIssue.id, +proposalscMergeId)
         .then((txInfo) => {
-          processEvent("dispute-proposal", txInfo.blockNumber, networkIssue._id);
+          //processEvent("dispute-proposal", txInfo.blockNumber, networkIssue._id);
           txWindow.updateItem(disputeTx.payload.id,
                               parseTransaction(txInfo, disputeTx.payload));
           onSuccess?.(txInfo);
@@ -324,7 +324,7 @@ export default function useBepro(props?: IUseBeProDefault) {
            ...(tx.payload as any),
            status: TransactionStatus.failed
          }));
-
+        console.log(error);
         onError?.(error);
         reject(error);
       });

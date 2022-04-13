@@ -15,12 +15,10 @@ import ProposalListAddresses from "components/proposal-list-addresses";
 import ProposalPullRequestDetail from "components/proposal-pullrequest-details";
 
 import { ApplicationContext } from "contexts/application";
-import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/add-toast";
 
-import { handlePercentage } from "helpers/handlePercentage";
 
 import { ProposalExtended } from "interfaces/bounty";
 import { pullRequest } from "interfaces/issue-data";
@@ -29,6 +27,8 @@ import {
   IDistribuitonPerUser
 } from "interfaces/proposal";
 
+import { BeproService } from "services/bepro-service";
+
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 
@@ -36,7 +36,7 @@ export default function PageProposal() {
   const router = useRouter();
   const { dispatch } = useContext(ApplicationContext);
   const { t } = useTranslation();
-  const { getUserOf, mergeClosedIssue, processEvent } = useApi();
+  const { getUserOf, processEvent } = useApi();
   const { handlerDisputeProposal, handleCloseIssue } = useBepro();
   const { activeIssue, networkIssue, getNetworkIssue, updateIssue } = useIssue();
   const { activeNetwork } = useNetwork();
@@ -74,7 +74,13 @@ export default function PageProposal() {
   }
 
   async function disputeProposal() {
-    handlerDisputeProposal(+proposal?.scMergeId).then(() => {
+    handlerDisputeProposal(+proposal?.scMergeId)
+    .then(txInfo => {
+      const { blockNumber } = txInfo as any;
+
+      return processEvent('proposal/disputed', blockNumber, undefined, undefined, activeNetwork?.name);
+    })
+    .then(() => {
       getNetworkIssue();
     });
   }
@@ -87,8 +93,16 @@ export default function PageProposal() {
       
       const { githubLogin } = await getUserOf(detail.recipient);
       const oracles = networkProposal?.details[i]?.percentage.toString();
+      const distributedAmount = 
+        await BeproService.calculateDistributedAmounts(networkIssue.tokenAmount, [detail.percentage]);
 
-      return { githubLogin, percentage: detail.percentage, address: detail.recipient, oracles };
+      return { 
+        githubLogin, 
+        percentage: detail.percentage, 
+        address: detail.recipient, 
+        oracles, 
+        distributedAmount: distributedAmount.proposals[0] 
+      };
     }
     const maping = networkProposal?.details?.map(mapUser) || [];
     await Promise.all(maping).then(setUsersDistribution);

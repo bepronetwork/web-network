@@ -240,9 +240,16 @@ class BeproFacet {
 
     await transactional.loadContract();
 
+    const network = await this.getNetworkObj();
+
     return bountyParser({
       ...bounty,
-      tokenAmount: fromSmartContractDecimals(bounty.tokenAmount, transactional.decimals)
+      tokenAmount: fromSmartContractDecimals(bounty.tokenAmount, transactional.decimals),
+      proposals: bounty.proposals.map(proposal => ({
+        ...proposal, 
+        oracles: fromSmartContractDecimals(+proposal.oracles, network.settlerToken.decimals),
+        disputeWeight: fromSmartContractDecimals(+proposal.disputeWeight, this.network.settlerToken.decimals)
+      }))
     });
   }
 
@@ -363,6 +370,12 @@ class BeproFacet {
   // TODO getNetworksQuantity
   // TODO getNetworkAdressByCreator
   // TODO getTokensLockedByAddress
+
+  async calculateDistributedAmounts(bountyAmount: number, percentages: number[]) {
+    const network = await this.getNetworkObj();
+
+    return network.calculateDistributedAmounts(bountyAmount, percentages);
+  }
 
   // Getters and Setters
 

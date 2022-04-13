@@ -161,8 +161,8 @@ function OraclesActions() {
 
   function getMaxAmmount(): number {
     return (
-      (action === t("my-oracles:actions.lock.label") &&
-        wallet?.balance?.bepro) ||
+      action === t("my-oracles:actions.lock.label") ?
+        wallet?.balance?.bepro :
       +wallet?.balance?.oracles?.locked
     );
   }

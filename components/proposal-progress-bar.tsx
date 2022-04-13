@@ -107,7 +107,7 @@ export default function ProposalProgressBar({
           </h4>
           <div className="caption-small d-flex align-items-center mb-4">
             <span className={`text-${issueColor} text-uppercase`}>
-              {formatNumberToString(issueDisputeAmount, 0)}{" "}
+              {formatNumberToNScale(issueDisputeAmount)}{" "}
             </span>{" "}
             /{formatNumberToNScale(stakedAmount)}{" "}
             <Translation label="$oracles" />{" "}

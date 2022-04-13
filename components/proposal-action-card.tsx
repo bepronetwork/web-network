@@ -88,6 +88,7 @@ export default function ProposalActionCard({
               >
                 {!currentPullRequest?.isMergeable ||
                   isDisputable ||
+                  networkProposal?.isDisputed ||
                   proposal?.isMerged ? (
                     <LockedIcon width={12} height={12} className="mr-1" />
                   ) : undefined}

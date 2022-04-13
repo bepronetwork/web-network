@@ -8,13 +8,14 @@ import ProposalProgressSmall from "components/proposal-progress-small";
 
 import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
+import { useNetwork } from "contexts/network";
 
 import { isProposalDisputable } from "helpers/proposal";
 
 import { IssueData } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
-
+import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network";
 
@@ -38,6 +39,9 @@ export default function ProposalItem({
   const { networkIssue, getNetworkIssue } = useIssue();
   const { handlerDisputeProposal } = useBepro();
   const { getURLWithNetwork } = useNetworkTheme();
+  const { activeNetwork } = useNetwork();
+  const { processEvent } = useApi();
+  
   const networkProposals = networkIssue?.proposals?.[proposal?.contractId];
   const networkPullRequest = networkIssue?.pullRequests?.[networkProposals?.prId];
 
@@ -51,8 +55,14 @@ export default function ProposalItem({
     .some(v => v)
 
   async function handleDispute() {
-    if (isDisable || networkIssue?.finalized) return;
-    handlerDisputeProposal(+proposal.scMergeId).then(() =>
+    if (!isDisputable || isFinalized) return;
+    handlerDisputeProposal(+proposal.scMergeId)
+    .then(txInfo => {
+      const { blockNumber } = txInfo as any;
+
+      return processEvent('proposal/disputed', blockNumber, undefined, undefined, activeNetwork?.name);
+    })
+    .then(() =>
       getNetworkIssue());
   }
 

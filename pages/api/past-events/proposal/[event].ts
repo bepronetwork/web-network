@@ -11,7 +11,7 @@ import { ProposalHelpers } from "helpers/api/proposal";
 
 const eventsMapping = {
   "created": ["getBountyProposalCreatedEvents", "readProposalCreated"],
-  "canceled": ["getBountyCanceledEvents", "readBountyCanceled"]
+  "disputed": ["getBountyProposalDisputedEvents", "readProposalDisputed"]
 }
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
