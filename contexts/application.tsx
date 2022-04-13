@@ -1,4 +1,4 @@
-import React, {
+import {
   createContext,
   Dispatch,
   useEffect,
@@ -7,7 +7,7 @@ import React, {
 } from "react";
 
 import { useRouter } from "next/router";
-import { setCookie, parseCookies } from "nookies";
+import { parseCookies, setCookie } from "nookies";
 import sanitizeHtml from "sanitize-html";
 
 import Loading from "components/loading";

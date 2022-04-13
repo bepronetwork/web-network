@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import {CURRENCY_ID, CURRENCY_VSLIST} from 'env'
+
+import getConfig from "next/config";
 
 import TransactionIcon from "assets/icons/transaction";
 
@@ -8,10 +9,12 @@ import Modal from "components/modal";
 
 import { formatNumberToNScale } from "helpers/formatNumber";
 
-import InputNumber from "./input-number";
-import ReactSelect from "./react-select";
 import useApi from "x-hooks/use-api";
 
+import InputNumber from "./input-number";
+import ReactSelect from "./react-select";
+
+const { publicRuntimeConfig } = getConfig()
 interface IPriceConversiorModalProps{
   show: boolean;
   onClose: ()=> void;
@@ -31,7 +34,7 @@ export default function PriceConversorModal({
   
 
   async function handlerChange({value, label}){
-    const data = await getCurrencyByToken(CURRENCY_ID, value)
+    const data = await getCurrencyByToken(publicRuntimeConfig.currency.currencyId, value)
     setCurrentCurrency({value, label})
     setCurrentPrice(data[value])
   }
@@ -39,7 +42,7 @@ export default function PriceConversorModal({
   useEffect(()=>{
     let currencyList;
     try {
-      const list = JSON.parse(CURRENCY_VSLIST)
+      const list = JSON.parse(publicRuntimeConfig.currency.currencyCompareList)
       currencyList = Array.isArray(list) ? list : defaultValue;
     } catch (error) {
       currencyList = defaultValue;

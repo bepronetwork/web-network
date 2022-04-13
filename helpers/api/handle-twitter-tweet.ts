@@ -1,9 +1,10 @@
+import getConfig from "next/config";
 import { TwitterApi } from "twitter-api-v2";
 
 import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { IssueState } from "interfaces/issue-data";
-
+const { publicRuntimeConfig, serverRuntimeConfig } = getConfig()
 function handleState(currentState: IssueState) {
   switch (currentState) {
   case "draft": {
@@ -54,16 +55,16 @@ export default function twitterTweet({
   };
 }) {
   if (
-    process.env.NEXT_TWITTER_APIKEY &&
-    process.env.NEXT_TWITTER_APIKEY_SECRET &&
-    process.env.NEXT_TWITTER_ACCESS_TOKEN &&
-    process.env.NEXT_TWITTER_ACCESS_SECRET
-  ) {
+    serverRuntimeConfig.twitter.apiKey && 
+    serverRuntimeConfig.twitter.apiSecret && 
+    serverRuntimeConfig.twitter.accessToken && 
+    serverRuntimeConfig.twitter.accessSecret 
+    ) {
     const twitterClient = new TwitterApi({
-      appKey: process.env.NEXT_TWITTER_APIKEY,
-      appSecret: process.env.NEXT_TWITTER_APIKEY_SECRET,
-      accessToken: process.env.NEXT_TWITTER_ACCESS_TOKEN,
-      accessSecret: process.env.NEXT_TWITTER_ACCESS_SECRET
+      appKey: serverRuntimeConfig.twitter.apiKey,
+      appSecret: serverRuntimeConfig.twitter.apiSecret,
+      accessToken: serverRuntimeConfig.twitter.accessToken,
+      accessSecret: serverRuntimeConfig.twitter.accessSecret,
     });
 
     let title: string;
@@ -107,7 +108,7 @@ export default function twitterTweet({
 
   ${body}
  
-  ${process.env.NEXT_PUBLIC_HOME_URL}/bounty?id=${issue.githubId}&repoId=${
+  ${publicRuntimeConfig.homeUrl}/bounty?id=${issue.githubId}&repoId=${
       issue.repository_id
     }
   `;

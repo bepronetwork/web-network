@@ -1,9 +1,9 @@
 import axios from "axios";
-
-import { API } from "../env";
+import getConfig from "next/config";
+const { publicRuntimeConfig } = getConfig()
 
 const api = axios.create({
-  baseURL: `${API}/api`
+  baseURL: `${publicRuntimeConfig.apiUrl}/api`
 });
 
 api.interceptors.response.use((response) => response,

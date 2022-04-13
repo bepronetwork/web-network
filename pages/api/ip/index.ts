@@ -1,9 +1,12 @@
 import axios from "axios";
 import withCors from 'middleware/withCors';
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
+const {serverRuntimeConfig} = getConfig()
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  if (process.env.SKIP_IP_API === "1")
+  const key = serverRuntimeConfig.ipApi.key;
+  if (serverRuntimeConfig.ipApi.skip)
     return res.status(200).json({ countryCode: "PT" });
 
   console.log({
@@ -17,7 +20,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const ip = req.headers["cf-connecting-ip"] || req.connection?.remoteAddress;
 
   const response = await axios
-    .get(`https://pro.ip-api.com/json/${ip}?key=${process.env.IP_API_KEY}&fields=status,message,countryCode,country`)
+    .get(`https://pro.ip-api.com/json/${ip}?key=${key}&fields=status,message,countryCode,country`)
     .catch((error) => {
       return error.response;
     });

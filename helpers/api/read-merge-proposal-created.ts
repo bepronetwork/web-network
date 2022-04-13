@@ -1,8 +1,10 @@
-import { CONTRACT_ADDRESS } from "env";
+
+import getConfig from "next/config";
 
 import { Bus } from "helpers/bus";
 
 import twitterTweet from "./handle-twitter-tweet";
+const { publicRuntimeConfig } = getConfig()
 
 export default async function readMergeProposalCreated(events,
                                                        { network, models, res, githubId, networkId }) {
@@ -47,7 +49,7 @@ export default async function readMergeProposalCreated(events,
       githubLogin: user?.githubLogin
     });
 
-    if (network.contractAddress === CONTRACT_ADDRESS)
+    if (network.contractAddress === publicRuntimeConfig.contract.address)
       twitterTweet({
         type: "proposal",
         action: "created",

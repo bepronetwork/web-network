@@ -1,4 +1,5 @@
-import { Web3Connection, Network, ERC20, NetworkFactory } from "bepro-js";
+import { ERC20, Network, NetworkFactory, Web3Connection } from "bepro-js";
+import getConfig from "next/config";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import {
@@ -6,18 +7,11 @@ import {
   SimpleBlockTransactionPayload
 } from "interfaces/transaction";
 
-import {
-  CONTRACT_ADDRESS,
-  SETTLER_ADDRESS,
-  WEB3_CONNECTION,
-  NETWORK_FACTORY_ADDRESS
-} from "../env";
 
+const { publicRuntimeConfig } = getConfig()
 class BeproFacet {
   readonly bepro: Web3Connection = new Web3Connection({
-    web3Host: WEB3_CONNECTION
-    //privateKey: process.env.NEXT_PUBLIC_WALLET_PRIVATE_KEY,
-    //debug: true
+    web3Host: publicRuntimeConfig.web3ProviderConnection
   });
 
   erc20: ERC20;
@@ -42,9 +36,9 @@ class BeproFacet {
       if (!this.started) await this.bepro.start();
 
       this.network = new Network(this.bepro,
-        customNetworkAddress || CONTRACT_ADDRESS);
+        customNetworkAddress || publicRuntimeConfig.contract.address);
 
-      this.erc20 = new ERC20(this.bepro, SETTLER_ADDRESS);
+      this.erc20 = new ERC20(this.bepro, publicRuntimeConfig.contract.settler);
 
       await this.network.loadContract();
 
@@ -62,13 +56,13 @@ class BeproFacet {
 
   async startNetworkFactory() {
     try {
-      if (!NETWORK_FACTORY_ADDRESS)
+      if (!publicRuntimeConfig.networkConfig.factoryAddress)
         console.error("Network Factory Contract is Missing");
       else {
         this.networkFactoryStarted = false;
 
         this.networkFactory = new NetworkFactory(this.bepro,
-          NETWORK_FACTORY_ADDRESS);
+          publicRuntimeConfig.networkConfig.factoryAddress);
 
         await this.networkFactory.loadContract();
 
@@ -253,7 +247,7 @@ class BeproFacet {
   }
 
   async createNetwork() {
-    return this.networkFactory.createNetwork(SETTLER_ADDRESS, SETTLER_ADDRESS);
+    return this.networkFactory.createNetwork(publicRuntimeConfig.contract.settler, publicRuntimeConfig.contract.settler);
   }
 
   async claimNetworkGovernor(networkAddress) {

@@ -1,8 +1,9 @@
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 
 import clsx from "clsx";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import getConfig from "next/config";
 import { useRouter } from "next/router";
 import { GetServerSideProps } from "next/types";
 
@@ -35,7 +36,7 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network";
 import useTransactions from "x-hooks/useTransactions";
-
+const { publicRuntimeConfig } = getConfig()
 interface Amount {
   value?: string;
   formattedValue: string;
@@ -86,7 +87,7 @@ export default function PageCreateIssue() {
     const strFiles = files?.map((file) =>
         file.uploaded &&
         `${file?.type?.split("/")[0] === "image" ? "!" : ""}[${file.name}](${
-          process.env.NEXT_PUBLIC_IPFS_BASE
+          publicRuntimeConfig.ipfsUrl
         }/${file.hash}) \n\n`);
     return `${str}\n\n${strFiles
       .toString()

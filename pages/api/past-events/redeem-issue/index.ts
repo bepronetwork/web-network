@@ -1,6 +1,6 @@
 import models from "db/models";
-import { CONTRACT_ADDRESS } from "env";
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
@@ -10,6 +10,8 @@ import { Bus } from "helpers/bus";
 import { handleNetworkAddress } from 'helpers/custom-network';
 
 import api from "services/api";
+
+const { publicRuntimeConfig } = getConfig()
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { fromBlock, id, networkName } = req.body;
@@ -25,7 +27,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   if (!customNetwork) return res.status(404).json("Invalid network");
   if (customNetwork.isClosed) return res.status(404).json("Invalid network");
 
-  const octokit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
+  const octokit = new Octokit({ auth: publicRuntimeConfig.github.token });
 
   const network = networkBeproJs({ contractAddress: handleNetworkAddress(customNetwork.networkAddress) });
 
@@ -64,7 +66,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         });
         issue.state = "canceled";
 
-        if (network.contractAddress === CONTRACT_ADDRESS)
+        if (network.contractAddress === publicRuntimeConfig.contract.address)
           twitterTweet({
             type: "bounty",
             action: "changes",

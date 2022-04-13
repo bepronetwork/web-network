@@ -1,12 +1,14 @@
 import models from "db/models";
 import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
+import getConfig from "next/config";
+const { serverRuntimeConfig } = getConfig()
 
 export default NextAuth({
   providers: [
     GithubProvider({
-      clientId: process.env.NEXT_PUBLIC_GH_CLIENT_ID,
-      clientSecret: process.env.GH_SECRET,
+      clientId: serverRuntimeConfig.github.clientId,
+      clientSecret: serverRuntimeConfig.github.secret,
       authorization:
         "https://github.com/login/oauth/authorize?scope=read:user+user:email+repo",
       profile(profile: { id; name; login; email; avatar_url }) {
