@@ -7,7 +7,7 @@ import React, {
   useEffect
 } from "react";
 
-import { fromSmartContractDecimals } from "bepro-js";
+import { fromSmartContractDecimals } from "@taikai/dappkit";
 import { useRouter } from "next/router";
 
 import {
@@ -140,7 +140,6 @@ export const IssueProvider: React.FC = function ({ children }) {
           disputedValue === 0,
           isDisputed,
         ].some(v=>v)
-        debugger;
 
         networkProposals[proposalId] = {
           ...merge,
