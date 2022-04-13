@@ -7,6 +7,7 @@ import React, {
   useEffect
 } from "react";
 
+import { fromSmartContractDecimals } from "bepro-js";
 import { useRouter } from "next/router";
 
 import {
@@ -121,27 +122,37 @@ export const IssueProvider: React.FC = function ({ children }) {
     const networkProposals: INetworkProposal[] = [];
 
     for (const meta of activeIssue.mergeProposals) {
-      const { scMergeId, id: proposalId } = meta;
+      const { scMergeId, id: proposalId, issueId } = meta;
 
       if (scMergeId) {
-        const merge = await BeproService.network.getMergeById(+network?._id,
-                                                              +scMergeId);
-
-        const isDisputed = activeIssue?.merged
-          ? activeIssue?.merged !== scMergeId
-          : await BeproService.network.isMergeDisputed(+network?._id,
-                                                       +scMergeId);
+        const [merge, disputedValue, isMergeDisputed] = await Promise.all([
+          BeproService.network.getMergeById(+network?._id, +scMergeId),
+          fromSmartContractDecimals(await BeproService.network.disputesForMergeByAddress(issueId, +scMergeId, wallet.address)),
+          await BeproService.network.isMergeDisputed(+network?._id, +scMergeId)
+        ])
+        
+        const isDisputed = [
+          activeIssue?.merged && activeIssue?.merged !== scMergeId,
+          isMergeDisputed,
+        ].some(v=>v)
+        
+        const canUserDispute = [
+          disputedValue === 0,
+          isDisputed,
+        ].some(v=>v)
+        debugger;
 
         networkProposals[proposalId] = {
           ...merge,
-          isDisputed
+          isDisputed,
+          canUserDispute
         };
       }
     }
 
     setNetworkIssue({ ...network, isDraft, networkProposals });
     return { ...network, isDraft, networkProposals };
-  }, [activeIssue, wallet?.address, beproServiceStarted]);
+  }, [activeIssue, wallet, beproServiceStarted]);
 
   useEffect(() => {
     if (activeIssue && wallet?.address && beproServiceStarted) {
@@ -154,7 +165,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     if (query.id && query.repoId) {
       if (
         query.id !== activeIssue?.githubId ||
-        +query.repoId !== +activeIssue?.repository_id && !noExpired
+        +query.repoId !== +activeIssue?.repository_id || !noExpired
       ) {
         setActiveIssue(null);
         updateIssue(`${query.repoId}`, `${query.id}`);

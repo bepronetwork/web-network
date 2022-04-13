@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 
-import { BEPRO_NETWORK_NAME, IPFS_BASE } from "env";
+import { BEPRO_NETWORK_NAME, CURRENCY_ID, IPFS_BASE } from "env";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
@@ -28,13 +28,12 @@ interface NetworkListItemProps {
 export default function NetworkListItem({
   network,
   redirectToHome = false,
-  updateNetworkParameter = (networkName, parameter, value) => {},
-  ...props
+  updateNetworkParameter,
 }: NetworkListItemProps) {
   const router = useRouter();
   const { t } = useTranslation("common");
 
-  const { getBeproCurrency } = useApi();
+  const { getCurrencyByToken } = useApi();
   const { getURLWithNetwork } = useNetwork();
 
   const { dispatch } = useContext(ApplicationContext);
@@ -80,7 +79,7 @@ export default function NetworkListItem({
       })
       .then((amount) => {
         BeproService.getNetworkObj(handleNetworkAddress(network)).then((networkObj) => {
-          getBeproCurrency(networkObj.transactionToken.contractAddress).then(({ usd }) => {
+          getCurrencyByToken(CURRENCY_ID, 'usd').then(({ usd }) => {
             dispatch(changeNetworksSummary({
                     label: "amountInNetwork",
                     amount: amount * usd,

@@ -39,10 +39,9 @@ export const DISPUTE_PERCENTAGE_MAX =
   process.env.NEXT_PUBLIC_DISPUTE_PERCENTAGE_MAX || 15;
 export const BEPRO_NETWORK_NAME =
   process.env.NEXT_PUBLIC_BEPRO_NETWORK_NAME || "bepro";
-export const CURRENCY_BEPRO_API =
-  process.env.NEXT_PUBLIC_CURRENCY_API ||
-  "https://api.coingecko.com/api/v3/coins/ethereum/contract";
-export const PRODUCTION_CONTRACT = process.env.NEXT_PUBLIC_PRODUCTION_CONTRACT;
-export const USE_PRODUCTION_CONTRACT_CONVERSION =
-  process.env.NEXT_PUBLIC_USE_PRODUCTION_CONTRACT;
+
 export const BEPRO_GITHUB_USER = process.env.NEXT_PUBLIC_BEPRO_GITHUB_USER;
+
+export const CURRENCY_API = process.env.NEXT_PUBLIC_CURRENCY_API;
+export const CURRENCY_ID = process.env.NEXT_PUBLIC_CURRENCY_ID;
+export const CURRENCY_VSLIST = process.env.NEXT_PUBLIC_CURRENCY_VSLIST;

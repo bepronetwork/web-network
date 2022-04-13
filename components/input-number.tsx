@@ -21,7 +21,6 @@ export default function InputNumber({
   warning = false,
   errorMessage,
   setMaxValue,
-  max,
   description,
   ...params
 }: InputNumberProps): JSX.Element {

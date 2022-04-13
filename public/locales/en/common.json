@@ -29,7 +29,9 @@
     }
   },
   "account": {
-    "hero": {}
+    "hero": {},
+    "payments": "Payments",
+    "payments-notfound": "you haven’t received any payments."
   },
   "heroes": {
     "in-progress": "Bounties in progress",
@@ -94,6 +96,7 @@
     "take-back": "Take Back",
     "install": "Install",
     "try-again": "Try Again",
+    "view-bounties": "View Bounties",
     "reconnect-account": "Reconnect account",
     "unlock-all": "Unlock all",
     "back-to-top": "Back to Top"
@@ -215,6 +218,10 @@
         "label": "Select a branch"
       }
     }
+  },
+  "labels":{
+    "recived": "Recived",
+    "recivedintotal": "Recived in total"
   },
   "errors": {
     "approve-transaction": "Failed to approve transaction",
