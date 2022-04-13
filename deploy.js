@@ -2,6 +2,7 @@ const {
   Web3Connection,
   ERC20,
   NetworkFactory,
+  BountyToken,
   Network_v2,
   toSmartContractDecimals
 } = require("@taikai/dappkit");
@@ -9,9 +10,9 @@ const {
 const cap = toSmartContractDecimals("50000000", 18);
 
 const connection = new Web3Connection({
-  web3Host: "http://127.0.0.1:7545",
+  web3Host: "HTTP://127.0.0.1:7545",
   privateKey:
-    "b1bfe68577f6fd3b0dab8cd484b5731f6b9979c18f1eb932d44853bff0f66990",
+    "d31ee57bf341f3c953895ca0b9c68f43daccabe2d97237a854fa9a893f064d10",
   debug: true,
   skipWindowAssignment: true
 });
@@ -33,6 +34,21 @@ const DeployERC20 = async (tokenName, tokenSymbol, capital) => {
   return tx.contractAddress;
 };
 
+const DeployBountyToken = async (tokenName, tokenSymbol) => {
+  const deployer = new BountyToken(connection);
+
+  await deployer.loadAbi();
+
+  const address = await deployer.connection.getAddress();
+
+  const tx = await deployer.deployJsonAbi(
+    tokenName,
+    tokenSymbol
+  );
+
+  return tx.contractAddress;
+};
+
 const DeployNetwork_v2 = async (settlerAddress, nftAddress, nftUri) => {
   const deployer = new Network_v2(connection);
 
@@ -47,27 +63,39 @@ const main = async () => {
   await connection.start();
 
   const settler = await DeployERC20("Settler", "STL", cap);
-  const transactional = await DeployERC20("Transactional", "$TRS", cap);
+  const transactional = await DeployERC20("Transactional", "TRS", cap);
   const reward = await DeployERC20("Reward", "RWD", cap);
-  const nft = await DeployERC20("NFT", "NFT", cap);
-  const network = await DeployNetwork_v2(settler, nft, "//");
+  const bountyToken = await DeployBountyToken("NFT", "NFT");
+  const network = await DeployNetwork_v2(settler, bountyToken, "//");
   //await TokenSummary(SETTLER_TOKEN.name, SETTLER_TOKEN.address);
   //await TokenSummary(NETWORK_TOKEN.name, NETWORK_TOKEN.address);
   //await DeployNetworkFactory();
 
-  console.table({
-    settler,
-    transactional,
-    reward,
-    nft,
-    network
-  });
-
   const settlerObj = new ERC20(connection, settler);
+  const nftObj = new BountyToken(connection, bountyToken);
+  const transactionalObj = new ERC20(connection, transactional);
   const networkObj = new Network_v2(connection, network);
 
   await settlerObj.loadContract();
   await networkObj.loadContract();
+  await nftObj.loadContract();
+  await transactionalObj.loadContract();
+
+  await settlerObj.approve(network, 1000000);
+  await transactionalObj.approve(network, 1000000);
+  await nftObj.setDispatcher(network);
+
+  await networkObj.changeDraftTime(61);
+  await networkObj.changeDisputableTime(61);
+  await networkObj.changeCouncilAmount(102000);
+
+  return console.table({
+    settler,
+    transactional,
+    reward,
+    bountyToken,
+    network
+  });
 
   await settlerObj.approve(networkObj.contractAddress, 1000000);
   await networkObj.lock(205000);
