@@ -1,8 +1,9 @@
-import models from "db/models";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
+
+import models from "db/models";
 
 import twitterTweet from "helpers/api/handle-twitter-tweet";
 
@@ -122,7 +123,7 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
 
       return res.status(200).json("ok");
     })
-    .catch((_) => res.status(422).json("nok"));
+    .catch(() => res.status(422).json("nok"));
 }
 
 export default async function Issue(req: NextApiRequest, res: NextApiResponse) {

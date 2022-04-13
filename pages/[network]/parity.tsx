@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { ListGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
 
 import { NetworkFactory, toSmartContractDecimals } from "@taikai/dappkit";
+import { ERC20 } from "@taikai/dappkit";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -337,12 +338,15 @@ export default function ParityPage() {
       });
   }
 
-  function deploySettlerToken() {
-    BeproService.erc20
-      .deployJsonAbi(settlerTokenName,
-                     settlerTokenSymbol,
-                     +toSmartContractDecimals(10, 18),
-                     wallet?.address)
+  async function deploySettlerToken() {
+    const erc20 = new ERC20(BeproService.bepro);
+
+    await erc20.loadContract();
+
+    erc20.deployJsonAbi(settlerTokenName,
+                        settlerTokenSymbol,
+                        +toSmartContractDecimals(10, 18),
+                        wallet?.address)
       .then((txInfo) => {
         console.debug(txInfo);
         dispatch(toastInfo("Deployed!"));

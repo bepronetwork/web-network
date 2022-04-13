@@ -9,7 +9,6 @@ import { Op } from "sequelize";
 import models from "db/models";
 
 import networkBeproJs from "helpers/api/handle-network-bepro";
-import twitterTweet from "helpers/api/handle-twitter-tweet";
 import paginate from "helpers/paginate";
 
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
@@ -39,8 +38,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     where.issueId = issue.id;
   }
-
-  const include = [{ association: "issue" }];
 
   where.status = {
     [Op.ne]: "pending"

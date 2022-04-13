@@ -1,9 +1,10 @@
-import Database from "db/models";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
+
+import Database from "db/models";
 
 import Bepro from "helpers/api/bepro-initializer";
 

@@ -117,51 +117,53 @@ export default function NewNetwork() {
 
     await BeproService.startNetworkFactory();
 
-    BeproService.createNetwork()
-      .then(() => {
-        BeproService.getNetworkAdressByCreator(wallet.address).then(async (networkAddress) => {
-          const networkData = steps.network.data;
-          const repositoriesData = steps.repositories;
+    // TODO
 
-          await BeproService.claimNetworkGovernor(networkAddress);
+    // BeproService.createNetwork()
+    //   .then(() => {
+    //     BeproService.getNetworkAdressByCreator(wallet.address).then(async (networkAddress) => {
+    //       const networkData = steps.network.data;
+    //       const repositoriesData = steps.repositories;
 
-          const json = {
-              name: networkData.displayName.data,
-              description: networkData.networkDescription,
-              colors: JSON.stringify(networkData.colors.data),
-              logoIcon: await psReadAsText(networkData.logoIcon.raw),
-              fullLogo: await psReadAsText(networkData.fullLogo.raw),
-              repositories: JSON.stringify(repositoriesData.data
-                  .filter((repo) => repo.checked)
-                  .map(({ name, fullName }) => ({ name, fullName }))),
-              botPermission: repositoriesData.permission,
-              creator: wallet.address,
-              githubLogin: user.login,
-              networkAddress,
-              accessToken: user?.accessToken,
-          };
+    //       await BeproService.claimNetworkGovernor(networkAddress);
 
-          createNetwork(json).then(() => {
-            router.push(getURLWithNetwork("/account/my-network/settings", {
-                  network: json.name,
-            }));
+    //       const json = {
+    //           name: networkData.displayName.data,
+    //           description: networkData.networkDescription,
+    //           colors: JSON.stringify(networkData.colors.data),
+    //           logoIcon: await psReadAsText(networkData.logoIcon.raw),
+    //           fullLogo: await psReadAsText(networkData.fullLogo.raw),
+    //           repositories: JSON.stringify(repositoriesData.data
+    //               .filter((repo) => repo.checked)
+    //               .map(({ name, fullName }) => ({ name, fullName }))),
+    //           botPermission: repositoriesData.permission,
+    //           creator: wallet.address,
+    //           githubLogin: user.login,
+    //           networkAddress,
+    //           accessToken: user?.accessToken,
+    //       };
 
-            setCreatingNetwork(false);
-          });
-        });
-      })
-      .catch((error) => {
-        dispatch(addToast({
-            type: "danger",
-            title: t("actions.failed"),
-            content: t("custom-network:errors.failed-to-create-network", {
-              error,
-            }),
-        }));
+    //       createNetwork(json).then(() => {
+    //         router.push(getURLWithNetwork("/account/my-network/settings", {
+    //               network: json.name,
+    //         }));
 
-        setCreatingNetwork(false);
-        console.log(error);
-      });
+    //         setCreatingNetwork(false);
+    //       });
+    //     });
+    //   })
+    //   .catch((error) => {
+    //     dispatch(addToast({
+    //         type: "danger",
+    //         title: t("actions.failed"),
+    //         content: t("custom-network:errors.failed-to-create-network", {
+    //           error,
+    //         }),
+    //     }));
+
+    //     setCreatingNetwork(false);
+    //     console.log(error);
+    //   });
   }
 
   useEffect(() => {
@@ -196,18 +198,19 @@ export default function NewNetwork() {
   }, [user?.login]);
 
   useEffect(() => {
-    if (wallet?.address && beproServiceStarted && networkFactoryStarted) {
-      BeproService.getTokensLockedByAddress(wallet.address)
-        .then((value) => {
-          handleLockDataChange({ label: "amountLocked", value });
-        })
-        .catch(console.log);
+    // TODO
+    // if (wallet?.address && beproServiceStarted && networkFactoryStarted) {
+    //   BeproService.getTokensLockedByAddress(wallet.address)
+    //     .then((value) => {
+    //       handleLockDataChange({ label: "amountLocked", value });
+    //     })
+    //     .catch(console.log);
 
-      handleLockDataChange({
-        label: "amountNeeded",
-        value: BeproService.operatorAmount,
-      });
-    }
+    //   handleLockDataChange({
+    //     label: "amountNeeded",
+    //     value: BeproService.operatorAmount,
+    //   });
+    // }
   }, [
     wallet?.address,
     wallet?.balance,

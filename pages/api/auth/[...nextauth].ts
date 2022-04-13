@@ -1,8 +1,9 @@
-import models from "db/models";
 import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import getConfig from "next/config";
 const { serverRuntimeConfig } = getConfig()
+
+import models from "db/models";
 
 export default NextAuth({
   providers: [
