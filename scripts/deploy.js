@@ -1,15 +1,56 @@
 const { Web3Connection, ERC20, NetworkFactory, Network } = require("@taikai/dappkit");
+const { exit } = require("process");
+
+
+const usage =  `------------------------------------------------------------------------- 
+  WebNetwork v1 Smart Contracts Deploy Script 🚀  
+-------------------------------------------------------------------------
+
+Usage: $0 -n <network> [-u <rpcUrl> -e <env file>] 
+
+<network> =  development | moonbase | kovan | mainnet | ropsten | seneca | afrodite | custom`
+
+const epilog = 'TAIKAI Copyright 2022'
+
+function showErrorAndHelp(message) {
+  return console.error(`
+${usage}
+
+💥 Failed: ${message}
+
+${epilog}
+`);
+}
 
 const argv = require('yargs')
     .alias('e', 'envFile')
     .describe('e', 'Environment file to load')
     .default('e', '.env')
+    .option('u', {
+      alias: "url",
+      describe: "EVM RPC URL",
+      type: 'string',
+      nargs: 1,
+    })  
     .alias('n', 'network')
     .describe('n', 'Ethereum Blockchain')
     .default('n', 'development')
+    .choices(["development", "moonbase", "kovan", "mainnet","ropsten", "seneca", "afrodite", "custom"])
+    .option('k', {
+      alias: "ownerKey",
+      describe: "Owner Private key",
+      type: 'string',
+      nargs: 1,
+    })  
+    .option('a', {
+      alias: "ownerAddress",
+      describe: "Owner Eth Address",
+      type: 'string',
+      nargs: 1,
+    })  
     .alias('h', 'help')
     .help('help')
-    .usage('Usage: $0 [options] <file>')
+    .usage(usage)
     .showHelpOnFail(false, 'Specify --help for available options')
     .epilog('TAIKAI Copyright 2022').argv;
 
@@ -44,8 +85,20 @@ const networks = {
 
 async function main() {
 
-  const ownerAddress = process.env.DEPLOY_OWNER_ADDRESS;
-  const ownerPrivKey = process.env.DEPLOY_PRIVATE_KEY;
+  const ownerAddress = argv.ownerAddress || process.env.DEPLOY_OWNER_ADDRESS;
+  const ownerPrivKey = argv.ownerKey || process.env.DEPLOY_PRIVATE_KEY;
+
+  let rpcUrl = "";
+  if (argv.network == 'custom') {
+    if ( !argv.url ) {
+      showErrorAndHelp(`Please provide a valid URL for the custom network`);
+      exit(1);
+    }    
+    rpcUrl = url;
+  } else {
+    rpcUrl = networks[argv.network].url
+  }
+
   const options = { 
       web3Host: networks[argv.network].url,
       privateKey: ownerPrivKey,
@@ -57,7 +110,7 @@ async function main() {
   await web3Connection.start();
 
   // 1. Deploying Bepro Network 
-  console.log(`Deploying Bepro Network on ${argv.network}`); 
+  console.log(`Deploying Bepro Network on ${argv.network} - ${rpcUrl}`); 
   const erc20Deployer = new ERC20(web3Connection);
   // Load abi contract is only needed for deploy actions
   await erc20Deployer.loadAbi();
