@@ -126,9 +126,13 @@ export const IssueProvider: React.FC = function ({ children }) {
         ? +activeIssue?.merged !== +proposal.id
         : await BeproService.network.isProposalDisputed(+bounty.id, +proposal.id);
 
+      const isDisputedByAddress = 
+        fromSmartContractDecimals(await BeproService.network.disputes(wallet.address, bounty.id, proposal.id)) > 0;
+
       networkProposals[+proposal.id] = {
         ...proposal,
-        isDisputed
+        isDisputed,
+        canUserDispute: !isDisputedByAddress
       };
     }
 

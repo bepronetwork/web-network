@@ -21,7 +21,8 @@ interface IIssueProposalProps {
 
 export default function IssueProposals({
   issue,
-  className = ""
+  className = "",
+  networkIssue
 }: IIssueProposalProps) {
   const { activeNetwork } = useNetwork();
   const { t } = useTranslation("proposal");
@@ -35,7 +36,6 @@ export default function IssueProposals({
               key={proposal.id}
               proposal={proposal}
               issue={issue}
-              isFinalized={networkIssue?.closed}
               isDisputable={
                 isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime) &&
                 !networkIssue?.proposals[proposal.id]?.isDisputed

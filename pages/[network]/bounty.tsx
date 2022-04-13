@@ -66,6 +66,7 @@ export default function PageIssue() {
         <IssueProposals
           key="tab-proposals"
           issue={issue}
+          networkIssue={networkIssue}
           className="border-top-0"
         />
       ),

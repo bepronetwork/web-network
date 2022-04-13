@@ -46,4 +46,5 @@ export interface ProposalExtended extends Proposal {
     details: ProposalDetail[];
 
     isDisputed?: boolean;
+    canUserDispute?: boolean;
 }

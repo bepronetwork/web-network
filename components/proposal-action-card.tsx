@@ -37,11 +37,14 @@ export default function ProposalActionCard({
   const { activeNetwork } = useNetwork();
   const { wallet, user } = useAuthentication();
 
-  const isDisputable = [
-    !networkProposal?.isDisputed,
-    !networkIssue?.closed,
-    isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime)
-  ].every((v) => v);
+  const isDisable = [
+    networkIssue?.closed,
+    !isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime),
+    networkProposal?.isDisputed,
+    !networkProposal?.canUserDispute,
+    wallet?.balance?.oracles?.tokensLocked === 0,
+  ].some((v) => v);
+
   const isSuccess = [
     networkIssue?.closed,
     !networkProposal?.isDisputed && proposal?.isMerged
@@ -68,7 +71,11 @@ export default function ProposalActionCard({
             <Button
               className="flex-grow-1"
               textClass="text-uppercase text-white"
-              disabled={!currentPullRequest?.isMergeable || proposal?.isMerged || isDisputable}
+              disabled={
+                !currentPullRequest?.isMergeable ||
+                 proposal?.isMerged || 
+                 isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime)
+              }
               onClick={onMerge}
             >
               {!currentPullRequest?.isMergeable ||
@@ -78,36 +85,18 @@ export default function ProposalActionCard({
               {t("common:actions.merge")}
             </Button>
 
-            {!isSuccess && !isDisable && (
-              <Button
-                className="flex-grow-1"
-                textClass="text-uppercase text-white"
-                color="purple"
-                disabled={isDisable}
-                onClick={onDispute}
-              >
-                {!currentPullRequest?.isMergeable ||
-                  isDisputable ||
-                  networkProposal?.isDisputed ||
-                  proposal?.isMerged ? (
-                    <LockedIcon width={12} height={12} className="mr-1" />
-                  ) : undefined}
-                <span>{t("common:actions.merge")}</span>
-              </Button>
-
-              {!isSuccess && isDisputable && (
+              {!isSuccess && !isDisable && (
                 <Button
                   className="flex-grow-1"
                   textClass="text-uppercase text-white"
                   color="purple"
-                  disabled={!isDisputable}
+                  disabled={isDisable}
                   onClick={onDispute}
                 >
                   {t("common:actions.dispute")}
                 </Button>
               )}
             </div>
-          }
         </div>
       </div>
     </div>

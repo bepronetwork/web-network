@@ -27,12 +27,14 @@ interface Options {
   proposal: Proposal;
   issue: IssueData;
   disputableTime?: number;
+  isDisputable: boolean;
 }
 
 export default function ProposalItem({
   proposal,
   issue,
   disputableTime,
+  isDisputable
 }: Options) {
 
   const { wallet } = useAuthentication()
@@ -46,16 +48,16 @@ export default function ProposalItem({
   const networkPullRequest = networkIssue?.pullRequests?.[networkProposals?.prId];
 
   const isDisable = [
-      networkIssue?.finalized,
+      networkIssue?.closed,
       !isProposalDisputable(proposal?.createdAt, disputableTime),
-      networkIssue?.networkProposals[proposal.id]?.isDisputed,
-      !networkIssue?.networkProposals[proposal.id]?.canUserDispute,
+      networkIssue?.proposals[proposal.contractId]?.isDisputed,
+      !networkIssue?.proposals[proposal.id]?.canUserDispute,
       wallet?.balance?.oracles?.tokensLocked === 0,
   ]
     .some(v => v)
 
   async function handleDispute() {
-    if (!isDisputable || isFinalized) return;
+    if (!isDisputable || networkIssue?.closed) return;
     handlerDisputeProposal(+proposal.scMergeId)
     .then(txInfo => {
       const { blockNumber } = txInfo as any;
@@ -67,11 +69,11 @@ export default function ProposalItem({
   }
 
   function getColors() {
-    if (networkIssue?.finalized && !networkProposals?.isDisputed && proposal.isMerged) {
+    if (networkIssue?.closed && !networkProposals?.isDisputed && proposal.isMerged) {
       return "success";
     }
 
-    if (networkProposals?.isDisputed || (networkIssue?.finalized && !proposal.isMerged)) {
+    if (networkProposals?.isDisputed || (networkIssue?.closed && !proposal.isMerged)) {
       return "danger";
     }
 
@@ -81,11 +83,11 @@ export default function ProposalItem({
   function getLabel() {
     let action = "dispute";
 
-    if (networkIssue?.finalized && !networkProposals?.isDisputed && proposal.isMerged) {
+    if (networkIssue?.closed && !networkProposals?.isDisputed && proposal.isMerged) {
       action = "accepted";
     }
 
-    if (networkProposals?.isDisputed || (networkIssue?.finalized && !proposal.isMerged)) {
+    if (networkProposals?.isDisputed || (networkIssue?.closed && !proposal.isMerged)) {
       action = "failed";
     }
 
@@ -133,7 +135,7 @@ export default function ProposalItem({
               <ProposalProgressSmall
                 pgClass={`${getColors()}`}
                 value={+networkProposals?.disputeWeight}
-                total={beproStaked}
+                total={wallet?.balance?.staked}
                 textClass={`pb-2 text-${getColors()}`}
               />
             </div>

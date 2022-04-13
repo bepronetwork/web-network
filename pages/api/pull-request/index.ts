@@ -210,8 +210,7 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json("Pull Request Canceled");
 }
 
-export default async function PullRequest(req: NextApiRequest,
-                                          res: NextApiResponse) {
+async function PullRequest(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
@@ -231,4 +230,4 @@ export default async function PullRequest(req: NextApiRequest,
 
   res.end();
 }
-export default  withCors(PullRequest)
+export default  withCors(PullRequest);
