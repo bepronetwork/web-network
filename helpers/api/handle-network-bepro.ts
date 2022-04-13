@@ -1,11 +1,11 @@
 import { Network, Web3Connection } from "bepro-js";
 import getConfig from "next/config";
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig, serverRuntimeConfig } = getConfig()
 
 export default function networkBeproJs({
   web3Connection = publicRuntimeConfig.web3ProviderConnection,
-  privateKey = publicRuntimeConfig.walletPrivateKey,
+  privateKey = serverRuntimeConfig.walletPrivateKey,
   contractAddress = publicRuntimeConfig.contract.address,
   debug = false
 }: {

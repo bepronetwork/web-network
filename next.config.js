@@ -62,8 +62,8 @@ const serverRuntimeConfig = {
     repo: process.env.NEXT_GH_REPO
   },
   ipApi:{
-    key: process.NEXT_IP_API_KEY,
-    skip: process.env.NEXT_SKIP_IP_API || true,
+  key: process.NEXT_IP_API_KEY,
+    skip: process.env.NEXT_SKIP_IP_API || false,
   },
   walletPrivateKey: process.env.NEXT_WALLET_PRIVATE_KEY,
   infura:{
