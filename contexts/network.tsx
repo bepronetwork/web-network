@@ -74,8 +74,8 @@ export const NetworkProvider: React.FC = function ({ children }) {
       setActiveNetwork({
         ...activeNetwork,
         councilAmount: values[0],
-        disputableTime: values[1],
-        draftTime: values[2],
+        disputableTime: values[1] / 1000,
+        draftTime: values[2] / 1000,
         oracleExchangeRate: values[3],
         mergeCreatorFeeShare: values[4],
         percentageNeededForDispute: values[5]

@@ -1,18 +1,15 @@
 import React from "react";
-import { useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
 import ProposalItem from "components/proposal-item";
 
-import { useAuthentication } from "contexts/authentication";
 import { IActiveIssue } from "contexts/issue";
+import { useNetwork } from "contexts/network";
 
 import { isProposalDisputable } from "helpers/proposal";
 
 import { BountyExtended } from "interfaces/bounty";
-
-import { BeproService } from "services/bepro-service";
 
 import NothingFound from "./nothing-found";
 
@@ -26,15 +23,8 @@ export default function IssueProposals({
   issue,
   className = ""
 }: IIssueProposalProps) {
-  const { wallet, beproServiceStarted } = useAuthentication();
-  const [disputableTime, setDisputableTime] = useState(0);
+  const { activeNetwork } = useNetwork();
   const { t } = useTranslation("proposal");
-
-  useEffect(() => {
-    if (beproServiceStarted) {
-      BeproService.getNetworkParameter("disputableTime").then(setDisputableTime);
-    }
-  }, [issue, wallet?.address, beproServiceStarted]);
 
   return (
     <div className={`content-wrapper ${className || ""} pt-0 pb-0`}>
@@ -47,7 +37,7 @@ export default function IssueProposals({
               issue={issue}
               isFinalized={networkIssue?.closed}
               isDisputable={
-                isProposalDisputable(proposal?.createdAt, disputableTime) &&
+                isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime) &&
                 !networkIssue?.proposals[proposal.id]?.isDisputed
               }
             />

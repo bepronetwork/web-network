@@ -65,11 +65,14 @@ export default function IssueProposalProgressBar({
   function renderSecondaryText(stepLabel, index) {
     const secondaryTextStyle = { top: "20px" };
 
+    const isHigher = new Date() > addSeconds(creationDate, activeNetwork?.draftTime || 0);
+
     const item = {
       Warning: {
         text: t("bounty:status.until-done", {
-          distance: getTimeDifferenceInWords(addSeconds(creationDate, activeNetwork?.draftTime || 0),
-                                             new Date())
+          distance: isHigher ? '0 seconds' 
+            : getTimeDifferenceInWords(addSeconds(creationDate, activeNetwork?.draftTime || 0),
+                                       new Date())
         }),
         color: "warning",
         bgColor: "warning-opac-25"

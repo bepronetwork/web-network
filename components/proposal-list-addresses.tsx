@@ -17,9 +17,9 @@ interface IProposalListAddressProps {
 
 export default function ProposalListAddresses({
   usersDistribution,
-  currency = "BEPRO"
+  currency = undefined
 }: IProposalListAddressProps) {
-  const { t } = useTranslation("proposal");
+  const { t } = useTranslation(["proposal", "common"]);
 
   return (
     <div className="col-md-6">
@@ -46,7 +46,7 @@ export default function ProposalListAddresses({
                     />
                     <span>
                       {formatNumberToNScale(+item?.oracles)}{" "}
-                      <span className="text-primary">${currency}</span>
+                      <span className="text-primary">${currency || t('common:misc.token')}</span>
                     </span>
                   </div>
                 </div>

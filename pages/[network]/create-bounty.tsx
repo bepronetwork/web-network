@@ -89,7 +89,9 @@ export default function PageCreateIssue() {
   async function allowCreateIssue() {
     if (!beproServiceStarted || !transactionalToken || issueAmount.floatValue <= 0) return;
 
-    handleApproveToken(transactionalToken.address, issueAmount.floatValue);
+    handleApproveToken(transactionalToken.address, issueAmount.floatValue).then(() => {
+      updateWalletByToken(transactionalToken);
+    });
   }
 
   function cleanFields() {

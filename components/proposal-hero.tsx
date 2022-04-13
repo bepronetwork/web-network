@@ -23,7 +23,7 @@ export default function ProposalHero({
 }: IProposalHeroProps) {
   const { activeIssue } = useIssue();
   const router = useRouter();
-  const { t } = useTranslation(["proposal"]);
+  const { t } = useTranslation(["proposal", "common"]);
 
   return (
     <div className="banner-shadow">
@@ -75,7 +75,7 @@ export default function ProposalHero({
           <div className="col-2 d-flex align-items-center justify-content-center">
             <PriceConversor
               currentValue={activeIssue?.amount || 0}
-              currency="BEPRO"
+              currency={activeIssue?.token?.symbol || t('common:misc.token')}
             />
           </div>
         </div>

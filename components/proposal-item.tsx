@@ -39,6 +39,7 @@ export default function ProposalItem({
   const { handlerDisputeProposal } = useBepro();
   const { getURLWithNetwork } = useNetworkTheme();
   const networkProposals = networkIssue?.proposals?.[proposal?.contractId];
+  const networkPullRequest = networkIssue?.pullRequests?.[networkProposals?.prId];
 
   const isDisable = [
       networkIssue?.finalized,
@@ -98,7 +99,7 @@ export default function ProposalItem({
               }`}
           >
             <Translation ns="pull-request" label={"abbreviation"} /> #
-            {proposal?.githubLogin} <Translation label={"misc.by"} />{" "}
+            {networkPullRequest?.cid} <Translation label={"misc.by"} />{" "}
             {proposal?.githubLogin && ` @${proposal?.githubLogin}`}
           </div>
           <div className="col-5 d-flex justify-content-between mb-2 text-white">

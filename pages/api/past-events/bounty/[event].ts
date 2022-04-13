@@ -10,7 +10,8 @@ import networkBeproJs from "helpers/api/handle-network-bepro";
 
 const eventsMapping = {
   "created": ["getBountyCreatedEvents", "readBountyCreated"],
-  "canceled": ["getBountyCanceledEvents", "readBountyCanceled"]
+  "canceled": ["getBountyCanceledEvents", "readBountyCanceled"],
+  "closed": ["getBountyDistributedEvents", "readBountyClosed"]
 }
 
 async function post(req: NextApiRequest, res: NextApiResponse) {

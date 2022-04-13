@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 
+import { ProposalDetail } from "@taikai/dappkit";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
@@ -21,9 +22,9 @@ import { addToast } from "contexts/reducers/add-toast";
 
 import { handlePercentage } from "helpers/handlePercentage";
 
+import { ProposalExtended } from "interfaces/bounty";
 import { pullRequest } from "interfaces/issue-data";
 import {
-  INetworkProposal,
   Proposal,
   IDistribuitonPerUser
 } from "interfaces/proposal";
@@ -35,28 +36,28 @@ export default function PageProposal() {
   const router = useRouter();
   const { dispatch } = useContext(ApplicationContext);
   const { t } = useTranslation();
-  const { getUserOf, mergeClosedIssue } = useApi();
+  const { getUserOf, mergeClosedIssue, processEvent } = useApi();
   const { handlerDisputeProposal, handleCloseIssue } = useBepro();
-  const { activeIssue, networkIssue, getNetworkIssue } = useIssue();
-  const { wallet } = useAuthentication();
+  const { activeIssue, networkIssue, getNetworkIssue, updateIssue } = useIssue();
   const { activeNetwork } = useNetwork();
   const [proposal, setProposal] = useState<Proposal>({} as Proposal);
-  const [networkProposal, setNetworkProposal] = useState<INetworkProposal>({} as INetworkProposal);
+  const [networkProposal, setNetworkProposal] = useState<ProposalExtended>({} as ProposalExtended);
   const [pullRequest, setPullRequest] = useState<pullRequest>({} as pullRequest);
   const [usersDistribution, setUsersDistribution] = useState<
     IDistribuitonPerUser[]
   >([]);
 
   async function closeIssue() {
-    handleCloseIssue(activeIssue?.issueId,
-                     +proposal.scMergeId)
-      .then(() =>
-        mergeClosedIssue(activeIssue?.issueId,
-                         pullRequest?.githubId,
-                         proposal?.scMergeId,
-                         wallet?.address,
-                         activeNetwork?.name))
+    handleCloseIssue(+activeIssue?.contractId,
+                     +proposal.contractId)
+      .then(txInfo => {
+        const { blockNumber } = txInfo as any;
+
+        return processEvent('bounty/closed', blockNumber, undefined, undefined, activeNetwork?.name);
+      })
       .then(() => {
+        updateIssue(activeIssue?.repository_id, activeIssue?.githubId);
+
         dispatch(addToast({
             type: "success",
             title: t("actions.success"),
@@ -67,7 +68,7 @@ export default function PageProposal() {
         dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
-            content: error.response.data.message
+            content: error?.response?.data?.message
         }));
       });
   }
@@ -79,28 +80,24 @@ export default function PageProposal() {
   }
 
   async function loadUsersDistribution() {
-    if (
-      networkProposal?.prAddresses?.length < 1 ||
-      networkProposal?.prAmounts?.length < 1
-    )
-      return;
+    if (!networkProposal?.details?.length) return;
   
-    async function mapUser(address: string, i: number): Promise<IDistribuitonPerUser> {
-      if(!address) return;
-      const { githubLogin } = await getUserOf(address);
-      const oracles = networkProposal?.prAmounts[i].toString();
-      const percentage = handlePercentage(+oracles, +activeIssue?.amount, 2);
+    async function mapUser(detail: ProposalDetail, i: number): Promise<IDistribuitonPerUser> {
+      if(!detail.recipient) return;
+      
+      const { githubLogin } = await getUserOf(detail.recipient);
+      const oracles = networkProposal?.details[i]?.percentage.toString();
 
-      return { githubLogin, percentage, address, oracles };
+      return { githubLogin, percentage: detail.percentage, address: detail.recipient, oracles };
     }
-    const maping = networkProposal?.prAddresses?.map(mapUser) || [];
+    const maping = networkProposal?.details?.map(mapUser) || [];
     await Promise.all(maping).then(setUsersDistribution);
   }
 
   async function loadData() {
     const { proposalId } = router.query;
     const mergeProposal = activeIssue?.mergeProposals.find((p) => +p.id === +proposalId);
-    const networkProposals = networkIssue?.networkProposals?.[+proposalId];
+    const networkProposals = networkIssue?.proposals?.[+mergeProposal.contractId];
 
     const PR = activeIssue?.pullRequests.find((pr) => pr.id === mergeProposal?.pullRequestId);
 
@@ -128,7 +125,7 @@ export default function PageProposal() {
           />
         </div>
         <div className="mt-3 row justify-content-between">
-          <ProposalListAddresses usersDistribution={usersDistribution} />
+          <ProposalListAddresses usersDistribution={usersDistribution} currency={activeIssue?.token?.symbol} />
           <ProposalActionCard
             proposal={proposal}
             networkProposal={networkProposal}

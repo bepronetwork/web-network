@@ -70,24 +70,21 @@ export default function useBepro(props?: IUseBeProDefault) {
     });
   }
 
-  async function handleCloseIssue(issueId: string,
+  async function handleCloseIssue(bountyId: number,
                                   proposalscMergeId: number): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue },
                                           activeNetwork);
       dispatch(closeIssueTx);
 
-      waitForClose(issueId, activeNetwork?.name).then(() => onSuccess?.());
+      //waitForClose(issueId, activeNetwork?.name).then(() => onSuccess?.());
 
       await BeproService.network
-        .closeIssue(networkIssue?._id, proposalscMergeId)
+        .closeBounty(+bountyId, +proposalscMergeId)
         .then((txInfo) => {
-          // Review: Review processEnvets are working correctly
-          processEvent("close-issue", txInfo.blockNumber, networkIssue?._id).then(() => {
-            onSuccess?.();
-          });
           txWindow.updateItem(closeIssueTx.payload.id,
                               parseTransaction(txInfo, closeIssueTx.payload));
+          onSuccess?.();
           resolve(txInfo);
         })
         .catch((err) => {

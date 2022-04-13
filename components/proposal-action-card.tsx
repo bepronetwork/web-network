@@ -6,20 +6,20 @@ import LockedIcon from "assets/icons/locked-icon";
 
 import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
+import { useNetwork } from "contexts/network";
 
 import { isProposalDisputable } from "helpers/proposal";
 
+import { ProposalExtended } from "interfaces/bounty";
 import { pullRequest } from "interfaces/issue-data";
-import { INetworkProposal, Proposal } from "interfaces/proposal";
-
-import { BeproService } from "services/bepro-service";
+import { Proposal } from "interfaces/proposal";
 
 import Button from "./button";
 import ProposalProgressBar from "./proposal-progress-bar";
 
 interface IProposalActionCardProps {
   proposal: Proposal;
-  networkProposal: INetworkProposal;
+  networkProposal: ProposalExtended;
   currentPullRequest: pullRequest;
   onMerge: () => void;
   onDispute: () => void;
@@ -32,38 +32,29 @@ export default function ProposalActionCard({
   onMerge,
   onDispute
 }: IProposalActionCardProps) {
-  const [disputableTime, setDisputableTime] = useState(0);
   const { t } = useTranslation(["common", "pull-request"]);
   const { networkIssue } = useIssue();
-  const { beproServiceStarted, wallet } = useAuthentication()
+  const { activeNetwork } = useNetwork();
+  const { wallet, user } = useAuthentication();
 
-  const isDisable = [
-      networkIssue?.finalized,
-      !isProposalDisputable(proposal?.createdAt, disputableTime),
-      networkProposal?.isDisputed,
-      !networkProposal?.canUserDispute,
-      wallet?.balance?.oracles?.tokensLocked === 0,
-  ].some((v) => v);
-
-  
+  const isDisputable = [
+    !networkProposal?.isDisputed,
+    !networkIssue?.closed,
+    isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime)
+  ].every((v) => v);
   const isSuccess = [
-    networkIssue?.finalized,
+    networkIssue?.closed,
     !networkProposal?.isDisputed && proposal?.isMerged
   ].every((v) => v);
-
-  useEffect(() => {
-    if (!beproServiceStarted) return;
-    BeproService?.getDisputableTime().then(setDisputableTime);
-  }, [proposal, networkIssue]);
 
   return (
     <div className="col-md-6">
       <div className="bg-shadow rounded-5 p-3">
         <div className="mb-5">
           <ProposalProgressBar
-            issueDisputeAmount={+networkProposal?.disputes}
+            issueDisputeAmount={+networkProposal?.disputeWeight}
             isDisputed={networkProposal?.isDisputed}
-            isFinished={networkIssue?.finalized}
+            isFinished={networkIssue?.closed}
             isMerged={proposal?.isMerged}
           />
         </div>
@@ -77,7 +68,7 @@ export default function ProposalActionCard({
             <Button
               className="flex-grow-1"
               textClass="text-uppercase text-white"
-              disabled={!currentPullRequest?.isMergeable || proposal?.isMerged}
+              disabled={!currentPullRequest?.isMergeable || proposal?.isMerged || isDisputable}
               onClick={onMerge}
             >
               {!currentPullRequest?.isMergeable ||
@@ -95,10 +86,27 @@ export default function ProposalActionCard({
                 disabled={isDisable}
                 onClick={onDispute}
               >
-                {t("common:actions.dispute")}
+                {!currentPullRequest?.isMergeable ||
+                  isDisputable ||
+                  proposal?.isMerged ? (
+                    <LockedIcon width={12} height={12} className="mr-1" />
+                  ) : undefined}
+                <span>{t("common:actions.merge")}</span>
               </Button>
-            )}
-          </div>
+
+              {!isSuccess && isDisputable && (
+                <Button
+                  className="flex-grow-1"
+                  textClass="text-uppercase text-white"
+                  color="purple"
+                  disabled={!isDisputable}
+                  onClick={onDispute}
+                >
+                  {t("common:actions.dispute")}
+                </Button>
+              )}
+            </div>
+          }
         </div>
       </div>
     </div>

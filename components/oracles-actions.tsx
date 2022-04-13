@@ -114,7 +114,7 @@ function OraclesActions() {
     if (!tokenAmount) {
       return setError(t("my-oracles:errors.amount-higher-0"));
     }
-    const isChecked = wallet?.isApprovedSettlerToken
+    const isChecked = !needsApproval();
     setShow(isChecked);
     setError(!isChecked ? t("my-oracles:errors.approve-transactions") : "")
   }
@@ -149,7 +149,7 @@ function OraclesActions() {
 
   function approveSettlerToken() {
     if (!wallet?.address && !beproServiceStarted) return;
-    //handleApproveToken().then(updateIsApprovedSettlerToken)
+    handleApproveToken(undefined, tokenAmount).then(updateAllowance);
   }
 
   function getCurrentLabel(): TransactionCurrency {
@@ -177,15 +177,20 @@ function OraclesActions() {
       : TransactionTypes.unlock;
   }
 
+  function updateAllowance() {
+    BeproService.getAllowance().then(setNetworkTokenAllowance).catch(console.log);
+  }
+
   const needsApproval = () => tokenAmount > networkTokenAllowance;
 
   useEffect(() => {
     if (wallet?.address && beproServiceStarted) 
-      BeproService.getAllowance().then(setNetworkTokenAllowance).catch(console.log);
+      updateAllowance();
   }, [wallet, beproServiceStarted]);
 
   return (
     <>
+    {console.log(networkTokenAllowance)}
       <div className="col-md-5">
         <div className="content-wrapper h-100">
           <OraclesBoxHeader
@@ -250,7 +255,7 @@ function OraclesActions() {
                   className="ms-0 read-only-button"
                   onClick={approveSettlerToken}
                 >
-                  {needsApproval() && (
+                  {!needsApproval() && (
                     <LockedIcon width={12} height={12} className="mr-1" />
                   )}
                   <span>

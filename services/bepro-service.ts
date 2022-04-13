@@ -1,5 +1,14 @@
+import { 
+  Web3Connection, 
+  Network_v2, 
+  ERC20, 
+  NetworkFactory, 
+  Bounty, 
+  fromSmartContractDecimals, 
+  OraclesResume 
+} from "@taikai/dappkit";
+import { nativeZeroAddress } from "@taikai/dappkit/dist/src/utils/constants";
 import getConfig from "next/config";
-import { Web3Connection, Network_v2, ERC20, NetworkFactory, Bounty, fromSmartContractDecimals, OraclesResume } from "@taikai/dappkit";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import {
@@ -372,7 +381,7 @@ class BeproFacet {
     branch,
     githubUser,
     transactional,
-    rewardToken = undefined,
+    rewardToken = nativeZeroAddress,
     tokenAmount = 0,
     rewardAmount = 0,
     fundingAmount = 0

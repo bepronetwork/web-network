@@ -93,6 +93,8 @@ export const IssueProvider: React.FC = function ({ children }) {
     const newActiveIssue = {
         ...issue,
         comments,
+        mergeProposals: issue.mergeProposals.map(mp => 
+          ({...mp, isMerged: issue.merged === null ? false : +mp.scMergeId === +issue.merged})),
         lastUpdated: +new Date()
     } as IActiveIssue;
 
