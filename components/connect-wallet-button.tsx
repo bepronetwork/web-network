@@ -1,6 +1,7 @@
-import React, { useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 
 import { useTranslation } from "next-i18next";
+import getConfig from "next/config";
 import Image from "next/image";
 
 import metamaskLogo from "assets/metamask.png";
@@ -12,10 +13,8 @@ import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 
 import { NetworkColors } from "interfaces/enums/network-ids";
+const { publicRuntimeConfig } = getConfig()
 
-
-const REQUIRED_NETWORK =
-  process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME?.toLowerCase();
 
 export default function ConnectWalletButton({
   children = null,
@@ -51,9 +50,9 @@ export default function ConnectWalletButton({
             {t("connect-wallet-button:to-access-this-page")}
             <br />
             <span
-              style={{ color: NetworkColors[REQUIRED_NETWORK.toLowerCase()] }}
+              style={{ color: NetworkColors[publicRuntimeConfig.metaMask.chainName.toLowerCase()] }}
             >
-              <span>{REQUIRED_NETWORK}</span>{" "}
+              <span>{publicRuntimeConfig.metaMask.chainName}</span>{" "}
               {t("connect-wallet-button:network")}
             </span>{" "}
             {t("connect-wallet-button:on-your-wallet")}

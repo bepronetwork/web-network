@@ -13,7 +13,7 @@ module.exports = {
         const [results, metadata] = await queryInterface.sequelize.query("UPDATE issues SET branch = $branch WHERE branch IS NULL",
                                                                          {
             bind: {
-              branch: process.env.NEXT_GITHUB_MAINBRANCH || "master"
+              branch: process.env.NEXT_GH_MAINBRANCH || "master"
             }
                                                                          });
 
