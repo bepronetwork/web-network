@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 
-import { getSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next/types";

@@ -1,4 +1,5 @@
 import models from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
@@ -42,8 +43,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(listBranchs);
 }
 
-export default async function GetBranchs(req: NextApiRequest,
-                                         res: NextApiResponse) {
+async function GetBranchs(req: NextApiRequest,
+                          res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
@@ -55,3 +56,5 @@ export default async function GetBranchs(req: NextApiRequest,
 
   res.end();
 }
+
+export default withCors(GetBranchs)

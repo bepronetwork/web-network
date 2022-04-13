@@ -1,5 +1,6 @@
 import { subHours, subMonths, subWeeks, subYears } from "date-fns";
 import models from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op, WhereOptions } from "sequelize";
 
@@ -119,8 +120,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function SearchIssues(req: NextApiRequest,
-                                           res: NextApiResponse) {
+async function SearchIssues(req: NextApiRequest,
+                            res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
@@ -132,3 +133,4 @@ export default async function SearchIssues(req: NextApiRequest,
 
   res.end();
 }
+export default withCors(SearchIssues)
