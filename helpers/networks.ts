@@ -68,7 +68,7 @@ export const NETWORKS: {
   "0x5dc": {
     id: "1500",
     name: "Seneca Testnet",
-    key: "staging",
+    key: "seneca",
     currency: DEV,
     decimals: 18,
     explorerURL: "https://blockscout.moonriver.moonbeam.network",
