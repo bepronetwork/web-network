@@ -73,5 +73,32 @@ export const NETWORKS: {
     decimals: 18,
     explorerURL: "https://blockscout.moonriver.moonbeam.network",
     rpcUrls: ["http://eth-seneca.taikai.network:8545"]
+  },
+  "0x5dd": {
+    id: "1501",
+    name: "Afrodite Testnet",
+    key: "afrodite",
+    currency: DEV,
+    decimals: 18,
+    explorerURL: "https://blockscout.moonriver.moonbeam.network",
+    rpcUrls: ["http://eth-seneca.taikai.network:8545"]
+  },
+  "0x5de": {
+    id: "1502",
+    name: "Irene Testnet",
+    key: "irene",
+    currency: DEV,
+    decimals: 18,
+    explorerURL: "https://blockscout.moonriver.moonbeam.network",
+    rpcUrls: ["http://eth-irene.taikai.network:8545"]
+  },
+  "0x5df": {
+    id: "1503",
+    name: "Iris Testnet",
+    key: "iris",
+    currency: DEV,
+    decimals: 18,
+    explorerURL: "https://blockscout.moonriver.moonbeam.network",
+    rpcUrls: ["http://eth-iris.taikai.network:8545"]
   }
 };
