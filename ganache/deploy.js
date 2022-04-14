@@ -3,7 +3,8 @@ const {
   ERC20,
   toSmartContractDecimals,
   Network
-} = require("bepro-js");
+} = require("@taikai/dappkit");
+
 require("dotenv").config();
 
 const cap = toSmartContractDecimals("50000000", 18);

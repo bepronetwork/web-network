@@ -1,4 +1,4 @@
-import { ERC20, Network, NetworkFactory, Web3Connection } from "bepro-js";
+import { ERC20, Network, NetworkFactory, Web3Connection } from "@taikai/dappkit";
 import getConfig from "next/config";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
