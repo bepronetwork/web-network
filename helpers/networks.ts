@@ -18,9 +18,9 @@ export type Network = {
 };
 
 const DEV: Currency = {
-  name: "Dev",
-  ticker: "DEV",
-  symbol: "Ξ"
+  name: "Test Ethereum",
+  ticker: "TETH",
+  symbol: "TETH"
 };
 
 const ETH: Currency = {
@@ -64,5 +64,14 @@ export const NETWORKS: {
     decimals: 18,
     explorerURL: "https://blockscout.moonriver.moonbeam.network",
     rpcUrls: ["https://rpc.moonriver.moonbeam.network"]
+  },
+  "0x5dc": {
+    id: "1500",
+    name: "Seneca Testnet",
+    key: "staging",
+    currency: DEV,
+    decimals: 18,
+    explorerURL: "https://blockscout.moonriver.moonbeam.network",
+    rpcUrls: ["http://eth-seneca.taikai.network:8545"]
   }
 };
