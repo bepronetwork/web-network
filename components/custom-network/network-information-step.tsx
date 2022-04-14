@@ -1,5 +1,5 @@
-import { API } from "env";
 import { useTranslation } from "next-i18next";
+import getConfig from "next/config";
 
 import ThemeColors from "components/custom-network/theme-colors";
 import ImageUploader from "components/image-uploader";
@@ -8,6 +8,7 @@ import Step from "components/step";
 import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
 import useNetwork from "x-hooks/use-network";
+const {publicRuntimeConfig} = getConfig()
 
 export default function NetworkInformationStep({
   data,
@@ -19,7 +20,6 @@ export default function NetworkInformationStep({
   changedDataHandler
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
-
   const { networkExists } = useNetwork();
 
   function showTextOrDefault(text: string, defaultText: string) {
@@ -112,7 +112,7 @@ export default function NetworkInformationStep({
             {t("custom-network:steps.network-information.fields.name.temporary")}
           </p>
           <p className="caption-small text-gray">
-            {urlWithoutProtocol(API)}/
+            {urlWithoutProtocol(publicRuntimeConfig.apiUrl)}/
             <span className="text-primary">
               {getQueryableText(data.displayName.data ||
                   t("custom-network:steps.network-information.fields.name.default"))}

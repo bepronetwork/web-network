@@ -1,13 +1,14 @@
 import models from "db/models";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
 import paginate from "helpers/paginate";
 
 import api from "services/api";
-
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { login, issueId, networkName } = req.query;
   const where = {} as any;
@@ -75,7 +76,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const [owner, repo] = repoInfo.githubPath.split("/");
 
-  const octoKit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
+  const octoKit = new Octokit({ auth: publicRuntimeConfig.github.token });
 
   const options = {
     accept: "application/vnd.github.v3+json",
@@ -84,7 +85,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     title,
     body,
     head: `${username}:${branch}`,
-    base: issue.branch || process.env.NEXT_GITHUB_MAINBRANCH,
+    base: issue.branch || serverRuntimeConfig.github.mainBranch,
     maintainer_can_modify: false,
     draft: false
   };
@@ -101,7 +102,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     issue.state = "ready";
 
-    const issueLink = `${process.env.NEXT_PUBLIC_HOME_URL}/bounty?id=${issue?.githubId}&repoId=${issue?.repository_id}`;
+    const issueLink = `${publicRuntimeConfig.homeUrl}/bounty?id=${issue?.githubId}&repoId=${issue?.repository_id}`;
     const body = `@${issue.creatorGithub}, @${username} has a solution - [check your bounty](${issueLink})`;
     await octoKit.rest.issues.createComment({
       owner,

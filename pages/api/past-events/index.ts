@@ -1,13 +1,15 @@
 import models from 'db/models';
-import {NextApiRequest, NextApiResponse} from 'next';
-import {Octokit} from 'octokit';
-import { Op } from 'sequelize'
+import { NextApiRequest, NextApiResponse } from 'next';
+import getConfig from 'next/config';
+import { Octokit } from 'octokit';
+import { Op } from 'sequelize';
 
 import networkBeproJs from 'helpers/api/handle-network-bepro';
 import readCloseIssues from 'helpers/api/read-close-issues';
 import readRedeemIssue from 'helpers/api/read-redeem-issue';
 
-const octokit = new Octokit({auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN});
+const { publicRuntimeConfig } = getConfig()
+const octokit = new Octokit({auth: publicRuntimeConfig.github.token});
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const bulk = await models.chainEvents.findOne({where: {name: `Bulk`}});
@@ -15,7 +17,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const customNetworks = await models.network.findAll({
     where: {
       name: {
-        [Op.notILike]: `%${process.env.NEXT_PUBLIC_BEPRO_NETWORK_NAME}%`
+        [Op.notILike]: `%${publicRuntimeConfig.networkConfig.networkName}%`
       }
     }
   })
@@ -24,8 +26,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   const networks = [{
     id: 1,
-    name: process.env.NEXT_PUBLIC_BEPRO_NETWORK_NAME, 
-    networkAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS
+    name: publicRuntimeConfig.networkConfig.networkName, 
+    networkAddress: publicRuntimeConfig.contract.address
   }, ...customNetworks]
 
   for (const customNetwork of networks) {

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 
-import { BEPRO_NETWORK_NAME } from "env";
 import { useTranslation } from "next-i18next";
+import getConfig from "next/config";
 
 import CustomContainer from "components/custom-container";
 import InternalLink from "components/internal-link";
@@ -24,7 +24,7 @@ interface NetworksListProps {
   creatorAddress?: string;
   redirectToHome?: boolean;
 }
-
+const { publicRuntimeConfig } = getConfig()
 export default function NetworksList({
   name,
   networkAddress,
@@ -84,7 +84,7 @@ export default function NetworksList({
               href="/new-network"
               label={String(t("actions.create-one"))}
               uppercase
-              blank={network.name !== BEPRO_NETWORK_NAME}
+              blank={network.name !== publicRuntimeConfig.networkConfig.networkName}
             />
           ) : (
             ""

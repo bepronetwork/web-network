@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 
-import { BEPRO_NETWORK_NAME } from "env";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import getConfig from "next/config";
 import { useRouter } from "next/router";
 
 import ConnectWalletButton from "components/connect-wallet-button";
@@ -29,6 +29,8 @@ import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
 import useOctokit from "x-hooks/use-octokit";
 
+
+const { publicRuntimeConfig } = getConfig()
 export default function NewNetwork() {
   const router = useRouter();
 
@@ -165,8 +167,8 @@ export default function NewNetwork() {
   useEffect(() => {
     if (!network) return;
 
-    if (network.name !== BEPRO_NETWORK_NAME)
-      router.push(getURLWithNetwork("/account", { network: BEPRO_NETWORK_NAME }));
+    if (network.name !== publicRuntimeConfig.networkConfig.networkName)
+      router.push(getURLWithNetwork("/account", { network: publicRuntimeConfig.networkConfig.networkName }));
     else if (!Object.keys(steps.network.data.colors.data).length) {
       const tmpSteps = Object.assign({}, steps);
 

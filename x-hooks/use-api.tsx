@@ -1,10 +1,6 @@
 import axios from "axios";
-import {
-  BEPRO_NETWORK_NAME,
-  CURRENCY_API,
-  CURRENCY_ID
-} from "env";
 import { head } from "lodash";
+import getConfig from "next/config";
 
 import { User } from "interfaces/api-response";
 import { BranchInfo, BranchsList } from "interfaces/branchs-list";
@@ -15,7 +11,7 @@ import { Proposal } from "interfaces/proposal";
 import { ReposList } from "interfaces/repos-list";
 
 import client from "services/api";
-
+const { publicRuntimeConfig } = getConfig()
 interface Paginated<T = any> {
   count: number;
   rows: T[];
@@ -42,7 +38,7 @@ export default function useApi() {
                            order = "DESC",
                            address = "",
                            creator = "",
-                           networkName = BEPRO_NETWORK_NAME) {
+                           networkName = publicRuntimeConfig.currency.networkConfig.networkName) {
     const search = new URLSearchParams({
       address,
       page,
@@ -71,7 +67,7 @@ export default function useApi() {
     creator = "",
     search = "",
     pullRequester = "",
-    networkName = BEPRO_NETWORK_NAME
+    networkName = publicRuntimeConfig.currency.networkConfig.networkName
   }) {
     const params = new URLSearchParams({
       address,
@@ -102,7 +98,7 @@ export default function useApi() {
     owner = "",
     name = "",
     path = "",
-    networkName = BEPRO_NETWORK_NAME
+    networkName = publicRuntimeConfig.currency.networkConfig.networkName
   }) {
     const params = new URLSearchParams({
       page,
@@ -119,7 +115,7 @@ export default function useApi() {
 
   async function getIssue(repoId: string | number, 
                           ghId: string | number,
-                          networkName = BEPRO_NETWORK_NAME) {
+                          networkName = publicRuntimeConfig.networkConfig.networkName) {
     return client
       .get<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`)
       .then(({ data }) => data)
@@ -127,7 +123,7 @@ export default function useApi() {
   }
 
   async function createIssue(payload: NewIssueParams,
-                             networkName = BEPRO_NETWORK_NAME) {
+                             networkName = publicRuntimeConfig.networkConfig.networkName) {
     return client
       .post<number>("/issue", { ...payload, networkName })
       .then(({ data }) => data)
@@ -144,7 +140,7 @@ export default function useApi() {
   async function patchIssueWithScId(repoId,
                                     githubId,
                                     scId,
-                                    networkName = BEPRO_NETWORK_NAME) {
+                                    networkName = publicRuntimeConfig.networkConfig.networkName) {
     return client
       .patch("/issue", { repoId, githubId, scId, networkName })
       .then(({ data }) => data === "ok")
@@ -153,7 +149,7 @@ export default function useApi() {
 
   async function getPendingFor(address: string,
                                page = "1",
-                               networkName = BEPRO_NETWORK_NAME) {
+                               networkName = publicRuntimeConfig.networkConfig.networkName) {
     const search = new URLSearchParams({
       address,
       page,
@@ -174,7 +170,7 @@ export default function useApi() {
       username: string;
       branch: string;
     },
-                                        networkName = BEPRO_NETWORK_NAME) {
+                                        networkName = publicRuntimeConfig.networkConfig.networkName) {
     return client
       .post("/pull-request/", { ...payload, repoId, githubId, networkName })
       .then(() => true)
@@ -217,7 +213,7 @@ export default function useApi() {
     return client.get<number>("/search/users/total").then(({ data }) => data);
   }
   
-  async function getTotalBounties(state: string, networkName = BEPRO_NETWORK_NAME): Promise<number> {
+  async function getTotalBounties(state: string, networkName = publicRuntimeConfig.networkConfig.networkName): Promise<number> {
     const search = new URLSearchParams({ state, networkName }).toString();
     return client.get<number>(`/search/issues/total?${search}`).then(({ data }) => data);
   }
@@ -229,7 +225,7 @@ export default function useApi() {
       .catch(() => []);
   }
 
-  async function createRepo(owner, repo, networkName = BEPRO_NETWORK_NAME) {
+  async function createRepo(owner, repo, networkName = publicRuntimeConfig.networkConfig.networkName) {
     return client
       .post("/repos/", { owner, repo, networkName })
       .then(({ status }) => status === 200)
@@ -239,7 +235,7 @@ export default function useApi() {
       });
   }
 
-  async function getReposList(force = false, networkName = BEPRO_NETWORK_NAME) {
+  async function getReposList(force = false, networkName = publicRuntimeConfig.networkConfig.networkName) {
     const search = new URLSearchParams({ networkName }).toString();
 
     if (!force && repoList.length)
@@ -253,7 +249,7 @@ export default function useApi() {
 
   async function getBranchsList(repoId: string | number,
                                 force = false,
-                                networkName = BEPRO_NETWORK_NAME) {
+                                networkName = publicRuntimeConfig.networkConfig.networkName) {
     if (!force && branchsList[repoId]?.length)
       return Promise.resolve(branchsList[repoId] as BranchInfo[]);
 
@@ -275,7 +271,7 @@ export default function useApi() {
 
   async function poll(eventName: string,
                       rest,
-                      networkName = BEPRO_NETWORK_NAME) {
+                      networkName = publicRuntimeConfig.networkConfig.networkName) {
     return client.post("/poll/",
       { eventName, ...rest, networkName },
       { timeout: 2 * 60 * 1000 });
@@ -284,7 +280,7 @@ export default function useApi() {
   async function waitForMerge(githubLogin,
                               issue_id,
                               currentGithubId,
-                              networkName = BEPRO_NETWORK_NAME) {
+                              networkName = publicRuntimeConfig.networkConfig.networkName) {
     return poll("mergeProposal",
       { githubLogin, issue_id, currentGithubId },
                 networkName)
@@ -293,14 +289,14 @@ export default function useApi() {
   }
 
   async function waitForClose(currentGithubId,
-                              networkName = BEPRO_NETWORK_NAME) {
+                              networkName = publicRuntimeConfig.networkConfig.networkName) {
     return poll("closeIssue", { currentGithubId }, networkName)
       .then(({ data }) => data)
       .catch(() => null);
   }
 
   async function waitForRedeem(currentGithubId,
-                               networkName = BEPRO_NETWORK_NAME) {
+                               networkName = publicRuntimeConfig.networkConfig.networkName) {
     return poll("redeemIssue", { currentGithubId }, networkName)
       .then(({ data }) => data)
       .catch(() => null);
@@ -310,7 +306,7 @@ export default function useApi() {
                               fromBlock: number,
                               id: number,
                               params?: object,
-                              networkName = BEPRO_NETWORK_NAME) {
+                              networkName = publicRuntimeConfig.networkConfig.networkName) {
     return client.post(`/past-events/${eventName}/`, {
       fromBlock,
       id,
@@ -341,7 +337,7 @@ export default function useApi() {
 
   async function userHasPR(issueId: string,
                            login: string,
-                           networkName = BEPRO_NETWORK_NAME) {
+                           networkName = publicRuntimeConfig.networkConfig.networkName) {
     const search = new URLSearchParams({
       issueId,
       login,
@@ -359,7 +355,7 @@ export default function useApi() {
 
   async function getUserPullRequests(page = "1",
                                      login: string,
-                                     networkName = BEPRO_NETWORK_NAME) {
+                                     networkName = publicRuntimeConfig.networkConfig.networkName) {
     const search = new URLSearchParams({ page, login, networkName }).toString();
 
     return client
@@ -373,7 +369,7 @@ export default function useApi() {
 
   async function startWorking(issueId: string,
                               githubLogin: string,
-                              networkName = BEPRO_NETWORK_NAME) {
+                              networkName = publicRuntimeConfig.networkConfig.networkName) {
     return client
       .put("/issue/working", { issueId, githubLogin, networkName })
       .then((response) => response)
@@ -386,7 +382,7 @@ export default function useApi() {
                                   pullRequestId: string,
                                   mergeProposalId: string,
                                   address: string,
-                                  networkName = BEPRO_NETWORK_NAME) {
+                                  networkName = publicRuntimeConfig.networkConfig.networkName) {
     return client
       .post("/pull-request/merge", {
         issueId,
@@ -405,7 +401,7 @@ export default function useApi() {
                                    pullRequestId: string,
                                    githubLogin: string,
                                    body: string,
-                                   networkName = BEPRO_NETWORK_NAME) {
+                                   networkName = publicRuntimeConfig.networkConfig.networkName) {
     return client
       .put("/pull-request/review", {
         issueId,
@@ -527,15 +523,15 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
-  async function getCurrencyByToken(tokenId = CURRENCY_ID, comparedToken?: string) {
-    let params:{ids: string, vs_currencies?: string} = {
+  async function getCurrencyByToken(tokenId = publicRuntimeConfig.currency.currencyId, comparedToken?: string) {
+    const params:{ids: string, vs_currencies?: string} = {
         ids: tokenId,
     }
     
     if(comparedToken) params.vs_currencies = comparedToken
 
     try {
-      const { data } = await axios.get(`${CURRENCY_API}/simple/price`,{
+      const { data } = await axios.get(`${publicRuntimeConfig.currency.apiUrl}/simple/price`,{
         params
       });
 

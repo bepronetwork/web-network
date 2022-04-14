@@ -1,6 +1,8 @@
-import { BEPRO_NETWORK_NAME, CONTRACT_ADDRESS } from "env";
+import getConfig from "next/config";
 
 import { INetwork, ThemeColors } from "interfaces/network";
+
+const { publicRuntimeConfig } = getConfig()
 
 export const DefaultNetworkInformation = {
   lock: {
@@ -40,7 +42,7 @@ export const DefaultNetworkInformation = {
 };
 
 export const handleNetworkAddress = (network: INetwork) => {
-  return network?.name === BEPRO_NETWORK_NAME
-    ? CONTRACT_ADDRESS
+  return network?.name === publicRuntimeConfig.networkConfig.networkName
+    ? publicRuntimeConfig.contract.address
     : network?.networkAddress;
 };

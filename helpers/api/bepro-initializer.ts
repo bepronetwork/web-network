@@ -1,5 +1,6 @@
 import { NetworkFactory, Web3Connection } from "@taikai/dappkit";
-import { NETWORK_FACTORY_ADDRESS, WEB3_CONNECTION } from "env";
+import getConfig from "next/config";
+const { publicRuntimeConfig } = getConfig()
 
 export default class Bepro {
   bepro: Web3Connection;
@@ -7,14 +8,14 @@ export default class Bepro {
 
   async init(network = false, erc20 = false, factory = false) {
     this.bepro = new Web3Connection({
-      web3Host: WEB3_CONNECTION,
+      web3Host: publicRuntimeConfig.web3ProviderConnection,
       debug: true
     });
 
     await this.bepro.start();
 
     this.networkFactory = new NetworkFactory(this.bepro,
-      NETWORK_FACTORY_ADDRESS);
+      publicRuntimeConfig.networkConfig.factoryAddress);
 
     if (factory) await this.networkFactory.loadContract();
   }
