@@ -5,7 +5,8 @@ export enum NetworkIds {
   rinkeby = 4,
   goerli = 5,
   moonriver = 1285,
-  localhost = 1337
+  localhost = 1337,
+  staging = 1500
 }
 
 export enum NetworkColors {
@@ -16,5 +17,6 @@ export enum NetworkColors {
   rinkeby = "#f6c343",
   goerli = "#f6c343",
   moonriver = "#f6c343",
-  localhost = "#29b6af"
+  localhost = "#29b6af",
+  staging = "#29b6af"
 }
