@@ -1,4 +1,6 @@
-import React, { useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
+
+import getConfig from "next/config";
 
 import Button from "components/button";
 import Indicator from "components/indicator";
@@ -7,7 +9,8 @@ import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { changeNetwork } from "contexts/reducers/change-network";
 
-import { NetworkIds, NetworkColors } from "interfaces/enums/network-ids";
+import { NetworkColors, NetworkIds } from "interfaces/enums/network-ids";
+const { publicRuntimeConfig } = getConfig()
 
 export default function NetworkIdentifier() {
   const {
@@ -35,7 +38,7 @@ export default function NetworkIdentifier() {
           <span>
             {network}{" "}
             {(network !==
-              process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME?.toLowerCase() &&
+              publicRuntimeConfig.metaMask.chainName.toLowerCase() &&
               "testnet") ||
               ""}
           </span>

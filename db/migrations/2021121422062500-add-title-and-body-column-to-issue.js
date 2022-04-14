@@ -46,7 +46,7 @@ module.exports = {
     if (!issues.length) return;
 
     const octokit = new Octokit({
-      auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN
+      auth: process.env.NEXT_PUBLIC_GH_TOKEN
     });
 
     console.log("Begin fetching title and body with Octokit");

@@ -1,6 +1,6 @@
 import models from "db/models";
-import { CONTRACT_ADDRESS } from "env";
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
@@ -8,6 +8,8 @@ import twitterTweet from "helpers/api/handle-twitter-tweet";
 
 import api from "services/api";
 
+
+const { publicRuntimeConfig } = getConfig()
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {
     title,
@@ -38,7 +40,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   });
   if (!repository) return res.status(422).json("repository not found");
 
-  const octokit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
+  const octokit = new Octokit({ auth: publicRuntimeConfig.github.token });
 
   const [owner, repo] = repository.githubPath.split("/");
 
@@ -112,7 +114,7 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
       await api.post(`/seo/${issueId}`).catch((e) => {
         console.log("Error creating SEO", e);
       });
-      if (network.contractAddress === CONTRACT_ADDRESS)
+      if (network.contractAddress === publicRuntimeConfig.contract.address)
         twitterTweet({
           type: "bounty",
           action: "created",

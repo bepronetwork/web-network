@@ -1,20 +1,13 @@
 import React, {
   createContext,
-  useCallback,
-  useState,
-  useContext,
-  useMemo,
-  useEffect
+  useCallback, useContext, useEffect, useMemo, useState
 } from "react";
 
 import { fromSmartContractDecimals } from "@taikai/dappkit";
 import { useRouter } from "next/router";
 
 import {
-  IssueData,
-  INetworkIssue,
-  pullRequest,
-  Comment
+  Comment, INetworkIssue, IssueData, pullRequest
 } from "interfaces/issue-data";
 import { INetworkProposal } from "interfaces/proposal";
 

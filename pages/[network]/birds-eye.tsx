@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import getConfig from "next/config";
 import router from "next/router";
 import { Octokit } from "octokit";
 
@@ -15,6 +16,7 @@ import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 
+const { publicRuntimeConfig } = getConfig()
 export default function FalconPunchPage() {
   const [userList, setUserList] = useState<
     { created_at: string; login: string; public_repos: number; eth: number }[]
@@ -95,7 +97,7 @@ export default function FalconPunchPage() {
   useEffect(() => {
     if (!wallet?.address) return;
 
-    if (wallet.address !== process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS)
+    if (wallet.address !== publicRuntimeConfig.adminWalletAddress)
       router.push("/");
   }, [wallet?.address]);
 

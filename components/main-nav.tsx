@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
-import { BEPRO_NETWORK_NAME, IPFS_BASE } from "env";
+import getConfig from "next/config";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
@@ -29,10 +29,7 @@ import { formatNumberToNScale } from "helpers/formatNumber";
 import { truncateAddress } from "helpers/truncate-address";
 
 import useNetwork from "x-hooks/use-network";
-
-const CURRENCY = process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME;
-const REQUIRED_NETWORK =
-  process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME?.toLowerCase();
+const { publicRuntimeConfig } = getConfig()
 
 export default function MainNav() {
   const { pathname } = useRouter();
@@ -63,9 +60,9 @@ export default function MainNav() {
             icon={
               isNetworksPage ? (
                 <BeproLogoBlue />
-              ) : network?.name !== BEPRO_NETWORK_NAME ? (
+              ) : network?.name !== publicRuntimeConfig.networkConfig.networkName ? (
                 <Image
-                  src={`${IPFS_BASE}/${network?.fullLogo}`}
+                  src={`${publicRuntimeConfig.ipfsUrl}/${network?.fullLogo}`}
                   width={104}
                   height={32}
                 />
@@ -166,7 +163,7 @@ export default function MainNav() {
             <HelpIcon />
           </Button>
 
-          <WrongNetworkModal requiredNetwork={REQUIRED_NETWORK} />
+          <WrongNetworkModal requiredNetwork={publicRuntimeConfig.metaMask.chainName?.toLowerCase()} />
 
           <ConnectWalletButton>
             <div className="d-flex account-info align-items-center">
@@ -189,7 +186,7 @@ export default function MainNav() {
                   <BalanceAddressAvatar
                     address={truncateAddress(wallet?.address || "", 4)}
                     balance={wallet?.balance?.eth}
-                    currency={CURRENCY}
+                    currency={publicRuntimeConfig.metaMask.tokenName}
                   />
                 }
                 className="meta-info d-flex align-items-center"
