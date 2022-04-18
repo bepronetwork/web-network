@@ -1,3 +1,4 @@
+import { API } from 'env';
 import { NextApiRequest } from 'next'
 import { getToken } from 'next-auth/jwt'
 import type { NextFetchEvent } from 'next/server'
@@ -15,5 +16,5 @@ export async function middleware(req: NextApiRequest, ev: NextFetchEvent) {
       status: 401,
     })
   }
-  return NextResponse.next()
+  return NextResponse.next();
 }

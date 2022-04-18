@@ -439,7 +439,8 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       ...(await serverSideTranslations(locale, [
         "common",
         "create-bounty",
-        "connect-wallet-button"
+        "connect-wallet-button",
+        "change-token-modal"
       ]))
     }
   };

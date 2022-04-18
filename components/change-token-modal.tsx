@@ -17,11 +17,10 @@ export default function ChangeTokenModal({
   setClose,
   setToken = (newToken: Token) => {}
 }) {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation(["common", "change-token-modal"]);
   const [address, setAddress] = useState('');
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
-  const [contract, setContract] = useState<ERC20>();
   const [isExecuting, setIsExecuting] = useState(false);
   const [isValidAddress, setIsValidAddress] = useState<boolean>();
 
@@ -46,7 +45,6 @@ export default function ChangeTokenModal({
 
       setName(await erc20.name());
       setSymbol(await erc20.symbol());
-      setContract(erc20);
       setIsValidAddress(true);
     } catch (error) {
       setIsValidAddress(false);
@@ -84,14 +82,19 @@ export default function ChangeTokenModal({
   }
 
   return (
-    <Modal show={show} onCloseClick={handleClose} title="Add Token" titlePosition="center">
+    <Modal show={show} onCloseClick={handleClose} title={t("change-token-modal:title")} titlePosition="center">
       <div className="container">
         <p className="caption-small trans mb-2 text-center">
-            Add an ERC20 token to use on this Bounty
+            {t("change-token-modal:description")}
         </p>
 
         <div className="form-group mt-3">
-          <label htmlFor="" className="caption-small mb-2 text-gray">Address</label>
+          <label 
+            htmlFor="" 
+            className="caption-small mb-2 text-gray"
+          >
+            {t("change-token-modal:fields.address.label")}
+          </label>
           <input 
             type="text" 
             className={`form-control rounded-4 ${isValidAddress === false ? 'is-invalid' : ''}`}
@@ -102,7 +105,7 @@ export default function ChangeTokenModal({
 
           {
             isValidAddress === false ? 
-            <small className="small-info text-danger">Invalid address provided!</small> : 
+            <small className="small-info text-danger">{t("change-token-modal:fields.address.error")}</small> : 
             <></>
           }
         </div>
@@ -110,14 +113,26 @@ export default function ChangeTokenModal({
         <div className="row">
           <div className="col-6">
             <div className="form-group">
-              <label htmlFor="" className="caption-small mb-2 text-gray">Name</label>
+              <label 
+                htmlFor="" 
+                className="caption-small mb-2 text-gray"
+              >
+                {t("change-token-modal:fields.name.label")}
+              </label>
+              
               <input type="text" className="form-control rounded-4" value={name} readOnly />
             </div>
           </div>
 
           <div className="col-6">
             <div className="form-group">
-              <label htmlFor="" className="caption-small mb-2 text-gray">Symbol</label>
+              <label 
+                htmlFor="" 
+                className="caption-small mb-2 text-gray"
+              >
+                {t("change-token-modal:fields.symbol.label")}
+              </label>
+
               <input type="text" className="form-control rounded-4" value={symbol} readOnly />
             </div>
           </div>
