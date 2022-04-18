@@ -1,3 +1,4 @@
+import { BountyParser } from "@taikai/dappkit";
 import { 
   Web3Connection, 
   Network_v2, 
@@ -217,7 +218,7 @@ class BeproFacet {
   async getBounty(id: number): Promise<Bounty> {
     if (!this.isStarted) return;
     
-    return this.network.getBounty(id);
+    return BountyParser(await this.network.getBounty(id));
   }
 
   async getBounties(ids: number[] = []): Promise<Bounty[]> {
