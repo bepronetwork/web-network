@@ -133,7 +133,7 @@ export default function NetworkListItem({
 
         <span
           className={`caption-medium mr-2 ${
-            network?.name === publicRuntimeConfig.configNetwork.networkName ? "text-blue" : ""
+            network?.name === publicRuntimeConfig?.networkConfig?.networkName ? "text-blue" : ""
           }`}
           style={{ color: `${network?.colors?.primary}` }}
         >
