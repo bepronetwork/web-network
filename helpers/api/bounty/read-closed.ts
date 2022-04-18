@@ -92,7 +92,7 @@ export default async function readBountyClosed(events, network: Network_v2, cust
 
             closedBounties.push(bounty.issueId);
         
-            if (network.contractAddress === publicRuntimeConfig.address.contract)
+            if (network.contractAddress === publicRuntimeConfig.contract.address)
               twitterTweet({
                 type: "bounty",
                 action: "distributed",

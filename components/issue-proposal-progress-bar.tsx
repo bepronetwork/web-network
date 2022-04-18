@@ -7,9 +7,6 @@ import { useNetwork } from "contexts/network";
 
 import { formatDate, getTimeDifferenceInWords } from "helpers/formatDate";
 
-import { BeproService } from "services/bepro-service";
-
-
 export default function IssueProposalProgressBar({
   isFinalized = false,
   isIssueinDraft = true,

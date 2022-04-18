@@ -178,7 +178,7 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
 
   const network = networkBeproJs({
     contractAddress: customNetwork.name.toLowerCase() === publicRuntimeConfig.networkConfig.networkName.toLowerCase() ? 
-      publicRuntimeConfig.address.contract : customNetwork.networkAddress,
+      publicRuntimeConfig.contract.address : customNetwork.networkAddress,
     version: 2
   }) as Network_v2;
 

@@ -67,7 +67,7 @@ export default async function readProposalCreated(events, network: Network_v2, c
 
             created.push(networkProposal.id);
         
-            if (network.contractAddress === publicRuntimeConfig.address.contract)
+            if (network.contractAddress === publicRuntimeConfig.contract.address)
               twitterTweet({
                 type: "proposal",
                 action: "created",

@@ -268,7 +268,7 @@ export default function PageCreateIssue() {
 
     const tmpTokens = [];
 
-    if (activeNetwork.networkAddress === publicRuntimeConfig.address.contract) tmpTokens.push(BEPRO_TOKEN);
+    if (activeNetwork.networkAddress === publicRuntimeConfig.contract.address) tmpTokens.push(BEPRO_TOKEN);
 
     tmpTokens.push(...activeNetwork.tokens.map(({name, symbol, address}) => ({name, symbol, address} as Token)));
 
@@ -381,7 +381,7 @@ export default function PageCreateIssue() {
                     defaultToken={BEPRO_TOKEN} 
                     tokens={customTokens} 
                     canAddToken={
-                      activeNetwork?.networkAddress === publicRuntimeConfig.address.contract ? 
+                      activeNetwork?.networkAddress === publicRuntimeConfig.contract.address ? 
                       publicRuntimeConfig.networkConfig.allowCustomTokens :
                       !!activeNetwork?.allowCustomTokens
                     }
