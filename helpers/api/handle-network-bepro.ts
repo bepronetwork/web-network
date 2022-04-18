@@ -1,5 +1,5 @@
-import getConfig from "next/config";
 import { Network, Web3Connection, Network_v2 } from "@taikai/dappkit";
+import getConfig from "next/config";
 
 const { publicRuntimeConfig, serverRuntimeConfig } = getConfig()
 
@@ -7,7 +7,7 @@ export default function networkBeproJs({
   web3Connection = publicRuntimeConfig.web3ProviderConnection,
   privateKey = serverRuntimeConfig.walletPrivateKey,
   contractAddress = publicRuntimeConfig.contract.address,
-  debug = false
+  debug = false,
   version = 1
 }: {
   web3Connection?: string;

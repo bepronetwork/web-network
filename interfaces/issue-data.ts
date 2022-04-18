@@ -61,7 +61,7 @@ export interface pullRequest {
   merged: boolean;
   updatedAt: Date;
   issue?: IssueData;
-  comments?: Comment[];
+  comments?: IssueDataComment[];
   status?: string;
   reviewers?: string[];
   contractId?: number;
@@ -75,7 +75,7 @@ export interface developer {
   type?: string;
 }
 
-export interface Comment {
+export interface IssueDataComment {
   body: string;
   created_at: string | number | Date;
   updated_at: string | number | Date;

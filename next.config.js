@@ -41,7 +41,8 @@ const publicRuntimeConfig = {
     },
     disputesPercentage: process.env.NEXT_PUBLIC_DISPUTE_PERCENTAGE_MAX,
     networkName: process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME,
-    factoryAddress: process.env.NEXT_PUBLIC_NETWORK_FACTORY_ADDRESS
+    factoryAddress: process.env.NEXT_PUBLIC_NETWORK_FACTORY_ADDRESS,
+    allowCustomTokens: process.env.NEXT_PUBLIC_ALLOW_CUSTOM_TOKENS
   },
   currency:{
     apiUrl: process.env.NEXT_PUBLIC_CURRENCY_API,

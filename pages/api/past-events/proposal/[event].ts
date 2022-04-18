@@ -1,7 +1,7 @@
 
 import { Network_v2 } from "@taikai/dappkit";
-import { BEPRO_NETWORK_NAME, CONTRACT_ADDRESS } from "env";
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
 import { Op } from "sequelize";
 
 import models from "db/models";
@@ -13,6 +13,8 @@ const eventsMapping = {
   "created": ["getBountyProposalCreatedEvents", "readProposalCreated"],
   "disputed": ["getBountyProposalDisputedEvents", "readProposalDisputed"]
 }
+
+const { publicRuntimeConfig } = getConfig();
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { event } = req.query;
@@ -29,8 +31,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   if (!customNetwork || customNetwork?.isClosed) return res.status(404).json("Invalid network");
 
   const network = networkBeproJs({
-    contractAddress: customNetwork.name.toLowerCase() === BEPRO_NETWORK_NAME.toLowerCase() ? 
-      CONTRACT_ADDRESS : customNetwork.networkAddress,
+    contractAddress: customNetwork.name.toLowerCase() === publicRuntimeConfig.networkConfig.networkName.toLowerCase() ? 
+      publicRuntimeConfig.address.contract : customNetwork.networkAddress,
     version: 2
   }) as Network_v2;
 

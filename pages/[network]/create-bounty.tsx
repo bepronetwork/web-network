@@ -1,6 +1,5 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
-import { ALLOW_CUSTOM_TOKENS, CONTRACT_ADDRESS, SETTLER_ADDRESS } from "env";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import getConfig from "next/config";
@@ -47,7 +46,7 @@ interface Amount {
 }
 
 const BEPRO_TOKEN: Token = {
-  address: SETTLER_ADDRESS,
+  address: publicRuntimeConfig.contract.settler,
   name: "BEPRO",
   symbol: "$BEPRO"
 };
@@ -269,7 +268,7 @@ export default function PageCreateIssue() {
 
     const tmpTokens = [];
 
-    if (activeNetwork.networkAddress === CONTRACT_ADDRESS) tmpTokens.push(BEPRO_TOKEN);
+    if (activeNetwork.networkAddress === publicRuntimeConfig.address.contract) tmpTokens.push(BEPRO_TOKEN);
 
     tmpTokens.push(...activeNetwork.tokens.map(({name, symbol, address}) => ({name, symbol, address} as Token)));
 
@@ -382,8 +381,8 @@ export default function PageCreateIssue() {
                     defaultToken={BEPRO_TOKEN} 
                     tokens={customTokens} 
                     canAddToken={
-                      activeNetwork?.networkAddress === CONTRACT_ADDRESS ? 
-                      ALLOW_CUSTOM_TOKENS :
+                      activeNetwork?.networkAddress === publicRuntimeConfig.address.contract ? 
+                      publicRuntimeConfig.networkConfig.allowCustomTokens :
                       !!activeNetwork?.allowCustomTokens
                     }
                     addToken={addToken} 

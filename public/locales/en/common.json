@@ -104,6 +104,7 @@
   "misc": {
     "by": "by",
     "and": "and",
+    "add": "Add",
     "comments_one": "{{count}} comment",
     "comments_other": "{{count}} comments",
     "created-at": "Created at",

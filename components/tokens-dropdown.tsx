@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import Creatable from "react-select/creatable";
 
+import { useTranslation } from "next-i18next";
+
 import ChangeTokenModal from "components/change-token-modal";
 
 import { Token } from "interfaces/token";
@@ -28,8 +30,10 @@ export default function TokensDropdown({
   const [options, setOptions] = useState<Option[]>();
   const [option, setOption] = useState<Option>();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const { t } = useTranslation("common");
 
-  const formatCreateLabel = (inputValue: string) => canAddToken ? `Add ${inputValue} token` : undefined;
+  const formatCreateLabel = 
+    (inputValue: string) => canAddToken ? `${t("misc.add")} ${inputValue} ${t("misc.token")}` : undefined;
   const tokenToOption = (token: Token): Option => ({ label: `${token.symbol} ${token.name}`, value: token });
 
   const handleChange = (newValue) => {

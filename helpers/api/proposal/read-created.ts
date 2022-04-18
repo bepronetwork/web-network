@@ -1,10 +1,12 @@
 import { Network_v2 } from "@taikai/dappkit";
-import { CONTRACT_ADDRESS } from "env";
+import getConfig from "next/config";
 import { Op } from "sequelize";
 
 import models from "db/models";
 
 import twitterTweet from "../handle-twitter-tweet";
+
+const { publicRuntimeConfig } = getConfig()
 
 export default async function readProposalCreated(events, network: Network_v2, customNetwork) {
   const created = [];
@@ -65,7 +67,7 @@ export default async function readProposalCreated(events, network: Network_v2, c
 
             created.push(networkProposal.id);
         
-            if (network.contractAddress === CONTRACT_ADDRESS)
+            if (network.contractAddress === publicRuntimeConfig.address.contract)
               twitterTweet({
                 type: "proposal",
                 action: "created",

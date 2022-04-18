@@ -144,7 +144,7 @@ export default function useApi() {
    * @returns string
    */
   async function createPreBounty(payload: CreateBounty,
-                                 networkName = BEPRO_NETWORK_NAME): Promise<string> {
+                                 networkName = publicRuntimeConfig.networkConfig.networkName): Promise<string> {
     return client
         .post("/bounty", { ...payload, networkName })
         .then(({ data }) => data)
@@ -191,7 +191,7 @@ export default function useApi() {
       username: string;
       branch: string;
     },
-                                        networkName = publicRuntimeConfig.networkConfig.networkName) {
+                                      networkName = publicRuntimeConfig.networkConfig.networkName) {
     return client
       .post("/pull-request/", { ...payload, repoId, githubId, networkName })
       .then(({ data }) => data)

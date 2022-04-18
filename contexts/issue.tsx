@@ -13,7 +13,7 @@ import { BountyExtended, ProposalExtended } from "interfaces/bounty";
 import {
   IssueData,
   pullRequest,
-  Comment
+  IssueDataComment
 } from "interfaces/issue-data";
 
 import { BeproService } from "services/bepro-service";
@@ -23,7 +23,7 @@ import useOctokit from "x-hooks/use-octokit";
 
 
 export interface IActiveIssue extends IssueData {
-  comments: Comment[];
+  comments: IssueDataComment[];
   lastUpdated: number;
 }
 const TTL = 60 * 2 * 100; // 2 Min
@@ -94,7 +94,7 @@ export const IssueProvider: React.FC = function ({ children }) {
         ...issue,
         comments,
         mergeProposals: issue.mergeProposals.map(mp => 
-          ({...mp, isMerged: issue.merged === null ? false : +mp.scMergeId === +issue.merged})),
+          ({...mp, isMerged: issue.merged !== null && +mp.scMergeId === +issue.merged})),
         lastUpdated: +new Date()
     } as IActiveIssue;
 

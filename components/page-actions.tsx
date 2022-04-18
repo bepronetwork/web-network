@@ -281,7 +281,7 @@ export default function PageActions({
     description: prDescription,
     branch
   }): Promise<void> {
-    let cancelPayload = undefined;
+    let pullRequestPayload = undefined;
 
     createPrePullRequest(repoId as string, githubId, {
         title: prTitle,
@@ -289,7 +289,7 @@ export default function PageActions({
         username: githubLogin,
         branch
     }).then(({bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid}) => {
-      cancelPayload = {
+      pullRequestPayload = {
           repoId, 
           issueGithubId: githubId, 
           bountyId,
@@ -323,7 +323,7 @@ export default function PageActions({
     })
     .catch((err) => {
       setShowPRModal(false);
-      if (cancelPayload) cancelPrePullRequest(cancelPayload);
+      if (pullRequestPayload) cancelPrePullRequest(pullRequestPayload);
 
       if (err.response?.status === 422 && err.response?.data) {
         err.response?.data.errors?.map((item) =>

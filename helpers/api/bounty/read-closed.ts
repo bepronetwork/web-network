@@ -1,5 +1,5 @@
 import { Network_v2 } from "@taikai/dappkit";
-import { CONTRACT_ADDRESS } from "env";
+import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
@@ -8,6 +8,8 @@ import models from "db/models";
 import api from "services/api";
 
 import twitterTweet from "../handle-twitter-tweet";
+
+const { publicRuntimeConfig } = getConfig()
 
 export default async function readBountyClosed(events, network: Network_v2, customNetwork) {
   const closedBounties = [];
@@ -90,7 +92,7 @@ export default async function readBountyClosed(events, network: Network_v2, cust
 
             closedBounties.push(bounty.issueId);
         
-            if (network.contractAddress === CONTRACT_ADDRESS)
+            if (network.contractAddress === publicRuntimeConfig.address.contract)
               twitterTweet({
                 type: "bounty",
                 action: "distributed",

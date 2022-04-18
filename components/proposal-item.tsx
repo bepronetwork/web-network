@@ -52,7 +52,7 @@ export default function ProposalItem({
       !isProposalDisputable(proposal?.createdAt, disputableTime),
       networkIssue?.proposals[proposal.contractId]?.isDisputed,
       !networkIssue?.proposals[proposal.id]?.canUserDispute,
-      wallet?.balance?.oracles?.tokensLocked === 0,
+      wallet?.balance?.oracles?.locked === 0,
   ]
     .some(v => v)
 

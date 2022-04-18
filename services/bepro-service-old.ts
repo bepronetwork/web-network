@@ -1,4 +1,4 @@
-import { Web3Connection, Network, ERC20, NetworkFactory } from '@taikai/dappkit';
+import { Web3Connection, Network, ERC20, NetworkFactory } from 'dappkit';
 
 import { TransactionStatus } from 'interfaces/enums/transaction-status'
 import {
@@ -7,16 +7,9 @@ import {
 } from 'interfaces/transaction'
 
 
-import {
-  CONTRACT_ADDRESS,
-  SETTLER_ADDRESS,
-  WEB3_CONNECTION,
-  NETWORK_FACTORY_ADDRESS
-} from '../env'
-
 class BeproFacet {
   readonly bepro: Web3Connection = new Web3Connection({
-    web3Host: WEB3_CONNECTION
+    //web3Host: WEB3_CONNECTION
     //privateKey: process.env.NEXT_PUBLIC_WALLET_PRIVATE_KEY,
     //debug: true
   })
@@ -42,10 +35,10 @@ class BeproFacet {
     try {
       if (!this.started) await this.bepro.start()
 
-      this.network = new Network(this.bepro,
-        customNetworkAddress || CONTRACT_ADDRESS)
+      // this.network = new Network(this.bepro,
+        // customNetworkAddress || CONTRACT_ADDRESS)
 
-      this.erc20 = new ERC20(this.bepro, SETTLER_ADDRESS)
+      // this.erc20 = new ERC20(this.bepro, SETTLER_ADDRESS)
 
       await this.network.loadContract()
 
@@ -63,20 +56,20 @@ class BeproFacet {
 
   async startNetworkFactory() {
     try {
-      if (!NETWORK_FACTORY_ADDRESS)
-        console.error('Network Factory Contract is Missing')
-      else {
-        this.networkFactoryStarted = false
+      // if (!NETWORK_FACTORY_ADDRESS)
+      //   console.error('Network Factory Contract is Missing')
+      // else {
+      //   this.networkFactoryStarted = false
         
-        this.networkFactory = new NetworkFactory(this.bepro,
-          NETWORK_FACTORY_ADDRESS)
+      //   this.networkFactory = new NetworkFactory(this.bepro,
+      //     NETWORK_FACTORY_ADDRESS)
 
-        await this.networkFactory.loadContract()
+      //   await this.networkFactory.loadContract()
 
-        this.networkFactoryStarted = true
+      //   this.networkFactoryStarted = true
 
-        this.operatorAmount = await this.getOperatorAmount()
-      }
+      //   this.operatorAmount = await this.getOperatorAmount()
+      // }
     } catch (error) {
       console.error(error)
     }
@@ -253,7 +246,7 @@ class BeproFacet {
   }
 
   async createNetwork() {
-    return this.networkFactory.createNetwork(SETTLER_ADDRESS, SETTLER_ADDRESS)
+    // return this.networkFactory.createNetwork(SETTLER_ADDRESS, SETTLER_ADDRESS)
   }
 
   async claimNetworkGovernor(networkAddress) {

@@ -1,10 +1,11 @@
 import { Network_v2 } from "@taikai/dappkit";
-import { CONTRACT_ADDRESS } from "env";
-import { Op } from "sequelize";
+import getConfig from "next/config";
 
 import models from "db/models";
 
 import twitterTweet from "../handle-twitter-tweet";
+
+const { publicRuntimeConfig } = getConfig();
 
 export default async function readProposalDisputed(events, network: Network_v2, customNetwork) {
   const disputed = [];
@@ -46,7 +47,7 @@ export default async function readProposalDisputed(events, network: Network_v2, 
           });
 
           if (proposal) {
-            if (network.contractAddress === CONTRACT_ADDRESS) {
+            if (network.contractAddress === publicRuntimeConfig.address.contract) {
               twitterTweet({
                 type: "proposal",
                 action: "failed",

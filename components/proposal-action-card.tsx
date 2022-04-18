@@ -42,7 +42,7 @@ export default function ProposalActionCard({
     !isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime),
     networkProposal?.isDisputed,
     !networkProposal?.canUserDispute,
-    wallet?.balance?.oracles?.tokensLocked === 0,
+    wallet?.balance?.oracles?.locked === 0,
   ].some((v) => v);
 
   const isSuccess = [

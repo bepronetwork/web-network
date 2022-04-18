@@ -1,4 +1,3 @@
-import { API } from 'env';
 import { NextApiRequest } from 'next'
 import { getToken } from 'next-auth/jwt'
 import type { NextFetchEvent } from 'next/server'

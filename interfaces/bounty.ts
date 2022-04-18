@@ -1,7 +1,4 @@
-import { PullRequest } from "@taikai/dappkit";
-import { Benefactor } from "@taikai/dappkit";
-import { ProposalDetail } from "@taikai/dappkit";
-import { Bounty, Proposal } from "@taikai/dappkit";
+import { PullRequest, Benefactor, ProposalDetail, Bounty, Proposal } from "@taikai/dappkit";
 
 export interface BountyExtended extends Bounty {
     id: number;

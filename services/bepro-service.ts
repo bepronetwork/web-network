@@ -9,12 +9,7 @@ import {
 } from "@taikai/dappkit";
 import { nativeZeroAddress } from "@taikai/dappkit/dist/src/utils/constants";
 import getConfig from "next/config";
-
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import {
-  BlockTransaction,
-  SimpleBlockTransactionPayload
-} from "@interfaces/transaction";
+import { NetworkParameters } from "types/dappkit";
 
 
 const { publicRuntimeConfig } = getConfig()
@@ -34,14 +29,11 @@ class BeproFacet {
 
   operatorAmount: number;
 
-  async start(networkAddress = CONTRACT_ADDRESS) {
+  async start(networkAddress = publicRuntimeConfig.contract.address) {
     try {
       if (!this.isStarted) await this.bepro.start();
-
-      this.network = new Network(this.bepro,
-        customNetworkAddress || publicRuntimeConfig.contract.address);
-
-      this.erc20 = new ERC20(this.bepro, publicRuntimeConfig.contract.settler);
+      
+      this.network = new Network_v2(this.bepro, networkAddress);
 
       await this.network.loadContract();
 
@@ -50,7 +42,7 @@ class BeproFacet {
       (window as any).network = this.network;
 
       console.table({
-        web3: WEB3_CONNECTION,
+        web3: publicRuntimeConfig.web3ProviderConnection,
         contract: networkAddress,
         settler: this.network.settlerToken?.contractAddress,
         nft: this.network.nftToken?.contractAddress,
@@ -172,23 +164,13 @@ class BeproFacet {
 
 
   // Getters and Setters
-  async getNetworkParameter(parameter: "councilAmount" | 
-    "disputableTime" | 
-    "draftTime" | 
-    "oracleExchangeRate" | 
-    "mergeCreatorFeeShare" | 
-    "percentageNeededForDispute") {
+  async getNetworkParameter(parameter: NetworkParameters) {
     if (this.isStarted) return this.network[parameter]();
 
     return 0;
   }
 
-  async setNetworkParameter(parameter: "councilAmount" | 
-  "disputableTime" | 
-  "draftTime" | 
-  "oracleExchangeRate" | 
-  "mergeCreatorFeeShare" | 
-  "percentageNeededForDispute", value: number) {
+  async setNetworkParameter(parameter: NetworkParameters, value: number) {
     if (!this.isStarted) return false;
     
     const param = [...parameter];
@@ -208,7 +190,7 @@ class BeproFacet {
     };
   }
 
-  async getAllowance(tokenAddress: string = SETTLER_ADDRESS, walletAddress: string = undefined) {
+  async getAllowance(tokenAddress: string = publicRuntimeConfig.contract.settler, walletAddress: string = undefined) {
     const erc20 = await this.getERC20Obj(tokenAddress);
 
     return erc20.allowance(walletAddress || this.address, this.network.contractAddress);
@@ -235,22 +217,7 @@ class BeproFacet {
   async getBounty(id: number): Promise<Bounty> {
     if (!this.isStarted) return;
     
-    const bounty = await this.network.getBounty(id);
-    const transactional = new ERC20(this.bepro, bounty.transactional);
-
-    await transactional.loadContract();
-
-    const network = await this.getNetworkObj();
-
-    return bountyParser({
-      ...bounty,
-      tokenAmount: fromSmartContractDecimals(bounty.tokenAmount, transactional.decimals),
-      proposals: bounty.proposals.map(proposal => ({
-        ...proposal, 
-        oracles: fromSmartContractDecimals(+proposal.oracles, network.settlerToken.decimals),
-        disputeWeight: fromSmartContractDecimals(+proposal.disputeWeight, this.network.settlerToken.decimals)
-      }))
-    });
+    return this.network.getBounty(id);
   }
 
   async getBounties(ids: number[] = []): Promise<Bounty[]> {

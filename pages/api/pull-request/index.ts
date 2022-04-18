@@ -1,5 +1,4 @@
 import { Network_v2 } from "@taikai/dappkit";
-import { BEPRO_NETWORK_NAME, CONTRACT_ADDRESS } from "env";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
@@ -12,6 +11,7 @@ import networkBeproJs from "helpers/api/handle-network-bepro";
 import paginate from "helpers/paginate";
 
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
+
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { login, issueId, networkName } = req.query;
   const where = {} as any;
@@ -177,8 +177,8 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
   if (!pullRequest) return res.status(404).json("Invalid");
 
   const network = networkBeproJs({
-    contractAddress: customNetwork.name.toLowerCase() === BEPRO_NETWORK_NAME.toLowerCase() ? 
-      CONTRACT_ADDRESS : customNetwork.networkAddress,
+    contractAddress: customNetwork.name.toLowerCase() === publicRuntimeConfig.networkConfig.networkName.toLowerCase() ? 
+      publicRuntimeConfig.address.contract : customNetwork.networkAddress,
     version: 2
   }) as Network_v2;
 

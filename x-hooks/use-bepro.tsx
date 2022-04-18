@@ -1,6 +1,5 @@
 import { useContext } from "react";
 
-
 import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import { useTranslation } from "next-i18next";
 
