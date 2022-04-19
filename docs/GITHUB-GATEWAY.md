@@ -1,6 +1,6 @@
 ## 1. GITHUB REPOSITORYS MANAGER
 
-To be possible managering repositories, issues, pullrequests and branchs, is required authenticating one account with [Github Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token). this account will recive permission of all repositories registred in the project for be manipulate using github api. So is recomended create a new account for this purpose only, like a bot account.
+To be possible attach managering repositories, issues, pullrequests and branchs, is required authenticating one account with [Github Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token). this account will recive permission of all repositories registred in the project for be manipulate using github api. So is recomended create a new account for this purpose only, like a bot account.
 
 Follow this [documentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) to generate your Github Token, remember of guarantee the permissions of scoopes `repo` and `admin:repo_hook` and change `Expiration` to a highest time.
 

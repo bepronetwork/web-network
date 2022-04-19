@@ -1,6 +1,6 @@
 ## 1. IPFS
 
-Following the idea of using and support the descentralized solutions, we choice [IPFS](https://ipfs.io/) for save files and pictures, like SEO Cards for exemple. your can [read more](https://docs.ipfs.io/).
+Following the idea of using and support the decentralized solutions, we choice [IPFS](https://ipfs.io/) for save files and pictures, like SEO Cards for exemple. your can [read more](https://docs.ipfs.io/).
 
 Is recomended using [Infura](https://infura.io/product/ipfs) to be your file host, but you can use any other ipfs solution.
 

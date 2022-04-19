@@ -8,15 +8,16 @@
 </h3>
 
 <p align="center">
-  <a href="#getting-started">Getting Started</a> •
-  <a href="#documentation">Documentation</a> •
-  <a href="#community">Community</a> •
-  <a href="#docker">Docker</a> •
-  <a href="#contributing">Contributing</a> •
-  <a href="#related">Related</a>
+  <a href="#2-getting-started">Getting Started</a> •
+  <a href="#3-environment-configuration">Enviroment</a> •
+  <a href="#4-running">Running</a> •
+  <a href="#7-contributing">Contributing</a> •
+  <a href="#8-join-in-us-community">Community</a> •
 </p>
 
 ---
+
+# How Works?
 
 ## 1. Prerequisites
 
@@ -39,13 +40,8 @@ Create database:
 ```bash
 $ docker-compose up -d
 ```
-
-Run migrations:
-
-```bash
-$ npm run migrate
-```
 <br>
+
 
 ## 3. Environment Configuration
 
@@ -58,23 +54,109 @@ $ cp .env.exemple .env
 
 *`* You need follow all the required steps to the project run correctly.`*
 
-- [MetaMask Setup](./docs/METAMASK.md) `*`
-- [Authentication Setup](./docs/AUTHENTICATION.md) `*`
-- [Github Gateway](./docs/GITHUB-GATEWAY.md) `*`
-- [IPFS/Infura Host](./docs/IPFS.md) `*`
-- [Ganache]()
-- [IP-Api]()
-- [Twitter Gateway]()
-## Running
+- `*` [MetaMask Setup](./docs/METAMASK.md)
+- `*` [Authentication Setup](./docs/AUTHENTICATION.md)
+- `*` [Github Gateway](./docs/GITHUB-GATEWAY.md)
+- `*` [IPFS/Infura Host](./docs/IPFS.md)
+- [Ganache](./docs/GANACHE.md)
+- [IP-Api](./docs/IP-API.md)
+- [Twitter Gateway](./docs/TWITTER-GATEWAY.md)
 
-## Container
+<br>
 
-## Deploy
-## Contributing
+## 4. Running
+
+After you have completed the [Environment Configuration](#3-enviroment-configuration) step, you are ready to run the project.
+
+make sure your database is up and run migrations:
+
+```bash
+$ npm run migrate
+```
+
+start project with:
+
+```bash
+$ npm run dev
+```
+
+and start a script to lister pastenvets from blockchain:
+
+```bash
+$ npm run schedules
+```
+<br>
+
+### Connecting Github and Metamask.
+
+With you project runing, you must access your domain, and connect you wallet.
+<br/>
+
+><img align="center" src="./docs/assets/connecting-metamask.png" width="500"/>
+
+<br>
+
+After you must connect with github.
+<br/>
+
+><img align="center" src="./docs/assets/connecting-account.png" width="500"/>
+
+<br>
+
+And if every runing well, you will see this page
+<br/>
+
+><img align="center" src="./docs/assets/connected-account.png" width="500"/>
+
+<br>
+
+<br>
+
+### Parity Configuration
+*`Attention, if you chose running with you can skip this step`*
+
+if you are the owner of the wallet configured as admin in the previous steps, you must access the parity page in `yourdomain/defaultnetworkname/parity`, to deploy a new contract.
+
+Parity page in `yourdomain/defaultnetworkname/parity`
+<br/>
+
+> <img align="center" src="./docs/assets/parity-page.png" width="500"/>
+<br/>
+
+With a new address of contract after deploy, you must update .env again in
+```text
+.env
+
+NEXT_PUBLIC_CONTRACT_ADDRESS=
+NEXT_PUBLIC_SETTLER_ADDRESS=
+NEXT_PUBLIC_TRANSACTION_ADDRESS=
+```
+<br>
+
+
+### Network Configuration
+
+Finnaly we can finish, the last step is configure own network,
+to learn more about networks inside webapp, read the [doc](./docs/NETWORK-MANAGER.md).
+
+In short, you can have one own network, with you branding, bounties and repositories.
+you can configurate this acessing  `yourdomain/defaultnetworkname/network-setting`.
+<br/>
+><img align="center" src="./docs/assets/network-settings-page.png" width="500"/>
+## 5. Container
+Soon.
+
+<br>
+
+## 6. Deploy
+<br>
+Soon.
+
+## 7. Contributing
 
 See [CONTRIBUTING.md](https://github.com/bepro/webapp/CONTRIBUTING.md) for our guide to contributing to web-network.
 
-## Join in us Community
+## 8. Join in us Community
 
 - [Discord](https://discord.gg/9aUufhzhfm)
 - [Telegram](https://t.me/betprotocol)
