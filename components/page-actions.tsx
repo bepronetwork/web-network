@@ -268,47 +268,42 @@ export default function PageActions({
   }
 
   async function handlePullrequest({title: prTitle, description: prDescription, branch}): Promise<void> {
-    return new Promise((resolve, reject) => {
-        createPullRequestIssue(repoId as string, githubId, {title: prTitle, description: prDescription, username: githubLogin, branch})
-        .then(() => {
+    createPullRequestIssue(repoId as string, githubId, {title: prTitle, description: prDescription, username: githubLogin, branch})
+    .then(() => {
+      dispatch(
+        addToast({
+          type: "success",
+          title: t('actions.success'),
+          content: t('pull-request:actions.create.success'),
+        })
+      );
+
+      if (handleMicroService)
+        handleMicroService(true);
+
+      setShowPRModal(false);
+    })
+    .catch((err) => {
+      if (err.response?.status === 422 && err.response?.data) {
+        err.response?.data.errors?.map((item) =>
           dispatch(
             addToast({
-              type: "success",
-              title: t('actions.success'),
-              content: t('pull-request:actions.create.success'),
+              type: "danger",
+              title: t('actions.failed'),
+              content: item.message,
             })
-          );
-
-          if (handleMicroService)
-            handleMicroService(true);
-
-          setShowPRModal(false);
-          resolve()
-        })
-        .catch((err) => {
-          if (err.response?.status === 422 && err.response?.data) {
-            err.response?.data.errors?.map((item) =>
-              dispatch(
-                addToast({
-                  type: "danger",
-                  title: t('actions.failed'),
-                  content: item.message,
-                })
-              )
-            );
-            reject(err)
-          } else {
-            dispatch(
-              addToast({
-                type: "danger",
-                title: t('actions.failed'),
-                content: t('pull-request:actions.create.error'),
-              })
-            );
-            reject()
-          }
-        });
-    }) 
+          )
+        );
+      } else {
+        dispatch(
+          addToast({
+            type: "danger",
+            title: t('actions.failed'),
+            content: t('pull-request:actions.create.error'),
+          })
+        );
+      }
+    });
   }
 
   async function handleStartWorking() {

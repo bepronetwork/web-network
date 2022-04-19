@@ -24,6 +24,7 @@ import { ProposalData } from '@interfaces/api-response';
 import { useTranslation } from 'next-i18next';
 import Avatar from './avatar';
 import PullRequestLabels, {PRLabel} from './pull-request-labels';
+import { changeLoadState } from '@contexts/reducers/change-load-state';
 
 interface participants {
   githubHandle: string;
@@ -245,12 +246,13 @@ export default function NewProposal({
     if (!activeRepo)
       return;
 
+    dispatch(changeLoadState(true));
+
     getParticipants(+githubId, activeRepo.githubPath)
       .then(participants => {
-        const pull = pullRequests?.find(pr => pr.githubId === githubId);
-        const tmpParticipants = Array.from(new Set([...participants, pull?.githubLogin]));
+        const tmpParticipants = [...participants];
 
-        pull?.reviewers?.forEach(participant => {
+        pullRequests?.find(pr => pr.githubId === githubId)?.reviewers?.forEach(participant => {
           if (!tmpParticipants.includes(participant)) tmpParticipants.push(participant)
         })
 
@@ -267,6 +269,9 @@ export default function NewProposal({
       })
       .catch((err) => {
         console.error('Error fetching pullRequestsParticipants', err)
+      })
+      .finally(() => {
+        dispatch(changeLoadState(false));
       });
   }
 
