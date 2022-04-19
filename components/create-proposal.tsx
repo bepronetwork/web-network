@@ -247,9 +247,10 @@ export default function NewProposal({
 
     getParticipants(+githubId, activeRepo.githubPath)
       .then(participants => {
-        const tmpParticipants = [...participants]
+        const pull = pullRequests?.find(pr => pr.githubId === githubId);
+        const tmpParticipants = Array.from(new Set([...participants, pull?.githubLogin]));
 
-        pullRequests?.find(pr => pr.githubId === githubId)?.reviewers?.forEach(participant => {
+        pull?.reviewers?.forEach(participant => {
           if (!tmpParticipants.includes(participant)) tmpParticipants.push(participant)
         })
 
