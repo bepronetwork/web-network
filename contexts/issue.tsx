@@ -3,7 +3,6 @@ import React, {
   useCallback, useContext, useEffect, useMemo, useState
 } from "react";
 
-import { fromSmartContractDecimals } from "@taikai/dappkit";
 import { useRouter } from "next/router";
 
 import { useAuthentication } from "contexts/authentication";
@@ -47,7 +46,7 @@ export const IssueProvider: React.FC = function ({ children }) {
   const { getIssueComments, getPullRequest, getPullRequestComments } =
     useOctokit();
 
-  const { wallet, beproServiceStarted } = useAuthentication();
+  const { wallet, user, beproServiceStarted } = useAuthentication();
 
   const addNewComment = useCallback((prId: number, comment: string) => {
     const pullRequests = [...activeIssue.pullRequests];
@@ -76,8 +75,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     });
 
     return Promise.all(mapPr);
-  },
-    []);
+  }, [user?.accessToken]);
 
   const updateIssue = useCallback(async (repoId: string | number, ghId: string | number): Promise<IActiveIssue> => {
     const issue = await getIssue(repoId, ghId, activeNetwork?.name);
@@ -103,7 +101,7 @@ export const IssueProvider: React.FC = function ({ children }) {
 
     return newActiveIssue;
   },
-    [activeNetwork, query?.repoId, query?.id]);
+    [activeNetwork, query?.repoId, query?.id, user?.accessToken]);
 
   const getNetworkIssue = useCallback(async () => {
     if (!wallet?.address || !activeIssue?.contractId || !beproServiceStarted)
@@ -127,8 +125,7 @@ export const IssueProvider: React.FC = function ({ children }) {
         ? +activeIssue?.merged !== +proposal.id
         : await BeproService.network.isProposalDisputed(+bounty.id, +proposal.id);
 
-      const isDisputedByAddress = 
-        fromSmartContractDecimals(await BeproService.network.disputes(wallet.address, bounty.id, proposal.id)) > 0;
+      const isDisputedByAddress = await BeproService.network.disputes(wallet.address, bounty.id, proposal.id) > 0;
 
       networkProposals[+proposal.id] = {
         ...proposal,
@@ -153,6 +150,8 @@ export const IssueProvider: React.FC = function ({ children }) {
   }, [activeIssue, wallet?.address, beproServiceStarted]);
 
   useEffect(() => {
+    if (!user?.accessToken) return;
+    
     const noExpired = +new Date() - activeIssue?.lastUpdated <= TTL;
     if (query.id && query.repoId) {
       if (
@@ -163,7 +162,7 @@ export const IssueProvider: React.FC = function ({ children }) {
         updateIssue(`${query.repoId}`, `${query.id}`);
       }
     }
-  }, [query, activeNetwork]);
+  }, [query, activeNetwork, user?.accessToken]);
 
   useEffect(() => {
     console.log('useIssue',{activeIssue, networkIssue})
