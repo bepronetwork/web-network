@@ -81,7 +81,7 @@ export const NETWORKS: {
     currency: DEV,
     decimals: 18,
     explorerURL: "https://blockscout.moonriver.moonbeam.network",
-    rpcUrls: ["http://eth-seneca.taikai.network:8545"]
+    rpcUrls: ["http://eth-afrodite.taikai.network:8545"]
   },
   "0x5de": {
     id: "1502",

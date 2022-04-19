@@ -23,6 +23,8 @@
     "deploy:moonbase": "node ./scripts/deploy -n moonbase",
     "deploy:seneca": "node ./scripts/deploy -n seneca",
     "deploy:afrodite": "node ./scripts/deploy -n afrodite",
+    "deploy:irene": "node ./scripts/deploy -n irene",
+    "deploy:iris": "node ./scripts/deploy -n iris",
     "ganache:deploy": "node ganache/deploy.js"
   },
   "dependencies": {
