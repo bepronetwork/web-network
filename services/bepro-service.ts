@@ -5,7 +5,6 @@ import {
   ERC20, 
   NetworkFactory, 
   Bounty, 
-  fromSmartContractDecimals, 
   OraclesResume 
 } from "@taikai/dappkit";
 import { nativeZeroAddress } from "@taikai/dappkit/dist/src/utils/constants";
@@ -216,8 +215,6 @@ class BeproFacet {
   }
 
   async getBounty(id: number): Promise<Bounty> {
-    if (!this.isStarted) return;
-    
     return BountyParser(await this.network.getBounty(id));
   }
 

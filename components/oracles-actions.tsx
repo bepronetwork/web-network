@@ -190,7 +190,6 @@ function OraclesActions() {
 
   return (
     <>
-    {console.log(networkTokenAllowance)}
       <div className="col-md-5">
         <div className="content-wrapper h-100">
           <OraclesBoxHeader

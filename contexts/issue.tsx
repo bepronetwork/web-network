@@ -70,7 +70,8 @@ export const IssueProvider: React.FC = function ({ children }) {
       pr.isMergeable =
             getPr?.data?.mergeable && getPr?.data?.mergeable_state === "clean";
       pr.merged = getPr?.data?.merged;
-      pr.comments = getComments?.data as any;
+      pr.state = getPr?.data?.state;
+      pr.comments = getComments as any;
       return pr;
     });
 
@@ -88,8 +89,8 @@ export const IssueProvider: React.FC = function ({ children }) {
       issue.pullRequests = await updatePullRequests(issue?.pullRequests,
                                                     ghPath);
     }
-    const { data: comments } = await getIssueComments(+issue.githubId,
-                                                      ghPath);
+    const comments = await getIssueComments(+issue.githubId,
+                                            ghPath);
     const newActiveIssue = {
         ...issue,
         comments,

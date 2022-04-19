@@ -78,23 +78,6 @@ export default function PageDevelopers() {
     loadTotals();
   }, [beproServiceStarted, activeNetwork]);
 
-  useEffect(() => {
-    if (user?.accessToken) {
-      const octokit = new Octokit({
-        auth: user?.accessToken
-      });
-
-      octokit.rest.pulls.listCommits({
-        owner: "bepronetwork",
-        repo: "bepro-js",
-        pull_number: 134
-      }).then(response => {
-        console.log(response);
-        console.log(response.data.map(commit => commit.author.login));
-      }).catch(response => console.log("listCommits", response));
-    }
-  }, [user?.accessToken]);
-
   return (
     <>
       <div>

@@ -17,14 +17,14 @@ export default function useOctokit() {
   async function getStargazers(path: string) {
     if (!authenticated) return { forks: 0, stars: 0 };
 
-    const { data: forks } = await octokit.rest.repos.listForks({
-      ...getOwnerRepoFrom(path),
-      per_page: 100
+    const forks = await octokit.paginate(octokit.rest.repos.listForks, {
+      ...getOwnerRepoFrom(path)
     });
-    const { data: stars } = await octokit.rest.activity.listStargazersForRepo({
-      ...getOwnerRepoFrom(path),
-      per_page: 100
+
+    const stars = await octokit.paginate(octokit.rest.activity.listStargazersForRepo, {
+      ...getOwnerRepoFrom(path)
     });
+
     const toLen = (array) =>
       array.length > 99 ? "+99" : array.length.toString();
 
@@ -32,16 +32,15 @@ export default function useOctokit() {
   }
 
   async function getCommitsOfPr(pull_number: number, path: string) {
-    return octokit.rest.pulls.listCommits({
+    return octokit.paginate(octokit.rest.pulls.listCommits, {
       ...getOwnerRepoFrom(path),
       pull_number
     });
   }
 
   async function getForksOf(path: string) {
-    return octokit.rest.repos.listForks({
-      ...getOwnerRepoFrom(path),
-      per_page: 100
+    return octokit.paginate(octokit.rest.repos.listForks, {
+      ...getOwnerRepoFrom(path)
     });
   }
 
@@ -57,7 +56,7 @@ export default function useOctokit() {
   }
 
   async function getIssueComments(issue_number: number, path: string) {
-    return octokit.rest.issues.listComments({
+    return octokit.paginate(octokit.rest.issues.listComments, {
       ...getOwnerRepoFrom(path),
       issue_number
     });
@@ -77,7 +76,7 @@ export default function useOctokit() {
 
   async function getParticipants(pullRequestGitId: number, path: string) {
     const response = await getCommitsOfPr(pullRequestGitId, path);
-    const commits = response.data || [];
+    const commits = response || [];
 
     if (!commits.length) return [];
 
@@ -96,14 +95,14 @@ export default function useOctokit() {
   }
 
   async function getPullRequestComments(pull_number: number, path: string) {
-    return octokit.rest.issues.listComments({
+    return octokit.paginate(octokit.rest.issues.listComments, {
       ...getOwnerRepoFrom(path),
       issue_number: pull_number
     });
   }
 
   async function listBranches(path: string) {
-    return octokit.rest.repos.listBranches({ ...getOwnerRepoFrom(path) });
+    return octokit.paginate(octokit.rest.repos.listBranches, { ...getOwnerRepoFrom(path) });
   }
 
   async function authenticate(auth: string) {

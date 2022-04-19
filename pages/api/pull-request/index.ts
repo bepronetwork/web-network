@@ -187,11 +187,12 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
   const networkBounty = await network.getBounty(contractId);
   
   if (!networkBounty) return res.status(404).json("Invalid");
+
+  const pullRequestNetwork = networkBounty.pullRequests.find(pr => pr.cid ===  +pullRequestGithubId && 
+                                                              pr.userBranch === userBranch && 
+                                                              pr.userRepo === userRepo );
   
-  if (networkBounty.pullRequests.find(pr =>
-    pr.cid ===  +pullRequestGithubId 
-    && pr.userBranch === userBranch 
-    && pr.userRepo === userRepo ))
+  if (!pullRequestNetwork)
     return res.status(404).json("Invalid");
 
   const octoKit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
