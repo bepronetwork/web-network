@@ -1,5 +1,5 @@
 
-import { ERC20, fromSmartContractDecimals, Network_v2 } from "@taikai/dappkit";
+import { ERC20, Network_v2 } from "@taikai/dappkit";
 
 import models from "db/models";
 
@@ -27,7 +27,7 @@ export default async function readBountyCreated(events, network: Network_v2, cus
           bounty.state = 'draft';
           bounty.creatorAddress = networkBounty.creator;
           bounty.creatorGithub = networkBounty.githubUser;
-          bounty.amount = fromSmartContractDecimals(networkBounty.tokenAmount);
+          bounty.amount = networkBounty.tokenAmount;
           bounty.branch = networkBounty.branch;
           bounty.title = networkBounty.title;
           bounty.contractId = id;

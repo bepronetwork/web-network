@@ -111,7 +111,7 @@ export default function PageProposal() {
   async function loadData() {
     const { proposalId } = router.query;
     const mergeProposal = activeIssue?.mergeProposals.find((p) => +p.id === +proposalId);
-    const networkProposals = networkIssue?.proposals?.[+mergeProposal.contractId];
+    const networkProposals = networkIssue?.proposals?.[+mergeProposal?.contractId];
 
     const PR = activeIssue?.pullRequests.find((pr) => pr.id === mergeProposal?.pullRequestId);
 

@@ -1,13 +1,12 @@
-import { BountyParser } from "@taikai/dappkit";
 import { 
   Web3Connection, 
   Network_v2, 
   ERC20, 
   NetworkFactory, 
   Bounty, 
-  OraclesResume 
+  OraclesResume,
+  Defaults
 } from "@taikai/dappkit";
-import { nativeZeroAddress } from "@taikai/dappkit/dist/src/utils/constants";
 import getConfig from "next/config";
 import { NetworkParameters } from "types/dappkit";
 
@@ -215,7 +214,7 @@ class BeproFacet {
   }
 
   async getBounty(id: number): Promise<Bounty> {
-    return BountyParser(await this.network.getBounty(id));
+    return this.network.getBounty(id);
   }
 
   async getBounties(ids: number[] = []): Promise<Bounty[]> {
@@ -359,7 +358,7 @@ class BeproFacet {
     branch,
     githubUser,
     transactional,
-    rewardToken = nativeZeroAddress,
+    rewardToken = Defaults.nativeZeroAddress,
     tokenAmount = 0,
     rewardAmount = 0,
     fundingAmount = 0

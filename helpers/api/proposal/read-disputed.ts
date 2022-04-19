@@ -33,7 +33,7 @@ export default async function readProposalDisputed(events, network: Network_v2, 
           where: {
             issueId: bounty.id,
             contractId: +networkPullRequest.id,
-            githubId: networkPullRequest.cid
+            githubId: networkPullRequest.cid.toString()
           }
         });
 

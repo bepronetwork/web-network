@@ -27,7 +27,7 @@ export default async function readPullRequestReady(events, network: Network_v2, 
         const pullRequest = await models.pullRequest.findOne({
             where: {
                 issueId: bounty.id,
-                githubId: networkPullRequest.cid,
+                githubId: networkPullRequest.cid.toString(),
                 status: "draft"
             }
         });

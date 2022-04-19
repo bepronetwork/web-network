@@ -34,7 +34,7 @@ export default async function readProposalCreated(events, network: Network_v2, c
           where: {
             issueId: bounty.id,
             contractId: +networkPullRequest.id,
-            githubId: networkPullRequest.cid
+            githubId: networkPullRequest.cid.toString()
           }
         });
 
