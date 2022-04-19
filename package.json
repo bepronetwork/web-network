@@ -8,7 +8,6 @@
   "scripts": {
     "prestart": "npm run migrate",
     "preinstall": "npm install --package-lock-only --ignore-scripts && npx npm-force-resolutions",
-    "postinstall": "npm explore bepro-js -- npm run build",
     "migrate": "sequelize db:migrate",
     "migrate:undo": "sequelize db:migrate:undo",
     "clean": "npm cache clean --force && rm -rf .next",
