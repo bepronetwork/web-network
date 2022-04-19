@@ -17,7 +17,6 @@ import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/add-toast";
-import { addTransaction } from "contexts/reducers/add-transaction";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
