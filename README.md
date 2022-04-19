@@ -113,9 +113,9 @@ And if every runing well, you will see this page
 <br>
 
 ### Parity Configuration
-*`Attention, if you chose running with you can skip this step`*
+*`Attention, if you chose running with Ganache you can skip this step`*
 
-if you are the owner of the wallet configured as admin in the previous steps, you must access the parity page in `yourdomain/defaultnetworkname/parity`, to deploy a new contract.
+if you are the owner of the wallet configured as admin in the previous steps, you must access the parity page in `yourdomain/defaultnetworkname/parity`, to deploy a new contract in ethereum blockchain.
 
 Parity page in `yourdomain/defaultnetworkname/parity`
 <br/>
@@ -136,11 +136,11 @@ NEXT_PUBLIC_TRANSACTION_ADDRESS=
 
 ### Network Configuration
 
-Finnaly we can finish, the last step is configure own network,
+finally we can finish, the last step is configure own network,
 to learn more about networks inside webapp, read the [doc](./docs/NETWORK-MANAGER.md).
 
 In short, you can have one own network, with you branding, bounties and repositories.
-you can configurate this acessing  `yourdomain/defaultnetworkname/network-setting`.
+
 <br/>
 ><img align="center" src="./docs/assets/network-settings-page.png" width="500"/>
 ## 5. Container
