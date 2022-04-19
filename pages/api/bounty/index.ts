@@ -1,8 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
 import models from "db/models";
+
+const { publicRuntimeConfig } = getConfig();
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -31,7 +34,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   if (!repository) return res.status(404).json("Repository not found");
 
-  const octokit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
+  const octokit = new Octokit({ auth: publicRuntimeConfig.github.token });
 
   const [owner, repo] = repository.githubPath.split("/");
 

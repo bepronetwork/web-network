@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next/types";
+import { Octokit } from "octokit";
 
 import ListIssues from "components/list-issues";
 import PageHero, { IInfosHero } from "components/page-hero";
@@ -18,7 +19,7 @@ import useApi from "x-hooks/use-api";
 
 export default function PageDevelopers() {
   const { t } = useTranslation(["common"]);
-  const { beproServiceStarted } = useAuthentication();
+  const { beproServiceStarted, user } = useAuthentication();
   const { getTotalUsers } = useApi();
 
   const [infos, setInfos] = useState<IInfosHero[]>([
@@ -76,6 +77,23 @@ export default function PageDevelopers() {
   useEffect(() => {
     loadTotals();
   }, [beproServiceStarted, activeNetwork]);
+
+  useEffect(() => {
+    if (user?.accessToken) {
+      const octokit = new Octokit({
+        auth: user?.accessToken
+      });
+
+      octokit.rest.pulls.listCommits({
+        owner: "bepronetwork",
+        repo: "bepro-js",
+        pull_number: 134
+      }).then(response => {
+        console.log(response);
+        console.log(response.data.map(commit => commit.author.login));
+      }).catch(response => console.log("listCommits", response));
+    }
+  }, [user?.accessToken]);
 
   return (
     <>
