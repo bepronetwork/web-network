@@ -49,7 +49,7 @@ export default function PullRequestItem({
       const [owner, repo] = repositoryPath.split('/')
       let lines = 0
       
-      const { data } = await getCommitsOfPr(pullRequest?.githubId, repositoryPath)
+      const data = await getCommitsOfPr(pullRequest?.githubId, repositoryPath)
       
       for(const commit of data) {
         const {data: { stats }} = await getCommit(owner, repo, commit.sha)

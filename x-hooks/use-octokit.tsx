@@ -20,7 +20,7 @@ export default function useOctokit() {
   }
 
   async function getCommitsOfPr(pull_number: number, path: string) {
-    return octokit.rest.pulls.listCommits({ ...getOwnerRepoFrom(path), pull_number })
+    return octokit.paginate(octokit.rest.pulls.listCommits, { ...getOwnerRepoFrom(path), pull_number});
   }
 
   async function getForksOf(path: string) {
@@ -49,8 +49,7 @@ export default function useOctokit() {
 
   async function getParticipants(pullRequestGitId: number, path: string) {
 
-    const response = await getCommitsOfPr(pullRequestGitId, path);
-    const commits = response.data || [];
+    const commits = await getCommitsOfPr(pullRequestGitId, path);
 
     if (!commits.length)
       return [];
