@@ -6,9 +6,9 @@ read more about in [doc](https://trufflesuite.com/docs/ganache/).
 
 <br/>
 
-## 2. CONFIGURING GANACHE SPACEWORK.
+## 2. CONFIGURING GANACHE WORKSPACE.
 
-1. After installing ganache, create a new etherium workspace
+1. After installing ganache, create a new ethereum workspace
 > <img align="center" src="./assets/ganache-create-workspace.png" width="500"/>
 <br/>
 
@@ -16,7 +16,7 @@ read more about in [doc](https://trufflesuite.com/docs/ganache/).
 > <img align="center" src="./assets/ganache-server.png" width="500"/>
 <br/>
 
-3. On Ganache Home, chose one wallet add copy the private key
+3. On Ganache Home, chose one wallet and copy the private key
 
 > <img align="center" src="./assets/ganache-home.png" width="500"/>
 <br/>

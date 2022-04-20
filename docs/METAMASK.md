@@ -2,7 +2,7 @@
 
 Configure the EVM network explorer, chain identification name and token, for exemple using Kovan.
 
-Or emulate your own block chain using [Ganache](../docs/GANACHE.md), check Ganache [doc]('https://trufflesuite.com/ganache/') for more.
+Or emulate your own block chain using [Ganache](../docs/GANACHE.md), check Ganache  [doc]('https://trufflesuite.com/ganache/') for more.
 
 ```text
 # .env
