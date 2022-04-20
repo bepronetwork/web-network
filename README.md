@@ -4,7 +4,7 @@
 </h2>
 
 <h3 align="center">
-  A tool to attach in Git Protocol Centralized SDKs to create incentives for developers to decentralize development in a liquid manner and with scale.
+  A tool to attach in Git Protocol Centralized SDKs to create incentives for developers to decentralize development in a liquid and scalable manner.
 </h3>
 
 <p align="center">
@@ -17,11 +17,11 @@
 
 ---
 
-# How Works?
+# How it Works?
 
 ## 1. Prerequisites
 
-- [NodeJS](https://nodejs.dev/) in v16.13 or more recent.
+- [NodeJS](https://nodejs.dev/) in v16.13 or newer.
 - [Docker](https://docs.docker.com/desktop/#download-and-install) or [PostgresSQL](https://www.postgresql.org/download/) in version 13.
 - [Metamask](https://metamask.io/download/)
 - [Github OAuth Apps](https://docs.github.com/en/developers/apps/building-oauth-apps)
@@ -45,14 +45,14 @@ $ docker-compose up -d
 
 ## 3. Environment Configuration
 
-Before start the project, you need set required keys and var in enviroment.
+Before start the project, you need to set required environment variables.
 
 First copy or create a file _.env_ from the file _.env.exemple_
 ```console
 $ cp .env.exemple .env
 ```
 
-*`* You need follow all the required steps to the project run correctly.`*
+*`* You need to follow all the required steps for the project to run correctly.`*
 
 - `*` [MetaMask Setup](./docs/METAMASK.md)
 - `*` [Authentication Setup](./docs/AUTHENTICATION.md)
@@ -80,7 +80,7 @@ start project with:
 $ npm run dev
 ```
 
-and start a script to lister pastenvets from blockchain:
+and start a script to listen past events from blockchain:
 
 ```bash
 $ npm run schedules
@@ -89,7 +89,7 @@ $ npm run schedules
 
 ### Connecting Github and Metamask.
 
-With you project runing, you must access your domain, and connect you wallet.
+With you project running, you must access your domain, and connect you wallet.
 <br/>
 
 ><img align="center" src="./docs/assets/connecting-metamask.png" width="500"/>
@@ -123,7 +123,7 @@ Parity page in `yourdomain/defaultnetworkname/parity`
 > <img align="center" src="./docs/assets/parity-page.png" width="500"/>
 <br/>
 
-With a new address of contract after deploy, you must update .env again in
+With the new contract address deployed, you must update .env again in
 ```text
 .env
 
@@ -136,10 +136,10 @@ NEXT_PUBLIC_TRANSACTION_ADDRESS=
 
 ### Network Configuration
 
-finally we can finish, the last step is configure own network,
+finally we can finish, the last step is configure the network,
 to learn more about networks inside webapp, read the [doc](./docs/NETWORK-MANAGER.md).
 
-In short, you can have one own network, with you branding, bounties and repositories.
+In short, you can own one network, with you branding, bounties and repositories.
 
 <br/>
 ><img align="center" src="./docs/assets/network-settings-page.png" width="500"/>
