@@ -149,12 +149,19 @@ async function main() {
   await beproToken.increaseAllowance(networkFactoryAddress, 1000000);
   await factory.lock("1000000");
 
-
   // 3. Creating the first network 
   const tx = await factory.createNetwork(beproAddress, beproAddress);
-  const network = await factory.getNetworkByAddress(ownerAddress);
-  console.log(`Deployed Network on ${network}`);
-
+  const networkAddress = await factory.getNetworkByAddress(ownerAddress);
+  console.log(`Deployed Network on ${networkAddress}`);
+  const networkContract = new Network(web3Connection, networkAddress);
+  await networkContract.start();
+  await networkContract.sendTx(networkContract.contract.methods.claimGovernor());
+  console.log(`Setting Redeeem time on ${networkAddress}`);
+  // 5min Disputable time
+  await networkContract.changeRedeemTime(60*5);
+  // 10min Disputable time
+  console.log(`Setting Disputable time on ${networkAddress}`);
+  await networkContract.changeDisputableTime(60*10);
 }
 
 main()
