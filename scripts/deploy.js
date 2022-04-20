@@ -1,6 +1,6 @@
 const { Web3Connection, ERC20, NetworkFactory, Network } = require("@taikai/dappkit");
 const { exit } = require("process");
-
+const stagingAccounts = require("./staging-accounts")
 
 const usage =  `------------------------------------------------------------------------- 
   WebNetwork v1 Smart Contracts Deploy Script 🚀  
@@ -123,7 +123,7 @@ async function main() {
   const { contractAddress: beproAddress } = await erc20Deployer.deployJsonAbi(
     "Bepro Network", // the name of the token
     "BEPRO", // the symbol of the token
-    "100000000000000000000000000",
+    "300000000000000000000000000", // 300M
     ownerAddress // the owner of the total amount of the tokens (your address)
   );
   console.log(`Deployed Bepro on ${beproAddress}`);
@@ -132,6 +132,11 @@ async function main() {
 
    const beproToken = new ERC20(web3Connection, beproAddress);
    await beproToken.start();
+
+   for(const address in stagingAccounts) {
+    console.log(`Transfering 10M BEPRO to ${address}`);
+    await beproToken.transferTokenAmount(address, 10000000);
+   }
 
   // 2. Deploying Network Proxy
     
