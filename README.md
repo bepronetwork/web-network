@@ -15,8 +15,11 @@
 </p>
 
 ---
+<br>
 
 # How it Works?
+Soon.
+<br>
 
 ## 1. Prerequisites
 
@@ -64,7 +67,7 @@ $ cp .env.exemple .env
 
 ## 4. Running
 
-After having completed the [Environment Configuration](#3-enviroment-configuration) step, the project is ready to be started.
+After having completed the [Environment Configuration](#3-environment-configuration) step, the project is ready to be started.
 
 make sure the database is up and run migrations;
 
@@ -137,7 +140,10 @@ The last step to configure the network is complete. learn more [link](./docs/NET
 
 
 <br/>
+
 ><img align="center" src="./docs/assets/network-settings-page.png" width="500"/>
+
+<br>
 
 ## 5. Container
 Soon.
@@ -146,11 +152,14 @@ Soon.
 
 ## 6. Deploy
 Soon.
+
 <br>
 
 ## 7. Contributing
 
 See [CONTRIBUTING.md](https://github.com/bepro/webapp/CONTRIBUTING.md) for our guide to contributing to web-network.
+
+<br>
 
 ## 8. Join the community
 
