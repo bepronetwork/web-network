@@ -28,8 +28,8 @@
   },
   "steps": {
     "lock": {
-      "title": "Lock $BEPRO",
-      "you-need-to-lock": "To create a network you will need to lock 1M $BEPRO"
+      "title": "Lock {{currency}}",
+      "you-need-to-lock": "To create a network you will need to lock {{creatorAmount}} {{currency}}"
     },
     "network-information": {
       "title": "Network information",
