@@ -1,4 +1,3 @@
-<!-- Using h2 instead of h1 because npm doesn't support align=center on h1 tags -->
 <h2 align="center">
   <a href="#readme" title="WebApp README.md"><img alt="WebApp Logo" src="https://bafybeigznseyukyehtkphkckbaebjixypvpesd7xkmyx2ryzlsjdexelyy.ipfs.infura-ipfs.io/" alt="WebApp Logo" width="160"/></a>
 </h2>
@@ -117,7 +116,6 @@ And if every runing well, you will see this page
 
 if you are the owner of the wallet configured as admin in the previous steps, you must access the parity page in `yourdomain/defaultnetworkname/parity`, to deploy a new contract in ethereum blockchain.
 
-Parity page in `yourdomain/defaultnetworkname/parity`
 <br/>
 
 > <img align="center" src="./docs/assets/parity-page.png" width="500"/>
@@ -143,14 +141,15 @@ In short, you can own one network, with you branding, bounties and repositories.
 
 <br/>
 ><img align="center" src="./docs/assets/network-settings-page.png" width="500"/>
+
 ## 5. Container
 Soon.
 
 <br>
 
 ## 6. Deploy
-<br>
 Soon.
+<br>
 
 ## 7. Contributing
 
