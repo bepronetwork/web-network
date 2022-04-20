@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-
 import { Octokit } from "octokit";
 
 import { useAuthentication } from "contexts/authentication";
