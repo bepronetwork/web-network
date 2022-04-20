@@ -11,7 +11,7 @@
   <a href="#3-environment-configuration">Enviroment</a> •
   <a href="#4-running">Running</a> •
   <a href="#7-contributing">Contributing</a> •
-  <a href="#8-join-the-community">Community</a> •
+  <a href="#8-join-the-community">Community</a>
 </p>
 
 ---
