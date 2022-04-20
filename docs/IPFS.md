@@ -1,11 +1,11 @@
 ## 1. IPFS
 
-Following the idea of using and support the decentralized solutions, we choice [IPFS](https://ipfs.io/) for save files and pictures, like SEO Cards for exemple. your can [read more](https://docs.ipfs.io/).
+Following the decentralized mantra, files created by the application are uploaded through [IPFS](https://ipfs.io/).
 
 Is recomended using [Infura](https://infura.io/product/ipfs) to be your file host, but you can use any other ipfs solution.
 
 
-Before create your account, create a new IPFS Project and set yours credentials here.
+Update the .env with the IPFS values;
 
 ```text
 # .env

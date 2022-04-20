@@ -1,7 +1,7 @@
 ## 1. WHAT IS A NETWORK IN WEBAPP?
 ## 2. HOW MANAGER MY NETWORK?
 
-If you are own of admin wallet, you can manager default settings to networks, in your .env file.
+The admin wallet is the address of the contracts governor, this person will be able to access the `/parity` page where actions for deploying ERC20 and Network are available.
 
  -  Default Network Name.
  -  Min and Max time for dispute.
@@ -23,7 +23,7 @@ NEXT_PUBLIC_DISPUTE_PERCENTAGE_MAX=15
 NEXT_PUBLIC_NETWORK_FACTORY_ADDRESS=
 ```
 
-But if you want manager other network, you can visite page `$networkname/account/my-network`
+Create other networks by visiting `/networkname/account/my-network`
 
 ## 3. WHAT IS A COUNCIL MEMBER AND WHAT CAN DO?
 ## 4. HOW WORKS BOUNTYS?

@@ -11,7 +11,7 @@
   <a href="#3-environment-configuration">Enviroment</a> •
   <a href="#4-running">Running</a> •
   <a href="#7-contributing">Contributing</a> •
-  <a href="#8-join-in-us-community">Community</a> •
+  <a href="#8-join-the-community">Community</a> •
 </p>
 
 ---
@@ -44,14 +44,13 @@ $ docker-compose up -d
 
 ## 3. Environment Configuration
 
-Before start the project, you need to set required environment variables.
+Create a new .env file based on the default example.
 
-First copy or create a file _.env_ from the file _.env.exemple_
 ```console
 $ cp .env.exemple .env
 ```
 
-*`* You must follow all the required steps for the project run correctly.`*
+*`* These steps are mandatory`*
 
 - `*` [MetaMask Setup](./docs/METAMASK.md)
 - `*` [Authentication Setup](./docs/AUTHENTICATION.md)
@@ -65,15 +64,15 @@ $ cp .env.exemple .env
 
 ## 4. Running
 
-After you have completed the [Environment Configuration](#3-enviroment-configuration) step, you are ready to run the project.
+After having completed the [Environment Configuration](#3-enviroment-configuration) step, the project is ready to be started.
 
-make sure your database is up and run migrations:
+make sure the database is up and run migrations;
 
 ```bash
 $ npm run migrate
 ```
 
-start project with:
+start project with;
 
 ```bash
 $ npm run dev
@@ -88,21 +87,21 @@ $ npm run schedules
 
 ### Connecting Github and Metamask.
 
-With you project running, you must access your domain, and connect you wallet.
+with the project running, browse to the project url, and connect the wallet.
 <br/>
 
 ><img align="center" src="./docs/assets/connecting-metamask.png" width="500"/>
 
 <br>
 
-After you must connect with github.
+Next, connect with github.
 <br/>
 
 ><img align="center" src="./docs/assets/connecting-account.png" width="500"/>
 
 <br>
 
-And if every runing well, you will see this page
+if no errors are shown, you should see this page
 <br/>
 
 ><img align="center" src="./docs/assets/connected-account.png" width="500"/>
@@ -112,16 +111,16 @@ And if every runing well, you will see this page
 <br>
 
 ### Parity Configuration
-*`Attention, if you chose running with Ganache you can skip this step`*
+*`if project is using Ganache you can skip this step`*
 
-if you are the owner of the wallet configured as admin in the previous steps, you must access the parity page in `yourdomain/defaultnetworkname/parity`, to deploy a new contract in ethereum blockchain.
+With the admin wallet loaded in the metamask, browse to the parity page in `yourdomain/defaultnetworkname/parity`, and deploy the required contracts.
 
 <br/>
 
 > <img align="center" src="./docs/assets/parity-page.png" width="500"/>
 <br/>
 
-With the new contract address deployed, you must update .env again in
+With the new contract address deployed, update .env again in
 ```text
 .env
 
@@ -134,10 +133,8 @@ NEXT_PUBLIC_TRANSACTION_ADDRESS=
 
 ### Network Configuration
 
-finally we can finish, the last step is configure the network,
-to learn more about networks inside webapp, read the [doc](./docs/NETWORK-MANAGER.md).
+The last step to configure the network is complete. learn more [link](./docs/NETWORK-MANAGER.md).
 
-In short, you can own one network, with you branding, bounties and repositories.
 
 <br/>
 ><img align="center" src="./docs/assets/network-settings-page.png" width="500"/>
@@ -155,7 +152,7 @@ Soon.
 
 See [CONTRIBUTING.md](https://github.com/bepro/webapp/CONTRIBUTING.md) for our guide to contributing to web-network.
 
-## 8. Join in us Community
+## 8. Join the community
 
 - [Discord](https://discord.gg/9aUufhzhfm)
 - [Telegram](https://t.me/betprotocol)
