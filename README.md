@@ -51,7 +51,7 @@ First copy or create a file _.env_ from the file _.env.exemple_
 $ cp .env.exemple .env
 ```
 
-*`* You need to follow all the required steps for the project to run correctly.`*
+*`* You must follow all the required steps for the project run correctly.`*
 
 - `*` [MetaMask Setup](./docs/METAMASK.md)
 - `*` [Authentication Setup](./docs/AUTHENTICATION.md)
