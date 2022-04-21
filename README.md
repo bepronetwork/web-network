@@ -3,7 +3,7 @@
 </h2>
 
 <h3 align="center">
-  A tool to attach in Git Protocol Centralized SDKs to create incentives for developers to decentralize development in a liquid and scalable manner. learn more [about](https://bepronetwork.medium.com/what-is-bepro-network-6ec4054d2020).
+  A tool to attach in Git Protocol Centralized SDKs to create incentives for developers to decentralize development in a liquid and scalable manner. learn more <a href="https://bepronetwork.medium.com/what-is-bepro-network-6ec4054d2020">about</a>.
 </h3>
 
 <p align="center">
