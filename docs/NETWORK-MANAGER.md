@@ -1,5 +1,4 @@
-## 1. WHAT IS A NETWORK IN WEBAPP?
-## 2. HOW MANAGER MY NETWORK?
+## 1. HOW MANAGER MY NETWORK?
 
 The admin wallet is the address of the contracts governor, this person will be able to access the `/parity` page where actions for deploying ERC20 and Network are available.
 
@@ -24,7 +23,3 @@ NEXT_PUBLIC_NETWORK_FACTORY_ADDRESS=
 ```
 
 Create other networks by visiting `/networkname/account/my-network`
-
-## 3. WHAT IS A COUNCIL MEMBER AND WHAT CAN DO?
-## 4. HOW WORKS BOUNTYS?
-## 5. HOW WORKS PROPOSAL AND MERGE PROPOSAL? 

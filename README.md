@@ -3,15 +3,15 @@
 </h2>
 
 <h3 align="center">
-  A tool to attach in Git Protocol Centralized SDKs to create incentives for developers to decentralize development in a liquid and scalable manner.
+  A tool to attach in Git Protocol Centralized SDKs to create incentives for developers to decentralize development in a liquid and scalable manner. learn more [about](https://bepronetwork.medium.com/what-is-bepro-network-6ec4054d2020).
 </h3>
 
 <p align="center">
   <a href="#2-getting-started">Getting Started</a> •
   <a href="#3-environment-configuration">Enviroment</a> •
   <a href="#4-running">Running</a> •
-  <a href="#7-contributing">Contributing</a> •
-  <a href="#8-join-the-community">Community</a>
+  <a href="#5-contributing">Contributing</a> •
+  <a href="#6-join-the-community">Community</a>
 </p>
 
 ---
@@ -145,26 +145,18 @@ The last step to configure the network is complete. learn more [link](./docs/NET
 
 <br>
 
-## 5. Container
-Soon.
-
-<br>
-
-## 6. Deploy
-Soon.
-
-<br>
-
-## 7. Contributing
+## 5. Contributing
 
 See [CONTRIBUTING.md](https://github.com/bepro/webapp/CONTRIBUTING.md) for our guide to contributing to web-network.
 
 <br>
 
-## 8. Join the community
+## 6. Join the community
 
 - [Discord](https://discord.gg/9aUufhzhfm)
 - [Telegram](https://t.me/betprotocol)
+- [Medium](https://bepronetwork.medium.com)
+- [WebSite](https://www.bepro.network)
 
 <br/>
 
