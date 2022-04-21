@@ -93,7 +93,8 @@ export default function NetworkInformationStep({
                 !data.fullLogo.raw?.type?.includes("image/svg")
               }
               onChange={changedDataHandler}
-              description={`${t("misc.upload")} ${t("custom-network:steps.network-information.fields.full-logo.label")}`}
+              description=
+                {`${t("misc.upload")} ${t("custom-network:steps.network-information.fields.full-logo.label")}`}
               lg
             />
           </div>

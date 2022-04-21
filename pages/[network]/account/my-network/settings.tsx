@@ -119,8 +119,8 @@ export default function Settings() {
 
     const tmpInfo2 = Object.assign({}, tmpInfo);
 
-    tmpInfo2.redeemTime = redeemTime;
-    tmpInfo2.disputeTime = disputeTime;
+    tmpInfo2.redeemTime = redeemTime / 1000;
+    tmpInfo2.disputeTime = disputeTime / 1000;
     tmpInfo2.councilAmount = councilAmount;
     tmpInfo2.percentageForDispute = percentageForDispute;
 
@@ -271,7 +271,8 @@ export default function Settings() {
           currentNetworkParameters.percentageForDispute !==
           newInfo.percentageForDispute
         )
-          await BeproService.setNetworkParameter("percentageNeededForDispute", newInfo.percentageForDispute).catch(console.log);
+          await BeproService.setNetworkParameter("percentageNeededForDispute", newInfo.percentageForDispute)
+          .catch(console.log);
 
         dispatch(addToast({
             type: "success",
@@ -458,7 +459,8 @@ export default function Settings() {
                     !newInfo.network.data.fullLogo.raw?.type?.includes("image/svg")
                   }
                   onChange={handleNetworkDataChange}
-                  description={`${t("misc.upload")} ${t("custom-network:steps.network-information.fields.full-logo.label")}`}
+                  description=
+                    {`${t("misc.upload")} ${t("custom-network:steps.network-information.fields.full-logo.label")}`}
                   lg
                 />
               </div>
@@ -632,8 +634,8 @@ export default function Settings() {
                     label={t("custom-network:redeem-time")}
                     max={+publicRuntimeConfig?.networkConfig?.reedemTime?.max}
                     description={t("custom-network:errors.redeem-time", {
-                      min: +publicRuntimeConfig?.networkConfig?.reedemTime?.min,
-                      max: +publicRuntimeConfig?.networkConfig?.reedemTime?.max
+                      min: +publicRuntimeConfig.networkConfig.reedemTime.min,
+                      max: formatNumberToCurrency(+publicRuntimeConfig.networkConfig.reedemTime.max, 0)
                     })}
                     symbol="seconds"
                     value={newInfo.redeemTime}

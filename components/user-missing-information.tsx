@@ -65,8 +65,7 @@ export default function UserMissingModal({ show }: { show: boolean }) {
   function handleUnlockAll() {
     if (!wallet?.address || !user?.login) return;
 
-    BeproService.network
-      .getOraclesOf(wallet.address)
+    BeproService.getOraclesOf(wallet.address)
       .then((value) => {
         setLoadingUnlock(true);
 

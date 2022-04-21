@@ -54,9 +54,7 @@ export default function NetworksPage() {
   async function loadTotals() {
     if (!networksSummary) return;
 
-    // TODO getNetworksQuantity
-    //const [quanty] = await Promise.all([BeproService.getNetworksQuantity()]);
-    const quanty = 0;
+    const [quanty] = await Promise.all([BeproService.getNetworksQuantity()]);
 
     setInfos([
       {

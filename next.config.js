@@ -29,11 +29,11 @@ const publicRuntimeConfig = {
   networkConfig:{
     disputableTime:{
       min: process.env.NEXT_PUBLIC_DISPUTABLE_TIME_MIN,
-      max: process.env.NEXT_PUBLIC_DISPUTABLE_TIME_MAX,
+      max: eval(process.env.NEXT_PUBLIC_DISPUTABLE_TIME_MAX),
     },
     reedemTime:{
       min: process.env.NEXT_PUBLIC_REDEEM_TIME_MIN,
-      max: process.env.NEXT_PUBLIC_REDEEM_TIME_MAX,
+      max: eval(process.env.NEXT_PUBLIC_REDEEM_TIME_MAX),
     },
     councilAmount:{
       min: process.env.NEXT_PUBLIC_COUNCIL_AMOUNT_MIN,

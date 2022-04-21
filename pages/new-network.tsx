@@ -26,8 +26,9 @@ import { psReadAsText } from "helpers/file-reader";
 import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
-import useNetwork from "x-hooks/use-network";
+import useNetworkTheme from "x-hooks/use-network";
 import useOctokit from "x-hooks/use-octokit";
+import TokenConfiguration from "components/custom-network/token-configuration";
 
 
 const { publicRuntimeConfig } = getConfig()
@@ -39,12 +40,11 @@ export default function NewNetwork() {
   const [currentStep, setCurrentStep] = useState(1);
   const [creatingNetwork, setCreatingNetwork] = useState(false);
   const [steps, setSteps] = useState(DefaultNetworkInformation);
-  const [networkFactoryStarted, setNetworkFactoryStarted] = useState(false);
 
   const { createNetwork } = useApi();
   const { listUserRepos } = useOctokit();
   const { network, getURLWithNetwork, colorsToCSS, DefaultTheme } =
-    useNetwork();
+  useNetworkTheme();
 
   const { dispatch } = useContext(ApplicationContext);
 
@@ -98,6 +98,7 @@ export default function NewNetwork() {
       1: "lock",
       2: "network",
       3: "repositories",
+      4: "token"
     };
 
     let canGo = false;
@@ -117,53 +118,51 @@ export default function NewNetwork() {
 
     await BeproService.startNetworkFactory();
 
-    // TODO
+    BeproService.createNetwork()
+      .then(() => {
+        BeproService.getNetworkAdressByCreator(wallet.address).then(async (networkAddress) => {
+          const networkData = steps.network.data;
+          const repositoriesData = steps.repositories;
 
-    // BeproService.createNetwork()
-    //   .then(() => {
-    //     BeproService.getNetworkAdressByCreator(wallet.address).then(async (networkAddress) => {
-    //       const networkData = steps.network.data;
-    //       const repositoriesData = steps.repositories;
+          await BeproService.claimNetworkGovernor(networkAddress);
 
-    //       await BeproService.claimNetworkGovernor(networkAddress);
+          const json = {
+              name: networkData.displayName.data,
+              description: networkData.networkDescription,
+              colors: JSON.stringify(networkData.colors.data),
+              logoIcon: await psReadAsText(networkData.logoIcon.raw),
+              fullLogo: await psReadAsText(networkData.fullLogo.raw),
+              repositories: JSON.stringify(repositoriesData.data
+                  .filter((repo) => repo.checked)
+                  .map(({ name, fullName }) => ({ name, fullName }))),
+              botPermission: repositoriesData.permission,
+              creator: wallet.address,
+              githubLogin: user.login,
+              networkAddress,
+              accessToken: user?.accessToken,
+          };
 
-    //       const json = {
-    //           name: networkData.displayName.data,
-    //           description: networkData.networkDescription,
-    //           colors: JSON.stringify(networkData.colors.data),
-    //           logoIcon: await psReadAsText(networkData.logoIcon.raw),
-    //           fullLogo: await psReadAsText(networkData.fullLogo.raw),
-    //           repositories: JSON.stringify(repositoriesData.data
-    //               .filter((repo) => repo.checked)
-    //               .map(({ name, fullName }) => ({ name, fullName }))),
-    //           botPermission: repositoriesData.permission,
-    //           creator: wallet.address,
-    //           githubLogin: user.login,
-    //           networkAddress,
-    //           accessToken: user?.accessToken,
-    //       };
+          createNetwork(json).then(() => {
+            router.push(getURLWithNetwork("/account/my-network/settings", {
+                  network: json.name,
+            }));
 
-    //       createNetwork(json).then(() => {
-    //         router.push(getURLWithNetwork("/account/my-network/settings", {
-    //               network: json.name,
-    //         }));
+            setCreatingNetwork(false);
+          });
+        });
+      })
+      .catch((error) => {
+        dispatch(addToast({
+            type: "danger",
+            title: t("actions.failed"),
+            content: t("custom-network:errors.failed-to-create-network", {
+              error,
+            }),
+        }));
 
-    //         setCreatingNetwork(false);
-    //       });
-    //     });
-    //   })
-    //   .catch((error) => {
-    //     dispatch(addToast({
-    //         type: "danger",
-    //         title: t("actions.failed"),
-    //         content: t("custom-network:errors.failed-to-create-network", {
-    //           error,
-    //         }),
-    //     }));
-
-    //     setCreatingNetwork(false);
-    //     console.log(error);
-    //   });
+        setCreatingNetwork(false);
+        console.log(error);
+      });
   }
 
   useEffect(() => {
@@ -198,31 +197,31 @@ export default function NewNetwork() {
   }, [user?.login]);
 
   useEffect(() => {
-    // TODO
-    // if (wallet?.address && beproServiceStarted && networkFactoryStarted) {
-    //   BeproService.getTokensLockedByAddress(wallet.address)
-    //     .then((value) => {
-    //       handleLockDataChange({ label: "amountLocked", value });
-    //     })
-    //     .catch(console.log);
+    if (wallet?.address && beproServiceStarted) {
+      BeproService.getTokensLockedByAddress(wallet.address)
+        .then((value) => {
+          handleLockDataChange({ label: "amountLocked", value });
+        })
+        .catch(console.log);
 
-    //   handleLockDataChange({
-    //     label: "amountNeeded",
-    //     value: BeproService.operatorAmount,
-    //   });
-    // }
+      BeproService.getCreatorAmount().then(value => {
+        handleLockDataChange({
+          label: "amountNeeded",
+          value
+        });
+      });      
+    }
   }, [
     wallet?.address,
     wallet?.balance,
-    beproServiceStarted,
-    networkFactoryStarted,
+    beproServiceStarted
   ]);
 
   useEffect(() => {
     //Validate Locked Tokens
     const lockData = steps.lock;
 
-    const lockValidated = lockData.amountLocked >= BeproService.operatorAmount;
+    const lockValidated = lockData.amountLocked >= lockData.amountNeeded;
 
     if (lockValidated !== steps.lock.validated) {
       const tmpSteps = Object.assign({}, steps);
@@ -300,14 +299,6 @@ export default function NewNetwork() {
     }
   }, [steps]);
 
-  useEffect(() => {
-    if (beproServiceStarted)
-      BeproService.startNetworkFactory()
-        .then(setNetworkFactoryStarted)
-        .catch((error) =>
-          console.log("Failed to start the Network Factory", error));
-  }, [beproServiceStarted]);
-
   return (
     <div className="new-network">
       <style>{colorsToCSS(steps.network.data.colors.data)}</style>
@@ -324,6 +315,7 @@ export default function NewNetwork() {
               currentStep={currentStep}
               handleChangeStep={handleChangeStep}
               handleChange={handleLockDataChange}
+              creatorAmount={steps.lock.amountNeeded}
               balance={{
                 beproAvailable: wallet?.balance?.bepro,
                 oraclesAvailable:
@@ -354,6 +346,13 @@ export default function NewNetwork() {
               handleFinish={handleCreateNetwork}
               handleCheckPermission={handleCheckPermission}
             />
+
+            {/* <TokenConfiguration
+              step={4}
+              currentStep={currentStep}
+              handleChangeStep={handleChangeStep}
+              handleFinish={handleCreateNetwork}
+            /> */}
           </Stepper>
         </div>
       </CustomContainer>
@@ -368,6 +367,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         "common",
         "custom-network",
         "connect-wallet-button",
+        "change-token-modal"
       ])),
     },
   };

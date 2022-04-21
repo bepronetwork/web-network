@@ -15,6 +15,7 @@ import { BeproService } from "services/bepro-service";
 export default function ChangeTokenModal({
   show,
   setClose,
+  description = undefined,
   setToken = (newToken: Token) => {}
 }) {
   const { t } = useTranslation(["common", "change-token-modal"]);
@@ -85,7 +86,7 @@ export default function ChangeTokenModal({
     <Modal show={show} onCloseClick={handleClose} title={t("change-token-modal:title")} titlePosition="center">
       <div className="container">
         <p className="caption-small trans mb-2 text-center">
-            {t("change-token-modal:description")}
+            {description || t("change-token-modal:description")}
         </p>
 
         <div className="form-group mt-3">

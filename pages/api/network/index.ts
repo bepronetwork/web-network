@@ -57,23 +57,17 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     if (!user) return res.status(403).json("Invalid user provided");
     if (!accessToken) return res.status(401).json("Unauthorized user");
-    if (!botPermission)
-      return res.status(403).json("Bepro-bot authorization needed");
+    if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
 
     // Contract Validations
     const BEPRO = new Bepro();
     await BEPRO.init(false, false, true);
 
-    const OPERATOR_AMOUNT = await BEPRO.networkFactory.OPERATOR_AMOUNT();
-    const amountStaked = await BEPRO.networkFactory.getLockedStakedByAddress(creator);
-    const checkingNetworkAddress =
-      await BEPRO.networkFactory.getNetworkByAddress(creator);
+    const creatorAmount = await BEPRO.networkFactory.creatorAmount();
+    const lockedAmount = await BEPRO.networkFactory.lockedTokensOfAddress(creator);
+    const checkingNetworkAddress = await BEPRO.networkFactory.networkOfAddress(creator);
 
-    if (
-      parseFloat(BEPRO.bepro.Web3.utils.fromWei(`${amountStaked}`)) <
-      OPERATOR_AMOUNT
-    )
-      return res.status(403).json("Insufficient locked amount");
+    if (lockedAmount < creatorAmount) return res.status(403).json("Insufficient locked amount");
 
     if (checkingNetworkAddress !== networkAddress)
       return res.status(403).json("Creator and network addresses do not match");
@@ -204,7 +198,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       await BEPRO.init(false, false, true);
 
       const checkingNetworkAddress =
-        await BEPRO.networkFactory.getNetworkByAddress(creator);
+        await BEPRO.networkFactory.networkOfAddress(creator);
 
       if (checkingNetworkAddress !== networkAddress)
         return res

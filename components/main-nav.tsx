@@ -61,7 +61,7 @@ export default function MainNav() {
               isNetworksPage ? (
                 <BeproLogoBlue />
               ) : network?.name !== publicRuntimeConfig.networkConfig.networkName ? (
-                <Image
+                <img
                   src={`${publicRuntimeConfig.ipfsUrl}/${network?.fullLogo}`}
                   width={104}
                   height={32}

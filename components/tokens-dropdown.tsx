@@ -11,6 +11,8 @@ interface TokensDropdownProps {
   defaultToken: Token;
   tokens: Token[];
   canAddToken?: boolean;
+  label?: string;
+  description?: string;
   addToken: (value: Token) => void;
   setToken?: (value: Token) => void;
 }
@@ -25,7 +27,9 @@ export default function TokensDropdown({
   tokens,
   addToken,
   setToken,
-  canAddToken
+  canAddToken,
+  label = undefined,
+  description = undefined
 } : TokensDropdownProps) {
   const [options, setOptions] = useState<Option[]>();
   const [option, setOption] = useState<Option>();
@@ -34,7 +38,7 @@ export default function TokensDropdown({
 
   const formatCreateLabel = 
     (inputValue: string) => canAddToken ? `${t("misc.add")} ${inputValue} ${t("misc.token")}` : undefined;
-  const tokenToOption = (token: Token): Option => ({ label: `${token.symbol} ${token.name}`, value: token });
+  const tokenToOption = (token: Token): Option => ({ label: `${token.symbol}`, value: token });
 
   const handleChange = (newValue) => {
     const { value, __isNew__ } = newValue;
@@ -58,7 +62,7 @@ export default function TokensDropdown({
 
   return(
     <div className="form-group">
-      <label className="caption-small mb-2">Token</label>
+      <label className="caption-small mb-2">{ label || t("misc.token") }</label>
       <Creatable
         className="react-select-container"
         classNamePrefix="react-select"
@@ -72,6 +76,7 @@ export default function TokensDropdown({
 
       <ChangeTokenModal 
         show={isModalVisible}
+        description={description}
         setToken={handleAddOption}
         setClose={() => setIsModalVisible(false)} 
       />

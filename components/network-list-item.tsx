@@ -48,9 +48,9 @@ export default function NetworkListItem({
   }
 
   useEffect(() => {
-    BeproService.getSettlerTokenName(handleNetworkAddress(network))
-      .then((name) => {
-        updateNetworkParameter(network.name, "tokenName", name);
+    BeproService.getSettlerTokenData(handleNetworkAddress(network))
+      .then(({symbol}) => {
+        updateNetworkParameter(network.name, "tokenName", symbol);
       })
       .catch(console.log);
 
@@ -73,7 +73,7 @@ export default function NetworkListItem({
       .catch(console.log);
 
     //TODO TVL Bounties
-    /*BeproService.getTotalSettlerLocked(handleNetworkAddress(network))
+    BeproService.getTotalSettlerLocked(handleNetworkAddress(network))
       .then((amount) => {
         updateNetworkParameter(network.name, "openBountiesAmount", amount);
 
@@ -90,7 +90,7 @@ export default function NetworkListItem({
           });
         });
       })
-      .catch(console.log);*/
+      .catch(console.log);
   }, []);
 
   return (
