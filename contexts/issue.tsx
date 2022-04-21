@@ -78,7 +78,10 @@ export const IssueProvider: React.FC = function ({ children }) {
   }, [user?.accessToken]);
 
   const updateIssue = useCallback(async (repoId: string | number, ghId: string | number): Promise<IActiveIssue> => {
+    if (!activeNetwork?.name) return;
+
     const issue = await getIssue(repoId, ghId, activeNetwork?.name);
+    
     if (!issue) throw new Error("Issue not found");
 
     const ghPath = issue.repository.githubPath;
