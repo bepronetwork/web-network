@@ -21,7 +21,7 @@ import TokensDropdown from "components/tokens-dropdown";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
-import { toastError } from "contexts/reducers/add-toast";
+import { toastError, toastWarning } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { updateTransaction } from "contexts/reducers/update-transaction";
 
@@ -83,7 +83,7 @@ export default function PageCreateIssue() {
 
   const txWindow = useTransactions();
   const { getURLWithNetwork } = useNetworkTheme();
-  const { createPreBounty, processEvent } = useApi();
+  const { createPreBounty, pastEventsV2 } = useApi();
 
   async function allowCreateIssue() {
     if (!beproServiceStarted || !transactionalToken || issueAmount.floatValue <= 0) return;
@@ -136,67 +136,68 @@ export default function PageCreateIssue() {
 
     setRedirecting(true);
 
-    let issueId = "";
-    let tx = undefined;
+    const cid = await createPreBounty({ title: payload.title,
+                                        body: payload.body,
+                                        creator: payload.creatorGithub,
+                                        repositoryId: payload.repositoryId }, activeNetwork?.name)
+                                      .then(cid => cid)
+                                      .catch(() => {
+                                        dispatch(toastError(t("create-bounty:errors.creating-bounty")));
 
-    createPreBounty({ 
+                                        return false;
+                                      });
+    if (!cid) return;
+
+    dispatch(openIssueTx);
+
+    const chainPayload = {
+      cid,
       title: payload.title,
-      body: payload.body,
-      creator: payload.creatorGithub,
-      repositoryId: payload.repositoryId
-    }, activeNetwork?.name)
-      .then((cid) => {
-        if (!cid) throw new Error(t("errors.creating-issue"));
+      repoPath: repository.path,
+      branch,
+      transactional: transactionalToken.address,
+      tokenAmount: payload.amount,
+      githubUser: payload.creatorGithub
+    };
 
-        issueId = cid;
+    const txInfo = await BeproService.openBounty(chainPayload)
+          .catch((e) => {
+            cleanFields();
+            if (e?.message?.toLowerCase().search("user denied") > -1)
+              dispatch(updateTransaction({ ...(openIssueTx.payload as any), status: TransactionStatus.rejected }));
+            else
+              dispatch(updateTransaction({
+                  ...(openIssueTx.payload as any),
+                  status: TransactionStatus.failed
+              }));
+    
+            dispatch(toastError(e.message || t("create-bounty:errors.creating-bounty")));
+            return false;
+          });
+    
+    if (!txInfo) return;
 
-        dispatch(openIssueTx);
+    txWindow.updateItem(openIssueTx.payload.id, parseTransaction(txInfo, openIssueTx.payload));
 
-        const chainPayload = {
-          cid,
-          title: payload.title,
-          repoPath: repository.path,
-          branch,
-          transactional: transactionalToken.address,
-          tokenAmount: payload.amount,
-          githubUser: payload.creatorGithub
-        };
+    const { blockNumber: fromBlock } = txInfo as any;
 
-        return BeproService.openBounty(chainPayload)
-      })
-      .then((txInfo) => {
-        tx = txInfo;
+    const createdBounties = await pastEventsV2("bounty", "created", activeNetwork?.name, { fromBlock } )
+      .then(({data}) => data)
+      .catch(() => false);
 
-        const { blockNumber } = txInfo as any;
+    if (!createdBounties) 
+      return dispatch(toastWarning("The bounty was created, but something went wrong while reading the blockchain, please go to the home page while we try to get your bounty"));
 
-        return processEvent("bounty/created", blockNumber, undefined, undefined, activeNetwork?.name);
-      })
-      .then(({data: createdBounties}) => {
-        if (createdBounties.includes(issueId)) {
-          txWindow.updateItem(openIssueTx.payload.id, parseTransaction(tx, openIssueTx.payload));
-          const [repoId, githubId] = issueId.split('/');
+    if (createdBounties.includes(cid)) {
+      const [repoId, githubId] = String(cid).split('/');
 
-          router.push(getURLWithNetwork('/bounty', {
-            id: githubId,
-            repoId
-          }));
-        } else throw new Error("Bounty not created");
-      })
-      .catch((e) => {
-        console.error("Failed to createIssue", e);
-        cleanFields();
-        if (e?.message?.toLowerCase().search("user denied") > -1)
-          dispatch(updateTransaction({ ...(openIssueTx.payload as any), status: TransactionStatus.rejected }));
-        else
-          dispatch(updateTransaction({
-              ...(openIssueTx.payload as any),
-              status: TransactionStatus.failed
-          }));
+      router.push(getURLWithNetwork('/bounty', {
+        id: githubId,
+        repoId
+      }));
+    }
 
-        dispatch(toastError(e.message || t("create-bounty:errors.creating-bounty")));
-        return false;
-      })
-      .finally(() => setRedirecting(false));
+    setRedirecting(false);
   }
 
   const issueContentIsValid = (): boolean => !!issueTitle && !!issueDescription;

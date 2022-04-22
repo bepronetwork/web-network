@@ -42,7 +42,7 @@ export default function ProposalItem({
   const { handlerDisputeProposal } = useBepro();
   const { getURLWithNetwork } = useNetworkTheme();
   const { activeNetwork } = useNetwork();
-  const { processEvent } = useApi();
+  const { pastEventsV2 } = useApi();
   
   const networkProposals = networkIssue?.proposals?.[proposal?.contractId];
   const networkPullRequest = networkIssue?.pullRequests?.[networkProposals?.prId];
@@ -60,9 +60,9 @@ export default function ProposalItem({
     if (!isDisputable || networkIssue?.closed) return;
     handlerDisputeProposal(+proposal.scMergeId)
     .then(txInfo => {
-      const { blockNumber } = txInfo as any;
+      const { blockNumber: fromBlock } = txInfo as any;
 
-      return processEvent('proposal/disputed', blockNumber, undefined, undefined, activeNetwork?.name);
+      return pastEventsV2("proposal", "disputed", activeNetwork?.name, { fromBlock });
     })
     .then(() =>
       getNetworkIssue());

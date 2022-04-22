@@ -59,7 +59,7 @@ export default async function readBountyCreated(events, network: Network_v2, cus
 
           await bounty.save();
         }
-      }
+      } else console.warn("Bounty not found", id, cid);
     } catch (error) {
       console.error(`[ERROR_BOUNTY] Failed to save ${cid} from past-events`, event, error);
     }

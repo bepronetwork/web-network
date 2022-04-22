@@ -3,6 +3,7 @@ import readPullRequestReady from "helpers/api/pull-request/read-ready";
 
 
 export const PullRequestHelpers = {
-    readPullRequestCreated,
-    readPullRequestReady
+    "created": ["getBountyPullRequestCreatedEvents", readPullRequestCreated],
+    "ready": ["getBountyPullRequestReadyForReviewEvents", readPullRequestReady],
+    //"canceled": ["getBountyPullRequestCanceledEvents", readPullRequestCanceled]
 };

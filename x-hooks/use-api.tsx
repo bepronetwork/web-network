@@ -2,7 +2,7 @@ import axios from "axios";
 import { head } from "lodash";
 import getConfig from "next/config";
 
-import { User } from "interfaces/api-response";
+import { PastEventsParams, User } from "interfaces/api";
 import { BranchInfo, BranchsList } from "interfaces/branchs-list";
 import { IssueData, pullRequest } from "interfaces/issue-data";
 import { INetwork } from "interfaces/network";
@@ -11,6 +11,9 @@ import { Proposal } from "interfaces/proposal";
 import { ReposList } from "interfaces/repos-list";
 
 import client from "services/api";
+
+import { Entities, Events } from "types/dappkit";
+
 const { publicRuntimeConfig } = getConfig()
 interface Paginated<T = any> {
   count: number;
@@ -365,6 +368,16 @@ export default function useApi() {
     });
   }
 
+  async function pastEventsV2(entity: Entities, 
+                              event: Events, 
+                              networkName: string = publicRuntimeConfig.networkConfig.networkName,
+                              params: PastEventsParams = {}) {
+    return client.post(`/past-events/v2/${entity}/${event}`, {
+      ...params,
+      networkName
+    });
+  }
+
   async function processMergeProposal(fromBlock, id) {
     return client.post("/past-events/merge-proposal/", { fromBlock, id });
   }
@@ -644,6 +657,7 @@ export default function useApi() {
     waitForMerge,
     waitForRedeem,
     createPreBounty,
-    cancelPrePullRequest
+    cancelPrePullRequest,
+    pastEventsV2
   };
 }

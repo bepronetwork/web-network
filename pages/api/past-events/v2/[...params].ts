@@ -7,17 +7,19 @@ import models from "db/models";
 
 import { BountyHelpers } from "helpers/api/bounty";
 import networkBeproJs from "helpers/api/handle-network-bepro";
+import { ProposalHelpers } from "helpers/api/proposal";
+import { PullRequestHelpers } from "helpers/api/pull-request";
 
 const { publicRuntimeConfig } = getConfig();
 
-const eventsMapping = {
-  "created": ["getBountyCreatedEvents", "readBountyCreated"],
-  "canceled": ["getBountyCanceledEvents", "readBountyCanceled"],
-  "closed": ["getBountyDistributedEvents", "readBountyClosed"]
+const Helpers = {
+  "bounty": BountyHelpers,
+  "proposal": ProposalHelpers,
+  "pull-request": PullRequestHelpers
 }
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const { event } = req.query;
+  const [entity, event] = req.query.params;
   const { fromBlock, id, networkName, toBlock } = req.body;
 
   const customNetwork = await models.network.findOne({
@@ -38,9 +40,11 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   await network.start();
 
-  if (!eventsMapping[String(event)]) return res.status(404).json("Invalid event");
+  const helper = Helpers[entity];
 
-  const [contractMethod, apiMethod] = eventsMapping[String(event)];
+  if (!helper[String(event)]) return res.status(404).json("Invalid event");
+
+  const [contractMethod, apiMethod] = helper[String(event)];
 
   const events = await network[contractMethod]({ 
     fromBlock, 
@@ -48,7 +52,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     filter: { id } 
   });
 
-  const results = await BountyHelpers[apiMethod](events, network, customNetwork);
+  const results = await apiMethod(events, network, customNetwork);
 
   return res.status(200).json(results);
 }

@@ -98,7 +98,7 @@ export default function PageActions({
   const { handleReedemIssue, handleCreatePullRequest } = useBepro();
   const { updateIssue } = useIssue();
 
-  const { createPrePullRequest, cancelPrePullRequest, startWorking, processEvent } = useApi();
+  const { createPrePullRequest, cancelPrePullRequest, startWorking, pastEventsV2 } = useApi();
 
   function renderIssueAvatars() {
     if (developers?.length > 0) return <IssueAvatars users={developers} />;
@@ -303,11 +303,7 @@ export default function PageActions({
       return handleCreatePullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid);
     })
     .then(txInfo => {
-      return processEvent('pull-request/created', 
-                          (txInfo as any).blockNumber, 
-                          undefined, 
-                          undefined, 
-                          activeNetwork?.name);
+      return pastEventsV2("pull-request", "created", activeNetwork?.name, { fromBlock: (txInfo as any).blockNumber });
     })
     .then(() => {
       dispatch(addToast({

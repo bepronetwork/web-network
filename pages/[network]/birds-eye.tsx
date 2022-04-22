@@ -10,7 +10,7 @@ import ConnectWalletButton from "components/connect-wallet-button";
 
 import { useAuthentication } from "contexts/authentication";
 
-import { User } from "interfaces/api-response";
+import { User } from "interfaces/api";
 
 import { BeproService } from "services/bepro-service";
 

@@ -36,7 +36,7 @@ export default function PageProposal() {
   const router = useRouter();
   const { dispatch } = useContext(ApplicationContext);
   const { t } = useTranslation();
-  const { getUserOf, processEvent } = useApi();
+  const { getUserOf, pastEventsV2 } = useApi();
   const { handlerDisputeProposal, handleCloseIssue } = useBepro();
   const { activeIssue, networkIssue, getNetworkIssue, updateIssue } = useIssue();
   const { activeNetwork } = useNetwork();
@@ -51,9 +51,9 @@ export default function PageProposal() {
     handleCloseIssue(+activeIssue?.contractId,
                      +proposal.contractId)
       .then(txInfo => {
-        const { blockNumber } = txInfo as any;
+        const { blockNumber: fromBlock } = txInfo as any;
 
-        return processEvent('bounty/closed', blockNumber, undefined, undefined, activeNetwork?.name);
+        return pastEventsV2("bounty", "closed", activeNetwork?.name, { fromBlock } );
       })
       .then(() => {
         updateIssue(activeIssue?.repository_id, activeIssue?.githubId);
@@ -76,9 +76,9 @@ export default function PageProposal() {
   async function disputeProposal() {
     handlerDisputeProposal(+proposal?.scMergeId)
     .then(txInfo => {
-      const { blockNumber } = txInfo as any;
+      const { blockNumber: fromBlock } = txInfo as any;
 
-      return processEvent('proposal/disputed', blockNumber, undefined, undefined, activeNetwork?.name);
+      return pastEventsV2("proposal", "disputed", activeNetwork?.name, { fromBlock } );
     })
     .then(() => {
       getNetworkIssue();

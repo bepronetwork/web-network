@@ -3,6 +3,6 @@ import readProposalDisputed from "helpers/api/proposal/read-disputed";
 
 
 export const ProposalHelpers = {
-  readProposalCreated,
-  readProposalDisputed
+  "created": ["getBountyProposalCreatedEvents", readProposalCreated],
+  "disputed": ["getBountyProposalDisputedEvents", readProposalDisputed]
 };
