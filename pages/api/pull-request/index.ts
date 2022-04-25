@@ -40,7 +40,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   }
 
   where.status = {
-    [Op.ne]: "pending"
+    [Op.notIn]: ["pending", "canceled"]
   };
 
   const prs = await models.pullRequest.findAndCountAll({

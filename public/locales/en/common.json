@@ -275,7 +275,9 @@
       "approve-settler": "Approve Network Token",
       "recognize-finished": "Recognize bounty as finished",
       "create-pull-request": "Create Pull Request",
-      "make-pull-request-ready": "Make Pull Request Ready"
+      "make-pull-request-ready": "Make Pull Request Ready",
+      "update-bounty-amount": "Update Bounty Amount",
+      "cancel-pull-request": "Cancel Pull Request"
     }
   },
   "sort": {

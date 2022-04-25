@@ -28,6 +28,7 @@ import { pullRequest } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
+import useNetworkTheme from "x-hooks/use-network";
 
 export default function PullRequestPage() {
   const router = useRouter();
@@ -44,14 +45,15 @@ export default function PullRequestPage() {
   const { wallet, user } = useAuthentication();
   const { dispatch } = useContext(ApplicationContext);
   const { prId, review } = router.query;
-  const { handleMakePullRequestReady } = useBepro();
+  const { handleMakePullRequestReady, handleCancelPullRequest } = useBepro();
+  const { getURLWithNetwork } = useNetworkTheme();
 
   function loadData() {
     dispatch(changeLoadState(true));
     if (!prId) return;
     const currentPR = activeIssue?.pullRequests.find((pr) => +pr?.githubId === +prId);
     setPullRequest(currentPR);
-    setNetworkPullRequest(networkIssue?.pullRequests?.find(pr => +pr.id === +currentPR.contractId));
+    setNetworkPullRequest(networkIssue?.pullRequests?.find(pr => +pr.id === +currentPR?.contractId));
     dispatch(changeLoadState(false));
   }
 
@@ -112,6 +114,37 @@ export default function PullRequestPage() {
           type: "danger",
           title: t("actions.failed"),
           content: t("pull-request:actions.make-ready.error"),
+      }));
+    });
+  }
+
+  function handleCancel() {
+    setIsExecuting(true);
+
+    handleCancelPullRequest(activeIssue?.contractId, pullRequest?.contractId)
+    .then(txInfo => {
+      const { blockNumber: fromBlock } = txInfo as any;
+      return pastEventsV2("pull-request", "canceled", activeNetwork?.name, { fromBlock });
+    })
+    .then(() => {
+      updateIssue(activeIssue.repository_id, activeIssue.githubId);
+      
+      dispatch(addToast({
+        type: "success",
+        title: t("actions.success"),
+        content: t("pull-request:actions.cancel.success"),
+      }));
+
+      router.push(getURLWithNetwork('/bounty', {
+        id: activeIssue.githubId,
+        repoId: activeIssue.repository_id
+      }));
+    })
+    .catch(() => {
+      dispatch(addToast({
+          type: "danger",
+          title: t("actions.failed"),
+          content: t("pull-request:actions.cancel.error"),
       }));
     });
   }
@@ -183,6 +216,23 @@ export default function PullRequestPage() {
                       </ReadOnlyButtonWrapper>
                     )
                   }
+
+{
+                    wallet?.address &&
+                    user?.login &&
+                    !networkPullRequest?.canceled &&
+                    networkPullRequest?.creator?.toLowerCase() === wallet?.address?.toLowerCase() && (
+                      <ReadOnlyButtonWrapper>
+                        <Button
+                          className="read-only-button text-nowrap"
+                          onClick={handleCancel}
+                        >
+                          {t("actions.cancel")}
+                        </Button>
+                      </ReadOnlyButtonWrapper>
+                    )
+                  }
+
                   <GithubLink
                     repoId={String(activeRepo?.id)}
                     forcePath={activeRepo?.githubPath}

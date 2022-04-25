@@ -50,6 +50,7 @@ export default function TransactionsList({
     [TransactionTypes.approveSettlerToken]: <ThumbsUp />,
     [TransactionTypes.recognizedAsFinish]: <RecognizeFinishedIcon />,
     [TransactionTypes.updateBountyAmount]: <RefreshIcon />,
+    [TransactionTypes.cancelPullRequest]: <CloseIssueIcon />
   };
 
   function renderTransactionRow(item: Transaction) {

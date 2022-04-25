@@ -32,6 +32,11 @@
       "title": "Make ready for review",
       "success": "Pull Request is ready for review",
       "error": "Failed to make pull request ready for review"
+    },
+    "cancel": {
+      "title": "Cancel Pull Request",
+      "success": "Pull Request cancelled",
+      "error": "Failed to cancel pull request"
     }
   },
   "errors": {
