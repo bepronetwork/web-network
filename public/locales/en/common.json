@@ -202,6 +202,14 @@
       "title": "Your account is missing some information",
       "content": "We need you to reconnect your Github Account",
       "error-message": "You need to unlock all your BEPRO before doing this"
+    },
+    "update-bounty-amount": {
+      "title": "Update Bounty Amount",
+      "fields": {
+        "amount": {
+          "label": "Amount"
+        }
+      }
     }
   },
   "forms": {

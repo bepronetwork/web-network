@@ -11,6 +11,7 @@ import HelpIcon from "assets/icons/help-icon";
 import InformationChatBubble from "assets/icons/information-chat-bubble";
 import PullRequestIcon from "assets/icons/pull-request-icon";
 import RecognizeFinishedIcon from "assets/icons/recognize-finished-icon";
+import RefreshIcon from "assets/icons/refresh-icon";
 import ReturnArrow from "assets/icons/return-arrow";
 import ThumbsUp from "assets/icons/thumbs-up";
 import UploadIcon from "assets/icons/upload";
@@ -47,7 +48,8 @@ export default function TransactionsList({
     [TransactionTypes.closeIssue]: <CloseIssueIcon />,
     [TransactionTypes.proposeMerge]: <CenterArrows />,
     [TransactionTypes.approveSettlerToken]: <ThumbsUp />,
-    [TransactionTypes.recognizedAsFinish]: <RecognizeFinishedIcon />
+    [TransactionTypes.recognizedAsFinish]: <RecognizeFinishedIcon />,
+    [TransactionTypes.updateBountyAmount]: <RefreshIcon />,
   };
 
   function renderTransactionRow(item: Transaction) {

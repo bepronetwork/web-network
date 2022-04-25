@@ -184,10 +184,10 @@ class BeproFacet {
     return network.getOraclesResume(this.address);
   }
 
-  async getAllowance(tokenAddress: string = publicRuntimeConfig.contract.settler, walletAddress: string = undefined) {
+  async getAllowance(tokenAddress: string = publicRuntimeConfig.contract.settler, walletAddress = this.address) {
     const erc20 = await this.getERC20Obj(tokenAddress);
 
-    return erc20.allowance(walletAddress || this.address, this.network.contractAddress);
+    return erc20.allowance(walletAddress, this.network.contractAddress);
   }
 
   async getOraclesOf(address: string) {

@@ -104,6 +104,36 @@ export default function useBepro(props?: IUseBeProDefault) {
     });
   }
 
+  async function handleUpdateBountyAmount(bountyId: number, amount: number): Promise<TransactionReceipt | Error> {
+    return new Promise(async (resolve, reject) => {
+      const transaction = addTransaction({ type: TransactionTypes.updateBountyAmount }, activeNetwork);
+
+      dispatch(transaction);
+
+      await BeproService.network.updateBountyAmount(bountyId, amount)
+      .then((txInfo) => {
+        txWindow.updateItem(transaction.payload.id,
+                            parseTransaction(txInfo, transaction.payload));
+        onSuccess?.();
+        resolve(txInfo);
+      })
+      .catch((err) => {
+        if (err?.message?.search("User denied") > -1)
+          dispatch(updateTransaction({
+            ...(transaction.payload as any),
+            remove: true
+          }));
+        else
+          dispatch(updateTransaction({
+            ...(transaction.payload as any),
+            status: TransactionStatus.failed
+          }));
+        onError?.(err);
+        reject(err);
+      });
+    });
+  }
+
   async function handleReedemIssue(): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue }, activeNetwork);
@@ -341,6 +371,7 @@ export default function useBepro(props?: IUseBeProDefault) {
     handleApproveToken,
     handleTakeBack,
     handleCreatePullRequest,
-    handleMakePullRequestReady
+    handleMakePullRequestReady,
+    handleUpdateBountyAmount
   };
 }

@@ -14,4 +14,5 @@ export enum TransactionTypes {
   recognizedAsFinish,
   createPullRequest,
   makePullRequestReady,
+  updateBountyAmount
 }

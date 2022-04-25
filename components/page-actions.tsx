@@ -11,6 +11,7 @@ import GithubLink from "components/github-link";
 import IssueAvatars from "components/issue-avatars";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
+import UpdateBountyAmountModal from "components/update-bounty-amount-modal";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
@@ -26,6 +27,7 @@ import { IForkInfo } from "interfaces/repos-list";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
+
 
 interface pageActions {
   issueId: string;
@@ -88,6 +90,7 @@ export default function PageActions({
 
   const [isExecuting, setIsExecuting] = useState(false);
   const [showPRModal, setShowPRModal] = useState(false);
+  const [showUpdateAmount, setShowUpdateAmount] = useState(false);
 
   const {
     dispatch,
@@ -96,7 +99,7 @@ export default function PageActions({
   const { activeNetwork } = useNetwork();
   const { wallet, user, updateWalletBalance } = useAuthentication();
   const { handleReedemIssue, handleCreatePullRequest } = useBepro();
-  const { updateIssue } = useIssue();
+  const { updateIssue, networkIssue, activeIssue } = useIssue();
 
   const { createPrePullRequest, cancelPrePullRequest, startWorking, pastEventsV2 } = useApi();
 
@@ -164,6 +167,20 @@ export default function PageActions({
       )
     );
   };
+
+  const renderUpdateAmount = () => {
+    if (isIssueinDraft && issueCreator?.toLowerCase() === wallet?.address.toLowerCase() && wallet?.address)
+      return <ReadOnlyButtonWrapper>
+        <Button
+          className="read-only-button me-1"
+          onClick={() => setShowUpdateAmount(true)}
+        >
+          <Translation ns="bounty" label="Update Amount" />
+        </Button>
+      </ReadOnlyButtonWrapper>;
+
+    return <></>;
+  }
 
   function renderProposeDestribution() {
     return (
@@ -389,6 +406,7 @@ export default function PageActions({
               {renderPullrequest()}
 
               {renderRedeem()}
+              {renderUpdateAmount()}
               {renderProposeDestribution()}
 
               {renderViewPullrequest()}
@@ -419,6 +437,15 @@ export default function PageActions({
           ""
         }
         onCloseClick={() => setShowPRModal(false)}
+      />
+
+      <UpdateBountyAmountModal
+        show={showUpdateAmount}
+        repoId={repoId}
+        transactionalAddress={networkIssue?.transactional}
+        bountyId={networkIssue?.id}
+        ghId={activeIssue?.githubId}
+        handleClose={() => setShowUpdateAmount(false)}
       />
     </div>
   );
