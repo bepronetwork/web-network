@@ -119,6 +119,7 @@ export default function useBepro(props?: IUseBeProDefault) {
           processEvent(`redeem-issue`, txInfo.blockNumber, networkIssue?._id).then(() => {
             txWindow.updateItem(redeemTx.payload.id, BeproService.parseTransaction(txInfo, redeemTx.payload));
             onSuccess?.()
+            resolve(txInfo)
           })
             .catch((err) => {
               if (err?.message?.search("User denied") > -1)
