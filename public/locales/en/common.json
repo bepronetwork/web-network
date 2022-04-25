@@ -99,7 +99,8 @@
     "view-bounties": "View Bounties",
     "reconnect-account": "Reconnect account",
     "unlock-all": "Unlock all",
-    "back-to-top": "Back to Top"
+    "back-to-top": "Back to Top",
+    "refuse": "Refuse"
   },
   "misc": {
     "by": "by",
@@ -277,7 +278,8 @@
       "create-pull-request": "Create Pull Request",
       "make-pull-request-ready": "Make Pull Request Ready",
       "update-bounty-amount": "Update Bounty Amount",
-      "cancel-pull-request": "Cancel Pull Request"
+      "cancel-pull-request": "Cancel Pull Request",
+      "refused-by-owner": "Refuse Bounty Proposal"
     }
   },
   "sort": {

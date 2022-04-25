@@ -393,6 +393,36 @@ export default function useBepro(props?: IUseBeProDefault) {
     });
   }
 
+  async function handleRefuseByOwner(bountyId: number, proposalId: number) {
+    return new Promise(async (resolve, reject) => {
+      const tx = addTransaction({ type: TransactionTypes.refuseProposal, }, activeNetwork);
+      dispatch(tx);
+
+      await BeproService.network.refuseBountyProposal(bountyId, proposalId)
+      .then(txInfo => {
+        txWindow.updateItem(tx.payload.id,
+                            parseTransaction(txInfo, tx.payload));
+         
+        resolve(txInfo);
+      })
+      .catch(error => {
+        if (error?.message?.search("User denied") > -1)
+          dispatch(updateTransaction({
+         ...(tx.payload as any),
+         status: TransactionStatus.rejected
+          }));
+        else
+         dispatch(updateTransaction({
+           ...(tx.payload as any),
+           status: TransactionStatus.failed
+         }));
+        console.log(error);
+        onError?.(error);
+        reject(error);
+      });
+    });
+  }
+
   return {
     handlerDisputeProposal,
     handleCloseIssue,
@@ -403,6 +433,7 @@ export default function useBepro(props?: IUseBeProDefault) {
     handleCreatePullRequest,
     handleMakePullRequestReady,
     handleUpdateBountyAmount,
-    handleCancelPullRequest
+    handleCancelPullRequest,
+    handleRefuseByOwner
   };
 }

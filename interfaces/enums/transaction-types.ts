@@ -15,5 +15,6 @@ export enum TransactionTypes {
   createPullRequest,
   makePullRequestReady,
   updateBountyAmount,
-  cancelPullRequest
+  cancelPullRequest,
+  refuseProposal
 }

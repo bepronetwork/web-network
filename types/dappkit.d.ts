@@ -7,4 +7,4 @@ export type NetworkParameters = "councilAmount" |
 
 export type Entities = "bounty" | "proposal" | "pull-request";
 
-export type Events = "created" | "canceled" | "closed" | "disputed" | "ready" | "updated";
+export type Events = "created" | "canceled" | "closed" | "disputed" | "ready" | "updated" | "refused";

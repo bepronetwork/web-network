@@ -1,10 +1,9 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { ApplicationContext } from "contexts/application";
+import { useAuthentication } from "contexts/authentication";
 
 import {
-  formatNumberToNScale,
-  formatNumberToString
+  formatNumberToNScale
 } from "helpers/formatNumber";
 
 import Translation from "./translation";
@@ -13,11 +12,11 @@ export default function ProposalProgressBar({
   isDisputed = null,
   issueDisputeAmount = 0,
   isFinished = false,
-  isMerged = false
+  isMerged = false,
+  refused = false
 }) {
-  const {
-    state: { beproStaked: stakedAmount }
-  } = useContext(ApplicationContext);
+  const { wallet } = useAuthentication();
+
   const [issueState, setIssueState] = useState<string>("");
   const [issueColor, setIssueColor] = useState<string>("");
   const [percentage, setPercentage] = useState<number>(0);
@@ -33,7 +32,7 @@ export default function ProposalProgressBar({
   }
 
   function getStateColor() {
-    if (isDisputed || (!isMerged && isFinished === true)) return "danger";
+    if (isDisputed || refused || (!isMerged && isFinished === true)) return "danger";
 
     if (isDisputed === false && isFinished === true && isMerged)
       return "success";
@@ -44,6 +43,8 @@ export default function ProposalProgressBar({
   }
 
   function getStateText() {
+    if (refused) return "Refused by bounty owner";
+    
     if (isDisputed === true || (!isMerged && isFinished === true))
       return "Failed";
 
@@ -58,7 +59,7 @@ export default function ProposalProgressBar({
   function loadDisputeState() {
     setIssueState(getStateText());
     setIssueColor(getStateColor());
-    setPercentage(+toPercent(issueDisputeAmount, stakedAmount));
+    setPercentage(+toPercent(issueDisputeAmount, wallet?.balance?.staked));
   }
 
   function renderColumn(dotLabel, index) {
@@ -90,7 +91,7 @@ export default function ProposalProgressBar({
   }
 
   useEffect(loadDisputeState, [
-    stakedAmount,
+    wallet?.balance?.staked,
     issueDisputeAmount,
     isDisputed,
     isFinished
@@ -109,7 +110,7 @@ export default function ProposalProgressBar({
             <span className={`text-${issueColor} text-uppercase`}>
               {formatNumberToNScale(issueDisputeAmount)}{" "}
             </span>{" "}
-            /{formatNumberToNScale(stakedAmount)}{" "}
+            /{formatNumberToNScale(wallet?.balance?.staked || 0)}{" "}
             <Translation label="$oracles" />{" "}
             <span className={`text-${issueColor}`}> ({percentage}%)</span>
           </div>

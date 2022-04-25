@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
@@ -23,6 +23,7 @@ interface IProposalActionCardProps {
   currentPullRequest: pullRequest;
   onMerge: () => void;
   onDispute: () => void;
+  onRefuse: () => Promise<void>;
 }
 
 export default function ProposalActionCard({
@@ -30,14 +31,17 @@ export default function ProposalActionCard({
   networkProposal,
   currentPullRequest,
   onMerge,
-  onDispute
+  onDispute,
+  onRefuse
 }: IProposalActionCardProps) {
   const { t } = useTranslation(["common", "pull-request"]);
   const { networkIssue } = useIssue();
   const { activeNetwork } = useNetwork();
-  const { wallet, user } = useAuthentication();
+  const { wallet } = useAuthentication();
 
-  const isDisable = [
+  const [isRefusing, setIsRefusing] = useState(false);
+
+  const isDisable = () => [
     networkIssue?.closed,
     !isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime),
     networkProposal?.isDisputed,
@@ -45,10 +49,23 @@ export default function ProposalActionCard({
     wallet?.balance?.oracles?.locked === 0,
   ].some((v) => v);
 
-  const isSuccess = [
+  const isSuccess =  () => [
     networkIssue?.closed,
     !networkProposal?.isDisputed && proposal?.isMerged
   ].every((v) => v);
+
+  const isRefusable = () => [
+    !networkIssue?.closed,
+    !networkIssue?.canceled,
+    !networkProposal?.isDisputed,
+    !networkProposal?.refusedByBountyOwner,
+    networkIssue?.creator === wallet?.address
+  ].every(v => v);
+
+  function handleRefuse() {
+    setIsRefusing(true);
+    onRefuse().finally(() => setIsRefusing(false));
+  }
 
   return (
     <div className="col-md-6">
@@ -59,6 +76,7 @@ export default function ProposalActionCard({
             isDisputed={networkProposal?.isDisputed}
             isFinished={networkIssue?.closed}
             isMerged={proposal?.isMerged}
+            refused={networkProposal?.refusedByBountyOwner}
           />
         </div>
         <div className="mt-2 py-2 text-center">
@@ -74,26 +92,40 @@ export default function ProposalActionCard({
               disabled={
                 !currentPullRequest?.isMergeable ||
                  proposal?.isMerged || 
+                 networkProposal?.refusedByBountyOwner ||
                  isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime)
               }
               onClick={onMerge}
             >
-              {!currentPullRequest?.isMergeable ||
-                (proposal?.isMerged && (
+              {(!currentPullRequest?.isMergeable ||
+                networkProposal?.refusedByBountyOwner ||
+                proposal?.isMerged ) && (
                   <LockedIcon width={12} height={12} className="mr-1" />
-                ))}
-              {t("common:actions.merge")}
+                )}
+              <span>{t("actions.merge")}</span>
             </Button>
 
-              {!isSuccess && !isDisable && (
+              {!isSuccess() && !isDisable() && (
                 <Button
                   className="flex-grow-1"
                   textClass="text-uppercase text-white"
                   color="purple"
-                  disabled={isDisable}
+                  disabled={isDisable()}
                   onClick={onDispute}
                 >
-                  {t("common:actions.dispute")}
+                  {t("actions.dispute")}
+                </Button>
+              )}
+
+              {isRefusable() && (
+                <Button
+                  className="flex-grow-1"
+                  textClass="text-uppercase text-white"
+                  color="purple"
+                  disabled={!isRefusable() || isRefusing}
+                  onClick={handleRefuse}
+                >
+                  {t("actions.refuse")}
                 </Button>
               )}
             </div>

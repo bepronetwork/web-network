@@ -49,12 +49,13 @@ export default function ProposalItem({
 
   const isDisable = [
       networkIssue?.closed,
+      networkProposals?.refusedByBountyOwner,
       !isProposalDisputable(proposal?.createdAt, disputableTime),
       networkIssue?.proposals[proposal.contractId]?.isDisputed,
       !networkIssue?.proposals[proposal.id]?.canUserDispute,
       wallet?.balance?.oracles?.locked === 0,
   ]
-    .some(v => v)
+    .some(v => v);
 
   async function handleDispute() {
     if (!isDisputable || networkIssue?.closed) return;
@@ -73,7 +74,9 @@ export default function ProposalItem({
       return "success";
     }
 
-    if (networkProposals?.isDisputed || (networkIssue?.closed && !proposal.isMerged)) {
+    if (networkProposals?.isDisputed || 
+        networkProposals?.refusedByBountyOwner || 
+        (networkIssue?.closed && !proposal.isMerged)) {
       return "danger";
     }
 
@@ -87,7 +90,9 @@ export default function ProposalItem({
       action = "accepted";
     }
 
-    if (networkProposals?.isDisputed || (networkIssue?.closed && !proposal.isMerged)) {
+    if (networkProposals?.isDisputed || 
+        networkProposals?.refusedByBountyOwner || 
+        (networkIssue?.closed && !proposal.isMerged)) {
       action = "failed";
     }
 

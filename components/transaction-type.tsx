@@ -23,7 +23,8 @@ export default function TransactionType({ type }) {
     [TransactionTypes.createPullRequest]: t("transactions.types.create-pull-request"),
     [TransactionTypes.makePullRequestReady]: t("transactions.types.make-pull-request-ready"),
     [TransactionTypes.updateBountyAmount]: t("transactions.types.update-bounty-amount"),
-    [TransactionTypes.cancelPullRequest]: t("transactions.types.cancel-pull-request")
+    [TransactionTypes.cancelPullRequest]: t("transactions.types.cancel-pull-request"),
+    [TransactionTypes.refuseProposal]: t("transactions.types.refused-by-owner")
   };
 
   return (

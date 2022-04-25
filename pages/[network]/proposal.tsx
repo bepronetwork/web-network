@@ -37,7 +37,7 @@ export default function PageProposal() {
   const { dispatch } = useContext(ApplicationContext);
   const { t } = useTranslation();
   const { getUserOf, pastEventsV2 } = useApi();
-  const { handlerDisputeProposal, handleCloseIssue } = useBepro();
+  const { handlerDisputeProposal, handleCloseIssue, handleRefuseByOwner } = useBepro();
   const { activeIssue, networkIssue, getNetworkIssue, updateIssue } = useIssue();
   const { activeNetwork } = useNetwork();
   const [proposal, setProposal] = useState<Proposal>({} as Proposal);
@@ -82,6 +82,27 @@ export default function PageProposal() {
     })
     .then(() => {
       getNetworkIssue();
+    });
+  }
+
+  async function handleRefuse() {
+    handleRefuseByOwner(+activeIssue?.contractId, +proposal.contractId)
+    .then(() => {
+      updateIssue(activeIssue?.repository_id, activeIssue?.githubId);
+      getNetworkIssue();
+
+      dispatch(addToast({
+          type: "success",
+          title: t("actions.success"),
+          content: t("proposal:messages.proposal-refused")
+      }));
+    })
+    .catch((error) => {
+      dispatch(addToast({
+          type: "danger",
+          title: t("actions.failed"),
+          content: error?.response?.data?.message
+      }));
     });
   }
 
@@ -146,6 +167,7 @@ export default function PageProposal() {
             currentPullRequest={pullRequest}
             onMerge={closeIssue}
             onDispute={disputeProposal}
+            onRefuse={handleRefuse}
           />
         </div>
       </CustomContainer>
