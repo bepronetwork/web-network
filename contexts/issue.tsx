@@ -3,7 +3,7 @@ import React, {
   useCallback, useContext, useEffect, useMemo, useState
 } from "react";
 
-import { fromSmartContractDecimals } from "bepro-js";
+import { fromSmartContractDecimals } from "@taikai/dappkit";
 import { useRouter } from "next/router";
 
 import {

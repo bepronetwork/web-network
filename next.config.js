@@ -35,7 +35,7 @@ const publicRuntimeConfig = {
       min: process.env.NEXT_PUBLIC_REDEEM_TIME_MIN,
       max: process.env.NEXT_PUBLIC_REDEEM_TIME_MAX,
     },
-    councilAmmount:{
+    councilAmount:{
       min: process.env.NEXT_PUBLIC_COUNCIL_AMOUNT_MIN,
       max: process.env.NEXT_PUBLIC_COUNCIL_AMOUNT_MAX,
     },

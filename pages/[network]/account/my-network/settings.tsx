@@ -343,7 +343,7 @@ export default function Settings() {
       !network ||
       !wallet?.address ||
       !user?.login ||
-      network?.name?.toLowerCase() === publicRuntimeConfig?.configNetwork?.networkName
+      network?.name?.toLowerCase() === publicRuntimeConfig?.networkConfig?.networkName
     )
       return;
 

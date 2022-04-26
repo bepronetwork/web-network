@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { ListGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
 
-import { NetworkFactory, toSmartContractDecimals } from "bepro-js";
+import { NetworkFactory, toSmartContractDecimals } from "@taikai/dappkit";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -86,7 +86,7 @@ export default function ParityPage() {
              t("parity:fields.github-login.placeholder"),
              githubLogin,
              (ev) => setGithubLogin(ev?.target?.value))
-    // formItem(`Read Repo`, `Github repo name to read from (pex bepro-js)`, readRepoName, (ev) => setReadRepoName(ev?.target?.value)),
+    // formItem(`Read Repo`, `Github repo name to read from (pex @taikai/dappkit)`, readRepoName, (ev) => setReadRepoName(ev?.target?.value)),
   ];
 
   function isValidForm() {

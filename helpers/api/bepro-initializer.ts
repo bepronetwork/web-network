@@ -1,4 +1,4 @@
-import { NetworkFactory, Web3Connection } from "bepro-js";
+import { NetworkFactory, Web3Connection } from "@taikai/dappkit";
 import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig()
 
