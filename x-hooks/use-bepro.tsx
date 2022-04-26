@@ -120,6 +120,7 @@ export default function useBepro(props?: IUseBeProDefault) {
             txWindow.updateItem(redeemTx.payload.id, BeproService.parseTransaction(txInfo, redeemTx.payload));
             resolve(txInfo)
             onSuccess?.()
+            resolve(txInfo)
           })
             .catch((err) => {
               if (err?.message?.search("User denied") > -1)
