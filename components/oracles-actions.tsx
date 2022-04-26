@@ -181,7 +181,7 @@ function OraclesActions() {
     BeproService.getAllowance().then(setNetworkTokenAllowance).catch(console.log);
   }
 
-  const needsApproval = () => tokenAmount > networkTokenAllowance;
+  const needsApproval = () => tokenAmount > networkTokenAllowance && action === t("my-oracles:actions.lock.label");
 
   useEffect(() => {
     if (wallet?.address && beproServiceStarted) 
