@@ -1,21 +1,17 @@
-import { FormCheck, ListGroup, ProgressBar } from "react-bootstrap";
+import { useState } from "react";
+import { FormCheck, ListGroup } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
-
-import ArrowRightLine from "assets/icons/arrow-right-line";
-import LockedIcon from "assets/icons/locked-icon";
-
-import Button from "components/button";
-import InputNumber from "components/input-number";
-import Step from "components/step";
-import UnlockBeproModal from "components/unlock-bepro-modal";
-
-import { formatNumberToCurrency, formatNumberToNScale } from "helpers/formatNumber";
-import { BEPRO_TOKEN, Token } from "interfaces/token";
-import { useState } from "react";
 import getConfig from "next/config";
-import { useNetwork } from "contexts/network";
+
+import Step from "components/step";
 import TokensDropdown from "components/tokens-dropdown";
+
+import { useNetwork } from "contexts/network";
+
+import { BEPRO_TOKEN, Token } from "interfaces/token";
+
+
 
 const { publicRuntimeConfig } = getConfig();
 

@@ -39,6 +39,14 @@
       "error": "Failed to cancel pull request"
     }
   },
+  "status": {
+    "ready-to-merge": "Ready to merge",
+    "draft": "Draft",
+    "merged": "Merged",
+    "conflicts": "Conflicts",
+    "closed": "Closed",
+    "broken-tests": "Broken tests"
+  },
   "errors": {
     "not-found": "No pull requests found",
     "no-reviews-found": "No reviews found",

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 
+import { useTranslation } from "next-i18next";
+
 export type PRLabel =
   | "ready to merge"
   | "broken tests"
@@ -24,19 +26,22 @@ function PullRequestLabels({
   isDraft = false,
   hero = false
 }: IPRLabel) {
+  const { t } = useTranslation("pull-request");
+
   const [state, setState] = useState<PRLabel>(label || null);
+
   function getColorLabel() {
     switch (state?.toLowerCase()) {
-    case "ready to merge": {
+    case t("status.ready-to-merge").toLowerCase(): {
       return "success";
     }
-    case "broken tests": {
+    case t("status.broken-tests").toLowerCase(): {
       return "warning";
     }
-    case "conflicts": {
+    case t("status.conflicts").toLowerCase(): {
       return "danger";
     }
-    case "closed": {
+    case t("status.closed").toLowerCase(): {
       return "danger";
     }
     default: {
@@ -46,11 +51,11 @@ function PullRequestLabels({
   }
 
   function getLabel(): PRLabel {
-    if (isDraft) return "draft";
-    if (merged) return "merged";
-    if (isMergeable) return "ready to merge";
+    if (isDraft) return t("status.draft");
+    if (merged) return t("status.merged");
+    if (isMergeable) return t("status.ready-to-merge");
     //isMergeable can be null;
-    return "conflicts";
+    return t("status.conflicts");
   }
 
   useEffect(() => {

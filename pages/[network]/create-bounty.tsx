@@ -186,7 +186,7 @@ export default function PageCreateIssue() {
       .catch(() => false);
 
     if (!createdBounties) 
-      return dispatch(toastWarning("The bounty was created, but something went wrong while reading the blockchain, please go to the home page while we try to get your bounty"));
+      return dispatch(toastWarning(t("create-bounty:errors.sync")));
 
     if (createdBounties.includes(cid)) {
       const [repoId, githubId] = String(cid).split('/');

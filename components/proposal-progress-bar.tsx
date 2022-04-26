@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { useTranslation } from "next-i18next";
+
 import { useAuthentication } from "contexts/authentication";
 
 import {
@@ -15,6 +17,8 @@ export default function ProposalProgressBar({
   isMerged = false,
   refused = false
 }) {
+  const { t } = useTranslation("proposal");
+  
   const { wallet } = useAuthentication();
 
   const [issueState, setIssueState] = useState<string>("");
@@ -43,17 +47,17 @@ export default function ProposalProgressBar({
   }
 
   function getStateText() {
-    if (refused) return "Refused by bounty owner";
+    if (refused) return t("status.refused");
     
     if (isDisputed === true || (!isMerged && isFinished === true))
-      return "Failed";
+      return t("status.failed");
 
-    if (isDisputed === false && isFinished === false) return "Open for dispute";
+    if (isDisputed === false && isFinished === false) return t("status.open-for-dispute");
 
     if (isDisputed === false && isFinished === true && isMerged)
-      return "Accepted";
+      return t("status.accepted");
 
-    return "Waiting";
+    return t("status.waiting");
   }
 
   function loadDisputeState() {

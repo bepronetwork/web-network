@@ -19,6 +19,7 @@
   "create-bounty": "Create Bounty",
   "bounty-created": "Bounty created",
   "errors": {
-    "creating-bounty": "Error creating bounty"
+    "creating-bounty": "Error creating bounty",
+    "sync": "The bounty was created, but something went wrong while reading the blockchain, please go to the home page while we try to get your bounty"
   }
 }

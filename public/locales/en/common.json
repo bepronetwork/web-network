@@ -132,7 +132,8 @@
     "token": "token",
     "creation-date": "creation date",
     "seconds": "seconds",
-    "on": "on"
+    "on": "on",
+    "next-step": "Next Step"
   },
   "modals": {
     "help-modal": {
@@ -152,6 +153,10 @@
       "provide-feedback": {
         "title": "provide feedback",
         "content": "Product feedback and requests."
+      },
+      "invalid-account-wallet": {
+        "title": "Github Account and Wallet don't match",
+        "description": "Login to the Github account previously associated to this wallet or change to the correct wallet for this account."
       }
     },
     "not-mergeable": {
