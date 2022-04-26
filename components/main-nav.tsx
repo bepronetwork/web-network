@@ -163,7 +163,7 @@ export default function MainNav() {
             <HelpIcon />
           </Button>
 
-          <WrongNetworkModal requiredNetwork={publicRuntimeConfig.metaMask.chainName?.toLowerCase()} />
+          <WrongNetworkModal requiredNetworkId={publicRuntimeConfig.metaMask.chainId} />
 
           <ConnectWalletButton>
             <div className="d-flex account-info align-items-center">
