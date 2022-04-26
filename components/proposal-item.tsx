@@ -47,12 +47,12 @@ export default function ProposalItem({
   const networkProposals = networkIssue?.proposals?.[proposal?.contractId];
   const networkPullRequest = networkIssue?.pullRequests?.[networkProposals?.prId];
 
-  const isDisable = [
+  const isDisable = () => [
       networkIssue?.closed,
       networkProposals?.refusedByBountyOwner,
       !isProposalDisputable(proposal?.createdAt, disputableTime),
       networkIssue?.proposals[proposal.contractId]?.isDisputed,
-      !networkIssue?.proposals[proposal.id]?.canUserDispute,
+      !networkIssue?.proposals[proposal.contractId]?.canUserDispute,
       wallet?.balance?.oracles?.locked === 0,
   ]
     .some(v => v);
@@ -149,15 +149,15 @@ export default function ProposalItem({
               <ReadOnlyButtonWrapper>
                 <Button
                   color={getColors()}
-                  disabled={isDisable || !networkProposals}
-                  outline={isDisable}
+                  disabled={isDisable() || !networkProposals}
+                  outline={isDisable()}
                   className={"align-self-center mb-2 ms-3 read-only-button"}
                   onClick={(ev) => {
                     ev.stopPropagation();
                     handleDispute();
                   }}
                 >
-                  {isDisable && getColors() !== "success" && (
+                  {isDisable() && getColors() !== "success" && (
                     <LockedIcon className={`me-2 text-${getColors()}`} />
                   )}
                   <span>{getLabel()}</span>

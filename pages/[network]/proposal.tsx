@@ -114,15 +114,14 @@ export default function PageProposal() {
       
       const { githubLogin } = await getUserOf(detail.recipient);
       const oracles = networkProposal?.details[i]?.percentage.toString();
-      const distributedAmount = 
-        await BeproService.calculateDistributedAmounts(networkIssue.tokenAmount, [detail.percentage]);
+      const distributedAmount = networkIssue.tokenAmount * detail.percentage / 100;
 
       return { 
         githubLogin, 
         percentage: detail.percentage, 
         address: detail.recipient, 
         oracles, 
-        distributedAmount: distributedAmount.proposals[0] 
+        distributedAmount 
       };
     }
     const maping = networkProposal?.details?.map(mapUser) || [];

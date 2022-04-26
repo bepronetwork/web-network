@@ -62,6 +62,14 @@ export default function ProposalActionCard({
     networkIssue?.creator === wallet?.address
   ].every(v => v);
 
+  const canMerge = () => [
+    currentPullRequest?.isMergeable,
+    !proposal?.isMerged,
+    !networkProposal?.isDisputed,
+    !networkProposal?.refusedByBountyOwner,
+    !isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime)
+  ].every(v => v);
+
   function handleRefuse() {
     setIsRefusing(true);
     onRefuse().finally(() => setIsRefusing(false));
@@ -89,17 +97,10 @@ export default function ProposalActionCard({
             <Button
               className="flex-grow-1"
               textClass="text-uppercase text-white"
-              disabled={
-                !currentPullRequest?.isMergeable ||
-                 proposal?.isMerged || 
-                 networkProposal?.refusedByBountyOwner ||
-                 isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime)
-              }
+              disabled={!canMerge()}
               onClick={onMerge}
             >
-              {(!currentPullRequest?.isMergeable ||
-                networkProposal?.refusedByBountyOwner ||
-                proposal?.isMerged ) && (
+              {!canMerge() && (
                   <LockedIcon width={12} height={12} className="mr-1" />
                 )}
               <span>{t("actions.merge")}</span>

@@ -36,6 +36,7 @@ export default function IssueProposals({
               key={proposal.id}
               proposal={proposal}
               issue={issue}
+              disputableTime={activeNetwork?.disputableTime}
               isDisputable={
                 isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime) &&
                 !networkIssue?.proposals[proposal.id]?.isDisputed
