@@ -25,6 +25,7 @@ import { changeGithubHandle } from "contexts/reducers/change-github-handle";
 import { changeGithubLogin } from "contexts/reducers/change-github-login";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 import { changeNetwork } from "contexts/reducers/change-network";
+import { changeNetworkId } from "contexts/reducers/change-network-id";
 import { changeWalletState } from "contexts/reducers/change-wallet-connect";
 
 import { truncateAddress } from "helpers/truncate-address";
@@ -145,6 +146,7 @@ export default function ConnectAccount() {
     try {
       const chainId = (window as any)?.ethereum?.chainId;
       if (+publicRuntimeConfig.metaMask.chainId !== +chainId) {
+        dispatch(changeNetworkId(+chainId));
         dispatch(changeNetwork((NetworkIds[+chainId] || "unknown")?.toLowerCase()));
         return;
       } else {
