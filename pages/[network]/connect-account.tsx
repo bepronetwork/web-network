@@ -30,8 +30,6 @@ import { changeWalletState } from "contexts/reducers/change-wallet-connect";
 
 import { truncateAddress } from "helpers/truncate-address";
 
-import { NetworkIds } from "interfaces/enums/network-ids";
-
 import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
@@ -147,7 +145,7 @@ export default function ConnectAccount() {
       const chainId = (window as any)?.ethereum?.chainId;
       if (+publicRuntimeConfig.metaMask.chainId !== +chainId) {
         dispatch(changeNetworkId(+chainId));
-        dispatch(changeNetwork((NetworkIds[+chainId] || "unknown")?.toLowerCase()));
+        dispatch(changeNetwork((publicRuntimeConfig.networkIds[+chainId] || "unknown")?.toLowerCase()));
         return;
       } else {
         await BeproService.login();
