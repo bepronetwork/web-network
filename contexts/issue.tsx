@@ -167,9 +167,9 @@ export const IssueProvider: React.FC = function ({ children }) {
     }
   }, [query, activeNetwork, user?.accessToken]);
 
-  useEffect(() => {
-    console.log('useIssue',{activeIssue, networkIssue})
-  }, [activeIssue, networkIssue]);
+  // useEffect(() => {
+  //   console.log('useIssue',{activeIssue, networkIssue})
+  // }, [activeIssue, networkIssue]);
 
   const memorizeValue = useMemo<IssueContextData>(() => ({
       activeIssue,
