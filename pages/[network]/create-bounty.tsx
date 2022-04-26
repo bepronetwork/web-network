@@ -141,7 +141,9 @@ export default function PageCreateIssue() {
                                         creator: payload.creatorGithub,
                                         repositoryId: payload.repositoryId }, activeNetwork?.name)
                                       .then(cid => cid)
-                                      .catch(() => {
+                                      .catch(error => {
+                                        console.log("Failed to create pre-bounty", error);
+
                                         dispatch(toastError(t("create-bounty:errors.creating-bounty")));
 
                                         return false;
@@ -170,6 +172,8 @@ export default function PageCreateIssue() {
                   ...(openIssueTx.payload as any),
                   status: TransactionStatus.failed
               }));
+
+            console.log("Failed to create bounty on chain", e);
     
             dispatch(toastError(e.message || t("create-bounty:errors.creating-bounty")));
             return false;
@@ -183,7 +187,11 @@ export default function PageCreateIssue() {
 
     const createdBounties = await pastEventsV2("bounty", "created", activeNetwork?.name, { fromBlock } )
       .then(({data}) => data)
-      .catch(() => false);
+      .catch(error => {
+        console.log("Failed to patch bounty", error);
+
+        return false;
+      });
 
     if (!createdBounties) 
       return dispatch(toastWarning(t("create-bounty:errors.sync")));
