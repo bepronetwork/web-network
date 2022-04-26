@@ -173,7 +173,7 @@ export default function PageActions({
       githubLogin && (
         <NewProposal
           isFinished={finished}
-          isIssueOwner={issueCreator === wallet?.address}
+          isIssueOwner={issueCreator?.toLowerCase() === wallet?.address.toLowerCase()}
           amountTotal={amountIssue}
           pullRequests={pullRequests}
         />
@@ -304,7 +304,7 @@ export default function PageActions({
                   title: t("actions.failed"),
                   content: item.message
               })));
-            reject(err);
+            reject(err?.response);
           } else {
             dispatch(addToast({
                 type: "danger",
