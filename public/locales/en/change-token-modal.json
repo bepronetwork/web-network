@@ -1,0 +1,16 @@
+{
+ "title": "Add Token",
+ "description": "Add an ERC20 token to use on this Bounty",
+ "fields": {
+   "address": {
+     "label": "Address",
+     "error": "Invalid address provided!"
+   },
+   "name": {
+     "label": "Name"
+   },
+   "symbol": {
+      "label": "Symbol"
+   }
+ }
+}

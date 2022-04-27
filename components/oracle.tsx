@@ -1,13 +1,14 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import clsx from "clsx";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
 import InternalLink from "components/internal-link";
 import PageHero, { IInfosHero } from "components/page-hero";
 
-import { ApplicationContext } from "contexts/application";
+import { useAuthentication } from "contexts/authentication";
+
+import { handleNetworkAddress } from "helpers/custom-network";
 
 import { BeproService } from "services/bepro-service";
 
@@ -16,9 +17,7 @@ import useNetwork from "x-hooks/use-network";
 
 export default function Oracle({ children }) {
   const { asPath } = useRouter();
-  const {
-    state: { beproInit }
-  } = useContext(ApplicationContext);
+  const {beproServiceStarted} = useAuthentication()
   const { network: activeNetwork, getURLWithNetwork } = useNetwork();
   const { t } = useTranslation(["oracle", "common"]);
   const { getTotalUsers } = useApi();
@@ -39,14 +38,15 @@ export default function Oracle({ children }) {
   ]);
 
   async function loadTotals() {
-    if (!beproInit || !activeNetwork) return;
+    if (!beproServiceStarted || !activeNetwork) return;
 
     const [closed, inProgress, onNetwork, totalUsers] = await Promise.all([
-      BeproService.getClosedIssues(activeNetwork.networkAddress),
-      BeproService.getOpenIssues(activeNetwork.networkAddress),
-      BeproService.getTokensStaked(activeNetwork.networkAddress),
+      BeproService.getClosedBounties(handleNetworkAddress(activeNetwork)),
+      BeproService.getOpenBounties(handleNetworkAddress(activeNetwork)),
+      BeproService.getTotalSettlerLocked(handleNetworkAddress(activeNetwork)),
       getTotalUsers()
     ]);
+
     setInfos([
       {
         value: inProgress,
@@ -70,7 +70,7 @@ export default function Oracle({ children }) {
 
   useEffect(() => {
     loadTotals();
-  }, [beproInit, activeNetwork]);
+  }, [beproServiceStarted, activeNetwork]);
 
   return (
     <div>
@@ -85,7 +85,7 @@ export default function Oracle({ children }) {
             <InternalLink
               href={getURLWithNetwork("/oracle/new-bounties")}
               label={String(t("new-bounties"))}
-              className={clsx("mr-3 h3 p-0")}
+              className={"mr-3 h3 p-0"}
               active={(asPath.endsWith("/oracle") && true) || undefined}
               nav
               transparent
@@ -94,7 +94,7 @@ export default function Oracle({ children }) {
             <InternalLink
               href={getURLWithNetwork("/oracle/ready-to-merge")}
               label={String(t("ready-to-merge"))}
-              className={clsx("h3 p-0")}
+              className={"h3 p-0"}
               nav
               transparent
             />

@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 
 import ArrowRight from "assets/icons/arrow-right";
 
-import { formatNumberToNScale } from "helpers/formatNumber";
+import { formatNumberToCurrency } from "helpers/formatNumber";
 import { truncateAddress } from "helpers/truncate-address";
 
 import { Currency } from "interfaces/currency";
@@ -17,9 +17,9 @@ interface IProposalListAddressProps {
 
 export default function ProposalListAddresses({
   usersDistribution,
-  currency = "BEPRO"
+  currency = undefined
 }: IProposalListAddressProps) {
-  const { t } = useTranslation("proposal");
+  const { t } = useTranslation(["proposal", "common"]);
 
   return (
     <div className="col-md-6">
@@ -45,8 +45,8 @@ export default function ProposalListAddresses({
                       height={10}
                     />
                     <span>
-                      {formatNumberToNScale(+item?.oracles)}{" "}
-                      <span className="text-primary">${currency}</span>
+                      {formatNumberToCurrency(+item?.distributedAmount, { minimumFractionDigits: 2 })}{" "}
+                      <span className="text-primary">${currency || t('common:misc.token')}</span>
                     </span>
                   </div>
                 </div>

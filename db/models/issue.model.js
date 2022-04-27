@@ -23,7 +23,12 @@ class Issue extends Model {
         },
         merged: DataTypes.STRING,
         seoImage: DataTypes.STRING,
-        network_id: DataTypes.INTEGER
+        network_id: DataTypes.INTEGER,
+        contractId: DataTypes.INTEGER,
+        tokenId: {
+          type: DataTypes.INTEGER,
+          allowNull: true
+        }
     },
                {
         sequelize,
@@ -56,6 +61,11 @@ class Issue extends Model {
     this.belongsTo(models.network, {
       foreignKey: "network_id",
       sourceKey: "id"
+    });
+    this.belongsTo(models.tokens, {
+      foreignKey: "tokenId",
+      sourceKey: "id",
+      as: "token"
     });
   }
 }

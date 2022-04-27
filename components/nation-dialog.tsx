@@ -3,6 +3,7 @@ import { Modal } from "react-bootstrap";
 
 import { kebabCase } from "lodash";
 import { useTranslation } from "next-i18next";
+import getConfig from "next/config";
 
 import BeProBlue from "assets/icons/bepro-blue";
 
@@ -10,9 +11,8 @@ import Loading from "components/loading";
 
 import useApi from "x-hooks/use-api";
 
-import { COUNTRY_CODE_BLOCKED } from "../env";
-
 export default function NationDialog({ children }) {
+  const {publicRuntimeConfig} = getConfig()
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isBlock, setBlock] = useState<boolean>(false);
   const { getClientNation } = useApi();
@@ -25,7 +25,7 @@ export default function NationDialog({ children }) {
       .then((data) => {
         if (
           data.countryCode &&
-          COUNTRY_CODE_BLOCKED.indexOf(data.countryCode) === -1
+          publicRuntimeConfig.countryCodeBlocked.indexOf(data.countryCode) === -1
         )
           return;
 

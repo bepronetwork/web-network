@@ -1,55 +1,45 @@
 import React from "react";
-import { useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
 import ProposalItem from "components/proposal-item";
 
-import { useAuthentication } from "contexts/authentication";
 import { IActiveIssue } from "contexts/issue";
+import { useNetwork } from "contexts/network";
 
 import { isProposalDisputable } from "helpers/proposal";
 
-import { INetworkIssue } from "interfaces/issue-data";
-
-import { BeproService } from "services/bepro-service";
+import { BountyExtended } from "interfaces/bounty";
 
 import NothingFound from "./nothing-found";
 
 interface IIssueProposalProps {
   issue: IActiveIssue;
-  networkIssue: INetworkIssue;
+  networkIssue: BountyExtended;
   className: string;
 }
 
 export default function IssueProposals({
   issue,
-  networkIssue,
-  className = ""
+  className = "",
+  networkIssue
 }: IIssueProposalProps) {
-  const { wallet, beproServiceStarted } = useAuthentication();
-  const [disputableTime, setDisputableTime] = useState(0);
+  const { activeNetwork } = useNetwork();
   const { t } = useTranslation("proposal");
-
-  useEffect(() => {
-    if (beproServiceStarted) {
-      BeproService.getDisputableTime().then(setDisputableTime);
-    }
-  }, [issue, wallet?.address, beproServiceStarted]);
 
   return (
     <div className={`content-wrapper ${className || ""} pt-0 pb-0`}>
       {(issue?.mergeProposals?.length > 0 &&
-        networkIssue?.networkProposals?.length > 0 &&
+        networkIssue?.proposals?.length > 0 &&
         React.Children.toArray(issue?.mergeProposals?.map((proposal) => (
             <ProposalItem
               key={proposal.id}
               proposal={proposal}
               issue={issue}
-              isFinalized={networkIssue?.finalized}
+              disputableTime={activeNetwork?.disputableTime}
               isDisputable={
-                isProposalDisputable(proposal?.createdAt, disputableTime) &&
-                !networkIssue?.networkProposals[proposal.id]?.isDisputed
+                isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime) &&
+                !networkIssue?.proposals[proposal.id]?.isDisputed
               }
             />
           )))) || <NothingFound description={t("errors.not-found")} />}

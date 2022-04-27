@@ -1,6 +1,7 @@
-import models from "db/models";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op } from "sequelize";
+
+import models from "db/models";
 
 import networkBeproJs from "helpers/api/handle-network-bepro";
 import readMergeProposalCreated from "helpers/api/read-merge-proposal-created";

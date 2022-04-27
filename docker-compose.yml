@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:13
+    restart: always
+    container_name: github-db
+    environment:
+      - POSTGRES_USER=github
+      - POSTGRES_PASSWORD=github
+      - POSTGRES_DB=github
+    ports:
+      - '54320:5432'

@@ -1,9 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { GetServerSideProps } from "next";
-import { signOut, useSession, signIn } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import getConfig from "next/config";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
@@ -34,6 +35,8 @@ import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
+
+const { publicRuntimeConfig } = getConfig()
 
 export default function ConnectAccount() {
   const router = useRouter();
@@ -141,7 +144,7 @@ export default function ConnectAccount() {
 
     try {
       const chainId = (window as any)?.ethereum?.chainId;
-      if (+process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID !== +chainId) {
+      if (+publicRuntimeConfig.metaMask.chainId !== +chainId) {
         dispatch(changeNetwork((NetworkIds[+chainId] || "unknown")?.toLowerCase()));
         return;
       } else {

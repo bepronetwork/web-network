@@ -1,6 +1,8 @@
-import models from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op } from "sequelize";
+
+import models from "db/models";
 
 import paginate from "helpers/paginate";
 
@@ -33,8 +35,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   return res.status(404).json([]);
 }
 
-export default async function SearchUsers(req: NextApiRequest,
-                                          res: NextApiResponse) {
+async function SearchUsers(req: NextApiRequest,
+                           res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "post":
     await post(req, res);
@@ -46,3 +48,4 @@ export default async function SearchUsers(req: NextApiRequest,
 
   res.end();
 }
+export default  withCors(SearchUsers)

@@ -3,19 +3,22 @@ const {
   ERC20,
   toSmartContractDecimals,
   Network
-} = require("bepro-js");
+} = require("@taikai/dappkit");
+
+require("dotenv").config();
 
 const cap = toSmartContractDecimals("50000000", 18);
 
 const connection = new Web3Connection({
-  web3Host: "http://127.0.0.1:7545",
-  privateKey:
-    "6dee9544733125f879bdf1f5c51638d0dbaceb579e15c49ac52348d39019b9ab",
+  web3Host: `${process.env.NEXT_GANACHE_HOST}:${process.env.NEXT_GANACHE_PORT}` || "http://127.0.0.1:7545",
+  privateKey: process.env.NEXT_GANACHE_WALLET_PRIVATE_KEY,
   debug: true,
   skipWindowAssignment: true
 });
 
 const DeployERC20andNetwork = async (tokenName, tokenSymbol, capital) => {
+  if(!process.env.NEXT_GANACHE_WALLET_PRIVATE_KEY) throw Error('Missing Wallet PrivateKey')
+
   connection.start();
 
   const deployer = new ERC20(connection);
@@ -35,7 +38,7 @@ const DeployERC20andNetwork = async (tokenName, tokenSymbol, capital) => {
         .then((txNetwork) =>
           console.log("Network Contract Address", txNetwork.contractAddress));
     })
-    .catch(console.log);
+    .catch((console.log)).finally(()=> process.exit());
 };
 
 const main = async () => {

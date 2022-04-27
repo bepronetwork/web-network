@@ -1,7 +1,6 @@
-import models from "db/models";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { Timers } from "helpers/timers";
+import models from "db/models";
 
 async function patch(req: NextApiRequest, res: NextApiResponse) {
   const { githubHandle } = req.query;

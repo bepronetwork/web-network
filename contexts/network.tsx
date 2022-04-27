@@ -1,22 +1,22 @@
 import React, {
-  createContext,
-  useState,
-  useContext,
-  useMemo,
-  useCallback,
-  useEffect
+  createContext, useCallback, useContext, useEffect, useMemo, useState
 } from "react";
 
-import { BEPRO_NETWORK_NAME } from "env";
+
+import getConfig from "next/config";
 import { useRouter } from "next/router";
-import { setCookie, parseCookies } from "nookies";
+import { parseCookies, setCookie } from "nookies";
 
 import NetworkThemeInjector from "components/custom-network/network-theme-injector";
 
 import { INetwork } from "interfaces/network";
 
+import { BeproService } from "services/bepro-service";
+
 import useApi from "x-hooks/use-api";
 
+const { publicRuntimeConfig } = getConfig()
+import { useAuthentication } from "./authentication";
 export interface NetworkContextData {
   activeNetwork: INetwork;
   updateActiveNetwork: () => void;
@@ -30,11 +30,12 @@ const expiresCookie = 60 * 60 * 1; // 1 hour
 export const NetworkProvider: React.FC = function ({ children }) {
   const [activeNetwork, setActiveNetwork] = useState<INetwork>(null);
 
-  const { query, push } = useRouter();
   const { getNetwork } = useApi();
+  const { query, push } = useRouter();
+  const { beproServiceStarted } = useAuthentication();
 
   const updateActiveNetwork = useCallback((forced?: boolean) => {
-    const networkName = String(query.network || BEPRO_NETWORK_NAME);
+    const networkName = String(query.network || publicRuntimeConfig.networkConfig.networkName);
     if (activeNetwork?.name === networkName && !forced) return activeNetwork;
 
     const networkFromStorage = parseCookies()[`${cookieKey}:${networkName}`];
@@ -51,25 +52,49 @@ export const NetworkProvider: React.FC = function ({ children }) {
           });
           setActiveNetwork(data);
         })
-        .catch((error) => {
+        .catch(() => {
           push({
             pathname: "/networks"
           });
         });
   },
-    [query, activeNetwork]);
+  [query, activeNetwork]);
+
+  const updateNetworkParameters = useCallback(() => {
+    if (!beproServiceStarted || activeNetwork?.councilAmount) return;
+
+    Promise.all([
+      BeproService.getNetworkParameter("councilAmount"),
+      BeproService.getNetworkParameter("disputableTime"),
+      BeproService.getNetworkParameter("draftTime"),
+      BeproService.getNetworkParameter("oracleExchangeRate"),
+      BeproService.getNetworkParameter("mergeCreatorFeeShare"),
+      BeproService.getNetworkParameter("percentageNeededForDispute")
+    ]).then(values => {
+      setActiveNetwork({
+        ...activeNetwork,
+        councilAmount: values[0],
+        disputableTime: values[1] / 1000,
+        draftTime: values[2] / 1000,
+        oracleExchangeRate: values[3],
+        mergeCreatorFeeShare: values[4],
+        percentageNeededForDispute: values[5]
+      });
+    });
+  }, [activeNetwork, beproServiceStarted]);
 
   useEffect(() => {
     updateActiveNetwork();
   }, [query]);
 
   useEffect(() => {
-    //console.warn('useNetwork',{activeNetwork})
-  }, [activeNetwork]);
+    if (query?.network) updateNetworkParameters();
+  }, [beproServiceStarted, query?.network]);
 
   const memorizeValue = useMemo<NetworkContextData>(() => ({
       activeNetwork,
-      updateActiveNetwork
+      updateActiveNetwork,
+      updateNetworkParameters
   }),
     [activeNetwork]);
 

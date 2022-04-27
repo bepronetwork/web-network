@@ -1,10 +1,13 @@
-import models from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
-import api from "services/api";
+import models from "db/models";
 
+import api from "services/api";
+const { publicRuntimeConfig } = getConfig()
 async function put(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, githubLogin, networkName } = req.body;
 
@@ -36,7 +39,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       await issue.save();
 
       const octokit = new Octokit({
-        auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN
+        auth: publicRuntimeConfig.github.token,
       });
 
       const response = await octokit.rest.issues.createComment({
@@ -61,8 +64,8 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function Working(req: NextApiRequest,
-                                      res: NextApiResponse) {
+async function Working(req: NextApiRequest,
+                       res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "put":
     await put(req, res);
@@ -74,3 +77,5 @@ export default async function Working(req: NextApiRequest,
 
   res.end();
 }
+
+export default withCors(Working)

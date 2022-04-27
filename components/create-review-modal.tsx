@@ -13,14 +13,23 @@ import { useRepos } from "contexts/repos";
 
 import { formatDate } from "helpers/formatDate";
 
+import { IssueData, pullRequest } from "interfaces/issue-data";
+interface CreateReviewModalModalProps{
+  show: boolean,
+  isExecuting: boolean,
+  onConfirm: (body: string)=> void,
+  onCloseClick: () => void,
+  issue: IssueData,
+  pullRequest: pullRequest
+}
 export default function CreateReviewModal({
   show = false,
   isExecuting = false,
-  onConfirm = ({ body }) => {},
-  onCloseClick = () => {},
+  onConfirm,
+  onCloseClick,
   issue,
   pullRequest
-}) {
+}: CreateReviewModalModalProps) {
   const [body, setBody] = useState("");
   const { activeRepo } = useRepos();
   const { t } = useTranslation(["common", "pull-request"]);
@@ -96,7 +105,7 @@ export default function CreateReviewModal({
           <Button
             className="mr-2"
             disabled={isButtonDisabled()}
-            onClick={() => onConfirm({ body })}
+            onClick={() => onConfirm(body)}
           >
             {isButtonDisabled() && !isExecuting && (
               <LockedIcon className="me-2" />

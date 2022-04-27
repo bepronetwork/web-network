@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 
+import { PullRequest } from "@taikai/dappkit";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
@@ -18,6 +19,7 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
+import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/add-toast";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 import { useRepos } from "contexts/repos";
@@ -25,32 +27,37 @@ import { useRepos } from "contexts/repos";
 import { pullRequest } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
-import useNetwork from "x-hooks/use-network";
+import useBepro from "x-hooks/use-bepro";
+import useNetworkTheme from "x-hooks/use-network";
 
-export default function PullRequest() {
+export default function PullRequestPage() {
   const router = useRouter();
   const { activeRepo } = useRepos();
-  const { activeIssue, addNewComment, updateIssue } = useIssue();
+  const { activeIssue, networkIssue, addNewComment, updateIssue } = useIssue();
 
-  const { createReviewForPR } = useApi();
+  const { createReviewForPR, pastEventsV2 } = useApi();
   const [showModal, setShowModal] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
   const [pullRequest, setPullRequest] = useState<pullRequest>();
+  const [networkPullRequest, setNetworkPullRequest] = useState<PullRequest>();
   const { t } = useTranslation(["common", "pull-request"]);
-  const { network } = useNetwork();
+  const { activeNetwork } = useNetwork();
   const { wallet, user } = useAuthentication();
   const { dispatch } = useContext(ApplicationContext);
   const { prId, review } = router.query;
+  const { handleMakePullRequestReady, handleCancelPullRequest } = useBepro();
+  const { getURLWithNetwork } = useNetworkTheme();
 
   function loadData() {
     dispatch(changeLoadState(true));
     if (!prId) return;
     const currentPR = activeIssue?.pullRequests.find((pr) => +pr?.githubId === +prId);
     setPullRequest(currentPR);
+    setNetworkPullRequest(networkIssue?.pullRequests?.find(pr => +pr.id === +currentPR?.contractId));
     dispatch(changeLoadState(false));
   }
 
-  function handleCreateReview({ body }) {
+  function handleCreateReview(body) {
     if (!user?.login) return;
 
     setIsExecuting(true);
@@ -59,7 +66,7 @@ export default function PullRequest() {
                       String(prId),
                       user?.login,
                       body,
-                      network?.name)
+                      activeNetwork?.name)
       .then((response) => {
         dispatch(addToast({
             type: "success",
@@ -85,6 +92,63 @@ export default function PullRequest() {
       });
   }
 
+  function handleMakeReady() {
+    setIsExecuting(true);
+
+    handleMakePullRequestReady(activeIssue?.contractId, pullRequest?.contractId)
+    .then(txInfo => {
+      const { blockNumber: fromBlock } = txInfo as any;
+      return pastEventsV2("pull-request", "ready", activeNetwork?.name, { fromBlock });
+    })
+    .then(() => {
+      updateIssue(activeIssue.repository_id, activeIssue.githubId);
+      
+      dispatch(addToast({
+        type: "success",
+        title: t("actions.success"),
+        content: t("pull-request:actions.make-ready.success"),
+      }));
+    })
+    .catch(() => {
+      dispatch(addToast({
+          type: "danger",
+          title: t("actions.failed"),
+          content: t("pull-request:actions.make-ready.error"),
+      }));
+    });
+  }
+
+  function handleCancel() {
+    setIsExecuting(true);
+
+    handleCancelPullRequest(activeIssue?.contractId, pullRequest?.contractId)
+    .then(txInfo => {
+      const { blockNumber: fromBlock } = txInfo as any;
+      return pastEventsV2("pull-request", "canceled", activeNetwork?.name, { fromBlock });
+    })
+    .then(() => {
+      updateIssue(activeIssue.repository_id, activeIssue.githubId);
+      
+      dispatch(addToast({
+        type: "success",
+        title: t("actions.success"),
+        content: t("pull-request:actions.cancel.success"),
+      }));
+
+      router.push(getURLWithNetwork('/bounty', {
+        id: activeIssue.githubId,
+        repoId: activeIssue.repository_id
+      }));
+    })
+    .catch(() => {
+      dispatch(addToast({
+          type: "danger",
+          title: t("actions.failed"),
+          content: t("pull-request:actions.cancel.error"),
+      }));
+    });
+  }
+
   function handleShowModal() {
     setShowModal(true);
   }
@@ -94,8 +158,8 @@ export default function PullRequest() {
   }
 
   useEffect(() => {
-    loadData();
-  }, [activeIssue]);
+    if (activeIssue && networkIssue) loadData();
+  }, [activeIssue, networkIssue]);
 
   useEffect(() => {
     if (review && pullRequest && user?.login) {
@@ -118,10 +182,12 @@ export default function PullRequest() {
                 </span>
               </div>
 
-              <div className="col-4 gap-2 p-0 d-flex justify-content-center">
+              <div className="col-4 gap-20 p-0 d-flex justify-content-end">
                 {wallet?.address &&
                   user?.login &&
-                  pullRequest?.state === "open" && (
+                  pullRequest?.state === "open" &&
+                  networkPullRequest?.ready &&
+                  !networkPullRequest?.canceled && (
                     <ReadOnlyButtonWrapper>
                       <Button
                         className="read-only-button text-nowrap"
@@ -131,7 +197,42 @@ export default function PullRequest() {
                       </Button>
                     </ReadOnlyButtonWrapper>
                   )}
-                
+
+                  {
+                    wallet?.address &&
+                    user?.login &&
+                    pullRequest?.state === "open" &&
+                    pullRequest?.status === "draft" &&
+                    !networkPullRequest?.ready &&
+                    !networkPullRequest?.canceled &&
+                    networkPullRequest?.creator?.toLowerCase() === wallet?.address?.toLowerCase() && (
+                      <ReadOnlyButtonWrapper>
+                        <Button
+                          className="read-only-button text-nowrap"
+                          onClick={handleMakeReady}
+                        >
+                          {t("pull-request:actions.make-ready.title")}
+                        </Button>
+                      </ReadOnlyButtonWrapper>
+                    )
+                  }
+
+{
+                    wallet?.address &&
+                    user?.login &&
+                    !networkPullRequest?.canceled &&
+                    networkPullRequest?.creator?.toLowerCase() === wallet?.address?.toLowerCase() && (
+                      <ReadOnlyButtonWrapper>
+                        <Button
+                          className="read-only-button text-nowrap"
+                          onClick={handleCancel}
+                        >
+                          {t("actions.cancel")}
+                        </Button>
+                      </ReadOnlyButtonWrapper>
+                    )
+                  }
+
                   <GithubLink
                     repoId={String(activeRepo?.id)}
                     forcePath={activeRepo?.githubPath}

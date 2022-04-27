@@ -1,8 +1,10 @@
-import models from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
-
+const { publicRuntimeConfig } = getConfig()
+import models from "db/models";
 async function put(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, pullRequestId, githubLogin, body, networkName } = req.body;
 
@@ -36,7 +38,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     const [owner, repo] = repository.githubPath.split("/");
 
-    const octoKit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
+    const octoKit = new Octokit({ auth: publicRuntimeConfig.github.token });
 
     const octoResponse = await octoKit.rest.issues.createComment({
       owner,
@@ -57,8 +59,8 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function PullRequestReview(req: NextApiRequest,
-                                                res: NextApiResponse) {
+async function PullRequestReview(req: NextApiRequest,
+                                 res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "put":
     await put(req, res);
@@ -70,3 +72,5 @@ export default async function PullRequestReview(req: NextApiRequest,
 
   res.end();
 }
+
+export default  withCors(PullRequestReview)

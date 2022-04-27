@@ -1,6 +1,7 @@
-import models from "db/models";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op } from "sequelize";
+
+import models from "db/models";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -10,9 +11,10 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   const include = [
     { association: "developers" },
-    { association: "pullRequests" },
+    { association: "pullRequests", where: { status: { [Op.notIn]: ["pending", "canceled"] } }, required: false },
     { association: "mergeProposals" },
-    { association: "repository" }
+    { association: "repository" },
+    { association: "token" }
   ];
 
   const network = await models.network.findOne({

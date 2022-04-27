@@ -1,4 +1,5 @@
 import { Proposal, INetworkProposal } from "interfaces/proposal";
+import { Token } from "interfaces/token";
 
 export type IssueState =
   | "pending"
@@ -38,6 +39,8 @@ export interface IssueData {
   title: string;
   updatedAt?: Date;
   url?: string;
+  contractId?: number;
+  token?: Token;
   working: string[];
 }
 
@@ -58,8 +61,10 @@ export interface pullRequest {
   merged: boolean;
   updatedAt: Date;
   issue?: IssueData;
-  comments?: Comment[];
+  comments?: IssueDataComment[];
+  status?: string;
   reviewers?: string[];
+  contractId?: number;
 }
 
 export interface developer {
@@ -70,9 +75,10 @@ export interface developer {
   type?: string;
 }
 
-export interface Comment {
+export interface IssueDataComment {
   body: string;
-  created_at: string;
+  created_at: string | number | Date;
+  updated_at: string | number | Date;
   user: GithubUser;
 }
 

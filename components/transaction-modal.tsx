@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { format } from "date-fns";
-import { BEPRO_NETWORK_NAME } from "env";
 import { useTranslation } from "next-i18next";
+import getConfig from "next/config";
 
 import ArrowRight from "assets/icons/arrow-right";
 import CopyIcon from "assets/icons/copy";
@@ -24,7 +24,7 @@ import useNetworkTheme from "x-hooks/use-network";
 
 import Button from "./button";
 import InternalLink from "./internal-link";
-
+const { publicRuntimeConfig } = getConfig()
 export default function TransactionModal({
   transaction = null,
   onCloseClick,
@@ -96,7 +96,7 @@ export default function TransactionModal({
   }
 
   function getEtherScanHref(tx: string) {
-    return `//${process.env.NEXT_PUBLIC_BLOCKSCAN_LINK}/tx/${tx}`;
+    return `//${publicRuntimeConfig.metaMask.blockScanUrl}/tx/${tx}`;
   }
 
   return (
@@ -150,7 +150,7 @@ export default function TransactionModal({
           <span className="text-ligth-gray">{t("misc.on")}</span>
           <InternalLink
             className={`${
-              transaction?.network?.name === BEPRO_NETWORK_NAME
+              transaction?.network?.name === publicRuntimeConfig.networkConfig.networkName
                 ? " text-primary "
                 : ""
             } p-0 ml-1`}

@@ -15,9 +15,10 @@ module.exports = {
         }
       })
       .then(() => {
-        queryInterface.insert(RepositoriesModel, "repositories", {
-          githubPath: `${process.env.GITHUB_OWNER}/${process.env.REPO}`
-        });
+        if(process.env.NEXT_GH_OWNER && process.env.NEXT_GH_REPO)
+          queryInterface.insert(RepositoriesModel, "repositories", {
+            githubPath: `${process.env.NEXT_GH_OWNER}/${process.env.NEXT_GH_REPO}`
+          });
       });
   },
 

@@ -1,14 +1,18 @@
-import models from "db/models";
+import { Network } from "@taikai/dappkit";
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
+import models from "db/models";
+
 import networkBeproJs from "helpers/api/handle-network-bepro";
 import readCloseIssues from "helpers/api/read-close-issues";
+const { publicRuntimeConfig } = getConfig()
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { fromBlock, id, networkName } = req.body;
-  const octokit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
+  const octokit = new Octokit({auth: publicRuntimeConfig.github.token});
 
   const customNetwork = await models.network.findOne({
     where: {
@@ -23,7 +27,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const network = networkBeproJs({
     contractAddress: customNetwork.networkAddress
-  });
+  }) as Network;
 
   await network.start();
 

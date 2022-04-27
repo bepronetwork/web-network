@@ -6,12 +6,15 @@ export interface Proposal {
   issueId?: number;
   pullRequestId?: number;
   scMergeId: string;
+  contractId?: number;
+  creator?: string;
 }
 
 export interface INetworkProposal {
   _id: string;
   disputes: number;
   isDisputed?: boolean;
+  canUserDispute?: boolean;
   prAddresses: string[];
   prAmounts: number[];
   proposalAddress: string;
@@ -23,4 +26,5 @@ export interface IDistribuitonPerUser {
   address: string;
   oracles: string;
   percentage: number;
+  distributedAmount?: number;
 }

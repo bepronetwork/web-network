@@ -1,4 +1,4 @@
-import { formatNumberToString } from "helpers/formatNumber";
+import { formatNumberToCurrency } from "helpers/formatNumber";
 
 interface BalanceAddressAvatarProps {
   address: string;
@@ -11,7 +11,7 @@ export default function BalanceAddressAvatar(props: BalanceAddressAvatarProps) {
     <div className="d-flex flex-column text-right">
       <p className="caption-small mb-1 mt-1">{props.address}</p>
       <p className="caption-small mb-0 trans">
-        {formatNumberToString(props.balance)} {props.currency}
+        {formatNumberToCurrency(props.balance)} {props.currency}
       </p>
     </div>
   );

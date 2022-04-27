@@ -1,7 +1,7 @@
 import { useContext, useEffect } from "react";
 
-import { BEPRO_NETWORK_NAME, IPFS_BASE } from "env";
 import { useTranslation } from "next-i18next";
+import getConfig from "next/config";
 import { useRouter } from "next/router";
 
 import NetworkLogo from "components/network-logo";
@@ -19,6 +19,7 @@ import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
+const { publicRuntimeConfig } = getConfig()
 interface NetworkListItemProps {
   network: INetwork;
   redirectToHome?: boolean;
@@ -28,13 +29,12 @@ interface NetworkListItemProps {
 export default function NetworkListItem({
   network,
   redirectToHome = false,
-  updateNetworkParameter = (networkName, parameter, value) => {},
-  ...props
+  updateNetworkParameter,
 }: NetworkListItemProps) {
   const router = useRouter();
   const { t } = useTranslation("common");
 
-  const { getBeproCurrency } = useApi();
+  const { getCurrencyByToken } = useApi();
   const { getURLWithNetwork } = useNetwork();
 
   const { dispatch } = useContext(ApplicationContext);
@@ -48,19 +48,19 @@ export default function NetworkListItem({
   }
 
   useEffect(() => {
-    BeproService.getTransactionalTokenName(handleNetworkAddress(network))
-      .then((name) => {
-        updateNetworkParameter(network.name, "tokenName", name);
+    BeproService.getSettlerTokenData(handleNetworkAddress(network))
+      .then(({symbol}) => {
+        updateNetworkParameter(network.name, "tokenName", symbol);
       })
       .catch(console.log);
 
-    BeproService.getBeproLocked(handleNetworkAddress(network))
+    BeproService.getTotalSettlerLocked(handleNetworkAddress(network))
       .then((amount) => {
         updateNetworkParameter(network.name, "tokensLocked", amount);
       })
       .catch(console.log);
 
-    BeproService.getOpenIssues(handleNetworkAddress(network))
+    BeproService.getOpenBounties(handleNetworkAddress(network))
       .then((quantity) => {
         updateNetworkParameter(network.name, "openBountiesQuantity", quantity);
 
@@ -72,7 +72,8 @@ export default function NetworkListItem({
       })
       .catch(console.log);
 
-    BeproService.getTokensStaked(handleNetworkAddress(network))
+    //TODO TVL Bounties
+    BeproService.getTotalSettlerLocked(handleNetworkAddress(network))
       .then((amount) => {
         updateNetworkParameter(network.name, "openBountiesAmount", amount);
 
@@ -80,7 +81,7 @@ export default function NetworkListItem({
       })
       .then((amount) => {
         BeproService.getNetworkObj(handleNetworkAddress(network)).then((networkObj) => {
-          getBeproCurrency(networkObj.transactionToken.contractAddress).then(({ usd }) => {
+          getCurrencyByToken(publicRuntimeConfig?.currency.currencyId, 'usd').then(({ usd }) => {
             dispatch(changeNetworksSummary({
                     label: "amountInNetwork",
                     amount: amount * usd,
@@ -97,9 +98,9 @@ export default function NetworkListItem({
       <div className="col-3">
         <div className="d-flex flex-row align-items-center gap-20">
           <NetworkLogo
-            src={`${IPFS_BASE}/${network?.logoIcon}`}
+            src={`${publicRuntimeConfig?.ipfsUrl}/${network?.logoIcon}`}
             alt={`${network?.name} logo`}
-            isBepro={network?.name === BEPRO_NETWORK_NAME}
+            isBepro={network?.name === publicRuntimeConfig?.networkConfig?.networkName}
           />
 
           <span className="caption-medium text-white">{network?.name}</span>
@@ -133,7 +134,7 @@ export default function NetworkListItem({
 
         <span
           className={`caption-medium mr-2 ${
-            network?.name === BEPRO_NETWORK_NAME ? "text-blue" : ""
+            network?.name === publicRuntimeConfig?.networkConfig?.networkName ? "text-blue" : ""
           }`}
           style={{ color: `${network?.colors?.primary}` }}
         >
