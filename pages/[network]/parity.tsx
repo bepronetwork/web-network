@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { ListGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
 
-import { NetworkFactory, toSmartContractDecimals } from "@taikai/dappkit";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -44,22 +43,14 @@ export default function ParityPage() {
   const [issuesList, setIssuesList] = useState([]);
   const [githubToken, setGithubToken] = useState("");
   const [githubLogin, setGithubLogin] = useState("");
-  const [readRepoName, setReadRepoName] = useState("");
-  const [githubCreator, setGithubCreator] = useState("");
-  const [councilAmount, setCouncilAmount] = useState("");
-  const [outputRepoName, setOutputRepoName] = useState("");
   const [networks, setNetworks] = useState<INetwork[]>([]);
   const [reposList, setReposList] = useState<ReposList>([]);
   const [showModalName, setShowModalName] = useState(false);
-  const [settlerTokenName, setSettlerTokenName] = useState("");
-  const [deployedContract, setDeployedContract] = useState("");
-  const [settlerTokenSymbol, setSettlerTokenSymbol] = useState("");
   const [availReposList, setAvailableList] = useState<string[]>([]);
-  const [settlerTokenAddress, setSettlerTokenAddress] = useState("");
   const [networkToUpdate, setNetworkToUpdate] = useState<INetwork>();
 
   const { activeNetwork } = useNetwork();
-  const { wallet, user } = useAuthentication();
+  const { wallet } = useAuthentication();
   const { dispatch } = useContext(ApplicationContext);
 
   const {
@@ -91,53 +82,6 @@ export default function ParityPage() {
 
   function isValidForm() {
     return formMaker.some(({ value }) => !value);
-  }
-
-  async function createComments(issue_number, out_issue_number) {
-    const octokit = new Octokit({ auth: githubToken });
-    const readRepoInfo = { owner: githubLogin, repo: readRepoName };
-    const outRepoInfo = { owner: githubLogin, repo: outputRepoName };
-
-    async function getComments(page = 1, comments = []) {
-      const mapComment = ({
-        user: { login = "" },
-        created_at = "",
-        updated_at = "",
-        body = ""
-      }) => ({ login, createdAt: created_at, updatedAt: updated_at, body });
-
-      return octokit.rest.issues
-        .listComments({ ...readRepoInfo, issue_number, page })
-        .then(({ data }) => {
-          if (data.length === 100)
-            return getComments(page + 1, [
-              ...comments,
-              ...data.map(mapComment)
-            ]);
-          return [...comments, ...data.map(mapComment)];
-        });
-    }
-
-    function createComment({
-      login = "",
-      body = "",
-      createdAt = "",
-      updatedAt = "",
-      issue_number
-    }) {
-      body = `> Created by ${login} at ${new Date(createdAt).toISOString()} ${
-        updatedAt ? `and updated at ${new Date(updatedAt).toISOString()}` : ""
-      }\n\n`.concat(body);
-      return octokit.rest.issues.createComment({
-        ...outRepoInfo,
-        issue_number: out_issue_number,
-        body
-      });
-    }
-
-    const comments = await getComments();
-
-    for (const comment of comments) await createComment(comment);
   }
 
   function listIssues() {
@@ -301,55 +245,6 @@ export default function ParityPage() {
       });
   }
 
-  function deployNewContract() {
-    BeproService.network
-      .deployJsonAbi(publicRuntimeConfig.contract.settler, publicRuntimeConfig.contract.transaction, wallet?.address)
-      .then((info) => {
-        console.debug("Deployed!");
-        console.table(info);
-        dispatch(toastInfo(t("parity:deployed")));
-        setDeployedContract(info.contractAddress);
-        return true;
-      });
-  }
-
-  async function deployNetworkFactory() {
-    const factory = new NetworkFactory(BeproService.bepro);
-
-    await factory.loadAbi();
-
-    const receipt = await factory.deployJsonAbi(publicRuntimeConfig.contract.settler);
-
-    console.log({ receipt });
-    console.log(receipt.contractAddress);
-  }
-
-  function updateCouncilAmount() {
-    BeproService.network
-      .changeCouncilAmount(councilAmount)
-      .then((info) => {
-        dispatch(toastInfo(t("parity:council-amount-changed")));
-        console.debug("Council Changed!");
-        console.table(info);
-      })
-      .catch((e) => {
-        console.error("Error deploying", e);
-      });
-  }
-
-  function deploySettlerToken() {
-    BeproService.erc20
-      .deployJsonAbi(settlerTokenName,
-                     settlerTokenSymbol,
-                     +toSmartContractDecimals(10, 18),
-                     wallet?.address)
-      .then((txInfo) => {
-        console.debug(txInfo);
-        dispatch(toastInfo("Deployed!"));
-        setSettlerTokenAddress(txInfo.contractAddress);
-      });
-  }
-
   function getSelfRepos() {
     getUserOf(wallet?.address)
       .then((user) => {
@@ -474,20 +369,6 @@ export default function ParityPage() {
     );
   }
 
-  function changeRedeem() {
-    BeproService.network.contract.methods
-      .changeRedeemTime(60)
-      .send({ from: wallet?.address })
-      .then(console.log);
-  }
-
-  function changeDisputableTime() {
-    BeproService.network.contract.methods
-      .changeDisputableTime(60)
-      .send({ from: wallet?.address })
-      .then(console.log);
-  }
-
   function handleNetworkClick(networkItem) {
     setNetworkToUpdate(networkItem);
     setShowModalName(true);
@@ -516,100 +397,60 @@ export default function ParityPage() {
         <ConnectWalletButton asModal={true} />
         <br />
         <br />
-        <div className="content-wrapper">
-          <div className="row mb-3">
-            <label className="p-small trans mb-2">
-              {t("parity:fields.contract-address.label")}
-            </label>
-            <input
-              value={deployedContract}
-              readOnly={true}
-              type="text"
-              className="form-control"
-              placeholder={t("parity:fields.contract-address.placeholder")}
-            />
-          </div>
-          <div className="row mb-3">
-            <label className="p-small trans mb-2">
-              {t("parity:fields.council-amount.label")}
-            </label>
-            <input
-              className="form-control"
-              value={councilAmount}
-              onChange={(e) => setCouncilAmount(e?.target?.value)}
-              type="text"
-              placeholder={t("parity:fields.council-amount.placeholder")}
-            />
-          </div>
-          <hr />
-          <div className="row mb-3 mxn-4">
-            <div className="col">
-              <label className="p-small trans mb-2 ml-2">
-                {t("parity:fields.settler-token-name.label")}
-              </label>
-              <input
-                className="form-control"
-                placeholder={t("parity:fields.settler-token-name.placeholder")}
-                value={settlerTokenName}
-                onChange={(e) => setSettlerTokenName(e?.target.value)}
-              />
-            </div>
-            <div className="col">
-              <label className="p-small trans mb-2 ml-2">
-                {t("parity:fields.settler-token-symbol.label")}
-              </label>
-              <input
-                className="form-control"
-                placeholder={t("parity:fields.settler-token-symbol.placeholder")}
-                value={settlerTokenSymbol}
-                onChange={(e) => setSettlerTokenSymbol(e?.target.value)}
-              />
-            </div>
-          </div>
-          <div className="row mb-3">
-            <label className="p-small trans mb-2">
-              {t("parity:fields.settler-token-address.label")}
-            </label>
-            <input
-              className="form-control"
-              value={settlerTokenAddress}
-              readOnly={true}
-            />
+
+        <div className="mt-3 mb-4 content-wrapper">
+          <h3 className="text-center">Networks</h3>
+          <div className="row caption-medium mb-2 mt-3 text-white">
+            <div className="col-2">Name</div>
+            <div className="col-3">Description</div>
+            <div className="col-2">Address</div>
+            <div className="col-1 text-center">Icon</div>
+            <div className="col-2 text-center">Logo</div>
+            <div className="col-2 text-center">Created At</div>
           </div>
 
-          <div className="row">
-            <div className="d-flex flex-row px-0 justify-content-center align-items-center mb-3">
-              <Button className="me-2" onClick={() => deployNewContract()}>
-                {t("parity:deploy-contract")}
-              </Button>
-              <Button
-                className="me-2"
-                disabled={!councilAmount}
-                onClick={() => updateCouncilAmount()}
-              >
-                {t("parity:update-council-amount")}
-              </Button>
-              <Button
-                disabled={!settlerTokenName || !settlerTokenSymbol}
-                onClick={() => deploySettlerToken()}
-              >
-                {t("parity:deploy-settler-token")}
-              </Button>
-              <Button onClick={() => changeRedeem()}>
-                {t("parity:change-redeem-time")}
-              </Button>
-              <Button onClick={() => changeDisputableTime()}>
-                {t("parity:change-disputable-time")}
-              </Button>
+          {networks.map((networkItem) => (
+            <div
+              key={networkItem.name}
+              className="row caption-small mb-1 bg-dark py-3 border-radius-8 text-gray cursor-pointer align-items-center bg-ligth-gray-hover"
+              onClick={() => handleNetworkClick(networkItem)}
+            >
+              <div className="col-2">{networkItem.name}</div>
+              <div className="col-3">{networkItem.description}</div>
+              <div className="col-2">
+                <OverlayTrigger
+                  key="bottom-creator"
+                  placement="bottom"
+                  overlay={
+                    <Tooltip id={"tooltip-bottom"}>
+                      {networkItem.networkAddress}
+                    </Tooltip>
+                  }
+                >
+                  <span>{truncateAddress(networkItem.networkAddress)}</span>
+                </OverlayTrigger>
+              </div>
+              <div className="col-1 d-flex align-items-center justify-content-center">
+                <Image
+                  src={`${publicRuntimeConfig.ipfsUrl}/${networkItem.logoIcon}`}
+                  width={30}
+                  height={30}
+                />
+              </div>
+              <div className="col-2 d-flex align-items-center justify-content-center">
+                <Image
+                  src={`${publicRuntimeConfig.ipfsUrl}/${networkItem.fullLogo}`}
+                  width={150}
+                  height={30}
+                />
+              </div>
+              <div className="col-2 text-center">
+                {formatDate(networkItem.createdAt, "-")}
+              </div>
             </div>
-
-            <div className="d-flex flex-row px-0 justify-content-center align-items-center">
-              <Button className="me-2" onClick={() => deployNetworkFactory()}>
-                Deploy Network Factory
-              </Button>
-            </div>
-          </div>
+          ))}
         </div>
+
         <div className="div mt-3 mb-4 content-wrapper">
           {formMaker.map(renderFormItems)}
         </div>
@@ -668,58 +509,6 @@ export default function ParityPage() {
           </div>
         </div>
         {issuesList.map(renderIssuesList)}
-        <div className="mt-3 mb-4 content-wrapper">
-          <h3 className="text-center">Networks</h3>
-          <div className="row caption-medium mb-2 mt-3 text-white">
-            <div className="col-2">Name</div>
-            <div className="col-3">Description</div>
-            <div className="col-2">Address</div>
-            <div className="col-1 text-center">Icon</div>
-            <div className="col-2 text-center">Logo</div>
-            <div className="col-2 text-center">Created At</div>
-          </div>
-
-          {networks.map((networkItem) => (
-            <div
-              key={networkItem.name}
-              className="row caption-small mb-1 bg-dark py-3 border-radius-8 text-gray cursor-pointer align-items-center bg-ligth-gray-hover"
-              onClick={() => handleNetworkClick(networkItem)}
-            >
-              <div className="col-2">{networkItem.name}</div>
-              <div className="col-3">{networkItem.description}</div>
-              <div className="col-2">
-                <OverlayTrigger
-                  key="bottom-creator"
-                  placement="bottom"
-                  overlay={
-                    <Tooltip id={"tooltip-bottom"}>
-                      {networkItem.networkAddress}
-                    </Tooltip>
-                  }
-                >
-                  <span>{truncateAddress(networkItem.networkAddress)}</span>
-                </OverlayTrigger>
-              </div>
-              <div className="col-1 d-flex align-items-center justify-content-center">
-                <Image
-                  src={`${publicRuntimeConfig.ipfsUrl}/${networkItem.logoIcon}`}
-                  width={30}
-                  height={30}
-                />
-              </div>
-              <div className="col-2 d-flex align-items-center justify-content-center">
-                <Image
-                  src={`${publicRuntimeConfig.ipfsUrl}/${networkItem.fullLogo}`}
-                  width={150}
-                  height={30}
-                />
-              </div>
-              <div className="col-2 text-center">
-                {formatDate(networkItem.createdAt, "-")}
-              </div>
-            </div>
-          ))}
-        </div>
 
         {networkToUpdate && (
           <OverrideNameModal

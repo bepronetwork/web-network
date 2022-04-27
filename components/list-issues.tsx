@@ -212,14 +212,14 @@ export default function ListIssues({
         >
           <div className="w-100">
             <InputGroup>
-              <InputGroup.Text className="rounded-8" onClick={handlerSearch}>
+              <InputGroup.Text onClick={handlerSearch}>
                 <SearchIcon />
               </InputGroup.Text>
 
               <FormControl
                 value={searchState}
                 onChange={(e) => setSearchState(e.target.value)}
-                className="rounded-8 p-2"
+                className="p-2"
                 placeholder={t("bounty:search")}
                 onKeyDown={handleSearch}
               />

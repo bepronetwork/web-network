@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from "react";
 
+import { useTranslation } from "next-i18next";
+
 export type PRLabel =
   | "ready to merge"
   | "broken tests"
   | "conflicts"
   | "merged"
-  | "closed";
+  | "closed"
+  | "draft";
 interface IPRLabel {
   label?: PRLabel;
   className?: string;
   hero?: boolean;
   merged?: boolean;
+  needsApproval?: boolean;
+  isDraft?: boolean;
   isMergeable?: boolean | null;
 }
 
@@ -19,34 +24,41 @@ function PullRequestLabels({
   className,
   merged,
   isMergeable,
+  needsApproval = false,
+  isDraft = false,
   hero = false
 }: IPRLabel) {
+  const { t } = useTranslation("pull-request");
+
   const [state, setState] = useState<PRLabel>(label || null);
+
   function getColorLabel() {
     switch (state?.toLowerCase()) {
-    case "ready to merge": {
+    case t("status.ready-to-merge").toLowerCase(): {
       return "success";
     }
-    case "broken tests": {
+    case t("status.broken-tests").toLowerCase(): {
       return "warning";
     }
-    case "conflicts": {
+    case t("status.conflicts").toLowerCase(): {
       return "danger";
     }
-    case "closed": {
+    case t("status.closed").toLowerCase(): {
       return "danger";
     }
     default: {
-      return hero ? "white" : "primary";
+      return hero || isDraft ? "white" : "primary";
     }
     }
   }
 
   function getLabel(): PRLabel {
-    if (merged) return "merged";
-    if (isMergeable) return "ready to merge";
-    //isMergeable can be null;
-    return "conflicts";
+    if (isDraft) return t("status.draft");
+    if (merged) return t("status.merged");
+    if (isMergeable) return t("status.ready-to-merge");
+    if (needsApproval) return t("status.needs-approval");
+    
+    return t("status.conflicts");
   }
 
   useEffect(() => {

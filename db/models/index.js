@@ -9,6 +9,8 @@ import Network from "./network.model";
 import PullRequests from "./pullRequest.model";
 import Repositories from "./repositories.model";
 import User from "./user";
+import Tokens from "./tokens.model";
+import NetworkTokens from "./network-tokens.model";
 
 const Database = { sequelize: null };
 
@@ -25,6 +27,8 @@ Database.repositories = Repositories;
 Database.pullRequest = PullRequests;
 Database.chainEvents = ChainEvents;
 Database.network = Network;
+Database.tokens = Tokens;
+Database.networkTokens = NetworkTokens;
 
 Object.values(Database).forEach((model) => {
   if (model?.init) {

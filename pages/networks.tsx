@@ -97,7 +97,7 @@ export default function NetworksPage() {
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common", "custom-network"]))
+      ...(await serverSideTranslations(locale, ["common", "custom-network", "pull-request"]))
     }
   };
 };

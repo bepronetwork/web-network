@@ -1,8 +1,9 @@
-import models from "db/models";
 import {withCors} from 'middleware';
 import withJwt from "middleware/withJwt";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op, WhereOptions } from "sequelize";
+
+import models from "db/models";
 
 async function getTotal(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = { state: { [Op.not]: "pending" } };

@@ -2,13 +2,13 @@ import { useTranslation } from "next-i18next";
 
 import { formatDate } from "helpers/formatDate";
 
-import { Comment as IComment } from "interfaces/issue-data";
+import { IssueDataComment } from "interfaces/issue-data";
 
 import Avatar from "./avatar";
 import MarkedRender from "./MarkedRender";
 
 interface CommentsProps{
-  comment: IComment;
+  comment: IssueDataComment;
 }
 export default function Comment({ comment }: CommentsProps) {
   const { t } = useTranslation("bounty");

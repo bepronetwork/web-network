@@ -1,5 +1,4 @@
-import { OraclesState } from "interfaces/oracles-state";
-
+import { OraclesResume } from "@taikai/dappkit";
 export interface BalanceState {
   eth: number;
   staked: number;
@@ -7,5 +6,5 @@ export interface BalanceState {
 }
 
 export interface IBalance extends BalanceState {
-  oracles: OraclesState;
+  oracles: OraclesResume;
 }

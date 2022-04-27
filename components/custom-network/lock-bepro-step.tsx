@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ProgressBar } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
@@ -13,7 +13,7 @@ import UnlockBeproModal from "components/unlock-bepro-modal";
 
 import { useAuthentication } from "contexts/authentication";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import { formatNumberToCurrency, formatNumberToNScale } from "helpers/formatNumber";
 
 import { BeproService } from "services/bepro-service";
 
@@ -23,15 +23,17 @@ export default function LockBeproStep({
   balance,
   currentStep,
   handleChange,
-  handleChangeStep
+  handleChangeStep,
+  creatorAmount = 0
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [isLocking, setIsLocking] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [showUnlockBepro, setShowUnlockBepro] = useState(false);
+  const [networkTokenName, setNetworkTokenName] = useState<string>(t("misc.token"));
 
-  const { updateWalletBalance } = useAuthentication();
+  const { updateWalletBalance, beproServiceStarted } = useAuthentication();
 
   const lockedPercent =
     ((data.amountLocked || 0) / (data.amountNeeded || 0)) * 100;
@@ -48,10 +50,10 @@ export default function LockBeproStep({
 
     try {
       const isApproved =
-        await BeproService.networkFactory.isApprovedSettlerToken(undefined, 1);
+        await BeproService.networkFactory.isApprovedNetworkToken(data.amount);
 
       if (!isApproved)
-        await BeproService.networkFactory.approveSettlerERC20Token();
+        await BeproService.networkFactory.approveNetworkToken(data.amount);
 
       const amount = data.amount;
 
@@ -98,9 +100,15 @@ export default function LockBeproStep({
     setShowUnlockBepro(false);
   }
 
+  useEffect(() => {
+    if (beproServiceStarted) BeproService.getSettlerTokenData().then(data => {
+      setNetworkTokenName(data.symbol);
+    });
+  }, [beproServiceStarted]);
+
   return (
     <Step
-      title={t("custom-network:steps.lock.title")}
+      title={t("custom-network:steps.lock.title", { currency: networkTokenName })}
       index={step}
       activeStep={currentStep}
       validated={data.validated}
@@ -108,7 +116,8 @@ export default function LockBeproStep({
     >
       <div className="row mb-4">
         <span className="caption-small text-gray">
-          {t("custom-network:steps.lock.you-need-to-lock")}
+          {t("custom-network:steps.lock.you-need-to-lock", 
+            { creatorAmount: formatNumberToNScale(creatorAmount), currency: networkTokenName })}
         </span>
       </div>
 
@@ -118,7 +127,7 @@ export default function LockBeproStep({
             <div className="col px-0">
               <div className="row mb-2">
                 <label htmlFor="" className="caption-medium text-gray">
-                  <span className="text-primary">{t("$bepro")}</span>{" "}
+                  <span className="text-primary">{networkTokenName}</span>{" "}
                   {t("transactions.amount")}
                 </label>
               </div>
@@ -144,7 +153,7 @@ export default function LockBeproStep({
 
                 <div className="d-flex caption-small justify-content-between align-items-center p-20">
                   <span className="text-ligth-gray">
-                    <span className="text-primary">{t("$bepro")}</span>{" "}
+                    <span className="text-primary">{networkTokenName}</span>{" "}
                     {t("misc.available")}
                   </span>
 
@@ -178,7 +187,7 @@ export default function LockBeproStep({
                   <div className="row mt-4">
                     <p className="caption-small text-gray">
                       {t("transactions.types.unlock")}{" "}
-                      <span className="text-primary">{t("$bepro")}</span>{" "}
+                      <span className="text-primary">{networkTokenName}</span>{" "}
                       {t("misc.by")} {t("misc.giving-away")}{" "}
                       <span className="text-purple">{t("$oracles")}</span>
                     </p>
@@ -211,7 +220,7 @@ export default function LockBeproStep({
 
         <div className="col bg-dark-gray border-radius-8 p-20">
           <p className="caption-medium text-gray mb-4">
-            <span className="text-primary">{t("$bepro")}</span>{" "}
+            <span className="text-primary">{networkTokenName}</span>{" "}
             {t("misc.locked")}
           </p>
 
@@ -309,7 +318,7 @@ export default function LockBeproStep({
                   <LockedIcon width={12} height={12} className="mr-1" />
                 )}
               <span>
-                {t("transactions.types.lock")} {t("$bepro")}
+                {t("transactions.types.lock")} {networkTokenName}
               </span>
               {isLocking ? (
                 <span className="spinner-border spinner-border-xs ml-1" />
@@ -318,7 +327,7 @@ export default function LockBeproStep({
               )}
             </Button>
 
-            {/* <Button disabled={lockedPercent === 0 || isUnlocking} color="ligth-gray" onClick={handleUnLock}>
+            <Button disabled={lockedPercent === 0 || isUnlocking} color="ligth-gray" onClick={handleUnLock}>
               {!isUnlocking || lockedPercent === 0 && (
                 <LockedIcon width={12} height={12} className="mr-1" />
               )}
@@ -328,7 +337,7 @@ export default function LockBeproStep({
               ) : (
                 ''
               )}
-            </Button> */}
+            </Button>
           </div>
         </div>
       </div>

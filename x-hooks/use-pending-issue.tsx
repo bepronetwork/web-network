@@ -6,6 +6,8 @@ import { addTransaction } from "contexts/reducers/add-transaction";
 import { updateTransaction } from "contexts/reducers/update-transaction";
 
 
+import { parseTransaction } from "helpers/transactions";
+
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { IssueData } from "interfaces/issue-data";
@@ -57,7 +59,7 @@ export default function usePendingIssue<
       .openIssue(cid, +tokenAmount)
       .then(async (txInfo) => {
         txWindow.updateItem(openIssueTx.payload.id,
-                            BeproService.parseTransaction(txInfo, openIssueTx.payload));
+                            parseTransaction(txInfo, openIssueTx.payload));
         // BeproService.parseTransaction(txInfo, openIssueTx.payload)
         //             .then(block => dispatch(updateTransaction(block)))
         const events = await BeproService.network.getOpenIssueEvents({

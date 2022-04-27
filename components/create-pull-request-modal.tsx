@@ -57,7 +57,7 @@ export default function CreatePullRequestModal({
   useEffect(() => {
     if (!user?.accessToken || options.length || !repo) return;
 
-    function mapBranches({ data: branches }) {
+    function mapBranches(branches) {
       return branches.map(({ name }) => ({
         value: name,
         label: name,

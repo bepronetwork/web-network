@@ -1,7 +1,8 @@
-import models from "db/models";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op } from "sequelize";
+
+import models from "db/models";
 
 async function getAllRepos(req, res) {
   const { networkName } = req.query;

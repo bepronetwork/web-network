@@ -25,27 +25,27 @@
 }
 
 :root {
-  --bs-bg-opacity: 1;
-  --bs-body-color: #{$white};
-  --bs-body-color-rgb: #{toRGB($white)};
-  --bs-gray: #{$gray};
-  --bs-gray-rgb: #{toRGB($gray)};
-  --bs-fail: #{$danger};
-  --bs-fail-rgb: #{toRGB($danger)};
-  --bs-shadow: #{$bg-shadow};
-  --bs-shadow-rgb: #{toRGB($bg-shadow)};
-  --bs-purple: #{$purple};
-  --bs-purple-rgb: #{toRGB($purple)};
-  --bs-primary: #{$primary};
-  --bs-primary-rgb: #{toRGB($primary)};
-  --bs-success: #{$success};
-  --bs-success-rgb: #{toRGB($success)};
-  --bs-warning: #{$warning};
-  --bs-warning-rgb: #{toRGB($warning)};
-  --bs-secondary: #{$secondary};
-  --bs-secondary-rgb: #{toRGB($secondary)};
-  --bs-body-bg: #{$bg};
-  --bs-body-bg-rgb: #{toRGB($bg)};
+  --bs-bg-opacity:1;
+  --bs-body-color:#{$white};
+  --bs-body-color-rgb:#{toRGB($white)};
+  --bs-gray:#{$gray};
+  --bs-gray-rgb:#{toRGB($gray)};
+  --bs-fail:#{$danger};
+  --bs-fail-rgb:#{toRGB($danger)};
+  --bs-shadow:#{$bg-shadow};
+  --bs-shadow-rgb:#{toRGB($bg-shadow)};
+  --bs-purple:#{$purple};
+  --bs-purple-rgb:#{toRGB($purple)};
+  --bs-primary:#{$primary};
+  --bs-primary-rgb:#{toRGB($primary)};
+  --bs-success:#{$success};
+  --bs-success-rgb:#{toRGB($success)};
+  --bs-warning:#{$warning};
+  --bs-warning-rgb:#{toRGB($warning)};
+  --bs-secondary:#{$secondary};
+  --bs-secondary-rgb:#{toRGB($secondary)};
+  --bs-body-bg:#{$bg};
+  --bs-body-bg-rgb:#{toRGB($bg)};
 }
 
 //bootstrap-overrides
@@ -1120,7 +1120,11 @@ textarea.form-control {
 
   .input-group {
     border: 2px solid transparent;
-    border-radius: math.div($m, 2);
+    
+    .input-group-text {
+      border-top-left-radius: math.div($m, 2);
+      border-bottom-left-radius: math.div($m, 2);
+    }
 
     &:hover {
       border: 2px solid $ligth-gray;

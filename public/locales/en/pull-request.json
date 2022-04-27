@@ -27,7 +27,26 @@
       "success": "Review submitted",
       "error": "To submit review"
     },
-    "view": "View Pull Request"
+    "view": "View Pull Request",
+    "make-ready": {
+      "title": "Make ready for review",
+      "success": "Pull Request is ready for review",
+      "error": "Failed to make pull request ready for review"
+    },
+    "cancel": {
+      "title": "Cancel Pull Request",
+      "success": "Pull Request cancelled",
+      "error": "Failed to cancel pull request"
+    }
+  },
+  "status": {
+    "ready-to-merge": "Ready to merge",
+    "draft": "Draft",
+    "merged": "Merged",
+    "conflicts": "Conflicts",
+    "closed": "Closed",
+    "broken-tests": "Broken tests",
+    "needs-approval": "Pending approval"
   },
   "errors": {
     "not-found": "No pull requests found",
