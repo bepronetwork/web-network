@@ -1,10 +1,10 @@
+import models from "db/models";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
 const { publicRuntimeConfig } = getConfig()
-import models from "db/models";
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {
     id: [repoId, networkName]

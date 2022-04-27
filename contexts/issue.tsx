@@ -6,30 +6,27 @@ import React, {
 import { fromSmartContractDecimals } from "@taikai/dappkit";
 import { useRouter } from "next/router";
 
-import { useAuthentication } from "contexts/authentication";
-import { useNetwork } from "contexts/network";
-
-import { BountyExtended, ProposalExtended } from "interfaces/bounty";
 import {
-  IssueData,
-  pullRequest,
-  IssueDataComment
+  Comment, INetworkIssue, IssueData, pullRequest
 } from "interfaces/issue-data";
+import { INetworkProposal } from "interfaces/proposal";
 
 import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useOctokit from "x-hooks/use-octokit";
 
+import { useAuthentication } from "./authentication";
+import { useNetwork } from "./network";
 
 export interface IActiveIssue extends IssueData {
-  comments: IssueDataComment[];
+  comments: Comment[];
   lastUpdated: number;
 }
 const TTL = 60 * 2 * 100; // 2 Min
 export interface IssueContextData {
   activeIssue: IActiveIssue;
-  networkIssue: BountyExtended;
+  networkIssue: INetworkIssue;
   updateIssue: (repoId: string | number, ghId: string | number) => Promise<IActiveIssue>;
   addNewComment: (prId: number, comment: string) => void;
   getNetworkIssue: () => void;
@@ -39,7 +36,7 @@ const IssueContext = createContext<IssueContextData>({} as IssueContextData);
 
 export const IssueProvider: React.FC = function ({ children }) {
   const [activeIssue, setActiveIssue] = useState<IActiveIssue>();
-  const [networkIssue, setNetworkIssue] = useState<BountyExtended>();
+  const [networkIssue, setNetworkIssue] = useState<INetworkIssue>();
 
   const { getIssue } = useApi();
   const { activeNetwork } = useNetwork();
@@ -47,7 +44,7 @@ export const IssueProvider: React.FC = function ({ children }) {
   const { getIssueComments, getPullRequest, getPullRequestComments } =
     useOctokit();
 
-  const { wallet, user, beproServiceStarted } = useAuthentication();
+  const { wallet, beproServiceStarted } = useAuthentication();
 
   const addNewComment = useCallback((prId: number, comment: string) => {
     const pullRequests = [...activeIssue.pullRequests];
@@ -70,19 +67,16 @@ export const IssueProvider: React.FC = function ({ children }) {
       pr.isMergeable =
             getPr?.data?.mergeable && getPr?.data?.mergeable_state === "clean";
       pr.merged = getPr?.data?.merged;
-      pr.state = getPr?.data?.state;
-      pr.comments = getComments as any;
+      pr.comments = getComments?.data as any;
       return pr;
     });
 
     return Promise.all(mapPr);
-  }, [user?.accessToken]);
+  },
+    []);
 
   const updateIssue = useCallback(async (repoId: string | number, ghId: string | number): Promise<IActiveIssue> => {
-    if (!activeNetwork?.name) return;
-
     const issue = await getIssue(repoId, ghId, activeNetwork?.name);
-    
     if (!issue) throw new Error("Issue not found");
 
     const ghPath = issue.repository.githubPath;
@@ -91,13 +85,11 @@ export const IssueProvider: React.FC = function ({ children }) {
       issue.pullRequests = await updatePullRequests(issue?.pullRequests,
                                                     ghPath);
     }
-    const comments = await getIssueComments(+issue.githubId,
-                                            ghPath);
+    const { data: comments } = await getIssueComments(+issue.githubId,
+                                                      ghPath);
     const newActiveIssue = {
         ...issue,
         comments,
-        mergeProposals: issue.mergeProposals.map(mp => 
-          ({...mp, isMerged: issue.merged !== null && +mp.scMergeId === +issue.merged})),
         lastUpdated: +new Date()
     } as IActiveIssue;
 
@@ -105,47 +97,54 @@ export const IssueProvider: React.FC = function ({ children }) {
 
     return newActiveIssue;
   },
-    [activeNetwork, query?.repoId, query?.id, user?.accessToken]);
+    [activeNetwork]);
 
   const getNetworkIssue = useCallback(async () => {
-    if (!wallet?.address || !activeIssue?.contractId || !beproServiceStarted)
+    if (!wallet?.address || !activeIssue?.issueId || !beproServiceStarted)
       return;
 
-    const bounty = await BeproService.getBounty(activeIssue?.contractId);
-
-    const isFinished = bounty?.pullRequests?.some(pullRequest => pullRequest.ready);
+    const network = await BeproService.network.getIssueByCID(activeIssue?.issueId);
 
     let isDraft = null;
 
     try {
-      isDraft = await BeproService.network.isBountyInDraft(bounty.id);
+      isDraft = await BeproService.network.isIssueInDraft(network?._id);
     } catch (error) {
       console.error(error);
     }
-    const networkProposals: ProposalExtended[] = [];
+    const networkProposals: INetworkProposal[] = [];
 
-    for (const proposal of bounty.proposals) {
-      const isDisputed = activeIssue?.merged
-        ? +activeIssue?.merged !== +proposal.id
-        : await BeproService.network.isProposalDisputed(+bounty.id, +proposal.id);
+    for (const meta of activeIssue.mergeProposals) {
+      const { scMergeId, id: proposalId, issueId } = meta;
 
-      const isDisputedByAddress = await BeproService.network.disputes(wallet.address, bounty.id, proposal.id) > 0;
+      if (scMergeId) {
+        const [merge, disputedValue, isMergeDisputed] = await Promise.all([
+          BeproService.network.getMergeById(+network?._id, +scMergeId),
+          fromSmartContractDecimals(await BeproService.network.disputesForMergeByAddress(issueId, +scMergeId, wallet.address)),
+          await BeproService.network.isMergeDisputed(+network?._id, +scMergeId)
+        ])
+        
+        const isDisputed = [
+          activeIssue?.merged && activeIssue?.merged !== scMergeId,
+          isMergeDisputed,
+        ].some(v=>v)
+        
+        const canUserDispute = [
+          disputedValue === 0,
+          isDisputed,
+        ].some(v=>v)
 
-      networkProposals[+proposal.id] = {
-        ...proposal,
-        isDisputed,
-        canUserDispute: !isDisputedByAddress
-      };
+        networkProposals[proposalId] = {
+          ...merge,
+          isDisputed,
+          canUserDispute
+        };
+      }
     }
 
-    setNetworkIssue({ 
-      ...bounty, 
-      isDraft, 
-      proposals: networkProposals,
-      isFinished
-    });
-    return { ...bounty, isDraft, networkProposals };
-  }, [activeIssue, wallet?.address, beproServiceStarted]);
+    setNetworkIssue({ ...network, isDraft, networkProposals });
+    return { ...network, isDraft, networkProposals };
+  }, [activeIssue, wallet, beproServiceStarted]);
 
   useEffect(() => {
     if (activeIssue && wallet?.address && beproServiceStarted) {
@@ -154,8 +153,6 @@ export const IssueProvider: React.FC = function ({ children }) {
   }, [activeIssue, wallet?.address, beproServiceStarted]);
 
   useEffect(() => {
-    if (!user?.accessToken) return;
-    
     const noExpired = +new Date() - activeIssue?.lastUpdated <= TTL;
     if (query.id && query.repoId) {
       if (
@@ -166,11 +163,11 @@ export const IssueProvider: React.FC = function ({ children }) {
         updateIssue(`${query.repoId}`, `${query.id}`);
       }
     }
-  }, [query, activeNetwork, user?.accessToken]);
+  }, [query, activeNetwork]);
 
-  // useEffect(() => {
-  //   console.log('useIssue',{activeIssue, networkIssue})
-  // }, [activeIssue, networkIssue]);
+  useEffect(() => {
+    console.warn('useIssue',{activeIssue, networkIssue})
+  }, [activeIssue, networkIssue]);
 
   const memorizeValue = useMemo<IssueContextData>(() => ({
       activeIssue,

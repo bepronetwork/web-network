@@ -111,16 +111,16 @@ export default function Settings() {
 
     setNewInfo(tmpInfo);
 
-    const redeemTime = await BeproService.getNetworkParameter("draftTime");
-    const disputeTime = await BeproService.getNetworkParameter("disputableTime");
-    const councilAmount = await BeproService.getNetworkParameter("councilAmount");
+    const redeemTime = await BeproService.getRedeemTime();
+    const disputeTime = await BeproService.getDisputableTime();
+    const councilAmount = await BeproService.getCouncilAmount();
     const percentageForDispute =
-      await BeproService.getNetworkParameter("percentageNeededForDispute");
+      await BeproService.getPercentageNeededForDispute();
 
     const tmpInfo2 = Object.assign({}, tmpInfo);
 
-    tmpInfo2.redeemTime = redeemTime / 1000;
-    tmpInfo2.disputeTime = disputeTime / 1000;
+    tmpInfo2.redeemTime = redeemTime;
+    tmpInfo2.disputeTime = disputeTime;
     tmpInfo2.councilAmount = councilAmount;
     tmpInfo2.percentageForDispute = percentageForDispute;
 
@@ -144,8 +144,8 @@ export default function Settings() {
 
   async function loadAmounts(networkArg) {
     try {
-      const tokenStaked = 0;//await BeproService.getTokensStaked(handleNetworkAddress(networkArg));
-      const oraclesStaked = await BeproService.getTotalSettlerLocked(handleNetworkAddress(networkArg));
+      const tokenStaked = await BeproService.getTokensStaked(handleNetworkAddress(networkArg));
+      const oraclesStaked = await BeproService.getBeproLocked(handleNetworkAddress(networkArg));
 
       setNetworkAmounts({
         tokenStaked,
@@ -259,20 +259,19 @@ export default function Settings() {
     updateNetwork(json)
       .then(async (result) => {
         if (currentNetworkParameters.redeemTime !== newInfo.redeemTime)
-          await BeproService.setNetworkParameter("draftTime", newInfo.redeemTime).catch(console.log);
+          await BeproService.setRedeemTime(newInfo.redeemTime).catch(console.log);
 
         if (currentNetworkParameters.disputeTime !== newInfo.disputeTime)
-          await BeproService.setNetworkParameter("disputableTime",newInfo.disputeTime).catch(console.log);
+          await BeproService.setDisputeTime(newInfo.disputeTime).catch(console.log);
 
         if (currentNetworkParameters.councilAmount !== newInfo.councilAmount)
-          await BeproService.setNetworkParameter("councilAmount", newInfo.councilAmount).catch(console.log);
+          await BeproService.setCouncilAmount(newInfo.councilAmount).catch(console.log);
 
         if (
           currentNetworkParameters.percentageForDispute !==
           newInfo.percentageForDispute
         )
-          await BeproService.setNetworkParameter("percentageNeededForDispute", newInfo.percentageForDispute)
-          .catch(console.log);
+          await BeproService.setPercentageForDispute(newInfo.percentageForDispute).catch(console.log);
 
         dispatch(addToast({
             type: "success",
@@ -304,40 +303,38 @@ export default function Settings() {
 
     setIsClosing(true);
 
-    // TODO Close Network
+    BeproService.closeNetwork()
+      .then(() => {
+        return updateNetwork({
+          githubLogin: user?.login,
+          isClosed: true,
+          creator: wallet?.address,
+          networkAddress: network.networkAddress
+        });
+      })
+      .then(() => {
+        dispatch(addToast({
+            type: "success",
+            title: t("actions.success"),
+            content: t("custom-network:messages.network-closed")
+        }));
 
-    // BeproService.closeNetwork()
-    //   .then(() => {
-    //     return updateNetwork({
-    //       githubLogin: user?.login,
-    //       isClosed: true,
-    //       creator: wallet?.address,
-    //       networkAddress: network.networkAddress
-    //     });
-    //   })
-    //   .then(() => {
-    //     dispatch(addToast({
-    //         type: "success",
-    //         title: t("actions.success"),
-    //         content: t("custom-network:messages.network-closed")
-    //     }));
+        updateWalletBalance();
 
-    //     updateWalletBalance();
-
-    //     router.push(getURLWithNetwork("/account/my-network"));
-    //   })
-    //   .catch((error) => {
-    //     dispatch(addToast({
-    //         type: "danger",
-    //         title: t("actions.failed"),
-    //         content: t("custom-network:errors.failed-to-close-network", {
-    //           error
-    //         })
-    //     }));
-    //   })
-    //   .finally(() => {
-    //     setIsClosing(false);
-    //   });
+        router.push(getURLWithNetwork("/account/my-network"));
+      })
+      .catch((error) => {
+        dispatch(addToast({
+            type: "danger",
+            title: t("actions.failed"),
+            content: t("custom-network:errors.failed-to-close-network", {
+              error
+            })
+        }));
+      })
+      .finally(() => {
+        setIsClosing(false);
+      });
   }
 
   useEffect(() => {
@@ -459,8 +456,7 @@ export default function Settings() {
                     !newInfo.network.data.fullLogo.raw?.type?.includes("image/svg")
                   }
                   onChange={handleNetworkDataChange}
-                  description=
-                    {`${t("misc.upload")} ${t("custom-network:steps.network-information.fields.full-logo.label")}`}
+                  description={`${t("misc.upload")} ${t("custom-network:steps.network-information.fields.full-logo.label")}`}
                   lg
                 />
               </div>
@@ -634,8 +630,8 @@ export default function Settings() {
                     label={t("custom-network:redeem-time")}
                     max={+publicRuntimeConfig?.networkConfig?.reedemTime?.max}
                     description={t("custom-network:errors.redeem-time", {
-                      min: +publicRuntimeConfig.networkConfig.reedemTime.min,
-                      max: formatNumberToCurrency(+publicRuntimeConfig.networkConfig.reedemTime.max, 0)
+                      min: +publicRuntimeConfig?.networkConfig?.reedemTime?.min,
+                      max: +publicRuntimeConfig?.networkConfig?.reedemTime?.max
                     })}
                     symbol="seconds"
                     value={newInfo.redeemTime}

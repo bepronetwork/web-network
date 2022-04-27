@@ -21,7 +21,6 @@
 !.env.example
 .idea/
 .vscode/
-.scripts/
 
 # debug
 npm-debug.log*

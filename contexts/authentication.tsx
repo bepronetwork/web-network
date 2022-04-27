@@ -12,6 +12,8 @@ import { useRouter } from "next/router";
 
 import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
 
+import { changeOraclesParse } from "contexts/reducers/change-oracles";
+
 import { IUser } from "interfaces/authentication";
 import { IWallet } from "interfaces/authentication";
 
@@ -56,7 +58,7 @@ export const AuthenticationProvider = ({ children }) => {
       await BeproService.login();
 
       const [isCouncil, isApprovedSettlerToken] = await Promise.all([
-        BeproService.isCouncil(),
+        BeproService.network.isCouncil(BeproService?.address),
         BeproService.isApprovedSettlerToken()
       ])
 
@@ -106,23 +108,23 @@ export const AuthenticationProvider = ({ children }) => {
       staked,
       isCouncil,
     ] = await Promise.all([
-      BeproService.getOraclesResume(),
+      BeproService.getOraclesSummary(),
       BeproService.getBalance("bepro"),
       BeproService.getBalance("eth"),
       BeproService.getBalance("staked"),
-      BeproService.isCouncil(),
+      BeproService.network.isCouncil(BeproService.address),
     ])
     setWallet((previousWallet) => ({
       ...previousWallet,
       isCouncil,
       balance: {
         ...previousWallet.balance,
-        oracles,
+        oracles: changeOraclesParse(BeproService.address, oracles),
         bepro,
         eth,
         staked,
       }}))
-  }, [wallet?.address, beproServiceStarted]);
+  }, []);
 
   const updateIsApprovedSettlerToken = useCallback(async ()=>{
     const [isApprovedSettlerToken] = await Promise.all([
@@ -153,7 +155,7 @@ export const AuthenticationProvider = ({ children }) => {
       BeproService.login()
         .then(async() =>{
           const [isCouncil, isApprovedSettlerToken] = await Promise.all([
-            BeproService.isCouncil(),
+            BeproService.network.isCouncil(BeproService?.address),
             BeproService.isApprovedSettlerToken()
           ])
           setWallet((previousWallet) => ({
@@ -176,7 +178,7 @@ export const AuthenticationProvider = ({ children }) => {
         BeproService.login()
         .then(async () =>{
           const [isCouncil, isApprovedSettlerToken] = await Promise.all([
-            BeproService.isCouncil(),
+            BeproService.network.isCouncil(address),
             BeproService.isApprovedSettlerToken()
           ])
           setWallet({ address, isCouncil, isApprovedSettlerToken })

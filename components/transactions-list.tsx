@@ -9,9 +9,7 @@ import CrossArrow from "assets/icons/cross-arrow";
 import DownloadIcon from "assets/icons/download";
 import HelpIcon from "assets/icons/help-icon";
 import InformationChatBubble from "assets/icons/information-chat-bubble";
-import PullRequestIcon from "assets/icons/pull-request-icon";
 import RecognizeFinishedIcon from "assets/icons/recognize-finished-icon";
-import RefreshIcon from "assets/icons/refresh-icon";
 import ReturnArrow from "assets/icons/return-arrow";
 import ThumbsUp from "assets/icons/thumbs-up";
 import UploadIcon from "assets/icons/upload";
@@ -37,8 +35,6 @@ export default function TransactionsList({
 
   const IconMaps = {
     [TransactionTypes.openIssue]: <InformationChatBubble />,
-    [TransactionTypes.createPullRequest]: <PullRequestIcon />,
-    [TransactionTypes.makePullRequestReady]: <PullRequestIcon />,
     [TransactionTypes.lock]: <UploadIcon />,
     [TransactionTypes.unlock]: <DownloadIcon />,
     [TransactionTypes.approveTransactionalERC20Token]: <ThumbsUp />,
@@ -48,10 +44,7 @@ export default function TransactionsList({
     [TransactionTypes.closeIssue]: <CloseIssueIcon />,
     [TransactionTypes.proposeMerge]: <CenterArrows />,
     [TransactionTypes.approveSettlerToken]: <ThumbsUp />,
-    [TransactionTypes.recognizedAsFinish]: <RecognizeFinishedIcon />,
-    [TransactionTypes.updateBountyAmount]: <RefreshIcon />,
-    [TransactionTypes.cancelPullRequest]: <CloseIssueIcon />,
-    [TransactionTypes.refuseProposal]: <CloseIssueIcon />
+    [TransactionTypes.recognizedAsFinish]: <RecognizeFinishedIcon />
   };
 
   function renderTransactionRow(item: Transaction) {

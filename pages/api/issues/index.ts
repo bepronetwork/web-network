@@ -1,9 +1,8 @@
 import { subHours, subMonths, subWeeks, subYears } from "date-fns";
+import models from "db/models";
 import { withCors } from 'middleware';
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op, WhereOptions } from "sequelize";
-
-import models from "db/models";
 
 import paginate from "helpers/paginate";
 
@@ -75,8 +74,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: "mergeProposals" }
   ];
 
-  const issues = 
-  await models.issue.findAndCountAll(paginate({ where: whereCondition, include, nest: true }, req.query, [
+  const issues = await models.issue.findAndCountAll(paginate({ where: whereCondition, include, nest: true }, req.query, [
       [req.query.sortBy || "updatedAt", req.query.order || "DESC"]
   ]));
   // await composeIssues(issues.rows);

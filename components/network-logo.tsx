@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import BeProBlue from "assets/icons/bepro-blue";
 
 interface NetworkLogoProps {
@@ -16,7 +18,7 @@ export default function NetworkLogo({
       {isBepro ? (
         <BeProBlue width={24} height={24} />
       ) : (
-        <img src={src} {...props} width={24} height={24} />
+        <Image src={src} {...props} width={24} height={24} />
       )}
     </div>
   );

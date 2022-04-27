@@ -1,5 +1,3 @@
-import { Token } from "interfaces/token";
-
 export interface INetwork {
   id: number;
   name: string;
@@ -18,14 +16,6 @@ export interface INetwork {
   creatorAddress: string;
   openBountiesAmount?: number;
   openBountiesQuantity?: number;
-  allowCustomTokens?: boolean;
-  tokens?: Token[];
-  councilAmount?: number;
-  disputableTime?: number;
-  draftTime?: number;
-  oracleExchangeRate?: number;
-  mergeCreatorFeeShare?: number;
-  percentageNeededForDispute?: number;
 }
 
 export interface ThemeColors {

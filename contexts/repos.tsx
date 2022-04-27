@@ -77,11 +77,9 @@ export const ReposProvider: React.FC = function ({ children }) {
 
     if (!repo) throw new Error("Repo not found");
 
-    const data = await getForksOf(repo?.githubPath);
+    const { data } = await getForksOf(repo?.githubPath);
 
-    if (!data) return [];
-
-    const forks = await Promise.all(data?.map(({ owner }): developer => ({
+    const forks = await Promise.all(data.map(({ owner }): developer => ({
             id: owner.id,
             login: owner?.login,
             avatar_url: owner.avatar_url,

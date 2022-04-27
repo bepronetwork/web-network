@@ -11,15 +11,14 @@
       "placeholder": "Type a description..."
     },
     "amount": {
-      "label": "Set {{token}} value",
-      "info": "{{amount}} {{token}} Available",
+      "label": "Set $BEPRO value",
+      "info": "{{amount}} $BEPRO Available",
       "max": "Max"
     }
   },
   "create-bounty": "Create Bounty",
   "bounty-created": "Bounty created",
   "errors": {
-    "creating-bounty": "Error creating bounty",
-    "sync": "The bounty was created, but something went wrong while reading the blockchain, please go to the home page while we try to get your bounty"
+    "creating-bounty": "Error creating bounty"
   }
 }

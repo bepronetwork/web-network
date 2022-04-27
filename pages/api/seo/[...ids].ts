@@ -1,10 +1,9 @@
 import axios from "axios";
+import models from "db/models";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
 import { Op } from "sequelize";
-
-import models from "db/models";
 
 // import { generateCard } from "helpers/seo/create-card-bounty";
 
@@ -60,7 +59,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   if (!issue) return res.status(404).json(null);
 
-  //const [, repo] = issue.repository.githubPath.split("/");
+  const [, repo] = issue.repository.githubPath.split("/");
 
   // const card = await generateCard({
   //   state: issue.state,

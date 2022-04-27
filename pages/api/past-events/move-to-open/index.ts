@@ -1,11 +1,9 @@
-import { Network_v2 } from "@taikai/dappkit";
 import { subMilliseconds } from "date-fns";
+import models from "db/models";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
-
-import models from "db/models";
 
 import networkBeproJs from "helpers/api/handle-network-bepro";
 import twitterTweet from "helpers/api/handle-twitter-tweet";
@@ -24,7 +22,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  const networks = [
+  [
     {
       id: 1,
       name: publicRuntimeConfig.networkConfig.networkName
@@ -32,19 +30,16 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       networkAddress: publicRuntimeConfig.contract.address,
     },
     ...customNetworks
-  ];
-
-  for (const customNetwork of networks) {
+  ].forEach(async (customNetwork) => {
     if (!customNetwork.name) return;
 
     console.log(`Moving issues of ${customNetwork.name} - ${customNetwork.networkAddress} to OPEN`);
     const network = networkBeproJs({
-      contractAddress: customNetwork.networkAddress,
-      version: 2
-    }) as Network_v2;
+      contractAddress: customNetwork.networkAddress
+    });
 
     await network.start();
-    const redeemTime = (await network.draftTime());
+    const redeemTime = (await network.redeemTime()) * 1000;
 
     const where = {
       createdAt: { [Op.lt]: subMilliseconds(+new Date(), redeemTime) },
@@ -86,7 +81,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         console.log("Error creating SEO", e);
       });
     }
-  }
+  });
 
   return res.status(200).json("Issues Moved to Open");
 }

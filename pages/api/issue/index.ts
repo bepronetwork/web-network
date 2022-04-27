@@ -1,9 +1,8 @@
+import models from "db/models";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
-
-import models from "db/models";
 
 import twitterTweet from "helpers/api/handle-twitter-tweet";
 
@@ -31,7 +30,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  if (!network || network?.isClosed) return res.status(404).json("Invalid network");
+  if (!network) return res.status(404).json("Invalid network");
+  if (network.isClosed) return res.status(404).json("Invalid network");
 
   if (!creatorGithub) return res.status(422).json("creatorGithub is required");
 
@@ -73,7 +73,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     network_id: network.id
   });
 
-  return res.status(200).json(`${repository_id}/${githubId}`);
+  return res.status(200).json(githubId);
 }
 
 async function patch(req: NextApiRequest, res: NextApiResponse) {
@@ -123,7 +123,7 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
 
       return res.status(200).json("ok");
     })
-    .catch(() => res.status(422).json("nok"));
+    .catch((_) => res.status(422).json("nok"));
 }
 
 export default async function Issue(req: NextApiRequest, res: NextApiResponse) {

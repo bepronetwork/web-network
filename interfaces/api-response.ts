@@ -23,9 +23,3 @@ export interface ProposalData {
   createdAt: string;
   updatedAt: string;
 }
-
-export interface PastEventsParams {
-  id? :number;
-  fromBlock?: number;
-  toBlock?: number;
-}

@@ -24,7 +24,7 @@ export default function ProposalPullRequestDetail({
   const { activeIssue } = useIssue();
 
   return (
-    <div className="bg-shadow rounded-5 p-3 d-flex flex-column">
+    <div className="bg-shadow rounded-5 p-3">
       <div className="pt-1 mb-2 d-inline-flex align-items-center justify-content-md-start gap-2">
         <span className="caption-large text-uppercase text-white">
           {t("pull-request:label")}

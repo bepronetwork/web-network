@@ -19,12 +19,7 @@ export default function TransactionType({ type }) {
     [TransactionTypes.closeIssue]: t("transactions.types.close-bounty"),
     [TransactionTypes.redeemIssue]: t("transactions.types.redeem-bounty"),
     [TransactionTypes.approveSettlerToken]: t("transactions.types.approve-settler"),
-    [TransactionTypes.recognizedAsFinish]: t("transactions.types.recognize-finished"),
-    [TransactionTypes.createPullRequest]: t("transactions.types.create-pull-request"),
-    [TransactionTypes.makePullRequestReady]: t("transactions.types.make-pull-request-ready"),
-    [TransactionTypes.updateBountyAmount]: t("transactions.types.update-bounty-amount"),
-    [TransactionTypes.cancelPullRequest]: t("transactions.types.cancel-pull-request"),
-    [TransactionTypes.refuseProposal]: t("transactions.types.refused-by-owner")
+    [TransactionTypes.recognizedAsFinish]: t("transactions.types.recognize-finished")
   };
 
   return (

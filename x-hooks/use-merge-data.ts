@@ -120,8 +120,8 @@ export default function useMergeData() {
 
       if (!OctoData[key]) {
         try {
-          const comments = await octokit.getPullRequestComments(pr.githubId,
-                                                                repo);
+          const { data: comments } = await octokit.getPullRequestComments(pr.githubId,
+                                                                          repo);
           const { data: pullRequest } = await octokit.getPullRequest(pr.githubId,
                                                                      repo);
 

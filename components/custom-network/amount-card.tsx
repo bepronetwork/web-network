@@ -1,5 +1,3 @@
-import { useTranslation } from "next-i18next";
-
 import Button from "components/button";
 import InfoTooltip from "components/info-tooltip";
 
@@ -23,7 +21,6 @@ export default function AmountCard({
   description,
   action
 }: AmountCardProps) {
-  const { t } = useTranslation("common");
   return (
     <div className="d-flex flex-column bg-shadow p-20 border-radius-8">
       <div className="d-flex flex-row align-items-center justify-content-between">
@@ -45,7 +42,7 @@ export default function AmountCard({
                 currency === "token" ? "primary" : "purple"
               }`}
             >
-              {currency === "token" ? t("$bepro") : t("$oracles")}
+              {currency === "token" ? "$BEPRO" : "oracles"}
             </span>
           )) ||
           ""

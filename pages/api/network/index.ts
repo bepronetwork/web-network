@@ -1,10 +1,9 @@
+import Database from "db/models";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
-
-import Database from "db/models";
 
 import Bepro from "helpers/api/bepro-initializer";
 
@@ -17,9 +16,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   const network = await Database.network.findOne({
     attributes: { exclude: ["id", "creatorAddress", "updatedAt"] },
-    include: [
-      { association: "tokens" }
-    ],
     where: {
       name: {
         [Op.iLike]: String(networkName)
@@ -57,17 +53,23 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     if (!user) return res.status(403).json("Invalid user provided");
     if (!accessToken) return res.status(401).json("Unauthorized user");
-    if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
+    if (!botPermission)
+      return res.status(403).json("Bepro-bot authorization needed");
 
     // Contract Validations
     const BEPRO = new Bepro();
     await BEPRO.init(false, false, true);
 
-    const creatorAmount = await BEPRO.networkFactory.creatorAmount();
-    const lockedAmount = await BEPRO.networkFactory.lockedTokensOfAddress(creator);
-    const checkingNetworkAddress = await BEPRO.networkFactory.networkOfAddress(creator);
+    const OPERATOR_AMOUNT = await BEPRO.networkFactory.OPERATOR_AMOUNT();
+    const amountStaked = await BEPRO.networkFactory.getLockedStakedByAddress(creator);
+    const checkingNetworkAddress =
+      await BEPRO.networkFactory.getNetworkByAddress(creator);
 
-    if (lockedAmount < creatorAmount) return res.status(403).json("Insufficient locked amount");
+    if (
+      parseFloat(BEPRO.bepro.Web3.utils.fromWei(`${amountStaked}`)) <
+      OPERATOR_AMOUNT
+    )
+      return res.status(403).json("Insufficient locked amount");
 
     if (checkingNetworkAddress !== networkAddress)
       return res.status(403).json("Creator and network addresses do not match");
@@ -198,7 +200,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       await BEPRO.init(false, false, true);
 
       const checkingNetworkAddress =
-        await BEPRO.networkFactory.networkOfAddress(creator);
+        await BEPRO.networkFactory.getNetworkByAddress(creator);
 
       if (checkingNetworkAddress !== networkAddress)
         return res

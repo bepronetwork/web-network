@@ -29,11 +29,11 @@ const publicRuntimeConfig = {
   networkConfig:{
     disputableTime:{
       min: process.env.NEXT_PUBLIC_DISPUTABLE_TIME_MIN,
-      max: eval(process.env.NEXT_PUBLIC_DISPUTABLE_TIME_MAX),
+      max: process.env.NEXT_PUBLIC_DISPUTABLE_TIME_MAX,
     },
     reedemTime:{
       min: process.env.NEXT_PUBLIC_REDEEM_TIME_MIN,
-      max: eval(process.env.NEXT_PUBLIC_REDEEM_TIME_MAX),
+      max: process.env.NEXT_PUBLIC_REDEEM_TIME_MAX,
     },
     councilAmount:{
       min: process.env.NEXT_PUBLIC_COUNCIL_AMOUNT_MIN,
@@ -41,8 +41,7 @@ const publicRuntimeConfig = {
     },
     disputesPercentage: process.env.NEXT_PUBLIC_DISPUTE_PERCENTAGE_MAX,
     networkName: process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME,
-    factoryAddress: process.env.NEXT_PUBLIC_NETWORK_FACTORY_ADDRESS,
-    allowCustomTokens: process.env.NEXT_PUBLIC_ALLOW_CUSTOM_TOKENS
+    factoryAddress: process.env.NEXT_PUBLIC_NETWORK_FACTORY_ADDRESS
   },
   currency:{
     apiUrl: process.env.NEXT_PUBLIC_CURRENCY_API,

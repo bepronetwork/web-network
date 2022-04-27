@@ -4,21 +4,17 @@ import { useTranslation } from "next-i18next";
 
 import { IActiveIssue } from "contexts/issue";
 
-import { BountyExtended } from "interfaces/bounty";
-
 import NothingFound from "./nothing-found";
 import PullRequestItem from "./pull-request-item";
 
 interface IIssuePullRequestProps {
   issue: IActiveIssue;
-  networkIssue: BountyExtended;
   className: string;
 }
 
 export default function IssuePullRequests({
   issue,
-  className,
-  networkIssue
+  className
 }: IIssuePullRequestProps) {
   const { t } = useTranslation("pull-request");
 
@@ -34,7 +30,6 @@ export default function IssuePullRequests({
               key={pullRequest.id}
               issue={issue}
               pullRequest={pullRequest}
-              networkPullRequest={networkIssue?.pullRequests?.find(pr => +pr.id === +pullRequest.contractId)}
             />
           )))) || <NothingFound description={t("errors.not-found")} />}
     </div>

@@ -1,8 +1,7 @@
+import models from "db/models";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op } from "sequelize";
-
-import models from "db/models";
 
 import paginate from "helpers/paginate";
 

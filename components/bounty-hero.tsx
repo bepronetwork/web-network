@@ -12,7 +12,7 @@ import PriceConversor from "./price-conversor";
 import Translation from "./translation";
 
 export default function BountyHero() {
-  const { t } = useTranslation(["bounty", "common"]);
+  const { t } = useTranslation("bounty");
   const { activeIssue } = useIssue();
   return (
     <div className="banner-shadow">
@@ -99,7 +99,7 @@ export default function BountyHero() {
           <div className="col-2 d-flex align-items-center justify-content-center">
             <PriceConversor
               currentValue={activeIssue?.amount || 0}
-              currency={activeIssue?.token?.symbol || t("common:misc.token")}
+              currency="BEPRO"
             />
           </div>
         </div>

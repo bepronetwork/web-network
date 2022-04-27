@@ -1,8 +1,7 @@
+import models from "db/models";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op, WhereOptions } from "sequelize";
-
-import models from "db/models";
 
 import paginate, { calculateTotalPages } from "helpers/paginate";
 
@@ -19,20 +18,15 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   if (networkAddress)
     whereCondition.networkAddress = { [Op.iLike]: String(networkAddress) };
 
-  const include = [
-    { association: "tokens" }
-  ];
-
   const networks = await models.network.findAndCountAll(paginate({
         attributes: {
           exclude: ["id", "creatorAddress", "updatedAt"]
         },
         where: whereCondition,
-        include,
         nest: true
   },
                                                                  req.query,
-      [[req.query.sortBy || "createdAt", req.query.order || "DESC"]]));
+      [[req.query.sortBy || "updatedAt", req.query.order || "DESC"]]));
 
   return res.status(200).json({
     ...networks,

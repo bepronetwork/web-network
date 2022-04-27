@@ -17,7 +17,7 @@ export default function ProposalProgress({
   return (
     <div className="container bg-shadow p-2">
       <div className="d-flex justify-content-center align-items-center gap-2">
-        {usersDistribution.length &&
+        {usersDistribution.length > 0 &&
           React.Children.toArray(usersDistribution.map((item, index) => (
               <div
                 key={index}
@@ -29,7 +29,7 @@ export default function ProposalProgress({
                 <Avatar key={index} userLogin={item.githubLogin} tooltip />
 
                 <p className="caption-small">
-                  {formatNumberToString(item.percentage, 0)}%
+                  {formatNumberToString(item.percentage, 2)}%
                 </p>
 
                 <span className="w-100 bg-primary p-1 rounded" />

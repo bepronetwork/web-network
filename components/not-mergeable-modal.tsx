@@ -11,9 +11,8 @@ import { useAuthentication } from "contexts/authentication";
 import { IActiveIssue, useIssue } from "contexts/issue";
 import { addToast } from "contexts/reducers/add-toast";
 
-import { ProposalExtended } from "interfaces/bounty";
 import { pullRequest } from "interfaces/issue-data";
-import { Proposal } from "interfaces/proposal";
+import { INetworkProposal, Proposal } from "interfaces/proposal";
 
 
 import useApi from "x-hooks/use-api";
@@ -24,7 +23,7 @@ interface IMergeableModalProps {
   issuePRs: pullRequest[];
   proposal: Proposal;
   pullRequest: pullRequest;
-  networkProposal: ProposalExtended;
+  networkProposal: INetworkProposal;
 }
 export default function NotMergeableModal({
   proposal,
@@ -51,17 +50,17 @@ export default function NotMergeableModal({
   const isIssueOwner = activeIssue?.creatorGithub === githubLogin;
   const isPullRequestOwner = pullRequest?.githubLogin === githubLogin;
   const isProposer =
-    networkProposal?.creator?.toLowerCase() === currentAddress;
+    networkProposal?.proposalAddress?.toLowerCase() === currentAddress;
   const hasPRMerged = !!pullRequest?.merged;
 
   const whenNotShow = [
     hasPRMerged, // Already exists a Pull Request merged to this bounty.
-    pullRequest?.isMergeable && !networkIssue?.closed, // The Pull Request was not merged year and the bounty is open.
+    pullRequest?.isMergeable && !networkIssue?.finalized, // The Pull Request was not merged year and the bounty is open.
     !(isIssueOwner || isPullRequestOwner || wallet?.isCouncil || isProposer), // The user is not the bounty creator, nor the pull request creator,
     // nor the proposal creator and is not a council member.
     (isIssueOwner || wallet?.isCouncil || isProposer) &&
       !isPullRequestOwner &&
-      !networkIssue?.closed // The bounty creator, proposal creator and council members can view only if the bounty was closed.
+      !networkIssue?.finalized // The bounty creator, proposal creator and council members can view only if the bounty was closed.
   ].some((values) => values);
 
   function handleModalVisibility() {
@@ -128,17 +127,17 @@ export default function NotMergeableModal({
       <div>
         <div className="d-flex justify-content-center m-2 text-center">
           <p className="h4 mb-2 text-white">
-            {(networkIssue?.closed &&
+            {(networkIssue?.finalized &&
               t("modals.not-mergeable.closed-bounty")) ||
               ""}
 
-            {(!networkIssue?.closed &&
+            {(!networkIssue?.finalized &&
               t("modals.not-mergeable.open-bounty")) ||
               ""}
           </p>
         </div>
         <div className="d-flex justify-content-center">
-          {wallet?.isCouncil && networkIssue?.closed && (
+          {wallet?.isCouncil && networkIssue?.finalized && (
             <Button
               color={`${
                 (mergeState === "error" && "transparent") || "primary"

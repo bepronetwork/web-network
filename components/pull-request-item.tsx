@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-import { PullRequest } from "@taikai/dappkit";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -26,13 +25,11 @@ import useOctokit from "x-hooks/use-octokit";
 interface IPullRequestItem {
   issue: IActiveIssue;
   pullRequest: pullRequest;
-  networkPullRequest: PullRequest;
 }
 
 export default function PullRequestItem({
   issue,
-  pullRequest,
-  networkPullRequest
+  pullRequest
 }: IPullRequestItem) {
   const router = useRouter();
   const { getCommitsOfPr, getCommit } = useOctokit();
@@ -51,11 +48,8 @@ export default function PullRequestItem({
     }));
   }
 
-  function canReview() {    
-    return pullRequest?.state === "open" && 
-    !!user?.login && pullRequest?.status === "ready" && 
-    !!networkPullRequest?.ready && 
-    !networkPullRequest?.canceled;
+  function canReview() {
+    return pullRequest?.state === "open" && !!user?.login;
   }
 
   async function getPullRequestInfo() {
@@ -64,10 +58,10 @@ export default function PullRequestItem({
       const [owner, repo] = repositoryPath.split("/");
       let lines = 0;
 
-      const commits = await getCommitsOfPr(+pullRequest?.githubId,
-                                           repositoryPath);
+      const { data } = await getCommitsOfPr(+pullRequest?.githubId,
+                                            repositoryPath);
 
-      for (const commit of commits) {
+      for (const commit of data) {
         const {
           data: { stats }
         } = await getCommit(owner, repo, commit.sha);
@@ -109,7 +103,6 @@ export default function PullRequestItem({
                   <PullRequestLabels
                     merged={pullRequest.merged}
                     isMergeable={pullRequest.isMergeable}
-                    isDraft={pullRequest.status === "draft"}
                   />
                 </div>
               </div>

@@ -20,7 +20,7 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "@taikai/dappkit": ["node_modules/@taikai/dappkit/dist/src/index.js"]
+      "dappkit": ["node_modules/@taikai/dappkit/dist/src/index.js"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

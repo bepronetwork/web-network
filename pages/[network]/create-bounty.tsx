@@ -1,5 +1,6 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 
+import clsx from "clsx";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import getConfig from "next/config";
@@ -16,21 +17,18 @@ import DragAndDrop, { IFilesProps } from "components/drag-and-drop";
 import InputNumber from "components/input-number";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import ReposDropdown from "components/repos-dropdown";
-import TokensDropdown from "components/tokens-dropdown";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
-import { toastError, toastWarning } from "contexts/reducers/add-toast";
+import { toastError } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { updateTransaction } from "contexts/reducers/update-transaction";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
-import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { Token } from "interfaces/token";
 
 import { BeproService } from "services/bepro-service";
 
@@ -45,12 +43,6 @@ interface Amount {
   floatValue?: number;
 }
 
-const BEPRO_TOKEN: Token = {
-  address: publicRuntimeConfig.contract.settler,
-  name: "BEPRO",
-  symbol: "$BEPRO"
-};
-
 export default function PageCreateIssue() {
   const router = useRouter();
   const { t } = useTranslation(["common", "create-bounty"]);
@@ -58,7 +50,7 @@ export default function PageCreateIssue() {
   const [branch, setBranch] = useState("");
   const [issueTitle, setIssueTitle] = useState("");
   const [redirecting, setRedirecting] = useState(false);
-  const [repository, setRepository] = useState<{id: string, path: string}>();
+  const [repository_id, setRepositoryId] = useState("");
   const [files, setFiles] = useState<IFilesProps[]>([]);
   const [issueDescription, setIssueDescription] = useState("");
   const [issueAmount, setIssueAmount] = useState<Amount>({
@@ -66,44 +58,29 @@ export default function PageCreateIssue() {
     formattedValue: "",
     floatValue: 0
   });
-  const [isTransactionalTokenApproved, setIsTransactionalTokenApproved] = useState(false);
-  const [transactionalToken, setTransactionalToken] = useState<Token>();
-  const [transactionalAllowance, setTransactionalAllowance] = useState<number>();
-  const [customTokens, setCustomTokens] = useState<Token[]>([BEPRO_TOKEN]);
-  
+
   const { activeNetwork } = useNetwork();
-  const { handleApproveToken } = useBepro();
-  const { wallet, user, beproServiceStarted } = useAuthentication();
+  const { handleApproveTransactionalToken } = useBepro()
+  const { wallet, user, beproServiceStarted, updateIsApprovedSettlerToken } = useAuthentication();
   const {
     dispatch,
     state: { myTransactions }
   } = useContext(ApplicationContext);
-  
-  const [tokenBalance, setTokenBalance] = useState(0);
 
   const txWindow = useTransactions();
   const { getURLWithNetwork } = useNetworkTheme();
-  const { createPreBounty, pastEventsV2 } = useApi();
+  const { createIssue: apiCreateIssue, patchIssueWithScId } = useApi();
 
   async function allowCreateIssue() {
-    if (!beproServiceStarted || !transactionalToken || issueAmount.floatValue <= 0) return;
-
-    handleApproveToken(transactionalToken.address, issueAmount.floatValue).then(() => {
-      updateWalletByToken(transactionalToken);
-    });
+    if (!beproServiceStarted) return;
+    handleApproveTransactionalToken()
+      .then(updateIsApprovedSettlerToken)
   }
 
   function cleanFields() {
     setIssueTitle("");
     setIssueDescription("");
     setIssueAmount({ value: "0", formattedValue: "0", floatValue: 0 });
-  }
-
-  function addToken(newToken: Token) {
-    setCustomTokens([
-      ...customTokens,
-      newToken
-    ]);
   }
   
   function addFilesInDescription(str) {
@@ -119,15 +96,13 @@ export default function PageCreateIssue() {
   }
 
   async function createIssue() {
-    if (!repository || !transactionalToken) return;
-
     const payload = {
       title: issueTitle,
-      body: addFilesInDescription(issueDescription),
+      description: addFilesInDescription(issueDescription),
       amount: issueAmount.floatValue,
       creatorAddress: BeproService.address,
       creatorGithub: user?.login,
-      repositoryId: repository?.id,
+      repository_id,
       branch
     };
 
@@ -135,83 +110,57 @@ export default function PageCreateIssue() {
                                        activeNetwork);
 
     setRedirecting(true);
+    apiCreateIssue(payload, activeNetwork?.name)
+      .then((cid) => {
+        if (!cid) throw new Error(t("errors.creating-issue"));
 
-    const cid = await createPreBounty({ title: payload.title,
-                                        body: payload.body,
-                                        creator: payload.creatorGithub,
-                                        repositoryId: payload.repositoryId }, activeNetwork?.name)
-                                      .then(cid => cid)
-                                      .catch(error => {
-                                        console.log("Failed to create pre-bounty", error);
+        dispatch(openIssueTx);
 
-                                        dispatch(toastError(t("create-bounty:errors.creating-bounty")));
-
-                                        return false;
-                                      });
-    if (!cid) return;
-
-    dispatch(openIssueTx);
-
-    const chainPayload = {
-      cid,
-      title: payload.title,
-      repoPath: repository.path,
-      branch,
-      transactional: transactionalToken.address,
-      tokenAmount: payload.amount,
-      githubUser: payload.creatorGithub
-    };
-
-    const txInfo = await BeproService.openBounty(chainPayload)
-          .catch((e) => {
-            cleanFields();
-            if (e?.message?.toLowerCase().search("user denied") > -1)
-              dispatch(updateTransaction({ ...(openIssueTx.payload as any), status: TransactionStatus.rejected }));
-            else
-              dispatch(updateTransaction({
-                  ...(openIssueTx.payload as any),
-                  status: TransactionStatus.failed
-              }));
-
-            console.log("Failed to create bounty on chain", e);
-    
-            dispatch(toastError(e.message || t("create-bounty:errors.creating-bounty")));
-            return false;
+        return BeproService.network
+          .openIssue([repository_id, cid].join("/"), payload.amount)
+          .then((txInfo) => {
+            txWindow.updateItem(openIssueTx.payload.id,
+                                BeproService.parseTransaction(txInfo, openIssueTx.payload));
+            return {
+              githubId: cid,
+              issueId: [repository_id, cid].join("/")
+            };
           });
-    
-    if (!txInfo) return;
+      })
+      .then(({ githubId, issueId }) =>
+        patchIssueWithScId(repository_id,
+                           githubId,
+                           issueId,
+                           activeNetwork?.name).then(async (result) => {
+                             if (!result)
+                               return dispatch(toastError(t("create-bounty:errors.creating-bounty")));
 
-    txWindow.updateItem(openIssueTx.payload.id, parseTransaction(txInfo, openIssueTx.payload));
+                             await router.push(getURLWithNetwork("/bounty", {
+              id: githubId,
+              repoId: repository_id
+                             }));
+                           }))
+      .catch((e) => {
+        console.error("Failed to createIssue", e);
+        cleanFields();
+        if (e?.message?.search("User denied") > -1)
+          dispatch(updateTransaction({ ...(openIssueTx.payload as any), remove: true }));
+        else
+          dispatch(updateTransaction({
+              ...(openIssueTx.payload as any),
+              status: TransactionStatus.failed
+          }));
 
-    const { blockNumber: fromBlock } = txInfo as any;
-
-    const createdBounties = await pastEventsV2("bounty", "created", activeNetwork?.name, { fromBlock } )
-      .then(({data}) => data)
-      .catch(error => {
-        console.log("Failed to patch bounty", error);
-
+        dispatch(toastError(e.message || t("create-bounty:errors.creating-bounty")));
         return false;
-      });
-
-    if (!createdBounties) 
-      return dispatch(toastWarning(t("create-bounty:errors.sync")));
-
-    if (createdBounties.includes(cid)) {
-      const [repoId, githubId] = String(cid).split('/');
-
-      router.push(getURLWithNetwork('/bounty', {
-        id: githubId,
-        repoId
-      }));
-    }
-
-    setRedirecting(false);
+      })
+      .finally(() => setRedirecting(false));
   }
 
   const issueContentIsValid = (): boolean => !!issueTitle && !!issueDescription;
 
   const verifyAmountBiggerThanBalance = (): boolean =>
-    !(issueAmount.floatValue > tokenBalance);
+    !(issueAmount.floatValue > Number(wallet?.balance?.bepro));
 
   const verifyTransactionState = (type: TransactionTypes): boolean =>
     !!myTransactions.find((transactions) =>
@@ -220,27 +169,27 @@ export default function PageCreateIssue() {
 
   function isCreateButtonDisabled() {
     return [
-      isTransactionalTokenApproved,
+      wallet?.isApprovedSettlerToken,
       issueContentIsValid(),
       verifyAmountBiggerThanBalance(),
       issueAmount.floatValue > 0,
       !!issueAmount.formattedValue,
       !verifyTransactionState(TransactionTypes.openIssue),
-      !!repository?.id,
+      !!repository_id,
       !!branch,
       !redirecting
     ].some((value) => value === false);
   }
 
-  const isApproveButtonDisabled = (): boolean =>
+  const isApproveButtonDisable = (): boolean =>
     [
-      !isTransactionalTokenApproved,
+      !wallet?.isApprovedSettlerToken,
       !verifyTransactionState(TransactionTypes.approveTransactionalERC20Token)
     ].some((value) => value === false);
 
   const handleIssueAmountBlurChange = () => {
-    if (issueAmount.floatValue > tokenBalance) {
-      setIssueAmount({ formattedValue: tokenBalance.toString() });
+    if (issueAmount.floatValue > Number(wallet?.balance?.bepro)) {
+      setIssueAmount({ formattedValue: wallet?.balance?.bepro?.toString() });
     }
   };
 
@@ -253,36 +202,6 @@ export default function PageCreateIssue() {
   };
 
   const onUpdateFiles = (files: IFilesProps[]) => setFiles(files);
-
-  const updateWalletByToken = async (token: Token) => {
-    setTokenBalance(await BeproService.getTokenBalance(token.address));
-    setTransactionalAllowance(await BeproService.getAllowance(token.address));
-  }
-
-  const isAmountApproved = () => transactionalAllowance >= issueAmount.floatValue;
-
-  useEffect(() => {
-    if (!wallet?.balance) return;
-    if (!transactionalToken) return setTransactionalToken(BEPRO_TOKEN);
-
-    updateWalletByToken(transactionalToken);
-  }, [transactionalToken, wallet]);
-
-  useEffect(() => {
-    setIsTransactionalTokenApproved(isAmountApproved());
-  }, [transactionalAllowance, issueAmount.floatValue]);
-
-  useEffect(() => {
-    if (!activeNetwork) return;
-
-    const tmpTokens = [];
-
-    if (activeNetwork.networkAddress === publicRuntimeConfig.contract.address) tmpTokens.push(BEPRO_TOKEN);
-
-    tmpTokens.push(...activeNetwork.tokens.map(({name, symbol, address}) => ({name, symbol, address} as Token)));
-
-    setCustomTokens(tmpTokens);
-  }, [activeNetwork]);
 
   return (
     <>
@@ -337,43 +256,46 @@ export default function PageCreateIssue() {
                 <div className="col">
                   <ReposDropdown
                     onSelected={(opt) => {
-                      setRepository(opt.value);
+                      setRepositoryId(opt.value);
                       setBranch(null);
                     }}
                   />
                 </div>
                 <div className="col">
                   <BranchsDropdown
-                    repoId={repository?.id}
+                    repoId={repository_id}
                     onSelected={(opt) => setBranch(opt.value)}
                   />
                 </div>
               </div>
               <div className="row">
-                <div className="col-6">
+                <div className="col">
                   <InputNumber
                     thousandSeparator
-                    max={tokenBalance}
-                    label={t("create-bounty:fields.amount.label", {token: transactionalToken?.symbol})}
-                    symbol={transactionalToken?.symbol}
+                    max={wallet?.balance?.bepro}
+                    className={clsx({
+                      "text-muted": wallet?.isApprovedSettlerToken
+                    })}
+                    label={t("create-bounty:fields.amount.label")}
+                    symbol={t("$bepro")}
                     value={issueAmount.formattedValue}
                     placeholder="0"
+                    disabled={!wallet?.isApprovedSettlerToken}
                     onValueChange={handleIssueAmountOnValueChange}
                     onBlur={handleIssueAmountBlurChange}
                     helperText={
                       <>
                         {t("create-bounty:fields.amount.info", {
-                          token: transactionalToken?.symbol,
-                          amount: formatNumberToCurrency(tokenBalance,
+                          amount: formatNumberToCurrency(wallet?.balance?.bepro,
                             { maximumFractionDigits: 18 })
                         })}
-                        {isTransactionalTokenApproved && (
+                        {wallet?.isApprovedSettlerToken && (
                           <span
                             className="caption-small text-primary ml-1 cursor-pointer text-uppercase"
                             onClick={() =>
                               setIssueAmount({
                                 formattedValue:
-                                tokenBalance.toString()
+                                  wallet?.balance?.bepro?.toString()
                               })
                             }
                           >
@@ -384,20 +306,7 @@ export default function PageCreateIssue() {
                     }
                   />
                 </div>
-                
-                <div className="col-6 mt-n2">
-                  <TokensDropdown 
-                    defaultToken={BEPRO_TOKEN} 
-                    tokens={customTokens} 
-                    canAddToken={
-                      activeNetwork?.networkAddress === publicRuntimeConfig.contract.address ? 
-                      publicRuntimeConfig.networkConfig.allowCustomTokens :
-                      !!activeNetwork?.allowCustomTokens
-                    }
-                    addToken={addToken} 
-                    setToken={setTransactionalToken}
-                  /> 
-                </div>
+                <div className="col"></div>
               </div>
 
               <div className="d-flex justify-content-center align-items-center mt-4">
@@ -407,11 +316,11 @@ export default function PageCreateIssue() {
                   </div>
                 ) : (
                   <>
-                    {!isTransactionalTokenApproved && issueAmount.floatValue > 0 ? (
+                    {!wallet?.isApprovedSettlerToken ? (
                       <ReadOnlyButtonWrapper>
                         <Button
                           className="me-3 read-only-button"
-                          disabled={isApproveButtonDisabled()}
+                          disabled={isApproveButtonDisable()}
                           onClick={allowCreateIssue}
                         >
                           {t("actions.approve")}
@@ -447,8 +356,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       ...(await serverSideTranslations(locale, [
         "common",
         "create-bounty",
-        "connect-wallet-button",
-        "change-token-modal"
+        "connect-wallet-button"
       ]))
     }
   };

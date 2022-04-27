@@ -26,9 +26,8 @@ import { psReadAsText } from "helpers/file-reader";
 import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
-import useNetworkTheme from "x-hooks/use-network";
+import useNetwork from "x-hooks/use-network";
 import useOctokit from "x-hooks/use-octokit";
-import TokenConfiguration from "components/custom-network/token-configuration";
 
 
 const { publicRuntimeConfig } = getConfig()
@@ -40,11 +39,12 @@ export default function NewNetwork() {
   const [currentStep, setCurrentStep] = useState(1);
   const [creatingNetwork, setCreatingNetwork] = useState(false);
   const [steps, setSteps] = useState(DefaultNetworkInformation);
+  const [networkFactoryStarted, setNetworkFactoryStarted] = useState(false);
 
   const { createNetwork } = useApi();
   const { listUserRepos } = useOctokit();
   const { network, getURLWithNetwork, colorsToCSS, DefaultTheme } =
-  useNetworkTheme();
+    useNetwork();
 
   const { dispatch } = useContext(ApplicationContext);
 
@@ -98,7 +98,6 @@ export default function NewNetwork() {
       1: "lock",
       2: "network",
       3: "repositories",
-      4: "token"
     };
 
     let canGo = false;
@@ -197,31 +196,30 @@ export default function NewNetwork() {
   }, [user?.login]);
 
   useEffect(() => {
-    if (wallet?.address && beproServiceStarted) {
+    if (wallet?.address && beproServiceStarted && networkFactoryStarted) {
       BeproService.getTokensLockedByAddress(wallet.address)
         .then((value) => {
           handleLockDataChange({ label: "amountLocked", value });
         })
         .catch(console.log);
 
-      BeproService.getCreatorAmount().then(value => {
-        handleLockDataChange({
-          label: "amountNeeded",
-          value
-        });
-      });      
+      handleLockDataChange({
+        label: "amountNeeded",
+        value: BeproService.operatorAmount,
+      });
     }
   }, [
     wallet?.address,
     wallet?.balance,
-    beproServiceStarted
+    beproServiceStarted,
+    networkFactoryStarted,
   ]);
 
   useEffect(() => {
     //Validate Locked Tokens
     const lockData = steps.lock;
 
-    const lockValidated = lockData.amountLocked >= lockData.amountNeeded;
+    const lockValidated = lockData.amountLocked >= BeproService.operatorAmount;
 
     if (lockValidated !== steps.lock.validated) {
       const tmpSteps = Object.assign({}, steps);
@@ -299,6 +297,14 @@ export default function NewNetwork() {
     }
   }, [steps]);
 
+  useEffect(() => {
+    if (beproServiceStarted)
+      BeproService.startNetworkFactory()
+        .then(setNetworkFactoryStarted)
+        .catch((error) =>
+          console.log("Failed to start the Network Factory", error));
+  }, [beproServiceStarted]);
+
   return (
     <div className="new-network">
       <style>{colorsToCSS(steps.network.data.colors.data)}</style>
@@ -315,7 +321,6 @@ export default function NewNetwork() {
               currentStep={currentStep}
               handleChangeStep={handleChangeStep}
               handleChange={handleLockDataChange}
-              creatorAmount={steps.lock.amountNeeded}
               balance={{
                 beproAvailable: wallet?.balance?.bepro,
                 oraclesAvailable:
@@ -346,13 +351,6 @@ export default function NewNetwork() {
               handleFinish={handleCreateNetwork}
               handleCheckPermission={handleCheckPermission}
             />
-
-            {/* <TokenConfiguration
-              step={4}
-              currentStep={currentStep}
-              handleChangeStep={handleChangeStep}
-              handleFinish={handleCreateNetwork}
-            /> */}
           </Stepper>
         </div>
       </CustomContainer>
@@ -367,7 +365,6 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         "common",
         "custom-network",
         "connect-wallet-button",
-        "change-token-modal"
       ])),
     },
   };

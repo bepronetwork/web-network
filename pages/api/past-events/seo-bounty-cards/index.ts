@@ -1,6 +1,5 @@
-import { NextApiRequest, NextApiResponse } from "next";
-
 import models from "db/models";
+import { NextApiRequest, NextApiResponse } from "next";
 
 // import { generateCard } from "helpers/seo/create-card-bounty";
 

@@ -1,9 +1,8 @@
-import {NextApiRequest, NextApiResponse} from 'next';
-import {Octokit} from 'octokit';
-import { Op } from 'sequelize'
-import getConfig from 'next/config';
-
 import models from 'db/models';
+import { NextApiRequest, NextApiResponse } from 'next';
+import getConfig from 'next/config';
+import { Octokit } from 'octokit';
+import { Op } from 'sequelize';
 
 import networkBeproJs from 'helpers/api/handle-network-bepro';
 import readCloseIssues from 'helpers/api/read-close-issues';

@@ -1,7 +1,6 @@
 import React, {
   Fragment,
   useContext,
-  useEffect,
   useRef,
   useState
 } from "react";
@@ -30,8 +29,6 @@ import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { TransactionCurrency } from "interfaces/transaction";
 
 
-import { BeproService } from "services/bepro-service";
-
 import useBepro from "x-hooks/use-bepro";
 
 function OraclesActions() {
@@ -46,12 +43,11 @@ function OraclesActions() {
   const [show, setShow] = useState<boolean>(false);
   const [action, setAction] = useState<string>(actions[0]);
   const [tokenAmount, setTokenAmount] = useState<number | undefined>();
-  const [networkTokenAllowance, setNetworkTokenAllowance] = useState(0);
 
   const networkTxRef = useRef<HTMLButtonElement>(null);
 
-  const { handleApproveToken } = useBepro()
-  const { wallet, beproServiceStarted, updateWalletBalance } = useAuthentication();
+  const { handleApproveTransactionalToken } = useBepro()
+  const { wallet, beproServiceStarted, updateIsApprovedSettlerToken, updateWalletBalance } = useAuthentication();
   const { state: { myTransactions }} = useContext(ApplicationContext);
 
   const renderAmount = tokenAmount
@@ -103,7 +99,7 @@ function OraclesActions() {
   const isButtonDisabled = (): boolean =>
     [
       tokenAmount < 1,
-      action === t("my-oracles:actions.lock.label") && needsApproval(),
+      action === t("my-oracles:actions.lock.label") && !wallet.isApprovedSettlerToken,
       !wallet?.address,
       tokenAmount > getMaxAmmount(),
       myTransactions.find(({ status, type }) =>
@@ -114,7 +110,7 @@ function OraclesActions() {
     if (!tokenAmount) {
       return setError(t("my-oracles:errors.amount-higher-0"));
     }
-    const isChecked = !needsApproval();
+    const isChecked = wallet?.isApprovedSettlerToken
     setShow(isChecked);
     setError(!isChecked ? t("my-oracles:errors.approve-transactions") : "")
   }
@@ -149,7 +145,7 @@ function OraclesActions() {
 
   function approveSettlerToken() {
     if (!wallet?.address && !beproServiceStarted) return;
-    handleApproveToken(undefined, tokenAmount).then(updateAllowance);
+    handleApproveTransactionalToken().then(updateIsApprovedSettlerToken)
   }
 
   function getCurrentLabel(): TransactionCurrency {
@@ -161,9 +157,10 @@ function OraclesActions() {
 
   function getMaxAmmount(): number {
     return (
-      action === t("my-oracles:actions.lock.label") ?
-        wallet?.balance?.bepro :
-      +wallet?.balance?.oracles?.locked
+      (action === t("my-oracles:actions.lock.label") &&
+        wallet?.balance?.bepro) ||
+      +wallet?.balance?.oracles?.tokensLocked -
+        +wallet?.balance?.oracles?.delegatedToOthers
     );
   }
 
@@ -176,17 +173,6 @@ function OraclesActions() {
       ? TransactionTypes.lock
       : TransactionTypes.unlock;
   }
-
-  function updateAllowance() {
-    BeproService.getAllowance().then(setNetworkTokenAllowance).catch(console.log);
-  }
-
-  const needsApproval = () => tokenAmount > networkTokenAllowance && action === t("my-oracles:actions.lock.label");
-
-  useEffect(() => {
-    if (wallet?.address && beproServiceStarted) 
-      updateAllowance();
-  }, [wallet, beproServiceStarted]);
 
   return (
     <>
@@ -204,7 +190,7 @@ function OraclesActions() {
           </p>
 
           <InputNumber
-            disabled={!wallet?.address}
+            disabled={!wallet.isApprovedSettlerToken || !wallet?.address}
             label={t("my-oracles:fields.amount.label", {
               currency: getCurrentLabel()
             })}
@@ -250,11 +236,11 @@ function OraclesActions() {
             <div className="mt-5 d-grid gap-3">
               {action === t("my-oracles:actions.lock.label") && (
                 <Button
-                  disabled={!needsApproval()}
+                  disabled={wallet.isApprovedSettlerToken}
                   className="ms-0 read-only-button"
                   onClick={approveSettlerToken}
                 >
-                  {!needsApproval() && (
+                  {wallet.isApprovedSettlerToken && (
                     <LockedIcon width={12} height={12} className="mr-1" />
                   )}
                   <span>

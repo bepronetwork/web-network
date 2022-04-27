@@ -8,14 +8,14 @@ import { useRepos } from "contexts/repos";
 
 export default function ReposDropdown({ onSelected = (opt: { value }) => {} }) {
   const { repoList } = useRepos();
-  const [options, setOptions] = useState<{ value: { id: string, path: string }; label: string }[]>();
+  const [options, setOptions] = useState<{ value: string; label: string }[]>();
   const { t } = useTranslation("common");
 
   function loadReposFromBackend() {
     if (!repoList) return;
 
     function mapRepo({ id: value, githubPath: label }) {
-      return { value: { id: value, path: label }, label };
+      return { value, label };
     }
 
     setOptions(repoList.map(mapRepo));

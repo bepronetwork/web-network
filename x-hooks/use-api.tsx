@@ -2,7 +2,7 @@ import axios from "axios";
 import { head } from "lodash";
 import getConfig from "next/config";
 
-import { PastEventsParams, User } from "interfaces/api";
+import { User } from "interfaces/api-response";
 import { BranchInfo, BranchsList } from "interfaces/branchs-list";
 import { IssueData, pullRequest } from "interfaces/issue-data";
 import { INetwork } from "interfaces/network";
@@ -11,9 +11,6 @@ import { Proposal } from "interfaces/proposal";
 import { ReposList } from "interfaces/repos-list";
 
 import client from "services/api";
-
-import { Entities, Events } from "types/dappkit";
-
 const { publicRuntimeConfig } = getConfig()
 interface Paginated<T = any> {
   count: number;
@@ -27,13 +24,6 @@ interface NewIssueParams {
   creatorAddress: string;
   creatorGithub: string;
   repository_id: string;
-}
-
-interface CreateBounty {
-  title: string;
-  body: string;
-  creator: string;
-  repositoryId: string;
 }
 
 const repoList: ReposList = [];
@@ -140,20 +130,6 @@ export default function useApi() {
       .catch(() => null);
   }
 
-  /**
-   * Ping the API to create an issue on Github, if succeed returns the CID (Repository ID on database + Issue ID on Github)
-   * @param payload
-   * @param networkName 
-   * @returns string
-   */
-  async function createPreBounty(payload: CreateBounty,
-                                 networkName = publicRuntimeConfig.networkConfig.networkName): Promise<string> {
-    return client
-        .post("/bounty", { ...payload, networkName })
-        .then(({ data }) => data)
-        .catch((error) => error);
-  }
-
   async function moveIssueToOpen(scIssueId?: string) {
     return client
       .post("/past-events/move-to-open", { scIssueId })
@@ -186,47 +162,18 @@ export default function useApi() {
       .catch(() => null);
   }
 
-  async function createPrePullRequest(repoId: string,
-                                      githubId: string,
-                                      payload: {
+  async function createPullRequestIssue(repoId: string,
+                                        githubId: string,
+                                        payload: {
       title: string;
       description: string;
       username: string;
       branch: string;
     },
-                                      networkName = publicRuntimeConfig.networkConfig.networkName) {
+                                        networkName = publicRuntimeConfig.networkConfig.networkName) {
     return client
       .post("/pull-request/", { ...payload, repoId, githubId, networkName })
-      .then(({ data }) => data)
-      .catch((error) => {
-        throw error;
-      });
-  }
-
-  async function cancelPrePullRequest({
-    repoId, 
-    issueGithubId, 
-    bountyId,
-    issueCid, 
-    pullRequestGithubId,
-    customNetworkName,
-    creator,
-    userBranch,
-    userRepo
-  }) {
-    return client
-      .delete("/pull-request/", {
-        data: { repoId, 
-                issueGithubId, 
-                bountyId,
-                issueCid, 
-                pullRequestGithubId,
-                customNetworkName,
-                creator,
-                userBranch,
-                userRepo }
-      })
-      .then(({ data }) => data)
+      .then(() => true)
       .catch((error) => {
         throw error;
       });
@@ -363,16 +310,6 @@ export default function useApi() {
     return client.post(`/past-events/${eventName}/`, {
       fromBlock,
       id,
-      ...params,
-      networkName
-    });
-  }
-
-  async function pastEventsV2(entity: Entities, 
-                              event: Events, 
-                              networkName: string = publicRuntimeConfig.networkConfig.networkName,
-                              params: PastEventsParams = {}) {
-    return client.post(`/past-events/v2/${entity}/${event}`, {
       ...params,
       networkName
     });
@@ -594,7 +531,7 @@ export default function useApi() {
     if(comparedToken) params.vs_currencies = comparedToken
 
     try {
-      const { data } = await axios.get(`${publicRuntimeConfig.currency.apiUrl}/simple/price`, {
+      const { data } = await axios.get(`${publicRuntimeConfig.currency.apiUrl}/simple/price`,{
         params
       });
 
@@ -616,7 +553,7 @@ export default function useApi() {
   return {
     createIssue,
     createNetwork,
-    createPrePullRequest,
+    createPullRequestIssue,
     createRepo,
     createReviewForPR,
     getAllUsers,
@@ -655,9 +592,6 @@ export default function useApi() {
     userHasPR,
     waitForClose,
     waitForMerge,
-    waitForRedeem,
-    createPreBounty,
-    cancelPrePullRequest,
-    pastEventsV2
+    waitForRedeem
   };
 }

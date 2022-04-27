@@ -65,7 +65,7 @@ function OraclesDelegate() {
   const isButtonDisabled = (): boolean =>
     [
       tokenAmount < 1,
-      tokenAmount > +wallet?.balance?.oracles?.locked,
+      tokenAmount > +wallet?.balance?.oracles?.tokensLocked,
       !delegatedTo,
       isAddressesEqual(),
       myTransactions.find(({ status, type }) =>
@@ -80,7 +80,8 @@ function OraclesDelegate() {
   useEffect(() => {
     if (!beproServiceStarted || !wallet?.balance) return;
 
-    setAvailableAmount(+wallet?.balance?.oracles?.locked);
+    setAvailableAmount(+wallet?.balance?.oracles?.tokensLocked -
+        wallet?.balance?.oracles?.delegatedToOthers);
   }, [beproServiceStarted, wallet?.balance]);
 
   return (

@@ -6,8 +6,6 @@ export interface Proposal {
   issueId?: number;
   pullRequestId?: number;
   scMergeId: string;
-  contractId?: number;
-  creator?: string;
 }
 
 export interface INetworkProposal {
@@ -26,5 +24,4 @@ export interface IDistribuitonPerUser {
   address: string;
   oracles: string;
   percentage: number;
-  distributedAmount?: number;
 }

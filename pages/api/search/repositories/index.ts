@@ -1,8 +1,7 @@
+import models from "db/models";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op, WhereOptions } from "sequelize";
-
-import models from "db/models";
 
 import paginate, { calculateTotalPages } from "helpers/paginate";
 
@@ -32,8 +31,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     whereCondition.network_id = network.id;
   }
 
-  const repositories = 
-    await models.repositories.findAndCountAll(paginate({ where: whereCondition, nest: true }, req.query, []));
+  const repositories = await models.repositories.findAndCountAll(paginate({ where: whereCondition, nest: true }, req.query, []));
 
   return res.status(200).json({
     ...repositories,
