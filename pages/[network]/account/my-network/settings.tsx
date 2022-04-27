@@ -39,7 +39,7 @@ import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
 import useOctokit from "x-hooks/use-octokit";
 
-const { publicRuntimeConfig } = getConfig?.()
+const { publicRuntimeConfig } = getConfig()
 interface NetworkAmounts {
   tokenStaked: number;
   oraclesStaked: number;
@@ -252,7 +252,7 @@ export default function Settings() {
           .map(({ name, fullName }) => ({ name, fullName }))),
       creator: wallet?.address,
       githubLogin: user?.login,
-      networkAddress: network.networkAddress,
+      networkAddress: network?.networkAddress,
       accessToken: user?.accessToken
     };
 
@@ -369,7 +369,7 @@ export default function Settings() {
   }, [BeproService.isStarted, network, wallet?.address, user?.login]);
 
   useEffect(() => {
-    const networkData = newInfo.network.data;
+    const networkData = newInfo?.network?.data;
 
     if (networkData.colors?.data?.primary) {
       const similarColors = [];
