@@ -6,6 +6,7 @@ import {
   useState
 } from "react";
 
+import getConfig from "next/config";
 import { useRouter } from "next/router";
 import { parseCookies, setCookie } from "nookies";
 import sanitizeHtml from "sanitize-html";
@@ -27,13 +28,13 @@ import { updateTransaction } from "contexts/reducers/update-transaction";
 import { handleNetworkAddress } from "helpers/custom-network";
 
 import { ApplicationState } from "interfaces/application-state";
-import { NetworkIds } from "interfaces/enums/network-ids";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { ReduceActor } from "interfaces/reduce-action";
 
 import { BeproService } from "services/bepro-service";
 
 
+import { changeNetworkId } from "./reducers/change-network-id";
 import { changeStakedState } from "./reducers/change-staked-amount";
 
 interface GlobalState {
@@ -68,6 +69,7 @@ const defaultState: GlobalState = {
     microServiceReady: null,
     myTransactions: [],
     network: "",
+    networkId: null,
     githubLogin: "",
     accessToken: "",
     isTransactionalTokenApproved: false,
@@ -82,6 +84,7 @@ const defaultState: GlobalState = {
 };
 
 export const ApplicationContext = createContext<GlobalState>(defaultState);
+const { publicRuntimeConfig } = getConfig()
 
 const cheatAddress = "";
 let waitingForTx = null;
@@ -113,7 +116,8 @@ export default function ApplicationContextProvider({ children }) {
     if (!window.ethereum) return;
 
     window.ethereum.on("chainChanged", (evt) => {
-      dispatch(changeNetwork((NetworkIds[+evt?.toString()] || "unknown")?.toLowerCase()));
+      dispatch(changeNetworkId(+evt?.toString()));
+      dispatch(changeNetwork((publicRuntimeConfig.networkIds[+evt?.toString()] || "unknown")?.toLowerCase()));
     });
 
     if (txListener) clearInterval(txListener);

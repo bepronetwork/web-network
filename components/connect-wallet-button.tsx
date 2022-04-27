@@ -12,7 +12,7 @@ import Modal from "components/modal";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 
-import { NetworkColors } from "interfaces/enums/network-ids";
+import { NetworkColors } from "interfaces/enums/network-colors";
 const { publicRuntimeConfig } = getConfig()
 
 

@@ -10,29 +10,32 @@ import { ApplicationContext } from "contexts/application";
 
 import { NETWORKS } from "helpers/networks";
 
-import { NetworkColors } from "interfaces/enums/network-ids";
+import { NetworkColors } from "interfaces/enums/network-colors";
 
 import Button from "./button";
-const { publicRuntimeConfig } = getConfig()
-export default function WrongNetworkModal({ requiredNetwork = "" }) {
+const { networkIds, metaMask  } = getConfig().publicRuntimeConfig
+
+export default function WrongNetworkModal({ requiredNetworkId = null }: {
+  requiredNetworkId: number
+}) {
   const [isAddingNetwork, setIsAddingNetwork] = useState(false);
   const { t } = useTranslation("common");
 
   const {
-    state: { network: activeNetwork }
+    state: { networkId: activeNetworkId }
   } = useContext(ApplicationContext);
 
   function showModal() {
     return (
-      !!activeNetwork &&
-      !!requiredNetwork &&
-      activeNetwork.toLocaleLowerCase() !== requiredNetwork.toLocaleLowerCase()
+      !!activeNetworkId &&
+      !!requiredNetworkId &&
+      +activeNetworkId !== +requiredNetworkId
     );
   }
 
   async function handleAddNetwork() {
     setIsAddingNetwork(true);
-    const chainId = `0x${Number(publicRuntimeConfig.metaMask.chainId).toString(16)}`;
+    const chainId = `0x${Number(metaMask.chainId).toString(16)}`;
     const currencyNetwork = NETWORKS[chainId];
     try {
       await window.ethereum.request({
@@ -80,8 +83,8 @@ export default function WrongNetworkModal({ requiredNetwork = "" }) {
       <div className="d-flex flex-column text-center align-items-center">
         <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
           {t("modals.wrong-network.please-connect")}{" "}
-          <span style={{ color: NetworkColors[requiredNetwork] }}>
-            <span>{requiredNetwork}</span> {t("modals.wrong-network.network")}
+          <span style={{ color: NetworkColors[networkIds[requiredNetworkId]] }}>
+            <span>{networkIds[requiredNetworkId]}</span> {t("modals.wrong-network.network")}
           </span>
           <br /> {t("modals.wrong-network.on-your-wallet")}
         </strong>
