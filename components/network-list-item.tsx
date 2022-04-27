@@ -80,7 +80,7 @@ export default function NetworkListItem({
       })
       .then((amount) => {
         BeproService.getNetworkObj(handleNetworkAddress(network)).then((networkObj) => {
-          getCurrencyByToken(publicRuntimeConfig.currency.currencyId, 'usd').then(({ usd }) => {
+          getCurrencyByToken(publicRuntimeConfig?.currency.currencyId, 'usd').then(({ usd }) => {
             dispatch(changeNetworksSummary({
                     label: "amountInNetwork",
                     amount: amount * usd,
@@ -97,9 +97,9 @@ export default function NetworkListItem({
       <div className="col-3">
         <div className="d-flex flex-row align-items-center gap-20">
           <NetworkLogo
-            src={`${publicRuntimeConfig.ipfsUrl}/${network?.logoIcon}`}
+            src={`${publicRuntimeConfig?.ipfsUrl}/${network?.logoIcon}`}
             alt={`${network?.name} logo`}
-            isBepro={network?.name === publicRuntimeConfig.networkConfig.networkName}
+            isBepro={network?.name === publicRuntimeConfig?.networkConfig?.networkName}
           />
 
           <span className="caption-medium text-white">{network?.name}</span>
