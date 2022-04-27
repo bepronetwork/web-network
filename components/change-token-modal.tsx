@@ -68,7 +68,7 @@ export default function ChangeTokenModal({
   }
 
   function handleConfirm() {
-    if (!(isValidAddress === true)) return;
+    if (isValidAddress !== true) return;
 
     const token = { address, name, symbol };
     
