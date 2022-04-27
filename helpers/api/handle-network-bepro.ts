@@ -1,4 +1,4 @@
-import { Network, Web3Connection } from "@taikai/dappkit";
+import { Network, Web3Connection, Network_v2 } from "@taikai/dappkit";
 import getConfig from "next/config";
 
 const { publicRuntimeConfig, serverRuntimeConfig } = getConfig()
@@ -7,12 +7,14 @@ export default function networkBeproJs({
   web3Connection = publicRuntimeConfig.web3ProviderConnection,
   privateKey = serverRuntimeConfig.walletPrivateKey,
   contractAddress = publicRuntimeConfig.contract.address,
-  debug = false
+  debug = false,
+  version = 1
 }: {
   web3Connection?: string;
   privateKey?: string;
   contractAddress?: string;
   debug?: boolean;
+  version?: number;
 }) {
   const bepro = new Web3Connection({
     web3Host: web3Connection,
@@ -20,5 +22,7 @@ export default function networkBeproJs({
     debug
   });
 
-  return new Network(bepro, contractAddress);
+  if (version === 1) return new Network(bepro, contractAddress);
+
+  return new Network_v2(bepro, contractAddress);
 }

@@ -3,9 +3,9 @@ import { Fragment, useEffect, useState } from "react";
 import { addSeconds } from "date-fns";
 import { useTranslation } from "next-i18next";
 
-import { formatDate, getTimeDifferenceInWords } from "helpers/formatDate";
+import { useNetwork } from "contexts/network";
 
-import { BeproService } from "services/bepro-service";
+import { formatDate, getTimeDifferenceInWords } from "helpers/formatDate";
 
 export default function IssueProposalProgressBar({
   isFinalized = false,
@@ -17,7 +17,7 @@ export default function IssueProposalProgressBar({
 }) {
   const [stepColor, setStepColor] = useState<string>("");
   const [currentStep, setCurrentStep] = useState<number>();
-  const [redeemTime, setRedeemTime] = useState(0);
+  const { activeNetwork } = useNetwork();
   const { t } = useTranslation(["common", "bounty"]);
   const steps = [
     t("bounty:steps.draft"),
@@ -62,11 +62,14 @@ export default function IssueProposalProgressBar({
   function renderSecondaryText(stepLabel, index) {
     const secondaryTextStyle = { top: "20px" };
 
+    const isHigher = new Date() > addSeconds(creationDate, activeNetwork?.draftTime || 0);
+
     const item = {
       Warning: {
         text: t("bounty:status.until-done", {
-          distance: getTimeDifferenceInWords(addSeconds(creationDate, redeemTime),
-                                             new Date())
+          distance: isHigher ? '0 seconds' 
+            : getTimeDifferenceInWords(addSeconds(creationDate, activeNetwork?.draftTime || 0),
+                                       new Date())
         }),
         color: "warning",
         bgColor: "warning-opac-25"
@@ -168,11 +171,6 @@ export default function IssueProposalProgressBar({
     mergeProposalAmount,
     isFinished
   ]);
-  useEffect(() => {
-    BeproService.getRedeemTime()
-      .then((time) => setRedeemTime(time))
-      .catch((error) => console.log("Failed to get redeem time:", error));
-  }, []);
 
   return (
     <div className="container">

@@ -7,13 +7,12 @@ import LockedIcon from "assets/icons/locked-icon";
 
 import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
+import { useNetwork } from "contexts/network";
 import { useRepos } from "contexts/repos";
 
 import sumObj from "helpers/sumObj";
 
 import { pullRequest } from "interfaces/issue-data";
-
-import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
@@ -101,11 +100,11 @@ export default function NewProposal({
   ]);
 
   const [show, setShow] = useState<boolean>(false);
-  const [isCouncil, setIsCouncil] = useState(false);
   const [error, setError] = useState<boolean>(false);
   const [distrib, setDistrib] = useState<object>({});
   const [success, setSuccess] = useState<boolean>(false);
   const [warning, setWarning] = useState<boolean>(false);
+  const [executing, setExecuting] = useState<boolean>(false);
   const [currentGithubId, setCurrentGithubId] = useState<string>();
   const [participants, setParticipants] = useState<participants[]>([]);
   const [showExceptionalMessage, setShowExceptionalMessage] =
@@ -115,13 +114,14 @@ export default function NewProposal({
   const { activeRepo } = useRepos();
   const { wallet, beproServiceStarted } = useAuthentication();
 
-  const { handleRecognizeAsFinished, handleProposeMerge } = useBepro({onSuccess})
+  const { handleProposeMerge } = useBepro({onSuccess})
   const { updateIssue, activeIssue, networkIssue } = useIssue()
   const { getParticipants } = useOctokit();
-  const { getUserWith } = useApi();
+  const { getUserWith, pastEventsV2 } = useApi();
+  const { activeNetwork } = useNetwork();
 
   function onSuccess(){
-    updateIssue(activeIssue.repository.id,activeIssue.githubId)
+    updateIssue(activeIssue.repository.id, activeIssue.githubId)
   }
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
@@ -163,12 +163,12 @@ export default function NewProposal({
         }))
       };
 
-      const currentProposals = networkIssue?.networkProposals?.map((item) => {
+      const currentProposals = networkIssue?.proposals?.map((item) => {
         return {
-          currentPrId: Number(activeIssue?.mergeProposals.find(mp=> mp.scMergeId === item._id).pullRequestId),
-          prAddressAmount: item.prAddresses.map((value, key) => ({
-            amount: Number(item.prAmounts[key]),
-            address: value.toLowerCase()
+          currentPrId: Number(activeIssue?.mergeProposals.find(mp=> +mp.scMergeId === item.id).pullRequestId),
+          prAddressAmount: item.details.map(detail => ({
+            amount: Number(detail.percentage),
+            address: detail.recipient
           }))
         };
       });
@@ -256,27 +256,31 @@ export default function NewProposal({
   }
 
   async function handleClickCreate(): Promise<void> {
-    function handleValues(amount, distributed) {
-      return Math.floor((amount * distributed) / 100);
-    }
-
     const prAddresses: string[] = [];
     const prAmounts: number[] = [];
 
     participants.map((items) => {
-      if (handleValues(amountTotal, distrib[items.githubHandle]) > 0) {
+      if (distrib[items.githubHandle] > 0) {
         prAddresses.push(items.address);
-        prAmounts.push(handleValues(amountTotal, distrib[items.githubHandle]));
+        prAmounts.push(distrib[items.githubHandle]);
       }
     });
 
-    //Chcking diff between total Distributed and total Ammount;
-    const totalDistributed = prAmounts.reduce((p, c) => p + c);
-    // Assigning the rest to last participant;
-    prAmounts[prAmounts.length - 1] += Math.ceil(amountTotal - totalDistributed);
+    setExecuting(true);
 
-    handleProposeMerge(currentPullRequest.githubId, prAddresses, prAmounts)
-    .finally(handleClose)
+    handleProposeMerge(+networkIssue.id, +currentPullRequest.contractId, prAddresses, prAmounts)
+    .then(txInfo => {
+      const { blockNumber: fromBlock } = txInfo as any;
+
+      return pastEventsV2("proposal", "created", activeNetwork?.name, { fromBlock });
+    })
+    .then(() => {
+      onSuccess();
+    })
+    .finally(() => {
+      handleClose();
+      setExecuting(false);
+    })
   }
 
   function handleClose() {
@@ -299,30 +303,6 @@ export default function NewProposal({
     handleInputColor("normal");
   }
 
-  function recognizeAsFinished() {
-    handleRecognizeAsFinished().then(()=>{
-      updateIssue(activeIssue.repository.id, activeIssue.githubId)
-    })
-  }
-
-  function updateCreateProposalHideState() {
-    if (!beproServiceStarted) return;
-
-    BeproService.network
-      .COUNCIL_AMOUNT()
-      .then(() => BeproService.network.isCouncil(wallet?.address))
-      .then((isCouncil) => setIsCouncil(isCouncil));
-  }
-
-  function renderRecognizeAsFinished() {
-    return (
-      <ReadOnlyButtonWrapper>
-        <Button onClick={recognizeAsFinished} className="read-only-button">
-          {t("bounty:actions.recognize-finished.title")}
-        </Button>
-      </ReadOnlyButtonWrapper>
-    );
-  }
   const cantBeMergeable = () =>
     !currentPullRequest.isMergeable || currentPullRequest.merged;
 
@@ -335,18 +315,17 @@ export default function NewProposal({
     }
   }, [pullRequests, activeRepo, beproServiceStarted]);
 
-  useEffect(updateCreateProposalHideState, [wallet?.address]);
-
   return (
     <div className="d-flex">
-      {(isCouncil && isFinished && (
+      {(wallet?.isCouncil && isFinished && (
         <ReadOnlyButtonWrapper>
           <Button className="read-only-button" onClick={() => setShow(true)}>
             {t("proposal:actions.create")}
           </Button>
         </ReadOnlyButtonWrapper>
       )) ||
-        (isIssueOwner && !isFinished && renderRecognizeAsFinished())}
+        <></>}
+        {/* (isIssueOwner && !isFinished && renderRecognizeAsFinished())} */}
       <Modal
         show={show}
         title={t("proposal:actions.new")}
@@ -360,15 +339,22 @@ export default function NewProposal({
                 !wallet?.address ||
                 participants.length === 0 ||
                 !success ||
+                executing ||
                 cantBeMergeable()
               }
             >
               {!wallet?.address ||
                 participants.length === 0 ||
+                executing ||
                 (!success && (
                   <LockedIcon width={12} height={12} className="mr-1" />
                 ))}
               <span>{t("proposal:actions.create")}</span>
+              {executing ? (
+              <span className="spinner-border spinner-border-xs ml-1" />
+            ) : (
+              ""
+            )}
             </Button>
 
             <Button color="dark-gray" onClick={handleClose}>

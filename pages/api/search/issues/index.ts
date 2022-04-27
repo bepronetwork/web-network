@@ -1,8 +1,9 @@
 import { subHours, subMonths, subWeeks, subYears } from "date-fns";
-import models from "db/models";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op, WhereOptions } from "sequelize";
+
+import models from "db/models";
 
 import paginate, { calculateTotalPages, paginateArray } from "helpers/paginate";
 import { searchPatternInText } from "helpers/string";
@@ -80,7 +81,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       ...(pullRequester ? { where: { githubLogin: pullRequester } } : {})
     },
     { association: "mergeProposals" },
-    { association: "repository" }
+    { association: "repository" },
+    { association: "token" }
   ];
 
   if (search) {

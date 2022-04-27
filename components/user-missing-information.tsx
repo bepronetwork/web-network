@@ -4,12 +4,18 @@ import { Spinner } from "react-bootstrap";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
+import Button from "components/button";
+import Modal from "components/modal";
+
 import { ApplicationContext } from "contexts/application";
+import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { changeGithubHandle } from "contexts/reducers/change-github-handle";
 import { updateTransaction } from "contexts/reducers/update-transaction";
+
+import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 
@@ -18,15 +24,13 @@ import { BeproService } from "services/bepro-service";
 import useApi from "x-hooks/use-api";
 import useTransactions from "x-hooks/useTransactions";
 
-import Button from "./button";
-import Modal from "./modal";
 
 export default function UserMissingModal({ show }: { show: boolean }) {
   const [isVisible, setVisible] = useState<boolean>(show);
   const {
-    dispatch,
-    state: { currentAddress, githubLogin }
+    dispatch
   } = useContext(ApplicationContext);
+  const { wallet, user } = useAuthentication();
   const { removeUser } = useApi();
   const router = useRouter();
   const { t } = useTranslation("common");
@@ -37,8 +41,10 @@ export default function UserMissingModal({ show }: { show: boolean }) {
   const { activeNetwork } = useNetwork();
 
   function handleReconnectAcount() {
+    if (!wallet?.address || !user?.login) return;
+
     setLoadingReconnect(true);
-    removeUser(currentAddress, githubLogin)
+    removeUser(wallet.address, user.login)
       .then(() => {
         dispatch(changeGithubHandle(""));
         router
@@ -57,8 +63,9 @@ export default function UserMissingModal({ show }: { show: boolean }) {
   }
 
   function handleUnlockAll() {
-    BeproService.network
-      .getOraclesByAddress(currentAddress)
+    if (!wallet?.address || !user?.login) return;
+
+    BeproService.getOraclesOf(wallet.address)
       .then((value) => {
         setLoadingUnlock(true);
 
@@ -71,7 +78,7 @@ export default function UserMissingModal({ show }: { show: boolean }) {
         dispatch(tmpTransaction);
 
         BeproService.network
-          .unlock(value, currentAddress)
+          .unlock(value)
           .then((answer) => {
             if (answer.status) {
               setError(false);
@@ -82,7 +89,7 @@ export default function UserMissingModal({ show }: { show: boolean }) {
               }));
 
               txWindow.updateItem(tmpTransaction.payload.id,
-                                  BeproService.parseTransaction(answer, tmpTransaction.payload));
+                                  parseTransaction(answer, tmpTransaction.payload));
             } else {
               dispatch(addToast({
                   type: "danger",

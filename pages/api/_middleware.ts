@@ -3,7 +3,7 @@ import { getToken } from 'next-auth/jwt'
 import type { NextFetchEvent } from 'next/server'
 import { NextResponse } from 'next/server'
 
-const whiteList=['auth']
+const whiteList=['auth', 'past-events']
 
 export async function middleware(req: NextApiRequest, ev: NextFetchEvent) {
   const method = req.method
@@ -15,5 +15,5 @@ export async function middleware(req: NextApiRequest, ev: NextFetchEvent) {
       status: 401,
     })
   }
-  return NextResponse.next()
+  return NextResponse.next();
 }

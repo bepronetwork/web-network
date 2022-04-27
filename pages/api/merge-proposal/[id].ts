@@ -1,6 +1,7 @@
-import models from "db/models";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
+
+import models from "db/models";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;

@@ -15,9 +15,10 @@ import useBepro from "x-hooks/use-bepro";
 interface Props extends ComponentPropsWithoutRef<"div"> {
   amount: string;
   address: string;
+  delegationId: number;
 }
 
-export default function OraclesTakeBackItem({amount = "", address = ""}: Props) {
+export default function OraclesTakeBackItem({amount = "", address = "", delegationId}: Props) {
   const { t } = useTranslation("common");
 
   const [show, setShow] = useState<boolean>(false);
@@ -35,8 +36,8 @@ export default function OraclesTakeBackItem({amount = "", address = ""}: Props) 
 
   async function takeBack() {
     handleCancel();
-    handleTakeBack(+amount, 'Oracles', address)
-    .then(updateWalletBalance)
+    handleTakeBack(delegationId, +amount, 'Oracles')
+    .then(updateWalletBalance);
   }
 
   return (

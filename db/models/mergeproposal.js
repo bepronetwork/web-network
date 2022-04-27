@@ -11,7 +11,9 @@ class MergeProposal extends Model {
         scMergeId: DataTypes.STRING,
         issueId: DataTypes.INTEGER,
         pullRequestId: DataTypes.INTEGER,
-        githubLogin: DataTypes.STRING
+        githubLogin: DataTypes.STRING,
+        contractId: DataTypes.INTEGER,
+        creator: DataTypes.STRING,
     },
                {
         sequelize,

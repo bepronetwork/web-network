@@ -19,7 +19,11 @@ class Network extends Model {
           defaultValue: false
         },
         createdAt: DataTypes.DATE,
-        updatedAt: DataTypes.DATE
+        updatedAt: DataTypes.DATE,
+        allowCustomTokens: {
+          type: DataTypes.BOOLEAN,
+          defaultValue: false
+        }
     },
                {
         sequelize,
@@ -36,6 +40,7 @@ class Network extends Model {
       foreignKey: "network_id",
       sourceKey: "id"
     });
+    this.belongsToMany(models.tokens, { through: 'network_tokens' });
   }
 }
 

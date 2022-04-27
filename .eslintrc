@@ -60,11 +60,13 @@
           ["/^assets/"],
           ["/^components/"],
           ["/^contexts/"],
+          ["/^db/"],
           ["/^helpers/"],
           ["/^interfaces/"],
           ["/^pages/"],
           ["/^services/"],
           ["/^styles/"],
+          ["/^types/"],
           ["/^x-hooks/"],
           ["parent", "sibling", "index"]
         ],

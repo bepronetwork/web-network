@@ -8,6 +8,8 @@ import PageHero, { IInfosHero } from "components/page-hero";
 
 import { useAuthentication } from "contexts/authentication";
 
+import { handleNetworkAddress } from "helpers/custom-network";
+
 import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
@@ -39,9 +41,9 @@ export default function Oracle({ children }) {
     if (!beproServiceStarted || !activeNetwork) return;
 
     const [closed, inProgress, onNetwork, totalUsers] = await Promise.all([
-      BeproService.getClosedIssues(activeNetwork.networkAddress),
-      BeproService.getOpenIssues(activeNetwork.networkAddress),
-      BeproService.getTokensStaked(activeNetwork.networkAddress),
+      BeproService.getClosedBounties(handleNetworkAddress(activeNetwork)),
+      BeproService.getOpenBounties(handleNetworkAddress(activeNetwork)),
+      BeproService.getTotalSettlerLocked(handleNetworkAddress(activeNetwork)),
       getTotalUsers()
     ]);
 

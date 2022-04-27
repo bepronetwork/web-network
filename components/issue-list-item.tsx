@@ -29,7 +29,7 @@ export default function IssueListItem({
 }) {
   const router = useRouter();
   const { activeNetwork } = useNetwork();
-  const { t } = useTranslation("bounty");
+  const { t } = useTranslation(["bounty", "common"]);
 
   function handleReviewsPr(pullRequests: pullRequest[]) {
     let numberAllReviewers = 0;
@@ -48,9 +48,7 @@ export default function IssueListItem({
           {(issue != null && issue?.mergeProposals?.length) || 0}
         </span>
         <span className="caption-small text-white-40 text-uppercase">
-          {issue?.mergeProposals?.length === 1
-            ? t("info.proposals_one")
-            : t("info.proposals_other")}
+          {t("info.proposals", { count: issue?.mergeProposals?.length})}
         </span>
       </div>
     );
@@ -63,9 +61,7 @@ export default function IssueListItem({
           {(issue != null && handleReviewsPr(issue?.pullRequests)) || 0}
         </span>
         <span className="caption-small text-white-40 text-uppercase">
-          {handleReviewsPr(issue?.pullRequests) === 1
-            ? t("info.reviews_one")
-            : t("info.reviews_other")}
+          {t("info.reviews", { count: handleReviewsPr(issue?.pullRequests)})}
         </span>
       </div>
     );
@@ -100,9 +96,7 @@ export default function IssueListItem({
               {(issue != null && issue.pullRequests?.length) || 0}
             </span>
             <span className="caption-small text-white-40 text-uppercase">
-              {issue?.pullRequests?.length === 1
-                ? t("info.pull-requests_one")
-                : t("info.pull-requests_other")}
+              {t("info.pull-requests", { count: issue?.pullRequests?.length})}
             </span>
           </div>
           {state?.toLowerCase() === "ready"
@@ -205,7 +199,7 @@ export default function IssueListItem({
           <span className="caption-large text-white text-opacity-1">
             {formatNumberToNScale(issue?.amount || 0)}{" "}
             <label className="text-uppercase text-primary">
-              <Translation label={"$bepro"} />
+              {issue?.token?.symbol || t("common:misc.token")}
             </label>
           </span>
           {(issue?.developers?.length > 0 && (

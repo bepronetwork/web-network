@@ -1,5 +1,6 @@
-import models from "db/models";
 import { NextApiRequest, NextApiResponse } from "next";
+
+import models from "db/models";
 
 import networkBeproJs from "helpers/api/handle-network-bepro";
 

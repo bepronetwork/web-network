@@ -1,4 +1,5 @@
 import { signIn, signOut } from "next-auth/react";
+import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
@@ -12,6 +13,7 @@ import Modal from "components/modal";
 import { truncateAddress } from "helpers/truncate-address";
 
 export default function InvalidAccountWalletModal({ user, wallet, isVisible }) {
+  const { t } = useTranslation("common");
   const { asPath } = useRouter();
 
   async function handleSubmit() {
@@ -27,13 +29,12 @@ export default function InvalidAccountWalletModal({ user, wallet, isVisible }) {
       centerTitle
       size="lg"
       show={isVisible}
-      title={"Github Account and Wallet don't match"}
+      title={t("modals.invalid-account-wallet.title")}
     >
       <div>
         <div className="d-flex justify-content-center mb-2 mx-2 text-center flex-column mb-4">
           <p className="caption-small text-gray">
-            Login to the Github account previously associated to this wallet or
-            change to the correct wallet for this account.
+          {t("modals.invalid-account-wallet.description")}
           </p>
         </div>
 
@@ -71,7 +72,7 @@ export default function InvalidAccountWalletModal({ user, wallet, isVisible }) {
 
         <div className="d-flex justify-content-center mt-3">
           <Button color="primary" onClick={handleSubmit}>
-            <span>Connect</span>
+            <span>{t("actions:connect")}</span>
           </Button>
         </div>
       </div>

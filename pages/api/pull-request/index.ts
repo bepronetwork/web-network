@@ -1,14 +1,17 @@
-import models from "db/models";
+import { Network_v2 } from "@taikai/dappkit";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
+import models from "db/models";
+
+import networkBeproJs from "helpers/api/handle-network-bepro";
 import paginate from "helpers/paginate";
 
-import api from "services/api";
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
+
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { login, issueId, networkName } = req.query;
   const where = {} as any;
@@ -36,7 +39,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     where.issueId = issue.id;
   }
 
-  const include = [{ association: "issue" }];
+  where.status = {
+    [Op.notIn]: ["pending", "canceled"]
+  };
 
   const prs = await models.pullRequest.findAndCountAll({
     ...paginate({ where }, req.query, [
@@ -97,45 +102,127 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       issueId: issue.id,
       githubId: created.data?.number,
       githubLogin: username,
-      branch
+      branch,
+      status: "pending"
     });
 
-    issue.state = "ready";
-
-    const issueLink = `${publicRuntimeConfig.homeUrl}/bounty?id=${issue?.githubId}&repoId=${issue?.repository_id}`;
-    const body = `@${issue.creatorGithub}, @${username} has a solution - [check your bounty](${issueLink})`;
-    await octoKit.rest.issues.createComment({
-      owner,
-      repo,
-      issue_number: issue.githubId,
-      body
-    });
-
-    await issue.save();
     /*twitterTweet({
       type: 'bounty',
       action: 'solution',
       username: username,
       issue
     })*/
-    await api.post(`/seo/${issue?.issueId}`).catch((e) => {
-      console.log("Error creating SEO", e);
-    });
 
-    return res.json("ok");
+    return res.status(200).json({ 
+      bountyId: issue.contractId,
+      originRepo: repoInfo.githubPath,
+      originBranch: issue.branch,
+      originCID: issue.issueId,
+      userRepo: `${username}/${repo}`,
+      userBranch: branch,
+      cid: created.data?.number 
+    });
   } catch (error) {
     return res.status(error.response.status).json(error.response.data);
   }
 }
 
-async function PullRequest(req: NextApiRequest,
-                           res: NextApiResponse) {
+async function del(req: NextApiRequest, res: NextApiResponse) {
+  const { 
+    repoId: repository_id, 
+    issueGithubId: githubId, 
+    bountyId: contractId, 
+    issueCid: issueId, 
+    pullRequestGithubId, 
+    customNetworkName,
+    creator,
+    userBranch,
+    userRepo
+  } = req.body;
+
+  const customNetwork = await models.network.findOne({
+    where: {
+      name: {
+        [Op.iLike]: String(customNetworkName)
+      }
+    }
+  });
+
+  if (!customNetwork || customNetwork?.isClosed) return res.status(404).json("Invalid");
+
+  const issue = await models.issue.findOne({
+    where: {
+      issueId,
+      network_id: customNetwork.id,
+      contractId,
+      repository_id,
+      githubId
+    },
+    include: [
+      { association: "repository" }
+    ]
+  });
+
+  if (!issue) return res.status(404).json("Invalid");
+
+  const pullRequest = await models.pullRequest.findOne({
+    where: {
+      githubId: String(pullRequestGithubId),
+      githubLogin: creator,
+      branch: userBranch,
+      status: "pending"
+    }
+  });
+
+  if (!pullRequest) return res.status(404).json("Invalid");
+
+  const network = networkBeproJs({
+    contractAddress: customNetwork.name.toLowerCase() === publicRuntimeConfig.networkConfig.networkName.toLowerCase() ? 
+      publicRuntimeConfig.contract.address : customNetwork.networkAddress,
+    version: 2
+  }) as Network_v2;
+
+  await network.start();
+
+  const networkBounty = await network.getBounty(contractId);
+  
+  if (!networkBounty) return res.status(404).json("Invalid");
+
+  const pullRequestNetwork = networkBounty.pullRequests.find(pr => pr.cid ===  +pullRequestGithubId && 
+                                                              pr.userBranch === userBranch && 
+                                                              pr.userRepo === userRepo );
+  
+  if (!pullRequestNetwork)
+    return res.status(404).json("Invalid");
+
+  const octoKit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
+
+  const [owner, repo] = issue.repository.githubPath.split("/");
+
+  await octoKit.rest.pulls.update({
+    owner,
+    repo,
+    pull_number: pullRequestGithubId,
+    state: "closed"
+  });
+
+  await pullRequest.destroy();
+
+  return res.status(200).json("Pull Request Canceled");
+}
+
+async function PullRequest(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
     break;
+
   case "post":
     await post(req, res);
+    break;
+
+  case "delete":
+    await del(req, res);
     break;
 
   default:
@@ -144,4 +231,4 @@ async function PullRequest(req: NextApiRequest,
 
   res.end();
 }
-export default  withCors(PullRequest)
+export default  withCors(PullRequest);
