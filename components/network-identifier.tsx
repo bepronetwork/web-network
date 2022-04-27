@@ -8,8 +8,10 @@ import Indicator from "components/indicator";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { changeNetwork } from "contexts/reducers/change-network";
+import { changeNetworkId } from "contexts/reducers/change-network-id";
 
-import { NetworkColors, NetworkIds } from "interfaces/enums/network-ids";
+import { NetworkColors } from "interfaces/enums/network-colors";
+
 const { publicRuntimeConfig } = getConfig()
 
 export default function NetworkIdentifier() {
@@ -24,8 +26,8 @@ export default function NetworkIdentifier() {
     if (!wallet?.address) return;
 
     const chainId = (window as any)?.ethereum?.chainId;
-
-    dispatch(changeNetwork((NetworkIds[+chainId] || "unknown")?.toLowerCase()));
+    dispatch(changeNetworkId(+chainId));
+    dispatch(changeNetwork((publicRuntimeConfig.networkIds[+chainId] || "unknown")?.toLowerCase()));
   }
 
   useEffect(updateNetwork, [wallet?.address]);

@@ -12,6 +12,7 @@ import { ChangeCurrentAddress } from "./change-current-address";
 import { ChangeGithubHandle } from "./change-github-handle";
 import { ChangeLoadState } from "./change-load-state";
 import { ChangeMyIssuesState } from "./change-my-issues";
+import { ChangeNetworkId } from "./change-network-id";
 import { ChangeNetworksSummary } from "./change-networks-summary";
 import { ChangeOraclesState } from "./change-oracles";
 import { ChangeSettlerTokenApproval } from "./change-settler-token-approval";
@@ -38,6 +39,7 @@ export default function LoadApplicationReducers() {
     AddTransactions,
     UpdateTransaction,
     ChangeNetwork,
+    ChangeNetworkId,
     ChangeGithubLogin,
     ChangeAccessToken,
     ChangeTransactionalTokenApproval,

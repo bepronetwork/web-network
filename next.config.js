@@ -47,6 +47,19 @@ const publicRuntimeConfig = {
     apiUrl: process.env.NEXT_PUBLIC_CURRENCY_API,
     currencyId: process.env.NEXT_PUBLIC_CURRENCY_ID,
     currencyCompareList: process.env.NEXT_PUBLIC_CURRENCY_VSLIST,
+  },
+  networkIds: {
+    1: 'ethereum',
+    42: 'kovan',
+    3: 'ropsten',
+    4: 'rinkeby',
+    5: 'goerli',
+    1285: 'moonriver',
+    1337: 'localhost',
+    1500: 'seneca',
+    1501: 'afrodite',
+    1502: 'irene',
+    1503: 'iris'
   }
 }
 

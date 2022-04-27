@@ -26,6 +26,7 @@ export interface ApplicationState {
     | UpdateBlockTransaction
   )[];
   network: string;
+  networkId: number;
   githubLogin: string;
   accessToken?: string;
   isTransactionalTokenApproved?: boolean;
