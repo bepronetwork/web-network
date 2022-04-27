@@ -14,6 +14,7 @@ interface IPRLabel {
   className?: string;
   hero?: boolean;
   merged?: boolean;
+  needsApproval?: boolean;
   isDraft?: boolean;
   isMergeable?: boolean | null;
 }
@@ -23,6 +24,7 @@ function PullRequestLabels({
   className,
   merged,
   isMergeable,
+  needsApproval = false,
   isDraft = false,
   hero = false
 }: IPRLabel) {
@@ -54,7 +56,8 @@ function PullRequestLabels({
     if (isDraft) return t("status.draft");
     if (merged) return t("status.merged");
     if (isMergeable) return t("status.ready-to-merge");
-    //isMergeable can be null;
+    if (needsApproval) return t("status.needs-approval");
+    
     return t("status.conflicts");
   }
 

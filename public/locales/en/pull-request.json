@@ -45,7 +45,8 @@
     "merged": "Merged",
     "conflicts": "Conflicts",
     "closed": "Closed",
-    "broken-tests": "Broken tests"
+    "broken-tests": "Broken tests",
+    "needs-approval": "Pending approval"
   },
   "errors": {
     "not-found": "No pull requests found",
