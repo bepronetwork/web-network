@@ -1,1 +1,1 @@
-export type Currency = "USD" | "BEPRO" | "ORACLES";
+export type Currency = "USD" | "BEPRO" | "ORACLES" | string;

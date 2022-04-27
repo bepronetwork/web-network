@@ -1,12 +1,15 @@
-import models from "db/models";
 import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
+import getConfig from "next/config";
+const { serverRuntimeConfig } = getConfig()
+
+import models from "db/models";
 
 export default NextAuth({
   providers: [
     GithubProvider({
-      clientId: process.env.NEXT_PUBLIC_GH_CLIENT_ID,
-      clientSecret: process.env.GH_SECRET,
+      clientId: serverRuntimeConfig.github.clientId,
+      clientSecret: serverRuntimeConfig.github.secret,
       authorization:
         "https://github.com/login/oauth/authorize?scope=read:user+user:email+repo",
       profile(profile: { id; name; login; email; avatar_url }) {
@@ -20,11 +23,12 @@ export default NextAuth({
       },
     }),
   ],
+  session:{
+    strategy: "jwt",
+    maxAge: 24 * 60 * 60 // 1 day
+  },
   callbacks: {
     async signIn({ user, account, profile }) {
-      // console.log(`User`, user);
-      // console.log(`Account`, account);
-      // console.log(`Profile`, profile);
       if (!profile?.login) return "/?authError=Profile not found";
 
       const find = await models.user.findOne({

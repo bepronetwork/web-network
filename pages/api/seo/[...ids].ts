@@ -1,11 +1,15 @@
 import axios from "axios";
-import models from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
 import { Op } from "sequelize";
+
+import models from "db/models";
 
 // import { generateCard } from "helpers/seo/create-card-bounty";
 
 // import IpfsStorage from "services/ipfs-service";
+const { publicRuntimeConfig } = getConfig()
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -22,7 +26,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   if (!issue) return res.status(404).json(null);
 
-  const url = `${process.env.NEXT_PUBLIC_IPFS_BASE}/${issue.seoImage}`;
+  const url = `${publicRuntimeConfig.ipfsUrl}/${issue.seoImage}`;
 
   const { data } = await axios.get(url, {
     responseType: "arraybuffer"
@@ -56,7 +60,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   if (!issue) return res.status(404).json(null);
 
-  const [, repo] = issue.repository.githubPath.split("/");
+  //const [, repo] = issue.repository.githubPath.split("/");
 
   // const card = await generateCard({
   //   state: issue.state,
@@ -85,7 +89,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json({ seoImage: 'hash' });
 }
 
-export default async function Seo(req: NextApiRequest, res: NextApiResponse) {
+async function Seo(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
@@ -103,3 +107,4 @@ export default async function Seo(req: NextApiRequest, res: NextApiResponse) {
 
   res.end();
 }
+export default withCors(Seo)

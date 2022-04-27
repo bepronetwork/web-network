@@ -30,8 +30,7 @@ export default function UnlockBeproModal({
   const { wallet, updateWalletBalance } = useAuthentication();
 
   const oraclesAvailable =
-    wallet?.balance?.oracles?.tokensLocked -
-    wallet?.balance?.oracles?.delegatedToOthers;
+    wallet?.balance?.oracles?.locked;
   const textOracleClass =
     amountToUnlock > oraclesAvailable ? "text-danger" : "text-purple";
   const textBeproClass =
@@ -51,8 +50,7 @@ export default function UnlockBeproModal({
   }
 
   function setToMax() {
-    setAmountToUnlock(wallet?.balance?.oracles?.tokensLocked -
-        wallet?.balance?.oracles?.delegatedToOthers);
+    setAmountToUnlock(wallet?.balance?.oracles?.locked);
   }
 
   function handleChange({ floatValue }) {

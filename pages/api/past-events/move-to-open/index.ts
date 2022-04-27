@@ -1,40 +1,50 @@
+import { Network_v2 } from "@taikai/dappkit";
 import { subMilliseconds } from "date-fns";
-import models from "db/models";
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
+
+import models from "db/models";
 
 import networkBeproJs from "helpers/api/handle-network-bepro";
 import twitterTweet from "helpers/api/handle-twitter-tweet";
 
 import api from "services/api";
 
+const { publicRuntimeConfig } = getConfig()
+
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const customNetworks = await models.network.findAll({
     where: {
       name: {
-        [Op.notILike]: `%${process.env.NEXT_PUBLIC_BEPRO_NETWORK_NAME}%`
+        [Op.notILike]: `%${publicRuntimeConfig.networkConfig.networkName
+}%`
       }
     }
   });
 
-  [
+  const networks = [
     {
       id: 1,
-      name: process.env.NEXT_PUBLIC_BEPRO_NETWORK_NAME,
-      networkAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS
+      name: publicRuntimeConfig.networkConfig.networkName
+,
+      networkAddress: publicRuntimeConfig.contract.address,
     },
     ...customNetworks
-  ].forEach(async (customNetwork) => {
+  ];
+
+  for (const customNetwork of networks) {
     if (!customNetwork.name) return;
 
     console.log(`Moving issues of ${customNetwork.name} - ${customNetwork.networkAddress} to OPEN`);
     const network = networkBeproJs({
-      contractAddress: customNetwork.networkAddress
-    });
+      contractAddress: customNetwork.networkAddress,
+      version: 2
+    }) as Network_v2;
 
     await network.start();
-    const redeemTime = (await network.redeemTime()) * 1000;
+    const redeemTime = (await network.draftTime());
 
     const where = {
       createdAt: { [Op.lt]: subMilliseconds(+new Date(), redeemTime) },
@@ -43,7 +53,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     };
 
     const issues = await models.issue.findAll({ where });
-    const octokit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
+    const octokit = new Octokit({ auth: publicRuntimeConfig.github.token });
 
     for (const issue of issues) {
       try {
@@ -64,7 +74,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       console.log(`Moved ${issue.issueId} to open`);
       await issue.save();
 
-      if (network.contractAddress === process.env.NEXT_PUBLIC_CONTRACT_ADDRESS)
+      if (network.contractAddress === publicRuntimeConfig.contract.address)
         twitterTweet({
           type: "bounty",
           action: "changes",
@@ -76,7 +86,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         console.log("Error creating SEO", e);
       });
     }
-  });
+  }
 
   return res.status(200).json("Issues Moved to Open");
 }

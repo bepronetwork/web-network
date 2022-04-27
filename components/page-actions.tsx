@@ -11,6 +11,7 @@ import GithubLink from "components/github-link";
 import IssueAvatars from "components/issue-avatars";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
+import UpdateBountyAmountModal from "components/update-bounty-amount-modal";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
@@ -26,6 +27,7 @@ import { IForkInfo } from "interfaces/repos-list";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
+
 
 interface pageActions {
   issueId: string;
@@ -88,6 +90,7 @@ export default function PageActions({
 
   const [isExecuting, setIsExecuting] = useState(false);
   const [showPRModal, setShowPRModal] = useState(false);
+  const [showUpdateAmount, setShowUpdateAmount] = useState(false);
 
   const {
     dispatch,
@@ -95,10 +98,10 @@ export default function PageActions({
   } = useContext(ApplicationContext);
   const { activeNetwork } = useNetwork();
   const { wallet, user, updateWalletBalance } = useAuthentication();
-  const { handleReedemIssue } = useBepro();
-  const { updateIssue } = useIssue();
+  const { handleReedemIssue, handleCreatePullRequest } = useBepro();
+  const { updateIssue, networkIssue, activeIssue } = useIssue();
 
-  const { createPullRequestIssue, startWorking } = useApi();
+  const { createPrePullRequest, cancelPrePullRequest, startWorking, pastEventsV2 } = useApi();
 
   function renderIssueAvatars() {
     if (developers?.length > 0) return <IssueAvatars users={developers} />;
@@ -165,14 +168,29 @@ export default function PageActions({
     );
   };
 
+  const renderUpdateAmount = () => {
+    if (isIssueinDraft && issueCreator?.toLowerCase() === wallet?.address.toLowerCase() && wallet?.address)
+      return <ReadOnlyButtonWrapper>
+        <Button
+          className="read-only-button me-1"
+          onClick={() => setShowUpdateAmount(true)}
+        >
+          <Translation ns="bounty" label="Update Amount" />
+        </Button>
+      </ReadOnlyButtonWrapper>;
+
+    return <></>;
+  }
+
   function renderProposeDestribution() {
     return (
       !finalized &&
       pullRequests?.length > 0 &&
-      githubLogin && (
+      wallet?.address &&
+      user?.login && (
         <NewProposal
           isFinished={finished}
-          isIssueOwner={issueCreator === wallet?.address}
+          isIssueOwner={issueCreator?.toLowerCase() === wallet?.address.toLowerCase()}
           amountTotal={amountIssue}
           pullRequests={pullRequests}
         />
@@ -189,7 +207,8 @@ export default function PageActions({
       !hasOpenPR &&
       isRepoForked &&
       isWorking &&
-      githubLogin && (
+      wallet?.address &&
+      user?.login && (
         <ReadOnlyButtonWrapper>
           <Button
             className="read-only-button"
@@ -209,7 +228,8 @@ export default function PageActions({
       !isIssueinDraft &&
       !finished &&
       !finalized &&
-      githubLogin && (
+      wallet?.address &&
+      user?.login && (
         <GithubLink
           repoId={String(repoId)}
           forcePath={repoPath}
@@ -229,7 +249,8 @@ export default function PageActions({
       !isIssueinDraft &&
       !finished &&
       !finalized &&
-      githubLogin && (
+      wallet?.address &&
+      user?.login && (
         <ReadOnlyButtonWrapper>
           <Button
             color="primary"
@@ -276,43 +297,60 @@ export default function PageActions({
     description: prDescription,
     branch
   }): Promise<void> {
-    return new Promise((resolve, reject) => {
-      createPullRequestIssue(repoId as string, githubId, {
+    let pullRequestPayload = undefined;
+
+    createPrePullRequest(repoId as string, githubId, {
         title: prTitle,
         description: prDescription,
         username: githubLogin,
         branch
-      })
-        .then(() => {
+    }).then(({bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid}) => {
+      pullRequestPayload = {
+          repoId, 
+          issueGithubId: githubId, 
+          bountyId,
+          issueCid: originCID, 
+          pullRequestGithubId: cid,
+          customNetworkName: activeNetwork.name,
+          creator: userRepo.split("/")[0],
+          userBranch,
+          userRepo
+      };
+
+      return handleCreatePullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid);
+    })
+    .then(txInfo => {
+      return pastEventsV2("pull-request", "created", activeNetwork?.name, { fromBlock: (txInfo as any).blockNumber });
+    })
+    .then(() => {
+      dispatch(addToast({
+            type: "success",
+            title: t("actions.success"),
+            content: t("pull-request:actions.create.success")
+      }));
+
+      if (handleMicroService) handleMicroService(true);
+
+      setShowPRModal(false);
+    })
+    .catch((err) => {
+      setShowPRModal(false);
+      if (pullRequestPayload) cancelPrePullRequest(pullRequestPayload);
+
+      if (err.response?.status === 422 && err.response?.data) {
+        err.response?.data.errors?.map((item) =>
           dispatch(addToast({
-              type: "success",
-              title: t("actions.success"),
-              content: t("pull-request:actions.create.success")
-          }));
-
-          if (handleMicroService) handleMicroService(true);
-
-          setShowPRModal(false);
-          resolve();
-        })
-        .catch((err) => {
-          if (err.response?.status === 422 && err.response?.data) {
-            err.response?.data.errors?.map((item) =>
-              dispatch(addToast({
-                  type: "danger",
-                  title: t("actions.failed"),
-                  content: item.message
-              })));
-            reject(err);
-          } else {
-            dispatch(addToast({
-                type: "danger",
-                title: t("actions.failed"),
-                content: t("pull-request:actions.create.error")
-            }));
-            reject();
-          }
-        });
+              type: "danger",
+              title: t("actions.failed"),
+              content: item.message
+          })));
+      } else {
+        dispatch(addToast({
+            type: "danger",
+            title: t("actions.failed"),
+            content: t("pull-request:actions.create.error")
+        }));
+      }
     });
   }
 
@@ -368,6 +406,7 @@ export default function PageActions({
               {renderPullrequest()}
 
               {renderRedeem()}
+              {renderUpdateAmount()}
               {renderProposeDestribution()}
 
               {renderViewPullrequest()}
@@ -398,6 +437,15 @@ export default function PageActions({
           ""
         }
         onCloseClick={() => setShowPRModal(false)}
+      />
+
+      <UpdateBountyAmountModal
+        show={showUpdateAmount}
+        repoId={repoId}
+        transactionalAddress={networkIssue?.transactional}
+        bountyId={networkIssue?.id}
+        ghId={activeIssue?.githubId}
+        handleClose={() => setShowUpdateAmount(false)}
       />
     </div>
   );

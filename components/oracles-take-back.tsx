@@ -26,12 +26,13 @@ export default function OraclesTakeBack() {
         />
         <div className="row">
           <div className="col">
-            {wallet?.balance?.oracles?.delegatedEntries.length > 1
+            {!wallet?.balance?.oracles?.delegations?.length
               ? t("errors.no-delegates")
-              : wallet?.balance?.oracles?.delegatedEntries.map(([address, amount]) => (
+              : wallet?.balance?.oracles?.delegations.map(({id, to, amount}) => (
                   <OraclesTakeBackItem
-                    key={[address, amount].join(".")}
-                    address={address}
+                    key={[to, amount].join(".")}
+                    address={to}
+                    delegationId={id}
                     amount={amount.toString()}
                   />
                 ))}

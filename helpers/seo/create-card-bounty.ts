@@ -1,11 +1,13 @@
 import Jimp from "jimp";
+import getConfig from "next/config";
 
 import { position, write } from "../jimp-tools";
 
-const bg = `${process.env.NEXT_PUBLIC_HOME_URL}/images/bg-bounty-card.png`;
-const icon = `${process.env.NEXT_PUBLIC_HOME_URL}/images/bepro-icon.png`;
-const repoMask = `${process.env.NEXT_PUBLIC_HOME_URL}/images/mask-issue-repo.png`;
-const stateMask = `${process.env.NEXT_PUBLIC_HOME_URL}/images/mask-issue-state.png`;
+const { publicRuntimeConfig } = getConfig()
+const bg = `${publicRuntimeConfig.homeUrl}/images/bg-bounty-card.png`;
+const icon = `${publicRuntimeConfig.homeUrl}/images/bepro-icon.png`;
+const repoMask = `${publicRuntimeConfig.homeUrl}/images/mask-issue-repo.png`;
+const stateMask = `${publicRuntimeConfig.homeUrl}/images/mask-issue-state.png`;
 
 async function doHeading({
   issueId,

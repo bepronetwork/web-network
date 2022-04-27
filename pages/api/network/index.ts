@@ -1,17 +1,25 @@
-import Database from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
+
+import Database from "db/models";
 
 import Bepro from "helpers/api/bepro-initializer";
 
 import IpfsStorage from "services/ipfs-service";
+
+const { publicRuntimeConfig } = getConfig()
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { name: networkName } = req.query;
 
   const network = await Database.network.findOne({
     attributes: { exclude: ["id", "creatorAddress", "updatedAt"] },
+    include: [
+      { association: "tokens" }
+    ],
     where: {
       name: {
         [Op.iLike]: String(networkName)
@@ -49,23 +57,17 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     if (!user) return res.status(403).json("Invalid user provided");
     if (!accessToken) return res.status(401).json("Unauthorized user");
-    if (!botPermission)
-      return res.status(403).json("Bepro-bot authorization needed");
+    if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
 
     // Contract Validations
     const BEPRO = new Bepro();
     await BEPRO.init(false, false, true);
 
-    const OPERATOR_AMOUNT = await BEPRO.networkFactory.OPERATOR_AMOUNT();
-    const amountStaked = await BEPRO.networkFactory.getLockedStakedByAddress(creator);
-    const checkingNetworkAddress =
-      await BEPRO.networkFactory.getNetworkByAddress(creator);
+    const creatorAmount = await BEPRO.networkFactory.creatorAmount();
+    const lockedAmount = await BEPRO.networkFactory.lockedTokensOfAddress(creator);
+    const checkingNetworkAddress = await BEPRO.networkFactory.networkOfAddress(creator);
 
-    if (
-      parseFloat(BEPRO.bepro.Web3.utils.fromWei(`${amountStaked}`)) <
-      OPERATOR_AMOUNT
-    )
-      return res.status(403).json("Insufficient locked amount");
+    if (lockedAmount < creatorAmount) return res.status(403).json("Insufficient locked amount");
 
     if (checkingNetworkAddress !== networkAddress)
       return res.status(403).json("Creator and network addresses do not match");
@@ -93,14 +95,14 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       const { data } = await octokitUser.rest.repos.addCollaborator({
         owner,
         repo,
-        username: process.env.NEXT_PUBLIC_BEPRO_GITHUB_USER
+        username: publicRuntimeConfig.github.user
       });
 
       if (data?.id) invitations.push(data?.id);
     }
 
     const octokitBot = new Octokit({
-      auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN
+      auth: publicRuntimeConfig.github.token
     });
 
     for (const invitation_id of invitations) {
@@ -156,7 +158,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     if (
       isAdminOverriding &&
-      creator !== process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS
+      creator !== publicRuntimeConfig.adminWalletAddress
     )
       return res.status(403).json("Unauthorized");
 
@@ -196,7 +198,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       await BEPRO.init(false, false, true);
 
       const checkingNetworkAddress =
-        await BEPRO.networkFactory.getNetworkByAddress(creator);
+        await BEPRO.networkFactory.networkOfAddress(creator);
 
       if (checkingNetworkAddress !== networkAddress)
         return res
@@ -278,7 +280,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         const { data } = await octokitUser.rest.repos.addCollaborator({
           owner,
           repo,
-          username: process.env.NEXT_PUBLIC_BEPRO_GITHUB_USER
+          username: publicRuntimeConfig.github.user
         });
 
         if (data?.id) invitations.push(data?.id);
@@ -291,7 +293,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
       if (invitations.length) {
         const octokitBot = new Octokit({
-          auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN
+          auth: publicRuntimeConfig.github.token
         });
 
         for (const invitation_id of invitations) {
@@ -321,8 +323,8 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function NetworkEndPoint(req: NextApiRequest,
-                                              res: NextApiResponse) {
+async function NetworkEndPoint(req: NextApiRequest,
+                               res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
@@ -342,3 +344,4 @@ export default async function NetworkEndPoint(req: NextApiRequest,
 
   res.end();
 }
+export default withCors(NetworkEndPoint)

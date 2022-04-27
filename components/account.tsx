@@ -13,7 +13,7 @@ import { useAuthentication } from "contexts/authentication";
 
 import useNetworkTheme from "x-hooks/use-network";
 
-export default function Account({ children }): JSX.Element {
+export default function Account({ children }){
   const { t } = useTranslation([
     "common",
     "bounty",
@@ -57,6 +57,14 @@ export default function Account({ children }): JSX.Element {
               href={getURLWithNetwork("/account/my-oracles")}
               label={String(t("$oracles"))}
               className={clsx("h4 p-0 mr-3")}
+              activeClass="account-link-active"
+              nav
+            />
+            
+            <InternalLink
+              href={getURLWithNetwork("/account/payments")}
+              label={String(t("common:account.payments"))}
+              className={clsx("mr-3 h4 p-0 text-capitalize")}
               activeClass="account-link-active"
               nav
             />

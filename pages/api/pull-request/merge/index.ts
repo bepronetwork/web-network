@@ -1,10 +1,13 @@
-import models from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
-import networkBeproJs from "helpers/api/handle-network-bepro";
+import models from "db/models";
 
+import networkBeproJs from "helpers/api/handle-network-bepro";
+const { publicRuntimeConfig } = getConfig()
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, pullRequestId, mergeProposalId, address, networkName } =
     req.body;
@@ -68,7 +71,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const [owner, repo] = repository.githubPath.split("/");
 
-    const octoKit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
+    const octoKit = new Octokit({ auth: publicRuntimeConfig.github.token });
 
     const octoResponse = await octoKit.rest.pulls.merge({
       owner,
@@ -82,8 +85,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default async function PullRequest(req: NextApiRequest,
-                                          res: NextApiResponse) {
+async function PullRequest(req: NextApiRequest,
+                           res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "post":
     await post(req, res);
@@ -95,3 +98,6 @@ export default async function PullRequest(req: NextApiRequest,
 
   res.end();
 }
+
+
+export default withCors(PullRequest)

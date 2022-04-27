@@ -6,5 +6,6 @@ export enum NetworkChain {
   Ropsten = 3,
   Rinkeby = 4,
   Goerli = 5,
-  Moonriver = 1285
+  Moonriver = 1285,
+  localhost = 1337
 }

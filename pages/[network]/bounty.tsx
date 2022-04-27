@@ -58,10 +58,10 @@ export default function PageIssue() {
         <Translation
           ns="proposal"
           label={"labelWithCount"}
-          params={{ count: +networkIssue?.mergeProposalAmount || 0 }}
+          params={{ count: +networkIssue?.proposals.length || 0 }}
         />
       ),
-      isEmpty: !(networkIssue?.mergeProposalAmount > 0),
+      isEmpty: !(networkIssue?.proposals.length > 0),
       component: (
         <IssueProposals
           key="tab-proposals"
@@ -87,6 +87,7 @@ export default function PageIssue() {
           key="tab-pull-requests"
           className="border-top-0"
           issue={issue}
+          networkIssue={networkIssue}
         />
       ),
       description: t("description_pull-request")
@@ -160,7 +161,7 @@ export default function PageIssue() {
       <PageActions
         state={issue?.state}
         developers={issue?.developers}
-        finalized={networkIssue?.finalized}
+        finalized={networkIssue?.closed || networkIssue?.canceled}
         isIssueinDraft={networkIssue?.isDraft}
         networkCID={networkIssue?.cid || issue?.issueId}
         issueId={issue?.issueId}
@@ -170,19 +171,19 @@ export default function PageIssue() {
         handleMicroService={refreshIssue}
         pullRequests={issue?.pullRequests || []}
         mergeProposals={issue?.mergeProposals}
-        amountIssue={networkIssue?.tokensStaked}
+        amountIssue={networkIssue?.tokenAmount}
         forks={activeRepo?.forks}
         githubLogin={user?.login}
         hasOpenPR={hasOpenPR}
         isRepoForked={isRepoForked}
         isWorking={isWorking}
-        issueCreator={networkIssue?.issueGenerator}
+        issueCreator={networkIssue?.creator}
         repoPath={issue?.repository?.githubPath}
         githubId={issue?.githubId}
         addNewComment={addNewComment}
-        finished={networkIssue?.recognizedAsFinished}
+        finished={networkIssue?.isFinished}
       />
-      {(networkIssue?.mergeProposalAmount > 0 ||
+      {(networkIssue?.proposals.length > 0 ||
         mergedPullRequests.length > 0) &&
         wallet?.address && (
           <CustomContainer className="mb-4">
@@ -204,10 +205,10 @@ export default function PageIssue() {
             <div className="p-0 me-3 flex-shrink-0 w-25 bd-highlight">
               <div className="sticky-bounty">
                 <IssueProposalProgressBar
-                  isFinalized={networkIssue?.finalized}
+                  isFinalized={networkIssue?.closed || networkIssue?.canceled}
                   isIssueinDraft={networkIssue.isDraft}
-                  mergeProposalAmount={networkIssue?.mergeProposalAmount}
-                  isFinished={networkIssue?.recognizedAsFinished}
+                  mergeProposalAmount={networkIssue?.proposals?.length}
+                  isFinished={networkIssue?.isFinished}
                   isCanceled={
                     issue?.state === "canceled" || networkIssue?.canceled
                   }

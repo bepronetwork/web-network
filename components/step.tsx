@@ -1,5 +1,7 @@
 import { Collapse } from "react-bootstrap";
 
+import { useTranslation } from "next-i18next";
+
 import SuccessIcon from "assets/icons/success-icon";
 
 import Button from "components/button";
@@ -18,6 +20,8 @@ export default function Step({
   handleFinish,
   ...props
 }: IStep) {
+  const { t } = useTranslation("common");
+
   const isActive = activeStep === index;
 
   function handleAction() {
@@ -47,7 +51,7 @@ export default function Step({
           {(validated && (
             <div className="d-flex flex-row justify-content-center">
               <Button onClick={handleAction}>
-                {finishLabel || "Next Step"}
+                {finishLabel || t("misc.next-step")}
               </Button>
             </div>
           )) || <></>}

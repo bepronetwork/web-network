@@ -1,13 +1,16 @@
-import models from "db/models";
-import { CONTRACT_ADDRESS } from "env";
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
+
+import models from "db/models";
 
 import twitterTweet from "helpers/api/handle-twitter-tweet";
 
 import api from "services/api";
 
+
+const { publicRuntimeConfig } = getConfig()
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {
     title,
@@ -28,8 +31,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  if (!network) return res.status(404).json("Invalid network");
-  if (network.isClosed) return res.status(404).json("Invalid network");
+  if (!network || network?.isClosed) return res.status(404).json("Invalid network");
 
   if (!creatorGithub) return res.status(422).json("creatorGithub is required");
 
@@ -38,7 +40,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   });
   if (!repository) return res.status(422).json("repository not found");
 
-  const octokit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
+  const octokit = new Octokit({ auth: publicRuntimeConfig.github.token });
 
   const [owner, repo] = repository.githubPath.split("/");
 
@@ -71,7 +73,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     network_id: network.id
   });
 
-  return res.status(200).json(githubId);
+  return res.status(200).json(`${repository_id}/${githubId}`);
 }
 
 async function patch(req: NextApiRequest, res: NextApiResponse) {
@@ -112,7 +114,7 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
       await api.post(`/seo/${issueId}`).catch((e) => {
         console.log("Error creating SEO", e);
       });
-      if (network.contractAddress === CONTRACT_ADDRESS)
+      if (network.contractAddress === publicRuntimeConfig.contract.address)
         twitterTweet({
           type: "bounty",
           action: "created",
@@ -121,7 +123,7 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
 
       return res.status(200).json("ok");
     })
-    .catch((_) => res.status(422).json("nok"));
+    .catch(() => res.status(422).json("nok"));
 }
 
 export default async function Issue(req: NextApiRequest, res: NextApiResponse) {

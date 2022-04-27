@@ -15,6 +15,7 @@ export default function TransactionStats({
     [TransactionStatus.pending]: "warning",
     [TransactionStatus.processing]: "info",
     [TransactionStatus.failed]: "danger",
+    [TransactionStatus.rejected]: "danger",
     [TransactionStatus.completed]: "success"
   };
 
@@ -22,6 +23,7 @@ export default function TransactionStats({
     [TransactionStatus.pending]: t("transactions.stats.pending"),
     [TransactionStatus.processing]: t("transactions.stats.processing"),
     [TransactionStatus.failed]: t("transactions.stats.rejected"),
+    [TransactionStatus.rejected]: t("transactions.stats.rejected"),
     [TransactionStatus.completed]: t("transactions.stats.completed")
   };
 

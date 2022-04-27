@@ -1,6 +1,8 @@
-import models from "db/models";
+import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op } from "sequelize";
+
+import models from "db/models";
 
 async function getAllRepos(req, res) {
   const { networkName } = req.query;
@@ -80,8 +82,8 @@ async function removeRepo(req: NextApiRequest, res: NextApiResponse) {
     .json(!deleted ? `Couldn't delete entry ${id}` : "ok");
 }
 
-export default async function RepoRoute(req: NextApiRequest,
-                                        res: NextApiResponse) {
+async function RepoRoute(req: NextApiRequest,
+                         res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await getAllRepos(req, res);
@@ -101,3 +103,4 @@ export default async function RepoRoute(req: NextApiRequest,
 
   res.end();
 }
+export default withCors(RepoRoute)
