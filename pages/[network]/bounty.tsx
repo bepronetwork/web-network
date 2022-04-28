@@ -67,6 +67,7 @@ export default function PageIssue() {
           key="tab-proposals"
           issue={issue}
           className="border-top-0"
+          networkIssue={networkIssue}
         />
       ),
       description: t("description_proposal")
