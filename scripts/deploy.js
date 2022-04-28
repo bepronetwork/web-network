@@ -133,7 +133,7 @@ async function main() {
    const beproToken = new ERC20(web3Connection, beproAddress);
    await beproToken.start();
 
-   for(const address in stagingAccounts) {
+   for(const address of stagingAccounts) {
     console.log(`Transfering 10M BEPRO to ${address}`);
     await beproToken.transferTokenAmount(address, 10000000);
    }
