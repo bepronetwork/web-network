@@ -12,8 +12,6 @@ import { useNetwork } from "contexts/network";
 
 import { isProposalDisputable } from "helpers/proposal";
 
-import { isProposalDisputable } from "helpers/proposal";
-
 import { IssueData } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
@@ -58,15 +56,6 @@ export default function ProposalItem({
       wallet?.balance?.oracles?.locked === 0,
   ]
     .some(v => v);
-
-  const isDisable = [
-      networkIssue?.finalized,
-      !isProposalDisputable(proposal?.createdAt, disputableTime),
-      networkIssue?.networkProposals[proposal.id]?.isDisputed,
-      !networkIssue?.networkProposals[proposal.id]?.canUserDispute,
-      wallet?.balance?.oracles?.tokensLocked === 0,
-  ]
-    .some(v => v)
 
   async function handleDispute() {
     if (!isDisputable || networkIssue?.closed) return;
