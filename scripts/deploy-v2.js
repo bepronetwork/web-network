@@ -147,30 +147,42 @@ async function main() {
   const factory = new NetworkFactoryV2(web3Connection, networkFactoryAddress);
   await factory.start()
   await beproToken.increaseAllowance(networkFactoryAddress, 1000000);
-  await factory.lock("1000000");
+  await factory.lock(1000000);
 
-  // 3. Creating the first network 
-  const tx = await factory.createNetwork(beproAddress, beproAddress);
-  const networkAddress = await factory.getNetworkByAddress(ownerAddress);
+  // 3. Deploy Bounty Token NFT
+
+  const bountyNFTDeployer = new BountyToken(web3Connection);
+  await bountyNFTDeployer.loadAbi();
+  const { contractAddress: bountyTokenAddress} = await bountyNFTDeployer.deployJsonAbi("Bounty NFT Bepro","bBEPRO");
+  console.log(`Deployed Bounty Token on ${bountyTokenAddress}`); 
+
+  // 4. Creating the first network 
+  const tx = await factory.createNetwork(
+    beproAddress, 
+    bountyTokenAddress, 
+    "", 
+    ownerAddress, 
+    10000, 
+    50000);
+  const networkAddress = await factory.networkOfAddress(ownerAddress);
+
+  // 5. Configure basic network Parameters
   console.log(`Deployed Network on ${networkAddress}`);
   const networkContract = new Network_v2(web3Connection, networkAddress);
   await networkContract.start();
   await networkContract.sendTx(networkContract.contract.methods.claimGovernor());
   console.log(`Setting Redeeem time on ${networkAddress}`);
   // 5min Disputable time
-  await networkContract.changeRedeemTime(60*5);
+  await networkContract.changeDraftTime(60*5);
   // 10min Disputable time
   console.log(`Setting Disputable time on ${networkAddress}`);
   await networkContract.changeDisputableTime(60*10);
 
-  const bountyNFTDeployer = new BountyToken(web3Connection);
-  await bountyNFTDeployer.loadAbi();
-  const { contractAddress: bountyTokenAddress} = await proxyDeployer.deployJsonAbi("Bounty NFT Bepro","bBEPRO");
-  console.log(`Deployed Bounty Token on ${bountyTokenAddress}`); 
+ // 6. Set Bounty NFT Dispatcher 
   const bountyBepro = new BountyToken(web3Connection, bountyTokenAddress);
   await bountyBepro.start()
-  await beproToken.setDispatcher(networkAddress);
-  console.log(`Set Bounty Token Dispatcher ${networkAddress}`); 
+  await bountyBepro.setDispatcher(networkAddress);
+  console.log(`Set Bounty Token Dispatcher ${networkAddress}`);
 }
 
 main()
