@@ -100,13 +100,13 @@ async function main() {
       showErrorAndHelp(`Please provide a valid URL for the custom network`);
       exit(1);
     }    
-    rpcUrl = url;
+    rpcUrl = argv.url;
   } else {
     rpcUrl = networks[argv.network].url
   }
 
   const options = { 
-      web3Host: networks[argv.network].url,
+      web3Host: rpcUrl,
       privateKey: ownerPrivKey,
       skipWindowAssignment: true
   };

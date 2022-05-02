@@ -24,8 +24,7 @@
     "deploy:seneca": "node ./scripts/deploy-v2 -n seneca",
     "deploy:afrodite": "node ./scripts/deploy-v2 -n afrodite",
     "deploy:irene": "node ./scripts/deploy-v2 -n irene",
-    "deploy:iris": "node ./scripts/deploy-v2 -n iris",
-    "ganache:deploy": "node ganache/deploy.js"
+    "deploy:iris": "node ./scripts/deploy-v2 -n iris"
   },
   "dependencies": {
     "@taikai/dappkit": "^2.0.0-alpha.4",
