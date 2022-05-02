@@ -240,6 +240,35 @@ export default function useOctokitGraph() {
     return branches;
   }
 
+  async function getUserRepositories(login:  string) {
+
+    const response = await getAllPages(`
+      query Repositories($login: String!, $cursor: String) {
+        user(login: $login) {
+          repositories(first: 100, after: $cursor) {
+            pageInfo {
+              endCursor
+              hasNextPage
+            }
+            nodes {
+              name
+              nameWithOwner
+              isFork
+            }
+          }
+        }
+      }
+    `, {
+      login
+    });
+
+    const repositories = response
+                          .flatMap(item => getPropertyRecursively("nodes", item)
+                                          .map(node => ({name: node["name"], fullName: node["nameWithOwner"]}) ) );
+
+    return repositories;
+  }
+
 /** 
  - User
 	- Repositories (name, full_name)
@@ -266,6 +295,7 @@ export default function useOctokitGraph() {
     getIssueOrPullRequestComments,
     getPullRequestDetails,
     getRepositoryForks,
-    getRepositoryBranches
+    getRepositoryBranches,
+    getUserRepositories
   };
 }

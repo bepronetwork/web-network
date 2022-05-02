@@ -6,6 +6,13 @@ export interface IUser {
   email?: string;
   image?: string;
   accessToken?: string;
+  repositories?: IRepository[];
+}
+
+export interface IRepository {
+  name: string;
+  nameWithOwner: string;
+  isFork: boolean;
 }
 
 export interface IWallet {
@@ -14,3 +21,4 @@ export interface IWallet {
   isApprovedSettlerToken: boolean;
   balance?: IBalance;
 }
+

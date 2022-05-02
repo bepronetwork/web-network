@@ -12,6 +12,7 @@ import CustomContainer from "components/custom-container";
 import LockBeproStep from "components/custom-network/lock-bepro-step";
 import NetworkInformationStep from "components/custom-network/network-information-step";
 import SelectRepositoriesStep from "components/custom-network/select-repositories-step";
+import TokenConfiguration from "components/custom-network/token-configuration";
 import Stepper from "components/stepper";
 
 import { ApplicationContext } from "contexts/application";
@@ -27,8 +28,7 @@ import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
-import useOctokit from "x-hooks/use-octokit";
-import TokenConfiguration from "components/custom-network/token-configuration";
+import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 
 const { publicRuntimeConfig } = getConfig()
@@ -42,7 +42,7 @@ export default function NewNetwork() {
   const [steps, setSteps] = useState(DefaultNetworkInformation);
 
   const { createNetwork } = useApi();
-  const { listUserRepos } = useOctokit();
+  const { getUserRepositories } = useOctokitGraph();
   const { network, getURLWithNetwork, colorsToCSS, DefaultTheme } =
   useNetworkTheme();
 
@@ -181,8 +181,8 @@ export default function NewNetwork() {
 
   useEffect(() => {
     if (user?.login)
-      listUserRepos(user.login).then(({ data }) => {
-        const repositories = data.items.map((repo) => ({
+      getUserRepositories(user.login).then(repos => {
+        const repositories = repos.map((repo) => ({
           checked: false,
           name: repo.name,
           fullName: repo.full_name,

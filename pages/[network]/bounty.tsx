@@ -24,7 +24,7 @@ import { TabbedNavigationItem } from "interfaces/tabbed-navigation";
 
 import useApi from "x-hooks/use-api";
 import useMergeData from "x-hooks/use-merge-data";
-import useOctokit from "x-hooks/use-octokit";
+import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 export default function PageIssue() {
   const router = useRouter();
@@ -39,7 +39,7 @@ export default function PageIssue() {
   const { wallet, user } = useAuthentication();
 
   const { activeRepo } = useRepos();
-  const { getUserRepos } = useOctokit();
+  const { getUserRepositories } = useOctokitGraph();
   const { userHasPR } = useApi();
   const { getMergedDataFromPullRequests } = useMergeData();
   const {
