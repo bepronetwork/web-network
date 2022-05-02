@@ -1,10 +1,13 @@
 
 import { Network_v2 } from "@taikai/dappkit";
+import getConfig from "next/config";
 import { Octokit } from "octokit";
 
 import models from "db/models";
 
 import api from "services/api";
+
+const { publicRuntimeConfig } = getConfig();
 
 export default async function readPullRequestCanceled(events, network: Network_v2, customNetwork) {
   const canceled: string[] = [];
@@ -38,7 +41,7 @@ export default async function readPullRequestCanceled(events, network: Network_v
 
           await pullRequest.save();
 
-          const octoKit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
+          const octoKit = new Octokit({ auth: publicRuntimeConfig.github.token });
 
           const [owner, repo] = networkPullRequest.originRepo.split("/");
 
