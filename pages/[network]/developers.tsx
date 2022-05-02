@@ -15,20 +15,11 @@ import { handleNetworkAddress } from "helpers/custom-network";
 import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
-import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 export default function PageDevelopers() {
   const { t } = useTranslation(["common"]);
   const { beproServiceStarted } = useAuthentication();
   const { getTotalUsers } = useApi();
-  const { 
-    getPullRequestParticipants, 
-    getPullRequestLinesOfCode, 
-    getIssueOrPullRequestComments,
-    getRepositoryForks,
-    getRepositoryBranches,
-    getUserRepositories
-  } = useOctokitGraph();
 
   const [infos, setInfos] = useState<IInfosHero[]>([
     {
@@ -85,17 +76,6 @@ export default function PageDevelopers() {
   useEffect(() => {
     loadTotals();
   }, [beproServiceStarted, activeNetwork]);
-
-  useEffect(() => {
-    if (user?.accessToken) {
-      // getPullRequestParticipants("bepronetwork/bepro-js", 134).then(console.log).catch(console.log);
-      // getPullRequestLinesOfCode("bepronetwork/bepro-js", 134).then(console.log).catch(console.log);
-      // getIssueOrPullRequestComments("bepronetwork/bepro-js", 134).then(console.log).catch(console.log);
-      // getRepositoryForks("bepronetwork/webapp-community").then(console.log).catch(console.log);
-      // getRepositoryBranches("bepronetwork/bepro-js").then(console.log).catch(console.log);
-      getUserRepositories("vhcsilva").then(console.log).catch(console.log);
-    }
-  }, [user?.accessToken]);
 
   return (
     <>
