@@ -268,27 +268,7 @@ export default function useOctokitGraph() {
 
     return repositories;
   }
-
-/** 
- - User
-	- Repositories (name, full_name)
-	- Forked Repositories
-	- Branches of a repo
-
-- Repository
-	- Forks (id, login, avatar_url, url, type) OK
-	- Branches
-
-- Issue
-	- Comments (total count, id, user.login, updated_at, body) OK
-
-- Pull Request
-	- Data (mergeable, merged, state) OK
-	- Participants OK
-	- Lines of code OK
-	- Comments OK
-**/
-
+  
   return {
     getPullRequestParticipants,
     getPullRequestLinesOfCode,

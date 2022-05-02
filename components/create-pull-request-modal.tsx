@@ -60,8 +60,6 @@ export default function CreatePullRequestModal({
     
     getRepositoryBranches(repo)
       .then(branches => {
-        console.log(branches);
-
         return branches.map(branch2 => ({
           value: branch2,
           label: branch2,
