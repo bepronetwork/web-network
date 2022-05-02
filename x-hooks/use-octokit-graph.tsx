@@ -25,7 +25,7 @@ export default function useOctokitGraph() {
 
     return graphql.defaults({
       headers: {
-        authorization: `token ${user.accessToken}`
+        authorization: `token ${user?.accessToken}`
       }
     });
   }
@@ -41,7 +41,7 @@ export default function useOctokitGraph() {
 
     do {
       const response = await api(query, {...variables, cursor: nextPageCursor});
-      
+
       pages.push(response);
 
       const { endCursor, hasNextPage } = getPropertyRecursively("pageInfo", response);
@@ -80,7 +80,7 @@ export default function useOctokitGraph() {
     });
 
     const participants = 
-      response.flatMap(item => getPropertyRecursively("nodes", item).map(node => node["login"]));
+      response?.flatMap(item => getPropertyRecursively("nodes", item).map(node => node["login"]));
 
     return participants;
   }
@@ -154,8 +154,9 @@ export default function useOctokitGraph() {
       id
     });
 
-    const comments = response
-    .flatMap(item => getPropertyRecursively("nodes", item).map(node => ({...node, author: node["author"]["login"]}) ) );
+    const comments = 
+      response?.flatMap(item => getPropertyRecursively("nodes", item)
+                        .map(node => ({...node, author: node["author"]["login"]}) ) );
 
     return comments;
   }
@@ -208,7 +209,8 @@ export default function useOctokitGraph() {
       owner
     });
 
-    const forks = response.flatMap(item => getPropertyRecursively("nodes", item).map(node => node["owner"]["login"] ) );
+    const forks = 
+      response?.flatMap(item => getPropertyRecursively("nodes", item).map(node => node["owner"]["login"] ) );
 
     return forks;
   }
@@ -235,7 +237,7 @@ export default function useOctokitGraph() {
       owner
     });
 
-    const branches = response.flatMap(item => getPropertyRecursively("nodes", item).map(node => node["name"] ) );
+    const branches = response?.flatMap(item => getPropertyRecursively("nodes", item).map(node => node["name"] ) );
 
     return branches;
   }
@@ -262,9 +264,7 @@ export default function useOctokitGraph() {
       login
     });
 
-    const repositories = response
-                          .flatMap(item => getPropertyRecursively("nodes", item)
-                                          .map(node => ({name: node["name"], fullName: node["nameWithOwner"]}) ) );
+    const repositories = response?.flatMap(item => getPropertyRecursively("nodes", item) );
 
     return repositories;
   }

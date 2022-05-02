@@ -23,7 +23,6 @@ import { useRepos } from "contexts/repos";
 import { TabbedNavigationItem } from "interfaces/tabbed-navigation";
 
 import useApi from "x-hooks/use-api";
-import useMergeData from "x-hooks/use-merge-data";
 import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 export default function PageIssue() {
@@ -34,14 +33,12 @@ export default function PageIssue() {
   const [hasOpenPR, setHasOpenPR] = useState(false);
   const [commentsIssue, setCommentsIssue] = useState();
   const [isRepoForked, setIsRepoForked] = useState(false);
-  const [mergedPullRequests, setMergedPullRequests] = useState([]);
 
   const { wallet, user } = useAuthentication();
 
   const { activeRepo } = useRepos();
   const { getUserRepositories } = useOctokitGraph();
   const { userHasPR } = useApi();
-  const { getMergedDataFromPullRequests } = useMergeData();
   const {
     activeIssue: issue,
     networkIssue,
@@ -58,10 +55,10 @@ export default function PageIssue() {
         <Translation
           ns="proposal"
           label={"labelWithCount"}
-          params={{ count: +networkIssue?.proposals.length || 0 }}
+          params={{ count: +networkIssue?.proposals?.length || 0 }}
         />
       ),
-      isEmpty: !(networkIssue?.proposals.length > 0),
+      isEmpty: !(networkIssue?.proposals?.length > 0),
       component: (
         <IssueProposals
           key="tab-proposals"
@@ -74,12 +71,12 @@ export default function PageIssue() {
     },
     {
       eventKey: "pull-requests",
-      isEmpty: !(mergedPullRequests.length > 0),
+      isEmpty: !(networkIssue?.pullRequests?.length > 0),
       title: (
         <Translation
           ns="pull-request"
           label={"labelWithCount"}
-          params={{ count: mergedPullRequests.length || 0 }}
+          params={{ count: networkIssue?.pullRequests?.length || 0 }}
         />
       ),
       component: (
@@ -97,10 +94,12 @@ export default function PageIssue() {
   function getRepoForked() {
     if (!activeRepo || !user?.login) return;
 
-    getUserRepos(user?.login, activeRepo.githubPath.split("/")[1])
-      .then(({ data }) => {
-        const isFokerd = data?.fork || data.owner.login === user?.login;
-        setIsRepoForked(isFokerd);
+    getUserRepositories(user?.login)
+      .then((repos) => {
+        const isForked = 
+          !!repos.find(repo => repo.IsFork || repo.name === activeRepo.githubPath.split("/")[1]);
+
+        setIsRepoForked(isForked);
       })
       .catch((e) => {
         console.log("Failed to get users repositories: ", e);
@@ -115,7 +114,7 @@ export default function PageIssue() {
       });
   }
 
-  function loadIssueData() {
+  function checkRepoForked() {
     if (user?.login && activeRepo) getRepoForked();
   }
 
@@ -128,12 +127,6 @@ export default function PageIssue() {
       setIsWorking(issue.working.some((el) => el === user?.login));
   }
 
-  function loadMergedPullRequests() {
-    if (issue && wallet?.address)
-      getMergedDataFromPullRequests(issue.repository?.githubPath,
-                                    issue.pullRequests).then(setMergedPullRequests);
-  }
-
   function syncLocalyState() {
     // eslint-disable-next-line no-unsafe-optional-chaining
     if (issue?.comments) setCommentsIssue([...issue?.comments] as any);
@@ -144,16 +137,9 @@ export default function PageIssue() {
       router.push("/404"));
   }
 
-  useEffect(syncLocalyState, [issue, activeRepo]);
-  useEffect(checkIsWorking, [issue, user?.login]);
-  useEffect(loadMergedPullRequests, [issue, wallet?.address]);
-  useEffect(loadIssueData, [
-    user?.login,
-    wallet?.address,
-    id,
-    issue,
-    activeRepo
-  ]);
+  useEffect(syncLocalyState, [ issue, activeRepo ]);
+  useEffect(checkIsWorking, [ issue, user?.login ]);
+  useEffect(checkRepoForked, [ user?.login, wallet?.address, id, issue, activeRepo ]);
 
   return (
     <>
@@ -183,8 +169,8 @@ export default function PageIssue() {
         addNewComment={addNewComment}
         finished={networkIssue?.isFinished}
       />
-      {(networkIssue?.proposals.length > 0 ||
-        mergedPullRequests.length > 0) &&
+      {(networkIssue?.proposals?.length > 0 ||
+        networkIssue?.pullRequests?.length > 0) &&
         wallet?.address && (
           <CustomContainer className="mb-4">
             <TabbedNavigation

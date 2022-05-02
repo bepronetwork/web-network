@@ -10,7 +10,7 @@ import ReactSelect from "components/react-select";
 
 import { useAuthentication } from "contexts/authentication";
 
-import useOctokit from "x-hooks/use-octokit";
+import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 export default function CreatePullRequestModal({
   show = false,
@@ -30,7 +30,7 @@ export default function CreatePullRequestModal({
 
   const { user } = useAuthentication();
 
-  const octo = useOctokit();
+  const { getRepositoryBranches } = useOctokitGraph();
 
   function onSelectedBranch(option) {
     setBranch(option.value);
@@ -55,18 +55,19 @@ export default function CreatePullRequestModal({
 
   useEffect(setDefaults, [show]);
   useEffect(() => {
-    if (!user?.accessToken || options.length || !repo) return;
+    if (!user?.accessToken || !repo) return;
 
-    function mapBranches(branches) {
-      return branches.map(({ name }) => ({
-        value: name,
-        label: name,
-        isSelected: branch && branch === name
-      }));
-    }
-    octo
-      .listBranches(repo)
-      .then(mapBranches)
+    
+    getRepositoryBranches(repo)
+      .then(branches => {
+        console.log(branches);
+
+        return branches.map(branch2 => ({
+          value: branch2,
+          label: branch2,
+          isSelected: branch && branch === branch2
+        }));
+      })
       .then(setOptions)
       .catch(console.log);
   }, [user?.accessToken, repo]);

@@ -19,7 +19,6 @@ import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
-import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 export interface IAuthenticationContext {
   user?: IUser;
@@ -46,7 +45,6 @@ export const AuthenticationProvider = ({ children }) => {
     useState<boolean>();
 
   const { getUserOf } = useApi();
-  const { getUserRepositories } = useOctokitGraph();
   const { getURLWithNetwork } = useNetworkTheme();
 
   const login = useCallback(async () => {
@@ -199,14 +197,6 @@ export const AuthenticationProvider = ({ children }) => {
       clearInterval(checkBeproServiceStarted);
     };
   }, []);
-
-  useEffect(() => {
-    if (!wallet?.address || !user?.accessToken) return;
-
-    getUserRepositories(user.login).then(data => {
-      setUser({ ...user, repositories: data });
-    });
-  }, [wallet, user]);
   
   const memorized = useMemo<IAuthenticationContext>(() => ({
       user,

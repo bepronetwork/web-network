@@ -6,7 +6,6 @@ export interface IUser {
   email?: string;
   image?: string;
   accessToken?: string;
-  repositories?: IRepository[];
 }
 
 export interface IRepository {

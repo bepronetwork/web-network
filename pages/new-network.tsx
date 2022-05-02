@@ -182,11 +182,14 @@ export default function NewNetwork() {
   useEffect(() => {
     if (user?.login)
       getUserRepositories(user.login).then(repos => {
-        const repositories = repos.map((repo) => ({
-          checked: false,
-          name: repo.name,
-          fullName: repo.full_name,
-        }));
+        const repositories = 
+          repos
+          .filter(repo => !repo.isFork && repo.nameWithOwner.split("/")[0] === user.login)
+          .map(repo => ({
+            checked: false,
+            name: repo.name,
+            fullName: repo.full_name,
+          }));
 
         const tmpSteps = Object.assign({}, steps);
 

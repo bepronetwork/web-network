@@ -37,7 +37,7 @@ import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
-import useOctokit from "x-hooks/use-octokit";
+import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 const { publicRuntimeConfig } = getConfig()
 interface NetworkAmounts {
@@ -75,7 +75,7 @@ export default function Settings() {
 
   const [updatingNetwork, setUpdatingNetwork] = useState(false);
 
-  const { listUserRepos } = useOctokit();
+  const { getUserRepositories } = useOctokitGraph();
   const { searchRepositories, updateNetwork, isNetworkOwner } = useApi();
   const { network, colorsToCSS, getURLWithNetwork } = useNetworkTheme();
   const { updateActiveNetwork } = useNetwork();
@@ -168,16 +168,16 @@ export default function Settings() {
       }));
 
       if (user?.login) {
-        const {
-          data: { items: githubRepos }
-        } = await listUserRepos(user?.login);
+        const githubRepos = await getUserRepositories(user?.login);
 
-        const repos = githubRepos.map((repo) => ({
+        const repos = githubRepos
+        .filter(repo => !repo.isFork && (user?.login === repo.nameWithOwner.split("/")[0]))
+        .map((repo) => ({
           checked: false,
           isSaved: false,
           name: repo.name,
           hasIssues: false,
-          fullName: repo.full_name
+          fullName: repo.nameWithOwner
         }));
 
         tmpRepos.push(...repos.filter((repo) =>
