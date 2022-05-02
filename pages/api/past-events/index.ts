@@ -1,16 +1,26 @@
+import { Network_v2 } from "@taikai/dappkit";
 import {NextApiRequest, NextApiResponse} from 'next';
-import {Octokit} from 'octokit';
-import { Op } from 'sequelize'
 import getConfig from 'next/config';
+import { Op } from 'sequelize'
 
 import models from 'db/models';
 
+import { BountyHelpers } from "helpers/api/bounty";
 import networkBeproJs from 'helpers/api/handle-network-bepro';
-import readCloseIssues from 'helpers/api/read-close-issues';
-import readRedeemIssue from 'helpers/api/read-redeem-issue';
+import { ProposalHelpers } from "helpers/api/proposal";
+import { PullRequestHelpers } from "helpers/api/pull-request";
 
-const { publicRuntimeConfig } = getConfig()
-const octokit = new Octokit({auth: publicRuntimeConfig.github.token});
+const { publicRuntimeConfig } = getConfig();
+
+const handler = async (type, helpers, network, customNetwork, fromBlock, toBlock) => {
+  const [contractMethod, apiMethod] = helpers[type];
+
+  const events = network[contractMethod]({ fromBlock,  toBlock });
+
+  const results = await apiMethod(events, network, customNetwork);
+
+  return results;
+};
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const bulk = await models.chainEvents.findOne({where: {name: `Bulk`}});
@@ -38,7 +48,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     let cEnd = 0
 
     console.log(`Reading past events of ${customNetwork.name} - ${customNetwork.networkAddress}`)
-    const network = networkBeproJs({ contractAddress: customNetwork.networkAddress });
+    const network = networkBeproJs({ contractAddress: customNetwork.networkAddress, version: 2 }) as Network_v2;
 
     await network.start();
     const web3 = network.web3;
@@ -49,26 +59,24 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     for (let page = 1; page <= pages; page++) {
       const nextEnd = start + PER_PAGE;
+
       if (end === 0) end = lastBlock
+
       cEnd = nextEnd > lastBlock ? lastBlock : nextEnd
 
       console.log(`[${customNetwork.name}] Reading from ${start} to ${cEnd}; page: ${page} of ${pages}`);
-      await network.getRedeemIssueEvents({fromBlock: start, toBlock: cEnd})
-                    .then(events => 
-                      readRedeemIssue(events, {network, models, res, octokit, customNetworkId: customNetwork.id}))
-                    .catch(error => {
-                      console.log(`Error reading RedeemIssue`, error);
-                    });
 
-      await network.getCloseIssueEvents({fromBlock: start, toBlock: cEnd})
-                    .then(events => 
-                      readCloseIssues(events, {network, models, res, octokit, customNetworkId: customNetwork.id}))
-                    .catch(error => {
-                      console.log(`Error reading CloseIssue`, error);
-                    });
+      const bountyEventsTypes = Object.keys(BountyHelpers);
+      const proposalEventsTypes = Object.keys(ProposalHelpers);
+      const pullRequestEventsTypes = Object.keys(PullRequestHelpers);
 
-      start+=PER_PAGE;
+      await Promise.all([
+        ...bountyEventsTypes.map(type => handler(type, BountyHelpers, network, customNetwork, start, cEnd)),
+        ...proposalEventsTypes.map(type => handler(type, ProposalHelpers, network, customNetwork, start, cEnd)),
+        ...pullRequestEventsTypes.map(type => handler(type, PullRequestHelpers, network, customNetwork, start, cEnd))
+      ]);
 
+      start += PER_PAGE;
     }
 
     start = +fromBlock
