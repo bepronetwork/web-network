@@ -50,7 +50,7 @@ export default async function readBountyClosed(events, network: Network_v2, cust
           if (pullRequest) {
             const [owner, repo] = bounty.repository.githubPath.split("/");
             
-            const octokit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
+            const octokit = new Octokit({ auth: publicRuntimeConfig.github.token });
 
             await octokit.rest.pulls.merge({
               owner,
