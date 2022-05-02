@@ -6,6 +6,13 @@ export interface User {
   email?: string;
   image?: string;
   accessToken?: string;
+  repositories?: IRepository[];
+}
+
+export interface IRepository {
+  name: string;
+  nameWithOwner: string;
+  isFork: boolean;
 }
 
 export interface Repository {

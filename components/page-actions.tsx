@@ -105,6 +105,8 @@ export default function PageActions({
 
   const isBountyOwner = () => issueCreator?.toLowerCase() === wallet?.address.toLowerCase();
 
+  const isBountyOwner = () => issueCreator?.toLowerCase() === wallet?.address.toLowerCase();
+
   function renderIssueAvatars() {
     if (developers?.length > 0) return <IssueAvatars users={developers} />;
 

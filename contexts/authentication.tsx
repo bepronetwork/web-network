@@ -19,6 +19,7 @@ import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
+import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 export interface IAuthenticationContext {
   user?: User;
@@ -45,6 +46,7 @@ export const AuthenticationProvider = ({ children }) => {
     useState<boolean>();
 
   const { getUserOf } = useApi();
+  const { getUserRepositories } = useOctokitGraph();
   const { getURLWithNetwork } = useNetworkTheme();
 
   const login = useCallback(async () => {
