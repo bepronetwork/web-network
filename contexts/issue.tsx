@@ -139,6 +139,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     setNetworkIssue({ 
       ...bounty, 
       isDraft, 
+      pullRequests: bounty.pullRequests.filter(pr => !pr.canceled),
       proposals: networkProposals,
       isFinished
     });
