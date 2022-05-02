@@ -195,7 +195,7 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
   if (!pullRequestNetwork)
     return res.status(404).json("Invalid");
 
-  const octoKit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
+  const octoKit = new Octokit({ auth: publicRuntimeConfig.github.token });
 
   const [owner, repo] = issue.repository.githubPath.split("/");
 

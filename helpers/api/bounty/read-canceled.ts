@@ -1,5 +1,6 @@
 
 import { Network_v2 } from "@taikai/dappkit";
+import getConfig from "next/config";
 import { Octokit } from "octokit";
 
 import models from "db/models";
@@ -7,6 +8,8 @@ import models from "db/models";
 import twitterTweet from "helpers/api/handle-twitter-tweet";
 
 import api from "services/api";
+
+const { publicRuntimeConfig } = getConfig();
 
 export default async function readBountyCanceled(events, network: Network_v2, customNetwork) {
   const canceledBounties: string[] = [];
@@ -37,7 +40,7 @@ export default async function readBountyCanceled(events, network: Network_v2, cu
 
           if (repository) {
             const [owner, repo] = repository.githubPath.split('/');
-            const octokit = new Octokit({ auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN });
+            const octokit = new Octokit({ auth: publicRuntimeConfig.github.token });
 
             await octokit.rest.issues.update({
               owner,
@@ -56,7 +59,7 @@ export default async function readBountyCanceled(events, network: Network_v2, cu
               console.log("Error creating SEO", e);
             });
 
-            if (network.contractAddress === process.env.CONTRACT_ADDRESS)
+            if (network.contractAddress === publicRuntimeConfig.contract.address)
               twitterTweet({
                 type: "bounty",
                 action: "changes",
