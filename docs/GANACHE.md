@@ -65,7 +65,6 @@ The console should output the deployed contracts.
 ```bash
 Deploying Bepro Network on custom - http://localhost:7545
 Deployed Bepro on 0xB07F50EBc910F3AB52742629f17f9E0DdBe0Fe14
-...
 Deployed Network Factory on 0x8e4dE4A261eA6963Da54b09Eb24422480f44bD3A
 Deployed Bounty Token on 0x1B762a3902c4BC5eB3E2795408F7db8f50d44519
 Deployed Network on 0xF0c0ffF429349413f4Ad43B7FC912228f2b109Cd
