@@ -178,6 +178,9 @@ async function main() {
   console.log(`Setting Disputable time on ${networkAddress}`);
   await networkContract.changeDisputableTime(60*10);
 
+  console.log(`Setting Council Ammount on ${networkAddress}`);
+  await networkContract.changeCouncilAmount(1000000);
+
  // 6. Set Bounty NFT Dispatcher 
   const bountyBepro = new BountyToken(web3Connection, bountyTokenAddress);
   await bountyBepro.start()
