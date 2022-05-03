@@ -14,6 +14,7 @@ import { useAuthentication } from "contexts/authentication";
 
 import { NetworkColors } from "interfaces/enums/network-colors";
 import { changeNetworkId } from "contexts/reducers/change-network-id";
+import { BeproService } from "services/bepro-service";
 
 const { metaMask } = getConfig().publicRuntimeConfig;
 
@@ -42,16 +43,17 @@ export default function ConnectWalletButton({
   }, [wallet]);
 
   async function handleLogin() {
-    if (window?.web3?.eth) {
-      window?.web3.eth.getChainId().then((chainId) => {
-        console.log("chainId", chainId);
-        if (+chainId === +metaMask.chainId) {
-          login();
-        } else {
-          dispatch(changeNetworkId(+chainId));
-          setShowModal(false);
-        }
-      });
+    if (BeproService?.network) {
+      BeproService.network.web3Connection.web3.eth
+        .getChainId()
+        .then((chainId) => {
+          if (+chainId === +metaMask.chainId) {
+            login();
+          } else {
+            dispatch(changeNetworkId(+chainId));
+            setShowModal(false);
+          }
+        });
     } else {
       login();
     }
