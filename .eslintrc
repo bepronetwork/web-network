@@ -61,6 +61,7 @@
           ["/^components/"],
           ["/^contexts/"],
           ["/^db/"],
+          ["/^graph-ql-queries/"],
           ["/^helpers/"],
           ["/^interfaces/"],
           ["/^pages/"],

@@ -2,6 +2,11 @@ import { graphql } from "@octokit/graphql";
 
 import { useAuthentication } from "contexts/authentication";
 
+import * as CommentsQueries from "graph-ql-queries/comments";
+import * as PullRequestQueries from "graph-ql-queries/pull-request";
+import * as RepositoryQueries from "graph-ql-queries/repository";
+import * as UserQueries from "graph-ql-queries/user";
+
 const getPropertyRecursively = (property, data) => {
   if (data[property]) return data[property];
 
@@ -31,7 +36,7 @@ export default function useOctokitGraph() {
   }
 
   /**
-   * Get all pages of a graphql list, the query MUST CONTAIN A `pageInfo`
+   * Get all pages of a graphql list, the query MUST CONTAIN `pageInfo` and `cursor` parameters
    * @param query string containing the GraphQL query
    * @param variables that mus be passed to the GraphQL query
    * @returns an array of objects containing the data returned by the GraphQL query
@@ -63,23 +68,7 @@ export default function useOctokitGraph() {
   async function getPullRequestParticipants(repositoryPath:  string, pullId: number): Promise<string[]> {
     const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
-    const response = await getAllPages(`
-        query PullRequestParticipants($repo: String!, $owner: String!, $pullId: Int!, $cursor: String) {
-          repository(name: $repo, owner: $owner) {
-              pullRequest(number: $pullId) {
-                  participants(first: 100, after: $cursor) {
-                      pageInfo {
-                          endCursor
-                          hasNextPage
-                      }
-                      nodes {
-                          login
-                      }
-                  }
-              }
-          }
-      }
-    `, {
+    const response = await getAllPages(PullRequestQueries.Participants, {
       repo,
       owner,
       pullId
@@ -96,16 +85,7 @@ export default function useOctokitGraph() {
 
     const githubAPI = getOctoKitInstance();
 
-    const response = await githubAPI?.(`
-        query PullRequestParticipants($repo: String!, $owner: String!, $pullId: Int!) {
-          repository(name: $repo, owner: $owner) {
-              pullRequest(number: $pullId) {
-                additions
-                deletions
-              }
-          }
-      }
-    `, {
+    const response = await githubAPI?.(PullRequestQueries.LinesOfCode, {
       repo,
       owner,
       pullId
@@ -119,46 +99,7 @@ export default function useOctokitGraph() {
   async function getIssueOrPullRequestComments(repositoryPath:  string, id: number) {
     const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
-    const response = await getAllPages(`
-        query Comments($repo: String!, $owner: String!, $id: Int!, $cursor: String) {
-          repository(name: $repo, owner: $owner) {
-              issueOrPullRequest(number: $id) {
-                  ... on PullRequest {
-                      comments(first: 100, after: $cursor) {
-                          pageInfo {
-                              endCursor
-                              hasNextPage
-                          }
-                          nodes {
-                              author {
-                                  login
-                              }
-                              id
-                              updatedAt
-                              body
-                          }
-                      }
-                  }
-                  ... on Issue {
-                      comments(first: 100, after: $cursor) {
-                          pageInfo {
-                              endCursor
-                              hasNextPage
-                          }
-                          nodes {
-                              author {
-                                  login
-                              }
-                              id
-                              updatedAt
-                              body
-                          }
-                      }
-                  }
-              }
-          }
-      }
-    `, {
+    const response = await getAllPages(CommentsQueries.Comments, {
       repo,
       owner,
       id
@@ -176,17 +117,7 @@ export default function useOctokitGraph() {
 
     const githubAPI = getOctoKitInstance();
 
-    const response = await githubAPI?.(`
-      query PullRequestDetails($repo: String!, $owner: String!, $id: Int!) {
-        repository(name: $repo, owner: $owner) {
-          pullRequest(number: $id) {
-            mergeable
-            merged
-            state
-          }
-        }
-      }
-    `, {
+    const response = await githubAPI?.(PullRequestQueries.Details, {
       repo,
       owner,
       id
@@ -200,23 +131,7 @@ export default function useOctokitGraph() {
   async function getRepositoryForks(repositoryPath:  string) {
     const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
-    const response = await getAllPages(`
-      query Forks($repo: String!, $owner: String!, $cursor: String) {
-        repository(name: $repo, owner: $owner) {
-            forks(first: 100, after: $cursor) {
-                pageInfo {
-                    endCursor
-                    hasNextPage
-                }
-                nodes {
-                    owner {
-                        login
-                    }
-                }
-            }
-        }
-      }
-    `, {
+    const response = await getAllPages(RepositoryQueries.Forks, {
       repo,
       owner
     });
@@ -230,21 +145,7 @@ export default function useOctokitGraph() {
   async function getRepositoryBranches(repositoryPath:  string) {
     const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
-    const response = await getAllPages(`
-      query Forks($repo: String!, $owner: String!, $cursor: String) {
-        repository(name: $repo, owner: $owner) {
-          refs(first: 100, refPrefix:"refs/heads/", after: $cursor) {
-            pageInfo {
-              endCursor
-              hasNextPage
-            }
-            nodes {
-              name
-            }
-          }
-        }
-      }
-    `, {
+    const response = await getAllPages(RepositoryQueries.Branches, {
       repo,
       owner
     });
@@ -256,23 +157,7 @@ export default function useOctokitGraph() {
 
   async function getUserRepositories(login:  string) {
 
-    const response = await getAllPages(`
-      query Repositories($login: String!, $cursor: String) {
-        user(login: $login) {
-          repositories(first: 100, after: $cursor) {
-            pageInfo {
-              endCursor
-              hasNextPage
-            }
-            nodes {
-              name
-              nameWithOwner
-              isFork
-            }
-          }
-        }
-      }
-    `, {
+    const response = await getAllPages(UserQueries.Repositories, {
       login
     });
 
