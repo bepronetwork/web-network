@@ -11,7 +11,8 @@ const publicRuntimeConfig = {
   contract:{
     address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
     settler: process.env.NEXT_PUBLIC_SETTLER_ADDRESS,
-    transaction: process.env.NEXT_PUBLIC_TRANSACTION_ADDRESS
+    transaction: process.env.NEXT_PUBLIC_TRANSACTION_ADDRESS,
+    nft: process.env.NEXT_PUBLIC_NFT_ADDRESS
   },
   web3ProviderConnection: process.env.NEXT_PUBLIC_WEB3_CONNECTION,
   github:{

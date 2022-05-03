@@ -148,7 +148,7 @@ class BeproFacet {
   }
 
   async createNetwork(networkToken: string = publicRuntimeConfig.contract.settler, 
-                      nftToken = '0x23891F76C9A3Ad7c523F4A373881bD7D282B5D5E', 
+                      nftToken: string = publicRuntimeConfig.contract.nft, 
                       nftUri = '//',
                       treasuryAddress = Defaults.nativeZeroAddress,
                       cancelFee = 10000,
