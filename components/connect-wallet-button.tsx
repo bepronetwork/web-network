@@ -11,9 +11,11 @@ import Modal from "components/modal";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
+import { changeNetworkId } from "contexts/reducers/change-network-id";
 
 import { NetworkColors } from "interfaces/enums/network-colors";
-import { changeNetworkId } from "contexts/reducers/change-network-id";
+
+
 import { BeproService } from "services/bepro-service";
 
 const { metaMask } = getConfig().publicRuntimeConfig;
@@ -43,8 +45,8 @@ export default function ConnectWalletButton({
   }, [wallet]);
 
   async function handleLogin() {
-    if (BeproService?.network) {
-      BeproService.network.web3Connection.web3.eth
+    if (BeproService?.bepro) {
+      BeproService.bepro.web3.eth
         .getChainId()
         .then((chainId) => {
           if (+chainId === +metaMask.chainId) {
