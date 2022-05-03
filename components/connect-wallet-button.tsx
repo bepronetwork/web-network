@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
@@ -13,26 +13,53 @@ import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 
 import { NetworkColors } from "interfaces/enums/network-colors";
-const { publicRuntimeConfig } = getConfig()
+import { changeNetworkId } from "contexts/reducers/change-network-id";
 
+const { metaMask } = getConfig().publicRuntimeConfig;
 
 export default function ConnectWalletButton({
   children = null,
   asModal = false,
-  forceLogin = false
+  forceLogin = false,
 }) {
   const { t } = useTranslation(["common", "connect-wallet-button"]);
 
   const {
-    state: { loading }
+    dispatch,
+    state: { loading },
   } = useContext(ApplicationContext);
   const { wallet, beproServiceStarted, login } = useAuthentication();
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     if (!beproServiceStarted) return;
 
     if (forceLogin) login();
   }, [beproServiceStarted]);
+
+  useEffect(() => {
+    handleShowModal();
+  }, [wallet]);
+
+  async function handleLogin() {
+    if (window?.web3?.eth) {
+      window?.web3.eth.getChainId().then((chainId) => {
+        console.log("chainId", chainId);
+        if (+chainId === +metaMask.chainId) {
+          login();
+        } else {
+          dispatch(changeNetworkId(+chainId));
+          setShowModal(false);
+        }
+      });
+    } else {
+      login();
+    }
+  }
+
+  function handleShowModal() {
+    if (!wallet?.address) setShowModal(true);
+  }
 
   if (asModal) {
     if (loading.isLoading) return <></>;
@@ -43,16 +70,16 @@ export default function ConnectWalletButton({
         titlePosition="center"
         centerTitle
         titleClass="h3 text-white bg-opacity-100"
-        show={!wallet?.address}
+        show={showModal}
       >
         <div className="d-flex flex-column text-center align-items-center">
           <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
             {t("connect-wallet-button:to-access-this-page")}
             <br />
             <span
-              style={{ color: NetworkColors[publicRuntimeConfig.metaMask.chainName.toLowerCase()] }}
+              style={{ color: NetworkColors[metaMask.chainName.toLowerCase()] }}
             >
-              <span>{publicRuntimeConfig.metaMask.chainName}</span>{" "}
+              <span>{metaMask.chainName}</span>{" "}
               {t("connect-wallet-button:network")}
             </span>{" "}
             {t("connect-wallet-button:on-your-wallet")}
@@ -60,7 +87,7 @@ export default function ConnectWalletButton({
           <div className="d-flex justify-content-center align-items-center w-100">
             <div
               className="rounded-8 bg-dark-gray text-white p-3 d-flex text-center justify-content-center align-items-center w-75 cursor-pointer"
-              onClick={login}
+              onClick={handleLogin}
             >
               <Image src={metamaskLogo} width={15} height={15} />
               <span className="text-white text-uppercase ms-2 caption-large">
@@ -100,7 +127,7 @@ export default function ConnectWalletButton({
       <Button
         color="white"
         className="text-primary bg-opacity-100"
-        onClick={login}
+        onClick={handleLogin}
       >
         <span>{t("main-nav.connect")}</span> <i className="ico-metamask" />
       </Button>
