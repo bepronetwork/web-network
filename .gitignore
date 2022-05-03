@@ -22,6 +22,9 @@
 .idea/
 .vscode/
 .scripts/
+dev.env
+old.env
+prod.env
 
 # debug
 npm-debug.log*
