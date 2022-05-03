@@ -42,3 +42,19 @@ export const Details =
       }
   }
 }`;
+
+export const CreateLabel =
+`mutation CreateLabel($name: String!, $repositoryId: ID!, $color: String!, $description: String) {
+  createLabel(
+    input: {
+      color: $color,
+      name: $name,
+      description: $description,
+      repositoryId: $repositoryId
+    }
+  ) {
+    label {
+      id
+    }
+  }
+}`;
