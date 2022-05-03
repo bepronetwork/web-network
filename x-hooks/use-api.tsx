@@ -151,7 +151,9 @@ export default function useApi() {
     return client
         .post("/bounty", { ...payload, networkName })
         .then(({ data }) => data)
-        .catch((error) => error);
+        .catch((error) => {
+          throw error
+        });
   }
 
   async function moveIssueToOpen(scIssueId?: string) {
