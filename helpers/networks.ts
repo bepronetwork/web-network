@@ -72,7 +72,7 @@ export const NETWORKS: {
     currency: DEV,
     decimals: 18,
     explorerURL: "https://blockscout.moonriver.moonbeam.network",
-    rpcUrls: ["http://eth-seneca.taikai.network:8545"]
+    rpcUrls: ["https://eth-seneca.taikai.network:8545"]
   },
   "0x5dd": {
     id: "1501",
@@ -81,7 +81,7 @@ export const NETWORKS: {
     currency: DEV,
     decimals: 18,
     explorerURL: "https://blockscout.moonriver.moonbeam.network",
-    rpcUrls: ["http://eth-afrodite.taikai.network:8545"]
+    rpcUrls: ["https://eth-afrodite.taikai.network:8545"]
   },
   "0x5de": {
     id: "1502",
@@ -90,7 +90,7 @@ export const NETWORKS: {
     currency: DEV,
     decimals: 18,
     explorerURL: "https://blockscout.moonriver.moonbeam.network",
-    rpcUrls: ["http://eth-irene.taikai.network:8545"]
+    rpcUrls: ["https://eth-irene.taikai.network:8545"]
   },
   "0x5df": {
     id: "1503",
@@ -99,6 +99,6 @@ export const NETWORKS: {
     currency: DEV,
     decimals: 18,
     explorerURL: "https://blockscout.moonriver.moonbeam.network",
-    rpcUrls: ["http://eth-iris.taikai.network:8545"]
+    rpcUrls: ["https://eth-iris.taikai.network:8545"]
   }
 };
