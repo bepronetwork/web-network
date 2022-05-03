@@ -1,6 +1,6 @@
 import { IBalance } from "interfaces/balance-state";
 
-export interface IUser {
+export interface User {
   name?: string;
   login?: string;
   email?: string;
@@ -8,13 +8,13 @@ export interface IUser {
   accessToken?: string;
 }
 
-export interface IRepository {
+export interface Repository {
   name: string;
   nameWithOwner: string;
   isFork: boolean;
 }
 
-export interface IWallet {
+export interface Wallet {
   address: string;
   isCouncil: boolean;
   isApprovedSettlerToken: boolean;
