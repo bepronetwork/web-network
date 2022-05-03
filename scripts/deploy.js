@@ -100,13 +100,13 @@ async function main() {
       showErrorAndHelp(`Please provide a valid URL for the custom network`);
       exit(1);
     }    
-    rpcUrl = url;
+    rpcUrl = argv.url;
   } else {
     rpcUrl = networks[argv.network].url
   }
 
   const options = { 
-      web3Host: networks[argv.network].url,
+      web3Host: rpcUrl,
       privateKey: ownerPrivKey,
       skipWindowAssignment: true
   };
@@ -133,10 +133,11 @@ async function main() {
    const beproToken = new ERC20(web3Connection, beproAddress);
    await beproToken.start();
 
-   for(const address of stagingAccounts) {
-    console.log(`Transfering 10M BEPRO to ${address}`);
-    await beproToken.transferTokenAmount(address, 10000000);
-   }
+   if(argv.network !== 'custom')
+    for(const address of stagingAccounts) {
+      console.log(`Transfering 10M BEPRO to ${address}`);
+      await beproToken.transferTokenAmount(address, 10000000);
+    }
 
   // 2. Deploying Network Proxy
     
