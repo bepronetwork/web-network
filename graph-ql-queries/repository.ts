@@ -29,3 +29,16 @@ export const Branches =
       }
     }
   }`;
+
+export const Details =
+`query Details($repo: String!, $owner: String!) {
+  repository(name: $repo, owner: $owner) {
+      id
+      labels(first: 1, query: "draft") {
+        nodes {
+          id
+          name
+        }
+      }
+  }
+}`;
