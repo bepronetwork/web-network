@@ -1,9 +1,12 @@
+import { graphql } from "@octokit/graphql";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
-import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
 import models from "db/models";
+
+import * as IssueQueries from "graph-ql-queries/issue";
+import * as RepositoryQueries from "graph-ql-queries/repository";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -34,26 +37,49 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   if (!repository) return res.status(404).json("Repository not found");
 
-  const octokit = new Octokit({ auth: publicRuntimeConfig.github.token });
-
   const [owner, repo] = repository.githubPath.split("/");
 
-  const githubId = (
-    await octokit.rest.issues.create({
-      owner,
-      repo,
-      title,
-      body,
-      labels: ["draft"]
-    })
-  )?.data?.number?.toString();
+  const githubAPI = graphql.defaults({
+    headers: {
+      authorization: `token ${publicRuntimeConfig.github.token}`,
+      accept: "application/vnd.github.bane-preview+json"
+    }
+  });
 
-  if (await models.issue.findOne({ where: { githubId, repository_id: repository.id } }))
+  const repositoryDetails = await githubAPI(RepositoryQueries.Details, {
+    repo,
+    owner
+  });
+
+  const repositoryGithubId = repositoryDetails["repository"]["id"];
+  let draftLabelId = null;
+
+  if (!repositoryDetails["repository"]["labels"]["nodes"].length) {
+    const createdLabel = await githubAPI(RepositoryQueries.CreateLabel, {
+      name: "draft",
+      repositoryId: repositoryGithubId,
+      color: "cfd3d7"
+    });
+
+    draftLabelId = createdLabel["createLabel"]["label"]["id"];
+  } else draftLabelId = repositoryDetails["repository"]["labels"]["nodes"][0]["id"];
+
+
+  const createdIssue = await githubAPI(IssueQueries.Create, {
+    repositoryId: repositoryGithubId,
+    title,
+    body,
+    labelId: [draftLabelId]
+  });
+
+  const githubId = createdIssue["createIssue"]["issue"]["number"];
+
+  if (await models.issue.findOne({ where: { githubId: `${githubId}`, repository_id: repository.id } }))
     return res.status(409).json("issueId already exists on database");
 
   await models.issue.create({
     issueId: `${repository.id}/${githubId}`,
-    githubId,
+    githubId: `${githubId}`,
     repository_id: repository.id,
     creatorAddress: '',
     creatorGithub: '',
