@@ -5,8 +5,6 @@ import { Octokit } from "octokit";
 
 import models from "db/models";
 
-import api from "services/api";
-
 const { publicRuntimeConfig } = getConfig();
 
 export default async function readPullRequestCanceled(events, network: Network_v2, customNetwork) {
@@ -63,6 +61,12 @@ export default async function readPullRequestCanceled(events, network: Network_v
           });
 
           canceled.push(pullRequest.githubId);
+
+          if (!networkBounty.pullRequests.find(pr => pr.ready && !pr.canceled)) {
+            bounty.state = "open";
+
+            await bounty.save();
+          }
         }
       }
 

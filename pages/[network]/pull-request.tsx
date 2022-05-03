@@ -185,7 +185,7 @@ export default function PullRequestPage() {
               <div className="col-4 gap-20 p-0 d-flex justify-content-end">
                 {wallet?.address &&
                   user?.login &&
-                  pullRequest?.state === "open" &&
+                  pullRequest?.state?.toLowerCase() === "open" &&
                   networkPullRequest?.ready &&
                   !networkPullRequest?.canceled && (
                     <ReadOnlyButtonWrapper>
@@ -201,7 +201,7 @@ export default function PullRequestPage() {
                   {
                     wallet?.address &&
                     user?.login &&
-                    pullRequest?.state === "open" &&
+                    pullRequest?.state?.toLowerCase() === "open" &&
                     pullRequest?.status === "draft" &&
                     !networkPullRequest?.ready &&
                     !networkPullRequest?.canceled &&

@@ -30,6 +30,12 @@ export default function useOctokitGraph() {
     });
   }
 
+  /**
+   * Get all pages of a graphql list, the query MUST CONTAIN A `pageInfo`
+   * @param query string containing the GraphQL query
+   * @param variables that mus be passed to the GraphQL query
+   * @returns an array of objects containing the data returned by the GraphQL query
+   */
   async function getAllPages(query, variables) {
     const api = getOctoKitInstance();
     
@@ -88,7 +94,9 @@ export default function useOctokitGraph() {
   async function getPullRequestLinesOfCode(repositoryPath:  string, pullId: number): Promise<number> {
     const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
-    const response = await getAllPages(`
+    const githubAPI = getOctoKitInstance();
+
+    const response = await githubAPI?.(`
         query PullRequestParticipants($repo: String!, $owner: String!, $pullId: Int!) {
           repository(name: $repo, owner: $owner) {
               pullRequest(number: $pullId) {
@@ -103,7 +111,7 @@ export default function useOctokitGraph() {
       pullId
     });
 
-    const { additions, deletions } = response[0]["repository"]["pullRequest"];
+    const { additions, deletions } = response["repository"]["pullRequest"];
 
     return additions + deletions;
   }
@@ -125,6 +133,7 @@ export default function useOctokitGraph() {
                               author {
                                   login
                               }
+                              id
                               updatedAt
                               body
                           }
@@ -140,6 +149,7 @@ export default function useOctokitGraph() {
                               author {
                                   login
                               }
+                              id
                               updatedAt
                               body
                           }
@@ -164,7 +174,9 @@ export default function useOctokitGraph() {
   async function getPullRequestDetails(repositoryPath:  string, id: number) {
     const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
-    const response = await getAllPages(`
+    const githubAPI = getOctoKitInstance();
+
+    const response = await githubAPI?.(`
       query PullRequestDetails($repo: String!, $owner: String!, $id: Int!) {
         repository(name: $repo, owner: $owner) {
           pullRequest(number: $id) {
@@ -180,7 +192,7 @@ export default function useOctokitGraph() {
       id
     });
 
-    const { mergeable, merged, state } = response[0]["repository"]["pullRequest"];
+    const { mergeable, merged, state } = response["repository"]["pullRequest"];
 
     return { mergeable, merged, state };
   }
