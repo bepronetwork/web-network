@@ -45,7 +45,7 @@ export default function ProposalItem({
   const { pastEventsV2 } = useApi();
   
   const networkProposals = networkIssue?.proposals?.[proposal?.contractId];
-  const networkPullRequest = networkIssue?.pullRequests?.[networkProposals?.prId];
+  const networkPullRequest = networkIssue?.pullRequests?.find(pr => pr.id === networkProposals?.prId);
 
   const isDisable = () => [
       networkIssue?.closed,
