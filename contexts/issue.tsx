@@ -89,6 +89,7 @@ export const IssueProvider: React.FC = function ({ children }) {
       issue.pullRequests = await updatePullRequests(issue?.pullRequests,
                                                     ghPath);
     }
+
     const comments = await getIssueOrPullRequestComments(ghPath, +issue.githubId);
     
     const newActiveIssue = {
@@ -152,7 +153,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     }
   }, [activeIssue, wallet?.address, beproServiceStarted]);
 
-  useEffect(() => {
+  useEffect(() => {    
     const noExpired = +new Date() - activeIssue?.lastUpdated <= TTL;
 
     if (query.id && query.repoId) {
