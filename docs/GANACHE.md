@@ -44,27 +44,33 @@ read more about in [doc](https://trufflesuite.com/docs/ganache/).
 
 ## 3. DEPLOY NEW CONTRACT IN GANACHE.
 
-1. Update the .env file with the private key
+1. Update the .env file with the wallet private key and address
 
 ```text
 # .env
 
-NEXT_GANACHE_HOST=http://127.0.0.1
-NEXT_GANACHE_PORT=7545
-NEXT_GANACHE_WALLET_PRIVATE_KEY=yourPrivateKey
+#Deploy Contract
+DEPLOY_OWNER_ADDRESS=
+DEPLOY_PRIVATE_KEY=
 ```
 
 2. to make deploy, run
 
 ```bash
-$ npm run ganache:deploy
+$  node ./scripts/deploy-v2 -n custom -u 'http://127.0.0.1:7545'
 ```
 
 The console should output the deployed contracts.
 
 ```bash
-ERC20 Contract Address: 0x2391c186F6813BDD167a360c3EeE98232e1b0080
-Network Contract Address: 0x10d3Dcc3BC74c22B6482AF74038d890983C65659
+Deploying Bepro Network on custom - http://localhost:7545
+Deployed Bepro on 0xB07F50EBc910F3AB52742629f17f9E0DdBe0Fe14
+Deployed Network Factory on 0x8e4dE4A261eA6963Da54b09Eb24422480f44bD3A
+Deployed Bounty Token on 0x1B762a3902c4BC5eB3E2795408F7db8f50d44519
+Deployed Network on 0xF0c0ffF429349413f4Ad43B7FC912228f2b109Cd
+Setting Redeeem time on 0xF0c0ffF429349413f4Ad43B7FC912228f2b109Cd
+Setting Disputable time on 0xF0c0ffF429349413f4Ad43B7FC912228f2b109Cd
+Set Bounty Token Dispatcher 0xF0c0ffF429349413f4Ad43B7FC912228f2b109Cd
 ```
 
 3. Update the .env with the contract addresses
@@ -73,6 +79,7 @@ Network Contract Address: 0x10d3Dcc3BC74c22B6482AF74038d890983C65659
 # .env
 
 NEXT_PUBLIC_CONTRACT_ADDRESS=NetworkContractAddress
-NEXT_PUBLIC_SETTLER_ADDRESS=ERC20ContractAddress
-NEXT_PUBLIC_TRANSACTION_ADDRESS=ERC20ContractAddress
+NEXT_PUBLIC_SETTLER_ADDRESS=BeproContractAddress
+NEXT_PUBLIC_TRANSACTION_ADDRESS=BeproContractAddress
+NEXT_PUBLIC_NETWORK_FACTORY_ADDRESS=NetworkFactoryAddress
 ```
