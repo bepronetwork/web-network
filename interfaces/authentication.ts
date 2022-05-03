@@ -8,12 +8,6 @@ export interface User {
   accessToken?: string;
 }
 
-export interface IRepository {
-  name: string;
-  nameWithOwner: string;
-  isFork: boolean;
-}
-
 export interface Repository {
   name: string;
   nameWithOwner: string;
