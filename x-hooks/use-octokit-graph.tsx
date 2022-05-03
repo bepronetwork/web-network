@@ -7,15 +7,7 @@ import * as PullRequestQueries from "graph-ql-queries/pull-request";
 import * as RepositoryQueries from "graph-ql-queries/repository";
 import * as UserQueries from "graph-ql-queries/user";
 
-const getPropertyRecursively = (property, data) => {
-  if (data[property]) return data[property];
-
-  let found = {};
-
-  for(const key in data) found = getPropertyRecursively(property, data[key]);
-
-  return found;
-};
+import { getPropertyRecursively } from "helpers/object";
 
 export default function useOctokitGraph() {
   const { user } = useAuthentication();
