@@ -37,3 +37,17 @@ export const Close =
     }
   }
 }`;
+
+export const RemoveLabel = 
+`mutation RemoveLabel($issueId: ID!, $labelId: [ID!]) {
+  removeLabelsFromLabelable(
+    input: {
+      labelIds: $labelId,
+      labelableId: $issueId
+    }
+  ) {
+    labelable {
+      id
+    }
+  }
+}`;

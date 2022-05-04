@@ -12,7 +12,6 @@ import { useRouter } from "next/router";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 
 import { BranchInfo, BranchsList } from "interfaces/branchs-list";
-import { developer } from "interfaces/issue-data";
 import {
   ReposList,
   RepoInfo,
@@ -21,7 +20,6 @@ import {
 } from "interfaces/repos-list";
 
 import useApi from "x-hooks/use-api";
-import useOctokit from "x-hooks/use-octokit";
 import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 import { ApplicationContext } from "./application";
@@ -61,10 +59,10 @@ export const ReposProvider: React.FC = function ({ children }) {
   const [forksList, setForksList] = useState<ForksList>({});
   const [activeRepo, setActiveRepo] = useState<IActiveRepo>(null);
 
-  const { getReposList, getBranchsList } = useApi();
+  const { getReposList } = useApi();
   const { dispatch } = useContext(ApplicationContext);
   const { activeNetwork } = useNetwork();
-  const { getRepositoryForks } = useOctokitGraph();
+  const { getRepositoryForks, getRepositoryBranches } = useOctokitGraph();
   const { query } = useRouter();
 
   const findRepo = (repoId: number): RepoInfo =>
@@ -94,10 +92,12 @@ export const ReposProvider: React.FC = function ({ children }) {
   const findBranch = useCallback(async (repoId: number, forced?: boolean): Promise<BranchInfo[]> => {
     if (branchsList[repoId] && !forced) return branchsList[repoId];
 
-    const branchs = await getBranchsList(repoId, false, activeNetwork?.name);
+    const repoPath = findRepo(repoId)?.githubPath;
+
+    const branchs = await getRepositoryBranches(repoPath);
     setBranchsList((prevState) => ({
         ...prevState,
-        [repoId]: branchs
+        [repoId]: branchs.map(branch => ({ branch }))
     }));
     return branchs;
   },

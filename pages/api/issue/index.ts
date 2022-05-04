@@ -1,6 +1,6 @@
-import { graphql } from "@octokit/graphql";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
+import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
 import models from "db/models";
@@ -43,12 +43,9 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const [owner, repo] = repository.githubPath.split("/");
 
-  const githubAPI = graphql.defaults({
-    headers: {
-      authorization: `token ${publicRuntimeConfig.github.token}`,
-      accept: "application/vnd.github.bane-preview+json"
-    }
-  });
+  const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
+
+  // accept: "application/vnd.github.bane-preview+json"
 
   const repositoryDetails = await githubAPI(RepositoryQueries.Details, {
     repo,

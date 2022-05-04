@@ -3,8 +3,14 @@ import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
-const { publicRuntimeConfig } = getConfig()
+
 import models from "db/models";
+
+import * as CommentsQueries from "graphql/comments";
+import * as IssueQueries from "graphql/issue";
+
+const { publicRuntimeConfig } = getConfig();
+
 async function put(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, pullRequestId, githubLogin, body, networkName } = req.body;
 
@@ -38,22 +44,28 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     const [owner, repo] = repository.githubPath.split("/");
 
-    const octoKit = new Octokit({ auth: publicRuntimeConfig.github.token });
+    const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
-    const octoResponse = await octoKit.rest.issues.createComment({
-      owner,
+    const issueDetails = await githubAPI(IssueQueries.Details, {
       repo,
-      issue_number: pullRequest.githubId,
-      body: `<p>@${githubLogin} reviewed this with the following message:</p><p>${body}</p>`
+      owner,
+      issueId: +issue.githubId
     });
 
+    const issueGithubId = issueDetails["repository"]["issue"]["id"];
+
+    const review = await githubAPI(CommentsQueries.Create, {
+      issueOrPullRequestId: issueGithubId,
+      body: `<p>@${githubLogin} reviewed this with the following message:</p><p>${body}</p>`
+    });
+    
     if (!pullRequest.reviewers.find((el) => el === String(githubLogin))) {
       pullRequest.reviewers = [...pullRequest.reviewers, githubLogin];
 
       await pullRequest.save();
     }
 
-    return res.status(octoResponse.status).json(octoResponse.data);
+    return res.status(200).json(review);
   } catch (error) {
     return res.status(error.status || 500).json(error.response?.data || error);
   }

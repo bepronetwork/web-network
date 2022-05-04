@@ -5,11 +5,14 @@ import { Op } from "sequelize";
 
 import models from "db/models";
 
+import * as IssueQueries from "graphql/issue";
+import * as PullRequestQueries from "graphql/pull-request";
+
 import api from "services/api";
 
 import twitterTweet from "../handle-twitter-tweet";
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 
 export default async function readBountyClosed(events, network: Network_v2, customNetwork) {
   const closedBounties = [];
@@ -50,19 +53,31 @@ export default async function readBountyClosed(events, network: Network_v2, cust
           if (pullRequest) {
             const [owner, repo] = bounty.repository.githubPath.split("/");
             
-            const octokit = new Octokit({ auth: publicRuntimeConfig.github.token });
+            const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
-            await octokit.rest.pulls.merge({
-              owner,
+            const issueDetails = await githubAPI(IssueQueries.Details, {
               repo,
-              pull_number: pullRequest?.githubId
+              owner,
+              issueId: +bounty.githubId
             });
-            
-            await octokit.rest.issues.update({
-              owner,
+
+            const issueGithubId = issueDetails["repository"]["issue"]["id"];
+
+            const pullRequestDetails = await githubAPI(PullRequestQueries.Details, {
               repo,
-              issue_number: bounty.githubId,
-              state: "closed"
+              owner,
+              id: +pullRequest.githubId
+            });
+  
+            const pullRequestGithubId = pullRequestDetails["repository"]["pullRequest"]["id"];
+
+
+            await githubAPI(PullRequestQueries.Merge, {
+              pullRequestId: pullRequestGithubId
+            });
+
+            await githubAPI(IssueQueries.Close, {
+              issueId: issueGithubId
             });
 
             const pullRequests = await models.pullRequest.findAll({
@@ -75,11 +90,16 @@ export default async function readBountyClosed(events, network: Network_v2, cust
         
             for (const pr of pullRequests) {
               try {
-                await octokit.rest.pulls.update({
-                  owner,
+                const pullRequestDetails = await githubAPI(PullRequestQueries.Details, {
                   repo,
-                  pull_number: pr.githubId,
-                  state: "closed"
+                  owner,
+                  id: +pr.githubId
+                });
+      
+                const pullRequestGithubId = pullRequestDetails["repository"]["pullRequest"]["id"];
+      
+                await githubAPI(PullRequestQueries.Close, {
+                  pullRequestId: pullRequestGithubId
                 });
               } catch (e) {
                 console.error(`Failed to update pull for ${pr.githubId}`, e);

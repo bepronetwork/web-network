@@ -12,7 +12,8 @@ const { publicRuntimeConfig } = getConfig()
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { fromBlock, id, networkName } = req.body;
-  const octokit = new Octokit({auth: publicRuntimeConfig.github.token});
+  
+  const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
   const customNetwork = await models.network.findOne({
     where: {
@@ -37,7 +38,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       readCloseIssues(events, {
         network,
         models,
-        octokit,
+        octokit: githubAPI,
         res,
         customNetworkId: customNetwork.id
       }))

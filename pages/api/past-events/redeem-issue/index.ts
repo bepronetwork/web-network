@@ -5,10 +5,13 @@ import { Op } from "sequelize";
 
 import models from "db/models";
 
+import * as IssueQueries from "graphql/issue";
+
 import networkBeproJs from "helpers/api/handle-network-bepro";
 import twitterTweet from "helpers/api/handle-twitter-tweet";
 import { Bus } from "helpers/bus";
 import { handleNetworkAddress } from 'helpers/custom-network';
+
 
 import api from "services/api";
 
@@ -28,7 +31,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   if (!customNetwork) return res.status(404).json("Invalid network");
   if (customNetwork.isClosed) return res.status(404).json("Invalid network");
 
-  const octokit = new Octokit({ auth: publicRuntimeConfig.github.token });
+  const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
   const network = networkBeproJs({ contractAddress: handleNetworkAddress(customNetwork.networkAddress) });
 
@@ -58,13 +61,21 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         const repoInfo = await models.repositories.findOne({
           where: { id: issue?.repository_id }
         });
+
         const [owner, repo] = repoInfo.githubPath.split("/");
-        await octokit.rest.issues.update({
-          owner,
+
+        const issueDetails = await githubAPI(IssueQueries.Details, {
           repo,
-          issue_number: +issue.githubId,
-          state: "closed"
+          owner,
+          issueId: +issue.githubId
         });
+      
+        const issueGithubId = issueDetails["repository"]["issue"]["id"];
+      
+        await githubAPI(IssueQueries.Close, {
+          issueId: issueGithubId
+        });
+
         issue.state = "canceled";
 
         if (network.contractAddress === publicRuntimeConfig.contract.address)

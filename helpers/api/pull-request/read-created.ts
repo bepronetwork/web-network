@@ -1,7 +1,7 @@
 
-import { graphql } from "@octokit/graphql";
 import { Network_v2 } from "@taikai/dappkit";
 import getConfig from "next/config";
+import { Octokit } from "octokit";
 
 import models from "db/models";
 
@@ -55,11 +55,7 @@ export default async function readPullRequestCreated(events, network: Network_v2
           const body = 
             `@${bounty.creatorGithub}, @${pullRequest.githubLogin} has a solution - [check your bounty](${issueLink})`;
 
-          const githubAPI = graphql.defaults({
-            headers: {
-              authorization: `token ${publicRuntimeConfig.github.token}`
-            }
-          });
+          const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
           const issueDetails = await githubAPI(IssueQueries.Details, {
             repo,

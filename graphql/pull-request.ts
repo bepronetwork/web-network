@@ -77,3 +77,16 @@ export const Create =
     }
   }
 }`;
+
+export const Merge =
+`mutation MergePullRequest($pullRequestId: ID!) {
+  mergePullRequest(
+    input: {
+      pullRequestId: $pullRequestId
+    }
+  ) {
+    pullRequest {
+      id
+    }
+  }
+}`;

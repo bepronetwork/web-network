@@ -1,4 +1,4 @@
-import { graphql } from "@octokit/graphql";
+import { Octokit } from "octokit";
 
 import { useAuthentication } from "contexts/authentication";
 
@@ -21,11 +21,9 @@ export default function useOctokitGraph() {
   function getOctoKitInstance() {
     if (!user?.accessToken) return undefined;
 
-    return graphql.defaults({
-      headers: {
-        authorization: `token ${user?.accessToken}`
-      }
-    });
+    const octokit = new Octokit({ auth: user.accessToken });
+
+    return octokit.graphql;
   }
 
   /**

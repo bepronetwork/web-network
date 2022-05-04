@@ -1,8 +1,8 @@
-import { graphql } from "@octokit/graphql";
 import { Network_v2 } from "@taikai/dappkit";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
+import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
 import models from "db/models";
@@ -84,11 +84,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const [owner, repo] = repoInfo.githubPath.split("/");
 
-  const githubAPI = graphql.defaults({
-    headers: {
-      authorization: `token ${publicRuntimeConfig.github.token}`
-    }
-  });
+  const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
   const repositoryDetails = await githubAPI(RepositoryQueries.Details, {
     repo,
@@ -205,11 +201,7 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
   if (!pullRequestNetwork)
     return res.status(404).json("Invalid");
 
-  const githubAPI = graphql.defaults({
-    headers: {
-      authorization: `token ${publicRuntimeConfig.github.token}`
-    }
-  });
+  const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
   const [owner, repo] = issue.repository.githubPath.split("/");
 

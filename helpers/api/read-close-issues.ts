@@ -1,11 +1,15 @@
 import getConfig from "next/config";
 import { Op } from "sequelize";
 
+import * as IssueQueries from "graphql/issue";
+import * as PullRequestQueries from "graphql/pull-request";
+
 import { Bus } from "helpers/bus";
 
 import api from "services/api";
 
 import twitterTweet from "./handle-twitter-tweet";
+
 
 const { publicRuntimeConfig } = getConfig()
 
@@ -41,18 +45,30 @@ export default async function readCloseIssues(events,
       where: { id: issue?.repository_id }
     });
     const [owner, repo] = repoInfo.githubPath.split("/");
-    
-    await octokit.rest.pulls.merge({
-      owner,
+
+    const issueDetails = await octokit(IssueQueries.Details, {
       repo,
-      pull_number: pullRequest?.githubId
+      owner,
+      issueId: +issue.githubId
     });
-    
-    await octokit.rest.issues.update({
-      owner,
+
+    const issueGithubId = issueDetails["repository"]["issue"]["id"];
+
+    const pullRequestDetails = await octokit(PullRequestQueries.Details, {
       repo,
-      issue_number: issue.githubId,
-      state: "closed"
+      owner,
+      id: +pullRequest.githubId
+    });
+
+    const pullRequestGithubId = pullRequestDetails["repository"]["pullRequest"]["id"];
+
+
+    await octokit(PullRequestQueries.Merge, {
+      pullRequestId: pullRequestGithubId
+    });
+
+    await octokit(IssueQueries.Close, {
+      issueId: issueGithubId
     });
 
     const pullRequests = await models.pullRequest.findAll({
@@ -65,11 +81,16 @@ export default async function readCloseIssues(events,
 
     for (const pr of pullRequests) {
       try {
-        await octokit.rest.pulls.update({
-          owner,
+        const pullRequestDetails = await octokit(PullRequestQueries.Details, {
           repo,
-          pull_number: pr.githubId,
-          state: "closed"
+          owner,
+          id: +pr.githubId
+        });
+
+        const pullRequestGithubId = pullRequestDetails["repository"]["pullRequest"]["id"];
+
+        await octokit(PullRequestQueries.Close, {
+          pullRequestId: pullRequestGithubId
         });
       } catch (e) {
         console.error(`Failed to update pull for ${pr.githubId}`, e);

@@ -7,6 +7,9 @@ import { Op } from "sequelize";
 
 import models from "db/models";
 
+import * as IssueQueries from "graphql/issue";
+import * as RepositoryQueries from "graphql/repository";
+
 import networkBeproJs from "helpers/api/handle-network-bepro";
 import twitterTweet from "helpers/api/handle-twitter-tweet";
 
@@ -53,19 +56,43 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     };
 
     const issues = await models.issue.findAll({ where });
-    const octokit = new Octokit({ auth: publicRuntimeConfig.github.token });
+
+    const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
+
+    // "application/vnd.github.bane-preview+json"
+
+    let currentRepo = '';
+    let labelId = null;
 
     for (const issue of issues) {
       try {
         const repoInfo = await models.repositories.findOne({
           where: { id: issue.repository_id }
         });
+
         const [owner, repo] = repoInfo.githubPath.split("/");
-        await octokit.rest.issues.removeLabel({
-          owner,
+
+        if (currentRepo !== `${owner}/${repo}`) {
+          currentRepo = `${owner}/${repo}`;
+
+          const repositoryDetails = await githubAPI(RepositoryQueries.Details, {
+            repo,
+            owner
+          });
+
+          labelId = 
+            repositoryDetails["repository"]["labels"]["nodes"].find(label => label.name.toLowerCase() === "draft")?.id;
+        }
+
+        const issueDetails = await githubAPI(IssueQueries.Details, {
           repo,
-          issue_number: issue.githubId,
-          name: "draft"
+          owner,
+          issueId: +issue.githubId
+        });
+
+        await githubAPI(IssueQueries.RemoveLabel, {
+          issueId: issueDetails["repository"]["issue"]["id"],
+          labelId: [labelId]
         });
       } catch (error) {
         // label not exists, ignoring

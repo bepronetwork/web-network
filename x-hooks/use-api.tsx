@@ -302,59 +302,11 @@ export default function useApi() {
       .catch(() => []);
   }
 
-  async function getBranchsList(repoId: string | number,
-                                force = false,
-                                networkName = publicRuntimeConfig.networkConfig.networkName) {
-    if (!force && branchsList[repoId]?.length)
-      return Promise.resolve(branchsList[repoId] as BranchInfo[]);
-
-    return client
-      .get<BranchInfo[]>(`/repos/branchs/${repoId}/${networkName}`)
-      .then(({ data }) => {
-        branchsList[repoId] = data;
-        return data;
-      })
-      .catch(() => []);
-  }
-
   async function removeRepo(id: string) {
     return client
       .delete(`/repos/${id}`)
       .then(({ status }) => status === 200)
       .catch(() => false);
-  }
-
-  async function poll(eventName: string,
-                      rest,
-                      networkName = publicRuntimeConfig.networkConfig.networkName) {
-    return client.post("/poll/",
-      { eventName, ...rest, networkName },
-      { timeout: 2 * 60 * 1000 });
-  }
-
-  async function waitForMerge(githubLogin,
-                              issue_id,
-                              currentGithubId,
-                              networkName = publicRuntimeConfig.networkConfig.networkName) {
-    return poll("mergeProposal",
-      { githubLogin, issue_id, currentGithubId },
-                networkName)
-      .then(({ data }) => data)
-      .catch(() => null);
-  }
-
-  async function waitForClose(currentGithubId,
-                              networkName = publicRuntimeConfig.networkConfig.networkName) {
-    return poll("closeIssue", { currentGithubId }, networkName)
-      .then(({ data }) => data)
-      .catch(() => null);
-  }
-
-  async function waitForRedeem(currentGithubId,
-                               networkName = publicRuntimeConfig.networkConfig.networkName) {
-    return poll("redeemIssue", { currentGithubId }, networkName)
-      .then(({ data }) => data)
-      .catch(() => null);
   }
 
   async function processEvent(eventName,
@@ -623,7 +575,6 @@ export default function useApi() {
     createReviewForPR,
     getAllUsers,
     getCurrencyByToken,
-    getBranchsList,
     getClientNation,
     getHealth,
     getIssue,
@@ -655,9 +606,6 @@ export default function useApi() {
     updateNetwork,
     uploadFiles,
     userHasPR,
-    waitForClose,
-    waitForMerge,
-    waitForRedeem,
     createPreBounty,
     cancelPrePullRequest,
     pastEventsV2

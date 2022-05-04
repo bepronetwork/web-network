@@ -1,3 +1,4 @@
+import { Network_v2 } from "@taikai/dappkit";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
@@ -6,8 +7,13 @@ import { Op } from "sequelize";
 
 import models from "db/models";
 
+import * as PullRequestQueries from "graphql/pull-request";
+
 import networkBeproJs from "helpers/api/handle-network-bepro";
-const { publicRuntimeConfig } = getConfig()
+
+
+const { publicRuntimeConfig } = getConfig();
+
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, pullRequestId, mergeProposalId, address, networkName } =
     req.body;
@@ -28,7 +34,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       where: { issueId, network_id: customNetwork.id }
     });
 
-    if (!issue) return res.status(404).json("Issue not found");
+    if (!issue) return res.status(404).json("Bounty not found");
 
     const pullRequest = await models.pullRequest.findOne({
       where: { githubId: pullRequestId, issueId: issue.id }
@@ -37,30 +43,30 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     if (!pullRequest) return res.status(404).json("Pull Request not found");
 
     const network = networkBeproJs({
-      contractAddress: customNetwork.networkAddress
-    });
+      contractAddress: customNetwork.networkAddress,
+      version: 2
+    }) as Network_v2;
 
     await network.start();
 
-    const issueBepro = await network.getIssueByCID(issueId);
+    const issueBepro = await network.getBounty(issue.contractId);
 
-    if (!issueBepro) return res.status(404).json("Issue not found on network");
+    if (!issueBepro) return res.status(404).json("Bounty not found on network");
 
-    if (issueBepro.canceled || !issueBepro.finalized)
-      return res.status(400).json("Issue canceled or not closed yet");
+    if (issueBepro.canceled || !issueBepro.closed)
+      return res.status(400).json("Bounty canceled or not closed yet");
 
-    const mergeBepro = await network.getMergeById(issueBepro._id,
-                                                  mergeProposalId);
+    const proposal = issueBepro.proposals[mergeProposalId];
 
-    if (!mergeBepro) return res.status(404).json("Merge proposal not found");
+    if (!proposal) return res.status(404).json("Merge proposal not found");
 
-    const isCouncil = await network.isCouncil(address);
+    const isCouncil = await network.getOraclesOf(address) >= await network.councilAmount();
 
     if (
-      address.toLowerCase() !== issueBepro.issueGenerator.toLowerCase() &&
-      address.toLowerCase() !== mergeBepro.proposalAddress.toLowerCase() &&
+      address.toLowerCase() !== issueBepro.creator.toLowerCase() &&
+      address.toLowerCase() !== proposal.creator.toLowerCase() &&
       !isCouncil &&
-      !mergeBepro.prAddresses.find((el) => el.toLowerCase() === address.toLowerCase())
+      !proposal.details.find(({recipient}) => recipient.toLowerCase() === address.toLowerCase())
     )
       return res.status(403).json("Not authorized");
 
@@ -71,15 +77,22 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const [owner, repo] = repository.githubPath.split("/");
 
-    const octoKit = new Octokit({ auth: publicRuntimeConfig.github.token });
+    const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
-    const octoResponse = await octoKit.rest.pulls.merge({
-      owner,
+    const pullRequestDetails = await githubAPI(PullRequestQueries.Details, {
       repo,
-      pull_number: pullRequest?.githubId
+      owner,
+      id: +pullRequest.githubId
     });
 
-    return res.status(octoResponse.status).json(octoResponse.data);
+    const pullRequestGithubId = pullRequestDetails["repository"]["pullRequest"]["id"];
+
+
+    const merged = await githubAPI(PullRequestQueries.Merge, {
+      pullRequestId: pullRequestGithubId
+    });
+
+    return res.status(200).json(merged);
   } catch (error) {
     return res.status(error.status || 500).json(error.response?.data || error);
   }

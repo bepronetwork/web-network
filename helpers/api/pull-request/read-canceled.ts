@@ -1,7 +1,7 @@
 
-import { graphql } from "@octokit/graphql";
 import { Network_v2 } from "@taikai/dappkit";
 import getConfig from "next/config";
+import { Octokit } from "octokit";
 
 import models from "db/models";
 
@@ -44,11 +44,7 @@ export default async function readPullRequestCanceled(events, network: Network_v
 
           const [owner, repo] = networkPullRequest.originRepo.split("/");
 
-          const githubAPI = graphql.defaults({
-            headers: {
-              authorization: `token ${publicRuntimeConfig.github.token}`
-            }
-          });
+          const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
           const pullRequestDetails = await githubAPI(PullRequestQueries.Details, {
             repo,

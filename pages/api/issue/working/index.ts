@@ -1,7 +1,7 @@
-import { graphql } from "@octokit/graphql";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
+import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
 import models from "db/models";
@@ -45,11 +45,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
       await issue.save();
 
-      const githubAPI = graphql.defaults({
-        headers: {
-          authorization: `token ${publicRuntimeConfig.github.token}`
-        }
-      });
+      const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
       const issueDetails = await githubAPI(IssueQueries.Details, {
         repo,
