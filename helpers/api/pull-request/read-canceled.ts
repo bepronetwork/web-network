@@ -1,7 +1,7 @@
 
+import { graphql } from "@octokit/graphql";
 import { Network_v2 } from "@taikai/dappkit";
 import getConfig from "next/config";
-import { Octokit } from "octokit";
 
 import models from "db/models";
 
