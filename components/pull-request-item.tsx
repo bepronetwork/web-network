@@ -21,7 +21,6 @@ import { formatNumberToNScale } from "helpers/formatNumber";
 import { pullRequest } from "interfaces/issue-data";
 
 import useNetwork from "x-hooks/use-network";
-import useOctokit from "x-hooks/use-octokit";
 import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 interface IPullRequestItem {
