@@ -345,8 +345,7 @@ export default function Settings() {
       !BeproService.isStarted ||
       !network ||
       !wallet?.address ||
-      !user?.login ||
-      network?.name?.toLowerCase() === publicRuntimeConfig?.networkConfig?.networkName
+      !user?.login
     )
       return;
 

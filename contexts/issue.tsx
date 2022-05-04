@@ -113,7 +113,7 @@ export const IssueProvider: React.FC = function ({ children }) {
 
     const bounty = await BeproService.getBounty(activeIssue?.contractId);
 
-    const isFinished = bounty?.pullRequests?.some(pullRequest => pullRequest.ready);
+    const isFinished = bounty?.pullRequests?.some(pullRequest => pullRequest.ready && !pullRequest.canceled);
 
     let isDraft = null;
 
@@ -154,9 +154,8 @@ export const IssueProvider: React.FC = function ({ children }) {
   }, [activeIssue, wallet?.address, beproServiceStarted]);
 
   useEffect(() => {
-    if (!user?.accessToken) return;
-    
     const noExpired = +new Date() - activeIssue?.lastUpdated <= TTL;
+
     if (query.id && query.repoId) {
       if (
         query.id !== activeIssue?.githubId ||
@@ -167,10 +166,6 @@ export const IssueProvider: React.FC = function ({ children }) {
       }
     }
   }, [query, activeNetwork, user?.accessToken]);
-
-  // useEffect(() => {
-  //   console.log('useIssue',{activeIssue, networkIssue})
-  // }, [activeIssue, networkIssue]);
 
   const memorizeValue = useMemo<IssueContextData>(() => ({
       activeIssue,

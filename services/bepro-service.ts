@@ -148,11 +148,14 @@ class BeproFacet {
   }
 
   async createNetwork(networkToken: string = publicRuntimeConfig.contract.settler, 
-                      nftToken = '0x23891F76C9A3Ad7c523F4A373881bD7D282B5D5E', 
-                      nftUri = '//') {
+                      nftToken: string = publicRuntimeConfig.contract.nft, 
+                      nftUri = '//',
+                      treasuryAddress = Defaults.nativeZeroAddress,
+                      cancelFee = 10000,
+                      closeFee= 50000) {
     if (!this.isNetworkFactoryStarted) await this.startNetworkFactory();
 
-    return this.networkFactory.createNetwork(networkToken, nftToken, nftUri);
+    return this.networkFactory.createNetwork(networkToken, nftToken, nftUri, treasuryAddress, cancelFee, closeFee);
   }
 
   // Getters and Setters
