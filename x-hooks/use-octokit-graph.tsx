@@ -2,10 +2,11 @@ import { graphql } from "@octokit/graphql";
 
 import { useAuthentication } from "contexts/authentication";
 
-import * as CommentsQueries from "graph-ql-queries/comments";
-import * as PullRequestQueries from "graph-ql-queries/pull-request";
-import * as RepositoryQueries from "graph-ql-queries/repository";
-import * as UserQueries from "graph-ql-queries/user";
+import * as CommentsQueries from "graphql/comments";
+import * as PullRequestQueries from "graphql/pull-request";
+import * as RepositoryQueries from "graphql/repository";
+import * as UserQueries from "graphql/user";
+
 
 import { getPropertyRecursively } from "helpers/object";
 
@@ -91,7 +92,7 @@ export default function useOctokitGraph() {
   async function getIssueOrPullRequestComments(repositoryPath:  string, id: number) {
     const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
-    const response = await getAllPages(CommentsQueries.Comments, {
+    const response = await getAllPages(CommentsQueries.List, {
       repo,
       owner,
       id

@@ -5,8 +5,9 @@ import { Op } from "sequelize";
 
 import models from "db/models";
 
-import * as IssueQueries from "graph-ql-queries/issue";
-import * as RepositoryQueries from "graph-ql-queries/repository";
+import * as IssueQueries from "graphql/issue";
+import * as RepositoryQueries from "graphql/repository";
+
 
 const { publicRuntimeConfig } = getConfig();
 

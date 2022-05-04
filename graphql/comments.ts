@@ -1,4 +1,14 @@
-export const Comments = 
+export const Create =
+`mutation CreateComment(issueOrPullRequestId: ID!, body: String!) {
+    addComment(
+        input: {
+            subjectId: $issueOrPullRequestId,
+            body: $body
+        }
+    )
+}`;
+
+export const List = 
   `query Comments($repo: String!, $owner: String!, $id: Int!, $cursor: String) {
     repository(name: $repo, owner: $owner) {
         issueOrPullRequest(number: $id) {

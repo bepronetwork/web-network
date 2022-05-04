@@ -29,9 +29,24 @@ export const Details =
   `query Details($repo: String!, $owner: String!, $id: Int!) {
     repository(name: $repo, owner: $owner) {
       pullRequest(number: $id) {
+        id
         mergeable
         merged
         state
       }
     }
   }`;
+
+export const Close =
+`mutation ClosePullRequest($pullRequestId: ID!) {
+  closePullRequest(
+    input: {
+      pullRequestId: $pullRequestId
+    }
+  ) {
+    issue {
+      id
+      number
+    }
+  }
+}`;
