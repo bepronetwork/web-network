@@ -1,11 +1,14 @@
+import { graphql } from "@octokit/graphql";
 import { Network_v2 } from "@taikai/dappkit";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
-import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
 import models from "db/models";
+
+import * as PullRequestQueries from "graphql/pull-request";
+import * as RepositoryQueries from "graphql/repository";
 
 import networkBeproJs from "helpers/api/handle-network-bepro";
 import paginate from "helpers/paginate";
@@ -81,26 +84,33 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const [owner, repo] = repoInfo.githubPath.split("/");
 
-  const octoKit = new Octokit({ auth: publicRuntimeConfig.github.token });
+  const githubAPI = graphql.defaults({
+    headers: {
+      authorization: `token ${publicRuntimeConfig.github.token}`
+    }
+  });
 
-  const options = {
-    accept: "application/vnd.github.v3+json",
-    owner,
+  const repositoryDetails = await githubAPI(RepositoryQueries.Details, {
     repo,
-    title,
-    body,
-    head: `${username}:${branch}`,
-    base: issue.branch || serverRuntimeConfig.github.mainBranch,
-    maintainer_can_modify: false,
-    draft: false
-  };
+    owner
+  });
+
+  const repositoryGithubId = repositoryDetails["repository"]["id"];
 
   try {
-    const created = await octoKit.rest.pulls.create(options);
+    const created = await githubAPI(PullRequestQueries.Create, {
+      repositoryId: repositoryGithubId,
+      title,
+      body,
+      head: `${username}:${branch}`,
+      base: issue.branch || serverRuntimeConfig.github.mainBranch,
+      maintainerCanModify: false,
+      draft: false
+    });
 
     await models.pullRequest.create({
       issueId: issue.id,
-      githubId: created.data?.number,
+      githubId: `${created["createPullRequest"]["pullRequest"]["number"]}`,
       githubLogin: username,
       branch,
       status: "pending"
@@ -120,10 +130,10 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       originCID: issue.issueId,
       userRepo: `${username}/${repo}`,
       userBranch: branch,
-      cid: created.data?.number 
+      cid: `${created["createPullRequest"]["pullRequest"]["number"]}`
     });
   } catch (error) {
-    return res.status(error.response.status).json(error.response.data);
+    return res.status(error?.response?.status || 500).json(error?.response?.data || error);
   }
 }
 
@@ -195,15 +205,22 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
   if (!pullRequestNetwork)
     return res.status(404).json("Invalid");
 
-  const octoKit = new Octokit({ auth: publicRuntimeConfig.github.token });
+  const githubAPI = graphql.defaults({
+    headers: {
+      authorization: `token ${publicRuntimeConfig.github.token}`
+    }
+  });
 
   const [owner, repo] = issue.repository.githubPath.split("/");
 
-  await octoKit.rest.pulls.update({
-    owner,
+  const pullRequestDetails = await githubAPI(PullRequestQueries.Details, {
     repo,
-    pull_number: pullRequestGithubId,
-    state: "closed"
+    owner,
+    id: +pullRequestGithubId
+  });
+
+  await githubAPI(PullRequestQueries.Close, {
+    pullRequestId: pullRequestDetails["repository"]["pullRequest"]["id"]
   });
 
   await pullRequest.destroy();

@@ -44,7 +44,34 @@ export const Close =
       pullRequestId: $pullRequestId
     }
   ) {
-    issue {
+    pullRequest {
+      id
+      number
+    }
+  }
+}`;
+
+export const Create =
+`mutation CreatePullRequest(
+  $repositoryId: ID!, 
+  $title: String!, 
+  $body: String!, 
+  $head: String!, 
+  $base: String!, 
+  $maintainerCanModify: Boolean, 
+  $draft: Boolean ) {
+  createPullRequest(
+    input: {
+      baseRefName: $base,
+      body: $body,
+      headRefName: $head,
+      repositoryId: $repositoryId,
+      title: $title,
+      maintainerCanModify: $maintainerCanModify,
+      draft: $draft
+    }
+  ) {
+    pullRequest {
       id
       number
     }

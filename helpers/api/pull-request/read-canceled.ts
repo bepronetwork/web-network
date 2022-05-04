@@ -1,9 +1,12 @@
 
+import { graphql } from "@octokit/graphql";
 import { Network_v2 } from "@taikai/dappkit";
 import getConfig from "next/config";
-import { Octokit } from "octokit";
 
 import models from "db/models";
+
+import * as CommentsQueries from "graphql/comments";
+import * as PullRequestQueries from "graphql/pull-request";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -39,24 +42,30 @@ export default async function readPullRequestCanceled(events, network: Network_v
 
           await pullRequest.save();
 
-          const octoKit = new Octokit({ auth: publicRuntimeConfig.github.token });
-
           const [owner, repo] = networkPullRequest.originRepo.split("/");
 
-          await octoKit.rest.pulls.update({
-            owner,
-            repo,
-            pull_number: pullRequest.githubId,
-            state: "closed"
+          const githubAPI = graphql.defaults({
+            headers: {
+              authorization: `token ${publicRuntimeConfig.github.token}`
+            }
           });
 
-          const body = 
-            `This pull request was closed by @${pullRequest.githubLogin}`;
-
-          await octoKit.rest.issues.createComment({
-            owner,
+          const pullRequestDetails = await githubAPI(PullRequestQueries.Details, {
             repo,
-            issue_number: pullRequest.githubId,
+            owner,
+            id: +pullRequest.githubId
+          });
+
+          const pullRequestGithubId = pullRequestDetails["repository"]["pullRequest"]["id"];
+
+          await githubAPI(PullRequestQueries.Close, {
+            pullRequestId: pullRequestGithubId
+          });
+
+          const body = `This pull request was closed by @${pullRequest.githubLogin}`;
+
+          await githubAPI(CommentsQueries.Create, {
+            issueOrPullRequestId: pullRequestGithubId,
             body
           });
 

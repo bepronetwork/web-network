@@ -1,13 +1,20 @@
+import { graphql } from "@octokit/graphql";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
-import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
 import models from "db/models";
 
+import * as CommentsQueries from "graphql/comments";
+import * as IssueQueries from "graphql/issue";
+
+import { getPropertyRecursively } from "helpers/object";
+
 import api from "services/api";
-const { publicRuntimeConfig } = getConfig()
+
+const { publicRuntimeConfig } = getConfig();
+
 async function put(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, githubLogin, networkName } = req.body;
 
@@ -38,22 +45,37 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
       await issue.save();
 
-      const octokit = new Octokit({
-        auth: publicRuntimeConfig.github.token,
+      const githubAPI = graphql.defaults({
+        headers: {
+          authorization: `token ${publicRuntimeConfig.github.token}`
+        }
       });
 
-      const response = await octokit.rest.issues.createComment({
-        owner,
+      const issueDetails = await githubAPI(IssueQueries.Details, {
         repo,
-        issue_number: issue.githubId,
-        body: `@${githubLogin} is working on this.`
+        owner,
+        issueId: +issue.githubId
       });
+
+      const issueGithubId = issueDetails["repository"]["issue"]["id"];
+
+      const commentEdge = getPropertyRecursively("node", await githubAPI(CommentsQueries.Create, {
+        issueOrPullRequestId: issueGithubId,
+        body: `@${githubLogin} is working on this.`
+      }));
+      
+      const comment = {
+        id: commentEdge["id"],
+        body: commentEdge["body"],
+        updatedAt: commentEdge["updatedAt"],
+        author: commentEdge["author"]["login"]
+      };
 
       await api.post(`/seo/${issue?.issueId}`).catch((e) => {
         console.log("Error creating SEO", e);
       });
 
-      return res.status(response.status).json(response.data);
+      return res.status(200).json(comment);
     }
 
     return res.status(409).json("Already working");

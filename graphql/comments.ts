@@ -1,11 +1,22 @@
 export const Create =
-`mutation CreateComment(issueOrPullRequestId: ID!, body: String!) {
+`mutation CreateComment($issueOrPullRequestId: ID!, $body: String!) {
     addComment(
         input: {
             subjectId: $issueOrPullRequestId,
             body: $body
         }
-    )
+    ) {
+        commentEdge {
+          node {
+            author {
+              login
+            }
+            body
+            id
+            updatedAt
+          }
+        }
+      }
 }`;
 
 export const List = 

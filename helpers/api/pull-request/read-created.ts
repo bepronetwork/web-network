@@ -1,9 +1,12 @@
 
+import { graphql } from "@octokit/graphql";
 import { Network_v2 } from "@taikai/dappkit";
 import getConfig from "next/config";
-import { Octokit } from "octokit";
 
 import models from "db/models";
+
+import * as CommentsQueries from "graphql/comments";
+import * as IssueQueries from "graphql/issue";
 
 import api from "services/api";
 
@@ -45,8 +48,6 @@ export default async function readPullRequestCreated(events, network: Network_v2
 
           await pullRequest.save();
 
-          const octoKit = new Octokit({ auth: publicRuntimeConfig.github.token });
-
           const [owner, repo] = networkPullRequest.originRepo.split("/");
 
           const issueLink = 
@@ -54,10 +55,22 @@ export default async function readPullRequestCreated(events, network: Network_v2
           const body = 
             `@${bounty.creatorGithub}, @${pullRequest.githubLogin} has a solution - [check your bounty](${issueLink})`;
 
-          await octoKit.rest.issues.createComment({
-            owner,
+          const githubAPI = graphql.defaults({
+            headers: {
+              authorization: `token ${publicRuntimeConfig.github.token}`
+            }
+          });
+
+          const issueDetails = await githubAPI(IssueQueries.Details, {
             repo,
-            issue_number: bounty.githubId,
+            owner,
+            issueId: +bounty.githubId
+          });
+    
+          const issueGithubId = issueDetails["repository"]["issue"]["id"];
+    
+          await githubAPI(CommentsQueries.Create, {
+            issueOrPullRequestId: issueGithubId,
             body
           });
 

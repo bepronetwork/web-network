@@ -1,13 +1,16 @@
 
+import { graphql } from "@octokit/graphql";
 import { Network_v2 } from "@taikai/dappkit";
 import getConfig from "next/config";
-import { Octokit } from "octokit";
 
 import models from "db/models";
+
+import * as IssueQueries from "graphql/issue";
 
 import twitterTweet from "helpers/api/handle-twitter-tweet";
 
 import api from "services/api";
+
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -39,14 +42,24 @@ export default async function readBountyCanceled(events, network: Network_v2, cu
           });
 
           if (repository) {
-            const [owner, repo] = repository.githubPath.split('/');
-            const octokit = new Octokit({ auth: publicRuntimeConfig.github.token });
+            const [owner, repo] = repository.githubPath.split("/");
 
-            await octokit.rest.issues.update({
-              owner,
+            const githubAPI = graphql.defaults({
+              headers: {
+                authorization: `token ${publicRuntimeConfig.github.token}`
+              }
+            });
+
+            const issueDetails = await githubAPI(IssueQueries.Details, {
               repo,
-              issue_number: bounty.githubId,
-              state: "closed"
+              owner,
+              issueId: +bounty.githubId
+            });
+
+            const issueGithubId = issueDetails["repository"]["issue"]["id"];
+
+            await githubAPI(IssueQueries.Close, {
+              issueId: issueGithubId
             });
 
             bounty.state = 'canceled';
