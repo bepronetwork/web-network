@@ -149,7 +149,7 @@ export default function useApi() {
   async function createPreBounty(payload: CreateBounty,
                                  networkName = publicRuntimeConfig.networkConfig.networkName): Promise<string> {
     return client
-        .post("/bounty", { ...payload, networkName })
+        .post("/issue", { ...payload, networkName })
         .then(({ data }) => data)
         .catch((error) => {
           throw error

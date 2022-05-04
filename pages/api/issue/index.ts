@@ -1,25 +1,25 @@
+import { graphql } from "@octokit/graphql";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
-import { Octokit } from "octokit";
 import { Op } from "sequelize";
 
 import models from "db/models";
+
+import * as IssueQueries from "graphql/issue";
+import * as RepositoryQueries from "graphql/repository";
 
 import twitterTweet from "helpers/api/handle-twitter-tweet";
 
 import api from "services/api";
 
+const { publicRuntimeConfig } = getConfig();
 
-const { publicRuntimeConfig } = getConfig()
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {
     title,
-    description: body,
-    amount,
-    repository_id,
-    branch,
-    creatorAddress,
-    creatorGithub,
+    body,
+    repositoryId,
+    creator,
     networkName
   } = req.body;
 
@@ -33,47 +33,69 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   if (!network || network?.isClosed) return res.status(404).json("Invalid network");
 
-  if (!creatorGithub) return res.status(422).json("creatorGithub is required");
+  if (!creator) return res.status(422).json("Invalid Github user");
 
   const repository = await models.repositories.findOne({
-    where: { id: req.body.repository_id, network_id: network.id }
+    where: { id: repositoryId, network_id: network.id }
   });
-  if (!repository) return res.status(422).json("repository not found");
 
-  const octokit = new Octokit({ auth: publicRuntimeConfig.github.token });
+  if (!repository) return res.status(404).json("Repository not found");
 
   const [owner, repo] = repository.githubPath.split("/");
 
-  const githubId =
-    req.body.githubIssueId ||
-    (
-      await octokit.rest.issues.create({
-        owner,
-        repo,
-        title,
-        body,
-        labels: ["draft"]
-      })
-    )?.data?.number?.toString();
+  const githubAPI = graphql.defaults({
+    headers: {
+      authorization: `token ${publicRuntimeConfig.github.token}`,
+      accept: "application/vnd.github.bane-preview+json"
+    }
+  });
 
-  if (await models.issue.findOne({ where: { githubId, repository_id } }))
+  const repositoryDetails = await githubAPI(RepositoryQueries.Details, {
+    repo,
+    owner
+  });
+
+  const repositoryGithubId = repositoryDetails["repository"]["id"];
+  let draftLabelId = null;
+
+  if (!repositoryDetails["repository"]["labels"]["nodes"].length) {
+    const createdLabel = await githubAPI(RepositoryQueries.CreateLabel, {
+      name: "draft",
+      repositoryId: repositoryGithubId,
+      color: "cfd3d7"
+    });
+
+    draftLabelId = createdLabel["createLabel"]["label"]["id"];
+  } else draftLabelId = repositoryDetails["repository"]["labels"]["nodes"][0]["id"];
+
+
+  const createdIssue = await githubAPI(IssueQueries.Create, {
+    repositoryId: repositoryGithubId,
+    title,
+    body,
+    labelId: [draftLabelId]
+  });
+
+  const githubId = createdIssue["createIssue"]["issue"]["number"];
+
+  if (await models.issue.findOne({ where: { githubId: `${githubId}`, repository_id: repository.id } }))
     return res.status(409).json("issueId already exists on database");
 
   await models.issue.create({
-    // issueId: `${repository_id}/${githubId}`,
-    githubId,
-    repository_id,
-    creatorAddress,
-    creatorGithub,
-    amount,
-    branch,
+    issueId: `${repository.id}/${githubId}`,
+    githubId: `${githubId}`,
+    repository_id: repository.id,
+    creatorAddress: '',
+    creatorGithub: '',
+    amount: 0,
+    branch: '',
     state: "pending",
-    title,
-    body,
+    title: '',
+    body: body,
     network_id: network.id
   });
 
-  return res.status(200).json(`${repository_id}/${githubId}`);
+  return res.status(200).json(`${repository.id}/${githubId}`);
 }
 
 async function patch(req: NextApiRequest, res: NextApiResponse) {
