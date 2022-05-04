@@ -7,6 +7,7 @@ import * as PullRequestQueries from "graphql/pull-request";
 import * as RepositoryQueries from "graphql/repository";
 import * as UserQueries from "graphql/user";
 
+
 import { getPropertyRecursively } from "helpers/object";
 
 import { GraphQlQueryResponseData, GraphQlResponse } from "types/octokit";
