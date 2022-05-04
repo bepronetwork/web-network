@@ -31,7 +31,7 @@ export default function PageIssue() {
 
   const [isWorking, setIsWorking] = useState(false);
   const [hasOpenPR, setHasOpenPR] = useState(false);
-  const [commentsIssue, setCommentsIssue] = useState();
+  const [commentsIssue, setCommentsIssue] = useState([]);
   const [isRepoForked, setIsRepoForked] = useState(false);
 
   const { wallet, user } = useAuthentication();
@@ -120,7 +120,7 @@ export default function PageIssue() {
   }
 
   function addNewComment(comment) {
-    setCommentsIssue([...(commentsIssue as any), comment] as any);
+    setCommentsIssue([...commentsIssue, comment]);
   }
 
   function checkIsWorking() {
@@ -130,7 +130,7 @@ export default function PageIssue() {
 
   function syncLocalyState() {
     // eslint-disable-next-line no-unsafe-optional-chaining
-    if (issue?.comments) setCommentsIssue([...issue?.comments] as any);
+    if (issue?.comments) setCommentsIssue([...issue?.comments]);
   }
 
   function refreshIssue() {
