@@ -19,7 +19,7 @@ export default function IssueComments({ comments, repo, issueId }) {
           <div className="content-wrapper">
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h3 className="caption-large mb-0">
-                {t("misc.comments", { count: comments?.length })}
+                {t("misc.comments", { count: comments?.length || 0 })}
               </h3>
               <a
                 href={replyRef}
@@ -42,9 +42,3 @@ export default function IssueComments({ comments, repo, issueId }) {
     </div>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {}
-  };
-};
