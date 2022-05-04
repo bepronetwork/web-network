@@ -13,16 +13,19 @@ import { NETWORKS } from "helpers/networks";
 import { NetworkColors } from "interfaces/enums/network-colors";
 
 import Button from "./button";
-const { networkIds, metaMask  } = getConfig().publicRuntimeConfig
+const { networkIds, metaMask } = getConfig().publicRuntimeConfig;
 
-export default function WrongNetworkModal({ requiredNetworkId = null }: {
-  requiredNetworkId: number
+export default function WrongNetworkModal({
+  requiredNetworkId = null,
+}: {
+  requiredNetworkId: number;
 }) {
   const [isAddingNetwork, setIsAddingNetwork] = useState(false);
+  const [error, setError] = useState<string>("");
   const { t } = useTranslation("common");
 
   const {
-    state: { networkId: activeNetworkId }
+    state: { networkId: activeNetworkId },
   } = useContext(ApplicationContext);
 
   function showModal() {
@@ -35,6 +38,7 @@ export default function WrongNetworkModal({ requiredNetworkId = null }: {
 
   async function handleAddNetwork() {
     setIsAddingNetwork(true);
+    setError("");
     const chainId = `0x${Number(metaMask.chainId).toString(16)}`;
     const currencyNetwork = NETWORKS[chainId];
     try {
@@ -42,28 +46,37 @@ export default function WrongNetworkModal({ requiredNetworkId = null }: {
         method: "wallet_switchEthereumChain",
         params: [
           {
-            chainId: chainId
-          }
-        ]
+            chainId: chainId,
+          },
+        ],
       });
     } catch (error: any) {
       if (error.code === 4902) {
-        await window.ethereum.request({
-          method: "wallet_addEthereumChain",
-          params: [
-            {
-              chainId: chainId,
-              chainName: currencyNetwork.name,
-              nativeCurrency: {
-                name: currencyNetwork.currency.name,
-                symbol: currencyNetwork.currency.symbol,
-                decimals: currencyNetwork.decimals
+        try {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [
+              {
+                chainId: chainId,
+                chainName: currencyNetwork.name,
+                nativeCurrency: {
+                  name: currencyNetwork.currency.name,
+                  symbol: currencyNetwork.currency.symbol,
+                  decimals: currencyNetwork.decimals,
+                },
+                rpcUrls: currencyNetwork.rpcUrls,
+                blockExplorerUrls: [currencyNetwork.explorerURL],
               },
-              rpcUrls: currencyNetwork.rpcUrls,
-              blockExplorerUrls: [currencyNetwork.explorerURL]
-            }
-          ]
-        });
+            ],
+          });
+        } catch (error: any) {
+          if (error.code === -32602) {
+            setError(t("modals.wrong-network.error-invalid-rpcUrl"));
+          }
+          if (error.code === -32603) {
+            setError(t("modals.wrong-network.error-failed-rpcUrl"));
+          }
+        }
       }
     } finally {
       setIsAddingNetwork(false);
@@ -84,7 +97,8 @@ export default function WrongNetworkModal({ requiredNetworkId = null }: {
         <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
           {t("modals.wrong-network.please-connect")}{" "}
           <span style={{ color: NetworkColors[networkIds[requiredNetworkId]] }}>
-            <span>{networkIds[requiredNetworkId]}</span> {t("modals.wrong-network.network")}
+            <span>{networkIds[requiredNetworkId]}</span>{" "}
+            {t("modals.wrong-network.network")}
           </span>
           <br /> {t("modals.wrong-network.on-your-wallet")}
         </strong>
@@ -103,6 +117,9 @@ export default function WrongNetworkModal({ requiredNetworkId = null }: {
         >
           {t("modals.wrong-network.change-network")}
         </Button>
+        {error && (
+          <p className="caption-small text-uppercase text-danger">{error}</p>
+        )}
         <div className="small-info text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-1 pt-1">
           {t("misc.by-connecting")}{" "}
           <a

@@ -202,7 +202,9 @@
       "please-connect": "please, connect to the",
       "network": "network",
       "on-your-wallet": "on your metamask wallet",
-      "change-network": "Change Network"
+      "change-network": "Change Network",
+      "error-invalid-rpcUrl": "rpcUrls error expected an array with at least one valid string HTTPS url",
+      "error-failed-rpcUrl": "Request rpcUrl failed"
     },
     "user-missing-information": {
       "title": "Your account is missing some information",
