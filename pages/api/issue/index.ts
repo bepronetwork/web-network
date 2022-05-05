@@ -45,8 +45,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
-  // accept: "application/vnd.github.bane-preview+json"
-
   const repositoryDetails = await githubAPI(RepositoryQueries.Details, {
     repo,
     owner
@@ -59,7 +57,10 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const createdLabel = await githubAPI(RepositoryQueries.CreateLabel, {
       name: "draft",
       repositoryId: repositoryGithubId,
-      color: "cfd3d7"
+      color: "cfd3d7",
+      headers: {
+        accept: "application/vnd.github.bane-preview+json"
+      }
     });
 
     draftLabelId = createdLabel["createLabel"]["label"]["id"];
