@@ -15,6 +15,7 @@ export default function useOctokitGraph() {
 
   function getOwnerRepoFrom(path: string) {
     const [owner, repo] = path.split("/");
+    
     return { owner, repo };
   }
 
@@ -113,6 +114,8 @@ export default function useOctokitGraph() {
       owner,
       id
     });
+
+    if(!response) return;
 
     const { mergeable, merged, state } = response["repository"]["pullRequest"];
 

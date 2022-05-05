@@ -89,6 +89,9 @@ export default function PullRequestPage() {
             title: t("actions.failed"),
             content: t("pull-request:actions.review.error"),
         }));
+      })
+      .finally(() => {
+        setIsExecuting(false);
       });
   }
 
@@ -115,6 +118,9 @@ export default function PullRequestPage() {
           title: t("actions.failed"),
           content: t("pull-request:actions.make-ready.error"),
       }));
+    })
+    .finally(() => {
+      setIsExecuting(false);
     });
   }
 
@@ -146,6 +152,9 @@ export default function PullRequestPage() {
           title: t("actions.failed"),
           content: t("pull-request:actions.cancel.error"),
       }));
+    })
+    .finally(() => {
+      setIsExecuting(false);
     });
   }
 

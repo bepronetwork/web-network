@@ -59,8 +59,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
-    // "application/vnd.github.bane-preview+json"
-
     let currentRepo = '';
     let labelId = null;
 
