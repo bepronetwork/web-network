@@ -7,7 +7,7 @@ import { Op } from "sequelize";
 import models from "db/models";
 
 import * as CommentsQueries from "graphql/comments";
-import * as IssueQueries from "graphql/issue";
+import * as PullRequestQueries from "graphql/pull-request";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -46,18 +46,27 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
-    const issueDetails = await githubAPI(IssueQueries.Details, {
+    const pullRequestDetails = await githubAPI(PullRequestQueries.Details, {
       repo,
       owner,
-      issueId: +issue.githubId
+      id: +pullRequest.githubId
     });
 
-    const issueGithubId = issueDetails["repository"]["issue"]["id"];
+    const pullRequestGithubId = pullRequestDetails["repository"]["pullRequest"]["id"];
 
-    const review = await githubAPI(CommentsQueries.Create, {
-      issueOrPullRequestId: issueGithubId,
+    const response = await githubAPI(CommentsQueries.Create, {
+      issueOrPullRequestId: pullRequestGithubId,
       body: `<p>@${githubLogin} reviewed this with the following message:</p><p>${body}</p>`
     });
+
+    const reviewEdge = response["addComment"]["commentEdge"]["node"];
+
+    const review = {
+      id: reviewEdge["id"],
+      body: reviewEdge["body"],
+      updatedAt: reviewEdge["updatedAt"],
+      author: reviewEdge["author"]["login"]
+    };
     
     if (!pullRequest.reviewers.find((el) => el === String(githubLogin))) {
       pullRequest.reviewers = [...pullRequest.reviewers, githubLogin];
@@ -67,6 +76,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     return res.status(200).json(review);
   } catch (error) {
+    console.log(error);
     return res.status(error.status || 500).json(error.response?.data || error);
   }
 }
