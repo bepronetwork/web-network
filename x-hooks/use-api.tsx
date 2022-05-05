@@ -427,7 +427,10 @@ export default function useApi() {
         body,
         networkName
       })
-      .then((response) => response);
+      .then((response) => response)
+      .catch(error => {
+        throw error;
+      });
   }
 
   async function removeUser(address: string, githubLogin: string) {
