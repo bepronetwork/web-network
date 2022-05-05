@@ -1,4 +1,4 @@
-import { Octokit } from "octokit";
+import { Octokit  } from "octokit";
 
 import { useAuthentication } from "contexts/authentication";
 
@@ -7,8 +7,9 @@ import * as PullRequestQueries from "graphql/pull-request";
 import * as RepositoryQueries from "graphql/repository";
 import * as UserQueries from "graphql/user";
 
-
 import { getPropertyRecursively } from "helpers/object";
+
+import { GraphQlResponse } from "types/octokit";
 
 export default function useOctokitGraph() {
   const { user } = useAuthentication();
@@ -19,7 +20,7 @@ export default function useOctokitGraph() {
     return { owner, repo };
   }
 
-  function getOctoKitInstance() {
+  function getOctoKitInstance(): Octokit["graphql"] {
     if (!user?.accessToken) return undefined;
 
     const octokit = new Octokit({ auth: user.accessToken });
@@ -33,7 +34,7 @@ export default function useOctokitGraph() {
    * @param variables that mus be passed to the GraphQL query
    * @returns an array of objects containing the data returned by the GraphQL query
    */
-  async function getAllPages(query, variables) {
+  async function getAllPages(query, variables): Promise<GraphQlResponse[]> {
     const api = getOctoKitInstance();
     
     if (!api) return;
