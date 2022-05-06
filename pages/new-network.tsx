@@ -188,7 +188,7 @@ export default function NewNetwork() {
           .map(repo => ({
             checked: false,
             name: repo.name,
-            fullName: repo.full_name,
+            fullName: repo.nameWithOwner,
           }));
 
         const tmpSteps = Object.assign({}, steps);

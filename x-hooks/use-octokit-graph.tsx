@@ -161,7 +161,11 @@ export default function useOctokitGraph() {
       login
     });
 
-    const repositories = response?.flatMap(item => getPropertyRecursively("nodes", item) );
+    const repositories = response.flatMap<{
+      name: string
+      nameWithOwner: string
+      isFork: boolean
+    }>(item => getPropertyRecursively("nodes", item) );
 
     return repositories;
   }
