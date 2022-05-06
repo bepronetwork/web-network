@@ -34,7 +34,7 @@ export default function useBepro(props?: IUseBeProDefault) {
   const { networkIssue, activeIssue, updateIssue } = useIssue()
   const { t } = useTranslation();
 
-  const { pastEventsV2 } = useApi();
+  const { processEvent } = useApi();
   const txWindow = useTransactions();
 
   async function handlerDisputeProposal(proposalscMergeId: number): Promise<TransactionReceipt | Error> {
@@ -140,7 +140,7 @@ export default function useBepro(props?: IUseBeProDefault) {
         .then((txInfo) => {
           tx = txInfo;
           // Review: Review processEnvets are working correctly
-          return pastEventsV2("bounty", 
+          return processEvent("bounty", 
                               "canceled", 
                               activeNetwork.name, 
                               { fromBlock: txInfo.blockNumber, id: networkIssue?.id });

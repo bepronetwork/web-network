@@ -309,31 +309,14 @@ export default function useApi() {
       .catch(() => false);
   }
 
-  async function processEvent(eventName,
-                              fromBlock: number,
-                              id: number,
-                              params?: object,
-                              networkName = publicRuntimeConfig.networkConfig.networkName) {
-    return client.post(`/past-events/${eventName}/`, {
-      fromBlock,
-      id,
-      ...params,
-      networkName
-    });
-  }
-
-  async function pastEventsV2(entity: Entities, 
+  async function processEvent(entity: Entities, 
                               event: Events, 
                               networkName: string = publicRuntimeConfig.networkConfig.networkName,
                               params: PastEventsParams = {}) {
-    return client.post(`/past-events/v2/${entity}/${event}`, {
+    return client.post(`/past-events/${entity}/${event}`, {
       ...params,
       networkName
     });
-  }
-
-  async function processMergeProposal(fromBlock, id) {
-    return client.post("/past-events/merge-proposal/", { fromBlock, id });
   }
 
   async function getHealth() {
@@ -598,7 +581,6 @@ export default function useApi() {
     moveIssueToOpen,
     patchIssueWithScId,
     processEvent,
-    processMergeProposal,
     removeRepo,
     removeUser,
     repositoryHasIssues,
@@ -610,7 +592,6 @@ export default function useApi() {
     uploadFiles,
     userHasPR,
     createPreBounty,
-    cancelPrePullRequest,
-    pastEventsV2
+    cancelPrePullRequest
   };
 }

@@ -101,7 +101,7 @@ export default function PageActions({
   const { handleReedemIssue, handleCreatePullRequest } = useBepro();
   const { updateIssue, networkIssue, activeIssue } = useIssue();
 
-  const { createPrePullRequest, cancelPrePullRequest, startWorking, pastEventsV2 } = useApi();
+  const { createPrePullRequest, cancelPrePullRequest, startWorking, processEvent } = useApi();
 
   const isBountyOwner = () => issueCreator?.toLowerCase() === wallet?.address.toLowerCase();
 
@@ -322,7 +322,7 @@ export default function PageActions({
       return handleCreatePullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid);
     })
     .then(txInfo => {
-      return pastEventsV2("pull-request", "created", activeNetwork?.name, { fromBlock: (txInfo as any).blockNumber });
+      return processEvent("pull-request", "created", activeNetwork?.name, { fromBlock: (txInfo as any).blockNumber });
     })
     .then(() => {
       dispatch(addToast({

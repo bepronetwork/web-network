@@ -117,7 +117,7 @@ export default function NewProposal({
   const { handleProposeMerge } = useBepro({onSuccess})
   const { updateIssue, activeIssue, networkIssue } = useIssue()
   const { getPullRequestParticipants } = useOctokitGraph();
-  const { getUserWith, pastEventsV2 } = useApi();
+  const { getUserWith, processEvent } = useApi();
   const { activeNetwork } = useNetwork();
 
   function onSuccess(){
@@ -272,7 +272,7 @@ export default function NewProposal({
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as any;
 
-      return pastEventsV2("proposal", "created", activeNetwork?.name, { fromBlock });
+      return processEvent("proposal", "created", activeNetwork?.name, { fromBlock });
     })
     .then(() => {
       onSuccess();

@@ -35,7 +35,7 @@ export default function PullRequestPage() {
   const { activeRepo } = useRepos();
   const { activeIssue, networkIssue, addNewComment, updateIssue } = useIssue();
 
-  const { createReviewForPR, pastEventsV2 } = useApi();
+  const { createReviewForPR, processEvent } = useApi();
   const [showModal, setShowModal] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
   const [pullRequest, setPullRequest] = useState<pullRequest>();
@@ -101,7 +101,7 @@ export default function PullRequestPage() {
     handleMakePullRequestReady(activeIssue?.contractId, pullRequest?.contractId)
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as any;
-      return pastEventsV2("pull-request", "ready", activeNetwork?.name, { fromBlock });
+      return processEvent("pull-request", "ready", activeNetwork?.name, { fromBlock });
     })
     .then(() => {
       updateIssue(activeIssue.repository_id, activeIssue.githubId);
@@ -130,7 +130,7 @@ export default function PullRequestPage() {
     handleCancelPullRequest(activeIssue?.contractId, pullRequest?.contractId)
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as any;
-      return pastEventsV2("pull-request", "canceled", activeNetwork?.name, { fromBlock });
+      return processEvent("pull-request", "canceled", activeNetwork?.name, { fromBlock });
     })
     .then(() => {
       updateIssue(activeIssue.repository_id, activeIssue.githubId);
