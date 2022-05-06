@@ -19,7 +19,7 @@ import { GraphQlResponse } from "types/octokit";
 
 const { publicRuntimeConfig } = getConfig()
 
-async function post(req: NextApiRequest, res: NextApiResponse) {
+async function get(req: NextApiRequest, res: NextApiResponse) {
   const customNetworks = await models.network.findAll({
     where: {
       name: {
@@ -121,8 +121,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 export default async function MoveToOpen(req: NextApiRequest,
                                          res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-  case "post":
-    await post(req, res);
+  case "get":
+    await get(req, res);
     break;
 
   default:
