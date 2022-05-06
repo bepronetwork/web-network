@@ -9,7 +9,7 @@ import * as UserQueries from "graphql/user";
 
 import { getPropertyRecursively } from "helpers/object";
 
-import { GraphQlResponse } from "types/octokit";
+import { GraphQlQueryResponseData, GraphQlResponse } from "types/octokit";
 
 export default function useOctokitGraph() {
   const { user } = useAuthentication();
@@ -44,11 +44,11 @@ export default function useOctokitGraph() {
     let hasMorePages = false;
 
     do {
-      const response = await api(query, {...variables, cursor: nextPageCursor});
+      const response = await api<GraphQlResponse>(query, {...variables, cursor: nextPageCursor});
 
       pages.push(response);
 
-      const { endCursor, hasNextPage } = getPropertyRecursively("pageInfo", response);
+      const { endCursor, hasNextPage } = getPropertyRecursively<GraphQlQueryResponseData>("pageInfo", response);
 
       nextPageCursor = endCursor;
       hasMorePages = hasNextPage;
@@ -68,7 +68,8 @@ export default function useOctokitGraph() {
     });
 
     const participants = 
-      response?.flatMap(item => getPropertyRecursively("nodes", item).map(node => node["login"]));
+      response?.flatMap(item => getPropertyRecursively<GraphQlQueryResponseData>("nodes", item)
+                                .map(node => node["login"]));
 
     return participants;
   }
@@ -78,13 +79,15 @@ export default function useOctokitGraph() {
 
     const githubAPI = getOctoKitInstance();
 
-    const response = await githubAPI?.(PullRequestQueries.LinesOfCode, {
+    if (!githubAPI) return 0;
+
+    const response = await githubAPI<GraphQlResponse>(PullRequestQueries.LinesOfCode, {
       repo,
       owner,
       pullId
     });
 
-    const { additions, deletions } = response["repository"]["pullRequest"];
+    const { additions, deletions } = response.repository.pullRequest;
 
     return additions + deletions;
   }
@@ -99,7 +102,7 @@ export default function useOctokitGraph() {
     });
 
     const comments = 
-      response?.flatMap(item => getPropertyRecursively("nodes", item)
+      response?.flatMap(item => getPropertyRecursively<GraphQlQueryResponseData>("nodes", item)
                         .map(node => ({...node, author: node["author"]["login"]}) ) );
 
     return comments;
@@ -110,15 +113,15 @@ export default function useOctokitGraph() {
 
     const githubAPI = getOctoKitInstance();
 
-    const response = await githubAPI?.(PullRequestQueries.Details, {
+    if (!githubAPI) return;
+
+    const response = await githubAPI<GraphQlResponse>(PullRequestQueries.Details, {
       repo,
       owner,
       id
     });
 
-    if(!response) return;
-
-    const { mergeable, merged, state } = response["repository"]["pullRequest"];
+    const { mergeable, merged, state } = response.repository.pullRequest;
 
     return { mergeable, merged, state };
   }
@@ -132,7 +135,8 @@ export default function useOctokitGraph() {
     });
 
     const forks = 
-      response?.flatMap(item => getPropertyRecursively("nodes", item).map(node => node["owner"]["login"] ) );
+      response?.flatMap(item => getPropertyRecursively<GraphQlQueryResponseData>("nodes", item)
+                                .map(node => node?.owner?.login ) );
 
     return forks;
   }
@@ -145,7 +149,8 @@ export default function useOctokitGraph() {
       owner
     });
 
-    const branches = response?.flatMap(item => getPropertyRecursively("nodes", item).map(node => node["name"] ) );
+    const branches = response?.flatMap(item => getPropertyRecursively<GraphQlQueryResponseData>("nodes", item)
+                                                .map(node => node?.name ) );
 
     return branches;
   }

@@ -10,6 +10,8 @@ import * as PullRequestQueries from "graphql/pull-request";
 
 import api from "services/api";
 
+import { GraphQlResponse } from "types/octokit";
+
 import twitterTweet from "../handle-twitter-tweet";
 
 const { publicRuntimeConfig } = getConfig();
@@ -55,21 +57,21 @@ export default async function readBountyClosed(events, network: Network_v2, cust
             
             const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
-            const issueDetails = await githubAPI(IssueQueries.Details, {
+            const issueDetails = await githubAPI<GraphQlResponse>(IssueQueries.Details, {
               repo,
               owner,
               issueId: +bounty.githubId
             });
 
-            const issueGithubId = issueDetails["repository"]["issue"]["id"];
+            const issueGithubId = issueDetails.repository.issue.id;
 
-            const pullRequestDetails = await githubAPI(PullRequestQueries.Details, {
+            const pullRequestDetails = await githubAPI<GraphQlResponse>(PullRequestQueries.Details, {
               repo,
               owner,
               id: +pullRequest.githubId
             });
   
-            const pullRequestGithubId = pullRequestDetails["repository"]["pullRequest"]["id"];
+            const pullRequestGithubId = pullRequestDetails.repository.pullRequest.id;
 
 
             await githubAPI(PullRequestQueries.Merge, {
@@ -90,13 +92,13 @@ export default async function readBountyClosed(events, network: Network_v2, cust
         
             for (const pr of pullRequests) {
               try {
-                const pullRequestDetails = await githubAPI(PullRequestQueries.Details, {
+                const pullRequestDetails = await githubAPI<GraphQlResponse>(PullRequestQueries.Details, {
                   repo,
                   owner,
                   id: +pr.githubId
                 });
       
-                const pullRequestGithubId = pullRequestDetails["repository"]["pullRequest"]["id"];
+                const pullRequestGithubId = pullRequestDetails.repository.pullRequest.id;
       
                 await githubAPI(PullRequestQueries.Close, {
                   pullRequestId: pullRequestGithubId

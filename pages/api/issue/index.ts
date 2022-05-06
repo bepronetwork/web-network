@@ -12,6 +12,8 @@ import twitterTweet from "helpers/api/handle-twitter-tweet";
 
 import api from "services/api";
 
+import { GraphQlResponse } from "types/octokit";
+
 const { publicRuntimeConfig } = getConfig();
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
@@ -45,16 +47,16 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
-  const repositoryDetails = await githubAPI(RepositoryQueries.Details, {
+  const repositoryDetails = await githubAPI<GraphQlResponse>(RepositoryQueries.Details, {
     repo,
     owner
   });
 
-  const repositoryGithubId = repositoryDetails["repository"]["id"];
+  const repositoryGithubId = repositoryDetails.repository.id;
   let draftLabelId = null;
 
-  if (!repositoryDetails["repository"]["labels"]["nodes"].length) {
-    const createdLabel = await githubAPI(RepositoryQueries.CreateLabel, {
+  if (!repositoryDetails.repository.labels.nodes.length) {
+    const createdLabel = await githubAPI<GraphQlResponse>(RepositoryQueries.CreateLabel, {
       name: "draft",
       repositoryId: repositoryGithubId,
       color: "cfd3d7",
@@ -63,18 +65,18 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       }
     });
 
-    draftLabelId = createdLabel["createLabel"]["label"]["id"];
-  } else draftLabelId = repositoryDetails["repository"]["labels"]["nodes"][0]["id"];
+    draftLabelId = createdLabel.createLabel.label.id;
+  } else draftLabelId = repositoryDetails.repository.labels.nodes[0].id;
 
 
-  const createdIssue = await githubAPI(IssueQueries.Create, {
+  const createdIssue = await githubAPI<GraphQlResponse>(IssueQueries.Create, {
     repositoryId: repositoryGithubId,
     title,
     body,
     labelId: [draftLabelId]
   });
 
-  const githubId = createdIssue["createIssue"]["issue"]["number"];
+  const githubId = createdIssue.createIssue.issue.number;
 
   if (await models.issue.findOne({ where: { githubId: `${githubId}`, repository_id: repository.id } }))
     return res.status(409).json("issueId already exists on database");

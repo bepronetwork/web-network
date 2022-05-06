@@ -13,6 +13,8 @@ import * as RepositoryQueries from "graphql/repository";
 import networkBeproJs from "helpers/api/handle-network-bepro";
 import paginate from "helpers/paginate";
 
+import { GraphQlResponse } from "types/octokit";
+
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
@@ -86,15 +88,15 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
-  const repositoryDetails = await githubAPI(RepositoryQueries.Details, {
+  const repositoryDetails = await githubAPI<GraphQlResponse>(RepositoryQueries.Details, {
     repo,
     owner
   });
 
-  const repositoryGithubId = repositoryDetails["repository"]["id"];
+  const repositoryGithubId = repositoryDetails.repository.id;
 
   try {
-    const created = await githubAPI(PullRequestQueries.Create, {
+    const created = await githubAPI<GraphQlResponse>(PullRequestQueries.Create, {
       repositoryId: repositoryGithubId,
       title,
       body,
@@ -106,7 +108,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     await models.pullRequest.create({
       issueId: issue.id,
-      githubId: `${created["createPullRequest"]["pullRequest"]["number"]}`,
+      githubId: `${created.createPullRequest.pullRequest.number}`,
       githubLogin: username,
       branch,
       status: "pending"
@@ -126,7 +128,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       originCID: issue.issueId,
       userRepo: `${username}/${repo}`,
       userBranch: branch,
-      cid: `${created["createPullRequest"]["pullRequest"]["number"]}`
+      cid: `${created.createPullRequest.pullRequest.number}`
     });
   } catch (error) {
     return res.status(error?.response?.status || 500).json(error?.response?.data || error);
@@ -205,14 +207,14 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
 
   const [owner, repo] = issue.repository.githubPath.split("/");
 
-  const pullRequestDetails = await githubAPI(PullRequestQueries.Details, {
+  const pullRequestDetails = await githubAPI<GraphQlResponse>(PullRequestQueries.Details, {
     repo,
     owner,
     id: +pullRequestGithubId
   });
 
   await githubAPI(PullRequestQueries.Close, {
-    pullRequestId: pullRequestDetails["repository"]["pullRequest"]["id"]
+    pullRequestId: pullRequestDetails.repository.pullRequest.id
   });
 
   await pullRequest.destroy();

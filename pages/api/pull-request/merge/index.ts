@@ -11,6 +11,8 @@ import * as PullRequestQueries from "graphql/pull-request";
 
 import networkBeproJs from "helpers/api/handle-network-bepro";
 
+import { GraphQlResponse } from "types/octokit";
+
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -79,16 +81,16 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
-    const pullRequestDetails = await githubAPI(PullRequestQueries.Details, {
+    const pullRequestDetails = await githubAPI<GraphQlResponse>(PullRequestQueries.Details, {
       repo,
       owner,
       id: +pullRequest.githubId
     });
 
-    const pullRequestGithubId = pullRequestDetails["repository"]["pullRequest"]["id"];
+    const pullRequestGithubId = pullRequestDetails.repository.pullRequest.id;
 
 
-    const merged = await githubAPI(PullRequestQueries.Merge, {
+    const merged = await githubAPI<GraphQlResponse>(PullRequestQueries.Merge, {
       pullRequestId: pullRequestGithubId
     });
 

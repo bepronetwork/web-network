@@ -13,6 +13,8 @@ import { getPropertyRecursively } from "helpers/object";
 
 import api from "services/api";
 
+import { GraphQlQueryResponseData, GraphQlResponse } from "types/octokit";
+
 const { publicRuntimeConfig } = getConfig();
 
 async function put(req: NextApiRequest, res: NextApiResponse) {
@@ -47,24 +49,25 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
       const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
-      const issueDetails = await githubAPI(IssueQueries.Details, {
+      const issueDetails = await githubAPI<GraphQlResponse>(IssueQueries.Details, {
         repo,
         owner,
         issueId: +issue.githubId
       });
 
-      const issueGithubId = issueDetails["repository"]["issue"]["id"];
+      const issueGithubId = issueDetails.repository.issue.id;
 
-      const commentEdge = getPropertyRecursively("node", await githubAPI(CommentsQueries.Create, {
-        issueOrPullRequestId: issueGithubId,
-        body: `@${githubLogin} is working on this.`
-      }));
+      const commentEdge = 
+        getPropertyRecursively<GraphQlQueryResponseData>("node", await githubAPI(CommentsQueries.Create, {
+          issueOrPullRequestId: issueGithubId,
+          body: `@${githubLogin} is working on this.`
+        }));
       
       const comment = {
-        id: commentEdge["id"],
-        body: commentEdge["body"],
-        updatedAt: commentEdge["updatedAt"],
-        author: commentEdge["author"]["login"]
+        id: commentEdge.id,
+        body: commentEdge.body,
+        updatedAt: commentEdge.updatedAt,
+        author: commentEdge.author.login
       };
 
       await api.post(`/seo/${issue?.issueId}`).catch((e) => {

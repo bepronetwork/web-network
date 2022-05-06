@@ -8,6 +8,8 @@ import models from "db/models";
 import * as CommentsQueries from "graphql/comments";
 import * as PullRequestQueries from "graphql/pull-request";
 
+import { GraphQlResponse } from "types/octokit";
+
 const { publicRuntimeConfig } = getConfig();
 
 export default async function readPullRequestCanceled(events, network: Network_v2, customNetwork) {
@@ -46,13 +48,13 @@ export default async function readPullRequestCanceled(events, network: Network_v
 
           const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
-          const pullRequestDetails = await githubAPI(PullRequestQueries.Details, {
+          const pullRequestDetails = await githubAPI<GraphQlResponse>(PullRequestQueries.Details, {
             repo,
             owner,
             id: +pullRequest.githubId
           });
 
-          const pullRequestGithubId = pullRequestDetails["repository"]["pullRequest"]["id"];
+          const pullRequestGithubId = pullRequestDetails.repository.pullRequest.id;
 
           await githubAPI(PullRequestQueries.Close, {
             pullRequestId: pullRequestGithubId

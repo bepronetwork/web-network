@@ -10,6 +10,8 @@ import * as IssueQueries from "graphql/issue";
 
 import api from "services/api";
 
+import { GraphQlResponse } from "types/octokit";
+
 const { publicRuntimeConfig } = getConfig();
 
 export default async function readPullRequestCreated(events, network: Network_v2, customNetwork) {
@@ -57,13 +59,13 @@ export default async function readPullRequestCreated(events, network: Network_v2
 
           const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
-          const issueDetails = await githubAPI(IssueQueries.Details, {
+          const issueDetails = await githubAPI<GraphQlResponse>(IssueQueries.Details, {
             repo,
             owner,
             issueId: +bounty.githubId
           });
     
-          const issueGithubId = issueDetails["repository"]["issue"]["id"];
+          const issueGithubId = issueDetails.repository.issue.id;
     
           await githubAPI(CommentsQueries.Create, {
             issueOrPullRequestId: issueGithubId,

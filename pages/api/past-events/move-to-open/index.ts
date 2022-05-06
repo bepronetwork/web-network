@@ -15,6 +15,8 @@ import twitterTweet from "helpers/api/handle-twitter-tweet";
 
 import api from "services/api";
 
+import { GraphQlResponse } from "types/octokit";
+
 const { publicRuntimeConfig } = getConfig()
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
@@ -73,23 +75,23 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         if (currentRepo !== `${owner}/${repo}`) {
           currentRepo = `${owner}/${repo}`;
 
-          const repositoryDetails = await githubAPI(RepositoryQueries.Details, {
+          const repositoryDetails = await githubAPI<GraphQlResponse>(RepositoryQueries.Details, {
             repo,
             owner
           });
 
           labelId = 
-            repositoryDetails["repository"]["labels"]["nodes"].find(label => label.name.toLowerCase() === "draft")?.id;
+            repositoryDetails.repository.labels.nodes.find(label => label.name.toLowerCase() === "draft")?.id;
         }
 
-        const issueDetails = await githubAPI(IssueQueries.Details, {
+        const issueDetails = await githubAPI<GraphQlResponse>(IssueQueries.Details, {
           repo,
           owner,
           issueId: +issue.githubId
         });
 
         await githubAPI(IssueQueries.RemoveLabel, {
-          issueId: issueDetails["repository"]["issue"]["id"],
+          issueId: issueDetails.repository.issue.id,
           labelId: [labelId]
         });
       } catch (error) {

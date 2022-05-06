@@ -9,6 +9,8 @@ import models from "db/models";
 import * as CommentsQueries from "graphql/comments";
 import * as PullRequestQueries from "graphql/pull-request";
 
+import { GraphQlResponse } from "types/octokit";
+
 const { publicRuntimeConfig } = getConfig();
 
 async function put(req: NextApiRequest, res: NextApiResponse) {
@@ -46,26 +48,26 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
-    const pullRequestDetails = await githubAPI(PullRequestQueries.Details, {
+    const pullRequestDetails = await githubAPI<GraphQlResponse>(PullRequestQueries.Details, {
       repo,
       owner,
       id: +pullRequest.githubId
     });
 
-    const pullRequestGithubId = pullRequestDetails["repository"]["pullRequest"]["id"];
+    const pullRequestGithubId = pullRequestDetails.repository.pullRequest.id;
 
-    const response = await githubAPI(CommentsQueries.Create, {
+    const response = await githubAPI<GraphQlResponse>(CommentsQueries.Create, {
       issueOrPullRequestId: pullRequestGithubId,
       body: `<p>@${githubLogin} reviewed this with the following message:</p><p>${body}</p>`
     });
 
-    const reviewEdge = response["addComment"]["commentEdge"]["node"];
+    const reviewEdge = response.addComment.commentEdge.node;
 
     const review = {
-      id: reviewEdge["id"],
-      body: reviewEdge["body"],
-      updatedAt: reviewEdge["updatedAt"],
-      author: reviewEdge["author"]["login"]
+      id: reviewEdge.id,
+      body: reviewEdge.body,
+      updatedAt: reviewEdge.updatedAt,
+      author: reviewEdge.author.login
     };
     
     if (!pullRequest.reviewers.find((el) => el === String(githubLogin))) {
