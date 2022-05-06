@@ -346,16 +346,15 @@ export default function NewNetwork() {
               step={3}
               currentStep={currentStep}
               handleChangeStep={handleChangeStep}
-              handleFinish={handleCreateNetwork}
               handleCheckPermission={handleCheckPermission}
             />
 
-            {/* <TokenConfiguration
+            <TokenConfiguration
               step={4}
               currentStep={currentStep}
               handleChangeStep={handleChangeStep}
               handleFinish={handleCreateNetwork}
-            /> */}
+            />
           </Stepper>
         </div>
       </CustomContainer>

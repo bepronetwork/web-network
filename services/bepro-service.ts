@@ -14,7 +14,7 @@ import { Token } from "interfaces/token";
 import { NetworkParameters } from "types/dappkit";
 
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 class BeproFacet {
   readonly bepro: Web3Connection = new Web3Connection({
     web3Host: publicRuntimeConfig.web3ProviderConnection
@@ -187,10 +187,12 @@ class BeproFacet {
     return network.getOraclesResume(this.address);
   }
 
-  async getAllowance(tokenAddress: string = publicRuntimeConfig.contract.settler, walletAddress = this.address) {
+  async getAllowance(tokenAddress: string = publicRuntimeConfig.contract.settler, 
+                    walletAddress = this.address, 
+                    spenderAddress = this.network.contractAddress) {
     const erc20 = await this.getERC20Obj(tokenAddress);
 
-    return erc20.allowance(walletAddress, this.network.contractAddress);
+    return erc20.allowance(walletAddress, spenderAddress);
   }
 
   async getOraclesOf(address: string) {
