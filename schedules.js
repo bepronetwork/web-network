@@ -7,7 +7,7 @@ const client = axios.create({
 
 async function processPastEvents() {
   return client
-    .get("past-events/")
+    .get("past-events//bulk")
     .then(({ data }) => console.log("Ran past events.", data))
     .catch((error) =>
       console.log("Error on past events", error?.message || error))
