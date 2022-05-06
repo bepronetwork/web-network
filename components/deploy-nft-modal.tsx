@@ -56,7 +56,7 @@ export default function DeployNFTModal({
   }
 
   return (
-    <Modal show={show} onCloseClick={handleClose} title={t("change-token-modal:title")} titlePosition="center">
+    <Modal show={show} onCloseClick={handleClose} title="New NFT" titlePosition="center">
       <div className="container">
         <p className="caption-small trans mb-2 text-center">
             Deploy a New NFT Token for your network

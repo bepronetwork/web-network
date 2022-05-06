@@ -7,6 +7,7 @@ import {
   OraclesResume,
   Defaults
 } from "@taikai/dappkit";
+import { BountyToken } from "@taikai/dappkit";
 import getConfig from "next/config";
 
 import { Token } from "interfaces/token";
@@ -36,6 +37,8 @@ class BeproFacet {
       this.network = new Network_v2(this.bepro, networkAddress);
 
       await this.network.loadContract();
+
+      (window as any).network = this.network;
 
       if (!this.isStarted)
         console.table({
@@ -140,16 +143,24 @@ class BeproFacet {
     return network.sendTx(network.contract.methods.claimGovernor());
   }
 
+  async setNFTTokenDispatcher(nftToken: string, dispatcher: string) {
+    const bountyToken = new BountyToken(this.bepro, nftToken);
+
+    await bountyToken.loadContract();
+
+    return bountyToken.setDispatcher(dispatcher);
+  }
+
   
   async closeNetwork() {
     if (!this.isNetworkFactoryStarted) await this.startNetworkFactory();
     
-    return this.networkFactory.unlock()
+    return this.networkFactory.unlock();
   }
 
   async createNetwork(networkToken: string = publicRuntimeConfig.contract.settler, 
                       nftToken: string = publicRuntimeConfig.contract.nft, 
-                      nftUri = '//',
+                      nftUri = publicRuntimeConfig.nftUri || "//",
                       treasuryAddress = Defaults.nativeZeroAddress,
                       cancelFee = 10000,
                       closeFee= 50000) {

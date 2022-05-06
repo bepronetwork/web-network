@@ -19,20 +19,19 @@ import { BeproService } from "services/bepro-service";
 const { publicRuntimeConfig } = getConfig();
 
 export default function TokenConfiguration({
+    data,
     step,
     handleFinish,
     currentStep,
-    handleChangeStep
+    handleChangeStep,
+    changedDataHandler
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [customTokens, setCustomTokens] = useState<Token[]>([BEPRO_TOKEN]);
   const [networkToken, setNetworkToken] = useState<Token>(BEPRO_TOKEN);
   const [allowCustomTransactionalTokens, setAllowCustomTransactionalTokens] = useState("false");
-  const [needsToDeployNFT, setNeedsToDeployNFT] = useState(false);
-  const [nftTokenAddress, setNftTokenAddress] = useState("");
   const [showModalDeploy, setShowModalDeploy] = useState(false);
-  const [isValidated, setIsValidated] = useState(false);
 
   const { activeNetwork } = useNetwork();
 
@@ -55,15 +54,25 @@ export default function TokenConfiguration({
     setAllowCustomTransactionalTokens(e.target.checked);
   }
 
+  function handleNFTTokenChange(e) {
+    changedDataHandler("tokens", { label: "validated", value: false });
+    changedDataHandler("tokens", { label: "nftToken", value: e.target.value });
+  }
+
+  function setDeployedAddress(address) {
+    changedDataHandler("tokens", { label: "validated", value: true });
+    changedDataHandler("tokens", { label: "nftToken", value: address });
+  }
+
   async function validateAddress() {
-    if (nftTokenAddress.trim() === "") return setIsValidated(false);
+    if (data.nftToken.trim() === "") return changedDataHandler("tokens", { label: "validated", value: false });
 
     try {
-      const token = new BountyToken(BeproService.bepro, nftTokenAddress);
+      const token = new BountyToken(BeproService.bepro, data.nftToken);
 
       await token.loadContract();
 
-      setIsValidated(true);
+      changedDataHandler("tokens", { label: "validated", value: true });
     } catch (error) {
       console.log(error);
     }
@@ -74,7 +83,7 @@ export default function TokenConfiguration({
       title="Token Configuration"
       index={step}
       activeStep={currentStep}
-      validated={isValidated}
+      validated={data.validated}
       handleClick={handleChangeStep}
       finishLabel={t("custom-network:steps.repositories.submit-label")}
       handleFinish={handleFinish}
@@ -138,8 +147,8 @@ export default function TokenConfiguration({
           <input 
             type="text" 
             className="form-control" 
-            value={nftTokenAddress} 
-            onChange={e => setNftTokenAddress(e.target.value)}
+            value={data.nftToken} 
+            onChange={handleNFTTokenChange}
             onBlur={validateAddress}
           />
         </div>
@@ -152,7 +161,7 @@ export default function TokenConfiguration({
       <DeployNFTModal 
         show={showModalDeploy}
         setClose={handleCloseModal}
-        setNFTAddress={setNftTokenAddress}
+        setNFTAddress={setDeployedAddress}
       />
     </Step>
   );

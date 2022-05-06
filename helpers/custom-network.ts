@@ -38,6 +38,10 @@ export const DefaultNetworkInformation = {
     validated: false,
     data: [],
     permission: false
+  },
+  tokens: {
+    validated: false,
+    nftToken: ''
   }
 };
 

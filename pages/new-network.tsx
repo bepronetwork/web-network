@@ -66,6 +66,14 @@ export default function NewNetwork() {
     setSteps(tmpSteps);
   }
 
+  function handleStepDataChange(step, newData) {
+    const tmpSteps = Object.assign({}, steps);
+
+    tmpSteps[step][newData.label] = newData.value;
+
+    setSteps(tmpSteps);
+  }
+
   function handleCheckRepository(repositoryName) {
     const tmpSteps = Object.assign({}, steps);
 
@@ -125,6 +133,7 @@ export default function NewNetwork() {
           const repositoriesData = steps.repositories;
 
           await BeproService.claimNetworkGovernor(networkAddress);
+          await BeproService.setNFTTokenDispatcher(steps.tokens.nftToken, networkAddress);
 
           const json = {
               name: networkData.displayName.data,
@@ -350,8 +359,10 @@ export default function NewNetwork() {
             />
 
             <TokenConfiguration
+              data={steps.tokens}
               step={4}
               currentStep={currentStep}
+              changedDataHandler={handleStepDataChange}
               handleChangeStep={handleChangeStep}
               handleFinish={handleCreateNetwork}
             />
