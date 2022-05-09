@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { FormCheck, ListGroup } from "react-bootstrap";
 
+import { BountyToken } from "@taikai/dappkit";
 import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
 
+import Button from "components/button";
+import DeployNFTModal from "components/deploy-nft-modal";
 import Step from "components/step";
 import TokensDropdown from "components/tokens-dropdown";
 
@@ -11,23 +14,34 @@ import { useNetwork } from "contexts/network";
 
 import { BEPRO_TOKEN, Token } from "interfaces/token";
 
-
+import { BeproService } from "services/bepro-service";
 
 const { publicRuntimeConfig } = getConfig();
 
 export default function TokenConfiguration({
+    data,
     step,
     handleFinish,
     currentStep,
-    handleChangeStep
+    handleChangeStep,
+    changedDataHandler
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [customTokens, setCustomTokens] = useState<Token[]>([BEPRO_TOKEN]);
   const [networkToken, setNetworkToken] = useState<Token>(BEPRO_TOKEN);
   const [allowCustomTransactionalTokens, setAllowCustomTransactionalTokens] = useState("false");
+  const [showModalDeploy, setShowModalDeploy] = useState(false);
 
   const { activeNetwork } = useNetwork();
+
+  function handleShowModal() {
+    setShowModalDeploy(true);
+  }
+
+  function handleCloseModal() {
+    setShowModalDeploy(false);
+  }
 
   function addToken(newToken: Token) {
     setCustomTokens([
@@ -40,17 +54,41 @@ export default function TokenConfiguration({
     setAllowCustomTransactionalTokens(e.target.checked);
   }
 
+  function handleNFTTokenChange(e) {
+    changedDataHandler("tokens", { label: "validated", value: false });
+    changedDataHandler("tokens", { label: "nftToken", value: e.target.value });
+  }
+
+  function setDeployedAddress(address) {
+    changedDataHandler("tokens", { label: "validated", value: true });
+    changedDataHandler("tokens", { label: "nftToken", value: address });
+  }
+
+  async function validateAddress() {
+    if (data.nftToken.trim() === "") return changedDataHandler("tokens", { label: "validated", value: false });
+
+    try {
+      const token = new BountyToken(BeproService.bepro, data.nftToken);
+
+      await token.loadContract();
+
+      changedDataHandler("tokens", { label: "validated", value: true });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <Step
       title="Token Configuration"
       index={step}
       activeStep={currentStep}
-      validated={true}
+      validated={data.validated}
       handleClick={handleChangeStep}
       finishLabel={t("custom-network:steps.repositories.submit-label")}
       handleFinish={handleFinish}
     >
-      <div className="row">
+      {/*<div className="row">
         <TokensDropdown 
           label="Network Token"
           description="Add an ERC20 token to be used as network token."
@@ -101,7 +139,30 @@ export default function TokenConfiguration({
         <ListGroup>
           <ListGroup.Item>Cras justo odio</ListGroup.Item>
         </ListGroup>
+      </div> */}
+
+      <div className="row align-items-center">
+        <div className="form-group col-9">
+          <label className="caption-small mb-2">NFT Token Address</label>
+          <input 
+            type="text" 
+            className="form-control" 
+            value={data.nftToken} 
+            onChange={handleNFTTokenChange}
+            onBlur={validateAddress}
+          />
+        </div>
+
+        <div className="col-3 pt-2">
+          <Button onClick={handleShowModal}>Deploy New NFT Token</Button>
+        </div>
       </div>
+
+      <DeployNFTModal 
+        show={showModalDeploy}
+        setClose={handleCloseModal}
+        setNFTAddress={setDeployedAddress}
+      />
     </Step>
   );
 }

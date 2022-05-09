@@ -300,44 +300,43 @@ export default function Settings() {
   }
 
   function handleCloseNetwork() {
-    if (!network || !user?.login || !wallet?.address) return;
+    if (!network || !user?.login || !user?.accessToken || !wallet?.address) return;
 
     setIsClosing(true);
 
-    // TODO Close Network
+    BeproService.closeNetwork()
+      .then(() => {
+        return updateNetwork({
+          githubLogin: user?.login,
+          isClosed: true,
+          creator: wallet?.address,
+          networkAddress: network.networkAddress,
+          accessToken: user?.accessToken
+        });
+      })
+      .then(() => {
+        dispatch(addToast({
+            type: "success",
+            title: t("actions.success"),
+            content: t("custom-network:messages.network-closed")
+        }));
 
-    // BeproService.closeNetwork()
-    //   .then(() => {
-    //     return updateNetwork({
-    //       githubLogin: user?.login,
-    //       isClosed: true,
-    //       creator: wallet?.address,
-    //       networkAddress: network.networkAddress
-    //     });
-    //   })
-    //   .then(() => {
-    //     dispatch(addToast({
-    //         type: "success",
-    //         title: t("actions.success"),
-    //         content: t("custom-network:messages.network-closed")
-    //     }));
+        updateWalletBalance();
 
-    //     updateWalletBalance();
-
-    //     router.push(getURLWithNetwork("/account/my-network"));
-    //   })
-    //   .catch((error) => {
-    //     dispatch(addToast({
-    //         type: "danger",
-    //         title: t("actions.failed"),
-    //         content: t("custom-network:errors.failed-to-close-network", {
-    //           error
-    //         })
-    //     }));
-    //   })
-    //   .finally(() => {
-    //     setIsClosing(false);
-    //   });
+        router.push(getURLWithNetwork("/account/my-network"));
+      })
+      .catch((error) => {
+        dispatch(addToast({
+            type: "danger",
+            title: t("actions.failed"),
+            content: t("custom-network:errors.failed-to-close-network", {
+              error
+            })
+        }));
+      })
+      .finally(() => {
+        setIsClosing(false);
+      });
   }
 
   useEffect(() => {

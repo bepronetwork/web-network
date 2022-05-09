@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ProgressBar } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
+import getConfig from "next/config";
 
 import ArrowRightLine from "assets/icons/arrow-right-line";
 import LockedIcon from "assets/icons/locked-icon";
@@ -16,6 +17,8 @@ import { useAuthentication } from "contexts/authentication";
 import { formatNumberToCurrency, formatNumberToNScale } from "helpers/formatNumber";
 
 import { BeproService } from "services/bepro-service";
+
+const { publicRuntimeConfig } = getConfig();
 
 export default function LockBeproStep({
   data,
@@ -32,6 +35,7 @@ export default function LockBeproStep({
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [showUnlockBepro, setShowUnlockBepro] = useState(false);
   const [networkTokenName, setNetworkTokenName] = useState<string>(t("misc.token"));
+  const [settlerAllowance, setSettlerAllowance] = useState(0);
 
   const { updateWalletBalance, beproServiceStarted } = useAuthentication();
 
@@ -44,6 +48,7 @@ export default function LockBeproStep({
   const textAmountClass =
     data.amount > balance.beproAvailable ? "text-danger" : "text-primary";
   const amountsClass = data.amount > maxValue ? "danger" : "success";
+  const needsAllowance = data.amount > settlerAllowance;
 
   async function handleLock() {
     setIsLocking(true);
@@ -85,6 +90,7 @@ export default function LockBeproStep({
         handleChange({ label: "amountLocked", value: 0 });
         handleChange({ label: "amount", value: 0 });
         updateWalletBalance();
+        updateAllowance();
       })
       .catch((error) => {
         console.log("Failed to Unlock", error);
@@ -100,10 +106,29 @@ export default function LockBeproStep({
     setShowUnlockBepro(false);
   }
 
+  function handleApproval() {
+    if (data.amountNeeded <= 0) return;
+
+    BeproService.networkFactory
+      .approveNetworkToken(data.amountNeeded - settlerAllowance)
+      .then(() => {
+        updateWalletBalance();
+        updateAllowance();
+      })
+      .catch(console.log);
+  }
+
+  function updateAllowance() {
+    BeproService.getAllowance(undefined, undefined, publicRuntimeConfig.networkConfig.factoryAddress)
+    .then(setSettlerAllowance);
+  }
+
   useEffect(() => {
-    if (beproServiceStarted) BeproService.getSettlerTokenData().then(data => {
-      setNetworkTokenName(data.symbol);
-    });
+    if (!beproServiceStarted) return;
+    
+    BeproService.getSettlerTokenData().then(data => setNetworkTokenName(data.symbol));
+    
+    updateAllowance();
   }, [beproServiceStarted]);
 
   return (
@@ -302,7 +327,13 @@ export default function LockBeproStep({
           </div>
 
           <div className="d-flex justify-content-center mt-4 pt-3">
-            <Button
+            {
+              needsAllowance && 
+              <Button onClick={handleApproval}>
+                {t('actions.approve')}
+              </Button>
+              ||
+              <Button
               disabled={
                 !(data.amount > 0) ||
                 lockedPercent >= 100 ||
@@ -325,7 +356,8 @@ export default function LockBeproStep({
               ) : (
                 ""
               )}
-            </Button>
+            </Button> 
+            }
 
             <Button disabled={lockedPercent === 0 || isUnlocking} color="ligth-gray" onClick={handleUnLock}>
               {!isUnlocking || lockedPercent === 0 && (
