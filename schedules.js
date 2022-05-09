@@ -7,7 +7,7 @@ const client = axios.create({
 
 async function processPastEvents() {
   return client
-    .get("past-events/bulk")
+    .post("past-events/bulk")
     .then(({ data }) => console.log("Ran past events.", data))
     .catch((error) =>
       console.log("Error on past events", error?.message || error))
@@ -18,7 +18,7 @@ async function processPastEvents() {
 
 async function moveToReady() {
   return client
-    .get("past-events/move-to-open/")
+    .post("past-events/move-to-open/")
     .then(({ data }) => console.log("Ran move to open.", data))
     .catch((error) =>
       console.log("Error move to open", error?.message || error))
