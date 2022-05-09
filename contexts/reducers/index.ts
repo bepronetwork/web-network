@@ -19,6 +19,7 @@ import { ChangeSettlerTokenApproval } from "./change-settler-token-approval";
 import { ChangeStakedState } from "./change-staked-amount";
 import { ChangeTransactionalTokenApproval } from "./change-transactional-token-approval";
 import { ChangeWalletState } from "./change-wallet-connect";
+import { ClearTransactions } from "./clear-transactions";
 import { addReducer } from "./main";
 import { RemoveToast } from "./remove-toast";
 
@@ -44,6 +45,7 @@ export default function LoadApplicationReducers() {
     ChangeAccessToken,
     ChangeTransactionalTokenApproval,
     ChangeSettlerTokenApproval,
-    ChangeNetworksSummary
+    ChangeNetworksSummary,
+    ClearTransactions
   ].forEach(addReducer);
 }
