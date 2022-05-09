@@ -16,8 +16,8 @@ export interface INetwork {
   tokensLocked?: number;
   networkAddress: string;
   creatorAddress: string;
-  openBountiesAmount?: number;
-  openBountiesQuantity?: number;
+  openBounties?: number;
+  totalBounties?: number;
   allowCustomTokens?: boolean;
   tokens?: Token[];
   councilAmount?: number;
