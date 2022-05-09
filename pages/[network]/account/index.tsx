@@ -18,7 +18,7 @@ import { formatNumberToCurrency } from "helpers/formatNumber";
 
 import { IssueData } from "interfaces/issue-data";
 
-import useMergeData from "x-hooks/use-merge-data";
+import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
 import usePendingIssue from "x-hooks/use-pending-issue";
 
@@ -33,12 +33,12 @@ export default function MyIssues() {
   const [pendingIssue, { updatePendingIssue, treatPendingIssue }] =
     usePendingIssue();
 
-  const { getPendingFor } = useMergeData();
+  const { getPendingFor } = useApi();
 
   function getPendingIssues() {
     if (!wallet?.address) return;
 
-    getPendingFor(wallet?.address, network?.name).then((pending) =>
+    getPendingFor(wallet?.address, undefined, network?.name).then((pending) =>
       setPendingIssues(pending.rows));
   }
 

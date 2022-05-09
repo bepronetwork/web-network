@@ -22,7 +22,7 @@ const handler = async (type, helpers, network, customNetwork, fromBlock, toBlock
   return results;
 };
 
-async function get(req: NextApiRequest, res: NextApiResponse) {
+async function post(req: NextApiRequest, res: NextApiResponse) {
   const bulk = await models.chainEvents.findOne({where: {name: `Bulk`}});
   const fromBlock = bulk?.dataValues?.lastBlock || 1731488;
   const customNetworks = await models.network.findAll({
@@ -93,8 +93,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 export default async function PastEvents(req: NextApiRequest, res: NextApiResponse) {
 
   switch (req.method.toLowerCase()) {
-  case 'get':
-    await get(req, res);
+  case 'post':
+    await post(req, res);
     break;
 
   default:

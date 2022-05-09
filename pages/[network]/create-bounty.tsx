@@ -83,7 +83,7 @@ export default function PageCreateIssue() {
 
   const txWindow = useTransactions();
   const { getURLWithNetwork } = useNetworkTheme();
-  const { createPreBounty, pastEventsV2 } = useApi();
+  const { createPreBounty, processEvent } = useApi();
 
   async function allowCreateIssue() {
     if (!beproServiceStarted || !transactionalToken || issueAmount.floatValue <= 0) return;
@@ -185,7 +185,7 @@ export default function PageCreateIssue() {
 
     const { blockNumber: fromBlock } = txInfo as any;
 
-    const createdBounties = await pastEventsV2("bounty", "created", activeNetwork?.name, { fromBlock } )
+    const createdBounties = await processEvent("bounty", "created", activeNetwork?.name, { fromBlock } )
       .then(({data}) => data)
       .catch(error => {
         console.log("Failed to patch bounty", error);

@@ -6,8 +6,17 @@ import { Op } from "sequelize";
 
 import models from "db/models";
 
+import * as CommentsQueries from "graphql/comments";
+import * as IssueQueries from "graphql/issue";
+
+import { getPropertyRecursively } from "helpers/object";
+
 import api from "services/api";
-const { publicRuntimeConfig } = getConfig()
+
+import { GraphQlQueryResponseData, GraphQlResponse } from "types/octokit";
+
+const { publicRuntimeConfig } = getConfig();
+
 async function put(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, githubLogin, networkName } = req.body;
 
@@ -38,22 +47,34 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
       await issue.save();
 
-      const octokit = new Octokit({
-        auth: publicRuntimeConfig.github.token,
+      const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
+
+      const issueDetails = await githubAPI<GraphQlResponse>(IssueQueries.Details, {
+        repo,
+        owner,
+        issueId: +issue.githubId
       });
 
-      const response = await octokit.rest.issues.createComment({
-        owner,
-        repo,
-        issue_number: issue.githubId,
-        body: `@${githubLogin} is working on this.`
-      });
+      const issueGithubId = issueDetails.repository.issue.id;
+
+      const commentEdge = 
+        getPropertyRecursively<GraphQlQueryResponseData>("node", await githubAPI(CommentsQueries.Create, {
+          issueOrPullRequestId: issueGithubId,
+          body: `@${githubLogin} is working on this.`
+        }));
+      
+      const comment = {
+        id: commentEdge.id,
+        body: commentEdge.body,
+        updatedAt: commentEdge.updatedAt,
+        author: commentEdge.author.login
+      };
 
       await api.post(`/seo/${issue?.issueId}`).catch((e) => {
         console.log("Error creating SEO", e);
       });
 
-      return res.status(response.status).json(response.data);
+      return res.status(200).json(comment);
     }
 
     return res.status(409).json("Already working");

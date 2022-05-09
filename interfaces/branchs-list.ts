@@ -1,6 +1,6 @@
 export interface BranchInfo {
   branch: string;
-  protected: boolean;
+  protected?: boolean;
 }
 
 export type BranchsList = {

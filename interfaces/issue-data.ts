@@ -79,7 +79,7 @@ export interface IssueDataComment {
   body: string;
   created_at: string | number | Date;
   updated_at: string | number | Date;
-  user: GithubUser;
+  author: string;
 }
 
 export interface GithubUser {

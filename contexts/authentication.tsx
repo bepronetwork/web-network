@@ -12,8 +12,8 @@ import { useRouter } from "next/router";
 
 import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
 
-import { IUser } from "interfaces/authentication";
-import { IWallet } from "interfaces/authentication";
+import { User } from "interfaces/authentication";
+import { Wallet } from "interfaces/authentication";
 
 import { BeproService } from "services/bepro-service";
 
@@ -21,8 +21,8 @@ import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
 
 export interface IAuthenticationContext {
-  user?: IUser;
-  wallet?: IWallet;
+  user?: User;
+  wallet?: Wallet;
   isGithubAndWalletMatched?: boolean;
   beproServiceStarted?: boolean;
   login: () => void;
@@ -38,8 +38,8 @@ export const AuthenticationProvider = ({ children }) => {
   const session = useSession();
   const { push, asPath, pathname } = useRouter();
 
-  const [user, setUser] = useState<IUser>();
-  const [wallet, setWallet] = useState<IWallet>();
+  const [user, setUser] = useState<User>();
+  const [wallet, setWallet] = useState<Wallet>();
   const [beproServiceStarted, setBeproServiceStarted] = useState(false);
   const [isGithubAndWalletMatched, setIsGithubAndWalletMatched] =
     useState<boolean>();
@@ -197,10 +197,6 @@ export const AuthenticationProvider = ({ children }) => {
       clearInterval(checkBeproServiceStarted);
     };
   }, []);
-
-  // useEffect(() => {
-  //   console.table({wallet, user})
-  // }, [wallet, user]);
   
   const memorized = useMemo<IAuthenticationContext>(() => ({
       user,

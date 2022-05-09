@@ -35,7 +35,7 @@ export default function PullRequestPage() {
   const { activeRepo } = useRepos();
   const { activeIssue, networkIssue, addNewComment, updateIssue } = useIssue();
 
-  const { createReviewForPR, pastEventsV2 } = useApi();
+  const { createReviewForPR, processEvent } = useApi();
   const [showModal, setShowModal] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
   const [pullRequest, setPullRequest] = useState<pullRequest>();
@@ -89,6 +89,9 @@ export default function PullRequestPage() {
             title: t("actions.failed"),
             content: t("pull-request:actions.review.error"),
         }));
+      })
+      .finally(() => {
+        setIsExecuting(false);
       });
   }
 
@@ -98,7 +101,7 @@ export default function PullRequestPage() {
     handleMakePullRequestReady(activeIssue?.contractId, pullRequest?.contractId)
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as any;
-      return pastEventsV2("pull-request", "ready", activeNetwork?.name, { fromBlock });
+      return processEvent("pull-request", "ready", activeNetwork?.name, { fromBlock });
     })
     .then(() => {
       updateIssue(activeIssue.repository_id, activeIssue.githubId);
@@ -115,6 +118,9 @@ export default function PullRequestPage() {
           title: t("actions.failed"),
           content: t("pull-request:actions.make-ready.error"),
       }));
+    })
+    .finally(() => {
+      setIsExecuting(false);
     });
   }
 
@@ -124,7 +130,7 @@ export default function PullRequestPage() {
     handleCancelPullRequest(activeIssue?.contractId, pullRequest?.contractId)
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as any;
-      return pastEventsV2("pull-request", "canceled", activeNetwork?.name, { fromBlock });
+      return processEvent("pull-request", "canceled", activeNetwork?.name, { fromBlock });
     })
     .then(() => {
       updateIssue(activeIssue.repository_id, activeIssue.githubId);
@@ -146,6 +152,9 @@ export default function PullRequestPage() {
           title: t("actions.failed"),
           content: t("pull-request:actions.cancel.error"),
       }));
+    })
+    .finally(() => {
+      setIsExecuting(false);
     });
   }
 
@@ -185,7 +194,7 @@ export default function PullRequestPage() {
               <div className="col-4 gap-20 p-0 d-flex justify-content-end">
                 {wallet?.address &&
                   user?.login &&
-                  pullRequest?.state === "open" &&
+                  pullRequest?.state?.toLowerCase() === "open" &&
                   networkPullRequest?.ready &&
                   !networkPullRequest?.canceled && (
                     <ReadOnlyButtonWrapper>
@@ -201,7 +210,7 @@ export default function PullRequestPage() {
                   {
                     wallet?.address &&
                     user?.login &&
-                    pullRequest?.state === "open" &&
+                    pullRequest?.state?.toLowerCase() === "open" &&
                     pullRequest?.status === "draft" &&
                     !networkPullRequest?.ready &&
                     !networkPullRequest?.canceled &&

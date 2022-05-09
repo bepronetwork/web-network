@@ -16,9 +16,9 @@ export default function Comment({ comment }: CommentsProps) {
   return (
     <div className="mb-3">
       <p className="caption-small text-uppercase mb-2">
-        <Avatar userLogin={comment?.user.login} />
+        <Avatar userLogin={comment?.author} />
 
-        <span className="ml-1">@{comment?.user.login} </span>
+        <span className="ml-1">@{comment?.author} </span>
 
         <span className="trans ml-1">
           {comment?.updated_at && formatDate(comment?.updated_at)}

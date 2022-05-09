@@ -3,8 +3,16 @@ import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
 import { Octokit } from "octokit";
 import { Op } from "sequelize";
-const { publicRuntimeConfig } = getConfig()
+
 import models from "db/models";
+
+import * as CommentsQueries from "graphql/comments";
+import * as PullRequestQueries from "graphql/pull-request";
+
+import { GraphQlResponse } from "types/octokit";
+
+const { publicRuntimeConfig } = getConfig();
+
 async function put(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, pullRequestId, githubLogin, body, networkName } = req.body;
 
@@ -38,23 +46,39 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     const [owner, repo] = repository.githubPath.split("/");
 
-    const octoKit = new Octokit({ auth: publicRuntimeConfig.github.token });
+    const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
 
-    const octoResponse = await octoKit.rest.issues.createComment({
-      owner,
+    const pullRequestDetails = await githubAPI<GraphQlResponse>(PullRequestQueries.Details, {
       repo,
-      issue_number: pullRequest.githubId,
+      owner,
+      id: +pullRequest.githubId
+    });
+
+    const pullRequestGithubId = pullRequestDetails.repository.pullRequest.id;
+
+    const response = await githubAPI<GraphQlResponse>(CommentsQueries.Create, {
+      issueOrPullRequestId: pullRequestGithubId,
       body: `<p>@${githubLogin} reviewed this with the following message:</p><p>${body}</p>`
     });
 
+    const reviewEdge = response.addComment.commentEdge.node;
+
+    const review = {
+      id: reviewEdge.id,
+      body: reviewEdge.body,
+      updatedAt: reviewEdge.updatedAt,
+      author: reviewEdge.author.login
+    };
+    
     if (!pullRequest.reviewers.find((el) => el === String(githubLogin))) {
       pullRequest.reviewers = [...pullRequest.reviewers, githubLogin];
 
       await pullRequest.save();
     }
 
-    return res.status(octoResponse.status).json(octoResponse.data);
+    return res.status(200).json(review);
   } catch (error) {
+    console.log(error);
     return res.status(error.status || 500).json(error.response?.data || error);
   }
 }

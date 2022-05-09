@@ -16,7 +16,7 @@ import { pullRequest } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-import useOctokit from "x-hooks/use-octokit";
+import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 import Avatar from "./avatar";
 import Button from "./button";
@@ -116,8 +116,8 @@ export default function NewProposal({
 
   const { handleProposeMerge } = useBepro({onSuccess})
   const { updateIssue, activeIssue, networkIssue } = useIssue()
-  const { getParticipants } = useOctokit();
-  const { getUserWith, pastEventsV2 } = useApi();
+  const { getPullRequestParticipants } = useOctokitGraph();
+  const { getUserWith, processEvent } = useApi();
   const { activeNetwork } = useNetwork();
 
   function onSuccess(){
@@ -228,7 +228,7 @@ export default function NewProposal({
   function getParticipantsPullRequest(githubId: string) {
     if (!activeRepo) return;
 
-    getParticipants(+githubId, activeRepo.githubPath)
+    getPullRequestParticipants(activeRepo.githubPath, +githubId)
       .then((participants) => {
         const tmpParticipants = [...participants];
 
@@ -272,7 +272,7 @@ export default function NewProposal({
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as any;
 
-      return pastEventsV2("proposal", "created", activeNetwork?.name, { fromBlock });
+      return processEvent("proposal", "created", activeNetwork?.name, { fromBlock });
     })
     .then(() => {
       onSuccess();

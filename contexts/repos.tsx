@@ -12,7 +12,6 @@ import { useRouter } from "next/router";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 
 import { BranchInfo, BranchsList } from "interfaces/branchs-list";
-import { developer } from "interfaces/issue-data";
 import {
   ReposList,
   RepoInfo,
@@ -21,7 +20,7 @@ import {
 } from "interfaces/repos-list";
 
 import useApi from "x-hooks/use-api";
-import useOctokit from "x-hooks/use-octokit";
+import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 import { ApplicationContext } from "./application";
 import { useNetwork } from "./network";
@@ -60,10 +59,10 @@ export const ReposProvider: React.FC = function ({ children }) {
   const [forksList, setForksList] = useState<ForksList>({});
   const [activeRepo, setActiveRepo] = useState<IActiveRepo>(null);
 
-  const { getReposList, getBranchsList } = useApi();
+  const { getReposList } = useApi();
   const { dispatch } = useContext(ApplicationContext);
   const { activeNetwork } = useNetwork();
-  const { getForksOf } = useOctokit();
+  const { getRepositoryForks, getRepositoryBranches } = useOctokitGraph();
   const { query } = useRouter();
 
   const findRepo = (repoId: number): RepoInfo =>
@@ -77,17 +76,9 @@ export const ReposProvider: React.FC = function ({ children }) {
 
     if (!repo) throw new Error("Repo not found");
 
-    const data = await getForksOf(repo?.githubPath);
+    const forks = await getRepositoryForks(repo?.githubPath);
 
-    if (!data) return [];
-
-    const forks = await Promise.all(data?.map(({ owner }): developer => ({
-            id: owner.id,
-            login: owner?.login,
-            avatar_url: owner.avatar_url,
-            url: owner.url,
-            type: owner.type
-    })));
+    if (!forks) return [];
 
     setForksList((prevState) => ({
         ...prevState,
@@ -101,12 +92,18 @@ export const ReposProvider: React.FC = function ({ children }) {
   const findBranch = useCallback(async (repoId: number, forced?: boolean): Promise<BranchInfo[]> => {
     if (branchsList[repoId] && !forced) return branchsList[repoId];
 
-    const branchs = await getBranchsList(repoId, false, activeNetwork?.name);
+    const repoPath = findRepo(repoId)?.githubPath;
+
+    if (!repoPath) return [];
+
+    const response = await getRepositoryBranches(repoPath);
+    const branches = response.map(branch => ({ branch }));
+
     setBranchsList((prevState) => ({
         ...prevState,
-        [repoId]: branchs
+        [repoId]: branches
     }));
-    return branchs;
+    return branches;
   },
     [activeNetwork, branchsList]);
 

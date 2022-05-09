@@ -149,9 +149,11 @@ export default function useApi() {
   async function createPreBounty(payload: CreateBounty,
                                  networkName = publicRuntimeConfig.networkConfig.networkName): Promise<string> {
     return client
-        .post("/bounty", { ...payload, networkName })
+        .post("/issue", { ...payload, networkName })
         .then(({ data }) => data)
-        .catch((error) => error);
+        .catch((error) => {
+          throw error
+        });
   }
 
   async function moveIssueToOpen(scIssueId?: string) {
@@ -300,21 +302,6 @@ export default function useApi() {
       .catch(() => []);
   }
 
-  async function getBranchsList(repoId: string | number,
-                                force = false,
-                                networkName = publicRuntimeConfig.networkConfig.networkName) {
-    if (!force && branchsList[repoId]?.length)
-      return Promise.resolve(branchsList[repoId] as BranchInfo[]);
-
-    return client
-      .get<BranchInfo[]>(`/repos/branchs/${repoId}/${networkName}`)
-      .then(({ data }) => {
-        branchsList[repoId] = data;
-        return data;
-      })
-      .catch(() => []);
-  }
-
   async function removeRepo(id: string) {
     return client
       .delete(`/repos/${id}`)
@@ -322,64 +309,14 @@ export default function useApi() {
       .catch(() => false);
   }
 
-  async function poll(eventName: string,
-                      rest,
-                      networkName = publicRuntimeConfig.networkConfig.networkName) {
-    return client.post("/poll/",
-      { eventName, ...rest, networkName },
-      { timeout: 2 * 60 * 1000 });
-  }
-
-  async function waitForMerge(githubLogin,
-                              issue_id,
-                              currentGithubId,
-                              networkName = publicRuntimeConfig.networkConfig.networkName) {
-    return poll("mergeProposal",
-      { githubLogin, issue_id, currentGithubId },
-                networkName)
-      .then(({ data }) => data)
-      .catch(() => null);
-  }
-
-  async function waitForClose(currentGithubId,
-                              networkName = publicRuntimeConfig.networkConfig.networkName) {
-    return poll("closeIssue", { currentGithubId }, networkName)
-      .then(({ data }) => data)
-      .catch(() => null);
-  }
-
-  async function waitForRedeem(currentGithubId,
-                               networkName = publicRuntimeConfig.networkConfig.networkName) {
-    return poll("redeemIssue", { currentGithubId }, networkName)
-      .then(({ data }) => data)
-      .catch(() => null);
-  }
-
-  async function processEvent(eventName,
-                              fromBlock: number,
-                              id: number,
-                              params?: object,
-                              networkName = publicRuntimeConfig.networkConfig.networkName) {
-    return client.post(`/past-events/${eventName}/`, {
-      fromBlock,
-      id,
-      ...params,
-      networkName
-    });
-  }
-
-  async function pastEventsV2(entity: Entities, 
+  async function processEvent(entity: Entities, 
                               event: Events, 
                               networkName: string = publicRuntimeConfig.networkConfig.networkName,
                               params: PastEventsParams = {}) {
-    return client.post(`/past-events/v2/${entity}/${event}`, {
+    return client.post(`/past-events/${entity}/${event}`, {
       ...params,
       networkName
     });
-  }
-
-  async function processMergeProposal(fromBlock, id) {
-    return client.post("/past-events/merge-proposal/", { fromBlock, id });
   }
 
   async function getHealth() {
@@ -473,7 +410,10 @@ export default function useApi() {
         body,
         networkName
       })
-      .then((response) => response);
+      .then((response) => response)
+      .catch(error => {
+        throw error;
+      });
   }
 
   async function removeUser(address: string, githubLogin: string) {
@@ -621,7 +561,6 @@ export default function useApi() {
     createReviewForPR,
     getAllUsers,
     getCurrencyByToken,
-    getBranchsList,
     getClientNation,
     getHealth,
     getIssue,
@@ -642,7 +581,6 @@ export default function useApi() {
     moveIssueToOpen,
     patchIssueWithScId,
     processEvent,
-    processMergeProposal,
     removeRepo,
     removeUser,
     repositoryHasIssues,
@@ -653,11 +591,7 @@ export default function useApi() {
     updateNetwork,
     uploadFiles,
     userHasPR,
-    waitForClose,
-    waitForMerge,
-    waitForRedeem,
     createPreBounty,
-    cancelPrePullRequest,
-    pastEventsV2
+    cancelPrePullRequest
   };
 }

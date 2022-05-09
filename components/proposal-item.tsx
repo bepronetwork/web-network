@@ -42,10 +42,10 @@ export default function ProposalItem({
   const { handlerDisputeProposal } = useBepro();
   const { getURLWithNetwork } = useNetworkTheme();
   const { activeNetwork } = useNetwork();
-  const { pastEventsV2 } = useApi();
+  const { processEvent } = useApi();
   
   const networkProposals = networkIssue?.proposals?.[proposal?.contractId];
-  const networkPullRequest = networkIssue?.pullRequests?.[networkProposals?.prId];
+  const networkPullRequest = networkIssue?.pullRequests?.find(pr => pr.id === networkProposals?.prId);
 
   const isDisable = () => [
       networkIssue?.closed,
@@ -63,7 +63,7 @@ export default function ProposalItem({
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as any;
 
-      return pastEventsV2("proposal", "disputed", activeNetwork?.name, { fromBlock });
+      return processEvent("proposal", "disputed", activeNetwork?.name, { fromBlock });
     })
     .then(() =>
       getNetworkIssue());
