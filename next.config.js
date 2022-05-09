@@ -14,6 +14,7 @@ const publicRuntimeConfig = {
     transaction: process.env.NEXT_PUBLIC_TRANSACTION_ADDRESS,
     nft: process.env.NEXT_PUBLIC_NFT_ADDRESS
   },
+  nftUri: process.env.NEXT_PUBLIC_NFT_URI,
   web3ProviderConnection: process.env.NEXT_PUBLIC_WEB3_CONNECTION,
   github:{
     token: process.env.NEXT_PUBLIC_GH_TOKEN,

@@ -16,7 +16,6 @@ export default function SelectRepositoriesStep({
   validated,
   githubLogin,
   currentStep,
-  handleFinish,
   handleChangeStep,
   handleCheckPermission
 }) {
@@ -33,8 +32,6 @@ export default function SelectRepositoriesStep({
       activeStep={currentStep}
       validated={validated}
       handleClick={handleChangeStep}
-      finishLabel={t("steps.repositories.submit-label")}
-      handleFinish={handleFinish}
     >
       {(githubLogin && (
         <div>

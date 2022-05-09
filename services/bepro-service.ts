@@ -7,6 +7,7 @@ import {
   OraclesResume,
   Defaults
 } from "@taikai/dappkit";
+import { BountyToken } from "@taikai/dappkit";
 import getConfig from "next/config";
 
 import { Token } from "interfaces/token";
@@ -14,7 +15,7 @@ import { Token } from "interfaces/token";
 import { NetworkParameters } from "types/dappkit";
 
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 class BeproFacet {
   readonly bepro: Web3Connection = new Web3Connection({
     web3Host: publicRuntimeConfig.web3ProviderConnection
@@ -36,6 +37,8 @@ class BeproFacet {
       this.network = new Network_v2(this.bepro, networkAddress);
 
       await this.network.loadContract();
+
+      (window as any).network = this.network;
 
       if (!this.isStarted)
         console.table({
@@ -140,16 +143,24 @@ class BeproFacet {
     return network.sendTx(network.contract.methods.claimGovernor());
   }
 
+  async setNFTTokenDispatcher(nftToken: string, dispatcher: string) {
+    const bountyToken = new BountyToken(this.bepro, nftToken);
+
+    await bountyToken.loadContract();
+
+    return bountyToken.setDispatcher(dispatcher);
+  }
+
   
   async closeNetwork() {
     if (!this.isNetworkFactoryStarted) await this.startNetworkFactory();
     
-    return this.networkFactory.unlock()
+    return this.networkFactory.unlock();
   }
 
   async createNetwork(networkToken: string = publicRuntimeConfig.contract.settler, 
                       nftToken: string = publicRuntimeConfig.contract.nft, 
-                      nftUri = '//',
+                      nftUri = publicRuntimeConfig.nftUri || "//",
                       treasuryAddress = Defaults.nativeZeroAddress,
                       cancelFee = 10000,
                       closeFee= 50000) {
@@ -187,10 +198,12 @@ class BeproFacet {
     return network.getOraclesResume(this.address);
   }
 
-  async getAllowance(tokenAddress: string = publicRuntimeConfig.contract.settler, walletAddress = this.address) {
+  async getAllowance(tokenAddress: string = publicRuntimeConfig.contract.settler, 
+                    walletAddress = this.address, 
+                    spenderAddress = this.network.contractAddress) {
     const erc20 = await this.getERC20Obj(tokenAddress);
 
-    return erc20.allowance(walletAddress, this.network.contractAddress);
+    return erc20.allowance(walletAddress, spenderAddress);
   }
 
   async getOraclesOf(address: string) {
