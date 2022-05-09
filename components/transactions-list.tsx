@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 
 import { useTranslation } from "next-i18next";
+import { setCookie } from "nookies";
 
 import CenterArrows from "assets/icons/center-arrows";
 import ChatBubbles from "assets/icons/chat-bubbles";
@@ -16,14 +17,16 @@ import ReturnArrow from "assets/icons/return-arrow";
 import ThumbsUp from "assets/icons/thumbs-up";
 import UploadIcon from "assets/icons/upload";
 
+import Button from "components/button";
 import TransactionStats from "components/transaction-stats";
 import TransactionType from "components/transaction-type";
 
 import { ApplicationContext } from "contexts/application";
+import { useAuthentication } from "contexts/authentication";
+import { clearTransactions } from "contexts/reducers/clear-transactions";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
-import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { Transaction } from "interfaces/transaction";
 
@@ -31,9 +34,11 @@ export default function TransactionsList({
   onActiveTransaction = (transaction) => {}
 }) {
   const {
+    dispatch,
     state: { myTransactions }
   } = useContext(ApplicationContext);
   const { t } = useTranslation("common");
+  const { wallet } = useAuthentication();
 
   const IconMaps = {
     [TransactionTypes.openIssue]: <InformationChatBubble />,
@@ -92,14 +97,36 @@ export default function TransactionsList({
     );
   }
 
+  function clearTransactionsList() {
+    setCookie(null,
+              `bepro.transactions:${wallet?.address?.toLowerCase()}`,
+              "[]",
+              {
+                maxAge: 24 * 60 * 60, // 24 hour
+                path: "/"
+              });
+
+    dispatch(clearTransactions());
+  }
+
   return (
     <div className="transaction-list w-100">
-      <div className="row">
-        <div className="col mb-3">
-          <h4 className="h4 m-0 text-white">{t("transactions.title_other")}</h4>
-        </div>
+      <div className="d-flex flex-row justify-content-between">
+        <h4 className="h4 m-0 text-white">{t("transactions.title_other")}</h4>
+
+        { 
+          myTransactions.length && 
+          <Button 
+            textClass="text-ligth-gray" 
+            className="px-0 hover-primary" 
+            onClick={clearTransactionsList} 
+            transparent
+          >
+            Clear
+            </Button>  || <></>
+        }
       </div>
-      <div className="overflow-auto tx-container">
+      <div className="overflow-auto tx-container mt-1 pt-2">
         {(!myTransactions || !myTransactions.length) && emptyTransaction()}
         {myTransactions.map(renderTransactionRow)}
       </div>

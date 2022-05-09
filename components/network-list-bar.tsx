@@ -1,7 +1,5 @@
 import { useTranslation } from "next-i18next";
 
-import ArrowDown from "assets/icons/arrow-down";
-
 import NetworkListBarColumn from "./network-list-bar-column";
 
 export default function NetworkListBar({ hideOrder = false, order, setOrder }) {
@@ -29,8 +27,16 @@ export default function NetworkListBar({ hideOrder = false, order, setOrder }) {
         hideOrder={hideOrder}
         columnOrder={order[1]}
         label={t("network-list-bar.number-of-bounties")}
-        isColumnActive={order[0] === "openBountiesQuantity"}
-        onClick={() => handleSetOrder("openBountiesQuantity")}
+        isColumnActive={order[0] === "totalBounties"}
+        onClick={() => handleSetOrder("totalBounties")}
+      />
+
+      <NetworkListBarColumn
+        hideOrder={hideOrder}
+        label={t("network-list-bar.open-bounties")}
+        columnOrder={order[1]}
+        isColumnActive={order[0] === "openBounties"}
+        onClick={() => handleSetOrder("openBounties")}
       />
 
       <NetworkListBarColumn
@@ -39,14 +45,6 @@ export default function NetworkListBar({ hideOrder = false, order, setOrder }) {
         columnOrder={order[1]}
         isColumnActive={order[0] === "tokensLocked"}
         onClick={() => handleSetOrder("tokensLocked")}
-      />
-
-      <NetworkListBarColumn
-        hideOrder={hideOrder}
-        label={t("network-list-bar.open-bounties")}
-        columnOrder={order[1]}
-        isColumnActive={order[0] === "openBountiesAmount"}
-        onClick={() => handleSetOrder("openBountiesAmount")}
       />
     </div>
   );

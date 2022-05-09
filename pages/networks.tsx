@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import getConfig from "next/config";
 
 import NetworksList from "components/networks-list";
 import PageHero, { IInfosHero } from "components/page-hero";
@@ -12,8 +13,13 @@ import { changeNetworksSummary } from "contexts/reducers/change-networks-summary
 
 import { BeproService } from "services/bepro-service";
 
+import useApi from "x-hooks/use-api";
+
+const { publicRuntimeConfig } = getConfig();
+
 export default function NetworksPage() {
   const { t } = useTranslation(["common", "custom-network"]);
+  const { getCurrencyByToken } = useApi();
 
   const [infos, setInfos] = useState<IInfosHero[]>([
     {
@@ -54,11 +60,15 @@ export default function NetworksPage() {
   async function loadTotals() {
     if (!networksSummary) return;
 
-    const [quanty] = await Promise.all([BeproService.getNetworksQuantity()]);
+    const [quantity, totalLocked, { usd }] = await Promise.all([
+      BeproService.getNetworksQuantity(),
+      BeproService.getTokensLocked(),
+      getCurrencyByToken(publicRuntimeConfig.currency.currencyId, 'usd')
+    ]);
 
     setInfos([
       {
-        value: quanty,
+        value: quantity,
         label: t("custom-network:hero.number-of-networks")
       },
       {
@@ -66,7 +76,7 @@ export default function NetworksPage() {
         label: t("custom-network:hero.number-of-bounties")
       },
       {
-        value: networksSummary.amountInNetwork,
+        value: totalLocked * usd,
         label: t("custom-network:hero.in-the-network"),
         currency: "USD"
       }
