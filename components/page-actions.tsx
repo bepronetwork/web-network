@@ -163,7 +163,7 @@ export default function PageActions({
             disabled={isReedemButtonDisable()}
             onClick={handleRedeem}
           >
-            <Translation ns="bounty" label="actions.redeem" />
+            <Translation ns="common" label="actions.cancel" />
           </Button>
         </ReadOnlyButtonWrapper>
       )

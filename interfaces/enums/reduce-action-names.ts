@@ -22,5 +22,6 @@ export enum ReduceActionName {
   ChangeAccessToken = "ChangeAccessToken",
   ChangeTransactionalTokenApproval = "ChangeTransactionalTokenApproval",
   ChangeSettlerTokenApproval = "ChangeSettlerTokenApproval",
-  ChangeNetworksSummary = "ChangeNetworksSummary"
+  ChangeNetworksSummary = "ChangeNetworksSummary",
+  ClearTransactions = "ClearTransactions"
 }

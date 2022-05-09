@@ -38,7 +38,7 @@ class BeproFacet {
 
       await this.network.loadContract();
 
-      (window as any).network = this.network;
+      //(window as any).network = this.network;
 
       if (!this.isStarted)
         console.table({

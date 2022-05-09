@@ -62,33 +62,19 @@ export default function NetworkListItem({
 
     BeproService.getOpenBounties(handleNetworkAddress(network))
       .then((quantity) => {
-        updateNetworkParameter(network.name, "openBountiesQuantity", quantity);
-
-        dispatch(changeNetworksSummary({
-            label: "bounties",
-            amount: quantity,
-            action: "add"
-        }));
+        updateNetworkParameter(network.name, "openBounties", quantity);
       })
       .catch(console.log);
 
-    //TODO TVL Bounties
-    BeproService.getTotalSettlerLocked(handleNetworkAddress(network))
-      .then((amount) => {
-        updateNetworkParameter(network.name, "openBountiesAmount", amount);
+    BeproService.getBountiesCount(handleNetworkAddress(network))
+      .then((quantity) => {
+        updateNetworkParameter(network.name, "totalBounties", quantity);
 
-        return amount;
-      })
-      .then((amount) => {
-        BeproService.getNetworkObj(handleNetworkAddress(network)).then((networkObj) => {
-          getCurrencyByToken(publicRuntimeConfig?.currency.currencyId, 'usd').then(({ usd }) => {
-            dispatch(changeNetworksSummary({
-                    label: "amountInNetwork",
-                    amount: amount * usd,
-                    action: "add"
-            }));
-          });
-        });
+        dispatch(changeNetworksSummary({
+          label: "bounties",
+          amount: quantity,
+          action: "add"
+        }));
       })
       .catch(console.log);
   }, []);
@@ -111,24 +97,24 @@ export default function NetworkListItem({
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center">
         <span className="caption-medium text-white">
-          {network.openBountiesQuantity !== undefined
-            ? formatNumberToNScale(network.openBountiesQuantity)
+          {network.totalBounties !== undefined
+            ? formatNumberToNScale(network.totalBounties)
             : "-"}
         </span>
       </div>
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center">
         <span className="caption-medium text-white">
-          {network.tokensLocked !== undefined
-            ? formatNumberToNScale(network.tokensLocked)
+          {network.openBounties !== undefined
+            ? formatNumberToNScale(network.openBounties)
             : "-"}
         </span>
       </div>
 
-      <div className="col-3 d-flex flex-row align-items-center justify-content-end gap-20">
-        <span className="caption-medium text-white">
-          {network.openBountiesAmount !== undefined
-            ? formatNumberToNScale(network.openBountiesAmount)
+      <div className="col-3 d-flex flex-row align-items-center justify-content-center gap-20">
+        <span className="caption-medium text-white ml-3">
+          {network.tokensLocked !== undefined
+            ? formatNumberToNScale(network.tokensLocked)
             : "-"}
         </span>
 
