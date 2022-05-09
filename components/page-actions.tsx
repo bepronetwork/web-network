@@ -101,7 +101,9 @@ export default function PageActions({
   const { handleReedemIssue, handleCreatePullRequest } = useBepro();
   const { updateIssue, networkIssue, activeIssue } = useIssue();
 
-  const { createPrePullRequest, cancelPrePullRequest, startWorking, pastEventsV2 } = useApi();
+  const { createPrePullRequest, cancelPrePullRequest, startWorking, processEvent } = useApi();
+
+  const isBountyOwner = () => issueCreator?.toLowerCase() === wallet?.address.toLowerCase();
 
   function renderIssueAvatars() {
     if (developers?.length > 0) return <IssueAvatars users={developers} />;
@@ -153,7 +155,7 @@ export default function PageActions({
   const renderRedeem = () => {
     return (
       isIssueinDraft &&
-      (issueCreator.toLowerCase() === wallet?.address.toLowerCase()) &&
+      isBountyOwner() &&
       !finalized && (
         <ReadOnlyButtonWrapper>
           <Button
@@ -169,7 +171,7 @@ export default function PageActions({
   };
 
   const renderUpdateAmount = () => {
-    if (isIssueinDraft && issueCreator?.toLowerCase() === wallet?.address.toLowerCase() && wallet?.address)
+    if (isIssueinDraft && isBountyOwner())
       return <ReadOnlyButtonWrapper>
         <Button
           className="read-only-button me-1"
@@ -190,7 +192,7 @@ export default function PageActions({
       user?.login && (
         <NewProposal
           isFinished={finished}
-          isIssueOwner={issueCreator?.toLowerCase() === wallet?.address.toLowerCase()}
+          isIssueOwner={isBountyOwner()}
           amountTotal={amountIssue}
           pullRequests={pullRequests}
         />
@@ -320,7 +322,7 @@ export default function PageActions({
       return handleCreatePullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid);
     })
     .then(txInfo => {
-      return pastEventsV2("pull-request", "created", activeNetwork?.name, { fromBlock: (txInfo as any).blockNumber });
+      return processEvent("pull-request", "created", activeNetwork?.name, { fromBlock: (txInfo as any).blockNumber });
     })
     .then(() => {
       dispatch(addToast({

@@ -4,7 +4,6 @@ import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-cor
 import { useTranslation } from "next-i18next";
 
 import { ApplicationContext } from "contexts/application";
-import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 import { addTransaction } from "contexts/reducers/add-transaction";
@@ -32,11 +31,10 @@ export default function useBepro(props?: IUseBeProDefault) {
 
   const { dispatch } = useContext(ApplicationContext);
   const { activeNetwork } = useNetwork();
-  const { user }  = useAuthentication()
   const { networkIssue, activeIssue, updateIssue } = useIssue()
   const { t } = useTranslation();
 
-  const { pastEventsV2, waitForClose, waitForRedeem, waitForMerge } = useApi();
+  const { processEvent } = useApi();
   const txWindow = useTransactions();
 
   async function handlerDisputeProposal(proposalscMergeId: number): Promise<TransactionReceipt | Error> {
@@ -47,7 +45,6 @@ export default function useBepro(props?: IUseBeProDefault) {
       await BeproService.network
         .disputeBountyProposal(+networkIssue.id, +proposalscMergeId)
         .then((txInfo) => {
-          //processEvent("dispute-proposal", txInfo.blockNumber, networkIssue._id);
           txWindow.updateItem(disputeTx.payload.id,
                               parseTransaction(txInfo, disputeTx.payload));
           onSuccess?.(txInfo);
@@ -75,8 +72,6 @@ export default function useBepro(props?: IUseBeProDefault) {
       const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue },
                                           activeNetwork);
       dispatch(closeIssueTx);
-
-      //waitForClose(issueId, activeNetwork?.name).then(() => onSuccess?.());
 
       await BeproService.network
         .closeBounty(+bountyId, +proposalscMergeId)
@@ -145,7 +140,7 @@ export default function useBepro(props?: IUseBeProDefault) {
         .then((txInfo) => {
           tx = txInfo;
           // Review: Review processEnvets are working correctly
-          return pastEventsV2("bounty", 
+          return processEvent("bounty", 
                               "canceled", 
                               activeNetwork.name, 
                               { fromBlock: txInfo.blockNumber, id: networkIssue?.id });

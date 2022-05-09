@@ -7,6 +7,6 @@ import readBountyUpdated from "helpers/api/bounty/read-updated";
 export const BountyHelpers = {
     "created": ["getBountyCreatedEvents", readBountyCreated],
     "canceled": ["getBountyCanceledEvents", readBountyCanceled],
-    "closed": ["getBountyDistributedEvents", readBountyClosed],
+    "closed": ["getBountyClosedEvents", readBountyClosed],
     "updated": ["getBountyAmountUpdatedEvents", readBountyUpdated]
 };

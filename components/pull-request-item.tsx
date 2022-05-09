@@ -21,7 +21,7 @@ import { formatNumberToNScale } from "helpers/formatNumber";
 import { pullRequest } from "interfaces/issue-data";
 
 import useNetwork from "x-hooks/use-network";
-import useOctokit from "x-hooks/use-octokit";
+import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 interface IPullRequestItem {
   issue: IActiveIssue;
@@ -35,7 +35,7 @@ export default function PullRequestItem({
   networkPullRequest
 }: IPullRequestItem) {
   const router = useRouter();
-  const { getCommitsOfPr, getCommit } = useOctokit();
+  const { getPullRequestLinesOfCode } = useOctokitGraph();
   const [linesOfCode, setLinesOfCode] = useState(0);
 
   const { getURLWithNetwork } = useNetwork();
@@ -61,18 +61,8 @@ export default function PullRequestItem({
   async function getPullRequestInfo() {
     try {
       const repositoryPath = issue.repository.githubPath;
-      const [owner, repo] = repositoryPath.split("/");
-      let lines = 0;
 
-      const commits = await getCommitsOfPr(+pullRequest?.githubId,
-                                           repositoryPath);
-
-      for (const commit of commits) {
-        const {
-          data: { stats }
-        } = await getCommit(owner, repo, commit.sha);
-        lines += stats.total;
-      }
+      const lines = await getPullRequestLinesOfCode(repositoryPath, +pullRequest?.githubId);
 
       setLinesOfCode(lines);
     } catch (error) {

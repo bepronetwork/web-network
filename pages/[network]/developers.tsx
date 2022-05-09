@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next/types";
-import { Octokit } from "octokit";
 
 import ListIssues from "components/list-issues";
 import PageHero, { IInfosHero } from "components/page-hero";
@@ -19,7 +18,7 @@ import useApi from "x-hooks/use-api";
 
 export default function PageDevelopers() {
   const { t } = useTranslation(["common"]);
-  const { beproServiceStarted, user } = useAuthentication();
+  const { beproServiceStarted } = useAuthentication();
   const { getTotalUsers } = useApi();
 
   const [infos, setInfos] = useState<IInfosHero[]>([

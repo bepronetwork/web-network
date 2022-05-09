@@ -31,7 +31,7 @@ export default function UpdateBountyAmountModal({
   const { handleApproveToken, handleUpdateBountyAmount } = useBepro();
   const { dispatch } = useContext(ApplicationContext);
   const { updateIssue } = useIssue();
-  const { pastEventsV2 } = useApi();
+  const { processEvent } = useApi();
   const { activeNetwork } = useNetwork();
 
   const [isExecuting, setIsExecuting] = useState(false);
@@ -71,7 +71,7 @@ export default function UpdateBountyAmountModal({
 
     handleUpdateBountyAmount(bountyId, newAmount)
     .then(txInfo => {
-      return pastEventsV2("bounty", "updated", activeNetwork?.name, { fromBlock: (txInfo as any).blockNumber });
+      return processEvent("bounty", "updated", activeNetwork?.name, { fromBlock: (txInfo as any).blockNumber });
     })
     .then(() => {
       updateIssue(repoId, ghId);

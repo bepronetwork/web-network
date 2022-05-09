@@ -63,6 +63,7 @@ export default function ConnectWalletButton({
 
   function handleShowModal() {
     if (!wallet?.address) setShowModal(true);
+    else setShowModal(false);
   }
 
   if (asModal) {

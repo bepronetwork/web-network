@@ -3,7 +3,6 @@ import React, {
   useCallback, useContext, useEffect, useMemo, useState
 } from "react";
 
-import { fromSmartContractDecimals } from "@taikai/dappkit";
 import { useRouter } from "next/router";
 
 import { useAuthentication } from "contexts/authentication";
@@ -19,7 +18,7 @@ import {
 import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
-import useOctokit from "x-hooks/use-octokit";
+import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 
 export interface IActiveIssue extends IssueData {
@@ -44,8 +43,8 @@ export const IssueProvider: React.FC = function ({ children }) {
   const { getIssue } = useApi();
   const { activeNetwork } = useNetwork();
   const { query } = useRouter();
-  const { getIssueComments, getPullRequest, getPullRequestComments } =
-    useOctokit();
+
+  const { getIssueOrPullRequestComments, getPullRequestDetails } = useOctokitGraph();
 
   const { wallet, user, beproServiceStarted } = useAuthentication();
 
@@ -64,13 +63,12 @@ export const IssueProvider: React.FC = function ({ children }) {
   const updatePullRequests = useCallback(async (prs: pullRequest[], githubPath: string) => {
     const mapPr = prs.map(async (pr) => {
       const [getPr, getComments] = await Promise.all([
-            getPullRequest(Number(pr.githubId), githubPath),
-            getPullRequestComments(Number(pr.githubId), githubPath)
+        getPullRequestDetails(githubPath, +pr.githubId),
+        getIssueOrPullRequestComments(githubPath, +pr.githubId)
       ]);
-      pr.isMergeable =
-            getPr?.data?.mergeable && getPr?.data?.mergeable_state === "clean";
-      pr.merged = getPr?.data?.merged;
-      pr.state = getPr?.data?.state;
+      pr.isMergeable = getPr?.mergeable === "MERGEABLE";
+      pr.merged = getPr?.merged;
+      pr.state = getPr?.state;
       pr.comments = getComments as any;
       return pr;
     });
@@ -91,8 +89,9 @@ export const IssueProvider: React.FC = function ({ children }) {
       issue.pullRequests = await updatePullRequests(issue?.pullRequests,
                                                     ghPath);
     }
-    const comments = await getIssueComments(+issue.githubId,
-                                            ghPath);
+
+    const comments = await getIssueOrPullRequestComments(ghPath, +issue.githubId);
+    
     const newActiveIssue = {
         ...issue,
         comments,
@@ -141,6 +140,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     setNetworkIssue({ 
       ...bounty, 
       isDraft, 
+      pullRequests: bounty.pullRequests.filter(pr => !pr.canceled),
       proposals: networkProposals,
       isFinished
     });
@@ -153,7 +153,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     }
   }, [activeIssue, wallet?.address, beproServiceStarted]);
 
-  useEffect(() => {
+  useEffect(() => {    
     const noExpired = +new Date() - activeIssue?.lastUpdated <= TTL;
 
     if (query.id && query.repoId) {

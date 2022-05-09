@@ -36,7 +36,7 @@ export default function PageProposal() {
   const router = useRouter();
   const { dispatch } = useContext(ApplicationContext);
   const { t } = useTranslation();
-  const { getUserOf, pastEventsV2 } = useApi();
+  const { getUserOf, processEvent } = useApi();
   const { handlerDisputeProposal, handleCloseIssue, handleRefuseByOwner } = useBepro();
   const { activeIssue, networkIssue, getNetworkIssue, updateIssue } = useIssue();
   const { activeNetwork } = useNetwork();
@@ -53,7 +53,7 @@ export default function PageProposal() {
       .then(txInfo => {
         const { blockNumber: fromBlock } = txInfo as any;
 
-        return pastEventsV2("bounty", "closed", activeNetwork?.name, { fromBlock } );
+        return processEvent("bounty", "closed", activeNetwork?.name, { fromBlock } );
       })
       .then(() => {
         updateIssue(activeIssue?.repository_id, activeIssue?.githubId);
@@ -78,7 +78,7 @@ export default function PageProposal() {
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as any;
 
-      return pastEventsV2("proposal", "disputed", activeNetwork?.name, { fromBlock } );
+      return processEvent("proposal", "disputed", activeNetwork?.name, { fromBlock } );
     })
     .then(() => {
       getNetworkIssue();
