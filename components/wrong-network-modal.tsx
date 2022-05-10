@@ -14,7 +14,7 @@ import { NetworkColors } from "interfaces/enums/network-colors";
 
 import Button from "./button";
 
-const publicRuntimeConfig = getConfig();
+const { publicRuntimeConfig } = getConfig();
 
 export default function WrongNetworkModal({
   requiredNetworkId = null,
