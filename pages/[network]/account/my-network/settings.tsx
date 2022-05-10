@@ -257,7 +257,7 @@ export default function Settings() {
     };
 
     updateNetwork(json)
-      .then(async (result) => {
+      .then(async () => {
         if (currentNetworkParameters.redeemTime !== newInfo.redeemTime)
           await BeproService.setNetworkParameter("draftTime", newInfo.redeemTime).catch(console.log);
 
@@ -282,7 +282,7 @@ export default function Settings() {
 
         setUpdatingNetwork(false);
 
-        updateActiveNetwork();
+        updateActiveNetwork(true);
         loadData();
       })
       .catch((error) => {
