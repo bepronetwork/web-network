@@ -23,14 +23,14 @@ export default function CreatePullRequestModal({
   const { t } = useTranslation(["common", "pull-request"]);
 
   const [title, setTitle] = useState("");
-  const [branch, setBranch] = useState();
+  const [branch, setBranch] = useState("");
   const [options, setOptions] = useState([]);
   const [description, setDescription] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
   const { user } = useAuthentication();
 
-  const { getRepositoryBranches } = useOctokitGraph();
+  const { getRepositoryBranches, getUserRepositories } = useOctokitGraph();
 
   function onSelectedBranch(option) {
     setBranch(option.value);
@@ -57,17 +57,26 @@ export default function CreatePullRequestModal({
   useEffect(() => {
     if (!user?.accessToken || !repo) return;
 
-    
-    getRepositoryBranches(repo)
-      .then(branches => {
-        return branches.map(branch2 => ({
-          value: branch2,
-          label: branch2,
-          isSelected: branch && branch === branch2
-        }));
-      })
-      .then(setOptions)
-      .catch(console.log);
+    let repoToSearch = `${user.login}/${repo.split("/")[1]}`;
+
+    getUserRepositories(user.login)
+    .then(repositories => {
+      const isOrganizationRepository = 
+        repositories.find(repository => repository.nameWithOwner === repo && repository.isOrganization);
+
+      if (isOrganizationRepository) repoToSearch = repo;
+
+      return getRepositoryBranches(repoToSearch);
+    })
+    .then(branches => {
+      return branches.map(branch2 => ({
+        value: `${repoToSearch.split("/")[0]}/${branch2}`,
+        label: branch2,
+        isSelected: branch && branch === branch2
+      }));
+    })
+    .then(setOptions)
+    .catch(console.log);
   }, [user?.accessToken, repo]);
 
   return (

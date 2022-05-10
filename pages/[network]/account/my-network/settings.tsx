@@ -171,7 +171,7 @@ export default function Settings() {
         const githubRepos = await getUserRepositories(user?.login);
 
         const repos = githubRepos
-        .filter(repo => !repo.isFork && (user?.login === repo.nameWithOwner.split("/")[0]))
+        .filter(repo => (!repo.isFork && (user?.login === repo.nameWithOwner.split("/")[0])) || repo.isOrganization)
         .map((repo) => ({
           checked: false,
           isSaved: false,

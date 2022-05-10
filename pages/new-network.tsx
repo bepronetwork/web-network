@@ -193,7 +193,7 @@ export default function NewNetwork() {
       getUserRepositories(user.login).then(repos => {
         const repositories = 
           repos
-          .filter(repo => !repo.isFork && repo.nameWithOwner.split("/")[0] === user.login)
+          .filter(repo => (!repo.isFork && (user?.login === repo.nameWithOwner.split("/")[0])) || repo.isOrganization)
           .map(repo => ({
             checked: false,
             name: repo.name,

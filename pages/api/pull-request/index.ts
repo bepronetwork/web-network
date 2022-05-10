@@ -100,7 +100,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       repositoryId: repositoryGithubId,
       title,
       body,
-      head: `${username}:${branch}`,
+      head: branch.replace("/", ":"),
       base: issue.branch || serverRuntimeConfig.github.mainBranch,
       maintainerCanModify: false,
       draft: false
