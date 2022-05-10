@@ -15,7 +15,7 @@ import paginate from "helpers/paginate";
 
 import { GraphQlResponse } from "types/octokit";
 
-const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { login, issueId, networkName } = req.query;
@@ -86,7 +86,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const [owner, repo] = repoInfo.githubPath.split("/");
 
-  const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
+  const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
 
   const repositoryDetails = await githubAPI<GraphQlResponse>(RepositoryQueries.Details, {
     repo,
@@ -101,7 +101,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       title,
       body,
       head: branch.replace("/", ":"),
-      base: issue.branch || serverRuntimeConfig.github.mainBranch,
+      base: issue.branch || serverRuntimeConfig?.github?.mainBranch,
       maintainerCanModify: false,
       draft: false
     });
@@ -185,8 +185,9 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
   if (!pullRequest) return res.status(404).json("Invalid");
 
   const network = networkBeproJs({
-    contractAddress: customNetwork.name.toLowerCase() === publicRuntimeConfig.networkConfig.networkName.toLowerCase() ? 
-      publicRuntimeConfig.contract.address : customNetwork.networkAddress,
+    contractAddress: 
+    customNetwork.name.toLowerCase() === publicRuntimeConfig?.networkConfig?.networkName?.toLowerCase() ? 
+      publicRuntimeConfig?.contract?.address : customNetwork.networkAddress,
     version: 2
   }) as Network_v2;
 
@@ -203,7 +204,7 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
   if (!pullRequestNetwork)
     return res.status(404).json("Invalid");
 
-  const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
+  const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
 
   const [owner, repo] = issue.repository.githubPath.split("/");
 

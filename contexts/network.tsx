@@ -9,14 +9,16 @@ import { parseCookies, setCookie } from "nookies";
 
 import NetworkThemeInjector from "components/custom-network/network-theme-injector";
 
+import { useAuthentication } from "contexts/authentication";
+
 import { INetwork } from "interfaces/network";
 
 import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 
-const { publicRuntimeConfig } = getConfig()
-import { useAuthentication } from "./authentication";
+const { publicRuntimeConfig } = getConfig();
+
 export interface NetworkContextData {
   activeNetwork: INetwork;
   updateActiveNetwork: () => void;

@@ -8,7 +8,8 @@ import Step from "components/step";
 import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
 import useNetwork from "x-hooks/use-network";
-const {publicRuntimeConfig} = getConfig()
+
+const { publicRuntimeConfig } = getConfig();
 
 export default function NetworkInformationStep({
   data,
@@ -113,7 +114,7 @@ export default function NetworkInformationStep({
             {t("custom-network:steps.network-information.fields.name.temporary")}
           </p>
           <p className="caption-small text-gray">
-            {urlWithoutProtocol(publicRuntimeConfig.apiUrl)}/
+            {urlWithoutProtocol(publicRuntimeConfig?.apiUrl)}/
             <span className="text-primary">
               {getQueryableText(data.displayName.data ||
                   t("custom-network:steps.network-information.fields.name.default"))}

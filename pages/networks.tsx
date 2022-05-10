@@ -63,7 +63,7 @@ export default function NetworksPage() {
     const [quantity, totalLocked, { usd }] = await Promise.all([
       BeproService.getNetworksQuantity(),
       BeproService.getTokensLocked(),
-      getCurrencyByToken(publicRuntimeConfig.currency.currencyId, 'usd')
+      getCurrencyByToken(publicRuntimeConfig?.currency?.currencyId, 'usd')
     ]);
 
     setInfos([

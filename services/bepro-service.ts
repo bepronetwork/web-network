@@ -18,7 +18,7 @@ import { NetworkParameters } from "types/dappkit";
 const { publicRuntimeConfig } = getConfig();
 class BeproFacet {
   readonly bepro: Web3Connection = new Web3Connection({
-    web3Host: publicRuntimeConfig.web3ProviderConnection
+    web3Host: publicRuntimeConfig?.web3ProviderConnection
   });
 
   network: Network_v2;
@@ -30,7 +30,7 @@ class BeproFacet {
   isLoggedIn = false;
   isNetworkFactoryStarted = false;
 
-  async start(networkAddress = publicRuntimeConfig.contract.address) {
+  async start(networkAddress = publicRuntimeConfig?.contract?.address) {
     try {
       if (!this.isStarted) await this.bepro.start();
       
@@ -42,7 +42,7 @@ class BeproFacet {
 
       if (!this.isStarted)
         console.table({
-          web3: publicRuntimeConfig.web3ProviderConnection,
+          web3: publicRuntimeConfig?.web3ProviderConnection,
           contract: networkAddress,
           settler: this.network.settlerToken?.contractAddress,
           nft: this.network.nftToken?.contractAddress,
@@ -59,13 +59,13 @@ class BeproFacet {
 
   async startNetworkFactory() {
     try {
-      if (!publicRuntimeConfig.networkConfig.factoryAddress)
+      if (!publicRuntimeConfig?.networkConfig?.factoryAddress)
         console.error("Network Factory Contract is Missing");
       else {
         this.isNetworkFactoryStarted = false;
 
         this.networkFactory = new NetworkFactoryV2(this.bepro,
-          publicRuntimeConfig.networkConfig.factoryAddress);
+          publicRuntimeConfig?.networkConfig?.factoryAddress);
 
         await this.networkFactory.loadContract();
 
@@ -158,9 +158,9 @@ class BeproFacet {
     return this.networkFactory.unlock();
   }
 
-  async createNetwork(networkToken: string = publicRuntimeConfig.contract.settler, 
-                      nftToken: string = publicRuntimeConfig.contract.nft, 
-                      nftUri = publicRuntimeConfig.nftUri || "//",
+  async createNetwork(networkToken: string = publicRuntimeConfig?.contract?.settler, 
+                      nftToken: string = publicRuntimeConfig?.contract?.nft, 
+                      nftUri = publicRuntimeConfig?.nftUri || "//",
                       treasuryAddress = Defaults.nativeZeroAddress,
                       cancelFee = 10000,
                       closeFee= 50000) {
@@ -198,7 +198,7 @@ class BeproFacet {
     return network.getOraclesResume(this.address);
   }
 
-  async getAllowance(tokenAddress: string = publicRuntimeConfig.contract.settler, 
+  async getAllowance(tokenAddress: string = publicRuntimeConfig?.contract?.settler, 
                     walletAddress = this.address, 
                     spenderAddress = this.network.contractAddress) {
     const erc20 = await this.getERC20Obj(tokenAddress);

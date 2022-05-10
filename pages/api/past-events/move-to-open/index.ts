@@ -17,13 +17,13 @@ import api from "services/api";
 
 import { GraphQlResponse } from "types/octokit";
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const customNetworks = await models.network.findAll({
     where: {
       name: {
-        [Op.notILike]: `%${publicRuntimeConfig.networkConfig.networkName
+        [Op.notILike]: `%${publicRuntimeConfig?.networkConfig?.networkName
 }%`
       }
     }
@@ -32,9 +32,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const networks = [
     {
       id: 1,
-      name: publicRuntimeConfig.networkConfig.networkName
+      name: publicRuntimeConfig?.networkConfig?.networkName
 ,
-      networkAddress: publicRuntimeConfig.contract.address,
+      networkAddress: publicRuntimeConfig?.contract?.address,
     },
     ...customNetworks
   ];
@@ -59,7 +59,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     const issues = await models.issue.findAll({ where });
 
-    const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
+    const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
 
     let currentRepo = '';
     let labelId = null;
@@ -101,7 +101,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       console.log(`Moved ${issue.issueId} to open`);
       await issue.save();
 
-      if (network.contractAddress === publicRuntimeConfig.contract.address)
+      if (network.contractAddress === publicRuntimeConfig?.contract?.address)
         twitterTweet({
           type: "bounty",
           action: "changes",

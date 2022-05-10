@@ -33,8 +33,9 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   if (!customNetwork || customNetwork?.isClosed) return res.status(404).json("Invalid network");
 
   const network = networkBeproJs({
-    contractAddress: customNetwork.name.toLowerCase() === publicRuntimeConfig.networkConfig.networkName.toLowerCase() ? 
-      publicRuntimeConfig.contract.address : customNetwork.networkAddress,
+    contractAddress: 
+    customNetwork.name.toLowerCase() === publicRuntimeConfig?.networkConfig?.networkName?.toLowerCase() ? 
+      publicRuntimeConfig?.contract?.address : customNetwork.networkAddress,
     version: 2
   }) as Network_v2;
 

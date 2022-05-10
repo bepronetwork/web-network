@@ -31,7 +31,8 @@ import useNetworkTheme from "x-hooks/use-network";
 import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
+
 export default function NewNetwork() {
   const router = useRouter();
 
@@ -177,8 +178,8 @@ export default function NewNetwork() {
   useEffect(() => {
     if (!network) return;
 
-    if (network.name !== publicRuntimeConfig.networkConfig.networkName)
-      router.push(getURLWithNetwork("/account", { network: publicRuntimeConfig.networkConfig.networkName }));
+    if (network.name !== publicRuntimeConfig?.networkConfig?.networkName)
+      router.push(getURLWithNetwork("/account", { network: publicRuntimeConfig?.networkConfig?.networkName }));
     else if (!Object.keys(steps.network.data.colors.data).length) {
       const tmpSteps = Object.assign({}, steps);
 

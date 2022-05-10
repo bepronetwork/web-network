@@ -6,7 +6,7 @@ import models from "db/models";
 
 import twitterTweet from "../handle-twitter-tweet";
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 
 export default async function readProposalCreated(events, network: Network_v2, customNetwork) {
   const created = [];
@@ -67,7 +67,7 @@ export default async function readProposalCreated(events, network: Network_v2, c
 
             created.push(networkProposal.id);
         
-            if (network.contractAddress === publicRuntimeConfig.contract.address)
+            if (network.contractAddress === publicRuntimeConfig?.contract?.address)
               twitterTweet({
                 type: "proposal",
                 action: "created",

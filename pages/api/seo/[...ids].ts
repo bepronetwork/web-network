@@ -9,7 +9,7 @@ import models from "db/models";
 // import { generateCard } from "helpers/seo/create-card-bounty";
 
 // import IpfsStorage from "services/ipfs-service";
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -26,7 +26,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   if (!issue) return res.status(404).json(null);
 
-  const url = `${publicRuntimeConfig.ipfsUrl}/${issue.seoImage}`;
+  const url = `${publicRuntimeConfig?.ipfsUrl}/${issue.seoImage}`;
 
   const { data } = await axios.get(url, {
     responseType: "arraybuffer"

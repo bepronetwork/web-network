@@ -39,7 +39,7 @@ import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
 import useOctokitGraph from "x-hooks/use-octokit-graph";
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 interface NetworkAmounts {
   tokenStaked: number;
   oraclesStaked: number;
@@ -632,8 +632,8 @@ export default function Settings() {
                     label={t("custom-network:redeem-time")}
                     max={+publicRuntimeConfig?.networkConfig?.reedemTime?.max}
                     description={t("custom-network:errors.redeem-time", {
-                      min: +publicRuntimeConfig.networkConfig.reedemTime.min,
-                      max: formatNumberToCurrency(+publicRuntimeConfig.networkConfig.reedemTime.max, 0)
+                      min: +publicRuntimeConfig?.networkConfig?.reedemTime?.min,
+                      max: formatNumberToCurrency(+publicRuntimeConfig?.networkConfig?.reedemTime?.max, 0)
                     })}
                     symbol="seconds"
                     value={newInfo.redeemTime}

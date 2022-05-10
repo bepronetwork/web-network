@@ -2,7 +2,7 @@ import getConfig from "next/config";
 
 import { INetwork, ThemeColors } from "interfaces/network";
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 
 export const DefaultNetworkInformation = {
   lock: {
@@ -46,7 +46,7 @@ export const DefaultNetworkInformation = {
 };
 
 export const handleNetworkAddress = (network: INetwork) => {
-  return network?.name === publicRuntimeConfig.networkConfig.networkName
-    ? publicRuntimeConfig.contract.address
+  return network?.name === publicRuntimeConfig?.networkConfig?.networkName
+    ? publicRuntimeConfig?.contract?.address
     : network?.networkAddress;
 };

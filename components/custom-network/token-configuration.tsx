@@ -95,8 +95,8 @@ export default function TokenConfiguration({
           defaultToken={BEPRO_TOKEN} 
           tokens={customTokens} 
           canAddToken={
-            activeNetwork?.networkAddress === publicRuntimeConfig.contract.address ? 
-            publicRuntimeConfig.networkConfig.allowCustomTokens :
+            activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address ? 
+            publicRuntimeConfig?.networkConfig?.allowCustomTokens :
             !!activeNetwork?.allowCustomTokens
           }
           addToken={addToken} 

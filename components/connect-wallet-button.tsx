@@ -18,7 +18,7 @@ import { NetworkColors } from "interfaces/enums/network-colors";
 
 import { BeproService } from "services/bepro-service";
 
-const { metaMask } = getConfig().publicRuntimeConfig;
+const { publicRuntimeConfig } = getConfig();
 
 export default function ConnectWalletButton({
   children = null,
@@ -49,7 +49,7 @@ export default function ConnectWalletButton({
       BeproService.bepro.web3.eth
         .getChainId()
         .then((chainId) => {
-          if (+chainId === +metaMask.chainId) {
+          if (+chainId === +publicRuntimeConfig?.metaMask?.chainId) {
             login();
           } else {
             dispatch(changeNetworkId(+chainId));
@@ -82,9 +82,9 @@ export default function ConnectWalletButton({
             {t("connect-wallet-button:to-access-this-page")}
             <br />
             <span
-              style={{ color: NetworkColors[metaMask.chainName.toLowerCase()] }}
+              style={{ color: NetworkColors[publicRuntimeConfig?.metaMask?.chainName?.toLowerCase()] }}
             >
-              <span>{metaMask.chainName}</span>{" "}
+              <span>{publicRuntimeConfig?.metaMask?.chainName}</span>{" "}
               {t("connect-wallet-button:network")}
             </span>{" "}
             {t("connect-wallet-button:on-your-wallet")}

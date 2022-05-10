@@ -14,7 +14,7 @@ import useApi from "x-hooks/use-api";
 import InputNumber from "./input-number";
 import ReactSelect from "./react-select";
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 interface IPriceConversiorModalProps{
   show: boolean;
   onClose: ()=> void;
@@ -34,7 +34,7 @@ export default function PriceConversorModal({
   
 
   async function handlerChange({value, label}){
-    const data = await getCurrencyByToken(publicRuntimeConfig.currency.currencyId, value)
+    const data = await getCurrencyByToken(publicRuntimeConfig?.currency?.currencyId, value)
     setCurrentCurrency({value, label})
     setCurrentPrice(data[value])
   }
@@ -42,7 +42,7 @@ export default function PriceConversorModal({
   useEffect(()=>{
     let currencyList;
     try {
-      const list = JSON.parse(publicRuntimeConfig.currency.currencyCompareList)
+      const list = JSON.parse(publicRuntimeConfig?.currency?.currencyCompareList)
       currencyList = Array.isArray(list) ? list : defaultValue;
     } catch (error) {
       currencyList = defaultValue;
