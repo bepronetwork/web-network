@@ -44,7 +44,9 @@ export default function useOctokitGraph() {
     let hasMorePages = false;
 
     do {
-      const response = await api<GraphQlResponse>(query, {...variables, cursor: nextPageCursor});
+      const response = await api<GraphQlResponse>(query, {...variables, cursor: nextPageCursor})
+        .then(data => data)
+        .catch(error => error.data);
 
       pages.push(response);
 
@@ -161,13 +163,25 @@ export default function useOctokitGraph() {
       login
     });
 
-    const repositories = response.flatMap<{
+    const userRepositories = response.flatMap<{
       name: string
       nameWithOwner: string
       isFork: boolean
-    }>(item => getPropertyRecursively("nodes", item) );
+      isOrganization?: boolean
+    }>(item => getPropertyRecursively("nodes", (item as any)?.user?.repositories) );
 
-    return repositories;
+    const organizationRepositories = response.flatMap<{
+      name: string
+      nameWithOwner: string
+      isFork: boolean
+      isOrganization: boolean
+    }>(item => {
+      return (item as any)?.user?.organizations?.nodes?.
+              flatMap(el => getPropertyRecursively<GraphQlQueryResponseData>("nodes", el))
+              .map(repo => ({...repo, isOrganization: true}));
+    });
+
+    return [...userRepositories, ...organizationRepositories];
   }
   
   return {

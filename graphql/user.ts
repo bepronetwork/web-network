@@ -12,5 +12,16 @@ export const Repositories =
           isFork
         }
       }
+      organizations(first: 100) {
+          nodes {
+              repositories(first: 100) {
+                  nodes {
+                      isFork
+                      name
+                      nameWithOwner
+                  }
+              }
+          }
+      }
     }
   }`;
