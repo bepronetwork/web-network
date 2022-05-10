@@ -109,13 +109,6 @@ class BeproFacet {
     return erc20.approve(this.network.contractAddress, amount);
   }
 
-  async isApprovedSettlerToken() {
-    const network = await this.getNetworkObj();
-    const settler = network.settlerToken;
-
-    return settler.isApproved(network.contractAddress, 1);
-  }
-
   async isNetworkAbleToClose(networkAddress = undefined) {
     const network = await this.getNetworkObj(networkAddress);
 
