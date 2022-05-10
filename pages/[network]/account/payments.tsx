@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useRouter } from "next/router";
 import { GetServerSideProps } from "next/types";
 
 import Account from "components/account";
@@ -11,14 +12,14 @@ import InternalLink from "components/internal-link";
 import NothingFound from "components/nothing-found";
 
 import { ApplicationContext } from "contexts/application";
+import { useAuthentication } from "contexts/authentication";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
-import useNetworkTheme from "x-hooks/use-network";
-import useApi from "x-hooks/use-api";
-import { useAuthentication } from "contexts/authentication";
 import { IPayment } from "interfaces/payments";
-import { useRouter } from "next/router";
+
+import useApi from "x-hooks/use-api";
+import useNetworkTheme from "x-hooks/use-network";
 
 interface IPaymentItem{
   payment:  IPayment

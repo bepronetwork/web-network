@@ -28,12 +28,12 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
 async function Payments(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-      case "get":
-        await get(req, res);
-        break;
+  case "get":
+    await get(req, res);
+    break;
 
-      default:
-        res.status(405).json("Method not allowed");
+  default:
+    res.status(405).json("Method not allowed");
   }
 
   res.end();
