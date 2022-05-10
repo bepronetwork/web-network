@@ -43,8 +43,8 @@ const PaymentItem = function ({payment}:IPaymentItem) {
           color="ligth-gray"
           outline
           className={"align-self-center"}
-          onClick={(ev) => {
-            const [repoId, id] = payment?.issue?.issueId?.split('/')
+          onClick={() => {
+            const [repoId, id] = payment.issue.issueId.split('/')
             router?.push(getURLWithNetwork('/bounty',{id, repoId}))
           }}
         >
