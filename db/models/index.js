@@ -11,6 +11,7 @@ import Repositories from "./repositories.model";
 import User from "./user";
 import Tokens from "./tokens.model";
 import NetworkTokens from "./network-tokens.model";
+import UserPayments from "./userPayments";
 
 const Database = { sequelize: null };
 
@@ -29,6 +30,7 @@ Database.chainEvents = ChainEvents;
 Database.network = Network;
 Database.tokens = Tokens;
 Database.networkTokens = NetworkTokens;
+Database.userPayments = UserPayments;
 
 Object.values(Database).forEach((model) => {
   if (model?.init) {
