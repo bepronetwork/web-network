@@ -35,7 +35,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
   const { beproServiceStarted } = useAuthentication();
 
   const updateActiveNetwork = useCallback((forced?: boolean) => {
-    const networkName = query.network || publicRuntimeConfig?.networkConfig?.networkName;
+    const networkName = query?.network || publicRuntimeConfig?.networkConfig?.networkName;
 
     if (!networkName)
       return;
@@ -61,8 +61,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
             pathname: "/networks"
           });
         });
-  },
-  [query, activeNetwork]);
+  }, [query, activeNetwork]);
 
   const updateNetworkParameters = useCallback(() => {
     if (!beproServiceStarted || activeNetwork?.councilAmount) return;
