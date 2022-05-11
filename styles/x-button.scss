@@ -1,0 +1,27 @@
+$small-icon: 14px;
+$only-child: 14px;
+
+.btn + .btn { margin-left: 8px; }
+
+button.btn,a.btn {
+  letter-spacing: .06rem;
+  svg,i {
+    &:not(:only-child) {
+      &:not(:last-child) {
+        margin-right: 8px;
+      }
+      &:last-child {
+        margin-left: 8px;
+      }
+      width: $small-icon;
+      height: $small-icon;
+      margin-top: -2px;
+      margin-bottom: -2px;
+    }
+
+    &:only-child {
+      width: $only-child;
+      height: $only-child;
+    }
+  }
+}

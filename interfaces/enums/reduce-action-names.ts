@@ -10,4 +10,10 @@ export enum ReduceActionName {
   ChangeBalance = `ChangeBalance`,
   AddToast = `AddToast`,
   RemoveToast = `RemoveToast`,
+  MyTransactions = `MyTransactions`,
+  AddTransactions = `AddTransactions`,
+  UpdateTransaction = `UpdateTransaction`,
+  ChangeMicroServiceReadyState = `ChangeMicroServiceReadyState`,
+  ChangeNetwork = `ChangeNetwork`,
+  GithubLogin = `GithubLogin`,
 }

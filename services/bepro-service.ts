@@ -1,5 +1,7 @@
-import {Application, Network, ERC20Contract} from 'bepro-js';
-import { CONTRACT_ADDRESS, SETTLER_ADDRESS, TRANSACTION_ADDRESS, WEB3_CONNECTION } from '../env';
+import {Application, ERC20Contract, Network} from 'bepro-js';
+import {BlockTransaction, SimpleBlockTransactionPayload} from '@interfaces/transaction';
+import {CONTRACT_ADDRESS, SETTLER_ADDRESS, TRANSACTION_ADDRESS, WEB3_CONNECTION} from '../env';
+import {TransactionStatus} from '@interfaces/enums/transaction-status';
 
 class BeproFacet {
   private _bepro: Application;
@@ -23,6 +25,8 @@ class BeproFacet {
       public readonly settlerAddress = SETTLER_ADDRESS,
       public readonly transactionAddress = TRANSACTION_ADDRESS, ) {
 
+    console.table({web3: WEB3_CONNECTION, contract: CONTRACT_ADDRESS, settler: SETTLER_ADDRESS, transaction: TRANSACTION_ADDRESS})
+
     const opt = {opt: {web3Connection}};
     this._bepro = new Application(opt);
     this._network = new Network({contractAddress, ...opt});
@@ -42,12 +46,11 @@ class BeproFacet {
     let success = false;
 
     try {
+      const bepro = await this.bepro.login();
+      const network = await this.network.login();
+      const erc20 = await this.ERC20.login();
 
-      success = ![
-        await this.bepro.login(),
-        await this.network.login(),
-        await this.ERC20.login(),
-      ].some(bool => !bool);
+      success = ![bepro, network, erc20].some(bool => !bool);
 
       if (success) {
         await this.network.__assert();
@@ -57,7 +60,7 @@ class BeproFacet {
 
     } catch (e) {
       success = false;
-      console.log(`Error logging in,`, e);
+      console.error(`Error logging in,`, e);
     }
 
     return this._loggedIn = success;
@@ -79,6 +82,20 @@ class BeproFacet {
 
   public async getAddress() {
     return await this._bepro.getAddress();
+  }
+
+  public async parseTransaction(transaction, simpleTx?: SimpleBlockTransactionPayload) {
+    const result = await this._bepro.web3.eth.getTransaction(transaction.transactionHash).catch(_ => null);
+
+    return {
+      ...simpleTx,
+      addressFrom: transaction.from,
+      addressTo: transaction.to,
+      transactionHash: transaction.transactionHash,
+      blockHash: transaction.blockHash,
+      confirmations: result?.nonce,
+      status: result && transaction.status ? TransactionStatus.completed : TransactionStatus.failed,
+    }
   }
 }
 

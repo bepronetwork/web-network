@@ -1,11 +1,14 @@
-import {ApplicationState} from '../../interfaces/application-state';
-import {ReduceAction, ReduceActor} from '../../interfaces/reduce-action';
-import {ReduceActionName} from '../../interfaces/enums/reduce-action-names';
-import {ToastNotification} from '../../interfaces/toast-notification';
+import {ApplicationState} from '@interfaces/application-state';
+import {ReduceAction, ReduceActor} from '@interfaces/reduce-action';
+import {ReduceActionName} from '@interfaces/enums/reduce-action-names';
 
 const reducer = (state: ApplicationState, payload): ApplicationState => {
   const toaster = Array.from(state.toaster);
-  toaster.splice(payload, 1);
+  const i = toaster.findIndex(({id}) => id === payload);
+
+  if (i > -1)
+    toaster.splice(i, 1);
+
   return ({...state, toaster})
 }
 

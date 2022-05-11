@@ -1,8 +1,8 @@
 import { GetStaticProps } from "next";
 import {useContext, useEffect, useState} from 'react';
-import {BeproService} from '../services/bepro-service';
-import {ApplicationContext} from '../contexts/application';
-import GithubMicroService from '../services/github-microservice';
+import {ApplicationContext} from '@contexts/application';
+import GithubMicroService from '@services/github-microservice';
+import {formatNumberToCurrency} from 'helpers/formatNumber'
 
 export default function PageHero({title = "Find issues to work",}) {
 
@@ -23,7 +23,7 @@ export default function PageHero({title = "Find issues to work",}) {
                       })
   }
 
-  useEffect(loadTotals, []);
+  useEffect(loadTotals, [beproInit]);
 
   return (
     <div className="banner bg-bepro-blue mb-4">
@@ -36,22 +36,22 @@ export default function PageHero({title = "Find issues to work",}) {
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4 className="h4 mb-0">{inProgress}</h4>
-                    <span className="p-small">In progress</span>
+                    <span className="smallCaption">In progress</span>
                   </div>
                 </div>
                 <div className="col-md-3">
                   <div className="top-border">
                     <h4 className="h4 mb-0">{closed}</h4>
-                    <span className="p-small">Issues closed</span>
+                    <span className="smallCaption">Issues closed</span>
                   </div>
                 </div>
                 <div className="col-md-6">
                   <div className="top-border">
                     <h4 className="h4 mb-0">
-                      {onNetwork}{" "}
+                      {formatNumberToCurrency(onNetwork)}{" "}
                       <span className="smallCaption trans">$BEPRO</span>
                     </h4>
-                    <span className="p-small">On network</span>
+                    <span className="smallCaption">Bounties in the Network</span>
                   </div>
                 </div>
               </div>

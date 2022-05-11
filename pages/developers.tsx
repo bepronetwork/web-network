@@ -1,12 +1,22 @@
-import { GetStaticProps } from "next";
+import { GetStaticProps } from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
-import PageHero from "../components/page-hero";
-import GithubMicroService from "../services/github-microservice";
-import ListIssues from "../components/list-issues";
-import ReactSelect from "../components/react-select";
-import {ApplicationContext} from '../contexts/application';
-import {changeLoadState} from '../contexts/reducers/change-load-state';
-import {IssueData} from '../interfaces/issue-data';
+import Link from 'next/link';
+import PageHero from "@components/page-hero";
+import GithubMicroService from '@services/github-microservice';
+import ListIssues from '@components/list-issues';
+import ReactSelect from '@components/react-select';
+import {ApplicationContext} from '@contexts/application';
+import {changeLoadState} from '@reducers/change-load-state';
+import {IssueData} from '@interfaces/issue-data';
+import NothingFound from '@components/nothing-found';
+import Button from '@components/button';
+import Paginate from '@components/paginate';
+import usePage from '@x-hooks/use-page';
+import useCount from '@x-hooks/use-count';
+import {useRouter} from 'next/router';
+import IssueFilterBox from '@components/issue-filter-box';
+import useFilters from '@x-hooks/use-filters';
+import IssueFilters from '@components/issue-filters';
 
 type Filter = {
   label: string;
@@ -47,79 +57,61 @@ const options_time = [
 ];
 
 export default function PageDevelopers() {
-  const {dispatch, state: {loading}} = useContext(ApplicationContext);
+  const {dispatch, state: {loading, currentAddress}} = useContext(ApplicationContext);
   const [issues, setIssues] = useState<IssueData[]>([]);
   const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
 
-  function handleChangeFilterByState(filter: Filter) {
-    setFilterByState(filter);
-  }
+  const page = usePage();
+  const results = useCount();
+  const router = useRouter();
+  const {repoId, time, state} = router.query;
 
   function updateIssuesList(issues: IssueData[]) {
-    console.log(`got issues`, issues);
     setIssues(issues);
   }
 
-  useEffect(() => {
-    async function getIssues() {
-      dispatch(changeLoadState(true))
-      GithubMicroService.getIssues()
-                        .then(updateIssuesList)
-                        .catch((error) => {
-                          console.log('Error', error)
-                        })
-                        .finally(() => {
-                          dispatch(changeLoadState(false))
-                        });
-    }
-    getIssues();
-  }, []);
+  function getIssues() {
+    dispatch(changeLoadState(true))
+    GithubMicroService.getIssues(page, repoId as string, time as string, state as string)
+                      .then(({rows, count}) => {
+                        results.setCount(count);
+                        return rows;
+                      })
+                      .then(updateIssuesList)
+                      .catch((error) => {
+                        console.error('Error fetching issues', error)
+                      })
+                      .finally(() => {
+                        dispatch(changeLoadState(false))
+                      });
+  }
 
-  const isDraftIssue = (issue: IssueData) => issue.state === 'draft';
-  const isClosedIssue = (issue: IssueData) => issue.state === 'closed';
-  const isOpenIssue = (issue: IssueData) => !isDraftIssue(issue) && !isClosedIssue(issue);
-
-  const issuesFilteredByState = issues.filter(issue => {
-    if (filterByState.value === 'all') return true;
-    if (filterByState.value === 'open') return isOpenIssue(issue);
-    if (filterByState.value === 'draft') return isDraftIssue(issue);
-    if (filterByState.value === 'closed') return isClosedIssue(issue);
-    }
-  );
+  useEffect(getIssues, [page, repoId, time, state]);
 
   return (<>
     <div>
-      <PageHero title="Find issue to work"/>
-      <div className="container">
+      <PageHero title="Find issues to work on"/>
+      <div className="container p-footer">
         <div className="row justify-content-center">
           <div className="col-md-10">
-            <div className="d-flex justify-content-between mb-4">
+            <div className="d-flex justify-content-end mb-4">
               <div className="col-md-3">
-                <ReactSelect
-                  id="filterByIssueState"
-                  className="react-select-filterIssues"
-                  defaultValue={filtersByIssueState[0]}
-                  options={filtersByIssueState}
-                  onChange={handleChangeFilterByState}
-                />
-              </div>
-              <div className="col-md-3">
-                <ReactSelect
-                  id="filterTime"
-                  className="react-select-filterIssues trans"
-                  defaultValue={options_time[0]}
-                  options={options_time}
-                  isDisabled
-                />
+                <IssueFilters />
               </div>
             </div>
           </div>
-          <ListIssues listIssues={issuesFilteredByState} />
-          {issuesFilteredByState.length === 0 && !loading.isLoading ? (
+          <ListIssues listIssues={issues} />
+          {issues?.length !== 0 && <Paginate count={results.count} onChange={(page) => router.push({pathname: `/`, query:{page}})} />}
+          {issues?.length === 0 && !loading.isLoading ? (
             <div className="col-md-10">
-              <h4>
-                {`${filterByState.emptyState}`}
-              </h4>
+              <NothingFound
+                description={filterByState.emptyState}>
+                <Link href="/create-issue" passHref>
+                  <Button>
+                    create one
+                  </Button>
+                </Link>
+              </NothingFound>
             </div>
           ) : null}
         </div>

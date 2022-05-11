@@ -8,4 +8,9 @@ export const TRANSACTION_ADDRESS = process.env.NEXT_PUBLIC_TRANSACTION_ADDRESS;
 
 export const WEB3_CONNECTION = process.env.NEXT_PUBLIC_WEB3_CONNECTION;
 
+// Set ISO CODES Countrys in UpperCase: https://countrycode.org/
+export const COUNTRY_CODE_BLOCKED = process.env.COUNTRY_CODE_BLOCKED || ["US", "SA"]
+
+// Visite https://chainlist.org/ to see more ChainID
+export const CURRENT_NETWORK_CHAINID = process.env.CURRENT_NETWORK_CHAINID || "42"
 

@@ -1,25 +1,26 @@
 import {GetStaticProps} from 'next';
 import React, {useContext, useEffect, useState} from 'react';
-import {IssueData} from '../interfaces/issue-data';
-import ListIssues from '../components/list-issues';
-import PageHero from '../components/page-hero';
-import GithubMicroService from '../services/github-microservice';
-import {ApplicationContext} from '../contexts/application';
-import {changeLoadState} from '../contexts/reducers/change-load-state';
+import Link from 'next/link';
+import {IssueData} from '@interfaces/issue-data';
+import ListIssues from '@components/list-issues';
+import PageHero from '@components/page-hero';
+import GithubMicroService from '@services/github-microservice';
+import {ApplicationContext} from '@contexts/application';
+import {changeLoadState} from '@reducers/change-load-state';
+import NothingFound from '@components/nothing-found';
+import Button from '@components/button';
 
 export default function PageCouncil() {
   const {dispatch} = useContext(ApplicationContext);
-  const [issues, setIssues] = useState<IssueData[]>();
+  const [issues, setIssues] = useState<IssueData[]>([]);
 
   function getIssues() {
     dispatch(changeLoadState(true))
-    GithubMicroService.getIssuesState({filterState: `ready`})
-                      .then(issues => {
-                        setIssues(issues)
-                        console.log(`got issues`, issues)
-                      })
+    GithubMicroService.getIssuesState('ready')
+                      .then(data => data.rows)
+                      .then(setIssues)
                       .catch((error) => {
-                        console.log('Error', error)
+                        console.error('getIssuesState Error', error)
                       })
                       .finally(() => {
                         dispatch(changeLoadState(false))
@@ -30,10 +31,23 @@ export default function PageCouncil() {
 
   return (
     <div>
-      <PageHero title="Ready to propose" />
-      <div className="container">
+      <PageHero title="Create Bounty Distributions" />
+      <div className="container p-footer">
         <div className="row justify-content-center">
           <ListIssues listIssues={issues}/>
+          {
+            issues?.length === 0 &&
+            <div className="mt-4">
+              <NothingFound
+              description="No issues ready to propose">
+                <Link href="/create-issue" passHref>
+                  <Button>
+                    create one
+                  </Button>
+                </Link>
+              </NothingFound>
+            </div>
+          }
         </div>
       </div>
     </div>

@@ -1,13 +1,17 @@
-import Modal from "./modal";
+import Modal from './modal';
 import {ComponentPropsWithoutRef, useContext, useState} from 'react';
-import {BeproService} from "services/bepro-service";
-import {changeLoadState} from '../contexts/reducers/change-load-state';
-import {ApplicationContext} from '../contexts/application';
+import {BeproService} from 'services/bepro-service';
+import {changeLoadState} from '@reducers/change-load-state';
+import {ApplicationContext} from '@contexts/application';
+import {addTransaction} from '@reducers/add-transaction';
+import {TransactionTypes} from '@interfaces/enums/transaction-types';
+import {updateTransaction} from '@reducers/update-transaction';
+import Button from './button';
 
 interface Props extends ComponentPropsWithoutRef<"div"> {
   amount: string;
   address: string;
-  onConfirm(status: boolean): void;
+  onConfirm?(status: boolean): void;
 }
 
 export default function OraclesTakeBackItem({
@@ -21,23 +25,27 @@ export default function OraclesTakeBackItem({
   function handleShow() {
     setShow(true);
   }
+
   function handleCancel() {
     setShow(false);
   }
+
   async function handleTakeBack() {
+    const delegateTx = addTransaction({type: TransactionTypes.takeBackOracles, amount: +amount, currency: 'Oracles'});
+    dispatch(delegateTx);
+
     try {
-      dispatch(changeLoadState(true));
 
-      const response = await BeproService.network.unlock({
-        tokenAmount: amount,
-        from: address,
-      });
-
-      onConfirm(response.status);
-      dispatch(changeLoadState(false));
+      BeproService.network.unlock({tokenAmount: amount, from: address,})
+                  .then(txInfo =>
+                          BeproService.parseTransaction(txInfo, delegateTx.payload)
+                                      .then((block) => {
+                                        dispatch(updateTransaction(block));
+                                        onConfirm(txInfo.status);
+                                      }))
     } catch (error) {
-      console.log("OraclesTakeBackItem handleTakeBack", error);
-      dispatch(changeLoadState(false));
+      console.error("OraclesTakeBackItem handleTakeBack", error);
+      dispatch(updateTransaction({...delegateTx as any, remove: true}));
     }
   }
 
@@ -46,33 +54,34 @@ export default function OraclesTakeBackItem({
       <div className="bg-opac w-100 mb-1 p-3">
         <div className="row align-items-center">
           <div className="col-md-6">
-            <p className="p-small text-bold color-purple mb-1">{amount}</p>
-            <p className="p-small mb-0">{address}</p>
+            <p className="largeCaption text-bold text-purple mb-1 text-uppercase">{amount} ORACLES</p>
+            <p className="smallCaption text-white mb-0">{address}</p>
           </div>
           <div className="col-md-6 d-flex justify-content-end">
-            <button className="btn btn-md btn-white" onClick={handleShow}>
+            <Button color='purple text-white-hover' outline onClick={handleShow}>
               Take Back
-            </button>
+            </Button>
           </div>
         </div>
       </div>
       <Modal
         show={show}
         title="Take Back"
+        onCloseClick={handleCancel}
         footer={
           <>
-            <button className="btn btn-md btn-opac" onClick={handleCancel}>
+            <Button color='dark-gray' onClick={handleCancel}>
               Cancel
-            </button>
-            <button className="btn btn-md btn-primary" onClick={handleTakeBack}>
+            </Button>
+            <Button onClick={handleTakeBack}>
               Confirm
-            </button>
+            </Button>
           </>
         }>
         <p className="text-center fs-4">
-          Give away{" "}
-          <span className="text-bold color-purple">{amount} Oracles</span> to
-          get back $BEPRO 200,000
+          <span className="me-2">Give away</span>
+          <span className="text-bold color-purple me-2">{amount} Oracles</span>
+          <span>to get back $BEPRO {amount}</span>
         </p>
       </Modal>
     </>

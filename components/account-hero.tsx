@@ -1,59 +1,37 @@
-import {useContext, useEffect, useReducer, useState} from 'react';
-import {BeproService} from "services/bepro-service";
-import {changeLoadState} from '../contexts/reducers/change-load-state';
-import {ApplicationContext} from '../contexts/application';
-import {changeMyIssuesState} from '../contexts/reducers/change-my-issues';
-import {changeOraclesState} from '../contexts/reducers/change-oracles';
+import {useContext, useEffect, useState} from 'react';
+import {BeproService} from "@services/bepro-service";
+import {changeLoadState} from '@reducers/change-load-state';
+import {ApplicationContext} from '@contexts/application';
+import {changeMyIssuesState} from '@reducers/change-my-issues';
+import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import GithubHandle from './github-handle';
+import {formatNumberToCurrency} from '@helpers/formatNumber';
+import {toastPrimary} from '@reducers/add-toast';
 
 export default function AccountHero() {
-  const {dispatch, state: {beproInit, oracles, metaMaskWallet, currentAddress, balance}} = useContext(ApplicationContext);
-
-  const [myIssueCount, setMyIssueCount] = useState<number>()
-  const [sumOfOracles, setSumOfOracles] = useState(0);
-  const [delegatedOracles, setDelegatedOracles] = useState(0);
+  const {dispatch, state: {beproInit, oracles, metaMaskWallet, currentAddress, balance, myIssues}} = useContext(ApplicationContext);
 
   function loadBeproNetworkInformation() {
     if (!beproInit || !metaMaskWallet || !currentAddress)
       return;
 
     const address = currentAddress;
-    dispatch(changeLoadState(true));
 
     BeproService.network
                 .getIssuesByAddress(address)
                 .then(issuesList => {
-                  setMyIssueCount(issuesList.length);
                   dispatch(changeMyIssuesState(issuesList));
                 })
                 .then(_ => BeproService.network.getOraclesSummary({address}))
                 .then(oracles => {
-                  dispatch(changeOraclesState(oracles));
+                  dispatch(changeOraclesState(changeOraclesParse(address, oracles)));
                 })
                 .catch(e => {
                   console.error(e);
                 })
-                .finally(() => dispatch(changeLoadState(false)))
-
   }
 
   useEffect(loadBeproNetworkInformation, [beproInit, metaMaskWallet, currentAddress])
-  useEffect(() => {
-    if (!currentAddress)
-      return;
-
-    setSumOfOracles(
-      oracles.amounts
-             .filter(address => address !== currentAddress)
-             .reduce((prev, current) => prev += +current, 0) + +oracles.oraclesDelegatedByOthers
-    )
-
-    setDelegatedOracles(
-      oracles.amounts
-             .filter(address => address === currentAddress)
-             .reduce((prev, current) => prev += +current, 0)
-    )
-  }, [balance.staked, oracles])
 
   return (
     <div className="banner bg-bepro-blue mb-4">
@@ -62,28 +40,36 @@ export default function AccountHero() {
           <div className="col-md-10">
             <div className="d-flex flex-column">
               <div className="d-flex justify-content-between">
-                <h1 className="h1 mb-0">My account</h1>
+                <h1 className="h2 mb-0">My account</h1>
                 <GithubHandle />
               </div>
               <div className="row">
-                <div className="col-md-4">
+                <div className="col-md-3">
                   <div className="top-border">
-                    <h4 className="h4 mb-0">{myIssueCount}</h4>
-                    <span className="p-small">Issues</span>
+                    <h4 className="h4 mb-0">{formatNumberToCurrency(myIssues.length || 0)}</h4>
+                    <span className="smallCaption">Issues</span>
                   </div>
                 </div>
-                <div className="col-md-4">
+                <div className="col-md-3">
                   <div className="top-border">
-                    <h4 className="h4 mb-0">{oracles.tokensLocked}</h4>
-                    <span className="p-small">Oracles</span>
+                    <h4 className="h4 mb-0">{formatNumberToCurrency(+oracles?.tokensLocked + +oracles?.oraclesDelegatedByOthers || 0)}</h4>
+                    <span className="smallCaption">Oracles</span>
                   </div>
                 </div>
-                <div className="col-md-4">
+                <div className="col-md-3">
                   <div className="top-border">
                     <h4 className="h4 mb-0">
-                      {delegatedOracles}
+                      {formatNumberToCurrency(oracles?.delegatedToOthers || 0)}
                     </h4>
-                    <span className="p-small">Delegated oracles</span>
+                    <span className="smallCaption">Delegated oracles</span>
+                  </div>
+                </div>
+                <div className="col-md-3">
+                  <div className="top-border">
+                    <h4 className="h4 mb-0">
+                      {formatNumberToCurrency(+oracles?.oraclesDelegatedByOthers || 0)}
+                    </h4>
+                    <span className="smallCaption">Delegated by Others</span>
                   </div>
                 </div>
               </div>

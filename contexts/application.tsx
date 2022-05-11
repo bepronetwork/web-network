@@ -1,16 +1,25 @@
 import React, {createContext, Dispatch, useContext, useEffect, useReducer} from 'react';
-import {mainReducer} from './reducers/main';
-import {ApplicationState} from '../interfaces/application-state';
-import {ReduceActor} from '../interfaces/reduce-action';
+import {mainReducer} from '@reducers/main';
+import {ApplicationState} from '@interfaces/application-state';
+import {ReduceActor} from '@interfaces/reduce-action';
 import LoadApplicationReducers from './reducers';
-import {BeproService} from '../services/bepro-service';
-import {changeBeproInitState} from './reducers/change-bepro-init-state';
+import {BeproService} from '@services/bepro-service';
+import {changeBeproInitState} from '@reducers/change-bepro-init-state';
 import GithubMicroService from '../services/github-microservice';
-import {useSession} from 'next-auth/client';
-import {changeGithubHandle} from './reducers/change-github-handle';
-import {changeCurrentAddress} from './reducers/change-current-address'
+import {getSession, useSession} from 'next-auth/react';
+import {changeGithubHandle} from '@reducers/change-github-handle';
+import {changeCurrentAddress} from '@reducers/change-current-address'
 import Loading from '../components/loading';
 import Toaster from '../components/toaster';
+import {changeGithubLogin} from '@reducers/change-github-login';
+import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
+import {changeBalance} from '@reducers/change-balance';
+import {changeNetwork} from '@reducers/change-network';
+import {useRouter} from 'next/router';
+import {toastError} from '@reducers/add-toast';
+import sanitizeHtml from 'sanitize-html';
+import {GetServerSideProps} from 'next';
+import {NetworkIds} from '@interfaces/enums/network-ids';
 
 interface GlobalState {
   state: ApplicationState,
@@ -39,7 +48,11 @@ const defaultState: GlobalState = {
       staked: 0,
       bepro: 0,
     },
-    toaster: []
+    toaster: [],
+    microServiceReady: null,
+    myTransactions: [],
+    network: ``,
+    githubLogin: ``,
   },
   dispatch: () => undefined
 };
@@ -48,52 +61,66 @@ export const ApplicationContext = createContext<GlobalState>(defaultState)
 
 export default function ApplicationContextProvider({children}) {
   const [state, dispatch] = useReducer(mainReducer, defaultState.state);
-  const [session] = useSession();
-  function onMetaMaskChange() {
-    console.log(`onMetaMaskChange`, state.currentAddress, BeproService.address, state.currentAddress === BeproService.address)
-    if (!state.metaMaskWallet || state.currentAddress === BeproService.address)
-      return;
+  const { authError } = useRouter().query;
 
-    GithubMicroService.getHandleOf(BeproService.address)
-                      .then(handle => {
-                        if (handle) dispatch(changeGithubHandle(handle))
-                      });
+  function updateSteFor(newAddress: string) {
+    BeproService.login(true)
+                .then(() =>  dispatch(changeCurrentAddress(newAddress)))
   }
 
-  function updateBeproLogin(newAddress) {
-      BeproService.login(true)
-                  .then(_ => { dispatch(changeCurrentAddress(newAddress)) })
-                  .then(() => { onMetaMaskChange() });
+  function onAddressChanged() {
+    if (!state.currentAddress)
+      return;
+
+    const address = state.currentAddress;
+
+    GithubMicroService.getUserOf(address)
+                      .then(user => {
+                        dispatch(changeGithubHandle(user?.githubHandle));
+                        dispatch(changeGithubLogin(user?.githubLogin));
+                      })
+
+    BeproService.network.getOraclesSummary({address})
+                .then(oracles => dispatch(changeOraclesState(changeOraclesParse(address, oracles))))
+
+    BeproService.getBalance('bepro').then(bepro => dispatch(changeBalance({bepro})));
+    BeproService.getBalance('eth').then(eth => dispatch(changeBalance({eth})));
+    BeproService.getBalance('staked').then(staked => dispatch(changeBalance({staked})));
   }
 
   function Initialize() {
     dispatch(changeBeproInitState(true) as any)
 
+    
     if (!window.ethereum)
       return;
 
-    window.ethereum.on(`accountsChanged`, (accounts) => updateBeproLogin(accounts[0]))
-  }
-
-  function setHandleIfConnected() {
-    if (state.githubHandle)
-      return;
-    if (!session?.user?.name){
-      dispatch(changeGithubHandle(``))
-      return;
-    }
-    dispatch(changeGithubHandle(session.user.name));
+    window.ethereum.on(`accountsChanged`, (accounts) => updateSteFor(accounts[0]))
+    window.ethereum.on('chainChanged', (evt) => {
+      dispatch(changeNetwork(NetworkIds[+evt?.toString()]?.toLowerCase()))
+    })
   }
 
   LoadApplicationReducers();
 
   useEffect(Initialize, []);
-  useEffect(onMetaMaskChange, [state.metaMaskWallet]);
-  useEffect(setHandleIfConnected, [session]);
+  useEffect(onAddressChanged, [state.currentAddress]);
+  useEffect(() => {
+    if (!authError)
+      return;
+
+    dispatch(toastError(sanitizeHtml(authError, {allowedTags: [], allowedAttributes: {}})));
+  }, [authError])
 
   return <ApplicationContext.Provider value={{state, dispatch: dispatch as any}}>
-    <Loading show={state.loading.isLoading} text={state.loading.text} />
-    <Toaster />
+    <Loading show={state.loading.isLoading} text={state.loading.text}/>
+    <Toaster/>
     {children}
   </ApplicationContext.Provider>
 }
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  return {
+    props: {session: await getSession(ctx)},
+  };
+};

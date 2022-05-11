@@ -1,7 +1,8 @@
 import { kebabCase } from "lodash";
 import { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
-import WebThreeUnavailable from "../assets/web3-unavailable";
+import WebThreeUnavailable from "@assets/web3-unavailable";
+import Button from "./button";
 
 export default function WebThreeDialog() {
   const [show, setShow] = useState<boolean>(false);
@@ -38,17 +39,18 @@ export default function WebThreeDialog() {
       </Modal.Body>
       <Modal.Footer>
         <a
-          className="btn btn-md btn-opac"
+          className="text-decoration-none"
           href="https://metamask.io/download.html"
           rel="noopener noreferrer"
           target="_blank">
-          Install
+          <Button color="dark-gray">
+              Install
+          </Button>
         </a>
-        <button
-          className="btn btn-md btn-primary"
+        <Button
           onClick={handleClickTryAgain}>
           Try Again
-        </button>
+        </Button>
       </Modal.Footer>
     </Modal>
   </>);

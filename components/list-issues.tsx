@@ -1,7 +1,7 @@
 import { GetStaticProps } from "next";
 import React from "react";
-import IssueListItem from "../components/issue-list-item";
-import {IssueData} from '../interfaces/issue-data';
+import IssueListItem from "@components/issue-list-item";
+import {IssueData} from '@interfaces/issue-data';
 
 export default function ListIssues({
   listIssues = [],
@@ -12,9 +12,9 @@ export default function ListIssues({
 }): JSX.Element {
   return (
     <>
-      {listIssues.map((issue) => (
-        // todo: issueId sometimes returns null
-        // <div className={className} key={issue.issueId}>
+      {listIssues?.map((issue) => (
+        // todo: dbId sometimes returns null
+        // <div className={className} key={issue.dbId}>
         <div className={className} key={issue.githubId}>
           <IssueListItem issue={issue}></IssueListItem>
         </div>

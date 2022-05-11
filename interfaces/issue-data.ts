@@ -1,19 +1,30 @@
+// REVIEW: redeem not exist in figma
+import {ProposalData} from '@services/github-microservice';
+
+export type IssueState =  'redeemed' | 'pending' |  'draft' | 'open' | 'in progress' | 'canceled' | 'closed' | 'ready' | 'done' | 'disputed'
+
 export interface IssueData {
+  _id?: string; // sc id
+  id?: string; // database id
   body: string;
   createdAt: Date;
   developers: developer[];
   dueDate?: string;
   githubId: string;
-  issueId: string;
+  issueId: string; // custom id repo/githubid
   creatorGithub?: string;
   creatorAddress?: string;
   isIssueinDraft?: boolean;
   amount?: number;
   url?: string;
   numberOfComments: number;
-  state: string;
+  state: IssueState;
   title: string;
   pullRequests: pullRequest[];
+  owner?: string;
+  repo?: string;
+  repository_id?: number;
+  mergeProposals: ProposalData[]
 }
 
 export interface pullRequest {
