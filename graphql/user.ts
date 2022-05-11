@@ -10,6 +10,9 @@ export const Repositories =
           name
           nameWithOwner
           isFork
+          owner {
+            login
+          }
         }
       }
       organizations(first: 100) {
@@ -18,6 +21,9 @@ export const Repositories =
                   nodes {
                       isFork
                       name
+                      owner {
+                        login
+                      }
                       nameWithOwner
                   }
               }

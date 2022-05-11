@@ -164,21 +164,31 @@ export default function useOctokitGraph() {
     });
 
     const userRepositories = response.flatMap<{
-      name: string
-      nameWithOwner: string
-      isFork: boolean
-      isOrganization?: boolean
-    }>(item => getPropertyRecursively("nodes", (item as any)?.user?.repositories) );
+      name: string;
+      nameWithOwner: string;
+      isFork: boolean;
+      isOrganization: boolean;
+      owner: string;
+    }>(item => {
+      return getPropertyRecursively<GraphQlQueryResponseData>("nodes", (item as any)?.user?.repositories)
+        .map(el => ({
+          ...el,
+          owner: el.owner.login,
+          isOrganization: false
+        }));
+    });
 
     const organizationRepositories = response.flatMap<{
-      name: string
-      nameWithOwner: string
-      isFork: boolean
-      isOrganization: boolean
+      name: string;
+      nameWithOwner: string;
+      isFork: boolean;
+      isOrganization: boolean;
+      owner: string;
     }>(item => {
       return (item as any)?.user?.organizations?.nodes?.
-              flatMap(el => getPropertyRecursively<GraphQlQueryResponseData>("nodes", el))
-              .map(repo => ({...repo, isOrganization: true}));
+              filter(el => el !== null)
+              .flatMap(el => getPropertyRecursively<GraphQlQueryResponseData>("nodes", el))
+              .map(repo => ({...repo, owner: repo.owner.login, isOrganization: true}));
     });
 
     return [...userRepositories, ...organizationRepositories];

@@ -97,8 +97,8 @@ export default function PageIssue() {
     getUserRepositories(user?.login)
       .then((repos) => {
         const isForked = 
-          !!repos.find(repo => repo.isFork || 
-                              repo.nameWithOwner === `${user.login}/${activeRepo.githubPath.split("/")[1]}`);
+          !!repos.find(repo => (repo.isFork && repo.nameWithOwner === `${user.login}/${activeRepo.name}`) 
+                                || repo.nameWithOwner === activeRepo.githubPath);
 
         setIsRepoForked(isForked);
       })
