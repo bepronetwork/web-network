@@ -51,7 +51,7 @@ export default NextAuth({
           where: { githubLogin: profile.login },
           raw: true,
         });
-        if (!user.address)
+        if (!user?.address)
           await models.user.destroy({
             where: { githubLogin: profile.login?.toString() },
           });
