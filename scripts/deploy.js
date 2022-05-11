@@ -76,16 +76,16 @@ const networks = {
     url: `https://ropsten.infura.io/v3/${process.env.DEPLOY_INFURA_KEY}`
   },
   seneca: {
-    url: 'http://eth-seneca.taikai.network:8545',
+    url: 'https://eth-seneca.taikai.network:8080',
   },
   afrodite: {
-    url: 'http://eth-afrodite.taikai.network:8545',
+    url: 'https://eth-afrodite.taikai.network:8080',
   },
   irene: {
-    url: 'http://eth-irene.taikai.network:8545',
+    url: 'https://eth-irene.taikai.network:8080',
   },
   iris: {
-    url: 'http://eth-iris.taikai.network:8545',
+    url: 'https://eth-iris.taikai.network:8080',
   }
 }
 
