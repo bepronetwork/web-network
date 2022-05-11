@@ -35,7 +35,11 @@ export const NetworkProvider: React.FC = function ({ children }) {
   const { beproServiceStarted } = useAuthentication();
 
   const updateActiveNetwork = useCallback((forced?: boolean) => {
-    const networkName = String(query.network || publicRuntimeConfig.networkConfig.networkName);
+    const networkName = query.network || publicRuntimeConfig?.networkConfig?.networkName;
+
+    if (!networkName)
+      return;
+    
     if (activeNetwork?.name === networkName && !forced) return activeNetwork;
 
     const networkFromStorage = parseCookies()[`${cookieKey}:${networkName}`];
