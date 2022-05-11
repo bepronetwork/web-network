@@ -1,16 +1,16 @@
 import {useEffect, useState} from 'react';
 import {IssueFilterBoxOption} from '@interfaces/filters';
-import GithubMicroService from '@services/github-microservice';
 import {RepoInfo} from '@interfaces/repos-list';
-import {subHours, subMonths, subWeeks, subYears} from 'date-fns';
 import {useRouter} from 'next/router';
+import useRepos from '@x-hooks/use-repos';
 
 type FilterStateUpdater = (opts: IssueFilterBoxOption[], opt: IssueFilterBoxOption, checked: boolean, type: ('time' | 'repo' | 'state'), multi?: boolean) => void;
 
-export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpdater] {
+export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpdater, () => void] {
   const [stateFilters, setStateFilters] = useState<IssueFilterBoxOption[]>([]);
   const [timeFilters, setTimeFilters] = useState<IssueFilterBoxOption[]>([]);
   const [repoFilters, setRepoFilters] = useState<IssueFilterBoxOption[]>([]);
+  const [[, repoList]] = useRepos();
 
   const router = useRouter()
 
@@ -25,12 +25,14 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
     const repoId = getActiveFiltersOf(repoFilters);
 
     const query = {
+      ... router.query,
       ... state ? {state} : {},
       ... time ? {time} : {},
       ... repoId ? {repoId} : {},
+      page: '1'
     }
 
-    router.push({pathname: './', query});
+    router.push({pathname: router.pathname, query}, router.pathname);
   }
 
   function makeFilterOption(label, value, checked = false) {
@@ -39,32 +41,33 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
 
   function loadRepos() {
 
-    function mapRepo({id: value, githubPath: label,}: RepoInfo) {
-      return makeFilterOption(label, value, router.query?.repoId as string === label);
+    function mapRepo({id: value, githubPath: label}: RepoInfo) {
+      return makeFilterOption(label, value, router.query?.repoId as string === value.toString());
     }
 
-    GithubMicroService.getReposList()
-                      .then(repos => [makeFilterOption(`All`, `allrepos`, !router.query?.repoId)].concat(repos.map(mapRepo)))
-                      .then(setRepoFilters)
+    setRepoFilters([makeFilterOption(`All`, `allrepos`, !router.query?.repoId)].concat(repoList.map(mapRepo)))
   }
 
   function loadFilters() {
-    const {time, state} = router.query || {};
+    const {time, state, repoId} = router.query || {};
+
     setStateFilters([
                       makeFilterOption(`All`, `allstates`, !state),
-                      makeFilterOption(`Open Issues`, `open`, state === `ready`),
-                      makeFilterOption(`Draft Issues`, `draft`, state === `draft`),
-                      makeFilterOption(`Closed Issues`, `closed`, state === `closed`),])
+                      makeFilterOption(`Open Bounties`, `open`, state === `ready` || state === `open`),
+                      makeFilterOption(`Draft Bounties`, `draft`, state === `draft`),
+                      makeFilterOption(`Closed Bounties`, `closed`, state === `closed`)])
 
     setTimeFilters([
                      makeFilterOption(`All`, `alltime`, !time),
                      makeFilterOption(`Past Week`, `week`, time === `week`),
                      makeFilterOption(`Past Month`, `month`, time === `month`),
                      makeFilterOption(`Past Year`, `year`, time === `year`),])
+
+    loadRepos()
   }
 
-  useEffect(loadFilters, [])
-  useEffect(loadRepos, [])
+  useEffect(loadFilters, [router.query])
+  useEffect(loadRepos, [repoList])
 
   function updateOpt(opts: IssueFilterBoxOption[], opt: IssueFilterBoxOption, checked: boolean, type: `time` | `repo` | `state`, multi = false): void {
     const tmp: IssueFilterBoxOption[] = [...opts];
@@ -82,5 +85,16 @@ export default function useFilters(): [IssueFilterBoxOption[][], FilterStateUpda
     updateRouterQuery()
   }
 
-  return [[repoFilters, stateFilters, timeFilters,], updateOpt]
+  function clearFilters() {
+    const query = {
+      ... router.query.sortBy ? {sortBy: router.query.sortBy}: {},
+      ... router.query.order ? {order: router.query.order}: {},
+      ... router.query.search ? {search: router.query.search}: {},
+      page: '1'
+    }
+
+    router.push({pathname: router.pathname, query}, router.pathname);
+  }
+
+  return [[repoFilters, stateFilters, timeFilters], updateOpt, clearFilters]
 }

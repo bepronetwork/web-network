@@ -1,7 +1,6 @@
-// REVIEW: redeem not exist in figma
-import {ProposalData} from '@services/github-microservice';
+import {ProposalData} from './api-response';
 
-export type IssueState =  'redeemed' | 'pending' |  'draft' | 'open' | 'in progress' | 'canceled' | 'closed' | 'ready' | 'done' | 'disputed'
+export type IssueState =  'pending' |  'draft' | 'open' | 'in progress' | 'canceled' | 'closed' | 'ready' | 'done' | 'disputed'
 
 export interface IssueData {
   _id?: string; // sc id
@@ -23,16 +22,33 @@ export interface IssueData {
   pullRequests: pullRequest[];
   owner?: string;
   repo?: string;
+  branch?: string;
   repository_id?: number;
-  mergeProposals: ProposalData[]
+  mergeProposals: ProposalData[];
+  working: string[];
+  merged: string;
+  seoImage?: string;
+  repository?: Repository
+}
+
+export interface Repository {
+  id: number,
+  githubPath: string
 }
 
 export interface pullRequest {
   createdAt: Date;
   githubId: string;
+  githubLogin: string;
   id: number;
+  isMergeable: boolean;
   issueId: number;
+  state: string;
+  merged: boolean;
   updatedAt: Date;
+  issue?: IssueData;
+  comments?: Comment[];
+  reviewers?: string[];
 }
 
 export interface developer {
@@ -41,4 +57,14 @@ export interface developer {
   avatar_url?: string;
   url?: string;
   type?: string;
+}
+
+export interface Comment {
+  body: string;
+  created_at: string;
+  user: GithubUser;
+}
+
+export interface GithubUser {
+  login: string;
 }

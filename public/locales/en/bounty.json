@@ -1,0 +1,76 @@
+{
+  "label": "bounty",
+  "label_one": "bounty",
+  "label_other": "bounties",
+  "labelWithCount_one": "{{count}} bounty",
+  "labelWithCount_other": "{{count}} bounties",
+  "no-comments-available": "_No comments available_",
+  "description": "description",
+  "view-all-addresses": "view all address",
+  "search": "Search for a bounty",
+  "description_proposal": "Reviewed implementations by the network council members ready to be approved by the network curators or council members.",
+  "description_pull-request": "Raw implementations from the network developers ready to be reviewed by anyone and approved into proposals by the network council members",
+  "info": {
+    "working": "Working",
+    "pull-requests_one": "pull request",
+    "pull-requests_other": "pull requests",
+    "proposals_one": "proposal",
+    "proposals_other": "proposals",
+    "reviews_one": "review",
+    "reviews_other": "reviews"
+  },
+  "info-data": {
+    "minutes_other": "minutes",
+    "minutes": "minute",
+    "hours_other": "hours",
+    "hours": "hour",
+    "months": "month",
+    "months_other": "months",
+    "years": "year",
+    "years_other": "years",
+    "days": "day",
+    "days_other": "days",
+    "text-data": "Opened {{value}} Ago"
+  },
+  "steps": {
+    "title": "Bounty State",
+    "draft": "Draft",
+    "development": "Development",
+    "finalized": "Finished",
+    "validation": "validation & disputes",
+    "closed": "closed & distributed"
+  },
+  "status": {
+    "ready": "ready",
+    "draft": "draft",
+    "closed": "closed",
+    "completed": "completed",
+    "canceled": "canceled",
+    "until-done": "{{distance}} until done",
+    "started-time": "started {{distance}} ago",
+    "opened-time": "opened {{distance}} ago",
+    "end-time": "at {{data}}",
+    "pending": "pending",
+    "in-progress": "in progress",
+    "open": "open"
+  },
+  "actions": {
+    "redeem": "Redeem",
+    "recognize-finished": {
+      "title": "Recognize as finished",
+      "error": "Failed to mark bounty as finished"
+    },
+    "start-working": {
+      "title": "Start Working",
+      "success": "To start working on this bounty",
+      "error": "To start working on this bounty"
+    }
+  },
+  "errors": {
+    "fetching": "Error fetching bounty",
+    "no-workers": "No one is working",
+    "no-bounties": "No bounties",
+    "no-bounties-in-draft": "No bounties in draft",
+    "no-bounties-to-merge": "No bounties ready to merge"
+  }
+}

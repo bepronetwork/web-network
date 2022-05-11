@@ -1,11 +1,14 @@
-import React, {ButtonHTMLAttributes} from 'react';
+import React, {ButtonHTMLAttributes, ReactNode} from 'react';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   color?: string;
+  textClass?: string;
   outline?: boolean;
   transparent?: boolean;
   rounded?: boolean;
   upperCase?: boolean;
+  asAnchor?: boolean;
+  applyTextColor?: boolean;
 }
 
 export default function Button({
@@ -14,17 +17,20 @@ export default function Button({
                                  outline,
                                  transparent,
                                  rounded,
-                                 className = ``,
+                                 className = ``, 
+                                 asAnchor = false,
+                                 applyTextColor = true,
+                                 textClass,
                                  ...rest
                                }: ButtonProps) {
 
   function getClass(): string {
     const type = `btn-${outline ? `outline-${color}` : color}`
-    const textColor = !outline && color !== 'white' && 'text-white bg-opacity-100' || ``
+    const textColor = textClass || (!outline && color !== 'white' && 'text-white' || ``)
     let append = className;
 
     if (transparent)
-      append += ' bg-transparent border-transparent bg-opac-hover'
+      append += ' bg-transparent border-transparent'
 
     if (rounded)
       append += ` circle-2 p-0`;
@@ -32,10 +38,10 @@ export default function Button({
     if (outline)
       append += ` bg-opac-hover-25`
 
-    return `btn ${type} ${textColor} d-flex align-items-center justify-content-center text-uppercase shadow-none ${append}`
+    return `btn ${type} ${applyTextColor ? textColor : ''} d-flex align-items-center justify-content-center text-uppercase shadow-none ${append}`
   }
 
   return <>
-    <button className={getClass()} {...rest}>{children}</button>
+    {!asAnchor ? <button className={getClass()} {...rest}>{children}</button> : <a className={getClass()}>{children}</a> }
   </>
 }

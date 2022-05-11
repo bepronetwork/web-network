@@ -1,3 +1,4 @@
+import { formatNumberToString } from "@helpers/formatNumber";
 import { GetStaticProps } from "next";
 import React from "react";
 import Avatar from "./avatar";
@@ -7,7 +8,7 @@ export default function ProposalProgress({ developers = [] }) {
     <div className="container mt-up">
       <div className="row justify-content-center">
         <div className="col-md-10">
-          <div className="content-wrapper p-0 overflow-hidden mb-4">
+          <div className="content-wrapper p-0 overflow-hidden">
             <div className="d-flex align-items-center gap-1">
               {developers.map((developer, index) => (
                 <div
@@ -15,13 +16,15 @@ export default function ProposalProgress({ developers = [] }) {
                   className={`user-block-progress d-flex flex-column align-items-center`}
                   style={{ width: `${developer.percentage}%` }}
                 >
-                  <Avatar
-                    key={index}
-                    className="mb-1"
-                    userLogin={developer.githubLogin}
-                  />
-                  <p className="p-small mb-0">
-                    {developer.percentage}% @{developer.githubLogin}
+                    <Avatar
+                      key={index}
+                      className="mb-2"
+                      userLogin={developer.githubLogin}
+                      tooltip
+                      />
+                  
+                  <p className="caption-small mb-0">
+                    {formatNumberToString(developer.percentage, 0)}%
                   </p>
                 </div>
               ))}

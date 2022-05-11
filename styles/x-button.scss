@@ -3,8 +3,16 @@ $only-child: 14px;
 
 .btn + .btn { margin-left: 8px; }
 
-button.btn,a.btn {
-  letter-spacing: .06rem;
+.btn-outline {
+  &-purple {
+    &:hover {
+      color: $white;
+      background-color: rgba($purple, .1);
+    }
+  }
+}
+
+button.btn,a.btn:not(.brand), .main-nav-link:not(.brand) {
   svg,i {
     &:not(:only-child) {
       &:not(:last-child) {

@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import WebThreeUnavailable from "@assets/web3-unavailable";
 import Button from "./button";
+import { useTranslation } from "next-i18next";
 
 export default function WebThreeDialog() {
   const [show, setShow] = useState<boolean>(false);
+  const { t } = useTranslation('common')
 
   function handleClickTryAgain() {
     window.location.reload();
@@ -22,18 +24,16 @@ export default function WebThreeDialog() {
       aria-describedby={`${kebabCase("WebThreeDialog")}-modal`}
       show={show}>
       <Modal.Header>
-        <Modal.Title>MetaMask not detected</Modal.Title>
+        <Modal.Title>{t('modals.web3-dialog.title')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p className="p-small text-white-50 text-center">
-          No ETH account available
+        <p className="caption-small text-warning text-center">
+          {t('modals.web3-dialog.eth-not-available')}
         </p>
         <div className="d-flex flex-column align-items-center">
           <WebThreeUnavailable />
-          <p className="p mb-0 mt-4 text-center">
-            Click upon install and follow the instructions to configure it. Make
-            sure your wallet is unlocked, you have at least one account in your
-            accounts list and try again.
+          <p className="p mb-0 mt-4 text-center fs-small">
+            {t('modals.web3-dialog.message')}
           </p>
         </div>
       </Modal.Body>
@@ -44,12 +44,12 @@ export default function WebThreeDialog() {
           rel="noopener noreferrer"
           target="_blank">
           <Button color="dark-gray">
-              Install
+            {t('actions.install')}
           </Button>
         </a>
         <Button
           onClick={handleClickTryAgain}>
-          Try Again
+          {t('actions.try-again')}
         </Button>
       </Modal.Footer>
     </Modal>

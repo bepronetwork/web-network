@@ -31,16 +31,34 @@ class BeproFacet {
     this._bepro = new Application(opt);
     this._network = new Network({contractAddress, ...opt});
     this._ERC20 = new ERC20Contract({contractAddress: settlerAddress, ...opt});
+
+  }
+
+  public async start() {
+    // this._bepro.test = true;
+    this._network.test = true;
+    this._ERC20.test = true;
+
+    try {
+      await this._network.start();
+      await this._ERC20.start();
+    } catch (e) {
+      console.log(`Failed to start`, e);
+      return false;
+    }
+
+    return true;
   }
 
   public async login(force?: boolean): Promise<boolean> {
     if (!force && this._loggedIn) return true;
 
-    if (force) {
+    if (force || this._network.test) {
       const opt = {opt: {web3Connection: this.web3Connection}};
+
       this._bepro = new Application(opt);
-      this._network = new Network({contractAddress: this.contractAddress, ...opt});
-      this._ERC20 = new ERC20Contract({contractAddress: this.settlerAddress, ...opt});
+      this._network = new Network({contractAddress: this.contractAddress, useLastBlockGasPriceWhenMetaSend: 10000000000, ...opt});
+      this._ERC20 = new ERC20Contract({contractAddress: this.settlerAddress, useLastBlockGasPriceWhenMetaSend: 10000000000, ...opt});
     }
 
     let success = false;
@@ -53,8 +71,9 @@ class BeproFacet {
       success = ![bepro, network, erc20].some(bool => !bool);
 
       if (success) {
-        await this.network.__assert();
         await this.ERC20.__assert();
+        await this.network.__assert();
+
         this._address = await this.bepro.getAddress();
       }
 
@@ -71,9 +90,9 @@ class BeproFacet {
       return 0;
 
     if (kind === 'bepro')
-      return this.ERC20.getTokenAmount(this.address);
+      return this.fromWei((await this.ERC20.getContract().methods.balanceOf(this.address).call()))
     if (kind === 'eth')
-      return this.bepro.web3.utils.fromWei((await this.bepro.web3.eth.getBalance(this.address)), `ether`);
+      return this.fromWei((await this.bepro.web3.eth.getBalance(this.address)));
     if (kind === 'staked')
       return this.network.getBEPROStaked();
 
@@ -84,19 +103,85 @@ class BeproFacet {
     return await this._bepro.getAddress();
   }
 
-  public async parseTransaction(transaction, simpleTx?: SimpleBlockTransactionPayload) {
-    const result = await this._bepro.web3.eth.getTransaction(transaction.transactionHash).catch(_ => null);
-
+  public parseTransaction(transaction, simpleTx?: SimpleBlockTransactionPayload) {
     return {
       ...simpleTx,
-      addressFrom: transaction.from,
-      addressTo: transaction.to,
-      transactionHash: transaction.transactionHash,
-      blockHash: transaction.blockHash,
-      confirmations: result?.nonce,
-      status: result && transaction.status ? TransactionStatus.completed : TransactionStatus.failed,
+      addressFrom: (transaction).from,
+      addressTo: (transaction).to,
+      transactionHash: (transaction).transactionHash,
+      blockHash: (transaction).blockHash,
+      confirmations: (simpleTx as BlockTransaction)?.confirmations,
+      status: (transaction).status ? TransactionStatus.completed : TransactionStatus.failed,
     }
   }
+
+  async getClosedIssues() {
+    return this._network.getAmountofIssuesClosed()
+               .catch(e => {
+                 console.log(`Error while getClosedIssued`, e)
+                 return 0;
+               });
+  }
+
+  async getOpenIssues() {
+    return this._network.getAmountofIssuesOpened()
+                       .catch(e => {
+                         console.log(`Error while getOpenIssues`, e)
+                         return 0;
+                       });
+  }
+
+  async getBEPROStaked() {
+    return this._network.getBEPROStaked()
+                       .catch(e => {
+                         console.log(`Error while getBEPROStaked`, e)
+                         return 0;
+                       });
+  }
+
+  async getTokensStaked() {
+    return this._network.getTokensStaked()
+                       .catch(e => {
+                         console.log(`Error while getBEPROStaked`, e)
+                         return 0;
+                       });
+  }
+
+  async getRedeemTime() {
+    return this._network.params.contract.getContract().methods.redeemTime().call()
+  }
+
+  async getDisputableTime() {
+    return this._network.params.contract.getContract().methods.disputableTime().call()
+  }
+
+  async getOraclesSummary() {
+    const summary = await this.network.params.contract.getContract().methods.getOraclesSummary(this.address).call()
+
+    return {
+      oraclesDelegatedByOthers: this.fromWei(summary[0]),
+      amounts: summary[1] ? summary[1].map(a => this.fromWei(a)) : [],
+      addresses: summary[2] ? summary[2].map(a => a) : [],
+      tokensLocked: this.fromWei(summary[3]),
+    }
+  }
+
+  async isApprovedTransactionalToken() {
+    return this.network.isApprovedTransactionalToken({address: this.address, amount: 1})
+  }
+
+  async isApprovedSettlerToken() {
+    return this.network.isApprovedSettlerToken({address: this.address, amount: 1})
+  }
+
+  fromWei(wei: string) {
+    return this.bepro.web3.utils.fromWei(wei, 'ether')
+  }
+
+  toWei(number: string | number) {
+    return this.bepro.web3.utils.toWei(number.toString(), 'ether')
+  }
+
 }
 
 // todo: complete this beast

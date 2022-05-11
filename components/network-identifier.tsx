@@ -4,6 +4,7 @@ import Indicator from '@components/indicator';
 import {NetworkIds} from '@interfaces/enums/network-ids';
 import { BeproService } from '@services/bepro-service';
 import { changeNetwork } from '@contexts/reducers/change-network';
+import Button from './button';
 
 const networkMap = {
   mainnet: `#29b6af`,
@@ -11,7 +12,8 @@ const networkMap = {
   ropsten: `#ff4a8d`,
   kovan: `#9064ff`,
   rinkeby: `#f6c343`,
-  goerli: `#f6c343`
+  goerli: `#f6c343`,
+  moonriver: `#f6c343`,
 }
 
 export default function NetworkIdentifier() {
@@ -21,19 +23,18 @@ export default function NetworkIdentifier() {
     if (!currentAddress)
       return;
 
-    BeproService.bepro.web3.eth.getChainId()
-                .then(net => {
-                  dispatch(changeNetwork(NetworkIds[net]?.toLowerCase()))
-                });
+    const chainId = (window as any)?.ethereum?.chainId;
+    dispatch(changeNetwork((NetworkIds[+chainId] || `unknown`)?.toLowerCase()))
+
   }
 
   useEffect(updateNetwork, [currentAddress]);
 
   return network &&
       <>
-        <div className="d-inline-flex align-items-center justify-content-center bg-white py-1 px-2 mr-1 rounded text-uppercase smallCaption fs-smallest text-center text-black text-nowrap">
-          <Indicator bg={networkMap[network]} /> <span>{network} {network !== `ethereum` && `testnet` || `mainnet`}</span>
-        </div>
+        <Button className='px-3 py-2 rounded pe-none bg-white bg-opacity-10'>
+          <Indicator bg={networkMap[network]} /> <span>{network} {network !== process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME && `testnet` || ``}</span>
+        </Button>
       </> || <></>
 
 }

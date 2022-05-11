@@ -4,25 +4,24 @@ import { Modal } from "react-bootstrap";
 import BeProBlue from "@assets/icons/bepro-blue";
 import Loading from 'components/loading'
 import { COUNTRY_CODE_BLOCKED } from "../env";
-import GithubMicroService from "@services/github-microservice";
+import useApi from '@x-hooks/use-api';
+import { useTranslation } from "next-i18next";
 
 export default function NationDialog({ children }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isBlock, setBlock] = useState<boolean>(false);
-  const [country, setCountry] = useState<string>("Your Country");
+  const {getClientNation} = useApi();
+  const { t } = useTranslation('common')
+  const [country, setCountry] = useState<string>();
 
   useEffect(() => {
     setIsLoading(true);
-    GithubMicroService.getClientNation()
-      .catch((e) => {
-        console.error(`Failed to fetch Nation; Blocking.`, e);
-        return {countryCode: `US`};
-      })
-      .then(({countryCode, country})=>{
-        if (COUNTRY_CODE_BLOCKED.indexOf(countryCode) === -1)
+    getClientNation()
+      .then((data)=>{
+        if (data.countryCode && COUNTRY_CODE_BLOCKED.indexOf(data.countryCode) === -1)
           return;
 
-        setCountry(country || '');
+        setCountry(data.country || String(t('modals.nation-dialog.your-country')));
         setBlock(true);
 
       })
@@ -45,18 +44,17 @@ export default function NationDialog({ children }) {
           <Modal.Body>
             <div className="d-flex flex-column mt-2 align-items-center text-whit">
               <p className="p text-white mb-2 text-center fs-9 white-space-wrap">
-                At the moment BEPRO Services are
-                not available in
+                {t('modals.nation-dialog.at-the-moment', { country })}
               </p>
               <a target="_blank" href="https://www.bepro.network/terms-and-conditions"
                 className="mb-2 text-center text-white-50 text-decoration-none text-uppercase fs-8">
-                Excluded Jurisdictions.
+                {t('modals.nation-dialog.excluded')}
               </a>
               <p className="p text-wrap mb-2 text-center fs-8">
-                For further information please contact us on
+                {t('modals.nation-dialog.further')}
               </p>
               <a className="family-inter text-uppercase text-blue-dark text-decoration-none fs-8" href="mailto: general@bepro.network">
-                general@bepro.network
+              {t('modals.nation-dialog.email')}
               </a>
             </div>
           </Modal.Body>
@@ -65,7 +63,7 @@ export default function NationDialog({ children }) {
     );
   }
 
-  if(isLoading) return <Loading show={isLoading} text="Please wait"/>
+  if(isLoading) return <Loading show={isLoading} text={t('please-wait')} />
 
   return <>{children}</>;
 }

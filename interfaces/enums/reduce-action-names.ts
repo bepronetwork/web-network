@@ -1,3 +1,5 @@
+import {changeAccessToken} from '@reducers/change-access-token';
+
 export enum ReduceActionName {
   GithubHandle = `GithubHandle`,
   MetaMaskWallet = `MetaMaskWallet`,
@@ -16,4 +18,7 @@ export enum ReduceActionName {
   ChangeMicroServiceReadyState = `ChangeMicroServiceReadyState`,
   ChangeNetwork = `ChangeNetwork`,
   GithubLogin = `GithubLogin`,
+  ChangeAccessToken = `ChangeAccessToken`,
+  ChangeTransactionalTokenApproval = `ChangeTransactionalTokenApproval`,
+  ChangeSettlerTokenApproval = `ChangeSettlerTokenApproval`,
 }

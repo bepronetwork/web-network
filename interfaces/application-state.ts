@@ -19,4 +19,7 @@ export interface ApplicationState {
   myTransactions: (SimpleBlockTransactionPayload|BlockTransaction|UpdateBlockTransaction)[];
   network: string;
   githubLogin: string;
+  accessToken?: string;
+  isTransactionalTokenApproved?: boolean;
+  isSettlerTokenApproved?: boolean;
 }

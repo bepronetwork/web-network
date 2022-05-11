@@ -1,0 +1,35 @@
+{
+  "label": "Pull Request",
+  "label_one": "pull request",
+  "label_other": "pull requests",
+  "labelWithCount_one": "{{count}} pull request",
+  "labelWithCount_other": "{{count}} pull requests",
+  "abbreviation": "PR",
+  "select": "Select a Pull Request",
+  "review_one": "review",
+  "review_other": "reviews",
+  "find-a-bounty": "Find a bounty to work on",
+  "actions": {
+    "create": {
+      "title": "Create Pull Request",
+      "success": "Created Pull Request",
+      "error": "To create pull request"
+    },
+    "merge": {
+      "title": "Merge",
+      "success": "",
+      "error": ""
+    },
+    "review": {
+      "success": "Review submitted",
+      "error": "To submit review"
+    },
+    "view": "View Pull Request"
+  },
+  "errors": {
+    "not-found": "No pull requests found",
+    "no-reviews-found": "No reviews found",
+    "merge-conflicts": "Pull request has merge conflicts and can't be merged",
+    "you-dont-have-pull-requests": "You don't have any Pull Requests. Find a Bounty to work on."
+  }
+}

@@ -1,4 +1,4 @@
-import {GetStaticProps} from 'next/types';
+import {GetServerSideProps, GetStaticProps} from 'next/types';
 import React, {useContext, useEffect, useState} from 'react';
 import PageActions from '@components/page-actions';
 import ProposalAddresses from '@components/proposal-addresses';
@@ -7,17 +7,24 @@ import ProposalProgress from '@components/proposal-progress';
 import {useRouter} from 'next/router';
 import {ApplicationContext} from '@contexts/application';
 import {BeproService} from '@services/bepro-service';
-import GithubMicroService, {ProposalData, User,} from '@services/github-microservice';
+import {ProposalData} from '@interfaces/api-response';
 import {formatDate} from '@helpers/formatDate';
 import {handlePercentage} from '@helpers/handlePercentage';
-import {IssueData} from '@interfaces/issue-data';
-import {addToast} from '@reducers/add-toast';
-
+import {IssueData, pullRequest} from '@interfaces/issue-data';
 import ProposalProgressBar from '@components/proposal-progress-bar';
 import {changeOraclesParse, changeOraclesState} from '@reducers/change-oracles';
 import CustomContainer from '@components/custom-container';
 import {formatNumberToCurrency} from '@helpers/formatNumber';
 import ConnectWalletButton from '@components/connect-wallet-button';
+import useRepos from '@x-hooks/use-repos';
+import useApi from '@x-hooks/use-api';
+import useMergeData from '@x-hooks/use-merge-data';
+import NotMergeableModal from '@components/not-mergeable-modal';
+import useOctokit from '@x-hooks/use-octokit';
+import {getSession} from 'next-auth/react';
+import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
+import { isProposalDisputable } from '@helpers/proposal';
 
 interface ProposalBepro {
   disputes: string;
@@ -40,7 +47,7 @@ interface usersAddresses {
 export default function PageProposal() {
   const router = useRouter();
   const {prId, mergeId, dbId, issueId} = router.query;
-  const { dispatch, state: {currentAddress, beproStaked}, } = useContext(ApplicationContext);
+  const { dispatch, state: {currentAddress, beproStaked, githubLogin}, } = useContext(ApplicationContext);
 
   const [proposalBepro, setProposalBepro] = useState<ProposalBepro>();
   const [proposalMicroService, setProposalMicroService] = useState<ProposalData>();
@@ -48,27 +55,57 @@ export default function PageProposal() {
   const [networkCid, setNetworkCid] = useState<string>();
   const [isFinalized, setIsFinalized] = useState<boolean>();
   const [isFinished, setIsFinished] = useState<boolean>();
+  const [prGithubId, setPrGithubId] = useState<string>();
+  const [isMergiable, setIsMergiable] = useState<boolean>();
+  const [pullRequestGh, setPullRequestGh] = useState<pullRequest>();
+  const [issuePRs, setIssuePRs] = useState<pullRequest[]>();
+  const [isCouncil, setIsCouncil] = useState(false);
   const [usersAddresses, setUsersAddresses] = useState<usersAddresses[]>();
   const [issueMicroService, setIssueMicroService] = useState<IssueData>(null);
-  const [repo, setRepo] = useState(``);
+  const [disputableTime, setDisputableTime] = useState(0)
+  const [[], {loadRepos}] = useRepos();
+  const {getUserOf, getIssue} = useApi();
+  const {getPullRequest} = useOctokit();
+  const { t } = useTranslation('common')
 
   async function getProposalData() {
-    const mergeProposal = await GithubMicroService.getMergeProposalIssue(dbId, mergeId);
-    const issueData = await GithubMicroService.getIssueId(issueId);
-    setProposalMicroService(mergeProposal as ProposalData);
+    const [repoId, ghId] = String(issueId).split(`/`);
+    const repos = await loadRepos();
+    const _repo = repos.find(({id}) => id === +repoId);
+
+    const issueData = await getIssue(repoId, ghId);
+
     setIssueMicroService(issueData);
+    setPrGithubId(issueData.pullRequests?.find(el => el.id === +prId).githubId);
+    setProposalMicroService(issueData.mergeProposals.find(({scMergeId, issueId, pullRequestId}) => scMergeId === String(mergeId) && pullRequestId === +prId && issueId === +dbId));
     setAmountIssue(issueData?.amount?.toString())
   }
 
-  async function getProposal() {
+  async function getProposal(force = false) {
+    if (!issueMicroService || !prGithubId)
+      return;
 
     try {
       const issue_id = await BeproService.network.getIssueByCID({issueCID: issueId}).then(({_id}) => _id);
       const merge = await BeproService.network.getMergeById({issue_id: issue_id, merge_id: mergeId});
       const isDisputed = await BeproService.network.isMergeDisputed({issueId: issue_id, mergeId});
-      const author = await GithubMicroService.getHandleOf(merge.proposalAddress);
+      const author = (await getUserOf(merge.proposalAddress))?.githubHandle;
+      const pullRequests = [];
 
+      for (const pullRequest of issueMicroService?.pullRequests) {
+        const {data: {merged, mergeable, mergeable_state, number, state}} = await getPullRequest(+pullRequest.githubId, issueMicroService.repository?.githubPath);
+        if (number === +prGithubId) {
+          setIsMergiable(mergeable && mergeable_state === 'clean');
+          //setPullRequestGh({...pullRequest, merged, isMergeable: mergeable && mergeable_state === 'clean', state});
+        }
+
+        pullRequests.push({...pullRequest, merged, isMergeable: mergeable && mergeable_state === 'clean', state, number})
+      }
+
+      setIssuePRs(pullRequests)
+      setPullRequestGh(pullRequests.find(({ number }) => number === +prGithubId))
       setProposalBepro({...merge, isDisputed, author});
+
       return Promise.resolve();
     } catch (e) {
       console.error(`Error fetching Proposal for issue cid:${issueId} with merge:${mergeId}`, e);
@@ -77,7 +114,7 @@ export default function PageProposal() {
 
   function getIssueAmount() {
     return BeproService.network.getIssueByCID({issueCID: issueId})
-                       .then(({_id}) => BeproService.network.getIssueById({issueId: _id}))
+//                      .then(({_id}) => BeproService.network.getIssueById({issueId: _id}))
                        .then(issue => {
                          setAmountIssue(issue.tokensStaked);
                          setNetworkCid(issue.cid);
@@ -92,7 +129,7 @@ export default function PageProposal() {
 
     async function mapUser(address: string, i: number) {
 
-      const {githubLogin} = await GithubMicroService.getUserOf(address);
+      const {githubLogin} = await getUserOf(address);
       const oracles = proposal.prAmounts[i].toString();
       const percentage = handlePercentage(+oracles, +amountIssue);
       return {githubLogin, percentage, address, oracles};
@@ -101,39 +138,42 @@ export default function PageProposal() {
     Promise.all(proposal.prAddresses.map(mapUser)).then(setUsersAddresses)
   }
 
-  function loadProposalData() {
+ async function loadProposalData() {
     if (issueId && currentAddress) {
-      BeproService.network.getOraclesSummary({address: currentAddress})
+    await  BeproService.getDisputableTime().then(setDisputableTime)
+    await  BeproService.network.isCouncil({address: currentAddress})
+        .then(isCouncil => setIsCouncil(isCouncil))
+
+    await  BeproService.network.getOraclesSummary({address: currentAddress})
                   .then(oracles => dispatch(changeOraclesState(changeOraclesParse(currentAddress, oracles))))
                   .then(async () => {
+                    await getProposal()
                     await getProposalData();
-                    await getProposal();
                     await getIssueAmount();
                   })
     }
   }
 
-  useEffect(() => { loadProposalData() }, [currentAddress, issueId]);
+  useEffect(() => { 
+    loadProposalData() 
+  }, [currentAddress, issueId,]);
   useEffect(() => { updateUsersAddresses(proposalBepro) }, [proposalBepro, currentAddress]);
-  useEffect(() => {
-    GithubMicroService.getReposList()
-                      .then(list => list.find(({id}) => id.toString() === (issueId as string).split(`/`)[0]))
-                      .then(item => setRepo(item?.githubPath))
-  }, [])
+  useEffect(() => { getProposal() }, [issueMicroService, prGithubId])
+
 
   return (
     <>
       <ProposalHero
         githubId={issueMicroService?.githubId}
         title={issueMicroService?.title}
-        pullRequestId={proposalMicroService?.pullRequest.githubId}
-        authorPullRequest={proposalBepro?.author}
+        pullRequestId={prGithubId}
+        authorPullRequest={pullRequestGh?.githubLogin}
         createdAt={proposalMicroService && formatDate(proposalMicroService.createdAt)}
         beproStaked={formatNumberToCurrency(amountIssue)}/>
       <ProposalProgress developers={usersAddresses}/>
-      <CustomContainer>
+      <CustomContainer className="mgt-20 mgb-20">
         <div className="col-6">
-          <ProposalProgressBar issueDisputeAmount={+proposalBepro?.disputes} isDisputed={proposalBepro?.isDisputed} stakedAmount={+beproStaked} />
+          <ProposalProgressBar issueDisputeAmount={+proposalBepro?.disputes} isDisputed={proposalBepro?.isDisputed} stakedAmount={+beproStaked} isFinished={isFinalized} isCurrentPRMerged={issueMicroService?.merged === mergeId} />
         </div>
       </CustomContainer>
       <PageActions
@@ -144,19 +184,36 @@ export default function PageProposal() {
         networkCID={networkCid}
         issueId={issueId as string}
         mergeId={mergeId as string}
-        handleBeproService={getProposal}
         isDisputed={proposalBepro?.isDisputed}
-        repoPath={repo}
-        finished={isFinished} />
-      <ProposalAddresses addresses={usersAddresses} currency="$BEPRO" />
-
+        githubId={prGithubId}
+        repoPath={issueMicroService?.repository?.githubPath}
+        canClose={isMergiable}
+        finished={isFinished}
+        isDisputable={isProposalDisputable(proposalMicroService?.createdAt, disputableTime)}
+        onCloseEvent={async () => {
+          return await loadProposalData();
+          }} />
+      <ProposalAddresses addresses={usersAddresses} currency={t('$bepro')} />
+      <NotMergeableModal
+        currentGithubLogin={githubLogin}
+        issuePRs={issuePRs}
+        currentAddress={currentAddress}
+        issue={issueMicroService}
+        pullRequest={pullRequestGh}
+        mergeProposal={proposalBepro}
+        isFinalized={isFinalized}
+        isCouncil={isCouncil}
+      />
       <ConnectWalletButton asModal={true} />
     </>
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
-    props: {},
+    props: {
+      session: await getSession(),
+      ...(await serverSideTranslations(locale, ['common', 'proposal', 'pull-request', 'connect-wallet-button'])),
+    },
   };
 };

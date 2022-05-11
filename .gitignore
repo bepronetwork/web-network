@@ -21,6 +21,7 @@
 !.env.example
 .idea/
 .vscode/
+.prettierrc
 
 # debug
 npm-debug.log*

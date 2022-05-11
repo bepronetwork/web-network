@@ -4,14 +4,14 @@ import React, { ReactNode } from "react";
 
 type NothingFoundProps = {
   description: string;
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 export default function NothingFound({ description, children }: NothingFoundProps) {
   return (
-      <div className="d-flex flex-column align-items-center gap-4">
+      <div className="d-flex flex-column align-items-center gap-4 mt-3">
         <NotFoundIcon  height={52} width={56}/>
-        <p className="smallCaption text-center text-uppercase mb-0">{description}</p>
+        <p className="caption-small text-center text-uppercase mb-0">{description}</p>
         { children }
       </div>
   );

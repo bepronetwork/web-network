@@ -3,12 +3,10 @@ import { useRouter } from 'next/router'
 import React, {useContext} from 'react';
 import {useEffect, useState} from 'react';
 import {BeproService} from '@services/bepro-service';
-import Link from 'next/link';
-import clsx from "clsx";
 import ConnectWalletButton from './connect-wallet-button';
 import {ApplicationContext} from '@contexts/application';
 import {changeStakedState} from '@reducers/change-staked-amount';
-import { formatNumberToNScale, formatNumberToString } from 'helpers/formatNumber';
+import { formatNumberToNScale } from 'helpers/formatNumber';
 import NetworkIdentifier from '@components/network-identifier';
 import BeproLogo from '@assets/icons/bepro-logo';
 import HelpIcon from '@assets/icons/help-icon';
@@ -19,9 +17,19 @@ import WrongNetworkModal from '@components/wrong-network-modal';
 import Button from './button';
 import PlusIcon from '@assets/icons/plus-icon';
 import BeproSmallLogo from '@assets/icons/bepro-small-logo';
+import { truncateAddress } from '@helpers/truncate-address';
+import InternalLink from './internal-link';
+import BalanceAddressAvatar from './balance-address-avatar';
+import useApi from '@x-hooks/use-api';
+import { User } from '@interfaces/api-response';
+import UserMissingModal from './user-missing-information';
+import Translation from './translation';
+
+const CURRENCY = process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME;
+const REQUIRED_NETWORK = process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME;
 
 export default function MainNav() {
-  const {dispatch, state: {currentAddress, balance}} = useContext(ApplicationContext);
+  const {dispatch, state: {currentAddress, balance, accessToken}} = useContext(ApplicationContext);
   const {asPath} = useRouter()
 
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
@@ -29,6 +37,8 @@ export default function MainNav() {
   const [ethBalance, setEthBalance] = useState(0);
   const [beproBalance, setBeproBalance] = useState(0);
   const [showHelp, setShowHelp] = useState(false);
+  const [modalUserMissing, setModalUserMissing] = useState<boolean>(false);
+  const {getUserOf,} = useApi();
 
   useEffect(() => {
     checkLogin();
@@ -45,7 +55,7 @@ export default function MainNav() {
   }
 
   function updateAddress(address) {
-    setAddress(`${address.substr(0,6)}...${address.substr(-4)}`);
+    setAddress(truncateAddress(address, 4));
   }
 
   function updateBalances() {
@@ -70,6 +80,10 @@ export default function MainNav() {
     setBeproBalance(await BeproService.getBalance('bepro'))
     setLoggedIn(true);
     dispatch(changeStakedState(await BeproService.network.getBEPROStaked()));
+    getUserOf(BeproService.address)
+      .then((user: User) => {
+        if(!user?.accessToken && user?.githubLogin) setModalUserMissing(true)
+      })
   }
 
   useEffect(updateState, [currentAddress]);
@@ -79,42 +93,33 @@ export default function MainNav() {
     <div className="main-nav d-flex align-items-center justify-content-between">
 
       <div className="d-flex">
-        <Link href="/" passHref>
-          <a>
-            <BeproLogo aria-hidden={true} />
-          </a>
-        </Link>
+        <InternalLink href="/" icon={<BeproLogo aria-hidden={true} />} className="brand" nav active />
         <ul className="nav-links">
-          <li><Link href="/developers" passHref><a
-          className={clsx({
-            active: asPath === '/developers',
-          })}
-          >Developers</a></Link></li>
-          <li><Link href="/council" passHref><a
-          className={clsx({
-            active: asPath === '/council',
-          })}
-          >Council</a></Link></li>
-          <li><Link href="/oracle" passHref><a
-          className={clsx({
-            active: asPath === '/oracle',
-          })}
-          >Oracle</a></Link></li>
-          {/* <li><a href="/">Lists</a></li>
-                        <li><a href="/issue">Issue</a></li>
-                        <li><a href="/proposal">Proposal</a></li>
-                        <li><a href="/account">My account</a></li> */}
+          <li>
+            <InternalLink href="/developers" label={<Translation label={'main-nav.developers'} />} nav uppercase />
+          </li>
+
+          <li>
+            <InternalLink href="/council" label={<Translation label={'main-nav.council'} />} nav uppercase />
+          </li>
+
+          <li>
+            <InternalLink href="/oracle" label={<Translation label={'main-nav.Oracle'} />} nav uppercase />
+          </li>
         </ul>
       </div>
+
       <div className="d-flex flex-row align-items-center">
-        <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" className='text-decoration-none' target="_blank">
-          <Button transparent><span>Get Started</span><ExternalLinkIcon className="ml-1" height={10} width={10} color="text-white"/></Button>
+        <a href="https://support.bepro.network/en/articles/5595864-using-the-testnet" className='d-flex align-items-center mr-3 text-decoration-none text-white text-uppercase main-nav-link opacity-75 opacity-100-hover' target="_blank">
+          <span><Translation label={'main-nav.get-started'} /></span>
+          <ExternalLinkIcon className="ml-1"/>
         </a>
-        <Link href="/create-issue" passHref>
-          <Button transparent><PlusIcon /> <span>Create issue</span></Button>
-        </Link>
-        <Button onClick={() => setShowHelp(true)}  className="ms-2 me-3 text-uppercase" transparent rounded><HelpIcon /></Button>
-        <WrongNetworkModal requiredNetwork="kovan" />
+
+        <InternalLink href="/create-bounty" icon={<PlusIcon />} label={<Translation label={'main-nav.create-bounty'} />} className="mr-2" iconBefore nav uppercase />
+
+        <Button onClick={() => setShowHelp(true)}  className="ms-2 me-4 opacity-75 opacity-100-hover" transparent rounded><HelpIcon /></Button>
+
+        <WrongNetworkModal requiredNetwork={REQUIRED_NETWORK} />
 
         <ConnectWalletButton onSuccess={login} onFail={checkLogin}>
           <div className="d-flex account-info align-items-center">
@@ -123,29 +128,15 @@ export default function MainNav() {
 
             <NetworkIdentifier />
 
-            <Link href="/account" passHref>
-              <Button className='mr-1' transparent>
-                <BeproSmallLogo />
-                <span>{formatNumberToNScale(beproBalance)}</span>
-              </Button>
-            </Link>
-            <Link href="/account" passHref>
-              <a className="meta-info d-flex align-items-center">
-                <div className="d-flex flex-column text-right">
-                  <p className="p-small mb-0">
-                    {address}
-                  </p>
-                  <p className="p-small mb-0 trans">{formatNumberToString(ethBalance)} ETH</p>
-                </div>
-                {/* <img className="avatar circle-2"src="https://uifaces.co/our-content/donated/Xp0NB-TL.jpg" alt="" /> */}
-              </a>
-            </Link>
+            <InternalLink href="/account" icon={<BeproSmallLogo />} label={formatNumberToNScale(beproBalance)} className="mx-3" transparent nav />
+
+            <InternalLink href="/account" icon={<BalanceAddressAvatar address={address} balance={ethBalance} currency={CURRENCY} />} className="meta-info d-flex align-items-center" />
           </div>
         </ConnectWalletButton>
       </div>
 
       <HelpModal show={showHelp} onCloseClick={() => setShowHelp(false)} />
-
+      <UserMissingModal show={modalUserMissing} />
     </div>
   )
 }
