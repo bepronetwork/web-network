@@ -4,13 +4,18 @@ import { useTranslation } from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
 
+import Badge from "components/badge";
 import Button from "components/button";
+import IconOption from "components/icon-option";
+import IconSingleValue from "components/icon-single-value";
 import Modal from "components/modal";
 import ReactSelect from "components/react-select";
 
 import { useAuthentication } from "contexts/authentication";
+import { useRepos } from "contexts/repos";
 
 import useOctokitGraph from "x-hooks/use-octokit-graph";
+
 
 export default function CreatePullRequestModal({
   show = false,
@@ -23,61 +28,68 @@ export default function CreatePullRequestModal({
   const { t } = useTranslation(["common", "pull-request"]);
 
   const [title, setTitle] = useState("");
-  const [branch, setBranch] = useState("");
+  const [selectedBranch, setSelectedBranch] = useState("");
   const [options, setOptions] = useState([]);
   const [description, setDescription] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
   const { user } = useAuthentication();
+  const { activeRepo } = useRepos();
 
   const { getRepositoryBranches, getUserRepositories } = useOctokitGraph();
 
   function onSelectedBranch(option) {
-    setBranch(option.value);
+    setSelectedBranch(option.value);
   }
 
   function isButtonDisabled(): boolean {
-    return [title, description, branch].some((s) => !s);
+    return [title, description, selectedBranch].some((s) => !s);
   }
 
   function setDefaults() {
     setTitle(prTitle);
     setDescription(prDescription);
-    setBranch(undefined);
+    setSelectedBranch(undefined);
     setIsCreating(false);
   }
 
   function handleConfirm() {
     setIsCreating(true);
-    onConfirm({ title, description, branch }).finally(() =>
+    onConfirm({ title, description, branch: selectedBranch }).finally(() =>
       setIsCreating(false));
   }
 
   useEffect(setDefaults, [show]);
   useEffect(() => {
-    if (!user?.accessToken || !repo) return;
-
-    let repoToSearch = `${user.login}/${repo.split("/")[1]}`;
+    if (!user?.accessToken || !repo || !show) return;
 
     getUserRepositories(user.login)
     .then(repositories => {
-      const isOrganizationRepository = 
-        repositories.find(repository => repository.nameWithOwner === repo && repository.isOrganization);
+      const filteredRepos = 
+        repositories.filter(repo => (repo.isFork && repo.nameWithOwner === `${user.login}/${activeRepo?.name}`) 
+                                    || repo.nameWithOwner === activeRepo?.githubPath);
 
-      if (isOrganizationRepository) repoToSearch = repo;
+      
 
-      return getRepositoryBranches(repoToSearch);
+      return Promise.all(filteredRepos
+        .map(async (repository) => ({ repository, branches:  await getRepositoryBranches(repository.nameWithOwner)})));
     })
+    .then(reposWithBranches => reposWithBranches
+      .map(({ repository, branches }) => branches.map(branch => ({ 
+        value: `${repository.owner}:${branch}`, 
+        label: branch,
+        postIcon: <Badge 
+                    color={repository.isOrganization ? "white-10" : "primary-30"}
+                    label={repository.isOrganization ? t("misc.organization") : t("misc.fork")}
+                  />,
+        isSelected: !!selectedBranch && branch === selectedBranch
+      })))
+      .flatMap(branch => branch))
     .then(branches => {
-      return branches.map(branch2 => ({
-        value: `${repoToSearch.split("/")[0]}/${branch2}`,
-        label: branch2,
-        isSelected: branch && branch === branch2
-      }));
+      setOptions(branches);
     })
-    .then(setOptions)
     .catch(console.log);
-  }, [user?.accessToken, repo]);
+  }, [user?.accessToken, repo, show]);
 
   return (
     <Modal
@@ -119,7 +131,14 @@ export default function CreatePullRequestModal({
             <label className="caption-small mb-2 text-gray">
               {t("forms.create-pull-request.branch.label")}
             </label>
-            <ReactSelect options={options} onChange={onSelectedBranch} />
+            <ReactSelect 
+              options={options} 
+              onChange={onSelectedBranch}
+              components={{
+                Option: IconOption,
+                SingleValue: IconSingleValue
+              }}
+              />
           </div>
         </div>
         <div className="d-flex pt-2 justify-content-center">

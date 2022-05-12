@@ -100,7 +100,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       repositoryId: repositoryGithubId,
       title,
       body,
-      head: branch.replace("/", ":"),
+      head: branch,
       base: issue.branch || serverRuntimeConfig?.github?.mainBranch,
       maintainerCanModify: false,
       draft: false
@@ -131,6 +131,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       cid: `${created.createPullRequest.pullRequest.number}`
     });
   } catch (error) {
+    console.log(error);
     return res.status(error?.response?.status || 500).json(error?.response?.data || error);
   }
 }
