@@ -191,6 +191,12 @@ class BeproFacet {
     return network.getOraclesResume(this.address);
   }
 
+  async getSettlerTokenAllowance(networkAddress: string = publicRuntimeConfig?.contract?.address): Promise<number> {
+    const network = await this.getNetworkObj(networkAddress);
+    
+    return this.getAllowance(network.settlerToken.contractAddress, this.address, networkAddress);
+  }
+
   async getAllowance(tokenAddress: string = publicRuntimeConfig?.contract?.settler, 
                     walletAddress = this.address, 
                     spenderAddress = this.network.contractAddress) {
@@ -208,10 +214,16 @@ class BeproFacet {
   async getSettlerTokenData(networkAddress = undefined): Promise<Token> {
     const network = await this.getNetworkObj(networkAddress);
 
+    return this.getERC20TokenData(network.settlerToken.contractAddress);
+  }
+
+  async getERC20TokenData(tokenAddress): Promise<Token> {
+    const token = await this.getERC20Obj(tokenAddress);
+
     return {
-      name: await network.settlerToken.name(),
-      symbol: await network.settlerToken.symbol(),
-      address: network.settlerToken.contractAddress
+      name: await token.name(),
+      symbol: await token.symbol(),
+      address: tokenAddress
     };
   }
 
