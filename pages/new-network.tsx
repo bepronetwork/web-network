@@ -116,7 +116,7 @@ export default function NewNetwork() {
       if (stepToGo < currentStep) canGo = true;
       else if (steps[stepsNames[stepToGo - 1]].validated) canGo = true;
     }
-
+    
     if (canGo) setCurrentStep(stepToGo);
   }
 
@@ -127,7 +127,7 @@ export default function NewNetwork() {
 
     await BeproService.startNetworkFactory();
 
-    BeproService.createNetwork(publicRuntimeConfig?.contract?.settler, steps.tokens.nftToken)
+    BeproService.createNetwork(steps.tokens.networkToken, steps.tokens.nftToken)
       .then(() => {
         BeproService.getNetworkAdressByCreator(wallet.address).then(async (networkAddress) => {
           const networkData = steps.network.data;

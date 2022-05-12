@@ -41,7 +41,8 @@ export const DefaultNetworkInformation = {
   },
   tokens: {
     validated: false,
-    nftToken: ''
+    nftToken: '',
+    networkToken: ''
   }
 };
 
