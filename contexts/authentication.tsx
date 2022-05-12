@@ -161,9 +161,7 @@ export const AuthenticationProvider = ({ children }) => {
 
         BeproService.login()
         .then(async () => {
-          const [isCouncil] = await Promise.all([
-            BeproService.isCouncil()
-          ])
+          const isCouncil = await BeproService.isCouncil();
 
           setWallet({ address, isCouncil })
         });
