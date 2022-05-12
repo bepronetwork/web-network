@@ -38,8 +38,6 @@ class BeproFacet {
 
       await this.network.loadContract();
 
-      //(window as any).network = this.network;
-
       if (!this.isStarted)
         console.table({
           web3: publicRuntimeConfig?.web3ProviderConnection,
@@ -50,6 +48,8 @@ class BeproFacet {
         });
 
       this.isStarted = true;
+
+      //(window as any).BeproService = this;
     } catch (error) {
       console.log("Failed to Start BeproService", error);
     }

@@ -127,7 +127,7 @@ export default function NewNetwork() {
 
     await BeproService.startNetworkFactory();
 
-    BeproService.createNetwork()
+    BeproService.createNetwork(publicRuntimeConfig?.contract?.settler, steps.tokens.nftToken)
       .then(() => {
         BeproService.getNetworkAdressByCreator(wallet.address).then(async (networkAddress) => {
           const networkData = steps.network.data;
