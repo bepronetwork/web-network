@@ -6,11 +6,10 @@ import models from "db/models";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const [address] = req.query.params;
-  console.log(req.query.params)
 
   const payments = await models.userPayments.findAll({
     include: [
-      { association: "issue" }
+      { association: "issue", include:[{ association: "token" }] }
     ],
     where: {
       address,

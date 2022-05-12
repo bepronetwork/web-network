@@ -1,6 +1,6 @@
 import { IssueData } from "./issue-data";
 
-export interface IPayment {
+export interface Payment {
   address: string;
   ammount: number;
   id: number;

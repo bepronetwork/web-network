@@ -11,7 +11,7 @@ import Repositories from "./repositories.model";
 import User from "./user";
 import Tokens from "./tokens.model";
 import NetworkTokens from "./network-tokens.model";
-import UserPayments from "./userPayments";
+import UserPayments from "./user-payments";
 
 const Database = { sequelize: null };
 

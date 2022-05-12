@@ -112,7 +112,7 @@ export default async function readBountyClosed(events, network: Network_v2, cust
             bounty.state = "closed";
             await bounty.save();
             await Promise.all(networkBounty?.proposals?.[0].details.map(async(detail) =>
-              await models.userPayments.create({
+              models.userPayments.create({
                 address: detail?.['recipient'],
                 ammount: Number((detail?.['percentage'] / 100) * networkBounty?.tokenAmount) || 0,
                 issueId:  bounty?.id,

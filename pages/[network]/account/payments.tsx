@@ -16,23 +16,24 @@ import { useAuthentication } from "contexts/authentication";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
-import { IPayment } from "interfaces/payments";
+import { Payment } from "interfaces/payments";
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
 
-interface IPaymentItem{
-  payment:  IPayment
+interface PaymentItem{
+  payment:  Payment
 }
 
-const PaymentItem = function ({payment}:IPaymentItem) {
+const PaymentItem = function ({payment}:PaymentItem) {
   const { getURLWithNetwork } = useNetworkTheme()
   const router = useRouter()
+  
   return (
     <div className="bg-dark-gray px-3 py-2 d-flex justify-content-between mt-1 rounded-5">
       <div className="d-inline-flex row flex-shirk-1">
         <span className="caption-large text-uppercase text-primary mb-1">
-          {`${formatNumberToCurrency(payment?.ammount)} $BEPRO`}
+          {`${formatNumberToCurrency(payment?.ammount)} ${payment?.issue?.token?.symbol || 'BEPRO'}`}
         </span>
         <p className="caption-small text-uppercase text-white text-truncate">
           {payment.transactionHash}
@@ -64,17 +65,18 @@ export default function Payments() {
 
   const {getPayments} = useApi()
   const {wallet} = useAuthentication()
-  const [payments, setPayments] = useState<IPayment[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
   const [hasMore, setHasMore] = useState(false);
   const [total, setTotal] = useState(0);
   const { getURLWithNetwork } = useNetworkTheme();
 
 
   useEffect(()=>{
-    getPayments(wallet?.address).then((data =>{
-      setPayments(data)
-      setTotal(data.map(i=> i.ammount).reduce((p,c) => p+c))
-    }))
+    if(wallet.address)
+      getPayments(wallet?.address).then((data =>{
+        setPayments(data)
+        setTotal(data?.map(i=> i?.ammount)?.reduce((p,c) => p+c) || 0)
+      }))
   },[wallet?.address])
 
   return (
