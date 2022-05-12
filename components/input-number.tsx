@@ -4,6 +4,7 @@ import NumberFormat from "react-number-format";
 import clsx from "clsx";
 import { kebabCase } from "lodash";
 import { useTranslation } from "next-i18next";
+
 import { InputNumber as InputNumberProps } from "types/input-number";
 
 import InfoTooltip from "./info-tooltip";
