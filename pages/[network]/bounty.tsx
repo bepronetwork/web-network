@@ -18,6 +18,7 @@ import Translation from "components/translation";
 
 import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
+import { useNetwork } from "contexts/network";
 import { useRepos } from "contexts/repos";
 
 import { TabbedNavigationItem } from "interfaces/tabbed-navigation";
@@ -34,11 +35,12 @@ export default function PageIssue() {
   const [commentsIssue, setCommentsIssue] = useState([]);
   const [isRepoForked, setIsRepoForked] = useState(false);
 
-  const { wallet, user } = useAuthentication();
-
-  const { activeRepo } = useRepos();
-  const { getUserRepositories } = useOctokitGraph();
   const { userHasPR } = useApi();
+  const { activeRepo } = useRepos();
+  const { activeNetwork } = useNetwork();
+  const { wallet, user } = useAuthentication();
+  const { getUserRepositories } = useOctokitGraph();
+
   const {
     activeIssue: issue,
     networkIssue,
@@ -106,7 +108,7 @@ export default function PageIssue() {
         console.log("Failed to get users repositories: ", e);
       });
 
-    userHasPR(`${repoId}/${id}`, user?.login)
+    userHasPR(`${repoId}/${id}`, user?.login, activeNetwork?.name)
       .then((result) => {
         setHasOpenPR(!!result);
       })
