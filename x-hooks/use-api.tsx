@@ -132,6 +132,13 @@ export default function useApi() {
       .catch(() => null);
   }
 
+  async function getPayments(address: string) {
+    return client
+      .get<IssueData>(`/payments/${address}`)
+      .then(({ data }) => data)
+      .catch(() => null);
+  }
+
   async function createIssue(payload: NewIssueParams,
                              networkName = publicRuntimeConfig.networkConfig.networkName) {
     return client
@@ -565,6 +572,7 @@ export default function useApi() {
     getHealth,
     getIssue,
     getIssues,
+    getPayments,
     getNetwork,
     getPendingFor,
     getProposal,
