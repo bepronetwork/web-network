@@ -125,8 +125,8 @@ export default function Settings() {
     tmpInfo2.percentageForDispute = percentageForDispute;
 
     setCurrentNetworkParameters({
-      redeemTime,
-      disputeTime,
+      redeemTime: redeemTime / 1000,
+      disputeTime: disputeTime / 1000,
       councilAmount,
       percentageForDispute
     });
