@@ -116,8 +116,6 @@ export default function NewNetwork() {
       if (stepToGo < currentStep) canGo = true;
       else if (steps[stepsNames[stepToGo - 1]].validated) canGo = true;
     }
-
-    canGo = true;
     
     if (canGo) setCurrentStep(stepToGo);
   }
