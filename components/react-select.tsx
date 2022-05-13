@@ -1,6 +1,6 @@
-import Select from "react-select";
+import Select, { Props } from "react-select";
 
-export default function ReactSelect(params: any) {
+export default function ReactSelect(params: Props) {
   return (
     <Select
       className="react-select-container"
