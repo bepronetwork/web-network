@@ -191,30 +191,24 @@ class BeproFacet {
     return network.getOraclesResume(this.address);
   }
 
+  async getAllowance(tokenAddress: string = publicRuntimeConfig?.contract?.settler, 
+                      walletAddress = this.address, 
+                      spenderAddress = this.network.contractAddress) {
+    const erc20 = await this.getERC20Obj(tokenAddress);
+
+    return erc20.allowance(walletAddress, spenderAddress);
+  }
+
   async getSettlerTokenAllowance(networkAddress: string = publicRuntimeConfig?.contract?.address): Promise<number> {
     const network = await this.getNetworkObj(networkAddress);
     
     return this.getAllowance(network.settlerToken.contractAddress, this.address, networkAddress);
   }
 
-  async getAllowance(tokenAddress: string = publicRuntimeConfig?.contract?.settler, 
-                    walletAddress = this.address, 
-                    spenderAddress = this.network.contractAddress) {
-    const erc20 = await this.getERC20Obj(tokenAddress);
-
-    return erc20.allowance(walletAddress, spenderAddress);
-  }
-
   async getOraclesOf(address: string) {
     const network = await this.getNetworkObj();
     
     return network.getOraclesOf(address);
-  }
-
-  async getSettlerTokenData(networkAddress = undefined): Promise<Token> {
-    const network = await this.getNetworkObj(networkAddress);
-
-    return this.getERC20TokenData(network.settlerToken.contractAddress);
   }
 
   async getERC20TokenData(tokenAddress): Promise<Token> {
@@ -225,6 +219,12 @@ class BeproFacet {
       symbol: await token.symbol(),
       address: tokenAddress
     };
+  }
+
+  async getSettlerTokenData(networkAddress = undefined): Promise<Token> {
+    const network = await this.getNetworkObj(networkAddress);
+
+    return this.getERC20TokenData(network.settlerToken.contractAddress);
   }
 
   async getClosedBounties(networkAddress = undefined) {
