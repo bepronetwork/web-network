@@ -111,22 +111,22 @@ export default function Settings() {
 
     setNewInfo(tmpInfo);
 
-    const redeemTime = await BeproService.getNetworkParameter("draftTime");
-    const disputeTime = await BeproService.getNetworkParameter("disputableTime");
+    const redeemTime = await BeproService.getNetworkParameter("draftTime").then(time => time / 1000);
+    const disputeTime = await BeproService.getNetworkParameter("disputableTime").then(time => time / 1000);
     const councilAmount = await BeproService.getNetworkParameter("councilAmount");
     const percentageForDispute =
       await BeproService.getNetworkParameter("percentageNeededForDispute");
 
     const tmpInfo2 = Object.assign({}, tmpInfo);
 
-    tmpInfo2.redeemTime = redeemTime / 1000;
-    tmpInfo2.disputeTime = disputeTime / 1000;
+    tmpInfo2.redeemTime = redeemTime;
+    tmpInfo2.disputeTime = disputeTime;
     tmpInfo2.councilAmount = councilAmount;
     tmpInfo2.percentageForDispute = percentageForDispute;
 
     setCurrentNetworkParameters({
-      redeemTime: redeemTime / 1000,
-      disputeTime: disputeTime / 1000,
+      redeemTime: redeemTime,
+      disputeTime: disputeTime,
       councilAmount,
       percentageForDispute
     });
