@@ -31,7 +31,9 @@ import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { Transaction } from "interfaces/transaction";
 
 export default function TransactionsList({
-  onActiveTransaction = (transaction) => {}
+  setActiveTransaction
+}: {
+  setActiveTransaction: React.Dispatch<React.SetStateAction<Transaction>>
 }) {
   const {
     dispatch,
@@ -65,7 +67,7 @@ export default function TransactionsList({
     return (
       <div
         className={className}
-        onClick={() => onActiveTransaction(item)}
+        onClick={() => setActiveTransaction(item)}
         key={item.id}
       >
         <div className="d-flex justify-content-start align-items-center">

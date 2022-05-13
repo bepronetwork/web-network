@@ -35,13 +35,13 @@ export default function TransactionsStateIndicator() {
   }
 
   function onActiveTransactionChange(transaction) {
-    setActiveTransaction(transaction);
+    return setActiveTransaction(transaction);
   }
 
   const overlay = (
     <Popover id="transactions-indicator">
       <Popover.Body className="bg-shadow p-3">
-        <TransactionsList onActiveTransaction={onActiveTransactionChange} />
+        <TransactionsList ActiveTransaction={onActiveTransactionChange} />
       </Popover.Body>
     </Popover>
   );
