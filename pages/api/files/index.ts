@@ -27,9 +27,9 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const uploadFiles = [...values].map(async (file) =>
-      await IpfsStorage.add(fs.readFileSync(file.filepath),
-                            false,
-                            file.originalFilename));
+       IpfsStorage.add(fs.readFileSync(file.filepath),
+                       false,
+                       file.originalFilename));
   const files = await Promise.all(uploadFiles).catch((e) => {
     return res.status(403).json(e);
   });
