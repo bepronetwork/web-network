@@ -13,9 +13,9 @@ import { BeproService } from "services/bepro-service";
 export default function DeployNFTModal({
   show,
   setClose,
-  setNFTAddress = (address: string) => {}
+  setNFTAddress
 }) {
-  const { t } = useTranslation(["common", "change-token-modal"]);
+  const { t } = useTranslation(["common", "change-token-modal", "custom-network"]);
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
   const [isExecuting, setIsExecuting] = useState(false);
@@ -56,10 +56,15 @@ export default function DeployNFTModal({
   }
 
   return (
-    <Modal show={show} onCloseClick={handleClose} title="New NFT" titlePosition="center">
+    <Modal 
+      show={show} 
+      onCloseClick={handleClose} 
+      title={t("custom-network:modals.deploy-nft-token.title")} 
+      titlePosition="center"
+    >
       <div className="container">
         <p className="caption-small trans mb-2 text-center">
-            Deploy a New NFT Token for your network
+          {t("custom-network:modals.deploy-nft-token.description")}
         </p>
 
         <div className="row">

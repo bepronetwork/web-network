@@ -68,6 +68,35 @@
       "label": "Repositories",
       "used-by-other-network": "The highlighted repositories are already being used by another network.",
       "has-bounties": "The highlighted repositories already have bounties and can't be removed."
+    },
+    "token-configuration": {
+      "title": "Token Configuration",
+      "fields": {
+        "tokens-dropdown": {
+          "label": "Network Token",
+          "description": "Add an ERC20 token to be used as network token."
+        },
+        "name": {
+          "label": "Name"
+        },
+        "symbol": {
+          "label": "Symbol"
+        },
+        "address": {
+          "label": "Address"
+        },
+        "nft-token": {
+          "label": "NFT Token Address",
+          "error": {
+            "pre": "Please provide a valid",
+            "mid": "BountyToken",
+            "post": "address."
+          }
+        }
+      },
+      "actions": {
+        "deploy-nft-token": "Deploy New NFT Token"
+      }
     }
   },
   "modals": {
@@ -79,6 +108,10 @@
       "title": "Update your Github Token",
       "description": "To create your custom network we need permission to access your repositories",
       "update-now": "Update now"
+    },
+    "deploy-nft-token": {
+      "title": "New NFT",
+      "description": "Deploy a New NFT Token for your network"
     }
   },
   "messages": {

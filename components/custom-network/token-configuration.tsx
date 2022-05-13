@@ -105,7 +105,7 @@ export default function TokenConfiguration({
 
   return (
     <Step
-      title="Token Configuration"
+      title={t("custom-network:steps.token-configuration.title")}
       index={step}
       activeStep={currentStep}
       validated={data.validated}
@@ -115,8 +115,8 @@ export default function TokenConfiguration({
     >
       <div className="row">
         <TokensDropdown 
-          label="Network Token"
-          description="Add an ERC20 token to be used as network token." 
+          label={t("custom-network:steps.token-configuration.fields.tokens-dropdown.label")}
+          description={t("custom-network:steps.token-configuration.fields.tokens-dropdown.description")}
           tokens={customTokens} 
           canAddToken={
             activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address ? 
@@ -130,17 +130,23 @@ export default function TokenConfiguration({
 
       <div className="row">
         <div className="form-group col-3">
-          <label className="caption-small mb-2">Name</label>
+          <label className="caption-small mb-2">
+            {t("custom-network:steps.token-configuration.fields.name.label")}
+          </label>
           <input type="text" className="form-control" value={networkToken?.name}  readOnly />
         </div>
 
         <div className="form-group col-3">
-          <label className="caption-small mb-2">Symbol</label>
+          <label className="caption-small mb-2">
+          {t("custom-network:steps.token-configuration.fields.symbol.label")}
+          </label>
           <input type="text" className="form-control" value={networkToken?.symbol}  readOnly />
         </div>
 
         <div className="form-group col-6">
-          <label className="caption-small mb-2">Address</label>
+          <label className="caption-small mb-2">
+            {t("custom-network:steps.token-configuration.fields.address.label")}
+          </label>
           <input type="text" className="form-control" value={networkToken?.address}  readOnly />
         </div>
       </div>
@@ -167,7 +173,10 @@ export default function TokenConfiguration({
 
       <div className="row align-items-center">
         <div className="form-group col-9">
-          <label className="caption-small mb-2">NFT Token Address</label>
+          <label className="caption-small mb-2">
+            {t("custom-network:steps.token-configuration.fields.nft-token.label")}
+          </label>
+
           <input 
             type="text" 
             className="form-control" 
@@ -179,13 +188,21 @@ export default function TokenConfiguration({
           {
             data.nftToken.error && 
             <small className="small-info text-danger">
-              Please provide a valid <a href="https://sdk.dappkit.dev/" target="_blank">BountyToken</a> address.
+              {t("custom-network:steps.token-configuration.fields.nft-token.error.pre")}
+
+              <a href="https://sdk.dappkit.dev/" target="_blank">
+                {t("custom-network:steps.token-configuration.fields.nft-token.error.mid")}
+              </a>
+              
+              {t("custom-network:steps.token-configuration.fields.nft-token.error.post")}
             </small>
           }
         </div>
 
         <div className="col-3 pt-2">
-          <Button onClick={handleShowModal}>Deploy New NFT Token</Button>
+          <Button onClick={handleShowModal}>
+            {t("custom-network:steps.token-configuration.actions.deploy-nft-token")}
+          </Button>
         </div>
       </div>
 
