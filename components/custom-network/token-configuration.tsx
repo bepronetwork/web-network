@@ -55,7 +55,7 @@ export default function TokenConfiguration({
   }
 
   function handleNFTTokenChange(e) {
-    changedDataHandler("tokens", { label: "nftToken", value: e.target.value });
+    changedDataHandler("tokens", { label: "nftToken", value: { address: e.target.value, error: false } });
   }
 
   function handleNetworkTokenChange(token: Token) {
@@ -63,21 +63,33 @@ export default function TokenConfiguration({
   }
 
   function setDeployedAddress(address) {
-    changedDataHandler("tokens", { label: "nftToken", value: address });
+    changedDataHandler("tokens", { label: "nftToken", value: { address, error: false } });
   }
 
   async function validateNFTAddress() {
-    if (data.nftToken.trim() === "") return changedDataHandler("tokens", { label: "validated", value: false });
+    if (data.nftToken.address.trim() === "") return false;
 
-    const token = new BountyToken(BeproService.bepro, data.nftToken);
+    try {
+      const token = new BountyToken(BeproService.bepro, data.nftToken.address);
 
-    await token.loadContract();
+      await token.loadContract();
+    } catch(error) {
+      changedDataHandler("tokens", { label: "nftToken", value: { ...data.nftToken, error: true } });
+
+      return false;
+    }
 
     return true;
   }
 
   useEffect(() => {
-    if (data.networkToken.trim() === "" || data.nftToken.trim() === "") 
+    if (data.networkToken.trim() === "") return setNetworkToken(undefined);
+
+    BeproService.getERC20TokenData(data.networkToken).then(setNetworkToken).catch(console.log);
+  }, [data.networkToken]);
+
+  useEffect(() => {
+    if (data.networkToken.trim() === "" || data.nftToken.address.trim() === "") 
       return changedDataHandler("tokens", { label: "validated", value: false });
 
     BeproService.getERC20TokenData(data.networkToken).then(data => {
@@ -159,9 +171,17 @@ export default function TokenConfiguration({
           <input 
             type="text" 
             className="form-control" 
-            value={data.nftToken} 
+            value={data.nftToken.address} 
             onChange={handleNFTTokenChange}
+            onBlur={validateNFTAddress}
           />
+
+          {
+            data.nftToken.error && 
+            <small className="small-info text-danger">
+              Please provide a valid <a href="https://sdk.dappkit.dev/" target="_blank">BountyToken</a> address.
+            </small>
+          }
         </div>
 
         <div className="col-3 pt-2">
