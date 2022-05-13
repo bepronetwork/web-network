@@ -69,7 +69,7 @@ export const IssueProvider: React.FC = function ({ children }) {
       pr.isMergeable = getPr?.mergeable === "MERGEABLE";
       pr.merged = getPr?.merged;
       pr.state = getPr?.state;
-      pr.comments = getComments as any;
+      pr.comments = getComments as IssueDataComment[];
       return pr;
     });
 

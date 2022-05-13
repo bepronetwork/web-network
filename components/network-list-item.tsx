@@ -17,7 +17,6 @@ import { INetwork } from "interfaces/network";
 
 import { BeproService } from "services/bepro-service";
 
-import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
 const { publicRuntimeConfig } = getConfig()
 interface NetworkListItemProps {
@@ -34,7 +33,6 @@ export default function NetworkListItem({
   const router = useRouter();
   const { t } = useTranslation("common");
 
-  const { getCurrencyByToken } = useApi();
   const { getURLWithNetwork } = useNetwork();
 
   const { dispatch } = useContext(ApplicationContext);

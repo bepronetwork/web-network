@@ -92,7 +92,7 @@ export default function OverrideNameModal({
     };
 
     updateNetwork(json)
-      .then((result) => {
+      .then(() => {
         dispatch(addToast({
             type: "success",
             title: t("actions.success"),

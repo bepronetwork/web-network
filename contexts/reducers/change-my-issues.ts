@@ -10,4 +10,5 @@ export const ChangeMyIssuesState: ReduceAction<number[]> = {
   fn: reducer
 };
 
-export const changeMyIssuesState = (payload: number[]): ReduceActor<number[]> => ({ name: ReduceActionName.MyIssues, payload });
+export const changeMyIssuesState = (payload: number[]): ReduceActor<number[]> => 
+({ name: ReduceActionName.MyIssues, payload });

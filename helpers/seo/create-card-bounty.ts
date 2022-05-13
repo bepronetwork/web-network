@@ -151,7 +151,7 @@ async function doTitle(title: string) {
       return currentLine + (c.length % 48) > 40 ? `${p} \n${c}` : `${p} ${c}`;
     });
   } catch {
-    title = title;
+    title
   }
 
   const titleText = await write(title || "", 48, "white", "semi");

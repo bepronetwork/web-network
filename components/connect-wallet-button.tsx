@@ -91,7 +91,8 @@ export default function ConnectWalletButton({
           </strong>
           <div className="d-flex justify-content-center align-items-center w-100">
             <div
-              className="rounded-8 bg-dark-gray text-white p-3 d-flex text-center justify-content-center align-items-center w-75 cursor-pointer"
+              className="rounded-8 bg-dark-gray text-white p-3 d-flex text-center
+                        justify-content-center align-items-center w-75 cursor-pointer"
               onClick={handleLogin}
             >
               <Image src={metamaskLogo} width={15} height={15} />

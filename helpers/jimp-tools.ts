@@ -57,7 +57,7 @@ export async function position(base: Jimp, image: Jimp, x = 0, y = 0) {
   return baseIMG.composite(positionIMG, x_axis, y_axis);
 }
 
-export async function write(text: string,
+export async function write(text?: string,
                             fontSize = 16,
                             textColor = "white",
                             fontFamily?: string,
@@ -81,5 +81,5 @@ export async function write(text: string,
   //   ...options,
   // });
 
-  return await Jimp.read(Buffer.from(buffer, "base64"));
+  return Jimp.read(Buffer.from(buffer, "base64"));
 }

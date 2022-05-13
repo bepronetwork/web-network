@@ -12,14 +12,23 @@ import { useAuthentication } from "contexts/authentication";
 
 import useOctokitGraph from "x-hooks/use-octokit-graph";
 
+interface props {
+  show: boolean,
+  onConfirm: (arg: { title:string , description:string , branch:string }) => Promise<void>;
+  onCloseClick: () => void;
+  repo: string;
+  title: string;
+  description: string;
+}
+
 export default function CreatePullRequestModal({
   show = false,
-  onConfirm = async ({ title, description, branch }): Promise<void> => {},
+  onConfirm,
   onCloseClick = () => {},
   repo = "",
   title: prTitle = "",
   description: prDescription = ""
-}) {
+}: props) {
   const { t } = useTranslation(["common", "pull-request"]);
 
   const [title, setTitle] = useState("");
@@ -76,8 +85,7 @@ export default function CreatePullRequestModal({
       show={show}
       onCloseClick={onCloseClick}
       title={t("pull-request:actions.create.title")}
-      titlePosition="center"
-    >
+      titlePosition="center">
       <div className="container">
         <div>
           <div className="form-group">

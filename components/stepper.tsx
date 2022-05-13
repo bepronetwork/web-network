@@ -1,6 +1,6 @@
 import { IStepper } from "interfaces/stepper";
 
-export default function Stepper({ children, ...props }: IStepper) {
+export default function Stepper({ children }: IStepper) {
   return (
     <div className="row">
       <div className="col-12">

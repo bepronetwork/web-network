@@ -89,7 +89,6 @@ function SelectOptionComponent({ innerProps, innerRef, data }) {
 export default function NewProposal({
   amountTotal,
   pullRequests = [],
-  isIssueOwner = false,
   isFinished = false
 }) {
   const { t } = useTranslation([
@@ -270,7 +269,7 @@ export default function NewProposal({
 
     handleProposeMerge(+networkIssue.id, +currentPullRequest.contractId, prAddresses, prAmounts)
     .then(txInfo => {
-      const { blockNumber: fromBlock } = txInfo as any;
+      const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
       return processEvent("proposal", "created", activeNetwork?.name, { fromBlock });
     })
@@ -318,7 +317,7 @@ export default function NewProposal({
   return (
     <div className="d-flex">
       {(wallet?.isCouncil && isFinished && (
-        <ReadOnlyButtonWrapper>
+        <ReadOnlyButtonWrapper >
           <Button className="read-only-button" onClick={() => setShow(true)}>
             {t("proposal:actions.create")}
           </Button>
@@ -331,38 +330,33 @@ export default function NewProposal({
         title={t("proposal:actions.new")}
         titlePosition="center"
         onCloseClick={handleClose}
-        footer={
-          <>
-            <Button
-              onClick={handleClickCreate}
-              disabled={
-                !wallet?.address ||
-                participants.length === 0 ||
-                !success ||
-                executing ||
-                cantBeMergeable()
-              }
-            >
-              {!wallet?.address ||
-                participants.length === 0 ||
-                executing ||
-                (!success && (
-                  <LockedIcon width={12} height={12} className="mr-1" />
-                ))}
-              <span>{t("proposal:actions.create")}</span>
-              {executing ? (
+        footer={<>
+          <Button
+            onClick={handleClickCreate}
+            disabled={!wallet?.address ||
+              participants.length === 0 ||
+              !success ||
+              executing ||
+              cantBeMergeable()}
+          >
+            {!wallet?.address ||
+              participants.length === 0 ||
+              executing ||
+              (!success && (
+                <LockedIcon width={12} height={12} className="mr-1" />
+              ))}
+            <span>{t("proposal:actions.create")}</span>
+            {executing ? (
               <span className="spinner-border spinner-border-xs ml-1" />
             ) : (
               ""
             )}
-            </Button>
+          </Button>
 
-            <Button color="dark-gray" onClick={handleClose}>
-              {t("actions.cancel")}
-            </Button>
-          </>
-        }
-      >
+          <Button color="dark-gray" onClick={handleClose}>
+            {t("actions.cancel")}
+          </Button>
+        </>}>
         <p className="caption-small text-white-50 mb-2 mt-2">
           {t("pull-request:select")}
         </p>
@@ -409,7 +403,6 @@ export default function NewProposal({
             <ul className="mb-0">
               {participants.map((item) => (
                 <CreateProposalDistributionItem
-                  key={item.githubHandle}
                   githubHandle={item.githubHandle}
                   githubLogin={item.githubLogin}
                   onChangeDistribution={handleChangeDistrib}

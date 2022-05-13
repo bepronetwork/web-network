@@ -15,7 +15,8 @@ export const ChangeBalance: ReduceAction<Partial<BalanceState> | BalanceState> =
     fn: reducer
   };
 
-export const changeBalance = (payload: Partial<BalanceState> | BalanceState): ReduceActor<Partial<BalanceState> | BalanceState> => ({
+export const changeBalance = 
+(payload: Partial<BalanceState> | BalanceState): ReduceActor<Partial<BalanceState> | BalanceState> => ({
   name: ReduceActionName.ChangeBalance,
   payload
 });

@@ -19,7 +19,7 @@ import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { TransactionCurrency } from "interfaces/transaction";
+import { BlockTransaction, TransactionCurrency } from "interfaces/transaction";
 
 import { BeproService } from "services/bepro-service";
 
@@ -63,7 +63,7 @@ function networkTxButton({
   const { t } = useTranslation(["common"]);
 
   const [showModal, setShowModal] = useState(false);
-  const [txSuccess, setTxSuccess] = useState(false);
+  const [txSuccess,] = useState(false);
 
   const { dispatch } = useContext(ApplicationContext);
   const { wallet, beproServiceStarted, updateWalletBalance } =
@@ -132,12 +132,12 @@ function networkTxButton({
         onFail(e.message);
         if (e?.message?.search("User denied") > -1)
           dispatch(updateTransaction({
-              ...(tmpTransaction.payload as any),
+              ...(tmpTransaction.payload as BlockTransaction),
               remove: true
           }));
         else
           dispatch(updateTransaction({
-              ...(tmpTransaction.payload as any),
+              ...(tmpTransaction.payload as BlockTransaction),
               status: TransactionStatus.failed
           }));
         console.error(e);
@@ -190,8 +190,7 @@ function networkTxButton({
         show={showModal}
         title={modalTitle}
         footer={modalFooter}
-        titlePosition="center"
-      >
+        titlePosition="center">
         <p className="p-small text-white-50 text-center">{modalDescription}</p>
         <div className={getDivClass()}>
           <Icon className="md-larger">

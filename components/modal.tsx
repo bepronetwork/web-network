@@ -1,9 +1,10 @@
 import { Modal as ModalBootstrap } from "react-bootstrap";
 
 import { kebabCase } from "lodash";
-import { Modal as ModalProps } from "types/modal";
 
 import CloseIcon from "assets/icons/close-icon";
+
+import { Modal as ModalProps } from "types/modal";
 
 import Button from "./button";
 

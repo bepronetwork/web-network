@@ -109,7 +109,7 @@ export default function ListIssues({
     }
   ];
 
-  const [filterByState, setFilterByState] = useState<Filter>(filtersByIssueState[0]);
+  const [filterByState,] = useState<Filter>(filtersByIssueState[0]);
 
   function isListEmpy(): boolean {
     return issuesPages.every((el) => el.issues?.length === 0);
@@ -307,11 +307,10 @@ export default function ListIssues({
         <InfiniteScroll
           handleNewPage={nextPage}
           isLoading={loading.isLoading}
-          hasMore={hasMore}
-        >
+          hasMore={hasMore}>
           {issuesPages.map(({ issues }) => {
             return issues?.map((issue) => (
-              <IssueListItem issue={issue} key={issue.githubId} />
+              <IssueListItem issue={issue} />
             ));
           })}
         </InfiniteScroll>

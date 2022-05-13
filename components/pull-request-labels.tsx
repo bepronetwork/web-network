@@ -71,9 +71,11 @@ function PullRequestLabels({
 
   return (
     <div
-      className={`pullrequest-labels d-flex justify-content-center align-items-center bg-${getColorLabel()}-30 rounded-pill p-1 ${
-        className || ""
-      }`}
+      className={`pullrequest-labels d-flex justify-content-center 
+                  align-items-center bg-${getColorLabel()}-30 rounded-pill p-1 ${
+                                                                                  className || ""
+                                                                                }`
+                }
     >
       <span
         className={`caption-small text-uppercase text-${getColorLabel()} mx-1 text-nowrap`}

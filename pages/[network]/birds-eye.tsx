@@ -45,7 +45,7 @@ export default function FalconPunchPage() {
       if (!beproServiceStarted) return 0;
 
       return BeproService.login()
-        .then(() => BeproService.bepro.Web3.eth.getBalance(address as any))
+        .then(() => BeproService.bepro.Web3.eth.getBalance(address as string | number))
         .then((eth) => +eth)
         .catch((e) => {
           console.error("Error on get eth", e);
@@ -55,10 +55,7 @@ export default function FalconPunchPage() {
 
     async function getInfo({
       githubLogin,
-      address,
-      createdAt,
-      updatedAt,
-      id
+      address
     }: Partial<User>) {
       const ghInfo = await getGithubInfo(githubLogin);
       const eth = await hasEthBalance(address);

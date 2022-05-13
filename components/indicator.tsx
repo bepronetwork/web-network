@@ -1,4 +1,4 @@
-export default function Indicator({ bg = "", border = false }) {
+export default function Indicator({ bg = "" }) {
   return (
     <>
       <span
