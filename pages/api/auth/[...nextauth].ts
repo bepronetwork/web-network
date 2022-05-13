@@ -28,7 +28,7 @@ export default NextAuth({
     maxAge: 24 * 60 * 60 // 1 day
   },
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ account, profile }) {
       if (!profile?.login) return "/?authError=Profile not found";
 
       const find = await models.user.findOne({
@@ -59,11 +59,11 @@ export default NextAuth({
 
       return true;
     },
-    async jwt({ token, user, account, profile, isNewUser }) {
+    async jwt({ token, account, profile }) {
       // console.log(`JWT`, token, user, account, profile, isNewUser);
       return { ...token, ...profile, ...account };
     },
-    async session({ session, user, token }) {
+    async session({ session, token }) {
       // console.log(`Session`, session, user, token);
       return {
         expires: session.expires,
