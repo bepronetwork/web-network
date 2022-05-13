@@ -10,7 +10,7 @@ import networkBeproJs from 'helpers/api/handle-network-bepro';
 import { ProposalHelpers } from "helpers/api/proposal";
 import { PullRequestHelpers } from "helpers/api/pull-request";
 
-const { publicRuntimeConfig } = getConfig();
+const { publicRuntimeConfig, serverRuntimeConfig } = getConfig();
 
 const handler = async (type, helpers, network, customNetwork, fromBlock, toBlock) => {
   const [contractMethod, apiMethod] = helpers[type];
@@ -24,7 +24,7 @@ const handler = async (type, helpers, network, customNetwork, fromBlock, toBlock
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const bulk = await models.chainEvents.findOne({where: {name: `Bulk`}});
-  const fromBlock = bulk?.dataValues?.lastBlock || 1731488;
+  const fromBlock = bulk?.dataValues?.lastBlock || serverRuntimeConfig.schedules.startProcessEventsAt;
   const customNetworks = await models.network.findAll({
     where: {
       name: {

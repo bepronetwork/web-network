@@ -93,6 +93,9 @@ const serverRuntimeConfig = {
     apiSecret: process.env.NEXT_TWITTER_APIKEY_SECRET,
     accessToken: process.env.NEXT_TWITTER_ACCESS_TOKEN,
     accessSecret: process.env.NEXT_TWITTER_ACCESS_SECRET,
+  },
+  schedules: {
+    startProcessEventsAt: process.env.SCHEDULES_START_BLOCK,
   }
 }
 
