@@ -28,16 +28,17 @@ function App({
     <>
       <Seo issueMeta={currentIssue} />
       <SessionProvider session={session}>
-        <RootProviders>
-          <NationDialog>
-            <MainNav />
-            <WebThreeDialog />
-            <div className="pb-5">
-              <Component {...pageProps} />
-            </div>
-            <StatusBar />
-          </NationDialog>
-        </RootProviders>
+        <WebThreeDialog>
+          <RootProviders>
+            <NationDialog>
+              <MainNav />
+              <div className="pb-5">
+                <Component {...pageProps} />
+              </div>
+              <StatusBar />
+            </NationDialog>
+          </RootProviders>
+        </WebThreeDialog>
       </SessionProvider>
     </>
   );

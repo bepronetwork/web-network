@@ -170,7 +170,7 @@ export const AuthenticationProvider = ({ children }) => {
   }, [pathname, wallet?.address]);
 
   useEffect(() => {
-    window.ethereum.on("accountsChanged", (accounts) => {
+    window?.ethereum?.on("accountsChanged", (accounts) => {
       if (BeproService.isStarted){
         const address = accounts[0];
         BeproService.login()
