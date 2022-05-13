@@ -39,12 +39,11 @@ export default function NetworkInformationStep({
 
   async function handleBlur(e) {
     const name = e.target.value;
-    const exists =
-      name.trim() !== ""
-        ? /bepro|taikai/gi.test(name)
-          ? false
-          : !(await networkExists(name))
-        : undefined;
+
+    let exists = undefined;
+
+    if (name.trim() !== "")
+      exists =  /bepro|taikai/gi.test(name) ? false : !(await networkExists(name));
 
     changedDataHandler({
       label: "displayName",
