@@ -41,7 +41,7 @@ export default function NetworkInformationStep({
     const name = e.target.value;
     const exists =
       name.trim() !== ""
-        ? (name.toLowerCase().includes("bepro") || name.toLowerCase().includes("taikai"))
+        ? /bepro|taikai/gi.test(name)
           ? false
           : !(await networkExists(name))
         : undefined;
