@@ -47,6 +47,7 @@ const publicRuntimeConfig = {
     allowCustomTokens: process.env.NEXT_PUBLIC_ALLOW_CUSTOM_TOKENS
   },
   currency:{
+    main: process.env.NEXT_PUBLIC_CURRENCY_MAIN,
     apiUrl: process.env.NEXT_PUBLIC_CURRENCY_API,
     currencyId: process.env.NEXT_PUBLIC_CURRENCY_ID,
     currencyCompareList: process.env.NEXT_PUBLIC_CURRENCY_VSLIST,
