@@ -58,7 +58,7 @@ export default function ListIssues({
   emptyMessage,
   buttonMessage,
   pullRequester
-}: ListIssuesProps): JSX.Element {
+}: ListIssuesProps) {
   const {
     dispatch,
     state: { loading }
