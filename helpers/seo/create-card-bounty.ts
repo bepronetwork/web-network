@@ -227,7 +227,7 @@ interface IGenerateResp {
   width: number;
   heigth: number;
   data: Buffer;
-  buffer: any;
+  buffer: Buffer;
 }
 
 export async function generateCard(issue: IGenerateCard): Promise<IGenerateResp> {

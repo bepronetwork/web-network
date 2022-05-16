@@ -11,7 +11,7 @@ export async function middleware(req: NextApiRequest) {
   const method = req.method
   const isInWhiteList = req.url?.split('/api')?.[1]?.split('/')?.some(r=> whiteList.includes(r));
 
-  const {page = {}, url, ip, ua, body} = req as any;
+  const {page = {}, url, ip, ua, body} = req as any; // eslint-disable-line
   const {pathname, search,} = new URL(url);
   
   
