@@ -28,7 +28,7 @@ interface props {
 export default function CreatePullRequestModal({
   show = false,
   onConfirm,
-  onCloseClick = () => {},
+  onCloseClick,
   repo = "",
   title: prTitle = "",
   description: prDescription = ""

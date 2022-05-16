@@ -29,7 +29,11 @@ const differentOrUndefined = (objectA, objectB, property) =>
 export default function OverrideNameModal({
   network,
   show = false,
-  onCloseClick = () => {}
+  onCloseClick
+}: {
+  network: INetwork,
+  show: boolean,
+  onCloseClick: () => void
 }) {
   const { t } = useTranslation(["common", "parity"]);
 

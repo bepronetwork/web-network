@@ -9,7 +9,7 @@ import PageIcon from "assets/icons/page-icon";
 
 import Modal from "components/modal";
 
-export default function HelpModal({ show = false, onCloseClick = () => {} }) {
+export default function HelpModal({ show = false, onCloseClick }: { show: boolean; onCloseClick: () => void }) {
   const { t } = useTranslation("common");
   const helpItem = (title = "", tagline = "", icon, href = "") => ({
     title,

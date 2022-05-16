@@ -20,7 +20,7 @@ export default function Modal({
   titleClass,
   okLabel = "",
   cancelLabel = "",
-  onOkClick = () => {},
+  onOkClick,
   titleComponent,
   ...params
 }: ModalProps) {
