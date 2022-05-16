@@ -226,9 +226,10 @@ export default function PullRequestPage() {
                     )
                   }
 
-{
+                  {
                     wallet?.address &&
                     user?.login &&
+                    networkPullRequest?.isCancelable &&
                     !networkPullRequest?.canceled &&
                     networkPullRequest?.creator?.toLowerCase() === wallet?.address?.toLowerCase() && (
                       <ReadOnlyButtonWrapper>

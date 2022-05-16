@@ -1,15 +1,16 @@
 import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import getConfig from "next/config";
-const { serverRuntimeConfig } = getConfig()
+
+const { serverRuntimeConfig } = getConfig();
 
 import models from "db/models";
 
 export default NextAuth({
   providers: [
     GithubProvider({
-      clientId: serverRuntimeConfig.github.clientId,
-      clientSecret: serverRuntimeConfig.github.secret,
+      clientId: serverRuntimeConfig?.github?.clientId,
+      clientSecret: serverRuntimeConfig?.github?.secret,
       authorization:
         "https://github.com/login/oauth/authorize?scope=read:user+user:email+repo",
       profile(profile: { id; name; login; email; avatar_url }) {
@@ -51,7 +52,7 @@ export default NextAuth({
           where: { githubLogin: profile.login },
           raw: true,
         });
-        if (!user.address)
+        if (!user?.address)
           await models.user.destroy({
             where: { githubLogin: profile.login?.toString() },
           });

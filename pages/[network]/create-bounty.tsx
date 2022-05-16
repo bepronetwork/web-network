@@ -39,7 +39,8 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network";
 import useTransactions from "x-hooks/useTransactions";
-const { publicRuntimeConfig } = getConfig()
+
+const { publicRuntimeConfig } = getConfig();
 interface Amount {
   value?: string;
   formattedValue: string;
@@ -47,7 +48,7 @@ interface Amount {
 }
 
 const BEPRO_TOKEN: Token = {
-  address: publicRuntimeConfig.contract.settler,
+  address: publicRuntimeConfig?.contract?.settler,
   name: "BEPRO",
   symbol: "$BEPRO"
 };
@@ -111,7 +112,7 @@ export default function PageCreateIssue() {
     const strFiles = files?.map((file) =>
         file.uploaded &&
         `${file?.type?.split("/")[0] === "image" ? "!" : ""}[${file.name}](${
-          publicRuntimeConfig.ipfsUrl
+          publicRuntimeConfig?.ipfsUrl
         }/${file.hash}) \n\n`);
     return `${str}\n\n${strFiles
       .toString()
@@ -280,7 +281,7 @@ export default function PageCreateIssue() {
 
     const tmpTokens = [];
 
-    if (activeNetwork.networkAddress === publicRuntimeConfig.contract.address) tmpTokens.push(BEPRO_TOKEN);
+    if (activeNetwork.networkAddress === publicRuntimeConfig?.contract?.address) tmpTokens.push(BEPRO_TOKEN);
 
     tmpTokens.push(...activeNetwork.tokens.map(({name, symbol, address}) => ({name, symbol, address} as Token)));
 
@@ -393,8 +394,8 @@ export default function PageCreateIssue() {
                     defaultToken={BEPRO_TOKEN} 
                     tokens={customTokens} 
                     canAddToken={
-                      activeNetwork?.networkAddress === publicRuntimeConfig.contract.address ? 
-                      publicRuntimeConfig.networkConfig.allowCustomTokens :
+                      activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address ? 
+                      publicRuntimeConfig?.networkConfig?.allowCustomTokens :
                       !!activeNetwork?.allowCustomTokens
                     }
                     addToken={addToken} 

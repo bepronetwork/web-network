@@ -8,7 +8,8 @@ import Step from "components/step";
 import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
 import useNetwork from "x-hooks/use-network";
-const {publicRuntimeConfig} = getConfig()
+
+const { publicRuntimeConfig } = getConfig();
 
 export default function NetworkInformationStep({
   data,
@@ -38,12 +39,11 @@ export default function NetworkInformationStep({
 
   async function handleBlur(e) {
     const name = e.target.value;
-    const exists =
-      name.trim() !== ""
-        ? name.toLowerCase().includes("bepro")
-          ? false
-          : !(await networkExists(name))
-        : undefined;
+
+    let exists = undefined;
+
+    if (name.trim() !== "")
+      exists =  /bepro|taikai/gi.test(name) ? false : !(await networkExists(name));
 
     changedDataHandler({
       label: "displayName",
@@ -113,7 +113,7 @@ export default function NetworkInformationStep({
             {t("custom-network:steps.network-information.fields.name.temporary")}
           </p>
           <p className="caption-small text-gray">
-            {urlWithoutProtocol(publicRuntimeConfig.apiUrl)}/
+            {urlWithoutProtocol(publicRuntimeConfig?.apiUrl)}/
             <span className="text-primary">
               {getQueryableText(data.displayName.data ||
                   t("custom-network:steps.network-information.fields.name.default"))}

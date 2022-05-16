@@ -21,7 +21,7 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
-
+import { useNetwork } from "contexts/network";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
@@ -50,7 +50,8 @@ function OraclesActions() {
 
   const networkTxRef = useRef<HTMLButtonElement>(null);
 
-  const { handleApproveToken } = useBepro()
+  const { handleApproveToken } = useBepro();
+  const { activeNetwork } = useNetwork();
   const { wallet, beproServiceStarted, updateWalletBalance } = useAuthentication();
   const { state: { myTransactions }} = useContext(ApplicationContext);
 
@@ -149,7 +150,8 @@ function OraclesActions() {
 
   function approveSettlerToken() {
     if (!wallet?.address && !beproServiceStarted) return;
-    handleApproveToken(undefined, tokenAmount).then(updateAllowance);
+
+    handleApproveToken(BeproService.network.settlerToken.contractAddress, tokenAmount).then(updateAllowance);
   }
 
   function getCurrentLabel(): TransactionCurrency {
@@ -178,15 +180,17 @@ function OraclesActions() {
   }
 
   function updateAllowance() {
-    BeproService.getAllowance().then(setNetworkTokenAllowance).catch(console.log);
+    BeproService.getSettlerTokenAllowance(activeNetwork?.networkAddress)
+    .then(setNetworkTokenAllowance)
+    .catch(console.log);
   }
 
   const needsApproval = () => tokenAmount > networkTokenAllowance && action === t("my-oracles:actions.lock.label");
 
   useEffect(() => {
-    if (wallet?.address && beproServiceStarted) 
+    if (wallet?.address && beproServiceStarted && activeNetwork?.networkAddress) 
       updateAllowance();
-  }, [wallet, beproServiceStarted]);
+  }, [wallet, beproServiceStarted, activeNetwork?.networkAddress]);
 
   return (
     <>

@@ -10,7 +10,7 @@ import { ThemeColors } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 //Todo: useNetwork was moved to context, refactor this hooks to be a theme-hooks
 
 export default function useNetworkTheme() {
@@ -141,7 +141,7 @@ export default function useNetworkTheme() {
       pathname: `/[network]/${href}`.replace("//", "/"),
       query: {
         ...query,
-        network: query.network || router?.query?.network || publicRuntimeConfig.networkConfig.networkName
+        network: query.network || router?.query?.network || publicRuntimeConfig?.networkConfig?.networkName
       }
     };
   }

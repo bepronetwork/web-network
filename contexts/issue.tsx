@@ -77,7 +77,7 @@ export const IssueProvider: React.FC = function ({ children }) {
   }, [user?.accessToken]);
 
   const updateIssue = useCallback(async (repoId: string | number, ghId: string | number): Promise<IActiveIssue> => {
-    if (!activeNetwork?.name) return;
+    if (!activeNetwork?.name || query?.network !== activeNetwork?.name) return;
 
     const issue = await getIssue(repoId, ghId, activeNetwork?.name);
     
@@ -137,10 +137,17 @@ export const IssueProvider: React.FC = function ({ children }) {
       };
     }
 
+    const pullRequests = bounty.pullRequests
+      .filter(pr => !pr.canceled)
+      .map(pullRequest => ({
+        ...pullRequest,
+        isCancelable: !bounty.proposals.find(proposal => proposal.prId === pullRequest.id),
+      }));
+
     setNetworkIssue({ 
       ...bounty, 
       isDraft, 
-      pullRequests: bounty.pullRequests.filter(pr => !pr.canceled),
+      pullRequests,
       proposals: networkProposals,
       isFinished
     });

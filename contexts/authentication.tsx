@@ -12,13 +12,13 @@ import { useRouter } from "next/router";
 
 import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
 
-import { User } from "interfaces/authentication";
-import { Wallet } from "interfaces/authentication";
+import { User, Wallet } from "interfaces/authentication";
 
 import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
+import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 export interface IAuthenticationContext {
   user?: User;
@@ -27,7 +27,6 @@ export interface IAuthenticationContext {
   beproServiceStarted?: boolean;
   login: () => void;
   updateWalletBalance: () => void;
-  updateIsApprovedSettlerToken: () => void;
 }
 
 const AuthenticationContext = createContext<IAuthenticationContext>({} as IAuthenticationContext);
@@ -55,14 +54,12 @@ export const AuthenticationProvider = ({ children }) => {
 
       await BeproService.login();
 
-      const [isCouncil, isApprovedSettlerToken] = await Promise.all([
-        BeproService.isCouncil(),
-        BeproService.isApprovedSettlerToken()
+      const [isCouncil] = await Promise.all([
+        BeproService.isCouncil()
       ])
 
       setWallet((previousWallet) => ({
         ...previousWallet,
-        isApprovedSettlerToken,
         isCouncil,
         address: BeproService?.address
       }));
@@ -124,16 +121,6 @@ export const AuthenticationProvider = ({ children }) => {
       }}))
   }, [wallet?.address, beproServiceStarted]);
 
-  const updateIsApprovedSettlerToken = useCallback(async ()=>{
-    const [isApprovedSettlerToken] = await Promise.all([
-      BeproService.isApprovedSettlerToken()
-    ])
-    setWallet(previousWallet =>({
-      ...previousWallet,
-      isApprovedSettlerToken
-    }))
-  },[wallet])
-
   // Side effects needed to the context work
   useEffect(() => {
     if (session.status === "authenticated") setUser({ ...session.data.user });
@@ -152,14 +139,12 @@ export const AuthenticationProvider = ({ children }) => {
     if (user && !wallet && beproServiceStarted)
       BeproService.login()
         .then(async() =>{
-          const [isCouncil, isApprovedSettlerToken] = await Promise.all([
+          const [isCouncil] = await Promise.all([
             BeproService.isCouncil(),
-            BeproService.isApprovedSettlerToken()
           ])
           setWallet((previousWallet) => ({
             ...previousWallet,
             isCouncil,
-            isApprovedSettlerToken,
             address: BeproService?.address
           }))})
         .catch(console.log);
@@ -170,22 +155,19 @@ export const AuthenticationProvider = ({ children }) => {
   }, [pathname, wallet?.address]);
 
   useEffect(() => {
-    window.ethereum.on("accountsChanged", (accounts) => {
+    window?.ethereum?.on("accountsChanged", (accounts) => {
       if (BeproService.isStarted){
         const address = accounts[0];
+
         BeproService.login()
-        .then(async () =>{
-          const [isCouncil, isApprovedSettlerToken] = await Promise.all([
-            BeproService.isCouncil(),
-            BeproService.isApprovedSettlerToken()
-          ])
-          setWallet({ address, isCouncil, isApprovedSettlerToken })
+        .then(async () => {
+          const isCouncil = await BeproService.isCouncil();
+
+          setWallet({ address, isCouncil })
         });
       }
     });
-  }, []);
 
-  useEffect(() => {
     const checkBeproServiceStarted = setInterval(() => {
       if (BeproService.isStarted) {
         setBeproServiceStarted(true);
@@ -204,8 +186,7 @@ export const AuthenticationProvider = ({ children }) => {
       beproServiceStarted,
       isGithubAndWalletMatched,
       login,
-      updateWalletBalance,
-      updateIsApprovedSettlerToken
+      updateWalletBalance
   }),
     [user, wallet, beproServiceStarted, isGithubAndWalletMatched]);
 

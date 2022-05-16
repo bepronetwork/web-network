@@ -10,7 +10,7 @@ import networkBeproJs from 'helpers/api/handle-network-bepro';
 import { ProposalHelpers } from "helpers/api/proposal";
 import { PullRequestHelpers } from "helpers/api/pull-request";
 
-const { publicRuntimeConfig } = getConfig();
+const { publicRuntimeConfig, serverRuntimeConfig } = getConfig();
 
 const handler = async (type, helpers, network, customNetwork, fromBlock, toBlock) => {
   const [contractMethod, apiMethod] = helpers[type];
@@ -24,11 +24,11 @@ const handler = async (type, helpers, network, customNetwork, fromBlock, toBlock
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const bulk = await models.chainEvents.findOne({where: {name: `Bulk`}});
-  const fromBlock = bulk?.dataValues?.lastBlock || 1731488;
+  const fromBlock = bulk?.dataValues?.lastBlock || serverRuntimeConfig.schedules.startProcessEventsAt;
   const customNetworks = await models.network.findAll({
     where: {
       name: {
-        [Op.notILike]: `%${publicRuntimeConfig.networkConfig.networkName}%`
+        [Op.notILike]: `%${publicRuntimeConfig?.networkConfig?.networkName}%`
       }
     }
   })
@@ -37,8 +37,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const networks = [{
     id: 1,
-    name: publicRuntimeConfig.networkConfig.networkName, 
-    networkAddress: publicRuntimeConfig.contract.address
+    name: publicRuntimeConfig?.networkConfig?.networkName, 
+    networkAddress: publicRuntimeConfig?.contract?.address
   }, ...customNetworks]
 
   for (const customNetwork of networks) {

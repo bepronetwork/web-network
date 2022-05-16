@@ -45,7 +45,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const [owner, repo] = repository.githubPath.split("/");
 
-  const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
+  const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
 
   const repositoryDetails = await githubAPI<GraphQlResponse>(RepositoryQueries.Details, {
     repo,
@@ -136,7 +136,7 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
       await api.post(`/seo/${issueId}`).catch((e) => {
         console.log("Error creating SEO", e);
       });
-      if (network.contractAddress === publicRuntimeConfig.contract.address)
+      if (network.contractAddress === publicRuntimeConfig?.contract?.address)
         twitterTweet({
           type: "bounty",
           action: "created",

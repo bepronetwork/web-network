@@ -7,7 +7,8 @@ import getConfig from "next/config";
 import { IssueData } from "interfaces/issue-data";
 
 import SEO_CONFIG from "../next-seo-config";
-const {publicRuntimeConfig} = getConfig()
+
+const {publicRuntimeConfig} = getConfig();
 
 interface ISeoProps {
   issueMeta?: IssueData;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormCheck, ListGroup } from "react-bootstrap";
 
 import { BountyToken } from "@taikai/dappkit";
@@ -29,7 +29,7 @@ export default function TokenConfiguration({
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [customTokens, setCustomTokens] = useState<Token[]>([BEPRO_TOKEN]);
-  const [networkToken, setNetworkToken] = useState<Token>(BEPRO_TOKEN);
+  const [networkToken, setNetworkToken] = useState<Token>();
   const [allowCustomTransactionalTokens, setAllowCustomTransactionalTokens] = useState("false");
   const [showModalDeploy, setShowModalDeploy] = useState(false);
 
@@ -55,32 +55,57 @@ export default function TokenConfiguration({
   }
 
   function handleNFTTokenChange(e) {
-    changedDataHandler("tokens", { label: "validated", value: false });
-    changedDataHandler("tokens", { label: "nftToken", value: e.target.value });
+    changedDataHandler("tokens", { label: "nftToken", value: { address: e.target.value, error: false } });
+  }
+
+  function handleNetworkTokenChange(token: Token) {
+    changedDataHandler("tokens", { label: "networkToken", value: token.address });
   }
 
   function setDeployedAddress(address) {
-    changedDataHandler("tokens", { label: "validated", value: true });
-    changedDataHandler("tokens", { label: "nftToken", value: address });
+    changedDataHandler("tokens", { label: "nftToken", value: { address, error: false } });
   }
 
-  async function validateAddress() {
-    if (data.nftToken.trim() === "") return changedDataHandler("tokens", { label: "validated", value: false });
+  async function validateNFTAddress() {
+    if (data.nftToken.address.trim() === "") return false;
 
     try {
-      const token = new BountyToken(BeproService.bepro, data.nftToken);
+      const token = new BountyToken(BeproService.bepro, data.nftToken.address);
 
       await token.loadContract();
+    } catch(error) {
+      changedDataHandler("tokens", { label: "nftToken", value: { ...data.nftToken, error: true } });
 
-      changedDataHandler("tokens", { label: "validated", value: true });
-    } catch (error) {
-      console.log(error);
+      return false;
     }
+
+    return true;
   }
+
+  useEffect(() => {
+    if (data.networkToken.trim() === "") return setNetworkToken(undefined);
+
+    BeproService.getERC20TokenData(data.networkToken).then(setNetworkToken).catch(console.log);
+  }, [data.networkToken]);
+
+  useEffect(() => {
+    if (data.networkToken.trim() === "" || data.nftToken.address.trim() === "") 
+      return changedDataHandler("tokens", { label: "validated", value: false });
+
+    BeproService.getERC20TokenData(data.networkToken).then(data => {
+      setNetworkToken(data);
+
+      return validateNFTAddress();
+    })
+    .then(validated => {
+      changedDataHandler("tokens", { label: "validated", value: validated });
+    })
+    .catch(console.log);
+  }, [data.networkToken, data.nftToken]);
 
   return (
     <Step
-      title="Token Configuration"
+      title={t("custom-network:steps.token-configuration.title")}
       index={step}
       activeStep={currentStep}
       validated={data.validated}
@@ -88,40 +113,45 @@ export default function TokenConfiguration({
       finishLabel={t("custom-network:steps.repositories.submit-label")}
       handleFinish={handleFinish}
     >
-      {/*<div className="row">
+      <div className="row">
         <TokensDropdown 
-          label="Network Token"
-          description="Add an ERC20 token to be used as network token."
-          defaultToken={BEPRO_TOKEN} 
+          label={t("custom-network:steps.token-configuration.fields.tokens-dropdown.label")}
+          description={t("custom-network:steps.token-configuration.fields.tokens-dropdown.description")}
           tokens={customTokens} 
           canAddToken={
-            activeNetwork?.networkAddress === publicRuntimeConfig.contract.address ? 
-            publicRuntimeConfig.networkConfig.allowCustomTokens :
+            activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address ? 
+            publicRuntimeConfig?.networkConfig?.allowCustomTokens :
             !!activeNetwork?.allowCustomTokens
           }
           addToken={addToken} 
-          setToken={setNetworkToken}
+          setToken={handleNetworkTokenChange}
         /> 
       </div>
 
       <div className="row">
         <div className="form-group col-3">
-          <label className="caption-small mb-2">Name</label>
+          <label className="caption-small mb-2">
+            {t("custom-network:steps.token-configuration.fields.name.label")}
+          </label>
           <input type="text" className="form-control" value={networkToken?.name}  readOnly />
         </div>
 
         <div className="form-group col-3">
-          <label className="caption-small mb-2">Symbol</label>
+          <label className="caption-small mb-2">
+          {t("custom-network:steps.token-configuration.fields.symbol.label")}
+          </label>
           <input type="text" className="form-control" value={networkToken?.symbol}  readOnly />
         </div>
 
         <div className="form-group col-6">
-          <label className="caption-small mb-2">Address</label>
+          <label className="caption-small mb-2">
+            {t("custom-network:steps.token-configuration.fields.address.label")}
+          </label>
           <input type="text" className="form-control" value={networkToken?.address}  readOnly />
         </div>
       </div>
 
-      <div className="row">
+      {/* <div className="row">
         <div className="d-flex align-items-center p-small text-white m-0 p-0">
           <FormCheck
             className="form-control-lg pb-0 pr-0 mr-0"
@@ -143,18 +173,36 @@ export default function TokenConfiguration({
 
       <div className="row align-items-center">
         <div className="form-group col-9">
-          <label className="caption-small mb-2">NFT Token Address</label>
+          <label className="caption-small mb-2">
+            {t("custom-network:steps.token-configuration.fields.nft-token.label")}
+          </label>
+
           <input 
             type="text" 
             className="form-control" 
-            value={data.nftToken} 
+            value={data.nftToken.address} 
             onChange={handleNFTTokenChange}
-            onBlur={validateAddress}
+            onBlur={validateNFTAddress}
           />
+
+          {
+            data.nftToken.error && 
+            <small className="small-info text-danger">
+              {t("custom-network:steps.token-configuration.fields.nft-token.error.pre")}
+
+              <a href="https://sdk.dappkit.dev/" target="_blank">
+                {t("custom-network:steps.token-configuration.fields.nft-token.error.mid")}
+              </a>
+              
+              {t("custom-network:steps.token-configuration.fields.nft-token.error.post")}
+            </small>
+          }
         </div>
 
         <div className="col-3 pt-2">
-          <Button onClick={handleShowModal}>Deploy New NFT Token</Button>
+          <Button onClick={handleShowModal}>
+            {t("custom-network:steps.token-configuration.actions.deploy-nft-token")}
+          </Button>
         </div>
       </div>
 

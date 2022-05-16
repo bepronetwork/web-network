@@ -46,7 +46,7 @@ export default async function readPullRequestCanceled(events, network: Network_v
 
           const [owner, repo] = networkPullRequest.originRepo.split("/");
 
-          const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
+          const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
 
           const pullRequestDetails = await githubAPI<GraphQlResponse>(PullRequestQueries.Details, {
             repo,

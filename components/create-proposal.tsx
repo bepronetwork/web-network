@@ -164,7 +164,7 @@ export default function NewProposal({
 
       const currentProposals = networkIssue?.proposals?.map((item) => {
         return {
-          currentPrId: Number(activeIssue?.mergeProposals.find(mp=> +mp.scMergeId === item.id).pullRequestId),
+          currentPrId: Number(activeIssue?.mergeProposals.find(mp=> +mp.scMergeId === item.id)?.pullRequestId),
           prAddressAmount: item.details.map(detail => ({
             amount: Number(detail.percentage),
             address: detail.recipient

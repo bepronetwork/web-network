@@ -12,7 +12,7 @@ import { changeNetworkId } from "contexts/reducers/change-network-id";
 
 import { NetworkColors } from "interfaces/enums/network-colors";
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 
 export default function NetworkIdentifier() {
   const {
@@ -27,7 +27,7 @@ export default function NetworkIdentifier() {
 
     const chainId = (window as any)?.ethereum?.chainId;
     dispatch(changeNetworkId(+chainId));
-    dispatch(changeNetwork((publicRuntimeConfig.networkIds[+chainId] || "unknown")?.toLowerCase()));
+    dispatch(changeNetwork((publicRuntimeConfig?.networkIds[+chainId] || "unknown")?.toLowerCase()));
   }
 
   useEffect(updateNetwork, [wallet?.address]);
@@ -40,7 +40,7 @@ export default function NetworkIdentifier() {
           <span>
             {network}{" "}
             {(network !==
-              publicRuntimeConfig.metaMask.chainName.toLowerCase() &&
+              publicRuntimeConfig?.metaMask?.chainName?.toLowerCase() &&
               "testnet") ||
               ""}
           </span>
