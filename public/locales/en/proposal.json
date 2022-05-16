@@ -30,5 +30,18 @@
     "open-for-dispute": "Open for Dispute",
     "accepted": "Accepted",
     "waiting": "Waiting"
+  },
+  "merge-modal": {
+    "title": "Bounty Distribution",
+    "confirm-merge": "Confirm Merge",
+    "proposal-creator": "Proposal Creator",
+    "proposal-creator-description": "Council Member who proposed this distribution",
+    "proposal-merger": "Merger",
+    "proposal-merger-description": "User who accepted the Bounty’s solution",
+    "contributor": "Contributor {{count}}",
+    "contributor-description": "User who actively participated in the development of the Bounty’s solution",
+    "total": "total",
+    "network-fee": "Network Fee",
+    "network-fee-description": "Network fee to make the transaction"
   }
 }

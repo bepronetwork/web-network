@@ -4,7 +4,9 @@ import { TwitterApi } from "twitter-api-v2";
 import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { IssueState } from "interfaces/issue-data";
-const { publicRuntimeConfig, serverRuntimeConfig } = getConfig()
+
+const { publicRuntimeConfig, serverRuntimeConfig } = getConfig();
+
 function handleState(currentState: IssueState) {
   switch (currentState) {
   case "draft": {
@@ -55,16 +57,16 @@ export default function twitterTweet({
   };
 }) {
   if (
-    serverRuntimeConfig.twitter.apiKey && 
-    serverRuntimeConfig.twitter.apiSecret && 
-    serverRuntimeConfig.twitter.accessToken && 
-    serverRuntimeConfig.twitter.accessSecret 
+    serverRuntimeConfig?.twitter?.apiKey && 
+    serverRuntimeConfig?.twitter?.apiSecret && 
+    serverRuntimeConfig?.twitter?.accessToken && 
+    serverRuntimeConfig?.twitter?.accessSecret 
     ) {
     const twitterClient = new TwitterApi({
-      appKey: serverRuntimeConfig.twitter.apiKey,
-      appSecret: serverRuntimeConfig.twitter.apiSecret,
-      accessToken: serverRuntimeConfig.twitter.accessToken,
-      accessSecret: serverRuntimeConfig.twitter.accessSecret,
+      appKey: serverRuntimeConfig?.twitter?.apiKey,
+      appSecret: serverRuntimeConfig?.twitter?.apiSecret,
+      accessToken: serverRuntimeConfig?.twitter?.accessToken,
+      accessSecret: serverRuntimeConfig?.twitter?.accessSecret,
     });
 
     let title: string;
@@ -108,7 +110,7 @@ export default function twitterTweet({
 
   ${body}
  
-  ${publicRuntimeConfig.homeUrl}/bounty?id=${issue.githubId}&repoId=${
+  ${publicRuntimeConfig?.homeUrl}/bounty?id=${issue.githubId}&repoId=${
       issue.repository_id
     }
   `;

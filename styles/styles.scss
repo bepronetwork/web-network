@@ -163,19 +163,41 @@ li {
       border-radius: 8px;
       border: 1px solid $ligth-gray;
       background-color: $bg-shadow;
+
+      &-list {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
     }
     &__value {
       text-transform: uppercase;
     }
     &__option {
-      @extend .p-small;
+      @extend .p;
       background-color: transparent;
       color: $gray;
+
+      &:only-child {
+        border-radius: 8px;
+      }
+
+      &:first-child {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+      }
+
+      &:last-child {
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
+
       &--is-selected {
-        color: var(--bs-primary);
+        color: $white;
+        background-color: $bg;
       }
       &:hover {
         color: $white;
+        background-color: $dark-gray;
       }
       &:active {
         background-color: transparent;

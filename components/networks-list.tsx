@@ -24,7 +24,8 @@ interface NetworksListProps {
   creatorAddress?: string;
   redirectToHome?: boolean;
 }
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
+
 export default function NetworksList({
   name,
   networkAddress,
@@ -84,7 +85,7 @@ export default function NetworksList({
               href="/new-network"
               label={String(t("actions.create-one"))}
               uppercase
-              blank={network.name !== publicRuntimeConfig.networkConfig.networkName}
+              blank={network.name !== publicRuntimeConfig?.networkConfig?.networkName}
             />
           ) : (
             ""

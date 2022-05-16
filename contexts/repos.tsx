@@ -125,7 +125,11 @@ export const ReposProvider: React.FC = function ({ children }) {
     setRepoList((prevState) => ({
       ...prevState,
       [activeNetwork?.name]: {
-        repos,
+        repos: repos.map(repo => {
+          const [owner, name] = repo.githubPath.split("/");
+
+          return {...repo, owner, name};
+        }),
         lastUpdated: +new Date()
       }
     }));

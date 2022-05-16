@@ -53,11 +53,11 @@ export default async function readPullRequestCreated(events, network: Network_v2
           const [owner, repo] = networkPullRequest.originRepo.split("/");
 
           const issueLink = 
-            `${publicRuntimeConfig.homeUrl}/bounty?id=${bounty.githubId}&repoId=${bounty.repository_id}`;
+            `${publicRuntimeConfig?.homeUrl}/bounty?id=${bounty.githubId}&repoId=${bounty.repository_id}`;
           const body = 
             `@${bounty.creatorGithub}, @${pullRequest.githubLogin} has a solution - [check your bounty](${issueLink})`;
 
-          const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
+          const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
 
           const issueDetails = await githubAPI<GraphQlResponse>(IssueQueries.Details, {
             repo,

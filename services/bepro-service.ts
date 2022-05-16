@@ -18,7 +18,7 @@ import { NetworkParameters } from "types/dappkit";
 const { publicRuntimeConfig } = getConfig();
 class BeproFacet {
   readonly bepro: Web3Connection = new Web3Connection({
-    web3Host: publicRuntimeConfig.web3ProviderConnection
+    web3Host: publicRuntimeConfig?.web3ProviderConnection
   });
 
   network: Network_v2;
@@ -30,7 +30,7 @@ class BeproFacet {
   isLoggedIn = false;
   isNetworkFactoryStarted = false;
 
-  async start(networkAddress = publicRuntimeConfig.contract.address) {
+  async start(networkAddress = publicRuntimeConfig?.contract?.address) {
     try {
       if (!this.isStarted) await this.bepro.start();
       
@@ -38,11 +38,9 @@ class BeproFacet {
 
       await this.network.loadContract();
 
-      //(window as any).network = this.network;
-
       if (!this.isStarted)
         console.table({
-          web3: publicRuntimeConfig.web3ProviderConnection,
+          web3: publicRuntimeConfig?.web3ProviderConnection,
           contract: networkAddress,
           settler: this.network.settlerToken?.contractAddress,
           nft: this.network.nftToken?.contractAddress,
@@ -50,6 +48,8 @@ class BeproFacet {
         });
 
       this.isStarted = true;
+
+      //(window as any).BeproService = this;
     } catch (error) {
       console.log("Failed to Start BeproService", error);
     }
@@ -59,13 +59,13 @@ class BeproFacet {
 
   async startNetworkFactory() {
     try {
-      if (!publicRuntimeConfig.networkConfig.factoryAddress)
+      if (!publicRuntimeConfig?.networkConfig?.factoryAddress)
         console.error("Network Factory Contract is Missing");
       else {
         this.isNetworkFactoryStarted = false;
 
         this.networkFactory = new NetworkFactoryV2(this.bepro,
-          publicRuntimeConfig.networkConfig.factoryAddress);
+          publicRuntimeConfig?.networkConfig?.factoryAddress);
 
         await this.networkFactory.loadContract();
 
@@ -107,13 +107,6 @@ class BeproFacet {
     const erc20 = await this.getERC20Obj(tokenAddress);
 
     return erc20.approve(this.network.contractAddress, amount);
-  }
-
-  async isApprovedSettlerToken() {
-    const network = await this.getNetworkObj();
-    const settler = network.settlerToken;
-
-    return settler.isApproved(network.contractAddress, 1);
   }
 
   async isNetworkAbleToClose(networkAddress = undefined) {
@@ -158,9 +151,9 @@ class BeproFacet {
     return this.networkFactory.unlock();
   }
 
-  async createNetwork(networkToken: string = publicRuntimeConfig.contract.settler, 
-                      nftToken: string = publicRuntimeConfig.contract.nft, 
-                      nftUri = publicRuntimeConfig.nftUri || "//",
+  async createNetwork(networkToken: string = publicRuntimeConfig?.contract?.settler, 
+                      nftToken: string = publicRuntimeConfig?.contract?.nft, 
+                      nftUri = publicRuntimeConfig?.nftUri || "//",
                       treasuryAddress = Defaults.nativeZeroAddress,
                       cancelFee = 10000,
                       closeFee= 50000) {
@@ -198,12 +191,18 @@ class BeproFacet {
     return network.getOraclesResume(this.address);
   }
 
-  async getAllowance(tokenAddress: string = publicRuntimeConfig.contract.settler, 
-                    walletAddress = this.address, 
-                    spenderAddress = this.network.contractAddress) {
+  async getAllowance(tokenAddress: string = publicRuntimeConfig?.contract?.settler, 
+                      walletAddress = this.address, 
+                      spenderAddress = this.network.contractAddress) {
     const erc20 = await this.getERC20Obj(tokenAddress);
 
     return erc20.allowance(walletAddress, spenderAddress);
+  }
+
+  async getSettlerTokenAllowance(networkAddress: string = publicRuntimeConfig?.contract?.address): Promise<number> {
+    const network = await this.getNetworkObj(networkAddress);
+    
+    return this.getAllowance(network.settlerToken.contractAddress, this.address, networkAddress);
   }
 
   async getOraclesOf(address: string) {
@@ -212,14 +211,20 @@ class BeproFacet {
     return network.getOraclesOf(address);
   }
 
+  async getERC20TokenData(tokenAddress): Promise<Token> {
+    const token = await this.getERC20Obj(tokenAddress);
+
+    return {
+      name: await token.name(),
+      symbol: await token.symbol(),
+      address: tokenAddress
+    };
+  }
+
   async getSettlerTokenData(networkAddress = undefined): Promise<Token> {
     const network = await this.getNetworkObj(networkAddress);
 
-    return {
-      name: await network.settlerToken.name(),
-      symbol: await network.settlerToken.symbol(),
-      address: network.settlerToken.contractAddress
-    };
+    return this.getERC20TokenData(network.settlerToken.contractAddress);
   }
 
   async getClosedBounties(networkAddress = undefined) {

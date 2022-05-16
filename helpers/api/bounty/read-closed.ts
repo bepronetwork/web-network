@@ -55,7 +55,7 @@ export default async function readBountyClosed(events, network: Network_v2, cust
           if (pullRequest) {
             const [owner, repo] = bounty.repository.githubPath.split("/");
             
-            const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
+            const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
 
             const issueDetails = await githubAPI<GraphQlResponse>(IssueQueries.Details, {
               repo,
@@ -111,10 +111,17 @@ export default async function readBountyClosed(events, network: Network_v2, cust
             bounty.merged = proposal.scMergeId;
             bounty.state = "closed";
             await bounty.save();
+            await Promise.all(networkBounty?.proposals?.[0].details.map(async(detail) =>
+              models.userPayments.create({
+                address: detail?.['recipient'],
+                ammount: Number((detail?.['percentage'] / 100) * networkBounty?.tokenAmount) || 0,
+                issueId:  bounty?.id,
+                transactionHash: event?.transactionHash || null
+              })))
 
             closedBounties.push(bounty.issueId);
         
-            if (network.contractAddress === publicRuntimeConfig.contract.address)
+            if (network.contractAddress === publicRuntimeConfig?.contract?.address)
               twitterTweet({
                 type: "bounty",
                 action: "distributed",

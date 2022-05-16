@@ -8,7 +8,7 @@ import ChangeTokenModal from "components/change-token-modal";
 import { Token } from "interfaces/token";
 
 interface TokensDropdownProps {
-  defaultToken: Token;
+  defaultToken?: Token;
   tokens: Token[];
   canAddToken?: boolean;
   label?: string;
@@ -69,7 +69,7 @@ export default function TokensDropdown({
         createOptionPosition="first"
         formatCreateLabel={formatCreateLabel}
         onChange={handleChange}
-        defaultValue={tokenToOption(defaultToken)}
+        defaultValue={defaultToken && tokenToOption(defaultToken)}
         options={options}
         value={option}
       />

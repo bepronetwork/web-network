@@ -119,7 +119,7 @@ export default function LockBeproStep({
   }
 
   function updateAllowance() {
-    BeproService.getAllowance(undefined, undefined, publicRuntimeConfig.networkConfig.factoryAddress)
+    BeproService.getAllowance(undefined, undefined, publicRuntimeConfig?.networkConfig?.factoryAddress)
     .then(setSettlerAllowance);
   }
 

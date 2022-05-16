@@ -12,12 +12,12 @@ export interface Repository {
   name: string;
   nameWithOwner: string;
   isFork: boolean;
+  isOrganization?: boolean;
 }
 
 export interface Wallet {
   address: string;
   isCouncil: boolean;
-  isApprovedSettlerToken: boolean;
   balance?: IBalance;
 }
 

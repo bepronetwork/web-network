@@ -435,8 +435,8 @@ export default function PageActions({
         onConfirm={handlePullrequest}
         repo={
           (githubLogin &&
-            repoPath &&
-            [githubLogin, repoPath.split("/")[1]].join("/")) ||
+            repoPath) &&
+            repoPath ||
           ""
         }
         onCloseClick={() => setShowPRModal(false)}

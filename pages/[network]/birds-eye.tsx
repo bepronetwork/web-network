@@ -16,7 +16,8 @@ import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
+
 export default function FalconPunchPage() {
   const [userList, setUserList] = useState<
     { created_at: string; login: string; public_repos: number; eth: number }[]
@@ -94,7 +95,7 @@ export default function FalconPunchPage() {
   useEffect(() => {
     if (!wallet?.address) return;
 
-    if (wallet.address !== publicRuntimeConfig.adminWalletAddress)
+    if (wallet.address !== publicRuntimeConfig?.adminWalletAddress)
       router.push("/");
   }, [wallet?.address]);
 

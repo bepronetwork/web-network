@@ -310,7 +310,7 @@ export default function ListIssues({
           hasMore={hasMore}>
           {issuesPages.map(({ issues }) => {
             return issues?.map((issue) => (
-              <IssueListItem issue={issue} />
+              <IssueListItem issue={issue} key={`${issue.repository_id}/${issue.githubId}`} />
             ));
           })}
         </InfiniteScroll>

@@ -24,7 +24,9 @@ import useNetworkTheme from "x-hooks/use-network";
 
 import Button from "./button";
 import InternalLink from "./internal-link";
-const { publicRuntimeConfig } = getConfig()
+
+const { publicRuntimeConfig } = getConfig();
+
 export default function TransactionModal({
   transaction = null,
   onCloseClick,
@@ -96,7 +98,7 @@ export default function TransactionModal({
   }
 
   function getEtherScanHref(tx: string) {
-    return `//${publicRuntimeConfig.metaMask.blockScanUrl}/tx/${tx}`;
+    return `//${publicRuntimeConfig?.metaMask?.blockScanUrl}/tx/${tx}`;
   }
 
   return (
@@ -150,7 +152,7 @@ export default function TransactionModal({
           <span className="text-ligth-gray">{t("misc.on")}</span>
           <InternalLink
             className={`${
-              transaction?.network?.name === publicRuntimeConfig.networkConfig.networkName
+              transaction?.network?.name === publicRuntimeConfig?.networkConfig?.networkName
                 ? " text-primary "
                 : ""
             } p-0 ml-1`}

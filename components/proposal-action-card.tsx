@@ -2,8 +2,6 @@ import React, { useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
-import LockedIcon from "assets/icons/locked-icon";
-
 import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
@@ -15,6 +13,7 @@ import { pullRequest } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
 import Button from "./button";
+import ProposalMerge from "./proposal-merge";
 import ProposalProgressBar from "./proposal-progress-bar";
 
 interface IProposalActionCardProps {
@@ -35,7 +34,7 @@ export default function ProposalActionCard({
   onRefuse
 }: IProposalActionCardProps) {
   const { t } = useTranslation(["common", "pull-request"]);
-  const { networkIssue } = useIssue();
+  const { networkIssue, activeIssue } = useIssue();
   const { activeNetwork } = useNetwork();
   const { wallet } = useAuthentication();
 
@@ -94,17 +93,14 @@ export default function ProposalActionCard({
             </span>
           )}
           <div className="d-flex flex-row justify-content-between mt-3">
-            <Button
-              className="flex-grow-1"
-              textClass="text-uppercase text-white"
-              disabled={!canMerge()}
-              onClick={onMerge}
-            >
-              {!canMerge() && (
-                  <LockedIcon width={12} height={12} className="mr-1" />
-                )}
-              <span>{t("actions.merge")}</span>
-            </Button>
+
+            <ProposalMerge 
+              amountTotal={activeIssue?.amount} 
+              tokenSymbol={activeIssue?.token?.symbol} 
+              proposal={networkProposal} 
+              onClickMerge={onMerge}
+              canMerge={!canMerge()}
+            />
 
               {!isSuccess() && !isDisable() && (
                 <Button
