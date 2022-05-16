@@ -23,6 +23,7 @@ import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 
+import { handleNetworkAddress } from "helpers/custom-network";
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
@@ -180,7 +181,7 @@ function OraclesActions() {
   }
 
   function updateAllowance() {
-    BeproService.getSettlerTokenAllowance(activeNetwork?.networkAddress)
+    BeproService.getSettlerTokenAllowance(handleNetworkAddress(activeNetwork))
     .then(setNetworkTokenAllowance)
     .catch(console.log);
   }
