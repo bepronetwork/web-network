@@ -100,7 +100,7 @@ export default function PullRequestPage() {
 
     handleMakePullRequestReady(activeIssue?.contractId, pullRequest?.contractId)
     .then(txInfo => {
-      const { blockNumber: fromBlock } = txInfo as any;
+      const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
       return processEvent("pull-request", "ready", activeNetwork?.name, { fromBlock });
     })
     .then(() => {
@@ -129,7 +129,7 @@ export default function PullRequestPage() {
 
     handleCancelPullRequest(activeIssue?.contractId, pullRequest?.contractId)
     .then(txInfo => {
-      const { blockNumber: fromBlock } = txInfo as any;
+      const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
       return processEvent("pull-request", "canceled", activeNetwork?.name, { fromBlock });
     })
     .then(() => {
