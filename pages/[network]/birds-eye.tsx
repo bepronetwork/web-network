@@ -18,9 +18,16 @@ import useApi from "x-hooks/use-api";
 
 const { publicRuntimeConfig } = getConfig();
 
+interface PropsUserList extends Partial<User> {
+   created_at: string; 
+   login: string; 
+   public_repos: number; 
+   eth: number 
+}
+
 export default function FalconPunchPage() {
   const [userList, setUserList] = useState<
-    { created_at: string; login: string; public_repos: number; eth: number }[]
+  PropsUserList[]
   >([]);
 
   const { getAllUsers } = useApi();
@@ -58,10 +65,13 @@ export default function FalconPunchPage() {
       githubLogin,
       address
     }: Partial<User>) {
-      const ghInfo = await getGithubInfo(githubLogin);
+      const {login, public_repos, created_at}: 
+      Partial<{ login: string, 
+                public_repos: number, 
+                created_at: string }> = await getGithubInfo(githubLogin);
       const eth = await hasEthBalance(address);
 
-      setUserList((prev) => [...(prev as any), { ...ghInfo, eth }]);
+      setUserList((prev) => [...prev, { login, public_repos, created_at, eth }]);
     }
 
     getAllUsers()

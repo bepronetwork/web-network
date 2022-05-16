@@ -434,7 +434,11 @@ export default function useApi() {
       });
   }
 
-  async function uploadFiles(files: File | File[]): Promise<any[]> {
+  async function uploadFiles(files: File | File[]): Promise<void | {
+    hash: string;
+    fileName: string;
+    size: string;
+}[]> {
     const form = new FormData();
     const isArray = Array.isArray(files);
     if (isArray) {

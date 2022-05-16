@@ -1,4 +1,4 @@
-import { forwardRef, useContext, useEffect, useState } from "react";
+import { forwardRef, useContext, useEffect, useState, ReactChild } from "react";
 
 import { useTranslation } from "next-i18next";
 
@@ -27,14 +27,17 @@ import useTransactions from "x-hooks/useTransactions";
 
 interface NetworkTxButtonParams {
   txMethod: string;
-  txParams: any;
+  txParams: {
+    from?: string,
+    tokenAmount?: number
+  }
   onTxStart?: () => void;
   onSuccess: () => void;
   onFail: (message?: string) => void;
   modalTitle: string;
   modalDescription: string;
   buttonLabel?: string;
-  children?: JSX.Element;
+  children?: ReactChild | ReactChild[];
   disabled?: boolean;
   txType: TransactionTypes;
   txCurrency: TransactionCurrency;
