@@ -9,17 +9,19 @@ import { parseCookies, setCookie } from "nookies";
 
 import NetworkThemeInjector from "components/custom-network/network-theme-injector";
 
+import { useAuthentication } from "contexts/authentication";
+
 import { INetwork } from "interfaces/network";
 
 import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 
-const { publicRuntimeConfig } = getConfig()
-import { useAuthentication } from "./authentication";
+const { publicRuntimeConfig } = getConfig();
+
 export interface NetworkContextData {
   activeNetwork: INetwork;
-  updateActiveNetwork: () => void;
+  updateActiveNetwork: (forced?: boolean) => void;
 }
 
 const NetworkContext = createContext<NetworkContextData>({} as NetworkContextData);
@@ -43,6 +45,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
     if (activeNetwork?.name === networkName && !forced) return activeNetwork;
 
     const networkFromStorage = parseCookies()[`${cookieKey}:${networkName}`];
+    
     if (networkFromStorage && !forced) {
       return setActiveNetwork(JSON.parse(networkFromStorage));
     }

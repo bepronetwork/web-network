@@ -2,11 +2,12 @@ import axios from "axios";
 import withCors from 'middleware/withCors';
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
-const {serverRuntimeConfig} = getConfig()
+
+const { serverRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const key = serverRuntimeConfig.ipApi.key;
-  if (serverRuntimeConfig.ipApi.skip)
+  const key = serverRuntimeConfig?.ipApi?.key;
+  if (serverRuntimeConfig?.ipApi?.skip)
     return res.status(200).json({ countryCode: "PT" });
 
   console.log({

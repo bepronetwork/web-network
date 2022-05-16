@@ -14,7 +14,7 @@ import client from "services/api";
 
 import { Entities, Events } from "types/dappkit";
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 interface Paginated<T = any> {
   count: number;
   rows: T[];
@@ -48,7 +48,7 @@ export default function useApi() {
                            order = "DESC",
                            address = "",
                            creator = "",
-                           networkName = publicRuntimeConfig.currency.networkConfig.networkName) {
+                           networkName = publicRuntimeConfig?.currency?.networkConfig?.networkName) {
     const search = new URLSearchParams({
       address,
       page,
@@ -77,7 +77,7 @@ export default function useApi() {
     creator = "",
     search = "",
     pullRequester = "",
-    networkName = publicRuntimeConfig.currency.networkConfig.networkName
+    networkName = publicRuntimeConfig?.currency?.networkConfig?.networkName
   }) {
     const params = new URLSearchParams({
       address,
@@ -108,7 +108,7 @@ export default function useApi() {
     owner = "",
     name = "",
     path = "",
-    networkName = publicRuntimeConfig.currency.networkConfig.networkName
+    networkName = publicRuntimeConfig?.currency?.networkConfig?.networkName
   }) {
     const params = new URLSearchParams({
       page,
@@ -125,7 +125,7 @@ export default function useApi() {
 
   async function getIssue(repoId: string | number, 
                           ghId: string | number,
-                          networkName = publicRuntimeConfig.networkConfig.networkName) {
+                          networkName = publicRuntimeConfig?.networkConfig?.networkName) {
     return client
       .get<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`)
       .then(({ data }) => data)
@@ -140,7 +140,7 @@ export default function useApi() {
   }
 
   async function createIssue(payload: NewIssueParams,
-                             networkName = publicRuntimeConfig.networkConfig.networkName) {
+                             networkName = publicRuntimeConfig?.networkConfig?.networkName) {
     return client
       .post<number>("/issue", { ...payload, networkName })
       .then(({ data }) => data)
@@ -154,7 +154,7 @@ export default function useApi() {
    * @returns string
    */
   async function createPreBounty(payload: CreateBounty,
-                                 networkName = publicRuntimeConfig.networkConfig.networkName): Promise<string> {
+                                 networkName = publicRuntimeConfig?.networkConfig?.networkName): Promise<string> {
     return client
         .post("/issue", { ...payload, networkName })
         .then(({ data }) => data)
@@ -173,7 +173,7 @@ export default function useApi() {
   async function patchIssueWithScId(repoId,
                                     githubId,
                                     scId,
-                                    networkName = publicRuntimeConfig.networkConfig.networkName) {
+                                    networkName = publicRuntimeConfig?.networkConfig?.networkName) {
     return client
       .patch("/issue", { repoId, githubId, scId, networkName })
       .then(({ data }) => data === "ok")
@@ -182,7 +182,7 @@ export default function useApi() {
 
   async function getPendingFor(address: string,
                                page = "1",
-                               networkName = publicRuntimeConfig.networkConfig.networkName) {
+                               networkName = publicRuntimeConfig?.networkConfig?.networkName) {
     const search = new URLSearchParams({
       address,
       page,
@@ -203,7 +203,7 @@ export default function useApi() {
       username: string;
       branch: string;
     },
-                                      networkName = publicRuntimeConfig.networkConfig.networkName) {
+                                      networkName = publicRuntimeConfig?.networkConfig?.networkName) {
     return client
       .post("/pull-request/", { ...payload, repoId, githubId, networkName })
       .then(({ data }) => data)
@@ -275,7 +275,8 @@ export default function useApi() {
     return client.get<number>("/search/users/total").then(({ data }) => data);
   }
   
-  async function getTotalBounties(state: string, networkName = publicRuntimeConfig.networkConfig.networkName): Promise<number> {
+  async function getTotalBounties(state: string, 
+                                  networkName = publicRuntimeConfig?.networkConfig?.networkName): Promise<number> {
     const search = new URLSearchParams({ state, networkName }).toString();
     return client.get<number>(`/search/issues/total?${search}`).then(({ data }) => data);
   }
@@ -287,7 +288,7 @@ export default function useApi() {
       .catch(() => []);
   }
 
-  async function createRepo(owner, repo, networkName = publicRuntimeConfig.networkConfig.networkName) {
+  async function createRepo(owner, repo, networkName = publicRuntimeConfig?.networkConfig?.networkName) {
     return client
       .post("/repos/", { owner, repo, networkName })
       .then(({ status }) => status === 200)
@@ -297,7 +298,7 @@ export default function useApi() {
       });
   }
 
-  async function getReposList(force = false, networkName = publicRuntimeConfig.networkConfig.networkName) {
+  async function getReposList(force = false, networkName = publicRuntimeConfig?.networkConfig?.networkName) {
     const search = new URLSearchParams({ networkName }).toString();
 
     if (!force && repoList.length)
@@ -318,7 +319,7 @@ export default function useApi() {
 
   async function processEvent(entity: Entities, 
                               event: Events, 
-                              networkName: string = publicRuntimeConfig.networkConfig.networkName,
+                              networkName: string = publicRuntimeConfig?.networkConfig?.networkName,
                               params: PastEventsParams = {}) {
     return client.post(`/past-events/${entity}/${event}`, {
       ...params,
@@ -344,7 +345,7 @@ export default function useApi() {
 
   async function userHasPR(issueId: string,
                            login: string,
-                           networkName = publicRuntimeConfig.networkConfig.networkName) {
+                           networkName = publicRuntimeConfig?.networkConfig?.networkName) {
     const search = new URLSearchParams({
       issueId,
       login,
@@ -362,7 +363,7 @@ export default function useApi() {
 
   async function getUserPullRequests(page = "1",
                                      login: string,
-                                     networkName = publicRuntimeConfig.networkConfig.networkName) {
+                                     networkName = publicRuntimeConfig?.networkConfig?.networkName) {
     const search = new URLSearchParams({ page, login, networkName }).toString();
 
     return client
@@ -376,7 +377,7 @@ export default function useApi() {
 
   async function startWorking(issueId: string,
                               githubLogin: string,
-                              networkName = publicRuntimeConfig.networkConfig.networkName) {
+                              networkName = publicRuntimeConfig?.networkConfig?.networkName) {
     return client
       .put("/issue/working", { issueId, githubLogin, networkName })
       .then((response) => response)
@@ -389,7 +390,7 @@ export default function useApi() {
                                   pullRequestId: string,
                                   mergeProposalId: string,
                                   address: string,
-                                  networkName = publicRuntimeConfig.networkConfig.networkName) {
+                                  networkName = publicRuntimeConfig?.networkConfig?.networkName) {
     return client
       .post("/pull-request/merge", {
         issueId,
@@ -408,7 +409,7 @@ export default function useApi() {
                                    pullRequestId: string,
                                    githubLogin: string,
                                    body: string,
-                                   networkName = publicRuntimeConfig.networkConfig.networkName) {
+                                   networkName = publicRuntimeConfig?.networkConfig?.networkName) {
     return client
       .put("/pull-request/review", {
         issueId,
@@ -533,7 +534,7 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
-  async function getCurrencyByToken(tokenId = publicRuntimeConfig.currency.currencyId, comparedToken?: string) {
+  async function getCurrencyByToken(tokenId = publicRuntimeConfig?.currency?.currencyId, comparedToken?: string) {
     const params:{ids: string, vs_currencies?: string} = {
         ids: tokenId,
     }
@@ -541,7 +542,7 @@ export default function useApi() {
     if(comparedToken) params.vs_currencies = comparedToken
 
     try {
-      const { data } = await axios.get(`${publicRuntimeConfig.currency.apiUrl}/simple/price`, {
+      const { data } = await axios.get(`${publicRuntimeConfig?.currency?.apiUrl}/simple/price`, {
         params
       });
 

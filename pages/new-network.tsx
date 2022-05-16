@@ -31,7 +31,8 @@ import useNetworkTheme from "x-hooks/use-network";
 import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
+
 export default function NewNetwork() {
   const router = useRouter();
 
@@ -115,7 +116,7 @@ export default function NewNetwork() {
       if (stepToGo < currentStep) canGo = true;
       else if (steps[stepsNames[stepToGo - 1]].validated) canGo = true;
     }
-
+    
     if (canGo) setCurrentStep(stepToGo);
   }
 
@@ -126,14 +127,14 @@ export default function NewNetwork() {
 
     await BeproService.startNetworkFactory();
 
-    BeproService.createNetwork()
+    BeproService.createNetwork(steps.tokens.networkToken, steps.tokens.nftToken.address)
       .then(() => {
         BeproService.getNetworkAdressByCreator(wallet.address).then(async (networkAddress) => {
           const networkData = steps.network.data;
           const repositoriesData = steps.repositories;
 
           await BeproService.claimNetworkGovernor(networkAddress);
-          await BeproService.setNFTTokenDispatcher(steps.tokens.nftToken, networkAddress);
+          await BeproService.setNFTTokenDispatcher(steps.tokens.nftToken.address, networkAddress);
 
           const json = {
               name: networkData.displayName.data,
@@ -177,8 +178,8 @@ export default function NewNetwork() {
   useEffect(() => {
     if (!network) return;
 
-    if (network.name !== publicRuntimeConfig.networkConfig.networkName)
-      router.push(getURLWithNetwork("/account", { network: publicRuntimeConfig.networkConfig.networkName }));
+    if (network.name !== publicRuntimeConfig?.networkConfig?.networkName)
+      router.push(getURLWithNetwork("/account", { network: publicRuntimeConfig?.networkConfig?.networkName }));
     else if (!Object.keys(steps.network.data.colors.data).length) {
       const tmpSteps = Object.assign({}, steps);
 
@@ -193,7 +194,7 @@ export default function NewNetwork() {
       getUserRepositories(user.login).then(repos => {
         const repositories = 
           repos
-          .filter(repo => !repo.isFork && repo.nameWithOwner.split("/")[0] === user.login)
+          .filter(repo => (!repo.isFork && (user?.login === repo.nameWithOwner.split("/")[0])) || repo.isOrganization)
           .map(repo => ({
             checked: false,
             name: repo.name,

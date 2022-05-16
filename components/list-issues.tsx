@@ -311,7 +311,7 @@ export default function ListIssues({
         >
           {issuesPages.map(({ issues }) => {
             return issues?.map((issue) => (
-              <IssueListItem issue={issue} key={issue.githubId} />
+              <IssueListItem issue={issue} key={`${issue.repository_id}/${issue.githubId}`} />
             ));
           })}
         </InfiniteScroll>

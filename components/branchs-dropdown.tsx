@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
+import IconOption from "components/icon-option";
 import ReactSelect from "components/react-select";
 
 import { useRepos } from "contexts/repos";
@@ -22,6 +23,7 @@ export default function BranchsDropdown({
     }
 
     const branchs = await findBranch(repoId);
+
     setOptions(branchs.map(mapRepo));
   }
 
@@ -40,6 +42,9 @@ export default function BranchsDropdown({
         options={options}
         onChange={onSelected}
         placeholder={t("forms.select-placeholder")}
+        components={{
+          Option: IconOption
+        }}
       />
     </div>
   );

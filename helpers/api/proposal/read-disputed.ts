@@ -47,7 +47,7 @@ export default async function readProposalDisputed(events, network: Network_v2, 
           });
 
           if (proposal) {
-            if (network.contractAddress === publicRuntimeConfig.contract.address) {
+            if (network.contractAddress === publicRuntimeConfig?.contract?.address) {
               twitterTweet({
                 type: "proposal",
                 action: "failed",

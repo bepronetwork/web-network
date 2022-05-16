@@ -7,7 +7,7 @@ import ConnectGithub from "components/connect-github";
 import RepositoriesList from "components/custom-network/repositories-list";
 import Step from "components/step";
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 
 export default function SelectRepositoriesStep({
   data,
@@ -38,7 +38,7 @@ export default function SelectRepositoriesStep({
           <RepositoriesList repositories={data.data} onClick={onClick} />
 
           <span className="caption-small text-gray px-0 mt-3">
-            {publicRuntimeConfig.github.user}
+            {publicRuntimeConfig?.github?.user}
           </span>
 
           <div className="d-flex align-items-center p-small text-white px-0 m-0 p-0">
@@ -49,7 +49,7 @@ export default function SelectRepositoriesStep({
               onChange={handleCheck}
             />
             <span>
-              {t("steps.repositories.give-access", { user: publicRuntimeConfig.github.user })}
+              {t("steps.repositories.give-access", { user: publicRuntimeConfig?.github?.user })}
             </span>
           </div>
 

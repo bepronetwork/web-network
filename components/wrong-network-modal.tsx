@@ -13,7 +13,8 @@ import { NETWORKS } from "helpers/networks";
 import { NetworkColors } from "interfaces/enums/network-colors";
 
 import Button from "./button";
-const { networkIds, metaMask } = getConfig().publicRuntimeConfig;
+
+const { publicRuntimeConfig } = getConfig();
 
 export default function WrongNetworkModal({
   requiredNetworkId = null,
@@ -39,7 +40,7 @@ export default function WrongNetworkModal({
   async function handleAddNetwork() {
     setIsAddingNetwork(true);
     setError("");
-    const chainId = `0x${Number(metaMask.chainId).toString(16)}`;
+    const chainId = `0x${Number(publicRuntimeConfig?.metaMask?.chainId).toString(16)}`;
     const currencyNetwork = NETWORKS[chainId];
     try {
       await window.ethereum.request({
@@ -96,8 +97,8 @@ export default function WrongNetworkModal({
       <div className="d-flex flex-column text-center align-items-center">
         <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
           {t("modals.wrong-network.please-connect")}{" "}
-          <span style={{ color: NetworkColors[networkIds[requiredNetworkId]] }}>
-            <span>{networkIds[requiredNetworkId]}</span>{" "}
+          <span style={{ color: NetworkColors[publicRuntimeConfig?.networkIds[requiredNetworkId]] }}>
+            <span>{publicRuntimeConfig?.networkIds[requiredNetworkId]}</span>{" "}
             {t("modals.wrong-network.network")}
           </span>
           <br /> {t("modals.wrong-network.on-your-wallet")}

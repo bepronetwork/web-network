@@ -8,7 +8,7 @@ export interface Token {
 }
 
 export const BEPRO_TOKEN: Token = {
-  address: publicRuntimeConfig.contract.settler,
+  address: publicRuntimeConfig?.contract?.settler,
   name: "BEPRO",
   symbol: "$BEPRO"
 };

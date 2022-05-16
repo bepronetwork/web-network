@@ -84,7 +84,7 @@ const defaultState: GlobalState = {
 };
 
 export const ApplicationContext = createContext<GlobalState>(defaultState);
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 
 const cheatAddress = "";
 let waitingForTx = null;
@@ -117,7 +117,7 @@ export default function ApplicationContextProvider({ children }) {
 
     window.ethereum.on("chainChanged", (evt) => {
       dispatch(changeNetworkId(+evt?.toString()));
-      dispatch(changeNetwork((publicRuntimeConfig.networkIds[+evt?.toString()] || "unknown")?.toLowerCase()));
+      dispatch(changeNetwork((publicRuntimeConfig?.networkIds[+evt?.toString()] || "unknown")?.toLowerCase()));
     });
 
     if (txListener) clearInterval(txListener);

@@ -35,7 +35,7 @@ import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 
 export default function ParityPage() {
   const { t } = useTranslation(["common", "parity"]);
@@ -377,7 +377,7 @@ export default function ParityPage() {
   useEffect(() => {
     if (!wallet?.address) return;
 
-    if (wallet?.address !== publicRuntimeConfig.adminWalletAddress)
+    if (wallet?.address !== publicRuntimeConfig?.adminWalletAddress)
       router.push("/account");
 
     getSelfRepos();
@@ -432,14 +432,14 @@ export default function ParityPage() {
               </div>
               <div className="col-1 d-flex align-items-center justify-content-center">
                 <Image
-                  src={`${publicRuntimeConfig.ipfsUrl}/${networkItem.logoIcon}`}
+                  src={`${publicRuntimeConfig?.ipfsUrl}/${networkItem.logoIcon}`}
                   width={30}
                   height={30}
                 />
               </div>
               <div className="col-2 d-flex align-items-center justify-content-center">
                 <Image
-                  src={`${publicRuntimeConfig.ipfsUrl}/${networkItem.fullLogo}`}
+                  src={`${publicRuntimeConfig?.ipfsUrl}/${networkItem.fullLogo}`}
                   width={150}
                   height={30}
                 />

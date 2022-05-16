@@ -39,7 +39,7 @@ import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
 import useOctokitGraph from "x-hooks/use-octokit-graph";
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 interface NetworkAmounts {
   tokenStaked: number;
   oraclesStaked: number;
@@ -111,22 +111,22 @@ export default function Settings() {
 
     setNewInfo(tmpInfo);
 
-    const redeemTime = await BeproService.getNetworkParameter("draftTime");
-    const disputeTime = await BeproService.getNetworkParameter("disputableTime");
+    const redeemTime = await BeproService.getNetworkParameter("draftTime").then(time => time / 1000);
+    const disputeTime = await BeproService.getNetworkParameter("disputableTime").then(time => time / 1000);
     const councilAmount = await BeproService.getNetworkParameter("councilAmount");
     const percentageForDispute =
       await BeproService.getNetworkParameter("percentageNeededForDispute");
 
     const tmpInfo2 = Object.assign({}, tmpInfo);
 
-    tmpInfo2.redeemTime = redeemTime / 1000;
-    tmpInfo2.disputeTime = disputeTime / 1000;
+    tmpInfo2.redeemTime = redeemTime;
+    tmpInfo2.disputeTime = disputeTime;
     tmpInfo2.councilAmount = councilAmount;
     tmpInfo2.percentageForDispute = percentageForDispute;
 
     setCurrentNetworkParameters({
-      redeemTime,
-      disputeTime,
+      redeemTime: redeemTime,
+      disputeTime: disputeTime,
       councilAmount,
       percentageForDispute
     });
@@ -171,7 +171,7 @@ export default function Settings() {
         const githubRepos = await getUserRepositories(user?.login);
 
         const repos = githubRepos
-        .filter(repo => !repo.isFork && (user?.login === repo.nameWithOwner.split("/")[0]))
+        .filter(repo => (!repo.isFork && (user?.login === repo.nameWithOwner.split("/")[0])) || repo.isOrganization)
         .map((repo) => ({
           checked: false,
           isSaved: false,
@@ -257,7 +257,7 @@ export default function Settings() {
     };
 
     updateNetwork(json)
-      .then(async (result) => {
+      .then(async () => {
         if (currentNetworkParameters.redeemTime !== newInfo.redeemTime)
           await BeproService.setNetworkParameter("draftTime", newInfo.redeemTime).catch(console.log);
 
@@ -282,7 +282,7 @@ export default function Settings() {
 
         setUpdatingNetwork(false);
 
-        updateActiveNetwork();
+        updateActiveNetwork(true);
         loadData();
       })
       .catch((error) => {
@@ -632,8 +632,8 @@ export default function Settings() {
                     label={t("custom-network:redeem-time")}
                     max={+publicRuntimeConfig?.networkConfig?.reedemTime?.max}
                     description={t("custom-network:errors.redeem-time", {
-                      min: +publicRuntimeConfig.networkConfig.reedemTime.min,
-                      max: formatNumberToCurrency(+publicRuntimeConfig.networkConfig.reedemTime.max, 0)
+                      min: +publicRuntimeConfig?.networkConfig?.reedemTime?.min,
+                      max: formatNumberToCurrency(+publicRuntimeConfig?.networkConfig?.reedemTime?.max, 0)
                     })}
                     symbol="seconds"
                     value={newInfo.redeemTime}
