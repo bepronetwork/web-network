@@ -5,7 +5,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next/types";
 
 import ListIssues from "components/list-issues";
-import PageHero, { IInfosHero } from "components/page-hero";
+import PageHero, { InfosHero } from "components/page-hero";
 
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
@@ -21,7 +21,7 @@ export default function PageDevelopers() {
   const { beproServiceStarted } = useAuthentication();
   const { getTotalUsers } = useApi();
 
-  const [infos, setInfos] = useState<IInfosHero[]>([
+  const [infos, setInfos] = useState<InfosHero[]>([
     {
       value: 0,
       label: t("heroes.in-progress")

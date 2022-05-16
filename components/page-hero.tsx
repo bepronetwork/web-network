@@ -7,19 +7,20 @@ import { Currency } from "interfaces/currency";
 
 import CustomContainer from "./custom-container";
 
-export interface IInfosHero {
+export interface InfosHero {
   value: number;
   label: string;
   currency?: Currency;
+  key?: string;
 }
 
-export interface IPageHeroProps {
+export interface PageHeroProps {
   title: string;
   subtitle?: string;
-  infos: IInfosHero[];
+  infos: InfosHero[];
 }
 
-function InfoComponent(info: IInfosHero) {
+function InfoComponent(info: InfosHero) {
   if (info.currency) {
     return (
       <div className="col px-2">
@@ -46,7 +47,7 @@ function InfoComponent(info: IInfosHero) {
   );
 }
 
-export default function PageHero({ title, subtitle, infos }: IPageHeroProps) {
+export default function PageHero({ title, subtitle, infos }: PageHeroProps) {
   return (
     <div className="banner-shadow">
       <CustomContainer>
