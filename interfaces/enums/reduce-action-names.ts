@@ -17,6 +17,7 @@ export enum ReduceActionName {
   ChangeNetwork = "ChangeNetwork",
   ChangeNetworkId = "ChangeNetworkId",
   GithubLogin = "GithubLogin",
+  ChangeAccessToken = "ChangeAccessToken",
   ChangeTransactionalTokenApproval = "ChangeTransactionalTokenApproval",
   ChangeSettlerTokenApproval = "ChangeSettlerTokenApproval",
   ChangeNetworksSummary = "ChangeNetworksSummary",
