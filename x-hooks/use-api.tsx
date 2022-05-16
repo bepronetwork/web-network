@@ -434,7 +434,7 @@ export default function useApi() {
       });
   }
 
-  async function uploadFiles(files: File | File[]): Promise<void | {
+  async function uploadFiles(files: File | File[]): Promise<{
     hash: string;
     fileName: string;
     size: string;
