@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+ /* eslint-disable */
 import { FormCheck, ListGroup } from "react-bootstrap";
 
 import { BountyToken } from "@taikai/dappkit";
@@ -214,3 +215,4 @@ export default function TokenConfiguration({
     </Step>
   );
 }
+ /* eslint-disable */

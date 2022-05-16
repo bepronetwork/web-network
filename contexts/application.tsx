@@ -39,7 +39,7 @@ import { changeStakedState } from "./reducers/change-staked-amount";
 
 interface GlobalState {
   state: ApplicationState;
-  dispatch: (action: ReduceActor) => Dispatch<ReduceActor>;
+  dispatch: (action: ReduceActor<any>) => Dispatch<ReduceActor<any>>; // eslint-disable-line
 }
 
 const defaultState: GlobalState = {
@@ -119,7 +119,7 @@ export default function ApplicationContextProvider({ children }) {
 
     if (txListener) clearInterval(txListener);
 
-    const web3 = (window as any).web3;
+    const web3 = (window as any).web3; // eslint-disable-line
 
     const getPendingBlock = () => {
       if (!cheatAddress || !waitingForTx || !waitingForTx?.transactionHash)
@@ -185,7 +185,7 @@ export default function ApplicationContextProvider({ children }) {
     const transactions = JSON.parse(cookie[`bepro.transactions:${address}`]
         ? cookie[`bepro.transactions:${address}`]
         : "[]");
-    const web3 = (window as any).web3;
+    const web3 = (window as any).web3; // eslint-disable-line
 
     const getStatusFromBlock = async (tx) => {
       const transaction = { ...tx };
@@ -232,7 +232,7 @@ export default function ApplicationContextProvider({ children }) {
   return (
     <ApplicationContext.Provider value={{ 
                                          state, 
-                                         dispatch: dispatch as (action: ReduceActor) => Dispatch<ReduceActor> }
+                                         dispatch: dispatch as any } // eslint-disable-line
                                        }>
       <Loading show={state.loading.isLoading} text={state.loading.text} />
       <Toaster />

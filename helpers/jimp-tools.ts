@@ -56,8 +56,8 @@ export async function position(base: Jimp, image: Jimp, x = 0, y = 0) {
 
   return baseIMG.composite(positionIMG, x_axis, y_axis);
 }
-
-export async function write(text?: string,
+/* eslint-disable */   // TODO: Find other choice to text2png
+export async function write(text: string,
                             fontSize = 16,
                             textColor = "white",
                             fontFamily?: string,
@@ -70,6 +70,7 @@ export async function write(text?: string,
     localFontPath = fontSemiBold;
   }
 
+/* eslint-disable */
   const buffer = "";
   // TODO: Find other choice to text2png
   // const buffer = text2png(text, {
@@ -81,5 +82,5 @@ export async function write(text?: string,
   //   ...options,
   // });
 
-  return Jimp.read(Buffer.from(buffer, "base64"));
+  return  Jimp.read(Buffer.from(buffer, "base64"));
 }
