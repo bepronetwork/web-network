@@ -28,7 +28,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   const customNetworks = await models.network.findAll({
     where: {
       name: {
-        [Op.notILike]: `%${publicRuntimeConfig.networkConfig.networkName}%`
+        [Op.notILike]: `%${publicRuntimeConfig?.networkConfig?.networkName}%`
       }
     }
   })
@@ -37,8 +37,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const networks = [{
     id: 1,
-    name: publicRuntimeConfig.networkConfig.networkName, 
-    networkAddress: publicRuntimeConfig.contract.address
+    name: publicRuntimeConfig?.networkConfig?.networkName, 
+    networkAddress: publicRuntimeConfig?.contract?.address
   }, ...customNetworks]
 
   for (const customNetwork of networks) {

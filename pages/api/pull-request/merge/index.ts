@@ -79,7 +79,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const [owner, repo] = repository.githubPath.split("/");
 
-    const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
+    const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
 
     const pullRequestDetails = await githubAPI<GraphQlResponse>(PullRequestQueries.Details, {
       repo,

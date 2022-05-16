@@ -35,7 +35,7 @@ import { BeproService } from "services/bepro-service";
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 
 export default function ConnectAccount() {
   const router = useRouter();
@@ -143,9 +143,9 @@ export default function ConnectAccount() {
 
     try {
       const chainId = (window as any)?.ethereum?.chainId;
-      if (+publicRuntimeConfig.metaMask.chainId !== +chainId) {
+      if (+publicRuntimeConfig?.metaMask?.chainId !== +chainId) {
         dispatch(changeNetworkId(+chainId));
-        dispatch(changeNetwork((publicRuntimeConfig.networkIds[+chainId] || "unknown")?.toLowerCase()));
+        dispatch(changeNetwork((publicRuntimeConfig?.networkIds[+chainId] || "unknown")?.toLowerCase()));
         return;
       } else {
         await BeproService.login();

@@ -12,7 +12,7 @@ import Loading from "components/loading";
 import useApi from "x-hooks/use-api";
 
 export default function NationDialog({ children }) {
-  const {publicRuntimeConfig} = getConfig()
+  const {publicRuntimeConfig} = getConfig();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isBlock, setBlock] = useState<boolean>(false);
   const { getClientNation } = useApi();
@@ -25,7 +25,7 @@ export default function NationDialog({ children }) {
       .then((data) => {
         if (
           data.countryCode &&
-          publicRuntimeConfig.countryCodeBlocked.indexOf(data.countryCode) === -1
+          publicRuntimeConfig?.countryCodeBlocked?.indexOf(data.countryCode) === -1
         )
           return;
 

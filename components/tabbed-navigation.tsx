@@ -64,7 +64,7 @@ export default function TabbedNavigation({
           <div className={`col-${(collapsable && "11") || "12"} p-0`}>
             <Nav>
               {tabs.map((tab) => (
-                <Nav.Item key={`${tab.eventKey}`}>
+                <Nav.Item key={`${tab.eventKey}`} className="cursor-pointer">
                   <Nav.Link eventKey={tab.eventKey}>
                     <div className="col">
                       <span className="mr-2">{tab.title}</span>

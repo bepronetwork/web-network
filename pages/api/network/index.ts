@@ -10,7 +10,7 @@ import Bepro from "helpers/api/bepro-initializer";
 
 import IpfsStorage from "services/ipfs-service";
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { name: networkName } = req.query;
@@ -95,14 +95,14 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       const { data } = await octokitUser.rest.repos.addCollaborator({
         owner,
         repo,
-        username: publicRuntimeConfig.github.user
+        username: publicRuntimeConfig?.github?.user
       });
 
       if (data?.id) invitations.push(data?.id);
     }
 
     const octokitBot = new Octokit({
-      auth: publicRuntimeConfig.github.token
+      auth: publicRuntimeConfig?.github?.token
     });
 
     for (const invitation_id of invitations) {
@@ -158,7 +158,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     if (
       isAdminOverriding &&
-      creator !== publicRuntimeConfig.adminWalletAddress
+      creator !== publicRuntimeConfig?.adminWalletAddress
     )
       return res.status(403).json("Unauthorized");
 
@@ -280,7 +280,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         const { data } = await octokitUser.rest.repos.addCollaborator({
           owner,
           repo,
-          username: publicRuntimeConfig.github.user
+          username: publicRuntimeConfig?.github?.user
         });
 
         if (data?.id) invitations.push(data?.id);
@@ -293,7 +293,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
       if (invitations.length) {
         const octokitBot = new Octokit({
-          auth: publicRuntimeConfig.github.token
+          auth: publicRuntimeConfig?.github?.token
         });
 
         for (const invitation_id of invitations) {

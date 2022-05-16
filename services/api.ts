@@ -1,9 +1,10 @@
 import axios from "axios";
 import getConfig from "next/config";
-const { publicRuntimeConfig } = getConfig()
+
+const { publicRuntimeConfig } = getConfig();
 
 const api = axios.create({
-  baseURL: `${publicRuntimeConfig.apiUrl}/api`
+  baseURL: `${publicRuntimeConfig?.apiUrl}/api`
 });
 
 api.interceptors.response.use((response) => response,

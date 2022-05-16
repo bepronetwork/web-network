@@ -39,7 +39,6 @@ $enable-negative-margins: true;
 
 $more-bg: (
   "dark": $bg,
-  "white-50": $gray,
   "shadow": $bg-shadow,
   "opac": $bg-opac,
   "purple": $purple,
@@ -52,10 +51,11 @@ $more-bg: (
   "warning": $warning,
   "warning-opac-25": rgba($warning, 0.25),
   "danger-opac-25": rgba($warning, 0.25),
-  "white-40": rgba($white, 0.4),
-  "white-70": rgba($white, 0.7),
-  "white-30": rgba($white, 0.3),
   "white-10": rgba($white, 0.1),
+  "white-30": rgba($white, 0.3),
+  "white-40": rgba($white, 0.4),
+  "white-50": rgba($white, 0.5),
+  "white-70": rgba($white, 0.7),
   "danger-10": rgba($danger, 0.1),
   "info-10": rgba($info, 0.1),
   "primary-30": rgba($primary, 0.3),

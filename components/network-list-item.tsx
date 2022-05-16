@@ -19,7 +19,7 @@ import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig } = getConfig();
 interface NetworkListItemProps {
   network: INetwork;
   redirectToHome?: boolean;

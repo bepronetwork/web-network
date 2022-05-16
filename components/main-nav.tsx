@@ -28,7 +28,8 @@ import { formatNumberToNScale } from "helpers/formatNumber";
 import { truncateAddress } from "helpers/truncate-address";
 
 import useNetwork from "x-hooks/use-network";
-const { publicRuntimeConfig } = getConfig()
+
+const { publicRuntimeConfig } = getConfig();
 
 export default function MainNav() {
   const { pathname } = useRouter();
@@ -59,9 +60,9 @@ export default function MainNav() {
             icon={
               isNetworksPage ? (
                 <BeproLogoBlue />
-              ) : network?.name !== publicRuntimeConfig.networkConfig.networkName ? (
+              ) : network?.name !== publicRuntimeConfig?.networkConfig?.networkName ? (
                 <img
-                  src={`${publicRuntimeConfig.ipfsUrl}/${network?.fullLogo}`}
+                  src={`${publicRuntimeConfig?.ipfsUrl}/${network?.fullLogo}`}
                   width={104}
                   height={32}
                 />
@@ -162,7 +163,7 @@ export default function MainNav() {
             <HelpIcon />
           </Button>
 
-          <WrongNetworkModal requiredNetworkId={publicRuntimeConfig.metaMask.chainId} />
+          <WrongNetworkModal requiredNetworkId={publicRuntimeConfig?.metaMask?.chainId} />
 
           <ConnectWalletButton>
             <div className="d-flex account-info align-items-center">
@@ -185,7 +186,7 @@ export default function MainNav() {
                   <BalanceAddressAvatar
                     address={truncateAddress(wallet?.address || "", 4)}
                     balance={wallet?.balance?.eth}
-                    currency={publicRuntimeConfig.metaMask.tokenName}
+                    currency={publicRuntimeConfig?.metaMask?.tokenName}
                   />
                 }
                 className="meta-info d-flex align-items-center"

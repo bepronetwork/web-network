@@ -46,7 +46,7 @@ export default async function readBountyCanceled(events, network: Network_v2, cu
           if (repository) {
             const [owner, repo] = repository.githubPath.split("/");
 
-            const githubAPI = (new Octokit({ auth: publicRuntimeConfig.github.token })).graphql;
+            const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
 
             const issueDetails = await githubAPI<GraphQlResponse>(IssueQueries.Details, {
               repo,
@@ -70,7 +70,7 @@ export default async function readBountyCanceled(events, network: Network_v2, cu
               console.log("Error creating SEO", e);
             });
 
-            if (network.contractAddress === publicRuntimeConfig.contract.address)
+            if (network.contractAddress === publicRuntimeConfig?.contract?.address)
               twitterTweet({
                 type: "bounty",
                 action: "changes",
