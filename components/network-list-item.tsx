@@ -71,13 +71,13 @@ export default function NetworkListItem({
     
     const coinInfo = await getCoinInfoByContract(settlerTokenData.address).catch(() => ({ prices: {} }));
     
-    addNetwork(handleNetworkAddress(network), 
-               totalBounties, 
-               (coinInfo.prices[mainCurrency] || 0) * totalSettlerLocked,
-               totalSettlerLocked,
-               settlerTokenData.name,
-               settlerTokenData.symbol,
-               !!coinInfo.prices[mainCurrency]);
+    addNetwork?.(handleNetworkAddress(network), 
+                 totalBounties, 
+                 (coinInfo.prices[mainCurrency] || 0) * totalSettlerLocked,
+                 totalSettlerLocked,
+                 settlerTokenData.name,
+                 settlerTokenData.symbol,
+                 !!coinInfo.prices[mainCurrency]);
   }
 
   useEffect(() => {

@@ -23,7 +23,7 @@ interface NetworksListProps {
   networkAddress?: string;
   creatorAddress?: string;
   redirectToHome?: boolean;
-  addNetwork: (address: string, 
+  addNetwork?: (address: string, 
               totalBounties: number, 
               amountInCurrency: number, 
               totalSettlerLocked: number, 
