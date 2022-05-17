@@ -70,7 +70,7 @@ export default function TokenConfiguration({
     if (data.nftToken.address.trim() === "") return false;
 
     try {
-      const token = new BountyToken(BeproService.bepro, data.nftToken.address);
+      const token = new BountyToken(BeproService.connection, data.nftToken.address);
 
       await token.loadContract();
     } catch(error) {
