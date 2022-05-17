@@ -9,7 +9,7 @@ import Modal from "components/modal";
 
 import { formatNumberToNScale } from "helpers/formatNumber";
 
-import useApi from "x-hooks/use-api";
+import { getCurrencyByToken } from "services/coingecko";
 
 import InputNumber from "./input-number";
 import ReactSelect from "./react-select";
@@ -26,7 +26,6 @@ export default function PriceConversorModal({
   show,
   onClose
 }:IPriceConversiorModalProps) {
-  const {getCurrencyByToken} = useApi()
   const [currentValue, setValue] = useState<number>(1);
   const [currentPrice, setCurrentPrice] = useState<number>(0)
   const [currentCurrency, setCurrentCurrency] = useState<{label: string, value: string}>(null)
