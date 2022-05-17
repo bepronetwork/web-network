@@ -1,17 +1,21 @@
 import React from "react";
 
+import InfoIcon from "assets/icons/info-icon";
+
 import { formatNumberToCurrency } from "helpers/formatNumber";
 import { highlightText } from "helpers/string";
 
 import { Currency } from "interfaces/currency";
 
+import Button from "./button";
 import CustomContainer from "./custom-container";
 
 export interface InfosHero {
   value: number;
   label: string;
   currency?: Currency;
-  key?: string;
+  hasNotConvertedTokens?: boolean;
+  setNotListedModalVisibility?: (visible: boolean) => void;
 }
 
 export interface PageHeroProps {
@@ -27,11 +31,19 @@ function InfoComponent(info: InfosHero) {
         <div className="border-top border-2 mb-2"></div>
         <div className="d-flex flex-row align-items-top">
           <span className="h4 text-white">
+            { info.hasNotConvertedTokens && "~ "}
             {formatNumberToCurrency(info.value)}
           </span>
+          
           <span className="caption-medium text-white-70 ml-1">
             ${info.currency}
           </span>
+
+          { info.hasNotConvertedTokens && 
+            <Button transparent className="p-0 ml-1" onClick={() => info?.setNotListedModalVisibility?.(true)}>
+              <InfoIcon width={14} height={14} color="text-white-10" />
+            </Button>
+          }
         </div>
         <span className="caption-small text-gray">{info.label}</span>
       </div>
