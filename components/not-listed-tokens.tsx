@@ -1,3 +1,5 @@
+import { useTranslation } from "next-i18next";
+
 import { formatNumberToNScale } from "helpers/formatNumber";
 
 import Modal from "./modal";
@@ -7,8 +9,15 @@ export default function NotListedTokens({
   handleClose,
   networks
 }){
+  const { t } = useTranslation("custom-network");
+  
   return(
-    <Modal show={isVisible} onCloseClick={handleClose} title="Not converted tokens" titlePosition="center">
+    <Modal 
+      show={isVisible} 
+      onCloseClick={handleClose} 
+      title={t("modals.not-listed-tokens.title")} 
+      titlePosition="center"
+    >
       { networks?.map(network => (
         <div className="d-flex flex-row justify-content-between caption-small py-2">
           <span>

@@ -112,6 +112,9 @@
     "deploy-nft-token": {
       "title": "New NFT",
       "description": "Deploy a New NFT Token for your network"
+    },
+    "not-listed-tokens": {
+      "title": "Not listed tokens"
     }
   },
   "messages": {
