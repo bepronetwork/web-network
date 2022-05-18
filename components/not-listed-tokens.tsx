@@ -19,7 +19,10 @@ export default function NotListedTokens({
       titlePosition="center"
     >
       { networks?.map(network => (
-        <div className="d-flex flex-row justify-content-between caption-small py-2">
+        <div 
+          className="d-flex flex-row justify-content-between caption-small py-2" 
+          key={`${network?.tokenName}${network?.tokenSymbol}`}
+        >
           <span>
             {network?.tokenName}
           </span>

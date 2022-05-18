@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import Loading from "components/loading";
 
@@ -7,6 +7,7 @@ import DAO from "services/dao-service";
 export interface DAOContextData {
   service?: DAO;
   isStarting?: boolean;
+  changeNetwork?: (netwokAddress: string) => Promise<boolean>;
 }
 
 const DAOContext = createContext<DAOContextData>({});
@@ -14,6 +15,19 @@ const DAOContext = createContext<DAOContextData>({});
 export const DAOContextProvider = ({ children }) => {
   const [service, setService] = useState<DAO>();
   const [isStarting, setIsStarting] = useState(false);
+
+  const changeNetwork = useCallback(async (networkAddress: string): Promise<boolean> => {
+    if (!service) return false;
+
+    setIsStarting(true);
+
+    const loaded = await service.loadNetwork(networkAddress)
+      .then(result => !!result)
+      .catch(() => false)
+      .finally(() => setIsStarting(false));
+
+    return loaded;
+  }, [service]);
 
   useEffect(() => {
     setIsStarting(true);
@@ -33,6 +47,7 @@ export const DAOContextProvider = ({ children }) => {
       }
       
     })
+    .catch(console.log)
     .finally(() => {
       setIsStarting(false);
     });
@@ -48,7 +63,8 @@ export const DAOContextProvider = ({ children }) => {
 
   const memorizedValue = useMemo<DAOContextData>(() => ({
     service,
-    isStarting
+    isStarting,
+    changeNetwork
   }), [service, isStarting]);
 
   return(

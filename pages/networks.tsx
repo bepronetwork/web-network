@@ -8,7 +8,7 @@ import NetworksList from "components/networks-list";
 import NotListedTokens from "components/not-listed-tokens";
 import PageHero, { InfosHero } from "components/page-hero";
 
-import { BeproService } from "services/bepro-service";
+import { useDAO } from "contexts/dao";
 
 export interface NetworkDetails {
   totalBounties: number;
@@ -24,6 +24,8 @@ interface Networks {
 
 export default function NetworksPage() {
   const { t } = useTranslation(["common", "custom-network"]);
+
+  const { service: DAOService } = useDAO();
 
   const [networks, setNetworks] = useState<Networks>();
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -92,35 +94,7 @@ export default function NetworksPage() {
   }, [networks]);
 
   useEffect(() => {
-    BeproService.startNetworkFactory().catch((error) =>
-      console.log("Failed to start the Network Factory", error));
-  }, []);
-
-    DAOService.loadFactory().then(started => {
-      if (started) 
-        return Promise.all([
-          DAOService.getNetworksQuantityInFactory().catch(() => 0),
-          DAOService.getTokensLockedInFactory().catch(() => 0),
-          getCurrencyByToken(publicRuntimeConfig?.currency?.currencyId, 'usd').catch(() => ({ usd: 0 }))
-        ]);
-    })
-    .then(([quantity, totalLocked, { usd }]) => {
-      setInfos([
-        {
-          value: quantity,
-          label: t("custom-network:hero.number-of-networks")
-        },
-        {
-          value: networksSummary.bounties,
-          label: t("custom-network:hero.number-of-bounties")
-        },
-        {
-          value: totalLocked * usd,
-          label: t("custom-network:hero.in-the-network"),
-          currency: "USD"
-        }
-      ]);
-    })
+    if (DAOService) DAOService.loadFactory();
   }, [DAOService]);
 
   return (

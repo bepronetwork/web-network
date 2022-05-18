@@ -2,14 +2,11 @@ import React, {
   createContext, useCallback, useContext, useEffect, useMemo, useState
 } from "react";
 
-
 import getConfig from "next/config";
 import { useRouter } from "next/router";
 import { parseCookies, setCookie } from "nookies";
 
 import NetworkThemeInjector from "components/custom-network/network-theme-injector";
-
-import { useAuthentication } from "contexts/authentication";
 
 import { INetwork } from "interfaces/network";
 
@@ -34,8 +31,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
 
   const { getNetwork } = useApi();
   const { query, push } = useRouter();
-  const { beproServiceStarted } = useAuthentication();
-  const { service: DAOService } = useDAO();
+  const { service: DAOService, changeNetwork } = useDAO();
 
   const updateActiveNetwork = useCallback((forced?: boolean) => {
     const networkName = query?.network || publicRuntimeConfig?.networkConfig?.networkName;
@@ -68,26 +64,32 @@ export const NetworkProvider: React.FC = function ({ children }) {
   }, [query, activeNetwork]);
 
   const updateNetworkParameters = useCallback(() => {
-    if (!DAOService || activeNetwork?.councilAmount) return;
+    if (!DAOService || activeNetwork?.councilAmount || !activeNetwork?.networkAddress) return;
 
-    Promise.all([
-      DAOService.getNetworkParameter("councilAmount"),
-      DAOService.getNetworkParameter("disputableTime"),
-      DAOService.getNetworkParameter("draftTime"),
-      DAOService.getNetworkParameter("oracleExchangeRate"),
-      DAOService.getNetworkParameter("mergeCreatorFeeShare"),
-      DAOService.getNetworkParameter("percentageNeededForDispute")
-    ]).then(values => {
-      setActiveNetwork({
-        ...activeNetwork,
-        councilAmount: values[0],
-        disputableTime: values[1] / 1000,
-        draftTime: values[2] / 1000,
-        oracleExchangeRate: values[3],
-        mergeCreatorFeeShare: values[4],
-        percentageNeededForDispute: values[5]
+    changeNetwork(activeNetwork.networkAddress)
+      .then(changed => {
+        if (!changed) return;
+
+        return Promise.all([
+          DAOService.getNetworkParameter("councilAmount"),
+          DAOService.getNetworkParameter("disputableTime"),
+          DAOService.getNetworkParameter("draftTime"),
+          DAOService.getNetworkParameter("oracleExchangeRate"),
+          DAOService.getNetworkParameter("mergeCreatorFeeShare"),
+          DAOService.getNetworkParameter("percentageNeededForDispute")
+        ]);
+      })
+      .then(values => {
+        setActiveNetwork({
+          ...activeNetwork,
+          councilAmount: values[0],
+          disputableTime: values[1] / 1000,
+          draftTime: values[2] / 1000,
+          oracleExchangeRate: values[3],
+          mergeCreatorFeeShare: values[4],
+          percentageNeededForDispute: values[5]
+        });
       });
-    });
   }, [activeNetwork, DAOService]);
 
   useEffect(() => {

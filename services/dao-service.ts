@@ -112,7 +112,7 @@ export default class DAO {
   }
 
   async getNetwork(networkAddress: string = undefined): Promise<Network_v2> {
-    if (!networkAddress || networkAddress === publicRuntimeConfig?.contract?.address) return this._network;
+    if (!networkAddress || (this.network && this.network?.contractAddress === networkAddress)) return this._network;
 
     const network = await this.loadNetwork(networkAddress, true);
 
