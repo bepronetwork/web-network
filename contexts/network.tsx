@@ -13,9 +13,9 @@ import { useAuthentication } from "contexts/authentication";
 
 import { INetwork } from "interfaces/network";
 
-import { BeproService } from "services/bepro-service";
-
 import useApi from "x-hooks/use-api";
+
+import { useDAO } from "./dao";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -35,6 +35,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
   const { getNetwork } = useApi();
   const { query, push } = useRouter();
   const { beproServiceStarted } = useAuthentication();
+  const { service: DAOService } = useDAO();
 
   const updateActiveNetwork = useCallback((forced?: boolean) => {
     const networkName = query?.network || publicRuntimeConfig?.networkConfig?.networkName;
@@ -67,15 +68,15 @@ export const NetworkProvider: React.FC = function ({ children }) {
   }, [query, activeNetwork]);
 
   const updateNetworkParameters = useCallback(() => {
-    if (!beproServiceStarted || activeNetwork?.councilAmount) return;
+    if (!DAOService || activeNetwork?.councilAmount) return;
 
     Promise.all([
-      BeproService.getNetworkParameter("councilAmount"),
-      BeproService.getNetworkParameter("disputableTime"),
-      BeproService.getNetworkParameter("draftTime"),
-      BeproService.getNetworkParameter("oracleExchangeRate"),
-      BeproService.getNetworkParameter("mergeCreatorFeeShare"),
-      BeproService.getNetworkParameter("percentageNeededForDispute")
+      DAOService.getNetworkParameter("councilAmount"),
+      DAOService.getNetworkParameter("disputableTime"),
+      DAOService.getNetworkParameter("draftTime"),
+      DAOService.getNetworkParameter("oracleExchangeRate"),
+      DAOService.getNetworkParameter("mergeCreatorFeeShare"),
+      DAOService.getNetworkParameter("percentageNeededForDispute")
     ]).then(values => {
       setActiveNetwork({
         ...activeNetwork,
@@ -87,7 +88,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
         percentageNeededForDispute: values[5]
       });
     });
-  }, [activeNetwork, beproServiceStarted]);
+  }, [activeNetwork, DAOService]);
 
   useEffect(() => {
     updateActiveNetwork();
@@ -95,14 +96,14 @@ export const NetworkProvider: React.FC = function ({ children }) {
 
   useEffect(() => {
     if (query?.network) updateNetworkParameters();
-  }, [beproServiceStarted, query?.network]);
+  }, [DAOService, query?.network]);
 
   const memorizeValue = useMemo<NetworkContextData>(() => ({
       activeNetwork,
       updateActiveNetwork,
       updateNetworkParameters
   }),
-    [activeNetwork]);
+    [activeNetwork, DAOService]);
 
   return (
     <NetworkContext.Provider value={memorizeValue}>

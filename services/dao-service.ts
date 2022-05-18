@@ -1,9 +1,13 @@
 import { 
+  ERC20,
   Network_v2,
   OraclesResume,
-  Web3Connection
+  Web3Connection,
+  NetworkFactoryV2
 } from "@taikai/dappkit";
 import getConfig from "next/config";
+
+import { Token } from "interfaces/token";
 
 import { NetworkParameters } from "types/dappkit";
 
@@ -12,9 +16,11 @@ const { publicRuntimeConfig } = getConfig();
 export default class DAO {
   private _web3Connection: Web3Connection;
   private _network: Network_v2;
+  private _factory: NetworkFactoryV2;
 
   get web3Connection() { return this._web3Connection; }
   get network() { return this._network; }
+  get factory() { return this._factory; }
 
   constructor() {
     if (!publicRuntimeConfig?.web3ProviderConnection) 
@@ -26,22 +32,49 @@ export default class DAO {
   }
 
   async loadNetwork(networkAddress: string = publicRuntimeConfig?.contract?.address, 
-                    shouldReturn?: boolean): Promise<Network_v2 | boolean> {
+                    skipAssignment?: boolean): Promise<Network_v2 | boolean> {
     try {
-      if (!networkAddress) throw new Error("Missing Network Contract Address");
+      if (!networkAddress) throw new Error("Missing Network_v2 Contract Address");
 
       const network = new Network_v2(this.web3Connection, networkAddress);
 
       await network.loadContract();
 
-      if (!shouldReturn) this._network = network;
+      if (!skipAssignment) this._network = network;
 
       return network;
     } catch (error) {
-      console.log("Error loading network: ", error);
+      console.log(`Error loading Network_v2 (${networkAddress}): `, error);
     }
 
     return false;
+  }
+
+  async loadFactory(skipAssignment?: boolean): Promise<NetworkFactoryV2 | boolean> {
+    try {
+      if (!publicRuntimeConfig?.networkConfig?.factoryAddress) 
+        throw new Error("Missing NetworkFactoryV2 Contract Address");
+
+      const factory = new NetworkFactoryV2(this.web3Connection, publicRuntimeConfig.networkConfig.factoryAddress);
+
+      await factory.loadContract();
+
+      if (!skipAssignment) this._factory = factory;
+
+      return factory;
+    } catch (error) {
+      console.log("Error loading NetworkFactoryV2: ", error);
+    }
+
+    return false;
+  }
+
+  async loadERC20(tokenAddress): Promise<ERC20> {
+    const erc20 = new ERC20(this.web3Connection, tokenAddress);
+
+    await erc20.loadContract();
+
+    return erc20;
   }
 
   async start(): Promise<boolean> {
@@ -79,7 +112,7 @@ export default class DAO {
   }
 
   async getNetwork(networkAddress: string = undefined): Promise<Network_v2> {
-    if (!networkAddress) return this._network;
+    if (!networkAddress || networkAddress === publicRuntimeConfig?.contract?.address) return this._network;
 
     const network = await this.loadNetwork(networkAddress, true);
 
@@ -144,12 +177,46 @@ export default class DAO {
   async getOpenBounties(networkAddress?: string): Promise<number> {
     const network = await this.getNetwork(networkAddress);
 
-    return network.openBounies();
+    return network.openBounties();
+  }
+
+  async getTotalBounties(networkAddress?: string): Promise<number> {
+    const network = await this.getNetwork(networkAddress);
+
+    return network.bountiesIndex();
   }
 
   async getTotalSettlerLocked(networkAddress?: string): Promise<number> {
     const network = await this.getNetwork(networkAddress);
 
     return network.totalSettlerLocked();
+  }
+
+  async getNetworksQuantityInFactory(): Promise<number> {
+    if (!this.factory) await this.loadFactory();
+
+    return this.factory.amountOfNetworks();
+  }
+
+  async getTokensLockedInFactory(): Promise<number> {
+    if (!this.factory) await this.loadFactory();
+
+    return this.factory.tokensLocked();
+  }
+
+  async getERC20TokenData(tokenAddress): Promise<Token> {
+    const token = await this.loadERC20(tokenAddress);
+
+    return {
+      name: await token.name(),
+      symbol: await token.symbol(),
+      address: tokenAddress
+    };
+  }
+
+  async getSettlerTokenData(networkAddress?: string): Promise<Token> {
+    const network = await this.getNetwork(networkAddress);
+
+    return this.getERC20TokenData(network.settlerToken.contractAddress);
   }
 }

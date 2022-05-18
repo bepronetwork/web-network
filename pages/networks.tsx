@@ -96,6 +96,33 @@ export default function NetworksPage() {
       console.log("Failed to start the Network Factory", error));
   }, []);
 
+    DAOService.loadFactory().then(started => {
+      if (started) 
+        return Promise.all([
+          DAOService.getNetworksQuantityInFactory().catch(() => 0),
+          DAOService.getTokensLockedInFactory().catch(() => 0),
+          getCurrencyByToken(publicRuntimeConfig?.currency?.currencyId, 'usd').catch(() => ({ usd: 0 }))
+        ]);
+    })
+    .then(([quantity, totalLocked, { usd }]) => {
+      setInfos([
+        {
+          value: quantity,
+          label: t("custom-network:hero.number-of-networks")
+        },
+        {
+          value: networksSummary.bounties,
+          label: t("custom-network:hero.number-of-bounties")
+        },
+        {
+          value: totalLocked * usd,
+          label: t("custom-network:hero.in-the-network"),
+          currency: "USD"
+        }
+      ]);
+    })
+  }, [DAOService]);
+
   return (
     <>
       <div>

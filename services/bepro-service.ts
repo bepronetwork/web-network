@@ -411,4 +411,4 @@ class BeproFacet {
   }
 }
 
-export const BeproService = new BeproFacet();
+export const BeproService = null;

@@ -31,9 +31,6 @@ import { ApplicationState } from "interfaces/application-state";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { ReduceActor } from "interfaces/reduce-action";
 
-import { BeproService } from "services/bepro-service";
-
-
 import { changeNetworkId } from "./reducers/change-network-id";
 import { changeStakedState } from "./reducers/change-staked-amount";
 
@@ -100,15 +97,16 @@ export default function ApplicationContextProvider({ children }) {
   const { wallet, beproServiceStarted } = useAuthentication();
 
   const Initialize = () => {
-    if (!activeNetwork) return;
+    //dispatch(changeLoadState(true));
 
-    dispatch(changeLoadState(true));
-
-    BeproService.start(handleNetworkAddress(activeNetwork))
-      .then((state) => {
-        dispatch(changeBeproInitState(state));
-      })
-      .finally(() => dispatch(changeLoadState(false)));
+    // DAOService.start()
+    //   .then(() => {
+    //     return DAOService.loadNetwork();
+    //   })
+    //   .then(started => {
+    //     dispatch(changeBeproInitState(started));
+    //   })
+    //   .finally(() => dispatch(changeLoadState(false)));
 
     if (!window.ethereum) return;
 
@@ -149,7 +147,7 @@ export default function ApplicationContextProvider({ children }) {
 
   LoadApplicationReducers();
 
-  useEffect(Initialize, [activeNetwork]);
+  useEffect(Initialize, []);
   useEffect(() => {
     if (!authError) return;
 
@@ -173,12 +171,12 @@ export default function ApplicationContextProvider({ children }) {
     else waitingForTx = transactionWithHash;
   }, [state.myTransactions]);
 
-  useEffect(() => {
-    if (beproServiceStarted) 
-      BeproService.getTotalSettlerLocked()
-      .then(amount => dispatch(changeStakedState(amount)))
-      .catch(console.log)
-  }, [pathname, beproServiceStarted])
+  // useEffect(() => {
+  //   if (beproServiceStarted) 
+  //     BeproService.getTotalSettlerLocked()
+  //     .then(amount => dispatch(changeStakedState(amount)))
+  //     .catch(console.log)
+  // }, [pathname, beproServiceStarted])
 
   const restoreTransactions = async (address) => {
     const cookie = parseCookies();

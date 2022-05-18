@@ -6,6 +6,7 @@ import DAO from "services/dao-service";
 
 export interface DAOContextData {
   service?: DAO;
+  isStarting?: boolean;
 }
 
 const DAOContext = createContext<DAOContextData>({});
@@ -46,8 +47,9 @@ export const DAOContextProvider = ({ children }) => {
   }, [service]);
 
   const memorizedValue = useMemo<DAOContextData>(() => ({
-    service
-  }), [service]);
+    service,
+    isStarting
+  }), [service, isStarting]);
 
   return(
     <DAOContext.Provider value={memorizedValue}>

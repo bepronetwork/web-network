@@ -43,6 +43,7 @@ export default function NetworkListItem({
   const [tokenSymbol, setTokenSymbol] = useState(String(t("misc.token")));
 
   const { getURLWithNetwork } = useNetwork();
+  const { service: DAOService } = useDAO();
 
   function handleRedirect() {
     const url = redirectToHome ? "/" : "/account/my-network/settings";

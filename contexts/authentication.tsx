@@ -12,9 +12,9 @@ import { useRouter } from "next/router";
 
 import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
 
-import { User, Wallet } from "interfaces/authentication";
+import { useDAO } from "contexts/dao";
 
-import { BeproService } from "services/bepro-service";
+import { User, Wallet } from "interfaces/authentication";
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
@@ -42,28 +42,31 @@ export const AuthenticationProvider = ({ children }) => {
   const [isGithubAndWalletMatched, setIsGithubAndWalletMatched] =
     useState<boolean>();
 
+  const { service: DAOService } = useDAO();
   const { getUserOf } = useApi();
   const { getURLWithNetwork } = useNetworkTheme();
 
   const login = useCallback(async () => {
-    if (!BeproService.isStarted) return;
-
     try {
+      if (!DAOService) return;
+
       await signOut({ redirect: false });
 
-      await BeproService.login();
+      await DAOService.connect();
 
-      const [isCouncil] = await Promise.all([
-        BeproService.isCouncil()
-      ])
+      // const [isCouncil] = await Promise.all([
+      //   BeproService.isCouncil()
+      // ])
+
+      const address = await DAOService.getAddress();
 
       setWallet((previousWallet) => ({
         ...previousWallet,
-        isCouncil,
-        address: BeproService?.address
+        isCouncil: false,
+        address
       }));
 
-      const savedUser = await getUserOf(BeproService?.address);
+      const savedUser = await getUserOf(address);
 
       if (!savedUser) return push(getURLWithNetwork("/connect-account"));
 
@@ -73,7 +76,7 @@ export const AuthenticationProvider = ({ children }) => {
     } catch (error) {
       console.log("Failed to login", error);
     }
-  }, [asPath]);
+  }, [asPath, DAOService]);
 
   const validateWalletAndGithub = useCallback((address: string) => {
     if(!address) return setIsGithubAndWalletMatched(false);
@@ -95,6 +98,8 @@ export const AuthenticationProvider = ({ children }) => {
     [user]);
 
   const updateWalletBalance = useCallback(async () => {
+    if (!DAOService || !wallet?.address) return;
+
     const [
       oracles,
       bepro,
@@ -102,11 +107,11 @@ export const AuthenticationProvider = ({ children }) => {
       staked,
       isCouncil,
     ] = await Promise.all([
-      BeproService.getOraclesResume(),
-      BeproService.getBalance("bepro"),
-      BeproService.getBalance("eth"),
-      BeproService.getBalance("staked"),
-      BeproService.isCouncil(),
+      DAOService.getOraclesResume(wallet.address),
+      DAOService.getBalance("settler"),
+      DAOService.getBalance("eth"),
+      DAOService.getBalance("staked"),
+      DAOService.isCouncil(wallet.address),
     ])
     setWallet((previousWallet) => ({
       ...previousWallet,
@@ -118,7 +123,7 @@ export const AuthenticationProvider = ({ children }) => {
         eth,
         staked,
       }}))
-  }, [wallet?.address, beproServiceStarted]);
+  }, [wallet?.address, DAOService]);
 
   // Side effects needed to the context work
   useEffect(() => {
@@ -135,49 +140,29 @@ export const AuthenticationProvider = ({ children }) => {
     )
       validateWalletAndGithub(wallet?.address);
 
-    if (user && !wallet && beproServiceStarted)
-      BeproService.login()
+    if (user && !wallet && DAOService)
+      DAOService.connect()
         .then(async() =>{
-          const [isCouncil] = await Promise.all([
-            BeproService.isCouncil(),
+          const [isCouncil, address] = await Promise.all([
+            DAOService.isCouncil(),
+            DAOService.getAddress(),
           ])
+
           setWallet((previousWallet) => ({
             ...previousWallet,
             isCouncil,
-            address: BeproService?.address
+            address
           }))})
         .catch(console.log);
-  }, [user, wallet, beproServiceStarted]);
+  }, [user, wallet, beproServiceStarted, DAOService]);
 
   useEffect(() => {
-    if (wallet && wallet?.address && beproServiceStarted) updateWalletBalance();
+    if (wallet && wallet?.address) updateWalletBalance();
   }, [pathname, wallet?.address]);
 
   useEffect(() => {
-    window?.ethereum?.on("accountsChanged", (accounts) => {
-      if (BeproService.isStarted){
-        const address = accounts[0];
-
-        BeproService.login()
-        .then(async () => {
-          const isCouncil = await BeproService.isCouncil();
-
-          setWallet({ address, isCouncil })
-        });
-      }
-    });
-
-    const checkBeproServiceStarted = setInterval(() => {
-      if (BeproService.isStarted) {
-        setBeproServiceStarted(true);
-        clearInterval(checkBeproServiceStarted);
-      }
-    }, 1000);
-
-    return () => {
-      clearInterval(checkBeproServiceStarted);
-    };
-  }, []);
+    if (DAOService) setBeproServiceStarted(true);
+  }, [DAOService]);
   
   const memorized = useMemo<IAuthenticationContext>(() => ({
       user,
@@ -187,7 +172,7 @@ export const AuthenticationProvider = ({ children }) => {
       login,
       updateWalletBalance
   }),
-    [user, wallet, beproServiceStarted, isGithubAndWalletMatched]);
+    [user, wallet, beproServiceStarted, isGithubAndWalletMatched, DAOService]);
 
   return (
     <AuthenticationContext.Provider value={memorized}>
