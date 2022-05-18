@@ -198,13 +198,6 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
   
   if (!networkBounty) return res.status(404).json("Invalid");
 
-  const pullRequestNetwork = networkBounty.pullRequests.find(pr => pr.cid ===  +pullRequestGithubId && 
-                                                              pr.userBranch === userBranch && 
-                                                              pr.userRepo === userRepo );
-  
-  if (!pullRequestNetwork)
-    return res.status(404).json("Invalid");
-
   const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
 
   const [owner, repo] = issue.repository.githubPath.split("/");
