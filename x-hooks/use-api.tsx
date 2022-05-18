@@ -534,24 +534,6 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
-  async function getCurrencyByToken(tokenId = publicRuntimeConfig?.currency?.currencyId, comparedToken?: string) {
-    const params:{ids: string, vs_currencies?: string} = {
-        ids: tokenId,
-    }
-    
-    if(comparedToken) params.vs_currencies = comparedToken
-
-    try {
-      const { data } = await axios.get(`${publicRuntimeConfig?.currency?.apiUrl}/simple/price`, {
-        params
-      });
-
-      return data[tokenId];
-    } catch (error) {
-      return {};
-    }
-  }
-
   async function repositoryHasIssues(repoPath) {
     const search = new URLSearchParams({ repoPath }).toString();
 
@@ -568,7 +550,6 @@ export default function useApi() {
     createRepo,
     createReviewForPR,
     getAllUsers,
-    getCurrencyByToken,
     getClientNation,
     getHealth,
     getIssue,

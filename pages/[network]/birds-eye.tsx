@@ -46,7 +46,7 @@ export default function FalconPunchPage() {
       if (!beproServiceStarted) return 0;
 
       return BeproService.login()
-        .then(() => BeproService.bepro.Web3.eth.getBalance(address as any))
+        .then(() => BeproService.connection.Web3.eth.getBalance(address as any))
         .then((eth) => +eth)
         .catch((e) => {
           console.error("Error on get eth", e);

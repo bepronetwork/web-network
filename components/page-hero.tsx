@@ -1,36 +1,49 @@
 import React from "react";
 
+import InfoIcon from "assets/icons/info-icon";
+
 import { formatNumberToCurrency } from "helpers/formatNumber";
 import { highlightText } from "helpers/string";
 
 import { Currency } from "interfaces/currency";
 
+import Button from "./button";
 import CustomContainer from "./custom-container";
 
-export interface IInfosHero {
+export interface InfosHero {
   value: number;
   label: string;
   currency?: Currency;
+  hasNotConvertedTokens?: boolean;
+  setNotListedModalVisibility?: (visible: boolean) => void;
 }
 
-export interface IPageHeroProps {
+export interface PageHeroProps {
   title: string;
   subtitle?: string;
-  infos: IInfosHero[];
+  infos: InfosHero[];
 }
 
-function InfoComponent(info: IInfosHero) {
+function InfoComponent(info: InfosHero) {
   if (info.currency) {
     return (
       <div className="col px-2">
         <div className="border-top border-2 mb-2"></div>
         <div className="d-flex flex-row align-items-top">
           <span className="h4 text-white">
+            { info.hasNotConvertedTokens && "~ "}
             {formatNumberToCurrency(info.value)}
           </span>
+          
           <span className="caption-medium text-white-70 ml-1">
             ${info.currency}
           </span>
+
+          { info.hasNotConvertedTokens && 
+            <Button transparent className="p-0 ml-1" onClick={() => info?.setNotListedModalVisibility?.(true)}>
+              <InfoIcon width={14} height={14} color="text-white-10" />
+            </Button>
+          }
         </div>
         <span className="caption-small text-gray">{info.label}</span>
       </div>
@@ -46,7 +59,7 @@ function InfoComponent(info: IInfosHero) {
   );
 }
 
-export default function PageHero({ title, subtitle, infos }: IPageHeroProps) {
+export default function PageHero({ title, subtitle, infos }: PageHeroProps) {
   return (
     <div className="banner-shadow">
       <CustomContainer>

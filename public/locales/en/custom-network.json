@@ -19,7 +19,7 @@
     "explanatory-text": "A list of all the networks using BEPRO network for their development",
     "number-of-networks": "Number of networks",
     "number-of-bounties": "Total number of bounties",
-    "in-the-network": "In the network"
+    "in-the-network": "In networks"
   },
   "network-list-bar": {
     "number-of-bounties": "Number of bounties",
@@ -112,6 +112,9 @@
     "deploy-nft-token": {
       "title": "New NFT",
       "description": "Deploy a New NFT Token for your network"
+    },
+    "not-listed-tokens": {
+      "title": "Not listed tokens"
     }
   },
   "messages": {
