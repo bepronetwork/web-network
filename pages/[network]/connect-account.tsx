@@ -43,7 +43,7 @@ export default function ConnectAccount() {
   const { t } = useTranslation(["common", "connect-account"]);
 
   const [isGhValid, setIsGhValid] = useState(null);
-  //const [lastAddressBeforeConnect, setLastAddressBeforeConnect] = useState("");
+  const [lastAddressBeforeConnect, setLastAddressBeforeConnect] = useState(""); /* eslint-disable-line */ // TODO need a usage logic
 
   const { getUserOf, joinAddressToUser, getUserWith } = useApi();
 
