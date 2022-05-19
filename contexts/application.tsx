@@ -18,14 +18,10 @@ import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 import { toastError } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
-import { changeBeproInitState } from "contexts/reducers/change-bepro-init-state";
-import { changeLoadState } from "contexts/reducers/change-load-state";
 import { changeNetwork } from "contexts/reducers/change-network";
 import LoadApplicationReducers from "contexts/reducers/index";
 import { mainReducer } from "contexts/reducers/main";
 import { updateTransaction } from "contexts/reducers/update-transaction";
-
-import { handleNetworkAddress } from "helpers/custom-network";
 
 import { ApplicationState } from "interfaces/application-state";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
@@ -94,7 +90,7 @@ export default function ApplicationContextProvider({ children }) {
   } = useRouter();
 
   const { activeNetwork } = useNetwork();
-  const { wallet, beproServiceStarted } = useAuthentication();
+  const { wallet } = useAuthentication();
 
   const Initialize = () => {
     //dispatch(changeLoadState(true));
@@ -171,6 +167,8 @@ export default function ApplicationContextProvider({ children }) {
     else waitingForTx = transactionWithHash;
   }, [state.myTransactions]);
 
+  // TODO Replace staked by getTotalSettlerLocked
+  
   // useEffect(() => {
   //   if (beproServiceStarted) 
   //     BeproService.getTotalSettlerLocked()
