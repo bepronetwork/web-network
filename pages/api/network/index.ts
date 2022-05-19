@@ -33,7 +33,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  try {
+   try {
     const {
       name,
       colors,
@@ -72,13 +72,22 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     if (checkingNetworkAddress !== networkAddress)
       return res.status(403).json("Creator and network addresses do not match");
 
-    // Uploading logos to IPFS
-    const fullLogoHash = (
-      await IpfsStorage.add(fullLogo, true, undefined, "svg")
-    ).hash;
-    const logoIconHash = (
-      await IpfsStorage.add(logoIcon, true, undefined, "svg")
-    ).hash;
+      // Uploading logos to IPFS
+    let fullLogoHash = null
+    let logoIconHash = null
+
+    try {
+      const [full, logo] = await Promise.all([
+        IpfsStorage.add(fullLogo, true, undefined, "svg"), 
+        IpfsStorage.add(logoIcon, true, undefined, "svg")
+      ])
+
+      fullLogoHash = full?.hash;
+      logoIconHash = logo.hash;
+
+    } catch (error) {
+      console.error('Failed to store ipfs', error);
+    }
 
     // Adding bepro-bot to repositories organization
     const octokitUser = new Octokit({
@@ -207,12 +216,21 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     }
 
     // Uploading logos to IPFS
-    const fullLogoHash = fullLogo
-      ? (await IpfsStorage.add(fullLogo, true, undefined, "svg")).hash
-      : undefined;
-    const logoIconHash = logoIcon
-      ? (await IpfsStorage.add(logoIcon, true, undefined, "svg")).hash
-      : undefined;
+    let fullLogoHash = null
+    let logoIconHash = null
+
+    try {
+      const [full, logo] = await Promise.all([
+        IpfsStorage.add(fullLogo, true, undefined, "svg"), 
+        IpfsStorage.add(logoIcon, true, undefined, "svg")
+      ])
+
+      fullLogoHash = full?.hash;
+      logoIconHash = logo.hash;
+
+    } catch (error) {
+      console.error('Failed to store ipfs', error);
+    }
 
     const addingRepos = repositoriesToAdd ? JSON.parse(repositoriesToAdd) : [];
 
