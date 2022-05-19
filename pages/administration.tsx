@@ -17,7 +17,7 @@ import OverrideNameModal from "components/custom-network/override-name-modal";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
-import { toastError, toastInfo } from "contexts/reducers/add-toast";
+import { toastError } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 import { updateTransaction } from "contexts/reducers/update-transaction";
