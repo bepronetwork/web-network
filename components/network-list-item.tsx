@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
@@ -7,35 +7,42 @@ import { useRouter } from "next/router";
 import NetworkLogo from "components/network-logo";
 import PullRequestLabels from "components/pull-request-labels";
 
-import { ApplicationContext } from "contexts/application";
-import { changeNetworksSummary } from "contexts/reducers/change-networks-summary";
-
 import { handleNetworkAddress } from "helpers/custom-network";
 import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { INetwork } from "interfaces/network";
 
 import { BeproService } from "services/bepro-service";
+import { getCoinInfoByContract } from "services/coingecko";
 
 import useNetwork from "x-hooks/use-network";
+
 const { publicRuntimeConfig } = getConfig();
 interface NetworkListItemProps {
   network: INetwork;
   redirectToHome?: boolean;
-  updateNetworkParameter?: (networkName, parameter, value) => void;
+  addNetwork: (address: string, 
+    totalBounties: number, 
+    amountInCurrency: number, 
+    totalSettlerLocked: number, 
+    tokenName: string,
+    tokenSymbol: string,
+    isListedInCoinGecko?: boolean) => void;
 }
 
 export default function NetworkListItem({
   network,
   redirectToHome = false,
-  updateNetworkParameter,
+  addNetwork
 }: NetworkListItemProps) {
   const router = useRouter();
   const { t } = useTranslation("common");
+  const [totalBounties, setTotalBounties] = useState(0);
+  const [openBounties, setOpenBounties] = useState(0);
+  const [tokensLocked, setTokensLocked] = useState(0);
+  const [tokenSymbol, setTokenSymbol] = useState(String(t("misc.token")));
 
   const { getURLWithNetwork } = useNetwork();
-
-  const { dispatch } = useContext(ApplicationContext);
 
   function handleRedirect() {
     const url = redirectToHome ? "/" : "/account/my-network/settings";
@@ -45,36 +52,35 @@ export default function NetworkListItem({
     }));
   }
 
+  async function loadNetworkData() {
+    const [settlerTokenData, totalSettlerLocked, openBounties, totalBounties] = await Promise.all([
+      BeproService.getSettlerTokenData(handleNetworkAddress(network)),
+      BeproService.getTotalSettlerLocked(handleNetworkAddress(network)),
+      BeproService.getOpenBounties(handleNetworkAddress(network)),
+      BeproService.getBountiesCount(handleNetworkAddress(network))
+    ]);
+
+    setTotalBounties(totalBounties);
+    setOpenBounties(openBounties);
+    setTokensLocked(totalSettlerLocked);
+    setTokenSymbol(settlerTokenData.symbol);
+    
+    
+    const mainCurrency = publicRuntimeConfig?.currency?.main || "usd";
+    
+    const coinInfo = await getCoinInfoByContract(settlerTokenData.address).catch(() => ({ prices: {} }));
+    
+    addNetwork?.(handleNetworkAddress(network), 
+                 totalBounties, 
+                 (coinInfo.prices[mainCurrency] || 0) * totalSettlerLocked,
+                 totalSettlerLocked,
+                 settlerTokenData.name,
+                 settlerTokenData.symbol,
+                 !!coinInfo.prices[mainCurrency]);
+  }
+
   useEffect(() => {
-    BeproService.getSettlerTokenData(handleNetworkAddress(network))
-      .then(({symbol}) => {
-        updateNetworkParameter(network.name, "tokenName", symbol);
-      })
-      .catch(console.log);
-
-    BeproService.getTotalSettlerLocked(handleNetworkAddress(network))
-      .then((amount) => {
-        updateNetworkParameter(network.name, "tokensLocked", amount);
-      })
-      .catch(console.log);
-
-    BeproService.getOpenBounties(handleNetworkAddress(network))
-      .then((quantity) => {
-        updateNetworkParameter(network.name, "openBounties", quantity);
-      })
-      .catch(console.log);
-
-    BeproService.getBountiesCount(handleNetworkAddress(network))
-      .then((quantity) => {
-        updateNetworkParameter(network.name, "totalBounties", quantity);
-
-        dispatch(changeNetworksSummary({
-          label: "bounties",
-          amount: quantity,
-          action: "add"
-        }));
-      })
-      .catch(console.log);
+    loadNetworkData();
   }, []);
 
   return (
@@ -95,25 +101,19 @@ export default function NetworkListItem({
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center">
         <span className="caption-medium text-white">
-          {network.totalBounties !== undefined
-            ? formatNumberToNScale(network.totalBounties)
-            : "-"}
+          {formatNumberToNScale(totalBounties)}
         </span>
       </div>
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center">
         <span className="caption-medium text-white">
-          {network.openBounties !== undefined
-            ? formatNumberToNScale(network.openBounties)
-            : "-"}
+          {formatNumberToNScale(openBounties)}
         </span>
       </div>
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center gap-20">
         <span className="caption-medium text-white ml-3">
-          {network.tokensLocked !== undefined
-            ? formatNumberToNScale(network.tokensLocked)
-            : "-"}
+          {formatNumberToNScale(tokensLocked)}
         </span>
 
         <span
@@ -122,7 +122,7 @@ export default function NetworkListItem({
           }`}
           style={{ color: `${network?.colors?.primary}` }}
         >
-          ${network.tokenName || t("misc.token")}
+          ${tokenSymbol}
         </span>
       </div>
     </div>

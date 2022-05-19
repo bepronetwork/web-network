@@ -45,8 +45,8 @@ export default function ConnectWalletButton({
   }, [wallet]);
 
   async function handleLogin() {
-    if (BeproService?.bepro) {
-      BeproService.bepro.web3.eth
+    if (BeproService?.connection) {
+      BeproService.connection.web3.eth
         .getChainId()
         .then((chainId) => {
           if (+chainId === +publicRuntimeConfig?.metaMask?.chainId) {

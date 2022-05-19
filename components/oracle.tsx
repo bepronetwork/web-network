@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
 import InternalLink from "components/internal-link";
-import PageHero, { IInfosHero } from "components/page-hero";
+import PageHero, { InfosHero } from "components/page-hero";
 
 import { useAuthentication } from "contexts/authentication";
 
@@ -21,7 +21,7 @@ export default function Oracle({ children }) {
   const { network: activeNetwork, getURLWithNetwork } = useNetwork();
   const { t } = useTranslation(["oracle", "common"]);
   const { getTotalUsers } = useApi();
-  const [infos, setInfos] = useState<IInfosHero[]>([
+  const [infos, setInfos] = useState<InfosHero[]>([
     {
       value: 0,
       label: t("common:heroes.in-progress")
