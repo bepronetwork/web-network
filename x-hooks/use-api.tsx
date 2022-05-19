@@ -276,7 +276,6 @@ export default function useApi() {
   }
   
   async function getTotalBounties(state: string, 
-
                                   networkName = publicRuntimeConfig.networkConfig.networkName): Promise<number> {
     const search = new URLSearchParams({ state, networkName }).toString();
     return client.get<number>(`/search/issues/total?${search}`).then(({ data }) => data);
