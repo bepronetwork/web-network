@@ -17,7 +17,7 @@ import { NetworkParameters } from "types/dappkit";
 
 const { publicRuntimeConfig } = getConfig();
 class BeproFacet {
-  readonly bepro: Web3Connection = new Web3Connection({
+  readonly connection: Web3Connection = new Web3Connection({
     web3Host: publicRuntimeConfig?.web3ProviderConnection
   });
 
@@ -32,9 +32,9 @@ class BeproFacet {
 
   async start(networkAddress = publicRuntimeConfig?.contract?.address) {
     try {
-      if (!this.isStarted) await this.bepro.start();
+      if (!this.isStarted) await this.connection.start();
       
-      this.network = new Network_v2(this.bepro, networkAddress);
+      this.network = new Network_v2(this.connection, networkAddress);
 
       await this.network.loadContract();
 
@@ -64,7 +64,7 @@ class BeproFacet {
       else {
         this.isNetworkFactoryStarted = false;
 
-        this.networkFactory = new NetworkFactoryV2(this.bepro,
+        this.networkFactory = new NetworkFactoryV2(this.connection,
           publicRuntimeConfig?.networkConfig?.factoryAddress);
 
         await this.networkFactory.loadContract();
@@ -83,10 +83,10 @@ class BeproFacet {
 
     this.isLoggedIn = false;
 
-    await this.bepro.connect();
+    await this.connection.connect();
     await this.start(this.network.contractAddress);
 
-    this.address = await this.bepro.getAddress();
+    this.address = await this.connection.getAddress();
     this.isLoggedIn = true;
 
     return this.isLoggedIn;
@@ -137,7 +137,7 @@ class BeproFacet {
   }
 
   async setNFTTokenDispatcher(nftToken: string, dispatcher: string) {
-    const bountyToken = new BountyToken(this.bepro, nftToken);
+    const bountyToken = new BountyToken(this.connection, nftToken);
 
     await bountyToken.loadContract();
 
@@ -259,13 +259,7 @@ class BeproFacet {
     try {
       const network = await this.getNetworkObj(networkAddress);
 
-      return Promise.all([
-        network.bountiesIndex(),
-        network.canceledBounties(),
-        network.closedBounties()
-      ]).then((values) => {
-        return values[0] - values[1] - values[2];
-      });
+      return network.openBounties();
     } catch (error) {
       console.log("Failed to getOpenBounties", error);
     }
@@ -293,7 +287,7 @@ class BeproFacet {
 
   async getNetworkObj(networkAddress = undefined): Promise<Network_v2> {
     if (networkAddress) {
-      const customNetwork = new Network_v2(this.bepro, networkAddress);
+      const customNetwork = new Network_v2(this.connection, networkAddress);
 
       await customNetwork.loadContract();
 
@@ -308,7 +302,7 @@ class BeproFacet {
   async getERC20Obj(tokenAddress = undefined): Promise<ERC20> {
     if (!tokenAddress) return this.network.settlerToken;
 
-    const erc20 = new ERC20(this.bepro, tokenAddress);
+    const erc20 = new ERC20(this.connection, tokenAddress);
 
     await erc20.loadContract();
 
@@ -326,7 +320,7 @@ class BeproFacet {
         n = await network.settlerToken.getTokenAmount(this.address);
         break;
       case 'eth':
-        n = +this.bepro.Web3.utils.fromWei(await this.bepro.getBalance());
+        n = +this.connection.Web3.utils.fromWei(await this.connection.getBalance());
         break;
       case 'staked':
         n = await network.totalSettlerLocked();
@@ -356,7 +350,7 @@ class BeproFacet {
     return this.networkFactory.tokensLocked();
   }
 
-  async getNetworksQuantity() {
+  async getNetworksQuantity(): Promise<number> {
     if (!this.isNetworkFactoryStarted) await this.startNetworkFactory();
 
     return this.networkFactory.amountOfNetworks();
@@ -383,11 +377,11 @@ class BeproFacet {
   // Getters and Setters
 
   fromWei(wei: string) {
-    return this.bepro.Web3.utils.fromWei(wei);
+    return this.connection.Web3.utils.fromWei(wei);
   }
 
   toWei(n: string | number) {
-    return this.bepro.Web3.utils.toWei(n.toString(), `ether`);
+    return this.connection.Web3.utils.toWei(n.toString(), `ether`);
   }
 
   async openBounty({

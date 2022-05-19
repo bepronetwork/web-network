@@ -40,12 +40,12 @@ export default function ChangeTokenModal({
     try {
       setIsExecuting(true);
 
-      if (!BeproService.bepro.utils.isAddress(address)) {
+      if (!BeproService.connection.utils.isAddress(address)) {
         setIsValidAddress(false);
         return;
       }
 
-      const erc20 = new ERC20(BeproService.bepro, address);
+      const erc20 = new ERC20(BeproService.connection, address);
 
       await erc20.loadContract();
 

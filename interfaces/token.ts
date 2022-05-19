@@ -7,6 +7,15 @@ export interface Token {
   symbol: string;
 }
 
+export interface TokenInfo extends Partial<Token> {
+    icon: string;
+    prices: TokenPrice
+}
+
+export interface TokenPrice {
+  [key: string]: number;
+}
+
 export const BEPRO_TOKEN: Token = {
   address: publicRuntimeConfig?.contract?.settler,
   name: "BEPRO",

@@ -28,7 +28,7 @@ export default function DeployNFTModal({
     try {
       setIsExecuting(true);
 
-      const deployer = new BountyToken(BeproService.bepro);
+      const deployer = new BountyToken(BeproService.connection);
 
       await deployer.loadAbi();
 

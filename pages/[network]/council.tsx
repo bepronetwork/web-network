@@ -6,7 +6,7 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 import ListIssues from "components/list-issues";
-import PageHero, { IInfosHero } from "components/page-hero";
+import PageHero, { InfosHero } from "components/page-hero";
 
 import { useAuthentication } from "contexts/authentication";
 
@@ -16,7 +16,7 @@ export default function PageCouncil() {
   const { t } = useTranslation(["council"]);
   const {beproServiceStarted} = useAuthentication()
   const { getTotalBounties } = useApi();
-  const [infos, setInfos] = useState<IInfosHero[]>([
+  const [infos, setInfos] = useState<InfosHero[]>([
     {
       value: 0,
       label: t("council:ready-bountys")
