@@ -64,19 +64,25 @@ export default function ProposalMerge({
   async function getDistributedAmounts() {
     if (!proposal?.details) return;
     
-    const distributions = await calculateDistributedAmounts(activeNetwork?.treasury,
-                                                            activeNetwork?.mergeCreatorFeeShare,
-                                                            activeNetwork?.proposerFeeShare,
-                                                            amountTotal,
-                                                            proposal.details.map(({ percentage }) => percentage));
+    const distributions = calculateDistributedAmounts(activeNetwork?.treasury,
+                                                      activeNetwork?.mergeCreatorFeeShare,
+                                                      activeNetwork?.proposerFeeShare,
+                                                      amountTotal,
+                                                      proposal.details.map(({ percentage }) => percentage));
+
     setDistributedAmounts(distributions);
+  }
+
+  function handleMerge() {
+    setShow(false);
+    onClickMerge();
   }
     
   useEffect(() => {
-    if (!proposal || activeNetwork) return;
+    if (!proposal || !activeNetwork?.mergeCreatorFeeShare || !activeNetwork?.treasury) return;
     
     getDistributedAmounts();
-  }, [proposal, activeNetwork]);
+  }, [proposal, activeNetwork?.treasury, activeNetwork?.mergeCreatorFeeShare, activeNetwork?.proposerFeeShare]);
 
   return (
     <>
@@ -98,7 +104,7 @@ export default function ProposalMerge({
         footer={
           <Button
             className="btn-block w-100"
-            onClick={onClickMerge}
+            onClick={handleMerge}
             disabled={canMerge}
           >
             <span>{t("proposal:merge-modal.confirm-merge")}</span>
