@@ -363,7 +363,7 @@ export default class DAO {
     tokenAmount = 0,
     rewardAmount = 0,
     fundingAmount = 0
-  }) {
+  }): Promise<TransactionReceipt> {
     return this.network.openBounty(tokenAmount,
                                    transactional,
                                    rewardToken,
