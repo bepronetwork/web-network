@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 import models from "db/models";
 
-import networkBeproJs from "helpers/api/handle-network-bepro";
+import DAO from "services/dao-service";
 
 async function remove(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -17,9 +17,14 @@ async function remove(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (user) {
-    const network = networkBeproJs({});
-    await network.start();
-    const beproLocked = await network.getOraclesByAddress(address);
+    const DAOService = new DAO(true);
+
+    if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
+
+    if (!await DAOService.loadNetwork())
+      return res.status(500).json("Failed to load network contract");
+
+    const beproLocked = await DAOService.network.getOraclesByAddress(address);
 
     if (beproLocked > 0)
       return res.status(409).json({ message: "User contains locked $Bepros" });

@@ -1,4 +1,3 @@
-import { Network_v2 } from "@taikai/dappkit";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
 import { Op } from "sequelize";
@@ -6,9 +5,11 @@ import { Op } from "sequelize";
 import models from "db/models";
 
 import { BountyHelpers } from "helpers/api/bounty";
-import networkBeproJs from "helpers/api/handle-network-bepro";
 import { ProposalHelpers } from "helpers/api/proposal";
 import { PullRequestHelpers } from "helpers/api/pull-request";
+import { handleNetworkAddress } from "helpers/custom-network";
+
+import DAO from "services/dao-service";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -32,14 +33,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   if (!customNetwork || customNetwork?.isClosed) return res.status(404).json("Invalid network");
 
-  const network = networkBeproJs({
-    contractAddress: 
-    customNetwork.name.toLowerCase() === publicRuntimeConfig?.networkConfig?.networkName?.toLowerCase() ? 
-      publicRuntimeConfig?.contract?.address : customNetwork.networkAddress,
-    version: 2
-  }) as Network_v2;
+  const DAOService = new DAO(true);
 
-  await network.start();
+  if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
+
+  if (!await DAOService.loadNetwork(handleNetworkAddress(customNetwork)))
+    return res.status(500).json("Failed to load network contract");
 
   const helper = Helpers[entity];
 
@@ -47,13 +46,13 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const [contractMethod, apiMethod] = helper[String(event)];
 
-  const events = await network[contractMethod]({ 
+  const events = await DAOService.network[contractMethod]({ 
     fromBlock, 
     toBlock: toBlock || (+fromBlock + 1), 
     filter: { id } 
   });
 
-  const results = await apiMethod(events, network, customNetwork);
+  const results = await apiMethod(events, DAOService.network, customNetwork);
 
   return res.status(200).json(results);
 }
