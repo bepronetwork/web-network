@@ -171,7 +171,7 @@ export default function PageActions({
   };
 
   const renderUpdateAmount = () => {
-    if (isIssueinDraft && isBountyOwner())
+    if (isIssueinDraft && isBountyOwner() && !finalized)
       return <ReadOnlyButtonWrapper>
         <Button
           className="read-only-button me-1"
