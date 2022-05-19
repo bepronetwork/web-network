@@ -31,6 +31,12 @@ interface CreateBounty {
   repositoryId: string;
 }
 
+interface FileUploadReturn {
+  hash: string;
+  fileName: string;
+  size: string;
+}[]
+
 const repoList: ReposList = [];
 
 export default function useApi() {
@@ -433,12 +439,8 @@ export default function useApi() {
         throw error;
       });
   }
-
-  async function uploadFiles(files: File | File[]): Promise<{
-    hash: string;
-    fileName: string;
-    size: string;
-}[]> {
+  
+  async function uploadFiles(files: File | File[]): Promise<FileUploadReturn> {
     const form = new FormData();
     const isArray = Array.isArray(files);
     if (isArray) {
