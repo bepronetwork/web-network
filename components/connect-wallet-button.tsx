@@ -16,9 +16,6 @@ import { changeNetworkId } from "contexts/reducers/change-network-id";
 
 import { NetworkColors } from "interfaces/enums/network-colors";
 
-
-import { BeproService } from "services/bepro-service";
-
 const { publicRuntimeConfig } = getConfig();
 
 export default function ConnectWalletButton({
@@ -34,7 +31,7 @@ export default function ConnectWalletButton({
   } = useContext(ApplicationContext);
   const [showModal, setShowModal] = useState(false);
 
-  const { wallet, beproServiceStarted, login } = useAuthentication();
+  const { wallet, login } = useAuthentication();
   const { service: DAOService } = useDAO();
 
   useEffect(() => {

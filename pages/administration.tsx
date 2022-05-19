@@ -16,6 +16,7 @@ import OverrideNameModal from "components/custom-network/override-name-modal";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { toastError } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
@@ -32,9 +33,8 @@ import { INetwork } from "interfaces/network";
 import { ReposList } from "interfaces/repos-list";
 import { BlockTransaction } from "interfaces/transaction";
 
-import { BeproService } from "services/bepro-service";
-
 import useApi from "x-hooks/use-api";
+
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -53,6 +53,7 @@ export default function ParityPage() {
   const { activeNetwork } = useNetwork();
   const { wallet } = useAuthentication();
   const { dispatch } = useContext(ApplicationContext);
+  const { service: DAOService } = useDAO();
 
   const {
     getUserOf,
@@ -146,7 +147,7 @@ export default function ParityPage() {
           console.debug(`(SC) Checking ${issue.title}`);
           if (
             !(
-              await BeproService.network.getIssueByCID(`${issue.repository_id}/${issue.number}`)
+              await DAOService.getBountyByCID(`${issue.repository_id}/${issue.number}`)
             )?.cid
           )
             openIssues.push(issue);
@@ -189,7 +190,9 @@ export default function ParityPage() {
 
     console.debug("scPayload,", scPayload, "msPayload", msPayload);
 
-    return apiCreateIssue(msPayload, activeNetwork?.name)
+    // TODO: use Network_V2 bounty
+
+    return false; /*apiCreateIssue(msPayload, activeNetwork?.name)
       .then((cid) => {
         if (!cid) throw new Error(t("errors.creating-issue"));
         return BeproService.network
@@ -235,7 +238,7 @@ export default function ParityPage() {
           }));
 
         return false;
-      });
+      });*/
   }
 
   function createIssuesFromList() {

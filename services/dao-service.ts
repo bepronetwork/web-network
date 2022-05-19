@@ -1,10 +1,15 @@
 import { 
   ERC20,
+  Bounty,
+  Defaults,
   Network_v2,
+  BountyToken,
+  TreasuryInfo,
   OraclesResume,
   Web3Connection,
   NetworkFactoryV2
 } from "@taikai/dappkit";
+import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import getConfig from "next/config";
 
 import { Token } from "interfaces/token";
@@ -22,12 +27,13 @@ export default class DAO {
   get network() { return this._network; }
   get factory() { return this._factory; }
 
-  constructor() {
-    if (!publicRuntimeConfig?.web3ProviderConnection) 
+  constructor(skipWindowAssignment = false) {
+    if (!publicRuntimeConfig?.web3ProviderConnection)
       throw new Error("Missing web3ProviderConnection in next.config.js");
 
     this._web3Connection = new Web3Connection({
-      web3Host: publicRuntimeConfig.web3ProviderConnection
+      web3Host: publicRuntimeConfig.web3ProviderConnection,
+      skipWindowAssignment
     });
   }
 
@@ -69,12 +75,20 @@ export default class DAO {
     return false;
   }
 
-  async loadERC20(tokenAddress): Promise<ERC20> {
+  async loadERC20(tokenAddress: string): Promise<ERC20> {
     const erc20 = new ERC20(this.web3Connection, tokenAddress);
 
     await erc20.loadContract();
 
     return erc20;
+  }
+
+  async loadBountyToken(tokenAddress: string): Promise<BountyToken> {
+    const token = new BountyToken(this.web3Connection, tokenAddress);
+
+    await token.loadContract();
+
+    return token;
   }
 
   async start(): Promise<boolean> {
@@ -119,21 +133,19 @@ export default class DAO {
     return network;
   }
 
-  async getBalance(kind: `eth` | `settler` | `staked`, address?: string): Promise<number> {
+  async getBalance(kind: `eth` | `settler` | `staked`, address: string): Promise<number> {
     try {
-      const network = await this.getNetwork();
-
       let n = 0;
 
       switch (kind) {
       case 'settler':
-        n = await network.settlerToken.getTokenAmount(address || await this.getAddress());
+        n = await this.network.settlerToken.getTokenAmount(address);
         break;
       case 'eth':
         n = +this.web3Connection.Web3.utils.fromWei(await this.web3Connection.getBalance());
         break;
       case 'staked':
-        n = await network.totalSettlerLocked();
+        n = await this.network.totalSettlerLocked();
         break;
       }
       
@@ -144,28 +156,67 @@ export default class DAO {
   }
 
   async getNetworkParameter(parameter: NetworkParameters): Promise<number> {
-    const network = await this.getNetwork();
-
-    return network[parameter]();
+    return this.network[parameter]();
   }
 
-  async getOraclesOf(address?: string): Promise<number> {
-    const network = await this.getNetwork();
-    
-    return network.getOraclesOf(address || await this.getAddress());
+  async setNetworkParameter(parameter: NetworkParameters, value: number): Promise<TransactionReceipt> {    
+    const param = [...parameter];
+    param[0] = param[0].toUpperCase();
+
+    return this.network[`change${param.join('')}`](value);
   }
 
-  async isCouncil(address?: string): Promise<boolean> {
+  async getOraclesOf(address: string): Promise<number> {    
+    return this.network.getOraclesOf(address);
+  }
+
+  async isCouncil(address: string): Promise<boolean> {
     const councilAmount = await this.getNetworkParameter("councilAmount");
-    const oraclesOf = await this.getOraclesOf(address || await this.getAddress());
+    const oraclesOf = await this.getOraclesOf(address);
 
     return oraclesOf >= councilAmount;
   }
 
-  async getOraclesResume(address?: string): Promise<OraclesResume> {
-    const network = await this.getNetwork();
+  async getOraclesResume(address: string): Promise<OraclesResume> {
+    return this.network.getOraclesResume(address);
+  }
 
-    return network.getOraclesResume(address || await this.getAddress());
+  async getBounty(id: number): Promise<Bounty> {
+    return this.network.getBounty(id);
+  }
+
+  async isBountyInDraft(id: number): Promise<boolean> {
+    return this.network.isBountyInDraft(id);
+  }
+
+  async isProposalDisputed(bountyId: number, proposalId: number): Promise<boolean> {
+    return this.network.isProposalDisputed(bountyId, proposalId);
+  }
+
+  async getDisputesOf(address: string, bountyId: number, proposalId: number): Promise<number> {
+    return this.network.disputes(address, bountyId, proposalId);
+  }
+
+  async getTreasury(): Promise<TreasuryInfo> {
+    const treasury = await this.network.treasuryInfo();
+
+    return {
+      treasury: treasury[0],
+      closeFee: +treasury[1],
+      cancelFee: +treasury[2]
+    };
+  }
+
+  async getMergeCreatorFee(): Promise<number> {
+    return this.network.mergeCreatorFeeShare();
+  }
+
+  async getProposerFee(): Promise<number> {
+    return this.network.proposerFeeShare();
+  }
+
+  async getBountyByCID(cid: string): Promise<Bounty> {
+    return this.network.cidBountyId(cid);
   }
 
   async getClosedBounties(networkAddress?: string): Promise<number> {
@@ -186,6 +237,10 @@ export default class DAO {
     return network.bountiesIndex();
   }
 
+  async getBountiesOfAddress(address: string): Promise<number[]> {
+    return this.network.getBountiesOfAddress(address);
+  }
+
   async getTotalSettlerLocked(networkAddress?: string): Promise<number> {
     const network = await this.getNetwork(networkAddress);
 
@@ -204,6 +259,54 @@ export default class DAO {
     return this.factory.tokensLocked();
   }
 
+  async isTokenApprovedInFactoy(amount: number): Promise<boolean> {
+    if (!this.factory) await this.loadFactory();
+
+    return this.factory.isApprovedNetworkToken(amount);
+  }
+
+  async approveTokenInFactory(amount: number): Promise<TransactionReceipt> {
+    if (!this.factory) await this.loadFactory();
+
+    return this.factory.approveNetworkToken(amount);
+  }
+
+  async lockInFactory(amount: number): Promise<TransactionReceipt> {
+    if (!this.factory) await this.loadFactory();
+
+    return this.factory.lock(amount);
+  }
+
+  async unlockFromFactory(): Promise<TransactionReceipt> {
+    if (!this.factory) await this.loadFactory();
+
+    return this.factory.unlock();
+  }
+
+  async getTokensLockedInFactoryByAddress(address: string): Promise<number> {
+    if (!this.factory) await this.loadFactory();
+
+    return this.factory.lockedTokensOfAddress(address);
+  }
+
+  async getFactoryCreatorAmount(): Promise<number> {
+    if (!this.factory) await this.loadFactory();
+      
+    return this.factory.creatorAmount();
+  }
+
+  async isNetworkAbleToClosed(): Promise<boolean> {
+    const totalSettlerLocked = await this.network.totalSettlerLocked();
+    const closedBounties = await this.network.closedBounties();
+    const canceledBounties = await this.network.canceledBounties();
+    const bountiesTotal = await this.network.bountiesIndex();
+
+    return (
+      totalSettlerLocked === 0 &&
+      closedBounties + canceledBounties === bountiesTotal
+    );
+  }
+
   async getERC20TokenData(tokenAddress): Promise<Token> {
     const token = await this.loadERC20(tokenAddress);
 
@@ -218,5 +321,154 @@ export default class DAO {
     const network = await this.getNetwork(networkAddress);
 
     return this.getERC20TokenData(network.settlerToken.contractAddress);
+  }
+
+  async getTokenBalance(tokenAddress: string, walletAddress: string): Promise<number> {
+    const erc20 = await this.loadERC20(tokenAddress);
+
+    return erc20.getTokenAmount(walletAddress);
+  }
+
+  async getAllowance(tokenAddress: string, 
+                     walletAddress: string, 
+                     spenderAddress: string = publicRuntimeConfig?.contract?.address): Promise<number> {
+    const erc20 = await this.loadERC20(tokenAddress);
+
+    return erc20.allowance(walletAddress, spenderAddress);
+  }
+
+  async getSettlerTokenAllowance(walletAddress: string): Promise<number> {
+
+    return this.getAllowance(this.network.settlerToken.contractAddress, 
+                             walletAddress, 
+                             this.network.contractAddress);
+  }
+
+  async deployBountyToken(name: string, symbol: string): Promise<TransactionReceipt> {
+    const deployer = new BountyToken(this.web3Connection);
+
+    await deployer.loadAbi();
+
+    return deployer.deployJsonAbi(name, symbol);
+  }
+
+  async openBounty({
+    cid,
+    title,
+    repoPath,
+    branch,
+    githubUser,
+    transactional,
+    rewardToken = Defaults.nativeZeroAddress,
+    tokenAmount = 0,
+    rewardAmount = 0,
+    fundingAmount = 0
+  }) {
+    return this.network.openBounty(tokenAmount,
+                                   transactional,
+                                   rewardToken,
+                                   rewardAmount,
+                                   fundingAmount,
+                                   cid,
+                                   title,
+                                   repoPath,
+                                   branch,
+                                   githubUser);
+  }
+
+  async disputeProposal(bountyId: number, proposalId: number): Promise<TransactionReceipt> {
+    return this.network.disputeBountyProposal(bountyId, proposalId);
+  }
+
+  async closeBounty(bountyId: number, proposalId: number): Promise<TransactionReceipt> {
+    return this.network.closeBounty(bountyId, proposalId);
+  }
+
+  async updateBountyAmount(bountyId: number, amount: number): Promise<TransactionReceipt> {
+    return this.network.updateBountyAmount(bountyId, amount);
+  }
+
+  async cancelBounty(bountyId: number): Promise<TransactionReceipt> {
+    return this.network.cancelBounty(bountyId);
+  }
+
+  async createPullRequest(bountyId: number,
+    originRepo: string,
+    originBranch: string,
+    originCID: string,
+    userRepo: string,
+    userBranch: string,
+    cid: number): Promise<TransactionReceipt> {
+
+    return this.network.createPullRequest(bountyId,
+                                          originRepo,
+                                          originBranch,
+                                          originCID,
+                                          userRepo,
+                                          userBranch,
+                                          cid);
+  }
+
+  async setPullRequestReadyToReview(bountyId: number, pullRequestId: number): Promise<TransactionReceipt> {
+    return this.network.markPullRequestReadyForReview(bountyId, pullRequestId);
+  }
+
+  async cancelPullRequest(bountyId: number, pullRequestId: number): Promise<TransactionReceipt> {
+    return this.network.cancelPullRequest(bountyId, pullRequestId);
+  }
+
+  async createProposal(bountyId, pullRequestId, addresses: string[], amounts: number[]): Promise<TransactionReceipt> {
+    return this.network.createBountyProposal(bountyId, pullRequestId, addresses, amounts);
+  }
+
+  async refuseProposal(bountyId: number, proposalId: number): Promise<TransactionReceipt> {
+    return this.network.refuseBountyProposal(bountyId, proposalId);
+  }
+
+  async approveToken(tokenAddress: string = undefined, amount: number) {
+    const erc20 = await this.loadERC20(tokenAddress);
+
+    return erc20.approve(this.network.contractAddress, amount);
+  }
+
+  async takeBackDelegation(delegationId: number): Promise<TransactionReceipt> {
+    return this.network.takeBackOracles(delegationId);
+  }
+
+  async createNetwork(networkToken: string = publicRuntimeConfig?.contract?.settler, 
+    nftToken: string = publicRuntimeConfig?.contract?.nft, 
+    nftUri = publicRuntimeConfig?.nftUri || "//",
+    treasuryAddress = Defaults.nativeZeroAddress,
+    cancelFee = 10000,
+    closeFee= 50000): Promise<TransactionReceipt> {
+    if (!this.factory) await this.loadFactory();
+
+    return this.factory.createNetwork(networkToken, nftToken, nftUri, treasuryAddress, cancelFee, closeFee);
+  }
+
+  async getNetworkAdressByCreator(address: string): Promise<string> {
+    if (!this.factory) await this.loadFactory();
+
+    return this.factory.networkOfAddress(address);
+  }
+
+  async claimNetworkGovernor(networkAddress): Promise<TransactionReceipt> {
+    const network = await this.getNetwork(networkAddress);
+
+    return network.governed.claimGovernor();
+  }
+
+  async setNFTTokenDispatcher(nftToken: string, dispatcher: string): Promise<TransactionReceipt> {
+    const bountyToken = await this.loadBountyToken(nftToken);
+
+    return bountyToken.setDispatcher(dispatcher);
+  }
+
+  toWei(n: string | number): Promise<string> {
+    return this.web3Connection.Web3.utils.toWei(n.toString(), `ether`);
+  }
+
+  isAddress(address: string): Promise<boolean> {
+    return this.web3Connection.utils.isAddress(address);
   }
 }

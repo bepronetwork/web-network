@@ -15,10 +15,10 @@ import {
   IssueDataComment
 } from "interfaces/issue-data";
 
-import { BeproService } from "services/bepro-service";
-
 import useApi from "x-hooks/use-api";
 import useOctokitGraph from "x-hooks/use-octokit-graph";
+
+import { useDAO } from "./dao";
 
 
 export interface IActiveIssue extends IssueData {
@@ -37,16 +37,16 @@ export interface IssueContextData {
 const IssueContext = createContext<IssueContextData>({} as IssueContextData);
 
 export const IssueProvider: React.FC = function ({ children }) {
-  const [activeIssue, setActiveIssue] = useState<IActiveIssue>();
-  const [networkIssue, setNetworkIssue] = useState<BountyExtended>();
-
-  const { getIssue } = useApi();
-  const { activeNetwork } = useNetwork();
   const { query } = useRouter();
 
+  const [activeIssue, setActiveIssue] = useState<IActiveIssue>();
+  const [networkIssue, setNetworkIssue] = useState<BountyExtended>();
+  
+  const { getIssue } = useApi();
+  const { activeNetwork } = useNetwork();
+  const { service: DAOService } = useDAO();
+  const { wallet, user } = useAuthentication();
   const { getIssueOrPullRequestComments, getPullRequestDetails } = useOctokitGraph();
-
-  const { wallet, user, beproServiceStarted } = useAuthentication();
 
   const addNewComment = useCallback((prId: number, comment: string) => {
     const pullRequests = [...activeIssue.pullRequests];
@@ -107,17 +107,17 @@ export const IssueProvider: React.FC = function ({ children }) {
     [activeNetwork, query?.repoId, query?.id, user?.accessToken]);
 
   const getNetworkIssue = useCallback(async () => {
-    if (!wallet?.address || !activeIssue?.contractId || !beproServiceStarted)
+    if (!wallet?.address || !activeIssue?.contractId || !DAOService)
       return;
 
-    const bounty = await BeproService.getBounty(activeIssue?.contractId);
+    const bounty = await DAOService.getBounty(activeIssue?.contractId);
 
     const isFinished = bounty?.pullRequests?.some(pullRequest => pullRequest.ready && !pullRequest.canceled);
 
     let isDraft = null;
 
     try {
-      isDraft = await BeproService.network.isBountyInDraft(bounty.id);
+      isDraft = await DAOService.isBountyInDraft(bounty.id);
     } catch (error) {
       console.error(error);
     }
@@ -126,9 +126,9 @@ export const IssueProvider: React.FC = function ({ children }) {
     for (const proposal of bounty.proposals) {
       const isDisputed = activeIssue?.merged
         ? +activeIssue?.merged !== +proposal.id
-        : await BeproService.network.isProposalDisputed(+bounty.id, +proposal.id);
+        : await DAOService.isProposalDisputed(+bounty.id, +proposal.id);
 
-      const isDisputedByAddress = await BeproService.network.disputes(wallet.address, bounty.id, proposal.id) > 0;
+      const isDisputedByAddress = await DAOService.getDisputesOf(wallet.address, bounty.id, proposal.id) > 0;
 
       networkProposals[+proposal.id] = {
         ...proposal,
@@ -152,13 +152,13 @@ export const IssueProvider: React.FC = function ({ children }) {
       isFinished
     });
     return { ...bounty, isDraft, networkProposals };
-  }, [activeIssue, wallet?.address, beproServiceStarted]);
+  }, [activeIssue, wallet?.address, DAOService]);
 
   useEffect(() => {
-    if (activeIssue && wallet?.address && beproServiceStarted) {
+    if (activeIssue && wallet?.address && DAOService) {
       getNetworkIssue();
     }
-  }, [activeIssue, wallet?.address, beproServiceStarted]);
+  }, [activeIssue, wallet?.address, DAOService]);
 
   useEffect(() => {    
     const noExpired = +new Date() - activeIssue?.lastUpdated <= TTL;

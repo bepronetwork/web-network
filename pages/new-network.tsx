@@ -17,14 +17,13 @@ import Stepper from "components/stepper";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 import { addToast } from "contexts/reducers/add-toast";
 
 import { isSameSet } from "helpers/array";
 import { isColorsSimilar } from "helpers/colors";
 import { DefaultNetworkInformation } from "helpers/custom-network";
 import { psReadAsText } from "helpers/file-reader";
-
-import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
@@ -43,13 +42,13 @@ export default function NewNetwork() {
   const [steps, setSteps] = useState(DefaultNetworkInformation);
 
   const { createNetwork } = useApi();
+  const { user, wallet } = useAuthentication();
+  const { service: DAOService } = useDAO();
   const { getUserRepositories } = useOctokitGraph();
-  const { network, getURLWithNetwork, colorsToCSS, DefaultTheme } =
-  useNetworkTheme();
+  const { network, getURLWithNetwork, colorsToCSS, DefaultTheme } = useNetworkTheme();
 
   const { dispatch } = useContext(ApplicationContext);
 
-  const { user, wallet, beproServiceStarted } = useAuthentication();
 
   function changeColor(newColor) {
     const tmpSteps = Object.assign({}, steps);
@@ -121,20 +120,18 @@ export default function NewNetwork() {
   }
 
   async function handleCreateNetwork() {
-    if (!user?.login || !wallet?.address) return;
+    if (!user?.login || !wallet?.address || !DAOService) return;
 
     setCreatingNetwork(true);
 
-    await BeproService.startNetworkFactory();
-
-    BeproService.createNetwork(steps.tokens.networkToken, steps.tokens.nftToken.address)
+    DAOService.createNetwork(steps.tokens.networkToken, steps.tokens.nftToken.address)
       .then(() => {
-        BeproService.getNetworkAdressByCreator(wallet.address).then(async (networkAddress) => {
+        DAOService.getNetworkAdressByCreator(wallet.address).then(async (networkAddress) => {
           const networkData = steps.network.data;
           const repositoriesData = steps.repositories;
 
-          await BeproService.claimNetworkGovernor(networkAddress);
-          await BeproService.setNFTTokenDispatcher(steps.tokens.nftToken.address, networkAddress);
+          await DAOService.claimNetworkGovernor(networkAddress);
+          await DAOService.setNFTTokenDispatcher(steps.tokens.nftToken.address, networkAddress);
 
           const json = {
               name: networkData.displayName.data,
@@ -210,14 +207,14 @@ export default function NewNetwork() {
   }, [user?.login]);
 
   useEffect(() => {
-    if (wallet?.address && beproServiceStarted) {
-      BeproService.getTokensLockedByAddress(wallet.address)
+    if (wallet?.address && DAOService) {
+      DAOService.getTokensLockedInFactoryByAddress(wallet.address)
         .then((value) => {
           handleLockDataChange({ label: "amountLocked", value });
         })
         .catch(console.log);
 
-      BeproService.getCreatorAmount().then(value => {
+      DAOService.getFactoryCreatorAmount().then(value => {
         handleLockDataChange({
           label: "amountNeeded",
           value
@@ -227,7 +224,7 @@ export default function NewNetwork() {
   }, [
     wallet?.address,
     wallet?.balance,
-    beproServiceStarted
+    DAOService
   ]);
 
   useEffect(() => {

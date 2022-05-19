@@ -23,7 +23,6 @@ export interface IAuthenticationContext {
   user?: User;
   wallet?: Wallet;
   isGithubAndWalletMatched?: boolean;
-  beproServiceStarted?: boolean;
   login: () => void;
   updateWalletBalance: () => void;
 }
@@ -38,9 +37,7 @@ export const AuthenticationProvider = ({ children }) => {
 
   const [user, setUser] = useState<User>();
   const [wallet, setWallet] = useState<Wallet>();
-  const [beproServiceStarted, setBeproServiceStarted] = useState(false);
-  const [isGithubAndWalletMatched, setIsGithubAndWalletMatched] =
-    useState<boolean>();
+  const [isGithubAndWalletMatched, setIsGithubAndWalletMatched] = useState<boolean>();
 
   const { service: DAOService } = useDAO();
   const { getUserOf } = useApi();
@@ -54,15 +51,13 @@ export const AuthenticationProvider = ({ children }) => {
 
       await DAOService.connect();
 
-      // const [isCouncil] = await Promise.all([
-      //   BeproService.isCouncil()
-      // ])
-
       const address = await DAOService.getAddress();
+
+      const isCouncil = await DAOService.isCouncil(address);
 
       setWallet((previousWallet) => ({
         ...previousWallet,
-        isCouncil: false,
+        isCouncil,
         address
       }));
 
@@ -108,9 +103,9 @@ export const AuthenticationProvider = ({ children }) => {
       isCouncil,
     ] = await Promise.all([
       DAOService.getOraclesResume(wallet.address),
-      DAOService.getBalance("settler"),
-      DAOService.getBalance("eth"),
-      DAOService.getBalance("staked"),
+      DAOService.getBalance("settler", wallet.address),
+      DAOService.getBalance("eth", wallet.address),
+      DAOService.getBalance("staked", wallet.address),
       DAOService.isCouncil(wallet.address),
     ])
     setWallet((previousWallet) => ({
@@ -142,11 +137,9 @@ export const AuthenticationProvider = ({ children }) => {
 
     if (user && !wallet && DAOService)
       DAOService.connect()
-        .then(async() =>{
-          const [isCouncil, address] = await Promise.all([
-            DAOService.isCouncil(),
-            DAOService.getAddress(),
-          ])
+        .then(async() => {
+          const address = await DAOService.getAddress();
+          const isCouncil = await DAOService.isCouncil(address);
 
           setWallet((previousWallet) => ({
             ...previousWallet,
@@ -154,25 +147,20 @@ export const AuthenticationProvider = ({ children }) => {
             address
           }))})
         .catch(console.log);
-  }, [user, wallet, beproServiceStarted, DAOService]);
+  }, [user, wallet, DAOService]);
 
   useEffect(() => {
     if (wallet && wallet?.address) updateWalletBalance();
   }, [pathname, wallet?.address]);
-
-  useEffect(() => {
-    if (DAOService) setBeproServiceStarted(true);
-  }, [DAOService]);
   
   const memorized = useMemo<IAuthenticationContext>(() => ({
       user,
       wallet,
-      beproServiceStarted,
       isGithubAndWalletMatched,
       login,
       updateWalletBalance
   }),
-    [user, wallet, beproServiceStarted, isGithubAndWalletMatched, DAOService]);
+    [user, wallet, isGithubAndWalletMatched, DAOService]);
 
   return (
     <AuthenticationContext.Provider value={memorized}>

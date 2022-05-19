@@ -19,6 +19,7 @@ import GithubImage from "components/github-image";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 import { toastError, toastSuccess } from "contexts/reducers/add-toast";
 import { changeCurrentAddress } from "contexts/reducers/change-current-address";
 import { changeGithubHandle } from "contexts/reducers/change-github-handle";
@@ -29,8 +30,6 @@ import { changeNetworkId } from "contexts/reducers/change-network-id";
 import { changeWalletState } from "contexts/reducers/change-wallet-connect";
 
 import { truncateAddress } from "helpers/truncate-address";
-
-import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
@@ -43,11 +42,11 @@ export default function ConnectAccount() {
   const { t } = useTranslation(["common", "connect-account"]);
 
   const [isGhValid, setIsGhValid] = useState(null);
-  const [lastAddressBeforeConnect, setLastAddressBeforeConnect] = useState(""); /* eslint-disable-line */ // TODO need a usage logic
 
   const { getUserOf, joinAddressToUser, getUserWith } = useApi();
 
   const { wallet, user } = useAuthentication();
+  const { service: DAOService } = useDAO();
   const { network, getURLWithNetwork } = useNetwork();
   const { dispatch } = useContext(ApplicationContext);
 
@@ -55,7 +54,6 @@ export default function ConnectAccount() {
 
   function updateLastUsedAddress() {
     dispatch(changeLoadState(false));
-   // setLastAddressBeforeConnect(localStorage.getItem("lastAddressBeforeConnect"));
   }
 
   async function checkAddressVsGh() {
@@ -142,22 +140,22 @@ export default function ConnectAccount() {
   }
 
   async function connectWallet() {
-    if (wallet?.address) return;
+    if (wallet?.address || !DAOService) return;
 
     let loggedIn = false;
 
     try {
-      const chainId = window?.ethereum?.chainId;
-      if (+publicRuntimeConfig.metaMask.chainId !== +chainId) {
+      const chainId = (window as any)?.ethereum?.chainId;
+
+      if (+publicRuntimeConfig?.metaMask?.chainId !== +chainId) {
         dispatch(changeNetworkId(+chainId));
         dispatch(changeNetwork((publicRuntimeConfig?.networkIds[+chainId] || "unknown")?.toLowerCase()));
         return;
       } else {
-        await BeproService.login();
-        loggedIn = BeproService.isLoggedIn;
+        loggedIn = await DAOService.connect();
       }
     } catch (e) {
-      console.error("Failed to login on BeproService", e);
+      console.error("Failed to login on DAOService", e);
     }
 
     if (!loggedIn) {
@@ -165,7 +163,7 @@ export default function ConnectAccount() {
       dispatch(changeCurrentAddress(""));
     } else {
       dispatch(changeWalletState(loggedIn));
-      dispatch(changeCurrentAddress(BeproService.address));
+      dispatch(changeCurrentAddress(wallet?.address));
     }
 
     return loggedIn;

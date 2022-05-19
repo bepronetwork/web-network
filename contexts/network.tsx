@@ -8,11 +8,11 @@ import { parseCookies, setCookie } from "nookies";
 
 import NetworkThemeInjector from "components/custom-network/network-theme-injector";
 
+import { useDAO } from "contexts/dao";
+
 import { INetwork } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
-
-import { useDAO } from "./dao";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -76,18 +76,29 @@ export const NetworkProvider: React.FC = function ({ children }) {
           DAOService.getNetworkParameter("draftTime"),
           DAOService.getNetworkParameter("oracleExchangeRate"),
           DAOService.getNetworkParameter("mergeCreatorFeeShare"),
-          DAOService.getNetworkParameter("percentageNeededForDispute")
+          DAOService.getNetworkParameter("proposerFeeShare"),
+          DAOService.getNetworkParameter("percentageNeededForDispute"),
+          DAOService.getTreasury()
         ]);
       })
-      .then(values => {
+      .then(([councilAmount, 
+              disputableTime, 
+              draftTime, 
+              oracleExchangeRate, 
+              mergeCreatorFeeShare,
+              proposerFeeShare,
+              percentageNeededForDispute, 
+              treasury]) => {
         setActiveNetwork({
           ...activeNetwork,
-          councilAmount: values[0],
-          disputableTime: values[1] / 1000,
-          draftTime: values[2] / 1000,
-          oracleExchangeRate: values[3],
-          mergeCreatorFeeShare: values[4],
-          percentageNeededForDispute: values[5]
+          councilAmount,
+          disputableTime: disputableTime / 1000,
+          draftTime: draftTime / 1000,
+          oracleExchangeRate,
+          mergeCreatorFeeShare,
+          proposerFeeShare,
+          percentageNeededForDispute,
+          treasury
         });
       });
   }, [activeNetwork, DAOService]);

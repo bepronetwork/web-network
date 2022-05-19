@@ -19,6 +19,7 @@ import InputNumber from "components/input-number";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/add-toast";
 
@@ -32,8 +33,6 @@ import { psReadAsText } from "helpers/file-reader";
 import { formatDate } from "helpers/formatDate";
 import { formatNumberToCurrency } from "helpers/formatNumber";
 import { getQueryableText, urlWithoutProtocol } from "helpers/string";
-
-import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
@@ -79,6 +78,7 @@ export default function Settings() {
   const { searchRepositories, updateNetwork, isNetworkOwner } = useApi();
   const { network, colorsToCSS, getURLWithNetwork } = useNetworkTheme();
   const { updateActiveNetwork } = useNetwork();
+  const { service: DAOService } = useDAO();
 
   const { dispatch } = useContext(ApplicationContext);
   const { wallet, user, updateWalletBalance } = useAuthentication();
@@ -111,11 +111,11 @@ export default function Settings() {
 
     setNewInfo(tmpInfo);
 
-    const redeemTime = await BeproService.getNetworkParameter("draftTime").then(time => time / 1000);
-    const disputeTime = await BeproService.getNetworkParameter("disputableTime").then(time => time / 1000);
-    const councilAmount = await BeproService.getNetworkParameter("councilAmount");
+    const redeemTime = await DAOService.getNetworkParameter("draftTime").then(time => time / 1000);
+    const disputeTime = await DAOService.getNetworkParameter("disputableTime").then(time => time / 1000);
+    const councilAmount = await DAOService.getNetworkParameter("councilAmount");
     const percentageForDispute =
-      await BeproService.getNetworkParameter("percentageNeededForDispute");
+      await DAOService.getNetworkParameter("percentageNeededForDispute");
 
     const tmpInfo2 = Object.assign({}, tmpInfo);
 
@@ -144,8 +144,8 @@ export default function Settings() {
 
   async function loadAmounts(networkArg) {
     try {
-      const tokenStaked = 0;//await BeproService.getTokensStaked(handleNetworkAddress(networkArg));
-      const oraclesStaked = await BeproService.getTotalSettlerLocked(handleNetworkAddress(networkArg));
+      const tokenStaked = 0;
+      const oraclesStaked = await DAOService.getTotalSettlerLocked(handleNetworkAddress(networkArg));
 
       setNetworkAmounts({
         tokenStaked,
@@ -228,7 +228,7 @@ export default function Settings() {
   }
 
   async function handleSubmit() {
-    if (!user?.login || !wallet?.address) return;
+    if (!user?.login || !wallet?.address || !DAOService) return;
 
     setUpdatingNetwork(true);
 
@@ -259,19 +259,19 @@ export default function Settings() {
     updateNetwork(json)
       .then(async () => {
         if (currentNetworkParameters.redeemTime !== newInfo.redeemTime)
-          await BeproService.setNetworkParameter("draftTime", newInfo.redeemTime).catch(console.log);
+          await DAOService.setNetworkParameter("draftTime", newInfo.redeemTime).catch(console.log);
 
         if (currentNetworkParameters.disputeTime !== newInfo.disputeTime)
-          await BeproService.setNetworkParameter("disputableTime",newInfo.disputeTime).catch(console.log);
+          await DAOService.setNetworkParameter("disputableTime",newInfo.disputeTime).catch(console.log);
 
         if (currentNetworkParameters.councilAmount !== newInfo.councilAmount)
-          await BeproService.setNetworkParameter("councilAmount", newInfo.councilAmount).catch(console.log);
+          await DAOService.setNetworkParameter("councilAmount", newInfo.councilAmount).catch(console.log);
 
         if (
           currentNetworkParameters.percentageForDispute !==
           newInfo.percentageForDispute
         )
-          await BeproService.setNetworkParameter("percentageNeededForDispute", newInfo.percentageForDispute)
+          await DAOService.setNetworkParameter("percentageNeededForDispute", newInfo.percentageForDispute)
           .catch(console.log);
 
         dispatch(addToast({
@@ -300,11 +300,11 @@ export default function Settings() {
   }
 
   function handleCloseNetwork() {
-    if (!network || !user?.login || !user?.accessToken || !wallet?.address) return;
+    if (!network || !user?.login || !user?.accessToken || !wallet?.address || !DAOService) return;
 
     setIsClosing(true);
 
-    BeproService.closeNetwork()
+    DAOService.unlockFromFactory()
       .then(() => {
         return updateNetwork({
           githubLogin: user?.login,
@@ -341,14 +341,14 @@ export default function Settings() {
 
   useEffect(() => {
     if (
-      !BeproService.isStarted ||
+      !DAOService ||
       !network ||
       !wallet?.address ||
       !user?.login
     )
       return;
 
-    BeproService.isNetworkAbleToClose(network?.networkAddress)
+    DAOService.isNetworkAbleToClosed()
       .then((result) => {
         setIsAbleToClose(result && !network?.isClosed);
       })
@@ -367,7 +367,7 @@ export default function Settings() {
 
         router.push(getURLWithNetwork("/account"));
       });
-  }, [BeproService.isStarted, network, wallet?.address, user?.login]);
+  }, [DAOService, network, wallet?.address, user?.login]);
 
   useEffect(() => {
     const networkData = newInfo?.network?.data;

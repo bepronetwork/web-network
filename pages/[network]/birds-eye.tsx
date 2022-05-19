@@ -9,10 +9,9 @@ import { Octokit } from "octokit";
 import ConnectWalletButton from "components/connect-wallet-button";
 
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 
 import { User } from "interfaces/api";
-
-import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 
@@ -31,7 +30,8 @@ export default function FalconPunchPage() {
   >([]);
 
   const { getAllUsers } = useApi();
-  const { wallet, user, beproServiceStarted } = useAuthentication();
+  const { service: DAOService } = useDAO();
+  const { wallet, user } = useAuthentication();
 
   function toDays(date = "") {
     return +new Date(date) / (24 * 60 * 60 * 1000);
@@ -50,10 +50,14 @@ export default function FalconPunchPage() {
     }
 
     async function hasEthBalance(address: string) {
-      if (!beproServiceStarted) return 0;
+      if (!DAOService) return 0;
 
-      return BeproService.login()
-        .then(() => BeproService.connection.Web3.eth.getBalance(address as string | number))
+      return DAOService.connect()
+        .then(connected => {
+          if (connected) return DAOService.getBalance("eth", address);
+
+          return 0;
+        })
         .then((eth) => +eth)
         .catch((e) => {
           console.error("Error on get eth", e);

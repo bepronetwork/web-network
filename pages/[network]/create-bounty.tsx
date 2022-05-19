@@ -20,6 +20,7 @@ import TokensDropdown from "components/tokens-dropdown";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { toastError, toastWarning } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
@@ -32,8 +33,6 @@ import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { Token } from "interfaces/token";
 import { BlockTransaction } from "interfaces/transaction";
-
-import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
@@ -75,7 +74,8 @@ export default function PageCreateIssue() {
   
   const { activeNetwork } = useNetwork();
   const { handleApproveToken } = useBepro();
-  const { wallet, user, beproServiceStarted } = useAuthentication();
+  const { service: DAOService } = useDAO();
+  const { wallet, user } = useAuthentication();
   const {
     dispatch,
     state: { myTransactions }
@@ -88,7 +88,7 @@ export default function PageCreateIssue() {
   const { createPreBounty, processEvent } = useApi();
 
   async function allowCreateIssue() {
-    if (!beproServiceStarted || !transactionalToken || issueAmount.floatValue <= 0) return;
+    if (!DAOService || !transactionalToken || issueAmount.floatValue <= 0) return;
 
     handleApproveToken(transactionalToken.address, issueAmount.floatValue).then(() => {
       updateWalletByToken(transactionalToken);
@@ -121,13 +121,13 @@ export default function PageCreateIssue() {
   }
 
   async function createIssue() {
-    if (!repository || !transactionalToken) return;
+    if (!repository || !transactionalToken || !DAOService || !wallet) return;
 
     const payload = {
       title: issueTitle,
       body: addFilesInDescription(issueDescription),
       amount: issueAmount.floatValue,
-      creatorAddress: BeproService.address,
+      creatorAddress: wallet.address,
       creatorGithub: user?.login,
       repositoryId: repository?.id,
       branch
@@ -164,7 +164,7 @@ export default function PageCreateIssue() {
       githubUser: payload.creatorGithub
     };
 
-    const txInfo = await BeproService.openBounty(chainPayload)
+    const txInfo = await DAOService.openBounty(chainPayload)
           .catch((e) => {
             cleanFields();
             if (e?.message?.toLowerCase().search("user denied") > -1)
@@ -259,18 +259,18 @@ export default function PageCreateIssue() {
   const onUpdateFiles = (files: IFilesProps[]) => setFiles(files);
 
   const updateWalletByToken = async (token: Token) => {
-    setTokenBalance(await BeproService.getTokenBalance(token.address));
-    setTransactionalAllowance(await BeproService.getAllowance(token.address));
+    setTokenBalance(await DAOService.getTokenBalance(token.address, wallet.address));
+    setTransactionalAllowance(await DAOService.getAllowance(token.address, wallet.address));
   }
 
   const isAmountApproved = () => transactionalAllowance >= issueAmount.floatValue;
 
   useEffect(() => {
-    if (!wallet?.balance) return;
+    if (!wallet?.balance || !DAOService) return;
     if (!transactionalToken) return setTransactionalToken(BEPRO_TOKEN);
 
     updateWalletByToken(transactionalToken);
-  }, [transactionalToken, wallet]);
+  }, [transactionalToken, wallet, DAOService]);
 
   useEffect(() => {
     setIsTransactionalTokenApproved(isAmountApproved());

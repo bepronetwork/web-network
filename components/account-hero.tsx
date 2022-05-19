@@ -5,30 +5,29 @@ import { useTranslation } from "next-i18next";
 import GithubHandle from "components/github-handle";
 
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
-
-import { BeproService } from "services/bepro-service";
 
 export default function AccountHero() {
   const { t } = useTranslation(["common", "bounty"]);
 
   const [myBounties, setMyBounties] = useState<number[]>([]);
 
-  const { wallet, beproServiceStarted } = useAuthentication();
+  const { service: DAOService } = useDAO();
+  const { wallet } = useAuthentication();
 
   function loadBeproNetworkInformation() {
-    if (!beproServiceStarted || !wallet?.address) return;
+    if (!DAOService || !wallet?.address) return;
 
     const address = wallet?.address;
 
-    BeproService.network
-      .getBountiesOfAddress(address)
+    DAOService.getBountiesOfAddress(address)
       .then(setMyBounties);
   }
 
   useEffect(loadBeproNetworkInformation, [
-    beproServiceStarted,
+    DAOService,
     wallet?.address,
   ]);
 
