@@ -2,13 +2,13 @@ import { Defaults } from "@taikai/dappkit";
 
 import { handlePercentage } from "helpers/handlePercentage";
 
-export default async function calculateDistributedAmounts(treasury,
-                                                          mergerFee: number,
-                                                          proposerFee: number,
-                                                          bountyAmount: number,
-                                                          proposalPercents: number[]) {
-  const treasuryAmount = treasury["0"] === Defaults.nativeZeroAddress ? 0 : 
-    (bountyAmount / 100) * (treasury["1"] / Defaults.TenK);
+export default function calculateDistributedAmounts(treasury,
+                                                    mergerFee: number,
+                                                    proposerFee: number,
+                                                    bountyAmount: number,
+                                                    proposalPercents: number[]) {
+  const treasuryAmount = treasury.treasury === Defaults.nativeZeroAddress ? 0 : 
+    (bountyAmount / 100) * (treasury.closeFee / Defaults.TenK);
 
   const mergerAmount = (bountyAmount / 100) * mergerFee;
   const proposerAmount = ((bountyAmount - mergerAmount) / 100) * proposerFee;
