@@ -61,7 +61,7 @@ function PullRequestLabels({
     return t("status.conflicts");
   }
 
-  function pullRequestLabelClass() {
+  function getPullRequestLabelClass(): string {
     return [
       `pullrequest-labels d-flex justify-content-center`,
       `align-items-center rounded-pill p-1`,
@@ -79,7 +79,7 @@ function PullRequestLabels({
   if (!state) return <></>;
 
   return (
-    <div className={pullRequestLabelClass()}>
+    <div className={getPullRequestLabelClass()}>
       <span
         className={`caption-small text-uppercase text-${getColorLabel()} mx-1 text-nowrap`}
       >
