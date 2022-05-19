@@ -70,7 +70,7 @@ export async function write(text: string,
     localFontPath = fontSemiBold;
   }
 
-/* eslint-disable */
+/* eslint-enable */ 
   const buffer = "";
   // TODO: Find other choice to text2png
   // const buffer = text2png(text, {
