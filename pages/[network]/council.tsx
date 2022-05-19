@@ -8,14 +8,13 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import ListIssues from "components/list-issues";
 import PageHero, { InfosHero } from "components/page-hero";
 
-import { useAuthentication } from "contexts/authentication";
-
 import useApi from "x-hooks/use-api";
 
 export default function PageCouncil() {
   const { t } = useTranslation(["council"]);
-  const {beproServiceStarted} = useAuthentication()
+
   const { getTotalBounties } = useApi();
+
   const [infos, setInfos] = useState<InfosHero[]>([
     {
       value: 0,
@@ -33,11 +32,10 @@ export default function PageCouncil() {
   ]);
 
   async function loadTotals() {
-    if (!beproServiceStarted) return;
-
     const [totalBounties] = await Promise.all([
       getTotalBounties('ready'),
     ]);
+    
     setInfos([
       {
         value: totalBounties,
