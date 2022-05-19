@@ -33,7 +33,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-   try {
+  try {
     const {
       name,
       colors,
