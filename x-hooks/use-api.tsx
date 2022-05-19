@@ -31,7 +31,7 @@ interface CreateBounty {
   repositoryId: string;
 }
 
-interface FileUploadReturn {
+type FileUploadReturn = {
   hash: string;
   fileName: string;
   size: string;
