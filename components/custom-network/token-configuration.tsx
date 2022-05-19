@@ -104,6 +104,8 @@ export default function TokenConfiguration({
     .catch(console.log);
   }, [data.networkToken, data.nftToken]);
 
+ /* eslint-enable */
+ 
   return (
     <Step
       title={t("custom-network:steps.token-configuration.title")}
@@ -215,4 +217,3 @@ export default function TokenConfiguration({
     </Step>
   );
 }
- /* eslint-disable */
