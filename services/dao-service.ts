@@ -452,10 +452,19 @@ export default class DAO {
     return this.factory.networkOfAddress(address);
   }
 
+  // TODO: use this method when the https://github.com/taikai/dappkit/pull/25 is merged
+  /*
   async claimNetworkGovernor(networkAddress): Promise<TransactionReceipt> {
     const network = await this.getNetwork(networkAddress);
 
     return network.governed.claimGovernor();
+  }
+  */
+
+  async claimNetworkGovernor(networkAddress): Promise<TransactionReceipt> {
+    const network = await this.getNetwork(networkAddress);
+
+    return network.sendTx(network.contract.methods.claimGovernor());
   }
 
   async setNFTTokenDispatcher(nftToken: string, dispatcher: string): Promise<TransactionReceipt> {
