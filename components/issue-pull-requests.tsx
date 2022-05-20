@@ -31,7 +31,6 @@ export default function IssuePullRequests({
       {(issue?.pullRequests?.length > 0 &&
         React.Children.toArray(issue?.pullRequests?.map((pullRequest) => (
             <PullRequestItem
-              key={pullRequest.id}
               issue={issue}
               pullRequest={pullRequest}
               networkPullRequest={networkIssue?.pullRequests?.find(pr => +pr.id === +pullRequest.contractId)}

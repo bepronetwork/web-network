@@ -78,7 +78,7 @@ export default function PullRequestItem({
 
   return (
     <>
-      <div className="content-list-item proposal">
+      <div className="content-list-item proposal" key={pullRequest.id}>
         <Link
           passHref
           href={getURLWithNetwork("/pull-request", {

@@ -56,7 +56,7 @@ export default async function readProposalCreated(events, network: Network_v2, c
           });
 
           if (!proposal) {
-            const merge = await models.mergeProposal.create({
+            await models.mergeProposal.create({
               scMergeId: networkProposal.id,
               issueId: bounty.id,
               pullRequestId: pullRequest.id,

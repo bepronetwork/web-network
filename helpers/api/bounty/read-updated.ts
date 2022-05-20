@@ -1,5 +1,5 @@
 
-import { ERC20, Network_v2 } from "@taikai/dappkit";
+import { Network_v2 } from "@taikai/dappkit";
 
 import models from "db/models";
 

@@ -14,6 +14,10 @@ export default function DeployNFTModal({
   show,
   setClose,
   setNFTAddress
+}:{
+  show: boolean
+  setClose: () => void
+  setNFTAddress: (address: string) => void
 }) {
   const { t } = useTranslation(["common", "change-token-modal", "custom-network"]);
   const [name, setName] = useState('');

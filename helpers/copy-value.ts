@@ -1,7 +1,5 @@
 export function CopyValue(value: string) {
-  let input: HTMLTextAreaElement;
-
-  input = document.createElement("textarea");
+  const input: HTMLTextAreaElement = document.createElement("textarea");
   input.style.display = "hidden";
   input.id = "made-input";
   input.value = value;

@@ -31,6 +31,7 @@ import { parseTransaction } from "helpers/transactions";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { Token } from "interfaces/token";
+import { BlockTransaction } from "interfaces/transaction";
 
 import { BeproService } from "services/bepro-service";
 
@@ -167,10 +168,12 @@ export default function PageCreateIssue() {
           .catch((e) => {
             cleanFields();
             if (e?.message?.toLowerCase().search("user denied") > -1)
-              dispatch(updateTransaction({ ...(openIssueTx.payload as any), status: TransactionStatus.rejected }));
+              dispatch(updateTransaction({ 
+                ...(openIssueTx.payload as BlockTransaction), status: TransactionStatus.rejected 
+              }));
             else
               dispatch(updateTransaction({
-                  ...(openIssueTx.payload as any),
+                  ...(openIssueTx.payload as BlockTransaction),
                   status: TransactionStatus.failed
               }));
 
@@ -184,7 +187,7 @@ export default function PageCreateIssue() {
 
     txWindow.updateItem(openIssueTx.payload.id, parseTransaction(txInfo, openIssueTx.payload));
 
-    const { blockNumber: fromBlock } = txInfo as any;
+    const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
     const createdBounties = await processEvent("bounty", "created", activeNetwork?.name, { fromBlock } )
       .then(({data}) => data)

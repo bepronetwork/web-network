@@ -9,7 +9,10 @@ import { useRepos } from "contexts/repos";
 
 export default function BranchsDropdown({
   repoId,
-  onSelected = (opt: { value }) => {}
+  onSelected
+}: {
+  repoId: string
+  onSelected: (e: { value: string }) => void
 }) {
   const { findBranch } = useRepos();
   const [options, setOptions] = useState<{ value: string; label: string }[]>();
@@ -22,7 +25,7 @@ export default function BranchsDropdown({
       return { value, label };
     }
 
-    const branchs = await findBranch(repoId);
+    const branchs = await findBranch(Number(repoId));
 
     setOptions(branchs.map(mapRepo));
   }

@@ -37,7 +37,7 @@ export default function TransactionModal({
   const { dispatch } = useContext(ApplicationContext);
   const [addressFrom, setAddressFrom] = useState("...");
   const [addressTo, setAddressTo] = useState("...");
-  const [details, setDetails] = useState<any>([]);
+  const [details, setDetails] = useState<any>([]);  // eslint-disable-line
   const { t } = useTranslation("common");
   const { getURLWithNetwork } = useNetworkTheme();
 
@@ -73,7 +73,7 @@ export default function TransactionModal({
 
   useEffect(updateAddresses, [transaction]);
 
-  function renderDetailRow(item): any {
+  function renderDetailRow(item): any {  // eslint-disable-line
     return (
       <>
         <div className="d-flex align-items-center justify-content-between bg-dark-gray py-2 mt-2 px-3 rounded-8">

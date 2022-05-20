@@ -29,8 +29,7 @@ export default function InvalidAccountWalletModal({ user, wallet, isVisible }) {
       centerTitle
       size="lg"
       show={isVisible}
-      title={t("modals.invalid-account-wallet.title")}
-    >
+      title={t("modals.invalid-account-wallet.title")}>
       <div>
         <div className="d-flex justify-content-center mb-2 mx-2 text-center flex-column mb-4">
           <p className="caption-small text-gray">
