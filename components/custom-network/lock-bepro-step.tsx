@@ -109,11 +109,11 @@ export default function LockBeproStep({
       .catch(console.log);
   }
 
-  function updateAllowance() {
-    DAOService.getAllowance(publicRuntimeConfig?.contract?.address, 
+  function updateAllowance() {  
+    DAOService.getAllowance(publicRuntimeConfig?.contract?.settler,
                             wallet.address, 
                             publicRuntimeConfig?.networkConfig?.factoryAddress)
-    .then(setSettlerAllowance);
+    .then(setSettlerAllowance).catch(() => 0);
   }
 
   useEffect(() => {
