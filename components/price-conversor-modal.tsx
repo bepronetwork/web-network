@@ -57,7 +57,9 @@ export default function PriceConversorModal({
       <div
         ref={innerRef}
         {...innerProps}
-        className="proposal__select_currency cursor-pointer d-inline-flex align-items-center flex-grow-1 justify-content-between text-center caption-large text-white p-1"
+        className="proposal__select_currency cursor-pointer d-inline-flex 
+                   align-items-center flex-grow-1 justify-content-between 
+                   text-center caption-large text-white p-1"
       >
         <span>{formatNumberToNScale(currentPrice)}</span>
         <span>{data?.value}</span>
@@ -71,7 +73,9 @@ export default function PriceConversorModal({
       <div
         ref={innerRef}
         {...innerProps}
-        className={`react-select__option p-small text-white p-2 d-flex justify-content-between hover-primary cursor-pointer text-${current? 'white' : 'gray'}`}
+        className={`react-select__option p-small text-white p-2 d-flex 
+                    justify-content-between hover-primary cursor-pointer 
+                    text-${current? 'white' : 'gray'}`}
       >
         <span className="">{data?.label}</span>
         <span className="text-uppercase">{data?.value}</span>
@@ -87,7 +91,10 @@ export default function PriceConversorModal({
     onCloseClick={onClose}
   >
     <div className="d-flex flex-row gap-2">
-      <InputNumber className="caption-large" symbol="$Bepro" value={currentValue} onValueChange={setValue}/>
+      <InputNumber className="caption-large" 
+      symbol="$Bepro" value={currentValue} 
+      onValueChange={(e) => setValue(e.floatValue)}
+      />
       <div className="d-flex justify-center align-items-center bg-dark-gray circle-2 p-2">
         <TransactionIcon width={14} height={10}/>
       </div>

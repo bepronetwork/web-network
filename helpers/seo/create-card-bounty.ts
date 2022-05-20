@@ -152,7 +152,7 @@ async function doTitle(title: string) {
       return currentLine + (c.length % 48) > 40 ? `${p} \n${c}` : `${p} ${c}`;
     });
   } catch {
-    title = title;
+    title
   }
 
   const titleText = await write(title || "", 48, "white", "semi");
@@ -227,7 +227,7 @@ interface IGenerateResp {
   width: number;
   heigth: number;
   data: Buffer;
-  buffer: any;
+  buffer: Buffer;
 }
 
 export async function generateCard(issue: IGenerateCard): Promise<IGenerateResp> {

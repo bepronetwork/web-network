@@ -192,7 +192,6 @@ export default function PageActions({
       user?.login && (
         <NewProposal
           isFinished={finished}
-          isIssueOwner={isBountyOwner()}
           amountTotal={amountIssue}
           pullRequests={pullRequests}
         />
@@ -322,7 +321,9 @@ export default function PageActions({
       return handleCreatePullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid);
     })
     .then(txInfo => {
-      return processEvent("pull-request", "created", activeNetwork?.name, { fromBlock: (txInfo as any).blockNumber });
+      return processEvent("pull-request", "created", activeNetwork?.name, { 
+        fromBlock: (txInfo as { blockNumber: number }).blockNumber 
+      });
     })
     .then(() => {
       dispatch(addToast({

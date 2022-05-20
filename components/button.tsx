@@ -9,6 +9,9 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   upperCase?: boolean;
   asAnchor?: boolean;
   applyTextColor?: boolean;
+  className?: string;
+  disabled?: boolean;
+  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void
 }
 
 export default function Button({

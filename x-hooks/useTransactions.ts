@@ -17,7 +17,7 @@ export default function useTransactions() {
 
   function updateItem(id: string, mergePayload: Partial<BlockTransaction>) {
     const old = findItem(id);
-    dispatch(updateTransaction({ ...old, ...(mergePayload as any) }));
+    dispatch(updateTransaction({ ...old, ...(mergePayload as BlockTransaction) }));
   }
 
   return { findItem, updateItem };

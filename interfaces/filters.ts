@@ -1,6 +1,6 @@
 export interface IssueFilterBoxOption {
   label: string;
-  value: any;
+  value: any; //eslint-disable-line
   checked: boolean;
 }
 

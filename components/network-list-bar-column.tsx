@@ -6,7 +6,13 @@ export default function NetworkListBarColumn({
   isColumnActive,
   columnOrder = "asc",
   label,
-  onClick = () => {}
+  onClick
+}: {
+  hideOrder: boolean;
+  isColumnActive: boolean;
+  columnOrder: string;
+  label: string;
+  onClick: () => void
 }) {
   const textClass = hideOrder
     ? "text-primary"

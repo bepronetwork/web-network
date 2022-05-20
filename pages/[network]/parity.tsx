@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ListGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
 
 import { GetServerSideProps } from "next";
@@ -17,7 +17,7 @@ import OverrideNameModal from "components/custom-network/override-name-modal";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
-import { toastError, toastInfo } from "contexts/reducers/add-toast";
+import { toastError } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 import { updateTransaction } from "contexts/reducers/update-transaction";
@@ -30,6 +30,7 @@ import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { INetwork } from "interfaces/network";
 import { ReposList } from "interfaces/repos-list";
+import { BlockTransaction } from "interfaces/transaction";
 
 import { BeproService } from "services/bepro-service";
 
@@ -63,20 +64,20 @@ export default function ParityPage() {
     searchNetworks
   } = useApi();
 
-  const formItem = (label = "",
-    placeholder = "",
-    value = "",
-    onChange = (ev) => {}) => ({ label, placeholder, value, onChange });
+  const formItem = (label: string, 
+    placeholder: string, 
+    value: string, 
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void) => ({ label, placeholder, value, onChange });
 
   const formMaker = [
     formItem(t("parity:fields.github-token.label"),
              t("parity:fields.github-token.placeholder"),
              githubToken,
-             (ev) => setGithubToken(ev?.target?.value)),
+             (e) => setGithubToken(e?.target?.value)),
     formItem(t("parity:fields.github-login.label"),
              t("parity:fields.github-login.placeholder"),
              githubLogin,
-             (ev) => setGithubLogin(ev?.target?.value))
+             (e) => setGithubLogin(e?.target?.value))
     // formItem(`Read Repo`, `Github repo name to read from (pex @taikai/dappkit)`, readRepoName, (ev) => setReadRepoName(ev?.target?.value)),
   ];
 
@@ -193,13 +194,19 @@ export default function ParityPage() {
         if (!cid) throw new Error(t("errors.creating-issue"));
         return BeproService.network
           .openIssue([repository_id, cid].join("/"), msPayload.amount)
-          .then((txInfo) => {
+          .then((txInfo: { events?: {
+            OpenIssue?: {
+              returnValues?: {
+                id: string | number;
+              }
+            }
+          }}) => {
             // BeproService.parseTransaction(txInfo, openIssueTx.payload)
             //             .then(block => dispatch(updateTransaction(block)))
             return {
               githubId: cid,
               issueId:
-                (txInfo as any).events?.OpenIssue?.returnValues?.id &&
+                txInfo.events?.OpenIssue?.returnValues?.id &&
                 [repository_id, cid].join("/")
             };
           });
@@ -220,10 +227,10 @@ export default function ParityPage() {
       .catch((e) => {
         console.error("Failed to createIssue", e);
         if (e?.message?.search("User denied") > -1)
-          dispatch(updateTransaction({ ...(openIssueTx.payload as any), remove: true }));
+          dispatch(updateTransaction({ ...(openIssueTx.payload as BlockTransaction), remove: true }));
         else
           dispatch(updateTransaction({
-              ...(openIssueTx.payload as any),
+              ...(openIssueTx.payload as BlockTransaction),
               status: TransactionStatus.failed
           }));
 
@@ -412,7 +419,9 @@ export default function ParityPage() {
           {networks.map((networkItem) => (
             <div
               key={networkItem.name}
-              className="row caption-small mb-1 bg-dark py-3 border-radius-8 text-gray cursor-pointer align-items-center bg-ligth-gray-hover"
+              className="row caption-small mb-1 bg-dark py-3 
+              border-radius-8 text-gray cursor-pointer 
+              align-items-center bg-ligth-gray-hover"
               onClick={() => handleNetworkClick(networkItem)}
             >
               <div className="col-2">{networkItem.name}</div>

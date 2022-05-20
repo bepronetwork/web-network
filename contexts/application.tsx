@@ -39,8 +39,7 @@ import { changeStakedState } from "./reducers/change-staked-amount";
 
 interface GlobalState {
   state: ApplicationState;
-  methods?: any;
-  dispatch: (action: ReduceActor<any>) => Dispatch<ReduceActor<any>>;
+  dispatch: (action: ReduceActor<any>) => Dispatch<ReduceActor<any>>; // eslint-disable-line
 }
 
 const defaultState: GlobalState = {
@@ -84,12 +83,10 @@ const defaultState: GlobalState = {
 };
 
 export const ApplicationContext = createContext<GlobalState>(defaultState);
-const { publicRuntimeConfig } = getConfig();
+const { publicRuntimeConfig } = getConfig()
 
 const cheatAddress = "";
 let waitingForTx = null;
-const cheatBepro = null;
-const cheatDispatcher = null;
 
 export default function ApplicationContextProvider({ children }) {
   const [state, dispatch] = useReducer(mainReducer, defaultState.state);
@@ -117,12 +114,12 @@ export default function ApplicationContextProvider({ children }) {
 
     window.ethereum.on("chainChanged", (evt) => {
       dispatch(changeNetworkId(+evt?.toString()));
-      dispatch(changeNetwork((publicRuntimeConfig?.networkIds[+evt?.toString()] || "unknown")?.toLowerCase()));
+      dispatch(changeNetwork((publicRuntimeConfig.networkIds[+evt?.toString()] || "unknown")?.toLowerCase()));
     });
 
     if (txListener) clearInterval(txListener);
 
-    const web3 = (window as any).web3;
+    const web3 = (window as any).web3; // eslint-disable-line
 
     const getPendingBlock = () => {
       if (!cheatAddress || !waitingForTx || !waitingForTx?.transactionHash)
@@ -188,7 +185,7 @@ export default function ApplicationContextProvider({ children }) {
     const transactions = JSON.parse(cookie[`bepro.transactions:${address}`]
         ? cookie[`bepro.transactions:${address}`]
         : "[]");
-    const web3 = (window as any).web3;
+    const web3 = (window as any).web3; // eslint-disable-line
 
     const getStatusFromBlock = async (tx) => {
       const transaction = { ...tx };
@@ -233,7 +230,10 @@ export default function ApplicationContextProvider({ children }) {
   }, [state.myTransactions, wallet]);
 
   return (
-    <ApplicationContext.Provider value={{ state, dispatch: dispatch as any }}>
+    <ApplicationContext.Provider value={{ 
+                                         state, 
+                                         dispatch: dispatch as any } // eslint-disable-line
+                                       }>
       <Loading show={state.loading.isLoading} text={state.loading.text} />
       <Toaster />
       {children}
