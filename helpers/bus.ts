@@ -1,1 +1,3 @@
-export const Bus = require("tiny-emitter/instance");
+import Bus from "tiny-emitter/instance";
+
+export { Bus };

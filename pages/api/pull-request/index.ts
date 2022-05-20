@@ -17,9 +17,15 @@ import { GraphQlResponse } from "types/octokit";
 
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
+interface propsWhere {
+  githubLogin?: string | string[];
+  issueId?: string | number;
+  status?: { [ key: string ]: string[]; };
+}
+
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { login, issueId, networkName } = req.query;
-  const where = {} as any;
+  const where = {} as propsWhere;
 
   if (login) where.githubLogin = login;
 

@@ -37,7 +37,6 @@ export default function NetworkListItem({
 }: NetworkListItemProps) {
   const router = useRouter();
   const { t } = useTranslation("common");
-
   const [totalBounties, setTotalBounties] = useState(0);
   const [openBounties, setOpenBounties] = useState(0);
   const [tokensLocked, setTokensLocked] = useState(0);

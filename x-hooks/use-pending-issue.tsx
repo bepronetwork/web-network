@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useContext, useState } from "react";
+import { useContext, useState } from "react";
 
 import { ApplicationContext } from "contexts/application";
 import { useNetwork } from "contexts/network";
@@ -11,6 +11,7 @@ import { parseTransaction } from "helpers/transactions";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { IssueData } from "interfaces/issue-data";
+import { BlockTransaction } from "interfaces/transaction";
 
 import { BeproService } from "services/bepro-service";
 
@@ -24,9 +25,7 @@ interface usePendingIssueActions {
 
 type usePendingIssueReturn = [IssueData, usePendingIssueActions];
 
-export default function usePendingIssue<
-  S = IssueData
->(): usePendingIssueReturn {
+export default function usePendingIssue(): usePendingIssueReturn {
   const [pendingIssue, setPendingIssue] = useState<IssueData>(null);
   const [issueExistsOnSc, setIssueExistsOnSc] = useState<boolean>(false);
   const { dispatch } = useContext(ApplicationContext);
@@ -75,13 +74,13 @@ export default function usePendingIssue<
       .catch((e) => {
         console.error("Failed to createIssue", e);
         if (e?.message?.search("User denied") > -1)
-          dispatch(updateTransaction({ ...(openIssueTx.payload as any), remove: true }));
+          dispatch(updateTransaction({ ...(openIssueTx.payload as BlockTransaction), remove: true }));
         else
           dispatch(updateTransaction({
-              ...(openIssueTx.payload as any),
+              ...(openIssueTx.payload as BlockTransaction),
               status: TransactionStatus.failed
           }));
-        return {} as any;
+        return {} as unknown;
       });
   }
 

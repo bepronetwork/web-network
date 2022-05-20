@@ -16,6 +16,8 @@ import Button from "./button";
 
 const { publicRuntimeConfig } = getConfig();
 
+type typeError = { code?: number}
+
 export default function WrongNetworkModal({
   requiredNetworkId = null,
 }: {
@@ -51,8 +53,8 @@ export default function WrongNetworkModal({
           },
         ],
       });
-    } catch (error: any) {
-      if (error.code === 4902) {
+    } catch (error) {
+      if ((error as typeError).code === 4902) {
         try {
           await window.ethereum.request({
             method: "wallet_addEthereumChain",
@@ -70,11 +72,11 @@ export default function WrongNetworkModal({
               },
             ],
           });
-        } catch (error: any) {
-          if (error.code === -32602) {
+        } catch (error) {
+          if ((error as typeError).code === -32602) {
             setError(t("modals.wrong-network.error-invalid-rpcUrl"));
           }
-          if (error.code === -32603) {
+          if ((error as typeError).code === -32603) {
             setError(t("modals.wrong-network.error-failed-rpcUrl"));
           }
         }

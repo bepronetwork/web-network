@@ -71,7 +71,9 @@ export default function UpdateBountyAmountModal({
 
     handleUpdateBountyAmount(bountyId, newAmount)
     .then(txInfo => {
-      return processEvent("bounty", "updated", activeNetwork?.name, { fromBlock: (txInfo as any).blockNumber });
+      return processEvent("bounty", "updated", activeNetwork?.name, { 
+        fromBlock: (txInfo as { blockNumber: number }).blockNumber 
+      });
     })
     .then(() => {
       updateIssue(repoId, ghId);

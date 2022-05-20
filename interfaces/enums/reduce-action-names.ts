@@ -1,5 +1,3 @@
-import { changeAccessToken } from "contexts/reducers/change-access-token";
-
 export enum ReduceActionName {
   GithubHandle = "GithubHandle",
   MetaMaskWallet = "MetaMaskWallet",

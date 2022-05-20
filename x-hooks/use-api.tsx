@@ -3,7 +3,6 @@ import { head } from "lodash";
 import getConfig from "next/config";
 
 import { PastEventsParams, User } from "interfaces/api";
-import { BranchInfo, BranchsList } from "interfaces/branchs-list";
 import { IssueData, pullRequest } from "interfaces/issue-data";
 import { INetwork } from "interfaces/network";
 import { PaginatedData } from "interfaces/paginated-data";
@@ -14,11 +13,7 @@ import client from "services/api";
 
 import { Entities, Events } from "types/dappkit";
 
-const { publicRuntimeConfig } = getConfig();
-interface Paginated<T = any> {
-  count: number;
-  rows: T[];
-}
+const { publicRuntimeConfig } = getConfig()
 
 interface NewIssueParams {
   title: string;
@@ -36,8 +31,13 @@ interface CreateBounty {
   repositoryId: string;
 }
 
+type FileUploadReturn = {
+  hash: string;
+  fileName: string;
+  size: string;
+}[]
+
 const repoList: ReposList = [];
-const branchsList: BranchsList = {};
 
 export default function useApi() {
   async function getIssues(page = "1",
@@ -177,7 +177,7 @@ export default function useApi() {
     return client
       .patch("/issue", { repoId, githubId, scId, networkName })
       .then(({ data }) => data === "ok")
-      .catch((_) => false);
+      .catch(() => false);
   }
 
   async function getPendingFor(address: string,
@@ -276,7 +276,7 @@ export default function useApi() {
   }
   
   async function getTotalBounties(state: string, 
-                                  networkName = publicRuntimeConfig?.networkConfig?.networkName): Promise<number> {
+                                  networkName = publicRuntimeConfig.networkConfig.networkName): Promise<number> {
     const search = new URLSearchParams({ state, networkName }).toString();
     return client.get<number>(`/search/issues/total?${search}`).then(({ data }) => data);
   }
@@ -331,14 +331,14 @@ export default function useApi() {
     return client
       .get("/health")
       .then(({ status }) => status === 204)
-      .catch((e) => false);
+      .catch(() => false);
   }
 
   async function getClientNation() {
     return client
       .get("/ip")
       .then(({ data }) => data || { countryCode: "US", country: "" })
-      .catch((e) => {
+      .catch(() => {
         return { countryCode: "US", country: "" };
       });
   }
@@ -438,8 +438,8 @@ export default function useApi() {
         throw error;
       });
   }
-
-  async function uploadFiles(files: File | File[]): Promise<any[]> {
+  
+  async function uploadFiles(files: File | File[]): Promise<FileUploadReturn> {
     const form = new FormData();
     const isArray = Array.isArray(files);
     if (isArray) {

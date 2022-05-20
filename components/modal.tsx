@@ -6,7 +6,6 @@ import CloseIcon from "assets/icons/close-icon";
 
 import { Modal as ModalProps } from "types/modal";
 
-
 import Button from "./button";
 
 export default function Modal({
@@ -21,7 +20,7 @@ export default function Modal({
   titleClass,
   okLabel = "",
   cancelLabel = "",
-  onOkClick = () => {},
+  onOkClick,
   titleComponent,
   ...params
 }: ModalProps) {

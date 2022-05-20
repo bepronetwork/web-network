@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+ /* eslint-disable */
 import { FormCheck, ListGroup } from "react-bootstrap";
 
 import { BountyToken } from "@taikai/dappkit";
@@ -103,6 +104,8 @@ export default function TokenConfiguration({
     .catch(console.log);
   }, [data.networkToken, data.nftToken]);
 
+ /* eslint-enable */
+ 
   return (
     <Step
       title={t("custom-network:steps.token-configuration.title")}

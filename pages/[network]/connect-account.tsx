@@ -43,7 +43,7 @@ export default function ConnectAccount() {
   const { t } = useTranslation(["common", "connect-account"]);
 
   const [isGhValid, setIsGhValid] = useState(null);
-  const [lastAddressBeforeConnect, setLastAddressBeforeConnect] = useState("");
+  const [lastAddressBeforeConnect, setLastAddressBeforeConnect] = useState(""); /* eslint-disable-line */ // TODO need a usage logic
 
   const { getUserOf, joinAddressToUser, getUserWith } = useApi();
 
@@ -55,7 +55,7 @@ export default function ConnectAccount() {
 
   function updateLastUsedAddress() {
     dispatch(changeLoadState(false));
-    setLastAddressBeforeConnect(localStorage.getItem("lastAddressBeforeConnect"));
+   // setLastAddressBeforeConnect(localStorage.getItem("lastAddressBeforeConnect"));
   }
 
   async function checkAddressVsGh() {
@@ -80,7 +80,12 @@ export default function ConnectAccount() {
     getUserOf(wallet?.address).then((user) => {
       setIsGhValid((user &&
           user.githubHandle ===
-            (session?.user.name || (session?.user as any)?.login)) ||
+            (session?.user.name || (session?.user as {
+              name?: string;
+              email?: string;
+              image?: string;
+              login?: string;
+          })?.login)) ||
           true);
 
       if (!user) return;
@@ -142,8 +147,8 @@ export default function ConnectAccount() {
     let loggedIn = false;
 
     try {
-      const chainId = (window as any)?.ethereum?.chainId;
-      if (+publicRuntimeConfig?.metaMask?.chainId !== +chainId) {
+      const chainId = window?.ethereum?.chainId;
+      if (+publicRuntimeConfig.metaMask.chainId !== +chainId) {
         dispatch(changeNetworkId(+chainId));
         dispatch(changeNetwork((publicRuntimeConfig?.networkIds[+chainId] || "unknown")?.toLowerCase()));
         return;

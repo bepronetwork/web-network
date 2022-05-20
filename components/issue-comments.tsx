@@ -1,4 +1,3 @@
-import { GetStaticProps } from "next";
 import { useTranslation } from "next-i18next";
 
 import ExternalLinkIcon from "assets/icons/external-link-icon";

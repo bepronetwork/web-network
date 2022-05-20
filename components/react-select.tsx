@@ -1,6 +1,7 @@
 import Select from "react-select";
 
-export default function ReactSelect(params: any) {
+ //TODO: Need to rework components to be able to use Props correctly { Props }
+export default function ReactSelect(params: any) { // eslint-disable-line 
   return (
     <Select
       className="react-select-container"

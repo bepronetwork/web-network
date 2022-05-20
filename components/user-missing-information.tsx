@@ -18,6 +18,7 @@ import { updateTransaction } from "contexts/reducers/update-transaction";
 import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
+import { BlockTransaction } from "interfaces/transaction";
 
 import { BeproService } from "services/bepro-service";
 
@@ -101,12 +102,12 @@ export default function UserMissingModal({ show }: { show: boolean }) {
           .catch((err) => {
             if (err?.message?.search("User denied") > -1)
               dispatch(updateTransaction({
-                  ...(tmpTransaction.payload as any),
+                  ...(tmpTransaction.payload as BlockTransaction),
                   remove: true
               }));
             else
               dispatch(updateTransaction({
-                  ...(tmpTransaction.payload as any),
+                  ...(tmpTransaction.payload as BlockTransaction),
                   status: TransactionStatus.failed
               }));
             console.error(err);
