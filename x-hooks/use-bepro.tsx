@@ -238,7 +238,7 @@ export default function useBepro(props?: IUseBeProDefault) {
             }));
           onError?.(err);
           reject(err);
-          console.error("Error closing issue", err);
+          console.error("Error Approving", err);
         });
     });
   }
@@ -293,33 +293,32 @@ export default function useBepro(props?: IUseBeProDefault) {
       dispatch(tx);
 
       await DAOService.createPullRequest(bountyId,
-                                                   originRepo,
-                                                   originBranch,
-                                                   originCID,
-                                                   userRepo,
-                                                   userBranch,
-                                                   cid)
-                                                   .then((txInfo: unknown) => {
-                                                     txWindow.updateItem(tx.payload.id,
-                                                                         parseTransaction(txInfo, tx.payload));
-                                                      
-                                                     resolve(txInfo);
-                                                   })
-                                                   .catch((error: { message: string; }) => {
-                                                     if (error?.message?.search("User denied") > -1)
-                                                       dispatch(updateTransaction({
-                                                      ...(tx.payload as BlockTransaction),
-                                                      status: TransactionStatus.rejected
-                                                       }));
-                                                     else
-                                                      dispatch(updateTransaction({
-                                                        ...(tx.payload as BlockTransaction),
-                                                        status: TransactionStatus.failed
-                                                      }));
+                                         originRepo,
+                                         originBranch,
+                                         originCID,
+                                         userRepo,
+                                         userBranch,
+                                         cid)
+                                         .then((txInfo: unknown) => {
+                                           txWindow.updateItem(tx.payload.id, parseTransaction(txInfo, tx.payload));
+                                          
+                                           resolve(txInfo);
+                                         })
+                                        .catch((error: { message: string; }) => {
+                                          if (error?.message?.search("User denied") > -1)
+                                            dispatch(updateTransaction({
+                                          ...(tx.payload as BlockTransaction),
+                                          status: TransactionStatus.rejected
+                                            }));
+                                          else
+                                          dispatch(updateTransaction({
+                                            ...(tx.payload as BlockTransaction),
+                                            status: TransactionStatus.failed
+                                          }));
 
-          onError?.(error);
-          reject(error);
-        });
+                                          onError?.(error);
+                                          reject(error);
+                                        });
     });
   }
 
