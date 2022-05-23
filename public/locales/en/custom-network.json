@@ -63,7 +63,7 @@
     "repositories": {
       "title": "Add Repositories",
       "submit-label": "Create Network",
-      "give-access": "Give access to the {{user}} as an org member.",
+      "give-access": "Give access to the {{user}} as an org maintain.",
       "you-need-to-accept": "You need to accept this so the bot can interact with the repositories.",
       "label": "Repositories",
       "used-by-other-network": "The highlighted repositories are already being used by another network.",
