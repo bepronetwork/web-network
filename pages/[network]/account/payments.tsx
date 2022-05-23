@@ -63,8 +63,8 @@ export default function Payments() {
     state: { loading }
   } = useContext(ApplicationContext);
 
-  const {getPayments} = useApi()
-  const {wallet} = useAuthentication()
+  const { getPayments } = useApi();
+  const {wallet} = useAuthentication();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [hasMore] = useState(false);
   const [total, setTotal] = useState(0);
@@ -72,11 +72,11 @@ export default function Payments() {
 
 
   useEffect(()=>{
-    if(wallet.address)
-      getPayments(wallet?.address).then((data =>{
-        setPayments(data)
-        setTotal(data?.map(i=> i?.ammount)?.reduce((p,c) => p+c) || 0)
-      }))
+    if(wallet?.address)
+      getPayments(wallet.address).then((data =>{
+        setPayments(data);
+        if (data.length) setTotal(data?.map(i=> i?.ammount)?.reduce((p,c) => p+c) || 0);
+      }));
   },[wallet?.address])
 
   return (
