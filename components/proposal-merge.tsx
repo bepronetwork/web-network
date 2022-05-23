@@ -64,11 +64,12 @@ export default function ProposalMerge({
   async function getDistributedAmounts() {
     if (!proposal?.details) return;
     
-    const distributions = calculateDistributedAmounts(activeNetwork?.treasury,
-                                                      activeNetwork?.mergeCreatorFeeShare,
-                                                      activeNetwork?.proposerFeeShare,
-                                                      amountTotal,
-                                                      proposal.details.map(({ percentage }) => percentage));
+    const distributions = 
+      calculateDistributedAmounts(activeNetwork?.treasury,
+                                  activeNetwork?.mergeCreatorFeeShare,
+                                  activeNetwork?.proposerFeeShare,
+                                  amountTotal,
+                                  proposal.details.map(({ percentage }) => percentage));
 
     setDistributedAmounts(distributions);
   }

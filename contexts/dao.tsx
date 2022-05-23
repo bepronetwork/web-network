@@ -46,22 +46,22 @@ export const DAOContextProvider = ({ children }) => {
     const daoService = new DAO();
 
     daoService.start()
-    .then(started => {
-      if (started) return daoService.loadNetwork();
+      .then(started => {
+        if (started) return daoService.loadNetwork();
 
-      return started;
-    })
-    .then(started => {
-      if (started) {
-        (window as any).DAOService = daoService;
-        setService(daoService);
-      }
-      
-    })
-    .catch(console.log)
-    .finally(() => {
-      setIsStarting(false);
-    });
+        return started;
+      })
+      .then(started => {
+        if (started) {
+          (window as any).DAOService = daoService;
+          setService(daoService);
+        }
+        
+      })
+      .catch(console.log)
+      .finally(() => {
+        setIsStarting(false);
+      });
   }, []);
 
   useEffect(() => {
