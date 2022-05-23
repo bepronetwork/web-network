@@ -72,13 +72,13 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     if (checkingNetworkAddress !== networkAddress)
       return res.status(403).json("Creator and network addresses do not match");
 
-      // Uploading logos to IPFS
+    // Uploading logos to IPFS
     let fullLogoHash = null
     let logoIconHash = null
 
     try {
       const [full, logo] = await Promise.all([
-        IpfsStorage.add(fullLogo, true, undefined, "svg"), 
+        IpfsStorage.add(fullLogo, true, undefined, "svg"),
         IpfsStorage.add(logoIcon, true, undefined, "svg")
       ])
 
@@ -215,23 +215,6 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
           .json("Creator and network addresses do not match");
     }
 
-    // Uploading logos to IPFS
-    let fullLogoHash = null
-    let logoIconHash = null
-
-    try {
-      const [full, logo] = await Promise.all([
-        IpfsStorage.add(fullLogo, true, undefined, "svg"), 
-        IpfsStorage.add(logoIcon, true, undefined, "svg")
-      ])
-
-      fullLogoHash = full?.hash;
-      logoIconHash = logo.hash;
-
-    } catch (error) {
-      console.error('Failed to store ipfs', error);
-    }
-
     const addingRepos = repositoriesToAdd ? JSON.parse(repositoriesToAdd) : [];
 
     if (addingRepos.length && !isAdminOverriding)
@@ -280,8 +263,20 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     if (!isAdminOverriding) network.colors = JSON.parse(colors);
 
-    if (logoIconHash) network.logoIcon = logoIconHash;
-    if (fullLogoHash) network.fullLogo = fullLogoHash;
+    if (fullLogo || logoIcon) {
+      try {
+        const [full, logo] = await Promise.all([
+          IpfsStorage.add(fullLogo, true, undefined, "svg"),
+          IpfsStorage.add(logoIcon, true, undefined, "svg")
+        ])
+
+        network.logoIcon = full?.hash;
+        network.fullLogo = logo.hash;
+
+      } catch (error) {
+        console.error('Failed to store ipfs', error);
+      }
+    }
 
     network.save();
 
@@ -362,4 +357,5 @@ async function NetworkEndPoint(req: NextApiRequest,
 
   res.end();
 }
+
 export default withCors(NetworkEndPoint)
