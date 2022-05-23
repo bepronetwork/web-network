@@ -7,6 +7,7 @@ import DAO from "services/dao-service";
 export interface DAOContextData {
   service?: DAO;
   isStarting?: boolean;
+  connect?: () => Promise<boolean>;
   changeNetwork?: (netwokAddress: string) => Promise<boolean>;
 }
 
@@ -27,6 +28,16 @@ export const DAOContextProvider = ({ children }) => {
       .finally(() => setIsStarting(false));
 
     return loaded;
+  }, [service]);
+
+  const connect = useCallback(async (): Promise<boolean> => {
+    if (!service) return false;
+
+    const connected = await service.connect();
+
+    setService(service);
+
+    return connected;
   }, [service]);
 
   useEffect(() => {
@@ -64,6 +75,7 @@ export const DAOContextProvider = ({ children }) => {
   const memorizedValue = useMemo<DAOContextData>(() => ({
     service,
     isStarting,
+    connect,
     changeNetwork
   }), [service, isStarting]);
 

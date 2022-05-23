@@ -39,7 +39,7 @@ export const AuthenticationProvider = ({ children }) => {
   const [wallet, setWallet] = useState<Wallet>();
   const [isGithubAndWalletMatched, setIsGithubAndWalletMatched] = useState<boolean>();
 
-  const { service: DAOService } = useDAO();
+  const { service: DAOService, connect } = useDAO();
   const { getUserOf } = useApi();
   const { getURLWithNetwork } = useNetworkTheme();
 
@@ -49,7 +49,7 @@ export const AuthenticationProvider = ({ children }) => {
 
       await signOut({ redirect: false });
 
-      await DAOService.connect();
+      await connect();
 
       const address = await DAOService.getAddress();
 
@@ -136,7 +136,7 @@ export const AuthenticationProvider = ({ children }) => {
       validateWalletAndGithub(wallet?.address);
 
     if (user && !wallet && DAOService)
-      DAOService.connect()
+      connect()
         .then(async() => {
           const address = await DAOService.getAddress();
           const isCouncil = await DAOService.isCouncil(address);

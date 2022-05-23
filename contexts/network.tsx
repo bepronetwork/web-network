@@ -10,6 +10,8 @@ import NetworkThemeInjector from "components/custom-network/network-theme-inject
 
 import { useDAO } from "contexts/dao";
 
+import { handleNetworkAddress } from "helpers/custom-network";
+
 import { INetwork } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
@@ -66,7 +68,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
   const updateNetworkParameters = useCallback(() => {
     if (!DAOService || activeNetwork?.councilAmount || !activeNetwork?.networkAddress) return;
 
-    changeNetwork(activeNetwork.networkAddress)
+    changeNetwork(handleNetworkAddress(activeNetwork))
       .then(changed => {
         if (!changed) return;
 
