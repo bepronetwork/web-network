@@ -33,6 +33,7 @@ interface pageActions {
   issueId: string;
   developers?: developer[];
   finalized: boolean;
+  canceled?: boolean;
   networkCID: string;
   isIssueinDraft: boolean;
   state?: IssueState | string;
@@ -79,6 +80,7 @@ export default function PageActions({
   canClose = true,
   githubId = "",
   finished = false,
+  canceled = false,
   repoPath = "",
   addNewComment,
   issueCreator
@@ -171,7 +173,7 @@ export default function PageActions({
   };
 
   const renderUpdateAmount = () => {
-    if (isIssueinDraft && isBountyOwner() && !finalized)
+    if (isIssueinDraft && isBountyOwner() && !finalized && !canceled)
       return <ReadOnlyButtonWrapper>
         <Button
           className="read-only-button me-1"
