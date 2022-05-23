@@ -94,7 +94,7 @@ export default function UpdateBountyAmountModal({
   }
 
   useEffect(() => {
-    if (!transactionalAddress || !DAOService || wallet?.address) return;
+    if (!transactionalAddress || !DAOService || !wallet?.address) return;
 
     updateAllowanceAndBalance();
   }, [transactionalAddress, DAOService, wallet]);
