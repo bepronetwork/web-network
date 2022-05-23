@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import getConfig from "next/config";
 import { Op } from "sequelize";
 
 import models from "db/models";
@@ -10,8 +9,6 @@ import { PullRequestHelpers } from "helpers/api/pull-request";
 import { handleNetworkAddress } from "helpers/custom-network";
 
 import DAO from "services/dao-service";
-
-const { publicRuntimeConfig } = getConfig();
 
 const Helpers = {
   "bounty": BountyHelpers,

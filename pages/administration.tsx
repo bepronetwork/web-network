@@ -21,20 +21,16 @@ import { useNetwork } from "contexts/network";
 import { toastError } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { changeLoadState } from "contexts/reducers/change-load-state";
-import { updateTransaction } from "contexts/reducers/update-transaction";
 
 import { formatDate } from "helpers/formatDate";
 import { formatNumberToString } from "helpers/formatNumber";
 import { truncateAddress } from "helpers/truncate-address";
 
-import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { INetwork } from "interfaces/network";
 import { ReposList } from "interfaces/repos-list";
-import { BlockTransaction } from "interfaces/transaction";
 
 import useApi from "x-hooks/use-api";
-
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -57,8 +53,6 @@ export default function ParityPage() {
 
   const {
     getUserOf,
-    createIssue: apiCreateIssue,
-    patchIssueWithScId,
     createRepo,
     getReposList,
     removeRepo: apiRemoveRepo,
