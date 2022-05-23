@@ -158,7 +158,8 @@ export default function PageActions({
     return (
       isIssueinDraft &&
       isBountyOwner() &&
-      !finalized && (
+      !finalized &&
+      !canceled && (
         <ReadOnlyButtonWrapper>
           <Button
             className="read-only-button me-1"
@@ -252,6 +253,7 @@ export default function PageActions({
       !isIssueinDraft &&
       !finished &&
       !finalized &&
+      !canceled &&
       wallet?.address &&
       user?.login && (
         <ReadOnlyButtonWrapper>
