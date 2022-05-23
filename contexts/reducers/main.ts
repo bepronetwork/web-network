@@ -7,7 +7,7 @@ const ReduceActions: ReduceAction[] = [];
 const findReducer = (action: ReduceActionName) =>
   ReduceActions.find(({ name }) => name === action);
 
-export const mainReducer = <T = unknown>(
+export const mainReducer = <T = any>(
   state: ApplicationState,
   action: ReduceActor<T>
 ) => {
@@ -17,5 +17,5 @@ export const mainReducer = <T = unknown>(
   throw new Error(`Could not find reducer with name ${action.name}`);
 };
 
-export const addReducer = (reducer: ReduceAction<unknown>) =>
+export const addReducer = (reducer: ReduceAction<any>) =>
   (!findReducer(reducer.name) && ReduceActions.push(reducer)) || false;
