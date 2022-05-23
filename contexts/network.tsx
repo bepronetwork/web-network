@@ -41,7 +41,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
     if (!networkName)
       return;
     
-    if (activeNetwork?.name === networkName && !forced) return activeNetwork;
+    if (activeNetwork?.name?.toLowerCase() === networkName.toLowerCase() && !forced) return activeNetwork;
 
     const networkFromStorage = parseCookies()[`${cookieKey}:${networkName}`];
     
@@ -68,21 +68,17 @@ export const NetworkProvider: React.FC = function ({ children }) {
   const updateNetworkParameters = useCallback(() => {
     if (!DAOService || activeNetwork?.councilAmount || !activeNetwork?.networkAddress) return;
 
-    changeNetwork(handleNetworkAddress(activeNetwork))
-      .then(changed => {
-        if (!changed) return;
-
-        return Promise.all([
-          DAOService.getNetworkParameter("councilAmount"),
-          DAOService.getNetworkParameter("disputableTime"),
-          DAOService.getNetworkParameter("draftTime"),
-          DAOService.getNetworkParameter("oracleExchangeRate"),
-          DAOService.getNetworkParameter("mergeCreatorFeeShare"),
-          DAOService.getNetworkParameter("proposerFeeShare"),
-          DAOService.getNetworkParameter("percentageNeededForDispute"),
-          DAOService.getTreasury()
-        ]);
-      })
+    
+    Promise.all([
+        DAOService.getNetworkParameter("councilAmount"),
+        DAOService.getNetworkParameter("disputableTime"),
+        DAOService.getNetworkParameter("draftTime"),
+        DAOService.getNetworkParameter("oracleExchangeRate"),
+        DAOService.getNetworkParameter("mergeCreatorFeeShare"),
+        DAOService.getNetworkParameter("proposerFeeShare"),
+        DAOService.getNetworkParameter("percentageNeededForDispute"),
+        DAOService.getTreasury()
+    ])
       .then(([councilAmount, 
               disputableTime, 
               draftTime, 
@@ -107,11 +103,15 @@ export const NetworkProvider: React.FC = function ({ children }) {
 
   useEffect(() => {
     updateActiveNetwork();
-  }, [query]);
+  }, [query?.network]);
 
   useEffect(() => {
-    if (query?.network) updateNetworkParameters();
-  }, [DAOService, query?.network]);
+    if (activeNetwork) updateNetworkParameters();
+  }, [DAOService, activeNetwork]);
+
+  useEffect(() => {
+    if(activeNetwork?.networkAddress) changeNetwork(handleNetworkAddress(activeNetwork));
+  }, [activeNetwork]);
 
   const memorizeValue = useMemo<NetworkContextData>(() => ({
       activeNetwork,

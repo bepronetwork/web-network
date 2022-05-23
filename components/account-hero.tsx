@@ -17,19 +17,12 @@ export default function AccountHero() {
   const { service: DAOService } = useDAO();
   const { wallet } = useAuthentication();
 
-  function loadBeproNetworkInformation() {
+  useEffect(() => {
     if (!DAOService || !wallet?.address) return;
 
-    const address = wallet?.address;
-
-    DAOService.getBountiesOfAddress(address)
+    DAOService.getBountiesOfAddress(wallet.address)
       .then(setMyBounties);
-  }
-
-  useEffect(loadBeproNetworkInformation, [
-    DAOService,
-    wallet?.address,
-  ]);
+  }, [ DAOService?.network?.contractAddress, wallet?.address ]);
 
   return (
     <div className="banner">
