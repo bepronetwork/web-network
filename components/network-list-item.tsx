@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
