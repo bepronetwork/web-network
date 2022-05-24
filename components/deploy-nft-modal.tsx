@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import { BountyToken } from "@taikai/dappkit";
 import { useTranslation } from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
@@ -8,7 +7,7 @@ import LockedIcon from "assets/icons/locked-icon";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import { BeproService } from "services/bepro-service";
+import { useDAO } from "contexts/dao";
 
 export default function DeployNFTModal({
   show,
@@ -20,19 +19,18 @@ export default function DeployNFTModal({
   setNFTAddress: (address: string) => void
 }) {
   const { t } = useTranslation(["common", "change-token-modal", "custom-network"]);
+  
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
   const [isExecuting, setIsExecuting] = useState(false);
+
+  const {service: DAOService } = useDAO();
 
   async function deployContract() {    
     try {
       setIsExecuting(true);
 
-      const deployer = new BountyToken(BeproService.connection);
-
-      await deployer.loadAbi();
-
-      const tx = await deployer.deployJsonAbi(name, symbol);
+      const tx = await DAOService.deployBountyToken(name, symbol);
 
       setNFTAddress(tx.contractAddress);
       setDefaults();

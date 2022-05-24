@@ -5,6 +5,14 @@ import { useTranslation } from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
 
+import Avatar from "components/avatar";
+import Button from "components/button";
+import CreateProposalDistributionItem from "components/create-proposal-distribution-item";
+import Modal from "components/modal";
+import PullRequestLabels from "components/pull-request-labels";
+import ReactSelect from "components/react-select";
+import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
+
 import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
@@ -18,13 +26,6 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useOctokitGraph from "x-hooks/use-octokit-graph";
 
-import Avatar from "./avatar";
-import Button from "./button";
-import CreateProposalDistributionItem from "./create-proposal-distribution-item";
-import Modal from "./modal";
-import PullRequestLabels from "./pull-request-labels";
-import ReactSelect from "./react-select";
-import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 
 interface participants {
   githubHandle: string;
@@ -111,7 +112,7 @@ export default function NewProposal({
   const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest);
 
   const { activeRepo } = useRepos();
-  const { wallet, beproServiceStarted } = useAuthentication();
+  const { wallet } = useAuthentication();
 
   const { handleProposeMerge } = useBepro({onSuccess})
   const { updateIssue, activeIssue, networkIssue } = useIssue()
@@ -306,13 +307,13 @@ export default function NewProposal({
     !currentPullRequest.isMergeable || currentPullRequest.merged;
 
   useEffect(() => {
-    if (pullRequests.length && activeRepo && beproServiceStarted) {
+    if (pullRequests.length && activeRepo) {
       const defaultPr =
         pullRequests.find((el) => el.isMergeable) || pullRequests[0];
       setCurrentPullRequest(defaultPr);
       getParticipantsPullRequest(defaultPr?.githubId);
     }
-  }, [pullRequests, activeRepo, beproServiceStarted]);
+  }, [pullRequests, activeRepo]);
 
   return (
     <div className="d-flex">

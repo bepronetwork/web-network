@@ -1,4 +1,3 @@
-import { Network_v2 } from "@taikai/dappkit";
 import {NextApiRequest, NextApiResponse} from 'next';
 import getConfig from 'next/config';
 import { Op } from 'sequelize'
@@ -6,9 +5,10 @@ import { Op } from 'sequelize'
 import models from 'db/models';
 
 import { BountyHelpers } from "helpers/api/bounty";
-import networkBeproJs from 'helpers/api/handle-network-bepro';
 import { ProposalHelpers } from "helpers/api/proposal";
 import { PullRequestHelpers } from "helpers/api/pull-request";
+
+import DAO from "services/dao-service";
 
 const { publicRuntimeConfig, serverRuntimeConfig } = getConfig();
 
@@ -41,6 +41,10 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     networkAddress: publicRuntimeConfig?.contract?.address
   }, ...customNetworks]
 
+  const DAOService = new DAO(true);
+
+  if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
+
   for (const customNetwork of networks) {
     if (!customNetwork.networkAddress) return
     
@@ -48,7 +52,11 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     let cEnd = 0
 
     console.log(`Reading past events of ${customNetwork.name} - ${customNetwork.networkAddress}`)
-    const network = networkBeproJs({ contractAddress: customNetwork.networkAddress, version: 2 }) as Network_v2;
+
+    if (!await DAOService.loadNetwork(customNetwork.networkAddress)) 
+      return res.status(500).json("Failed to load network contract");
+
+    const network = DAOService.network;
 
     await network.start();
     const web3 = network.web3;

@@ -133,7 +133,7 @@ export default function useApi() {
 
   async function getPayments(address: string) {
     return client
-      .get<IssueData>(`/payments/${address}`)
+      .get<IssueData[]>(`/payments/${address}`)
       .then(({ data }) => data)
       .catch(() => null);
   }

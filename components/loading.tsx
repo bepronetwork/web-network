@@ -3,7 +3,7 @@ import { Modal, Spinner } from "react-bootstrap";
 
 import Translation from "components/translation";
 
-export default function Loading({ show, text }) {
+export default function Loading({ show, text = undefined }) {
   return (
     <Modal
       show={show}

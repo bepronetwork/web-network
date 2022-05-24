@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import { ERC20 } from "@taikai/dappkit";
 import { useTranslation } from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
@@ -8,9 +7,9 @@ import LockedIcon from "assets/icons/locked-icon";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import { Token } from "interfaces/token";
+import { useDAO } from "contexts/dao";
 
-import { BeproService } from "services/bepro-service";
+import { Token } from "interfaces/token";
 
 export default function ChangeTokenModal({
   show,
@@ -24,11 +23,14 @@ export default function ChangeTokenModal({
   setToken: (token: Token) => void
 }) {
   const { t } = useTranslation(["common", "change-token-modal"]);
+
   const [address, setAddress] = useState('');
-  const [name, setName] = useState('');
-  const [symbol, setSymbol] = useState('');
   const [isExecuting, setIsExecuting] = useState(false);
   const [isValidAddress, setIsValidAddress] = useState<boolean>();
+  const [name, setName] = useState('');
+  const [symbol, setSymbol] = useState('');
+
+  const { service: DAOService } = useDAO();
 
   async function loadContract() {
     if (address.trim() === "") {
@@ -40,14 +42,12 @@ export default function ChangeTokenModal({
     try {
       setIsExecuting(true);
 
-      if (!BeproService.connection.utils.isAddress(address)) {
+      if (!DAOService.isAddress(address)) {
         setIsValidAddress(false);
         return;
       }
 
-      const erc20 = new ERC20(BeproService.connection, address);
-
-      await erc20.loadContract();
+      const erc20 = await DAOService.loadERC20(address);
 
       setName(await erc20.name());
       setSymbol(await erc20.symbol());
