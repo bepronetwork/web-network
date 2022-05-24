@@ -4,14 +4,16 @@ import { useTranslation } from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
 
+import BountyDistributionItem from "components/bounty-distribution-item";
+import Button from "components/button";
+import Modal from "components/modal";
+
+import { useNetwork } from "contexts/network";
+
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
 import { ProposalExtended } from "interfaces/bounty";
-
-import BountyDistributionItem from "./bounty-distribution-item";
-import Button from "./button";
-import Modal from "./modal";
 
 interface amount {
   value: number;
@@ -45,6 +47,8 @@ export default function ProposalMerge({
   onClickMerge,
   canMerge,
 }: props) {
+  const { t } = useTranslation(["common", "proposal"]);
+
   const [show, setShow] = useState<boolean>(false);
   const [distributedAmounts, setDistributedAmounts] =
     useState<distributedAmounts>({
@@ -54,19 +58,32 @@ export default function ProposalMerge({
       proposals: [defaultAmount],
     });
 
-  const { t } = useTranslation(["common", "proposal"]);
+  const { activeNetwork } = useNetwork();
 
-  useEffect(() => {
-    getDistributedAmounts();
-  }, [proposal]);
-
+  
   async function getDistributedAmounts() {
     if (!proposal?.details) return;
+    
+    const distributions = 
+      calculateDistributedAmounts(activeNetwork?.treasury,
+                                  activeNetwork?.mergeCreatorFeeShare,
+                                  activeNetwork?.proposerFeeShare,
+                                  amountTotal,
+                                  proposal.details.map(({ percentage }) => percentage));
 
-    const distributions = await calculateDistributedAmounts(amountTotal,
-                                                            proposal.details.map(({ percentage }) => percentage));
     setDistributedAmounts(distributions);
   }
+
+  function handleMerge() {
+    setShow(false);
+    onClickMerge();
+  }
+    
+  useEffect(() => {
+    if (!proposal || !activeNetwork?.mergeCreatorFeeShare || !activeNetwork?.treasury) return;
+    
+    getDistributedAmounts();
+  }, [proposal, activeNetwork?.treasury, activeNetwork?.mergeCreatorFeeShare, activeNetwork?.proposerFeeShare]);
 
   return (
     <>
@@ -88,7 +105,7 @@ export default function ProposalMerge({
         footer={
           <Button
             className="btn-block w-100"
-            onClick={onClickMerge}
+            onClick={handleMerge}
             disabled={canMerge}
           >
             <span>{t("proposal:merge-modal.confirm-merge")}</span>

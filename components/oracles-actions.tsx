@@ -21,17 +21,14 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 
-import { handleNetworkAddress } from "helpers/custom-network";
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { TransactionCurrency } from "interfaces/transaction";
-
-
-import { BeproService } from "services/bepro-service";
 
 import useBepro from "x-hooks/use-bepro";
 
@@ -51,9 +48,10 @@ function OraclesActions() {
 
   const networkTxRef = useRef<HTMLButtonElement>(null);
 
-  const { handleApproveToken } = useBepro();
   const { activeNetwork } = useNetwork();
-  const { wallet, beproServiceStarted, updateWalletBalance } = useAuthentication();
+  const { service: DAOService } = useDAO();
+  const { handleApproveToken } = useBepro();
+  const { wallet, updateWalletBalance } = useAuthentication();
   const { state: { myTransactions }} = useContext(ApplicationContext);
 
   const renderAmount = tokenAmount
@@ -150,9 +148,9 @@ function OraclesActions() {
   }
 
   function approveSettlerToken() {
-    if (!wallet?.address && !beproServiceStarted) return;
+    if (!wallet?.address || !DAOService) return;
 
-    handleApproveToken(BeproService.network.settlerToken.contractAddress, tokenAmount).then(updateAllowance);
+    handleApproveToken(DAOService.network.settlerToken.contractAddress, tokenAmount).then(updateAllowance);
   }
 
   function getCurrentLabel(): TransactionCurrency {
@@ -181,7 +179,7 @@ function OraclesActions() {
   }
 
   function updateAllowance() {
-    BeproService.getSettlerTokenAllowance(handleNetworkAddress(activeNetwork))
+    DAOService.getSettlerTokenAllowance(wallet.address)
     .then(setNetworkTokenAllowance)
     .catch(console.log);
   }
@@ -189,9 +187,9 @@ function OraclesActions() {
   const needsApproval = () => tokenAmount > networkTokenAllowance && action === t("my-oracles:actions.lock.label");
 
   useEffect(() => {
-    if (wallet?.address && beproServiceStarted && activeNetwork?.networkAddress) 
+    if (wallet?.address && DAOService && activeNetwork?.networkAddress) 
       updateAllowance();
-  }, [wallet, beproServiceStarted, activeNetwork?.networkAddress]);
+  }, [wallet, DAOService, activeNetwork?.networkAddress]);
 
   return (
     <>

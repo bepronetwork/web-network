@@ -1,4 +1,3 @@
-import { Network_v2 } from "@taikai/dappkit";
 import { subMilliseconds } from "date-fns";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
@@ -10,10 +9,10 @@ import models from "db/models";
 import * as IssueQueries from "graphql/issue";
 import * as RepositoryQueries from "graphql/repository";
 
-import networkBeproJs from "helpers/api/handle-network-bepro";
 import twitterTweet from "helpers/api/handle-twitter-tweet";
 
 import api from "services/api";
+import DAO from "services/dao-service";
 
 import { GraphQlResponse } from "types/octokit";
 
@@ -39,16 +38,20 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     ...customNetworks
   ];
 
+  const DAOService = new DAO(true);
+
+  if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
+
   for (const customNetwork of networks) {
     if (!customNetwork.name) return;
 
     console.log(`Moving issues of ${customNetwork.name} - ${customNetwork.networkAddress} to OPEN`);
-    const network = networkBeproJs({
-      contractAddress: customNetwork.networkAddress,
-      version: 2
-    }) as Network_v2;
+    
+    if (!await DAOService.loadNetwork(customNetwork.networkAddress)) 
+      return res.status(500).json("Failed to load network contract");
 
-    await network.start();
+    const network = DAOService.network;
+
     const redeemTime = (await network.draftTime());
 
     const where = {

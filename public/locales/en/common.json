@@ -239,8 +239,8 @@
     }
   },
   "labels":{
-    "recived": "Recived",
-    "recivedintotal": "Recived in total"
+    "recived": "Received",
+    "recivedintotal": "Received in total"
   },
   "errors": {
     "approve-transaction": "Failed to approve transaction",

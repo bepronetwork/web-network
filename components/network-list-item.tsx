@@ -7,12 +7,13 @@ import { useRouter } from "next/router";
 import NetworkLogo from "components/network-logo";
 import PullRequestLabels from "components/pull-request-labels";
 
+import { useDAO } from "contexts/dao";
+
 import { handleNetworkAddress } from "helpers/custom-network";
 import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { INetwork } from "interfaces/network";
 
-import { BeproService } from "services/bepro-service";
 import { getCoinInfoByContract } from "services/coingecko";
 
 import useNetwork from "x-hooks/use-network";
@@ -43,6 +44,7 @@ export default function NetworkListItem({
   const [tokenSymbol, setTokenSymbol] = useState(String(t("misc.token")));
 
   const { getURLWithNetwork } = useNetwork();
+  const { service: DAOService } = useDAO();
 
   function handleRedirect() {
     const url = redirectToHome ? "/" : "/account/my-network/settings";
@@ -54,34 +56,34 @@ export default function NetworkListItem({
 
   async function loadNetworkData() {
     const [settlerTokenData, totalSettlerLocked, openBounties, totalBounties] = await Promise.all([
-      BeproService.getSettlerTokenData(handleNetworkAddress(network)),
-      BeproService.getTotalSettlerLocked(handleNetworkAddress(network)),
-      BeproService.getOpenBounties(handleNetworkAddress(network)),
-      BeproService.getBountiesCount(handleNetworkAddress(network))
+      DAOService.getSettlerTokenData(handleNetworkAddress(network)).catch(() => undefined),
+      DAOService.getTotalSettlerLocked(handleNetworkAddress(network)).catch(() => 0),
+      DAOService.getOpenBounties(handleNetworkAddress(network)).catch(() => 0),
+      DAOService.getTotalBounties(handleNetworkAddress(network)).catch(() => 0)
     ]);
 
     setTotalBounties(totalBounties);
     setOpenBounties(openBounties);
     setTokensLocked(totalSettlerLocked);
-    setTokenSymbol(settlerTokenData.symbol);
+    setTokenSymbol(settlerTokenData?.symbol);
     
     
     const mainCurrency = publicRuntimeConfig?.currency?.main || "usd";
     
-    const coinInfo = await getCoinInfoByContract(settlerTokenData.address).catch(() => ({ prices: {} }));
+    const coinInfo = await getCoinInfoByContract(settlerTokenData?.address).catch(() => ({ prices: {} }));
     
     addNetwork?.(handleNetworkAddress(network), 
                  totalBounties, 
                  (coinInfo.prices[mainCurrency] || 0) * totalSettlerLocked,
                  totalSettlerLocked,
-                 settlerTokenData.name,
-                 settlerTokenData.symbol,
+                 settlerTokenData?.name,
+                 settlerTokenData?.symbol,
                  !!coinInfo.prices[mainCurrency]);
   }
 
   useEffect(() => {
-    loadNetworkData();
-  }, []);
+    if (DAOService) loadNetworkData();
+  }, [DAOService]);
 
   return (
     <div className="list-item p-20 d-flex flex-row" onClick={handleRedirect}>

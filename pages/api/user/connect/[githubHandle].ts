@@ -19,9 +19,6 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
   if (user.address && !req.body.migrate && user.githubHandle)
     return res.status(409).json("Spam Error: user already joined");
 
-  // if (!+(await BeproService.beproNetwork.web3.eth.getBalance(req.body.address)))
-  //   return res.status(422).json(`Spam Error: Address has to hold Native Currency`);
-
   await user.update({
     githubHandle: user.githubHandle || githubHandle,
     githubLogin: user.githubLogin,

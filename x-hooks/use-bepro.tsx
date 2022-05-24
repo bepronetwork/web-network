@@ -4,6 +4,7 @@ import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-cor
 import { useTranslation } from "next-i18next";
 
 import { ApplicationContext } from "contexts/application";
+import { useDAO } from "contexts/dao";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 import { addTransaction } from "contexts/reducers/add-transaction";
@@ -14,8 +15,6 @@ import { parseTransaction } from "helpers/transactions";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { BlockTransaction, TransactionCurrency } from "interfaces/transaction";
-
-import { BeproService } from "services/bepro-service";
 
 import useApi from "./use-api";
 import useTransactions from "./useTransactions";
@@ -31,7 +30,8 @@ export default function useBepro(props?: IUseBeProDefault) {
 
   const { dispatch } = useContext(ApplicationContext);
   const { activeNetwork } = useNetwork();
-  const { networkIssue, activeIssue, updateIssue } = useIssue()
+  const { networkIssue, activeIssue, updateIssue } = useIssue();
+  const { service: DAOService } = useDAO();
   const { t } = useTranslation();
 
   const { processEvent } = useApi();
@@ -42,8 +42,7 @@ export default function useBepro(props?: IUseBeProDefault) {
       const disputeTx = addTransaction({ type: TransactionTypes.dispute },
                                        activeNetwork);
       dispatch(disputeTx);
-      await BeproService.network
-        .disputeBountyProposal(+networkIssue.id, +proposalscMergeId)
+      await DAOService.disputeProposal(+networkIssue.id, +proposalscMergeId)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           txWindow.updateItem(disputeTx.payload.id,
                               parseTransaction(txInfo, disputeTx.payload));
@@ -73,8 +72,7 @@ export default function useBepro(props?: IUseBeProDefault) {
                                           activeNetwork);
       dispatch(closeIssueTx);
 
-      await BeproService.network
-        .closeBounty(+bountyId, +proposalscMergeId)
+      await DAOService.closeBounty(+bountyId, +proposalscMergeId)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           txWindow.updateItem(closeIssueTx.payload.id,
                               parseTransaction(txInfo, closeIssueTx.payload));
@@ -105,7 +103,7 @@ export default function useBepro(props?: IUseBeProDefault) {
 
       dispatch(transaction);
 
-      await BeproService.network.updateBountyAmount(bountyId, amount)
+      await DAOService.updateBountyAmount(bountyId, amount)
       .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
         txWindow.updateItem(transaction.payload.id,
                             parseTransaction(txInfo, transaction.payload));
@@ -135,8 +133,7 @@ export default function useBepro(props?: IUseBeProDefault) {
       dispatch(redeemTx);
       let tx: { blockNumber: number; }
 
-      await BeproService.network
-        .cancelBounty(networkIssue?.id)
+      await DAOService.cancelBounty(networkIssue?.id)
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
           // Review: Review processEnvets are working correctly
@@ -178,11 +175,10 @@ export default function useBepro(props?: IUseBeProDefault) {
                                 activeNetwork);
       dispatch(tx);
 
-      await BeproService.network
-                   .createBountyProposal(bountyId,
-                                         pullRequestId,
-                                         addresses,
-                                         amounts)
+      await DAOService.createProposal(bountyId,
+                                      pullRequestId,
+                                      addresses,
+                                      amounts)
                    .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {            
                      txWindow.updateItem(tx.payload.id,
                                          parseTransaction(txInfo, tx.payload));
@@ -207,7 +203,7 @@ export default function useBepro(props?: IUseBeProDefault) {
     });
   }
 
-  async function handleApproveToken(tokenAddress: string = undefined, 
+  async function handleApproveToken(tokenAddress: string, 
                                     amount: number, 
                                     tokenType: "transactional" | "network" = "transactional"):
     Promise<TransactionReceipt | Error> {
@@ -220,7 +216,7 @@ export default function useBepro(props?: IUseBeProDefault) {
                                 activeNetwork);
       dispatch(tx);
 
-      await BeproService.approveToken(tokenAddress, amount)
+      await DAOService.approveToken(tokenAddress, amount)
       .then((txInfo) => {
         if (!txInfo) throw new Error(t("errors.approve-transaction"));
               
@@ -242,7 +238,7 @@ export default function useBepro(props?: IUseBeProDefault) {
             }));
           onError?.(err);
           reject(err);
-          console.error("Error closing issue", err);
+          console.error("Error Approving", err);
         });
     });
   }
@@ -258,8 +254,7 @@ export default function useBepro(props?: IUseBeProDefault) {
                                 activeNetwork);
       dispatch(tx);
 
-      await BeproService.network
-                    .takeBackOracles(delegationId)
+      await DAOService.takeBackDelegation(delegationId)
                     .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
                       if (!txInfo) throw new Error(t("errors.approve-transaction"));
               
@@ -297,34 +292,33 @@ export default function useBepro(props?: IUseBeProDefault) {
       const tx = addTransaction({ type: TransactionTypes.createPullRequest, }, activeNetwork);
       dispatch(tx);
 
-      await BeproService.network.createPullRequest(bountyId,
-                                                   originRepo,
-                                                   originBranch,
-                                                   originCID,
-                                                   userRepo,
-                                                   userBranch,
-                                                   cid)
-                                                   .then((txInfo: unknown) => {
-                                                     txWindow.updateItem(tx.payload.id,
-                                                                         parseTransaction(txInfo, tx.payload));
-                                                      
-                                                     resolve(txInfo);
-                                                   })
-                                                   .catch((error: { message: string; }) => {
-                                                     if (error?.message?.search("User denied") > -1)
-                                                       dispatch(updateTransaction({
-                                                      ...(tx.payload as BlockTransaction),
-                                                      status: TransactionStatus.rejected
-                                                       }));
-                                                     else
-                                                      dispatch(updateTransaction({
-                                                        ...(tx.payload as BlockTransaction),
-                                                        status: TransactionStatus.failed
-                                                      }));
+      await DAOService.createPullRequest(bountyId,
+                                         originRepo,
+                                         originBranch,
+                                         originCID,
+                                         userRepo,
+                                         userBranch,
+                                         cid)
+                                         .then((txInfo: unknown) => {
+                                           txWindow.updateItem(tx.payload.id, parseTransaction(txInfo, tx.payload));
+                                          
+                                           resolve(txInfo);
+                                         })
+                                        .catch((error: { message: string; }) => {
+                                          if (error?.message?.search("User denied") > -1)
+                                            dispatch(updateTransaction({
+                                          ...(tx.payload as BlockTransaction),
+                                          status: TransactionStatus.rejected
+                                            }));
+                                          else
+                                          dispatch(updateTransaction({
+                                            ...(tx.payload as BlockTransaction),
+                                            status: TransactionStatus.failed
+                                          }));
 
-                                                     onError?.(error);
-                                                     reject(error);
-                                                   });
+                                          onError?.(error);
+                                          reject(error);
+                                        });
     });
   }
 
@@ -333,7 +327,7 @@ export default function useBepro(props?: IUseBeProDefault) {
       const tx = addTransaction({ type: TransactionTypes.makePullRequestReady, }, activeNetwork);
       dispatch(tx);
 
-      await BeproService.network.markPullRequestReadyForReview(bountyId, pullRequestId)
+      await DAOService.setPullRequestReadyToReview(bountyId, pullRequestId)
       .then((txInfo: unknown) => {
         txWindow.updateItem(tx.payload.id,
                             parseTransaction(txInfo, tx.payload));
@@ -363,7 +357,7 @@ export default function useBepro(props?: IUseBeProDefault) {
       const tx = addTransaction({ type: TransactionTypes.cancelPullRequest, }, activeNetwork);
       dispatch(tx);
 
-      await BeproService.network.cancelPullRequest(bountyId, pullRequestId)
+      await DAOService.cancelPullRequest(bountyId, pullRequestId)
       .then((txInfo: unknown) => {
         txWindow.updateItem(tx.payload.id,
                             parseTransaction(txInfo, tx.payload));
@@ -393,7 +387,7 @@ export default function useBepro(props?: IUseBeProDefault) {
       const tx = addTransaction({ type: TransactionTypes.refuseProposal, }, activeNetwork);
       dispatch(tx);
 
-      await BeproService.network.refuseBountyProposal(bountyId, proposalId)
+      await DAOService.refuseProposal(bountyId, proposalId)
       .then((txInfo: unknown) => {
         txWindow.updateItem(tx.payload.id,
                             parseTransaction(txInfo, tx.payload));

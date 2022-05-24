@@ -1,4 +1,3 @@
-import { Network_v2 } from "@taikai/dappkit";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
@@ -9,10 +8,11 @@ import models from "db/models";
 
 import * as PullRequestQueries from "graphql/pull-request";
 
-import networkBeproJs from "helpers/api/handle-network-bepro";
+import { handleNetworkAddress } from "helpers/custom-network";
+
+import DAO from "services/dao-service";
 
 import { GraphQlResponse } from "types/octokit";
-
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -44,10 +44,14 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     if (!pullRequest) return res.status(404).json("Pull Request not found");
 
-    const network = networkBeproJs({
-      contractAddress: customNetwork.networkAddress,
-      version: 2
-    }) as Network_v2;
+    const DAOService = new DAO(true);
+
+    if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
+
+    if (!await DAOService.loadNetwork(handleNetworkAddress(customNetwork)))
+      return res.status(500).json("Failed to load network contract");
+
+    const network = DAOService.network;
 
     await network.start();
 
@@ -113,6 +117,5 @@ async function PullRequest(req: NextApiRequest,
 
   res.end();
 }
-
 
 export default withCors(PullRequest)

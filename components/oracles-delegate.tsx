@@ -24,7 +24,7 @@ function OraclesDelegate() {
   const [delegatedTo, setDelegatedTo] = useState<string>("");
   const [tokenAmount, setTokenAmount] = useState<number | undefined>();
 
-  const { wallet, beproServiceStarted } = useAuthentication();
+  const { wallet } = useAuthentication();
   const {
     state: { myTransactions }
   } = useContext(ApplicationContext);
@@ -78,10 +78,10 @@ function OraclesDelegate() {
     delegatedTo?.toLowerCase() === wallet?.address?.toLowerCase();
 
   useEffect(() => {
-    if (!beproServiceStarted || !wallet?.balance) return;
+    if (!wallet?.balance) return;
 
     setAvailableAmount(+wallet?.balance?.oracles?.locked);
-  }, [beproServiceStarted, wallet?.balance]);
+  }, [wallet?.balance]);
 
   return (
     <div className="col-md-5">

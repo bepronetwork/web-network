@@ -11,12 +11,10 @@ import Modal from "components/modal";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 import { changeNetworkId } from "contexts/reducers/change-network-id";
 
 import { NetworkColors } from "interfaces/enums/network-colors";
-
-
-import { BeproService } from "services/bepro-service";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -31,23 +29,24 @@ export default function ConnectWalletButton({
     dispatch,
     state: { loading },
   } = useContext(ApplicationContext);
-  const { wallet, beproServiceStarted, login } = useAuthentication();
   const [showModal, setShowModal] = useState(false);
 
+  const { wallet, login } = useAuthentication();
+  const { service: DAOService } = useDAO();
+
   useEffect(() => {
-    if (!beproServiceStarted) return;
+    if (!DAOService) return;
 
     if (forceLogin) login();
-  }, [beproServiceStarted]);
+  }, [DAOService]);
 
   useEffect(() => {
     handleShowModal();
   }, [wallet]);
 
   async function handleLogin() {
-    if (BeproService?.connection) {
-      BeproService.connection.web3.eth
-        .getChainId()
+    if (DAOService) {
+      DAOService.getChainId()
         .then((chainId) => {
           if (+chainId === +publicRuntimeConfig?.metaMask?.chainId) {
             login();

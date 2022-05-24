@@ -8,13 +8,13 @@ import Button from "components/button";
 import Modal from "components/modal";
 
 import { ApplicationContext } from "contexts/application";
+import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 import { toastError } from "contexts/reducers/add-toast";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
-
-import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
@@ -33,6 +33,8 @@ export default function UpdateBountyAmountModal({
   const { updateIssue } = useIssue();
   const { processEvent } = useApi();
   const { activeNetwork } = useNetwork();
+  const { service: DAOService } = useDAO();
+  const { wallet } = useAuthentication();
 
   const [isExecuting, setIsExecuting] = useState(false);
   const [newAmount, setNewAmount] = useState(0);
@@ -87,15 +89,17 @@ export default function UpdateBountyAmountModal({
   }
 
   function updateAllowanceAndBalance() {
-    BeproService.getAllowance(transactionalAddress).then(setAllowance);
-    BeproService.getTokenBalance(transactionalAddress).then(setBalance);
+    DAOService.getAllowance(transactionalAddress, wallet?.address, DAOService.network.contractAddress)
+      .then(setAllowance);
+      
+    DAOService.getTokenBalance(transactionalAddress, wallet?.address).then(setBalance);
   }
 
   useEffect(() => {
-    if (!transactionalAddress) return;
+    if (!transactionalAddress || !DAOService || !wallet?.address) return;
 
     updateAllowanceAndBalance();
-  }, [transactionalAddress]);
+  }, [transactionalAddress, DAOService, wallet]);
 
   return (
     <Modal show={show} onCloseClick={handleClose} title={t("modals.update-bounty-amount.title")} titlePosition="center">

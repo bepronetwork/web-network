@@ -6,8 +6,7 @@ import { Op } from "sequelize";
 
 import Database from "db/models";
 
-import Bepro from "helpers/api/bepro-initializer";
-
+import DAO from "services/dao-service";
 import IpfsStorage from "services/ipfs-service";
 
 const { publicRuntimeConfig } = getConfig();
@@ -60,12 +59,14 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
 
     // Contract Validations
-    const BEPRO = new Bepro();
-    await BEPRO.init(false, false, true);
+    const DAOService = new DAO(true);
 
-    const creatorAmount = await BEPRO.networkFactory.creatorAmount();
-    const lockedAmount = await BEPRO.networkFactory.lockedTokensOfAddress(creator);
-    const checkingNetworkAddress = await BEPRO.networkFactory.networkOfAddress(creator);
+    if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
+    if (!await DAOService.loadFactory()) return res.status(500).json("Failed to load factory contract");
+
+    const creatorAmount = await DAOService.getFactoryCreatorAmount();
+    const lockedAmount = await DAOService.getTokensLockedInFactoryByAddress(creator);
+    const checkingNetworkAddress = await DAOService.getNetworkAdressByCreator(creator);
 
     if (lockedAmount < creatorAmount) return res.status(403).json("Insufficient locked amount");
 
@@ -204,16 +205,15 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     if (!isAdminOverriding) {
       // Contract Validations
-      const BEPRO = new Bepro();
-      await BEPRO.init(false, false, true);
+      const DAOService = new DAO(true);
 
-      const checkingNetworkAddress =
-        await BEPRO.networkFactory.networkOfAddress(creator);
+      if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
+      if (!await DAOService.loadFactory()) return res.status(500).json("Failed to load factory contract");
+
+      const checkingNetworkAddress = await DAOService.getNetworkAdressByCreator(creator);
 
       if (checkingNetworkAddress !== networkAddress)
-        return res
-          .status(403)
-          .json("Creator and network addresses do not match");
+        return res.status(403).json("Creator and network addresses do not match");
     }
 
     const addingRepos = repositoriesToAdd ? JSON.parse(repositoriesToAdd) : [];

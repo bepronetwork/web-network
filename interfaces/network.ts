@@ -1,3 +1,5 @@
+import { TreasuryInfo } from "@taikai/dappkit";
+
 import { Token } from "interfaces/token";
 
 export interface INetwork {
@@ -25,7 +27,9 @@ export interface INetwork {
   draftTime?: number;
   oracleExchangeRate?: number;
   mergeCreatorFeeShare?: number;
+  proposerFeeShare?: number;
   percentageNeededForDispute?: number;
+  treasury?: TreasuryInfo;
 }
 
 export interface ThemeColors {
