@@ -3,7 +3,7 @@ import getConfig from "next/config";
 
 import { PastEventsParams, User } from "interfaces/api";
 import { IssueData, pullRequest } from "interfaces/issue-data";
-import { INetwork } from "interfaces/network";
+import { Network } from "interfaces/network";
 import { PaginatedData } from "interfaces/paginated-data";
 import { Proposal } from "interfaces/proposal";
 import { ReposList } from "interfaces/repos-list";
@@ -483,7 +483,7 @@ export default function useApi() {
 
     return client
       .get<{
-        rows: INetwork[];
+        rows: Network[];
         count: number;
         pages: number;
         currentPage: number;
@@ -496,7 +496,7 @@ export default function useApi() {
     const search = new URLSearchParams({ name }).toString();
 
     return client
-      .get<INetwork>(`/network?${search}`)
+      .get<Network>(`/network?${search}`)
       .then((response) => response)
       .catch((error) => {
         throw error;
@@ -524,7 +524,7 @@ export default function useApi() {
 
     return client
       .get<{
-        rows: INetwork[];
+        rows: Network[];
         count: number;
         pages: number;
         currentPage: number;

@@ -12,7 +12,7 @@ import { useDAO } from "contexts/dao";
 import { handleNetworkAddress } from "helpers/custom-network";
 import { formatNumberToNScale } from "helpers/formatNumber";
 
-import { INetwork } from "interfaces/network";
+import { Network } from "interfaces/network";
 
 import { getCoinInfoByContract } from "services/coingecko";
 
@@ -20,7 +20,7 @@ import useNetwork from "x-hooks/use-network";
 
 const { publicRuntimeConfig } = getConfig();
 interface NetworkListItemProps {
-  network: INetwork;
+  network: Network;
   redirectToHome?: boolean;
   addNetwork: (address: string, 
     totalBounties: number, 

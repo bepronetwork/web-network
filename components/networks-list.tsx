@@ -14,7 +14,7 @@ import { changeLoadState } from "contexts/reducers/change-load-state";
 
 import { orderByProperty } from "helpers/array";
 
-import { INetwork } from "interfaces/network";
+import { Network } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
@@ -42,7 +42,7 @@ export default function NetworksList({
 }: NetworksListProps) {
   const { t } = useTranslation(["common", "custom-network"]);
   const [order, setOrder] = useState(["name", "asc"]);
-  const [networks, setNetworks] = useState<INetwork[]>([]);
+  const [networks, setNetworks] = useState<Network[]>([]);
 
   const { searchNetworks } = useApi();
   const { network } = useNetwork();
