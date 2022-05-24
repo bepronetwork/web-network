@@ -258,9 +258,11 @@ export default function PageCreateIssue() {
 
   const onUpdateFiles = (files: IFilesProps[]) => setFiles(files);
 
-  const updateWalletByToken = async (token: Token) => {
-    setTokenBalance(await DAOService.getTokenBalance(token.address, wallet.address));
-    setTransactionalAllowance(await DAOService.getAllowance(token.address, wallet.address));
+  const updateWalletByToken = (token: Token) => {
+    DAOService.getTokenBalance(token.address, wallet.address).then(setTokenBalance);
+    
+    DAOService.getAllowance(token.address, wallet.address, DAOService.network.contractAddress)
+      .then(setTransactionalAllowance);
   }
 
   const isAmountApproved = () => transactionalAllowance >= issueAmount.floatValue;

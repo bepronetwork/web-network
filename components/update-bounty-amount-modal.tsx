@@ -89,7 +89,9 @@ export default function UpdateBountyAmountModal({
   }
 
   function updateAllowanceAndBalance() {
-    DAOService.getAllowance(transactionalAddress, wallet?.address).then(setAllowance);
+    DAOService.getAllowance(transactionalAddress, wallet?.address, DAOService.network.contractAddress)
+      .then(setAllowance);
+      
     DAOService.getTokenBalance(transactionalAddress, wallet?.address).then(setBalance);
   }
 

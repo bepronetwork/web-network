@@ -331,7 +331,7 @@ export default class DAO {
 
   async getAllowance(tokenAddress: string, 
                      walletAddress: string, 
-                     spenderAddress: string = publicRuntimeConfig?.contract?.address): Promise<number> {
+                     spenderAddress: string): Promise<number> {
     const erc20 = await this.loadERC20(tokenAddress);
 
     return erc20.allowance(walletAddress, spenderAddress);
