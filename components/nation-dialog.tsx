@@ -7,20 +7,17 @@ import getConfig from "next/config";
 
 import BeProBlue from "assets/icons/bepro-blue";
 
-import Loading from "components/loading";
 
 import useApi from "x-hooks/use-api";
 
 export default function NationDialog({ children }) {
   const {publicRuntimeConfig} = getConfig();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isBlock, setBlock] = useState<boolean>(false);
   const { getClientNation } = useApi();
   const { t } = useTranslation("common");
   const [country, setCountry] = useState<string>();
 
   useEffect(() => {
-    setIsLoading(true);
     getClientNation()
       .then((data) => {
         if (
@@ -32,7 +29,6 @@ export default function NationDialog({ children }) {
         setCountry(data.country || String(t("modals.nation-dialog.your-country")));
         setBlock(true);
       })
-      .finally(() => setIsLoading(false));
   }, []);
 
   if (isBlock) {
@@ -78,8 +74,6 @@ export default function NationDialog({ children }) {
       </div>
     );
   }
-
-  if (isLoading) return <Loading show={isLoading} text={t("please-wait")} />;
 
   return <>{children}</>;
 }

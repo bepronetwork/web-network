@@ -1,4 +1,3 @@
-import axios from "axios";
 import { head } from "lodash";
 import getConfig from "next/config";
 

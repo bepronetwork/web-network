@@ -151,8 +151,7 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
     pullRequestGithubId, 
     customNetworkName,
     creator,
-    userBranch,
-    userRepo
+    userBranch
   } = req.body;
 
   const customNetwork = await models.network.findOne({

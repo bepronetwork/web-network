@@ -90,7 +90,7 @@ let waitingForTx = null;
 
 export default function ApplicationContextProvider({ children }) {
   const [state, dispatch] = useReducer(mainReducer, defaultState.state);
-  const [txListener, setTxListener] = useState<any>();
+  const [txListener, setTxListener] = useState<NodeJS.Timeout | undefined>();
   const {
     query: { authError },
     pathname
