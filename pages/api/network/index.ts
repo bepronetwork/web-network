@@ -104,7 +104,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       const { data } = await octokitUser.rest.repos.addCollaborator({
         owner,
         repo,
-        username: publicRuntimeConfig?.github?.user
+        username: publicRuntimeConfig?.github?.user,
+        permission: 'maintain'
       });
 
       if (data?.id) invitations.push(data?.id);
@@ -293,7 +294,8 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         const { data } = await octokitUser.rest.repos.addCollaborator({
           owner,
           repo,
-          username: publicRuntimeConfig?.github?.user
+          username: publicRuntimeConfig?.github?.user,
+          permission: 'maintain'
         });
 
         if (data?.id) invitations.push(data?.id);
