@@ -66,7 +66,7 @@ export default function Payments() {
   const {getPayments} = useApi()
   const {wallet} = useAuthentication()
   const [payments, setPayments] = useState<Payment[]>([]);
-  const [hasMore, setHasMore] = useState(false);
+  const [hasMore] = useState(false);
   const [total, setTotal] = useState(0);
   const { getURLWithNetwork } = useNetworkTheme();
 

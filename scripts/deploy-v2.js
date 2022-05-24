@@ -133,7 +133,7 @@ async function main() {
    const beproToken = new ERC20(web3Connection, beproAddress);
    await beproToken.start();
 
-   if(argv.network !== 'custom')
+   if(argv.network !== 'custom' || argv.network !== 'local')
     for(const address of stagingAccounts) {
       console.log(`Transfering 10M BEPRO to ${address}`);
       await beproToken.transferTokenAmount(address, 10000000);
@@ -161,10 +161,11 @@ async function main() {
   const tx = await factory.createNetwork(
     beproAddress, 
     bountyTokenAddress, 
-    "", 
+    process?.env?.NEXT_PUBLIC_IPFS_BASE || "", 
     ownerAddress, 
     10000, 
     50000);
+  
   const networkAddress = await factory.networkOfAddress(ownerAddress);
 
   // 5. Configure basic network Parameters
