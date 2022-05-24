@@ -3,6 +3,8 @@ import { useTranslation } from "next-i18next";
 import Button from "components/button";
 import InfoTooltip from "components/info-tooltip";
 
+import { useNetwork } from "contexts/network";
+
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
 interface AmountCardProps {
@@ -24,6 +26,8 @@ export default function AmountCard({
   action
 }: AmountCardProps) {
   const { t } = useTranslation("common");
+  const { activeNetwork } = useNetwork();
+  
   return (
     <div className="d-flex flex-column bg-shadow p-20 border-radius-8">
       <div className="d-flex flex-row align-items-center justify-content-between">
@@ -45,7 +49,7 @@ export default function AmountCard({
                 currency === "token" ? "primary" : "purple"
               }`}
             >
-              {currency === "token" ? t("$bepro") : t("$oracles")}
+              {currency === "token" ? (activeNetwork?.networkToken?.symbol || t("misc.$token")) : t("$oracles")}
             </span>
           )) ||
           ""

@@ -12,6 +12,7 @@ import Modal from "components/modal";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
+import { useNetwork } from "contexts/network";
 import { toastError } from "contexts/reducers/add-toast";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
@@ -19,7 +20,6 @@ import { formatNumberToCurrency } from "helpers/formatNumber";
 import { IssueData } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
-import useNetwork from "x-hooks/use-network";
 import usePendingIssue from "x-hooks/use-pending-issue";
 
 export default function MyIssues() {
@@ -27,7 +27,7 @@ export default function MyIssues() {
 
   const [pendingIssues, setPendingIssues] = useState<IssueData[]>([]);
 
-  const { network } = useNetwork();
+  const { activeNetwork } = useNetwork();
   const { wallet, user } = useAuthentication();
   const { dispatch } = useContext(ApplicationContext);
   const [pendingIssue, { updatePendingIssue, treatPendingIssue }] =
@@ -38,7 +38,7 @@ export default function MyIssues() {
   function getPendingIssues() {
     if (!wallet?.address) return;
 
-    getPendingFor(wallet?.address, undefined, network?.name).then((pending) =>
+    getPendingFor(wallet?.address, undefined, activeNetwork?.name).then((pending) =>
       setPendingIssues(pending.rows));
   }
 
@@ -91,7 +91,7 @@ export default function MyIssues() {
                     <span className="text-white">
                       {formatNumberToCurrency(pendingIssue?.amount)}
                     </span>{" "}
-                    <span className="text-primary">{t("$bepro")}</span>
+                    <span className="text-primary">{activeNetwork?.networkToken?.symbol || t("misc.$token")}</span>
                   </h4>
                 </div>
               </Modal>

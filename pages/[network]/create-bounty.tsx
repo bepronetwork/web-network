@@ -31,7 +31,7 @@ import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { Token } from "interfaces/token";
+import { BEPRO_TOKEN, Token } from "interfaces/token";
 import { BlockTransaction } from "interfaces/transaction";
 
 import useApi from "x-hooks/use-api";
@@ -45,12 +45,6 @@ interface Amount {
   formattedValue: string;
   floatValue?: number;
 }
-
-const BEPRO_TOKEN: Token = {
-  address: publicRuntimeConfig?.contract?.settler,
-  name: "BEPRO",
-  symbol: "$BEPRO"
-};
 
 export default function PageCreateIssue() {
   const router = useRouter();

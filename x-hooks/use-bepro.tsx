@@ -218,7 +218,9 @@ export default function useBepro(props?: IUseBeProDefault) {
 
       await DAOService.approveToken(tokenAddress, amount)
       .then((txInfo) => {
-        if (!txInfo) throw new Error(t("errors.approve-transaction"));
+        if (!txInfo) throw new Error(t("errors.approve-transaction", {
+          currency: activeNetwork?.networkToken?.symbol || t("misc.$token")
+        }));
               
         txWindow.updateItem(tx.payload.id,
                             parseTransaction(txInfo, tx.payload));
@@ -256,7 +258,9 @@ export default function useBepro(props?: IUseBeProDefault) {
 
       await DAOService.takeBackDelegation(delegationId)
                     .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
-                      if (!txInfo) throw new Error(t("errors.approve-transaction"));
+                      if (!txInfo) throw new Error(t("errors.approve-transaction", {
+                        currency: activeNetwork?.networkToken?.symbol || t("misc.$token")
+                      }));
               
                       txWindow.updateItem(tx.payload.id,
                                           parseTransaction(txInfo, tx.payload));

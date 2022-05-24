@@ -36,7 +36,7 @@ function InfoComponent(info: InfosHero) {
           </span>
           
           <span className="caption-medium text-white-70 ml-1">
-            ${info.currency}
+            {info.currency}
           </span>
 
           { info.hasNotConvertedTokens && 

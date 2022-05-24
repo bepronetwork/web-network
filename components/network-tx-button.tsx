@@ -39,7 +39,7 @@ interface NetworkTxButtonParams {
   children?: ReactChild | ReactChild[];
   disabled?: boolean;
   txType: TransactionTypes;
-  txCurrency: TransactionCurrency;
+  txCurrency: string;
   fullWidth?: boolean;
   useContract?: boolean;
   className?: string;
@@ -59,7 +59,7 @@ function networkTxButton({
     useContract = false,
     disabled = false,
     txType = TransactionTypes.unknown,
-    txCurrency = "$BEPRO"
+    txCurrency
   }: NetworkTxButtonParams,
                          elementRef) {
   const { t } = useTranslation(["common"]);
@@ -87,7 +87,7 @@ function networkTxButton({
     const tmpTransaction = addTransaction({
         type: txType,
         amount: txParams?.tokenAmount || 0,
-        currency: txCurrency
+        currency: txCurrency || t("misc.$token")
     },
                                           activeNetwork);
     dispatch(tmpTransaction);

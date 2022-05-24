@@ -113,10 +113,11 @@ async function doSubTitle({
     return repoBorder;
   }
 
-  async function doAmmount() {
+  // TODO: Pass currency parameter to this function
+  async function doAmmount(currency = "$TOKEN") {
     const value = new Intl.NumberFormat("en").format(ammoutValue);
     const ammountText = await write(value, 70, "white", "semi", {});
-    const currencyText = await write("$BEPRO", 38, "#4250E4", "regular", {});
+    const currencyText = await write(currency, 38, "#4250E4", "regular", {});
     const margin = 10;
     const width = ammountText.bitmap.width + currencyText.bitmap.width + margin;
     const height = Math.max(ammountText.bitmap.height,

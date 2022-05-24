@@ -77,7 +77,7 @@ export default function Settings() {
   const { getUserRepositories } = useOctokitGraph();
   const { searchRepositories, updateNetwork, isNetworkOwner } = useApi();
   const { network, colorsToCSS, getURLWithNetwork } = useNetworkTheme();
-  const { updateActiveNetwork } = useNetwork();
+  const { activeNetwork, updateActiveNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
 
   const { dispatch } = useContext(ApplicationContext);
@@ -653,11 +653,12 @@ export default function Settings() {
                   <InputNumber
                     classSymbol={"text-primary"}
                     label={t("custom-network:council-amount")}
-                    symbol={t("$bepro")}
+                    symbol={activeNetwork?.networkToken?.symbol || t("misc.$token")}
                    max={+publicRuntimeConfig?.networkConfig?.councilAmount?.max}
                     description={t("custom-network:errors.council-amount", {
-                     min: formatNumberToCurrency(+publicRuntimeConfig?.networkConfig?.councilAmount?.min, 0),
-                     max: formatNumberToCurrency(+publicRuntimeConfig?.networkConfig?.councilAmount?.max, 0)
+                      token: activeNetwork?.networkToken?.symbol || t("misc.$token"),
+                      min: formatNumberToCurrency(+publicRuntimeConfig?.networkConfig?.councilAmount?.min, 0),
+                      max: formatNumberToCurrency(+publicRuntimeConfig?.networkConfig?.councilAmount?.max, 0)
                     })}
                     value={newInfo.councilAmount}
                     error={!isValidCouncilAmount}

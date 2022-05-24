@@ -28,7 +28,6 @@ import { formatNumberToCurrency } from "helpers/formatNumber";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { TransactionCurrency } from "interfaces/transaction";
 
 import useBepro from "x-hooks/use-bepro";
 
@@ -65,35 +64,51 @@ function OraclesActions() {
 
   const renderInfo = {
     Lock: {
-      title: t("my-oracles:actions.lock.title"),
-      description: t("my-oracles:actions.lock.description"),
+      title: t("my-oracles:actions.lock.title", { currency: activeNetwork?.networkToken?.symbol || t("misc.$token") }),
+      description: 
+        t("my-oracles:actions.lock.description", { currency: activeNetwork?.networkToken?.symbol || t("misc.$token") }),
       label: t("my-oracles:actions.lock.get-amount-oracles", {
         amount: renderAmount
       }),
       caption: (
         <>
           {t("misc.get")} <span className="text-purple">{t("$oracles")}</span>{" "}
-          {t("misc.from")} <span className="text-primary">{t("$bepro")}</span>
+          {t("misc.from")} <span className="text-primary">
+            { activeNetwork?.networkToken?.symbol || t("$misc.token")}
+          </span>
         </>
       ),
-      body: t("my-oracles:actions.lock.body", { amount: renderAmount }),
+      body: 
+        t("my-oracles:actions.lock.body", { 
+          amount: renderAmount, 
+          currency: activeNetwork?.networkToken?.symbol || t("misc.$token")
+        }),
       params() {
         return { tokenAmount };
       }
     },
     Unlock: {
-      title: t("my-oracles:actions.unlock.title"),
-      description: t("my-oracles:actions.unlock.description"),
+      title: 
+        t("my-oracles:actions.unlock.title", { currency: activeNetwork?.networkToken?.symbol || t("misc.$token") }),
+      description: 
+        t("my-oracles:actions.unlock.description", { 
+          currency: activeNetwork?.networkToken?.symbol || t("misc.$token")
+        }),
       label: t("my-oracles:actions.unlock.get-amount-bepro", {
-        amount: renderAmount
+        amount: renderAmount,
+        currency: activeNetwork?.networkToken?.symbol || t("misc.$token")
       }),
       caption: (
         <>
-          {t("misc.get")} <span className="text-primary">{t("$bepro")}</span>{" "}
+          {t("misc.get")} <span className="text-primary">
+            { activeNetwork?.networkToken?.symbol || t("misc.$token")}</span>{" "}
           {t("misc.from")} <span className="text-purple">{t("$oracles")}</span>
         </>
       ),
-      body: t("my-oracles:actions.unlock.body", { amount: renderAmount }),
+      body: t("my-oracles:actions.unlock.body", { 
+        amount: renderAmount,
+        currency: activeNetwork?.networkToken?.symbol || t("misc.$token")
+      }),
       params(from: string) {
         return { tokenAmount, from };
       }
@@ -112,11 +127,15 @@ function OraclesActions() {
 
   function handleCheck() {
     if (!tokenAmount) {
-      return setError(t("my-oracles:errors.amount-higher-0"));
+      return setError(t("my-oracles:errors.amount-higher-0", {
+        currency: activeNetwork?.networkToken?.symbol || t("misc.$token")
+      }));
     }
     const isChecked = !needsApproval();
     setShow(isChecked);
-    setError(!isChecked ? t("my-oracles:errors.approve-transactions") : "")
+    setError(!isChecked ? t("my-oracles:errors.approve-transactions", {
+      currency: activeNetwork?.networkToken?.symbol || t("misc.$token")
+    }) : "")
   }
 
   function onSuccess() {
@@ -153,11 +172,9 @@ function OraclesActions() {
     handleApproveToken(DAOService.network.settlerToken.contractAddress, tokenAmount).then(updateAllowance);
   }
 
-  function getCurrentLabel(): TransactionCurrency {
-    return (
-      (action === t("my-oracles:actions.lock.label") && t("$bepro")) ||
-      t("$oracles")
-    );
+  function getCurrentLabel() {
+    return action === t("my-oracles:actions.lock.label") ? 
+    ( activeNetwork?.networkToken?.symbol || t("$misc.token")) : t("$oracles");
   }
 
   function getMaxAmmount(): number {
