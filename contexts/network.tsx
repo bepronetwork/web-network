@@ -66,8 +66,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
   }, [query, activeNetwork]);
 
   const updateNetworkParameters = useCallback(() => {
-    if (!DAOService || activeNetwork?.councilAmount || !activeNetwork?.networkAddress) return;
-
+    if (!DAOService?.network?.contractAddress || !activeNetwork?.networkAddress) return;
     
     Promise.all([
         DAOService.getNetworkParameter("councilAmount"),
@@ -87,8 +86,8 @@ export const NetworkProvider: React.FC = function ({ children }) {
               proposerFeeShare,
               percentageNeededForDispute, 
               treasury]) => {
-        setActiveNetwork({
-          ...activeNetwork,
+        setActiveNetwork(prevNetwork => ({
+          ...prevNetwork,
           councilAmount,
           disputableTime: disputableTime / 1000,
           draftTime: draftTime / 1000,
@@ -97,28 +96,27 @@ export const NetworkProvider: React.FC = function ({ children }) {
           proposerFeeShare,
           percentageNeededForDispute,
           treasury
-        });
+        }));
       });
-  }, [activeNetwork, DAOService]);
+  }, [activeNetwork?.networkAddress, DAOService?.network?.contractAddress]);
 
   useEffect(() => {
     updateActiveNetwork();
   }, [query?.network]);
 
-  useEffect(() => {
-    if (activeNetwork) updateNetworkParameters();
-  }, [DAOService, activeNetwork]);
-
-  useEffect(() => {
-    if(activeNetwork?.networkAddress) changeNetwork(handleNetworkAddress(activeNetwork));
-  }, [activeNetwork]);
+  useEffect(() => {    
+    if (DAOService?.network?.contractAddress !== activeNetwork?.networkAddress) 
+      changeNetwork(handleNetworkAddress(activeNetwork))
+        .then(loaded => {
+          if (loaded) updateNetworkParameters();
+        });
+  }, [DAOService?.network?.contractAddress, activeNetwork?.networkAddress]);
 
   const memorizeValue = useMemo<NetworkContextData>(() => ({
       activeNetwork,
       updateActiveNetwork,
       updateNetworkParameters
-  }),
-    [activeNetwork, DAOService]);
+  }), [activeNetwork, DAOService]);
 
   return (
     <NetworkContext.Provider value={memorizeValue}>

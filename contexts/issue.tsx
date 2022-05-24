@@ -107,7 +107,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     [activeNetwork, query?.repoId, query?.id, user?.accessToken]);
 
   const getNetworkIssue = useCallback(async () => {
-    if (!wallet?.address || !activeIssue?.contractId || !DAOService)
+    if (!wallet?.address || !activeIssue?.contractId || !DAOService?.network?.contractAddress)
       return;
 
     const bounty = await DAOService.getBounty(activeIssue?.contractId);
@@ -152,13 +152,11 @@ export const IssueProvider: React.FC = function ({ children }) {
       isFinished
     });
     return { ...bounty, isDraft, networkProposals };
-  }, [activeIssue, wallet?.address, DAOService]);
+  }, [activeIssue, wallet?.address, DAOService?.network?.contractAddress]);
 
   useEffect(() => {
-    if (activeIssue && wallet?.address && DAOService) {
-      getNetworkIssue();
-    }
-  }, [activeIssue, wallet?.address, DAOService]);
+    getNetworkIssue();
+  }, [activeIssue, wallet?.address, DAOService?.network?.contractAddress]);
 
   useEffect(() => {    
     const noExpired = +new Date() - activeIssue?.lastUpdated <= TTL;

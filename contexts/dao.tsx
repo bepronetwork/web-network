@@ -18,7 +18,7 @@ export const DAOContextProvider = ({ children }) => {
   const [isStarting, setIsStarting] = useState(false);
 
   const changeNetwork = useCallback(async (networkAddress: string): Promise<boolean> => {
-    if (!service) return false;
+    if (!service || !networkAddress) return false;
 
     setIsStarting(true);
 
