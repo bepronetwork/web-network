@@ -64,7 +64,6 @@ export default function PageCreateIssue() {
   const [isTransactionalTokenApproved, setIsTransactionalTokenApproved] = useState(false);
   const [transactionalToken, setTransactionalToken] = useState<Token>();
   const [transactionalAllowance, setTransactionalAllowance] = useState<number>();
-  const [customTokens, setCustomTokens] = useState<Token[]>([BEPRO_TOKEN]);
   
   const { activeNetwork } = useNetwork();
   const { handleApproveToken } = useBepro();
@@ -75,6 +74,8 @@ export default function PageCreateIssue() {
     state: { myTransactions }
   } = useContext(ApplicationContext);
   
+  const [customTokens, setCustomTokens] = useState<Token[]>([]);
+
   const [tokenBalance, setTokenBalance] = useState(0);
 
   const txWindow = useTransactions();
@@ -273,16 +274,19 @@ export default function PageCreateIssue() {
   }, [transactionalAllowance, issueAmount.floatValue]);
 
   useEffect(() => {
-    if (!activeNetwork) return;
+    if (!activeNetwork?.networkToken) return;
 
     const tmpTokens = [];
 
-    if (activeNetwork.networkAddress === publicRuntimeConfig?.contract?.address) tmpTokens.push(BEPRO_TOKEN);
+    tmpTokens.push(BEPRO_TOKEN);
+    
+    if (activeNetwork.networkAddress !== publicRuntimeConfig?.contract?.address)
+      tmpTokens.push(activeNetwork.networkToken);
 
     tmpTokens.push(...activeNetwork.tokens.map(({name, symbol, address}) => ({name, symbol, address} as Token)));
 
     setCustomTokens(tmpTokens);
-  }, [activeNetwork]);
+  }, [activeNetwork?.networkToken]);
 
   return (
     <>
@@ -386,8 +390,7 @@ export default function PageCreateIssue() {
                 </div>
                 
                 <div className="col-6 mt-n2">
-                  <TokensDropdown 
-                    defaultToken={BEPRO_TOKEN} 
+                  <TokensDropdown
                     tokens={customTokens} 
                     canAddToken={
                       activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address ? 
