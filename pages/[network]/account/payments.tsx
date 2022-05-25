@@ -106,7 +106,7 @@ export default function Payments() {
                 <InfiniteScroll
                   handleNewPage={() => { console.log("No function"); }}
                   isLoading={loading.isLoading}
-                  hasMore={false}
+                  hasMore={hasMore}
                 >
                   {React.Children.toArray(payments.map(payment => <PaymentItem payment={payment} />))}
                 </InfiniteScroll>
