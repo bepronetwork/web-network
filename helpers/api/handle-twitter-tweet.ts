@@ -29,7 +29,7 @@ function handleState(currentState: IssueState) {
   }
   }
 }
-// TODO: Pass currency parameter to this function
+
 export default function twitterTweet({
   type,
   action,

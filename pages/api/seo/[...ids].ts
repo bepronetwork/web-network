@@ -50,7 +50,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     { association: "developers" },
     { association: "pullRequests" },
     { association: "mergeProposals" },
-    { association: "repository" }
+    { association: "repository" },
+    { association: "token" }
   ];
 
   const issue = await models.issue.findOne({
@@ -70,7 +71,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   //   ammount: issue.amount,
   //   working: issue.working?.length || 0,
   //   pr: issue.pullRequests?.length || 0,
-  //   proposal: issue?.mergeProposals?.length || 0
+  //   proposal: issue?.mergeProposals?.length || 0,
+  //   currency: issue?.token?.symbol
   // }).catch((e) => {
   //   console.log("Error generating card", e);
   //   return null;

@@ -84,10 +84,12 @@ async function doHeading({
 
 async function doSubTitle({
   repoName,
-  ammoutValue
+  ammoutValue,
+  currency
 }: {
   repoName: string;
   ammoutValue: number;
+  currency: string;
 }) {
   async function doRepo() {
     const borderSize = 4;
@@ -113,11 +115,10 @@ async function doSubTitle({
     return repoBorder;
   }
 
-  // TODO: Pass currency parameter to this function
-  async function doAmmount(currency = "$TOKEN") {
+  async function doAmmount() {
     const value = new Intl.NumberFormat("en").format(ammoutValue);
     const ammountText = await write(value, 70, "white", "semi", {});
-    const currencyText = await write(currency, 38, "#4250E4", "regular", {});
+    const currencyText = await write(currency || "$TOKEN", 38, "#4250E4", "regular", {});
     const margin = 10;
     const width = ammountText.bitmap.width + currencyText.bitmap.width + margin;
     const height = Math.max(ammountText.bitmap.height,
@@ -222,6 +223,7 @@ export interface IGenerateCard {
   working: number;
   pr: number;
   proposal: number;
+  currency: string;
 }
 
 interface IGenerateResp {
@@ -242,7 +244,8 @@ export async function generateCard(issue: IGenerateCard): Promise<IGenerateResp>
   const title = await doTitle(issue.title);
   const subTitle = await doSubTitle({
     repoName: issue.repo,
-    ammoutValue: issue.ammount
+    ammoutValue: issue.ammount,
+    currency: issue.currency
   });
   const footer = await doFooter({
     working: issue.working,

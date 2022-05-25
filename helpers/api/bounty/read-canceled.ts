@@ -30,7 +30,10 @@ export default async function readBountyCanceled(events, network: Network_v2, cu
           contractId: id,
           issueId: networkBounty.cid,
           network_id: customNetwork.id
-        }
+        },
+        include: [
+          { association: "token" }
+        ]
       });
       
       if (bounty) {
@@ -75,7 +78,8 @@ export default async function readBountyCanceled(events, network: Network_v2, cu
                 type: "bounty",
                 action: "changes",
                 issuePreviousState: "draft",
-                issue: bounty
+                issue: bounty,
+                currency: bounty.token.symbol
               });
           }
         }

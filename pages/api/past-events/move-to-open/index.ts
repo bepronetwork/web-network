@@ -60,7 +60,12 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       state: "draft"
     };
 
-    const issues = await models.issue.findAll({ where });
+    const issues = await models.issue.findAll({ 
+      where, 
+      include: [
+        { association: "token" }
+      ] 
+    });
 
     const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
 
@@ -109,7 +114,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
           type: "bounty",
           action: "changes",
           issuePreviousState: "draft",
-          issue
+          issue,
+          currency: issue.token.symbol
         });
 
       await api.post(`/seo/${issue.issueId}`).catch((e) => {
