@@ -27,7 +27,7 @@ export const addTransaction = (payload: Partial<SimpleBlockTransactionPayload>,
     type: TransactionTypes.unknown,
     date: +new Date(),
     amount: 0,
-    currency: "",
+    currency: "$TOKEN",
     network,
     ...payload,
     id: uuidv4()
