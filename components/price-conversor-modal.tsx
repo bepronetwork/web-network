@@ -12,7 +12,7 @@ import { useNetwork } from "contexts/network";
 
 import { formatNumberToNScale } from "helpers/formatNumber";
 
-import { getCurrencyByToken } from "services/coingecko";
+import { getCoinInfoByContract } from "services/coingecko";
 
 import InputNumber from "./input-number";
 import ReactSelect from "./react-select";
@@ -39,9 +39,14 @@ export default function PriceConversorModal({
   const { activeNetwork } = useNetwork();  
 
   async function handlerChange({value, label}){
-    const data = await getCurrencyByToken(publicRuntimeConfig?.currency?.currencyId, value)
-    setCurrentCurrency({value, label})
-    setCurrentPrice(data[value])
+    if (!activeNetwork?.networkToken?.address) return;
+
+    const data = 
+      await getCoinInfoByContract(activeNetwork.networkToken.address)
+        .catch(() => ({ prices: { [value]: 0 } }));
+
+    setCurrentCurrency({value, label});
+    setCurrentPrice(data.prices[value]);
   }
 
   useEffect(()=>{
