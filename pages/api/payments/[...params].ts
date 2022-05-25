@@ -5,11 +5,25 @@ import { Op } from "sequelize";
 import models from "db/models";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const [address] = req.query.params;
+  const [address, networkName] = req.query.params;
+
+  const network = await models.network.findOne({
+    where: {
+      name: {
+        [Op.iLike]: String(networkName)
+      }
+    }
+  });
+
+  if (!network) return res.status(404).json("Invalid network");
 
   const payments = await models.userPayments.findAll({
     include: [
-      { association: "issue", include:[{ association: "token" }] }
+      { 
+        association: "issue", 
+        where: { network_id: network.id },
+        include:[{ association: "token" }] 
+      }
     ],
     where: {
       address,
