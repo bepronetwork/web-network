@@ -131,9 +131,9 @@ export default function useApi() {
       .catch(() => null);
   }
 
-  async function getPayments(address: string) {
+  async function getPayments(address: string, networkName = publicRuntimeConfig?.networkConfig?.networkName) {
     return client
-      .get<IssueData[]>(`/payments/${address}`)
+      .get<IssueData[]>(`/payments/${address}/${networkName}`)
       .then(({ data }) => data)
       .catch(() => null);
   }

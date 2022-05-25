@@ -13,6 +13,7 @@ import NothingFound from "components/nothing-found";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
+import { useNetwork } from "contexts/network";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
@@ -69,15 +70,16 @@ export default function Payments() {
   const [hasMore] = useState(false);
   const [total, setTotal] = useState(0);
   const { getURLWithNetwork } = useNetworkTheme();
+  const { activeNetwork } = useNetwork();
 
 
   useEffect(()=>{
-    if(wallet?.address)
-      getPayments(wallet.address).then((data =>{
+    if(wallet?.address && activeNetwork?.name)
+      getPayments(wallet.address, activeNetwork.name).then((data => {
         setPayments(data);
         if (data.length) setTotal(data?.map(i=> i?.ammount)?.reduce((p,c) => p+c) || 0);
       }));
-  },[wallet?.address])
+  },[wallet?.address, activeNetwork?.name])
 
   return (
     <Account>
