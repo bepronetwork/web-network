@@ -27,7 +27,7 @@ import { formatNumberToString } from "helpers/formatNumber";
 import { truncateAddress } from "helpers/truncate-address";
 
 import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { INetwork } from "interfaces/network";
+import { Network } from "interfaces/network";
 import { ReposList } from "interfaces/repos-list";
 
 import useApi from "x-hooks/use-api";
@@ -40,11 +40,11 @@ export default function ParityPage() {
   const [issuesList, setIssuesList] = useState([]);
   const [githubToken, setGithubToken] = useState("");
   const [githubLogin, setGithubLogin] = useState("");
-  const [networks, setNetworks] = useState<INetwork[]>([]);
+  const [networks, setNetworks] = useState<Network[]>([]);
   const [reposList, setReposList] = useState<ReposList>([]);
   const [showModalName, setShowModalName] = useState(false);
   const [availReposList, setAvailableList] = useState<string[]>([]);
-  const [networkToUpdate, setNetworkToUpdate] = useState<INetwork>();
+  const [networkToUpdate, setNetworkToUpdate] = useState<Network>();
 
   const { activeNetwork } = useNetwork();
   const { wallet } = useAuthentication();

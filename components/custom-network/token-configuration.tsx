@@ -70,7 +70,7 @@ export default function TokenConfiguration({
     if (data.nftToken.address.trim() === "" || !DAOService) return false;
 
     try {
-      DAOService.loadBountyToken(data.nftToken.address);
+      await DAOService.loadBountyToken(data.nftToken.address);
     } catch(error) {
       changedDataHandler("tokens", { label: "nftToken", value: { ...data.nftToken, error: true } });
 
@@ -191,11 +191,11 @@ export default function TokenConfiguration({
             data.nftToken.error && 
             <small className="small-info text-danger">
               {t("custom-network:steps.token-configuration.fields.nft-token.error.pre")}
-
+              {" "}
               <a href="https://sdk.dappkit.dev/classes/BountyToken.html" target="_blank">
                 {t("custom-network:steps.token-configuration.fields.nft-token.error.mid")}
               </a>
-              
+              {" "}
               {t("custom-network:steps.token-configuration.fields.nft-token.error.post")}
             </small>
           }

@@ -77,11 +77,13 @@ export default function Settings() {
   const { getUserRepositories } = useOctokitGraph();
   const { searchRepositories, updateNetwork, isNetworkOwner } = useApi();
   const { network, colorsToCSS, getURLWithNetwork } = useNetworkTheme();
-  const { updateActiveNetwork } = useNetwork();
+  const { activeNetwork, updateActiveNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
 
   const { dispatch } = useContext(ApplicationContext);
   const { wallet, user, updateWalletBalance } = useAuthentication();
+
+  const networkTokenSymbol = activeNetwork?.networkToken?.symbol || t("misc.$token");
 
   const isValidDescription =
     newInfo.network.data.networkDescription.trim() !== "";
@@ -316,11 +318,12 @@ export default function Settings() {
       })
       .then(() => {
         dispatch(addToast({
-            type: "success",
-            title: t("actions.success"),
-            content: t("custom-network:messages.network-closed")
+          type: "success",
+          title: t("actions.success"),
+          content: t("custom-network:messages.network-closed")
         }));
-
+        
+        updateActiveNetwork(true);
         updateWalletBalance();
 
         router.push(getURLWithNetwork("/account/my-network"));
@@ -653,11 +656,12 @@ export default function Settings() {
                   <InputNumber
                     classSymbol={"text-primary"}
                     label={t("custom-network:council-amount")}
-                    symbol={t("$bepro")}
+                    symbol={networkTokenSymbol}
                    max={+publicRuntimeConfig?.networkConfig?.councilAmount?.max}
                     description={t("custom-network:errors.council-amount", {
-                     min: formatNumberToCurrency(+publicRuntimeConfig?.networkConfig?.councilAmount?.min, 0),
-                     max: formatNumberToCurrency(+publicRuntimeConfig?.networkConfig?.councilAmount?.max, 0)
+                      token: networkTokenSymbol,
+                      min: formatNumberToCurrency(+publicRuntimeConfig?.networkConfig?.councilAmount?.min, 0),
+                      max: formatNumberToCurrency(+publicRuntimeConfig?.networkConfig?.councilAmount?.max, 0)
                     })}
                     value={newInfo.councilAmount}
                     error={!isValidCouncilAmount}

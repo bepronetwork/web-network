@@ -12,14 +12,14 @@ import { useDAO } from "contexts/dao";
 
 import { handleNetworkAddress } from "helpers/custom-network";
 
-import { INetwork } from "interfaces/network";
+import { Network } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 
 const { publicRuntimeConfig } = getConfig();
 
 export interface NetworkContextData {
-  activeNetwork: INetwork;
+  activeNetwork: Network;
   updateActiveNetwork: (forced?: boolean) => void;
 }
 
@@ -29,7 +29,7 @@ const cookieKey = "bepro.network";
 const expiresCookie = 60 * 60 * 1; // 1 hour
 
 export const NetworkProvider: React.FC = function ({ children }) {
-  const [activeNetwork, setActiveNetwork] = useState<INetwork>(null);
+  const [activeNetwork, setActiveNetwork] = useState<Network>(null);
 
   const { getNetwork } = useApi();
   const { query, push } = useRouter();
@@ -76,7 +76,8 @@ export const NetworkProvider: React.FC = function ({ children }) {
         DAOService.getNetworkParameter("mergeCreatorFeeShare"),
         DAOService.getNetworkParameter("proposerFeeShare"),
         DAOService.getNetworkParameter("percentageNeededForDispute"),
-        DAOService.getTreasury()
+        DAOService.getTreasury(),
+        DAOService.getSettlerTokenData(activeNetwork.networkAddress)
     ])
       .then(([councilAmount, 
               disputableTime, 
@@ -85,7 +86,8 @@ export const NetworkProvider: React.FC = function ({ children }) {
               mergeCreatorFeeShare,
               proposerFeeShare,
               percentageNeededForDispute, 
-              treasury]) => {
+              treasury,
+              networkToken]) => {
         setActiveNetwork(prevNetwork => ({
           ...prevNetwork,
           councilAmount,
@@ -95,7 +97,11 @@ export const NetworkProvider: React.FC = function ({ children }) {
           mergeCreatorFeeShare,
           proposerFeeShare,
           percentageNeededForDispute,
-          treasury
+          treasury,
+          networkToken: {
+            ...networkToken,
+            symbol: `$${networkToken.symbol}`,
+          }
         }));
       });
   }, [activeNetwork?.networkAddress, DAOService?.network?.contractAddress]);
@@ -105,7 +111,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
   }, [query?.network]);
 
   useEffect(() => {    
-    if (DAOService?.network?.contractAddress !== activeNetwork?.networkAddress) 
+    if (DAOService?.network?.contractAddress !== activeNetwork?.networkAddress ||! activeNetwork?.draftTime) 
       changeNetwork(handleNetworkAddress(activeNetwork))
         .then(loaded => {
           if (loaded) updateNetworkParameters();

@@ -1,6 +1,6 @@
 import getConfig from "next/config";
 
-import { INetwork, ThemeColors } from "interfaces/network";
+import { Network, ThemeColors } from "interfaces/network";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -49,7 +49,7 @@ export const DefaultNetworkInformation = {
   }
 };
 
-export const handleNetworkAddress = (network: INetwork) => {
+export const handleNetworkAddress = (network: Network) => {
   return network?.name === publicRuntimeConfig?.networkConfig?.networkName
     ? publicRuntimeConfig?.contract?.address
     : network?.networkAddress;

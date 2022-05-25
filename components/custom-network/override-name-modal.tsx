@@ -14,7 +14,7 @@ import { addToast } from "contexts/reducers/add-toast";
 
 import { psReadAsText } from "helpers/file-reader";
 
-import { INetwork } from "interfaces/network";
+import { Network } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 
@@ -31,7 +31,7 @@ export default function OverrideNameModal({
   show = false,
   onCloseClick
 }: {
-  network: INetwork,
+  network: Network,
   show: boolean,
   onCloseClick: () => void
 }) {
@@ -40,7 +40,7 @@ export default function OverrideNameModal({
   const [logoIcon, setLogoIcon] = useState(defaultImage);
   const [fullLogo, setFullLogo] = useState(defaultImage);
   const [isExecuting, setIsExecuting] = useState(false);
-  const [newNetwork, setNewNetwork] = useState<INetwork>();
+  const [newNetwork, setNewNetwork] = useState<Network>();
 
   const { updateNetwork } = useApi();
 
