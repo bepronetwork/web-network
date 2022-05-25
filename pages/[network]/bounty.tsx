@@ -18,7 +18,6 @@ import Translation from "components/translation";
 
 import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
-import { useNetwork } from "contexts/network";
 import { useRepos } from "contexts/repos";
 
 import { TabbedNavigationItem } from "interfaces/tabbed-navigation";
@@ -30,25 +29,19 @@ export default function PageIssue() {
   const router = useRouter();
   const { t } = useTranslation("bounty");
 
-  const [isWorking, setIsWorking] = useState(false);
-  const [hasOpenPR, setHasOpenPR] = useState(false);
   const [commentsIssue, setCommentsIssue] = useState([]);
   const [isRepoForked, setIsRepoForked] = useState(false);
 
-  const { userHasPR } = useApi();
   const { activeRepo } = useRepos();
-  const { activeNetwork } = useNetwork();
   const { wallet, user } = useAuthentication();
   const { getUserRepositories } = useOctokitGraph();
 
   const {
-    activeIssue: issue,
-    networkIssue,
-    updateIssue,
-    getNetworkIssue
+    activeIssue,
+    networkIssue
   } = useIssue();
 
-  const { id, repoId } = router.query;
+  const { id } = router.query;
 
   const tabs: TabbedNavigationItem[] = [
     {
@@ -64,7 +57,7 @@ export default function PageIssue() {
       component: (
         <IssueProposals
           key="tab-proposals"
-          issue={issue}
+          issue={activeIssue}
           className="border-top-0"
           networkIssue={networkIssue}
         />
@@ -85,7 +78,7 @@ export default function PageIssue() {
         <IssuePullRequests
           key="tab-pull-requests"
           className="border-top-0"
-          issue={issue}
+          issue={activeIssue}
           networkIssue={networkIssue}
         />
       ),
@@ -107,14 +100,6 @@ export default function PageIssue() {
       .catch((e) => {
         console.log("Failed to get users repositories: ", e);
       });
-
-    userHasPR(`${repoId}/${id}`, user?.login, activeNetwork?.name)
-      .then((result) => {
-        setHasOpenPR(!!result);
-      })
-      .catch((e) => {
-        console.log("Failed to list PRs", e);
-      });
   }
 
   function checkRepoForked() {
@@ -125,53 +110,21 @@ export default function PageIssue() {
     setCommentsIssue([...commentsIssue, comment]);
   }
 
-  function checkIsWorking() {
-    if (issue?.working && user?.login)
-      setIsWorking(issue.working.some((el) => el === user?.login));
-  }
-
   function syncLocalyState() {
     // eslint-disable-next-line no-unsafe-optional-chaining
-    if (issue?.comments) setCommentsIssue([...issue?.comments]);
+    if (activeIssue?.comments) setCommentsIssue([...activeIssue?.comments]);
   }
 
-  function refreshIssue() {
-    updateIssue(`${issue.repository_id}`, issue.githubId).catch(() =>
-      router.push("/404"));
-  }
-
-  useEffect(syncLocalyState, [ issue, activeRepo ]);
-  useEffect(checkIsWorking, [ issue, user?.login ]);
-  useEffect(checkRepoForked, [ user?.login, wallet?.address, id, issue, activeRepo ]);
+  useEffect(syncLocalyState, [ activeIssue, activeRepo ]);
+  useEffect(checkRepoForked, [ user?.login, wallet?.address, id, activeIssue, activeRepo ]);
 
   return (
     <>
       <BountyHero />
+
       <PageActions
-        state={issue?.state}
-        developers={issue?.developers}
-        finalized={networkIssue?.closed}
-        canceled={networkIssue?.canceled}
-        isIssueinDraft={networkIssue?.isDraft}
-        networkCID={networkIssue?.cid || issue?.issueId}
-        issueId={issue?.issueId}
-        title={issue?.title}
-        description={issue?.body}
-        handleBeproService={getNetworkIssue}
-        handleMicroService={refreshIssue}
-        pullRequests={issue?.pullRequests || []}
-        mergeProposals={issue?.mergeProposals}
-        amountIssue={networkIssue?.tokenAmount}
-        forks={activeRepo?.forks}
-        githubLogin={user?.login}
-        hasOpenPR={hasOpenPR}
         isRepoForked={isRepoForked}
-        isWorking={isWorking}
-        issueCreator={networkIssue?.creator}
-        repoPath={issue?.repository?.githubPath}
-        githubId={issue?.githubId}
         addNewComment={addNewComment}
-        finished={networkIssue?.isFinished}
       />
       {(networkIssue?.proposals?.length > 0 ||
         networkIssue?.pullRequests?.length > 0) &&
@@ -189,7 +142,7 @@ export default function PageIssue() {
           <div className="d-flex bd-highlight justify-content-center mx-2 px-4">
             <div className="ps-3 pe-0 ms-0 me-2 w-65 bd-highlight">
               <div className="container">
-                <IssueDescription description={issue?.body || ""} />
+                <IssueDescription description={activeIssue?.body || ""} />
               </div>
             </div>
             <div className="p-0 me-3 flex-shrink-0 w-25 bd-highlight">
@@ -200,7 +153,7 @@ export default function PageIssue() {
                   mergeProposalAmount={networkIssue?.proposals?.length}
                   isFinished={networkIssue?.isFinished}
                   isCanceled={
-                    issue?.state === "canceled" || networkIssue?.canceled
+                    activeIssue?.state === "canceled" || networkIssue?.canceled
                   }
                   creationDate={networkIssue.creationDate}
                 />
@@ -210,12 +163,12 @@ export default function PageIssue() {
         </div>
       ) : (
         <CustomContainer>
-          <IssueDescription description={issue?.body || ""} />
+          <IssueDescription description={activeIssue?.body || ""} />
         </CustomContainer>
       )}
       <IssueComments
         comments={commentsIssue}
-        repo={issue?.repository?.githubPath}
+        repo={activeIssue?.repository?.githubPath}
         issueId={id}
       />
     </>
