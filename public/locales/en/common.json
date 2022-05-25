@@ -130,6 +130,7 @@
     "locked": "locked",
     "upload": "upload",
     "token": "token",
+    "$token": "$TOKEN",
     "creation-date": "creation date",
     "seconds": "seconds",
     "on": "on",

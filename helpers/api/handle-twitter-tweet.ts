@@ -35,7 +35,8 @@ export default function twitterTweet({
   action,
   issue,
   issuePreviousState,
-  username
+  username,
+  currency = "$TOKEN"
 }: {
   type: "bounty" | "proposal";
   action:
@@ -46,6 +47,7 @@ export default function twitterTweet({
     | "distributed"
     | "working";
   issuePreviousState?: IssueState;
+  currency?: string;
   username?: string;
   issue: {
     id: string | number;
@@ -80,7 +82,7 @@ export default function twitterTweet({
 
     if (type === "bounty" && action === "created") {
       title = "Alert";
-      body = `${issueTitle} and earn up to ${amount} $BEPRO`;
+      body = `${issueTitle} and earn up to ${amount} ${currency}`;
     }
     if (type === "bounty" && action === "changes") {
       title = "Status Update";
@@ -96,7 +98,7 @@ export default function twitterTweet({
     }
     if (type === "bounty" && action === "distributed") {
       title = "Fully Distributed";
-      body = `${issueTitle} was closed and fully distributed with ${amount} $BEPRO.`;
+      body = `${issueTitle} was closed and fully distributed with ${amount} ${currency}.`;
     }
     if (type === "proposal") {
       title = "Proposal Status";

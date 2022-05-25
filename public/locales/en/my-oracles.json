@@ -7,17 +7,17 @@
   "actions": {
     "lock": {
       "label": "Lock",
-      "title": "Lock $BEPRO",
-      "description": "Lock $BEPRO to receive ORACLES",
+      "title": "Lock {{currency}}",
+      "description": "Lock {{currency}} to receive ORACLES",
       "get-amount-oracles": "Get {{amount}} ORACLES",
-      "body": "You are locking /bepro{{amount}} $BEPRO /br/ to get /oracles{{amount}} Oracles"
+      "body": "You are locking /bepro{{amount}} {{currency}} /br/ to get /oracles{{amount}} Oracles"
     },
     "unlock": {
       "label": "Unlock",
-      "title": "Unlock $BEPRO",
-      "description": "Get $BEPRO from ORACLES",
-      "get-amount-bepro": "Get {{amount}} $BEPRO",
-      "body": "Give away /oracles{{amount}} Oracles/ /br/ to get back /bepro{{amount}} $BEPRO"
+      "title": "Unlock {{currency}}",
+      "description": "Get {{currency}} from ORACLES",
+      "get-amount-bepro": "Get {{amount}} {{currency}}",
+      "body": "Give away /oracles{{amount}} Oracles/ /br/ to get back /bepro{{amount}} {{currency}}"
     },
     "delegate": {
       "label": "Delegate",
@@ -42,10 +42,10 @@
   },
   "errors": {
     "amount-greater": "Amount is greater than your {{amount}} amount",
-    "amount-higher-0": "$BEPRO amount needs to be higher than 0.",
+    "amount-higher-0": "{{currency}} amount needs to be higher than 0.",
     "fill-required-fields": "Please fill all required fields.",
     "self-delegate": "You can't delegate Oracles to your own address.",
-    "approve-transactions": "Please approve BEPRO Transactions First. Check it and try again.",
+    "approve-transactions": "Please approve {{currency}} Transactions First. Check it and try again.",
     "no-delegates": "No delegates found"
   }
 }

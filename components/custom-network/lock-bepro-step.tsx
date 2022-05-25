@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ProgressBar } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
@@ -14,6 +14,7 @@ import UnlockBeproModal from "components/unlock-bepro-modal";
 
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
+import { useNetwork } from "contexts/network";
 
 import { formatNumberToCurrency, formatNumberToNScale } from "helpers/formatNumber";
 
@@ -33,11 +34,13 @@ export default function LockBeproStep({
   const [isLocking, setIsLocking] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [showUnlockBepro, setShowUnlockBepro] = useState(false);
-  const [networkTokenName, setNetworkTokenName] = useState<string>(t("misc.token"));
   const [settlerAllowance, setSettlerAllowance] = useState(0);
 
   const { service: DAOService } = useDAO();
   const { wallet, updateWalletBalance } = useAuthentication();
+  const { activeNetwork } = useNetwork();
+
+  const networkTokenName = activeNetwork?.networkToken?.symbol || t("misc.$token");
 
   const lockedPercent =
     ((data.amountLocked || 0) / (data.amountNeeded || 0)) * 100;
@@ -115,14 +118,6 @@ export default function LockBeproStep({
                             publicRuntimeConfig?.networkConfig?.factoryAddress)
     .then(setSettlerAllowance).catch(() => 0);
   }
-
-  useEffect(() => {
-    if (!DAOService || !wallet?.address) return;
-    
-    DAOService.getSettlerTokenData().then(data => setNetworkTokenName(data.symbol));
-    
-    updateAllowance();
-  }, [DAOService, wallet]);
 
   return (
     <Step

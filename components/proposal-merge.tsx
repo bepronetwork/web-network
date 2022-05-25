@@ -136,6 +136,7 @@ export default function ProposalMerge({
               percentage={item.percentage}
               symbol={tokenSymbol ? tokenSymbol : t("common:misc.token")}
               amount={item.value}
+              key={key}
             />
           ))}
           <BountyDistributionItem

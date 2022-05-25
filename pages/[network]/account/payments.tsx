@@ -27,14 +27,15 @@ interface PaymentItem{
 }
 
 const PaymentItem = function ({payment}:PaymentItem) {
-  const { getURLWithNetwork } = useNetworkTheme()
-  const router = useRouter()
+  const { getURLWithNetwork } = useNetworkTheme();
+  const router = useRouter();
+  const { t } = useTranslation("common");
   
   return (
     <div className="bg-dark-gray px-3 py-2 d-flex justify-content-between mt-1 rounded-5">
       <div className="d-inline-flex row flex-shirk-1">
         <span className="caption-large text-uppercase text-primary mb-1">
-          {`${formatNumberToCurrency(payment?.ammount)} ${payment?.issue?.token?.symbol || 'BEPRO'}`}
+          {`${formatNumberToCurrency(payment?.ammount)} $${payment?.issue?.token?.symbol || t("misc.$token")}`}
         </span>
         <p className="caption-small text-uppercase text-white text-truncate">
           {payment.transactionHash}
