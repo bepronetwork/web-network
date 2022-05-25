@@ -89,8 +89,7 @@ function SelectOptionComponent({ innerProps, innerRef, data }) {
 
 export default function NewProposal({
   amountTotal,
-  pullRequests = [],
-  isFinished = false
+  pullRequests = []
 }) {
   const { t } = useTranslation([
     "common",

@@ -273,7 +273,6 @@ export default function PageActions({
               {/* Create Proposal Button */}
               { (isLoggedIn && isCouncilMember && isBountyOpen && isBountyFinished && hasPullRequests) &&
                 <NewProposal
-                  isFinished={networkIssue?.isFinished}
                   amountTotal={networkIssue?.tokenAmount}
                   pullRequests={activeIssue?.pullRequests}
                 />
