@@ -83,6 +83,8 @@ export default function Settings() {
   const { dispatch } = useContext(ApplicationContext);
   const { wallet, user, updateWalletBalance } = useAuthentication();
 
+  const networkTokenSymbol = activeNetwork?.networkToken?.symbol || t("misc.$token");
+
   const isValidDescription =
     newInfo.network.data.networkDescription.trim() !== "";
   const isValidPercentageForDispute =
@@ -653,10 +655,10 @@ export default function Settings() {
                   <InputNumber
                     classSymbol={"text-primary"}
                     label={t("custom-network:council-amount")}
-                    symbol={activeNetwork?.networkToken?.symbol || t("misc.$token")}
+                    symbol={networkTokenSymbol}
                    max={+publicRuntimeConfig?.networkConfig?.councilAmount?.max}
                     description={t("custom-network:errors.council-amount", {
-                      token: activeNetwork?.networkToken?.symbol || t("misc.$token"),
+                      token: networkTokenSymbol,
                       min: formatNumberToCurrency(+publicRuntimeConfig?.networkConfig?.councilAmount?.min, 0),
                       max: formatNumberToCurrency(+publicRuntimeConfig?.networkConfig?.councilAmount?.max, 0)
                     })}

@@ -32,10 +32,12 @@ export default function useBepro(props?: IUseBeProDefault) {
   const { activeNetwork } = useNetwork();
   const { networkIssue, activeIssue, updateIssue } = useIssue();
   const { service: DAOService } = useDAO();
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
 
   const { processEvent } = useApi();
   const txWindow = useTransactions();
+
+  const networkTokenSymbol = activeNetwork?.networkToken?.symbol || t("misc.$token");
 
   async function handlerDisputeProposal(proposalscMergeId: number): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
@@ -219,7 +221,7 @@ export default function useBepro(props?: IUseBeProDefault) {
       await DAOService.approveToken(tokenAddress, amount)
       .then((txInfo) => {
         if (!txInfo) throw new Error(t("errors.approve-transaction", {
-          currency: activeNetwork?.networkToken?.symbol || t("misc.$token")
+          currency: networkTokenSymbol
         }));
               
         txWindow.updateItem(tx.payload.id,
@@ -259,7 +261,7 @@ export default function useBepro(props?: IUseBeProDefault) {
       await DAOService.takeBackDelegation(delegationId)
                     .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
                       if (!txInfo) throw new Error(t("errors.approve-transaction", {
-                        currency: activeNetwork?.networkToken?.symbol || t("misc.$token")
+                        currency: networkTokenSymbol
                       }));
               
                       txWindow.updateItem(tx.payload.id,

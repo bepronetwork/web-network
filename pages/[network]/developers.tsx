@@ -21,6 +21,8 @@ export default function PageDevelopers() {
   const { service: DAOService } = useDAO();
   const { activeNetwork } = useNetwork();
 
+  const networkTokenSymbol = activeNetwork?.networkToken?.symbol || t("misc.$token");
+
   const [infos, setInfos] = useState<InfosHero[]>([
     {
       value: 0,
@@ -33,7 +35,7 @@ export default function PageDevelopers() {
     {
       value: 0,
       label: t("heroes.bounties-in-network"),
-      currency: activeNetwork?.networkToken?.symbol || t("misc.$token")
+      currency: networkTokenSymbol
     },
     {
       value: 0,
@@ -62,7 +64,7 @@ export default function PageDevelopers() {
         {
           value: onNetwork,
           label: t("heroes.bounties-in-network"),
-          currency: activeNetwork?.networkToken?.symbol || t("misc.$token")
+          currency: networkTokenSymbol
         },
         {
           value: totalUsers,

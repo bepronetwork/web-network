@@ -53,6 +53,8 @@ function OraclesActions() {
   const { wallet, updateWalletBalance } = useAuthentication();
   const { state: { myTransactions }} = useContext(ApplicationContext);
 
+  const networkTokenSymbol = activeNetwork?.networkToken?.symbol || t("misc.$token");
+
   const renderAmount = tokenAmount
     ? `${formatNumberToCurrency(tokenAmount)} `
     : "0";
@@ -64,9 +66,9 @@ function OraclesActions() {
 
   const renderInfo = {
     Lock: {
-      title: t("my-oracles:actions.lock.title", { currency: activeNetwork?.networkToken?.symbol || t("misc.$token") }),
+      title: t("my-oracles:actions.lock.title", { currency: networkTokenSymbol }),
       description: 
-        t("my-oracles:actions.lock.description", { currency: activeNetwork?.networkToken?.symbol || t("misc.$token") }),
+        t("my-oracles:actions.lock.description", { currency: networkTokenSymbol }),
       label: t("my-oracles:actions.lock.get-amount-oracles", {
         amount: renderAmount
       }),
@@ -74,14 +76,14 @@ function OraclesActions() {
         <>
           {t("misc.get")} <span className="text-purple">{t("$oracles")}</span>{" "}
           {t("misc.from")} <span className="text-primary">
-            { activeNetwork?.networkToken?.symbol || t("$misc.token")}
+            {networkTokenSymbol}
           </span>
         </>
       ),
       body: 
         t("my-oracles:actions.lock.body", { 
           amount: renderAmount, 
-          currency: activeNetwork?.networkToken?.symbol || t("misc.$token")
+          currency: networkTokenSymbol
         }),
       params() {
         return { tokenAmount };
@@ -89,25 +91,25 @@ function OraclesActions() {
     },
     Unlock: {
       title: 
-        t("my-oracles:actions.unlock.title", { currency: activeNetwork?.networkToken?.symbol || t("misc.$token") }),
+        t("my-oracles:actions.unlock.title", { currency: networkTokenSymbol }),
       description: 
         t("my-oracles:actions.unlock.description", { 
-          currency: activeNetwork?.networkToken?.symbol || t("misc.$token")
+          currency: networkTokenSymbol
         }),
       label: t("my-oracles:actions.unlock.get-amount-bepro", {
         amount: renderAmount,
-        currency: activeNetwork?.networkToken?.symbol || t("misc.$token")
+        currency: networkTokenSymbol
       }),
       caption: (
         <>
           {t("misc.get")} <span className="text-primary">
-            { activeNetwork?.networkToken?.symbol || t("misc.$token")}</span>{" "}
+            { networkTokenSymbol}</span>{" "}
           {t("misc.from")} <span className="text-purple">{t("$oracles")}</span>
         </>
       ),
       body: t("my-oracles:actions.unlock.body", { 
         amount: renderAmount,
-        currency: activeNetwork?.networkToken?.symbol || t("misc.$token")
+        currency: networkTokenSymbol
       }),
       params(from: string) {
         return { tokenAmount, from };
@@ -128,13 +130,13 @@ function OraclesActions() {
   function handleCheck() {
     if (!tokenAmount) {
       return setError(t("my-oracles:errors.amount-higher-0", {
-        currency: activeNetwork?.networkToken?.symbol || t("misc.$token")
+        currency: networkTokenSymbol
       }));
     }
     const isChecked = !needsApproval();
     setShow(isChecked);
     setError(!isChecked ? t("my-oracles:errors.approve-transactions", {
-      currency: activeNetwork?.networkToken?.symbol || t("misc.$token")
+      currency: networkTokenSymbol
     }) : "")
   }
 
@@ -173,8 +175,7 @@ function OraclesActions() {
   }
 
   function getCurrentLabel() {
-    return action === t("my-oracles:actions.lock.label") ? 
-    ( activeNetwork?.networkToken?.symbol || t("$misc.token")) : t("$oracles");
+    return action === t("my-oracles:actions.lock.label") ? networkTokenSymbol : t("$oracles");
   }
 
   function getMaxAmmount(): number {
