@@ -20,7 +20,7 @@ import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { BlockTransaction, TransactionCurrency } from "interfaces/transaction";
+import { BlockTransaction } from "interfaces/transaction";
 
 import useTransactions from "x-hooks/useTransactions";
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ProgressBar } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
