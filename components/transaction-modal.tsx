@@ -73,14 +73,15 @@ export default function TransactionModal({
 
   useEffect(updateAddresses, [transaction]);
 
-  function renderDetailRow(item): any {  // eslint-disable-line
+  function renderDetailRow(item, index): any {  // eslint-disable-line
     return (
-      <>
-        <div className="d-flex align-items-center justify-content-between bg-dark-gray py-2 mt-2 px-3 rounded-8">
-          <span className="caption-small text-white-50">{item.span}</span>
-          <span className="caption-medium text-white">{item.content}</span>
-        </div>
-      </>
+      <div 
+        className="d-flex align-items-center justify-content-between bg-dark-gray py-2 mt-2 px-3 rounded-8" 
+        key={`${item.span}${index}`}
+      >
+        <span className="caption-small text-white-50">{item.span}</span>
+        <span className="caption-medium text-white">{item.content}</span>
+      </div>
     );
   }
 
