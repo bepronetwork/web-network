@@ -318,11 +318,12 @@ export default function Settings() {
       })
       .then(() => {
         dispatch(addToast({
-            type: "success",
-            title: t("actions.success"),
-            content: t("custom-network:messages.network-closed")
+          type: "success",
+          title: t("actions.success"),
+          content: t("custom-network:messages.network-closed")
         }));
-
+        
+        updateActiveNetwork(true);
         updateWalletBalance();
 
         router.push(getURLWithNetwork("/account/my-network"));
