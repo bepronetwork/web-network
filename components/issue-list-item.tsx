@@ -199,7 +199,7 @@ export default function IssueListItem({
           <span className="caption-large text-white text-opacity-1">
             {formatNumberToNScale(issue?.amount || 0)}{" "}
             <label className="text-uppercase text-primary">
-              {issue?.token?.symbol || t("common:misc.token")}
+              ${issue?.token?.symbol || t("common:misc.token")}
             </label>
           </span>
           {(issue?.developers?.length > 0 && (
