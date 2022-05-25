@@ -39,7 +39,7 @@ export default function MyIssues() {
     if (!wallet?.address) return;
 
     getPendingFor(wallet?.address, undefined, activeNetwork?.name).then((pending) =>
-      setPendingIssues(pending.rows));
+      setPendingIssues(pending?.rows));
   }
 
   function createPendingIssue() {
