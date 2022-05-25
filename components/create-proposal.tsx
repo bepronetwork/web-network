@@ -142,7 +142,8 @@ export default function NewProposal({
     return currentProposals.some((activeProposal) => {
       if (activeProposal.currentPrId === currentDistrbuition.currentPrId) {
         return activeProposal.prAddressAmount.every((ap) =>
-          currentDistrbuition.prAddressAmount.find((p) => ap.amount === p.amount && ap.address === p.address));
+          currentDistrbuition.prAddressAmount.find((p) => 
+          ap.amount === p.amount && ap.address.toLowerCase() === p.address.toLowerCase()));
       } else {
         return false;
       }
@@ -158,7 +159,7 @@ export default function NewProposal({
       const currentDistrbuition = {
         currentPrId: id,
         prAddressAmount: participants.map((item) => ({
-          amount: (amountTotal * obj[item.githubHandle]) / 100,
+          amount: obj[item.githubHandle],
           address: item.address.toLowerCase()
         }))
       };
@@ -392,9 +393,9 @@ export default function NewProposal({
           isOptionDisabled={(option) => option.isDisable}
           onChange={handleChangeSelect}
         />
-        {(participants.length === 0 && (
+        {(!participants.length && (
           <p className="text-uppercase text-danger text-center w-100 caption mt-4 mb-0">
-            {t("status.network-congestion")}
+            {t("pull-request:errors.pull-request-participants")}
           </p>
         )) || (
           <>
