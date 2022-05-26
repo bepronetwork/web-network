@@ -82,6 +82,11 @@ export default function PageCreateIssue() {
   const { getURLWithNetwork } = useNetworkTheme();
   const { createPreBounty, processEvent } = useApi();
 
+  const defaultToken = activeNetwork?.networkToken || BEPRO_TOKEN;
+  const canAddCustomToken = activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address ? 
+    publicRuntimeConfig?.networkConfig?.allowCustomTokens :
+    !!activeNetwork?.allowCustomTokens;
+
   async function allowCreateIssue() {
     if (!DAOService || !transactionalToken || issueAmount.floatValue <= 0) return;
 
@@ -391,12 +396,9 @@ export default function PageCreateIssue() {
                 
                 <div className="col-6 mt-n2">
                   <TokensDropdown
-                    tokens={customTokens} 
-                    canAddToken={
-                      activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address ? 
-                      publicRuntimeConfig?.networkConfig?.allowCustomTokens :
-                      !!activeNetwork?.allowCustomTokens
-                    }
+                    tokens={customTokens}
+                    defaultToken={defaultToken}
+                    canAddToken={canAddCustomToken}
                     addToken={addToken} 
                     setToken={setTransactionalToken}
                   /> 
