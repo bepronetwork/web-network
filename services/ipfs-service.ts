@@ -10,14 +10,14 @@ const port = serverRuntimeConfig?.infura?.port || "5001";
 const auth =
   "Basic " +
   Buffer.from(serverRuntimeConfig?.infura?.projectId +
-      ":" +
-      serverRuntimeConfig?.infura?.projectSecret).toString("base64");
+    ":" +
+    serverRuntimeConfig?.infura?.projectSecret).toString("base64");
 const baseURL = `https://${host}:${port}/api/v0`;
 
 export async function add(file: Buffer | string,
-                          pin = false,
-                          originalFilename?: string,
-                          ext?: string): Promise<{ hash: string; fileName: string; size: string }> {
+  pin = false,
+  originalFilename?: string,
+  ext?: string): Promise<{ hash: string; fileName: string; size: string }> {
   const form = new FormData();
 
   const isBuffer = Buffer.isBuffer(file);
@@ -49,11 +49,10 @@ export async function add(file: Buffer | string,
   };
 
   const { data } = await axios.post(`${baseURL}/add?stream-channels=true&progress=false&pin=${pin}`,
-                                    form,
-                                    {
+    form,
+    {
       headers
-                                    });
-  console.log({ data });
+    });
   return { hash: data.Hash, fileName: data.Name, size: data.Size };
 }
 
@@ -82,10 +81,10 @@ export async function addAll(files: Buffer[]): Promise<{ hash: string; fileName:
   };
 
   const { data } = await axios.post(`${baseURL}/add?wrap-with-directory=true&only-hash=true`,
-                                    form,
-                                    {
+    form,
+    {
       headers
-                                    });
+    });
 
   return { hash: data.Hash, fileName: data.Name, size: data.Size };
 }

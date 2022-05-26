@@ -5,10 +5,10 @@ import getConfig from "next/config";
 import { Op } from "sequelize";
 
 import models from "db/models";
+import nodeHtmlToImage from "node-html-to-image";
 
-// import { generateCard } from "helpers/seo/create-card-bounty";
+import IpfsStorage from "services/ipfs-service";
 
-// import IpfsStorage from "services/ipfs-service";
 const { publicRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
@@ -41,54 +41,71 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const {
-    ids: [repoId, ghId]
-  } = req.query;
-  const issueId = [repoId, ghId].join("/");
+  try {
+    const {
+      ids: [repoId, ghId]
+    } = req.query;
+    const issueId = [repoId, ghId].join("/");
 
-  const include = [
-    { association: "developers" },
-    { association: "pullRequests" },
-    { association: "mergeProposals" },
-    { association: "repository" },
-    { association: "token" }
-  ];
+    const include = [
+      { association: "developers" },
+      { association: "pullRequests" },
+      { association: "mergeProposals" },
+      { association: "repository" },
+      { association: "token" }
+    ];
 
-  const issue = await models.issue.findOne({
-    where: { issueId },
-    include
-  });
+    const issue = await models.issue.findOne({
+      where: { issueId },
+      include
+    });
 
-  if (!issue) return res.status(404).json(null);
+    if (!issue) return res.status(404).json(null);
 
-  //const [, repo] = issue.repository.githubPath.split("/");
+    const [, repo] = issue.repository.githubPath.split("/");
 
-  // const card = await generateCard({
-  //   state: issue.state,
-  //   issueId: ghId,
-  //   title: issue.title,
-  //   repo,
-  //   ammount: issue.amount,
-  //   working: issue.working?.length || 0,
-  //   pr: issue.pullRequests?.length || 0,
-  //   proposal: issue?.mergeProposals?.length || 0,
-  //   currency: issue?.token?.symbol
-  // }).catch((e) => {
-  //   console.log("Error generating card", e);
-  //   return null;
-  // });
+    const baseUrl = publicRuntimeConfig.homeUrl;
+    const background = `${baseUrl}/images/bg-bounty-card.png`;
+    const logo = `${baseUrl}/images/bepro-icon.png`;
+    const font = `${baseUrl}/fonts/SpaceGrotesk.woff2`;
+    const { data: html } = await axios.get(`${baseUrl}/templates/seo/bounty.html`)
 
-  // if (!card) return;
+    const content = {
+      state: issue.state,
+      issueId: ghId,
+      title: issue.title,
+      repo,
+      ammount: issue.amount,
+      working: issue.working?.length || 0,
+      proposals: issue?.mergeProposals?.length || 0,
+      pullRequests: issue.pullRequests?.length || 0,
+      currency: issue?.token?.symbol,
+      background,
+      logo,
+      font,
+    }
 
-  // const img = Buffer.from(card.buffer);
-  // const { hash } = await IpfsStorage.add(img).catch((e) => {
-  //   console.log("Failed to upload to IPFS", e);
-  //   return { hash: null };
-  // });
+    const card = await nodeHtmlToImage({
+      html,
+      type: "jpeg",
+      content
+    })
 
-  // await issue.update({ seoImage: hash });
+    if (!card) return;
 
-  return res.status(200).json({ seoImage: 'hash' });
+    const img = Buffer.from(card as string);
+    const { hash } = await IpfsStorage.add(img).catch((e) => {
+      console.log("Failed to upload to IPFS", e);
+      return { hash: null };
+    });
+
+    await issue.update({ seoImage: hash });
+
+    return res.status(200).json({ seoImage: hash });
+  }
+  catch (e) { 
+    return res.status(500).json("Internal Error");
+  }
 }
 
 async function Seo(req: NextApiRequest, res: NextApiResponse) {

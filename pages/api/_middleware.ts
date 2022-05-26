@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 
 import { error, info } from 'helpers/api/handle-log'
 
-const whiteList = ['auth', 'past-events'];
+const whiteList = ['auth', 'past-events', 'seo'];
 const ignorePaths = ['health'];
 
 export async function middleware(req: NextApiRequest) {
