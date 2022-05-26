@@ -1,4 +1,4 @@
-import { forwardRef, useContext, useEffect, useState } from "react";
+import { forwardRef, useContext, useEffect, useState, ReactChild } from "react";
 
 import { useTranslation } from "next-i18next";
 
@@ -10,6 +10,7 @@ import Modal from "components/modal";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
@@ -19,25 +20,26 @@ import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { TransactionCurrency } from "interfaces/transaction";
-
-import { BeproService } from "services/bepro-service";
+import { BlockTransaction } from "interfaces/transaction";
 
 import useTransactions from "x-hooks/useTransactions";
 
 interface NetworkTxButtonParams {
   txMethod: string;
-  txParams: any;
+  txParams: {
+    from?: string,
+    tokenAmount?: number
+  }
   onTxStart?: () => void;
   onSuccess: () => void;
   onFail: (message?: string) => void;
   modalTitle: string;
   modalDescription: string;
   buttonLabel?: string;
-  children?: JSX.Element;
+  children?: ReactChild | ReactChild[];
   disabled?: boolean;
   txType: TransactionTypes;
-  txCurrency: TransactionCurrency;
+  txCurrency: string;
   fullWidth?: boolean;
   useContract?: boolean;
   className?: string;
@@ -57,35 +59,35 @@ function networkTxButton({
     useContract = false,
     disabled = false,
     txType = TransactionTypes.unknown,
-    txCurrency = "$BEPRO"
+    txCurrency
   }: NetworkTxButtonParams,
                          elementRef) {
   const { t } = useTranslation(["common"]);
 
   const [showModal, setShowModal] = useState(false);
-  const [txSuccess, setTxSuccess] = useState(false);
+  const [txSuccess,] = useState(false);
 
   const { dispatch } = useContext(ApplicationContext);
-  const { wallet, beproServiceStarted, updateWalletBalance } =
-    useAuthentication();
-
+  
   const txWindow = useTransactions();
   const { activeNetwork } = useNetwork();
+  const { service: DAOService } = useDAO();
+  const { wallet, updateWalletBalance } = useAuthentication();
 
   function checkForTxMethod() {
-    if (!beproServiceStarted || !wallet) return;
+    if (!DAOService || !wallet) return;
 
-    if (!txMethod || typeof BeproService.network[txMethod] !== "function")
+    if (!txMethod || typeof DAOService.network[txMethod] !== "function")
       throw new Error("Wrong txMethod");
   }
 
   function makeTx() {
-    if (!beproServiceStarted || !wallet) return;
+    if (!DAOService || !wallet) return;
 
     const tmpTransaction = addTransaction({
         type: txType,
         amount: txParams?.tokenAmount || 0,
-        currency: txCurrency
+        currency: txCurrency || t("misc.$token")
     },
                                           activeNetwork);
     dispatch(tmpTransaction);
@@ -93,12 +95,11 @@ function networkTxButton({
     let transactionMethod;
 
     if (!useContract)
-      transactionMethod = BeproService.network[txMethod](txParams.tokenAmount,
-                                                         txParams.from);
+      transactionMethod = DAOService.network[txMethod](txParams.tokenAmount, txParams.from);
     else {
-      const weiAmount = BeproService.toWei(txParams?.tokenAmount.toString());
+      const weiAmount = DAOService.toWei(txParams?.tokenAmount.toString());
 
-      transactionMethod = BeproService.network.contract.methods[txMethod];
+      transactionMethod = DAOService.network.contract.methods[txMethod];
       transactionMethod =
         txMethod === "lock"
           ? transactionMethod(weiAmount).send({ from: wallet.address })
@@ -132,12 +133,12 @@ function networkTxButton({
         onFail(e.message);
         if (e?.message?.search("User denied") > -1)
           dispatch(updateTransaction({
-              ...(tmpTransaction.payload as any),
+              ...(tmpTransaction.payload as BlockTransaction),
               remove: true
           }));
         else
           dispatch(updateTransaction({
-              ...(tmpTransaction.payload as any),
+              ...(tmpTransaction.payload as BlockTransaction),
               status: TransactionStatus.failed
           }));
         console.error(e);
@@ -165,7 +166,7 @@ function networkTxButton({
     </Button>
   );
 
-  useEffect(checkForTxMethod, [beproServiceStarted, wallet]);
+  useEffect(checkForTxMethod, [DAOService, wallet]);
 
   return (
     <>
@@ -190,8 +191,7 @@ function networkTxButton({
         show={showModal}
         title={modalTitle}
         footer={modalFooter}
-        titlePosition="center"
-      >
+        titlePosition="center">
         <p className="p-small text-white-50 text-center">{modalDescription}</p>
         <div className={getDivClass()}>
           <Icon className="md-larger">

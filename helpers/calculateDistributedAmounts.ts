@@ -1,22 +1,17 @@
 import { Defaults } from "@taikai/dappkit";
 
-import { BeproService } from "services/bepro-service";
+import { handlePercentage } from "helpers/handlePercentage";
 
-import { handlePercentage } from "./handlePercentage";
+export default function calculateDistributedAmounts(treasury,
+                                                    mergerFee: number,
+                                                    proposerFee: number,
+                                                    bountyAmount: number,
+                                                    proposalPercents: number[]) {
+  const treasuryAmount = treasury.treasury === Defaults.nativeZeroAddress ? 0 : 
+    (bountyAmount / 100) * (treasury.closeFee / Defaults.TenK);
 
-export default async function calculateDistributedAmounts(bountyAmount: number,
-                                                          proposalPercents: number[]) {
-  const treasury = await BeproService.network.treasuryInfo();
-
-  const treasuryAmount =
-    treasury["0"] === Defaults.nativeZeroAddress
-      ? 0
-      : (bountyAmount / 100) * (treasury["1"] / Defaults.TenK);
-  const mergerAmount =
-    (bountyAmount / 100) * (await BeproService.network.mergeCreatorFeeShare());
-  const proposerAmount =
-    ((bountyAmount - mergerAmount) / 100) *
-    (await BeproService.network.proposerFeeShare());
+  const mergerAmount = (bountyAmount / 100) * mergerFee;
+  const proposerAmount = ((bountyAmount - mergerAmount) / 100) * proposerFee;
   const amount = bountyAmount - treasuryAmount - mergerAmount - proposerAmount;
 
   return {

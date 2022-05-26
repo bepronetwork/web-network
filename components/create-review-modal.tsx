@@ -50,8 +50,7 @@ export default function CreateReviewModal({
       show={show}
       onCloseClick={onCloseClick}
       title={t("modals.create-review.title")}
-      titlePosition="center"
-    >
+      titlePosition="center">
       <div className="container">
         <div className="mb-2">
           <p className="caption-small trans mb-2">

@@ -1,27 +1,36 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import getConfig from "next/config";
 
 import NetworksList from "components/networks-list";
-import PageHero, { IInfosHero } from "components/page-hero";
+import NotListedTokens from "components/not-listed-tokens";
+import PageHero, { InfosHero } from "components/page-hero";
 
-import { ApplicationContext } from "contexts/application";
-import { changeNetworksSummary } from "contexts/reducers/change-networks-summary";
+import { useDAO } from "contexts/dao";
 
-import { BeproService } from "services/bepro-service";
-
-import useApi from "x-hooks/use-api";
-
-const { publicRuntimeConfig } = getConfig();
+export interface NetworkDetails {
+  totalBounties: number;
+  totalSettlerLocked: number;
+  tokenSymbol: string;
+  tokenName: string;
+  amountInCurrency: number;
+  isListedInCoinGecko?: boolean;
+}
+interface Networks {
+  [key: string]: NetworkDetails;
+}
 
 export default function NetworksPage() {
   const { t } = useTranslation(["common", "custom-network"]);
-  const { getCurrencyByToken } = useApi();
 
-  const [infos, setInfos] = useState<IInfosHero[]>([
+  const { service: DAOService } = useDAO();
+
+  const [networks, setNetworks] = useState<Networks>();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const [infos, setInfos] = useState<InfosHero[]>([
     {
       value: 0,
       label: t("custom-network:hero.number-of-networks")
@@ -34,58 +43,59 @@ export default function NetworksPage() {
       value: 0,
       label: t("custom-network:hero.in-the-network"),
       currency: "USD"
-    },
-    {
-      value: 0,
-      label: t("heroes.protocol-members")
     }
   ]);
 
-  const {
-    dispatch,
-    state: { networksSummary }
-  } = useContext(ApplicationContext);
-
-  useEffect(() => {
-    BeproService.startNetworkFactory().catch((error) =>
-      console.log("Failed to start the Network Factory", error));
-  }, []);
-
-  useEffect(() => {
-    dispatch(changeNetworksSummary({
-        action: "reset"
+  function addNetwork(address: string, 
+                      totalBounties: number, 
+                      amountInCurrency: number, 
+                      totalSettlerLocked: number, 
+                      tokenName: string,
+                      tokenSymbol: string,
+                      isListedInCoinGecko = false) {
+    setNetworks(prevNetworks => ({
+      ...prevNetworks,
+      [address]: {
+        totalBounties,
+        amountInCurrency,
+        totalSettlerLocked,
+        tokenSymbol,
+        tokenName,
+        isListedInCoinGecko
+      }
     }));
-  }, []);
+  }
 
-  async function loadTotals() {
-    if (!networksSummary) return;
+  useEffect(() => {    
+    if (!networks) return;
 
-    const [quantity, totalLocked, { usd }] = await Promise.all([
-      BeproService.getNetworksQuantity(),
-      BeproService.getTokensLocked(),
-      getCurrencyByToken(publicRuntimeConfig?.currency?.currencyId, 'usd')
-    ]);
+    const networksAddresses = Object.keys(networks);
+    const numberOfNetworks = networksAddresses.length;
+    const totalBounties = networksAddresses.reduce((acc, el) => acc + networks[el].totalBounties, 0);
+    const amountInNetworks = networksAddresses.reduce((acc, el) => acc + networks[el].amountInCurrency, 0);
 
     setInfos([
       {
-        value: quantity,
+        value: numberOfNetworks,
         label: t("custom-network:hero.number-of-networks")
       },
       {
-        value: networksSummary.bounties,
+        value: totalBounties,
         label: t("custom-network:hero.number-of-bounties")
       },
       {
-        value: totalLocked * usd,
+        value: amountInNetworks,
         label: t("custom-network:hero.in-the-network"),
-        currency: "USD"
+        currency: "USD",
+        hasNotConvertedTokens: !!Object.entries(networks).find(network => !network[1].isListedInCoinGecko),
+        setNotListedModalVisibility: () => setIsModalVisible(true)
       }
-    ]);
-  }
+    ]);    
+  }, [networks]);
 
   useEffect(() => {
-    loadTotals();
-  }, [BeproService.isStarted, networksSummary]);
+    if (DAOService) DAOService.loadFactory();
+  }, [DAOService]);
 
   return (
     <>
@@ -97,9 +107,15 @@ export default function NetworksPage() {
         />
 
         <div className="mt-3">
-          <NetworksList redirectToHome />
+          <NetworksList addNetwork={addNetwork} redirectToHome />
         </div>
       </div>
+
+      <NotListedTokens 
+        isVisible={isModalVisible} 
+        handleClose={() => setIsModalVisible(false)} 
+        networks={networks && Object.entries(networks).map(e => e[1]) || []} 
+      />
     </>
   );
 }

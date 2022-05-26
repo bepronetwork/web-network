@@ -18,29 +18,21 @@ import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 import { toastError } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
-import { changeBeproInitState } from "contexts/reducers/change-bepro-init-state";
-import { changeLoadState } from "contexts/reducers/change-load-state";
 import { changeNetwork } from "contexts/reducers/change-network";
 import LoadApplicationReducers from "contexts/reducers/index";
 import { mainReducer } from "contexts/reducers/main";
 import { updateTransaction } from "contexts/reducers/update-transaction";
 
-import { handleNetworkAddress } from "helpers/custom-network";
-
 import { ApplicationState } from "interfaces/application-state";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { ReduceActor } from "interfaces/reduce-action";
-
-import { BeproService } from "services/bepro-service";
-
 
 import { changeNetworkId } from "./reducers/change-network-id";
 import { changeStakedState } from "./reducers/change-staked-amount";
 
 interface GlobalState {
   state: ApplicationState;
-  methods?: any;
-  dispatch: (action: ReduceActor<any>) => Dispatch<ReduceActor<any>>;
+  dispatch: (action: ReduceActor<any>) => Dispatch<ReduceActor<any>>; // eslint-disable-line
 }
 
 const defaultState: GlobalState = {
@@ -84,45 +76,44 @@ const defaultState: GlobalState = {
 };
 
 export const ApplicationContext = createContext<GlobalState>(defaultState);
-const { publicRuntimeConfig } = getConfig();
+const { publicRuntimeConfig } = getConfig()
 
 const cheatAddress = "";
 let waitingForTx = null;
-const cheatBepro = null;
-const cheatDispatcher = null;
 
 export default function ApplicationContextProvider({ children }) {
   const [state, dispatch] = useReducer(mainReducer, defaultState.state);
-  const [txListener, setTxListener] = useState<any>();
+  const [txListener, setTxListener] = useState<NodeJS.Timeout | undefined>();
   const {
     query: { authError },
     pathname
   } = useRouter();
 
   const { activeNetwork } = useNetwork();
-  const { wallet, beproServiceStarted } = useAuthentication();
+  const { wallet } = useAuthentication();
 
   const Initialize = () => {
-    if (!activeNetwork) return;
+    //dispatch(changeLoadState(true));
 
-    dispatch(changeLoadState(true));
-
-    BeproService.start(handleNetworkAddress(activeNetwork))
-      .then((state) => {
-        dispatch(changeBeproInitState(state));
-      })
-      .finally(() => dispatch(changeLoadState(false)));
+    // DAOService.start()
+    //   .then(() => {
+    //     return DAOService.loadNetwork();
+    //   })
+    //   .then(started => {
+    //     dispatch(changeBeproInitState(started));
+    //   })
+    //   .finally(() => dispatch(changeLoadState(false)));
 
     if (!window.ethereum) return;
 
     window.ethereum.on("chainChanged", (evt) => {
       dispatch(changeNetworkId(+evt?.toString()));
-      dispatch(changeNetwork((publicRuntimeConfig?.networkIds[+evt?.toString()] || "unknown")?.toLowerCase()));
+      dispatch(changeNetwork((publicRuntimeConfig.networkIds[+evt?.toString()] || "unknown")?.toLowerCase()));
     });
 
     if (txListener) clearInterval(txListener);
 
-    const web3 = (window as any).web3;
+    const web3 = (window as any).web3; // eslint-disable-line
 
     const getPendingBlock = () => {
       if (!cheatAddress || !waitingForTx || !waitingForTx?.transactionHash)
@@ -152,7 +143,7 @@ export default function ApplicationContextProvider({ children }) {
 
   LoadApplicationReducers();
 
-  useEffect(Initialize, [activeNetwork]);
+  useEffect(Initialize, []);
   useEffect(() => {
     if (!authError) return;
 
@@ -176,19 +167,21 @@ export default function ApplicationContextProvider({ children }) {
     else waitingForTx = transactionWithHash;
   }, [state.myTransactions]);
 
-  useEffect(() => {
-    if (beproServiceStarted) 
-      BeproService.getTotalSettlerLocked()
-      .then(amount => dispatch(changeStakedState(amount)))
-      .catch(console.log)
-  }, [pathname, beproServiceStarted])
+  // TODO Replace staked by getTotalSettlerLocked
+  
+  // useEffect(() => {
+  //   if (beproServiceStarted) 
+  //     BeproService.getTotalSettlerLocked()
+  //     .then(amount => dispatch(changeStakedState(amount)))
+  //     .catch(console.log)
+  // }, [pathname, beproServiceStarted])
 
   const restoreTransactions = async (address) => {
     const cookie = parseCookies();
     const transactions = JSON.parse(cookie[`bepro.transactions:${address}`]
         ? cookie[`bepro.transactions:${address}`]
         : "[]");
-    const web3 = (window as any).web3;
+    const web3 = (window as any).web3; // eslint-disable-line
 
     const getStatusFromBlock = async (tx) => {
       const transaction = { ...tx };
@@ -233,7 +226,10 @@ export default function ApplicationContextProvider({ children }) {
   }, [state.myTransactions, wallet]);
 
   return (
-    <ApplicationContext.Provider value={{ state, dispatch: dispatch as any }}>
+    <ApplicationContext.Provider value={{ 
+                                         state, 
+                                         dispatch: dispatch as any } // eslint-disable-line
+                                       }>
       <Loading show={state.loading.isLoading} text={state.loading.text} />
       <Toaster />
       {children}

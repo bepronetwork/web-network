@@ -32,7 +32,8 @@ export default async function readBountyClosed(events, network: Network_v2, cust
           network_id: customNetwork.id
         },
         include: [
-          { association: 'repository' }
+          { association: 'repository' },
+          { association: 'token' }
         ]
       });
 
@@ -125,7 +126,8 @@ export default async function readBountyClosed(events, network: Network_v2, cust
               twitterTweet({
                 type: "bounty",
                 action: "distributed",
-                issue: bounty
+                issue: bounty,
+                currency: bounty.token.symbol
               });
         
             await api.post(`/seo/${bounty.issueId}`).catch((e) => {

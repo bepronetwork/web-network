@@ -131,7 +131,10 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
       if (!result[0]) return res.status(422).json("nok");
 
       const issue = await models.issue.findOne({
-        where: { issueId }
+        where: { issueId },
+        include: [
+          { association: "token" }
+        ]
       });
       await api.post(`/seo/${issueId}`).catch((e) => {
         console.log("Error creating SEO", e);
@@ -140,7 +143,8 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
         twitterTweet({
           type: "bounty",
           action: "created",
-          issue
+          issue,
+          currency: issue.token.symbol
         });
 
       return res.status(200).json("ok");

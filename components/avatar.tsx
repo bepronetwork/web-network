@@ -13,7 +13,7 @@ export default function Avatar({
   src?: string;
   tooltip?: boolean;
   border?: boolean;
-}): JSX.Element {
+}) {
   return (
     <OverlayTrigger
       key="right"

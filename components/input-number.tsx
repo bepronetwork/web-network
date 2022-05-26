@@ -24,7 +24,7 @@ export default function InputNumber({
   setMaxValue,
   description,
   ...params
-}: InputNumberProps): JSX.Element {
+}: InputNumberProps) {
   const { t } = useTranslation(["common"]);
 
   const id = kebabCase(label);

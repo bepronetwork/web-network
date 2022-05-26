@@ -127,7 +127,10 @@ export default function UnlockBeproModal({
           </div>
         </div>
 
-        <div className="d-flex mb-2 caption-small bg-dark-gray justify-content-between border-radius-8 align-items-center p-20 amount-input">
+        <div className="
+        d-flex mb-2 caption-small bg-dark-gray justify-content-between
+        border-radius-8 align-items-center p-20 amount-input
+                      ">
           <span className="text-ligth-gray">
             <span className="text-primary">{t("$bepro")}</span>{" "}
             {t("misc.available")}

@@ -14,13 +14,13 @@ import CustomContainer from "./custom-container";
 import DateLabel from "./date-label";
 import PriceConversor from "./price-conversor";
 
-interface IProposalHeroProps {
+interface ProposalHeroProps {
   proposal: Proposal;
 }
 
 export default function ProposalHero({
   proposal,
-}: IProposalHeroProps) {
+}: ProposalHeroProps) {
   const { activeIssue } = useIssue();
   const router = useRouter();
   const { t } = useTranslation(["proposal", "common"]);

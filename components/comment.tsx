@@ -9,12 +9,13 @@ import MarkedRender from "./MarkedRender";
 
 interface CommentsProps{
   comment: IssueDataComment;
+  key: string | number;
 }
-export default function Comment({ comment }: CommentsProps) {
+export default function Comment({ comment, key }: CommentsProps) {
   const { t } = useTranslation("bounty");
 
   return (
-    <div className="mb-3">
+    <div className="mb-3" key={key}>
       <p className="caption-small text-uppercase mb-2">
         <Avatar userLogin={comment?.author} />
 

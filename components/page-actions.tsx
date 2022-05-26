@@ -33,6 +33,7 @@ interface pageActions {
   issueId: string;
   developers?: developer[];
   finalized: boolean;
+  canceled?: boolean;
   networkCID: string;
   isIssueinDraft: boolean;
   state?: IssueState | string;
@@ -79,6 +80,7 @@ export default function PageActions({
   canClose = true,
   githubId = "",
   finished = false,
+  canceled = false,
   repoPath = "",
   addNewComment,
   issueCreator
@@ -156,7 +158,8 @@ export default function PageActions({
     return (
       isIssueinDraft &&
       isBountyOwner() &&
-      !finalized && (
+      !finalized &&
+      !canceled && (
         <ReadOnlyButtonWrapper>
           <Button
             className="read-only-button me-1"
@@ -171,7 +174,7 @@ export default function PageActions({
   };
 
   const renderUpdateAmount = () => {
-    if (isIssueinDraft && isBountyOwner())
+    if (isIssueinDraft && isBountyOwner() && !finalized && !canceled)
       return <ReadOnlyButtonWrapper>
         <Button
           className="read-only-button me-1"
@@ -192,7 +195,6 @@ export default function PageActions({
       user?.login && (
         <NewProposal
           isFinished={finished}
-          isIssueOwner={isBountyOwner()}
           amountTotal={amountIssue}
           pullRequests={pullRequests}
         />
@@ -251,6 +253,7 @@ export default function PageActions({
       !isIssueinDraft &&
       !finished &&
       !finalized &&
+      !canceled &&
       wallet?.address &&
       user?.login && (
         <ReadOnlyButtonWrapper>
@@ -322,7 +325,9 @@ export default function PageActions({
       return handleCreatePullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid);
     })
     .then(txInfo => {
-      return processEvent("pull-request", "created", activeNetwork?.name, { fromBlock: (txInfo as any).blockNumber });
+      return processEvent("pull-request", "created", activeNetwork?.name, { 
+        fromBlock: (txInfo as { blockNumber: number }).blockNumber 
+      });
     })
     .then(() => {
       dispatch(addToast({

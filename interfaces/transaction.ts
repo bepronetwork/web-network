@@ -1,7 +1,7 @@
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 
-import { INetwork } from "./network";
+import { Network } from "./network";
 
 export type TransactionCurrency = "Oracles" | "$BEPRO";
 
@@ -11,8 +11,8 @@ export interface SimpleBlockTransactionPayload {
   type: TransactionTypes;
   status: TransactionStatus;
   amount: number;
-  currency: TransactionCurrency;
-  network?: INetwork;
+  currency: string;
+  network?: Network;
 }
 
 export interface BlockTransaction extends SimpleBlockTransactionPayload {

@@ -1,6 +1,5 @@
 import type { NextApiRequest } from 'next'
 import { getToken } from 'next-auth/jwt'
-import type { NextFetchEvent } from 'next/server'
 import { NextResponse } from 'next/server'
 
 import { error, info } from 'helpers/api/handle-log'
@@ -8,11 +7,11 @@ import { error, info } from 'helpers/api/handle-log'
 const whiteList = ['auth', 'past-events'];
 const ignorePaths = ['health'];
 
-export async function middleware(req: NextApiRequest, ev: NextFetchEvent) {
+export async function middleware(req: NextApiRequest) {
   const method = req.method
   const isInWhiteList = req.url?.split('/api')?.[1]?.split('/')?.some(r=> whiteList.includes(r));
 
-  const {page = {}, url, ip, ua, body} = req as any;
+  const {page = {}, url, ip, ua, body} = req as any; // eslint-disable-line
   const {pathname, search,} = new URL(url);
   
   

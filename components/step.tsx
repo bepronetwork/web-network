@@ -11,14 +11,12 @@ import { IStep } from "interfaces/stepper";
 export default function Step({
   title,
   index,
-  completed = false,
   activeStep,
   children,
   validated = false,
   finishLabel,
   handleClick,
-  handleFinish,
-  ...props
+  handleFinish
 }: IStep) {
   const { t } = useTranslation("common");
 

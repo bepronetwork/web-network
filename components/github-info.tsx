@@ -17,7 +17,7 @@ export default function GithubInfo({
   variant,
   disabled,
   active = false,
-  onClick = () => {}
+  onClick
 }: GithubInfoProps) {
   function handleClick(event) {
     event.stopPropagation();

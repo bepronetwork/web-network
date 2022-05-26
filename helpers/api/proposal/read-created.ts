@@ -26,7 +26,10 @@ export default async function readProposalCreated(events, network: Network_v2, c
           creatorAddress: networkBounty.creator,
           creatorGithub: networkBounty.githubUser,
           network_id: customNetwork.id
-        }
+        },
+        include: [
+          { association: "token" }
+        ]
       });
 
       if (bounty) {
@@ -56,7 +59,7 @@ export default async function readProposalCreated(events, network: Network_v2, c
           });
 
           if (!proposal) {
-            const merge = await models.mergeProposal.create({
+            await models.mergeProposal.create({
               scMergeId: networkProposal.id,
               issueId: bounty.id,
               pullRequestId: pullRequest.id,
@@ -71,7 +74,8 @@ export default async function readProposalCreated(events, network: Network_v2, c
               twitterTweet({
                 type: "proposal",
                 action: "created",
-                issue: bounty
+                issue: bounty,
+                currency: bounty.token.symbol
               });
           }
         }

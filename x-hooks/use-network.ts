@@ -136,7 +136,7 @@ export default function useNetworkTheme() {
     });
   }
 
-  function getURLWithNetwork(href: string, query = {} as any): UrlObject {
+  function getURLWithNetwork(href: string, query = {} as Record<string, unknown>): UrlObject {
     return {
       pathname: `/[network]/${href}`.replace("//", "/"),
       query: {

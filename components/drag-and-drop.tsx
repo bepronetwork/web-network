@@ -48,7 +48,7 @@ export default function DragAndDrop({ onUpdateFiles }: IDragAndDropProps) {
           }));
           setFiles(updatefiles);
         })
-        .catch((e) => {
+        .catch(() => {
           setFiles(files.filter((file) => file.uploaded));
         });
   },

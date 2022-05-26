@@ -11,12 +11,10 @@ import Modal from "components/modal";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 import { changeNetworkId } from "contexts/reducers/change-network-id";
 
 import { NetworkColors } from "interfaces/enums/network-colors";
-
-
-import { BeproService } from "services/bepro-service";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -31,23 +29,24 @@ export default function ConnectWalletButton({
     dispatch,
     state: { loading },
   } = useContext(ApplicationContext);
-  const { wallet, beproServiceStarted, login } = useAuthentication();
   const [showModal, setShowModal] = useState(false);
 
+  const { wallet, login } = useAuthentication();
+  const { service: DAOService } = useDAO();
+
   useEffect(() => {
-    if (!beproServiceStarted) return;
+    if (!DAOService) return;
 
     if (forceLogin) login();
-  }, [beproServiceStarted]);
+  }, [DAOService]);
 
   useEffect(() => {
     handleShowModal();
   }, [wallet]);
 
   async function handleLogin() {
-    if (BeproService?.bepro) {
-      BeproService.bepro.web3.eth
-        .getChainId()
+    if (DAOService) {
+      DAOService.getChainId()
         .then((chainId) => {
           if (+chainId === +publicRuntimeConfig?.metaMask?.chainId) {
             login();
@@ -91,7 +90,8 @@ export default function ConnectWalletButton({
           </strong>
           <div className="d-flex justify-content-center align-items-center w-100">
             <div
-              className="rounded-8 bg-dark-gray text-white p-3 d-flex text-center justify-content-center align-items-center w-75 cursor-pointer"
+              className="rounded-8 bg-dark-gray text-white p-3 d-flex text-center
+                        justify-content-center align-items-center w-75 cursor-pointer"
               onClick={handleLogin}
             >
               <Image src={metamaskLogo} width={15} height={15} />

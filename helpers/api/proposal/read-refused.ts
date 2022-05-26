@@ -25,7 +25,10 @@ export default async function readProposalRefused(events, network: Network_v2, c
           creatorAddress: networkBounty.creator,
           creatorGithub: networkBounty.githubUser,
           network_id: customNetwork.id
-        }
+        },
+        include: [
+          { association: "token" }
+        ]
       });
 
       if (bounty) {
@@ -51,7 +54,8 @@ export default async function readProposalRefused(events, network: Network_v2, c
               twitterTweet({
                 type: "proposal",
                 action: "failed",
-                issue: bounty
+                issue: bounty,
+                currency: bounty.token.symbol
               });
 
               disputed.push(networkProposal.id);

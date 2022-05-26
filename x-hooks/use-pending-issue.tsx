@@ -1,22 +1,21 @@
-import { Dispatch, SetStateAction, useContext, useState } from "react";
+import { useContext, useState } from "react";
 
 import { ApplicationContext } from "contexts/application";
+import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { updateTransaction } from "contexts/reducers/update-transaction";
-
 
 import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { IssueData } from "interfaces/issue-data";
-
-import { BeproService } from "services/bepro-service";
+import { BlockTransaction } from "interfaces/transaction";
 
 import useApi from "x-hooks/use-api";
 import useTransactions from "x-hooks/useTransactions";
-
+// TODO treat pending bounty with Network_v2
 interface usePendingIssueActions {
   treatPendingIssue(): Promise<boolean>;
   updatePendingIssue: (issue: IssueData) => void
@@ -24,15 +23,14 @@ interface usePendingIssueActions {
 
 type usePendingIssueReturn = [IssueData, usePendingIssueActions];
 
-export default function usePendingIssue<
-  S = IssueData
->(): usePendingIssueReturn {
+export default function usePendingIssue(): usePendingIssueReturn {
   const [pendingIssue, setPendingIssue] = useState<IssueData>(null);
   const [issueExistsOnSc, setIssueExistsOnSc] = useState<boolean>(false);
   const { dispatch } = useContext(ApplicationContext);
   const { patchIssueWithScId } = useApi();
   const txWindow = useTransactions();
   const { activeNetwork } = useNetwork();
+  const { service: DAOService } = useDAO();
 
   async function updateIssueWithCID(repoId,
                                     githubId,
@@ -55,40 +53,42 @@ export default function usePendingIssue<
                                        activeNetwork);
     dispatch(openIssueTx);
 
-    return BeproService.network
-      .openIssue(cid, +tokenAmount)
-      .then(async (txInfo) => {
-        txWindow.updateItem(openIssueTx.payload.id,
-                            parseTransaction(txInfo, openIssueTx.payload));
-        // BeproService.parseTransaction(txInfo, openIssueTx.payload)
-        //             .then(block => dispatch(updateTransaction(block)))
-        const events = await BeproService.network.getOpenIssueEvents({
-          fromBlock: txInfo.blockNumber,
-          address: BeproService.address
-        });
+    return;
 
-        return {
-          githubId: pendingIssue.githubId,
-          issueId: events[0]?.returnValues?.id
-        };
-      })
-      .catch((e) => {
-        console.error("Failed to createIssue", e);
-        if (e?.message?.search("User denied") > -1)
-          dispatch(updateTransaction({ ...(openIssueTx.payload as any), remove: true }));
-        else
-          dispatch(updateTransaction({
-              ...(openIssueTx.payload as any),
-              status: TransactionStatus.failed
-          }));
-        return {} as any;
-      });
+    // return BeproService.network
+    //   .openIssue(cid, +tokenAmount)
+    //   .then(async (txInfo) => {
+    //     txWindow.updateItem(openIssueTx.payload.id,
+    //                         parseTransaction(txInfo, openIssueTx.payload));
+    //     // BeproService.parseTransaction(txInfo, openIssueTx.payload)
+    //     //             .then(block => dispatch(updateTransaction(block)))
+    //     const events = await BeproService.network.getOpenIssueEvents({
+    //       fromBlock: txInfo.blockNumber,
+    //       address: BeproService.address
+    //     });
+
+    //     return {
+    //       githubId: pendingIssue.githubId,
+    //       issueId: events[0]?.returnValues?.id
+    //     };
+    //   })
+    //   .catch((e) => {
+    //     console.error("Failed to createIssue", e);
+    //     if (e?.message?.search("User denied") > -1)
+    //       dispatch(updateTransaction({ ...(openIssueTx.payload as any), remove: true }));
+    //     else
+    //       dispatch(updateTransaction({
+    //           ...(openIssueTx.payload as any),
+    //           status: TransactionStatus.failed
+    //       }));
+    //     return {} as any;
+    //   });
   }
 
   async function pendingIssueExistsOnSC(issue: IssueData): Promise<boolean> {
-    return !!(
+    return false; /*!!(
       await BeproService.network.getIssueByCID(`${issue.repository_id}/${issue.githubId}`)
-    )?.cid;
+    )?.cid;*/
   }
 
   async function updatePendingIssue(issue: IssueData) {

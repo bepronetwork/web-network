@@ -43,9 +43,9 @@ export default function IssueListItem({
 
   function renderProposals() {
     return (
-      <div className="d-flex align-items-center">
+      <div className="d-flex align-items-center" key={issue.githubId}>
         <span className="caption-small mr-1 text-white">
-          {(issue != null && issue?.mergeProposals?.length) || 0}
+          {(issue !== null && issue?.mergeProposals?.length) || 0}
         </span>
         <span className="caption-small text-white-40 text-uppercase">
           {t("info.proposals", { count: issue?.mergeProposals?.length})}
@@ -58,7 +58,7 @@ export default function IssueListItem({
     return (
       <div className="d-flex align-items-center">
         <span className="caption-small mr-1 text-white">
-          {(issue != null && handleReviewsPr(issue?.pullRequests)) || 0}
+          {(issue !== null && handleReviewsPr(issue?.pullRequests)) || 0}
         </span>
         <span className="caption-small text-white-40 text-uppercase">
           {t("info.reviews", { count: handleReviewsPr(issue?.pullRequests)})}
@@ -77,7 +77,7 @@ export default function IssueListItem({
         return (
           <div className="d-flex align-items-center">
             <span className="caption-small mr-1 text-white">
-              {(issue != null && issue.working?.length) || 0}
+              {(issue !== null && issue.working?.length) || 0}
             </span>
             <span className="caption-small text-white-40 text-uppercase">
               {t("info.working")}
@@ -93,7 +93,7 @@ export default function IssueListItem({
           {handleFirstChildren()}
           <div className="d-flex align-items-center">
             <span className="caption-small mr-1 text-white">
-              {(issue != null && issue.pullRequests?.length) || 0}
+              {(issue !== null && issue.pullRequests?.length) || 0}
             </span>
             <span className="caption-small text-white-40 text-uppercase">
               {t("info.pull-requests", { count: issue?.pullRequests?.length})}
@@ -199,7 +199,7 @@ export default function IssueListItem({
           <span className="caption-large text-white text-opacity-1">
             {formatNumberToNScale(issue?.amount || 0)}{" "}
             <label className="text-uppercase text-primary">
-              {issue?.token?.symbol || t("common:misc.token")}
+              ${issue?.token?.symbol || t("common:misc.token")}
             </label>
           </span>
           {(issue?.developers?.length > 0 && (
