@@ -42,7 +42,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         issueId: ghId,
         title: issue.title,
         repo,
-        ammount: issue.amount,
+        ammount: new Intl.NumberFormat('en').format(issue?.amount || 0),
         working: issue.working?.length || 0,
         proposals: issue?.mergeProposals?.length || 0,
         pullRequests: issue.pullRequests?.length || 0,
