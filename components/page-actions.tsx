@@ -162,7 +162,7 @@ export default function PageActions({
 
         addNewComment(response.data);
 
-        return getNetworkIssue();
+        return updateBountyData();
       })
       .then(() => setIsExecuting(false))
       .catch((error) => {
