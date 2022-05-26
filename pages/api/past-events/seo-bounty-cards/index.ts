@@ -1,9 +1,9 @@
+import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
+import nodeHtmlToImage from "node-html-to-image";
 
 import models from "db/models";
-import nodeHtmlToImage from "node-html-to-image";
-import axios from "axios";
 
 import IpfsStorage from "services/ipfs-service";
 
@@ -34,14 +34,14 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     const { data: html } = await axios.get(`${baseUrl}/templates/seo/bounty.html`)
 
     for (const issue of issues) {
-      const [, repo] = issue?.repository.githubPath.split("/");
-      const [, ghId] = issue?.issueId.split("/");
+      const repo = issue?.repository?.githubPath?.split("/");
+      const ghId = issue?.issueId?.split("/");
 
       const content = {
         state: issue.state,
-        issueId: ghId,
+        issueId: ghId[1],
         title: issue.title,
-        repo,
+        repo: repo[1],
         ammount: new Intl.NumberFormat('en').format(issue?.amount || 0),
         working: issue.working?.length || 0,
         proposals: issue?.mergeProposals?.length || 0,
@@ -58,7 +58,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         content
       });
 
-      const data = Buffer.from(card as String);
+      const data = Buffer.from(card as string);
       const response = await IpfsStorage.add(data);
 
       if (response && response.hash) {

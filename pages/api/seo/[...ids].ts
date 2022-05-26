@@ -2,10 +2,10 @@ import axios from "axios";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
+import nodeHtmlToImage from "node-html-to-image";
 import { Op } from "sequelize";
 
 import models from "db/models";
-import nodeHtmlToImage from "node-html-to-image";
 
 import IpfsStorage from "services/ipfs-service";
 
