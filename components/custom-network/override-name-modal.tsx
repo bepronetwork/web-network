@@ -14,7 +14,7 @@ import { addToast } from "contexts/reducers/add-toast";
 
 import { psReadAsText } from "helpers/file-reader";
 
-import { INetwork } from "interfaces/network";
+import { Network } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 
@@ -29,14 +29,18 @@ const differentOrUndefined = (objectA, objectB, property) =>
 export default function OverrideNameModal({
   network,
   show = false,
-  onCloseClick = () => {}
+  onCloseClick
+}: {
+  network: Network,
+  show: boolean,
+  onCloseClick: () => void
 }) {
   const { t } = useTranslation(["common", "parity"]);
 
   const [logoIcon, setLogoIcon] = useState(defaultImage);
   const [fullLogo, setFullLogo] = useState(defaultImage);
   const [isExecuting, setIsExecuting] = useState(false);
-  const [newNetwork, setNewNetwork] = useState<INetwork>();
+  const [newNetwork, setNewNetwork] = useState<Network>();
 
   const { updateNetwork } = useApi();
 
@@ -92,7 +96,7 @@ export default function OverrideNameModal({
     };
 
     updateNetwork(json)
-      .then((result) => {
+      .then(() => {
         dispatch(addToast({
             type: "success",
             title: t("actions.success"),

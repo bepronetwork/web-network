@@ -2,25 +2,24 @@ import React, {
   createContext, useCallback, useContext, useEffect, useMemo, useState
 } from "react";
 
-
 import getConfig from "next/config";
 import { useRouter } from "next/router";
 import { parseCookies, setCookie } from "nookies";
 
 import NetworkThemeInjector from "components/custom-network/network-theme-injector";
 
-import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 
-import { INetwork } from "interfaces/network";
+import { handleNetworkAddress } from "helpers/custom-network";
 
-import { BeproService } from "services/bepro-service";
+import { Network } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 
 const { publicRuntimeConfig } = getConfig();
 
 export interface NetworkContextData {
-  activeNetwork: INetwork;
+  activeNetwork: Network;
   updateActiveNetwork: (forced?: boolean) => void;
 }
 
@@ -30,11 +29,11 @@ const cookieKey = "bepro.network";
 const expiresCookie = 60 * 60 * 1; // 1 hour
 
 export const NetworkProvider: React.FC = function ({ children }) {
-  const [activeNetwork, setActiveNetwork] = useState<INetwork>(null);
+  const [activeNetwork, setActiveNetwork] = useState<Network>(null);
 
   const { getNetwork } = useApi();
   const { query, push } = useRouter();
-  const { beproServiceStarted } = useAuthentication();
+  const { service: DAOService, changeNetwork } = useDAO();
 
   const updateActiveNetwork = useCallback((forced?: boolean) => {
     const networkName = query?.network || publicRuntimeConfig?.networkConfig?.networkName;
@@ -42,7 +41,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
     if (!networkName)
       return;
     
-    if (activeNetwork?.name === networkName && !forced) return activeNetwork;
+    if (activeNetwork?.name?.toLowerCase() === networkName.toLowerCase() && !forced) return activeNetwork;
 
     const networkFromStorage = parseCookies()[`${cookieKey}:${networkName}`];
     
@@ -67,42 +66,63 @@ export const NetworkProvider: React.FC = function ({ children }) {
   }, [query, activeNetwork]);
 
   const updateNetworkParameters = useCallback(() => {
-    if (!beproServiceStarted || activeNetwork?.councilAmount) return;
-
+    if (!DAOService?.network?.contractAddress || !activeNetwork?.networkAddress) return;
+    
     Promise.all([
-      BeproService.getNetworkParameter("councilAmount"),
-      BeproService.getNetworkParameter("disputableTime"),
-      BeproService.getNetworkParameter("draftTime"),
-      BeproService.getNetworkParameter("oracleExchangeRate"),
-      BeproService.getNetworkParameter("mergeCreatorFeeShare"),
-      BeproService.getNetworkParameter("percentageNeededForDispute")
-    ]).then(values => {
-      setActiveNetwork({
-        ...activeNetwork,
-        councilAmount: values[0],
-        disputableTime: values[1] / 1000,
-        draftTime: values[2] / 1000,
-        oracleExchangeRate: values[3],
-        mergeCreatorFeeShare: values[4],
-        percentageNeededForDispute: values[5]
+        DAOService.getNetworkParameter("councilAmount"),
+        DAOService.getNetworkParameter("disputableTime"),
+        DAOService.getNetworkParameter("draftTime"),
+        DAOService.getNetworkParameter("oracleExchangeRate"),
+        DAOService.getNetworkParameter("mergeCreatorFeeShare"),
+        DAOService.getNetworkParameter("proposerFeeShare"),
+        DAOService.getNetworkParameter("percentageNeededForDispute"),
+        DAOService.getTreasury(),
+        DAOService.getSettlerTokenData(activeNetwork.networkAddress)
+    ])
+      .then(([councilAmount, 
+              disputableTime, 
+              draftTime, 
+              oracleExchangeRate, 
+              mergeCreatorFeeShare,
+              proposerFeeShare,
+              percentageNeededForDispute, 
+              treasury,
+              networkToken]) => {
+        setActiveNetwork(prevNetwork => ({
+          ...prevNetwork,
+          councilAmount,
+          disputableTime: disputableTime / 1000,
+          draftTime: draftTime / 1000,
+          oracleExchangeRate,
+          mergeCreatorFeeShare,
+          proposerFeeShare,
+          percentageNeededForDispute,
+          treasury,
+          networkToken: {
+            ...networkToken,
+            symbol: `$${networkToken.symbol}`,
+          }
+        }));
       });
-    });
-  }, [activeNetwork, beproServiceStarted]);
+  }, [activeNetwork?.networkAddress, DAOService?.network?.contractAddress]);
 
   useEffect(() => {
     updateActiveNetwork();
-  }, [query]);
+  }, [query?.network]);
 
-  useEffect(() => {
-    if (query?.network) updateNetworkParameters();
-  }, [beproServiceStarted, query?.network]);
+  useEffect(() => {    
+    if (DAOService?.network?.contractAddress !== activeNetwork?.networkAddress ||! activeNetwork?.draftTime) 
+      changeNetwork(handleNetworkAddress(activeNetwork))
+        .then(loaded => {
+          if (loaded) updateNetworkParameters();
+        });
+  }, [DAOService?.network?.contractAddress, activeNetwork?.networkAddress]);
 
   const memorizeValue = useMemo<NetworkContextData>(() => ({
       activeNetwork,
       updateActiveNetwork,
       updateNetworkParameters
-  }),
-    [activeNetwork]);
+  }), [activeNetwork, DAOService]);
 
   return (
     <NetworkContext.Provider value={memorizeValue}>

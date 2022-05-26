@@ -28,7 +28,9 @@ export default function TransactionStats({
   };
 
   function rowClassName() {
-    return `bg-transparent stats caption-small text-uppercase px-2 py-1 rounded border border-2 border-${ColorMap[status]} text-${ColorMap[status]}`;
+    return `bg-transparent stats caption-small text-uppercase 
+            px-2 py-1 rounded border border-2 
+            border-${ColorMap[status]} text-${ColorMap[status]}`;
   }
 
   return (

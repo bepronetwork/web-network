@@ -61,6 +61,15 @@ function PullRequestLabels({
     return t("status.conflicts");
   }
 
+  function getPullRequestLabelClass(): string {
+    return [
+      `pullrequest-labels d-flex justify-content-center`,
+      `align-items-center rounded-pill p-1`,
+      `bg-${getColorLabel()}-30`,
+      className || "",
+    ].join(' ');
+  }
+
   useEffect(() => {
     if (!label) {
       setState(getLabel());
@@ -70,11 +79,7 @@ function PullRequestLabels({
   if (!state) return <></>;
 
   return (
-    <div
-      className={`pullrequest-labels d-flex justify-content-center align-items-center bg-${getColorLabel()}-30 rounded-pill p-1 ${
-        className || ""
-      }`}
-    >
+    <div className={getPullRequestLabelClass()}>
       <span
         className={`caption-small text-uppercase text-${getColorLabel()} mx-1 text-nowrap`}
       >

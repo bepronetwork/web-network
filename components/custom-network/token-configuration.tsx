@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+ /* eslint-disable */
 import { FormCheck, ListGroup } from "react-bootstrap";
 
-import { BountyToken } from "@taikai/dappkit";
 import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
 
@@ -10,11 +10,10 @@ import DeployNFTModal from "components/deploy-nft-modal";
 import Step from "components/step";
 import TokensDropdown from "components/tokens-dropdown";
 
+import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 
 import { BEPRO_TOKEN, Token } from "interfaces/token";
-
-import { BeproService } from "services/bepro-service";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -34,6 +33,7 @@ export default function TokenConfiguration({
   const [showModalDeploy, setShowModalDeploy] = useState(false);
 
   const { activeNetwork } = useNetwork();
+  const { service: DAOService } = useDAO();
 
   function handleShowModal() {
     setShowModalDeploy(true);
@@ -67,12 +67,10 @@ export default function TokenConfiguration({
   }
 
   async function validateNFTAddress() {
-    if (data.nftToken.address.trim() === "") return false;
+    if (data.nftToken.address.trim() === "" || !DAOService) return false;
 
     try {
-      const token = new BountyToken(BeproService.bepro, data.nftToken.address);
-
-      await token.loadContract();
+      await DAOService.loadBountyToken(data.nftToken.address);
     } catch(error) {
       changedDataHandler("tokens", { label: "nftToken", value: { ...data.nftToken, error: true } });
 
@@ -83,16 +81,18 @@ export default function TokenConfiguration({
   }
 
   useEffect(() => {
+    if (!DAOService) return;
     if (data.networkToken.trim() === "") return setNetworkToken(undefined);
 
-    BeproService.getERC20TokenData(data.networkToken).then(setNetworkToken).catch(console.log);
-  }, [data.networkToken]);
+    DAOService.getERC20TokenData(data.networkToken).then(setNetworkToken).catch(console.log);
+  }, [data.networkToken, DAOService]);
 
   useEffect(() => {
+    if (!DAOService) return;
     if (data.networkToken.trim() === "" || data.nftToken.address.trim() === "") 
       return changedDataHandler("tokens", { label: "validated", value: false });
 
-    BeproService.getERC20TokenData(data.networkToken).then(data => {
+    DAOService.getERC20TokenData(data.networkToken).then(data => {
       setNetworkToken(data);
 
       return validateNFTAddress();
@@ -101,8 +101,10 @@ export default function TokenConfiguration({
       changedDataHandler("tokens", { label: "validated", value: validated });
     })
     .catch(console.log);
-  }, [data.networkToken, data.nftToken]);
+  }, [data.networkToken, data.nftToken, DAOService]);
 
+ /* eslint-enable */
+ 
   return (
     <Step
       title={t("custom-network:steps.token-configuration.title")}
@@ -189,11 +191,11 @@ export default function TokenConfiguration({
             data.nftToken.error && 
             <small className="small-info text-danger">
               {t("custom-network:steps.token-configuration.fields.nft-token.error.pre")}
-
-              <a href="https://sdk.dappkit.dev/" target="_blank">
+              {" "}
+              <a href="https://sdk.dappkit.dev/classes/BountyToken.html" target="_blank">
                 {t("custom-network:steps.token-configuration.fields.nft-token.error.mid")}
               </a>
-              
+              {" "}
               {t("custom-network:steps.token-configuration.fields.nft-token.error.post")}
             </small>
           }

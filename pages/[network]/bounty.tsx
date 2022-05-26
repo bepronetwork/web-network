@@ -150,7 +150,8 @@ export default function PageIssue() {
       <PageActions
         state={issue?.state}
         developers={issue?.developers}
-        finalized={networkIssue?.closed || networkIssue?.canceled}
+        finalized={networkIssue?.closed}
+        canceled={networkIssue?.canceled}
         isIssueinDraft={networkIssue?.isDraft}
         networkCID={networkIssue?.cid || issue?.issueId}
         issueId={issue?.issueId}

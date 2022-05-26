@@ -6,8 +6,7 @@ import { Op } from "sequelize";
 
 import Database from "db/models";
 
-import Bepro from "helpers/api/bepro-initializer";
-
+import DAO from "services/dao-service";
 import IpfsStorage from "services/ipfs-service";
 
 const { publicRuntimeConfig } = getConfig();
@@ -60,12 +59,14 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
 
     // Contract Validations
-    const BEPRO = new Bepro();
-    await BEPRO.init(false, false, true);
+    const DAOService = new DAO(true);
 
-    const creatorAmount = await BEPRO.networkFactory.creatorAmount();
-    const lockedAmount = await BEPRO.networkFactory.lockedTokensOfAddress(creator);
-    const checkingNetworkAddress = await BEPRO.networkFactory.networkOfAddress(creator);
+    if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
+    if (!await DAOService.loadFactory()) return res.status(500).json("Failed to load factory contract");
+
+    const creatorAmount = await DAOService.getFactoryCreatorAmount();
+    const lockedAmount = await DAOService.getTokensLockedInFactoryByAddress(creator);
+    const checkingNetworkAddress = await DAOService.getNetworkAdressByCreator(creator);
 
     if (lockedAmount < creatorAmount) return res.status(403).json("Insufficient locked amount");
 
@@ -73,12 +74,21 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       return res.status(403).json("Creator and network addresses do not match");
 
     // Uploading logos to IPFS
-    const fullLogoHash = (
-      await IpfsStorage.add(fullLogo, true, undefined, "svg")
-    ).hash;
-    const logoIconHash = (
-      await IpfsStorage.add(logoIcon, true, undefined, "svg")
-    ).hash;
+    let fullLogoHash = null
+    let logoIconHash = null
+
+    try {
+      const [full, logo] = await Promise.all([
+        IpfsStorage.add(fullLogo, true, undefined, "svg"),
+        IpfsStorage.add(logoIcon, true, undefined, "svg")
+      ])
+
+      fullLogoHash = full?.hash;
+      logoIconHash = logo.hash;
+
+    } catch (error) {
+      console.error('Failed to store ipfs', error);
+    }
 
     // Adding bepro-bot to repositories organization
     const octokitUser = new Octokit({
@@ -95,7 +105,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       const { data } = await octokitUser.rest.repos.addCollaborator({
         owner,
         repo,
-        username: publicRuntimeConfig?.github?.user
+        username: publicRuntimeConfig?.github?.user,
+        permission: 'maintain'
       });
 
       if (data?.id) invitations.push(data?.id);
@@ -194,25 +205,16 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     if (!isAdminOverriding) {
       // Contract Validations
-      const BEPRO = new Bepro();
-      await BEPRO.init(false, false, true);
+      const DAOService = new DAO(true);
 
-      const checkingNetworkAddress =
-        await BEPRO.networkFactory.networkOfAddress(creator);
+      if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
+      if (!await DAOService.loadFactory()) return res.status(500).json("Failed to load factory contract");
+
+      const checkingNetworkAddress = await DAOService.getNetworkAdressByCreator(creator);
 
       if (checkingNetworkAddress !== networkAddress)
-        return res
-          .status(403)
-          .json("Creator and network addresses do not match");
+        return res.status(403).json("Creator and network addresses do not match");
     }
-
-    // Uploading logos to IPFS
-    const fullLogoHash = fullLogo
-      ? (await IpfsStorage.add(fullLogo, true, undefined, "svg")).hash
-      : undefined;
-    const logoIconHash = logoIcon
-      ? (await IpfsStorage.add(logoIcon, true, undefined, "svg")).hash
-      : undefined;
 
     const addingRepos = repositoriesToAdd ? JSON.parse(repositoriesToAdd) : [];
 
@@ -262,8 +264,20 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     if (!isAdminOverriding) network.colors = JSON.parse(colors);
 
-    if (logoIconHash) network.logoIcon = logoIconHash;
-    if (fullLogoHash) network.fullLogo = fullLogoHash;
+    if (fullLogo || logoIcon) {
+      try {
+        const [full, logo] = await Promise.all([
+          IpfsStorage.add(fullLogo, true, undefined, "svg"),
+          IpfsStorage.add(logoIcon, true, undefined, "svg")
+        ])
+
+        network.logoIcon = full?.hash;
+        network.fullLogo = logo.hash;
+
+      } catch (error) {
+        console.error('Failed to store ipfs', error);
+      }
+    }
 
     network.save();
 
@@ -280,7 +294,8 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         const { data } = await octokitUser.rest.repos.addCollaborator({
           owner,
           repo,
-          username: publicRuntimeConfig?.github?.user
+          username: publicRuntimeConfig?.github?.user,
+          permission: 'maintain'
         });
 
         if (data?.id) invitations.push(data?.id);
@@ -344,4 +359,5 @@ async function NetworkEndPoint(req: NextApiRequest,
 
   res.end();
 }
+
 export default withCors(NetworkEndPoint)

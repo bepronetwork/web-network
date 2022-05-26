@@ -20,6 +20,7 @@ import TokensDropdown from "components/tokens-dropdown";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { toastError, toastWarning } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
@@ -30,9 +31,8 @@ import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { Token } from "interfaces/token";
-
-import { BeproService } from "services/bepro-service";
+import { BEPRO_TOKEN, Token } from "interfaces/token";
+import { BlockTransaction } from "interfaces/transaction";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
@@ -45,12 +45,6 @@ interface Amount {
   formattedValue: string;
   floatValue?: number;
 }
-
-const BEPRO_TOKEN: Token = {
-  address: publicRuntimeConfig?.contract?.settler,
-  name: "BEPRO",
-  symbol: "$BEPRO"
-};
 
 export default function PageCreateIssue() {
   const router = useRouter();
@@ -70,16 +64,18 @@ export default function PageCreateIssue() {
   const [isTransactionalTokenApproved, setIsTransactionalTokenApproved] = useState(false);
   const [transactionalToken, setTransactionalToken] = useState<Token>();
   const [transactionalAllowance, setTransactionalAllowance] = useState<number>();
-  const [customTokens, setCustomTokens] = useState<Token[]>([BEPRO_TOKEN]);
   
   const { activeNetwork } = useNetwork();
   const { handleApproveToken } = useBepro();
-  const { wallet, user, beproServiceStarted } = useAuthentication();
+  const { service: DAOService } = useDAO();
+  const { wallet, user } = useAuthentication();
   const {
     dispatch,
     state: { myTransactions }
   } = useContext(ApplicationContext);
   
+  const [customTokens, setCustomTokens] = useState<Token[]>([]);
+
   const [tokenBalance, setTokenBalance] = useState(0);
 
   const txWindow = useTransactions();
@@ -87,7 +83,7 @@ export default function PageCreateIssue() {
   const { createPreBounty, processEvent } = useApi();
 
   async function allowCreateIssue() {
-    if (!beproServiceStarted || !transactionalToken || issueAmount.floatValue <= 0) return;
+    if (!DAOService || !transactionalToken || issueAmount.floatValue <= 0) return;
 
     handleApproveToken(transactionalToken.address, issueAmount.floatValue).then(() => {
       updateWalletByToken(transactionalToken);
@@ -120,13 +116,13 @@ export default function PageCreateIssue() {
   }
 
   async function createIssue() {
-    if (!repository || !transactionalToken) return;
+    if (!repository || !transactionalToken || !DAOService || !wallet) return;
 
     const payload = {
       title: issueTitle,
       body: addFilesInDescription(issueDescription),
       amount: issueAmount.floatValue,
-      creatorAddress: BeproService.address,
+      creatorAddress: wallet.address,
       creatorGithub: user?.login,
       repositoryId: repository?.id,
       branch
@@ -163,14 +159,16 @@ export default function PageCreateIssue() {
       githubUser: payload.creatorGithub
     };
 
-    const txInfo = await BeproService.openBounty(chainPayload)
+    const txInfo = await DAOService.openBounty(chainPayload)
           .catch((e) => {
             cleanFields();
             if (e?.message?.toLowerCase().search("user denied") > -1)
-              dispatch(updateTransaction({ ...(openIssueTx.payload as any), status: TransactionStatus.rejected }));
+              dispatch(updateTransaction({ 
+                ...(openIssueTx.payload as BlockTransaction), status: TransactionStatus.rejected 
+              }));
             else
               dispatch(updateTransaction({
-                  ...(openIssueTx.payload as any),
+                  ...(openIssueTx.payload as BlockTransaction),
                   status: TransactionStatus.failed
               }));
 
@@ -184,7 +182,7 @@ export default function PageCreateIssue() {
 
     txWindow.updateItem(openIssueTx.payload.id, parseTransaction(txInfo, openIssueTx.payload));
 
-    const { blockNumber: fromBlock } = txInfo as any;
+    const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
     const createdBounties = await processEvent("bounty", "created", activeNetwork?.name, { fromBlock } )
       .then(({data}) => data)
@@ -255,35 +253,40 @@ export default function PageCreateIssue() {
 
   const onUpdateFiles = (files: IFilesProps[]) => setFiles(files);
 
-  const updateWalletByToken = async (token: Token) => {
-    setTokenBalance(await BeproService.getTokenBalance(token.address));
-    setTransactionalAllowance(await BeproService.getAllowance(token.address));
+  const updateWalletByToken = (token: Token) => {
+    DAOService.getTokenBalance(token.address, wallet.address).then(setTokenBalance);
+    
+    DAOService.getAllowance(token.address, wallet.address, DAOService.network.contractAddress)
+      .then(setTransactionalAllowance);
   }
 
   const isAmountApproved = () => transactionalAllowance >= issueAmount.floatValue;
 
   useEffect(() => {
-    if (!wallet?.balance) return;
+    if (!wallet?.balance || !DAOService) return;
     if (!transactionalToken) return setTransactionalToken(BEPRO_TOKEN);
 
     updateWalletByToken(transactionalToken);
-  }, [transactionalToken, wallet]);
+  }, [transactionalToken, wallet, DAOService]);
 
   useEffect(() => {
     setIsTransactionalTokenApproved(isAmountApproved());
   }, [transactionalAllowance, issueAmount.floatValue]);
 
   useEffect(() => {
-    if (!activeNetwork) return;
+    if (!activeNetwork?.networkToken) return;
 
     const tmpTokens = [];
 
-    if (activeNetwork.networkAddress === publicRuntimeConfig?.contract?.address) tmpTokens.push(BEPRO_TOKEN);
+    tmpTokens.push(BEPRO_TOKEN);
+    
+    if (activeNetwork.networkAddress !== publicRuntimeConfig?.contract?.address)
+      tmpTokens.push(activeNetwork.networkToken);
 
     tmpTokens.push(...activeNetwork.tokens.map(({name, symbol, address}) => ({name, symbol, address} as Token)));
 
     setCustomTokens(tmpTokens);
-  }, [activeNetwork]);
+  }, [activeNetwork?.networkToken]);
 
   return (
     <>
@@ -387,8 +390,7 @@ export default function PageCreateIssue() {
                 </div>
                 
                 <div className="col-6 mt-n2">
-                  <TokensDropdown 
-                    defaultToken={BEPRO_TOKEN} 
+                  <TokensDropdown
                     tokens={customTokens} 
                     canAddToken={
                       activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address ? 

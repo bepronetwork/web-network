@@ -33,7 +33,6 @@ export default function IssueProposals({
         networkIssue?.proposals?.length > 0 &&
         React.Children.toArray(issue?.mergeProposals?.map((proposal) => (
             <ProposalItem
-              key={proposal.id}
               proposal={proposal}
               issue={issue}
               disputableTime={activeNetwork?.disputableTime}

@@ -67,7 +67,7 @@ export default function useFilters(): [
   }
 
   function loadFilters() {
-    const { time, state, repoId } = router.query || {};
+    const { time, state } = router.query || {};
 
     setStateFilters([
       makeFilterOption("All", "allstates", !state),

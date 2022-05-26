@@ -46,7 +46,7 @@ export default function RepositoriesList({ repositories, onClick }) {
       const tmpRepos = [];
 
       result.forEach((item, index) => {
-        if ((item as any).value) tmpRepos.push(savedPaths[index]);
+        if ((item as any).value) tmpRepos.push(savedPaths[index]);  /* eslint-disable-line */ // TODO fix line  
       });
 
       setReposWithIssues(tmpRepos);

@@ -9,7 +9,7 @@ import PageIcon from "assets/icons/page-icon";
 
 import Modal from "components/modal";
 
-export default function HelpModal({ show = false, onCloseClick = () => {} }) {
+export default function HelpModal({ show = false, onCloseClick }: { show: boolean; onCloseClick: () => void }) {
   const { t } = useTranslation("common");
   const helpItem = (title = "", tagline = "", icon, href = "") => ({
     title,
@@ -37,7 +37,7 @@ export default function HelpModal({ show = false, onCloseClick = () => {} }) {
              "https://discord.gg/bepronetwork")
   ];
 
-  function HelpItemRow(item, i) {
+  function HelpItemRow(item) {
     const rowClassName =
       "row row-button d-flex align-items-center cursor-pointer bg-opac-hover mxn-3 px-3 text-decoration-none";
 
@@ -70,8 +70,7 @@ export default function HelpModal({ show = false, onCloseClick = () => {} }) {
         title={String(t("modals.help-modal.title"))}
         titlePosition="center"
         onCloseClick={onCloseClick}
-        backdrop={true}
-      >
+        backdrop={true} >
         {helpItems.map(HelpItemRow)}
       </Modal>
     </>

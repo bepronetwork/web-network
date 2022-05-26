@@ -1,4 +1,3 @@
-import { Network_v2 } from "@taikai/dappkit";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
@@ -10,16 +9,24 @@ import models from "db/models";
 import * as PullRequestQueries from "graphql/pull-request";
 import * as RepositoryQueries from "graphql/repository";
 
-import networkBeproJs from "helpers/api/handle-network-bepro";
+import { handleNetworkAddress } from "helpers/custom-network";
 import paginate from "helpers/paginate";
+
+import DAO from "services/dao-service";
 
 import { GraphQlResponse } from "types/octokit";
 
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
+interface propsWhere {
+  githubLogin?: string | string[];
+  issueId?: string | number;
+  status?: { [ key: string ]: string[]; };
+}
+
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { login, issueId, networkName } = req.query;
-  const where = {} as any;
+  const where = {} as propsWhere;
 
   if (login) where.githubLogin = login;
 
@@ -145,8 +152,7 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
     pullRequestGithubId, 
     customNetworkName,
     creator,
-    userBranch,
-    userRepo
+    userBranch
   } = req.body;
 
   const customNetwork = await models.network.findOne({
@@ -185,12 +191,14 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
 
   if (!pullRequest) return res.status(404).json("Invalid");
 
-  const network = networkBeproJs({
-    contractAddress: 
-    customNetwork.name.toLowerCase() === publicRuntimeConfig?.networkConfig?.networkName?.toLowerCase() ? 
-      publicRuntimeConfig?.contract?.address : customNetwork.networkAddress,
-    version: 2
-  }) as Network_v2;
+  const DAOService = new DAO(true);
+
+  if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
+
+  if (!await DAOService.loadNetwork(handleNetworkAddress(customNetwork)))
+    return res.status(500).json("Failed to load network contract");
+
+  const network = DAOService.network;
 
   await network.start();
 

@@ -5,6 +5,14 @@ import { useTranslation } from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
 
+import Avatar from "components/avatar";
+import Button from "components/button";
+import CreateProposalDistributionItem from "components/create-proposal-distribution-item";
+import Modal from "components/modal";
+import PullRequestLabels from "components/pull-request-labels";
+import ReactSelect from "components/react-select";
+import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
+
 import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
@@ -18,13 +26,6 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useOctokitGraph from "x-hooks/use-octokit-graph";
 
-import Avatar from "./avatar";
-import Button from "./button";
-import CreateProposalDistributionItem from "./create-proposal-distribution-item";
-import Modal from "./modal";
-import PullRequestLabels from "./pull-request-labels";
-import ReactSelect from "./react-select";
-import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 
 interface participants {
   githubHandle: string;
@@ -89,7 +90,6 @@ function SelectOptionComponent({ innerProps, innerRef, data }) {
 export default function NewProposal({
   amountTotal,
   pullRequests = [],
-  isIssueOwner = false,
   isFinished = false
 }) {
   const { t } = useTranslation([
@@ -112,7 +112,7 @@ export default function NewProposal({
   const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest);
 
   const { activeRepo } = useRepos();
-  const { wallet, beproServiceStarted } = useAuthentication();
+  const { wallet } = useAuthentication();
 
   const { handleProposeMerge } = useBepro({onSuccess})
   const { updateIssue, activeIssue, networkIssue } = useIssue()
@@ -142,7 +142,8 @@ export default function NewProposal({
     return currentProposals.some((activeProposal) => {
       if (activeProposal.currentPrId === currentDistrbuition.currentPrId) {
         return activeProposal.prAddressAmount.every((ap) =>
-          currentDistrbuition.prAddressAmount.find((p) => ap.amount === p.amount && ap.address === p.address));
+          currentDistrbuition.prAddressAmount.find((p) => 
+          ap.amount === p.amount && ap.address.toLowerCase() === p.address.toLowerCase()));
       } else {
         return false;
       }
@@ -158,7 +159,7 @@ export default function NewProposal({
       const currentDistrbuition = {
         currentPrId: id,
         prAddressAmount: participants.map((item) => ({
-          amount: (amountTotal * obj[item.githubHandle]) / 100,
+          amount: obj[item.githubHandle],
           address: item.address.toLowerCase()
         }))
       };
@@ -270,7 +271,7 @@ export default function NewProposal({
 
     handleProposeMerge(+networkIssue.id, +currentPullRequest.contractId, prAddresses, prAmounts)
     .then(txInfo => {
-      const { blockNumber: fromBlock } = txInfo as any;
+      const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
       return processEvent("proposal", "created", activeNetwork?.name, { fromBlock });
     })
@@ -307,18 +308,18 @@ export default function NewProposal({
     !currentPullRequest.isMergeable || currentPullRequest.merged;
 
   useEffect(() => {
-    if (pullRequests.length && activeRepo && beproServiceStarted) {
+    if (pullRequests.length && activeRepo) {
       const defaultPr =
         pullRequests.find((el) => el.isMergeable) || pullRequests[0];
       setCurrentPullRequest(defaultPr);
       getParticipantsPullRequest(defaultPr?.githubId);
     }
-  }, [pullRequests, activeRepo, beproServiceStarted]);
+  }, [pullRequests, activeRepo]);
 
   return (
     <div className="d-flex">
       {(wallet?.isCouncil && isFinished && (
-        <ReadOnlyButtonWrapper>
+        <ReadOnlyButtonWrapper >
           <Button className="read-only-button" onClick={() => setShow(true)}>
             {t("proposal:actions.create")}
           </Button>
@@ -331,38 +332,33 @@ export default function NewProposal({
         title={t("proposal:actions.new")}
         titlePosition="center"
         onCloseClick={handleClose}
-        footer={
-          <>
-            <Button
-              onClick={handleClickCreate}
-              disabled={
-                !wallet?.address ||
-                participants.length === 0 ||
-                !success ||
-                executing ||
-                cantBeMergeable()
-              }
-            >
-              {!wallet?.address ||
-                participants.length === 0 ||
-                executing ||
-                (!success && (
-                  <LockedIcon width={12} height={12} className="mr-1" />
-                ))}
-              <span>{t("proposal:actions.create")}</span>
-              {executing ? (
+        footer={<>
+          <Button
+            onClick={handleClickCreate}
+            disabled={!wallet?.address ||
+              participants.length === 0 ||
+              !success ||
+              executing ||
+              cantBeMergeable()}
+          >
+            {!wallet?.address ||
+              participants.length === 0 ||
+              executing ||
+              (!success && (
+                <LockedIcon width={12} height={12} className="mr-1" />
+              ))}
+            <span>{t("proposal:actions.create")}</span>
+            {executing ? (
               <span className="spinner-border spinner-border-xs ml-1" />
             ) : (
               ""
             )}
-            </Button>
+          </Button>
 
-            <Button color="dark-gray" onClick={handleClose}>
-              {t("actions.cancel")}
-            </Button>
-          </>
-        }
-      >
+          <Button color="dark-gray" onClick={handleClose}>
+            {t("actions.cancel")}
+          </Button>
+        </>}>
         <p className="caption-small text-white-50 mb-2 mt-2">
           {t("pull-request:select")}
         </p>
@@ -397,9 +393,9 @@ export default function NewProposal({
           isOptionDisabled={(option) => option.isDisable}
           onChange={handleChangeSelect}
         />
-        {(participants.length === 0 && (
+        {(!participants.length && (
           <p className="text-uppercase text-danger text-center w-100 caption mt-4 mb-0">
-            {t("status.network-congestion")}
+            {t("pull-request:errors.pull-request-participants")}
           </p>
         )) || (
           <>
@@ -409,7 +405,6 @@ export default function NewProposal({
             <ul className="mb-0">
               {participants.map((item) => (
                 <CreateProposalDistributionItem
-                  key={item.githubHandle}
                   githubHandle={item.githubHandle}
                   githubLogin={item.githubLogin}
                   onChangeDistribution={handleChangeDistrib}

@@ -1,11 +1,9 @@
-import axios from "axios";
 import { head } from "lodash";
 import getConfig from "next/config";
 
 import { PastEventsParams, User } from "interfaces/api";
-import { BranchInfo, BranchsList } from "interfaces/branchs-list";
 import { IssueData, pullRequest } from "interfaces/issue-data";
-import { INetwork } from "interfaces/network";
+import { Network } from "interfaces/network";
 import { PaginatedData } from "interfaces/paginated-data";
 import { Proposal } from "interfaces/proposal";
 import { ReposList } from "interfaces/repos-list";
@@ -14,11 +12,7 @@ import client from "services/api";
 
 import { Entities, Events } from "types/dappkit";
 
-const { publicRuntimeConfig } = getConfig();
-interface Paginated<T = any> {
-  count: number;
-  rows: T[];
-}
+const { publicRuntimeConfig } = getConfig()
 
 interface NewIssueParams {
   title: string;
@@ -36,8 +30,13 @@ interface CreateBounty {
   repositoryId: string;
 }
 
+type FileUploadReturn = {
+  hash: string;
+  fileName: string;
+  size: string;
+}[]
+
 const repoList: ReposList = [];
-const branchsList: BranchsList = {};
 
 export default function useApi() {
   async function getIssues(page = "1",
@@ -132,9 +131,9 @@ export default function useApi() {
       .catch(() => null);
   }
 
-  async function getPayments(address: string) {
+  async function getPayments(address: string, networkName = publicRuntimeConfig?.networkConfig?.networkName) {
     return client
-      .get<IssueData>(`/payments/${address}`)
+      .get<IssueData[]>(`/payments/${address}/${networkName}`)
       .then(({ data }) => data)
       .catch(() => null);
   }
@@ -177,7 +176,7 @@ export default function useApi() {
     return client
       .patch("/issue", { repoId, githubId, scId, networkName })
       .then(({ data }) => data === "ok")
-      .catch((_) => false);
+      .catch(() => false);
   }
 
   async function getPendingFor(address: string,
@@ -276,7 +275,7 @@ export default function useApi() {
   }
   
   async function getTotalBounties(state: string, 
-                                  networkName = publicRuntimeConfig?.networkConfig?.networkName): Promise<number> {
+                                  networkName = publicRuntimeConfig.networkConfig.networkName): Promise<number> {
     const search = new URLSearchParams({ state, networkName }).toString();
     return client.get<number>(`/search/issues/total?${search}`).then(({ data }) => data);
   }
@@ -331,14 +330,14 @@ export default function useApi() {
     return client
       .get("/health")
       .then(({ status }) => status === 204)
-      .catch((e) => false);
+      .catch(() => false);
   }
 
   async function getClientNation() {
     return client
       .get("/ip")
       .then(({ data }) => data || { countryCode: "US", country: "" })
-      .catch((e) => {
+      .catch(() => {
         return { countryCode: "US", country: "" };
       });
   }
@@ -438,8 +437,8 @@ export default function useApi() {
         throw error;
       });
   }
-
-  async function uploadFiles(files: File | File[]): Promise<any[]> {
+  
+  async function uploadFiles(files: File | File[]): Promise<FileUploadReturn> {
     const form = new FormData();
     const isArray = Array.isArray(files);
     if (isArray) {
@@ -484,7 +483,7 @@ export default function useApi() {
 
     return client
       .get<{
-        rows: INetwork[];
+        rows: Network[];
         count: number;
         pages: number;
         currentPage: number;
@@ -497,7 +496,7 @@ export default function useApi() {
     const search = new URLSearchParams({ name }).toString();
 
     return client
-      .get<INetwork>(`/network?${search}`)
+      .get<Network>(`/network?${search}`)
       .then((response) => response)
       .catch((error) => {
         throw error;
@@ -525,31 +524,13 @@ export default function useApi() {
 
     return client
       .get<{
-        rows: INetwork[];
+        rows: Network[];
         count: number;
         pages: number;
         currentPage: number;
       }>(`/search/networks/?${params}`)
       .then(({ data }) => data)
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
-  }
-
-  async function getCurrencyByToken(tokenId = publicRuntimeConfig?.currency?.currencyId, comparedToken?: string) {
-    const params:{ids: string, vs_currencies?: string} = {
-        ids: tokenId,
-    }
-    
-    if(comparedToken) params.vs_currencies = comparedToken
-
-    try {
-      const { data } = await axios.get(`${publicRuntimeConfig?.currency?.apiUrl}/simple/price`, {
-        params
-      });
-
-      return data[tokenId];
-    } catch (error) {
-      return {};
-    }
   }
 
   async function repositoryHasIssues(repoPath) {
@@ -568,7 +549,6 @@ export default function useApi() {
     createRepo,
     createReviewForPR,
     getAllUsers,
-    getCurrencyByToken,
     getClientNation,
     getHealth,
     getIssue,

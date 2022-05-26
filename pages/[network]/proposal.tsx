@@ -27,8 +27,6 @@ import {
   IDistribuitonPerUser
 } from "interfaces/proposal";
 
-import { BeproService } from "services/bepro-service";
-
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 
@@ -51,7 +49,7 @@ export default function PageProposal() {
     handleCloseIssue(+activeIssue?.contractId,
                      +proposal.contractId)
       .then(txInfo => {
-        const { blockNumber: fromBlock } = txInfo as any;
+        const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
         return processEvent("bounty", "closed", activeNetwork?.name, { fromBlock } );
       })
@@ -76,7 +74,7 @@ export default function PageProposal() {
   async function disputeProposal() {
     handlerDisputeProposal(+proposal?.scMergeId)
     .then(txInfo => {
-      const { blockNumber: fromBlock } = txInfo as any;
+      const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
       return processEvent("proposal", "disputed", activeNetwork?.name, { fromBlock } );
     })

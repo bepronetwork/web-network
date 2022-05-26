@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ProgressBar } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
@@ -13,10 +13,10 @@ import Step from "components/step";
 import UnlockBeproModal from "components/unlock-bepro-modal";
 
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
+import { useNetwork } from "contexts/network";
 
 import { formatNumberToCurrency, formatNumberToNScale } from "helpers/formatNumber";
-
-import { BeproService } from "services/bepro-service";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -34,10 +34,13 @@ export default function LockBeproStep({
   const [isLocking, setIsLocking] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [showUnlockBepro, setShowUnlockBepro] = useState(false);
-  const [networkTokenName, setNetworkTokenName] = useState<string>(t("misc.token"));
   const [settlerAllowance, setSettlerAllowance] = useState(0);
 
-  const { updateWalletBalance, beproServiceStarted } = useAuthentication();
+  const { service: DAOService } = useDAO();
+  const { wallet, updateWalletBalance } = useAuthentication();
+  const { activeNetwork } = useNetwork();
+
+  const networkTokenName = activeNetwork?.networkToken?.symbol || t("misc.$token");
 
   const lockedPercent =
     ((data.amountLocked || 0) / (data.amountNeeded || 0)) * 100;
@@ -51,21 +54,14 @@ export default function LockBeproStep({
   const needsAllowance = data.amount > settlerAllowance;
 
   async function handleLock() {
+    if (!DAOService) return;
+
     setIsLocking(true);
 
     try {
-      const isApproved =
-        await BeproService.networkFactory.isApprovedNetworkToken(data.amount);
-
-      if (!isApproved)
-        await BeproService.networkFactory.approveNetworkToken(data.amount);
-
       const amount = data.amount;
 
-      await BeproService.startNetworkFactory();
-
-      BeproService.networkFactory
-        .lock(amount)
+      DAOService.lockInFactory(amount)
         .then(() => {
           handleChange({ label: "amountLocked", value: amount });
           handleChange({ label: "amount", value: 0 });
@@ -80,12 +76,11 @@ export default function LockBeproStep({
   }
 
   async function handleUnLock() {
+    if (!DAOService) return;
+    
     setIsUnlocking(true);
 
-    await BeproService.startNetworkFactory();
-
-    BeproService.networkFactory
-      .unlock()
+    DAOService.unlockFromFactory()
       .then(() => {
         handleChange({ label: "amountLocked", value: 0 });
         handleChange({ label: "amount", value: 0 });
@@ -109,8 +104,7 @@ export default function LockBeproStep({
   function handleApproval() {
     if (data.amountNeeded <= 0) return;
 
-    BeproService.networkFactory
-      .approveNetworkToken(data.amountNeeded - settlerAllowance)
+    DAOService.approveTokenInFactory(data.amountNeeded - settlerAllowance)
       .then(() => {
         updateWalletBalance();
         updateAllowance();
@@ -118,18 +112,12 @@ export default function LockBeproStep({
       .catch(console.log);
   }
 
-  function updateAllowance() {
-    BeproService.getAllowance(undefined, undefined, publicRuntimeConfig?.networkConfig?.factoryAddress)
-    .then(setSettlerAllowance);
+  function updateAllowance() {  
+    DAOService.getAllowance(publicRuntimeConfig?.contract?.settler,
+                            wallet.address, 
+                            publicRuntimeConfig?.networkConfig?.factoryAddress)
+    .then(setSettlerAllowance).catch(() => 0);
   }
-
-  useEffect(() => {
-    if (!beproServiceStarted) return;
-    
-    BeproService.getSettlerTokenData().then(data => setNetworkTokenName(data.symbol));
-    
-    updateAllowance();
-  }, [beproServiceStarted]);
 
   return (
     <Step

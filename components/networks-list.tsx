@@ -14,7 +14,7 @@ import { changeLoadState } from "contexts/reducers/change-load-state";
 
 import { orderByProperty } from "helpers/array";
 
-import { INetwork } from "interfaces/network";
+import { Network } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
@@ -23,6 +23,13 @@ interface NetworksListProps {
   networkAddress?: string;
   creatorAddress?: string;
   redirectToHome?: boolean;
+  addNetwork?: (address: string, 
+              totalBounties: number, 
+              amountInCurrency: number, 
+              totalSettlerLocked: number, 
+              tokenName: string,
+              tokenSymbol: string,
+              isListedInCoinGecko?: boolean) => void;
 }
 const { publicRuntimeConfig } = getConfig();
 
@@ -31,24 +38,16 @@ export default function NetworksList({
   networkAddress,
   creatorAddress,
   redirectToHome = false,
+  addNetwork
 }: NetworksListProps) {
   const { t } = useTranslation(["common", "custom-network"]);
   const [order, setOrder] = useState(["name", "asc"]);
-  const [networks, setNetworks] = useState<INetwork[]>([]);
+  const [networks, setNetworks] = useState<Network[]>([]);
 
   const { searchNetworks } = useApi();
   const { network } = useNetwork();
 
   const { dispatch } = useContext(ApplicationContext);
-
-  function updateNetworkParameter(networkName, parameter, value) {
-    const tmpNetworks = [...networks];
-    const index = tmpNetworks.findIndex((el) => el.name === networkName);
-
-    tmpNetworks[index][parameter] = value;
-
-    setNetworks(tmpNetworks);
-  }
 
   function handleOrderChange(newOrder) {
     setNetworks(orderByProperty(networks, newOrder[0], newOrder[1]));
@@ -100,7 +99,7 @@ export default function NetworksList({
               key={`network-list-item-${networkItem.name}`}
               network={networkItem}
               redirectToHome={redirectToHome}
-              updateNetworkParameter={updateNetworkParameter}
+              addNetwork={addNetwork}
             />
           ))}
         </>

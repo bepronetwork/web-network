@@ -61,7 +61,7 @@ export default function ProposalItem({
     if (!isDisputable || networkIssue?.closed) return;
     handlerDisputeProposal(+proposal.scMergeId)
     .then(txInfo => {
-      const { blockNumber: fromBlock } = txInfo as any;
+      const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
       return processEvent("proposal", "disputed", activeNetwork?.name, { fromBlock });
     })

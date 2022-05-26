@@ -32,7 +32,7 @@
     "no-return-await": 1,
     "camelcase": 0,
     "no-underscore-dangle": 0,
-    "class-methods-use-this": 1,
+    "class-methods-use-this": 0,
     "@typescript-eslint/no-empty-function": 1,
     "@typescript-eslint/ban-ts-comment": 0,
     "no-async-promise-executor": 0,
@@ -75,5 +75,5 @@
       }
     ]
   },
-  "ignorePatterns": ["**/*.js"]
+  "ignorePatterns": ["**/*.js", "**/assets/icons/*.tsx", "**/assets/*.tsx"]
 }

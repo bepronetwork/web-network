@@ -11,7 +11,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: "developers" },
     { association: "pullRequests" },
     { association: "mergeProposals" },
-    { association: "repository" }
+    { association: "repository" },
+    { association: "token" },
   ];
 
   const issues = await models.issue.findAll({
@@ -36,7 +37,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     //   ammount: issue?.amount,
     //   working: issue?.working?.length || 0,
     //   pr: issue?.pullRequests?.length || 0,
-    //   proposal: issue?.mergeProposals?.length || 0
+    //   proposal: issue?.mergeProposals?.length || 0,
+    //   currency: issue?.token?.symbol
     // });
 
     // const data = Buffer.from(card.buffer);

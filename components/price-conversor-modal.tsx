@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 
 
+import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
 
 import TransactionIcon from "assets/icons/transaction";
 
 import Modal from "components/modal";
 
+import { useNetwork } from "contexts/network";
+
 import { formatNumberToNScale } from "helpers/formatNumber";
 
-import useApi from "x-hooks/use-api";
+import { getCoinInfoByContract } from "services/coingecko";
 
 import InputNumber from "./input-number";
 import ReactSelect from "./react-select";
@@ -26,17 +29,24 @@ export default function PriceConversorModal({
   show,
   onClose
 }:IPriceConversiorModalProps) {
-  const {getCurrencyByToken} = useApi()
-  const [currentValue, setValue] = useState<number>(1);
-  const [currentPrice, setCurrentPrice] = useState<number>(0)
-  const [currentCurrency, setCurrentCurrency] = useState<{label: string, value: string}>(null)
-  const [options, setOptions] = useState([])
+  const { t } = useTranslation("common");
   
+  const [currentValue, setValue] = useState<number>(1);
+  const [currentPrice, setCurrentPrice] = useState<number>(0);
+  const [currentCurrency, setCurrentCurrency] = useState<{label: string, value: string}>(null);
+  const [options, setOptions] = useState([]);
+
+  const { activeNetwork } = useNetwork();  
 
   async function handlerChange({value, label}){
-    const data = await getCurrencyByToken(publicRuntimeConfig?.currency?.currencyId, value)
-    setCurrentCurrency({value, label})
-    setCurrentPrice(data[value])
+    if (!activeNetwork?.networkToken?.address) return;
+
+    const data = 
+      await getCoinInfoByContract(activeNetwork.networkToken.address)
+        .catch(() => ({ prices: { [value]: 0 } }));
+
+    setCurrentCurrency({value, label});
+    setCurrentPrice(data.prices[value]);
   }
 
   useEffect(()=>{
@@ -58,7 +68,9 @@ export default function PriceConversorModal({
       <div
         ref={innerRef}
         {...innerProps}
-        className="proposal__select_currency cursor-pointer d-inline-flex align-items-center flex-grow-1 justify-content-between text-center caption-large text-white p-1"
+        className="proposal__select_currency cursor-pointer d-inline-flex 
+                   align-items-center flex-grow-1 justify-content-between 
+                   text-center caption-large text-white p-1"
       >
         <span>{formatNumberToNScale(currentPrice)}</span>
         <span>{data?.value}</span>
@@ -72,7 +84,9 @@ export default function PriceConversorModal({
       <div
         ref={innerRef}
         {...innerProps}
-        className={`react-select__option p-small text-white p-2 d-flex justify-content-between hover-primary cursor-pointer text-${current? 'white' : 'gray'}`}
+        className={`react-select__option p-small text-white p-2 d-flex 
+                    justify-content-between hover-primary cursor-pointer 
+                    text-${current? 'white' : 'gray'}`}
       >
         <span className="">{data?.label}</span>
         <span className="text-uppercase">{data?.value}</span>
@@ -88,7 +102,10 @@ export default function PriceConversorModal({
     onCloseClick={onClose}
   >
     <div className="d-flex flex-row gap-2">
-      <InputNumber className="caption-large" symbol="$Bepro" value={currentValue} onValueChange={setValue}/>
+      <InputNumber className="caption-large" 
+      symbol={activeNetwork?.networkToken?.symbol || t("misc.$token")} value={currentValue} 
+      onValueChange={(e) => setValue(e.floatValue)}
+      />
       <div className="d-flex justify-center align-items-center bg-dark-gray circle-2 p-2">
         <TransactionIcon width={14} height={10}/>
       </div>

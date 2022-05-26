@@ -4,24 +4,24 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
 import InternalLink from "components/internal-link";
-import PageHero, { IInfosHero } from "components/page-hero";
+import PageHero, { InfosHero } from "components/page-hero";
 
-import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 
 import { handleNetworkAddress } from "helpers/custom-network";
-
-import { BeproService } from "services/bepro-service";
 
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
 
 export default function Oracle({ children }) {
   const { asPath } = useRouter();
-  const {beproServiceStarted} = useAuthentication()
-  const { network: activeNetwork, getURLWithNetwork } = useNetwork();
   const { t } = useTranslation(["oracle", "common"]);
+
   const { getTotalUsers } = useApi();
-  const [infos, setInfos] = useState<IInfosHero[]>([
+  const { service: DAOService } = useDAO();
+  const { network: activeNetwork, getURLWithNetwork } = useNetwork();
+
+  const [infos, setInfos] = useState<InfosHero[]>([
     {
       value: 0,
       label: t("common:heroes.in-progress")
@@ -37,40 +37,37 @@ export default function Oracle({ children }) {
     }
   ]);
 
-  async function loadTotals() {
-    if (!beproServiceStarted || !activeNetwork) return;
-
-    const [closed, inProgress, onNetwork, totalUsers] = await Promise.all([
-      BeproService.getClosedBounties(handleNetworkAddress(activeNetwork)),
-      BeproService.getOpenBounties(handleNetworkAddress(activeNetwork)),
-      BeproService.getTotalSettlerLocked(handleNetworkAddress(activeNetwork)),
-      getTotalUsers()
-    ]);
-
-    setInfos([
-      {
-        value: inProgress,
-        label: t("common:heroes.in-progress")
-      },
-      {
-        value: closed,
-        label: t("common:heroes.bounties-closed")
-      },
-      {
-        value: onNetwork,
-        label: t("common:heroes.bounties-in-network"),
-        currency: "BEPRO"
-      },
-      {
-        value: totalUsers,
-        label: t("common:heroes.protocol-members")
-      }
-    ]);
-  }
-
   useEffect(() => {
-    loadTotals();
-  }, [beproServiceStarted, activeNetwork]);
+    if (!DAOService || !activeNetwork) return;
+
+    Promise.all([
+      DAOService.getClosedBounties(handleNetworkAddress(activeNetwork)),
+      DAOService.getOpenBounties(handleNetworkAddress(activeNetwork)),
+      DAOService.getTotalSettlerLocked(handleNetworkAddress(activeNetwork)),
+      getTotalUsers()
+    ])
+    .then(([closed, inProgress, onNetwork, totalUsers]) => {
+      setInfos([
+        {
+          value: inProgress,
+          label: t("common:heroes.in-progress")
+        },
+        {
+          value: closed,
+          label: t("common:heroes.bounties-closed")
+        },
+        {
+          value: onNetwork,
+          label: t("common:heroes.bounties-in-network"),
+          currency: "BEPRO"
+        },
+        {
+          value: totalUsers,
+          label: t("common:heroes.protocol-members")
+        }
+      ]);
+    });
+  }, [DAOService, activeNetwork]);
 
   return (
     <div>

@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode } from "react";
+import { ReactElement, ReactNode, CSSProperties } from "react";
 
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -16,7 +16,7 @@ interface InternalLinkProps {
   activeClass?: string;
   blank?: boolean;
   brand?: boolean;
-  style?: any;
+  style?: CSSProperties;
 }
 
 export default function InternalLink({

@@ -130,6 +130,7 @@
     "locked": "locked",
     "upload": "upload",
     "token": "token",
+    "$token": "$TOKEN",
     "creation-date": "creation date",
     "seconds": "seconds",
     "on": "on",
@@ -239,8 +240,8 @@
     }
   },
   "labels":{
-    "recived": "Recived",
-    "recivedintotal": "Recived in total"
+    "recived": "Received",
+    "recivedintotal": "Received in total"
   },
   "errors": {
     "approve-transaction": "Failed to approve transaction",

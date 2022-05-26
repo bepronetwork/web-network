@@ -120,7 +120,9 @@ export default function MainNav() {
         <div className="d-flex flex-row align-items-center">
           <a
             href="https://support.bepro.network/en/articles/5595864-using-the-testnet"
-            className="d-flex align-items-center mr-3 text-decoration-none text-white text-uppercase main-nav-link opacity-75 opacity-100-hover"
+            className="d-flex align-items-center mr-3 text-decoration-none 
+                       text-white text-uppercase main-nav-link opacity-75 
+                       opacity-100-hover"
             target="_blank"
             rel="noreferrer"
           >
