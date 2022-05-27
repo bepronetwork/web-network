@@ -1,7 +1,7 @@
-export interface WindowWithEthereum {
-  ethereum: Ethereum;
-}
+import DAO from "services/dao-service";
 
-export interface Ethereum {
-  [key: string]: any; //eslint-disable-line
+declare global {
+  interface Window {
+    DAOService: DAO;
+  }
 }
