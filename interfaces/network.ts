@@ -50,3 +50,56 @@ export interface Color {
   code: string;
   label: string;
 }
+
+export interface Icon {
+  preview: string;
+  raw: File;
+}
+
+export interface Repository {
+  checked: boolean;
+  name: string;
+  fullName: string;
+  isSaved?: boolean;
+  hasIssues?: boolean;
+}
+
+export interface Field<T> {
+  value: T;
+  validated?: boolean;
+  validator?: Validator<T>;
+}
+
+export type Validator<T> = (value: T) => boolean;
+
+export interface NetworkSettings {
+  isSettingsValidated: boolean;
+  tokensLocked?: {
+    amount: number;
+    locked: number;
+    needed: number;
+    validated: boolean;
+  };
+  details?: {
+    name: Field<string>;
+    description: Field<string>;
+    logoIcon: Field<Icon>;
+    fullLogo: Field<Icon>;
+    theme: {
+      colors: ThemeColors;
+      similar: string[];
+      black: string[];
+    };
+    validated: boolean;
+  };
+  github?: {
+    repositories: Repository[];
+    botPermission: boolean;
+    validated: boolean;
+  };
+  tokens?: {
+    settler: Field<string>;
+    bounty: Field<string>;
+    validated: boolean;
+  }
+}
