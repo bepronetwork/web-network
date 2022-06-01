@@ -1,27 +1,43 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
 
+import { useRouter } from "next/router";
+
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 
-import { Icon, NetworkSettings } from "interfaces/network";
+import { DefaultNetworkSettings } from "helpers/custom-network";
+
+import { Icon, NetworkSettings, Theme } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 import useOctokitGraph from "x-hooks/use-octokit-graph";
 
-
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
 
-interface ProviderProps {
-  isCreating?: boolean;
-  children: ReactNode | ReactNode[];
-}
+const ALLOWED_PATHS = ["/new-network", "/[network]/account/my-network/settings"];
 
-export const NetworkSettingsProvider = ({ isCreating, children } : ProviderProps) => {
-  const { getNetwork } = useApi();
+export const NetworkSettingsProvider = ({ children }) => {
+  const router = useRouter();
+  
+  const [isSettingsValidated, setIsSettingsValidated] = useState(DefaultNetworkSettings.isSettingsValidated);
+  const [tokensLocked, setTokensLocked] = useState(DefaultNetworkSettings.tokensLocked);
+  const [details, setDetails] = useState(DefaultNetworkSettings.details);
+  const [github, setGithub] = useState(DefaultNetworkSettings.github);
+  const [tokens, setTokens] = useState(DefaultNetworkSettings.tokens);
+  
+  const { activeNetwork } = useNetwork();
+  const { service: DAOService } = useDAO();
+  const { wallet, user } = useAuthentication();
+  const { getUserRepositories } = useOctokitGraph();
+  const { getNetwork, searchRepositories, repositoryHasIssues } = useApi();
+
+  const isCreating = useMemo(() => router.pathname === "/new-network", [router.pathname]);
+  const needsToLoad = useMemo(() => ALLOWED_PATHS.includes(router.pathname), [router.pathname]);
 
   const FieldsValidators = {
-    name: async (value: string) => {
+    amount: (locked: number, needed: number) => needed > 0 && locked >= needed,
+    name: async (value: string): Promise<boolean | undefined> => {
       let validated = undefined;
 
       if (value.trim() !== "")
@@ -30,27 +46,17 @@ export const NetworkSettingsProvider = ({ isCreating, children } : ProviderProps
       return validated;
     },
     description: (value: string) => value.trim() !== "",
-    logo: (value: Icon) => value.preview !== "" && value?.raw?.type?.includes("image/svg")
+    logo: (value: Icon) => value.preview !== "" && value?.raw?.type?.includes("image/svg"),
+    colors: (value: Theme) => !value?.similar?.length
   };
-
-  const [isSettingsValidated, setIsSettingsValidated] = useState(false);
-  const [tokensLocked, setTokensLocked] = useState(undefined);
-  const [details, setDetails] = useState(undefined);
-  const [github, setGithub] = useState(undefined);
-  const [tokens, setTokens] = useState(undefined);
-
-  const { activeNetwork } = useNetwork();
-  const { searchRepositories, repositoryHasIssues } = useApi();
-  const { service: DAOService } = useDAO();
-  const { wallet, user } = useAuthentication();
-  const { getUserRepositories } = useOctokitGraph();
 
   // Getting external data
   useEffect(() => {
-    if (!wallet?.address || !user?.login || !DAOService || (!activeNetwork && !isCreating)) return;
+    if (!wallet?.address || !user?.login || !DAOService || (!activeNetwork && !isCreating) || !needsToLoad) return;
 
     getUserRepositories(user.login)
       .then(async (githubRepositories) => {
+        const repositories = [];
         const filtered = githubRepositories
           .filter(repo => (!repo.isFork && (user.login === repo.nameWithOwner.split("/")[0])) || repo.isOrganization)
           .map(repo => ({
@@ -61,24 +67,23 @@ export const NetworkSettingsProvider = ({ isCreating, children } : ProviderProps
             fullName: repo.nameWithOwner
           }));
         
-        if (isCreating) return filtered;
-        
-        let { rows: networkRepositories } = await searchRepositories({ networkName: activeNetwork.name });
-        
-        const repositories = [];
+        if (isCreating) repositories.push(...filtered);
+        else {
+          let { rows: networkRepositories } = await searchRepositories({ networkName: activeNetwork.name });
 
-        networkRepositories = await Promise.all(networkRepositories.map( async (repo) => ({
-          checked: true,
-          isSaved: true,
-          name: repo.githubPath.split("/")[1],
-          fullName: repo.githubPath,
-          hasIssues: await repositoryHasIssues(repo.githubPath)
-        })));
+          networkRepositories = await Promise.all(networkRepositories.map( async (repo) => ({
+            checked: true,
+            isSaved: true,
+            name: repo.githubPath.split("/")[1],
+            fullName: repo.githubPath,
+            hasIssues: await repositoryHasIssues(repo.githubPath)
+          })));
 
-        repositories.push(...networkRepositories);
-        
-        repositories.push(...filtered.filter(repo =>
-          !repositories.find((repoB) => repoB.fullName === repo.fullName)));
+          repositories.push(...networkRepositories);
+          
+          repositories.push(...filtered.filter(repo =>
+            !repositories.find((repoB) => repoB.fullName === repo.fullName)));
+        }
 
         setGithub(previous => ({
           ...previous,
@@ -96,11 +101,12 @@ export const NetworkSettingsProvider = ({ isCreating, children } : ProviderProps
       ]) => {
         setTokensLocked(previous => ({
           ...previous,
+          amount: 0,
           locked: tokensLockedInRegistry,
           needed: registryCreatorAmount
         }));
       });
-  }, [wallet?.address, user?.login, DAOService, activeNetwork]);
+  }, [wallet?.address, user?.login, DAOService, activeNetwork, isCreating, needsToLoad]);
 
   // General validation
   useEffect(() => {
@@ -114,29 +120,29 @@ export const NetworkSettingsProvider = ({ isCreating, children } : ProviderProps
 
   // Tokens locked validation
   useEffect(() => {
-    const locked = tokensLocked?.amountLocked;
-    const needed = tokensLocked?.amountNeeded;
-
     setTokensLocked(previous => ({
       ...previous,
-      validated: locked > 0 && needed > 0 && locked >= needed
+      validated: FieldsValidators.amount(tokensLocked?.locked, tokensLocked?.needed)
     }));
-  }, [tokensLocked?.amountLocked, tokensLocked?.amountNeeded]);
+  }, [tokensLocked?.locked, tokensLocked?.needed]);
 
   // Details validation
   useEffect(() => {
-    const validated = [
-      details?.fullLogo?.validated,
-      details?.logoIcon?.validated,
-      details?.name?.validated,
-      details?.description?.validated,
-      !details?.theme?.similar?.length,
-    ].every(condition => condition);
-
-    setDetails(previous => ({
-      ...previous,
-      validated
-    }));
+    FieldsValidators.name(details?.name)
+    .then(nameValidated => {
+      const validated = [
+        nameValidated,
+        FieldsValidators.logo(details?.fullLogo),
+        FieldsValidators.logo(details?.logoIcon),
+        FieldsValidators.description(details?.description),
+        FieldsValidators.colors(details?.theme),
+      ].every(condition => condition);
+  
+      setDetails(previous => ({
+        ...previous,
+        validated
+      }));
+    });
   }, [details?.name, details?.description, details?.logoIcon, details?.fullLogo, details?.theme]);
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({

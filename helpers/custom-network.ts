@@ -1,8 +1,47 @@
 import getConfig from "next/config";
 
-import { Network, ThemeColors } from "interfaces/network";
+import { Network, Repository, ThemeColors } from "interfaces/network";
 
 const { publicRuntimeConfig } = getConfig();
+
+
+export const DefaultNetworkSettings = {
+  isSettingsValidated: false,
+  tokensLocked: {
+    amount: 0,
+    locked: 0,
+    needed: 0,
+    validated: false,
+  },
+  details: {
+    name: "",
+    description: "",
+    logoIcon: {
+      preview: "",
+      raw: undefined as File
+    },
+    fullLogo: {
+      preview: "",
+      raw: undefined as File
+    },
+    theme: {
+      colors: {} as ThemeColors,
+      similar: [] as string[],
+      black: [] as string[],
+    },
+    validated: false,
+  },
+  github: {
+    repositories: [] as Repository[],
+    botPermission: false,
+    validated: false,
+  },
+  tokens: {
+    settler: "",
+    bounty: "",
+    validated: false,
+  }
+};
 
 export const DefaultNetworkInformation = {
   lock: {

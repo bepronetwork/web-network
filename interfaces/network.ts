@@ -64,13 +64,11 @@ export interface Repository {
   hasIssues?: boolean;
 }
 
-export interface Field<T> {
-  value: T;
-  validated?: boolean;
-  validator?: Validator<T>;
+export interface Theme {
+  colors: ThemeColors;
+  similar: string[];
+  black: string[];
 }
-
-export type Validator<T> = (value: T) => boolean;
 
 export interface NetworkSettings {
   isSettingsValidated: boolean;
@@ -81,15 +79,11 @@ export interface NetworkSettings {
     validated: boolean;
   };
   details?: {
-    name: Field<string>;
-    description: Field<string>;
-    logoIcon: Field<Icon>;
-    fullLogo: Field<Icon>;
-    theme: {
-      colors: ThemeColors;
-      similar: string[];
-      black: string[];
-    };
+    name: string;
+    description: string;
+    logoIcon?: Icon;
+    fullLogo?: Icon;
+    theme?: Theme;
     validated: boolean;
   };
   github?: {
@@ -98,8 +92,8 @@ export interface NetworkSettings {
     validated: boolean;
   };
   tokens?: {
-    settler: Field<string>;
-    bounty: Field<string>;
+    settler: string;
+    bounty: string;
     validated: boolean;
   }
 }
