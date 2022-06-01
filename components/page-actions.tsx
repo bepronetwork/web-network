@@ -177,6 +177,19 @@ export default function PageActions({
       });
   }
 
+  function renderForkRepositoryLink() {
+    if (isLoggedIn && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isRepoForked)
+      return (
+        <GithubLink
+          repoId={String(repoId)}
+          forcePath={activeIssue?.repository?.githubPath}
+          hrefPath="fork"
+          color="primary"
+        >
+          <Translation label="actions.fork-repository" />
+        </GithubLink> );
+  }
+
   return (
     <div className="container mt-4">
       <div className="row justify-content-center">
@@ -189,17 +202,7 @@ export default function PageActions({
             <div className="d-flex flex-row align-items-center gap-20">
               <ForksAvatars forks={activeRepo?.forks || []} repositoryPath={activeIssue?.repository?.githubPath} />
 
-              {/* Fork Repository Link */}
-              { (isLoggedIn && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isRepoForked) &&
-                <GithubLink
-                  repoId={String(repoId)}
-                  forcePath={activeIssue?.repository?.githubPath}
-                  hrefPath="fork"
-                  color="primary"
-                >
-                  <Translation label="actions.fork-repository" />
-                </GithubLink>
-              }
+              {renderForkRepositoryLink()}
 
               {/* Start Working Button */}
               { ( isLoggedIn && 
