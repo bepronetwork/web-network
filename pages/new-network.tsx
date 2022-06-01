@@ -18,6 +18,7 @@ import Stepper from "components/stepper";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
+import { useNetworkSettings } from "contexts/network-settings";
 import { addToast } from "contexts/reducers/add-toast";
 
 import { isSameSet } from "helpers/array";
@@ -42,8 +43,9 @@ export default function NewNetwork() {
   const [steps, setSteps] = useState(DefaultNetworkInformation);
 
   const { createNetwork } = useApi();
-  const { user, wallet } = useAuthentication();
   const { service: DAOService } = useDAO();
+  const { user, wallet } = useAuthentication();
+  const { github } = useNetworkSettings();
   const { getUserRepositories } = useOctokitGraph();
   const { network, getURLWithNetwork, colorsToCSS, DefaultTheme } = useNetworkTheme();
 
@@ -208,13 +210,13 @@ export default function NewNetwork() {
 
   useEffect(() => {
     if (wallet?.address && DAOService) {
-      DAOService.getTokensLockedInFactoryByAddress(wallet.address)
+      DAOService.getTokensLockedInRegistryByAddress(wallet.address)
         .then((value) => {
           handleLockDataChange({ label: "amountLocked", value });
         })
         .catch(console.log);
 
-      DAOService.getFactoryCreatorAmount().then(value => {
+      DAOService.getRegistryCreatorAmount().then(value => {
         handleLockDataChange({
           label: "amountNeeded",
           value
