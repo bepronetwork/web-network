@@ -9,7 +9,6 @@ import PageHero, { InfosHero } from "components/page-hero";
 
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
-import { NetworkSettingsProvider } from "contexts/network-settings";
 
 import { handleNetworkAddress } from "helpers/custom-network";
 
@@ -75,7 +74,6 @@ export default function PageDevelopers() {
 
   return (
     <>
-    <NetworkSettingsProvider>
       <PageHero
         title={t("heroes.bounties.title")}
         subtitle={t("heroes.bounties.subtitle")}
@@ -83,7 +81,6 @@ export default function PageDevelopers() {
       />
 
       <ListIssues />
-    </NetworkSettingsProvider>
     </>
   );
 }
