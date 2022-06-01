@@ -190,6 +190,102 @@ export default function PageActions({
         </GithubLink> );
   }
 
+  function renderStartWorkingButton() {
+    if (isLoggedIn && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isWorkingOnBounty && isRepoForked)
+      return(
+        <ReadOnlyButtonWrapper>
+          <Button
+            color="primary"
+            onClick={handleStartWorking}
+            className="read-only-button"
+            disabled={isExecuting}
+          >
+            <span>
+              <Translation ns="bounty" label="actions.start-working.title" />
+            </span>
+            {isExecuting ? (
+              <span className="spinner-border spinner-border-xs ml-1" />
+            ) : (
+              ""
+            )}
+          </Button>
+        </ReadOnlyButtonWrapper>
+      );
+  }
+
+  function renderCreatePullRequestButton() {
+    if (isLoggedIn && 
+        isBountyOpen && 
+        !isBountyInDraft && 
+        !isBountyFinished && 
+        isWorkingOnBounty && 
+        !hasOpenPullRequest && 
+        isRepoForked)
+      return(
+        <ReadOnlyButtonWrapper>
+          <Button
+            className="read-only-button"
+            onClick={() => setShowPRModal(true)}
+            disabled={!user?.login || !wallet?.address || hasOpenPullRequest}
+          >
+            <Translation ns="pull-request" label="actions.create.title" />
+          </Button>
+        </ReadOnlyButtonWrapper>
+      );
+  }
+
+  function renderCancelButton() {
+    if (isLoggedIn && isBountyOpen && isBountyOwner && isBountyInDraft)
+      return(
+        <ReadOnlyButtonWrapper>
+          <Button
+            className="read-only-button me-1"
+            onClick={handleRedeem}
+          >
+            <Translation ns="common" label="actions.cancel" />
+          </Button>
+        </ReadOnlyButtonWrapper>
+      );
+  }
+
+  function renderUpdateAmountButton() {
+    if (isLoggedIn && isBountyOpen && isBountyOwner && isBountyInDraft)
+      return(
+        <ReadOnlyButtonWrapper>
+          <Button
+            className="read-only-button me-1"
+            onClick={() => setShowUpdateAmount(true)}
+          >
+            <Translation ns="bounty" label="actions.update-amount" />
+          </Button>
+        </ReadOnlyButtonWrapper>
+      );
+  }
+
+  function renderCreateProposalButton() {
+    if (isLoggedIn && isCouncilMember && isBountyOpen && isBountyFinished && hasPullRequests)
+      return(
+        <NewProposal amountTotal={networkIssue?.tokenAmount} pullRequests={activeIssue?.pullRequests} />
+      );
+  }
+
+  function renderViewPullRequestLink() {
+    if (isLoggedIn && !isBountyInDraft && hasOpenPullRequest)
+      return(
+        <GithubLink
+          repoId={String(repoId)}
+          forcePath={activeIssue?.repository?.githubPath}
+          hrefPath={`pull/${
+            activeIssue?.pullRequests?.find((pr) => pr.githubLogin === user?.login)
+              ?.githubId || ""
+          }`}
+          color="primary"
+        >
+          <Translation ns="pull-request" label="actions.view" />
+        </GithubLink>
+      );
+  }
+
   return (
     <div className="container mt-4">
       <div className="row justify-content-center">
@@ -204,97 +300,17 @@ export default function PageActions({
 
               {renderForkRepositoryLink()}
 
-              {/* Start Working Button */}
-              { ( isLoggedIn && 
-                  !isBountyInDraft && 
-                  !isBountyFinished && 
-                  isBountyOpen && 
-                  !isWorkingOnBounty && 
-                  isRepoForked ) &&
-                <ReadOnlyButtonWrapper>
-                  <Button
-                    color="primary"
-                    onClick={handleStartWorking}
-                    className="read-only-button"
-                    disabled={isExecuting}
-                  >
-                    <span>
-                      <Translation ns="bounty" label="actions.start-working.title" />
-                    </span>
-                    {isExecuting ? (
-                      <span className="spinner-border spinner-border-xs ml-1" />
-                    ) : (
-                      ""
-                    )}
-                  </Button>
-                </ReadOnlyButtonWrapper>
-              }
+              {renderStartWorkingButton()}
 
-              {/* Create Pull Request Button */}
-              { ( isLoggedIn && 
-                  isBountyOpen && 
-                  !isBountyInDraft && 
-                  !isBountyFinished && 
-                  isWorkingOnBounty && 
-                  !hasOpenPullRequest && 
-                  isRepoForked ) &&
-                <ReadOnlyButtonWrapper>
-                  <Button
-                    className="read-only-button"
-                    onClick={() => setShowPRModal(true)}
-                    disabled={!user?.login || !wallet?.address || hasOpenPullRequest}
-                  >
-                    <Translation ns="pull-request" label="actions.create.title" />
-                  </Button>
-                </ReadOnlyButtonWrapper>
-              }
+              {renderCreatePullRequestButton()}
 
-              {/* Cancel Button */}
-              { (isLoggedIn && isBountyOpen && isBountyOwner && isBountyInDraft ) &&
-                <ReadOnlyButtonWrapper>
-                  <Button
-                    className="read-only-button me-1"
-                    onClick={handleRedeem}
-                  >
-                    <Translation ns="common" label="actions.cancel" />
-                  </Button>
-                </ReadOnlyButtonWrapper>
-              }
+              {renderCancelButton()}
 
-              {/* Update Amount Button */}
-              { (isLoggedIn && isBountyOpen && isBountyOwner && isBountyInDraft) &&
-                <ReadOnlyButtonWrapper>
-                  <Button
-                    className="read-only-button me-1"
-                    onClick={() => setShowUpdateAmount(true)}
-                  >
-                    <Translation ns="bounty" label="actions.update-amount" />
-                  </Button>
-                </ReadOnlyButtonWrapper>
-              }
+              {renderUpdateAmountButton()}
 
-              {/* Create Proposal Button */}
-              { (isLoggedIn && isCouncilMember && isBountyOpen && isBountyFinished && hasPullRequests) &&
-                <NewProposal
-                  amountTotal={networkIssue?.tokenAmount}
-                  pullRequests={activeIssue?.pullRequests}
-                />
-              }
+              {renderCreateProposalButton()}
 
-              {/* View Pull Request Link */}
-              { (isLoggedIn && !isBountyInDraft && hasOpenPullRequest) &&
-                <GithubLink
-                  repoId={String(repoId)}
-                  forcePath={activeIssue?.repository?.githubPath}
-                  hrefPath={`pull/${
-                    activeIssue?.pullRequests?.find((pr) => pr.githubLogin === user?.login)
-                      ?.githubId || ""
-                  }`}
-                  color="primary"
-                >
-                  <Translation ns="pull-request" label="actions.view" />
-                </GithubLink>
-              }
+              {renderViewPullRequestLink()}
 
               <GithubLink
                 repoId={String(repoId)}
