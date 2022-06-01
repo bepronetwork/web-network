@@ -94,7 +94,7 @@ export default function NetworksPage() {
   }, [networks]);
 
   useEffect(() => {
-    if (DAOService) DAOService.loadFactory();
+    if (DAOService) DAOService.loadRegistry();
   }, [DAOService]);
 
   return (
