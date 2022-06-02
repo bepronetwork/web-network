@@ -29,7 +29,8 @@
   "steps": {
     "lock": {
       "title": "Lock {{currency}}",
-      "you-need-to-lock": "To create a network you will need to lock {{creatorAmount}} {{currency}}"
+      "you-need-to-lock": "To create a network you will need to lock {{creatorAmount}} {{currency}}",
+      "full": "FULL"
     },
     "network-information": {
       "title": "Network information",
