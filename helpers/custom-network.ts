@@ -16,7 +16,7 @@ export const DefaultNetworkSettings = {
   details: {
     name: "",
     description: "",
-    logoIcon: {
+    iconLogo: {
       preview: "",
       raw: undefined as File
     },
@@ -46,7 +46,6 @@ export const DefaultNetworkSettings = {
 export const DefaultNetworkInformation = {
   lock: {
     validated: false,
-    amount: 0,
     amountLocked: 0,
     amountNeeded: 0
   },

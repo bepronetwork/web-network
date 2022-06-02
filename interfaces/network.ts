@@ -73,7 +73,6 @@ export interface Theme {
 export interface NetworkSettings {
   isSettingsValidated: boolean;
   tokensLocked?: {
-    amount: number;
     locked: number;
     needed: number;
     validated: boolean;
@@ -81,7 +80,7 @@ export interface NetworkSettings {
   details?: {
     name: string;
     description: string;
-    logoIcon?: Icon;
+    iconLogo?: Icon;
     fullLogo?: Icon;
     theme?: Theme;
     validated: boolean;
@@ -95,5 +94,11 @@ export interface NetworkSettings {
     settler: string;
     bounty: string;
     validated: boolean;
+  }
+  Fields?: {
+    [key: symbol]: {
+      setter: (value: number | string | boolean | Icon | Color | Repository) => void,
+      validator: (value: number | string | boolean | Icon | Color | Repository) => boolean,
+    }
   }
 }
