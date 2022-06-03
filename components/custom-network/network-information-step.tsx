@@ -44,11 +44,11 @@ export default function NetworkInformationStep({
   }
 
   function handleDescriptionChange(e) {
-    fields.descrition.setter(e.target.value);
+    fields.description.setter(e.target.value);
   }
 
   function handleColorChange(value) {
-    fields.color.setter(value);
+    fields.colors.setter(value);
   }
 
   return (
