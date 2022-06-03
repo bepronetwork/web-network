@@ -6,11 +6,14 @@ import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 
+import { isSameSet } from "helpers/array";
+import { isColorsSimilar } from "helpers/colors";
 import { DefaultNetworkSettings } from "helpers/custom-network";
 
 import { Color, Icon, NetworkSettings, Theme } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
+import useNetworkTheme from "x-hooks/use-network";
 import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
@@ -28,6 +31,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   
   const { activeNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
+  const { DefaultTheme } = useNetworkTheme();
   const { wallet, user } = useAuthentication();
   const { getUserRepositories } = useOctokitGraph();
   const { getNetwork, searchRepositories, repositoryHasIssues } = useApi();
@@ -57,7 +61,10 @@ export const NetworkSettingsProvider = ({ children }) => {
 
         setDetails(previous => ({
           ...previous,
-          validated,
+          name: {
+            ...previous.name,
+            validated
+          }
         }));
   
         return validated;
@@ -68,7 +75,13 @@ export const NetworkSettingsProvider = ({ children }) => {
       validator: (value: string) => value.trim() !== ""
     },
     logo: {
-      setter: (value: Icon, type: "full" | "icon") => setDetails(previous => ({ ...previous, [`${type}Logo`]: value })),
+      setter: (value: Icon, type: "full" | "icon") => setDetails(previous => ({ 
+        ...previous, 
+        [`${type}Logo`]: { 
+          value,
+          validated: value?.preview !== "" && value?.raw?.type?.includes("image/svg")
+        }
+      })),
       validator: (value: Icon) => value?.preview !== "" && value?.raw?.type?.includes("image/svg")
     },
     colors: {
@@ -100,6 +113,15 @@ export const NetworkSettingsProvider = ({ children }) => {
     },
     permission: {
       setter: (value) => setGithub(previous => ({ ...previous, botPermission: value }))
+    },
+    settlerToken: {
+      setter: (value) => setTokens(previous => ({ ...previous, settler: value })),
+    },
+    bountyToken: {
+      setter: (value) => setTokens(previous => ({ ...previous, bounty: value })),
+    },
+    bountyURI: {
+      setter: (value) => setTokens(previous => ({ ...previous, bountyURI: value })),
     }
   };
 
@@ -143,6 +165,14 @@ export const NetworkSettingsProvider = ({ children }) => {
           repositories
         }));
       });
+
+    setDetails(previous => ({
+      ...previous,
+      theme: {
+        ...previous.theme,
+        colors: DefaultTheme()
+      }
+    }));
   }, [wallet?.address, user?.login, DAOService, activeNetwork, isCreating, needsToLoad]);
 
   useEffect(() => {
@@ -183,39 +213,49 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   // Details validation
   useEffect(() => {
-    console.log("validating", details?.fullLogo?.value);
+    const validated = [
+      details?.name?.validated,
+      Fields.logo.validator(details?.fullLogo?.value),
+      Fields.logo.validator(details?.iconLogo?.value),
+      Fields.description.validator(details?.description),
+      Fields.colors.validator(details?.theme),
+    ].every(condition => condition);
 
-    if (details?.name?.value?.trim() !== "")
-      Fields.name.validator(details?.name.value)
-      .then(nameValidated => {
-        const validated = [
-          nameValidated,
-          Fields.logo.validator(details?.fullLogo?.value),
-          Fields.logo.validator(details?.iconLogo?.value),
-          Fields.description.validator(details?.description),
-          Fields.colors.validator(details?.theme),
-        ].every(condition => condition);
+    setDetails(previous => ({
+      ...previous,
+      validated
+    }));
+  }, [details?.validated, details?.description, details?.iconLogo, details?.fullLogo, details?.theme]);
+
+  useEffect(() => {
+    const colors = details?.theme?.colors;
     
-        setDetails(previous => ({
-          ...previous,
-          validated
-        }));
-      });
-    else {
-      const validated = [
-        false,
-        Fields.logo.validator(details?.fullLogo?.value),
-        Fields.logo.validator(details?.iconLogo?.value),
-        Fields.description.validator(details?.description),
-        Fields.colors.validator(details?.theme),
-      ].every(condition => condition);
-  
+    if (!colors?.primary) return;
+    
+    const similar = [];
+
+    similar.push(...isColorsSimilar({ label: "text", code: colors.text }, [
+      { label: "primary", code: colors.primary },
+      //{ label: 'secondary', code: colors.secondary },
+      { label: "background", code: colors.background },
+      { label: "shadow", code: colors.shadow },
+    ]));
+
+    similar.push(...isColorsSimilar({ label: "background", code: colors.background }, [
+        { label: "success", code: colors.success },
+        { label: "fail", code: colors.fail },
+        { label: "warning", code: colors.warning },
+    ]));
+
+    if (!isSameSet(new Set(similar), new Set(details?.theme?.similar)))
       setDetails(previous => ({
         ...previous,
-        validated
+        theme: {
+          ...previous.theme,
+          similar
+        }
       }));
-    }
-  }, [details?.name, details?.description, details?.iconLogo, details?.fullLogo, details?.theme]);
+  }, [details?.theme?.colors]);
 
   // Github validation
   useEffect(() => {
@@ -226,11 +266,26 @@ export const NetworkSettingsProvider = ({ children }) => {
       github?.botPermission
     ].every(condition => condition);
 
-    setGithub(previous => ({
+    if (validated !== github?.validated)
+      setGithub(previous => ({
+        ...previous,
+        validated
+      }));
+  }, [github]);
+
+  // Tokens validation
+  useEffect(() => {
+    const validated = [
+      tokens?.settler?.trim() !== "",
+      tokens?.bounty?.trim() !== "",
+      tokens?.bountyURI?.trim() !== ""
+    ].every(condition => condition);
+
+    setTokens(previous => ({
       ...previous,
       validated
     }));
-  }, [github?.repositories, github?.botPermission]);
+  }, [tokens?.settler, tokens?.bounty, tokens?.bountyURI]);
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({
     tokensLocked,
