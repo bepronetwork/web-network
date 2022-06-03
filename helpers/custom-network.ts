@@ -48,6 +48,7 @@ export const DefaultNetworkSettings = {
   tokens: {
     settler: "",
     bounty: "",
+    bountyURI: "",
     validated: false,
   }
 };

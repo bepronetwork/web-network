@@ -93,6 +93,10 @@
             "mid": "BountyToken",
             "post": "address."
           }
+        },
+        "nft-token-uri": {
+          "label": "NFT URI",
+          "error": "You must provide an URI."
         }
       },
       "actions": {

@@ -98,6 +98,7 @@ export interface NetworkSettings {
   tokens?: {
     settler: string;
     bounty: string;
+    bountyURI: string;
     validated: boolean;
   }
   fields?: {
