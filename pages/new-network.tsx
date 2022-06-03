@@ -64,51 +64,8 @@ export default function NewNetwork() {
       if (stepToGo < currentStep) canGo = true;
       else if (stepsNames[stepToGo - 1].validated) canGo = true;
     }
-    
+
     if (canGo) setCurrentStep(stepToGo);
-  }
-
-  function changeColor(newColor) {
-    const tmpSteps = Object.assign({}, steps);
-
-    tmpSteps.network.data.colors.data[newColor.label] = newColor.value;
-
-    setSteps(tmpSteps);
-  }
-
-  function handleNetworkDataChange(newData) {
-    const tmpSteps = Object.assign({}, steps);
-
-    tmpSteps.network.data[newData.label] = newData.value;
-
-    setSteps(tmpSteps);
-  }
-
-  function handleStepDataChange(step, newData) {
-    const tmpSteps = Object.assign({}, steps);
-
-    tmpSteps[step][newData.label] = newData.value;
-
-    setSteps(tmpSteps);
-  }
-
-  function handleCheckRepository(repositoryName) {
-    const tmpSteps = Object.assign({}, steps);
-
-    const repositoryIndex = tmpSteps.repositories.data.findIndex((repo) => repo.name === repositoryName);
-
-    tmpSteps.repositories.data[repositoryIndex].checked =
-      !tmpSteps.repositories.data[repositoryIndex].checked;
-
-    setSteps(tmpSteps);
-  }
-
-  function handleCheckPermission(check) {
-    const tmpSteps = Object.assign({}, steps);
-
-    tmpSteps.repositories.permission = check;
-
-    setSteps(tmpSteps);
   }
 
   async function handleCreateNetwork() {
@@ -259,10 +216,8 @@ export default function NewNetwork() {
             />
 
             <TokenConfiguration
-              data={steps.tokens}
               step={4}
               currentStep={currentStep}
-              changedDataHandler={handleStepDataChange}
               handleChangeStep={handleChangeStep}
               handleFinish={handleCreateNetwork}
             />
