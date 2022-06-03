@@ -17,7 +17,7 @@ export default function RepositoriesList({ repositories, onClick }) {
   function handleClick(repository) {
     if (reposWithIssues.includes(repository.fullName)) return;
 
-    onClick(repository.name);
+    onClick(repository.fullName);
   }
 
   useEffect(() => {
