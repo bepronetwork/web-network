@@ -14,7 +14,9 @@ export default function ImageUploader({
   className = ""
 }) {
   const { t } = useTranslation("custom-network");
+
   const [image, setImage] = useState(value);
+  
   const dimensions = {
     width: (lg && "150") || "80",
     height: "80"
@@ -29,7 +31,7 @@ export default function ImageUploader({
   }
 
   useEffect(() => {
-    onChange({ label: name, value: image });
+    onChange(image);
   }, [image]);
 
   return (

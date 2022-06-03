@@ -14,15 +14,24 @@ export const DefaultNetworkSettings = {
     validated: false,
   },
   details: {
-    name: "",
+    name: {
+      value: "",
+      validated: undefined
+    },
     description: "",
     iconLogo: {
-      preview: "",
-      raw: undefined as File
+      value: {
+        preview: "",
+        raw: undefined as File
+      },
+      validated: undefined
     },
     fullLogo: {
-      preview: "",
-      raw: undefined as File
+      value: {
+        preview: "",
+        raw: undefined as File
+      },
+      validated: undefined
     },
     theme: {
       colors: {} as ThemeColors,

@@ -41,12 +41,24 @@ export const NetworkSettingsProvider = ({ children }) => {
       validator: (locked: number, needed: number) => needed > 0 && locked >= needed
     },
     name: {
-      setter: (value: string) => setDetails(previous => ({ ...previous, name: value })),
+      setter: (value: string) => setDetails(previous => ({
+        ...previous, 
+        validated: false, 
+        name: { 
+          value, 
+          validated: undefined 
+        } 
+      })),
       validator: async (value: string): Promise<boolean | undefined> => {
         let validated = undefined;
   
         if (value.trim() !== "")
           validated = /bepro|taikai/gi.test(value) ? false : !(await getNetwork(value).catch(() => false));
+
+        setDetails(previous => ({
+          ...previous,
+          validated,
+        }));
   
         return validated;
       }
@@ -57,7 +69,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     },
     logo: {
       setter: (value: Icon, type: "full" | "icon") => setDetails(previous => ({ ...previous, [`${type}Logo`]: value })),
-      validator: (value: Icon) => value.preview !== "" && value?.raw?.type?.includes("image/svg")
+      validator: (value: Icon) => value?.preview !== "" && value?.raw?.type?.includes("image/svg")
     },
     colors: {
       setter: (value: Color) => setDetails(previous => ({ 
@@ -71,6 +83,23 @@ export const NetworkSettingsProvider = ({ children }) => {
         } 
       })),
       validator: (value: Theme) => !value?.similar?.length
+    },
+    repository: {
+      setter: (fullName: string) => setGithub(previous => {
+        const tmpRepositories = previous.repositories;
+        const index = tmpRepositories.findIndex((repo) => repo.fullName === fullName);
+        const selectedRepository = tmpRepositories[index];
+
+        tmpRepositories[index] = {
+          ...selectedRepository,
+          checked: !selectedRepository.checked
+        };
+
+        return { ...previous, repositories: tmpRepositories };
+      }),
+    },
+    permission: {
+      setter: (value) => setGithub(previous => ({ ...previous, botPermission: value }))
     }
   };
 
@@ -154,12 +183,29 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   // Details validation
   useEffect(() => {
-    Fields.name.validator(details?.name)
-    .then(nameValidated => {
+    console.log("validating", details?.fullLogo?.value);
+
+    if (details?.name?.value?.trim() !== "")
+      Fields.name.validator(details?.name.value)
+      .then(nameValidated => {
+        const validated = [
+          nameValidated,
+          Fields.logo.validator(details?.fullLogo?.value),
+          Fields.logo.validator(details?.iconLogo?.value),
+          Fields.description.validator(details?.description),
+          Fields.colors.validator(details?.theme),
+        ].every(condition => condition);
+    
+        setDetails(previous => ({
+          ...previous,
+          validated
+        }));
+      });
+    else {
       const validated = [
-        nameValidated,
-        Fields.logo.validator(details?.fullLogo),
-        Fields.logo.validator(details?.iconLogo),
+        false,
+        Fields.logo.validator(details?.fullLogo?.value),
+        Fields.logo.validator(details?.iconLogo?.value),
         Fields.description.validator(details?.description),
         Fields.colors.validator(details?.theme),
       ].every(condition => condition);
@@ -168,8 +214,23 @@ export const NetworkSettingsProvider = ({ children }) => {
         ...previous,
         validated
       }));
-    });
+    }
   }, [details?.name, details?.description, details?.iconLogo, details?.fullLogo, details?.theme]);
+
+  // Github validation
+  useEffect(() => {
+    if (!github?.repositories?.length) return;
+
+    const validated = [
+      github?.repositories?.some((repository) => repository.checked),
+      github?.botPermission
+    ].every(condition => condition);
+
+    setGithub(previous => ({
+      ...previous,
+      validated
+    }));
+  }, [github?.repositories, github?.botPermission]);
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({
     tokensLocked,
@@ -177,7 +238,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     github,
     tokens,
     isSettingsValidated,
-    Fields
+    fields: Fields
   }), [tokensLocked, details, github, tokens, isSettingsValidated, Fields]);
 
   return (

@@ -70,6 +70,11 @@ export interface Theme {
   black: string[];
 }
 
+export interface Field<T> {
+  value: T;
+  validated?: boolean;
+}
+
 export interface NetworkSettings {
   isSettingsValidated: boolean;
   tokensLocked?: {
@@ -78,10 +83,10 @@ export interface NetworkSettings {
     validated: boolean;
   };
   details?: {
-    name: string;
+    name: Field<string>;
     description: string;
-    iconLogo?: Icon;
-    fullLogo?: Icon;
+    iconLogo?: Field<Icon>;
+    fullLogo?: Field<Icon>;
     theme?: Theme;
     validated: boolean;
   };
@@ -95,10 +100,10 @@ export interface NetworkSettings {
     bounty: string;
     validated: boolean;
   }
-  Fields?: {
-    [key: symbol]: {
-      setter: (value: number | string | boolean | Icon | Color | Repository) => void,
-      validator: (value: number | string | boolean | Icon | Color | Repository) => boolean,
+  fields?: {
+    [key: string]: {
+      setter: (value, value2?) => void;
+      validator?: (value1, value2?) => Promise<boolean> | boolean | undefined;
     }
   }
 }
