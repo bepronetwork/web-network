@@ -30,16 +30,16 @@ export default function useNetworkTheme() {
 
   function DefaultTheme(): ThemeColors {
     return {
-      text: getComputedStyle(document.documentElement).getPropertyValue("--bs-body-color"),
-      background: getComputedStyle(document.documentElement).getPropertyValue("--bs-body-bg"),
-      shadow: getComputedStyle(document.documentElement).getPropertyValue("--bs-shadow"),
-      gray: getComputedStyle(document.documentElement).getPropertyValue("--bs-gray"),
-      primary: getComputedStyle(document.documentElement).getPropertyValue("--bs-primary"),
-      secondary: getComputedStyle(document.documentElement).getPropertyValue("--bs-secondary"),
-      oracle: getComputedStyle(document.documentElement).getPropertyValue("--bs-oracle"),
-      success: getComputedStyle(document.documentElement).getPropertyValue("--bs-success"),
-      fail: getComputedStyle(document.documentElement).getPropertyValue("--bs-fail"),
-      warning: getComputedStyle(document.documentElement).getPropertyValue("--bs-warning")
+      text: getComputedStyle(document.documentElement).getPropertyValue("--bs-body-color").trim(),
+      background: getComputedStyle(document.documentElement).getPropertyValue("--bs-body-bg").trim(),
+      shadow: getComputedStyle(document.documentElement).getPropertyValue("--bs-shadow").trim(),
+      gray: getComputedStyle(document.documentElement).getPropertyValue("--bs-gray").trim(),
+      primary: getComputedStyle(document.documentElement).getPropertyValue("--bs-primary").trim(),
+      secondary: getComputedStyle(document.documentElement).getPropertyValue("--bs-secondary").trim(),
+      oracle: getComputedStyle(document.documentElement).getPropertyValue("--bs-purple").trim(),
+      success: getComputedStyle(document.documentElement).getPropertyValue("--bs-success").trim(),
+      fail: getComputedStyle(document.documentElement).getPropertyValue("--bs-fail").trim(),
+      warning: getComputedStyle(document.documentElement).getPropertyValue("--bs-warning").trim()
     };
   }
 
