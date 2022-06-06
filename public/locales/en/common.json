@@ -104,6 +104,7 @@
   },
   "misc": {
     "by": "by",
+    "ago": "ago",
     "and": "and",
     "add": "Add",
     "comments_one": "{{count}} comment",

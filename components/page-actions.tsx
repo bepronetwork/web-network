@@ -1,14 +1,13 @@
 import React, { useContext, useState } from "react";
 
-import { GetStaticProps } from "next";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
 import Button from "components/button";
 import NewProposal from "components/create-proposal";
 import CreatePullRequestModal from "components/create-pull-request-modal";
+import ForksAvatars from "components/forks-avatars";
 import GithubLink from "components/github-link";
-import IssueAvatars from "components/issue-avatars";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
 import UpdateBountyAmountModal from "components/update-bounty-amount-modal";
@@ -18,283 +17,73 @@ import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/add-toast";
-
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { developer, IssueState, pullRequest } from "interfaces/issue-data";
-import { Proposal } from "interfaces/proposal";
-import { IForkInfo } from "interfaces/repos-list";
+import { useRepos } from "contexts/repos";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 
-
-interface pageActions {
-  issueId: string;
-  developers?: developer[];
-  finalized: boolean;
-  canceled?: boolean;
-  networkCID: string;
-  isIssueinDraft: boolean;
-  state?: IssueState | string;
-  pullRequests?: pullRequest[];
-  mergeProposals?: Proposal[];
-  amountIssue?: string | number;
-  forks?: IForkInfo[];
-  title?: string;
-  description?: string;
-  handleMicroService?: (force?: boolean) => void;
-  handleBeproService?: (force?: boolean) => void;
-  githubLogin?: string;
-  mergeId?: string;
-  hasOpenPR?: boolean;
+interface PageActionsProps {
   isRepoForked?: boolean;
-  isWorking?: boolean;
-  canClose?: boolean;
-  githubId?: string;
-  finished?: boolean;
-  issueCreator?: string;
-  repoPath?: string;
   addNewComment?: (comment: string) => void;
-  issueRepo?: string;
-  isDisputable?: boolean;
-  onCloseEvent?: () => void;
 }
 
 export default function PageActions({
-  developers,
-  finalized,
-  networkCID,
-  isIssueinDraft,
-  state,
-  pullRequests,
-  amountIssue,
-  forks,
-  title,
-  description,
-  handleMicroService,
-  githubLogin,
-  hasOpenPR = false,
   isRepoForked = false,
-  isWorking = false,
-  canClose = true,
-  githubId = "",
-  finished = false,
-  canceled = false,
-  repoPath = "",
-  addNewComment,
-  issueCreator
-}: pageActions) {
+  addNewComment
+}: PageActionsProps) {
+  const { t } = useTranslation(["common", "pull-request", "bounty"]);
+
   const {
     query: { repoId, id }
   } = useRouter();
-  const { t } = useTranslation(["common", "pull-request", "bounty"]);
 
   const [isExecuting, setIsExecuting] = useState(false);
   const [showPRModal, setShowPRModal] = useState(false);
   const [showUpdateAmount, setShowUpdateAmount] = useState(false);
 
   const {
-    dispatch,
-    state: { myTransactions }
+    dispatch
   } = useContext(ApplicationContext);
-  const { activeNetwork } = useNetwork();
-  const { wallet, user, updateWalletBalance } = useAuthentication();
-  const { handleReedemIssue, handleCreatePullRequest } = useBepro();
-  const { updateIssue, networkIssue, activeIssue } = useIssue();
 
+  const { activeRepo } = useRepos();
+  const { activeNetwork } = useNetwork();
+  const { handleReedemIssue, handleCreatePullRequest } = useBepro();
+  const { wallet, user, updateWalletBalance } = useAuthentication();
+  const { networkIssue, activeIssue, getNetworkIssue, updateIssue } = useIssue();
   const { createPrePullRequest, cancelPrePullRequest, startWorking, processEvent } = useApi();
 
-  const isBountyOwner = () => issueCreator?.toLowerCase() === wallet?.address.toLowerCase();
+  const issueGithubID = activeIssue?.githubId;
 
-  function renderIssueAvatars() {
-    if (developers?.length > 0) return <IssueAvatars users={developers} />;
+  const isCouncilMember = !!wallet?.isCouncil;
+  const isBountyInDraft = !!networkIssue?.isDraft;
+  const isBountyFinished = !!networkIssue?.isFinished;
+  const isLoggedIn = !!wallet?.address && !!user?.login;
+  const isWorkingOnBounty = !!activeIssue?.working?.find((login) => login === user?.login);
+  const isBountyOpen = networkIssue?.closed === false && networkIssue?.canceled === false;
 
-    if (developers?.length && state.toLowerCase() !== "draft")
-      return (
-        <p className="p-small mt-3">
-          <Translation ns="bounty" label="errors.no-workers" />
-        </p>
-      );
+  const isBountyOwner = 
+    wallet?.address && networkIssue?.creator && networkIssue?.creator?.toLowerCase() === wallet?.address?.toLowerCase();
+
+  const hasPullRequests = 
+    !!activeIssue?.pullRequests?.filter(pullRequest => pullRequest?.status !== "canceled")?.length;
+  
+  const hasOpenPullRequest = 
+    !!activeIssue?.pullRequests?.find(pullRequest => pullRequest?.githubLogin === user?.login && 
+                                                     pullRequest?.status !== "canceled");
+
+  async function updateBountyData() {
+    return Promise.all([
+      updateIssue(`${repoId}`, `${id}`),
+      getNetworkIssue()
+    ]);
   }
-
-  function renderForkAvatars() {
-    if (forks?.length > 0) {
-      return (
-        <a
-          className="d-flex align-items-center text-decoration-none text-white-50"
-          href={`https://github.com/${repoPath}/network/members`}
-          target="_blank"
-          rel="noreferrer"
-        >
-          <IssueAvatars users={forks} />
-          <span className="caption-small">
-            <Translation label="misc.forks" />
-          </span>
-        </a>
-      );
-    }
-  }
-
-  const isClosedIssue = (state: IssueState | string): boolean =>
-    state?.toLocaleLowerCase() === "closed" ||
-    state?.toLocaleLowerCase() === "redeemed";
-  const isReedemButtonDisable = () =>
-    [
-      !myTransactions.find((transactions) =>
-          transactions.type === TransactionTypes.redeemIssue &&
-          transactions.status === TransactionStatus.pending)
-    ].some((values) => values === false);
 
   async function handleRedeem() {
     handleReedemIssue()
-                      .then(()=>{
-                        updateIssue(`${repoId}`, `${id}`);
-                        updateWalletBalance()
-                      });
-  }
-
-  const renderRedeem = () => {
-    return (
-      isIssueinDraft &&
-      isBountyOwner() &&
-      !finalized &&
-      !canceled && (
-        <ReadOnlyButtonWrapper>
-          <Button
-            className="read-only-button me-1"
-            disabled={isReedemButtonDisable()}
-            onClick={handleRedeem}
-          >
-            <Translation ns="common" label="actions.cancel" />
-          </Button>
-        </ReadOnlyButtonWrapper>
-      )
-    );
-  };
-
-  const renderUpdateAmount = () => {
-    if (isIssueinDraft && isBountyOwner() && !finalized && !canceled)
-      return <ReadOnlyButtonWrapper>
-        <Button
-          className="read-only-button me-1"
-          onClick={() => setShowUpdateAmount(true)}
-        >
-          <Translation ns="bounty" label="Update Amount" />
-        </Button>
-      </ReadOnlyButtonWrapper>;
-
-    return <></>;
-  }
-
-  function renderProposeDestribution() {
-    return (
-      !finalized &&
-      pullRequests?.length > 0 &&
-      wallet?.address &&
-      user?.login && (
-        <NewProposal
-          isFinished={finished}
-          amountTotal={amountIssue}
-          pullRequests={pullRequests}
-        />
-      )
-    );
-  }
-
-  function renderPullrequest() {
-    return (
-      !isClosedIssue(state) &&
-      !isIssueinDraft &&
-      !finished &&
-      !finalized &&
-      !hasOpenPR &&
-      isRepoForked &&
-      isWorking &&
-      wallet?.address &&
-      user?.login && (
-        <ReadOnlyButtonWrapper>
-          <Button
-            className="read-only-button"
-            onClick={() => setShowPRModal(true)}
-            disabled={!user?.login || !wallet?.address || hasOpenPR}
-          >
-            <Translation ns="pull-request" label="actions.create.title" />
-          </Button>
-        </ReadOnlyButtonWrapper>
-      )
-    );
-  }
-
-  function renderForkRepository() {
-    return (
-      !isRepoForked &&
-      !isIssueinDraft &&
-      !finished &&
-      !finalized &&
-      wallet?.address &&
-      user?.login && (
-        <GithubLink
-          repoId={String(repoId)}
-          forcePath={repoPath}
-          hrefPath="fork"
-          color="primary"
-        >
-          <Translation label="actions.fork-repository" />
-        </GithubLink>
-      )
-    );
-  }
-
-  function renderStartWorking() {
-    return (
-      isRepoForked &&
-      !isWorking &&
-      !isIssueinDraft &&
-      !finished &&
-      !finalized &&
-      !canceled &&
-      wallet?.address &&
-      user?.login && (
-        <ReadOnlyButtonWrapper>
-          <Button
-            color="primary"
-            onClick={handleStartWorking}
-            className="read-only-button"
-            disabled={isExecuting}
-          >
-            <span>
-              <Translation ns="bounty" label="actions.start-working.title" />
-            </span>
-            {isExecuting ? (
-              <span className="spinner-border spinner-border-xs ml-1" />
-            ) : (
-              ""
-            )}
-          </Button>
-        </ReadOnlyButtonWrapper>
-      )
-    );
-  }
-
-  function renderViewPullrequest() {
-    return (
-      !isIssueinDraft &&
-      hasOpenPR &&
-      githubLogin && (
-        <GithubLink
-          repoId={String(repoId)}
-          forcePath={repoPath}
-          hrefPath={`pull/${
-            pullRequests?.find((pr) => pr.githubLogin === githubLogin)
-              ?.githubId || ""
-          }`}
-          color="primary"
-        >
-          <Translation ns="pull-request" label="actions.view" />
-        </GithubLink>
-      )
-    );
+    .then(()=>{
+      updateWalletBalance();
+      updateBountyData();
+    });
   }
 
   async function handlePullrequest({
@@ -304,15 +93,15 @@ export default function PageActions({
   }): Promise<void> {
     let pullRequestPayload = undefined;
 
-    createPrePullRequest(repoId as string, githubId, {
+    createPrePullRequest(repoId as string, issueGithubID, {
         title: prTitle,
         description: prDescription,
-        username: githubLogin,
+        username: user?.login,
         branch
     }).then(({bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid}) => {
       pullRequestPayload = {
           repoId, 
-          issueGithubId: githubId, 
+          issueGithubId: issueGithubID, 
           bountyId,
           issueCid: originCID, 
           pullRequestGithubId: cid,
@@ -336,10 +125,9 @@ export default function PageActions({
             content: t("pull-request:actions.create.success")
       }));
 
-      if (handleMicroService) handleMicroService(true);
-
-      setShowPRModal(false);
+      return updateBountyData();
     })
+    .then(() => setShowPRModal(false))
     .catch((err) => {
       setShowPRModal(false);
       if (pullRequestPayload) cancelPrePullRequest(pullRequestPayload);
@@ -364,7 +152,7 @@ export default function PageActions({
   async function handleStartWorking() {
     setIsExecuting(true);
 
-    startWorking(networkCID, githubLogin, activeNetwork?.name)
+    startWorking(networkIssue?.cid, user?.login, activeNetwork?.name)
       .then((response) => {
         dispatch(addToast({
             type: "success",
@@ -372,12 +160,11 @@ export default function PageActions({
             content: t("bounty:actions.start-working.success")
         }));
 
-        if (handleMicroService) handleMicroService(true);
+        addNewComment(response.data);
 
-        if (addNewComment) addNewComment(response.data);
-
-        setIsExecuting(false);
+        return updateBountyData();
       })
+      .then(() => setIsExecuting(false))
       .catch((error) => {
         console.log("Failed to start working", error);
         dispatch(addToast({
@@ -390,6 +177,115 @@ export default function PageActions({
       });
   }
 
+  function renderForkRepositoryLink() {
+    if (isLoggedIn && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isRepoForked)
+      return (
+        <GithubLink
+          repoId={String(repoId)}
+          forcePath={activeIssue?.repository?.githubPath}
+          hrefPath="fork"
+          color="primary"
+        >
+          <Translation label="actions.fork-repository" />
+        </GithubLink> );
+  }
+
+  function renderStartWorkingButton() {
+    if (isLoggedIn && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isWorkingOnBounty && isRepoForked)
+      return(
+        <ReadOnlyButtonWrapper>
+          <Button
+            color="primary"
+            onClick={handleStartWorking}
+            className="read-only-button"
+            disabled={isExecuting}
+          >
+            <span>
+              <Translation ns="bounty" label="actions.start-working.title" />
+            </span>
+            {isExecuting ? (
+              <span className="spinner-border spinner-border-xs ml-1" />
+            ) : (
+              ""
+            )}
+          </Button>
+        </ReadOnlyButtonWrapper>
+      );
+  }
+
+  function renderCreatePullRequestButton() {
+    if (isLoggedIn && 
+        isBountyOpen && 
+        !isBountyInDraft && 
+        !isBountyFinished && 
+        isWorkingOnBounty && 
+        !hasOpenPullRequest && 
+        isRepoForked)
+      return(
+        <ReadOnlyButtonWrapper>
+          <Button
+            className="read-only-button"
+            onClick={() => setShowPRModal(true)}
+            disabled={!user?.login || !wallet?.address || hasOpenPullRequest}
+          >
+            <Translation ns="pull-request" label="actions.create.title" />
+          </Button>
+        </ReadOnlyButtonWrapper>
+      );
+  }
+
+  function renderCancelButton() {
+    if (isLoggedIn && isBountyOpen && isBountyOwner && isBountyInDraft)
+      return(
+        <ReadOnlyButtonWrapper>
+          <Button
+            className="read-only-button me-1"
+            onClick={handleRedeem}
+          >
+            <Translation ns="common" label="actions.cancel" />
+          </Button>
+        </ReadOnlyButtonWrapper>
+      );
+  }
+
+  function renderUpdateAmountButton() {
+    if (isLoggedIn && isBountyOpen && isBountyOwner && isBountyInDraft)
+      return(
+        <ReadOnlyButtonWrapper>
+          <Button
+            className="read-only-button me-1"
+            onClick={() => setShowUpdateAmount(true)}
+          >
+            <Translation ns="bounty" label="actions.update-amount" />
+          </Button>
+        </ReadOnlyButtonWrapper>
+      );
+  }
+
+  function renderCreateProposalButton() {
+    if (isLoggedIn && isCouncilMember && isBountyOpen && isBountyFinished && hasPullRequests)
+      return(
+        <NewProposal amountTotal={networkIssue?.tokenAmount} pullRequests={activeIssue?.pullRequests} />
+      );
+  }
+
+  function renderViewPullRequestLink() {
+    if (isLoggedIn && !isBountyInDraft && hasOpenPullRequest)
+      return(
+        <GithubLink
+          repoId={String(repoId)}
+          forcePath={activeIssue?.repository?.githubPath}
+          hrefPath={`pull/${
+            activeIssue?.pullRequests?.find((pr) => pr.githubLogin === user?.login)
+              ?.githubId || ""
+          }`}
+          color="primary"
+        >
+          <Translation ns="pull-request" label="actions.view" />
+        </GithubLink>
+      );
+  }
+
   return (
     <div className="container mt-4">
       <div className="row justify-content-center">
@@ -398,33 +294,31 @@ export default function PageActions({
             <h4 className="h4 d-flex align-items-center">
               {t("misc.details")}
             </h4>
+
             <div className="d-flex flex-row align-items-center gap-20">
-              {(!canClose && !finalized && (
-                <span className="caption-small text-danger">
-                  {t("pull-request:errors.merge-conflicts")}
-                </span>
-              )) ||
-                ""}
-              {renderIssueAvatars()}
-              {forks && renderForkAvatars()}
+              <ForksAvatars forks={activeRepo?.forks || []} repositoryPath={activeIssue?.repository?.githubPath} />
 
-              {renderForkRepository()}
-              {renderStartWorking()}
-              {renderPullrequest()}
+              {renderForkRepositoryLink()}
 
-              {renderRedeem()}
-              {renderUpdateAmount()}
-              {renderProposeDestribution()}
+              {renderStartWorkingButton()}
 
-              {renderViewPullrequest()}
+              {renderCreatePullRequestButton()}
+
+              {renderCancelButton()}
+
+              {renderUpdateAmountButton()}
+
+              {renderCreateProposalButton()}
+
+              {renderViewPullRequestLink()}
 
               <GithubLink
                 repoId={String(repoId)}
-                forcePath={repoPath}
+                forcePath={activeIssue?.repository?.githubPath}
                 hrefPath={`${
-                  (state?.toLowerCase() === "pull request" && "pull") ||
+                  (activeIssue?.state?.toLowerCase() === "pull request" && "pull") ||
                   "issues"
-                }/${githubId || ""}`}
+                }/${issueGithubID || ""}`}
               >
                 {t("actions.view-on-github")}
               </GithubLink>
@@ -432,15 +326,16 @@ export default function PageActions({
           </div>
         </div>
       </div>
+
       <CreatePullRequestModal
         show={showPRModal}
-        title={title}
-        description={description}
+        title={activeIssue?.title}
+        description={activeIssue?.body}
         onConfirm={handlePullrequest}
         repo={
-          (githubLogin &&
-            repoPath) &&
-            repoPath ||
+          (user?.login &&
+            activeIssue?.repository?.githubPath) &&
+            activeIssue?.repository?.githubPath ||
           ""
         }
         onCloseClick={() => setShowPRModal(false)}
@@ -457,9 +352,3 @@ export default function PageActions({
     </div>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {}
-  };
-};

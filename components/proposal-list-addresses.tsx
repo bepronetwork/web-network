@@ -8,10 +8,10 @@ import { formatNumberToCurrency } from "helpers/formatNumber";
 import { truncateAddress } from "helpers/truncate-address";
 
 import { Currency } from "interfaces/currency";
-import { IDistribuitonPerUser } from "interfaces/proposal";
+import { DistribuitonPerUser } from "interfaces/proposal";
 
 interface IProposalListAddressProps {
-  usersDistribution: IDistribuitonPerUser[];
+  usersDistribution: DistribuitonPerUser[];
   currency?: Currency;
 }
 

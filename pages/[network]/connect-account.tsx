@@ -31,8 +31,6 @@ import { changeWalletState } from "contexts/reducers/change-wallet-connect";
 
 import { truncateAddress } from "helpers/truncate-address";
 
-import { WindowWithEthereum } from "interfaces/window";
-
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
 
@@ -147,7 +145,7 @@ export default function ConnectAccount() {
     let loggedIn = false;
 
     try {
-      const chainId = (window as WindowWithEthereum)?.ethereum?.chainId;
+      const chainId = window?.ethereum?.chainId;
 
       if (+publicRuntimeConfig?.metaMask?.chainId !== +chainId) {
         dispatch(changeNetworkId(+chainId));
