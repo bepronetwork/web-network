@@ -18,7 +18,6 @@ const { publicRuntimeConfig } = getConfig();
 
 export default function TokenConfiguration({
     step,
-    handleFinish,
     currentStep,
     handleChangeStep
 }) {
@@ -117,8 +116,6 @@ export default function TokenConfiguration({
       activeStep={currentStep}
       validated={tokens.validated}
       handleClick={handleChangeStep}
-      finishLabel={t("custom-network:steps.repositories.submit-label")}
-      handleFinish={handleFinish}
     >
       <div className="row">
         <TokensDropdown 

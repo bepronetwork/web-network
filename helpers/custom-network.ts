@@ -50,6 +50,15 @@ export const DefaultNetworkSettings = {
     bounty: "",
     bountyURI: "",
     validated: false,
+  },
+  treasury: {
+    address: {
+      value: "",
+      validated: undefined
+    },
+    cancelFee: 1,
+    closeFee: 5,
+    validated: false
   }
 };
 

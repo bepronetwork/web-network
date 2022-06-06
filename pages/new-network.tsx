@@ -13,22 +13,20 @@ import LockBeproStep from "components/custom-network/lock-bepro-step";
 import NetworkInformationStep from "components/custom-network/network-information-step";
 import SelectRepositoriesStep from "components/custom-network/select-repositories-step";
 import TokenConfiguration from "components/custom-network/token-configuration";
+import TreasuryStep from "components/custom-network/treasury-step";
 import Stepper from "components/stepper";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
+import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
 import { addToast } from "contexts/reducers/add-toast";
 
-import { isSameSet } from "helpers/array";
-import { isColorsSimilar } from "helpers/colors";
-import { DefaultNetworkInformation } from "helpers/custom-network";
 import { psReadAsText } from "helpers/file-reader";
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
-import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -39,14 +37,13 @@ export default function NewNetwork() {
 
   const [currentStep, setCurrentStep] = useState(1);
   const [creatingNetwork, setCreatingNetwork] = useState(false);
-  const [steps, setSteps] = useState(DefaultNetworkInformation);
 
   const { createNetwork } = useApi();
+  const { activeNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
   const { user, wallet } = useAuthentication();
-  const { getUserRepositories } = useOctokitGraph();
-  const { tokensLocked, details, github, tokens } = useNetworkSettings();
-  const { network, getURLWithNetwork, colorsToCSS, DefaultTheme } = useNetworkTheme();
+  const { getURLWithNetwork, colorsToCSS } = useNetworkTheme();
+  const { tokensLocked, details, github, tokens, treasury } = useNetworkSettings();
 
   const { dispatch } = useContext(ApplicationContext);
 
@@ -55,7 +52,8 @@ export default function NewNetwork() {
       1: tokensLocked,
       2: details,
       3: github,
-      4: tokens
+      4: tokens,
+      5: treasury
     };
 
     let canGo = false;
@@ -122,74 +120,15 @@ export default function NewNetwork() {
   }
 
   useEffect(() => {
-    if (!network) return;
+    if (!activeNetwork) return;
 
-    if (network.name !== publicRuntimeConfig?.networkConfig?.networkName)
+    if (activeNetwork.name.toLowerCase() !== publicRuntimeConfig?.networkConfig?.networkName.toLowerCase())
       router.push(getURLWithNetwork("/account", { network: publicRuntimeConfig?.networkConfig?.networkName }));
-    else if (!Object.keys(steps.network.data.colors.data).length) {
-      const tmpSteps = Object.assign({}, steps);
-
-      tmpSteps.network.data.colors.data = network.colors || DefaultTheme();
-
-      setSteps(tmpSteps);
-    }
-  }, [network]);
-
-  useEffect(() => {
-    if (user?.login)
-      getUserRepositories(user.login).then(repos => {
-        const repositories = 
-          repos
-          .filter(repo => (!repo.isFork && (user?.login === repo.nameWithOwner.split("/")[0])) || repo.isOrganization)
-          .map(repo => ({
-            checked: false,
-            name: repo.name,
-            fullName: repo.nameWithOwner,
-          }));
-
-        const tmpSteps = Object.assign({}, steps);
-
-        tmpSteps.repositories.data = repositories;
-
-        setSteps(tmpSteps);
-      });
-  }, [user?.login]);
-
-  useEffect(() => {
-    const networkData = steps.network.data;
-
-    if (networkData.colors.data.primary) {
-      const similarColors = [];
-      const colors = networkData.colors.data;
-
-      similarColors.push(...isColorsSimilar({ label: "text", code: colors.text }, [
-          { label: "primary", code: colors.primary },
-          //{ label: 'secondary', code: colors.secondary },
-          { label: "background", code: colors.background },
-          { label: "shadow", code: colors.shadow },
-      ]));
-
-      similarColors.push(...isColorsSimilar({ label: "background", code: colors.background }, [
-          { label: "success", code: colors.success },
-          { label: "fail", code: colors.fail },
-          { label: "warning", code: colors.warning },
-      ]));
-
-      if (
-        !isSameSet(new Set(similarColors), new Set(networkData.colors.similar))
-      ) {
-        const tmpSteps = Object.assign({}, steps);
-
-        tmpSteps.network.data.colors.similar = similarColors;
-
-        setSteps(tmpSteps);
-      }
-    }
-  }, [steps]);
+  }, [activeNetwork]);
 
   return (
     <div className="new-network">
-      <style>{colorsToCSS(steps.network.data.colors.data)}</style>
+      <style>{colorsToCSS(details?.theme?.colors)}</style>
       <ConnectWalletButton asModal={true} />
 
       {(creatingNetwork && <CreatingNetworkLoader />) || ""}
@@ -217,6 +156,12 @@ export default function NewNetwork() {
 
             <TokenConfiguration
               step={4}
+              currentStep={currentStep}
+              handleChangeStep={handleChangeStep}
+            />
+
+            <TreasuryStep
+              step={5}
               currentStep={currentStep}
               handleChangeStep={handleChangeStep}
               handleFinish={handleCreateNetwork}

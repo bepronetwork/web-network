@@ -100,6 +100,12 @@ export interface NetworkSettings {
     bounty: string;
     bountyURI: string;
     validated: boolean;
+  },
+  treasury?: {
+    address?: Field<string>;
+    cancelFee?: number;
+    closeFee?: number;
+    validated?: boolean;
   }
   fields?: {
     [key: string]: {

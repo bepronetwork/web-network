@@ -26,6 +26,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   const [github, setGithub] = useState(DefaultNetworkSettings.github);
   const [tokens, setTokens] = useState(DefaultNetworkSettings.tokens);
   const [details, setDetails] = useState(DefaultNetworkSettings.details);
+  const [treasury, setTreasury] = useState(DefaultNetworkSettings.treasury);
   const [tokensLocked, setTokensLocked] = useState(DefaultNetworkSettings.tokensLocked);
   const [isSettingsValidated, setIsSettingsValidated] = useState(DefaultNetworkSettings.isSettingsValidated);
   
@@ -122,6 +123,15 @@ export const NetworkSettingsProvider = ({ children }) => {
     },
     bountyURI: {
       setter: (value) => setTokens(previous => ({ ...previous, bountyURI: value })),
+    },
+    treasury: {
+      setter: (value) => setTreasury(previous => ({ ...previous, address: { value, validated: undefined } })),
+    },
+    cancelFee: {
+      setter: (value) => setTreasury(previous => ({ ...previous, cancelFee: value })),
+    },
+    closeFee: {
+      setter: (value) => setTreasury(previous => ({ ...previous, closeFee: value })),
     }
   };
 
@@ -170,7 +180,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       ...previous,
       theme: {
         ...previous.theme,
-        colors: DefaultTheme()
+        colors: activeNetwork?.colors || DefaultTheme()
       }
     }));
   }, [wallet?.address, user?.login, DAOService, activeNetwork, isCreating, needsToLoad]);
@@ -199,9 +209,10 @@ export const NetworkSettingsProvider = ({ children }) => {
       tokensLocked?.validated,
       details?.validated,
       github?.validated,
-      tokens?.validated
+      tokens?.validated,
+      treasury?.validated !== false
     ].every( condition => !!condition ));
-  }, [tokensLocked?.validated, details?.validated, github?.validated, tokens?.validated]);
+  }, [tokensLocked?.validated, details?.validated, github?.validated, tokens?.validated, treasury?.validated]);
 
   // Tokens locked validation
   useEffect(() => {
@@ -236,7 +247,6 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     similar.push(...isColorsSimilar({ label: "text", code: colors.text }, [
       { label: "primary", code: colors.primary },
-      //{ label: 'secondary', code: colors.secondary },
       { label: "background", code: colors.background },
       { label: "shadow", code: colors.shadow },
     ]));
@@ -287,14 +297,45 @@ export const NetworkSettingsProvider = ({ children }) => {
     }));
   }, [tokens?.settler, tokens?.bounty, tokens?.bountyURI]);
 
+  // Treasury validation
+  useEffect(() => {
+    if (!DAOService) return;
+
+    if (treasury?.address?.value?.trim() === "")
+      setTreasury(previous => ({
+        ...previous,
+        address: {
+          ...previous.address,
+          validated: undefined
+        },
+        validated: undefined
+      }));
+    else
+      Promise.all([
+        DAOService.isAddress(treasury?.address?.value),
+        treasury?.cancelFee >= 0 && treasury?.cancelFee <= 100,
+        treasury?.closeFee >= 0 && treasury?.closeFee <= 100
+      ]).then((validations) => {
+        setTreasury(previous => ({
+          ...previous,
+          address: {
+            ...previous.address,
+            validated: validations[0]
+          },
+          validated: validations.every(condition => condition)
+        }));
+      });
+  }, [DAOService, treasury?.address?.value, treasury?.cancelFee, treasury?.closeFee]);
+
   const memorizedValue = useMemo<NetworkSettings>(() => ({
     tokensLocked,
     details,
     github,
     tokens,
+    treasury,
     isSettingsValidated,
     fields: Fields
-  }), [tokensLocked, details, github, tokens, isSettingsValidated, Fields]);
+  }), [tokensLocked, details, github, tokens, treasury, isSettingsValidated, Fields]);
 
   return (
     <NetworkSettingsContext.Provider value={memorizedValue}>
