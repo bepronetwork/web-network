@@ -2,13 +2,13 @@ import React from "react";
 
 import { formatNumberToString } from "helpers/formatNumber";
 
-import { IDistribuitonPerUser } from "interfaces/proposal";
+import { DistribuitonPerUser } from "interfaces/proposal";
 
 
 import Avatar from "./avatar";
 
 interface IProposalProgressProps {
-  usersDistribution: IDistribuitonPerUser[];
+  usersDistribution: DistribuitonPerUser[];
 }
 
 export default function ProposalProgress({

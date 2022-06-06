@@ -2,40 +2,29 @@ import React from "react";
 
 import { useTranslation } from "next-i18next";
 
-import { IActiveIssue } from "contexts/issue";
+import NothingFound from "components/nothing-found";
+import PullRequestItem from "components/pull-request-item";
 
-import { BountyExtended } from "interfaces/bounty";
+import { useIssue } from "contexts/issue";
 
-import NothingFound from "./nothing-found";
-import PullRequestItem from "./pull-request-item";
-
-interface IIssuePullRequestProps {
-  issue: IActiveIssue;
-  networkIssue: BountyExtended;
-  className: string;
-}
-
-export default function IssuePullRequests({
-  issue,
-  className,
-  networkIssue
-}: IIssuePullRequestProps) {
+export default function IssuePullRequests() {
   const { t } = useTranslation("pull-request");
 
+  const { activeIssue, networkIssue } = useIssue();
+
+  const hasPullRequests = !!activeIssue?.pullRequests?.length;
+
   return (
-    <div
-      className={`content-wrapper ${className || ""} pt-0 ${
-        (issue?.pullRequests?.length > 0 && "pb-0") || "pb-3"
-      }`}
-    >
-      {(issue?.pullRequests?.length > 0 &&
-        React.Children.toArray(issue?.pullRequests?.map((pullRequest) => (
+    <div className={`content-wrapper border-top-0 pt-0 ${ (hasPullRequests && "pb-0") || "pb-3" }`}>
+      {hasPullRequests &&
+        React.Children.toArray(activeIssue?.pullRequests?.map((pullRequest) => (
             <PullRequestItem
-              issue={issue}
               pullRequest={pullRequest}
               networkPullRequest={networkIssue?.pullRequests?.find(pr => +pr.id === +pullRequest.contractId)}
             />
-          )))) || <NothingFound description={t("errors.not-found")} />}
+          ))) || 
+        <NothingFound description={t("errors.not-found")} />
+      }
     </div>
   );
 }
