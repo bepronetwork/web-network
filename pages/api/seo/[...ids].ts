@@ -68,7 +68,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const background = `${baseUrl}/images/bg-bounty-card.png`;
     const logo = `${baseUrl}/images/bepro-icon.png`;
     const font = `${baseUrl}/fonts/SpaceGrotesk.woff2`;
-    const { data: html } = await axios.get(`${baseUrl}/templates/seo/bounty.html`)
+    const { data: html } = await axios.get(`${baseUrl}/templates/seo/bounty.hbs`)
 
     const content = {
       state: issue.state,
@@ -92,7 +92,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     })
 
     if (!card) return;
-
+    
     const img = Buffer.from(card as string);
     const { hash } = await IpfsStorage.add(img).catch((e) => {
       console.log("Failed to upload to IPFS", e);
