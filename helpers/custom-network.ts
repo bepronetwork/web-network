@@ -1,10 +1,9 @@
-import { nativeZeroAddress } from "@taikai/dappkit/dist/src/utils/constants";
+import { Defaults } from "@taikai/dappkit";
 import getConfig from "next/config";
 
 import { Network, Repository, ThemeColors } from "interfaces/network";
 
 const { publicRuntimeConfig } = getConfig();
-
 
 export const DefaultNetworkSettings = {
   isSettingsValidated: false,
@@ -54,55 +53,29 @@ export const DefaultNetworkSettings = {
   },
   treasury: {
     address: {
-      value: nativeZeroAddress,
+      value: Defaults.nativeZeroAddress,
       validated: undefined
     },
     cancelFee: 1,
     closeFee: 5,
     validated: false
-  }
-};
-
-export const DefaultNetworkInformation = {
-  lock: {
-    validated: false,
-    amountLocked: 0,
-    amountNeeded: 0
   },
-  network: {
-    validated: false,
-    data: {
-      logoIcon: {
-        preview: "",
-        raw: undefined as File
-      },
-      fullLogo: {
-        preview: "",
-        raw: undefined as File
-      },
-      displayName: {
-        data: "",
-        validated: undefined
-      },
-      networkDescription: "",
-      colors: {
-        data: {} as ThemeColors,
-        similar: [] as string[],
-        black: [] as string[]
-      }
-    }
-  },
-  repositories: {
-    validated: false,
-    data: [],
-    permission: false
-  },
-  tokens: {
-    validated: false,
-    networkToken: '',
-    nftToken: {
-      address: '',
-      error: false
+  parameters: {
+    draftTime: {
+      value: 0,
+      validated: undefined
+    },
+    disputableTime: {
+      value: 0,
+      validated: undefined
+    },
+    percentageNeededForDispute: {
+      value: 0,
+      validated: undefined
+    },
+    councilAmount: {
+      value: 0,
+      validated: undefined
     }
   }
 };

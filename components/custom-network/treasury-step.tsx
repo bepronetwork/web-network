@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { nativeZeroAddress } from "@taikai/dappkit/dist/src/utils/constants";
+import { Defaults } from "@taikai/dappkit";
 import { useTranslation } from "next-i18next";
 
 import Step from "components/step";
@@ -15,7 +15,7 @@ export default function TreasuryStep({
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
 
-  const [address, setAddress] = useState(nativeZeroAddress);
+  const [address, setAddress] = useState(Defaults.nativeZeroAddress);
   const [closeFee, setCloseFee] = useState(5);
   const [cancelFee, setCancelFee] = useState(1);
   
