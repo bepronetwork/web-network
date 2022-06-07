@@ -123,7 +123,13 @@
   "modals": {
     "loader": {
       "being-prepared": "Your network is being prepared",
-      "dont-close-window": "Please, don't close this window"
+      "dont-close-window": "Please, don't close this window",
+      "steps": {
+        "deploy-network": "Deploying Network_v2",
+        "set-dispatcher": "Setting Bounty Token Dispatcher",
+        "add-to-registry": "Registering Network_v2",
+        "sync-web-network": "Synchronizing Web-network"
+      }
     },
     "update-github-token": {
       "title": "Update your Github Token",
