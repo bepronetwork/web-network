@@ -1,3 +1,4 @@
+import { nativeZeroAddress } from "@taikai/dappkit/dist/src/utils/constants";
 import getConfig from "next/config";
 
 import { Network, Repository, ThemeColors } from "interfaces/network";
@@ -53,7 +54,7 @@ export const DefaultNetworkSettings = {
   },
   treasury: {
     address: {
-      value: "",
+      value: nativeZeroAddress,
       validated: undefined
     },
     cancelFee: 1,

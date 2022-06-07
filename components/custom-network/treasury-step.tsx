@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { nativeZeroAddress } from "@taikai/dappkit/dist/src/utils/constants";
 import { useTranslation } from "next-i18next";
 
 import Step from "components/step";
@@ -14,7 +15,7 @@ export default function TreasuryStep({
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
 
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState(nativeZeroAddress);
   const [closeFee, setCloseFee] = useState(5);
   const [cancelFee, setCancelFee] = useState(1);
   
@@ -49,7 +50,7 @@ export default function TreasuryStep({
       title={t("custom-network:steps.treasury.title")}
       index={step}
       activeStep={currentStep}
-      validated={treasury.validated}
+      validated={treasury.validated !== false}
       handleClick={handleChangeStep}
       finishLabel={t("custom-network:steps.repositories.submit-label")}
       handleFinish={handleFinish}
