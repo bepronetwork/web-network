@@ -418,6 +418,103 @@ export default function useBepro(props?: IUseBeProDefault) {
     });
   }
 
+  async function handleDeployNetworkV2(networkToken: string, 
+                                       nftToken: string, 
+                                       nftUri: string,
+                                       treasuryAddress: string,
+                                       cancelFee: number,
+                                       closeFee: number): Promise<TransactionReceipt | Error> {
+    return new Promise(async (resolve, reject) => {
+      const transaction = addTransaction({ type: TransactionTypes.deployNetworkV2 }, activeNetwork);
+
+      dispatch(transaction);
+
+      await DAOService.deployNetworkV2(networkToken, 
+                                       nftToken, 
+                                       nftUri,
+                                       treasuryAddress,
+                                       cancelFee,
+                                       closeFee)
+        .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
+          txWindow.updateItem(transaction.payload.id, parseTransaction(txInfo, transaction.payload));
+          onSuccess?.();
+          resolve(txInfo);
+        })
+        .catch((err: { message: string; }) => {
+          if (err?.message?.search("User denied") > -1)
+            dispatch(updateTransaction({
+              ...(transaction.payload as BlockTransaction),
+              remove: true
+            }));
+          else
+            dispatch(updateTransaction({
+              ...(transaction.payload as BlockTransaction),
+              status: TransactionStatus.failed
+            }));
+          onError?.(err);
+          reject(err);
+        });
+    });
+  }
+
+  async function handleSetDispatcher(nftToken: string, networkAddress: string): Promise<TransactionReceipt | Error> {
+    return new Promise(async (resolve, reject) => {
+      const transaction = addTransaction({ type: TransactionTypes.setNFTDispatcher }, activeNetwork);
+
+      dispatch(transaction);
+
+      await DAOService.setNFTTokenDispatcher(nftToken, networkAddress)
+        .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
+          txWindow.updateItem(transaction.payload.id,  parseTransaction(txInfo, transaction.payload));
+          onSuccess?.();
+          resolve(txInfo);
+        })
+        .catch((err: { message: string; }) => {
+          if (err?.message?.search("User denied") > -1)
+            dispatch(updateTransaction({
+              ...(transaction.payload as BlockTransaction),
+              remove: true
+            }));
+          else
+            dispatch(updateTransaction({
+              ...(transaction.payload as BlockTransaction),
+              status: TransactionStatus.failed
+            }));
+          onError?.(err);
+          reject(err);
+        });
+    });
+  }
+
+  async function handleAddNetworkToRegistry(networkAddress: string): Promise<TransactionReceipt | Error> {
+    return new Promise(async (resolve, reject) => {
+      const transaction = addTransaction({ type: TransactionTypes.addNetworkToRegistry }, activeNetwork);
+
+      dispatch(transaction);
+
+      await DAOService.addNetworkToRegistry(networkAddress)
+        .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
+          txWindow.updateItem(transaction.payload.id,  parseTransaction(txInfo, transaction.payload));
+          onSuccess?.();
+          resolve(txInfo);
+        })
+        .catch((err: { message: string; }) => {
+          if (err?.message?.search("User denied") > -1)
+            dispatch(updateTransaction({
+              ...(transaction.payload as BlockTransaction),
+              remove: true
+            }));
+          else
+            dispatch(updateTransaction({
+              ...(transaction.payload as BlockTransaction),
+              status: TransactionStatus.failed
+            }));
+          onError?.(err);
+          reject(err);
+        });
+    });
+  }
+
   return {
     handlerDisputeProposal,
     handleCloseIssue,
@@ -429,6 +526,9 @@ export default function useBepro(props?: IUseBeProDefault) {
     handleMakePullRequestReady,
     handleUpdateBountyAmount,
     handleCancelPullRequest,
-    handleRefuseByOwner
+    handleRefuseByOwner,
+    handleDeployNetworkV2,
+    handleSetDispatcher,
+    handleAddNetworkToRegistry
   };
 }
