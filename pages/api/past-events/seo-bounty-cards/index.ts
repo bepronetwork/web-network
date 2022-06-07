@@ -1,56 +1,77 @@
+import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
+import nodeHtmlToImage from "node-html-to-image";
 
 import models from "db/models";
 
-// import { generateCard } from "helpers/seo/create-card-bounty";
+import IpfsStorage from "services/ipfs-service";
 
-// import IpfsStorage from "services/ipfs-service";
+const { publicRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const include = [
-    { association: "developers" },
-    { association: "pullRequests" },
-    { association: "mergeProposals" },
-    { association: "repository" },
-    { association: "token" },
-  ];
+  try {
+    const include = [
+      { association: "developers" },
+      { association: "pullRequests" },
+      { association: "mergeProposals" },
+      { association: "repository" },
+      { association: "token" },
+    ];
 
-  const issues = await models.issue.findAll({
-    include
-  });
+    const issues = await models.issue.findAll({
+      include
+    });
 
-  if (issues?.length < 1) return res.status(400).json("issues not find");
+    if (issues?.length < 1) return res.status(400).json("issues not find");
 
-  // const created = [];
+    const created = [];
 
-  // for (const issue of issues) {
-    // const [, repo] = issue?.repository.githubPath.split("/");
-    // const [, ghId] = issue?.issueId.split("/");
+    const baseUrl = publicRuntimeConfig.homeUrl;
+    const background = `${baseUrl}/images/bg-bounty-card.png`;
+    const logo = `${baseUrl}/images/bepro-icon.png`;
+    const font = `${baseUrl}/fonts/SpaceGrotesk.woff2`;
+    const { data: html } = await axios.get(`${baseUrl}/templates/seo/bounty.html`)
 
-    // console.log("Parsing issue", issue?.issueId, repo, issue?.title);
+    for (const issue of issues) {
+      const repo = issue?.repository?.githubPath?.split("/");
+      const ghId = issue?.issueId?.split("/");
 
-    // const card = await generateCard({
-    //   state: issue?.state,
-    //   issueId: ghId,
-    //   title: issue?.title,
-    //   repo,
-    //   ammount: issue?.amount,
-    //   working: issue?.working?.length || 0,
-    //   pr: issue?.pullRequests?.length || 0,
-    //   proposal: issue?.mergeProposals?.length || 0,
-    //   currency: issue?.token?.symbol
-    // });
+      const content = {
+        state: issue.state,
+        issueId: ghId[1],
+        title: issue.title,
+        repo: repo[1],
+        ammount: new Intl.NumberFormat('en').format(issue?.amount || 0),
+        working: issue.working?.length || 0,
+        proposals: issue?.mergeProposals?.length || 0,
+        pullRequests: issue.pullRequests?.length || 0,
+        currency: issue?.token?.symbol,
+        background,
+        logo,
+        font,
+      }
 
-    // const data = Buffer.from(card.buffer);
-    // const response = await IpfsStorage.add(data);
+      const card = await nodeHtmlToImage({
+        html,
+        type: "jpeg",
+        content
+      });
 
-    // if (response && response.hash) {
-    //   await issue.update({ seoImage: response.hash });
-    //   created.push({ issueId: issue?.issueId, seoImage: response.hash });
-    // }
-  // }
+      const data = Buffer.from(card as string);
+      const response = await IpfsStorage.add(data);
 
-  return res.status(200).json('created');
+      if (response && response.hash) {
+        await issue.update({ seoImage: response.hash });
+        created.push({ issueId: issue?.issueId, seoImage: response.hash });
+      }
+    }
+
+    return res.status(200).json(created);
+  } catch (e) {
+    console.error(e)
+    return res.status(500).json('Internal Error')
+  }
 }
 
 export default async function GetIssues(req: NextApiRequest,

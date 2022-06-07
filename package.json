@@ -51,6 +51,7 @@
     "next-i18next": "^10.5.0",
     "next-seo": "^5.1.0",
     "nextjs-cors": "^2.1.1",
+    "node-html-to-image": "^3.2.4",
     "nookies": "^2.5.2",
     "octokit": "1.7.1",
     "pg": "^8.7.3",
@@ -72,6 +73,7 @@
     "yargs": "^17.4.0"
   },
   "devDependencies": {
+    "@metamask/providers": "^8.1.1",
     "@octokit/types": "^6.34.0",
     "@types/cookie": "^0.4.1",
     "@types/cors": "^2.8.12",
@@ -83,7 +85,6 @@
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.15.0",
     "@typescript-eslint/parser": "^5.15.0",
-    "@metamask/providers": "^8.1.1",
     "eslint": "8.11.0",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-import-helpers": "^1.2.1",

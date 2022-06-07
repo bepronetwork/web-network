@@ -10,8 +10,8 @@ const port = serverRuntimeConfig?.infura?.port || "5001";
 const auth =
   "Basic " +
   Buffer.from(serverRuntimeConfig?.infura?.projectId +
-      ":" +
-      serverRuntimeConfig?.infura?.projectSecret).toString("base64");
+    ":" +
+    serverRuntimeConfig?.infura?.projectSecret).toString("base64");
 const baseURL = `https://${host}:${port}/api/v0`;
 
 export async function add(file: Buffer | string,
@@ -53,7 +53,6 @@ export async function add(file: Buffer | string,
                                     {
       headers
                                     });
-  console.log({ data });
   return { hash: data.Hash, fileName: data.Name, size: data.Size };
 }
 
