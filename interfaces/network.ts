@@ -106,7 +106,13 @@ export interface NetworkSettings {
     cancelFee?: number;
     closeFee?: number;
     validated?: boolean;
-  }
+  },
+  parameters?: {
+    draftTime?: Field<number>;
+    disputableTime?: Field<number>;
+    percentageNeededForDispute?: Field<number>;
+    councilAmount?: Field<number>;
+  },
   fields?: {
     [key: string]: {
       setter: (value, value2?) => void;

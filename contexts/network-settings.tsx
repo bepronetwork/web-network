@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
+import getConfig from "next/config";
 import { useRouter } from "next/router";
 
 import { useAuthentication } from "contexts/authentication";
@@ -16,9 +17,27 @@ import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
 import useOctokitGraph from "x-hooks/use-octokit-graph";
 
+const { publicRuntimeConfig } = getConfig();
+
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
 
 const ALLOWED_PATHS = ["/new-network", "/[network]/account/my-network/settings"];
+
+const LIMITS = {
+  percentageNeededForDispute: { min: +publicRuntimeConfig?.networkConfig?.disputesPercentage },
+  draftTime: {
+    min: +publicRuntimeConfig?.networkConfig?.reedemTime?.min,
+    max: +publicRuntimeConfig?.networkConfig?.reedemTime?.max,
+  },
+  disputableTime: {
+    min: +publicRuntimeConfig?.networkConfig?.disputableTime?.min,
+    max: +publicRuntimeConfig?.networkConfig?.disputableTime?.max,
+  },
+  councilAmount: {
+    min: +publicRuntimeConfig?.networkConfig?.councilAmount?.min,
+    max: +publicRuntimeConfig?.networkConfig?.councilAmount?.max
+  }
+};
 
 export const NetworkSettingsProvider = ({ children }) => {
   const router = useRouter();
@@ -27,6 +46,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   const [tokens, setTokens] = useState(DefaultNetworkSettings.tokens);
   const [details, setDetails] = useState(DefaultNetworkSettings.details);
   const [treasury, setTreasury] = useState(DefaultNetworkSettings.treasury);
+  const [parameters, setParameters] = useState(DefaultNetworkSettings.parameters);
   const [tokensLocked, setTokensLocked] = useState(DefaultNetworkSettings.tokensLocked);
   const [isSettingsValidated, setIsSettingsValidated] = useState(DefaultNetworkSettings.isSettingsValidated);
   
@@ -111,33 +131,45 @@ export const NetworkSettingsProvider = ({ children }) => {
 
         return { ...previous, repositories: tmpRepositories };
       }),
+      validator: value => value.some((repository) => repository.checked)
     },
     permission: {
-      setter: (value) => setGithub(previous => ({ ...previous, botPermission: value }))
+      setter: value => setGithub(previous => ({ ...previous, botPermission: value }))
     },
     settlerToken: {
-      setter: (value) => setTokens(previous => ({ ...previous, settler: value })),
+      setter: value => setTokens(previous => ({ ...previous, settler: value })),
     },
     bountyToken: {
-      setter: (value) => setTokens(previous => ({ ...previous, bounty: value })),
+      setter: value => setTokens(previous => ({ ...previous, bounty: value })),
     },
     bountyURI: {
-      setter: (value) => setTokens(previous => ({ ...previous, bountyURI: value })),
+      setter: value => setTokens(previous => ({ ...previous, bountyURI: value })),
     },
     treasury: {
-      setter: (value) => setTreasury(previous => ({ ...previous, address: { value, validated: undefined } })),
+      setter: value => setTreasury(previous => ({ ...previous, address: { value, validated: undefined } })),
     },
     cancelFee: {
-      setter: (value) => setTreasury(previous => ({ ...previous, cancelFee: value })),
+      setter: value => setTreasury(previous => ({ ...previous, cancelFee: value })),
     },
     closeFee: {
-      setter: (value) => setTreasury(previous => ({ ...previous, closeFee: value })),
+      setter: value => setTreasury(previous => ({ ...previous, closeFee: value })),
+    },
+    parameter: {
+      setter: value => setParameters(previous => ({ ...previous, [value.label]: value.value })),
+      validator: 
+        (parameter, value) => value >= (LIMITS[parameter].min || value) && value <= (LIMITS[parameter].max || value)
     }
   };
 
   // Getting external data
   useEffect(() => {
-    if (!wallet?.address || !user?.login || !DAOService || (!activeNetwork && !isCreating) || !needsToLoad) return;
+    if ( !wallet?.address || 
+         !user?.login || 
+         !DAOService || 
+         !activeNetwork?.name || 
+         !activeNetwork?.councilAmount || 
+         !needsToLoad ) 
+      return;
 
     getUserRepositories(user.login)
       .then(async (githubRepositories) => {
@@ -180,10 +212,29 @@ export const NetworkSettingsProvider = ({ children }) => {
       ...previous,
       theme: {
         ...previous.theme,
-        colors: activeNetwork?.colors || DefaultTheme()
+        colors: isCreating && DefaultTheme() || activeNetwork?.colors,
+        ...(isCreating && {} || {
+          name: activeNetwork?.name,
+          description: activeNetwork?.description,
+        })
       }
     }));
-  }, [wallet?.address, user?.login, DAOService, activeNetwork, isCreating, needsToLoad]);
+
+    if (isCreating)
+      setParameters(previous => ({
+        ...previous,
+        draftTime: { value: activeNetwork.draftTime, validated: true },
+        disputableTime: { value: activeNetwork.disputableTime, validated: true },
+        percentageNeededForDispute: { value: activeNetwork.percentageNeededForDispute, validated: true },
+        councilAmount: { value: activeNetwork.councilAmount, validated: true },
+      }));
+  }, [ wallet?.address, 
+       user?.login, 
+       DAOService, 
+       activeNetwork?.name, 
+       activeNetwork?.councilAmount, 
+       isCreating, 
+       needsToLoad ]);
 
   useEffect(() => {
     if (wallet?.balance)
@@ -272,7 +323,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     if (!github?.repositories?.length) return;
 
     const validated = [
-      github?.repositories?.some((repository) => repository.checked),
+      Fields.repository.validator(github?.repositories),
       github?.botPermission
     ].every(condition => condition);
 
@@ -327,6 +378,33 @@ export const NetworkSettingsProvider = ({ children }) => {
       });
   }, [DAOService, treasury?.address?.value, treasury?.cancelFee, treasury?.closeFee]);
 
+  // Parameters Validation
+  useEffect(() => {
+    setParameters(previous => ({
+      ...previous,
+      draftTime: { 
+        ...previous.draftTime,
+        validated: Fields.parameter.validator("draftTime", parameters?.draftTime?.value)
+      },
+      councilAmount: { 
+        ...previous.councilAmount,
+        validated: Fields.parameter.validator("councilAmount", parameters?.councilAmount?.value)
+      },
+      disputableTime: { 
+        ...previous.disputableTime,
+        validated: Fields.parameter.validator("disputableTime", parameters?.disputableTime?.value)
+      },
+      percentageNeededForDispute: { 
+        ...previous.percentageNeededForDispute,
+        validated: 
+          Fields.parameter.validator("percentageNeededForDispute", parameters?.percentageNeededForDispute?.value)
+      }
+    }));
+  }, [ parameters?.councilAmount?.value, 
+       parameters?.disputableTime?.value, 
+       parameters?.draftTime?.value, 
+       parameters?.percentageNeededForDispute?.value ]);
+
   const memorizedValue = useMemo<NetworkSettings>(() => ({
     tokensLocked,
     details,
@@ -334,8 +412,9 @@ export const NetworkSettingsProvider = ({ children }) => {
     tokens,
     treasury,
     isSettingsValidated,
+    parameters,
     fields: Fields
-  }), [tokensLocked, details, github, tokens, treasury, isSettingsValidated, Fields]);
+  }), [tokensLocked, details, github, tokens, treasury, parameters, isSettingsValidated, Fields]);
 
   return (
     <NetworkSettingsContext.Provider value={memorizedValue}>
