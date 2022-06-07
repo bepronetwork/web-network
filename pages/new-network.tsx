@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 
+import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -26,6 +27,7 @@ import { addToast } from "contexts/reducers/add-toast";
 import { psReadAsText } from "helpers/file-reader";
 
 import useApi from "x-hooks/use-api";
+import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network";
 
 const { publicRuntimeConfig } = getConfig();
@@ -36,7 +38,7 @@ export default function NewNetwork() {
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [creatingNetwork, setCreatingNetwork] = useState(false);
+  const [creatingNetwork, setCreatingNetwork] = useState<number>();
 
   const { createNetwork } = useApi();
   const { activeNetwork } = useNetwork();
@@ -44,8 +46,28 @@ export default function NewNetwork() {
   const { user, wallet } = useAuthentication();
   const { getURLWithNetwork, colorsToCSS } = useNetworkTheme();
   const { tokensLocked, details, github, tokens, treasury } = useNetworkSettings();
+  const { handleDeployNetworkV2, handleSetDispatcher, handleAddNetworkToRegistry } = useBepro();
 
   const { dispatch } = useContext(ApplicationContext);
+
+  const creationSteps = [
+    {
+      id: 1,
+      name: t("custom-network:modals.loader.steps.deploy-network"),
+    },
+    {
+      id: 2,
+      name: t("custom-network:modals.loader.steps.set-dispatcher")
+    },
+    {
+      id: 3,
+      name: t("custom-network:modals.loader.steps.add-to-registry"),
+    },
+    {
+      id: 4,
+      name: t("custom-network:modals.loader.steps.sync-web-network")
+    },
+  ];
 
   function handleChangeStep(stepToGo: number) {
     const stepsNames = {
@@ -69,41 +91,53 @@ export default function NewNetwork() {
   async function handleCreateNetwork() {
     if (!user?.login || !wallet?.address || !DAOService) return;
 
-    setCreatingNetwork(true);
+    setCreatingNetwork(0);
 
-    DAOService.createNetwork(steps.tokens.networkToken, steps.tokens.nftToken.address)
+    const deployNetworkTX = await handleDeployNetworkV2(tokens.settler,
+                                                        tokens.bounty,
+                                                        tokens.bountyURI,
+                                                        treasury.address.value,
+                                                        treasury.cancelFee,
+                                                        treasury.closeFee).catch(error => error);
+
+    if (!(deployNetworkTX as TransactionReceipt)?.contractAddress) return setCreatingNetwork(undefined);
+
+    const deployedNetworkAddress = (deployNetworkTX as TransactionReceipt).contractAddress;
+
+    setCreatingNetwork(1);
+
+    await handleSetDispatcher(tokens.bounty, deployedNetworkAddress)
+      .catch(error => console.error("Failed to set dispatcher", deployedNetworkAddress, error));
+
+    setCreatingNetwork(2);
+
+    await handleAddNetworkToRegistry(deployedNetworkAddress)
+      .catch(error => console.error("Failed to add to registry", deployedNetworkAddress, error));
+
+    setCreatingNetwork(3);
+
+    const payload = {
+      name: details.name.value,
+      description: details.description,
+      colors: JSON.stringify(details.theme.colors),
+      logoIcon: await psReadAsText(details.iconLogo.value.raw),
+      fullLogo: await psReadAsText(details.fullLogo.value.raw),
+      repositories: 
+        JSON.stringify(github.repositories
+          .filter((repo) => repo.checked)
+          .map(({ name, fullName }) => ({ name, fullName }))),
+      botPermission: github.botPermission,
+      creator: wallet.address,
+      githubLogin: user.login,
+      networkAddress: deployedNetworkAddress,
+      accessToken: user.accessToken
+    };
+
+    await createNetwork(payload)
       .then(() => {
-        DAOService.getNetworkAdressByCreator(wallet.address).then(async (networkAddress) => {
-          const networkData = steps.network.data;
-          const repositoriesData = steps.repositories;
+        router.push(getURLWithNetwork("/account/my-network/settings", { network: payload.name }));
 
-          await DAOService.claimNetworkGovernor(networkAddress);
-          await DAOService.setNFTTokenDispatcher(steps.tokens.nftToken.address, networkAddress);
-
-          const json = {
-              name: networkData.displayName.data,
-              description: networkData.networkDescription,
-              colors: JSON.stringify(networkData.colors.data),
-              logoIcon: await psReadAsText(networkData.logoIcon.raw),
-              fullLogo: await psReadAsText(networkData.fullLogo.raw),
-              repositories: JSON.stringify(repositoriesData.data
-                  .filter((repo) => repo.checked)
-                  .map(({ name, fullName }) => ({ name, fullName }))),
-              botPermission: repositoriesData.permission,
-              creator: wallet.address,
-              githubLogin: user.login,
-              networkAddress,
-              accessToken: user?.accessToken,
-          };
-
-          createNetwork(json).then(() => {
-            router.push(getURLWithNetwork("/account/my-network/settings", {
-                  network: json.name,
-            }));
-
-            setCreatingNetwork(false);
-          });
-        });
+        setCreatingNetwork(undefined);
       })
       .catch((error) => {
         dispatch(addToast({
@@ -114,8 +148,8 @@ export default function NewNetwork() {
             }),
         }));
 
-        setCreatingNetwork(false);
-        console.log(error);
+        setCreatingNetwork(undefined);
+        console.error("Failed synchronize network with web-network", deployedNetworkAddress, error);
       });
   }
 
@@ -131,7 +165,11 @@ export default function NewNetwork() {
       <style>{colorsToCSS(details?.theme?.colors)}</style>
       <ConnectWalletButton asModal={true} />
 
-      {(creatingNetwork && <CreatingNetworkLoader />) || ""}
+      {
+        (creatingNetwork !== undefined && 
+        <CreatingNetworkLoader currentStep={creatingNetwork} steps={creationSteps} />) || 
+        ""
+      }
 
       <CustomContainer>
         <div className="mt-5 pt-5">
