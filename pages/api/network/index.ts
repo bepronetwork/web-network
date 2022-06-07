@@ -62,10 +62,10 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const DAOService = new DAO(true);
 
     if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
-    if (!await DAOService.loadFactory()) return res.status(500).json("Failed to load factory contract");
+    if (!await DAOService.loadRegistry()) return res.status(500).json("Failed to load registry");
 
-    const creatorAmount = await DAOService.getFactoryCreatorAmount();
-    const lockedAmount = await DAOService.getTokensLockedInFactoryByAddress(creator);
+    const creatorAmount = await DAOService.getRegistryCreatorAmount();
+    const lockedAmount = await DAOService.getTokensLockedInRegistryByAddress(creator);
     const checkingNetworkAddress = await DAOService.getNetworkAdressByCreator(creator);
 
     if (lockedAmount < creatorAmount) return res.status(403).json("Insufficient locked amount");
@@ -106,7 +106,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         owner,
         repo,
         username: publicRuntimeConfig?.github?.user,
-        permission: 'maintain'
+        ...(githubLogin !== owner  && { permission: "maintain"} || {})
       });
 
       if (data?.id) invitations.push(data?.id);
@@ -208,7 +208,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       const DAOService = new DAO(true);
 
       if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
-      if (!await DAOService.loadFactory()) return res.status(500).json("Failed to load factory contract");
+      if (!await DAOService.loadRegistry()) return res.status(500).json("Failed to load factory contract");
 
       const checkingNetworkAddress = await DAOService.getNetworkAdressByCreator(creator);
 
@@ -295,7 +295,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
           owner,
           repo,
           username: publicRuntimeConfig?.github?.user,
-          permission: 'maintain'
+          ...(githubLogin !== owner  && { permission: "maintain"} || {})
         });
 
         if (data?.id) invitations.push(data?.id);
