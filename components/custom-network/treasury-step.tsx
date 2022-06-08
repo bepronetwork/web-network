@@ -82,7 +82,7 @@ export default function TreasuryStep({
 
         <div className="form-group col-3">
           <label className="caption-small mb-2">
-            {t("custom-network:steps.treasury.fields.cancel-fee.label")}
+            {t("custom-network:steps.treasury.fields.cancel-fee.label")} (%)
           </label>
 
           <input 
@@ -96,7 +96,7 @@ export default function TreasuryStep({
 
         <div className="form-group col-3">
           <label className="caption-small mb-2">
-            {t("custom-network:steps.treasury.fields.close-fee.label")}
+            {t("custom-network:steps.treasury.fields.close-fee.label")} (%)
           </label>
 
           <input 
