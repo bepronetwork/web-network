@@ -64,8 +64,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
     if (!await DAOService.loadRegistry()) return res.status(500).json("Failed to load registry");
 
-    const creatorAmount = await DAOService.getRegistryCreatorAmount();
-    const lockedAmount = await DAOService.getTokensLockedInRegistryByAddress(creator);
     const checkingNetworkAddress = await DAOService.getNetworkAdressByCreator(creator);
 
     if (checkingNetworkAddress !== networkAddress)
