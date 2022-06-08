@@ -23,16 +23,19 @@ export default function ImageUploader({
   };
 
   function handleChange(event) {
-    if (event.target.files.length)
-      setImage({
-        preview: URL.createObjectURL(event.target.files[0]),
-        raw: event.target.files[0]
-      });
+    if (!event.target.files.length) return;
+    const newImage = {
+      preview: URL.createObjectURL(event.target.files[0]),
+      raw: event.target.files[0]
+    };
+    
+    setImage(newImage);
+    onChange(image);
   }
 
   useEffect(() => {
-    onChange(image);
-  }, [image]);
+    setImage(value);
+  }, [value]);
 
   return (
     <div className="d-flex flex-column align-items-center justify-content-center">

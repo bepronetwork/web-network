@@ -136,7 +136,7 @@ export default function Settings() {
 
         if (activeNetwork.percentageNeededForDispute !== parameters.percentageNeededForDispute.value)
           await DAOService.setNetworkParameter("percentageNeededForDispute", 
-                                               parameters.percentageNeededForDispute.value)
+                                               parameters.percentageNeededForDispute.value * 10000)
           .catch(console.log);
 
         dispatch(addToast({
@@ -225,19 +225,31 @@ export default function Settings() {
   }
 
   function handleDisputableTimeChange({ floatValue }) {
-    fields.parameter.setter("disputableTime", floatValue);
+    fields.parameter.setter({
+      label: "disputableTime", 
+      value: floatValue
+    });
   }
 
   function handlePercentageNeededForDisputeChange({ floatValue }) {
-    fields.parameter.setter("percentageNeededForDispute", floatValue);
+    fields.parameter.setter({
+      label: "percentageNeededForDispute", 
+      value: floatValue
+    });
   }
 
   function handleDraftTimeChange({ floatValue }) {
-    fields.parameter.setter("draftTime", floatValue);
+    fields.parameter.setter({
+      label: "draftTime", 
+      value: floatValue
+    });
   }
 
   function handleCouncilAmountChange({ floatValue }) {
-    fields.parameter.setter("councilAmount", floatValue);
+    fields.parameter.setter({
+      label: "councilAmount", 
+      value: floatValue
+    });
   }
 
   useEffect(() => {

@@ -19,12 +19,14 @@ import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 const { publicRuntimeConfig } = getConfig();
 
+const IPFS_URL = publicRuntimeConfig?.ipfsUrl;
+
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
 
 const ALLOWED_PATHS = ["/new-network", "/[network]/account/my-network/settings"];
 
 const LIMITS = {
-  percentageNeededForDispute: { min: +publicRuntimeConfig?.networkConfig?.disputesPercentage },
+  percentageNeededForDispute: { max: +publicRuntimeConfig?.networkConfig?.disputesPercentage },
   draftTime: {
     min: +publicRuntimeConfig?.networkConfig?.reedemTime?.min,
     max: +publicRuntimeConfig?.networkConfig?.reedemTime?.max,
@@ -155,7 +157,10 @@ export const NetworkSettingsProvider = ({ children }) => {
       setter: value => setTreasury(previous => ({ ...previous, closeFee: value })),
     },
     parameter: {
-      setter: value => setParameters(previous => ({ ...previous, [value.label]: value.value })),
+      setter: value => setParameters(previous => ({ 
+        ...previous, 
+        [value.label]: { value: value.value, validated: undefined },  
+      })),
       validator: 
         (parameter, value) => value >= (LIMITS[parameter].min || value) && value <= (LIMITS[parameter].max || value)
     }
@@ -213,14 +218,31 @@ export const NetworkSettingsProvider = ({ children }) => {
       theme: {
         ...previous.theme,
         colors: isCreating && DefaultTheme() || activeNetwork?.colors,
-        ...(isCreating && {} || {
-          name: activeNetwork?.name,
-          description: activeNetwork?.description,
-        })
-      }
+      },
+      ...(isCreating && {} || {
+        name: {
+          value: activeNetwork?.name,
+          validated: true
+        },
+        description: activeNetwork?.description,
+        fullLogo: {
+          ...previous.fullLogo,
+          value: {
+            ...previous.fullLogo.value,
+            preview: `${IPFS_URL}/${activeNetwork.fullLogo}`
+          }
+        },
+        iconLogo: {
+          ...previous.iconLogo,
+          value: {
+            ...previous.iconLogo.value,
+            preview: `${IPFS_URL}/${activeNetwork.logoIcon}`
+          }
+        }
+      })
     }));
 
-    if (isCreating)
+    if (!isCreating)
       setParameters(previous => ({
         ...previous,
         draftTime: { value: activeNetwork.draftTime, validated: true },
