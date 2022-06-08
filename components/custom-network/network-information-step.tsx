@@ -68,7 +68,7 @@ export default function NetworkInformationStep({
           <div className="d-flex gap-20">
             <ImageUploader
               name="logoIcon"
-              value={details.iconLogo}
+              value={details.iconLogo.value}
               error={details.iconLogo.validated === false}
               onChange={handleIconChange}
               description={
@@ -81,7 +81,7 @@ export default function NetworkInformationStep({
 
             <ImageUploader
               name="fullLogo"
-              value={details.fullLogo}
+              value={details.fullLogo.value}
               error={details.fullLogo.validated === false}
               onChange={handleFullChange}
               description=
