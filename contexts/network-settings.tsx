@@ -72,7 +72,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         ...previous, 
         validated: false, 
         name: { 
-          value, 
+          value: value.replace(/\s+/g,"-").replace(/--+/gm, "-"), 
           validated: undefined 
         } 
       })),
