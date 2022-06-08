@@ -23,7 +23,7 @@
   &.text-purple {
     svg {
       path {
-        fill: $purple;
+        fill: var(--bs-purple);
       }
     }
   }
