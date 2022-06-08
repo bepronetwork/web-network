@@ -68,8 +68,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const lockedAmount = await DAOService.getTokensLockedInRegistryByAddress(creator);
     const checkingNetworkAddress = await DAOService.getNetworkAdressByCreator(creator);
 
-    if (lockedAmount < creatorAmount) return res.status(403).json("Insufficient locked amount");
-
     if (checkingNetworkAddress !== networkAddress)
       return res.status(403).json("Creator and network addresses do not match");
 
