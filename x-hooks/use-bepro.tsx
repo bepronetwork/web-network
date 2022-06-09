@@ -16,8 +16,8 @@ import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { BlockTransaction, TransactionCurrency } from "interfaces/transaction";
 
-import useApi from "./use-api";
-import useTransactions from "./useTransactions";
+import useApi from "x-hooks/use-api";
+import useTransactions from "x-hooks/useTransactions";
 
 interface IUseBeProDefault {
   onSuccess?: (data?: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => void;
@@ -53,7 +53,10 @@ export default function useBepro(props?: IUseBeProDefault) {
         })
         .catch((err: { message: string; }) => {
           if (err?.message?.search("User denied") > -1)
-            dispatch(updateTransaction({ ...(disputeTx.payload as BlockTransaction), remove: true }));
+            dispatch(updateTransaction({ 
+              ...(disputeTx.payload as BlockTransaction), 
+              status: TransactionStatus.rejected
+            }));
           else {
             dispatch(updateTransaction({
               ...(disputeTx.payload as BlockTransaction),
@@ -85,7 +88,7 @@ export default function useBepro(props?: IUseBeProDefault) {
           if (err?.message?.search("User denied") > -1)
             dispatch(updateTransaction({
               ...(closeIssueTx.payload as BlockTransaction),
-              remove: true
+              status: TransactionStatus.rejected
             }));
           else
             dispatch(updateTransaction({
@@ -116,7 +119,7 @@ export default function useBepro(props?: IUseBeProDefault) {
         if (err?.message?.search("User denied") > -1)
           dispatch(updateTransaction({
             ...(transaction.payload as BlockTransaction),
-            remove: true
+            status: TransactionStatus.rejected
           }));
         else
           dispatch(updateTransaction({
@@ -153,7 +156,10 @@ export default function useBepro(props?: IUseBeProDefault) {
         })
         .catch((err: { message: string; }) => {
           if (err?.message?.search("User denied") > -1)
-            dispatch(updateTransaction({ ...(redeemTx.payload as BlockTransaction), remove: true }));
+            dispatch(updateTransaction({ 
+              ...(redeemTx.payload as BlockTransaction), 
+              status: TransactionStatus.rejected 
+            }));
           else
             dispatch(updateTransaction({
               ...(redeemTx.payload as BlockTransaction),
@@ -191,7 +197,7 @@ export default function useBepro(props?: IUseBeProDefault) {
           if (err?.message?.search("User denied") > -1)
             dispatch(updateTransaction({
               ...(tx.payload as BlockTransaction),
-              remove: true
+              status: TransactionStatus.rejected
             }));
           else
             dispatch(updateTransaction({
@@ -233,7 +239,7 @@ export default function useBepro(props?: IUseBeProDefault) {
           if (err?.message?.search("User denied") > -1)
             dispatch(updateTransaction({
               ...(tx.payload as BlockTransaction),
-              remove: true
+              status: TransactionStatus.rejected
             }));
           else
             dispatch(updateTransaction({
@@ -273,7 +279,7 @@ export default function useBepro(props?: IUseBeProDefault) {
           if (err?.message?.search("User denied") > -1)
             dispatch(updateTransaction({
               ...(tx.payload as BlockTransaction),
-              remove: true
+              status: TransactionStatus.rejected
             }));
           else
             dispatch(updateTransaction({
@@ -444,7 +450,7 @@ export default function useBepro(props?: IUseBeProDefault) {
           if (err?.message?.search("User denied") > -1)
             dispatch(updateTransaction({
               ...(transaction.payload as BlockTransaction),
-              remove: true
+              status: TransactionStatus.rejected
             }));
           else
             dispatch(updateTransaction({
@@ -473,7 +479,7 @@ export default function useBepro(props?: IUseBeProDefault) {
           if (err?.message?.search("User denied") > -1)
             dispatch(updateTransaction({
               ...(transaction.payload as BlockTransaction),
-              remove: true
+              status: TransactionStatus.rejected
             }));
           else
             dispatch(updateTransaction({
@@ -502,7 +508,7 @@ export default function useBepro(props?: IUseBeProDefault) {
           if (err?.message?.search("User denied") > -1)
             dispatch(updateTransaction({
               ...(transaction.payload as BlockTransaction),
-              remove: true
+              status: TransactionStatus.rejected
             }));
           else
             dispatch(updateTransaction({
@@ -517,7 +523,7 @@ export default function useBepro(props?: IUseBeProDefault) {
 
   async function handleDeployBountyToken(name: string, symbol: string): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
-      const transaction = addTransaction({ type: TransactionTypes.addNetworkToRegistry }, activeNetwork);
+      const transaction = addTransaction({ type: TransactionTypes.deployBountyToken }, activeNetwork);
 
       dispatch(transaction);
 
@@ -531,7 +537,7 @@ export default function useBepro(props?: IUseBeProDefault) {
           if (err?.message?.search("User denied") > -1)
             dispatch(updateTransaction({
               ...(transaction.payload as BlockTransaction),
-              remove: true
+              status: TransactionStatus.rejected
             }));
           else
             dispatch(updateTransaction({
