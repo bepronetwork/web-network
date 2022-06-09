@@ -78,6 +78,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: "developers" },
     {
       association: "pullRequests",
+      required: false,
       where: {
         status: {
           [Op.not]: "canceled"

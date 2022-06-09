@@ -290,7 +290,11 @@
       "make-pull-request-ready": "Make Pull Request Ready",
       "update-bounty-amount": "Update Bounty Amount",
       "cancel-pull-request": "Cancel Pull Request",
-      "refused-by-owner": "Refuse Bounty Proposal"
+      "refused-by-owner": "Refuse Bounty Proposal",
+      "deploy-network-v2": "Deploy Network_v2",
+      "set-dispatcher": "Set Dispatcher",
+      "register-network": "Register Network",
+      "deploy-bounty-token": "Deploy Bounty Token"
     }
   },
   "sort": {

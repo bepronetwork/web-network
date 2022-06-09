@@ -74,13 +74,13 @@ export default function PageDevelopers() {
 
   return (
     <>
-    <PageHero
-      title={t("heroes.bounties.title")}
-      subtitle={t("heroes.bounties.subtitle")}
-      infos={infos}
-    />
+      <PageHero
+        title={t("heroes.bounties.title")}
+        subtitle={t("heroes.bounties.subtitle")}
+        infos={infos}
+      />
 
-    <ListIssues />
+      <ListIssues />
     </>
   );
 }

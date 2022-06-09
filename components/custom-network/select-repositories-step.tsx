@@ -7,22 +7,27 @@ import ConnectGithub from "components/connect-github";
 import RepositoriesList from "components/custom-network/repositories-list";
 import Step from "components/step";
 
+import { useAuthentication } from "contexts/authentication";
+import { useNetworkSettings } from "contexts/network-settings";
+
 const { publicRuntimeConfig } = getConfig();
 
 export default function SelectRepositoriesStep({
-  data,
   step,
-  onClick,
-  validated,
-  githubLogin,
   currentStep,
-  handleChangeStep,
-  handleCheckPermission
+  handleChangeStep
 }) {
   const { t } = useTranslation("custom-network");
 
-  function handleCheck(e) {
-    handleCheckPermission(e.target.checked);
+  const { user } = useAuthentication();
+  const { github, fields } = useNetworkSettings();
+
+  function handleRepositoryCheck(fullName: string) {
+    fields.repository.setter(fullName);
+  }
+
+  function handlePermissonCheck(e) {
+    fields.permission.setter(e.target.checked);
   }
 
   return (
@@ -30,12 +35,12 @@ export default function SelectRepositoriesStep({
       title={t("steps.repositories.title")}
       index={step}
       activeStep={currentStep}
-      validated={validated}
+      validated={github.validated}
       handleClick={handleChangeStep}
     >
-      {(githubLogin && (
+      {(user?.login && (
         <div>
-          <RepositoriesList repositories={data.data} onClick={onClick} />
+          <RepositoriesList repositories={github.repositories} onClick={handleRepositoryCheck} />
 
           <span className="caption-small text-gray px-0 mt-3">
             {publicRuntimeConfig?.github?.user}
@@ -45,8 +50,7 @@ export default function SelectRepositoriesStep({
             <FormCheck
               className="form-control-lg px-0 pb-0 mr-1"
               type="checkbox"
-              value={data.permission}
-              onChange={handleCheck}
+              onChange={handlePermissonCheck}
             />
             <span>
               {t("steps.repositories.give-access", { user: publicRuntimeConfig?.github?.user })}
