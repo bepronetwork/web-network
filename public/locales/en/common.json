@@ -293,7 +293,8 @@
       "refused-by-owner": "Refuse Bounty Proposal",
       "deploy-network-v2": "Deploy Network_v2",
       "set-dispatcher": "Set Dispatcher",
-      "register-network": "Register Network"
+      "register-network": "Register Network",
+      "deploy-bounty-token": "Deploy Bounty Token"
     }
   },
   "sort": {

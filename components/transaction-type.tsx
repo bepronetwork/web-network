@@ -27,7 +27,8 @@ export default function TransactionType({ type }) {
     [TransactionTypes.refuseProposal]: t("transactions.types.refused-by-owner"),
     [TransactionTypes.deployNetworkV2]: t("transactions.types.deploy-network-v2"),
     [TransactionTypes.setNFTDispatcher]: t("transactions.types.set-dispatcher"),
-    [TransactionTypes.addNetworkToRegistry]: t("transactions.types.register-network")
+    [TransactionTypes.addNetworkToRegistry]: t("transactions.types.register-network"),
+    [TransactionTypes.deployBountyToken]: t("transactions.types.deploy-bounty-token"),
   };
 
   return (

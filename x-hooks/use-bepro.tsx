@@ -515,6 +515,35 @@ export default function useBepro(props?: IUseBeProDefault) {
     });
   }
 
+  async function handleDeployBountyToken(name: string, symbol: string): Promise<TransactionReceipt> {
+    return new Promise(async (resolve, reject) => {
+      const transaction = addTransaction({ type: TransactionTypes.addNetworkToRegistry }, activeNetwork);
+
+      dispatch(transaction);
+
+      await DAOService.deployBountyToken(name, symbol)
+        .then((txInfo: TransactionReceipt) => {
+          txWindow.updateItem(transaction.payload.id,  parseTransaction(txInfo, transaction.payload));
+          onSuccess?.();
+          resolve(txInfo);
+        })
+        .catch((err: { message: string; }) => {
+          if (err?.message?.search("User denied") > -1)
+            dispatch(updateTransaction({
+              ...(transaction.payload as BlockTransaction),
+              remove: true
+            }));
+          else
+            dispatch(updateTransaction({
+              ...(transaction.payload as BlockTransaction),
+              status: TransactionStatus.failed
+            }));
+          onError?.(err);
+          reject(err);
+        });
+    });
+  }
+
   return {
     handlerDisputeProposal,
     handleCloseIssue,
@@ -529,6 +558,7 @@ export default function useBepro(props?: IUseBeProDefault) {
     handleRefuseByOwner,
     handleDeployNetworkV2,
     handleSetDispatcher,
-    handleAddNetworkToRegistry
+    handleAddNetworkToRegistry,
+    handleDeployBountyToken
   };
 }
