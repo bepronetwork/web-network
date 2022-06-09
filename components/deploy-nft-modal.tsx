@@ -7,7 +7,7 @@ import LockedIcon from "assets/icons/locked-icon";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import { useDAO } from "contexts/dao";
+import useBepro from "x-hooks/use-bepro";
 
 export default function DeployNFTModal({
   show,
@@ -24,13 +24,13 @@ export default function DeployNFTModal({
   const [symbol, setSymbol] = useState('');
   const [isExecuting, setIsExecuting] = useState(false);
 
-  const {service: DAOService } = useDAO();
+  const { handleDeployBountyToken } = useBepro();
 
   async function deployContract() {    
     try {
       setIsExecuting(true);
 
-      const tx = await DAOService.deployBountyToken(name, symbol);
+      const tx = await handleDeployBountyToken(name, symbol);
 
       setNFTAddress(tx.contractAddress);
       setDefaults();

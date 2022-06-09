@@ -1,13 +1,13 @@
 import { useState } from "react";
 
-export default function ColorInput({ label, value, onChange, error = false }) {
-  const [color, setColor] = useState(value);
+export default function ColorInput({ label, code, onChange, error = false }) {
+  const [color, setColor] = useState(code);
 
   function handleBlur(event) {
     if (event.target.value === "#000000") {
       event.preventDefault();
       event.stopPropagation();
-    } else onChange({ label, value: color });
+    } else onChange({ label, code: color });
   }
 
   function handleChange(event) {
@@ -37,7 +37,7 @@ export default function ColorInput({ label, value, onChange, error = false }) {
           (error && "danger") || "ligth-gray"
         } mt-2`}
       >
-        {value}
+        {code}
       </span>
     </div>
   );

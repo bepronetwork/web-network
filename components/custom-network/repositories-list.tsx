@@ -12,12 +12,12 @@ export default function RepositoriesList({ repositories, onClick }) {
   const [existingRepos, setExistingRepos] = useState([]);
   const [reposWithIssues, setReposWithIssues] = useState([]);
 
-  const { searchRepositories, repositoryHasIssues } = useApi();
+  const { searchRepositories } = useApi();
 
   function handleClick(repository) {
     if (reposWithIssues.includes(repository.fullName)) return;
 
-    onClick(repository.name);
+    onClick(repository.fullName);
   }
 
   useEffect(() => {
@@ -38,19 +38,8 @@ export default function RepositoriesList({ repositories, onClick }) {
         })
         .catch(console.log);
 
-    const savedPaths = repositories
-      .filter((repository) => repository.isSaved)
-      .map((repository) => repository.fullName);
-
-    Promise.allSettled(savedPaths.map((path) => repositoryHasIssues(path))).then((result) => {
-      const tmpRepos = [];
-
-      result.forEach((item, index) => {
-        if ((item as any).value) tmpRepos.push(savedPaths[index]);  /* eslint-disable-line */ // TODO fix line  
-      });
-
-      setReposWithIssues(tmpRepos);
-    });
+    setReposWithIssues(repositories.filter(repository => repository.hasIssues)
+      .map((repository) => repository.fullName));
   }, [repositories]);
 
   return (

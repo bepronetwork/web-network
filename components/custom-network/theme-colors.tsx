@@ -19,7 +19,7 @@ export default function ThemeColors({ colors, similar, setColor }) {
                 <div className="col-2" key={color[0]}>
                   <ColorInput
                     label={color[0]}
-                    value={color[1]}
+                    code={color[1]}
                     onChange={setColor}
                     error={similar.includes(color[0])}
                   />

@@ -14,23 +14,26 @@ export default function ImageUploader({
   className = ""
 }) {
   const { t } = useTranslation("custom-network");
+
   const [image, setImage] = useState(value);
+  
   const dimensions = {
     width: (lg && "150") || "80",
     height: "80"
   };
 
   function handleChange(event) {
-    if (event.target.files.length)
-      setImage({
-        preview: URL.createObjectURL(event.target.files[0]),
-        raw: event.target.files[0]
-      });
+    if (!event.target.files.length) return;
+    
+    onChange({
+      preview: URL.createObjectURL(event.target.files[0]),
+      raw: event.target.files[0]
+    });
   }
 
   useEffect(() => {
-    onChange({ label: name, value: image });
-  }, [image]);
+    setImage(value);
+  }, [value?.preview]);
 
   return (
     <div className="d-flex flex-column align-items-center justify-content-center">
