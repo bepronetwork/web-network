@@ -136,7 +136,7 @@ export default function Settings() {
 
         if (activeNetwork.percentageNeededForDispute !== parameters.percentageNeededForDispute.value)
           await DAOService.setNetworkParameter("percentageNeededForDispute", 
-                                               parameters.percentageNeededForDispute.value * 10000)
+                                               parameters.percentageNeededForDispute.value)
           .catch(console.log);
 
         dispatch(addToast({
