@@ -5,53 +5,50 @@ import ThemeColors from "components/custom-network/theme-colors";
 import ImageUploader from "components/image-uploader";
 import Step from "components/step";
 
-import { getQueryableText, urlWithoutProtocol } from "helpers/string";
+import { useNetworkSettings } from "contexts/network-settings";
 
-import useNetwork from "x-hooks/use-network";
+import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
 const { publicRuntimeConfig } = getConfig();
 
 export default function NetworkInformationStep({
-  data,
   step,
-  setColor,
-  validated,
   currentStep,
-  handleChangeStep,
-  changedDataHandler
+  handleChangeStep
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
-  const { networkExists } = useNetwork();
+
+  const { details, fields } = useNetworkSettings();
+
+  const name = details.name;
+  const nameInputClass = name.validated !== undefined ? (name.validated === true && "is-valid") || "is-invalid" : "";
 
   function showTextOrDefault(text: string, defaultText: string) {
     return text.trim() === "" ? defaultText : text;
   }
 
   function handleInputChange(e) {
-    changedDataHandler({
-      label: "displayName",
-      value: {
-        data: e.target.value,
-        validated: undefined
-      }
-    });
+    fields.name.setter(e.target.value);
   }
 
-  async function handleBlur(e) {
-    const name = e.target.value;
+  function handleBlur(e) {
+    fields.name.validator(e.target.value);
+  }
 
-    let exists = undefined;
+  function handleIconChange(value) {
+    fields.logo.setter(value, "icon");
+  }
 
-    if (name.trim() !== "")
-      exists =  /bepro|taikai/gi.test(name) ? false : !(await networkExists(name));
+  function handleFullChange(value) {
+    fields.logo.setter(value, "full");
+  }
 
-    changedDataHandler({
-      label: "displayName",
-      value: {
-        data: name,
-        validated: exists
-      }
-    });
+  function handleDescriptionChange(e) {
+    fields.description.setter(e.target.value);
+  }
+
+  function handleColorChange(value) {
+    fields.colors.setter(value);
   }
 
   return (
@@ -59,7 +56,7 @@ export default function NetworkInformationStep({
       title={t("custom-network:steps.network-information.title")}
       index={step}
       activeStep={currentStep}
-      validated={validated}
+      validated={details.validated}
       handleClick={handleChangeStep}
     >
       <span className="caption-small text-gray mb-4">
@@ -71,12 +68,9 @@ export default function NetworkInformationStep({
           <div className="d-flex gap-20">
             <ImageUploader
               name="logoIcon"
-              value={data.logoIcon}
-              error={
-                data.logoIcon.raw &&
-                !data.logoIcon.raw?.type?.includes("image/svg")
-              }
-              onChange={changedDataHandler}
+              value={details.iconLogo.value}
+              error={details.iconLogo.validated === false}
+              onChange={handleIconChange}
               description={
                 <>
                   {t("misc.upload")} <br />{" "}
@@ -87,12 +81,9 @@ export default function NetworkInformationStep({
 
             <ImageUploader
               name="fullLogo"
-              value={data.fullLogo}
-              error={
-                data.fullLogo.raw &&
-                !data.fullLogo.raw?.type?.includes("image/svg")
-              }
-              onChange={changedDataHandler}
+              value={details.fullLogo.value}
+              error={details.fullLogo.validated === false}
+              onChange={handleFullChange}
               description=
                 {`${t("misc.upload")} ${t("custom-network:steps.network-information.fields.full-logo.label")}`}
               lg
@@ -106,8 +97,7 @@ export default function NetworkInformationStep({
 
         <div className="col ml-2">
           <p className="h3 text-white mb-3">
-            {showTextOrDefault(data.displayName.data,
-                               t("custom-network:steps.network-information.fields.name.default"))}
+            {showTextOrDefault(name.value, t("custom-network:steps.network-information.fields.name.default"))}
           </p>
           <p className="caption-small text-ligth-gray mb-2">
             {t("custom-network:steps.network-information.fields.name.temporary")}
@@ -115,8 +105,7 @@ export default function NetworkInformationStep({
           <p className="caption-small text-gray">
             {urlWithoutProtocol(publicRuntimeConfig?.apiUrl)}/
             <span className="text-primary">
-              {getQueryableText(data.displayName.data ||
-                  t("custom-network:steps.network-information.fields.name.default"))}
+              {getQueryableText(name.value || t("custom-network:steps.network-information.fields.name.default"))}
             </span>
           </p>
         </div>
@@ -133,18 +122,13 @@ export default function NetworkInformationStep({
             name="display-name"
             id="display-name"
             placeholder={t("custom-network:steps.network-information.fields.name.default")}
-            className={`form-control ${
-              data.displayName.validated !== undefined
-                ? (data.displayName.validated === true && "is-valid") ||
-                  "is-invalid"
-                : ""
-            }`}
-            value={data.displayName.data}
+            className={`form-control ${nameInputClass}`}
+            value={name.value}
             onChange={handleInputChange}
             onBlur={handleBlur}
           />
 
-          {(data.displayName.validated === undefined && (
+          {(name.validated === undefined && (
             <p className="p-small text-gray opacity-75 mt-2 mb-0">
               {t("custom-network:steps.network-information.fields.name.helper")}
             </p>
@@ -174,13 +158,8 @@ export default function NetworkInformationStep({
             cols={30}
             rows={5}
             className="form-control"
-            value={data.networkDescription}
-            onChange={(e) =>
-              changedDataHandler({
-                label: "networkDescription",
-                value: e.target.value
-              })
-            }
+            value={details.description}
+            onChange={handleDescriptionChange}
           ></textarea>
         </div>
       </div>
@@ -188,9 +167,9 @@ export default function NetworkInformationStep({
       <div className="row mx-0 px-0 mb-3">
         <div className="col">
           <ThemeColors
-            colors={data.colors.data}
-            similar={data.colors.similar}
-            setColor={setColor}
+            colors={details.theme.colors}
+            similar={details.theme.similar}
+            setColor={handleColorChange}
           />
         </div>
       </div>

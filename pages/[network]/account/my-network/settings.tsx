@@ -21,14 +21,10 @@ import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
+import { useNetworkSettings } from "contexts/network-settings";
 import { addToast } from "contexts/reducers/add-toast";
 
-import { isSameSet } from "helpers/array";
-import { isColorsSimilar } from "helpers/colors";
-import {
-  DefaultNetworkInformation,
-  handleNetworkAddress
-} from "helpers/custom-network";
+import { handleNetworkAddress } from "helpers/custom-network";
 import { psReadAsText } from "helpers/file-reader";
 import { formatDate } from "helpers/formatDate";
 import { formatNumberToCurrency } from "helpers/formatNumber";
@@ -36,9 +32,16 @@ import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
-import useOctokitGraph from "x-hooks/use-octokit-graph";
 
 const { publicRuntimeConfig } = getConfig();
+
+const MAX_PERCENTAGE_FOR_DISPUTE = +publicRuntimeConfig?.networkConfig?.disputesPercentage;
+const MIN_DRAFT_TIME = +publicRuntimeConfig?.networkConfig?.reedemTime?.min;
+const MAX_DRAFT_TIME = +publicRuntimeConfig?.networkConfig?.reedemTime?.max;
+const MIN_DISPUTE_TIME = +publicRuntimeConfig?.networkConfig?.disputableTime?.min;
+const MAX_DISPUTE_TIME = +publicRuntimeConfig?.networkConfig?.disputableTime?.max;
+const MIN_COUNCIL_AMOUNT = +publicRuntimeConfig?.networkConfig?.councilAmount?.min;
+const MAX_COUNCIL_AMOUNT = +publicRuntimeConfig?.networkConfig?.councilAmount?.max;
 interface NetworkAmounts {
   tokenStaked: number;
   oraclesStaked: number;
@@ -51,22 +54,6 @@ export default function Settings() {
   const [isClosing, setIsClosing] = useState(false);
   const [isAbleToClose, setIsAbleToClose] = useState(false);
 
-  const [newInfo, setNewInfo] = useState({
-    ...DefaultNetworkInformation,
-    redeemTime: 0,
-    disputeTime: 0,
-    validated: false,
-    councilAmount: 0,
-    percentageForDispute: 0
-  });
-
-  const [currentNetworkParameters, setCurrentNetworkParameters] = useState({
-    redeemTime: 0,
-    disputeTime: 0,
-    councilAmount: 0,
-    percentageForDispute: 0
-  });
-
   const [networkAmounts, setNetworkAmounts] = useState<NetworkAmounts>({
     tokenStaked: 0,
     oraclesStaked: 0
@@ -74,74 +61,28 @@ export default function Settings() {
 
   const [updatingNetwork, setUpdatingNetwork] = useState(false);
 
-  const { getUserRepositories } = useOctokitGraph();
-  const { searchRepositories, updateNetwork, isNetworkOwner } = useApi();
-  const { network, colorsToCSS, getURLWithNetwork } = useNetworkTheme();
-  const { activeNetwork, updateActiveNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
+  const { updateNetwork, isNetworkOwner } = useApi();
+  const { activeNetwork, updateActiveNetwork } = useNetwork();
+  const { colorsToCSS, getURLWithNetwork } = useNetworkTheme();
+  const { wallet, user, updateWalletBalance } = useAuthentication();
+  const { details, github, parameters, fields } = useNetworkSettings();
 
   const { dispatch } = useContext(ApplicationContext);
-  const { wallet, user, updateWalletBalance } = useAuthentication();
 
   const networkTokenSymbol = activeNetwork?.networkToken?.symbol || t("misc.$token");
-
-  const isValidDescription =
-    newInfo.network.data.networkDescription.trim() !== "";
-  const isValidPercentageForDispute =
-    newInfo.percentageForDispute <= +publicRuntimeConfig?.networkConfig?.disputesPercentage;
-  const isValidRedeemTime =
-    newInfo.redeemTime >= +publicRuntimeConfig?.networkConfig?.reedemTime?.min &&
-    newInfo.redeemTime <= +publicRuntimeConfig?.networkConfig?.reedemTime?.max;
-  const isValidDisputeTime =
-    newInfo.disputeTime >= +publicRuntimeConfig?.networkConfig?.disputableTime?.min &&
-    newInfo.disputeTime <= +publicRuntimeConfig?.networkConfig?.disputableTime?.max;
-  const isValidCouncilAmount =
-    newInfo.councilAmount >= +publicRuntimeConfig?.networkConfig?.councilAmount?.min &&
-    newInfo.councilAmount <= +publicRuntimeConfig?.networkConfig?.councilAmount?.max;
+  const settingsValidated = [
+    fields.description.validator(details?.description),
+    fields.colors.validator(details?.theme?.colors),
+    fields.repository.validator(github?.repositories),
+    parameters?.draftTime?.validated,
+    parameters?.disputableTime?.validated,
+    parameters?.percentageNeededForDispute?.validated,
+    parameters?.councilAmount?.validated
+  ].every(condition => condition);
 
   function showTextOrDefault(text: string, defaultText: string) {
     return text?.trim() === "" ? defaultText : text;
-  }
-
-  async function loadData() {
-    const tmpInfo = Object.assign({}, newInfo);
-
-    tmpInfo.network.data.colors.data = network.colors;
-    tmpInfo.network.data.networkDescription = network.description;
-    tmpInfo.network.data.logoIcon.preview = `${publicRuntimeConfig?.ipfsUrl}/${network.logoIcon}`;
-    tmpInfo.network.data.fullLogo.preview = `${publicRuntimeConfig?.ipfsUrl}/${network.fullLogo}`;
-
-    setNewInfo(tmpInfo);
-
-    const redeemTime = await DAOService.getNetworkParameter("draftTime").then(time => time / 1000);
-    const disputeTime = await DAOService.getNetworkParameter("disputableTime").then(time => time / 1000);
-    const councilAmount = await DAOService.getNetworkParameter("councilAmount");
-    const percentageForDispute =
-      await DAOService.getNetworkParameter("percentageNeededForDispute");
-
-    const tmpInfo2 = Object.assign({}, tmpInfo);
-
-    tmpInfo2.redeemTime = redeemTime;
-    tmpInfo2.disputeTime = disputeTime;
-    tmpInfo2.councilAmount = councilAmount;
-    tmpInfo2.percentageForDispute = percentageForDispute;
-
-    setCurrentNetworkParameters({
-      redeemTime: redeemTime,
-      disputeTime: disputeTime,
-      councilAmount,
-      percentageForDispute
-    });
-
-    setNewInfo(tmpInfo2);
-
-    const tmpRepos = await loadRepositories();
-
-    const tmpInfo3 = Object.assign({}, tmpInfo2);
-
-    tmpInfo3.repositories.data = tmpRepos;
-
-    setNewInfo(tmpInfo3);
   }
 
   async function loadAmounts(networkArg) {
@@ -158,122 +99,44 @@ export default function Settings() {
     }
   }
 
-  async function loadRepositories() {
-    try {
-      const { rows } = await searchRepositories({ networkName: network.name });
-
-      const tmpRepos = rows.map((row) => ({
-        checked: true,
-        isSaved: true,
-        name: row.githubPath.split("/")[1],
-        fullName: row.githubPath
-      }));
-
-      if (user?.login) {
-        const githubRepos = await getUserRepositories(user?.login);
-
-        const repos = githubRepos
-        .filter(repo => (!repo.isFork && (user?.login === repo.nameWithOwner.split("/")[0])) || repo.isOrganization)
-        .map((repo) => ({
-          checked: false,
-          isSaved: false,
-          name: repo.name,
-          hasIssues: false,
-          fullName: repo.nameWithOwner
-        }));
-
-        tmpRepos.push(...repos.filter((repo) =>
-              !tmpRepos.map((repoB) => repoB.fullName).includes(repo.fullName)));
-      }
-
-      return tmpRepos;
-    } catch (error) {
-      console.log(error);
-    }
-
-    return [];
-  }
-
-  function changeColor(newColor) {
-    const tmpInfo = Object.assign({}, newInfo);
-
-    tmpInfo.network.data.colors.data[newColor.label] = newColor.value;
-
-    setNewInfo(tmpInfo);
-  }
-
-  function handleNetworkDataChange(newData) {
-    const tmpInfo = Object.assign({}, newInfo);
-
-    tmpInfo.network.data[newData.label] = newData.value;
-
-    setNewInfo(tmpInfo);
-  }
-
-  function handleInputChange(label, value) {
-    const tmpInfo = Object.assign({}, newInfo);
-
-    tmpInfo[label] = value;
-
-    setNewInfo(tmpInfo);
-  }
-
-  function handleCheckRepository(repositoryName) {
-    const tmpSteps = Object.assign({}, newInfo);
-
-    const repositoryIndex = tmpSteps.repositories.data.findIndex((repo) => repo.name === repositoryName);
-
-    tmpSteps.repositories.data[repositoryIndex].checked =
-      !tmpSteps.repositories.data[repositoryIndex].checked;
-
-    setNewInfo(tmpSteps);
-  }
-
   async function handleSubmit() {
-    if (!user?.login || !wallet?.address || !DAOService) return;
+    if (!user?.login || !wallet?.address || !DAOService || !activeNetwork) return;
 
     setUpdatingNetwork(true);
 
-    const networkData = newInfo.network.data;
-    const repositoriesData = newInfo.repositories;
-
     const json = {
-      description: networkData.networkDescription,
-      colors: JSON.stringify(networkData.colors?.data),
-      logoIcon: networkData.logoIcon.raw
-        ? await psReadAsText(networkData.logoIcon.raw)
-        : undefined,
-      fullLogo: networkData.fullLogo.raw
-        ? await psReadAsText(networkData.fullLogo.raw)
-        : undefined,
-      repositoriesToAdd: JSON.stringify(repositoriesData.data
+      description: details.description,
+      colors: JSON.stringify(details.theme.colors),
+      logoIcon: details.iconLogo.value.raw ? await psReadAsText(details.iconLogo.value.raw) : undefined,
+      fullLogo: details.fullLogo.value.raw ? await psReadAsText(details.fullLogo.value.raw) : undefined,
+      repositoriesToAdd: 
+        JSON.stringify(github.repositories
           .filter((repo) => repo.checked && !repo.isSaved)
           .map(({ name, fullName }) => ({ name, fullName }))),
-      repositoriesToRemove: JSON.stringify(repositoriesData.data
+      repositoriesToRemove: 
+        JSON.stringify(github.repositories
           .filter((repo) => !repo.checked && repo.isSaved)
           .map(({ name, fullName }) => ({ name, fullName }))),
-      creator: wallet?.address,
-      githubLogin: user?.login,
-      networkAddress: network?.networkAddress,
-      accessToken: user?.accessToken
+      creator: wallet.address,
+      githubLogin: user.login,
+      networkAddress: activeNetwork.networkAddress,
+      accessToken: user.accessToken
     };
 
     updateNetwork(json)
       .then(async () => {
-        if (currentNetworkParameters.redeemTime !== newInfo.redeemTime)
-          await DAOService.setNetworkParameter("draftTime", newInfo.redeemTime).catch(console.log);
+        if (activeNetwork.draftTime !== parameters.draftTime.value)
+          await DAOService.setNetworkParameter("draftTime", parameters.draftTime.value).catch(console.log);
 
-        if (currentNetworkParameters.disputeTime !== newInfo.disputeTime)
-          await DAOService.setNetworkParameter("disputableTime",newInfo.disputeTime).catch(console.log);
+        if (activeNetwork.disputableTime !== parameters.disputableTime.value)
+          await DAOService.setNetworkParameter("disputableTime", parameters.disputableTime.value).catch(console.log);
 
-        if (currentNetworkParameters.councilAmount !== newInfo.councilAmount)
-          await DAOService.setNetworkParameter("councilAmount", newInfo.councilAmount).catch(console.log);
+        if (activeNetwork.councilAmount !== parameters.councilAmount.value)
+          await DAOService.setNetworkParameter("councilAmount", parameters.councilAmount.value).catch(console.log);
 
-        if (
-          currentNetworkParameters.percentageForDispute !==
-          newInfo.percentageForDispute
-        )
-          await DAOService.setNetworkParameter("percentageNeededForDispute", newInfo.percentageForDispute)
+        if (activeNetwork.percentageNeededForDispute !== parameters.percentageNeededForDispute.value)
+          await DAOService.setNetworkParameter("percentageNeededForDispute", 
+                                               parameters.percentageNeededForDispute.value)
           .catch(console.log);
 
         dispatch(addToast({
@@ -285,7 +148,6 @@ export default function Settings() {
         setUpdatingNetwork(false);
 
         updateActiveNetwork(true);
-        loadData();
       })
       .catch((error) => {
         dispatch(addToast({
@@ -302,17 +164,17 @@ export default function Settings() {
   }
 
   function handleCloseNetwork() {
-    if (!network || !user?.login || !user?.accessToken || !wallet?.address || !DAOService) return;
+    if (!activeNetwork || !user?.login || !user?.accessToken || !wallet?.address || !DAOService) return;
 
     setIsClosing(true);
 
-    DAOService.unlockFromFactory()
+    DAOService.unlockFromRegistry()
       .then(() => {
         return updateNetwork({
-          githubLogin: user?.login,
+          githubLogin: user.login,
           isClosed: true,
-          creator: wallet?.address,
-          networkAddress: network.networkAddress,
+          creator: wallet.address,
+          networkAddress: activeNetwork.networkAddress,
           accessToken: user?.accessToken
         });
       })
@@ -342,27 +204,68 @@ export default function Settings() {
       });
   }
 
+  function handleIconChange(value) {
+    fields.logo.setter(value, "icon");
+  }
+
+  function handleFullChange(value) {
+    fields.logo.setter(value, "full");
+  }
+
+  function handleDescriptionChange(e) {
+    fields.description.setter(e.target.value);
+  }
+
+  function handleColorChange(value) {
+    fields.colors.setter(value);
+  }
+
+  function handleRepositoryCheck(fullName: string) {
+    fields.repository.setter(fullName);
+  }
+
+  function handleDisputableTimeChange({ floatValue }) {
+    fields.parameter.setter({
+      label: "disputableTime", 
+      value: floatValue
+    });
+  }
+
+  function handlePercentageNeededForDisputeChange({ floatValue }) {
+    fields.parameter.setter({
+      label: "percentageNeededForDispute", 
+      value: floatValue
+    });
+  }
+
+  function handleDraftTimeChange({ floatValue }) {
+    fields.parameter.setter({
+      label: "draftTime", 
+      value: floatValue
+    });
+  }
+
+  function handleCouncilAmountChange({ floatValue }) {
+    fields.parameter.setter({
+      label: "councilAmount", 
+      value: floatValue
+    });
+  }
+
   useEffect(() => {
-    if (
-      !DAOService ||
-      !network ||
-      !wallet?.address ||
-      !user?.login
-    )
-      return;
+    if (!DAOService || !activeNetwork || !wallet?.address || !user?.login) return;
 
     DAOService.isNetworkAbleToClosed()
       .then((result) => {
-        setIsAbleToClose(result && !network?.isClosed);
+        setIsAbleToClose(result && !activeNetwork?.isClosed);
       })
       .catch(console.log);
 
-    isNetworkOwner(wallet?.address, network?.networkAddress)
+    isNetworkOwner(wallet?.address, activeNetwork?.networkAddress)
       .then((result) => {
         if (!result) router.push(getURLWithNetwork("/account"));
         else {
-          loadData();
-          loadAmounts(network);
+          loadAmounts(activeNetwork);
         }
       })
       .catch((error) => {
@@ -370,60 +273,11 @@ export default function Settings() {
 
         router.push(getURLWithNetwork("/account"));
       });
-  }, [DAOService, network, wallet?.address, user?.login]);
-
-  useEffect(() => {
-    const networkData = newInfo?.network?.data;
-
-    if (networkData.colors?.data?.primary) {
-      const similarColors = [];
-      const colors = networkData?.colors?.data;
-
-      similarColors?.push(...isColorsSimilar({ label: "text", code: colors?.text }, [
-          { label: "primary", code: colors?.primary },
-          //{ label: 'secondary', code: colors?.secondary },
-          { label: "background", code: colors?.background },
-          { label: "shadow", code: colors?.shadow }
-      ]));
-
-      similarColors?.push(...isColorsSimilar({ label: "background", code: colors?.background }, [
-          { label: "success", code: colors?.success },
-          { label: "fail", code: colors?.fail },
-          { label: "warning", code: colors?.warning }
-      ]));
-
-      if (
-        !isSameSet(new Set(similarColors), new Set(networkData.colors?.similar))
-      ) {
-        const tmpInfo = Object.assign({}, newInfo);
-
-        tmpInfo.network.data.colors.similar = similarColors;
-
-        setNewInfo(tmpInfo);
-      }
-    }
-
-    const validation = [
-      isValidRedeemTime,
-      isValidDescription,
-      isValidDisputeTime,
-      isValidCouncilAmount,
-      isValidPercentageForDispute,
-      !newInfo.network.data.colors?.similar.length
-    ].every((condition) => condition);
-
-    if (validation !== newInfo.validated) {
-      const tmpInfo = Object.assign({}, newInfo);
-
-      tmpInfo.validated = validation;
-
-      setNewInfo(tmpInfo);
-    }
-  }, [newInfo]);
+  }, [DAOService, activeNetwork, wallet?.address, user?.login]);
 
   return (
     <div>
-      <style>{colorsToCSS(newInfo.network.data.colors?.data)}</style>
+      <style>{colorsToCSS(details?.theme?.colors)}</style>
 
       <ConnectWalletButton asModal={true} />
 
@@ -434,13 +288,10 @@ export default function Settings() {
               <div className="d-flex flex-column justify-content-center">
                 <ImageUploader
                   name="logoIcon"
-                  value={newInfo.network.data.logoIcon}
+                  value={details?.iconLogo?.value}
                   className="bg-shadow"
-                  error={
-                    newInfo.network.data.logoIcon.raw &&
-                    !newInfo.network.data.logoIcon.raw?.type?.includes("image/svg")
-                  }
-                  onChange={handleNetworkDataChange}
+                  error={details?.iconLogo?.validated === false}
+                  onChange={handleIconChange}
                   description={
                     <>
                       {t("misc.upload")} <br />{" "}
@@ -453,13 +304,10 @@ export default function Settings() {
               <div className="d-flex flex-column justify-content-center">
                 <ImageUploader
                   name="fullLogo"
-                  value={newInfo.network.data.fullLogo}
+                  value={details?.fullLogo?.value}
                   className="bg-shadow"
-                  error={
-                    newInfo.network.data.fullLogo.raw &&
-                    !newInfo.network.data.fullLogo.raw?.type?.includes("image/svg")
-                  }
-                  onChange={handleNetworkDataChange}
+                  error={details?.fullLogo?.validated === false}
+                  onChange={handleFullChange}
                   description=
                     {`${t("misc.upload")} ${t("custom-network:steps.network-information.fields.full-logo.label")}`}
                   lg
@@ -468,7 +316,7 @@ export default function Settings() {
 
               <div className="d-flex flex-column justify-content-center">
                 <p className="h3 text-white mb-3 text-capitalize">
-                  {showTextOrDefault(network?.name,
+                  {showTextOrDefault(activeNetwork?.name,
                                      t("custom-network:steps.network-information.fields.name.default"))}
                 </p>
 
@@ -478,7 +326,7 @@ export default function Settings() {
                 <p className="caption-small text-gray mb-3">
                   {urlWithoutProtocol(publicRuntimeConfig?.apiUrl)}/
                   <span className="text-primary">
-                    {showTextOrDefault(getQueryableText(network?.name || ""),
+                    {showTextOrDefault(getQueryableText(activeNetwork?.name || ""),
                                        t("custom-network:steps.network-information.fields.name.default"))}
                   </span>
                 </p>
@@ -489,8 +337,8 @@ export default function Settings() {
                       {t("misc.creation-date")}
                     </span>
                     <span className="text-gray caption-small">
-                      {network?.createdAt
-                        ? formatDate(network?.createdAt, "-")
+                      {activeNetwork?.createdAt
+                        ? formatDate(activeNetwork?.createdAt, "-")
                         : ""}
                     </span>
                   </div>
@@ -561,28 +409,23 @@ export default function Settings() {
                     cols={30}
                     rows={5}
                     className={`form-control ${
-                      isValidDescription ? "" : "is-invalid"
+                      fields.description.validator(details?.description) ? "" : "is-invalid"
                     }`}
-                    value={newInfo.network.data.networkDescription}
-                    onChange={(e) =>
-                      handleNetworkDataChange({
-                        label: "networkDescription",
-                        value: e.target.value
-                      })
-                    }
+                    value={details?.description}
+                    onChange={handleDescriptionChange}
                   ></textarea>
                 </div>
               </div>
 
               <RepositoriesList
-                repositories={newInfo.repositories.data}
-                onClick={handleCheckRepository}
+                repositories={github.repositories}
+                onClick={handleRepositoryCheck}
               />
 
               <ThemeColors
-                colors={newInfo.network.data.colors?.data}
-                similar={newInfo.network.data.colors?.similar}
-                setColor={changeColor}
+                colors={details?.theme?.colors}
+                similar={details?.theme?.similar}
+                setColor={handleColorChange}
               />
 
               <div className="row px-0 mt-3">
@@ -591,21 +434,19 @@ export default function Settings() {
                     classSymbol={"text-ligth-gray"}
                     label={t("custom-network:dispute-time")}
                     symbol={t("misc.seconds")}
-                    max={+publicRuntimeConfig?.networkConfig?.disputableTime?.max}
+                    max={MAX_DISPUTE_TIME}
                     description={t("custom-network:errors.dispute-time", {
-                      min: +publicRuntimeConfig?.networkConfig?.disputableTime?.min,
-                      max: formatNumberToCurrency(+publicRuntimeConfig?.networkConfig?.disputableTime?.max, 0)
+                      min: MIN_DISPUTE_TIME,
+                      max: formatNumberToCurrency(MAX_DISPUTE_TIME, 0)
                     })}
-                    value={newInfo.disputeTime}
-                    error={!isValidDisputeTime}
+                    value={parameters?.disputableTime?.value}
+                    error={parameters?.disputableTime?.validated === false}
                     min={0}
                     placeholder={"0"}
                     thousandSeparator
                     decimalSeparator="."
                     decimalScale={18}
-                    onValueChange={({ floatValue }) =>
-                      handleInputChange("disputeTime", floatValue)
-                    }
+                    onValueChange={handleDisputableTimeChange}
                   />
                 </div>
 
@@ -613,19 +454,17 @@ export default function Settings() {
                   <InputNumber
                     classSymbol={"text-ligth-gray"}
                     label={t("custom-network:percentage-for-dispute")}
-                    max={+publicRuntimeConfig?.networkConfig?.disputesPercentage}
+                    max={MAX_PERCENTAGE_FOR_DISPUTE}
                     description={t("custom-network:errors.percentage-for-dispute",
-                      {max: +publicRuntimeConfig?.networkConfig?.disputesPercentage })}
+                      {max: MAX_PERCENTAGE_FOR_DISPUTE })}
                     symbol="%"
-                    value={newInfo.percentageForDispute}
-                    error={!isValidPercentageForDispute}
+                    value={parameters?.percentageNeededForDispute?.value}
+                    error={parameters?.percentageNeededForDispute?.validated === false}
                     placeholder={"0"}
                     thousandSeparator
                     decimalSeparator="."
                     decimalScale={18}
-                    onValueChange={({ floatValue }) =>
-                      handleInputChange("percentageForDispute", floatValue)
-                    }
+                    onValueChange={handlePercentageNeededForDisputeChange}
                   />
                 </div>
 
@@ -633,22 +472,20 @@ export default function Settings() {
                   <InputNumber
                     classSymbol={"text-ligth-gray"}
                     label={t("custom-network:redeem-time")}
-                    max={+publicRuntimeConfig?.networkConfig?.reedemTime?.max}
+                    max={MAX_DRAFT_TIME}
                     description={t("custom-network:errors.redeem-time", {
-                      min: +publicRuntimeConfig?.networkConfig?.reedemTime?.min,
-                      max: formatNumberToCurrency(+publicRuntimeConfig?.networkConfig?.reedemTime?.max, 0)
+                      min: MIN_DRAFT_TIME,
+                      max: formatNumberToCurrency(MAX_DRAFT_TIME, 0)
                     })}
                     symbol="seconds"
-                    value={newInfo.redeemTime}
-                    error={!isValidRedeemTime}
+                    value={parameters?.draftTime?.value}
+                    error={parameters?.draftTime?.validated === false}
                     min={0}
                     placeholder={"0"}
                     thousandSeparator
                     decimalSeparator="."
                     decimalScale={18}
-                    onValueChange={({ floatValue }) =>
-                      handleInputChange("redeemTime", floatValue)
-                    }
+                    onValueChange={handleDraftTimeChange}
                   />
                 </div>
 
@@ -657,28 +494,26 @@ export default function Settings() {
                     classSymbol={"text-primary"}
                     label={t("custom-network:council-amount")}
                     symbol={networkTokenSymbol}
-                   max={+publicRuntimeConfig?.networkConfig?.councilAmount?.max}
+                   max={MAX_COUNCIL_AMOUNT}
                     description={t("custom-network:errors.council-amount", {
                       token: networkTokenSymbol,
-                      min: formatNumberToCurrency(+publicRuntimeConfig?.networkConfig?.councilAmount?.min, 0),
-                      max: formatNumberToCurrency(+publicRuntimeConfig?.networkConfig?.councilAmount?.max, 0)
+                      min: formatNumberToCurrency(MIN_COUNCIL_AMOUNT, 0),
+                      max: formatNumberToCurrency(MAX_COUNCIL_AMOUNT, 0)
                     })}
-                    value={newInfo.councilAmount}
-                    error={!isValidCouncilAmount}
+                    value={parameters?.councilAmount?.value}
+                    error={parameters?.councilAmount?.validated === false}
                    min={0}
                     placeholder={"0"}
                     thousandSeparator
                     decimalSeparator="."
                     decimalScale={18}
-                    onValueChange={({ floatValue }) =>
-                      handleInputChange("councilAmount", floatValue)
-                    }
+                    onValueChange={handleCouncilAmountChange}
                   />
                 </div>
               </div>
             </div>
 
-            {(newInfo.validated && !network?.isClosed && (
+            {(settingsValidated && !activeNetwork?.isClosed && (
               <div className="d-flex flex-row justify-content-center mt-3 mb-2">
                 <Button onClick={handleSubmit} disabled={updatingNetwork}>
                   <span>{t("custom-network:save-settings")}</span>

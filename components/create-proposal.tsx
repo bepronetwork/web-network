@@ -89,8 +89,7 @@ function SelectOptionComponent({ innerProps, innerRef, data }) {
 
 export default function NewProposal({
   amountTotal,
-  pullRequests = [],
-  isFinished = false
+  pullRequests = []
 }) {
   const { t } = useTranslation([
     "common",
@@ -318,15 +317,12 @@ export default function NewProposal({
 
   return (
     <div className="d-flex">
-      {(wallet?.isCouncil && isFinished && (
-        <ReadOnlyButtonWrapper >
-          <Button className="read-only-button" onClick={() => setShow(true)}>
-            {t("proposal:actions.create")}
-          </Button>
-        </ReadOnlyButtonWrapper>
-      )) ||
-        <></>}
-        {/* (isIssueOwner && !isFinished && renderRecognizeAsFinished())} */}
+      <ReadOnlyButtonWrapper >
+        <Button className="read-only-button" onClick={() => setShow(true)}>
+          {t("proposal:actions.create")}
+        </Button>
+      </ReadOnlyButtonWrapper>
+
       <Modal
         show={show}
         title={t("proposal:actions.new")}

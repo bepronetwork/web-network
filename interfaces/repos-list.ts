@@ -7,9 +7,9 @@ export interface RepoInfo {
   owner: string;
 }
 
-export type IForkInfo = developer;
+export type ForkInfo = developer;
 
 export type ForksList = {
-  [repoId: number]: IForkInfo[];
+  [repoId: number]: ForkInfo[];
 };
 export type ReposList = RepoInfo[];

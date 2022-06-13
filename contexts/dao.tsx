@@ -27,6 +27,8 @@ export const DAOContextProvider = ({ children }) => {
       .catch(() => false)
       .finally(() => setIsStarting(false));
 
+    if (loaded) window.DAOService = service;
+
     return loaded;
   }, [service]);
 
@@ -53,7 +55,7 @@ export const DAOContextProvider = ({ children }) => {
       })
       .then(started => {
         if (started) {
-          (window as any).DAOService = daoService;
+          window.DAOService = daoService;
           setService(daoService);
         }
         

@@ -21,7 +21,7 @@ export interface INetworkProposal {
   votes: number;
 }
 
-export interface IDistribuitonPerUser {
+export interface DistribuitonPerUser {
   githubLogin: string;
   address: string;
   oracles: string;
