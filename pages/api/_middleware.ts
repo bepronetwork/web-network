@@ -1,9 +1,11 @@
 import type { NextApiRequest } from 'next'
 import { getToken } from 'next-auth/jwt'
+import getConfig from 'next/config';
 import { NextResponse } from 'next/server'
 
 import { error, info } from 'helpers/api/handle-log'
 
+const { serverRuntimeConfig } = getConfig();
 const whiteList = ['auth', 'past-events'];
 const ignorePaths = ['health'];
 
@@ -19,7 +21,7 @@ export async function middleware(req: NextApiRequest) {
     info({method, ip, ua, ...page, pathname, search, body});
 
 
-  if(method !== 'GET' && !isInWhiteList){
+  if(method !== 'GET' && !isInWhiteList || serverRuntimeConfig?.e2e?.testnet !== true){
     const token = await getToken({req})
     if(!token) return new Response('Unauthorized',{
       status: 401,
