@@ -93,7 +93,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const [owner, repo] = repoInfo.githubPath.split("/");
 
-  if(serverRuntimeConfig?.e2e?.testnet === true) {
+  if(serverRuntimeConfig?.e2e === true) {
 
     await models.pullRequest.create({
       issueId: issue.id,
