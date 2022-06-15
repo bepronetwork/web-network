@@ -295,6 +295,20 @@ export default class DAO {
     return this.registry.lockAmountForNetworkCreation();
   }
 
+  async isRegistryGovernor(address: string): Promise<boolean> {
+    if (!this.registry) await this.loadRegistry();
+
+    const governor = await this.registry.governed._governor();
+
+    return governor === address;
+  }
+
+  async isNetworkGovernor(address: string): Promise<boolean> {
+    const governor = await this.network.governed._governor();
+
+    return governor === address;
+  }
+
   async isNetworkAbleToClosed(): Promise<boolean> {
     const totalSettlerLocked = await this.network.totalSettlerLocked();
     const closedBounties = await this.network.closedBounties();
