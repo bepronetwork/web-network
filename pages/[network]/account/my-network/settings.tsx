@@ -494,7 +494,7 @@ export default function Settings() {
                     classSymbol={"text-primary"}
                     label={t("custom-network:council-amount")}
                     symbol={networkTokenSymbol}
-                   max={MAX_COUNCIL_AMOUNT}
+                    max={MAX_COUNCIL_AMOUNT}
                     description={t("custom-network:errors.council-amount", {
                       token: networkTokenSymbol,
                       min: formatNumberToCurrency(MIN_COUNCIL_AMOUNT, 0),
