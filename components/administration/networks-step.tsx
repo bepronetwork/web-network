@@ -68,6 +68,9 @@ export default function NetworksStep({
     forcedNetwork?.draftTime !== parameters?.draftTime?.value && parameters?.draftTime?.validated,
     forcedNetwork?.percentageNeededForDispute !== parameters?.percentageNeededForDispute?.value 
       && parameters?.percentageNeededForDispute?.validated,
+    details?.iconLogo?.value?.raw && details?.iconLogo?.validated,
+    details?.fullLogo?.value?.raw && details?.fullLogo?.validated,
+    JSON.stringify(details?.theme?.colors) !== JSON.stringify(forcedNetwork?.colors)
   ].some(condition => condition);
 
   function handleChange(address: string) {
@@ -180,7 +183,7 @@ export default function NetworksStep({
   }
 
   async function handleSubmit() {
-    if (!wallet?.address || !user?.login) return;
+    if (!wallet?.address || !user?.login || !forcedNetwork) return;
 
     setIsUpdatingNetwork(true);
 
@@ -188,6 +191,7 @@ export default function NetworksStep({
       githubLogin: user?.login,
       override: true,
       creator: wallet?.address,
+      colors: JSON.stringify(details?.theme?.colors),
       networkAddress: forcedNetwork.networkAddress,
       name: differentOrUndefined(details?.name?.value, forcedNetwork.name),
       description: differentOrUndefined(details?.description, forcedNetwork.description),
@@ -201,7 +205,7 @@ export default function NetworksStep({
           : undefined
     };
 
-    updateNetwork(json)
+    await updateNetwork(json)
       .then(() => {
         dispatch(addToast({
             type: "success",
@@ -223,6 +227,19 @@ export default function NetworksStep({
         setIsUpdatingNetwork(false);
         console.log(error);
       });
+
+    if (forcedNetwork.draftTime !== parameters.draftTime.value)
+      await DAOService.setNetworkParameter("draftTime", parameters.draftTime.value).catch(console.log);
+
+    if (forcedNetwork.disputableTime !== parameters.disputableTime.value)
+      await DAOService.setNetworkParameter("disputableTime", parameters.disputableTime.value).catch(console.log);
+
+    if (forcedNetwork.councilAmount !== parameters.councilAmount.value)
+      await DAOService.setNetworkParameter("councilAmount", parameters.councilAmount.value).catch(console.log);
+
+    if (forcedNetwork.percentageNeededForDispute !== parameters.percentageNeededForDispute.value)
+      await DAOService.setNetworkParameter("percentageNeededForDispute", 
+                                           parameters.percentageNeededForDispute.value).catch(console.log);
   }
  
   return (

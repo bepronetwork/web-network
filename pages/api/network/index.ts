@@ -75,12 +75,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     try {
       const [full, logo] = await Promise.all([
-        IpfsStorage.add(fullLogo, true, undefined, "svg"),
-        IpfsStorage.add(logoIcon, true, undefined, "svg")
+        IpfsStorage.add(fullLogo, true, undefined, "svg").catch(() => undefined),
+        IpfsStorage.add(logoIcon, true, undefined, "svg").catch(() => undefined)
       ])
 
-      fullLogoHash = full?.hash;
-      logoIconHash = logo.hash;
+      if (full?.hash) fullLogoHash = full.hash;
+      if (logo?.hash) logoIconHash = logo.hash;
 
     } catch (error) {
       console.error('Failed to store ipfs', error);
@@ -256,17 +256,17 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     network.description = description;
 
-    if (!isAdminOverriding) network.colors = JSON.parse(colors);
+    if (colors) network.colors = JSON.parse(colors);
 
     if (fullLogo || logoIcon) {
       try {
         const [full, logo] = await Promise.all([
-          IpfsStorage.add(fullLogo, true, undefined, "svg"),
-          IpfsStorage.add(logoIcon, true, undefined, "svg")
+          IpfsStorage.add(fullLogo, true, undefined, "svg").catch(() => undefined),
+          IpfsStorage.add(logoIcon, true, undefined, "svg").catch(() => undefined)
         ])
 
-        network.logoIcon = full?.hash;
-        network.fullLogo = logo.hash;
+        if (full?.hash) network.logoIcon = logo?.hash;
+        if (logo?.hash) network.fullLogo = full?.hash;
 
       } catch (error) {
         console.error('Failed to store ipfs', error);
