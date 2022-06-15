@@ -5,7 +5,6 @@ import getConfig from "next/config";
 
 import NetworksDropDown from "components/administration/networks-dropdown";
 import Button from "components/button";
-import ThemeColors from "components/custom-network/theme-colors";
 import ImageUploader from "components/image-uploader";
 import InputNumber from "components/input-number";
 import Step from "components/step";
@@ -191,7 +190,6 @@ export default function NetworksStep({
       githubLogin: user?.login,
       override: true,
       creator: wallet?.address,
-      colors: JSON.stringify(details?.theme?.colors),
       networkAddress: forcedNetwork.networkAddress,
       name: differentOrUndefined(details?.name?.value, forcedNetwork.name),
       description: differentOrUndefined(details?.description, forcedNetwork.description),
@@ -368,16 +366,6 @@ export default function NetworksStep({
                   value={details?.description}
                   onChange={handleDescriptionChange}
                 ></textarea>
-              </div>
-            </div>
-
-            <div className="row mx-0 px-0 mb-3">
-              <div className="col">
-                <ThemeColors
-                  colors={details?.theme?.colors}
-                  similar={details?.theme?.similar}
-                  setColor={fields.colors.setter}
-                />
               </div>
             </div>
 
