@@ -163,12 +163,6 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     const isAdminOverriding = !!override;
 
-    if (
-      isAdminOverriding &&
-      creator !== publicRuntimeConfig?.adminWalletAddress
-    )
-      return res.status(403).json("Unauthorized");
-
     const user = await Database.user.findOne({
       where: {
         githubLogin,
@@ -177,7 +171,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     });
 
     if (!user) return res.status(403).json("Invalid user provided");
-    if (!accessToken) return res.status(401).json("Unauthorized user");
+    if (!accessToken && !isAdminOverriding) return res.status(401).json("Unauthorized user");
 
     const network = await Database.network.findOne({
       where: {
@@ -199,17 +193,21 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       return res.status(200).json("Network closed");
     }
 
+    // Contract Validations
+    const DAOService = new DAO(true);
+
+    if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
+    if (!await DAOService.loadRegistry()) return res.status(500).json("Failed to load factory contract");
+
     if (!isAdminOverriding) {
-      // Contract Validations
-      const DAOService = new DAO(true);
-
-      if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
-      if (!await DAOService.loadRegistry()) return res.status(500).json("Failed to load factory contract");
-
       const checkingNetworkAddress = await DAOService.getNetworkAdressByCreator(creator);
 
       if (checkingNetworkAddress !== networkAddress)
         return res.status(403).json("Creator and network addresses do not match");
+    } else {
+      const isRegistryGovernor = await DAOService.isRegistryGovernor(creator);
+
+      if (!isRegistryGovernor) return res.status(403).json("Unauthorized");
     }
 
     const addingRepos = repositoriesToAdd ? JSON.parse(repositoriesToAdd) : [];
