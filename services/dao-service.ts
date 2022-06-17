@@ -487,4 +487,16 @@ export default class DAO {
   isAddress(address: string): Promise<boolean> {
     return this.web3Connection.utils.isAddress(address);
   }
+
+  getTimeChain(): Promise<number> { 
+    return this.web3Connection.Web3.eth.getBlock(`latest`).then(block => block.timestamp*1000);
+  }
+
+  async isBountyInDraftChain(creationDateIssue: number): Promise<boolean> { 
+    const time = await this.getTimeChain();
+    const redeemTime = await this.network.draftTime();
+
+    return (new Date(time) < new Date(creationDateIssue + redeemTime))
+  }
+
 }

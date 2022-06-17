@@ -93,6 +93,27 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const [owner, repo] = repoInfo.githubPath.split("/");
 
+  if(serverRuntimeConfig?.e2e === true) {
+
+    await models.pullRequest.create({
+      issueId: issue.id,
+      githubId: `00`,
+      githubLogin: username,
+      branch,
+      status: "pending"
+    });
+
+    return res.status(200).json({ 
+      bountyId: issue.contractId,
+      originRepo: repoInfo.githubPath,
+      originBranch: issue.branch,
+      originCID: issue.issueId,
+      userRepo: `${username}/${repo}`,
+      userBranch: branch,
+      cid: `00`
+    })
+  }
+
   const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
 
   const repositoryDetails = await githubAPI<GraphQlResponse>(RepositoryQueries.Details, {
@@ -141,6 +162,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     console.log(error);
     return res.status(error?.response?.status || 500).json(error?.response?.data || error);
   }
+
 }
 
 async function del(req: NextApiRequest, res: NextApiResponse) {
@@ -206,6 +228,7 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
   
   if (!networkBounty) return res.status(404).json("Invalid");
 
+  
   const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
 
   const [owner, repo] = issue.repository.githubPath.split("/");
