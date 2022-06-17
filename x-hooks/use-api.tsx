@@ -1,7 +1,7 @@
 import { head } from "lodash";
 import getConfig from "next/config";
 
-import { PastEventsParams, User } from "interfaces/api";
+import { PastEventsParams, SearchNetworkParams, User } from "interfaces/api";
 import { IssueData, pullRequest } from "interfaces/issue-data";
 import { Network } from "interfaces/network";
 import { PaginatedData } from "interfaces/paginated-data";
@@ -511,7 +511,7 @@ export default function useApi() {
     sortBy = "updatedAt",
     order = "DESC",
     search = ""
-  }) {
+  }: SearchNetworkParams) {
     const params = new URLSearchParams({
       page,
       name,

@@ -11,7 +11,7 @@ import { isSameSet } from "helpers/array";
 import { isColorsSimilar } from "helpers/colors";
 import { DefaultNetworkSettings } from "helpers/custom-network";
 
-import { Color, Icon, NetworkSettings, Theme } from "interfaces/network";
+import { Color, Icon, Network, NetworkSettings, Theme } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
@@ -23,7 +23,7 @@ const IPFS_URL = publicRuntimeConfig?.ipfsUrl;
 
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
 
-const ALLOWED_PATHS = ["/new-network", "/[network]/account/my-network/settings"];
+const ALLOWED_PATHS = ["/new-network", "/[network]/account/my-network/settings", "/administration"];
 
 const LIMITS = {
   percentageNeededForDispute: { max: +publicRuntimeConfig?.networkConfig?.disputesPercentage },
@@ -44,6 +44,7 @@ const LIMITS = {
 export const NetworkSettingsProvider = ({ children }) => {
   const router = useRouter();
   
+  const [forcedNetwork, setForcedNetwork] = useState<Network>();
   const [github, setGithub] = useState(DefaultNetworkSettings.github);
   const [tokens, setTokens] = useState(DefaultNetworkSettings.tokens);
   const [details, setDetails] = useState(DefaultNetworkSettings.details);
@@ -61,6 +62,7 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   const isCreating = useMemo(() => router.pathname === "/new-network", [router.pathname]);
   const needsToLoad = useMemo(() => ALLOWED_PATHS.includes(router.pathname), [router.pathname]);
+  const network = useMemo(() => forcedNetwork || activeNetwork, [forcedNetwork, activeNetwork]);
 
   const Fields = {
     amount: {
@@ -171,8 +173,8 @@ export const NetworkSettingsProvider = ({ children }) => {
     if ( !wallet?.address || 
          !user?.login || 
          !DAOService || 
-         !activeNetwork?.name || 
-         !activeNetwork?.councilAmount || 
+         !network?.name || 
+         !network?.councilAmount || 
          !needsToLoad ) 
       return;
 
@@ -191,7 +193,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         
         if (isCreating) repositories.push(...filtered);
         else {
-          let { rows: networkRepositories } = await searchRepositories({ networkName: activeNetwork.name });
+          let { rows: networkRepositories } = await searchRepositories({ networkName: network.name });
 
           networkRepositories = await Promise.all(networkRepositories.map( async (repo) => ({
             checked: true,
@@ -217,26 +219,26 @@ export const NetworkSettingsProvider = ({ children }) => {
       ...previous,
       theme: {
         ...previous.theme,
-        colors: isCreating && DefaultTheme() || activeNetwork?.colors,
+        colors: isCreating && DefaultTheme() || network?.colors,
       },
       ...(isCreating && {} || {
         name: {
-          value: activeNetwork?.name,
-          validated: true
+          value: network?.name,
+          validated: undefined
         },
-        description: activeNetwork?.description,
+        description: network?.description,
         fullLogo: {
           ...previous.fullLogo,
           value: {
             ...previous.fullLogo.value,
-            preview: `${IPFS_URL}/${activeNetwork.fullLogo}`
+            preview: `${IPFS_URL}/${network.fullLogo}`
           }
         },
         iconLogo: {
           ...previous.iconLogo,
           value: {
             ...previous.iconLogo.value,
-            preview: `${IPFS_URL}/${activeNetwork.logoIcon}`
+            preview: `${IPFS_URL}/${network.logoIcon}`
           }
         }
       })
@@ -245,16 +247,16 @@ export const NetworkSettingsProvider = ({ children }) => {
     if (!isCreating)
       setParameters(previous => ({
         ...previous,
-        draftTime: { value: activeNetwork.draftTime, validated: true },
-        disputableTime: { value: activeNetwork.disputableTime, validated: true },
-        percentageNeededForDispute: { value: activeNetwork.percentageNeededForDispute, validated: true },
-        councilAmount: { value: activeNetwork.councilAmount, validated: true },
+        draftTime: { value: network.draftTime, validated: true },
+        disputableTime: { value: network.disputableTime, validated: true },
+        percentageNeededForDispute: { value: network.percentageNeededForDispute, validated: true },
+        councilAmount: { value: network.councilAmount, validated: true },
       }));
   }, [ wallet?.address, 
        user?.login, 
        DAOService, 
-       activeNetwork?.name, 
-       activeNetwork?.councilAmount, 
+       network?.name, 
+       network?.councilAmount, 
        isCreating, 
        needsToLoad ]);
 
@@ -435,8 +437,10 @@ export const NetworkSettingsProvider = ({ children }) => {
     treasury,
     isSettingsValidated,
     parameters,
+    forcedNetwork,
+    setForcedNetwork,
     fields: Fields
-  }), [tokensLocked, details, github, tokens, treasury, parameters, isSettingsValidated, Fields]);
+  }), [tokensLocked, details, github, tokens, treasury, parameters, isSettingsValidated, Fields, setForcedNetwork]);
 
   return (
     <NetworkSettingsContext.Provider value={memorizedValue}>
