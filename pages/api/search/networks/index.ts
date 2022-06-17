@@ -25,7 +25,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   const networks = await models.network.findAndCountAll(paginate({
         attributes: {
-          exclude: ["id", "creatorAddress", "updatedAt"]
+          exclude: ["id", "creatorAddress"]
         },
         where: whereCondition,
         include,

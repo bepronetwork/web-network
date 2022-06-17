@@ -77,6 +77,8 @@ export interface Field<T> {
 
 export interface NetworkSettings {
   isSettingsValidated: boolean;
+  forcedNetwork?: Network;
+  setForcedNetwork?: (network: Network) => void;
   tokensLocked?: {
     locked: number;
     needed: number;

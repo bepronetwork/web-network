@@ -29,3 +29,13 @@ export interface PastEventsParams {
   fromBlock?: number;
   toBlock?: number;
 }
+
+export interface SearchNetworkParams {
+  page?: string;
+  name?: string;
+  creatorAddress?: string;
+  networkAddress?: string;
+  sortBy?: string;
+  order?: string;
+  search?: string
+}
