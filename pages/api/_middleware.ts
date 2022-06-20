@@ -21,11 +21,13 @@ export async function middleware(req: NextApiRequest) {
   if (!ignorePaths.some(k => pathname.includes(k)))
     info({method, ip, ua, ...page, pathname, search, body});
 
-  if(method !== 'GET' && !isInWhiteList || testnet !== true){
-    const token = await getToken({req})
-    if(!token) return new Response('Unauthorized',{
-      status: 401,
-    })
+  if(testnet !== true){
+    if(method !== 'GET' && !isInWhiteList){
+      const token = await getToken({req})
+      if(!token) return new Response('Unauthorized',{
+        status: 401,
+      })
+    }
   }
 
   try {
