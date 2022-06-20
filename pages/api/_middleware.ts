@@ -17,10 +17,8 @@ export async function middleware(req: NextApiRequest) {
   const {page = {}, url, ip, ua, body} = req as any; // eslint-disable-line
   const {pathname, search,} = new URL(url);
   
-  
   if (!ignorePaths.some(k => pathname.includes(k)))
     info({method, ip, ua, ...page, pathname, search, body});
-
 
   if(method !== 'GET' && !isInWhiteList && !testnet){
     const token = await getToken({req})
@@ -28,7 +26,6 @@ export async function middleware(req: NextApiRequest) {
       status: 401,
     })
   }
-
 
   try {
     return NextResponse.next();
