@@ -4,6 +4,7 @@ import getConfig from "next/config";
 import models from "db/models";
 
 import twitterTweet from "../handle-twitter-tweet";
+import { bountyReadyPRsHasNoInvalidProposals } from "./utils";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -59,6 +60,17 @@ export default async function readProposalRefused(events, network: Network_v2, c
               });
 
               disputed.push(networkProposal.id);
+            }
+
+            const validation = await bountyReadyPRsHasNoInvalidProposals(networkBounty, network).catch(() => -1);
+            let newState = bounty.state;
+
+            if ([0, 1].includes(validation)) newState = "open";
+            if ([2, 3].includes(validation)) newState = "ready";
+
+            if (newState !== bounty.state) {
+              bounty.state = newState;
+              await bounty.save();
             }
           }
         }

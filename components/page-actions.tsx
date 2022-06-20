@@ -217,7 +217,6 @@ export default function PageActions({
     if (isLoggedIn && 
         isBountyOpen && 
         !isBountyInDraft && 
-        !isBountyFinished && 
         isWorkingOnBounty && 
         !hasOpenPullRequest && 
         isRepoForked)
