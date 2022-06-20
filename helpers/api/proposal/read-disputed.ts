@@ -62,7 +62,7 @@ export default async function readProposalDisputed(events, network: Network_v2, 
               disputed.push(networkProposal.id);
             }
 
-            const validation = await bountyReadyPRsHasNoInvalidProposals(networkBounty, network);
+            const validation = await bountyReadyPRsHasNoInvalidProposals(networkBounty, network).catch(() => -1);
             let newState = bounty.state;
 
             if ([0, 1].includes(validation)) newState = "open";
