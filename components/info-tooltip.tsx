@@ -15,12 +15,10 @@ export default function InfoTooltip({ description = "" }) {
   );
 
   return (
-    <>
-      <OverlayTrigger placement="bottom" overlay={popover}>
-        <span className="text-white-10">
-          <InfoIcon width={14} height={14} color="text-white-10" />
-        </span>
-      </OverlayTrigger>
-    </>
+    <OverlayTrigger placement="bottom" overlay={popover}>
+      <span className="text-white-10">
+        <InfoIcon width={14} height={14} color="text-white-10" className="info" />
+      </span>
+    </OverlayTrigger>
   );
 }

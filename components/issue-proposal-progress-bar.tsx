@@ -3,22 +3,20 @@ import { Fragment, useEffect, useState } from "react";
 import { addSeconds } from "date-fns";
 import { useTranslation } from "next-i18next";
 
+import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 
 import { formatDate, getTimeDifferenceInWords } from "helpers/formatDate";
 
-export default function IssueProposalProgressBar({
-  isFinalized = false,
-  isIssueinDraft = true,
-  mergeProposalAmount = 0,
-  isFinished = false,
-  isCanceled = false,
-  creationDate
-}) {
+export default function IssueProposalProgressBar() {
+  const { t } = useTranslation(["common", "bounty"]);
+
   const [stepColor, setStepColor] = useState<string>("");
   const [currentStep, setCurrentStep] = useState<number>();
+  
   const { activeNetwork } = useNetwork();
-  const { t } = useTranslation(["common", "bounty"]);
+  const { activeIssue, networkIssue } = useIssue();
+  
   const steps = [
     t("bounty:steps.draft"),
     t("bounty:steps.development"),
@@ -27,36 +25,15 @@ export default function IssueProposalProgressBar({
     t("bounty:steps.closed")
   ];
 
+  const isFinalized = !!networkIssue?.closed;
+  const isFinished = !!networkIssue?.isFinished;
+  const isIssueinDraft = !!networkIssue?.isDraft;
+  const creationDate = networkIssue?.creationDate;
+  const mergeProposalAmount = networkIssue?.proposals?.length;
+  const isCanceled = activeIssue?.state === "canceled" || !!networkIssue?.canceled;
+
   function toRepresentationPercent() {
     return currentStep === 0 ? "1" : `${currentStep * 25}`;
-  }
-
-  function getStepColor() {
-    if (isCanceled) return "danger";
-    if (isFinalized) return "success";
-
-    return "primary";
-  }
-
-  function loadDisputeState() {
-    //Draft -> isIssueInDraft()
-    //Development -> estado inicial
-    //Finalized -> recognizedAsFinished == true
-    //Dispute Window -> mergeProposalAmount > 0
-    //Closed and Distributed -> finalized == true
-    let value = 0;
-    if (!isIssueinDraft) {
-      value = 1;
-      if (isFinished) {
-        value = 2;
-        if (mergeProposalAmount > 0) value = 3;
-        if (isFinalized) {
-          value = 4;
-        }
-      }
-    }
-    setCurrentStep(value);
-    setStepColor(getStepColor());
   }
 
   function renderSecondaryText(stepLabel, index) {
@@ -76,7 +53,7 @@ export default function IssueProposalProgressBar({
       },
       Started: {
         text: t("bounty:status.started-time", {
-          distance: getTimeDifferenceInWords(creationDate, new Date())
+          distance: getTimeDifferenceInWords(new Date(creationDate), new Date())
         }),
         color: "ligth-gray"
       },
@@ -164,13 +141,26 @@ export default function IssueProposalProgressBar({
     );
   }
 
-  useEffect(loadDisputeState, [
-    isFinalized,
-    isIssueinDraft,
-    isCanceled,
-    mergeProposalAmount,
-    isFinished
-  ]);
+  useEffect(() => {
+    //Draft -> isIssueInDraft()
+    //Development -> estado inicial
+    //Finalized -> recognizedAsFinished == true
+    //Dispute Window -> mergeProposalAmount > 0
+    //Closed and Distributed -> finalized == true
+    let step = 0;
+    let stepColor = "primary"
+
+    if (isFinalized) step = 4;
+    else if (mergeProposalAmount > 0) step = 3;
+    else if (isFinished) step = 2;
+    else if (!isIssueinDraft) step = 1;
+
+    if (isCanceled) stepColor = "danger";
+    if (isFinalized) stepColor = "success";
+
+    setStepColor(stepColor);
+    setCurrentStep(step);
+  }, [isFinalized, isIssueinDraft, isCanceled, mergeProposalAmount, isFinished]);
 
   return (
     <div className="container">

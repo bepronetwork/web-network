@@ -8,50 +8,45 @@ import Modal from "components/modal";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
-import { IActiveIssue, useIssue } from "contexts/issue";
+import { useIssue } from "contexts/issue";
+import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/add-toast";
 
 import { ProposalExtended } from "interfaces/bounty";
 import { pullRequest } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
-
 import useApi from "x-hooks/use-api";
-import useNetwork from "x-hooks/use-network";
 
-interface IMergeableModalProps {
-  issue: IActiveIssue;
-  issuePRs: pullRequest[];
+interface MergeableModalProps {
   proposal: Proposal;
   pullRequest: pullRequest;
   networkProposal: ProposalExtended;
 }
 export default function NotMergeableModal({
   proposal,
-  issuePRs,
   pullRequest,
   networkProposal
-}: IMergeableModalProps) {
+}: MergeableModalProps) {
   const { t } = useTranslation("common");
-  const { activeIssue, networkIssue } = useIssue();
-  //TODO: Move to AuthContext
 
   const {
-    dispatch,
-    state: { currentAddress, githubLogin }
+    dispatch
   } = useContext(ApplicationContext);
 
   const [isVisible, setVisible] = useState(false);
   const [mergeState, setMergeState] = useState("");
-  const { wallet } = useAuthentication()
 
-  const { network } = useNetwork();
+  const { activeNetwork } = useNetwork();
   const { mergeClosedIssue } = useApi();
+  const { wallet, user } = useAuthentication();
+  const { activeIssue, networkIssue } = useIssue();
 
-  const isIssueOwner = activeIssue?.creatorGithub === githubLogin;
-  const isPullRequestOwner = pullRequest?.githubLogin === githubLogin;
+
+  const isIssueOwner = activeIssue?.creatorGithub === user?.login;
+  const isPullRequestOwner = pullRequest?.githubLogin === user?.login;
   const isProposer =
-    networkProposal?.creator?.toLowerCase() === currentAddress;
+    networkProposal?.creator?.toLowerCase() === wallet?.address?.toLowerCase();
   const hasPRMerged = !!pullRequest?.merged;
 
   const whenNotShow = [
@@ -64,16 +59,6 @@ export default function NotMergeableModal({
       !networkIssue?.closed // The bounty creator, proposal creator and council members can view only if the bounty was closed.
   ].some((values) => values);
 
-  function handleModalVisibility() {
-    if (!pullRequest || !issuePRs?.length || mergeState === "success") return;
-
-    if (whenNotShow) {
-      setVisible(false);
-    } else if (isIssueOwner || isPullRequestOwner || wallet?.isCouncil || isProposer) {
-      setVisible(pullRequest.state === "open");
-    }
-  }
-
   function handleRetryMerge() {
     if (mergeState === "error") return false;
 
@@ -82,8 +67,8 @@ export default function NotMergeableModal({
     mergeClosedIssue(activeIssue?.issueId,
                      pullRequest?.githubId,
                      proposal?.scMergeId,
-                     currentAddress,
-                     network?.name)
+                     wallet?.address,
+                     activeNetwork?.name)
       .then(() => {
         dispatch(addToast({
             type: "success",
@@ -95,6 +80,8 @@ export default function NotMergeableModal({
         setVisible(false);
       })
       .catch((error) => {
+        console.log("Failed to retry merge", error);
+
         dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
@@ -105,15 +92,22 @@ export default function NotMergeableModal({
       });
   }
 
-  useEffect(handleModalVisibility, [
+  useEffect(() => {
+    if (!pullRequest || !activeIssue?.pullRequests?.length || mergeState === "success") return;
+
+    if (whenNotShow) {
+      setVisible(false);
+    } else if (isIssueOwner || isPullRequestOwner || wallet?.isCouncil || isProposer) {
+      setVisible(pullRequest.state === "open");
+    }
+  }, [
     activeIssue,
-    issuePRs,
     mergeState,
     pullRequest,
     networkProposal,
     networkIssue,
-    currentAddress,
-    githubLogin,
+    wallet?.address,
+    user?.login,
     wallet?.isCouncil
   ]);
 

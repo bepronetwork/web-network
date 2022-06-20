@@ -21,8 +21,6 @@ export default function PageDevelopers() {
   const { service: DAOService } = useDAO();
   const { activeNetwork } = useNetwork();
 
-  const networkTokenSymbol = activeNetwork?.networkToken?.symbol || t("misc.$token");
-
   const [infos, setInfos] = useState<InfosHero[]>([
     {
       value: 0,
@@ -35,7 +33,7 @@ export default function PageDevelopers() {
     {
       value: 0,
       label: t("heroes.bounties-in-network"),
-      currency: networkTokenSymbol
+      currency: t("misc.$token")
     },
     {
       value: 0,
@@ -44,7 +42,7 @@ export default function PageDevelopers() {
   ]);
 
   useEffect(() => {
-    if (!DAOService || !activeNetwork) return;
+    if (!DAOService || !activeNetwork?.networkToken) return;
 
     Promise.all([
       DAOService.getClosedBounties(handleNetworkAddress(activeNetwork)).catch(() => 0),
@@ -64,7 +62,7 @@ export default function PageDevelopers() {
         {
           value: onNetwork,
           label: t("heroes.bounties-in-network"),
-          currency: networkTokenSymbol
+          currency: activeNetwork.networkToken.symbol || t("misc.$token")
         },
         {
           value: totalUsers,
@@ -72,19 +70,17 @@ export default function PageDevelopers() {
         }
       ]);
     });
-  }, [DAOService, activeNetwork]);
+  }, [DAOService, activeNetwork?.networkToken]);
 
   return (
     <>
-      <div>
-        <PageHero
-          title={t("heroes.bounties.title")}
-          subtitle={t("heroes.bounties.subtitle")}
-          infos={infos}
-        />
+      <PageHero
+        title={t("heroes.bounties.title")}
+        subtitle={t("heroes.bounties.subtitle")}
+        infos={infos}
+      />
 
-        <ListIssues />
-      </div>
+      <ListIssues />
     </>
   );
 }

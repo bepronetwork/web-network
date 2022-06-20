@@ -1,0 +1,30 @@
+.amount-with-preview {
+  &.text-primary {
+    svg {
+      path {
+        fill: var(--bs-primary);
+      }
+    }
+  }
+  &.text-success {
+    svg {
+      path {
+        fill: var(--bs-success);
+      }
+    }
+  }
+  &.text-danger {
+    svg {
+      path {
+        fill: var(--bs-danger);
+      }
+    }
+  }
+  &.text-purple {
+    svg {
+      path {
+        fill: var(--bs-purple);
+      }
+    }
+  }
+}
