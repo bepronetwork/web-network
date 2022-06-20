@@ -17,11 +17,10 @@ export async function middleware(req: NextApiRequest) {
   const {page = {}, url, ip, ua, body} = req as any; // eslint-disable-line
   const {pathname, search,} = new URL(url);
   
-  
   if (!ignorePaths.some(k => pathname.includes(k)))
     info({method, ip, ua, ...page, pathname, search, body});
 
-  if(method !== 'GET' && !isInWhiteList || testnet !== true){
+  if(method !== 'GET' && !isInWhiteList && !testnet){
     const token = await getToken({req})
     if(!token) return new Response('Unauthorized',{
       status: 401,
