@@ -96,14 +96,19 @@ export default function PageProposal() {
 
   async function handleRefuse() {
     handleRefuseByOwner(+activeIssue?.contractId, +proposal.contractId)
-    .then(() => {
+    .then(txInfo => {
+      const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
+
       updateIssue(activeIssue?.repository_id, activeIssue?.githubId);
       getNetworkIssue();
 
+      return processEvent("proposal", "refused", activeNetwork?.name, { fromBlock } );
+    })
+    .then(() => {
       dispatch(addToast({
-          type: "success",
-          title: t("actions.success"),
-          content: t("proposal:messages.proposal-refused")
+        type: "success",
+        title: t("actions.success"),
+        content: t("proposal:messages.proposal-refused")
       }));
     })
     .catch(error => {

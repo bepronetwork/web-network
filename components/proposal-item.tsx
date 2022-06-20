@@ -52,7 +52,7 @@ export default function ProposalItem({
   const { activeNetwork } = useNetwork();
   const { handlerDisputeProposal } = useBepro();
   const { getURLWithNetwork } = useNetworkTheme();
-  const { activeIssue, networkIssue, getNetworkIssue } = useIssue();
+  const { activeIssue, networkIssue, getNetworkIssue, updateIssue } = useIssue();
   
   const networkProposal = networkIssue?.proposals?.[proposal?.contractId];
   const networkPullRequest = networkIssue?.pullRequests?.find(pr => pr.id === networkProposal?.prId);
@@ -86,7 +86,10 @@ export default function ProposalItem({
 
         return processEvent("proposal", "disputed", activeNetwork?.name, { fromBlock });
       })
-      .then(() => getNetworkIssue());
+      .then(() => {
+        getNetworkIssue()
+        updateIssue(activeIssue.repository_id, activeIssue.githubId);
+      });
   }
 
   useEffect(() => {
