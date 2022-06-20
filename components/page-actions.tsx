@@ -133,7 +133,7 @@ export default function PageActions({
       if (pullRequestPayload) cancelPrePullRequest(pullRequestPayload);
 
       if (err.response?.status === 422 && err.response?.data) {
-        err.response?.data.errors?.map((item) =>
+        err.response?.data?.map((item) =>
           dispatch(addToast({
               type: "danger",
               title: t("actions.failed"),
