@@ -16,5 +16,9 @@ export enum TransactionTypes {
   makePullRequestReady,
   updateBountyAmount,
   cancelPullRequest,
-  refuseProposal
+  refuseProposal,
+  deployNetworkV2,
+  setNFTDispatcher,
+  addNetworkToRegistry,
+  deployBountyToken
 }

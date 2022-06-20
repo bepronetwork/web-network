@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
- /* eslint-disable */
-import { FormCheck, ListGroup } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
@@ -12,27 +10,29 @@ import TokensDropdown from "components/tokens-dropdown";
 
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
+import { useNetworkSettings } from "contexts/network-settings";
 
 import { BEPRO_TOKEN, Token } from "interfaces/token";
 
 const { publicRuntimeConfig } = getConfig();
 
 export default function TokenConfiguration({
-    data,
     step,
-    handleFinish,
     currentStep,
-    handleChangeStep,
-    changedDataHandler
+    handleChangeStep
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
 
-  const [customTokens, setCustomTokens] = useState<Token[]>([BEPRO_TOKEN]);
+  const [bountyTokenAddress, setBountyTokenAddress] = useState("");
+  const [bountyTokenUri, setBountyTokenUri] = useState("");
+  const [bountyTokenUriError, setBountyTokenUriError] = useState(false);
+  const [bountyTokenError, setBountyTokenError] = useState(false);
   const [networkToken, setNetworkToken] = useState<Token>();
-  const [allowCustomTransactionalTokens, setAllowCustomTransactionalTokens] = useState("false");
   const [showModalDeploy, setShowModalDeploy] = useState(false);
+  const [customTokens, setCustomTokens] = useState<Token[]>([BEPRO_TOKEN]);
 
   const { activeNetwork } = useNetwork();
+  const { tokens, fields } = useNetworkSettings();
   const { service: DAOService } = useDAO();
 
   function handleShowModal() {
@@ -50,29 +50,40 @@ export default function TokenConfiguration({
     ]);
   }
 
-  function handleCheck(e) {
-    setAllowCustomTransactionalTokens(e.target.checked);
+  function handleNFTTokenChange(e) {
+    setBountyTokenAddress(e.target.value);
+    setBountyTokenError(false);
   }
 
-  function handleNFTTokenChange(e) {
-    changedDataHandler("tokens", { label: "nftToken", value: { address: e.target.value, error: false } });
+  function handleNFTTokenURIChange(e) {
+    setBountyTokenUri(e.target.value);
+    setBountyTokenUriError(false);
   }
 
   function handleNetworkTokenChange(token: Token) {
-    changedDataHandler("tokens", { label: "networkToken", value: token.address });
+    fields.settlerToken.setter(token.address);
   }
 
   function setDeployedAddress(address) {
-    changedDataHandler("tokens", { label: "nftToken", value: { address, error: false } });
+    setBountyTokenAddress(address);
+    fields.bountyToken.setter(bountyTokenAddress);
+  }
+
+  function validateTokenUri() {
+    setBountyTokenUriError(bountyTokenUri.trim() === "");
+    fields.bountyURI.setter(bountyTokenUri);
   }
 
   async function validateNFTAddress() {
-    if (data.nftToken.address.trim() === "" || !DAOService) return false;
+    if (bountyTokenAddress.trim() === "") fields.bountyToken.setter(bountyTokenAddress);
+    if (bountyTokenAddress.trim() === "" || !DAOService) return undefined;
 
     try {
-      await DAOService.loadBountyToken(data.nftToken.address);
+      await DAOService.loadBountyToken(bountyTokenAddress);
+      fields.bountyToken.setter(bountyTokenAddress);
+      setBountyTokenError(false);
     } catch(error) {
-      changedDataHandler("tokens", { label: "nftToken", value: { ...data.nftToken, error: true } });
+      setBountyTokenError(true);
 
       return false;
     }
@@ -82,38 +93,29 @@ export default function TokenConfiguration({
 
   useEffect(() => {
     if (!DAOService) return;
-    if (data.networkToken.trim() === "") return setNetworkToken(undefined);
+    if (tokens?.settler?.trim() === "") return setNetworkToken(undefined);
 
-    DAOService.getERC20TokenData(data.networkToken).then(setNetworkToken).catch(console.log);
-  }, [data.networkToken, DAOService]);
+    DAOService.getERC20TokenData(tokens?.settler).then(setNetworkToken).catch(console.log);
+  }, [tokens?.settler, DAOService]);
 
   useEffect(() => {
     if (!DAOService) return;
-    if (data.networkToken.trim() === "" || data.nftToken.address.trim() === "") 
-      return changedDataHandler("tokens", { label: "validated", value: false });
 
-    DAOService.getERC20TokenData(data.networkToken).then(data => {
-      setNetworkToken(data);
-
-      return validateNFTAddress();
-    })
-    .then(validated => {
-      changedDataHandler("tokens", { label: "validated", value: validated });
-    })
-    .catch(console.log);
-  }, [data.networkToken, data.nftToken, DAOService]);
-
- /* eslint-enable */
+    if (tokens?.settler !== "")
+      DAOService.getERC20TokenData(tokens?.settler)
+        .then(setNetworkToken)
+        .catch(console.log);
+    
+    validateNFTAddress();
+  }, [tokens?.settler, tokens?.bounty, DAOService]);
  
   return (
     <Step
       title={t("custom-network:steps.token-configuration.title")}
       index={step}
       activeStep={currentStep}
-      validated={data.validated}
+      validated={tokens.validated}
       handleClick={handleChangeStep}
-      finishLabel={t("custom-network:steps.repositories.submit-label")}
-      handleFinish={handleFinish}
     >
       <div className="row">
         <TokensDropdown 
@@ -153,26 +155,6 @@ export default function TokenConfiguration({
         </div>
       </div>
 
-      {/* <div className="row">
-        <div className="d-flex align-items-center p-small text-white m-0 p-0">
-          <FormCheck
-            className="form-control-lg pb-0 pr-0 mr-0"
-            type="checkbox"
-            value={allowCustomTransactionalTokens}
-            onChange={handleCheck}
-          />
-          <span>
-            Allow users to use others tokens as Transactional Tokens
-          </span>
-        </div>
-      </div>
-
-      <div className="row">
-        <ListGroup>
-          <ListGroup.Item>Cras justo odio</ListGroup.Item>
-        </ListGroup>
-      </div> */}
-
       <div className="row align-items-center">
         <div className="form-group col-9">
           <label className="caption-small mb-2">
@@ -182,13 +164,13 @@ export default function TokenConfiguration({
           <input 
             type="text" 
             className="form-control" 
-            value={data.nftToken.address} 
+            value={bountyTokenAddress}
             onChange={handleNFTTokenChange}
             onBlur={validateNFTAddress}
           />
 
           {
-            data.nftToken.error && 
+            bountyTokenError && 
             <small className="small-info text-danger">
               {t("custom-network:steps.token-configuration.fields.nft-token.error.pre")}
               {" "}
@@ -205,6 +187,29 @@ export default function TokenConfiguration({
           <Button onClick={handleShowModal}>
             {t("custom-network:steps.token-configuration.actions.deploy-nft-token")}
           </Button>
+        </div>
+      </div>
+
+      <div className="row align-items-center">
+        <div className="form-group col-12">
+          <label className="caption-small mb-2">
+            {t("custom-network:steps.token-configuration.fields.nft-token-uri.label")}
+          </label>
+
+          <input 
+            type="text" 
+            className="form-control" 
+            value={bountyTokenUri}
+            onChange={handleNFTTokenURIChange}
+            onBlur={validateTokenUri}
+          />
+
+          {
+            bountyTokenUriError && 
+            <small className="small-info text-danger">
+              {t("custom-network:steps.token-configuration.fields.nft-token-uri.error")}
+            </small>
+          }
         </div>
       </div>
 

@@ -24,7 +24,7 @@ import { ProposalExtended } from "interfaces/bounty";
 import { pullRequest } from "interfaces/issue-data";
 import {
   Proposal,
-  IDistribuitonPerUser
+  DistribuitonPerUser
 } from "interfaces/proposal";
 
 import useApi from "x-hooks/use-api";
@@ -32,22 +32,22 @@ import useBepro from "x-hooks/use-bepro";
 
 export default function PageProposal() {
   const router = useRouter();
-  const { dispatch } = useContext(ApplicationContext);
   const { t } = useTranslation();
-  const { getUserOf, processEvent } = useApi();
-  const { handlerDisputeProposal, handleCloseIssue, handleRefuseByOwner } = useBepro();
-  const { activeIssue, networkIssue, getNetworkIssue, updateIssue } = useIssue();
-  const { activeNetwork } = useNetwork();
+
+  const { dispatch } = useContext(ApplicationContext);
+  
   const [proposal, setProposal] = useState<Proposal>({} as Proposal);
-  const [networkProposal, setNetworkProposal] = useState<ProposalExtended>({} as ProposalExtended);
   const [pullRequest, setPullRequest] = useState<pullRequest>({} as pullRequest);
-  const [usersDistribution, setUsersDistribution] = useState<
-    IDistribuitonPerUser[]
-  >([]);
+  const [usersDistribution, setUsersDistribution] = useState<DistribuitonPerUser[]>([]);
+  const [networkProposal, setNetworkProposal] = useState<ProposalExtended>({} as ProposalExtended);
+  
+  const { activeNetwork } = useNetwork();
+  const { getUserOf, processEvent } = useApi();
+  const { activeIssue, networkIssue, getNetworkIssue, updateIssue } = useIssue();
+  const { handlerDisputeProposal, handleCloseIssue, handleRefuseByOwner } = useBepro();
 
   async function closeIssue() {
-    handleCloseIssue(+activeIssue?.contractId,
-                     +proposal.contractId)
+    handleCloseIssue(+activeIssue?.contractId, +proposal.contractId)
       .then(txInfo => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
@@ -62,7 +62,9 @@ export default function PageProposal() {
             content: t("modals.not-mergeable.success-message")
         }));
       })
-      .catch((error) => {
+      .catch(error => {
+        console.log("Failed to close bounty", error);
+
         dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
@@ -73,29 +75,45 @@ export default function PageProposal() {
 
   async function disputeProposal() {
     handlerDisputeProposal(+proposal?.scMergeId)
-    .then(txInfo => {
-      const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
+      .then(txInfo => {
+        const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-      return processEvent("proposal", "disputed", activeNetwork?.name, { fromBlock } );
-    })
-    .then(() => {
-      getNetworkIssue();
-    });
+        return processEvent("proposal", "disputed", activeNetwork?.name, { fromBlock } );
+      })
+      .then(() => {
+        getNetworkIssue();
+      })
+      .catch(error => {
+        console.log("Failed to dispute proposal", error);
+
+        dispatch(addToast({
+            type: "danger",
+            title: t("actions.failed"),
+            content: error?.response?.data?.message
+        }));
+      });
   }
 
   async function handleRefuse() {
     handleRefuseByOwner(+activeIssue?.contractId, +proposal.contractId)
-    .then(() => {
+    .then(txInfo => {
+      const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
+
       updateIssue(activeIssue?.repository_id, activeIssue?.githubId);
       getNetworkIssue();
 
+      return processEvent("proposal", "refused", activeNetwork?.name, { fromBlock } );
+    })
+    .then(() => {
       dispatch(addToast({
-          type: "success",
-          title: t("actions.success"),
-          content: t("proposal:messages.proposal-refused")
+        type: "success",
+        title: t("actions.success"),
+        content: t("proposal:messages.proposal-refused")
       }));
     })
-    .catch((error) => {
+    .catch(error => {
+      console.log("Failed to refuse proposal", error);
+
       dispatch(addToast({
           type: "danger",
           title: t("actions.failed"),
@@ -104,12 +122,12 @@ export default function PageProposal() {
     });
   }
 
-  async function loadUsersDistribution() {
+  useEffect(() => {
     if (!networkProposal?.details?.length) return;
-  
-    async function mapUser(detail: ProposalDetail, i: number): Promise<IDistribuitonPerUser> {
+
+    Promise.all(networkProposal.details.map( async (detail: ProposalDetail, i: number) => {
       if(!detail.recipient) return;
-      
+
       const { githubLogin } = await getUserOf(detail.recipient);
       const oracles = networkProposal?.details[i]?.percentage.toString();
       const distributedAmount = networkIssue.tokenAmount * detail.percentage / 100;
@@ -121,34 +139,27 @@ export default function PageProposal() {
         oracles, 
         distributedAmount 
       };
-    }
-    const maping = networkProposal?.details?.map(mapUser) || [];
-    await Promise.all(maping).then(setUsersDistribution);
-  }
-
-  async function loadData() {
-    const { proposalId } = router.query;
-    const mergeProposal = activeIssue?.mergeProposals.find((p) => +p.id === +proposalId);
-    const networkProposals = networkIssue?.proposals?.[+mergeProposal?.contractId];
-
-    const PR = activeIssue?.pullRequests.find((pr) => pr.id === mergeProposal?.pullRequestId);
-
-    setPullRequest(PR);
-    setProposal(mergeProposal);
-    setNetworkProposal(networkProposals);
-  }
-
-  useEffect(() => {
-    loadUsersDistribution();
+    })).then(setUsersDistribution);
   }, [networkProposal, activeIssue]);
 
   useEffect(() => {
-    loadData();
+    if (!activeIssue || !networkIssue) return;
+
+    const { proposalId } = router.query;
+
+    const mergeProposal = activeIssue?.mergeProposals.find((p) => +p.id === +proposalId);
+    const networkProposals = networkIssue?.proposals?.[+mergeProposal?.contractId];
+    const pullRequest = activeIssue?.pullRequests.find((pr) => pr.id === mergeProposal?.pullRequestId);
+
+    setProposal(mergeProposal);
+    setPullRequest(pullRequest);
+    setNetworkProposal(networkProposals);
   }, [router.query, activeIssue, networkIssue]);
 
   return (
     <>
       <ProposalHero proposal={proposal} />
+
       <CustomContainer>
         <div className="mt-3">
           <ProposalPullRequestDetail
@@ -170,12 +181,11 @@ export default function PageProposal() {
       </CustomContainer>
 
       <NotMergeableModal
-        issuePRs={activeIssue?.pullRequests}
-        issue={activeIssue}
         pullRequest={pullRequest}
         proposal={proposal}
         networkProposal={networkProposal}
       />
+
       <ConnectWalletButton asModal={true} />
     </>
   );

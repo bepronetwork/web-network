@@ -9,17 +9,17 @@ import Button from "components/button";
 import GithubInfo from "components/github-info";
 import Modal from "components/modal";
 
+import { useIssue } from "contexts/issue";
 import { useRepos } from "contexts/repos";
 
 import { formatDate } from "helpers/formatDate";
 
-import { IssueData, pullRequest } from "interfaces/issue-data";
+import { pullRequest } from "interfaces/issue-data";
 interface CreateReviewModalModalProps{
   show: boolean,
   isExecuting: boolean,
   onConfirm: (body: string)=> void,
   onCloseClick: () => void,
-  issue: IssueData,
   pullRequest: pullRequest
 }
 export default function CreateReviewModal({
@@ -27,12 +27,14 @@ export default function CreateReviewModal({
   isExecuting = false,
   onConfirm,
   onCloseClick,
-  issue,
   pullRequest
 }: CreateReviewModalModalProps) {
-  const [body, setBody] = useState("");
-  const { activeRepo } = useRepos();
   const { t } = useTranslation(["common", "pull-request"]);
+
+  const [body, setBody] = useState("");
+  
+  const { activeRepo } = useRepos();
+  const { activeIssue } = useIssue();
 
   function isButtonDisabled(): boolean {
     return body.trim() === "" || isExecuting;
@@ -54,7 +56,7 @@ export default function CreateReviewModal({
       <div className="container">
         <div className="mb-2">
           <p className="caption-small trans mb-2">
-            #{issue?.githubId} {issue?.title}
+            #{activeIssue?.githubId} {activeIssue?.title}
           </p>
 
           <p className="h4 mb-2">
@@ -91,6 +93,7 @@ export default function CreateReviewModal({
             <label className="caption-small mb-2 text-gray">
               {t("modals.create-review.fields.review.label")}
             </label>
+            
             <textarea
               value={body}
               rows={5}

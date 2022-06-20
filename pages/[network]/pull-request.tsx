@@ -32,30 +32,32 @@ import useNetworkTheme from "x-hooks/use-network";
 
 export default function PullRequestPage() {
   const router = useRouter();
-  const { activeRepo } = useRepos();
-  const { activeIssue, networkIssue, addNewComment, updateIssue } = useIssue();
 
-  const { createReviewForPR, processEvent } = useApi();
+  const { t } = useTranslation(["common", "pull-request"]);
+  
   const [showModal, setShowModal] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
   const [pullRequest, setPullRequest] = useState<pullRequest>();
   const [networkPullRequest, setNetworkPullRequest] = useState<PullRequest>();
-  const { t } = useTranslation(["common", "pull-request"]);
+
+  const { dispatch } = useContext(ApplicationContext);
+  
+  const { activeRepo } = useRepos();
   const { activeNetwork } = useNetwork();
   const { wallet, user } = useAuthentication();
-  const { dispatch } = useContext(ApplicationContext);
-  const { prId, review } = router.query;
-  const { handleMakePullRequestReady, handleCancelPullRequest } = useBepro();
   const { getURLWithNetwork } = useNetworkTheme();
+  const { createReviewForPR, processEvent } = useApi();
+  const { handleMakePullRequestReady, handleCancelPullRequest } = useBepro();
+  const { activeIssue, networkIssue, addNewComment, updateIssue } = useIssue();
+  
+  const { prId, review } = router.query;
 
-  function loadData() {
-    dispatch(changeLoadState(true));
-    if (!prId) return;
-    const currentPR = activeIssue?.pullRequests.find((pr) => +pr?.githubId === +prId);
-    setPullRequest(currentPR);
-    setNetworkPullRequest(networkIssue?.pullRequests?.find(pr => +pr.id === +currentPR?.contractId));
-    dispatch(changeLoadState(false));
-  }
+  const isConnected = !!wallet?.address && !!user?.login;
+  const isPullRequestOpen = pullRequest?.state?.toLowerCase() === "open";
+  const isPullRequestReady = !!networkPullRequest?.ready;
+  const isPullRequestCanceled = !!networkPullRequest?.canceled;
+  const isPullRequestCancelable = !!networkPullRequest?.isCancelable;
+  const isPullRequestCreator = networkPullRequest?.creator?.toLowerCase() === wallet?.address?.toLowerCase();
 
   function handleCreateReview(body) {
     if (!user?.login) return;
@@ -78,6 +80,7 @@ export default function PullRequestPage() {
           ...pullRequest,
           comments: [...pullRequest.comments, response.data],
         });
+        
         addNewComment(pullRequest?.id, response.data);
 
         setIsExecuting(false);
@@ -167,18 +170,27 @@ export default function PullRequestPage() {
   }
 
   useEffect(() => {
-    if (activeIssue && networkIssue) loadData();
-  }, [activeIssue, networkIssue]);
+    if (!activeIssue || !networkIssue || !prId) return;
+
+    dispatch(changeLoadState(true));
+
+    const currentPR = activeIssue.pullRequests.find((pr) => +pr.githubId === +prId);
+    const currentNetworkPR = networkIssue?.pullRequests?.find(pr => +pr.id === +currentPR?.contractId);
+
+    setPullRequest(currentPR);
+    setNetworkPullRequest(currentNetworkPR);
+
+    dispatch(changeLoadState(false));
+  }, [activeIssue, networkIssue, prId]);
 
   useEffect(() => {
-    if (review && pullRequest && user?.login) {
-      setShowModal(true);
-    }
-  }, []);
+    if (review && pullRequest && user?.login) setShowModal(true);
+  }, [review, pullRequest, user]);
 
   return (
     <>
       <PullRequestHero currentPullRequest={pullRequest} />
+
       <CustomContainer>
         <div className="mt-3">
           <div className="row align-items-center bg-shadow border-radius-8 px-3 py-4">
@@ -192,11 +204,8 @@ export default function PullRequestPage() {
               </div>
 
               <div className="col-4 gap-20 p-0 d-flex justify-content-end">
-                {wallet?.address &&
-                  user?.login &&
-                  pullRequest?.state?.toLowerCase() === "open" &&
-                  networkPullRequest?.ready &&
-                  !networkPullRequest?.canceled && (
+                {/* Make Review Button */}
+                { (isConnected && isPullRequestOpen && isPullRequestReady && !isPullRequestCanceled) &&
                     <ReadOnlyButtonWrapper>
                       <Button
                         className="read-only-button text-nowrap"
@@ -205,53 +214,51 @@ export default function PullRequestPage() {
                         {t("actions.make-a-review")}
                       </Button>
                     </ReadOnlyButtonWrapper>
-                  )}
+                }
 
-                  {
-                    wallet?.address &&
-                    user?.login &&
-                    pullRequest?.state?.toLowerCase() === "open" &&
-                    pullRequest?.status === "draft" &&
-                    !networkPullRequest?.ready &&
-                    !networkPullRequest?.canceled &&
-                    networkPullRequest?.creator?.toLowerCase() === wallet?.address?.toLowerCase() && (
-                      <ReadOnlyButtonWrapper>
-                        <Button
-                          className="read-only-button text-nowrap"
-                          onClick={handleMakeReady}
-                        >
-                          {t("pull-request:actions.make-ready.title")}
-                        </Button>
-                      </ReadOnlyButtonWrapper>
-                    )
-                  }
+                {/* Make Ready for Review Button */}
+                { ( isConnected && 
+                    isPullRequestOpen && 
+                    !isPullRequestReady && 
+                    !isPullRequestCanceled && 
+                    isPullRequestCreator ) && (
+                    <ReadOnlyButtonWrapper>
+                      <Button
+                        className="read-only-button text-nowrap"
+                        onClick={handleMakeReady}
+                      >
+                        {t("pull-request:actions.make-ready.title")}
+                      </Button>
+                    </ReadOnlyButtonWrapper>
+                  )
+                }
 
-                  {
-                    wallet?.address &&
-                    user?.login &&
-                    networkPullRequest?.isCancelable &&
-                    !networkPullRequest?.canceled &&
-                    networkPullRequest?.creator?.toLowerCase() === wallet?.address?.toLowerCase() && (
-                      <ReadOnlyButtonWrapper>
-                        <Button
-                          className="read-only-button text-nowrap"
-                          onClick={handleCancel}
-                        >
-                          {t("actions.cancel")}
-                        </Button>
-                      </ReadOnlyButtonWrapper>
-                    )
-                  }
+                {/* Cancel Button */}
+                { ( isConnected &&
+                    !isPullRequestCanceled &&
+                    isPullRequestCancelable &&
+                    isPullRequestCreator ) && (
+                    <ReadOnlyButtonWrapper>
+                      <Button
+                        className="read-only-button text-nowrap"
+                        onClick={handleCancel}
+                      >
+                        {t("actions.cancel")}
+                      </Button>
+                    </ReadOnlyButtonWrapper>
+                  )
+                }
 
-                  <GithubLink
-                    repoId={String(activeRepo?.id)}
-                    forcePath={activeRepo?.githubPath}
-                    hrefPath={`pull/${pullRequest?.githubId || ""}`}
-                  >
-                    {t("actions.view-on-github")}
-                  </GithubLink>
+                <GithubLink
+                  repoId={String(activeRepo?.id)}
+                  forcePath={activeRepo?.githubPath}
+                  hrefPath={`pull/${pullRequest?.githubId || ""}`}
+                >
+                  {t("actions.view-on-github")}
+                </GithubLink>
               </div>
             </div>
+            
             <div className="col-12 mt-4">
               {(pullRequest?.comments?.length > 0 &&
                 React.Children.toArray(pullRequest?.comments?.map((comment, index) => (
@@ -268,11 +275,10 @@ export default function PullRequestPage() {
 
       <CreateReviewModal
         show={showModal}
-        onCloseClick={handleCloseModal}
-        issue={activeIssue}
         pullRequest={pullRequest}
-        onConfirm={handleCreateReview}
         isExecuting={isExecuting}
+        onConfirm={handleCreateReview}
+        onCloseClick={handleCloseModal}
       />
 
       <ConnectWalletButton asModal={true} />
