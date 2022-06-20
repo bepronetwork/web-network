@@ -98,7 +98,7 @@ const serverRuntimeConfig = {
   schedules: {
     startProcessEventsAt: process.env.SCHEDULES_START_BLOCK,
   },
-  e2e:  Boolean(process.env.NEXT_E2E_TESTNET) || false,
+  e2e:  process.env.NEXT_E2E_TESTNET === "true" ? true : false || false,
 }
 
 
