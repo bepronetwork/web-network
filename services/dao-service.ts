@@ -7,7 +7,7 @@ import {
   TreasuryInfo,
   OraclesResume,
   Web3Connection,
-  NetworkFactoryV2
+  Network_Registry
 } from "@taikai/dappkit";
 import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import getConfig from "next/config";
@@ -21,11 +21,11 @@ const { publicRuntimeConfig } = getConfig();
 export default class DAO {
   private _web3Connection: Web3Connection;
   private _network: Network_v2;
-  private _factory: NetworkFactoryV2;
+  private _registry: Network_Registry;
 
   get web3Connection() { return this._web3Connection; }
   get network() { return this._network; }
-  get factory() { return this._factory; }
+  get registry() { return this._registry; }
 
   constructor(skipWindowAssignment = false) {
     if (!publicRuntimeConfig?.web3ProviderConnection)
@@ -56,20 +56,20 @@ export default class DAO {
     return false;
   }
 
-  async loadFactory(skipAssignment?: boolean): Promise<NetworkFactoryV2 | boolean> {
+  async loadRegistry(skipAssignment?: boolean): Promise<Network_Registry | boolean> {
     try {
-      if (!publicRuntimeConfig?.networkConfig?.factoryAddress) 
-        throw new Error("Missing NetworkFactoryV2 Contract Address");
+      if (!publicRuntimeConfig?.contract?.registry) 
+        throw new Error("Missing Network_Registry Contract Address");
 
-      const factory = new NetworkFactoryV2(this.web3Connection, publicRuntimeConfig.networkConfig.factoryAddress);
+      const registry = new Network_Registry(this.web3Connection, publicRuntimeConfig.contract.registry);
 
-      await factory.loadContract();
+      await registry.loadContract();
 
-      if (!skipAssignment) this._factory = factory;
+      if (!skipAssignment) this._registry = registry;
 
-      return factory;
+      return registry;
     } catch (error) {
-      console.log("Error loading NetworkFactoryV2: ", error);
+      console.log("Error loading Network_Registry: ", error);
     }
 
     return false;
@@ -247,52 +247,66 @@ export default class DAO {
     return network.totalSettlerLocked();
   }
 
-  async getNetworksQuantityInFactory(): Promise<number> {
-    if (!this.factory) await this.loadFactory();
+  async getNetworksQuantityInRegistry(): Promise<number> {
+    if (!this.registry) await this.loadRegistry();
 
-    return this.factory.amountOfNetworks();
+    return this.registry.amountOfNetworks();
   }
 
-  async getTokensLockedInFactory(): Promise<number> {
-    if (!this.factory) await this.loadFactory();
+  async getTokensLockedInRegistry(): Promise<number> {
+    if (!this.registry) await this.loadRegistry();
 
-    return this.factory.tokensLocked();
+    return this.registry.totalLockedAmount();
   }
 
-  async isTokenApprovedInFactoy(amount: number): Promise<boolean> {
-    if (!this.factory) await this.loadFactory();
+  async isTokenApprovedInRegistry(amount: number): Promise<boolean> {
+    if (!this.registry) await this.loadRegistry();
 
-    return this.factory.isApprovedNetworkToken(amount);
+    return this.registry.token.isApproved(this.registry.contractAddress, amount);
   }
 
-  async approveTokenInFactory(amount: number): Promise<TransactionReceipt> {
-    if (!this.factory) await this.loadFactory();
+  async approveTokenInRegistry(amount: number): Promise<TransactionReceipt> {
+    if (!this.registry) await this.loadRegistry();
 
-    return this.factory.approveNetworkToken(amount);
+    return this.registry.token.approve(this.registry.contractAddress, amount);
   }
 
-  async lockInFactory(amount: number): Promise<TransactionReceipt> {
-    if (!this.factory) await this.loadFactory();
+  async lockInRegistry(amount: number): Promise<TransactionReceipt> {
+    if (!this.registry) await this.loadRegistry();
 
-    return this.factory.lock(amount);
+    return this.registry.lock(amount);
   }
 
-  async unlockFromFactory(): Promise<TransactionReceipt> {
-    if (!this.factory) await this.loadFactory();
+  async unlockFromRegistry(): Promise<TransactionReceipt> {
+    if (!this.registry) await this.loadRegistry();
 
-    return this.factory.unlock();
+    return this.registry.unlock();
   }
 
-  async getTokensLockedInFactoryByAddress(address: string): Promise<number> {
-    if (!this.factory) await this.loadFactory();
+  async getTokensLockedInRegistryByAddress(address: string): Promise<number> {
+    if (!this.registry) await this.loadRegistry();
 
-    return this.factory.lockedTokensOfAddress(address);
+    return this.registry.lockedTokensOfAddress(address);
   }
 
-  async getFactoryCreatorAmount(): Promise<number> {
-    if (!this.factory) await this.loadFactory();
+  async getRegistryCreatorAmount(): Promise<number> {
+    if (!this.registry) await this.loadRegistry();
       
-    return this.factory.creatorAmount();
+    return this.registry.lockAmountForNetworkCreation();
+  }
+
+  async isRegistryGovernor(address: string): Promise<boolean> {
+    if (!this.registry) await this.loadRegistry();
+
+    const governor = await this.registry.governed._governor();
+
+    return governor === address;
+  }
+
+  async isNetworkGovernor(address: string): Promise<boolean> {
+    const governor = await this.network.governed._governor();
+
+    return governor === address;
   }
 
   async isNetworkAbleToClosed(): Promise<boolean> {
@@ -435,36 +449,29 @@ export default class DAO {
     return this.network.takeBackOracles(delegationId);
   }
 
-  async createNetwork(networkToken: string = publicRuntimeConfig?.contract?.settler, 
+  async deployNetworkV2(networkToken: string = publicRuntimeConfig?.contract?.settler, 
     nftToken: string = publicRuntimeConfig?.contract?.nft, 
     nftUri = publicRuntimeConfig?.nftUri || "//",
     treasuryAddress = Defaults.nativeZeroAddress,
     cancelFee = 10000,
     closeFee= 50000): Promise<TransactionReceipt> {
-    if (!this.factory) await this.loadFactory();
+    const newNetwork = new Network_v2(this.web3Connection);
 
-    return this.factory.createNetwork(networkToken, nftToken, nftUri, treasuryAddress, cancelFee, closeFee);
+    await newNetwork.loadAbi();
+
+    return newNetwork.deployJsonAbi(networkToken, nftToken, nftUri, treasuryAddress, cancelFee, closeFee);
+  }
+
+  async addNetworkToRegistry(networkAddress: string): Promise<TransactionReceipt> {
+    if (!this.registry) await this.loadRegistry();
+
+    return this.registry.registerNetwork(networkAddress);
   }
 
   async getNetworkAdressByCreator(address: string): Promise<string> {
-    if (!this.factory) await this.loadFactory();
+    if (!this.registry) await this.loadRegistry();
 
-    return this.factory.networkOfAddress(address);
-  }
-
-  // TODO: use this method when the https://github.com/taikai/dappkit/pull/25 is merged
-  /*
-  async claimNetworkGovernor(networkAddress): Promise<TransactionReceipt> {
-    const network = await this.getNetwork(networkAddress);
-
-    return network.governed.claimGovernor();
-  }
-  */
-
-  async claimNetworkGovernor(networkAddress): Promise<TransactionReceipt> {
-    const network = await this.getNetwork(networkAddress);
-
-    return network.sendTx(network.contract.methods.claimGovernor());
+    return this.registry.networkOfAddress(address);
   }
 
   async setNFTTokenDispatcher(nftToken: string, dispatcher: string): Promise<TransactionReceipt> {
@@ -480,4 +487,16 @@ export default class DAO {
   isAddress(address: string): Promise<boolean> {
     return this.web3Connection.utils.isAddress(address);
   }
+
+  getTimeChain(): Promise<number> { 
+    return this.web3Connection.Web3.eth.getBlock(`latest`).then(block => block.timestamp*1000);
+  }
+
+  async isBountyInDraftChain(creationDateIssue: number): Promise<boolean> { 
+    const time = await this.getTimeChain();
+    const redeemTime = await this.network.draftTime();
+
+    return (new Date(time) < new Date(creationDateIssue + redeemTime))
+  }
+
 }

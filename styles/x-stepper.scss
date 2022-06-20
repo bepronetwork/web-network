@@ -6,7 +6,7 @@
   .step {
     background-color: $bg-shadow;
 
-    svg:not(button svg) {
+    svg:not(button):not(svg):not(.info) {
       color: var(--bs-primary);
     }
 

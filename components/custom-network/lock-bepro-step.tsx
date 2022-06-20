@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ProgressBar } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
@@ -8,6 +8,7 @@ import ArrowRightLine from "assets/icons/arrow-right-line";
 import LockedIcon from "assets/icons/locked-icon";
 
 import Button from "components/button";
+import AmountWithPreview from "components/custom-network/amount-with-preview";
 import InputNumber from "components/input-number";
 import Step from "components/step";
 import UnlockBeproModal from "components/unlock-bepro-modal";
@@ -15,19 +16,16 @@ import UnlockBeproModal from "components/unlock-bepro-modal";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
+import { useNetworkSettings } from "contexts/network-settings";
 
 import { formatNumberToCurrency, formatNumberToNScale } from "helpers/formatNumber";
 
 const { publicRuntimeConfig } = getConfig();
 
 export default function LockBeproStep({
-  data,
   step,
-  balance,
   currentStep,
-  handleChange,
-  handleChangeStep,
-  creatorAmount = 0
+  handleChangeStep
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
 
@@ -35,44 +33,44 @@ export default function LockBeproStep({
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [showUnlockBepro, setShowUnlockBepro] = useState(false);
   const [settlerAllowance, setSettlerAllowance] = useState(0);
+  const [amount, setAmount] = useState(0);
 
-  const { service: DAOService } = useDAO();
-  const { wallet, updateWalletBalance } = useAuthentication();
   const { activeNetwork } = useNetwork();
+  const { service: DAOService } = useDAO();
+  const { tokensLocked } = useNetworkSettings();
+  const { wallet, updateWalletBalance } = useAuthentication();
 
   const networkTokenName = activeNetwork?.networkToken?.symbol || t("misc.$token");
 
-  const lockedPercent =
-    ((data.amountLocked || 0) / (data.amountNeeded || 0)) * 100;
-  const lockingPercent = ((data.amount || 0) / (data.amountNeeded || 0)) * 100;
+  const balance = {
+    beproAvailable: wallet?.balance?.bepro,
+    oraclesAvailable: +wallet?.balance?.oracles?.tokensLocked - wallet?.balance?.oracles?.delegatedToOthers,
+    tokensLocked: wallet?.balance?.oracles?.tokensLocked,
+  };
+
+  const amountLocked = tokensLocked.locked;
+  const amountNeeded = tokensLocked.needed;
+
+  const lockedPercent = (amountLocked / amountNeeded) * 100;
+  const lockingPercent = (amount / amountNeeded) * 100;
   const maxPercent = 100 - lockedPercent;
-  const maxValue = Math.min(balance.beproAvailable,
-                            +data.amountNeeded - +data.amountLocked);
-  const textAmountClass =
-    data.amount > balance.beproAvailable ? "text-danger" : "text-primary";
-  const amountsClass = data.amount > maxValue ? "danger" : "success";
-  const needsAllowance = data.amount > settlerAllowance;
+  const maxValue = Math.min(balance.beproAvailable, amountNeeded - amountLocked);
+  const textAmountClass = amount > balance.beproAvailable ? "danger" : "primary";
+  const amountsClass = amount > maxValue ? "danger" : "success";
+  const needsAllowance = amount > settlerAllowance;
 
   async function handleLock() {
-    if (!DAOService) return;
+    if (!DAOService || !amount) return;
 
     setIsLocking(true);
 
-    try {
-      const amount = data.amount;
-
-      DAOService.lockInFactory(amount)
-        .then(() => {
-          handleChange({ label: "amountLocked", value: amount });
-          handleChange({ label: "amount", value: 0 });
-          updateWalletBalance();
-        })
-        .catch(console.log)
-        .finally(() => setIsLocking(false));
-    } catch (error) {
-      console.log(error);
-      setIsLocking(false);
-    }
+    DAOService.lockInRegistry(amount)
+      .then(() => {
+        setAmount(0);
+        updateWalletBalance();
+      })
+      .catch(console.log)
+      .finally(() => setIsLocking(false));
   }
 
   async function handleUnLock() {
@@ -80,10 +78,9 @@ export default function LockBeproStep({
     
     setIsUnlocking(true);
 
-    DAOService.unlockFromFactory()
+    DAOService.unlockFromRegistry()
       .then(() => {
-        handleChange({ label: "amountLocked", value: 0 });
-        handleChange({ label: "amount", value: 0 });
+        setAmount(0);
         updateWalletBalance();
         updateAllowance();
       })
@@ -101,10 +98,18 @@ export default function LockBeproStep({
     setShowUnlockBepro(false);
   }
 
-  function handleApproval() {
-    if (data.amountNeeded <= 0) return;
+  function handleAmountChange(params) {
+    setAmount(params.floatValue);
+  }
 
-    DAOService.approveTokenInFactory(data.amountNeeded - settlerAllowance)
+  function handleSetMaxValue() {
+    setAmount(maxValue);
+  }
+
+  function handleApproval() {
+    if (amountNeeded <= 0) return;
+
+    DAOService.approveTokenInRegistry(amountNeeded - settlerAllowance)
       .then(() => {
         updateWalletBalance();
         updateAllowance();
@@ -115,22 +120,26 @@ export default function LockBeproStep({
   function updateAllowance() {  
     DAOService.getAllowance(publicRuntimeConfig?.contract?.settler,
                             wallet.address, 
-                            publicRuntimeConfig?.networkConfig?.factoryAddress)
+                            publicRuntimeConfig?.contract?.registry)
     .then(setSettlerAllowance).catch(() => 0);
   }
+
+  useEffect(() => {
+    if (DAOService && wallet?.address) updateAllowance();
+  }, [DAOService, wallet?.address]);
 
   return (
     <Step
       title={t("custom-network:steps.lock.title", { currency: networkTokenName })}
       index={step}
       activeStep={currentStep}
-      validated={data.validated}
+      validated={tokensLocked.validated}
       handleClick={handleChangeStep}
     >
       <div className="row mb-4">
         <span className="caption-small text-gray">
           {t("custom-network:steps.lock.you-need-to-lock", 
-            { creatorAmount: formatNumberToNScale(creatorAmount), currency: networkTokenName })}
+            { creatorAmount: formatNumberToNScale(amountNeeded), currency: networkTokenName })}
         </span>
       </div>
 
@@ -149,19 +158,15 @@ export default function LockBeproStep({
                 <InputNumber
                   classSymbol={"text-primary"}
                   max={maxValue}
-                  value={data.amount}
-                  error={data.amount > maxValue}
-                  setMaxValue={() =>
-                    handleChange({ label: "amount", value: maxValue })
-                  }
+                  value={amount}
+                  error={amount > maxValue}
+                  setMaxValue={handleSetMaxValue}
                   min={0}
                   placeholder={"0"}
                   thousandSeparator
                   decimalSeparator="."
                   decimalScale={18}
-                  onValueChange={(params) =>
-                    handleChange({ label: "amount", value: params.floatValue })
-                  }
+                  onValueChange={handleAmountChange}
                 />
 
                 <div className="d-flex caption-small justify-content-between align-items-center p-20">
@@ -177,7 +182,7 @@ export default function LockBeproStep({
                       })}
                     </span>
 
-                    {data.amount > 0 && (
+                    {amount > 0 && (
                       <>
                         <span
                           className={`${textAmountClass} ml-1 d-flex align-items-center`}
@@ -186,8 +191,7 @@ export default function LockBeproStep({
                         </span>
 
                         <span className={`${textAmountClass} ml-1`}>
-                          {formatNumberToCurrency(parseFloat(balance.beproAvailable) -
-                              parseFloat(data.amount))}
+                          {formatNumberToCurrency(balance.beproAvailable - amount)}
                         </span>
                       </>
                     )}
@@ -238,38 +242,19 @@ export default function LockBeproStep({
           </p>
 
           <div className="d-flex justify-content-between caption-large mb-3 amount-input">
-            <div className="d-flex align-items-center">
-              <span
-                className={`text-${
-                  (lockedPercent >= 100 && "success") || "white"
-                } mr-1`}
-              >
-                {formatNumberToCurrency(data.amountLocked || 0, {
-                  maximumFractionDigits: 18
-                })}
-              </span>
+            <AmountWithPreview
+              amount={amountLocked}
+              amountColor={(lockedPercent >= 100 && "success") || "white"}
+              preview={amountLocked + amount}
+              previewColor={amountsClass}
+              type="currency"
+            />
 
-              {data.amount > 0 && (
-                <div className={`text-${amountsClass}`}>
-                  <ArrowRightLine />
-
-                  <span className="ml-1">
-                    {formatNumberToCurrency(parseFloat(data.amountLocked) + parseFloat(data.amount))}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <span
-              className={`text-${
-                (lockedPercent >= 100 && "success") || "gray"
-              }`}
-            >
-              {(lockedPercent >= 100 && "full") ||
-                formatNumberToCurrency(data.amountNeeded || 0, {
-                  maximumFractionDigits: 18
-                })}
-            </span>
+            <AmountWithPreview
+              amount={lockedPercent >= 100 && t("custom-network:steps.lock.full") || amountNeeded}
+              amountColor={(lockedPercent >= 100 && "success") || "gray"}
+              type="currency"
+            />
           </div>
 
           <div className="row justify-content-between caption-large mb-3">
@@ -288,30 +273,14 @@ export default function LockBeproStep({
             </ProgressBar>
           </div>
 
-          <div className="d-flex align-items-center caption-large text-white amount-input">
-            <span
-              className={`text-${
-                (lockedPercent >= 100 && "success") || "white"
-              } mr-1`}
-            >
-              {formatNumberToCurrency(lockedPercent, {
-                maximumFractionDigits: 2
-              })}
-              %
-            </span>
-
-            {data.amount > 0 && (
-              <div className={`text-${amountsClass}`}>
-                <ArrowRightLine />
-
-                <span className="ml-1">
-                  {formatNumberToCurrency(lockingPercent + lockedPercent, {
-                    maximumFractionDigits: 2
-                  })}
-                  %
-                </span>
-              </div>
-            )}
+          <div className="d-flex align-items-center caption-large amount-input">
+            <AmountWithPreview
+              amount={lockedPercent}
+              amountColor={(lockedPercent >= 100 && "success") || "white"}
+              preview={lockingPercent + lockedPercent}
+              previewColor={amountsClass}
+              type="percent"
+            />
           </div>
 
           <div className="d-flex justify-content-center mt-4 pt-3">
@@ -323,17 +292,17 @@ export default function LockBeproStep({
               ||
               <Button
               disabled={
-                !(data.amount > 0) ||
+                !(amount > 0) ||
                 lockedPercent >= 100 ||
-                data.amount > maxValue ||
+                amount > maxValue ||
                 isLocking
               }
               onClick={() => handleLock()}
             >
               {!isLocking &&
-                (!(data.amount > 0) ||
+                (!(amount > 0) ||
                   lockedPercent >= 100 ||
-                  data.amount > maxValue) && (
+                  amount > maxValue) && (
                   <LockedIcon width={12} height={12} className="mr-1" />
                 )}
               <span>

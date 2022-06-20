@@ -24,7 +24,11 @@ export default function TransactionType({ type }) {
     [TransactionTypes.makePullRequestReady]: t("transactions.types.make-pull-request-ready"),
     [TransactionTypes.updateBountyAmount]: t("transactions.types.update-bounty-amount"),
     [TransactionTypes.cancelPullRequest]: t("transactions.types.cancel-pull-request"),
-    [TransactionTypes.refuseProposal]: t("transactions.types.refused-by-owner")
+    [TransactionTypes.refuseProposal]: t("transactions.types.refused-by-owner"),
+    [TransactionTypes.deployNetworkV2]: t("transactions.types.deploy-network-v2"),
+    [TransactionTypes.setNFTDispatcher]: t("transactions.types.set-dispatcher"),
+    [TransactionTypes.addNetworkToRegistry]: t("transactions.types.register-network"),
+    [TransactionTypes.deployBountyToken]: t("transactions.types.deploy-bounty-token"),
   };
 
   return (

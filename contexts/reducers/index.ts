@@ -1,4 +1,3 @@
-import { ChangeAccessToken } from "contexts/reducers/change-access-token";
 import { ChangeGithubLogin } from "contexts/reducers/change-github-login";
 import { ChangeMicroServiceReady } from "contexts/reducers/change-microservice-ready";
 import { ChangeNetwork } from "contexts/reducers/change-network";
@@ -42,7 +41,6 @@ export default function LoadApplicationReducers() {
     ChangeNetwork,
     ChangeNetworkId,
     ChangeGithubLogin,
-    ChangeAccessToken,
     ChangeTransactionalTokenApproval,
     ChangeSettlerTokenApproval,
     ChangeNetworksSummary,

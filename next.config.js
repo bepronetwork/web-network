@@ -12,7 +12,8 @@ const publicRuntimeConfig = {
     address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
     settler: process.env.NEXT_PUBLIC_SETTLER_ADDRESS,
     transaction: process.env.NEXT_PUBLIC_TRANSACTION_ADDRESS,
-    nft: process.env.NEXT_PUBLIC_NFT_ADDRESS
+    nft: process.env.NEXT_PUBLIC_NFT_ADDRESS,
+    registry: process.env.NEXT_PUBLIC_NETWORK_REGISTRY_ADDRESS
   },
   nftUri: process.env.NEXT_PUBLIC_NFT_URI,
   web3ProviderConnection: process.env.NEXT_PUBLIC_WEB3_CONNECTION,
@@ -43,7 +44,6 @@ const publicRuntimeConfig = {
     },
     disputesPercentage: process.env.NEXT_PUBLIC_DISPUTE_PERCENTAGE_MAX,
     networkName: process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME,
-    factoryAddress: process.env.NEXT_PUBLIC_NETWORK_FACTORY_ADDRESS,
     allowCustomTokens: process.env.NEXT_PUBLIC_ALLOW_CUSTOM_TOKENS
   },
   currency:{
@@ -97,7 +97,8 @@ const serverRuntimeConfig = {
   },
   schedules: {
     startProcessEventsAt: process.env.SCHEDULES_START_BLOCK,
-  }
+  },
+  e2e:  Boolean(process.env.NEXT_E2E_TESTNET) || false,
 }
 
 

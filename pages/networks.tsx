@@ -87,14 +87,15 @@ export default function NetworksPage() {
         value: amountInNetworks,
         label: t("custom-network:hero.in-the-network"),
         currency: "USD",
-        hasNotConvertedTokens: !!Object.entries(networks).find(network => !network[1].isListedInCoinGecko),
+        hasNotConvertedTokens: !!Object.entries(networks).find(network => 
+          !network[1].isListedInCoinGecko && network[1].amountInCurrency > 0),
         setNotListedModalVisibility: () => setIsModalVisible(true)
       }
     ]);    
   }, [networks]);
 
   useEffect(() => {
-    if (DAOService) DAOService.loadFactory();
+    if (DAOService) DAOService.loadRegistry();
   }, [DAOService]);
 
   return (

@@ -117,7 +117,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     let isDraft = null;
 
     try {
-      isDraft = await DAOService.isBountyInDraft(bounty.id);
+      isDraft = await DAOService.isBountyInDraftChain(bounty.creationDate);
     } catch (error) {
       console.error(error);
     }

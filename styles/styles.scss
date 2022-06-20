@@ -17,6 +17,7 @@
 @import "components/network-hero";
 @import "components/creating-network-loader";
 @import "components/counter-badge";
+@import "components/amount-with-preview";
 
 @function toRGB($color) {
   @return "" + red($color) + ", " + green($color) + ", " + blue($color);
@@ -1397,6 +1398,13 @@ input[type="color"] {
       svg {
         path {
           fill: var(--bs-primary);
+        }
+      }
+    }
+    &-success {
+      svg {
+        path {
+          fill: var(--bs-success);
         }
       }
     }

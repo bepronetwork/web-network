@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 
+import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -13,22 +14,21 @@ import LockBeproStep from "components/custom-network/lock-bepro-step";
 import NetworkInformationStep from "components/custom-network/network-information-step";
 import SelectRepositoriesStep from "components/custom-network/select-repositories-step";
 import TokenConfiguration from "components/custom-network/token-configuration";
+import TreasuryStep from "components/custom-network/treasury-step";
 import Stepper from "components/stepper";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
+import { useNetwork } from "contexts/network";
+import { useNetworkSettings } from "contexts/network-settings";
 import { addToast } from "contexts/reducers/add-toast";
 
-import { isSameSet } from "helpers/array";
-import { isColorsSimilar } from "helpers/colors";
-import { DefaultNetworkInformation } from "helpers/custom-network";
 import { psReadAsText } from "helpers/file-reader";
 
 import useApi from "x-hooks/use-api";
+import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network";
-import useOctokitGraph from "x-hooks/use-octokit-graph";
-
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -38,125 +38,106 @@ export default function NewNetwork() {
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [creatingNetwork, setCreatingNetwork] = useState(false);
-  const [steps, setSteps] = useState(DefaultNetworkInformation);
+  const [creatingNetwork, setCreatingNetwork] = useState<number>();
 
   const { createNetwork } = useApi();
-  const { user, wallet } = useAuthentication();
+  const { activeNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
-  const { getUserRepositories } = useOctokitGraph();
-  const { network, getURLWithNetwork, colorsToCSS, DefaultTheme } = useNetworkTheme();
+  const { user, wallet } = useAuthentication();
+  const { getURLWithNetwork, colorsToCSS } = useNetworkTheme();
+  const { tokensLocked, details, github, tokens, treasury } = useNetworkSettings();
+  const { handleDeployNetworkV2, handleSetDispatcher, handleAddNetworkToRegistry } = useBepro();
 
   const { dispatch } = useContext(ApplicationContext);
 
-
-  function changeColor(newColor) {
-    const tmpSteps = Object.assign({}, steps);
-
-    tmpSteps.network.data.colors.data[newColor.label] = newColor.value;
-
-    setSteps(tmpSteps);
-  }
-
-  function handleNetworkDataChange(newData) {
-    const tmpSteps = Object.assign({}, steps);
-
-    tmpSteps.network.data[newData.label] = newData.value;
-
-    setSteps(tmpSteps);
-  }
-
-  function handleStepDataChange(step, newData) {
-    const tmpSteps = Object.assign({}, steps);
-
-    tmpSteps[step][newData.label] = newData.value;
-
-    setSteps(tmpSteps);
-  }
-
-  function handleCheckRepository(repositoryName) {
-    const tmpSteps = Object.assign({}, steps);
-
-    const repositoryIndex = tmpSteps.repositories.data.findIndex((repo) => repo.name === repositoryName);
-
-    tmpSteps.repositories.data[repositoryIndex].checked =
-      !tmpSteps.repositories.data[repositoryIndex].checked;
-
-    setSteps(tmpSteps);
-  }
-
-  function handleCheckPermission(check) {
-    const tmpSteps = Object.assign({}, steps);
-
-    tmpSteps.repositories.permission = check;
-
-    setSteps(tmpSteps);
-  }
-
-  function handleLockDataChange(newData) {
-    const tmpSteps = Object.assign({}, steps);
-
-    tmpSteps.lock[newData.label] = newData.value;
-
-    setSteps(tmpSteps);
-  }
+  const creationSteps = [
+    {
+      id: 1,
+      name: t("custom-network:modals.loader.steps.deploy-network"),
+    },
+    {
+      id: 2,
+      name: t("custom-network:modals.loader.steps.set-dispatcher")
+    },
+    {
+      id: 3,
+      name: t("custom-network:modals.loader.steps.add-to-registry"),
+    },
+    {
+      id: 4,
+      name: t("custom-network:modals.loader.steps.sync-web-network")
+    },
+  ];
 
   function handleChangeStep(stepToGo: number) {
     const stepsNames = {
-      1: "lock",
-      2: "network",
-      3: "repositories",
-      4: "token"
+      1: tokensLocked,
+      2: details,
+      3: github,
+      4: tokens,
+      5: treasury
     };
 
     let canGo = false;
 
     if (stepToGo !== currentStep) {
       if (stepToGo < currentStep) canGo = true;
-      else if (steps[stepsNames[stepToGo - 1]].validated) canGo = true;
+      else if (stepsNames[stepToGo - 1].validated) canGo = true;
     }
-    
+
     if (canGo) setCurrentStep(stepToGo);
   }
 
   async function handleCreateNetwork() {
     if (!user?.login || !wallet?.address || !DAOService) return;
 
-    setCreatingNetwork(true);
+    setCreatingNetwork(0);
 
-    DAOService.createNetwork(steps.tokens.networkToken, steps.tokens.nftToken.address)
+    const deployNetworkTX = await handleDeployNetworkV2(tokens.settler,
+                                                        tokens.bounty,
+                                                        tokens.bountyURI,
+                                                        treasury.address.value,
+                                                        treasury.cancelFee,
+                                                        treasury.closeFee).catch(error => error);
+
+    if (!(deployNetworkTX as TransactionReceipt)?.contractAddress) return setCreatingNetwork(undefined);
+
+    const deployedNetworkAddress = (deployNetworkTX as TransactionReceipt).contractAddress;
+
+    setCreatingNetwork(1);
+
+    await handleSetDispatcher(tokens.bounty, deployedNetworkAddress)
+      .catch(error => console.error("Failed to set dispatcher", deployedNetworkAddress, error));
+
+    setCreatingNetwork(2);
+
+    await handleAddNetworkToRegistry(deployedNetworkAddress)
+      .catch(error => console.error("Failed to add to registry", deployedNetworkAddress, error));
+
+    setCreatingNetwork(3);
+
+    const payload = {
+      name: details.name.value,
+      description: details.description,
+      colors: JSON.stringify(details.theme.colors),
+      logoIcon: await psReadAsText(details.iconLogo.value.raw),
+      fullLogo: await psReadAsText(details.fullLogo.value.raw),
+      repositories: 
+        JSON.stringify(github.repositories
+          .filter((repo) => repo.checked)
+          .map(({ name, fullName }) => ({ name, fullName }))),
+      botPermission: github.botPermission,
+      creator: wallet.address,
+      githubLogin: user.login,
+      networkAddress: deployedNetworkAddress,
+      accessToken: user.accessToken
+    };
+
+    await createNetwork(payload)
       .then(() => {
-        DAOService.getNetworkAdressByCreator(wallet.address).then(async (networkAddress) => {
-          const networkData = steps.network.data;
-          const repositoriesData = steps.repositories;
+        router.push(getURLWithNetwork("/account/my-network/settings", { network: payload.name }));
 
-          await DAOService.claimNetworkGovernor(networkAddress);
-          await DAOService.setNFTTokenDispatcher(steps.tokens.nftToken.address, networkAddress);
-
-          const json = {
-              name: networkData.displayName.data,
-              description: networkData.networkDescription,
-              colors: JSON.stringify(networkData.colors.data),
-              logoIcon: await psReadAsText(networkData.logoIcon.raw),
-              fullLogo: await psReadAsText(networkData.fullLogo.raw),
-              repositories: JSON.stringify(repositoriesData.data
-                  .filter((repo) => repo.checked)
-                  .map(({ name, fullName }) => ({ name, fullName }))),
-              botPermission: repositoriesData.permission,
-              creator: wallet.address,
-              githubLogin: user.login,
-              networkAddress,
-              accessToken: user?.accessToken,
-          };
-
-          createNetwork(json).then(() => {
-            router.push(getURLWithNetwork("/account/my-network/settings", {
-                  network: json.name,
-            }));
-
-            setCreatingNetwork(false);
-          });
-        });
+        setCreatingNetwork(undefined);
       })
       .catch((error) => {
         dispatch(addToast({
@@ -167,200 +148,59 @@ export default function NewNetwork() {
             }),
         }));
 
-        setCreatingNetwork(false);
-        console.log(error);
+        setCreatingNetwork(undefined);
+        console.error("Failed synchronize network with web-network", deployedNetworkAddress, error);
       });
   }
 
   useEffect(() => {
-    if (!network) return;
+    if (!activeNetwork) return;
 
-    if (network.name !== publicRuntimeConfig?.networkConfig?.networkName)
+    if (activeNetwork.name.toLowerCase() !== publicRuntimeConfig?.networkConfig?.networkName.toLowerCase())
       router.push(getURLWithNetwork("/account", { network: publicRuntimeConfig?.networkConfig?.networkName }));
-    else if (!Object.keys(steps.network.data.colors.data).length) {
-      const tmpSteps = Object.assign({}, steps);
-
-      tmpSteps.network.data.colors.data = network.colors || DefaultTheme();
-
-      setSteps(tmpSteps);
-    }
-  }, [network]);
-
-  useEffect(() => {
-    if (user?.login)
-      getUserRepositories(user.login).then(repos => {
-        const repositories = 
-          repos
-          .filter(repo => (!repo.isFork && (user?.login === repo.nameWithOwner.split("/")[0])) || repo.isOrganization)
-          .map(repo => ({
-            checked: false,
-            name: repo.name,
-            fullName: repo.nameWithOwner,
-          }));
-
-        const tmpSteps = Object.assign({}, steps);
-
-        tmpSteps.repositories.data = repositories;
-
-        setSteps(tmpSteps);
-      });
-  }, [user?.login]);
-
-  useEffect(() => {
-    if (wallet?.address && DAOService) {
-      DAOService.getTokensLockedInFactoryByAddress(wallet.address)
-        .then((value) => {
-          handleLockDataChange({ label: "amountLocked", value });
-        })
-        .catch(console.log);
-
-      DAOService.getFactoryCreatorAmount().then(value => {
-        handleLockDataChange({
-          label: "amountNeeded",
-          value
-        });
-      });      
-    }
-  }, [
-    wallet?.address,
-    wallet?.balance,
-    DAOService
-  ]);
-
-  useEffect(() => {
-    //Validate Locked Tokens
-    const lockData = steps.lock;
-
-    const lockValidated = lockData.amountLocked >= lockData.amountNeeded;
-
-    if (lockValidated !== steps.lock.validated) {
-      const tmpSteps = Object.assign({}, steps);
-
-      tmpSteps.lock.validated = lockValidated;
-
-      setSteps(tmpSteps);
-    }
-
-    // Validate Network informations
-    const networkData = steps.network.data;
-
-    const networkValidated = [
-      networkData.fullLogo.preview !== "",
-      networkData.logoIcon.preview !== "",
-      networkData.fullLogo.raw?.type?.includes("image/svg"),
-      networkData.logoIcon.raw?.type?.includes("image/svg"),
-      networkData.displayName.validated,
-      networkData.networkDescription.trim() !== "",
-      !networkData.colors.similar.length, // All colors should be different
-    ].every((condition) => condition === true);
-
-    if (networkValidated !== steps.network.validated) {
-      const tmpSteps = Object.assign({}, steps);
-
-      tmpSteps.network.validated = networkValidated;
-
-      setSteps(tmpSteps);
-    }
-
-    // Validate Repositories
-    const repositoriesData = steps.repositories.data;
-    const repositoriesValidated =
-      steps.repositories.permission &&
-      repositoriesData.some((repository) => repository.checked);
-
-    if (repositoriesValidated !== steps.repositories.validated) {
-      const tmpSteps = Object.assign({}, steps);
-
-      tmpSteps.repositories.validated = repositoriesValidated;
-
-      setSteps(tmpSteps);
-    }
-  }, [steps]);
-
-  useEffect(() => {
-    const networkData = steps.network.data;
-
-    if (networkData.colors.data.primary) {
-      const similarColors = [];
-      const colors = networkData.colors.data;
-
-      similarColors.push(...isColorsSimilar({ label: "text", code: colors.text }, [
-          { label: "primary", code: colors.primary },
-          //{ label: 'secondary', code: colors.secondary },
-          { label: "background", code: colors.background },
-          { label: "shadow", code: colors.shadow },
-      ]));
-
-      similarColors.push(...isColorsSimilar({ label: "background", code: colors.background }, [
-          { label: "success", code: colors.success },
-          { label: "fail", code: colors.fail },
-          { label: "warning", code: colors.warning },
-      ]));
-
-      if (
-        !isSameSet(new Set(similarColors), new Set(networkData.colors.similar))
-      ) {
-        const tmpSteps = Object.assign({}, steps);
-
-        tmpSteps.network.data.colors.similar = similarColors;
-
-        setSteps(tmpSteps);
-      }
-    }
-  }, [steps]);
+  }, [activeNetwork]);
 
   return (
     <div className="new-network">
-      <style>{colorsToCSS(steps.network.data.colors.data)}</style>
+      <style>{colorsToCSS(details?.theme?.colors)}</style>
       <ConnectWalletButton asModal={true} />
 
-      {(creatingNetwork && <CreatingNetworkLoader />) || ""}
+      {
+        (creatingNetwork !== undefined && 
+        <CreatingNetworkLoader currentStep={creatingNetwork} steps={creationSteps} />) || 
+        ""
+      }
 
       <CustomContainer>
         <div className="mt-5 pt-5">
           <Stepper>
             <LockBeproStep
-              data={steps.lock}
               step={1}
               currentStep={currentStep}
               handleChangeStep={handleChangeStep}
-              handleChange={handleLockDataChange}
-              creatorAmount={steps.lock.amountNeeded}
-              balance={{
-                beproAvailable: wallet?.balance?.bepro,
-                oraclesAvailable:
-                  +wallet?.balance?.oracles?.tokensLocked -
-                  wallet?.balance?.oracles?.delegatedToOthers,
-                tokensLocked: wallet?.balance?.oracles?.tokensLocked,
-              }}
             />
 
             <NetworkInformationStep
-              data={steps.network.data}
-              setColor={changeColor}
-              changedDataHandler={handleNetworkDataChange}
-              validated={steps.network.validated}
               step={2}
               currentStep={currentStep}
               handleChangeStep={handleChangeStep}
             />
 
             <SelectRepositoriesStep
-              data={steps.repositories}
-              onClick={handleCheckRepository}
-              githubLogin={user?.login}
-              validated={steps.repositories.validated}
               step={3}
               currentStep={currentStep}
               handleChangeStep={handleChangeStep}
-              handleCheckPermission={handleCheckPermission}
             />
 
             <TokenConfiguration
-              data={steps.tokens}
               step={4}
               currentStep={currentStep}
-              changedDataHandler={handleStepDataChange}
+              handleChangeStep={handleChangeStep}
+            />
+
+            <TreasuryStep
+              step={5}
+              currentStep={currentStep}
               handleChangeStep={handleChangeStep}
               handleFinish={handleCreateNetwork}
             />

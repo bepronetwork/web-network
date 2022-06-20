@@ -1,4 +1,7 @@
 
+import React, { useEffect, useState } from "react";
+
+import { useTranslation } from "next-i18next";
 import Link from "next/link";
 
 import LockedIcon from "assets/icons/locked-icon";
@@ -12,7 +15,6 @@ import { useNetwork } from "contexts/network";
 
 import { isProposalDisputable } from "helpers/proposal";
 
-import { IssueData } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
 import useApi from "x-hooks/use-api";
@@ -23,111 +25,119 @@ import Button from "./button";
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 import Translation from "./translation";
 
-interface Options {
+interface ProposalItemProps {
   proposal: Proposal;
-  issue: IssueData;
-  disputableTime?: number;
-  isDisputable: boolean;
 }
 
-export default function ProposalItem({
-  proposal,
-  issue,
-  disputableTime,
-  isDisputable
-}: Options) {
+interface ProposalState {
+  label: string;
+  textColor: string;
+  contextColor: string;
+}
 
-  const { wallet } = useAuthentication()
-  const { networkIssue, getNetworkIssue } = useIssue();
+const DEFAULT_PROPOSAL_STATE: ProposalState = {
+  label: "dispute",
+  textColor: "white",
+  contextColor: "purple"
+};
+
+export default function ProposalItem({
+  proposal
+}: ProposalItemProps) {
+  const { t } = useTranslation("common");
+  const [ proposalState, setProposalState ] = useState<ProposalState>(DEFAULT_PROPOSAL_STATE);
+
+  const { processEvent } = useApi();
+  const { wallet } = useAuthentication();
+  const { activeNetwork } = useNetwork();
   const { handlerDisputeProposal } = useBepro();
   const { getURLWithNetwork } = useNetworkTheme();
-  const { activeNetwork } = useNetwork();
-  const { processEvent } = useApi();
+  const { activeIssue, networkIssue, getNetworkIssue, updateIssue } = useIssue();
   
-  const networkProposals = networkIssue?.proposals?.[proposal?.contractId];
-  const networkPullRequest = networkIssue?.pullRequests?.find(pr => pr.id === networkProposals?.prId);
+  const networkProposal = networkIssue?.proposals?.[proposal?.contractId];
+  const networkPullRequest = networkIssue?.pullRequests?.find(pr => pr.id === networkProposal?.prId);
+
+  const isProposalMerged = proposal.isMerged;
+  const isBountyClosed = !!networkIssue?.closed;
+  const isProposalDisputed = !!networkProposal?.isDisputed;
+  const isDisputableByUser = !!networkProposal?.canUserDispute;
+  const isProposalRefused = networkProposal?.refusedByBountyOwner;
+
+  const isDisputable = 
+    isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime) && !isProposalDisputed;
 
   const isDisable = () => [
-      networkIssue?.closed,
-      networkProposals?.refusedByBountyOwner,
-      !isProposalDisputable(proposal?.createdAt, disputableTime),
-      networkIssue?.proposals[proposal.contractId]?.isDisputed,
-      !networkIssue?.proposals[proposal.contractId]?.canUserDispute,
+      isBountyClosed,
+      isProposalRefused,
+      !isDisputable,
+      isProposalDisputed,
+      !isDisputableByUser,
       wallet?.balance?.oracles?.locked === 0,
-  ]
-    .some(v => v);
+  ].some(v => v);
 
-  async function handleDispute() {
-    if (!isDisputable || networkIssue?.closed) return;
+  async function handleDispute(event: React.MouseEvent<HTMLButtonElement>) {
+    event.stopPropagation();
+
+    if (!isDisputable || isBountyClosed) return;
+
     handlerDisputeProposal(+proposal.scMergeId)
-    .then(txInfo => {
-      const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
+      .then(txInfo => {
+        const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-      return processEvent("proposal", "disputed", activeNetwork?.name, { fromBlock });
-    })
-    .then(() =>
-      getNetworkIssue());
+        return processEvent("proposal", "disputed", activeNetwork?.name, { fromBlock });
+      })
+      .then(() => {
+        getNetworkIssue()
+        updateIssue(activeIssue.repository_id, activeIssue.githubId);
+      });
   }
 
-  function getColors() {
-    if (networkIssue?.closed && !networkProposals?.isDisputed && proposal.isMerged) {
-      return "success";
-    }
+  useEffect(() => {
+    if (isBountyClosed && !isProposalDisputed && isProposalMerged) 
+      setProposalState({
+        label: "accepted",
+        textColor: "success",
+        contextColor: "success"
+      });
+    else if (isProposalDisputed || isProposalRefused || (isBountyClosed && !isProposalMerged))
+      setProposalState({
+        label: "failed",
+        textColor: "danger",
+        contextColor: "danger"
+      });
+    else
+      setProposalState(DEFAULT_PROPOSAL_STATE);
 
-    if (networkProposals?.isDisputed || 
-        networkProposals?.refusedByBountyOwner || 
-        (networkIssue?.closed && !proposal.isMerged)) {
-      return "danger";
-    }
-
-    return "purple";
-  }
-
-  function getLabel() {
-    let action = "dispute";
-
-    if (networkIssue?.closed && !networkProposals?.isDisputed && proposal.isMerged) {
-      action = "accepted";
-    }
-
-    if (networkProposals?.isDisputed || 
-        networkProposals?.refusedByBountyOwner || 
-        (networkIssue?.closed && !proposal.isMerged)) {
-      action = "failed";
-    }
-
-    return <Translation label={`actions.${action}`} />;
-  }
+  }, [isBountyClosed, isProposalDisputed, isProposalMerged, isProposalRefused]);
 
   return (
     <Link
       passHref
       key={`${proposal?.pullRequestId}${proposal?.scMergeId}`}
       href={getURLWithNetwork("/proposal", {
-        id: issue.githubId,
-        repoId: issue.repository_id,
+        id: activeIssue?.githubId,
+        repoId: activeIssue?.repository_id,
         proposalId: proposal?.id
       })}
     >
       <div className="content-list-item proposal cursor-pointer">
         <div className="rounded row align-items-center">
           <div
-            className={`col-3 caption-small mt-2 text-uppercase text-${getColors() === "purple" ? "white" : getColors()
-              }`}
+            className={`col-3 caption-small mt-2 text-uppercase text-${proposalState.textColor}`}
           >
             <Translation ns="pull-request" label={"abbreviation"} /> #
             {networkPullRequest?.cid} <Translation label={"misc.by"} />{" "}
             {proposal?.githubLogin && ` @${proposal?.githubLogin}`}
           </div>
           <div className="col-5 d-flex justify-content-between mb-2 text-white">
-            {networkProposals?.details &&
-              networkProposals?.details?.map((detail, i) => (
+            {networkProposal?.details &&
+              networkProposal?.details?.map((detail, i) => (
                 <PercentageProgressBar
                   key={`pg-${i}`}
-                  textClass={`caption-small p-small text-${getColors()}`}
-                  pgClass={`bg-${getColors()}`}
+                  textClass={`caption-small p-small text-${proposalState.contextColor}`}
+                  pgClass={`bg-${proposalState.contextColor}`}
                   className={
-                    (i + 1 < networkProposals?.details?.length && "me-2") ||
+                    (i + 1 < networkProposal?.details?.length && "me-2") ||
                     ""
                   }
                   value={detail.percentage}
@@ -138,29 +148,26 @@ export default function ProposalItem({
           <div className="col-4 d-flex">
             <div className="col-9 offset-1 text-white">
               <ProposalProgressSmall
-                pgClass={`${getColors()}`}
-                value={+networkProposals?.disputeWeight}
+                pgClass={`${proposalState.contextColor}`}
+                value={+networkProposal?.disputeWeight}
                 total={wallet?.balance?.staked}
-                textClass={`pb-2 text-${getColors()}`}
+                textClass={`pb-2 text-${proposalState.contextColor}`}
               />
             </div>
 
             <div className="col-1 offset-1 justify-content-end d-flex">
               <ReadOnlyButtonWrapper>
                 <Button
-                  color={getColors()}
-                  disabled={isDisable() || !networkProposals}
+                  color={proposalState.contextColor}
+                  disabled={isDisable() || !networkProposal}
                   outline={isDisable()}
                   className={"align-self-center mb-2 ms-3 read-only-button"}
-                  onClick={(ev) => {
-                    ev.stopPropagation();
-                    handleDispute();
-                  }}
+                  onClick={handleDispute}
                 >
-                  {isDisable() && getColors() !== "success" && (
-                    <LockedIcon className={`me-2 text-${getColors()}`} />
+                  {isDisable() && proposalState.contextColor !== "success" && (
+                    <LockedIcon className={`me-2 text-${proposalState.contextColor}`} />
                   )}
-                  <span>{getLabel()}</span>
+                  <span>{t(`actions.${proposalState.label}`)}</span>
                 </Button>
               </ReadOnlyButtonWrapper>
             </div>

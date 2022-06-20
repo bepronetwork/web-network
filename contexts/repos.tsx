@@ -16,7 +16,7 @@ import {
   ReposList,
   RepoInfo,
   ForksList,
-  IForkInfo
+  ForkInfo
 } from "interfaces/repos-list";
 
 import useApi from "x-hooks/use-api";
@@ -26,7 +26,7 @@ import { ApplicationContext } from "./application";
 import { useNetwork } from "./network";
 
 interface IActiveRepo extends RepoInfo {
-  forks: IForkInfo[];
+  forks: ForkInfo[];
   branchs: BranchInfo[];
 }
 
@@ -44,7 +44,7 @@ export interface ReposContextData {
   activeRepo: IActiveRepo;
   loadRepos: () => Promise<ReposList>;
   updateActiveRepo: (repoId: number) => Promise<IActiveRepo>;
-  findForks: (repoId: number) => Promise<IForkInfo[]>;
+  findForks: (repoId: number) => Promise<ForkInfo[]>;
   findBranch: (repoId: number) => Promise<BranchInfo[]>;
   findRepo: (repoId: number) => RepoInfo;
 }
@@ -70,7 +70,7 @@ export const ReposProvider: React.FC = function ({ children }) {
   const isLoadedReposByNetwork = (): boolean =>
     repoList[activeNetwork?.name]?.repos?.length > 0;
 
-  const findForks = useCallback(async (repoId: number, forced?: boolean): Promise<IForkInfo[]> => {
+  const findForks = useCallback(async (repoId: number, forced?: boolean): Promise<ForkInfo[]> => {
     if (forksList[repoId] && !forced) return forksList[repoId];
     const repo = findRepo(repoId);
 

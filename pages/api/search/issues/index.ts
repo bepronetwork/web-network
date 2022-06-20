@@ -78,7 +78,13 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: "developers" },
     {
       association: "pullRequests",
-      ...(pullRequester ? { where: { githubLogin: pullRequester } } : {})
+      required: false,
+      where: {
+        status: {
+          [Op.not]: "canceled"
+        },
+        ...(pullRequester ? { githubLogin: pullRequester } : {})
+      }
     },
     { association: "mergeProposals" },
     { association: "repository" },

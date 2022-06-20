@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import { useIssue } from "contexts/issue";
 
 import { pullRequest } from "interfaces/issue-data";
-import { IDistribuitonPerUser } from "interfaces/proposal";
+import { DistribuitonPerUser } from "interfaces/proposal";
 
 import Avatar from "./avatar";
 import DateLabel from "./date-label";
@@ -14,7 +14,7 @@ import Translation from "./translation";
 
 interface IProposalPRDetailsProps {
   currentPullRequest: pullRequest;
-  usersDistribution: IDistribuitonPerUser[];
+  usersDistribution: DistribuitonPerUser[];
 }
 export default function ProposalPullRequestDetail({
   currentPullRequest,

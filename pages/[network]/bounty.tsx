@@ -14,11 +14,9 @@ import IssueProposals from "components/issue-proposals";
 import IssuePullRequests from "components/issue-pull-requests";
 import PageActions from "components/page-actions";
 import TabbedNavigation from "components/tabbed-navigation";
-import Translation from "components/translation";
 
 import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
-import { useNetwork } from "contexts/network";
 import { useRepos } from "contexts/repos";
 
 import { TabbedNavigationItem } from "interfaces/tabbed-navigation";
@@ -30,71 +28,47 @@ export default function PageIssue() {
   const router = useRouter();
   const { t } = useTranslation("bounty");
 
-  const [isWorking, setIsWorking] = useState(false);
-  const [hasOpenPR, setHasOpenPR] = useState(false);
   const [commentsIssue, setCommentsIssue] = useState([]);
   const [isRepoForked, setIsRepoForked] = useState(false);
 
-  const { userHasPR } = useApi();
   const { activeRepo } = useRepos();
-  const { activeNetwork } = useNetwork();
   const { wallet, user } = useAuthentication();
+  const { activeIssue, networkIssue } = useIssue();
   const { getUserRepositories } = useOctokitGraph();
 
-  const {
-    activeIssue: issue,
-    networkIssue,
-    updateIssue,
-    getNetworkIssue
-  } = useIssue();
+  const { id } = router.query;
 
-  const { id, repoId } = router.query;
+  const proposalsCount = networkIssue?.proposals?.length || 0;
+  const pullRequestsCount = networkIssue?.pullRequests?.length || 0;
 
   const tabs: TabbedNavigationItem[] = [
     {
+      isEmpty: !proposalsCount,
       eventKey: "proposals",
-      title: (
-        <Translation
-          ns="proposal"
-          label={"labelWithCount"}
-          params={{ count: +networkIssue?.proposals?.length || 0 }}
-        />
-      ),
-      isEmpty: !(networkIssue?.proposals?.length > 0),
-      component: (
-        <IssueProposals
-          key="tab-proposals"
-          issue={issue}
-          className="border-top-0"
-          networkIssue={networkIssue}
-        />
-      ),
-      description: t("description_proposal")
+      title: t("proposal:labelWithCount", { count: proposalsCount }),
+      description: t("description_proposal"),
+      component: ( <IssueProposals key="tab-proposals" /> )
     },
     {
+      isEmpty: !pullRequestsCount,
       eventKey: "pull-requests",
-      isEmpty: !(networkIssue?.pullRequests?.length > 0),
-      title: (
-        <Translation
-          ns="pull-request"
-          label={"labelWithCount"}
-          params={{ count: networkIssue?.pullRequests?.length || 0 }}
-        />
-      ),
-      component: (
-        <IssuePullRequests
-          key="tab-pull-requests"
-          className="border-top-0"
-          issue={issue}
-          networkIssue={networkIssue}
-        />
-      ),
-      description: t("description_pull-request")
+      title: t("pull-request:labelWithCount", { count: pullRequestsCount }),
+      description: t("description_pull-request"),
+      component: ( <IssuePullRequests key="tab-pull-requests" /> )
+
     }
   ];
 
-  function getRepoForked() {
-    if (!activeRepo || !user?.login) return;
+  function addNewComment(comment) {
+    setCommentsIssue([...commentsIssue, comment]);
+  }
+
+  useEffect(() => {
+    if (activeIssue?.comments) setCommentsIssue([...activeIssue.comments]);
+  }, [ activeIssue, activeRepo ]);
+
+  useEffect(() => {
+    if (!user?.login || !activeRepo) return;
 
     getUserRepositories(user?.login)
       .then((repos) => {
@@ -107,75 +81,18 @@ export default function PageIssue() {
       .catch((e) => {
         console.log("Failed to get users repositories: ", e);
       });
-
-    userHasPR(`${repoId}/${id}`, user?.login, activeNetwork?.name)
-      .then((result) => {
-        setHasOpenPR(!!result);
-      })
-      .catch((e) => {
-        console.log("Failed to list PRs", e);
-      });
-  }
-
-  function checkRepoForked() {
-    if (user?.login && activeRepo) getRepoForked();
-  }
-
-  function addNewComment(comment) {
-    setCommentsIssue([...commentsIssue, comment]);
-  }
-
-  function checkIsWorking() {
-    if (issue?.working && user?.login)
-      setIsWorking(issue.working.some((el) => el === user?.login));
-  }
-
-  function syncLocalyState() {
-    // eslint-disable-next-line no-unsafe-optional-chaining
-    if (issue?.comments) setCommentsIssue([...issue?.comments]);
-  }
-
-  function refreshIssue() {
-    updateIssue(`${issue.repository_id}`, issue.githubId).catch(() =>
-      router.push("/404"));
-  }
-
-  useEffect(syncLocalyState, [ issue, activeRepo ]);
-  useEffect(checkIsWorking, [ issue, user?.login ]);
-  useEffect(checkRepoForked, [ user?.login, wallet?.address, id, issue, activeRepo ]);
+  }, [ user?.login, wallet?.address, id, activeIssue, activeRepo ]);
 
   return (
     <>
       <BountyHero />
+
       <PageActions
-        state={issue?.state}
-        developers={issue?.developers}
-        finalized={networkIssue?.closed}
-        canceled={networkIssue?.canceled}
-        isIssueinDraft={networkIssue?.isDraft}
-        networkCID={networkIssue?.cid || issue?.issueId}
-        issueId={issue?.issueId}
-        title={issue?.title}
-        description={issue?.body}
-        handleBeproService={getNetworkIssue}
-        handleMicroService={refreshIssue}
-        pullRequests={issue?.pullRequests || []}
-        mergeProposals={issue?.mergeProposals}
-        amountIssue={networkIssue?.tokenAmount}
-        forks={activeRepo?.forks}
-        githubLogin={user?.login}
-        hasOpenPR={hasOpenPR}
         isRepoForked={isRepoForked}
-        isWorking={isWorking}
-        issueCreator={networkIssue?.creator}
-        repoPath={issue?.repository?.githubPath}
-        githubId={issue?.githubId}
         addNewComment={addNewComment}
-        finished={networkIssue?.isFinished}
       />
-      {(networkIssue?.proposals?.length > 0 ||
-        networkIssue?.pullRequests?.length > 0) &&
-        wallet?.address && (
+
+      {((!!proposalsCount || !!pullRequestsCount) && wallet?.address ) &&
           <CustomContainer className="mb-4">
             <TabbedNavigation
               className="issue-tabs"
@@ -183,39 +100,32 @@ export default function PageIssue() {
               collapsable
             />
           </CustomContainer>
-        )}
+      }
+
       {networkIssue ? (
         <div className="container mb-1">
           <div className="d-flex bd-highlight justify-content-center mx-2 px-4">
             <div className="ps-3 pe-0 ms-0 me-2 w-65 bd-highlight">
               <div className="container">
-                <IssueDescription description={issue?.body || ""} />
+                <IssueDescription description={activeIssue?.body || ""} />
               </div>
             </div>
             <div className="p-0 me-3 flex-shrink-0 w-25 bd-highlight">
               <div className="sticky-bounty">
-                <IssueProposalProgressBar
-                  isFinalized={networkIssue?.closed || networkIssue?.canceled}
-                  isIssueinDraft={networkIssue.isDraft}
-                  mergeProposalAmount={networkIssue?.proposals?.length}
-                  isFinished={networkIssue?.isFinished}
-                  isCanceled={
-                    issue?.state === "canceled" || networkIssue?.canceled
-                  }
-                  creationDate={networkIssue.creationDate}
-                />
+                <IssueProposalProgressBar />
               </div>
             </div>
           </div>
         </div>
       ) : (
         <CustomContainer>
-          <IssueDescription description={issue?.body || ""} />
+          <IssueDescription description={activeIssue?.body || ""} />
         </CustomContainer>
       )}
+
       <IssueComments
         comments={commentsIssue}
-        repo={issue?.repository?.githubPath}
+        repo={activeIssue?.repository?.githubPath}
         issueId={id}
       />
     </>
@@ -228,9 +138,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 }) => {
   const { id, repoId, network } = query;
   const { getIssue } = useApi();
-  const currentIssue = await getIssue(repoId as string,
-                                      id as string,
-                                      network as string);
+  const currentIssue = await getIssue(repoId as string, id as string, network as string);
 
   return {
     props: {

@@ -13,7 +13,7 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
 
 import { useAuthentication } from "contexts/authentication";
-import { IActiveIssue } from "contexts/issue";
+import { useIssue } from "contexts/issue";
 
 import { getTimeDifferenceInWords } from "helpers/formatDate";
 import { formatNumberToNScale } from "helpers/formatNumber";
@@ -23,29 +23,30 @@ import { pullRequest } from "interfaces/issue-data";
 import useNetwork from "x-hooks/use-network";
 import useOctokitGraph from "x-hooks/use-octokit-graph";
 
-interface IPullRequestItem {
-  issue: IActiveIssue;
+interface PullRequestItem {
   pullRequest: pullRequest;
   networkPullRequest: PullRequest;
 }
 
 export default function PullRequestItem({
-  issue,
   pullRequest,
   networkPullRequest
-}: IPullRequestItem) {
+}: PullRequestItem) {
   const router = useRouter();
-  const { getPullRequestLinesOfCode } = useOctokitGraph();
+
   const [linesOfCode, setLinesOfCode] = useState(0);
-
-  const { getURLWithNetwork } = useNetwork();
-
+  
+  const { activeIssue } = useIssue();
   const { user } = useAuthentication();
+  const { getURLWithNetwork } = useNetwork();
+  const { getPullRequestLinesOfCode } = useOctokitGraph();
+
+  const pullRequestCommentsCount = pullRequest?.comments?.length || 0;
 
   function handleReviewClick() {
     router.push(getURLWithNetwork("/pull-request", {
-        id: issue?.githubId,
-        repoId: issue?.repository_id,
+        id: activeIssue?.githubId,
+        repoId: activeIssue?.repository_id,
         prId: pullRequest?.githubId,
         review: true
     }));
@@ -58,32 +59,21 @@ export default function PullRequestItem({
     !networkPullRequest?.canceled;
   }
 
-  async function getPullRequestInfo() {
-    try {
-      const repositoryPath = issue.repository.githubPath;
-
-      const lines = await getPullRequestLinesOfCode(repositoryPath, +pullRequest?.githubId);
-
-      setLinesOfCode(lines);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   useEffect(() => {
-    if (pullRequest) {
-      getPullRequestInfo();
-    }
+    if (!pullRequest || !activeIssue) return;
+
+    getPullRequestLinesOfCode(activeIssue.repository.githubPath, +pullRequest.githubId)
+      .then(setLinesOfCode)
+      .catch(error => console.log("Failed to get lines of code", error));
   }, [pullRequest]);
 
   return (
-    <>
-      <div className="content-list-item proposal" key={pullRequest.id}>
+    <div className="content-list-item proposal" key={pullRequest.id}>
         <Link
           passHref
           href={getURLWithNetwork("/pull-request", {
-            id: issue?.githubId,
-            repoId: issue?.repository_id,
+            id: activeIssue?.githubId,
+            repoId: activeIssue?.repository_id,
             prId: pullRequest?.githubId
           })}
         >
@@ -91,10 +81,12 @@ export default function PullRequestItem({
             <div className="row align-items-center pl-1 pr-1">
               <div className="col-6 d-flex align-items-center caption-small text-uppercase text-white">
                 <Avatar userLogin={pullRequest?.githubLogin} />
+
                 <span className="ml-2">
                   #{pullRequest?.githubId} <Translation label={"misc.by"} /> @
                   {pullRequest?.githubLogin}
                 </span>
+
                 <div className="ml-3 d-flex">
                   <PullRequestLabels
                     merged={pullRequest.merged}
@@ -106,25 +98,28 @@ export default function PullRequestItem({
 
               <div className="col-1 caption-small text-uppercase text-white d-flex justify-content-center">
                 {formatNumberToNScale(linesOfCode)}{" "}
-                <span className="text-gray ml-1">LOC</span>
+
+                <span className="text-gray ml-1">
+                  <Translation ns="pull-request" label="loc" />
+                </span>
               </div>
 
               <div className="col-2 caption-small text-uppercase text-white d-flex justify-content-center">
-                <span>{pullRequest?.comments?.length || 0}</span>
+                <span>{pullRequestCommentsCount}</span>
 
                 <span className="text-gray ml-1">
                   <Translation
                     ns="pull-request"
                     label="review"
-                    params={{ count: pullRequest?.comments?.length || 0 }}
+                    params={{ count: pullRequestCommentsCount }}
                   />
                 </span>
               </div>
 
               <div className="col-2 caption-small text-uppercase text-gray d-flex justify-content-start">
-                {getTimeDifferenceInWords(new Date(pullRequest?.createdAt),
-                                          new Date())}{" "}
-                ago
+                { getTimeDifferenceInWords(new Date(pullRequest?.createdAt), new Date()) }{" "}
+
+                <Translation label="misc.ago" />
               </div>
 
               <div className="col-1 d-flex justify-content-center">
@@ -138,6 +133,7 @@ export default function PullRequestItem({
                     }}
                   >
                     {!canReview() && <LockedIcon className="me-2" />}
+                    
                     <span>
                       <Translation label="actions.review" />
                     </span>
@@ -148,6 +144,5 @@ export default function PullRequestItem({
           </a>
         </Link>
       </div>
-    </>
   );
 }
