@@ -1,8 +1,7 @@
 import { Network_v2, fromSmartContractDecimals } from "@taikai/dappkit";
 
 import models from "db/models";
-export default async function updateAmount(events, network: Network_v2, customNetwork) {
-  const created = [];
+export default async function updateAmount(events, network: Network_v2) {
 
   const _network = await models.network.findOne({
     where: {
@@ -10,23 +9,29 @@ export default async function updateAmount(events, network: Network_v2, customNe
     }
   })
 
-  if (!network) return console.warn("Network not found in the database", network?.contractAddress);
+  if (!_network) return console.warn("Network not found in the database", network?.contractAddress);
 
+  const councilAmount = await network.councilAmount();
+  const existing_members = [...(_network.councilMembers || [])];
+  const remove_members = [];
 
   try {
     for (const event of events) {
       const { newLockedTotal, actor } = event.returnValues;
-      const councilAmount = +fromSmartContractDecimals(newLockedTotal) > (await network?.councilAmount());
-      const isCouncil = _network?.councilMembers?.find(adr => adr === String(actor));
-      if (councilAmount && !isCouncil) {
-        _network.councilMembers = [...(_network?.councilMembers || []), String(actor)]
-      } else if (isCouncil && !councilAmount) {
-        _network.councilMembers = _network.councilMembers.filter(adr => adr !== String(actor))
-      }
+      const newTotal = fromSmartContractDecimals(newLockedTotal)
+      if (newTotal >= councilAmount && !existing_members.includes(actor))
+        existing_members.push(actor)
+      else if (newTotal < councilAmount && existing_members.includes(actor))
+        remove_members.push(actor);
     }
+
+    const new_members = existing_members
+      .filter((address) => !remove_members.includes(address))
+      
+    _network.councilMembers = new_members
     await _network.save();
   } catch (error) {
     console.error(error)
   }
-  return created;
+  return existing_members;
 }
