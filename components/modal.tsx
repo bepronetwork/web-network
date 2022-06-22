@@ -11,6 +11,7 @@ import Button from "./button";
 export default function Modal({
   title = "",
   centerTitle = false,
+  subTitle = "",
   key,
   children = null,
   footer = null,
@@ -22,6 +23,7 @@ export default function Modal({
   cancelLabel = "",
   onOkClick,
   titleComponent,
+  subTitleComponent,
   ...params
 }: ModalProps) {
   const modalTitle = `${kebabCase(key || title)}-modal`;
@@ -61,7 +63,7 @@ export default function Modal({
       {...params}
     >
       <ModalBootstrap.Header
-        className={`relative d-flex w-100 justify-content-${titlePosition} `}
+        className={`relative d-flex w-100 flex-column justify-content-${titlePosition} `}
       >
         <ModalBootstrap.Title
           className={`pt-3 text-white ${titleClass || ""} ${
@@ -70,6 +72,9 @@ export default function Modal({
         >
           <h3>{titleComponent || title}</h3>
         </ModalBootstrap.Title>
+
+        {subTitle || subTitleComponent && <p className="text-white caption-small">{subTitleComponent || subTitle }</p>}
+
         {onCloseClick && (
           <Button
             transparent
