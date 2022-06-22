@@ -24,7 +24,7 @@ export const bountyReadyPRsHasNoInvalidProposals = async (bounty: Bounty, networ
 
   const invalidProposals = proposalsWithDisputeState.filter(p =>  p.isDisputed || p.refusedByBountyOwner);
 
-  if (invalidProposals.length) return 1;
+  if (invalidProposals.length && proposalsWithDisputeState.length === invalidProposals.length) return 1;
 
   return 2;
 }
