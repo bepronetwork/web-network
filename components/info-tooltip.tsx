@@ -1,12 +1,8 @@
 import { OverlayTrigger, Popover } from "react-bootstrap";
 
 import InfoIcon from "assets/icons/info-icon";
-import InfoIconEmpty from "assets/icons/info-icon-empty";
 
-export default function InfoTooltip({
-  description = "",
-  secondaryIcon = false,
-}) {
+export default function InfoTooltip({ description = "" }) {
   const popover = (
     <Popover id="popover-tabbed-description" className="p-2 bg-white">
       <Popover.Body
@@ -21,21 +17,7 @@ export default function InfoTooltip({
   return (
     <OverlayTrigger placement="bottom" overlay={popover}>
       <span className="text-white-10">
-      {console.log('secondary', secondaryIcon)}
-        {!secondaryIcon ? (
-          <InfoIcon
-            width={14}
-            height={14}
-            color="text-white-10"
-            className="info"
-          />
-        ) : (
-          <InfoIconEmpty
-            width={14}
-            height={14}
-            className="empty-info"
-          />
-        )}
+        <InfoIcon width={14} height={14} color="text-white-10" className="info" />
       </span>
     </OverlayTrigger>
   );

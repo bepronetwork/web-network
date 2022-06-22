@@ -97,8 +97,7 @@ export default function ProposalActionCard({
             <ProposalMerge 
               amountTotal={activeIssue?.amount} 
               tokenSymbol={activeIssue?.token?.symbol} 
-              proposal={networkProposal}
-              idBounty={activeIssue?.id} 
+              proposal={networkProposal} 
               onClickMerge={onMerge}
               canMerge={!canMerge()}
             />

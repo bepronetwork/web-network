@@ -1,8 +1,7 @@
 export interface BountyDistribution {
     percentage: number;
-    amounts: number[];
-    symbols: string[];
+    amount: number;
+    symbol: string;
     name: string;
     description: string;
-    line?: boolean
   }

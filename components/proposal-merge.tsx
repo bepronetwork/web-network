@@ -14,9 +14,6 @@ import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
 import { ProposalExtended } from "interfaces/bounty";
-import { TokenInfo } from "interfaces/token";
-
-import { getCoinInfoByContract } from "services/coingecko";
 
 interface amount {
   value: number;
@@ -36,7 +33,6 @@ interface props {
   proposal: ProposalExtended;
   onClickMerge: () => void;
   canMerge: boolean;
-  idBounty: string;
 }
 
 const defaultAmount = {
@@ -50,12 +46,10 @@ export default function ProposalMerge({
   proposal,
   onClickMerge,
   canMerge,
-  idBounty
 }: props) {
   const { t } = useTranslation(["common", "proposal"]);
 
   const [show, setShow] = useState<boolean>(false);
-  const [coinInfo, setCoinInfo] = useState<TokenInfo>()
   const [distributedAmounts, setDistributedAmounts] =
     useState<distributedAmounts>({
       treasuryAmount: defaultAmount,
@@ -66,54 +60,30 @@ export default function ProposalMerge({
 
   const { activeNetwork } = useNetwork();
 
+  
   async function getDistributedAmounts() {
     if (!proposal?.details) return;
+    
+    const distributions = 
+      calculateDistributedAmounts(activeNetwork?.treasury,
+                                  activeNetwork?.mergeCreatorFeeShare,
+                                  activeNetwork?.proposerFeeShare,
+                                  amountTotal,
+                                  proposal.details.map(({ percentage }) => percentage));
 
-    const distributions = calculateDistributedAmounts(activeNetwork?.treasury,
-                                                      activeNetwork?.mergeCreatorFeeShare,
-                                                      activeNetwork?.proposerFeeShare,
-                                                      amountTotal,
-                                                      proposal.details.map(({ percentage }) => percentage));
     setDistributedAmounts(distributions);
-  }
-
-  async function  getCoinInfo() { 
-    await getCoinInfoByContract(activeNetwork?.networkToken?.address).then((tokenInfo) => {
-      setCoinInfo(tokenInfo)
-    }).catch(err => console.error('CoinInfo', err))
-  }
-
-  function handleTokenToEurConversion(value: number):number {
-    if(!coinInfo) return 0
-    return Number((coinInfo.prices['eur'] * value).toFixed(4))
-  }
-
-  function currentTokenSymbol() {
-    return tokenSymbol ? tokenSymbol : t("common:misc.token")
   }
 
   function handleMerge() {
     setShow(false);
     onClickMerge();
   }
-
+    
   useEffect(() => {
-    if (
-      !proposal ||
-      !activeNetwork?.mergeCreatorFeeShare ||
-      !activeNetwork?.treasury
-    )
-      return;
-
+    if (!proposal || !activeNetwork?.mergeCreatorFeeShare || !activeNetwork?.treasury) return;
+    
     getDistributedAmounts();
-    getCoinInfo()
-  }, [
-    proposal,
-    activeNetwork?.treasury,
-    activeNetwork?.mergeCreatorFeeShare,
-    activeNetwork?.proposerFeeShare,
-    activeNetwork?.networkToken?.address
-  ]);
+  }, [proposal, activeNetwork?.treasury, activeNetwork?.mergeCreatorFeeShare, activeNetwork?.proposerFeeShare]);
 
   return (
     <>
@@ -130,53 +100,32 @@ export default function ProposalMerge({
       <Modal
         show={show}
         title={t("proposal:merge-modal.title")}
-        subTitleComponent={
-          <>
-          {t("proposal:merge-modal.sub-title")}{" "}
-          <span className="text-primary">{t("proposal:merge-modal.bounty", {
-            id: idBounty
-          })}</span>
-        </>
-        }
         titlePosition="center"
         onCloseClick={() => setShow(false)}
         footer={
-          <>
-            <Button
-              className="btn-block w-100"
-              onClick={handleMerge}
-              disabled={canMerge}
-            >
-              <span>{t("proposal:merge-modal.confirm-merge")}</span>
-            </Button>
-            <Button
-              color="dark-gray"
-              className="w-100"
-              onClick={() => setShow(false)}
-            >
-              <span>{t("common:actions.cancel")}</span>
-            </Button>
-          </>
+          <Button
+            className="btn-block w-100"
+            onClick={handleMerge}
+            disabled={canMerge}
+          >
+            <span>{t("proposal:merge-modal.confirm-merge")}</span>
+          </Button>
         }
       >
-        <ul className="mb-0 bg-dark-gray rounded-3 px-1 py-2">
+        <ul className="mb-0">
           <BountyDistributionItem
             name={t("proposal:merge-modal.proposal-creator")}
             description={t("proposal:merge-modal.proposal-creator-description")}
             percentage={distributedAmounts.proposerAmount.percentage}
-            symbols={[currentTokenSymbol(), 'eur']}
-            line={true}
-            amounts={[distributedAmounts.proposerAmount.value, 
-                      handleTokenToEurConversion(distributedAmounts.proposerAmount.value)]}
+            symbol={tokenSymbol ? tokenSymbol : t("common:misc.token")}
+            amount={distributedAmounts.proposerAmount.value}
           />
           <BountyDistributionItem
             name={t("proposal:merge-modal.proposal-merger")}
             description={t("proposal:merge-modal.proposal-merger-description")}
             percentage={distributedAmounts.mergerAmount.percentage}
-            symbols={[currentTokenSymbol(), 'eur']}
-            line={true}
-            amounts={[distributedAmounts.mergerAmount.value, 
-                      handleTokenToEurConversion(distributedAmounts.mergerAmount.value)]}
+            symbol={tokenSymbol ? tokenSymbol : t("common:misc.token")}
+            amount={distributedAmounts.mergerAmount.value}
           />
           {distributedAmounts?.proposals?.map((item, key) => (
             <BountyDistributionItem
@@ -185,53 +134,30 @@ export default function ProposalMerge({
               })}
               description={t("proposal:merge-modal.contributor-description")}
               percentage={item.percentage}
-              symbols={[currentTokenSymbol(), 'eur']}
-              line={true}
-              amounts={[item.value, handleTokenToEurConversion(item.value)]}
+              symbol={tokenSymbol ? tokenSymbol : t("common:misc.token")}
+              amount={item.value}
               key={key}
             />
           ))}
           <BountyDistributionItem
             name={t("proposal:merge-modal.network-fee")}
-            description={t("proposal:merge-modal.network-fee-description", {
-              percentage: distributedAmounts.treasuryAmount.percentage,
-            })}
+            description={t("proposal:merge-modal.network-fee-description")}
             percentage={distributedAmounts.treasuryAmount.percentage}
-            symbols={[currentTokenSymbol(), 'eur']}
-            amounts={[distributedAmounts.treasuryAmount.value, 
-                      handleTokenToEurConversion(distributedAmounts.treasuryAmount.value)]}
+            symbol={tokenSymbol ? tokenSymbol : t("common:misc.token")}
+            amount={distributedAmounts.treasuryAmount.value}
           />
         </ul>
-
-        <div className="mt-4 border-dashed"></div>
-
-        <div className="d-flex justify-content-between rounded-5 mt-4 py-2 px-3 bg-black">
-          <span className="text-white caption-medium pt-3">
+        <div className="rounded-5 py-3 px-3 bg-black text-center mt-4">
+          <span className="text-white caption-medium">
             {t("proposal:merge-modal.total")}
           </span>
-
-          <div
-            className={`d-flex flex-column cursor-pointer 
-          ${handleTokenToEurConversion(amountTotal) > 0 ? "mt-1" : "mt-3"}`}
-          >
-            <div className="d-flex justify-content-end mb-1">
-              <span className="text-white caption-medium">
-                {formatNumberToCurrency(amountTotal)}
-              </span>
-              <span className="text-primary ms-2 caption-medium text-white-40">
-                {currentTokenSymbol()}
-              </span>
-            </div>
-            {handleTokenToEurConversion(amountTotal) > 0 && (
-            <div className="d-flex justify-content-end">
-              <span className="text-white caption-small text-ligth-gray">
-                {handleTokenToEurConversion(amountTotal)}</span>
-              <span className=" ms-2 caption-small text-ligth-gray">
-                EUR
-              </span>
-            </div>
-            )}
-
+          <div className=" d-flex justify-content-center cursor-pointer mt-1">
+            <span className="text-white caption-large">
+              {formatNumberToCurrency(amountTotal)}
+            </span>
+            <span className="text-primary ms-2 caption-large">
+              {tokenSymbol ? tokenSymbol : t("common:misc.token")}
+            </span>
           </div>
         </div>
       </Modal>

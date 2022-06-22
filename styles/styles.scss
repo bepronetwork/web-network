@@ -386,10 +386,6 @@ li {
   }
 }
 
-.border-dashed {
-  border: 1px dashed $ligth-gray
-}
-
 .account-bepro {
   display: flex;
   align-items: center;
@@ -1248,10 +1244,6 @@ textarea.form-control {
       color: $value !important;
     }
   }
-}
-
-.line {
-  height: 1px;
 }
 
 .image-uploader {
