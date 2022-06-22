@@ -36,7 +36,7 @@ export interface Network {
 export interface ThemeColors {
   text: string;
   gray: string;
-  fail: string;
+  danger: string;
   shadow: string;
   oracle: string;
   primary: string;
@@ -44,6 +44,7 @@ export interface ThemeColors {
   warning: string;
   secondary: string;
   background: string;
+  info: string;
 }
 
 export interface Color {
