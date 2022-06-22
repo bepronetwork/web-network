@@ -12,15 +12,12 @@ import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
 
+import { StepWrapperProps } from "interfaces/stepper";
 import { BEPRO_TOKEN, Token } from "interfaces/token";
 
 const { publicRuntimeConfig } = getConfig();
 
-export default function TokenConfiguration({
-    step,
-    currentStep,
-    handleChangeStep
-}) {
+export default function TokenConfiguration({ activeStep, index, validated, handleClick } : StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [bountyTokenAddress, setBountyTokenAddress] = useState("");
@@ -112,10 +109,10 @@ export default function TokenConfiguration({
   return (
     <Step
       title={t("custom-network:steps.token-configuration.title")}
-      index={step}
-      activeStep={currentStep}
-      validated={tokens.validated}
-      handleClick={handleChangeStep}
+      index={index}
+      activeStep={activeStep}
+      validated={validated}
+      handleClick={handleClick}
     >
       <div className="row">
         <TokensDropdown 

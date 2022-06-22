@@ -9,13 +9,11 @@ import { useNetworkSettings } from "contexts/network-settings";
 
 import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
+import { StepWrapperProps } from "interfaces/stepper";
+
 const { publicRuntimeConfig } = getConfig();
 
-export default function NetworkInformationStep({
-  step,
-  currentStep,
-  handleChangeStep
-}) {
+export default function NetworkInformationStep({ activeStep, index, validated, handleClick } : StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
 
   const { details, fields } = useNetworkSettings();
@@ -54,10 +52,10 @@ export default function NetworkInformationStep({
   return (
     <Step
       title={t("custom-network:steps.network-information.title")}
-      index={step}
-      activeStep={currentStep}
-      validated={details.validated}
-      handleClick={handleChangeStep}
+      index={index}
+      activeStep={activeStep}
+      validated={validated}
+      handleClick={handleClick}
     >
       <span className="caption-small text-gray mb-4">
         {t("custom-network:steps.network-information.you-can-change")}

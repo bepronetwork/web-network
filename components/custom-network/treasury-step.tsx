@@ -7,12 +7,9 @@ import Step from "components/step";
 
 import { useNetworkSettings } from "contexts/network-settings";
 
-export default function TreasuryStep({
-  step,
-  handleFinish,
-  currentStep,
-  handleChangeStep
-}) {
+import { StepWrapperProps } from "interfaces/stepper";
+
+export default function TreasuryStep({ activeStep, index, validated, handleClick, handleFinish } : StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [address, setAddress] = useState(Defaults.nativeZeroAddress);
@@ -48,10 +45,10 @@ export default function TreasuryStep({
   return(
     <Step
       title={t("custom-network:steps.treasury.title")}
-      index={step}
-      activeStep={currentStep}
-      validated={treasury.validated !== false}
-      handleClick={handleChangeStep}
+      index={index}
+      activeStep={activeStep}
+      validated={validated !== false}
+      handleClick={handleClick}
       finishLabel={t("custom-network:steps.repositories.submit-label")}
       handleFinish={handleFinish}
     >

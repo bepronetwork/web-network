@@ -6,7 +6,7 @@ import SuccessIcon from "assets/icons/success-icon";
 
 import Button from "components/button";
 
-import { IStep } from "interfaces/stepper";
+import { StepProps } from "interfaces/stepper";
 
 export default function Step({
   title,
@@ -17,7 +17,7 @@ export default function Step({
   finishLabel,
   handleClick,
   handleFinish
-}: IStep) {
+}: StepProps) {
   const { t } = useTranslation("common");
 
   const isActive = activeStep === index;
@@ -37,7 +37,7 @@ export default function Step({
           className={`caption-medium mr-1 ${
             isActive ? "text-white" : "text-ligth-gray"
           }`}
-        >{`${index}. ${title}`}</span>
+        >{`${index + 1}. ${title}`}</span>
 
         {(validated && <SuccessIcon />) || ""}
       </div>

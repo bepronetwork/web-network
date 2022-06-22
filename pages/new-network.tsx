@@ -37,7 +37,6 @@ export default function NewNetwork() {
 
   const { t } = useTranslation(["common", "custom-network"]);
 
-  const [currentStep, setCurrentStep] = useState(1);
   const [creatingNetwork, setCreatingNetwork] = useState<number>();
 
   const { createNetwork } = useApi();
@@ -68,25 +67,6 @@ export default function NewNetwork() {
       name: t("custom-network:modals.loader.steps.sync-web-network")
     },
   ];
-
-  function handleChangeStep(stepToGo: number) {
-    const stepsNames = {
-      1: tokensLocked,
-      2: details,
-      3: github,
-      4: tokens,
-      5: treasury
-    };
-
-    let canGo = false;
-
-    if (stepToGo !== currentStep) {
-      if (stepToGo < currentStep) canGo = true;
-      else if (stepsNames[stepToGo - 1].validated) canGo = true;
-    }
-
-    if (canGo) setCurrentStep(stepToGo);
-  }
 
   async function handleCreateNetwork() {
     if (!user?.login || !wallet?.address || !DAOService) return;
@@ -174,36 +154,15 @@ export default function NewNetwork() {
       <CustomContainer>
         <div className="mt-5 pt-5">
           <Stepper>
-            <LockBeproStep
-              step={1}
-              currentStep={currentStep}
-              handleChangeStep={handleChangeStep}
-            />
+            <LockBeproStep validated={tokensLocked.validated} />
 
-            <NetworkInformationStep
-              step={2}
-              currentStep={currentStep}
-              handleChangeStep={handleChangeStep}
-            />
+            <NetworkInformationStep validated={details.validated} />
 
-            <SelectRepositoriesStep
-              step={3}
-              currentStep={currentStep}
-              handleChangeStep={handleChangeStep}
-            />
+            <SelectRepositoriesStep validated={github.validated} />
 
-            <TokenConfiguration
-              step={4}
-              currentStep={currentStep}
-              handleChangeStep={handleChangeStep}
-            />
+            <TokenConfiguration validated={tokens.validated} />
 
-            <TreasuryStep
-              step={5}
-              currentStep={currentStep}
-              handleChangeStep={handleChangeStep}
-              handleFinish={handleCreateNetwork}
-            />
+            <TreasuryStep validated={treasury.validated} handleFinish={handleCreateNetwork} />
           </Stepper>
         </div>
       </CustomContainer>

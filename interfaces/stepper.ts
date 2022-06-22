@@ -1,17 +1,15 @@
-import { ReactNode, ReactElement } from "react";
+import { ReactNode } from "react";
 
-export interface IStepper {
-  children: ReactElement<IStep> | ReactElement<IStep>[];
-}
-
-export interface IStep {
+export interface StepProps {
   title: string;
   index: number;
   completed?: boolean;
   activeStep: number;
-  validated?: boolean;
+  validated: boolean;
   children: ReactNode | ReactNode[];
   finishLabel?: string;
-  handleClick?: (index) => void;
+  handleClick: (index) => void;
   handleFinish?: () => void;
 }
+
+export type StepWrapperProps = Partial<StepProps>;
