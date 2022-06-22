@@ -66,14 +66,6 @@ export const DAOContextProvider = ({ children }) => {
       });
   }, []);
 
-  useEffect(() => {
-    if (!service) return;
-    
-    window?.ethereum?.on("accountsChanged", () => {
-      service.connect();
-    });
-  }, [service]);
-
   const memorizedValue = useMemo<DAOContextData>(() => ({
     service,
     isStarting,
