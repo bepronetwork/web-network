@@ -1,7 +1,7 @@
 import { Network_v2, fromSmartContractDecimals } from "@taikai/dappkit";
 
 import models from "db/models";
-export default async function updateAmount(events, network: Network_v2) {
+export default async function updateOraclesAmount(events, network: Network_v2) {
 
   const _network = await models.network.findOne({
     where: {
