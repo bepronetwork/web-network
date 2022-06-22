@@ -328,7 +328,7 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     similar.push(...isColorsSimilar({ label: "background", code: colors.background }, [
         { label: "success", code: colors.success },
-        { label: "fail", code: colors.fail },
+        { label: "danger", code: colors.danger },
         { label: "warning", code: colors.warning },
     ]));
 
