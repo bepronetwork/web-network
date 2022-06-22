@@ -8,6 +8,8 @@ import { useRouter } from "next/router";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 
+import { bountyReadyPRsHasNoInvalidProposals } from "helpers/api/proposal/utils";
+
 import { BountyExtended, ProposalExtended } from "interfaces/bounty";
 import {
   IssueData,
@@ -112,7 +114,9 @@ export const IssueProvider: React.FC = function ({ children }) {
 
     const bounty = await DAOService.getBounty(activeIssue?.contractId);
 
-    const isFinished = bounty?.pullRequests?.some(pullRequest => pullRequest.ready && !pullRequest.canceled);
+    const readyPRsCheck = await bountyReadyPRsHasNoInvalidProposals(bounty, DAOService.network).catch(() => -1);
+    const isFinished = 3 === readyPRsCheck;
+    const isInValidation = [2, 3].includes(readyPRsCheck);
 
     let isDraft = null;
 
@@ -149,7 +153,8 @@ export const IssueProvider: React.FC = function ({ children }) {
       isDraft, 
       pullRequests,
       proposals: networkProposals,
-      isFinished
+      isFinished,
+      isInValidation
     });
     return { ...bounty, isDraft, networkProposals };
   }, [activeIssue, wallet?.address, DAOService?.network?.contractAddress]);

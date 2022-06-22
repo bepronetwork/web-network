@@ -159,8 +159,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       cid: `${created.createPullRequest.pullRequest.number}`
     });
   } catch (error) {
-    console.log(error);
-    return res.status(error?.response?.status || 500).json(error?.response?.data || error);
+    return res.status(error?.errors[0]?.type === "UNPROCESSABLE" && 422|| 500).json(error?.errors || error);
   }
 
 }

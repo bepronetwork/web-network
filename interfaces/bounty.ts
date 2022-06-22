@@ -28,6 +28,7 @@ export interface BountyExtended extends Bounty {
 
     isDraft?: boolean;
     isFinished?: boolean;
+    isInValidation?: boolean;
     proposals: ProposalExtended[];
 }
 
