@@ -50,7 +50,7 @@ export default function BountyDistributionItem({
           {verifyAmount() && (
             <div className="d-flex justify-content-end">
               <span className="caption-small text-ligth-gray">
-                {formatNumberToCurrency(amounts[1])}{" "}
+                {amounts[1]}{" "}
                 <label className="ps-1 caption-small text-uppercase text-ligth-gray">
                   {symbols[1]}
                 </label>
