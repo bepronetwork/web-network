@@ -1,7 +1,6 @@
 import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
 
-import ThemeColors from "components/custom-network/theme-colors";
 import ImageUploader from "components/image-uploader";
 import Step from "components/step";
 
@@ -43,10 +42,6 @@ export default function NetworkInformationStep({ activeStep, index, validated, h
 
   function handleDescriptionChange(e) {
     fields.description.setter(e.target.value);
-  }
-
-  function handleColorChange(value) {
-    fields.colors.setter(value);
   }
 
   return (
@@ -159,16 +154,6 @@ export default function NetworkInformationStep({ activeStep, index, validated, h
             value={details.description}
             onChange={handleDescriptionChange}
           ></textarea>
-        </div>
-      </div>
-
-      <div className="row mx-0 px-0 mb-3">
-        <div className="col">
-          <ThemeColors
-            colors={details.theme.colors}
-            similar={details.theme.similar}
-            setColor={handleColorChange}
-          />
         </div>
       </div>
     </Step>
