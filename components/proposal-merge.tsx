@@ -83,9 +83,9 @@ export default function ProposalMerge({
     }).catch(err => console.error('CoinInfo', err))
   }
 
-  function handleTokenToEurConversion(value: number) {
+  function handleTokenToEurConversion(value: number):number {
     if(!coinInfo) return 0
-    return (coinInfo.prices['eur'] * value)
+    return Number((coinInfo.prices['eur'] * value).toFixed(4))
   }
 
   function currentTokenSymbol() {
@@ -225,7 +225,7 @@ export default function ProposalMerge({
             {handleTokenToEurConversion(amountTotal) > 0 && (
             <div className="d-flex justify-content-end">
               <span className="text-white caption-small text-ligth-gray">
-                {formatNumberToCurrency(handleTokenToEurConversion(amountTotal))}</span>
+                {handleTokenToEurConversion(amountTotal)}</span>
               <span className=" ms-2 caption-small text-ligth-gray">
                 EUR
               </span>
