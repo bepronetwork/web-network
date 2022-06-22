@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 
-export default function Stepper({ children }) {
+export default function Stepper({ children, hack = false }) {
   const [activeStep, setActiveStep] = useState(0);
 
   function handleClick(stepToGo: number) {
-    if (stepToGo <= activeStep || children[stepToGo - 1].props.validated) setActiveStep(stepToGo);
+    if (stepToGo <= activeStep || children[stepToGo - 1].props.validated || hack) setActiveStep(stepToGo);
   }
 
   return (
