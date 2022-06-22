@@ -5,6 +5,7 @@ export interface RepoInfo {
   githubPath: string;
   name: string;
   owner: string;
+  isFork?: boolean;
 }
 
 export type ForkInfo = developer;

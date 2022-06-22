@@ -5,7 +5,7 @@ import ExternalLinkIcon from "assets/icons/external-link-icon";
 import Button from "./button";
 import Comment from "./comment";
 
-export default function IssueComments({ comments, repo, issueId }) {
+export default function IssueComments({ comments = [], repo, issueId }) {
   const replyRef =
     (comments?.length > 0 && comments[0]?.html_url) ||
     `https://github.com/${repo}/issues/${issueId}`;
@@ -32,8 +32,8 @@ export default function IssueComments({ comments, repo, issueId }) {
                 </Button>
               </a>
             </div>
-            {comments?.map((comment) => (
-              <Comment comment={comment} key={comment.id} />
+            {comments && comments?.map((comment) => (
+              <Comment comment={comment} key={comment?.id} />
             ))}
           </div>
         </div>

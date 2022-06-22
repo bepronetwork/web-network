@@ -50,10 +50,12 @@ export default function useOctokitGraph() {
 
       pages.push(response);
 
-      const { endCursor, hasNextPage } = getPropertyRecursively<GraphQlQueryResponseData>("pageInfo", response);
+      if(response && response?.pageInfo){
+        const { endCursor, hasNextPage } = getPropertyRecursively<GraphQlQueryResponseData>("pageInfo", response);
 
-      nextPageCursor = endCursor;
-      hasMorePages = hasNextPage;
+        nextPageCursor = endCursor;
+        hasMorePages = hasNextPage;
+      }
 
     } while (hasMorePages);
 
@@ -105,9 +107,9 @@ export default function useOctokitGraph() {
 
     const comments = 
       response?.flatMap(item => getPropertyRecursively<GraphQlQueryResponseData>("nodes", item)
-                        .map(node => ({...node, author: node["author"]["login"]}) ) );
+                        ?.map(node => ({...node, author: node["author"]["login"]}) ) );
 
-    return comments;
+    return comments || [];
   }
 
   async function getPullRequestDetails(repositoryPath:  string, id: number) {
@@ -128,6 +130,24 @@ export default function useOctokitGraph() {
     return { mergeable, merged, state };
   }
 
+  //  Note: if repository not exist or it private will return null
+  async function getRepository(repositoryPath:  string) {
+    try {
+      const { owner, repo } = getOwnerRepoFrom(repositoryPath);
+
+      const response = await getAllPages(RepositoryQueries.Repository, {
+      repo,
+      owner
+      });
+
+      const repository = response.flatMap((item)=> getPropertyRecursively<GraphQlQueryResponseData>("repository", item))
+
+      return repository?.[0];
+    } catch (error) {
+      return error
+    }
+  }
+
   async function getRepositoryForks(repositoryPath:  string) {
     const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
@@ -138,9 +158,9 @@ export default function useOctokitGraph() {
 
     const forks = 
       response?.flatMap(item => getPropertyRecursively<GraphQlQueryResponseData>("nodes", item)
-                                .map(node => node?.owner?.login ) );
+                                ?.map(node => node?.owner?.login ) );
 
-    return forks;
+    return forks || [];
   }
 
   async function getRepositoryBranches(repositoryPath:  string) {
@@ -152,9 +172,9 @@ export default function useOctokitGraph() {
     });
 
     const branches = response?.flatMap(item => getPropertyRecursively<GraphQlQueryResponseData>("nodes", item)
-                                                .map(node => node?.name ) );
+                                                ?.map(node => node?.name ) );
 
-    return branches;
+    return branches || [];
   }
 
   async function getUserRepositories(login:  string) {
@@ -171,7 +191,7 @@ export default function useOctokitGraph() {
       owner: string;
     }>(item => {
       return getPropertyRecursively<GraphQlQueryResponseData>("nodes", item?.["user"]?.repositories)
-        .map(el => ({
+        ?.map(el => ({
           ...el,
           owner: el.owner.login,
           isOrganization: false
@@ -187,8 +207,8 @@ export default function useOctokitGraph() {
     }>(item => {
       return item?.["user"]?.organizations?.nodes?.
               filter(el => el !== null)
-              .flatMap(el => getPropertyRecursively<GraphQlQueryResponseData>("nodes", el))
-              .map(repo => ({...repo, owner: repo.owner.login, isOrganization: true}));
+              ?.flatMap(el => getPropertyRecursively<GraphQlQueryResponseData>("nodes", el))
+              ?.map(repo => ({...repo, owner: repo.owner.login, isOrganization: true}));
     });
 
     return [...userRepositories, ...organizationRepositories];
@@ -199,6 +219,7 @@ export default function useOctokitGraph() {
     getPullRequestLinesOfCode,
     getIssueOrPullRequestComments,
     getPullRequestDetails,
+    getRepository,
     getRepositoryForks,
     getRepositoryBranches,
     getUserRepositories
