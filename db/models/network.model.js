@@ -18,6 +18,9 @@ class Network extends Model {
           type: DataTypes.BOOLEAN,
           defaultValue: false
         },
+        councilMembers: {
+          type: DataTypes.ARRAY(DataTypes.STRING)
+        },
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE,
         allowCustomTokens: {
