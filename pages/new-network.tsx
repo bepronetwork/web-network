@@ -12,6 +12,7 @@ import CreatingNetworkLoader from "components/creating-network-loader";
 import CustomContainer from "components/custom-container";
 import LockBeproStep from "components/custom-network/lock-bepro-step";
 import NetworkInformationStep from "components/custom-network/network-information-step";
+import NetworkSettingsStep from "components/custom-network/network-settings-step";
 import SelectRepositoriesStep from "components/custom-network/select-repositories-step";
 import TokenConfiguration from "components/custom-network/token-configuration";
 import TreasuryStep from "components/custom-network/treasury-step";
@@ -153,10 +154,12 @@ export default function NewNetwork() {
 
       <CustomContainer>
         <div className="mt-5 pt-5">
-          <Stepper>
+          <Stepper hack>
             <LockBeproStep validated={tokensLocked.validated} />
 
             <NetworkInformationStep validated={details.validated} />
+
+            <NetworkSettingsStep />
 
             <SelectRepositoriesStep validated={github.validated} />
 

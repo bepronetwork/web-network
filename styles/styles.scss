@@ -1287,18 +1287,22 @@ textarea.form-control {
   }
 }
 
-.custom-color-input {
-  width: 38px;
-  height: 38px;
+.custom-color-input-wrapper {
+  padding: 10px 20px;
 
-  border-radius: 38px;
-  border: 2px solid $white;
+  .custom-color-input {
+    width: 20px;
+    height: 20px;
 
-  &.is-invalid {
-    border: 2px solid var(--bs-fail);
+    border-radius: 20px;
+    
+
+    &.is-invalid {
+      border: 2px solid var(--bs-fail);
+    }
+
+    overflow: hidden;
   }
-
-  overflow: hidden;
 }
 
 input[type="color"] {

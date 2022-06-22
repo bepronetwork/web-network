@@ -61,6 +61,28 @@
       },
       "logo-helper": "The logos must be in .svg format"
     },
+    "network-settings": {
+      "title": "Network Settings",
+      "fields": {
+        "colors": {
+          "label": "Colours",
+          "similar-colors": "These colours are very similar. Please pick a different colour.",
+          "types": {
+            "primary": "Primary",
+            "secondary": "Secondary",
+            "oracle": "Oracle",
+            "text-colour": "Text Colour",
+            "background": "Background",
+            "background-shadow": "Background Shadow",
+            "gray": "Gray",
+            "success": "Success",
+            "danger": "Danger",
+            "warning": "Warning",
+            "info": "info"
+          }
+        }
+      }
+    },
     "repositories": {
       "title": "Add Repositories",
       "submit-label": "Create Network",
