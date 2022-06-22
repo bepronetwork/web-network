@@ -100,7 +100,8 @@
     "reconnect-account": "Reconnect account",
     "unlock-all": "Unlock all",
     "back-to-top": "Back to Top",
-    "refuse": "Refuse"
+    "refuse": "Refuse",
+    "disconnect-accounts": "Disconnect Accounts"
   },
   "misc": {
     "by": "by",
@@ -157,11 +158,11 @@
       "provide-feedback": {
         "title": "provide feedback",
         "content": "Product feedback and requests."
-      },
-      "invalid-account-wallet": {
-        "title": "Github Account and Wallet don't match",
-        "description": "Login to the Github account previously associated to this wallet or change to the correct wallet for this account."
       }
+    },
+    "invalid-account-wallet": {
+      "title": "Github Account and Wallet don't match",
+      "description": "Login to the Github account previously associated to this wallet or change to the correct wallet for this account."
     },
     "not-mergeable": {
       "title": "Merging bounty",

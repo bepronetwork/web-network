@@ -32,8 +32,10 @@
     "waiting": "Waiting"
   },
   "merge-modal": {
-    "title": "Bounty Distribution",
-    "confirm-merge": "Confirm Merge",
+    "title": "Confirm Bounty Distribution",
+    "sub-title": "You are about to distribute the",
+    "bounty":"Bounty #{{id}}",
+    "confirm-merge": "Confirm Distribution",
     "proposal-creator": "Proposal Creator",
     "proposal-creator-description": "Council Member who proposed this distribution",
     "proposal-merger": "Merger",
@@ -42,6 +44,6 @@
     "contributor-description": "User who actively participated in the development of the Bounty’s solution",
     "total": "total",
     "network-fee": "Network Fee",
-    "network-fee-description": "Network fee to make the transaction"
+    "network-fee-description": "We charge a {{percentage}}% convenience fee on every distribution. This makes sure we can keep improving the platform."
   }
 }

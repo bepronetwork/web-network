@@ -4,9 +4,9 @@ import { NextResponse } from 'next/server'
 
 import { error, info } from 'helpers/api/handle-log'
 
-const testnet = Boolean(process.env.NEXT_E2E_TESTNET) || false
+const testnet = process.env.NEXT_E2E_TESTNET === "true" ? true : false;
 
-const whiteList = ['auth', 'past-events', 'seo'];
+const whiteList = ['auth', 'past-events', 'seo', 'users'];
 
 const ignorePaths = ['health'];
 

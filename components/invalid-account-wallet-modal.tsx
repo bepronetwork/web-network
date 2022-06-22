@@ -13,12 +13,23 @@ import Modal from "components/modal";
 import { truncateAddress } from "helpers/truncate-address";
 
 export default function InvalidAccountWalletModal({ user, wallet, isVisible }) {
-  const { t } = useTranslation("common");
   const { asPath } = useRouter();
+  const { t } = useTranslation("common");
 
-  async function handleSubmit() {
+  const disconnectBtnVisible = user?.login && wallet?.address && isVisible;
+
+  async function handleDisconnectAccounts() {
     await signOut({ redirect: false });
 
+    await window?.ethereum?.request({
+      method: 'wallet_requestPermissions',
+      params: [{
+        eth_accounts: {},
+      }]
+    });
+  }
+
+  function handleConnectGithub() {
     return signIn("github", {
       callbackUrl: `${window.location.protocol}//${window.location.host}/${asPath}`
     });
@@ -69,11 +80,20 @@ export default function InvalidAccountWalletModal({ user, wallet, isVisible }) {
           </div>
         </div>
 
-        <div className="d-flex justify-content-center mt-3">
-          <Button color="primary" onClick={handleSubmit}>
-            <span>{t("actions:connect")}</span>
-          </Button>
-        </div>
+        { disconnectBtnVisible &&
+          <div className="d-flex justify-content-center mt-3">
+            <Button color="primary" onClick={handleDisconnectAccounts}>
+              <span>{t("actions.disconnect-accounts")}</span>
+            </Button>
+          </div>
+        }
+        { !disconnectBtnVisible &&
+          <div className="d-flex justify-content-center mt-3">
+            <Button color="primary" onClick={handleConnectGithub}>
+              <span>Connect Github</span>
+            </Button>
+          </div>
+        }
       </div>
     </Modal>
   );

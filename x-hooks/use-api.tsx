@@ -39,32 +39,6 @@ type FileUploadReturn = {
 const repoList: ReposList = [];
 
 export default function useApi() {
-  async function getIssues(page = "1",
-                           repoId = "",
-                           time = "",
-                           state = "",
-                           sortBy = "updatedAt",
-                           order = "DESC",
-                           address = "",
-                           creator = "",
-                           networkName = publicRuntimeConfig?.currency?.networkConfig?.networkName) {
-    const search = new URLSearchParams({
-      address,
-      page,
-      repoId,
-      time,
-      state,
-      sortBy,
-      order,
-      creator,
-      networkName
-    }).toString();
-    return client
-      .get<{ rows: IssueData[]; count: number }>(`/issues/?${search}`)
-      .then(({ data }) => data)
-      .catch(() => ({ rows: [], count: 0 }));
-  }
-
   async function searchIssues({
     page = "1",
     repoId = "",
@@ -189,7 +163,7 @@ export default function useApi() {
       networkName
     }).toString();
     return client
-      .get<IssueData[]>(`/issues/?${search}`)
+      .get<IssueData[]>(`/search/issues/?${search}`)
       .then(({ data }) => data)
       .catch(() => null);
   }
@@ -552,7 +526,6 @@ export default function useApi() {
     getClientNation,
     getHealth,
     getIssue,
-    getIssues,
     getPayments,
     getNetwork,
     getPendingFor,

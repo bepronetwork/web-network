@@ -20,20 +20,19 @@ export default function IssueProposalProgressBar() {
   const steps = [
     t("bounty:steps.draft"),
     t("bounty:steps.development"),
-    t("bounty:steps.finalized"),
     t("bounty:steps.validation"),
     t("bounty:steps.closed")
   ];
 
   const isFinalized = !!networkIssue?.closed;
-  const isFinished = !!networkIssue?.isFinished;
+  const isInValidation = !!networkIssue?.isInValidation;
   const isIssueinDraft = !!networkIssue?.isDraft;
   const creationDate = networkIssue?.creationDate;
-  const mergeProposalAmount = networkIssue?.proposals?.length;
+  const closedDate = networkIssue?.closedDate;
   const isCanceled = activeIssue?.state === "canceled" || !!networkIssue?.canceled;
 
-  function toRepresentationPercent() {
-    return currentStep === 0 ? "1" : `${currentStep * 25}`;
+  function toRepresentationHeight() {
+    return currentStep === 0 ? "1px" : `${currentStep * 66.7}px`;
   }
 
   function renderSecondaryText(stepLabel, index) {
@@ -41,11 +40,11 @@ export default function IssueProposalProgressBar() {
 
     const isHigher = new Date() > addSeconds(creationDate, activeNetwork?.draftTime || 0);
 
-    const item = {
+    const item = date => ({
       Warning: {
         text: t("bounty:status.until-done", {
           distance: isHigher ? '0 seconds' 
-            : getTimeDifferenceInWords(addSeconds(creationDate, activeNetwork?.draftTime || 0),
+            : getTimeDifferenceInWords(addSeconds(date, activeNetwork?.draftTime || 0),
                                        new Date())
         }),
         color: "warning",
@@ -53,37 +52,25 @@ export default function IssueProposalProgressBar() {
       },
       Started: {
         text: t("bounty:status.started-time", {
-          distance: getTimeDifferenceInWords(new Date(creationDate), new Date())
+          distance: getTimeDifferenceInWords(new Date(date), new Date())
         }),
         color: "ligth-gray"
       },
       At: {
-        text: t("bounty:status.end-time", { data: formatDate(creationDate) }),
+        text: t("bounty:status.end-time", { data: formatDate(date) }),
         color: "ligth-gray"
       }
-    };
+    });
 
     let currentValue: { text: string; color?: string; bgColor?: string } = {
       text: ""
     };
 
-    if (
-      index === currentStep &&
-      [steps[1], steps[3]].includes(steps[currentStep])
-    ) {
-      currentValue = item.Started;
-    }
+    if (index === currentStep && currentStep === 1) currentValue = item(creationDate).Started;
 
-    if (index === currentStep && isIssueinDraft && !isCanceled) {
-      currentValue = item.Warning;
-    }
+    if (index === currentStep && isIssueinDraft && !isCanceled) currentValue = item(creationDate).Warning;
 
-    if (
-      index === currentStep &&
-      [steps[2], steps[4]].includes(steps[currentStep])
-    ) {
-      currentValue = item.At;
-    }
+    if (index === currentStep && currentStep === 3) currentValue = item(closedDate).At;
 
     if (currentValue)
       return (
@@ -100,7 +87,7 @@ export default function IssueProposalProgressBar() {
   }
 
   function renderColumn(stepLabel, index) {
-    const style = { top: index === 0 ? "0" : `${index * 60}px`, left: "7px" };
+    const style = { top: index === 0 ? "0" : `${index * 66.7}px`, left: "7px" };
     const dotClass = `d-flex align-items-center justify-content-center rounded-circle bg-${
       currentStep >= index ? stepColor : "ligth-gray"
     }`;
@@ -150,9 +137,8 @@ export default function IssueProposalProgressBar() {
     let step = 0;
     let stepColor = "primary"
 
-    if (isFinalized) step = 4;
-    else if (mergeProposalAmount > 0) step = 3;
-    else if (isFinished) step = 2;
+    if (isFinalized) step = 3;
+    else if (isInValidation) step = 2;
     else if (!isIssueinDraft) step = 1;
 
     if (isCanceled) stepColor = "danger";
@@ -160,7 +146,7 @@ export default function IssueProposalProgressBar() {
 
     setStepColor(stepColor);
     setCurrentStep(step);
-  }, [isFinalized, isIssueinDraft, isCanceled, mergeProposalAmount, isFinished]);
+  }, [isFinalized, isIssueinDraft, isCanceled, isInValidation]);
 
   return (
     <div className="container">
@@ -177,7 +163,7 @@ export default function IssueProposalProgressBar() {
                     className={`progress-bar w-100 bg-${stepColor}`}
                     role="progressbar"
                     style={{
-                      height: `${toRepresentationPercent()}%`
+                      height: `${toRepresentationHeight()}`
                     }}
                   >
                     {steps.map(renderColumn)}
