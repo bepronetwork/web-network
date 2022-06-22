@@ -153,7 +153,6 @@ export const ReposProvider: React.FC = function ({ children }) {
 
     const newActiveRepo = {
         ...findedRepo,
-        isFork: !!ghRepository?.isFork,
         hasGhVisibility: !!ghRepository,
         forks: [],
         branchs: []

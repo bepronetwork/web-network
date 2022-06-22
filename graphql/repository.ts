@@ -1,9 +1,7 @@
 export const Repository = 
   `query Repository($repo: String!, $owner: String!) {
     repository(name: $repo, owner: $owner) {
-      name
       nameWithOwner
-      isFork
       visibility
     }
   }`;
