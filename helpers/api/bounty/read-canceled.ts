@@ -14,7 +14,7 @@ import api from "services/api";
 import { GraphQlResponse } from "types/octokit";
 
 
-const { publicRuntimeConfig } = getConfig();
+const { publicRuntimeConfig, serverRuntimeConfig } = getConfig();
 
 export default async function readBountyCanceled(events, network: Network_v2, customNetwork) {
   const canceledBounties: string[] = [];
@@ -49,7 +49,7 @@ export default async function readBountyCanceled(events, network: Network_v2, cu
           if (repository) {
             const [owner, repo] = repository.githubPath.split("/");
 
-            const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
+            const githubAPI = (new Octokit({ auth: serverRuntimeConfig?.github?.token })).graphql;
 
             const issueDetails = await githubAPI<GraphQlResponse>(IssueQueries.Details, {
               repo,
