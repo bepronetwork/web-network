@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
+import ArrowUp from "assets/icons/arrow-up";
+
 import Button from "components/button";
 import ColorInput from "components/color-input";
 
 const MoreColoursButton = ({isVisible, onClick}) => {
-  const posfix = isVisible ? "less" : "...";
+  const posfix = isVisible ? <span className="ml-1 svg-primary"><ArrowUp width={6.33} height={3.22} /></span> : "...";
   const textClass = isVisible ? "text-primary" : "text-gray text-primary-hover";
 
   return <Button onClick={onClick} textClass={`px-0 ${textClass}`} transparent>
@@ -30,11 +32,11 @@ export default function ThemeColors({ colors, similar, setColor }) {
 
   return (
     <>
-      <label htmlFor="colors" className="caption-small mb-1">
+      <label htmlFor="colors" className="caption-small mb-1 text-white">
         {t("steps.network-information.fields.colors.label")}
       </label>
 
-      <div className="d-flex flex-row px-3 border-radius-8 justify-content-center mx-0 gap-20 mb-2">
+      <div className="d-flex flex-row px-3 border-radius-8 justify-content-center gap-20 mb-2">
         {
           colorsEntries.slice(0, 3).map(color => 
           <div className="col-4" key={color.label}>
