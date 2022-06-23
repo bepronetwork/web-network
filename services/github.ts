@@ -1,36 +1,34 @@
-import { Octokit  } from "octokit";
-
-import { useAuthentication } from "contexts/authentication";
+import { Octokit } from "octokit";
 
 import * as CommentsQueries from "graphql/comments";
 import * as PullRequestQueries from "graphql/pull-request";
 import * as RepositoryQueries from "graphql/repository";
 import * as UserQueries from "graphql/user";
 
-import MiniCache from "helpers/cache";
 import { getPropertyRecursively } from "helpers/object";
-
-import api from "services/api";
 
 import { GraphQlQueryResponseData, GraphQlResponse } from "types/octokit";
 
-const CACHE = new MiniCache();
+class Github {
+  private _accessToken: string;
+  private _octokit: Octokit;
 
-export default function useOctokitGraph() {
-  const { user } = useAuthentication();
+  get accessToken() { return this._accessToken; }
+  get octokit() { return this._octokit; }
 
-  function getOwnerRepoFrom(path: string) {
+  constructor(accessToken: string) {
+    this._accessToken = accessToken;
+    this._octokit = new Octokit({ auth: this._accessToken });
+  }
+
+  graphql() {
+    return this._octokit.graphql;
+  }
+
+  getOwnerRepoFrom(path: string) {
     const [owner, repo] = path.split("/");
     
     return { owner, repo };
-  }
-
-  function getOctoKitInstance(): Octokit["graphql"] {
-    if (!user?.accessToken) return undefined;
-
-    const octokit = new Octokit({ auth: user.accessToken });
-
-    return octokit.graphql;
   }
 
   /**
@@ -39,17 +37,13 @@ export default function useOctokitGraph() {
    * @param variables that mus be passed to the GraphQL query
    * @returns an array of objects containing the data returned by the GraphQL query
    */
-  async function getAllPages(query, variables): Promise<GraphQlResponse[]> {
-    const api = getOctoKitInstance();
-    
-    if (!api) return;
-
+  async getAllPages(query, variables): Promise<GraphQlResponse[]> {
     const pages = [];
     let nextPageCursor = null;
     let hasMorePages = false;
 
     do {
-      const response = await api<GraphQlResponse>(query, {...variables, cursor: nextPageCursor})
+      const response = await this.graphql()<GraphQlResponse>(query, { ...variables, cursor: nextPageCursor })
         .then(data => data)
         .catch(error => error.data);
 
@@ -65,27 +59,26 @@ export default function useOctokitGraph() {
     return pages;
   }
 
-  async function getPullRequestParticipants(repositoryPath:  string, pullId: number): Promise<string[]> {
-    const keys = ["getPullRequestParticipants", repositoryPath, pullId];
-    const cached = CACHE.get(keys);
+  async getPullRequestParticipants(repositoryPath:  string, pullId: number): Promise<string[]> {
+    const { owner, repo } = this.getOwnerRepoFrom(repositoryPath);
 
-    if (cached) return cached;
+    const response = await this.getAllPages(PullRequestQueries.Participants, {
+      repo,
+      owner,
+      pullId
+    });
 
-    const { data: participants } = await api.get(`/github/pull-request/participants/${repositoryPath}/${pullId}`);
-
-    CACHE.set(keys, participants, 10);
+    const participants = 
+      response?.flatMap(item => getPropertyRecursively<GraphQlQueryResponseData>("nodes", item)
+                                .map(node => node["login"]));
 
     return participants;
   }
 
-  async function getPullRequestLinesOfCode(repositoryPath:  string, pullId: number): Promise<number> {
-    const { owner, repo } = getOwnerRepoFrom(repositoryPath);
+  async getPullRequestLinesOfCode(repositoryPath:  string, pullId: number): Promise<number> {
+    const { owner, repo } = this.getOwnerRepoFrom(repositoryPath);
 
-    const githubAPI = getOctoKitInstance();
-
-    if (!githubAPI) return 0;
-
-    const response = await githubAPI<GraphQlResponse>(PullRequestQueries.LinesOfCode, {
+    const response = await this.graphql()<GraphQlResponse>(PullRequestQueries.LinesOfCode, {
       repo,
       owner,
       pullId
@@ -96,10 +89,10 @@ export default function useOctokitGraph() {
     return additions + deletions;
   }
 
-  async function getIssueOrPullRequestComments(repositoryPath:  string, id: number) {
-    const { owner, repo } = getOwnerRepoFrom(repositoryPath);
+  async getIssueOrPullRequestComments(repositoryPath:  string, id: number) {
+    const { owner, repo } = this.getOwnerRepoFrom(repositoryPath);
 
-    const response = await getAllPages(CommentsQueries.List, {
+    const response = await this.getAllPages(CommentsQueries.List, {
       repo,
       owner,
       id
@@ -112,14 +105,10 @@ export default function useOctokitGraph() {
     return comments;
   }
 
-  async function getPullRequestDetails(repositoryPath:  string, id: number) {
-    const { owner, repo } = getOwnerRepoFrom(repositoryPath);
+  async getPullRequestDetails(repositoryPath:  string, id: number) {
+    const { owner, repo } = this.getOwnerRepoFrom(repositoryPath);
 
-    const githubAPI = getOctoKitInstance();
-
-    if (!githubAPI) return;
-
-    const response = await githubAPI<GraphQlResponse>(PullRequestQueries.Details, {
+    const response = await this.graphql()<GraphQlResponse>(PullRequestQueries.Details, {
       repo,
       owner,
       id
@@ -130,10 +119,10 @@ export default function useOctokitGraph() {
     return { mergeable, merged, state };
   }
 
-  async function getRepositoryForks(repositoryPath:  string) {
-    const { owner, repo } = getOwnerRepoFrom(repositoryPath);
+  async getRepositoryForks(repositoryPath:  string) {
+    const { owner, repo } = this.getOwnerRepoFrom(repositoryPath);
 
-    const response = await getAllPages(RepositoryQueries.Forks, {
+    const response = await this.getAllPages(RepositoryQueries.Forks, {
       repo,
       owner
     });
@@ -145,10 +134,10 @@ export default function useOctokitGraph() {
     return forks;
   }
 
-  async function getRepositoryBranches(repositoryPath:  string) {
-    const { owner, repo } = getOwnerRepoFrom(repositoryPath);
+  async getRepositoryBranches(repositoryPath:  string) {
+    const { owner, repo } = this.getOwnerRepoFrom(repositoryPath);
 
-    const response = await getAllPages(RepositoryQueries.Branches, {
+    const response = await this.getAllPages(RepositoryQueries.Branches, {
       repo,
       owner
     });
@@ -159,9 +148,9 @@ export default function useOctokitGraph() {
     return branches;
   }
 
-  async function getUserRepositories(login:  string) {
+  async getUserRepositories(login:  string) {
 
-    const response = await getAllPages(UserQueries.Repositories, {
+    const response = await this.getAllPages(UserQueries.Repositories, {
       login
     });
 
@@ -195,14 +184,6 @@ export default function useOctokitGraph() {
 
     return [...userRepositories, ...organizationRepositories];
   }
-  
-  return {
-    getPullRequestParticipants,
-    getPullRequestLinesOfCode,
-    getIssueOrPullRequestComments,
-    getPullRequestDetails,
-    getRepositoryForks,
-    getRepositoryBranches,
-    getUserRepositories
-  };
 }
+
+export default Github;
