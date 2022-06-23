@@ -44,7 +44,7 @@ export default function Step({
 
       <Collapse in={isActive}>
         <div>
-          <div className="row pt-4">{children}</div>
+          <div className="row pt-2">{children}</div>
 
           {(validated && (
             <div className="d-flex flex-row justify-content-center">
