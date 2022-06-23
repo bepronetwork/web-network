@@ -1457,3 +1457,13 @@ input[type="color"] {
     pointer-events: none !important;
   }
 }
+
+.svg {
+  &-primary {
+    svg {  
+      path {
+        fill: var(--bs-primary);
+      }
+    }
+  }
+}
