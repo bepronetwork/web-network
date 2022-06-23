@@ -3,6 +3,7 @@ import * as PullRequestQueries from "graphql/pull-request";
 import * as RepositoryQueries from "graphql/repository";
 import * as UserQueries from "graphql/user";
 
+import MiniCache from "helpers/cache";
 import { getPropertyRecursively } from "helpers/object";
 
 import api from "services/api";
@@ -49,17 +50,14 @@ export default function useOctokit() {
   }
 
   async function getPullRequestParticipants(repositoryPath:  string, pullId: number): Promise<string[]> {
-    const { owner, repo } = getOwnerRepoFrom(repositoryPath);
+    const keys = ["getPullRequestParticipants", repositoryPath, pullId];
+    const cached = CACHE.get(keys);
 
-    const response = await getAllPages(PullRequestQueries.Participants, {
-      repo,
-      owner,
-      pullId
-    });
+    if (cached) return cached;
 
-    const participants = 
-      response?.flatMap(item => getPropertyRecursively<GraphQlQueryResponseData>("nodes", item)
-                                .map(node => node["login"]));
+    const { data: participants } = await api.get(`/github/pull-request/participants/${repositoryPath}/${pullId}`);
+
+    CACHE.set(keys, participants, 10);
 
     return participants;
   }
