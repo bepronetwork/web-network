@@ -17,7 +17,7 @@ export default function useOctokit() {
   }
 
   function makeOctokitRequest(query: string, params): Promise<GraphQlResponse> {
-    return api.post("/graphql", { query, params }).then(({ data }) => data).catch(error => error.data);
+    return api.post("/graphql", { query, params }).then(({ data }) => data)
   }
 
   /**

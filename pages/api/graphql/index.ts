@@ -4,16 +4,17 @@ import { getSession } from "next-auth/react";
 import getConfig from "next/config";
 import { Octokit } from "octokit";
 
+import { error as LogError } from "helpers/api/handle-log";
+
 import { CustomSession } from "interfaces/custom-session";
 
 const { serverRuntimeConfig: { github: { token: botToken } } } = getConfig();
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
+  const { query, params } = req.body;
+  const session = await getSession({ req }) as CustomSession;
+
   try {
-    const { query, params } = req.body;
-
-    const session = await getSession({ req }) as CustomSession;
-
     const octokit = new Octokit({
       auth: session?.user?.accessToken || botToken
     });
@@ -22,15 +23,17 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     return res.status(200).json(result);
   } catch(error) {
-    error("", { req, error });
-    return res.status(500).json(error);
+    LogError("", { req, error, session });
+    
+    return res.status(200).json(error.data);
   }
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
   case "POST":
-    return post(req, res);
+    await post(req, res);
+    break;
   default:
     return res.status(405).json({ statusCode: 405, message: "Method Not Allowed" });
   }
