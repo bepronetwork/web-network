@@ -63,7 +63,7 @@ export const ReposProvider: React.FC = function ({ children }) {
   const { getReposList } = useApi();
   const { dispatch } = useContext(ApplicationContext);
   const { activeNetwork } = useNetwork();
-  const { getRepository, getRepositoryForks, getRepositoryBranches } = useOctokitGraph();
+  const { getRepository, getRepositoryForks, getRepositoryBranches } = useOctokit();
   const { query } = useRouter();
 
   const findRepo = (repoId: number): RepoInfo =>
