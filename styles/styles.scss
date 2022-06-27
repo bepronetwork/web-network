@@ -140,6 +140,8 @@ li {
       }
       &--is-disabled {
         border-color: transparent;
+        background-color: $black;
+        opacity: 0.4;
       }
     }
     &__value-filterIssues {
@@ -537,6 +539,11 @@ label {
     background-color: $black;
     border: 1px solid $black;
     color: var(--bs-gray);
+
+    &.group-disabled {
+      opacity: 0.4;
+      border: 1px solid rgba($black, 0.4);
+    }
   }
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
