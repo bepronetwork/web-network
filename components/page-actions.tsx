@@ -22,6 +22,8 @@ import { useRepos } from "contexts/repos";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 
+import Modal from "./modal";
+
 interface PageActionsProps {
   isRepoForked?: boolean;
   addNewComment?: (comment: string) => void;
@@ -39,6 +41,7 @@ export default function PageActions({
 
   const [isExecuting, setIsExecuting] = useState(false);
   const [showPRModal, setShowPRModal] = useState(false);
+  const [showGHModal, setShowGHModal] = useState(false);
   const [showUpdateAmount, setShowUpdateAmount] = useState(false);
 
   const {
@@ -61,17 +64,18 @@ export default function PageActions({
   const isWorkingOnBounty = !!activeIssue?.working?.find((login) => login === user?.login);
   const isBountyOpen = networkIssue?.closed === false && networkIssue?.canceled === false;
 
-  const isBountyOwner = 
+  const isBountyOwner =
     wallet?.address && networkIssue?.creator && networkIssue?.creator?.toLowerCase() === wallet?.address?.toLowerCase();
 
-  const hasPullRequests = 
+  const hasPullRequests =
     !!activeIssue?.pullRequests?.filter(pullRequest => pullRequest?.status !== "canceled")?.length;
-  
-  const hasOpenPullRequest = 
-    !!activeIssue?.pullRequests?.find(pullRequest => pullRequest?.githubLogin === user?.login && 
-                                                     pullRequest?.status !== "canceled");
 
-  async function updateBountyData() {
+  const hasOpenPullRequest =
+    !!activeIssue?.pullRequests?.find(pullRequest => pullRequest?.githubLogin === user?.login &&
+      pullRequest?.status !== "canceled");
+
+
+  async function updateBountyData() { 
     return Promise.all([
       updateIssue(`${repoId}`, `${id}`),
       getNetworkIssue()
@@ -80,10 +84,10 @@ export default function PageActions({
 
   async function handleRedeem() {
     handleReedemIssue()
-    .then(()=>{
-      updateWalletBalance();
-      updateBountyData();
-    });
+      .then(() => {
+        updateWalletBalance();
+        updateBountyData();
+      });
   }
 
   async function handlePullrequest({
@@ -91,73 +95,75 @@ export default function PageActions({
     description: prDescription,
     branch
   }): Promise<void> {
+    if(!activeRepo.hasGhVisibility) return setShowGHModal(true)
     let pullRequestPayload = undefined;
 
     createPrePullRequest(repoId as string, issueGithubID, {
-        title: prTitle,
-        description: prDescription,
-        username: user?.login,
-        branch
-    }).then(({bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid}) => {
+      title: prTitle,
+      description: prDescription,
+      username: user?.login,
+      branch
+    }).then(({ bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid }) => {
       pullRequestPayload = {
-          repoId, 
-          issueGithubId: issueGithubID, 
-          bountyId,
-          issueCid: originCID, 
-          pullRequestGithubId: cid,
-          customNetworkName: activeNetwork.name,
-          creator: userRepo.split("/")[0],
-          userBranch,
-          userRepo
+        repoId,
+        issueGithubId: issueGithubID,
+        bountyId,
+        issueCid: originCID,
+        pullRequestGithubId: cid,
+        customNetworkName: activeNetwork.name,
+        creator: userRepo.split("/")[0],
+        userBranch,
+        userRepo
       };
 
       return handleCreatePullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid);
     })
-    .then(txInfo => {
-      return processEvent("pull-request", "created", activeNetwork?.name, { 
-        fromBlock: (txInfo as { blockNumber: number }).blockNumber 
-      });
-    })
-    .then(() => {
-      dispatch(addToast({
-            type: "success",
-            title: t("actions.success"),
-            content: t("pull-request:actions.create.success")
-      }));
+      .then(txInfo => {
+        return processEvent("pull-request", "created", activeNetwork?.name, {
+          fromBlock: (txInfo as { blockNumber: number }).blockNumber
+        });
+      })
+      .then(() => {
+        dispatch(addToast({
+          type: "success",
+          title: t("actions.success"),
+          content: t("pull-request:actions.create.success")
+        }));
 
-      return updateBountyData();
-    })
-    .then(() => setShowPRModal(false))
-    .catch((err) => {
-      setShowPRModal(false);
-      if (pullRequestPayload) cancelPrePullRequest(pullRequestPayload);
+        return updateBountyData();
+      })
+      .then(() => setShowPRModal(false))
+      .catch((err) => {
+        setShowPRModal(false);
+        if (pullRequestPayload) cancelPrePullRequest(pullRequestPayload);
 
-      if (err.response?.status === 422 && err.response?.data) {
-        err.response?.data?.map((item) =>
-          dispatch(addToast({
+        if (err.response?.status === 422 && err.response?.data) {
+          err.response?.data?.map((item) =>
+            dispatch(addToast({
               type: "danger",
               title: t("actions.failed"),
               content: item.message
-          })));
-      } else {
-        dispatch(addToast({
+            })));
+        } else {
+          dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
             content: t("pull-request:actions.create.error")
-        }));
-      }
-    });
+          }));
+        }
+      });
   }
 
   async function handleStartWorking() {
+    if(!activeRepo.hasGhVisibility) return setShowGHModal(true)
     setIsExecuting(true);
 
     startWorking(networkIssue?.cid, user?.login, activeNetwork?.name)
       .then((response) => {
         dispatch(addToast({
-            type: "success",
-            title: t("actions.success"),
-            content: t("bounty:actions.start-working.success")
+          type: "success",
+          title: t("actions.success"),
+          content: t("bounty:actions.start-working.success")
         }));
 
         addNewComment(response.data);
@@ -168,9 +174,9 @@ export default function PageActions({
       .catch((error) => {
         console.log("Failed to start working", error);
         dispatch(addToast({
-            type: "danger",
-            title: t("actions.failed"),
-            content: t("bounty:actions.start-working.error")
+          type: "danger",
+          title: t("actions.failed"),
+          content: t("bounty:actions.start-working.error")
         }));
 
         setIsExecuting(false);
@@ -187,12 +193,12 @@ export default function PageActions({
           color="primary"
         >
           <Translation label="actions.fork-repository" />
-        </GithubLink> );
+        </GithubLink>);
   }
 
   function renderStartWorkingButton() {
     if (isLoggedIn && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isWorkingOnBounty && isRepoForked)
-      return(
+      return (
         <ReadOnlyButtonWrapper>
           <Button
             color="primary"
@@ -214,13 +220,13 @@ export default function PageActions({
   }
 
   function renderCreatePullRequestButton() {
-    if (isLoggedIn && 
-        isBountyOpen && 
-        !isBountyInDraft && 
-        isWorkingOnBounty && 
-        !hasOpenPullRequest && 
-        isRepoForked)
-      return(
+    if (isLoggedIn &&
+      isBountyOpen &&
+      !isBountyInDraft &&
+      isWorkingOnBounty &&
+      !hasOpenPullRequest &&
+      isRepoForked)
+      return (
         <ReadOnlyButtonWrapper>
           <Button
             className="read-only-button"
@@ -235,7 +241,7 @@ export default function PageActions({
 
   function renderCancelButton() {
     if (isLoggedIn && isBountyOpen && isBountyOwner && isBountyInDraft)
-      return(
+      return (
         <ReadOnlyButtonWrapper>
           <Button
             className="read-only-button me-1"
@@ -249,7 +255,7 @@ export default function PageActions({
 
   function renderUpdateAmountButton() {
     if (isLoggedIn && isBountyOpen && isBountyOwner && isBountyInDraft)
-      return(
+      return (
         <ReadOnlyButtonWrapper>
           <Button
             className="read-only-button me-1"
@@ -263,21 +269,20 @@ export default function PageActions({
 
   function renderCreateProposalButton() {
     if (isLoggedIn && isCouncilMember && isBountyOpen && isBountyFinished && hasPullRequests)
-      return(
+      return (
         <NewProposal amountTotal={networkIssue?.tokenAmount} pullRequests={activeIssue?.pullRequests} />
       );
   }
 
   function renderViewPullRequestLink() {
     if (isLoggedIn && !isBountyInDraft && hasOpenPullRequest)
-      return(
+      return (
         <GithubLink
           repoId={String(repoId)}
           forcePath={activeIssue?.repository?.githubPath}
-          hrefPath={`pull/${
-            activeIssue?.pullRequests?.find((pr) => pr.githubLogin === user?.login)
+          hrefPath={`pull/${activeIssue?.pullRequests?.find((pr) => pr.githubLogin === user?.login)
               ?.githubId || ""
-          }`}
+            }`}
           color="primary"
         >
           <Translation ns="pull-request" label="actions.view" />
@@ -313,11 +318,13 @@ export default function PageActions({
 
               <GithubLink
                 repoId={String(repoId)}
+                onClick={() => {
+                  if(!activeRepo.hasGhVisibility) return setShowGHModal(true)
+                }}
                 forcePath={activeIssue?.repository?.githubPath}
-                hrefPath={`${
-                  (activeIssue?.state?.toLowerCase() === "pull request" && "pull") ||
+                hrefPath={`${(activeIssue?.state?.toLowerCase() === "pull request" && "pull") ||
                   "issues"
-                }/${issueGithubID || ""}`}
+                  }/${issueGithubID || ""}`}
               >
                 {t("actions.view-on-github")}
               </GithubLink>
@@ -334,7 +341,7 @@ export default function PageActions({
         repo={
           (user?.login &&
             activeIssue?.repository?.githubPath) &&
-            activeIssue?.repository?.githubPath ||
+          activeIssue?.repository?.githubPath ||
           ""
         }
         onCloseClick={() => setShowPRModal(false)}
@@ -348,6 +355,16 @@ export default function PageActions({
         ghId={activeIssue?.githubId}
         handleClose={() => setShowUpdateAmount(false)}
       />
+
+      <Modal
+        title={t("modals.gh-access.title")}
+        centerTitle
+        show={showGHModal}
+        okLabel={t("actions.close")}
+        onOkClick={() => setShowGHModal(false)}
+      >
+        <h5 className="text-center"><Translation ns="common" label="modals.gh-access.content" /></h5>
+      </Modal>
     </div>
   );
 }

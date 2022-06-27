@@ -223,6 +223,10 @@
           "label": "Amount"
         }
       }
+    },
+    "gh-access": {
+      "title": "Access Denied",
+      "content": "You don’t have access to this repository, please contact the network admin."
     }
   },
   "forms": {

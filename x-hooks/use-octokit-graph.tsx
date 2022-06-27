@@ -132,20 +132,16 @@ export default function useOctokitGraph() {
 
   //  Note: if repository not exist or it private will return null
   async function getRepository(repositoryPath:  string) {
-    try {
-      const { owner, repo } = getOwnerRepoFrom(repositoryPath);
+    const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
-      const response = await getAllPages(RepositoryQueries.Repository, {
+    const response = await getAllPages(RepositoryQueries.Repository, {
       repo,
       owner
-      });
+    });
 
-      const repository = response.flatMap((item)=> getPropertyRecursively<GraphQlQueryResponseData>("repository", item))
+    const repository = response?.flatMap((item)=> getPropertyRecursively<GraphQlQueryResponseData>("repository", item))
 
-      return repository?.[0];
-    } catch (error) {
-      return error
-    }
+    return repository?.[0] || null;
   }
 
   async function getRepositoryForks(repositoryPath:  string) {
