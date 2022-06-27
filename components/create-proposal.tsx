@@ -24,7 +24,7 @@ import { pullRequest } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-import useOctokitGraph from "x-hooks/use-octokit-graph";
+import useOctokit from "x-hooks/use-octokit";
 
 
 interface participants {
@@ -115,7 +115,7 @@ export default function NewProposal({
 
   const { handleProposeMerge } = useBepro({onSuccess})
   const { updateIssue, activeIssue, networkIssue } = useIssue()
-  const { getPullRequestParticipants } = useOctokitGraph();
+  const { getPullRequestParticipants } = useOctokit();
   const { getUserWith, processEvent } = useApi();
   const { activeNetwork } = useNetwork();
 

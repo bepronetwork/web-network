@@ -20,7 +20,7 @@ import {
 } from "interfaces/repos-list";
 
 import useApi from "x-hooks/use-api";
-import useOctokitGraph from "x-hooks/use-octokit-graph";
+import useOctokit from "x-hooks/use-octokit";
 
 import { ApplicationContext } from "./application";
 import { useNetwork } from "./network";

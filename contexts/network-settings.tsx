@@ -15,7 +15,7 @@ import { Color, Icon, Network, NetworkSettings, Theme } from "interfaces/network
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
-import useOctokitGraph from "x-hooks/use-octokit-graph";
+import useOctokit from "x-hooks/use-octokit";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -57,7 +57,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   const { service: DAOService } = useDAO();
   const { DefaultTheme } = useNetworkTheme();
   const { wallet, user } = useAuthentication();
-  const { getUserRepositories } = useOctokitGraph();
+  const { getUserRepositories } = useOctokit();
   const { getNetwork, searchRepositories, repositoryHasIssues } = useApi();
 
   const isCreating = useMemo(() => router.pathname === "/new-network", [router.pathname]);
