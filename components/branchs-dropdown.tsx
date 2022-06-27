@@ -43,7 +43,7 @@ export default function BranchsDropdown({
       </label>
       <ReactSelect
         key={`select_repo-${repoId}`}
-        isDisabled={!repoId || !options}
+        isDisabled={disabled || !repoId || !options}
         options={options}
         onChange={onSelected}
         placeholder={t("forms.select-placeholder")}
