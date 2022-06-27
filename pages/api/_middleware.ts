@@ -6,7 +6,7 @@ import { error, info } from 'helpers/api/handle-log'
 
 const testnet = process.env.NEXT_E2E_TESTNET === "true" ? true : false;
 
-const whiteList = ['auth', 'past-events', 'seo', 'users'];
+const whiteList = ['auth', 'past-events', 'seo', 'users', 'graphql'];
 
 const ignorePaths = ['health'];
 

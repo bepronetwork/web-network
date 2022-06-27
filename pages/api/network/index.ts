@@ -9,7 +9,7 @@ import Database from "db/models";
 import DAO from "services/dao-service";
 import IpfsStorage from "services/ipfs-service";
 
-const { publicRuntimeConfig } = getConfig();
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { name: networkName } = req.query;
@@ -109,7 +109,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const octokitBot = new Octokit({
-      auth: publicRuntimeConfig?.github?.token
+      auth: serverRuntimeConfig?.github?.token
     });
 
     for (const invitation_id of invitations) {
@@ -302,7 +302,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
       if (invitations.length) {
         const octokitBot = new Octokit({
-          auth: publicRuntimeConfig?.github?.token
+          auth: serverRuntimeConfig?.github?.token
         });
 
         for (const invitation_id of invitations) {
