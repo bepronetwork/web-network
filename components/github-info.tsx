@@ -22,7 +22,7 @@ export default function GithubInfo({
   function handleClick(event) {
     event.stopPropagation();
 
-    if (!disabled) onClick();
+    if (!disabled) onClick?.();
   }
 
   function getClassName() {
