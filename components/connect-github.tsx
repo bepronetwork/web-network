@@ -1,34 +1,36 @@
 import { signIn, signOut } from "next-auth/react";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
 import GithubImage from "components/github-image";
 
 import { useAuthentication } from "contexts/authentication";
-import { useNetwork } from "contexts/network";
 
 import useApi from "x-hooks/use-api";
+import useNetworkTheme from "x-hooks/use-network";
 
 export default function ConnectGithub() {
   const { t } = useTranslation("common");
 
-  const api = useApi();
+  const { push, asPath } = useRouter();
+
+  const { getUserOf } = useApi();
   const { wallet } = useAuthentication();
-  const { activeNetwork } = useNetwork();
+  const { getURLWithNetwork } = useNetworkTheme();
 
   async function clickSignIn() {
-    await signOut({ redirect: false });
-
     localStorage.setItem("lastAddressBeforeConnect", wallet?.address);
 
-    const user = await api.getUserOf(wallet?.address);
+    const user = await getUserOf(wallet?.address?.toLowerCase());
 
-    return signIn("github", {
-      callbackUrl: `${window.location.protocol}//${
-        window.location.host
-      }/${activeNetwork.name.toLowerCase()}/connect-account${
-        user ? "?migrate=1" : ""
-      }`
+    if (!user) return push(getURLWithNetwork("/connect-account"));
+
+    await signOut({ redirect: false });
+
+    signIn("github", {
+      callbackUrl: `${window.location.protocol}//${window.location.host}/${asPath}`
     });
+    
   }
 
   return (
