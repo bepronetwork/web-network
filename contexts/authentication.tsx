@@ -75,7 +75,7 @@ export const AuthenticationProvider = ({ children }) => {
     if (!address || !login || EXCLUDED_PAGES.includes(String(pathname))) 
       return setIsGithubAndWalletMatched(undefined);
 
-    const userLogin = address ? (await getUserOf(address)).githubLogin : undefined;
+    const userLogin = address ? (await getUserOf(address))?.githubLogin : undefined;
 
     if (login) setIsGithubAndWalletMatched(userLogin === login);
   }, [pathname]);
