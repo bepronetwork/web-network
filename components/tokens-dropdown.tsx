@@ -13,6 +13,7 @@ interface TokensDropdownProps {
   canAddToken?: boolean;
   label?: string;
   description?: string;
+  disabled?: boolean;
   addToken: (value: Token) => void;
   setToken?: (value: Token) => void;
 }
@@ -29,7 +30,8 @@ export default function TokensDropdown({
   setToken,
   canAddToken,
   label = undefined,
-  description = undefined
+  description = undefined,
+  disabled
 } : TokensDropdownProps) {
   const [options, setOptions] = useState<Option[]>();
   const [option, setOption] = useState<Option>();
@@ -72,6 +74,7 @@ export default function TokensDropdown({
         defaultValue={defaultToken && tokenToOption(defaultToken)}
         options={options}
         value={option}
+        isDisabled={disabled}
       />
 
       <ChangeTokenModal 

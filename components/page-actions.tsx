@@ -60,7 +60,8 @@ export default function PageActions({
   const isCouncilMember = !!wallet?.isCouncil;
   const isBountyInDraft = !!networkIssue?.isDraft;
   const isBountyFinished = !!networkIssue?.isFinished;
-  const isLoggedIn = !!wallet?.address && !!user?.login;
+  const isWalletConnected = !!wallet?.address;
+  const isWalletAndGHConnected = isWalletConnected && !!user?.login;
   const isWorkingOnBounty = !!activeIssue?.working?.find((login) => login === user?.login);
   const isBountyOpen = networkIssue?.closed === false && networkIssue?.canceled === false;
 
@@ -184,7 +185,7 @@ export default function PageActions({
   }
 
   function renderForkRepositoryLink() {
-    if (isLoggedIn && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isRepoForked)
+    if (isWalletAndGHConnected && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isRepoForked)
       return (
         <GithubLink
           repoId={String(repoId)}
@@ -197,8 +198,13 @@ export default function PageActions({
   }
 
   function renderStartWorkingButton() {
-    if (isLoggedIn && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isWorkingOnBounty && isRepoForked)
-      return (
+    if (isWalletAndGHConnected && 
+        !isBountyInDraft && 
+        !isBountyFinished && 
+        isBountyOpen && 
+        !isWorkingOnBounty && 
+        isRepoForked)
+      return(
         <ReadOnlyButtonWrapper>
           <Button
             color="primary"
@@ -220,13 +226,13 @@ export default function PageActions({
   }
 
   function renderCreatePullRequestButton() {
-    if (isLoggedIn &&
-      isBountyOpen &&
-      !isBountyInDraft &&
-      isWorkingOnBounty &&
-      !hasOpenPullRequest &&
-      isRepoForked)
-      return (
+    if (isWalletAndGHConnected && 
+        isBountyOpen && 
+        !isBountyInDraft && 
+        isWorkingOnBounty && 
+        !hasOpenPullRequest && 
+        isRepoForked)
+      return(
         <ReadOnlyButtonWrapper>
           <Button
             className="read-only-button"
@@ -240,8 +246,8 @@ export default function PageActions({
   }
 
   function renderCancelButton() {
-    if (isLoggedIn && isBountyOpen && isBountyOwner && isBountyInDraft)
-      return (
+    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft)
+      return(
         <ReadOnlyButtonWrapper>
           <Button
             className="read-only-button me-1"
@@ -254,8 +260,8 @@ export default function PageActions({
   }
 
   function renderUpdateAmountButton() {
-    if (isLoggedIn && isBountyOpen && isBountyOwner && isBountyInDraft)
-      return (
+    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft)
+      return(
         <ReadOnlyButtonWrapper>
           <Button
             className="read-only-button me-1"
@@ -268,15 +274,15 @@ export default function PageActions({
   }
 
   function renderCreateProposalButton() {
-    if (isLoggedIn && isCouncilMember && isBountyOpen && isBountyFinished && hasPullRequests)
-      return (
+    if (isWalletConnected && isCouncilMember && isBountyOpen && isBountyFinished && hasPullRequests)
+      return(
         <NewProposal amountTotal={networkIssue?.tokenAmount} pullRequests={activeIssue?.pullRequests} />
       );
   }
 
   function renderViewPullRequestLink() {
-    if (isLoggedIn && !isBountyInDraft && hasOpenPullRequest)
-      return (
+    if (isWalletAndGHConnected && !isBountyInDraft && hasOpenPullRequest)
+      return(
         <GithubLink
           repoId={String(repoId)}
           forcePath={activeIssue?.repository?.githubPath}
