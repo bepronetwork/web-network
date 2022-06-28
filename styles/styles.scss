@@ -760,6 +760,10 @@ label {
   width: 2px;
 }
 
+.issue-progress-vertical {
+  height: 2px;
+}
+
 .material-icons {
   &.md-small {
     font-size: 16px;
@@ -1101,7 +1105,6 @@ a.row-button svg {
 }
 
 textarea.form-control {
-  resize: none;
   border-radius: math.div($m, 2);
 }
 
@@ -1278,6 +1281,10 @@ textarea.form-control {
       fill: $ligth-gray;
     }
   }
+}
+
+.color-light-gray {
+  color: $ligth-gray
 }
 
 .custom-color-input {
