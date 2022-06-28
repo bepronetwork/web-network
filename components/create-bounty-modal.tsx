@@ -12,6 +12,8 @@ import { useNetwork } from "contexts/network";
 
 import { BEPRO_TOKEN, Token } from "interfaces/token";
 
+import BranchsDropdown from "./branchs-dropdown";
+import ReposDropdown from "./repos-dropdown";
 import TokensDropdown from "./tokens-dropdown";
 
 const { publicRuntimeConfig } = getConfig();
@@ -27,11 +29,14 @@ export default function CreateBountyModal() {
   const [progressPercentage, setProgressPercentage] = useState<number>(0);
   const [transactionalToken, setTransactionalToken] = useState<Token>();
   const [customTokens, setCustomTokens] = useState<Token[]>([]);
-  
+  const [repository, setRepository] = useState<{ id: string; path: string }>();
+  const [branch, setBranch] = useState("");
+
   const defaultToken = activeNetwork?.networkToken || BEPRO_TOKEN;
-  const canAddCustomToken = activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address ? 
-  publicRuntimeConfig?.networkConfig?.allowCustomTokens :
-  !!activeNetwork?.allowCustomTokens;
+  const canAddCustomToken =
+    activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address
+      ? publicRuntimeConfig?.networkConfig?.allowCustomTokens
+      : !!activeNetwork?.allowCustomTokens;
 
   const steps = ["details", "bounty", "additional details", "Review "];
 
@@ -44,25 +49,30 @@ export default function CreateBountyModal() {
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-md-6">
-              <Button color="black" className="container-bounty w-100 bg-30-hover" > 
-                  <span className="">Bounty</span>
+              <Button
+                color="black"
+                className="container-bounty w-100 bg-30-hover"
+              >
+                <span className="">Bounty</span>
               </Button>
             </div>
             <div className="col-md-6">
-            <Button color="black" className="container-bounty w-100 bg-30-hover" > 
-                  <span className="">Funding Request</span>
+              <Button
+                color="black"
+                className="container-bounty w-100 bg-30-hover"
+              >
+                <span className="">Funding Request</span>
               </Button>
             </div>
             <div className="col-md-12 mt-4">
-
-            <TokensDropdown
-                    label="Set Bounty Token"
-                    tokens={customTokens}
-                    defaultToken={defaultToken}
-                    canAddToken={canAddCustomToken}
-                    addToken={addToken} 
-                    setToken={setTransactionalToken}
-                  /> 
+              <TokensDropdown
+                label="Set Bounty Token"
+                tokens={customTokens}
+                defaultToken={defaultToken}
+                canAddToken={canAddCustomToken}
+                addToken={addToken}
+                setToken={setTransactionalToken}
+              />
             </div>
             <div className="col-md-6">a</div>
             <div className="col-md-1">b</div>
@@ -72,14 +82,33 @@ export default function CreateBountyModal() {
       );
     }
     if (currentSection === 2) {
-      return <div>additional details</div>;
+      return (
+        <div className="container pt-4">
+          <div className="row justify-content-center">
+            <div className="col-md-6">
+              <ReposDropdown
+                onSelected={(opt) => {
+                  setRepository(opt.value);
+                  setBranch(null);
+                }}
+              />
+            </div>
+            <div className="col-md-6">
+              <BranchsDropdown
+                repoId={repository?.id}
+                onSelected={(opt) => setBranch(opt.value)}
+              />
+            </div>
+          </div>
+        </div>
+      );
     }
     if (currentSection === 3) {
       return <div>Review</div>;
     }
   }
 
-//TODO: ADDING FILES
+  //TODO: ADDING FILES
   function renderDetails() {
     return (
       <div className="container">
@@ -120,10 +149,7 @@ export default function CreateBountyModal() {
   }
 
   function addToken(newToken: Token) {
-    setCustomTokens([
-      ...customTokens,
-      newToken
-    ]);
+    setCustomTokens([...customTokens, newToken]);
   }
 
   function renderColumn(stepLabel: string, index: number) {
