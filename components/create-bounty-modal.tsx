@@ -1,44 +1,85 @@
 import { Fragment, useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
+import getConfig from "next/config";
 
 import DoneIcon from "assets/icons/done-icon";
 
 import Button from "components/button";
 import Modal from "components/modal";
 
+import { useNetwork } from "contexts/network";
+
+import { BEPRO_TOKEN, Token } from "interfaces/token";
+
+import TokensDropdown from "./tokens-dropdown";
+
+const { publicRuntimeConfig } = getConfig();
+
 export default function CreateBountyModal() {
   const { t } = useTranslation(["common", "create-bounty"]);
+
+  const { activeNetwork } = useNetwork();
   const [show, setShow] = useState<boolean>(false);
   const [bountyTitle, setBountyTitle] = useState<string>();
   const [bountyDescription, setBountyDescription] = useState<string>();
-  const [currentSection, setCurrentSection] = useState<number>(0)
-  const [progressPercentage, setProgressPercentage] = useState<number>(0)
+  const [currentSection, setCurrentSection] = useState<number>(0);
+  const [progressPercentage, setProgressPercentage] = useState<number>(0);
+  const [transactionalToken, setTransactionalToken] = useState<Token>();
+  const [customTokens, setCustomTokens] = useState<Token[]>([]);
+  
+  const defaultToken = activeNetwork?.networkToken || BEPRO_TOKEN;
+  const canAddCustomToken = activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address ? 
+  publicRuntimeConfig?.networkConfig?.allowCustomTokens :
+  !!activeNetwork?.allowCustomTokens;
 
   const steps = ["details", "bounty", "additional details", "Review "];
 
-
   function renderCurrentSection() {
-    if(currentSection === 0){
-      return renderDetails()
+    if (currentSection === 0) {
+      return renderDetails();
     }
-    if(currentSection === 1){
-      return <div>
-        bounty
-      </div>
+    if (currentSection === 1) {
+      return (
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-md-6">
+              <Button color="black" className="container-bounty w-100 bg-30-hover" > 
+                  <span className="">Bounty</span>
+              </Button>
+            </div>
+            <div className="col-md-6">
+            <Button color="black" className="container-bounty w-100 bg-30-hover" > 
+                  <span className="">Funding Request</span>
+              </Button>
+            </div>
+            <div className="col-md-12 mt-4">
+
+            <TokensDropdown
+                    label="Set Bounty Token"
+                    tokens={customTokens}
+                    defaultToken={defaultToken}
+                    canAddToken={canAddCustomToken}
+                    addToken={addToken} 
+                    setToken={setTransactionalToken}
+                  /> 
+            </div>
+            <div className="col-md-6">a</div>
+            <div className="col-md-1">b</div>
+            <div className="col-md-5">a</div>
+          </div>
+        </div>
+      );
     }
-    if(currentSection === 2){
-      return <div>
-        additional details
-      </div>
+    if (currentSection === 2) {
+      return <div>additional details</div>;
     }
-    if(currentSection === 3){
-      return <div>
-        Review
-      </div>
+    if (currentSection === 3) {
+      return <div>Review</div>;
     }
   }
 
+//TODO: ADDING FILES
   function renderDetails() {
     return (
       <div className="container">
@@ -78,8 +119,14 @@ export default function CreateBountyModal() {
     );
   }
 
-  function renderColumn(stepLabel: string, index: number) {
+  function addToken(newToken: Token) {
+    setCustomTokens([
+      ...customTokens,
+      newToken
+    ]);
+  }
 
+  function renderColumn(stepLabel: string, index: number) {
     function handleStyleColumns(column) {
       if (column === 0) {
         return "50px";
@@ -91,12 +138,12 @@ export default function CreateBountyModal() {
     }
 
     function handleColorState(index) {
-      if(index === currentSection){
-        return "text-white"
-      }else if(index < currentSection){
-        return "text-primary"
-      }else {
-        return "color-light-gray"
+      if (index === currentSection) {
+        return "text-white";
+      } else if (index < currentSection) {
+        return "text-primary";
+      } else {
+        return "color-light-gray";
       }
     }
 
@@ -113,18 +160,25 @@ export default function CreateBountyModal() {
         >
           <div className={dotClass} style={dotStyle}>
             <div
-              className={`rounded-circle bg-${index <= currentSection ? 'primary': 'black'}`}
+              className={`rounded-circle bg-${
+                index <= currentSection ? "primary" : "black"
+              }`}
               style={{ width: "18px", height: "18px" }}
             >
-              {index < currentSection ? <DoneIcon /> :
-               <span className={handleColorState(index)}>{index + 1}</span>}
+              {index < currentSection ? (
+                <DoneIcon />
+              ) : (
+                <span className={handleColorState(index)}>{index + 1}</span>
+              )}
             </div>
           </div>
           <div
             className="position-absolute d-flex align-items-start flex-column mt-1"
             style={labelStyle}
           >
-            <label className={`text-uppercase caption-small ${handleColorState(index)}`}>
+            <label
+              className={`text-uppercase caption-small ${handleColorState(index)}`}
+            >
               {stepLabel}
             </label>
           </div>
@@ -134,28 +188,30 @@ export default function CreateBountyModal() {
   }
 
   function handleNextStepAndCreate() {
-    console.log('steps', steps.length, currentSection)
-    currentSection+1 < steps.length && setCurrentSection((prevState) => prevState + 1)
+    console.log("steps", steps.length, currentSection);
+    currentSection + 1 < steps.length &&
+      setCurrentSection((prevState) => prevState + 1);
   }
 
   function handleCancelAndBack() {
-    if(currentSection === 0){
-      setBountyTitle("")
-      setBountyDescription("")
-      setShow(false)
-    }else {
-      setCurrentSection((prevState) => prevState - 1)
+    if (currentSection === 0) {
+      setBountyTitle("");
+      setBountyDescription("");
+      setShow(false);
+    } else {
+      setCurrentSection((prevState) => prevState - 1);
     }
   }
 
   function setProgressBar() {
-    const progress = [0,30,60,100]
-    setProgressPercentage(progress[steps.findIndex((value) => value === steps[currentSection])])
+    const progress = [0, 30, 60, 100];
+    setProgressPercentage(progress[steps.findIndex((value) => value === steps[currentSection])]);
   }
 
   useEffect(() => {
-    setProgressBar()
-  },[currentSection])
+    setProgressBar();
+    if (!transactionalToken) return setTransactionalToken(BEPRO_TOKEN);
+  }, [currentSection, transactionalToken]);
 
   return (
     <>
@@ -175,7 +231,9 @@ export default function CreateBountyModal() {
           <>
             <div className="d-flex flex-grow-1">
               <Button color="dark-gray" onClick={handleCancelAndBack}>
-                <span>{currentSection === 0 ? t("common:actions.cancel"): "back"}</span>
+                <span>
+                  {currentSection === 0 ? t("common:actions.cancel") : "back"}
+                </span>
               </Button>
             </div>
 
@@ -183,7 +241,9 @@ export default function CreateBountyModal() {
               className="d-flex flex-shrink-0 w-40 btn-block"
               onClick={handleNextStepAndCreate}
             >
-              <span>{currentSection !== 3 ? "Next Step" : t(" :create-bounty") }</span>
+              <span>
+                {currentSection !== 3 ? "Next Step" : t(" :create-bounty")}
+              </span>
             </Button>
           </>
         }
