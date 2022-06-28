@@ -1,4 +1,3 @@
-import { GetStaticProps } from "next";
 import { useTranslation } from "next-i18next";
 
 import MarkedRender from "components/MarkedRender";
@@ -17,9 +16,3 @@ export default function IssueDescription({ description }) {
     </div>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {}
-  };
-};
