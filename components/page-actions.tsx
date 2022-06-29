@@ -108,7 +108,7 @@ export default function PageActions({
     if(DAOService && networkIssue)
       (async()=>{
         const cancelableTime = await DAOService.getCancelableTime();
-        const canceable = +new Date() <= +new Date(networkIssue.creationDate + cancelableTime) 
+        const canceable = +new Date() >= +new Date(networkIssue.creationDate + cancelableTime) 
         setIsCancelable(canceable)
       })()
   },[DAOService && networkIssue])
