@@ -12,6 +12,7 @@ import { useNetwork } from "contexts/network";
 
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
 import { formatNumberToCurrency } from "helpers/formatNumber";
+import { handleTokenToEurConversion } from "helpers/handleTokenToEurConversion";
 
 import { ProposalExtended } from "interfaces/bounty";
 import { TokenInfo } from "interfaces/token";
@@ -83,9 +84,8 @@ export default function ProposalMerge({
     }).catch(err => console.error('CoinInfo', err))
   }
 
-  function handleTokenToEurConversion(value: number):number {
-    if(!coinInfo) return 0
-    return Number((coinInfo.prices['eur'] * value).toFixed(4))
+  function handleConversion(value) {
+    return handleTokenToEurConversion(value, coinInfo.prices['eur'])
   }
 
   function currentTokenSymbol() {
@@ -167,7 +167,7 @@ export default function ProposalMerge({
             symbols={[currentTokenSymbol(), 'eur']}
             line={true}
             amounts={[distributedAmounts.proposerAmount.value, 
-                      handleTokenToEurConversion(distributedAmounts.proposerAmount.value)]}
+                      handleConversion(distributedAmounts.proposerAmount.value)]}
           />
           <BountyDistributionItem
             name={t("proposal:merge-modal.proposal-merger")}
@@ -176,7 +176,7 @@ export default function ProposalMerge({
             symbols={[currentTokenSymbol(), 'eur']}
             line={true}
             amounts={[distributedAmounts.mergerAmount.value, 
-                      handleTokenToEurConversion(distributedAmounts.mergerAmount.value)]}
+                      handleConversion(distributedAmounts.mergerAmount.value)]}
           />
           {distributedAmounts?.proposals?.map((item, key) => (
             <BountyDistributionItem
@@ -187,7 +187,7 @@ export default function ProposalMerge({
               percentage={item.percentage}
               symbols={[currentTokenSymbol(), 'eur']}
               line={true}
-              amounts={[item.value, handleTokenToEurConversion(item.value)]}
+              amounts={[item.value, handleConversion(item.value)]}
               key={key}
             />
           ))}
@@ -199,7 +199,7 @@ export default function ProposalMerge({
             percentage={distributedAmounts.treasuryAmount.percentage}
             symbols={[currentTokenSymbol(), 'eur']}
             amounts={[distributedAmounts.treasuryAmount.value, 
-                      handleTokenToEurConversion(distributedAmounts.treasuryAmount.value)]}
+                      handleConversion(distributedAmounts.treasuryAmount.value)]}
           />
         </ul>
 
@@ -212,7 +212,7 @@ export default function ProposalMerge({
 
           <div
             className={`d-flex flex-column cursor-pointer 
-          ${handleTokenToEurConversion(amountTotal) > 0 ? "mt-1" : "mt-3"}`}
+          ${handleConversion(amountTotal) > 0 ? "mt-1" : "mt-3"}`}
           >
             <div className="d-flex justify-content-end mb-1">
               <span className="text-white caption-medium">
@@ -222,10 +222,10 @@ export default function ProposalMerge({
                 {currentTokenSymbol()}
               </span>
             </div>
-            {handleTokenToEurConversion(amountTotal) > 0 && (
+            {handleConversion(amountTotal) > 0 && (
             <div className="d-flex justify-content-end">
               <span className="text-white caption-small text-ligth-gray">
-                {handleTokenToEurConversion(amountTotal)}</span>
+                {handleConversion(amountTotal)}</span>
               <span className=" ms-2 caption-small text-ligth-gray">
                 EUR
               </span>
