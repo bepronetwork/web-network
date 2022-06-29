@@ -9,6 +9,14 @@ import { useNetwork } from "contexts/network";
 
 import { isSameSet } from "helpers/array";
 import { isColorsSimilar } from "helpers/colors";
+import { 
+  DEFAULT_CANCEL_FEE, 
+  DEFAULT_CLOSE_FEE, 
+  DEFAULT_COUNCIL_AMOUNT, 
+  DEFAULT_DISPUTE_TIME, 
+  DEFAULT_DRAFT_TIME, 
+  DEFAULT_PERCENTAGE_FOR_DISPUTE 
+} from "helpers/contants";
 import { DefaultNetworkSettings } from "helpers/custom-network";
 
 import { Color, Icon, Network, NetworkSettings, Theme } from "interfaces/network";
@@ -48,8 +56,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   const [github, setGithub] = useState(DefaultNetworkSettings.github);
   const [tokens, setTokens] = useState(DefaultNetworkSettings.tokens);
   const [details, setDetails] = useState(DefaultNetworkSettings.details);
-  const [treasury, setTreasury] = useState(DefaultNetworkSettings.treasury);
-  const [parameters, setParameters] = useState(DefaultNetworkSettings.parameters);
+  const [settings, setSettings] = useState(DefaultNetworkSettings.settings);
   const [tokensLocked, setTokensLocked] = useState(DefaultNetworkSettings.tokensLocked);
   const [isSettingsValidated, setIsSettingsValidated] = useState(DefaultNetworkSettings.isSettingsValidated);
   
@@ -110,7 +117,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       validator: (value: Icon) => value?.preview !== "" && value?.raw?.type?.includes("image/svg")
     },
     colors: {
-      setter: (value: Color) => setDetails(previous => ({ 
+      setter: (value: Color) => setSettings(previous => ({ 
         ...previous, 
         theme: { 
           ...previous.theme, 
@@ -150,18 +157,39 @@ export const NetworkSettingsProvider = ({ children }) => {
       setter: value => setTokens(previous => ({ ...previous, bountyURI: value })),
     },
     treasury: {
-      setter: value => setTreasury(previous => ({ ...previous, address: { value, validated: undefined } })),
+      setter: value => setSettings(previous => ({ 
+        ...previous, 
+        treasury: { 
+          ...previous.treasury, 
+          address: { value, validated: undefined } 
+        } 
+      })),
     },
     cancelFee: {
-      setter: value => setTreasury(previous => ({ ...previous, cancelFee: value })),
+      setter: value => setSettings(previous => ({ 
+        ...previous, 
+        treasury: { 
+          ...previous.treasury, 
+          cancelFee: value
+        } 
+      })),
     },
     closeFee: {
-      setter: value => setTreasury(previous => ({ ...previous, closeFee: value })),
+      setter: value => setSettings(previous => ({ 
+        ...previous, 
+        treasury: { 
+          ...previous.treasury, 
+          closeFee: value
+        } 
+      })),
     },
     parameter: {
-      setter: value => setParameters(previous => ({ 
+      setter: value => setSettings(previous => ({ 
         ...previous, 
-        [value.label]: { value: value.value, validated: undefined },  
+        parameters: {
+          ...previous.parameters,
+          [value.label]: { value: value.value, validated: undefined }
+        },  
       })),
       validator: 
         (parameter, value) => value >= (LIMITS[parameter].min || value) && value <= (LIMITS[parameter].max || value)
@@ -215,13 +243,28 @@ export const NetworkSettingsProvider = ({ children }) => {
         }));
       });
 
-    setDetails(previous => ({
+    setSettings(previous => ({
       ...previous,
       theme: {
         ...previous.theme,
         colors: isCreating && DefaultTheme() || network?.colors,
       },
-      ...(isCreating && {} || {
+    }));
+
+    if (!isCreating) {
+      setSettings(previous => ({
+        ...previous,
+        parameters: {
+          ...previous.parameters,
+          draftTime: { value: network.draftTime, validated: true },
+          disputableTime: { value: network.disputableTime, validated: true },
+          percentageNeededForDispute: { value: network.percentageNeededForDispute, validated: true },
+          councilAmount: { value: network.councilAmount, validated: true }
+        }
+      }));
+
+      setDetails(previous => ({
+        ...previous,
         name: {
           value: network?.name,
           validated: undefined
@@ -241,16 +284,17 @@ export const NetworkSettingsProvider = ({ children }) => {
             preview: `${IPFS_URL}/${network.logoIcon}`
           }
         }
-      })
-    }));
-
-    if (!isCreating)
-      setParameters(previous => ({
+      }));
+    } else
+      setSettings(previous => ({
         ...previous,
-        draftTime: { value: network.draftTime, validated: true },
-        disputableTime: { value: network.disputableTime, validated: true },
-        percentageNeededForDispute: { value: network.percentageNeededForDispute, validated: true },
-        councilAmount: { value: network.councilAmount, validated: true },
+        parameters: {
+          ...previous.parameters,
+          draftTime: { value: DEFAULT_DRAFT_TIME, validated: true },
+          disputableTime: { value: DEFAULT_DISPUTE_TIME, validated: true },
+          percentageNeededForDispute: { value: DEFAULT_PERCENTAGE_FOR_DISPUTE, validated: true },
+          councilAmount: { value: DEFAULT_COUNCIL_AMOUNT, validated: true }
+        }
       }));
   }, [ wallet?.address, 
        user?.login, 
@@ -285,7 +329,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       details?.validated,
       github?.validated,
       tokens?.validated,
-      treasury?.validated !== false
+      settings?.validated !== false
     ].every( condition => !!condition ));
   }, [tokensLocked?.validated, details?.validated, github?.validated, tokens?.validated, treasury?.validated]);
 
@@ -304,17 +348,16 @@ export const NetworkSettingsProvider = ({ children }) => {
       Fields.logo.validator(details?.fullLogo?.value),
       Fields.logo.validator(details?.iconLogo?.value),
       Fields.description.validator(details?.description),
-      Fields.colors.validator(details?.theme),
     ].every(condition => condition);
 
     setDetails(previous => ({
       ...previous,
       validated
     }));
-  }, [details?.validated, details?.description, details?.iconLogo, details?.fullLogo, details?.theme]);
+  }, [details?.validated, details?.description, details?.iconLogo, details?.fullLogo, details?.name]);
 
   useEffect(() => {
-    const colors = details?.theme?.colors;
+    const colors = settings?.theme?.colors;
     
     if (!colors?.primary) return;
     
@@ -332,15 +375,17 @@ export const NetworkSettingsProvider = ({ children }) => {
         { label: "warning", code: colors.warning },
     ]));
 
-    if (!isSameSet(new Set(similar), new Set(details?.theme?.similar)))
-      setDetails(previous => ({
+    if (!isSameSet(new Set(similar), new Set(settings?.theme?.similar)))
+      setSettings(previous => ({
         ...previous,
         theme: {
           ...previous.theme,
           similar
         }
       }));
-  }, [details?.theme?.colors]);
+  }, [settings?.theme?.colors]);
+
+  useEffect(() => {
 
   // Github validation
   useEffect(() => {

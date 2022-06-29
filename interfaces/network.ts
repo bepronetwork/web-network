@@ -73,6 +73,8 @@ export interface Theme {
 
 export interface Field<T> {
   value: T;
+  get: () => T;
+  set: (value: T) => void;
   validated?: boolean;
 }
 
@@ -90,7 +92,23 @@ export interface NetworkSettings {
     description: string;
     iconLogo?: Field<Icon>;
     fullLogo?: Field<Icon>;
+    validated: boolean;
+  };
+  settings?: {
     theme?: Theme;
+    treasury?: {
+      address?: Field<string>;
+      cancelFee?: number;
+      closeFee?: number;
+      validated?: boolean;
+    };
+    parameters?: {
+      draftTime?: Field<number>;
+      disputableTime?: Field<number>;
+      percentageNeededForDispute?: Field<number>;
+      councilAmount?: Field<number>;
+      validated?: boolean;
+    };
     validated: boolean;
   };
   github?: {
@@ -103,19 +121,7 @@ export interface NetworkSettings {
     bounty: string;
     bountyURI: string;
     validated: boolean;
-  },
-  treasury?: {
-    address?: Field<string>;
-    cancelFee?: number;
-    closeFee?: number;
-    validated?: boolean;
-  },
-  parameters?: {
-    draftTime?: Field<number>;
-    disputableTime?: Field<number>;
-    percentageNeededForDispute?: Field<number>;
-    councilAmount?: Field<number>;
-  },
+  };
   fields?: {
     [key: string]: {
       setter: (value, value2?) => void;

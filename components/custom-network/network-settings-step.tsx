@@ -23,7 +23,7 @@ const Section = ({ children = undefined, title }) => (
   </div>
 );
 
-const ParameterInput = ({ label, symbol, value, onChange, onBlur}) => (
+const ParameterInput = ({ label, symbol, value, onChange, onBlur = undefined}) => (
   <div className="form-group col">
     <label className="caption-small mb-2">
       {label}
@@ -45,42 +45,22 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [address, setAddress] = useState("");
-  const [cancelFee, setCancelFee] = useState(1);
-  const [closeFee, setCloseFee] = useState(5);
-  const [disputeTime, setDisputeTime] = useState(259200);
-  const [percentageForDispute, setPercentageForDispute] = useState(3);
-  const [draftTime, setDraftTime] = useState(86400);
-  const [councilAmount, setCouncilAmount] = useState(25000000);
 
-  const { details, fields, treasury } = useNetworkSettings();
+  const { details, fields, treasury, parameters } = useNetworkSettings();
 
-  function handleColorChange(value) {
-    fields.colors.setter(value);
-  }
+  const handleAddressChange = e => setAddress(e.target.value);
+  const handleColorChange = value => fields.colors.setter(value);
+  const handleCloseFeeChange = param => fields.closeFee.setter(param.floatValue);
+  const handleCancelFeeChange = param => fields.cancelFee.setter(param.floatValue);
+  const handleDraftTimeChange = ({ floatValue: value }) => fields.parameter.setter({ label: "draftTime", value });
+  const handleDisputeTimeChange = 
+    ({ floatValue: value }) => fields.parameter.setter({ label: "disputableTime", value });
+  const handleCouncilAmountChange = 
+    ({ floatValue: value }) => fields.parameter.setter({ label: "councilAmount", value });
+  const handlePercentageForDisputeChange = 
+    ({ floatValue: value }) => fields.parameter.setter({ label: "percentageNeededForDispute", value });
 
-  function handleAddressChange(e) {
-    setAddress(e.target.value);
-  }
-
-  function handleAddressBlur() {
-    fields.treasury.setter(address);
-  }
-
-  function handleCancelFeeChange(e) {
-    setCancelFee(e.target.value);
-  }
-
-  function handleCancelFeeBlur() {
-    fields.cancelFee.setter(address);
-  }
-
-  function handleCloseFeeChange(e) {
-    setCloseFee(e.target.value);
-  }
-
-  function handleCloseFeeBlur() {
-    fields.closeFee.setter(address);
-  }
+  const handleAddressBlur = () => fields.treasury.setter(address);
   
   return (
     <Step
@@ -125,17 +105,15 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
         <ParameterInput 
           label={t("custom-network:steps.treasury.fields.cancel-fee.label")}
           symbol="%"
-          value={cancelFee}
+          value={treasury?.cancelFee}
           onChange={handleCancelFeeChange}
-          onBlur={handleCancelFeeBlur}
         />
 
         <ParameterInput 
           label={t("custom-network:steps.treasury.fields.close-fee.label")}
           symbol="%"
-          value={closeFee}
+          value={treasury?.closeFee}
           onChange={handleCloseFeeChange}
-          onBlur={handleCloseFeeBlur}
         />
       </Section>
 
@@ -147,33 +125,29 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
         <ParameterInput 
           label="Dispute Time"
           symbol="SECONDS"
-          value={disputeTime}
-          onChange={handleCloseFeeChange}
-          onBlur={handleCloseFeeBlur}
+          value={parameters?.disputableTime?.value}
+          onChange={handleDisputeTimeChange}
         />
 
         <ParameterInput 
           label="Percentage for Dispute"
           symbol="%"
-          value={percentageForDispute}
-          onChange={handleCloseFeeChange}
-          onBlur={handleCloseFeeBlur}
+          value={parameters?.percentageNeededForDispute?.value}
+          onChange={handlePercentageForDisputeChange}
         />
 
         <ParameterInput 
           label="Draft Time"
           symbol="SECONDS"
-          value={draftTime}
-          onChange={handleCloseFeeChange}
-          onBlur={handleCloseFeeBlur}
+          value={parameters?.draftTime?.value}
+          onChange={handleDraftTimeChange}
         />
 
         <ParameterInput 
           label="Council Amount"
           symbol="BEPRO"
-          value={councilAmount}
-          onChange={handleCloseFeeChange}
-          onBlur={handleCloseFeeBlur}
+          value={parameters?.councilAmount?.value}
+          onChange={handleCouncilAmountChange}
         />        
       </Section>
     </Step>

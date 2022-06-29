@@ -11,8 +11,13 @@ export default function Stepper({ children, hack = false }) {
     <div className="row">
       <div className="col-12">
         <div className="stepper">
-          {children.map((step, index) => React.cloneElement(step, { activeStep, index, handleClick }))}
-          </div>
+          {children.map((step, index) => React.cloneElement(step, { 
+            key: `step-${index}`, 
+            activeStep, 
+            index, 
+            handleClick }))
+          }
+        </div>
       </div>
     </div>
   );
