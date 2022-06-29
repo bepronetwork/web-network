@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
+import { FormCheck } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
@@ -8,15 +9,27 @@ import DoneIcon from "assets/icons/done-icon";
 import Button from "components/button";
 import Modal from "components/modal";
 
+import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 
-import { BEPRO_TOKEN, Token } from "interfaces/token";
+import { BEPRO_TOKEN, Token, TokenInfo } from "interfaces/token";
+
+import { getCoinInfoByContract } from "services/coingecko";
 
 import BranchsDropdown from "./branchs-dropdown";
+import CreateBountyDetails from "./create-bounty-details";
+import CreateBountyTokenAmount from "./create-bounty-token-amount";
+import { IFilesProps } from "./drag-and-drop";
+import GithubInfo from "./github-info";
 import ReposDropdown from "./repos-dropdown";
-import TokensDropdown from "./tokens-dropdown";
 
 const { publicRuntimeConfig } = getConfig();
+interface Amount {
+  value?: string;
+  formattedValue: string;
+  floatValue?: number;
+}
 
 export default function CreateBountyModal() {
   const { t } = useTranslation(["common", "create-bounty"]);
@@ -31,7 +44,22 @@ export default function CreateBountyModal() {
   const [customTokens, setCustomTokens] = useState<Token[]>([]);
   const [repository, setRepository] = useState<{ id: string; path: string }>();
   const [branch, setBranch] = useState("");
-
+  const [tokenBalance, setTokenBalance] = useState(0);
+  const [activeBounty, setActiveBounty] = useState<boolean>(true);
+  const [issueAmount, setIssueAmount] = useState<Amount>({
+    value: "",
+    formattedValue: "",
+    floatValue: 0,
+  });
+  const [isTransactionalTokenApproved, setIsTransactionalTokenApproved] =
+    useState(false);
+  const { service: DAOService } = useDAO();
+  const { wallet, user } = useAuthentication();
+  const [transactionalAllowance, setTransactionalAllowance] =
+    useState<number>();
+  const [coinInfo, setCoinInfo] = useState<TokenInfo>();
+  const [rewardChecked, setRewardChecked] = useState<boolean>(false);
+  const [files, setFiles] = useState<IFilesProps[]>([]);
   const defaultToken = activeNetwork?.networkToken || BEPRO_TOKEN;
   const canAddCustomToken =
     activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address
@@ -39,6 +67,91 @@ export default function CreateBountyModal() {
       : !!activeNetwork?.allowCustomTokens;
 
   const steps = ["details", "bounty", "additional details", "Review "];
+
+  function verifyAmountBiggerThanBalance(): boolean {
+    return !(issueAmount.floatValue > tokenBalance);
+  }
+
+  function handleIssueAmountBlurChange() {
+    if (issueAmount.floatValue > tokenBalance) {
+      setIssueAmount({ formattedValue: tokenBalance.toString() });
+    }
+  }
+
+  function onUpdateFiles(files: IFilesProps[]) {
+    return setFiles(files);
+  }
+
+  function addFilesInDescription(str) {
+    const strFiles = files?.map((file) =>
+        file.uploaded &&
+        `${file?.type?.split("/")[0] === "image" ? "!" : ""}[${file.name}](${
+          publicRuntimeConfig?.ipfsUrl
+        }/${file.hash}) \n\n`);
+    return `${str}\n\n${strFiles
+      .toString()
+      .replace(",![", "![")
+      .replace(",[", "[")}`;
+  }
+
+  function handleIssueAmountOnValueChange(values: Amount) {
+    if (values.floatValue < 0 || values.value === "-") {
+      setIssueAmount({ formattedValue: "" });
+    } else {
+      setIssueAmount(values);
+    }
+  }
+
+  function handleRewardChecked(e) {
+    setRewardChecked(e.target.checked);
+  }
+
+  async function getCoinInfo(address) {
+    await getCoinInfoByContract(address)
+      .then((tokenInfo) => {
+        setCoinInfo(tokenInfo);
+      })
+      .catch((err) => {
+        console.error("CoinInfo", err);
+        setCoinInfo(null);
+      });
+  }
+
+  function renderDetails(review = false) {
+    return (
+      <CreateBountyDetails
+        bountyTitle={bountyTitle}
+        setBountyTitle={setBountyTitle}
+        bountyDescription={bountyDescription}
+        setBountyDescription={setBountyDescription}
+        onUpdateFiles={onUpdateFiles}
+        review={review}
+      />
+    );
+  }
+
+  function renderBountyToken(review = false) {
+    return (
+      <CreateBountyTokenAmount
+        currentToken={transactionalToken}
+        setCurrentToken={setTransactionalToken}
+        customTokens={customTokens}
+        userAddress={wallet?.address}
+        defaultToken={defaultToken}
+        canAddCustomToken={canAddCustomToken}
+        addToken={addToken}
+        issueAmount={issueAmount}
+        setIssueAmount={setIssueAmount}
+        handleAmountOnValueChange={handleIssueAmountOnValueChange}
+        handleAmountBlurChange={handleIssueAmountBlurChange}
+        tokenBalance={tokenBalance}
+        isCurrentTokenApproved={isTransactionalTokenApproved}
+        coinInfo={coinInfo}
+        labelSelect="set Bounty Token"
+        review={review}
+      />
+    );
+  }
 
   function renderCurrentSection() {
     if (currentSection === 0) {
@@ -51,7 +164,13 @@ export default function CreateBountyModal() {
             <div className="col-md-6">
               <Button
                 color="black"
-                className="container-bounty w-100 bg-30-hover"
+                className={`container-bounty w-100 bg-30-hover ${
+                  activeBounty && "active-bounty"
+                }`}
+                onClick={() => {
+                  setActiveBounty(true);
+                  setRewardChecked(false);
+                }}
               >
                 <span className="">Bounty</span>
               </Button>
@@ -59,24 +178,49 @@ export default function CreateBountyModal() {
             <div className="col-md-6">
               <Button
                 color="black"
-                className="container-bounty w-100 bg-30-hover"
+                className={`container-bounty w-100 bg-30-hover ${
+                  !activeBounty && "active-bounty"
+                }`}
+                onClick={() => setActiveBounty(false)}
               >
                 <span className="">Funding Request</span>
               </Button>
             </div>
-            <div className="col-md-12 mt-4">
-              <TokensDropdown
-                label="Set Bounty Token"
-                tokens={customTokens}
-                defaultToken={defaultToken}
-                canAddToken={canAddCustomToken}
-                addToken={addToken}
-                setToken={setTransactionalToken}
-              />
-            </div>
-            <div className="col-md-6">a</div>
-            <div className="col-md-1">b</div>
-            <div className="col-md-5">a</div>
+            {renderBountyToken()}
+            {!activeBounty && (
+              <>
+                <div className="col-md-12">
+                  <FormCheck
+                    className="form-control-md pb-0"
+                    style={{}}
+                    type="checkbox"
+                    label="Reward Funders"
+                    onChange={handleRewardChecked}
+                  />
+                </div>
+                {rewardChecked && (
+                  <div className="col-md-12">
+                    <CreateBountyTokenAmount
+                      currentToken={transactionalToken}
+                      setCurrentToken={setTransactionalToken}
+                      customTokens={customTokens}
+                      userAddress={wallet?.address}
+                      defaultToken={defaultToken}
+                      canAddCustomToken={canAddCustomToken}
+                      addToken={addToken}
+                      issueAmount={issueAmount}
+                      setIssueAmount={setIssueAmount}
+                      handleAmountOnValueChange={handleIssueAmountOnValueChange}
+                      handleAmountBlurChange={handleIssueAmountBlurChange}
+                      tokenBalance={tokenBalance}
+                      isCurrentTokenApproved={isTransactionalTokenApproved}
+                      coinInfo={coinInfo}
+                      labelSelect="set Reward Token"
+                    />
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
       );
@@ -88,8 +232,13 @@ export default function CreateBountyModal() {
             <div className="col-md-6">
               <ReposDropdown
                 onSelected={(opt) => {
+                  console.log("test", opt);
                   setRepository(opt.value);
                   setBranch(null);
+                }}
+                value={{
+                  label: repository?.path,
+                  value: repository,
                 }}
               />
             </div>
@@ -97,6 +246,10 @@ export default function CreateBountyModal() {
               <BranchsDropdown
                 repoId={repository?.id}
                 onSelected={(opt) => setBranch(opt.value)}
+                value={{
+                  label: branch,
+                  value: branch,
+                }}
               />
             </div>
           </div>
@@ -104,48 +257,31 @@ export default function CreateBountyModal() {
       );
     }
     if (currentSection === 3) {
-      return <div>Review</div>;
-    }
-  }
-
-  //TODO: ADDING FILES
-  function renderDetails() {
-    return (
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-md-12 m-0">
-            <div className="form-group">
+      return (
+        <>
+          {renderDetails(true)}
+          {renderBountyToken(true)}
+          <div className="row">
+            <div className="col-md-6">
               <label className="caption-small mb-2">
-                {t("create-bounty:fields.title.label")}
+                Repository
               </label>
-              <input
-                type="text"
-                className="form-control rounded-lg"
-                placeholder={t("create-bounty:fields.title.placeholder")}
-                value={bountyTitle}
-                onChange={(e) => setBountyTitle(e.target.value)}
+              <GithubInfo
+                parent="list"
+                variant="repository"
+                label={repository?.path}
               />
-              <p className="p-small text-gray trans mt-2">
-                {t("create-bounty:fields.title.tip")}
-              </p>
+            </div>
+            <div className="col-md-6">
+            <label className="caption-small mb-2">
+                Branch
+              </label>
+              <GithubInfo parent="list" variant="repository" label={branch} />
             </div>
           </div>
-        </div>
-
-        <div className="form-group">
-          <label className="caption-small mb-2">
-            {t("create-bounty:fields.description.label")}
-          </label>
-          <textarea
-            className="form-control"
-            rows={3}
-            placeholder={t("create-bounty:fields.description.placeholder")}
-            value={bountyDescription}
-            onChange={(e) => setBountyDescription(e.target.value)}
-          />
-        </div>
-      </div>
-    );
+        </>
+      );
+    }
   }
 
   function addToken(newToken: Token) {
@@ -214,7 +350,6 @@ export default function CreateBountyModal() {
   }
 
   function handleNextStepAndCreate() {
-    console.log("steps", steps.length, currentSection);
     currentSection + 1 < steps.length &&
       setCurrentSection((prevState) => prevState + 1);
   }
@@ -234,10 +369,43 @@ export default function CreateBountyModal() {
     setProgressPercentage(progress[steps.findIndex((value) => value === steps[currentSection])]);
   }
 
+  const updateWalletByToken = (token: Token) => {
+    DAOService.getTokenBalance(token.address, wallet.address).then(setTokenBalance);
+
+    DAOService.getAllowance(token.address,
+                            wallet.address,
+                            DAOService.network.contractAddress).then(setTransactionalAllowance);
+  };
+
+  useEffect(() => {
+    if (!wallet?.balance || !DAOService) return;
+    if (!transactionalToken) return setTransactionalToken(BEPRO_TOKEN);
+
+    updateWalletByToken(transactionalToken);
+  }, [transactionalToken, wallet, DAOService]);
+
+  useEffect(() => {
+    if (!activeNetwork?.networkToken) return;
+
+    const tmpTokens = [];
+
+    tmpTokens.push(BEPRO_TOKEN);
+
+    if (activeNetwork.networkAddress !== publicRuntimeConfig?.contract?.address)
+      tmpTokens.push(activeNetwork.networkToken);
+
+    tmpTokens.push(...activeNetwork.tokens.map(({ name, symbol, address }) => ({ name, symbol, address } as Token)));
+
+    setCustomTokens(tmpTokens);
+  }, [activeNetwork?.networkToken]);
+
   useEffect(() => {
     setProgressBar();
-    if (!transactionalToken) return setTransactionalToken(BEPRO_TOKEN);
-  }, [currentSection, transactionalToken]);
+  }, [currentSection]);
+
+  useEffect(() => {
+    transactionalToken?.address && getCoinInfo(transactionalToken.address);
+  }, [transactionalToken]);
 
   return (
     <>
@@ -252,7 +420,10 @@ export default function CreateBountyModal() {
         show={show}
         title={"Create Bounty"}
         titlePosition="center"
-        onCloseClick={() => setShow(false)}
+        onCloseClick={() => {
+          setShow(false);
+          setRewardChecked(false);
+        }}
         footer={
           <>
             <div className="d-flex flex-grow-1">
@@ -278,7 +449,7 @@ export default function CreateBountyModal() {
           <div className="container mb-4 pb-4">
             <div className="row justify-content-md-center">
               <div className="p-0 col-md-10">
-                <div className="progress bg-ligth-gray issue-progress-vertical">
+                <div className="progress bg-black issue-progress-vertical">
                   <div
                     className={`progress-bar bg-primary`}
                     role="progressbar"
