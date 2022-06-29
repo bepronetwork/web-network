@@ -33,6 +33,7 @@ export default function InfoTooltip({
           <InfoIconEmpty
             width={14}
             height={14}
+            color="colors-ligth-gray"
             className="empty-info"
           />
         )}
