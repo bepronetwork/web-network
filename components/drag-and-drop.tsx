@@ -19,9 +19,10 @@ export interface IFilesProps {
 
 interface IDragAndDropProps {
   onUpdateFiles: (files: IFilesProps[]) => void;
+  disabled?: boolean;
 }
 
-export default function DragAndDrop({ onUpdateFiles }: IDragAndDropProps) {
+export default function DragAndDrop({ onUpdateFiles, disabled }: IDragAndDropProps) {
   const [files, setFiles] = useState<IFilesProps[]>([] as IFilesProps[]);
   const { t } = useTranslation(["common"]);
   const { uploadFiles } = useApi();
@@ -60,7 +61,8 @@ export default function DragAndDrop({ onUpdateFiles }: IDragAndDropProps) {
   const useDrop = {
     accept: "image/jpeg, image/png, application/pdf",
     maxSize: 32000000, //32mb (max size ipfs)
-    onDropAccepted
+    onDropAccepted,
+    disabled
   };
   const { getRootProps, getInputProps, isDragActive, isDragReject } =
     useDropzone(useDrop);

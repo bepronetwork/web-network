@@ -6,8 +6,9 @@ import ReactSelect from "components/react-select";
 
 import { useRepos } from "contexts/repos";
 
-export default function ReposDropdown({ onSelected }: {
+export default function ReposDropdown({ onSelected, disabled }: {
   onSelected: (e: { value: { id: string; path: string; } }) => void
+  disabled?: boolean;
 }) {
   const { repoList } = useRepos();
   const [options, setOptions] = useState<{ value: { id: string, path: string }; label: string }[]>();
@@ -34,6 +35,7 @@ export default function ReposDropdown({ onSelected }: {
         options={options}
         onChange={onSelected}
         placeholder={t("forms.select-placeholder")}
+        isDisabled={disabled}
       />
     </div>
   );
