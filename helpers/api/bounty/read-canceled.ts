@@ -23,7 +23,7 @@ export default async function readBountyCanceled(events, network: Network_v2, cu
     const { id } = event.returnValues;
 
     try {
-      const networkBounty = await network.getBounty(id);
+      const networkBounty = await network.getBounty(+id);
 
       const bounty = await models.issue.findOne({
         where: {

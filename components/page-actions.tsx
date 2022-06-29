@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
@@ -14,6 +14,7 @@ import UpdateBountyAmountModal from "components/update-bounty-amount-modal";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/add-toast";
@@ -42,7 +43,10 @@ export default function PageActions({
   const [isExecuting, setIsExecuting] = useState(false);
   const [showPRModal, setShowPRModal] = useState(false);
   const [showGHModal, setShowGHModal] = useState(false);
+  const [showHardCancelModal, setShowHardCancelModal] = useState(false);
   const [showUpdateAmount, setShowUpdateAmount] = useState(false);
+
+  const [isCancelable, setIsCancelable] = useState(false);
 
   const {
     dispatch
@@ -50,7 +54,8 @@ export default function PageActions({
 
   const { activeRepo } = useRepos();
   const { activeNetwork } = useNetwork();
-  const { handleReedemIssue, handleCreatePullRequest } = useBepro();
+  const { handleReedemIssue, handleHardCancelBounty, handleCreatePullRequest } = useBepro();
+  const {service: DAOService} = useDAO()
   const { wallet, user, updateWalletBalance } = useAuthentication();
   const { networkIssue, activeIssue, getNetworkIssue, updateIssue } = useIssue();
   const { createPrePullRequest, cancelPrePullRequest, startWorking, processEvent } = useApi();
@@ -89,6 +94,24 @@ export default function PageActions({
         updateBountyData();
       });
   }
+ 
+  async function handleHardCancel() {
+    setShowHardCancelModal(false)
+    handleHardCancelBounty()
+      .then(() => {
+        updateWalletBalance();
+        updateBountyData();
+      });
+  }
+
+  useEffect(()=>{
+    if(DAOService && networkIssue)
+      (async()=>{
+        const cancelableTime = await DAOService.getCancelableTime();
+        const canceable = +new Date() <= +new Date(networkIssue.creationDate + cancelableTime) 
+        setIsCancelable(canceable)
+      })()
+  },[DAOService && networkIssue])
 
   async function handlePullrequest({
     title: prTitle,
@@ -239,6 +262,21 @@ export default function PageActions({
       );
   }
 
+  function renderHardCancelButton() {
+    if (wallet?.isNetworkGovernor && isCancelable)
+      return (
+        <ReadOnlyButtonWrapper>
+          <Button
+            color="danger"
+            className="read-only-button me-1"
+            onClick={()=>setShowHardCancelModal(true)}
+          >
+            <Translation ns="common" label="actions.cancel" />
+          </Button>
+        </ReadOnlyButtonWrapper>
+      );
+  }
+
   function renderCancelButton() {
     if (isLoggedIn && isBountyOpen && isBountyOwner && isBountyInDraft)
       return (
@@ -302,6 +340,8 @@ export default function PageActions({
             <div className="d-flex flex-row align-items-center gap-20">
               <ForksAvatars forks={activeRepo?.forks || []} repositoryPath={activeIssue?.repository?.githubPath} />
 
+              {renderHardCancelButton()}
+
               {renderForkRepositoryLink()}
 
               {renderStartWorkingButton()}
@@ -364,6 +404,18 @@ export default function PageActions({
         onOkClick={() => setShowGHModal(false)}
       >
         <h5 className="text-center"><Translation ns="common" label="modals.gh-access.content" /></h5>
+      </Modal>
+      
+      <Modal
+        title={t("modals.hard-cancel.title")}
+        centerTitle
+        show={showHardCancelModal}
+        onCloseClick={() => setShowHardCancelModal(false)}
+        cancelLabel={t("actions.close")}
+        okLabel={t("actions.continue")}
+        onOkClick={handleHardCancel}
+      >
+        <h5 className="text-center"><Translation ns="common" label="modals.hard-cancel.content" /></h5>
       </Modal>
     </div>
   );

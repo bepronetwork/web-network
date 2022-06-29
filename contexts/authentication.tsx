@@ -100,16 +100,20 @@ export const AuthenticationProvider = ({ children }) => {
       eth,
       staked,
       isCouncil,
+      isNetworkGovernor
     ] = await Promise.all([
       DAOService.getOraclesResume(wallet.address),
       DAOService.getBalance("settler", wallet.address),
       DAOService.getBalance("eth", wallet.address),
       DAOService.getBalance("staked", wallet.address),
       DAOService.isCouncil(wallet.address),
+      DAOService.isNetworkGovernor(wallet.address)
     ])
+
     setWallet((previousWallet) => ({
       ...previousWallet,
       isCouncil,
+      isNetworkGovernor,
       balance: {
         ...previousWallet.balance,
         oracles,

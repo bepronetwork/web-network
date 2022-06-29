@@ -474,6 +474,10 @@ export default class DAO {
     return this.registry.networkOfAddress(address);
   }
 
+  async hardCancel(bountyId: number): Promise<TransactionReceipt>{
+    return this.network.hardCancel(bountyId);
+  }
+
   async setNFTTokenDispatcher(nftToken: string, dispatcher: string): Promise<TransactionReceipt> {
     const bountyToken = await this.loadBountyToken(nftToken);
 
@@ -488,7 +492,7 @@ export default class DAO {
     return this.web3Connection.utils.isAddress(address);
   }
 
-  getTimeChain(): Promise<number> { 
+  async getTimeChain(): Promise<number> { 
     return this.web3Connection.Web3.eth.getBlock(`latest`).then(block => block.timestamp*1000);
   }
 
@@ -499,4 +503,7 @@ export default class DAO {
     return (new Date(time) < new Date(creationDateIssue + redeemTime))
   }
 
+  getCancelableTime(): Promise<number> {
+    return this._network.cancelableTime();
+  }
 }

@@ -74,6 +74,7 @@
     "approve": "Approve",
     "cancel": "Cancel",
     "close": "Close",
+    "continue": "Continue",
     "completed": "Completed",
     "confirm": "Confirm",
     "connect": "Connect",
@@ -227,6 +228,10 @@
     "gh-access": {
       "title": "Access Denied",
       "content": "You don’t have access to this repository, please contact the network admin."
+    },
+    "hard-cancel": {
+      "title": "Attention!",
+      "content": "This action will return the locked amount to the original creators address along with any reward tokens and revert funding entries"
     }
   },
   "forms": {
