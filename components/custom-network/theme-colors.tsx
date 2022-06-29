@@ -32,10 +32,6 @@ export default function ThemeColors({ colors, similar, setColor }) {
 
   return (
     <>
-      <label htmlFor="colors" className="caption-small mb-1 text-white">
-        {t("steps.network-information.fields.colors.label")}
-      </label>
-
       <div className="d-flex flex-row px-3 border-radius-8 justify-content-center gap-20 mb-2">
         {
           colorsEntries.slice(0, 3).map(color => 

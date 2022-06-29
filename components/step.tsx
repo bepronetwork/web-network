@@ -2,7 +2,7 @@ import { Collapse } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
 
-import SuccessIcon from "assets/icons/success-icon";
+import ConfirmIcon from "assets/icons/confirm-icon";
 
 import Button from "components/button";
 
@@ -22,24 +22,24 @@ export default function Step({
 
   const isActive = activeStep === index;
 
+  const textColor = isActive ? "white" : (validated && "success" || "ligth-gray");
+  const bgColor = !isActive && validated ? "bg-success-15" : "";
+
   function handleAction() {
     if (finishLabel) handleFinish?.();
     else handleClick?.(index + 1);
   }
 
   return (
-    <div className="step border-radius-8 p-4">
+    <div className={`step border-radius-8 px-4 py-3 ${bgColor}`}>
       <div
         className="d-flex flex-row align-items-center cursor-pointer"
         onClick={() => handleClick?.(index)}
       >
+        {(validated && <span className="mr-2"><ConfirmIcon /></span>) || ""}
         <span
-          className={`caption-medium mr-1 ${
-            isActive ? "text-white" : "text-ligth-gray"
-          }`}
+          className={`caption-medium text-${textColor}`}
         >{`${index + 1}. ${title}`}</span>
-
-        {(validated && <SuccessIcon />) || ""}
       </div>
 
       <Collapse in={isActive}>

@@ -1291,11 +1291,11 @@ textarea.form-control {
   padding: 10px 20px;
 
   .custom-color-input {
-    width: 20px;
-    height: 20px;
+    width: 25px;
+    height: 25px;
 
-    border-radius: 20px;
-    
+    border-radius: 25px;
+    border: 2px solid $white;
 
     &.is-invalid {
       border: 2px solid var(--bs-fail);

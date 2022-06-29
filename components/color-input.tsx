@@ -22,12 +22,12 @@ export default function ColorInput({ label, code, onChange, error = false }) {
   return (
     <div className="d-flex flex-column mb-2">
       <span
-        className={`caption-medium text-${(error && "danger") || "gray"} mt-2 mb-1`}
+        className={`caption-small text-${(error && "danger") || "gray"} mt-2 mb-1`}
       >
         {label}
       </span>
 
-      <div className={`d-flex flex-row align-items-center bg-white-10 border border-ligth-gray border-radius-8 
+      <div className={`d-flex flex-row align-items-center bg-black border-radius-8 
         custom-color-input-wrapper cursor-pointer`} onClick={handleDivClick}>
         <div className={`custom-color-input mr-1 ${(error && "is-invalid") || ""}`}>
           <input
