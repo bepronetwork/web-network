@@ -82,6 +82,7 @@ export default function PageCreateIssue() {
   const { getURLWithNetwork } = useNetworkTheme();
   const { createPreBounty, processEvent } = useApi();
 
+  const isFieldsDisabled = !user;
   const defaultToken = activeNetwork?.networkToken || BEPRO_TOKEN;
   const canAddCustomToken = activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address ? 
     publicRuntimeConfig?.networkConfig?.allowCustomTokens :
@@ -322,6 +323,7 @@ export default function PageCreateIssue() {
                   placeholder={t("create-bounty:fields.title.placeholder")}
                   value={issueTitle}
                   onChange={(e) => setIssueTitle(e.target.value)}
+                  disabled={isFieldsDisabled}
                 />
                 <p className="p-small text-gray trans my-2">
                   {t("create-bounty:fields.title.tip")}
@@ -337,14 +339,16 @@ export default function PageCreateIssue() {
                   placeholder={t("create-bounty:fields.description.placeholder")}
                   value={issueDescription}
                   onChange={(e) => setIssueDescription(e.target.value)}
+                  disabled={isFieldsDisabled}
                 />
               </div>
               <div className="mb-4">
-                <DragAndDrop onUpdateFiles={onUpdateFiles} />
+                <DragAndDrop onUpdateFiles={onUpdateFiles} disabled={isFieldsDisabled} />
               </div>
               <div className="row mb-4">
                 <div className="col">
                   <ReposDropdown
+                    disabled={isFieldsDisabled}
                     onSelected={(opt) => {
                       setRepository(opt.value);
                       setBranch(null);
@@ -353,6 +357,7 @@ export default function PageCreateIssue() {
                 </div>
                 <div className="col">
                   <BranchsDropdown
+                    disabled={isFieldsDisabled}
                     repoId={repository?.id}
                     onSelected={(opt) => setBranch(opt.value)}
                   />
@@ -362,6 +367,7 @@ export default function PageCreateIssue() {
                 <div className="col-6">
                   <InputNumber
                     thousandSeparator
+                    disabled={isFieldsDisabled}
                     max={tokenBalance}
                     label={t("create-bounty:fields.amount.label", {token: transactionalToken?.symbol})}
                     symbol={transactionalToken?.symbol}
@@ -396,6 +402,7 @@ export default function PageCreateIssue() {
                 
                 <div className="col-6 mt-n2">
                   <TokensDropdown
+                    disabled={isFieldsDisabled}
                     tokens={customTokens}
                     defaultToken={defaultToken}
                     canAddToken={canAddCustomToken}

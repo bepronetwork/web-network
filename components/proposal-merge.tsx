@@ -80,7 +80,7 @@ export default function ProposalMerge({
   async function  getCoinInfo() { 
     await getCoinInfoByContract(activeNetwork?.networkToken?.address).then((tokenInfo) => {
       setCoinInfo(tokenInfo)
-    }).catch(err => console.error('CoinInfo', err))
+    }).catch(error => console.log("getCoinInfo", error));
   }
 
   function handleTokenToEurConversion(value: number):number {

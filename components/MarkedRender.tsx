@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 
 import { marked } from "marked";
 import sanitizeHtml from "sanitize-html";
-export default function MarkedRender({ source = "_loading..._" }) {
+
+export default function MarkedRender({ className = "", source = "_loading..._" }) {
   const [innerHtml, setInnerHtml] = useState<{ __html: string }>(null);
 
   useEffect(() => {
@@ -14,6 +15,6 @@ export default function MarkedRender({ source = "_loading..._" }) {
   }, [source]);
 
   return (
-    <div className="marked-render" dangerouslySetInnerHTML={innerHtml}></div>
+    <div className={`marked-render ${className}`} dangerouslySetInnerHTML={innerHtml}></div>
   );
 }

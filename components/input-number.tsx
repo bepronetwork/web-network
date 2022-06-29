@@ -77,6 +77,7 @@ export default function InputNumber({
                 "border border-1 border-success border-radius-8": success,
                 "border border-1 border-danger border-radius-8": error,
                 "border border-1 border-warning border-radius-8": warning,
+                "group-disabled": params?.disabled,
                 ...errorStyle
                             })}
           >

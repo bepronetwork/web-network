@@ -52,7 +52,7 @@ export default function PullRequestPage() {
   
   const { prId, review } = router.query;
 
-  const isConnected = !!wallet?.address && !!user?.login;
+  const isWalletConnected = !!wallet?.address;
   const isPullRequestOpen = pullRequest?.state?.toLowerCase() === "open";
   const isPullRequestReady = !!networkPullRequest?.ready;
   const isPullRequestCanceled = !!networkPullRequest?.canceled;
@@ -205,7 +205,7 @@ export default function PullRequestPage() {
 
               <div className="col-4 gap-20 p-0 d-flex justify-content-end">
                 {/* Make Review Button */}
-                { (isConnected && isPullRequestOpen && isPullRequestReady && !isPullRequestCanceled) &&
+                { (isWalletConnected && isPullRequestOpen && isPullRequestReady && !isPullRequestCanceled) &&
                     <ReadOnlyButtonWrapper>
                       <Button
                         className="read-only-button text-nowrap"
@@ -217,7 +217,7 @@ export default function PullRequestPage() {
                 }
 
                 {/* Make Ready for Review Button */}
-                { ( isConnected && 
+                { ( isWalletConnected && 
                     isPullRequestOpen && 
                     !isPullRequestReady && 
                     !isPullRequestCanceled && 
@@ -234,7 +234,7 @@ export default function PullRequestPage() {
                 }
 
                 {/* Cancel Button */}
-                { ( isConnected &&
+                { ( isWalletConnected &&
                     !isPullRequestCanceled &&
                     isPullRequestCancelable &&
                     isPullRequestCreator ) && (

@@ -9,10 +9,12 @@ import { useRepos } from "contexts/repos";
 
 export default function BranchsDropdown({
   repoId,
-  onSelected
+  onSelected,
+  disabled
 }: {
   repoId: string
   onSelected: (e: { value: string }) => void
+  disabled?: boolean
 }) {
   const { findBranch } = useRepos();
   const [options, setOptions] = useState<{ value: string; label: string }[]>();
@@ -41,7 +43,7 @@ export default function BranchsDropdown({
       </label>
       <ReactSelect
         key={`select_repo-${repoId}`}
-        isDisabled={!repoId || !options}
+        isDisabled={disabled || !repoId || !options}
         options={options}
         onChange={onSelected}
         placeholder={t("forms.select-placeholder")}
