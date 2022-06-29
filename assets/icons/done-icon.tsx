@@ -13,8 +13,8 @@ export default function DoneIcon(props: SVGProps<SVGSVGElement>) {
       <path
         d="M9 1.10742L3.5 6.60742L1 4.10742"
         stroke="white"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
