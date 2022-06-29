@@ -5,6 +5,8 @@ import { useTranslation } from "next-i18next";
 
 import ChangeTokenModal from "components/change-token-modal";
 
+import { useDAO } from "contexts/dao";
+
 import { Token } from "interfaces/token";
 
 interface TokensDropdownProps {
@@ -15,6 +17,8 @@ interface TokensDropdownProps {
   description?: string;
   addToken: (value: Token) => void;
   setToken?: (value: Token) => void;
+  userAddress?: string;
+  disabled?: boolean;
 }
 
 interface Option {
@@ -29,24 +33,33 @@ export default function TokensDropdown({
   setToken,
   canAddToken,
   label = undefined,
-  description = undefined
-} : TokensDropdownProps) {
+  description = undefined,
+  userAddress,
+  disabled = false
+}: TokensDropdownProps) {
   const [options, setOptions] = useState<Option[]>();
   const [option, setOption] = useState<Option>();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const { service: DAOService } = useDAO();
   const { t } = useTranslation("common");
 
-  const formatCreateLabel = 
-    (inputValue: string) => canAddToken ? `${t("misc.add")} ${inputValue} ${t("misc.token")}` : undefined;
-  const tokenToOption = (token: Token): Option => ({ label: `${token.symbol}`, value: token });
+  const formatCreateLabel = (inputValue: string) =>
+    canAddToken
+      ? `${t("misc.add")} ${inputValue} ${t("misc.token")}`
+      : undefined;
+
+  const tokenToOption = (token: Token): Option => ({
+    label: `${token.symbol}`,
+    value: token,
+  });
 
   const handleChange = (newValue) => {
     const { value, __isNew__ } = newValue;
 
     if (__isNew__ && !canAddToken) return;
     if (__isNew__) return setIsModalVisible(true);
-    
-    setToken(value); 
+
+    setToken(value);
     setOption(tokenToOption(value));
   };
 
@@ -54,15 +67,47 @@ export default function TokensDropdown({
     addToken(newToken);
     setToken(newToken);
     setOption(tokenToOption(newToken));
+  };
+
+  async function getBalanceTokens() {
+    Promise.all(tokens.map(async (token) => {
+      if (token?.address && userAddress) {
+        const value = await DAOService.getTokenBalance(token.address,
+                                                       userAddress);
+
+        return {...token, currentValue: value };
+      }
+    })).then((values) => {
+      if(values[0]) setOptions(values.map((token) => tokenToOption(token)))
+    });
   }
 
   useEffect(() => {
-    setOptions(tokens.map(token => tokenToOption(token)));
+    if(tokens) getBalanceTokens();
   }, [tokens]);
 
-  return(
+  function SelectOptionComponent({ innerProps, innerRef, data }) {
+    console.log("option content", data);
+    const { name, symbol, currentValue } = data.value;
+
+    return (
+      <div
+        ref={innerRef}
+        {...innerProps}
+        className="proposal__select-options d-flex align-items-center text-center p-small p-1"
+      >
+        <span>{name}</span>
+        <div className="d-flex flex-grow-1 justify-content-end">
+          {currentValue} {symbol}
+        </div>
+      </div>
+    );
+  }
+
+  return (
     <div className="form-group">
-      <label className="caption-small mb-2">{ label || t("misc.token") }</label>
+      {console.log("options", options, option)}
+      <label className="caption-small mb-2">{label || t("misc.token")}</label>
       <Creatable
         className="react-select-container"
         classNamePrefix="react-select"
@@ -72,13 +117,17 @@ export default function TokensDropdown({
         defaultValue={defaultToken && tokenToOption(defaultToken)}
         options={options}
         value={option}
+        components={{
+          Option: SelectOptionComponent,
+        }}
+        isDisabled={disabled}
       />
 
-      <ChangeTokenModal 
+      <ChangeTokenModal
         show={isModalVisible}
         description={description}
         setToken={handleAddOption}
-        setClose={() => setIsModalVisible(false)} 
+        setClose={() => setIsModalVisible(false)}
       />
     </div>
   );
