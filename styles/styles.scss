@@ -1287,18 +1287,22 @@ textarea.form-control {
   }
 }
 
-.custom-color-input {
-  width: 38px;
-  height: 38px;
+.custom-color-input-wrapper {
+  padding: 10px 20px;
 
-  border-radius: 38px;
-  border: 2px solid $white;
+  .custom-color-input {
+    width: 25px;
+    height: 25px;
 
-  &.is-invalid {
-    border: 2px solid var(--bs-fail);
+    border-radius: 25px;
+    border: 2px solid $white;
+
+    &.is-invalid {
+      border: 2px solid var(--bs-fail);
+    }
+
+    overflow: hidden;
   }
-
-  overflow: hidden;
 }
 
 input[type="color"] {
@@ -1451,5 +1455,15 @@ input[type="color"] {
 
   .read-only-button {
     pointer-events: none !important;
+  }
+}
+
+.svg {
+  &-primary {
+    svg {  
+      path {
+        fill: var(--bs-primary);
+      }
+    }
   }
 }

@@ -21,10 +21,12 @@ const { publicRuntimeConfig } = getConfig();
 export default class DAO {
   private _web3Connection: Web3Connection;
   private _network: Network_v2;
+  private _networkAux: Network_v2;
   private _registry: Network_Registry;
 
   get web3Connection() { return this._web3Connection; }
   get network() { return this._network; }
+  get networkAux() { return this._networkAux; }
   get registry() { return this._registry; }
 
   constructor(skipWindowAssignment = false) {
@@ -159,11 +161,22 @@ export default class DAO {
     return this.network[parameter]();
   }
 
-  async setNetworkParameter(parameter: NetworkParameters, value: number): Promise<TransactionReceipt> {    
-    const param = [...parameter];
-    param[0] = param[0].toUpperCase();
+  async setNetworkParameter(parameter: NetworkParameters, 
+                            value: number, 
+                            networkAddress?: string): Promise<TransactionReceipt> {    
+    let network = this.network;
 
-    return this.network[`change${param.join('')}`](value);
+    if (networkAddress) {
+      if (this.networkAux?.contractAddress === networkAddress)
+        network = this.networkAux;
+      else {
+        this._networkAux = await this.loadNetwork(networkAddress, true);
+        network = this.networkAux;
+      }
+      
+    }
+    
+    return network[`change${parameter[0].toUpperCase() + parameter.slice(1)}`](value);
   }
 
   async getOraclesOf(address: string): Promise<number> {    

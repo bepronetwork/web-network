@@ -232,6 +232,11 @@
     "hard-cancel": {
       "title": "Attention!",
       "content": "This action will return the locked amount to the original creators address along with any reward tokens and revert funding entries"
+    },
+    "already-has-network": {
+      "title": "Network already exists",
+      "button-label": "My networks",
+      "content": "Connected wallet already has a network."
     }
   },
   "forms": {
@@ -304,7 +309,11 @@
       "deploy-network-v2": "Deploy Network_v2",
       "set-dispatcher": "Set Dispatcher",
       "register-network": "Register Network",
-      "deploy-bounty-token": "Deploy Bounty Token"
+      "deploy-bounty-token": "Deploy Bounty Token",
+      "set-draft-time": "Set Draft Time",
+      "set-disputable-time": "Set Disputable Time",
+      "set-council-amount": "Set Council Amount",
+      "set-percentage-dispute": "Set Percentage for Dispute"
     }
   },
   "sort": {
