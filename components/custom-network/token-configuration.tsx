@@ -17,7 +17,14 @@ import { BEPRO_TOKEN, Token } from "interfaces/token";
 
 const { publicRuntimeConfig } = getConfig();
 
-export default function TokenConfiguration({ activeStep, index, validated, handleClick } : StepWrapperProps) {
+export default function TokenConfiguration({ 
+  activeStep, 
+  index, 
+  validated, 
+  handleClick, 
+  finishLabel, 
+  handleFinish 
+} : StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [bountyTokenAddress, setBountyTokenAddress] = useState("");
@@ -113,6 +120,8 @@ export default function TokenConfiguration({ activeStep, index, validated, handl
       activeStep={activeStep}
       validated={validated}
       handleClick={handleClick}
+      handleFinish={handleFinish}
+      finishLabel={finishLabel}
     >
       <div className="row">
         <TokensDropdown 
