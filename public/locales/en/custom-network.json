@@ -67,6 +67,7 @@
         "colors": {
           "label": "Colours",
           "similar-colors": "These colours are very similar. Please pick a different colour.",
+          "more-colors": "More colours",
           "types": {
             "primary": "Primary",
             "secondary": "Secondary",
@@ -80,6 +81,10 @@
             "warning": "Warning",
             "info": "info"
           }
+        },
+        "other-settings": {
+          "title": "Other Settings",
+          "parameters-warning": "Changing these parameters will launch a new transaction for each one."
         },
         "fees": {
           "title": "Fees"

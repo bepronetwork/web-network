@@ -232,6 +232,11 @@
     "hard-cancel": {
       "title": "Attention!",
       "content": "This action will return the locked amount to the original creators address along with any reward tokens and revert funding entries"
+    },
+    "already-has-network": {
+      "title": "Network already exists",
+      "button-label": "My networks",
+      "content": "Connected wallet already has a network."
     }
   },
   "forms": {

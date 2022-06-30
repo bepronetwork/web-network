@@ -7,12 +7,12 @@ import ArrowUp from "assets/icons/arrow-up";
 import Button from "components/button";
 import ColorInput from "components/color-input";
 
-const MoreColoursButton = ({isVisible, onClick}) => {
+const MoreColoursButton = ({label, isVisible, onClick}) => {
   const posfix = isVisible ? <span className="ml-1 svg-primary"><ArrowUp width={6.33} height={3.22} /></span> : "...";
   const textClass = isVisible ? "text-primary" : "text-gray text-primary-hover";
 
   return <Button onClick={onClick} textClass={`px-0 ${textClass}`} transparent>
-    More Colours{posfix}
+    {label}{posfix}
   </Button>;
 }
 
@@ -46,7 +46,11 @@ export default function ThemeColors({ colors, similar, setColor }) {
         }
       </div>
 
-      <MoreColoursButton isVisible={moreColorsVisible} onClick={handleMoreColorsVsibility} />
+      <MoreColoursButton 
+        label={t("steps.network-settings.fields.colors.more-colors")} 
+        isVisible={moreColorsVisible} 
+        onClick={handleMoreColorsVsibility} 
+      />
 
       { moreColorsVisible &&
         <div className="row bg-dark-gray p-3 border-radius-8 mx-0 mt-2">

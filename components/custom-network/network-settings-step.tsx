@@ -72,7 +72,7 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
       validated={validated}
       handleClick={handleClick}
     >
-      <Section title="Colours">
+      <Section title={t("custom-network:steps.network-settings.fields.colors.label")}>
         <div className="col">
           <ThemeColors
             colors={settings?.theme?.colors}
@@ -121,21 +121,21 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
         />
       </Section>
 
-      <Section title="Other Settings">
+      <Section title={t("custom-network:steps.network-settings.fields.other-settings.title")}>
         <small className="small-info text-gray my-2">
-          Changing these parameters will launch a new transaction for each one.
+          {t("custom-network:steps.network-settings.fields.other-settings.parameters-warning")}
         </small>
         
         <ParameterInput 
-          label="Dispute Time"
-          symbol="SECONDS"
+          label={t("custom-network:dispute-time")}
+          symbol={t("misc.seconds")}
           value={settings?.parameters?.disputableTime?.value}
           error={settings?.parameters?.disputableTime?.validated === false}
           onChange={handleDisputeTimeChange}
         />
 
         <ParameterInput 
-          label="Percentage for Dispute"
+          label={t("custom-network:percentage-for-dispute")}
           symbol="%"
           value={settings?.parameters?.percentageNeededForDispute?.value}
           error={settings?.parameters?.percentageNeededForDispute?.validated === false}
@@ -143,15 +143,15 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
         />
 
         <ParameterInput 
-          label="Draft Time"
-          symbol="SECONDS"
+          label={t("custom-network:redeem-time")}
+          symbol={t("misc.seconds")}
           value={settings?.parameters?.draftTime?.value}
           error={settings?.parameters?.draftTime?.validated === false}
           onChange={handleDraftTimeChange}
         />
 
         <ParameterInput 
-          label="Council Amount"
+          label={t("custom-network:council-amount")}
           symbol="BEPRO"
           value={settings?.parameters?.councilAmount?.value}
           error={settings?.parameters?.councilAmount?.validated === false}

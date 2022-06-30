@@ -10,15 +10,15 @@ export default function AlreadyHasNetworkModal({
 
   return(
     <Modal
-        title="Network already exists"
+        title={t("modals.already-has-network.title")}
         centerTitle
         show={show}
-        okLabel="My networks"
+        okLabel={t("modals.already-has-network.button-label")}
         onOkClick={onOkClick}
       >
         <div className="text-center">
           <span className="caption-small">
-            Connected wallet already has a network.
+            {t("modals.already-has-network.content")}
           </span>
         </div>
       </Modal>
