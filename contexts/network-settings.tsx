@@ -182,13 +182,13 @@ export const NetworkSettingsProvider = ({ children }) => {
       .then(async (githubRepositories) => {
         const repositories = [];
         const filtered = githubRepositories
-          .filter(repo => (!repo.isFork && (user.login === repo.nameWithOwner.split("/")[0])) || repo.isOrganization)
+          .filter(repo => (!repo?.isFork && (user.login === repo?.nameWithOwner.split("/")[0])) || repo?.isOrganization)
           .map(repo => ({
             checked: false,
             isSaved: false,
             hasIssues: false,
-            name: repo.name,
-            fullName: repo.nameWithOwner
+            name: repo?.name,
+            fullName: repo?.nameWithOwner
           }));
         
         if (isCreating) repositories.push(...filtered);
