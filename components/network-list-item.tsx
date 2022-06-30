@@ -119,10 +119,7 @@ export default function NetworkListItem({
         </span>
 
         <span
-          className={`caption-medium mr-2 ${
-            network?.name === publicRuntimeConfig?.networkConfig?.networkName ? "text-blue" : ""
-          }`}
-          style={{ color: `${network?.colors?.primary}` }}
+          className="caption-medium mr-2 text-blue"
         >
           ${tokenSymbol}
         </span>
