@@ -569,7 +569,6 @@ export default function useBepro() {
       await DAOService.setNetworkParameter(parameter, value, networkAddress)
         .then((txInfo: TransactionReceipt) => {
           txWindow.updateItem(transaction.payload.id,  parseTransaction(txInfo, transaction.payload));
-          onSuccess?.();
           resolve(txInfo);
         })
         .catch((err: { message: string; }) => {
@@ -583,7 +582,6 @@ export default function useBepro() {
               ...(transaction.payload as BlockTransaction),
               status: TransactionStatus.failed
             }));
-          onError?.(err);
           reject(err);
         });
     });
