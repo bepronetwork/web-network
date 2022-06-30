@@ -19,15 +19,8 @@ import { BlockTransaction, TransactionCurrency } from "interfaces/transaction";
 import useApi from "x-hooks/use-api";
 import useTransactions from "x-hooks/useTransactions";
 
-interface IUseBeProDefault {
-  onSuccess?: (data?: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => void;
-  onError?: (err?: { message: string; }) => void;
-}
 
-export default function useBepro(props?: IUseBeProDefault) {
-  const onSuccess = props?.onSuccess;
-  const onError = props?.onError;
-
+export default function useBepro() {
   const { dispatch } = useContext(ApplicationContext);
   const { activeNetwork } = useNetwork();
   const { networkIssue, activeIssue, updateIssue } = useIssue();
@@ -48,7 +41,6 @@ export default function useBepro(props?: IUseBeProDefault) {
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           txWindow.updateItem(disputeTx.payload.id,
                               parseTransaction(txInfo, disputeTx.payload));
-          onSuccess?.(txInfo);
           resolve?.(txInfo);
         })
         .catch((err: { message: string; }) => {
@@ -63,7 +55,6 @@ export default function useBepro(props?: IUseBeProDefault) {
               status: TransactionStatus.failed
             }));
           }
-          onError?.(err);
           reject?.(err);
           console.error("Error creating dispute", err);
         });
@@ -81,7 +72,6 @@ export default function useBepro(props?: IUseBeProDefault) {
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           txWindow.updateItem(closeIssueTx.payload.id,
                               parseTransaction(txInfo, closeIssueTx.payload));
-          onSuccess?.();
           resolve(txInfo);
         })
         .catch((err: { message: string; }) => {
@@ -95,7 +85,6 @@ export default function useBepro(props?: IUseBeProDefault) {
               ...(closeIssueTx.payload as BlockTransaction),
               status: TransactionStatus.failed
             }));
-          onError?.(err);
           reject(err);
           console.error("Error closing issue", err);
         });
@@ -112,7 +101,6 @@ export default function useBepro(props?: IUseBeProDefault) {
       .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
         txWindow.updateItem(transaction.payload.id,
                             parseTransaction(txInfo, transaction.payload));
-        onSuccess?.();
         resolve(txInfo);
       })
       .catch((err: { message: string; }) => {
@@ -126,7 +114,6 @@ export default function useBepro(props?: IUseBeProDefault) {
             ...(transaction.payload as BlockTransaction),
             status: TransactionStatus.failed
           }));
-        onError?.(err);
         reject(err);
       });
     });
@@ -152,7 +139,6 @@ export default function useBepro(props?: IUseBeProDefault) {
 
           txWindow.updateItem(redeemTx.payload.id, parseTransaction(tx, redeemTx.payload));
           updateIssue(activeIssue.repository_id, activeIssue.githubId);
-          onSuccess?.();
         })
         .catch((err: { message: string; }) => {
           if (err?.message?.search("User denied") > -1)
@@ -165,7 +151,43 @@ export default function useBepro(props?: IUseBeProDefault) {
               ...(redeemTx.payload as BlockTransaction),
               status: TransactionStatus.failed
             }));
-          onError?.(err);
+          reject(err);
+          console.error("Error closing issue", err);
+        });
+    })
+  }
+  
+  async function handleHardCancelBounty(): Promise<TransactionReceipt | Error> {
+    return new Promise(async (resolve, reject) => {
+      const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue }, activeNetwork);
+      dispatch(redeemTx);
+      let tx: { blockNumber: number; }
+
+      await DAOService.hardCancel(networkIssue?.id)
+        .then((txInfo: { blockNumber: number; }) => {
+          tx = txInfo;
+          return processEvent("bounty", 
+                              "canceled", 
+                              activeNetwork.name, 
+                              { fromBlock: txInfo.blockNumber, id: networkIssue?.id });
+        })
+        .then(({data: canceledBounties}) => {
+          if (!canceledBounties.find((cid: string) => cid === networkIssue?.cid)) throw new Error('Failed');
+          txWindow.updateItem(redeemTx.payload.id, parseTransaction(tx, redeemTx.payload));
+          
+          updateIssue(activeIssue.repository_id, activeIssue.githubId);
+        })
+        .catch((err: { message: string; }) => {
+          if (err?.message?.search("User denied") > -1)
+            dispatch(updateTransaction({ 
+              ...(redeemTx.payload as BlockTransaction), 
+              status: TransactionStatus.rejected 
+            }));
+          else
+            dispatch(updateTransaction({
+              ...(redeemTx.payload as BlockTransaction),
+              status: TransactionStatus.failed
+            }));
           reject(err);
           console.error("Error closing issue", err);
         });
@@ -190,7 +212,6 @@ export default function useBepro(props?: IUseBeProDefault) {
                    .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {            
                      txWindow.updateItem(tx.payload.id,
                                          parseTransaction(txInfo, tx.payload));
-                     onSuccess?.();
                      resolve(txInfo);
                    })
         .catch((err: { message: string; }) => {
@@ -204,7 +225,6 @@ export default function useBepro(props?: IUseBeProDefault) {
               ...(tx.payload as BlockTransaction),
               status: TransactionStatus.failed
             }));
-          onError?.(err);
           reject(err);
           console.error("Error closing issue", err);
         });
@@ -232,7 +252,6 @@ export default function useBepro(props?: IUseBeProDefault) {
               
         txWindow.updateItem(tx.payload.id,
                             parseTransaction(txInfo, tx.payload));
-        onSuccess?.(txInfo);
         resolve(txInfo);
       })
         .catch((err) => {
@@ -246,7 +265,6 @@ export default function useBepro(props?: IUseBeProDefault) {
               ...(tx.payload as BlockTransaction),
               status: TransactionStatus.failed
             }));
-          onError?.(err);
           reject(err);
           console.error("Error Approving", err);
         });
@@ -272,7 +290,6 @@ export default function useBepro(props?: IUseBeProDefault) {
               
                       txWindow.updateItem(tx.payload.id,
                                           parseTransaction(txInfo, tx.payload));
-                      onSuccess?.(txInfo);
                       resolve(txInfo);
                     })
         .catch((err: { message: string; }) => {
@@ -286,7 +303,6 @@ export default function useBepro(props?: IUseBeProDefault) {
               ...(tx.payload as BlockTransaction),
               status: TransactionStatus.failed
             }));
-          onError?.(err);
           reject(err);
           console.error("Error closing issue", err);
         });
@@ -328,7 +344,6 @@ export default function useBepro(props?: IUseBeProDefault) {
                                             status: TransactionStatus.failed
                                           }));
 
-                                          onError?.(error);
                                           reject(error);
                                         });
     });
@@ -358,7 +373,6 @@ export default function useBepro(props?: IUseBeProDefault) {
            status: TransactionStatus.failed
          }));
         console.log(error);
-        onError?.(error);
         reject(error);
       });
     });
@@ -388,7 +402,6 @@ export default function useBepro(props?: IUseBeProDefault) {
            status: TransactionStatus.failed
          }));
         console.log(error);
-        onError?.(error);
         reject(error);
       });
     });
@@ -418,7 +431,6 @@ export default function useBepro(props?: IUseBeProDefault) {
            status: TransactionStatus.failed
          }));
         console.log(error);
-        onError?.(error);
         reject(error);
       });
     });
@@ -443,7 +455,6 @@ export default function useBepro(props?: IUseBeProDefault) {
                                        closeFee)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           txWindow.updateItem(transaction.payload.id, parseTransaction(txInfo, transaction.payload));
-          onSuccess?.();
           resolve(txInfo);
         })
         .catch((err: { message: string; }) => {
@@ -457,7 +468,6 @@ export default function useBepro(props?: IUseBeProDefault) {
               ...(transaction.payload as BlockTransaction),
               status: TransactionStatus.failed
             }));
-          onError?.(err);
           reject(err);
         });
     });
@@ -472,7 +482,6 @@ export default function useBepro(props?: IUseBeProDefault) {
       await DAOService.setNFTTokenDispatcher(nftToken, networkAddress)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           txWindow.updateItem(transaction.payload.id,  parseTransaction(txInfo, transaction.payload));
-          onSuccess?.();
           resolve(txInfo);
         })
         .catch((err: { message: string; }) => {
@@ -486,7 +495,6 @@ export default function useBepro(props?: IUseBeProDefault) {
               ...(transaction.payload as BlockTransaction),
               status: TransactionStatus.failed
             }));
-          onError?.(err);
           reject(err);
         });
     });
@@ -501,7 +509,6 @@ export default function useBepro(props?: IUseBeProDefault) {
       await DAOService.addNetworkToRegistry(networkAddress)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           txWindow.updateItem(transaction.payload.id,  parseTransaction(txInfo, transaction.payload));
-          onSuccess?.();
           resolve(txInfo);
         })
         .catch((err: { message: string; }) => {
@@ -515,7 +522,6 @@ export default function useBepro(props?: IUseBeProDefault) {
               ...(transaction.payload as BlockTransaction),
               status: TransactionStatus.failed
             }));
-          onError?.(err);
           reject(err);
         });
     });
@@ -530,7 +536,6 @@ export default function useBepro(props?: IUseBeProDefault) {
       await DAOService.deployBountyToken(name, symbol)
         .then((txInfo: TransactionReceipt) => {
           txWindow.updateItem(transaction.payload.id,  parseTransaction(txInfo, transaction.payload));
-          onSuccess?.();
           resolve(txInfo);
         })
         .catch((err: { message: string; }) => {
@@ -544,7 +549,6 @@ export default function useBepro(props?: IUseBeProDefault) {
               ...(transaction.payload as BlockTransaction),
               status: TransactionStatus.failed
             }));
-          onError?.(err);
           reject(err);
         });
     });
@@ -560,6 +564,7 @@ export default function useBepro(props?: IUseBeProDefault) {
     handleCreatePullRequest,
     handleMakePullRequestReady,
     handleUpdateBountyAmount,
+    handleHardCancelBounty,
     handleCancelPullRequest,
     handleRefuseByOwner,
     handleDeployNetworkV2,
