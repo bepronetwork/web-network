@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 
+import { Defaults } from "@taikai/dappkit";
 import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
@@ -7,6 +8,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import getConfig from "next/config";
 import { useRouter } from "next/router";
 
+import AlreadyHasNetworkModal from "components/already-has-network-modal";
 import ConnectWalletButton from "components/connect-wallet-button";
 import CreatingNetworkLoader from "components/creating-network-loader";
 import CustomContainer from "components/custom-container";
@@ -23,7 +25,14 @@ import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
 import { addToast } from "contexts/reducers/add-toast";
+import { changeLoadState } from "contexts/reducers/change-load-state";
 
+import { 
+  DEFAULT_COUNCIL_AMOUNT, 
+  DEFAULT_DISPUTE_TIME, 
+  DEFAULT_DRAFT_TIME, 
+  DEFAULT_PERCENTAGE_FOR_DISPUTE 
+} from "helpers/contants";
 import { psReadAsText } from "helpers/file-reader";
 
 import useApi from "x-hooks/use-api";
@@ -38,11 +47,13 @@ export default function NewNetwork() {
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [creatingNetwork, setCreatingNetwork] = useState<number>();
+  const [hasNetwork, setHasNetwork] = useState(false);
 
   const { createNetwork } = useApi();
   const { activeNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
   const { user, wallet } = useAuthentication();
+  const { handleChangeNetworkParameter } = useBepro();
   const { getURLWithNetwork, colorsToCSS } = useNetworkTheme();
   const { tokensLocked, details, github, tokens, settings } = useNetworkSettings();
   const { handleDeployNetworkV2, handleSetDispatcher, handleAddNetworkToRegistry } = useBepro();
@@ -50,22 +61,10 @@ export default function NewNetwork() {
   const { dispatch } = useContext(ApplicationContext);
 
   const creationSteps = [
-    {
-      id: 1,
-      name: t("custom-network:modals.loader.steps.deploy-network"),
-    },
-    {
-      id: 2,
-      name: t("custom-network:modals.loader.steps.set-dispatcher")
-    },
-    {
-      id: 3,
-      name: t("custom-network:modals.loader.steps.add-to-registry"),
-    },
-    {
-      id: 4,
-      name: t("custom-network:modals.loader.steps.sync-web-network")
-    },
+    { id: 1, name: t("custom-network:modals.loader.steps.deploy-network") },
+    { id: 2, name: t("custom-network:modals.loader.steps.set-dispatcher") },
+    { id: 3, name: t("custom-network:modals.loader.steps.add-to-registry") },
+    { id: 4, name: t("custom-network:modals.loader.steps.sync-web-network") }
   ];
 
   async function handleCreateNetwork() {
@@ -83,6 +82,23 @@ export default function NewNetwork() {
     if (!(deployNetworkTX as TransactionReceipt)?.contractAddress) return setCreatingNetwork(undefined);
 
     const deployedNetworkAddress = (deployNetworkTX as TransactionReceipt).contractAddress;
+
+    const draftTime = settings.parameters.draftTime.value;
+    const disputableTime = settings.parameters.disputableTime.value;
+    const councilAmount = settings.parameters.councilAmount.value;
+    const percentageForDispute = settings.parameters.percentageNeededForDispute.value;
+
+    if (draftTime !== DEFAULT_DRAFT_TIME) 
+      await handleChangeNetworkParameter("draftTime", draftTime, deployedNetworkAddress);
+    
+    if (disputableTime !== DEFAULT_DISPUTE_TIME) 
+      await handleChangeNetworkParameter("disputableTime", disputableTime, deployedNetworkAddress);
+
+    if (councilAmount !== DEFAULT_COUNCIL_AMOUNT) 
+      await handleChangeNetworkParameter("councilAmount", councilAmount, deployedNetworkAddress);
+
+    if (percentageForDispute !== DEFAULT_PERCENTAGE_FOR_DISPUTE) 
+      await handleChangeNetworkParameter("percentageNeededForDispute", percentageForDispute, deployedNetworkAddress);
 
     setCreatingNetwork(1);
 
@@ -133,12 +149,27 @@ export default function NewNetwork() {
       });
   }
 
+  function goToMyNetworkPage() {
+    router.push(getURLWithNetwork("/account/my-network", { network: publicRuntimeConfig?.networkConfig?.networkName }));
+  }
+
   useEffect(() => {
     if (!activeNetwork) return;
 
     if (activeNetwork.name.toLowerCase() !== publicRuntimeConfig?.networkConfig?.networkName.toLowerCase())
       router.push(getURLWithNetwork("/account", { network: publicRuntimeConfig?.networkConfig?.networkName }));
   }, [activeNetwork]);
+
+  useEffect(() => {
+    if (!DAOService || !wallet?.address) return;
+
+    dispatch(changeLoadState(true));
+
+    DAOService.getNetworkAdressByCreator(wallet.address)
+      .then(networkAddress => setHasNetwork(networkAddress !== Defaults.nativeZeroAddress))
+      .catch(console.log)
+      .finally(() => dispatch(changeLoadState(false)));
+  }, [DAOService, wallet]);
 
   return (
     <div className="new-network">
@@ -153,7 +184,6 @@ export default function NewNetwork() {
 
       <CustomContainer>
         <div className="mt-5 pt-5">
-          {console.log(settings)}
           <Stepper>
             <LockBeproStep validated={tokensLocked?.validated} />
 
@@ -171,6 +201,8 @@ export default function NewNetwork() {
           </Stepper>
         </div>
       </CustomContainer>
+
+      <AlreadyHasNetworkModal show={hasNetwork} onOkClick={goToMyNetworkPage} />
     </div>
   );
 }
