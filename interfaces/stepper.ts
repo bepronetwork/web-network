@@ -5,7 +5,7 @@ export interface StepProps {
   index: number;
   completed?: boolean;
   activeStep: number;
-  validated: boolean;
+  validated?: boolean;
   children: ReactNode | ReactNode[];
   finishLabel?: string;
   handleClick: (index) => void;
