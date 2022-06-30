@@ -63,6 +63,37 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
     ({ floatValue: value }) => fields.parameter.setter({ label: "percentageNeededForDispute", value });
 
   const handleAddressBlur = () => fields.treasury.setter(address);
+
+  const parameterInputs = [
+    { 
+      label: t("custom-network:dispute-time"), 
+      symbol: t("misc.seconds"), 
+      value: settings?.parameters?.disputableTime?.value,
+      error: settings?.parameters?.disputableTime?.validated === false,
+      onChange: handleDisputeTimeChange
+    },
+    { 
+      label: t("custom-network:percentage-for-dispute"), 
+      symbol: "%", 
+      value: settings?.parameters?.percentageNeededForDispute?.value,
+      error: settings?.parameters?.percentageNeededForDispute?.validated === false,
+      onChange: handlePercentageForDisputeChange
+    },
+    { 
+      label: t("custom-network:redeem-time"), 
+      symbol: t("misc.seconds"), 
+      value: settings?.parameters?.draftTime?.value,
+      error: settings?.parameters?.draftTime?.validated === false,
+      onChange: handleDraftTimeChange
+    },
+    { 
+      label: t("custom-network:council-amount"), 
+      symbol: "BEPRO", 
+      value: settings?.parameters?.councilAmount?.value,
+      error: settings?.parameters?.councilAmount?.validated === false,
+      onChange: handleCouncilAmountChange
+    }
+  ];
   
   return (
     <Step
@@ -125,38 +156,17 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
         <small className="small-info text-gray my-2">
           {t("custom-network:steps.network-settings.fields.other-settings.parameters-warning")}
         </small>
-        
-        <ParameterInput 
-          label={t("custom-network:dispute-time")}
-          symbol={t("misc.seconds")}
-          value={settings?.parameters?.disputableTime?.value}
-          error={settings?.parameters?.disputableTime?.validated === false}
-          onChange={handleDisputeTimeChange}
-        />
 
-        <ParameterInput 
-          label={t("custom-network:percentage-for-dispute")}
-          symbol="%"
-          value={settings?.parameters?.percentageNeededForDispute?.value}
-          error={settings?.parameters?.percentageNeededForDispute?.validated === false}
-          onChange={handlePercentageForDisputeChange}
-        />
-
-        <ParameterInput 
-          label={t("custom-network:redeem-time")}
-          symbol={t("misc.seconds")}
-          value={settings?.parameters?.draftTime?.value}
-          error={settings?.parameters?.draftTime?.validated === false}
-          onChange={handleDraftTimeChange}
-        />
-
-        <ParameterInput 
-          label={t("custom-network:council-amount")}
-          symbol="BEPRO"
-          value={settings?.parameters?.councilAmount?.value}
-          error={settings?.parameters?.councilAmount?.validated === false}
-          onChange={handleCouncilAmountChange}
-        />        
+        {
+        parameterInputs.map(({ label, symbol, value, error, onChange }) => 
+          <ParameterInput 
+            label={label}
+            symbol={symbol}
+            value={value}
+            error={error}
+            onChange={onChange}
+          />)
+        }
       </Section>
     </Step>
   );
