@@ -46,8 +46,14 @@ export const DefaultNetworkSettings = {
         value: Defaults.nativeZeroAddress,
         validated: undefined
       },
-      cancelFee: 1,
-      closeFee: 5,
+      cancelFee: {
+        value: 0,
+        validated: undefined
+      },
+      closeFee: {
+        value: 0,
+        validated: undefined
+      },
       validated: false
     },
     parameters: {

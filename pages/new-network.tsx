@@ -15,7 +15,6 @@ import NetworkInformationStep from "components/custom-network/network-informatio
 import NetworkSettingsStep from "components/custom-network/network-settings-step";
 import SelectRepositoriesStep from "components/custom-network/select-repositories-step";
 import TokenConfiguration from "components/custom-network/token-configuration";
-import TreasuryStep from "components/custom-network/treasury-step";
 import Stepper from "components/stepper";
 
 import { ApplicationContext } from "contexts/application";
@@ -45,7 +44,7 @@ export default function NewNetwork() {
   const { service: DAOService } = useDAO();
   const { user, wallet } = useAuthentication();
   const { getURLWithNetwork, colorsToCSS } = useNetworkTheme();
-  const { tokensLocked, details, github, tokens, treasury } = useNetworkSettings();
+  const { tokensLocked, details, github, tokens, settings } = useNetworkSettings();
   const { handleDeployNetworkV2, handleSetDispatcher, handleAddNetworkToRegistry } = useBepro();
 
   const { dispatch } = useContext(ApplicationContext);
@@ -77,9 +76,9 @@ export default function NewNetwork() {
     const deployNetworkTX = await handleDeployNetworkV2(tokens.settler,
                                                         tokens.bounty,
                                                         tokens.bountyURI,
-                                                        treasury.address.value,
-                                                        treasury.cancelFee,
-                                                        treasury.closeFee).catch(error => error);
+                                                        settings.treasury.address.value,
+                                                        settings.treasury.cancelFee.value,
+                                                        settings.treasury.closeFee.value).catch(error => error);
 
     if (!(deployNetworkTX as TransactionReceipt)?.contractAddress) return setCreatingNetwork(undefined);
 
@@ -100,7 +99,7 @@ export default function NewNetwork() {
     const payload = {
       name: details.name.value,
       description: details.description,
-      colors: JSON.stringify(details.theme.colors),
+      colors: JSON.stringify(settings.theme.colors),
       logoIcon: await psReadAsText(details.iconLogo.value.raw),
       fullLogo: await psReadAsText(details.fullLogo.value.raw),
       repositories: 
@@ -143,7 +142,7 @@ export default function NewNetwork() {
 
   return (
     <div className="new-network">
-      <style>{colorsToCSS(details?.theme?.colors)}</style>
+      <style>{colorsToCSS(settings?.theme?.colors)}</style>
       <ConnectWalletButton asModal={true} />
 
       {
@@ -154,18 +153,21 @@ export default function NewNetwork() {
 
       <CustomContainer>
         <div className="mt-5 pt-5">
-          <Stepper hack>
-            <LockBeproStep validated={tokensLocked.validated} />
+          {console.log(settings)}
+          <Stepper>
+            <LockBeproStep validated={tokensLocked?.validated} />
 
-            <NetworkInformationStep validated={details.validated} />
+            <NetworkInformationStep validated={details?.validated} />
 
-            <NetworkSettingsStep />
+            <NetworkSettingsStep validated={settings?.validated} />
 
-            <SelectRepositoriesStep validated={github.validated} />
+            <SelectRepositoriesStep validated={github?.validated} />
 
-            <TokenConfiguration validated={tokens.validated} />
-
-            <TreasuryStep validated={treasury.validated} handleFinish={handleCreateNetwork} />
+            <TokenConfiguration 
+              validated={tokens?.validated} 
+              handleFinish={handleCreateNetwork} 
+              finishLabel={t("custom-network:steps.repositories.submit-label")} 
+            />
           </Stepper>
         </div>
       </CustomContainer>

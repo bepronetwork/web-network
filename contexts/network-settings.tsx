@@ -77,27 +77,28 @@ export const NetworkSettingsProvider = ({ children }) => {
       validator: (locked: number, needed: number) => needed > 0 && locked >= needed
     },
     name: {
-      setter: (value: string) => setDetails(previous => ({
-        ...previous, 
-        validated: false, 
-        name: { 
-          value: value.replace(/\s+/g,"-").replace(/--+/gm, "-"), 
-          validated: undefined 
-        } 
-      })),
+      setter: (value: string) => setDetails(previous => {
+        const newState = structuredClone(previous);
+
+        newState.validated = false;
+        newState.name.value = value.replace(/\s+/g,"-").replace(/--+/gm, "-");
+        newState.name.validated = undefined;
+
+        return newState;
+      }),
       validator: async (value: string): Promise<boolean | undefined> => {
         let validated = undefined;
   
         if (value.trim() !== "")
           validated = /bepro|taikai/gi.test(value) ? false : !(await getNetwork(value).catch(() => false));
 
-        setDetails(previous => ({
-          ...previous,
-          name: {
-            ...previous.name,
-            validated
-          }
-        }));
+        setDetails(previous => {
+          const newState = structuredClone(previous);
+
+          newState.name.validated = validated;
+          
+          return newState;
+        });
   
         return validated;
       }
@@ -117,30 +118,24 @@ export const NetworkSettingsProvider = ({ children }) => {
       validator: (value: Icon) => value?.preview !== "" && value?.raw?.type?.includes("image/svg")
     },
     colors: {
-      setter: (value: Color) => setSettings(previous => ({ 
-        ...previous, 
-        theme: { 
-          ...previous.theme, 
-          colors: {
-            ...previous.theme.colors,
-            [value.label]: value.code
-          } 
-        } 
-      })),
+      setter: (value: Color) => setSettings(previous => {
+        const newState = structuredClone(previous);
+
+        newState.theme.colors[value.label] = value.code;
+
+        return newState;
+      }),
       validator: (value: Theme) => !value?.similar?.length
     },
     repository: {
       setter: (fullName: string) => setGithub(previous => {
-        const tmpRepositories = previous.repositories;
-        const index = tmpRepositories.findIndex((repo) => repo.fullName === fullName);
-        const selectedRepository = tmpRepositories[index];
+        const newState = structuredClone(previous);
+        const index = newState.repositories.findIndex((repo) => repo.fullName === fullName);
+        const selectedRepository = newState.repositories[index];
 
-        tmpRepositories[index] = {
-          ...selectedRepository,
-          checked: !selectedRepository.checked
-        };
+        newState.repositories[index].checked = !selectedRepository.checked;
 
-        return { ...previous, repositories: tmpRepositories };
+        return newState;
       }),
       validator: value => value.some((repository) => repository.checked)
     },
@@ -170,7 +165,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         ...previous, 
         treasury: { 
           ...previous.treasury, 
-          cancelFee: value
+          cancelFee: { value, validated: undefined }
         } 
       })),
     },
@@ -179,7 +174,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         ...previous, 
         treasury: { 
           ...previous.treasury, 
-          closeFee: value
+          closeFee: { value, validated: undefined }
         } 
       })),
     },
@@ -252,50 +247,40 @@ export const NetworkSettingsProvider = ({ children }) => {
     }));
 
     if (!isCreating) {
-      setSettings(previous => ({
-        ...previous,
-        parameters: {
-          ...previous.parameters,
-          draftTime: { value: network.draftTime, validated: true },
-          disputableTime: { value: network.disputableTime, validated: true },
-          percentageNeededForDispute: { value: network.percentageNeededForDispute, validated: true },
-          councilAmount: { value: network.councilAmount, validated: true }
-        }
-      }));
+      setSettings(previous => {
+        const newState = structuredClone(previous);
 
-      setDetails(previous => ({
-        ...previous,
-        name: {
-          value: network?.name,
-          validated: undefined
-        },
-        description: network?.description,
-        fullLogo: {
-          ...previous.fullLogo,
-          value: {
-            ...previous.fullLogo.value,
-            preview: `${IPFS_URL}/${network.fullLogo}`
-          }
-        },
-        iconLogo: {
-          ...previous.iconLogo,
-          value: {
-            ...previous.iconLogo.value,
-            preview: `${IPFS_URL}/${network.logoIcon}`
-          }
-        }
-      }));
+        newState.parameters.draftTime = { value: network.draftTime, validated: true };
+        newState.parameters.disputableTime = { value: network.disputableTime, validated: true };
+        newState.parameters.percentageNeededForDispute = { value: network.percentageNeededForDispute, validated: true };
+        newState.parameters.councilAmount = { value: network.councilAmount, validated: true };
+
+        return newState;
+      });
+
+      setDetails(previous => {
+        const newState = structuredClone(previous);
+
+        newState.name = { value: network?.name, validated: undefined };
+        newState.description = network?.description;
+        newState.fullLogo.value.preview = `${IPFS_URL}/${network?.fullLogo}`;
+        newState.iconLogo.value.preview = `${IPFS_URL}/${network?.logoIcon}`;
+
+        return newState;
+      });
     } else
-      setSettings(previous => ({
-        ...previous,
-        parameters: {
-          ...previous.parameters,
-          draftTime: { value: DEFAULT_DRAFT_TIME, validated: true },
-          disputableTime: { value: DEFAULT_DISPUTE_TIME, validated: true },
-          percentageNeededForDispute: { value: DEFAULT_PERCENTAGE_FOR_DISPUTE, validated: true },
-          councilAmount: { value: DEFAULT_COUNCIL_AMOUNT, validated: true }
-        }
-      }));
+      setSettings(previous => {
+        const newState = structuredClone(previous);
+
+        newState.parameters.draftTime = { value: DEFAULT_DRAFT_TIME, validated: true };
+        newState.parameters.disputableTime = { value: DEFAULT_DISPUTE_TIME, validated: true };
+        newState.parameters.percentageNeededForDispute = { value: DEFAULT_PERCENTAGE_FOR_DISPUTE, validated: true };
+        newState.parameters.councilAmount = { value: DEFAULT_COUNCIL_AMOUNT, validated: true };
+        newState.treasury.cancelFee = { value: DEFAULT_CANCEL_FEE, validated: true };
+        newState.treasury.closeFee = { value: DEFAULT_CLOSE_FEE, validated: true };
+
+        return newState;
+      });
   }, [ wallet?.address, 
        user?.login, 
        DAOService, 
@@ -331,7 +316,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       tokens?.validated,
       settings?.validated !== false
     ].every( condition => !!condition ));
-  }, [tokensLocked?.validated, details?.validated, github?.validated, tokens?.validated, treasury?.validated]);
+  }, [tokensLocked?.validated, details?.validated, github?.validated, tokens?.validated, settings?.validated]);
 
   // Tokens locked validation
   useEffect(() => {
@@ -354,7 +339,29 @@ export const NetworkSettingsProvider = ({ children }) => {
       ...previous,
       validated
     }));
-  }, [details?.validated, details?.description, details?.iconLogo, details?.fullLogo, details?.name]);
+  }, [details?.description, details?.iconLogo, details?.fullLogo, details?.name]);
+
+  // Settings Validation
+  useEffect(() => {
+    const validated = [
+      !settings?.theme?.similar?.length,
+      settings?.treasury?.validated,
+      settings?.parameters?.draftTime?.validated,
+      settings?.parameters?.disputableTime?.validated,
+      settings?.parameters?.percentageNeededForDispute?.validated,
+      settings?.parameters?.councilAmount?.validated,
+    ].every(condition => condition);
+
+    setSettings(previous => ({
+      ...previous,
+      validated
+    }));
+  }, [ settings?.theme?.similar,
+       settings?.treasury?.validated,
+       settings?.parameters?.councilAmount?.validated, 
+       settings?.parameters?.disputableTime?.validated, 
+       settings?.parameters?.draftTime?.validated, 
+       settings?.parameters?.percentageNeededForDispute?.validated ]);
 
   useEffect(() => {
     const colors = settings?.theme?.colors;
@@ -385,7 +392,60 @@ export const NetworkSettingsProvider = ({ children }) => {
       }));
   }, [settings?.theme?.colors]);
 
+  // Treasury validation
   useEffect(() => {
+    if (!DAOService) return;
+
+    const isAddressEmpty = settings?.treasury?.address?.value?.trim() === "";
+
+    const conditionOrUndefined = condition => isAddressEmpty ? undefined : condition;
+
+    Promise.all([
+      conditionOrUndefined(DAOService.isAddress(settings?.treasury?.address?.value)),
+      conditionOrUndefined(settings?.treasury?.cancelFee?.value >= 0 && settings?.treasury?.cancelFee?.value <= 100),
+      conditionOrUndefined(settings?.treasury?.closeFee?.value >= 0 && settings?.treasury?.closeFee?.value <= 100)
+    ]).then(validations => {
+      setSettings(previous => {
+        const newState = structuredClone(previous);
+
+        newState.treasury.address.validated = validations[0];
+        newState.treasury.cancelFee.validated = validations[1];
+        newState.treasury.closeFee.validated = validations[2];
+        newState.treasury.validated = validations.every(condition => condition !== false);
+
+        return newState;
+      });
+    });
+  }, [ DAOService, 
+       settings?.treasury?.address?.value, 
+       settings?.treasury?.cancelFee?.value, 
+       settings?.treasury?.closeFee?.value ]);
+
+  // Parameters Validation
+  useEffect(() => {
+    setSettings(previous => {
+      const newState = structuredClone(previous);
+
+      const validations = [
+        Fields.parameter.validator("draftTime", settings?.parameters?.draftTime?.value),
+        Fields.parameter.validator("councilAmount", settings?.parameters?.councilAmount?.value),
+        Fields.parameter.validator("disputableTime", settings?.parameters?.disputableTime?.value),
+        Fields.parameter.validator("percentageNeededForDispute", 
+                                   settings?.parameters?.percentageNeededForDispute?.value)
+      ];
+
+      newState.parameters.draftTime.validated = validations[0];
+      newState.parameters.councilAmount.validated = validations[1];
+      newState.parameters.disputableTime.validated = validations[2];
+      newState.parameters.percentageNeededForDispute.validated = validations[3];
+      newState.parameters.validated = validations.every(condition => condition);
+
+      return newState;
+    });
+  }, [ settings?.parameters?.councilAmount?.value, 
+       settings?.parameters?.disputableTime?.value, 
+       settings?.parameters?.draftTime?.value, 
+       settings?.parameters?.percentageNeededForDispute?.value ]);
 
   // Github validation
   useEffect(() => {
@@ -417,75 +477,17 @@ export const NetworkSettingsProvider = ({ children }) => {
     }));
   }, [tokens?.settler, tokens?.bounty, tokens?.bountyURI]);
 
-  // Treasury validation
-  useEffect(() => {
-    if (!DAOService) return;
-
-    if (treasury?.address?.value?.trim() === "")
-      setTreasury(previous => ({
-        ...previous,
-        address: {
-          ...previous.address,
-          validated: undefined
-        },
-        validated: undefined
-      }));
-    else
-      Promise.all([
-        DAOService.isAddress(treasury?.address?.value),
-        treasury?.cancelFee >= 0 && treasury?.cancelFee <= 100,
-        treasury?.closeFee >= 0 && treasury?.closeFee <= 100
-      ]).then((validations) => {
-        setTreasury(previous => ({
-          ...previous,
-          address: {
-            ...previous.address,
-            validated: validations[0]
-          },
-          validated: validations.every(condition => condition)
-        }));
-      });
-  }, [DAOService, treasury?.address?.value, treasury?.cancelFee, treasury?.closeFee]);
-
-  // Parameters Validation
-  useEffect(() => {
-    setParameters(previous => ({
-      ...previous,
-      draftTime: { 
-        ...previous.draftTime,
-        validated: Fields.parameter.validator("draftTime", parameters?.draftTime?.value)
-      },
-      councilAmount: { 
-        ...previous.councilAmount,
-        validated: Fields.parameter.validator("councilAmount", parameters?.councilAmount?.value)
-      },
-      disputableTime: { 
-        ...previous.disputableTime,
-        validated: Fields.parameter.validator("disputableTime", parameters?.disputableTime?.value)
-      },
-      percentageNeededForDispute: { 
-        ...previous.percentageNeededForDispute,
-        validated: 
-          Fields.parameter.validator("percentageNeededForDispute", parameters?.percentageNeededForDispute?.value)
-      }
-    }));
-  }, [ parameters?.councilAmount?.value, 
-       parameters?.disputableTime?.value, 
-       parameters?.draftTime?.value, 
-       parameters?.percentageNeededForDispute?.value ]);
-
   const memorizedValue = useMemo<NetworkSettings>(() => ({
     tokensLocked,
     details,
     github,
     tokens,
-    treasury,
+    settings,
     isSettingsValidated,
-    parameters,
     forcedNetwork,
     setForcedNetwork,
     fields: Fields
-  }), [tokensLocked, details, github, tokens, treasury, parameters, isSettingsValidated, Fields, setForcedNetwork]);
+  }), [tokensLocked, details, github, tokens, settings, isSettingsValidated, Fields, setForcedNetwork]);
 
   return (
     <NetworkSettingsContext.Provider value={memorizedValue}>

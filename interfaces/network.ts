@@ -73,8 +73,6 @@ export interface Theme {
 
 export interface Field<T> {
   value: T;
-  get: () => T;
-  set: (value: T) => void;
   validated?: boolean;
 }
 
@@ -98,8 +96,8 @@ export interface NetworkSettings {
     theme?: Theme;
     treasury?: {
       address?: Field<string>;
-      cancelFee?: number;
-      closeFee?: number;
+      cancelFee?: Field<number>;
+      closeFee?: Field<number>;
       validated?: boolean;
     };
     parameters?: {

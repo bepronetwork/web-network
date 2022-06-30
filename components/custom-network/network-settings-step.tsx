@@ -23,7 +23,7 @@ const Section = ({ children = undefined, title }) => (
   </div>
 );
 
-const ParameterInput = ({ label, symbol, value, onChange, onBlur = undefined}) => (
+const ParameterInput = ({ label, symbol, value, onChange, error = false, onBlur = undefined}) => (
   <div className="form-group col">
     <label className="caption-small mb-2">
       {label}
@@ -37,6 +37,8 @@ const ParameterInput = ({ label, symbol, value, onChange, onBlur = undefined}) =
       placeholder={"0"}
       onValueChange={onChange}
       onBlur={onBlur}
+      error={error}
+      thousandSeparator
     />
   </div>
 );
@@ -46,7 +48,7 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
 
   const [address, setAddress] = useState("");
 
-  const { details, fields, treasury, parameters } = useNetworkSettings();
+  const { fields, settings } = useNetworkSettings();
 
   const handleAddressChange = e => setAddress(e.target.value);
   const handleColorChange = value => fields.colors.setter(value);
@@ -73,8 +75,8 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
       <Section title="Colours">
         <div className="col">
           <ThemeColors
-            colors={details.theme.colors}
-            similar={details.theme.similar}
+            colors={settings?.theme?.colors}
+            similar={settings?.theme?.similar}
             setColor={handleColorChange}
           />
         </div>
@@ -95,7 +97,7 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
           />
 
           {
-            treasury?.address?.validated === false && 
+            settings?.treasury?.address?.validated === false && 
             <small className="small-info text-danger">
               {t("custom-network:steps.treasury.fields.address.error")}
             </small>
@@ -105,14 +107,16 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
         <ParameterInput 
           label={t("custom-network:steps.treasury.fields.cancel-fee.label")}
           symbol="%"
-          value={treasury?.cancelFee}
+          value={settings?.treasury?.cancelFee?.value}
+          error={settings?.treasury?.cancelFee?.validated === false}
           onChange={handleCancelFeeChange}
         />
 
         <ParameterInput 
           label={t("custom-network:steps.treasury.fields.close-fee.label")}
           symbol="%"
-          value={treasury?.closeFee}
+          value={settings?.treasury?.closeFee?.value}
+          error={settings?.treasury?.closeFee?.validated === false}
           onChange={handleCloseFeeChange}
         />
       </Section>
@@ -125,28 +129,32 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
         <ParameterInput 
           label="Dispute Time"
           symbol="SECONDS"
-          value={parameters?.disputableTime?.value}
+          value={settings?.parameters?.disputableTime?.value}
+          error={settings?.parameters?.disputableTime?.validated === false}
           onChange={handleDisputeTimeChange}
         />
 
         <ParameterInput 
           label="Percentage for Dispute"
           symbol="%"
-          value={parameters?.percentageNeededForDispute?.value}
+          value={settings?.parameters?.percentageNeededForDispute?.value}
+          error={settings?.parameters?.percentageNeededForDispute?.validated === false}
           onChange={handlePercentageForDisputeChange}
         />
 
         <ParameterInput 
           label="Draft Time"
           symbol="SECONDS"
-          value={parameters?.draftTime?.value}
+          value={settings?.parameters?.draftTime?.value}
+          error={settings?.parameters?.draftTime?.validated === false}
           onChange={handleDraftTimeChange}
         />
 
         <ParameterInput 
           label="Council Amount"
           symbol="BEPRO"
-          value={parameters?.councilAmount?.value}
+          value={settings?.parameters?.councilAmount?.value}
+          error={settings?.parameters?.councilAmount?.validated === false}
           onChange={handleCouncilAmountChange}
         />        
       </Section>
