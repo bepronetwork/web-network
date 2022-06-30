@@ -165,7 +165,6 @@ export default function useBepro() {
 
       await DAOService.hardCancel(networkIssue?.id)
         .then((txInfo: { blockNumber: number; }) => {
-          debugger;
           tx = txInfo;
           return processEvent("bounty", 
                               "canceled", 
@@ -173,7 +172,6 @@ export default function useBepro() {
                               { fromBlock: txInfo.blockNumber, id: networkIssue?.id });
         })
         .then(({data: canceledBounties}) => {
-          debugger;
           if (!canceledBounties.find((cid: string) => cid === networkIssue?.cid)) throw new Error('Failed');
           txWindow.updateItem(redeemTx.payload.id, parseTransaction(tx, redeemTx.payload));
           
