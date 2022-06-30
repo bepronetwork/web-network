@@ -23,6 +23,6 @@ export enum TransactionTypes {
   deployBountyToken,
   setDraftTime,
   setDisputableTime,
-  setPercentageForDispute,
+  setPercentageNeededForDispute,
   setCouncilAmount
 }

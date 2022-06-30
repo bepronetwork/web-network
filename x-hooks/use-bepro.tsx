@@ -16,6 +16,8 @@ import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { BlockTransaction, TransactionCurrency } from "interfaces/transaction";
 
+import { NetworkParameters } from "types/dappkit";
+
 import useApi from "x-hooks/use-api";
 import useTransactions from "x-hooks/useTransactions";
 
@@ -554,6 +556,39 @@ export default function useBepro() {
     });
   }
 
+  async function handleChangeNetworkParameter(parameter: NetworkParameters, 
+                                              value: number, 
+                                              networkAddress?: string): Promise<TransactionReceipt> {
+    return new Promise(async (resolve, reject) => {
+      const transaction = addTransaction({ 
+        type: TransactionTypes[`set${parameter[0].toUpperCase() + parameter.slice(1)}`] 
+      }, activeNetwork);
+
+      dispatch(transaction);
+
+      await DAOService.setNetworkParameter(parameter, value, networkAddress)
+        .then((txInfo: TransactionReceipt) => {
+          txWindow.updateItem(transaction.payload.id,  parseTransaction(txInfo, transaction.payload));
+          onSuccess?.();
+          resolve(txInfo);
+        })
+        .catch((err: { message: string; }) => {
+          if (err?.message?.search("User denied") > -1)
+            dispatch(updateTransaction({
+              ...(transaction.payload as BlockTransaction),
+              status: TransactionStatus.rejected
+            }));
+          else
+            dispatch(updateTransaction({
+              ...(transaction.payload as BlockTransaction),
+              status: TransactionStatus.failed
+            }));
+          onError?.(err);
+          reject(err);
+        });
+    });
+  }
+
   return {
     handlerDisputeProposal,
     handleCloseIssue,
@@ -570,6 +605,7 @@ export default function useBepro() {
     handleDeployNetworkV2,
     handleSetDispatcher,
     handleAddNetworkToRegistry,
-    handleDeployBountyToken
+    handleDeployBountyToken,
+    handleChangeNetworkParameter
   };
 }
