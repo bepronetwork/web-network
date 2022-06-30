@@ -21,7 +21,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     return res.status(200).json(result);
   } catch(error) {
-    LogError("", { req, error, access_token, login, name });
+    LogError("GraphQL Proxy", { req, error, access_token, login, name });
     
     return res.status(200).json(error.data);
   }

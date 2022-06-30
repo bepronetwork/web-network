@@ -50,7 +50,7 @@ export default function NetworksStep({
   const { wallet, user } = useAuthentication();
   const { searchNetworks, updateNetwork } = useApi();
   const { dispatch } = useContext(ApplicationContext);
-  const { forcedNetwork, details, fields, parameters, setForcedNetwork } = useNetworkSettings();
+  const { forcedNetwork, details, fields, settings, setForcedNetwork } = useNetworkSettings();
 
   const networkTokenSymbol = forcedNetwork?.networkToken?.symbol || t("misc.$token");
   const networkAlreadyLoaded = 
@@ -58,6 +58,8 @@ export default function NetworksStep({
   const nameInputClass = forcedNetwork?.name === details?.name?.value || details?.name?.validated === undefined ? "" : (
     details?.name?.validated && "is-valid" || "is-invalid"
   );
+
+  const parameters = settings?.parameters;
 
   const canSubmit = [
     forcedNetwork?.name !== details?.name?.value && details?.name?.validated,
@@ -69,7 +71,7 @@ export default function NetworksStep({
       && parameters?.percentageNeededForDispute?.validated,
     details?.iconLogo?.value?.raw && details?.iconLogo?.validated,
     details?.fullLogo?.value?.raw && details?.fullLogo?.validated,
-    JSON.stringify(details?.theme?.colors) !== JSON.stringify(forcedNetwork?.colors)
+    JSON.stringify(settings?.theme?.colors) !== JSON.stringify(forcedNetwork?.colors)
   ].some(condition => condition);
 
   function handleChange(address: string) {

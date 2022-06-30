@@ -30,16 +30,17 @@ export default function useNetworkTheme() {
 
   function DefaultTheme(): ThemeColors {
     return {
+      primary: getComputedStyle(document.documentElement).getPropertyValue("--bs-primary").trim(),
+      secondary: getComputedStyle(document.documentElement).getPropertyValue("--bs-secondary").trim(),
+      oracle: getComputedStyle(document.documentElement).getPropertyValue("--bs-purple").trim(),
       text: getComputedStyle(document.documentElement).getPropertyValue("--bs-body-color").trim(),
       background: getComputedStyle(document.documentElement).getPropertyValue("--bs-body-bg").trim(),
       shadow: getComputedStyle(document.documentElement).getPropertyValue("--bs-shadow").trim(),
       gray: getComputedStyle(document.documentElement).getPropertyValue("--bs-gray").trim(),
-      primary: getComputedStyle(document.documentElement).getPropertyValue("--bs-primary").trim(),
-      secondary: getComputedStyle(document.documentElement).getPropertyValue("--bs-secondary").trim(),
-      oracle: getComputedStyle(document.documentElement).getPropertyValue("--bs-purple").trim(),
       success: getComputedStyle(document.documentElement).getPropertyValue("--bs-success").trim(),
-      fail: getComputedStyle(document.documentElement).getPropertyValue("--bs-fail").trim(),
-      warning: getComputedStyle(document.documentElement).getPropertyValue("--bs-warning").trim()
+      danger: getComputedStyle(document.documentElement).getPropertyValue("--bs-danger").trim(),
+      warning: getComputedStyle(document.documentElement).getPropertyValue("--bs-warning").trim(),
+      info: getComputedStyle(document.documentElement).getPropertyValue("--bs-info").trim()
     };
   }
 
@@ -55,8 +56,9 @@ export default function useNetworkTheme() {
       secondary: overrideColors?.secondary || network.colors?.secondary,
       oracle: overrideColors?.oracle || network.colors?.oracle,
       success: overrideColors?.success || network.colors?.success,
-      fail: overrideColors?.fail || network.colors?.fail,
-      warning: overrideColors?.warning || network.colors?.warning
+      danger: overrideColors?.danger || network.colors?.danger,
+      warning: overrideColors?.warning || network.colors?.warning,
+      info: overrideColors?.info || network.colors?.info
     };
 
     return `:root {
@@ -67,8 +69,8 @@ export default function useNetworkTheme() {
         ""
       }
       ${
-        (colors.fail &&
-          `--bs-fail: ${colors.fail}; --bs-fail-rgb: ${hexadecimalToRGB(colors.fail).join(",")};`) ||
+        (colors.danger &&
+          `--bs-danger: ${colors.danger}; --bs-danger-rgb: ${hexadecimalToRGB(colors.danger).join(",")};`) ||
         ""
       }
       ${
@@ -121,6 +123,13 @@ export default function useNetworkTheme() {
           `--bs-body-bg: ${
             colors.background
           }; --bs-body-bg-rgb: ${hexadecimalToRGB(colors.background).join(",")};`) ||
+        ""
+      }
+      ${
+        (colors.info &&
+          `--bs-info: ${
+            colors.info
+          }; --bs-info-rgb: ${hexadecimalToRGB(colors.info).join(",")};`) ||
         ""
       }
     }`;

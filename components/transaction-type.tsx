@@ -29,6 +29,10 @@ export default function TransactionType({ type }) {
     [TransactionTypes.setNFTDispatcher]: t("transactions.types.set-dispatcher"),
     [TransactionTypes.addNetworkToRegistry]: t("transactions.types.register-network"),
     [TransactionTypes.deployBountyToken]: t("transactions.types.deploy-bounty-token"),
+    [TransactionTypes.setDraftTime]: t("transactions.types.set-draft-time"),
+    [TransactionTypes.setDisputableTime]: t("transactions.types.set-disputable-time"),
+    [TransactionTypes.setPercentageNeededForDispute]: t("transactions.types.set-percentage-dispute"),
+    [TransactionTypes.setCouncilAmount]: t("transactions.types.set-council-amount")
   };
 
   return (

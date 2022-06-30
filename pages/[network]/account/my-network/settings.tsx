@@ -31,6 +31,7 @@ import { formatNumberToCurrency } from "helpers/formatNumber";
 import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
 import useApi from "x-hooks/use-api";
+import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network";
 
 const { publicRuntimeConfig } = getConfig();
@@ -63,22 +64,23 @@ export default function Settings() {
 
   const { service: DAOService } = useDAO();
   const { updateNetwork, isNetworkOwner } = useApi();
+  const { handleChangeNetworkParameter } = useBepro();
   const { activeNetwork, updateActiveNetwork } = useNetwork();
   const { colorsToCSS, getURLWithNetwork } = useNetworkTheme();
   const { wallet, user, updateWalletBalance } = useAuthentication();
-  const { details, github, parameters, fields } = useNetworkSettings();
+  const { details, github, settings, fields } = useNetworkSettings();
 
   const { dispatch } = useContext(ApplicationContext);
 
   const networkTokenSymbol = activeNetwork?.networkToken?.symbol || t("misc.$token");
   const settingsValidated = [
     fields.description.validator(details?.description),
-    fields.colors.validator(details?.theme?.colors),
+    fields.colors.validator(settings?.theme?.colors),
     fields.repository.validator(github?.repositories),
-    parameters?.draftTime?.validated,
-    parameters?.disputableTime?.validated,
-    parameters?.percentageNeededForDispute?.validated,
-    parameters?.councilAmount?.validated
+    settings?.parameters?.draftTime?.validated,
+    settings?.parameters?.disputableTime?.validated,
+    settings?.parameters?.percentageNeededForDispute?.validated,
+    settings?.parameters?.councilAmount?.validated
   ].every(condition => condition);
 
   function showTextOrDefault(text: string, defaultText: string) {
@@ -106,7 +108,7 @@ export default function Settings() {
 
     const json = {
       description: details.description,
-      colors: JSON.stringify(details.theme.colors),
+      colors: JSON.stringify(settings.theme.colors),
       logoIcon: details.iconLogo.value.raw ? await psReadAsText(details.iconLogo.value.raw) : undefined,
       fullLogo: details.fullLogo.value.raw ? await psReadAsText(details.fullLogo.value.raw) : undefined,
       repositoriesToAdd: 
@@ -125,19 +127,23 @@ export default function Settings() {
 
     updateNetwork(json)
       .then(async () => {
-        if (activeNetwork.draftTime !== parameters.draftTime.value)
-          await DAOService.setNetworkParameter("draftTime", parameters.draftTime.value).catch(console.log);
+        const draftTime = settings.parameters.draftTime.value;
+        const disputableTime = settings.parameters.disputableTime.value;
+        const councilAmount = settings.parameters.councilAmount.value;
+        const percentageNeededForDispute = settings.parameters.percentageNeededForDispute.value;
 
-        if (activeNetwork.disputableTime !== parameters.disputableTime.value)
-          await DAOService.setNetworkParameter("disputableTime", parameters.disputableTime.value).catch(console.log);
+        if (activeNetwork.draftTime !== draftTime)
+          await handleChangeNetworkParameter("draftTime", draftTime).catch(console.log);
 
-        if (activeNetwork.councilAmount !== parameters.councilAmount.value)
-          await DAOService.setNetworkParameter("councilAmount", parameters.councilAmount.value).catch(console.log);
+        if (activeNetwork.disputableTime !== disputableTime)
+          await handleChangeNetworkParameter("disputableTime", disputableTime).catch(console.log);
 
-        if (activeNetwork.percentageNeededForDispute !== parameters.percentageNeededForDispute.value)
-          await DAOService.setNetworkParameter("percentageNeededForDispute", 
-                                               parameters.percentageNeededForDispute.value)
-          .catch(console.log);
+        if (activeNetwork.councilAmount !== councilAmount)
+          await handleChangeNetworkParameter("councilAmount", councilAmount).catch(console.log);
+
+        if (activeNetwork.percentageNeededForDispute !== percentageNeededForDispute)
+          await handleChangeNetworkParameter("percentageNeededForDispute", percentageNeededForDispute)
+            .catch(console.log);
 
         dispatch(addToast({
             type: "success",
@@ -253,7 +259,11 @@ export default function Settings() {
   }
 
   useEffect(() => {
-    if (!DAOService || !activeNetwork || !wallet?.address || !user?.login) return;
+    if (!DAOService ||
+        !activeNetwork || 
+        !wallet?.address || 
+        !user?.login || 
+        activeNetwork?.name !== router?.query?.network) return;
 
     DAOService.isNetworkAbleToClosed()
       .then((result) => {
@@ -273,11 +283,11 @@ export default function Settings() {
 
         router.push(getURLWithNetwork("/account"));
       });
-  }, [DAOService, activeNetwork, wallet?.address, user?.login]);
+  }, [DAOService, activeNetwork, wallet?.address, user?.login, router?.query?.network]);
 
   return (
     <div>
-      <style>{colorsToCSS(details?.theme?.colors)}</style>
+      <style>{colorsToCSS(settings?.theme?.colors)}</style>
 
       <ConnectWalletButton asModal={true} />
 
@@ -422,13 +432,15 @@ export default function Settings() {
                 onClick={handleRepositoryCheck}
               />
 
-              <ThemeColors
-                colors={details?.theme?.colors}
-                similar={details?.theme?.similar}
-                setColor={handleColorChange}
-              />
+              <div className="col">
+                <ThemeColors
+                  colors={settings?.theme?.colors}
+                  similar={settings?.theme?.similar}
+                  setColor={handleColorChange}
+                />
+              </div>
 
-              <div className="row px-0 mt-3">
+              <div className="row px-0 mx-0 mt-3">
                 <div className="col-3">
                   <InputNumber
                     classSymbol={"text-ligth-gray"}
@@ -439,8 +451,8 @@ export default function Settings() {
                       min: MIN_DISPUTE_TIME,
                       max: formatNumberToCurrency(MAX_DISPUTE_TIME, 0)
                     })}
-                    value={parameters?.disputableTime?.value}
-                    error={parameters?.disputableTime?.validated === false}
+                    value={settings?.parameters?.disputableTime?.value}
+                    error={settings?.parameters?.disputableTime?.validated === false}
                     min={0}
                     placeholder={"0"}
                     thousandSeparator
@@ -458,8 +470,8 @@ export default function Settings() {
                     description={t("custom-network:errors.percentage-for-dispute",
                       {max: MAX_PERCENTAGE_FOR_DISPUTE })}
                     symbol="%"
-                    value={parameters?.percentageNeededForDispute?.value}
-                    error={parameters?.percentageNeededForDispute?.validated === false}
+                    value={settings?.parameters?.percentageNeededForDispute?.value}
+                    error={settings?.parameters?.percentageNeededForDispute?.validated === false}
                     placeholder={"0"}
                     thousandSeparator
                     decimalSeparator="."
@@ -478,8 +490,8 @@ export default function Settings() {
                       max: formatNumberToCurrency(MAX_DRAFT_TIME, 0)
                     })}
                     symbol="seconds"
-                    value={parameters?.draftTime?.value}
-                    error={parameters?.draftTime?.validated === false}
+                    value={settings?.parameters?.draftTime?.value}
+                    error={settings?.parameters?.draftTime?.validated === false}
                     min={0}
                     placeholder={"0"}
                     thousandSeparator
@@ -500,8 +512,8 @@ export default function Settings() {
                       min: formatNumberToCurrency(MIN_COUNCIL_AMOUNT, 0),
                       max: formatNumberToCurrency(MAX_COUNCIL_AMOUNT, 0)
                     })}
-                    value={parameters?.councilAmount?.value}
-                    error={parameters?.councilAmount?.validated === false}
+                    value={settings?.parameters?.councilAmount?.value}
+                    error={settings?.parameters?.councilAmount?.validated === false}
                    min={0}
                     placeholder={"0"}
                     thousandSeparator

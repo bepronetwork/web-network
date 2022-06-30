@@ -44,6 +44,7 @@ $more-bg: (
   "purple": $purple,
   "blue": $blue,
   "success": $success,
+  "success-15": rgba($success, 0.15),
   "dark-gray": $dark-gray,
   "ligth-gray": $ligth-gray,
   "disabled": $disabled,
@@ -128,6 +129,8 @@ $form-check-input-checked-border-color: $primary;
 $enable-validation-icons: false;
 
 $modal-content-border-radius: math.div($m, 2);
+
+$input-border-radius: 8px;
 
 // Tooltip
 $tooltip-opacity: 1;

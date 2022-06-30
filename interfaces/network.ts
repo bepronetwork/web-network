@@ -36,7 +36,7 @@ export interface Network {
 export interface ThemeColors {
   text: string;
   gray: string;
-  fail: string;
+  danger: string;
   shadow: string;
   oracle: string;
   primary: string;
@@ -44,6 +44,7 @@ export interface ThemeColors {
   warning: string;
   secondary: string;
   background: string;
+  info: string;
 }
 
 export interface Color {
@@ -89,7 +90,23 @@ export interface NetworkSettings {
     description: string;
     iconLogo?: Field<Icon>;
     fullLogo?: Field<Icon>;
+    validated: boolean;
+  };
+  settings?: {
     theme?: Theme;
+    treasury?: {
+      address?: Field<string>;
+      cancelFee?: Field<number>;
+      closeFee?: Field<number>;
+      validated?: boolean;
+    };
+    parameters?: {
+      draftTime?: Field<number>;
+      disputableTime?: Field<number>;
+      percentageNeededForDispute?: Field<number>;
+      councilAmount?: Field<number>;
+      validated?: boolean;
+    };
     validated: boolean;
   };
   github?: {
@@ -102,19 +119,7 @@ export interface NetworkSettings {
     bounty: string;
     bountyURI: string;
     validated: boolean;
-  },
-  treasury?: {
-    address?: Field<string>;
-    cancelFee?: number;
-    closeFee?: number;
-    validated?: boolean;
-  },
-  parameters?: {
-    draftTime?: Field<number>;
-    disputableTime?: Field<number>;
-    percentageNeededForDispute?: Field<number>;
-    councilAmount?: Field<number>;
-  },
+  };
   fields?: {
     [key: string]: {
       setter: (value, value2?) => void;
