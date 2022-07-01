@@ -3,10 +3,8 @@ import { useState } from "react";
 import getConfig from "next/config";
 import { useRouter } from "next/router";
 
-import BeproLogo from "assets/icons/bepro-logo";
 import BeproLogoBlue from "assets/icons/bepro-logo-blue";
 import BeproSmallLogo from "assets/icons/bepro-small-logo";
-import ExternalLinkIcon from "assets/icons/external-link-icon";
 import HelpIcon from "assets/icons/help-icon";
 import NotificationIcon from "assets/icons/notification-icon";
 import PlusIcon from "assets/icons/plus-icon";
