@@ -432,7 +432,7 @@ li {
 .banner-shadow {
   width: 100%;
   min-height: 164px;
-  background-color: $bg;
+  background-color: var(--bs-shadow);
   color: $white;
   padding-top: ($navbar-height + $m + 4);
   padding-bottom: $m + 4;
