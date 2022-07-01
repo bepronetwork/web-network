@@ -54,9 +54,9 @@
     "developers": "Developers",
     "council": "Council",
     "Oracle": "Oracle",
-    "create-bounty": "Create bounty",
+    "new-bounty": "New bounty",
     "get-started": "Get Started",
-    "connect": "Connect"
+    "connect": "Connect Wallet"
   },
   "select-a-repository": "Select a repository",
   "select-a-branch": "Select a branch",
