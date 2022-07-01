@@ -432,10 +432,11 @@ li {
 .banner-shadow {
   width: 100%;
   min-height: 164px;
-  background-color: var(--bs-shadow);
+  background-color: $bg;
   color: $white;
   padding-top: ($navbar-height + $m + 4);
   padding-bottom: $m + 4;
+  border-bottom: 1px solid $disabled;
 }
 
 // Remove: After update all headers
@@ -1031,6 +1032,8 @@ $c_props: (
 }
 
 .main-nav {
+  border-bottom: 1px solid $disabled;
+
   .btn:not(.brand) svg:only-child {
     width: 24px;
     height: 24px;
@@ -1466,4 +1469,22 @@ input[type="color"] {
       }
     }
   }
+}
+
+.nav-link-gradient {
+  background: linear-gradient(to right, #9669ED -0.33%, #FF6A2C 50.71%, #4250E4 99.67%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  width: fit-content;
+  font-weight: bold;
+  background-size: 200% 200%;
+  
+  animation: grandient-loop 3s ease-in-out infinite;
+}
+
+@keyframes grandient-loop {
+0%{background-position:right}
+50%{background-position:left}
+100%{background-position:right}
 }

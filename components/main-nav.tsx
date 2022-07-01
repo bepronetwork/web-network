@@ -8,6 +8,7 @@ import BeproLogoBlue from "assets/icons/bepro-logo-blue";
 import BeproSmallLogo from "assets/icons/bepro-small-logo";
 import ExternalLinkIcon from "assets/icons/external-link-icon";
 import HelpIcon from "assets/icons/help-icon";
+import NotificationIcon from "assets/icons/notification-icon";
 import PlusIcon from "assets/icons/plus-icon";
 
 import BalanceAddressAvatar from "components/balance-address-avatar";
@@ -40,12 +41,11 @@ export default function MainNav() {
   const { network, getURLWithNetwork } = useNetwork();
 
   const isNetworksPage = ["/networks", "/new-network"].includes(pathname);
+  const isBeproNetwork = network?.name === publicRuntimeConfig?.networkConfig?.networkName;
 
   return (
     <div
-      className={`main-nav d-flex flex-column ${
-        (isNetworksPage && "bg-shadow") || "bg-primary"
-      }`}
+      className={`main-nav d-flex flex-column bg-${isBeproNetwork || isNetworksPage ? "dark" : "primary"}`}
     >
       {network?.isClosed && <ClosedNetworkAlert />}
 
@@ -58,16 +58,14 @@ export default function MainNav() {
           <InternalLink
             href={getURLWithNetwork("/", { network: network?.name })}
             icon={
-              isNetworksPage ? (
-                <BeproLogoBlue />
-              ) : network?.name !== publicRuntimeConfig?.networkConfig?.networkName ? (
+              !isBeproNetwork ? (
                 <img
                   src={`${publicRuntimeConfig?.ipfsUrl}/${network?.fullLogo}`}
                   width={104}
                   height={32}
                 />
               ) : (
-                <BeproLogo aria-hidden={true} />
+                <BeproLogoBlue />
               )
             }
             className="brand"
@@ -108,8 +106,10 @@ export default function MainNav() {
                 <InternalLink
                   href={"/networks"}
                   label={"Networks"}
+                  className={`${isBeproNetwork && "nav-link-gradient" || ""}`}
                   nav
                   uppercase
+                  active={isBeproNetwork}
                 />
               </li>
             </ul>
@@ -117,31 +117,17 @@ export default function MainNav() {
             ""}
         </div>
 
-        <div className="d-flex flex-row align-items-center">
-          <a
-            href="https://support.bepro.network/en/articles/5595864-using-the-testnet"
-            className="d-flex align-items-center mr-3 text-decoration-none 
-                       text-white text-uppercase main-nav-link opacity-75 
-                       opacity-100-hover"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <span>
-              <Translation label={"main-nav.get-started"} />
-            </span>
-            <ExternalLinkIcon className="ml-1" />
-          </a>
-
+        <div className="d-flex flex-row align-items-center gap-20">
           {(!isNetworksPage && (
             <ReadOnlyButtonWrapper>
               <InternalLink
                 href={getURLWithNetwork("/create-bounty")}
                 icon={<PlusIcon />}
-                label={<Translation label={"main-nav.create-bounty"} />}
-                className="mr-2 read-only-button"
+                label={<Translation label={"main-nav.new-bounty"} />}
+                className="read-only-button"
                 iconBefore
-                nav
                 uppercase
+                outline
               />
             </ReadOnlyButtonWrapper>
           )) || (
@@ -149,7 +135,6 @@ export default function MainNav() {
               href="/new-network"
               icon={<PlusIcon />}
               label={"New Network"}
-              className="mr-2"
               iconBefore
               nav
               uppercase
@@ -158,11 +143,19 @@ export default function MainNav() {
 
           <Button
             onClick={() => setShowHelp(true)}
-            className="ms-2 me-4 opacity-75 opacity-100-hover"
+            className="opacity-75 opacity-100-hover"
             transparent
             rounded
           >
             <HelpIcon />
+          </Button>
+
+          <Button
+            className="opacity-75 opacity-100-hover"
+            transparent
+            rounded
+          >
+            <NotificationIcon />
           </Button>
 
           <WrongNetworkModal requiredNetworkId={publicRuntimeConfig?.metaMask?.chainId} />
