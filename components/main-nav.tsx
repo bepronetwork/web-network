@@ -160,16 +160,16 @@ export default function MainNav() {
             <div className="d-flex account-info align-items-center">
               <TransactionsStateIndicator />
 
-              <NetworkIdentifier />
+              {/* <NetworkIdentifier /> */}
 
-              <InternalLink
+              {/* <InternalLink
                 href={getURLWithNetwork("/account")}
                 icon={<BeproSmallLogo />}
                 label={formatNumberToNScale(wallet?.balance?.bepro || 0)}
                 className="mx-3"
                 transparent
                 nav
-              />
+              /> */}
 
               <InternalLink
                 href={getURLWithNetwork("/account")}
