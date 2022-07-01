@@ -12,7 +12,6 @@ import TokensDropdown from "./tokens-dropdown";
 export default function CreateBountyTokenAmount({
   currentToken,
   setCurrentToken,
-  isCurrentTokenApproved,
   addToken,
   canAddCustomToken,
   defaultToken,
@@ -26,8 +25,35 @@ export default function CreateBountyTokenAmount({
   handleAmountOnValueChange,
   handleAmountBlurChange,
   review = false,
+  activeBounty
 }) {
   const { t } = useTranslation(["create-bounty"]);
+
+
+  function handleHelperText() {
+    if(review) return;
+    if(!activeBounty) return;
+    return (
+      <>
+      {t("create-bounty:fields.amount.info", {
+        token: currentToken?.symbol,
+        amount: formatNumberToCurrency(tokenBalance, {
+          maximumFractionDigits: 18,
+        }),
+      })}     
+        <span
+          className="caption-small text-primary ml-1 cursor-pointer text-uppercase"
+          onClick={() =>
+            setIssueAmount({
+              formattedValue: tokenBalance.toString(),
+            })
+          }
+        >
+          {t("create-bounty:fields.amount.max")}
+        </span>
+    </>
+    )
+  }
 
   return (
     <>
@@ -57,28 +83,7 @@ export default function CreateBountyTokenAmount({
             placeholder="0"
             onValueChange={handleAmountOnValueChange}
             onBlur={handleAmountBlurChange}
-            helperText={
-              <>
-                {t("create-bounty:fields.amount.info", {
-                  token: currentToken?.symbol,
-                  amount: formatNumberToCurrency(tokenBalance, {
-                    maximumFractionDigits: 18,
-                  }),
-                })}
-                {isCurrentTokenApproved && (
-                  <span
-                    className="caption-small text-primary ml-1 cursor-pointer text-uppercase"
-                    onClick={() =>
-                      setIssueAmount({
-                        formattedValue: tokenBalance.toString(),
-                      })
-                    }
-                  >
-                    {t("create-bounty:fields.amount.max")}
-                  </span>
-                )}
-              </>
-            }
+            helperText={handleHelperText()}
           />
           <div className="mt-4 pt-1 mx-2">
             <ArrowRight className="text-gray" width={9} height={9} />
