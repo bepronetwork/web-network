@@ -104,10 +104,8 @@ export default function MainNav() {
                 <InternalLink
                   href={"/networks"}
                   label={"Networks"}
-                  className={`${isBeproNetwork && "nav-link-gradient" || ""}`}
                   nav
                   uppercase
-                  active={isBeproNetwork}
                 />
               </li>
             </ul>
