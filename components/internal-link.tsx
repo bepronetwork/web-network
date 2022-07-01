@@ -17,6 +17,7 @@ interface InternalLinkProps {
   blank?: boolean;
   brand?: boolean;
   style?: CSSProperties;
+  outline?: boolean;
 }
 
 export default function InternalLink({
@@ -30,6 +31,7 @@ export default function InternalLink({
   brand = false,
   activeClass,
   style,
+  outline,
   ...props
 }: InternalLinkProps) {
   const { asPath, pathname } = useRouter();
@@ -50,7 +52,7 @@ export default function InternalLink({
 
     if (uppercase) classes += " text-uppercase ";
 
-    return `${(!nav && "btn btn-primary ") || " main-nav-link "} ${
+    return `${(!nav && `btn btn-${outline && "outline-" || ""}primary`) || " main-nav-link "} ${
       brand ? "" : " text-white "
     } bg-opacity-100 d-flex align-items-center justify-content-center text-decoration-none shadow-none ${classes}`;
   }
