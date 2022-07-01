@@ -266,6 +266,29 @@ li {
   }
 }
 
+.container-bounty {
+  height: 63px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+
+  &.bg-30,
+  &.bg-30-hover:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.3) !important;
+    border: 2px solid $primary !important;
+  }
+}
+
+.active-bounty {
+  background-color: rgba(var(--bs-primary-rgb), 0.3) !important;
+  border: 2px solid $primary !important;
+}
+
+.info-amount {
+  border-radius: 4px;
+}
+
+
 .p-nm {
   font-size: 14px;
   line-height: 140%;
