@@ -78,8 +78,9 @@ export default function TokensDropdown({
         return {...token, currentValue: value };
       }
     })).then((values) => {
+      console.log('values', values)
       if(values[0]) setOptions(values.map((token) => tokenToOption(token)))
-    });
+    }).catch(err => console.log('err token', err))
   }
 
   useEffect(() => {
@@ -87,16 +88,16 @@ export default function TokensDropdown({
   }, [tokens]);
 
   function SelectOptionComponent({ innerProps, innerRef, data }) {
-    console.log("option content", data);
     const { name, symbol, currentValue } = data.value;
-
+    
+    if(data.__isNew__) return 
     return (
       <div
         ref={innerRef}
         {...innerProps}
         className="proposal__select-options d-flex align-items-center text-center p-small p-1"
       >
-        <span>{name}</span>
+        {data?.__isNew__ ? formatCreateLabel(name): <span>{name}</span>}
         <div className="d-flex flex-grow-1 justify-content-end">
           {currentValue} {symbol}
         </div>
