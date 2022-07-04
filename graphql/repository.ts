@@ -1,3 +1,11 @@
+export const Repository = 
+  `query Repository($repo: String!, $owner: String!) {
+    repository(name: $repo, owner: $owner) {
+      nameWithOwner
+      visibility
+    }
+  }`;
+
 export const Forks = 
   `query Forks($repo: String!, $owner: String!, $cursor: String) {
     repository(name: $repo, owner: $owner) {

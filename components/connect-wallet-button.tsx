@@ -131,10 +131,10 @@ export default function ConnectWalletButton({
     return (
       <Button
         color="white"
-        className="text-primary bg-opacity-100"
+        className="text-dark bg-opacity-100"
         onClick={handleLogin}
       >
-        <span>{t("main-nav.connect")}</span> <i className="ico-metamask" />
+        <span>{t("main-nav.connect")}</span>
       </Button>
     );
 

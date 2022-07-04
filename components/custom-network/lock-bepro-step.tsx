@@ -20,13 +20,11 @@ import { useNetworkSettings } from "contexts/network-settings";
 
 import { formatNumberToCurrency, formatNumberToNScale } from "helpers/formatNumber";
 
+import { StepWrapperProps } from "interfaces/stepper";
+
 const { publicRuntimeConfig } = getConfig();
 
-export default function LockBeproStep({
-  step,
-  currentStep,
-  handleChangeStep
-}) {
+export default function LockBeproStep({ activeStep, index, handleClick, validated } : StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [isLocking, setIsLocking] = useState(false);
@@ -131,10 +129,10 @@ export default function LockBeproStep({
   return (
     <Step
       title={t("custom-network:steps.lock.title", { currency: networkTokenName })}
-      index={step}
-      activeStep={currentStep}
-      validated={tokensLocked.validated}
-      handleClick={handleChangeStep}
+      index={index}
+      activeStep={activeStep}
+      validated={validated}
+      handleClick={handleClick}
     >
       <div className="row mb-4">
         <span className="caption-small text-gray">

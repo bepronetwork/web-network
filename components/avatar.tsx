@@ -14,20 +14,23 @@ export default function Avatar({
   tooltip?: boolean;
   border?: boolean;
 }) {
-  return (
-    <OverlayTrigger
-      key="right"
-      placement="right"
-      overlay={
-        (tooltip && <Tooltip id={"tooltip-right"}>@{userLogin}</Tooltip>) || (
-          <></>
-        )
-      }
-    >
-      <img
-        className={`avatar circle-3 ${border && "border-avatar"} ${className}`}
-        src={src || `https://github.com/${userLogin}.png`}
-      />
-    </OverlayTrigger>
-  );
+  if (userLogin || src)
+    return (
+      <OverlayTrigger
+        key="right"
+        placement="right"
+        overlay={
+          (tooltip && <Tooltip id={"tooltip-right"}>@{userLogin}</Tooltip>) || (
+            <></>
+          )
+        }
+      >
+        <img
+          className={`avatar circle-3 ${border && "border-avatar"} ${className}`}
+          src={src || `https://github.com/${userLogin}.png`}
+        />
+      </OverlayTrigger>
+    );
+
+  return <></>;
 }

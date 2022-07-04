@@ -10,13 +10,11 @@ import Step from "components/step";
 import { useAuthentication } from "contexts/authentication";
 import { useNetworkSettings } from "contexts/network-settings";
 
+import { StepWrapperProps } from "interfaces/stepper";
+
 const { publicRuntimeConfig } = getConfig();
 
-export default function SelectRepositoriesStep({
-  step,
-  currentStep,
-  handleChangeStep
-}) {
+export default function SelectRepositoriesStep({ activeStep, index, validated, handleClick } : StepWrapperProps) {
   const { t } = useTranslation("custom-network");
 
   const { user } = useAuthentication();
@@ -33,10 +31,10 @@ export default function SelectRepositoriesStep({
   return (
     <Step
       title={t("steps.repositories.title")}
-      index={step}
-      activeStep={currentStep}
-      validated={github.validated}
-      handleClick={handleChangeStep}
+      index={index}
+      activeStep={activeStep}
+      validated={validated}
+      handleClick={handleClick}
     >
       {(user?.login && (
         <div>

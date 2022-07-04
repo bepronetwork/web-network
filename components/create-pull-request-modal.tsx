@@ -14,7 +14,7 @@ import ReactSelect from "components/react-select";
 import { useAuthentication } from "contexts/authentication";
 import { useRepos } from "contexts/repos";
 
-import useOctokitGraph from "x-hooks/use-octokit-graph";
+import useOctokit from "x-hooks/use-octokit";
 
 interface props {
   show: boolean,
@@ -44,7 +44,7 @@ export default function CreatePullRequestModal({
   const { user } = useAuthentication();
   const { activeRepo } = useRepos();
 
-  const { getRepositoryBranches, getUserRepositories } = useOctokitGraph();
+  const { getRepositoryBranches, getUserRepositories } = useOctokit();
 
   function onSelectedBranch(option) {
     setSelectedBranch(option.value);

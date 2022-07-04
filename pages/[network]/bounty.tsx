@@ -22,7 +22,7 @@ import { useRepos } from "contexts/repos";
 import { TabbedNavigationItem } from "interfaces/tabbed-navigation";
 
 import useApi from "x-hooks/use-api";
-import useOctokitGraph from "x-hooks/use-octokit-graph";
+import useOctokit from "x-hooks/use-octokit";
 
 export default function PageIssue() {
   const router = useRouter();
@@ -34,7 +34,7 @@ export default function PageIssue() {
   const { activeRepo } = useRepos();
   const { wallet, user } = useAuthentication();
   const { activeIssue, networkIssue } = useIssue();
-  const { getUserRepositories } = useOctokitGraph();
+  const { getUserRepositories } = useOctokit();
 
   const { id } = router.query;
 
