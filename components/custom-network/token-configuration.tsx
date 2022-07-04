@@ -8,6 +8,7 @@ import DeployNFTModal from "components/deploy-nft-modal";
 import Step from "components/step";
 import TokensDropdown from "components/tokens-dropdown";
 
+import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
@@ -22,7 +23,8 @@ export default function TokenConfiguration({
     handleChangeStep
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
-
+  
+  const { wallet } = useAuthentication();
   const [bountyTokenAddress, setBountyTokenAddress] = useState("");
   const [bountyTokenUri, setBountyTokenUri] = useState("");
   const [bountyTokenUriError, setBountyTokenUriError] = useState(false);
@@ -129,6 +131,7 @@ export default function TokenConfiguration({
           }
           addToken={addToken} 
           setToken={handleNetworkTokenChange}
+          userAddress={wallet?.address}
         /> 
       </div>
 
