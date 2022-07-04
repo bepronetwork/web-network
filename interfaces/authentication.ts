@@ -18,6 +18,7 @@ export interface Repository {
 export interface Wallet {
   address: string;
   isCouncil: boolean;
+  isNetworkGovernor: boolean;
   balance?: IBalance;
 }
 

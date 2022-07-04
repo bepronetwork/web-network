@@ -7,7 +7,7 @@ import {
   createContext
 } from "react";
 
-import { signIn, signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
 import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
@@ -17,13 +17,12 @@ import { useDAO } from "contexts/dao";
 import { User, Wallet } from "interfaces/authentication";
 
 import useApi from "x-hooks/use-api";
-import useNetworkTheme from "x-hooks/use-network";
 
 export interface IAuthenticationContext {
   user?: User;
   wallet?: Wallet;
   isGithubAndWalletMatched?: boolean;
-  login: () => void;
+  login: () => Promise<boolean>;
   updateWalletBalance: () => void;
 }
 
@@ -33,30 +32,27 @@ const EXCLUDED_PAGES = ["/networks", "/[network]/connect-account"];
 
 export const AuthenticationProvider = ({ children }) => {
   const session = useSession();
-  const { push, asPath, pathname } = useRouter();
+  const { asPath, pathname } = useRouter();
 
   const [user, setUser] = useState<User>();
   const [wallet, setWallet] = useState<Wallet>();
   const [isGithubAndWalletMatched, setIsGithubAndWalletMatched] = useState<boolean>();
 
-  const { getUserOf, getUserWith } = useApi();
-  const { getURLWithNetwork } = useNetworkTheme();
+  const { getUserOf } = useApi();
   const { service: DAOService, connect } = useDAO();
 
   const login = useCallback(async () => {
     try {
-      if (!user?.login)
-        return signIn("github", {
-          callbackUrl: `${window.location.protocol}//${window.location.host}/${asPath}`
-        });
-
       if (!DAOService) return;
 
       await connect();
 
       await updateWalletAddress();
+
+      return true;
     } catch (error) {
       console.log("Failed to login", error);
+      return false;
     }
   }, [user?.login, asPath, DAOService]);
 
@@ -76,20 +72,13 @@ export const AuthenticationProvider = ({ children }) => {
   }, [DAOService]);
 
   const validateWalletAndGithub = useCallback(async (address: string, login: string) => {
-    if (!address && !login) return setIsGithubAndWalletMatched(undefined);
+    if (!address || !login || EXCLUDED_PAGES.includes(String(pathname))) 
+      return setIsGithubAndWalletMatched(undefined);
 
-    const userAddress = login ? (await getUserWith(login)).address : undefined;
-    const userLogin = address ? (await getUserOf(address)).githubLogin : undefined;
+    const userLogin = address ? (await getUserOf(address))?.githubLogin : undefined;
 
-    if (!userAddress && !userLogin) {
-      await signOut({ redirect: false });
-      setIsGithubAndWalletMatched(undefined);
-
-      push(getURLWithNetwork("/connect-account"));
-    } else {
-      setIsGithubAndWalletMatched(userLogin === login && userAddress === address);
-    }
-  }, []);
+    if (login) setIsGithubAndWalletMatched(userLogin === login);
+  }, [pathname]);
 
   const updateWalletBalance = useCallback(async () => {
     if (!DAOService || !wallet?.address) return;
@@ -100,16 +89,20 @@ export const AuthenticationProvider = ({ children }) => {
       eth,
       staked,
       isCouncil,
+      isNetworkGovernor
     ] = await Promise.all([
       DAOService.getOraclesResume(wallet.address),
       DAOService.getBalance("settler", wallet.address),
       DAOService.getBalance("eth", wallet.address),
       DAOService.getBalance("staked", wallet.address),
       DAOService.isCouncil(wallet.address),
+      DAOService.isNetworkGovernor(wallet.address)
     ])
+
     setWallet((previousWallet) => ({
       ...previousWallet,
       isCouncil,
+      isNetworkGovernor,
       balance: {
         ...previousWallet.balance,
         oracles,
@@ -126,16 +119,8 @@ export const AuthenticationProvider = ({ children }) => {
   }, [session]);
 
   useEffect(() => {
-    if ((user?.login || wallet?.address) && !EXCLUDED_PAGES.includes(String(pathname)))
-      validateWalletAndGithub(wallet?.address.toLowerCase(), user?.login);
-
-    if (user && !wallet && DAOService)
-      connect()
-        .then(() => {
-          updateWalletAddress();
-        })
-        .catch(console.log);
-  }, [user?.login, wallet?.address, DAOService]);
+    validateWalletAndGithub(wallet?.address.toLowerCase(), user?.login);
+  }, [user?.login, wallet?.address]);
 
   useEffect(() => {
     if (!DAOService) return;

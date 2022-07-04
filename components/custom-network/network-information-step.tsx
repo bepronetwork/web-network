@@ -1,7 +1,6 @@
 import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
 
-import ThemeColors from "components/custom-network/theme-colors";
 import ImageUploader from "components/image-uploader";
 import Step from "components/step";
 
@@ -9,13 +8,11 @@ import { useNetworkSettings } from "contexts/network-settings";
 
 import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
+import { StepWrapperProps } from "interfaces/stepper";
+
 const { publicRuntimeConfig } = getConfig();
 
-export default function NetworkInformationStep({
-  step,
-  currentStep,
-  handleChangeStep
-}) {
+export default function NetworkInformationStep({ activeStep, index, validated, handleClick } : StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
 
   const { details, fields } = useNetworkSettings();
@@ -47,17 +44,13 @@ export default function NetworkInformationStep({
     fields.description.setter(e.target.value);
   }
 
-  function handleColorChange(value) {
-    fields.colors.setter(value);
-  }
-
   return (
     <Step
       title={t("custom-network:steps.network-information.title")}
-      index={step}
-      activeStep={currentStep}
-      validated={details.validated}
-      handleClick={handleChangeStep}
+      index={index}
+      activeStep={activeStep}
+      validated={validated}
+      handleClick={handleClick}
     >
       <span className="caption-small text-gray mb-4">
         {t("custom-network:steps.network-information.you-can-change")}
@@ -161,16 +154,6 @@ export default function NetworkInformationStep({
             value={details.description}
             onChange={handleDescriptionChange}
           ></textarea>
-        </div>
-      </div>
-
-      <div className="row mx-0 px-0 mb-3">
-        <div className="col">
-          <ThemeColors
-            colors={details.theme.colors}
-            similar={details.theme.similar}
-            setColor={handleColorChange}
-          />
         </div>
       </div>
     </Step>

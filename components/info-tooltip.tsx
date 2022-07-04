@@ -21,7 +21,6 @@ export default function InfoTooltip({
   return (
     <OverlayTrigger placement="bottom" overlay={popover}>
       <span className="text-white-10">
-      {console.log('secondary', secondaryIcon)}
         {!secondaryIcon ? (
           <InfoIcon
             width={14}

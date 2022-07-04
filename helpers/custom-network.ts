@@ -33,12 +33,49 @@ export const DefaultNetworkSettings = {
       },
       validated: undefined
     },
+    validated: false,
+  },
+  settings: {
     theme: {
       colors: {} as ThemeColors,
       similar: [] as string[],
       black: [] as string[],
     },
-    validated: false,
+    treasury: {
+      address: {
+        value: Defaults.nativeZeroAddress,
+        validated: undefined
+      },
+      cancelFee: {
+        value: 0,
+        validated: undefined
+      },
+      closeFee: {
+        value: 0,
+        validated: undefined
+      },
+      validated: false
+    },
+    parameters: {
+      draftTime: {
+        value: 0,
+        validated: undefined
+      },
+      disputableTime: {
+        value: 0,
+        validated: undefined
+      },
+      percentageNeededForDispute: {
+        value: 0,
+        validated: undefined
+      },
+      councilAmount: {
+        value: 0,
+        validated: undefined
+      },
+      validated: undefined
+    },
+    validated: undefined
   },
   github: {
     repositories: [] as Repository[],
@@ -50,33 +87,6 @@ export const DefaultNetworkSettings = {
     bounty: "",
     bountyURI: "",
     validated: false,
-  },
-  treasury: {
-    address: {
-      value: Defaults.nativeZeroAddress,
-      validated: undefined
-    },
-    cancelFee: 1,
-    closeFee: 5,
-    validated: false
-  },
-  parameters: {
-    draftTime: {
-      value: 0,
-      validated: undefined
-    },
-    disputableTime: {
-      value: 0,
-      validated: undefined
-    },
-    percentageNeededForDispute: {
-      value: 0,
-      validated: undefined
-    },
-    councilAmount: {
-      value: 0,
-      validated: undefined
-    }
   }
 };
 

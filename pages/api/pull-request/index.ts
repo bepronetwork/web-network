@@ -16,7 +16,7 @@ import DAO from "services/dao-service";
 
 import { GraphQlResponse } from "types/octokit";
 
-const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
+const { serverRuntimeConfig } = getConfig();
 
 interface propsWhere {
   githubLogin?: string | string[];
@@ -114,7 +114,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     })
   }
 
-  const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
+  const githubAPI = (new Octokit({ auth: serverRuntimeConfig?.github?.token })).graphql;
 
   const repositoryDetails = await githubAPI<GraphQlResponse>(RepositoryQueries.Details, {
     repo,
@@ -228,7 +228,7 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
   if (!networkBounty) return res.status(404).json("Invalid");
 
   
-  const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
+  const githubAPI = (new Octokit({ auth: serverRuntimeConfig?.github?.token })).graphql;
 
   const [owner, repo] = issue.repository.githubPath.split("/");
 
