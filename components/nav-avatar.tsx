@@ -14,48 +14,6 @@ import { truncateAddress } from "helpers/truncate-address";
 
 import useNetworkTheme from "x-hooks/use-network";
 
-const Link = (label, href) => ({ label, href });
-
-const ProfileInternalLink = ({ label, href }) => 
-  <InternalLink 
-    href={href} 
-    label={label} 
-    className="mb-1 p family-Regular" 
-    key={label}
-    nav 
-  />;
-
-const ProfileExternalLink = ({ label, href, className = "" }) => (
-  <div className={`d-flex flex-row align-items-center justify-content-between ${className}`} key={label}>
-    <a 
-      href={href} 
-      className={`text-decoration-none p family-Regular ${ className || "text-gray"}`} 
-      target="_blank"
-    >
-        {label}
-      </a>
-    <ExternalLinkIcon width={12} height={12} />
-  </div>
-);
-
-const DisconnectWallet = ({ onClick }) => (
-  <div 
-    className="d-flex flex-row align-items-center justify-content-between pt-3 pb-1 px-0 cursor-pointer text-danger" 
-    onClick={onClick}
-  >
-    <span className="p family-Regular">Disconnect wallet</span>
-    <CloseIcon width={10} height={10} color="" />
-  </div>
-);
-
-const LinksSession = ({ children }) => (
-  <div className="row align-items-center border-bottom border-ligth-gray">
-    <div className="d-flex flex-column gap-3 pt-3 pb-3 px-0">
-      {children}
-    </div>
-  </div>
-);
-
 export default function NavAvatar() {
   const [visible, setVisible] = useState(false);
 
@@ -68,6 +26,49 @@ export default function NavAvatar() {
   
   const username = user?.login ? user.login : truncateAddress(wallet?.address);
 
+  const Link = (label, href) => ({ label, href });
+
+  const ProfileInternalLink = ({ label, href }) => 
+    <InternalLink 
+      href={href} 
+      label={label} 
+      className="mb-1 p family-Regular" 
+      key={label}
+      nav 
+    />;
+
+  const ProfileExternalLink = ({ label, href, className = "" }) => (
+    <div className={`d-flex flex-row align-items-center justify-content-between ${className}`} key={label}>
+      <a 
+        href={href} 
+        className={`text-decoration-none p family-Regular ${ className || "text-gray"}`} 
+        target="_blank"
+      >
+          {label}
+        </a>
+      <ExternalLinkIcon width={12} height={12} />
+    </div>
+  );
+
+  const DisconnectWallet = ({ onClick }) => (
+    <div 
+      className="d-flex flex-row align-items-center justify-content-between pt-3 pb-1 px-0 cursor-pointer text-danger" 
+      onClick={onClick}
+    >
+      <span className="p family-Regular">Disconnect wallet</span>
+      <CloseIcon width={10} height={10} color="" />
+    </div>
+  );
+
+  const LinksSession = ({ children }) => (
+    <div className="row align-items-center border-bottom border-ligth-gray">
+      <div className="d-flex flex-column gap-3 pt-3 pb-3 px-0">
+        {children}
+      </div>
+    </div>
+  );
+
+  // TODO: update internal links when the new profile page is ready
   const internalLinks = [
     Link("Wallet", ""),
     Link("Payments", getURLWithNetwork("/account/payments")),
