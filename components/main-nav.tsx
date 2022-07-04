@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
+import { Defaults } from "@taikai/dappkit";
 import getConfig from "next/config";
 import { useRouter } from "next/router";
 
@@ -19,22 +20,53 @@ import Translation from "components/translation";
 import WrongNetworkModal from "components/wrong-network-modal";
 
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 
+import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
 
-
 const { publicRuntimeConfig } = getConfig();
+
+interface MyNetworkLink {
+  href: string;
+  label: string;
+  icon?: ReactNode;
+}
 
 export default function MainNav() {
   const { pathname } = useRouter();
 
   const [showHelp, setShowHelp] = useState(false);
+  const [myNetwork, setMyNetwork] = useState<MyNetworkLink>({ 
+    label: "New Network", 
+    href: "/new-network", 
+    icon: <PlusIcon /> 
+  });
 
   const { wallet } = useAuthentication();
+  const { service: DAOService } = useDAO();
+  const { searchNetworks } = useApi();
   const { network, getURLWithNetwork } = useNetwork();
 
   const isNetworksPage = ["/networks", "/new-network"].includes(pathname);
   const isBeproNetwork = network?.name === publicRuntimeConfig?.networkConfig?.networkName;
+
+  useEffect(() => {
+    if (!DAOService || !wallet?.address) return;
+
+    DAOService.getNetworkAdressByCreator(wallet.address)
+      .then(async networkAddress => {
+        if (networkAddress === Defaults.nativeZeroAddress) return;
+
+        const network = await searchNetworks({ networkAddress }).then(({ rows }) => rows[0]);
+
+        setMyNetwork({ 
+          label: "My Network", 
+          href: `/${network.name.toLowerCase()}`
+        });
+      })
+      .catch(console.log);
+  }, [DAOService, wallet?.address]);
 
   return (
     <div
@@ -124,12 +156,12 @@ export default function MainNav() {
             </ReadOnlyButtonWrapper>
           )) || (
             <InternalLink
-              href="/new-network"
-              icon={<PlusIcon />}
-              label={"New Network"}
+              href={myNetwork.href}
+              icon={myNetwork.icon}
+              label={myNetwork.label}
               iconBefore
-              nav
               uppercase
+              outline
             />
           )}
 
