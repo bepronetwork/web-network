@@ -4,18 +4,15 @@ import getConfig from "next/config";
 import { useRouter } from "next/router";
 
 import BeproLogoBlue from "assets/icons/bepro-logo-blue";
-import BeproSmallLogo from "assets/icons/bepro-small-logo";
 import HelpIcon from "assets/icons/help-icon";
-import NotificationIcon from "assets/icons/notification-icon";
 import PlusIcon from "assets/icons/plus-icon";
 
-import BalanceAddressAvatar from "components/balance-address-avatar";
 import Button from "components/button";
 import ClosedNetworkAlert from "components/closed-network-alert";
 import ConnectWalletButton from "components/connect-wallet-button";
 import HelpModal from "components/help-modal";
 import InternalLink from "components/internal-link";
-import NetworkIdentifier from "components/network-identifier";
+import NavAvatar from "components/nav-avatar";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import TransactionsStateIndicator from "components/transactions-state-indicator";
 import Translation from "components/translation";
@@ -23,10 +20,8 @@ import WrongNetworkModal from "components/wrong-network-modal";
 
 import { useAuthentication } from "contexts/authentication";
 
-import { formatNumberToNScale } from "helpers/formatNumber";
-import { truncateAddress } from "helpers/truncate-address";
-
 import useNetwork from "x-hooks/use-network";
+
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -43,7 +38,8 @@ export default function MainNav() {
 
   return (
     <div
-      className={`main-nav d-flex flex-column bg-${isBeproNetwork || isNetworksPage ? "dark" : "primary"}`}
+      className={`main-nav d-flex flex-column justify-content-center
+         bg-${isBeproNetwork || isNetworksPage ? "dark" : "primary"}`}
     >
       {network?.isClosed && <ClosedNetworkAlert />}
 
@@ -146,43 +142,22 @@ export default function MainNav() {
             <HelpIcon />
           </Button>
 
-          <Button
-            className="opacity-75 opacity-100-hover"
-            transparent
-            rounded
-          >
-            <NotificationIcon />
-          </Button>
-
           <WrongNetworkModal requiredNetworkId={publicRuntimeConfig?.metaMask?.chainId} />
 
           <ConnectWalletButton>
-            <div className="d-flex account-info align-items-center">
+            <>
+              {/* <Button
+                className="opacity-75 opacity-100-hover"
+                transparent
+                rounded
+              >
+                <NotificationIcon />
+              </Button> */}
+
               <TransactionsStateIndicator />
 
-              {/* <NetworkIdentifier /> */}
-
-              {/* <InternalLink
-                href={getURLWithNetwork("/account")}
-                icon={<BeproSmallLogo />}
-                label={formatNumberToNScale(wallet?.balance?.bepro || 0)}
-                className="mx-3"
-                transparent
-                nav
-              /> */}
-
-              <InternalLink
-                href={getURLWithNetwork("/account")}
-                icon={
-                  <BalanceAddressAvatar
-                    address={truncateAddress(wallet?.address || "", 4)}
-                    balance={wallet?.balance?.eth}
-                    currency={publicRuntimeConfig?.metaMask?.tokenName}
-                  />
-                }
-                className="meta-info d-flex align-items-center"
-              />
-            </div>
+              <NavAvatar />
+            </>
           </ConnectWalletButton>
         </div>
 

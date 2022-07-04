@@ -24,6 +24,7 @@ export interface IAuthenticationContext {
   isGithubAndWalletMatched?: boolean;
   login: () => Promise<boolean>;
   updateWalletBalance: () => void;
+  disconnectWallet: () => void;
 }
 
 const AuthenticationContext = createContext<IAuthenticationContext>({} as IAuthenticationContext);
@@ -47,7 +48,9 @@ export const AuthenticationProvider = ({ children }) => {
 
       await connect();
 
-      await updateWalletAddress();
+      const address = await updateWalletAddress();
+
+      window.connectedAddress = address;
 
       return true;
     } catch (error) {
@@ -55,6 +58,11 @@ export const AuthenticationProvider = ({ children }) => {
       return false;
     }
   }, [user?.login, asPath, DAOService]);
+
+  const disconnectWallet = useCallback(() => {
+    window.connectedAddress = undefined;
+    setWallet(undefined);
+  }, []);
 
   const updateWalletAddress = useCallback(async () => {
     const address = await DAOService.getAddress();
@@ -125,12 +133,16 @@ export const AuthenticationProvider = ({ children }) => {
   useEffect(() => {
     if (!DAOService) return;
     
-    window?.ethereum?.on("accountsChanged", () => {
-      DAOService.connect()
-        .then(connected => {
-          if (connected) updateWalletAddress();
-        })
-        .catch(error => console.log("Failed to change account", error));
+    window?.ethereum?.on("accountsChanged", (accounts) => {
+      if (window.connectedAddress)
+        DAOService.connect()
+          .then(connected => {
+            if (connected) {
+              window.connectedAddress = accounts[0];
+              updateWalletAddress();
+            }
+          })
+          .catch(error => console.log("Failed to change account", error));
     });
   }, [DAOService]);
 
@@ -143,7 +155,8 @@ export const AuthenticationProvider = ({ children }) => {
       wallet,
       isGithubAndWalletMatched,
       login,
-      updateWalletBalance
+      updateWalletBalance,
+      disconnectWallet
   }),
     [user, wallet, isGithubAndWalletMatched, DAOService]);
 
