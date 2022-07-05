@@ -6,7 +6,7 @@ import ReactSelect from "components/react-select";
 
 import { useRepos } from "contexts/repos";
 
-export default function ReposDropdown({ onSelected, value }: {
+export default function ReposDropdown({ onSelected, value, disabled }: {
   onSelected: (e: { value: { id: string; path: string; } }) => void,
   value?: { label: string, value: { id: string, path: string } }
   disabled?: boolean;

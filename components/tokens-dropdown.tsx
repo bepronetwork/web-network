@@ -15,7 +15,6 @@ interface TokensDropdownProps {
   canAddToken?: boolean;
   label?: string;
   description?: string;
-  disabled?: boolean;
   addToken: (value: Token) => void;
   setToken?: (value: Token) => void;
   userAddress?: string;
