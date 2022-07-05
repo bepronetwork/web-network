@@ -1,7 +1,6 @@
 import { useTranslation } from "next-i18next";
 
 import ArrowRight from "assets/icons/arrow-right";
-import InfoIconEmpty from "assets/icons/info-icon-empty";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
 import { handleTokenToEurConversion } from "helpers/handleTokenToEurConversion";
@@ -21,7 +20,6 @@ export default function CreateBountyTokenAmount({
   tokenBalance,
   issueAmount,
   setIssueAmount,
-  coinInfo,
   handleAmountOnValueChange,
   handleAmountBlurChange,
   review = false,
@@ -29,6 +27,9 @@ export default function CreateBountyTokenAmount({
 }) {
   const { t } = useTranslation(["create-bounty"]);
 
+  function getCurrentCoin() {
+    return customTokens?.find(token => token?.address === currentToken)
+  }
 
   function handleHelperText() {
     if(review) return;
@@ -56,13 +57,13 @@ export default function CreateBountyTokenAmount({
   }
 
   return (
-    <>
+    <div className="container">
       <div className="col-md-12 mt-4">
         <TokensDropdown
           label={labelSelect}
           tokens={customTokens}
           userAddress={userAddress}
-          defaultToken={defaultToken}
+          defaultToken={defaultToken} 
           canAddToken={canAddCustomToken}
           addToken={addToken}
           setToken={setCurrentToken}
@@ -88,7 +89,7 @@ export default function CreateBountyTokenAmount({
           <div className="mt-4 pt-1 mx-2">
             <ArrowRight className="text-gray" width={9} height={9} />
           </div>
-
+          {console.log('customTokens',customTokens )}
           <InputNumber
             thousandSeparator
             label={" "}
@@ -97,11 +98,11 @@ export default function CreateBountyTokenAmount({
             classSymbol="text-white-30 mt-3"
             disabled={true}
             value={handleTokenToEurConversion(Number(issueAmount.value),
-                                              coinInfo?.prices["eur"])}
+                                              getCurrentCoin()?.tokenInfo?.prices["eur"])}
             placeholder="-"
             helperText={
               <>
-                {!coinInfo && (
+                {!getCurrentCoin()?.tokenInfo && !review && (
                   <p className="p-small text-danger">
                     Could not convert this token
                   </p>
@@ -111,6 +112,6 @@ export default function CreateBountyTokenAmount({
           />
         </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -3,11 +3,14 @@ import Creatable from "react-select/creatable";
 
 import { useTranslation } from "next-i18next";
 
+import DoneIcon from "assets/icons/done-icon";
+
 import ChangeTokenModal from "components/change-token-modal";
 
 import { useDAO } from "contexts/dao";
 
 import { Token } from "interfaces/token";
+
 
 interface TokensDropdownProps {
   defaultToken?: Token;
@@ -49,7 +52,7 @@ export default function TokensDropdown({
       : undefined;
 
   const tokenToOption = (token: Token): Option => ({
-    label: `${token.symbol}`,
+    label: `${token?.tokenInfo ? token.tokenInfo.name : token.name}`,
     value: token,
   });
 
@@ -70,7 +73,7 @@ export default function TokensDropdown({
   };
 
   async function getBalanceTokens() {
-    Promise.all(tokens.map(async (token) => {
+    Promise.all(tokens?.map(async (token) => {
       if (token?.address && userAddress) {
         const value = await DAOService.getTokenBalance(token.address,
                                                        userAddress);
@@ -78,7 +81,6 @@ export default function TokensDropdown({
         return {...token, currentValue: value };
       }
     })).then((values) => {
-      console.log('values', values)
       if(values[0]) setOptions(values.map((token) => tokenToOption(token)))
     }).catch(err => console.log('err token', err))
   }
@@ -88,26 +90,63 @@ export default function TokensDropdown({
   }, [tokens]);
 
   function SelectOptionComponent({ innerProps, innerRef, data }) {
-    const { name, symbol, currentValue } = data.value;
-    
-    if(data.__isNew__) return 
+    const { name, symbol, address, currentValue, tokenInfo } = data.value;
+
     return (
       <div
         ref={innerRef}
         {...innerProps}
+        className={`proposal__select-options d-flex align-items-center text-center p-small p-1 my-1
+        ${address === option?.value?.address && 'bg-black rounded'}
+        `}
+      >
+        {data?.__isNew__ ? <span className="mx-2">{formatCreateLabel(data?.value)}</span>: 
+        <>
+          {tokenInfo?.icon && <img src={tokenInfo.icon} width={14} height={14} className='mx-2'/>}
+          <span className={`${tokenInfo ? null :'mx-2'}`}>{tokenInfo ?  tokenInfo.name : name}</span>        
+          <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">
+            {currentValue} {tokenInfo?.symbol ? tokenInfo?.symbol : symbol} 
+            {address === option?.value?.address && <DoneIcon className="ms-1 text-primary" width={14} height={14} />}
+          </div>
+        </>
+        }
+
+      </div>
+    );
+  }
+
+  function SelectValueComponent(props) {
+    console.log("props -> ", props?.selectProps?.inputValue);
+    const { name, tokenInfo } = props.getValue()[0].value;
+    return (
+      <div
+        {...props}
         className="proposal__select-options d-flex align-items-center text-center p-small p-1"
       >
-        {data?.__isNew__ ? formatCreateLabel(name): <span>{name}</span>}
-        <div className="d-flex flex-grow-1 justify-content-end">
-          {currentValue} {symbol}
-        </div>
+        {props.children[0] !== null ? (
+          <>
+            {props.children[1]}
+            {tokenInfo?.icon && (
+              <img
+                src={tokenInfo.icon}
+                width={14}
+                height={14}
+                className="mx-2"
+              />
+            )}
+            <span className={`${tokenInfo ? "mt-1" : "mx-2"}`}>
+              {tokenInfo ? tokenInfo.name : name}
+            </span>
+          </>
+        ) : (
+          <>{props.children[1]}</>
+        )}
       </div>
     );
   }
 
   return (
     <div className="form-group">
-      {console.log("options", options, option)}
       <label className="caption-small mb-2">{label || t("misc.token")}</label>
       <Creatable
         className="react-select-container"
@@ -120,6 +159,7 @@ export default function TokensDropdown({
         value={option}
         components={{
           Option: SelectOptionComponent,
+          ValueContainer: SelectValueComponent
         }}
         isDisabled={disabled}
       />

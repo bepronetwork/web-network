@@ -21,10 +21,11 @@ interface IDragAndDropProps {
   onUpdateFiles: (files: IFilesProps[]) => void;
   review?: boolean
   disabled?: boolean;
+  externalFiles?: IFilesProps[]
 }
 
-export default function DragAndDrop ({ onUpdateFiles, review = false, disabled }: IDragAndDropProps) {
-  const [files, setFiles] = useState<IFilesProps[]>([] as IFilesProps[]);
+export default function DragAndDrop ({ externalFiles, onUpdateFiles, review = false, disabled }: IDragAndDropProps) {
+  const [files, setFiles] = useState<IFilesProps[]>(externalFiles ? externalFiles : [] as IFilesProps[]);
   const { t } = useTranslation(["common"]);
   const { uploadFiles } = useApi();
 

@@ -108,10 +108,9 @@ export default function CreateBountyModal() {
   const { service: DAOService } = useDAO();
   const { wallet, user } = useAuthentication();
   const [tokenAllowance, setTokenAllowance] = useState<number>();
-  const [coinInfo, setCoinInfo] = useState<TokenInfo>();
-  const [rewardCoinInfo, setRewardCoinInfo] = useState<TokenInfo>();
   const [rewardChecked, setRewardChecked] = useState<boolean>(false);
   const [files, setFiles] = useState<IFilesProps[]>([]);
+  
   const defaultToken = activeNetwork?.networkToken || BEPRO_TOKEN;
   const canAddCustomToken =
     activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address
@@ -119,6 +118,7 @@ export default function CreateBountyModal() {
       : !!activeNetwork?.allowCustomTokens;
 
   const steps = ["details", "bounty", "additional details", "Review "];
+  const isFieldsDisabled = !user;
 
   function verifyAmountBiggerThanBalance(): boolean {
     return !(issueAmount.floatValue > tokenBalance);
@@ -167,19 +167,6 @@ export default function CreateBountyModal() {
     setRewardChecked(e.target.checked);
   }
 
-  async function getCoinInfo(address: string,
-                             type: "transactional" | "reward") {
-    await getCoinInfoByContract(address)
-      .then((tokenInfo) => {
-        type === "transactional" && setCoinInfo(tokenInfo);
-        type === "reward" && setRewardCoinInfo(tokenInfo);
-      })
-      .catch((err) => {
-        console.error("CoinInfo ", err);
-        type === "transactional" && setCoinInfo(null);
-        type === "reward" && setRewardCoinInfo(null);
-      });
-  }
 
   function renderDetails(review = false) {
     return (
@@ -190,6 +177,7 @@ export default function CreateBountyModal() {
         setBountyDescription={setBountyDescription}
         onUpdateFiles={onUpdateFiles}
         review={review}
+        files={files}
       />
     );
   }
@@ -211,7 +199,6 @@ export default function CreateBountyModal() {
         }
         handleAmountBlurChange={handleIssueAmountBlurChange}
         tokenBalance={tokenBalance}
-        coinInfo={coinInfo}
         activeBounty={activeBounty}
         labelSelect="set Bounty Token"
         review={review}
@@ -236,7 +223,6 @@ export default function CreateBountyModal() {
         }
         handleAmountBlurChange={handleRewardAmountBlurChange}
         tokenBalance={rewardBalance}
-        coinInfo={rewardCoinInfo}
         activeBounty={activeBounty}
         labelSelect="set Reward Token"
         review={review}
@@ -291,7 +277,7 @@ export default function CreateBountyModal() {
                   />
                 </div>
                 {rewardChecked && (
-                  <div className="col-md-12">{renderRewardToken()}</div>
+                 renderRewardToken()
                 )}
               </>
             )}
@@ -313,7 +299,8 @@ export default function CreateBountyModal() {
                   label: repository?.path,
                   value: repository,
                 }}
-              />
+                disabled={isFieldsDisabled}
+               />
             </div>
             <div className="col-md-6">
               <BranchsDropdown
@@ -323,6 +310,7 @@ export default function CreateBountyModal() {
                   label: branch,
                   value: branch,
                 }}
+                disabled={isFieldsDisabled}
               />
             </div>
           </div>
@@ -335,6 +323,7 @@ export default function CreateBountyModal() {
           {renderDetails(true)}
           {renderBountyToken(true)}
           {rewardChecked && renderRewardToken(true)}
+          <div className="container">
           <div className="row">
             <div className="col-md-6">
               <label className="caption-small mb-2">Repository</label>
@@ -346,22 +335,30 @@ export default function CreateBountyModal() {
               />
             </div>
             <div className="col-md-6">
-              <label className="caption-small mb-2">Branch</label>
-              <GithubInfo
-                parent="list"
-                variant="repository"
-                label={branch}
-                simpleDisabled={true}
-              />
+              <label className="caption-small mb-2 ms-3">Branch</label>
+              <div className="ms-3">
+                <GithubInfo
+                  parent="list"
+                  variant="repository"
+                  label={branch}
+                  simpleDisabled={true}
+                />
+              </div>
             </div>
+          </div>
           </div>
         </>
       );
     }
   }
 
-  function addToken(newToken: Token) {
-    setCustomTokens([...customTokens, newToken]);
+  async function addToken(newToken: Token) {
+    await getCoinInfoByContract(newToken?.address).then(tokenInfo => {
+      setCustomTokens([...customTokens, {...newToken, tokenInfo}])
+    }).catch(err => {
+      console.error('coinErro', err)
+      setCustomTokens([...customTokens, newToken]);
+    })
   }
 
   function handleNextStepAndCreate() {
@@ -439,6 +436,7 @@ export default function CreateBountyModal() {
     setRepository(undefined);
     setBranch("");
     setCurrentSection(0);
+    setFiles([])
   }
 
   useEffect(() => {
@@ -452,22 +450,28 @@ export default function CreateBountyModal() {
       tmpTokens.push(activeNetwork.networkToken);
 
     tmpTokens.push(...activeNetwork.tokens.map(({ name, symbol, address }) => ({ name, symbol, address } as Token)));
-
-    setCustomTokens(tmpTokens);
+    
+    getTokenInfo(tmpTokens)
   }, [activeNetwork?.networkToken]);
+
+  async function getTokenInfo(tmpTokens: Token[]) {
+    await Promise.all(tmpTokens.map(async (token) => {
+      if (token?.address) {
+        const Info = await getCoinInfoByContract(token.address).then((tokenInfo) => tokenInfo)
+        return {...token, tokenInfo: Info };
+      }else {
+        return token
+      }
+    })).then((tokens) => {
+      setCustomTokens(tokens)
+    }).catch(() => {
+      setCustomTokens(tmpTokens)
+    })
+  }
 
   useEffect(() => {
     setProgressBar();
   }, [currentSection]);
-
-  useEffect(() => {
-    transactionalToken?.address &&
-      getCoinInfo(transactionalToken.address, "transactional");
-  }, [transactionalToken]);
-
-  useEffect(() => {
-    rewardToken?.address && getCoinInfo(rewardToken.address, "reward");
-  }, [rewardToken]);
 
   const isAmountApproved = (tokenAllowance: number, amount: number) =>
     tokenAllowance >= amount;

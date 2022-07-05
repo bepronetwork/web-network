@@ -6,6 +6,7 @@ export interface Token {
   name: string;
   symbol: string;
   currentValue?: number;
+  tokenInfo?: TokenInfo;
 }
 
 export interface TokenInfo extends Partial<Token> {

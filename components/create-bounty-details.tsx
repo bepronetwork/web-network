@@ -1,3 +1,5 @@
+import React from "react";
+
 import { useTranslation } from "next-i18next";
 
 import DragAndDrop from "./drag-and-drop";
@@ -8,6 +10,7 @@ export default function CreateBountyDetails({
   bountyDescription,
   setBountyDescription,
   onUpdateFiles,
+  files,
   review = false
 }) {
   const { t } = useTranslation("create-bounty");
@@ -49,7 +52,7 @@ export default function CreateBountyDetails({
         />
       </div>
       <div className="mb-4">
-        <DragAndDrop onUpdateFiles={onUpdateFiles} review={review}/>
+        <DragAndDrop externalFiles={files} onUpdateFiles={onUpdateFiles} review={review}/>
       </div>
     </div>
   );
