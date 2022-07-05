@@ -28,6 +28,7 @@
     "ganache:dev": "ganache -h 0.0.0.0 -p 8545 -a 50  -s 0x6d2119524d65ea0b15b214ef260d3acdf8ca0ec6ec68045b5785d970f5ad97bd3d0025d212e625a8a21920852cc165c10faa6d8387a0c2530d1ffc0d265d92935749"
   },
   "dependencies": {
+    "@metamask/jazzicon": "^2.0.0",
     "@taikai/dappkit": "2.0.5",
     "@vlsergey/react-bootstrap-pagination": "^3.2.1",
     "abort-controller": "^3.0.0",
@@ -84,12 +85,12 @@
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.15.0",
     "@typescript-eslint/parser": "^5.15.0",
+    "cross-env": "^7.0.3",
     "eslint": "8.11.0",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-import-helpers": "^1.2.1",
     "eslint-plugin-react": "^7.29.4",
     "eslint-plugin-react-hooks": "^4.3.0",
-    "typescript": "^4.6.2",
-    "cross-env": "^7.0.3"
+    "typescript": "^4.6.2"
   }
 }

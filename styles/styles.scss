@@ -18,6 +18,8 @@
 @import "components/creating-network-loader";
 @import "components/counter-badge";
 @import "components/amount-with-preview";
+@import "components/identicon";
+@import "components/profile-menu";
 
 @function toRGB($color) {
   @return "" + red($color) + ", " + green($color) + ", " + blue($color);
@@ -432,7 +434,7 @@ li {
 .banner-shadow {
   width: 100%;
   min-height: 164px;
-  background-color: var(--bs-shadow);
+  background-color: $bg;
   color: $white;
   padding-top: ($navbar-height + $m + 4);
   padding-bottom: $m + 4;
@@ -621,16 +623,29 @@ label {
   height: 32px;
   border-radius: 16px;
 }
+
 .circle-3 {
   width: 28px;
   height: 28px;
   border-radius: 14px;
 }
 
+.circle-4 {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+}
+
 .border-avatar {
   border: solid;
   border-width: 2px;
   border-color: $white;
+
+  &.border-primary {
+    border: solid;
+    border-width: 2px;
+    border-color: var(--bs-primary);
+  }
 }
 
 .ico-metamask {
@@ -1487,4 +1502,18 @@ input[type="color"] {
 0%{background-position:right}
 50%{background-position:left}
 100%{background-position:right}
+}
+
+.nav-avatar {
+  .text-primary {
+    svg {
+      color: var(--bs-primary);
+    }
+  }
+
+  .text-danger {
+    svg {
+      color: var(--bs-danger) !important;
+    }
+  }
 }

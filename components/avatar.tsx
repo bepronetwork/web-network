@@ -6,13 +6,15 @@ export default function Avatar({
   className,
   src,
   tooltip = false,
-  border = false
+  border = false,
+  size = "sm"
 }: {
   userLogin: string;
   className?: string;
   src?: string;
   tooltip?: boolean;
   border?: boolean;
+  size?: "sm" | "lg";
 }) {
   if (userLogin || src)
     return (
@@ -26,7 +28,7 @@ export default function Avatar({
         }
       >
         <img
-          className={`avatar circle-3 ${border && "border-avatar"} ${className}`}
+          className={`avatar circle-${size === "sm" ? "3" : "4"} ${border && "border-avatar" || ""} ${className}`}
           src={src || `https://github.com/${userLogin}.png`}
         />
       </OverlayTrigger>
