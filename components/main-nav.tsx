@@ -62,7 +62,7 @@ export default function MainNav() {
 
         setMyNetwork({ 
           label: "My Network", 
-          href: `/${network.name.toLowerCase()}`
+          href: `/${network?.name?.toLowerCase()}`
         });
       })
       .catch(console.log);

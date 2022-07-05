@@ -48,9 +48,7 @@ export const AuthenticationProvider = ({ children }) => {
 
       await connect();
 
-      const address = await updateWalletAddress();
-
-      window.connectedAddress = address;
+      await updateWalletAddress();
 
       return true;
     } catch (error) {
@@ -60,7 +58,6 @@ export const AuthenticationProvider = ({ children }) => {
   }, [user?.login, asPath, DAOService]);
 
   const disconnectWallet = useCallback(() => {
-    window.connectedAddress = undefined;
     setWallet(undefined);
   }, []);
 
@@ -133,18 +130,17 @@ export const AuthenticationProvider = ({ children }) => {
   useEffect(() => {
     if (!DAOService) return;
     
-    window?.ethereum?.on("accountsChanged", (accounts) => {
-      if (window.connectedAddress)
+    if (wallet?.address)
+      window?.ethereum?.on("accountsChanged", () => {
         DAOService.connect()
           .then(connected => {
-            if (connected) {
-              window.connectedAddress = accounts[0];
-              updateWalletAddress();
-            }
+            if (connected) updateWalletAddress();
           })
           .catch(error => console.log("Failed to change account", error));
-    });
-  }, [DAOService]);
+      });
+    else
+      window?.ethereum?.removeAllListeners("accountsChanged");
+  }, [DAOService, wallet?.address]);
 
   useEffect(() => {
     if (wallet && wallet?.address) updateWalletBalance();
