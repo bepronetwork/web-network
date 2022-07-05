@@ -56,7 +56,25 @@
     "Oracle": "Oracle",
     "new-bounty": "New bounty",
     "get-started": "Get Started",
-    "connect": "Connect Wallet"
+    "connect": "Connect Wallet",
+    "new-network": "New Network",
+    "my-network": "My Network",
+    "networks": "Networks",
+    "nav-avatar": {
+      "view-profile": "View profile",
+      "wallet": "Wallet",
+      "payments": "Payments",
+      "bounties": "Bounties",
+      "pull-requests": "Pull Requests",
+      "proposals": "Proposals",
+      "custom-network": "Custom Network",
+      "support-center": "Support Center",
+      "guides": "Guides",
+      "join-discord": "Join the Discord",
+      "follow-on-twitter": "Follow @bepronet on Twitter",
+      "web-network-1": "Web Network Version 1.0",
+      "disconnect-wallet": "Disconnect Wallet"
+    }
   },
   "select-a-repository": "Select a repository",
   "select-a-branch": "Select a branch",

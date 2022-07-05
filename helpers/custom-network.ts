@@ -91,7 +91,8 @@ export const DefaultNetworkSettings = {
 };
 
 export const handleNetworkAddress = (network: Network) => {
-  return network?.name === publicRuntimeConfig?.networkConfig?.networkName
-    ? publicRuntimeConfig?.contract?.address
-    : network?.networkAddress;
+  if (!network || network?.name === publicRuntimeConfig?.networkConfig?.networkName)
+    return publicRuntimeConfig?.contract?.address;
+
+  return network.networkAddress;
 };

@@ -52,9 +52,11 @@ export default function InternalLink({
 
     if (uppercase) classes += " text-uppercase ";
 
+    if (props.icon) classes += " d-flex align-items-center justify-content-center ";
+
     return `${(!nav && `btn btn-${outline && "outline-" || ""}primary`) || " main-nav-link "} ${
       brand ? "" : " text-white "
-    } bg-opacity-100 d-flex align-items-center justify-content-center text-decoration-none shadow-none ${classes}`;
+    } bg-opacity-100 text-decoration-none shadow-none ${classes}`;
   }
 
   return (

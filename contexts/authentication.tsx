@@ -24,6 +24,7 @@ export interface IAuthenticationContext {
   isGithubAndWalletMatched?: boolean;
   login: () => Promise<boolean>;
   updateWalletBalance: () => void;
+  disconnectWallet: () => void;
 }
 
 const AuthenticationContext = createContext<IAuthenticationContext>({} as IAuthenticationContext);
@@ -55,6 +56,10 @@ export const AuthenticationProvider = ({ children }) => {
       return false;
     }
   }, [user?.login, asPath, DAOService]);
+
+  const disconnectWallet = useCallback(() => {
+    setWallet(undefined);
+  }, []);
 
   const updateWalletAddress = useCallback(async () => {
     const address = await DAOService.getAddress();
@@ -125,14 +130,17 @@ export const AuthenticationProvider = ({ children }) => {
   useEffect(() => {
     if (!DAOService) return;
     
-    window?.ethereum?.on("accountsChanged", () => {
-      DAOService.connect()
-        .then(connected => {
-          if (connected) updateWalletAddress();
-        })
-        .catch(error => console.log("Failed to change account", error));
-    });
-  }, [DAOService]);
+    if (wallet?.address)
+      window?.ethereum?.on("accountsChanged", () => {
+        DAOService.connect()
+          .then(connected => {
+            if (connected) updateWalletAddress();
+          })
+          .catch(error => console.log("Failed to change account", error));
+      });
+    else
+      window?.ethereum?.removeAllListeners("accountsChanged");
+  }, [DAOService, wallet?.address]);
 
   useEffect(() => {
     if (wallet && wallet?.address) updateWalletBalance();
@@ -143,7 +151,8 @@ export const AuthenticationProvider = ({ children }) => {
       wallet,
       isGithubAndWalletMatched,
       login,
-      updateWalletBalance
+      updateWalletBalance,
+      disconnectWallet
   }),
     [user, wallet, isGithubAndWalletMatched, DAOService]);
 
