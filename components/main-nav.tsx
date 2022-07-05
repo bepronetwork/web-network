@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactElement, ReactNode, useEffect, useState } from "react";
 
 import { Defaults } from "@taikai/dappkit";
 import getConfig from "next/config";
@@ -29,7 +29,7 @@ const { publicRuntimeConfig } = getConfig();
 
 interface MyNetworkLink {
   href: string;
-  label: string;
+  label: string | ReactElement;
   icon?: ReactNode;
 }
 
@@ -38,7 +38,7 @@ export default function MainNav() {
 
   const [showHelp, setShowHelp] = useState(false);
   const [myNetwork, setMyNetwork] = useState<MyNetworkLink>({ 
-    label: "New Network", 
+    label: <Translation label={"main-nav.new-network"} />, 
     href: "/new-network", 
     icon: <PlusIcon /> 
   });
@@ -61,7 +61,7 @@ export default function MainNav() {
         const network = await searchNetworks({ networkAddress }).then(({ rows }) => rows[0]);
 
         setMyNetwork({ 
-          label: "My Network", 
+          label: <Translation label={"main-nav.my-network"} />, 
           href: `/${network?.name?.toLowerCase()}`
         });
       })
@@ -131,7 +131,7 @@ export default function MainNav() {
               <li>
                 <InternalLink
                   href={"/networks"}
-                  label={"Networks"}
+                  label={<Translation label={"main-nav.networks"} />}
                   nav
                   uppercase
                 />

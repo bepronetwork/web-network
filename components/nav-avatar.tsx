@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { OverlayTrigger, Popover } from "react-bootstrap";
 
+import { useTranslation } from "next-i18next";
+
 import CloseIcon from "assets/icons/close-icon";
 import ExternalLinkIcon from "assets/icons/external-link-icon";
 
@@ -15,6 +17,8 @@ import { truncateAddress } from "helpers/truncate-address";
 import useNetworkTheme from "x-hooks/use-network";
 
 export default function NavAvatar() {
+  const { t } = useTranslation("common");
+
   const [visible, setVisible] = useState(false);
 
   const { getURLWithNetwork } = useNetworkTheme();
@@ -55,7 +59,7 @@ export default function NavAvatar() {
       className="d-flex flex-row align-items-center justify-content-between pt-3 pb-1 px-0 cursor-pointer text-danger" 
       onClick={onClick}
     >
-      <span className="p family-Regular">Disconnect wallet</span>
+      <span className="p family-Regular">{t("main-nav.nav-avatar.disconnect-wallet")}</span>
       <CloseIcon width={10} height={10} color="" />
     </div>
   );
@@ -70,19 +74,19 @@ export default function NavAvatar() {
 
   // TODO: update internal links when the new profile page is ready
   const internalLinks = [
-    Link("Wallet", ""),
-    Link("Payments", getURLWithNetwork("/account/payments")),
-    Link("Bounties", getURLWithNetwork("/account")),
-    Link("Pull Requests", getURLWithNetwork("/account/my-pull-requests")),
-    Link("Proposals", ""),
-    Link("Custom Network", getURLWithNetwork("/account/my-network")),
+    Link(t("main-nav.nav-avatar.wallet"), ""),
+    Link(t("main-nav.nav-avatar.payments"), getURLWithNetwork("/account/payments")),
+    Link(t("main-nav.nav-avatar.bounties"), getURLWithNetwork("/account")),
+    Link(t("main-nav.nav-avatar.pull-requests"), getURLWithNetwork("/account/my-pull-requests")),
+    Link(t("main-nav.nav-avatar.proposals"), ""),
+    Link(t("main-nav.nav-avatar.custom-network"), getURLWithNetwork("/account/my-network")),
   ];
 
   const externalLinks = [
-    Link("Support Center", "https://support.bepro.network/en/"),
-    Link("Guides", "https://docs.bepro.network/"),
-    Link("Join the Discord", "https://discord.gg/9aUufhzhfm"),
-    Link("Follow @bepronet on Twitter", "https://twitter.com/bepronet"),
+    Link(t("main-nav.nav-avatar.support-center"), "https://support.bepro.network/en/"),
+    Link(t("main-nav.nav-avatar.guides"), "https://docs.bepro.network/"),
+    Link(t("main-nav.nav-avatar.join-discord"), "https://discord.gg/9aUufhzhfm"),
+    Link(t("main-nav.nav-avatar.follow-on-twitter"), "https://twitter.com/bepronet"),
   ];
 
   const overlay = (
@@ -99,7 +103,12 @@ export default function NavAvatar() {
               </div>
 
               <div className="d-flex flex-row justify-content-left">
-                <InternalLink href="" label="View Profile" className="text-gray p family-Regular" nav />
+                <InternalLink 
+                  href="" 
+                  label={t("main-nav.nav-avatar.view-profile")} 
+                  className="text-gray p family-Regular" 
+                  nav 
+                />
               </div>
           </div>
         </div>
@@ -114,7 +123,7 @@ export default function NavAvatar() {
 
         <LinksSession>
           <ProfileExternalLink 
-            label="Web Network Version 1.0" 
+            label={t("main-nav.nav-avatar.web-network-1")}
             href="https://development.bepro.network/" 
             className="text-primary" 
           />
