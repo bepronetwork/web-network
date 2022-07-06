@@ -21,7 +21,7 @@
   "dependencies": {
     "@vlsergey/react-bootstrap-pagination": "^3.2.1",
     "axios": "^0.21.1",
-    "bepro-js-v1": "1.2.9",
+    "bepro-js-v1": "1.2.10",
     "bootstrap": "^5.1.3",
     "clsx": "^1.1.1",
     "cron": "^1.8.2",
