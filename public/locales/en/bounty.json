@@ -25,7 +25,12 @@
     "development": "Development",
     "finalized": "Finished",
     "validation": "validation & disputes",
-    "closed": "closed & distributed"
+    "closed": "closed & distributed",
+    "details": "details",
+    "bounty": "bounty",
+    "funding": "funding request",
+    "additional-details": "additional details", 
+    "review": "review"
   },
   "status": {
     "ready": "ready",
@@ -59,6 +64,40 @@
     "no-workers": "No one is working",
     "no-bounties": "No bounties",
     "no-bounties-in-draft": "No bounties in draft",
-    "no-bounties-to-merge": "No bounties ready to merge"
-  }
+    "no-bounties-to-merge": "No bounties ready to merge",
+    "creating-bounty": "Error creating bounty",
+    "sync": "The bounty was created, but something went wrong while reading the blockchain, please go to the home page while we try to get your bounty"
+  },
+  "title": "Create new Bounty",
+  "fields": {
+    "title": {
+      "label": "Bounty title",
+      "placeholder": "Your bounty title",
+      "tip": "Tip: Try to be as descriptive as possible"
+    },
+    "description": {
+      "label": "Description",
+      "placeholder": "Type a description..."
+    },
+    "select-token": {
+      "bounty": "Set Bounty Token",
+      "reward": "Set Reward Token"
+    },
+    "amount": {
+      "label": "Set {{token}} value",
+      "info": "{{amount}} {{token}} Available",
+      "max": "Max"
+    },
+    "conversion-token": {
+      "invalid": "Could not convert this token"
+    }
+  },
+  "reward-funders": "Reward Funders",
+  "review": {
+    "repository": "Repository",
+    "branch": "Branch"
+  },
+  "create-bounty": "Create Bounty",
+  "next-step": "Next Step",
+  "bounty-created": "Bounty created"
 }

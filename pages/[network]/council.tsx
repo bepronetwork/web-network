@@ -73,7 +73,7 @@ export default function PageCouncil() {
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common", "bounty", "council"]))
+      ...(await serverSideTranslations(locale, ["common", "bounty", "council", "connect-wallet-button"]))
     }
   };
 };

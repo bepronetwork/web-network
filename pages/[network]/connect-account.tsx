@@ -288,7 +288,7 @@ export default function ConnectAccount() {
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common", "connect-account"]))
+      ...(await serverSideTranslations(locale, ["common", "bounty", "connect-wallet-button", "connect-account"]))
     }
   };
 };

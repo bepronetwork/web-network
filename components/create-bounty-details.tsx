@@ -13,7 +13,7 @@ export default function CreateBountyDetails({
   files,
   review = false,
 }) {
-  const { t } = useTranslation("create-bounty");
+  const { t } = useTranslation("bounty");
 
   return (
     <div className="container">

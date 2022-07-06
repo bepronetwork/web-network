@@ -146,19 +146,18 @@ export default function MainNav() {
 
         <div className="d-flex flex-row align-items-center gap-20">
           {(!isNetworksPage && (
-            <Button
-            transparent
-            onClick={() => {wallet?.address ? setShowCreateBounty(true) : setVerifyAddressAfterClick(true) }}
-            >
-            <InternalLink
-                href="javascript:void(0)"
-                icon={<PlusIcon />}
-                label={<Translation label={"main-nav.new-bounty"} />}
-                iconBefore
-                uppercase
-                outline
-              />
-            </Button>
+            <div
+            className="btn btn-outline-primary text-white bg-opacity-100  text-uppercase
+          text-decoration-none shadow-none d-flex align-items-center justify-content-center"
+            onClick={() => {
+              wallet?.address
+                ? setShowCreateBounty(true)
+                : setVerifyAddressAfterClick(true);
+            }}
+          >  
+          <PlusIcon className="me-2" style={{ width:"14", height:"14"}} />
+          <Translation label={"main-nav.new-bounty"} />
+          </div>
           )) || (
             <InternalLink
               href={myNetwork.href}

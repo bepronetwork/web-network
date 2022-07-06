@@ -12,7 +12,7 @@ export default function Home() {
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common", "bounty", "create-bounty" ,"connect-wallet-button"]))
+      ...(await serverSideTranslations(locale, ["common", "bounty", "connect-wallet-button"]))
     }
   };
 };

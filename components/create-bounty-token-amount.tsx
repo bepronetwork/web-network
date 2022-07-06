@@ -25,7 +25,7 @@ export default function CreateBountyTokenAmount({
   review = false,
   activeBounty
 }) {
-  const { t } = useTranslation("create-bounty");
+  const { t } = useTranslation("bounty");
 
   function getCurrentCoin() {
     return customTokens?.find(token => token?.address === currentToken)
