@@ -11,7 +11,6 @@ import { useDAO } from "contexts/dao";
 
 import { Token } from "interfaces/token";
 
-
 interface TokensDropdownProps {
   defaultToken?: Token;
   tokens: Token[];
@@ -38,8 +37,8 @@ export default function TokensDropdown({
   label = undefined,
   description = undefined,
   userAddress,
-  disabled = false
-} : TokensDropdownProps) {
+  disabled = false,
+}: TokensDropdownProps) {
   const [options, setOptions] = useState<Option[]>();
   const [option, setOption] = useState<Option>();
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -78,15 +77,17 @@ export default function TokensDropdown({
         const value = await DAOService.getTokenBalance(token.address,
                                                        userAddress);
 
-        return {...token, currentValue: value };
+        return { ...token, currentValue: value };
       }
-    })).then((values) => {
-      if(values[0]) setOptions(values.map((token) => tokenToOption(token)))
-    }).catch(err => console.log('err token', err))
+    }))
+      .then((values) => {
+        if (values[0]) setOptions(values.map((token) => tokenToOption(token)));
+      })
+      .catch((err) => console.log("err token", err));
   }
 
   useEffect(() => {
-    if(tokens) getBalanceTokens();
+    if (tokens) getBalanceTokens();
   }, [tokens]);
 
   function SelectOptionComponent({ innerProps, innerRef, data }) {
@@ -97,26 +98,41 @@ export default function TokensDropdown({
         ref={innerRef}
         {...innerProps}
         className={`proposal__select-options d-flex align-items-center text-center p-small p-1 my-1
-        ${address === option?.value?.address && 'bg-black rounded'}
+        ${address === option?.value?.address && "bg-black rounded"}
         `}
       >
-        {data?.__isNew__ ? <span className="mx-2">{formatCreateLabel(data?.value)}</span>: 
-        <>
-          {tokenInfo?.icon && <img src={tokenInfo.icon} width={14} height={14} className='mx-2'/>}
-          <span className={`${tokenInfo ? null :'mx-2'}`}>{tokenInfo ?  tokenInfo.name : name}</span>        
-          <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">
-            {currentValue} {tokenInfo?.symbol ? tokenInfo?.symbol : symbol} 
-            {address === option?.value?.address && <DoneIcon className="ms-1 text-primary" width={14} height={14} />}
-          </div>
-        </>
-        }
-
+        {data?.__isNew__ ? (
+          <span className="mx-2">{formatCreateLabel(data?.value)}</span>
+        ) : (
+          <>
+            {tokenInfo?.icon && (
+              <img
+                src={tokenInfo.icon}
+                width={14}
+                height={14}
+                className="mx-2"
+              />
+            )}
+            <span className={`${tokenInfo ? null : "mx-2"}`}>
+              {tokenInfo ? tokenInfo.name : name}
+            </span>
+            <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">
+              {currentValue} {tokenInfo?.symbol ? tokenInfo?.symbol : symbol}
+              {address === option?.value?.address && (
+                <DoneIcon
+                  className="ms-1 text-primary"
+                  width={14}
+                  height={14}
+                />
+              )}
+            </div>
+          </>
+        )}
       </div>
     );
   }
 
   function SelectValueComponent(props) {
-    console.log("props -> ", props?.selectProps?.inputValue);
     const { name, tokenInfo } = props.getValue()[0].value;
     return (
       <div
@@ -126,14 +142,7 @@ export default function TokensDropdown({
         {props.children[0] !== null ? (
           <>
             {props.children[1]}
-            {tokenInfo?.icon && (
-              <img
-                src={tokenInfo.icon}
-                width={14}
-                height={14}
-                className="mx-2"
-              />
-            )}
+            {tokenInfo?.icon && ( <img src={tokenInfo.icon} width={14} height={14} className="mx-2" /> )}
             <span className={`${tokenInfo ? "mt-1" : "mx-2"}`}>
               {tokenInfo ? tokenInfo.name : name}
             </span>
@@ -159,7 +168,7 @@ export default function TokensDropdown({
         value={option}
         components={{
           Option: SelectOptionComponent,
-          ValueContainer: SelectValueComponent
+          ValueContainer: SelectValueComponent,
         }}
         isDisabled={disabled}
       />
