@@ -14,7 +14,6 @@ import ConnectWalletButton from "components/connect-wallet-button";
 import HelpModal from "components/help-modal";
 import InternalLink from "components/internal-link";
 import NavAvatar from "components/nav-avatar";
-import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import TransactionsStateIndicator from "components/transactions-state-indicator";
 import Translation from "components/translation";
 import WrongNetworkModal from "components/wrong-network-modal";
