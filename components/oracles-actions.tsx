@@ -217,7 +217,6 @@ function OraclesActions() {
             actions={actions}
             onChange={setAction}
             currentAction={action}
-            available={getMaxAmmount()}
           />
 
           <p className="caption-small text-white text-uppercase mt-2 mb-3">
