@@ -91,7 +91,6 @@ export default function CreatePullRequestModal({
             const [owner , name] = pr.branch.split(':');
 
             return name === branch && repository.owner === owner 
-           
           });
 
           const isSameBranch = activeIssue.repository.githubPath.split('/')[0] && activeIssue.branch === branch;
