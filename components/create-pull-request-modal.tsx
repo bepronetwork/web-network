@@ -85,11 +85,14 @@ export default function CreatePullRequestModal({
     .then(reposWithBranches => reposWithBranches
       .map(({ repository, branches }) => branches
         .map(branch => { 
-          const isDisabled =  !!activeIssue.pullRequests.find(pr=> pr.branch.split(':')[1] === branch)
+          const isDisabled =  !!activeIssue.pullRequests
+          .find(pr=> pr.branch.split(':')[1] === branch && pr?.userRepo === repository?.nameWithOwner);
+
           const postIcon = <Badge 
             color={repository.isOrganization ? "white-10" : "primary-30"}
             label={repository.isOrganization ? t("misc.organization") : t("misc.fork")}
           />
+
           const disabledIcon = <Badge 
           color={"danger"}
           label={`${t("pull-request:abbreviation")} ${t("pull-request:opened")}`}
