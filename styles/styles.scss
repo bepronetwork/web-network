@@ -636,6 +636,16 @@ label {
   border-radius: 20px;
 }
 
+.circle-5 {
+  width: 108px;
+  height: 108px;
+  border-radius: 54px;
+}
+
+.font-weight-normal {
+  font-weight: normal !important;
+}
+
 .border-avatar {
   border: solid;
   border-width: 2px;
@@ -1515,5 +1525,12 @@ input[type="color"] {
     svg {
       color: var(--bs-danger) !important;
     }
+  }
+}
+
+.profile {
+  &-side {
+    height: 90vh;
+    border-right: 1px solid $ligth-gray;
   }
 }

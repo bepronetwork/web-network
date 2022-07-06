@@ -12,8 +12,8 @@ import { ReposProvider } from "contexts/repos";
 const RootProviders: React.FC = ({ children }) => {
   return (
     <DAOContextProvider>
-      <AuthenticationProvider>
-        <NetworkProvider>
+      <NetworkProvider>
+        <AuthenticationProvider>
           <NetworkSettingsProvider>
             <ApplicationContextProvider>
               <ReposProvider>
@@ -21,8 +21,8 @@ const RootProviders: React.FC = ({ children }) => {
               </ReposProvider>
             </ApplicationContextProvider>
           </NetworkSettingsProvider>
-        </NetworkProvider>
-      </AuthenticationProvider>
+        </AuthenticationProvider>
+      </NetworkProvider>
     </DAOContextProvider>
   );
 };

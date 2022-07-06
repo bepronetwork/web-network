@@ -32,9 +32,9 @@ function App({
           <RootProviders>
             <NationDialog>
               <MainNav />
-              <div className="pb-5">
-                <Component {...pageProps} />
-              </div>
+
+              <Component {...pageProps} />
+              
               <StatusBar />
             </NationDialog>
           </RootProviders>
