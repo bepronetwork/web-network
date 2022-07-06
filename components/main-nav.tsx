@@ -1,36 +1,39 @@
-import { useState } from "react";
+import { ReactElement, ReactNode, useEffect, useState } from "react";
 
+import { Defaults } from "@taikai/dappkit";
 import getConfig from "next/config";
 import { useRouter } from "next/router";
 
 import BeproLogoBlue from "assets/icons/bepro-logo-blue";
-import BeproSmallLogo from "assets/icons/bepro-small-logo";
 import HelpIcon from "assets/icons/help-icon";
-import NotificationIcon from "assets/icons/notification-icon";
 import PlusIcon from "assets/icons/plus-icon";
 
-import BalanceAddressAvatar from "components/balance-address-avatar";
 import Button from "components/button";
 import ClosedNetworkAlert from "components/closed-network-alert";
 import ConnectWalletButton from "components/connect-wallet-button";
 import HelpModal from "components/help-modal";
 import InternalLink from "components/internal-link";
-import NetworkIdentifier from "components/network-identifier";
+import NavAvatar from "components/nav-avatar";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import TransactionsStateIndicator from "components/transactions-state-indicator";
 import Translation from "components/translation";
 import WrongNetworkModal from "components/wrong-network-modal";
 
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 
-import { formatNumberToNScale } from "helpers/formatNumber";
-import { truncateAddress } from "helpers/truncate-address";
-
+import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
 
 import CreateBountyModal from "./create-bounty-modal";
 
 const { publicRuntimeConfig } = getConfig();
+
+interface MyNetworkLink {
+  href: string;
+  label: string | ReactElement;
+  icon?: ReactNode;
+}
 
 export default function MainNav() {
   const { pathname } = useRouter();
@@ -38,15 +41,41 @@ export default function MainNav() {
   const [showHelp, setShowHelp] = useState(false);
   const [showCreateBounty, setShowCreateBounty] = useState(false);
   const [verifyAddressAfterClick, setVerifyAddressAfterClick] = useState(false);
+  const [myNetwork, setMyNetwork] = useState<MyNetworkLink>({ 
+    label: <Translation label={"main-nav.new-network"} />, 
+    href: "/new-network", 
+    icon: <PlusIcon /> 
+  });
+
   const { wallet } = useAuthentication();
+  const { service: DAOService } = useDAO();
+  const { searchNetworks } = useApi();
   const { network, getURLWithNetwork } = useNetwork();
 
   const isNetworksPage = ["/networks", "/new-network"].includes(pathname);
   const isBeproNetwork = network?.name === publicRuntimeConfig?.networkConfig?.networkName;
 
+  useEffect(() => {
+    if (!DAOService || !wallet?.address) return;
+
+    DAOService.getNetworkAdressByCreator(wallet.address)
+      .then(async networkAddress => {
+        if (networkAddress === Defaults.nativeZeroAddress) return;
+
+        const network = await searchNetworks({ networkAddress }).then(({ rows }) => rows[0]);
+
+        setMyNetwork({ 
+          label: <Translation label={"main-nav.my-network"} />, 
+          href: `/${network?.name?.toLowerCase()}`
+        });
+      })
+      .catch(console.log);
+  }, [DAOService, wallet?.address]);
+
   return (
     <div
-      className={`main-nav d-flex flex-column bg-${isBeproNetwork || isNetworksPage ? "dark" : "primary"}`}
+      className={`main-nav d-flex flex-column justify-content-center
+         bg-${isBeproNetwork || isNetworksPage ? "dark" : "primary"}`}
     >
       {network?.isClosed && <ClosedNetworkAlert />}
 
@@ -106,7 +135,7 @@ export default function MainNav() {
               <li>
                 <InternalLink
                   href={"/networks"}
-                  label={"Networks"}
+                  label={<Translation label={"main-nav.networks"} />}
                   nav
                   uppercase
                 />
@@ -133,12 +162,12 @@ export default function MainNav() {
             </Button>
           )) || (
             <InternalLink
-              href="/new-network"
-              icon={<PlusIcon />}
-              label={"New Network"}
+              href={myNetwork.href}
+              icon={myNetwork.icon}
+              label={myNetwork.label}
               iconBefore
-              nav
               uppercase
+              outline
             />
           )}
 
@@ -151,43 +180,22 @@ export default function MainNav() {
             <HelpIcon />
           </Button>
 
-          <Button
-            className="opacity-75 opacity-100-hover"
-            transparent
-            rounded
-          >
-            <NotificationIcon />
-          </Button>
-
           <WrongNetworkModal requiredNetworkId={publicRuntimeConfig?.metaMask?.chainId} />
 
           <ConnectWalletButton>
-            <div className="d-flex account-info align-items-center">
+            <>
+              {/* <Button
+                className="opacity-75 opacity-100-hover"
+                transparent
+                rounded
+              >
+                <NotificationIcon />
+              </Button> */}
+
               <TransactionsStateIndicator />
 
-              <NetworkIdentifier />
-
-              <InternalLink
-                href={getURLWithNetwork("/account")}
-                icon={<BeproSmallLogo />}
-                label={formatNumberToNScale(wallet?.balance?.bepro || 0)}
-                className="mx-3"
-                transparent
-                nav
-              />
-
-              <InternalLink
-                href={getURLWithNetwork("/account")}
-                icon={
-                  <BalanceAddressAvatar
-                    address={truncateAddress(wallet?.address || "", 4)}
-                    balance={wallet?.balance?.eth}
-                    currency={publicRuntimeConfig?.metaMask?.tokenName}
-                  />
-                }
-                className="meta-info d-flex align-items-center"
-              />
-            </div>
+              <NavAvatar />
+            </>
           </ConnectWalletButton>
         </div>
         <HelpModal show={showHelp} onCloseClick={() => setShowHelp(false)} />
