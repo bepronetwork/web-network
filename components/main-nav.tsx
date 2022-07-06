@@ -28,13 +28,16 @@ import { truncateAddress } from "helpers/truncate-address";
 
 import useNetwork from "x-hooks/use-network";
 
+import CreateBountyModal from "./create-bounty-modal";
+
 const { publicRuntimeConfig } = getConfig();
 
 export default function MainNav() {
   const { pathname } = useRouter();
 
   const [showHelp, setShowHelp] = useState(false);
-
+  const [showCreateBounty, setShowCreateBounty] = useState(false);
+  const [verifyAddressAfterClick, setVerifyAddressAfterClick] = useState(false);
   const { wallet } = useAuthentication();
   const { network, getURLWithNetwork } = useNetwork();
 
@@ -115,17 +118,19 @@ export default function MainNav() {
 
         <div className="d-flex flex-row align-items-center gap-20">
           {(!isNetworksPage && (
-            <ReadOnlyButtonWrapper>
-              <InternalLink
-                href={getURLWithNetwork("/create-bounty")}
+            <Button
+            transparent
+            onClick={() => {wallet?.address ? setShowCreateBounty(true) : setVerifyAddressAfterClick(true) }}
+            >
+            <InternalLink
+                href="javascript:void(0)"
                 icon={<PlusIcon />}
                 label={<Translation label={"main-nav.new-bounty"} />}
-                className="read-only-button"
                 iconBefore
                 uppercase
                 outline
               />
-            </ReadOnlyButtonWrapper>
+            </Button>
           )) || (
             <InternalLink
               href="/new-network"
@@ -185,8 +190,11 @@ export default function MainNav() {
             </div>
           </ConnectWalletButton>
         </div>
-
         <HelpModal show={showHelp} onCloseClick={() => setShowHelp(false)} />
+        {showCreateBounty && wallet?.address && (
+          <CreateBountyModal show={showCreateBounty} setShow={setShowCreateBounty}/>
+        )}  
+         {verifyAddressAfterClick && <ConnectWalletButton asModal={verifyAddressAfterClick} />}
       </div>
     </div>
   );

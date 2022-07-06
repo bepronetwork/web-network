@@ -25,7 +25,7 @@ export default function CreateBountyTokenAmount({
   review = false,
   activeBounty
 }) {
-  const { t } = useTranslation(["create-bounty"]);
+  const { t } = useTranslation("create-bounty");
 
   function getCurrentCoin() {
     return customTokens?.find(token => token?.address === currentToken)
@@ -36,7 +36,7 @@ export default function CreateBountyTokenAmount({
     if(!activeBounty) return;
     return (
       <>
-      {t("create-bounty:fields.amount.info", {
+      {t("fields.amount.info", {
         token: currentToken?.symbol,
         amount: formatNumberToCurrency(tokenBalance, {
           maximumFractionDigits: 18,
@@ -50,7 +50,7 @@ export default function CreateBountyTokenAmount({
             })
           }
         >
-          {t("create-bounty:fields.amount.max")}
+          {t("fields.amount.max")}
         </span>
     </>
     )
@@ -76,7 +76,7 @@ export default function CreateBountyTokenAmount({
             thousandSeparator
             disabled={review}
             max={tokenBalance}
-            label={t("create-bounty:fields.amount.label", {
+            label={t("fields.amount.label", {
               token: currentToken?.symbol,
             })}
             symbol={currentToken?.symbol}
@@ -89,7 +89,6 @@ export default function CreateBountyTokenAmount({
           <div className="mt-4 pt-1 mx-2">
             <ArrowRight className="text-gray" width={9} height={9} />
           </div>
-          {console.log('customTokens',customTokens )}
           <InputNumber
             thousandSeparator
             label={" "}
@@ -97,14 +96,15 @@ export default function CreateBountyTokenAmount({
             symbol={"EUR"}
             classSymbol="text-white-30 mt-3"
             disabled={true}
-            value={handleTokenToEurConversion(Number(issueAmount.value),
-                                              getCurrentCoin()?.tokenInfo?.prices["eur"])}
+            value={getCurrentCoin()?.tokenInfo ? 
+              handleTokenToEurConversion(Number(issueAmount.value),
+                                         getCurrentCoin()?.tokenInfo?.prices["eur"]): '-'}
             placeholder="-"
             helperText={
               <>
                 {!getCurrentCoin()?.tokenInfo && !review && (
                   <p className="p-small text-danger">
-                    Could not convert this token
+                   {t("fields.conversion-token.invalid")}
                   </p>
                 )}
               </>

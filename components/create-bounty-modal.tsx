@@ -11,8 +11,6 @@ import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
 import router from "next/router";
 
-import PlusIcon from "assets/icons/plus-icon";
-
 import Button from "components/button";
 import Modal from "components/modal";
 
@@ -26,7 +24,7 @@ import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { BEPRO_TOKEN, Token, TokenInfo } from "interfaces/token";
+import { BEPRO_TOKEN, Token } from "interfaces/token";
 import { BlockTransaction } from "interfaces/transaction";
 
 import { getCoinInfoByContract } from "services/coingecko";
@@ -46,7 +44,6 @@ import { IFilesProps } from "./drag-and-drop";
 import GithubInfo from "./github-info";
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 import ReposDropdown from "./repos-dropdown";
-import Translation from "./translation";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -69,7 +66,13 @@ interface Amount {
   floatValue?: number;
 }
 
-export default function CreateBountyModal() {
+export default function CreateBountyModal({
+  show,
+  setShow,
+}: {
+  show: boolean;
+  setShow: Dispatch<SetStateAction<boolean>>;
+}) {
   const { t } = useTranslation(["common", "create-bounty"]);
 
   const { activeNetwork } = useNetwork();
@@ -81,7 +84,6 @@ export default function CreateBountyModal() {
     dispatch,
     state: { myTransactions },
   } = useContext(ApplicationContext);
-  const [show, setShow] = useState<boolean>(false);
   const [bountyTitle, setBountyTitle] = useState<string>("");
   const [bountyDescription, setBountyDescription] = useState<string>("");
   const [currentSection, setCurrentSection] = useState<number>(0);
@@ -110,22 +112,22 @@ export default function CreateBountyModal() {
   const [tokenAllowance, setTokenAllowance] = useState<number>();
   const [rewardChecked, setRewardChecked] = useState<boolean>(false);
   const [files, setFiles] = useState<IFilesProps[]>([]);
-  
+
   const defaultToken = activeNetwork?.networkToken || BEPRO_TOKEN;
   const canAddCustomToken =
     activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address
       ? publicRuntimeConfig?.networkConfig?.allowCustomTokens
       : !!activeNetwork?.allowCustomTokens;
 
-  const steps = ["details", "bounty", "additional details", "Review "];
+  const steps = [t("create-bounty:steps.details"),
+                 t("create-bounty:steps.bounty"), 
+                 t("create-bounty:steps.additional-details"), 
+                 t("create-bounty:steps.review")];
+
   const isFieldsDisabled = !user;
 
-  function verifyAmountBiggerThanBalance(): boolean {
-    return !(issueAmount.floatValue > tokenBalance);
-  }
-
   function handleIssueAmountBlurChange() {
-    if (issueAmount.floatValue > tokenBalance) {
+    if (activeBounty && issueAmount.floatValue > tokenBalance) {
       setIssueAmount({ formattedValue: tokenBalance.toString() });
     }
   }
@@ -167,7 +169,6 @@ export default function CreateBountyModal() {
     setRewardChecked(e.target.checked);
   }
 
-
   function renderDetails(review = false) {
     return (
       <CreateBountyDetails
@@ -200,7 +201,7 @@ export default function CreateBountyModal() {
         handleAmountBlurChange={handleIssueAmountBlurChange}
         tokenBalance={tokenBalance}
         activeBounty={activeBounty}
-        labelSelect="set Bounty Token"
+        labelSelect={t("create-bounty:fields.select-token.bounty")}
         review={review}
       />
     );
@@ -223,8 +224,8 @@ export default function CreateBountyModal() {
         }
         handleAmountBlurChange={handleRewardAmountBlurChange}
         tokenBalance={rewardBalance}
-        activeBounty={activeBounty}
-        labelSelect="set Reward Token"
+        activeBounty={true}
+        labelSelect={t("create-bounty:fields.select-token.reward")}
         review={review}
       />
     );
@@ -250,7 +251,7 @@ export default function CreateBountyModal() {
                   setRewardAmount({ formattedValue: "" });
                 }}
               >
-                <span className="">Bounty</span>
+                <span>{t("create-bounty:steps.bounty")}</span>
               </Button>
             </div>
             <div className="col-md-6">
@@ -261,7 +262,7 @@ export default function CreateBountyModal() {
                 }`}
                 onClick={() => setActiveBounty(false)}
               >
-                <span className="">Funding Request</span>
+                <span >{t("create-bounty:steps.funding")}</span>
               </Button>
             </div>
             {renderBountyToken()}
@@ -270,15 +271,13 @@ export default function CreateBountyModal() {
                 <div className="col-md-12">
                   <FormCheck
                     className="form-control-md pb-0"
-                    type="checkbox"
-                    label="Reward Funders"
+                    type="checkbox" 
+                    label={t("create-bounty:reward-funders")}
                     onChange={handleRewardChecked}
                     checked={rewardChecked}
                   />
                 </div>
-                {rewardChecked && (
-                 renderRewardToken()
-                )}
+                {rewardChecked && renderRewardToken()}
               </>
             )}
           </div>
@@ -300,7 +299,7 @@ export default function CreateBountyModal() {
                   value: repository,
                 }}
                 disabled={isFieldsDisabled}
-               />
+              />
             </div>
             <div className="col-md-6">
               <BranchsDropdown
@@ -324,28 +323,28 @@ export default function CreateBountyModal() {
           {renderBountyToken(true)}
           {rewardChecked && renderRewardToken(true)}
           <div className="container">
-          <div className="row">
-            <div className="col-md-6">
-              <label className="caption-small mb-2">Repository</label>
-              <GithubInfo
-                parent="list"
-                variant="repository"
-                label={repository?.path}
-                simpleDisabled={true}
-              />
-            </div>
-            <div className="col-md-6">
-              <label className="caption-small mb-2 ms-3">Branch</label>
-              <div className="ms-3">
+            <div className="row">
+              <div className="col-md-6">
+                <label className="caption-small mb-2">{t("create-bounty:review.repository")}</label>
                 <GithubInfo
                   parent="list"
                   variant="repository"
-                  label={branch}
+                  label={repository?.path}
                   simpleDisabled={true}
                 />
               </div>
+              <div className="col-md-6">
+                <label className="caption-small mb-2 ms-3">{t("create-bounty:review.branch")}</label>
+                <div className="ms-3">
+                  <GithubInfo
+                    parent="list"
+                    variant="repository"
+                    label={branch}
+                    simpleDisabled={true}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
           </div>
         </>
       );
@@ -353,12 +352,14 @@ export default function CreateBountyModal() {
   }
 
   async function addToken(newToken: Token) {
-    await getCoinInfoByContract(newToken?.address).then(tokenInfo => {
-      setCustomTokens([...customTokens, {...newToken, tokenInfo}])
-    }).catch(err => {
-      console.error('coinErro', err)
-      setCustomTokens([...customTokens, newToken]);
-    })
+    await getCoinInfoByContract(newToken?.address)
+      .then((tokenInfo) => {
+        setCustomTokens([...customTokens, { ...newToken, tokenInfo }]);
+      })
+      .catch((err) => {
+        console.error("coinErro", err);
+        setCustomTokens([...customTokens, newToken]);
+      });
   }
 
   function handleNextStepAndCreate() {
@@ -369,6 +370,7 @@ export default function CreateBountyModal() {
     }
   }
 
+//TODO: add some function
   function verifyNextStepAndCreate() {
     const isIssueAmount =
       issueAmount.floatValue <= 0 || issueAmount.floatValue === undefined
@@ -436,7 +438,7 @@ export default function CreateBountyModal() {
     setRepository(undefined);
     setBranch("");
     setCurrentSection(0);
-    setFiles([])
+    setFiles([]);
   }
 
   useEffect(() => {
@@ -450,23 +452,25 @@ export default function CreateBountyModal() {
       tmpTokens.push(activeNetwork.networkToken);
 
     tmpTokens.push(...activeNetwork.tokens.map(({ name, symbol, address }) => ({ name, symbol, address } as Token)));
-    
-    getTokenInfo(tmpTokens)
+
+    getTokenInfo(tmpTokens);
   }, [activeNetwork?.networkToken]);
 
   async function getTokenInfo(tmpTokens: Token[]) {
     await Promise.all(tmpTokens.map(async (token) => {
       if (token?.address) {
-        const Info = await getCoinInfoByContract(token.address).then((tokenInfo) => tokenInfo)
-        return {...token, tokenInfo: Info };
-      }else {
-        return token
+        const Info = await getCoinInfoByContract(token.address).then((tokenInfo) => tokenInfo);
+        return { ...token, tokenInfo: Info };
+      } else {
+        return token;
       }
-    })).then((tokens) => {
-      setCustomTokens(tokens)
-    }).catch(() => {
-      setCustomTokens(tmpTokens)
-    })
+    }))
+      .then((tokens) => {
+        setCustomTokens(tokens);
+      })
+      .catch(() => {
+        setCustomTokens(tmpTokens);
+      });
   }
 
   useEffect(() => {
@@ -613,21 +617,10 @@ export default function CreateBountyModal() {
   }
 
   return (
-    <>
-      <Button
-        className="btn btn-outline-primary"
-        textClass="text-uppercase text-white"
-        onClick={() => setShow(true)}
-      >
-        <PlusIcon />
-        <span>
-          <Translation label={"main-nav.new-bounty"} />
-        </span>
-      </Button>
-
+    <> 
       <Modal
         show={show}
-        title={"Create Bounty"}
+        title={t("create-bounty:title")}
         titlePosition="center"
         onCloseClick={() => {
           cleanFields();
@@ -639,7 +632,7 @@ export default function CreateBountyModal() {
             <div className="d-flex flex-grow-1">
               <Button color="dark-gray" onClick={handleCancelAndBack}>
                 <span>
-                  {currentSection === 0 ? t("common:actions.cancel") : "back"}
+                  {currentSection === 0 ? t("common:actions.cancel") : t("common:actions.back")}
                 </span>
               </Button>
             </div>
@@ -661,7 +654,7 @@ export default function CreateBountyModal() {
               disabled={verifyNextStepAndCreate()}
             >
               <span>
-                {currentSection !== 3 ? "Next Step" : t(" :create-bounty")}
+                {currentSection !== 3 ? t("create-bounty:next-step") : t("create-bounty:create-bounty")}
               </span>
             </Button>
           </>

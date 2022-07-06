@@ -88,7 +88,7 @@ export default function PageDevelopers() {
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common", "bounty"]))
+      ...(await serverSideTranslations(locale, ["common", "bounty", "create-bounty","connect-wallet-button"]))
     }
   };
 };
