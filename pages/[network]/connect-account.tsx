@@ -43,9 +43,9 @@ export default function ConnectAccount() {
 
   const { getUserOf, joinAddressToUser, getUserWith } = useApi();
 
-  const { wallet, user, login } = useAuthentication();
+  const { wallet, user, connectWallet, connectGithub } = useAuthentication();
   const { service: DAOService } = useDAO();
-  const { network, getURLWithNetwork } = useNetwork();
+  const { getURLWithNetwork } = useNetwork();
   const { dispatch } = useContext(ApplicationContext);
 
   const { migrate } = router.query;
@@ -123,7 +123,7 @@ export default function ConnectAccount() {
     return signOut({ redirect: false }).then(() => router.push("/"));
   }
 
-  async function connectWallet() {
+  async function loginWallet() {
     if (wallet?.address || !DAOService) return;
 
     try {
@@ -134,19 +134,15 @@ export default function ConnectAccount() {
         dispatch(changeNetwork((publicRuntimeConfig?.networkIds[+chainId] || "unknown")?.toLowerCase()));
         return;
       } else
-        await login();
+        await connectWallet();
     } catch (e) {
       console.error("Failed to login on DAOService", e);
     }
   }
 
-  function connectGithub() {
+  function loginGithub() {
     localStorage.setItem("lastAddressBeforeConnect", wallet?.address);
-    return signIn("github", {
-      callbackUrl: `${window.location.protocol}//${
-        window.location.host
-      }/${network.name.toLowerCase()}/connect-account`
-    });
+    return connectGithub();
   }
 
   function renderMetamaskLogo() {
@@ -185,7 +181,7 @@ export default function ConnectAccount() {
                         ? "dark border-dark"
                         : "black border-black border-primary-hover cursor-pointer"
                     } d-flex justify-content-between p-3 align-items-center`}
-                    onClick={connectGithub}
+                    onClick={loginGithub}
                   >
                     {!user?.login && (
                       <div className="mx-auto d-flex align-items-center">
@@ -216,7 +212,7 @@ export default function ConnectAccount() {
                         ? "dark border-dark"
                         : "black border-black border-primary-hover cursor-pointer"
                     } d-flex justify-content-between p-3 align-items-center ${getValidClass()}`}
-                    onClick={connectWallet}
+                    onClick={loginWallet}
                   >
                     {!wallet?.address && (
                       <div className="mx-auto d-flex align-items-center">
