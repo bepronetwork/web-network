@@ -10,6 +10,7 @@ export const Repositories =
           name
           nameWithOwner
           isFork
+          isInOrganization
           owner {
             login
           }

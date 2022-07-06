@@ -85,22 +85,46 @@ export default function CreatePullRequestModal({
     .then(reposWithBranches => reposWithBranches
       .map(({ repository, branches }) => branches
         .map(branch => { 
-          const isDisabled =  !!activeIssue.pullRequests
-          .find(pr=> pr.branch.split(':')[1] === branch && pr?.userRepo === repository?.nameWithOwner);
+          
+          const isDisabled = !!activeIssue.pullRequests
+          .find(pr => {
+            const [owner , name] = pr.branch.split(':');
 
-          const postIcon = <Badge 
-            color={repository.isOrganization ? "white-10" : "primary-30"}
-            label={repository.isOrganization ? t("misc.organization") : t("misc.fork")}
-          />
+            return name === branch && repository.owner === owner 
+           
+          });
 
-          const disabledIcon = <Badge 
-          color={"danger"}
-          label={`${t("pull-request:abbreviation")} ${t("pull-request:opened")}`}
-        />
+          const isSameBranch = activeIssue.repository.githubPath.split('/')[0] && activeIssue.branch === branch;
+          
+          let postIcon = <></>
+
+          if(repository.isFork){
+            postIcon =  <Badge 
+              color={"primary-30"}
+              label={t("misc.fork")}
+            />
+          }
+
+          if(repository.isInOrganization){
+            postIcon =  <Badge 
+              color={"white-10"}
+              label={t("misc.organization")}
+            />
+          }
+
+          let disabledIcon = <></>
+
+          if(isDisabled){
+            disabledIcon = <Badge 
+              color={"danger"}
+              label={`${t("pull-request:abbreviation")} ${t("pull-request:opened")}`}
+              />
+          }
+
           return {
             value: `${repository.owner}:${branch}`, 
             label: branch,
-            isDisabled,
+            isDisabled: isDisabled || isSameBranch,
             disabledIcon,
             postIcon,
             isSelected: !!selectedBranch && branch === selectedBranch}

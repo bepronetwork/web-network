@@ -166,6 +166,7 @@ export default function useOctokit() {
       nameWithOwner: string;
       isFork: boolean;
       isOrganization: boolean;
+      isInOrganization: boolean;
       owner: string;
     }>(item => {
       return getPropertyRecursively<GraphQlQueryResponseData>("nodes", item?.["user"]?.repositories)
@@ -181,6 +182,7 @@ export default function useOctokit() {
       nameWithOwner: string;
       isFork: boolean;
       isOrganization: boolean;
+      isInOrganization: boolean;
       owner: string;
     }>(item => {
       return item?.["user"]?.organizations?.nodes?.
