@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {Network, Application, ERC20Contract} from 'bepro-js';
+import {Network, Application, ERC20Contract} from 'bepro-js-v1';
 
 const options = {opt: {web3Connection: process.env.NEXT_PUBLIC_WEB3_CONNECTION},}
 

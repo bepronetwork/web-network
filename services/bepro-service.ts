@@ -1,4 +1,4 @@
-import {Application, ERC20Contract, Network} from 'bepro-js';
+import {Application, ERC20Contract, Network} from 'bepro-js-v1';
 import {BlockTransaction, SimpleBlockTransactionPayload} from '@interfaces/transaction';
 import {CONTRACT_ADDRESS, SETTLER_ADDRESS, TRANSACTION_ADDRESS, WEB3_CONNECTION} from '../env';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
