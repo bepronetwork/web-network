@@ -6,6 +6,7 @@ import metamaskLogo from "assets/metamask.png";
 
 import Avatar from "components/avatar";
 import AvatarOrIdenticon from "components/avatar-or-identicon";
+import Badge from "components/badge";
 import GithubImage from "components/github-image";
 import ProfileLayout from "components/profile/profile-layout";
 
@@ -77,7 +78,18 @@ export default function Profile() {
       <div className="row mb-5">
         <div className="col">
           <AvatarOrIdenticon user={user?.login} address={wallet?.address} size="lg" withBorder />
-          <h4 className="mt-3 text-gray text-uppercase">{addressOrUsername}</h4>
+          
+          <div className="d-flex flex-row mt-3 align-items-center">
+            <h4 className="text-gray text-uppercase mr-2">{addressOrUsername}</h4>
+            
+            { wallet?.isCouncil && 
+              <Badge 
+                label="Council" 
+                color="purple-30" 
+                className="caption border border-purple text-purple border-radius-8" 
+              /> 
+            }
+          </div>
         </div>
       </div>
 
