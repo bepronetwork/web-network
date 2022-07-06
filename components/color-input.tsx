@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function ColorInput({ label, code, onChange, error = false }) {
   const [color, setColor] = useState(code);
@@ -18,6 +18,18 @@ export default function ColorInput({ label, code, onChange, error = false }) {
   function handleDivClick() {
     if (colorRef?.current) colorRef.current.click();
   }
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (colorRef.current && !colorRef.current.contains(event.target)) {
+        onChange({ label, code: color });
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [colorRef, color]);
 
   return (
     <div className="d-flex flex-column mb-2">
