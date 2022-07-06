@@ -73,7 +73,7 @@ export default function CreateBountyModal({
   show: boolean;
   setShow: Dispatch<SetStateAction<boolean>>;
 }) {
-  const { t } = useTranslation(["common", "create-bounty"]);
+  const { t } = useTranslation(["common", "bounty"]);
 
   const { activeNetwork } = useNetwork();
   const { getURLWithNetwork } = useNetworkTheme();
@@ -119,10 +119,10 @@ export default function CreateBountyModal({
       ? publicRuntimeConfig?.networkConfig?.allowCustomTokens
       : !!activeNetwork?.allowCustomTokens;
 
-  const steps = [t("create-bounty:steps.details"),
-                 t("create-bounty:steps.bounty"), 
-                 t("create-bounty:steps.additional-details"), 
-                 t("create-bounty:steps.review")];
+  const steps = [t("bounty:steps.details"),
+                 t("bounty:steps.bounty"), 
+                 t("bounty:steps.additional-details"), 
+                 t("bounty:steps.review")];
 
   const isFieldsDisabled = !user;
 
@@ -201,7 +201,7 @@ export default function CreateBountyModal({
         handleAmountBlurChange={handleIssueAmountBlurChange}
         tokenBalance={tokenBalance}
         activeBounty={activeBounty}
-        labelSelect={t("create-bounty:fields.select-token.bounty")}
+        labelSelect={t("bounty:fields.select-token.bounty")}
         review={review}
       />
     );
@@ -225,7 +225,7 @@ export default function CreateBountyModal({
         handleAmountBlurChange={handleRewardAmountBlurChange}
         tokenBalance={rewardBalance}
         activeBounty={true}
-        labelSelect={t("create-bounty:fields.select-token.reward")}
+        labelSelect={t("bounty:fields.select-token.reward")}
         review={review}
       />
     );
@@ -251,7 +251,7 @@ export default function CreateBountyModal({
                   setRewardAmount({ formattedValue: "" });
                 }}
               >
-                <span>{t("create-bounty:steps.bounty")}</span>
+                <span>{t("bounty:steps.bounty")}</span>
               </Button>
             </div>
             <div className="col-md-6">
@@ -262,7 +262,7 @@ export default function CreateBountyModal({
                 }`}
                 onClick={() => setActiveBounty(false)}
               >
-                <span >{t("create-bounty:steps.funding")}</span>
+                <span >{t("bounty:steps.funding")}</span>
               </Button>
             </div>
             {renderBountyToken()}
@@ -272,7 +272,7 @@ export default function CreateBountyModal({
                   <FormCheck
                     className="form-control-md pb-0"
                     type="checkbox" 
-                    label={t("create-bounty:reward-funders")}
+                    label={t("bounty:reward-funders")}
                     onChange={handleRewardChecked}
                     checked={rewardChecked}
                   />
@@ -325,7 +325,7 @@ export default function CreateBountyModal({
           <div className="container">
             <div className="row">
               <div className="col-md-6">
-                <label className="caption-small mb-2">{t("create-bounty:review.repository")}</label>
+                <label className="caption-small mb-2">{t("bounty:review.repository")}</label>
                 <GithubInfo
                   parent="list"
                   variant="repository"
@@ -334,7 +334,7 @@ export default function CreateBountyModal({
                 />
               </div>
               <div className="col-md-6">
-                <label className="caption-small mb-2 ms-3">{t("create-bounty:review.branch")}</label>
+                <label className="caption-small mb-2 ms-3">{t("bounty:review.branch")}</label>
                 <div className="ms-3">
                   <GithubInfo
                     parent="list"
@@ -380,12 +380,13 @@ export default function CreateBountyModal({
       rewardAmount.floatValue <= 0 || rewardAmount.floatValue === undefined
         ? true
         : false;
-    if ((currentSection === 0 && !bountyTitle) || !bountyDescription)
-      return true;
+    if ((currentSection === 0 && !bountyTitle) || !bountyDescription) return true;
     if (currentSection === 1 && activeBounty && isIssueAmount) return true;
-    if (currentSection === 1 && !activeBounty && isRewardAmount) return true;
+    if (currentSection === 1 && !activeBounty && !rewardChecked && isIssueAmount) return true;
+    if (currentSection === 1 && !activeBounty && rewardChecked && isIssueAmount) return true;
+    if (currentSection === 1 && !activeBounty && rewardChecked && isRewardAmount) return true;
     if (currentSection === 2 && !repository && !branch) return true;
-    if (currentSection === 3 && !isTokenApproved) return true;
+    if (currentSection === 3 && isTokenApproved) return true;
 
     return false;
   }
@@ -539,7 +540,7 @@ export default function CreateBountyModal({
                                       activeNetwork?.name)
       .then((cid) => cid)
       .catch(() => {
-        dispatch(toastError(t("create-bounty:errors.creating-bounty")));
+        dispatch(toastError(t("bounty:errors.creating-bounty")));
 
         return false;
       });
@@ -557,13 +558,17 @@ export default function CreateBountyModal({
       githubUser: payload.creatorGithub,
     };
 
+    if (!activeBounty && !rewardChecked) {
+      chainPayload.tokenAmount = 0;
+      chainPayload.fundingAmount = issueAmount.floatValue;
+    }
+
     if (rewardChecked) {
       chainPayload.tokenAmount = 0;
       chainPayload.rewardAmount = rewardAmount.floatValue;
       chainPayload.rewardToken = rewardToken.address;
       chainPayload.fundingAmount = issueAmount.floatValue;
     }
-
     const txInfo = await DAOService.openBounty(chainPayload).catch((e) => {
       cleanFields();
       if (e?.message?.toLowerCase().search("user denied") > -1)
@@ -579,7 +584,7 @@ export default function CreateBountyModal({
 
       console.log("Failed to create bounty on chain", e);
 
-      dispatch(toastError(e.message || t("create-bounty:errors.creating-bounty")));
+      dispatch(toastError(e.message || t("bounty:errors.creating-bounty")));
       return false;
     });
 
@@ -602,7 +607,7 @@ export default function CreateBountyModal({
       });
 
     if (!createdBounties)
-      return dispatch(toastWarning(t("create-bounty:errors.sync")));
+      return dispatch(toastWarning(t("bounty:errors.sync")));
 
     if (createdBounties.includes(cid)) {
       const [repoId, githubId] = String(cid).split("/");
@@ -620,7 +625,7 @@ export default function CreateBountyModal({
     <> 
       <Modal
         show={show}
-        title={t("create-bounty:title")}
+        title={t("bounty:title")}
         titlePosition="center"
         onCloseClick={() => {
           cleanFields();
@@ -654,7 +659,7 @@ export default function CreateBountyModal({
               disabled={verifyNextStepAndCreate()}
             >
               <span>
-                {currentSection !== 3 ? t("create-bounty:next-step") : t("create-bounty:create-bounty")}
+                {currentSection !== 3 ? t("bounty:next-step") : t("bounty:create-bounty")}
               </span>
             </Button>
           </>
