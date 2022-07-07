@@ -85,15 +85,14 @@ export default function CreatePullRequestModal({
     .then(reposWithBranches => reposWithBranches
       .map(({ repository, branches }) => branches
         .map(branch => { 
-          
-          const isDisabled = !!activeIssue.pullRequests
-          .find(pr => {
-            const [owner , name] = pr.branch.split(':');
 
-            return name === branch && repository.owner === owner 
-          });
+          const prExistsInActiveIssue = 
+          activeIssue.pullRequests
+          .some(({branch: b}) => b === `${repository.owner}:${branch}`);
 
-          const isSameBranch = activeIssue.repository.githubPath.split('/')[0] && activeIssue.branch === branch;
+          const isBaseBranch = 
+          (activeIssue.repository.githubPath === repository.nameWithOwner 
+          && activeIssue.branch === branch) ;
           
           let postIcon = <></>
 
@@ -111,19 +110,14 @@ export default function CreatePullRequestModal({
             />
           }
 
-          let disabledIcon = <></>
-
-          if(isDisabled){
-            disabledIcon = <Badge 
-              color={"danger"}
-              label={`${t("pull-request:abbreviation")} ${t("pull-request:opened")}`}
-              />
-          }
+          const disabledIcon = !prExistsInActiveIssue 
+          ? <></> 
+          : <Badge color={"danger"} label={`${t("pull-request:abbreviation")} ${t("pull-request:opened")}`} />;
 
           return {
             value: `${repository.owner}:${branch}`, 
             label: branch,
-            isDisabled: isDisabled || isSameBranch,
+            isDisabled: prExistsInActiveIssue || isBaseBranch,
             disabledIcon,
             postIcon,
             isSelected: !!selectedBranch && branch === selectedBranch}
