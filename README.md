@@ -8,6 +8,7 @@ First time
 ```bash
 docker run -d --name github-db -p 54320:5432 -e POSTGRES_PASSWORD=github -e POSTGRES_DB=github -e POSTGRES_USER=github postgres:13
 ```
+
 After that
 ```bash
 docker start github-db
