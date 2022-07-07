@@ -1,3 +1,5 @@
+import { NumberFormatValues } from "react-number-format";
+
 import { useTranslation } from "next-i18next";
 
 import ArrowRight from "assets/icons/arrow-right";
@@ -20,28 +22,40 @@ export default function CreateBountyTokenAmount({
   tokenBalance,
   issueAmount,
   setIssueAmount,
-  handleAmountOnValueChange,
-  handleAmountBlurChange,
   review = false,
-  activeBounty
+  isFundingType,
 }) {
   const { t } = useTranslation("bounty");
 
   function getCurrentCoin() {
-    return customTokens?.find(token => token?.address === currentToken)
+    return customTokens?.find((token) => token?.address === currentToken);
+  }
+
+  function handleIssueAmountOnValueChange(values: NumberFormatValues) {
+    if (values.floatValue < 0 || values.value === "-") {
+      setIssueAmount({ formattedValue: "" })
+    } else {
+      setIssueAmount(values)
+    }
+  }
+
+  function handleIssueAmountBlurChange() {
+    if (isFundingType  && issueAmount.floatValue > tokenBalance) {
+      setIssueAmount({ formattedValue: tokenBalance.toString() });
+    }
   }
 
   function handleHelperText() {
-    if(review) return;
-    if(!activeBounty) return;
+    if (review) return;
+    if (!isFundingType) return;
     return (
       <>
-      {t("fields.amount.info", {
-        token: currentToken?.symbol,
-        amount: formatNumberToCurrency(tokenBalance, {
-          maximumFractionDigits: 18,
-        }),
-      })}     
+        {t("fields.amount.info", {
+          token: currentToken?.symbol,
+          amount: formatNumberToCurrency(tokenBalance, {
+            maximumFractionDigits: 18,
+          }),
+        })}
         <span
           className="caption-small text-primary ml-1 cursor-pointer text-uppercase"
           onClick={() =>
@@ -52,8 +66,8 @@ export default function CreateBountyTokenAmount({
         >
           {t("fields.amount.max")}
         </span>
-    </>
-    )
+      </>
+    );
   }
 
   return (
@@ -63,7 +77,7 @@ export default function CreateBountyTokenAmount({
           label={labelSelect}
           tokens={customTokens}
           userAddress={userAddress}
-          defaultToken={defaultToken} 
+          defaultToken={defaultToken}
           canAddToken={canAddCustomToken}
           addToken={addToken}
           setToken={setCurrentToken}
@@ -82,8 +96,8 @@ export default function CreateBountyTokenAmount({
             symbol={currentToken?.symbol}
             value={issueAmount.formattedValue}
             placeholder="0"
-            onValueChange={handleAmountOnValueChange}
-            onBlur={handleAmountBlurChange}
+            onValueChange={handleIssueAmountOnValueChange}
+            onBlur={handleIssueAmountBlurChange}
             helperText={handleHelperText()}
           />
           <div className="mt-4 pt-1 mx-2">
@@ -96,15 +110,18 @@ export default function CreateBountyTokenAmount({
             symbol={"EUR"}
             classSymbol="text-white-30 mt-3"
             disabled={true}
-            value={getCurrentCoin()?.tokenInfo ? 
-              handleTokenToEurConversion(Number(issueAmount.value),
-                                         getCurrentCoin()?.tokenInfo?.prices["eur"]): '-'}
+            value={
+              getCurrentCoin()?.tokenInfo
+                ? handleTokenToEurConversion(Number(issueAmount.value),
+                                             getCurrentCoin()?.tokenInfo?.prices["eur"])
+                : "-"
+            }
             placeholder="-"
             helperText={
               <>
                 {!getCurrentCoin()?.tokenInfo && !review && (
                   <p className="p-small text-danger">
-                   {t("fields.conversion-token.invalid")}
+                    {t("fields.conversion-token.invalid")}
                   </p>
                 )}
               </>

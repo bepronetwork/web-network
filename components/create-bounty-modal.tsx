@@ -6,6 +6,7 @@ import {
   useState,
 } from "react";
 import { FormCheck } from "react-bootstrap";
+import { NumberFormatValues } from "react-number-format";
 
 import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
@@ -47,7 +48,7 @@ import ReposDropdown from "./repos-dropdown";
 
 const { publicRuntimeConfig } = getConfig();
 
-interface chainPayload {
+interface BountyPayload {
   title: string;
   cid: string | boolean;
   repoPath: string;
@@ -58,12 +59,6 @@ interface chainPayload {
   rewardToken?: string;
   rewardAmount?: number;
   fundingAmount?: number;
-}
-
-interface Amount {
-  value?: string;
-  formattedValue: string;
-  floatValue?: number;
 }
 
 export default function CreateBountyModal({
@@ -95,13 +90,13 @@ export default function CreateBountyModal({
   const [branch, setBranch] = useState("");
   const [tokenBalance, setTokenBalance] = useState(0);
   const [rewardBalance, setRewardBalance] = useState(0);
-  const [activeBounty, setActiveBounty] = useState<boolean>(true);
-  const [issueAmount, setIssueAmount] = useState<Amount>({
+  const [isFundingType , setIsFundingType] = useState<boolean>(true);
+  const [issueAmount, setIssueAmount] = useState<NumberFormatValues>({
     value: "",
     formattedValue: "",
     floatValue: 0,
   });
-  const [rewardAmount, setRewardAmount] = useState<Amount>({
+  const [rewardAmount, setRewardAmount] = useState<NumberFormatValues>({
     value: "",
     formattedValue: "",
     floatValue: 0,
@@ -126,18 +121,6 @@ export default function CreateBountyModal({
 
   const isFieldsDisabled = !user;
 
-  function handleIssueAmountBlurChange() {
-    if (activeBounty && issueAmount.floatValue > tokenBalance) {
-      setIssueAmount({ formattedValue: tokenBalance.toString() });
-    }
-  }
-
-  function handleRewardAmountBlurChange() {
-    if (rewardAmount.floatValue > tokenBalance) {
-      setRewardAmount({ formattedValue: tokenBalance.toString() });
-    }
-  }
-
   function onUpdateFiles(files: IFilesProps[]) {
     return setFiles(files);
   }
@@ -152,17 +135,6 @@ export default function CreateBountyModal({
       .toString()
       .replace(",![", "![")
       .replace(",[", "[")}`;
-  }
-
-  function handleIssueAmountOnValueChange(values: Amount,
-                                          type: "reward" | "issue") {
-    if (values.floatValue < 0 || values.value === "-") {
-      type === "reward" && setRewardAmount({ formattedValue: "" });
-      type === "issue" && setIssueAmount({ formattedValue: "" });
-    } else {
-      type === "reward" && setRewardAmount(values);
-      type === "issue" && setIssueAmount(values);
-    }
   }
 
   function handleRewardChecked(e) {
@@ -183,49 +155,21 @@ export default function CreateBountyModal({
     );
   }
 
-  function renderBountyToken(review = false) {
+  function renderBountyToken(review = false, type: 'bounty' | 'reward') {
     return (
       <CreateBountyTokenAmount
-        currentToken={transactionalToken}
-        setCurrentToken={setTransactionalToken}
+        currentToken={type === 'bounty' ? transactionalToken : rewardToken}
+        setCurrentToken={type === 'bounty' ? setTransactionalToken : setRewardToken}
         customTokens={customTokens}
         userAddress={wallet?.address}
         defaultToken={defaultToken}
         canAddCustomToken={canAddCustomToken}
         addToken={addToken}
-        issueAmount={issueAmount}
-        setIssueAmount={setIssueAmount}
-        handleAmountOnValueChange={(e) =>
-          handleIssueAmountOnValueChange(e, "issue")
-        }
-        handleAmountBlurChange={handleIssueAmountBlurChange}
-        tokenBalance={tokenBalance}
-        activeBounty={activeBounty}
-        labelSelect={t("bounty:fields.select-token.bounty")}
-        review={review}
-      />
-    );
-  }
-
-  function renderRewardToken(review = false) {
-    return (
-      <CreateBountyTokenAmount
-        currentToken={rewardToken}
-        setCurrentToken={setRewardToken}
-        customTokens={customTokens}
-        userAddress={wallet?.address}
-        defaultToken={defaultToken}
-        canAddCustomToken={canAddCustomToken}
-        addToken={addToken}
-        issueAmount={rewardAmount}
-        setIssueAmount={setRewardAmount}
-        handleAmountOnValueChange={(e) =>
-          handleIssueAmountOnValueChange(e, "reward")
-        }
-        handleAmountBlurChange={handleRewardAmountBlurChange}
-        tokenBalance={rewardBalance}
-        activeBounty={true}
-        labelSelect={t("bounty:fields.select-token.reward")}
+        issueAmount={type === 'bounty' ? issueAmount : rewardAmount}
+        setIssueAmount={type === 'bounty' ? setIssueAmount : setRewardAmount}
+        tokenBalance={type === 'bounty' ? tokenBalance : rewardBalance}
+        isFundingType={type === 'bounty' ? isFundingType : true}
+        labelSelect={type === 'bounty' ? t("bounty:fields.select-token.bounty"): t("bounty:fields.select-token.reward")}
         review={review}
       />
     );
@@ -243,10 +187,10 @@ export default function CreateBountyModal({
               <Button
                 color="black"
                 className={`container-bounty w-100 bg-30-hover ${
-                  activeBounty && "active-bounty"
+                  isFundingType  && "funding-type"
                 }`}
                 onClick={() => {
-                  setActiveBounty(true);
+                  setIsFundingType(true);
                   setRewardChecked(false);
                   setRewardAmount({ formattedValue: "" });
                 }}
@@ -258,15 +202,15 @@ export default function CreateBountyModal({
               <Button
                 color="black"
                 className={`container-bounty w-100 bg-30-hover ${
-                  !activeBounty && "active-bounty"
+                  !isFundingType  && "funding-type"
                 }`}
-                onClick={() => setActiveBounty(false)}
+                onClick={() => setIsFundingType(false)}
               >
                 <span >{t("bounty:steps.funding")}</span>
               </Button>
             </div>
-            {renderBountyToken()}
-            {!activeBounty && (
+            {renderBountyToken(false,'bounty')}
+            {!isFundingType  && (
               <>
                 <div className="col-md-12">
                   <FormCheck
@@ -277,7 +221,7 @@ export default function CreateBountyModal({
                     checked={rewardChecked}
                   />
                 </div>
-                {rewardChecked && renderRewardToken()}
+                {rewardChecked && renderBountyToken(false,'reward')}
               </>
             )}
           </div>
@@ -320,8 +264,8 @@ export default function CreateBountyModal({
       return (
         <>
           {renderDetails(true)}
-          {renderBountyToken(true)}
-          {rewardChecked && renderRewardToken(true)}
+          {renderBountyToken(true,'bounty')}
+          {rewardChecked && renderBountyToken(true,'reward')}
           <div className="container">
             <div className="row">
               <div className="col-md-6">
@@ -381,12 +325,12 @@ export default function CreateBountyModal({
         ? true
         : false;
     if ((currentSection === 0 && !bountyTitle) || !bountyDescription) return true;
-    if (currentSection === 1 && activeBounty && isIssueAmount) return true;
-    if (currentSection === 1 && !activeBounty && !rewardChecked && isIssueAmount) return true;
-    if (currentSection === 1 && !activeBounty && rewardChecked && isIssueAmount) return true;
-    if (currentSection === 1 && !activeBounty && rewardChecked && isRewardAmount) return true;
+    if (currentSection === 1 && isFundingType  && isIssueAmount) return true;
+    if (currentSection === 1 && !isFundingType  && !rewardChecked && isIssueAmount) return true;
+    if (currentSection === 1 && !isFundingType  && rewardChecked && isIssueAmount) return true;
+    if (currentSection === 1 && !isFundingType  && rewardChecked && isRewardAmount) return true;
     if (currentSection === 2 && !repository && !branch) return true;
-    if (currentSection === 3 && isTokenApproved) return true;
+    if (currentSection === 3 && !isTokenApproved) return true;
 
     return false;
   }
@@ -482,9 +426,9 @@ export default function CreateBountyModal({
     tokenAllowance >= amount;
 
   useEffect(() => {
-    activeBounty &&
+    isFundingType  &&
       setIsTokenApproved(isAmountApproved(tokenAllowance, issueAmount.floatValue));
-    !activeBounty &&
+    !isFundingType  &&
       setIsTokenApproved(isAmountApproved(tokenAllowance, rewardAmount.floatValue));
   }, [tokenAllowance, issueAmount.floatValue, rewardAmount.floatValue]);
 
@@ -548,7 +492,7 @@ export default function CreateBountyModal({
 
     dispatch(openIssueTx);
 
-    const chainPayload: chainPayload = {
+    const bountyPayload: BountyPayload = {
       cid,
       title: payload.title,
       repoPath: repository.path,
@@ -558,18 +502,19 @@ export default function CreateBountyModal({
       githubUser: payload.creatorGithub,
     };
 
-    if (!activeBounty && !rewardChecked) {
-      chainPayload.tokenAmount = 0;
-      chainPayload.fundingAmount = issueAmount.floatValue;
+    if (!isFundingType  && !rewardChecked) {
+      bountyPayload.tokenAmount = 0;
+      bountyPayload.fundingAmount = issueAmount.floatValue;
     }
 
     if (rewardChecked) {
-      chainPayload.tokenAmount = 0;
-      chainPayload.rewardAmount = rewardAmount.floatValue;
-      chainPayload.rewardToken = rewardToken.address;
-      chainPayload.fundingAmount = issueAmount.floatValue;
+      bountyPayload.tokenAmount = 0;
+      bountyPayload.rewardAmount = rewardAmount.floatValue;
+      bountyPayload.rewardToken = rewardToken.address;
+      bountyPayload.fundingAmount = issueAmount.floatValue;
     }
-    const txInfo = await DAOService.openBounty(chainPayload).catch((e) => {
+
+    const txInfo = await DAOService.openBounty(bountyPayload).catch((e) => {
       cleanFields();
       if (e?.message?.toLowerCase().search("user denied") > -1)
         dispatch(updateTransaction({
