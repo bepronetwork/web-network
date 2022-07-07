@@ -17,6 +17,8 @@ type TokenBalance = Partial<TokenInfo>;
 
 export default function WalletBalance() {
   const [tokens, setTokens] = useState<TokenBalance[]>([]);
+  const [totalEuro, setTotalEuro] = useState(0);
+  const [hasNoConvertedToken, setHasNoConvertedToken] = useState(false);
 
   const { activeNetwork } = useNetwork();
   const { wallet } = useAuthentication();
@@ -84,19 +86,42 @@ export default function WalletBalance() {
 
   }, [DAOService, activeNetwork?.networkToken, wallet?.balance]);
 
+  useEffect(() => {
+    if (!tokens.length) return;
+
+    const totalConverted = tokens.reduce((acc, token) => acc + (token.balance * (token.prices?.eur || 0)), 0);
+    const noConverted = !!tokens.find(token => token.prices?.eur === undefined);
+
+    setTotalEuro(totalConverted);
+    setHasNoConvertedToken(noConverted);
+
+  }, [tokens]);
+
   return(
     <FlexColumn>
       <FlexRow className="justify-content-between align-items-center mb-4">
-        {console.log(tokens)}
         <span className="family-Regular h4 text-white">Balance</span>
         
         <FlexRow className="align-items-center">
           <span className="caption-medium text-white mr-2">Total</span>
-          <span className="h4 family-Regular text-white bg-dark-gray py-2 px-3 border-radius-8">$100,000 USD</span>
+          <span className="h4 family-Regular text-white bg-dark-gray py-2 px-3 border-radius-8">
+            {`${hasNoConvertedToken && "~" || ""} ${formatNumberToCurrency(totalEuro)} EURO`}
+          </span>
         </FlexRow>
       </FlexRow>
 
       {tokens.map(TokenBalance)}
+
+      <FlexRow className="mt-3 mb-3">
+        <span className="family-Regular h4 text-white">Oracles delegated to me</span>
+      </FlexRow>
+      
+      <TokenBalance 
+        icon={<OracleIcon />} 
+        symbol="Oracles" 
+        name={`Locked ${activeNetwork?.networkToken?.name || "Network Token"}`}
+        balance={wallet?.balance?.oracles?.delegatedByOthers || 0}
+      />
     </FlexColumn>
   );
 }
