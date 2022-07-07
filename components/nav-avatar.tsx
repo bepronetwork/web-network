@@ -79,7 +79,7 @@ export default function NavAvatar() {
     Link(t("main-nav.nav-avatar.bounties"), getURLWithNetwork("/profile/bounties")),
     Link(t("main-nav.nav-avatar.pull-requests"), getURLWithNetwork("/profile/pull-requests")),
     Link(t("main-nav.nav-avatar.proposals"), getURLWithNetwork("/profile/proposals")),
-    Link(t("main-nav.nav-avatar.custom-network"), getURLWithNetwork("/profile/custom-network")),
+    Link(t("main-nav.nav-avatar.my-network"), getURLWithNetwork("/profile/my-network")),
   ];
 
   const externalLinks = [
