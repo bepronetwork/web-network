@@ -72,7 +72,6 @@ export default function NavAvatar() {
     </div>
   );
 
-  // TODO: update internal links when the new profile page is ready
   const internalLinks = [
     Link(t("main-nav.nav-avatar.wallet"), getURLWithNetwork("/profile/wallet")),
     Link(t("main-nav.nav-avatar.payments"), getURLWithNetwork("/profile/payments")),
