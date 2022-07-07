@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { useTranslation } from "next-i18next";
+
 import BeProBlue from "assets/icons/bepro-blue";
 import OracleIcon from "assets/icons/oracle-icon";
 
@@ -16,6 +18,8 @@ import { getCoinInfoByContract } from "services/coingecko";
 type TokenBalance = Partial<TokenInfo>;
 
 export default function WalletBalance() {
+  const { t } = useTranslation(["common", "profile"]);
+
   const [tokens, setTokens] = useState<TokenBalance[]>([]);
   const [totalEuro, setTotalEuro] = useState(0);
   const [hasNoConvertedToken, setHasNoConvertedToken] = useState(false);
@@ -27,6 +31,12 @@ export default function WalletBalance() {
   const FlexRow = ({ children, className = "" }) => <div className={`d-flex flex-row ${className}`}>{children}</div>;
   const FlexColumn = ({ children, className = "" }) => 
     <div className={`d-flex flex-column ${className}`}>{children}</div>;
+
+  const oracleToken = {
+    symbol: t("$oracles"),
+    name: t("profile:oracle-name-placeholder"),
+    icon: <OracleIcon />
+  };
 
   const TokenBalance = ({ icon, name, symbol, balance } : TokenBalance) => {
     const CONTAINER_CLASSES = [
@@ -76,9 +86,9 @@ export default function WalletBalance() {
       tmpTokens.push({
         ...settler,
         balance: wallet.balance.oracles.locked,
-        symbol: "Oracles",
-        name: `Locked ${settler.name}`,
-        icon: <OracleIcon />
+        symbol: oracleToken.symbol,
+        name: `${t("misc.locked")} ${settler.name}`,
+        icon: oracleToken.icon
       });
 
       setTokens(tmpTokens);
@@ -100,12 +110,12 @@ export default function WalletBalance() {
   return(
     <FlexColumn>
       <FlexRow className="justify-content-between align-items-center mb-4">
-        <span className="family-Regular h4 text-white">Balance</span>
+        <span className="family-Regular h4 text-white">{t("profile:balance")}</span>
         
         <FlexRow className="align-items-center">
-          <span className="caption-medium text-white mr-2">Total</span>
+          <span className="caption-medium text-white mr-2">{t("misc.total")}</span>
           <span className="h4 family-Regular text-white bg-dark-gray py-2 px-3 border-radius-8">
-            {`${hasNoConvertedToken && "~" || ""} ${formatNumberToCurrency(totalEuro)} EURO`}
+            {`${hasNoConvertedToken && "~" || ""} ${formatNumberToCurrency(totalEuro)} ${t("currencies.euro")}`}
           </span>
         </FlexRow>
       </FlexRow>
@@ -113,13 +123,13 @@ export default function WalletBalance() {
       {tokens.map(TokenBalance)}
 
       <FlexRow className="mt-3 mb-3">
-        <span className="family-Regular h4 text-white">Oracles delegated to me</span>
+        <span className="family-Regular h4 text-white">{t("profile:oracles-deletaged-to-me")}</span>
       </FlexRow>
       
       <TokenBalance 
-        icon={<OracleIcon />} 
-        symbol="Oracles" 
-        name={`Locked ${activeNetwork?.networkToken?.name || "Network Token"}`}
+        icon={oracleToken.icon} 
+        symbol={oracleToken.symbol}
+        name={`Locked ${activeNetwork?.networkToken?.name || oracleToken.name}`}
         balance={wallet?.balance?.oracles?.delegatedByOthers || 0}
       />
     </FlexColumn>

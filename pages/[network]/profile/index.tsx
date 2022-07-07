@@ -1,4 +1,5 @@
 import { GetServerSideProps } from "next";
+import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Image from "next/image";
 
@@ -14,13 +15,13 @@ import { useAuthentication } from "contexts/authentication";
 
 import { truncateAddress } from "helpers/truncate-address";
 
-
 interface ConnectionButtonProps {
   type: "github" | "wallet";
   credential: string;
 }
 
 export default function Profile() {
+  const { t } = useTranslation("profile");
   const { wallet, user, connectWallet, connectGithub } = useAuthentication();
 
   const addressOrUsername = user?.login ? user.login : truncateAddress(wallet?.address);
@@ -40,8 +41,8 @@ export default function Profile() {
     };
 
     const CREDENTIALS = {
-      github: credential ? credential : "Connect Github",
-      wallet: credential ? truncateAddress(credential) : "Connect Wallet"
+      github: credential ? credential : t("connect-github"),
+      wallet: credential ? truncateAddress(credential) : t("connect-wallet")
     };
 
     const ACTIONS = {
@@ -94,7 +95,7 @@ export default function Profile() {
       </div>
 
       <div className="row mb-3">
-        <span className="caption text-gray">Connections</span>
+        <span className="caption text-gray">{t("connections")}</span>
       </div>
 
       <div className="row">
@@ -116,10 +117,8 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
     props: {
       ...(await serverSideTranslations(locale, [
         "common",
-        "bounty",
-        "proposal",
-        "pull-request",
-        "connect-wallet-button"
+        "connect-wallet-button",
+        "profile"
       ]))
     }
   };
