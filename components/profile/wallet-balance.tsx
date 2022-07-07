@@ -17,6 +17,12 @@ import { getCoinInfoByContract } from "services/coingecko";
 
 type TokenBalance = Partial<TokenInfo>;
 
+export const FlexRow = ({ children, className = "" }) => 
+  <div className={`d-flex flex-row ${className}`}>{children}</div>;
+  
+export const FlexColumn = ({ children, className = "" }) => 
+  <div className={`d-flex flex-column ${className}`}>{children}</div>;
+
 export default function WalletBalance() {
   const { t } = useTranslation(["common", "profile"]);
 
@@ -27,10 +33,6 @@ export default function WalletBalance() {
   const { activeNetwork } = useNetwork();
   const { wallet } = useAuthentication();
   const { service: DAOService } = useDAO();
-
-  const FlexRow = ({ children, className = "" }) => <div className={`d-flex flex-row ${className}`}>{children}</div>;
-  const FlexColumn = ({ children, className = "" }) => 
-    <div className={`d-flex flex-column ${className}`}>{children}</div>;
 
   const oracleToken = {
     symbol: t("$oracles"),
