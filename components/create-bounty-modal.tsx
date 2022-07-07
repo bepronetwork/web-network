@@ -90,7 +90,7 @@ export default function CreateBountyModal({
   const [branch, setBranch] = useState("");
   const [tokenBalance, setTokenBalance] = useState(0);
   const [rewardBalance, setRewardBalance] = useState(0);
-  const [isFundingType , setIsFundingType] = useState<boolean>(true);
+  const [isFundingType, setIsFundingType] = useState<boolean>(true);
   const [issueAmount, setIssueAmount] = useState<NumberFormatValues>({
     value: "",
     formattedValue: "",
@@ -114,10 +114,12 @@ export default function CreateBountyModal({
       ? publicRuntimeConfig?.networkConfig?.allowCustomTokens
       : !!activeNetwork?.allowCustomTokens;
 
-  const steps = [t("bounty:steps.details"),
-                 t("bounty:steps.bounty"), 
-                 t("bounty:steps.additional-details"), 
-                 t("bounty:steps.review")];
+  const steps = [
+    t("bounty:steps.details"),
+    t("bounty:steps.bounty"),
+    t("bounty:steps.additional-details"),
+    t("bounty:steps.review"),
+  ];
 
   const isFieldsDisabled = !user;
 
@@ -155,21 +157,27 @@ export default function CreateBountyModal({
     );
   }
 
-  function renderBountyToken(review = false, type: 'bounty' | 'reward') {
+  function renderBountyToken(review = false, type: "bounty" | "reward") {
     return (
       <CreateBountyTokenAmount
-        currentToken={type === 'bounty' ? transactionalToken : rewardToken}
-        setCurrentToken={type === 'bounty' ? setTransactionalToken : setRewardToken}
+        currentToken={type === "bounty" ? transactionalToken : rewardToken}
+        setCurrentToken={
+          type === "bounty" ? setTransactionalToken : setRewardToken
+        }
         customTokens={customTokens}
         userAddress={wallet?.address}
         defaultToken={defaultToken}
         canAddCustomToken={canAddCustomToken}
         addToken={addToken}
-        issueAmount={type === 'bounty' ? issueAmount : rewardAmount}
-        setIssueAmount={type === 'bounty' ? setIssueAmount : setRewardAmount}
-        tokenBalance={type === 'bounty' ? tokenBalance : rewardBalance}
-        isFundingType={type === 'bounty' ? isFundingType : true}
-        labelSelect={type === 'bounty' ? t("bounty:fields.select-token.bounty"): t("bounty:fields.select-token.reward")}
+        issueAmount={type === "bounty" ? issueAmount : rewardAmount}
+        setIssueAmount={type === "bounty" ? setIssueAmount : setRewardAmount}
+        tokenBalance={type === "bounty" ? tokenBalance : rewardBalance}
+        isFundingType={type === "bounty" ? isFundingType : true}
+        labelSelect={
+          type === "bounty"
+            ? t("bounty:fields.select-token.bounty")
+            : t("bounty:fields.select-token.reward")
+        }
         review={review}
       />
     );
@@ -187,12 +195,12 @@ export default function CreateBountyModal({
               <Button
                 color="black"
                 className={`container-bounty w-100 bg-30-hover ${
-                  isFundingType  && "funding-type"
+                  isFundingType && "funding-type"
                 }`}
                 onClick={() => {
                   setIsFundingType(true);
                   setRewardChecked(false);
-                  setRewardAmount({ formattedValue: "" });
+                  setRewardAmount({ value: "0", formattedValue: "0", floatValue: 0 });
                 }}
               >
                 <span>{t("bounty:steps.bounty")}</span>
@@ -202,26 +210,26 @@ export default function CreateBountyModal({
               <Button
                 color="black"
                 className={`container-bounty w-100 bg-30-hover ${
-                  !isFundingType  && "funding-type"
+                  !isFundingType && "funding-type"
                 }`}
                 onClick={() => setIsFundingType(false)}
               >
-                <span >{t("bounty:steps.funding")}</span>
+                <span>{t("bounty:steps.funding")}</span>
               </Button>
             </div>
-            {renderBountyToken(false,'bounty')}
-            {!isFundingType  && (
+            {renderBountyToken(false, "bounty")}
+            {!isFundingType && (
               <>
                 <div className="col-md-12">
                   <FormCheck
                     className="form-control-md pb-0"
-                    type="checkbox" 
+                    type="checkbox"
                     label={t("bounty:reward-funders")}
                     onChange={handleRewardChecked}
                     checked={rewardChecked}
                   />
                 </div>
-                {rewardChecked && renderBountyToken(false,'reward')}
+                {rewardChecked && renderBountyToken(false, "reward")}
               </>
             )}
           </div>
@@ -264,12 +272,14 @@ export default function CreateBountyModal({
       return (
         <>
           {renderDetails(true)}
-          {renderBountyToken(true,'bounty')}
-          {rewardChecked && renderBountyToken(true,'reward')}
+          {renderBountyToken(true, "bounty")}
+          {rewardChecked && renderBountyToken(true, "reward")}
           <div className="container">
             <div className="row">
               <div className="col-md-6">
-                <label className="caption-small mb-2">{t("bounty:review.repository")}</label>
+                <label className="caption-small mb-2">
+                  {t("bounty:review.repository")}
+                </label>
                 <GithubInfo
                   parent="list"
                   variant="repository"
@@ -278,7 +288,9 @@ export default function CreateBountyModal({
                 />
               </div>
               <div className="col-md-6">
-                <label className="caption-small mb-2 ms-3">{t("bounty:review.branch")}</label>
+                <label className="caption-small mb-2 ms-3">
+                  {t("bounty:review.branch")}
+                </label>
                 <div className="ms-3">
                   <GithubInfo
                     parent="list"
@@ -314,7 +326,7 @@ export default function CreateBountyModal({
     }
   }
 
-//TODO: add some function
+  //TODO: add some function
   function verifyNextStepAndCreate() {
     const isIssueAmount =
       issueAmount.floatValue <= 0 || issueAmount.floatValue === undefined
@@ -324,11 +336,30 @@ export default function CreateBountyModal({
       rewardAmount.floatValue <= 0 || rewardAmount.floatValue === undefined
         ? true
         : false;
-    if ((currentSection === 0 && !bountyTitle) || !bountyDescription) return true;
-    if (currentSection === 1 && isFundingType  && isIssueAmount) return true;
-    if (currentSection === 1 && !isFundingType  && !rewardChecked && isIssueAmount) return true;
-    if (currentSection === 1 && !isFundingType  && rewardChecked && isIssueAmount) return true;
-    if (currentSection === 1 && !isFundingType  && rewardChecked && isRewardAmount) return true;
+    if ((currentSection === 0 && !bountyTitle) || !bountyDescription)
+      return true;
+    if (currentSection === 1 && isFundingType && isIssueAmount) return true;
+    if (
+      currentSection === 1 &&
+      !isFundingType &&
+      !rewardChecked &&
+      isIssueAmount
+    )
+      return true;
+    if (
+      currentSection === 1 &&
+      !isFundingType &&
+      rewardChecked &&
+      isIssueAmount
+    )
+      return true;
+    if (
+      currentSection === 1 &&
+      !isFundingType &&
+      rewardChecked &&
+      isRewardAmount
+    )
+      return true;
     if (currentSection === 2 && !repository && !branch) return true;
     if (currentSection === 3 && !isTokenApproved) return true;
 
@@ -426,9 +457,9 @@ export default function CreateBountyModal({
     tokenAllowance >= amount;
 
   useEffect(() => {
-    isFundingType  &&
+    isFundingType &&
       setIsTokenApproved(isAmountApproved(tokenAllowance, issueAmount.floatValue));
-    !isFundingType  &&
+    !isFundingType &&
       setIsTokenApproved(isAmountApproved(tokenAllowance, rewardAmount.floatValue));
   }, [tokenAllowance, issueAmount.floatValue, rewardAmount.floatValue]);
 
@@ -502,7 +533,7 @@ export default function CreateBountyModal({
       githubUser: payload.creatorGithub,
     };
 
-    if (!isFundingType  && !rewardChecked) {
+    if (!isFundingType && !rewardChecked) {
       bountyPayload.tokenAmount = 0;
       bountyPayload.fundingAmount = issueAmount.floatValue;
     }
@@ -567,7 +598,7 @@ export default function CreateBountyModal({
   }
 
   return (
-    <> 
+    <>
       <Modal
         show={show}
         title={t("bounty:title")}
@@ -582,7 +613,9 @@ export default function CreateBountyModal({
             <div className="d-flex flex-grow-1">
               <Button color="dark-gray" onClick={handleCancelAndBack}>
                 <span>
-                  {currentSection === 0 ? t("common:actions.cancel") : t("common:actions.back")}
+                  {currentSection === 0
+                    ? t("common:actions.cancel")
+                    : t("common:actions.back")}
                 </span>
               </Button>
             </div>
@@ -604,7 +637,9 @@ export default function CreateBountyModal({
               disabled={verifyNextStepAndCreate()}
             >
               <span>
-                {currentSection !== 3 ? t("bounty:next-step") : t("bounty:create-bounty")}
+                {currentSection !== 3
+                  ? t("bounty:next-step")
+                  : t("bounty:create-bounty")}
               </span>
             </Button>
           </>
