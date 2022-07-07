@@ -15,6 +15,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY . .
 ENV CI=true
-RUN npm install --no-audit
+RUN npm install --only=production --no-audit
 COPY --from=builder /app/.next .next
+EXPOSE 3000
 CMD npm run start
