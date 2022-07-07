@@ -38,7 +38,8 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       ...(await serverSideTranslations(locale, [
         "common",
         "my-oracles",
-        "connect-wallet-button"
+        "connect-wallet-button",
+        "profile"
       ]))
     }
   };
