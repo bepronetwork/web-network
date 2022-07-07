@@ -7,7 +7,7 @@ export default NextAuth({
   providers: [
     GithubProvider({
       clientId: process.env.NEXT_PUBLIC_GH_CLIENT_ID,
-      clientSecret: process.env.GH_SECRET,
+      clientSecret: process.env.NEXT_GH_SECRET,
       profile(profile: {id, name, login, email, avatar_url}) {
         return {
           id: profile.id,
