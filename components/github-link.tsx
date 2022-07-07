@@ -26,7 +26,7 @@ export default function GithubLink({
   return (
     <div onClick={onClick}>
       <a
-        href={!onClick && `https://github.com/${githubPath}/${hrefPath}`}
+        href={!onClick ?`https://github.com/${githubPath}/${hrefPath}`: "#"}
         target="_blank"
         className={`btn btn-${color} text-uppercase d-flex align-items-center github-link`}
         rel="noreferrer"
