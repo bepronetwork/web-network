@@ -107,7 +107,9 @@ function networkTxButton({
               from: wallet.address
           });
     }
-
+    
+    const methodName = txMethod === 'delegateOracles' ? 'delegate' : txMethod;
+    
     transactionMethod
       .then((answer) => {
         if (answer.status) {
@@ -115,9 +117,9 @@ function networkTxButton({
           dispatch(addToast({
               type: "success",
               title: t("actions.success"),
-              content: `${txMethod} ${txParams?.tokenAmount} ${txCurrency}`
+              content: `${t(`transactions.types.${methodName}`)} ${txParams?.tokenAmount} ${txCurrency || t("misc.$token")}`
           }));
-
+          
           txWindow.updateItem(tmpTransaction.payload.id,
                               parseTransaction(answer, tmpTransaction.payload));
         } else {
