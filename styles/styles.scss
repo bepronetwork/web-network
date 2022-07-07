@@ -1529,8 +1529,9 @@ input[type="color"] {
 }
 
 .profile {
-  &-side {
-    height: 90vh;
-    border-right: 1px solid $ligth-gray;
+  &-content {
+    min-height: 90vh;
+    height: max-content;
+    border-left: 1px solid $ligth-gray;
   }
 }

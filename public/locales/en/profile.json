@@ -1,7 +1,7 @@
 {
   "balance": "Balance",
   "oracle-name-placeholder": "Locked Network Token",
-  "oracles-deletaged-to-me": "Oracles delegated to me",
+  "deletaged-to-me": "Delegated to me",
   "connect-wallet": "Connect Wallet",
   "connect-github": "Connect Github",
   "connections": "Connections"

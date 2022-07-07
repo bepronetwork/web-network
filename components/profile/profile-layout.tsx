@@ -9,7 +9,7 @@ export default function ProfileLayout({ children }) {
       <div className="row pt-4 mx-0">
         <ProfileSide />
 
-        <div className="col-10 pt-4 px-4">
+        <div className="col-10 pt-4 px-4 profile-content">
           {children}
         </div>
       </div>

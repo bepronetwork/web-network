@@ -33,7 +33,7 @@ export default function ProfileSide() {
   ];
 
   return(
-    <aside className="profile-side col-2">
+    <aside className="col-2">
       <ul className="ml-2 pt-4">
         {links.map(ProfileLink)}  
       </ul>

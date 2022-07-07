@@ -38,6 +38,9 @@ export default function WalletBalance() {
     icon: <OracleIcon />
   };
 
+  const oraclesLocked = wallet?.balance?.oracles?.locked || 0;
+  const oraclesDelegatedToMe = wallet?.balance?.oracles?.delegatedByOthers || 0;
+
   const TokenBalance = ({ icon, name, symbol, balance } : TokenBalance) => {
     const CONTAINER_CLASSES = [
       "justify-content-between align-items-center bg-transparent",
@@ -83,14 +86,6 @@ export default function WalletBalance() {
       if (activeNetwork.networkToken.address !== BEPRO_TOKEN.address)
         tmpTokens.push(settler);
 
-      tmpTokens.push({
-        ...settler,
-        balance: wallet.balance.oracles.locked,
-        symbol: oracleToken.symbol,
-        name: `${t("misc.locked")} ${settler.name}`,
-        icon: oracleToken.icon
-      });
-
       setTokens(tmpTokens);
     });
 
@@ -122,15 +117,33 @@ export default function WalletBalance() {
 
       {tokens.map(TokenBalance)}
 
+      <FlexRow className="mt-3 mb-3 justify-content-between align-items-center">
+        <span className="family-Regular h4 text-white">{t("$oracles")}</span>
+
+        <FlexRow className="align-items-center">
+          <span className="caption-medium text-white mr-2">{t("misc.total")}</span>
+          <span className="h4 family-Regular text-white bg-dark-gray py-2 px-3 border-radius-8">
+            {formatNumberToCurrency(oraclesLocked + oraclesDelegatedToMe)}
+          </span>
+        </FlexRow>
+      </FlexRow>
+
+      <TokenBalance 
+        icon={oracleToken.icon} 
+        symbol={oracleToken.symbol}
+        name={`Locked ${activeNetwork?.networkToken?.name || oracleToken.name}`}
+        balance={oraclesLocked}
+      />
+
       <FlexRow className="mt-3 mb-3">
-        <span className="family-Regular h4 text-white">{t("profile:oracles-deletaged-to-me")}</span>
+        <span className="caption-large text-white text-capitalize">{t("profile:deletaged-to-me")}</span>
       </FlexRow>
       
       <TokenBalance 
         icon={oracleToken.icon} 
         symbol={oracleToken.symbol}
         name={`Locked ${activeNetwork?.networkToken?.name || oracleToken.name}`}
-        balance={wallet?.balance?.oracles?.delegatedByOthers || 0}
+        balance={oraclesDelegatedToMe}
       />
     </FlexColumn>
   );
