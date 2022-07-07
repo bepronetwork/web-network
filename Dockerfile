@@ -2,7 +2,7 @@ FROM node:16.14 AS builder
 
 WORKDIR /app
 RUN apt-get update 
-COPY ${BUILD_ENV_FILE} .build.env
+ADD ${BUILD_ENV_FILE} .build.env
 COPY package*.json ./
 RUN mkdir scripts
 ENV CI=true
