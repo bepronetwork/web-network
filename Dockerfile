@@ -2,13 +2,13 @@ FROM node:16.14 AS builder
 
 WORKDIR /app
 RUN apt-get update 
+COPY ${BUILD_ENV_FILE} build.env
 COPY package*.json ./
 RUN mkdir scripts
 ENV CI=true
 RUN npm --silent install --no-audit
 COPY . .
-RUN npm run build
-
+RUN export $(cat .build.env | xargs) &&  npm run build
 FROM node:16.14 AS release
 
 WORKDIR /app
