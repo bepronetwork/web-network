@@ -4,6 +4,7 @@ import { useTranslation } from "next-i18next";
 
 import BeProBlue from "assets/icons/bepro-blue";
 import OracleIcon from "assets/icons/oracle-icon";
+import TokenIconPlaceholder from "assets/icons/token-icon-placeholder";
 
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
@@ -83,7 +84,12 @@ export default function WalletBalance() {
         icon: <BeProBlue width={24} height={24} />, balance: beproBalance 
       }];
 
-      const settler = { ...activeNetwork.networkToken, ...settlerInfo, balance: settlerBalance };
+      const settler = { 
+        ...activeNetwork.networkToken, 
+        ...settlerInfo, 
+        balance: settlerBalance,
+        icon: (settlerInfo as TokenInfo)?.icon || <TokenIconPlaceholder />
+      };
 
       if (activeNetwork.networkToken.address !== BEPRO_TOKEN.address)
         tmpTokens.push(settler);
