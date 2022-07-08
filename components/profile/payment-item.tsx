@@ -17,7 +17,7 @@ export default function PaymentItem({ ammount, issue, transactionHash } : Paymen
   const { getURLWithNetwork } = useNetworkTheme();
 
   const CONTAINER_CLASSES = [
-    "justify-content-between align-items-center bg-dark-gray",
+    "justify-content-between align-items-center bg-transparent",
     "border border-dark-gray border-radius-8 mb-2 py-3 px-4"
   ];
 
@@ -30,14 +30,17 @@ export default function PaymentItem({ ammount, issue, transactionHash } : Paymen
   return (
     <FlexRow className={CONTAINER_CLASSES.join(" ")} key={transactionHash}>
       <FlexColumn>
-        <FlexRow>
-          <span className="caption-large text-uppercase text-primary mb-1">
-            {`${formatNumberToCurrency(ammount)} $${issue?.token?.symbol || t("misc.$token")}`}
+        <FlexRow className="caption-large text-uppercase mb-1">
+          <span className="text-white mr-1">
+            {formatNumberToCurrency(ammount)}
+          </span>
+          <span className="text-primary">
+            {`$${issue?.token?.symbol || t("misc.$token")}`}
           </span>
         </FlexRow>
       
         <FlexRow>
-          <span className="caption-small text-uppercase text-white text-truncate">
+          <span className="caption-small text-uppercase text-gray">
             {transactionHash}
           </span>
         </FlexRow>

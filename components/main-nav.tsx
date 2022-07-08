@@ -54,7 +54,7 @@ export default function MainNav() {
   const { network, getURLWithNetwork } = useNetwork();
 
   const isNetworksPage = ["/networks", "/new-network"].includes(pathname);
-  const isBeproNetwork = network?.name === publicRuntimeConfig?.networkConfig?.networkName;
+  const isBeproNetwork = !network?.name || network?.name === publicRuntimeConfig?.networkConfig?.networkName;
 
   useEffect(() => {
     if (!DAOService || !wallet?.address) return;

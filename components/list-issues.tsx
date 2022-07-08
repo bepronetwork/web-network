@@ -43,6 +43,7 @@ interface ListIssuesProps {
   emptyMessage?: string;
   buttonMessage?: string;
   pullRequester?: string;
+  proposer?: string;
 }
 
 interface IssuesPage {
@@ -55,7 +56,8 @@ export default function ListIssues({
   filterState,
   emptyMessage,
   buttonMessage,
-  pullRequester
+  pullRequester,
+  proposer
 }: ListIssuesProps) {
   const {
     dispatch,
@@ -75,6 +77,7 @@ export default function ListIssues({
   const { search, setSearch, clearSearch } = useSearch();
   const [searchState, setSearchState] = useState(search);
 
+  const isProfilePage = router?.asPath?.includes("profile");
   const { repoId, time, state, sortBy, order } = router.query as {
     repoId: string;
     time: string;
@@ -144,6 +147,7 @@ export default function ListIssues({
       order,
       creator,
       pullRequester,
+      proposer,
       networkName: activeNetwork?.name
     })
       .then(({ rows, pages, currentPage }) => {
@@ -202,7 +206,10 @@ export default function ListIssues({
   ]);
 
   return (
-    <CustomContainer>
+    <CustomContainer 
+      className={isProfilePage && "px-0 mx-0" || ""}
+      className2={isProfilePage && "justify-content-left" || ""}
+    >
       {!isListEmpy() || (isListEmpy() && hasFilter()) ? (
         <div
           className={"d-flex align-items-center gap-20 list-actions sticky-top"}

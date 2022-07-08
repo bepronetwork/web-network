@@ -111,9 +111,15 @@ export default function WalletBalance() {
         
         <FlexRow className="align-items-center">
           <span className="caption-medium text-white mr-2">{t("misc.total")}</span>
-          <span className="h4 family-Regular text-white bg-dark-gray py-2 px-3 border-radius-8">
-            {`${hasNoConvertedToken && "~" || ""} ${formatNumberToCurrency(totalEuro)} ${t("currencies.euro")}`}
-          </span>
+          <div className="caption-large text-white bg-dark-gray py-2 px-3 border-radius-8">
+            <span>
+              {`${hasNoConvertedToken && "~" || ""} ${formatNumberToCurrency(totalEuro)}`}
+            </span>
+
+            <span className="text-gray ml-1">
+              {t("currencies.euro")}
+            </span>
+          </div>
         </FlexRow>
       </FlexRow>
 
@@ -124,7 +130,7 @@ export default function WalletBalance() {
 
         <FlexRow className="align-items-center">
           <span className="caption-medium text-white mr-2">{t("misc.total")}</span>
-          <span className="h4 family-Regular text-white bg-dark-gray py-2 px-3 border-radius-8">
+          <span className="caption-large text-white bg-dark-gray py-2 px-3 border-radius-8">
             {formatNumberToCurrency(oraclesLocked + oraclesDelegatedToMe)}
           </span>
         </FlexRow>

@@ -65,13 +65,19 @@ export default function Payments() {
     <ProfileLayout>
       <Col xs={10}>
         <FlexRow className="align-items-center justify-content-between mb-4">
-          <span className="family-Regular h4 text-white">Tokens Received</span>
+          <span className="family-Regular h4 text-white">Payments</span>
 
           <FlexRow className="align-items-center">
-            <span className="caption-medium text-white mr-2">{t("misc.total")}</span>
-            <span className="h4 family-Regular text-white bg-dark-gray py-2 px-3 border-radius-8">
-              {`${hasNoConvertedToken && "~" || ""} ${formatNumberToCurrency(totalEuro)} ${t("currencies.euro")}`}
-            </span>
+            <span className="caption-medium text-white mr-2">Received in Total</span>
+            <div className="caption-large bg-dark-gray py-2 px-3 border-radius-8">
+              <span className="text-white">
+              {`${hasNoConvertedToken && "~" || ""} ${formatNumberToCurrency(totalEuro)}`}
+              </span>
+
+              <span className="text-gray ml-1">
+                {t("currencies.euro")}
+              </span>
+            </div>
           </FlexRow>
         </FlexRow>
 
