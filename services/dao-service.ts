@@ -49,6 +49,7 @@ export default class DAO {
       await network.loadContract();
 
       if (!skipAssignment) this._network = network;
+      else this._networkAux = network;
 
       return network;
     } catch (error) {
@@ -129,6 +130,8 @@ export default class DAO {
 
   async getNetwork(networkAddress: string = undefined): Promise<Network_v2> {
     if (!networkAddress || (this.network && this.network?.contractAddress === networkAddress)) return this._network;
+    if (networkAddress && this.networkAux && this.networkAux?.contractAddress === networkAddress) 
+      return this._networkAux;
 
     const network = await this.loadNetwork(networkAddress, true);
 
@@ -157,25 +160,17 @@ export default class DAO {
     }
   }
 
-  async getNetworkParameter(parameter: NetworkParameters): Promise<number> {
-    return this.network[parameter]();
+  async getNetworkParameter(parameter: NetworkParameters, networkAddress?: string): Promise<number> {
+    const network = await this.getNetwork(networkAddress);
+
+    return network[parameter]();
   }
 
   async setNetworkParameter(parameter: NetworkParameters, 
                             value: number, 
                             networkAddress?: string): Promise<TransactionReceipt> {    
-    let network = this.network;
+    const network = await this.getNetwork(networkAddress);
 
-    if (networkAddress) {
-      if (this.networkAux?.contractAddress === networkAddress)
-        network = this.networkAux;
-      else {
-        this._networkAux = await this.loadNetwork(networkAddress, true);
-        network = this.networkAux;
-      }
-      
-    }
-    
     return network[`change${parameter[0].toUpperCase() + parameter.slice(1)}`](value);
   }
 
@@ -210,13 +205,14 @@ export default class DAO {
     return this.network.disputes(address, bountyId, proposalId);
   }
 
-  async getTreasury(): Promise<TreasuryInfo> {
-    const treasury = await this.network.treasuryInfo();
+  async getTreasury(networkAddress?: string): Promise<TreasuryInfo> {
+    const network = await this.getNetwork(networkAddress);
+    const treasury = network.treasuryInfo();
 
     return {
       treasury: treasury[0],
-      closeFee: +treasury[1],
-      cancelFee: +treasury[2]
+      closeFee: +(treasury[1] || 0),
+      cancelFee: +(treasury[2] || 0)
     };
   }
 

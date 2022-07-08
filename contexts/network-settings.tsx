@@ -31,7 +31,7 @@ const IPFS_URL = publicRuntimeConfig?.ipfsUrl;
 
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
 
-const ALLOWED_PATHS = ["/new-network", "/[network]/account/my-network/settings", "/administration"];
+const ALLOWED_PATHS = ["/new-network", "/[network]/profile/my-network", "/administration"];
 
 const LIMITS = {
   percentageNeededForDispute: { max: +publicRuntimeConfig?.networkConfig?.disputesPercentage },
