@@ -135,7 +135,7 @@ export default function TokenConfiguration({
           description={t("custom-network:steps.token-configuration.fields.tokens-dropdown.description")}
           tokens={customTokens} 
           canAddToken={
-            activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address ? 
+            activeNetwork?.name === publicRuntimeConfig?.networkConfig?.networkName ? 
             publicRuntimeConfig?.networkConfig?.allowCustomTokens :
             !!activeNetwork?.allowCustomTokens
           }
