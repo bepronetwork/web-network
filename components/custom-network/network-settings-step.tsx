@@ -1,29 +1,16 @@
 import { useState } from "react";
 
 import { useTranslation } from "next-i18next";
-import getConfig from "next/config";
 
 import InputNumber from "components/input-number";
 import Step from "components/step";
 
-import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
-
-import { formatNumberToCurrency } from "helpers/formatNumber";
 
 import { StepWrapperProps } from "interfaces/stepper";
 
+import NetworkContractSettings from "./network-contract-settings";
 import ThemeColors from "./theme-colors";
-
-const { publicRuntimeConfig } = getConfig();
-
-const MAX_PERCENTAGE_FOR_DISPUTE = +publicRuntimeConfig?.networkConfig?.disputesPercentage;
-const MIN_DRAFT_TIME = +publicRuntimeConfig?.networkConfig?.reedemTime?.min;
-const MAX_DRAFT_TIME = +publicRuntimeConfig?.networkConfig?.reedemTime?.max;
-const MIN_DISPUTE_TIME = +publicRuntimeConfig?.networkConfig?.disputableTime?.min;
-const MAX_DISPUTE_TIME = +publicRuntimeConfig?.networkConfig?.disputableTime?.max;
-const MIN_COUNCIL_AMOUNT = +publicRuntimeConfig?.networkConfig?.councilAmount?.min;
-const MAX_COUNCIL_AMOUNT = +publicRuntimeConfig?.networkConfig?.councilAmount?.max;
 
 const Section = ({ children = undefined, title }) => (
   <div className="row mx-0 px-0 mb-2 mt-1">
@@ -61,70 +48,13 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
   const [address, setAddress] = useState("");
 
   const { fields, settings } = useNetworkSettings();
-  const { activeNetwork } = useNetwork()
 
   const handleAddressChange = e => setAddress(e.target.value);
   const handleColorChange = value => fields.colors.setter(value);
   const handleCloseFeeChange = param => fields.closeFee.setter(param.floatValue);
   const handleCancelFeeChange = param => fields.cancelFee.setter(param.floatValue);
-  const handleDraftTimeChange = ({ floatValue: value }) => fields.parameter.setter({ label: "draftTime", value });
-  const handleDisputeTimeChange = 
-    ({ floatValue: value }) => fields.parameter.setter({ label: "disputableTime", value });
-  const handleCouncilAmountChange = 
-    ({ floatValue: value }) => fields.parameter.setter({ label: "councilAmount", value });
-  const handlePercentageForDisputeChange = 
-    ({ floatValue: value }) => fields.parameter.setter({ label: "percentageNeededForDispute", value });
-
   const handleAddressBlur = () => fields.treasury.setter(address);
-  const networkTokenSymbol = activeNetwork?.networkToken?.symbol || t("misc.$token");
 
-  const parameterInputs = [
-    { 
-      label: t("custom-network:dispute-time"), 
-      description: t("custom-network:errors.dispute-time", {
-        min: MIN_DISPUTE_TIME,
-        max: formatNumberToCurrency(MAX_DISPUTE_TIME, 0)
-      }),
-      symbol: t("misc.seconds"), 
-      value: settings?.parameters?.disputableTime?.value,
-      error: settings?.parameters?.disputableTime?.validated === false,
-      onChange: handleDisputeTimeChange
-    },
-    { 
-      label: t("custom-network:percentage-for-dispute"), 
-      description: t("custom-network:errors.percentage-for-dispute", {
-        max: MAX_PERCENTAGE_FOR_DISPUTE 
-      }),
-      symbol: "%", 
-      value: settings?.parameters?.percentageNeededForDispute?.value,
-      error: settings?.parameters?.percentageNeededForDispute?.validated === false,
-      onChange: handlePercentageForDisputeChange
-    },
-    { 
-      label: t("custom-network:redeem-time"), 
-      description: t("custom-network:errors.redeem-time", {
-        min: MIN_DRAFT_TIME,
-        max: formatNumberToCurrency(MAX_DRAFT_TIME, 0)
-      }),
-      symbol: t("misc.seconds"), 
-      value: settings?.parameters?.draftTime?.value,
-      error: settings?.parameters?.draftTime?.validated === false,
-      onChange: handleDraftTimeChange
-    },
-    { 
-      label: t("custom-network:council-amount"), 
-      description: t("custom-network:errors.council-amount", {
-        token: networkTokenSymbol,
-        min: formatNumberToCurrency(MIN_COUNCIL_AMOUNT, 0),
-        max: formatNumberToCurrency(MAX_COUNCIL_AMOUNT, 0)
-      }),
-      symbol: "BEPRO", 
-      value: settings?.parameters?.councilAmount?.value,
-      error: settings?.parameters?.councilAmount?.validated === false,
-      onChange: handleCouncilAmountChange
-    }
-  ];
-  
   return (
     <Step
       title={t("custom-network:steps.network-settings.title")}
@@ -187,17 +117,7 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
           {t("custom-network:steps.network-settings.fields.other-settings.parameters-warning")}
         </small>
 
-        {
-        parameterInputs.map(({ label, description, symbol, value, error, onChange }) => 
-          <ParameterInput 
-            label={label}
-            description={description}
-            symbol={symbol}
-            value={value}
-            error={error}
-            onChange={onChange}
-          />)
-        }
+        <NetworkContractSettings/>
       </Section>
     </Step>
   );
