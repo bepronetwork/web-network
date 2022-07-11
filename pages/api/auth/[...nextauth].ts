@@ -19,6 +19,10 @@ export default NextAuth({
       }
     }),
   ],
+  session: {
+    strategy: "jwt",
+    maxAge: 24 * 60 * 60
+  },
   callbacks: {
     async signIn({user, account, profile}) {
       // console.log(`User`, user);
@@ -47,11 +51,11 @@ export default NextAuth({
     },
     async jwt({ token, user, account, profile, isNewUser }) {
       // console.log(`JWT`, token, user, account, profile, isNewUser);
-      return {...token, ...profile};
+      return {...token, ...profile, ...account};
     },
     async session({ session, user, token }) {
       // console.log(`Session`, session, user, token);
-      return {expires: session.expires, user: {...session.user, login: token.login}};
+      return {expires: session.expires, user: {...session.user, login: token.login, accessToken: token?.access_token}};
     }
   },
 });
