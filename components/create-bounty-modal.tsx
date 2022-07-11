@@ -107,7 +107,13 @@ export default function CreateBountyModal({
   const [tokenAllowance, setTokenAllowance] = useState<number>();
   const [rewardChecked, setRewardChecked] = useState<boolean>(false);
   const [files, setFiles] = useState<IFilesProps[]>([]);
-  const [defaultToken, setDefaultToken] = useState<Token>(activeNetwork?.networkToken || BEPRO_TOKEN);
+  const [defaultTokens, setDefaultTokens] = useState<{
+    transactional: Token;
+    reward: Token;
+  }>({
+    transactional: activeNetwork?.networkToken || BEPRO_TOKEN,
+    reward: activeNetwork?.networkToken || BEPRO_TOKEN,
+  });
 
   const canAddCustomToken =
     activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address
@@ -143,10 +149,11 @@ export default function CreateBountyModal({
     setRewardChecked(e.target.checked);
   }
 
-  async function handleDefaultToken(token: Token) {
-    DAOService.getTokenBalance(token.address,
-                               wallet?.address).then(value => setDefaultToken({ ...token, currentValue: value }))
-                                      .catch(() => setDefaultToken(token))                             
+  async function getCurrentValueDefaultToken(token: Token) {
+    DAOService.getTokenBalance(token.address, wallet?.address).then((value) => {
+      const newToken = { ...token, currentValue: value };
+      setDefaultTokens({ transactional: newToken, reward: newToken });
+    });
   }
 
   function renderDetails(review = false) {
@@ -172,7 +179,9 @@ export default function CreateBountyModal({
         }
         customTokens={customTokens}
         userAddress={wallet?.address}
-        defaultToken={defaultToken}
+        defaultToken={
+          type === "bounty" ? defaultTokens.transactional : defaultTokens.reward
+        }
         canAddCustomToken={canAddCustomToken}
         addToken={addToken}
         issueAmount={type === "bounty" ? issueAmount : rewardAmount}
@@ -181,8 +190,12 @@ export default function CreateBountyModal({
         isFundingType={type === "bounty" ? isFundingType : true}
         labelSelect={
           type === "bounty"
-            ? t("bounty:fields.select-token.bounty", { set: review ? "": t("bounty:fields.set")})
-            : t("bounty:fields.select-token.reward", { set: review ? "": t("bounty:fields.set")})
+            ? t("bounty:fields.select-token.bounty", {
+                set: review ? "" : t("bounty:fields.set"),
+            })
+            : t("bounty:fields.select-token.reward", {
+                set: review ? "" : t("bounty:fields.set"),
+            })
         }
         review={review}
       />
@@ -206,8 +219,16 @@ export default function CreateBountyModal({
                 onClick={() => {
                   setIsFundingType(true);
                   setRewardChecked(false);
-                  setRewardAmount({ value: "0", formattedValue: "0", floatValue: 0 });
-                  setIssueAmount({ value: "0", formattedValue: "0", floatValue: 0 });
+                  setRewardAmount({
+                    value: "0",
+                    formattedValue: "0",
+                    floatValue: 0,
+                  });
+                  setIssueAmount({
+                    value: "0",
+                    formattedValue: "0",
+                    floatValue: 0,
+                  });
                 }}
               >
                 <span>{t("bounty:steps.bounty")}</span>
@@ -220,9 +241,13 @@ export default function CreateBountyModal({
                   !isFundingType && "funding-type"
                 }`}
                 onClick={() => {
-                  setIsFundingType(false)
-                  setRewardChecked(true)
-                  setIssueAmount({ value: "0", formattedValue: "0", floatValue: 0 });
+                  setIsFundingType(false);
+                  setRewardChecked(true);
+                  setIssueAmount({
+                    value: "0",
+                    formattedValue: "0",
+                    floatValue: 0,
+                  });
                 }}
               >
                 <span>{t("bounty:steps.funding")}</span>
@@ -415,30 +440,35 @@ export default function CreateBountyModal({
 
   useEffect(() => {
     setIssueAmount({ value: "0", formattedValue: "0", floatValue: 0 });
-  }, [transactionalToken])
+    setDefaultTokens(({ reward }) => {
+      return {
+        reward,
+        transactional: { ...transactionalToken, currentValue: tokenBalance },
+      };
+    });
+  }, [transactionalToken]);
 
   useEffect(() => {
     setRewardAmount({ value: "0", formattedValue: "0", floatValue: 0 });
-  }, [rewardToken])
+    setDefaultTokens(({ transactional }) => {
+      return {
+        transactional,
+        reward: { ...rewardToken, currentValue: rewardBalance },
+      };
+    });
+  }, [rewardToken]);
 
   useEffect(() => {
     handleTokens(rewardToken, setRewardToken, setRewardBalance);
   }, [rewardToken, wallet, DAOService]);
 
   useEffect(() => {
-    handleDefaultToken(activeNetwork?.networkToken || BEPRO_TOKEN)
-  }, [])
+    getCurrentValueDefaultToken(activeNetwork?.networkToken || BEPRO_TOKEN);
+  }, []);
 
-  function cleanFields() {
-    setBountyTitle("");
-    setBountyDescription("");
-    setIssueAmount({ value: "0", formattedValue: "0", floatValue: 0 });
-    setRewardAmount({ value: "0", formattedValue: "0", floatValue: 0 });
-    setRepository(undefined);
-    setBranch("");
-    setCurrentSection(0);
-    setFiles([]);
-  }
+  useEffect(() => {
+    setProgressBar();
+  }, [currentSection]);
 
   useEffect(() => {
     if (!activeNetwork?.networkToken) return;
@@ -454,6 +484,17 @@ export default function CreateBountyModal({
 
     getTokenInfo(tmpTokens);
   }, [activeNetwork?.networkToken]);
+
+  function cleanFields() {
+    setBountyTitle("");
+    setBountyDescription("");
+    setIssueAmount({ value: "0", formattedValue: "0", floatValue: 0 });
+    setRewardAmount({ value: "0", formattedValue: "0", floatValue: 0 });
+    setRepository(undefined);
+    setBranch("");
+    setCurrentSection(0);
+    setFiles([]);
+  }
 
   async function getTokenInfo(tmpTokens: Token[]) {
     await Promise.all(tmpTokens.map(async (token) => {
@@ -471,10 +512,6 @@ export default function CreateBountyModal({
         setCustomTokens(tmpTokens);
       });
   }
-
-  useEffect(() => {
-    setProgressBar();
-  }, [currentSection]);
 
   const isAmountApproved = (tokenAllowance: number, amount: number) =>
     tokenAllowance >= amount;
