@@ -178,7 +178,7 @@ export default function ApplicationContextProvider({children}) {
 
   const restoreTransactions = async (address)=>{
     const cookie = parseCookies()
-    const transactions = JSON.parse(cookie[`bepro.transactions:${address}`])
+    const transactions = JSON.parse(cookie[`bepro.transactions:${address}`] || "[]")
     const web3 = (window as any).web3;
 
     const getStatusFromBlock = async (tx) => {
