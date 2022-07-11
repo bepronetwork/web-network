@@ -80,11 +80,12 @@
       "placeholder": "Type a description..."
     },
     "select-token": {
-      "bounty": "Set Bounty Token",
-      "reward": "Set Reward Token"
+      "bounty": "{{set}} Bounty Token",
+      "reward": "{{set}} Reward Token"
     },
+    "set": "Set",
     "amount": {
-      "label": "Set {{token}} value",
+      "label": "amount",
       "info": "{{amount}} {{token}} Available",
       "max": "Max"
     },

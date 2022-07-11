@@ -4,7 +4,6 @@ import { useTranslation } from "next-i18next";
 
 import ArrowRight from "assets/icons/arrow-right";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
 import { handleTokenToEurConversion } from "helpers/handleTokenToEurConversion";
 
 import InputNumber from "./input-number";
@@ -32,41 +31,38 @@ export default function CreateBountyTokenAmount({
   }
 
   function handleIssueAmountOnValueChange(values: NumberFormatValues) {
-    if (values.floatValue < 0 || values.value === "-") {
-      setIssueAmount({ formattedValue: "" })
+    if (values.floatValue < 0) {
+      setIssueAmount({ formattedValue: "" });
     } else {
-      setIssueAmount(values)
+      setIssueAmount(values);
     }
   }
 
   function handleIssueAmountBlurChange() {
-    if (isFundingType  && issueAmount.floatValue > tokenBalance) {
+    if (isFundingType && issueAmount.floatValue > tokenBalance) {
       setIssueAmount({ formattedValue: tokenBalance.toString() });
     }
   }
 
-  function handleHelperText() {
+  function handleMaxValue() {
     if (review) return;
     if (!isFundingType) return;
     return (
-      <>
-        {t("fields.amount.info", {
-          token: currentToken?.symbol,
-          amount: formatNumberToCurrency(tokenBalance, {
-            maximumFractionDigits: 18,
-          }),
-        })}
+      <div className="text-gray text-uppercase caption-small">
+        {t("fields.set")}
         <span
-          className="caption-small text-primary ml-1 cursor-pointer text-uppercase"
+          className="text-primary ms-2 cursor-pointer text-uppercase"
           onClick={() =>
             setIssueAmount({
               formattedValue: tokenBalance.toString(),
+              floatValue: tokenBalance,
+              value: tokenBalance.toString()
             })
           }
         >
           {t("fields.amount.max")}
         </span>
-      </>
+      </div>
     );
   }
 
@@ -90,15 +86,21 @@ export default function CreateBountyTokenAmount({
             thousandSeparator
             disabled={review}
             max={tokenBalance}
-            label={t("fields.amount.label", {
-              token: currentToken?.symbol,
-            })}
+            label={
+              <div className="d-flex mb-2">
+                <label className="flex-grow-1 caption-small text-gray align-items-center">
+                  <span className="mr-1">
+                    {t("fields.amount.label")}
+                  </span>{" "}
+                </label>
+                {handleMaxValue()}
+              </div>
+            }
             symbol={currentToken?.symbol}
             value={issueAmount.formattedValue}
             placeholder="0"
             onValueChange={handleIssueAmountOnValueChange}
             onBlur={handleIssueAmountBlurChange}
-            helperText={handleHelperText()}
           />
           <div className="mt-4 pt-1 mx-2">
             <ArrowRight className="text-gray" width={9} height={9} />
@@ -114,7 +116,7 @@ export default function CreateBountyTokenAmount({
               getCurrentCoin()?.tokenInfo
                 ? handleTokenToEurConversion(Number(issueAmount.value),
                                              getCurrentCoin()?.tokenInfo?.prices["eur"])
-                : "-"
+                : "0"
             }
             placeholder="-"
             helperText={

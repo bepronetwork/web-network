@@ -107,8 +107,8 @@ export default function CreateBountyModal({
   const [tokenAllowance, setTokenAllowance] = useState<number>();
   const [rewardChecked, setRewardChecked] = useState<boolean>(false);
   const [files, setFiles] = useState<IFilesProps[]>([]);
+  const [defaultToken, setDefaultToken] = useState<Token>(activeNetwork?.networkToken || BEPRO_TOKEN);
 
-  const defaultToken = activeNetwork?.networkToken || BEPRO_TOKEN;
   const canAddCustomToken =
     activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address
       ? publicRuntimeConfig?.networkConfig?.allowCustomTokens
@@ -143,6 +143,12 @@ export default function CreateBountyModal({
     setRewardChecked(e.target.checked);
   }
 
+  async function handleDefaultToken(token: Token) {
+    DAOService.getTokenBalance(token.address,
+                               wallet?.address).then(value => setDefaultToken({ ...token, currentValue: value }))
+                                      .catch(() => setDefaultToken(token))                             
+  }
+
   function renderDetails(review = false) {
     return (
       <CreateBountyDetails
@@ -175,8 +181,8 @@ export default function CreateBountyModal({
         isFundingType={type === "bounty" ? isFundingType : true}
         labelSelect={
           type === "bounty"
-            ? t("bounty:fields.select-token.bounty")
-            : t("bounty:fields.select-token.reward")
+            ? t("bounty:fields.select-token.bounty", { set: review ? "": t("bounty:fields.set")})
+            : t("bounty:fields.select-token.reward", { set: review ? "": t("bounty:fields.set")})
         }
         review={review}
       />
@@ -201,6 +207,7 @@ export default function CreateBountyModal({
                   setIsFundingType(true);
                   setRewardChecked(false);
                   setRewardAmount({ value: "0", formattedValue: "0", floatValue: 0 });
+                  setIssueAmount({ value: "0", formattedValue: "0", floatValue: 0 });
                 }}
               >
                 <span>{t("bounty:steps.bounty")}</span>
@@ -212,7 +219,11 @@ export default function CreateBountyModal({
                 className={`container-bounty w-100 bg-30-hover ${
                   !isFundingType && "funding-type"
                 }`}
-                onClick={() => setIsFundingType(false)}
+                onClick={() => {
+                  setIsFundingType(false)
+                  setRewardChecked(true)
+                  setIssueAmount({ value: "0", formattedValue: "0", floatValue: 0 });
+                }}
               >
                 <span>{t("bounty:steps.funding")}</span>
               </Button>
@@ -403,8 +414,20 @@ export default function CreateBountyModal({
   }, [transactionalToken, wallet, DAOService]);
 
   useEffect(() => {
+    setIssueAmount({ value: "0", formattedValue: "0", floatValue: 0 });
+  }, [transactionalToken])
+
+  useEffect(() => {
+    setRewardAmount({ value: "0", formattedValue: "0", floatValue: 0 });
+  }, [rewardToken])
+
+  useEffect(() => {
     handleTokens(rewardToken, setRewardToken, setRewardBalance);
   }, [rewardToken, wallet, DAOService]);
+
+  useEffect(() => {
+    handleDefaultToken(activeNetwork?.networkToken || BEPRO_TOKEN)
+  }, [])
 
   function cleanFields() {
     setBountyTitle("");

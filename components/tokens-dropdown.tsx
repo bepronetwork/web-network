@@ -51,7 +51,7 @@ export default function TokensDropdown({
       : undefined;
 
   const tokenToOption = (token: Token): Option => ({
-    label: `${token?.tokenInfo ? token.tokenInfo.name : token.name}`,
+    label: `${token?.tokenInfo ? token.tokenInfo.name : token.symbol}`,
     value: token,
   });
 
@@ -65,11 +65,14 @@ export default function TokensDropdown({
     setOption(tokenToOption(value));
   };
 
-  const handleAddOption = (newToken: Token) => {
+  async function handleAddOption(newToken: Token) {
     addToken(newToken);
     setToken(newToken);
-    setOption(tokenToOption(newToken));
-  };
+    await DAOService.getTokenBalance(newToken.address, userAddress)
+      .then((value) =>
+        setOption(tokenToOption({ ...newToken, currentValue: value })))
+      .catch(() => setOption(tokenToOption(newToken)));
+  }
 
   async function getBalanceTokens() {
     Promise.all(tokens?.map(async (token) => {
@@ -133,24 +136,34 @@ export default function TokensDropdown({
   }
 
   function SelectValueComponent(props) {
-    const { name, tokenInfo } = props.getValue()[0].value;
+    const { getValue } = props;
+    const { name, tokenInfo, currentValue, symbol } = getValue()[0].value;
     return (
-      <div
-        {...props}
-        className="proposal__select-options d-flex align-items-center text-center p-small p-1"
-      >
+      <>
         {props.children[0] !== null ? (
           <>
-            {props.children[1]}
-            {tokenInfo?.icon && ( <img src={tokenInfo.icon} width={14} height={14} className="mx-2" /> )}
-            <span className={`${tokenInfo ? "mt-1" : "mx-2"}`}>
-              {tokenInfo ? tokenInfo.name : name}
-            </span>
+            <div className="flex-grow-0 proposal__select-options d-flex align-items-center text-center p-small p-1">
+              {props.children[1]}
+              {tokenInfo?.icon && (
+                <img
+                  src={tokenInfo.icon}
+                  width={14}
+                  height={14}
+                  className="mx-2"
+                />
+              )}
+              <span className={`${tokenInfo ? "mt-1" : "mx-2"}`}>
+                {tokenInfo ? tokenInfo.name : name}
+              </span>
+            </div>
+            <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">
+              {currentValue} {tokenInfo?.symbol && currentValue ? tokenInfo?.symbol : symbol}
+            </div>
           </>
         ) : (
-          <>{props.children[1]}</>
+          props.children[1]
         )}
-      </div>
+      </>
     );
   }
 
