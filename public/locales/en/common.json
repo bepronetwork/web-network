@@ -5,6 +5,9 @@
   "bepro": "BEPRO",
   "please-wait": "Please wait",
   "close": "Close",
+  "currencies": {
+    "euro": "EURO"
+  },
   "filters": {
     "filters": "Filter",
     "search-repositories": "Search repositories",
@@ -62,12 +65,13 @@
     "networks": "Networks",
     "nav-avatar": {
       "view-profile": "View profile",
+      "profile": "Profile",
       "wallet": "Wallet",
       "payments": "Payments",
       "bounties": "Bounties",
       "pull-requests": "Pull Requests",
       "proposals": "Proposals",
-      "custom-network": "Custom Network",
+      "my-network": "My Network",
       "support-center": "Support Center",
       "guides": "Guides",
       "join-discord": "Join the Discord",
@@ -148,7 +152,7 @@
     "status": "Status",
     "available": "available",
     "giving-away": "giving away",
-    "locked": "locked",
+    "locked": "Locked",
     "upload": "upload",
     "token": "token",
     "$token": "$TOKEN",
@@ -157,7 +161,8 @@
     "on": "on",
     "next-step": "Next Step",
     "fork": "Fork",
-    "organization": "Organization"
+    "organization": "Organization",
+    "total": "Total"
   },
   "modals": {
     "help-modal": {

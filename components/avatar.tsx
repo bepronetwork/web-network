@@ -1,6 +1,8 @@
 import React from "react";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
+import { SizeOptions } from "interfaces/utils";
+
 export default function Avatar({
   userLogin,
   className,
@@ -14,8 +16,13 @@ export default function Avatar({
   src?: string;
   tooltip?: boolean;
   border?: boolean;
-  size?: "sm" | "lg";
+  size?: SizeOptions;
 }) {
+  const SIZES = {
+    sm: 3,
+    md: 4,
+    lg: 5
+  }
   if (userLogin || src)
     return (
       <OverlayTrigger
@@ -28,7 +35,7 @@ export default function Avatar({
         }
       >
         <img
-          className={`avatar circle-${size === "sm" ? "3" : "4"} ${border && "border-avatar" || ""} ${className}`}
+          className={`avatar circle-${SIZES[size]} ${border && "border-avatar" || ""} ${className}`}
           src={src || `https://github.com/${userLogin}.png`}
         />
       </OverlayTrigger>

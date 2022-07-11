@@ -7,7 +7,7 @@ import {
   createContext
 } from "react";
 
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
 import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
@@ -22,7 +22,8 @@ export interface IAuthenticationContext {
   user?: User;
   wallet?: Wallet;
   isGithubAndWalletMatched?: boolean;
-  login: () => Promise<boolean>;
+  connectWallet: () => Promise<boolean>;
+  connectGithub: () => void;
   updateWalletBalance: () => void;
   disconnectWallet: () => void;
 }
@@ -42,7 +43,7 @@ export const AuthenticationProvider = ({ children }) => {
   const { getUserOf } = useApi();
   const { service: DAOService, connect } = useDAO();
 
-  const login = useCallback(async () => {
+  const connectWallet = useCallback(async () => {
     try {
       if (!DAOService) return;
 
@@ -56,6 +57,14 @@ export const AuthenticationProvider = ({ children }) => {
       return false;
     }
   }, [user?.login, asPath, DAOService]);
+
+  const connectGithub = useCallback(() => {
+    const URL_BASE = `${window.location.protocol}//${ window.location.host}`;
+
+    signIn("github", {
+      callbackUrl: `${URL_BASE}${asPath}`
+    });
+  }, []);
 
   const disconnectWallet = useCallback(() => {
     setWallet(undefined);
@@ -150,7 +159,8 @@ export const AuthenticationProvider = ({ children }) => {
       user,
       wallet,
       isGithubAndWalletMatched,
-      login,
+      connectWallet,
+      connectGithub,
       updateWalletBalance,
       disconnectWallet
   }),
