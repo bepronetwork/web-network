@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from 'react'
 
 import { head } from 'lodash'
 import { useRouter } from 'next/router'
-import { getSession } from 'next-auth/react'
 import { GetServerSideProps } from 'next/types'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
@@ -176,7 +175,6 @@ export default function PullRequest() {
 export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, ['common', 'pull-request'])),
     },
   };

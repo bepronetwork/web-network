@@ -7,7 +7,6 @@ import router from 'next/router';
 import ConnectWalletButton from '@components/connect-wallet-button';
 import useApi from '@x-hooks/use-api';
 import {GetServerSideProps} from 'next';
-import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 
 export default function FalconPunchPage() {
@@ -102,7 +101,6 @@ export default function FalconPunchPage() {
 export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, ['common',])),
     },
   };

@@ -3,10 +3,8 @@ import OraclesActions from '@components/oracles-actions';
 import OraclesDelegate from '@components/oracles-delegate';
 import OraclesTakeBack from '@components/oracles-take-back';
 import Account from '@components/account';
-import ConnectWalletButton from '@components/connect-wallet-button';
 import ExternalLinkIcon from '@assets/icons/external-link-icon';
 import {GetServerSideProps} from 'next';
-import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 
@@ -56,7 +54,6 @@ export default function MyOracles() {
 export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, ['common', 'connect-wallet-button', 'my-oracles', 'bounty', 'pull-request'])),
     },
   };
