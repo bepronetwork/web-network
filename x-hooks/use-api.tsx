@@ -157,7 +157,7 @@ export default function useApi() {
   }
 
   async function getUserOf(address: string): Promise<User> {
-    return client.post<User[]>(`/search/users/address/`, [address])
+    return client.post<User[]>(`/search/users/address/`, [address?.toLowerCase()])
                  .then(({data}) => data[0])
                  .catch(() => ({} as User))
   }
