@@ -9,6 +9,7 @@ import { useNetworkSettings } from "contexts/network-settings";
 
 import { StepWrapperProps } from "interfaces/stepper";
 
+import NetworkContractSettings from "./network-contract-settings";
 import ThemeColors from "./theme-colors";
 
 const Section = ({ children = undefined, title }) => (
@@ -23,16 +24,14 @@ const Section = ({ children = undefined, title }) => (
   </div>
 );
 
-const ParameterInput = ({ label, symbol, value, onChange, error = false, onBlur = undefined}) => (
+const ParameterInput = ({ label, description = null, symbol, value, onChange, error = false, onBlur = undefined}) => (
   <div className="form-group col">
-    <label className="caption-small mb-2">
-      {label}
-    </label>
-
     <InputNumber
       classSymbol={"text-primary"}
       symbol={symbol}
       value={value}
+      label={label}
+      description={description}
       min={0}
       placeholder={"0"}
       onValueChange={onChange}
@@ -54,47 +53,8 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
   const handleColorChange = value => fields.colors.setter(value);
   const handleCloseFeeChange = param => fields.closeFee.setter(param.floatValue);
   const handleCancelFeeChange = param => fields.cancelFee.setter(param.floatValue);
-  const handleDraftTimeChange = ({ floatValue: value }) => fields.parameter.setter({ label: "draftTime", value });
-  const handleDisputeTimeChange = 
-    ({ floatValue: value }) => fields.parameter.setter({ label: "disputableTime", value });
-  const handleCouncilAmountChange = 
-    ({ floatValue: value }) => fields.parameter.setter({ label: "councilAmount", value });
-  const handlePercentageForDisputeChange = 
-    ({ floatValue: value }) => fields.parameter.setter({ label: "percentageNeededForDispute", value });
-
   const handleAddressBlur = () => fields.treasury.setter(address);
 
-  const parameterInputs = [
-    { 
-      label: t("custom-network:dispute-time"), 
-      symbol: t("misc.seconds"), 
-      value: settings?.parameters?.disputableTime?.value,
-      error: settings?.parameters?.disputableTime?.validated === false,
-      onChange: handleDisputeTimeChange
-    },
-    { 
-      label: t("custom-network:percentage-for-dispute"), 
-      symbol: "%", 
-      value: settings?.parameters?.percentageNeededForDispute?.value,
-      error: settings?.parameters?.percentageNeededForDispute?.validated === false,
-      onChange: handlePercentageForDisputeChange
-    },
-    { 
-      label: t("custom-network:redeem-time"), 
-      symbol: t("misc.seconds"), 
-      value: settings?.parameters?.draftTime?.value,
-      error: settings?.parameters?.draftTime?.validated === false,
-      onChange: handleDraftTimeChange
-    },
-    { 
-      label: t("custom-network:council-amount"), 
-      symbol: "BEPRO", 
-      value: settings?.parameters?.councilAmount?.value,
-      error: settings?.parameters?.councilAmount?.validated === false,
-      onChange: handleCouncilAmountChange
-    }
-  ];
-  
   return (
     <Step
       title={t("custom-network:steps.network-settings.title")}
@@ -157,16 +117,7 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
           {t("custom-network:steps.network-settings.fields.other-settings.parameters-warning")}
         </small>
 
-        {
-        parameterInputs.map(({ label, symbol, value, error, onChange }) => 
-          <ParameterInput 
-            label={label}
-            symbol={symbol}
-            value={value}
-            error={error}
-            onChange={onChange}
-          />)
-        }
+        <NetworkContractSettings/>
       </Section>
     </Step>
   );
