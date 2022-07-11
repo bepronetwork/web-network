@@ -42,7 +42,6 @@ export default function PageIssue() {
   const [isWorking, setIsWorking] = useState(false);
   const [hasOpenPR, setHasOpenPR] = useState(false);
   const [mergedPullRequests, setMergedPullRequests] = useState([]);
-  const [currentUser, setCurrentUser] = useState<User>();
   const {getMergedDataFromPullRequests} = useMergeData();
   const {getIssueComments, getForksOf, getUserRepos, getPullRequest} = useOctokit();
   const [[activeRepo, reposList]] = useRepos();
@@ -136,14 +135,6 @@ export default function PageIssue() {
       });
   }
 
-  const getCurrentUserMicroService = () => {
-    if (currentAddress == currentUser?.address)
-      return;
-
-    getUserOf(currentAddress)
-      .then((user: User) => setCurrentUser(user));
-  };
-
   function getRepoForked() {
     if (!activeRepo || !githubLogin)
       return;
@@ -166,7 +157,6 @@ export default function PageIssue() {
     if (currentAddress && id) {
       getsIssueMicroService();
       getsIssueBeproService();
-      getCurrentUserMicroService();
     } else if (id) getsIssueMicroService();
 
     if (githubLogin && activeRepo) getRepoForked();
@@ -225,7 +215,7 @@ export default function PageIssue() {
         mergeProposals={issue?.mergeProposals}
         amountIssue={networkIssue?.tokensStaked}
         forks={forks}
-        githubLogin={currentUser?.githubLogin}
+        githubLogin={githubLogin}
         hasOpenPR={hasOpenPR}
         isRepoForked={isRepoForked}
         isWorking={isWorking}
@@ -282,7 +272,6 @@ export const getServerSideProps: GetServerSideProps = async ({query, locale}) =>
 
   return {
     props: {
-      session: await getSession(),
       currentIssue,
       ...(await serverSideTranslations(locale, ['common', 'bounty', 'proposal', 'pull-request'])),
     },
