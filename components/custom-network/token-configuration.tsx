@@ -115,6 +115,10 @@ export default function TokenConfiguration({
     validateNFTAddress();
   }, [tokens?.settler, tokens?.bounty, DAOService]);
  
+  useEffect(() => {
+    if(bountyTokenAddress.length < 18) validateNFTAddress()
+  },[bountyTokenAddress])
+  
   return (
     <Step
       title={t("custom-network:steps.token-configuration.title")}

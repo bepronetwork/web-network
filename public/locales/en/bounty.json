@@ -35,6 +35,7 @@
   "status": {
     "ready": "ready",
     "draft": "draft",
+    "opened": "opened",
     "closed": "closed",
     "completed": "completed",
     "canceled": "canceled",

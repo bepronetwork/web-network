@@ -46,6 +46,7 @@ export default function ListSort({
     <ReactSelect
       defaultValue={getDefaultValue()}
       options={options}
+      isSearchable={false}
       onChange={handleSelectChange}
     />
   );

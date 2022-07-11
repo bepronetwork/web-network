@@ -112,14 +112,14 @@ export default function PageActions({
         const canceable = +new Date() >= +new Date(networkIssue.creationDate + cancelableTime) 
         setIsCancelable(canceable)
       })()
-  },[DAOService && networkIssue])
+  },[DAOService, networkIssue])
 
   async function handlePullrequest({
     title: prTitle,
     description: prDescription,
     branch
   }): Promise<void> {
-    if(!activeRepo.hasGhVisibility) return setShowGHModal(true)
+    if(!activeRepo?.hasGhVisibility) return setShowGHModal(true)
     let pullRequestPayload = undefined;
 
     createPrePullRequest(repoId as string, issueGithubID, {
@@ -179,7 +179,7 @@ export default function PageActions({
   }
 
   async function handleStartWorking() {
-    if(!activeRepo.hasGhVisibility) return setShowGHModal(true)
+    if(!activeRepo?.hasGhVisibility) return setShowGHModal(true)
     setIsExecuting(true);
 
     startWorking(networkIssue?.cid, user?.login, activeNetwork?.name)
@@ -253,14 +253,13 @@ export default function PageActions({
         isBountyOpen && 
         !isBountyInDraft && 
         isWorkingOnBounty && 
-        !hasOpenPullRequest && 
         isRepoForked)
       return(
         <ReadOnlyButtonWrapper>
           <Button
             className="read-only-button"
             onClick={() => setShowPRModal(true)}
-            disabled={!user?.login || !wallet?.address || hasOpenPullRequest}
+            disabled={!user?.login || !wallet?.address}
           >
             <Translation ns="pull-request" label="actions.create.title" />
           </Button>
@@ -324,9 +323,7 @@ export default function PageActions({
         <GithubLink
           repoId={String(repoId)}
           forcePath={activeIssue?.repository?.githubPath}
-          hrefPath={`pull/${activeIssue?.pullRequests?.find((pr) => pr.githubLogin === user?.login)
-              ?.githubId || ""
-            }`}
+          hrefPath={`pull?q=base:${activeIssue?.branch}`}
           color="primary"
         >
           <Translation ns="pull-request" label="actions.view" />
@@ -364,9 +361,7 @@ export default function PageActions({
 
               <GithubLink
                 repoId={String(repoId)}
-                onClick={() => {
-                  if(!activeRepo.hasGhVisibility) return setShowGHModal(true)
-                }}
+                onClick={!activeRepo?.hasGhVisibility ? () => setShowGHModal(true) : null}
                 forcePath={activeIssue?.repository?.githubPath}
                 hrefPath={`${(activeIssue?.state?.toLowerCase() === "pull request" && "pull") ||
                   "issues"

@@ -28,7 +28,7 @@
       "success": "Review submitted",
       "error": "To submit review"
     },
-    "view": "View Pull Request",
+    "view": "View Pull Requests",
     "make-ready": {
       "title": "Make ready for review",
       "success": "Pull Request is ready for review",
