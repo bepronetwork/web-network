@@ -25,6 +25,9 @@ import { changeTransactionalTokenApproval } from './reducers/change-transactiona
 import { changeSettlerTokenApproval } from './reducers/change-settler-token-approval';
 import {setCookie, parseCookies} from 'nookies'
 import { addTransaction } from './reducers/add-transaction';
+import { useSession } from 'next-auth/react';
+import { CustomSession } from '@interfaces/custom-session';
+import InvalidAccountWalletModal from '@components/invalid-account-wallet-modal';
 
 interface GlobalState {
   state: ApplicationState,
@@ -77,6 +80,9 @@ export default function ApplicationContextProvider({children}) {
   const [txListener, setTxListener] = useState<any>();
   const {authError} = useRouter().query;
   const {getUserOf} = useApi();
+  const session = useSession();
+  const { pathname } = useRouter();
+  const [ isGithubAndWalletMatched, setIsGithubAndWalletMatched ] = useState<boolean>();
 
   function updateSteFor(newAddress: string) {
     BeproService.login(true)
@@ -89,13 +95,6 @@ export default function ApplicationContextProvider({children}) {
 
     const address = state.currentAddress;
     cheatAddress = address;
-
-    getUserOf(address)
-      .then(user => {
-        dispatch(changeGithubHandle(user?.githubHandle));
-        dispatch(changeGithubLogin(user?.githubLogin));
-        dispatch(changeAccessToken(user?.accessToken));
-      })
 
     BeproService.getOraclesSummary()
                 .then(oracles => dispatch(changeOraclesState(changeOraclesParse(address, oracles))))
@@ -174,7 +173,31 @@ export default function ApplicationContextProvider({children}) {
     else
       waitingForTx = transactionWithHash
 
-  }, [state.myTransactions])
+  }, [state.myTransactions]);
+
+  async function validateGithubAndWallet(login, address) {
+    const userLogin = address ? (await getUserOf(address))?.githubLogin : undefined;
+
+    if (login) setIsGithubAndWalletMatched(userLogin === login);
+  }
+
+  useEffect(() => {
+    const user = (session?.data as CustomSession)?.user;
+
+    dispatch(changeGithubHandle(user?.name));
+    dispatch(changeGithubLogin(user?.login));
+    dispatch(changeAccessToken(user?.accessToken));
+  }, [session]);
+
+  useEffect(() => {
+    const userLogin = state?.githubLogin;
+    const userAddress = state?.currentAddress;
+
+    if (!userLogin || !userAddress || !pathname || pathname?.includes("connect-account")) 
+      return setIsGithubAndWalletMatched(undefined);
+
+    validateGithubAndWallet(userLogin, userAddress);
+  }, [state?.githubLogin, state?.currentAddress, pathname]);
 
   const restoreTransactions = async (address)=>{
     const cookie = parseCookies()
@@ -220,6 +243,11 @@ export default function ApplicationContextProvider({children}) {
   return (
     <ApplicationContext.Provider value={{ state, dispatch: dispatch as any }}>
       <Loading show={state.loading.isLoading} text={state.loading.text} />
+      <InvalidAccountWalletModal 
+        user={session?.data?.user} 
+        wallet={state.currentAddress} 
+        isVisible={isGithubAndWalletMatched === false && !state.loading.isLoading} 
+      />
       <Toaster />
       {children}
     </ApplicationContext.Provider>
