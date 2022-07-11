@@ -112,7 +112,7 @@ export default function PageActions({
         const canceable = +new Date() >= +new Date(networkIssue.creationDate + cancelableTime) 
         setIsCancelable(canceable)
       })()
-  },[DAOService && networkIssue])
+  },[DAOService, networkIssue])
 
   async function handlePullrequest({
     title: prTitle,

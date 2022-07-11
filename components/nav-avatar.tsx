@@ -25,7 +25,7 @@ export default function NavAvatar() {
   const { wallet, user, disconnectWallet } = useAuthentication();
 
   const avatar = () => user?.login && 
-    <Avatar userLogin={user.login} className="border-primary" size="lg" /> || 
+    <Avatar userLogin={user.login} className="border-primary" size="md" /> || 
     <Identicon address={wallet?.address} />;
   
   const username = user?.login ? user.login : truncateAddress(wallet?.address);
@@ -72,14 +72,13 @@ export default function NavAvatar() {
     </div>
   );
 
-  // TODO: update internal links when the new profile page is ready
   const internalLinks = [
-    Link(t("main-nav.nav-avatar.wallet"), ""),
-    Link(t("main-nav.nav-avatar.payments"), getURLWithNetwork("/account/payments")),
-    Link(t("main-nav.nav-avatar.bounties"), getURLWithNetwork("/account")),
-    Link(t("main-nav.nav-avatar.pull-requests"), getURLWithNetwork("/account/my-pull-requests")),
-    Link(t("main-nav.nav-avatar.proposals"), ""),
-    Link(t("main-nav.nav-avatar.custom-network"), getURLWithNetwork("/account/my-network")),
+    Link(t("main-nav.nav-avatar.wallet"), getURLWithNetwork("/profile/wallet")),
+    Link(t("main-nav.nav-avatar.payments"), getURLWithNetwork("/profile/payments")),
+    Link(t("main-nav.nav-avatar.bounties"), getURLWithNetwork("/profile/bounties")),
+    Link(t("main-nav.nav-avatar.pull-requests"), getURLWithNetwork("/profile/pull-requests")),
+    Link(t("main-nav.nav-avatar.proposals"), getURLWithNetwork("/profile/proposals")),
+    Link(t("main-nav.nav-avatar.my-network"), getURLWithNetwork("/profile/my-network")),
   ];
 
   const externalLinks = [
@@ -104,7 +103,7 @@ export default function NavAvatar() {
 
               <div className="d-flex flex-row justify-content-left">
                 <InternalLink 
-                  href="" 
+                  href={getURLWithNetwork("/profile")} 
                   label={t("main-nav.nav-avatar.view-profile")} 
                   className="text-gray p family-Regular" 
                   nav 
