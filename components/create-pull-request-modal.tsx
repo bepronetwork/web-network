@@ -1,10 +1,9 @@
 import LockedIcon from '@assets/icons/locked-icon';
 import Modal from '@components/modal';
-import {useContext, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import Button from './button';
 import ReactSelect from '@components/react-select';
 import useOctokit from '@x-hooks/use-octokit';
-import {ApplicationContext} from '@contexts/application';
 import { useTranslation } from 'next-i18next';
 
 export default function CreatePullRequestModal({
@@ -20,7 +19,6 @@ export default function CreatePullRequestModal({
   const [branch, setBranch] = useState();
   const [isCreating, setIsCreating] = useState(false)
   const octo = useOctokit();
-  const {state: {accessToken,}} = useContext(ApplicationContext);
   const { t } = useTranslation(['common', 'pull-request'])
 
   function onSelectedBranch(option) {
@@ -46,13 +44,13 @@ export default function CreatePullRequestModal({
 
   useEffect(setDefaults, [show])
   useEffect(() => {
-    if (!accessToken || options.length || !repo)
+    if (options.length || !repo)
       return;
 
     function mapBranches({data: branches}) { return branches.map(({name}) => ({value: name, label: name, isSelected: branch && branch === name}))}
     octo.listBranches(repo).then(mapBranches).then(setOptions)
 
-  }, [accessToken, repo]);
+  }, [repo]);
 
   return (
     <Modal size="lg" show={show} onCloseClick={onCloseClick} title={t('pull-request:actions.create.title')} titlePosition="center">
