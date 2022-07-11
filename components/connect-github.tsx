@@ -4,17 +4,26 @@ import {ApplicationContext} from '@contexts/application';
 import {signIn, signOut} from 'next-auth/react';
 import useApi from '@x-hooks/use-api';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 
 export default function ConnectGithub() {
   const {state: {currentAddress}} = useContext(ApplicationContext);
   const api = useApi();
   const { t } = useTranslation('common')
+  const { push, asPath } = useRouter();
 
   async function clickSignIn() {
     await signOut({redirect: false});
+
     localStorage.setItem(`lastAddressBeforeConnect`, currentAddress);
+
     const user = await api.getUserOf(currentAddress);
-    return signIn('github', {callbackUrl: `${window.location.protocol}//${window.location.host}/connect-account${!!user ? `?migrate=1` : ``}`})
+
+    if (!user) return push("/connect-account");
+    
+    return signIn('github', {
+      callbackUrl: `${window.location.protocol}//${window.location.host}/${asPath}`
+    });
   }
 
   return (
