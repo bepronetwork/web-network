@@ -12,10 +12,10 @@ import Button from "components/button";
 import ConnectWalletButton from "components/connect-wallet-button";
 import CustomContainer from "components/custom-container";
 import AmountCard from "components/custom-network/amount-card";
+import NetworkContractSettings from "components/custom-network/network-contract-settings";
 import RepositoriesList from "components/custom-network/repositories-list";
 import ThemeColors from "components/custom-network/theme-colors";
 import ImageUploader from "components/image-uploader";
-import InputNumber from "components/input-number";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
@@ -27,7 +27,6 @@ import { addToast } from "contexts/reducers/add-toast";
 import { handleNetworkAddress } from "helpers/custom-network";
 import { psReadAsText } from "helpers/file-reader";
 import { formatDate } from "helpers/formatDate";
-import { formatNumberToCurrency } from "helpers/formatNumber";
 import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
 import useApi from "x-hooks/use-api";
@@ -36,13 +35,6 @@ import useNetworkTheme from "x-hooks/use-network";
 
 const { publicRuntimeConfig } = getConfig();
 
-const MAX_PERCENTAGE_FOR_DISPUTE = +publicRuntimeConfig?.networkConfig?.disputesPercentage;
-const MIN_DRAFT_TIME = +publicRuntimeConfig?.networkConfig?.reedemTime?.min;
-const MAX_DRAFT_TIME = +publicRuntimeConfig?.networkConfig?.reedemTime?.max;
-const MIN_DISPUTE_TIME = +publicRuntimeConfig?.networkConfig?.disputableTime?.min;
-const MAX_DISPUTE_TIME = +publicRuntimeConfig?.networkConfig?.disputableTime?.max;
-const MIN_COUNCIL_AMOUNT = +publicRuntimeConfig?.networkConfig?.councilAmount?.min;
-const MAX_COUNCIL_AMOUNT = +publicRuntimeConfig?.networkConfig?.councilAmount?.max;
 interface NetworkAmounts {
   tokenStaked: number;
   oraclesStaked: number;
@@ -72,7 +64,6 @@ export default function Settings() {
 
   const { dispatch } = useContext(ApplicationContext);
 
-  const networkTokenSymbol = activeNetwork?.networkToken?.symbol || t("misc.$token");
   const settingsValidated = [
     fields.description.validator(details?.description),
     fields.colors.validator(settings?.theme?.colors),
@@ -230,33 +221,6 @@ export default function Settings() {
     fields.repository.setter(fullName);
   }
 
-  function handleDisputableTimeChange({ floatValue }) {
-    fields.parameter.setter({
-      label: "disputableTime", 
-      value: floatValue
-    });
-  }
-
-  function handlePercentageNeededForDisputeChange({ floatValue }) {
-    fields.parameter.setter({
-      label: "percentageNeededForDispute", 
-      value: floatValue
-    });
-  }
-
-  function handleDraftTimeChange({ floatValue }) {
-    fields.parameter.setter({
-      label: "draftTime", 
-      value: floatValue
-    });
-  }
-
-  function handleCouncilAmountChange({ floatValue }) {
-    fields.parameter.setter({
-      label: "councilAmount", 
-      value: floatValue
-    });
-  }
 
   useEffect(() => {
     if (!DAOService ||
@@ -441,87 +405,7 @@ export default function Settings() {
               </div>
 
               <div className="row px-0 mx-0 mt-3">
-                <div className="col-3">
-                  <InputNumber
-                    classSymbol={"text-ligth-gray"}
-                    label={t("custom-network:dispute-time")}
-                    symbol={t("misc.seconds")}
-                    max={MAX_DISPUTE_TIME}
-                    description={t("custom-network:errors.dispute-time", {
-                      min: MIN_DISPUTE_TIME,
-                      max: formatNumberToCurrency(MAX_DISPUTE_TIME, 0)
-                    })}
-                    value={settings?.parameters?.disputableTime?.value}
-                    error={settings?.parameters?.disputableTime?.validated === false}
-                    min={0}
-                    placeholder={"0"}
-                    thousandSeparator
-                    decimalSeparator="."
-                    decimalScale={18}
-                    onValueChange={handleDisputableTimeChange}
-                  />
-                </div>
-
-                <div className="col-3">
-                  <InputNumber
-                    classSymbol={"text-ligth-gray"}
-                    label={t("custom-network:percentage-for-dispute")}
-                    max={MAX_PERCENTAGE_FOR_DISPUTE}
-                    description={t("custom-network:errors.percentage-for-dispute",
-                      {max: MAX_PERCENTAGE_FOR_DISPUTE })}
-                    symbol="%"
-                    value={settings?.parameters?.percentageNeededForDispute?.value}
-                    error={settings?.parameters?.percentageNeededForDispute?.validated === false}
-                    placeholder={"0"}
-                    thousandSeparator
-                    decimalSeparator="."
-                    decimalScale={18}
-                    onValueChange={handlePercentageNeededForDisputeChange}
-                  />
-                </div>
-
-                <div className="col-3">
-                  <InputNumber
-                    classSymbol={"text-ligth-gray"}
-                    label={t("custom-network:redeem-time")}
-                    max={MAX_DRAFT_TIME}
-                    description={t("custom-network:errors.redeem-time", {
-                      min: MIN_DRAFT_TIME,
-                      max: formatNumberToCurrency(MAX_DRAFT_TIME, 0)
-                    })}
-                    symbol="seconds"
-                    value={settings?.parameters?.draftTime?.value}
-                    error={settings?.parameters?.draftTime?.validated === false}
-                    min={0}
-                    placeholder={"0"}
-                    thousandSeparator
-                    decimalSeparator="."
-                    decimalScale={18}
-                    onValueChange={handleDraftTimeChange}
-                  />
-                </div>
-
-                <div className="col-3">
-                  <InputNumber
-                    classSymbol={"text-primary"}
-                    label={t("custom-network:council-amount")}
-                    symbol={networkTokenSymbol}
-                    max={MAX_COUNCIL_AMOUNT}
-                    description={t("custom-network:errors.council-amount", {
-                      token: networkTokenSymbol,
-                      min: formatNumberToCurrency(MIN_COUNCIL_AMOUNT, 0),
-                      max: formatNumberToCurrency(MAX_COUNCIL_AMOUNT, 0)
-                    })}
-                    value={settings?.parameters?.councilAmount?.value}
-                    error={settings?.parameters?.councilAmount?.validated === false}
-                   min={0}
-                    placeholder={"0"}
-                    thousandSeparator
-                    decimalSeparator="."
-                    decimalScale={18}
-                    onValueChange={handleCouncilAmountChange}
-                  />
-                </div>
+                <NetworkContractSettings/>
               </div>
             </div>
 
