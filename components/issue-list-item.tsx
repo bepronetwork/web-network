@@ -1,7 +1,6 @@
 import React from "react";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
-import { GetStaticProps } from "next";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
@@ -211,9 +210,3 @@ export default function IssueListItem({
     </div>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {}
-  };
-};

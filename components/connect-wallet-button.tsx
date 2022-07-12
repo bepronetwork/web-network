@@ -31,13 +31,13 @@ export default function ConnectWalletButton({
   } = useContext(ApplicationContext);
   const [showModal, setShowModal] = useState(false);
 
-  const { wallet, login } = useAuthentication();
+  const { wallet, connectWallet } = useAuthentication();
   const { service: DAOService } = useDAO();
 
   useEffect(() => {
     if (!DAOService) return;
 
-    if (forceLogin) login();
+    if (forceLogin) connectWallet();
   }, [DAOService]);
 
   useEffect(() => {
@@ -49,14 +49,14 @@ export default function ConnectWalletButton({
       DAOService.getChainId()
         .then((chainId) => {
           if (+chainId === +publicRuntimeConfig?.metaMask?.chainId) {
-            login();
+            connectWallet();
           } else {
             dispatch(changeNetworkId(+chainId));
             setShowModal(false);
           }
         });
     } else {
-      login();
+      connectWallet();
     }
   }
 
@@ -131,10 +131,10 @@ export default function ConnectWalletButton({
     return (
       <Button
         color="white"
-        className="text-primary bg-opacity-100"
+        className="text-dark bg-opacity-100"
         onClick={handleLogin}
       >
-        <span>{t("main-nav.connect")}</span> <i className="ico-metamask" />
+        <span>{t("main-nav.connect")}</span>
       </Button>
     );
 

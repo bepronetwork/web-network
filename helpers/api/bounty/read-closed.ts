@@ -14,7 +14,7 @@ import { GraphQlResponse } from "types/octokit";
 
 import twitterTweet from "../handle-twitter-tweet";
 
-const { publicRuntimeConfig } = getConfig();
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
 export default async function readBountyClosed(events, network: Network_v2, customNetwork) {
   const closedBounties = [];
@@ -56,7 +56,7 @@ export default async function readBountyClosed(events, network: Network_v2, cust
           if (pullRequest) {
             const [owner, repo] = bounty.repository.githubPath.split("/");
             
-            const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
+            const githubAPI = (new Octokit({ auth: serverRuntimeConfig?.github?.token })).graphql;
 
             const issueDetails = await githubAPI<GraphQlResponse>(IssueQueries.Details, {
               repo,

@@ -18,6 +18,8 @@
 @import "components/creating-network-loader";
 @import "components/counter-badge";
 @import "components/amount-with-preview";
+@import "components/identicon";
+@import "components/profile-menu";
 
 @function toRGB($color) {
   @return "" + red($color) + ", " + green($color) + ", " + blue($color);
@@ -140,6 +142,8 @@ li {
       }
       &--is-disabled {
         border-color: transparent;
+        background-color: $black;
+        opacity: 0.4;
       }
     }
     &__value-filterIssues {
@@ -265,6 +269,29 @@ li {
     background-color: rgba(var(--bs-primary-rgb), 0.3) !important;
   }
 }
+
+.container-bounty {
+  height: 63px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+
+  &.bg-30,
+  &.bg-30-hover:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.3) !important;
+    border: 2px solid $primary !important;
+  }
+}
+
+.funding-type {
+  background-color: rgba(var(--bs-primary-rgb), 0.3) !important;
+  border: 2px solid $primary !important;
+}
+
+.info-amount {
+  border-radius: 4px;
+}
+
 
 .p-nm {
   font-size: 14px;
@@ -430,10 +457,11 @@ li {
 .banner-shadow {
   width: 100%;
   min-height: 164px;
-  background-color: var(--bs-shadow);
+  background-color: $bg;
   color: $white;
   padding-top: ($navbar-height + $m + 4);
   padding-bottom: $m + 4;
+  border-bottom: 1px solid $disabled;
 }
 
 // Remove: After update all headers
@@ -537,6 +565,11 @@ label {
     background-color: $black;
     border: 1px solid $black;
     color: var(--bs-gray);
+
+    &.group-disabled {
+      opacity: 0.4;
+      border: 1px solid rgba($black, 0.4);
+    }
   }
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
@@ -613,16 +646,39 @@ label {
   height: 32px;
   border-radius: 16px;
 }
+
 .circle-3 {
   width: 28px;
   height: 28px;
   border-radius: 14px;
 }
 
+.circle-4 {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+}
+
+.circle-5 {
+  width: 108px;
+  height: 108px;
+  border-radius: 54px;
+}
+
+.font-weight-normal {
+  font-weight: normal !important;
+}
+
 .border-avatar {
   border: solid;
   border-width: 2px;
   border-color: $white;
+
+  &.border-primary {
+    border: solid;
+    border-width: 2px;
+    border-color: var(--bs-primary);
+  }
 }
 
 .ico-metamask {
@@ -758,6 +814,10 @@ label {
 .issue-progress-horizontal {
   height: 200px;
   width: 2px;
+}
+
+.issue-progress-vertical {
+  height: 2px;
 }
 
 .material-icons {
@@ -1024,6 +1084,8 @@ $c_props: (
 }
 
 .main-nav {
+  border-bottom: 1px solid $disabled;
+
   .btn:not(.brand) svg:only-child {
     width: 24px;
     height: 24px;
@@ -1101,7 +1163,6 @@ a.row-button svg {
 }
 
 textarea.form-control {
-  resize: none;
   border-radius: math.div($m, 2);
 }
 
@@ -1280,18 +1341,31 @@ textarea.form-control {
   }
 }
 
+.color-light-gray {
+  color: $ligth-gray
+}
+
 .custom-color-input {
   width: 38px;
   height: 38px;
 
-  border-radius: 38px;
-  border: 2px solid $white;
+.custom-color-input-wrapper {
+  padding: 10px 20px;
 
-  &.is-invalid {
-    border: 2px solid var(--bs-fail);
+
+  .custom-color-input {
+    width: 25px;
+    height: 25px;
+
+    border-radius: 25px;
+    border: 2px solid $white;
+
+    &.is-invalid {
+      border: 2px solid var(--bs-fail);
+    }
+
+    overflow: hidden;
   }
-
-  overflow: hidden;
 }
 
 input[type="color"] {
@@ -1444,5 +1518,55 @@ input[type="color"] {
 
   .read-only-button {
     pointer-events: none !important;
+  }
+}
+
+.svg {
+  &-primary {
+    svg {  
+      path {
+        fill: var(--bs-primary);
+      }
+    }
+  }
+}
+
+.nav-link-gradient {
+  background: linear-gradient(to right, #9669ED -0.33%, #FF6A2C 50.71%, #4250E4 99.67%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  width: fit-content;
+  font-weight: bold;
+  background-size: 200% 200%;
+  
+  animation: grandient-loop 3s ease-in-out infinite;
+}
+
+@keyframes grandient-loop {
+0%{background-position:right}
+50%{background-position:left}
+100%{background-position:right}
+}}
+
+.nav-avatar {
+  .text-primary {
+    svg {
+      color: var(--bs-primary);
+    }
+  }
+
+  .text-danger {
+    svg {
+      color: var(--bs-danger) !important;
+    }
+  }
+}
+
+.profile {
+  &-content {
+    min-height: 90vh;
+    height: max-content;
+    border-left: 1px solid $ligth-gray;
   }
 }

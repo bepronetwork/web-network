@@ -2,11 +2,11 @@ import { Collapse } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
 
-import SuccessIcon from "assets/icons/success-icon";
+import ConfirmIcon from "assets/icons/confirm-icon";
 
 import Button from "components/button";
 
-import { IStep } from "interfaces/stepper";
+import { StepProps } from "interfaces/stepper";
 
 export default function Step({
   title,
@@ -17,10 +17,13 @@ export default function Step({
   finishLabel,
   handleClick,
   handleFinish
-}: IStep) {
+}: StepProps) {
   const { t } = useTranslation("common");
 
   const isActive = activeStep === index;
+
+  const textColor = isActive ? "white" : (validated && "success" || "ligth-gray");
+  const bgColor = !isActive && validated ? "bg-success-15" : "";
 
   function handleAction() {
     if (finishLabel) handleFinish?.();
@@ -28,23 +31,20 @@ export default function Step({
   }
 
   return (
-    <div className="step border-radius-8 p-4">
+    <div className={`step border-radius-8 px-4 py-3 ${bgColor}`}>
       <div
         className="d-flex flex-row align-items-center cursor-pointer"
         onClick={() => handleClick?.(index)}
       >
+        {(validated && <span className="mr-2"><ConfirmIcon /></span>) || ""}
         <span
-          className={`caption-medium mr-1 ${
-            isActive ? "text-white" : "text-ligth-gray"
-          }`}
-        >{`${index}. ${title}`}</span>
-
-        {(validated && <SuccessIcon />) || ""}
+          className={`caption-medium text-${textColor}`}
+        >{`${index + 1}. ${title}`}</span>
       </div>
 
       <Collapse in={isActive}>
         <div>
-          <div className="row pt-4">{children}</div>
+          <div className="row pt-2">{children}</div>
 
           {(validated && (
             <div className="d-flex flex-row justify-content-center">

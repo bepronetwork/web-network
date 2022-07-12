@@ -14,7 +14,7 @@ import api from "services/api";
 
 import { GraphQlResponse } from "types/octokit";
 
-const { publicRuntimeConfig } = getConfig();
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -45,7 +45,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const [owner, repo] = repository.githubPath.split("/");
 
-  const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
+  const githubAPI = (new Octokit({ auth: serverRuntimeConfig?.github?.token })).graphql;
 
   const repositoryDetails = await githubAPI<GraphQlResponse>(RepositoryQueries.Details, {
     repo,

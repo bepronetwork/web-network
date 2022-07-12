@@ -1,7 +1,5 @@
 import React, { ReactNode } from "react";
 
-import { GetStaticProps } from "next";
-
 import NotFoundIcon from "assets/icons/not-found-icon";
 
 type NothingFoundProps = {
@@ -21,9 +19,3 @@ export default function NothingFound({
     </div>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {}
-  };
-};

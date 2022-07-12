@@ -1,7 +1,6 @@
-import { signIn, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
-import { useRouter } from "next/router";
 
 import ErrorMarkIcon from "assets/icons/errormark-icon";
 import metamaskLogo from "assets/metamask.png";
@@ -13,7 +12,6 @@ import Modal from "components/modal";
 import { truncateAddress } from "helpers/truncate-address";
 
 export default function InvalidAccountWalletModal({ user, wallet, isVisible }) {
-  const { asPath } = useRouter();
   const { t } = useTranslation("common");
 
   const disconnectBtnVisible = user?.login && wallet?.address && isVisible;
@@ -26,13 +24,7 @@ export default function InvalidAccountWalletModal({ user, wallet, isVisible }) {
       params: [{
         eth_accounts: {},
       }]
-    });
-  }
-
-  function handleConnectGithub() {
-    return signIn("github", {
-      callbackUrl: `${window.location.protocol}//${window.location.host}/${asPath}`
-    });
+    });  
   }
 
   return (
@@ -51,9 +43,8 @@ export default function InvalidAccountWalletModal({ user, wallet, isVisible }) {
         <div className="row gx-3 connect-account">
           <div className="col-6">
             <div
-              className={
-                "button-connect border bg-dark border-danger d-flex justify-content-between p-3 align-items-center"
-              }
+              className={`button-connect border bg-dark 
+                border-danger d-flex justify-content-between p-3 align-items-center`}
             >
               <div>
                 <Avatar src={user?.image} userLogin={user?.login || "null"} />{" "}
@@ -65,9 +56,8 @@ export default function InvalidAccountWalletModal({ user, wallet, isVisible }) {
           </div>
           <div className="col-6">
             <div
-              className={
-                "button-connect border bg-dark border-danger d-flex justify-content-between p-3 align-items-center"
-              }
+              className={`button-connect border bg-dark 
+                border-danger d-flex justify-content-between p-3 align-items-center`}
             >
               <div>
                 <Image src={metamaskLogo} width={15} height={15} />{" "}
@@ -84,13 +74,6 @@ export default function InvalidAccountWalletModal({ user, wallet, isVisible }) {
           <div className="d-flex justify-content-center mt-3">
             <Button color="primary" onClick={handleDisconnectAccounts}>
               <span>{t("actions.disconnect-accounts")}</span>
-            </Button>
-          </div>
-        }
-        { !disconnectBtnVisible &&
-          <div className="d-flex justify-content-center mt-3">
-            <Button color="primary" onClick={handleConnectGithub}>
-              <span>Connect Github</span>
             </Button>
           </div>
         }

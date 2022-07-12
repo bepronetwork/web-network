@@ -12,9 +12,10 @@ import Modal from "components/modal";
 import ReactSelect from "components/react-select";
 
 import { useAuthentication } from "contexts/authentication";
+import { useIssue } from "contexts/issue";
 import { useRepos } from "contexts/repos";
 
-import useOctokitGraph from "x-hooks/use-octokit-graph";
+import useOctokit from "x-hooks/use-octokit";
 
 interface props {
   show: boolean,
@@ -43,8 +44,9 @@ export default function CreatePullRequestModal({
 
   const { user } = useAuthentication();
   const { activeRepo } = useRepos();
+  const { activeIssue } = useIssue()
 
-  const { getRepositoryBranches, getUserRepositories } = useOctokitGraph();
+  const { getRepositoryBranches, getUserRepositories } = useOctokit();
 
   function onSelectedBranch(option) {
     setSelectedBranch(option.value);
@@ -76,26 +78,52 @@ export default function CreatePullRequestModal({
       const filteredRepos = 
         repositories.filter(repo => (repo.isFork && repo.nameWithOwner === `${user.login}/${activeRepo?.name}`) 
                                     || repo.nameWithOwner === activeRepo?.githubPath);
-
       
-
       return Promise.all(filteredRepos
         .map(async (repository) => ({ repository, branches:  await getRepositoryBranches(repository.nameWithOwner)})));
     })
     .then(reposWithBranches => reposWithBranches
-      .map(({ repository, branches }) => branches.map(branch => ({ 
-        value: `${repository.owner}:${branch}`, 
-        label: branch,
-        postIcon: <Badge 
-                    color={repository.isOrganization ? "white-10" : "primary-30"}
-                    label={repository.isOrganization ? t("misc.organization") : t("misc.fork")}
-                  />,
-        isSelected: !!selectedBranch && branch === selectedBranch
-      })))
+      .map(({ repository, branches }) => branches
+        .map(branch => { 
+
+          const prExistsInActiveIssue = 
+          activeIssue.pullRequests
+          .some(({branch: b}) => b === `${repository.owner}:${branch}`);
+
+          const isBaseBranch = 
+          (activeIssue.repository.githubPath === repository.nameWithOwner 
+          && activeIssue.branch === branch) ;
+          
+          let postIcon = <></>
+
+          if(repository.isFork){
+            postIcon =  <Badge 
+              color={"primary-30"}
+              label={t("misc.fork")}
+            />
+          }
+
+          if(repository.isInOrganization){
+            postIcon =  <Badge 
+              color={"white-10"}
+              label={t("misc.organization")}
+            />
+          }
+
+          const disabledIcon = !prExistsInActiveIssue 
+          ? <></> 
+          : <Badge color={"danger"} label={`${t("pull-request:abbreviation")} ${t("pull-request:opened")}`} />;
+
+          return {
+            value: `${repository.owner}:${branch}`, 
+            label: branch,
+            isDisabled: prExistsInActiveIssue || isBaseBranch,
+            disabledIcon,
+            postIcon,
+            isSelected: !!selectedBranch && branch === selectedBranch}
+        }))
       .flatMap(branch => branch))
-    .then(branches => {
-      setOptions(branches);
-    })
+    .then(setOptions)
     .catch(console.log);
   }, [user?.accessToken, repo, show]);
 
@@ -141,10 +169,12 @@ export default function CreatePullRequestModal({
             <ReactSelect 
               options={options} 
               onChange={onSelectedBranch}
+              isDisabled={!options.length}
               components={{
                 Option: IconOption,
                 SingleValue: IconSingleValue
               }}
+              isOptionDisabled={(option) => option?.isDisabled}
               />
           </div>
         </div>

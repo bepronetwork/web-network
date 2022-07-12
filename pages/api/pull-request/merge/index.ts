@@ -14,7 +14,7 @@ import DAO from "services/dao-service";
 
 import { GraphQlResponse } from "types/octokit";
 
-const { publicRuntimeConfig } = getConfig();
+const { serverRuntimeConfig } = getConfig();
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, pullRequestId, mergeProposalId, address, networkName } =
@@ -83,7 +83,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const [owner, repo] = repository.githubPath.split("/");
 
-    const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
+    const githubAPI = (new Octokit({ auth: serverRuntimeConfig?.github?.token })).graphql;
 
     const pullRequestDetails = await githubAPI<GraphQlResponse>(PullRequestQueries.Details, {
       repo,

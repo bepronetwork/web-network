@@ -10,7 +10,7 @@ import * as PullRequestQueries from "graphql/pull-request";
 
 import { GraphQlResponse } from "types/octokit";
 
-const { publicRuntimeConfig } = getConfig();
+const { serverRuntimeConfig } = getConfig();
 
 export default async function readPullRequestCanceled(events, network: Network_v2, customNetwork) {
   const canceled: string[] = [];
@@ -46,7 +46,7 @@ export default async function readPullRequestCanceled(events, network: Network_v
 
           const [owner, repo] = networkPullRequest.originRepo.split("/");
 
-          const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
+          const githubAPI = (new Octokit({ auth: serverRuntimeConfig?.github?.token })).graphql;
 
           const pullRequestDetails = await githubAPI<GraphQlResponse>(PullRequestQueries.Details, {
             repo,

@@ -58,7 +58,7 @@ export default function TransactionsStateIndicator() {
         onToggle={(next) => setShowOverlay(next)}
         overlay={overlay}
       >
-        <div className="me-3">
+        <div>
           <Button
             className="opacity-75 opacity-100-hover"
             transparent

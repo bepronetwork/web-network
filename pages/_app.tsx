@@ -1,7 +1,7 @@
 import { isMobile } from "react-device-detect";
 
 import { GetServerSideProps } from "next";
-import { getSession, SessionProvider } from "next-auth/react";
+import { SessionProvider } from "next-auth/react";
 import { appWithTranslation } from "next-i18next";
 import { AppProps } from "next/app";
 
@@ -32,9 +32,9 @@ function App({
           <RootProviders>
             <NationDialog>
               <MainNav />
-              <div className="pb-5">
-                <Component {...pageProps} />
-              </div>
+
+              <Component {...pageProps} />
+              
               <StatusBar />
             </NationDialog>
           </RootProviders>
@@ -46,8 +46,8 @@ function App({
 
 export default appWithTranslation(App);
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps: GetServerSideProps = async () => {
   return {
-    props: { session: await getSession(ctx) }
+    props: {}
   };
 };

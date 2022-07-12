@@ -9,7 +9,7 @@ import Database from "db/models";
 import DAO from "services/dao-service";
 import IpfsStorage from "services/ipfs-service";
 
-const { publicRuntimeConfig } = getConfig();
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { name: networkName } = req.query;
@@ -90,7 +90,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const octokitUser = new Octokit({
       auth: accessToken
     });
-
     const repos = JSON.parse(repositories);
 
     const invitations = [];
@@ -98,24 +97,30 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     for (const repository of repos) {
       const [owner, repo] = repository.fullName.split("/");
 
-      const { data } = await octokitUser.rest.repos.addCollaborator({
+      await octokitUser.rest.repos.addCollaborator({
         owner,
         repo,
         username: publicRuntimeConfig?.github?.user,
         ...(githubLogin !== owner  && { permission: "maintain"} || {})
+      })
+      .then(({data}) => invitations.push(data?.id))
+      .catch((e) => {
+        console.error('[GH Add Colaborator Fail]', {e})
+        return e;
       });
-
-      if (data?.id) invitations.push(data?.id);
     }
 
     const octokitBot = new Octokit({
-      auth: publicRuntimeConfig?.github?.token
+      auth: serverRuntimeConfig?.github?.token
     });
 
     for (const invitation_id of invitations) {
       if (invitation_id)
         await octokitBot.rest.repos.acceptInvitationForAuthenticatedUser({
           invitation_id
+        }).catch((e)=>{
+          console.error('[GH Accpet Invitation Fail]', {e})
+          return e;
         });
     }
 
@@ -302,7 +307,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
       if (invitations.length) {
         const octokitBot = new Octokit({
-          auth: publicRuntimeConfig?.github?.token
+          auth: serverRuntimeConfig?.github?.token
         });
 
         for (const invitation_id of invitations) {

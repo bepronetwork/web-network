@@ -28,7 +28,6 @@ import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { ReduceActor } from "interfaces/reduce-action";
 
 import { changeNetworkId } from "./reducers/change-network-id";
-import { changeStakedState } from "./reducers/change-staked-amount";
 
 interface GlobalState {
   state: ApplicationState;
@@ -86,7 +85,6 @@ export default function ApplicationContextProvider({ children }) {
   const [txListener, setTxListener] = useState<NodeJS.Timeout | undefined>();
   const {
     query: { authError },
-    pathname
   } = useRouter();
 
   const { activeNetwork } = useNetwork();

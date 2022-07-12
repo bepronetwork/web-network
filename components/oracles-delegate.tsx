@@ -88,7 +88,6 @@ function OraclesDelegate() {
       <div className="content-wrapper h-100">
         <OraclesBoxHeader
           actions={t("my-oracles:actions.delegate.title")}
-          available={availableAmount}
         />
         <p className="caption-small text-white text-uppercase mt-2 mb-3">
           {t("my-oracles:actions.delegate.description")}

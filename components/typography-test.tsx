@@ -1,5 +1,3 @@
-import { GetStaticProps } from "next";
-
 export default function TypographyTest() {
   return (
     <div className="container">
@@ -90,9 +88,3 @@ export default function TypographyTest() {
     </div>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {}
-  };
-};

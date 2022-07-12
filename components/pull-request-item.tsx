@@ -21,7 +21,7 @@ import { formatNumberToNScale } from "helpers/formatNumber";
 import { pullRequest } from "interfaces/issue-data";
 
 import useNetwork from "x-hooks/use-network";
-import useOctokitGraph from "x-hooks/use-octokit-graph";
+import useOctokit from "x-hooks/use-octokit";
 
 interface PullRequestItem {
   pullRequest: pullRequest;
@@ -39,7 +39,7 @@ export default function PullRequestItem({
   const { activeIssue } = useIssue();
   const { user } = useAuthentication();
   const { getURLWithNetwork } = useNetwork();
-  const { getPullRequestLinesOfCode } = useOctokitGraph();
+  const { getPullRequestLinesOfCode } = useOctokit();
 
   const pullRequestCommentsCount = pullRequest?.comments?.length || 0;
 

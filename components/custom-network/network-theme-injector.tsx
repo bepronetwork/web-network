@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 
+import getConfig from "next/config";
+
 import useNetworkTheme from "x-hooks/use-network";
+
+const { publicRuntimeConfig: { networkConfig: { networkName } } } = getConfig();
 
 export default function NetworkThemeInjector() {
   const [currentColors, setCurrentColors] = useState("");
@@ -8,7 +12,8 @@ export default function NetworkThemeInjector() {
   const { network, colorsToCSS } = useNetworkTheme();
 
   useEffect(() => {
-    setCurrentColors(colorsToCSS());
+    if (network?.name && network?.name !== networkName)
+      setCurrentColors(colorsToCSS());
   }, [network]);
 
   return (

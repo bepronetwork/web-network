@@ -18,7 +18,6 @@ const publicRuntimeConfig = {
   nftUri: process.env.NEXT_PUBLIC_NFT_URI,
   web3ProviderConnection: process.env.NEXT_PUBLIC_WEB3_CONNECTION,
   github:{
-    token: process.env.NEXT_PUBLIC_GH_TOKEN,
     user: process.env.NEXT_PUBLIC_GH_USER,
   },
   metaMask:{
@@ -76,7 +75,8 @@ const serverRuntimeConfig = {
     secret: process.env.NEXT_GH_SECRET,
     mainBranch: process.env.NEXT_GH_MAINBRANCH,
     owner: process.env.NEXT_GH_OWNER,
-    repo: process.env.NEXT_GH_REPO
+    repo: process.env.NEXT_GH_REPO,
+    token: process.env.NEXT_PUBLIC_GH_TOKEN,
   },
   ipApi:{
   key: process.NEXT_IP_API_KEY,

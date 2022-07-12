@@ -1,3 +1,5 @@
+import { ReactElement } from "react";
+
 import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
@@ -5,10 +7,13 @@ export interface Token {
   address: string;
   name: string;
   symbol: string;
+  currentValue?: number;
+  tokenInfo?: TokenInfo;
+  balance?: number;
 }
 
 export interface TokenInfo extends Partial<Token> {
-    icon: string;
+    icon: string | ReactElement;
     prices: TokenPrice
 }
 
@@ -18,6 +23,6 @@ export interface TokenPrice {
 
 export const BEPRO_TOKEN: Token = {
   address: publicRuntimeConfig?.contract?.settler,
-  name: "BEPRO",
-  symbol: "$BEPRO"
+  name: "Bepro Network",
+  symbol: "BEPRO"
 };
