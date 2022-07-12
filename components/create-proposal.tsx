@@ -24,7 +24,7 @@ import { pullRequest } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-import useOctokitGraph from "x-hooks/use-octokit-graph";
+import useOctokit from "x-hooks/use-octokit";
 
 
 interface participants {
@@ -113,15 +113,11 @@ export default function NewProposal({
   const { activeRepo } = useRepos();
   const { wallet } = useAuthentication();
 
-  const { handleProposeMerge } = useBepro({onSuccess})
+  const { handleProposeMerge } = useBepro()
   const { updateIssue, activeIssue, networkIssue } = useIssue()
-  const { getPullRequestParticipants } = useOctokitGraph();
+  const { getPullRequestParticipants } = useOctokit();
   const { getUserWith, processEvent } = useApi();
   const { activeNetwork } = useNetwork();
-
-  function onSuccess(){
-    updateIssue(activeIssue.repository.id, activeIssue.githubId)
-  }
 
   function handleChangeDistrib(params: { [key: string]: number }): void {
     setDistrib((prevState) => {
@@ -275,7 +271,7 @@ export default function NewProposal({
       return processEvent("proposal", "created", activeNetwork?.name, { fromBlock });
     })
     .then(() => {
-      onSuccess();
+      updateIssue(activeIssue.repository.id, activeIssue.githubId)
     })
     .finally(() => {
       handleClose();

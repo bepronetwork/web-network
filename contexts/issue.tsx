@@ -18,7 +18,7 @@ import {
 } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
-import useOctokitGraph from "x-hooks/use-octokit-graph";
+import useOctokit from "x-hooks/use-octokit";
 
 import { useDAO } from "./dao";
 
@@ -48,7 +48,7 @@ export const IssueProvider: React.FC = function ({ children }) {
   const { activeNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
   const { wallet, user } = useAuthentication();
-  const { getIssueOrPullRequestComments, getPullRequestDetails } = useOctokitGraph();
+  const { getIssueOrPullRequestComments, getPullRequestDetails } = useOctokit();
 
   const addNewComment = useCallback((prId: number, comment: string) => {
     const pullRequests = [...activeIssue.pullRequests];

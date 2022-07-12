@@ -15,7 +15,7 @@ import api from "services/api";
 
 import { GraphQlQueryResponseData, GraphQlResponse } from "types/octokit";
 
-const { publicRuntimeConfig } = getConfig();
+const { serverRuntimeConfig } = getConfig();
 
 async function put(req: NextApiRequest, res: NextApiResponse) {
   const { issueId, githubLogin, networkName } = req.body;
@@ -47,7 +47,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
       await issue.save();
 
-      const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
+      const githubAPI = (new Octokit({ auth: serverRuntimeConfig?.github?.token })).graphql;
 
       const issueDetails = await githubAPI<GraphQlResponse>(IssueQueries.Details, {
         repo,

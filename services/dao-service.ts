@@ -21,10 +21,12 @@ const { publicRuntimeConfig } = getConfig();
 export default class DAO {
   private _web3Connection: Web3Connection;
   private _network: Network_v2;
+  private _networkAux: Network_v2;
   private _registry: Network_Registry;
 
   get web3Connection() { return this._web3Connection; }
   get network() { return this._network; }
+  get networkAux() { return this._networkAux; }
   get registry() { return this._registry; }
 
   constructor(skipWindowAssignment = false) {
@@ -159,11 +161,22 @@ export default class DAO {
     return this.network[parameter]();
   }
 
-  async setNetworkParameter(parameter: NetworkParameters, value: number): Promise<TransactionReceipt> {    
-    const param = [...parameter];
-    param[0] = param[0].toUpperCase();
+  async setNetworkParameter(parameter: NetworkParameters, 
+                            value: number, 
+                            networkAddress?: string): Promise<TransactionReceipt> {    
+    let network = this.network;
 
-    return this.network[`change${param.join('')}`](value);
+    if (networkAddress) {
+      if (this.networkAux?.contractAddress === networkAddress)
+        network = this.networkAux;
+      else {
+        this._networkAux = await this.loadNetwork(networkAddress, true);
+        network = this.networkAux;
+      }
+      
+    }
+    
+    return network[`change${parameter[0].toUpperCase() + parameter.slice(1)}`](value);
   }
 
   async getOraclesOf(address: string): Promise<number> {    
@@ -474,6 +487,10 @@ export default class DAO {
     return this.registry.networkOfAddress(address);
   }
 
+  async hardCancel(bountyId: number): Promise<TransactionReceipt>{
+    return this.network.hardCancel(bountyId);
+  }
+
   async setNFTTokenDispatcher(nftToken: string, dispatcher: string): Promise<TransactionReceipt> {
     const bountyToken = await this.loadBountyToken(nftToken);
 
@@ -488,7 +505,7 @@ export default class DAO {
     return this.web3Connection.utils.isAddress(address);
   }
 
-  getTimeChain(): Promise<number> { 
+  async getTimeChain(): Promise<number> { 
     return this.web3Connection.Web3.eth.getBlock(`latest`).then(block => block.timestamp*1000);
   }
 
@@ -499,4 +516,7 @@ export default class DAO {
     return (new Date(time) < new Date(creationDateIssue + redeemTime))
   }
 
+  getCancelableTime(): Promise<number> {
+    return this._network.cancelableTime();
+  }
 }

@@ -12,7 +12,7 @@ import api from "services/api";
 
 import { GraphQlResponse } from "types/octokit";
 
-const { publicRuntimeConfig } = getConfig();
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
 export default async function readPullRequestCreated(events, network: Network_v2, customNetwork) {
   const created: string[] = [];
@@ -57,7 +57,7 @@ export default async function readPullRequestCreated(events, network: Network_v2
           const body = 
             `@${bounty.creatorGithub}, @${pullRequest.githubLogin} has a solution - [check your bounty](${issueLink})`;
 
-          const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
+          const githubAPI = (new Octokit({ auth: serverRuntimeConfig?.github?.token })).graphql;
 
           const issueDetails = await githubAPI<GraphQlResponse>(IssueQueries.Details, {
             repo,

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 
 import { GetServerSideProps } from "next";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import getConfig from "next/config";
@@ -21,15 +21,13 @@ import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { toastError, toastSuccess } from "contexts/reducers/add-toast";
-import { changeCurrentAddress } from "contexts/reducers/change-current-address";
-import { changeGithubHandle } from "contexts/reducers/change-github-handle";
-import { changeGithubLogin } from "contexts/reducers/change-github-login";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 import { changeNetwork } from "contexts/reducers/change-network";
 import { changeNetworkId } from "contexts/reducers/change-network-id";
-import { changeWalletState } from "contexts/reducers/change-wallet-connect";
 
 import { truncateAddress } from "helpers/truncate-address";
+
+import { CustomSession } from "interfaces/custom-session";
 
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
@@ -45,16 +43,12 @@ export default function ConnectAccount() {
 
   const { getUserOf, joinAddressToUser, getUserWith } = useApi();
 
-  const { wallet, user } = useAuthentication();
+  const { wallet, user, connectWallet, connectGithub } = useAuthentication();
   const { service: DAOService } = useDAO();
-  const { network, getURLWithNetwork } = useNetwork();
+  const { getURLWithNetwork } = useNetwork();
   const { dispatch } = useContext(ApplicationContext);
 
   const { migrate } = router.query;
-
-  function updateLastUsedAddress() {
-    dispatch(changeLoadState(false));
-  }
 
   async function checkAddressVsGh() {
     if (!wallet?.address || !user?.login) return;
@@ -68,23 +62,17 @@ export default function ConnectAccount() {
     ) {
       dispatch(toastError(t("connect-account:errors.migrating-address-not-match", {
             address: truncateAddress(validatingUser.address)
-      }),
-                          undefined,
-          { delay: 10000 }));
+      }), undefined, { delay: 10000 }));
+
       setIsGhValid(false);
+
       return;
     }
 
     getUserOf(wallet?.address).then((user) => {
-      setIsGhValid((user &&
-          user.githubHandle ===
-            (session?.user.name || (session?.user as {
-              name?: string;
-              email?: string;
-              image?: string;
-              login?: string;
-          })?.login)) ||
-          true);
+      const { sessionName, sessionLogin } = session as CustomSession;
+
+      setIsGhValid((user && user.githubHandle === (sessionName || sessionLogin)) || true);
 
       if (!user) return;
 
@@ -123,8 +111,6 @@ export default function ConnectAccount() {
       if (result === true) {
         dispatch(toastSuccess(t("connect-account:connected-accounts")));
         dispatch(changeLoadState(false));
-        dispatch(changeGithubHandle(session.user.name || user?.login));
-        dispatch(changeGithubLogin(user?.login));
         return router.push(getURLWithNetwork("/account"));
       }
 
@@ -134,15 +120,11 @@ export default function ConnectAccount() {
   }
 
   function cancelAndSignOut() {
-    dispatch(changeGithubHandle(""));
-    dispatch(changeGithubLogin(""));
     return signOut({ redirect: false }).then(() => router.push("/"));
   }
 
-  async function connectWallet() {
+  async function loginWallet() {
     if (wallet?.address || !DAOService) return;
-
-    let loggedIn = false;
 
     try {
       const chainId = window?.ethereum?.chainId;
@@ -151,38 +133,22 @@ export default function ConnectAccount() {
         dispatch(changeNetworkId(+chainId));
         dispatch(changeNetwork((publicRuntimeConfig?.networkIds[+chainId] || "unknown")?.toLowerCase()));
         return;
-      } else {
-        loggedIn = await DAOService.connect();
-      }
+      } else
+        await connectWallet();
     } catch (e) {
       console.error("Failed to login on DAOService", e);
     }
-
-    if (!loggedIn) {
-      dispatch(changeWalletState(false));
-      dispatch(changeCurrentAddress(""));
-    } else {
-      dispatch(changeWalletState(loggedIn));
-      dispatch(changeCurrentAddress(wallet?.address));
-    }
-
-    return loggedIn;
   }
 
-  function connectGithub() {
+  function loginGithub() {
     localStorage.setItem("lastAddressBeforeConnect", wallet?.address);
-    return signIn("github", {
-      callbackUrl: `${window.location.protocol}//${
-        window.location.host
-      }/${network.name.toLowerCase()}/connect-account`
-    });
+    return connectGithub();
   }
 
   function renderMetamaskLogo() {
     return <Image src={metamaskLogo} width={15} height={15} />;
   }
 
-  useEffect(updateLastUsedAddress, []);
   useEffect(() => {
     checkAddressVsGh();
   }, [wallet?.address]);
@@ -215,7 +181,7 @@ export default function ConnectAccount() {
                         ? "dark border-dark"
                         : "black border-black border-primary-hover cursor-pointer"
                     } d-flex justify-content-between p-3 align-items-center`}
-                    onClick={connectGithub}
+                    onClick={loginGithub}
                   >
                     {!user?.login && (
                       <div className="mx-auto d-flex align-items-center">
@@ -246,7 +212,7 @@ export default function ConnectAccount() {
                         ? "dark border-dark"
                         : "black border-black border-primary-hover cursor-pointer"
                     } d-flex justify-content-between p-3 align-items-center ${getValidClass()}`}
-                    onClick={connectWallet}
+                    onClick={loginWallet}
                   >
                     {!wallet?.address && (
                       <div className="mx-auto d-flex align-items-center">
@@ -318,7 +284,7 @@ export default function ConnectAccount() {
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common", "connect-account"]))
+      ...(await serverSideTranslations(locale, ["common", "bounty", "connect-wallet-button", "connect-account"]))
     }
   };
 };

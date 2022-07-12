@@ -65,6 +65,8 @@ export interface pullRequest {
   status?: string;
   reviewers?: string[];
   contractId?: number;
+  userBranch?: string;
+  userRepo?: string;
 }
 
 export interface developer {

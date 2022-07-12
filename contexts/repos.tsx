@@ -20,7 +20,7 @@ import {
 } from "interfaces/repos-list";
 
 import useApi from "x-hooks/use-api";
-import useOctokitGraph from "x-hooks/use-octokit-graph";
+import useOctokit from "x-hooks/use-octokit";
 
 import { ApplicationContext } from "./application";
 import { useNetwork } from "./network";
@@ -28,6 +28,7 @@ import { useNetwork } from "./network";
 interface IActiveRepo extends RepoInfo {
   forks: ForkInfo[];
   branchs: BranchInfo[];
+  hasGhVisibility: boolean;
 }
 
 export type RepoListByNetwork = {
@@ -62,7 +63,7 @@ export const ReposProvider: React.FC = function ({ children }) {
   const { getReposList } = useApi();
   const { dispatch } = useContext(ApplicationContext);
   const { activeNetwork } = useNetwork();
-  const { getRepositoryForks, getRepositoryBranches } = useOctokitGraph();
+  const { getRepository, getRepositoryForks, getRepositoryBranches } = useOctokit();
   const { query } = useRouter();
 
   const findRepo = (repoId: number): RepoInfo =>
@@ -125,7 +126,7 @@ export const ReposProvider: React.FC = function ({ children }) {
     setRepoList((prevState) => ({
       ...prevState,
       [activeNetwork?.name]: {
-        repos: repos.map(repo => {
+        repos: repos?.map(repo => {
           const [owner, name] = repo.githubPath.split("/");
 
           return {...repo, owner, name};
@@ -142,21 +143,31 @@ export const ReposProvider: React.FC = function ({ children }) {
     if (activeRepo?.id === repoId) return activeRepo;
 
     const findedRepo = findRepo(repoId);
+
     if (!findedRepo) throw new Error("Repo not found");
 
     const noExpired =
         +new Date() - repoList[activeNetwork?.name].lastUpdated <= TTL;
 
-    const [branchs, forks] = await Promise.all([
-        findBranch(+findedRepo?.id, !noExpired),
-        findForks(+findedRepo?.id, !noExpired)
-    ]);
+    const ghRepository = await getRepository(findedRepo?.githubPath);
 
     const newActiveRepo = {
         ...findedRepo,
-        forks,
-        branchs
+        hasGhVisibility: !!ghRepository,
+        forks: [],
+        branchs: []
     };
+
+    if(newActiveRepo.hasGhVisibility){
+      const [branchs, forks] = await Promise.all([
+        findBranch(+findedRepo?.id, !noExpired),
+        findForks(+findedRepo?.id, !noExpired)
+      ]);
+
+      newActiveRepo.branchs = branchs;
+      newActiveRepo.forks = forks;
+    }
+
     setActiveRepo(newActiveRepo);
     return newActiveRepo;
   },
@@ -176,10 +187,6 @@ export const ReposProvider: React.FC = function ({ children }) {
       loadRepos();
     }
   }, [activeNetwork]);
-
-  useEffect(() => {
-    //console.warn('useRepo',{activeRepo, repoList, branchsList, forksList})
-  }, [activeRepo, repoList, branchsList, forksList]);
 
   const memorizeValue = useMemo<ReposContextData>(() => ({
       repoList: repoList[activeNetwork?.name]?.repos,

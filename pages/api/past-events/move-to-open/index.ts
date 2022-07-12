@@ -16,7 +16,7 @@ import DAO from "services/dao-service";
 
 import { GraphQlResponse } from "types/octokit";
 
-const { publicRuntimeConfig } = getConfig();
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const customNetworks = await models.network.findAll({
@@ -67,7 +67,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       ] 
     });
 
-    const githubAPI = (new Octokit({ auth: publicRuntimeConfig?.github?.token })).graphql;
+    const githubAPI = (new Octokit({ auth: serverRuntimeConfig?.github?.token })).graphql;
 
     let currentRepo = '';
     let labelId = null;
