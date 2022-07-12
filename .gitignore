@@ -31,3 +31,17 @@ yarn-error.log*
 package-lock.json
 
 .editorconfig
+
+.scripts/addresses-v1.txt
+
+.scripts/addresses.txt
+
+.scripts/deploy-v1.js
+
+.scripts/deploy-v2.js
+
+.scripts/tests.js
+
+dev.env
+
+old.env

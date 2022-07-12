@@ -90,7 +90,8 @@
     "install": "Install",
     "try-again": "Try Again",
     "reconnect-account": "Reconnect account",
-    "unlock-all": "Unlock all"
+    "unlock-all": "Unlock all",
+    "disconnect-accounts": "Disconnect Accounts"
   },
   "misc": {
     "by": "by",
@@ -134,6 +135,10 @@
         "title": "provide feedback",
         "content": "Product feedback and requests."
       }
+    },
+    "invalid-account-wallet": {
+      "title": "Github Account and Wallet don't match",
+      "description": "Login to the Github account previously associated to this wallet or change to the correct wallet for this account."
     },
     "not-mergeable": {
       "title": "Merging bounty",

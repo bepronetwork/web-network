@@ -129,13 +129,19 @@ export default function PageProposal() {
 
     async function mapUser(address: string, i: number) {
 
-      const {githubLogin} = await getUserOf(address);
+      const response = await getUserOf(address);
+      
+      if (!response) return undefined;
+
       const oracles = proposal.prAmounts[i].toString();
       const percentage = handlePercentage(+oracles, +amountIssue);
+
       return {githubLogin, percentage, address, oracles};
     }
 
-    Promise.all(proposal.prAddresses.map(mapUser)).then(setUsersAddresses)
+    Promise.all(proposal.prAddresses.map(mapUser)).then(addresses => {
+      setUsersAddresses(addresses.filter(el => !!el));
+    })
   }
 
  async function loadProposalData() {
@@ -212,7 +218,6 @@ export default function PageProposal() {
 export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, ['common', 'proposal', 'pull-request', 'connect-wallet-button'])),
     },
   };

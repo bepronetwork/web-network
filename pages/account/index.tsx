@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { getSession } from 'next-auth/react'
 import { useTranslation } from 'next-i18next'
 import { GetServerSideProps } from 'next/types'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -109,7 +108,6 @@ export default function MyIssues() {
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, [
         'common',
         'bounty',

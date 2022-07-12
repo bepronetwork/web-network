@@ -1,9 +1,10 @@
-import {Octokit} from 'octokit';
-import {useContext, useEffect, useState} from 'react';
-import {ApplicationContext} from '@contexts/application';
+import { Octokit } from 'octokit';
+import { useState } from 'react';
+import { GithubRequestParams } from '@interfaces/github';
+import { GithubActions } from '@interfaces/enums/github-actions';
+import api from '@services/api';
 
 export default function useOctokit() {
-  const {state:{accessToken}} = useContext(ApplicationContext);
   const [octokit, setOctokit] = useState<Octokit>(new Octokit());
 
   function getOwnerRepoFrom(path: string) {
@@ -11,40 +12,36 @@ export default function useOctokit() {
     return {owner, repo};
   }
 
-  async function getStargazers(path: string) {
-    const {data: forks} = await octokit.rest.repos.listForks({...getOwnerRepoFrom(path), per_page: 100,});
-    const {data: stars} = await octokit.rest.activity.listStargazersForRepo({...getOwnerRepoFrom(path), per_page: 100,})
-    const toLen = (array) =>  array.length > 99 ? `+99` : array.length.toString();
-
-    return { forks: toLen(forks), stars: toLen(stars), };
+  function makeOctokitRequest(action: GithubActions, params: GithubRequestParams) {
+    return api.post("/github", { action, params })
+      .then(({ data }) => data)
+      .catch(error => {
+        console.log("makeOctokitRequest", error);
+      });
   }
 
   async function getCommitsOfPr(pull_number: number, path: string) {
-    return octokit.paginate(octokit.rest.pulls.listCommits, { ...getOwnerRepoFrom(path), pull_number});
+    return makeOctokitRequest(GithubActions.PullRequestCommits, { ...getOwnerRepoFrom(path), pull_number });
   }
 
   async function getForksOf(path: string) {
-    return octokit.rest.repos.listForks({ ...getOwnerRepoFrom(path), per_page: 100, });
+    return makeOctokitRequest(GithubActions.RepositoryForks, { ...getOwnerRepoFrom(path) });
   }
 
   async function getUserRepos(githubLogin: string, repoName: string) {
-    return octokit.rest.repos.get({owner: githubLogin, repo: repoName})
+    return makeOctokitRequest(GithubActions.UserRepositories, { owner: githubLogin, repo: repoName });
   }
 
-  async function getIssueComments(issue_number: number, path: string,) {
-    return octokit.rest.issues.listComments({ ...getOwnerRepoFrom(path), issue_number })
+  async function getIssueComments(issue_number: number, path: string) {
+    return makeOctokitRequest(GithubActions.PullRequestOrIssueComments, { ...getOwnerRepoFrom(path), issue_number });
   }
 
   function getCommit(owner, repo, ref) {
-    return octokit.rest.repos.getCommit({
-      owner,
-      repo,
-      ref
-    })
+    return makeOctokitRequest(GithubActions.Commit, { owner, repo, ref });
   }
 
   async function getIssue(issue_number: number, path: string,) {
-    return octokit.rest.issues.get({ ...getOwnerRepoFrom(path), issue_number })
+    return makeOctokitRequest(GithubActions.Issue, { ...getOwnerRepoFrom(path), issue_number });
   }
 
   async function getParticipants(pullRequestGitId: number, path: string) {
@@ -64,26 +61,17 @@ export default function useOctokit() {
   }
 
   async function getPullRequest(pull_number: number, path: string) {
-    return octokit.rest.pulls.get({...getOwnerRepoFrom(path), pull_number,})
+    return makeOctokitRequest(GithubActions.PullRequest, { ...getOwnerRepoFrom(path), pull_number });
   }
 
   async function getPullRequestComments(pull_number: number, path: string) {
-    return octokit.rest.issues.listComments({...getOwnerRepoFrom(path), issue_number: pull_number})
+    return makeOctokitRequest(GithubActions.PullRequestOrIssueComments, { ...getOwnerRepoFrom(path), issue_number: pull_number });
   }
 
-  async function listBranches(path: string,) {
-    return octokit.rest.repos.listBranches({...getOwnerRepoFrom(path)});
+  async function listBranches(path: string) {
+    return makeOctokitRequest(GithubActions.RepositoryBranches, { ...getOwnerRepoFrom(path) });
   }
 
-  async function authenticate(auth: string) {
-    if (!auth)
-      return;
-
-    setOctokit(new Octokit({auth}));
-  }
-
-  useEffect(() => { authenticate(accessToken) }, [accessToken])
-
-  return {getIssue, getCommit, getIssueComments, getCommitsOfPr, getForksOf, getUserRepos, getStargazers, authenticate, getParticipants, listBranches, getPullRequest, getPullRequestComments};
+  return {getIssue, getCommit, getIssueComments, getCommitsOfPr, getForksOf, getUserRepos, getParticipants, listBranches, getPullRequest, getPullRequestComments};
 
 }

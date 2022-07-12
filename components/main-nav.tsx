@@ -80,10 +80,10 @@ export default function MainNav() {
     setBeproBalance(await BeproService.getBalance('bepro'))
     setLoggedIn(true);
     dispatch(changeStakedState(await BeproService.network.getBEPROStaked()));
-    getUserOf(BeproService.address)
-      .then((user: User) => {
-        if(!user?.accessToken && user?.githubLogin) setModalUserMissing(true)
-      })
+    // getUserOf(BeproService.address)
+    //   .then((user: User) => {
+    //     if(!user?.accessToken && user?.githubLogin) setModalUserMissing(true)
+    //   });
   }
 
   useEffect(updateState, [currentAddress]);

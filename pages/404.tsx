@@ -5,7 +5,6 @@ import InternalLink from '@components/internal-link';
 import NotFoundIcon from '../assets/icons/not-found-icon';
 import { GetStaticProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { getSession } from 'next-auth/react';
 
 export default function NotFound() {
   const { t } = useTranslation('common')
@@ -36,7 +35,6 @@ export default function NotFound() {
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, ['common'])),
     },
   }

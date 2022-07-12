@@ -18,7 +18,6 @@ import Button from '@components/button';
 import useApi from '@x-hooks/use-api';
 import {TransactionStatus} from '@interfaces/enums/transaction-status';
 import {GetServerSideProps} from 'next';
-import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 
@@ -432,7 +431,6 @@ export default function ParityPage() {
 export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, ['common', 'connect-wallet-button', 'parity'])),
     },
   };

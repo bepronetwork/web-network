@@ -21,7 +21,6 @@ import useApi from '@x-hooks/use-api';
 import {User} from '@interfaces/api-response';
 import useTransactions from '@x-hooks/useTransactions';
 import { changeTransactionalTokenApproval } from '@contexts/reducers/change-transactional-token-approval';
-import {getSession} from 'next-auth/react';
 import {serverSideTranslations} from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import DragAndDrop,{IFilesProps} from '@components/drag-and-drop'
@@ -36,7 +35,7 @@ export default function PageCreateIssue() {
   const [issueDescription, setIssueDescription] = useState('');
   const [issueAmount, setIssueAmount] = useState<Amount>({value: '', formattedValue: '', floatValue: 0});
   const [balance, setBalance] = useState(0);
-  const {dispatch, state: {currentAddress, githubHandle, myTransactions, isTransactionalTokenApproved}} = useContext(ApplicationContext);
+  const {dispatch, state: {currentAddress, githubLogin, myTransactions, isTransactionalTokenApproved}} = useContext(ApplicationContext);
   const [currentUser, setCurrentUser] = useState<User>();
   const [repository_id, setRepositoryId] = useState(``);
   const [files, setFiles] = useState<IFilesProps[]>([]);
@@ -45,7 +44,7 @@ export default function PageCreateIssue() {
   const router = useRouter();
   const {getUserOf, createIssue: apiCreateIssue, patchIssueWithScId} = useApi();
   const txWindow = useTransactions();
-  const { t } = useTranslation(['common', 'create-bounty'])
+  const { t } = useTranslation(['common', 'create-bounty']);
 
   async function allowCreateIssue() {
     const loggedIn = await BeproService.login();
@@ -270,7 +269,7 @@ export default function PageCreateIssue() {
               </div>
 
               <div className="d-flex justify-content-center align-items-center mt-4">
-                {!githubHandle ? (
+                {!githubLogin ? (
                   <div className="mt-3 mb-0">
                     <ConnectGithub />
                   </div>
@@ -297,7 +296,6 @@ export default function PageCreateIssue() {
 export const getServerSideProps: GetServerSideProps = async ({locale}) => {
   return {
     props: {
-      session: await getSession(),
       ...(await serverSideTranslations(locale, ['common', 'create-bounty', 'connect-wallet-button'])),
     },
   };

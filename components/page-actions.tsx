@@ -191,8 +191,7 @@ export default function PageActions({
   function renderProposeDestribution() {
     return (
       !finalized &&
-      pullRequests?.length > 0 &&
-      githubLogin && <NewProposal issueId={issueId}
+      pullRequests?.length > 0 && <NewProposal issueId={issueId}
                                   isFinished={finished}
                                   isIssueOwner={issueCreator == currentAddress}
                                   amountTotal={amountIssue}
