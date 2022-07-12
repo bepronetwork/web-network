@@ -7,6 +7,8 @@ export interface Token {
   address: string;
   name: string;
   symbol: string;
+  currentValue?: number;
+  tokenInfo?: TokenInfo;
   balance?: number;
 }
 

@@ -14,7 +14,6 @@ import ConnectWalletButton from "components/connect-wallet-button";
 import HelpModal from "components/help-modal";
 import InternalLink from "components/internal-link";
 import NavAvatar from "components/nav-avatar";
-import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import TransactionsStateIndicator from "components/transactions-state-indicator";
 import Translation from "components/translation";
 import WrongNetworkModal from "components/wrong-network-modal";
@@ -24,6 +23,8 @@ import { useDAO } from "contexts/dao";
 
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
+
+import CreateBountyModal from "./create-bounty-modal";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -37,6 +38,8 @@ export default function MainNav() {
   const { pathname } = useRouter();
 
   const [showHelp, setShowHelp] = useState(false);
+  const [showCreateBounty, setShowCreateBounty] = useState(false);
+  const [verifyAddressAfterClick, setVerifyAddressAfterClick] = useState(false);
   const [myNetwork, setMyNetwork] = useState<MyNetworkLink>({ 
     label: <Translation label={"main-nav.new-network"} />, 
     href: "/new-network", 
@@ -143,17 +146,18 @@ export default function MainNav() {
 
         <div className="d-flex flex-row align-items-center gap-20">
           {(!isNetworksPage && (
-            <ReadOnlyButtonWrapper>
-              <InternalLink
-                href={getURLWithNetwork("/create-bounty")}
-                icon={<PlusIcon />}
-                label={<Translation label={"main-nav.new-bounty"} />}
-                className="read-only-button"
-                iconBefore
-                uppercase
-                outline
-              />
-            </ReadOnlyButtonWrapper>
+            <div
+            className="btn btn-outline-primary text-white bg-opacity-100  text-uppercase
+          text-decoration-none shadow-none d-flex align-items-center justify-content-center"
+            onClick={() => {
+              wallet?.address
+                ? setShowCreateBounty(true)
+                : setVerifyAddressAfterClick(true);
+            }}
+          >  
+          <PlusIcon className="me-2" style={{ width:"14", height:"14"}} />
+          <Translation label={"main-nav.new-bounty"} />
+          </div>
           )) || (
             <InternalLink
               href={myNetwork.href}
@@ -192,8 +196,11 @@ export default function MainNav() {
             </>
           </ConnectWalletButton>
         </div>
-
         <HelpModal show={showHelp} onCloseClick={() => setShowHelp(false)} />
+        {showCreateBounty && wallet?.address && (
+          <CreateBountyModal show={showCreateBounty} setShow={setShowCreateBounty}/>
+        )}  
+         {verifyAddressAfterClick && <ConnectWalletButton asModal={verifyAddressAfterClick} />}
       </div>
     </div>
   );

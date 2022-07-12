@@ -10,14 +10,17 @@ import { useRepos } from "contexts/repos";
 export default function BranchsDropdown({
   repoId,
   onSelected,
+  value,
   disabled
 }: {
   repoId: string
   onSelected: (e: { value: string }) => void
+  value?: { value: string, label: string }
   disabled?: boolean
 }) {
   const { findBranch } = useRepos();
   const [options, setOptions] = useState<{ value: string; label: string }[]>();
+  const [option, setOption] = useState<{ value: string; label: string }>()
   const { t } = useTranslation("common");
 
   async function loadBranchsFromBackend() {
@@ -28,13 +31,22 @@ export default function BranchsDropdown({
     }
 
     const branchs = await findBranch(Number(repoId));
-
     setOptions(branchs.map(mapRepo));
   }
 
   useEffect(() => {
     loadBranchsFromBackend();
   }, [repoId]);
+
+  useEffect(() => { value?.label && setOption(value) }, [value]);
+  
+  function onChangeSelect(e: { value: string }) {
+    onSelected(e)
+    setOption({
+      value: e.value,
+      label: e.value
+    })
+  }
 
   return (
     <div>
@@ -45,7 +57,8 @@ export default function BranchsDropdown({
         key={`select_repo-${repoId}`}
         isDisabled={disabled || !repoId || !options}
         options={options}
-        onChange={onSelected}
+        value={option}
+        onChange={onChangeSelect}
         placeholder={t("forms.select-placeholder")}
         components={{
           Option: IconOption

@@ -28,7 +28,7 @@ export default function InputNumber({
 }: InputNumberProps) {
   const { t } = useTranslation(["common"]);
 
-  const id = kebabCase(label);
+  const id = kebabCase(typeof label === 'string' ? label : "");
   const errorStyle = { "text-danger bg-opacity-100": error };
   const successStyle = { "text-success bg-opacity-100": success };
   const warningStyle = { "text-warning bg-opacity-100": warning };
@@ -37,7 +37,7 @@ export default function InputNumber({
 
   return (
     <Component {...(shouldBeWrapped && { className: "form-group" })}>
-      {label && (
+      {label && typeof label === 'string' ? (
         <label
           className="caption-small mb-2 text-gray d-flex align-items-center"
           id={id}
@@ -45,7 +45,7 @@ export default function InputNumber({
           <span className="mr-1">{label}</span>{" "}
           {description ? <InfoTooltip description={description} /> : ""}
         </label>
-      )}
+      ): label}
       <div
         className={clsx("input-group border-radius-8", {
           ...errorStyle,
