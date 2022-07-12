@@ -8,6 +8,7 @@ interface GithubInfoProps {
   onClick?: () => void;
   variant: "user" | "repository";
   parent: "list" | "modal" | "hero";
+  simpleDisabled?: boolean
 }
 
 export default function GithubInfo({
@@ -16,6 +17,7 @@ export default function GithubInfo({
   parent,
   variant,
   disabled,
+  simpleDisabled,
   active = false,
   onClick
 }: GithubInfoProps) {
@@ -51,7 +53,7 @@ export default function GithubInfo({
   }
 
   return (
-    <div key={label} className={getClassName()} onClick={handleClick}>
+    <div key={label} className={getClassName()} onClick={(event) => { simpleDisabled ? null : handleClick(event) }}>
       <span>{label}</span>
     </div>
   );

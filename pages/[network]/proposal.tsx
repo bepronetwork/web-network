@@ -196,6 +196,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
     props: {
       ...(await serverSideTranslations(locale, [
         "common",
+        "bounty",
         "proposal",
         "pull-request",
         "connect-wallet-button"

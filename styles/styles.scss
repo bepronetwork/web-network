@@ -270,6 +270,29 @@ li {
   }
 }
 
+.container-bounty {
+  height: 63px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+
+  &.bg-30,
+  &.bg-30-hover:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.3) !important;
+    border: 2px solid $primary !important;
+  }
+}
+
+.funding-type {
+  background-color: rgba(var(--bs-primary-rgb), 0.3) !important;
+  border: 2px solid $primary !important;
+}
+
+.info-amount {
+  border-radius: 4px;
+}
+
+
 .p-nm {
   font-size: 14px;
   line-height: 140%;
@@ -793,6 +816,10 @@ label {
   width: 2px;
 }
 
+.issue-progress-vertical {
+  height: 2px;
+}
+
 .material-icons {
   &.md-small {
     font-size: 16px;
@@ -1136,7 +1163,6 @@ a.row-button svg {
 }
 
 textarea.form-control {
-  resize: none;
   border-radius: math.div($m, 2);
 }
 
@@ -1315,8 +1341,17 @@ textarea.form-control {
   }
 }
 
+.color-light-gray {
+  color: $ligth-gray
+}
+
+.custom-color-input {
+  width: 38px;
+  height: 38px;
+
 .custom-color-input-wrapper {
   padding: 10px 20px;
+
 
   .custom-color-input {
     width: 25px;
@@ -1512,7 +1547,7 @@ input[type="color"] {
 0%{background-position:right}
 50%{background-position:left}
 100%{background-position:right}
-}
+}}
 
 .nav-avatar {
   .text-primary {

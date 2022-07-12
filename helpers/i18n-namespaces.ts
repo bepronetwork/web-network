@@ -6,7 +6,6 @@ export enum I18nNamespaces {
   bounty = "bounty",
   connectAccount = "connect-account",
   council = "council",
-  createBounty = "create-bounty",
   developers = "developers",
   parity = "parity",
   proposal = "proposal",
