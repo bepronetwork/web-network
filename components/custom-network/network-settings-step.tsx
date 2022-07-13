@@ -1,8 +1,5 @@
-import { useState } from "react";
-
 import { useTranslation } from "next-i18next";
 
-import InputNumber from "components/input-number";
 import Step from "components/step";
 
 import { useNetworkSettings } from "contexts/network-settings";
@@ -10,7 +7,9 @@ import { useNetworkSettings } from "contexts/network-settings";
 import { StepWrapperProps } from "interfaces/stepper";
 
 import NetworkContractSettings from "./network-contract-settings";
+import NetworkParameterInput from "./network-parameter-input";
 import ThemeColors from "./theme-colors";
+import TreasuryAddressField from "./treasury-address-field";
 
 const Section = ({ children = undefined, title }) => (
   <div className="row mx-0 px-0 mb-2 mt-1">
@@ -24,36 +23,12 @@ const Section = ({ children = undefined, title }) => (
   </div>
 );
 
-const ParameterInput = ({ label, description = null, symbol, value, onChange, error = false, onBlur = undefined}) => (
-  <div className="form-group col">
-    <InputNumber
-      classSymbol={"text-primary"}
-      symbol={symbol}
-      value={value}
-      label={label}
-      description={description}
-      min={0}
-      placeholder={"0"}
-      onValueChange={onChange}
-      onBlur={onBlur}
-      error={error}
-      thousandSeparator
-    />
-  </div>
-);
-
 export default function NetworkSettingsStep({ activeStep, index, validated, handleClick } : StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
 
-  const [address, setAddress] = useState("");
-
   const { fields, settings } = useNetworkSettings();
 
-  const handleAddressChange = e => setAddress(e.target.value);
   const handleColorChange = value => fields.colors.setter(value);
-  const handleCloseFeeChange = param => fields.closeFee.setter(param.floatValue);
-  const handleCancelFeeChange = param => fields.cancelFee.setter(param.floatValue);
-  const handleAddressBlur = () => fields.treasury.setter(address);
 
   return (
     <Step
@@ -79,36 +54,27 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
             {t("custom-network:steps.treasury.fields.address.label")}
           </label>
 
-          <input 
-            type="text" 
-            className="form-control" 
-            value={address}
-            onChange={handleAddressChange}
-            onBlur={handleAddressBlur}
+          <TreasuryAddressField
+            value={settings?.treasury?.address?.value}
+            onChange={fields.treasury.setter}
+            validated={settings?.treasury?.address?.validated}
           />
-
-          {
-            settings?.treasury?.address?.validated === false && 
-            <small className="small-info text-danger">
-              {t("custom-network:steps.treasury.fields.address.error")}
-            </small>
-          }
         </div>
 
-        <ParameterInput 
+        <NetworkParameterInput
           label={t("custom-network:steps.treasury.fields.cancel-fee.label")}
           symbol="%"
           value={settings?.treasury?.cancelFee?.value}
           error={settings?.treasury?.cancelFee?.validated === false}
-          onChange={handleCancelFeeChange}
+          onChange={fields.cancelFee.setter}
         />
 
-        <ParameterInput 
+        <NetworkParameterInput
           label={t("custom-network:steps.treasury.fields.close-fee.label")}
           symbol="%"
           value={settings?.treasury?.closeFee?.value}
           error={settings?.treasury?.closeFee?.validated === false}
-          onChange={handleCloseFeeChange}
+          onChange={fields.closeFee.setter}
         />
       </Section>
 
