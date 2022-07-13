@@ -1,3 +1,9 @@
+import { Client } from '@elastic/elasticsearch'
+
+const client = new Client({
+  node: process?.env?.NEXT_ELASTIC_SEARCH_URL,
+})
+
 const Levels = {log: 'LOG', info: 'INFO', error: 'ERROR'};
 
 const output = (level: string, message: string|any, rest) => { // eslint-disable-line
@@ -8,6 +14,17 @@ const output = (level: string, message: string|any, rest) => { // eslint-disable
 
   const string = `(${level}) (${new Date().toISOString()}) ${msg}\n`;
   console.log(string, rest);
+  
+
+  client?.index({
+      index: "web-network",
+      document: {
+        level,
+        timestamp: new Date(),
+        message, 
+        rest
+      }
+  })
   
 }
 /* eslint-disable */ //Todo complex output
