@@ -6,7 +6,7 @@ import GithubInfo from "components/github-info";
 
 import useApi from "x-hooks/use-api";
 
-export default function RepositoriesList({ repositories, onClick }) {
+export default function RepositoriesList({ withLabel = true, repositories, onClick }) {
   const { t } = useTranslation("custom-network");
 
   const [existingRepos, setExistingRepos] = useState([]);
@@ -44,9 +44,11 @@ export default function RepositoriesList({ repositories, onClick }) {
 
   return (
     <div className="row mx-0 mb-4 justify-content-start repositories-list">
-      <span className="caption-small text-gray px-0">
-        {t("steps.repositories.label")}
-      </span>
+      { withLabel && 
+        <span className="caption-small text-gray px-0">
+          {t("steps.repositories.label")}
+        </span>
+      }
 
       {repositories.map((repository) => (
         <GithubInfo
