@@ -4,16 +4,26 @@ import { Col, Row } from "react-bootstrap";
 import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
 
+import ConnectGithub from "components/connect-github";
 import AmountCard from "components/custom-network/amount-card";
+import NetworkContractSettings from "components/custom-network/network-contract-settings";
+import NetworkParameterInput from "components/custom-network/network-parameter-input";
+import RepositoriesList from "components/custom-network/repositories-list";
+import ThemeColors from "components/custom-network/theme-colors";
+import TreasuryAddressField from "components/custom-network/treasury-address-field";
 import ImageUploader from "components/image-uploader";
 
+import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
+import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
 
 import { formatDate } from "helpers/formatDate";
 import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
 import { Network } from "interfaces/network";
+
+import useNetworkTheme from "x-hooks/use-network";
 
 interface MyNetworkSettingsProps {
   network: Network;
@@ -24,9 +34,17 @@ const { publicRuntimeConfig: { apiUrl } } = getConfig();
 export default function MyNetworkSettings({ network } : MyNetworkSettingsProps) {
   const { t } = useTranslation(["common", "custom-network"]);
 
+  const { user } = useAuthentication();
+  const { activeNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
-  const { details, fields, forcedNetwork, setForcedNetwork } = useNetworkSettings();
+  const { colorsToCSS } = useNetworkTheme();
+  const { details, fields, github, settings, forcedNetwork, setForcedNetwork } = useNetworkSettings();
 
+  const isCurrentNetwork = 
+    !!forcedNetwork && !!activeNetwork && forcedNetwork?.networkAddress === activeNetwork?.networkAddress;
+
+  const handleColorChange = value => fields.colors.setter(value);
+  
   const NetworkAmount = (title, description, amount) => ({ title, description, amount });
 
   const networkAmounts = [
@@ -94,6 +112,7 @@ export default function MyNetworkSettings({ network } : MyNetworkSettingsProps) 
 
   return(
     <>
+      { isCurrentNetwork && <style>{colorsToCSS(settings?.theme?.colors)}</style> }
       <Row className="mb-3">
         <h3 className="text-capitalize family-Regular text-white">{forcedNetwork?.name}</h3>
       </Row>
@@ -157,9 +176,76 @@ export default function MyNetworkSettings({ network } : MyNetworkSettingsProps) 
 
       <Row>
         {networkAmounts.map(amount => 
-          <Col xs={3}>
+          <Col xs={3} key={amount.title}>
             <AmountCard {...amount} />
           </Col>)}
+      </Row>
+      
+      <Row className="mt-4">
+        <span className="caption-medium text-white mb-3">Repositories</span>
+
+        { !user?.login &&
+          <ConnectGithub /> || 
+          <RepositoriesList
+            repositories={github.repositories}
+            onClick={fields.repository.setter}
+            withLabel={false}
+          />
+        }
+      </Row>
+
+      <Row className="mt-4">
+        <Col>
+          <span className="caption-medium text-white mb-3">Network Colours</span>
+
+          <ThemeColors
+            colors={settings?.theme?.colors}
+            similar={settings?.theme?.similar}
+            setColor={handleColorChange}
+          />
+        </Col>
+      </Row>
+
+      <Row className="mt-4">
+        <span className="caption-medium text-white mb-3">
+          {t("custom-network:steps.network-settings.fields.fees.title")}
+        </span>
+
+        <Col xs={8}>
+          <TreasuryAddressField
+            value={settings?.treasury?.address?.value}
+            onChange={fields.treasury.setter}
+            validated={settings?.treasury?.address?.validated}
+          />
+        </Col>
+
+        <Col>
+          <NetworkParameterInput
+            label={t("custom-network:steps.treasury.fields.cancel-fee.label")}
+            symbol="%"
+            value={settings?.treasury?.cancelFee?.value}
+            error={settings?.treasury?.cancelFee?.validated === false}
+            onChange={fields.cancelFee.setter}
+          />
+        </Col>
+
+        <Col>
+          <NetworkParameterInput
+            label={t("custom-network:steps.treasury.fields.close-fee.label")}
+            symbol="%"
+            value={settings?.treasury?.closeFee?.value}
+            error={settings?.treasury?.closeFee?.validated === false}
+            onChange={fields.closeFee.setter}
+          />
+        </Col>
+      </Row>
+
+      <Row className="mt-4">
+        <span className="caption-medium text-white mb-3">
+          {t("custom-network:steps.network-settings.fields.other-settings.title")}
+        </span>
+      
+        <NetworkContractSettings />
       </Row>
     </>
   );

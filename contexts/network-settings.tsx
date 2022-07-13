@@ -33,7 +33,7 @@ const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefi
 
 const ALLOWED_PATHS = ["/new-network", "/[network]/profile/my-network", "/administration"];
 
-const LIMITS = {
+export const LIMITS = {
   percentageNeededForDispute: { max: +publicRuntimeConfig?.networkConfig?.disputesPercentage },
   draftTime: {
     min: +publicRuntimeConfig?.networkConfig?.reedemTime?.min,
@@ -194,60 +194,52 @@ export const NetworkSettingsProvider = ({ children }) => {
   // Getting external data
   useEffect(() => {
     if ( !wallet?.address || 
-         !user?.login || 
          !DAOService || 
          !network?.name || 
          !network?.councilAmount || 
          !needsToLoad ) 
       return;
 
-    getUserRepositories(user.login)
-      .then(async (githubRepositories) => {
-        const repositories = [];
-        const filtered = githubRepositories
-          .filter(repo => (
-            !repo?.isFork 
-            && (user.login === repo?.nameWithOwner.split("/")[0])) 
-            || repo?.isInOrganization)
-          .map(repo => ({
-            checked: false,
-            isSaved: false,
-            hasIssues: false,
-            name: repo?.name,
-            fullName: repo?.nameWithOwner
-          }));
-        
-        if (isCreating) repositories.push(...filtered);
-        else {
-          let { rows: networkRepositories } = await searchRepositories({ networkName: network.name });
-
-          networkRepositories = await Promise.all(networkRepositories.map( async (repo) => ({
-            checked: true,
-            isSaved: true,
-            name: repo.githubPath.split("/")[1],
-            fullName: repo.githubPath,
-            hasIssues: await repositoryHasIssues(repo.githubPath)
-          })));
-
-          repositories.push(...networkRepositories);
+    if (user?.login)
+      getUserRepositories(user.login)
+        .then(async (githubRepositories) => {
+          const repositories = [];
+          const filtered = githubRepositories
+            .filter(repo => (
+              !repo?.isFork 
+              && (user.login === repo?.nameWithOwner.split("/")[0])) 
+              || repo?.isInOrganization)
+            .map(repo => ({
+              checked: false,
+              isSaved: false,
+              hasIssues: false,
+              name: repo?.name,
+              fullName: repo?.nameWithOwner
+            }));
           
-          repositories.push(...filtered.filter(repo =>
-            !repositories.find((repoB) => repoB.fullName === repo.fullName)));
-        }
+          if (isCreating) repositories.push(...filtered);
+          else {
+            let { rows: networkRepositories } = await searchRepositories({ networkName: network.name });
 
-        setGithub(previous => ({
-          ...previous,
-          repositories
-        }));
-      });
+            networkRepositories = await Promise.all(networkRepositories.map( async (repo) => ({
+              checked: true,
+              isSaved: true,
+              name: repo.githubPath.split("/")[1],
+              fullName: repo.githubPath,
+              hasIssues: await repositoryHasIssues(repo.githubPath)
+            })));
 
-    setSettings(previous => ({
-      ...previous,
-      theme: {
-        ...previous.theme,
-        colors: isCreating && DefaultTheme() || network?.colors,
-      },
-    }));
+            repositories.push(...networkRepositories);
+            
+            repositories.push(...filtered.filter(repo =>
+              !repositories.find((repoB) => repoB.fullName === repo.fullName)));
+          }
+
+          setGithub(previous => ({
+            ...previous,
+            repositories
+          }));
+        });
 
     if (!isCreating) {
       setSettings(previous => {
@@ -257,6 +249,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         newState.parameters.disputableTime = { value: network.disputableTime, validated: true };
         newState.parameters.percentageNeededForDispute = { value: network.percentageNeededForDispute, validated: true };
         newState.parameters.councilAmount = { value: network.councilAmount, validated: true };
+        newState.theme.colors = network?.colors;
 
         return newState;
       });
@@ -281,6 +274,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         newState.parameters.councilAmount = { value: DEFAULT_COUNCIL_AMOUNT, validated: true };
         newState.treasury.cancelFee = { value: DEFAULT_CANCEL_FEE, validated: true };
         newState.treasury.closeFee = { value: DEFAULT_CLOSE_FEE, validated: true };
+        newState.theme.colors = DefaultTheme();
 
         return newState;
       });
