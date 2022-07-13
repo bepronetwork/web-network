@@ -1,4 +1,4 @@
-FROM node:16.10 AS builder
+FROM node:16.16 AS builder
 
 WORKDIR /app
 RUN apt-get update 
@@ -8,7 +8,7 @@ RUN npm install --no-audit
 COPY . .
 RUN npm run build
 
-FROM node:16.10-alpine AS release
+FROM node:16.16-alpine AS release
 
 WORKDIR /app
 COPY package*.json ./
