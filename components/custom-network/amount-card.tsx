@@ -15,7 +15,7 @@ export default function AmountCard({
 }: AmountCardProps) {
   
   return (
-    <div className="d-flex flex-column bg-shadow p-20 border-radius-8">
+    <div className="d-flex flex-column bg-shadow p-3 border-radius-8">
       <div className="d-flex flex-row align-items-center justify-content-between">
         <span className="caption-medium text-gray font-weight-normal">{title}</span>
 
