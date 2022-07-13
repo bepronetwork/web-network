@@ -1,22 +1,11 @@
 import { useTranslation } from "next-i18next";
-import getConfig from "next/config";
 
-import InputNumber from "components/input-number";
+import NetworkParameterInput from "components/custom-network/network-parameter-input";
 
 import { useNetwork } from "contexts/network";
-import { useNetworkSettings } from "contexts/network-settings";
+import { LIMITS, useNetworkSettings } from "contexts/network-settings";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
-
-const { publicRuntimeConfig } = getConfig();
-
-const MAX_PERCENTAGE_FOR_DISPUTE = +publicRuntimeConfig?.networkConfig?.disputesPercentage;
-const MIN_DRAFT_TIME = +publicRuntimeConfig?.networkConfig?.reedemTime?.min;
-const MAX_DRAFT_TIME = +publicRuntimeConfig?.networkConfig?.reedemTime?.max;
-const MIN_DISPUTE_TIME = +publicRuntimeConfig?.networkConfig?.disputableTime?.min;
-const MAX_DISPUTE_TIME = +publicRuntimeConfig?.networkConfig?.disputableTime?.max;
-const MIN_COUNCIL_AMOUNT = +publicRuntimeConfig?.networkConfig?.councilAmount?.min;
-const MAX_COUNCIL_AMOUNT = +publicRuntimeConfig?.networkConfig?.councilAmount?.max;
 
 export default function NetworkContractSettings() {
   const { t } = useTranslation(["common", "custom-network"]);
@@ -37,8 +26,8 @@ export default function NetworkContractSettings() {
     { 
       label: t("custom-network:dispute-time"), 
       description: t("custom-network:errors.dispute-time", {
-        min: MIN_DISPUTE_TIME,
-        max: formatNumberToCurrency(MAX_DISPUTE_TIME, 0)
+        min: LIMITS.disputableTime.min,
+        max: formatNumberToCurrency(LIMITS.disputableTime.max, 0)
       }),
       symbol: t("misc.seconds"), 
       value: settings?.parameters?.disputableTime?.value,
@@ -48,7 +37,7 @@ export default function NetworkContractSettings() {
     { 
       label: t("custom-network:percentage-for-dispute"), 
       description: t("custom-network:errors.percentage-for-dispute", {
-        max: MAX_PERCENTAGE_FOR_DISPUTE 
+        max: LIMITS.percentageNeededForDispute.max 
       }),
       symbol: "%", 
       value: settings?.parameters?.percentageNeededForDispute?.value,
@@ -58,8 +47,8 @@ export default function NetworkContractSettings() {
     { 
       label: t("custom-network:redeem-time"), 
       description: t("custom-network:errors.redeem-time", {
-        min: MIN_DRAFT_TIME,
-        max: formatNumberToCurrency(MAX_DRAFT_TIME, 0)
+        min: LIMITS.draftTime.min,
+        max: formatNumberToCurrency(LIMITS.draftTime.max, 0)
       }),
       symbol: t("misc.seconds"), 
       value: settings?.parameters?.draftTime?.value,
@@ -70,8 +59,8 @@ export default function NetworkContractSettings() {
       label: t("custom-network:council-amount"), 
       description: t("custom-network:errors.council-amount", {
         token: networkTokenSymbol,
-        min: formatNumberToCurrency(MIN_COUNCIL_AMOUNT, 0),
-        max: formatNumberToCurrency(MAX_COUNCIL_AMOUNT, 0)
+        min: formatNumberToCurrency(LIMITS.councilAmount.min, 0),
+        max: formatNumberToCurrency(LIMITS.councilAmount.max, 0)
       }),
       symbol: "BEPRO", 
       value: settings?.parameters?.councilAmount?.value,
@@ -81,26 +70,8 @@ export default function NetworkContractSettings() {
   ];
   
   return (
-    <>
-      <div className="d-flex flex-row px-3 border-radius-8 justify-content-center gap-20 mb-2">
-      {
-        parameterInputs.map(({ label, description, symbol, value, error, onChange }) => 
-        <div className="form-group col">
-            <InputNumber
-              classSymbol={"text-primary"}
-              symbol={symbol}
-              value={value}
-              label={label}
-              description={description}
-              min={0}
-              placeholder={"0"}
-              onValueChange={onChange}
-              error={error}
-              thousandSeparator
-            />
-        </div>)
-        }
-      </div>
-    </>
+    <div className="d-flex flex-row border-radius-8 justify-content-center gap-20 mb-2">
+      { parameterInputs.map(input => <NetworkParameterInput  key={input.label} {...input} />) }
+    </div>
   );
 }
