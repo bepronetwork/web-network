@@ -557,7 +557,7 @@ export default function useBepro() {
   }
 
   async function handleChangeNetworkParameter(parameter: NetworkParameters, 
-                                              value: number, 
+                                              value: number | string, 
                                               networkAddress?: string): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
       const transaction = addTransaction({ 

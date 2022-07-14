@@ -174,9 +174,11 @@ export default class DAO {
   }
 
   async setNetworkParameter(parameter: NetworkParameters, 
-                            value: number, 
+                            value: number | string, 
                             networkAddress?: string): Promise<TransactionReceipt> {    
     const network = await this.getNetwork(networkAddress);
+
+    if (parameter === "treasury") return network.updateTresuryAddress(value);
 
     return network[`change${parameter[0].toUpperCase() + parameter.slice(1)}`](value);
   }
@@ -214,12 +216,12 @@ export default class DAO {
 
   async getTreasury(networkAddress?: string): Promise<TreasuryInfo> {
     const network = await this.getNetwork(networkAddress);
-    const treasury = network.treasuryInfo();
+    const treasury = await network.treasuryInfo();
 
     return {
-      treasury: treasury[0],
-      closeFee: +(treasury[1] || 0),
-      cancelFee: +(treasury[2] || 0)
+      treasury: treasury?.treasury || Defaults.nativeZeroAddress,
+      closeFee: +(treasury?.closeFee || 0),
+      cancelFee: +(treasury?.cancelFee || 0)
     };
   }
 
