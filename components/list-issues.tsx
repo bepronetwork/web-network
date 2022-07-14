@@ -289,7 +289,7 @@ export default function ListIssues({
         </div>
       )) || <></>}
 
-      {issuesPages.every((el) => el.issues?.length > 0) &&
+      {issuesPages.every((el) => el.issues?.length === 0) &&
       !loading.isLoading ? (
         <div className="pt-4">
           <NothingFound description={emptyMessage || filterByState.emptyState}>
@@ -305,7 +305,7 @@ export default function ListIssues({
         </div>
       ) : null}
 
-      {(issuesPages.some((el) => el.issues?.length === 0) && (
+      {(issuesPages.some((el) => el.issues?.length > 0) && (
         <InfiniteScroll
           handleNewPage={nextPage}
           isLoading={loading.isLoading}
