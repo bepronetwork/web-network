@@ -31,9 +31,7 @@ export default function MyNetwork() {
   const { wallet } = useAuthentication();
   const { service: DAOService } = useDAO();
 
-  useEffect(() => {
-    if (!DAOService || !wallet?.address) return;
-
+  async function updateEditingNetwork() {
     dispatch(changeLoadState(true));
 
     DAOService.getNetworkAdressByCreator(wallet.address)
@@ -52,6 +50,12 @@ export default function MyNetwork() {
       })
       .catch(console.log)
       .finally(() => dispatch(changeLoadState(false)));
+  }
+
+  useEffect(() => {
+    if (!DAOService || !wallet?.address) return;
+
+    updateEditingNetwork();
   }, [DAOService, wallet?.address]);
   
   return(
@@ -68,7 +72,7 @@ export default function MyNetwork() {
         </Col>
       ||
         <Col xs={10}>
-          <MyNetworkSettings network={myNetwork} />
+          <MyNetworkSettings network={myNetwork} updateEditingNetwork={updateEditingNetwork} />
         </Col>
       }
     </ProfileLayout>
