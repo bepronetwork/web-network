@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 
 import { GetServerSideProps } from "next";
-import { signOut, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import getConfig from "next/config";
@@ -142,7 +142,12 @@ export default function ConnectAccount() {
 
   function loginGithub() {
     localStorage.setItem("lastAddressBeforeConnect", wallet?.address);
-    return connectGithub();
+
+    const URL_BASE = `${window.location.protocol}//${ window.location.host}`;
+
+    signIn("github", {
+      callbackUrl: `${URL_BASE}${router.asPath}`
+    });
   }
 
   function renderMetamaskLogo() {

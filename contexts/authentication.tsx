@@ -17,6 +17,7 @@ import { useDAO } from "contexts/dao";
 import { User, Wallet } from "interfaces/authentication";
 
 import useApi from "x-hooks/use-api";
+import useNetworkTheme from "x-hooks/use-network";
 
 export interface IAuthenticationContext {
   user?: User;
@@ -34,12 +35,12 @@ const EXCLUDED_PAGES = ["/networks", "/[network]/connect-account"];
 
 export const AuthenticationProvider = ({ children }) => {
   const session = useSession();
-  const { asPath, pathname } = useRouter();
+  const { asPath, pathname, push } = useRouter();
 
   const [user, setUser] = useState<User>();
   const [wallet, setWallet] = useState<Wallet>();
   const [isGithubAndWalletMatched, setIsGithubAndWalletMatched] = useState<boolean>();
-
+  const { getURLWithNetwork } = useNetworkTheme();
   const { getUserOf } = useApi();
   const { service: DAOService, connect } = useDAO();
 
@@ -58,13 +59,17 @@ export const AuthenticationProvider = ({ children }) => {
     }
   }, [user?.login, asPath, DAOService]);
 
-  const connectGithub = useCallback(() => {
+  const connectGithub = useCallback(async () => {
     const URL_BASE = `${window.location.protocol}//${ window.location.host}`;
+
+    const user = await getUserOf(wallet?.address?.toLowerCase());
+
+    if (!user) return push(getURLWithNetwork("/connect-account"));
 
     signIn("github", {
       callbackUrl: `${URL_BASE}${asPath}`
     });
-  }, []);
+  }, [wallet?.address, asPath]);
 
   const disconnectWallet = useCallback(() => {
     setWallet(undefined);
