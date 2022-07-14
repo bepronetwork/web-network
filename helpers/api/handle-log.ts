@@ -5,7 +5,7 @@ const { serverRuntimeConfig } = getConfig();
 
 const Levels = {log: 'LOG', info: 'INFO', error: 'ERROR'};
 
-const output = (level: string, message: string|any, rest) => { // eslint-disable-line
+const output = (level: string, message: string|any, ...rest) => { // eslint-disable-line
   const msg = rest.length ? message : 'No message';
   
   if (!rest.length || !rest)
