@@ -1,7 +1,5 @@
 FROM node:16.16 AS builder
 
-ENV PUPPETEER_SKIP_DOWNLOAD=1
-
 WORKDIR /app
 RUN apt-get update 
 COPY package*.json ./
