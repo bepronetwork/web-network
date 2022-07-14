@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
+import { Defaults } from "@taikai/dappkit";
 import getConfig from "next/config";
 import { useRouter } from "next/router";
 
@@ -17,7 +18,7 @@ import {
   DEFAULT_DRAFT_TIME, 
   DEFAULT_PERCENTAGE_FOR_DISPUTE 
 } from "helpers/contants";
-import { DefaultNetworkSettings } from "helpers/custom-network";
+import { DefaultNetworkSettings, handleNetworkAddress } from "helpers/custom-network";
 
 import { Color, Icon, Network, NetworkSettings, Theme } from "interfaces/network";
 
@@ -242,17 +243,25 @@ export const NetworkSettingsProvider = ({ children }) => {
         });
 
     if (!isCreating) {
-      setSettings(previous => {
-        const newState = structuredClone(previous);
+      DAOService.getTreasury(handleNetworkAddress(network))
+        .then(({ treasury, closeFee, cancelFee }) => 
+          setSettings(previous => {
+            const newState = structuredClone(previous);
 
-        newState.parameters.draftTime = { value: network.draftTime, validated: true };
-        newState.parameters.disputableTime = { value: network.disputableTime, validated: true };
-        newState.parameters.percentageNeededForDispute = { value: network.percentageNeededForDispute, validated: true };
-        newState.parameters.councilAmount = { value: network.councilAmount, validated: true };
-        newState.theme.colors = network?.colors;
+            newState.parameters.draftTime = { value: network.draftTime, validated: true };
+            newState.parameters.disputableTime = { value: network.disputableTime, validated: true };
+            newState.parameters.percentageNeededForDispute = { 
+              value: network.percentageNeededForDispute, 
+              validated: true 
+            };
+            newState.parameters.councilAmount = { value: network.councilAmount, validated: true };
+            newState.treasury.address = { value: treasury, validated: true };
+            newState.treasury.cancelFee = { value: cancelFee, validated: true };
+            newState.treasury.closeFee = { value: closeFee, validated: true };
+            newState.theme.colors = network?.colors;
 
-        return newState;
-      });
+            return newState;
+          }));
 
       setDetails(previous => {
         const newState = structuredClone(previous);
@@ -281,8 +290,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   }, [ wallet?.address, 
        user?.login, 
        DAOService, 
-       network?.name, 
-       network?.councilAmount, 
+       network, 
        isCreating, 
        needsToLoad ]);
 
@@ -393,9 +401,10 @@ export const NetworkSettingsProvider = ({ children }) => {
   useEffect(() => {
     if (!DAOService) return;
 
-    const isAddressEmpty = settings?.treasury?.address?.value?.trim() === "";
+    const isAddressEmptyOrZeroAddress = settings?.treasury?.address?.value?.trim() === "" || 
+      settings?.treasury?.address?.value === Defaults.nativeZeroAddress;
 
-    const conditionOrUndefined = condition => isAddressEmpty ? undefined : condition;
+    const conditionOrUndefined = condition => isAddressEmptyOrZeroAddress ? undefined : condition;
 
     Promise.all([
       conditionOrUndefined(DAOService.isAddress(settings?.treasury?.address?.value)),
