@@ -12,13 +12,13 @@ export default function NetworkContractSettings() {
   const { fields, settings } = useNetworkSettings();
   const { activeNetwork } = useNetwork()
   
-  const handleDraftTimeChange = ({ floatValue: value }) => fields.parameter.setter({ label: "draftTime", value });
+  const handleDraftTimeChange = value => fields.parameter.setter({ label: "draftTime", value });
   const handleDisputeTimeChange = 
-    ({ floatValue: value }) => fields.parameter.setter({ label: "disputableTime", value });
+    value => fields.parameter.setter({ label: "disputableTime", value });
   const handleCouncilAmountChange = 
-    ({ floatValue: value }) => fields.parameter.setter({ label: "councilAmount", value });
+    value => fields.parameter.setter({ label: "councilAmount", value });
   const handlePercentageForDisputeChange = 
-    ({ floatValue: value }) => fields.parameter.setter({ label: "percentageNeededForDispute", value });
+    value => fields.parameter.setter({ label: "percentageNeededForDispute", value });
 
   const networkTokenSymbol = activeNetwork?.networkToken?.symbol || t("misc.$token");
 
@@ -70,7 +70,7 @@ export default function NetworkContractSettings() {
   ];
   
   return (
-    <div className="d-flex flex-row border-radius-8 justify-content-center gap-20 mb-2">
+    <div className="d-flex flex-row border-radius-8 justify-content-center gap-20">
       { parameterInputs.map(input => <NetworkParameterInput  key={input.label} {...input} />) }
     </div>
   );

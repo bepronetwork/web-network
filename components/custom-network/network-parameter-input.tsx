@@ -7,7 +7,7 @@ interface NetworkParameterInputProps {
   description?: string;
   symbol: string;
   value: number;
-  onChange: (values: NumberFormatValues) => void;
+  onChange: (value: number) => void;
   error?: boolean;
   onBlur?: () => void;
 }
@@ -16,6 +16,8 @@ export default function NetworkParameterInput({
   onChange,
   ...props
 } : NetworkParameterInputProps) {
+  const handleChange = (values: NumberFormatValues) => onChange(values.floatValue);
+
   return(
     <div className="form-group col">
       <InputNumber
@@ -23,7 +25,7 @@ export default function NetworkParameterInput({
         min={0}
         placeholder={"0"}
         thousandSeparator
-        onValueChange={onChange}
+        onValueChange={handleChange}
         {...props}
       />
     </div>
