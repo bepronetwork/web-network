@@ -98,6 +98,13 @@ export default class DAO {
     try {
       await this.web3Connection.start();
 
+      console.table({
+        Network_v2: publicRuntimeConfig?.contract?.address,
+        Settler: publicRuntimeConfig?.contract?.settler,
+        Transactional: publicRuntimeConfig?.contract?.transaction,
+        Network_Registry: publicRuntimeConfig?.contract?.registry
+      });
+
       return true;
     } catch (error) {
       console.log("Error starting: ", error);
@@ -318,11 +325,16 @@ export default class DAO {
     return governor === address;
   }
 
-  async isNetworkAbleToClosed(): Promise<boolean> {
-    const totalSettlerLocked = await this.network.totalSettlerLocked();
-    const closedBounties = await this.network.closedBounties();
-    const canceledBounties = await this.network.canceledBounties();
-    const bountiesTotal = await this.network.bountiesIndex();
+  async isNetworkAbleToBeClosed(networkAddress?: string): Promise<boolean> {
+    const network = await this.getNetwork(networkAddress);
+
+    const [totalSettlerLocked, closedBounties, canceledBounties, bountiesTotal] = 
+      await Promise.all([
+        network.totalSettlerLocked(),
+        network.closedBounties(),
+        network.canceledBounties(),
+        network.bountiesIndex()
+      ]);
 
     return (
       totalSettlerLocked === 0 &&
