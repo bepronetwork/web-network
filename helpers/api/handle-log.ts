@@ -13,15 +13,16 @@ const output = (level: string, message: string|any, rest) => { // eslint-disable
 
   const string = `(${level}) (${new Date().toISOString()}) ${msg}\n`;
   console.log(string, rest);
-  if(serverRuntimeConfig?.elasticSearchUrl 
-    && serverRuntimeConfig?.elasticSearchUser
-     && serverRuntimeConfig?.elasticSearchPassword) {
+
+  if(serverRuntimeConfig?.elasticSearch?.url 
+    && serverRuntimeConfig?.elasticSearch?.username
+     && serverRuntimeConfig?.elasticSearch.password) {
       
     const client = new Client({
-      node: serverRuntimeConfig.elasticSearchUrl,
+      node: serverRuntimeConfig?.elasticSearch?.url,
       auth: {
-        username: serverRuntimeConfig.elasticSearchUser,
-        password: serverRuntimeConfig.elasticSearchPassword,
+        username: serverRuntimeConfig?.elasticSearch?.username,
+        password: serverRuntimeConfig?.elasticSearch?.password,
       }
     })
   
