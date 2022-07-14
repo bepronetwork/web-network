@@ -127,8 +127,6 @@ export default function CreateBountyModal({
     t("bounty:steps.review"),
   ];
 
-  const isFieldsDisabled = !user;
-
   function onUpdateFiles(files: IFilesProps[]) {
     return setFiles(files);
   }
@@ -286,7 +284,6 @@ export default function CreateBountyModal({
                   label: repository?.path,
                   value: repository,
                 }}
-                disabled={isFieldsDisabled}
               />
             </div>
             <div className="col-md-6">
@@ -297,7 +294,6 @@ export default function CreateBountyModal({
                   label: branch,
                   value: branch,
                 }}
-                disabled={isFieldsDisabled}
               />
             </div>
           </div>
