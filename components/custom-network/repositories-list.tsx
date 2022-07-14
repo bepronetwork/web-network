@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
-import GithubInfo from "components/github-info";
+import RepositoryCheck from "components/custom-network/repository-check";
 
 import useApi from "x-hooks/use-api";
 
@@ -43,7 +43,7 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
   }, [repositories]);
 
   return (
-    <div className="row mx-0 mb-4 justify-content-start repositories-list">
+    <div className="row mx-0 justify-content-start repositories-list">
       { withLabel && 
         <span className="caption-small text-gray px-0">
           {t("steps.repositories.label")}
@@ -51,15 +51,11 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
       }
 
       {repositories.map((repository) => (
-        <GithubInfo
-          parent="list"
-          variant="repository"
+        <RepositoryCheck
           key={repository.name}
           label={repository.name}
           active={repository.checked}
-          color={
-            reposWithIssues.includes(repository.fullName) ? "info" : undefined
-          }
+          color={reposWithIssues.includes(repository.fullName) && "info"}
           onClick={() => handleClick(repository)}
           disabled={
             !repository.isSaved && existingRepos.includes(repository.fullName)
