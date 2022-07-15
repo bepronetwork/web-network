@@ -49,7 +49,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   const [updatingNetwork, setUpdatingNetwork] = useState(false);
 
   const { updateNetwork } = useApi();
-  const { activeNetwork } = useNetwork();
+  const { activeNetwork, updateActiveNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
   const { colorsToCSS } = useNetworkTheme();
   const { handleChangeNetworkParameter } = useBepro();
@@ -127,7 +127,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
         const cancelFee = settings.treasury.cancelFee.value;
         //const closeFee = settings.treasury.closeFee.value;
         const networkAddress = handleNetworkAddress(network);
-
+        
         if (forcedNetwork.draftTime !== draftTime)
           await handleChangeNetworkParameter("draftTime", draftTime, networkAddress).catch(console.log);
 
@@ -156,14 +156,16 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
         //   await handleChangeNetworkParameter("closeFee", closeFee)
         //     .catch(console.log);
 
-        dispatch(addToast({
-            type: "success",
-            title: t("actions.success"),
-            content: t("custom-network:messages.refresh-the-page")
-        }));
+        if (isCurrentNetwork) updateActiveNetwork(true);
 
-        setUpdatingNetwork(false);
-        updateEditingNetwork();
+        return updateEditingNetwork();
+      })
+      .then(() => {
+        dispatch(addToast({
+          type: "success",
+          title: t("actions.success"),
+          content: t("custom-network:messages.refresh-the-page")
+        }));
       })
       .catch((error) => {
         dispatch(addToast({
@@ -172,11 +174,11 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
             content: t("custom-network:errors.failed-to-update-network", {
               error
             })
-        }));
-
-        setUpdatingNetwork(false);
+        }))
+        
         console.log(error);
-      });
+      })
+      .finally(() => setUpdatingNetwork(false));
   }
 
   function handleCloseNetwork() {
@@ -196,6 +198,8 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
       })
       .then(() => {
         updateWalletBalance();
+
+        if (isCurrentNetwork) updateActiveNetwork(true);
 
         return updateEditingNetwork();
       })
