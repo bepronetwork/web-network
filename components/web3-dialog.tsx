@@ -8,7 +8,7 @@ import WebThreeUnavailable from "assets/web3-unavailable";
 
 import Button from "./button";
 
-export default function WebThreeDialog({children}) {
+export default function WebThreeDialog() {
   const [show, setShow] = useState<boolean>(false);
   const { t } = useTranslation("common");
 
@@ -59,6 +59,5 @@ export default function WebThreeDialog({children}) {
         </Modal>
       </div>
     );
-
-  return children
+  return null;
 }
