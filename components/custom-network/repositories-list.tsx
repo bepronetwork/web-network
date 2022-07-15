@@ -55,11 +55,9 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
           key={repository.name}
           label={repository.name}
           active={repository.checked}
-          color={reposWithIssues.includes(repository.fullName) && "info"}
+          hasIssues={reposWithIssues.includes(repository.fullName)}
           onClick={() => handleClick(repository)}
-          disabled={
-            !repository.isSaved && existingRepos.includes(repository.fullName)
-          }
+          usedByOtherNetwork={!repository.isSaved && existingRepos.includes(repository.fullName)}
         />
       ))}
 
