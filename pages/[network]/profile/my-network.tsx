@@ -5,6 +5,7 @@ import { Defaults } from "@taikai/dappkit";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { setCookie } from "nookies";
 
 import InternalLink from "components/internal-link";
 import NothingFound from "components/nothing-found";
@@ -14,6 +15,7 @@ import ProfileLayout from "components/profile/profile-layout";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
+import { cookieKey, expiresCookie } from "contexts/network";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 
 import { Network } from "interfaces/network";
@@ -46,7 +48,15 @@ export default function MyNetwork() {
         });
       })
       .then(({ count, rows }) => {
-        if (count > 0) setMyNetwork(rows[0]);
+        if (count === 0) return;
+        
+        const network = rows[0];
+
+        setMyNetwork(network);
+        setCookie(null, `${cookieKey}:${network.networkName.toLowerCase()}`, JSON.stringify(network), {
+          maxAge: expiresCookie,
+          path: "/"
+        });
       })
       .catch(console.log)
       .finally(() => dispatch(changeLoadState(false)));
