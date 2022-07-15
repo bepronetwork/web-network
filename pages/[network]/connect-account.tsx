@@ -79,7 +79,7 @@ export default function ConnectAccount() {
       if (!isGhValid) return;
 
       if (user.address === wallet?.address)
-        return router.push(getURLWithNetwork("/account"));
+        return router.push(getURLWithNetwork("/profile"));
     });
   }
 
@@ -111,7 +111,7 @@ export default function ConnectAccount() {
       if (result === true) {
         dispatch(toastSuccess(t("connect-account:connected-accounts")));
         dispatch(changeLoadState(false));
-        return router.push(getURLWithNetwork("/account"));
+        return router.push(getURLWithNetwork("/profile"));
       }
 
       dispatch(toastError(result as unknown as string));
