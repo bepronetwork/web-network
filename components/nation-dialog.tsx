@@ -10,7 +10,7 @@ import BeProBlue from "assets/icons/bepro-blue";
 
 import useApi from "x-hooks/use-api";
 
-export default function NationDialog({ children }) {
+export default function NationDialog() {
   const {publicRuntimeConfig} = getConfig();
   const [isBlock, setBlock] = useState<boolean>(false);
   const { getClientNation } = useApi();
@@ -75,5 +75,5 @@ export default function NationDialog({ children }) {
     );
   }
 
-  return <>{children}</>;
+  return null;
 }
