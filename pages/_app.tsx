@@ -18,7 +18,7 @@ import "../styles/styles.scss";
 
 function App({
   Component,
-  pageProps: { session, currentIssue, ...pageProps }
+  pageProps: { session, currentIssue, ...pageProps },
 }: AppProps) {
   if (isMobile) {
     return <MobileNotSupported />;
@@ -28,17 +28,13 @@ function App({
     <>
       <Seo issueMeta={currentIssue} />
       <SessionProvider session={session}>
-        <WebThreeDialog>
-          <RootProviders>
-            <NationDialog>
-              <MainNav />
-
-              <Component {...pageProps} />
-              
-              <StatusBar />
-            </NationDialog>
-          </RootProviders>
-        </WebThreeDialog>
+        <WebThreeDialog />
+        <RootProviders>
+          <NationDialog />
+          <MainNav />
+          <Component {...pageProps} />
+          <StatusBar />
+        </RootProviders>
       </SessionProvider>
     </>
   );
@@ -48,6 +44,6 @@ export default appWithTranslation(App);
 
 export const getServerSideProps: GetServerSideProps = async () => {
   return {
-    props: {}
+    props: {},
   };
 };
