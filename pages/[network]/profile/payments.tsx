@@ -65,10 +65,10 @@ export default function Payments() {
     <ProfileLayout>
       <Col xs={10}>
         <FlexRow className="align-items-center justify-content-between mb-4">
-          <span className="family-Regular h4 text-white">Payments</span>
+          <span className="family-Regular h4 text-white">{t("main-nav.nav-avatar.payments")}</span>
 
           <FlexRow className="align-items-center">
-            <span className="caption-medium text-white mr-2">Received in Total</span>
+            <span className="caption-medium text-white mr-2">{t("labels.recivedintotal")}</span>
             <div className="caption-large bg-dark-gray py-2 px-3 border-radius-8">
               <span className="text-white">
               {`${hasNoConvertedToken && "~" || ""} ${formatNumberToCurrency(totalEuro)}`}
@@ -94,7 +94,8 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       ...(await serverSideTranslations(locale, [
         "common",
         "profile",
-        "connect-wallet-button"
+        "connect-wallet-button",
+        "bounty"
       ]))
     }
   };

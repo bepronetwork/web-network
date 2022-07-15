@@ -12,7 +12,7 @@ import useNetworkTheme from "x-hooks/use-network";
 
 export default function PaymentItem({ ammount, issue, transactionHash } : Payment) {
   const { push } = useRouter();
-  const { t } = useTranslation(["common", "profile"]);
+  const { t } = useTranslation(["common", "profile", "bounty"]);
 
   const { getURLWithNetwork } = useNetworkTheme();
 
@@ -52,7 +52,7 @@ export default function PaymentItem({ ammount, issue, transactionHash } : Paymen
         onClick={handleClick}
         outline
       >
-        <span className="text-white text-nowrap">issue #{issue?.issueId}</span>
+        <span className="text-white text-nowrap">{t("bounty:label")} #{issue?.issueId}</span>
       </Button>
     </FlexRow>
   );

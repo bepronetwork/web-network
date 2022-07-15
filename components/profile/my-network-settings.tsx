@@ -287,7 +287,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
       <Row className="mb-4 align-items-end">
         <Col xs="auto">
           <Row className="mb-2">
-            <span className="caption-small text-gray">Query URL</span>
+            <span className="caption-small text-gray">{t("custom-network:query-url")}</span>
           </Row>
           
           <Row className="mb-2">
@@ -301,7 +301,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
           </Row>
 
           <Row className="mb-2">
-            <span className="caption-small text-gray">Creation Date</span>
+            <span className="caption-small text-gray">{t("misc.creation-date")}</span>
           </Row>
 
           <Row>
@@ -366,7 +366,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
       </Row>
       
       <Row className="mt-4">
-        <span className="caption-medium text-white mb-3">Repositories</span>
+        <span className="caption-medium text-white mb-3">{t("custom-network:steps.repositories.label")}</span>
 
         { !user?.login &&
           <ConnectGithub /> || 
@@ -380,7 +380,9 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
 
       <Row className="mt-4">
         <Col>
-          <span className="caption-medium text-white mb-3">Network Colours</span>
+          <span className="caption-medium text-white mb-3">
+            {t("custom-network:steps.network-settings.fields.colors.label")}
+          </span>
 
           <ThemeColors
             colors={settings?.theme?.colors}

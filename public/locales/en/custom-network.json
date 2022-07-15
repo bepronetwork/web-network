@@ -1,6 +1,6 @@
 {
   "title": "Custom Network",
-  "query-url": "Query url",
+  "query-url": "Query URL",
   "close-network": "Close network",
   "tokens-staked": "${{symbol}} in the network",
   "tokens-staked-description": "$TOKEN staked",
@@ -65,7 +65,7 @@
       "title": "Network Settings",
       "fields": {
         "colors": {
-          "label": "Colours",
+          "label": "Network Colours",
           "similar-colors": "These colours are very similar. Please pick a different colour.",
           "more-colors": "More colours",
           "types": {
