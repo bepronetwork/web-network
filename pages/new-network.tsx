@@ -131,7 +131,7 @@ export default function NewNetwork() {
 
     await createNetwork(payload)
       .then(() => {
-        router.push(getURLWithNetwork("/account/my-network/settings", { network: payload.name }));
+        router.push(getURLWithNetwork("/", { network: payload.name }));
 
         setCreatingNetwork(undefined);
       })
@@ -150,7 +150,7 @@ export default function NewNetwork() {
   }
 
   function goToMyNetworkPage() {
-    router.push(getURLWithNetwork("/account/my-network", { network: publicRuntimeConfig?.networkConfig?.networkName }));
+    router.push(getURLWithNetwork("/profile/my-network", { network: publicRuntimeConfig?.networkConfig?.networkName }));
   }
 
   useEffect(() => {
