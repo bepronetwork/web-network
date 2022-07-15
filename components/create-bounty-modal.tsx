@@ -20,6 +20,7 @@ import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { addTransaction } from "contexts/reducers/add-transaction";
+import { changeShowCreateBountyState } from "contexts/reducers/change-show-create-bounty";
 
 import { parseTransaction } from "helpers/transactions";
 
@@ -63,13 +64,10 @@ interface BountyPayload {
 
 export default function CreateBountyModal({
   show,
-  setShow,
 }: {
   show: boolean;
-  setShow: Dispatch<SetStateAction<boolean>>;
 }) {
   const { t } = useTranslation(["common", "bounty"]);
-
   const { activeNetwork } = useNetwork();
   const { getURLWithNetwork } = useNetworkTheme();
   const { handleApproveToken } = useBepro();
@@ -401,7 +399,7 @@ export default function CreateBountyModal({
   function handleCancelAndBack() {
     if (currentSection === 0) {
       cleanFields();
-      setShow(false);
+      dispatch(changeShowCreateBountyState(false))
     } else {
       setCurrentSection((prevState) => prevState - 1);
     }
@@ -648,7 +646,7 @@ export default function CreateBountyModal({
           id: githubId,
           repoId,
       }));
-      setShow(false);
+      dispatch(changeShowCreateBountyState(false))
       cleanFields();
     }
   }
@@ -661,7 +659,7 @@ export default function CreateBountyModal({
         titlePosition="center"
         onCloseClick={() => {
           cleanFields();
-          setShow(false);
+          dispatch(changeShowCreateBountyState(false))
           setRewardChecked(false);
         }}
         footer={

@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode, useEffect, useState } from "react";
+import { ReactElement, ReactNode, useContext, useEffect, useState } from "react";
 
 import { Defaults } from "@taikai/dappkit";
 import getConfig from "next/config";
@@ -18,13 +18,13 @@ import TransactionsStateIndicator from "components/transactions-state-indicator"
 import Translation from "components/translation";
 import WrongNetworkModal from "components/wrong-network-modal";
 
+import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
+import { changeShowCreateBountyState } from "contexts/reducers/change-show-create-bounty";
 
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
-
-import CreateBountyModal from "./create-bounty-modal";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -38,7 +38,9 @@ export default function MainNav() {
   const { pathname } = useRouter();
 
   const [showHelp, setShowHelp] = useState(false);
-  const [showCreateBounty, setShowCreateBounty] = useState(false);
+  const {
+    dispatch
+  } = useContext(ApplicationContext);
   const [verifyAddressAfterClick, setVerifyAddressAfterClick] = useState(false);
   const [myNetwork, setMyNetwork] = useState<MyNetworkLink>({ 
     label: <Translation label={"main-nav.new-network"} />, 
@@ -151,7 +153,7 @@ export default function MainNav() {
           text-decoration-none shadow-none d-flex align-items-center justify-content-center"
             onClick={() => {
               wallet?.address
-                ? setShowCreateBounty(true)
+                ? dispatch(changeShowCreateBountyState(true))
                 : setVerifyAddressAfterClick(true);
             }}
           >  
@@ -197,9 +199,6 @@ export default function MainNav() {
           </ConnectWalletButton>
         </div>
         <HelpModal show={showHelp} onCloseClick={() => setShowHelp(false)} />
-        {showCreateBounty && wallet?.address && (
-          <CreateBountyModal show={showCreateBounty} setShow={setShowCreateBounty}/>
-        )}  
          {verifyAddressAfterClick && <ConnectWalletButton asModal={verifyAddressAfterClick} />}
       </div>
     </div>

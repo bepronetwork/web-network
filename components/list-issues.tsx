@@ -30,6 +30,7 @@ import usePage from "x-hooks/use-page";
 import useSearch from "x-hooks/use-search";
 import { useAuthentication } from "contexts/authentication";
 import CreateBountyModal from "./create-bounty-modal";
+import { changeShowCreateBountyState } from "contexts/reducers/change-show-create-bounty";
 
 type Filter = {
   label: string;
@@ -72,7 +73,6 @@ export default function ListIssues({
   const [hasMore, setHasMore] = useState(false);
   const [truncatedData, setTruncatedData] = useState(false);
   const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([]);
-  const [showCreateBounty, setShowCreateBounty] = useState(false);
   const { wallet } = useAuthentication();
   const { activeNetwork } = useNetwork();
   const { searchIssues } = useApi();
@@ -294,12 +294,9 @@ export default function ListIssues({
         <div className="pt-4">
           <NothingFound description={emptyMessage || filterByState.emptyState}>
             {wallet?.address && (
-              <>
-                <Button onClick={() => setShowCreateBounty(true)}>
+                <Button onClick={() => dispatch(changeShowCreateBountyState(true))}>
                   {buttonMessage || String(t("actions.create-one"))}
                 </Button>
-                <CreateBountyModal show={showCreateBounty} setShow={setShowCreateBounty}/>
-              </>
               )}
           </NothingFound>
         </div>
