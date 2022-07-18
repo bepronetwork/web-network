@@ -5,7 +5,7 @@ export default function TreasuryAddressField({
   onChange,
   validated = undefined
 }) {
-  const { t } = useTranslation("custom-netwokr");
+  const { t } = useTranslation("custom-network");
 
   const handleChange = e => onChange(e.target.value);
 
