@@ -10,6 +10,8 @@ import { useDAO } from "contexts/dao";
 
 import { handleNetworkAddress } from "helpers/custom-network";
 
+import DAO from "services/dao-service";
+
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
 
@@ -37,36 +39,52 @@ export default function Oracle({ children }) {
     }
   ]);
 
+  async function loadData() {
+    try {
+      const networkAddress = handleNetworkAddress(activeNetwork);
+      const dao = new DAO({
+        web3Connection: DAOService.web3Connection,
+        skipWindowAssignment: true
+      });
+
+      await dao.loadNetwork(networkAddress);
+
+      Promise.all([
+        DAOService.getClosedBounties(),
+        DAOService.getOpenBounties(),
+        DAOService.getTotalSettlerLocked(),
+        getTotalUsers()
+      ])
+      .then(([closed, inProgress, onNetwork, totalUsers]) => {
+        setInfos([
+          {
+            value: inProgress,
+            label: t("common:heroes.in-progress")
+          },
+          {
+            value: closed,
+            label: t("common:heroes.bounties-closed")
+          },
+          {
+            value: onNetwork,
+            label: t("common:heroes.bounties-in-network"),
+            currency: "BEPRO"
+          },
+          {
+            value: totalUsers,
+            label: t("common:heroes.protocol-members")
+          }
+        ]);
+      });
+    } catch (error) {
+      console.log("Failed to load oracle data", error, activeNetwork);
+    }
+  }
+
   useEffect(() => {
     if (!DAOService || !activeNetwork) return;
 
-    Promise.all([
-      DAOService.getClosedBounties(handleNetworkAddress(activeNetwork)),
-      DAOService.getOpenBounties(handleNetworkAddress(activeNetwork)),
-      DAOService.getTotalSettlerLocked(handleNetworkAddress(activeNetwork)),
-      getTotalUsers()
-    ])
-    .then(([closed, inProgress, onNetwork, totalUsers]) => {
-      setInfos([
-        {
-          value: inProgress,
-          label: t("common:heroes.in-progress")
-        },
-        {
-          value: closed,
-          label: t("common:heroes.bounties-closed")
-        },
-        {
-          value: onNetwork,
-          label: t("common:heroes.bounties-in-network"),
-          currency: "BEPRO"
-        },
-        {
-          value: totalUsers,
-          label: t("common:heroes.protocol-members")
-        }
-      ]);
-    });
+    loadData();
   }, [DAOService, activeNetwork]);
 
   return (

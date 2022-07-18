@@ -76,7 +76,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
         DAOService.getNetworkParameter("proposerFeeShare"),
         DAOService.getNetworkParameter("percentageNeededForDispute"),
         DAOService.getTreasury(),
-        DAOService.getSettlerTokenData(handleNetworkAddress(activeNetwork))
+        DAOService.getSettlerTokenData()
     ])
       .then(([councilAmount, 
               disputableTime, 

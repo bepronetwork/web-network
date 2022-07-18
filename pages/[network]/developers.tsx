@@ -10,8 +10,6 @@ import PageHero, { InfosHero } from "components/page-hero";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 
-import { handleNetworkAddress } from "helpers/custom-network";
-
 import useApi from "x-hooks/use-api";
 
 export default function PageDevelopers() {
@@ -45,9 +43,9 @@ export default function PageDevelopers() {
     if (!DAOService || !activeNetwork?.networkToken) return;
 
     Promise.all([
-      DAOService.getClosedBounties(handleNetworkAddress(activeNetwork)).catch(() => 0),
-      DAOService.getOpenBounties(handleNetworkAddress(activeNetwork)).catch(() => 0),
-      DAOService.getTotalSettlerLocked(handleNetworkAddress(activeNetwork)).catch(() => 0),
+      DAOService.getClosedBounties().catch(() => 0),
+      DAOService.getOpenBounties().catch(() => 0),
+      DAOService.getTotalSettlerLocked().catch(() => 0),
       getTotalUsers(),
     ]).then(([closed, inProgress, onNetwork, totalUsers]) => {
       setInfos([

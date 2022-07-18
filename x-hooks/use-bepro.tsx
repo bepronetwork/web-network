@@ -16,6 +16,8 @@ import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { BlockTransaction, TransactionCurrency } from "interfaces/transaction";
 
+import DAO from "services/dao-service";
+
 import { NetworkParameters } from "types/dappkit";
 
 import useApi from "x-hooks/use-api";
@@ -560,13 +562,24 @@ export default function useBepro() {
                                               value: number | string, 
                                               networkAddress?: string): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
+      let service = DAOService;
+
+      if (networkAddress && networkAddress !== DAOService?.network?.contractAddress) {
+        service = new DAO({
+          web3Connection: DAOService.web3Connection,
+          skipWindowAssignment: true
+        });
+  
+        await service.loadNetwork(networkAddress);
+      }
+
       const transaction = addTransaction({ 
         type: TransactionTypes[`set${parameter[0].toUpperCase() + parameter.slice(1)}`] 
       }, activeNetwork);
 
       dispatch(transaction);
 
-      await DAOService.setNetworkParameter(parameter, value, networkAddress)
+      await service.setNetworkParameter(parameter, value)
         .then((txInfo: TransactionReceipt) => {
           txWindow.updateItem(transaction.payload.id,  parseTransaction(txInfo, transaction.payload));
           resolve(txInfo);

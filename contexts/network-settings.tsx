@@ -22,6 +22,8 @@ import { DefaultNetworkSettings, handleNetworkAddress } from "helpers/custom-net
 
 import { Color, Icon, Network, NetworkSettings, Theme } from "interfaces/network";
 
+import DAO from "services/dao-service";
+
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
 import useOctokit from "x-hooks/use-octokit";
@@ -192,6 +194,20 @@ export const NetworkSettingsProvider = ({ children }) => {
     }
   };
 
+  async function getService() {
+    if (!forcedNetwork) return DAOService;
+
+    const networkAddress = handleNetworkAddress(network);
+    const dao = new DAO({
+      web3Connection: DAOService.web3Connection,
+      skipWindowAssignment: true
+    });
+
+    await dao.loadNetwork(networkAddress);
+
+    return dao;
+  }
+
   // Getting external data
   useEffect(() => {
     if ( !wallet?.address || 
@@ -243,7 +259,9 @@ export const NetworkSettingsProvider = ({ children }) => {
         });
 
     if (!isCreating) {
-      DAOService.getTreasury(handleNetworkAddress(network))
+      getService()
+      .then(service => {
+        service.getTreasury()
         .then(({ treasury, closeFee, cancelFee }) => 
           setSettings(previous => {
             const newState = { ...previous };
@@ -262,6 +280,8 @@ export const NetworkSettingsProvider = ({ children }) => {
 
             return newState;
           }));
+      })
+      .catch(error => console.log("Failed to load network parameters", error, network));
 
       setDetails(previous => {
         const newState = { ...previous };

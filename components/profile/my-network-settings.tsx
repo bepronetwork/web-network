@@ -30,6 +30,8 @@ import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
 import { Network } from "interfaces/network";
 
+import DAO from "services/dao-service";
+
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network";
@@ -226,22 +228,29 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   useEffect(() => {
     if (!network) return;
 
-    DAOService.loadNetwork(handleNetworkAddress(network), true)
+    try {
+      const networkAddress = handleNetworkAddress(network);
+      const dao = new DAO({
+        web3Connection: DAOService.web3Connection,
+        skipWindowAssignment: true
+      });
+
+      dao.loadNetwork(networkAddress)
       .then(loaded => {
         if (!loaded) return;
 
         Promise.all([
-          DAOService.getNetworkParameter("councilAmount", handleNetworkAddress(network)),
-          DAOService.getNetworkParameter("disputableTime", handleNetworkAddress(network)),
-          DAOService.getNetworkParameter("draftTime", handleNetworkAddress(network)),
-          DAOService.getNetworkParameter("oracleExchangeRate", handleNetworkAddress(network)),
-          DAOService.getNetworkParameter("mergeCreatorFeeShare", handleNetworkAddress(network)),
-          DAOService.getNetworkParameter("proposerFeeShare", handleNetworkAddress(network)),
-          DAOService.getNetworkParameter("percentageNeededForDispute", handleNetworkAddress(network)),
-          DAOService.getTreasury(handleNetworkAddress(network)),
-          DAOService.getSettlerTokenData(handleNetworkAddress(network)),
-          DAOService.getTotalSettlerLocked(handleNetworkAddress(network)),
-          DAOService.isNetworkAbleToBeClosed(handleNetworkAddress(network)),
+          dao.getNetworkParameter("councilAmount"),
+          dao.getNetworkParameter("disputableTime"),
+          dao.getNetworkParameter("draftTime"),
+          dao.getNetworkParameter("oracleExchangeRate"),
+          dao.getNetworkParameter("mergeCreatorFeeShare"),
+          dao.getNetworkParameter("proposerFeeShare"),
+          dao.getNetworkParameter("percentageNeededForDispute"),
+          dao.getTreasury(),
+          dao.getSettlerTokenData(),
+          dao.getTotalSettlerLocked(),
+          dao.isNetworkAbleToBeClosed(),
           0
         ])
         .then(([councilAmount, 
@@ -273,8 +282,10 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
 
           setIsAbleToBeClosed(isNetworkAbleToBeClosed);
         });
-      })
-      .catch(error => console.log("Failed to Load Network", error));
+      });
+    } catch (error) {
+      console.log("Failed to load network data", error, network);
+    }
   }, [network]);
 
   return(
