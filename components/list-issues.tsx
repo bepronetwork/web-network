@@ -28,6 +28,9 @@ import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
 import usePage from "x-hooks/use-page";
 import useSearch from "x-hooks/use-search";
+import { useAuthentication } from "contexts/authentication";
+import CreateBountyModal from "./create-bounty-modal";
+import { changeShowCreateBountyState } from "contexts/reducers/change-show-create-bounty";
 
 type Filter = {
   label: string;
@@ -70,8 +73,7 @@ export default function ListIssues({
   const [hasMore, setHasMore] = useState(false);
   const [truncatedData, setTruncatedData] = useState(false);
   const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([]);
-
-  const { getURLWithNetwork } = useNetworkTheme();
+  const { wallet } = useAuthentication();
   const { activeNetwork } = useNetwork();
   const { searchIssues } = useApi();
   const { page, nextPage, goToFirstPage } = usePage();
@@ -291,14 +293,11 @@ export default function ListIssues({
       !loading.isLoading ? (
         <div className="pt-4">
           <NothingFound description={emptyMessage || filterByState.emptyState}>
-            <ReadOnlyButtonWrapper>
-              <InternalLink
-                className="read-only-button"
-                label={buttonMessage || String(t("actions.create-one"))}
-                href={redirect || getURLWithNetwork("/create-bounty")}
-                uppercase
-              />
-            </ReadOnlyButtonWrapper>
+            {wallet?.address && (
+                <Button onClick={() => dispatch(changeShowCreateBountyState(true))}>
+                  {buttonMessage || String(t("actions.create-one"))}
+                </Button>
+              )}
           </NothingFound>
         </div>
       ) : null}
