@@ -13,7 +13,7 @@ import getConfig from "next/config";
 import router from "next/router";
 
 import Button from "components/button";
-import Modal from "components/modal";
+import Modal from "components/modal"; 
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
@@ -114,6 +114,8 @@ export default function CreateBountyModal({
     transactional: activeNetwork?.networkToken || BEPRO_TOKEN,
     reward: activeNetwork?.networkToken || BEPRO_TOKEN,
   });
+  const [isLoadingApprove, setIsLoadingApprove] = useState<boolean>(false);
+  const [isLoadingCreateBounty, setIsLoadingCreateBounty] = useState<boolean>(false);
 
   const canAddCustomToken =
     activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address
@@ -522,16 +524,17 @@ export default function CreateBountyModal({
   async function allowCreateIssue() {
     if (!DAOService || !transactionalToken || issueAmount.floatValue <= 0)
       return;
+    setIsLoadingApprove(true)
 
     if (rewardChecked && rewardToken?.address && rewardAmount.floatValue > 0) {
       handleApproveToken(rewardToken.address, rewardAmount.floatValue).then(() => {
         updateWalletByToken(rewardToken, setRewardBalance);
-      });
+      }).finally(() => setIsLoadingApprove(false))
     } else {
       handleApproveToken(transactionalToken.address,
                          issueAmount.floatValue).then(() => {
                            updateWalletByToken(transactionalToken, setTokenBalance);
-                         });
+                         }).finally(() => setIsLoadingApprove(false))
     }
   }
 
@@ -548,7 +551,7 @@ export default function CreateBountyModal({
 
   async function createIssue() {
     if (!repository || !transactionalToken || !DAOService || !wallet) return;
-
+    setIsLoadingCreateBounty(true)
     const payload = {
       title: bountyTitle,
       body: addFilesInDescription(bountyDescription),
@@ -572,7 +575,7 @@ export default function CreateBountyModal({
       .then((cid) => cid)
       .catch(() => {
         dispatch(toastError(t("bounty:errors.creating-bounty")));
-
+        setIsLoadingCreateBounty(false)
         return false;
       });
     if (!cid) return;
@@ -603,6 +606,7 @@ export default function CreateBountyModal({
 
     const txInfo = await DAOService.openBounty(bountyPayload).catch((e) => {
       cleanFields();
+      setIsLoadingCreateBounty(false)
       if (e?.message?.toLowerCase().search("user denied") > -1)
         dispatch(updateTransaction({
             ...(openIssueTx.payload as BlockTransaction),
@@ -634,7 +638,7 @@ export default function CreateBountyModal({
       .then(({ data }) => data)
       .catch((error) => {
         console.log("Failed to patch bounty", error);
-
+        setIsLoadingCreateBounty(false)
         return false;
       });
 
@@ -650,6 +654,7 @@ export default function CreateBountyModal({
       }));
       setShow(false);
       cleanFields();
+      setIsLoadingCreateBounty(false)
     }
   }
 
@@ -664,10 +669,14 @@ export default function CreateBountyModal({
           setShow(false);
           setRewardChecked(false);
         }}
+        onCloseDisabled={isLoadingApprove || isLoadingCreateBounty}
         footer={
           <>
             <div className="d-flex flex-grow-1">
-              <Button color="dark-gray" onClick={handleCancelAndBack}>
+              <Button color="dark-gray" 
+                onClick={handleCancelAndBack} 
+                disabled={isLoadingApprove || isLoadingCreateBounty}
+              >
                 <span>
                   {currentSection === 0
                     ? t("common:actions.cancel")
@@ -681,6 +690,7 @@ export default function CreateBountyModal({
                   className="me-3 read-only-button"
                   disabled={isApproveButtonDisabled()}
                   onClick={allowCreateIssue}
+                  isLoading={isLoadingApprove}
                 >
                   {t("actions.approve")}
                 </Button>
@@ -691,6 +701,7 @@ export default function CreateBountyModal({
               className="d-flex flex-shrink-0 w-40 btn-block"
               onClick={handleNextStepAndCreate}
               disabled={verifyNextStepAndCreate()}
+              isLoading={isLoadingCreateBounty}
             >
               <span>
                 {currentSection !== 3

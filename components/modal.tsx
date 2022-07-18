@@ -16,6 +16,7 @@ export default function Modal({
   children = null,
   footer = null,
   onCloseClick,
+  onCloseDisabled = false,
   backdrop = "static",
   titlePosition = "start",
   titleClass,
@@ -42,7 +43,7 @@ export default function Modal({
             </button>
           )}
           {cancelLabel && (
-            <button className="btn btn-gray" onClick={() => onCloseClick()}>
+            <button className="btn btn-gray" onClick={() => onCloseClick()} disabled={onCloseDisabled}>
               {cancelLabel}
             </button>
           )}
@@ -80,6 +81,7 @@ export default function Modal({
             transparent
             className="close-button p-1 position-absolute end-94 text-gray"
             onClick={onCloseClick}
+            disabled={onCloseDisabled}
           >
             <CloseIcon />
           </Button>
