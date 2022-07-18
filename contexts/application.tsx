@@ -11,6 +11,7 @@ import { useRouter } from "next/router";
 import { parseCookies, setCookie } from "nookies";
 import sanitizeHtml from "sanitize-html";
 
+import CreateBountyModal from "components/create-bounty-modal";
 import Loading from "components/loading";
 import Toaster from "components/toaster";
 
@@ -69,7 +70,8 @@ const defaultState: GlobalState = {
       bounties: 0,
       amountInNetwork: 0,
       amountDistributed: 0
-    }
+    },
+    showCreateBounty: false
   },
   dispatch: () => undefined
 };
@@ -230,6 +232,7 @@ export default function ApplicationContextProvider({ children }) {
                                        }>
       <Loading show={state.loading.isLoading} text={state.loading.text} />
       <Toaster />
+      {wallet?.address && <CreateBountyModal show={state.showCreateBounty} />} 
       {children}
     </ApplicationContext.Provider>
   );

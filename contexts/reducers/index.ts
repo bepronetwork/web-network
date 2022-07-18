@@ -15,6 +15,7 @@ import { ChangeNetworkId } from "./change-network-id";
 import { ChangeNetworksSummary } from "./change-networks-summary";
 import { ChangeOraclesState } from "./change-oracles";
 import { ChangeSettlerTokenApproval } from "./change-settler-token-approval";
+import { ChangeShowCreateBounty } from "./change-show-create-bounty";
 import { ChangeStakedState } from "./change-staked-amount";
 import { ChangeTransactionalTokenApproval } from "./change-transactional-token-approval";
 import { ChangeWalletState } from "./change-wallet-connect";
@@ -44,6 +45,7 @@ export default function LoadApplicationReducers() {
     ChangeTransactionalTokenApproval,
     ChangeSettlerTokenApproval,
     ChangeNetworksSummary,
-    ClearTransactions
+    ClearTransactions,
+    ChangeShowCreateBounty
   ].forEach(addReducer);
 }
