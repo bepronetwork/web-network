@@ -10,22 +10,21 @@ import SearchIcon from "assets/icons/search-icon";
 import Button from "components/button";
 import CustomContainer from "components/custom-container";
 import InfiniteScroll from "components/infinite-scroll";
-import InternalLink from "components/internal-link";
 import IssueFilters from "components/issue-filters";
 import IssueListItem from "components/issue-list-item";
 import ListSort from "components/list-sort";
 import NothingFound from "components/nothing-found";
-import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import ScrollTopButton from "components/scroll-top-button";
 
 import { ApplicationContext } from "contexts/application";
+import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 import { changeLoadState } from "contexts/reducers/change-load-state";
+import { changeShowCreateBountyState } from "contexts/reducers/change-show-create-bounty";
 
 import { IssueData } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
-import useNetworkTheme from "x-hooks/use-network";
 import usePage from "x-hooks/use-page";
 import useSearch from "x-hooks/use-search";
 
@@ -53,7 +52,6 @@ interface IssuesPage {
 
 export default function ListIssues({
   creator,
-  redirect,
   filterState,
   emptyMessage,
   buttonMessage,
@@ -70,8 +68,7 @@ export default function ListIssues({
   const [hasMore, setHasMore] = useState(false);
   const [truncatedData, setTruncatedData] = useState(false);
   const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([]);
-
-  const { getURLWithNetwork } = useNetworkTheme();
+  const { wallet } = useAuthentication();
   const { activeNetwork } = useNetwork();
   const { searchIssues } = useApi();
   const { page, nextPage, goToFirstPage } = usePage();
@@ -291,14 +288,11 @@ export default function ListIssues({
       !loading.isLoading ? (
         <div className="pt-4">
           <NothingFound description={emptyMessage || filterByState.emptyState}>
-            <ReadOnlyButtonWrapper>
-              <InternalLink
-                className="read-only-button"
-                label={buttonMessage || String(t("actions.create-one"))}
-                href={redirect || getURLWithNetwork("/create-bounty")}
-                uppercase
-              />
-            </ReadOnlyButtonWrapper>
+            {wallet?.address && (
+                <Button onClick={() => dispatch(changeShowCreateBountyState(true))}>
+                  {buttonMessage || String(t("actions.create-one"))}
+                </Button>
+              )}
           </NothingFound>
         </div>
       ) : null}

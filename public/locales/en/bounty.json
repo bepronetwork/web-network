@@ -91,7 +91,8 @@
       "max": "Max"
     },
     "conversion-token": {
-      "invalid": "Could not convert this token"
+      "invalid": "Could not convert this token",
+      "not-found": "Can't convert because not found"
     }
   },
   "reward-funders": "Reward Funders",
