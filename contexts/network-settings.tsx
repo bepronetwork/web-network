@@ -79,7 +79,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     },
     name: {
       setter: (value: string) => setDetails(previous => {
-        const newState = structuredClone(previous);
+        const newState = { ...previous };
 
         newState.validated = false;
         newState.name.value = value.replace(/\s+/g,"-").replace(/--+/gm, "-");
@@ -94,7 +94,7 @@ export const NetworkSettingsProvider = ({ children }) => {
           validated = /bepro|taikai/gi.test(value) ? false : !(await getNetwork(value).catch(() => false));
 
         setDetails(previous => {
-          const newState = structuredClone(previous);
+          const newState = { ...previous };
 
           newState.name.validated = validated;
           
@@ -120,7 +120,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     },
     colors: {
       setter: (value: Color) => setSettings(previous => {
-        const newState = structuredClone(previous);
+        const newState = { ...previous };
 
         newState.theme.colors[value.label] = value.code;
 
@@ -130,7 +130,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     },
     repository: {
       setter: (fullName: string) => setGithub(previous => {
-        const newState = structuredClone(previous);
+        const newState = { ...previous };
         const index = newState.repositories.findIndex((repo) => repo.fullName === fullName);
         const selectedRepository = newState.repositories[index];
 
@@ -246,7 +246,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       DAOService.getTreasury(handleNetworkAddress(network))
         .then(({ treasury, closeFee, cancelFee }) => 
           setSettings(previous => {
-            const newState = structuredClone(previous);
+            const newState = { ...previous };
 
             newState.parameters.draftTime = { value: network.draftTime, validated: true };
             newState.parameters.disputableTime = { value: network.disputableTime, validated: true };
@@ -264,7 +264,7 @@ export const NetworkSettingsProvider = ({ children }) => {
           }));
 
       setDetails(previous => {
-        const newState = structuredClone(previous);
+        const newState = { ...previous };
 
         newState.name = { value: network?.name, validated: undefined };
         newState.description = network?.description;
@@ -275,7 +275,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       });
     } else
       setSettings(previous => {
-        const newState = structuredClone(previous);
+        const newState = { ...previous };
 
         newState.parameters.draftTime = { value: DEFAULT_DRAFT_TIME, validated: true };
         newState.parameters.disputableTime = { value: DEFAULT_DISPUTE_TIME, validated: true };
@@ -412,7 +412,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       conditionOrUndefined(settings?.treasury?.closeFee?.value >= 0 && settings?.treasury?.closeFee?.value <= 100)
     ]).then(validations => {
       setSettings(previous => {
-        const newState = structuredClone(previous);
+        const newState = { ...previous };
 
         newState.treasury.address.validated = validations[0];
         newState.treasury.cancelFee.validated = validations[1];
@@ -430,7 +430,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   // Parameters Validation
   useEffect(() => {
     setSettings(previous => {
-      const newState = structuredClone(previous);
+      const newState = { ...previous };
 
       const validations = [
         Fields.parameter.validator("draftTime", settings?.parameters?.draftTime?.value),

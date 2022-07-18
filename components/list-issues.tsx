@@ -28,6 +28,7 @@ import useApi from "x-hooks/use-api";
 import usePage from "x-hooks/use-page";
 import useSearch from "x-hooks/use-search";
 
+
 type Filter = {
   label: string;
   value: string;
@@ -208,7 +209,7 @@ export default function ListIssues({
   return (
     <CustomContainer 
       className={isProfilePage && "px-0 mx-0" || ""}
-      className2={isProfilePage && "justify-content-left" || ""}
+      childWrapperClassName={isProfilePage && "justify-content-left" || ""}
     >
       {!isListEmpy() || (isListEmpy() && hasFilter()) ? (
         <div
