@@ -153,6 +153,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
               </div>
 
               <div className="row mx-0 bg-dark-gray border-radius-8 amount-input">
+                <div className="col px-0">
                 <InputNumber
                   classSymbol={"text-primary"}
                   max={maxValue}
@@ -167,7 +168,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                   onValueChange={handleAmountChange}
                 />
 
-                <div className="d-flex caption-small justify-content-between align-items-center p-20">
+                <div className="d-flex caption-small justify-content-between align-items-center p-3 mt-1 mb-1">
                   <span className="text-ligth-gray">
                     <span className="text-primary">{networkTokenName}</span>{" "}
                     {t("misc.available")}
@@ -195,6 +196,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                     )}
                   </div>
                 </div>
+                </div>
               </div>
 
               {balance.oraclesAvailable > 0 && (
@@ -209,7 +211,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                   </div>
 
                   <div
-                    className="row mt-2 bg-dark-gray bg-dark-hover cursor-pointer border-radius-8 caption-small p-20"
+                    className="row mt-2 bg-dark-gray bg-dark-hover cursor-pointer border-radius-8 caption-small p-3"
                     onClick={handleShowUnlockModal}
                   >
                     <div className="d-flex justify-content-between px-0">
@@ -233,7 +235,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
           </div>
         </div>
 
-        <div className="col bg-dark-gray border-radius-8 p-20">
+        <div className="col bg-dark-gray border-radius-8 p-3">
           <p className="caption-medium text-gray mb-4">
             <span className="text-primary">{networkTokenName}</span>{" "}
             {t("misc.locked")}
