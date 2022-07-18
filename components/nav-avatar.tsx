@@ -30,6 +30,15 @@ export default function NavAvatar() {
   
   const username = user?.login ? user.login : truncateAddress(wallet?.address);
 
+  function handleLinkClick() {
+    setVisible(false);
+  }
+
+  function handleDisconnectWallet() {
+    disconnectWallet();
+    handleLinkClick();
+  }
+
   const Link = (label, href) => ({ label, href });
 
   const ProfileInternalLink = ({ label, href }) => 
@@ -38,6 +47,7 @@ export default function NavAvatar() {
       label={label} 
       className="mb-1 p family-Regular" 
       key={label}
+      onClick={handleLinkClick}
       nav 
     />;
 
@@ -47,6 +57,7 @@ export default function NavAvatar() {
         href={href} 
         className={`text-decoration-none p family-Regular ${ className || "text-gray"}`} 
         target="_blank"
+        onClick={handleLinkClick}
       >
           {label}
         </a>
@@ -106,6 +117,7 @@ export default function NavAvatar() {
                   href={getURLWithNetwork("/profile")} 
                   label={t("main-nav.nav-avatar.view-profile")} 
                   className="text-gray p family-Regular" 
+                  onClick={handleLinkClick}
                   nav 
                 />
               </div>
@@ -129,7 +141,7 @@ export default function NavAvatar() {
         </LinksSession>
 
         <div className="row align-items-center">
-          <DisconnectWallet onClick={disconnectWallet} />
+          <DisconnectWallet onClick={handleDisconnectWallet} />
         </div>
       </Popover.Body>
     </Popover>
