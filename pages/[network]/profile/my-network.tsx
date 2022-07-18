@@ -48,7 +48,7 @@ export default function MyNetwork() {
         });
       })
       .then(({ count, rows }) => {
-        if (count === 0) return;
+        if (count === 0) return setMyNetwork(undefined);
         
         const network = rows[0];
 
