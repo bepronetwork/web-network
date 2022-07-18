@@ -1,6 +1,6 @@
 import Cors from 'cors'
 
-import { info } from 'helpers/api/handle-log';
+import { info, error } from 'helpers/api/handle-log';
 
 const cors = Cors({
   methods: ['GET', 'PUT', 'POST'],
@@ -21,11 +21,14 @@ function runMiddleware(req, res, fn) {
   })
 }
 
-function runLogger(req) {
-  const {method, url, ip, ua, body} = {...req} as any; // eslint-disable-line
+function runLogger(req, e = null) {
+  const {page = {}, method, url, ip, ua, body} = {...req} as any; // eslint-disable-line
   const pathname = url.split('/api')[1];
-  if (!ignorePaths.some(k => pathname.includes(k)))
-    info({method, ip, ua, pathname, body});
+
+  if (!ignorePaths.some(k => pathname.includes(k))){
+    const data = {method, ip, ua, pathname, body, ...page}
+    e ? error(e, data) : info(data);
+  }
 }
 
 const withCors = (handler) => {
@@ -34,7 +37,8 @@ const withCors = (handler) => {
     runMiddleware(req, res, cors)
     .then(()=>{
       return handler(req, res);
-    }).catch(()=>{
+    }).catch((e)=>{
+      runLogger(req, e);
       return res.status(401).write('Unautorized');
     })
   };
