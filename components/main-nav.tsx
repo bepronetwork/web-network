@@ -61,7 +61,12 @@ export default function MainNav() {
 
     DAOService.getNetworkAdressByCreator(wallet.address)
       .then(async networkAddress => {
-        if (networkAddress === Defaults.nativeZeroAddress) return;
+        if (networkAddress === Defaults.nativeZeroAddress) 
+          return setMyNetwork({ 
+            label: <Translation label={"main-nav.new-network"} />, 
+            href: "/new-network", 
+            icon: <PlusIcon /> 
+          });
 
         const network = await searchNetworks({ networkAddress }).then(({ rows }) => rows[0]);
 
