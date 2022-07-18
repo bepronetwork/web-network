@@ -37,6 +37,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
     props: {
       ...(await serverSideTranslations(locale, [
         "common",
+        "bounty",
         "my-oracles",
         "connect-wallet-button",
         "profile"
