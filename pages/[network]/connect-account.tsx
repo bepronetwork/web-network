@@ -43,7 +43,7 @@ export default function ConnectAccount() {
 
   const { getUserOf, joinAddressToUser, getUserWith } = useApi();
 
-  const { wallet, user, connectWallet, connectGithub } = useAuthentication();
+  const { wallet, user, connectWallet } = useAuthentication();
   const { service: DAOService } = useDAO();
   const { getURLWithNetwork } = useNetwork();
   const { dispatch } = useContext(ApplicationContext);
