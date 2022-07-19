@@ -163,7 +163,8 @@
     "next-step": "Next Step",
     "fork": "Fork",
     "organization": "Organization",
-    "total": "Total"
+    "total": "Total",
+    "clear": "Clear"
   },
   "modals": {
     "help-modal": {
