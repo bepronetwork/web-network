@@ -18,7 +18,6 @@ interface InternalLinkProps {
   brand?: boolean;
   style?: CSSProperties;
   outline?: boolean;
-  onClick?: () => void;
 }
 
 export default function InternalLink({
@@ -66,7 +65,6 @@ export default function InternalLink({
         className={getClasses()}
         target={`${blank ? "_blank" : ""}`}
         style={{ ...style }}
-        onClick={props.onClick}
       >
         {(iconBefore && props.icon) || ""}
         {(props.label && <span>{props.label}</span>) || ""}

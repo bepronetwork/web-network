@@ -12,6 +12,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
   disabled?: boolean;
   isLoading?: boolean;
+  align?: "left" | "center" | "right";
   onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void
 }
 
@@ -26,6 +27,7 @@ export default function Button({
   applyTextColor = true,
   textClass,
   isLoading,
+  align = "center",
   ...rest
 }: ButtonProps) {
   function getClass(): string {
@@ -42,7 +44,7 @@ export default function Button({
 
     return `btn ${type} ${
       applyTextColor ? textColor : ""
-    } d-flex align-items-center justify-content-center text-uppercase shadow-none ${append}`;
+    } d-flex align-items-center justify-content-${align} text-uppercase shadow-none ${append}`;
   }
 
   function handleSpinner() {
