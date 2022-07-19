@@ -142,7 +142,7 @@ export default function TokensDropdown({
   function SelectValueComponent(props) {
     const { getValue } = props;
     
-    if (!getValue()[0]) return <div {...props}>{props.children}</div>;
+    if (!getValue()[0]) return <>{props.children}</>;
 
     const { name, tokenInfo, currentValue, symbol } = getValue()[0].value;
 

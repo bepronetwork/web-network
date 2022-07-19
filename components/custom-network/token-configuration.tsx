@@ -72,7 +72,7 @@ export default function TokenConfiguration({
 
   function setDeployedAddress(address) {
     setBountyTokenAddress(address);
-    fields.bountyToken.setter(bountyTokenAddress);
+    fields.bountyToken.setter(address);
   }
 
   function validateTokenUri() {
