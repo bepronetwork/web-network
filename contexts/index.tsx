@@ -1,5 +1,7 @@
 import React from "react";
 
+import CreateBountyModal from "components/create-bounty-modal";
+
 import ApplicationContextProvider from "contexts/application";
 import { AuthenticationProvider } from "contexts/authentication";
 import { DAOContextProvider } from "contexts/dao";
@@ -17,7 +19,10 @@ const RootProviders: React.FC = ({ children }) => {
           <NetworkSettingsProvider>
             <ApplicationContextProvider>
               <ReposProvider>
-                <IssueProvider>{children}</IssueProvider>
+                <IssueProvider>
+                  <CreateBountyModal />
+                  {children}
+                </IssueProvider>
               </ReposProvider>
             </ApplicationContextProvider>
           </NetworkSettingsProvider>

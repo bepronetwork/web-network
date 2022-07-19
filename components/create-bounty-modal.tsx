@@ -12,15 +12,26 @@ import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
 import router from "next/router";
 
+import BranchsDropdown from "components/branchs-dropdown";
 import Button from "components/button";
+import ConnectWalletButton from "components/connect-wallet-button";
+import CreateBountyDetails from "components/create-bounty-details";
+import CreateBountyProgress from "components/create-bounty-progress";
+import CreateBountyTokenAmount from "components/create-bounty-token-amount";
+import { IFilesProps } from "components/drag-and-drop";
+import GithubInfo from "components/github-info";
 import Modal from "components/modal"; 
+import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
+import ReposDropdown from "components/repos-dropdown";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
+import { toastError, toastWarning } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { changeShowCreateBountyState } from "contexts/reducers/change-show-create-bounty";
+import { updateTransaction } from "contexts/reducers/update-transaction";
 
 import { parseTransaction } from "helpers/transactions";
 
@@ -36,16 +47,6 @@ import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network";
 import useTransactions from "x-hooks/useTransactions";
 
-import { toastError, toastWarning } from "../contexts/reducers/add-toast";
-import { updateTransaction } from "../contexts/reducers/update-transaction";
-import BranchsDropdown from "./branchs-dropdown";
-import CreateBountyDetails from "./create-bounty-details";
-import CreateBountyProgress from "./create-bounty-progress";
-import CreateBountyTokenAmount from "./create-bounty-token-amount";
-import { IFilesProps } from "./drag-and-drop";
-import GithubInfo from "./github-info";
-import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
-import ReposDropdown from "./repos-dropdown";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -62,11 +63,7 @@ interface BountyPayload {
   fundingAmount?: number;
 }
 
-export default function CreateBountyModal({
-  show,
-}: {
-  show: boolean;
-}) {
+export default function CreateBountyModal() {
   const { t } = useTranslation(["common", "bounty"]);
   const { activeNetwork } = useNetwork();
   const { getURLWithNetwork } = useNetworkTheme();
@@ -75,7 +72,7 @@ export default function CreateBountyModal({
   const txWindow = useTransactions();
   const {
     dispatch,
-    state: { myTransactions },
+    state: { myTransactions, showCreateBounty },
   } = useContext(ApplicationContext);
   const [bountyTitle, setBountyTitle] = useState<string>("");
   const [bountyDescription, setBountyDescription] = useState<string>("");
@@ -459,8 +456,9 @@ export default function CreateBountyModal({
   }, [rewardToken, wallet, DAOService]);
 
   useEffect(() => {
-    getCurrentValueDefaultToken(activeNetwork?.networkToken || BEPRO_TOKEN);
-  }, []);
+    if (DAOService && activeNetwork?.networkToken && wallet?.address) 
+      getCurrentValueDefaultToken(activeNetwork?.networkToken);
+  }, [DAOService, activeNetwork?.networkToken, wallet?.address]);
 
   useEffect(() => {
     setProgressBar();
@@ -656,10 +654,13 @@ export default function CreateBountyModal({
     }
   }
 
+  if (showCreateBounty && !wallet?.address)
+    return <ConnectWalletButton asModal={true} />;
+
   return (
     <>
       <Modal
-        show={show}
+        show={showCreateBounty && !!wallet?.address}
         title={t("bounty:title")}
         titlePosition="center"
         onCloseClick={() => {
