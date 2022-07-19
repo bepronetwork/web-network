@@ -23,7 +23,7 @@ export default function Newissues() {
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common", "bounty", "oracle"]))
+      ...(await serverSideTranslations(locale, ["common", "bounty", "oracle", "connect-wallet-button"]))
     }
   };
 };
