@@ -57,7 +57,7 @@ export default function MainNav() {
   const isBeproNetwork = !network?.name || network?.name === publicRuntimeConfig?.networkConfig?.networkName;
 
   useEffect(() => {
-    if (!DAOService || !wallet?.address) return;
+    if (!DAOService || !wallet?.address || !isNetworksPage) return;
 
     DAOService.getNetworkAdressByCreator(wallet.address)
       .then(async networkAddress => {
@@ -76,7 +76,7 @@ export default function MainNav() {
         });
       })
       .catch(console.log);
-  }, [DAOService, wallet?.address]);
+  }, [DAOService, wallet?.address, isNetworksPage]);
 
   return (
     <div
