@@ -236,17 +236,14 @@ export const NetworkSettingsProvider = ({ children }) => {
           
           if (isCreating) repositories.push(...filtered);
           else {
-            let { rows: networkRepositories } = await searchRepositories({ networkName: network.name });
-
-            networkRepositories = await Promise.all(networkRepositories.map( async (repo) => ({
-              checked: true,
-              isSaved: true,
-              name: repo.githubPath.split("/")[1],
-              fullName: repo.githubPath,
-              hasIssues: await repositoryHasIssues(repo.githubPath)
-            })));
-
-            repositories.push(...networkRepositories);
+            repositories.push(... await searchRepositories({ networkName: network.name })
+              .then(({ rows }) => Promise.all(rows.map( async repo => ({
+                checked: true,
+                isSaved: true,
+                name: repo.githubPath.split("/")[1],
+                fullName: repo.githubPath,
+                hasIssues: await repositoryHasIssues(repo.githubPath)
+              })))));
             
             repositories.push(...filtered.filter(repo =>
               !repositories.find((repoB) => repoB.fullName === repo.fullName)));
