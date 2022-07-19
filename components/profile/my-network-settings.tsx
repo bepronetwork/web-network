@@ -21,7 +21,7 @@ import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
-import { addToast } from "contexts/reducers/add-toast";
+import { toastError, toastSuccess } from "contexts/reducers/add-toast";
 
 import { handleNetworkAddress } from "helpers/custom-network";
 import { psReadAsText } from "helpers/file-reader";
@@ -117,66 +117,70 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
       accessToken: user.accessToken
     };
 
-    console.log(json);
-
     updateNetwork(json)
       .then(async () => {
-        const draftTime = settings.parameters.draftTime.value;
-        const disputableTime = settings.parameters.disputableTime.value;
-        const councilAmount = settings.parameters.councilAmount.value;
-        const percentageNeededForDispute = settings.parameters.percentageNeededForDispute.value;
-        const treasury = settings.treasury.address.value;
-        const cancelFee = settings.treasury.cancelFee.value;
-        //const closeFee = settings.treasury.closeFee.value;
+        const {
+          parameters: {
+            draftTime: { value: draftTime },
+            disputableTime: { value: disputableTime },
+            councilAmount: { value: councilAmount },
+            percentageNeededForDispute: { value: percentageForDispute },
+          },
+          treasury: {
+            address: { value: treasury },
+            cancelFee: { value: cancelFee },
+            // closeFee: { value: closeFee },
+          }
+        } = settings;
+
         const networkAddress = handleNetworkAddress(network);
+
+        const promises = await Promise.allSettled([
+          ... draftTime !== forcedNetwork.draftTime ? 
+            [handleChangeNetworkParameter("draftTime", draftTime, networkAddress)] : [],
+          ... disputableTime !== forcedNetwork.disputableTime ? 
+            [handleChangeNetworkParameter("disputableTime", disputableTime, networkAddress)] : [],
+          ... councilAmount !== forcedNetwork.councilAmount ? 
+            [handleChangeNetworkParameter("councilAmount", councilAmount, networkAddress)] : [],
+          ... percentageForDispute !== forcedNetwork.percentageNeededForDispute ? 
+            [handleChangeNetworkParameter("percentageNeededForDispute", percentageForDispute, networkAddress)] : [],
+          ... treasury !== forcedNetwork.treasury.treasury ? 
+            [handleChangeNetworkParameter("treasury", treasury, networkAddress)] : [],
+          ... cancelFee !== forcedNetwork.treasury.cancelFee ? 
+            [handleChangeNetworkParameter("cancelFee", cancelFee, networkAddress)] : [],
+          // ... closeFee !== forcedNetwork.treasury.closeFee ? [handleChangeNetworkParameter("closeFee", closeFee, networkAddress)] : [],
+        ]);
+
+        const failed = [];
+        const success = [];
+
+        promises.forEach(promise => {
+          if (promise.status === "fulfilled") success.push(promise.value);
+          else failed.push(promise.reason);
+        });
+
+        if (failed.length) {
+          dispatch(toastError(t("custom-network:errors.updated-parameters", {
+            failed: failed.length
+          }), t("custom-network:errors.updating-values")));
+          console.error(failed);
+        }
         
-        if (forcedNetwork.draftTime !== draftTime)
-          await handleChangeNetworkParameter("draftTime", draftTime, networkAddress).catch(console.log);
-
-        if (forcedNetwork.disputableTime !== disputableTime)
-          await handleChangeNetworkParameter("disputableTime", disputableTime, networkAddress)
-            .catch(console.log);
-
-        if (forcedNetwork.councilAmount !== councilAmount)
-          await handleChangeNetworkParameter("councilAmount", councilAmount, networkAddress)
-            .catch(console.log);
-
-        if (forcedNetwork.percentageNeededForDispute !== percentageNeededForDispute)
-          await handleChangeNetworkParameter("percentageNeededForDispute", percentageNeededForDispute, networkAddress)
-            .catch(console.log);
-
-        if (forcedNetwork.treasury.treasury !== treasury)
-          await handleChangeNetworkParameter("treasury", treasury, networkAddress)
-            .catch(console.log);
-
-        if (forcedNetwork.treasury.cancelFee !== cancelFee)
-          await handleChangeNetworkParameter("cancelFee", cancelFee, networkAddress)
-            .catch(console.log);
-
-        // TODO: remove comment when change close fee is implemented in the contract
-        // if (forcedNetwork.treasury.closeFee !== closeFee)
-        //   await handleChangeNetworkParameter("closeFee", closeFee)
-        //     .catch(console.log);
+        if (success.length)
+          dispatch(toastSuccess(t("custom-network:messages.updated-parameters", { 
+            updated: success.length, 
+            total: promises.length 
+          })));
 
         if (isCurrentNetwork) updateActiveNetwork(true);
 
         return updateEditingNetwork();
       })
       .then(() => {
-        dispatch(addToast({
-          type: "success",
-          title: t("actions.success"),
-          content: t("custom-network:messages.refresh-the-page")
-        }));
+        dispatch(toastSuccess(t("custom-network:messages.refresh-the-page"), t("actions.success")));
       })
       .catch((error) => {
-        dispatch(addToast({
-            type: "danger",
-            title: t("actions.failed"),
-            content: t("custom-network:errors.failed-to-update-network", {
-              error
-            })
-        }))
+        dispatch(toastError(t("custom-network:errors.failed-to-update-network", { error }), t("actions.failed")));
         
         console.log(error);
       })
@@ -205,21 +209,9 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
 
         return updateEditingNetwork();
       })
-      .then(() => 
-        dispatch(addToast({
-          type: "success",
-          title: t("actions.success"),
-          content: t("custom-network:messages.network-closed")
-        })) )
-      .catch((error) => {
-        dispatch(addToast({
-            type: "danger",
-            title: t("actions.failed"),
-            content: t("custom-network:errors.failed-to-close-network", {
-              error
-            })
-        }));
-      })
+      .then(() => dispatch(toastSuccess(t("custom-network:messages.network-closed"), t("actions.success"))))
+      .catch(error => 
+        dispatch(toastError(t("custom-network:errors.failed-to-close-network", { error }), t("actions.failed"))))
       .finally(() => {
         setIsClosing(false);
       });
