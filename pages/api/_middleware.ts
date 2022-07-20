@@ -2,23 +2,13 @@ import type { NextApiRequest } from 'next'
 import { getToken } from 'next-auth/jwt'
 import { NextResponse } from 'next/server'
 
-import { error, info } from 'helpers/api/handle-log'
-
 const testnet = process.env.NEXT_E2E_TESTNET === "true" ? true : false;
 
 const whiteList = ['auth', 'past-events', 'seo', 'users', 'graphql'];
 
-const ignorePaths = ['health'];
-
 export async function middleware(req: NextApiRequest) {
   const method = req.method
   const isInWhiteList = req.url?.split('/api')?.[1]?.split('/')?.some(r=> whiteList.includes(r));
-
-  const {page = {}, url, ip, ua, body} = req as any; // eslint-disable-line
-  const {pathname, search,} = new URL(url);
-  
-  if (!ignorePaths.some(k => pathname.includes(k)))
-    info({method, ip, ua, ...page, pathname, search, body});
 
   if(method !== 'GET' && !isInWhiteList && !testnet){
     const token = await getToken({req})
@@ -30,7 +20,6 @@ export async function middleware(req: NextApiRequest) {
   try {
     return NextResponse.next();
   } catch (e) {
-    error(e);
     return NextResponse.error();
   }
 }

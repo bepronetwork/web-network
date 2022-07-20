@@ -32,6 +32,10 @@ export default function Oracle({ children }) {
       value: 0,
       label: t("common:heroes.bounties-in-network"),
       currency: "BEPRO"
+    },
+    {
+      value: 0,
+      label: t("common:heroes.protocol-members")
     }
   ]);
 

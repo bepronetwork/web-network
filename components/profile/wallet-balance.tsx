@@ -28,7 +28,7 @@ export default function WalletBalance() {
   const { t } = useTranslation(["common", "profile"]);
 
   const [tokens, setTokens] = useState<TokenBalance[]>([]);
-  const [totalEuro, setTotalEuro] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0);
   const [hasNoConvertedToken, setHasNoConvertedToken] = useState(false);
 
   const { activeNetwork } = useNetwork();
@@ -103,9 +103,10 @@ export default function WalletBalance() {
     if (!tokens.length) return;
 
     const totalConverted = tokens.reduce((acc, token) => acc + (token.balance * (token.prices?.eur || 0)), 0);
+    const totalTokens = tokens.reduce((acc,token) => acc + token.balance, 0)
     const noConverted = !!tokens.find(token => token.prices?.eur === undefined);
 
-    setTotalEuro(totalConverted);
+    setTotalAmount(noConverted ? totalTokens : totalConverted);
     setHasNoConvertedToken(noConverted);
 
   }, [tokens]);
@@ -117,15 +118,10 @@ export default function WalletBalance() {
         
         <FlexRow className="align-items-center">
           <span className="caption-medium text-white mr-2">{t("misc.total")}</span>
-          <div className="caption-large text-white bg-dark-gray py-2 px-3 border-radius-8">
-            <span>
-              {`${hasNoConvertedToken && "~" || ""} ${formatNumberToCurrency(totalEuro)}`}
-            </span>
-
-            <span className="text-gray ml-1">
-              {t("currencies.euro")}
-            </span>
-          </div>
+          <span className="h4 family-Regular text-white bg-dark-gray py-2 px-3 border-radius-8">
+            {`${formatNumberToCurrency(totalAmount)} 
+            ${!hasNoConvertedToken ? t("currencies.euro") : t("misc.token_other")}`}
+          </span>
         </FlexRow>
       </FlexRow>
 
