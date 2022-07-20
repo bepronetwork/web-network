@@ -226,7 +226,8 @@ export default function PageActions({
         !isBountyFinished && 
         isBountyOpen && 
         !isWorkingOnBounty && 
-        isRepoForked)
+        isRepoForked &&
+        !!activeIssue?.contractId)
       return(
         <ReadOnlyButtonWrapper>
           <Button
