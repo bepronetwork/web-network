@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
+import { Defaults } from "@taikai/dappkit";
 import getConfig from "next/config";
 import { useRouter } from "next/router";
 
@@ -17,9 +18,11 @@ import {
   DEFAULT_DRAFT_TIME, 
   DEFAULT_PERCENTAGE_FOR_DISPUTE 
 } from "helpers/contants";
-import { DefaultNetworkSettings } from "helpers/custom-network";
+import { DefaultNetworkSettings, handleNetworkAddress } from "helpers/custom-network";
 
 import { Color, Icon, Network, NetworkSettings, Theme } from "interfaces/network";
+
+import DAO from "services/dao-service";
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
@@ -31,9 +34,9 @@ const IPFS_URL = publicRuntimeConfig?.ipfsUrl;
 
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
 
-const ALLOWED_PATHS = ["/new-network", "/[network]/account/my-network/settings", "/administration"];
+const ALLOWED_PATHS = ["/new-network", "/[network]/profile/my-network", "/administration"];
 
-const LIMITS = {
+export const LIMITS = {
   percentageNeededForDispute: { max: +publicRuntimeConfig?.networkConfig?.disputesPercentage },
   draftTime: {
     min: +publicRuntimeConfig?.networkConfig?.reedemTime?.min,
@@ -78,7 +81,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     },
     name: {
       setter: (value: string) => setDetails(previous => {
-        const newState = structuredClone(previous);
+        const newState = { ...previous };
 
         newState.validated = false;
         newState.name.value = value.replace(/\s+/g,"-").replace(/--+/gm, "-");
@@ -93,7 +96,7 @@ export const NetworkSettingsProvider = ({ children }) => {
           validated = /bepro|taikai/gi.test(value) ? false : !(await getNetwork(value).catch(() => false));
 
         setDetails(previous => {
-          const newState = structuredClone(previous);
+          const newState = { ...previous };
 
           newState.name.validated = validated;
           
@@ -119,7 +122,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     },
     colors: {
       setter: (value: Color) => setSettings(previous => {
-        const newState = structuredClone(previous);
+        const newState = { ...previous };
 
         newState.theme.colors[value.label] = value.code;
 
@@ -129,7 +132,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     },
     repository: {
       setter: (fullName: string) => setGithub(previous => {
-        const newState = structuredClone(previous);
+        const newState = { ...previous };
         const index = newState.repositories.findIndex((repo) => repo.fullName === fullName);
         const selectedRepository = newState.repositories[index];
 
@@ -191,78 +194,94 @@ export const NetworkSettingsProvider = ({ children }) => {
     }
   };
 
+  async function getService() {
+    if (!forcedNetwork) return DAOService;
+
+    const networkAddress = handleNetworkAddress(network);
+    const dao = new DAO({
+      web3Connection: DAOService.web3Connection,
+      skipWindowAssignment: true
+    });
+
+    await dao.loadNetwork(networkAddress);
+
+    return dao;
+  }
+
   // Getting external data
   useEffect(() => {
     if ( !wallet?.address || 
-         !user?.login || 
          !DAOService || 
          !network?.name || 
          !network?.councilAmount || 
          !needsToLoad ) 
       return;
 
-    getUserRepositories(user.login)
-      .then(async (githubRepositories) => {
-        const repositories = [];
-        const filtered = githubRepositories
-          .filter(repo => (
-            !repo?.isFork 
-            && (user.login === repo?.nameWithOwner.split("/")[0])) 
-            || repo?.isInOrganization)
-          .map(repo => ({
-            checked: false,
-            isSaved: false,
-            hasIssues: false,
-            name: repo?.name,
-            fullName: repo?.nameWithOwner
-          }));
-        
-        if (isCreating) repositories.push(...filtered);
-        else {
-          let { rows: networkRepositories } = await searchRepositories({ networkName: network.name });
-
-          networkRepositories = await Promise.all(networkRepositories.map( async (repo) => ({
-            checked: true,
-            isSaved: true,
-            name: repo.githubPath.split("/")[1],
-            fullName: repo.githubPath,
-            hasIssues: await repositoryHasIssues(repo.githubPath)
-          })));
-
-          repositories.push(...networkRepositories);
+    if (user?.login)
+      getUserRepositories(user.login)
+        .then(async (githubRepositories) => {
+          const repositories = [];
+          const filtered = githubRepositories
+            .filter(repo => (
+              !repo?.isFork 
+              && (user.login === repo?.nameWithOwner.split("/")[0])) 
+              || repo?.isInOrganization)
+            .map(repo => ({
+              checked: false,
+              isSaved: false,
+              hasIssues: false,
+              name: repo?.name,
+              fullName: repo?.nameWithOwner
+            }));
           
-          repositories.push(...filtered.filter(repo =>
-            !repositories.find((repoB) => repoB.fullName === repo.fullName)));
-        }
+          if (isCreating) repositories.push(...filtered);
+          else {
+            repositories.push(... await searchRepositories({ networkName: network.name })
+              .then(({ rows }) => Promise.all(rows.map( async repo => ({
+                checked: true,
+                isSaved: true,
+                name: repo.githubPath.split("/")[1],
+                fullName: repo.githubPath,
+                hasIssues: await repositoryHasIssues(repo.githubPath)
+              })))));
+            
+            repositories.push(...filtered.filter(repo =>
+              !repositories.find((repoB) => repoB.fullName === repo.fullName)));
+          }
 
-        setGithub(previous => ({
-          ...previous,
-          repositories
-        }));
-      });
-
-    setSettings(previous => ({
-      ...previous,
-      theme: {
-        ...previous.theme,
-        colors: isCreating && DefaultTheme() || network?.colors,
-      },
-    }));
+          setGithub(previous => ({
+            ...previous,
+            repositories
+          }));
+        });
 
     if (!isCreating) {
-      setSettings(previous => {
-        const newState = structuredClone(previous);
+      getService()
+      .then(service => {
+        service.getTreasury()
+        .then(({ treasury, closeFee, cancelFee }) => 
+          setSettings(previous => {
+            const newState = { ...previous };
 
-        newState.parameters.draftTime = { value: network.draftTime, validated: true };
-        newState.parameters.disputableTime = { value: network.disputableTime, validated: true };
-        newState.parameters.percentageNeededForDispute = { value: network.percentageNeededForDispute, validated: true };
-        newState.parameters.councilAmount = { value: network.councilAmount, validated: true };
+            newState.parameters.draftTime = { value: network.draftTime, validated: true };
+            newState.parameters.disputableTime = { value: network.disputableTime, validated: true };
+            newState.parameters.percentageNeededForDispute = { 
+              value: network.percentageNeededForDispute, 
+              validated: true 
+            };
+            newState.parameters.councilAmount = { value: network.councilAmount, validated: true };
+            newState.treasury.address = { value: treasury, validated: true };
+            newState.treasury.cancelFee = { value: cancelFee, validated: true };
+            newState.treasury.closeFee = { value: closeFee, validated: true };
+            newState.theme.colors = network?.colors;
 
-        return newState;
-      });
+            return newState;
+          }));
+      })
+      .catch(error => console.log("Failed to load network parameters", error, network));
 
       setDetails(previous => {
-        const newState = structuredClone(previous);
+        const newState = { ...previous };
 
         newState.name = { value: network?.name, validated: undefined };
         newState.description = network?.description;
@@ -273,7 +292,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       });
     } else
       setSettings(previous => {
-        const newState = structuredClone(previous);
+        const newState = { ...previous };
 
         newState.parameters.draftTime = { value: DEFAULT_DRAFT_TIME, validated: true };
         newState.parameters.disputableTime = { value: DEFAULT_DISPUTE_TIME, validated: true };
@@ -281,14 +300,14 @@ export const NetworkSettingsProvider = ({ children }) => {
         newState.parameters.councilAmount = { value: DEFAULT_COUNCIL_AMOUNT, validated: true };
         newState.treasury.cancelFee = { value: DEFAULT_CANCEL_FEE, validated: true };
         newState.treasury.closeFee = { value: DEFAULT_CLOSE_FEE, validated: true };
+        newState.theme.colors = DefaultTheme();
 
         return newState;
       });
   }, [ wallet?.address, 
        user?.login, 
        DAOService, 
-       network?.name, 
-       network?.councilAmount, 
+       network, 
        isCreating, 
        needsToLoad ]);
 
@@ -399,9 +418,10 @@ export const NetworkSettingsProvider = ({ children }) => {
   useEffect(() => {
     if (!DAOService) return;
 
-    const isAddressEmpty = settings?.treasury?.address?.value?.trim() === "";
+    const isAddressEmptyOrZeroAddress = settings?.treasury?.address?.value?.trim() === "" || 
+      settings?.treasury?.address?.value === Defaults.nativeZeroAddress;
 
-    const conditionOrUndefined = condition => isAddressEmpty ? undefined : condition;
+    const conditionOrUndefined = condition => isAddressEmptyOrZeroAddress ? undefined : condition;
 
     Promise.all([
       conditionOrUndefined(DAOService.isAddress(settings?.treasury?.address?.value)),
@@ -409,7 +429,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       conditionOrUndefined(settings?.treasury?.closeFee?.value >= 0 && settings?.treasury?.closeFee?.value <= 100)
     ]).then(validations => {
       setSettings(previous => {
-        const newState = structuredClone(previous);
+        const newState = { ...previous };
 
         newState.treasury.address.validated = validations[0];
         newState.treasury.cancelFee.validated = validations[1];
@@ -427,7 +447,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   // Parameters Validation
   useEffect(() => {
     setSettings(previous => {
-      const newState = structuredClone(previous);
+      const newState = { ...previous };
 
       const validations = [
         Fields.parameter.validator("draftTime", settings?.parameters?.draftTime?.value),

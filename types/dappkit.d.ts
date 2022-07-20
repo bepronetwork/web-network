@@ -4,7 +4,11 @@ export type NetworkParameters = "councilAmount" |
   "oracleExchangeRate" | 
   "mergeCreatorFeeShare" | 
   "proposerFeeShare" |
-  "percentageNeededForDispute";
+  "percentageNeededForDispute" |
+  "cancelFee" |
+  "closeFee" |
+  "cancelableTime" |
+  "treasury";
 
 export type Entities = "bounty" | "proposal" | "pull-request";
 

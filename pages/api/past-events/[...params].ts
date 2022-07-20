@@ -30,7 +30,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   if (!customNetwork || customNetwork?.isClosed) return res.status(404).json("Invalid network");
 
-  const DAOService = new DAO(true);
+  const DAOService = new DAO({ skipWindowAssignment: true });
 
   if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
 

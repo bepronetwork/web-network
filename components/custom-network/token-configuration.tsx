@@ -72,7 +72,7 @@ export default function TokenConfiguration({
 
   function setDeployedAddress(address) {
     setBountyTokenAddress(address);
-    fields.bountyToken.setter(bountyTokenAddress);
+    fields.bountyToken.setter(address);
   }
 
   function validateTokenUri() {
@@ -135,7 +135,7 @@ export default function TokenConfiguration({
           description={t("custom-network:steps.token-configuration.fields.tokens-dropdown.description")}
           tokens={customTokens} 
           canAddToken={
-            activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address ? 
+            activeNetwork?.name === publicRuntimeConfig?.networkConfig?.networkName ? 
             publicRuntimeConfig?.networkConfig?.allowCustomTokens :
             !!activeNetwork?.allowCustomTokens
           }
