@@ -22,6 +22,7 @@ import { useNetwork } from "contexts/network";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { changeShowCreateBountyState } from "contexts/reducers/change-show-create-bounty";
 
+import { handleNetworkAddress } from "helpers/custom-network";
 import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
@@ -473,7 +474,8 @@ export default function CreateBountyModal({
 
     tmpTokens.push(BEPRO_TOKEN);
 
-    if (activeNetwork.networkAddress !== publicRuntimeConfig?.contract?.address)
+    if (handleNetworkAddress(activeNetwork) !== publicRuntimeConfig?.contract?.address && 
+      activeNetwork.networkToken.address.toLowerCase() !== BEPRO_TOKEN.address.toLowerCase())
       tmpTokens.push(activeNetwork.networkToken);
 
     tmpTokens.push(...activeNetwork.tokens.map(({ name, symbol, address }) => ({ name, symbol, address } as Token)));
