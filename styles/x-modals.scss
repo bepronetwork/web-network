@@ -8,3 +8,7 @@
     max-width: 660px;
   }
 }
+
+.modal-backdrop { 
+  z-index: 1055 !important;
+}
