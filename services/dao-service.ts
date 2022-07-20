@@ -18,22 +18,25 @@ import { NetworkParameters } from "types/dappkit";
 
 const { publicRuntimeConfig } = getConfig();
 
+interface DAOServiceProps {
+  skipWindowAssignment?: boolean;
+  web3Connection?: Web3Connection;
+}
+
 export default class DAO {
   private _web3Connection: Web3Connection;
   private _network: Network_v2;
-  private _networkAux: Network_v2;
   private _registry: Network_Registry;
 
   get web3Connection() { return this._web3Connection; }
   get network() { return this._network; }
-  get networkAux() { return this._networkAux; }
   get registry() { return this._registry; }
 
-  constructor(skipWindowAssignment = false) {
+  constructor({ skipWindowAssignment, web3Connection } : DAOServiceProps = {}) {
     if (!publicRuntimeConfig?.web3ProviderConnection)
       throw new Error("Missing web3ProviderConnection in next.config.js");
 
-    this._web3Connection = new Web3Connection({
+    this._web3Connection = web3Connection || new Web3Connection({
       web3Host: publicRuntimeConfig.web3ProviderConnection,
       skipWindowAssignment
     });
@@ -97,6 +100,13 @@ export default class DAO {
     try {
       await this.web3Connection.start();
 
+      console.table({
+        Network_v2: publicRuntimeConfig?.contract?.address,
+        Settler: publicRuntimeConfig?.contract?.settler,
+        Transactional: publicRuntimeConfig?.contract?.transaction,
+        Network_Registry: publicRuntimeConfig?.contract?.registry
+      });
+
       return true;
     } catch (error) {
       console.log("Error starting: ", error);
@@ -127,14 +137,6 @@ export default class DAO {
     return this.web3Connection.web3.eth.getChainId();
   }
 
-  async getNetwork(networkAddress: string = undefined): Promise<Network_v2> {
-    if (!networkAddress || (this.network && this.network?.contractAddress === networkAddress)) return this._network;
-
-    const network = await this.loadNetwork(networkAddress, true);
-
-    return network;
-  }
-
   async getBalance(kind: `eth` | `settler` | `staked`, address: string): Promise<number> {
     try {
       let n = 0;
@@ -161,22 +163,10 @@ export default class DAO {
     return this.network[parameter]();
   }
 
-  async setNetworkParameter(parameter: NetworkParameters, 
-                            value: number, 
-                            networkAddress?: string): Promise<TransactionReceipt> {    
-    let network = this.network;
+  async setNetworkParameter(parameter: NetworkParameters, value: number | string): Promise<TransactionReceipt> {    
+    if (parameter === "treasury") return this.network.updateTresuryAddress(value);
 
-    if (networkAddress) {
-      if (this.networkAux?.contractAddress === networkAddress)
-        network = this.networkAux;
-      else {
-        this._networkAux = await this.loadNetwork(networkAddress, true);
-        network = this.networkAux;
-      }
-      
-    }
-    
-    return network[`change${parameter[0].toUpperCase() + parameter.slice(1)}`](value);
+    return this.network[`change${parameter[0].toUpperCase() + parameter.slice(1)}`](value);
   }
 
   async getOraclesOf(address: string): Promise<number> {    
@@ -214,9 +204,9 @@ export default class DAO {
     const treasury = await this.network.treasuryInfo();
 
     return {
-      treasury: treasury[0],
-      closeFee: +treasury[1],
-      cancelFee: +treasury[2]
+      treasury: treasury?.treasury || Defaults.nativeZeroAddress,
+      closeFee: +(treasury?.closeFee || 0),
+      cancelFee: +(treasury?.cancelFee || 0)
     };
   }
 
@@ -232,32 +222,24 @@ export default class DAO {
     return this.network.cidBountyId(cid);
   }
 
-  async getClosedBounties(networkAddress?: string): Promise<number> {
-    const network = await this.getNetwork(networkAddress);
-
-    return network.closedBounties();
+  async getClosedBounties(): Promise<number> {
+    return this.network.closedBounties();
   }
 
-  async getOpenBounties(networkAddress?: string): Promise<number> {
-    const network = await this.getNetwork(networkAddress);
-
-    return network.openBounties();
+  async getOpenBounties(): Promise<number> {
+    return this.network.openBounties();
   }
 
-  async getTotalBounties(networkAddress?: string): Promise<number> {
-    const network = await this.getNetwork(networkAddress);
-
-    return network.bountiesIndex();
+  async getTotalBounties(): Promise<number> {
+    return this.network.bountiesIndex();
   }
 
   async getBountiesOfAddress(address: string): Promise<number[]> {
     return this.network.getBountiesOfAddress(address);
   }
 
-  async getTotalSettlerLocked(networkAddress?: string): Promise<number> {
-    const network = await this.getNetwork(networkAddress);
-
-    return network.totalSettlerLocked();
+  async getTotalSettlerLocked(): Promise<number> {
+    return this.network.totalSettlerLocked();
   }
 
   async getNetworksQuantityInRegistry(): Promise<number> {
@@ -322,11 +304,14 @@ export default class DAO {
     return governor === address;
   }
 
-  async isNetworkAbleToClosed(): Promise<boolean> {
-    const totalSettlerLocked = await this.network.totalSettlerLocked();
-    const closedBounties = await this.network.closedBounties();
-    const canceledBounties = await this.network.canceledBounties();
-    const bountiesTotal = await this.network.bountiesIndex();
+  async isNetworkAbleToBeClosed(): Promise<boolean> {
+    const [totalSettlerLocked, closedBounties, canceledBounties, bountiesTotal] = 
+      await Promise.all([
+        this.network.totalSettlerLocked(),
+        this.network.closedBounties(),
+        this.network.canceledBounties(),
+        this.network.bountiesIndex()
+      ]);
 
     return (
       totalSettlerLocked === 0 &&
@@ -344,10 +329,8 @@ export default class DAO {
     };
   }
 
-  async getSettlerTokenData(networkAddress?: string): Promise<Token> {
-    const network = await this.getNetwork(networkAddress);
-
-    return this.getERC20TokenData(network.settlerToken.contractAddress);
+  async getSettlerTokenData(): Promise<Token> {
+    return this.getERC20TokenData(this.network.settlerToken.contractAddress);
   }
 
   async getTokenBalance(tokenAddress: string, walletAddress: string): Promise<number> {

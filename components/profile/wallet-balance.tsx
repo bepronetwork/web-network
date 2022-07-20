@@ -4,6 +4,7 @@ import { useTranslation } from "next-i18next";
 
 import BeProBlue from "assets/icons/bepro-blue";
 import OracleIcon from "assets/icons/oracle-icon";
+import TokenIconPlaceholder from "assets/icons/token-icon-placeholder";
 
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
@@ -17,20 +18,22 @@ import { getCoinInfoByContract } from "services/coingecko";
 
 type TokenBalance = Partial<TokenInfo>;
 
+export const FlexRow = ({ children, className = "" }) => 
+  <div className={`d-flex flex-row ${className}`}>{children}</div>;
+  
+export const FlexColumn = ({ children, className = "" }) => 
+  <div className={`d-flex flex-column ${className}`}>{children}</div>;
+
 export default function WalletBalance() {
   const { t } = useTranslation(["common", "profile"]);
 
   const [tokens, setTokens] = useState<TokenBalance[]>([]);
-  const [totalEuro, setTotalEuro] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0);
   const [hasNoConvertedToken, setHasNoConvertedToken] = useState(false);
 
   const { activeNetwork } = useNetwork();
   const { wallet } = useAuthentication();
   const { service: DAOService } = useDAO();
-
-  const FlexRow = ({ children, className = "" }) => <div className={`d-flex flex-row ${className}`}>{children}</div>;
-  const FlexColumn = ({ children, className = "" }) => 
-    <div className={`d-flex flex-column ${className}`}>{children}</div>;
 
   const oracleToken = {
     symbol: t("$oracles"),
@@ -81,7 +84,12 @@ export default function WalletBalance() {
         icon: <BeProBlue width={24} height={24} />, balance: beproBalance 
       }];
 
-      const settler = { ...activeNetwork.networkToken, ...settlerInfo, balance: settlerBalance };
+      const settler = { 
+        ...activeNetwork.networkToken, 
+        ...settlerInfo, 
+        balance: settlerBalance,
+        icon: (settlerInfo as TokenInfo)?.icon || <TokenIconPlaceholder />
+      };
 
       if (activeNetwork.networkToken.address !== BEPRO_TOKEN.address)
         tmpTokens.push(settler);
@@ -95,9 +103,10 @@ export default function WalletBalance() {
     if (!tokens.length) return;
 
     const totalConverted = tokens.reduce((acc, token) => acc + (token.balance * (token.prices?.eur || 0)), 0);
+    const totalTokens = tokens.reduce((acc,token) => acc + token.balance, 0)
     const noConverted = !!tokens.find(token => token.prices?.eur === undefined);
 
-    setTotalEuro(totalConverted);
+    setTotalAmount(noConverted ? totalTokens : totalConverted);
     setHasNoConvertedToken(noConverted);
 
   }, [tokens]);
@@ -110,7 +119,8 @@ export default function WalletBalance() {
         <FlexRow className="align-items-center">
           <span className="caption-medium text-white mr-2">{t("misc.total")}</span>
           <span className="h4 family-Regular text-white bg-dark-gray py-2 px-3 border-radius-8">
-            {`${hasNoConvertedToken && "~" || ""} ${formatNumberToCurrency(totalEuro)} ${t("currencies.euro")}`}
+            {`${formatNumberToCurrency(totalAmount)} 
+            ${!hasNoConvertedToken ? t("currencies.euro") : t("misc.token_other")}`}
           </span>
         </FlexRow>
       </FlexRow>
@@ -122,7 +132,7 @@ export default function WalletBalance() {
 
         <FlexRow className="align-items-center">
           <span className="caption-medium text-white mr-2">{t("misc.total")}</span>
-          <span className="h4 family-Regular text-white bg-dark-gray py-2 px-3 border-radius-8">
+          <span className="caption-large text-white bg-dark-gray py-2 px-3 border-radius-8">
             {formatNumberToCurrency(oraclesLocked + oraclesDelegatedToMe)}
           </span>
         </FlexRow>

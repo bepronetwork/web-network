@@ -66,7 +66,7 @@ export default function IssueFilters() {
           className="p-0 mr-2"
           onClick={handleClearFilters}
         >
-          Clear
+          <Translation label="misc.clear" />
         </Button>
       )}
 

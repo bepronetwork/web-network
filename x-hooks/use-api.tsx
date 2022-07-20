@@ -50,6 +50,7 @@ export default function useApi() {
     creator = "",
     search = "",
     pullRequester = "",
+    proposer = "",
     networkName = publicRuntimeConfig?.currency?.networkConfig?.networkName
   }) {
     const params = new URLSearchParams({
@@ -63,6 +64,7 @@ export default function useApi() {
       creator,
       search,
       pullRequester,
+      proposer,
       networkName
     }).toString();
     return client

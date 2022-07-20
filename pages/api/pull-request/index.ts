@@ -212,7 +212,7 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
 
   if (!pullRequest) return res.status(404).json("Invalid");
 
-  const DAOService = new DAO(true);
+  const DAOService = new DAO({ skipWindowAssignment: true });
 
   if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
 

@@ -59,7 +59,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
 
     // Contract Validations
-    const DAOService = new DAO(true);
+    const DAOService = new DAO({ skipWindowAssignment: true });
 
     if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
     if (!await DAOService.loadRegistry()) return res.status(500).json("Failed to load registry");
@@ -199,7 +199,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     }
 
     // Contract Validations
-    const DAOService = new DAO(true);
+    const DAOService = new DAO({ skipWindowAssignment: true });
 
     if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
     if (!await DAOService.loadRegistry()) return res.status(500).json("Failed to load factory contract");

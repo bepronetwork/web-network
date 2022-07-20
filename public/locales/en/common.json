@@ -156,6 +156,7 @@
     "locked": "Locked",
     "upload": "upload",
     "token": "token",
+    "token_other": "tokens",
     "$token": "$TOKEN",
     "creation-date": "creation date",
     "seconds": "seconds",
@@ -163,7 +164,8 @@
     "next-step": "Next Step",
     "fork": "Fork",
     "organization": "Organization",
-    "total": "Total"
+    "total": "Total",
+    "clear": "Clear"
   },
   "modals": {
     "help-modal": {

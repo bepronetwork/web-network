@@ -41,7 +41,6 @@ export default function MainNav() {
   const {
     dispatch
   } = useContext(ApplicationContext);
-  const [verifyAddressAfterClick, setVerifyAddressAfterClick] = useState(false);
   const [myNetwork, setMyNetwork] = useState<MyNetworkLink>({ 
     label: <Translation label={"main-nav.new-network"} />, 
     href: "/new-network", 
@@ -54,10 +53,10 @@ export default function MainNav() {
   const { network, getURLWithNetwork } = useNetwork();
 
   const isNetworksPage = ["/networks", "/new-network"].includes(pathname);
-  const isBeproNetwork = network?.name === publicRuntimeConfig?.networkConfig?.networkName;
+  const isBeproNetwork = !network?.name || network?.name === publicRuntimeConfig?.networkConfig?.networkName;
 
   useEffect(() => {
-    if (!DAOService || !wallet?.address) return;
+    if (!DAOService || !wallet?.address || !isNetworksPage) return;
 
     DAOService.getNetworkAdressByCreator(wallet.address)
       .then(async networkAddress => {
@@ -76,7 +75,7 @@ export default function MainNav() {
         });
       })
       .catch(console.log);
-  }, [DAOService, wallet?.address]);
+  }, [DAOService, wallet?.address, isNetworksPage]);
 
   return (
     <div
@@ -156,11 +155,7 @@ export default function MainNav() {
             <div
             className="btn btn-outline-primary text-white bg-opacity-100  text-uppercase
           text-decoration-none shadow-none d-flex align-items-center justify-content-center"
-            onClick={() => {
-              wallet?.address
-                ? dispatch(changeShowCreateBountyState(true))
-                : setVerifyAddressAfterClick(true);
-            }}
+            onClick={() => dispatch(changeShowCreateBountyState(true))}
           >
             <span className="text-new-bounty">
               <PlusIcon
@@ -209,7 +204,6 @@ export default function MainNav() {
           </ConnectWalletButton>
         </div>
         <HelpModal show={showHelp} onCloseClick={() => setShowHelp(false)} />
-         {verifyAddressAfterClick && <ConnectWalletButton asModal={verifyAddressAfterClick} />}
       </div>
     </div>
   );

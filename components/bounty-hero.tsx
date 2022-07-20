@@ -13,7 +13,7 @@ import Translation from "./translation";
 
 export default function BountyHero() {
   const { t } = useTranslation(["bounty", "common"]);
-  const { activeIssue } = useIssue();
+  const { activeIssue, networkIssue } = useIssue();
   return (
     <div className="banner-shadow">
       <CustomContainer>
@@ -88,9 +88,9 @@ export default function BountyHero() {
                 </span>
               </div>
 
-              {activeIssue?.createdAt && (
+              {networkIssue?.creationDate && (
                 <DateLabel
-                  date={activeIssue?.createdAt}
+                  date={networkIssue.creationDate}
                   className="text-white"
                 />
               )}

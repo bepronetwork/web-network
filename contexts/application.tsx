@@ -11,7 +11,6 @@ import { useRouter } from "next/router";
 import { parseCookies, setCookie } from "nookies";
 import sanitizeHtml from "sanitize-html";
 
-import CreateBountyModal from "components/create-bounty-modal";
 import Loading from "components/loading";
 import Toaster from "components/toaster";
 
@@ -20,6 +19,7 @@ import { useNetwork } from "contexts/network";
 import { toastError } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { changeNetwork } from "contexts/reducers/change-network";
+import { changeNetworkId } from "contexts/reducers/change-network-id";
 import LoadApplicationReducers from "contexts/reducers/index";
 import { mainReducer } from "contexts/reducers/main";
 import { updateTransaction } from "contexts/reducers/update-transaction";
@@ -28,7 +28,6 @@ import { ApplicationState } from "interfaces/application-state";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { ReduceActor } from "interfaces/reduce-action";
 
-import { changeNetworkId } from "./reducers/change-network-id";
 
 interface GlobalState {
   state: ApplicationState;
@@ -232,7 +231,6 @@ export default function ApplicationContextProvider({ children }) {
                                        }>
       <Loading show={state.loading.isLoading} text={state.loading.text} />
       <Toaster />
-      {wallet?.address && <CreateBountyModal show={state.showCreateBounty} />} 
       {children}
     </ApplicationContext.Provider>
   );
