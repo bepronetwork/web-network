@@ -1239,6 +1239,8 @@ textarea.form-control {
 
     button {
       background-color: $black;
+      border-top-right-radius: math.div($m, 2);
+      border-bottom-right-radius: math.div($m, 2);
 
       svg {
         color: var(--bs-primary);

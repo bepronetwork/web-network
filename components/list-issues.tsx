@@ -216,8 +216,8 @@ export default function ListIssues({
           className={"d-flex align-items-center gap-20 list-actions sticky-top"}
         >
           <div className="w-100">
-            <InputGroup>
-              <InputGroup.Text onClick={handlerSearch}>
+            <InputGroup className="border-radius-8">
+              <InputGroup.Text className="cursor-pointer" onClick={handlerSearch}>
                 <SearchIcon />
               </InputGroup.Text>
 
@@ -231,7 +231,7 @@ export default function ListIssues({
 
               {showClearButton() && (
                 <button
-                  className="btn bg-black border-0 rounded-8 py-0 px-3"
+                  className="btn bg-black border-0 py-0 px-3"
                   onClick={handleClearSearch}
                 >
                   <CloseIcon width={10} height={10} />
