@@ -20,6 +20,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     search,
     page,
     pullRequester,
+    proposer,
     networkName,
     repoPath
   } = req.query || {};
@@ -78,7 +79,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: "developers" },
     {
       association: "pullRequests",
-      required: false,
+      required: !!pullRequester,
       where: {
         status: {
           [Op.not]: "canceled"
@@ -86,7 +87,13 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
         ...(pullRequester ? { githubLogin: pullRequester } : {})
       }
     },
-    { association: "mergeProposals" },
+    { 
+      association: "mergeProposals",
+      required: !!proposer,
+      where: {
+        ...(proposer ? { githubLogin: proposer } : {})
+      }
+    },
     { association: "repository" },
     { association: "token" }
   ];

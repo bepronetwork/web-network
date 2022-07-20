@@ -82,7 +82,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     if (!activeNetwork?.name || query?.network !== activeNetwork?.name) return;
 
     const issue = await getIssue(repoId, ghId, activeNetwork?.name);
-    
+
     if (!issue) throw new Error("Issue not found");
 
     const ghPath = issue.repository.githubPath;
@@ -92,8 +92,12 @@ export const IssueProvider: React.FC = function ({ children }) {
                                                     ghPath);
     }
 
-    const comments = await getIssueOrPullRequestComments(ghPath, +issue.githubId);
-    
+    const comments = await getIssueOrPullRequestComments(ghPath, +issue.githubId)
+      .catch(error => {
+        console.log("Failed to get comments", error);
+        return [];
+      });
+      
     const newActiveIssue = {
         ...issue,
         comments,
@@ -101,7 +105,7 @@ export const IssueProvider: React.FC = function ({ children }) {
           ({...mp, isMerged: issue.merged !== null && +mp.scMergeId === +issue.merged})),
         lastUpdated: +new Date()
     } as IActiveIssue;
-
+  
     setActiveIssue(newActiveIssue);
 
     return newActiveIssue;

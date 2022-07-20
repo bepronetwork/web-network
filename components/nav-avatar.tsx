@@ -2,13 +2,14 @@ import { useState } from "react";
 import { OverlayTrigger, Popover } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
 import CloseIcon from "assets/icons/close-icon";
 import ExternalLinkIcon from "assets/icons/external-link-icon";
 
 import Avatar from "components/avatar";
+import Button from "components/button";
 import Identicon from "components/identicon";
-import InternalLink from "components/internal-link";
 
 import { useAuthentication } from "contexts/authentication";
 
@@ -16,8 +17,10 @@ import { truncateAddress } from "helpers/truncate-address";
 
 import useNetworkTheme from "x-hooks/use-network";
 
+
 export default function NavAvatar() {
   const { t } = useTranslation("common");
+  const router = useRouter();
 
   const [visible, setVisible] = useState(false);
 
@@ -30,16 +33,28 @@ export default function NavAvatar() {
   
   const username = user?.login ? user.login : truncateAddress(wallet?.address);
 
+  function handleInternalLinkClick(href) {
+    setVisible(false);
+    router.push(href);
+  }
+
+  function handleDisconnectWallet() {
+    disconnectWallet();
+    setVisible(false);
+  }
+
   const Link = (label, href) => ({ label, href });
 
-  const ProfileInternalLink = ({ label, href }) => 
-    <InternalLink 
-      href={href} 
-      label={label} 
-      className="mb-1 p family-Regular" 
+  const ProfileInternalLink = ({ label, href, className = "" }) => 
+    <Button
+      className={`mb-1 p family-Regular p-0 text-capitalize font-weight-normal mx-0 ${className}`}
+      align="left"
       key={label}
-      nav 
-    />;
+      onClick={() => handleInternalLinkClick(href)}
+      transparent
+    >
+      {label}
+    </Button>;
 
   const ProfileExternalLink = ({ label, href, className = "" }) => (
     <div className={`d-flex flex-row align-items-center justify-content-between ${className}`} key={label}>
@@ -102,11 +117,10 @@ export default function NavAvatar() {
               </div>
 
               <div className="d-flex flex-row justify-content-left">
-                <InternalLink 
+                <ProfileInternalLink 
                   href={getURLWithNetwork("/profile")} 
                   label={t("main-nav.nav-avatar.view-profile")} 
-                  className="text-gray p family-Regular" 
-                  nav 
+                  className="text-gray p family-Regular"
                 />
               </div>
           </div>
@@ -129,7 +143,7 @@ export default function NavAvatar() {
         </LinksSession>
 
         <div className="row align-items-center">
-          <DisconnectWallet onClick={disconnectWallet} />
+          <DisconnectWallet onClick={handleDisconnectWallet} />
         </div>
       </Popover.Body>
     </Popover>

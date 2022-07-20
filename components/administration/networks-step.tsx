@@ -136,9 +136,8 @@ export default function NetworksStep({
     try {
       setIsLoading(true);
 
-      const network = await searchNetworks({
-        networkAddress: selectedNetworkAddress
-      }).then(({ rows }) => rows[0]);
+      const network = await searchNetworks({ networkAddress: selectedNetworkAddress })
+        .then(({ rows }) => rows[0]);
 
       if (network.networkAddress !== DAOService.network.contractAddress) 
         await DAOService.loadNetwork(network.networkAddress);
@@ -154,7 +153,7 @@ export default function NetworksStep({
         DAOService.getNetworkParameter("proposerFeeShare"),
         DAOService.getNetworkParameter("percentageNeededForDispute"),
         DAOService.getTreasury(),
-        DAOService.getSettlerTokenData(network.networkAddress)
+        DAOService.getSettlerTokenData()
       ])
       .then(([councilAmount, 
               disputableTime, 

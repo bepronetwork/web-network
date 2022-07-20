@@ -10,18 +10,18 @@ const { serverRuntimeConfig: { authSecret, github: { token: botToken } } } = get
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { query, params } = req.body;
-  const { access_token, login, name } = await getToken({ req, secret: authSecret });
+  const token = await getToken({ req, secret: authSecret });
 
   try {
     const octokit = new Octokit({
-      auth: access_token || botToken
+      auth: token?.access_token || botToken
     });
 
     const result = await octokit.graphql(query, params);
 
     return res.status(200).json(result);
   } catch(error) {
-    LogError("GraphQL Proxy", { req, error, access_token, login, name });
+    LogError("GraphQL Proxy", { req, error, token });
     
     return res.status(200).json(error.data);
   }

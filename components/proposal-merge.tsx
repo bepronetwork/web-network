@@ -85,7 +85,7 @@ export default function ProposalMerge({
   }
 
   function handleConversion(value) {
-    return handleTokenToEurConversion(value, coinInfo.prices['eur'])
+    return handleTokenToEurConversion(value, coinInfo?.prices['eur'])
   }
 
   function currentTokenSymbol() {

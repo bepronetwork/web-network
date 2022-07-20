@@ -35,7 +35,7 @@ export default function ConnectGithub() {
 
   return (
     <div className="container-fluid">
-      <div className="row mtn-4 mb-2">
+      <div className="row mt-3 mb-2 mx-0">
         <div className="col text-center px-0">
           <div className="content-wrapper py-3 border-radius-8 bg-dark-gray">
             <GithubImage />{" "}

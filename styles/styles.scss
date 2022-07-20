@@ -57,7 +57,7 @@ li {
   list-style: none;
 }
 
-.cursor-now-allowed {
+.cursor-not-allowed {
   cursor: not-allowed;
 }
 
@@ -256,6 +256,10 @@ li {
 
 .mw-github-info {
   max-width: 235px;
+}
+
+.max-width-content {
+  width: max-content;
 }
 
 .github-info {
@@ -1349,10 +1353,6 @@ textarea.form-control {
   color: $ligth-gray
 }
 
-.custom-color-input {
-  width: 38px;
-  height: 38px;
-
 .custom-color-input-wrapper {
   padding: 10px 20px;
 
@@ -1361,7 +1361,7 @@ textarea.form-control {
     width: 25px;
     height: 25px;
 
-    border-radius: 25px;
+    border-radius: 50%;
     border: 2px solid $white;
 
     &.is-invalid {
@@ -1548,10 +1548,10 @@ input[type="color"] {
 }
 
 @keyframes grandient-loop {
-0%{background-position:right}
-50%{background-position:left}
-100%{background-position:right}
-}}
+  0%{background-position:right}
+  50%{background-position:left}
+  100%{background-position:right}
+}
 
 .nav-avatar {
   .text-primary {

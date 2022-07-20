@@ -42,7 +42,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     networkAddress: publicRuntimeConfig?.contract?.address
   }, ...customNetworks]
 
-  const DAOService = new DAO(true);
+  const DAOService = new DAO({ skipWindowAssignment: true });
 
   if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
 
