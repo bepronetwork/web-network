@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { FormControl, InputGroup } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
@@ -77,6 +77,7 @@ export default function ListIssues({
   const { page, nextPage, goToFirstPage } = usePage();
   const { search, setSearch, clearSearch } = useSearch();
   const [searchState, setSearchState] = useState(search);
+  const searchTimeout = useRef(null);
 
   const isProfilePage = router?.asPath?.includes("profile");
   const { repoId, time, state, sortBy, order } = router.query as {
@@ -205,6 +206,16 @@ export default function ListIssues({
     creator,
     activeNetwork
   ]);
+
+  useEffect(() => {
+    clearTimeout(searchTimeout.current);
+
+    searchTimeout.current =  setTimeout(() => {
+      setSearch(searchState);
+    }, 1000);
+
+    return () => clearTimeout(searchTimeout.current);
+  }, [searchState]);
 
   return (
     <CustomContainer 
