@@ -156,6 +156,7 @@
     "locked": "Locked",
     "upload": "upload",
     "token": "token",
+    "token_other": "tokens",
     "$token": "$TOKEN",
     "creation-date": "creation date",
     "seconds": "seconds",
