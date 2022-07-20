@@ -1226,6 +1226,11 @@ textarea.form-control {
 
     &:focus-within {
       border-color: var(--bs-primary);
+
+      .input-group-text {
+        border: 0 !important;
+        background-color: $black;
+      }
     }
 
     input {
