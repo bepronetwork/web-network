@@ -78,6 +78,7 @@ export default function CreateBountyTokenAmount({
           addToken={addToken}
           setToken={setCurrentToken}
           disabled={review}
+          needsBalance
         />
       </div>
       <div className="col-md-12">

@@ -2,17 +2,18 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
+import ArrowDown from "assets/icons/arrow-down";
 import ArrowUp from "assets/icons/arrow-up";
 
 import Button from "components/button";
 import ColorInput from "components/color-input";
 
 const MoreColoursButton = ({label, isVisible, onClick}) => {
-  const posfix = isVisible ? <span className="ml-1 svg-primary"><ArrowUp width={6.33} height={3.22} /></span> : "...";
-  const textClass = isVisible ? "text-primary" : "text-gray text-primary-hover";
+  const posfix = isVisible ? <ArrowUp width={6.33} height={3.22} /> : <ArrowDown width={6.33} height={3.22} />;
 
-  return <Button onClick={onClick} textClass={`px-0 ${textClass}`} transparent>
-    {label}{posfix}
+  return <Button onClick={onClick} textClass="px-0 text-primary" transparent>
+    {label}
+    <span className="ml-1 svg-primary">{posfix}</span>
   </Button>;
 }
 
@@ -21,6 +22,8 @@ export default function ThemeColors({ colors, similar, setColor }) {
 
   const [colorsEntries, setColorsEntries] = useState([]);
   const [moreColorsVisible, setMoreColorsVisible] = useState(false);
+
+  const hasError = !!similar?.length;
 
   function handleMoreColorsVsibility() {
     setMoreColorsVisible(previous => !previous);
@@ -32,7 +35,7 @@ export default function ThemeColors({ colors, similar, setColor }) {
 
   return (
     <>
-      <div className="d-flex flex-row px-3 border-radius-8 justify-content-center gap-20 mb-2">
+      <div className="row border-radius-8 justify-content-center mb-2">
         {
           colorsEntries.slice(0, 3).map(color => 
           <div className="col-4" key={color.label}>
@@ -48,12 +51,12 @@ export default function ThemeColors({ colors, similar, setColor }) {
 
       <MoreColoursButton 
         label={t("steps.network-settings.fields.colors.more-colors")} 
-        isVisible={moreColorsVisible} 
+        isVisible={hasError || moreColorsVisible} 
         onClick={handleMoreColorsVsibility} 
       />
 
-      { moreColorsVisible &&
-        <div className="row bg-dark-gray p-3 border-radius-8 mx-0 mt-2">
+      { (hasError || moreColorsVisible) &&
+        <div className="row bg-dark-gray p-3 border-radius-8 mt-2 mx-0">
           {
             colorsEntries.slice(3, 15).map(color => 
             <div className="col-3" key={color.label}>
@@ -68,7 +71,7 @@ export default function ThemeColors({ colors, similar, setColor }) {
         </div>
       }
 
-      {(similar.length && (
+      {(!!similar.length && (
         <p className="p-small text-danger mt-2">
           {t("steps.network-information.fields.colors.similar-colors")}
         </p>

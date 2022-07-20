@@ -8,8 +8,6 @@ import PageHero, { InfosHero } from "components/page-hero";
 
 import { useDAO } from "contexts/dao";
 
-import { handleNetworkAddress } from "helpers/custom-network";
-
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
 
@@ -34,6 +32,10 @@ export default function Oracle({ children }) {
       value: 0,
       label: t("common:heroes.bounties-in-network"),
       currency: "BEPRO"
+    },
+    {
+      value: 0,
+      label: t("common:heroes.protocol-members")
     }
   ]);
 
@@ -41,9 +43,9 @@ export default function Oracle({ children }) {
     if (!DAOService || !activeNetwork) return;
 
     Promise.all([
-      DAOService.getClosedBounties(handleNetworkAddress(activeNetwork)),
-      DAOService.getOpenBounties(handleNetworkAddress(activeNetwork)),
-      DAOService.getTotalSettlerLocked(handleNetworkAddress(activeNetwork)),
+      DAOService.getClosedBounties(),
+      DAOService.getOpenBounties(),
+      DAOService.getTotalSettlerLocked(),
       getTotalUsers()
     ])
     .then(([closed, inProgress, onNetwork, totalUsers]) => {

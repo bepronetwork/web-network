@@ -43,9 +43,9 @@ export default function useFilters(): [
 
     const query = {
       ...router.query,
-      ...(state ? { state } : {}),
-      ...(time ? { time } : {}),
-      ...(repoId ? { repoId } : {}),
+      ...(state !== "" ? { state } : { state: undefined }),
+      ...(time !== "" ? { time } : { time: undefined }),
+      ...(repoId !== "" ? { repoId } : { repoId: undefined}),
       page: "1"
     };
 
@@ -110,9 +110,9 @@ export default function useFilters(): [
 
   function clearFilters() {
     const query = {
-      ...(router.query.sortBy ? { sortBy: router.query.sortBy } : {}),
-      ...(router.query.order ? { order: router.query.order } : {}),
-      ...(router.query.search ? { search: router.query.search } : {}),
+      ...(router.query.sortBy ? { sortBy: router.query.sortBy } : { sortBy: undefined }),
+      ...(router.query.order ? { order: router.query.order } : { order: undefined }),
+      ...(router.query.search ? { search: router.query.search } : { search: undefined }),
       network: activeNetwork.name,
       page: "1"
     };

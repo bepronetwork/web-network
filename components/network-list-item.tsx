@@ -15,6 +15,7 @@ import { formatNumberToNScale } from "helpers/formatNumber";
 import { Network } from "interfaces/network";
 
 import { getCoinInfoByContract } from "services/coingecko";
+import DAO from "services/dao-service";
 
 import useNetwork from "x-hooks/use-network";
 
@@ -55,30 +56,42 @@ export default function NetworkListItem({
   }
 
   async function loadNetworkData() {
-    const [settlerTokenData, totalSettlerLocked, openBounties, totalBounties] = await Promise.all([
-      DAOService.getSettlerTokenData(handleNetworkAddress(network)).catch(() => undefined),
-      DAOService.getTotalSettlerLocked(handleNetworkAddress(network)).catch(() => 0),
-      DAOService.getOpenBounties(handleNetworkAddress(network)).catch(() => 0),
-      DAOService.getTotalBounties(handleNetworkAddress(network)).catch(() => 0)
-    ]);
+    try {
+      const networkAddress = handleNetworkAddress(network);
+      const dao = new DAO({
+        web3Connection: DAOService.web3Connection,
+        skipWindowAssignment: true
+      });
 
-    setTotalBounties(totalBounties);
-    setOpenBounties(openBounties);
-    setTokensLocked(totalSettlerLocked);
-    setTokenSymbol(settlerTokenData?.symbol);
-    
-    
-    const mainCurrency = publicRuntimeConfig?.currency?.main || "usd";
-    
-    const coinInfo = await getCoinInfoByContract(settlerTokenData?.address).catch(() => ({ prices: {} }));
-    
-    addNetwork?.(handleNetworkAddress(network), 
-                 totalBounties, 
-                 (coinInfo.prices[mainCurrency] || 0) * totalSettlerLocked,
-                 totalSettlerLocked,
-                 settlerTokenData?.name,
-                 settlerTokenData?.symbol,
-                 !!coinInfo.prices[mainCurrency]);
+      await dao.loadNetwork(networkAddress);
+
+      const [settlerTokenData, totalSettlerLocked, openBounties, totalBounties] = await Promise.all([
+        dao.getSettlerTokenData().catch(() => undefined),
+        dao.getTotalSettlerLocked().catch(() => 0),
+        dao.getOpenBounties().catch(() => 0),
+        dao.getTotalBounties().catch(() => 0)
+      ]);
+
+      setTotalBounties(totalBounties);
+      setOpenBounties(openBounties);
+      setTokensLocked(totalSettlerLocked);
+      setTokenSymbol(settlerTokenData?.symbol);
+      
+      
+      const mainCurrency = publicRuntimeConfig?.currency?.main || "usd";
+      
+      const coinInfo = await getCoinInfoByContract(settlerTokenData?.address).catch(() => ({ prices: {} }));
+      
+      addNetwork?.(handleNetworkAddress(network), 
+                   totalBounties, 
+                   (coinInfo.prices[mainCurrency] || 0) * totalSettlerLocked,
+                   totalSettlerLocked,
+                   settlerTokenData?.name,
+                   settlerTokenData?.symbol,
+                   !!coinInfo.prices[mainCurrency]);
+    } catch (error) {
+      console.log("Failed to load network data", error, network);
+    }
   }
 
   useEffect(() => {

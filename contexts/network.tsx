@@ -25,8 +25,8 @@ export interface NetworkContextData {
 
 const NetworkContext = createContext<NetworkContextData>({} as NetworkContextData);
 
-const cookieKey = "bepro.network";
-const expiresCookie = 60 * 60 * 1; // 1 hour
+export const cookieKey = "bepro.network";
+export const expiresCookie = 60 * 60 * 1; // 1 hour
 
 export const NetworkProvider: React.FC = function ({ children }) {
   const [activeNetwork, setActiveNetwork] = useState<Network>(null);
@@ -51,8 +51,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
 
     getNetwork(networkName)
         .then(({ data }) => {
-          localStorage.setItem(networkName.toLowerCase(), JSON.stringify(data));
-          setCookie(null, `${cookieKey}:${networkName}`, JSON.stringify(data), {
+          setCookie(null, `${cookieKey}:${networkName.toLowerCase()}`, JSON.stringify(data), {
             maxAge: expiresCookie, // 1 hour
             path: "/"
           });
@@ -77,7 +76,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
         DAOService.getNetworkParameter("proposerFeeShare"),
         DAOService.getNetworkParameter("percentageNeededForDispute"),
         DAOService.getTreasury(),
-        DAOService.getSettlerTokenData(handleNetworkAddress(activeNetwork))
+        DAOService.getSettlerTokenData()
     ])
       .then(([councilAmount, 
               disputableTime, 
