@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { FormControl, InputGroup } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
@@ -77,6 +77,7 @@ export default function ListIssues({
   const { page, nextPage, goToFirstPage } = usePage();
   const { search, setSearch, clearSearch } = useSearch();
   const [searchState, setSearchState] = useState(search);
+  const searchTimeout = useRef(null);
 
   const isProfilePage = router?.asPath?.includes("profile");
   const { repoId, time, state, sortBy, order } = router.query as {
@@ -206,6 +207,16 @@ export default function ListIssues({
     activeNetwork
   ]);
 
+  useEffect(() => {
+    clearTimeout(searchTimeout.current);
+
+    searchTimeout.current =  setTimeout(() => {
+      setSearch(searchState);
+    }, 1000);
+
+    return () => clearTimeout(searchTimeout.current);
+  }, [searchState]);
+
   return (
     <CustomContainer 
       className={isProfilePage && "px-0 mx-0" || ""}
@@ -216,8 +227,8 @@ export default function ListIssues({
           className={"d-flex align-items-center gap-20 list-actions sticky-top"}
         >
           <div className="w-100">
-            <InputGroup>
-              <InputGroup.Text onClick={handlerSearch}>
+            <InputGroup className="border-radius-8">
+              <InputGroup.Text className="cursor-pointer" onClick={handlerSearch}>
                 <SearchIcon />
               </InputGroup.Text>
 
@@ -231,7 +242,7 @@ export default function ListIssues({
 
               {showClearButton() && (
                 <button
-                  className="btn bg-black border-0 rounded-8 py-0 px-3"
+                  className="btn bg-black border-0 py-0 px-3"
                   onClick={handleClearSearch}
                 >
                   <CloseIcon width={10} height={10} />
