@@ -319,7 +319,7 @@ export default class DAO {
     );
   }
 
-  async getERC20TokenData(tokenAddress): Promise<Token> {
+  async getERC20TokenData(tokenAddress: string): Promise<Token> {
     const token = await this.loadERC20(tokenAddress);
 
     return {
