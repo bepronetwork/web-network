@@ -28,7 +28,7 @@ export default function IssueProposalProgressBar() {
   const isFinalized = !!networkIssue?.closed;
   const isInValidation = !!networkIssue?.isInValidation;
   const isIssueinDraft = !!networkIssue?.isDraft;
-  const creationDate = networkIssue?.creationDate;
+  const creationDate = networkIssue?.creationDate || new Date();
   const closedDate = networkIssue?.closedDate;
   const isCanceled = activeIssue?.state === "canceled" || !!networkIssue?.canceled;
   const lastProposalCreationDate = 
@@ -50,8 +50,7 @@ export default function IssueProposalProgressBar() {
       Warning: {
         text: t("bounty:status.until-done", {
           distance: isHigher ? '0 seconds' 
-            : getTimeDifferenceInWords(addSeconds(date, toAdd),
-                                       new Date())
+            : getTimeDifferenceInWords(addSeconds(date, toAdd), new Date())
         }),
         color: "warning",
         bgColor: "warning-opac-25"
