@@ -8,7 +8,6 @@ import {
 
 import getConfig from "next/config";
 import { useRouter } from "next/router";
-import { parseCookies, setCookie } from "nookies";
 import sanitizeHtml from "sanitize-html";
 
 import Loading from "components/loading";
@@ -176,10 +175,7 @@ export default function ApplicationContextProvider({ children }) {
   // }, [pathname, beproServiceStarted])
 
   const restoreTransactions = async (address) => {
-    const cookie = parseCookies();
-    const transactions = JSON.parse(cookie[`bepro.transactions:${address}`]
-        ? cookie[`bepro.transactions:${address}`]
-        : "[]");
+    const transactions = JSON.parse(localStorage.getItem(`bepro.transactions:${address}`) || "[]");
     const web3 = (window as any).web3; // eslint-disable-line
 
     const getStatusFromBlock = async (tx) => {
@@ -211,16 +207,10 @@ export default function ApplicationContextProvider({ children }) {
     if (!wallet?.address) return;
 
     if (state.myTransactions.length < 1)
-      restoreTransactions(wallet?.address?.toLowerCase());
+      restoreTransactions(wallet.address.toLowerCase());
     else {
       const value = JSON.stringify(state.myTransactions.slice(0, 5));
-      setCookie(null,
-                `bepro.transactions:${wallet?.address.toLowerCase()}`,
-                value,
-                {
-          maxAge: 24 * 60 * 60, // 24 hour
-          path: "/"
-                });
+      localStorage.setItem(`bepro.transactions:${wallet.address.toLowerCase()}`, value);
     }
   }, [state.myTransactions, wallet]);
 
