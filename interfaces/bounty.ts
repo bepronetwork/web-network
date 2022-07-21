@@ -1,5 +1,7 @@
 import { PullRequest, Benefactor, ProposalDetail, Bounty, Proposal } from "@taikai/dappkit";
 
+import { Token } from "interfaces/token";
+
 export interface BountyExtended extends Bounty {
     id: number;
     creationDate: number;
@@ -10,6 +12,8 @@ export interface BountyExtended extends Bounty {
     rewardToken: string;
     rewardAmount: number;
     fundingAmount: number;
+    fundedAmount?: number;
+    fundedPercent?: number;
 
     closed: boolean;
     canceled: boolean;
@@ -29,7 +33,11 @@ export interface BountyExtended extends Bounty {
     isDraft?: boolean;
     isFinished?: boolean;
     isInValidation?: boolean;
+    isFundingRequest?: boolean;
     proposals: ProposalExtended[];
+
+    transactionalTokenData?: Token;
+    rewardTokenData?: Token;
 }
 
 export interface ProposalExtended extends Proposal {
