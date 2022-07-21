@@ -1,7 +1,6 @@
 import React, { useContext } from "react";
 
 import { useTranslation } from "next-i18next";
-import { setCookie } from "nookies";
 
 import CenterArrows from "assets/icons/center-arrows";
 import ChatBubbles from "assets/icons/chat-bubbles";
@@ -100,13 +99,7 @@ export default function TransactionsList({
   }
 
   function clearTransactionsList() {
-    setCookie(null,
-              `bepro.transactions:${wallet?.address?.toLowerCase()}`,
-              "[]",
-              {
-                maxAge: 24 * 60 * 60, // 24 hour
-                path: "/"
-              });
+    localStorage.setItem(`bepro.transactions:${wallet?.address?.toLowerCase()}`, "[]");
 
     dispatch(clearTransactions());
   }
