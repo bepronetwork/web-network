@@ -100,13 +100,7 @@ export default function TransactionsList({
   }
 
   function clearTransactionsList() {
-    setCookie(null,
-              `bepro.transactions:${wallet?.address?.toLowerCase()}`,
-              "[]",
-              {
-                maxAge: 24 * 60 * 60, // 24 hour
-                path: "/"
-              });
+    localStorage.setItem(`bepro.transactions:${wallet?.address?.toLowerCase()}`, "[]");
 
     dispatch(clearTransactions());
   }
