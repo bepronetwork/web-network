@@ -26,8 +26,8 @@ function runLogger(req, e = null) {
   const pathname = url.split('/api')[1];
 
   if (!ignorePaths.some(k => pathname.includes(k))){
-    const data = {method, ip, ua, pathname, body, ...page}
-    e ? error(e, data) : info(data);
+    const data = {method, ip, ua, pathname, body, ...page};
+    e ? error(e?.message, data) : info(data);
   }
 }
 
