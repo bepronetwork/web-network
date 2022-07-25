@@ -600,6 +600,33 @@ export default function useBepro() {
     });
   }
 
+  async function handleFundBounty(bountyId: number, amount: number, tokenDecimals?: number) {
+    return new Promise(async (resolve, reject) => {
+      const transaction = addTransaction({ type: TransactionTypes.fundBounty }, activeNetwork);
+
+      dispatch(transaction);
+
+      await DAOService.fundBounty(bountyId, amount, tokenDecimals)
+        .then((txInfo: TransactionReceipt) => {
+          txWindow.updateItem(transaction.payload.id,  parseTransaction(txInfo, transaction.payload));
+          resolve(txInfo);
+        })
+        .catch((err: { message: string; }) => {
+          if (err?.message?.search("User denied") > -1)
+            dispatch(updateTransaction({
+              ...(transaction.payload as BlockTransaction),
+              status: TransactionStatus.rejected
+            }));
+          else
+            dispatch(updateTransaction({
+              ...(transaction.payload as BlockTransaction),
+              status: TransactionStatus.failed
+            }));
+          reject(err);
+        });
+    });
+  }
+
   return {
     handlerDisputeProposal,
     handleCloseIssue,
@@ -617,6 +644,7 @@ export default function useBepro() {
     handleSetDispatcher,
     handleAddNetworkToRegistry,
     handleDeployBountyToken,
-    handleChangeNetworkParameter
+    handleChangeNetworkParameter,
+    handleFundBounty
   };
 }

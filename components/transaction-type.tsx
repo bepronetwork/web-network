@@ -32,7 +32,8 @@ export default function TransactionType({ type }) {
     [TransactionTypes.setDraftTime]: t("transactions.types.set-draft-time"),
     [TransactionTypes.setDisputableTime]: t("transactions.types.set-disputable-time"),
     [TransactionTypes.setPercentageNeededForDispute]: t("transactions.types.set-percentage-dispute"),
-    [TransactionTypes.setCouncilAmount]: t("transactions.types.set-council-amount")
+    [TransactionTypes.setCouncilAmount]: t("transactions.types.set-council-amount"),
+    [TransactionTypes.fundBounty]: "Fund Bounty",
   };
 
   return (

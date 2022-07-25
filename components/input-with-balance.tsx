@@ -1,5 +1,7 @@
 import { useTranslation } from "next-i18next";
 
+import ArrowRightLine from "assets/icons/arrow-right-line";
+
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
 import InputNumber from "./input-number";
@@ -55,6 +57,20 @@ export default function InputWithBalance({
               maximumFractionDigits: 18
             })}
           </span>
+
+          { value > 0 &&
+            <>
+              <span className="svg-white-40 ml-1">
+                <ArrowRightLine width={10} height={10} />
+              </span>
+
+              <span className="text-white ml-1">
+                {formatNumberToCurrency(balance - value, {
+                  maximumFractionDigits: 18
+                })}
+              </span>
+            </>
+          }
         </div>
       </div>
       </div>

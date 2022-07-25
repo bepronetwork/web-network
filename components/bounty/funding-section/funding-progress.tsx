@@ -4,8 +4,6 @@ import ArrowRightLine from "assets/icons/arrow-right-line";
 
 import { Amount, ColAuto, RowCenterBetween, RowWithTwoColumns } from "components/bounty/funding-section/minimals";
 
-import { formatNumberToString } from "helpers/formatNumber";
-
 interface FundingProgressProps {
   fundedAmount: number;
   fundingAmount: number;
@@ -25,11 +23,14 @@ export default function FundingProgress({
   const maxPercent = 100 - fundedPercent;
   const totalPercent = fundingPercent + fundedPercent;
   const isFundingModal = amountToFund > 0;
+  const contextClass = totalPercent < 100 ? "primary" : (totalPercent === 100 ? "success" : "danger");
+  const secondaryProgressVariant = 
+    totalPercent < 100 ? "blue-dark" : (totalPercent === 100 ? "success-50" : "danger-50");
 
-  const FundedAmountWithPreview = () => 
+  const AmountWithPreview = ({ amount, preview = undefined, type }) => 
     <Row className="align-items-center">
       <Col>
-        <Amount amount={fundedAmount} />
+        <Amount amount={amount} className={isFundingModal && "caption-medium" || undefined} type={type} />
       </Col>
       { isFundingModal &&
         <>
@@ -37,7 +38,7 @@ export default function FundingProgress({
             <ArrowRightLine width={10} height={10} />
           </Col>
           <Col>
-            <Amount className="text-primary" amount={amountToFund} />
+            <Amount className={`text-${contextClass} caption-medium`} amount={preview} type={type} />
           </Col>
         </>
       }
@@ -46,23 +47,27 @@ export default function FundingProgress({
   return(
     <div>
       <RowWithTwoColumns
-        col1={<FundedAmountWithPreview />}
-        col2={<Amount amount={fundingAmount} symbol={fundingTokenSymbol} />}
+        col1={<AmountWithPreview amount={fundedAmount} preview={amountToFund} type="currency" />}
+        col2={<Amount 
+                amount={fundingAmount} 
+                symbol={fundingTokenSymbol} 
+                className={isFundingModal && "caption-medium" || undefined} 
+              />}
       />
 
-      <RowCenterBetween>
+      <RowCenterBetween className="mt-1">
         <Col>
           <ProgressBar>
             <ProgressBar
-              now={fundingPercent > maxPercent ? 100 : fundedPercent}
+              now={fundedPercent}
               isChild
             />
 
             { isFundingModal && 
               <ProgressBar
-                variant="blue-dark"
+                variant={secondaryProgressVariant}
                 min={0}
-                now={fundingPercent > maxPercent ? 0 : fundingPercent}
+                now={fundingPercent > maxPercent ? 100 : fundingPercent}
                 isChild
               />
             }
@@ -70,9 +75,7 @@ export default function FundingProgress({
         </Col>
 
         <ColAuto>
-          <span className="ml-1 caption-medium text-white font-weight-normal">
-            {formatNumberToString(totalPercent, 0)}%
-          </span>
+          <AmountWithPreview amount={fundedPercent} preview={totalPercent} type="percent" />
         </ColAuto>
       </RowCenterBetween>
     </div>
