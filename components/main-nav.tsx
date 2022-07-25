@@ -160,7 +160,6 @@ export default function MainNav() {
             <span className="text-new-bounty">
               <PlusIcon
                 className="me-2"
-                style={{ width: "14", height: "14" }}
               />
               <Translation label={"main-nav.new-bounty"} />
             </span>
