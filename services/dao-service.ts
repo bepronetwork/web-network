@@ -367,7 +367,7 @@ export default class DAO {
     title,
     repoPath,
     branch,
-    githubUser,
+    githubUser = "",
     transactional,
     rewardToken = Defaults.nativeZeroAddress,
     tokenAmount = 0,
@@ -384,6 +384,10 @@ export default class DAO {
                                    repoPath,
                                    branch,
                                    githubUser);
+  }
+
+  async fundBounty(bountyId: number, amount: number, tokenDecimals?: number): Promise<TransactionReceipt> {
+    return this.network.fundBounty(bountyId, amount, tokenDecimals);
   }
 
   async disputeProposal(bountyId: number, proposalId: number): Promise<TransactionReceipt> {
