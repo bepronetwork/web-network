@@ -92,6 +92,18 @@ li {
   }
 }
 
+.card-close-button {
+  :hover {
+    color: $white !important;
+    background-color: none !important;
+  }
+
+  svg {
+    height: 10px !important;
+    width: 10px !important;
+  }
+}
+
 .modal {
   &-header {
     padding-bottom: 0;
@@ -663,6 +675,12 @@ label {
   border-radius: 20px;
 }
 
+.become-council {
+  border-radius: math.div($m, 2);
+  background-color: rgba(var(--bs-purple-rgb), 0.3) !important;
+  border: 2px solid $purple !important;
+}
+
 .circle-5 {
   width: 108px;
   height: 108px;
@@ -1053,6 +1071,10 @@ $c_props: (
     width: 18px !important;
     height: 18px !important;
   }
+}
+
+.amount-white-color {
+  color: $white !important;
 }
 
 .bg-main-image {
