@@ -134,38 +134,40 @@ export default function FundingSection() {
                 </Col>
               </Row>
 
-              <Row className="mx-0">
-                <Collapsable
-                  labelShow="Manage Funding"
-                  labelHide="Manage Funding"
-                  labelColor="gray"
-                  activeColor="white"
-                  className="gap-2"
-                >
-                  {walletFunds?.map(fund => 
-                    <RowWithTwoColumns 
-                      key={`fund-${fund.id}`}
-                      className="p-2 bg-shadow border-radius-8"
-                      col1={
-                        <Amount 
-                          amount={fund.amount}
-                          symbol={transactionalSymbol}
-                          className="caption-large text-white"
-                        />
-                      }
-                      col2={
-                        <Button
-                          textClass="text-danger p-0"
-                          transparent
-                          onClick={() => setFundingToRetract(fund)}
-                        >
-                          Retract Funding
-                        </Button>
-                      }
-                    />)
-                  }
-                </Collapsable>
-              </Row>
+              { networkIssue?.isDraft &&
+                <Row className="mx-0">
+                  <Collapsable
+                    labelShow="Manage Funding"
+                    labelHide="Manage Funding"
+                    labelColor="gray"
+                    activeColor="white"
+                    className="gap-2"
+                  >
+                    {walletFunds?.map(fund => 
+                      <RowWithTwoColumns 
+                        key={`fund-${fund.id}`}
+                        className="p-2 bg-shadow border-radius-8"
+                        col1={
+                          <Amount 
+                            amount={fund.amount}
+                            symbol={transactionalSymbol}
+                            className="caption-large text-white"
+                          />
+                        }
+                        col2={
+                          <Button
+                            textClass="text-danger p-0"
+                            transparent
+                            onClick={() => setFundingToRetract(fund)}
+                          >
+                            Retract Funding
+                          </Button>
+                        }
+                      />)
+                    }
+                  </Collapsable>
+                </Row>
+              }
             </>
           }
         </Col>
