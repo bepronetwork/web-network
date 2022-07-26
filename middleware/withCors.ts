@@ -7,32 +7,42 @@ const cors = Cors({
   origin: [process.env.NEXT_PUBLIC_HOME_URL || 'http://localhost:3000'],
 })
 
-const ignoreLogPaths = ['health'];
+const ignorePaths = ['health'];
 
-const runMiddleware = (req, res, fn) =>
-  new Promise((resolve, reject) => {
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
     fn(req, res, (result) => {
-      if (result instanceof Error)
-        reject(result);
-      else resolve(result);
+      if (result instanceof Error) {
+        return reject(result)
+      }
+
+      return resolve(result)
     })
-  });
-
-export default function withCors(handler) {
-  return async (req, res) =>
-    runMiddleware(req, res, cors)
-      .then(() => {
-        const {page = {}, url, ip, ua, body, method} = req as any;
-        const {pathname, search,} = new URL(url);
-
-        if (!ignoreLogPaths.some(k => pathname.includes(k)))
-          info('Access', {method, ip, ua, ...page, pathname, search, body});
-
-        return handler(req, res)
-      })
-      .catch((e) => {
-        if (e)
-          error(e.message, e);
-        res.status(401).json({error: "Unauthorized", reason: "CORS"})
-      })
+  })
 }
+
+function runLogger(req, e = null) {
+  const {page = {}, url, ip, ua, body, method} = req as any;
+  const {pathname, search,} = new URL(url);
+
+  if (!ignorePaths.some(k => pathname.includes(k)))
+    info('Access', {method, ip, ua, ...page, pathname, search, body});
+
+  if (e)
+    error(e?.message, e);
+}
+
+const withCors = (handler) => {
+  return async (req, res) => {
+    runLogger(req);
+    runMiddleware(req, res, cors)
+    .then(()=>{
+      return handler(req, res);
+    }).catch((e)=>{
+      runLogger(req, e);
+      return res.status(401).write('Unautorized');
+    })
+  };
+};
+
+export default withCors;
