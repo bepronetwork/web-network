@@ -23,10 +23,10 @@ function runMiddleware(req, res, fn) {
 
 function runLogger(req, e = null) {
   const {page = {}, url, ip, ua, body, method} = req as any;
-  const {pathname, search,} = new URL(url);
+  const pathname = url.split('/api')[1];
 
   if (!ignorePaths.some(k => pathname.includes(k)))
-    info('Access', {method, ip, ua, ...page, pathname, search, body});
+    info('Access', {method, ip, ua, ...page, pathname, body});
 
   if (e)
     error(e?.message, e);
