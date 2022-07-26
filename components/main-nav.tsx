@@ -157,10 +157,9 @@ export default function MainNav() {
           text-decoration-none shadow-none d-flex align-items-center justify-content-center"
             onClick={() => dispatch(changeShowCreateBountyState(true))}
           >
-            <span className="text-new-bounty">
+            <span className="new-bounty">
               <PlusIcon
                 className="me-2"
-                style={{ width: "14", height: "14" }}
               />
               <Translation label={"main-nav.new-bounty"} />
             </span>
