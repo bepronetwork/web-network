@@ -11,6 +11,8 @@ import { useDAO } from "contexts/dao";
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
 
+import CardBecomeCouncil from "./card-become-council";
+
 export default function Oracle({ children }) {
   const { asPath } = useRouter();
   const { t } = useTranslation(["oracle", "common"]);
@@ -101,7 +103,12 @@ export default function Oracle({ children }) {
         </div>
       </div>
       <div className="container p-footer">
-        <div className="row justify-content-center">{children}</div>
+        <div className="row justify-content-center">
+          <div className="col-md-10 mt-2">
+            <CardBecomeCouncil />
+          </div>
+          {children}
+        </div>
       </div>
     </div>
   );
