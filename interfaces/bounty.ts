@@ -54,3 +54,10 @@ export interface ProposalExtended extends Proposal {
     isDisputed?: boolean;
     canUserDispute?: boolean;
 }
+
+export interface BenefactorExtended extends Benefactor {
+    id: number;
+    amount: number;
+    benefactor: string;
+    creationDate: number;
+}

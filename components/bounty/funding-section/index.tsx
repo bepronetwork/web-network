@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 
-import { Benefactor } from "@taikai/dappkit";
-
 import FundModal from "components/bounty/funding-section/fund-modal";
 import FundingProgress from "components/bounty/funding-section/funding-progress";
 import { Amount, CaptionLarge, CaptionMedium, RowWithTwoColumns } from "components/bounty/funding-section/minimals";
@@ -14,9 +12,14 @@ import CustomContainer from "components/custom-container";
 import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
 
+import { BenefactorExtended } from "interfaces/bounty";
+
+import RetractModal from "./retract-modal";
+
 export default function FundingSection() {
   const [showFundModal, setShowFundModal] = useState(false);
-  const [walletFunds, setWalletFunds] = useState<Benefactor>();
+  const [walletFunds, setWalletFunds] = useState<BenefactorExtended[]>();
+  const [fundingToRetract, setFundingToRetract] = useState<BenefactorExtended>();
 
   const { networkIssue } = useIssue();
   const { wallet } = useAuthentication();
@@ -30,12 +33,15 @@ export default function FundingSection() {
 
   const handleShowFundModal = () => setShowFundModal(true);
   const handleCloseFundModal = () => setShowFundModal(false);
+  const handleCloseRetractModal = () => setFundingToRetract(undefined);
 
   useEffect(() => {
     if (!wallet?.address || !networkIssue) return;
 
-    const funds = networkIssue.funding.filter(fund => fund.benefactor.toLowerCase() === wallet.address.toLowerCase() 
-                                                      && fund.amount > 0);
+    const funds = 
+      networkIssue.funding
+        .map((fund, index) => ({ ...fund, id: index }))
+        .filter(fund => fund.benefactor.toLowerCase() === wallet.address.toLowerCase() && fund.amount > 0);
 
     setWalletFunds(funds);
   }, [wallet, networkIssue]);
@@ -49,6 +55,12 @@ export default function FundingSection() {
       <FundModal 
         show={isConnected && showFundModal} 
         onCloseClick={handleCloseFundModal}
+      />
+
+      <RetractModal
+        show={!!fundingToRetract}
+        fundingToRetract={fundingToRetract}
+        onCloseClick={handleCloseRetractModal}
       />
 
       <RowWithTwoColumns
@@ -130,12 +142,13 @@ export default function FundingSection() {
                   activeColor="white"
                   className="gap-2"
                 >
-                  {walletFunds?.map(({amount}) => 
+                  {walletFunds?.map(fund => 
                     <RowWithTwoColumns 
+                      key={`fund-${fund.id}`}
                       className="p-2 bg-shadow border-radius-8"
                       col1={
                         <Amount 
-                          amount={amount}
+                          amount={fund.amount}
                           symbol={transactionalSymbol}
                           className="caption-large text-white"
                         />
@@ -144,6 +157,7 @@ export default function FundingSection() {
                         <Button
                           textClass="text-danger p-0"
                           transparent
+                          onClick={() => setFundingToRetract(fund)}
                         >
                           Retract Funding
                         </Button>

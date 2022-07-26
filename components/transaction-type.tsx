@@ -34,6 +34,7 @@ export default function TransactionType({ type }) {
     [TransactionTypes.setPercentageNeededForDispute]: t("transactions.types.set-percentage-dispute"),
     [TransactionTypes.setCouncilAmount]: t("transactions.types.set-council-amount"),
     [TransactionTypes.fundBounty]: "Fund Bounty",
+    [TransactionTypes.retractFundBounty]: "Retract Fund Bounty",
   };
 
   return (

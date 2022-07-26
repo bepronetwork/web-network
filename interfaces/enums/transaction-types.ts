@@ -25,5 +25,6 @@ export enum TransactionTypes {
   setDisputableTime,
   setPercentageNeededForDispute,
   setCouncilAmount,
-  fundBounty
+  fundBounty,
+  retractFundBounty
 }
