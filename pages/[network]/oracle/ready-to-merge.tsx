@@ -21,7 +21,7 @@ export default function ReadyToMergeIssues() {
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common", "bounty", "oracle", "connect-wallet-button"]))
+      ...(await serverSideTranslations(locale, ["common", "bounty", "oracle", "connect-wallet-button", "council"]))
     }
   };
 };
