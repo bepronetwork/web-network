@@ -134,7 +134,7 @@ export default function FundingSection() {
                 </Col>
               </Row>
 
-              { networkIssue?.isDraft &&
+              { (networkIssue?.isDraft || !isBountyFunded) &&
                 <Row className="mx-0">
                   <Collapsable
                     labelShow="Manage Funding"
