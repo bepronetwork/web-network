@@ -1,8 +1,6 @@
 import { useContext, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 
-import LockedIcon from "assets/icons/locked-icon";
-
 import Button from "components/button";
 import Modal from "components/modal";
 

@@ -16,7 +16,6 @@ interface InputWithBalanceProps {
 }
 
 export default function InputWithBalance({
-  label,
   value,
   onChange,
   symbol,
