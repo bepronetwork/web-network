@@ -7,7 +7,7 @@ const cors = Cors({
   origin: [process.env.NEXT_PUBLIC_HOME_URL || 'http://localhost:3000'],
 })
 
-const ignorePaths = ['health'];
+const ignorePaths = ['health', 'ip'];
 
 function runMiddleware(req, res, fn) {
   return new Promise((resolve, reject) => {
@@ -22,13 +22,15 @@ function runMiddleware(req, res, fn) {
 }
 
 function runLogger(req, e = null) {
-  const {page = {}, method, url, ip, ua, body} = {...req} as any; // eslint-disable-line
-  const pathname = url.split('/api')[1];
+  const {page = {}, url, ip, ua, body, method} = req as any;
+  const search = Object(new URLSearchParams(url.split('?')[1]));
+  const pathname = url.split('/api')[1].replace(/\?.+/g, '');
 
-  if (!ignorePaths.some(k => pathname.includes(k))){
-    const data = {method, ip, ua, pathname, body, ...page}
-    e ? error(e, data) : info(data);
-  }
+  if (!ignorePaths.some(k => pathname.includes(k)))
+    info('Access', {method, ip, ua, ...page, pathname, search, body});
+
+  if (e)
+    error(e?.message, e);
 }
 
 const withCors = (handler) => {
