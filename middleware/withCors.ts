@@ -7,7 +7,7 @@ const cors = Cors({
   origin: [process.env.NEXT_PUBLIC_HOME_URL || 'http://localhost:3000'],
 })
 
-const ignorePaths = ['health'];
+const ignorePaths = ['health', 'ip'];
 
 function runMiddleware(req, res, fn) {
   return new Promise((resolve, reject) => {
