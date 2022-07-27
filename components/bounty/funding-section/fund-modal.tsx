@@ -1,5 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 
+import { useTranslation } from "next-i18next";
+
 import LockedIcon from "assets/icons/locked-icon";
 
 import FundingProgress from "components/bounty/funding-section/funding-progress";
@@ -22,14 +24,16 @@ export default function FundModal({
   show = false,
   onCloseClick
 }) {
+  const { t } = useTranslation(["common", "funding", "bounty"]);
+
   const [amountToFund, setAmountToFund] = useState(0);
   const [rewardPreview, setRewardPreview] = useState(0);
   const [isExecuting, setIsExecuting] = useState(false);
 
   const { handleFundBounty } = useBepro();
-  const { activeIssue, networkIssue, getNetworkIssue } = useIssue();
   const { dispatch } = useContext(ApplicationContext);
   const { allowance, balance, setAddress, approve } = useERC20();
+  const { activeIssue, networkIssue, getNetworkIssue } = useIssue();
 
   const bountyId = activeIssue?.contractId || networkIssue?.id || "XX";
   const fundBtnDisabled = 
@@ -39,14 +43,14 @@ export default function FundModal({
   const amountNotFunded = (networkIssue?.fundingAmount || 0) - (networkIssue?.fundedAmount || 0);
 
   const ConfirmBtn = {
-    label: needsApproval ? "Approve" : "Fund Bounty",
+    label: needsApproval ? t("actions.approve") : t("fund:actions.fund-bounty"),
     action: needsApproval ? handleApprove : fundBounty
   }
   
   const SubTitle = 
     <span className="caption-medium text-gray font-weight-normal">
-      You are about to fund 
-      <span className="text-primary"> Bounty #{bountyId}</span>
+      {t("fund:modals.fund.description")}
+      <span className="text-primary text-capitalize"> {t("bounty:label")} #{bountyId}</span>
     </span>;
 
   function fundBounty() {
@@ -60,11 +64,14 @@ export default function FundModal({
 
         onCloseClick();
         getNetworkIssue();
-        dispatch(toastSuccess(`Funded ${amountFormatted} $${rewardTokenSymbol}`, "Bounty funded successfully"));
+        dispatch(toastSuccess(t("funding:modals.fund.funded-x-symbol", {
+          amount: amountFormatted,
+          symbol: rewardTokenSymbol
+        }), t("funding:modals.fund.funded-successfully")));
       })
       .catch(error => {
         console.debug("Failed to fund bounty", error);
-        dispatch(toastError("Something went wrong. Try again later.", "Failed to fund bounty"));
+        dispatch(toastError(t("funding:try-again"), t("funding:modals.fund.failed-to-fund")));
       })
       .finally(() => setIsExecuting(false));
   }
@@ -92,7 +99,7 @@ export default function FundModal({
   
   return(
     <Modal 
-      title="Fund Bounty"
+      title={t("funding:modals.fund.title")}
       subTitleComponent={SubTitle}
       show={show}
       onCloseClick={onCloseClick}
@@ -107,7 +114,7 @@ export default function FundModal({
         />
 
         <InputWithBalance
-          label="Fund Amount"
+          label={t("funding:modals.fund.fields.fund-amount.label")}
           value={amountToFund}
           onChange={setAmountToFund}
           symbol={networkIssue?.transactionalTokenData?.symbol}
@@ -116,7 +123,7 @@ export default function FundModal({
         />
 
         <RowWithTwoColumns
-          col1={ <CaptionMedium text="Reward" color="white" /> }
+          col1={ <CaptionMedium text={t("funding:reward")} color="white" /> }
           col2={
             <div className="bg-dark-gray border-radius-8 py-2 px-3">
               +<Amount
@@ -136,7 +143,7 @@ export default function FundModal({
               outline
               onClick={onCloseClick}
             >
-              Cancel
+              {t("actions.cancel")}
             </Button>
           }
           col2={

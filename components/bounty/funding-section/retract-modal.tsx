@@ -1,6 +1,8 @@
 import { useContext, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 
+import { useTranslation } from "next-i18next";
+
 import Button from "components/button";
 import Modal from "components/modal";
 
@@ -17,6 +19,8 @@ export default function RetractModal({
   onCloseClick,
   fundingToRetract
 }) {
+  const { t } = useTranslation(["common", "funding", "bounty"]);
+
   const [isExecuting, setIsExecuting] = useState(false);
 
   const { handleRetractFundBounty } = useBepro();
@@ -34,25 +38,28 @@ export default function RetractModal({
       .then(() => {
         onCloseClick();
         getNetworkIssue();
-        dispatch(toastSuccess(`Retracted ${fundingToRetract.amount} $${tokenSymbol}`, "Retract Funds successfully"));
+        dispatch(toastSuccess(t("funding:modals.retract.retract-x-symbol", {
+          amount: fundingToRetract.amount,
+          symbol: tokenSymbol
+        }), t("funding:modals.retract.retract-successfully")));
       })
       .catch(error => {
         console.debug("Failed to retract funds", error);
-        dispatch(toastError("Something went wrong. Try again later.", "Failed to retract funds"));
+        dispatch(toastError(t("funding:try-again"), t("funding:failed-to-retract")));
       })
       .finally(() => setIsExecuting(false));
   }
   
   return(
     <Modal
-      title="Retract Funding"
+      title={t("funding:modals.retract.title")}
       show={show}
       onCloseClick={onCloseClick}
     >
       <Row className="justify-content-center text-center">
         <Col xs="auto">
           <h4 className="family-Regular font-weight-normal mb-2">
-            You are about to retract
+            {t("funding:modals.retract.description")}
           </h4>
 
           <div className="bg-dark-gray border-radius-8 py-2 px-3 mb-2">
@@ -63,7 +70,9 @@ export default function RetractModal({
           </div>
 
           <h4 className="family-Regular font-weight-normal mb-4">
-            from the <span className="text-primary">Bounty #{networkIssue?.id}</span> fund.
+            {t("funding:modals.retract.from-the")} 
+            <span className="text-primary">{t("bounty:label")} #{networkIssue?.id}</span> 
+            {t("funding:fund")}.
           </h4>
         </Col>
       </Row>
@@ -75,7 +84,7 @@ export default function RetractModal({
               outline
               onClick={onCloseClick}
             >
-              Cancel
+              {t("actions.cancel")}
             </Button>
           }
           col2={
@@ -84,7 +93,7 @@ export default function RetractModal({
               color="danger"
               onClick={handleRetract}
             >
-              <span>Retract Funding</span>
+              <span>{t("funding:actions.retract-funding")}</span>
               { isExecuting && <span className="spinner-border spinner-border-xs ml-1" /> }
             </Button>
           }

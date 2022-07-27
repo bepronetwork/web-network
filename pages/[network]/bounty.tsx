@@ -152,6 +152,7 @@ export const getServerSideProps: GetServerSideProps = async ({
         "proposal",
         "pull-request",
         "connect-wallet-button",
+        "funding"
       ]))
     }
   };
