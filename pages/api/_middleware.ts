@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server'
 const testnet = process.env.NEXT_E2E_TESTNET === "true";
 
 const blackList = {
-  GET: ['auth', 'past-events', 'seo', 'health', 'ip', 'search', 'repos', 'issue', 'payments'],
+  GET: ['auth', 'past-events', 'seo', 'health', 'ip', 'search', 'repos', 'issue', 'payments', 'network'],
   POST: ['issue', 'users', 'graphql']
 };
 
