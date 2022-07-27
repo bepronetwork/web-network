@@ -2,7 +2,6 @@ import { useContext, useEffect } from "react";
 
 import getConfig from "next/config";
 
-import Button from "components/button";
 import Indicator from "components/indicator";
 
 import { ApplicationContext } from "contexts/application";
@@ -34,18 +33,16 @@ export default function NetworkIdentifier() {
 
   return (
     (network && (
-      <>
-        <Button className="px-3 py-2 rounded pe-none bg-white bg-opacity-10">
-          <Indicator bg={NetworkColors[network]} />{" "}
-          <span>
-            {network}{" "}
-            {(network !==
-              publicRuntimeConfig?.metaMask?.chainName?.toLowerCase() &&
-              "testnet") ||
-              ""}
-          </span>
-        </Button>
-      </>
+      <div className="ml-2 bg-transparent p-0 d-flex flex-row align-items-center justify-content-center">
+        <Indicator bg={NetworkColors[network]} />
+        <span className="caption-small text-white-50 ">
+          {network}{" "}
+          {(network !==
+            publicRuntimeConfig?.metaMask?.chainName?.toLowerCase() &&
+            "testnet") ||
+            ""}
+        </span>
+      </div>
     )) || <></>
   );
 }

@@ -1586,3 +1586,13 @@ input[type="color"] {
     border-left: 1px solid $ligth-gray;
   }
 }
+
+.border-disabled {
+  &-left {
+    border-left: 1px solid $disabled;
+  }
+
+  &-right {
+    border-right: 1px solid $disabled;
+  }
+}
