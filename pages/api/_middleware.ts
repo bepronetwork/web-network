@@ -13,12 +13,6 @@ export async function middleware(req: NextApiRequest) {
   const method = req.method;
   const shouldCheckForToken = blackList[method]?.every(path => req.url.search(path) <= -1);
 
-  console.log("middleware:log", {
-    method,
-    shouldCheckForToken,
-    url: req.url
-  });
-
   if (!testnet && shouldCheckForToken)
     if(!await getToken({req}))
       return new Response(JSON.stringify({reason: "Missing token"}),{status: 401, statusText: "Unauthorized"});
