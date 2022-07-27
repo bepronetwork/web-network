@@ -2,8 +2,6 @@ import { useContext, useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
-import ExternalLinkIcon from "assets/icons/external-link-icon";
-
 import NetworkIdentifier from "components/network-identifier";
 import Translation from "components/translation";
 
