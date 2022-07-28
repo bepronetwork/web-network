@@ -64,11 +64,14 @@ export default function NotMergeableModal({
 
     setMergeState("loading");
 
-    mergeClosedIssue(activeIssue?.issueId,
-                     pullRequest?.githubId,
-                     proposal?.scMergeId,
-                     wallet?.address,
-                     activeNetwork?.name)
+    mergeClosedIssue({
+      issueId: activeIssue?.issueId,
+      pullRequestId: pullRequest?.githubId,
+      mergeProposalId: proposal?.scMergeId,
+      address: wallet?.address,
+      networkName: activeNetwork?.name,
+      wallet: wallet?.address
+    })
       .then(() => {
         dispatch(addToast({
             type: "success",

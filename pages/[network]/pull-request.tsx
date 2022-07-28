@@ -64,11 +64,14 @@ export default function PullRequestPage() {
 
     setIsExecuting(true);
 
-    createReviewForPR(String(activeIssue?.issueId),
-                      String(prId),
-                      user?.login,
-                      body,
-                      activeNetwork?.name)
+    createReviewForPR({
+      issueId: String(activeIssue?.issueId),
+      pullRequestId: String(prId),
+      githubLogin: user?.login,
+      body,
+      networkName: activeNetwork?.name,
+      wallet: wallet.address
+    })
       .then((response) => {
         dispatch(addToast({
             type: "success",
@@ -101,7 +104,7 @@ export default function PullRequestPage() {
   function handleMakeReady() {
     setIsExecuting(true);
 
-    handleMakePullRequestReady(activeIssue?.contractId, pullRequest?.contractId)
+    handleMakePullRequestReady(activeIssue.contractId, pullRequest.contractId)
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
       return processEvent("pull-request", "ready", activeNetwork?.name, { fromBlock });
