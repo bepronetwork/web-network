@@ -11,7 +11,7 @@ $purple: #9669ed;
 $success: #35e0ad;
 $danger: #eb5757;
 $warning: #ee9240;
-$light-warning: #ffd646;
+$light-warning: #CCAB38;
 //Specials
 $dark-gray: #20222b;
 $gray: #c4c7d3;
@@ -64,8 +64,11 @@ $more-bg: (
   "info-30": rgba($info, 0.3),
   "success-30": rgba($success, 0.3),
   "danger-30": rgba($danger, 0.3),
+  "danger-70": rgba($danger, 0.7),
   "warning-30": rgba($warning, 0.3),
-  "gray-70": rgba($gray, 0.7)
+  "gray-70": rgba($gray, 0.7),
+  "light-warning-30": rgba($light-warning, 0.3),
+  "light-warning": $light-warning
 );
 
 $more-colors: (

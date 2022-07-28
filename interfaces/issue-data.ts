@@ -10,13 +10,16 @@ export type IssueState =
   | "closed"
   | "ready"
   | "done"
-  | "disputed";
+  | "disputed"
+  | "funding"
+  | "proposal";
 
 export type CID = `${string}/${string}`;
 
 export interface IssueData {
   id?: string; // database id
   amount?: number;
+  fundingAmount?: number;
   body: string;
   branch?: string;
   createdAt: Date;
