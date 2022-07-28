@@ -61,8 +61,17 @@ export default NextAuth({
       return true;
     },
     async jwt({ token, account, profile }) {
-      // console.log(`JWT`, token, user, account, profile, isNewUser);
-      return { ...token, ...profile, ...account };
+      const user = await models.user.findOne({
+        where: { 
+          githubLogin: profile?.login || token?.login
+        },
+        raw: true
+      })
+        .catch(error => {
+          console.log("JWT Callback", error)
+        });
+
+      return { ...token, ...profile, ...account, wallet: user?.address };
     },
     async session({ session, token }) {
       // console.log(`Session`, session, user, token);
