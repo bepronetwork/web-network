@@ -673,8 +673,9 @@ export default function CreateBountyModal() {
         onCloseDisabled={isLoadingApprove || isLoadingCreateBounty}
         footer={
           <>
-            <div className="d-flex flex-grow-1">
-              <Button color="dark-gray" 
+            <div className="d-flex flex-row justify-content-between">
+              <Button 
+                color="dark-gray" 
                 onClick={handleCancelAndBack} 
                 disabled={isLoadingApprove || isLoadingCreateBounty}
               >
@@ -684,32 +685,35 @@ export default function CreateBountyModal() {
                     : t("common:actions.back")}
                 </span>
               </Button>
-            </div>
-            {!isTokenApproved && currentSection === 3 ? (
-              <ReadOnlyButtonWrapper>
-                <Button
-                  className="me-3 read-only-button"
-                  disabled={isApproveButtonDisabled()}
-                  onClick={allowCreateIssue}
-                  isLoading={isLoadingApprove}
-                >
-                  {t("actions.approve")}
-                </Button>
-              </ReadOnlyButtonWrapper>
-            ) : null}
 
-            <Button
-              className="d-flex flex-shrink-0 w-40 btn-block"
-              onClick={handleNextStepAndCreate}
-              disabled={verifyNextStepAndCreate()}
-              isLoading={isLoadingCreateBounty}
-            >
-              <span>
-                {currentSection !== 3
-                  ? t("bounty:next-step")
-                  : t("bounty:create-bounty")}
-              </span>
-            </Button>
+              {!isTokenApproved && currentSection === 3 ? (
+                <ReadOnlyButtonWrapper>
+                  <Button
+                    className="read-only-button"
+                    disabled={isApproveButtonDisabled()}
+                    onClick={allowCreateIssue}
+                    isLoading={isLoadingApprove}
+                  >
+                    {t("actions.approve")}
+                  </Button>
+                </ReadOnlyButtonWrapper>
+              ) : null}
+
+              { (isTokenApproved && currentSection === 3 || currentSection !== 3) &&
+                <Button
+                  className="d-flex flex-shrink-0 w-40 btn-block"
+                  onClick={handleNextStepAndCreate}
+                  disabled={verifyNextStepAndCreate()}
+                  isLoading={isLoadingCreateBounty}
+                >
+                  <span>
+                    {currentSection !== 3
+                      ? t("bounty:next-step")
+                      : t("bounty:create-bounty")}
+                  </span>
+                </Button>
+              }
+            </div>
           </>
         }
       >
