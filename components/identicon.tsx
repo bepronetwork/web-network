@@ -20,7 +20,7 @@ export default function Identicon({
   const ref = useRef<HTMLDivElement>();
 
   const SIZES = {
-    sm: 28,
+    sm: 24,
     md: 40,
     lg: 108
   };
