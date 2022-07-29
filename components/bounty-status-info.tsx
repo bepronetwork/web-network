@@ -15,8 +15,8 @@ export default function BountyStatusInfo({ issueState }: IBountyStatusInfo) {
       return "bg-info-30 text-info";
     }
     case "open": {
-      if(ellipse) return "bg-primary"
-      return "bg-primary-30 text-white";
+      if(ellipse) return "bg-success"
+      return "bg-success-30 text-success";
     }
     case "canceled": {
       if(ellipse) return null
