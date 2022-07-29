@@ -10,7 +10,7 @@ interface PaymentsListProps {
 export default function PaymentsList({ payments } : PaymentsListProps) {
   return(
     <>
-      {payments.map(PaymentItem)}
+      {payments && payments.map(PaymentItem)}
     </>
   );
 }

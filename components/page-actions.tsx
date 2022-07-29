@@ -122,11 +122,14 @@ export default function PageActions({
     if(!activeRepo?.hasGhVisibility) return setShowGHModal(true)
     let pullRequestPayload = undefined;
 
-    createPrePullRequest(repoId as string, issueGithubID, {
+    createPrePullRequest({
+      repoId: String(repoId),
+      issueGithubID,
       title: prTitle,
       description: prDescription,
       username: user?.login,
-      branch
+      branch,
+      wallet: wallet.address
     }).then(({ bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid }) => {
       pullRequestPayload = {
         repoId,
@@ -137,7 +140,8 @@ export default function PageActions({
         customNetworkName: activeNetwork.name,
         creator: userRepo.split("/")[0],
         userBranch,
-        userRepo
+        userRepo,
+        wallet: wallet.address
       };
 
       return handleCreatePullRequest(bountyId, originRepo, originBranch, originCID, userRepo, userBranch, cid);
@@ -182,7 +186,12 @@ export default function PageActions({
     if(!activeRepo?.hasGhVisibility) return setShowGHModal(true)
     setIsExecuting(true);
 
-    startWorking(networkIssue?.cid, user?.login, activeNetwork?.name)
+    startWorking({
+      issueId: networkIssue?.cid, 
+      githubLogin: user?.login, 
+      networkName: activeNetwork?.name, 
+      wallet: wallet.address
+    })
       .then((response) => {
         dispatch(addToast({
           type: "success",

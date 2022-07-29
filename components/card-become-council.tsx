@@ -7,7 +7,6 @@ import ArrowRight from "assets/icons/arrow-right";
 import CloseIcon from "assets/icons/close-icon";
 
 import { formatNumberToNScale } from "helpers/formatNumber";
-import { highlightText } from "helpers/string";
 
 import useNetwork from "x-hooks/use-network";
 

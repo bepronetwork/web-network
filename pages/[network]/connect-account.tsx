@@ -104,8 +104,9 @@ export default function ConnectAccount() {
       return dispatch(toastError(t("connect-account:errors.migrating-already-happened")));
     }
 
-    joinAddressToUser(session.user.name || user?.login, {
-      address: wallet?.address.toLowerCase(),
+    joinAddressToUser({
+      githubHandle: session.user.name || user?.login,
+      wallet: wallet?.address.toLowerCase(),
       migrate: !!migrate
     }).then((result) => {
       if (result === true) {

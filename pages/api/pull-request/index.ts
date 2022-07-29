@@ -73,7 +73,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {
     repoId: repository_id,
-    githubId,
+    issueGithubID: githubId,
     title,
     description: body,
     username,

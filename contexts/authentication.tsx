@@ -157,7 +157,10 @@ export const AuthenticationProvider = ({ children }) => {
   }, [DAOService, wallet?.address]);
 
   useEffect(() => {
-    if (wallet && wallet?.address) updateWalletBalance();
+    if (!wallet?.address) return localStorage.setItem("currentWallet", "");
+    
+    localStorage.setItem("currentWallet", wallet.address);
+    updateWalletBalance();
   }, [pathname, wallet?.address]);
   
   const memorized = useMemo<IAuthenticationContext>(() => ({
