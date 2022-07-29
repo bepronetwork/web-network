@@ -82,7 +82,7 @@ export default function IssueListItem({
               isActive && "-40"
             }`}
           >
-            {formatNumberToNScale(issue?.fundingAmount ? issue?.fundingAmount : issue?.amount || 0)}{" "}
+            {formatNumberToNScale(issue?.fundingAmount > 0 ? issue?.fundingAmount : issue?.amount || 0)}{" "}
             <label
               className={`caption-small text-uppercase ${
                 !isActive ? "text-primary" : "text-white-40"
@@ -92,7 +92,7 @@ export default function IssueListItem({
             </label>
           </span>
         </div>
-        {(issue?.fundingAmount <= 0 || issue?.fundingAmount) && (
+        {(issue?.fundingAmount > 0) && (
           <>
             <div className="p-0 col-md-6 mt-1">
               <div className="bg-dark-gray w-100 issue-funding-progress">
@@ -135,6 +135,11 @@ export default function IssueListItem({
     );
   }
 
+  function handleIssueState() {
+    if(issue?.amount < issue?.fundingAmount) return "funding"
+    return issue?.state
+  }
+
   return (
     <div
       className="bg-shadow list-item p-3"
@@ -160,7 +165,7 @@ export default function IssueListItem({
             )}
           </h4>
           <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2 gap-20">
-            <BountyStatusInfo issueState={issue.state} />
+            <BountyStatusInfo issueState={handleIssueState()} />
             <div className="d-flex align-items-center">
               {renderAvatar()}
               {issue?.repository && (
