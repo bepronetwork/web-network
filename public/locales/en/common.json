@@ -125,7 +125,9 @@
     "unlock-all": "Unlock all",
     "back-to-top": "Back to Top",
     "refuse": "Refuse",
-    "disconnect-accounts": "Disconnect Accounts"
+    "disconnect-accounts": "Disconnect Accounts",
+    "show": "Show",
+    "hide": "Hide"
   },
   "misc": {
     "by": "by",
@@ -339,7 +341,9 @@
       "set-draft-time": "Set Draft Time",
       "set-disputable-time": "Set Disputable Time",
       "set-council-amount": "Set Council Amount",
-      "set-percentage-dispute": "Set Percentage for Dispute"
+      "set-percentage-dispute": "Set Percentage for Dispute",
+      "fund-bounty": "Fund Bounty",
+      "retract-fund": "Retract Bounty Fund"
     }
   },
   "sort": {

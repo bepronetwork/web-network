@@ -1618,3 +1618,20 @@ input[type="color"] {
     border-right: 1px solid $disabled;
   }
 }
+.svg {
+  &-gray {
+    svg {
+      color: $gray !important;
+    }
+  }
+
+  &-white-40 {
+    svg {
+      color: rgba($white, 0.4) !important;
+    }
+  }
+}
+
+.border-bottom-dashed {
+  border-bottom: 1px dashed $white;
+}

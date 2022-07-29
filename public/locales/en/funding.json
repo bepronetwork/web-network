@@ -1,0 +1,38 @@
+{
+  "title": "Funding",
+  "reward": "Reward",
+  "current-funding": "Current Funding",
+  "total-amount": "Total Amount",
+  "funding-rewards": "Funding Rewards",
+  "funds-given": "Funds Given",
+  "future-rewards": "Future Rewards",
+  "try-again": "Something went wrong. Try again later.",
+  "fund": "Fund",
+  "actions": {
+    "fund-bounty": "Fund Bounty",
+    "manage-funding": "Manage Funding",
+    "retract-funding": "Retract Funding"
+  },
+  "modals": {
+    "fund": {
+      "title": "Fund Bounty",
+      "description": "You are about to fund",
+      "funded-succesfully": "Bounty Funded Sucessfully",
+      "funded-x-symbol": "Funded {{amount}} ${{symbol}}",
+      "failed-to-fund": "Failed to fund bounty",
+      "fields": {
+        "fund-amount": {
+          "label": "Fund Amount"
+        }
+      }
+    },
+    "retract": {
+      "title": "Retract Funding",
+      "description": "You are about to retract",
+      "from-the": "from the",
+      "retract-successfully": "Retract Funds Successfully",
+      "retract-x-symbol": "Retracted {{amount}} ${{symbol}}",
+      "failed-to-retract": "Failed to retract funds"
+    }
+  }
+}
