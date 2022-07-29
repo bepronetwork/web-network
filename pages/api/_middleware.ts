@@ -36,7 +36,6 @@ export async function middleware(req: NextApiRequest) {
     const requestWallet = (req.headers as CombinedHeader).get("wallet")?.toLowerCase();
     const tokenWallet = String(token.wallet)?.toLowerCase();
 
-    console.warn({ requestWallet });
 
     if (tokenWallet && tokenWallet !== requestWallet)
       return UnauthorizedResponse("Invalid Accounts");
