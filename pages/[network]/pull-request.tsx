@@ -102,6 +102,8 @@ export default function PullRequestPage() {
   }
 
   function handleMakeReady() {
+    if (!activeIssue || !pullRequest) return;
+    
     setIsExecuting(true);
 
     handleMakePullRequestReady(activeIssue.contractId, pullRequest.contractId)
