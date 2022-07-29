@@ -32,12 +32,14 @@ export default function TransactionType({ type }) {
     [TransactionTypes.setDraftTime]: t("transactions.types.set-draft-time"),
     [TransactionTypes.setDisputableTime]: t("transactions.types.set-disputable-time"),
     [TransactionTypes.setPercentageNeededForDispute]: t("transactions.types.set-percentage-dispute"),
-    [TransactionTypes.setCouncilAmount]: t("transactions.types.set-council-amount")
+    [TransactionTypes.setCouncilAmount]: t("transactions.types.set-council-amount"),
+    [TransactionTypes.fundBounty]: t("transactions.types.fund-bounty"),
+    [TransactionTypes.retractFundBounty]: t("transactions.types.retract-fund"),
   };
 
   return (
     <span className="d-block caption-small text-white-50 text-uppercase fs-small">
-      {[TypeMaps[type]] || "Missing map"}
+      {[TypeMaps[type]] || t("transactions.types.unknown")}
     </span>
   );
 }

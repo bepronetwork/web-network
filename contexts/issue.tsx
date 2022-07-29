@@ -3,6 +3,7 @@ import React, {
   useCallback, useContext, useEffect, useMemo, useState
 } from "react";
 
+import { Defaults } from "@taikai/dappkit";
 import { useRouter } from "next/router";
 
 import { useAuthentication } from "contexts/authentication";
@@ -113,7 +114,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     [activeNetwork, query?.repoId, query?.id, user?.accessToken]);
 
   const getNetworkIssue = useCallback(async () => {
-    if (!wallet?.address || !activeIssue?.contractId || !DAOService?.network?.contractAddress)
+    if (!activeIssue?.contractId || !DAOService?.network?.contractAddress)
       return;
 
     const bounty = await DAOService.getBounty(activeIssue?.contractId);
@@ -134,9 +135,12 @@ export const IssueProvider: React.FC = function ({ children }) {
     for (const proposal of bounty.proposals) {
       const isDisputed = activeIssue?.merged
         ? +activeIssue?.merged !== +proposal.id
-        : await DAOService.isProposalDisputed(+bounty.id, +proposal.id);
+        : await DAOService.isProposalDisputed(+bounty.id, +proposal.id).catch(() => false);
 
-      const isDisputedByAddress = await DAOService.getDisputesOf(wallet.address, bounty.id, proposal.id) > 0;
+      let isDisputedByAddress = false;
+      
+      if (wallet?.address) 
+        isDisputedByAddress = await DAOService.getDisputesOf(wallet.address, bounty.id, proposal.id).catch(() => 0) > 0;
 
       networkProposals[+proposal.id] = {
         ...proposal,
@@ -152,13 +156,24 @@ export const IssueProvider: React.FC = function ({ children }) {
         isCancelable: !bounty.proposals.find(proposal => proposal.prId === pullRequest.id),
       }));
 
+    const transactionalTokenData = await DAOService.getERC20TokenData(bounty.transactional);
+    const rewardTokenData = bounty.rewardToken !== Defaults.nativeZeroAddress ? 
+      await DAOService.getERC20TokenData(bounty.rewardToken).catch(() => undefined) : undefined;
+    const fundedAmount = bounty.funding.reduce((acc, benefactor) => acc + benefactor.amount, 0);
+    const fundedPercent = fundedAmount / bounty.fundingAmount * 100;
+
     setNetworkIssue({ 
       ...bounty, 
       isDraft, 
       pullRequests,
       proposals: networkProposals,
       isFinished,
-      isInValidation
+      isInValidation,
+      isFundingRequest: bounty.fundingAmount > 0,
+      transactionalTokenData,
+      rewardTokenData,
+      fundedAmount,
+      fundedPercent
     });
     return { ...bounty, isDraft, networkProposals };
   }, [activeIssue, wallet?.address, DAOService?.network?.contractAddress]);
