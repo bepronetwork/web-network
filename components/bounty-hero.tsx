@@ -14,6 +14,12 @@ import Translation from "./translation";
 export default function BountyHero() {
   const { t } = useTranslation(["bounty", "common"]);
   const { activeIssue, networkIssue } = useIssue();
+
+  function handleIssueState() {
+    if(activeIssue?.amount < activeIssue?.fundingAmount) return "funding"
+    return activeIssue?.state
+  }
+
   return (
     <div className="banner-shadow">
       <CustomContainer>
@@ -25,7 +31,7 @@ export default function BountyHero() {
             </div>
 
             <div className="mt-3 pt-1 d-inline-flex align-items-center justify-content-md-start gap-20">
-              <BountyStatusInfo issueState={activeIssue?.state} />
+              <BountyStatusInfo issueState={handleIssueState()} />
 
               <div className="d-flex align-items-center">
                 <Avatar
