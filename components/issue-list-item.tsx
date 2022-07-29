@@ -8,16 +8,15 @@ import Avatar from "components/avatar";
 
 import { useNetwork } from "contexts/network";
 
+import { formatDate } from "helpers/formatDate";
 import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { IssueData } from "interfaces/issue-data";
 import { IssueState } from "interfaces/issue-data";
 
 import BountyStatusInfo from "./bounty-status-info";
-import DateLabel from "./date-label";
 import Identicon from "./identicon";
 import Translation from "./translation";
-import { formatDate } from "helpers/formatDate";
 
 export default function IssueListItem({
   issue = null,
