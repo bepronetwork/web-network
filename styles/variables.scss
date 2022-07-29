@@ -17,7 +17,7 @@ $dark-gray: #20222b;
 $gray: #c4c7d3;
 $ligth-gray: #434758;
 $blue: #4250e4;
-$blue-dark: #3b49e0;
+$blue-dark: #283089;
 // Fix-ME: Remove disabled color
 $disabled: #423b51;
 
@@ -46,10 +46,12 @@ $more-bg: (
   "blue": $blue,
   "success": $success,
   "success-15": rgba($success, 0.15),
+  "success-50": rgba($success, 0.5),
   "dark-gray": $dark-gray,
   "ligth-gray": $ligth-gray,
   "disabled": $disabled,
   "danger": $danger,
+  "danger-50": rgba($danger, 0.5),
   "warning": $warning,
   "warning-opac-25": rgba($warning, 0.25),
   "danger-opac-25": rgba($warning, 0.25),
@@ -69,10 +71,13 @@ $more-bg: (
   "gray-70": rgba($gray, 0.7),
   "light-warning-30": rgba($light-warning, 0.3),
   "light-warning": $light-warning
+  "blue-dark": $blue-dark,
+  "blue-shadow": $bg-blue-shadow,
 );
 
 $more-colors: (
   "blue-dark": $blue-dark,
+  "blue-shadow": $bg-blue-shadow,
   "gray": $gray,
   "dark-gray": $dark-gray,
   "ligth-gray": $ligth-gray,

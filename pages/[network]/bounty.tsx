@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { GetServerSideProps } from "next/types";
 
 import BountyHero from "components/bounty-hero";
+import FundingSection from "components/bounty/funding-section";
 import CustomContainer from "components/custom-container";
 import IssueComments from "components/issue-comments";
 import IssueDescription from "components/issue-description";
@@ -87,6 +88,8 @@ export default function PageIssue() {
     <>
       <BountyHero />
 
+      { networkIssue?.isFundingRequest && <FundingSection /> }
+
       <PageActions
         isRepoForked={isRepoForked}
         addNewComment={addNewComment}
@@ -102,7 +105,7 @@ export default function PageIssue() {
           </CustomContainer>
       }
 
-      {networkIssue ? (
+      { wallet?.address ? (
         <div className="container mb-1">
           <div className="d-flex bd-highlight justify-content-center mx-2 px-4">
             <div className="ps-3 pe-0 ms-0 me-2 w-65 bd-highlight">
@@ -149,6 +152,7 @@ export const getServerSideProps: GetServerSideProps = async ({
         "proposal",
         "pull-request",
         "connect-wallet-button",
+        "funding"
       ]))
     }
   };

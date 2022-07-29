@@ -2,15 +2,14 @@ import { useContext, useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
-import ExternalLinkIcon from "assets/icons/external-link-icon";
-
-import LanguageSelector from "components/language-selector";
+import NetworkIdentifier from "components/network-identifier";
 import Translation from "components/translation";
 
 import { ApplicationContext } from "contexts/application";
 import { changeMicroServiceReady } from "contexts/reducers/change-microservice-ready";
 
 import useApi from "x-hooks/use-api";
+
 
 export default function StatusBar() {
   const {
@@ -55,7 +54,7 @@ export default function StatusBar() {
         rel="noreferrer"
       >
         <span className={indicatorClass} style={indicatorStyle} />
-        <span className="caption-small">
+        <span className="caption-small mr-2">
           {info[1]} {ms}ms
         </span>
       </a>
@@ -65,43 +64,30 @@ export default function StatusBar() {
   useEffect(neverEndingUpdate, []);
 
   return (
-    <>
-      <div
-        className="position-fixed bg-shadow bottom-0 w-100 px-3 py-1 d-flex"
-        id="status-bar"
-      >
-        <div className="d-flex align-items-center w-100">
-          {renderNetworkStatus()}
-          <div className="ms-3 text-gray">|</div>
-          <div className="ms-3 flex-grow-1 text-center text-uppercase family-Regular status-bar-text text-ligth-gray">
-            <Translation label="status.tagline" />
-            <a
-              href="https://www.bepro.network/terms-and-conditions"
-              target="_blank"
-              className="ms-2 text-decoration-none text-primary"
-              rel="noreferrer"
-            >
-              <Translation label="status.terms-and-conditions" />
-            </a>
-          </div>
-          <LanguageSelector />
-          <div className="ms-3 text-gray">|</div>
-          <a
-            className="ms-3 text-decoration-none caption-small text-white"
-            target="_blank"
-            href="https://support.bepro.network/"
-            rel="noreferrer"
-          >
-            <Translation label="status.support" />{" "}
-            <ExternalLinkIcon
-              className="ml-1"
-              height={11}
-              width={11}
-              color="text-white"
-            />
-          </a>
-        </div>
+    <div
+      className={`position-fixed bg-shadow bottom-0 w-100 px-3 py-0 d-flex border-disabled 
+        border-top d-flex flex-row align-items-center`}
+      id="status-bar"
+    >
+      <div className="border-disabled-right">
+        {renderNetworkStatus()}
       </div>
-    </>
+
+      <div className="ms-3 flex-grow-1 text-center text-uppercase family-Regular status-bar-text text-ligth-gray">
+        <Translation label="status.tagline" />
+        <a
+          href="https://www.bepro.network/terms-and-conditions"
+          target="_blank"
+          className="ms-2 text-decoration-none text-primary"
+          rel="noreferrer"
+        >
+          <Translation label="status.terms-and-conditions" />
+        </a>
+      </div>
+
+      <div className="border-disabled-left py-1">
+        <NetworkIdentifier />
+      </div>
+    </div>
   );
 }

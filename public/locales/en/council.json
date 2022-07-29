@@ -4,5 +4,9 @@
   "ready-bountys": "Ready Bounties",
   "council-members": "Council Members",
   "distributed-developers": "Distributed to developers",
-  "empty": "No bounties ready to propose"
+  "empty": "No bounties ready to propose",
+  "become-council": "Become a Council",
+  "become-council-description-part-one": "By becoming a council member you can participate in the bounty distribution and disputes on the network. Become a Council member by locking",
+  "become-council-description-part-two": "through your wallet.",
+  "go-to-wallet": "Go To Wallet"
 }

@@ -92,6 +92,18 @@ li {
   }
 }
 
+.card-close-button {
+  :hover {
+    color: $white !important;
+    background-color: none !important;
+  }
+
+  svg {
+    height: 10px !important;
+    width: 10px !important;
+  }
+}
+
 .modal {
   &-header {
     padding-bottom: 0;
@@ -670,6 +682,12 @@ label {
   border-radius: 20px;
 }
 
+.become-council {
+  border-radius: math.div($m, 2);
+  background-color: rgba(var(--bs-purple-rgb), 0.3) !important;
+  border: 2px solid $purple !important;
+}
+
 .circle-5 {
   width: 108px;
   height: 108px;
@@ -1074,6 +1092,10 @@ $c_props: (
     width: 18px !important;
     height: 18px !important;
   }
+}
+
+.amount-white-color {
+  color: $white !important;
 }
 
 .bg-main-image {
@@ -1605,4 +1627,31 @@ input[type="color"] {
     height: max-content;
     border-left: 1px solid $ligth-gray;
   }
+}
+
+.border-disabled {
+  &-left {
+    border-left: 1px solid $disabled;
+  }
+
+  &-right {
+    border-right: 1px solid $disabled;
+  }
+}
+.svg {
+  &-gray {
+    svg {
+      color: $gray !important;
+    }
+  }
+
+  &-white-40 {
+    svg {
+      color: rgba($white, 0.4) !important;
+    }
+  }
+}
+
+.border-bottom-dashed {
+  border-bottom: 1px dashed $white;
 }

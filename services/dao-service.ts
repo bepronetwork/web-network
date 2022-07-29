@@ -319,7 +319,7 @@ export default class DAO {
     );
   }
 
-  async getERC20TokenData(tokenAddress): Promise<Token> {
+  async getERC20TokenData(tokenAddress: string): Promise<Token> {
     const token = await this.loadERC20(tokenAddress);
 
     return {
@@ -367,7 +367,7 @@ export default class DAO {
     title,
     repoPath,
     branch,
-    githubUser,
+    githubUser = "",
     transactional,
     rewardToken = Defaults.nativeZeroAddress,
     tokenAmount = 0,
@@ -384,6 +384,14 @@ export default class DAO {
                                    repoPath,
                                    branch,
                                    githubUser);
+  }
+
+  async fundBounty(bountyId: number, amount: number, tokenDecimals?: number): Promise<TransactionReceipt> {
+    return this.network.fundBounty(bountyId, amount, tokenDecimals);
+  }
+
+  async retractFundBounty(bountyId: number, fundingId: number): Promise<TransactionReceipt> {
+    return this.network.retractFunds(bountyId, [fundingId]);
   }
 
   async disputeProposal(bountyId: number, proposalId: number): Promise<TransactionReceipt> {
