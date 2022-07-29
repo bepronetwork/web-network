@@ -66,7 +66,8 @@ export default async function readProposalRefused(events, network: Network_v2, c
             let newState = bounty.state;
 
             if ([0, 1].includes(validation)) newState = "open";
-            if ([2, 3].includes(validation)) newState = "ready";
+            if ([3].includes(validation)) newState = "proposal";
+            if ([2].includes(validation)) newState = "ready";
 
             if (newState !== bounty.state) {
               bounty.state = newState;
