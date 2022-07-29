@@ -8,7 +8,6 @@ import {
 
 import getConfig from "next/config";
 import { useRouter } from "next/router";
-import { parseCookies, setCookie } from "nookies";
 import sanitizeHtml from "sanitize-html";
 
 import Loading from "components/loading";
@@ -19,6 +18,7 @@ import { useNetwork } from "contexts/network";
 import { toastError } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { changeNetwork } from "contexts/reducers/change-network";
+import { changeNetworkId } from "contexts/reducers/change-network-id";
 import LoadApplicationReducers from "contexts/reducers/index";
 import { mainReducer } from "contexts/reducers/main";
 import { updateTransaction } from "contexts/reducers/update-transaction";
@@ -27,8 +27,6 @@ import { ApplicationState } from "interfaces/application-state";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { ReduceActor } from "interfaces/reduce-action";
 
-import { changeNetworkId } from "./reducers/change-network-id";
-import { changeStakedState } from "./reducers/change-staked-amount";
 
 interface GlobalState {
   state: ApplicationState;
@@ -70,7 +68,8 @@ const defaultState: GlobalState = {
       bounties: 0,
       amountInNetwork: 0,
       amountDistributed: 0
-    }
+    },
+    showCreateBounty: false
   },
   dispatch: () => undefined
 };
@@ -86,7 +85,6 @@ export default function ApplicationContextProvider({ children }) {
   const [txListener, setTxListener] = useState<NodeJS.Timeout | undefined>();
   const {
     query: { authError },
-    pathname
   } = useRouter();
 
   const { activeNetwork } = useNetwork();
@@ -177,10 +175,7 @@ export default function ApplicationContextProvider({ children }) {
   // }, [pathname, beproServiceStarted])
 
   const restoreTransactions = async (address) => {
-    const cookie = parseCookies();
-    const transactions = JSON.parse(cookie[`bepro.transactions:${address}`]
-        ? cookie[`bepro.transactions:${address}`]
-        : "[]");
+    const transactions = JSON.parse(localStorage.getItem(`bepro.transactions:${address}`) || "[]");
     const web3 = (window as any).web3; // eslint-disable-line
 
     const getStatusFromBlock = async (tx) => {
@@ -212,16 +207,10 @@ export default function ApplicationContextProvider({ children }) {
     if (!wallet?.address) return;
 
     if (state.myTransactions.length < 1)
-      restoreTransactions(wallet?.address?.toLowerCase());
+      restoreTransactions(wallet.address.toLowerCase());
     else {
       const value = JSON.stringify(state.myTransactions.slice(0, 5));
-      setCookie(null,
-                `bepro.transactions:${wallet?.address.toLowerCase()}`,
-                value,
-                {
-          maxAge: 24 * 60 * 60, // 24 hour
-          path: "/"
-                });
+      localStorage.setItem(`bepro.transactions:${wallet.address.toLowerCase()}`, value);
     }
   }, [state.myTransactions, wallet]);
 

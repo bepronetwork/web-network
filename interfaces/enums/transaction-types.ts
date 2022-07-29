@@ -20,5 +20,11 @@ export enum TransactionTypes {
   deployNetworkV2,
   setNFTDispatcher,
   addNetworkToRegistry,
-  deployBountyToken
+  deployBountyToken,
+  setDraftTime,
+  setDisputableTime,
+  setPercentageNeededForDispute,
+  setCouncilAmount,
+  fundBounty,
+  retractFundBounty
 }

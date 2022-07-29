@@ -5,6 +5,9 @@
   "bepro": "BEPRO",
   "please-wait": "Please wait",
   "close": "Close",
+  "currencies": {
+    "euro": "EURO"
+  },
   "filters": {
     "filters": "Filter",
     "search-repositories": "Search repositories",
@@ -54,9 +57,28 @@
     "developers": "Developers",
     "council": "Council",
     "Oracle": "Oracle",
-    "create-bounty": "Create bounty",
+    "new-bounty": "New bounty",
     "get-started": "Get Started",
-    "connect": "Connect"
+    "connect": "Connect Wallet",
+    "new-network": "New Network",
+    "my-network": "My Network",
+    "networks": "Networks",
+    "nav-avatar": {
+      "view-profile": "View profile",
+      "profile": "Profile",
+      "wallet": "Wallet",
+      "payments": "Payments",
+      "bounties": "Bounties",
+      "pull-requests": "Pull Requests",
+      "proposals": "Proposals",
+      "my-network": "My Network",
+      "support-center": "Support Center",
+      "guides": "Guides",
+      "join-discord": "Join the Discord",
+      "follow-on-twitter": "Follow @bepronet on Twitter",
+      "web-network-1": "Web Network Version 1.0",
+      "disconnect-wallet": "Disconnect Wallet"
+    }
   },
   "select-a-repository": "Select a repository",
   "select-a-branch": "Select a branch",
@@ -73,7 +95,9 @@
     "accepted": "Accepted",
     "approve": "Approve",
     "cancel": "Cancel",
+    "back": "Back",
     "close": "Close",
+    "continue": "Continue",
     "completed": "Completed",
     "confirm": "Confirm",
     "connect": "Connect",
@@ -101,7 +125,9 @@
     "unlock-all": "Unlock all",
     "back-to-top": "Back to Top",
     "refuse": "Refuse",
-    "disconnect-accounts": "Disconnect Accounts"
+    "disconnect-accounts": "Disconnect Accounts",
+    "show": "Show",
+    "hide": "Hide"
   },
   "misc": {
     "by": "by",
@@ -129,16 +155,19 @@
     "status": "Status",
     "available": "available",
     "giving-away": "giving away",
-    "locked": "locked",
+    "locked": "Locked",
     "upload": "upload",
     "token": "token",
+    "token_other": "tokens",
     "$token": "$TOKEN",
     "creation-date": "creation date",
     "seconds": "seconds",
     "on": "on",
     "next-step": "Next Step",
     "fork": "Fork",
-    "organization": "Organization"
+    "organization": "Organization",
+    "total": "Total",
+    "clear": "Clear"
   },
   "modals": {
     "help-modal": {
@@ -227,6 +256,15 @@
     "gh-access": {
       "title": "Access Denied",
       "content": "You don’t have access to this repository, please contact the network admin."
+    },
+    "hard-cancel": {
+      "title": "Attention!",
+      "content": "This action will return the locked amount to the original creators address along with any reward tokens and revert funding entries"
+    },
+    "already-has-network": {
+      "title": "Network already exists",
+      "button-label": "My networks",
+      "content": "Connected wallet already has a network."
     }
   },
   "forms": {
@@ -299,7 +337,13 @@
       "deploy-network-v2": "Deploy Network_v2",
       "set-dispatcher": "Set Dispatcher",
       "register-network": "Register Network",
-      "deploy-bounty-token": "Deploy Bounty Token"
+      "deploy-bounty-token": "Deploy Bounty Token",
+      "set-draft-time": "Set Draft Time",
+      "set-disputable-time": "Set Disputable Time",
+      "set-council-amount": "Set Council Amount",
+      "set-percentage-dispute": "Set Percentage for Dispute",
+      "fund-bounty": "Fund Bounty",
+      "retract-fund": "Retract Bounty Fund"
     }
   },
   "sort": {

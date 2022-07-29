@@ -1,10 +1,10 @@
 {
   "title": "Custom Network",
-  "query-url": "Query url",
+  "query-url": "Query URL",
   "close-network": "Close network",
-  "tokens-staked": "$TOKEN staked",
+  "tokens-staked": "${{symbol}} in the network",
   "tokens-staked-description": "$TOKEN staked",
-  "oracles-staked": "Oracles staked",
+  "oracles-staked": "Locked ${{symbol}}",
   "oracles-staked-description": "The amount of tokens locked by users to curate the network",
   "tvl": "TVL",
   "tvl-description": "Total locked value",
@@ -60,6 +60,36 @@
         }
       },
       "logo-helper": "The logos must be in .svg format"
+    },
+    "network-settings": {
+      "title": "Network Settings",
+      "fields": {
+        "colors": {
+          "label": "Network Colours",
+          "similar-colors": "These colours are very similar. Please pick a different colour.",
+          "more-colors": "More colours",
+          "types": {
+            "primary": "Primary",
+            "secondary": "Secondary",
+            "oracle": "Oracle",
+            "text-colour": "Text Colour",
+            "background": "Background",
+            "background-shadow": "Background Shadow",
+            "gray": "Gray",
+            "success": "Success",
+            "danger": "Danger",
+            "warning": "Warning",
+            "info": "info"
+          }
+        },
+        "other-settings": {
+          "title": "Other Settings",
+          "parameters-warning": "Changing these parameters will launch a new transaction for each one."
+        },
+        "fees": {
+          "title": "Fees"
+        }
+      }
     },
     "repositories": {
       "title": "Add Repositories",
@@ -146,7 +176,8 @@
   },
   "messages": {
     "refresh-the-page": "Refresh the page for the changes to take effect.",
-    "network-closed": "Network closed."
+    "network-closed": "Network closed.",
+    "updated-parameters": "Updated {{updated}} of {{total}} params"
   },
   "errors": {
     "failed-to-create-network": "Failed to create network {{error}}",
@@ -157,6 +188,8 @@
     "dispute-time": "The time that proposals can be disputed. Min. {{min}} and Max. {{max}} seconds.",
     "percentage-for-dispute": "`Percentage needed for a proposal to be disputed by the community. Max. {{max}}%.`",
     "redeem-time": "The time after a bounty creation that it can be cancelled. Min. {{min}} and Max. {{max}} seconds.",
-    "council-amount": "The amount of {{token}} locked needed to be a council member. Min. {{min}} and Max. {{max}}."
+    "council-amount": "The amount of {{token}} locked needed to be a council member. Min. {{min}} and Max. {{max}}.",
+    "updating-values": "Error updating network values",
+    "updated-parameters": "Failed to update {{failed}} params"
   }
 }

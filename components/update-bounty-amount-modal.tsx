@@ -96,10 +96,10 @@ export default function UpdateBountyAmountModal({
   }
 
   useEffect(() => {
-    if (!transactionalAddress || !DAOService || !wallet?.address) return;
+    if (!transactionalAddress || !DAOService || !wallet?.address || !show) return;
 
     updateAllowanceAndBalance();
-  }, [transactionalAddress, DAOService, wallet]);
+  }, [transactionalAddress, DAOService, wallet, show]);
 
   return (
     <Modal show={show} onCloseClick={handleClose} title={t("modals.update-bounty-amount.title")} titlePosition="center">

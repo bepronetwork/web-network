@@ -9,13 +9,12 @@ import MarkedRender from "./MarkedRender";
 
 interface CommentsProps{
   comment: IssueDataComment;
-  key: string | number;
 }
-export default function Comment({ comment, key }: CommentsProps) {
+export default function Comment({ comment }: CommentsProps) {
   const { t } = useTranslation("bounty");
 
   return (
-    <div className="mb-3" key={key}>
+    <div className="mb-3">
       <p className="caption-small text-uppercase mb-2">
         <Avatar userLogin={comment?.author} />
 
@@ -26,9 +25,10 @@ export default function Comment({ comment, key }: CommentsProps) {
         </span>
       </p>
 
-      <p className="p-small content-wrapper child mb-0 comment">
-        <MarkedRender source={comment?.body || t("no-comments-available")} />
-      </p>
+      <MarkedRender 
+        className="p-small content-wrapper child mb-0 comment" 
+        source={comment?.body || t("no-comments-available")} 
+      />
     </div>
   );
 }

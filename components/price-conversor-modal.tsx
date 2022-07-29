@@ -35,6 +35,7 @@ export default function PriceConversorModal({
   const [currentPrice, setCurrentPrice] = useState<number>(0);
   const [currentCurrency, setCurrentCurrency] = useState<{label: string, value: string}>(null);
   const [options, setOptions] = useState([]);
+  const [errorCoinInfo, setErrorCoinInfo] = useState<boolean>(false);
 
   const { activeNetwork } = useNetwork();  
 
@@ -43,8 +44,11 @@ export default function PriceConversorModal({
 
     const data = 
       await getCoinInfoByContract(activeNetwork.networkToken.address)
-        .catch(() => ({ prices: { [value]: 0 } }));
-
+        .catch((err) => {
+          if(err) setErrorCoinInfo(true)
+          return ({ prices: { [value]: 0 } })
+        });
+    if(data.prices[value] > 0) setErrorCoinInfo(false)
     setCurrentCurrency({value, label});
     setCurrentPrice(data.prices[value]);
   }
@@ -96,32 +100,47 @@ export default function PriceConversorModal({
 
   return (
     <Modal
-    show={show}
-    title={"Converter"}
-    titlePosition="center"
-    onCloseClick={onClose}
-  >
-    <div className="d-flex flex-row gap-2">
-      <InputNumber className="caption-large" 
-      symbol={activeNetwork?.networkToken?.symbol || t("misc.$token")} value={currentValue} 
-      onValueChange={(e) => setValue(e.floatValue)}
-      />
-      <div className="d-flex justify-center align-items-center bg-dark-gray circle-2 p-2">
-        <TransactionIcon width={14} height={10}/>
+      show={show}
+      title={"Converter"}
+      titlePosition="center"
+      onCloseClick={onClose}
+    >
+      <div className="d-flex flex-row gap-2">
+        <div>
+          <InputNumber
+            className="caption-large"
+            symbol={
+              activeNetwork?.networkToken?.symbol || t("common:misc.$token")
+            }
+            value={currentValue}
+            onValueChange={(e) => setValue(e.floatValue)}
+          />
+        </div>
+        <div className="d-flex justify-center align-items-center bg-dark-gray circle-2 p-2">
+          <TransactionIcon width={14} height={10} />
+        </div>
+        <div>
+          <ReactSelect
+            key="select_currency"
+            isSearchable={false}
+            components={{
+              Option: SelectOptionComponent,
+              ValueContainer: SelectValueComponent,
+            }}
+            defaultValue={{
+              value: options[0]?.value,
+              label: options[0]?.label,
+            }}
+            options={options}
+            onChange={handlerChange}
+          />
+          {errorCoinInfo && (
+            <p className="p-small text-danger ms-1">
+              {t("bounty:fields.conversion-token.not-found")}
+            </p>
+          )}
+        </div>
       </div>
-      <ReactSelect key='select_currency'
-      isSearchable={false} 
-      components={{
-        Option: SelectOptionComponent,
-        ValueContainer: SelectValueComponent
-      }}
-      defaultValue={{
-        value: options[0]?.value,
-        label: options[0]?.label,
-      }}
-      options={options} 
-      onChange={handlerChange} />
-    </div>
-  </Modal>
+    </Modal>
   );
 }

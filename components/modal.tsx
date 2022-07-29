@@ -16,6 +16,7 @@ export default function Modal({
   children = null,
   footer = null,
   onCloseClick,
+  onCloseDisabled = false,
   backdrop = "static",
   titlePosition = "start",
   titleClass,
@@ -32,18 +33,19 @@ export default function Modal({
     if (footer) return footer;
     if (okLabel || cancelLabel)
       return (
-        <div className="mb-3">
+        <div className="mb-2 d-flex flex-row justify-content-between">
+          {cancelLabel && (
+            <button className="btn btn-outline-gray" onClick={() => onCloseClick()} disabled={onCloseDisabled}>
+              {cancelLabel}
+            </button>
+          )}
+
           {okLabel && (
             <button
-              className="btn btn-primary mr-2"
+              className="btn btn-primary"
               onClick={() => onOkClick()}
             >
               {okLabel}
-            </button>
-          )}
-          {cancelLabel && (
-            <button className="btn btn-gray" onClick={() => onCloseClick()}>
-              {cancelLabel}
             </button>
           )}
         </div>
@@ -78,15 +80,16 @@ export default function Modal({
         {onCloseClick && (
           <Button
             transparent
-            className="close-button p-1 position-absolute end-94 text-gray"
+            className="close-button p-1 position-absolute end-94 text-gray mt-1"
             onClick={onCloseClick}
+            disabled={onCloseDisabled}
           >
             <CloseIcon />
           </Button>
         )}
       </ModalBootstrap.Header>
       <ModalBootstrap.Body>{children}</ModalBootstrap.Body>
-      <ModalBootstrap.Footer>{renderFooter()}</ModalBootstrap.Footer>
+      <ModalBootstrap.Footer className="row mx-0">{renderFooter()}</ModalBootstrap.Footer>
     </ModalBootstrap>
   );
 }

@@ -1,5 +1,3 @@
-import { GetStaticProps } from "next";
-
 export default function IssueAvatars({ users }) {
   return (
     <div className="avatar-list mr-1">
@@ -34,9 +32,3 @@ export default function IssueAvatars({ users }) {
     </div>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {}
-  };
-};

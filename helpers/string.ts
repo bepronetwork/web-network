@@ -56,8 +56,8 @@ export const highlightText = (str: string, className?: string) => {
   }
 
   const regex = /\*([\0-9a-zA-Z\u00C0-\u024F\u1E00-\u1EFF]*?)\*/g;
-  const subst = `<span class='text-purple text-uppercase ${
-    className || ""
+  const subst = `<span class=' ${
+    className || "text-purple text-uppercase"
   }'>$1</span>`;
   return str.replaceAll(regex, subst);
 };

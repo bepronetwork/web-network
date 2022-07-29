@@ -24,7 +24,7 @@ const Seo: React.FC<ISeoProps> = ({ issueMeta }) => {
     if(homeUrl)
       return (
         <NextSeo
-          title={issueMeta?.title}
+          title={issueMeta?.title?.replace(/\b\w/g, c => c.toUpperCase())}
           openGraph={{
             url: `${homeUrl}/bounty?id=${ghId}&repoId=${repoId}`,
             title: issueMeta?.title,

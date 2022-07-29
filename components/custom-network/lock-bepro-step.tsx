@@ -20,13 +20,11 @@ import { useNetworkSettings } from "contexts/network-settings";
 
 import { formatNumberToCurrency, formatNumberToNScale } from "helpers/formatNumber";
 
+import { StepWrapperProps } from "interfaces/stepper";
+
 const { publicRuntimeConfig } = getConfig();
 
-export default function LockBeproStep({
-  step,
-  currentStep,
-  handleChangeStep
-}) {
+export default function LockBeproStep({ activeStep, index, handleClick, validated } : StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [isLocking, setIsLocking] = useState(false);
@@ -131,10 +129,10 @@ export default function LockBeproStep({
   return (
     <Step
       title={t("custom-network:steps.lock.title", { currency: networkTokenName })}
-      index={step}
-      activeStep={currentStep}
-      validated={tokensLocked.validated}
-      handleClick={handleChangeStep}
+      index={index}
+      activeStep={activeStep}
+      validated={validated}
+      handleClick={handleClick}
     >
       <div className="row mb-4">
         <span className="caption-small text-gray">
@@ -155,6 +153,7 @@ export default function LockBeproStep({
               </div>
 
               <div className="row mx-0 bg-dark-gray border-radius-8 amount-input">
+                <div className="col px-0">
                 <InputNumber
                   classSymbol={"text-primary"}
                   max={maxValue}
@@ -169,7 +168,7 @@ export default function LockBeproStep({
                   onValueChange={handleAmountChange}
                 />
 
-                <div className="d-flex caption-small justify-content-between align-items-center p-20">
+                <div className="d-flex caption-small justify-content-between align-items-center p-3 mt-1 mb-1">
                   <span className="text-ligth-gray">
                     <span className="text-primary">{networkTokenName}</span>{" "}
                     {t("misc.available")}
@@ -197,6 +196,7 @@ export default function LockBeproStep({
                     )}
                   </div>
                 </div>
+                </div>
               </div>
 
               {balance.oraclesAvailable > 0 && (
@@ -211,7 +211,7 @@ export default function LockBeproStep({
                   </div>
 
                   <div
-                    className="row mt-2 bg-dark-gray bg-dark-hover cursor-pointer border-radius-8 caption-small p-20"
+                    className="row mt-2 bg-dark-gray bg-dark-hover cursor-pointer border-radius-8 caption-small p-3"
                     onClick={handleShowUnlockModal}
                   >
                     <div className="d-flex justify-content-between px-0">
@@ -235,7 +235,7 @@ export default function LockBeproStep({
           </div>
         </div>
 
-        <div className="col bg-dark-gray border-radius-8 p-20">
+        <div className="col bg-dark-gray border-radius-8 p-3">
           <p className="caption-medium text-gray mb-4">
             <span className="text-primary">{networkTokenName}</span>{" "}
             {t("misc.locked")}

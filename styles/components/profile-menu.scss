@@ -1,0 +1,13 @@
+.profile-menu {
+  .text-primary {
+    svg {
+      color: var(--bs-primary);
+    }
+  }
+
+  .text-danger {
+    svg {
+      color: var(--bs-danger) !important;
+    }
+  }
+}

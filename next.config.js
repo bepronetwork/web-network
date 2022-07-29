@@ -83,6 +83,11 @@ const serverRuntimeConfig = {
     skip: process.env.NEXT_SKIP_IP_API || false,
   },
   walletPrivateKey: process.env.NEXT_WALLET_PRIVATE_KEY,
+  elasticSearch:{
+    url: process.env.NEXT_ELASTIC_SEARCH_URL,
+    username: process.env.NEXT_ELASTIC_SEARCH_USERNAME,
+    password: process.env.NEXT_ELASTIC_SEARCH_PASSWORD,
+  },
   infura:{
     host: process.env.NEXT_IPFS_HOST,
     port: process.env.NEXT_IPFS_PORT,

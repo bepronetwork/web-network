@@ -38,9 +38,9 @@ export default function ImageUploader({
   return (
     <div className="d-flex flex-column align-items-center justify-content-center">
       <label
-        className={`bg-black image-uploader ${
+        className={`bg-black image-uploader border border-white-50 rounded-10 ${
           (lg && "lg") || ""
-        } border-radius-8 d-flex flex-column text-center align-items-center justify-content-center ${
+        } d-flex flex-column text-center align-items-center justify-content-center ${
           (error && "error") || ""
         } ${className}`}
         htmlFor={name}

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "16.13.2"
+    "node": "^16.13.2"
   },
   "scripts": {
     "prestart": "npm run migrate",
@@ -28,15 +28,16 @@
     "ganache:dev": "ganache -h 0.0.0.0 -p 8545 -a 50  -s 0x6d2119524d65ea0b15b214ef260d3acdf8ca0ec6ec68045b5785d970f5ad97bd3d0025d212e625a8a21920852cc165c10faa6d8387a0c2530d1ffc0d265d92935749"
   },
   "dependencies": {
-    "@taikai/dappkit": "2.0.3",
+    "@elastic/elasticsearch": "^8.2.1",
+    "@metamask/jazzicon": "^2.0.0",
+    "@taikai/dappkit": "2.0.6",
     "@vlsergey/react-bootstrap-pagination": "^3.2.1",
     "abort-controller": "^3.0.0",
     "axios": "^0.26.1",
-    "bootstrap": "^5.1.3",
+    "bootstrap": "5.1.3",
     "clsx": "^1.1.1",
     "cors": "^2.8.5",
     "cron": "^1.8.2",
-    "cross-env": "^7.0.3",
     "date-fns": "^2.28.0",
     "dotenv": "^16.0.0",
     "file-type": "^17.1.1",
@@ -80,11 +81,12 @@
     "@types/formidable": "^2.0.4",
     "@types/lodash": "^4.14.180",
     "@types/node": "^17.0.21",
-    "@types/react": "^17.0.40",
+    "@types/react": "17.0.40",
     "@types/react-select": "^5.0.1",
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.15.0",
     "@typescript-eslint/parser": "^5.15.0",
+    "cross-env": "^7.0.3",
     "eslint": "8.11.0",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-import-helpers": "^1.2.1",

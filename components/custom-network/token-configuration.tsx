@@ -8,21 +8,27 @@ import DeployNFTModal from "components/deploy-nft-modal";
 import Step from "components/step";
 import TokensDropdown from "components/tokens-dropdown";
 
+import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
 
+import { StepWrapperProps } from "interfaces/stepper";
 import { BEPRO_TOKEN, Token } from "interfaces/token";
 
 const { publicRuntimeConfig } = getConfig();
 
-export default function TokenConfiguration({
-    step,
-    currentStep,
-    handleChangeStep
-}) {
+export default function TokenConfiguration({ 
+  activeStep, 
+  index, 
+  validated, 
+  handleClick, 
+  finishLabel, 
+  handleFinish 
+} : StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
-
+  
+  const { wallet } = useAuthentication();
   const [bountyTokenAddress, setBountyTokenAddress] = useState("");
   const [bountyTokenUri, setBountyTokenUri] = useState("");
   const [bountyTokenUriError, setBountyTokenUriError] = useState(false);
@@ -66,7 +72,7 @@ export default function TokenConfiguration({
 
   function setDeployedAddress(address) {
     setBountyTokenAddress(address);
-    fields.bountyToken.setter(bountyTokenAddress);
+    fields.bountyToken.setter(address);
   }
 
   function validateTokenUri() {
@@ -109,13 +115,19 @@ export default function TokenConfiguration({
     validateNFTAddress();
   }, [tokens?.settler, tokens?.bounty, DAOService]);
  
+  useEffect(() => {
+    if(bountyTokenAddress.length < 18) validateNFTAddress()
+  },[bountyTokenAddress])
+  
   return (
     <Step
       title={t("custom-network:steps.token-configuration.title")}
-      index={step}
-      activeStep={currentStep}
-      validated={tokens.validated}
-      handleClick={handleChangeStep}
+      index={index}
+      activeStep={activeStep}
+      validated={validated}
+      handleClick={handleClick}
+      handleFinish={handleFinish}
+      finishLabel={finishLabel}
     >
       <div className="row">
         <TokensDropdown 
@@ -123,12 +135,13 @@ export default function TokenConfiguration({
           description={t("custom-network:steps.token-configuration.fields.tokens-dropdown.description")}
           tokens={customTokens} 
           canAddToken={
-            activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address ? 
+            activeNetwork?.name === publicRuntimeConfig?.networkConfig?.networkName ? 
             publicRuntimeConfig?.networkConfig?.allowCustomTokens :
             !!activeNetwork?.allowCustomTokens
           }
           addToken={addToken} 
           setToken={handleNetworkTokenChange}
+          userAddress={wallet?.address}
         /> 
       </div>
 

@@ -32,6 +32,7 @@ export interface ApplicationState {
   isTransactionalTokenApproved?: boolean;
   isSettlerTokenApproved?: boolean;
   networksSummary?: NetworksSummary;
+  showCreateBounty?: boolean;
 }
 
 export interface NetworksSummary {

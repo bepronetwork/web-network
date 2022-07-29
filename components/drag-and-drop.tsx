@@ -19,10 +19,13 @@ export interface IFilesProps {
 
 interface IDragAndDropProps {
   onUpdateFiles: (files: IFilesProps[]) => void;
+  review?: boolean
+  disabled?: boolean;
+  externalFiles?: IFilesProps[]
 }
 
-export default function DragAndDrop({ onUpdateFiles }: IDragAndDropProps) {
-  const [files, setFiles] = useState<IFilesProps[]>([] as IFilesProps[]);
+export default function DragAndDrop ({ externalFiles, onUpdateFiles, review = false, disabled }: IDragAndDropProps) {
+  const [files, setFiles] = useState<IFilesProps[]>(externalFiles ? externalFiles : [] as IFilesProps[]);
   const { t } = useTranslation(["common"]);
   const { uploadFiles } = useApi();
 
@@ -60,7 +63,8 @@ export default function DragAndDrop({ onUpdateFiles }: IDragAndDropProps) {
   const useDrop = {
     accept: "image/jpeg, image/png, application/pdf",
     maxSize: 32000000, //32mb (max size ipfs)
-    onDropAccepted
+    onDropAccepted,
+    disabled
   };
   const { getRootProps, getInputProps, isDragActive, isDragReject } =
     useDropzone(useDrop);
@@ -73,16 +77,17 @@ export default function DragAndDrop({ onUpdateFiles }: IDragAndDropProps) {
   const filesNames = files?.map((file, i) => (
     <span key={i} className="selected-file-item my-1 mx-2 text-lowercase">
       {truncateAddress(file?.name, 17, 3)}{" "}
-      {file.uploaded ? (
-        <CloseIcon
+      {file.uploaded ? 
+        !review && (
+          <CloseIcon
           width={8}
           height={8}
           className="ms-2 cursor-pointer"
           onClick={() => {
             handlerRemove(file);
           }}
-        />
-      ) : (
+        />)
+       : (
         <span className="spinner-border spinner-border-sm" />
       )}
     </span>
@@ -91,7 +96,8 @@ export default function DragAndDrop({ onUpdateFiles }: IDragAndDropProps) {
   return (
     <>
       <div className="d-flex flex-wrap align-items-center text-center">
-        <button
+        {!review && (
+          <button
           {...getRootProps({
             className:
               "dropzone border border-dark-gray bg-transparent rounded-pill p-2 mr-2"
@@ -109,6 +115,7 @@ export default function DragAndDrop({ onUpdateFiles }: IDragAndDropProps) {
             )}
           </div>
         </button>
+        )}
 
         {filesNames}
       </div>

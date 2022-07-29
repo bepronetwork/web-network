@@ -1,7 +1,7 @@
 import { isMobile } from "react-device-detect";
 
 import { GetServerSideProps } from "next";
-import { getSession, SessionProvider } from "next-auth/react";
+import { SessionProvider } from "next-auth/react";
 import { appWithTranslation } from "next-i18next";
 import { AppProps } from "next/app";
 
@@ -18,7 +18,7 @@ import "../styles/styles.scss";
 
 function App({
   Component,
-  pageProps: { session, currentIssue, ...pageProps }
+  pageProps: { session, currentIssue, ...pageProps },
 }: AppProps) {
   if (isMobile) {
     return <MobileNotSupported />;
@@ -28,17 +28,13 @@ function App({
     <>
       <Seo issueMeta={currentIssue} />
       <SessionProvider session={session}>
-        <WebThreeDialog>
-          <RootProviders>
-            <NationDialog>
-              <MainNav />
-              <div className="pb-5">
-                <Component {...pageProps} />
-              </div>
-              <StatusBar />
-            </NationDialog>
-          </RootProviders>
-        </WebThreeDialog>
+        <WebThreeDialog />
+        <RootProviders>
+          <NationDialog />
+          <MainNav />
+          <Component {...pageProps} />
+          <StatusBar />
+        </RootProviders>
       </SessionProvider>
     </>
   );
@@ -46,8 +42,8 @@ function App({
 
 export default appWithTranslation(App);
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps: GetServerSideProps = async () => {
   return {
-    props: { session: await getSession(ctx) }
+    props: {},
   };
 };

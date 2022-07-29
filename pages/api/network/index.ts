@@ -59,7 +59,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
 
     // Contract Validations
-    const DAOService = new DAO(true);
+    const DAOService = new DAO({ skipWindowAssignment: true });
 
     if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
     if (!await DAOService.loadRegistry()) return res.status(500).json("Failed to load registry");
@@ -90,7 +90,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const octokitUser = new Octokit({
       auth: accessToken
     });
-
     const repos = JSON.parse(repositories);
 
     const invitations = [];
@@ -98,14 +97,17 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     for (const repository of repos) {
       const [owner, repo] = repository.fullName.split("/");
 
-      const { data } = await octokitUser.rest.repos.addCollaborator({
+      await octokitUser.rest.repos.addCollaborator({
         owner,
         repo,
         username: publicRuntimeConfig?.github?.user,
         ...(githubLogin !== owner  && { permission: "maintain"} || {})
+      })
+      .then(({data}) => invitations.push(data?.id))
+      .catch((e) => {
+        console.error('[GH Add Colaborator Fail]', {e})
+        return e;
       });
-
-      if (data?.id) invitations.push(data?.id);
     }
 
     const octokitBot = new Octokit({
@@ -116,6 +118,9 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       if (invitation_id)
         await octokitBot.rest.repos.acceptInvitationForAuthenticatedUser({
           invitation_id
+        }).catch((e)=>{
+          console.error('[GH Accpet Invitation Fail]', {e})
+          return e;
         });
     }
 
@@ -194,7 +199,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     }
 
     // Contract Validations
-    const DAOService = new DAO(true);
+    const DAOService = new DAO({ skipWindowAssignment: true });
 
     if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
     if (!await DAOService.loadRegistry()) return res.status(500).json("Failed to load factory contract");

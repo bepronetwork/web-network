@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
@@ -14,6 +14,7 @@ import UpdateBountyAmountModal from "components/update-bounty-amount-modal";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/add-toast";
@@ -42,7 +43,10 @@ export default function PageActions({
   const [isExecuting, setIsExecuting] = useState(false);
   const [showPRModal, setShowPRModal] = useState(false);
   const [showGHModal, setShowGHModal] = useState(false);
+  const [showHardCancelModal, setShowHardCancelModal] = useState(false);
   const [showUpdateAmount, setShowUpdateAmount] = useState(false);
+
+  const [isCancelable, setIsCancelable] = useState(false);
 
   const {
     dispatch
@@ -50,7 +54,8 @@ export default function PageActions({
 
   const { activeRepo } = useRepos();
   const { activeNetwork } = useNetwork();
-  const { handleReedemIssue, handleCreatePullRequest } = useBepro();
+  const { handleReedemIssue, handleHardCancelBounty, handleCreatePullRequest } = useBepro();
+  const {service: DAOService} = useDAO()
   const { wallet, user, updateWalletBalance } = useAuthentication();
   const { networkIssue, activeIssue, getNetworkIssue, updateIssue } = useIssue();
   const { createPrePullRequest, cancelPrePullRequest, startWorking, processEvent } = useApi();
@@ -60,7 +65,8 @@ export default function PageActions({
   const isCouncilMember = !!wallet?.isCouncil;
   const isBountyInDraft = !!networkIssue?.isDraft;
   const isBountyFinished = !!networkIssue?.isFinished;
-  const isLoggedIn = !!wallet?.address && !!user?.login;
+  const isWalletConnected = !!wallet?.address;
+  const isWalletAndGHConnected = isWalletConnected && !!user?.login;
   const isWorkingOnBounty = !!activeIssue?.working?.find((login) => login === user?.login);
   const isBountyOpen = networkIssue?.closed === false && networkIssue?.canceled === false;
 
@@ -89,13 +95,31 @@ export default function PageActions({
         updateBountyData();
       });
   }
+ 
+  async function handleHardCancel() {
+    setShowHardCancelModal(false)
+    handleHardCancelBounty()
+      .then(() => {
+        updateWalletBalance();
+        updateBountyData();
+      });
+  }
+
+  useEffect(()=>{
+    if(DAOService && networkIssue)
+      (async()=>{
+        const cancelableTime = await DAOService.getCancelableTime();
+        const canceable = +new Date() >= +new Date(networkIssue.creationDate + cancelableTime) 
+        setIsCancelable(canceable)
+      })()
+  },[DAOService, networkIssue])
 
   async function handlePullrequest({
     title: prTitle,
     description: prDescription,
     branch
   }): Promise<void> {
-    if(!activeRepo.hasGhVisibility) return setShowGHModal(true)
+    if(!activeRepo?.hasGhVisibility) return setShowGHModal(true)
     let pullRequestPayload = undefined;
 
     createPrePullRequest(repoId as string, issueGithubID, {
@@ -155,7 +179,7 @@ export default function PageActions({
   }
 
   async function handleStartWorking() {
-    if(!activeRepo.hasGhVisibility) return setShowGHModal(true)
+    if(!activeRepo?.hasGhVisibility) return setShowGHModal(true)
     setIsExecuting(true);
 
     startWorking(networkIssue?.cid, user?.login, activeNetwork?.name)
@@ -184,7 +208,7 @@ export default function PageActions({
   }
 
   function renderForkRepositoryLink() {
-    if (isLoggedIn && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isRepoForked)
+    if (isWalletAndGHConnected && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isRepoForked)
       return (
         <GithubLink
           repoId={String(repoId)}
@@ -197,8 +221,14 @@ export default function PageActions({
   }
 
   function renderStartWorkingButton() {
-    if (isLoggedIn && !isBountyInDraft && !isBountyFinished && isBountyOpen && !isWorkingOnBounty && isRepoForked)
-      return (
+    if (isWalletAndGHConnected && 
+        !isBountyInDraft && 
+        !isBountyFinished && 
+        isBountyOpen && 
+        !isWorkingOnBounty && 
+        isRepoForked &&
+        !!activeIssue?.contractId)
+      return(
         <ReadOnlyButtonWrapper>
           <Button
             color="primary"
@@ -220,18 +250,17 @@ export default function PageActions({
   }
 
   function renderCreatePullRequestButton() {
-    if (isLoggedIn &&
-      isBountyOpen &&
-      !isBountyInDraft &&
-      isWorkingOnBounty &&
-      !hasOpenPullRequest &&
-      isRepoForked)
-      return (
+    if (isWalletAndGHConnected && 
+        isBountyOpen && 
+        !isBountyInDraft && 
+        isWorkingOnBounty && 
+        isRepoForked)
+      return(
         <ReadOnlyButtonWrapper>
           <Button
             className="read-only-button"
             onClick={() => setShowPRModal(true)}
-            disabled={!user?.login || !wallet?.address || hasOpenPullRequest}
+            disabled={!user?.login || !wallet?.address}
           >
             <Translation ns="pull-request" label="actions.create.title" />
           </Button>
@@ -239,9 +268,24 @@ export default function PageActions({
       );
   }
 
-  function renderCancelButton() {
-    if (isLoggedIn && isBountyOpen && isBountyOwner && isBountyInDraft)
+  function renderHardCancelButton() {
+    if (wallet?.isNetworkGovernor && isCancelable)
       return (
+        <ReadOnlyButtonWrapper>
+          <Button
+            color="danger"
+            className="read-only-button me-1"
+            onClick={()=>setShowHardCancelModal(true)}
+          >
+            <Translation ns="common" label="actions.cancel" />
+          </Button>
+        </ReadOnlyButtonWrapper>
+      );
+  }
+
+  function renderCancelButton() {
+    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft)
+      return(
         <ReadOnlyButtonWrapper>
           <Button
             className="read-only-button me-1"
@@ -254,8 +298,8 @@ export default function PageActions({
   }
 
   function renderUpdateAmountButton() {
-    if (isLoggedIn && isBountyOpen && isBountyOwner && isBountyInDraft)
-      return (
+    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft)
+      return(
         <ReadOnlyButtonWrapper>
           <Button
             className="read-only-button me-1"
@@ -268,21 +312,19 @@ export default function PageActions({
   }
 
   function renderCreateProposalButton() {
-    if (isLoggedIn && isCouncilMember && isBountyOpen && isBountyFinished && hasPullRequests)
-      return (
+    if (isWalletConnected && isCouncilMember && isBountyOpen && isBountyFinished && hasPullRequests)
+      return(
         <NewProposal amountTotal={networkIssue?.tokenAmount} pullRequests={activeIssue?.pullRequests} />
       );
   }
 
   function renderViewPullRequestLink() {
-    if (isLoggedIn && !isBountyInDraft && hasOpenPullRequest)
-      return (
+    if (isWalletAndGHConnected && !isBountyInDraft && hasOpenPullRequest)
+      return(
         <GithubLink
           repoId={String(repoId)}
           forcePath={activeIssue?.repository?.githubPath}
-          hrefPath={`pull/${activeIssue?.pullRequests?.find((pr) => pr.githubLogin === user?.login)
-              ?.githubId || ""
-            }`}
+          hrefPath={`pull?q=base:${activeIssue?.branch}`}
           color="primary"
         >
           <Translation ns="pull-request" label="actions.view" />
@@ -302,6 +344,8 @@ export default function PageActions({
             <div className="d-flex flex-row align-items-center gap-20">
               <ForksAvatars forks={activeRepo?.forks || []} repositoryPath={activeIssue?.repository?.githubPath} />
 
+              {renderHardCancelButton()}
+
               {renderForkRepositoryLink()}
 
               {renderStartWorkingButton()}
@@ -318,9 +362,7 @@ export default function PageActions({
 
               <GithubLink
                 repoId={String(repoId)}
-                onClick={() => {
-                  if(!activeRepo.hasGhVisibility) return setShowGHModal(true)
-                }}
+                onClick={!activeRepo?.hasGhVisibility ? () => setShowGHModal(true) : null}
                 forcePath={activeIssue?.repository?.githubPath}
                 hrefPath={`${(activeIssue?.state?.toLowerCase() === "pull request" && "pull") ||
                   "issues"
@@ -364,6 +406,18 @@ export default function PageActions({
         onOkClick={() => setShowGHModal(false)}
       >
         <h5 className="text-center"><Translation ns="common" label="modals.gh-access.content" /></h5>
+      </Modal>
+      
+      <Modal
+        title={t("modals.hard-cancel.title")}
+        centerTitle
+        show={showHardCancelModal}
+        onCloseClick={() => setShowHardCancelModal(false)}
+        cancelLabel={t("actions.close")}
+        okLabel={t("actions.continue")}
+        onOkClick={handleHardCancel}
+      >
+        <h5 className="text-center"><Translation ns="common" label="modals.hard-cancel.content" /></h5>
       </Modal>
     </div>
   );

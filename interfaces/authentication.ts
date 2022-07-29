@@ -12,12 +12,13 @@ export interface Repository {
   name: string;
   nameWithOwner: string;
   isFork: boolean;
-  isOrganization?: boolean;
+  isInOrganization?: boolean;
 }
 
 export interface Wallet {
   address: string;
   isCouncil: boolean;
+  isNetworkGovernor: boolean;
   balance?: IBalance;
 }
 

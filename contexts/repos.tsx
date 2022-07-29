@@ -188,10 +188,6 @@ export const ReposProvider: React.FC = function ({ children }) {
     }
   }, [activeNetwork]);
 
-  useEffect(() => {
-    //console.warn('useRepo',{activeRepo, repoList, branchsList, forksList})
-  }, [activeRepo, repoList, branchsList, forksList]);
-
   const memorizeValue = useMemo<ReposContextData>(() => ({
       repoList: repoList[activeNetwork?.name]?.repos,
       branchsList,

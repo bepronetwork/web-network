@@ -1,51 +1,86 @@
-import { useState } from "react";
+import { ReactElement, ReactNode, useContext, useEffect, useState } from "react";
 
+import { Defaults } from "@taikai/dappkit";
 import getConfig from "next/config";
 import { useRouter } from "next/router";
 
-import BeproLogo from "assets/icons/bepro-logo";
 import BeproLogoBlue from "assets/icons/bepro-logo-blue";
-import BeproSmallLogo from "assets/icons/bepro-small-logo";
-import ExternalLinkIcon from "assets/icons/external-link-icon";
 import HelpIcon from "assets/icons/help-icon";
 import PlusIcon from "assets/icons/plus-icon";
 
-import BalanceAddressAvatar from "components/balance-address-avatar";
 import Button from "components/button";
 import ClosedNetworkAlert from "components/closed-network-alert";
 import ConnectWalletButton from "components/connect-wallet-button";
 import HelpModal from "components/help-modal";
 import InternalLink from "components/internal-link";
-import NetworkIdentifier from "components/network-identifier";
-import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
+import NavAvatar from "components/nav-avatar";
 import TransactionsStateIndicator from "components/transactions-state-indicator";
 import Translation from "components/translation";
 import WrongNetworkModal from "components/wrong-network-modal";
 
+import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
+import { changeShowCreateBountyState } from "contexts/reducers/change-show-create-bounty";
 
-import { formatNumberToNScale } from "helpers/formatNumber";
-import { truncateAddress } from "helpers/truncate-address";
-
+import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
 
 const { publicRuntimeConfig } = getConfig();
+
+interface MyNetworkLink {
+  href: string;
+  label: string | ReactElement;
+  icon?: ReactNode;
+}
 
 export default function MainNav() {
   const { pathname } = useRouter();
 
   const [showHelp, setShowHelp] = useState(false);
+  const {
+    dispatch
+  } = useContext(ApplicationContext);
+  const [myNetwork, setMyNetwork] = useState<MyNetworkLink>({ 
+    label: <Translation label={"main-nav.new-network"} />, 
+    href: "/new-network", 
+    icon: <PlusIcon /> 
+  });
 
   const { wallet } = useAuthentication();
+  const { service: DAOService } = useDAO();
+  const { searchNetworks } = useApi();
   const { network, getURLWithNetwork } = useNetwork();
 
   const isNetworksPage = ["/networks", "/new-network"].includes(pathname);
+  const isBeproNetwork = !network?.name || network?.name === publicRuntimeConfig?.networkConfig?.networkName;
+
+  useEffect(() => {
+    if (!DAOService || !wallet?.address || !isNetworksPage) return;
+
+    DAOService.getNetworkAdressByCreator(wallet.address)
+      .then(async networkAddress => {
+        if (networkAddress === Defaults.nativeZeroAddress) 
+          return setMyNetwork({ 
+            label: <Translation label={"main-nav.new-network"} />, 
+            href: "/new-network", 
+            icon: <PlusIcon /> 
+          });
+
+        const network = await searchNetworks({ networkAddress }).then(({ rows }) => rows[0]);
+
+        setMyNetwork({ 
+          label: <Translation label={"main-nav.my-network"} />, 
+          href: `/${network?.name?.toLowerCase()}`
+        });
+      })
+      .catch(console.log);
+  }, [DAOService, wallet?.address, isNetworksPage]);
 
   return (
     <div
-      className={`main-nav d-flex flex-column ${
-        (isNetworksPage && "bg-shadow") || "bg-primary"
-      }`}
+      className={`main-nav d-flex flex-column justify-content-center
+         bg-${isBeproNetwork || isNetworksPage ? "dark" : "primary"}`}
     >
       {network?.isClosed && <ClosedNetworkAlert />}
 
@@ -58,16 +93,14 @@ export default function MainNav() {
           <InternalLink
             href={getURLWithNetwork("/", { network: network?.name })}
             icon={
-              isNetworksPage ? (
-                <BeproLogoBlue />
-              ) : network?.name !== publicRuntimeConfig?.networkConfig?.networkName ? (
+              !isBeproNetwork ? (
                 <img
                   src={`${publicRuntimeConfig?.ipfsUrl}/${network?.fullLogo}`}
                   width={104}
                   height={32}
                 />
               ) : (
-                <BeproLogo aria-hidden={true} />
+                <BeproLogoBlue />
               )
             }
             className="brand"
@@ -107,7 +140,7 @@ export default function MainNav() {
               <li>
                 <InternalLink
                   href={"/networks"}
-                  label={"Networks"}
+                  label={<Translation label={"main-nav.networks"} />}
                   nav
                   uppercase
                 />
@@ -117,48 +150,34 @@ export default function MainNav() {
             ""}
         </div>
 
-        <div className="d-flex flex-row align-items-center">
-          <a
-            href="https://support.bepro.network/en/articles/5595864-using-the-testnet"
-            className="d-flex align-items-center mr-3 text-decoration-none 
-                       text-white text-uppercase main-nav-link opacity-75 
-                       opacity-100-hover"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <span>
-              <Translation label={"main-nav.get-started"} />
-            </span>
-            <ExternalLinkIcon className="ml-1" />
-          </a>
-
+        <div className="d-flex flex-row align-items-center gap-20">
           {(!isNetworksPage && (
-            <ReadOnlyButtonWrapper>
-              <InternalLink
-                href={getURLWithNetwork("/create-bounty")}
-                icon={<PlusIcon />}
-                label={<Translation label={"main-nav.create-bounty"} />}
-                className="mr-2 read-only-button"
-                iconBefore
-                nav
-                uppercase
+            <div
+            className="btn btn-outline-primary text-white bg-opacity-100  text-uppercase
+          text-decoration-none shadow-none d-flex align-items-center justify-content-center"
+            onClick={() => dispatch(changeShowCreateBountyState(true))}
+          >
+            <span className="new-bounty">
+              <PlusIcon
+                className="me-2"
               />
-            </ReadOnlyButtonWrapper>
+              <Translation label={"main-nav.new-bounty"} />
+            </span>
+          </div>
           )) || (
             <InternalLink
-              href="/new-network"
-              icon={<PlusIcon />}
-              label={"New Network"}
-              className="mr-2"
+              href={myNetwork.href}
+              icon={myNetwork.icon}
+              label={myNetwork.label}
               iconBefore
-              nav
               uppercase
+              outline
             />
           )}
 
           <Button
             onClick={() => setShowHelp(true)}
-            className="ms-2 me-4 opacity-75 opacity-100-hover"
+            className="opacity-75 opacity-100-hover"
             transparent
             rounded
           >
@@ -168,35 +187,21 @@ export default function MainNav() {
           <WrongNetworkModal requiredNetworkId={publicRuntimeConfig?.metaMask?.chainId} />
 
           <ConnectWalletButton>
-            <div className="d-flex account-info align-items-center">
+            <>
+              {/* <Button
+                className="opacity-75 opacity-100-hover"
+                transparent
+                rounded
+              >
+                <NotificationIcon />
+              </Button> */}
+
               <TransactionsStateIndicator />
 
-              <NetworkIdentifier />
-
-              <InternalLink
-                href={getURLWithNetwork("/account")}
-                icon={<BeproSmallLogo />}
-                label={formatNumberToNScale(wallet?.balance?.bepro || 0)}
-                className="mx-3"
-                transparent
-                nav
-              />
-
-              <InternalLink
-                href={getURLWithNetwork("/account")}
-                icon={
-                  <BalanceAddressAvatar
-                    address={truncateAddress(wallet?.address || "", 4)}
-                    balance={wallet?.balance?.eth}
-                    currency={publicRuntimeConfig?.metaMask?.tokenName}
-                  />
-                }
-                className="meta-info d-flex align-items-center"
-              />
-            </div>
+              <NavAvatar />
+            </>
           </ConnectWalletButton>
         </div>
-
         <HelpModal show={showHelp} onCloseClick={() => setShowHelp(false)} />
       </div>
     </div>

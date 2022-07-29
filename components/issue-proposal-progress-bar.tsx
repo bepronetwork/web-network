@@ -13,6 +13,7 @@ export default function IssueProposalProgressBar() {
 
   const [stepColor, setStepColor] = useState<string>("");
   const [currentStep, setCurrentStep] = useState<number>();
+  const [draftTime, setDraftTime] = useState(0);
   
   const { activeNetwork } = useNetwork();
   const { activeIssue, networkIssue } = useIssue();
@@ -27,9 +28,14 @@ export default function IssueProposalProgressBar() {
   const isFinalized = !!networkIssue?.closed;
   const isInValidation = !!networkIssue?.isInValidation;
   const isIssueinDraft = !!networkIssue?.isDraft;
-  const creationDate = networkIssue?.creationDate;
+  const creationDate = networkIssue?.creationDate ;
   const closedDate = networkIssue?.closedDate;
   const isCanceled = activeIssue?.state === "canceled" || !!networkIssue?.canceled;
+  const lastProposalCreationDate = 
+    networkIssue?.proposals?.filter(proposal => !proposal.refusedByBountyOwner && !proposal.isDisputed)
+      .reduce((proposalAnt, proposalCur) => 
+        proposalAnt.creationDate > proposalCur.creationDate && 
+        proposalAnt || proposalCur, { creationDate })?.creationDate;
 
   function toRepresentationHeight() {
     return currentStep === 0 ? "1px" : `${currentStep * 66.7}px`;
@@ -38,14 +44,13 @@ export default function IssueProposalProgressBar() {
   function renderSecondaryText(stepLabel, index) {
     const secondaryTextStyle = { top: "20px" };
 
-    const isHigher = new Date() > addSeconds(creationDate, activeNetwork?.draftTime || 0);
+    const isHigher = creationDate && (new Date() > addSeconds(creationDate, draftTime));
 
-    const item = date => ({
+    const item = (date, toAdd = 0) => ({
       Warning: {
         text: t("bounty:status.until-done", {
           distance: isHigher ? '0 seconds' 
-            : getTimeDifferenceInWords(addSeconds(date, activeNetwork?.draftTime || 0),
-                                       new Date())
+            : getTimeDifferenceInWords(addSeconds(date, toAdd), new Date())
         }),
         color: "warning",
         bgColor: "warning-opac-25"
@@ -66,11 +71,16 @@ export default function IssueProposalProgressBar() {
       text: ""
     };
 
-    if (index === currentStep && currentStep === 1) currentValue = item(creationDate).Started;
+    if (creationDate && index === currentStep && currentStep === 1) 
+      currentValue = item(addSeconds(creationDate, draftTime)).Started;
 
-    if (index === currentStep && isIssueinDraft && !isCanceled) currentValue = item(creationDate).Warning;
+    if (creationDate && index === currentStep && currentStep === 0 && !isCanceled && !isFinalized) 
+      currentValue = item(creationDate, draftTime).Warning;
+    
+    if (lastProposalCreationDate && index === currentStep && currentStep === 2 && !isCanceled && !isFinalized) 
+      currentValue = item(lastProposalCreationDate).Started;
 
-    if (index === currentStep && currentStep === 3) currentValue = item(closedDate).At;
+    if (closedDate && index === currentStep && currentStep === 3) currentValue = item(closedDate).At;
 
     if (currentValue)
       return (
@@ -127,6 +137,10 @@ export default function IssueProposalProgressBar() {
       </Fragment>
     );
   }
+
+  useEffect(() => {
+    if (activeNetwork?.draftTime) setDraftTime(activeNetwork?.draftTime);
+  }, [activeNetwork?.draftTime, activeNetwork?.disputableTime]);
 
   useEffect(() => {
     //Draft -> isIssueInDraft()
