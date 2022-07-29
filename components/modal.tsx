@@ -89,9 +89,7 @@ export default function Modal({
         )}
       </ModalBootstrap.Header>
       <ModalBootstrap.Body>{children}</ModalBootstrap.Body>
-      { (footer || okLabel || cancelLabel ) &&
-        <ModalBootstrap.Footer className="row mx-0">{renderFooter()}</ModalBootstrap.Footer>
-      }
+      <ModalBootstrap.Footer className="row mx-0">{renderFooter()}</ModalBootstrap.Footer>
     </ModalBootstrap>
   );
 }

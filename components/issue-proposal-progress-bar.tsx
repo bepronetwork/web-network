@@ -28,7 +28,7 @@ export default function IssueProposalProgressBar() {
   const isFinalized = !!networkIssue?.closed;
   const isInValidation = !!networkIssue?.isInValidation;
   const isIssueinDraft = !!networkIssue?.isDraft;
-  const creationDate = networkIssue?.creationDate || new Date();
+  const creationDate = networkIssue?.creationDate ;
   const closedDate = networkIssue?.closedDate;
   const isCanceled = activeIssue?.state === "canceled" || !!networkIssue?.canceled;
   const lastProposalCreationDate = 
@@ -44,7 +44,7 @@ export default function IssueProposalProgressBar() {
   function renderSecondaryText(stepLabel, index) {
     const secondaryTextStyle = { top: "20px" };
 
-    const isHigher = new Date() > addSeconds(creationDate, draftTime);
+    const isHigher = creationDate && (new Date() > addSeconds(creationDate, draftTime));
 
     const item = (date, toAdd = 0) => ({
       Warning: {
@@ -71,16 +71,16 @@ export default function IssueProposalProgressBar() {
       text: ""
     };
 
-    if (index === currentStep && currentStep === 1) 
+    if (creationDate && index === currentStep && currentStep === 1) 
       currentValue = item(addSeconds(creationDate, draftTime)).Started;
 
-    if (index === currentStep && currentStep === 0 && !isCanceled && !isFinalized) 
+    if (creationDate && index === currentStep && currentStep === 0 && !isCanceled && !isFinalized) 
       currentValue = item(creationDate, draftTime).Warning;
     
-    if (index === currentStep && currentStep === 2 && !isCanceled && !isFinalized) 
+    if (lastProposalCreationDate && index === currentStep && currentStep === 2 && !isCanceled && !isFinalized) 
       currentValue = item(lastProposalCreationDate).Started;
 
-    if (index === currentStep && currentStep === 3) currentValue = item(closedDate).At;
+    if (closedDate && index === currentStep && currentStep === 3) currentValue = item(closedDate).At;
 
     if (currentValue)
       return (
