@@ -4,8 +4,6 @@ import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
-import Avatar from "components/avatar";
-
 import { useNetwork } from "contexts/network";
 
 import { formatDate } from "helpers/formatDate";
@@ -116,18 +114,6 @@ export default function IssueListItem({
     );
   }
 
-  function renderAvatar() {
-    if (issue?.creatorGithub)
-      return (
-        <Avatar className="mr-2" size="sm" userLogin={issue?.creatorGithub} border />
-      );
-    if (issue?.creatorAddress)
-      return (
-        <Identicon className="mr-2" address={issue?.creatorAddress} size="sm" />
-      );
-    return null;
-  }
-
   function createIssueDate(date: Date) {
     return (
       <span className="caption-medium text-white-40">{formatDate(date)}</span>
@@ -166,11 +152,11 @@ export default function IssueListItem({
           <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2 gap-20">
             <BountyStatusInfo issueState={handleIssueState()} />
             <div className="d-flex align-items-center">
-              {renderAvatar()}
+              <Identicon className="mr-2" address={issue?.creatorAddress} size="sm" />
               {issue?.repository && (
                 <OverlayTrigger
                   key="bottom-githubPath"
-                  placement="bottom"
+                  placement="bottom"  
                   overlay={
                     <Tooltip id={"tooltip-bottom"}>
                       {issue?.repository?.githubPath}
@@ -185,7 +171,7 @@ export default function IssueListItem({
                 </OverlayTrigger>
               )}
             </div>
-            {renderIssueData(issue?.state)}
+            {renderIssueData(handleIssueState())}
             {createIssueDate(issue?.createdAt)}
           </div>
         </div>

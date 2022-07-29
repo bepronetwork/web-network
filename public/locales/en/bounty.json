@@ -46,7 +46,8 @@
     "pending": "pending",
     "in-progress": "in progress",
     "open": "open",
-    "funding": "funding"
+    "funding": "funding",
+    "proposal": "proposal"
   },
   "actions": {
     "redeem": "Redeem",

@@ -1,22 +1,25 @@
+import { ReactElement } from "react";
 import { Badge as ReactBadge } from "react-bootstrap";
 
 interface BadgeProps {
-  label: string;
+  label?: string | ReactElement;
   color?: string;
   className?: string;
+  children?: ReactElement
 }
 
 export default function Badge({
   label,
   color = "primary",
-  className
+  className,
+  children
 }: BadgeProps) {
   return(
     <ReactBadge 
       className={className || "p-small family-Regular text-uppercase"}
-      bg={color}
+      bg={color} 
     >
-      {label}
+      {label ? label : children}
     </ReactBadge>
   );
 }
