@@ -50,7 +50,7 @@ const repoList: ReposList = [];
 
 export default function useApi() {
   client.interceptors.request.use(config => {
-    config.headers["wallet"] = typeof window !== 'undefined' && localStorage.getItem("currentWallet") || ""
+    config.headers["wallet"] = typeof window !== 'undefined' && sessionStorage.getItem("currentWallet") || ""
 
     return config;
   });
