@@ -157,9 +157,7 @@ export const AuthenticationProvider = ({ children }) => {
   }, [DAOService, wallet?.address]);
 
   useEffect(() => {
-    if (!wallet?.address) return localStorage.setItem("currentWallet", "");
-    
-    localStorage.setItem("currentWallet", wallet.address);
+    sessionStorage.setItem("currentWallet", wallet?.address || "");
     updateWalletBalance();
   }, [pathname, wallet?.address]);
   
