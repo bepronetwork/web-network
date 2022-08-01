@@ -11,11 +11,23 @@ type CombinedHeader = IncomingHttpHeaders & CustomHeader;
 
 const testnet = process.env.NEXT_E2E_TESTNET === "true";
 
-const blackList = {
-  POST: ["network", "pull-request", "repos"],
-  PUT: ["issue/working", "network", "pull-request/review"],
-  DELETE: ["pull-request", "user", "repos"],
-  PATCH: ["user/connect"]
+const pastEventsEvents =  ["created", "canceled", "closed", "disputed", "ready", "updated", "refused"];
+const pastEventsEntities = ["bounty", "proposal", "pull-request"];
+const pastEventsEndPoints = 
+  pastEventsEntities.flatMap(entity => pastEventsEvents.map(event => `past-events/${entity}/${event}`));
+
+const whiteList = {
+  POST: [ "auth/_log",
+          "auth/signin/github",
+          "auth/signout",
+          "graphql", 
+          "issue", 
+          "search/users/address", 
+          "search/users/all", 
+          "search/users/login", 
+          "search/users/total", 
+          "seo",
+          ...pastEventsEndPoints ]
 };
 
 const UnauthorizedResponse = 
@@ -23,9 +35,9 @@ const UnauthorizedResponse =
 
 export async function middleware(req: NextApiRequest) {
   const method = req.method;
-  const endpoint = req.url.split("api/")[1];
 
-  const shouldCheckForToken = blackList[method]?.some(path => (new RegExp(`^${path}$`)).test(endpoint) );
+  const shouldCheckForToken = 
+    method !== "GET" && !whiteList[method]?.some(path => (new RegExp(`${path}$`)).test(req.url) );
 
   if (!testnet && shouldCheckForToken) {
     const token = await getToken({req});
@@ -36,8 +48,7 @@ export async function middleware(req: NextApiRequest) {
     const requestWallet = (req.headers as CombinedHeader).get("wallet")?.toLowerCase();
     const tokenWallet = String(token.wallet)?.toLowerCase();
 
-
-    if (tokenWallet && tokenWallet !== requestWallet)
+    if (tokenWallet && requestWallet !== "" && tokenWallet !== requestWallet)
       return UnauthorizedResponse("Invalid Accounts");
   }
 
