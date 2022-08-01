@@ -8,6 +8,7 @@ import { useNetwork } from "contexts/network";
 
 import { formatDate } from "helpers/formatDate";
 import { formatNumberToNScale } from "helpers/formatNumber";
+import { getIssueState } from "helpers/handleTypeIssue";
 
 import { IssueData } from "interfaces/issue-data";
 import { IssueState } from "interfaces/issue-data";
@@ -120,11 +121,6 @@ export default function IssueListItem({
     );
   }
 
-  function handleIssueState() {
-    if(issue?.amount < issue?.fundingAmount) return "funding"
-    return issue?.state
-  }
-
   return (
     <div
       className="bg-shadow list-item p-3"
@@ -150,7 +146,11 @@ export default function IssueListItem({
             )}
           </h4>
           <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2 gap-20">
-            <BountyStatusInfo issueState={handleIssueState()} />
+            <BountyStatusInfo issueState={getIssueState({
+              state: issue?.state,
+              amount: issue?.amount,
+              fundingAmount: issue?.fundingAmount
+            })} />
             <div className="d-flex align-items-center">
               <Identicon className="mr-2" address={issue?.creatorAddress} size="sm" />
               {issue?.repository && (
@@ -171,7 +171,11 @@ export default function IssueListItem({
                 </OverlayTrigger>
               )}
             </div>
-            {renderIssueData(handleIssueState())}
+            {renderIssueData(getIssueState({
+              state: issue?.state,
+              amount: issue?.amount,
+              fundingAmount: issue?.fundingAmount
+            }))}
             {createIssueDate(issue?.createdAt)}
           </div>
         </div>
