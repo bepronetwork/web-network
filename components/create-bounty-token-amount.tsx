@@ -73,7 +73,6 @@ export default function CreateBountyTokenAmount({
           label={labelSelect}
           tokens={customTokens}
           userAddress={userAddress}
-          defaultToken={defaultToken}
           canAddToken={canAddCustomToken}
           addToken={addToken}
           setToken={setCurrentToken}

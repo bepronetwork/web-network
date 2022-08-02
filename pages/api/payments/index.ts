@@ -5,7 +5,7 @@ import { Op } from "sequelize";
 import models from "db/models";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const [address, networkName] = req.query.params;
+  const { wallet, networkName } = req.query;
 
   const network = await models.network.findOne({
     where: {
@@ -26,7 +26,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       }
     ],
     where: {
-      address,
+      address: wallet,
       transactionHash:{
         [Op.not]: null
       }
