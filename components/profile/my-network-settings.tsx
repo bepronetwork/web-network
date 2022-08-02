@@ -346,11 +346,11 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
         <Col xs="auto">
           <Button
             color="dark-gray"
-            disabled={!isAbleToBeClosed || isClosing}
+            disabled={!isAbleToBeClosed || isClosing || !user?.login}
             className="ml-2"
             onClick={handleCloseNetwork}
           >
-            {!isAbleToBeClosed && <LockedIcon className="me-2" />}
+            {(!isAbleToBeClosed || !user?.login) && <LockedIcon className="me-2" />}
             <span>{t("custom-network:close-network")}</span>
             {isClosing ? (
               <span className="spinner-border spinner-border-xs ml-1" />
