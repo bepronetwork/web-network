@@ -392,6 +392,7 @@ export default function CreateBountyModal() {
       return true;
     if (currentSection === 2 && (!repository || !branch)) return true;
     if (currentSection === 3 && !isTokenApproved) return true;
+    if (currentSection === 3 && isLoadingCreateBounty) return true;
 
     return false;
   }
@@ -603,7 +604,6 @@ export default function CreateBountyModal() {
     }
 
     const txInfo = await DAOService.openBounty(bountyPayload).catch((e) => {
-      cleanFields();
       setIsLoadingCreateBounty(false)
       if (e?.message?.toLowerCase().search("user denied") > -1)
         dispatch(updateTransaction({
