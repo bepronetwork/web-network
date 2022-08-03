@@ -21,5 +21,6 @@ export enum ReduceActionName {
   ChangeSettlerTokenApproval = "ChangeSettlerTokenApproval",
   ChangeNetworksSummary = "ChangeNetworksSummary",
   ClearTransactions = "ClearTransactions",
-  ShowCreateBounty = "ShowCreateBounty"
+  ShowCreateBounty = "ShowCreateBounty",
+  ShowWeb3Dialog = "showWeb3Dialog"
 }
