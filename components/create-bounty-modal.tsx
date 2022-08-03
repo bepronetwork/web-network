@@ -275,8 +275,8 @@ export default function CreateBountyModal() {
             <div className="col-md-6">
               <ReposDropdown
                 onSelected={(opt) => {
+                  setBranch(null)
                   setRepository(opt.value);
-                  setBranch(null);
                 }}
                 value={{
                   label: repository?.path,
@@ -390,7 +390,7 @@ export default function CreateBountyModal() {
       isRewardAmount
     )
       return true;
-    if (currentSection === 2 && !repository && !branch) return true;
+    if (currentSection === 2 && (!repository || !branch)) return true;
     if (currentSection === 3 && !isTokenApproved) return true;
 
     return false;
