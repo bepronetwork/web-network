@@ -1,12 +1,9 @@
-import { isMobile } from "react-device-detect";
-
 import { GetServerSideProps } from "next";
 import { SessionProvider } from "next-auth/react";
 import { appWithTranslation } from "next-i18next";
 import { AppProps } from "next/app";
 
 import MainNav from "components/main-nav";
-import MobileNotSupported from "components/mobile-not-supported";
 import NationDialog from "components/nation-dialog";
 import Seo from "components/seo";
 import StatusBar from "components/status-bar";
@@ -20,16 +17,13 @@ function App({
   Component,
   pageProps: { session, currentIssue, ...pageProps },
 }: AppProps) {
-  if (isMobile) {
-    return <MobileNotSupported />;
-  }
 
   return (
     <>
       <Seo issueMeta={currentIssue} />
       <SessionProvider session={session}>
-        <WebThreeDialog />
         <RootProviders>
+          <WebThreeDialog />
           <NationDialog />
           <MainNav />
           <Component {...pageProps} />

@@ -22,6 +22,7 @@ import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { changeShowCreateBountyState } from "contexts/reducers/change-show-create-bounty";
+import { changeShowWeb3DialogState } from "contexts/reducers/change-show-web3-dialog";
 
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
@@ -76,6 +77,11 @@ export default function MainNav() {
       })
       .catch(console.log);
   }, [DAOService, wallet?.address, isNetworksPage]);
+
+  function handleNewBounty () {
+    if(!window.ethereum) return dispatch(changeShowWeb3DialogState(true))
+    return dispatch(changeShowCreateBountyState(true))
+  } 
 
   return (
     <div
@@ -155,7 +161,7 @@ export default function MainNav() {
             <div
             className="btn btn-outline-primary text-white bg-opacity-100  text-uppercase
           text-decoration-none shadow-none d-flex align-items-center justify-content-center"
-            onClick={() => dispatch(changeShowCreateBountyState(true))}
+            onClick={handleNewBounty}
           >
             <span className="new-bounty">
               <PlusIcon

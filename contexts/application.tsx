@@ -69,7 +69,8 @@ const defaultState: GlobalState = {
       amountInNetwork: 0,
       amountDistributed: 0
     },
-    showCreateBounty: false
+    showCreateBounty: false,
+    showWeb3Dialog: false
   },
   dispatch: () => undefined
 };

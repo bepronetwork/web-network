@@ -32,7 +32,7 @@ export default function FundingSection() {
   const hasReward = networkIssue?.rewardAmount > 0;
   const isBountyFunded = !!networkIssue?.funded;
   const fundsGiven = walletFunds?.reduce((acc, fund) => acc + fund.amount, 0);
-  const futureRewards = fundsGiven / networkIssue.fundingAmount * networkIssue.rewardAmount;
+  const futureRewards = fundsGiven / networkIssue?.fundingAmount * networkIssue?.rewardAmount;
   const transactionalSymbol = networkIssue?.transactionalTokenData?.symbol;
 
   const handleShowFundModal = () => setShowFundModal(true);

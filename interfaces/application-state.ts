@@ -33,6 +33,7 @@ export interface ApplicationState {
   isSettlerTokenApproved?: boolean;
   networksSummary?: NetworksSummary;
   showCreateBounty?: boolean;
+  showWeb3Dialog?: boolean;
 }
 
 export interface NetworksSummary {

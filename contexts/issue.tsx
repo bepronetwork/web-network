@@ -114,9 +114,9 @@ export const IssueProvider: React.FC = function ({ children }) {
     [activeNetwork, query?.repoId, query?.id, user?.accessToken]);
 
   const getNetworkIssue = useCallback(async () => {
-    if (!activeIssue?.contractId || !DAOService?.network?.contractAddress)
+    if ((!activeIssue?.contractId || !DAOService?.network?.contractAddress) || !wallet?.address)
       return;
-
+      
     const bounty = await DAOService.getBounty(activeIssue?.contractId);
 
     const readyPRsCheck = await bountyReadyPRsHasNoInvalidProposals(bounty, DAOService.network).catch(() => -1);

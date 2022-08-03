@@ -34,7 +34,7 @@ export default function RetractModal({
 
     setIsExecuting(true);
     
-    handleRetractFundBounty(networkIssue.id, fundingToRetract.id)
+    handleRetractFundBounty(networkIssue?.id, fundingToRetract.id)
       .then(() => {
         onCloseClick();
         getNetworkIssue();

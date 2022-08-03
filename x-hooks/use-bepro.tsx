@@ -41,7 +41,7 @@ export default function useBepro() {
       const disputeTx = addTransaction({ type: TransactionTypes.dispute },
                                        activeNetwork);
       dispatch(disputeTx);
-      await DAOService.disputeProposal(+networkIssue.id, +proposalscMergeId)
+      await DAOService.disputeProposal(+networkIssue?.id, +proposalscMergeId)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           txWindow.updateItem(disputeTx.payload.id,
                               parseTransaction(txInfo, disputeTx.payload));
