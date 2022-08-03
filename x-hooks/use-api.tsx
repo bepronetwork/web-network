@@ -1,7 +1,17 @@
 import { head } from "lodash";
 import getConfig from "next/config";
 
-import { PastEventsParams, SearchNetworkParams, User } from "interfaces/api";
+import { 
+  PastEventsParams, 
+  CreatePrePullRequestParams, 
+  SearchNetworkParams, 
+  User, 
+  CancelPrePullRequestParams, 
+  StartWorkingParams, 
+  PatchUserParams, 
+  MergeClosedIssueParams,
+  CreateReviewParams
+} from "interfaces/api";
 import { IssueData, pullRequest } from "interfaces/issue-data";
 import { Network } from "interfaces/network";
 import { PaginatedData } from "interfaces/paginated-data";
@@ -12,7 +22,7 @@ import client from "services/api";
 
 import { Entities, Events } from "types/dappkit";
 
-const { publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig: { networkConfig: { networkName: DEFAULT_NETWORK_NAME } } } = getConfig();
 
 interface NewIssueParams {
   title: string;
@@ -39,6 +49,12 @@ type FileUploadReturn = {
 const repoList: ReposList = [];
 
 export default function useApi() {
+  client.interceptors.request.use(config => {
+    config.headers["wallet"] = typeof window !== 'undefined' && sessionStorage.getItem("currentWallet") || ""
+
+    return config;
+  });
+
   async function searchIssues({
     page = "1",
     repoId = "",
@@ -51,7 +67,7 @@ export default function useApi() {
     search = "",
     pullRequester = "",
     proposer = "",
-    networkName = publicRuntimeConfig?.currency?.networkConfig?.networkName
+    networkName = DEFAULT_NETWORK_NAME
   }) {
     const params = new URLSearchParams({
       address,
@@ -83,7 +99,7 @@ export default function useApi() {
     owner = "",
     name = "",
     path = "",
-    networkName = publicRuntimeConfig?.currency?.networkConfig?.networkName
+    networkName = DEFAULT_NETWORK_NAME
   }) {
     const params = new URLSearchParams({
       page,
@@ -98,24 +114,23 @@ export default function useApi() {
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
-  async function getIssue(repoId: string | number, 
-                          ghId: string | number,
-                          networkName = publicRuntimeConfig?.networkConfig?.networkName) {
+  async function getIssue(repoId: string | number, ghId: string | number, networkName = DEFAULT_NETWORK_NAME) {
     return client
       .get<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`)
       .then(({ data }) => data)
       .catch(() => null);
   }
 
-  async function getPayments(address: string, networkName = publicRuntimeConfig?.networkConfig?.networkName) {
+  async function getPayments(wallet: string, networkName = DEFAULT_NETWORK_NAME) {
+    const params = new URLSearchParams({ wallet, networkName }).toString();
+
     return client
-      .get<IssueData[]>(`/payments/${address}/${networkName}`)
+      .get<IssueData[]>(`/payments?${params}`)
       .then(({ data }) => data)
       .catch(() => null);
   }
 
-  async function createIssue(payload: NewIssueParams,
-                             networkName = publicRuntimeConfig?.networkConfig?.networkName) {
+  async function createIssue(payload: NewIssueParams, networkName = DEFAULT_NETWORK_NAME) {
     return client
       .post<number>("/issue", { ...payload, networkName })
       .then(({ data }) => data)
@@ -128,8 +143,7 @@ export default function useApi() {
    * @param networkName 
    * @returns string
    */
-  async function createPreBounty(payload: CreateBounty,
-                                 networkName = publicRuntimeConfig?.networkConfig?.networkName): Promise<string> {
+  async function createPreBounty(payload: CreateBounty, networkName = DEFAULT_NETWORK_NAME): Promise<string> {
     return client
         .post("/issue", { ...payload, networkName })
         .then(({ data }) => data)
@@ -138,26 +152,17 @@ export default function useApi() {
         });
   }
 
-  async function moveIssueToOpen(scIssueId?: string) {
-    return client
-      .post("/past-events/move-to-open", { scIssueId })
-      .then(({ data }) => data)
-      .catch(() => null);
-  }
-
   async function patchIssueWithScId(repoId,
                                     githubId,
                                     scId,
-                                    networkName = publicRuntimeConfig?.networkConfig?.networkName) {
+                                    networkName = DEFAULT_NETWORK_NAME) {
     return client
       .patch("/issue", { repoId, githubId, scId, networkName })
       .then(({ data }) => data === "ok")
       .catch(() => false);
   }
 
-  async function getPendingFor(address: string,
-                               page = "1",
-                               networkName = publicRuntimeConfig?.networkConfig?.networkName) {
+  async function getPendingFor(address: string, page = "1", networkName = DEFAULT_NETWORK_NAME) {
     const search = new URLSearchParams({
       address,
       page,
@@ -170,46 +175,24 @@ export default function useApi() {
       .catch(() => null);
   }
 
-  async function createPrePullRequest(repoId: string,
-                                      githubId: string,
-                                      payload: {
-      title: string;
-      description: string;
-      username: string;
-      branch: string;
-    },
-                                      networkName = publicRuntimeConfig?.networkConfig?.networkName) {
+  async function createPrePullRequest({ 
+    networkName = DEFAULT_NETWORK_NAME,
+    ...rest 
+  } : CreatePrePullRequestParams) {
     return client
-      .post("/pull-request/", { ...payload, repoId, githubId, networkName })
+      .post("/pull-request/", { networkName, ...rest })
       .then(({ data }) => data)
       .catch((error) => {
         throw error;
       });
   }
 
-  async function cancelPrePullRequest({
-    repoId, 
-    issueGithubId, 
-    bountyId,
-    issueCid, 
-    pullRequestGithubId,
-    customNetworkName,
-    creator,
-    userBranch,
-    userRepo
-  }) {
+  async function cancelPrePullRequest({ 
+    networkName = DEFAULT_NETWORK_NAME,
+    ...rest 
+  } : CancelPrePullRequestParams) {
     return client
-      .delete("/pull-request/", {
-        data: { repoId, 
-                issueGithubId, 
-                bountyId,
-                issueCid, 
-                pullRequestGithubId,
-                customNetworkName,
-                creator,
-                userBranch,
-                userRepo }
-      })
+      .delete("/pull-request/", { data: { customNetworkName: networkName, ...rest } })
       .then(({ data }) => data)
       .catch((error) => {
         throw error;
@@ -227,10 +210,9 @@ export default function useApi() {
       });
   }
 
-  async function joinAddressToUser(githubHandle: string,
-                                   payload: { address: string; migrate?: boolean }): Promise<boolean> {
+  async function joinAddressToUser({ wallet, ...rest } : PatchUserParams): Promise<boolean> {
     return client
-      .patch<string>(`/user/connect/${githubHandle}`, payload)
+      .patch<string>(`/user/connect`, { wallet, ...rest })
       .then(() => true)
       .catch((error) => {
         if (error.response) return error.response.data;
@@ -250,8 +232,7 @@ export default function useApi() {
     return client.get<number>("/search/users/total").then(({ data }) => data);
   }
   
-  async function getTotalBounties(state: string, 
-                                  networkName = publicRuntimeConfig.networkConfig.networkName): Promise<number> {
+  async function getTotalBounties(state: string, networkName = DEFAULT_NETWORK_NAME): Promise<number> {
     const search = new URLSearchParams({ state, networkName }).toString();
     return client.get<number>(`/search/issues/total?${search}`).then(({ data }) => data);
   }
@@ -263,7 +244,7 @@ export default function useApi() {
       .catch(() => []);
   }
 
-  async function createRepo(owner, repo, networkName = publicRuntimeConfig?.networkConfig?.networkName) {
+  async function createRepo(owner, repo, networkName = DEFAULT_NETWORK_NAME) {
     return client
       .post("/repos/", { owner, repo, networkName })
       .then(({ status }) => status === 200)
@@ -273,7 +254,7 @@ export default function useApi() {
       });
   }
 
-  async function getReposList(force = false, networkName = publicRuntimeConfig?.networkConfig?.networkName) {
+  async function getReposList(force = false, networkName = DEFAULT_NETWORK_NAME) {
     const search = new URLSearchParams({ networkName }).toString();
 
     if (!force && repoList.length)
@@ -294,7 +275,7 @@ export default function useApi() {
 
   async function processEvent(entity: Entities, 
                               event: Events, 
-                              networkName: string = publicRuntimeConfig?.networkConfig?.networkName,
+                              networkName: string = DEFAULT_NETWORK_NAME,
                               params: PastEventsParams = {}) {
     return client.post(`/past-events/${entity}/${event}`, {
       ...params,
@@ -318,9 +299,7 @@ export default function useApi() {
       });
   }
 
-  async function userHasPR(issueId: string,
-                           login: string,
-                           networkName = publicRuntimeConfig?.networkConfig?.networkName) {
+  async function userHasPR(issueId: string, login: string, networkName = DEFAULT_NETWORK_NAME) {
     const search = new URLSearchParams({
       issueId,
       login,
@@ -336,9 +315,7 @@ export default function useApi() {
       });
   }
 
-  async function getUserPullRequests(page = "1",
-                                     login: string,
-                                     networkName = publicRuntimeConfig?.networkConfig?.networkName) {
+  async function getUserPullRequests(page = "1", login: string, networkName = DEFAULT_NETWORK_NAME) {
     const search = new URLSearchParams({ page, login, networkName }).toString();
 
     return client
@@ -350,49 +327,27 @@ export default function useApi() {
       });
   }
 
-  async function startWorking(issueId: string,
-                              githubLogin: string,
-                              networkName = publicRuntimeConfig?.networkConfig?.networkName) {
+  async function startWorking({ networkName = DEFAULT_NETWORK_NAME, ...rest } : StartWorkingParams) {
     return client
-      .put("/issue/working", { issueId, githubLogin, networkName })
+      .put("/issue/working", { networkName, ...rest })
       .then((response) => response)
       .catch((error) => {
         throw error;
       });
   }
 
-  async function mergeClosedIssue(issueId: string,
-                                  pullRequestId: string,
-                                  mergeProposalId: string,
-                                  address: string,
-                                  networkName = publicRuntimeConfig?.networkConfig?.networkName) {
+  async function mergeClosedIssue({ networkName = DEFAULT_NETWORK_NAME, ...rest } : MergeClosedIssueParams) {
     return client
-      .post("/pull-request/merge", {
-        issueId,
-        pullRequestId,
-        mergeProposalId,
-        address,
-        networkName
-      })
+      .post("/pull-request/merge", { networkName, ...rest})
       .then((response) => response)
       .catch((error) => {
         throw error;
       });
   }
 
-  async function createReviewForPR(issueId: string,
-                                   pullRequestId: string,
-                                   githubLogin: string,
-                                   body: string,
-                                   networkName = publicRuntimeConfig?.networkConfig?.networkName) {
+  async function createReviewForPR({ networkName = DEFAULT_NETWORK_NAME, ...rest } : CreateReviewParams) {
     return client
-      .put("/pull-request/review", {
-        issueId,
-        pullRequestId,
-        githubLogin,
-        body,
-        networkName
-      })
+      .put("/pull-request/review", { networkName, ...rest })
       .then((response) => response)
       .catch(error => {
         throw error;
@@ -542,7 +497,6 @@ export default function useApi() {
     isNetworkOwner,
     joinAddressToUser,
     mergeClosedIssue,
-    moveIssueToOpen,
     patchIssueWithScId,
     processEvent,
     removeRepo,

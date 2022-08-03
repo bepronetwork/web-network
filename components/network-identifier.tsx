@@ -22,9 +22,8 @@ export default function NetworkIdentifier() {
   const { wallet } = useAuthentication();
 
   function updateNetwork() {
-    if (!wallet?.address) return;
-
     const chainId = window?.ethereum?.chainId;
+    
     dispatch(changeNetworkId(+chainId));
     dispatch(changeNetwork((publicRuntimeConfig?.networkIds[+chainId] || "unknown")?.toLowerCase()));
   }

@@ -44,6 +44,7 @@ export default function ProposalActionCard({
     networkIssue?.closed,
     !isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime),
     networkProposal?.isDisputed,
+    networkProposal?.refusedByBountyOwner,
     !networkProposal?.canUserDispute,
     wallet?.balance?.oracles?.locked === 0,
   ].some((v) => v);
