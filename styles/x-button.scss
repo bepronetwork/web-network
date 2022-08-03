@@ -6,6 +6,12 @@ $only-child: 14px;
 }
 
 .btn-outline {
+  &-primary {
+    &:hover {
+      color: $white;
+      background-color: rgba($primary, 0.1);
+    }
+  }
   &-purple {
     &:hover {
       color: $white;

@@ -46,6 +46,6 @@
     "fill-required-fields": "Please fill all required fields.",
     "self-delegate": "You can't delegate Oracles to your own address.",
     "approve-transactions": "Please approve {{currency}} Transactions First. Check it and try again.",
-    "no-delegates": "No delegates found"
+    "no-delegates": "No delegations found"
   }
 }

@@ -211,7 +211,7 @@ function OraclesActions() {
 
   return (
     <>
-      <div className="col-md-5">
+      <div className="col-md-6">
         <div className="content-wrapper h-100">
           <OraclesBoxHeader
             actions={actions}
