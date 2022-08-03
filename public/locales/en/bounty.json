@@ -45,7 +45,9 @@
     "end-time": "at {{data}}",
     "pending": "pending",
     "in-progress": "in progress",
-    "open": "open"
+    "open": "open",
+    "funding": "funding",
+    "proposal": "proposal"
   },
   "actions": {
     "redeem": "Redeem",

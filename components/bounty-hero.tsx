@@ -5,6 +5,8 @@ import GithubInfo from "components/github-info";
 
 import { useIssue } from "contexts/issue";
 
+import { getIssueState } from "helpers/handleTypeIssue";
+
 import BountyStatusInfo from "./bounty-status-info";
 import CustomContainer from "./custom-container";
 import DateLabel from "./date-label";
@@ -14,6 +16,7 @@ import Translation from "./translation";
 export default function BountyHero() {
   const { t } = useTranslation(["bounty", "common"]);
   const { activeIssue, networkIssue } = useIssue();
+
   return (
     <div className="banner-shadow">
       <CustomContainer>
@@ -25,7 +28,11 @@ export default function BountyHero() {
             </div>
 
             <div className="mt-3 pt-1 d-inline-flex align-items-center justify-content-md-start gap-20">
-              <BountyStatusInfo issueState={activeIssue?.state} />
+              <BountyStatusInfo issueState={getIssueState({
+              state: activeIssue?.state,
+              amount: activeIssue?.amount,
+              fundingAmount: activeIssue?.fundingAmount
+              })} />
 
               <div className="d-flex align-items-center">
                 <Avatar

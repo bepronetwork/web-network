@@ -14,6 +14,7 @@ class Issue extends Model {
         creatorAddress: DataTypes.STRING,
         creatorGithub: DataTypes.STRING,
         amount: DataTypes.INTEGER,
+        fundingAmount: DataTypes.INTEGER,
         repository_id: DataTypes.STRING,
         title: DataTypes.TEXT,
         body: DataTypes.TEXT,

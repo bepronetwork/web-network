@@ -28,6 +28,7 @@ export default async function readBountyCreated(events, network: Network_v2, cus
           bounty.creatorAddress = networkBounty.creator;
           bounty.creatorGithub = networkBounty.githubUser;
           bounty.amount = networkBounty.tokenAmount;
+          bounty.fundingAmount = networkBounty.fundingAmount;
           bounty.branch = networkBounty.branch;
           bounty.title = networkBounty.title;
           bounty.contractId = id;

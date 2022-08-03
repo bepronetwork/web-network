@@ -599,8 +599,15 @@ label {
 
 .status {
   padding: math.div($m, 4);
-  border-radius: math.div($m, 8);
+  border-radius: 50px;
   color: $bg-shadow;
+}
+
+.ellipse {
+  width: 6px;
+  height: 6px;
+  border-radius: 5px;
+  margin-top: 6px;
 }
 
 .badge-opaque {
@@ -836,6 +843,15 @@ label {
 .proposal-progress {
   height: 6px;
   border-radius: 19px;
+}
+
+.issue-funding-progress {
+  height: 3px;
+  border-radius: 9px;
+}
+
+.issue-percentage-text {
+  font-size: 8px;
 }
 
 .issue-proposal-progress {
@@ -1149,6 +1165,10 @@ a.row-button svg {
 
 .text-danger {
   color: rgba(var(--bs-danger-rgb), 1) !important;
+}
+
+.text-light-warning {
+  color: $light-warning !important;
 }
 
 .issue-tabs {
