@@ -6,13 +6,13 @@ import GithubInfo from "components/github-info";
 import { useIssue } from "contexts/issue";
 
 import { getIssueState } from "helpers/handleTypeIssue";
+import { truncateAddress } from "helpers/truncate-address";
 
 import BountyStatusInfo from "./bounty-status-info";
 import CustomContainer from "./custom-container";
 import DateLabel from "./date-label";
 import PriceConversor from "./price-conversor";
 import Translation from "./translation";
-import { formatAddress } from "helpers/formatAddress";
 
 export default function BountyHero() {
   const { t } = useTranslation(["bounty", "common"]);
@@ -46,7 +46,7 @@ export default function BountyHero() {
                   label={activeIssue?.creatorGithub ? 
                     ["@", activeIssue?.creatorGithub].join("")
                     :
-                    formatAddress(activeIssue?.creatorAddress)
+                    truncateAddress(activeIssue?.creatorAddress)
                   }
                 />
               </div>

@@ -8,7 +8,7 @@ import models from "db/models";
 import * as CommentsQueries from "graphql/comments";
 import * as IssueQueries from "graphql/issue";
 
-import { formatAddress } from "helpers/formatAddress";
+import { truncateAddress } from "helpers/truncate-address";
 
 import api from "services/api";
 
@@ -56,7 +56,7 @@ export default async function readPullRequestCreated(events, network: Network_v2
 
           const issueLink = 
             `${publicRuntimeConfig?.homeUrl}/bounty?id=${bounty.githubId}&repoId=${bounty.repository_id}`;
-          const creator = bounty?.creatorGithub ? "@"+bounty?.creatorGithub : formatAddress(bounty?.creatorAddress)
+          const creator = bounty?.creatorGithub ? "@"+bounty?.creatorGithub : truncateAddress(bounty?.creatorAddress)
           const body = 
             `${creator}, @${pullRequest.githubLogin} has a solution - [check your bounty](${issueLink})`;
 
