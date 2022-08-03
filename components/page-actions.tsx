@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { isMobile } from "react-device-detect";
 
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
@@ -342,7 +343,8 @@ export default function PageActions({
             </h4>
 
             <div className="d-flex flex-row align-items-center gap-20">
-              <ForksAvatars forks={activeRepo?.forks || []} repositoryPath={activeIssue?.repository?.githubPath} />
+              {!isMobile && 
+              <ForksAvatars forks={activeRepo?.forks || []} repositoryPath={activeIssue?.repository?.githubPath} />}
 
               {renderHardCancelButton()}
 

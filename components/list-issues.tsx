@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { FormControl, InputGroup } from "react-bootstrap";
+import { isMobile } from "react-device-detect";
 
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
@@ -164,7 +165,7 @@ export default function ListIssues({
 
             return 0;
           });
-
+          console.log('tmp', tmp)
           setIssuesPages(tmp);
         } else {
           setIssuesPages([{ page: currentPage, issues: rows }]);
@@ -217,12 +218,19 @@ export default function ListIssues({
     return () => clearTimeout(searchTimeout.current);
   }, [searchState]);
 
+  
+  function isRenderFilter() {
+    if(isMobile) return false
+
+    return (!isListEmpy() || (isListEmpy() && hasFilter()))
+  }
+
   return (
     <CustomContainer 
       className={isProfilePage && "px-0 mx-0" || ""}
       childWrapperClassName={isProfilePage && "justify-content-left" || ""}
     >
-      {!isListEmpy() || (isListEmpy() && hasFilter()) ? (
+      {isRenderFilter() ? (
         <div
           className={"d-flex align-items-center gap-20 list-actions sticky-top"}
         >
