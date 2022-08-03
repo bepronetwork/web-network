@@ -165,7 +165,6 @@ export default function ListIssues({
 
             return 0;
           });
-          console.log('tmp', tmp)
           setIssuesPages(tmp);
         } else {
           setIssuesPages([{ page: currentPage, issues: rows }]);
