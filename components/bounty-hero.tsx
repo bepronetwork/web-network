@@ -12,6 +12,7 @@ import CustomContainer from "./custom-container";
 import DateLabel from "./date-label";
 import PriceConversor from "./price-conversor";
 import Translation from "./translation";
+import { formatAddress } from "helpers/formatAddress";
 
 export default function BountyHero() {
   const { t } = useTranslation(["bounty", "common"]);
@@ -42,7 +43,11 @@ export default function BountyHero() {
                 <GithubInfo
                   parent="hero"
                   variant="user"
-                  label={["@", activeIssue?.creatorGithub].join("")}
+                  label={activeIssue?.creatorGithub ? 
+                    ["@", activeIssue?.creatorGithub].join("")
+                    :
+                    formatAddress(activeIssue?.creatorAddress)
+                  }
                 />
               </div>
 
