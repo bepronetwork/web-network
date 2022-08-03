@@ -1,11 +1,14 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { Modal } from "react-bootstrap";
+import { isMobile } from "react-device-detect";
 
 import { kebabCase } from "lodash";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
 import WebThreeUnavailable from "assets/web3-unavailable";
+
+import MobileNotSupported from "components/mobile-not-supported";
 
 import { ApplicationContext } from "contexts/application";
 import { changeShowWeb3DialogState } from "contexts/reducers/change-show-web3-dialog";
@@ -43,7 +46,9 @@ export default function WebThreeDialog() {
       dispatch(changeShowWeb3DialogState(!window?.ethereum));
   }, [router.pathname]);
 
-  if (showWeb3Dialog)
+  if(showWeb3Dialog && isMobile) return <MobileNotSupported />
+  
+  if (showWeb3Dialog && !isMobile)
     return (
       <div className="container-fluid vw-100 vh-100 bg-image bg-main-image">
         <Modal
