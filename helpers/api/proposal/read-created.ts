@@ -68,6 +68,10 @@ export default async function readProposalCreated(events, network: Network_v2, c
               creator: networkProposal.creator
             });
 
+            bounty.state = "proposal";
+            
+            await bounty.save();
+
             created.push(networkProposal.id);
         
             if (network.contractAddress === publicRuntimeConfig?.contract?.address)

@@ -2,47 +2,35 @@ import React from "react";
 
 import { IssueState } from "interfaces/issue-data";
 
+import Badge from "./badge";
 import Translation from "./translation";
 
 interface IBountyStatusInfo {
   issueState: IssueState;
 }
+
 export default function BountyStatusInfo({ issueState }: IBountyStatusInfo) {
-  function handleColorState() {
-    switch (issueState?.toLowerCase()) {
-    case "draft": {
-      return "bg-white-50";
-    }
-    case "open": {
-      return "bg-primary text-white";
-    }
-    case "in progress": {
-      return "bg-primary text-white";
-    }
-    case "canceled": {
-      return "bg-dark-gray text-white";
-    }
-    case "closed": {
-      return "bg-dark-gray text-white";
-    }
-    case "ready": {
-      return "bg-success";
-    }
-    case "done": {
-      return "bg-success";
-    }
-    case "disputed": {
-      return "bg-danger text-white";
-    }
-    default: {
-      return "primary";
-    }
-    }
-  }
+
+  const colors = {
+    draft: { ellipse: "bg-info", badge: "bg-info-30 text-info" },
+    open: { ellipse: "bg-success", badge: "bg-success-30 text-success"},
+    canceled: { ellipse: "", badge: "bg-danger-30 text-danger-70" },
+    closed: { ellipse: "", badge: "bg-dark-gray text-white-40" },
+    ready: { ellipse: "bg-success", badge: "bg-success-30 text-success" },
+    proposal: { ellipse: "bg-purple", badge: "bg-purple-30 text-purple" },
+    funding: { ellipse: "bg-light-warning", badge: "bg-light-warning-30 text-light-warning" },
+  };
 
   return (
-    <span className={`status caption-small ${handleColorState()}`}>
-      {issueState && <Translation ns="bounty" label={`status.${issueState}`} />}
-    </span>
+      <Badge
+        className={`d-flex status caption-medium py-1 px-3 ${colors[issueState]?.badge}`}
+      >
+        <>
+          {colors[issueState]?.ellipse && <div className={`ellipse bg-primary me-2 ${colors[issueState]?.ellipse}`} />}
+          {issueState && (
+            <Translation ns="bounty" label={`status.${issueState}`} />
+          )}
+        </>
+      </Badge>
   );
 }
