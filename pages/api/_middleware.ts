@@ -27,6 +27,7 @@ const whiteList = {
           "search/users/login", 
           "search/users/total", 
           "seo",
+          "past-events/bulk",
           ...pastEventsEndPoints ]
 };
 
