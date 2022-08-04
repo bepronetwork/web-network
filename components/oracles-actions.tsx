@@ -20,18 +20,27 @@ import OraclesBoxHeader from "components/oracles-box-header";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import { ApplicationContext } from "contexts/application";
-import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
+import { Wallet } from "interfaces/authentication";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 
 import useBepro from "x-hooks/use-bepro";
 
-function OraclesActions() {
+interface OraclesActionsProps {
+  wallet: Wallet;
+  updateWalletBalance: () => void;
+}
+
+
+function OraclesActions({
+  wallet,
+  updateWalletBalance
+} : OraclesActionsProps) {
   const { t } = useTranslation(["common", "my-oracles"]);
 
   const actions: string[] = [
@@ -50,7 +59,6 @@ function OraclesActions() {
   const { activeNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
   const { handleApproveToken } = useBepro();
-  const { wallet, updateWalletBalance } = useAuthentication();
   const { state: { myTransactions }} = useContext(ApplicationContext);
 
   const networkTokenSymbol = activeNetwork?.networkToken?.symbol || t("misc.$token");
@@ -211,7 +219,7 @@ function OraclesActions() {
 
   return (
     <>
-      <div className="col-md-5">
+      <div className="col-md-6">
         <div className="content-wrapper h-100">
           <OraclesBoxHeader
             actions={actions}

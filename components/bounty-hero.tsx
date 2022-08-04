@@ -8,6 +8,7 @@ import GithubInfo from "components/github-info";
 import { useIssue } from "contexts/issue";
 
 import { getIssueState } from "helpers/handleTypeIssue";
+import { truncateAddress } from "helpers/truncate-address";
 
 import BountyStatusInfo from "./bounty-status-info";
 import CustomContainer from "./custom-container";

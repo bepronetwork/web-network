@@ -41,7 +41,7 @@ export const AuthenticationProvider = ({ children }) => {
   const [wallet, setWallet] = useState<Wallet>();
   const [isGithubAndWalletMatched, setIsGithubAndWalletMatched] = useState<boolean>();
   const { getURLWithNetwork } = useNetworkTheme();
-  const { getUserOf } = useApi();
+  const { getUserOf, getUserWith } = useApi();
   const { service: DAOService, connect } = useDAO();
 
   const connectWallet = useCallback(async () => {
@@ -94,9 +94,11 @@ export const AuthenticationProvider = ({ children }) => {
     if (!address || !login || EXCLUDED_PAGES.includes(String(pathname))) 
       return setIsGithubAndWalletMatched(undefined);
 
-    const userLogin = address ? (await getUserOf(address))?.githubLogin : undefined;
+    const databaseUser = login ? await getUserWith(login) : address ? await getUserOf(address) : null;
 
-    if (login) setIsGithubAndWalletMatched(userLogin === login);
+    if (databaseUser?.address && login)
+      setIsGithubAndWalletMatched(login === databaseUser?.githubLogin && address ? address === databaseUser.address : true);
+
   }, [pathname]);
 
   const updateWalletBalance = useCallback(async () => {

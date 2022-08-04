@@ -4,6 +4,10 @@
   "available": "Available",
   "delegated": "Delegated",
   "list-of-delegations": "List of Delegations",
+  "descriptions": {
+    "oracles-delegated-to-others": "Oracles delegated by me to others users",
+    "oracles-delegated-to-me": "Oracles delegated to me by others users"
+  },
   "actions": {
     "lock": {
       "label": "Lock",
@@ -46,6 +50,6 @@
     "fill-required-fields": "Please fill all required fields.",
     "self-delegate": "You can't delegate Oracles to your own address.",
     "approve-transactions": "Please approve {{currency}} Transactions First. Check it and try again.",
-    "no-delegates": "No delegates found"
+    "no-delegates": "No delegations found"
   }
 }
