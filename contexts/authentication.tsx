@@ -96,7 +96,7 @@ export const AuthenticationProvider = ({ children }) => {
 
     const userLogin = address ? (await getUserOf(address))?.githubLogin : undefined;
 
-    if (login) setIsGithubAndWalletMatched(userLogin === login);
+    if (userLogin) setIsGithubAndWalletMatched(userLogin === login);
   }, [pathname]);
 
   const updateWalletBalance = useCallback(async () => {
