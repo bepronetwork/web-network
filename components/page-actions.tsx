@@ -122,7 +122,7 @@ export default function PageActions({
     if(!activeRepo?.hasGhVisibility) return setShowGHModal(true)
     let pullRequestPayload = undefined;
 
-    createPrePullRequest({
+    await createPrePullRequest({
       repoId: String(repoId),
       issueGithubID,
       title: prTitle,
@@ -162,7 +162,6 @@ export default function PageActions({
       })
       .then(() => setShowPRModal(false))
       .catch((err) => {
-        setShowPRModal(false);
         if (pullRequestPayload) cancelPrePullRequest(pullRequestPayload);
 
         if (err.response?.status === 422 && err.response?.data) {

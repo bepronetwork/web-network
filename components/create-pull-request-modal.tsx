@@ -132,6 +132,7 @@ export default function CreatePullRequestModal({
       size="lg"
       show={show}
       onCloseClick={onCloseClick}
+      onCloseDisabled={isCreating}
       title={t("pull-request:actions.create.title")}
       titlePosition="center">
       <div className="container">
@@ -192,7 +193,7 @@ export default function CreatePullRequestModal({
               ""
             )}
           </Button>
-          <Button color="dark-gray" onClick={onCloseClick}>
+          <Button color="dark-gray" onClick={onCloseClick} disabled={isCreating}>
             {t("actions.cancel")}
           </Button>
         </div>
