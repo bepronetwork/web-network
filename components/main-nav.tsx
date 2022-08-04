@@ -152,18 +152,14 @@ export default function MainNav() {
 
         <div className="d-flex flex-row align-items-center gap-20">
           {(!isNetworksPage && (
-            <div
-            className="btn btn-outline-primary text-white bg-opacity-100  text-uppercase
-          text-decoration-none shadow-none d-flex align-items-center justify-content-center"
-            onClick={() => dispatch(changeShowCreateBountyState(true))}
-          >
-            <span className="new-bounty">
-              <PlusIcon
-                className="me-2"
-              />
-              <Translation label={"main-nav.new-bounty"} />
-            </span>
-          </div>
+            <Button 
+              outline
+              onClick={() => dispatch(changeShowCreateBountyState(true))}
+              textClass="text-white"
+            >
+              <PlusIcon />
+              <span><Translation label={"main-nav.new-bounty"} /></span>
+            </Button>
           )) || (
             <InternalLink
               href={myNetwork.href}

@@ -9,5 +9,6 @@ export interface Modal extends ModalProps {
   footer?: ReactElement | ReactElement[];
   onCloseClick?: () => void;
   onCloseDisabled?: boolean;
+  okDisabled?: boolean;
   onOkClick?: () => void;
 }
