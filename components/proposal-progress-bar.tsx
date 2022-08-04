@@ -98,7 +98,9 @@ export default function ProposalProgressBar({
     wallet?.balance?.staked,
     issueDisputeAmount,
     isDisputed,
-    isFinished
+    isFinished,
+    refused,
+    isMerged
   ]);
 
   return (
