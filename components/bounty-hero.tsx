@@ -95,9 +95,7 @@ export default function BountyHero() {
                       {activeIssue?.pullRequests?.length || 0}
                     </span>
                     <span className="caption-small text-white-40 text-uppercase">
-                      {activeIssue?.pullRequests?.length === 1
-                        ? t("info.pull-requests_one")
-                        : t("info.pull-requests_other")}
+                      {t("info.pull-requests", {count: activeIssue?.pullRequests?.length})}
                     </span>
                   </div>
 
@@ -106,9 +104,7 @@ export default function BountyHero() {
                       {activeIssue?.mergeProposals?.length || 0}
                     </span>
                     <span className="caption-small text-white-40 text-uppercase">
-                      {activeIssue?.mergeProposals?.length === 1
-                        ? t("info.proposals_one")
-                        : t("info.proposals_other")}
+                      {t("info.proposals", {count: activeIssue?.mergeProposals?.length})}
                     </span>
                   </div>
 
