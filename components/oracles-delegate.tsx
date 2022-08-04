@@ -9,14 +9,20 @@ import OraclesBoxHeader from "components/oracles-box-header";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import { ApplicationContext } from "contexts/application";
-import { useAuthentication } from "contexts/authentication";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
+import { Wallet } from "interfaces/authentication";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 
-function OraclesDelegate() {
+interface OraclesDelegateProps {
+  wallet: Wallet;
+}
+
+function OraclesDelegate({
+  wallet
+} : OraclesDelegateProps) {
   const { t } = useTranslation(["common", "my-oracles"]);
 
   const [error, setError] = useState<string>("");
@@ -24,7 +30,6 @@ function OraclesDelegate() {
   const [delegatedTo, setDelegatedTo] = useState<string>("");
   const [tokenAmount, setTokenAmount] = useState<number | undefined>();
 
-  const { wallet } = useAuthentication();
   const {
     state: { myTransactions }
   } = useContext(ApplicationContext);
@@ -84,7 +89,7 @@ function OraclesDelegate() {
   }, [wallet?.balance]);
 
   return (
-    <div className="col-md-5">
+    <div className="col-md-6">
       <div className="content-wrapper h-100">
         <OraclesBoxHeader
           actions={t("my-oracles:actions.delegate.title")}

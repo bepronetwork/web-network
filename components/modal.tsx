@@ -25,6 +25,7 @@ export default function Modal({
   onOkClick,
   titleComponent,
   subTitleComponent,
+  okDisabled = false,
   ...params
 }: ModalProps) {
   const modalTitle = `${kebabCase(key || title)}-modal`;
@@ -42,6 +43,7 @@ export default function Modal({
 
           {okLabel && (
             <button
+              disabled={okDisabled}
               className="btn btn-primary"
               onClick={() => onOkClick()}
             >

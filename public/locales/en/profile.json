@@ -2,6 +2,7 @@
   "balance": "Balance",
   "oracle-name-placeholder": "Locked Network Token",
   "deletaged-to-me": "Delegated to me",
+  "deletaged-to-others": "Delegated to others",
   "connect-wallet": "Connect Wallet",
   "connect-github": "Connect Github",
   "connections": "Connections"
