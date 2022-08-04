@@ -1574,6 +1574,10 @@ input[type="color"] {
   }
 }
 
+.read-only-button-mobile {
+  pointer-events: none !important;
+}
+
 .svg {
   &-primary {
     svg {  
