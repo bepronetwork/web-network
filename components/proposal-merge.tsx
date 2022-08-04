@@ -109,6 +109,7 @@ export default function ProposalMerge({
     getCoinInfo()
   }, [
     proposal,
+    amountTotal,
     activeNetwork?.treasury,
     activeNetwork?.mergeCreatorFeeShare,
     activeNetwork?.proposerFeeShare,
