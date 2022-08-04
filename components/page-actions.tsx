@@ -152,6 +152,7 @@ export default function PageActions({
         });
       })
       .then(() => {
+        setShowPRModal(false)
         dispatch(addToast({
           type: "success",
           title: t("actions.success"),
@@ -160,7 +161,6 @@ export default function PageActions({
 
         return updateBountyData();
       })
-      .then(() => setShowPRModal(false))
       .catch((err) => {
         setShowPRModal(false);
         if (pullRequestPayload) cancelPrePullRequest(pullRequestPayload);
