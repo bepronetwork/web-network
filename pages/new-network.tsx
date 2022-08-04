@@ -132,8 +132,6 @@ export default function NewNetwork() {
     await createNetwork(payload)
       .then(() => {
         router.push(getURLWithNetwork("/", { network: payload.name }));
-
-        setCreatingNetwork(undefined);
       })
       .catch((error) => {
         dispatch(addToast({
