@@ -16,6 +16,7 @@ import { addToast } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { updateTransaction } from "contexts/reducers/update-transaction";
 
+import { formatNumberToCurrency } from "helpers/formatNumber";
 import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
@@ -118,7 +119,9 @@ function networkTxButton({
           dispatch(addToast({
               type: "success",
               title: t("actions.success"),
-              content: `${t(`transactions.types.${methodName}`)} ${txParams?.tokenAmount} ${currency}`
+              content: `
+              ${t(`transactions.types.${methodName}`)} ${formatNumberToCurrency(txParams?.tokenAmount)} ${currency}
+              `
           }));
           
           txWindow.updateItem(tmpTransaction.payload.id,
