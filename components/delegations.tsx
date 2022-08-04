@@ -29,13 +29,13 @@ export default function Delegations({
   const renderInfo = {
     toMe: {
       title: t("profile:deletaged-to-me"),
-      description: "Oracles delegated to me by others users",
+      description: t("my-oracles:descriptions.oracles-delegated-to-me"),
       total: undefined,
       delegations: [ wallet?.balance?.oracles?.delegatedByOthers || 0 ]
     },
     toOthers: {
       title: t("profile:deletaged-to-others"),
-      description: "Oracles delegated by me to others users",
+      description: t("my-oracles:descriptions.oracles-delegated-to-others"),
       total: wallet?.balance?.oracles?.delegations?.reduce((acc, delegation) => acc + delegation.amount, 0),
       delegations: wallet?.balance?.oracles?.delegations || []
     }

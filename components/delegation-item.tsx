@@ -67,7 +67,7 @@ export default function DelegationItem({
       <TokenBalance
         icon={oracleToken.icon} 
         symbol={oracleToken.symbol}
-        name={`Locked ${tokenName || oracleToken.name}`}
+        name={`${t("misc.locked")} ${tokenName || oracleToken.name}`}
         balance={delegationAmount}
         type={tokenBalanceType}
         delegation={delegation}

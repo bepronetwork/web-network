@@ -4,6 +4,10 @@
   "available": "Available",
   "delegated": "Delegated",
   "list-of-delegations": "List of Delegations",
+  "descriptions": {
+    "oracles-delegated-to-others": "Oracles delegated by me to others users",
+    "oracles-delegated-to-me": "Oracles delegated to me by others users"
+  },
   "actions": {
     "lock": {
       "label": "Lock",

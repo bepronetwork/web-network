@@ -55,7 +55,7 @@ export default function Oracles() {
         <TokenBalance
           icon={oracleToken.icon} 
           symbol={oracleToken.symbol}
-          name={`Locked ${activeNetwork?.networkToken?.name || oracleToken.name}`}
+          name={`${t("misc.locked")} ${activeNetwork?.networkToken?.name || oracleToken.name}`}
           balance={oraclesLocked}
           type="oracle"
         />
