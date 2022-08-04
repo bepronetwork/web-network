@@ -694,15 +694,6 @@ label {
   border-radius: 54px;
 }
 
-.new-bounty {
-  height: 10px;
-  svg {
-    width: 14px !important;
-    height: 14px !important;
-    margin-bottom: 2px;
-  }
-}
-
 .font-weight-normal {
   font-weight: normal !important;
 }
@@ -1581,6 +1572,10 @@ input[type="color"] {
   .read-only-button {
     pointer-events: none !important;
   }
+}
+
+.read-only-button {
+  pointer-events: none !important;
 }
 
 .svg {

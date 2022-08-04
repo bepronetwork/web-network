@@ -16,6 +16,7 @@ import { ChangeNetworksSummary } from "./change-networks-summary";
 import { ChangeOraclesState } from "./change-oracles";
 import { ChangeSettlerTokenApproval } from "./change-settler-token-approval";
 import { ChangeShowCreateBounty } from "./change-show-create-bounty";
+import { ChangeShowWeb3Dialog } from "./change-show-web3-dialog";
 import { ChangeStakedState } from "./change-staked-amount";
 import { ChangeTransactionalTokenApproval } from "./change-transactional-token-approval";
 import { ChangeWalletState } from "./change-wallet-connect";
@@ -46,6 +47,7 @@ export default function LoadApplicationReducers() {
     ChangeSettlerTokenApproval,
     ChangeNetworksSummary,
     ClearTransactions,
-    ChangeShowCreateBounty
+    ChangeShowCreateBounty,
+    ChangeShowWeb3Dialog
   ].forEach(addReducer);
 }
