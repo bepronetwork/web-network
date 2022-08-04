@@ -1,5 +1,6 @@
 import React from "react";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { isMobile } from "react-device-detect";
 
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
@@ -74,25 +75,30 @@ export default function IssueListItem({
           !isActive ? "bg-black" : "bg-dark-gray"
         } `}
       >
-        <div className="px-0 pt-1 col-md-12">
-          <span
-            className={`caption-large text-opacity-1 text-white${
-              isActive && "-40"
-            }`}
-          >
-            {formatNumberToNScale(issue?.fundingAmount > 0 ? issue?.fundingAmount : issue?.amount || 0)}{" "}
-            <label
-              className={`caption-small text-uppercase ${
-                !isActive ? "text-primary" : "text-white-40"
+        {issue?.fundingAmount > 0 && isMobile ? null : (
+          <div className="px-0 pt-1 col-md-12">
+            <span
+              className={`caption-large text-opacity-1 text-white${
+                isActive && "-40"
               }`}
             >
-              ${issue?.token?.symbol || t("common:misc.token")}
-            </label>
-          </span>
-        </div>
-        {(issue?.fundingAmount > 0) && (
+              {formatNumberToNScale(issue?.fundingAmount > 0
+                  ? issue?.fundingAmount
+                  : issue?.amount || 0)}{" "}
+              <label
+                className={`caption-small text-uppercase ${
+                  !isActive ? "text-primary" : "text-white-40"
+                }`}
+              >
+                ${issue?.token?.symbol || t("common:misc.token")}
+              </label>
+            </span>
+          </div>
+        )}
+
+        {issue?.fundingAmount > 0 && (
           <>
-            <div className="p-0 col-md-6 mt-1">
+            <div className={`p-0 col-md-6 col-10 mt-1 ${isMobile && "pt-1"}`}>
               <div className="bg-dark-gray w-100 issue-funding-progress">
                 <div
                   className={`${
@@ -103,9 +109,9 @@ export default function IssueListItem({
               </div>
             </div>
             <div
-              className={`issue-percentage-text caption-small py-0 pe-0 ps-1 pb-1 col-md-2 ${
+              className={`issue-percentage-text caption-small py-0 pe-0 ps-1 pb-1 col-2 col-md-2 ${
                 percentage !== 100 ? "text-white" : "text-success"
-              }`}
+              } ${isMobile && "pt-1"}`}
             >
               {percentage.toFixed(0)}%
             </div>
@@ -146,35 +152,45 @@ export default function IssueListItem({
             )}
           </h4>
           <div className="d-flex align-center flex-wrap align-items-center justify-content-md-start mt-2 gap-20">
-            <BountyStatusInfo issueState={getIssueState({
-              state: issue?.state,
-              amount: issue?.amount,
-              fundingAmount: issue?.fundingAmount
-            })} />
-            <div className="d-flex align-items-center">
-              <Identicon className="mr-2" address={issue?.creatorAddress} size="sm" />
-              {issue?.repository && (
-                <OverlayTrigger
-                  key="bottom-githubPath"
-                  placement="bottom"  
-                  overlay={
-                    <Tooltip id={"tooltip-bottom"}>
-                      {issue?.repository?.githubPath}
-                    </Tooltip>
-                  }
-                >
-                  <div className="bg-primary rounded-4 px-2 py-1">
-                    <span className="caption-medium text-uppercase mw-github-info">
-                      {issue?.repository?.githubPath.split("/")?.[1]}
-                    </span>
-                  </div>
-                </OverlayTrigger>
-              )}
-            </div>
+            {!isMobile && (
+              <>
+                <BountyStatusInfo
+                  issueState={getIssueState({
+                    state: issue?.state,
+                    amount: issue?.amount,
+                    fundingAmount: issue?.fundingAmount,
+                  })}
+                />
+                <div className="d-flex align-items-center">
+                  <Identicon
+                    className="mr-2"
+                    address={issue?.creatorAddress}
+                    size="sm"
+                  />
+                  {issue?.repository && (
+                    <OverlayTrigger
+                      key="bottom-githubPath"
+                      placement="bottom"
+                      overlay={
+                        <Tooltip id={"tooltip-bottom"}>
+                          {issue?.repository?.githubPath}
+                        </Tooltip>
+                      }
+                    >
+                      <div className="bg-primary rounded-4 px-2 py-1">
+                        <span className="caption-medium text-uppercase mw-github-info">
+                          {issue?.repository?.githubPath.split("/")?.[1]}
+                        </span>
+                      </div>
+                    </OverlayTrigger>
+                  )}
+                </div>
+              </>
+            )}
             {renderIssueData(getIssueState({
-              state: issue?.state,
-              amount: issue?.amount,
-              fundingAmount: issue?.fundingAmount
+                state: issue?.state,
+                amount: issue?.amount,
+                fundingAmount: issue?.fundingAmount,
             }))}
             {createIssueDate(issue?.createdAt)}
           </div>
