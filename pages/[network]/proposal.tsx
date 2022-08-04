@@ -99,12 +99,12 @@ export default function PageProposal() {
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-      updateIssue(activeIssue?.repository_id, activeIssue?.githubId);
-      getNetworkIssue();
-
       return processEvent("proposal", "refused", activeNetwork?.name, { fromBlock } );
     })
     .then(() => {
+      updateIssue(activeIssue?.repository_id, activeIssue?.githubId);
+      getNetworkIssue();
+      
       dispatch(addToast({
         type: "success",
         title: t("actions.success"),
