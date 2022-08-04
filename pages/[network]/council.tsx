@@ -4,14 +4,17 @@ import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
+import CardBecomeCouncil from "components/card-become-council";
 import ListIssues from "components/list-issues";
 import PageHero, { InfosHero } from "components/page-hero";
+
+import { useAuthentication } from "contexts/authentication";
 
 import useApi from "x-hooks/use-api";
 
 export default function PageCouncil() {
   const { t } = useTranslation(["council"]);
-
+  const { wallet } = useAuthentication();
   const { getTotalBounties } = useApi();
 
   const [infos, setInfos] = useState<InfosHero[]>([
@@ -64,7 +67,13 @@ export default function PageCouncil() {
         subtitle={t("council:subtitle")}
         infos={infos}
       />
-
+      <div className="container">
+        <div className="row justify-content-center">
+          <div className="col-md-10 mt-2">
+            {!wallet?.isCouncil && <CardBecomeCouncil />}
+          </div>
+        </div>
+      </div>
       <ListIssues filterState="ready" emptyMessage={t("council:empty")} />
     </div>
   );
