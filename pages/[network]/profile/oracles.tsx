@@ -22,8 +22,8 @@ import { formatNumberToCurrency } from "helpers/formatNumber";
 export default function Oracles() {
   const { t } = useTranslation(["common", "profile"]);
 
-  const { wallet } = useAuthentication();
   const { activeNetwork } = useNetwork();
+  const { wallet, updateWalletBalance } = useAuthentication();
 
   const oracleToken = {
     symbol: t("$oracles"),
@@ -61,9 +61,9 @@ export default function Oracles() {
         />
 
         <Row className="mt-4 mb-4">
-          <OraclesActions />
+          <OraclesActions wallet={wallet} updateWalletBalance={updateWalletBalance} />
 
-          <OraclesDelegate />
+          <OraclesDelegate wallet={wallet} />
         </Row>
 
         <Row>
