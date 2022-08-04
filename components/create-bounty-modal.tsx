@@ -358,6 +358,8 @@ export default function CreateBountyModal() {
 
   //TODO: add some function
   function verifyNextStepAndCreate() {
+    if (isLoadingCreateBounty) return true;
+    
     const isIssueAmount =
       issueAmount.floatValue <= 0 || issueAmount.floatValue === undefined
         ? true
