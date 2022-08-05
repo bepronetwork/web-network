@@ -96,7 +96,7 @@ export default function ProposalActionCard({
           <div className="d-flex flex-row justify-content-between mt-3">
 
             <ProposalMerge 
-              amountTotal={activeIssue?.amount} 
+              amountTotal={Math.max(activeIssue?.amount || 0, activeIssue?.fundingAmount || 0)} 
               tokenSymbol={activeIssue?.token?.symbol} 
               proposal={networkProposal}
               idBounty={activeIssue?.id} 
