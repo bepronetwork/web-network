@@ -43,7 +43,6 @@ export default function NotMergeableModal({
   const { activeIssue, networkIssue } = useIssue();
 
 
-  const isIssueOwner = activeIssue?.creatorAddress.toLowerCase() === wallet?.address.toLowerCase();
   const isIssueOwner = !!activeIssue && activeIssue?.creatorAddress?.toLowerCase() === wallet?.address?.toLowerCase();
   const isPullRequestOwner = pullRequest?.githubLogin === user?.login;
   const isProposer =
