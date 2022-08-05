@@ -60,7 +60,11 @@ export default function BountyHero() {
                     <GithubInfo
                       parent="hero"
                       variant="user"
-                      label={["@", activeIssue?.creatorGithub].join("")}
+                      label={activeIssue?.creatorGithub ? 
+                        ["@", activeIssue?.creatorGithub].join("")
+                        :
+                        truncateAddress(activeIssue?.creatorAddress)
+                      }
                     />
                   </div>
 
