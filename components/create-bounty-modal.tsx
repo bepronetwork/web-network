@@ -275,8 +275,8 @@ export default function CreateBountyModal() {
             <div className="col-md-6">
               <ReposDropdown
                 onSelected={(opt) => {
+                  setBranch(null)
                   setRepository(opt.value);
-                  setBranch(null);
                 }}
                 value={{
                   label: repository?.path,
@@ -358,6 +358,8 @@ export default function CreateBountyModal() {
 
   //TODO: add some function
   function verifyNextStepAndCreate() {
+    if (isLoadingCreateBounty) return true;
+    
     const isIssueAmount =
       issueAmount.floatValue <= 0 || issueAmount.floatValue === undefined
         ? true
@@ -390,8 +392,9 @@ export default function CreateBountyModal() {
       isRewardAmount
     )
       return true;
-    if (currentSection === 2 && !repository && !branch) return true;
+    if (currentSection === 2 && (!repository || !branch)) return true;
     if (currentSection === 3 && !isTokenApproved) return true;
+    if (currentSection === 3 && isLoadingCreateBounty) return true;
 
     return false;
   }
@@ -603,7 +606,6 @@ export default function CreateBountyModal() {
     }
 
     const txInfo = await DAOService.openBounty(bountyPayload).catch((e) => {
-      cleanFields();
       setIsLoadingCreateBounty(false)
       if (e?.message?.toLowerCase().search("user denied") > -1)
         dispatch(updateTransaction({

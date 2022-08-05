@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import InternalLink from "components/internal-link";
 import PageHero, { InfosHero } from "components/page-hero";
 
+import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 
 import useApi from "x-hooks/use-api";
@@ -20,6 +21,7 @@ export default function Oracle({ children }) {
   const { getTotalUsers } = useApi();
   const { service: DAOService } = useDAO();
   const { network: activeNetwork, getURLWithNetwork } = useNetwork();
+  const { wallet } = useAuthentication();
 
   const [infos, setInfos] = useState<InfosHero[]>([
     {
@@ -105,7 +107,7 @@ export default function Oracle({ children }) {
       <div className="container p-footer">
         <div className="row justify-content-center">
           <div className="col-md-10 mt-2">
-            <CardBecomeCouncil />
+            {!wallet?.isCouncil && <CardBecomeCouncil />}
           </div>
           {children}
         </div>

@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { isMobile } from "react-device-detect";
 
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
@@ -122,7 +123,7 @@ export default function PageActions({
     if(!activeRepo?.hasGhVisibility) return setShowGHModal(true)
     let pullRequestPayload = undefined;
 
-    createPrePullRequest({
+    await createPrePullRequest({
       repoId: String(repoId),
       issueGithubID,
       title: prTitle,
@@ -152,6 +153,7 @@ export default function PageActions({
         });
       })
       .then(() => {
+        setShowPRModal(false)
         dispatch(addToast({
           type: "success",
           title: t("actions.success"),
@@ -160,9 +162,7 @@ export default function PageActions({
 
         return updateBountyData();
       })
-      .then(() => setShowPRModal(false))
       .catch((err) => {
-        setShowPRModal(false);
         if (pullRequestPayload) cancelPrePullRequest(pullRequestPayload);
 
         if (err.response?.status === 422 && err.response?.data) {
@@ -351,7 +351,8 @@ export default function PageActions({
             </h4>
 
             <div className="d-flex flex-row align-items-center gap-20">
-              <ForksAvatars forks={activeRepo?.forks || []} repositoryPath={activeIssue?.repository?.githubPath} />
+              {!isMobile && 
+              <ForksAvatars forks={activeRepo?.forks || []} repositoryPath={activeIssue?.repository?.githubPath} />}
 
               {renderHardCancelButton()}
 

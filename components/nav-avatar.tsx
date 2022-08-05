@@ -89,6 +89,7 @@ export default function NavAvatar() {
 
   const internalLinks = [
     Link(t("main-nav.nav-avatar.wallet"), getURLWithNetwork("/profile/wallet")),
+    Link(t("main-nav.nav-avatar.oracles"), getURLWithNetwork("/profile/oracles")),
     Link(t("main-nav.nav-avatar.payments"), getURLWithNetwork("/profile/payments")),
     Link(t("main-nav.nav-avatar.bounties"), getURLWithNetwork("/profile/bounties")),
     Link(t("main-nav.nav-avatar.pull-requests"), getURLWithNetwork("/profile/pull-requests")),

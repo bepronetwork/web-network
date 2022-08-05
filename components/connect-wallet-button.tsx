@@ -13,6 +13,7 @@ import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { changeNetworkId } from "contexts/reducers/change-network-id";
+import { changeShowWeb3DialogState } from "contexts/reducers/change-show-web3-dialog";
 
 import { NetworkColors } from "interfaces/enums/network-colors";
 
@@ -44,7 +45,8 @@ export default function ConnectWalletButton({
     handleShowModal();
   }, [wallet]);
 
-  async function handleLogin() {
+  async function handleLogin()  {
+    if(!window?.ethereum) return dispatch(changeShowWeb3DialogState(true))
     if (DAOService) {
       DAOService.getChainId()
         .then((chainId) => {

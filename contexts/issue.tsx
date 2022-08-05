@@ -116,11 +116,11 @@ export const IssueProvider: React.FC = function ({ children }) {
   const getNetworkIssue = useCallback(async () => {
     if (!activeIssue?.contractId || !DAOService?.network?.contractAddress)
       return;
-
+      
     const bounty = await DAOService.getBounty(activeIssue?.contractId);
 
     const readyPRsCheck = await bountyReadyPRsHasNoInvalidProposals(bounty, DAOService.network).catch(() => -1);
-    const isFinished = 3 === readyPRsCheck;
+    const isFinished = readyPRsCheck !== 0;
     const isInValidation = [2, 3].includes(readyPRsCheck);
 
     let isDraft = null;

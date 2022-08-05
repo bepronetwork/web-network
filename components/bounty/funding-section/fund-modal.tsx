@@ -32,8 +32,8 @@ export default function FundModal({
 
   const { handleFundBounty } = useBepro();
   const { dispatch } = useContext(ApplicationContext);
-  const { allowance, balance, setAddress, approve } = useERC20();
   const { activeIssue, networkIssue, getNetworkIssue } = useIssue();
+  const { allowance, balance, setAddress, approve, updateAllowanceAndBalance } = useERC20();
 
   const bountyId = activeIssue?.contractId || networkIssue?.id || "XX";
   const fundBtnDisabled = 
@@ -43,15 +43,26 @@ export default function FundModal({
   const amountNotFunded = (networkIssue?.fundingAmount || 0) - (networkIssue?.fundedAmount || 0);
 
   const ConfirmBtn = {
-    label: needsApproval ? t("actions.approve") : t("fund:actions.fund-bounty"),
+    label: needsApproval ? t("actions.approve") : t("funding:actions.fund-bounty"),
     action: needsApproval ? handleApprove : fundBounty
   }
   
   const SubTitle = 
     <span className="caption-medium text-gray font-weight-normal">
-      {t("fund:modals.fund.description")}
+      {t("funding:modals.fund.description")}
       <span className="text-primary text-capitalize"> {t("bounty:label")} #{bountyId}</span>
     </span>;
+
+  function setDefaults() {
+    setAmountToFund(0);
+    setRewardPreview(0);
+    updateAllowanceAndBalance();
+  }
+
+  function handleClose() {
+    setDefaults();
+    onCloseClick();
+  }
 
   function fundBounty() {
     if (!networkIssue?.id || !amountToFund) return;
@@ -62,12 +73,12 @@ export default function FundModal({
       .then(() => {
         const amountFormatted = formatNumberToCurrency(amountToFund);
 
-        onCloseClick();
+        handleClose();
         getNetworkIssue();
         dispatch(toastSuccess(t("funding:modals.fund.funded-x-symbol", {
           amount: amountFormatted,
           symbol: rewardTokenSymbol
-        }), t("funding:modals.fund.funded-successfully")));
+        }), t("funding:modals.fund.funded-succesfully")));
       })
       .catch(error => {
         console.debug("Failed to fund bounty", error);
@@ -102,7 +113,7 @@ export default function FundModal({
       title={t("funding:modals.fund.title")}
       subTitleComponent={SubTitle}
       show={show}
-      onCloseClick={onCloseClick}
+      onCloseClick={handleClose}
     >
       <div className="mt-2 px-2 d-grid gap-4">
         <FundingProgress
@@ -141,7 +152,7 @@ export default function FundModal({
             <Button 
               color="gray" 
               outline
-              onClick={onCloseClick}
+              onClick={handleClose}
             >
               {t("actions.cancel")}
             </Button>
