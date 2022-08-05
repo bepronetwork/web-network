@@ -109,6 +109,7 @@ export default function ProposalMerge({
     getCoinInfo()
   }, [
     proposal,
+    amountTotal,
     activeNetwork?.treasury,
     activeNetwork?.mergeCreatorFeeShare,
     activeNetwork?.proposerFeeShare,
@@ -160,14 +161,16 @@ export default function ProposalMerge({
         }
       >
         <ul className="mb-0 bg-dark-gray rounded-3 px-1 py-2">
-          <BountyDistributionItem
-            name={t("proposal:merge-modal.proposal-creator")}
-            description={t("proposal:merge-modal.proposal-creator-description")}
-            percentage={distributedAmounts.proposerAmount.percentage}
+        <BountyDistributionItem
+            name={t("proposal:merge-modal.network-fee")}
+            description={t("proposal:merge-modal.network-fee-description", {
+              percentage: distributedAmounts.treasuryAmount.percentage,
+            })}
+            percentage={distributedAmounts.treasuryAmount.percentage}
             symbols={[currentTokenSymbol(), 'eur']}
             line={true}
-            amounts={[distributedAmounts.proposerAmount.value, 
-                      handleConversion(distributedAmounts.proposerAmount.value)]}
+            amounts={[distributedAmounts.treasuryAmount.value, 
+                      handleConversion(distributedAmounts.treasuryAmount.value)]}
           />
           <BountyDistributionItem
             name={t("proposal:merge-modal.proposal-merger")}
@@ -178,6 +181,15 @@ export default function ProposalMerge({
             amounts={[distributedAmounts.mergerAmount.value, 
                       handleConversion(distributedAmounts.mergerAmount.value)]}
           />
+          <BountyDistributionItem
+            name={t("proposal:merge-modal.proposal-creator")}
+            description={t("proposal:merge-modal.proposal-creator-description")}
+            percentage={distributedAmounts.proposerAmount.percentage}
+            symbols={[currentTokenSymbol(), 'eur']}
+            line={true}
+            amounts={[distributedAmounts.proposerAmount.value, 
+                      handleConversion(distributedAmounts.proposerAmount.value)]}
+          />
           {distributedAmounts?.proposals?.map((item, key) => (
             <BountyDistributionItem
               name={t("proposal:merge-modal.contributor", {
@@ -186,21 +198,11 @@ export default function ProposalMerge({
               description={t("proposal:merge-modal.contributor-description")}
               percentage={item.percentage}
               symbols={[currentTokenSymbol(), 'eur']}
-              line={true}
+              line={key !== ((distributedAmounts?.proposals?.length || 0 ) - 1)}
               amounts={[item.value, handleConversion(item.value)]}
               key={key}
             />
           ))}
-          <BountyDistributionItem
-            name={t("proposal:merge-modal.network-fee")}
-            description={t("proposal:merge-modal.network-fee-description", {
-              percentage: distributedAmounts.treasuryAmount.percentage,
-            })}
-            percentage={distributedAmounts.treasuryAmount.percentage}
-            symbols={[currentTokenSymbol(), 'eur']}
-            amounts={[distributedAmounts.treasuryAmount.value, 
-                      handleConversion(distributedAmounts.treasuryAmount.value)]}
-          />
         </ul>
 
         <div className="mt-4 border-dashed"></div>
