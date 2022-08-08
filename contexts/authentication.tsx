@@ -7,7 +7,7 @@ import {
   createContext
 } from "react";
 
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
 import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
@@ -24,9 +24,10 @@ export interface IAuthenticationContext {
   wallet?: Wallet;
   isGithubAndWalletMatched?: boolean;
   connectWallet: () => Promise<boolean>;
-  connectGithub: () => void;
-  updateWalletBalance: () => void;
   disconnectWallet: () => void;
+  connectGithub: () => void;
+  disconnectGithub: () => void;
+  updateWalletBalance: () => void;
 }
 
 const AuthenticationContext = createContext<IAuthenticationContext>({} as IAuthenticationContext);
@@ -59,6 +60,11 @@ export const AuthenticationProvider = ({ children }) => {
     }
   }, [user?.login, asPath, DAOService]);
 
+  
+  const disconnectWallet = useCallback(() => {
+    setWallet(undefined);
+  }, []);
+  
   const connectGithub = useCallback(async () => {
     const URL_BASE = `${window.location.protocol}//${ window.location.host}`;
 
@@ -71,9 +77,9 @@ export const AuthenticationProvider = ({ children }) => {
     });
   }, [wallet?.address, asPath]);
 
-  const disconnectWallet = useCallback(() => {
-    setWallet(undefined);
-  }, []);
+  const disconnectGithub = useCallback(async () => {
+    return signOut({ redirect: false });
+  }, [user?.login, asPath, wallet?.address]);
 
   const updateWalletAddress = useCallback(async () => {
     const address = await DAOService.getAddress();
@@ -97,7 +103,8 @@ export const AuthenticationProvider = ({ children }) => {
     const databaseUser = login ? await getUserWith(login) : address ? await getUserOf(address) : null;
 
     if (databaseUser?.address && login)
-      setIsGithubAndWalletMatched(login === databaseUser?.githubLogin && address ? address === databaseUser.address : true);
+      setIsGithubAndWalletMatched(login === databaseUser?.githubLogin && 
+        address ? address === databaseUser.address : true);
 
   }, [pathname]);
 
@@ -170,7 +177,8 @@ export const AuthenticationProvider = ({ children }) => {
       connectWallet,
       connectGithub,
       updateWalletBalance,
-      disconnectWallet
+      disconnectWallet,
+      disconnectGithub
   }),
     [user, wallet, isGithubAndWalletMatched, DAOService]);
 

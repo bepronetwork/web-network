@@ -11,4 +11,6 @@ export interface Modal extends ModalProps {
   onCloseDisabled?: boolean;
   okDisabled?: boolean;
   onOkClick?: () => void;
+  okColor?: string;
+  isOkActionExecuting?: boolean;
 }

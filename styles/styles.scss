@@ -1586,6 +1586,13 @@ input[type="color"] {
       }
     }
   }
+  &-warning {
+    svg {  
+      path {
+        fill: var(--bs-warning);
+      }
+    }
+  }
 }
 
 .nav-link-gradient {

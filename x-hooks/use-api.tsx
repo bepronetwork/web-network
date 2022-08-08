@@ -473,6 +473,13 @@ export default function useApi() {
       .catch(() => false);
   }
 
+  async function resetUser(address: string, githubLogin: string) {
+    return client
+      .post<User[]>("/user/reset", { address, githubLogin })
+      .then(({ data }) => data[0])
+      .catch(() => ({} as User));
+  }
+
   return {
     createIssue,
     createNetwork,
@@ -510,6 +517,7 @@ export default function useApi() {
     uploadFiles,
     userHasPR,
     createPreBounty,
-    cancelPrePullRequest
+    cancelPrePullRequest,
+    resetUser
   };
 }

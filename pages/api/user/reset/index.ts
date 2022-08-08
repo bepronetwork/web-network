@@ -1,0 +1,54 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import { getToken } from "next-auth/jwt";
+
+import models from "db/models";
+
+import { error as LogError } from "helpers/api/handle-log";
+
+const DAY = 1000 * 60 * 60 * 24;
+
+async function post(req: NextApiRequest, res: NextApiResponse) {
+  const { address, githubLogin } = req.body;
+
+  try {
+
+    const user = await models.user.findOne({ where: {
+      address: address.toLowerCase(),
+      githubLogin: githubLogin.toLowerCase()
+    } });
+
+    if (!user) 
+      return res.status(404).json("User not found");
+
+    const headerWallet = (req.headers.wallet as string).toLowerCase();
+    const token = await getToken({req});
+    const hasSevenDays = (((new Date()).getTime() - user.updatedAt) / DAY) > 7;
+    
+    if (headerWallet !== user.address || !token || token?.login !== githubLogin || !hasSevenDays)
+      return res.status(401).json("Unauthorized");
+
+
+    //user.githubHandle = "";
+    //user.githubLogin = "";
+
+    //await user.save();
+
+    return res.status(200).json("User reseted sucessfully");
+  } catch(e) {
+    LogError("Reset Account", { req, address, githubLogin, error: e });
+    return res.status(500).json(e);
+  }
+}
+
+export default async function ResetUser(req: NextApiRequest, res: NextApiResponse) {
+  switch (req.method.toLowerCase()) {
+  case "post":
+    await post(req, res);
+    break;
+
+  default:
+    res.status(405);
+  }
+
+  res.end();
+}
