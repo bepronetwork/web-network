@@ -85,6 +85,7 @@ export interface CreateReviewParams extends RequestParams {
 }
 
 export interface PatchUserParams extends RequestParams {
-  githubHandle: string;
+  githubLogin: string;
   migrate?: boolean;
+  reset?: boolean;
 }
