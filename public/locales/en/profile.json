@@ -5,5 +5,9 @@
   "deletaged-to-others": "Delegated to others",
   "connect-wallet": "Connect Wallet",
   "connect-github": "Connect Github",
-  "connections": "Connections"
+  "connections": "Connections",
+  "payments": {
+    "start-date": "Start date",
+    "end-date": "End date"
+  }
 }

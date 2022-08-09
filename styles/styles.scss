@@ -576,6 +576,18 @@ label {
     opacity: 0.4;
   }
 }
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  background-color: $white !important;
+  border-radius: 5px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  transform:scale(1.2);
+  cursor:pointer;
+  background-color: rgba($white, 0.2);
+}
+
 .input-group {
   .input-group-text {
     background-color: $black;

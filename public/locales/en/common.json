@@ -13,6 +13,7 @@
     "search-repositories": "Search repositories",
     "repository": "repository",
     "all": "All",
+    "no-records-found": "No records found",
     "bounties": {
       "title": "bounty state",
       "all": "All bounties",
