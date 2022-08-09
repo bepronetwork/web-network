@@ -17,12 +17,12 @@ import { useDAO } from "contexts/dao";
 import { User, Wallet } from "interfaces/authentication";
 
 import useApi from "x-hooks/use-api";
-import useNetworkTheme from "x-hooks/use-network";
 
 export interface IAuthenticationContext {
   user?: User;
   wallet?: Wallet;
   isGithubAndWalletMatched?: boolean;
+  needRegistration: boolean;
   connectWallet: () => Promise<boolean>;
   disconnectWallet: () => void;
   connectGithub: () => void;
@@ -32,7 +32,7 @@ export interface IAuthenticationContext {
 
 const AuthenticationContext = createContext<IAuthenticationContext>({} as IAuthenticationContext);
 
-const EXCLUDED_PAGES = ["/networks", "/[network]/connect-account"];
+const EXCLUDED_PAGES = ["/networks", "/connect-account"];
 
 export const AuthenticationProvider = ({ children }) => {
   const session = useSession();
@@ -40,8 +40,9 @@ export const AuthenticationProvider = ({ children }) => {
 
   const [user, setUser] = useState<User>();
   const [wallet, setWallet] = useState<Wallet>();
+  const [needRegistration, setNeedRegistration] = useState(false);
   const [isGithubAndWalletMatched, setIsGithubAndWalletMatched] = useState<boolean>();
-  const { getURLWithNetwork } = useNetworkTheme();
+
   const { getUserOf, getUserWith } = useApi();
   const { service: DAOService, connect } = useDAO();
 
@@ -70,7 +71,7 @@ export const AuthenticationProvider = ({ children }) => {
 
     const user = await getUserOf(wallet?.address?.toLowerCase());
 
-    if (!user) return push(getURLWithNetwork("/connect-account"));
+    if (!user?.githubLogin) return push("/connect-account");
 
     signIn("github", {
       callbackUrl: `${URL_BASE}${asPath}`
@@ -101,6 +102,8 @@ export const AuthenticationProvider = ({ children }) => {
       return setIsGithubAndWalletMatched(undefined);
 
     const databaseUser = login ? await getUserWith(login) : address ? await getUserOf(address) : null;
+    
+    setNeedRegistration(!databaseUser?.githubLogin);
 
     if (databaseUser?.address && login)
       setIsGithubAndWalletMatched(login === databaseUser?.githubLogin && 
@@ -173,6 +176,7 @@ export const AuthenticationProvider = ({ children }) => {
   const memorized = useMemo<IAuthenticationContext>(() => ({
       user,
       wallet,
+      needRegistration,
       isGithubAndWalletMatched,
       connectWallet,
       connectGithub,
@@ -180,7 +184,7 @@ export const AuthenticationProvider = ({ children }) => {
       disconnectWallet,
       disconnectGithub
   }),
-    [user, wallet, isGithubAndWalletMatched, DAOService]);
+    [user, wallet, needRegistration, isGithubAndWalletMatched, DAOService]);
 
   return (
     <AuthenticationContext.Provider value={memorized}>
