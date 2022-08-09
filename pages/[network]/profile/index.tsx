@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
@@ -15,19 +15,22 @@ import { useAuthentication } from "contexts/authentication";
 
 import { truncateAddress } from "helpers/truncate-address";
 
-
 export default function Profile() {
   const { t } = useTranslation("profile");
 
   const [showRemoveModal, setShowRemoveModal] = useState(false);
 
-  const { wallet, user, connectWallet, connectGithub } = useAuthentication();
+  const { wallet, user, needRegistration, connectWallet, connectGithub, disconnectGithub } = useAuthentication();
 
   const isConnected = !!user?.login && !!wallet?.address;
   const addressOrUsername = user?.login ? user.login : truncateAddress(wallet?.address);
 
   const handleClickDisconnect = () => setShowRemoveModal(true);
   const hideRemoveModal = () => setShowRemoveModal(false);
+
+  useEffect(() => {
+    if (needRegistration) disconnectGithub();
+  }, [needRegistration]);
   
   return(
     <ProfileLayout>
@@ -82,6 +85,7 @@ export default function Profile() {
         githubLogin={user?.login}
         walletAddress={wallet?.address}
         onCloseClick={hideRemoveModal}
+        disconnectGithub={disconnectGithub}
       />
     </ProfileLayout>
   );
