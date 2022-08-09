@@ -10,7 +10,7 @@ import { Payment } from "interfaces/payments";
 
 import useNetworkTheme from "x-hooks/use-network";
 
-export default function PaymentItem({ ammount, issue, transactionHash } : Payment) {
+export default function PaymentItem({ ammount, issue, transactionHash, id} : Payment) {
   const { push } = useRouter();
   const { t } = useTranslation(["common", "profile", "bounty"]);
 
@@ -28,7 +28,7 @@ export default function PaymentItem({ ammount, issue, transactionHash } : Paymen
   }
 
   return (
-    <FlexRow className={CONTAINER_CLASSES.join(" ")} key={transactionHash}>
+    <FlexRow className={CONTAINER_CLASSES.join(" ")} key={id}>
       <FlexColumn>
         <FlexRow className="caption-large text-uppercase mb-1">
           <span className="text-white mr-1">
