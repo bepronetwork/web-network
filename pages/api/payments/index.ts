@@ -1,3 +1,4 @@
+import { endOfDay, isAfter, parseISO, startOfDay } from "date-fns";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op } from "sequelize";
@@ -5,7 +6,10 @@ import { Op } from "sequelize";
 import models from "db/models";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const { wallet, networkName } = req.query;
+  const { wallet, networkName, startDate, endDate  } = req.query;
+  
+  const initialDate = parseISO(startDate.toString())
+  const finalDate = parseISO(endDate.toString())
 
   const network = await models.network.findOne({
     where: {
@@ -16,6 +20,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!network) return res.status(404).json("Invalid network");
+
+  if(isAfter(initialDate, finalDate)) return res.status(404).json("Invalid date");
 
   const payments = await models.userPayments.findAll({
     include: [
@@ -29,6 +35,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       address: wallet,
       transactionHash:{
         [Op.not]: null
+      },
+      createdAt: {
+        [Op.between]: [startOfDay(initialDate), endOfDay(finalDate)],
       }
     }
   });
