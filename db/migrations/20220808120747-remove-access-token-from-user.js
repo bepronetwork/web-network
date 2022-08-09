@@ -2,11 +2,11 @@
 
 module.exports = {
   async up (queryInterface, Sequelize) {
-    queryInterface.removeColumn("users", "accessToken");
+    await queryInterface.removeColumn("users", "accessToken");
   },
 
   async down (queryInterface, Sequelize) {
-    queryInterface.addColumn("users", "accessToken", {
+    await queryInterface.addColumn("users", "accessToken", {
       type: Sequelize.STRING
     });
   }
