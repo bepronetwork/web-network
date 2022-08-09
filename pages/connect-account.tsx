@@ -20,6 +20,7 @@ import GithubImage from "components/github-image";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
+import { useNetwork } from "contexts/network";
 import { toastError, toastSuccess } from "contexts/reducers/add-toast";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 import { changeNetwork } from "contexts/reducers/change-network";
@@ -30,7 +31,7 @@ import { truncateAddress } from "helpers/truncate-address";
 import { CustomSession } from "interfaces/custom-session";
 
 import useApi from "x-hooks/use-api";
-import useNetwork from "x-hooks/use-network";
+import useNetworkTheme from "x-hooks/use-network";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -41,14 +42,14 @@ export default function ConnectAccount() {
 
   const [isGhValid, setIsGhValid] = useState(null);
 
+  const { service: DAOService } = useDAO();
+  const { lastNetworkVisited } = useNetwork();
+  const { getURLWithNetwork } = useNetworkTheme();
+  const { dispatch } = useContext(ApplicationContext);
+  const { wallet, user, connectWallet } = useAuthentication();
   const { getUserOf, joinAddressToUser, getUserWith } = useApi();
 
-  const { wallet, user, connectWallet } = useAuthentication();
-  const { service: DAOService } = useDAO();
-  const { getURLWithNetwork } = useNetwork();
-  const { dispatch } = useContext(ApplicationContext);
-
-  const { migrate } = router.query;
+  const { migrate, reset } = router.query;
 
   async function checkAddressVsGh() {
     if (!wallet?.address || !user?.login) return;
@@ -78,8 +79,11 @@ export default function ConnectAccount() {
 
       if (!isGhValid) return;
 
-      if (user.address === wallet?.address)
-        return router.push(getURLWithNetwork("/profile"));
+      if (user.address === wallet?.address) {
+        const redirectTo = lastNetworkVisited ? `${lastNetworkVisited}/profile` : "/networks";
+
+        return router.push(redirectTo);
+      }
     });
   }
 
@@ -92,32 +96,21 @@ export default function ConnectAccount() {
   async function joinAddressToGh() {
     dispatch(changeLoadState(true));
 
-    const validatingUser = await getUserOf(wallet?.address);
-
-    if (
-      validatingUser &&
-      (validatingUser.githubHandle ||
-        validatingUser.accessToken.toLowerCase() !==
-          user?.accessToken.toLowerCase())
-    ) {
-      dispatch(changeLoadState(false));
-      return dispatch(toastError(t("connect-account:errors.migrating-already-happened")));
-    }
-
     joinAddressToUser({
-      githubHandle: session.user.name || user?.login,
-      wallet: wallet?.address.toLowerCase(),
-      migrate: !!migrate
-    }).then((result) => {
-      if (result === true) {
-        dispatch(toastSuccess(t("connect-account:connected-accounts")));
-        dispatch(changeLoadState(false));
-        return router.push(getURLWithNetwork("/profile"));
-      }
+      githubLogin: user?.login,
+      wallet: wallet?.address.toLowerCase()
+    }).then(() => {
+      dispatch(toastSuccess(t("connect-account:connected-accounts")));
 
-      dispatch(toastError(result as unknown as string));
-      dispatch(changeLoadState(false));
-    });
+      const redirectTo = lastNetworkVisited ? `${lastNetworkVisited}/profile` : "/networks";
+
+      return router.push(redirectTo);
+    })
+    .catch(error => {
+      console.debug("Failed to patch user", error);
+      dispatch(toastError("Try again later", "Something wen wrong"));
+    })
+    .finally(() => dispatch(changeLoadState(false)));
   }
 
   function cancelAndSignOut() {
