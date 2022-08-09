@@ -1,10 +1,12 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, SetStateAction, useEffect, useState } from "react";
 import { Col } from "react-bootstrap";
 
 import { format, subDays } from "date-fns";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
+import ArrowRight from "assets/icons/arrow-right";
 
 import NothingFound from "components/nothing-found";
 import PaymentsList from "components/profile/payments-list";
@@ -22,7 +24,6 @@ import { Payment } from "interfaces/payments";
 import { getCoinInfoByContract } from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
-
 
 
 export default function Payments() {
@@ -54,10 +55,12 @@ export default function Payments() {
   const [option, setOption] = useState<{ value: string; label: string }>(defaultOptions[0]);
   const [startDate, setStartDate] = useState<string>(format(subDays(new Date(), 7), "yyyy-MM-dd").toString());
   const [endDate, setEndDate] = useState<string>(format(new Date(), "yyyy-MM-dd").toString());
+  const [hideFilterButton, setHideFilterButton] = useState<boolean>(true);
 
   function onChangeSelect(e: { value: string; label: string }) {
     setStartDate(e.value);
     setEndDate(format(new Date(), "yyyy-MM-dd").toString());
+    setHideFilterButton(true)
     setOption({
       value: e.value,
       label: e.label,
@@ -75,8 +78,9 @@ export default function Payments() {
 
   useEffect(() => {
     if (!wallet?.address || !activeNetwork?.name) return;
-
+    
     getPayments(wallet.address, activeNetwork.name, startDate, endDate).then(setPayments);
+    
   }, [wallet?.address, activeNetwork?.name, startDate, endDate]);
 
   useEffect(() => {
@@ -96,6 +100,19 @@ export default function Payments() {
     });
   }, [payments]);
 
+  function handleFilter() {
+    setOption({ value: "-", label: "-" });
+    setStartDate("");
+    setEndDate(format(new Date(), "yyyy-MM-dd").toString())
+    setHideFilterButton(false)
+  }
+
+  function onChangeDate(e: ChangeEvent<HTMLInputElement>, setState: (value: SetStateAction<string>) => void) {
+    setOption({ value: "-", label: "-" });
+    setHideFilterButton(true)
+    setState(e.target.value);
+  }
+
   return (
     <ProfileLayout>
       <Col xs={10}>
@@ -103,38 +120,48 @@ export default function Payments() {
           <span className="family-Regular h4 text-white">
             {t("main-nav.nav-avatar.payments")}
           </span>
-          <FlexRow>
+          <div className="d-flex col-md-8">
             <ReactSelect
               options={defaultOptions}
               value={option}
               onChange={onChangeSelect}
             />
-            <label className="mt-2 ms-2 text-uppercase caption-small">{t("profile:payments.start-date")}</label>
+            <div className="mt-1">
+              <label className="mt-2 ms-2 text-uppercase caption-small">
+                {t("profile:payments.period")}
+              </label>
+            </div>
             <input
               type="date"
               key="startDate"
               className="form-control ms-2"
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setOption({value: "-", label: "-"})
-                setStartDate(e.target.value);
-              }}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => onChangeDate(e, setStartDate)}
               value={startDate}
               max={endDate}
             />
-            <label className="mt-2 ms-2 me-1 text-uppercase caption-small">{t("profile:payments.end-date")}</label>
+            <div>
+              <ArrowRight className="mt-3 mx-2" height="10px" width="10px" />
+            </div>
+
             <input
               type="date"
               key="endDate"
               className="form-control"
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setOption({value: "-", label: "-"})
-                setEndDate(e.target.value);
-              }}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => onChangeDate(e, setEndDate)}
               value={endDate}
               max={format(new Date(), "yyyy-MM-dd").toString()}
             />
-
-          </FlexRow>
+            <div className="col-md-3">
+              {hideFilterButton && (
+                <button
+                className="btn bg-transparent text-primary border-0 ms-2 py-0 mt-3"
+                onClick={handleFilter}
+              >
+                {t("filters.clear-filter")}
+              </button>
+              )}
+            </div>
+          </div>
           <FlexRow className="align-items-center">
             <span className="caption-medium text-white mr-2">
               {t("labels.recivedintotal")}
