@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getToken } from "next-auth/jwt";
+import { Op } from "sequelize";
 
 import models from "db/models";
 
@@ -11,7 +12,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   const { address, githubLogin } = req.body;
 
   try {
-
     const user = await models.user.findOne({ where: {
       address: address.toLowerCase(),
       githubLogin: githubLogin.toLowerCase()
@@ -22,16 +22,39 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const headerWallet = (req.headers.wallet as string).toLowerCase();
     const token = await getToken({req});
-    const hasSevenDays = (((new Date()).getTime() - user.updatedAt) / DAY) > 7;
-    
-    if (headerWallet !== user.address || !token || token?.login !== githubLogin || !hasSevenDays)
+
+    if ( headerWallet !== user.address || !token || token?.login !== githubLogin )
       return res.status(401).json("Unauthorized");
 
+    const hasSevenDays = (((new Date()).getTime() - user.resetedAt) / DAY) > 7;
 
-    //user.githubHandle = "";
-    //user.githubLogin = "";
+    if (!hasSevenDays) return res.status(409).json("LESS_THAN_7_DAYS");
 
-    //await user.save();
+    const issuesWithPullRequestsByAccount = await models.issue.findAndCountAll({
+      where: {
+        state: {
+          [Op.notIn]: ["canceled", "closed"]
+        }
+      },
+      include: [{
+        association: "pullRequests",
+        required: true,
+        where: {
+          status: {
+            [Op.not]: "canceled"
+          },
+          githubLogin
+        }
+      }]
+    });
+
+    if (!issuesWithPullRequestsByAccount.count) return res.status(409).json("PULL_REQUESTS_OPEN");
+
+    user.resetedAt = new Date();
+    user.githubHandle = null;
+    user.githubLogin = null;
+
+    await user.save();
 
     return res.status(200).json("User reseted sucessfully");
   } catch(e) {
