@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Col, Row } from "react-bootstrap";
+
+import { useRouter } from "next/router";
 
 import InfoIconEmpty from "assets/icons/info-icon-empty";
 
 import Modal from "components/modal";
+
+import { ApplicationContext } from "contexts/application";
+import { toastError, toastSuccess } from "contexts/reducers/add-toast";
 
 import useApi from "x-hooks/use-api";
 
@@ -12,17 +17,21 @@ interface RemoveGithubAccountProps {
   githubLogin: string;
   walletAddress: string;
   onCloseClick: () => void;
+  disconnectGithub: () => void;
 }
 
 function RemoveGithubAccount({
   show,
   githubLogin,
   walletAddress,
-  onCloseClick
+  onCloseClick,
+  disconnectGithub
 } : RemoveGithubAccountProps) {
+  const router = useRouter();
   const [isExecuting, setIsExecuting] = useState(false);
 
   const { resetUser } = useApi();
+  const { dispatch } = useContext(ApplicationContext);
   
   const SpanPrimary = ({ text }) => <span className="text-primary">{text}</span>;
   const WarningSpan = ({ text}) => 
@@ -39,9 +48,22 @@ function RemoveGithubAccount({
     setIsExecuting(true);
 
     resetUser(walletAddress, githubLogin)
-      .then(console.log)
-      .catch(console.debug)
-      .finally(() => setIsExecuting(false));
+      .then(() => {
+        disconnectGithub();
+        router.push("/connect-account");
+      })
+      .catch(error => {
+        if (error?.response?.status === 409) {
+          const message = {
+            LESS_THAN_7_DAYS: "Last account change was less than 7 days ago",
+            PULL_REQUESTS_OPEN: "There is pull requests open for this account"
+          };
+
+          dispatch(toastError(message[error.response.data], "Failed to remove account"));
+        } else 
+          dispatch(toastError("Check the requirements", "Failed to remove account"));
+        setIsExecuting(false);
+      })
   }
 
   return(
