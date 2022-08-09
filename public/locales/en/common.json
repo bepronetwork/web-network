@@ -14,6 +14,7 @@
     "repository": "repository",
     "all": "All",
     "no-records-found": "No records found",
+    "clear-filter": "Clear filter",
     "bounties": {
       "title": "bounty state",
       "all": "All bounties",

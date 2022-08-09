@@ -7,7 +7,6 @@
   "connect-github": "Connect Github",
   "connections": "Connections",
   "payments": {
-    "start-date": "Start date",
-    "end-date": "End date"
+    "period": "Period"
   }
 }
