@@ -55,7 +55,7 @@ export default function Payments() {
     .then(tokens => {
       const totalConverted = tokens.reduce((acc, token) => acc + (token.value * (token.price || 0)), 0);
       const noConverted = !!tokens.find(token => token.price === undefined);
-
+      
       setTotalEuro(totalConverted);
       setHasNoConvertedToken(noConverted);
     });
@@ -68,16 +68,24 @@ export default function Payments() {
           <span className="family-Regular h4 text-white">{t("main-nav.nav-avatar.payments")}</span>
 
           <FlexRow className="align-items-center">
-            <span className="caption-medium text-white mr-2">{t("labels.recivedintotal")}</span>
-            <div className="caption-large bg-dark-gray py-2 px-3 border-radius-8">
-              <span className="text-white">
-              {`${hasNoConvertedToken && "~" || ""} ${formatNumberToCurrency(totalEuro)}`}
-              </span>
+          {!hasNoConvertedToken ? (
+              <>
+                <span className="caption-medium text-white mr-2">
+                  {t("labels.recivedintotal")}
+                </span>
+                <div className="caption-large bg-dark-gray py-2 px-3 border-radius-8">
+                  <span className="text-white">
+                    {formatNumberToCurrency(totalEuro)}
+                  </span>
 
-              <span className="text-gray ml-1">
-                {t("currencies.euro")}
+                  <span className="text-gray ml-1">{t("currencies.euro")}</span>
+                </div>
+              </>
+            ) : (
+              <span className="caption-small text-danger">
+                {t("currencies.error-convert-all-to-euro")}
               </span>
-            </div>
+            )}
           </FlexRow>
         </FlexRow>
 
