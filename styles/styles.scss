@@ -1586,6 +1586,20 @@ input[type="color"] {
       }
     }
   }
+  &-success {
+    svg {  
+      path {
+        fill: var(--bs-success);
+      }
+    }
+  }
+  &-danger {
+    svg {  
+      path {
+        fill: var(--bs-danger);
+      }
+    }
+  }
   &-warning {
     svg {  
       path {

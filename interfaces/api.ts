@@ -9,7 +9,6 @@ export interface User {
   createdAt: string;
   id: number;
   updatedAt: string;
-  accessToken?: string;
 }
 
 export interface ProposalData {

@@ -48,7 +48,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       }]
     });
 
-    if (!issuesWithPullRequestsByAccount.count) return res.status(409).json("PULL_REQUESTS_OPEN");
+    if (issuesWithPullRequestsByAccount.count > 0) return res.status(409).json("PULL_REQUESTS_OPEN");
 
     user.resetedAt = new Date();
     user.githubHandle = null;
