@@ -6,7 +6,8 @@
   "please-wait": "Please wait",
   "close": "Close",
   "currencies": {
-    "euro": "EURO"
+    "euro": "EURO",
+    "error-convert-all-to-euro": "could not convert all tokens to Euro"
   },
   "filters": {
     "filters": "Filter",
