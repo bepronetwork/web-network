@@ -1,5 +1,4 @@
-import { useContext, useEffect } from "react";
-import { Row } from "react-bootstrap";
+import { useContext } from "react";
 
 import { GetServerSideProps } from "next";
 import { useSession } from "next-auth/react";
@@ -17,7 +16,7 @@ import { FlexRow } from "components/profile/wallet-balance";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
-import { toastError, toastSuccess, toastWarning } from "contexts/reducers/add-toast";
+import { toastError, toastSuccess } from "contexts/reducers/add-toast";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 
 import { CustomSession } from "interfaces/custom-session";
