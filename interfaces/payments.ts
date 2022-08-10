@@ -7,4 +7,6 @@ export interface Payment {
   issue: IssueData;
   issueId: number;
   transactionHash: string;
+  labelBounty?: string;
+  labelToken?: string;
 }
