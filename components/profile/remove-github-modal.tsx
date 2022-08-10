@@ -8,7 +8,7 @@ import InfoIconEmpty from "assets/icons/info-icon-empty";
 import Modal from "components/modal";
 
 import { ApplicationContext } from "contexts/application";
-import { toastError, toastSuccess } from "contexts/reducers/add-toast";
+import { toastError } from "contexts/reducers/add-toast";
 
 import useApi from "x-hooks/use-api";
 
@@ -49,9 +49,9 @@ function RemoveGithubAccount({
 
     resetUser(walletAddress, githubLogin)
       .then(() => {
-        disconnectGithub();
-        router.push("/connect-account");
+        return disconnectGithub();
       })
+      .then(() => router.push("/connect-account"))
       .catch(error => {
         if (error?.response?.status === 409) {
           const message = {
