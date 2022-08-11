@@ -2,8 +2,15 @@
   "connect-github-and-wallet": "Connect your GitHub account and MetaMask wallet",
   "connect-to-use": "To access and use our network please connect your github account and web3 wallet",
   "connected-accounts": "Connected accounts!",
+  "warnings": {
+    "already-connected": "These accounts are already connected",
+    "already-in-use": "This github account or this wallet is already in use"
+  },
   "errors": {
     "migrating-address-not-match": "When migrating, address must match {{address}}.",
-    "migrating-already-happened": "Migration not possible or already happened."
+    "migrating-already-happened": "Migration not possible or already happened.",
+    "no-actions-needed": "No actions needed for this user",
+    "try-again": "Try again later",
+    "something-went-wrong": "Something went wrong"
   }
 }

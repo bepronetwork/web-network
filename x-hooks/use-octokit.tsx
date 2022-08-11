@@ -16,8 +16,8 @@ export default function useOctokit() {
     return { owner, repo };
   }
 
-  function makeOctokitRequest(query: string, params): Promise<GraphQlResponse> {
-    return api.post("/graphql", { query, params }).then(({ data }) => data).catch(error => {
+  function makeOctokitRequest(query: string, params, useBotToken?: boolean): Promise<GraphQlResponse> {
+    return api.post("/graphql", { query, params, useBotToken }).then(({ data }) => data).catch(error => {
       console.log("makeOctokitRequest", error);
 
       return error.data;
@@ -30,13 +30,13 @@ export default function useOctokit() {
    * @param variables that mus be passed to the GraphQL query
    * @returns an array of objects containing the data returned by the GraphQL query
    */
-  async function getAllPages(query, variables): Promise<GraphQlResponse[]> {
+  async function getAllPages(query, variables, useBotToken?: boolean): Promise<GraphQlResponse[]> {
     const pages = [];
     let nextPageCursor = null;
     let hasMorePages = false;
 
     do {
-      const response = await makeOctokitRequest(query, { ...variables, cursor: nextPageCursor });
+      const response = await makeOctokitRequest(query, { ...variables, cursor: nextPageCursor }, useBotToken);
 
       pages.push(response);
 
@@ -141,13 +141,13 @@ export default function useOctokit() {
     return forks || [];
   }
 
-  async function getRepositoryBranches(repositoryPath:  string) {
+  async function getRepositoryBranches(repositoryPath: string, useBotToken?: boolean) {
     const { owner, repo } = getOwnerRepoFrom(repositoryPath);
 
     const response = await getAllPages(RepositoryQueries.Branches, {
       repo,
       owner
-    });
+    }, useBotToken);
 
     const branches = response?.flatMap(item => getPropertyRecursively<GraphQlQueryResponseData>("nodes", item)
                                                 ?.map(node => node?.name ) );

@@ -35,6 +35,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     include
   });
 
+  console.log("#test", issue);
+  console.log("#test", issue.title);
+
   if (!issue) return res.status(404).json("Issue not found");
 
   return res.status(200).json(issue);
