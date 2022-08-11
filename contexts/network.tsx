@@ -20,6 +20,7 @@ const { publicRuntimeConfig } = getConfig();
 
 export interface NetworkContextData {
   activeNetwork: Network;
+  lastNetworkVisited?: string;
   updateActiveNetwork: (forced?: boolean) => void;
 }
 
@@ -30,6 +31,7 @@ export const expiresCookie = 60 * 60 * 1; // 1 hour
 
 export const NetworkProvider: React.FC = function ({ children }) {
   const [activeNetwork, setActiveNetwork] = useState<Network>(null);
+  const [lastNetworkVisited, setLastNetworkVisited] = useState<string>();
 
   const { getNetwork } = useApi();
   const { query, push } = useRouter();
@@ -106,6 +108,11 @@ export const NetworkProvider: React.FC = function ({ children }) {
   }, [activeNetwork?.networkAddress, DAOService?.network?.contractAddress]);
 
   useEffect(() => {
+    if (query?.network) 
+      localStorage.setItem("lastNetworkVisited", query.network.toString());
+    
+    setLastNetworkVisited(localStorage.getItem("lastNetworkVisited"));
+    
     updateActiveNetwork();
   }, [query?.network]);
 
@@ -119,9 +126,10 @@ export const NetworkProvider: React.FC = function ({ children }) {
 
   const memorizeValue = useMemo<NetworkContextData>(() => ({
       activeNetwork,
+      lastNetworkVisited,
       updateActiveNetwork,
       updateNetworkParameters
-  }), [activeNetwork, DAOService]);
+  }), [activeNetwork, lastNetworkVisited, DAOService]);
 
   return (
     <NetworkContext.Provider value={memorizeValue}>

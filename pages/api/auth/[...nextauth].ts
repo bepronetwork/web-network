@@ -29,36 +29,15 @@ export default NextAuth({
     maxAge: 24 * 60 * 60 // 1 day
   },
   callbacks: {
-    async signIn({ account, profile }) {
-      if (!profile?.login) return "/?authError=Profile not found";
+    async signIn({ profile }) {
+      try {
+        if (!profile?.login) return "/?authError=Profile not found";
 
-      const find = await models.user.findOne({
-        where: { githubLogin: profile.login },
-        raw: true,
-      });
-      const name = profile?.name || profile.login;
-      if (!find)
-        await models.user.create({
-          githubHandle: name,
-          githubLogin: profile.login?.toString(),
-          accessToken: account?.access_token,
-        });
-      else
-        await models.user.update({ accessToken: account?.access_token },
-          { where: { githubLogin: profile.login?.toString() } });
-
-      setTimeout(async () => {
-        const user = await models.user.findOne({
-          where: { githubLogin: profile.login },
-          raw: true,
-        });
-        if (!user?.address)
-          await models.user.destroy({
-            where: { githubLogin: profile.login?.toString() },
-          });
-      }, 60 * 1000);
-
-      return true;
+        return true;
+      } catch(e) {
+        console.log("SignIn Callback", e);
+        return false;
+      }
     },
     async jwt({ token, account, profile }) {
       const user = await models.user.findOne({
