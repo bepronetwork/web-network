@@ -1,78 +1,32 @@
+import { useState } from "react";
+
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import Image from "next/image";
 
-import metamaskLogo from "assets/metamask.png";
-
-import Avatar from "components/avatar";
 import AvatarOrIdenticon from "components/avatar-or-identicon";
 import Badge from "components/badge";
-import GithubImage from "components/github-image";
+import Button from "components/button";
+import { ConnectionButton } from "components/profile/connect-button";
 import ProfileLayout from "components/profile/profile-layout";
+import { RemoveGithubAccount } from "components/profile/remove-github-modal";
 
 import { useAuthentication } from "contexts/authentication";
 
 import { truncateAddress } from "helpers/truncate-address";
 
-interface ConnectionButtonProps {
-  type: "github" | "wallet";
-  credential: string;
-}
-
 export default function Profile() {
   const { t } = useTranslation("profile");
-  const { wallet, user, connectWallet, connectGithub } = useAuthentication();
 
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
+
+  const { wallet, user, connectWallet, connectGithub, disconnectGithub } = useAuthentication();
+
+  const isConnected = !!user?.login && !!wallet?.address;
   const addressOrUsername = user?.login ? user.login : truncateAddress(wallet?.address);
 
-  const ConnectionButton = ({
-    type,
-    credential
-  } : ConnectionButtonProps) => {
-    const ICONS = {
-      github: credential ? <Avatar userLogin={credential} /> : <GithubImage width={28} height={28} opacity={1} />,
-      wallet: <Image src={metamaskLogo} width={28} height={28} />
-    };
-
-    const LABELS = {
-      github: "Github",
-      wallet: "Wallet"
-    };
-
-    const CREDENTIALS = {
-      github: credential ? credential : t("connect-github"),
-      wallet: credential ? truncateAddress(credential) : t("connect-wallet")
-    };
-
-    const ACTIONS = {
-      github: credential ? undefined : connectGithub,
-      wallet: credential ? undefined : connectWallet,
-    };
-
-    const CLASSES_BUTTON = [
-      "d-flex",
-      "flex-row",
-      "bg-dark-gray",
-      "align-items-center",
-      "p-3",
-      "border",
-      "border-dark-gray",
-      "border-radius-8",
-      ...credential ? [] : ["justify-content-center", "cursor-pointer", "border-primary-hover"]
-    ];
-
-    return(
-      <div className="d-flex flex-column">
-        <label className="caption-medium mb-2">{LABELS[type]}</label>
-
-        <div className={CLASSES_BUTTON.join(" ")} onClick={ACTIONS[type]}>
-          {ICONS[type]}
-          <span className="ml-2 caption-large text-white font-weight-normal">{CREDENTIALS[type]}</span>
-        </div>
-      </div>
-    );
-  }
+  const handleClickDisconnect = () => setShowRemoveModal(true);
+  const hideRemoveModal = () => setShowRemoveModal(false);
   
   return(
     <ProfileLayout>
@@ -87,7 +41,7 @@ export default function Profile() {
               <Badge 
                 label="Council" 
                 color="purple-30" 
-                className="caption border border-purple text-purple border-radius-8" 
+                className="caption border border-purple text-purple border-radius-8"
               /> 
             }
           </div>
@@ -100,13 +54,35 @@ export default function Profile() {
 
       <div className="row">
         <div className="col-4">
-          <ConnectionButton type="github" credential={user?.login} />
+          <ConnectionButton
+            type="github" 
+            credential={user?.login} 
+            connect={connectGithub}
+          />
+
+          { isConnected &&
+            <Button outline color="danger" className="mt-3" onClick={handleClickDisconnect}>
+              {t("actions.remove-github-account")}
+            </Button>
+          }
         </div>
 
         <div className="col-4">
-          <ConnectionButton type="wallet" credential={wallet?.address} />
+          <ConnectionButton 
+            type="wallet" 
+            credential={wallet?.address} 
+            connect={connectWallet} 
+          />
         </div>
       </div>
+
+      <RemoveGithubAccount
+        show={showRemoveModal}
+        githubLogin={user?.login}
+        walletAddress={wallet?.address}
+        onCloseClick={hideRemoveModal}
+        disconnectGithub={disconnectGithub}
+      />
     </ProfileLayout>
   );
 }

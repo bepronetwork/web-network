@@ -4,6 +4,7 @@ import { isMobile } from "react-device-detect";
 
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
+import { UrlObject } from "url";
 
 import CloseIcon from "assets/icons/close-icon";
 import SearchIcon from "assets/icons/search-icon";
@@ -40,7 +41,7 @@ type FiltersByIssueState = Filter[];
 
 interface ListIssuesProps {
   creator?: string;
-  redirect?: string;
+  redirect?: string | UrlObject;
   filterState?: string;
   emptyMessage?: string;
   buttonMessage?: string;
@@ -59,7 +60,8 @@ export default function ListIssues({
   emptyMessage,
   buttonMessage,
   pullRequester,
-  proposer
+  proposer,
+  redirect
 }: ListIssuesProps) {
   const {
     dispatch,
@@ -69,18 +71,22 @@ export default function ListIssues({
   const router = useRouter();
   const { t } = useTranslation(["common", "bounty"]);
 
+  const { search, setSearch, clearSearch } = useSearch();
+  
   const [hasMore, setHasMore] = useState(false);
+  const [searchState, setSearchState] = useState(search);
   const [truncatedData, setTruncatedData] = useState(false);
   const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([]);
+
+  const searchTimeout = useRef(null);
+  
+  const { searchIssues } = useApi();
   const { wallet } = useAuthentication();
   const { activeNetwork } = useNetwork();
-  const { searchIssues } = useApi();
   const { page, nextPage, goToFirstPage } = usePage();
-  const { search, setSearch, clearSearch } = useSearch();
-  const [searchState, setSearchState] = useState(search);
-  const searchTimeout = useRef(null);
 
   const isProfilePage = router?.asPath?.includes("profile");
+
   const { repoId, time, state, sortBy, order } = router.query as {
     repoId: string;
     time: string;
@@ -184,6 +190,12 @@ export default function ListIssues({
     if (event.key !== "Enter") return;
 
     setSearch(searchState);
+  }
+
+  function handleNotFoundClick() {
+    if (!redirect) return dispatch(changeShowCreateBountyState(true));
+
+    router.push(redirect);
   }
 
   useEffect(() => {
@@ -315,7 +327,7 @@ export default function ListIssues({
         <div className="pt-4">
           <NothingFound description={emptyMessage || filterByState.emptyState}>
             {wallet?.address && (
-                <Button onClick={() => dispatch(changeShowCreateBountyState(true))}>
+                <Button onClick={handleNotFoundClick}>
                   {buttonMessage || String(t("actions.create-one"))}
                 </Button>
               )}

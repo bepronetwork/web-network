@@ -9,7 +9,6 @@ export interface User {
   createdAt: string;
   id: number;
   updatedAt: string;
-  accessToken?: string;
 }
 
 export interface ProposalData {
@@ -85,6 +84,7 @@ export interface CreateReviewParams extends RequestParams {
 }
 
 export interface PatchUserParams extends RequestParams {
-  githubHandle: string;
+  githubLogin: string;
   migrate?: boolean;
+  reset?: boolean;
 }
