@@ -103,13 +103,6 @@ export default function CreateBountyModal() {
   const [tokenAllowance, setTokenAllowance] = useState<number>();
   const [rewardChecked, setRewardChecked] = useState<boolean>(false);
   const [files, setFiles] = useState<IFilesProps[]>([]);
-  const [defaultTokens, setDefaultTokens] = useState<{
-    transactional: Token;
-    reward: Token;
-  }>({
-    transactional: activeNetwork?.networkToken || BEPRO_TOKEN,
-    reward: activeNetwork?.networkToken || BEPRO_TOKEN,
-  });
   const [isLoadingApprove, setIsLoadingApprove] = useState<boolean>(false);
   const [isLoadingCreateBounty, setIsLoadingCreateBounty] = useState<boolean>(false);
 
@@ -145,13 +138,6 @@ export default function CreateBountyModal() {
     setRewardChecked(e.target.checked);
   }
 
-  async function getCurrentValueDefaultToken(token: Token) {
-    DAOService.getTokenBalance(token.address, wallet?.address).then((value) => {
-      const newToken = { ...token, currentValue: value };
-      setDefaultTokens({ transactional: newToken, reward: newToken });
-    });
-  }
-
   function renderDetails(review = false) {
     return (
       <CreateBountyDetails
@@ -170,14 +156,10 @@ export default function CreateBountyModal() {
     return (
       <CreateBountyTokenAmount
         currentToken={type === "bounty" ? transactionalToken : rewardToken}
-        setCurrentToken={
-          type === "bounty" ? setTransactionalToken : setRewardToken
-        }
+        setCurrentToken={type === "bounty" ? setTransactionalToken : setRewardToken}
         customTokens={customTokens}
         userAddress={wallet?.address}
-        defaultToken={
-          type === "bounty" ? defaultTokens.transactional : defaultTokens.reward
-        }
+        defaultToken={review && ((type === "bounty" ? transactionalToken : rewardToken))}
         canAddCustomToken={canAddCustomToken}
         addToken={addToken}
         issueAmount={type === "bounty" ? issueAmount : rewardAmount}
@@ -292,6 +274,7 @@ export default function CreateBountyModal() {
                   label: branch,
                   value: branch,
                 }}
+                fromBountyCreation
               />
             </div>
           </div>
@@ -306,18 +289,18 @@ export default function CreateBountyModal() {
           {rewardChecked && renderBountyToken(true, "reward")}
           <div className="container">
             <div className="row">
-              <div className="col-md-6">
+              <div className="col-md-6 text-truncate">
                 <label className="caption-small mb-2">
                   {t("bounty:review.repository")}
                 </label>
-                <GithubInfo
-                  parent="list"
-                  variant="repository"
-                  label={repository?.path}
-                  simpleDisabled={true}
-                />
+              <GithubInfo
+                parent="list"
+                variant="repository"
+                label={repository?.path.length <= 20 ? repository?.path : repository?.path.slice(0,20)+"..."}
+                simpleDisabled={true}
+              />
               </div>
-              <div className="col-md-6">
+              <div className="col-md-6 text-truncate">
                 <label className="caption-small mb-2 ms-3">
                   {t("bounty:review.branch")}
                 </label>
@@ -325,7 +308,7 @@ export default function CreateBountyModal() {
                   <GithubInfo
                     parent="list"
                     variant="repository"
-                    label={branch}
+                    label={branch.length <= 20 ? branch : branch.slice(0,20)+"..."}
                     simpleDisabled={true}
                   />
                 </div>
@@ -415,58 +398,46 @@ export default function CreateBountyModal() {
 
   function updateWalletByToken(token: Token,
                                setBalance: Dispatch<SetStateAction<number>>) {
-    DAOService.getTokenBalance(token.address, wallet.address).then(setBalance);
+    DAOService.getTokenBalance(token?.address, wallet.address).then(setBalance);
 
-    DAOService.getAllowance(token.address,
+    DAOService.getAllowance(token?.address,
                             wallet.address,
                             DAOService.network.contractAddress).then(setTokenAllowance);
   }
 
   function handleTokens(token: Token,
-                        setToken: Dispatch<SetStateAction<Token>>,
                         setBalance: Dispatch<SetStateAction<number>>) {
-    if (!wallet?.balance || !DAOService) return;
-    if (!token) return setToken(BEPRO_TOKEN);
+    if (!wallet?.balance || !DAOService || !token) return;
 
     updateWalletByToken(token, setBalance);
   }
 
   useEffect(() => {
-    handleTokens(transactionalToken, setTransactionalToken, setTokenBalance);
+    handleTokens(transactionalToken, setTokenBalance);
   }, [transactionalToken, wallet, DAOService]);
 
   useEffect(() => {
     setIssueAmount({ value: "0", formattedValue: "0", floatValue: 0 });
-    setDefaultTokens(({ reward }) => {
-      return {
-        reward,
-        transactional: { ...transactionalToken, currentValue: tokenBalance },
-      };
-    });
   }, [transactionalToken]);
 
   useEffect(() => {
     setRewardAmount({ value: "0", formattedValue: "0", floatValue: 0 });
-    setDefaultTokens(({ transactional }) => {
-      return {
-        transactional,
-        reward: { ...rewardToken, currentValue: rewardBalance },
-      };
-    });
   }, [rewardToken]);
 
   useEffect(() => {
-    handleTokens(rewardToken, setRewardToken, setRewardBalance);
+    handleTokens(rewardToken, setRewardBalance);
   }, [rewardToken, wallet, DAOService]);
-
-  useEffect(() => {
-    if (DAOService && activeNetwork?.networkToken && wallet?.address) 
-      getCurrentValueDefaultToken(activeNetwork?.networkToken);
-  }, [DAOService, activeNetwork?.networkToken, wallet?.address]);
 
   useEffect(() => {
     setProgressBar();
   }, [currentSection]);
+
+  useEffect(() => {
+    if(customTokens?.length === 1) {
+      setTransactionalToken(customTokens[0])
+      setRewardToken(customTokens[0])
+    }
+  }, [customTokens])
 
   useEffect(() => {
     if (!activeNetwork?.networkToken) return;

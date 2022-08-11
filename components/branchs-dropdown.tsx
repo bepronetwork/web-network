@@ -11,12 +11,14 @@ export default function BranchsDropdown({
   repoId,
   onSelected,
   value,
-  disabled
+  disabled,
+  fromBountyCreation = false
 }: {
   repoId: string
   onSelected: (e: { value: string }) => void
   value?: { value: string, label: string }
   disabled?: boolean
+  fromBountyCreation?: boolean
 }) {
   const { findBranch } = useRepos();
   const [options, setOptions] = useState<{ value: string; label: string }[]>();
@@ -30,7 +32,7 @@ export default function BranchsDropdown({
       return { value, label };
     }
 
-    const branchs = await findBranch(Number(repoId));
+    const branchs = await findBranch(Number(repoId), fromBountyCreation);
     setOptions(branchs.map(mapRepo));
   }
 

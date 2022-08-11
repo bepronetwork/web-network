@@ -121,8 +121,9 @@ export default function useApi() {
       .catch(() => null);
   }
 
-  async function getPayments(wallet: string, networkName = DEFAULT_NETWORK_NAME) {
-    const params = new URLSearchParams({ wallet, networkName }).toString();
+  async function getPayments(wallet: string, networkName = DEFAULT_NETWORK_NAME, startDate: string, endDate: string) {
+    const dates = startDate ? { startDate, endDate } : { endDate }
+    const params = new URLSearchParams({ wallet, networkName, ...dates }).toString();
 
     return client
       .get<IssueData[]>(`/payments?${params}`)
