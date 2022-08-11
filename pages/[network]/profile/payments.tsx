@@ -163,25 +163,6 @@ export default function Payments() {
             </div>
           </div>
           <FlexRow className="align-items-center">
-<<<<<<< HEAD
-          {!hasNoConvertedToken ? (
-              <>
-                <span className="caption-medium text-white mr-2">
-                  {t("labels.recivedintotal")}
-                </span>
-                <div className="caption-large bg-dark-gray py-2 px-3 border-radius-8">
-                  <span className="text-white">
-                    {formatNumberToCurrency(totalEuro)}
-                  </span>
-
-                  <span className="text-gray ml-1">{t("currencies.euro")}</span>
-                </div>
-              </>
-            ) : (
-              <span className="caption-small text-danger">
-                {t("currencies.error-convert-all-to-euro")}
-              </span>
-=======
           {hasNoConvertedToken ? (
               <span className="caption-small text-danger">
                 {t("currencies.error-convert-all-to-euro")}
@@ -199,7 +180,6 @@ export default function Payments() {
                   <span className="text-gray ml-1">{t("currencies.euro")}</span>
                 </div>
               </>
->>>>>>> 5339437b4535a15827b034cd500958810373b086
             )}
           </FlexRow>
         </FlexRow>
