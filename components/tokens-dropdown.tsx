@@ -22,6 +22,7 @@ interface TokensDropdownProps {
   userAddress?: string;
   disabled?: boolean;
   needsBalance?: boolean;
+  token?: Token;
 }
 
 interface Option {
@@ -39,6 +40,7 @@ export default function TokensDropdown({
   description = undefined,
   userAddress,
   disabled = false,
+  token,
   needsBalance
 }: TokensDropdownProps) {
   const [options, setOptions] = useState<Option[]>();
@@ -95,7 +97,13 @@ export default function TokensDropdown({
     if (!tokens?.length) return;
     if (needsBalance) getBalanceTokens();
     else setOptions(tokens.map(tokenToOption));
+    if(tokens?.length === 1) setOption(tokenToOption(tokens[0]))
   }, [tokens]);
+
+  useEffect(() => {
+    if(defaultToken || !token) return;
+    setOption(tokenToOption(token))
+  }, [token])
 
   function SelectOptionComponent({ innerProps, innerRef, data }) {
     const { name, symbol, address, currentValue, tokenInfo } = data.value;

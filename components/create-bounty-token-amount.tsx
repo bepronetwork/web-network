@@ -14,7 +14,7 @@ export default function CreateBountyTokenAmount({
   setCurrentToken,
   addToken,
   canAddCustomToken,
-  defaultToken,
+  defaultToken = null,
   userAddress,
   customTokens,
   labelSelect,
@@ -70,6 +70,7 @@ export default function CreateBountyTokenAmount({
     <div className="container">
       <div className="col-md-12 mt-4">
         <TokensDropdown
+          token={currentToken}
           label={labelSelect}
           tokens={customTokens}
           userAddress={userAddress}
@@ -77,6 +78,7 @@ export default function CreateBountyTokenAmount({
           addToken={addToken}
           setToken={setCurrentToken}
           disabled={review}
+          defaultToken={defaultToken}
           needsBalance
         />
       </div>
@@ -96,7 +98,7 @@ export default function CreateBountyTokenAmount({
                 {handleMaxValue()}
               </div>
             }
-            symbol={currentToken?.symbol}
+            symbol={currentToken?.symbol || t("common:misc.token")}
             value={issueAmount.formattedValue}
             placeholder="0"
             onValueChange={handleIssueAmountOnValueChange}
