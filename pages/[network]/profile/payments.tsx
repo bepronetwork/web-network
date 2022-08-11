@@ -86,15 +86,15 @@ export default function Payments() {
   useEffect(() => {
     if (!payments?.length) return;
 
-    Promise.all(payments.map(async (payment) => ({
-        tokenAddress: payment.issue.token.address,
-        value: payment.ammount,
-        price: await getCoinPrice(payment.issue.token.address),
-    }))).then((tokens) => {
-      const totalConverted = tokens.reduce((acc, token) => acc + token.value * (token.price || 0),
-                                           0);
-      const noConverted = !!tokens.find((token) => token.price === undefined);
-
+    Promise.all(payments.map(async payment => ({
+      tokenAddress: payment.issue.token.address, 
+      value: payment.ammount,
+      price: await getCoinPrice(payment.issue.token.address)
+    })))
+    .then(tokens => {
+      const totalConverted = tokens.reduce((acc, token) => acc + (token.value * (token.price || 0)), 0);
+      const noConverted = !!tokens.find(token => token.price === undefined);
+      
       setTotalEuro(totalConverted);
       setHasNoConvertedToken(noConverted);
     });
@@ -163,18 +163,24 @@ export default function Payments() {
             </div>
           </div>
           <FlexRow className="align-items-center">
-            <span className="caption-medium text-white mr-2">
-              {t("labels.recivedintotal")}
-            </span>
-            <div className="caption-large bg-dark-gray py-2 px-3 border-radius-8">
-              <span className="text-white">
-                {`${
-                  (hasNoConvertedToken && "~") || ""
-                } ${formatNumberToCurrency(totalEuro)}`}
+          {hasNoConvertedToken ? (
+              <span className="caption-small text-danger">
+                {t("currencies.error-convert-all-to-euro")}
               </span>
+            ) : (
+              <>
+                <span className="caption-medium text-white mr-2">
+                  {t("labels.recivedintotal")}
+                </span>
+                <div className="caption-large bg-dark-gray py-2 px-3 border-radius-8">
+                  <span className="text-white">
+                    {formatNumberToCurrency(totalEuro)}
+                  </span>
 
-              <span className="text-gray ml-1">{t("currencies.euro")}</span>
-            </div>
+                  <span className="text-gray ml-1">{t("currencies.euro")}</span>
+                </div>
+              </>
+            )}
           </FlexRow>
         </FlexRow>
 
