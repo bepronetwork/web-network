@@ -96,7 +96,7 @@ export const ReposProvider: React.FC = function ({ children }) {
     const repoPath = findRepo(repoId)?.githubPath;
     if (!repoPath) return [];
 
-    const response = await getRepositoryBranches(repoPath);
+    const response = await getRepositoryBranches(repoPath, forced);
     const branches = response.map(branch => ({ branch }));
 
     setBranchsList((prevState) => ({
