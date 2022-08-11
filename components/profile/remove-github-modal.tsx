@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
 import InfoIconEmpty from "assets/icons/info-icon-empty";
@@ -28,6 +29,8 @@ function RemoveGithubAccount({
   disconnectGithub
 } : RemoveGithubAccountProps) {
   const router = useRouter();
+  const { t } = useTranslation(["profile", "common"]);
+
   const [isExecuting, setIsExecuting] = useState(false);
 
   const { resetUser } = useApi();
@@ -55,13 +58,14 @@ function RemoveGithubAccount({
       .catch(error => {
         if (error?.response?.status === 409) {
           const message = {
-            LESS_THAN_7_DAYS: "Last account change was less than 7 days ago",
-            PULL_REQUESTS_OPEN: "There is pull requests open for this account"
+            LESS_THAN_7_DAYS: t("modals.remove-github.errors.less-than-7-days"),
+            PULL_REQUESTS_OPEN: t("modals.remove-github.errors.pull-requests-open")
           };
 
-          dispatch(toastError(message[error.response.data], "Failed to remove account"));
+          dispatch(toastError(message[error.response.data], t("modals.remove-github.errors.failed-to-remove")));
         } else 
-          dispatch(toastError("Check the requirements", "Failed to remove account"));
+          dispatch(toastError(t("modals.remove-github.errors.check-requirements"), 
+                              t("modals.remove-github.errors.failed-to-remove")));
         setIsExecuting(false);
       })
   }
@@ -69,10 +73,10 @@ function RemoveGithubAccount({
   return(
     <Modal
       show={show}
-      okLabel="Remove"
+      okLabel={t("common:actions.remove")}
       okColor="danger"
-      cancelLabel="Cancel"
-      title="Remove Github Account"
+      cancelLabel={t("common:actions.cancel")}
+      title={t("modals.remove-github.title")}
       onCloseClick={onCloseClick}
       onOkClick={handleClickRemove}
       isOkActionExecuting={isExecuting}
@@ -81,16 +85,19 @@ function RemoveGithubAccount({
         <Col>
           <Row className="text-center mb-4">
             <span className="family-Regular font-weight-medium text-white">
-              Remove <SpanPrimary text={githubLogin} /> account from the wallet <SpanPrimary text={walletAddress} />
+              {t("common:actions.remove")}{" "}
+              <SpanPrimary text={githubLogin} />
+              {t("modals.remove-github.account-from-wallet")}
+              <SpanPrimary text={walletAddress} />
             </span>
           </Row>
 
           <WarningSpan
-            text="The account can only be changed again after seven days"
+            text={t("modals.remove-github.warnings.period")}
           />
 
           <WarningSpan
-            text="There must be no open pull requests on bounties for this account"
+            text={t("modals.remove-github.warnings.pull-requests")}
           />
         </Col>
       </Row>

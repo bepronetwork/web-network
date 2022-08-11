@@ -25,7 +25,7 @@ function ConnectionButton({
   state,
   connect
 } : ConnectionButtonProps) {
-  const { t } = useTranslation("profile");
+  const { t } = useTranslation(["profile", "common"]);
 
   const COLORS = {
     profile: "dark-gray",
@@ -43,8 +43,8 @@ function ConnectionButton({
   }
 
   const LABELS = {
-    github: "Github",
-    wallet: "Wallet"
+    github: t("common:misc.github"),
+    wallet: t("common:misc.wallet")
   };
 
   const CREDENTIALS = {

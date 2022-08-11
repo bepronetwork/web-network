@@ -77,9 +77,10 @@ export default function ConnectAccount() {
     .catch(error => {
       console.debug("Failed to patch user", error);
 
-      const reason = error?.response?.status === 409 ? "No actions needed for this user" : "Try again later";
+      const reason = error?.response?.status === 409 ? t("connect-account.errors.no-actions-needed") : 
+        t("connect-account.errors.try-again");
 
-      dispatch(toastError(reason, "Something went wrong"));
+      dispatch(toastError(reason, t("connect-account.errors.something-went-wrong")));
     })
     .finally(() => dispatch(changeLoadState(false)));
   }
@@ -129,14 +130,14 @@ export default function ConnectAccount() {
 
               { isGithubAndWalletMatched &&
                 <Message 
-                  text="These accounts are already connected"
+                  text={t("connect-account:warnings.already-connected")}
                   type="success"
                 />
               }
 
               { isGithubAndWalletMatched === false &&
                 <Message 
-                  text="This github account or this wallet is already in use"
+                  text={t("connect-account:warnings.already-in-use")}
                   type="danger"
                 />
               }

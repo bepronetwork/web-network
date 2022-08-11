@@ -62,7 +62,7 @@ export default function Profile() {
 
           { isConnected &&
             <Button outline color="danger" className="mt-3" onClick={handleClickDisconnect}>
-              Remove Github Account
+              {t("actions.remove-github-account")}
             </Button>
           }
         </div>

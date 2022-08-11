@@ -128,7 +128,8 @@
     "refuse": "Refuse",
     "disconnect-accounts": "Disconnect Accounts",
     "show": "Show",
-    "hide": "Hide"
+    "hide": "Hide",
+    "remove": "Remove"
   },
   "misc": {
     "by": "by",
@@ -168,7 +169,8 @@
     "fork": "Fork",
     "organization": "Organization",
     "total": "Total",
-    "clear": "Clear"
+    "clear": "Clear",
+    "wallet": "Wallet"
   },
   "modals": {
     "help-modal": {
