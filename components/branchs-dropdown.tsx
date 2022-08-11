@@ -30,7 +30,7 @@ export default function BranchsDropdown({
       return { value, label };
     }
 
-    const branchs = await findBranch(Number(repoId));
+    const branchs = await findBranch(Number(repoId), true);
     setOptions(branchs.map(mapRepo));
   }
 

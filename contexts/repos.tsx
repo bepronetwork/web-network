@@ -46,7 +46,7 @@ export interface ReposContextData {
   loadRepos: () => Promise<ReposList>;
   updateActiveRepo: (repoId: number) => Promise<IActiveRepo>;
   findForks: (repoId: number) => Promise<ForkInfo[]>;
-  findBranch: (repoId: number) => Promise<BranchInfo[]>;
+  findBranch: (repoId: number, forced?: boolean) => Promise<BranchInfo[]>;
   findRepo: (repoId: number) => RepoInfo;
 }
 
@@ -94,7 +94,6 @@ export const ReposProvider: React.FC = function ({ children }) {
     if (branchsList[repoId] && !forced) return branchsList[repoId];
 
     const repoPath = findRepo(repoId)?.githubPath;
-
     if (!repoPath) return [];
 
     const response = await getRepositoryBranches(repoPath);
