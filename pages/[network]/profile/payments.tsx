@@ -68,7 +68,11 @@ export default function Payments() {
           <span className="family-Regular h4 text-white">{t("main-nav.nav-avatar.payments")}</span>
 
           <FlexRow className="align-items-center">
-          {!hasNoConvertedToken ? (
+          {hasNoConvertedToken ? (
+              <span className="caption-small text-danger">
+                {t("currencies.error-convert-all-to-euro")}
+              </span>
+            ) : (
               <>
                 <span className="caption-medium text-white mr-2">
                   {t("labels.recivedintotal")}
@@ -81,10 +85,6 @@ export default function Payments() {
                   <span className="text-gray ml-1">{t("currencies.euro")}</span>
                 </div>
               </>
-            ) : (
-              <span className="caption-small text-danger">
-                {t("currencies.error-convert-all-to-euro")}
-              </span>
             )}
           </FlexRow>
         </FlexRow>
