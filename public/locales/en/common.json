@@ -6,13 +6,16 @@
   "please-wait": "Please wait",
   "close": "Close",
   "currencies": {
-    "euro": "EURO"
+    "euro": "EURO",
+    "error-convert-all-to-euro": "could not convert all tokens to Euro"
   },
   "filters": {
     "filters": "Filter",
     "search-repositories": "Search repositories",
     "repository": "repository",
     "all": "All",
+    "no-records-found": "No records found",
+    "clear-filter": "Clear filter",
     "bounties": {
       "title": "bounty state",
       "all": "All bounties",

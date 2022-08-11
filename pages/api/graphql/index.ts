@@ -9,8 +9,9 @@ import { error as LogError } from "helpers/api/handle-log";
 const { serverRuntimeConfig: { authSecret, github: { token: botToken } } } = getConfig();
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
-  const { query, params } = req.body;
-  const token = await getToken({ req, secret: authSecret });
+  const { query, params, useBotToken } = req.body;
+  
+  const token = useBotToken ? undefined : await getToken({ req, secret: authSecret });
 
   try {
     const octokit = new Octokit({

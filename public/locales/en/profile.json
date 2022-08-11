@@ -6,6 +6,9 @@
   "connect-wallet": "Connect Wallet",
   "connect-github": "Connect Github",
   "connections": "Connections",
+  "payments": {
+    "period": "Period"
+  },
   "actions": {
     "remove-github-account": "Remove Github Account"
   },
@@ -24,5 +27,5 @@
         "check-requirements": "Check the requirements"
       }
     }
-  }
+   }
 }
