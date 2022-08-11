@@ -35,11 +35,7 @@ export default function NetworkIdentifier() {
       <div className="ml-2 bg-transparent p-0 d-flex flex-row align-items-center justify-content-center">
         <Indicator bg={NetworkColors[network]} />
         <span className="caption-small text-white-50 ">
-          {network}{" "}
-          {(network !==
-            publicRuntimeConfig?.metaMask?.chainName?.toLowerCase() &&
-            "testnet") ||
-            ""}
+          {network}
         </span>
       </div>
     )) || <></>

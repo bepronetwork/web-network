@@ -11,8 +11,14 @@ class User extends Model {
     super.init({
         githubHandle: DataTypes.STRING,
         githubLogin: DataTypes.STRING,
-        address: { type: DataTypes.STRING, unique: true },
-        accessToken: DataTypes.STRING
+        address: { 
+          type: DataTypes.STRING, 
+          unique: true 
+        },
+        resetedAt: {
+          type: DataTypes.DATE,
+          allowNull: true
+        }
     },
                {
         sequelize,

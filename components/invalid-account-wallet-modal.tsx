@@ -1,4 +1,3 @@
-import { signOut } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
 
@@ -6,26 +5,12 @@ import ErrorMarkIcon from "assets/icons/errormark-icon";
 import metamaskLogo from "assets/metamask.png";
 
 import Avatar from "components/avatar";
-import Button from "components/button";
 import Modal from "components/modal";
 
 import { truncateAddress } from "helpers/truncate-address";
 
 export default function InvalidAccountWalletModal({ user, wallet, isVisible }) {
   const { t } = useTranslation("common");
-
-  const disconnectBtnVisible = user?.login && wallet?.address && isVisible;
-
-  async function handleDisconnectAccounts() {
-    await signOut({ redirect: false });
-
-    await window?.ethereum?.request({
-      method: 'wallet_requestPermissions',
-      params: [{
-        eth_accounts: {},
-      }]
-    });  
-  }
 
   return (
     <Modal
@@ -69,14 +54,6 @@ export default function InvalidAccountWalletModal({ user, wallet, isVisible }) {
             </div>
           </div>
         </div>
-
-        { disconnectBtnVisible &&
-          <div className="d-flex justify-content-center mt-3">
-            <Button color="primary" onClick={handleDisconnectAccounts}>
-              <span>{t("actions.disconnect-accounts")}</span>
-            </Button>
-          </div>
-        }
       </div>
     </Modal>
   );

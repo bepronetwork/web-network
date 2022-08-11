@@ -212,14 +212,7 @@ export default function useApi() {
   }
 
   async function joinAddressToUser({ wallet, ...rest } : PatchUserParams): Promise<boolean> {
-    return client
-      .patch<string>(`/user/connect`, { wallet, ...rest })
-      .then(() => true)
-      .catch((error) => {
-        if (error.response) return error.response.data;
-
-        return "Unknown error. Check logs.";
-      });
+    return client.patch(`/user/connect`, { wallet, ...rest });
   }
 
   async function getUserWith(login: string): Promise<User> {
@@ -474,6 +467,10 @@ export default function useApi() {
       .catch(() => false);
   }
 
+  async function resetUser(address: string, githubLogin: string) {
+    return client.post("/user/reset", { address, githubLogin });
+  }
+
   return {
     createIssue,
     createNetwork,
@@ -511,6 +508,7 @@ export default function useApi() {
     uploadFiles,
     userHasPR,
     createPreBounty,
-    cancelPrePullRequest
+    cancelPrePullRequest,
+    resetUser
   };
 }

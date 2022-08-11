@@ -8,5 +8,24 @@
   "connections": "Connections",
   "payments": {
     "period": "Period"
-  }
+  },
+  "actions": {
+    "remove-github-account": "Remove Github Account"
+  },
+  "modals": {
+    "remove-github": {
+      "title": "Remove Github Account",
+      "account-from-wallet": "account from the wallet",
+      "warnings": {
+        "period": "The account can only be changed again after seven days",
+        "pull-requests": "There must be no open pull requests on bounties for this account"
+      },
+      "errors": {
+        "less-than-7-days": "Last account change was less than 7 days ago",
+        "pull-requests-open": "There are pull requests open for this account",
+        "failed-to-remove": "Failed to remove account",
+        "check-requirements": "Check the requirements"
+      }
+    }
+   }
 }

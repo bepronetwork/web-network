@@ -130,7 +130,8 @@
     "refuse": "Refuse",
     "disconnect-accounts": "Disconnect Accounts",
     "show": "Show",
-    "hide": "Hide"
+    "hide": "Hide",
+    "remove": "Remove"
   },
   "misc": {
     "by": "by",
@@ -170,7 +171,8 @@
     "fork": "Fork",
     "organization": "Organization",
     "total": "Total",
-    "clear": "Clear"
+    "clear": "Clear",
+    "wallet": "Wallet"
   },
   "modals": {
     "help-modal": {
@@ -194,7 +196,7 @@
     },
     "invalid-account-wallet": {
       "title": "Github Account and Wallet don't match",
-      "description": "Login to the Github account previously associated to this wallet or change to the correct wallet for this account."
+      "description": "Please change to the previously connected wallet and disconnect your github account from your profile page if you wish to change the connection"
     },
     "not-mergeable": {
       "title": "Merging bounty",

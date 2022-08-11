@@ -7,31 +7,34 @@ import {
   createContext
 } from "react";
 
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
 import InvalidAccountWalletModal from "components/invalid-account-wallet-modal";
 
 import { useDAO } from "contexts/dao";
 
+import { User as UserApi } from "interfaces/api";
 import { User, Wallet } from "interfaces/authentication";
+import { CustomSession } from "interfaces/custom-session";
 
 import useApi from "x-hooks/use-api";
-import useNetworkTheme from "x-hooks/use-network";
 
 export interface IAuthenticationContext {
   user?: User;
   wallet?: Wallet;
   isGithubAndWalletMatched?: boolean;
   connectWallet: () => Promise<boolean>;
-  connectGithub: () => void;
-  updateWalletBalance: () => void;
   disconnectWallet: () => void;
+  connectGithub: () => void;
+  disconnectGithub: () => void;
+  updateWalletBalance: () => void;
+  validateWalletAndGithub: (address: string, login: string) => void;
 }
 
 const AuthenticationContext = createContext<IAuthenticationContext>({} as IAuthenticationContext);
 
-const EXCLUDED_PAGES = ["/networks", "/[network]/connect-account"];
+const EXCLUDED_PAGES = ["/networks", "/connect-account"];
 
 export const AuthenticationProvider = ({ children }) => {
   const session = useSession();
@@ -39,8 +42,9 @@ export const AuthenticationProvider = ({ children }) => {
 
   const [user, setUser] = useState<User>();
   const [wallet, setWallet] = useState<Wallet>();
+  const [databaseUser, setDatabaseUser] = useState<UserApi>();
   const [isGithubAndWalletMatched, setIsGithubAndWalletMatched] = useState<boolean>();
-  const { getURLWithNetwork } = useNetworkTheme();
+
   const { getUserOf, getUserWith } = useApi();
   const { service: DAOService, connect } = useDAO();
 
@@ -59,21 +63,29 @@ export const AuthenticationProvider = ({ children }) => {
     }
   }, [user?.login, asPath, DAOService]);
 
+  
+  const disconnectWallet = useCallback(() => {
+    setWallet(undefined);
+  }, []);
+
+  const disconnectGithub = useCallback(async () => {
+    return signOut({ redirect: false });
+  }, [user?.login, asPath, wallet?.address]);
+  
   const connectGithub = useCallback(async () => {
     const URL_BASE = `${window.location.protocol}//${ window.location.host}`;
 
     const user = await getUserOf(wallet?.address?.toLowerCase());
 
-    if (!user) return push(getURLWithNetwork("/connect-account"));
+    if (!user?.githubLogin && !asPath?.includes("connect-account")) {
+      await disconnectGithub();
+      return push("/connect-account");
+    }
 
     signIn("github", {
       callbackUrl: `${URL_BASE}${asPath}`
     });
   }, [wallet?.address, asPath]);
-
-  const disconnectWallet = useCallback(() => {
-    setWallet(undefined);
-  }, []);
 
   const updateWalletAddress = useCallback(async () => {
     const address = await DAOService.getAddress();
@@ -91,13 +103,19 @@ export const AuthenticationProvider = ({ children }) => {
   }, [DAOService]);
 
   const validateWalletAndGithub = useCallback(async (address: string, login: string) => {
-    if (!address || !login || EXCLUDED_PAGES.includes(String(pathname))) 
+    if (!address || !login)
       return setIsGithubAndWalletMatched(undefined);
 
-    const databaseUser = login ? await getUserWith(login) : address ? await getUserOf(address) : null;
+    let databaseUser = login ? await getUserWith(login) : null;
 
-    if (databaseUser?.address && login)
-      setIsGithubAndWalletMatched(login === databaseUser?.githubLogin && address ? address === databaseUser.address : true);
+    if (!databaseUser?.address) databaseUser = address ? await getUserOf(address) : null;
+    
+    if (databaseUser) setDatabaseUser(databaseUser);
+
+    if (!databaseUser?.githubLogin) setIsGithubAndWalletMatched(undefined);
+    else if (databaseUser?.githubLogin && login)
+      setIsGithubAndWalletMatched(login === databaseUser.githubLogin && 
+        (address ? address === databaseUser.address : true));
 
   }, [pathname]);
 
@@ -133,15 +151,19 @@ export const AuthenticationProvider = ({ children }) => {
       }}))
   }, [wallet?.address, DAOService]);
 
-  // Side effects needed to the context work
+  // Needed side effects for the context to work
   useEffect(() => {
-    if (session.status === "authenticated") setUser({ ...session.data.user });
-    else if (session.status === "unauthenticated") setUser(undefined);
-  }, [session]);
+    if (session.status === "authenticated" && !!databaseUser?.githubLogin) 
+      setUser({ ...session.data.user });
+    else
+      setUser(undefined);
+  }, [session, databaseUser, pathname]);
 
   useEffect(() => {
-    validateWalletAndGithub(wallet?.address.toLowerCase(), user?.login);
-  }, [user?.login, wallet?.address]);
+    const login  = user?.login || (session.data as CustomSession)?.user?.login;
+
+    validateWalletAndGithub(wallet?.address.toLowerCase(), login);
+  }, [user?.login, session?.data?.user?.name, wallet?.address]);
 
   useEffect(() => {
     if (!DAOService) return;
@@ -170,7 +192,9 @@ export const AuthenticationProvider = ({ children }) => {
       connectWallet,
       connectGithub,
       updateWalletBalance,
-      disconnectWallet
+      disconnectWallet,
+      disconnectGithub,
+      validateWalletAndGithub
   }),
     [user, wallet, isGithubAndWalletMatched, DAOService]);
 
