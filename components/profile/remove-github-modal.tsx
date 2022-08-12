@@ -4,9 +4,8 @@ import { Col, Row } from "react-bootstrap";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
-import InfoIconEmpty from "assets/icons/info-icon-empty";
-
 import Modal from "components/modal";
+import { WarningSpan } from "components/warning-span";
 
 import { ApplicationContext } from "contexts/application";
 import { toastError } from "contexts/reducers/add-toast";
@@ -37,15 +36,6 @@ function RemoveGithubAccount({
   const { dispatch } = useContext(ApplicationContext);
   
   const SpanPrimary = ({ text }) => <span className="text-primary">{text}</span>;
-  const WarningSpan = ({ text}) => 
-    <Row className="p family-Regular font-weight-medium svg-warning text-warning border-radius-4 mt-2">
-      <span>
-        <span className="mr-1">
-          <InfoIconEmpty width={12} height={12} />
-        </span>
-        {text}
-      </span>
-    </Row>;
 
   function handleClickRemove() {
     setIsExecuting(true);
