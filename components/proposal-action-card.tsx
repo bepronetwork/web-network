@@ -120,7 +120,7 @@ export default function ProposalActionCard({
                 <Button
                   className="flex-grow-1"
                   textClass="text-uppercase text-white"
-                  color="purple"
+                  color="danger"
                   disabled={!isRefusable() || isRefusing}
                   onClick={handleRefuse}
                 >
