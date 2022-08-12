@@ -32,7 +32,7 @@ export default function IssueComments({ comments = [], repo, issueId }) {
                 </Button>
               </a>
             </div>
-            {comments && comments?.map((comment) => (
+            {!!comments.length && comments?.map((comment) => (
               <Comment comment={comment} key={comment?.id} />
             ))}
           </div>
