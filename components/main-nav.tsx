@@ -84,128 +84,129 @@ export default function MainNav() {
   } 
 
   return (
-    <div
-      className={`main-nav d-flex flex-column justify-content-center
-         bg-${isBeproNetwork || isNetworksPage ? "dark" : "primary"}`}
-    >
+    <>
       {network?.isClosed && <ClosedNetworkAlert />}
-
       <div
-        className={`d-flex flex-row align-items-center justify-content-between px-3 ${
-          wallet?.address ? "py-0" : "py-3"
-        }`}
+        className={`main-nav d-flex flex-column justify-content-center
+          bg-${isBeproNetwork || isNetworksPage ? "dark" : "primary"}`}
       >
-        <div className="d-flex">
-          <InternalLink
-            href={getURLWithNetwork("/", { network: network?.name })}
-            icon={
-              !isBeproNetwork ? (
-                <img
-                  src={`${publicRuntimeConfig?.ipfsUrl}/${network?.fullLogo}`}
-                  width={104}
-                  height={32}
-                />
-              ) : (
-                <BeproLogoBlue />
-              )
-            }
-            className="brand"
-            nav
-            active
-            brand
-          />
-          {(!isNetworksPage && (
-            <ul className="nav-links">
-              <li>
-                <InternalLink
-                  href={getURLWithNetwork("/developers")}
-                  label={<Translation label={"main-nav.developers"} />}
-                  nav
-                  uppercase
-                />
-              </li>
-
-              <li>
-                <InternalLink
-                  href={getURLWithNetwork("/council")}
-                  label={<Translation label={"main-nav.council"} />}
-                  nav
-                  uppercase
-                />
-              </li>
-
-              <li>
-                <InternalLink
-                  href={getURLWithNetwork("/oracle")}
-                  label={<Translation label={"main-nav.Oracle"} />}
-                  nav
-                  uppercase
-                />
-              </li>
-
-              <li>
-                <InternalLink
-                  href={"/networks"}
-                  label={<Translation label={"main-nav.networks"} />}
-                  nav
-                  uppercase
-                />
-              </li>
-            </ul>
-          )) ||
-            ""}
-        </div>
-
-        <div className="d-flex flex-row align-items-center gap-20">
-          {(!isNetworksPage && (
-            <Button 
-              outline
-              onClick={handleNewBounty}
-              textClass="text-white"
-            >
-              <PlusIcon />
-              <span><Translation label={"main-nav.new-bounty"} /></span>
-            </Button>
-          )) || (
+        <div
+          className={`d-flex flex-row align-items-center justify-content-between px-3 ${
+            wallet?.address ? "py-0" : "py-3"
+          }`}
+        >
+          <div className="d-flex">
             <InternalLink
-              href={myNetwork.href}
-              icon={myNetwork.icon}
-              label={myNetwork.label}
-              iconBefore
-              uppercase
-              outline
+              href={getURLWithNetwork("/", { network: network?.name })}
+              icon={
+                !isBeproNetwork ? (
+                  <img
+                    src={`${publicRuntimeConfig?.ipfsUrl}/${network?.fullLogo}`}
+                    width={104}
+                    height={32}
+                  />
+                ) : (
+                  <BeproLogoBlue />
+                )
+              }
+              className="brand"
+              nav
+              active
+              brand
             />
-          )}
+            {(!isNetworksPage && (
+              <ul className="nav-links">
+                <li>
+                  <InternalLink
+                    href={getURLWithNetwork("/developers")}
+                    label={<Translation label={"main-nav.developers"} />}
+                    nav
+                    uppercase
+                  />
+                </li>
 
-          <Button
-            onClick={() => setShowHelp(true)}
-            className="opacity-75 opacity-100-hover"
-            transparent
-            rounded
-          >
-            <HelpIcon />
-          </Button>
+                <li>
+                  <InternalLink
+                    href={getURLWithNetwork("/council")}
+                    label={<Translation label={"main-nav.council"} />}
+                    nav
+                    uppercase
+                  />
+                </li>
 
-          <WrongNetworkModal requiredNetworkId={publicRuntimeConfig?.metaMask?.chainId} />
+                <li>
+                  <InternalLink
+                    href={getURLWithNetwork("/oracle")}
+                    label={<Translation label={"main-nav.Oracle"} />}
+                    nav
+                    uppercase
+                  />
+                </li>
 
-          <ConnectWalletButton>
-            <>
-              {/* <Button
-                className="opacity-75 opacity-100-hover"
-                transparent
-                rounded
+                <li>
+                  <InternalLink
+                    href={"/networks"}
+                    label={<Translation label={"main-nav.networks"} />}
+                    nav
+                    uppercase
+                  />
+                </li>
+              </ul>
+            )) ||
+              ""}
+          </div>
+
+          <div className="d-flex flex-row align-items-center gap-20">
+            {(!isNetworksPage && (
+              <Button 
+                outline
+                onClick={handleNewBounty}
+                textClass="text-white"
               >
-                <NotificationIcon />
-              </Button> */}
+                <PlusIcon />
+                <span><Translation label={"main-nav.new-bounty"} /></span>
+              </Button>
+            )) || (
+              <InternalLink
+                href={myNetwork.href}
+                icon={myNetwork.icon}
+                label={myNetwork.label}
+                iconBefore
+                uppercase
+                outline
+              />
+            )}
 
-              <TransactionsStateIndicator />
+            <Button
+              onClick={() => setShowHelp(true)}
+              className="opacity-75 opacity-100-hover"
+              transparent
+              rounded
+            >
+              <HelpIcon />
+            </Button>
 
-              <NavAvatar />
-            </>
-          </ConnectWalletButton>
+            <WrongNetworkModal requiredNetworkId={publicRuntimeConfig?.metaMask?.chainId} />
+
+            <ConnectWalletButton>
+              <>
+                {/* <Button
+                  className="opacity-75 opacity-100-hover"
+                  transparent
+                  rounded
+                >
+                  <NotificationIcon />
+                </Button> */}
+
+                <TransactionsStateIndicator />
+
+                <NavAvatar />
+              </>
+            </ConnectWalletButton>
+          </div>
+          <HelpModal show={showHelp} onCloseClick={() => setShowHelp(false)} />
         </div>
-        <HelpModal show={showHelp} onCloseClick={() => setShowHelp(false)} />
       </div>
-    </div>
+    </>
   );
 }
