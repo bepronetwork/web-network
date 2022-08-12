@@ -38,7 +38,7 @@ export default function FundModal({
   const bountyId = activeIssue?.contractId || networkIssue?.id || "XX";
   const fundBtnDisabled = 
     isExecuting || !amountToFund || amountToFund + networkIssue?.fundedAmount > networkIssue?.fundingAmount;
-  const rewardTokenSymbol = networkIssue?.transactionalTokenData?.symbol;
+  const rewardTokenSymbol = networkIssue?.rewardTokenData?.symbol;
   const needsApproval = amountToFund > allowance;
   const amountNotFunded = (networkIssue?.fundingAmount || 0) - (networkIssue?.fundedAmount || 0);
 
@@ -133,19 +133,22 @@ export default function FundModal({
           max={Math.min(amountNotFunded, balance)}
         />
 
-        <RowWithTwoColumns
-          col1={ <CaptionMedium text={t("funding:reward")} color="white" /> }
-          col2={
-            <div className="bg-dark-gray border-radius-8 py-2 px-3">
-              +<Amount
-                amount={rewardPreview}
-                symbol={rewardTokenSymbol}
-                symbolColor="warning"
-                className="caption-large text-white font-weight-normal"
-              />
-            </div>
-          }
-        />
+        {networkIssue?.rewardAmount > 0 && (
+                  <RowWithTwoColumns
+                    col1={<CaptionMedium text={t("funding:reward")} color="white" />}
+                    col2={
+                      <div className="bg-dark-gray border-radius-8 py-2 px-3">
+                        +
+                        <Amount
+                          amount={rewardPreview}
+                          symbol={rewardTokenSymbol}
+                          symbolColor="warning"
+                          className="caption-large text-white font-weight-normal"
+                        />
+                      </div>
+                    }
+                  />
+                )}
 
         <RowWithTwoColumns
           col1={
