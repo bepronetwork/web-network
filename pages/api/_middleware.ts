@@ -29,7 +29,8 @@ const whiteList = {
           "search/users/total", 
           "seo",
           "past-events/bulk",
-          ...pastEventsEndPoints ]
+          ...pastEventsEndPoints ],
+  PUT: [ "network" ]
 };
 
 const UnauthorizedResponse = 
