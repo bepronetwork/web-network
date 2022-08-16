@@ -11,7 +11,7 @@ type CombinedHeader = IncomingHttpHeaders & CustomHeader;
 
 const testnet = process.env.NEXT_E2E_TESTNET === "true";
 
-const pastEventsEvents =  ["created", "canceled", "closed", "disputed", "ready", "updated", "refused"];
+const pastEventsEvents =  ["created", "canceled", "closed", "disputed", "ready", "updated", "refused", "funded"];
 const pastEventsEntities = ["bounty", "proposal", "pull-request"];
 const pastEventsEndPoints = 
   pastEventsEntities.flatMap(entity => pastEventsEvents.map(event => `past-events/${entity}/${event}`));

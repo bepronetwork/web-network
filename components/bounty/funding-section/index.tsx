@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
 import FundModal from "components/bounty/funding-section/fund-modal";
 import FundingProgress from "components/bounty/funding-section/funding-progress";
@@ -20,12 +21,14 @@ import RetractModal from "./retract-modal";
 
 export default function FundingSection() {
   const { t } = useTranslation(["common", "funding"]);
-
+  const {
+    query: { repoId }
+  } = useRouter();
   const [showFundModal, setShowFundModal] = useState(false);
   const [walletFunds, setWalletFunds] = useState<BenefactorExtended[]>();
   const [fundingToRetract, setFundingToRetract] = useState<BenefactorExtended>();
 
-  const { networkIssue } = useIssue();
+  const { networkIssue, activeIssue } = useIssue();
   const { wallet } = useAuthentication();
   
   const isConnected = !!wallet?.address;
@@ -59,6 +62,8 @@ export default function FundingSection() {
       <FundModal 
         show={isConnected && showFundModal} 
         onCloseClick={handleCloseFundModal}
+        repoId={repoId}
+        ghId={activeIssue?.githubId}
       />
 
       <RetractModal
