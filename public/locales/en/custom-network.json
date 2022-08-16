@@ -156,6 +156,10 @@
       "dont-close-window": "Please, don't close this window",
       "steps": {
         "deploy-network": "Deploying Network_v2",
+        "changing-draft-time": "Deploying Network_v2 (Changing draft time)",
+        "changing-disputable-time": "Deploying Network_v2 (Changing disputable time)",
+        "changing-dispute-percentage": "Deploying Network_v2 (Changing dispute percentage)",
+        "changing-council-amount": "Deploying Network_v2 (Changing council amount)",
         "set-dispatcher": "Setting Bounty Token Dispatcher",
         "add-to-registry": "Registering Network_v2",
         "sync-web-network": "Synchronizing Web-network"
