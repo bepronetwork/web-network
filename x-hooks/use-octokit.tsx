@@ -95,7 +95,7 @@ export default function useOctokit() {
       response?.flatMap(item => getPropertyRecursively<GraphQlQueryResponseData>("nodes", item)
                         ?.map(node => ({...node, author: node["author"]["login"]}) ) );
 
-    return comments || [];
+    return comments.filter(el => el) || [];
   }
 
   async function getPullRequestDetails(repositoryPath:  string, id: number) {
