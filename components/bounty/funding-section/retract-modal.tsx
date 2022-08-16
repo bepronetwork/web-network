@@ -70,8 +70,8 @@ export default function RetractModal({
           </div>
 
           <h4 className="family-Regular font-weight-normal mb-4">
-            {t("funding:modals.retract.from-the")} 
-            <span className="text-primary">{t("bounty:label")} #{networkIssue?.id}</span> 
+            {t("funding:modals.retract.from-the")}{" "} 
+            <span className="text-primary">{t("bounty:label")} #{networkIssue?.id}{" "}</span> 
             {t("funding:fund")}.
           </h4>
         </Col>
