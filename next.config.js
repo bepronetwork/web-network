@@ -106,49 +106,57 @@ const serverRuntimeConfig = {
   e2e:  process.env.NEXT_E2E_TESTNET === "true" ? true : false || false,
 }
 
+const importConfigsFromDB = async () => {
+  console.log("Configs imported");
+}
 
-module.exports = {
-  i18n,
-  sassOptions: {
-    includePaths: [path.join(__dirname, "styles")]
-  },
-  images: {
-    domains: ["ipfs.infura.io"]
-  },
-  serverRuntimeConfig,
-  publicRuntimeConfig,
-  webpack5: true,
-  async redirects() {
-    return [
-      {
-        source: "/",
-        destination: "/bepro",
-        permanent: true
-      }
-    ];
-  },
-  async headers() {
-    return [
-      {
-        source: "/(.*)",
-        headers: [
-          {
-            key: "X-Frame-Options",
-            value: "DENY"
-          },
-        ]
-      },
-      {
-        source: "/api/(.*)",
-        headers: [
-          { key: "Access-Control-Allow-Credentials", value: "true" },
-          { key: "Access-Control-Allow-Origin", value: `${process.env.NEXT_PUBLIC_HOME_URL || 'https://development.bepro.network'}` },
-          {
-            key: "Access-Control-Allow-Headers",
-            value: "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
-          }
-        ]
-      }
-    ];
-  }
+
+module.exports = async () => {
+  await importConfigsFromDB();
+  
+  return {
+    i18n,
+    sassOptions: {
+      includePaths: [path.join(__dirname, "styles")]
+    },
+    images: {
+      domains: ["ipfs.infura.io"]
+    },
+    serverRuntimeConfig,
+    publicRuntimeConfig,
+    webpack5: true,
+    async redirects() {
+      return [
+        {
+          source: "/",
+          destination: "/bepro",
+          permanent: true
+        }
+      ];
+    },
+    async headers() {
+      return [
+        {
+          source: "/(.*)",
+          headers: [
+            {
+              key: "X-Frame-Options",
+              value: "DENY"
+            },
+          ]
+        },
+        {
+          source: "/api/(.*)",
+          headers: [
+            { key: "Access-Control-Allow-Credentials", value: "true" },
+            { key: "Access-Control-Allow-Origin", value: `${process.env.NEXT_PUBLIC_HOME_URL || 'https://development.bepro.network'}` },
+            {
+              key: "Access-Control-Allow-Headers",
+              value: "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+            }
+          ]
+        }
+      ];
+    }
+  };
 };
