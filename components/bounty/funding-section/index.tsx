@@ -62,8 +62,6 @@ export default function FundingSection() {
       <FundModal 
         show={isConnected && showFundModal} 
         onCloseClick={handleCloseFundModal}
-        repoId={repoId}
-        ghId={activeIssue?.githubId}
       />
 
       <RetractModal

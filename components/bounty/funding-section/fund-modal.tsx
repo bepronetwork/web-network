@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
 import LockedIcon from "assets/icons/locked-icon";
 
@@ -25,15 +26,15 @@ import { Amount, CaptionMedium, RowWithTwoColumns } from "./minimals";
 export default function FundModal({
   show = false,
   onCloseClick,
-  repoId,
-  ghId
 }) {
   const { t } = useTranslation(["common", "funding", "bounty"]);
 
   const [amountToFund, setAmountToFund] = useState(0);
   const [rewardPreview, setRewardPreview] = useState(0);
   const [isExecuting, setIsExecuting] = useState(false);
-
+  const {
+    query: { repoId }
+  } = useRouter();
   const { handleFundBounty } = useBepro();
   const { dispatch } = useContext(ApplicationContext);
   const { processEvent } = useApi();
@@ -85,7 +86,7 @@ export default function FundModal({
       })
       .then(() => {
         const amountFormatted = formatNumberToCurrency(amountToFund);
-        updateIssue(repoId, ghId)
+        updateIssue(repoId.toString(), activeIssue?.githubId)
         handleClose();
         getNetworkIssue();
         dispatch(toastSuccess(t("funding:modals.fund.funded-x-symbol", {
