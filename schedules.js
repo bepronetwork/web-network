@@ -16,19 +16,9 @@ async function processPastEvents() {
     .then(({ data }) => console.log("Ran past events.", data))
     .catch((error) =>
       console.log("Error on past events", error?.message || error))
-    .finally(() =>{
+    .finally(() => {
       return setTimeout(async () => await processPastEvents(), scheduleInterval)
     });
 }
 
-async function moveToReady() {
-  return client
-    .get("past-events/move-to-open/")
-    .then(({ data }) => console.log("Ran move to open.", data))
-    .catch((error) =>
-      console.log("Error move to open", error?.message || error))
-    .finally(() => setTimeout(async () => await moveToReady(), scheduleInterval));
-}
-
-moveToReady();
 processPastEvents();
