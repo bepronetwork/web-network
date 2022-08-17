@@ -33,7 +33,9 @@ export default function BranchsDropdown({
     }
 
     const branchs = await findBranch(Number(repoId), fromBountyCreation);
-    setOptions(branchs.map(mapRepo));
+    const options = branchs.map(mapRepo)
+    setOptions(options);
+    options?.[0] && setOption(options[0]);
   }
 
   useEffect(() => {

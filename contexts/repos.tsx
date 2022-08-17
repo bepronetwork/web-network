@@ -67,7 +67,7 @@ export const ReposProvider: React.FC = function ({ children }) {
   const { query } = useRouter();
 
   const findRepo = (repoId: number): RepoInfo =>
-    repoList[activeNetwork?.name]?.repos?.find(({ id }) => id === repoId);
+    repoList[activeNetwork?.name]?.repos?.find(({ id }) => +id === +repoId);
   const isLoadedReposByNetwork = (): boolean =>
     repoList[activeNetwork?.name]?.repos?.length > 0;
 
