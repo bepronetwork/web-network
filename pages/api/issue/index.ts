@@ -10,8 +10,6 @@ import * as RepositoryQueries from "graphql/repository";
 
 import twitterTweet from "helpers/api/handle-twitter-tweet";
 
-import { api } from "services/api";
-
 import { GraphQlResponse } from "types/octokit";
 
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
@@ -136,9 +134,7 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
           { association: "token" }
         ]
       });
-      await api.post(`/seo/${issueId}`).catch((e) => {
-        console.log("Error creating SEO", e);
-      });
+ 
       if (network.contractAddress === publicRuntimeConfig?.contract?.address)
         twitterTweet({
           type: "bounty",

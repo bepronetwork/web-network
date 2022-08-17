@@ -3,8 +3,6 @@ import { Network_v2 } from "@taikai/dappkit";
 
 import models from "db/models";
 
-import { api } from "services/api";
-
 export default async function readPullRequestReady(events, network: Network_v2, customNetwork) {
   const created: string[] = [];
 
@@ -44,10 +42,6 @@ export default async function readPullRequestReady(events, network: Network_v2, 
           bounty.state = "ready";
 
           await bounty.save();
-
-          await api.post(`/seo/${bounty.issueId}`).catch((e) => {
-            console.log("Error creating SEO", e);
-          });
 
           created.push(pullRequest.githubId);
         }

@@ -8,8 +8,6 @@ import models from "db/models";
 import * as IssueQueries from "graphql/issue";
 import * as PullRequestQueries from "graphql/pull-request";
 
-import { api } from "services/api";
-
 import { GraphQlResponse } from "types/octokit";
 
 import twitterTweet from "../handle-twitter-tweet";
@@ -130,9 +128,6 @@ export default async function readBountyClosed(events, network: Network_v2, cust
                 currency: bounty.token.symbol
               });
         
-            await api.post(`/seo/${bounty.issueId}`).catch((e) => {
-              console.log("Error creating SEO", e);
-            });
           }
         }
       }

@@ -10,8 +10,6 @@ import * as IssueQueries from "graphql/issue";
 
 import { truncateAddress } from "helpers/truncate-address";
 
-import { api } from "services/api";
-
 import { GraphQlResponse } from "types/octokit";
 
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
@@ -73,10 +71,6 @@ export default async function readPullRequestCreated(events, network: Network_v2
           await githubAPI(CommentsQueries.Create, {
             issueOrPullRequestId: issueGithubId,
             body
-          });
-
-          await api.post(`/seo/${bounty.issueId}`).catch((e) => {
-            console.log("Error creating SEO", e);
           });
 
           created.push(pullRequest.githubId);
