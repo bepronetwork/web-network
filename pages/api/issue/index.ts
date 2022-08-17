@@ -10,7 +10,7 @@ import * as RepositoryQueries from "graphql/repository";
 
 import twitterTweet from "helpers/api/handle-twitter-tweet";
 
-import api from "services/api";
+import { api } from "services/api";
 
 import { GraphQlResponse } from "types/octokit";
 

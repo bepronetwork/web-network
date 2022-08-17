@@ -10,7 +10,7 @@ import * as IssueQueries from "graphql/issue";
 
 import { truncateAddress } from "helpers/truncate-address";
 
-import api from "services/api";
+import { api } from "services/api";
 
 import { GraphQlResponse } from "types/octokit";
 

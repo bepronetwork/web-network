@@ -8,7 +8,8 @@ const publicRuntimeConfig = {
   adminWalletAddress: process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS,
   homeUrl: process.env.NEXT_PUBLIC_HOME_URL,
   apiUrl: process.env.NEXT_PUBLIC_API_HOST,
-  contract:{
+  eventsApiUrl: process.env.NEXT_PUBLIC_EVENTS_API,
+  contract: {
     address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
     settler: process.env.NEXT_PUBLIC_SETTLER_ADDRESS,
     transaction: process.env.NEXT_PUBLIC_TRANSACTION_ADDRESS,
@@ -17,10 +18,10 @@ const publicRuntimeConfig = {
   },
   nftUri: process.env.NEXT_PUBLIC_NFT_URI,
   web3ProviderConnection: process.env.NEXT_PUBLIC_WEB3_CONNECTION,
-  github:{
+  github: {
     user: process.env.NEXT_PUBLIC_GH_USER,
   },
-  metaMask:{
+  metaMask: {
     tokenName: process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME,
     chainId: process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID,
     chainName: process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME,
@@ -28,16 +29,16 @@ const publicRuntimeConfig = {
   },
   countryCodeBlocked: process.env.NEXT_PUBLIC_COUNTRY_CODE_BLOCKED,
   ipfsUrl: process.env.NEXT_PUBLIC_IPFS_BASE,
-  networkConfig:{
-    disputableTime:{
+  networkConfig: {
+    disputableTime: {
       min: process.env.NEXT_PUBLIC_DISPUTABLE_TIME_MIN,
       max: eval(process.env.NEXT_PUBLIC_DISPUTABLE_TIME_MAX),
     },
-    reedemTime:{
+    reedemTime: {
       min: process.env.NEXT_PUBLIC_REDEEM_TIME_MIN,
       max: eval(process.env.NEXT_PUBLIC_REDEEM_TIME_MAX),
     },
-    councilAmount:{
+    councilAmount: {
       min: process.env.NEXT_PUBLIC_COUNCIL_AMOUNT_MIN,
       max: process.env.NEXT_PUBLIC_COUNCIL_AMOUNT_MAX,
     },
@@ -45,7 +46,7 @@ const publicRuntimeConfig = {
     networkName: process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME,
     allowCustomTokens: process.env.NEXT_PUBLIC_ALLOW_CUSTOM_TOKENS
   },
-  currency:{
+  currency: {
     main: process.env.NEXT_PUBLIC_CURRENCY_MAIN,
     apiUrl: process.env.NEXT_PUBLIC_CURRENCY_API,
     currencyId: process.env.NEXT_PUBLIC_CURRENCY_ID,
@@ -70,7 +71,7 @@ const publicRuntimeConfig = {
 const serverRuntimeConfig = {
   authSecret: process.env.NEXTAUTH_SECRET,
   authUrl: process.env.NEXTAUTH_URL,
-  github:{
+  github: {
     clientId: process.env.NEXT_GH_CLIENT_ID,
     secret: process.env.NEXT_GH_SECRET,
     mainBranch: process.env.NEXT_GH_MAINBRANCH,
@@ -78,23 +79,23 @@ const serverRuntimeConfig = {
     repo: process.env.NEXT_GH_REPO,
     token: process.env.NEXT_PUBLIC_GH_TOKEN,
   },
-  ipApi:{
-  key: process.NEXT_IP_API_KEY,
+  ipApi: {
+    key: process.NEXT_IP_API_KEY,
     skip: process.env.NEXT_SKIP_IP_API || false,
   },
   walletPrivateKey: process.env.NEXT_WALLET_PRIVATE_KEY,
-  elasticSearch:{
+  elasticSearch: {
     url: process.env.NEXT_ELASTIC_SEARCH_URL,
     username: process.env.NEXT_ELASTIC_SEARCH_USERNAME,
     password: process.env.NEXT_ELASTIC_SEARCH_PASSWORD,
   },
-  infura:{
+  infura: {
     host: process.env.NEXT_IPFS_HOST,
     port: process.env.NEXT_IPFS_PORT,
     projectId: process.env.NEXT_IPFS_PROJECT_ID,
     projectSecret: process.env.NEXT_IPFS_PROJECT_SECRET
   },
-  twitter:{
+  twitter: {
     apiKey: process.env.NEXT_TWITTER_APIKEY,
     apiSecret: process.env.NEXT_TWITTER_APIKEY_SECRET,
     accessToken: process.env.NEXT_TWITTER_ACCESS_TOKEN,
@@ -103,7 +104,7 @@ const serverRuntimeConfig = {
   schedules: {
     startProcessEventsAt: process.env.SCHEDULES_START_BLOCK,
   },
-  e2e:  process.env.NEXT_E2E_TESTNET === "true" ? true : false || false,
+  e2e: process.env.NEXT_E2E_TESTNET === "true" ? true : false || false,
 }
 
 

@@ -11,7 +11,7 @@ import * as IssueQueries from "graphql/issue";
 
 import { getPropertyRecursively } from "helpers/object";
 
-import api from "services/api";
+import { api } from "services/api";
 
 import { GraphQlQueryResponseData, GraphQlResponse } from "types/octokit";
 

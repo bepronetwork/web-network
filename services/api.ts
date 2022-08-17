@@ -3,8 +3,12 @@ import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: `${publicRuntimeConfig?.apiUrl}/api`
+});
+
+export const eventsApi = axios.create({
+  baseURL: `${publicRuntimeConfig?.eventsApiUrl}/`
 });
 
 api.interceptors.response.use((response) => response,
@@ -13,4 +17,10 @@ api.interceptors.response.use((response) => response,
                                 throw error;
                               });
 
-export default api;
+eventsApi.interceptors.response.use((response) => response,
+                                    (error) => {
+                                      console.debug("[EventsApi] Failed", error);
+                                      throw error;
+                                    });
+
+export default {api, eventsApi};
