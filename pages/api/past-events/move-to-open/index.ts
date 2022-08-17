@@ -11,7 +11,7 @@ import * as RepositoryQueries from "graphql/repository";
 
 import { Settings } from "helpers/settings";
 
-import api from "services/api";
+import { api } from "services/api";
 import DAO from "services/dao-service";
 
 import { GraphQlResponse } from "types/octokit";

@@ -19,7 +19,7 @@ import { PaginatedData } from "interfaces/paginated-data";
 import { Proposal } from "interfaces/proposal";
 import { ReposList } from "interfaces/repos-list";
 
-import client from "services/api";
+import { api } from "services/api";
 
 import { Entities, Events } from "types/dappkit";
 interface NewIssueParams {
@@ -50,7 +50,7 @@ export default function useApi() {
   const sessionStorageSettings = getSettingsFromSessionStorage();
   const DEFAULT_NETWORK_NAME = sessionStorageSettings?.defaultNetworkConfig?.name || "bepro";
 
-  client.interceptors.request.use(config => {
+  api.interceptors.request.use(config => {
     config.headers["wallet"] = typeof window !== 'undefined' && sessionStorage.getItem("currentWallet") || ""
 
     return config;
@@ -84,7 +84,7 @@ export default function useApi() {
       proposer,
       networkName
     }).toString();
-    return client
+    return api
       .get<{
         rows: IssueData[];
         count: number;
@@ -109,14 +109,14 @@ export default function useApi() {
       path,
       networkName
     }).toString();
-    return client
+    return api
       .get<{ rows; count: number; pages: number; currentPage: number }>(`/search/repositories?${params}`)
       .then(({ data }) => data)
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
   async function getIssue(repoId: string | number, ghId: string | number, networkName = DEFAULT_NETWORK_NAME) {
-    return client
+    return api
       .get<IssueData>(`/issue/${repoId}/${ghId}/${networkName}`)
       .then(({ data }) => data)
       .catch(() => null);
@@ -126,14 +126,14 @@ export default function useApi() {
     const dates = startDate ? { startDate, endDate } : { endDate }
     const params = new URLSearchParams({ wallet, networkName, ...dates }).toString();
 
-    return client
+    return api
       .get<IssueData[]>(`/payments?${params}`)
       .then(({ data }) => data)
       .catch(() => null);
   }
 
   async function createIssue(payload: NewIssueParams, networkName = DEFAULT_NETWORK_NAME) {
-    return client
+    return api
       .post<number>("/issue", { ...payload, networkName })
       .then(({ data }) => data)
       .catch(() => null);
@@ -146,7 +146,7 @@ export default function useApi() {
    * @returns string
    */
   async function createPreBounty(payload: CreateBounty, networkName = DEFAULT_NETWORK_NAME): Promise<string> {
-    return client
+    return api
         .post("/issue", { ...payload, networkName })
         .then(({ data }) => data)
         .catch((error) => {
@@ -158,7 +158,7 @@ export default function useApi() {
                                     githubId,
                                     scId,
                                     networkName = DEFAULT_NETWORK_NAME) {
-    return client
+    return api
       .patch("/issue", { repoId, githubId, scId, networkName })
       .then(({ data }) => data === "ok")
       .catch(() => false);
@@ -171,7 +171,7 @@ export default function useApi() {
       state: "pending",
       networkName
     }).toString();
-    return client
+    return api
       .get<IssueData[]>(`/search/issues/?${search}`)
       .then(({ data }) => data)
       .catch(() => null);
@@ -181,7 +181,7 @@ export default function useApi() {
     networkName = DEFAULT_NETWORK_NAME,
     ...rest 
   } : CreatePrePullRequestParams) {
-    return client
+    return api
       .post("/pull-request/", { networkName, ...rest })
       .then(({ data }) => data)
       .catch((error) => {
@@ -193,7 +193,7 @@ export default function useApi() {
     networkName = DEFAULT_NETWORK_NAME,
     ...rest 
   } : CancelPrePullRequestParams) {
-    return client
+    return api
       .delete("/pull-request/", { data: { customNetworkName: networkName, ...rest } })
       .then(({ data }) => data)
       .catch((error) => {
@@ -203,7 +203,7 @@ export default function useApi() {
 
   async function getPullRequestIssue(issueId: string, page = "1") {
     const search = new URLSearchParams({ issueId, page }).toString();
-    return client
+    return api
       .get<PaginatedData<pullRequest>>(`/pull-request?${search}`)
       .then(({ data: { rows } }) => head(rows))
       .catch((e) => {
@@ -213,34 +213,34 @@ export default function useApi() {
   }
 
   async function joinAddressToUser({ wallet, ...rest } : PatchUserParams): Promise<boolean> {
-    return client.patch(`/user/connect`, { wallet, ...rest });
+    return api.patch(`/user/connect`, { wallet, ...rest });
   }
 
   async function getUserWith(login: string): Promise<User> {
-    return client
+    return api
       .post<User[]>("/search/users/login/", [login])
       .then(({ data }) => data[0] || ({} as User))
       .catch(() => ({} as User));
   }
 
   async function getTotalUsers(): Promise<number> {
-    return client.get<number>("/search/users/total").then(({ data }) => data);
+    return api.get<number>("/search/users/total").then(({ data }) => data);
   }
   
   async function getTotalBounties(state: string, networkName = DEFAULT_NETWORK_NAME): Promise<number> {
     const search = new URLSearchParams({ state, networkName }).toString();
-    return client.get<number>(`/search/issues/total?${search}`).then(({ data }) => data);
+    return api.get<number>(`/search/issues/total?${search}`).then(({ data }) => data);
   }
 
   async function getAllUsers(payload: { page: number } = { page: 1 }) {
-    return client
+    return api
       .post<User[]>("/search/users/all", payload)
       .then(({ data }) => data)
       .catch(() => []);
   }
 
   async function createRepo(owner, repo, networkName = DEFAULT_NETWORK_NAME) {
-    return client
+    return api
       .post("/repos/", { owner, repo, networkName })
       .then(({ status }) => status === 200)
       .catch((e) => {
@@ -255,14 +255,14 @@ export default function useApi() {
     if (!force && repoList.length)
       return Promise.resolve(repoList as ReposList);
 
-    return client
+    return api
       .get<ReposList>(`/repos?${search}`)
       .then(({ data }) => data)
       .catch(() => []);
   }
 
   async function removeRepo(id: string) {
-    return client
+    return api
       .delete(`/repos/${id}`)
       .then(({ status }) => status === 200)
       .catch(() => false);
@@ -272,21 +272,21 @@ export default function useApi() {
                               event: Events, 
                               networkName: string = DEFAULT_NETWORK_NAME,
                               params: PastEventsParams = {}) {
-    return client.post(`/past-events/${entity}/${event}`, {
+    return api.post(`/past-events/${entity}/${event}`, {
       ...params,
       networkName
     });
   }
 
   async function getHealth() {
-    return client
+    return api
       .get("/health")
       .then(({ status }) => status === 204)
       .catch(() => false);
   }
 
-  async function getClientNation() {
-    return client
+  async function getapiNation() {
+    return api
       .get("/ip")
       .then(({ data }) => data || { countryCode: "US", country: "" })
       .catch(() => {
@@ -301,7 +301,7 @@ export default function useApi() {
       page: "1",
       networkName
     }).toString();
-    return client
+    return api
       .get<PaginatedData<pullRequest>>(`/pull-request?${search}`)
       .then(({ data: { count } }) => count > 0)
       .catch((e) => {
@@ -313,7 +313,7 @@ export default function useApi() {
   async function getUserPullRequests(page = "1", login: string, networkName = DEFAULT_NETWORK_NAME) {
     const search = new URLSearchParams({ page, login, networkName }).toString();
 
-    return client
+    return api
       .get<PaginatedData<pullRequest>>(`/pull-request?${search}`)
       .then(({ data }) => data)
       .catch((e) => {
@@ -323,7 +323,7 @@ export default function useApi() {
   }
 
   async function startWorking({ networkName = DEFAULT_NETWORK_NAME, ...rest } : StartWorkingParams) {
-    return client
+    return api
       .put("/issue/working", { networkName, ...rest })
       .then((response) => response)
       .catch((error) => {
@@ -332,7 +332,7 @@ export default function useApi() {
   }
 
   async function mergeClosedIssue({ networkName = DEFAULT_NETWORK_NAME, ...rest } : MergeClosedIssueParams) {
-    return client
+    return api
       .post("/pull-request/merge", { networkName, ...rest})
       .then((response) => response)
       .catch((error) => {
@@ -341,7 +341,7 @@ export default function useApi() {
   }
 
   async function createReviewForPR({ networkName = DEFAULT_NETWORK_NAME, ...rest } : CreateReviewParams) {
-    return client
+    return api
       .put("/pull-request/review", { networkName, ...rest })
       .then((response) => response)
       .catch(error => {
@@ -350,13 +350,13 @@ export default function useApi() {
   }
 
   async function removeUser(address: string, githubLogin: string) {
-    return client
+    return api
       .delete(`/user/${address}/${githubLogin}`)
       .then(({ status }) => status === 200);
   }
 
   async function createNetwork(networkInfo) {
-    return client
+    return api
       .post("/network", { ...networkInfo })
       .then((response) => response)
       .catch((error) => {
@@ -384,11 +384,11 @@ export default function useApi() {
       form.append("file", files);
     }
 
-    return client.post("/files", form).then(({ data }) => data);
+    return api.post("/files", form).then(({ data }) => data);
   }
 
   async function updateNetwork(networkInfo) {
-    return client
+    return api
       .put("/network", { ...networkInfo })
       .then((response) => response)
       .catch((error) => {
@@ -397,14 +397,14 @@ export default function useApi() {
   }
 
   async function getProposal(dbId: string | number): Promise<Proposal> {
-    return client
+    return api
       .get<Proposal>(`/merge-proposal/${dbId}`)
       .then(({ data }) => data)
       .catch(() => null);
   }
 
   async function getUserOf(address: string): Promise<User> {
-    return client
+    return api
       .post<User[]>("/search/users/address/", [address])
       .then(({ data }) => data[0])
       .catch(() => ({} as User));
@@ -416,7 +416,7 @@ export default function useApi() {
       networkAddress
     }).toString();
 
-    return client
+    return api
       .get<{
         rows: Network[];
         count: number;
@@ -435,7 +435,7 @@ export default function useApi() {
 
     const search = new URLSearchParams(Params).toString();
 
-    return client
+    return api
       .get<Network>(`/network?${search}`)
       .then((response) => response)
       .catch((error) => {
@@ -466,7 +466,7 @@ export default function useApi() {
       ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {})
     }).toString();
 
-    return client
+    return api
       .get<{
         rows: Network[];
         count: number;
@@ -480,14 +480,14 @@ export default function useApi() {
   async function repositoryHasIssues(repoPath) {
     const search = new URLSearchParams({ repoPath }).toString();
 
-    return client
+    return api
       .get<{ rows: IssueData[]; count: number }>(`/search/issues/?${search}`)
       .then(({ data }) => !!data.count)
       .catch(() => false);
   }
 
   async function resetUser(address: string, githubLogin: string) {
-    return client.post("/user/reset", { address, githubLogin });
+    return api.post("/user/reset", { address, githubLogin });
   }
 
   async function getSettings() {
@@ -503,7 +503,7 @@ export default function useApi() {
     createRepo,
     createReviewForPR,
     getAllUsers,
-    getClientNation,
+    getapiNation,
     getHealth,
     getIssue,
     getPayments,

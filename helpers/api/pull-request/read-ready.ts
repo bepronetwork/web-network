@@ -3,7 +3,7 @@ import { Network_v2 } from "@taikai/dappkit";
 
 import models from "db/models";
 
-import api from "services/api";
+import { api } from "services/api";
 
 export default async function readPullRequestReady(events, network: Network_v2, customNetwork) {
   const created: string[] = [];

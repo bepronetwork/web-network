@@ -8,7 +8,7 @@ import models from "db/models";
 import * as IssueQueries from "graphql/issue";
 import * as PullRequestQueries from "graphql/pull-request";
 
-import api from "services/api";
+import { api } from "services/api";
 
 import { GraphQlResponse } from "types/octokit";
 
