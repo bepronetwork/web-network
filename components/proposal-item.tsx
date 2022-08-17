@@ -110,6 +110,15 @@ export default function ProposalItem({
 
   }, [isBountyClosed, isProposalDisputed, isProposalMerged, isProposalRefused]);
 
+  if (activeIssue?.mergeProposals?.length !== networkIssue?.proposals?.length && !networkProposal)
+    return (
+      <div className="content-list-item proposal my-1">
+        <div className="d-flex justify-content-center">
+          <span className="spinner-border spinner-border-xs my-2"/>
+        </div>
+      </div>
+    );
+
   return (
     <Link
       passHref
