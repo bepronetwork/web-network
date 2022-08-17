@@ -47,14 +47,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       networkAddress
     } = req.body;
 
-    const user = await Database.user.findOne({
-      where: {
-        githubLogin,
-        address: creator.toLowerCase()
-      }
-    });
-
-    if (!user) return res.status(403).json("Invalid user provided");
     if (!accessToken) return res.status(401).json("Unauthorized user");
     if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
 
@@ -168,14 +160,6 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
     const isAdminOverriding = !!override;
 
-    const user = await Database.user.findOne({
-      where: {
-        githubLogin,
-        address: creator.toLowerCase()
-      }
-    });
-
-    if (!user) return res.status(403).json("Invalid user provided");
     if (!accessToken && !isAdminOverriding) return res.status(401).json("Unauthorized user");
 
     const network = await Database.network.findOne({

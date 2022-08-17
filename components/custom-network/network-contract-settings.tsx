@@ -70,7 +70,7 @@ export default function NetworkContractSettings() {
   ];
   
   return (
-    <div className="d-flex flex-row border-radius-8 justify-content-center gap-20">
+    <div className="d-flex flex-row border-radius-8 justify-content-center gap-20 mt-2">
       { parameterInputs.map(input => <NetworkParameterInput  key={input.label} {...input} />) }
     </div>
   );

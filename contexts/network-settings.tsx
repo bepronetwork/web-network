@@ -290,7 +290,12 @@ export const NetworkSettingsProvider = ({ children }) => {
 
         return newState;
       });
-    } else
+    } else {
+      setDetails({ 
+        ...DefaultNetworkSettings.details,
+        fullLogo: { ...DefaultNetworkSettings.details.fullLogo, value: { preview: "", raw: undefined } },
+        iconLogo: { ...DefaultNetworkSettings.details.iconLogo, value: { preview: "", raw: undefined } }
+      });
       setSettings(previous => {
         const newState = { ...previous };
 
@@ -304,12 +309,14 @@ export const NetworkSettingsProvider = ({ children }) => {
 
         return newState;
       });
+    }
   }, [ wallet?.address, 
        user?.login, 
        DAOService, 
        network, 
        isCreating, 
-       needsToLoad ]);
+       needsToLoad,
+       router.pathname ]);
 
   useEffect(() => {
     if (wallet?.balance)

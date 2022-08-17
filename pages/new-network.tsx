@@ -62,6 +62,10 @@ export default function NewNetwork() {
 
   const creationSteps = [
     { id: 1, name: t("custom-network:modals.loader.steps.deploy-network") },
+    { id: 1, name: t("custom-network:modals.loader.steps.changing-draft-time") },
+    { id: 1, name: t("custom-network:modals.loader.steps.changing-disputable-time") },
+    { id: 1, name: t("custom-network:modals.loader.steps.changing-dispute-percentage") },
+    { id: 1, name: t("custom-network:modals.loader.steps.changing-council-amount") },
     { id: 2, name: t("custom-network:modals.loader.steps.set-dispatcher") },
     { id: 3, name: t("custom-network:modals.loader.steps.add-to-registry") },
     { id: 4, name: t("custom-network:modals.loader.steps.sync-web-network") }
@@ -88,29 +92,37 @@ export default function NewNetwork() {
     const councilAmount = settings.parameters.councilAmount.value;
     const percentageForDispute = settings.parameters.percentageNeededForDispute.value;
 
-    if (draftTime !== DEFAULT_DRAFT_TIME) 
+    if (draftTime !== DEFAULT_DRAFT_TIME) {
+      setCreatingNetwork(1);
       await handleChangeNetworkParameter("draftTime", draftTime, deployedNetworkAddress);
+    }
     
-    if (disputableTime !== DEFAULT_DISPUTE_TIME) 
+    if (disputableTime !== DEFAULT_DISPUTE_TIME) {
+      setCreatingNetwork(2);
       await handleChangeNetworkParameter("disputableTime", disputableTime, deployedNetworkAddress);
+    }
 
-    if (councilAmount !== DEFAULT_COUNCIL_AMOUNT) 
+    if (councilAmount !== DEFAULT_COUNCIL_AMOUNT) {
+      setCreatingNetwork(3);
       await handleChangeNetworkParameter("councilAmount", councilAmount, deployedNetworkAddress);
+    }
 
-    if (percentageForDispute !== DEFAULT_PERCENTAGE_FOR_DISPUTE) 
+    if (percentageForDispute !== DEFAULT_PERCENTAGE_FOR_DISPUTE) {
+      setCreatingNetwork(4);
       await handleChangeNetworkParameter("percentageNeededForDispute", percentageForDispute, deployedNetworkAddress);
+    }
 
-    setCreatingNetwork(1);
+    setCreatingNetwork(5);
 
     await handleSetDispatcher(tokens.bounty, deployedNetworkAddress)
       .catch(error => console.error("Failed to set dispatcher", deployedNetworkAddress, error));
 
-    setCreatingNetwork(2);
+    setCreatingNetwork(6);
 
     await handleAddNetworkToRegistry(deployedNetworkAddress)
       .catch(error => console.error("Failed to add to registry", deployedNetworkAddress, error));
 
-    setCreatingNetwork(3);
+    setCreatingNetwork(7);
 
     const payload = {
       name: details.name.value,

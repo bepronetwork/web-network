@@ -8,11 +8,13 @@ export default function CreatingNetworkLoader({
 }) {
   const { t } = useTranslation(["custom-network"]);
 
+  const maxStep = steps?.reduce((max, step) => Math.max(max, step.id), 0);
+
   return (
     <div className="creating-network-loader">
       <div className="d-flex flex-row align-items-end">
         <span className="caption-large text-white">
-          Step ({steps[currentStep].id}/{steps.length}) {steps[currentStep].name}
+          Step ({steps[currentStep].id}/{maxStep}) {steps[currentStep].name}
         </span>{" "}
         <LoadingDots />
       </div>

@@ -19,7 +19,7 @@ export default function NetworkParameterInput({
   const handleChange = (values: NumberFormatValues) => onChange(values.floatValue);
 
   return(
-    <div className="form-group col">
+    <div className="form-group col mb-0">
       <InputNumber
         classSymbol={"text-primary"}
         min={0}

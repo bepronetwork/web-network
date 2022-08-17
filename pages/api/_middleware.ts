@@ -21,14 +21,16 @@ const whiteList = {
           "auth/signin/github",
           "auth/signout",
           "graphql", 
-          "issue", 
+          "issue",
+          "network",
           "search/users/address", 
           "search/users/all", 
           "search/users/login", 
           "search/users/total", 
           "seo",
           "past-events/bulk",
-          ...pastEventsEndPoints ]
+          ...pastEventsEndPoints ],
+  PUT: [ "network" ]
 };
 
 const UnauthorizedResponse = 

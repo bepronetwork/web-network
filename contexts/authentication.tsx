@@ -34,7 +34,7 @@ export interface IAuthenticationContext {
 
 const AuthenticationContext = createContext<IAuthenticationContext>({} as IAuthenticationContext);
 
-const EXCLUDED_PAGES = ["/networks", "/connect-account"];
+const EXCLUDED_PAGES = ["/networks", "/connect-account", "/new-network", "/[network]/profile/my-network"];
 
 export const AuthenticationProvider = ({ children }) => {
   const session = useSession();

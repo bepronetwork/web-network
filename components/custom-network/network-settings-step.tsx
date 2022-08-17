@@ -1,6 +1,7 @@
 import { useTranslation } from "next-i18next";
 
 import Step from "components/step";
+import { WarningSpan } from "components/warning-span";
 
 import { useNetworkSettings } from "contexts/network-settings";
 
@@ -79,11 +80,11 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
       </Section>
 
       <Section title={t("custom-network:steps.network-settings.fields.other-settings.title")}>
-        <small className="small-info text-gray my-2">
-          {t("custom-network:steps.network-settings.fields.other-settings.parameters-warning")}
-        </small>
-
         <NetworkContractSettings/>
+
+        <WarningSpan
+          text={t("custom-network:steps.network-settings.fields.other-settings.parameters-warning")}
+        />
       </Section>
     </Step>
   );
