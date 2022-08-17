@@ -19,7 +19,7 @@ import { PaginatedData } from "interfaces/paginated-data";
 import { Proposal } from "interfaces/proposal";
 import { ReposList } from "interfaces/repos-list";
 
-import { api } from "services/api";
+import { api, eventsApi } from "services/api";
 
 import { Entities, Events } from "types/dappkit";
 interface NewIssueParams {
@@ -34,7 +34,6 @@ interface NewIssueParams {
 interface CreateBounty {
   title: string;
   body: string;
-  creator: string;
   repositoryId: string;
 }
 
@@ -272,10 +271,11 @@ export default function useApi() {
                               event: Events, 
                               networkName: string = DEFAULT_NETWORK_NAME,
                               params: PastEventsParams = {}) {
-    return api.post(`/past-events/${entity}/${event}`, {
-      ...params,
-      networkName
-    });
+    
+    const events = await eventsApi.get(`/past-events/${entity}/${event}`, {
+                                  params: { ...params, networkName }
+    }).then(({ data }) => data?.[networkName]);
+    return events;
   }
 
   async function getHealth() {
@@ -285,7 +285,7 @@ export default function useApi() {
       .catch(() => false);
   }
 
-  async function getapiNation() {
+  async function getClientNation() {
     return api
       .get("/ip")
       .then(({ data }) => data || { countryCode: "US", country: "" })
@@ -503,7 +503,7 @@ export default function useApi() {
     createRepo,
     createReviewForPR,
     getAllUsers,
-    getapiNation,
+    getClientNation,
     getHealth,
     getIssue,
     getPayments,

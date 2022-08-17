@@ -21,7 +21,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     title,
     body,
     repositoryId,
-    //creator,
     networkName
   } = req.body;
 
@@ -34,8 +33,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!network || network?.isClosed) return res.status(404).json("Invalid network");
-
-  //if (!creator) return res.status(422).json("Invalid Github user");
 
   const repository = await models.repositories.findOne({
     where: { id: repositoryId, network_id: network.id }
