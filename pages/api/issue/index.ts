@@ -9,7 +9,7 @@ import * as IssueQueries from "graphql/issue";
 import * as RepositoryQueries from "graphql/repository";
 
 
-import api from "services/api";
+import {api} from "services/api";
 
 
 import { GraphQlResponse } from "types/octokit";

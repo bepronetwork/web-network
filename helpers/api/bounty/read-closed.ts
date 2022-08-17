@@ -8,8 +8,6 @@ import models from "db/models";
 import * as IssueQueries from "graphql/issue";
 import * as PullRequestQueries from "graphql/pull-request";
 
-import { api } from "services/api";
-
 import { GraphQlResponse } from "types/octokit";
 
 const { serverRuntimeConfig } = getConfig();
@@ -120,9 +118,20 @@ export default async function readBountyClosed(events, network: Network_v2, cust
 
             closedBounties.push(bounty.issueId);
         
+<<<<<<< HEAD
             await api.post(`/seo/${bounty.issueId}`).catch((e) => {
               console.log("Error creating SEO", e);
             });
+=======
+            if (network.contractAddress === publicRuntimeConfig?.contract?.address)
+              twitterTweet({
+                type: "bounty",
+                action: "distributed",
+                issue: bounty,
+                currency: bounty.token.symbol
+              });
+        
+>>>>>>> 56e0de23 (chore: remove seo generate scripts and dependecies)
           }
         }
       }
