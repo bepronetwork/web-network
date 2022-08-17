@@ -20,6 +20,7 @@ export interface IssueData {
   id?: string; // database id
   amount?: number;
   fundingAmount?: number;
+  fundedAmount?: number;
   body: string;
   branch?: string;
   createdAt: Date;
