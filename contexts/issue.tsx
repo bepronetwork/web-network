@@ -9,7 +9,7 @@ import { useRouter } from "next/router";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 
-import { bountyReadyPRsHasNoInvalidProposals } from "helpers/api/proposal/utils";
+import { bountyReadyPRsHasNoInvalidProposals } from "helpers/proposal";
 
 import { BountyExtended, ProposalExtended } from "interfaces/bounty";
 import {
