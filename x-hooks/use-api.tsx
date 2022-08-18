@@ -272,10 +272,9 @@ export default function useApi() {
                               networkName: string = DEFAULT_NETWORK_NAME,
                               params: PastEventsParams = {}) {
     
-    const events = await eventsApi.get(`/past-events/${entity}/${event}`, {
-                                  params: { ...params, networkName }
+    return eventsApi.get(`/past-events/${entity}/${event}`, {
+      params: { ...params, networkName }
     }).then(({ data }) => data?.[networkName]);
-    return events;
   }
 
   async function getHealth() {
