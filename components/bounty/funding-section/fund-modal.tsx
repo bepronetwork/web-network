@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
 import LockedIcon from "assets/icons/locked-icon";
 
@@ -11,10 +12,12 @@ import Modal from "components/modal";
 
 import { ApplicationContext } from "contexts/application";
 import { useIssue } from "contexts/issue";
+import { useNetwork } from "contexts/network";
 import { toastError, toastSuccess } from "contexts/reducers/add-toast";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
+import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useERC20 from "x-hooks/use-erc20";
 
@@ -22,17 +25,21 @@ import { Amount, CaptionMedium, RowWithTwoColumns } from "./minimals";
 
 export default function FundModal({
   show = false,
-  onCloseClick
+  onCloseClick,
 }) {
   const { t } = useTranslation(["common", "funding", "bounty"]);
 
   const [amountToFund, setAmountToFund] = useState(0);
   const [rewardPreview, setRewardPreview] = useState(0);
   const [isExecuting, setIsExecuting] = useState(false);
-
+  const {
+    query: { repoId }
+  } = useRouter();
   const { handleFundBounty } = useBepro();
   const { dispatch } = useContext(ApplicationContext);
-  const { activeIssue, networkIssue, getNetworkIssue } = useIssue();
+  const { processEvent } = useApi();
+  const { activeNetwork } = useNetwork();
+  const { activeIssue, networkIssue, getNetworkIssue, updateIssue } = useIssue();
   const { allowance, balance, setAddress, approve, updateAllowanceAndBalance } = useERC20();
 
   const bountyId = activeIssue?.contractId || networkIssue?.id || "XX";
@@ -70,9 +77,16 @@ export default function FundModal({
     setIsExecuting(true);
 
     handleFundBounty(networkIssue.id, amountToFund)
+      .then(async (txInfo) => {
+        const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
+        
+        await processEvent("bounty", "funded", activeNetwork?.name, { 
+          fromBlock
+        })
+      })
       .then(() => {
         const amountFormatted = formatNumberToCurrency(amountToFund);
-
+        updateIssue(repoId.toString(), activeIssue?.githubId)
         handleClose();
         getNetworkIssue();
         dispatch(toastSuccess(t("funding:modals.fund.funded-x-symbol", {
