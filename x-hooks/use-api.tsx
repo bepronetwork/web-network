@@ -152,16 +152,6 @@ export default function useApi() {
         });
   }
 
-  async function patchIssueWithScId(repoId,
-                                    githubId,
-                                    scId,
-                                    networkName = DEFAULT_NETWORK_NAME) {
-    return api
-      .patch("/issue", { repoId, githubId, scId, networkName })
-      .then(({ data }) => data === "ok")
-      .catch(() => false);
-  }
-
   async function getPendingFor(address: string, page = "1", networkName = DEFAULT_NETWORK_NAME) {
     const search = new URLSearchParams({
       address,
@@ -494,7 +484,6 @@ export default function useApi() {
     isNetworkOwner,
     joinAddressToUser,
     mergeClosedIssue,
-    patchIssueWithScId,
     processEvent,
     removeRepo,
     removeUser,

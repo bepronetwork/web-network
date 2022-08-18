@@ -11,11 +11,6 @@ type CombinedHeader = IncomingHttpHeaders & CustomHeader;
 
 const testnet = process.env.NEXT_E2E_TESTNET === "true";
 
-const pastEventsEvents =  ["created", "canceled", "closed", "disputed", "ready", "updated", "refused"];
-const pastEventsEntities = ["bounty", "proposal", "pull-request"];
-const pastEventsEndPoints = 
-  pastEventsEntities.flatMap(entity => pastEventsEvents.map(event => `past-events/${entity}/${event}`));
-
 const whiteList = {
   POST: [ "auth/_log",
           "auth/signin/github",
@@ -27,9 +22,7 @@ const whiteList = {
           "search/users/all", 
           "search/users/login", 
           "search/users/total", 
-          "seo",
-          "past-events/bulk",
-          ...pastEventsEndPoints ],
+          "seo" ],
   PUT: [ "network" ]
 };
 
