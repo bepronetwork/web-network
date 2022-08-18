@@ -8,9 +8,7 @@ import models from "db/models";
 import * as IssueQueries from "graphql/issue";
 import * as RepositoryQueries from "graphql/repository";
 
-
-import {api} from "services/api";
-
+import { api } from "services/api";
 
 import { GraphQlResponse } from "types/octokit";
 
@@ -95,55 +93,10 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(`${repository.id}/${githubId}`);
 }
 
-async function patch(req: NextApiRequest, res: NextApiResponse) {
-  const {
-    repoId: repository_id,
-    githubId,
-    scId: issueId,
-    networkName
-  } = req.body;
-
-  const network = await models.network.findOne({
-    where: {
-      name: {
-        [Op.iLike]: String(networkName)
-      }
-    }
-  });
-
-  if (!network) return res.status(404).json("Invalid network");
-  if (network.isClosed) return res.status(404).json("Invalid network");
-
-  return models.issue
-    .update({ issueId, state: "draft" },
-            {
-        where: {
-          githubId: githubId,
-          repository_id,
-          issueId: null,
-          network_id: network.id
-        }
-            })
-    .then(async (result) => {
-      if (!result[0]) return res.status(422).json("nok");
-
-      await api.post(`/seo/${issueId}`).catch((e) => {
-        console.log("Error creating SEO", e);
-      });
-
-      return res.status(200).json("ok");
-    })
-    .catch(() => res.status(422).json("nok"));
-}
-
 export default async function Issue(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "post":
     await post(req, res);
-    break;
-
-  case "patch":
-    await patch(req, res);
     break;
 
   default:

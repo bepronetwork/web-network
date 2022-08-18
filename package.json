@@ -66,7 +66,6 @@
     "sequelize": "6.17.0",
     "sequelize-cli": "^6.4.1",
     "tiny-emitter": "^2.1.0",
-    "twitter-api-v2": "^1.11.0",
     "uuid": "^8.3.2",
     "yargs": "^17.4.0"
   },

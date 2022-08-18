@@ -142,13 +142,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       status: "pending"
     });
 
-    /*twitterTweet({
-      type: 'bounty',
-      action: 'solution',
-      username: username,
-      issue
-    })*/
-
     return res.status(200).json({ 
       bountyId: issue.contractId,
       originRepo: repoInfo.githubPath,

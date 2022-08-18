@@ -61,7 +61,6 @@ $ cp .env.exemple .env
 - `*` [IPFS/Infura Host](./docs/IPFS.md)
 - [Ganache](./docs/GANACHE.md)
 - [IP-Api](./docs/IP-API.md)
-- [Twitter Gateway](./docs/TWITTER-GATEWAY.md)
 
 <br>
 
