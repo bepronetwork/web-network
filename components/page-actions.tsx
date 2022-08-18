@@ -21,6 +21,8 @@ import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/add-toast";
 import { useRepos } from "contexts/repos";
 
+import { getIssueState } from "helpers/handleTypeIssue";
+
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 
@@ -70,6 +72,11 @@ export default function PageActions({
   const isWalletAndGHConnected = isWalletConnected && !!user?.login;
   const isWorkingOnBounty = !!activeIssue?.working?.find((login) => login === user?.login);
   const isBountyOpen = networkIssue?.closed === false && networkIssue?.canceled === false;
+  const isStateToWorking = ["proposal", "open", "ready"].some(value => value === getIssueState({
+    state: activeIssue?.state,
+    amount: activeIssue?.amount,
+    fundingAmount: activeIssue?.fundingAmount
+  }))
 
   const isBountyOwner =
     wallet?.address && networkIssue?.creator && networkIssue?.creator?.toLowerCase() === wallet?.address?.toLowerCase();
@@ -236,7 +243,7 @@ export default function PageActions({
         isBountyOpen && 
         !isWorkingOnBounty && 
         isRepoForked &&
-        !!activeIssue?.contractId)
+        isStateToWorking)
       return(
         <ReadOnlyButtonWrapper>
           <Button
