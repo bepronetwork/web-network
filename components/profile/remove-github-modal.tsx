@@ -76,8 +76,8 @@ function RemoveGithubAccount({
           <Row className="text-center mb-4">
             <span className="family-Regular font-weight-medium text-white">
               {t("common:actions.remove")}{" "}
-              <SpanPrimary text={githubLogin} />
-              {t("modals.remove-github.account-from-wallet")}
+              <SpanPrimary text={githubLogin} />{" "}
+              {t("modals.remove-github.account-from-wallet")}{" "}
               <SpanPrimary text={walletAddress} />
             </span>
           </Row>
