@@ -10,13 +10,14 @@ import {
   Network_Registry
 } from "@taikai/dappkit";
 import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
-import getConfig from "next/config";
+
+import { getSettingsFromSessionStorage } from "helpers/settings";
 
 import { Token } from "interfaces/token";
 
 import { NetworkParameters } from "types/dappkit";
 
-const { publicRuntimeConfig } = getConfig();
+const sessionStorageSettings = getSettingsFromSessionStorage();
 
 interface DAOServiceProps {
   skipWindowAssignment?: boolean;
@@ -33,16 +34,18 @@ export default class DAO {
   get registry() { return this._registry; }
 
   constructor({ skipWindowAssignment, web3Connection } : DAOServiceProps = {}) {
-    if (!publicRuntimeConfig?.web3ProviderConnection)
-      throw new Error("Missing web3ProviderConnection in next.config.js");
+    const web3Host = sessionStorageSettings?.urls?.web3Provider;
+
+    if (!web3Host && !web3Connection)
+      throw new Error("Missing web3 provider URL");
 
     this._web3Connection = web3Connection || new Web3Connection({
-      web3Host: publicRuntimeConfig.web3ProviderConnection,
+      web3Host,
       skipWindowAssignment
     });
   }
 
-  async loadNetwork(networkAddress: string = publicRuntimeConfig?.contract?.address, 
+  async loadNetwork(networkAddress: string = sessionStorageSettings?.contracts?.network, 
                     skipAssignment?: boolean): Promise<Network_v2 | boolean> {
     try {
       if (!networkAddress) throw new Error("Missing Network_v2 Contract Address");
@@ -63,10 +66,12 @@ export default class DAO {
 
   async loadRegistry(skipAssignment?: boolean): Promise<Network_Registry | boolean> {
     try {
-      if (!publicRuntimeConfig?.contract?.registry) 
+      const networkRegistryAddress = sessionStorageSettings?.contracts?.networkRegistry;
+
+      if (!networkRegistryAddress) 
         throw new Error("Missing Network_Registry Contract Address");
 
-      const registry = new Network_Registry(this.web3Connection, publicRuntimeConfig.contract.registry);
+      const registry = new Network_Registry(this.web3Connection, networkRegistryAddress);
 
       await registry.loadContract();
 
@@ -101,10 +106,10 @@ export default class DAO {
       await this.web3Connection.start();
 
       console.table({
-        Network_v2: publicRuntimeConfig?.contract?.address,
-        Settler: publicRuntimeConfig?.contract?.settler,
-        Transactional: publicRuntimeConfig?.contract?.transaction,
-        Network_Registry: publicRuntimeConfig?.contract?.registry
+        Network_v2: sessionStorageSettings?.contracts?.network,
+        Settler: sessionStorageSettings?.contracts?.settlerToken,
+        Transactional: sessionStorageSettings?.contracts?.transactionalToken,
+        Network_Registry: sessionStorageSettings?.contracts?.networkRegistry
       });
 
       return true;
@@ -339,9 +344,7 @@ export default class DAO {
     return erc20.getTokenAmount(walletAddress);
   }
 
-  async getAllowance(tokenAddress: string, 
-                     walletAddress: string, 
-                     spenderAddress: string): Promise<number> {
+  async getAllowance(tokenAddress: string, walletAddress: string, spenderAddress: string): Promise<number> {
     const erc20 = await this.loadERC20(tokenAddress);
 
     return erc20.allowance(walletAddress, spenderAddress);
@@ -349,9 +352,7 @@ export default class DAO {
 
   async getSettlerTokenAllowance(walletAddress: string): Promise<number> {
 
-    return this.getAllowance(this.network.settlerToken.contractAddress, 
-                             walletAddress, 
-                             this.network.contractAddress);
+    return this.getAllowance(this.network.settlerToken.contractAddress, walletAddress, this.network.contractAddress);
   }
 
   async deployBountyToken(name: string, symbol: string): Promise<TransactionReceipt> {
@@ -453,9 +454,9 @@ export default class DAO {
     return this.network.takeBackOracles(delegationId);
   }
 
-  async deployNetworkV2(networkToken: string = publicRuntimeConfig?.contract?.settler, 
-    nftToken: string = publicRuntimeConfig?.contract?.nft, 
-    nftUri = publicRuntimeConfig?.nftUri || "//",
+  async deployNetworkV2(networkToken: string = sessionStorageSettings?.contracts?.settlerToken, 
+    nftToken: string = sessionStorageSettings?.contracts?.nftToken, 
+    nftUri = sessionStorageSettings?.urls?.nft || "//",
     treasuryAddress = Defaults.nativeZeroAddress,
     cancelFee = 10000,
     closeFee= 50000): Promise<TransactionReceipt> {

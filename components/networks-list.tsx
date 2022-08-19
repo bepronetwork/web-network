@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
-import getConfig from "next/config";
 import { useRouter } from "next/router";
 
 import CustomContainer from "components/custom-container";
@@ -13,6 +12,7 @@ import NothingFound from "components/nothing-found";
 import { ApplicationContext } from "contexts/application";
 import { useDAO } from "contexts/dao";
 import { changeLoadState } from "contexts/reducers/change-load-state";
+import { useSettings } from "contexts/settings";
 
 import { orderByProperty } from "helpers/array";
 import { handleNetworkAddress } from "helpers/custom-network";
@@ -37,7 +37,6 @@ interface NetworksListProps {
               tokenSymbol: string,
               isListedInCoinGecko?: boolean) => void;
 }
-const { publicRuntimeConfig } = getConfig();
 
 export default function NetworksList({
   name,
@@ -48,11 +47,14 @@ export default function NetworksList({
 }: NetworksListProps) {
   const router = useRouter();
   const { t } = useTranslation(["common", "custom-network"]);
+
   const [order, setOrder] = useState(["name", "asc"]);
   const [networks, setNetworks] = useState<Network[]>([]);
-  const { service: DAOService } = useDAO();
-  const { searchNetworks } = useApi();
+  
   const { network } = useNetwork();
+  const { settings } = useSettings();
+  const { searchNetworks } = useApi();
+  const { service: DAOService } = useDAO();
   const { getURLWithNetwork } = useNetwork();
 
   const { dispatch } = useContext(ApplicationContext);
@@ -98,7 +100,7 @@ export default function NetworksList({
               dao.getTotalBounties().catch(() => 0)
             ]);
 
-            const mainCurrency = publicRuntimeConfig?.currency?.main || "usd";
+            const mainCurrency = settings?.currency?.defaultFiat || "eur";
       
             const coinInfo = await getCoinInfoByContract(settlerTokenData?.address).catch(() => ({ prices: {} }));
       
@@ -139,7 +141,7 @@ export default function NetworksList({
               href="/new-network"
               label={String(t("actions.create-one"))}
               uppercase
-              blank={network.name !== publicRuntimeConfig?.networkConfig?.networkName}
+              blank={network.name !== settings?.defaultNetworkConfig?.name}
             />
           ) : (
             ""

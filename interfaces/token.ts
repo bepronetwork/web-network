@@ -1,8 +1,8 @@
 import { ReactElement } from "react";
 
-import getConfig from "next/config";
+import { getSettingsFromSessionStorage } from "helpers/settings";
 
-const { publicRuntimeConfig } = getConfig();
+const settings = getSettingsFromSessionStorage();
 export interface Token {
   address: string;
   name: string;
@@ -22,7 +22,7 @@ export interface TokenPrice {
 }
 
 export const BEPRO_TOKEN: Token = {
-  address: publicRuntimeConfig?.contract?.settler,
+  address: settings?.contracts?.settlerToken,
   name: "Bepro Network",
   symbol: "BEPRO"
 };

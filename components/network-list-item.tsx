@@ -1,13 +1,11 @@
-import getConfig from "next/config";
-
 import NetworkLogo from "components/network-logo";
 import PullRequestLabels from "components/pull-request-labels";
+
+import { useSettings } from "contexts/settings";
 
 import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { Network } from "interfaces/network";
-
-const { publicRuntimeConfig } = getConfig();
 interface NetworkListItemProps {
   network: Network;
   tokenSymbolDefault: string;
@@ -19,6 +17,7 @@ export default function NetworkListItem({
   tokenSymbolDefault,
   handleRedirect
 }: NetworkListItemProps) {
+  const { settings } = useSettings();
 
   function onClick() {
     handleRedirect(network?.name);
@@ -29,9 +28,9 @@ export default function NetworkListItem({
       <div className="col-3">
         <div className="d-flex flex-row align-items-center gap-20">
           <NetworkLogo
-            src={`${publicRuntimeConfig?.ipfsUrl}/${network?.logoIcon}`}
+            src={`${settings?.urls?.ipfs}/${network?.logoIcon}`}
             alt={`${network?.name} logo`}
-            isBepro={network?.name === publicRuntimeConfig?.networkConfig?.networkName}
+            isBepro={network?.name === settings?.defaultNetworkConfig?.name}
           />
 
           <span className="caption-medium text-white">{network?.name}</span>

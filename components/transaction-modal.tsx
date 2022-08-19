@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from "react";
 
 import { format } from "date-fns";
 import { useTranslation } from "next-i18next";
-import getConfig from "next/config";
 
 import ArrowRight from "assets/icons/arrow-right";
 import CopyIcon from "assets/icons/copy";
@@ -13,6 +12,7 @@ import TransactionStats from "components/transaction-stats";
 
 import { ApplicationContext } from "contexts/application";
 import { toastInfo } from "contexts/reducers/add-toast";
+import { useSettings } from "contexts/settings";
 
 import { CopyValue } from "helpers/copy-value";
 import { formatNumberToString } from "helpers/formatNumber";
@@ -25,8 +25,6 @@ import useNetworkTheme from "x-hooks/use-network";
 import Button from "./button";
 import InternalLink from "./internal-link";
 
-const { publicRuntimeConfig } = getConfig();
-
 export default function TransactionModal({
   transaction = null,
   onCloseClick,
@@ -34,11 +32,15 @@ export default function TransactionModal({
   transaction: Transaction;
   onCloseClick: () => void;
 }) {
-  const { dispatch } = useContext(ApplicationContext);
-  const [addressFrom, setAddressFrom] = useState("...");
-  const [addressTo, setAddressTo] = useState("...");
-  const [details, setDetails] = useState<any>([]);  // eslint-disable-line
   const { t } = useTranslation("common");
+  
+  const [details, setDetails] = useState<any>([]);  // eslint-disable-line
+  const [addressTo, setAddressTo] = useState("...");
+  const [addressFrom, setAddressFrom] = useState("...");
+
+  const { dispatch } = useContext(ApplicationContext);
+
+  const { settings } = useSettings();
   const { getURLWithNetwork } = useNetworkTheme();
 
   function updateAddresses() {
@@ -99,7 +101,7 @@ export default function TransactionModal({
   }
 
   function getEtherScanHref(tx: string) {
-    return `//${publicRuntimeConfig?.metaMask?.blockScanUrl}/tx/${tx}`;
+    return `//${settings?.urls?.blockScan}/tx/${tx}`;
   }
 
   return (
@@ -153,7 +155,7 @@ export default function TransactionModal({
           <span className="text-ligth-gray">{t("misc.on")}</span>
           <InternalLink
             className={`${
-              transaction?.network?.name === publicRuntimeConfig?.networkConfig?.networkName
+              transaction?.network?.name === settings?.defaultNetworkConfig?.name
                 ? " text-primary "
                 : ""
             } p-0 ml-1`}

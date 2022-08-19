@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
-import getConfig from "next/config";
 import Image from "next/image";
 
 import metamaskLogo from "assets/metamask.png";
@@ -14,10 +13,9 @@ import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { changeNetworkId } from "contexts/reducers/change-network-id";
 import { changeShowWeb3DialogState } from "contexts/reducers/change-show-web3-dialog";
+import { useSettings } from "contexts/settings";
 
 import { NetworkColors } from "interfaces/enums/network-colors";
-
-const { publicRuntimeConfig } = getConfig();
 
 export default function ConnectWalletButton({
   children = null,
@@ -32,8 +30,9 @@ export default function ConnectWalletButton({
   } = useContext(ApplicationContext);
   const [showModal, setShowModal] = useState(false);
 
-  const { wallet, connectWallet } = useAuthentication();
   const { service: DAOService } = useDAO();
+  const { settings } = useSettings();
+  const { wallet, connectWallet } = useAuthentication();
 
   useEffect(() => {
     if (!DAOService) return;
@@ -50,7 +49,7 @@ export default function ConnectWalletButton({
     if (DAOService) {
       DAOService.getChainId()
         .then((chainId) => {
-          if (+chainId === +publicRuntimeConfig?.metaMask?.chainId) {
+          if (+chainId === +settings?.requiredChain?.id) {
             connectWallet();
           } else {
             dispatch(changeNetworkId(+chainId));
@@ -83,9 +82,9 @@ export default function ConnectWalletButton({
             {t("connect-wallet-button:to-access-this-page")}
             <br />
             <span
-              style={{ color: NetworkColors[publicRuntimeConfig?.metaMask?.chainName?.toLowerCase()] }}
+              style={{ color: NetworkColors[settings?.requiredChain?.name?.toLowerCase()] }}
             >
-              <span>{publicRuntimeConfig?.metaMask?.chainName}</span>{" "}
+              <span>{settings?.requiredChain?.name}</span>{" "}
               {t("connect-wallet-button:network")}
             </span>{" "}
             {t("connect-wallet-button:on-your-wallet")}

@@ -1,23 +1,20 @@
 import { useEffect, useState } from "react";
 
-
 import { useTranslation } from "next-i18next";
-import getConfig from "next/config";
 
 import TransactionIcon from "assets/icons/transaction";
 
+import InputNumber from "components/input-number";
 import Modal from "components/modal";
+import ReactSelect from "components/react-select";
 
 import { useNetwork } from "contexts/network";
+import { useSettings } from "contexts/settings";
 
 import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { getCoinInfoByContract } from "services/coingecko";
 
-import InputNumber from "./input-number";
-import ReactSelect from "./react-select";
-
-const { publicRuntimeConfig } = getConfig();
 interface IPriceConversiorModalProps{
   show: boolean;
   onClose: ()=> void;
@@ -31,13 +28,14 @@ export default function PriceConversorModal({
 }:IPriceConversiorModalProps) {
   const { t } = useTranslation("common");
   
+  const [options, setOptions] = useState([]);
   const [currentValue, setValue] = useState<number>(1);
   const [currentPrice, setCurrentPrice] = useState<number>(0);
-  const [currentCurrency, setCurrentCurrency] = useState<{label: string, value: string}>(null);
-  const [options, setOptions] = useState([]);
   const [errorCoinInfo, setErrorCoinInfo] = useState<boolean>(false);
+  const [currentCurrency, setCurrentCurrency] = useState<{label: string, value: string}>(null);
 
-  const { activeNetwork } = useNetwork();  
+  const { settings } = useSettings();
+  const { activeNetwork } = useNetwork();
 
   async function handlerChange({value, label}){
     if (!activeNetwork?.networkToken?.address) return;
@@ -54,13 +52,7 @@ export default function PriceConversorModal({
   }
 
   useEffect(()=>{
-    let currencyList;
-    try {
-      const list = JSON.parse(publicRuntimeConfig?.currency?.currencyCompareList)
-      currencyList = Array.isArray(list) ? list : defaultValue;
-    } catch (error) {
-      currencyList = defaultValue;
-    }
+    const currencyList = settings?.currency?.conversionList || defaultValue;
     const opt = currencyList.map(currency=>({value: currency?.value, label: currency?.label}))
     setOptions(opt)
     handlerChange(opt[0])

@@ -4,6 +4,13 @@ const { i18n } = require("./next-i18next.config");
 const { parseSettingsFromDB, combineSettings } = require("./scripts/settings/index.js");
 require("dotenv").config();
 
+const publicRuntimeConfig = {
+  urls: {
+    api: process.env.NEXT_PUBLIC_API_HOST || "http://localhost:3000",
+    home: process.env.NEXT_PUBLIC_HOME_URL || "http://localhost:3000"
+  }
+};
+
 // Will only be available on the server-side
 const serverSettings = {
   auth: {
@@ -38,8 +45,6 @@ const serverSettings = {
 
 module.exports = async () => {
   const serverRuntimeConfig = combineSettings(serverSettings, await parseSettingsFromDB());
-
-  console.log({serverRuntimeConfig});
   
   return {
     i18n,
@@ -49,6 +54,7 @@ module.exports = async () => {
     images: {
       domains: ["ipfs.infura.io"]
     },
+    publicRuntimeConfig,
     serverRuntimeConfig,
     webpack5: true,
     async redirects() {
