@@ -12,13 +12,34 @@ class Settings extends Model {
       },
       key: {
         type: DataTypes.STRING,
-        unique: "settingKeyValue"
+        allowNull: false
       },
       value: {
         type: DataTypes.STRING,
-        unique: "settingKeyValue"
+        allowNull: false
       },
-      type: DataTypes.ENUM("string", "boolean", "number", "json")
+      type: {
+        type: DataTypes.ENUM("string", "boolean", "number", "json"),
+        defaultValue: "string",
+        allowNull: false
+      },
+      group: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      visibility: {
+        type: DataTypes.ENUM("public", "private"),
+        defaultValue: "public",
+        allowNull: false
+      },
+      createdAt: {
+        allowNull: false,
+        type: DataTypes.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        type: DataTypes.DATE
+      }
     }, {
       sequelize,
       modelName: "settings",
