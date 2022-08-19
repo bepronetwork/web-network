@@ -3,26 +3,28 @@ import { Modal } from "react-bootstrap";
 
 import { kebabCase } from "lodash";
 import { useTranslation } from "next-i18next";
-import getConfig from "next/config";
 
 import BeProBlue from "assets/icons/bepro-blue";
 
+import { useSettings } from "contexts/settings";
 
 import useApi from "x-hooks/use-api";
 
 export default function NationDialog() {
-  const {publicRuntimeConfig} = getConfig();
-  const [isBlock, setBlock] = useState<boolean>(false);
-  const { getClientNation } = useApi();
   const { t } = useTranslation("common");
+  
   const [country, setCountry] = useState<string>();
+  const [isBlock, setBlock] = useState<boolean>(false);
+
+  const { settings } = useSettings();
+  const { getClientNation } = useApi();
 
   useEffect(() => {
     getClientNation()
       .then((data) => {
         if (
           data.countryCode &&
-          publicRuntimeConfig?.countryCodeBlocked?.indexOf(data.countryCode) === -1
+          settings?.excludedJurisdictions?.indexOf(data.countryCode) === -1
         )
           return;
 

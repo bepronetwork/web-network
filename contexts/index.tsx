@@ -9,26 +9,28 @@ import { IssueProvider } from "contexts/issue";
 import { NetworkProvider } from "contexts/network";
 import { NetworkSettingsProvider } from "contexts/network-settings";
 import { ReposProvider } from "contexts/repos";
-
+import { SettingsProvider } from "contexts/settings";
 
 const RootProviders: React.FC = ({ children }) => {
   return (
-    <DAOContextProvider>
-      <NetworkProvider>
-        <AuthenticationProvider>
-          <NetworkSettingsProvider>
-            <ApplicationContextProvider>
-              <ReposProvider>
-                <IssueProvider>
-                  <CreateBountyModal />
-                  {children}
-                </IssueProvider>
-              </ReposProvider>
-            </ApplicationContextProvider>
-          </NetworkSettingsProvider>
-        </AuthenticationProvider>
-      </NetworkProvider>
-    </DAOContextProvider>
+    <SettingsProvider>
+      <DAOContextProvider>
+        <NetworkProvider>
+          <AuthenticationProvider>
+            <NetworkSettingsProvider>
+              <ApplicationContextProvider>
+                <ReposProvider>
+                  <IssueProvider>
+                    <CreateBountyModal />
+                    {children}
+                  </IssueProvider>
+                </ReposProvider>
+              </ApplicationContextProvider>
+            </NetworkSettingsProvider>
+          </AuthenticationProvider>
+        </NetworkProvider>
+      </DAOContextProvider>
+    </SettingsProvider>
   );
 };
 

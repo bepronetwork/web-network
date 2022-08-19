@@ -27,7 +27,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     const created = [];
 
-    const baseUrl = publicRuntimeConfig.homeUrl;
+    const baseUrl = publicRuntimeConfig?.homeUrl;
     const background = `${baseUrl}/images/bg-bounty-card.png`;
     const logo = `${baseUrl}/images/bepro-icon.png`;
     const font = `${baseUrl}/fonts/SpaceGrotesk.woff2`;

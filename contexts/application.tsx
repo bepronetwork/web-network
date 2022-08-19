@@ -107,7 +107,7 @@ export default function ApplicationContextProvider({ children }) {
 
     window.ethereum.on("chainChanged", (evt) => {
       dispatch(changeNetworkId(+evt?.toString()));
-      dispatch(changeNetwork((publicRuntimeConfig.networkIds[+evt?.toString()] || "unknown")?.toLowerCase()));
+      dispatch(changeNetwork((publicRuntimeConfig?.networkIds && publicRuntimeConfig?.networkIds[+evt?.toString()] || "unknown")?.toLowerCase()));
     });
 
     if (txListener) clearInterval(txListener);

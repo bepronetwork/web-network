@@ -14,6 +14,7 @@ import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetworkSettings } from "contexts/network-settings";
 import { addToast } from "contexts/reducers/add-toast";
+import { useSettings } from "contexts/settings";
 
 import { psReadAsText } from "helpers/file-reader";
 import { formatNumberToCurrency } from "helpers/formatNumber";
@@ -21,17 +22,7 @@ import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
 import useApi from "x-hooks/use-api";
 
-const { publicRuntimeConfig } = getConfig();
-
-const MAX_PERCENTAGE_FOR_DISPUTE = +publicRuntimeConfig?.networkConfig?.disputesPercentage;
-const MIN_DRAFT_TIME = +publicRuntimeConfig?.networkConfig?.reedemTime?.min;
-const MAX_DRAFT_TIME = +publicRuntimeConfig?.networkConfig?.reedemTime?.max;
-const MIN_DISPUTE_TIME = +publicRuntimeConfig?.networkConfig?.disputableTime?.min;
-const MAX_DISPUTE_TIME = +publicRuntimeConfig?.networkConfig?.disputableTime?.max;
-const MIN_COUNCIL_AMOUNT = +publicRuntimeConfig?.networkConfig?.councilAmount?.min;
-const MAX_COUNCIL_AMOUNT = +publicRuntimeConfig?.networkConfig?.councilAmount?.max;
-
-const differentOrUndefined = (valueA, valueB) => valueA !== valueB ? valueA : undefined;
+const { publicRuntimeConfig: { urls: { homeURL }} } = getConfig();
 
 export default function NetworksStep({
     step,
@@ -46,11 +37,22 @@ export default function NetworksStep({
   const [ isNetworkGovernor, setIsNetworkGovernor ] = useState(false);
   const [ selectedNetworkAddress, setSelectedNetworkAddress ] = useState<string>();
 
+  const { settings: appSettings } = useSettings();
   const { service: DAOService } = useDAO();
   const { wallet, user } = useAuthentication();
   const { searchNetworks, updateNetwork } = useApi();
   const { dispatch } = useContext(ApplicationContext);
   const { forcedNetwork, details, fields, settings, setForcedNetwork } = useNetworkSettings();
+
+  const MAX_PERCENTAGE_FOR_DISPUTE = +appSettings?.networkParametersLimits?.disputePercentage?.max;
+  const MIN_DRAFT_TIME = +appSettings?.networkParametersLimits?.draftTime?.min;
+  const MAX_DRAFT_TIME = +appSettings?.networkParametersLimits?.draftTime?.max;
+  const MIN_DISPUTE_TIME = +appSettings?.networkParametersLimits?.disputableTime?.min;
+  const MAX_DISPUTE_TIME = +appSettings?.networkParametersLimits?.disputableTime?.max;
+  const MIN_COUNCIL_AMOUNT = +appSettings?.networkParametersLimits?.councilAmount?.min;
+  const MAX_COUNCIL_AMOUNT = +appSettings?.networkParametersLimits?.councilAmount?.max;
+
+  const differentOrUndefined = (valueA, valueB) => valueA !== valueB ? valueA : undefined;
 
   const networkTokenSymbol = forcedNetwork?.networkToken?.symbol || t("misc.$token");
   const networkAlreadyLoaded = 
@@ -311,7 +313,7 @@ export default function NetworksStep({
                   {t("custom-network:steps.network-information.fields.name.temporary")}
                 </p>
                 <p className="caption-small text-gray">
-                  {urlWithoutProtocol(publicRuntimeConfig?.apiUrl)}/
+                  {urlWithoutProtocol(homeURL)}/
                   <span className="text-primary">
                     {getQueryableText(details?.name?.value || 
                                       t("custom-network:steps.network-information.fields.name.default"))}

@@ -9,7 +9,6 @@ import { FormCheck } from "react-bootstrap";
 import { NumberFormatValues } from "react-number-format";
 
 import { useTranslation } from "next-i18next";
-import getConfig from "next/config";
 import router from "next/router";
 
 import BranchsDropdown from "components/branchs-dropdown";
@@ -32,6 +31,7 @@ import { toastError, toastWarning } from "contexts/reducers/add-toast";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { changeShowCreateBountyState } from "contexts/reducers/change-show-create-bounty";
 import { updateTransaction } from "contexts/reducers/update-transaction";
+import { useSettings } from "contexts/settings";
 
 import { handleNetworkAddress } from "helpers/custom-network";
 import { parseTransaction } from "helpers/transactions";
@@ -47,9 +47,6 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network";
 import useTransactions from "x-hooks/useTransactions";
-
-
-const { publicRuntimeConfig } = getConfig();
 
 interface BountyPayload {
   title: string;
@@ -105,10 +102,11 @@ export default function CreateBountyModal() {
   const [files, setFiles] = useState<IFilesProps[]>([]);
   const [isLoadingApprove, setIsLoadingApprove] = useState<boolean>(false);
   const [isLoadingCreateBounty, setIsLoadingCreateBounty] = useState<boolean>(false);
+  const { settings } = useSettings();
 
   const canAddCustomToken =
-    activeNetwork?.networkAddress === publicRuntimeConfig?.contract?.address
-      ? publicRuntimeConfig?.networkConfig?.allowCustomTokens
+    activeNetwork?.networkAddress === settings?.contracts?.network
+      ? settings?.defaultNetworkConfig?.allowCustomTokens
       : !!activeNetwork?.allowCustomTokens;
 
   const steps = [
@@ -126,7 +124,7 @@ export default function CreateBountyModal() {
     const strFiles = files?.map((file) =>
         file.uploaded &&
         `${file?.type?.split("/")[0] === "image" ? "!" : ""}[${file.name}](${
-          publicRuntimeConfig?.ipfsUrl
+          settings?.urls?.ipfs
         }/${file.hash}) \n\n`);
     return `${str}\n\n${strFiles
       .toString()
@@ -446,7 +444,7 @@ export default function CreateBountyModal() {
 
     tmpTokens.push(BEPRO_TOKEN);
 
-    if (handleNetworkAddress(activeNetwork) !== publicRuntimeConfig?.contract?.address && 
+    if (handleNetworkAddress(activeNetwork) !== settings?.contracts?.network && 
       activeNetwork.networkToken.address.toLowerCase() !== BEPRO_TOKEN.address.toLowerCase())
       tmpTokens.push(activeNetwork.networkToken);
 

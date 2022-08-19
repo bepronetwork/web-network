@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { ProgressBar } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
-import getConfig from "next/config";
 
 import ArrowRightLine from "assets/icons/arrow-right-line";
 import LockedIcon from "assets/icons/locked-icon";
@@ -17,22 +16,22 @@ import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
+import { useSettings } from "contexts/settings";
 
 import { formatNumberToCurrency, formatNumberToNScale } from "helpers/formatNumber";
 
 import { StepWrapperProps } from "interfaces/stepper";
 
-const { publicRuntimeConfig } = getConfig();
-
 export default function LockBeproStep({ activeStep, index, handleClick, validated } : StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
 
+  const [amount, setAmount] = useState(0);
   const [isLocking, setIsLocking] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
-  const [showUnlockBepro, setShowUnlockBepro] = useState(false);
   const [settlerAllowance, setSettlerAllowance] = useState(0);
-  const [amount, setAmount] = useState(0);
+  const [showUnlockBepro, setShowUnlockBepro] = useState(false);
 
+  const { settings } = useSettings();
   const { activeNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
   const { tokensLocked } = useNetworkSettings();
@@ -116,10 +115,8 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   }
 
   function updateAllowance() {  
-    DAOService.getAllowance(publicRuntimeConfig?.contract?.settler,
-                            wallet.address, 
-                            publicRuntimeConfig?.contract?.registry)
-    .then(setSettlerAllowance).catch(() => 0);
+    DAOService.getAllowance(settings?.contracts?.settlerToken, wallet.address, settings?.contracts?.networkRegistry)
+      .then(setSettlerAllowance).catch(() => 0);
   }
 
   useEffect(() => {

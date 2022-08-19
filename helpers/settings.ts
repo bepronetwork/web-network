@@ -1,3 +1,5 @@
+import { SettingsType } from "contexts/settings";
+
 interface Setting {
   key: string;
   value: string;
@@ -38,5 +40,13 @@ const settingsToJson = (settings: Setting[]) => {
   return settingsJson;
 };
 
+const getSettingsFromSessionStorage = () => 
+  typeof window !== 'undefined' && JSON.parse(sessionStorage.getItem("web-network.settings")) || undefined;
+
+const setSettingsToSessionStorage = (settings: SettingsType) => {
+  if (typeof window !== 'undefined')
+    sessionStorage.setItem("web-network.settings", JSON.stringify(settings));
+}
+
 export type { Setting };
-export { settingsToJson, parseSettingValue };
+export { settingsToJson, parseSettingValue, setSettingsToSessionStorage, getSettingsFromSessionStorage };

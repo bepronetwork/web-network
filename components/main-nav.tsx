@@ -1,7 +1,6 @@
 import { ReactElement, ReactNode, useContext, useEffect, useState } from "react";
 
 import { Defaults } from "@taikai/dappkit";
-import getConfig from "next/config";
 import { useRouter } from "next/router";
 
 import BeproLogoBlue from "assets/icons/bepro-logo-blue";
@@ -23,11 +22,10 @@ import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { changeShowCreateBountyState } from "contexts/reducers/change-show-create-bounty";
 import { changeShowWeb3DialogState } from "contexts/reducers/change-show-web3-dialog";
+import { useSettings } from "contexts/settings";
 
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
-
-const { publicRuntimeConfig } = getConfig();
 
 interface MyNetworkLink {
   href: string;
@@ -48,13 +46,14 @@ export default function MainNav() {
     icon: <PlusIcon /> 
   });
 
+  const { settings } = useSettings();
+  const { searchNetworks } = useApi();
   const { wallet } = useAuthentication();
   const { service: DAOService } = useDAO();
-  const { searchNetworks } = useApi();
   const { network, getURLWithNetwork } = useNetwork();
 
   const isNetworksPage = ["/networks", "/new-network"].includes(pathname);
-  const isBeproNetwork = !network?.name || network?.name === publicRuntimeConfig?.networkConfig?.networkName;
+  const isBeproNetwork = !network?.name || network?.name === settings?.defaultNetworkConfig?.name;
 
   useEffect(() => {
     if (!DAOService || !wallet?.address || !isNetworksPage) return;
@@ -101,7 +100,7 @@ export default function MainNav() {
               icon={
                 !isBeproNetwork ? (
                   <img
-                    src={`${publicRuntimeConfig?.ipfsUrl}/${network?.fullLogo}`}
+                    src={`${settings?.urls?.ipfs}/${network?.fullLogo}`}
                     width={104}
                     height={32}
                   />
@@ -186,7 +185,7 @@ export default function MainNav() {
               <HelpIcon />
             </Button>
 
-            <WrongNetworkModal requiredNetworkId={publicRuntimeConfig?.metaMask?.chainId} />
+            <WrongNetworkModal requiredNetworkId={settings?.requiredChain?.id} />
 
             <ConnectWalletButton>
               <>

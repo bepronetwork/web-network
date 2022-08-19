@@ -41,7 +41,7 @@ interface MyNetworkSettingsProps {
   updateEditingNetwork: () => void
 }
 
-const { publicRuntimeConfig: { apiUrl } } = getConfig();
+const { publicRuntimeConfig } = getConfig();
 
 export default function MyNetworkSettings({ network, updateEditingNetwork } : MyNetworkSettingsProps) {
   const { t } = useTranslation(["common", "custom-network"]);
@@ -295,7 +295,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
           
           <Row className="mb-2">
             <span className="caption-large">
-              <span className="text-white">{urlWithoutProtocol(apiUrl)}/</span>
+              <span className="text-white">{urlWithoutProtocol(publicRuntimeConfig?.apiUrl)}/</span>
               <span className="text-primary">
               {showTextOrDefault(getQueryableText(network?.name || ""),
                                  t("custom-network:steps.network-information.fields.name.default"))}
