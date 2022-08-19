@@ -8,9 +8,12 @@ interface IDataLabelProps {
 export default function DateLabel({ date, className }: IDataLabelProps) {
   const { t } = useTranslation("common");
 
+  const start = new Date(date);
+  const end = new Date();
+
   const duration = intervalToDuration({
-    start: new Date(date),
-    end: new Date()
+    start: start > end ? end : start,
+    end: end
   });
 
   const translated = (measure: string, amount = 0) =>
