@@ -241,7 +241,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
           dao.getNetworkParameter("percentageNeededForDispute"),
           dao.getTreasury(),
           dao.getSettlerTokenData(),
-          dao.getTotalSettlerLocked(),
+          dao.getTotalNetworkToken(),
           dao.isNetworkAbleToBeClosed(),
           0
         ])
