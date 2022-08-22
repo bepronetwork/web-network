@@ -9,7 +9,7 @@ import models from "db/models";
 import * as IssueQueries from "graphql/issue";
 import * as RepositoryQueries from "graphql/repository";
 
-import { settingsToJson } from "helpers/settings";
+import { Settings } from "interfaces/settings";
 
 import api from "services/api";
 import DAO from "services/dao-service";
@@ -27,7 +27,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     raw: true,
   });
 
-  const defaultConfig = settingsToJson(settings);
+  const defaultConfig = (new Settings(settings)).raw();
 
   if (!defaultConfig?.defaultNetworkConfig?.name || !defaultConfig?.contracts?.network)
     return res.status(500).json("Missing defaultNetworkConfig or contracts settings");

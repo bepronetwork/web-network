@@ -8,7 +8,8 @@ import { BountyHelpers } from "helpers/api/bounty";
 import { OraclesHelpers } from "helpers/api/oracles";
 import { ProposalHelpers } from "helpers/api/proposal";
 import { PullRequestHelpers } from "helpers/api/pull-request";
-import { settingsToJson } from 'helpers/settings';
+
+import { Settings } from "interfaces/settings";
 
 import DAO from "services/dao-service";
 
@@ -36,7 +37,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     raw: true,
   });
 
-  const defaultConfig = settingsToJson(settings);
+  const defaultConfig = (new Settings(settings)).raw();
 
   if (!defaultConfig?.defaultNetworkConfig?.name || !defaultConfig?.contracts?.network)
     return res.status(500).json("Missing defaultNetworkConfig or contracts settings");

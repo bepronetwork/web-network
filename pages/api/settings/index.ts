@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 import models from "db/models";
 
-import { settingsToJson } from "helpers/settings";
+import { Settings } from "interfaces/settings";
 
 async function get(_req: NextApiRequest, res: NextApiResponse) {
   const settings = await models.settings.findAll({
@@ -10,9 +10,9 @@ async function get(_req: NextApiRequest, res: NextApiResponse) {
     raw: true,
   });
 
-  const settingsJson = settingsToJson(settings);
+  const settingsList = new Settings(settings);
 
-  return res.status(200).json(settingsJson);
+  return res.status(200).json(settingsList.raw());
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
