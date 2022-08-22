@@ -55,7 +55,7 @@ export default async function readPullRequestCreated(events, network: Network_v2
           const [owner, repo] = networkPullRequest.originRepo.split("/");
 
           const issueLink = 
-            `${publicRuntimeConfig?.homeUrl}/bounty?id=${bounty.githubId}&repoId=${bounty.repository_id}`;
+            `${publicRuntimeConfig?.urls?.home}/bounty?id=${bounty.githubId}&repoId=${bounty.repository_id}`;
           const creator = bounty?.creatorGithub ? "@"+bounty?.creatorGithub : truncateAddress(bounty?.creatorAddress)
           const body = 
             `${creator}, @${pullRequest.githubLogin} has a solution - [check your bounty](${issueLink})`;

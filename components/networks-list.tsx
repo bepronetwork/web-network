@@ -15,7 +15,6 @@ import { changeLoadState } from "contexts/reducers/change-load-state";
 import { useSettings } from "contexts/settings";
 
 import { orderByProperty } from "helpers/array";
-import { handleNetworkAddress } from "helpers/custom-network";
 
 import { Network } from "interfaces/network";
 
@@ -73,6 +72,8 @@ export default function NetworksList({
   }
 
   useEffect(() => {
+    if (!DAOService) return;
+    
     dispatch(changeLoadState(true));
 
     searchNetworks({
@@ -85,7 +86,7 @@ export default function NetworksList({
       .then(async ({ count, rows }) => {
         if (count > 0) {
           Promise.all(rows?.map(async (network: Network) => {
-            const networkAddress = handleNetworkAddress(network);
+            const networkAddress = network?.networkAddress;
             const dao = new DAO({
               web3Connection: DAOService.web3Connection,
               skipWindowAssignment: true
@@ -104,7 +105,7 @@ export default function NetworksList({
       
             const coinInfo = await getCoinInfoByContract(settlerTokenData?.address).catch(() => ({ prices: {} }));
       
-            addNetwork?.(handleNetworkAddress(network), 
+            addNetwork?.(networkAddress, 
                          totalBounties, 
                          (coinInfo.prices[mainCurrency] || 0) * totalSettlerLocked,
                          totalSettlerLocked,

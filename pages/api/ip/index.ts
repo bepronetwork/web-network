@@ -7,6 +7,7 @@ const { serverRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const key = serverRuntimeConfig?.ipApi?.key;
+  
   if (serverRuntimeConfig?.ipApi?.skip)
     return res.status(200).json({ countryCode: "PT" });
 

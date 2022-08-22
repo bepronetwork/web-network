@@ -9,7 +9,7 @@ import Database from "db/models";
 import DAO from "services/dao-service";
 import IpfsStorage from "services/ipfs-service";
 
-const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
+const { serverRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { name: networkName } = req.query;
@@ -86,13 +86,20 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const invitations = [];
 
+    const githubUserSetting = await Database.settings.findOne({
+      where: { visibility: "public", group: "github", key: "botUser" },
+      raw: true,
+    });
+
+    if (!githubUserSetting) return res.status(500).json("Missing github bot user");
+
     for (const repository of repos) {
       const [owner, repo] = repository.fullName.split("/");
 
       await octokitUser.rest.repos.addCollaborator({
         owner,
         repo,
-        username: publicRuntimeConfig?.github?.user,
+        username: githubUserSetting.value,
         ...(githubLogin !== owner  && { permission: "maintain"} || {})
       })
       .then(({data}) => invitations.push(data?.id))
@@ -271,13 +278,20 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
 
       const invitations = [];
 
+      const githubUserSetting = await Database.settings.findOne({
+        where: { visibility: "public", group: "github", key: "botUser" },
+        raw: true,
+      });
+  
+      if (!githubUserSetting) return res.status(500).json("Missing github bot user");
+
       for (const repository of addingRepos) {
         const [owner, repo] = repository.fullName.split("/");
 
         const { data } = await octokitUser.rest.repos.addCollaborator({
           owner,
           repo,
-          username: publicRuntimeConfig?.github?.user,
+          username: githubUserSetting.value,
           ...(githubLogin !== owner  && { permission: "maintain"} || {})
         });
 

@@ -36,7 +36,7 @@ export default class DAO {
   constructor({ skipWindowAssignment, web3Connection } : DAOServiceProps = {}) {
     const web3Host = sessionStorageSettings?.urls?.web3Provider;
 
-    if (!web3Host && !web3Connection)
+    if ((sessionStorageSettings && !web3Host) && !web3Connection)
       throw new Error("Missing web3 provider URL");
 
     this._web3Connection = web3Connection || new Web3Connection({

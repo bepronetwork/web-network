@@ -1,7 +1,6 @@
 import { FormCheck } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
-import getConfig from "next/config";
 
 import ConnectGithub from "components/connect-github";
 import RepositoriesList from "components/custom-network/repositories-list";
@@ -9,14 +8,14 @@ import Step from "components/step";
 
 import { useAuthentication } from "contexts/authentication";
 import { useNetworkSettings } from "contexts/network-settings";
+import { useSettings } from "contexts/settings";
 
 import { StepWrapperProps } from "interfaces/stepper";
-
-const { publicRuntimeConfig } = getConfig();
 
 export default function SelectRepositoriesStep({ activeStep, index, validated, handleClick } : StepWrapperProps) {
   const { t } = useTranslation("custom-network");
 
+  const { settings } = useSettings();
   const { user } = useAuthentication();
   const { github, fields } = useNetworkSettings();
 
@@ -41,7 +40,7 @@ export default function SelectRepositoriesStep({ activeStep, index, validated, h
           <RepositoriesList repositories={github.repositories} onClick={handleRepositoryCheck} />
 
           <span className="caption-small text-gray px-0 mt-3">
-            {publicRuntimeConfig?.github?.user}
+            {settings?.github?.botUser}
           </span>
 
           <div className="d-flex align-items-center p-small text-white px-0 m-0 p-0">
@@ -51,7 +50,7 @@ export default function SelectRepositoriesStep({ activeStep, index, validated, h
               onChange={handlePermissonCheck}
             />
             <span>
-              {t("steps.repositories.give-access", { user: publicRuntimeConfig?.github?.user })}
+              {t("steps.repositories.give-access", { user: settings?.github?.botUser })}
             </span>
           </div>
 

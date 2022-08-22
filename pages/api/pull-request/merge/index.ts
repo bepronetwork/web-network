@@ -8,8 +8,6 @@ import models from "db/models";
 
 import * as PullRequestQueries from "graphql/pull-request";
 
-import { handleNetworkAddress } from "helpers/custom-network";
-
 import DAO from "services/dao-service";
 
 import { GraphQlResponse } from "types/octokit";
@@ -48,7 +46,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
 
-    if (!await DAOService.loadNetwork(handleNetworkAddress(customNetwork)))
+    if (!await DAOService.loadNetwork(customNetwork.networkAddress))
       return res.status(500).json("Failed to load network contract");
 
     const network = DAOService.network;

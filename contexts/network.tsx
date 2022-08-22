@@ -2,7 +2,6 @@ import React, {
   createContext, useCallback, useContext, useEffect, useMemo, useState
 } from "react";
 
-import getConfig from "next/config";
 import { useRouter } from "next/router";
 import { parseCookies, setCookie } from "nookies";
 
@@ -10,13 +9,11 @@ import NetworkThemeInjector from "components/custom-network/network-theme-inject
 
 import { useDAO } from "contexts/dao";
 
-import { handleNetworkAddress } from "helpers/custom-network";
-
 import { Network } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 
-const { publicRuntimeConfig } = getConfig();
+import { useSettings } from "./settings";
 
 export interface NetworkContextData {
   activeNetwork: Network;
@@ -34,11 +31,12 @@ export const NetworkProvider: React.FC = function ({ children }) {
   const [lastNetworkVisited, setLastNetworkVisited] = useState<string>();
 
   const { getNetwork } = useApi();
+  const { settings } = useSettings();
   const { query, push } = useRouter();
   const { service: DAOService, changeNetwork } = useDAO();
 
   const updateActiveNetwork = useCallback((forced?: boolean) => {
-    const networkName = query?.network || publicRuntimeConfig?.networkConfig?.networkName;
+    const networkName = query?.network || settings?.defaultNetworkConfig?.name;
 
     if (!networkName)
       return;
@@ -118,7 +116,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
 
   useEffect(() => {    
     if (DAOService?.network?.contractAddress !== activeNetwork?.networkAddress ||! activeNetwork?.draftTime) 
-      changeNetwork(handleNetworkAddress(activeNetwork))
+      changeNetwork(activeNetwork?.networkAddress)
         .then(loaded => {
           if (loaded) updateNetworkParameters();
         });

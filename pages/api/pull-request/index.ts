@@ -9,7 +9,6 @@ import models from "db/models";
 import * as PullRequestQueries from "graphql/pull-request";
 import * as RepositoryQueries from "graphql/repository";
 
-import { handleNetworkAddress } from "helpers/custom-network";
 import paginate from "helpers/paginate";
 
 import DAO from "services/dao-service";
@@ -216,7 +215,7 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
 
   if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
 
-  if (!await DAOService.loadNetwork(handleNetworkAddress(customNetwork)))
+  if (!await DAOService.loadNetwork(customNetwork.networkAddress))
     return res.status(500).json("Failed to load network contract");
 
   const network = DAOService.network;

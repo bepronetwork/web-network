@@ -1,9 +1,6 @@
 import { Defaults } from "@taikai/dappkit";
-import getConfig from "next/config";
 
-import { Network, Repository, ThemeColors } from "interfaces/network";
-
-const { publicRuntimeConfig } = getConfig();
+import { Repository, ThemeColors } from "interfaces/network";
 
 export const DefaultNetworkSettings = {
   isSettingsValidated: false,
@@ -88,11 +85,4 @@ export const DefaultNetworkSettings = {
     bountyURI: "",
     validated: false,
   }
-};
-
-export const handleNetworkAddress = (network: Network) => {
-  if (!network || network?.name === publicRuntimeConfig?.networkConfig?.networkName)
-    return publicRuntimeConfig?.contract?.address;
-
-  return network.networkAddress;
 };

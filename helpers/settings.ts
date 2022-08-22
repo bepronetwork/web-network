@@ -19,7 +19,7 @@ const parseSettingValue = (setting: Setting) => {
   return parsers[setting.type](setting.value);
 };
 
-const settingsToJson = (settings: Setting[]) => {
+const settingsToJson = (settings: Setting[]): SettingsType => {
   const settingsJson = {};
 
   settings.forEach(setting => {

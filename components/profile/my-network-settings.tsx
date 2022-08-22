@@ -23,7 +23,6 @@ import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
 import { toastError, toastSuccess } from "contexts/reducers/add-toast";
 
-import { handleNetworkAddress } from "helpers/custom-network";
 import { psReadAsText } from "helpers/file-reader";
 import { formatDate } from "helpers/formatDate";
 import { getQueryableText, urlWithoutProtocol } from "helpers/string";
@@ -59,8 +58,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   const { user, wallet, updateWalletBalance } = useAuthentication();
   const { details, fields, github, settings, forcedNetwork, setForcedNetwork } = useNetworkSettings();
 
-  const isCurrentNetwork =  
-    !!network && !!activeNetwork && handleNetworkAddress(network) === handleNetworkAddress(activeNetwork);
+  const isCurrentNetwork = !!network && !!activeNetwork && network?.networkAddress === activeNetwork?.networkAddress;
 
   const settingsValidated = [
     fields.description.validator(details?.description),
@@ -133,7 +131,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
           }
         } = settings;
 
-        const networkAddress = handleNetworkAddress(network);
+        const networkAddress = network?.networkAddress;
 
         const promises = await Promise.allSettled([
           ... draftTime !== forcedNetwork.draftTime ? 
@@ -198,7 +196,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
           githubLogin: user.login,
           isClosed: true,
           creator: wallet.address,
-          networkAddress: handleNetworkAddress(network),
+          networkAddress: network?.networkAddress,
           accessToken: user?.accessToken
         });
       })
@@ -221,7 +219,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
     if (!network) return;
 
     try {
-      const networkAddress = handleNetworkAddress(network);
+      const networkAddress = network?.networkAddress;
       const dao = new DAO({
         web3Connection: DAOService.web3Connection,
         skipWindowAssignment: true
@@ -295,7 +293,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
           
           <Row className="mb-2">
             <span className="caption-large">
-              <span className="text-white">{urlWithoutProtocol(publicRuntimeConfig?.apiUrl)}/</span>
+              <span className="text-white">{urlWithoutProtocol(publicRuntimeConfig?.urls?.api)}/</span>
               <span className="text-primary">
               {showTextOrDefault(getQueryableText(network?.name || ""),
                                  t("custom-network:steps.network-information.fields.name.default"))}
