@@ -18,7 +18,7 @@ export default function NotListedTokens({
       title={t("modals.not-listed-tokens.title")} 
       titlePosition="center"
     >
-      { networks?.filter(network => network?.totalSettlerLocked > 0)?.map(network => (
+      { networks?.filter(network => network?.totalNetworkToken > 0)?.map(network => (
         <div 
           className="d-flex flex-row justify-content-between caption-small py-2" 
           key={`${network?.tokenName}${network?.tokenSymbol}`}
@@ -28,7 +28,7 @@ export default function NotListedTokens({
           </span>
 
           <span>
-            {formatNumberToNScale(network?.totalSettlerLocked)} ${network?.tokenSymbol}
+            {formatNumberToNScale(network?.totalNetworkToken)} ${network?.tokenSymbol}
           </span>
         </div>
       )) }

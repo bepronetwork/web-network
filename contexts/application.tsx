@@ -166,11 +166,11 @@ export default function ApplicationContextProvider({ children }) {
     else waitingForTx = transactionWithHash;
   }, [state.myTransactions]);
 
-  // TODO Replace staked by getTotalSettlerLocked
+  // TODO Replace staked by getTotalNetworkToken
   
   // useEffect(() => {
   //   if (beproServiceStarted) 
-  //     BeproService.getTotalSettlerLocked()
+  //     BeproService.getTotalNetworkToken()
   //     .then(amount => dispatch(changeStakedState(amount)))
   //     .catch(console.log)
   // }, [pathname, beproServiceStarted])
