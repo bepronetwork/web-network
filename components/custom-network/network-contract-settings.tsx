@@ -3,14 +3,15 @@ import { useTranslation } from "next-i18next";
 import NetworkParameterInput from "components/custom-network/network-parameter-input";
 
 import { useNetwork } from "contexts/network";
-import { LIMITS, useNetworkSettings } from "contexts/network-settings";
+import { useNetworkSettings } from "contexts/network-settings";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
 export default function NetworkContractSettings() {
   const { t } = useTranslation(["common", "custom-network"]);
-  const { fields, settings } = useNetworkSettings();
+
   const { activeNetwork } = useNetwork()
+  const { fields, settings, LIMITS } = useNetworkSettings();
   
   const handleDraftTimeChange = value => fields.parameter.setter({ label: "draftTime", value });
   const handleDisputeTimeChange = 

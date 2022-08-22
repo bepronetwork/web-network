@@ -20,6 +20,8 @@ export default function NationDialog() {
   const { getClientNation } = useApi();
 
   useEffect(() => {
+    if (!settings) return;
+    
     getClientNation()
       .then((data) => {
         if (
@@ -31,7 +33,7 @@ export default function NationDialog() {
         setCountry(data.country || String(t("modals.nation-dialog.your-country")));
         setBlock(true);
       })
-  }, []);
+  }, [settings]);
 
   if (isBlock) {
     return (

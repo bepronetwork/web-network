@@ -12,9 +12,7 @@ import api from "services/api";
 
 import { GraphQlResponse } from "types/octokit";
 
-import twitterTweet from "../handle-twitter-tweet";
-
-const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
+const { serverRuntimeConfig } = getConfig();
 
 export default async function readBountyClosed(events, network: Network_v2, customNetwork) {
   const closedBounties = [];
@@ -121,14 +119,6 @@ export default async function readBountyClosed(events, network: Network_v2, cust
               })))
 
             closedBounties.push(bounty.issueId);
-        
-            if (network.contractAddress === publicRuntimeConfig?.contract?.address)
-              twitterTweet({
-                type: "bounty",
-                action: "distributed",
-                issue: bounty,
-                currency: bounty.token.symbol
-              });
         
             await api.post(`/seo/${bounty.issueId}`).catch((e) => {
               console.log("Error creating SEO", e);

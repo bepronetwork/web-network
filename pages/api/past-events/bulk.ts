@@ -8,10 +8,11 @@ import { BountyHelpers } from "helpers/api/bounty";
 import { OraclesHelpers } from "helpers/api/oracles";
 import { ProposalHelpers } from "helpers/api/proposal";
 import { PullRequestHelpers } from "helpers/api/pull-request";
+import { settingsToJson } from 'helpers/settings';
 
 import DAO from "services/dao-service";
 
-const { publicRuntimeConfig, serverRuntimeConfig } = getConfig();
+const { serverRuntimeConfig } = getConfig();
 
 const handler = async (type, helpers, network, customNetwork, fromBlock, toBlock) => {
   const [contractMethod, apiMethod] = helpers[type];
@@ -26,10 +27,24 @@ const handler = async (type, helpers, network, customNetwork, fromBlock, toBlock
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const bulk = await models.chainEvents.findOne({ where: { name: `Bulk` } });
   const fromBlock = bulk?.dataValues?.lastBlock || serverRuntimeConfig.schedules.startProcessEventsAt;
+
+  const settings = await models.settings.findAll({
+    where: { 
+      visibility: "public",
+      group: { [Op.or]: ["defaultNetworkConfig", "contracts"] }
+    },
+    raw: true,
+  });
+
+  const defaultConfig = settingsToJson(settings);
+
+  if (!defaultConfig?.defaultNetworkConfig?.name || !defaultConfig?.contracts?.network)
+    return res.status(500).json("Missing defaultNetworkConfig or contracts settings");
+
   const customNetworks = await models.network.findAll({
     where: {
       name: {
-        [Op.notILike]: `%${publicRuntimeConfig?.networkConfig?.networkName}%`
+        [Op.notILike]: `%${defaultConfig.defaultNetworkConfig.name}%`
       }
     }
   })
@@ -38,8 +53,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const networks = [{
     id: 1,
-    name: publicRuntimeConfig?.networkConfig?.networkName,
-    networkAddress: publicRuntimeConfig?.contract?.address
+    name: defaultConfig.defaultNetworkConfig.name,
+    networkAddress: defaultConfig.contracts.network
   }, ...customNetworks]
 
   const DAOService = new DAO({ skipWindowAssignment: true });

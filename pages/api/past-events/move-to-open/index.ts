@@ -9,21 +9,33 @@ import models from "db/models";
 import * as IssueQueries from "graphql/issue";
 import * as RepositoryQueries from "graphql/repository";
 
-import twitterTweet from "helpers/api/handle-twitter-tweet";
+import { settingsToJson } from "helpers/settings";
 
 import api from "services/api";
 import DAO from "services/dao-service";
 
 import { GraphQlResponse } from "types/octokit";
 
-const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
+const { serverRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
+  const settings = await models.settings.findAll({
+    where: { 
+      visibility: "public",
+      group: { [Op.or]: ["defaultNetworkConfig", "contracts"] }
+    },
+    raw: true,
+  });
+
+  const defaultConfig = settingsToJson(settings);
+
+  if (!defaultConfig?.defaultNetworkConfig?.name || !defaultConfig?.contracts?.network)
+    return res.status(500).json("Missing defaultNetworkConfig or contracts settings");
+
   const customNetworks = await models.network.findAll({
     where: {
       name: {
-        [Op.notILike]: `%${publicRuntimeConfig?.networkConfig?.networkName
-}%`
+        [Op.notILike]: `%${defaultConfig.defaultNetworkConfig.name}%`
       }
     }
   });
@@ -31,9 +43,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const networks = [
     {
       id: 1,
-      name: publicRuntimeConfig?.networkConfig?.networkName
+      name: defaultConfig.defaultNetworkConfig.name
 ,
-      networkAddress: publicRuntimeConfig?.contract?.address,
+      networkAddress: defaultConfig.contracts.network,
     },
     ...customNetworks
   ];
@@ -108,15 +120,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       issue.state = "open";
       console.log(`Moved ${issue.issueId} to open`);
       await issue.save();
-
-      if (network.contractAddress === publicRuntimeConfig?.contract?.address)
-        twitterTweet({
-          type: "bounty",
-          action: "changes",
-          issuePreviousState: "draft",
-          issue,
-          currency: issue.token.symbol
-        });
 
       await api.post(`/seo/${issue.issueId}`).catch((e) => {
         console.log("Error creating SEO", e);

@@ -1,12 +1,7 @@
 import { Network_v2 } from "@taikai/dappkit";
-import getConfig from "next/config";
 import { Op } from "sequelize";
 
 import models from "db/models";
-
-import twitterTweet from "../handle-twitter-tweet";
-
-const { publicRuntimeConfig } = getConfig();
 
 export default async function readProposalCreated(events, network: Network_v2, customNetwork) {
   const created = [];
@@ -73,14 +68,6 @@ export default async function readProposalCreated(events, network: Network_v2, c
             await bounty.save();
 
             created.push(networkProposal.id);
-        
-            if (network.contractAddress === publicRuntimeConfig?.contract?.address)
-              twitterTweet({
-                type: "proposal",
-                action: "created",
-                issue: bounty,
-                currency: bounty.token.symbol
-              });
           }
         }
       }

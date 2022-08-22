@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
-import getConfig from "next/config";
 
 import Button from "components/button";
 import DeployNFTModal from "components/deploy-nft-modal";
@@ -12,11 +11,10 @@ import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
+import { useSettings } from "contexts/settings";
 
 import { StepWrapperProps } from "interfaces/stepper";
 import { BEPRO_TOKEN, Token } from "interfaces/token";
-
-const { publicRuntimeConfig } = getConfig();
 
 export default function TokenConfiguration({ 
   activeStep, 
@@ -28,18 +26,19 @@ export default function TokenConfiguration({
 } : StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
   
-  const { wallet } = useAuthentication();
-  const [bountyTokenAddress, setBountyTokenAddress] = useState("");
   const [bountyTokenUri, setBountyTokenUri] = useState("");
-  const [bountyTokenUriError, setBountyTokenUriError] = useState(false);
-  const [bountyTokenError, setBountyTokenError] = useState(false);
   const [networkToken, setNetworkToken] = useState<Token>();
   const [showModalDeploy, setShowModalDeploy] = useState(false);
+  const [bountyTokenError, setBountyTokenError] = useState(false);
+  const [bountyTokenAddress, setBountyTokenAddress] = useState("");
+  const [bountyTokenUriError, setBountyTokenUriError] = useState(false);
   const [customTokens, setCustomTokens] = useState<Token[]>([BEPRO_TOKEN]);
-
+  
+  const { settings } = useSettings();
+  const { wallet } = useAuthentication();
   const { activeNetwork } = useNetwork();
-  const { tokens, fields } = useNetworkSettings();
   const { service: DAOService } = useDAO();
+  const { tokens, fields } = useNetworkSettings();
 
   function handleShowModal() {
     setShowModalDeploy(true);
@@ -135,8 +134,8 @@ export default function TokenConfiguration({
           description={t("custom-network:steps.token-configuration.fields.tokens-dropdown.description")}
           tokens={customTokens} 
           canAddToken={
-            activeNetwork?.name === publicRuntimeConfig?.networkConfig?.networkName ? 
-            publicRuntimeConfig?.networkConfig?.allowCustomTokens :
+            activeNetwork?.name === settings?.defaultNetworkConfig?.name ? 
+            settings?.defaultNetworkConfig?.allowCustomTokens :
             !!activeNetwork?.allowCustomTokens
           }
           addToken={addToken} 
