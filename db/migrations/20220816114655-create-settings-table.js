@@ -1,5 +1,7 @@
 'use strict';
 
+const { saveSettingsFromEnv } = require("../../scripts/settings/save-from-env");
+
 module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.sequelize.query("DROP TYPE IF EXISTS enum_settings_visibility");
@@ -50,6 +52,8 @@ module.exports = {
       type: "unique",
       name: "unique_settings_key_value"
     });
+
+    await saveSettingsFromEnv();
   },
 
   async down (queryInterface, Sequelize) {
