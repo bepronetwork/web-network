@@ -49,7 +49,7 @@ export default function Oracle({ children }) {
     Promise.all([
       DAOService.getClosedBounties(),
       DAOService.getOpenBounties(),
-      DAOService.getTotalSettlerLocked(),
+      DAOService.getTotalNetworkToken(),
       getTotalUsers()
     ])
     .then(([closed, inProgress, onNetwork, totalUsers]) => {
