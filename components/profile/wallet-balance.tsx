@@ -115,7 +115,7 @@ export default function WalletBalance() {
         </FlexRow>
       </FlexRow>
 
-      {tokens.map(token => <TokenBalance {...token} type="token" />)}
+      {tokens.map(token => <TokenBalance key={`balance-${token.address}`} {...token} type="token" />)}
 
       <FlexRow className="mt-3 mb-3 justify-content-between align-items-center">
         <span className="h4 family-Regular text-white font-weight-medium">{t("$oracles")}</span>
