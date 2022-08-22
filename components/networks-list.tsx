@@ -112,7 +112,7 @@ export default function NetworksList() {
       
       const [settlerTokenData, totalSettlerLocked, openBounties, totalBounties] = await Promise.all([
         dao.getSettlerTokenData().catch(() => undefined),
-        dao.getTotalSettlerLocked().catch(() => 0),
+        dao.getTotalNetworkToken().catch(() => 0),
         dao.getOpenBounties().catch(() => 0),
         dao.getTotalBounties().catch(() => 0)
       ]);

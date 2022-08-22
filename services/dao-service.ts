@@ -7,7 +7,7 @@ import {
   TreasuryInfo,
   OraclesResume,
   Web3Connection,
-  Network_Registry
+  NetworkRegistry
 } from "@taikai/dappkit";
 import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
 
@@ -25,7 +25,7 @@ interface DAOServiceProps {
 export default class DAO {
   private _web3Connection: Web3Connection;
   private _network: Network_v2;
-  private _registry: Network_Registry;
+  private _registry: NetworkRegistry;
   private _web3Host: string;
   private _registryAddress: string;
 
@@ -66,12 +66,12 @@ export default class DAO {
     return false;
   }
 
-  async loadRegistry(skipAssignment?: boolean): Promise<Network_Registry | boolean> {
+  async loadRegistry(skipAssignment?: boolean): Promise<NetworkRegistry | boolean> {
     try {
       if (!this.registryAddress) 
         throw new Error("Missing Network_Registry Contract Address");
 
-      const registry = new Network_Registry(this.web3Connection, this.registryAddress);
+      const registry = new NetworkRegistry(this.web3Connection, this.registryAddress);
 
       await registry.loadContract();
 
@@ -79,7 +79,7 @@ export default class DAO {
 
       return registry;
     } catch (error) {
-      console.log("Error loading Network_Registry: ", error);
+      console.log("Error loading NetworkRegistry: ", error);
     }
 
     return false;
@@ -141,13 +141,13 @@ export default class DAO {
 
       switch (kind) {
       case 'settler':
-        n = await this.network.settlerToken.getTokenAmount(address);
+        n = await this.network.networkToken.getTokenAmount(address);
         break;
       case 'eth':
         n = +this.web3Connection.Web3.utils.fromWei(await this.web3Connection.getBalance());
         break;
       case 'staked':
-        n = await this.network.totalSettlerLocked();
+        n = await this.network.totalNetworkToken();
         break;
       }
       
@@ -236,8 +236,8 @@ export default class DAO {
     return this.network.getBountiesOfAddress(address);
   }
 
-  async getTotalSettlerLocked(): Promise<number> {
-    return this.network.totalSettlerLocked();
+  async getTotalNetworkToken(): Promise<number> {
+    return this.network.totalNetworkToken();
   }
 
   async getNetworksQuantityInRegistry(): Promise<number> {
@@ -303,16 +303,16 @@ export default class DAO {
   }
 
   async isNetworkAbleToBeClosed(): Promise<boolean> {
-    const [totalSettlerLocked, closedBounties, canceledBounties, bountiesTotal] = 
+    const [totalNetworkToken, closedBounties, canceledBounties, bountiesTotal] = 
       await Promise.all([
-        this.network.totalSettlerLocked(),
+        this.network.totalNetworkToken(),
         this.network.closedBounties(),
         this.network.canceledBounties(),
         this.network.bountiesIndex()
       ]);
 
     return (
-      totalSettlerLocked === 0 &&
+      totalNetworkToken === 0 &&
       closedBounties + canceledBounties === bountiesTotal
     );
   }
@@ -328,7 +328,7 @@ export default class DAO {
   }
 
   async getSettlerTokenData(): Promise<Token> {
-    return this.getERC20TokenData(this.network.settlerToken.contractAddress);
+    return this.getERC20TokenData(this.network.networkToken.contractAddress);
   }
 
   async getTokenBalance(tokenAddress: string, walletAddress: string): Promise<number> {
@@ -345,7 +345,9 @@ export default class DAO {
 
   async getSettlerTokenAllowance(walletAddress: string): Promise<number> {
 
-    return this.getAllowance(this.network.settlerToken.contractAddress, walletAddress, this.network.contractAddress);
+    return this.getAllowance(this.network.networkToken.contractAddress, 
+                             walletAddress, 
+                             this.network.contractAddress);
   }
 
   async deployBountyToken(name: string, symbol: string): Promise<TransactionReceipt> {
