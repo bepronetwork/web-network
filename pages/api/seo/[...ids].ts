@@ -7,7 +7,7 @@ import { Op } from "sequelize";
 
 import models from "db/models";
 
-import { settingsToJson } from "helpers/settings";
+import { Settings } from "interfaces/settings";
 
 import IpfsStorage from "services/ipfs-service";
 
@@ -36,7 +36,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     raw: true,
   });
 
-  const defaultConfig = settingsToJson(settings);
+  const defaultConfig = (new Settings(settings)).raw();
 
   if (!defaultConfig?.urls?.ipfs)
     return res.status(500).json("Missing ipfs url on settings");

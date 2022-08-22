@@ -1,8 +1,9 @@
 const path = require("path");
 
-const { i18n } = require("./next-i18next.config");
-const { parseSettingsFromDB, combineSettings } = require("./scripts/settings/index.js");
 require("dotenv").config();
+
+const { i18n } = require("./next-i18next.config");
+const { loadSettingsFromDB } = require("./scripts/settings/load-from-db.js");
 
 const publicRuntimeConfig = {
   urls: {
@@ -44,7 +45,7 @@ const serverSettings = {
 }
 
 module.exports = async () => {
-  const serverRuntimeConfig = combineSettings(serverSettings, await parseSettingsFromDB());
+  const serverRuntimeConfig = await loadSettingsFromDB(serverSettings);
   
   return {
     i18n,
