@@ -179,7 +179,7 @@ function OraclesActions({
   function approveSettlerToken() {
     if (!wallet?.address || !DAOService) return;
 
-    handleApproveToken(DAOService.network.settlerToken.contractAddress, tokenAmount).then(updateAllowance);
+    handleApproveToken(DAOService.network.networkToken.contractAddress, tokenAmount).then(updateAllowance);
   }
 
   function getCurrentLabel() {
