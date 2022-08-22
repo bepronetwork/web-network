@@ -120,7 +120,7 @@ async function main() {
         privateKey: ownerPrivKey,
         skipWindowAssignment: true
     };
-    console.log({ options })
+
     // Connect to the RPC Endpoint
     const web3Connection = new Web3Connection(options);
     await web3Connection.start();
@@ -136,7 +136,7 @@ async function main() {
         transactional: {
             name: 'USD Coint',
             symbol: "USDC",
-            cap: "500000000000000000000000"
+            cap: "300000000000000000000000000"
         },
         network: {
             name: 'Bepro Token',
@@ -146,7 +146,7 @@ async function main() {
         reward: {
             name: 'Reward Network',
             symbol: "RWD",
-            cap: "500000000000000000000000"
+            cap: "300000000000000000000000000"
         },
         nft: {
             name: 'Bounty',
@@ -170,7 +170,7 @@ async function main() {
 
         const nftReceiptAddress = (await Deployer(BountyToken, [tokens.nft.name, tokens.nft.symbol]))?.contractAddress
 
-        // 2. Instancing Contract
+        // 2. Loading Contracts Instance
         console.log(`Loading Contracts...`);
         const networkToken = new ERC20(web3Connection, networkReceiptAddress);
         const bountyTransactional = new ERC20(web3Connection, transactionalReceiptAddress);
@@ -187,7 +187,7 @@ async function main() {
         if (argv.network !== 'custom' || argv.network !== 'local')
             for (const address of stagingAccounts) {
                 console.log(`Transfering 10M BEPRO to ${address}`);
-                await bountyTransactional.transferTokenAmount(address, 10000);
+                await bountyTransactional.transferTokenAmount(address, 10000000);
             }
 
 
