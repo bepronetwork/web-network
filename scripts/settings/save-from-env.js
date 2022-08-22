@@ -61,7 +61,7 @@ const serverSettings = [
   ServerSettingItem("e2eEnabled", process.env.NEXT_E2E_TESTNET || false, "boolean")
 ];
 
-const main = async () => {
+const saveSettingsFromEnv = async () => {
   const sequelize = new Sequelize(DBConfig.database, DBConfig.username, DBConfig.password, DBConfig);
 
   SettingsModel.init(sequelize);
@@ -69,9 +69,6 @@ const main = async () => {
   await SettingsModel.bulkCreate([...publicSettings, ...serverSettings]);
 }
 
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+module.exports = {
+  saveSettingsFromEnv
+};
