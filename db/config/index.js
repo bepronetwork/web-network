@@ -1,3 +1,4 @@
+const {info} = require("../../helpers/api/handle-log");
 require("dotenv").config();
 
 module.exports = {
@@ -8,6 +9,12 @@ module.exports = {
   
   host: process.env.NEXT_DB_HOST || "localhost",
   port: +process.env.NEXT_DB_PORT || 54320,
+  ... (process.env.NEXT_DB_LOG ? {
+    logging: (sql, queryObject) => { info(`SQL`, {sql, queryObject}) },
+  } : {
+    logging: false
+  }),
+
   ...(process.env.NEXT_DB_HOST
     ? {
         dialectOptions: {
