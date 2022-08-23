@@ -1,32 +1,29 @@
-module.exports = ( async () => {
-  const {info} = await import("../../scripts/logging.js");
-  await import("dotenv");
+const {info} = require("../../scripts/logging.js");
+require("dotenv").config();
 
-  return {
-    dialect: process.env.NEXT_DB_DIALECT || "postgres",
-    username: process.env.NEXT_DB_USERNAME || "github",
-    password: process.env.NEXT_DB_PASSWORD || "github",
-    database: process.env.NEXT_DB_DATABASE || "github",
+module.exports = {
+  dialect: process.env.NEXT_DB_DIALECT || "postgres",
+  username: process.env.NEXT_DB_USERNAME || "github",
+  password: process.env.NEXT_DB_PASSWORD || "github",
+  database: process.env.NEXT_DB_DATABASE || "github",
 
-    host: process.env.NEXT_DB_HOST || "localhost",
-    port: +process.env.NEXT_DB_PORT || 54320,
-    ... (process.env.NEXT_DB_LOG ? {
-      logging: (sql) => { info(sql) },
-    } : {
-      logging: false
-    }),
+  host: process.env.NEXT_DB_HOST || "localhost",
+  port: +process.env.NEXT_DB_PORT || 54320,
+  ... (process.env.NEXT_DB_LOG ? {
+    logging: (sql) => { info(sql) },
+  } : {
+    logging: false
+  }),
 
-    ...(process.env.NEXT_DB_HOST
-      ? {
-        dialectOptions: {
+  ...(process.env.NEXT_DB_HOST
+    ? {
+      dialectOptions: {
 
-          ssl: {
-            required: true,
-            rejectUnauthorized: false
-          }
+        ssl: {
+          required: true,
+          rejectUnauthorized: false
         }
       }
-      : {})
-  };
-
-})();
+    }
+    : {})
+};
