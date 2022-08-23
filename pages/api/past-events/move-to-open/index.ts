@@ -20,22 +20,21 @@ const { serverRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const settings = await models.settings.findAll({
-    where: { 
-      visibility: "public",
-      group: { [Op.or]: ["defaultNetworkConfig", "contracts"] }
-    },
+    where: { visibility: "public" },
     raw: true,
   });
 
-  const defaultConfig = (new Settings(settings)).raw();
+  const publicSettings = (new Settings(settings)).raw();
 
-  if (!defaultConfig?.defaultNetworkConfig?.name || !defaultConfig?.contracts?.network)
-    return res.status(500).json("Missing defaultNetworkConfig or contracts settings");
+  if (!publicSettings?.contracts?.network) return res.status(500).json("Missing default network contract");
+  if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
+
+  const defaultNetworkName = publicSettings?.defaultNetworkConfig?.name || "bepro";
 
   const customNetworks = await models.network.findAll({
     where: {
       name: {
-        [Op.notILike]: `%${defaultConfig.defaultNetworkConfig.name}%`
+        [Op.notILike]: `%${defaultNetworkName}%`
       }
     }
   });
@@ -43,14 +42,16 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const networks = [
     {
       id: 1,
-      name: defaultConfig.defaultNetworkConfig.name
-,
-      networkAddress: defaultConfig.contracts.network,
+      name: defaultNetworkName,
+      networkAddress: publicSettings.contracts.network,
     },
     ...customNetworks
   ];
 
-  const DAOService = new DAO({ skipWindowAssignment: true });
+  const DAOService = new DAO({ 
+    skipWindowAssignment: true,
+    web3Host: publicSettings.urls.web3Provider
+  });
 
   if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
 
@@ -130,8 +131,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json("Issues Moved to Open");
 }
 
-export default async function MoveToOpen(req: NextApiRequest,
-                                         res: NextApiResponse) {
+export default async function MoveToOpen(req: NextApiRequest,  res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
