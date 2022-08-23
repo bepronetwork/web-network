@@ -7,7 +7,7 @@ import { Op } from "sequelize";
 
 import models from "db/models";
 
-import { Settings } from "interfaces/settings";
+import { Settings } from "helpers/settings";
 
 import IpfsStorage from "services/ipfs-service";
 

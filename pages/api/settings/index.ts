@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 import models from "db/models";
 
-import { Settings } from "interfaces/settings";
+import { Settings } from "helpers/settings";
 
 async function get(_req: NextApiRequest, res: NextApiResponse) {
   const settings = await models.settings.findAll({
