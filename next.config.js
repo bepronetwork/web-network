@@ -45,7 +45,7 @@ const serverSettings = {
 }
 
 module.exports = async () => {
-  const serverRuntimeConfig = await loadSettingsFromDB(serverSettings);
+  const serverRuntimeConfig = process.env.NEXT_DB_DATABASE ? await loadSettingsFromDB(serverSettings) : {};
   
   return {
     i18n,
