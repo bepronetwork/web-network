@@ -50,7 +50,16 @@ class Settings {
   }
 }
 
+const getSettingsFromSessionStorage = () => 
+  typeof window !== 'undefined' && JSON.parse(sessionStorage.getItem("web-network.settings")) || undefined;
+
+const setSettingsToSessionStorage = settings => {
+  if (typeof window !== 'undefined')
+    sessionStorage.setItem("web-network.settings", JSON.stringify(settings));
+}
 
 module.exports = { 
-  Settings
+  Settings,
+  getSettingsFromSessionStorage,
+  setSettingsToSessionStorage
 };

@@ -9,7 +9,7 @@ import models from "db/models";
 import * as IssueQueries from "graphql/issue";
 import * as RepositoryQueries from "graphql/repository";
 
-import { Settings } from "interfaces/settings";
+import { Settings } from "helpers/settings";
 
 import api from "services/api";
 import DAO from "services/dao-service";

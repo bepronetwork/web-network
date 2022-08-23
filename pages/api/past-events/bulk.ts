@@ -8,8 +8,7 @@ import { BountyHelpers } from "helpers/api/bounty";
 import { OraclesHelpers } from "helpers/api/oracles";
 import { ProposalHelpers } from "helpers/api/proposal";
 import { PullRequestHelpers } from "helpers/api/pull-request";
-
-import { Settings } from "interfaces/settings";
+import { Settings } from "helpers/settings";
 
 import DAO from "services/dao-service";
 
