@@ -10,6 +10,7 @@ import * as PullRequestQueries from "graphql/pull-request";
 import * as RepositoryQueries from "graphql/repository";
 
 import paginate from "helpers/paginate";
+import { Settings } from "helpers/settings";
 
 import DAO from "services/dao-service";
 
@@ -92,7 +93,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const [owner, repo] = repoInfo.githubPath.split("/");
 
-  if(serverRuntimeConfig?.e2e === true) {
+  if(serverRuntimeConfig?.e2eEnabled === true) {
 
     await models.pullRequest.create({
       issueId: issue.id,
@@ -211,7 +212,19 @@ async function del(req: NextApiRequest, res: NextApiResponse) {
 
   if (!pullRequest) return res.status(404).json("Invalid");
 
-  const DAOService = new DAO({ skipWindowAssignment: true });
+  const settings = await models.settings.findAll({
+    where: { visibility: "public" },
+    raw: true,
+  });
+
+  const publicSettings = (new Settings(settings)).raw();
+
+  if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
+
+  const DAOService = new DAO({ 
+    skipWindowAssignment: true,
+    web3Host: publicSettings.urls.web3Provider
+  });
 
   if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
 
