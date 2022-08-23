@@ -397,6 +397,7 @@ export default function NewProposal({
             <ul className="mb-0">
               {participants.map((item) => (
                 <CreateProposalDistributionItem
+                  key={`distribution-item-${item.githubLogin}`}
                   githubHandle={item.githubHandle}
                   githubLogin={item.githubLogin}
                   onChangeDistribution={handleChangeDistrib}
