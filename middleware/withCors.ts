@@ -1,6 +1,6 @@
 import Cors from 'cors'
 
-import { info, error } from 'helpers/api/handle-log';
+import { info, error } from '@scripts/logging.js';
 
 const cors = Cors({
   methods: ['GET', 'PUT', 'POST'],

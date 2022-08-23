@@ -1,10 +1,10 @@
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
+import { error as LogError } from "@scripts/logging.js";
 import { Op } from "sequelize";
 
 import models from "db/models";
 
-import { error as LogError } from "helpers/api/handle-log";
 import paginate from "helpers/paginate";
 
 
