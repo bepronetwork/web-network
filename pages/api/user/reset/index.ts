@@ -1,8 +1,8 @@
+import { error as LogError } from "@scripts/logging.js";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getToken } from "next-auth/jwt";
-import { error as LogError } from "@scripts/logging.js";
-
 import { Op } from "sequelize";
+
 import models from "db/models";
 
 const DAY = 1000 * 60 * 60 * 24;
