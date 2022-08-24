@@ -12,11 +12,12 @@ export default function SettingsNotLoaded({ isVisible  }) {
       <Modal
         centerTitle
         show={isVisible}
-        title="Failed to load settings">
+        title={t("modals.settings-not-loaded.title")}
+      >
         <div>
           <div className="d-flex justify-content-center mb-2 mx-2 text-center flex-column mb-4">
             <p className="caption-small text-gray">
-              Please reload the page or contact the administrator.
+              {t("modals.settings-not-loaded.description")}
             </p>
           </div>
         </div>
