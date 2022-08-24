@@ -14,7 +14,6 @@ import UnlockBeproModal from "components/unlock-bepro-modal";
 
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
-import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
 import { useSettings } from "contexts/settings";
 
@@ -32,12 +31,11 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const [showUnlockBepro, setShowUnlockBepro] = useState(false);
 
   const { settings } = useSettings();
-  const { activeNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
   const { tokensLocked } = useNetworkSettings();
   const { wallet, updateWalletBalance } = useAuthentication();
 
-  const networkTokenName = activeNetwork?.networkToken?.symbol || t("misc.$token");
+  const networkTokenName = settings?.beproToken?.symbol || t("misc.$token");
 
   const balance = {
     beproAvailable: wallet?.balance?.bepro,
