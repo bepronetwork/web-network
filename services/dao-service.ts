@@ -11,33 +11,36 @@ import {
 } from "@taikai/dappkit";
 import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
 
-import { getSettingsFromSessionStorage } from "helpers/settings";
-
 import { Token } from "interfaces/token";
 
 import { NetworkParameters } from "types/dappkit";
 
-const sessionStorageSettings = getSettingsFromSessionStorage();
-
 interface DAOServiceProps {
   skipWindowAssignment?: boolean;
   web3Connection?: Web3Connection;
+  web3Host?: string;
+  registryAddress?: string;
 }
 
 export default class DAO {
   private _web3Connection: Web3Connection;
   private _network: Network_v2;
   private _registry: Network_Registry;
+  private _web3Host: string;
+  private _registryAddress: string;
 
   get web3Connection() { return this._web3Connection; }
   get network() { return this._network; }
   get registry() { return this._registry; }
+  get web3Host() { return this._web3Host; }
+  get registryAddress() { return this._registryAddress; }
 
-  constructor({ skipWindowAssignment, web3Connection } : DAOServiceProps = {}) {
-    const web3Host = sessionStorageSettings?.urls?.web3Provider;
+  constructor({ skipWindowAssignment, web3Connection, web3Host, registryAddress } : DAOServiceProps = {}) {
+    if (!web3Host && !web3Connection)
+      throw new Error("Missing web3 provider URL or web3 connection");
 
-    if ((sessionStorageSettings && !web3Host) && !web3Connection)
-      throw new Error("Missing web3 provider URL");
+    this._web3Host = web3Host;
+    this._registryAddress = registryAddress;
 
     this._web3Connection = web3Connection || new Web3Connection({
       web3Host,
@@ -45,8 +48,7 @@ export default class DAO {
     });
   }
 
-  async loadNetwork(networkAddress: string = sessionStorageSettings?.contracts?.network, 
-                    skipAssignment?: boolean): Promise<Network_v2 | boolean> {
+  async loadNetwork(networkAddress: string, skipAssignment?: boolean): Promise<Network_v2 | boolean> {
     try {
       if (!networkAddress) throw new Error("Missing Network_v2 Contract Address");
 
@@ -66,12 +68,10 @@ export default class DAO {
 
   async loadRegistry(skipAssignment?: boolean): Promise<Network_Registry | boolean> {
     try {
-      const networkRegistryAddress = sessionStorageSettings?.contracts?.networkRegistry;
-
-      if (!networkRegistryAddress) 
+      if (!this.registryAddress) 
         throw new Error("Missing Network_Registry Contract Address");
 
-      const registry = new Network_Registry(this.web3Connection, networkRegistryAddress);
+      const registry = new Network_Registry(this.web3Connection, this.registryAddress);
 
       await registry.loadContract();
 
@@ -104,13 +104,6 @@ export default class DAO {
   async start(): Promise<boolean> {
     try {
       await this.web3Connection.start();
-
-      console.table({
-        Network_v2: sessionStorageSettings?.contracts?.network,
-        Settler: sessionStorageSettings?.contracts?.settlerToken,
-        Transactional: sessionStorageSettings?.contracts?.transactionalToken,
-        Network_Registry: sessionStorageSettings?.contracts?.networkRegistry
-      });
 
       return true;
     } catch (error) {
@@ -454,9 +447,9 @@ export default class DAO {
     return this.network.takeBackOracles(delegationId);
   }
 
-  async deployNetworkV2(networkToken: string = sessionStorageSettings?.contracts?.settlerToken, 
-    nftToken: string = sessionStorageSettings?.contracts?.nftToken, 
-    nftUri = sessionStorageSettings?.urls?.nft || "//",
+  async deployNetworkV2(networkToken: string,
+    nftToken: string = Defaults.nativeZeroAddress, 
+    nftUri = "//",
     treasuryAddress = Defaults.nativeZeroAddress,
     cancelFee = 10000,
     closeFee= 50000): Promise<TransactionReceipt> {
