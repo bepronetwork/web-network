@@ -14,7 +14,7 @@ import { useNetworkSettings } from "contexts/network-settings";
 import { useSettings } from "contexts/settings";
 
 import { StepWrapperProps } from "interfaces/stepper";
-import { BEPRO_TOKEN, Token } from "interfaces/token";
+import { Token } from "interfaces/token";
 
 export default function TokenConfiguration({ 
   activeStep, 
@@ -32,7 +32,7 @@ export default function TokenConfiguration({
   const [bountyTokenError, setBountyTokenError] = useState(false);
   const [bountyTokenAddress, setBountyTokenAddress] = useState("");
   const [bountyTokenUriError, setBountyTokenUriError] = useState(false);
-  const [customTokens, setCustomTokens] = useState<Token[]>([BEPRO_TOKEN]);
+  const [customTokens, setCustomTokens] = useState<Token[]>([]);
   
   const { settings } = useSettings();
   const { wallet } = useAuthentication();
@@ -117,6 +117,10 @@ export default function TokenConfiguration({
   useEffect(() => {
     if(bountyTokenAddress.length < 18) validateNFTAddress()
   },[bountyTokenAddress])
+
+  useEffect(() => {
+    if (settings?.beproToken) setCustomTokens([settings.beproToken]);
+  }, [settings]);
   
   return (
     <Step

@@ -37,7 +37,7 @@ import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { BEPRO_TOKEN, Token } from "interfaces/token";
+import { Token } from "interfaces/token";
 import { BlockTransaction } from "interfaces/transaction";
 
 import { getCoinInfoByContract } from "services/coingecko";
@@ -437,19 +437,24 @@ export default function CreateBountyModal() {
   }, [customTokens])
 
   useEffect(() => {
-    if (!activeNetwork?.networkToken) return;
+    if (!activeNetwork?.networkToken || !settings?.contracts?.settlerToken) return;
 
     const tmpTokens = [];
+    const beproToken = {
+      address: settings.contracts.settlerToken,
+      name: "Bepro Network",
+      symbol: "BEPRO"
+    };
 
-    tmpTokens.push(BEPRO_TOKEN);
+    tmpTokens.push(beproToken);
 
-    if (activeNetwork.networkToken.address.toLowerCase() !== BEPRO_TOKEN.address.toLowerCase())
+    if (activeNetwork.networkToken.address.toLowerCase() !== beproToken?.address?.toLowerCase())
       tmpTokens.push(activeNetwork.networkToken);
 
     tmpTokens.push(...activeNetwork.tokens.map(({ name, symbol, address }) => ({ name, symbol, address } as Token)));
 
     getTokenInfo(tmpTokens);
-  }, [activeNetwork?.networkToken]);
+  }, [activeNetwork?.networkToken, settings]);
 
   function cleanFields() {
     setBountyTitle("");

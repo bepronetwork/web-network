@@ -1,8 +1,4 @@
 import { ReactElement } from "react";
-
-import { getSettingsFromSessionStorage } from "helpers/settings";
-
-const settings = getSettingsFromSessionStorage();
 export interface Token {
   address: string;
   name: string;
@@ -20,9 +16,3 @@ export interface TokenInfo extends Partial<Token> {
 export interface TokenPrice {
   [key: string]: number;
 }
-
-export const BEPRO_TOKEN: Token = {
-  address: settings?.contracts?.settlerToken,
-  name: "Bepro Network",
-  symbol: "BEPRO"
-};

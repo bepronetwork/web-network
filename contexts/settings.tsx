@@ -25,9 +25,17 @@ const SettingsProvider = ({ children }) => {
   const fetchAndUpdateSettings = useCallback(async () => {
     try {
       const settings = await getSettings();
+      const settingsWithBeproToken = {
+        ...settings,
+        beproToken: {
+          address: settings?.contracts?.settlerToken,
+          name: "Bepro Network",
+          symbol: "BEPRO"
+        }
+      };
 
-      setSettings(settings);
-      setSettingsToSessionStorage(settings);
+      setSettings(settingsWithBeproToken);
+      setSettingsToSessionStorage(settingsWithBeproToken);
 
       setFailed(false);
 
