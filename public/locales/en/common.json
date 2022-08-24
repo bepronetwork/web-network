@@ -271,6 +271,10 @@
       "title": "Network already exists",
       "button-label": "My networks",
       "content": "Connected wallet already has a network."
+    },
+    "settings-not-loaded": {
+      "title": "Failed to load settings",
+      "description": "Please reload the page or contact the administrator."
     }
   },
   "forms": {
