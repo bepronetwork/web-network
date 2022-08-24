@@ -69,6 +69,13 @@ export const DAOContextProvider = ({ children }) => {
         if (started) {
           window.DAOService = daoService;
           setService(daoService);
+
+          console.table({
+            Network_v2: settings?.contracts?.network,
+            Settler: settings?.contracts?.settlerToken,
+            Transactional: settings?.contracts?.transactionalToken,
+            Network_Registry: settings?.contracts?.networkRegistry
+          });
         }
         
       })
