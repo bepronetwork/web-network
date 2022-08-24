@@ -1,5 +1,7 @@
 import React, { ButtonHTMLAttributes } from "react";
 
+import LockedIcon from "assets/icons/locked-icon";
+
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   color?: string;
   textClass?: string;
@@ -12,6 +14,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
   disabled?: boolean;
   isLoading?: boolean;
+  withLockIcon?: boolean;
   align?: "left" | "center" | "right";
   onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void
 }
@@ -28,6 +31,7 @@ export default function Button({
   textClass,
   isLoading,
   align = "center",
+  withLockIcon = false,
   ...rest
 }: ButtonProps) {
   function getClass(): string {
@@ -55,10 +59,16 @@ export default function Button({
     <>
       {!asAnchor ? (
         <button className={getClass()} {...rest}>
-          {children}{handleSpinner()}
+          {withLockIcon && <LockedIcon className="me-2" />}
+          {children}
+          {handleSpinner()}
         </button>
       ) : (
-        <a className={getClass()}>{children}{handleSpinner()}</a>
+        <a className={getClass()}>
+          {withLockIcon && <LockedIcon className="me-2" />}
+          {children}
+          {handleSpinner()}
+        </a>
       )}
     </>
   );
