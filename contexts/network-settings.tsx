@@ -202,9 +202,8 @@ export const NetworkSettingsProvider = ({ children }) => {
   useEffect(() => {
     if ( !wallet?.address || 
          !DAOService || 
-         !network?.name || 
-         !network?.councilAmount || 
-         !needsToLoad ) 
+         (!isCreating && !network?.name && !network?.councilAmount) || 
+         !needsToLoad )
       return;
 
     if (user?.login)
@@ -409,7 +408,17 @@ export const NetworkSettingsProvider = ({ children }) => {
           similar
         }
       }));
-  }, [settings?.theme?.colors]);
+  }, [ settings?.theme?.colors?.primary,
+       settings?.theme?.colors?.secondary,
+       settings?.theme?.colors?.oracle,
+       settings?.theme?.colors?.text,
+       settings?.theme?.colors?.background,
+       settings?.theme?.colors?.shadow,
+       settings?.theme?.colors?.gray,
+       settings?.theme?.colors?.success,
+       settings?.theme?.colors?.danger,
+       settings?.theme?.colors?.warning,
+       settings?.theme?.colors?.info ]);
 
   // Treasury validation
   useEffect(() => {
