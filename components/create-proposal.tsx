@@ -56,6 +56,7 @@ function SelectValueComponent({ innerProps, innerRef, ...rest }) {
         <PullRequestLabels
           isMergeable={data.isMergeable}
           merged={data.merged}
+          isDraft={data.isDraft}
         />
       </div>
     </div>
@@ -81,6 +82,7 @@ function SelectOptionComponent({ innerProps, innerRef, data }) {
         <PullRequestLabels
           isMergeable={data.isMergeable}
           merged={data.merged}
+          isDraft={data.isDraft}
         />
       </div>
     </div>
@@ -299,8 +301,7 @@ export default function NewProposal({
     handleInputColor("normal");
   }
 
-  const cantBeMergeable = () =>
-    !currentPullRequest.isMergeable || currentPullRequest.merged;
+  const cantBeMergeable = () => !currentPullRequest.isMergeable || currentPullRequest.merged;
 
   useEffect(() => {
     if (pullRequests.length && activeRepo) {
@@ -380,7 +381,8 @@ export default function NewProposal({
             githubLogin: items.githubLogin,
             marged: items.merged,
             isMergeable: items.isMergeable,
-            isDisable: items.merged || !items.isMergeable
+            isDraft: items.status === "draft",
+            isDisable: items.merged || !items.isMergeable || items.status === "draft"
           }))}
           isOptionDisabled={(option) => option.isDisable}
           onChange={handleChangeSelect}
