@@ -27,8 +27,8 @@ export default function NetworkContractSettings() {
     { 
       label: t("custom-network:dispute-time"), 
       description: t("custom-network:errors.dispute-time", {
-        min: LIMITS.disputableTime.min,
-        max: formatNumberToCurrency(LIMITS.disputableTime.max, 0)
+        min: LIMITS?.disputableTime?.min,
+        max: formatNumberToCurrency(LIMITS?.disputableTime?.max, 0)
       }),
       symbol: t("misc.seconds"), 
       value: settings?.parameters?.disputableTime?.value,
@@ -38,7 +38,7 @@ export default function NetworkContractSettings() {
     { 
       label: t("custom-network:percentage-for-dispute"), 
       description: t("custom-network:errors.percentage-for-dispute", {
-        max: LIMITS.percentageNeededForDispute.max 
+        max: LIMITS?.percentageNeededForDispute?.max 
       }),
       symbol: "%", 
       value: settings?.parameters?.percentageNeededForDispute?.value,
@@ -48,8 +48,8 @@ export default function NetworkContractSettings() {
     { 
       label: t("custom-network:redeem-time"), 
       description: t("custom-network:errors.redeem-time", {
-        min: LIMITS.draftTime.min,
-        max: formatNumberToCurrency(LIMITS.draftTime.max, 0)
+        min: LIMITS?.draftTime?.min,
+        max: formatNumberToCurrency(LIMITS?.draftTime?.max, 0)
       }),
       symbol: t("misc.seconds"), 
       value: settings?.parameters?.draftTime?.value,
@@ -60,8 +60,8 @@ export default function NetworkContractSettings() {
       label: t("custom-network:council-amount"), 
       description: t("custom-network:errors.council-amount", {
         token: networkTokenSymbol,
-        min: formatNumberToCurrency(LIMITS.councilAmount.min, 0),
-        max: formatNumberToCurrency(LIMITS.councilAmount.max, 0)
+        min: formatNumberToCurrency(LIMITS?.councilAmount?.min, 0),
+        max: formatNumberToCurrency(LIMITS?.councilAmount?.max, 0)
       }),
       symbol: "BEPRO", 
       value: settings?.parameters?.councilAmount?.value,
