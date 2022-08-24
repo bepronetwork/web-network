@@ -1,9 +1,9 @@
+import { error as LogError } from "@scripts/logging.js";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getToken } from "next-auth/jwt";
 import getConfig from "next/config";
 import { Octokit } from "octokit";
-import { error as LogError } from "@scripts/logging.js";
 
 const { serverRuntimeConfig: { authSecret, github: { token: botToken } } } = getConfig();
 
