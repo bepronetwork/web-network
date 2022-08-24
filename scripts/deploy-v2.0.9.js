@@ -205,7 +205,11 @@ async function main() {
 
         //add allowed tokens
         console.log(`Adding Allowed Tokens...`);
-        network.registry.addAllowedTokens([networkToken.contractAddress, rewardToken.contractAddress, bountyTransactional.contractAddress]);
+        // Reward Tokens
+        network.registry.addAllowedTokens([rewardToken.contractAddress]);
+        // Transactionals Tokens
+        network.registry.addAllowedTokens([bountyTransactional.contractAddress], true);
+
 
         console.table({
             NetworkToken: networkToken.contractAddress,
