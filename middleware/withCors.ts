@@ -1,10 +1,12 @@
-import Cors from 'cors'
-
 import { info, error } from '@scripts/logging.js';
+import Cors from 'cors'
+import getConfig from "next/config";
+
+const { publicRuntimeConfig } = getConfig();
 
 const cors = Cors({
   methods: ['GET', 'PUT', 'POST'],
-  origin: [process.env.NEXT_PUBLIC_HOME_URL || 'http://localhost:3000'],
+  origin: [publicRuntimeConfig?.urls?.home || 'http://localhost:3000'],
 })
 
 const ignorePaths = ['health', 'ip'];
