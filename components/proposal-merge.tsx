@@ -38,6 +38,7 @@ interface props {
   onClickMerge: () => void;
   canMerge: boolean;
   idBounty: string;
+  isMerging?: boolean;
 }
 
 const defaultAmount = {
@@ -51,7 +52,8 @@ export default function ProposalMerge({
   proposal,
   onClickMerge,
   canMerge,
-  idBounty
+  idBounty,
+  isMerging
 }: props) {
   const { t } = useTranslation(["common", "proposal"]);
 
@@ -123,8 +125,9 @@ export default function ProposalMerge({
         textClass="text-uppercase text-white"
         onClick={() => setShow(true)}
         disabled={canMerge}
+        isLoading={isMerging}
       >
-        {canMerge && <LockedIcon width={12} height={12} className="mr-1" />}
+        {(canMerge && !isMerging) && <LockedIcon width={12} height={12} className="mr-1" />}
 
         <span>{t("actions.merge")}</span>
       </Button>
