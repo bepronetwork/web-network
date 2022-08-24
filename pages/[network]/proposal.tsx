@@ -47,7 +47,7 @@ export default function PageProposal() {
   const { handlerDisputeProposal, handleCloseIssue, handleRefuseByOwner } = useBepro();
 
   async function closeIssue() {
-    handleCloseIssue(+activeIssue?.contractId, +proposal.contractId)
+    return handleCloseIssue(+activeIssue?.contractId, +proposal.contractId)
       .then(txInfo => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
@@ -63,6 +63,8 @@ export default function PageProposal() {
         }));
       })
       .catch(error => {
+        if (error?.code === 4001) return;
+
         console.log("Failed to close bounty", error);
 
         dispatch(addToast({
@@ -74,16 +76,19 @@ export default function PageProposal() {
   }
 
   async function disputeProposal() {
-    handlerDisputeProposal(+proposal?.scMergeId)
+    return handlerDisputeProposal(+proposal?.scMergeId)
       .then(txInfo => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
         return processEvent("proposal", "disputed", activeNetwork?.name, { fromBlock } );
       })
       .then(() => {
+        updateIssue(activeIssue?.repository_id, activeIssue?.githubId);
         getNetworkIssue();
       })
       .catch(error => {
+        if (error?.code === 4001) return;
+
         console.log("Failed to dispute proposal", error);
 
         dispatch(addToast({
@@ -95,7 +100,7 @@ export default function PageProposal() {
   }
 
   async function handleRefuse() {
-    handleRefuseByOwner(+activeIssue?.contractId, +proposal.contractId)
+    return handleRefuseByOwner(+activeIssue?.contractId, +proposal.contractId)
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
@@ -112,6 +117,8 @@ export default function PageProposal() {
       }));
     })
     .catch(error => {
+      if (error?.code === 4001) return;
+      
       console.log("Failed to refuse proposal", error);
 
       dispatch(addToast({
