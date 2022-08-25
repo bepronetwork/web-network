@@ -208,8 +208,7 @@ async function main() {
     // Reward Tokens
     network.registry.addAllowedTokens([rewardToken.contractAddress]);
     // Transactionals Tokens
-    network.registry.addAllowedTokens([bountyTransactional.contractAddress], true);
-
+    network.registry.addAllowedTokens([bountyTransactional.contractAddress, networkToken.contractAddress], true);
 
     console.table({
       NetworkToken: networkToken.contractAddress,
