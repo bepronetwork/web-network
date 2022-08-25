@@ -101,7 +101,7 @@ export default function TransactionModal({
   }
 
   function getEtherScanHref(tx: string) {
-    return `//${settings?.urls?.blockScan}/tx/${tx}`;
+    return `${settings?.urls?.blockScan}/${tx}`;
   }
 
   return (
