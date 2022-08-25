@@ -7,7 +7,6 @@ import GithubImage from "components/github-image";
 import { useAuthentication } from "contexts/authentication";
 
 import useApi from "x-hooks/use-api";
-import useNetworkTheme from "x-hooks/use-network";
 
 export default function ConnectGithub() {
   const { t } = useTranslation("common");
@@ -16,14 +15,13 @@ export default function ConnectGithub() {
 
   const { getUserOf } = useApi();
   const { wallet } = useAuthentication();
-  const { getURLWithNetwork } = useNetworkTheme();
 
   async function clickSignIn() {
     localStorage.setItem("lastAddressBeforeConnect", wallet?.address);
 
     const user = await getUserOf(wallet?.address?.toLowerCase());
 
-    if (!user) return push(getURLWithNetwork("/connect-account"));
+    if (!user) return push("/connect-account");
 
     await signOut({ redirect: false });
 

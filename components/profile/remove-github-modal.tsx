@@ -48,7 +48,6 @@ function RemoveGithubAccount({
       .catch(error => {
         if (error?.response?.status === 409) {
           const message = {
-            LESS_THAN_7_DAYS: t("modals.remove-github.errors.less-than-7-days"),
             PULL_REQUESTS_OPEN: t("modals.remove-github.errors.pull-requests-open")
           };
 
@@ -81,10 +80,6 @@ function RemoveGithubAccount({
               <SpanPrimary text={walletAddress} />
             </span>
           </Row>
-
-          <WarningSpan
-            text={t("modals.remove-github.warnings.period")}
-          />
 
           <WarningSpan
             text={t("modals.remove-github.warnings.pull-requests")}
