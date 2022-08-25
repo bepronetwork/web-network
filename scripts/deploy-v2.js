@@ -49,14 +49,20 @@ const argv = require('yargs')
     nargs: 1,
   })
   .option('t', {
-    alias: "transactionalAddress",
+    alias: "transactionalTokenAddress",
     describe: "Transactional Address",
     type: 'string',
     nargs: 1,
   })
   .option('g', {
-    alias: "networkToken",
+    alias: "networkTokenAddress",
     describe: "Network Token Address",
+    type: 'string',
+    nargs: 1,
+  })
+  .option('-r', {
+    alias: "rewardTokenAddress",
+    describe: "Reward Token Address",
     type: 'string',
     nargs: 1,
   })
@@ -157,16 +163,18 @@ async function main() {
   const ownerAddress = argv.ownerAddress || process.env.DEPLOY_OWNER_ADDRESS || await web3Connection.getAddress();
 
   const getNetworkReceipt = async () =>
-    argv.networkToken || (await Deployer(ERC20, [tokens.network.name, tokens.network.symbol, tokens.network.cap, ownerAddress]))?.contractAddress;
+    argv.networkTokenAddress || (await Deployer(ERC20, [tokens.network.name, tokens.network.symbol, tokens.network.cap, ownerAddress]))?.contractAddress;
   const getTransactionalReceipt = async () =>
-    argv.transactionalAddress || (await Deployer(ERC20, [tokens.transactional.name, tokens.transactional.symbol, tokens.transactional.cap, ownerAddress]))?.contractAddress;
+    argv.transactionalTokenAddress || (await Deployer(ERC20, [tokens.transactional.name, tokens.transactional.symbol, tokens.transactional.cap, ownerAddress]))?.contractAddress;
+  const getRewardReceipt = async () =>
+    argv.rewardTokenAddress || (await Deployer(ERC20, [tokens.reward.name, tokens.reward.symbol, tokens.reward.cap, ownerAddress]))?.contractAddress;
 
   try {
     // 1. Deploying Contracts
     console.log(`Deploying Contracts...`);
     const networkReceiptAddress = await getNetworkReceipt();
     const transactionalReceiptAddress = await getTransactionalReceipt();
-    const rewardReceiptAddress = (await Deployer(ERC20, [tokens.reward.name, tokens.reward.symbol, tokens.reward.cap, ownerAddress]))?.contractAddress
+    const rewardReceiptAddress = await getRewardReceipt();
 
     const nftReceiptAddress = (await Deployer(BountyToken, [tokens.nft.name, tokens.nft.symbol]))?.contractAddress
 
@@ -208,7 +216,7 @@ async function main() {
     // Reward Tokens
     network.registry.addAllowedTokens([rewardToken.contractAddress]);
     // Transactionals Tokens
-    network.registry.addAllowedTokens([bountyTransactional.contractAddress, networkToken.contractAddress], true);
+    network.registry.addAllowedTokens([bountyTransactional.contractAddress], true);
 
     console.table({
       NetworkToken: networkToken.contractAddress,
