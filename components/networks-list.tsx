@@ -62,11 +62,11 @@ export default function NetworksList({
     setOrder(newOrder);
   }
 
-  function handleRedirect() {
+  function handleRedirect(networkName) {
     const url = redirectToHome ? "/" : "/account/my-network/settings";
 
     router.push(getURLWithNetwork(url, {
-        network: network.name
+        network: networkName
     }));
   }
 
