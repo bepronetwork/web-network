@@ -27,7 +27,6 @@ function RemoveGithubAccount({
   onCloseClick,
   disconnectGithub
 } : RemoveGithubAccountProps) {
-  const router = useRouter();
   const { t } = useTranslation(["profile", "common"]);
 
   const [isExecuting, setIsExecuting] = useState(false);
@@ -44,11 +43,10 @@ function RemoveGithubAccount({
       .then(() => {
         return disconnectGithub();
       })
-      .then(() => router.push("/connect-account"))
+      .then(onCloseClick)
       .catch(error => {
         if (error?.response?.status === 409) {
           const message = {
-            LESS_THAN_7_DAYS: t("modals.remove-github.errors.less-than-7-days"),
             PULL_REQUESTS_OPEN: t("modals.remove-github.errors.pull-requests-open")
           };
 
@@ -56,8 +54,7 @@ function RemoveGithubAccount({
         } else 
           dispatch(toastError(t("modals.remove-github.errors.check-requirements"), 
                               t("modals.remove-github.errors.failed-to-remove")));
-        setIsExecuting(false);
-      })
+      }).finally(()=> setIsExecuting(false))
   }
 
   return(
@@ -81,10 +78,6 @@ function RemoveGithubAccount({
               <SpanPrimary text={walletAddress} />
             </span>
           </Row>
-
-          <WarningSpan
-            text={t("modals.remove-github.warnings.period")}
-          />
 
           <WarningSpan
             text={t("modals.remove-github.warnings.pull-requests")}

@@ -1,8 +1,8 @@
+import { error as LogError } from "@scripts/logging.js";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getToken } from "next-auth/jwt";
-import { error as LogError } from "@scripts/logging.js";
-
 import { Op } from "sequelize";
+
 import models from "db/models";
 
 enum Actions {
@@ -32,6 +32,9 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
       return res.status(409).json("No actions needed for this user");
 
     if (action === Actions.REGISTER) {
+      if(!address)
+        return res.status(404).json("Missing WalletAddress");
+        
       await models.user.create({
         address,
         githubHandle: token.name || githubLogin,
