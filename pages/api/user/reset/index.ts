@@ -5,8 +5,6 @@ import { Op } from "sequelize";
 
 import models from "db/models";
 
-const DAY = 1000 * 60 * 60 * 24;
-
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { address, githubLogin } = req.body;
 
