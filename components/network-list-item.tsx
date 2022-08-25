@@ -11,7 +11,7 @@ const { publicRuntimeConfig } = getConfig();
 interface NetworkListItemProps {
   network: Network;
   tokenSymbolDefault: string;
-  handleRedirect: () => void;
+  handleRedirect: (networkName: string) => void;
 }
 
 export default function NetworkListItem({
@@ -20,8 +20,12 @@ export default function NetworkListItem({
   handleRedirect
 }: NetworkListItemProps) {
 
+  function onClick() {
+    handleRedirect(network?.name);
+  }
+
   return (
-    <div className="list-item p-20 d-flex flex-row" onClick={handleRedirect}>
+    <div className="list-item p-20 d-flex flex-row" onClick={onClick}>
       <div className="col-3">
         <div className="d-flex flex-row align-items-center gap-20">
           <NetworkLogo
