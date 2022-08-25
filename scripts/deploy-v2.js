@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { Web3Connection, ERC20, BountyToken, Network_v2, Network_Registry } = require("@taikai/dappkit");
+const { Web3Connection, ERC20, BountyToken, Network_v2, NetworkRegistry } = require("@taikai/dappkit");
 const { exit } = require("process");
 const stagingAccounts = require("./staging-accounts");
 const { updateSetting } = require("./settings/save-from-env");
@@ -8,7 +8,7 @@ const usage = `-----------------------------------------------------------------
   WebNetwork v2 Smart Contracts Deploy Script 🚀  
 -------------------------------------------------------------------------
 
-Usage: $0 -n <network> [-u <rpcUrl> -e <env file>] 
+Usage: $0 -n <network> [-u <rpcUrl> -e <env file> -t <transactional>] 
 
 <network> =  development | moonbase | kovan | mainnet | ropsten | seneca | afrodite | custom`
 
@@ -47,6 +47,24 @@ const argv = require('yargs')
   .option('a', {
     alias: "ownerAddress",
     describe: "Owner Eth Address",
+    type: 'string',
+    nargs: 1,
+  })
+  .option('t', {
+    alias: "transactionalTokenAddress",
+    describe: "Transactional Address",
+    type: 'string',
+    nargs: 1,
+  })
+  .option('g', {
+    alias: "networkTokenAddress",
+    describe: "Network Token Address",
+    type: 'string',
+    nargs: 1,
+  })
+  .option('-r', {
+    alias: "rewardTokenAddress",
+    describe: "Reward Token Address",
     type: 'string',
     nargs: 1,
   })
@@ -91,10 +109,7 @@ const networks = {
   }
 }
 
-
 async function main() {
-
-  const ownerAddress = argv.ownerAddress || process.env.DEPLOY_OWNER_ADDRESS;
   const ownerPrivKey = argv.ownerKey || process.env.DEPLOY_PRIVATE_KEY;
 
   let rpcUrl = "";
@@ -118,124 +133,113 @@ async function main() {
   const web3Connection = new Web3Connection(options);
   await web3Connection.start();
 
-
-  const DeployERC20 = async (tokenName, tokenSymbol, capital) => {
-    const deployer = new ERC20(web3Connection);
-
-    // Load abi contract is only needed for deploy actions
-    await deployer.loadAbi();
-
-    const tx = await deployer.deployJsonAbi(
-      tokenName, // the name of the token
-      tokenSymbol, // the symbol of the token
-      capital, // capital
-      ownerAddress // the owner of the total amount of the tokens (your address)
-    );
-    
-    console.log(`Deployed ${tokenName} - ${tokenSymbol} at ${tx.contractAddress}`)
-    return tx.contractAddress;
-  };
-
-  const DeployBountyToken = async (tokenName, tokenSymbol) => {
-    const deployer = new BountyToken(web3Connection);
-
-    await deployer.loadAbi();
-
-    const tx = await deployer.deployJsonAbi(
-      tokenName,
-      tokenSymbol
-    );
-    console.log(`Deployed ${tokenName} - ${tokenSymbol} at ${tx.contractAddress}`)
-    return tx.contractAddress;
-  };
-
-  const DeployNetwork_v2 = async (settlerAddress, nftAddress, nftUri) => {
-    const deployer = new Network_v2(web3Connection);
-
-    await deployer.loadAbi();
-
-    const tx = await deployer.deployJsonAbi(settlerAddress, nftAddress, nftUri);
-
-    console.log(`Deployed Network_V2 at ${tx.contractAddress}`)
-    return tx.contractAddress;
-  };
-
-  const DeployNetworkRegistry = async (token) => {
-    const deployer = new Network_Registry(web3Connection);
-
-    await deployer.loadAbi();
-
-    const tx = await deployer.deployJsonAbi(token, 1000000, await web3Connection.getAddress(), 10000);
-
-    console.log(`Deployed Network_Registry at ${tx.contractAddress}`)
-
-    return tx.contractAddress;
+  const Deployer = async (_class, args) => {
+    const deployer = new _class(web3Connection);
+    deployer.loadAbi();
+    const tx = deployer.deployJsonAbi(...(args || []));
+    return tx;
   }
 
-  // 1. Deploying Contracts
-  console.log(`Deploying Contracts...`);
-  const settlerAddress = await DeployERC20("Bepro Network", "BEPRO", "300000000000000000000000000");
-  const transactionalAddress = await DeployERC20("USD Coin", "USDC", "500000000000000000000000");
-  const rewardAddress = await DeployERC20("Reward Network", "RWD", "500000000000000000000000");
-  const bountyTokenAddress = await DeployBountyToken("NFT Token", "NFT");
-  const networkAddress = await DeployNetwork_v2(settlerAddress, bountyTokenAddress, "//");
-  const registryAddress = await DeployNetworkRegistry(settlerAddress);
-
-  // 2. Instancing Contract
-  console.log(`Loading Contracts...`);
-  const settler = new ERC20(web3Connection, settlerAddress);
-  const bountyToken = new BountyToken(web3Connection, bountyTokenAddress);
-  const transactional = new ERC20(web3Connection, transactionalAddress);
-  const reward = new ERC20(web3Connection, rewardAddress);
-  const registry = new Network_Registry(web3Connection, registryAddress);
-  const networkContract = new Network_v2(web3Connection, networkAddress);
-
-  await settler.loadContract();
-  await bountyToken.loadContract();
-  await transactional.loadContract();
-  await reward.loadContract();
-  await registry.loadContract();
-  await networkContract.loadContract();
-
-  // Transfer BEPRO to dev accounts
-  if (argv.network !== 'custom' || argv.network !== 'local')
-    for (const address of stagingAccounts) {
-      console.log(`Transfering 10M BEPRO to ${address}`);
-      await settler.transferTokenAmount(address, 10000000);
+  const tokens = {
+    transactional: {
+      name: 'USD Coint',
+      symbol: "USDC",
+      cap: "300000000000000000000000000"
+    },
+    network: {
+      name: 'Bepro Token',
+      symbol: "BEPRO",
+      cap: "300000000000000000000000000"
+    },
+    reward: {
+      name: 'Reward Network',
+      symbol: "RWD",
+      cap: "300000000000000000000000000"
+    },
+    nft: {
+      name: 'Bounty',
+      symbol: "~",
     }
-  
-  // 4. Approve, lock and create a new network using the factory
-  await settler.approve(registryAddress, 1000000);
-  await registry.lock(1000000);
-  await registry.registerNetwork(networkAddress);
-  await bountyToken.setDispatcher(networkAddress);
+  }
 
-  // // 5. Configure basic network Parameters
-  console.log(`Setting Redeeem time on ${networkAddress}`);
-  // 5min Disputable time
-  await networkContract.changeDraftTime(60*5);
-  // 10min Disputable time
-  console.log(`Setting Disputable time on ${networkAddress}`);
-  await networkContract.changeDisputableTime(60*10);
-  console.log(`Setting Council Ammount on ${networkAddress}`);
-  await networkContract.changeCouncilAmount(1000000);
+  const ownerAddress = argv.ownerAddress || process.env.DEPLOY_OWNER_ADDRESS || await web3Connection.getAddress();
 
-  console.table({
-    Settler: settlerAddress,
-    Transactional: transactionalAddress,
-    Reward: rewardAddress,
-    BountyToken: bountyTokenAddress,
-    Network_v2: networkAddress,
-    Network_Registry: registryAddress
-  });
+  const getNetworkReceipt = async () =>
+    argv.networkTokenAddress || (await Deployer(ERC20, [tokens.network.name, tokens.network.symbol, tokens.network.cap, ownerAddress]))?.contractAddress;
+  const getTransactionalReceipt = async () =>
+    argv.transactionalTokenAddress || (await Deployer(ERC20, [tokens.transactional.name, tokens.transactional.symbol, tokens.transactional.cap, ownerAddress]))?.contractAddress;
+  const getRewardReceipt = async () =>
+    argv.rewardTokenAddress || (await Deployer(ERC20, [tokens.reward.name, tokens.reward.symbol, tokens.reward.cap, ownerAddress]))?.contractAddress;
 
-  await Promise.all([
-    updateSetting("nftToken", bountyTokenAddress, "contracts"),
-    updateSetting("settlerToken", settlerAddress, "contracts"),
-    updateSetting("network", networkAddress, "contracts"),
-    updateSetting("transactionalToken", settlerAddress, "contracts"),
-    updateSetting("networkRegistry", registryAddress, "contracts")
-  ]);
+  try {
+    // 1. Deploying Contracts
+    console.log(`Deploying Contracts...`);
+    const networkReceiptAddress = await getNetworkReceipt();
+    const transactionalReceiptAddress = await getTransactionalReceipt();
+    const rewardReceiptAddress = await getRewardReceipt();
+
+    const nftReceiptAddress = (await Deployer(BountyToken, [tokens.nft.name, tokens.nft.symbol]))?.contractAddress
+
+    // 2. Loading Contracts Instance
+    console.log(`Loading Contracts...`);
+    const networkToken = new ERC20(web3Connection, networkReceiptAddress);
+    const bountyTransactional = new ERC20(web3Connection, transactionalReceiptAddress);
+    const rewardToken = new ERC20(web3Connection, rewardReceiptAddress);
+
+    const bountyToken = new BountyToken(web3Connection, nftReceiptAddress);
+
+    await networkToken.loadContract();
+    await bountyTransactional.loadContract();
+    await rewardToken.loadContract();
+    await bountyToken.loadContract();
+
+    // Transfer BEPRO to dev accounts
+    if (argv.network !== 'custom' || argv.network !== 'local')
+      for (const address of stagingAccounts) {
+        console.log(`Transfering 10M BEPRO to ${address}`);
+        await bountyTransactional.transferTokenAmount(address, 10000000);
+      }
+
+
+    console.log(`Deploying Network_V2 With Registry...`);
+    const registryReceipt = await Deployer(NetworkRegistry, [networkToken.contractAddress, 1000, ownerAddress, 10000]);
+    const networkReceipt = await Deployer(Network_v2, [networkToken.contractAddress, registryReceipt.contractAddress]);
+
+    const network = new Network_v2(web3Connection, networkReceipt.contractAddress);
+    await network.loadContract();
+
+    console.log(`Changing Network_V2 Settings...`);
+    await network.changeDraftTime(60 * 5);//  5 minutes
+    await network.changeDisputableTime(60 * 10); // 10 minutes
+    await network.changeCouncilAmount(105000); // 105000 Tokens
+
+    //add allowed tokens
+    console.log(`Adding Allowed Tokens...`);
+    // Reward Tokens
+    network.registry.addAllowedTokens([rewardToken.contractAddress]);
+    // Transactionals Tokens
+    network.registry.addAllowedTokens([bountyTransactional.contractAddress], true);
+
+    console.table({
+      NetworkToken: networkToken.contractAddress,
+      BountyTransactional: bountyTransactional.contractAddress,
+      RewardToken: rewardToken.contractAddress,
+      BountyToken: bountyToken.contractAddress,
+      Network_v2: network.contractAddress,
+      NetworkRegistry: registryReceipt.contractAddress || undefined
+    });
+
+    await Promise.all([
+      updateSetting("settlerToken", networkToken.contractAddress, "contracts"),
+      updateSetting("network", network.contractAddress, "contracts"),
+      updateSetting("transactionalToken", networkToken.contractAddress, "contracts"),
+      updateSetting("networkRegistry", registryReceipt.contractAddress, "contracts")
+    ]);
+    
+  } catch (error) {
+    console.error(error);
+    exit(1);
+  }
 }
 
 main()
