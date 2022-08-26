@@ -3,7 +3,6 @@ const path = require("path");
 require("dotenv").config();
 
 const { i18n } = require("./next-i18next.config");
-const { loadSettingsFromDB } = require("./scripts/settings/load-from-db.js");
 
 const publicRuntimeConfig = {
   urls: {
@@ -13,7 +12,7 @@ const publicRuntimeConfig = {
 };
 
 // Will only be available on the server-side
-const serverSettings = {
+const serverRuntimeConfig = {
   auth: {
     secret: process.env.NEXTAUTH_SECRET,
     url: process.env.NEXTAUTH_URL
@@ -21,10 +20,14 @@ const serverSettings = {
   github:{
     clientId: process.env.NEXT_GH_CLIENT_ID,
     secret: process.env.NEXT_GH_SECRET,
-    token: process.env.NEXT_PUBLIC_GH_TOKEN
+    token: process.env.NEXT_PUBLIC_GH_TOKEN,
+    mainBranch: process.env.NEXT_GH_MAINBRANCH,
+    owner: process.env.NEXT_GH_OWNER,
+    repository: process.env.NEXT_GH_REPO,
   },
   ipApi: {
-    key: process.env.NEXT_IP_API_KEY
+    key: process.env.NEXT_IP_API_KEY,
+    skip: process.env.NEXT_SKIP_IP_API || false
   },
   walletPrivateKey: process.env.NEXT_WALLET_PRIVATE_KEY,
   elasticSearch:{
@@ -33,6 +36,8 @@ const serverSettings = {
     url: process.env.NEXT_ELASTIC_SEARCH_URL
   },
   infura:{
+    host: process.env.NEXT_IPFS_HOST,
+    port: process.env.NEXT_IPFS_PORT,
     projectId: process.env.NEXT_IPFS_PROJECT_ID,
     projectSecret: process.env.NEXT_IPFS_PROJECT_SECRET
   },
@@ -41,12 +46,12 @@ const serverSettings = {
     apiSecret: process.env.NEXT_TWITTER_APIKEY_SECRET,
     accessToken: process.env.NEXT_TWITTER_ACCESS_TOKEN,
     accessSecret: process.env.NEXT_TWITTER_ACCESS_SECRET
-  }
+  },
+  e2eEnabled: process.env.NEXT_E2E_TESTNET || false,
+  scheduleInterval: process.env.NEXT_E2E_TESTNET || 60,
 }
 
-module.exports = async () => {
-  const serverRuntimeConfig = process.env.NEXT_DB_DATABASE ? await loadSettingsFromDB(serverSettings) : {};
-  
+module.exports = () => {  
   return {
     i18n,
     sassOptions: {

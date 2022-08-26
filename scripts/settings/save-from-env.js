@@ -41,6 +41,7 @@ const publicSettings = [
   PublicSettingItem("1501", "afrodite", "string", "chainIds"),
   PublicSettingItem("1502", "irene", "string", "chainIds"),
   PublicSettingItem("1503", "iris", "string", "chainIds"),
+  PublicSettingItem("1287", "moonbase", "string", "chainIds"),
   PublicSettingItem("disputableTime", `{ "min": 60, "max": 1728000 }`, "json", "networkParametersLimits"),
   PublicSettingItem("draftTime", `{ "min": 60, "max": 1728000 }`, "json", "networkParametersLimits"),
   PublicSettingItem("councilAmount", `{ "min": 100001, "max": 50000000 }`, "json", "networkParametersLimits"),
@@ -50,23 +51,12 @@ const publicSettings = [
   PublicSettingItem("adminWallet", process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS, "string", "defaultNetworkConfig"),
 ];
 
-const serverSettings = [
-  ServerSettingItem("skip", process.env.NEXT_SKIP_IP_API || false, "boolean", "ipApi"),
-  ServerSettingItem("mainBranch", process.env.NEXT_GH_MAINBRANCH, "string", "github"),
-  ServerSettingItem("owner", process.env.NEXT_GH_OWNER, "string", "github"),
-  ServerSettingItem("repository", process.env.NEXT_GH_REPO, "string", "github"),
-  ServerSettingItem("host", process.env.NEXT_IPFS_HOST, "string", "infura"),
-  ServerSettingItem("port", process.env.NEXT_IPFS_PORT, "string", "infura"),
-  ServerSettingItem("scheduleInterval", process.env.SCHEDULES_START_BLOCK || 60, "number"),
-  ServerSettingItem("e2eEnabled", process.env.NEXT_E2E_TESTNET || false, "boolean")
-];
-
 const saveSettingsFromEnv = async () => {
   const sequelize = new Sequelize(DBConfig.database, DBConfig.username, DBConfig.password, DBConfig);
 
   SettingsModel.init(sequelize);
 
-  await SettingsModel.bulkCreate([...publicSettings, ...serverSettings]);
+  await SettingsModel.bulkCreate(publicSettings);
 }
 
 module.exports = {
