@@ -28,7 +28,7 @@ function RemoveGithubAccount({
   disconnectGithub
 } : RemoveGithubAccountProps) {
   const { t } = useTranslation(["profile", "common"]);
-
+  const router = useRouter();
   const [isExecuting, setIsExecuting] = useState(false);
 
   const { resetUser } = useApi();
@@ -43,7 +43,7 @@ function RemoveGithubAccount({
       .then(() => {
         return disconnectGithub();
       })
-      .then(onCloseClick)
+      .then(() => router.push("/connect-account"))
       .catch(error => {
         if (error?.response?.status === 409) {
           const message = {
