@@ -12,7 +12,7 @@
     "migrate:undo": "sequelize db:migrate:undo",
     "clean": "npm cache clean --force && rm -rf .next",
     "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
-    "prebuild": "next telemetry disable",
+    "prebuild": "next telemetry disable && npm run migrate",
     "build": "next build",
     "start": "next start",
     "make-seo": "node make-seo.js",
