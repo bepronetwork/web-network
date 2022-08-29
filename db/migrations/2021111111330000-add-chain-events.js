@@ -3,7 +3,7 @@ const { DataTypes } = require("sequelize");
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const lastBlock = 1731488;
-    queryInterface
+    await queryInterface
       .createTable("chainEvents", {
         id: {
           type: DataTypes.INTEGER,
@@ -31,6 +31,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    queryInterface.dropTable("chainEvents");
+    await queryInterface.dropTable("chainEvents");
   }
 };

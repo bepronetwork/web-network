@@ -11,10 +11,11 @@ import InfoTooltip from "components/info-tooltip";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
+import { useSettings } from "contexts/settings";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
-import { BEPRO_TOKEN, TokenInfo } from "interfaces/token";
+import { TokenInfo } from "interfaces/token";
 
 import { getCoinInfoByContract } from "services/coingecko";
 
@@ -28,17 +29,12 @@ export const FlexColumn = ({ children, className = "" }) =>
 
 export default function WalletBalance() {
   const { t } = useTranslation(["common", "profile"]);
-
-  const beproToken = {
-    ...BEPRO_TOKEN,
-    icon: <BeProBlue width={24} height={24} />,
-    balance: 0
-  };
-
-  const [tokens, setTokens] = useState<TokenBalanceType[]>([beproToken]);
+  
+  const [tokens, setTokens] = useState<TokenBalanceType[]>([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [hasNoConvertedToken, setHasNoConvertedToken] = useState(false);
-
+  
+  const { settings } = useSettings();
   const { activeNetwork } = useNetwork();
   const { wallet } = useAuthentication();
   const { service: DAOService } = useDAO();
@@ -53,12 +49,24 @@ export default function WalletBalance() {
   const oraclesDelegatedToMe = wallet?.balance?.oracles?.delegatedByOthers || 0;
 
   useEffect(() => {
-    if (!DAOService || !activeNetwork?.networkToken || !wallet?.balance) return;
+    let beproToken = undefined;
+
+    if (settings?.beproToken) {
+      beproToken = {
+        ...settings.beproToken,
+        icon: <BeProBlue width={24} height={24} />,
+        balance: 0
+      };
+  
+      setTokens([beproToken]);
+    }
+
+    if (!DAOService || !activeNetwork?.networkToken || !wallet?.balance || !settings?.beproToken) return;
 
     Promise.all([
-      DAOService.getTokenBalance(BEPRO_TOKEN.address, wallet.address),
+      DAOService.getTokenBalance(beproToken.address, wallet.address),
       DAOService.getTokenBalance(activeNetwork.networkToken.address, wallet.address),
-      getCoinInfoByContract(BEPRO_TOKEN.address).catch(console.log),
+      getCoinInfoByContract(beproToken.address).catch(console.log),
       getCoinInfoByContract(activeNetwork.networkToken.address).catch(console.log)
     ])
     .then(([beproBalance, settlerBalance, beproInfo, settlerInfo]) => {
@@ -75,13 +83,13 @@ export default function WalletBalance() {
         icon: (settlerInfo as TokenInfo)?.icon || <TokenIconPlaceholder />
       };
 
-      if (activeNetwork.networkToken.address !== BEPRO_TOKEN.address)
+      if (activeNetwork.networkToken.address !== beproToken.address)
         tmpTokens.push(settler);
 
       setTokens(tmpTokens);
     });
 
-  }, [DAOService, activeNetwork?.networkToken, wallet?.balance]);
+  }, [DAOService, activeNetwork?.networkToken, wallet?.balance, settings]);
 
   useEffect(() => {
     if (!tokens.length) return;
@@ -115,7 +123,7 @@ export default function WalletBalance() {
         </FlexRow>
       </FlexRow>
 
-      {tokens.map(token => <TokenBalance {...token} type="token" />)}
+      {tokens.map(token => <TokenBalance key={`balance-${token.address}`} {...token} type="token" />)}
 
       <FlexRow className="mt-3 mb-3 justify-content-between align-items-center">
         <span className="h4 family-Regular text-white font-weight-medium">{t("$oracles")}</span>

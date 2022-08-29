@@ -7,14 +7,12 @@ import models from "db/models";
 
 import * as IssueQueries from "graphql/issue";
 
-import twitterTweet from "helpers/api/handle-twitter-tweet";
-
 import api from "services/api";
 
 import { GraphQlResponse } from "types/octokit";
 
 
-const { publicRuntimeConfig, serverRuntimeConfig } = getConfig();
+const { serverRuntimeConfig } = getConfig();
 
 export default async function readBountyCanceled(events, network: Network_v2, customNetwork) {
   const canceledBounties: string[] = [];
@@ -72,15 +70,6 @@ export default async function readBountyCanceled(events, network: Network_v2, cu
             await api.post(`/seo/${networkBounty.cid}`).catch((e) => {
               console.log("Error creating SEO", e);
             });
-
-            if (network.contractAddress === publicRuntimeConfig?.contract?.address)
-              twitterTweet({
-                type: "bounty",
-                action: "changes",
-                issuePreviousState: "draft",
-                issue: bounty,
-                currency: bounty.token.symbol
-              });
           }
         }
       }

@@ -9,21 +9,32 @@ import models from "db/models";
 import * as IssueQueries from "graphql/issue";
 import * as RepositoryQueries from "graphql/repository";
 
-import twitterTweet from "helpers/api/handle-twitter-tweet";
+import { Settings } from "helpers/settings";
 
 import api from "services/api";
 import DAO from "services/dao-service";
 
 import { GraphQlResponse } from "types/octokit";
 
-const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
+const { serverRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
+  const settings = await models.settings.findAll({
+    where: { visibility: "public" },
+    raw: true,
+  });
+
+  const publicSettings = (new Settings(settings)).raw();
+
+  if (!publicSettings?.contracts?.network) return res.status(500).json("Missing default network contract");
+  if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
+
+  const defaultNetworkName = publicSettings?.defaultNetworkConfig?.name || "bepro";
+
   const customNetworks = await models.network.findAll({
     where: {
       name: {
-        [Op.notILike]: `%${publicRuntimeConfig?.networkConfig?.networkName
-}%`
+        [Op.notILike]: `%${defaultNetworkName}%`
       }
     }
   });
@@ -31,14 +42,16 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   const networks = [
     {
       id: 1,
-      name: publicRuntimeConfig?.networkConfig?.networkName
-,
-      networkAddress: publicRuntimeConfig?.contract?.address,
+      name: defaultNetworkName,
+      networkAddress: publicSettings.contracts.network,
     },
     ...customNetworks
   ];
 
-  const DAOService = new DAO({ skipWindowAssignment: true });
+  const DAOService = new DAO({ 
+    skipWindowAssignment: true,
+    web3Host: publicSettings.urls.web3Provider
+  });
 
   if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
 
@@ -109,15 +122,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       console.log(`Moved ${issue.issueId} to open`);
       await issue.save();
 
-      if (network.contractAddress === publicRuntimeConfig?.contract?.address)
-        twitterTweet({
-          type: "bounty",
-          action: "changes",
-          issuePreviousState: "draft",
-          issue,
-          currency: issue.token.symbol
-        });
-
       await api.post(`/seo/${issue.issueId}`).catch((e) => {
         console.log("Error creating SEO", e);
       });
@@ -127,8 +131,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json("Issues Moved to Open");
 }
 
-export default async function MoveToOpen(req: NextApiRequest,
-                                         res: NextApiResponse) {
+export default async function MoveToOpen(req: NextApiRequest,  res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);

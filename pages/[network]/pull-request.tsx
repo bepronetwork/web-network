@@ -36,7 +36,9 @@ export default function PullRequestPage() {
   const { t } = useTranslation(["common", "pull-request"]);
   
   const [showModal, setShowModal] = useState(false);
-  const [isExecuting, setIsExecuting] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [isMakingReady, setIsMakingReady] = useState(false);
+  const [isCreatingReview, setIsCreatingReview] = useState(false);
   const [pullRequest, setPullRequest] = useState<pullRequest>();
   const [networkPullRequest, setNetworkPullRequest] = useState<PullRequest>();
 
@@ -62,7 +64,7 @@ export default function PullRequestPage() {
   function handleCreateReview(body) {
     if (!user?.login) return;
 
-    setIsExecuting(true);
+    setIsCreatingReview(true);
 
     createReviewForPR({
       issueId: String(activeIssue?.issueId),
@@ -86,7 +88,6 @@ export default function PullRequestPage() {
         
         addNewComment(pullRequest?.id, response.data);
 
-        setIsExecuting(false);
         setShowModal(false);
       })
       .catch(() => {
@@ -97,14 +98,14 @@ export default function PullRequestPage() {
         }));
       })
       .finally(() => {
-        setIsExecuting(false);
+        setIsCreatingReview(false);
       });
   }
 
   function handleMakeReady() {
     if (!activeIssue || !pullRequest) return;
     
-    setIsExecuting(true);
+    setIsMakingReady(true);
 
     handleMakePullRequestReady(activeIssue.contractId, pullRequest.contractId)
     .then(txInfo => {
@@ -112,8 +113,10 @@ export default function PullRequestPage() {
       return processEvent("pull-request", "ready", activeNetwork?.name, { fromBlock });
     })
     .then(() => {
-      updateIssue(activeIssue.repository_id, activeIssue.githubId);
-      
+      return updateIssue(activeIssue.repository_id, activeIssue.githubId);
+    })
+    .then(() => {
+      setIsMakingReady(false);
       dispatch(addToast({
         type: "success",
         title: t("actions.success"),
@@ -121,19 +124,17 @@ export default function PullRequestPage() {
       }));
     })
     .catch(() => {
+      setIsMakingReady(false);
       dispatch(addToast({
           type: "danger",
           title: t("actions.failed"),
           content: t("pull-request:actions.make-ready.error"),
       }));
-    })
-    .finally(() => {
-      setIsExecuting(false);
     });
   }
 
   function handleCancel() {
-    setIsExecuting(true);
+    setIsCancelling(true);
 
     handleCancelPullRequest(activeIssue?.contractId, pullRequest?.contractId)
     .then(txInfo => {
@@ -154,15 +155,16 @@ export default function PullRequestPage() {
         repoId: activeIssue.repository_id
       }));
     })
-    .catch(() => {
-      dispatch(addToast({
-          type: "danger",
-          title: t("actions.failed"),
-          content: t("pull-request:actions.cancel.error"),
-      }));
+    .catch(error => {
+      if (error?.code !== 4001)
+        dispatch(addToast({
+            type: "danger",
+            title: t("actions.failed"),
+            content: t("pull-request:actions.cancel.error"),
+        }));
     })
     .finally(() => {
-      setIsExecuting(false);
+      setIsCancelling(false);
     });
   }
 
@@ -215,6 +217,10 @@ export default function PullRequestPage() {
                       <Button
                         className="read-only-button text-nowrap"
                         onClick={handleShowModal}
+                        disabled={isCreatingReview || isCancelling || isMakingReady}
+                        isLoading={isCreatingReview}
+                        withLockIcon={isCancelling || isMakingReady}
+                        
                       >
                         {t("actions.make-a-review")}
                       </Button>
@@ -231,6 +237,9 @@ export default function PullRequestPage() {
                       <Button
                         className="read-only-button text-nowrap"
                         onClick={handleMakeReady}
+                        disabled={isCreatingReview || isCancelling || isMakingReady}
+                        isLoading={isMakingReady}
+                        withLockIcon={isCreatingReview || isCancelling}
                       >
                         {t("pull-request:actions.make-ready.title")}
                       </Button>
@@ -247,6 +256,9 @@ export default function PullRequestPage() {
                       <Button
                         className="read-only-button text-nowrap"
                         onClick={handleCancel}
+                        disabled={isCreatingReview || isCancelling || isMakingReady}
+                        isLoading={isCancelling}
+                        withLockIcon={isCreatingReview || isMakingReady}
                       >
                         {t("actions.cancel")}
                       </Button>
@@ -281,7 +293,7 @@ export default function PullRequestPage() {
       <CreateReviewModal
         show={showModal}
         pullRequest={pullRequest}
-        isExecuting={isExecuting}
+        isExecuting={isCreatingReview}
         onConfirm={handleCreateReview}
         onCloseClick={handleCloseModal}
       />

@@ -86,7 +86,7 @@ module.exports = {
     console.log("Issues updated: ", issuesUpdated);
   },
   down: async (queryInterface, Sequelize) => {
-    queryInterface.removeColumn("issues", "title");
-    queryInterface.removeColumn("issues", "body");
+    await queryInterface.removeColumn("issues", "title");
+    await queryInterface.removeColumn("issues", "body");
   }
 };

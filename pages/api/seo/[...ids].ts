@@ -7,6 +7,8 @@ import { Op } from "sequelize";
 
 import models from "db/models";
 
+import { Settings } from "helpers/settings";
+
 import IpfsStorage from "services/ipfs-service";
 
 const { publicRuntimeConfig } = getConfig();
@@ -25,6 +27,19 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!issue) return res.status(404).json(null);
+
+  const settings = await models.settings.findAll({
+    where: { 
+      visibility: "public",
+      group: "urls"
+    },
+    raw: true,
+  });
+
+  const defaultConfig = (new Settings(settings)).raw();
+
+  if (!defaultConfig?.urls?.ipfs)
+    return res.status(500).json("Missing ipfs url on settings");
 
   const url = `${publicRuntimeConfig?.ipfsUrl}/${issue.seoImage}`;
 
@@ -64,7 +79,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const [, repo] = issue.repository.githubPath.split("/");
 
-    const baseUrl = publicRuntimeConfig.homeUrl;
+    const baseUrl = publicRuntimeConfig?.urls?.home;
     const background = `${baseUrl}/images/bg-bounty-card.png`;
     const logo = `${baseUrl}/images/bepro-icon.png`;
     const font = `${baseUrl}/fonts/SpaceGrotesk.woff2`;

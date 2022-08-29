@@ -1,17 +1,14 @@
 import { useContext, useEffect } from "react";
 
-import getConfig from "next/config";
-
 import Indicator from "components/indicator";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { changeNetwork } from "contexts/reducers/change-network";
 import { changeNetworkId } from "contexts/reducers/change-network-id";
+import { useSettings } from "contexts/settings";
 
 import { NetworkColors } from "interfaces/enums/network-colors";
-
-const { publicRuntimeConfig } = getConfig();
 
 export default function NetworkIdentifier() {
   const {
@@ -19,13 +16,14 @@ export default function NetworkIdentifier() {
     dispatch
   } = useContext(ApplicationContext);
 
+  const { settings } = useSettings();
   const { wallet } = useAuthentication();
 
   function updateNetwork() {
     const chainId = window?.ethereum?.chainId;
     
     dispatch(changeNetworkId(+chainId));
-    dispatch(changeNetwork((publicRuntimeConfig?.networkIds[+chainId] || "unknown")?.toLowerCase()));
+    dispatch(changeNetwork((settings?.chainIds && settings?.chainIds[+chainId] || "unknown")?.toLowerCase()));
   }
 
   useEffect(updateNetwork, [wallet?.address]);

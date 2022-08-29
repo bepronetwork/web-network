@@ -26,12 +26,22 @@ export default function ThemeColors({ colors, similar, setColor }) {
   const hasError = !!similar?.length;
 
   function handleMoreColorsVsibility() {
-    setMoreColorsVisible(previous => !previous);
+    setMoreColorsVisible(!moreColorsVisible);
   }
 
   useEffect(() => {
     setColorsEntries(colors && Object.entries(colors).map(color => ({ label: color[0], code: color[1] })) || []);
-  }, [colors]);
+  }, [ colors?.primary,
+       colors?.secondary,
+       colors?.oracle,
+       colors?.text,
+       colors?.background,
+       colors?.shadow,
+       colors?.gray,
+       colors?.success,
+       colors?.danger,
+       colors?.warning,
+       colors?.info ]);
 
   return (
     <>

@@ -96,7 +96,7 @@ export default function NetworkInformationStep({ activeStep, index, validated, h
             {t("custom-network:steps.network-information.fields.name.temporary")}
           </p>
           <p className="caption-small text-gray">
-            {urlWithoutProtocol(publicRuntimeConfig?.apiUrl)}/
+            {urlWithoutProtocol(publicRuntimeConfig?.urls?.home)}/
             <span className="text-primary">
               {getQueryableText(name.value || t("custom-network:steps.network-information.fields.name.default"))}
             </span>

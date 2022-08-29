@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 
@@ -20,8 +21,8 @@ interface IProposalActionCardProps {
   proposal: Proposal;
   networkProposal: ProposalExtended;
   currentPullRequest: pullRequest;
-  onMerge: () => void;
-  onDispute: () => void;
+  onMerge: () => Promise<void>;
+  onDispute: () => Promise<void>;
   onRefuse: () => Promise<void>;
 }
 
@@ -34,19 +35,27 @@ export default function ProposalActionCard({
   onRefuse
 }: IProposalActionCardProps) {
   const { t } = useTranslation(["common", "pull-request"]);
-  const { networkIssue, activeIssue } = useIssue();
+  
+  const [isMerging, setIsMerging] = useState(false);
+  const [isRefusing, setIsRefusing] = useState(false);
+  const [isDisputing, setIsDisputing] = useState(false);
+  const [chaintime, setChainTime] = useState<number>();
+
   const { activeNetwork } = useNetwork();
   const { wallet } = useAuthentication();
+  const { service: DAOService } = useDAO();
+  const { networkIssue, activeIssue } = useIssue();
 
-  const [isRefusing, setIsRefusing] = useState(false);
 
   const isDisable = () => [
     networkIssue?.closed,
-    !isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime),
+    !isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime, chaintime),
     networkProposal?.isDisputed,
     networkProposal?.refusedByBountyOwner,
     !networkProposal?.canUserDispute,
     wallet?.balance?.oracles?.locked === 0,
+    isMerging,
+    isRefusing
   ].some((v) => v);
 
   const isSuccess =  () => [
@@ -67,13 +76,31 @@ export default function ProposalActionCard({
     !proposal?.isMerged,
     !networkProposal?.isDisputed,
     !networkProposal?.refusedByBountyOwner,
-    !isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime)
+    !isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime),
+    !isMerging,
+    !isRefusing,
+    !isDisputing
   ].every(v => v);
 
   function handleRefuse() {
     setIsRefusing(true);
     onRefuse().finally(() => setIsRefusing(false));
   }
+
+  function handleDispute() {
+    setIsDisputing(true);
+    onDispute().finally(() => setIsDisputing(false));
+  }
+
+  function handleMerge() {
+    setIsMerging(true);
+    onMerge().finally(() => setIsMerging(false));
+  }
+
+  useEffect(() => {
+    if (DAOService)
+      DAOService.getTimeChain().then(setChainTime);
+  }, [DAOService]);
 
   return (
     <div className="col-md-6">
@@ -93,41 +120,47 @@ export default function ProposalActionCard({
               {t("pull-request:errors.merge-conflicts")}
             </span>
           )}
+          
           <div className="d-flex flex-row justify-content-between mt-3">
 
             <ProposalMerge 
               amountTotal={Math.max(activeIssue?.amount || 0, activeIssue?.fundingAmount || 0)} 
               tokenSymbol={activeIssue?.token?.symbol} 
               proposal={networkProposal}
+              isMerging={isMerging}
               idBounty={activeIssue?.id} 
-              onClickMerge={onMerge}
+              onClickMerge={handleMerge}
               canMerge={!canMerge()}
             />
 
-              {!isSuccess() && !isDisable() && (
-                <Button
-                  className="flex-grow-1"
-                  textClass="text-uppercase text-white"
-                  color="purple"
-                  disabled={isDisable()}
-                  onClick={onDispute}
-                >
-                  {t("actions.dispute")}
-                </Button>
-              )}
+            {!isSuccess() && !isDisable() && (
+              <Button
+                className="flex-grow-1"
+                textClass="text-uppercase text-white"
+                color="purple"
+                disabled={isDisable() || isDisputing}
+                onClick={handleDispute}
+                isLoading={isDisputing}
+                withLockIcon={isDisable()}
+              >
+                {t("actions.dispute")}
+              </Button>
+            )}
 
-              {isRefusable() && (
-                <Button
-                  className="flex-grow-1"
-                  textClass="text-uppercase text-white"
-                  color="danger"
-                  disabled={!isRefusable() || isRefusing}
-                  onClick={handleRefuse}
-                >
-                  {t("actions.refuse")}
-                </Button>
-              )}
-            </div>
+            {isRefusable() && (
+              <Button
+                className="flex-grow-1"
+                textClass="text-uppercase text-white"
+                color="danger"
+                disabled={!isRefusable() || isRefusing || isDisputing || isMerging}
+                onClick={handleRefuse}
+                isLoading={isRefusing}
+                withLockIcon={isDisputing || isMerging}
+              >
+                {t("actions.refuse")}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>

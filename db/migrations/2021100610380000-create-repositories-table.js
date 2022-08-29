@@ -1,7 +1,7 @@
 const { RepositoriesModel } = require("../models/repositories.model");
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    queryInterface
+    await queryInterface
       .createTable("repositories", {
         id: {
           type: Sequelize.INTEGER,
@@ -24,6 +24,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    queryInterface.dropTable("repositories");
+    await queryInterface.dropTable("repositories");
   }
 };

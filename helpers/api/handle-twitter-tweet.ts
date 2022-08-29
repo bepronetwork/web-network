@@ -112,7 +112,7 @@ export default function twitterTweet({
 
   ${body}
  
-  ${publicRuntimeConfig?.homeUrl}/bounty?id=${issue.githubId}&repoId=${
+  ${publicRuntimeConfig?.urls?.home}/bounty?id=${issue.githubId}&repoId=${
       issue.repository_id
     }
   `;

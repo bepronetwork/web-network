@@ -1,12 +1,8 @@
 import { Network_v2 } from "@taikai/dappkit";
-import getConfig from "next/config";
 
 import models from "db/models";
 
-import twitterTweet from "../handle-twitter-tweet";
 import { bountyReadyPRsHasNoInvalidProposals } from "./utils";
-
-const { publicRuntimeConfig } = getConfig();
 
 export default async function readProposalRefused(events, network: Network_v2, customNetwork) {
   const disputed = [];
@@ -51,16 +47,7 @@ export default async function readProposalRefused(events, network: Network_v2, c
           });
 
           if (proposal) {
-            if (network.contractAddress === publicRuntimeConfig?.contract?.address) {
-              twitterTweet({
-                type: "proposal",
-                action: "failed",
-                issue: bounty,
-                currency: bounty.token.symbol
-              });
-
-              disputed.push(networkProposal.id);
-            }
+            disputed.push(networkProposal.id);
 
             const validation = await bountyReadyPRsHasNoInvalidProposals(networkBounty, network).catch(() => -1);
             let newState = bounty.state;
