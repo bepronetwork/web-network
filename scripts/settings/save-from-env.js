@@ -59,6 +59,15 @@ const saveSettingsFromEnv = async () => {
   await SettingsModel.bulkCreate(publicSettings);
 }
 
+const updateSetting = async (key, value, group = undefined) => {
+  const sequelize = new Sequelize(DBConfig.database, DBConfig.username, DBConfig.password, DBConfig);
+
+  SettingsModel.init(sequelize);
+
+  await SettingsModel.update({ value }, { where: { key, group } });
+}
+
 module.exports = {
-  saveSettingsFromEnv
+  saveSettingsFromEnv,
+  updateSetting
 };
