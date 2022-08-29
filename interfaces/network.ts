@@ -125,5 +125,8 @@ export interface NetworkSettings {
       setter: (value, value2?) => void;
       validator?: (value1, value2?) => Promise<boolean> | boolean | undefined;
     }
+  },
+  LIMITS: {
+    [key: string]: { min?: number; max?: number };
   }
 }

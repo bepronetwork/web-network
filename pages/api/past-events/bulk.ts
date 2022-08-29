@@ -8,10 +8,11 @@ import { BountyHelpers } from "helpers/api/bounty";
 import { OraclesHelpers } from "helpers/api/oracles";
 import { ProposalHelpers } from "helpers/api/proposal";
 import { PullRequestHelpers } from "helpers/api/pull-request";
+import { Settings } from "helpers/settings";
 
 import DAO from "services/dao-service";
 
-const { publicRuntimeConfig, serverRuntimeConfig } = getConfig();
+const { serverRuntimeConfig } = getConfig();
 
 const handler = async (type, helpers, network, customNetwork, fromBlock, toBlock) => {
   const [contractMethod, apiMethod] = helpers[type];
@@ -26,10 +27,23 @@ const handler = async (type, helpers, network, customNetwork, fromBlock, toBlock
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const bulk = await models.chainEvents.findOne({ where: { name: `Bulk` } });
   const fromBlock = bulk?.dataValues?.lastBlock || serverRuntimeConfig.schedules.startProcessEventsAt;
+
+  const settings = await models.settings.findAll({
+    where: { visibility: "public" },
+    raw: true,
+  });
+
+  const publicSettings = (new Settings(settings)).raw();
+
+  if (!publicSettings?.contracts?.network) return res.status(500).json("Missing default network contract");
+  if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
+
+  const defaultNetworkName = publicSettings?.defaultNetworkConfig?.name || "bepro";
+
   const customNetworks = await models.network.findAll({
     where: {
       name: {
-        [Op.notILike]: `%${publicRuntimeConfig?.networkConfig?.networkName}%`
+        [Op.notILike]: `%${defaultNetworkName}%`
       }
     }
   })
@@ -38,11 +52,14 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const networks = [{
     id: 1,
-    name: publicRuntimeConfig?.networkConfig?.networkName,
-    networkAddress: publicRuntimeConfig?.contract?.address
+    name: defaultNetworkName,
+    networkAddress: publicSettings.contracts.network
   }, ...customNetworks]
 
-  const DAOService = new DAO({ skipWindowAssignment: true });
+  const DAOService = new DAO({ 
+    skipWindowAssignment: true,
+    web3Host: publicSettings.urls.web3Provider
+  });
 
   if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
 

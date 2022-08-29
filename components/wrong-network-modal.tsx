@@ -2,19 +2,17 @@ import { useContext, useState } from "react";
 import { Spinner } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
-import getConfig from "next/config";
 
 import Modal from "components/modal";
 
 import { ApplicationContext } from "contexts/application";
+import { useSettings } from "contexts/settings";
 
 import { NETWORKS } from "helpers/networks";
 
 import { NetworkColors } from "interfaces/enums/network-colors";
 
 import Button from "./button";
-
-const { publicRuntimeConfig } = getConfig();
 
 type typeError = { code?: number}
 
@@ -23,13 +21,16 @@ export default function WrongNetworkModal({
 }: {
   requiredNetworkId: number;
 }) {
-  const [isAddingNetwork, setIsAddingNetwork] = useState(false);
-  const [error, setError] = useState<string>("");
   const { t } = useTranslation("common");
+
+  const [error, setError] = useState<string>("");
+  const [isAddingNetwork, setIsAddingNetwork] = useState(false);
 
   const {
     state: { networkId: activeNetworkId },
   } = useContext(ApplicationContext);
+
+  const { settings } = useSettings();
 
   function showModal() {
     return (
@@ -42,7 +43,7 @@ export default function WrongNetworkModal({
   async function handleAddNetwork() {
     setIsAddingNetwork(true);
     setError("");
-    const chainId = `0x${Number(publicRuntimeConfig?.metaMask?.chainId).toString(16)}`;
+    const chainId = `0x${Number(settings?.requiredChain?.id).toString(16)}`;
     const currencyNetwork = NETWORKS[chainId];
     try {
       await window.ethereum.request({
@@ -99,8 +100,8 @@ export default function WrongNetworkModal({
       <div className="d-flex flex-column text-center align-items-center">
         <strong className="caption-small d-block text-uppercase text-white-50 mb-3 pb-1">
           {t("modals.wrong-network.please-connect")}{" "}
-          <span style={{ color: NetworkColors[publicRuntimeConfig?.networkIds[requiredNetworkId]] }}>
-            <span>{publicRuntimeConfig?.networkIds[requiredNetworkId]}</span>{" "}
+          <span style={{ color: NetworkColors[settings?.chainIds && settings?.chainIds[requiredNetworkId] || ""] }}>
+          <span>{settings?.chainIds && settings?.chainIds[requiredNetworkId] || ""}</span>{" "}
             {t("modals.wrong-network.network")}
           </span>
           <br /> {t("modals.wrong-network.on-your-wallet")}

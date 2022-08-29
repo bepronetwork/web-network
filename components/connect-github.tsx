@@ -16,6 +16,7 @@ export default function ConnectGithub() {
   const { getUserOf } = useApi();
   const { wallet } = useAuthentication();
 
+
   async function clickSignIn() {
     localStorage.setItem("lastAddressBeforeConnect", wallet?.address);
 

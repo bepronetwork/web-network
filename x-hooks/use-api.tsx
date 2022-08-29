@@ -1,5 +1,6 @@
 import { head } from "lodash";
-import getConfig from "next/config";
+
+import { getSettingsFromSessionStorage } from "helpers/settings";
 
 import { 
   PastEventsParams, 
@@ -21,9 +22,6 @@ import { ReposList } from "interfaces/repos-list";
 import client from "services/api";
 
 import { Entities, Events } from "types/dappkit";
-
-const { publicRuntimeConfig: { networkConfig: { networkName: DEFAULT_NETWORK_NAME } } } = getConfig();
-
 interface NewIssueParams {
   title: string;
   description: string;
@@ -49,6 +47,9 @@ type FileUploadReturn = {
 const repoList: ReposList = [];
 
 export default function useApi() {
+  const sessionStorageSettings = getSettingsFromSessionStorage();
+  const DEFAULT_NETWORK_NAME = sessionStorageSettings?.defaultNetworkConfig?.name || "bepro";
+
   client.interceptors.request.use(config => {
     config.headers["wallet"] = typeof window !== 'undefined' && sessionStorage.getItem("currentWallet") || ""
 
@@ -471,6 +472,12 @@ export default function useApi() {
     return client.post("/user/reset", { address, githubLogin });
   }
 
+  async function getSettings() {
+    return client.get("/settings")
+      .then((({ data }) => data))
+      .catch((error) => { throw error });
+  }
+
   return {
     createIssue,
     createNetwork,
@@ -509,6 +516,7 @@ export default function useApi() {
     userHasPR,
     createPreBounty,
     cancelPrePullRequest,
-    resetUser
+    resetUser,
+    getSettings
   };
 }

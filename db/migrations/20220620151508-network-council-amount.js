@@ -2,7 +2,7 @@
 
 module.exports = {
   async up (queryInterface, Sequelize) {
-    queryInterface
+    await queryInterface
     .addColumn("networks", "councilMembers", {
       type: Sequelize.ARRAY(Sequelize.STRING),
       default: []
@@ -10,6 +10,6 @@ module.exports = {
   },
 
   async down (queryInterface) {
-    queryInterface.removeColumn("networks", "councilMembers");
+    await queryInterface.removeColumn("networks", "councilMembers");
   }
 };

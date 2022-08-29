@@ -8,13 +8,11 @@ import models from "db/models";
 import * as IssueQueries from "graphql/issue";
 import * as RepositoryQueries from "graphql/repository";
 
-import twitterTweet from "helpers/api/handle-twitter-tweet";
-
 import api from "services/api";
 
 import { GraphQlResponse } from "types/octokit";
 
-const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
+const { serverRuntimeConfig } = getConfig();
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -130,22 +128,9 @@ async function patch(req: NextApiRequest, res: NextApiResponse) {
     .then(async (result) => {
       if (!result[0]) return res.status(422).json("nok");
 
-      const issue = await models.issue.findOne({
-        where: { issueId },
-        include: [
-          { association: "token" }
-        ]
-      });
       await api.post(`/seo/${issueId}`).catch((e) => {
         console.log("Error creating SEO", e);
       });
-      if (network.contractAddress === publicRuntimeConfig?.contract?.address)
-        twitterTweet({
-          type: "bounty",
-          action: "created",
-          issue,
-          currency: issue.token.symbol
-        });
 
       return res.status(200).json("ok");
     })

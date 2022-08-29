@@ -5,7 +5,6 @@ import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-cor
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import getConfig from "next/config";
 import { useRouter } from "next/router";
 
 import AlreadyHasNetworkModal from "components/already-has-network-modal";
@@ -26,6 +25,7 @@ import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
 import { addToast } from "contexts/reducers/add-toast";
 import { changeLoadState } from "contexts/reducers/change-load-state";
+import { useSettings } from "contexts/settings";
 
 import { 
   DEFAULT_COUNCIL_AMOUNT, 
@@ -39,8 +39,6 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network";
 
-const { publicRuntimeConfig } = getConfig();
-
 export default function NewNetwork() {
   const router = useRouter();
 
@@ -53,12 +51,15 @@ export default function NewNetwork() {
   const { activeNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
   const { user, wallet } = useAuthentication();
+  const { settings: appSettings } = useSettings(); 
   const { handleChangeNetworkParameter } = useBepro();
   const { getURLWithNetwork, colorsToCSS } = useNetworkTheme();
   const { tokensLocked, details, github, tokens, settings } = useNetworkSettings();
   const { handleDeployNetworkV2, handleSetDispatcher, handleAddNetworkToRegistry } = useBepro();
 
   const { dispatch } = useContext(ApplicationContext);
+
+  const defaultNetworkName = appSettings?.defaultNetworkConfig?.name?.toLowerCase() || "bepro";
 
   const creationSteps = [
     { id: 1, name: t("custom-network:modals.loader.steps.deploy-network") },
@@ -160,14 +161,14 @@ export default function NewNetwork() {
   }
 
   function goToMyNetworkPage() {
-    router.push(getURLWithNetwork("/profile/my-network", { network: publicRuntimeConfig?.networkConfig?.networkName }));
+    router.push(getURLWithNetwork("/profile/my-network", { network: defaultNetworkName }));
   }
 
   useEffect(() => {
     if (!activeNetwork) return;
 
-    if (activeNetwork.name.toLowerCase() !== publicRuntimeConfig?.networkConfig?.networkName.toLowerCase())
-      router.push(getURLWithNetwork("/account", { network: publicRuntimeConfig?.networkConfig?.networkName }));
+    if (activeNetwork.name.toLowerCase() !== defaultNetworkName)
+      router.push(getURLWithNetwork("/account", { network: defaultNetworkName }));
   }, [activeNetwork]);
 
   useEffect(() => {

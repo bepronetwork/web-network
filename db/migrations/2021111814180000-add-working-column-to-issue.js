@@ -7,7 +7,7 @@ module.exports = {
      * await queryInterface.createTable('merge_proposals', { id: Sequelize.INTEGER });
      */
 
-    queryInterface
+    await queryInterface
       .addColumn("issues", "working", {
         type: Sequelize.ARRAY(Sequelize.STRING)
       })
@@ -23,6 +23,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('merge_proposals');
      */
-    queryInterface.removeColumn("issues", "working");
+    await queryInterface.removeColumn("issues", "working");
   }
 };

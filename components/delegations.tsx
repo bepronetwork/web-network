@@ -82,6 +82,7 @@ export default function Delegations({
           { (type === "toMe" || !!renderInfo[type].delegations?.length) && 
             renderInfo[type].delegations.map(delegation => 
               <DelegationItem
+                key={`delegation-${delegation.id}-${delegation.to}`}
                 type={type}
                 delegation={delegation} 
                 tokenName={networkTokenName}

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import getConfig from "next/config";
 import router from "next/router";
 import { Octokit } from "octokit";
 
@@ -10,12 +9,11 @@ import ConnectWalletButton from "components/connect-wallet-button";
 
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
+import { useSettings } from "contexts/settings";
 
 import { User } from "interfaces/api";
 
 import useApi from "x-hooks/use-api";
-
-const { publicRuntimeConfig } = getConfig();
 
 interface PropsUserList extends Partial<User> {
    created_at: string; 
@@ -30,6 +28,7 @@ export default function FalconPunchPage() {
   >([]);
 
   const { getAllUsers } = useApi();
+  const { settings } = useSettings();
   const { service: DAOService } = useDAO();
   const { wallet, user } = useAuthentication();
 
@@ -109,7 +108,7 @@ export default function FalconPunchPage() {
   useEffect(() => {
     if (!wallet?.address) return;
 
-    if (wallet.address !== publicRuntimeConfig?.adminWalletAddress)
+    if (wallet.address !== settings?.defaultNetworkConfig?.adminWallet)
       router.push("/");
   }, [wallet?.address]);
 

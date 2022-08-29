@@ -4,7 +4,7 @@ import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
 
 const api = axios.create({
-  baseURL: `${publicRuntimeConfig?.apiUrl}/api`
+  baseURL: `${publicRuntimeConfig?.urls?.api}/api`
 });
 
 api.interceptors.response.use((response) => response,

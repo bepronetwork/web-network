@@ -1,8 +1,8 @@
-import getConfig from "next/config";
 import { useRouter } from "next/router";
 import { UrlObject } from "url";
 
 import { useNetwork } from "contexts/network";
+import { useSettings } from "contexts/settings";
 
 import { hexadecimalToRGB } from "helpers/colors";
 
@@ -10,12 +10,11 @@ import { ThemeColors } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 
-const { publicRuntimeConfig } = getConfig();
-//Todo: useNetwork was moved to context, refactor this hooks to be a theme-hooks
-
 export default function useNetworkTheme() {
   const router = useRouter();
+
   const { getNetwork } = useApi();
+  const { settings } = useSettings();
   const { activeNetwork: network } = useNetwork();
 
   async function networkExists(networkName: string) {
@@ -150,7 +149,7 @@ export default function useNetworkTheme() {
       pathname: `/[network]/${href}`.replace("//", "/"),
       query: {
         ...query,
-        network: query.network || router?.query?.network || publicRuntimeConfig?.networkConfig?.networkName
+        network: query.network || router?.query?.network || settings?.defaultNetworkConfig?.name || "bepro"
       }
     };
   }
