@@ -72,7 +72,7 @@ const updateSetting = async (key, value, group = undefined, type = "string", vis
   });
 
   if (!created)
-    await SettingsModel.update({ value }, { where: { key, group } });
+    await SettingsModel.update({ value }, { where: { key, group }, individualHooks: true });
 }
 
 module.exports = {
