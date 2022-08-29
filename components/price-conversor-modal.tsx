@@ -53,9 +53,13 @@ export default function PriceConversorModal({
 
   useEffect(()=>{
     const currencyList = settings?.currency?.conversionList || defaultValue;
-    const opt = currencyList.map(currency=>({value: currency?.value, label: currency?.label}))
-    setOptions(opt)
-    handlerChange(opt[0])
+    console.log(currencyList)
+    if(currencyList.length){
+      const opt = currencyList.map(currency=>({value: currency?.value, label: currency?.label}))
+      setOptions(opt)
+      handlerChange(opt[0])
+    }
+    
   },[])
 
   function SelectValueComponent({ innerProps, innerRef, ...rest }) {

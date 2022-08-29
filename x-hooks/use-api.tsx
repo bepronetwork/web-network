@@ -461,6 +461,12 @@ export default function useApi() {
     return api.post("/user/reset", { address, githubLogin });
   }
 
+  async function getSettings() {
+    return api.get("/settings")
+      .then((({ data }) => data))
+      .catch((error) => { throw error });
+  }
+
   return {
     createIssue,
     createNetwork,

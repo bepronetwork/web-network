@@ -3,7 +3,7 @@
 const { saveSettingsFromEnv } = require("../../scripts/settings/save-from-env");
 
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     // await queryInterface.sequelize.query("DROP TYPE IF EXISTS enum_settings_visibility");
 
     // await queryInterface.sequelize.query("CREATE TYPE enum_settings_visibility AS ENUM('public', 'private')");
@@ -53,10 +53,14 @@ module.exports = {
       name: "unique_settings_key_value"
     });
 
-    await saveSettingsFromEnv();
+    try {
+      await saveSettingsFromEnv();
+    } catch (error) {
+      console.error(error)
+    }
   },
 
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface, Sequelize) {
     await queryInterface.dropTable("settings");
     // await queryInterface.sequelize.query("DROP TYPE IF EXISTS enum_settings_visibility");
   }
