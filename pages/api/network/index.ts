@@ -6,10 +6,12 @@ import { Op } from "sequelize";
 
 import Database from "db/models";
 
+import { Settings } from "helpers/settings";
+
 import DAO from "services/dao-service";
 import IpfsStorage from "services/ipfs-service";
 
-const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
+const { serverRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const { name: networkName } = req.query;
@@ -50,10 +52,25 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     if (!accessToken) return res.status(401).json("Unauthorized user");
     if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
 
+    const settings = await Database.settings.findAll({
+      where: { visibility: "public" },
+      raw: true,
+    });
+
+    const publicSettings = (new Settings(settings)).raw();
+
+    if (!publicSettings?.contracts?.networkRegistry) return res.status(500).json("Missing network registry contract");
+    if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
+
     // Contract Validations
-    const DAOService = new DAO({ skipWindowAssignment: true });
+    const DAOService = new DAO({ 
+      skipWindowAssignment: true,
+      web3Host: publicSettings.urls.web3Provider,
+      registryAddress: publicSettings.contracts.networkRegistry
+    });
 
     if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
+    
     if (!await DAOService.loadRegistry()) return res.status(500).json("Failed to load registry");
 
     const checkingNetworkAddress = await DAOService.getNetworkAdressByCreator(creator);
@@ -86,13 +103,15 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     const invitations = [];
 
+    if (!publicSettings?.github?.botUser) return res.status(500).json("Missing github bot user");
+
     for (const repository of repos) {
       const [owner, repo] = repository.fullName.split("/");
 
       await octokitUser.rest.repos.addCollaborator({
         owner,
         repo,
-        username: publicRuntimeConfig?.github?.user,
+        username: publicSettings?.github?.botUser,
         ...(githubLogin !== owner  && { permission: "maintain"} || {})
       })
       .then(({data}) => invitations.push(data?.id))
@@ -182,8 +201,22 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       return res.status(200).json("Network closed");
     }
 
+    const settings = await Database.settings.findAll({
+      where: { visibility: "public" },
+      raw: true,
+    });
+
+    const publicSettings = (new Settings(settings)).raw();
+
+    if (!publicSettings?.contracts?.networkRegistry) return res.status(500).json("Missing network registry contract");
+    if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
+
     // Contract Validations
-    const DAOService = new DAO({ skipWindowAssignment: true });
+    const DAOService = new DAO({ 
+      skipWindowAssignment: true,
+      web3Host: publicSettings.urls.web3Provider,
+      registryAddress: publicSettings.contracts.networkRegistry
+    });
 
     if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
     if (!await DAOService.loadRegistry()) return res.status(500).json("Failed to load factory contract");
@@ -270,6 +303,8 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       });
 
       const invitations = [];
+  
+      if (!publicSettings?.github?.botUser) return res.status(500).json("Missing github bot user");
 
       for (const repository of addingRepos) {
         const [owner, repo] = repository.fullName.split("/");
@@ -277,7 +312,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         const { data } = await octokitUser.rest.repos.addCollaborator({
           owner,
           repo,
-          username: publicRuntimeConfig?.github?.user,
+          username: publicSettings?.github?.botUser,
           ...(githubLogin !== owner  && { permission: "maintain"} || {})
         });
 
@@ -321,8 +356,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-async function NetworkEndPoint(req: NextApiRequest,
-                               res: NextApiResponse) {
+async function NetworkEndPoint(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);

@@ -7,7 +7,7 @@ module.exports = {
      * await queryInterface.createTable('merge_proposals', { id: Sequelize.INTEGER });
      */
 
-    queryInterface
+    await queryInterface
       .addColumn("pull_requests", "reviewers", {
         type: Sequelize.ARRAY(Sequelize.STRING),
         defaultValue: []
@@ -19,6 +19,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    queryInterface.removeColumn("pull_requests", "reviewers");
+    await queryInterface.removeColumn("pull_requests", "reviewers");
   }
 };

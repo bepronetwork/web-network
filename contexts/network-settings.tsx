@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { Defaults } from "@taikai/dappkit";
-import getConfig from "next/config";
 import { useRouter } from "next/router";
 
 import { useAuthentication } from "contexts/authentication";
@@ -18,7 +17,7 @@ import {
   DEFAULT_DRAFT_TIME, 
   DEFAULT_PERCENTAGE_FOR_DISPUTE 
 } from "helpers/contants";
-import { DefaultNetworkSettings, handleNetworkAddress } from "helpers/custom-network";
+import { DefaultNetworkSettings } from "helpers/custom-network";
 
 import { Color, Icon, Network, NetworkSettings, Theme } from "interfaces/network";
 
@@ -28,29 +27,11 @@ import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
 import useOctokit from "x-hooks/use-octokit";
 
-const { publicRuntimeConfig } = getConfig();
-
-const IPFS_URL = publicRuntimeConfig?.ipfsUrl;
+import { useSettings } from "./settings";
 
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
 
 const ALLOWED_PATHS = ["/new-network", "/[network]/profile/my-network", "/administration"];
-
-export const LIMITS = {
-  percentageNeededForDispute: { max: +publicRuntimeConfig?.networkConfig?.disputesPercentage },
-  draftTime: {
-    min: +publicRuntimeConfig?.networkConfig?.reedemTime?.min,
-    max: +publicRuntimeConfig?.networkConfig?.reedemTime?.max,
-  },
-  disputableTime: {
-    min: +publicRuntimeConfig?.networkConfig?.disputableTime?.min,
-    max: +publicRuntimeConfig?.networkConfig?.disputableTime?.max,
-  },
-  councilAmount: {
-    min: +publicRuntimeConfig?.networkConfig?.councilAmount?.min,
-    max: +publicRuntimeConfig?.networkConfig?.councilAmount?.max
-  }
-};
 
 export const NetworkSettingsProvider = ({ children }) => {
   const router = useRouter();
@@ -68,7 +49,16 @@ export const NetworkSettingsProvider = ({ children }) => {
   const { DefaultTheme } = useNetworkTheme();
   const { wallet, user } = useAuthentication();
   const { getUserRepositories } = useOctokit();
+  const { settings: appSettings } = useSettings();
   const { getNetwork, searchRepositories, repositoryHasIssues } = useApi();
+
+  const IPFS_URL = appSettings?.urls?.ipfs;
+  const LIMITS = {
+    percentageNeededForDispute: appSettings?.networkParamatersLimits?.disputePercentage,
+    draftTime: appSettings?.networkParamatersLimits?.draftTime,
+    disputableTime: appSettings?.networkParamatersLimits?.disputableTime,
+    councilAmount: appSettings?.networkParamatersLimits?.councilAmount
+  };
 
   const isCreating = useMemo(() => router.pathname === "/new-network", [router.pathname]);
   const needsToLoad = useMemo(() => ALLOWED_PATHS.includes(router.pathname), [router.pathname]);
@@ -190,14 +180,14 @@ export const NetworkSettingsProvider = ({ children }) => {
         },  
       })),
       validator: 
-        (parameter, value) => value >= (LIMITS[parameter].min || value) && value <= (LIMITS[parameter].max || value)
+        (parameter, value) => value >= (LIMITS[parameter]?.min || value) && value <= (LIMITS[parameter]?.max || value)
     }
   };
 
   async function getService() {
     if (!forcedNetwork) return DAOService;
 
-    const networkAddress = handleNetworkAddress(network);
+    const networkAddress = network?.networkAddress;
     const dao = new DAO({
       web3Connection: DAOService.web3Connection,
       skipWindowAssignment: true
@@ -212,9 +202,8 @@ export const NetworkSettingsProvider = ({ children }) => {
   useEffect(() => {
     if ( !wallet?.address || 
          !DAOService || 
-         !network?.name || 
-         !network?.councilAmount || 
-         !needsToLoad ) 
+         (!isCreating && !network?.name && !network?.councilAmount) || 
+         !needsToLoad )
       return;
 
     if (user?.login)
@@ -419,7 +408,17 @@ export const NetworkSettingsProvider = ({ children }) => {
           similar
         }
       }));
-  }, [settings?.theme?.colors]);
+  }, [ settings?.theme?.colors?.primary,
+       settings?.theme?.colors?.secondary,
+       settings?.theme?.colors?.oracle,
+       settings?.theme?.colors?.text,
+       settings?.theme?.colors?.background,
+       settings?.theme?.colors?.shadow,
+       settings?.theme?.colors?.gray,
+       settings?.theme?.colors?.success,
+       settings?.theme?.colors?.danger,
+       settings?.theme?.colors?.warning,
+       settings?.theme?.colors?.info ]);
 
   // Treasury validation
   useEffect(() => {
@@ -516,8 +515,9 @@ export const NetworkSettingsProvider = ({ children }) => {
     isSettingsValidated,
     forcedNetwork,
     setForcedNetwork,
+    LIMITS,
     fields: Fields
-  }), [tokensLocked, details, github, tokens, settings, isSettingsValidated, Fields, setForcedNetwork]);
+  }), [tokensLocked, details, github, tokens, settings, isSettingsValidated, Fields, LIMITS, setForcedNetwork]);
 
   return (
     <NetworkSettingsContext.Provider value={memorizedValue}>

@@ -1,12 +1,9 @@
+import { error as LogError } from "@scripts/logging.js";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getToken } from "next-auth/jwt";
 import { Op } from "sequelize";
 
 import models from "db/models";
-
-import { error as LogError } from "helpers/api/handle-log";
-
-const DAY = 1000 * 60 * 60 * 24;
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const { address, githubLogin } = req.body;
@@ -25,10 +22,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     if ( headerWallet !== user.address || !token || token?.login !== githubLogin )
       return res.status(401).json("Unauthorized");
-
-    const hasSevenDays = (((new Date()).getTime() - user.resetedAt) / DAY) > 7;
-
-    if (!hasSevenDays) return res.status(409).json("LESS_THAN_7_DAYS");
 
     const issuesWithPullRequestsByAccount = await models.issue.findAndCountAll({
       where: {

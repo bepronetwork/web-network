@@ -1,21 +1,25 @@
 
 import axios from "axios";
-import getConfig from "next/config";
+
+import { getSettingsFromSessionStorage } from "helpers/settings";
 
 import { TokenInfo } from "interfaces/token";
 
-const { publicRuntimeConfig } = getConfig();
+const settings = getSettingsFromSessionStorage();
 
 const COINGECKO_API = axios.create({
-  baseURL: publicRuntimeConfig?.currency?.apiUrl
+  baseURL: settings?.currency?.api || "https://api.coingecko.com/api/v3"
 });
 
-const DEFAULT_CURRENCIES = [{value: "usd", label: "US Dollar"}, {value: "eur", label: "Euro"}];
+const DEFAULT_TOKEN = settings?.currency?.defaultToken || "bepro-network";
+
+const DEFAULT_CURRENCIES = settings?.currency?.conversionList || 
+  [{value: "usd", label: "US Dollar"}, {value: "eur", label: "Euro"}];
 
 /**
  * Get the price of a coin from CoinGecko by its currencyID
  */
-const getCurrencyByToken = async (tokenId = publicRuntimeConfig?.currency?.currencyId, comparedToken?: string) => {
+const getCurrencyByToken = async (tokenId = DEFAULT_TOKEN, comparedToken?: string) => {
   const params:{ids: string, vs_currencies?: string} = {
     ids: tokenId,
   }
@@ -38,12 +42,9 @@ const getCurrencyByToken = async (tokenId = publicRuntimeConfig?.currency?.curre
  */
 const getCoinInfoByContract = async (contractAddress: string, asset_platform = "ethereum"): Promise<TokenInfo> => {
   const { data } = await COINGECKO_API.get(`/coins/${asset_platform}/contract/${contractAddress}`);
-    
-  const currenciesToGet = publicRuntimeConfig?.currency?.currencyCompareList ?
-    JSON.parse(publicRuntimeConfig?.currency?.currencyCompareList) : DEFAULT_CURRENCIES;
 
   const currencies = 
-    currenciesToGet.map(currency => ([ currency.value, data?.market_data?.current_price?.[currency.value]]));
+    DEFAULT_CURRENCIES.map(currency => ([ currency.value, data?.market_data?.current_price?.[currency.value]]));
 
   const info: TokenInfo = {
     name: data?.name,

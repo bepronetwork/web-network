@@ -8,7 +8,7 @@ import models from "db/models";
 
 import * as PullRequestQueries from "graphql/pull-request";
 
-import { handleNetworkAddress } from "helpers/custom-network";
+import { Settings } from "helpers/settings";
 
 import DAO from "services/dao-service";
 
@@ -44,11 +44,23 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     if (!pullRequest) return res.status(404).json("Pull Request not found");
 
-    const DAOService = new DAO({ skipWindowAssignment: true });
+    const settings = await models.settings.findAll({
+      where: { visibility: "public" },
+      raw: true,
+    });
+  
+    const publicSettings = (new Settings(settings)).raw();
+  
+    if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
+
+    const DAOService = new DAO({ 
+      skipWindowAssignment: true,
+      web3Host: publicSettings.urls.web3Provider
+    });
 
     if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
 
-    if (!await DAOService.loadNetwork(handleNetworkAddress(customNetwork)))
+    if (!await DAOService.loadNetwork(customNetwork.networkAddress))
       return res.status(500).json("Failed to load network contract");
 
     const network = DAOService.network;

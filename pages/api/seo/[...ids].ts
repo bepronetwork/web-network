@@ -6,6 +6,8 @@ import { Op } from "sequelize";
 
 import models from "db/models";
 
+import { Settings } from "helpers/settings";
+
 const { publicRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
@@ -23,6 +25,19 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   if (!issue) return res.status(404).json(null);
 
+  const settings = await models.settings.findAll({
+    where: { 
+      visibility: "public",
+      group: "urls"
+    },
+    raw: true,
+  });
+
+  const defaultConfig = (new Settings(settings)).raw();
+
+  if (!defaultConfig?.urls?.ipfs)
+    return res.status(500).json("Missing ipfs url on settings");
+
   const url = `${publicRuntimeConfig?.ipfsUrl}/${issue.seoImage}`;
 
   const { data } = await axios.get(url, {
@@ -36,6 +51,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   return res.status(200).end(data);
 }
+
 async function Seo(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":

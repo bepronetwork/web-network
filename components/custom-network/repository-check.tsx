@@ -39,7 +39,7 @@ export default function RepositoryCheck({
 
   return (
     <div key={label} className={classes.join(" ")} onClick={handleClick}>
-      {XIcon}
+      {(active || isDisabled) && XIcon}
       <span>{label}</span>
       {(active || isDisabled) && XIcon}
     </div>

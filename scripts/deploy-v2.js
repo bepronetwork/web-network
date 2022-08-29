@@ -1,6 +1,7 @@
 const { Web3Connection, ERC20, BountyToken, Network_v2, Network_Registry } = require("@taikai/dappkit");
 const { exit } = require("process");
-const stagingAccounts = require("./staging-accounts")
+const stagingAccounts = require("./staging-accounts");
+const { updateSetting } = require("./settings/save-from-env");
 
 const usage = `------------------------------------------------------------------------- 
   WebNetwork v2 Smart Contracts Deploy Script 🚀  
@@ -58,7 +59,7 @@ require('dotenv').config({ path: argv.envFile });
 
 const networks = {
   development: {
-    url: 'http://127.0.0.1:8545/',
+    url: 'http://127.0.0.1:7545/',
   },
   moonbase: {
     url: 'https://rpc.api.moonbase.moonbeam.network',
@@ -226,6 +227,14 @@ async function main() {
     Network_v2: networkAddress,
     Network_Registry: registryAddress
   });
+
+  await Promise.all([
+    updateSetting("nftToken", bountyTokenAddress, "contracts"),
+    updateSetting("settlerToken", settlerAddress, "contracts"),
+    updateSetting("network", networkAddress, "contracts"),
+    updateSetting("transactionalToken", settlerAddress, "contracts"),
+    updateSetting("networkRegistry", registryAddress, "contracts")
+  ]);
 }
 
 main()

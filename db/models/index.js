@@ -12,6 +12,7 @@ import User from "./user";
 import Tokens from "./tokens.model";
 import NetworkTokens from "./network-tokens.model";
 import UserPayments from "./user-payments";
+import Settings from "./settings.model";
 
 const Database = { sequelize: null };
 
@@ -31,6 +32,7 @@ Database.network = Network;
 Database.tokens = Tokens;
 Database.networkTokens = NetworkTokens;
 Database.userPayments = UserPayments;
+Database.settings = Settings;
 
 Object.values(Database).forEach((model) => {
   if (model?.init) {

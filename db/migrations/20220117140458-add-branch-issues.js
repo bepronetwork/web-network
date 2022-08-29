@@ -5,7 +5,7 @@ require("dotenv").config();
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    queryInterface
+    await queryInterface
       .addColumn("issues", "branch", {
         type: Sequelize.STRING
       })
@@ -21,6 +21,6 @@ module.exports = {
       });
   },
   down: async (queryInterface, Sequelize) => {
-    queryInterface.removeColumn("issues", "branch");
+    await queryInterface.removeColumn("issues", "branch");
   }
 };

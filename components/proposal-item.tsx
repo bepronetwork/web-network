@@ -10,6 +10,7 @@ import PercentageProgressBar from "components/percentage-progress-bar";
 import ProposalProgressSmall from "components/proposal-progress-small";
 
 import { useAuthentication } from "contexts/authentication";
+import { useDAO } from "contexts/dao";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 
@@ -45,11 +46,14 @@ export default function ProposalItem({
   proposal
 }: ProposalItemProps) {
   const { t } = useTranslation("common");
+
+  const [ isDisputable, setIsDisputable ] = useState(false); 
   const [ proposalState, setProposalState ] = useState<ProposalState>(DEFAULT_PROPOSAL_STATE);
 
   const { processEvent } = useApi();
   const { wallet } = useAuthentication();
   const { activeNetwork } = useNetwork();
+  const { service: DAOService } = useDAO();
   const { handlerDisputeProposal } = useBepro();
   const { getURLWithNetwork } = useNetworkTheme();
   const { activeIssue, networkIssue, getNetworkIssue, updateIssue } = useIssue();
@@ -62,9 +66,6 @@ export default function ProposalItem({
   const isProposalDisputed = !!networkProposal?.isDisputed;
   const isDisputableByUser = !!networkProposal?.canUserDispute;
   const isProposalRefused = networkProposal?.refusedByBountyOwner;
-
-  const isDisputable = 
-    isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime) && !isProposalDisputed;
 
   const isDisable = () => [
       isBountyClosed,
@@ -109,6 +110,24 @@ export default function ProposalItem({
       setProposalState(DEFAULT_PROPOSAL_STATE);
 
   }, [isBountyClosed, isProposalDisputed, isProposalMerged, isProposalRefused]);
+
+  useEffect(() => {
+    if (proposal?.createdAt && activeNetwork?.disputableTime && DAOService)
+      DAOService.getTimeChain()
+        .then(chainTime => {
+          const canDispute = isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime, chainTime);
+          setIsDisputable(canDispute && !isProposalDisputed);
+        });
+  }, [DAOService, proposal?.createdAt, activeNetwork?.disputableTime, isProposalDisputed]);
+
+  if (activeIssue?.mergeProposals?.length !== networkIssue?.proposals?.length && !networkProposal)
+    return (
+      <div className="content-list-item proposal my-1">
+        <div className="d-flex justify-content-center">
+          <span className="spinner-border spinner-border-xs my-2"/>
+        </div>
+      </div>
+    );
 
   return (
     <Link

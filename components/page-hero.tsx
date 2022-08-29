@@ -35,7 +35,7 @@ function InfoComponent(info: InfosHero) {
             {formatNumberToCurrency(info.value)}
           </span>
           
-          <span className="caption-medium text-white-70 ml-1">
+          <span className="caption-medium text-white-70 ml-1 mt-1">
             {info.currency}
           </span>
 

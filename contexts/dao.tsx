@@ -2,6 +2,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 import Loading from "components/loading";
 
+import { useSettings } from "contexts/settings";
+
 import DAO from "services/dao-service";
 
 export interface DAOContextData {
@@ -17,6 +19,8 @@ export const DAOContextProvider = ({ children }) => {
   const [service, setService] = useState<DAO>();
   const [isStarting, setIsStarting] = useState(false);
 
+  const { settings } = useSettings();
+
   const changeNetwork = useCallback(async (networkAddress: string): Promise<boolean> => {
     if (!service || !networkAddress) return false;
 
@@ -30,7 +34,7 @@ export const DAOContextProvider = ({ children }) => {
     if (loaded) window.DAOService = service;
 
     return loaded;
-  }, [service]);
+  }, [service, settings]);
 
   const connect = useCallback(async (): Promise<boolean> => {
     if (!service) return false;
@@ -40,16 +44,24 @@ export const DAOContextProvider = ({ children }) => {
     setService(service);
 
     return connected;
-  }, [service]);
+  }, [service, settings]);
 
   useEffect(() => {
+    if (!!service || 
+        !settings?.urls?.web3Provider || 
+        !settings?.contracts?.network || 
+        !settings?.contracts?.networkRegistry) return;
+
     setIsStarting(true);
 
-    const daoService = new DAO();
+    const daoService = new DAO({
+      web3Host: settings.urls.web3Provider,
+      registryAddress: settings.contracts.networkRegistry
+    });
 
     daoService.start()
       .then(started => {
-        if (started) return daoService.loadNetwork();
+        if (started) return daoService.loadNetwork(settings.contracts.network);
 
         return started;
       })
@@ -57,6 +69,13 @@ export const DAOContextProvider = ({ children }) => {
         if (started) {
           window.DAOService = daoService;
           setService(daoService);
+
+          console.table({
+            Network_v2: settings?.contracts?.network,
+            Settler: settings?.contracts?.settlerToken,
+            Transactional: settings?.contracts?.transactionalToken,
+            Network_Registry: settings?.contracts?.networkRegistry
+          });
         }
         
       })
@@ -64,14 +83,14 @@ export const DAOContextProvider = ({ children }) => {
       .finally(() => {
         setIsStarting(false);
       });
-  }, []);
+  }, [service, settings]);
 
   const memorizedValue = useMemo<DAOContextData>(() => ({
     service,
     isStarting,
     connect,
     changeNetwork
-  }), [service, isStarting]);
+  }), [service, isStarting, settings]);
 
   return(
     <DAOContext.Provider value={memorizedValue}>

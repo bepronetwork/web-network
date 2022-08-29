@@ -4,11 +4,11 @@ import getConfig from "next/config";
 const { publicRuntimeConfig } = getConfig();
 
 export const api = axios.create({
-  baseURL: `${publicRuntimeConfig?.apiUrl}/api`
+  baseURL: `${publicRuntimeConfig?.urls?.api}/api`
 });
 
 export const eventsApi = axios.create({
-  baseURL: `${publicRuntimeConfig?.eventsApiUrl}`
+  baseURL: `${publicRuntimeConfig?.urls?.events}`
 });
 
 api.interceptors.response.use((response) => response,

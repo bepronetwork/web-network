@@ -295,13 +295,13 @@ li {
   &.bg-30,
   &.bg-30-hover:hover {
     background-color: rgba(var(--bs-primary-rgb), 0.3) !important;
-    border: 2px solid $primary !important;
+    border: 2px solid var(--bs-primary) !important;
   }
 }
 
 .funding-type {
   background-color: rgba(var(--bs-primary-rgb), 0.3) !important;
-  border: 2px solid $primary !important;
+  border: 2px solid var(--bs-primary) !important;
 }
 
 .info-amount {
@@ -1263,7 +1263,7 @@ textarea.form-control {
 
   &.sticky-top {
     padding: 20px 0;
-    top: 4.35em;
+    top: 4.40em;
   }
 
   .input-group {

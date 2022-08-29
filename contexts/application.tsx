@@ -6,7 +6,6 @@ import {
   useState
 } from "react";
 
-import getConfig from "next/config";
 import { useRouter } from "next/router";
 import sanitizeHtml from "sanitize-html";
 
@@ -26,6 +25,8 @@ import { updateTransaction } from "contexts/reducers/update-transaction";
 import { ApplicationState } from "interfaces/application-state";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { ReduceActor } from "interfaces/reduce-action";
+
+import { useSettings } from "./settings";
 
 
 interface GlobalState {
@@ -76,7 +77,6 @@ const defaultState: GlobalState = {
 };
 
 export const ApplicationContext = createContext<GlobalState>(defaultState);
-const { publicRuntimeConfig } = getConfig()
 
 const cheatAddress = "";
 let waitingForTx = null;
@@ -88,26 +88,16 @@ export default function ApplicationContextProvider({ children }) {
     query: { authError },
   } = useRouter();
 
+  const { settings } = useSettings();
   const { activeNetwork } = useNetwork();
   const { wallet } = useAuthentication();
 
   const Initialize = () => {
-    //dispatch(changeLoadState(true));
-
-    // DAOService.start()
-    //   .then(() => {
-    //     return DAOService.loadNetwork();
-    //   })
-    //   .then(started => {
-    //     dispatch(changeBeproInitState(started));
-    //   })
-    //   .finally(() => dispatch(changeLoadState(false)));
-
     if (!window.ethereum) return;
 
     window.ethereum.on("chainChanged", (evt) => {
       dispatch(changeNetworkId(+evt?.toString()));
-      dispatch(changeNetwork((publicRuntimeConfig.networkIds[+evt?.toString()] || "unknown")?.toLowerCase()));
+      dispatch(changeNetwork((settings?.chainIds && settings?.chainIds[+evt?.toString()] || "unknown")?.toLowerCase()));
     });
 
     if (txListener) clearInterval(txListener);
@@ -165,15 +155,6 @@ export default function ApplicationContextProvider({ children }) {
       waitingForTx = null;
     else waitingForTx = transactionWithHash;
   }, [state.myTransactions]);
-
-  // TODO Replace staked by getTotalSettlerLocked
-  
-  // useEffect(() => {
-  //   if (beproServiceStarted) 
-  //     BeproService.getTotalSettlerLocked()
-  //     .then(amount => dispatch(changeStakedState(amount)))
-  //     .catch(console.log)
-  // }, [pathname, beproServiceStarted])
 
   const restoreTransactions = async (address) => {
     const transactions = JSON.parse(localStorage.getItem(`bepro.transactions:${address}`) || "[]");

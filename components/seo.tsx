@@ -8,7 +8,7 @@ import { IssueData } from "interfaces/issue-data";
 
 import SEO_CONFIG from "../next-seo-config";
 
-const {publicRuntimeConfig} = getConfig();
+const { publicRuntimeConfig } = getConfig();
 
 interface ISeoProps {
   issueMeta?: IssueData;
@@ -17,7 +17,7 @@ interface ISeoProps {
 const Seo: React.FC<ISeoProps> = ({ issueMeta }) => {
   if (issueMeta) {
     // eslint-disable-next-line no-unsafe-optional-chaining
-    const homeUrl = publicRuntimeConfig?.homeUrl || process.env.NEXT_PUBLIC_HOME_URL
+    const homeUrl = publicRuntimeConfig?.urls?.home
     // eslint-disable-next-line no-unsafe-optional-chaining
     const [repoId, ghId] = issueMeta?.issueId?.split("/");
     const description = removeMarkdown(issueMeta?.body?.substring(0, 160).trimEnd());

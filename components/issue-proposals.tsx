@@ -15,7 +15,7 @@ export default function IssueProposals() {
   const hasProposals = !!activeIssue?.mergeProposals?.length && !!networkIssue?.proposals?.length;
 
   return (
-    <div className={`content-wrapper border-top-0 pt-0 pb-0`}>
+    <div className={`content-wrapper border-top-0 ${hasProposals && "pt-0 pb-0" || "py-1" }`}>
       {hasProposals &&
         React.Children.toArray(activeIssue?.mergeProposals?.map((proposal) => (
             <ProposalItem proposal={proposal} />
