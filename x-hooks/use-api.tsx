@@ -354,7 +354,7 @@ export default function useApi() {
   }
 
   async function registerNetwork(networkInfo) {
-    return client
+    return api
       .patch("/network", { ...networkInfo })
       .then((response) => response)
       .catch((error) => {
@@ -480,7 +480,7 @@ export default function useApi() {
   }
 
   async function getSettings() {
-    return client.get("/settings")
+    return api.get("/settings")
       .then((({ data }) => data))
       .catch((error) => { throw error });
   }
