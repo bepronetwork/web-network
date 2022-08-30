@@ -43,7 +43,19 @@ class Settings extends Model {
     }, {
       sequelize,
       modelName: "settings",
-      tableName: "settings"
+      tableName: "settings",
+      hooks: {
+        afterSave: async (setting) => {
+          if (setting.key === "network" && setting.group === "contracts") {
+            await sequelize.query(
+              `UPDATE networks SET "networkAddress" = ? WHERE name = 'bepro'`,
+              {
+                replacements: [setting.value],
+              }
+            );
+          }
+        }
+      }
     });
   }
 
