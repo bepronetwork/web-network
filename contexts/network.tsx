@@ -41,10 +41,10 @@ export const NetworkProvider: React.FC = function ({ children }) {
     
     if (activeNetwork?.name?.toLowerCase() === networkName.toLowerCase() && !forced) return activeNetwork;
 
-    const networkFromStorage = JSON.parse(sessionStorage.getItem(`${cookieKey}:${networkName}`) || "{}");
+    const networkFromStorage = sessionStorage.getItem(`${cookieKey}:${networkName}`);
     
     if (networkFromStorage && !forced) {
-      return setActiveNetwork(JSON.parse(networkFromStorage));
+      return setActiveNetwork(networkFromStorage && JSON.parse(networkFromStorage) || undefined);
     }
 
     getNetwork(networkName)
