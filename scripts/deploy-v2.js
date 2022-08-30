@@ -1,3 +1,4 @@
+require("dotenv").config();
 const { Web3Connection, ERC20, BountyToken, Network_v2, Network_Registry } = require("@taikai/dappkit");
 const { exit } = require("process");
 const stagingAccounts = require("./staging-accounts");
