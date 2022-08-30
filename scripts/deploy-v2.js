@@ -93,7 +93,7 @@ const networks = {
 
 
 async function main() {
-
+  console.log({ host: process.env.NEXT_DB_DATABASE, ...process.env })
   const ownerAddress = argv.ownerAddress || process.env.DEPLOY_OWNER_ADDRESS;
   const ownerPrivKey = argv.ownerKey || process.env.DEPLOY_PRIVATE_KEY;
 
