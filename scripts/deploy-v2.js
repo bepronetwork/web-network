@@ -131,7 +131,7 @@ async function main() {
       capital, // capital
       ownerAddress // the owner of the total amount of the tokens (your address)
     );
-    
+
     console.log(`Deployed ${tokenName} - ${tokenSymbol} at ${tx.contractAddress}`)
     return tx.contractAddress;
   };
@@ -203,7 +203,7 @@ async function main() {
       console.log(`Transfering 10M BEPRO to ${address}`);
       await settler.transferTokenAmount(address, 10000000);
     }
-  
+
   // 4. Approve, lock and create a new network using the factory
   await settler.approve(registryAddress, 1000000);
   await registry.lock(1000000);
@@ -213,10 +213,10 @@ async function main() {
   // // 5. Configure basic network Parameters
   console.log(`Setting Redeeem time on ${networkAddress}`);
   // 5min Disputable time
-  await networkContract.changeDraftTime(60*5);
+  await networkContract.changeDraftTime(60 * 5);
   // 10min Disputable time
   console.log(`Setting Disputable time on ${networkAddress}`);
-  await networkContract.changeDisputableTime(60*10);
+  await networkContract.changeDisputableTime(60 * 10);
   console.log(`Setting Council Ammount on ${networkAddress}`);
   await networkContract.changeCouncilAmount(1000000);
 
@@ -235,7 +235,9 @@ async function main() {
     updateSetting("network", networkAddress, "contracts"),
     updateSetting("transactionalToken", settlerAddress, "contracts"),
     updateSetting("networkRegistry", registryAddress, "contracts")
-  ]);
+  ]).catch((e) => {
+    console.error(`Was Can't not updated address at database: ${e}`)
+  });
 }
 
 main()
