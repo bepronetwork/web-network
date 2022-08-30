@@ -1,7 +1,5 @@
 'use strict';
 
-const { Network } = require("../models/network.model");
-
 module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.addColumn("networks", "isRegistered", {
@@ -9,7 +7,7 @@ module.exports = {
       defaultValue: false
     });
 
-    await queryInterface.update("networks", {
+    await queryInterface.bulkUpdate("networks", {
       isRegistered: true
     }, {
       name: "bepro"
