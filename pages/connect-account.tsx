@@ -36,12 +36,18 @@ export default function ConnectAccount() {
     isGithubAndWalletMatched, 
     connectWallet, 
     connectGithub, 
+    disconnectGithub,
     validateWalletAndGithub 
   } = useAuthentication();
 
   const { user: sessionUser } = (sessionData || {}) as CustomSession;
 
-  const isButtonDisabled = [isGithubAndWalletMatched !== undefined, !wallet?.address.toLowerCase()].some(t=>t);
+  const isButtonDisabled = [
+    isGithubAndWalletMatched !== undefined,
+    !sessionUser?.login,
+    !wallet?.address
+  ].some(condition => condition);
+
   const connectButtonState = {
     "undefined": undefined,
     "true": "success",
@@ -60,6 +66,11 @@ export default function ConnectAccount() {
     const redirectTo = lastNetworkVisited ? `${lastNetworkVisited}/profile` : "/networks";
 
     router.push(redirectTo);
+  }
+
+  function handleCancel() {
+    if (!isGithubAndWalletMatched) disconnectGithub();
+    redirectToProfile();
   }
 
   async function joinAddressToGh() {
@@ -173,7 +184,7 @@ export default function ConnectAccount() {
                   )}
                   {t("actions.done")}
                 </Button>
-                <Button color="dark-gray" onClick={redirectToProfile}>
+                <Button color="dark-gray" onClick={handleCancel}>
                   {t("actions.cancel")}
                 </Button>
               </div>
