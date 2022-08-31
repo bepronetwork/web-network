@@ -71,7 +71,7 @@ export default function MainNav() {
 
         setMyNetwork({ 
           label: <Translation label={"main-nav.my-network"} />, 
-          href: `/${network?.name?.toLowerCase()}`
+          href: `/${network?.name?.toLowerCase()}${network?.isRegistered ? "" : "/profile/my-network"}`
         });
       })
       .catch(console.log);
