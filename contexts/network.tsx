@@ -49,6 +49,8 @@ export const NetworkProvider: React.FC = function ({ children }) {
 
     getNetwork(networkName)
         .then(({ data }) => {
+          if (!data.isRegistered) throw new Error("Network not registered");
+          
           sessionStorage.setItem(`${cookieKey}:${networkName.toLowerCase()}`, JSON.stringify(data));
           setActiveNetwork(data);
         })
