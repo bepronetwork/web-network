@@ -80,12 +80,13 @@ export default function NetworksList({
       name,
       networkAddress,
       creatorAddress,
+      isRegistered: true,
       sortBy: "name",
       order: "asc"
     })
       .then(async ({ count, rows }) => {
         if (count > 0) {
-          Promise.all(rows?.map(async (network: Network) => {
+          return Promise.all(rows?.map(async (network: Network) => {
             const networkAddress = network?.networkAddress;
             const dao = new DAO({
               web3Connection: DAOService.web3Connection,
