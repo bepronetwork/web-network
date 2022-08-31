@@ -40,7 +40,9 @@ export interface SearchNetworkParams {
   networkAddress?: string;
   sortBy?: string;
   order?: string;
-  search?: string
+  search?: string;
+  isClosed?: boolean;
+  isRegistered?: boolean;
 }
 
 export interface CreatePrePullRequestParams extends RequestParams {

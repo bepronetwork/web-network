@@ -5,7 +5,6 @@ import { Defaults } from "@taikai/dappkit";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { setCookie } from "nookies";
 
 import InternalLink from "components/internal-link";
 import NothingFound from "components/nothing-found";
@@ -15,7 +14,7 @@ import ProfileLayout from "components/profile/profile-layout";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
-import { cookieKey, expiresCookie } from "contexts/network";
+import { cookieKey } from "contexts/network";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 
 import { Network } from "interfaces/network";
@@ -37,28 +36,30 @@ export default function MyNetwork() {
     dispatch(changeLoadState(true));
 
     DAOService.getNetworkAdressByCreator(wallet.address)
-      .then(networkAddress => {
-        if (networkAddress === Defaults.nativeZeroAddress) return { count: 0, rows: [] };
-        
-        return searchNetworks({
-          networkAddress,
-          creatorAddress: wallet.address,
-          sortBy: "name",
-          order: "asc"
-        });
-      })
-      .then(({ count, rows }) => {
-        if (count === 0) return setMyNetwork(undefined);
-        
-        const network = rows[0];
+      .then(registeredNetwork => {
+        if (registeredNetwork === Defaults.nativeZeroAddress)
+          return { count: -1, rows: [] };
 
-        setMyNetwork(network);
-        setCookie(null, `${cookieKey}:${network.networkName.toLowerCase()}`, JSON.stringify(network), {
-          maxAge: expiresCookie,
-          path: "/"
+        return searchNetworks({
+          creatorAddress: wallet.address,
+          isClosed: false
         });
       })
-      .catch(console.log)
+      .then(({ rows, count }) => {
+        if (count < 0)
+          setMyNetwork(undefined);
+        else if (count === 0) 
+          console.debug("Something went wrong, the user has a network but it's not saved", wallet.address);
+        else {
+          const savedNetwork = rows[0];
+
+          setMyNetwork(savedNetwork);
+          sessionStorage.setItem(`${cookieKey}:${savedNetwork.name.toLowerCase()}`, JSON.stringify(savedNetwork));
+        }
+
+        return true;
+      })
+      .catch(error => console.debug("Failed to get network", error))
       .finally(() => dispatch(changeLoadState(false)));
   }
 
@@ -81,7 +82,7 @@ export default function MyNetwork() {
           </NothingFound>
         </Col>
       ||
-        <Col xs={10}>
+        <Col xs={10} className="pb-5">
           <MyNetworkSettings network={myNetwork} updateEditingNetwork={updateEditingNetwork} />
         </Col>
       }

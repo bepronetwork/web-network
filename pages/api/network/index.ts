@@ -1,3 +1,5 @@
+import { error as LogError } from '@scripts/logging.js';
+import { Defaults } from '@taikai/dappkit';
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
@@ -41,15 +43,13 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       creator,
       fullLogo,
       logoIcon,
-      accessToken,
       description,
-      githubLogin,
       repositories,
       botPermission,
-      networkAddress
+      accessToken,
+      githubLogin
     } = req.body;
 
-    if (!accessToken) return res.status(401).json("Unauthorized user");
     if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
 
     const settings = await Database.settings.findAll({
@@ -73,10 +73,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     
     if (!await DAOService.loadRegistry()) return res.status(500).json("Failed to load registry");
 
-    const checkingNetworkAddress = await DAOService.getNetworkAdressByCreator(creator);
-
-    if (checkingNetworkAddress !== networkAddress)
-      return res.status(403).json("Creator and network addresses do not match");
+    if (await DAOService.hasNetworkRegistered(creator))
+      return res.status(403).json("Already exists a network registered for this wallet");
 
     // Uploading logos to IPFS
     let fullLogoHash = null
@@ -95,55 +93,16 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       console.error('Failed to store ipfs', error);
     }
 
-    // Adding bepro-bot to repositories organization
-    const octokitUser = new Octokit({
-      auth: accessToken
-    });
-    const repos = JSON.parse(repositories);
-
-    const invitations = [];
-
-    if (!publicSettings?.github?.botUser) return res.status(500).json("Missing github bot user");
-
-    for (const repository of repos) {
-      const [owner, repo] = repository.fullName.split("/");
-
-      await octokitUser.rest.repos.addCollaborator({
-        owner,
-        repo,
-        username: publicSettings?.github?.botUser,
-        ...(githubLogin !== owner  && { permission: "maintain"} || {})
-      })
-      .then(({data}) => invitations.push(data?.id))
-      .catch((e) => {
-        console.error('[GH Add Colaborator Fail]', {e})
-        return e;
-      });
-    }
-
-    const octokitBot = new Octokit({
-      auth: serverRuntimeConfig?.github?.token
-    });
-
-    for (const invitation_id of invitations) {
-      if (invitation_id)
-        await octokitBot.rest.repos.acceptInvitationForAuthenticatedUser({
-          invitation_id
-        }).catch((e)=>{
-          console.error('[GH Accpet Invitation Fail]', {e})
-          return e;
-        });
-    }
-
     const network = await Database.network.create({
       creatorAddress: creator,
       name: name.toLowerCase(),
       description,
       colors: JSON.parse(colors),
-      networkAddress,
       logoIcon: logoIconHash,
       fullLogo: fullLogoHash
     });
+
+    const repos = JSON.parse(repositories);
 
     for (const repository of repos) {
       await Database.repositories.create({
@@ -152,9 +111,101 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       });
     }
 
+    if (!publicSettings?.github?.botUser) return res.status(500).json("Missing github bot user");
+    if (!serverRuntimeConfig?.github?.token) return res.status(500).json("Missing github bot token");
+
+    const octokitUser = new Octokit({
+      auth: accessToken
+    });
+
+    const invitations = [];
+
+    for (const repository of repos) {
+      const [owner, repo] = repository.fullName.split("/");
+
+      await octokitUser.rest.repos.addCollaborator({
+        owner,
+        repo,
+        username: publicSettings.github.botUser,
+        ...(githubLogin !== owner  && { permission: "maintain"} || {})
+      })
+      .then(({data}) => invitations.push(data?.id))
+      .catch((e) => {
+        LogError('[GH Add Colaborator Fail]', {e})
+        return e;
+      });
+    }
+
+    const octokitBot = new Octokit({
+      auth: serverRuntimeConfig.github.token
+    });
+
+    for (const invitation_id of invitations) {
+      if (invitation_id)
+        await octokitBot.rest.repos.acceptInvitationForAuthenticatedUser({
+          invitation_id
+        }).catch((e)=>{
+          LogError('[GH Accpet Invitation Fail]', {e})
+          return e;
+        });
+    }
+
     return res.status(200).json("Network created");
   } catch (error) {
-    console.log(error);
+    LogError("Failed to create network", { error, req });
+    return res.status(500).json(error);
+  }
+}
+
+async function patch(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    const {
+      creator
+    } = req.body;
+
+    const settings = await Database.settings.findAll({
+      where: { visibility: "public" },
+      raw: true,
+    });
+
+    const publicSettings = (new Settings(settings)).raw();
+
+    if (!publicSettings?.contracts?.networkRegistry) return res.status(500).json("Missing network registry contract");
+    if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
+
+    // Contract Validations
+    const DAOService = new DAO({ 
+      skipWindowAssignment: true,
+      web3Host: publicSettings.urls.web3Provider,
+      registryAddress: publicSettings.contracts.networkRegistry
+    });
+
+    if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
+    
+    if (!await DAOService.loadRegistry()) return res.status(500).json("Failed to load registry");
+
+    const registeredNetwork = await DAOService.getNetworkAdressByCreator(creator);
+
+    if (registeredNetwork === Defaults.nativeZeroAddress)
+      return res.status(403).json("No network registered for this wallet");
+
+    const savedNetwork = await Database.network.findOne({
+      where: {
+        creatorAddress: creator,
+        isClosed: false,
+        isRegistered: false
+      }
+    });
+
+    if (!savedNetwork) return res.status(409).json("Network to register not found");
+
+    savedNetwork.isRegistered = true;
+    savedNetwork.networkAddress = registeredNetwork;
+    await savedNetwork.save();
+
+    return res.status(200).json("Registered");
+  } catch (error) {
+    LogError("Failed to patch network data", { error, req });
     return res.status(500).json(error);
   }
 }
@@ -356,7 +407,7 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-async function NetworkEndPoint(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
   case "get":
     await get(req, res);
@@ -364,6 +415,10 @@ async function NetworkEndPoint(req: NextApiRequest, res: NextApiResponse) {
 
   case "post":
     await post(req, res);
+    break;
+
+  case "patch":
+    await patch(req, res);
     break;
 
   case "put":
@@ -377,4 +432,4 @@ async function NetworkEndPoint(req: NextApiRequest, res: NextApiResponse) {
   res.end();
 }
 
-export default withCors(NetworkEndPoint)
+export default withCors(handler)

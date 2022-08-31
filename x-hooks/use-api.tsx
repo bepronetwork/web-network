@@ -363,6 +363,15 @@ export default function useApi() {
         throw error;
       });
   }
+
+  async function registerNetwork(networkInfo) {
+    return client
+      .patch("/network", { ...networkInfo })
+      .then((response) => response)
+      .catch((error) => {
+        throw error;
+      });
+  }
   
   async function uploadFiles(files: File | File[]): Promise<FileUploadReturn> {
     const form = new FormData();
@@ -436,7 +445,9 @@ export default function useApi() {
     networkAddress = "",
     sortBy = "updatedAt",
     order = "DESC",
-    search = ""
+    search = "",
+    isClosed = undefined,
+    isRegistered = undefined
   }: SearchNetworkParams) {
     const params = new URLSearchParams({
       page,
@@ -445,7 +456,9 @@ export default function useApi() {
       networkAddress,
       sortBy,
       order,
-      search
+      search,
+      ... (isClosed !== undefined && { isClosed: isClosed.toString() } || {}),
+      ... (isRegistered !== undefined && { isRegistered: isRegistered.toString() } || {})
     }).toString();
 
     return client
@@ -517,6 +530,7 @@ export default function useApi() {
     createPreBounty,
     cancelPrePullRequest,
     resetUser,
-    getSettings
+    getSettings,
+    registerNetwork
   };
 }
