@@ -175,7 +175,7 @@ export default function TokenConfiguration({
             <small className="small-info text-danger">
               {t("custom-network:steps.token-configuration.fields.nft-token.error.pre")}
               {" "}
-              <a href="https://sdk.dappkit.dev/" target="_blank">
+              <a href="https://sdk.dappkit.dev/classes/ERC20.html" target="_blank">
                 {t("misc.token")}
               </a>
               {" "}
