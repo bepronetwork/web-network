@@ -443,7 +443,6 @@ export default function useApi() {
       });
   }
 
-
   async function searchNetworks({
     page = "1",
     name = "",
