@@ -1334,6 +1334,14 @@ textarea.form-control {
   }
 }
 
+.react-select__multi-value {
+  background-color: $white !important;
+}
+
+.react-select__multi-value__remove {
+  color: $black;
+}
+
 .scroll-top-button {
   position: fixed;
   bottom: 50px;
