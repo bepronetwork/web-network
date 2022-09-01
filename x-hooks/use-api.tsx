@@ -433,9 +433,10 @@ export default function useApi() {
       });
   }
 
+    return api
   
   async function getTokens() {
-    return client
+    return api
       .get<Token[]>(`/tokens`)
       .then(({ data }) => data)
       .catch((error) => {
