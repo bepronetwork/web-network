@@ -26,7 +26,7 @@ const handler = async (type, helpers, network, customNetwork, fromBlock, toBlock
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   const bulk = await models.chainEvents.findOne({ where: { name: `Bulk` } });
-  const fromBlock = bulk?.dataValues?.lastBlock || serverRuntimeConfig.schedules.startProcessEventsAt;
+  const fromBlock = bulk?.dataValues?.lastBlock || serverRuntimeConfig.schedules.startProcessEventsAt || "latest";
 
   const settings = await models.settings.findAll({
     where: { visibility: "public" },
