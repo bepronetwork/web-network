@@ -1,6 +1,8 @@
 {
- "title": "Add Token",
+ "title": "New ERC20 Token",
  "description": "Add an ERC20 token to use on this Bounty",
+ "description-erc20": "Deploy a new token for you network",
+ "title-erc20": "New ERC20 Token",
  "fields": {
    "address": {
      "label": "Address",
