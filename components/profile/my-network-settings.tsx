@@ -311,7 +311,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
           <Col xs="auto">
             <InfoIconEmpty width={12} height={12} />
             <span className="ml-1 caption-small">
-              This network has yet to be registered to be usable, please do so.
+              {t("custom-network:errors.network-not-registered")}
             </span>
           </Col>
           <Col xs="auto">
@@ -322,7 +322,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
               withLockIcon={!wallet?.address || !user?.accessToken}
               isLoading={isRegistering}
             >
-              Register
+              {t("actions.register")}
             </Button>
           </Col>
         </Row> 
