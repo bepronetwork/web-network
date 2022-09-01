@@ -428,7 +428,7 @@ export default class DAO {
   }
 
   async withdrawFundRewardBounty(bountyId: number, fundingId: number): Promise<TransactionReceipt> {
-    return this.network.withdrawFundingReward(bountyId, [fundingId]);
+    return this.network.withdrawFundingReward(bountyId, fundingId);
   }
 
   async disputeProposal(bountyId: number, proposalId: number): Promise<TransactionReceipt> {
