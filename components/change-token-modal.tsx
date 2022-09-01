@@ -15,7 +15,7 @@ export default function ChangeTokenModal({
   show,
   setClose,
   description,
-  setToken
+  setToken,
 }:{
   show: boolean,
   setClose: () => void,
@@ -45,12 +45,11 @@ export default function ChangeTokenModal({
       if (!DAOService.isAddress(address)) {
         setIsValidAddress(false);
         return;
-      }
+      } 
 
-      const erc20 = await DAOService.loadERC20(address);
-
-      setName(await erc20.name());
-      setSymbol(await erc20.symbol());
+      const token = await DAOService.loadERC20(address)
+      setName(await token.name());
+      setSymbol(await token.symbol());
       setIsValidAddress(true);
     } catch (error) {
       setIsValidAddress(false);

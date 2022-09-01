@@ -6,6 +6,7 @@ export interface Token {
   currentValue?: number;
   tokenInfo?: TokenInfo;
   balance?: number;
+  isTransactional?: boolean;
 }
 
 export interface TokenInfo extends Partial<Token> {

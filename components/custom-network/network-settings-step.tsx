@@ -54,12 +54,15 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
           <label className="caption-small mb-2">
             {t("custom-network:steps.treasury.fields.address.label")}
           </label>
-
           <TreasuryAddressField
             value={settings?.treasury?.address?.value}
             onChange={fields.treasury.setter}
             validated={settings?.treasury?.address?.validated}
+            disabled={true}
           />
+            <WarningSpan
+              text={t("custom-network:steps.network-settings.fields.other-settings.warning-registry")}
+            />
         </div>
 
         <NetworkParameterInput
@@ -68,6 +71,8 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
           value={settings?.treasury?.cancelFee?.value}
           error={settings?.treasury?.cancelFee?.validated === false}
           onChange={fields.cancelFee.setter}
+          disabled={true}
+          className="mt-1"
         />
 
         <NetworkParameterInput
@@ -76,12 +81,13 @@ export default function NetworkSettingsStep({ activeStep, index, validated, hand
           value={settings?.treasury?.closeFee?.value}
           error={settings?.treasury?.closeFee?.validated === false}
           onChange={fields.closeFee.setter}
+          disabled={true}
+          className="mt-1"
         />
       </Section>
 
       <Section title={t("custom-network:steps.network-settings.fields.other-settings.title")}>
-        <NetworkContractSettings/>
-
+        <NetworkContractSettings/> 
         <WarningSpan
           text={t("custom-network:steps.network-settings.fields.other-settings.parameters-warning")}
         />
