@@ -26,5 +26,7 @@ export enum TransactionTypes {
   setPercentageNeededForDispute,
   setCouncilAmount,
   fundBounty,
-  retractFundBounty
+  retractFundBounty,
+  withdrawFundRewardBounty,  
+  deployERC20Token,
 }
