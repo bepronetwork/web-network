@@ -20,8 +20,11 @@ class Tokens extends Model {
         },
         address: {
           type: DataTypes.STRING,
-          allowNull: false,
-          unique: true
+          allowNull: false
+        },
+        isTransactional: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false
         }
       },
       {

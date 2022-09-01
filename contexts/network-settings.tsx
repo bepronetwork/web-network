@@ -137,11 +137,11 @@ export const NetworkSettingsProvider = ({ children }) => {
     settlerToken: {
       setter: value => setTokens(previous => ({ ...previous, settler: value })),
     },
-    bountyToken: {
-      setter: value => setTokens(previous => ({ ...previous, bounty: value })),
+    allowedTransactions: {
+      setter: value => setTokens(previous => ({ ...previous, allowedTransactions: value })),
     },
-    bountyURI: {
-      setter: value => setTokens(previous => ({ ...previous, bountyURI: value })),
+    allowedRewards: {
+      setter: value => setTokens(previous => ({ ...previous, allowedRewards: value })),
     },
     treasury: {
       setter: value => setSettings(previous => ({ 
@@ -492,15 +492,15 @@ export const NetworkSettingsProvider = ({ children }) => {
   useEffect(() => {
     const validated = [
       tokens?.settler?.trim() !== "",
-      tokens?.bounty?.trim() !== "",
-      tokens?.bountyURI?.trim() !== ""
+      tokens?.allowedRewards?.length > 0,
+      tokens?.allowedTransactions?.length > 0,
     ].every(condition => condition);
 
     setTokens(previous => ({
       ...previous,
       validated
     }));
-  }, [tokens?.settler, tokens?.bounty, tokens?.bountyURI]);
+  }, [tokens?.settler, tokens?.allowedRewards, tokens?.allowedTransactions]);
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({
     tokensLocked,

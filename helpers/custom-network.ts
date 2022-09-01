@@ -1,6 +1,7 @@
 import { Defaults } from "@taikai/dappkit";
 
 import { Repository, ThemeColors } from "interfaces/network";
+import { Token } from "interfaces/token";
 
 export const DefaultNetworkSettings = {
   isSettingsValidated: false,
@@ -81,8 +82,8 @@ export const DefaultNetworkSettings = {
   },
   tokens: {
     settler: "",
-    bounty: "",
-    bountyURI: "",
+    allowedTransactions: [] as Token[],
+    allowedRewards: [] as Token[],
     validated: false,
   }
 };
