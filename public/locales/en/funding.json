@@ -11,7 +11,8 @@
   "actions": {
     "fund-bounty": "Fund Bounty",
     "manage-funding": "Manage Funding",
-    "retract-funding": "Retract Funding"
+    "retract-funding": "Retract Funding",
+    "withdraw-funding": "Withdraw Funding"
   },
   "modals": {
     "fund": {
@@ -33,6 +34,14 @@
       "retract-successfully": "Retract Funds Successfully",
       "retract-x-symbol": "Retracted {{amount}} ${{symbol}}",
       "failed-to-retract": "Failed to retract funds"
+    },
+    "reward": {
+      "title": "Withdraw Funding Reward",
+      "description": "You are about to withdraw reward",
+      "from-the": "from the",
+      "withdraw-x-symbol": "Withdraw {{amount}} ${{symbol}}",
+      "withdraw-successfully": "Withdraw Funds Reward Successfully",
+      "failed-to-withdraw": "failed to withdraw funds reward"
     }
   }
 }
