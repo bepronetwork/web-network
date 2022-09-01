@@ -160,7 +160,7 @@ export default function PullRequestPage() {
       }));
     })
     .catch(error => {
-      if (error?.code !== 4001)
+      if (error?.code !== MetamaskErrors.UserRejected)
         dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
