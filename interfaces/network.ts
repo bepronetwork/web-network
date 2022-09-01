@@ -118,8 +118,8 @@ export interface NetworkSettings {
   };
   tokens?: {
     settler: string;
-    bounty: string;
-    bountyURI: string;
+    allowedTransactions: Token[],
+    allowedRewards: Token[],
     validated: boolean;
   };
   fields?: {

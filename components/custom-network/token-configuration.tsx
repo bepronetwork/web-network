@@ -3,18 +3,19 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 
 import Button from "components/button";
-import DeployNFTModal from "components/deploy-nft-modal";
+import DeployERC20Modal from "components/deploy-erc20-modal";
+import MultipleTokensDropdown from "components/multiple-tokens-dropdown";
 import Step from "components/step";
-import TokensDropdown from "components/tokens-dropdown";
 
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
-import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
 import { useSettings } from "contexts/settings";
 
 import { StepWrapperProps } from "interfaces/stepper";
 import { Token } from "interfaces/token";
+
+import useApi from "x-hooks/use-api";
 
 export default function TokenConfiguration({ 
   activeStep, 
@@ -22,23 +23,25 @@ export default function TokenConfiguration({
   validated, 
   handleClick, 
   finishLabel, 
-  handleFinish 
+  handleFinish
 } : StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
   
-  const [bountyTokenUri, setBountyTokenUri] = useState("");
+  const { wallet } = useAuthentication();
+  const [networkTokenAddress, setNetworkTokenAddress] = useState("");
+  const [networkTokenError, setNetworkTokenError] = useState(false);
   const [networkToken, setNetworkToken] = useState<Token>();
   const [showModalDeploy, setShowModalDeploy] = useState(false);
-  const [bountyTokenError, setBountyTokenError] = useState(false);
-  const [bountyTokenAddress, setBountyTokenAddress] = useState("");
-  const [bountyTokenUriError, setBountyTokenUriError] = useState(false);
-  const [customTokens, setCustomTokens] = useState<Token[]>([]);
-  
-  const { settings } = useSettings();
-  const { wallet } = useAuthentication();
-  const { activeNetwork } = useNetwork();
-  const { service: DAOService } = useDAO();
+  const [allowedTransactionalTokens, setAllowedTransactionalTokens] = useState<Token[]>();
+  const [allowedRewardTokens, setAllowedRewardTokens] = useState<Token[]>();
+  const [selectedRewardTokens, setSelectedRewardTokens] = useState<Token[]>();
+  const [selectedTransactionalTokens, setSelectedTransactionalTokens] =
+    useState<Token[]>();
+
   const { tokens, fields } = useNetworkSettings();
+  const { service: DAOService } = useDAO();
+  const { getTokens } = useApi();
+  const { settings } = useSettings();
 
   function handleShowModal() {
     setShowModalDeploy(true);
@@ -48,48 +51,50 @@ export default function TokenConfiguration({
     setShowModalDeploy(false);
   }
 
-  function addToken(newToken: Token) {
-    setCustomTokens([
-      ...customTokens,
+  function addTransactionalToken(newToken: Token) {
+    setAllowedTransactionalTokens([
+      ...allowedTransactionalTokens,
       newToken
     ]);
   }
 
-  function handleNFTTokenChange(e) {
-    setBountyTokenAddress(e.target.value);
-    setBountyTokenError(false);
+  function addRewardToken(newToken: Token) {
+    setAllowedRewardTokens([
+      ...allowedRewardTokens,
+      newToken
+    ]);
   }
 
-  function handleNFTTokenURIChange(e) {
-    setBountyTokenUri(e.target.value);
-    setBountyTokenUriError(false);
+  function changeSelectedTransactionalTokens(newToken: Token[]) {
+    setSelectedTransactionalTokens(newToken);
   }
 
-  function handleNetworkTokenChange(token: Token) {
-    fields.settlerToken.setter(token.address);
+  function changeSelectedRewardTokens(newToken: Token[]) {
+    setSelectedRewardTokens(newToken);
+  }
+
+  function handleNetworkTokenChange(e) {
+    setNetworkTokenAddress(e.target.value)
+    setNetworkToken({ address: "", name: "", symbol: ""})
+    setNetworkTokenError(false);
   }
 
   function setDeployedAddress(address) {
-    setBountyTokenAddress(address);
-    fields.bountyToken.setter(address);
+    setNetworkTokenAddress(address);
+    fields.settlerToken.setter(address);
   }
 
-  function validateTokenUri() {
-    setBountyTokenUriError(bountyTokenUri.trim() === "");
-    fields.bountyURI.setter(bountyTokenUri);
-  }
-
-  async function validateNFTAddress() {
-    if (bountyTokenAddress.trim() === "") fields.bountyToken.setter(bountyTokenAddress);
-    if (bountyTokenAddress.trim() === "" || !DAOService) return undefined;
+  async function validateNetworkAddress() {
+    if (networkTokenAddress.trim() === "") fields.settlerToken.setter(networkTokenAddress);
+    if (networkTokenAddress.trim() === "" || !DAOService) return undefined;
 
     try {
-      await DAOService.loadBountyToken(bountyTokenAddress);
-      fields.bountyToken.setter(bountyTokenAddress);
-      setBountyTokenError(false);
+      await DAOService.getERC20TokenData(networkTokenAddress).then(setNetworkToken)
+      fields.settlerToken.setter(networkTokenAddress);
+      setNetworkTokenError(false);
     } catch(error) {
-      setBountyTokenError(true);
-
+      setNetworkTokenError(true);
+      setNetworkToken({ address: "", name: "", symbol: ""})
       return false;
     }
 
@@ -111,17 +116,35 @@ export default function TokenConfiguration({
         .then(setNetworkToken)
         .catch(console.log);
     
-    validateNFTAddress();
-  }, [tokens?.settler, tokens?.bounty, DAOService]);
+    validateNetworkAddress();
+  }, [tokens?.settler, DAOService]);
  
   useEffect(() => {
-    if(bountyTokenAddress.length < 18) validateNFTAddress()
-  },[bountyTokenAddress])
+    if(networkTokenAddress.length < 18) validateNetworkAddress()
+  },[networkTokenAddress])
 
   useEffect(() => {
-    if (settings?.beproToken) setCustomTokens([settings.beproToken]);
-  }, [settings]);
+    fields.allowedRewards.setter(selectedRewardTokens)
+  }, [selectedRewardTokens])
+
+  useEffect(() => {
+    fields.allowedTransactions.setter(selectedTransactionalTokens)
+  }, [selectedTransactionalTokens])
+
+  useEffect(() => {
+    if(!wallet?.address) return
+    getTokens().then(tokens => {
+      setAllowedTransactionalTokens(tokens.filter((token) => token.isTransactional === true))
+      setAllowedRewardTokens(tokens.filter((token) => token.isTransactional === false))
+    }).catch(err => console.log('err tokens ->', err))
+  }, [wallet?.address])
   
+  function handleEmptyTokens (tokens: Token[]) {
+    if(tokens?.length === 0) return [settings?.beproToken]
+
+    return tokens
+  }
+
   return (
     <Step
       title={t("custom-network:steps.token-configuration.title")}
@@ -132,66 +155,27 @@ export default function TokenConfiguration({
       handleFinish={handleFinish}
       finishLabel={finishLabel}
     >
-      <div className="row">
-        <TokensDropdown 
-          label={t("custom-network:steps.token-configuration.fields.tokens-dropdown.label")}
-          description={t("custom-network:steps.token-configuration.fields.tokens-dropdown.description")}
-          tokens={customTokens} 
-          canAddToken={
-            activeNetwork?.name === settings?.defaultNetworkConfig?.name ? 
-            settings?.defaultNetworkConfig?.allowCustomTokens :
-            !!activeNetwork?.allowCustomTokens
-          }
-          addToken={addToken} 
-          setToken={handleNetworkTokenChange}
-          userAddress={wallet?.address}
-        /> 
-      </div>
-
-      <div className="row">
-        <div className="form-group col-3">
-          <label className="caption-small mb-2">
-            {t("custom-network:steps.token-configuration.fields.name.label")}
-          </label>
-          <input type="text" className="form-control" value={networkToken?.name}  readOnly />
-        </div>
-
-        <div className="form-group col-3">
-          <label className="caption-small mb-2">
-          {t("custom-network:steps.token-configuration.fields.symbol.label")}
-          </label>
-          <input type="text" className="form-control" value={networkToken?.symbol}  readOnly />
-        </div>
-
-        <div className="form-group col-6">
-          <label className="caption-small mb-2">
-            {t("custom-network:steps.token-configuration.fields.address.label")}
-          </label>
-          <input type="text" className="form-control" value={networkToken?.address}  readOnly />
-        </div>
-      </div>
-
       <div className="row align-items-center">
         <div className="form-group col-9">
           <label className="caption-small mb-2">
-            {t("custom-network:steps.token-configuration.fields.nft-token.label")}
+            {t("custom-network:steps.token-configuration.fields.tokens-dropdown.label")}
           </label>
 
           <input 
             type="text" 
             className="form-control" 
-            value={bountyTokenAddress}
-            onChange={handleNFTTokenChange}
-            onBlur={validateNFTAddress}
+            value={networkTokenAddress}
+            onChange={handleNetworkTokenChange}
+            onBlur={validateNetworkAddress}
           />
 
           {
-            bountyTokenError && 
+            networkTokenError && 
             <small className="small-info text-danger">
               {t("custom-network:steps.token-configuration.fields.nft-token.error.pre")}
               {" "}
-              <a href="https://sdk.dappkit.dev/classes/BountyToken.html" target="_blank">
-                {t("custom-network:steps.token-configuration.fields.nft-token.error.mid")}
+              <a href="https://sdk.dappkit.dev/" target="_blank">
+                {t("misc.token")}
               </a>
               {" "}
               {t("custom-network:steps.token-configuration.fields.nft-token.error.post")}
@@ -201,38 +185,55 @@ export default function TokenConfiguration({
 
         <div className="col-3 pt-2">
           <Button onClick={handleShowModal}>
-            {t("custom-network:steps.token-configuration.actions.deploy-nft-token")}
+            {t("custom-network:steps.token-configuration.actions.deploy-new-token")}
           </Button>
         </div>
       </div>
 
-      <div className="row align-items-center">
-        <div className="form-group col-12">
+      <div className="row">
+        <div className="form-group col-6">
           <label className="caption-small mb-2">
-            {t("custom-network:steps.token-configuration.fields.nft-token-uri.label")}
+            {t("custom-network:steps.token-configuration.fields.name.label")}
           </label>
+          <input type="text" className="form-control" value={networkToken?.name}  readOnly />
+        </div>
 
-          <input 
-            type="text" 
-            className="form-control" 
-            value={bountyTokenUri}
-            onChange={handleNFTTokenURIChange}
-            onBlur={validateTokenUri}
-          />
-
-          {
-            bountyTokenUriError && 
-            <small className="small-info text-danger">
-              {t("custom-network:steps.token-configuration.fields.nft-token-uri.error")}
-            </small>
-          }
+        <div className="form-group col-6">
+          <label className="caption-small mb-2">
+          {t("custom-network:steps.token-configuration.fields.symbol.label")}
+          </label>
+          <input type="text" className="form-control" value={networkToken?.symbol}  readOnly />
         </div>
       </div>
 
-      <DeployNFTModal 
+      <div className="row">
+          <>
+            <MultipleTokensDropdown
+              label={t("select-multiple.allowed-transactional-tokens")}
+              description={t("select-multiple.add-transactional-tokens")}
+              addToken={addTransactionalToken}
+              tokens={handleEmptyTokens(allowedTransactionalTokens)}
+              canAddToken={false}
+              selectedTokens={selectedTransactionalTokens}
+              changeSelectedTokens={changeSelectedTransactionalTokens}
+            />
+
+            <MultipleTokensDropdown
+              label={t("select-multiple.allowed-reward-tokens")}
+              description={t("select-multiple.add-reward-tokens")}
+              addToken={addRewardToken}
+              tokens={handleEmptyTokens(allowedRewardTokens)}
+              canAddToken={false}
+              selectedTokens={selectedRewardTokens}
+              changeSelectedTokens={changeSelectedRewardTokens}
+            />
+          </>
+      </div>
+
+      <DeployERC20Modal 
         show={showModalDeploy}
         setClose={handleCloseModal}
-        setNFTAddress={setDeployedAddress}
+        setERC20Address={setDeployedAddress}
       />
     </Step>
   );

@@ -7,32 +7,37 @@ import LockedIcon from "assets/icons/locked-icon";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import useBepro from "x-hooks/use-bepro";
+import { useAuthentication } from "contexts/authentication";
 
-export default function DeployNFTModal({
+import useERC20 from "x-hooks/use-erc20";
+
+export default function DeployERC20Modal({
   show,
   setClose,
-  setNFTAddress
+  setERC20Address
 }:{
   show: boolean
   setClose: () => void
-  setNFTAddress: (address: string) => void
+  setERC20Address: (address: string) => void
 }) {
   const { t } = useTranslation(["common", "change-token-modal", "custom-network"]);
   
-  const [name, setName] = useState('');
-  const [symbol, setSymbol] = useState('');
+  const [name, setName] = useState<string>('');
+  const [symbol, setSymbol] = useState<string>('');
+  const [cap, setCap] = useState<number>(0);
   const [isExecuting, setIsExecuting] = useState(false);
 
-  const { handleDeployBountyToken } = useBepro();
+  const { handleDeployERC20Token } = useERC20();
+  const { wallet } = useAuthentication();
 
-  async function deployContract() {    
+  async function deployContract() {  
     try {
+      if(!wallet?.address) return;  
       setIsExecuting(true);
 
-      const tx = await handleDeployBountyToken(name, symbol);
+      await handleDeployERC20Token(name, symbol, cap.toString(), wallet?.address)
+      .then(token => setERC20Address(token.contractAddress))
 
-      setNFTAddress(tx.contractAddress);
       setDefaults();
       setClose();
     } catch (error) {
@@ -43,12 +48,13 @@ export default function DeployNFTModal({
   }
 
   function canSubmit() {
-    return name.trim() !== "" && symbol.trim() !== "";
+    return name.trim() !== "" && symbol.trim() !== "" && cap > 0 ;
   }
 
   function setDefaults() {
     setName("");
     setSymbol("");
+    setCap(0)
     setIsExecuting(false);
   }
 
@@ -61,12 +67,12 @@ export default function DeployNFTModal({
     <Modal 
       show={show} 
       onCloseClick={handleClose} 
-      title={t("custom-network:modals.deploy-nft-token.title")} 
+      title={t("change-token-modal:title-erc20")} 
       titlePosition="center"
     >
       <div className="container">
         <p className="caption-small trans mb-2 text-center">
-          {t("custom-network:modals.deploy-nft-token.description")}
+        {t("change-token-modal:description-erc20")} 
         </p>
 
         <div className="row">
@@ -102,6 +108,23 @@ export default function DeployNFTModal({
                 className="form-control rounded-4" 
                 value={symbol} 
                 onChange={e => setSymbol(e.target.value)} 
+              />
+            </div>
+          </div>
+          <div className="col-12">
+            <div className="form-group">
+              <label 
+                htmlFor="" 
+                className="caption-small mb-2 text-gray"
+              >
+                {t("misc.cap")}
+              </label>
+
+              <input 
+                type="number" 
+                className="form-control rounded-4" 
+                value={cap} 
+                onChange={e => setCap(Number(e.target.value))} 
               />
             </div>
           </div>

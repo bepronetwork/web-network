@@ -55,7 +55,7 @@ export default function NewNetwork() {
   const { handleChangeNetworkParameter } = useBepro();
   const { getURLWithNetwork, colorsToCSS } = useNetworkTheme();
   const { tokensLocked, details, github, tokens, settings } = useNetworkSettings();
-  const { handleDeployNetworkV2, handleSetDispatcher, handleAddNetworkToRegistry } = useBepro();
+  const { handleDeployNetworkV2, handleAddNetworkToRegistry } = useBepro();
 
   const { dispatch } = useContext(ApplicationContext);
 
@@ -67,9 +67,8 @@ export default function NewNetwork() {
     { id: 1, name: t("custom-network:modals.loader.steps.changing-disputable-time") },
     { id: 1, name: t("custom-network:modals.loader.steps.changing-dispute-percentage") },
     { id: 1, name: t("custom-network:modals.loader.steps.changing-council-amount") },
-    { id: 2, name: t("custom-network:modals.loader.steps.set-dispatcher") },
-    { id: 3, name: t("custom-network:modals.loader.steps.add-to-registry") },
-    { id: 4, name: t("custom-network:modals.loader.steps.sync-web-network") }
+    { id: 2, name: t("custom-network:modals.loader.steps.add-to-registry") },
+    { id: 3, name: t("custom-network:modals.loader.steps.sync-web-network") }
   ];
 
   async function handleCreateNetwork() {
@@ -111,12 +110,7 @@ export default function NewNetwork() {
 
     setCreatingNetwork(0);
 
-    const deployNetworkTX = await handleDeployNetworkV2(tokens.settler,
-                                                        tokens.bounty,
-                                                        tokens.bountyURI,
-                                                        settings.treasury.address.value,
-                                                        settings.treasury.cancelFee.value,
-                                                        settings.treasury.closeFee.value).catch(error => error);
+    const deployNetworkTX = await handleDeployNetworkV2(tokens.settler).catch(error => error);
 
     if (!(deployNetworkTX as TransactionReceipt)?.contractAddress) return setCreatingNetwork(undefined);
 
@@ -149,15 +143,10 @@ export default function NewNetwork() {
 
     setCreatingNetwork(5);
 
-    await handleSetDispatcher(tokens.bounty, deployedNetworkAddress)
-      .catch(error => console.error("Failed to set dispatcher", deployedNetworkAddress, error));
-
-    setCreatingNetwork(6);
-
     await handleAddNetworkToRegistry(deployedNetworkAddress)
       .catch(error => console.error("Failed to add to registry", deployedNetworkAddress, error));
 
-    setCreatingNetwork(7);
+    setCreatingNetwork(6);
 
     await registerNetwork({
       creator: payload.creator
@@ -216,7 +205,6 @@ export default function NewNetwork() {
         <CreatingNetworkLoader currentStep={creatingNetwork} steps={creationSteps} />) || 
         ""
       }
-
       <CustomContainer>
         <div className="mt-5 pt-5">
           <Stepper>
