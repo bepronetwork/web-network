@@ -32,7 +32,6 @@ export default function NetworkParameterInput({
         placeholder={"0"}
         thousandSeparator
         onValueChange={handleChange}
-        decimalScale={decimals}
         disabled={disabled}
         {...props}
       />
