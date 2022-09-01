@@ -91,7 +91,7 @@ export default function ConnectAccount() {
       const reason = error?.response?.status === 409 ? t("connect-account.errors.no-actions-needed") : 
         t("connect-account.errors.try-again");
 
-      dispatch(toastError(reason, t("connect-account.errors.something-went-wrong")));
+      dispatch(toastError(reason, t("connect-account:errors.something-went-wrong")));
     })
     .finally(() => dispatch(changeLoadState(false)));
   }
