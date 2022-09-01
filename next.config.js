@@ -47,6 +47,9 @@ const serverRuntimeConfig = {
     accessToken: process.env.NEXT_TWITTER_ACCESS_TOKEN,
     accessSecret: process.env.NEXT_TWITTER_ACCESS_SECRET
   },
+  schedules: {
+    startProcessEventsAt: process.env.SCHEDULES_START_BLOCK
+  },
   e2eEnabled: process.env.NEXT_E2E_TESTNET || false,
   scheduleInterval: process.env.NEXT_E2E_TESTNET || 60,
 }
