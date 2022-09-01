@@ -24,6 +24,7 @@ import { addToast } from "contexts/reducers/add-toast";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 import { useRepos } from "contexts/repos";
 
+import { MetamaskErrors } from "interfaces/enums/Errors";
 import { pullRequest } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
@@ -123,8 +124,11 @@ export default function PullRequestPage() {
         content: t("pull-request:actions.make-ready.success"),
       }));
     })
-    .catch(() => {
+    .catch(error => {
       setIsMakingReady(false);
+      
+      if (error?.code === MetamaskErrors.UserRejected) return;
+      
       dispatch(addToast({
           type: "danger",
           title: t("actions.failed"),
