@@ -101,10 +101,10 @@ export default function CreateBountyModal() {
   const [isLoadingCreateBounty, setIsLoadingCreateBounty] = useState<boolean>(false);
   const { settings } = useSettings();
 
-  const canAddCustomToken =
-    activeNetwork?.networkAddress === settings?.contracts?.network
-      ? settings?.defaultNetworkConfig?.allowCustomTokens
-      : !!activeNetwork?.allowCustomTokens;
+  const [canAddCustomToken, setCanAddCustomToken] = 
+  useState<boolean>(activeNetwork?.networkAddress === settings?.contracts?.network
+    ? settings?.defaultNetworkConfig?.allowCustomTokens
+    : !!activeNetwork?.allowCustomTokens)
 
   const steps = [
     t("bounty:steps.details"),
@@ -152,7 +152,11 @@ export default function CreateBountyModal() {
       <CreateBountyTokenAmount
         currentToken={type === "bounty" ? transactionalToken : rewardToken}
         setCurrentToken={type === "bounty" ? setTransactionalToken : setRewardToken}
-        customTokens={customTokens}
+        customTokens={
+          type === "bounty"
+            ? customTokens.filter((token) => token.isTransactional !== false)
+            : customTokens.filter((token) => token.isTransactional !== true)
+        }
         userAddress={wallet?.address}
         defaultToken={review && ((type === "bounty" ? transactionalToken : rewardToken))}
         canAddCustomToken={canAddCustomToken}
@@ -423,24 +427,21 @@ export default function CreateBountyModal() {
   }, [customTokens])
 
   useEffect(() => {
-    if (!activeNetwork?.networkToken || !settings?.contracts?.settlerToken) return;
+    if (!settings?.contracts?.settlerToken && !activeNetwork.tokens) return;
+    if (!activeNetwork?.tokens && settings?.contracts?.settlerToken) {
+      const beproToken = {
+        address: settings.contracts.settlerToken,
+        name: "Bepro Network",
+        symbol: "BEPRO"
+      };
 
-    const tmpTokens = [];
-    const beproToken = {
-      address: settings.contracts.settlerToken,
-      name: "Bepro Network",
-      symbol: "BEPRO"
-    };
-
-    tmpTokens.push(beproToken);
-
-    if (activeNetwork.networkToken.address.toLowerCase() !== beproToken?.address?.toLowerCase())
-      tmpTokens.push(activeNetwork.networkToken);
-
-    tmpTokens.push(...activeNetwork.tokens.map(({ name, symbol, address }) => ({ name, symbol, address } as Token)));
-
-    getTokenInfo(tmpTokens);
-  }, [activeNetwork?.networkToken, settings]);
+      getTokenInfo([beproToken])
+      setCanAddCustomToken(true)
+      return;
+    }
+    setCanAddCustomToken(false)
+    getTokenInfo(activeNetwork.tokens);
+  }, [activeNetwork?.tokens, settings]);
 
   function cleanFields() {
     setBountyTitle("");

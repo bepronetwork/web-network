@@ -61,7 +61,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       repositories,
       botPermission,
       accessToken,
-      githubLogin
+      githubLogin,
+      allowedTokens
     } = req.body;
 
     if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
@@ -173,6 +174,31 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
           LogError('[GH Accpet Invitation Fail]', {e})
           return e;
         });
+    }
+
+    for (const repository of repos) {
+      await Database.repositories.create({
+        githubPath: repository.fullName,
+        network_id: network.id
+      });
+    }
+//TODO: move tokens logic to new endpoint   
+    if(allowedTokens?.allowedTransactions.length > 0){
+      for (const token of allowedTokens.allowedTransactions) {
+        await Database.networkTokens.create({
+          networkId: network.id,
+          tokenId: token.id
+        })
+      }
+    }
+
+    if(allowedTokens?.allowedRewards.length > 0){
+      for (const token of allowedTokens.allowedRewards) {
+        await Database.networkTokens.create({
+          networkId: network.id,
+          tokenId: token.id
+        })
+      }
     }
 
     return res.status(200).json("Network created");
