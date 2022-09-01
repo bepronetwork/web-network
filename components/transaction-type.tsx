@@ -35,6 +35,8 @@ export default function TransactionType({ type }) {
     [TransactionTypes.setCouncilAmount]: t("transactions.types.set-council-amount"),
     [TransactionTypes.fundBounty]: t("transactions.types.fund-bounty"),
     [TransactionTypes.retractFundBounty]: t("transactions.types.retract-fund"),
+    [TransactionTypes.withdrawFundRewardBounty]: t("transactions.types.withdraw-fund-reward-bounty"),
+    [TransactionTypes.deployERC20Token]: t("transactions.types.deploy-erc20-token")
   };
 
   return (
