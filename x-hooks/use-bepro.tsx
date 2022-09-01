@@ -440,23 +440,13 @@ export default function useBepro() {
     });
   }
 
-  async function handleDeployNetworkV2(networkToken: string, 
-                                       nftToken: string, 
-                                       nftUri: string,
-                                       treasuryAddress: string,
-                                       cancelFee: number,
-                                       closeFee: number): Promise<TransactionReceipt | Error> {
+  async function handleDeployNetworkV2(networkToken: string): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const transaction = addTransaction({ type: TransactionTypes.deployNetworkV2 }, activeNetwork);
 
       dispatch(transaction);
 
-      await DAOService.deployNetworkV2(networkToken, 
-                                       nftToken, 
-                                       nftUri,
-                                       treasuryAddress,
-                                       cancelFee,
-                                       closeFee)
+      await DAOService.deployNetworkV2(networkToken)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           txWindow.updateItem(transaction.payload.id, parseTransaction(txInfo, transaction.payload));
           resolve(txInfo);
@@ -654,6 +644,33 @@ export default function useBepro() {
     });
   }
 
+  async function handleWithdrawFundRewardBounty(bountyId: number, fundingId: number) {
+    return new Promise(async (resolve, reject) => {
+      const transaction = addTransaction({ type: TransactionTypes.withdrawFundRewardBounty }, activeNetwork);
+
+      dispatch(transaction);
+
+      await DAOService.withdrawFundRewardBounty(bountyId, fundingId)
+        .then((txInfo: TransactionReceipt) => {
+          txWindow.updateItem(transaction.payload.id,  parseTransaction(txInfo, transaction.payload));
+          resolve(txInfo);
+        })
+        .catch((err: { message: string; }) => {
+          if (err?.message?.search("User denied") > -1)
+            dispatch(updateTransaction({
+              ...(transaction.payload as BlockTransaction),
+              status: TransactionStatus.rejected
+            }));
+          else
+            dispatch(updateTransaction({
+              ...(transaction.payload as BlockTransaction),
+              status: TransactionStatus.failed
+            }));
+          reject(err);
+        });
+    });
+  }
+
   return {
     handlerDisputeProposal,
     handleCloseIssue,
@@ -673,6 +690,7 @@ export default function useBepro() {
     handleDeployBountyToken,
     handleChangeNetworkParameter,
     handleFundBounty,
-    handleRetractFundBounty
+    handleRetractFundBounty,
+    handleWithdrawFundRewardBounty
   };
 }
