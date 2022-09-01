@@ -86,6 +86,12 @@
   },
   "select-a-repository": "Select a repository",
   "select-a-branch": "Select a branch",
+  "select-multiple": {
+    "allowed-transactional-tokens": "Allowed Transactional tokens",
+    "add-transactional-tokens": "Add Transactional tokens",
+    "allowed-reward-tokens": "Allowed Reward tokens",
+    "add-reward-tokens": "Add Reward tokens"
+  },
   "status": {
     "network-problems": "network problems",
     "waiting": "waiting",
@@ -140,6 +146,7 @@
     "ago": "ago",
     "and": "and",
     "add": "Add",
+    "cap": "cap",
     "comments_one": "{{count}} comment",
     "comments_other": "{{count}} comments",
     "created-at": "Created at",
@@ -354,7 +361,9 @@
       "set-council-amount": "Set Council Amount",
       "set-percentage-dispute": "Set Percentage for Dispute",
       "fund-bounty": "Fund Bounty",
-      "retract-fund": "Retract Bounty Fund"
+      "retract-fund": "Retract Bounty Fund",
+      "withdraw-fund-reward-bounty": "Withdraw Reward Bounty Fund",
+      "deploy-erc20-token": "Deploy ERC20 Token"
     }
   },
   "sort": {
