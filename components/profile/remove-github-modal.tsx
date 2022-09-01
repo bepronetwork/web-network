@@ -27,9 +27,8 @@ function RemoveGithubAccount({
   onCloseClick,
   disconnectGithub
 } : RemoveGithubAccountProps) {
-  const router = useRouter();
   const { t } = useTranslation(["profile", "common"]);
-
+  const router = useRouter();
   const [isExecuting, setIsExecuting] = useState(false);
 
   const { resetUser } = useApi();
@@ -55,8 +54,7 @@ function RemoveGithubAccount({
         } else 
           dispatch(toastError(t("modals.remove-github.errors.check-requirements"), 
                               t("modals.remove-github.errors.failed-to-remove")));
-        setIsExecuting(false);
-      })
+      }).finally(()=> setIsExecuting(false))
   }
 
   return(
