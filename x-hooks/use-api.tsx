@@ -18,6 +18,7 @@ import { Network } from "interfaces/network";
 import { PaginatedData } from "interfaces/paginated-data";
 import { Proposal } from "interfaces/proposal";
 import { ReposList } from "interfaces/repos-list";
+import { Token } from "interfaces/token";
 
 import client from "services/api";
 
@@ -438,6 +439,16 @@ export default function useApi() {
       });
   }
 
+  
+  async function getTokens() {
+    return client
+      .get<Token[]>(`/tokens`)
+      .then(({ data }) => data)
+      .catch((error) => {
+        throw error;
+      });
+  }
+
   async function searchNetworks({
     page = "1",
     name = "",
@@ -531,6 +542,7 @@ export default function useApi() {
     cancelPrePullRequest,
     resetUser,
     getSettings,
-    registerNetwork
+    registerNetwork,
+    getTokens
   };
 }
