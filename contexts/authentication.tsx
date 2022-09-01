@@ -19,6 +19,7 @@ import { User, Wallet } from "interfaces/authentication";
 import { CustomSession } from "interfaces/custom-session";
 
 import useApi from "x-hooks/use-api";
+import useNetworkTheme from "x-hooks/use-network";
 
 export interface IAuthenticationContext {
   user?: User;
@@ -38,13 +39,13 @@ const EXCLUDED_PAGES = ["/networks", "/connect-account", "/new-network", "/[netw
 
 export const AuthenticationProvider = ({ children }) => {
   const session = useSession();
-  const { asPath, pathname, push } = useRouter();
+  const { asPath, pathname, push, replace } = useRouter();
 
   const [user, setUser] = useState<User>();
   const [wallet, setWallet] = useState<Wallet>();
   const [databaseUser, setDatabaseUser] = useState<UserApi>();
   const [isGithubAndWalletMatched, setIsGithubAndWalletMatched] = useState<boolean>();
-
+  const {getURLWithNetwork} = useNetworkTheme()
   const { getUserOf, getUserWith } = useApi();
   const { service: DAOService, connect } = useDAO();
 
@@ -64,8 +65,11 @@ export const AuthenticationProvider = ({ children }) => {
   }, [user?.login, asPath, DAOService]);
 
   
-  const disconnectWallet = useCallback(() => {
+  const disconnectWallet = useCallback(async () => {
+    localStorage.clear();
     setWallet(undefined);
+    await replace(getURLWithNetwork('/'));
+    signOut();
   }, []);
 
   const disconnectGithub = useCallback(async () => {

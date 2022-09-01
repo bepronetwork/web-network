@@ -41,7 +41,7 @@ export default function ConnectAccount() {
 
   const { user: sessionUser } = (sessionData || {}) as CustomSession;
 
-  const isButtonDisabled = isGithubAndWalletMatched !== undefined;
+  const isButtonDisabled = [isGithubAndWalletMatched !== undefined, !wallet?.address.toLowerCase()].some(t=>t);
   const connectButtonState = {
     "undefined": undefined,
     "true": "success",
