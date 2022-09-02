@@ -167,7 +167,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       }
     }
 
-    if(allowedTokens?.allowedRewards.length > 0){
+    if(allowedTokens?.allowedRewards?.length > 0){
       for (const token of allowedTokens.allowedRewards) {
         await Database.networkTokens.create({
           networkId: network.id,

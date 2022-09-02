@@ -496,15 +496,13 @@ export const NetworkSettingsProvider = ({ children }) => {
   useEffect(() => {
     const validated = [
       tokens?.settler?.trim() !== "",
-      tokens?.allowedRewards?.length > 0,
-      tokens?.allowedTransactions?.length > 0,
     ].every(condition => condition);
 
     setTokens(previous => ({
       ...previous,
       validated
     }));
-  }, [tokens?.settler, tokens?.allowedRewards, tokens?.allowedTransactions]);
+  }, [tokens?.settler]);
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({
     tokensLocked,
