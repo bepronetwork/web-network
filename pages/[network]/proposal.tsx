@@ -21,6 +21,7 @@ import { addToast } from "contexts/reducers/add-toast";
 
 
 import { ProposalExtended } from "interfaces/bounty";
+import { MetamaskErrors } from "interfaces/enums/Errors";
 import { pullRequest } from "interfaces/issue-data";
 import {
   Proposal,
@@ -63,7 +64,7 @@ export default function PageProposal() {
         }));
       })
       .catch(error => {
-        if (error?.code === 4001) return;
+        if (error?.code === MetamaskErrors.UserRejected) return;
 
         console.log("Failed to close bounty", error);
 
@@ -87,7 +88,7 @@ export default function PageProposal() {
         getNetworkIssue();
       })
       .catch(error => {
-        if (error?.code === 4001) return;
+        if (error?.code === MetamaskErrors.UserRejected) return;
 
         console.log("Failed to dispute proposal", error);
 
@@ -117,7 +118,7 @@ export default function PageProposal() {
       }));
     })
     .catch(error => {
-      if (error?.code === 4001) return;
+      if (error?.code === MetamaskErrors.UserRejected) return;
       
       console.log("Failed to refuse proposal", error);
 

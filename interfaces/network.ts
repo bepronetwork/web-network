@@ -31,6 +31,7 @@ export interface Network {
   proposerFeeShare?: number;
   percentageNeededForDispute?: number;
   treasury?: TreasuryInfo;
+  isRegistered?: boolean;
 }
 
 export interface ThemeColors {

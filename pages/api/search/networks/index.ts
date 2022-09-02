@@ -9,7 +9,7 @@ import paginate, { calculateTotalPages } from "helpers/paginate";
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const whereCondition: WhereOptions = {};
 
-  const { name, creatorAddress, networkAddress, page } = req.query || {};
+  const { name, creatorAddress, networkAddress, isClosed, isRegistered, page } = req.query || {};
 
   if (name) whereCondition.name = name;
 
@@ -18,7 +18,13 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
   if (networkAddress)
     whereCondition.networkAddress = { [Op.iLike]: String(networkAddress) };
+  
+  if (isClosed)
+    whereCondition.isClosed = isClosed;
 
+  if (isRegistered)
+    whereCondition.isRegistered = isRegistered;
+    
   const include = [
     { association: "tokens" }
   ];

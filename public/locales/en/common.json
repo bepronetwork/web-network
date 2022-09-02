@@ -132,7 +132,8 @@
     "disconnect-accounts": "Disconnect Accounts",
     "show": "Show",
     "hide": "Hide",
-    "remove": "Remove"
+    "remove": "Remove",
+    "register": "Register"
   },
   "misc": {
     "by": "by",

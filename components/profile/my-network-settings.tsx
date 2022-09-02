@@ -4,6 +4,7 @@ import { Col, Row } from "react-bootstrap";
 import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
 
+import InfoIconEmpty from "assets/icons/info-icon-empty";
 import LockedIcon from "assets/icons/locked-icon";
 
 import Button from "components/button";
@@ -21,7 +22,7 @@ import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
-import { toastError, toastSuccess } from "contexts/reducers/add-toast";
+import { addToast, toastError, toastSuccess } from "contexts/reducers/add-toast";
 
 import { psReadAsText } from "helpers/file-reader";
 import { formatDate } from "helpers/formatDate";
@@ -46,19 +47,21 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [isClosing, setIsClosing] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
   const [isAbleToBeClosed, setIsAbleToBeClosed] = useState(false);
   const [updatingNetwork, setUpdatingNetwork] = useState(false);
 
-  const { updateNetwork } = useApi();
-  const { activeNetwork, updateActiveNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
   const { colorsToCSS } = useNetworkTheme();
+  const { updateNetwork, registerNetwork } = useApi();
   const { handleChangeNetworkParameter } = useBepro();
   const { dispatch } = useContext(ApplicationContext);
+  const { activeNetwork, updateActiveNetwork } = useNetwork();
   const { user, wallet, updateWalletBalance } = useAuthentication();
   const { details, fields, github, settings, forcedNetwork, setForcedNetwork } = useNetworkSettings();
 
   const isCurrentNetwork = !!network && !!activeNetwork && network?.networkAddress === activeNetwork?.networkAddress;
+  const networkNeedRegistration = network?.isRegistered === false;
 
   const settingsValidated = [
     fields.description.validator(details?.description),
@@ -214,18 +217,40 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
         setIsClosing(false);
       });
   }
+
+  function handleRegisterNetwork() {
+    setIsRegistering(true);
+    registerNetwork({
+      creator: wallet.address
+    })
+      .then(() => {
+        if (isCurrentNetwork) updateActiveNetwork(true);
+
+        return updateEditingNetwork();
+      })
+      .catch(error => {
+        dispatch(addToast({
+            type: "danger",
+            title: t("actions.failed"),
+            content: t("custom-network:errors.failed-to-create-network", {
+              error,
+            }),
+        }));
+
+        console.debug("Failed register network", error);
+      }).finally(() => setIsRegistering(false));
+  }
   
   useEffect(() => {
-    if (!network) return;
+    if (!network?.networkAddress) return;
 
     try {
-      const networkAddress = network?.networkAddress;
       const dao = new DAO({
         web3Connection: DAOService.web3Connection,
         skipWindowAssignment: true
       });
 
-      dao.loadNetwork(networkAddress)
+      dao.loadNetwork(network.networkAddress)
       .then(loaded => {
         if (!loaded) return;
 
@@ -276,11 +301,32 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
     } catch (error) {
       console.log("Failed to load network data", error, network);
     }
-  }, [network]);
+  }, [network?.networkAddress]);
 
   return(
     <>
       { isCurrentNetwork && <style>{colorsToCSS(settings?.theme?.colors)}</style> }
+      { networkNeedRegistration && 
+        <Row className="bg-warning-opac-25 py-2 border border-warning border-radius-4 align-items-center mb-2">
+          <Col xs="auto">
+            <InfoIconEmpty width={12} height={12} />
+            <span className="ml-1 caption-small">
+              {t("custom-network:errors.network-not-registered")}
+            </span>
+          </Col>
+          <Col xs="auto">
+            <Button 
+              color="warning"
+              onClick={handleRegisterNetwork}
+              disabled={!wallet?.address || !user?.accessToken || isRegistering}
+              withLockIcon={!wallet?.address || !user?.accessToken}
+              isLoading={isRegistering}
+            >
+              {t("actions.register")}
+            </Button>
+          </Col>
+        </Row> 
+      }
       <Row className="mb-3">
         <h3 className="text-capitalize family-Regular text-white">{network?.name}</h3>
       </Row>
@@ -435,7 +481,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
         <NetworkContractSettings />
       </Row>
 
-      {(settingsValidated && !network?.isClosed) &&
+      {(settingsValidated && !network?.isClosed && !networkNeedRegistration) &&
         <Row className="mt-1 mb-5">
           <Col>
             <Button onClick={handleSubmit} disabled={updatingNetwork}>

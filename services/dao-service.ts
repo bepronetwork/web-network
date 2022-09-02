@@ -472,6 +472,12 @@ export default class DAO {
     return this.registry.networkOfAddress(address);
   }
 
+  async hasNetworkRegistered(walletAddress: string): Promise<boolean> {
+    const networkAddress = await this.getNetworkAdressByCreator(walletAddress);
+
+    return networkAddress !== Defaults.nativeZeroAddress;
+  }
+
   async hardCancel(bountyId: number): Promise<TransactionReceipt>{
     return this.network.hardCancel(bountyId);
   }
