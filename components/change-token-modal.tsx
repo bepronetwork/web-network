@@ -46,10 +46,10 @@ export default function ChangeTokenModal({
         setIsValidAddress(false);
         return;
       } 
-
-      const token = await DAOService.loadERC20(address)
-      setName(await token.name());
-      setSymbol(await token.symbol());
+      
+      const token = await DAOService.getERC20TokenData(address)
+      setName(token.name);
+      setSymbol(token.symbol);
       setIsValidAddress(true);
     } catch (error) {
       setIsValidAddress(false);
