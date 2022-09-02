@@ -32,6 +32,7 @@ export interface Network {
   percentageNeededForDispute?: number;
   treasury?: TreasuryInfo;
   isRegistered?: boolean;
+  totalSettlerConverted?: number;
 }
 
 export interface ThemeColors {

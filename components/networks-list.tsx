@@ -18,32 +18,16 @@ import { orderByProperty } from "helpers/array";
 
 import { Network } from "interfaces/network";
 
+import { NetworksPageContext } from "pages/networks";
+
 import { getCoinInfoByContract } from "services/coingecko";
 import DAO from "services/dao-service";
 
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
-interface NetworksListProps {
-  name?: string;
-  networkAddress?: string;
-  creatorAddress?: string;
-  redirectToHome?: boolean;
-  addNetwork?: (address: string, 
-              totalBounties: number, 
-              amountInCurrency: number, 
-              totalSettlerLocked: number, 
-              tokenName: string,
-              tokenSymbol: string,
-              isListedInCoinGecko?: boolean) => void;
-}
 
-export default function NetworksList({
-  name,
-  networkAddress,
-  creatorAddress,
-  redirectToHome = false,
-  addNetwork
-}: NetworksListProps) {
+
+export default function NetworksList() {
   const router = useRouter();
   const { t } = useTranslation(["common", "custom-network"]);
 
@@ -57,73 +41,36 @@ export default function NetworksList({
   const { getURLWithNetwork } = useNetwork();
 
   const { dispatch } = useContext(ApplicationContext);
+  const { 
+    setNumberOfNetworks, 
+    setNumberOfBounties, 
+    setTotalConverted, 
+    setNotConvertedTokens 
+  } = useContext(NetworksPageContext);
 
   function handleOrderChange(newOrder) {
-    setNetworks(orderByProperty(networks, newOrder[0], newOrder[1]));
     setOrder(newOrder);
   }
 
   function handleRedirect(networkName) {
-    const url = redirectToHome ? "/" : "/account/my-network/settings";
-
-    router.push(getURLWithNetwork(url, {
+    router.push(getURLWithNetwork("/", {
         network: networkName
     }));
   }
 
-  useEffect(() => {
-    if (!DAOService) return;
-    
+  useEffect(() => {    
     dispatch(changeLoadState(true));
 
     searchNetworks({
-      name,
-      networkAddress,
-      creatorAddress,
       isRegistered: true,
       sortBy: "name",
       order: "asc"
     })
       .then(async ({ count, rows }) => {
         if (count > 0) {
-          return Promise.all(rows?.map(async (network: Network) => {
-            const networkAddress = network?.networkAddress;
-            const dao = new DAO({
-              web3Connection: DAOService.web3Connection,
-              skipWindowAssignment: true
-            });
+          setNumberOfNetworks(count);
 
-            await dao.loadNetwork(networkAddress);
-            
-            const [settlerTokenData, totalSettlerLocked, openBounties, totalBounties] = await Promise.all([
-              dao.getSettlerTokenData().catch(() => undefined),
-              dao.getTotalSettlerLocked().catch(() => 0),
-              dao.getOpenBounties().catch(() => 0),
-              dao.getTotalBounties().catch(() => 0)
-            ]);
-
-            const mainCurrency = settings?.currency?.defaultFiat || "eur";
-      
-            const coinInfo = await getCoinInfoByContract(settlerTokenData?.address).catch(() => ({ prices: {} }));
-      
-            addNetwork?.(networkAddress, 
-                         totalBounties, 
-                         (coinInfo.prices[mainCurrency] || 0) * totalSettlerLocked,
-                         totalSettlerLocked,
-                         settlerTokenData?.name,
-                         settlerTokenData?.symbol,
-                         !!coinInfo.prices[mainCurrency]);
-
-
-            return { ...network, 
-                     openBounties, 
-                     totalBounties, 
-                     networkToken: settlerTokenData, 
-                     tokensLocked: totalSettlerLocked 
-            }
-          }))
-          .then(network => setNetworks(network))
-          .catch(error => console.log("Failed to load network data", error, network))
+          setNetworks(rows);
         }
       })
       .catch((error) => {
@@ -132,7 +79,61 @@ export default function NetworksList({
       .finally(() => {
         dispatch(changeLoadState(false));
       });
-  }, [creatorAddress, DAOService]);
+  }, []);
+
+  useEffect(() => {
+    if (!networks.length) return;
+
+    setNumberOfBounties(networks.reduce((acc, el) => acc + (el?.totalBounties || 0), 0));
+    setTotalConverted(networks.reduce((acc, el) => acc + (el?.totalSettlerConverted || 0), 0));
+
+    const networkWithNotConvertedToken = 
+      networks.filter(network => network?.tokensLocked > 0 && network?.totalSettlerConverted === 0);
+
+    const notConvertedEntries = 
+      networkWithNotConvertedToken.map(({ tokensLocked, networkToken }) => [networkToken.address, {
+        name: networkToken.name,
+        symbol: networkToken.symbol,
+        totalSettlerLocked: tokensLocked
+      }]);
+
+    setNotConvertedTokens(Object.fromEntries(notConvertedEntries));
+
+    if (!DAOService || networks?.every(network => network?.openBounties !== undefined)) return;
+
+    Promise.all(networks.map(async (network: Network) => {
+      const networkAddress = network?.networkAddress;
+      const dao = new DAO({
+        web3Connection: DAOService.web3Connection,
+        skipWindowAssignment: true
+      });
+
+      await dao.loadNetwork(networkAddress);
+      
+      const [settlerTokenData, totalSettlerLocked, openBounties, totalBounties] = await Promise.all([
+        dao.getSettlerTokenData().catch(() => undefined),
+        dao.getTotalSettlerLocked().catch(() => 0),
+        dao.getOpenBounties().catch(() => 0),
+        dao.getTotalBounties().catch(() => 0)
+      ]);
+
+      const mainCurrency = settings?.currency?.defaultFiat || "eur";
+
+      const coinInfo = await getCoinInfoByContract(settlerTokenData?.address).catch(() => ({ prices: {} }));
+
+      const totalSettlerConverted = (coinInfo.prices[mainCurrency] || 0) * totalSettlerLocked;
+
+      return { ...network, 
+               openBounties, 
+               totalBounties, 
+               networkToken: settlerTokenData, 
+               tokensLocked: totalSettlerLocked,
+               totalSettlerConverted
+      }
+    }))
+      .then(setNetworks)
+      .catch(error => console.log("Failed to load network data", error, network));
+  }, [networks, DAOService]);
 
   return (
     <CustomContainer>
@@ -153,7 +154,7 @@ export default function NetworksList({
         <>
           <NetworkListBar order={order} setOrder={handleOrderChange} />
 
-          {networks.map((networkItem) => (
+          {orderByProperty(networks, order[0], order[1]).map((networkItem) => (
             <NetworkListItem
               key={`network-list-item-${networkItem.name}`}
               network={networkItem}
