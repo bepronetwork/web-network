@@ -1,5 +1,6 @@
 import { ReactElement } from "react";
 export interface Token {
+  id?: number;
   address: string;
   name: string;
   symbol: string;

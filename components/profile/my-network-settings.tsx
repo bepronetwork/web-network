@@ -16,6 +16,8 @@ import RepositoriesList from "components/custom-network/repositories-list";
 import ThemeColors from "components/custom-network/theme-colors";
 import TreasuryAddressField from "components/custom-network/treasury-address-field";
 import ImageUploader from "components/image-uploader";
+import TokensSettings from "components/tokens-settings";
+import { WarningSpan } from "components/warning-span";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
@@ -29,12 +31,15 @@ import { formatDate } from "helpers/formatDate";
 import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
 import { Network } from "interfaces/network";
+import { Token } from "interfaces/token";
 
 import DAO from "services/dao-service";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network";
+
+import RegistryGovernorSettings from "./registry-governor-settings";
 
 interface MyNetworkSettingsProps {
   network: Network;
@@ -48,6 +53,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
 
   const [isClosing, setIsClosing] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [isGovernorRegistry, setIsGovernorRegistry] = useState(false);
   const [isAbleToBeClosed, setIsAbleToBeClosed] = useState(false);
   const [updatingNetwork, setUpdatingNetwork] = useState(false);
 
@@ -58,7 +64,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   const { dispatch } = useContext(ApplicationContext);
   const { activeNetwork, updateActiveNetwork } = useNetwork();
   const { user, wallet, updateWalletBalance } = useAuthentication();
-  const { details, fields, github, settings, forcedNetwork, setForcedNetwork } = useNetworkSettings();
+  const { details, fields, github, settings, tokens, forcedNetwork, setForcedNetwork } = useNetworkSettings();
 
   const isCurrentNetwork = !!network && !!activeNetwork && network?.networkAddress === activeNetwork?.networkAddress;
   const networkNeedRegistration = network?.isRegistered === false;
@@ -114,7 +120,11 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
       creator: wallet.address,
       githubLogin: user.login,
       networkAddress: network.networkAddress,
-      accessToken: user.accessToken
+      accessToken: user.accessToken,
+      allAllowedTokens: tokens?.allowedTransactions
+        .concat(tokens?.allowedRewards)
+        .map((token) => token?.id)
+        .filter((v) => v),
     };
 
     updateNetwork(json)
@@ -126,11 +136,6 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
             councilAmount: { value: councilAmount },
             percentageNeededForDispute: { value: percentageForDispute },
           },
-          treasury: {
-            address: { value: treasury },
-            cancelFee: { value: cancelFee },
-            // closeFee: { value: closeFee },
-          }
         } = settings;
 
         const networkAddress = network?.networkAddress;
@@ -143,12 +148,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
           ... councilAmount !== forcedNetwork.councilAmount ? 
             [handleChangeNetworkParameter("councilAmount", councilAmount, networkAddress)] : [],
           ... percentageForDispute !== forcedNetwork.percentageNeededForDispute ? 
-            [handleChangeNetworkParameter("percentageNeededForDispute", percentageForDispute, networkAddress)] : [],
-          ... treasury !== forcedNetwork.treasury.treasury ? 
-            [handleChangeNetworkParameter("treasury", treasury, networkAddress)] : [],
-          ... cancelFee !== forcedNetwork.treasury.cancelFee ? 
-            [handleChangeNetworkParameter("cancelFee", cancelFee, networkAddress)] : [],
-          // ... closeFee !== forcedNetwork.treasury.closeFee ? [handleChangeNetworkParameter("closeFee", closeFee, networkAddress)] : [],
+            [handleChangeNetworkParameter("percentageNeededForDispute", percentageForDispute, networkAddress)] : []
         ]);
 
         const failed = [];
@@ -302,8 +302,23 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
     }
   }, [network?.networkAddress]);
 
-  return(
+  useEffect(() => {
+    if(!DAOService || !wallet?.address) return;
+
+    DAOService.isRegistryGovernor(wallet?.address).then(setIsGovernorRegistry)
+  }, [wallet])
+
+  function setCurrentSelectedTokens({transactional, reward}: {
+    transactional: Token[],
+    reward: Token[]
+  }) {
+    fields.allowedTransactions.setter(transactional)
+    fields.allowedRewards.setter(reward)
+  }
+
+  return (
     <>
+      {isGovernorRegistry && <RegistryGovernorSettings />}
       { isCurrentNetwork && <style>{colorsToCSS(settings?.theme?.colors)}</style> }
       { networkNeedRegistration && 
         <Row className="bg-warning-opac-25 py-2 border border-warning border-radius-4 align-items-center mb-2">
@@ -437,20 +452,10 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
           />
         </Col>
       </Row>
-
-      <Row className="mt-4">
+      <Row>
         <span className="caption-medium text-white mb-3">
           {t("custom-network:steps.network-settings.fields.fees.title")}
         </span>
-
-        <Col xs={8}>
-          <TreasuryAddressField
-            value={settings?.treasury?.address?.value}
-            onChange={fields.treasury.setter}
-            validated={settings?.treasury?.address?.validated}
-          />
-        </Col>
-
         <Col>
           <NetworkParameterInput
             label={t("custom-network:steps.treasury.fields.cancel-fee.label")}
@@ -458,6 +463,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
             value={settings?.treasury?.cancelFee?.value}
             error={settings?.treasury?.cancelFee?.validated === false}
             onChange={fields.cancelFee.setter}
+            disabled={true}
           />
         </Col>
 
@@ -468,10 +474,27 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
             value={settings?.treasury?.closeFee?.value}
             error={settings?.treasury?.closeFee?.validated === false}
             onChange={fields.closeFee.setter}
+            disabled={true}
           />
         </Col>
-      </Row>
 
+        <Col xs={6}>
+            <TreasuryAddressField
+              value={settings?.treasury?.address?.value}
+              onChange={fields.treasury.setter}
+              validated={settings?.treasury?.address?.validated}
+              disabled={true}
+            />
+          </Col>
+    </Row>
+      <Row>
+      <WarningSpan
+              text={t("custom-network:steps.network-settings.fields.other-settings.warning-registry")}
+            />
+      </Row>
+      <Row className="mt-4">
+        <TokensSettings setCurrentSelectedTokens={setCurrentSelectedTokens} defaultSelectedTokens={network?.tokens}/>
+      </Row>
       <Row className="mt-4">
         <span className="caption-medium text-white mb-3">
           {t("custom-network:steps.network-settings.fields.other-settings.title")}
