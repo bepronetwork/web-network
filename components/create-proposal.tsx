@@ -273,7 +273,7 @@ export default function NewProposal({
       return processEvent("proposal", "created", activeNetwork?.name, { fromBlock });
     })
     .then(() => {
-      updateIssue(activeIssue.repository.id, activeIssue.githubId)
+      return updateIssue(activeIssue.repository.id, activeIssue.githubId);
     })
     .finally(() => {
       handleClose();

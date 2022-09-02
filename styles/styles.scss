@@ -1495,7 +1495,7 @@ input[type="color"] {
     border-radius: math.div($m, 2);
   }
 
-  > input {
+  > input:not(:only-child) {
     border-right: none !important;
   }
 

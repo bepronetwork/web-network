@@ -3,7 +3,6 @@ import React, {
 } from "react";
 
 import { useRouter } from "next/router";
-import { parseCookies, setCookie } from "nookies";
 
 import NetworkThemeInjector from "components/custom-network/network-theme-injector";
 
@@ -24,7 +23,6 @@ export interface NetworkContextData {
 const NetworkContext = createContext<NetworkContextData>({} as NetworkContextData);
 
 export const cookieKey = "bepro.network";
-export const expiresCookie = 60 * 60 * 1; // 1 hour
 
 export const NetworkProvider: React.FC = function ({ children }) {
   const [activeNetwork, setActiveNetwork] = useState<Network>(null);
@@ -43,18 +41,17 @@ export const NetworkProvider: React.FC = function ({ children }) {
     
     if (activeNetwork?.name?.toLowerCase() === networkName.toLowerCase() && !forced) return activeNetwork;
 
-    const networkFromStorage = parseCookies()[`${cookieKey}:${networkName}`];
+    const networkFromStorage = sessionStorage.getItem(`${cookieKey}:${networkName}`);
     
     if (networkFromStorage && !forced) {
-      return setActiveNetwork(JSON.parse(networkFromStorage));
+      return setActiveNetwork(networkFromStorage && JSON.parse(networkFromStorage) || undefined);
     }
 
     getNetwork(networkName)
         .then(({ data }) => {
-          setCookie(null, `${cookieKey}:${networkName.toLowerCase()}`, JSON.stringify(data), {
-            maxAge: expiresCookie, // 1 hour
-            path: "/"
-          });
+          if (!data.isRegistered) throw new Error("Network not registered");
+          
+          sessionStorage.setItem(`${cookieKey}:${networkName.toLowerCase()}`, JSON.stringify(data));
           setActiveNetwork(data);
         })
         .catch(() => {

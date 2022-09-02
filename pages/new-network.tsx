@@ -47,11 +47,11 @@ export default function NewNetwork() {
   const [creatingNetwork, setCreatingNetwork] = useState<number>();
   const [hasNetwork, setHasNetwork] = useState(false);
 
-  const { createNetwork } = useApi();
   const { activeNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
   const { user, wallet } = useAuthentication();
   const { settings: appSettings } = useSettings(); 
+  const { createNetwork, registerNetwork } = useApi();
   const { handleChangeNetworkParameter } = useBepro();
   const { getURLWithNetwork, colorsToCSS } = useNetworkTheme();
   const { tokensLocked, details, github, tokens, settings } = useNetworkSettings();
@@ -74,6 +74,40 @@ export default function NewNetwork() {
 
   async function handleCreateNetwork() {
     if (!user?.login || !wallet?.address || !DAOService) return;
+
+    const payload = {
+      name: details.name.value,
+      description: details.description,
+      colors: JSON.stringify(settings.theme.colors),
+      logoIcon: await psReadAsText(details.iconLogo.value.raw),
+      fullLogo: await psReadAsText(details.fullLogo.value.raw),
+      repositories: 
+        JSON.stringify(github.repositories
+          .filter((repo) => repo.checked)
+          .map(({ name, fullName }) => ({ name, fullName }))),
+      botPermission: github.botPermission,
+      creator: wallet.address,
+      accessToken: user.accessToken,
+      githubLogin: user.login
+    };
+
+    const networkCreated = await createNetwork(payload)
+      .then(() => {
+        return true;
+      })
+      .catch((error) => {
+        dispatch(addToast({
+            type: "danger",
+            title: t("actions.failed"),
+            content: t("custom-network:errors.failed-to-create-network", {
+              error,
+            }),
+        }));
+
+        return false;
+      });
+
+    if (!networkCreated) return;
 
     setCreatingNetwork(0);
 
@@ -125,28 +159,14 @@ export default function NewNetwork() {
 
     setCreatingNetwork(7);
 
-    const payload = {
-      name: details.name.value,
-      description: details.description,
-      colors: JSON.stringify(settings.theme.colors),
-      logoIcon: await psReadAsText(details.iconLogo.value.raw),
-      fullLogo: await psReadAsText(details.fullLogo.value.raw),
-      repositories: 
-        JSON.stringify(github.repositories
-          .filter((repo) => repo.checked)
-          .map(({ name, fullName }) => ({ name, fullName }))),
-      botPermission: github.botPermission,
-      creator: wallet.address,
-      githubLogin: user.login,
-      networkAddress: deployedNetworkAddress,
-      accessToken: user.accessToken
-    };
-
-    await createNetwork(payload)
+    await registerNetwork({
+      creator: payload.creator
+    })
       .then(() => {
         router.push(getURLWithNetwork("/", { network: payload.name }));
       })
       .catch((error) => {
+        checkHasNetwork();
         dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
@@ -164,6 +184,15 @@ export default function NewNetwork() {
     router.push(getURLWithNetwork("/profile/my-network", { network: defaultNetworkName }));
   }
 
+  function checkHasNetwork() {
+    dispatch(changeLoadState(true));
+
+    DAOService.getNetworkAdressByCreator(wallet.address)
+      .then(networkAddress => setHasNetwork(networkAddress !== Defaults.nativeZeroAddress))
+      .catch(console.log)
+      .finally(() => dispatch(changeLoadState(false)));
+  }
+
   useEffect(() => {
     if (!activeNetwork) return;
 
@@ -174,12 +203,7 @@ export default function NewNetwork() {
   useEffect(() => {
     if (!DAOService || !wallet?.address) return;
 
-    dispatch(changeLoadState(true));
-
-    DAOService.getNetworkAdressByCreator(wallet.address)
-      .then(networkAddress => setHasNetwork(networkAddress !== Defaults.nativeZeroAddress))
-      .catch(console.log)
-      .finally(() => dispatch(changeLoadState(false)));
+    checkHasNetwork();
   }, [DAOService, wallet]);
 
   return (
