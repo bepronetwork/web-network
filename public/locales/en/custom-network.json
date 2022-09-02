@@ -16,6 +16,7 @@
   "save-settings": "Save settings",
   "config-tokens-registry": "Config Allowed Tokens",
   "config-tokens": "Config Tokens",
+<<<<<<< HEAD
   "save-transactional-config": "Save transactional configs",
   "save-reward-config": "Save reward configs",
   "registry": {
@@ -23,6 +24,10 @@
     "config-fees": "Config Fees",
     "save-fees-config": "Save fees config"
   },
+=======
+  "add-tokens": "Add Tokens",
+  "remove-tokens": "Remove Tokens",
+>>>>>>> 7d70c9e (adding translations)
   "hero": {
     "title": "Networks",
     "explanatory-text": "A list of all the networks using BEPRO network for their development",
