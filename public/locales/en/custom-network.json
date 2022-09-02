@@ -14,6 +14,10 @@
   "redeem-time": "Draft time",
   "council-amount": "Council Amount",
   "save-settings": "Save settings",
+  "config-tokens-registry": "Config Allowed Tokens",
+  "config-tokens": "Config Tokens",
+  "add-tokens": "Add Tokens",
+  "remove-tokens": "Remove Tokens",
   "hero": {
     "title": "Networks",
     "explanatory-text": "A list of all the networks using BEPRO network for their development",
@@ -85,7 +89,8 @@
         "other-settings": {
           "title": "Other Settings",
           "parameters-warning": "Changing these parameters will launch a new transaction for each one.",
-          "warning-registry": "These values were chosen by the network registry and are subject to change"
+          "warning-registry": "These values were chosen by the network registry and are subject to change",
+          "warning-add-remove-allowed-tokens": "if there is removal and addition of tokens, two transactions will be required"
         },
         "fees": {
           "title": "Fees"
