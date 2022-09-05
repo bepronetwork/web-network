@@ -14,21 +14,22 @@ export default function NotListedTokens({
   return(
     <Modal 
       show={isVisible} 
-      onCloseClick={handleClose} 
+      onCloseClick={handleClose}
+      backdrop={true}
       title={t("modals.not-listed-tokens.title")} 
       titlePosition="center"
     >
       { networks?.filter(network => network?.totalSettlerLocked > 0)?.map(network => (
         <div 
           className="d-flex flex-row justify-content-between caption-small py-2" 
-          key={`${network?.tokenName}${network?.tokenSymbol}`}
+          key={`${network?.name}${network?.symbol}`}
         >
           <span>
-            {network?.tokenName}
+            {network?.name}
           </span>
 
           <span>
-            {formatNumberToNScale(network?.totalSettlerLocked)} ${network?.tokenSymbol}
+            {formatNumberToNScale(network?.totalSettlerLocked)} <span className="text-primary">${network?.symbol}</span>
           </span>
         </div>
       )) }

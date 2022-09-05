@@ -19,6 +19,9 @@ export default function NetworkListItem({
 }: NetworkListItemProps) {
   const { settings } = useSettings();
 
+  const Spinner = () => <span className="spinner-border spinner-border-xs ml-1" />;
+  const isNotUndefined = value => value !== undefined;
+
   function onClick() {
     handleRedirect(network?.name);
   }
@@ -41,19 +44,19 @@ export default function NetworkListItem({
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center">
         <span className="caption-medium text-white">
-          {formatNumberToNScale(network?.totalBounties)}
+          {isNotUndefined(network?.totalBounties) ? formatNumberToNScale(network?.totalBounties) : <Spinner />}
         </span>
       </div>
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center">
         <span className="caption-medium text-white">
-          {formatNumberToNScale(network?.openBounties)}
+          {isNotUndefined(network?.openBounties) ? formatNumberToNScale(network?.openBounties) : <Spinner />}
         </span>
       </div>
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center gap-20">
         <span className="caption-medium text-white ml-3">
-          {formatNumberToNScale(network?.tokensLocked)}
+          {isNotUndefined(network?.tokensLocked) ? formatNumberToNScale(network?.tokensLocked) : <Spinner />}
         </span>
 
         <span

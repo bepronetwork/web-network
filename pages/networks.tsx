@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
@@ -10,25 +10,47 @@ import PageHero, { InfosHero } from "components/page-hero";
 
 import { useDAO } from "contexts/dao";
 
-export interface NetworkDetails {
-  totalBounties: number;
+interface NetworkTokenLocked {
+  name: string;
+  symbol: string;
   totalSettlerLocked: number;
-  tokenSymbol: string;
-  tokenName: string;
-  amountInCurrency: number;
-  isListedInCoinGecko?: boolean;
 }
-interface Networks {
-  [key: string]: NetworkDetails;
+
+interface NotConvertedTokens {
+  [address: string]: NetworkTokenLocked;
 }
+
+interface NetworksPageProps {
+  numberOfNetworks: number;
+  numberOfBounties: number;
+  totalConverted: number;
+  notConvertedTokens?: NotConvertedTokens;
+  setNumberOfNetworks: (quantity: number) => void;
+  setNumberOfBounties: (quantity: number) => void;
+  setTotalConverted: (amount: number) => void;
+  setNotConvertedTokens: (tokens: NotConvertedTokens) => void;
+}
+
+export const NetworksPageContext = createContext<NetworksPageProps>({
+  numberOfNetworks: 0,
+  numberOfBounties: 0,
+  totalConverted: 0,
+  setNumberOfNetworks: (quantity: number) => console.log("incrementNumberOfNetworks", quantity),
+  setNumberOfBounties: (quantity: number) => console.log("incrementNumberOfBounties", quantity),
+  setTotalConverted: (amount: number) => console.log("incrementTotalConverted", amount),
+  setNotConvertedTokens: (tokens: NotConvertedTokens) => console.log("includeNotConvertedToken", tokens)
+});
 
 export default function NetworksPage() {
   const { t } = useTranslation(["common", "custom-network"]);
 
   const { service: DAOService } = useDAO();
-
-  const [networks, setNetworks] = useState<Networks>();
+  
+  const [totalConverted, setTotalConverted] = useState(0);
+  const [numberOfNetworks, setNumberOfNetworks] = useState(0);
+  const [numberOfBounties, setNumberOfBounties] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [notConvertedTokens, setNotConvertedTokens] = useState<NotConvertedTokens>();
 
   const [infos, setInfos] = useState<InfosHero[]>([
     {
@@ -46,60 +68,43 @@ export default function NetworksPage() {
     }
   ]);
 
-  function addNetwork(address: string, 
-                      totalBounties: number, 
-                      amountInCurrency: number, 
-                      totalSettlerLocked: number, 
-                      tokenName: string,
-                      tokenSymbol: string,
-                      isListedInCoinGecko = false) {
-    setNetworks(prevNetworks => ({
-      ...prevNetworks,
-      [address]: {
-        totalBounties,
-        amountInCurrency,
-        totalSettlerLocked,
-        tokenSymbol,
-        tokenName,
-        isListedInCoinGecko
-      }
-    }));
-  }
+  useEffect(() => {
+    if (DAOService) DAOService.loadRegistry();
+  }, [DAOService]);
 
   useEffect(() => {    
-    if (!networks) return;
-
-    const networksAddresses = Object.keys(networks);
-    const numberOfNetworks = networksAddresses.length;
-    const totalBounties = networksAddresses.reduce((acc, el) => acc + networks[el].totalBounties, 0);
-    const amountInNetworks = networksAddresses.reduce((acc, el) => acc + networks[el].amountInCurrency, 0);
-
     setInfos([
       {
         value: numberOfNetworks,
         label: t("custom-network:hero.number-of-networks")
       },
       {
-        value: totalBounties,
+        value: numberOfBounties,
         label: t("custom-network:hero.number-of-bounties")
       },
       {
-        value: amountInNetworks,
+        value: totalConverted,
         label: t("custom-network:hero.in-the-network"),
         currency: "USD",
-        hasNotConvertedTokens: !!Object.entries(networks).find(network => 
-          !network[1].isListedInCoinGecko && network[1].amountInCurrency > 0),
+        hasNotConvertedTokens: !!notConvertedTokens,
         setNotListedModalVisibility: () => setIsModalVisible(true)
       }
     ]);    
-  }, [networks]);
+  }, [numberOfNetworks, numberOfBounties, totalConverted, notConvertedTokens]);
 
-  useEffect(() => {
-    if (DAOService) DAOService.loadRegistry();
-  }, [DAOService]);
+  const contextValue = {
+    totalConverted,
+    numberOfNetworks,
+    numberOfBounties,
+    notConvertedTokens,
+    setNumberOfNetworks,
+    setNumberOfBounties,
+    setTotalConverted,
+    setNotConvertedTokens
+  }
 
   return (
-    <>
+    <NetworksPageContext.Provider value={contextValue}>
       <div>
         <PageHero
           title={t("custom-network:hero.title")}
@@ -108,16 +113,16 @@ export default function NetworksPage() {
         />
 
         <div className="mt-3">
-          <NetworksList addNetwork={addNetwork} redirectToHome />
+          <NetworksList />
         </div>
       </div>
 
       <NotListedTokens 
         isVisible={isModalVisible} 
         handleClose={() => setIsModalVisible(false)} 
-        networks={networks && Object.entries(networks).map(e => e[1]) || []} 
+        networks={notConvertedTokens && Object.entries(notConvertedTokens).map(e => e[1]) || []} 
       />
-    </>
+    </NetworksPageContext.Provider>
   );
 }
 
