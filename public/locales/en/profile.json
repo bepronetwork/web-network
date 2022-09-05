@@ -12,6 +12,10 @@
   "actions": {
     "remove-github-account": "Remove Github Account"
   },
+  "tips": {
+    "total-balance": "Total tokens in your wallet",
+    "total-oracles": "Total {{tokenName}} token locked available for network curation"
+  },
   "modals": {
     "remove-github": {
       "title": "Remove Github Account",

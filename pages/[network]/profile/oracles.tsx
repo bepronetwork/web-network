@@ -45,7 +45,9 @@ export default function Oracles() {
             <span className="caption-large text-white bg-dark-gray py-2 px-3 rounded-3 font-weight-medium">
               <span className="mr-2">{formatNumberToCurrency(oraclesLocked + oraclesDelegatedToMe)}</span>
               <InfoTooltip
-                description="PLACEHOLDER"
+                description={t("profile:tips.total-oracles", {
+                  tokenName: activeNetwork?.networkToken?.name || oracleToken.name
+                })}
                 secondaryIcon
               />
             </span>
