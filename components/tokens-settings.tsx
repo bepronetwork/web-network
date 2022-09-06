@@ -16,17 +16,17 @@ import { WarningSpan } from "./warning-span";
 export default function TokensSettings({
   isGovernorRegistry = false,
   defaultSelectedTokens,
-  setCurrentSelectedTokens
+  setCurrentSelectedTokens,
 }: {
   isGovernorRegistry?: boolean;
   setCurrentSelectedTokens?: ({
     transactional,
-    reward
-}: {
-    transactional: Token[],
-    reward: Token[]
-}) => void,
-  defaultSelectedTokens?: Token[]
+    reward,
+  }: {
+    transactional: Token[];
+    reward: Token[];
+  }) => void;
+  defaultSelectedTokens?: Token[];
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
   const { service: DAOService } = useDAO();
@@ -43,42 +43,59 @@ export default function TokensSettings({
     useState<boolean>(false);
   const [allowedTransactionalTokens, setAllowedTransactionalTokens] =
     useState<Token[]>();
-  const { getTokens } = useApi() 
+  const [isInterval, setIsInterval] = useState<boolean>(false);
+  const { getTokens, updateAllowedTokens } = useApi();
 
   useEffect(() => {
     if (!DAOService) return;
 
-    if(isGovernorRegistry) getAllowedTokensContract();
+    if (isGovernorRegistry) getAllowedTokensContract();
 
-    if(!isGovernorRegistry) {
-      getTokens().then(tokens => {
-        setAllowedTransactionalTokens(tokens.filter((token) => token.isTransactional === true))
-        setAllowedRewardTokens(tokens.filter((token) => token.isTransactional === false))
-      }).catch(err => console.log('err tokens ->', err))
+    if (!isGovernorRegistry) {
+      getTokens()
+        .then((tokens) => {
+          setAllowedTransactionalTokens(tokens.filter((token) => token.isTransactional === true));
+          setAllowedRewardTokens(tokens.filter((token) => token.isTransactional === false));
+        })
+        .catch((err) => console.log("error to get tokens:", err));
     }
   }, [isGovernorRegistry]);
 
   useEffect(() => {
-    if(defaultSelectedTokens?.length > 0) {
-      setSelectedTransactionalTokens(defaultSelectedTokens?.filter((token) => token.isTransactional === true))
-      setSelectedRewardTokens(defaultSelectedTokens?.filter((token) => token.isTransactional === false))
-    }
-  },[defaultSelectedTokens])
+    if (!isInterval) return;
+    const interval = setInterval(() => {
+      getAllowedTokensContract();
+      updateAllowedTokens().catch(err => console.log("error when synchronizing tokens to database", err))
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [isInterval]);
 
   useEffect(() => {
-    if(!setCurrentSelectedTokens) return;
+    if (defaultSelectedTokens?.length > 0) {
+      setSelectedTransactionalTokens(defaultSelectedTokens?.filter((token) => token.isTransactional === true));
+      setSelectedRewardTokens(defaultSelectedTokens?.filter((token) => token.isTransactional === false));
+    }
+  }, [defaultSelectedTokens]);
+
+  useEffect(() => {
+    if (!setCurrentSelectedTokens) return;
 
     setCurrentSelectedTokens({
-        transactional: selectedTransactionalTokens,
-        reward: selectedRewardTokens
-    })
-  }, [selectedRewardTokens, selectedTransactionalTokens])
+      transactional: selectedTransactionalTokens,
+      reward: selectedRewardTokens,
+    });
+  }, [selectedRewardTokens, selectedTransactionalTokens]);
 
   async function getAllowedTokensContract() {
     DAOService.getAllowedTokens().then(async (tokens) => {
+
       setCurrentAllowedTokens(tokens);
+      if(tokens?.reward?.length === 0) setSelectedRewardTokens([])
+      if(tokens?.transactional?.length === 0) setSelectedTransactionalTokens([])
+
       if (tokens?.transactional?.length > 0) {
-        Promise.all(tokens?.transactional?.map(async (address) => {
+        await Promise.all(tokens?.transactional?.map(async (address) => {
           const token = await DAOService.getERC20TokenData(address);
           return token;
         })).then((token) => {
@@ -87,15 +104,16 @@ export default function TokensSettings({
           setSelectedTransactionalTokens(token);
         });
       }
+
       if (tokens?.reward?.length > 0) {
-        Promise.all(tokens?.reward?.map(async (address) => {
+        await Promise.all(tokens?.reward?.map(async (address) => {
           const token = await DAOService.getERC20TokenData(address);
           return token;
         })).then((token) => {
           setAllowedRewardTokens(token);
           setSelectedRewardTokens(token);
         });
-      }
+      } 
     });
   }
 
@@ -121,95 +139,85 @@ export default function TokensSettings({
     setSelectedRewardTokens(newToken);
   }
 
-  async function addTransactionalTokens() {
-    const addTransactionalTokens = [];
-
-    selectedTransactionalTokens?.map(({ address }) => {
-      const token = currentAllowedTokens?.transactional?.find((currentAddress) => address === currentAddress);
-      if (!token) addTransactionalTokens.push(address);
-    });
+  function addTransactionalTokens() {
+    const addTransactionalTokens = selectedTransactionalTokens
+      ?.map(({ address }) => {
+        const token = currentAllowedTokens?.transactional?.find((currentAddress) => address === currentAddress);
+        if (!token) return address;
+      })
+      .filter((v) => v);
 
     if (addTransactionalTokens.length > 0) {
-      setTransansactionLoading(true);
-      try {
-        await DAOService.addAllowedTokens(addTransactionalTokens, true)
-      } catch (err) {
-        console.log("err", err);
-      }
+      DAOService.addAllowedTokens(addTransactionalTokens, true).catch(() => {
+        setIsInterval(false);
+      });
     }
   }
 
-  async function removeTransactionalTokens() {
-    const removeTransactionalTokens = [];
-
-    currentAllowedTokens?.transactional?.map((currentAddress) => {
+  function removeTransactionalTokens() {
+    const removeTransactionalTokens = currentAllowedTokens?.transactional?.map((currentAddress) => {
       const token = selectedTransactionalTokens?.find(({ address }) => address === currentAddress);
-      if (!token) removeTransactionalTokens.push(currentAddress);
-      return currentAddress;
-    });
+      if (!token) return currentAddress;
+    }).filter(v => v)
 
-    setTransansactionLoading(true);
-    DAOService.removeAllowedTokens(removeTransactionalTokens, true)
-      .then((res) => console.log("res", res))
-      .catch((err) => console.log("err", err));
-    await getAllowedTokensContract();
-  }
-
-  async function addRewardTokens() {
-    const addRewardTokens = [];
-
-    selectedRewardTokens?.map(({ address }) => {
-      const token = currentAllowedTokens?.transactional?.find((currentAddress) => address === currentAddress);
-      if (!token) addRewardTokens.push(address);
-    });
-
-    try {
-      if (addRewardTokens.length > 0) {
-        setTransansactionLoading(true);
-        await DAOService.addAllowedTokens(addRewardTokens, false);
-        await getAllowedTokensContract();
-        setTransansactionLoading(false);
-      }
-    } catch (err) {
-      console.log("errr", err);
+    if (removeTransactionalTokens.length > 0) {
+      DAOService.removeAllowedTokens(removeTransactionalTokens, true).catch(() => {
+        setIsInterval(false);
+      });
     }
   }
 
-  async function removeRewardTokens() {
-    const removeRewardTokens = [];
+  function saveTransactionalTokens() {
+    addTransactionalTokens()
+    removeTransactionalTokens()
+    setIsInterval(true);
+  }
 
-    currentAllowedTokens?.transactional?.map((currentAddress) => {
+  function saveRewardTokens() {
+    addRewardTokens()
+    removeRewardTokens()
+    setIsInterval(true);
+  }
+
+  function addRewardTokens() {
+    const addRewardTokens = selectedRewardTokens?.map(({ address }) => {
+      const token = currentAllowedTokens?.reward?.find((currentAddress) => address === currentAddress);
+      if (!token) return address
+    }).filter(v => v)
+    
+    if (addRewardTokens.length > 0) {
+      DAOService.addAllowedTokens(addRewardTokens, false).catch(() => {
+        setIsInterval(false);
+      });
+    }
+  }
+
+  function removeRewardTokens() {
+    const removeRewardTokens = currentAllowedTokens?.reward?.map((currentAddress) => {
       const token = selectedRewardTokens?.find(({ address }) => address === currentAddress);
-      if (!token) removeRewardTokens.push(currentAddress);
-    });
+      if (!token) return currentAddress
+    }).filter(v => v)
 
-    try {
-      if (removeRewardTokens.length > 0) {
-        setTransansactionLoading(true);
-        await DAOService.removeAllowedTokens(removeRewardTokens, false);
-        await getAllowedTokensContract();
-      }
-    } catch (err) {
-      console.log("errr", err);
+    if (removeRewardTokens.length > 0) {
+      DAOService.removeAllowedTokens(removeRewardTokens, false).catch(() => {
+        setIsInterval(false);
+      });
     }
   }
 
   function renderButtons(isTransactional: boolean) {
-    const addMethod = isTransactional
-      ? addTransactionalTokens
-      : addRewardTokens;
-    const removeMethod = isTransactional
-      ? removeTransactionalTokens
-      : removeRewardTokens;
+    const saveMethod = isTransactional
+      ? saveTransactionalTokens
+      : saveRewardTokens;
 
     return (
       <div className="d-flex">
-        <Button className="mb-2" onClick={addMethod}>
-          <span>{t("custom-network:add-tokens")}</span>
-        </Button>
-
-        <Button color="danger" className="mb-2" onClick={removeMethod}>
-          <span>{t("custom-network:remove-tokens")}</span>
+        <Button className="mb-2" onClick={saveMethod}>
+          <span>
+          {isTransactional
+              ? t("custom-network:save-transactional-config")
+              : t("custom-network:save-reward-config")}
+          </span>
         </Button>
       </div>
     );
@@ -219,10 +227,20 @@ export default function TokensSettings({
     <>
       <Row className="mt-1">
         <span className="caption-medium text-white mb-3">
-          {isGovernorRegistry ? t("custom-network:config-tokens-registry") : t("custom-network:config-tokens")}
+          {isGovernorRegistry
+            ? t("custom-network:config-tokens-registry")
+            : t("custom-network:config-tokens")}
         </span>
+        {isGovernorRegistry && (
+          <div className="mb-3">
+            <WarningSpan
+              text={t("custom-network:steps.network-settings.fields.other-settings.warning-sync-tokens-database")}
+            />
+          </div>
+      )}
         <Col xs={8}>
           <MultipleTokensDropdown
+            key="select-multi-transactional"
             label={t("select-multiple.allowed-transactional-tokens")}
             description={t("select-multiple.add-transactional-tokens")}
             addToken={addTransactionalToken}
@@ -249,6 +267,7 @@ export default function TokensSettings({
       <Row>
         <Col xs={8}>
           <MultipleTokensDropdown
+            key="select-multi-reward"
             label={t("select-multiple.allowed-reward-tokens")}
             description={t("select-multiple.add-reward-tokens")}
             addToken={addRewardToken}
