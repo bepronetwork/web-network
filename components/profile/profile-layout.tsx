@@ -3,7 +3,7 @@ import ProfileSide from "components/profile/profile-side";
 
 export default function ProfileLayout({ children }) {
   return(
-    <div className="pt-5">
+    <>
       <ConnectWalletButton asModal={true} />
       
       <div className="row pt-4 mx-0">
@@ -13,6 +13,6 @@ export default function ProfileLayout({ children }) {
           {children}
         </div>
       </div>
-    </div>
+    </>
   );
 }

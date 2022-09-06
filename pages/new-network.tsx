@@ -207,7 +207,7 @@ export default function NewNetwork() {
   }, [DAOService, wallet]);
 
   return (
-    <div className="new-network">
+    <div>
       <style>{colorsToCSS(settings?.theme?.colors)}</style>
       <ConnectWalletButton asModal={true} />
 
