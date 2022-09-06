@@ -481,6 +481,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     if (!github?.repositories?.length) return;
 
     const validated = [
+      Fields.repository.validator(github?.repositories),
       github?.botPermission
     ].every(condition => condition);
 
