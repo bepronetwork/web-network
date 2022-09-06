@@ -132,11 +132,28 @@ export default function TokenConfiguration({
   }, [selectedTransactionalTokens])
 
   useEffect(() => {
-    if(!wallet?.address) return
-    getTokens().then(tokens => {
-      setAllowedTransactionalTokens(tokens.filter((token) => token.isTransactional === true))
-      setAllowedRewardTokens(tokens.filter((token) => token.isTransactional === false))
-    }).catch(err => console.log('err tokens ->', err))
+    if(!wallet?.address || !DAOService) return
+    
+    DAOService.getAllowedTokens().then((allowedTokens) => {
+      getTokens()
+        .then((tokens) => {
+          setAllowedTransactionalTokens(allowedTokens.transactional
+              ?.map((transactionalToken) => {
+                return tokens.find((token) =>
+                    token.address === transactionalToken &&
+                    token.isTransactional === true);
+              })
+              .filter((v) => v));
+          setAllowedRewardTokens(allowedTokens.reward
+              ?.map((rewardToken) => {
+                return tokens.find((token) =>
+                    token.address === rewardToken &&
+                    token.isTransactional === false);
+              })
+              .filter((v) => v));
+        })
+        .catch((err) => console.log("error to get tokens database ->", err));
+    }).catch((err) => console.log("error to get allowed tokens contract ->", err));
   }, [wallet?.address])
   
   function handleEmptyTokens (tokens: Token[]) {
