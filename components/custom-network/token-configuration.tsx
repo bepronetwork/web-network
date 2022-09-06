@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
@@ -25,7 +25,7 @@ export default function TokenConfiguration({
   handleFinish 
 } : StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
-  
+  const tokenAddressInputRef = useRef<HTMLInputElement>(null)
   const [bountyTokenUri, setBountyTokenUri] = useState("");
   const [networkToken, setNetworkToken] = useState<Token>();
   const [showModalDeploy, setShowModalDeploy] = useState(false);
@@ -72,6 +72,8 @@ export default function TokenConfiguration({
   function setDeployedAddress(address) {
     setBountyTokenAddress(address);
     fields.bountyToken.setter(address);
+    if(tokenAddressInputRef?.current)
+      tokenAddressInputRef.current.focus()
   }
 
   function validateTokenUri() {
@@ -178,6 +180,7 @@ export default function TokenConfiguration({
           </label>
 
           <input 
+            ref={tokenAddressInputRef}
             type="text" 
             className="form-control" 
             value={bountyTokenAddress}
