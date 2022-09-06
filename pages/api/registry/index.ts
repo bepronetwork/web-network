@@ -64,24 +64,26 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 
     if(removeTransactionalTokens.length > 0) {
       for (const address of removeTransactionalTokens) {
-        const exists = await Database.tokens.findOne({
+        const token = await Database.tokens.findOne({
             where: {
               address: address,
               isTransactional: true,
             }
         });
-        if (exists) await exists.destroy().catch(() => console.log('Error synchronizing token deletion'))
+        if (token) await Database.networkTokens.destroy({ where : { tokenId: token.id }})
+        .catch(() => console.log('Error synchronizing token deletion'))
       }
     }
     if(removeRewardTokens.length > 0) {
       for (const address of removeRewardTokens) {
-        const exists = await Database.tokens.findOne({
+        const token = await Database.tokens.findOne({
               where: {
                 address: address,
                 isTransactional: false,
               }
         });
-        if (exists) await exists.destroy().catch(() => console.log('Error synchronizing token deletion'))
+        if (token) await Database.networkTokens.destroy({ where : { tokenId: token.id }})
+        .catch(() => console.log('Error synchronizing token deletion'))
       }
     }
   }
