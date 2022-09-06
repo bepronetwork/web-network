@@ -16,8 +16,13 @@
   "save-settings": "Save settings",
   "config-tokens-registry": "Config Allowed Tokens",
   "config-tokens": "Config Tokens",
-  "add-tokens": "Add Tokens",
-  "remove-tokens": "Remove Tokens",
+  "save-transactional-config": "Save transactional configs",
+  "save-reward-config": "Save reward configs",
+  "registry": {
+    "title-governor": "Registry Governor",
+    "config-fees": "Config Fees",
+    "save-fees-config": "Save fees config"
+  },
   "hero": {
     "title": "Networks",
     "explanatory-text": "A list of all the networks using BEPRO network for their development",
@@ -90,7 +95,8 @@
           "title": "Other Settings",
           "parameters-warning": "Changing these parameters will launch a new transaction for each one.",
           "warning-registry": "These values were chosen by the network registry and are subject to change",
-          "warning-add-remove-allowed-tokens": "if there is removal and addition of tokens, two transactions will be required"
+          "warning-add-remove-allowed-tokens": "if there is removal and addition of tokens, two transactions will be required",
+          "warning-sync-tokens-database": "After any interaction with the contract every 30 seconds is synchronized with the database, your unsaved changes will be lost"
         },
         "fees": {
           "title": "Fees"
