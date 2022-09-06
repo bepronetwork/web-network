@@ -215,7 +215,7 @@ export default function NewNetwork() {
       }
 
       <CustomContainer>
-        <div className="mt-5 pt-5">
+        <div className="mt-5">
           <Stepper>
             <LockBeproStep validated={tokensLocked?.validated} />
 

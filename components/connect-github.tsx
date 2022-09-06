@@ -23,7 +23,7 @@ export default function ConnectGithub() {
     const user = await getUserOf(wallet?.address?.toLowerCase());
 
 
-    if (!user.githubHandle) return push("/connect-account");
+    if (!user?.githubHandle) return push("/connect-account");
 
     await signOut({ redirect: false });
 

@@ -98,7 +98,6 @@ export const NetworkSettingsProvider = ({ children }) => {
     },
     description: {
       setter: (value: string) => setDetails(previous => ({ ...previous, description: value })),
-      validator: (value: string) => value.trim() !== ""
     },
     logo: {
       setter: (value: Icon, type: "full" | "icon") => setDetails(previous => ({ 
@@ -273,7 +272,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         const newState = { ...previous };
 
         newState.name = { value: network?.name, validated: undefined };
-        newState.description = network?.description;
+        newState.description = network?.description || "";
         newState.fullLogo.value.preview = `${IPFS_URL}/${network?.fullLogo}`;
         newState.iconLogo.value.preview = `${IPFS_URL}/${network?.logoIcon}`;
 
@@ -350,14 +349,13 @@ export const NetworkSettingsProvider = ({ children }) => {
       details?.name?.validated,
       Fields.logo.validator(details?.fullLogo?.value),
       Fields.logo.validator(details?.iconLogo?.value),
-      Fields.description.validator(details?.description),
     ].every(condition => condition);
 
     setDetails(previous => ({
       ...previous,
       validated
     }));
-  }, [details?.description, details?.iconLogo, details?.fullLogo, details?.name]);
+  }, [details?.iconLogo, details?.fullLogo, details?.name]);
 
   // Settings Validation
   useEffect(() => {
