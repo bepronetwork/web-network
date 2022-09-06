@@ -15,7 +15,6 @@
 
 @import "components/network-logo";
 @import "components/network-hero";
-@import "components/creating-network-loader";
 @import "components/counter-badge";
 @import "components/amount-with-preview";
 @import "components/identicon";
@@ -86,7 +85,9 @@ li {
     border-radius: 8px;
   }
 }
-
+.zindex-2000{
+  z-index: 2000 !important;
+}
 .card-close-button {
   :hover {
     color: $white !important;

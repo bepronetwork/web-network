@@ -44,7 +44,7 @@ export default function NewNetwork() {
 
   const { t } = useTranslation(["common", "custom-network"]);
 
-  const [creatingNetwork, setCreatingNetwork] = useState<number>();
+  const [creatingNetwork, setCreatingNetwork] = useState<number>(-1);
   const [hasNetwork, setHasNetwork] = useState(false);
 
   const { activeNetwork } = useNetwork();
@@ -74,6 +74,7 @@ export default function NewNetwork() {
 
   async function handleCreateNetwork() {
     if (!user?.login || !wallet?.address || !DAOService) return;
+    setCreatingNetwork(0);
 
     const payload = {
       name: details.name.value,
@@ -92,10 +93,8 @@ export default function NewNetwork() {
     };
 
     const networkCreated = await createNetwork(payload)
-      .then(() => {
-        return true;
-      })
       .catch((error) => {
+        setCreatingNetwork(-1);
         dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
@@ -109,7 +108,7 @@ export default function NewNetwork() {
 
     if (!networkCreated) return;
 
-    setCreatingNetwork(0);
+    
 
     const deployNetworkTX = await handleDeployNetworkV2(tokens.settler,
                                                         tokens.bounty,
@@ -118,7 +117,7 @@ export default function NewNetwork() {
                                                         settings.treasury.cancelFee.value,
                                                         settings.treasury.closeFee.value).catch(error => error);
 
-    if (!(deployNetworkTX as TransactionReceipt)?.contractAddress) return setCreatingNetwork(undefined);
+    if (!(deployNetworkTX as TransactionReceipt)?.contractAddress) return setCreatingNetwork(-1);
 
     const deployedNetworkAddress = (deployNetworkTX as TransactionReceipt).contractAddress;
 
@@ -175,7 +174,7 @@ export default function NewNetwork() {
             }),
         }));
 
-        setCreatingNetwork(undefined);
+        setCreatingNetwork(-1);
         console.error("Failed synchronize network with web-network", deployedNetworkAddress, error);
       });
   }
@@ -212,9 +211,7 @@ export default function NewNetwork() {
       <ConnectWalletButton asModal={true} />
 
       {
-        (creatingNetwork !== undefined && 
-        <CreatingNetworkLoader currentStep={creatingNetwork} steps={creationSteps} />) || 
-        ""
+        (creatingNetwork > -1 && <CreatingNetworkLoader currentStep={creatingNetwork} steps={creationSteps} />)
       }
 
       <CustomContainer>
