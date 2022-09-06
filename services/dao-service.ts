@@ -9,7 +9,8 @@ import {
   Web3Connection,
   NetworkRegistry
 } from "@taikai/dappkit";
-import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
+import {PromiEvent, TransactionReceipt} from "web3-core";
+import {Contract} from "web3-eth-contract";
 
 import { Token } from "interfaces/token";
 
@@ -21,6 +22,8 @@ interface DAOServiceProps {
   web3Host?: string;
   registryAddress?: string;
 }
+
+type ResolveReject = (values?: any) => void
 
 export default class DAO {
   private _web3Connection: Web3Connection;
@@ -99,6 +102,48 @@ export default class DAO {
     await token.loadContract();
 
     return token;
+  }
+
+
+  transactionHandler(event: PromiEvent<TransactionReceipt | Contract>,
+    resolve: ResolveReject,
+    reject: ResolveReject,
+    debug = false) {
+
+    let _iban: string;let tries = 1;
+    const maxTries = 60 // 1 per second
+
+    const getTx = async (hash: string) =>
+    this.web3Connection.eth.getTransactionReceipt(hash);
+
+    const handleTransaction = (tx: any) => {
+      if (!tx) {
+        if (tries === maxTries)
+          reject({message: `Failed to fetch transaction ${_iban} within ${maxTries}`})
+        else {
+          tries += 1 
+          startTimeout(_iban);
+        }
+      } else {
+        resolve(tx);
+      }
+    }
+
+    const startTimeout = (hash: string) =>
+    setTimeout(() => getTx(hash).then(handleTransaction), 1000);
+
+
+    event.once(`transactionHash`, async (hash) => {
+      try {
+        _iban = hash;
+        startTimeout(hash);
+      } catch (e) {
+        console.error(e);
+        reject(e);
+      }
+    });
+
+    event.once('error', (error) => { reject(error); });
   }
 
   async start(): Promise<boolean> {
@@ -255,13 +300,19 @@ export default class DAO {
   async addAllowedTokens(addresses: string[], isTransactional: boolean) {
     if (!this.registry) await this.loadRegistry();
 
-    return this.registry.addAllowedTokens(addresses, isTransactional);
+    this.web3Connection.options.customTransactionHandler = this.transactionHandler.bind(this) 
+
+    return this.registry.addAllowedTokens(addresses, isTransactional)
+    .finally(() => this.web3Connection.options.customTransactionHandler = null)
   }
 
   async removeAllowedTokens(addresses: string[], isTransactional: boolean) {
     if (!this.registry) await this.loadRegistry();
 
-    return this.registry.removeAllowedTokens(addresses, isTransactional);
+    this.web3Connection.options.customTransactionHandler = this.transactionHandler.bind(this) 
+
+    return this.registry.removeAllowedTokens(addresses, isTransactional)
+    .finally(() => this.web3Connection.options.customTransactionHandler = null)
   }
 
   async updateConfigFees(closeFee: number, cancelFee: number){
