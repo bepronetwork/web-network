@@ -53,8 +53,10 @@ export default function DeployNFTModal({
   }
 
   function handleClose() {
-    setDefaults();
-    setClose();
+    if(!isExecuting){
+      setDefaults();
+      setClose();
+    }
   }
 
   return (
@@ -124,7 +126,7 @@ export default function DeployNFTModal({
             )}
           </Button>
 
-          <Button color="dark-gray" onClick={handleClose}>
+          <Button color="dark-gray" disabled={isExecuting} onClick={handleClose}>
             {t("actions.cancel")}
           </Button>
         </div>
