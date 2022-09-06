@@ -11,11 +11,11 @@ import Button from "components/button";
 import ConnectGithub from "components/connect-github";
 import AmountCard from "components/custom-network/amount-card";
 import NetworkContractSettings from "components/custom-network/network-contract-settings";
-import NetworkParameterInput from "components/custom-network/network-parameter-input";
 import RepositoriesList from "components/custom-network/repositories-list";
 import ThemeColors from "components/custom-network/theme-colors";
 import TreasuryAddressField from "components/custom-network/treasury-address-field";
 import ImageUploader from "components/image-uploader";
+import InputNumber from "components/input-number";
 import TokensSettings from "components/tokens-settings";
 import { WarningSpan } from "components/warning-span";
 
@@ -458,24 +458,22 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
           {t("custom-network:steps.network-settings.fields.fees.title")}
         </span>
         <Col>
-          <NetworkParameterInput
+          <InputNumber
+            disabled={true}
             label={t("custom-network:steps.treasury.fields.cancel-fee.label")}
             symbol="%"
             value={settings?.treasury?.cancelFee?.value}
-            error={settings?.treasury?.cancelFee?.validated === false}
-            onChange={fields.cancelFee.setter}
-            disabled={true}
+            thousandSeparator
           />
         </Col>
 
         <Col>
-          <NetworkParameterInput
+          <InputNumber
+            disabled={true}
             label={t("custom-network:steps.treasury.fields.close-fee.label")}
             symbol="%"
             value={settings?.treasury?.closeFee?.value}
-            error={settings?.treasury?.closeFee?.validated === false}
-            onChange={fields.closeFee.setter}
-            disabled={true}
+            thousandSeparator
           />
         </Col>
 
