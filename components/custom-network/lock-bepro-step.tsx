@@ -26,6 +26,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [amount, setAmount] = useState(0);
+  const [isApproving, setIsApproving] = useState(false);
   const [isLocking, setIsLocking] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [settlerAllowance, setSettlerAllowance] = useState(0);
@@ -103,14 +104,14 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   }
 
   function handleApproval() {
-    if (amountNeeded <= 0) return;
-
+    if (amountNeeded <= 0|| isApproving) return;
+    setIsApproving(true)
     DAOService.approveTokenInRegistry(amountNeeded - settlerAllowance)
       .then(() => {
         updateWalletBalance();
         updateAllowance();
       })
-      .catch(console.log);
+      .catch(console.log).finally(()=> setIsApproving(false))
   }
 
   function updateAllowance() {
@@ -290,8 +291,9 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                 <div className="d-flex justify-content-center mt-4 pt-3">
                   {
                     needsAllowance &&
-                    <Button onClick={handleApproval}>
+                    <Button disabled={isApproving} onClick={handleApproval}>
                       {t('actions.approve')}
+                      {isApproving && <span className="spinner-border spinner-border-xs ml-1" />}
                     </Button>
                     ||
                     <Button
