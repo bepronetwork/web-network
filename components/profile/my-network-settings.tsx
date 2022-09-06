@@ -66,7 +66,6 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   const settingsValidated = [
     fields.description.validator(details?.description),
     fields.colors.validator(settings?.theme?.colors),
-    fields.repository.validator(github?.repositories),
     settings?.parameters?.draftTime?.validated,
     settings?.parameters?.disputableTime?.validated,
     settings?.parameters?.percentageNeededForDispute?.validated,

@@ -83,7 +83,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         let validated = undefined;
   
         if (value.trim() !== "")
-          validated = /bepro|taikai/gi.test(value) ? false : !(await getNetwork(value).catch(() => false));
+          validated = /bepro|taikai/gi.test(value) ? false : !(await getNetwork({name: value}).catch(() => false));
 
         setDetails(previous => {
           const newState = { ...previous };
@@ -481,7 +481,6 @@ export const NetworkSettingsProvider = ({ children }) => {
     if (!github?.repositories?.length) return;
 
     const validated = [
-      Fields.repository.validator(github?.repositories),
       github?.botPermission
     ].every(condition => condition);
 
