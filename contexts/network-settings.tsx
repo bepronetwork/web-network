@@ -54,10 +54,10 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   const IPFS_URL = appSettings?.urls?.ipfs;
   const LIMITS = {
-    percentageNeededForDispute: appSettings?.networkParamatersLimits?.disputePercentage,
-    draftTime: appSettings?.networkParamatersLimits?.draftTime,
-    disputableTime: appSettings?.networkParamatersLimits?.disputableTime,
-    councilAmount: appSettings?.networkParamatersLimits?.councilAmount
+    percentageNeededForDispute: appSettings?.networkParametersLimits?.disputePercentage,
+    draftTime: appSettings?.networkParametersLimits?.draftTime,
+    disputableTime: appSettings?.networkParametersLimits?.disputableTime,
+    councilAmount: appSettings?.networkParametersLimits?.councilAmount
   };
 
   const isCreating = useMemo(() => router.pathname === "/new-network", [router.pathname]);
@@ -421,7 +421,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   // Treasury validation
   useEffect(() => {
     if (!DAOService) return;
-
+    
     const isAddressEmptyOrZeroAddress = settings?.treasury?.address?.value?.trim() === "" || 
       settings?.treasury?.address?.value === Defaults.nativeZeroAddress;
 
@@ -434,7 +434,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     ]).then(validations => {
       setSettings(previous => {
         const newState = { ...previous };
-
+        debugger;
         newState.treasury.address.validated = validations[0];
         newState.treasury.cancelFee.validated = validations[1];
         newState.treasury.closeFee.validated = validations[2];
@@ -452,7 +452,6 @@ export const NetworkSettingsProvider = ({ children }) => {
   useEffect(() => {
     setSettings(previous => {
       const newState = { ...previous };
-
       const validations = [
         Fields.parameter.validator("draftTime", settings?.parameters?.draftTime?.value),
         Fields.parameter.validator("councilAmount", settings?.parameters?.councilAmount?.value),
