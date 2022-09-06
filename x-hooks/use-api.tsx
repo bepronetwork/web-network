@@ -454,6 +454,15 @@ export default function useApi() {
       });
   }
 
+  async function updateAllowedTokens() {
+    return client
+      .get(`/registry`)
+      .then(({ data }) => data)
+      .catch((error) => {
+        throw error;
+      });
+  }
+
   async function searchNetworks({
     page = "1",
     name = "",
