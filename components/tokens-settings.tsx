@@ -43,33 +43,39 @@ export default function TokensSettings({
     useState<boolean>(false);
   const [allowedTransactionalTokens, setAllowedTransactionalTokens] =
     useState<Token[]>();
-  const [isInterval, setIsInterval] = useState<boolean>(false);
   const { getTokens, updateAllowedTokens } = useApi();
 
   useEffect(() => {
     if (!DAOService) return;
 
-    if (isGovernorRegistry) getAllowedTokensContract();
+    if (isGovernorRegistry) {
+      getAllowedTokensContract();
+      updateAllowedTokens()
+    }
 
     if (!isGovernorRegistry) {
-      getTokens()
-        .then((tokens) => {
-          setAllowedTransactionalTokens(tokens.filter((token) => token.isTransactional === true));
-          setAllowedRewardTokens(tokens.filter((token) => token.isTransactional === false));
-        })
-        .catch((err) => console.log("error to get tokens:", err));
+      DAOService.getAllowedTokens().then((allowedTokens) => {
+        getTokens()
+          .then((tokens) => {
+            setAllowedTransactionalTokens(allowedTokens.transactional
+                ?.map((transactionalToken) => {
+                  return tokens.find((token) =>
+                      token.address === transactionalToken &&
+                      token.isTransactional === true);
+                })
+                .filter((v) => v));
+            setAllowedRewardTokens(allowedTokens.reward
+                ?.map((rewardToken) => {
+                  return tokens.find((token) =>
+                      token.address === rewardToken &&
+                      token.isTransactional === false);
+                })
+                .filter((v) => v));
+          })
+          .catch((err) => console.log("error to get tokens database ->", err));
+      }).catch((err) => console.log("error to get allowed tokens ->", err));
     }
   }, [isGovernorRegistry]);
-
-  useEffect(() => {
-    if (!isInterval) return;
-    const interval = setInterval(() => {
-      getAllowedTokensContract();
-      updateAllowedTokens().catch(err => console.log("error when synchronizing tokens to database", err))
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [isInterval]);
 
   useEffect(() => {
     if (defaultSelectedTokens?.length > 0) {
@@ -148,9 +154,11 @@ export default function TokensSettings({
       .filter((v) => v);
 
     if (addTransactionalTokens.length > 0) {
-      DAOService.addAllowedTokens(addTransactionalTokens, true).catch(() => {
-        setIsInterval(false);
-      });
+      DAOService.addAllowedTokens(addTransactionalTokens, true)
+      .then(() => {
+        getAllowedTokensContract();
+        updateAllowedTokens()
+      })
     }
   }
 
@@ -161,22 +169,22 @@ export default function TokensSettings({
     }).filter(v => v)
 
     if (removeTransactionalTokens.length > 0) {
-      DAOService.removeAllowedTokens(removeTransactionalTokens, true).catch(() => {
-        setIsInterval(false);
-      });
+      DAOService.removeAllowedTokens(removeTransactionalTokens, true)
+      .then(() => {
+        getAllowedTokensContract();
+        updateAllowedTokens()
+      })
     }
   }
 
   function saveTransactionalTokens() {
     addTransactionalTokens()
     removeTransactionalTokens()
-    setIsInterval(true);
   }
 
   function saveRewardTokens() {
     addRewardTokens()
     removeRewardTokens()
-    setIsInterval(true);
   }
 
   function addRewardTokens() {
@@ -186,9 +194,11 @@ export default function TokensSettings({
     }).filter(v => v)
     
     if (addRewardTokens.length > 0) {
-      DAOService.addAllowedTokens(addRewardTokens, false).catch(() => {
-        setIsInterval(false);
-      });
+      DAOService.addAllowedTokens(addRewardTokens, false)
+      .then(() => {
+        getAllowedTokensContract();
+        updateAllowedTokens()
+      })
     }
   }
 
@@ -199,9 +209,11 @@ export default function TokensSettings({
     }).filter(v => v)
 
     if (removeRewardTokens.length > 0) {
-      DAOService.removeAllowedTokens(removeRewardTokens, false).catch(() => {
-        setIsInterval(false);
-      });
+      DAOService.removeAllowedTokens(removeRewardTokens, false)
+      .then(() => {
+        getAllowedTokensContract();
+        updateAllowedTokens()
+      })
     }
   }
 
