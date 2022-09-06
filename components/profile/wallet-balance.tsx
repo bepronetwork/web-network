@@ -116,7 +116,7 @@ export default function WalletBalance() {
               {!hasNoConvertedToken ? t("currencies.euro") : t("misc.token_other")}
             </span>
             <InfoTooltip 
-              description="PLACEHOLDER"
+              description={t("profile:tips.total-balance")}
               secondaryIcon
             />
           </span>
@@ -133,7 +133,9 @@ export default function WalletBalance() {
           <span className="caption-large text-white font-weight-medium bg-dark-gray py-2 px-3 rounded-3">
             <span className="mr-2">{formatNumberToCurrency(oraclesLocked + oraclesDelegatedToMe)}</span>
             <InfoTooltip 
-              description="PLACEHOLDER"
+              description={t("profile:tips.total-oracles", {
+                tokenName: activeNetwork?.networkToken?.name || oracleToken.name
+              })}
               secondaryIcon
             />
           </span>
@@ -143,7 +145,7 @@ export default function WalletBalance() {
       <TokenBalance
         icon={oracleToken.icon} 
         symbol={oracleToken.symbol}
-        name={`Locked ${activeNetwork?.networkToken?.name || oracleToken.name}`}
+        name={`${t("misc.locked")} ${activeNetwork?.networkToken?.name || oracleToken.name}`}
         balance={oraclesLocked}
         type="oracle"
       />
