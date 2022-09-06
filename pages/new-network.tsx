@@ -60,7 +60,14 @@ export default function NewNetwork() {
   const { dispatch } = useContext(ApplicationContext);
 
   const defaultNetworkName = appSettings?.defaultNetworkConfig?.name?.toLowerCase() || "bepro";
-
+  const isFormValidates = [
+    tokensLocked?.validated,
+    details?.validated,
+    settings?.validated,
+    github?.validated,
+    tokens?.validated,
+  ].every(condition=>condition)
+    
   const creationSteps = [
     { id: 1, name: t("custom-network:modals.loader.steps.deploy-network") },
     { id: 1, name: t("custom-network:modals.loader.steps.changing-draft-time") },
@@ -226,7 +233,7 @@ export default function NewNetwork() {
             <SelectRepositoriesStep validated={github?.validated} />
 
             <TokenConfiguration 
-              validated={tokens?.validated} 
+              validated={isFormValidates} 
               handleFinish={handleCreateNetwork} 
               finishLabel={t("custom-network:steps.repositories.submit-label")} 
             />
