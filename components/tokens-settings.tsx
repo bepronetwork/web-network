@@ -46,49 +46,23 @@ export default function TokensSettings({
     useState<boolean>(false);
   const [allowedTransactionalTokens, setAllowedTransactionalTokens] =
     useState<Token[]>();
-<<<<<<< HEAD
   const { getTokens, processEvent } = useApi();
   const { activeNetwork } = useNetwork();
   
-=======
-  const { getTokens, updateAllowedTokens } = useApi();
-
->>>>>>> 3c48713 (adjusting tokens settings to receive promises)
   useEffect(() => {
     if (!DAOService) return;
 
     if (isGovernorRegistry) {
       getAllowedTokensContract();
-<<<<<<< HEAD
-=======
-      updateAllowedTokens()
->>>>>>> 3c48713 (adjusting tokens settings to receive promises)
     }
 
     if (!isGovernorRegistry) {
       DAOService.getAllowedTokens().then((allowedTokens) => {
         getTokens()
           .then((tokens) => {
-<<<<<<< HEAD
             const { transactional, reward } = handleAllowedTokensDatabase(allowedTokens, tokens)
             setAllowedTransactionalTokens(transactional);
             setAllowedRewardTokens(reward);
-=======
-            setAllowedTransactionalTokens(allowedTokens.transactional
-                ?.map((transactionalToken) => {
-                  return tokens.find((token) =>
-                      token.address === transactionalToken &&
-                      token.isTransactional === true);
-                })
-                .filter((v) => v));
-            setAllowedRewardTokens(allowedTokens.reward
-                ?.map((rewardToken) => {
-                  return tokens.find((token) =>
-                      token.address === rewardToken &&
-                      token.isTransactional === false);
-                })
-                .filter((v) => v));
->>>>>>> 3c48713 (adjusting tokens settings to receive promises)
           })
           .catch((err) => console.log("error to get tokens database ->", err));
       }).catch((err) => console.log("error to get allowed tokens ->", err));
@@ -172,19 +146,12 @@ export default function TokensSettings({
       .filter((v) => v);
 
     if (addTransactionalTokens.length > 0) {
-<<<<<<< HEAD
       await DAOService.addAllowedTokens(addTransactionalTokens, true)
       .then((txInfo) => {
         processEvent("registry", "changed", activeNetwork?.name, { 
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
         })
         getAllowedTokensContract();
-=======
-      DAOService.addAllowedTokens(addTransactionalTokens, true)
-      .then(() => {
-        getAllowedTokensContract();
-        updateAllowedTokens()
->>>>>>> 3c48713 (adjusting tokens settings to receive promises)
       })
     }
   }
@@ -197,17 +164,11 @@ export default function TokensSettings({
 
     if (removeTransactionalTokens.length > 0) {
       DAOService.removeAllowedTokens(removeTransactionalTokens, true)
-<<<<<<< HEAD
       .then((txInfo) => {
         processEvent("registry", "changed", activeNetwork?.name, { 
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
         })
         getAllowedTokensContract();
-=======
-      .then(() => {
-        getAllowedTokensContract();
-        updateAllowedTokens()
->>>>>>> 3c48713 (adjusting tokens settings to receive promises)
       })
     }
   }
@@ -230,17 +191,11 @@ export default function TokensSettings({
     
     if (addRewardTokens.length > 0) {
       DAOService.addAllowedTokens(addRewardTokens, false)
-<<<<<<< HEAD
       .then((txInfo) => {
         processEvent("registry", "changed", activeNetwork?.name, { 
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
         })
         getAllowedTokensContract();
-=======
-      .then(() => {
-        getAllowedTokensContract();
-        updateAllowedTokens()
->>>>>>> 3c48713 (adjusting tokens settings to receive promises)
       })
     }
   }
@@ -253,17 +208,11 @@ export default function TokensSettings({
 
     if (removeRewardTokens.length > 0) {
       DAOService.removeAllowedTokens(removeRewardTokens, false)
-<<<<<<< HEAD
       .then((txInfo) => {
         processEvent("registry", "changed", activeNetwork?.name, { 
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
         })
         getAllowedTokensContract();
-=======
-      .then(() => {
-        getAllowedTokensContract();
-        updateAllowedTokens()
->>>>>>> 3c48713 (adjusting tokens settings to receive promises)
       })
     }
   }
