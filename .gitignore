@@ -25,6 +25,7 @@
 dev.env
 old.env
 prod.env
+types/settings.d.ts
 
 # debug
 npm-debug.log*
