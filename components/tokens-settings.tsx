@@ -8,6 +8,8 @@ import { useNetwork } from "contexts/network";
 
 import { handleAllowedTokensDatabase } from "helpers/handleAllowedTokens";
 
+import { handleAllowedTokensDatabase } from "helpers/handleAllowedTokens";
+
 import { Token } from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
