@@ -5,7 +5,7 @@ import Database from "db/models";
 
 import DAO from "services/dao-service";
 
-async function get(req: NextApiRequest, res: NextApiResponse) {
+async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const DAOService = new DAO({ skipWindowAssignment: true });
 
@@ -95,8 +95,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 async function UpdateAllowedTokens(req: NextApiRequest,
                                    res: NextApiResponse) {
   switch (req.method.toLowerCase()) {
-  case "get":
-    await get(req, res);
+  case "post":
+    await post(req, res);
     break;
 
   default:
