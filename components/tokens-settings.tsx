@@ -5,6 +5,8 @@ import { useTranslation } from "next-i18next";
 
 import { useDAO } from "contexts/dao";
 
+import { handleAllowedTokensDatabase } from "helpers/handleAllowedTokens";
+
 import { Token } from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
@@ -44,7 +46,7 @@ export default function TokensSettings({
   const [allowedTransactionalTokens, setAllowedTransactionalTokens] =
     useState<Token[]>();
   const { getTokens, updateAllowedTokens } = useApi();
-
+  
   useEffect(() => {
     if (!DAOService) return;
 
@@ -57,20 +59,9 @@ export default function TokensSettings({
       DAOService.getAllowedTokens().then((allowedTokens) => {
         getTokens()
           .then((tokens) => {
-            setAllowedTransactionalTokens(allowedTokens.transactional
-                ?.map((transactionalToken) => {
-                  return tokens.find((token) =>
-                      token.address === transactionalToken &&
-                      token.isTransactional === true);
-                })
-                .filter((v) => v));
-            setAllowedRewardTokens(allowedTokens.reward
-                ?.map((rewardToken) => {
-                  return tokens.find((token) =>
-                      token.address === rewardToken &&
-                      token.isTransactional === false);
-                })
-                .filter((v) => v));
+            const { transactional, reward } = handleAllowedTokensDatabase(allowedTokens, tokens)
+            setAllowedTransactionalTokens(transactional);
+            setAllowedRewardTokens(reward);
           })
           .catch((err) => console.log("error to get tokens database ->", err));
       }).catch((err) => console.log("error to get allowed tokens ->", err));
@@ -157,7 +148,7 @@ export default function TokensSettings({
       DAOService.addAllowedTokens(addTransactionalTokens, true)
       .then(() => {
         getAllowedTokensContract();
-        updateAllowedTokens()
+        updateAllowedTokens();
       })
     }
   }
@@ -171,7 +162,7 @@ export default function TokensSettings({
     if (removeTransactionalTokens.length > 0) {
       DAOService.removeAllowedTokens(removeTransactionalTokens, true)
       .then(() => {
-        getAllowedTokensContract();
+        getAllowedTokensContract()
         updateAllowedTokens()
       })
     }
