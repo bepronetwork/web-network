@@ -106,28 +106,30 @@ export default class DAO {
 
 
   transactionHandler(event: PromiEvent<TransactionReceipt | Contract>,
-    resolve: ResolveReject,
-    reject: ResolveReject,
-    debug = false) {
-
-    let _iban: string;let tries = 1;
-    const maxTries = 60 // 1 per second
+                    resolve: ResolveReject,
+                    reject: ResolveReject,
+                    debug = false) {
+    let _iban: string;
+    let tries = 1;
+    const maxTries = 60; // 1 per second
 
     const getTx = async (hash: string) =>
-    this.web3Connection.eth.getTransactionReceipt(hash);
+      this.web3Connection.eth.getTransactionReceipt(hash);
 
     const handleTransaction = (tx: any) => {
       if (!tx) {
         if (tries === maxTries)
-          reject({message: `Failed to fetch transaction ${_iban} within ${maxTries}`})
+          reject({
+            message: `Failed to fetch transaction ${_iban} within ${maxTries}`,
+          });
         else {
-          tries += 1 
+          tries += 1;
           startTimeout(_iban);
         }
       } else {
         resolve(tx);
       }
-    }
+    };
 
     const startTimeout = (hash: string) =>
     setTimeout(() => getTx(hash).then(handleTransaction), 1000);
@@ -303,7 +305,7 @@ export default class DAO {
     this.web3Connection.options.customTransactionHandler = this.transactionHandler.bind(this) 
 
     return this.registry.addAllowedTokens(addresses, isTransactional)
-    .finally(() => this.web3Connection.options.customTransactionHandler = null)
+                        .finally(() => this.web3Connection.options.customTransactionHandler = null)
   }
 
   async removeAllowedTokens(addresses: string[], isTransactional: boolean) {
@@ -312,7 +314,7 @@ export default class DAO {
     this.web3Connection.options.customTransactionHandler = this.transactionHandler.bind(this) 
 
     return this.registry.removeAllowedTokens(addresses, isTransactional)
-    .finally(() => this.web3Connection.options.customTransactionHandler = null)
+                        .finally(() => this.web3Connection.options.customTransactionHandler = null)
   }
 
   async updateConfigFees(closeFee: number, cancelFee: number){
