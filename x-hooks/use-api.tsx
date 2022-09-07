@@ -451,7 +451,7 @@ export default function useApi() {
 
   async function updateAllowedTokens() {
     return client
-      .get(`/registry`)
+      .post(`/registry`)
       .then(({ data }) => data)
       .catch((error) => {
         throw error;
