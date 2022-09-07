@@ -10,10 +10,12 @@ interface NetworkParameterInputProps {
   onChange: (value: number) => void;
   error?: boolean;
   onBlur?: () => void;
+  decimals?: number;
 }
 
 export default function NetworkParameterInput({
   onChange,
+  decimals = 18,
   ...props
 } : NetworkParameterInputProps) {
   const handleChange = (values: NumberFormatValues) => onChange(values.floatValue);
@@ -26,6 +28,7 @@ export default function NetworkParameterInput({
         placeholder={"0"}
         thousandSeparator
         onValueChange={handleChange}
+        decimalScale={decimals}
         {...props}
       />
     </div>
