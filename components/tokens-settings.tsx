@@ -234,13 +234,6 @@ export default function TokensSettings({
             ? t("custom-network:config-tokens-registry")
             : t("custom-network:config-tokens")}
         </span>
-        {isGovernorRegistry && (
-          <div className="mb-3">
-            <WarningSpan
-              text={t("custom-network:steps.network-settings.fields.other-settings.warning-sync-tokens-database")}
-            />
-          </div>
-      )}
         <Col xs={8}>
           <MultipleTokensDropdown
             key="select-multi-transactional"
