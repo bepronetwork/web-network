@@ -10,12 +10,14 @@ interface NetworkParameterInputProps {
   onChange: (value: number) => void;
   error?: boolean;
   onBlur?: () => void;
+  decimals?: number;
   className?: string;
-  disabled?: boolean
+  disabled?: boolean;
 }
 
 export default function NetworkParameterInput({
   onChange,
+  decimals = 18,
   className,
   disabled = false,
   ...props
@@ -30,6 +32,7 @@ export default function NetworkParameterInput({
         placeholder={"0"}
         thousandSeparator
         onValueChange={handleChange}
+        decimalScale={decimals}
         disabled={disabled}
         {...props}
       />

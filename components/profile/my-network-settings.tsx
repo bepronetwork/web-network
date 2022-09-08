@@ -70,7 +70,6 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   const networkNeedRegistration = network?.isRegistered === false;
 
   const settingsValidated = [
-    fields.description.validator(details?.description),
     fields.colors.validator(settings?.theme?.colors),
     fields.repository.validator(github?.repositories),
     settings?.parameters?.draftTime?.validated,
@@ -106,7 +105,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
     setUpdatingNetwork(true);
 
     const json = {
-      description: details.description,
+      description: details?.description || "",
       colors: JSON.stringify(settings.theme.colors),
       logoIcon: details.iconLogo.value.raw ? await psReadAsText(details.iconLogo.value.raw) : undefined,
       fullLogo: details.fullLogo.value.raw ? await psReadAsText(details.fullLogo.value.raw) : undefined,

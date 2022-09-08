@@ -87,5 +87,6 @@ export default function WebThreeDialog() {
         </Modal>
       </div>
     );
-  return null;
+
+  return <></>;
 }

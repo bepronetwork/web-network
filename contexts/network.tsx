@@ -47,7 +47,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
       return setActiveNetwork(networkFromStorage && JSON.parse(networkFromStorage) || undefined);
     }
 
-    getNetwork(networkName)
+    getNetwork({name: networkName})
         .then(({ data }) => {
           if (!data.isRegistered) throw new Error("Network not registered");
           

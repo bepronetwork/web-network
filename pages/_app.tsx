@@ -26,7 +26,10 @@ function App({
           <WebThreeDialog />
           <NationDialog />
           <MainNav />
+          <div id="root-container">
           <Component {...pageProps} />
+          </div>
+
           <StatusBar />
         </RootProviders>
       </SessionProvider>

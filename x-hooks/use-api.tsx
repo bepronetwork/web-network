@@ -428,8 +428,13 @@ export default function useApi() {
       .catch(() => false);
   }
 
-  async function getNetwork(name: string) {
-    const search = new URLSearchParams({ name }).toString();
+  async function getNetwork({ name, creator }: { name?: string, creator?: string }) {
+    const Params = {} as { name?: string, creator?: string }
+    if (name) Params.name = name
+
+    if (creator) Params.creator = creator
+
+    const search = new URLSearchParams(Params).toString();
 
     return client
       .get<Network>(`/network?${search}`)

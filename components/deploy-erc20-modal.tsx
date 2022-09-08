@@ -59,8 +59,10 @@ export default function DeployERC20Modal({
   }
 
   function handleClose() {
-    setDefaults();
-    setClose();
+    if(!isExecuting){
+      setDefaults();
+      setClose();
+    }
   }
 
   return (
@@ -147,7 +149,7 @@ export default function DeployERC20Modal({
             )}
           </Button>
 
-          <Button color="dark-gray" onClick={handleClose}>
+          <Button color="dark-gray" disabled={isExecuting} onClick={handleClose}>
             {t("actions.cancel")}
           </Button>
         </div>

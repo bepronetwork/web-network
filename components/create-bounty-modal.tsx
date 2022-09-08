@@ -60,6 +60,12 @@ interface BountyPayload {
   fundingAmount?: number;
 }
 
+const ZeroNumberFormatValues = {
+  value: "",
+  formattedValue: "",
+  floatValue: 0,
+};
+
 export default function CreateBountyModal() {
   const { t } = useTranslation(["common", "bounty"]);
   const { activeNetwork } = useNetwork();
@@ -83,16 +89,8 @@ export default function CreateBountyModal() {
   const [tokenBalance, setTokenBalance] = useState(0);
   const [rewardBalance, setRewardBalance] = useState(0);
   const [isFundingType, setIsFundingType] = useState<boolean>(true);
-  const [issueAmount, setIssueAmount] = useState<NumberFormatValues>({
-    value: "",
-    formattedValue: "",
-    floatValue: 0,
-  });
-  const [rewardAmount, setRewardAmount] = useState<NumberFormatValues>({
-    value: "",
-    formattedValue: "",
-    floatValue: 0,
-  });
+  const [issueAmount, setIssueAmount] = useState<NumberFormatValues>(ZeroNumberFormatValues);
+  const [rewardAmount, setRewardAmount] = useState<NumberFormatValues>(ZeroNumberFormatValues);
   const [isTokenApproved, setIsTokenApproved] = useState(false);
   const { service: DAOService } = useDAO();
   const { wallet, user } = useAuthentication();
@@ -198,16 +196,8 @@ export default function CreateBountyModal() {
                 onClick={() => {
                   setIsFundingType(true);
                   setRewardChecked(false);
-                  setRewardAmount({
-                    value: "0",
-                    formattedValue: "0",
-                    floatValue: 0,
-                  });
-                  setIssueAmount({
-                    value: "0",
-                    formattedValue: "0",
-                    floatValue: 0,
-                  });
+                  setRewardAmount(ZeroNumberFormatValues);
+                  setIssueAmount(ZeroNumberFormatValues);
                 }}
               >
                 <span>{t("bounty:steps.bounty")}</span>
@@ -222,11 +212,7 @@ export default function CreateBountyModal() {
                 onClick={() => {
                   setIsFundingType(false);
                   setRewardChecked(true);
-                  setIssueAmount({
-                    value: "0",
-                    formattedValue: "0",
-                    floatValue: 0,
-                  });
+                  setIssueAmount(ZeroNumberFormatValues);
                 }}
               >
                 <span>{t("bounty:steps.funding")}</span>
@@ -460,8 +446,8 @@ export default function CreateBountyModal() {
   function cleanFields() {
     setBountyTitle("");
     setBountyDescription("");
-    setIssueAmount({ value: "0", formattedValue: "0", floatValue: 0 });
-    setRewardAmount({ value: "0", formattedValue: "0", floatValue: 0 });
+    setIssueAmount(ZeroNumberFormatValues);
+    setRewardAmount(ZeroNumberFormatValues);
     setRepository(undefined);
     setBranch("");
     setCurrentSection(0);

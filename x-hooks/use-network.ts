@@ -19,7 +19,7 @@ export default function useNetworkTheme() {
 
   async function networkExists(networkName: string) {
     try {
-      await getNetwork(networkName);
+      await getNetwork({name: networkName});
 
       return true;
     } catch (error) {

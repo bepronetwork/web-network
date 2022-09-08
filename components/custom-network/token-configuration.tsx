@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
@@ -170,6 +170,7 @@ export default function TokenConfiguration({
           </label>
 
           <input 
+            ref={tokenAddressInputRef}
             type="text" 
             className="form-control" 
             value={networkTokenAddress}

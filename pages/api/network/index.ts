@@ -16,20 +16,34 @@ import IpfsStorage from "services/ipfs-service";
 const { serverRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const { name: networkName } = req.query;
+  const { name: networkName, creator: creatorAddress } = req.query;
+
+  let where = {}
+  
+  if(networkName){
+    where = {
+      name: {
+        [Op.iLike]: String(networkName)
+      }
+    }
+  } 
+
+  else if(creatorAddress){
+    where = {
+      creatorAddress: {
+        [Op.iLike]: String(creatorAddress)
+      }
+    }
+  }
 
   const network = await Database.network.findOne({
     attributes: { exclude: ["id", "creatorAddress", "updatedAt"] },
     include: [
       { association: "tokens" }
     ],
-    where: {
-      name: {
-        [Op.iLike]: String(networkName)
-      }
-    }
+    where
   });
-
+  
   if (!network) return res.status(404);
 
   return res.status(200).json(network);
@@ -52,6 +66,17 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     } = req.body;
 
     if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
+
+    const hasNetwork = await Database.network.findOne({
+      where:{
+        creatorAddress: creator,
+        isClosed: false,
+      }
+    })
+    
+    if(hasNetwork){
+      return res.status(409).json("Already exists a network created for this wallet");
+    }
 
     const settings = await Database.settings.findAll({
       where: { visibility: "public" },

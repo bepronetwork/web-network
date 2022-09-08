@@ -71,7 +71,7 @@ export default function PageDevelopers() {
   }, [DAOService, activeNetwork?.networkToken]);
 
   return (
-    <div className="mb-5">
+    <>
       <PageHero
         title={t("heroes.bounties.title")}
         subtitle={t("heroes.bounties.subtitle")}
@@ -79,7 +79,7 @@ export default function PageDevelopers() {
       />
 
       <ListIssues />
-    </div>
+    </>
   );
 }
 
