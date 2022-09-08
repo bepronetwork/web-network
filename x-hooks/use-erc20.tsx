@@ -6,8 +6,11 @@ import { useDAO } from "contexts/dao";
 import useBepro from "x-hooks/use-bepro";
 
 export default function useERC20() {
-  const [allowance, setAllowance] = useState(0);
   const [balance, setBalance] = useState(0);
+  const [name, setName] = useState<string>();
+  const [decimals, setDecimals] = useState(18); 
+  const [allowance, setAllowance] = useState(0);
+  const [symbol, setSymbol] = useState<string>();
   const [address, setAddress] = useState<string>();
 
   const { wallet } = useAuthentication();
@@ -39,10 +42,22 @@ export default function useERC20() {
   }, [wallet?.address, DAOService, address]);
 
   useEffect(() => {
+    if (DAOService && address) 
+      DAOService.getERC20TokenData(address)
+        .then(({ name, symbol, decimals }) => {
+          setName(name);
+          setSymbol(symbol);
+          setDecimals(decimals);
+        })
+        .catch(error => console.debug("useERC20:getERC20TokenData", logData, error));
+        
     updateAllowanceAndBalance();
   }, [wallet?.address, DAOService, address]);
 
   return {
+    name,
+    decimals,
+    symbol,
     allowance,
     balance,
     address,

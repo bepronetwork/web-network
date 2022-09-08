@@ -1,6 +1,4 @@
 import {
-  Dispatch,
-  SetStateAction,
   useContext,
   useEffect,
   useState,
@@ -71,14 +69,11 @@ export default function CreateBountyModal() {
   const { t } = useTranslation(["common", "bounty"]);
 
   const [branch, setBranch] = useState("");
-  const [tokenBalance, setTokenBalance] = useState(0);
-  const [rewardBalance, setRewardBalance] = useState(0);
   const [files, setFiles] = useState<IFilesProps[]>([]);
   const [rewardToken, setRewardToken] = useState<Token>();
   const [bountyTitle, setBountyTitle] = useState<string>("");
   const [customTokens, setCustomTokens] = useState<Token[]>([]);
   const [isTokenApproved, setIsTokenApproved] = useState(false);
-  const [tokenAllowance, setTokenAllowance] = useState<number>();
   const [currentSection, setCurrentSection] = useState<number>(0);
   const [isFundingType, setIsFundingType] = useState<boolean>(true);
   const [rewardChecked, setRewardChecked] = useState<boolean>(false);
@@ -155,28 +150,46 @@ export default function CreateBountyModal() {
   }
 
   function renderBountyToken(review = false, type: "bounty" | "reward") {
+    const fieldParams = {
+      bounty: {
+        token: transactionalToken,
+        setToken: setTransactionalToken,
+        default: transactionalToken,
+        decimals: transactionalERC20?.decimals,
+        amount: issueAmount,
+        setAmount: setIssueAmount,
+        balance: transactionalERC20.balance,
+        isFunding: false,
+        label: t("bounty:fields.select-token.bounty", { set: review ? "" : t("bounty:fields.set") })
+      },
+      reward: {
+        token: rewardToken,
+        setToken: setRewardToken,
+        default: rewardToken,
+        decimals: transactionalERC20?.decimals,
+        amount: rewardAmount,
+        setAmount: setRewardAmount,
+        balance: rewardERC20.balance,
+        isFunding: true,
+        label: t("bounty:fields.select-token.reward", { set: review ? "" : t("bounty:fields.set") })
+      }
+    };
+
     return (
       <CreateBountyTokenAmount
-        currentToken={type === "bounty" ? transactionalToken : rewardToken}
-        setCurrentToken={type === "bounty" ? setTransactionalToken : setRewardToken}
+        currentToken={fieldParams[type].token}
+        setCurrentToken={fieldParams[type].setToken}
         customTokens={customTokens}
         userAddress={wallet?.address}
-        defaultToken={review && ((type === "bounty" ? transactionalToken : rewardToken))}
+        defaultToken={review && fieldParams[type].default}
         canAddCustomToken={canAddCustomToken}
         addToken={addToken}
-        issueAmount={type === "bounty" ? issueAmount : rewardAmount}
-        setIssueAmount={type === "bounty" ? setIssueAmount : setRewardAmount}
-        tokenBalance={type === "bounty" ? tokenBalance : rewardBalance}
-        isFundingType={type === "bounty" ? isFundingType : true}
-        labelSelect={
-          type === "bounty"
-            ? t("bounty:fields.select-token.bounty", {
-                set: review ? "" : t("bounty:fields.set"),
-            })
-            : t("bounty:fields.select-token.reward", {
-                set: review ? "" : t("bounty:fields.set"),
-            })
-        }
+        decimals={fieldParams[type].decimals}
+        issueAmount={fieldParams[type].amount}
+        setIssueAmount={fieldParams[type].setAmount}
+        tokenBalance={fieldParams[type].balance}
+        isFundingType={fieldParams[type].isFunding}
+        labelSelect={fieldParams[type].label}
         review={review}
       />
     );
@@ -386,69 +399,6 @@ export default function CreateBountyModal() {
     setProgressPercentage(progress[steps.findIndex((value) => value === steps[currentSection])]);
   }
 
-  function updateWalletByToken(token: Token,
-                               setBalance: Dispatch<SetStateAction<number>>) {
-    DAOService.getTokenBalance(token?.address, wallet.address).then(setBalance);
-
-    DAOService.getAllowance(token?.address,
-                            wallet.address,
-                            DAOService.network.contractAddress).then(setTokenAllowance);
-  }
-
-  function handleTokens(token: Token,
-                        setBalance: Dispatch<SetStateAction<number>>) {
-    if (!wallet?.balance || !DAOService || !token) return;
-
-    updateWalletByToken(token, setBalance);
-  }
-
-  useEffect(() => {
-    handleTokens(transactionalToken, setTokenBalance);
-  }, [transactionalToken, wallet, DAOService]);
-
-  useEffect(() => {
-    setIssueAmount(ZeroNumberFormatValues);
-  }, [transactionalToken]);
-
-  useEffect(() => {
-    setRewardAmount(ZeroNumberFormatValues);
-  }, [rewardToken]);
-
-  useEffect(() => {
-    handleTokens(rewardToken, setRewardBalance);
-  }, [rewardToken, wallet, DAOService]);
-
-  useEffect(() => {
-    setProgressBar();
-  }, [currentSection]);
-
-  useEffect(() => {
-    if(customTokens?.length === 1) {
-      setTransactionalToken(customTokens[0])
-      setRewardToken(customTokens[0])
-    }
-  }, [customTokens])
-
-  useEffect(() => {
-    if (!activeNetwork?.networkToken || !settings?.contracts?.settlerToken) return;
-
-    const tmpTokens = [];
-    const beproToken = {
-      address: settings.contracts.settlerToken,
-      name: "Bepro Network",
-      symbol: "BEPRO"
-    };
-
-    tmpTokens.push(beproToken);
-
-    if (activeNetwork.networkToken.address.toLowerCase() !== beproToken?.address?.toLowerCase())
-      tmpTokens.push(activeNetwork.networkToken);
-
-    tmpTokens.push(...activeNetwork.tokens.map(({ name, symbol, address }) => ({ name, symbol, address } as Token)));
-
-    getTokenInfo(tmpTokens);
-  }, [activeNetwork?.networkToken, settings]);
-
   function cleanFields() {
     setBountyTitle("");
     setBountyDescription("");
@@ -477,15 +427,7 @@ export default function CreateBountyModal() {
       });
   }
 
-  const isAmountApproved = (tokenAllowance: number, amount: number) =>
-    tokenAllowance >= amount;
-
-  useEffect(() => {
-    isFundingType &&
-      setIsTokenApproved(isAmountApproved(tokenAllowance, issueAmount.floatValue));
-    !isFundingType &&
-      setIsTokenApproved(isAmountApproved(tokenAllowance, rewardAmount.floatValue));
-  }, [tokenAllowance, issueAmount.floatValue, rewardAmount.floatValue]);
+  const isAmountApproved = (tokenAllowance: number, amount: number) => tokenAllowance >= amount;
 
   async function allowCreateIssue() {
     if (!DAOService || !transactionalToken || issueAmount.floatValue <= 0)
@@ -493,14 +435,17 @@ export default function CreateBountyModal() {
     setIsLoadingApprove(true)
 
     if (rewardChecked && rewardToken?.address && rewardAmount.floatValue > 0) {
-      handleApproveToken(rewardToken.address, rewardAmount.floatValue).then(() => {
-        updateWalletByToken(rewardToken, setRewardBalance);
-      }).finally(() => setIsLoadingApprove(false))
+      handleApproveToken(rewardToken.address, rewardAmount.floatValue)
+        .then(() => {
+          return rewardERC20.updateAllowanceAndBalance();
+        })
+        .finally(() => setIsLoadingApprove(false))
     } else {
-      handleApproveToken(transactionalToken.address,
-                         issueAmount.floatValue).then(() => {
-                           updateWalletByToken(transactionalToken, setTokenBalance);
-                         }).finally(() => setIsLoadingApprove(false))
+      handleApproveToken(transactionalToken.address, issueAmount.floatValue)
+        .then(() => {
+          return transactionalERC20.updateAllowanceAndBalance();
+        })
+        .finally(() => setIsLoadingApprove(false));
     }
   }
 
@@ -594,10 +539,7 @@ export default function CreateBountyModal() {
 
     const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-    const createdBounties = await processEvent("bounty",
-                                               "created",
-                                               activeNetwork?.name,
-      { fromBlock })
+    const createdBounties = await processEvent("bounty", "created", activeNetwork?.name, { fromBlock })
       .then(({ data }) => data)
       .catch((error) => {
         console.log("Failed to patch bounty", error);
@@ -620,6 +562,60 @@ export default function CreateBountyModal() {
       setIsLoadingCreateBounty(false)
     }
   }
+
+  useEffect(() => {
+    if (transactionalToken?.address) transactionalERC20.setAddress(transactionalToken.address);
+  }, [transactionalToken, wallet, DAOService]);
+
+  useEffect(() => {
+    if (rewardToken?.address) rewardERC20.setAddress(rewardToken.address);
+  }, [rewardToken, wallet, DAOService]);
+
+  useEffect(() => {
+    setIssueAmount(ZeroNumberFormatValues);
+  }, [transactionalToken]);
+
+  useEffect(() => {
+    setRewardAmount(ZeroNumberFormatValues);
+  }, [rewardToken]);
+
+  useEffect(() => {
+    setProgressBar();
+  }, [currentSection]);
+
+  useEffect(() => {
+    if(customTokens?.length === 1) {
+      setTransactionalToken(customTokens[0])
+      setRewardToken(customTokens[0])
+    }
+  }, [customTokens]);
+
+  useEffect(() => {
+    if (isFundingType)
+      setIsTokenApproved(isAmountApproved(transactionalERC20.allowance, issueAmount.floatValue));
+    else
+      setIsTokenApproved(isAmountApproved(rewardERC20.allowance, rewardAmount.floatValue));
+  }, [transactionalERC20.allowance, rewardERC20.allowance, issueAmount.floatValue, rewardAmount.floatValue]);
+
+  useEffect(() => {
+    if (!activeNetwork?.networkToken || !settings?.contracts?.settlerToken) return;
+
+    const tmpTokens = [];
+    const beproToken = {
+      address: settings.contracts.settlerToken,
+      name: "Bepro Network",
+      symbol: "BEPRO"
+    };
+
+    tmpTokens.push(beproToken);
+
+    if (activeNetwork.networkToken.address.toLowerCase() !== beproToken?.address?.toLowerCase())
+      tmpTokens.push(activeNetwork.networkToken);
+
+    tmpTokens.push(...activeNetwork.tokens.map(({ name, symbol, address }) => ({ name, symbol, address } as Token)));
+
+    getTokenInfo(tmpTokens);
+  }, [activeNetwork?.networkToken, settings]);
 
   if (showCreateBounty && !wallet?.address)
     return <ConnectWalletButton asModal={true} />;

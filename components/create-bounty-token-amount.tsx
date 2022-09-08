@@ -23,6 +23,7 @@ export default function CreateBountyTokenAmount({
   setIssueAmount,
   review = false,
   isFundingType,
+  decimals = 18
 }) {
   const { t } = useTranslation("bounty");
 
@@ -101,6 +102,7 @@ export default function CreateBountyTokenAmount({
             symbol={currentToken?.symbol || t("common:misc.token")}
             value={issueAmount.value}
             placeholder="0"
+            decimalScale={decimals}
             onValueChange={handleIssueAmountOnValueChange}
             onBlur={handleIssueAmountBlurChange}
           />

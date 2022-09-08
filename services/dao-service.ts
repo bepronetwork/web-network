@@ -323,7 +323,8 @@ export default class DAO {
     return {
       name: await token.name(),
       symbol: await token.symbol(),
-      address: tokenAddress
+      address: tokenAddress,
+      decimals: token.decimals
     };
   }
 
