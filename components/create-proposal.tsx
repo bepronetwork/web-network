@@ -403,7 +403,6 @@ export default function NewProposal({
                   githubHandle={item.githubHandle}
                   githubLogin={item.githubLogin}
                   onChangeDistribution={handleChangeDistrib}
-                  defaultPercentage={0}
                   error={!!error}
                   success={success}
                   warning={warning}
