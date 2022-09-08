@@ -4,6 +4,7 @@ import { Col, Row } from "react-bootstrap";
 import { useTranslation } from "next-i18next";
 
 import { useDAO } from "contexts/dao";
+import { useNetwork } from "contexts/network";
 
 import { handleAllowedTokensDatabase } from "helpers/handleAllowedTokens";
 
@@ -45,14 +46,14 @@ export default function TokensSettings({
     useState<boolean>(false);
   const [allowedTransactionalTokens, setAllowedTransactionalTokens] =
     useState<Token[]>();
-  const { getTokens, updateAllowedTokens } = useApi();
+  const { getTokens, processEvent } = useApi();
+  const { activeNetwork } = useNetwork();
   
   useEffect(() => {
     if (!DAOService) return;
 
     if (isGovernorRegistry) {
       getAllowedTokensContract();
-      updateAllowedTokens()
     }
 
     if (!isGovernorRegistry) {
@@ -136,7 +137,7 @@ export default function TokensSettings({
     setSelectedRewardTokens(newToken);
   }
 
-  function addTransactionalTokens() {
+  async function addTransactionalTokens() {
     const addTransactionalTokens = selectedTransactionalTokens
       ?.map(({ address }) => {
         const token = currentAllowedTokens?.transactional?.find((currentAddress) => address === currentAddress);
@@ -145,10 +146,12 @@ export default function TokensSettings({
       .filter((v) => v);
 
     if (addTransactionalTokens.length > 0) {
-      DAOService.addAllowedTokens(addTransactionalTokens, true)
-      .then(() => {
+      await DAOService.addAllowedTokens(addTransactionalTokens, true)
+      .then((txInfo) => {
+        processEvent("registry", "changed", activeNetwork?.name, { 
+          fromBlock: (txInfo as { blockNumber: number }).blockNumber 
+        })
         getAllowedTokensContract();
-        updateAllowedTokens();
       })
     }
   }
@@ -161,9 +164,11 @@ export default function TokensSettings({
 
     if (removeTransactionalTokens.length > 0) {
       DAOService.removeAllowedTokens(removeTransactionalTokens, true)
-      .then(() => {
-        getAllowedTokensContract()
-        updateAllowedTokens()
+      .then((txInfo) => {
+        processEvent("registry", "changed", activeNetwork?.name, { 
+          fromBlock: (txInfo as { blockNumber: number }).blockNumber 
+        })
+        getAllowedTokensContract();
       })
     }
   }
@@ -186,9 +191,11 @@ export default function TokensSettings({
     
     if (addRewardTokens.length > 0) {
       DAOService.addAllowedTokens(addRewardTokens, false)
-      .then(() => {
+      .then((txInfo) => {
+        processEvent("registry", "changed", activeNetwork?.name, { 
+          fromBlock: (txInfo as { blockNumber: number }).blockNumber 
+        })
         getAllowedTokensContract();
-        updateAllowedTokens()
       })
     }
   }
@@ -201,9 +208,11 @@ export default function TokensSettings({
 
     if (removeRewardTokens.length > 0) {
       DAOService.removeAllowedTokens(removeRewardTokens, false)
-      .then(() => {
+      .then((txInfo) => {
+        processEvent("registry", "changed", activeNetwork?.name, { 
+          fromBlock: (txInfo as { blockNumber: number }).blockNumber 
+        })
         getAllowedTokensContract();
-        updateAllowedTokens()
       })
     }
   }

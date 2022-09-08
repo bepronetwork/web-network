@@ -1,3 +1,4 @@
+
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op } from "sequelize";
 
@@ -6,6 +7,7 @@ import models from "db/models";
 import { BountyHelpers } from "helpers/api/bounty";
 import { ProposalHelpers } from "helpers/api/proposal";
 import { PullRequestHelpers } from "helpers/api/pull-request";
+import { RegistryHelpers } from "helpers/api/registry";
 import { Settings } from "helpers/settings";
 
 import DAO from "services/dao-service";
@@ -13,7 +15,8 @@ import DAO from "services/dao-service";
 const Helpers = {
   "bounty": BountyHelpers,
   "proposal": ProposalHelpers,
-  "pull-request": PullRequestHelpers
+  "pull-request": PullRequestHelpers,
+  "registry": RegistryHelpers 
 }
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
@@ -55,6 +58,21 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const [contractMethod, apiMethod] = helper[String(event)];
 
+  if(String(event) === "changed"){
+
+    const registry = await DAOService.loadRegistry(true)
+    if (!registry) return res.status(500).json("Failed to load registry");
+    
+    const events = await registry[contractMethod]({ 
+      fromBlock,
+      toBlock: toBlock || (+fromBlock + 1),
+      filter: { id }
+    })
+    const registryResults = await apiMethod(events, DAOService.network, registry);
+
+    return res.status(200).json(registryResults);
+  }
+  
   const events = await DAOService.network[contractMethod]({ 
     fromBlock, 
     toBlock: toBlock || (+fromBlock + 1), 
@@ -62,7 +80,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   });
 
   const results = await apiMethod(events, DAOService.network, customNetwork);
-
   return res.status(200).json(results);
 }
 
