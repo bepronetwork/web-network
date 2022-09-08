@@ -9,7 +9,8 @@ import {
   Web3Connection,
   NetworkRegistry
 } from "@taikai/dappkit";
-import {PromiEvent, TransactionReceipt} from "web3-core";
+import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
+import {PromiEvent, TransactionReceipt as TransactionReceiptWeb3Core} from "web3-core";
 import {Contract} from "web3-eth-contract";
 
 import { Token } from "interfaces/token";
@@ -105,7 +106,7 @@ export default class DAO {
   }
 
 
-  transactionHandler(event: PromiEvent<TransactionReceipt | Contract>,
+  transactionHandler(event: PromiEvent<TransactionReceiptWeb3Core | Contract>,
                     resolve: ResolveReject,
                     reject: ResolveReject,
                     debug = false) {
