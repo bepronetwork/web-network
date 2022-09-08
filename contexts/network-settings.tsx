@@ -434,7 +434,6 @@ export const NetworkSettingsProvider = ({ children }) => {
     ]).then(validations => {
       setSettings(previous => {
         const newState = { ...previous };
-        debugger;
         newState.treasury.address.validated = validations[0];
         newState.treasury.cancelFee.validated = validations[1];
         newState.treasury.closeFee.validated = validations[2];
