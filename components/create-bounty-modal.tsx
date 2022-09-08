@@ -44,6 +44,7 @@ import { getCoinInfoByContract } from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
+import useERC20 from "x-hooks/use-erc20";
 import useNetworkTheme from "x-hooks/use-network";
 import useTransactions from "x-hooks/useTransactions";
 
@@ -68,38 +69,44 @@ const ZeroNumberFormatValues = {
 
 export default function CreateBountyModal() {
   const { t } = useTranslation(["common", "bounty"]);
-  const { activeNetwork } = useNetwork();
-  const { getURLWithNetwork } = useNetworkTheme();
-  const { handleApproveToken } = useBepro();
-  const { createPreBounty, processEvent } = useApi();
+
+  const [branch, setBranch] = useState("");
+  const [tokenBalance, setTokenBalance] = useState(0);
+  const [rewardBalance, setRewardBalance] = useState(0);
+  const [files, setFiles] = useState<IFilesProps[]>([]);
+  const [rewardToken, setRewardToken] = useState<Token>();
+  const [bountyTitle, setBountyTitle] = useState<string>("");
+  const [customTokens, setCustomTokens] = useState<Token[]>([]);
+  const [isTokenApproved, setIsTokenApproved] = useState(false);
+  const [tokenAllowance, setTokenAllowance] = useState<number>();
+  const [currentSection, setCurrentSection] = useState<number>(0);
+  const [isFundingType, setIsFundingType] = useState<boolean>(true);
+  const [rewardChecked, setRewardChecked] = useState<boolean>(false);
+  const [transactionalToken, setTransactionalToken] = useState<Token>();
+  const [bountyDescription, setBountyDescription] = useState<string>("");
+  const [progressPercentage, setProgressPercentage] = useState<number>(0);
+  const [isLoadingApprove, setIsLoadingApprove] = useState<boolean>(false);
+  const [repository, setRepository] = useState<{ id: string; path: string }>();
+  const [isLoadingCreateBounty, setIsLoadingCreateBounty] = useState<boolean>(false);
+  const [issueAmount, setIssueAmount] = useState<NumberFormatValues>(ZeroNumberFormatValues);
+  const [rewardAmount, setRewardAmount] = useState<NumberFormatValues>(ZeroNumberFormatValues);
+
+  const rewardERC20 = useERC20();
   const txWindow = useTransactions();
+  const { settings } = useSettings();
+  const transactionalERC20 = useERC20();
+  const { activeNetwork } = useNetwork();
+  const { service: DAOService } = useDAO();
+  const { handleApproveToken } = useBepro();
+  const { wallet, user } = useAuthentication();
+  const { getURLWithNetwork } = useNetworkTheme();
+  const { createPreBounty, processEvent } = useApi();
+
   const {
     dispatch,
     state: { myTransactions, showCreateBounty },
   } = useContext(ApplicationContext);
-  const [bountyTitle, setBountyTitle] = useState<string>("");
-  const [bountyDescription, setBountyDescription] = useState<string>("");
-  const [currentSection, setCurrentSection] = useState<number>(0);
-  const [progressPercentage, setProgressPercentage] = useState<number>(0);
-  const [transactionalToken, setTransactionalToken] = useState<Token>();
-  const [rewardToken, setRewardToken] = useState<Token>();
-  const [customTokens, setCustomTokens] = useState<Token[]>([]);
-  const [repository, setRepository] = useState<{ id: string; path: string }>();
-  const [branch, setBranch] = useState("");
-  const [tokenBalance, setTokenBalance] = useState(0);
-  const [rewardBalance, setRewardBalance] = useState(0);
-  const [isFundingType, setIsFundingType] = useState<boolean>(true);
-  const [issueAmount, setIssueAmount] = useState<NumberFormatValues>(ZeroNumberFormatValues);
-  const [rewardAmount, setRewardAmount] = useState<NumberFormatValues>(ZeroNumberFormatValues);
-  const [isTokenApproved, setIsTokenApproved] = useState(false);
-  const { service: DAOService } = useDAO();
-  const { wallet, user } = useAuthentication();
-  const [tokenAllowance, setTokenAllowance] = useState<number>();
-  const [rewardChecked, setRewardChecked] = useState<boolean>(false);
-  const [files, setFiles] = useState<IFilesProps[]>([]);
-  const [isLoadingApprove, setIsLoadingApprove] = useState<boolean>(false);
-  const [isLoadingCreateBounty, setIsLoadingCreateBounty] = useState<boolean>(false);
-  const { settings } = useSettings();
+  
 
   const canAddCustomToken =
     activeNetwork?.networkAddress === settings?.contracts?.network
@@ -400,11 +407,11 @@ export default function CreateBountyModal() {
   }, [transactionalToken, wallet, DAOService]);
 
   useEffect(() => {
-    setIssueAmount({ value: "0", formattedValue: "0", floatValue: 0 });
+    setIssueAmount(ZeroNumberFormatValues);
   }, [transactionalToken]);
 
   useEffect(() => {
-    setRewardAmount({ value: "0", formattedValue: "0", floatValue: 0 });
+    setRewardAmount(ZeroNumberFormatValues);
   }, [rewardToken]);
 
   useEffect(() => {
@@ -521,16 +528,14 @@ export default function CreateBountyModal() {
       branch,
     };
 
-    const openIssueTx = addTransaction({ type: TransactionTypes.openIssue, amount: payload.amount },
-                                       activeNetwork);
+    const openIssueTx = addTransaction({ type: TransactionTypes.openIssue, amount: payload.amount }, activeNetwork);
 
     const cid = await createPreBounty({
         title: payload.title,
         body: payload.body,
         creator: payload.creatorGithub,
         repositoryId: payload.repositoryId,
-    },
-                                      activeNetwork?.name)
+    }, activeNetwork?.name)
       .then((cid) => cid)
       .catch(() => {
         dispatch(toastError(t("bounty:errors.creating-bounty")));
