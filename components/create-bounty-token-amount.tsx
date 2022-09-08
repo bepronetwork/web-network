@@ -99,7 +99,7 @@ export default function CreateBountyTokenAmount({
               </div>
             }
             symbol={currentToken?.symbol || t("common:misc.token")}
-            value={issueAmount.formattedValue}
+            value={issueAmount.value}
             placeholder="0"
             onValueChange={handleIssueAmountOnValueChange}
             onBlur={handleIssueAmountBlurChange}

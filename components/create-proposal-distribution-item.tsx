@@ -8,7 +8,6 @@ interface Props {
   githubHandle: string;
   githubLogin: string;
   onChangeDistribution(params: { [key: string]: number }): void;
-  defaultPercentage?: number;
   isDisable?: boolean;
   error?: boolean;
   success?: boolean;
@@ -19,11 +18,10 @@ export default function CreateProposalDistributionItem({
   githubHandle,
   githubLogin,
   onChangeDistribution,
-  defaultPercentage = 0,
   isDisable = false,
   ...params
 }: Props) {
-  const [value, setValue] = useState<number>(defaultPercentage);
+  const [value, setValue] = useState<number>();
 
   function handleValueChange(params: NumberFormatValues) {
     setValue(params.floatValue);
@@ -37,7 +35,7 @@ export default function CreateProposalDistributionItem({
       enhancedValue = 100;
     }
     if (!value || value < 0) {
-      enhancedValue = 0;
+      enhancedValue = undefined;
     }
 
     setValue(enhancedValue);
@@ -58,6 +56,7 @@ export default function CreateProposalDistributionItem({
           onBlur={handleBlur}
           className="text-center"
           disabled={isDisable}
+          placeholder="0%"
           {...params}
         />
       </div>
