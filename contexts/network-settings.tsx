@@ -54,10 +54,10 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   const IPFS_URL = appSettings?.urls?.ipfs;
   const LIMITS = {
-    percentageNeededForDispute: appSettings?.networkParamatersLimits?.disputePercentage,
-    draftTime: appSettings?.networkParamatersLimits?.draftTime,
-    disputableTime: appSettings?.networkParamatersLimits?.disputableTime,
-    councilAmount: appSettings?.networkParamatersLimits?.councilAmount
+    percentageNeededForDispute: appSettings?.networkParametersLimits?.disputePercentage,
+    draftTime: appSettings?.networkParametersLimits?.draftTime,
+    disputableTime: appSettings?.networkParametersLimits?.disputableTime,
+    councilAmount: appSettings?.networkParametersLimits?.councilAmount
   };
 
   const isCreating = useMemo(() => router.pathname === "/new-network", [router.pathname]);

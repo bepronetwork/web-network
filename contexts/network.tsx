@@ -34,7 +34,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
   const { service: DAOService, changeNetwork } = useDAO();
 
   const updateActiveNetwork = useCallback((forced?: boolean) => {
-    const networkName = query?.network || settings?.defaultNetworkConfig?.name;
+    const networkName = query?.network?.toString() || settings?.defaultNetworkConfig?.name;
 
     if (!networkName)
       return;
