@@ -12,7 +12,7 @@ interface NetworkParameterInputProps {
   onBlur?: () => void;
   decimals?: number;
   className?: string;
-  disabled?: boolean
+  disabled?: boolean;
 }
 
 export default function NetworkParameterInput({
