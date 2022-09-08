@@ -33,6 +33,7 @@ export default function NetworkContractSettings() {
       symbol: t("misc.seconds"), 
       value: settings?.parameters?.disputableTime?.value,
       error: settings?.parameters?.disputableTime?.validated === false,
+      decimals: 0,
       onChange: handleDisputeTimeChange
     },
     { 
@@ -54,6 +55,7 @@ export default function NetworkContractSettings() {
       symbol: t("misc.seconds"), 
       value: settings?.parameters?.draftTime?.value,
       error: settings?.parameters?.draftTime?.validated === false,
+      decimals: 0,
       onChange: handleDraftTimeChange
     },
     { 
