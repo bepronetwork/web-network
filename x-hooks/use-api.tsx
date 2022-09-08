@@ -443,14 +443,6 @@ export default function useApi() {
       });
   }
 
-  async function updateAllowedTokens() {
-    return client
-      .post(`/registry`)
-      .then(({ data }) => data)
-      .catch((error) => {
-        throw error;
-      });
-  }
 
   async function searchNetworks({
     page = "1",
@@ -546,6 +538,5 @@ export default function useApi() {
     getSettings,
     registerNetwork,
     getTokens,
-    updateAllowedTokens,
   };
 }
