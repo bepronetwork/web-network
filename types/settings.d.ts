@@ -1,3 +1,5 @@
+import { Token } from "interfaces/token";
+
 export type ConversionItem = {
   value: string;
   label: string;
@@ -56,4 +58,5 @@ export type SettingsType = {
     ipfs: string;
   };
   excludedJurisdictions: string[];
+  beproToken?: Token
 }
