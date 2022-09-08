@@ -8,22 +8,13 @@ export type ParameterLimit = {
   max?: number;
 }
 
+export type ChainId = {
+  [key: string]: string;
+}
+
 // This type must be kept in sync with the settings in the database
 export type SettingsType = {
-  chainIds: {
-    1: "ethereum";
-    3: "ropsten";
-    4: "rinkeby";
-    5: "goerli";
-    42: "kovan";
-    1285: "moonriver";
-    1287: "moonbase";
-    1337: "localhost";
-    1503: "iris";
-    1502: "irene";
-    1501: "afrodite";
-    1500: "seneca";
-  };
+  chainIds: ChainId;
   contracts: {
     settlerToken: string;
     network: string;
