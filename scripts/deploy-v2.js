@@ -2,7 +2,7 @@ require("dotenv").config();
 const { Web3Connection, ERC20, BountyToken, Network_v2, NetworkRegistry } = require("@taikai/dappkit");
 const { exit } = require("process");
 const stagingAccounts = require("./staging-accounts");
-const { updateSetting } = require("./settings/save-from-env");
+const { updateSetting, updateTokens } = require("./settings/save-from-env");
 
 const usage = `------------------------------------------------------------------------- 
   WebNetwork v2 Smart Contracts Deploy Script 🚀  
@@ -216,9 +216,9 @@ async function main() {
     //add allowed tokens
     console.log(`Adding Allowed Tokens...`);
     // Reward Tokens
-    network.registry.addAllowedTokens([rewardToken.contractAddress]);
+    await network.registry.addAllowedTokens([rewardToken.contractAddress])
     // Transactionals Tokens
-    network.registry.addAllowedTokens([bountyTransactional.contractAddress], true);
+    await network.registry.addAllowedTokens([bountyTransactional.contractAddress], true);
 
     console.table({
       NetworkToken: networkToken.contractAddress,
@@ -233,7 +233,15 @@ async function main() {
       updateSetting("settlerToken", networkToken.contractAddress, "contracts"),
       updateSetting("network", network.contractAddress, "contracts"),
       updateSetting("transactionalToken", networkToken.contractAddress, "contracts"),
-      updateSetting("networkRegistry", registryReceipt.contractAddress, "contracts")
+      updateSetting("networkRegistry", registryReceipt.contractAddress, "contracts"),
+      updateTokens({ name: await rewardToken.name(), 
+                     symbol: await rewardToken.symbol(),
+                     isTransactional: false,
+                     address: rewardToken.contractAddress }),
+      updateTokens({ name: await bountyTransactional.name(), 
+                      symbol: await bountyTransactional.symbol(),
+                      isTransactional: true,
+                      address: bountyTransactional.contractAddress })
     ]);
     
   } catch (error) {
