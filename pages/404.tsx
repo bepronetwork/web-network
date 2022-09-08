@@ -11,7 +11,7 @@ export default function NotFound() {
   const { t } = useTranslation("common");
 
   return (
-    <div className="pt-5">
+    <>
       <div className="row pt-5 mt-5">
         <div className="col d-flex justify-content-center mt-5 pt-5">
           <NotFoundIcon height={131} width={118} />
@@ -34,7 +34,7 @@ export default function NotFound() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

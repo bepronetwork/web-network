@@ -86,7 +86,7 @@ export default function FalconPunchPage() {
 
   function renderUserRow({ created_at, login, public_repos, eth }) {
     return (
-      <div className="row mb-3">
+      <div className="row">
         <div className="col">@{login}</div>
         <div
           className={`col text-${

@@ -88,7 +88,11 @@ export default function TokensDropdown({
       }
     }))
       .then((values) => {
-        if (values[0]) setOptions(values.map((token) => tokenToOption(token)));
+        if (values[0]) {
+          const tokensOptions = values.map(tokenToOption);
+          setOptions(tokensOptions)
+          setOption(tokensOptions[0])
+        }
       })
       .catch((err) => console.log("err token", err));
   }
@@ -96,7 +100,16 @@ export default function TokensDropdown({
   useEffect(() => {
     if (!tokens?.length) return;
     if (needsBalance) getBalanceTokens();
-    else setOptions(tokens.map(tokenToOption));
+    else {
+      const tokensOptions = tokens.map(tokenToOption);
+      setOptions(tokensOptions)
+      
+      //Set first token as default
+      if(tokensOptions?.[0]){
+        setOption(tokensOptions?.[0])
+        handleChange(tokensOptions?.[0])
+      }
+    }
     if(tokens?.length === 1) setOption(tokenToOption(tokens[0]))
   }, [tokens]);
 
