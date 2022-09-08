@@ -170,7 +170,6 @@ export default function TokenConfiguration({
           </label>
 
           <input 
-            ref={tokenAddressInputRef}
             type="text" 
             className="form-control" 
             value={networkTokenAddress}
