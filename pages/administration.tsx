@@ -47,7 +47,7 @@ export default function ParityPage() {
   }, [wallet?.address]);
 
   return (
-    <div className="container mb-5 pt-5">
+    <div className="container">
       <ConnectWalletButton asModal={true} />
       <br />
       <br />

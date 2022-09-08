@@ -15,7 +15,6 @@
 
 @import "components/network-logo";
 @import "components/network-hero";
-@import "components/creating-network-loader";
 @import "components/counter-badge";
 @import "components/amount-with-preview";
 @import "components/identicon";
@@ -66,11 +65,6 @@ li {
   border-radius: 0;
 }
 
-.pull-request-button {
-  height: 40px;
-  width: 215px;
-}
-
 .mgt-20 {
   margin-top: 20px !important;
 }
@@ -91,7 +85,9 @@ li {
     border-radius: 8px;
   }
 }
-
+.zindex-2000{
+  z-index: 2000 !important;
+}
 .card-close-button {
   :hover {
     color: $white !important;
@@ -102,6 +98,11 @@ li {
     height: 10px !important;
     width: 10px !important;
   }
+}
+
+#root-container{
+  padding-top: $navbar-height;
+  padding-bottom: $statusbar-height;
 }
 
 .modal {
@@ -132,6 +133,7 @@ li {
     }
   }
 }
+
 .react-select {
   &-container & {
     &__control {
@@ -377,39 +379,6 @@ li {
       }
     }
   }
-  .account-info {
-    // padding: $m $m*2;
-    margin-right: -$m;
-    .meta-info {
-      padding: $m;
-      background-color: rgba($white, 0.1);
-      color: $white;
-      text-decoration: none;
-      transition: 0.2s ease-in-out;
-      cursor: pointer;
-      border-radius: 0;
-      border: 0;
-      &:hover {
-        border: 0;
-      }
-      .p-small {
-        font-size: 12px;
-        text-transform: uppercase;
-        margin-bottom: 0px;
-        font-family: "Space Grotesk", sans-serif;
-        font-weight: 700;
-        text-align: right;
-      }
-      .short-address {
-        position: relative;
-        width: 80px;
-        overflow: hidden;
-        direction: rtl;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-      }
-    }
-  }
 }
 
 .subnav-item {
@@ -433,58 +402,13 @@ li {
   border: 1px dashed $ligth-gray
 }
 
-.account-bepro {
-  display: flex;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.1);
-  background-image: url("https://64.media.tumblr.com/95a86e7d8880b0a5c35a2fd7ba318140/e8afc16b16e16514-1a/s75x75_c1/696047f5fc05984243125426c0ec7984fd4d0824.png");
-  padding-left: 32px;
-  padding-right: 16px;
-  background-repeat: no-repeat;
-  background-position: 6px center;
-  background-size: 20px;
-  border-radius: 16px;
-  height: 32px;
-  font-size: 12px;
-  text-transform: uppercase;
-  transition: 0.2s ease-in-out;
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.2);
-    color: $white;
-    cursor: pointer;
-  }
-}
-// Remove: After update all headers
-.banner {
-  width: 100%;
-  min-height: 240px;
-  background-color: var(--bs-primary);
-  color: $white;
-  padding: ($navbar-height + $m * 3) $m * 3 $m * 3 $m * 3;
-  .banner-highlight {
-    background-color: rgba($white, 0.1);
-    padding: $m;
-    margin-top: $m;
-    text-align: center;
-    border-radius: math.div($m, 2);
-  }
-}
-
 .banner-shadow {
   width: 100%;
   min-height: 164px;
   background-color: $bg;
   color: $white;
-  padding-top: ($navbar-height + $m + 4);
-  padding-bottom: $m + 4;
+  padding: $m + 4;
   border-bottom: 1px solid $dark-gray;
-}
-
-// Remove: After update all headers
-.top-border {
-  padding-top: $m;
-  margin-top: $m;
-  border-top: 4px solid $white;
 }
 
 // Todo: check if can move to boostrap
