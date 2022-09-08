@@ -4,19 +4,17 @@ const Sequelize = require("sequelize");
 
 const DBConfig = require("../../db/config");
 const SettingsModel = require("../../db/models/settings.model");
+const TokensModel = require("../../db/models/tokens.model");
 
 const SettingItem = (key, value, visibility, type, group = undefined) => ({ key, value, type, visibility, group });
 const PublicSettingItem = (key, value, type = "string", group = undefined) => SettingItem(key, value, "public", type, group);
-const ServerSettingItem = (key, value, type = "string", group = undefined) => SettingItem(key, value, "private", type, group);
 
 const publicSettings = [
-  PublicSettingItem("nft", process.env.NEXT_PUBLIC_NFT_URI, "string", "urls"),
   PublicSettingItem("api", process.env.NEXT_PUBLIC_API_HOST, "string", "urls"),
   PublicSettingItem("home", process.env.NEXT_PUBLIC_HOME_URL, "string", "urls"),
   PublicSettingItem("ipfs", process.env.NEXT_PUBLIC_IPFS_BASE, "string", "urls"),
   PublicSettingItem("blockScan", process.env.NEXT_PUBLIC_BLOCKSCAN_LINK, "string", "urls"),
   PublicSettingItem("web3Provider", process.env.NEXT_PUBLIC_WEB3_CONNECTION, "string", "urls"),
-  PublicSettingItem("nftToken", process.env.NEXT_PUBLIC_NFT_ADDRESS, "string", "contracts"),
   PublicSettingItem("settlerToken", process.env.NEXT_PUBLIC_SETTLER_ADDRESS, "string", "contracts"),
   PublicSettingItem("network", process.env.NEXT_PUBLIC_CONTRACT_ADDRESS, "string", "contracts"),
   PublicSettingItem("transactionalToken", process.env.NEXT_PUBLIC_TRANSACTION_ADDRESS, "string", "contracts"),
@@ -75,7 +73,33 @@ const updateSetting = async (key, value, group = undefined, type = "string", vis
     await SettingsModel.update({ value }, { where: { key, group }, individualHooks: true });
 }
 
+const updateTokens = async ({
+    name,
+    symbol,
+    isTransactional,
+    address
+  }) => {
+    const sequelize = new Sequelize(DBConfig.database, DBConfig.username, DBConfig.password, DBConfig);
+  
+    TokensModel.init(sequelize);
+  
+    const [, created] = await TokensModel.findOrCreate({
+      where: {
+        name,
+        symbol,
+        isTransactional
+      },
+      defaults: {
+        address
+      }
+    });
+
+  if (!created)
+    await TokensModel.update({ address }, { where: { name, symbol, isTransactional }});
+}
+
 module.exports = {
   saveSettingsFromEnv,
-  updateSetting
-};
+  updateSetting,
+  updateTokens
+}
