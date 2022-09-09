@@ -433,8 +433,6 @@ export default function useApi() {
       });
   }
 
-    return api
-  
   async function getTokens() {
     return api
       .get<Token[]>(`/tokens`)
