@@ -91,7 +91,6 @@ export default function TokensDropdown({
         if (values[0]) {
           const tokensOptions = values.map(tokenToOption);
           setOptions(tokensOptions)
-          setOption(tokensOptions[0])
         }
       })
       .catch((err) => console.log("err token", err));
