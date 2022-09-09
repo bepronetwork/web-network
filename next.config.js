@@ -7,10 +7,10 @@ const { i18n } = require("./next-i18next.config");
 const publicRuntimeConfig = {
   urls: {
     api: process.env.NEXT_PUBLIC_API_HOST || "http://localhost:3000",
+    home: process.env.NEXT_PUBLIC_HOME_URL || "http://localhost:3000",
     events: process.env.NEXT_PUBLIC_EVENTS_API || "http://localhost:3334",
-    home: process.env.NEXT_PUBLIC_HOME_URL || "http://localhost:3000"
   }
-};
+}
 
 // Will only be available on the server-side
 const serverRuntimeConfig = {

@@ -8,7 +8,7 @@ export const api = axios.create({
 });
 
 export const eventsApi = axios.create({
-  baseURL: `${publicRuntimeConfig?.urls?.events}/`
+  baseURL: `${publicRuntimeConfig?.urls?.events}`
 });
 
 api.interceptors.response.use((response) => response,

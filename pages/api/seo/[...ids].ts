@@ -8,7 +8,6 @@ import models from "db/models";
 
 import { Settings } from "helpers/settings";
 
-
 const { publicRuntimeConfig } = getConfig();
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
