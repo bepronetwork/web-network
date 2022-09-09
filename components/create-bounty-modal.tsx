@@ -35,6 +35,7 @@ import { useSettings } from "contexts/settings";
 
 import { parseTransaction } from "helpers/transactions";
 
+import { MetamaskErrors } from "interfaces/enums/Errors";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { Token } from "interfaces/token";
@@ -420,10 +421,9 @@ export default function CreateBountyModal() {
   }, [currentSection]);
 
   useEffect(() => {
-    if(customTokens?.length === 1) {
-      setTransactionalToken(customTokens[0])
-      setRewardToken(customTokens[0])
-    }
+    if(!customTokens?.length) return;
+    if (!transactionalToken) setTransactionalToken(customTokens[0]);
+    if (!rewardToken) setRewardToken(customTokens[0]);
   }, [customTokens])
 
   useEffect(() => {
@@ -561,18 +561,24 @@ export default function CreateBountyModal() {
       }
 
       const networkBounty = await DAOService.openBounty(bountyPayload).catch((e) => {
-        if (e?.message?.toLowerCase().search("user denied") > -1)
+        if (e?.code === MetamaskErrors.UserRejected)
           dispatch(updateTransaction({
             ...(transactionToast.payload as BlockTransaction),
             status: TransactionStatus.rejected,
           }));
         else
-        dispatch(updateTransaction({
-            ...(transactionToast.payload as BlockTransaction),
-            status: TransactionStatus.failed,
-        }));
+          dispatch(updateTransaction({
+              ...(transactionToast.payload as BlockTransaction),
+              status: TransactionStatus.failed,
+          }));
 
-        dispatch(toastError(e.message || t("bounty:errors.creating-bounty")));
+        if (e?.code === MetamaskErrors.ExceedAllowance)
+          dispatch(toastError(t("bounty:errors.exceeds-allowance")));
+        else 
+          dispatch(toastError(e.message || t("bounty:errors.creating-bounty")));
+        
+        console.debug(e);
+
         return e;
       });
 
