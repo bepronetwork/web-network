@@ -5,6 +5,8 @@ const Sequelize = require("sequelize");
 const DBConfig = require("../../db/config");
 const SettingsModel = require("../../db/models/settings.model");
 const TokensModel = require("../../db/models/tokens.model");
+const NetworkModel = require("../../db/models/network.model");
+const NetworkTokensModel = require("../../db/models/network-tokens.model");
 
 const SettingItem = (key, value, visibility, type, group = undefined) => ({ key, value, type, visibility, group });
 const PublicSettingItem = (key, value, type = "string", group = undefined) => SettingItem(key, value, "public", type, group);
@@ -82,8 +84,10 @@ const updateTokens = async ({
     const sequelize = new Sequelize(DBConfig.database, DBConfig.username, DBConfig.password, DBConfig);
   
     TokensModel.init(sequelize);
+    NetworkModel.init(sequelize);
+    NetworkTokensModel.init(sequelize);
   
-    const [, created] = await TokensModel.findOrCreate({
+    const [token, created] = await TokensModel.findOrCreate({
       where: {
         name,
         symbol,
@@ -96,6 +100,21 @@ const updateTokens = async ({
 
   if (!created)
     await TokensModel.update({ address }, { where: { name, symbol, isTransactional }});
+
+  const beproNetwork = await NetworkModel.findOne({
+    where: {
+      name: "bepro"
+    }
+  });
+
+  if (beproNetwork) {
+    await NetworkTokensModel.findOrCreate({
+      where: {
+        tokenId: token.id,
+        networkId: beproNetwork.id
+      }
+    });
+  }
 }
 
 module.exports = {
