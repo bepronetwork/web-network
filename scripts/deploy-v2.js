@@ -198,6 +198,8 @@ async function main() {
       for (const address of stagingAccounts) {
         console.log(`Transfering 10M BEPRO to ${address}`);
         await bountyTransactional.transferTokenAmount(address, 10000000);
+        await rewardToken.transferTokenAmount(address, 10000000);
+        await networkToken.transferTokenAmount(address, 10000000);
       }
 
 
