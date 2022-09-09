@@ -427,8 +427,8 @@ export default function CreateBountyModal() {
   }, [customTokens])
 
   useEffect(() => {
-    if (!settings?.contracts?.settlerToken && !activeNetwork?.tokens) return;
-    if (!activeNetwork?.tokens && settings?.contracts?.settlerToken) {
+    if (!settings?.contracts?.settlerToken || activeNetwork?.tokens === undefined) return;
+    if (!activeNetwork.tokens.length && settings.contracts.settlerToken) {
       const beproToken = {
         address: settings.contracts.settlerToken,
         name: "Bepro Network",
