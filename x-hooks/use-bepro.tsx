@@ -65,6 +65,33 @@ export default function useBepro() {
     });
   }
 
+  async function handleFeeSettings(closeFee: number, cancelFee: number): Promise<TransactionReceipt | Error> {
+    return new Promise(async (resolve, reject) => {
+      const transaction = addTransaction({ type: TransactionTypes.configFees }, activeNetwork);
+
+      dispatch(transaction);
+
+      await DAOService.updateConfigFees(closeFee, cancelFee)
+        .then((txInfo: TransactionReceipt) => {
+          txWindow.updateItem(transaction.payload.id,  parseTransaction(txInfo, transaction.payload));
+          resolve(txInfo);
+        })
+        .catch((err: { message: string; }) => {
+          if (err?.message?.search("User denied") > -1)
+            dispatch(updateTransaction({
+              ...(transaction.payload as BlockTransaction),
+              status: TransactionStatus.rejected
+            }));
+          else
+            dispatch(updateTransaction({
+              ...(transaction.payload as BlockTransaction),
+              status: TransactionStatus.failed
+            }));
+          reject(err);
+        });
+    });
+  }
+
   async function handleCloseIssue(bountyId: number,
                                   proposalscMergeId: number): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
@@ -691,6 +718,7 @@ export default function useBepro() {
     handleChangeNetworkParameter,
     handleFundBounty,
     handleRetractFundBounty,
-    handleWithdrawFundRewardBounty
+    handleWithdrawFundRewardBounty,
+    handleFeeSettings
   };
 }
