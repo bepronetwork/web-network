@@ -1,65 +1,27 @@
-import { useContext } from "react";
 import { Col, Row } from "react-bootstrap";
 
-import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import { useTranslation } from "next-i18next";
 
 import Button from "components/button";
 import NetworkParameterInput from "components/custom-network/network-parameter-input";
 import TokensSettings from "components/tokens-settings";
 
-import { ApplicationContext } from "contexts/application";
-import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
-import { addTransaction } from "contexts/reducers/add-transaction";
-import { updateTransaction } from "contexts/reducers/update-transaction";
 
-import { parseTransaction } from "helpers/transactions";
-
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { BlockTransaction } from "interfaces/transaction";
-
-import useTransactions from "x-hooks/useTransactions";
+import useBepro from "x-hooks/use-bepro";
 
 export default function RegistryGovernorSettings() {
   const { t } = useTranslation(["common", "custom-network"]);
-  const { dispatch } = useContext(ApplicationContext);
   const { fields, settings } = useNetworkSettings();
-  const {  activeNetwork, updateActiveNetwork } = useNetwork();
-  const { service: DAOService } = useDAO();
-  const txWindow = useTransactions();
+  const { updateActiveNetwork } = useNetwork();
+  const { handleFeeSettings } = useBepro()
 
-  async function handleFeeSettings(): Promise<TransactionReceipt | Error> {
-    return new Promise(async (resolve, reject) => {
-      const transaction = addTransaction({ type: TransactionTypes.configFees }, activeNetwork);
-
-      dispatch(transaction);
-
-      await DAOService.updateConfigFees(settings?.treasury?.closeFee?.value,
-                                        settings?.treasury?.cancelFee?.value)
-        .then((txInfo: TransactionReceipt) => {
-          txWindow.updateItem(transaction.payload.id,  parseTransaction(txInfo, transaction.payload));
-          resolve(txInfo);
-        })
-        .catch((err: { message: string; }) => {
-          if (err?.message?.search("User denied") > -1)
-            dispatch(updateTransaction({
-              ...(transaction.payload as BlockTransaction),
-              status: TransactionStatus.rejected
-            }));
-          else
-            dispatch(updateTransaction({
-              ...(transaction.payload as BlockTransaction),
-              status: TransactionStatus.failed
-            }));
-          reject(err);
-        });
-    });
-  }
+  
   async function saveFeeSettings() {
-    await handleFeeSettings().then(() => updateActiveNetwork())
+    await handleFeeSettings(settings?.treasury?.closeFee?.value,
+                            settings?.treasury?.cancelFee?.value)
+                            .then(() => updateActiveNetwork())
   }
 
   return (
