@@ -64,6 +64,11 @@ export default function PageActions({
   const { createPrePullRequest, cancelPrePullRequest, startWorking, processEvent } = useApi();
 
   const issueGithubID = activeIssue?.githubId;
+  const issueState = getIssueState({
+    state: activeIssue?.state,
+    amount: activeIssue?.amount,
+    fundingAmount: activeIssue?.fundingAmount
+  })
 
   const isCouncilMember = !!wallet?.isCouncil;
   const isBountyInDraft = !!networkIssue?.isDraft;
@@ -72,11 +77,7 @@ export default function PageActions({
   const isWalletAndGHConnected = isWalletConnected && !!user?.login;
   const isWorkingOnBounty = !!activeIssue?.working?.find((login) => login === user?.login);
   const isBountyOpen = networkIssue?.closed === false && networkIssue?.canceled === false;
-  const isStateToWorking = ["proposal", "open", "ready"].some(value => value === getIssueState({
-    state: activeIssue?.state,
-    amount: activeIssue?.amount,
-    fundingAmount: activeIssue?.fundingAmount
-  }))
+  const isStateToWorking = ["proposal", "open", "ready"].some(value => value === issueState)
 
   const isBountyOwner =
     wallet?.address && networkIssue?.creator && networkIssue?.creator?.toLowerCase() === wallet?.address?.toLowerCase();
@@ -97,7 +98,7 @@ export default function PageActions({
   }
 
   async function handleRedeem() {
-    handleReedemIssue()
+    handleReedemIssue(issueState === 'funding')
       .then(() => {
         updateWalletBalance();
         updateBountyData();

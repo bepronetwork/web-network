@@ -150,13 +150,13 @@ export default function useBepro() {
     });
   }
 
-  async function handleReedemIssue(): Promise<TransactionReceipt | Error> {
+  async function handleReedemIssue(isFundingRequest: boolean): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue }, activeNetwork);
       dispatch(redeemTx);
       let tx: { blockNumber: number; }
-
-      await DAOService.cancelBounty(networkIssue?.id)
+      console.log('values', networkIssue?.id, isFundingRequest)
+      await DAOService.cancelBounty(networkIssue?.id, isFundingRequest)
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
           // Review: Review processEnvets are working correctly
