@@ -11,23 +11,28 @@ interface NetworkParameterInputProps {
   error?: boolean;
   onBlur?: () => void;
   decimals?: number;
+  className?: string;
+  disabled?: boolean
 }
 
 export default function NetworkParameterInput({
   onChange,
   decimals = 18,
+  className,
+  disabled = false,
   ...props
 } : NetworkParameterInputProps) {
   const handleChange = (values: NumberFormatValues) => onChange(values.floatValue);
 
   return(
-    <div className="form-group col mb-0">
+    <div className={`form-group col mb-0 ${className}`}>
       <InputNumber
         classSymbol={"text-primary"}
         min={0}
         placeholder={"0"}
         thousandSeparator
         onValueChange={handleChange}
+        disabled={disabled}
         decimalScale={decimals}
         {...props}
       />

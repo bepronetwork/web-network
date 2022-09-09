@@ -35,6 +35,7 @@ import { useSettings } from "contexts/settings";
 
 import { parseTransaction } from "helpers/transactions";
 
+import { MetamaskErrors } from "interfaces/enums/Errors";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { Token } from "interfaces/token";
@@ -101,10 +102,10 @@ export default function CreateBountyModal() {
   const [isLoadingCreateBounty, setIsLoadingCreateBounty] = useState<boolean>(false);
   const { settings } = useSettings();
 
-  const canAddCustomToken =
-    activeNetwork?.networkAddress === settings?.contracts?.network
-      ? settings?.defaultNetworkConfig?.allowCustomTokens
-      : !!activeNetwork?.allowCustomTokens;
+  const [canAddCustomToken, setCanAddCustomToken] = 
+  useState<boolean>(activeNetwork?.networkAddress === settings?.contracts?.network
+    ? settings?.defaultNetworkConfig?.allowCustomTokens
+    : !!activeNetwork?.allowCustomTokens)
 
   const steps = [
     t("bounty:steps.details"),
@@ -152,7 +153,11 @@ export default function CreateBountyModal() {
       <CreateBountyTokenAmount
         currentToken={type === "bounty" ? transactionalToken : rewardToken}
         setCurrentToken={type === "bounty" ? setTransactionalToken : setRewardToken}
-        customTokens={customTokens}
+        customTokens={
+          type === "bounty"
+            ? customTokens.filter((token) => token.isTransactional !== false)
+            : customTokens.filter((token) => token.isTransactional !== true)
+        }
         userAddress={wallet?.address}
         defaultToken={review && ((type === "bounty" ? transactionalToken : rewardToken))}
         canAddCustomToken={canAddCustomToken}
@@ -416,31 +421,27 @@ export default function CreateBountyModal() {
   }, [currentSection]);
 
   useEffect(() => {
-    if(customTokens?.length === 1) {
-      setTransactionalToken(customTokens[0])
-      setRewardToken(customTokens[0])
-    }
+    if(!customTokens?.length) return;
+    if (!transactionalToken) setTransactionalToken(customTokens[0]);
+    if (!rewardToken) setRewardToken(customTokens[0]);
   }, [customTokens])
 
   useEffect(() => {
-    if (!activeNetwork?.networkToken || !settings?.contracts?.settlerToken) return;
+    if (!settings?.contracts?.settlerToken || activeNetwork?.tokens === undefined) return;
+    if (!activeNetwork.tokens.length && settings.contracts.settlerToken) {
+      const beproToken = {
+        address: settings.contracts.settlerToken,
+        name: "Bepro Network",
+        symbol: "BEPRO"
+      };
 
-    const tmpTokens = [];
-    const beproToken = {
-      address: settings.contracts.settlerToken,
-      name: "Bepro Network",
-      symbol: "BEPRO"
-    };
-
-    tmpTokens.push(beproToken);
-
-    if (activeNetwork.networkToken.address.toLowerCase() !== beproToken?.address?.toLowerCase())
-      tmpTokens.push(activeNetwork.networkToken);
-
-    tmpTokens.push(...activeNetwork.tokens.map(({ name, symbol, address }) => ({ name, symbol, address } as Token)));
-
-    getTokenInfo(tmpTokens);
-  }, [activeNetwork?.networkToken, settings]);
+      getTokenInfo([beproToken])
+      setCanAddCustomToken(true)
+      return;
+    }
+    setCanAddCustomToken(false)
+    getTokenInfo(activeNetwork.tokens);
+  }, [activeNetwork?.tokens, settings]);
 
   function cleanFields() {
     setBountyTitle("");
@@ -560,18 +561,24 @@ export default function CreateBountyModal() {
       }
 
       const networkBounty = await DAOService.openBounty(bountyPayload).catch((e) => {
-        if (e?.message?.toLowerCase().search("user denied") > -1)
+        if (e?.code === MetamaskErrors.UserRejected)
           dispatch(updateTransaction({
             ...(transactionToast.payload as BlockTransaction),
             status: TransactionStatus.rejected,
           }));
         else
-        dispatch(updateTransaction({
-            ...(transactionToast.payload as BlockTransaction),
-            status: TransactionStatus.failed,
-        }));
+          dispatch(updateTransaction({
+              ...(transactionToast.payload as BlockTransaction),
+              status: TransactionStatus.failed,
+          }));
 
-        dispatch(toastError(e.message || t("bounty:errors.creating-bounty")));
+        if (e?.code === MetamaskErrors.ExceedAllowance)
+          dispatch(toastError(t("bounty:errors.exceeds-allowance")));
+        else 
+          dispatch(toastError(e.message || t("bounty:errors.creating-bounty")));
+        
+        console.debug(e);
+
         return e;
       });
 

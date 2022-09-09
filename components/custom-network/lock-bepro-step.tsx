@@ -216,7 +216,8 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                         </div>
 
                         <div
-                          className="row mt-2 bg-dark-gray bg-dark-hover cursor-pointer border-radius-8 caption-small p-3"
+                          className={`row mt-2 bg-dark-gray bg-dark-hover cursor-pointer 
+                            border-radius-8 caption-small p-3`}
                           onClick={handleShowUnlockModal}
                         >
                           <div className="d-flex justify-content-between px-0">

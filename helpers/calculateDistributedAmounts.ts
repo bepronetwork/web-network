@@ -8,7 +8,7 @@ export default function calculateDistributedAmounts(treasury,
                                                     bountyAmount: number,
                                                     proposalPercents: number[]) {
   const treasuryAmount = !treasury.treasury || treasury.treasury === Defaults.nativeZeroAddress ? 0 : 
-    (bountyAmount / 100) * (treasury.closeFee / Defaults.TenK);
+    (bountyAmount / 100) * treasury.closeFee;
 
   const mergerAmount = (bountyAmount / 100) * mergerFee;
   const proposerAmount = ((bountyAmount - mergerAmount) / 100) * proposerFee;
