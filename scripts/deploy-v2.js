@@ -216,9 +216,9 @@ async function main() {
     //add allowed tokens
     console.log(`Adding Allowed Tokens...`);
     // Reward Tokens
-    await network.registry.addAllowedTokens([rewardToken.contractAddress])
+    await network.registry.addAllowedTokens([networkToken.contractAddress, rewardToken.contractAddress])
     // Transactionals Tokens
-    await network.registry.addAllowedTokens([bountyTransactional.contractAddress], true);
+    await network.registry.addAllowedTokens([networkToken.contractAddress, bountyTransactional.contractAddress], true);
 
     console.table({
       NetworkToken: networkToken.contractAddress,
@@ -234,14 +234,30 @@ async function main() {
       updateSetting("network", network.contractAddress, "contracts"),
       updateSetting("transactionalToken", networkToken.contractAddress, "contracts"),
       updateSetting("networkRegistry", registryReceipt.contractAddress, "contracts"),
-      updateTokens({ name: await rewardToken.name(), 
-                     symbol: await rewardToken.symbol(),
-                     isTransactional: false,
-                     address: rewardToken.contractAddress }),
-      updateTokens({ name: await bountyTransactional.name(), 
-                      symbol: await bountyTransactional.symbol(),
-                      isTransactional: true,
-                      address: bountyTransactional.contractAddress })
+      updateTokens({ 
+        name: await networkToken.name(), 
+        symbol: await networkToken.symbol(),
+        isTransactional: false,
+        address: networkToken.contractAddress 
+      }),
+      updateTokens({ 
+        name: await networkToken.name(), 
+        symbol: await networkToken.symbol(),
+        isTransactional: true,
+        address: networkToken.contractAddress 
+      }),
+      updateTokens({ 
+        name: await rewardToken.name(), 
+        symbol: await rewardToken.symbol(),
+        isTransactional: false,
+        address: rewardToken.contractAddress
+      }),
+      updateTokens({
+        name: await bountyTransactional.name(), 
+        symbol: await bountyTransactional.symbol(),
+        isTransactional: true,
+        address: bountyTransactional.contractAddress
+      })
     ]);
     
   } catch (error) {
