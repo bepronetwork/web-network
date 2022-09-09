@@ -14,6 +14,17 @@
   "redeem-time": "Draft time",
   "council-amount": "Council Amount",
   "save-settings": "Save settings",
+  "config-tokens-registry": "Config Allowed Tokens",
+  "config-tokens": "Config Tokens",
+  "save-transactional-config": "Save transactional configs",
+  "save-reward-config": "Save reward configs",
+  "registry": {
+    "title-governor": "Registry Governor",
+    "config-fees": "Config Fees",
+    "save-fees-config": "Save fees config"
+  },
+  "add-tokens": "Add Tokens",
+  "remove-tokens": "Remove Tokens",
   "hero": {
     "title": "Networks",
     "explanatory-text": "A list of all the networks using BEPRO network for their development",
@@ -84,7 +95,9 @@
         },
         "other-settings": {
           "title": "Other Settings",
-          "parameters-warning": "Changing these parameters will launch a new transaction for each one."
+          "parameters-warning": "Changing these parameters will launch a new transaction for each one.",
+          "warning-registry": "These values were chosen by the network registry and are subject to change",
+          "warning-add-remove-allowed-tokens": "if there is removal and addition of tokens, two transactions will be required"
         },
         "fees": {
           "title": "Fees"
@@ -104,7 +117,7 @@
       "title": "Token Configuration",
       "fields": {
         "tokens-dropdown": {
-          "label": "Network Token",
+          "label": "Network Token address",
           "description": "Add an ERC20 token to be used as network token."
         },
         "name": {
@@ -130,7 +143,7 @@
         }
       },
       "actions": {
-        "deploy-nft-token": "Deploy New NFT Token"
+        "deploy-new-token": "Deploy New Token"
       }
     },
     "treasury": {

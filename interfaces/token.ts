@@ -1,11 +1,13 @@
 import { ReactElement } from "react";
 export interface Token {
+  id?: number;
   address: string;
   name: string;
   symbol: string;
   currentValue?: number;
   tokenInfo?: TokenInfo;
   balance?: number;
+  isTransactional?: boolean;
 }
 
 export interface TokenInfo extends Partial<Token> {

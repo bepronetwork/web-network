@@ -61,7 +61,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       repositories,
       botPermission,
       accessToken,
-      githubLogin
+      githubLogin,
+      allowedTokens
     } = req.body;
 
     if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
@@ -72,7 +73,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         isClosed: false,
       }
     })
-    
     if(hasNetwork){
       return res.status(409).json("Already exists a network created for this wallet");
     }
@@ -175,6 +175,25 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         });
     }
 
+//TODO: move tokens logic to new endpoint   
+    if(allowedTokens?.allowedTransactions.length > 0){
+      for (const token of allowedTokens.allowedTransactions) {
+        await Database.networkTokens.create({
+          networkId: network.id,
+          tokenId: token.id
+        })
+      }
+    }
+
+    if(allowedTokens?.allowedRewards?.length > 0){
+      for (const token of allowedTokens.allowedRewards) {
+        await Database.networkTokens.create({
+          networkId: network.id,
+          tokenId: token.id
+        })
+      }
+    }
+
     return res.status(200).json("Network created");
   } catch (error) {
     LogError("Failed to create network", { error, req });
@@ -250,7 +269,8 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
       githubLogin,
       networkAddress,
       repositoriesToAdd,
-      repositoriesToRemove
+      repositoriesToRemove,
+      allAllowedTokens
     } = req.body;
 
     const isAdminOverriding = !!override;
@@ -411,6 +431,43 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
               invitation_id
             });
         }
+      }
+    }
+    
+    const network_tokens = await Database.networkTokens.findAll({
+      where: {
+        networkId: network.id
+      }
+    });
+
+    const addTokens = allAllowedTokens?.map(tokenId => {
+      const valid = network_tokens.find(networkToken => networkToken.tokenId === tokenId)
+      if(!valid) return tokenId
+    }).filter(v => v)
+
+    const removeTokens = network_tokens.map(networkToken => {
+      const valid = allAllowedTokens?.find(number => number === networkToken.tokenId)
+      if(!valid) return networkToken.tokenId
+    }).filter(v => v)
+
+    if(addTokens?.length > 0){
+      for (const id of addTokens) {
+        await Database.networkTokens.create({
+          networkId: network.id,
+          tokenId: id
+        });
+      }
+    }
+
+    if(removeTokens?.length > 0){
+      for (const id of removeTokens) {
+        const exists = await Database.networkTokens.findOne({
+          where: {
+            networkId: network.id,
+            tokenId: id
+          }
+        });
+        if (exists) await exists.destroy();
       }
     }
 
