@@ -82,7 +82,7 @@ export default function MyNetwork() {
           </NothingFound>
         </Col>
       ||
-        <Col xs={10} className="pb-5">
+        <Col xs={10}>
           <MyNetworkSettings network={myNetwork} updateEditingNetwork={updateEditingNetwork} />
         </Col>
       }
