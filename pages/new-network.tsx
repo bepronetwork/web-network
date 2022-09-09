@@ -95,7 +95,8 @@ export default function NewNetwork() {
       botPermission: github.botPermission,
       creator: wallet.address,
       accessToken: user.accessToken,
-      githubLogin: user.login
+      githubLogin: user.login,
+      allowedTokens: tokens
     };
 
     const networkCreated = await createNetwork(payload)

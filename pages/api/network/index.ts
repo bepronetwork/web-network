@@ -73,7 +73,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         isClosed: false,
       }
     })
-    
     if(hasNetwork){
       return res.status(409).json("Already exists a network created for this wallet");
     }
@@ -176,12 +175,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         });
     }
 
-    for (const repository of repos) {
-      await Database.repositories.create({
-        githubPath: repository.fullName,
-        network_id: network.id
-      });
-    }
 //TODO: move tokens logic to new endpoint   
     if(allowedTokens?.allowedTransactions.length > 0){
       for (const token of allowedTokens.allowedTransactions) {
