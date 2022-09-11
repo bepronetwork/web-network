@@ -221,6 +221,11 @@ async function main() {
     await network.registry.addAllowedTokens([networkToken.contractAddress, rewardToken.contractAddress])
     // Transactionals Tokens
     await network.registry.addAllowedTokens([networkToken.contractAddress, bountyTransactional.contractAddress], true);
+    
+    console.log(`Adding Network_V2 to registry...`)
+    await network.registry.token.approve(registryReceipt.contractAddress, 1000);
+    await network.registry.lock(1000)
+    await network.registry.registerNetwork(networkReceipt.contractAddress);
 
     console.table({
       NetworkToken: networkToken.contractAddress,
