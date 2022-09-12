@@ -7,6 +7,7 @@ export interface Token {
   currentValue?: number;
   tokenInfo?: TokenInfo;
   balance?: number;
+  decimals?: number;
   isTransactional?: boolean;
 }
 

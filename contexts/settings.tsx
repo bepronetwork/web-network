@@ -4,9 +4,9 @@ import SettingsNotLoaded from "components/settings-not-loaded";
 
 import { getSettingsFromSessionStorage, setSettingsToSessionStorage } from "helpers/settings";
 
-import useApi from "x-hooks/use-api";
+import { SettingsType } from "types/settings";
 
-export type SettingsType = { [key: string]: any}; //eslint-disable-line
+import useApi from "x-hooks/use-api";
 
 interface SettingsContextProps {
   settings?: SettingsType;

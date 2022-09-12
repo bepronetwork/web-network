@@ -19,7 +19,7 @@ type typeError = { code?: number}
 export default function WrongNetworkModal({
   requiredNetworkId = null,
 }: {
-  requiredNetworkId: number;
+  requiredNetworkId: string | number;
 }) {
   const { t } = useTranslation("common");
 
