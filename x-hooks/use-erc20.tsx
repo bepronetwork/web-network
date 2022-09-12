@@ -32,6 +32,7 @@ export default function useERC20() {
   const { handleApproveToken } = useBepro();
   const { activeNetwork } = useNetwork();
   const txWindow = useTransactions();
+  const { dispatch } = useContext(ApplicationContext);
 
   const logData = { 
     wallet: wallet?.address, 
