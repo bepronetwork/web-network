@@ -83,7 +83,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         let validated = undefined;
   
         if (value.trim() !== "")
-          validated = /bepro|taikai/gi.test(value) ? false : !(await getNetwork(value).catch(() => false));
+          validated = /bepro|taikai/gi.test(value) ? false : !(await getNetwork({name: value}).catch(() => false));
 
         setDetails(previous => {
           const newState = { ...previous };
@@ -98,7 +98,6 @@ export const NetworkSettingsProvider = ({ children }) => {
     },
     description: {
       setter: (value: string) => setDetails(previous => ({ ...previous, description: value })),
-      validator: (value: string) => value.trim() !== ""
     },
     logo: {
       setter: (value: Icon, type: "full" | "icon") => setDetails(previous => ({ 
@@ -138,11 +137,11 @@ export const NetworkSettingsProvider = ({ children }) => {
     settlerToken: {
       setter: value => setTokens(previous => ({ ...previous, settler: value })),
     },
-    bountyToken: {
-      setter: value => setTokens(previous => ({ ...previous, bounty: value })),
+    allowedTransactions: {
+      setter: value => setTokens(previous => ({ ...previous, allowedTransactions: value })),
     },
-    bountyURI: {
-      setter: value => setTokens(previous => ({ ...previous, bountyURI: value })),
+    allowedRewards: {
+      setter: value => setTokens(previous => ({ ...previous, allowedRewards: value })),
     },
     treasury: {
       setter: value => setSettings(previous => ({ 
@@ -273,7 +272,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         const newState = { ...previous };
 
         newState.name = { value: network?.name, validated: undefined };
-        newState.description = network?.description;
+        newState.description = network?.description || "";
         newState.fullLogo.value.preview = `${IPFS_URL}/${network?.fullLogo}`;
         newState.iconLogo.value.preview = `${IPFS_URL}/${network?.logoIcon}`;
 
@@ -350,14 +349,13 @@ export const NetworkSettingsProvider = ({ children }) => {
       details?.name?.validated,
       Fields.logo.validator(details?.fullLogo?.value),
       Fields.logo.validator(details?.iconLogo?.value),
-      Fields.description.validator(details?.description),
     ].every(condition => condition);
 
     setDetails(previous => ({
       ...previous,
       validated
     }));
-  }, [details?.description, details?.iconLogo, details?.fullLogo, details?.name]);
+  }, [details?.iconLogo, details?.fullLogo, details?.name]);
 
   // Settings Validation
   useEffect(() => {
@@ -423,7 +421,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   // Treasury validation
   useEffect(() => {
     if (!DAOService) return;
-
+    
     const isAddressEmptyOrZeroAddress = settings?.treasury?.address?.value?.trim() === "" || 
       settings?.treasury?.address?.value === Defaults.nativeZeroAddress;
 
@@ -436,7 +434,6 @@ export const NetworkSettingsProvider = ({ children }) => {
     ]).then(validations => {
       setSettings(previous => {
         const newState = { ...previous };
-
         newState.treasury.address.validated = validations[0];
         newState.treasury.cancelFee.validated = validations[1];
         newState.treasury.closeFee.validated = validations[2];
@@ -454,7 +451,6 @@ export const NetworkSettingsProvider = ({ children }) => {
   useEffect(() => {
     setSettings(previous => {
       const newState = { ...previous };
-
       const validations = [
         Fields.parameter.validator("draftTime", settings?.parameters?.draftTime?.value),
         Fields.parameter.validator("councilAmount", settings?.parameters?.councilAmount?.value),
@@ -496,15 +492,13 @@ export const NetworkSettingsProvider = ({ children }) => {
   useEffect(() => {
     const validated = [
       tokens?.settler?.trim() !== "",
-      tokens?.bounty?.trim() !== "",
-      tokens?.bountyURI?.trim() !== ""
     ].every(condition => condition);
 
     setTokens(previous => ({
       ...previous,
       validated
     }));
-  }, [tokens?.settler, tokens?.bounty, tokens?.bountyURI]);
+  }, [tokens?.settler]);
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({
     tokensLocked,

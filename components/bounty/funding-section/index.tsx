@@ -3,6 +3,8 @@ import { Col, Row } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
 
+import ArrowRight from "assets/icons/arrow-right";
+
 import FundModal from "components/bounty/funding-section/fund-modal";
 import FundingProgress from "components/bounty/funding-section/funding-progress";
 import { Amount, CaptionLarge, CaptionMedium, RowWithTwoColumns } from "components/bounty/funding-section/minimals";
@@ -16,14 +18,14 @@ import { useIssue } from "contexts/issue";
 
 import { BenefactorExtended } from "interfaces/bounty";
 
-import RetractModal from "./retract-modal";
+import RetractOrWithdrawModal from "./retract-or-withdraw-modal";
 
 export default function FundingSection() {
   const { t } = useTranslation(["common", "funding"]);
 
   const [showFundModal, setShowFundModal] = useState(false);
   const [walletFunds, setWalletFunds] = useState<BenefactorExtended[]>();
-  const [fundingToRetract, setFundingToRetract] = useState<BenefactorExtended>();
+  const [fundingtoRetractOrWithdraw, setFundingToRetractOrWithdraw] = useState<BenefactorExtended>();
 
   const { networkIssue } = useIssue();
   const { wallet } = useAuthentication();
@@ -34,10 +36,11 @@ export default function FundingSection() {
   const fundsGiven = walletFunds?.reduce((acc, fund) => acc + fund.amount, 0);
   const futureRewards = fundsGiven / networkIssue?.fundingAmount * networkIssue?.rewardAmount;
   const transactionalSymbol = networkIssue?.transactionalTokenData?.symbol;
+  const rewardTokenSymbol = networkIssue?.rewardTokenData?.symbol;
 
   const handleShowFundModal = () => setShowFundModal(true);
   const handleCloseFundModal = () => setShowFundModal(false);
-  const handleCloseRetractModal = () => setFundingToRetract(undefined);
+  const handleCloseRetractOrWithdrawModal = () => setFundingToRetractOrWithdraw(undefined);
 
   useEffect(() => {
     if (!wallet?.address || !networkIssue) return;
@@ -61,10 +64,10 @@ export default function FundingSection() {
         onCloseClick={handleCloseFundModal}
       />
 
-      <RetractModal
-        show={!!fundingToRetract}
-        fundingToRetract={fundingToRetract}
-        onCloseClick={handleCloseRetractModal}
+      <RetractOrWithdrawModal
+        show={!!fundingtoRetractOrWithdraw}
+        fundingtoRetractOrWithdraw={fundingtoRetractOrWithdraw}
+        onCloseClick={handleCloseRetractOrWithdrawModal}
       />
 
       <RowWithTwoColumns
@@ -74,7 +77,7 @@ export default function FundingSection() {
             {t("funding:actions.fund-bounty")}
           </Button>}
       />
-
+      
       <Row className="border-radius-8 bg-shadow mt-3 mx-0 p-2 border border-disabled">
         <Col className="d-grid gap-2">
           <RowWithTwoColumns
@@ -107,8 +110,7 @@ export default function FundingSection() {
               }
             />
           }
-
-          { !!walletFunds?.length && 
+          {!!walletFunds?.length && 
             <>
               <hr className="bg-disabled" />
 
@@ -140,8 +142,7 @@ export default function FundingSection() {
                   />
                 </Col>
               </Row>
-
-              { (networkIssue?.isDraft || !isBountyFunded) &&
+              { (networkIssue?.isDraft || !isBountyFunded || networkIssue?.closed) &&
                 <Row className="mx-0">
                   <Collapsable
                     labelShow={t("funding:actions.manage-funding")}
@@ -151,27 +152,54 @@ export default function FundingSection() {
                     className="gap-2"
                   >
                     {walletFunds?.map(fund => 
+                    <>
                       <RowWithTwoColumns 
                         key={`fund-${fund.id}`}
                         className="p-2 bg-shadow border-radius-8"
                         col1={
+                          <>
                           <Amount 
                             amount={fund.amount}
                             symbol={transactionalSymbol}
                             className="caption-large text-white"
                           />
+                              {networkIssue?.closed && networkIssue?.rewardAmount > 0 && (
+                                <>
+                                  <ArrowRight className="mx-2" />
+                                  <span className="caption-medium me-2 text-uppercase">
+                                    {t("funding:reward")}
+                                  </span>
+                                  <Amount
+                                    amount={
+                                      (fund.amount /
+                                        networkIssue.fundingAmount) *
+                                      networkIssue.rewardAmount
+                                    }
+                                    symbol={rewardTokenSymbol}
+                                    symbolColor="warning"
+                                    className="caption-large text-white"
+                                  />
+                                </>
+                              )}
+                        </>
                         }
-                        col2={
-                          <Button
-                            textClass="text-danger p-0"
-                            transparent
-                            onClick={() => setFundingToRetract(fund)}
-                          >
-                            {t("funding:actions.retract-funding")}
-                          </Button>
+                        col2={ 
+                            networkIssue?.closed && networkIssue?.rewardAmount > 0 && (
+                              <Button
+                              textClass={`${networkIssue?.closed ? "text-primary" : 'text-danger'} p-0`}
+                              transparent
+                              onClick={() => setFundingToRetractOrWithdraw(fund)}
+                            >
+                              {networkIssue?.closed
+                                ? t("funding:actions.withdraw-funding")
+                                : t("funding:actions.retract-funding")}
+                            </Button>
+                            )
                         }
-                      />)
+                      />
+                      </>)
                     }
+
                   </Collapsable>
                 </Row>
               }

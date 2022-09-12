@@ -22,14 +22,15 @@ export default function ConnectGithub() {
 
     const user = await getUserOf(wallet?.address?.toLowerCase());
 
-    if (!user) return push("/connect-account");
+
+    if (!user?.githubHandle) return push("/connect-account");
 
     await signOut({ redirect: false });
 
     signIn("github", {
       callbackUrl: `${window.location.protocol}//${window.location.host}/${asPath}`
     });
-    
+
   }
 
   return (

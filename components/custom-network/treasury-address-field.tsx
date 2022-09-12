@@ -3,7 +3,8 @@ import { useTranslation } from "next-i18next";
 export default function TreasuryAddressField({
   value,
   onChange,
-  validated = undefined
+  validated = undefined,
+  disabled = false
 }) {
   const { t } = useTranslation("custom-network");
 
@@ -20,6 +21,7 @@ export default function TreasuryAddressField({
         className="form-control" 
         value={value}
         onChange={handleChange}
+        disabled={disabled}
       />
 
       {

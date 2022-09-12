@@ -101,7 +101,8 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         "bounty",
         "pull-request",
         "custom-network",
-        "profile"
+        "profile",
+        "change-token-modal"
       ]))
     }
   };

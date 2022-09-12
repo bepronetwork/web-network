@@ -10,6 +10,14 @@ export type NetworkParameters = "councilAmount" |
   "cancelableTime" |
   "treasury";
 
-export type Entities = "bounty" | "proposal" | "pull-request";
+export type Entities = "bounty" | "proposal" | "pull-request" | "registry";
 
-export type Events = "created" | "canceled" | "closed" | "disputed" | "ready" | "updated" | "refused" | "funded";
+export type Events = "created" | 
+  "canceled" | 
+  "closed" | 
+  "disputed" | 
+  "ready" | 
+  "updated" | 
+  "refused" | 
+  "funded" | 
+  "changed";

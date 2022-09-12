@@ -61,7 +61,7 @@ export default function PageCouncil() {
 
 
   return (
-    <div>
+    <>
       <PageHero
         title={t("council:title")}
         subtitle={t("council:subtitle")}
@@ -75,7 +75,7 @@ export default function PageCouncil() {
         </div>
       </div>
       <ListIssues filterState="ready" emptyMessage={t("council:empty")} />
-    </div>
+    </>
   );
 }
 

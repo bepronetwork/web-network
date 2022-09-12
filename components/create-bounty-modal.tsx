@@ -103,10 +103,10 @@ export default function CreateBountyModal() {
   } = useContext(ApplicationContext);
   
 
-  const canAddCustomToken =
-    activeNetwork?.networkAddress === settings?.contracts?.network
-      ? settings?.defaultNetworkConfig?.allowCustomTokens
-      : !!activeNetwork?.allowCustomTokens;
+  const [canAddCustomToken, setCanAddCustomToken] = 
+  useState<boolean>(activeNetwork?.networkAddress === settings?.contracts?.network
+    ? settings?.defaultNetworkConfig?.allowCustomTokens
+    : !!activeNetwork?.allowCustomTokens)
 
   const steps = [
     t("bounty:steps.details"),

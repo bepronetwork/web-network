@@ -44,7 +44,7 @@ export default function NewNetwork() {
 
   const { t } = useTranslation(["common", "custom-network"]);
 
-  const [creatingNetwork, setCreatingNetwork] = useState<number>();
+  const [creatingNetwork, setCreatingNetwork] = useState<number>(-1);
   const [hasNetwork, setHasNetwork] = useState(false);
 
   const { activeNetwork } = useNetwork();
@@ -55,25 +55,32 @@ export default function NewNetwork() {
   const { handleChangeNetworkParameter } = useBepro();
   const { getURLWithNetwork, colorsToCSS } = useNetworkTheme();
   const { tokensLocked, details, github, tokens, settings } = useNetworkSettings();
-  const { handleDeployNetworkV2, handleSetDispatcher, handleAddNetworkToRegistry } = useBepro();
+  const { handleDeployNetworkV2, handleAddNetworkToRegistry } = useBepro();
 
   const { dispatch } = useContext(ApplicationContext);
 
   const defaultNetworkName = appSettings?.defaultNetworkConfig?.name?.toLowerCase() || "bepro";
-
+  const isFormValidates = [
+    tokensLocked?.validated,
+    details?.validated,
+    settings?.validated,
+    github?.validated,
+    tokens?.validated,
+  ].every(condition=>condition)
+    
   const creationSteps = [
     { id: 1, name: t("custom-network:modals.loader.steps.deploy-network") },
     { id: 1, name: t("custom-network:modals.loader.steps.changing-draft-time") },
     { id: 1, name: t("custom-network:modals.loader.steps.changing-disputable-time") },
     { id: 1, name: t("custom-network:modals.loader.steps.changing-dispute-percentage") },
     { id: 1, name: t("custom-network:modals.loader.steps.changing-council-amount") },
-    { id: 2, name: t("custom-network:modals.loader.steps.set-dispatcher") },
-    { id: 3, name: t("custom-network:modals.loader.steps.add-to-registry") },
-    { id: 4, name: t("custom-network:modals.loader.steps.sync-web-network") }
+    { id: 2, name: t("custom-network:modals.loader.steps.add-to-registry") },
+    { id: 3, name: t("custom-network:modals.loader.steps.sync-web-network") }
   ];
 
   async function handleCreateNetwork() {
     if (!user?.login || !wallet?.address || !DAOService) return;
+    setCreatingNetwork(0);
 
     const payload = {
       name: details.name.value,
@@ -88,14 +95,13 @@ export default function NewNetwork() {
       botPermission: github.botPermission,
       creator: wallet.address,
       accessToken: user.accessToken,
-      githubLogin: user.login
+      githubLogin: user.login,
+      allowedTokens: tokens
     };
 
     const networkCreated = await createNetwork(payload)
-      .then(() => {
-        return true;
-      })
       .catch((error) => {
+        setCreatingNetwork(-1);
         dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
@@ -109,16 +115,11 @@ export default function NewNetwork() {
 
     if (!networkCreated) return;
 
-    setCreatingNetwork(0);
+    
 
-    const deployNetworkTX = await handleDeployNetworkV2(tokens.settler,
-                                                        tokens.bounty,
-                                                        tokens.bountyURI,
-                                                        settings.treasury.address.value,
-                                                        settings.treasury.cancelFee.value,
-                                                        settings.treasury.closeFee.value).catch(error => error);
+    const deployNetworkTX = await handleDeployNetworkV2(tokens.settler).catch(error => error);
 
-    if (!(deployNetworkTX as TransactionReceipt)?.contractAddress) return setCreatingNetwork(undefined);
+    if (!(deployNetworkTX as TransactionReceipt)?.contractAddress) return setCreatingNetwork(-1);
 
     const deployedNetworkAddress = (deployNetworkTX as TransactionReceipt).contractAddress;
 
@@ -149,15 +150,10 @@ export default function NewNetwork() {
 
     setCreatingNetwork(5);
 
-    await handleSetDispatcher(tokens.bounty, deployedNetworkAddress)
-      .catch(error => console.error("Failed to set dispatcher", deployedNetworkAddress, error));
-
-    setCreatingNetwork(6);
-
     await handleAddNetworkToRegistry(deployedNetworkAddress)
       .catch(error => console.error("Failed to add to registry", deployedNetworkAddress, error));
 
-    setCreatingNetwork(7);
+    setCreatingNetwork(6);
 
     await registerNetwork({
       creator: payload.creator
@@ -175,7 +171,7 @@ export default function NewNetwork() {
             }),
         }));
 
-        setCreatingNetwork(undefined);
+        setCreatingNetwork(-1);
         console.error("Failed synchronize network with web-network", deployedNetworkAddress, error);
       });
   }
@@ -207,18 +203,15 @@ export default function NewNetwork() {
   }, [DAOService, wallet]);
 
   return (
-    <div className="new-network">
+    <div>
       <style>{colorsToCSS(settings?.theme?.colors)}</style>
       <ConnectWalletButton asModal={true} />
 
       {
-        (creatingNetwork !== undefined && 
-        <CreatingNetworkLoader currentStep={creatingNetwork} steps={creationSteps} />) || 
-        ""
+        (creatingNetwork > -1 && <CreatingNetworkLoader currentStep={creatingNetwork} steps={creationSteps} />)
       }
-
       <CustomContainer>
-        <div className="mt-5 pt-5">
+        <div className="mt-5">
           <Stepper>
             <LockBeproStep validated={tokensLocked?.validated} />
 
@@ -229,7 +222,7 @@ export default function NewNetwork() {
             <SelectRepositoriesStep validated={github?.validated} />
 
             <TokenConfiguration 
-              validated={tokens?.validated} 
+              validated={isFormValidates} 
               handleFinish={handleCreateNetwork} 
               finishLabel={t("custom-network:steps.repositories.submit-label")} 
             />

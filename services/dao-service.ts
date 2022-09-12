@@ -7,9 +7,11 @@ import {
   TreasuryInfo,
   OraclesResume,
   Web3Connection,
-  Network_Registry
+  NetworkRegistry
 } from "@taikai/dappkit";
 import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
+import {PromiEvent, TransactionReceipt as TransactionReceiptWeb3Core} from "web3-core";
+import {Contract} from "web3-eth-contract";
 
 import { Token } from "interfaces/token";
 
@@ -22,10 +24,12 @@ interface DAOServiceProps {
   registryAddress?: string;
 }
 
+type ResolveReject = (values?: any) => void
+
 export default class DAO {
   private _web3Connection: Web3Connection;
   private _network: Network_v2;
-  private _registry: Network_Registry;
+  private _registry: NetworkRegistry;
   private _web3Host: string;
   private _registryAddress: string;
 
@@ -66,12 +70,12 @@ export default class DAO {
     return false;
   }
 
-  async loadRegistry(skipAssignment?: boolean): Promise<Network_Registry | boolean> {
+  async loadRegistry(skipAssignment?: boolean): Promise<NetworkRegistry | boolean> {
     try {
       if (!this.registryAddress) 
         throw new Error("Missing Network_Registry Contract Address");
 
-      const registry = new Network_Registry(this.web3Connection, this.registryAddress);
+      const registry = new NetworkRegistry(this.web3Connection, this.registryAddress);
 
       await registry.loadContract();
 
@@ -79,7 +83,7 @@ export default class DAO {
 
       return registry;
     } catch (error) {
-      console.log("Error loading Network_Registry: ", error);
+      console.log("Error loading NetworkRegistry: ", error);
     }
 
     return false;
@@ -99,6 +103,50 @@ export default class DAO {
     await token.loadContract();
 
     return token;
+  }
+
+
+  transactionHandler(event: PromiEvent<TransactionReceiptWeb3Core | Contract>,
+                    resolve: ResolveReject,
+                    reject: ResolveReject,
+                    debug = false) {
+    let _iban: string;
+    let tries = 1;
+    const maxTries = 60; // 1 per second
+
+    const getTx = async (hash: string) =>
+      this.web3Connection.eth.getTransactionReceipt(hash);
+
+    const handleTransaction = (tx: any) => {
+      if (!tx) {
+        if (tries === maxTries)
+          reject({
+            message: `Failed to fetch transaction ${_iban} within ${maxTries}`,
+          });
+        else {
+          tries += 1;
+          startTimeout(_iban);
+        }
+      } else {
+        resolve(tx);
+      }
+    };
+
+    const startTimeout = (hash: string) =>
+    setTimeout(() => getTx(hash).then(handleTransaction), 1000);
+
+
+    event.once(`transactionHash`, async (hash) => {
+      try {
+        _iban = hash;
+        startTimeout(hash);
+      } catch (e) {
+        console.error(e);
+        reject(e);
+      }
+    });
+
+    event.once('error', (error) => { reject(error); });
   }
 
   async start(): Promise<boolean> {
@@ -141,13 +189,13 @@ export default class DAO {
 
       switch (kind) {
       case 'settler':
-        n = await this.network.settlerToken.getTokenAmount(address);
+        n = await this.network.networkToken.getTokenAmount(address);
         break;
       case 'eth':
         n = +this.web3Connection.Web3.utils.fromWei(await this.web3Connection.getBalance());
         break;
       case 'staked':
-        n = await this.network.totalSettlerLocked();
+        n = await this.network.totalNetworkToken();
         break;
       }
       
@@ -236,14 +284,50 @@ export default class DAO {
     return this.network.getBountiesOfAddress(address);
   }
 
-  async getTotalSettlerLocked(): Promise<number> {
-    return this.network.totalSettlerLocked();
+  async getTotalNetworkToken(): Promise<number> {
+    return this.network.totalNetworkToken();
   }
 
   async getNetworksQuantityInRegistry(): Promise<number> {
     if (!this.registry) await this.loadRegistry();
 
     return this.registry.amountOfNetworks();
+  }
+
+  async getAllowedTokens(): Promise<{ transactional: string[]; reward: string[] }> {
+    if (!this.registry) await this.loadRegistry();
+
+    return this.registry.getAllowedTokens();
+  }
+
+  async addAllowedTokens(addresses: string[], isTransactional: boolean) {
+    if (!this.registry) await this.loadRegistry();
+
+    this.web3Connection.options.customTransactionHandler = this.transactionHandler.bind(this) 
+
+    return this.registry.addAllowedTokens(addresses, isTransactional)
+                        .finally(() => this.web3Connection.options.customTransactionHandler = null)
+  }
+
+  async removeAllowedTokens(addresses: string[], isTransactional: boolean) {
+    if (!this.registry) await this.loadRegistry();
+
+    this.web3Connection.options.customTransactionHandler = this.transactionHandler.bind(this) 
+
+    return this.registry.removeAllowedTokens(addresses, isTransactional)
+                        .finally(() => this.web3Connection.options.customTransactionHandler = null)
+  }
+
+  async updateConfigFees(closeFee: number, cancelFee: number){
+    if (!this.registry) await this.loadRegistry();
+
+    return this.registry.changeGlobalFees(closeFee, cancelFee)
+  }
+
+  async getTreasuryRegistry(): Promise<string> {
+    if (!this.registry) await this.loadRegistry();
+
+    return this.registry.treasury();
   }
 
   async getTokensLockedInRegistry(): Promise<number> {
@@ -292,7 +376,6 @@ export default class DAO {
     if (!this.registry) await this.loadRegistry();
 
     const governor = await this.registry.governed._governor();
-
     return governor === address;
   }
 
@@ -303,16 +386,16 @@ export default class DAO {
   }
 
   async isNetworkAbleToBeClosed(): Promise<boolean> {
-    const [totalSettlerLocked, closedBounties, canceledBounties, bountiesTotal] = 
+    const [totalNetworkToken, closedBounties, canceledBounties, bountiesTotal] = 
       await Promise.all([
-        this.network.totalSettlerLocked(),
+        this.network.totalNetworkToken(),
         this.network.closedBounties(),
         this.network.canceledBounties(),
         this.network.bountiesIndex()
       ]);
 
     return (
-      totalSettlerLocked === 0 &&
+      totalNetworkToken === 0 &&
       closedBounties + canceledBounties === bountiesTotal
     );
   }
@@ -329,7 +412,7 @@ export default class DAO {
   }
 
   async getSettlerTokenData(): Promise<Token> {
-    return this.getERC20TokenData(this.network.settlerToken.contractAddress);
+    return this.getERC20TokenData(this.network.networkToken.contractAddress);
   }
 
   async getTokenBalance(tokenAddress: string, walletAddress: string): Promise<number> {
@@ -346,7 +429,9 @@ export default class DAO {
 
   async getSettlerTokenAllowance(walletAddress: string): Promise<number> {
 
-    return this.getAllowance(this.network.settlerToken.contractAddress, walletAddress, this.network.contractAddress);
+    return this.getAllowance(this.network.networkToken.contractAddress, 
+                             walletAddress, 
+                             this.network.contractAddress);
   }
 
   async deployBountyToken(name: string, symbol: string): Promise<TransactionReceipt> {
@@ -355,6 +440,14 @@ export default class DAO {
     await deployer.loadAbi();
 
     return deployer.deployJsonAbi(name, symbol);
+  }
+
+  async deployERC20Token(name: string, symbol: string, cap: string, ownerAddress: string): Promise<TransactionReceipt> {
+    const deployer = new ERC20(this.web3Connection);
+
+    await deployer.loadAbi();
+
+    return deployer.deployJsonAbi(name, symbol, cap, ownerAddress);
   }
 
   async openBounty({
@@ -387,6 +480,10 @@ export default class DAO {
 
   async retractFundBounty(bountyId: number, fundingId: number): Promise<TransactionReceipt> {
     return this.network.retractFunds(bountyId, [fundingId]);
+  }
+
+  async withdrawFundRewardBounty(bountyId: number, fundingId: number): Promise<TransactionReceipt> {
+    return this.network.withdrawFundingReward(bountyId, fundingId);
   }
 
   async disputeProposal(bountyId: number, proposalId: number): Promise<TransactionReceipt> {
@@ -448,17 +545,13 @@ export default class DAO {
     return this.network.takeBackOracles(delegationId);
   }
 
-  async deployNetworkV2(networkToken: string,
-    nftToken: string = Defaults.nativeZeroAddress, 
-    nftUri = "//",
-    treasuryAddress = Defaults.nativeZeroAddress,
-    cancelFee = 10000,
-    closeFee= 50000): Promise<TransactionReceipt> {
-    const newNetwork = new Network_v2(this.web3Connection);
+  async deployNetworkV2(networkToken: string): Promise<TransactionReceipt> {
+    const registryAddress: string = this._registryAddress
 
+    const newNetwork = new Network_v2(this.web3Connection);
     await newNetwork.loadAbi();
 
-    return newNetwork.deployJsonAbi(networkToken, nftToken, nftUri, treasuryAddress, cancelFee, closeFee);
+    return newNetwork.deployJsonAbi(networkToken,  registryAddress);
   }
 
   async addNetworkToRegistry(networkAddress: string): Promise<TransactionReceipt> {

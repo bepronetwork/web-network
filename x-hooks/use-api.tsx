@@ -18,6 +18,7 @@ import { Network } from "interfaces/network";
 import { PaginatedData } from "interfaces/paginated-data";
 import { Proposal } from "interfaces/proposal";
 import { ReposList } from "interfaces/repos-list";
+import { Token } from "interfaces/token";
 
 import client from "services/api";
 
@@ -427,8 +428,13 @@ export default function useApi() {
       .catch(() => false);
   }
 
-  async function getNetwork(name: string) {
-    const search = new URLSearchParams({ name }).toString();
+  async function getNetwork({ name, creator }: { name?: string, creator?: string }) {
+    const Params = {} as { name?: string, creator?: string }
+    if (name) Params.name = name
+
+    if (creator) Params.creator = creator
+
+    const search = new URLSearchParams(Params).toString();
 
     return client
       .get<Network>(`/network?${search}`)
@@ -437,6 +443,17 @@ export default function useApi() {
         throw error;
       });
   }
+
+  
+  async function getTokens() {
+    return client
+      .get<Token[]>(`/tokens`)
+      .then(({ data }) => data)
+      .catch((error) => {
+        throw error;
+      });
+  }
+
 
   async function searchNetworks({
     page = "1",
@@ -531,6 +548,7 @@ export default function useApi() {
     cancelPrePullRequest,
     resetUser,
     getSettings,
-    registerNetwork
+    registerNetwork,
+    getTokens,
   };
 }

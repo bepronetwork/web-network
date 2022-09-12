@@ -45,7 +45,7 @@ export default function PageDevelopers() {
     Promise.all([
       DAOService.getClosedBounties().catch(() => 0),
       DAOService.getOpenBounties().catch(() => 0),
-      DAOService.getTotalSettlerLocked().catch(() => 0),
+      DAOService.getTotalNetworkToken().catch(() => 0),
       getTotalUsers(),
     ]).then(([closed, inProgress, onNetwork, totalUsers]) => {
       setInfos([
@@ -71,7 +71,7 @@ export default function PageDevelopers() {
   }, [DAOService, activeNetwork?.networkToken]);
 
   return (
-    <div className="mb-5">
+    <>
       <PageHero
         title={t("heroes.bounties.title")}
         subtitle={t("heroes.bounties.subtitle")}
@@ -79,7 +79,7 @@ export default function PageDevelopers() {
       />
 
       <ListIssues />
-    </div>
+    </>
   );
 }
 
