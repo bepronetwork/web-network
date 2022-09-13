@@ -198,6 +198,8 @@ async function main() {
       for (const address of stagingAccounts) {
         console.log(`Transfering 10M BEPRO to ${address}`);
         await bountyTransactional.transferTokenAmount(address, 10000000);
+        await rewardToken.transferTokenAmount(address, 10000000);
+        await networkToken.transferTokenAmount(address, 10000000);
       }
 
 
@@ -220,6 +222,11 @@ async function main() {
     // Transactionals Tokens
     await network.registry.addAllowedTokens([networkToken.contractAddress, bountyTransactional.contractAddress], true);
 
+    console.log(`Adding Network_V2 to registry...`)
+    await network.registry.token.approve(registryReceipt.contractAddress, 1000);
+    await network.registry.lock(1000)
+    await network.registry.registerNetwork(networkReceipt.contractAddress);
+
     console.table({
       NetworkToken: networkToken.contractAddress,
       BountyTransactional: bountyTransactional.contractAddress,
@@ -234,32 +241,32 @@ async function main() {
       updateSetting("network", network.contractAddress, "contracts"),
       updateSetting("transactionalToken", networkToken.contractAddress, "contracts"),
       updateSetting("networkRegistry", registryReceipt.contractAddress, "contracts"),
-      updateTokens({ 
-        name: await networkToken.name(), 
+      updateTokens({
+        name: await networkToken.name(),
         symbol: await networkToken.symbol(),
         isTransactional: false,
-        address: networkToken.contractAddress 
+        address: networkToken.contractAddress
       }),
-      updateTokens({ 
-        name: await networkToken.name(), 
+      updateTokens({
+        name: await networkToken.name(),
         symbol: await networkToken.symbol(),
         isTransactional: true,
-        address: networkToken.contractAddress 
+        address: networkToken.contractAddress
       }),
-      updateTokens({ 
-        name: await rewardToken.name(), 
+      updateTokens({
+        name: await rewardToken.name(),
         symbol: await rewardToken.symbol(),
         isTransactional: false,
         address: rewardToken.contractAddress
       }),
       updateTokens({
-        name: await bountyTransactional.name(), 
+        name: await bountyTransactional.name(),
         symbol: await bountyTransactional.symbol(),
         isTransactional: true,
         address: bountyTransactional.contractAddress
       })
     ]);
-    
+
   } catch (error) {
     console.error(error);
     exit(1);

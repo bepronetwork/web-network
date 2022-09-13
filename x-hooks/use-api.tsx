@@ -35,6 +35,7 @@ interface NewIssueParams {
 interface CreateBounty {
   title: string;
   body: string;
+  creator: string;
   repositoryId: string;
 }
 

@@ -20,9 +20,11 @@ import useBepro from "x-hooks/use-bepro";
 import useTransactions from "./useTransactions";
 
 export default function useERC20() {
-  const { dispatch } = useContext(ApplicationContext);
-  const [allowance, setAllowance] = useState(0);
   const [balance, setBalance] = useState(0);
+  const [name, setName] = useState<string>();
+  const [decimals, setDecimals] = useState(18); 
+  const [allowance, setAllowance] = useState(0);
+  const [symbol, setSymbol] = useState<string>();
   const [address, setAddress] = useState<string>();
 
   const { wallet } = useAuthentication();
@@ -30,6 +32,7 @@ export default function useERC20() {
   const { handleApproveToken } = useBepro();
   const { activeNetwork } = useNetwork();
   const txWindow = useTransactions();
+  const { dispatch } = useContext(ApplicationContext);
 
   const logData = { 
     wallet: wallet?.address, 
@@ -56,6 +59,15 @@ export default function useERC20() {
   }, [wallet?.address, DAOService, address]);
 
   useEffect(() => {
+    if (DAOService && address) 
+      DAOService.getERC20TokenData(address)
+        .then(({ name, symbol, decimals }) => {
+          setName(name);
+          setSymbol(symbol);
+          setDecimals(decimals);
+        })
+        .catch(error => console.debug("useERC20:getERC20TokenData", logData, error));
+        
     updateAllowanceAndBalance();
   }, [wallet?.address, DAOService, address]);
 
@@ -90,6 +102,9 @@ export default function useERC20() {
   }
 
   return {
+    name,
+    decimals,
+    symbol,
     handleDeployERC20Token,
     allowance,
     balance,

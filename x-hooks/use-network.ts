@@ -144,12 +144,15 @@ export default function useNetworkTheme() {
     });
   }
 
-  function getURLWithNetwork(href: string, query = {} as Record<string, unknown>): UrlObject {
+  function getURLWithNetwork(href: string, query = undefined): UrlObject {
     return {
       pathname: `/[network]/${href}`.replace("//", "/"),
       query: {
         ...query,
-        network: query.network || router?.query?.network || settings?.defaultNetworkConfig?.name || "bepro"
+        network: query?.network || 
+                 router?.query?.network || 
+                 settings?.defaultNetworkConfig?.name || 
+                 "bepro"
       }
     };
   }

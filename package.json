@@ -16,6 +16,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "npx eslint . --fix --ext .ts,.tsx",
+    "generate-settings-types": "node ./scripts/settings/generate-types.js",
     "deploy:local": "node ./scripts/deploy-v2 -n development",
     "deploy:kovan": "node ./scripts/deploy-v2 -n kovan",
     "deploy:ropsten": "node ./scripts/deploy-v2 -n ropsten",
