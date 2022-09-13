@@ -5,7 +5,8 @@ module.exports = {
     await queryInterface
     .addColumn("tokens", "isTransactional", {
       type: Sequelize.BOOLEAN,
-      allowNull: false
+      allowNull: false,
+      defaultValue: false
     })
   },
 
