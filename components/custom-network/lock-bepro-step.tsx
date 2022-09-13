@@ -76,11 +76,10 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
     setIsUnlocking(true);
 
     DAOService.unlockFromRegistry()
-      .then(() => {
-        setAmount(0);
-        updateWalletBalance();
-        updateAllowance();
-      })
+      .then(() => 
+        Promise.all([setAmount(0),
+                     updateWalletBalance(),
+                     updateAllowance()]))
       .catch((error) => {
         console.log("Failed to Unlock", error);
       })
@@ -107,10 +106,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
     if (amountNeeded <= 0|| isApproving) return;
     setIsApproving(true)
     DAOService.approveTokenInRegistry(amountNeeded - settlerAllowance)
-      .then(() => {
-        updateWalletBalance();
-        updateAllowance();
-      })
+      .then(() => Promise.all([updateWalletBalance(),updateAllowance()]))
       .catch(console.log).finally(()=> setIsApproving(false))
   }
 

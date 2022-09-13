@@ -355,7 +355,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       ...previous,
       validated
     }));
-  }, [details?.iconLogo, details?.fullLogo, details?.name]);
+  }, [details?.iconLogo, details?.fullLogo, details?.name?.validated]);
 
   // Settings Validation
   useEffect(() => {

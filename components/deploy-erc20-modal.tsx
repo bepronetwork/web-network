@@ -91,6 +91,7 @@ export default function DeployERC20Modal({
                 type="text" 
                 className="form-control rounded-4" 
                 value={name} 
+                disabled={isExecuting}
                 onChange={e => setName(e.target.value)} 
               />
             </div>
@@ -109,6 +110,7 @@ export default function DeployERC20Modal({
                 type="text" 
                 className="form-control rounded-4" 
                 value={symbol} 
+                disabled={isExecuting}
                 onChange={e => setSymbol(e.target.value)} 
               />
             </div>
@@ -126,6 +128,7 @@ export default function DeployERC20Modal({
                 type="number" 
                 className="form-control rounded-4" 
                 value={cap} 
+                disabled={isExecuting}
                 onChange={e => setCap(Number(e.target.value))} 
               />
             </div>

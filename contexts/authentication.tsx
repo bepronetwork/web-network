@@ -29,7 +29,7 @@ export interface IAuthenticationContext {
   disconnectWallet: () => void;
   connectGithub: () => void;
   disconnectGithub: () => void;
-  updateWalletBalance: () => void;
+  updateWalletBalance: () => Promise<void>;
   validateWalletAndGithub: (address: string, login: string) => void;
 }
 
