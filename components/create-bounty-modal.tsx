@@ -598,24 +598,21 @@ export default function CreateBountyModal() {
   }, [transactionalERC20.allowance, rewardERC20.allowance, issueAmount.floatValue, rewardAmount.floatValue]);
 
   useEffect(() => {
-    if (!activeNetwork?.networkToken || !settings?.contracts?.settlerToken) return;
+    if (!settings?.contracts?.settlerToken || activeNetwork?.tokens === undefined) return;
+    if (!activeNetwork.tokens.length && settings.contracts.settlerToken) {
+      const beproToken = {
+        address: settings.contracts.settlerToken,
+        name: "Bepro Network",
+        symbol: "BEPRO"
+      };
 
-    const tmpTokens = [];
-    const beproToken = {
-      address: settings.contracts.settlerToken,
-      name: "Bepro Network",
-      symbol: "BEPRO"
-    };
-
-    tmpTokens.push(beproToken);
-
-    if (activeNetwork.networkToken.address.toLowerCase() !== beproToken?.address?.toLowerCase())
-      tmpTokens.push(activeNetwork.networkToken);
-
-    tmpTokens.push(...activeNetwork.tokens.map(({ name, symbol, address }) => ({ name, symbol, address } as Token)));
-
-    getTokenInfo(tmpTokens);
-  }, [activeNetwork?.networkToken, settings]);
+      getTokenInfo([beproToken])
+      setCanAddCustomToken(true)
+      return;
+    }
+    setCanAddCustomToken(false)
+    getTokenInfo(activeNetwork.tokens);
+  }, [activeNetwork?.tokens, settings]);
 
   if (showCreateBounty && !wallet?.address)
     return <ConnectWalletButton asModal={true} />;
