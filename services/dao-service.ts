@@ -395,7 +395,7 @@ export default class DAO {
       ]);
 
     return (
-      totalNetworkToken === 0 &&
+      parseInt(totalNetworkToken) === 0 &&
       closedBounties + canceledBounties === bountiesTotal
     );
   }
