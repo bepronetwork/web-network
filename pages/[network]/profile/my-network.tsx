@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { Col } from "react-bootstrap";
 
-import { Defaults } from "@taikai/dappkit";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -13,8 +12,7 @@ import ProfileLayout from "components/profile/profile-layout";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { cookieKey, useNetwork } from "contexts/network";
+import { cookieKey } from "contexts/network";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 import { useSettings } from "contexts/settings";
 
@@ -31,47 +29,31 @@ export default function MyNetwork() {
   
   const { searchNetworks } = useApi();
   const { wallet } = useAuthentication();
-  const { settings: appSettings } = useSettings(); 
-  const { service: DAOService } = useDAO();
-  const {  activeNetwork } = useNetwork();
-  const defaultNetworkName = appSettings?.defaultNetworkConfig?.name?.toLowerCase() || "bepro";
 
   async function updateEditingNetwork() {
     dispatch(changeLoadState(true));
 
-    DAOService.getNetworkAdressByCreator(wallet.address)
-      .then(registeredNetwork => {
-        if (registeredNetwork === Defaults.nativeZeroAddress)
-          return { count: -1, rows: [] };
+    searchNetworks({
+      creatorAddress: wallet.address,
+      isClosed: false
+    })
+      .then(({ count , rows }) => {
+        const savedNetwork = count > 0 ? rows[0] : undefined;
 
-        return searchNetworks({
-          creatorAddress: wallet.address,
-          isClosed: false
-        });
-      })
-      .then(({ rows, count }) => {
-        if (count < 0)
-          setMyNetwork(undefined);
-        else if (count === 0) 
-          console.debug("Something went wrong, the user has a network but it's not saved", wallet.address);
-        else {
-          const savedNetwork = rows[0];
-
-          setMyNetwork(savedNetwork);
+        if (savedNetwork)
           sessionStorage.setItem(`${cookieKey}:${savedNetwork.name.toLowerCase()}`, JSON.stringify(savedNetwork));
-        }
 
-        return true;
+        setMyNetwork(savedNetwork);
       })
       .catch(error => console.debug("Failed to get network", error))
       .finally(() => dispatch(changeLoadState(false)));
   }
 
   useEffect(() => {
-    if (!DAOService || !wallet?.address) return;
+    if (!wallet?.address) return;
 
     updateEditingNetwork();
-  }, [DAOService, wallet?.address]);
+  }, [wallet?.address]);
   
   return(
     <ProfileLayout>

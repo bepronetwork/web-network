@@ -20,4 +20,5 @@ export type Events = "created" |
   "updated" | 
   "refused" | 
   "funded" | 
-  "changed";
+  "changed" |
+  "registered";

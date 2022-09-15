@@ -64,8 +64,6 @@ export default async function readTokenChanged(events, network: Network_v2, regi
           }
         }
       }else console.warn("Allowed tokens not found in the registry");
-
-      console.log('deu bom')
     } catch (error) {
       console.error(`[ERROR_REGISTRY] Failed to save tokens from past-events`, event, error);
     }
