@@ -1,5 +1,4 @@
 import { error as LogError } from '@scripts/logging.js';
-import { Defaults } from '@taikai/dappkit';
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
@@ -62,17 +61,19 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       botPermission,
       accessToken,
       githubLogin,
-      allowedTokens
+      allowedTokens,
+      networkAddress
     } = req.body;
 
     if (!botPermission) return res.status(403).json("Bepro-bot authorization needed");
 
     const hasNetwork = await Database.network.findOne({
-      where:{
+      where: {
         creatorAddress: creator,
         isClosed: false,
       }
     })
+
     if(hasNetwork){
       return res.status(409).json("Already exists a network created for this wallet");
     }
@@ -124,7 +125,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       description,
       colors: JSON.parse(colors),
       logoIcon: logoIconHash,
-      fullLogo: fullLogoHash
+      fullLogo: fullLogoHash,
+      networkAddress
     });
 
     const repos = JSON.parse(repositories);
@@ -197,59 +199,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     return res.status(200).json("Network created");
   } catch (error) {
     LogError("Failed to create network", { error, req });
-    return res.status(500).json(error);
-  }
-}
-
-async function patch(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    const {
-      creator
-    } = req.body;
-
-    const settings = await Database.settings.findAll({
-      where: { visibility: "public" },
-      raw: true,
-    });
-
-    const publicSettings = (new Settings(settings)).raw();
-
-    if (!publicSettings?.contracts?.networkRegistry) return res.status(500).json("Missing network registry contract");
-    if (!publicSettings?.urls?.web3Provider) return res.status(500).json("Missing web3 provider url");
-
-    // Contract Validations
-    const DAOService = new DAO({ 
-      skipWindowAssignment: true,
-      web3Host: publicSettings.urls.web3Provider,
-      registryAddress: publicSettings.contracts.networkRegistry
-    });
-
-    if (!await DAOService.start()) return res.status(500).json("Failed to connect with chain");
-    
-    if (!await DAOService.loadRegistry()) return res.status(500).json("Failed to load registry");
-
-    const registeredNetwork = await DAOService.getNetworkAdressByCreator(creator);
-
-    if (registeredNetwork === Defaults.nativeZeroAddress)
-      return res.status(403).json("No network registered for this wallet");
-
-    const savedNetwork = await Database.network.findOne({
-      where: {
-        creatorAddress: creator,
-        isClosed: false,
-        isRegistered: false
-      }
-    });
-
-    if (!savedNetwork) return res.status(409).json("Network to register not found");
-
-    savedNetwork.isRegistered = true;
-    savedNetwork.networkAddress = registeredNetwork;
-    await savedNetwork.save();
-
-    return res.status(200).json("Registered");
-  } catch (error) {
-    LogError("Failed to patch network data", { error, req });
     return res.status(500).json(error);
   }
 }
@@ -497,10 +446,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   case "post":
     await post(req, res);
-    break;
-
-  case "patch":
-    await patch(req, res);
     break;
 
   case "put":
