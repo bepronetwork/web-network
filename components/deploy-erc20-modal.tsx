@@ -5,11 +5,13 @@ import { useTranslation } from "next-i18next";
 import LockedIcon from "assets/icons/locked-icon";
 
 import Button from "components/button";
+import InputNumber from "components/input-number";
 import Modal from "components/modal";
 
 import { useAuthentication } from "contexts/authentication";
 
 import useERC20 from "x-hooks/use-erc20";
+
 
 export default function DeployERC20Modal({
   show,
@@ -36,7 +38,7 @@ export default function DeployERC20Modal({
       setIsExecuting(true);
 
       await handleDeployERC20Token(name, symbol, cap.toString(), wallet?.address)
-      .then(token => setERC20Address(token.contractAddress))
+        .then(token => setERC20Address(token.contractAddress))
 
       setDefaults();
       setClose();
@@ -63,6 +65,10 @@ export default function DeployERC20Modal({
       setDefaults();
       setClose();
     }
+  }
+
+  function handleCapChange({ floatValue }) {
+    setCap(floatValue);
   }
 
   return (
@@ -124,12 +130,11 @@ export default function DeployERC20Modal({
                 {t("misc.cap")}
               </label>
 
-              <input 
-                type="number" 
-                className="form-control rounded-4" 
+              <InputNumber
                 value={cap} 
+                onValueChange={handleCapChange}
+                decimalScale={0}
                 disabled={isExecuting}
-                onChange={e => setCap(Number(e.target.value))} 
               />
             </div>
           </div>
