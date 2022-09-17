@@ -154,19 +154,19 @@ export default function useBepro() {
     return new Promise(async (resolve, reject) => {
       const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue }, activeNetwork);
       dispatch(redeemTx);
+
       let tx: { blockNumber: number; }
 
       await DAOService.cancelBounty(networkIssue?.id)
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
-          // Review: Review processEnvets are working correctly
           return processEvent("bounty", 
                               "canceled", 
                               activeNetwork.name, 
                               { fromBlock: txInfo.blockNumber, id: networkIssue?.id });
         })
-        .then(({data: canceledBounties}) => {
-          if (!canceledBounties.find((cid: string) => cid === networkIssue?.cid)) throw new Error('Failed');
+        .then((canceledBounties) => {
+          if (!canceledBounties?.[networkIssue?.cid]) throw new Error('Failed');
 
           txWindow.updateItem(redeemTx.payload.id, parseTransaction(tx, redeemTx.payload));
           updateIssue(activeIssue.repository_id, activeIssue.githubId);
@@ -202,8 +202,8 @@ export default function useBepro() {
                               activeNetwork.name, 
                               { fromBlock: txInfo.blockNumber, id: networkIssue?.id });
         })
-        .then(({data: canceledBounties}) => {
-          if (!canceledBounties.find((cid: string) => cid === networkIssue?.cid)) throw new Error('Failed');
+        .then((canceledBounties) => {
+          if (!canceledBounties?.[networkIssue?.cid]) throw new Error('Failed');
           txWindow.updateItem(redeemTx.payload.id, parseTransaction(tx, redeemTx.payload));
           
           updateIssue(activeIssue.repository_id, activeIssue.githubId);

@@ -23,6 +23,7 @@ import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { BlockTransaction } from "interfaces/transaction";
 
+import useApi from "x-hooks/use-api";
 import useTransactions from "x-hooks/useTransactions";
 
 interface NetworkTxButtonParams {
@@ -71,6 +72,7 @@ function networkTxButton({
   const { dispatch } = useContext(ApplicationContext);
   
   const txWindow = useTransactions();
+  const { processEvent } = useApi();
   const { activeNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
   const { wallet, updateWalletBalance } = useAuthentication();
@@ -113,7 +115,7 @@ function networkTxButton({
     const currency = txCurrency || t("misc.$token");
     
     transactionMethod
-      .then((answer) => {
+      .then(async(answer) => {
         if (answer.status) {
           onSuccess && onSuccess();
           dispatch(addToast({
@@ -123,7 +125,10 @@ function networkTxButton({
               ${t(`transactions.types.${methodName}`)} ${formatNumberToCurrency(txParams?.tokenAmount)} ${currency}
               `
           }));
-          
+
+          if(answer.blockNumber) 
+            await processEvent("oracles","changed", activeNetwork.name, {fromBlock:answer.blockNumber})
+
           txWindow.updateItem(tmpTransaction.payload.id,
                               parseTransaction(answer, tmpTransaction.payload));
         } else {

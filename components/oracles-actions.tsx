@@ -64,7 +64,7 @@ function OraclesActions({
   const networkTokenSymbol = activeNetwork?.networkToken?.symbol || t("misc.$token");
 
   const renderAmount = tokenAmount
-    ? `${formatNumberToCurrency(tokenAmount)} `
+    ? `${formatNumberToCurrency(tokenAmount, {maximumFractionDigits: 18})}`
     : "0";
 
   const verifyTransactionState = (type: TransactionTypes): boolean =>
@@ -127,7 +127,7 @@ function OraclesActions({
 
   const isButtonDisabled = (): boolean =>
     [
-      tokenAmount < 1,
+      tokenAmount > 1e-18,
       action === t("my-oracles:actions.lock.label") && needsApproval(),
       !wallet?.address,
       tokenAmount > getMaxAmmount(),

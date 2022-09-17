@@ -3,5 +3,6 @@ export enum Errors {
 }
 
 export enum MetamaskErrors {
-  UserRejected = 4001
+  UserRejected = 4001,
+  ExceedAllowance = -32603
 }

@@ -15,7 +15,7 @@ const publicSettings = [
   PublicSettingItem("api", process.env.NEXT_PUBLIC_API_HOST, "string", "urls"),
   PublicSettingItem("home", process.env.NEXT_PUBLIC_HOME_URL, "string", "urls"),
   PublicSettingItem("ipfs", process.env.NEXT_PUBLIC_IPFS_BASE, "string", "urls"),
-  PublicSettingItem("blockScan", process.env.NEXT_PUBLIC_BLOCKSCAN_LINK, "string", "urls"),
+  PublicSettingItem("blockScan", process.env.NEXT_PUBLIC_BLOCKSCAN_LINK || '', "string", "urls"),
   PublicSettingItem("web3Provider", process.env.NEXT_PUBLIC_WEB3_CONNECTION, "string", "urls"),
   PublicSettingItem("settlerToken", process.env.NEXT_PUBLIC_SETTLER_ADDRESS, "string", "contracts"),
   PublicSettingItem("network", process.env.NEXT_PUBLIC_CONTRACT_ADDRESS, "string", "contracts"),
@@ -25,11 +25,11 @@ const publicSettings = [
   PublicSettingItem("token", process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME, "string", "requiredChain"),
   PublicSettingItem("id", process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID, "string", "requiredChain"),
   PublicSettingItem("name", process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME, "string", "requiredChain"),
-  PublicSettingItem("excludedJurisdictions", process.env.NEXT_PUBLIC_COUNTRY_CODE_BLOCKED, "json"),
-  PublicSettingItem("api", process.env.NEXT_PUBLIC_CURRENCY_API, "string", "currency"),
-  PublicSettingItem("defaultFiat", process.env.NEXT_PUBLIC_CURRENCY_MAIN, "string", "currency"),
-  PublicSettingItem("defaultToken", process.env.NEXT_PUBLIC_CURRENCY_ID, "string", "currency"),
-  PublicSettingItem("conversionList", process.env.NEXT_PUBLIC_CURRENCY_VSLIST, "json", "currency"),
+  PublicSettingItem("excludedJurisdictions", process.env.NEXT_PUBLIC_COUNTRY_CODE_BLOCKED || '[]', "json"),
+  PublicSettingItem("api", process.env.NEXT_PUBLIC_CURRENCY_API || '', "string", "currency"),
+  PublicSettingItem("defaultFiat", process.env.NEXT_PUBLIC_CURRENCY_MAIN || '', "string", "currency"),
+  PublicSettingItem("defaultToken", process.env.NEXT_PUBLIC_CURRENCY_ID || '', "string", "currency"),
+  PublicSettingItem("conversionList", process.env.NEXT_PUBLIC_CURRENCY_VSLIST || '[]', "json", "currency"),
   PublicSettingItem("1", "ethereum", "string", "chainIds"),
   PublicSettingItem("3", "ropsten", "string", "chainIds"),
   PublicSettingItem("4", "rinkeby", "string", "chainIds"),
@@ -46,8 +46,8 @@ const publicSettings = [
   PublicSettingItem("draftTime", `{ "min": 60, "max": 1728000 }`, "json", "networkParametersLimits"),
   PublicSettingItem("councilAmount", `{ "min": 100001, "max": 50000000 }`, "json", "networkParametersLimits"),
   PublicSettingItem("disputePercentage", `{ "max": 15 }`, "json", "networkParametersLimits"),
-  PublicSettingItem("name", process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME, "string", "defaultNetworkConfig"),
-  PublicSettingItem("allowCustomTokens", process.env.NEXT_PUBLIC_ALLOW_CUSTOM_TOKENS, "boolean", "defaultNetworkConfig"),
+  PublicSettingItem("name", process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME || 'bepro', "string", "defaultNetworkConfig"),
+  PublicSettingItem("allowCustomTokens", process.env.NEXT_PUBLIC_ALLOW_CUSTOM_TOKENS || 0, "boolean", "defaultNetworkConfig"),
   PublicSettingItem("adminWallet", process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS, "string", "defaultNetworkConfig"),
 ];
 
@@ -61,6 +61,9 @@ const saveSettingsFromEnv = async () => {
 
 const updateSetting = async (key, value, group = undefined, type = "string", visibility = "public") => {
   const sequelize = new Sequelize(DBConfig.database, DBConfig.username, DBConfig.password, DBConfig);
+  if (!value) {
+    return console.warn(`Value is required`)
+  }
 
   SettingsModel.init(sequelize);
 

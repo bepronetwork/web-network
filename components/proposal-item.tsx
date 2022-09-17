@@ -58,8 +58,8 @@ export default function ProposalItem({
   const { getURLWithNetwork } = useNetworkTheme();
   const { activeIssue, networkIssue, getNetworkIssue, updateIssue } = useIssue();
   
-  const networkProposal = networkIssue?.proposals?.[proposal?.contractId];
-  const networkPullRequest = networkIssue?.pullRequests?.find(pr => pr.id === networkProposal?.prId);
+  const networkProposal = networkIssue?.proposals?.[+proposal?.scMergeId];
+  const networkPullRequest = networkIssue?.pullRequests?.[networkProposal?.prId];
 
   const isProposalMerged = proposal.isMerged;
   const isBountyClosed = !!networkIssue?.closed;

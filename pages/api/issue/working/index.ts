@@ -11,8 +11,6 @@ import * as IssueQueries from "graphql/issue";
 
 import { getPropertyRecursively } from "helpers/object";
 
-import api from "services/api";
-
 import { GraphQlQueryResponseData, GraphQlResponse } from "types/octokit";
 
 const { serverRuntimeConfig } = getConfig();
@@ -69,10 +67,6 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
         updatedAt: commentEdge.updatedAt,
         author: commentEdge.author.login
       };
-
-      await api.post(`/seo/${issue?.issueId}`).catch((e) => {
-        console.log("Error creating SEO", e);
-      });
 
       return res.status(200).json(comment);
     }

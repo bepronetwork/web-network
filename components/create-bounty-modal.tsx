@@ -33,6 +33,7 @@ import { useSettings } from "contexts/settings";
 
 import { parseTransaction } from "helpers/transactions";
 
+import { MetamaskErrors } from "interfaces/enums/Errors";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { Token } from "interfaces/token";
@@ -103,7 +104,7 @@ export default function CreateBountyModal() {
   } = useContext(ApplicationContext);
   
 
-  const [canAddCustomToken, setCanAddCustomToken] = 
+  const [canAddCustomToken] = 
   useState<boolean>(activeNetwork?.networkAddress === settings?.contracts?.network
     ? settings?.defaultNetworkConfig?.allowCustomTokens
     : !!activeNetwork?.allowCustomTokens)
@@ -338,7 +339,7 @@ export default function CreateBountyModal() {
     currentSection + 1 < steps.length &&
       setCurrentSection((prevState) => prevState + 1);
     if (currentSection === 3) {
-      createIssue();
+      createBounty();
     }
   }
 
@@ -460,105 +461,113 @@ export default function CreateBountyModal() {
       !verifyTransactionState(TransactionTypes.approveTransactionalERC20Token),
     ].some((value) => value === false);
 
-  async function createIssue() {
+  async function createBounty() {
     if (!repository || !transactionalToken || !DAOService || !wallet) return;
+
     setIsLoadingCreateBounty(true)
-    const payload = {
-      title: bountyTitle,
-      body: addFilesInDescription(bountyDescription),
-      amount: issueAmount.floatValue,
-      creatorAddress: wallet.address,
-      creatorGithub: user?.login,
-      repositoryId: repository?.id,
-      branch,
-    };
 
-    const openIssueTx = addTransaction({ type: TransactionTypes.openIssue, amount: payload.amount }, activeNetwork);
+    try {
+      const payload = {
+        title: bountyTitle,
+        body: addFilesInDescription(bountyDescription),
+        amount: issueAmount.floatValue,
+        creatorAddress: wallet.address,
+        githubUser: user?.login,
+        repositoryId: repository?.id,
+        branch,
+      };
 
-    const cid = await createPreBounty({
+      const cid = await createPreBounty({
         title: payload.title,
         body: payload.body,
-        creator: payload.creatorGithub,
+        creator: payload.githubUser,
         repositoryId: payload.repositoryId,
-    }, activeNetwork?.name)
+      }, activeNetwork?.name)
       .then((cid) => cid)
-      .catch(() => {
-        dispatch(toastError(t("bounty:errors.creating-bounty")));
-        setIsLoadingCreateBounty(false)
-        return false;
-      });
-    if (!cid) return;
 
-    dispatch(openIssueTx);
+      if (!cid){
+        return dispatch(toastError(t("bounty:errors.creating-bounty")));
+      }
+      
+      const transactionToast = 
+    addTransaction({ type: TransactionTypes.openIssue, amount: payload.amount },
+                   activeNetwork);
 
-    const bountyPayload: BountyPayload = {
+      dispatch(transactionToast);
+
+      const bountyPayload: BountyPayload = {
       cid,
-      title: payload.title,
-      repoPath: repository.path,
       branch,
+      repoPath: repository.path,
       transactional: transactionalToken.address,
+      title: payload.title,
       tokenAmount: payload.amount,
-      githubUser: payload.creatorGithub,
-    };
+      githubUser: payload.githubUser,
+      };
 
-    if (!isFundingType && !rewardChecked) {
-      bountyPayload.tokenAmount = 0;
-      bountyPayload.fundingAmount = issueAmount.floatValue;
-    }
+      if (!isFundingType && !rewardChecked) {
+        bountyPayload.tokenAmount = 0;
+        bountyPayload.fundingAmount = issueAmount.floatValue;
+      }
 
-    if (rewardChecked) {
-      bountyPayload.tokenAmount = 0;
-      bountyPayload.rewardAmount = rewardAmount.floatValue;
-      bountyPayload.rewardToken = rewardToken.address;
-      bountyPayload.fundingAmount = issueAmount.floatValue;
-    }
+      if (rewardChecked) {
+        bountyPayload.tokenAmount = 0;
+        bountyPayload.rewardAmount = rewardAmount.floatValue;
+        bountyPayload.rewardToken = rewardToken.address;
+        bountyPayload.fundingAmount = issueAmount.floatValue;
+      }
 
-    const txInfo = await DAOService.openBounty(bountyPayload).catch((e) => {
-      setIsLoadingCreateBounty(false)
-      if (e?.message?.toLowerCase().search("user denied") > -1)
-        dispatch(updateTransaction({
-            ...(openIssueTx.payload as BlockTransaction),
+      const networkBounty = await DAOService.openBounty(bountyPayload).catch((e) => {
+        if (e?.code === MetamaskErrors.UserRejected)
+          dispatch(updateTransaction({
+            ...(transactionToast.payload as BlockTransaction),
             status: TransactionStatus.rejected,
-        }));
-      else
-        dispatch(updateTransaction({
-            ...(openIssueTx.payload as BlockTransaction),
-            status: TransactionStatus.failed,
-        }));
+          }));
+        else
+          dispatch(updateTransaction({
+              ...(transactionToast.payload as BlockTransaction),
+              status: TransactionStatus.failed,
+          }));
 
-      console.log("Failed to create bounty on chain", e);
+        if (e?.code === MetamaskErrors.ExceedAllowance)
+          dispatch(toastError(t("bounty:errors.exceeds-allowance")));
+        else 
+          dispatch(toastError(e.message || t("bounty:errors.creating-bounty")));
+        
+        console.debug(e);
 
-      dispatch(toastError(e.message || t("bounty:errors.creating-bounty")));
-      return false;
-    });
-
-    if (!txInfo) return;
-
-    txWindow.updateItem(openIssueTx.payload.id,
-                        parseTransaction(txInfo, openIssueTx.payload));
-
-    const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
-
-    const createdBounties = await processEvent("bounty", "created", activeNetwork?.name, { fromBlock })
-      .then(({ data }) => data)
-      .catch((error) => {
-        console.log("Failed to patch bounty", error);
-        setIsLoadingCreateBounty(false)
-        return false;
+        return e;
       });
 
-    if (!createdBounties)
-      return dispatch(toastWarning(t("bounty:errors.sync")));
+      if (!networkBounty || networkBounty?.error) {
+        throw new Error('bounty creation failed');
+      }
 
-    if (createdBounties.includes(cid)) {
-      const [repoId, githubId] = String(cid).split("/");
+      txWindow.updateItem(transactionToast.payload.id,
+                          parseTransaction(networkBounty, transactionToast.payload));
 
-      router.push(getURLWithNetwork("/bounty", {
+    
+      const createdBounty = await processEvent("bounty",
+                                               "created",
+                                               activeNetwork?.name,
+      { fromBlock: networkBounty?.blockNumber})
+
+      if (!createdBounty){
+        dispatch(toastWarning(t("bounty:errors.sync")));
+      }
+    
+      if (createdBounty?.[cid]) {
+        const [repoId, githubId] = String(cid).split("/");
+
+        router.push(getURLWithNetwork("/bounty", {
           id: githubId,
           repoId,
-      }));
-      dispatch(changeShowCreateBountyState(false))
+        }));
+      }
+
       cleanFields();
+      dispatch(changeShowCreateBountyState(false))
+    }finally{
       setIsLoadingCreateBounty(false)
     }
   }

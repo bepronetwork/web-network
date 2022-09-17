@@ -221,7 +221,7 @@ async function main() {
     await network.registry.addAllowedTokens([networkToken.contractAddress, rewardToken.contractAddress])
     // Transactionals Tokens
     await network.registry.addAllowedTokens([networkToken.contractAddress, bountyTransactional.contractAddress], true);
-    
+
     console.log(`Adding Network_V2 to registry...`)
     await network.registry.token.approve(registryReceipt.contractAddress, 1000);
     await network.registry.lock(1000)
@@ -241,32 +241,32 @@ async function main() {
       updateSetting("network", network.contractAddress, "contracts"),
       updateSetting("transactionalToken", networkToken.contractAddress, "contracts"),
       updateSetting("networkRegistry", registryReceipt.contractAddress, "contracts"),
-      updateTokens({ 
-        name: await networkToken.name(), 
+      updateTokens({
+        name: await networkToken.name(),
         symbol: await networkToken.symbol(),
         isTransactional: false,
-        address: networkToken.contractAddress 
+        address: networkToken.contractAddress
       }),
-      updateTokens({ 
-        name: await networkToken.name(), 
+      updateTokens({
+        name: await networkToken.name(),
         symbol: await networkToken.symbol(),
         isTransactional: true,
-        address: networkToken.contractAddress 
+        address: networkToken.contractAddress
       }),
-      updateTokens({ 
-        name: await rewardToken.name(), 
+      updateTokens({
+        name: await rewardToken.name(),
         symbol: await rewardToken.symbol(),
         isTransactional: false,
         address: rewardToken.contractAddress
       }),
       updateTokens({
-        name: await bountyTransactional.name(), 
+        name: await bountyTransactional.name(),
         symbol: await bountyTransactional.symbol(),
         isTransactional: true,
         address: bountyTransactional.contractAddress
       })
     ]);
-    
+
   } catch (error) {
     console.error(error);
     exit(1);
