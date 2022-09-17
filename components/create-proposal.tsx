@@ -108,6 +108,7 @@ export default function NewProposal({
   const [executing, setExecuting] = useState<boolean>(false);
   const [currentGithubId, setCurrentGithubId] = useState<string>();
   const [participants, setParticipants] = useState<participants[]>([]);
+  const [isLoadingParticipants, setIsLoadingParticipants] = useState<boolean>(false);
   const [showExceptionalMessage, setShowExceptionalMessage] =
     useState<boolean>();
   const [currentPullRequest, setCurrentPullRequest] = useState<pullRequest>({} as pullRequest);
@@ -225,7 +226,7 @@ export default function NewProposal({
 
   function getParticipantsPullRequest(githubId: string) {
     if (!activeRepo) return;
-
+    setIsLoadingParticipants(true)
     getPullRequestParticipants(activeRepo.githubPath, +githubId)
       .then((participants) => {
         const tmpParticipants = [...participants];
@@ -246,11 +247,13 @@ export default function NewProposal({
         const tmpParticipants = participantsPr.filter(({ address }) => !!address);
         setDistrib(Object.fromEntries(tmpParticipants.map((participant) => [participant.githubHandle, 0])));
         setCurrentGithubId(githubId);
+        setParticipants([])
         setParticipants(tmpParticipants);
       })
       .catch((err) => {
         console.error("Error fetching pullRequestsParticipants", err);
-      });
+      })
+      .finally(() => setIsLoadingParticipants(false))
   }
 
   async function handleClickCreate(): Promise<void> {
@@ -311,6 +314,72 @@ export default function NewProposal({
       getParticipantsPullRequest(defaultPr?.githubId);
     }
   }, [pullRequests, activeRepo]);
+
+
+  function renderDistribution() {
+    if (isLoadingParticipants)
+      return (
+      <div className="d-flex justify-content-center mt-4">
+        <span className="spinner-border spinner-border-md" />
+      </div>
+      );
+
+    if (!participants.length)
+      return (
+        <p className="text-uppercase text-danger text-center w-100 caption mt-4 mb-0">
+          {t("pull-request:errors.pull-request-participants")}
+        </p>
+      );
+
+    return (
+      <>
+        <p className="caption-small mt-3 text-white-50 text-uppercase mb-2 mt-3">
+          {t("proposal:actions.propose-distribution")}
+        </p>
+        <ul className="mb-0">
+          {participants.map((item) => (
+            <CreateProposalDistributionItem
+              key={`distribution-item-${item.githubLogin}`}
+              githubHandle={item.githubHandle}
+              githubLogin={item.githubLogin}
+              onChangeDistribution={handleChangeDistrib}
+              error={!!error}
+              success={success}
+              warning={warning}
+              isDisable={cantBeMergeable()}
+            />
+          ))}
+        </ul>
+        <div className="d-flex" style={{ justifyContent: "flex-end" }}>
+          {warning || cantBeMergeable() ? (
+            <p
+              className={`caption-small pr-3 mt-3 mb-0 text-uppercase text-${
+                warning ? "warning" : "danger"
+              }`}
+            >
+              {t(`proposal:errors.${
+                  warning ? "distribution-already-exists" : "pr-cant-merged"
+                }`)}
+            </p>
+          ) : (
+            <p
+              className={clsx("caption-small pr-3 mt-3 mb-0  text-uppercase", {
+                "text-success": success,
+                "text-danger": error,
+              })}
+            >
+              {showExceptionalMessage && error
+                ? t("proposal:messages.distribution-cant-done")
+                : t(`proposal:messages.distribution-${
+                      success ? "is" : "must-be"
+                    }-100`)}
+            </p>
+          )}
+        </div>
+      </>
+    );
+  }
+
 
   return (
     <div className="d-flex">
@@ -387,58 +456,7 @@ export default function NewProposal({
           isOptionDisabled={(option) => option.isDisable}
           onChange={handleChangeSelect}
         />
-        {(!participants.length && (
-          <p className="text-uppercase text-danger text-center w-100 caption mt-4 mb-0">
-            {t("pull-request:errors.pull-request-participants")}
-          </p>
-        )) || (
-          <>
-            <p className="caption-small mt-3 text-white-50 text-uppercase mb-2 mt-3">
-              {t("proposal:actions.propose-distribution")}
-            </p>
-            <ul className="mb-0">
-              {participants.map((item) => (
-                <CreateProposalDistributionItem
-                  key={`distribution-item-${item.githubLogin}`}
-                  githubHandle={item.githubHandle}
-                  githubLogin={item.githubLogin}
-                  onChangeDistribution={handleChangeDistrib}
-                  error={!!error}
-                  success={success}
-                  warning={warning}
-                  isDisable={cantBeMergeable()}
-                />
-              ))}
-            </ul>
-            <div className="d-flex" style={{ justifyContent: "flex-end" }}>
-              {warning || cantBeMergeable() ? (
-                <p
-                  className={`caption-small pr-3 mt-3 mb-0 text-uppercase text-${
-                    warning ? "warning" : "danger"
-                  }`}
-                >
-                  {t(`proposal:errors.${
-                      warning ? "distribution-already-exists" : "pr-cant-merged"
-                    }`)}
-                </p>
-              ) : (
-                <p
-                  className={clsx("caption-small pr-3 mt-3 mb-0  text-uppercase",
-                                  {
-                      "text-success": success,
-                      "text-danger": error
-                                  })}
-                >
-                  {showExceptionalMessage && error
-                    ? t("proposal:messages.distribution-cant-done")
-                    : t(`proposal:messages.distribution-${
-                          success ? "is" : "must-be"
-                        }-100`)}
-                </p>
-              )}
-            </div>
-          </>
-        )}
+          {renderDistribution()}
       </Modal>
     </div>
   );
