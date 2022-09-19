@@ -107,8 +107,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
     try {
       const [full, logo] = await Promise.all([
-        IpfsStorage.add(fullLogo, true, undefined, "svg").catch(() => undefined),
-        IpfsStorage.add(logoIcon, true, undefined, "svg").catch(() => undefined)
+        IpfsStorage.add(fullLogo, true, undefined, "svg"),
+        IpfsStorage.add(logoIcon, true, undefined, "svg")
       ])
 
       if (full?.hash) fullLogoHash = full.hash;
