@@ -379,8 +379,8 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     if (fullLogo || logoIcon) {
       try {
         const [full, logo] = await Promise.all([
-          IpfsStorage.add(fullLogo, true, undefined, "svg").catch(() => undefined),
-          IpfsStorage.add(logoIcon, true, undefined, "svg").catch(() => undefined)
+          IpfsStorage.add(fullLogo, true, undefined, "svg"),
+          IpfsStorage.add(logoIcon, true, undefined, "svg")
         ])
 
         if (full?.hash) network.logoIcon = logo?.hash;
