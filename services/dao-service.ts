@@ -498,8 +498,8 @@ export default class DAO {
     return this.network.updateBountyAmount(bountyId, amount);
   }
 
-  async cancelBounty(bountyId: number): Promise<TransactionReceipt> {
-    return this.network.cancelBounty(bountyId);
+  async cancelBounty(bountyId: number, funding: boolean): Promise<TransactionReceipt> {
+    return funding ? this.network.cancelFundRequest(bountyId) : this.network.cancelBounty(bountyId);
   }
 
   async createPullRequest(bountyId: number,

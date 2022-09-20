@@ -150,14 +150,14 @@ export default function useBepro() {
     });
   }
 
-  async function handleReedemIssue(): Promise<TransactionReceipt | Error> {
+  async function handleReedemIssue(funding = false): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue }, activeNetwork);
       dispatch(redeemTx);
 
       let tx: { blockNumber: number; }
 
-      await DAOService.cancelBounty(networkIssue?.id)
+      await DAOService.cancelBounty(networkIssue?.id, funding)
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
           return processEvent("bounty", 
