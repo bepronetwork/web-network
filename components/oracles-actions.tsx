@@ -127,7 +127,7 @@ function OraclesActions({
 
   const isButtonDisabled = (): boolean =>
     [
-      tokenAmount > 1e-18,
+      tokenAmount < 1e-18,
       action === t("my-oracles:actions.lock.label") && needsApproval(),
       !wallet?.address,
       tokenAmount > getMaxAmmount(),
