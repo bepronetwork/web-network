@@ -21,6 +21,7 @@
     "deploy:kovan": "node ./scripts/deploy-v2 -n kovan",
     "deploy:ropsten": "node ./scripts/deploy-v2 -n ropsten",
     "deploy:moonbase": "node ./scripts/deploy-v2 -n moonbase",
+    "deploy:moonbeam": "node ./scripts/deploy-v2 -n moonbeam",
     "deploy:seneca": "node ./scripts/deploy-v2 -n seneca",
     "deploy:afrodite": "node ./scripts/deploy-v2 -n afrodite",
     "deploy:irene": "node ./scripts/deploy-v2 -n irene",
