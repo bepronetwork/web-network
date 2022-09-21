@@ -14,8 +14,9 @@ import ProfileLayout from "components/profile/profile-layout";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
-import { cookieKey } from "contexts/network";
+import { cookieKey, useNetwork } from "contexts/network";
 import { changeLoadState } from "contexts/reducers/change-load-state";
+import { useSettings } from "contexts/settings";
 
 import { Network } from "interfaces/network";
 
@@ -30,7 +31,10 @@ export default function MyNetwork() {
   
   const { searchNetworks } = useApi();
   const { wallet } = useAuthentication();
+  const { settings: appSettings } = useSettings(); 
   const { service: DAOService } = useDAO();
+  const {  activeNetwork } = useNetwork();
+  const defaultNetworkName = appSettings?.defaultNetworkConfig?.name?.toLowerCase() || "bepro";
 
   async function updateEditingNetwork() {
     dispatch(changeLoadState(true));
@@ -75,7 +79,11 @@ export default function MyNetwork() {
         <Col className="pt-5">
           <NothingFound description={t("custom-network:errors.not-found")}>
             <InternalLink
-              href="/new-network"
+              href={
+                activeNetwork?.name.toLowerCase() === defaultNetworkName
+                  ? "/new-network"
+                  : "/networks"
+              }
               label={String(t("actions.create-one"))}
               uppercase
             />
