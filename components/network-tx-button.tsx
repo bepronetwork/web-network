@@ -29,8 +29,8 @@ import useTransactions from "x-hooks/useTransactions";
 interface NetworkTxButtonParams {
   txMethod: string;
   txParams: {
-    from?: string,
-    tokenAmount?: number
+    from?: string;
+    tokenAmount?: string;
   }
   onTxStart?: () => void;
   onSuccess: () => void;
@@ -115,7 +115,7 @@ function networkTxButton({
     const currency = txCurrency || t("misc.$token");
     
     transactionMethod
-      .then(async(answer) => {
+      .then(answer => {
         if (answer.status) {
           onSuccess && onSuccess();
           dispatch(addToast({
@@ -127,7 +127,7 @@ function networkTxButton({
           }));
 
           if(answer.blockNumber) 
-            await processEvent("oracles","changed", activeNetwork.name, {fromBlock:answer.blockNumber})
+            processEvent("oracles","changed", activeNetwork.name, {fromBlock:answer.blockNumber});
 
           txWindow.updateItem(tmpTransaction.payload.id,
                               parseTransaction(answer, tmpTransaction.payload));
