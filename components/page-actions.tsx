@@ -75,8 +75,9 @@ export default function PageActions({
   const issueState = getIssueState({
     state: activeIssue?.state,
     amount: activeIssue?.amount,
-    fundingAmount: activeIssue?.fundingAmount
+    fundingAmount: activeIssue?.fundingAmount 
   })
+  const isBountyFunded = activeIssue?.fundedAmount === activeIssue?.fundingAmount
   const isStateToWorking = ["proposal", "open", "ready"].some(value => value === issueState)
 
   const isBountyOwner =
@@ -301,7 +302,7 @@ export default function PageActions({
   }
 
   function renderCancelButton() {
-    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft)
+    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft && !isBountyFunded)
       return(
         <ReadOnlyButtonWrapper>
           <Button
