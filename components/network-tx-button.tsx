@@ -127,7 +127,7 @@ function networkTxButton({
           }));
 
           if(answer.blockNumber) 
-            processEvent("oracles","changed", activeNetwork.name, {fromBlock:answer.blockNumber});
+            processEvent("oracles","changed", activeNetwork.name, {fromBlock:answer.blockNumber}).catch(console.debug);
 
           txWindow.updateItem(tmpTransaction.payload.id,
                               parseTransaction(answer, tmpTransaction.payload));
