@@ -192,7 +192,7 @@ export default function NewNetwork() {
   useEffect(() => {
     if (!activeNetwork) return;
 
-    if (activeNetwork.name.toLowerCase() !== defaultNetworkName && activeNetwork.isClosed === false)
+    if (activeNetwork.name.toLowerCase() !== defaultNetworkName)
       router.push(getURLWithNetwork("/profile/my-network", { network: defaultNetworkName }));
   }, [activeNetwork]);
 
