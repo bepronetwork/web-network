@@ -12,7 +12,7 @@
   "filters": {
     "filters": "Filter",
     "search-repositories": "Search repositories",
-    "repository": "repository",
+    "repository": "repository", 
     "all": "All",
     "no-records-found": "No records found",
     "clear-filter": "Clear filter",
@@ -58,8 +58,8 @@
   },
   "main-nav": {
     "developers": "Developers",
-    "council": "Council",
-    "Oracle": "Oracle",
+    "council": "Curators",
+    "Oracle": "Oracles",
     "new-bounty": "New bounty",
     "get-started": "Get Started",
     "connect": "Connect Wallet",
@@ -358,7 +358,7 @@
       "deploy-bounty-token": "Deploy Bounty Token",
       "set-draft-time": "Set Draft Time",
       "set-disputable-time": "Set Disputable Time",
-      "set-council-amount": "Set Council Amount",
+      "set-council-amount": "Set Curator Amount",
       "set-percentage-dispute": "Set Percentage for Dispute",
       "fund-bounty": "Fund Bounty",
       "retract-fund": "Retract Bounty Fund",
