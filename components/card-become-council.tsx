@@ -43,7 +43,10 @@ export default function CardBecomeCouncil() {
       </div>
       <Link href={getURLWithNetwork("/profile/oracles")}>
         <a className="text-decoration-none text-purple text-uppercase">
-          {t("go-to-oracles")} <ArrowRight className="text-purple ms-2 mb-1" />
+          {t("go-to-oracles", {
+            token: activeNetwork?.networkToken?.name.toUpperCase(),
+          })}{" "}
+          <ArrowRight className="text-purple ms-2 mb-1" />
         </a>
       </Link>
     </div>
