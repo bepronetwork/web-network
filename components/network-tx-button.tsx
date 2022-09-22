@@ -43,7 +43,6 @@ interface NetworkTxButtonParams {
   txType: TransactionTypes;
   txCurrency: string;
   fullWidth?: boolean;
-  useContract?: boolean;
   className?: string;
 }
 
@@ -58,12 +57,10 @@ function networkTxButton({
     className = "",
     children = null,
     fullWidth = false,
-    useContract = false,
     disabled = false,
     txType = TransactionTypes.unknown,
     txCurrency
-  }: NetworkTxButtonParams,
-                         elementRef) {
+  }: NetworkTxButtonParams, elementRef) {
   const { t } = useTranslation(["common"]);
 
   const [showModal, setShowModal] = useState(false);
@@ -91,30 +88,13 @@ function networkTxButton({
         type: txType,
         amount: txParams?.tokenAmount || 0,
         currency: txCurrency || t("misc.$token")
-    },
-                                          activeNetwork);
+    }, activeNetwork);
     dispatch(tmpTransaction);
-
-    let transactionMethod;
-
-    if (!useContract)
-      transactionMethod = DAOService.network[txMethod](txParams.tokenAmount, txParams.from);
-    else {
-      const weiAmount = DAOService.toWei(txParams?.tokenAmount.toString());
-
-      transactionMethod = DAOService.network.contract.methods[txMethod];
-      transactionMethod =
-        txMethod === "lock"
-          ? transactionMethod(weiAmount).send({ from: wallet.address })
-          : transactionMethod(weiAmount, txParams?.from).send({
-              from: wallet.address
-          });
-    }
     
     const methodName = txMethod === 'delegateOracles' ? 'delegate' : txMethod;
     const currency = txCurrency || t("misc.$token");
     
-    transactionMethod
+    DAOService.network[txMethod](txParams.tokenAmount, txParams.from)
       .then(answer => {
         if (answer.status) {
           onSuccess && onSuccess();
