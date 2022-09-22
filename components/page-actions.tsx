@@ -70,6 +70,7 @@ export default function PageActions({
   const isBountyFinished = !!networkIssue?.isFinished;
   const isWalletConnected = !!wallet?.address;
   const isWalletAndGHConnected = isWalletConnected && !!user?.login;
+  const isFundingRequest = +networkIssue?.fundingAmount > 0 || +activeIssue?.fundingAmount > 0;
   const isWorkingOnBounty = !!activeIssue?.working?.find((login) => login === user?.login);
   const isBountyOpen = networkIssue?.closed === false && networkIssue?.canceled === false;
   const issueState = getIssueState({
@@ -317,7 +318,7 @@ export default function PageActions({
   }
 
   function renderUpdateAmountButton() {
-    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft && !isBountyFunding)
+    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft && !isFundingRequest)
       return(
         <ReadOnlyButtonWrapper>
           <Button
