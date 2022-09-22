@@ -11,6 +11,7 @@ import {
   toSmartContractDecimals
 } from "@taikai/dappkit";
 import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
+import BigNumber from "bignumber.js";
 import {PromiEvent, TransactionReceipt as TransactionReceiptWeb3Core} from "web3-core";
 import {Contract} from "web3-eth-contract";
 
@@ -25,6 +26,7 @@ interface DAOServiceProps {
   registryAddress?: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ResolveReject = (values?: any) => void
 
 export default class DAO {
@@ -109,8 +111,7 @@ export default class DAO {
 
   transactionHandler(event: PromiEvent<TransactionReceiptWeb3Core | Contract>,
                     resolve: ResolveReject,
-                    reject: ResolveReject,
-                    debug = false) {
+                    reject: ResolveReject) {
     let _iban: string;
     let tries = 1;
     const maxTries = 60; // 1 per second
@@ -118,6 +119,7 @@ export default class DAO {
     const getTx = async (hash: string) =>
       this.web3Connection.eth.getTransactionReceipt(hash);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleTransaction = (tx: any) => {
       if (!tx) {
         if (tries === maxTries)
@@ -184,29 +186,30 @@ export default class DAO {
     return this.web3Connection.web3.eth.getChainId();
   }
 
-  async getBalance(kind: `eth` | `settler` | `staked`, address: string): Promise<number> {
+  async getBalance(kind: `eth` | `settler` | `staked`, address: string): Promise<BigNumber> {
+    let n = new BigNumber("0");
     try {
-      let n = 0;
+      const decimals = +this.network.networkToken.decimals;
 
       switch (kind) {
       case 'settler':
-        n = await this.network.networkToken.getTokenAmount(address);
+        n = new BigNumber(await this.network.networkToken.getTokenAmount(address)).decimalPlaces(decimals);
         break;
       case 'eth':
-        n = +this.web3Connection.Web3.utils.fromWei(await this.web3Connection.getBalance());
+        n = new BigNumber(await this.web3Connection.getBalance()).decimalPlaces(16);
         break;
       case 'staked':
-        n = await this.network.totalNetworkToken();
+        n = new BigNumber(await this.network.totalNetworkToken()).decimalPlaces(decimals);
         break;
       }
-      
-      return n;
     } catch (error) {
-      return 0;
+      console.debug("Failed to getBalance", error);
     }
+
+    return n;
   }
 
-  async getNetworkParameter(parameter: NetworkParameters): Promise<number> {
+  async getNetworkParameter(parameter: NetworkParameters): Promise<string | number> {
     return this.network[parameter]();
   }
 
@@ -216,23 +219,42 @@ export default class DAO {
     return this.network[`change${parameter[0].toUpperCase() + parameter.slice(1)}`](value);
   }
 
-  async getOraclesOf(address: string): Promise<number> {    
-    return this.network.getOraclesOf(address);
+  async getOraclesOf(address: string): Promise<BigNumber> { 
+    const oracles = this.network.getOraclesOf(address);
+    
+    return new BigNumber(oracles);
   }
 
   async isCouncil(address: string): Promise<boolean> {
     const councilAmount = await this.getNetworkParameter("councilAmount");
     const oraclesOf = await this.getOraclesOf(address);
 
-    return oraclesOf >= councilAmount;
+    return oraclesOf.gte(councilAmount);
   }
 
   async getOraclesResume(address: string): Promise<OraclesResume> {
-    return this.network.getOraclesResume(address);
+    const resume = await this.network.getOraclesResume(address);
+    
+    return {
+      ...resume,
+      locked: new BigNumber(resume.locked),
+      delegatedToOthers: new BigNumber(resume.delegatedToOthers),
+      delegatedByOthers: new BigNumber(resume.delegatedByOthers),
+      delegations: resume.delegations.map(delegation => ({ ...delegation, amount: new BigNumber(delegation.amount) }))
+    };
   }
 
   async getBounty(id: number): Promise<Bounty> {
-    return this.network.getBounty(id);
+    const bounty = await this.network.getBounty(id);
+
+    return {
+      ...bounty,
+      tokenAmount: new BigNumber(bounty.tokenAmount),
+      rewardAmount: new BigNumber(bounty.rewardAmount),
+      fundingAmount: new BigNumber(bounty.fundingAmount),
+      proposals: 
+        bounty.proposals.map(proposal => ({ ...proposal, disputeWeight: new BigNumber(proposal.disputeWeight) }))
+    };
   }
 
   async isBountyInDraft(id: number): Promise<boolean> {
@@ -243,8 +265,10 @@ export default class DAO {
     return this.network.isProposalDisputed(bountyId, proposalId);
   }
 
-  async getDisputesOf(address: string, bountyId: number, proposalId: number): Promise<number> {
-    return this.network.disputes(address, bountyId, proposalId);
+  async getDisputesOf(address: string, bountyId: number, proposalId: number): Promise<BigNumber> {
+    const disputes = await this.network.disputes(address, bountyId, proposalId);
+
+    return new BigNumber(disputes);
   }
 
   async getTreasury(): Promise<TreasuryInfo> {
@@ -285,8 +309,10 @@ export default class DAO {
     return this.network.getBountiesOfAddress(address);
   }
 
-  async getTotalNetworkToken(): Promise<number> {
-    return this.network.totalNetworkToken();
+  async getTotalNetworkToken(): Promise<BigNumber> {
+    const totalNetworkToken = await this.network.totalNetworkToken();
+
+    return new BigNumber(totalNetworkToken);
   }
 
   async getNetworksQuantityInRegistry(): Promise<number> {
@@ -331,10 +357,12 @@ export default class DAO {
     return this.registry.treasury();
   }
 
-  async getTokensLockedInRegistry(): Promise<number> {
+  async getTokensLockedInRegistry(): Promise<BigNumber> {
     if (!this.registry) await this.loadRegistry();
 
-    return this.registry.totalLockedAmount();
+    const totalLocked = await this.registry.totalLockedAmount();
+
+    return new BigNumber(totalLocked);
   }
 
   async isTokenApprovedInRegistry(amount: number): Promise<boolean> {
@@ -361,22 +389,27 @@ export default class DAO {
     return this.registry.unlock();
   }
 
-  async getTokensLockedInRegistryByAddress(address: string): Promise<number> {
+  async getTokensLockedInRegistryByAddress(address: string): Promise<BigNumber> {
     if (!this.registry) await this.loadRegistry();
 
-    return this.registry.lockedTokensOfAddress(address);
+    const totalLocked = await this.registry.lockedTokensOfAddress(address);
+
+    return new BigNumber(totalLocked);
   }
 
-  async getRegistryCreatorAmount(): Promise<number> {
+  async getRegistryCreatorAmount(): Promise<BigNumber> {
     if (!this.registry) await this.loadRegistry();
+
+    const creatorAmount = await this.registry.lockAmountForNetworkCreation();
       
-    return this.registry.lockAmountForNetworkCreation();
+    return new BigNumber(creatorAmount);
   }
 
   async isRegistryGovernor(address: string): Promise<boolean> {
     if (!this.registry) await this.loadRegistry();
 
     const governor = await this.registry.governed._governor();
+
     return governor === address;
   }
 
@@ -396,7 +429,7 @@ export default class DAO {
       ]);
 
     return (
-      +totalNetworkToken === 0 &&
+      BigNumber(totalNetworkToken).isEqualTo(0) &&
       closedBounties + canceledBounties === bountiesTotal
     );
   }
@@ -416,19 +449,23 @@ export default class DAO {
     return this.getERC20TokenData(this.network.networkToken.contractAddress);
   }
 
-  async getTokenBalance(tokenAddress: string, walletAddress: string): Promise<number> {
+  async getTokenBalance(tokenAddress: string, walletAddress: string): Promise<BigNumber> {
     const erc20 = await this.loadERC20(tokenAddress);
 
-    return erc20.getTokenAmount(walletAddress);
+    const balance = await erc20.getTokenAmount(walletAddress);
+
+    return new BigNumber(balance);
   }
 
-  async getAllowance(tokenAddress: string, walletAddress: string, spenderAddress: string): Promise<number> {
+  async getAllowance(tokenAddress: string, walletAddress: string, spenderAddress: string): Promise<BigNumber> {
     const erc20 = await this.loadERC20(tokenAddress);
 
-    return erc20.allowance(walletAddress, spenderAddress);
+    const allowance = await erc20.allowance(walletAddress, spenderAddress);
+
+    return new BigNumber(allowance);
   }
 
-  async getSettlerTokenAllowance(walletAddress: string): Promise<number> {
+  async getSettlerTokenAllowance(walletAddress: string): Promise<BigNumber> {
 
     return this.getAllowance(this.network.networkToken.contractAddress, 
                              walletAddress, 
@@ -459,7 +496,7 @@ export default class DAO {
     githubUser = "",
     transactional,
     rewardToken = Defaults.nativeZeroAddress,
-    tokenAmount = 0,
+    tokenAmount = "0",
     rewardAmount = 0,
     fundingAmount = 0
   }): Promise<TransactionReceipt> {
@@ -475,7 +512,7 @@ export default class DAO {
                                    githubUser);
   }
 
-  async fundBounty(bountyId: number, amount: number, tokenDecimals?: number): Promise<TransactionReceipt> {
+  async fundBounty(bountyId: number, amount: string, tokenDecimals?: number): Promise<TransactionReceipt> {
     return this.network.fundBounty(bountyId, amount, tokenDecimals);
   }
 
@@ -495,7 +532,7 @@ export default class DAO {
     return this.network.closeBounty(bountyId, proposalId);
   }
 
-  async updateBountyAmount(bountyId: number, amount: number): Promise<TransactionReceipt> {
+  async updateBountyAmount(bountyId: number, amount: string): Promise<TransactionReceipt> {
     return this.network.updateBountyAmount(bountyId, amount);
   }
 
@@ -536,7 +573,7 @@ export default class DAO {
     return this.network.refuseBountyProposal(bountyId, proposalId);
   }
 
-  async approveToken(tokenAddress: string = undefined, amount: number) {
+  async approveToken(tokenAddress: string = undefined, amount: string) {
     const erc20 = await this.loadERC20(tokenAddress);
 
     return erc20.approve(this.network.contractAddress, amount);
@@ -581,10 +618,6 @@ export default class DAO {
     const bountyToken = await this.loadBountyToken(nftToken);
 
     return bountyToken.setDispatcher(dispatcher);
-  }
-
-  toWei(n: string | number): Promise<string> {
-    return this.web3Connection.Web3.utils.toWei(n.toString(), `ether`);
   }
 
   isAddress(address: string): Promise<boolean> {

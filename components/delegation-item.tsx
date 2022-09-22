@@ -37,7 +37,7 @@ export default function DelegationItem({
   const { activeNetwork } = useNetwork();
   const { updateWalletBalance } = useAuthentication();
 
-  const delegationAmount = +delegation?.amount || 0;
+  const delegationAmount = delegation?.amount?.toString() || "0";
   const tokenBalanceType = type === "toMe" ? "oracle" : "delegation";
 
   const oracleToken = {
@@ -58,7 +58,7 @@ export default function DelegationItem({
     handleCancel();
     setIsExecuting(true);
 
-    await handleTakeBack(delegation?.id, delegationAmount, 'Oracles').catch(console.debug);
+    await handleTakeBack(delegation?.id, delegationAmount.toString(), 'Oracles').catch(console.debug);
 
     updateWalletBalance();
     setIsExecuting(false);

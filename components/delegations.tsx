@@ -9,7 +9,7 @@ import DelegationItem from "components/delegation-item";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import { formatStringToCurrency } from "helpers/formatNumber";
 
 import InfoTooltip from "./info-tooltip";
 import { FlexRow } from "./profile/wallet-balance";
@@ -35,10 +35,9 @@ export default function Delegations({
     },
     toOthers: {
       title: t("profile:deletaged-to-others"),
+      total: wallet?.balance?.oracles?.delegations?.reduce((acc, delegation) => delegation.amount.plus(acc), 0),
       description: 
              t("my-oracles:descriptions.oracles-delegated-to-others", { token: activeNetwork?.networkToken?.symbol }),
-      total: wallet?.balance?.oracles?.delegations?.reduce((acc, delegation) => Number(acc) + Number(delegation.amount),
-                                                           0),
       delegations: wallet?.balance?.oracles?.delegations || []
     }
   };
@@ -71,7 +70,7 @@ export default function Delegations({
           <FlexRow className="align-items-center">
             <span className="caption-large text-white mr-2 font-weight-medium">{t("misc.total")}</span>
             <span className="caption-large text-white bg-dark-gray py-2 px-3 rounded-3 font-weight-medium">
-              {formatNumberToCurrency(renderInfo[type].total)}
+              {formatStringToCurrency(renderInfo[type].total)}
             </span>
           </FlexRow>
         }

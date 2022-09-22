@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import BeProBlue from "assets/icons/bepro-blue";
@@ -31,7 +32,7 @@ export default function WalletBalance() {
   const { t } = useTranslation(["common", "profile"]);
   
   const [tokens, setTokens] = useState<TokenBalanceType[]>([]);
-  const [totalAmount, setTotalAmount] = useState(0);
+  const [totalAmount, setTotalAmount] = useState("0");
   const [hasNoConvertedToken, setHasNoConvertedToken] = useState(false);
   
   const { settings } = useSettings();
@@ -55,7 +56,7 @@ export default function WalletBalance() {
       beproToken = {
         ...settings.beproToken,
         icon: <BeProBlue width={24} height={24} />,
-        balance: 0
+        balance: "0"
       };
   
       setTokens([beproToken]);
@@ -94,11 +95,13 @@ export default function WalletBalance() {
   useEffect(() => {
     if (!tokens.length) return;
 
-    const totalConverted = tokens.reduce((acc, token) => acc + (token.balance * (token.prices?.eur || 0)), 0);
-    const totalTokens = tokens.reduce((acc,token) => acc + token.balance, 0)
+    const totalConverted = tokens.reduce((acc, token) => BigNumber(token.balance)
+                                                          .multipliedBy(token.prices?.eur || 0)
+                                                          .plus(acc), BigNumber(0));
+    const totalTokens = tokens.reduce((acc, token) => BigNumber(token.balance).plus(acc), BigNumber(0));
     const noConverted = !!tokens.find(token => token.prices?.eur === undefined);
 
-    setTotalAmount(noConverted ? totalTokens : totalConverted);
+    setTotalAmount(noConverted ? totalTokens.toString() : totalConverted.toString());
     setHasNoConvertedToken(noConverted);
 
   }, [tokens]);
