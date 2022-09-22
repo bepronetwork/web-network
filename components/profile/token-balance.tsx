@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 
 import Button from "components/button";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import { formatStringToCurrency } from "helpers/formatNumber";
 
 import { TokenInfo } from "interfaces/token";
 
@@ -22,7 +22,7 @@ export default function TokenBalance({
   icon, 
   name, 
   symbol, 
-  balance ,
+  balance,
   type,
   delegation,
   overSymbol,
@@ -42,7 +42,7 @@ export default function TokenBalance({
   };
 
   const delegationSymbol = 
-    delegation && <>{formatNumberToCurrency(balance)}<span className="ml-1 text-purple">{symbol}</span></>;
+    delegation && <>{formatStringToCurrency(balance.toString())}<span className="ml-1 text-purple">{symbol}</span></>;
 
   return (
     <FlexRow className={CONTAINER_CLASSES.join(" ")}>
@@ -63,7 +63,7 @@ export default function TokenBalance({
             {t("actions.take-back")}
           </Button> ||
           <>
-            <span className="caption text-white mr-1">{formatNumberToCurrency(balance)}</span>
+            <span className="caption text-white mr-1">{formatStringToCurrency(balance.toString())}</span>
             <span className={`caption text-${symbolColor[type]}`}>{type === "token" && "$"}{symbol}</span>
           </>
         }

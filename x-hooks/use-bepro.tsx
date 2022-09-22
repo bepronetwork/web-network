@@ -123,7 +123,7 @@ export default function useBepro() {
     });
   }
 
-  async function handleUpdateBountyAmount(bountyId: number, amount: number): Promise<TransactionReceipt | Error> {
+  async function handleUpdateBountyAmount(bountyId: number, amount: string): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const transaction = addTransaction({ type: TransactionTypes.updateBountyAmount }, activeNetwork);
 
@@ -264,7 +264,7 @@ export default function useBepro() {
   }
 
   async function handleApproveToken(tokenAddress: string, 
-                                    amount: number, 
+                                    amount: string, 
                                     tokenType: "transactional" | "network" = "transactional"):
     Promise<TransactionReceipt | Error> {
 
@@ -304,7 +304,7 @@ export default function useBepro() {
   }
 
   async function handleTakeBack(delegationId: number,
-                                amount: number, 
+                                amount: string, 
                                 currency: TransactionCurrency): Promise<TransactionReceipt | Error> {
 
     return new Promise(async (resolve, reject) => {
@@ -618,7 +618,7 @@ export default function useBepro() {
     });
   }
 
-  async function handleFundBounty(bountyId: number, amount: number, tokenDecimals?: number) {
+  async function handleFundBounty(bountyId: number, amount: string, tokenDecimals?: number) {
     return new Promise(async (resolve, reject) => {
       const transaction = addTransaction({ type: TransactionTypes.fundBounty }, activeNetwork);
 

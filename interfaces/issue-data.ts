@@ -18,9 +18,9 @@ export type CID = `${string}/${string}`;
 
 export interface IssueData {
   id?: string; // database id
-  amount?: number;
-  fundingAmount?: number;
-  fundedAmount?: number;
+  amount?: string;
+  fundingAmount?: string;
+  fundedAmount?: string;
   body: string;
   branch?: string;
   createdAt: Date;

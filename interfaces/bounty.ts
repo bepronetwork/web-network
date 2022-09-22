@@ -5,14 +5,14 @@ import { Token } from "interfaces/token";
 export interface BountyExtended extends Bounty {
     id: number;
     creationDate: number;
-    tokenAmount: number;
+    tokenAmount: string;
 
     creator: string;
     transactional: string;
     rewardToken: string;
-    rewardAmount: number;
-    fundingAmount: number;
-    fundedAmount?: number;
+    rewardAmount: string;
+    fundingAmount: string;
+    fundedAmount?: string;
     fundedPercent?: number;
 
     closed: boolean;

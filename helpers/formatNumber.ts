@@ -14,3 +14,13 @@ export const formatNumberToNScale = (number: number) => {
 
 export const formatNumberToCurrency = (number: number | string, options = {}) =>
   new Intl.NumberFormat("en", options).format(Number(number));
+
+export const formatStringToCurrency = (numStr: string) => {
+  if (numStr?.toString()?.trim() === "" || numStr === undefined || !numStr) return "0";
+
+  const [ rest, decimals ] = numStr.toString().split(".");
+
+  const decimalsStr = decimals ? `.${decimals}` : "";
+  
+  return `${rest.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}${decimalsStr}`;
+}
