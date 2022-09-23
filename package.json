@@ -26,6 +26,8 @@
     "deploy:afrodite": "node ./scripts/deploy-v2 -n afrodite",
     "deploy:irene": "node ./scripts/deploy-v2 -n irene",
     "deploy:iris": "node ./scripts/deploy-v2 -n iris",
+    "deploy:diogenes": "node ./scripts/deploy-v2 -n diogenes",
+    "deploy:aurelius": "node ./scripts/deploy-v2 -n aurelius",
     "ganache:dev": "ganache -h 0.0.0.0 -p 8545 -a 50  -s 0x6d2119524d65ea0b15b214ef260d3acdf8ca0ec6ec68045b5785d970f5ad97bd3d0025d212e625a8a21920852cc165c10faa6d8387a0c2530d1ffc0d265d92935749"
   },
   "dependencies": {
