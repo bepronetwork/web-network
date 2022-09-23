@@ -41,6 +41,8 @@ const publicSettings = [
   PublicSettingItem("1501", "afrodite", "string", "chainIds"),
   PublicSettingItem("1502", "irene", "string", "chainIds"),
   PublicSettingItem("1503", "iris", "string", "chainIds"),
+  PublicSettingItem("1504", "diogenes", "string", "chainIds"),
+  PublicSettingItem("1505", "aurelius", "string", "chainIds"),  
   PublicSettingItem("1287", "moonbase", "string", "chainIds"),
   PublicSettingItem("disputableTime", `{ "min": 60, "max": 1728000 }`, "json", "networkParametersLimits"),
   PublicSettingItem("draftTime", `{ "min": 60, "max": 1728000 }`, "json", "networkParametersLimits"),
