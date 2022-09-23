@@ -26,7 +26,7 @@ export default function Oracles() {
   const { wallet, updateWalletBalance } = useAuthentication();
 
   const oracleToken = {
-    symbol: t("$oracles"),
+    symbol: t("$oracles",   { token: activeNetwork?.networkToken?.symbol }),
     name: t("profile:oracle-name-placeholder"),
     icon: <OracleIcon />
   };
@@ -38,7 +38,9 @@ export default function Oracles() {
     <ProfileLayout>
       <Col xs={10}>
         <FlexRow className="mb-3 justify-content-between align-items-center">
-          <span className="h4 family-Regular text-white font-weight-medium">{t("$oracles")}</span>
+          <span className="h4 family-Regular text-white font-weight-medium">
+            {t("$oracles",   { token: activeNetwork?.networkToken?.symbol })}
+          </span>
 
           <FlexRow className="align-items-center">
             <span className="caption-large text-white mr-2 font-weight-medium">{t("misc.total")}</span>

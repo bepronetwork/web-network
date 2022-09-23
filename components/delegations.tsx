@@ -29,20 +29,21 @@ export default function Delegations({
   const renderInfo = {
     toMe: {
       title: t("profile:deletaged-to-me"),
-      description: t("my-oracles:descriptions.oracles-delegated-to-me"),
+      description: t("my-oracles:descriptions.oracles-delegated-to-me", { token: activeNetwork?.networkToken?.symbol }),
       total: undefined,
       delegations: [ wallet?.balance?.oracles?.delegatedByOthers || 0 ]
     },
     toOthers: {
       title: t("profile:deletaged-to-others"),
-      description: t("my-oracles:descriptions.oracles-delegated-to-others"),
+      description: 
+             t("my-oracles:descriptions.oracles-delegated-to-others", { token: activeNetwork?.networkToken?.symbol }),
       total: wallet?.balance?.oracles?.delegations?.reduce((acc, delegation) => acc + delegation.amount, 0),
       delegations: wallet?.balance?.oracles?.delegations || []
     }
   };
 
   const oracleToken = {
-    symbol: t("$oracles"),
+    symbol: t("$oracles", { token: activeNetwork?.networkToken?.symbol }),
     name: t("profile:oracle-name-placeholder"),
     icon: <OracleIcon />
   };

@@ -136,7 +136,8 @@ export default function MainNav() {
                 <li>
                   <InternalLink
                     href={getURLWithNetwork("/oracle")}
-                    label={<Translation label={"main-nav.Oracle"} />}
+                    label={<Translation label={"main-nav.Oracle"} 
+                                        params={{ token: network?.networkToken?.symbol }} />}
                     nav
                     uppercase
                   />

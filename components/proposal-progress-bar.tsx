@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 
 import { useAuthentication } from "contexts/authentication";
+import { useNetwork } from "contexts/network";
 
 import {
   formatNumberToNScale
@@ -24,6 +25,7 @@ export default function ProposalProgressBar({
   const [issueState, setIssueState] = useState<string>("");
   const [issueColor, setIssueColor] = useState<string>("");
   const [percentage, setPercentage] = useState<number>(0);
+  const { activeNetwork } = useNetwork();
 
   const columns = [0, 1, 2, 3, 3];
 
@@ -117,7 +119,7 @@ export default function ProposalProgressBar({
               {formatNumberToNScale(issueDisputeAmount)}{" "}
             </span>{" "}
             /{formatNumberToNScale(wallet?.balance?.staked || 0)}{" "}
-            <Translation label="$oracles" />{" "}
+            <Translation label="$oracles" params={{ token: activeNetwork?.networkToken?.symbol }}/>{" "}
             <span className={`text-${issueColor}`}> ({percentage}%)</span>
           </div>
         </div>

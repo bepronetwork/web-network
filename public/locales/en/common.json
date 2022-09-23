@@ -1,6 +1,6 @@
 {
   "title": "Hello world",
-  "$oracles": "Oracles",
+  "$oracles": "bv{{token}}",
   "$bepro": "$BEPRO",
   "bepro": "BEPRO",
   "please-wait": "Please wait",
@@ -49,7 +49,7 @@
     "bounties-in-network": "In the Network",
     "protocol-members": "Protocol members",
     "my-account": "My account",
-    "delegated-oracles": "Delegated Oracles",
+    "delegated-oracles": "Delegated bv{{token}}",
     "delegated-by-others": "Delegated by Other"
   },
   "connect-states": {
@@ -59,7 +59,7 @@
   "main-nav": {
     "developers": "Developers",
     "council": "Curators",
-    "Oracle": "Oracles",
+    "Oracle": "bv{{token}}",
     "new-bounty": "New bounty",
     "get-started": "Get Started",
     "connect": "Connect Wallet",
@@ -70,7 +70,7 @@
       "view-profile": "View profile",
       "profile": "Profile",
       "wallet": "Wallet",
-      "oracles": "Oracles",
+      "oracles": "bv{{token}}",
       "payments": "Payments",
       "bounties": "Bounties",
       "pull-requests": "Pull Requests",

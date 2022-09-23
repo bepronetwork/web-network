@@ -1,33 +1,33 @@
 {
-  "how-to-use": "How to use Oracles ?",
-  "oracles-usage": "Oracles can be used for Curators or as a requirement to create Distributions in the Network",
+  "how-to-use": "How to use bv{{token}} ?",
+  "oracles-usage": "bv{{token}} can be used for Curators or as a requirement to create Distributions in the Network",
   "available": "Available",
   "delegated": "Delegated",
   "list-of-delegations": "List of Delegations",
   "descriptions": {
-    "oracles-delegated-to-others": "Oracles delegated by me to others users",
-    "oracles-delegated-to-me": "Oracles delegated to me by others users"
+    "oracles-delegated-to-others": "bv{{token}} delegated by me to others users",
+    "oracles-delegated-to-me": "bv{{token}} delegated to me by others users"
   },
   "actions": {
     "lock": {
       "label": "Lock",
       "title": "Lock {{currency}}",
-      "description": "Lock {{currency}} to receive ORACLES",
-      "get-amount-oracles": "Get {{amount}} ORACLES",
-      "body": "You are locking /bepro{{amount}} {{currency}} /br/ to get /oracles{{amount}} Oracles"
+      "description": "Lock {{currency}} to receive bv{{token}}",
+      "get-amount-oracles": "Get {{amount}} bv{{token}}",
+      "body": "You are locking /bepro{{amount}} {{currency}} /br/ to get {{amount}} bv{{token}}"
     },
     "unlock": {
       "label": "Unlock",
       "title": "Unlock {{currency}}",
-      "description": "Get {{currency}} from ORACLES",
+      "description": "Get {{currency}} from bv{{token}}",
       "get-amount-bepro": "Get {{amount}} {{currency}}",
-      "body": "Give away /oracles{{amount}} Oracles/ /br/ to get back /bepro{{amount}} {{currency}}"
+      "body": "Give away {{amount}} bv{{token}}/ /br/ to get back /bepro{{amount}} {{currency}}"
     },
     "delegate": {
       "label": "Delegate",
-      "title": "Delegate Oracles",
-      "delegate-to-address": "Delegate oracles to an address",
-      "description": "Delegate Oracles to use them in bounties"
+      "title": "Delegate bv{{token}}",
+      "delegate-to-address": "Delegate bv{{token}} to an address",
+      "description": "Delegate bv{{token}} to use them in bounties"
     }
   },
   "fields": {
@@ -36,8 +36,8 @@
       "placeholder": "Insert an amount of {{currency}}"
     },
     "oracles": {
-      "label": "Oracles Amount",
-      "placeholder": "Insert an amount of Oracles"
+      "label": "bv{{token}} Amount",
+      "placeholder": "Insert an amount of bv{{token}}"
     },
     "address": {
       "label": "Delegation Address",
@@ -48,7 +48,7 @@
     "amount-greater": "Amount is greater than your {{amount}} amount",
     "amount-higher-0": "{{currency}} amount needs to be higher than 0.",
     "fill-required-fields": "Please fill all required fields.",
-    "self-delegate": "You can't delegate Oracles to your own address.",
+    "self-delegate": "You can't delegate bv{{token}} to your own address.",
     "approve-transactions": "Please approve {{currency}} Transactions First. Check it and try again.",
     "no-delegates": "No delegations found"
   }

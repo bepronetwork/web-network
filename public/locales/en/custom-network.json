@@ -205,7 +205,7 @@
     "dispute-time": "The time that proposals can be disputed. Min. {{min}} and Max. {{max}} seconds.",
     "percentage-for-dispute": "`Percentage needed for a proposal to be disputed by the community. Max. {{max}}%.`",
     "redeem-time": "The time after a bounty creation that it can be cancelled. Min. {{min}} and Max. {{max}} seconds.",
-    "council-amount": "The amount of {{token}} locked needed to be a curator member. Min. {{min}} and Max. {{max}}.",
+    "council-amount": "The amount of {{token}} locked needed to be a curator. Min. {{min}} and Max. {{max}}.",
     "updating-values": "Error updating network values",
     "updated-parameters": "Failed to update {{failed}} params",
     "network-not-registered": "This network has yet to be registered to be usable, please do so."

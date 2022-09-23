@@ -21,6 +21,7 @@ import { useSettings } from "contexts/settings";
 import { formatNumberToCurrency, formatNumberToNScale } from "helpers/formatNumber";
 
 import { StepWrapperProps } from "interfaces/stepper";
+import { useNetwork } from "contexts/network";
 
 export default function LockBeproStep({ activeStep, index, handleClick, validated }: StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
@@ -36,7 +37,8 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const { service: DAOService } = useDAO();
   const { tokensLocked } = useNetworkSettings();
   const { user, wallet, updateWalletBalance } = useAuthentication();
-
+  const { activeNetwork } = useNetwork();
+  
   const networkTokenName = settings?.beproToken?.symbol || t("misc.$token");
 
   const balance = {
@@ -207,7 +209,9 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                             {t("transactions.types.unlock")}{" "}
                             <span className="text-primary">{networkTokenName}</span>{" "}
                             {t("misc.by")} {t("misc.giving-away")}{" "}
-                            <span className="text-purple">{t("$oracles")}</span>
+                            <span className="text-purple">
+                              {t("$oracles", { token: activeNetwork?.networkToken?.symbol })}
+                            </span>
                           </p>
                         </div>
 
@@ -219,7 +223,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                           <div className="d-flex justify-content-between px-0">
                             <span className="text-ligth-gray">
                               <span className="text-purple text-uppercase">
-                                {t("$oracles")}
+                                {t("$oracles", { token: activeNetwork?.networkToken?.symbol })}
                               </span>{" "}
                               {t("misc.available")}
                             </span>
