@@ -7,7 +7,7 @@
   "oracles-staked": "Locked ${{symbol}}",
   "oracles-staked-description": "The amount of tokens locked by users to curate the network",
   "tvl": "TVL",
-  "tvl-description": "Total locked value",
+  "tvl-description": "Total Value Locked",
   "network-settings": "Network Settings",
   "dispute-time": "Dispute time",
   "percentage-for-dispute": "Percentage for dispute",
