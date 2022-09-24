@@ -112,7 +112,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       where: whereCondition,
       include,
       nest: true,
-      order: [...fields || "createdAt", req.query.order || "DESC"]
+      order: [[...fields || "createdAt", req.query.order || "DESC"]]
     });
 
     const result = [];
