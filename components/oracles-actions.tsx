@@ -50,6 +50,7 @@ function OraclesActions({
 
   const [error, setError] = useState<string>("");
   const [show, setShow] = useState<boolean>(false);
+  const [isApproving, setIsApproving] = useState<boolean>(false)
   const [action, setAction] = useState<string>(actions[0]);
   const [tokenAmount, setTokenAmount] = useState<number | undefined>();
   const [networkTokenAllowance, setNetworkTokenAllowance] = useState(0);
@@ -178,8 +179,10 @@ function OraclesActions({
 
   function approveSettlerToken() {
     if (!wallet?.address || !DAOService) return;
-
-    handleApproveToken(DAOService.network.networkToken.contractAddress, tokenAmount).then(updateAllowance);
+    setIsApproving(true)
+    handleApproveToken(DAOService.network.networkToken.contractAddress, tokenAmount)
+                                                                                    .then(updateAllowance)
+                                                                                  .finally(()=> setIsApproving(false));
   }
 
   function getCurrentLabel() {
@@ -278,7 +281,7 @@ function OraclesActions({
             <div className="mt-5 d-grid gap-3">
               {action === t("my-oracles:actions.lock.label") && (
                 <Button
-                  disabled={!needsApproval()}
+                  disabled={!needsApproval() || isApproving}
                   className="ms-0 read-only-button"
                   onClick={approveSettlerToken}
                 >
