@@ -8,7 +8,6 @@ import ListIssues from "components/list-issues";
 import PageHero, { InfosHero } from "components/page-hero";
 
 import { useDAO } from "contexts/dao";
-import { useNetwork } from "contexts/network";
 
 import useApi from "x-hooks/use-api";
 
@@ -17,7 +16,6 @@ export default function PageDevelopers() {
 
   const { getTotalUsers } = useApi();
   const { service: DAOService } = useDAO();
-  const { activeNetwork } = useNetwork();
 
   const [infos, setInfos] = useState<InfosHero[]>([
     {
@@ -40,7 +38,7 @@ export default function PageDevelopers() {
   ]);
 
   useEffect(() => {
-    if (!DAOService || !activeNetwork?.networkToken) return;
+    if (!DAOService) return;
 
     Promise.all([
       DAOService.getClosedBounties().catch(() => 0),
@@ -60,7 +58,7 @@ export default function PageDevelopers() {
         {
           value: onNetwork,
           label: t("heroes.bounties-in-network"),
-          currency: activeNetwork.networkToken.symbol || t("misc.$token")
+          currency: t("$oracles")
         },
         {
           value: totalUsers,
@@ -68,7 +66,7 @@ export default function PageDevelopers() {
         }
       ]);
     });
-  }, [DAOService, activeNetwork?.networkToken]);
+  }, [DAOService]);
 
   return (
     <>
