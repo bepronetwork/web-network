@@ -21,6 +21,7 @@ export interface Network {
   openBounties?: number;
   totalBounties?: number;
   allowCustomTokens?: boolean;
+  councilMembers: string[];
   tokens?: Token[];
   networkToken?: Token;
   councilAmount?: number;
