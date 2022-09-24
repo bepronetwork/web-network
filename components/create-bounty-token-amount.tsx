@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { NumberFormatValues } from "react-number-format";
 
 import { useTranslation } from "next-i18next";
@@ -26,16 +27,20 @@ export default function CreateBountyTokenAmount({
   decimals = 18
 }) {
   const { t } = useTranslation("bounty");
-
+  const [inputError, setInputError] = useState("")
   function getCurrentCoin() {
     return customTokens?.find((token) => token?.address === currentToken);
   }
 
   function handleIssueAmountOnValueChange(values: NumberFormatValues) {
-    if (values.floatValue < 0) {
+    if(!isFundingType && (+values.floatValue > +currentToken?.currentValue)){
+      setIssueAmount({ formattedValue: "" });
+      setInputError(t("bounty:errors.exceeds-allowance"))
+    }else if (values.floatValue < 0) {
       setIssueAmount({ formattedValue: "" });
     } else {
       setIssueAmount(values);
+      inputError && setInputError("")
     }
   }
 
@@ -87,7 +92,7 @@ export default function CreateBountyTokenAmount({
         <div className="d-flex">
           <InputNumber
             thousandSeparator
-            disabled={review}
+            disabled={review || !currentToken?.currentValue}
             max={tokenBalance}
             label={
               <div className="d-flex mb-2">
@@ -105,6 +110,12 @@ export default function CreateBountyTokenAmount({
             decimalScale={decimals}
             onValueChange={handleIssueAmountOnValueChange}
             onBlur={handleIssueAmountBlurChange}
+            error={!!inputError}
+            helperText={
+              <>
+              {inputError && <p className="p-small my-2">{inputError}</p>}
+              </>
+            }
           />
           <div className="mt-4 pt-1 mx-2">
             <ArrowRight className="text-gray" width={9} height={9} />
@@ -115,7 +126,7 @@ export default function CreateBountyTokenAmount({
             className="mt-3"
             symbol={"EUR"}
             classSymbol="text-white-30 mt-3"
-            disabled={true}
+            disabled
             value={
               getCurrentCoin()?.tokenInfo
                 ? handleTokenToEurConversion(Number(issueAmount.value),
