@@ -2,6 +2,7 @@ import { subHours, subMonths, subWeeks, subYears } from "date-fns";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op, WhereOptions } from "sequelize";
+import { Sequelize } from "sequelize";
 
 import models from "db/models";
 
@@ -97,13 +98,21 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: "repository" },
     { association: "token" }
   ];
-
+  const sortBy = String(req?.query?.sortBy).split(',');
+  
   if (search) {
+
+    const fields = sortBy?.reduce((prev, current, index) => {
+      prev.push(current)
+      if(index !== sortBy.length - 1) prev.push(Sequelize.literal('+'))
+      return prev
+    },[])
+
     const issues = await models.issue.findAll({
       where: whereCondition,
       include,
       nest: true,
-      order: [[req.query.sortBy || "createdAt", req.query.order || "DESC"]]
+      order: [...fields || "createdAt", req.query.order || "DESC"]
     });
 
     const result = [];
@@ -121,10 +130,17 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       currentPage: +paginatedData.page
     });
   } else {
+
+    const fields = sortBy?.reduce((prev, current, index) => {
+      prev.push(current)
+      if(index !== sortBy.length - 1) prev.push(Sequelize.literal('+'))
+      return prev
+    },[])
+
     const issues = await models.issue.findAndCountAll(paginate({ 
       where: whereCondition, 
       include, nest: true }, req.query, [
-        [req.query.sortBy || "updatedAt", req.query.order || "DESC"]
+        [...fields|| "updatedAt", req.query.order || "DESC"]
       ]));
 
     return res.status(200).json({
