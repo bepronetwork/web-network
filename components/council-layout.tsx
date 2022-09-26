@@ -58,7 +58,7 @@ export default function CouncilLayout({ children }) {
         label: t("council:ready-bountys"),
       },
       {
-        value: 0,
+        value: activeNetwork?.councilMembers?.length || 0,
         label: t("council:council-members"),
       },
       {
