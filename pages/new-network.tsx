@@ -182,7 +182,7 @@ export default function NewNetwork() {
 
   function checkHasNetwork() {
     dispatch(changeLoadState(true));
-
+    
     DAOService.getNetworkAdressByCreator(wallet.address)
       .then(networkAddress => setHasNetwork(networkAddress !== Defaults.nativeZeroAddress))
       .catch(console.log)
@@ -193,7 +193,7 @@ export default function NewNetwork() {
     if (!activeNetwork) return;
 
     if (activeNetwork.name.toLowerCase() !== defaultNetworkName)
-      router.push(getURLWithNetwork("/account", { network: defaultNetworkName }));
+      router.push(getURLWithNetwork("/profile/my-network", { network: defaultNetworkName }));
   }, [activeNetwork]);
 
   useEffect(() => {
