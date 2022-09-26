@@ -71,7 +71,7 @@
       "view-profile": "View profile",
       "profile": "Profile",
       "wallet": "Wallet",
-      "oracles": "bv{{token}}",
+      "oracles": "lock/unlock",
       "payments": "Payments",
       "bounties": "Bounties",
       "pull-requests": "Pull Requests",
