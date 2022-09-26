@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
@@ -32,13 +32,15 @@ export default function TokenConfiguration({
   const { wallet } = useAuthentication();
   const [networkTokenAddress, setNetworkTokenAddress] = useState("");
   const [networkTokenError, setNetworkTokenError] = useState(false);
-  const [networkToken, setNetworkToken] = useState<Token>();
+  const [networkToken, setNetworkToken] = useState<Token>(undefined);
   const [showModalDeploy, setShowModalDeploy] = useState(false);
   const [allowedTransactionalTokens, setAllowedTransactionalTokens] = useState<Token[]>();
-  const [allowedRewardTokens, setAllowedRewardTokens] = useState<Token[]>();
-  const [selectedRewardTokens, setSelectedRewardTokens] = useState<Token[]>();
+  const [allowedRewardTokens, setAllowedRewardTokens] = useState<Token[]>([]);
+  const [selectedRewardTokens, setSelectedRewardTokens] = useState<Token[]>([]);
   const [selectedTransactionalTokens, setSelectedTransactionalTokens] =
     useState<Token[]>();
+
+  const debounce = useRef(null)
 
   const { tokens, fields } = useNetworkSettings();
   const { service: DAOService } = useDAO();
@@ -77,23 +79,15 @@ export default function TokenConfiguration({
 
   function handleNetworkTokenChange(e) {
     setNetworkTokenAddress(e.target.value)
-    setNetworkToken({ address: "", name: "", symbol: ""})
+  }
+
+  async function validateNetworkAddress(address) {
     setNetworkTokenError(false);
-  }
-
-  function setDeployedAddress(address) {
-    setNetworkTokenAddress(address);
-    fields.settlerToken.setter(address);
-  }
-
-  async function validateNetworkAddress() {
-    if (networkTokenAddress.trim() === "") fields.settlerToken.setter(networkTokenAddress);
-    if (networkTokenAddress.trim() === "" || !DAOService) return undefined;
+    if (address?.trim() === "" || !DAOService) return undefined;
 
     try {
-      await DAOService.getERC20TokenData(networkTokenAddress).then(setNetworkToken)
-      fields.settlerToken.setter(networkTokenAddress);
-      setNetworkTokenError(false);
+      await DAOService.getERC20TokenData(address)
+      .then(setNetworkToken)
     } catch(error) {
       setNetworkTokenError(true);
       setNetworkToken({ address: "", name: "", symbol: ""})
@@ -103,34 +97,37 @@ export default function TokenConfiguration({
     return true;
   }
 
+  // LoadData from context
   useEffect(() => {
     if (!DAOService) return;
-    if (tokens?.settler?.trim() === "") return setNetworkToken(undefined);
-
-    DAOService.getERC20TokenData(tokens?.settler).then(setNetworkToken).catch(console.log);
-  }, [tokens?.settler, DAOService]);
-
-  useEffect(() => {
-    if (!DAOService) return;
-
-    if (tokens?.settler !== "")
-      DAOService.getERC20TokenData(tokens?.settler)
-        .then(setNetworkToken)
-        .catch(console.log);
+    if(!networkTokenAddress.length && tokens?.settler)
+      setNetworkTokenAddress(tokens?.settler)
+    if(!selectedRewardTokens?.length && tokens?.allowedRewards)
+      setSelectedRewardTokens(tokens.allowedRewards)
+    if(!selectedTransactionalTokens?.length && tokens?.allowedTransactions)
+      setSelectedTransactionalTokens(tokens.allowedTransactions)
     
-    validateNetworkAddress();
-  }, [tokens?.settler, DAOService]);
+  }, [DAOService, tokens?.settler]);
  
+
   useEffect(() => {
-    if(networkTokenAddress.length < 18) validateNetworkAddress()
+    if(networkTokenAddress.length >= 16){
+      clearTimeout(debounce.current)
+      debounce.current = setTimeout(async() => {
+        if(await validateNetworkAddress(networkTokenAddress) && tokens?.settler !== networkTokenAddress)
+          fields.settlerToken.setter(networkTokenAddress);
+      }, 500)
+    }
   },[networkTokenAddress])
 
   useEffect(() => {
-    fields.allowedRewards.setter(selectedRewardTokens)
+    if(selectedRewardTokens?.length)
+      fields.allowedRewards.setter(selectedRewardTokens)
   }, [selectedRewardTokens])
 
   useEffect(() => {
-    fields.allowedTransactions.setter(selectedTransactionalTokens)
+    if(selectedTransactionalTokens?.length)
+      fields.allowedTransactions.setter(selectedTransactionalTokens)
   }, [selectedTransactionalTokens])
 
   useEffect(() => {
@@ -149,7 +146,6 @@ export default function TokenConfiguration({
   
   function handleEmptyTokens (tokens: Token[]) {
     if(tokens?.length === 0) return [settings?.beproToken]
-
     return tokens
   }
 
@@ -174,7 +170,6 @@ export default function TokenConfiguration({
             className="form-control" 
             value={networkTokenAddress}
             onChange={handleNetworkTokenChange}
-            onBlur={validateNetworkAddress}
           />
 
           {
@@ -241,7 +236,7 @@ export default function TokenConfiguration({
       <DeployERC20Modal 
         show={showModalDeploy}
         setClose={handleCloseModal}
-        setERC20Address={setDeployedAddress}
+        setERC20Address={setNetworkTokenAddress}
       />
     </Step>
   );

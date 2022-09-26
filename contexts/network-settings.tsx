@@ -176,43 +176,21 @@ export const NetworkSettingsProvider = ({ children }) => {
     return newState;
   }
 
-  function handlerDefaultSettings(){
-    setFields('settings.theme.colors', DefaultTheme())
-    
-    setFields('settings.parameters', {
-      draftTime: {
-        value: DEFAULT_DRAFT_TIME,
-        validated: undefined
-      },
-      disputableTime: {
-        value: DEFAULT_DISPUTE_TIME,
-        validated: undefined
-      },
-      percentageNeededForDispute: {
-        value: DEFAULT_PERCENTAGE_FOR_DISPUTE,
-        validated: undefined
-      },
-      councilAmount: {
-        value: DEFAULT_COUNCIL_AMOUNT,
-        validated: undefined
-      },
-      validated: undefined
-    })
-
-    setFields('settings.treasury.cancelFee', {value:DEFAULT_CANCEL_FEE, validated: true})
-    setFields('settings.treasury.closeFee', {value: DEFAULT_CLOSE_FEE, validated: true})
-  }
-
   const setFields = (field: string, value: unknown)=> {
+    console.log({field, value})
     const method = field.split('.')
+    
     if(!method || !value) return;
-    const newValues = {...networkSettings}
 
-    method.reduce((p,c)=> 
-       c === method[method.length-1] ? p[c] = value : p[c]
-    , networkSettings)
+    setNetworkSettings((prev)=>{
+      const newValues = {...prev}
 
-    setNetworkSettings(handerValidateForm(newValues))
+      method.reduce((p,c)=> 
+          c === method[method.length-1] ? p[c] = value : p[c]
+        , newValues)
+
+      return handerValidateForm(newValues)
+    })
   }
   
   const Fields = {
@@ -253,7 +231,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         const index = networkSettings.github.repositories.findIndex((repo) => repo.fullName === fullName);
         const selectedRepository = networkSettings.github.repositories[index];
         selectedRepository.checked = !selectedRepository.checked;
-        setFields(`github.repositories[${index}]`, selectedRepository)
+        setFields(`github.repositories.${index}`, selectedRepository)
       },
       validator: value => value.some((repository) => repository.checked)
     },
@@ -299,8 +277,34 @@ export const NetworkSettingsProvider = ({ children }) => {
     return dao;
   }
 
+  function handlerDefaultSettings(){
+    setFields('settings.theme.colors', DefaultTheme())
+    
+    setFields('settings.parameters', {
+    draftTime: {
+      value: DEFAULT_DRAFT_TIME,
+      validated: undefined
+    },
+    disputableTime: {
+      value: DEFAULT_DISPUTE_TIME,
+      validated: undefined
+    },
+    percentageNeededForDispute: {
+      value: DEFAULT_PERCENTAGE_FOR_DISPUTE,
+      validated: undefined
+    },
+    councilAmount: {
+      value: DEFAULT_COUNCIL_AMOUNT,
+      validated: undefined
+    },
+    validated: undefined
+    })
 
-  // Getting external data
+    setFields('settings.treasury.cancelFee', {value:DEFAULT_CANCEL_FEE, validated: true})
+    setFields('settings.treasury.closeFee', {value: DEFAULT_CLOSE_FEE, validated: true})
+  }
+  
+  // TODO: Better this effect
   useEffect(() => {
     if ( !wallet?.address || 
          !DAOService || 
@@ -326,10 +330,56 @@ export const NetworkSettingsProvider = ({ children }) => {
       Fields.logo.setter(`${IPFS_URL}/${network?.logoIcon}`, 'icon')
 
     } else {
-      handlerDefaultSettings();
+      Promise.all([
+        DAOService.getTokensLockedInRegistryByAddress(wallet.address),
+        DAOService.getRegistryCreatorAmount()
+      ])
+        .then(([
+          tokensLockedInRegistry,
+          registryCreatorAmount
+        ]) => {
+          setFields('tokensLocked', {
+            amount: 0,
+            locked: tokensLockedInRegistry,
+            needed: registryCreatorAmount,
+            validated: tokensLockedInRegistry === registryCreatorAmount
+          })
+        });
+      const storageData = localStorage.getItem(`${localStorageKey}:${wallet?.address}`);
+      if(storageData){
+        const {at, data} = JSON.parse(storageData);
+        if(+new Date() - +new Date(at) <= TTL){
+          if(data?.details){
+            setFields('details.name', data?.details.name)
+            setFields('details.description', data?.details.description)
+          }
+
+          if(data?.settings)
+            setFields('settings', data?.settings)
+          else
+            handlerDefaultSettings();
+
+          if(data?.github)
+            setFields('github', data?.github)
+
+          if(data?.tokens)
+            setFields('tokens', data?.tokens)
+        }
+      } else
+        handlerDefaultSettings();
     }
 
-    if (user?.login)
+  }, [ wallet, 
+       user?.login, 
+       DAOService, 
+       network, 
+       isCreating, 
+       needsToLoad,
+       router.pathname]);
+
+  //Load GH Repositories
+  useEffect(()=>{
+    if (user?.login && !networkSettings?.github?.repositories?.length)
       getUserRepositories(user.login)
       .then(async (githubRepositories) => {
         const repositories = [];
@@ -362,46 +412,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         }
         setFields('github.repositories', repositories)
       });
-  }, [ wallet?.address, 
-       user?.login, 
-       DAOService, 
-       network, 
-       isCreating, 
-       needsToLoad,
-       router.pathname]);
-
-  useEffect(() => {
-    if (wallet?.balance)
-      Promise.all([
-        DAOService.getTokensLockedInRegistryByAddress(wallet.address),
-        DAOService.getRegistryCreatorAmount()
-      ])
-        .then(([
-          tokensLockedInRegistry,
-          registryCreatorAmount
-        ]) => {
-          setFields('tokensLocked', {
-            amount: 0,
-            locked: tokensLockedInRegistry,
-            needed: registryCreatorAmount,
-            validated: tokensLockedInRegistry === registryCreatorAmount
-          })
-        });
-  }, [wallet?.balance]);
-
-  useEffect(()=>{
-    const storageData = localStorage.getItem(`${localStorageKey}:${wallet?.address}`);
-    if(storageData && !networkSettings.details.name.value.length){
-      try {
-        const {at, data} = JSON.parse(storageData);
-        if(+new Date() - +new Date(at) <= TTL){
-            
-          setNetworkSettings({...DefaultNetworkSettings, ...data})
-        }
-      } catch (error) {
-        console.error(error)
-      }}
-  },[])
+  },[user?.login])
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({
     ...networkSettings,

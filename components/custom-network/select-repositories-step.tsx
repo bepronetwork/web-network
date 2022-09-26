@@ -47,6 +47,7 @@ export default function SelectRepositoriesStep({ activeStep, index, validated, h
             <FormCheck
               className="form-control-lg px-0 pb-0 mr-1"
               type="checkbox"
+              defaultChecked={!!github.botPermission || false}
               onChange={handlePermissonCheck}
             />
             <span>
