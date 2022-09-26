@@ -37,7 +37,7 @@ const argv = require('yargs')
   .alias('n', 'network')
   .describe('n', 'Ethereum Blockchain')
   .default('n', 'development')
-  .choices(["development", "moonbase", "kovan", "mainnet", "ropsten", "seneca", "afrodite", "custom"])
+  .choices(["development", "moonbase", "kovan", "mainnet", "ropsten", "seneca", "afrodite", "custom", "diogenes","aurelius"])
   .option('k', {
     alias: "ownerKey",
     describe: "Owner Private key",
@@ -106,7 +106,13 @@ const networks = {
   },
   iris: {
     url: 'https://eth-iris.taikai.network:8080',
-  }
+  },
+  diogenes: {
+    url: 'https://eth-diogenes.taikai.network:8080',
+  },
+  aurelius: {
+    url: 'https://eth-aurelius.taikai.network:8080',
+  }  
 }
 
 async function main() {

@@ -100,5 +100,23 @@ export const NETWORKS: {
     decimals: 18,
     explorerURL: "https://blockscout.moonriver.moonbeam.network",
     rpcUrls: ["https://eth-iris.taikai.network:8080"]
+  },
+  "0x5e1": {
+    id: "1504",
+    name: "Diogenes Testnet",
+    key: "diogenes",
+    currency: DEV,
+    decimals: 18,
+    explorerURL: "https://blockscout.moonriver.moonbeam.network",
+    rpcUrls: ["https://eth-diogenes.taikai.network:8080"]
+  },
+  "0x5e2": {
+    id: "1505",
+    name: "Aurelius Testnet",
+    key: "aurelius",
+    currency: DEV,
+    decimals: 18,
+    explorerURL: "https://blockscout.moonriver.moonbeam.network",
+    rpcUrls: ["https://eth-aurelius.taikai.network:8080"]
   }
 };
