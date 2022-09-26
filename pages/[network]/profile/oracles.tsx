@@ -60,6 +60,7 @@ export default function Oracles() {
           icon={oracleToken.icon} 
           symbol={oracleToken.symbol}
           name={`${t("misc.locked")} ${activeNetwork?.networkToken?.name || oracleToken.name}`}
+          overSymbol={t("bepro-votes")}
           balance={oraclesLocked}
           type="oracle"
         />

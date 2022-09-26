@@ -1,6 +1,7 @@
 {
   "title": "Hello world",
   "$oracles": "bv{{token}}",
+  "bepro-votes": "Bepro Votes",
   "$bepro": "$BEPRO",
   "bepro": "BEPRO",
   "please-wait": "Please wait",

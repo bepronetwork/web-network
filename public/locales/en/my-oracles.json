@@ -27,7 +27,7 @@
       "label": "Delegate",
       "title": "Delegate bv{{token}}",
       "delegate-to-address": "Delegate bv{{token}} to an address",
-      "description": "Delegate bv{{token}} to use them in bounties"
+      "description": "Delegate bv{{token}} to help curators"
     }
   },
   "fields": {

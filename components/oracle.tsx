@@ -79,7 +79,7 @@ export default function Oracle({ children }) {
     <div>
       <PageHero
         title={t("oracle:title")}
-        subtitle={t("oracle:subtitle", { token: activeNetwork?.networkToken?.name.split(" ").join("") })}
+        subtitle={t("oracle:subtitle", { token: activeNetwork?.networkToken?.symbol })}
         infos={infos}
       />
       <div className="container pt-3">
