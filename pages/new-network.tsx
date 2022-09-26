@@ -157,7 +157,7 @@ export default function NewNetwork() {
 
     setCreatingNetwork(6);
 
-    await processEvent("registry", "registered", payload.name, { fromBlock: registrationTx.blockNumber })
+    await processEvent("registry", "registered", payload.name.toLowerCase(), { fromBlock: registrationTx.blockNumber })
       .then(() => {
         router.push(getURLWithNetwork("/", { network: payload.name }));
       })
