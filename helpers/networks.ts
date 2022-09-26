@@ -110,7 +110,7 @@ export const NETWORKS: {
     explorerURL: "https://blockscout.moonriver.moonbeam.network",
     rpcUrls: ["https://eth-diogenes.taikai.network:8080"]
   },
-  "0x5e2": {
+  "0x5e1": {
     id: "1505",
     name: "Aurelius Testnet",
     key: "aurelius",
