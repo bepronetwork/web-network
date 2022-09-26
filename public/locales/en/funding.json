@@ -19,7 +19,7 @@
       "title": "Fund Bounty",
       "description": "You are about to fund",
       "funded-succesfully": "Bounty Funded Sucessfully",
-      "funded-x-symbol": "Funded {{amount}} ${{symbol}}",
+      "funded-x-symbol": "Funded {{amount}} {{symbol}}",
       "failed-to-fund": "Failed to fund bounty",
       "fields": {
         "fund-amount": {
@@ -39,7 +39,7 @@
       "title": "Withdraw Funding Reward",
       "description": "You are about to withdraw reward",
       "from-the": "from the",
-      "withdraw-x-symbol": "Withdraw {{amount}} ${{symbol}}",
+      "withdraw-x-symbol": "Withdraw {{amount}} {{symbol}}",
       "withdraw-successfully": "Withdraw Funds Reward Successfully",
       "failed-to-withdraw": "failed to withdraw funds reward"
     }

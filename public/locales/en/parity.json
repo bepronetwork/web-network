@@ -41,7 +41,7 @@
     },
     "settler-token-symbol": {
       "label": "New settler token symbol",
-      "placeholder": "pex $BEPRO"
+      "placeholder": "pex BEPRO"
     },
     "settler-token-address": {
       "label": "New settler token address"
