@@ -85,7 +85,7 @@ export default function NewNetwork() {
 
     if (!deployNetworkTX?.contractAddress) return setCreatingNetwork(-1);
 
-    const deployedNetworkAddress = deployNetworkTX.contractAdd;
+    const deployedNetworkAddress = deployNetworkTX.contractAddress;
 
     const payload = {
       name: details.name.value,
