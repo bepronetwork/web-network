@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react";
+
 import { useTranslation } from "next-i18next";
 import getConfig from "next/config";
 
@@ -15,7 +17,11 @@ const { publicRuntimeConfig } = getConfig();
 export default function NetworkInformationStep({ activeStep, index, validated, handleClick } : StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
 
+  const debounce = useRef(null)
+
   const { details, fields } = useNetworkSettings();
+  const [nameInput, setNameInput] = useState("")
+  const [descriptionInput, setDescriptionInput] = useState("")
 
   const name = details.name;
   const nameInputClass = name.validated !== undefined ? (name.validated === true && "is-valid") || "is-invalid" : "";
@@ -25,7 +31,14 @@ export default function NetworkInformationStep({ activeStep, index, validated, h
   }
 
   function handleInputChange(e) {
-    fields.name.setter(e.target.value);
+    
+    setNameInput(e.target.value)
+
+    clearTimeout(debounce.current)
+    
+    debounce.current = setTimeout(() => {
+      fields.name.setter(e.target.value);
+    }, 1000)
   }
 
   function handleBlur(e) {
@@ -41,8 +54,23 @@ export default function NetworkInformationStep({ activeStep, index, validated, h
   }
 
   function handleDescriptionChange(e) {
-    fields.description.setter(e.target.value);
+    setDescriptionInput(e.target.value)
+
+
+    clearTimeout(debounce.current)
+    
+    debounce.current = setTimeout(() => {
+      fields.description.setter(e.target.value);
+    }, 1000)
   }
+
+  useEffect(()=>{
+    if(name?.value !== nameInput)
+      setNameInput(name?.value)
+
+    if(details?.description !== descriptionInput)
+      setDescriptionInput(details?.description)
+  },[name?.value, details?.description])
 
   return (
     <Step
@@ -90,7 +118,7 @@ export default function NetworkInformationStep({ activeStep, index, validated, h
 
         <div className="col ml-2">
           <p className="h3 text-white mb-3">
-            {showTextOrDefault(name.value, t("custom-network:steps.network-information.fields.name.default"))}
+            {showTextOrDefault(nameInput, t("custom-network:steps.network-information.fields.name.default"))}
           </p>
           <p className="caption-small text-ligth-gray mb-2">
             {t("custom-network:steps.network-information.fields.name.temporary")}
@@ -98,7 +126,7 @@ export default function NetworkInformationStep({ activeStep, index, validated, h
           <p className="caption-small text-gray">
             {urlWithoutProtocol(publicRuntimeConfig?.urls?.home)}/
             <span className="text-primary">
-              {getQueryableText(name.value || t("custom-network:steps.network-information.fields.name.default"))}
+              {getQueryableText(nameInput || t("custom-network:steps.network-information.fields.name.default"))}
             </span>
           </p>
         </div>
@@ -116,7 +144,7 @@ export default function NetworkInformationStep({ activeStep, index, validated, h
             id="display-name"
             placeholder={t("custom-network:steps.network-information.fields.name.default")}
             className={`form-control ${nameInputClass}`}
-            value={name.value}
+            value={nameInput}
             onChange={handleInputChange}
             onBlur={handleBlur}
           />
@@ -151,7 +179,7 @@ export default function NetworkInformationStep({ activeStep, index, validated, h
             cols={30}
             rows={5}
             className="form-control"
-            value={details.description}
+            value={descriptionInput}
             onChange={handleDescriptionChange}
           ></textarea>
         </div>
