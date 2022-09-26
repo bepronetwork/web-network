@@ -12,7 +12,7 @@ import ProfileLayout from "components/profile/profile-layout";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
-import { cookieKey } from "contexts/network";
+import { cookieKey, useNetwork } from "contexts/network";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 import { useSettings } from "contexts/settings";
 
@@ -29,6 +29,10 @@ export default function MyNetwork() {
   
   const { searchNetworks } = useApi();
   const { wallet } = useAuthentication();
+  const {  activeNetwork } = useNetwork();
+  const { settings: appSettings } = useSettings(); 
+
+  const defaultNetworkName = appSettings?.defaultNetworkConfig?.name?.toLowerCase() || "bepro";
 
   async function updateEditingNetwork() {
     dispatch(changeLoadState(true));
