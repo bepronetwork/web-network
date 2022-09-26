@@ -38,7 +38,7 @@
     "bounty":"Bounty #{{id}}",
     "confirm-merge": "Confirm Distribution",
     "proposal-creator": "Proposal Creator",
-    "proposal-creator-description": "Council Member who proposed this distribution",
+    "proposal-creator-description": "Curator who proposed this distribution",
     "proposal-merger": "Merger",
     "proposal-merger-description": "User who accepted the Bounty’s solution",
     "contributor": "Contributor {{count}}",

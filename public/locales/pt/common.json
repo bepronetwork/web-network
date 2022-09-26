@@ -1,6 +1,6 @@
 {
   "title": "Hello world",
-  "$oracles": "Oracles",
+  "$oracles": "bv{{token}}",
   "$bepro": "$BEPRO",
   "please-wait": "Só um momento",
   "close": "fechar",
@@ -76,8 +76,8 @@
   },
   "main-nav": {
     "developers": "Developers",
-    "council": "Council",
-    "Oracle": "Oracle",
+    "council": "Curators",
+    "Oracle": "bv{{tokenSymbol}}",
     "create-bounty": "Criar Bounty",
     "get-started": "Comece Agora",
     "connect": "Conectar"

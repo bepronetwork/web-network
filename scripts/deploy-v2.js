@@ -153,7 +153,7 @@ async function main() {
       cap: "300000000000000000000000000"
     },
     network: {
-      name: 'Bepro Token',
+      name: 'Bepro',
       symbol: "BEPRO",
       cap: "300000000000000000000000000"
     },

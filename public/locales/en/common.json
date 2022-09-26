@@ -1,6 +1,7 @@
 {
   "title": "Hello world",
-  "$oracles": "Oracles",
+  "$oracles": "bv{{token}}",
+  "bepro-votes": "Bepro Votes",
   "$bepro": "$BEPRO",
   "bepro": "BEPRO",
   "please-wait": "Please wait",
@@ -12,7 +13,7 @@
   "filters": {
     "filters": "Filter",
     "search-repositories": "Search repositories",
-    "repository": "repository",
+    "repository": "repository", 
     "all": "All",
     "no-records-found": "No records found",
     "clear-filter": "Clear filter",
@@ -49,7 +50,7 @@
     "bounties-in-network": "In the Network",
     "protocol-members": "Protocol members",
     "my-account": "My account",
-    "delegated-oracles": "Delegated Oracles",
+    "delegated-oracles": "Delegated bv{{token}}",
     "delegated-by-others": "Delegated by Other"
   },
   "connect-states": {
@@ -58,8 +59,8 @@
   },
   "main-nav": {
     "developers": "Developers",
-    "council": "Council",
-    "Oracle": "Oracle",
+    "council": "Curators",
+    "Oracle": "bv{{token}}",
     "new-bounty": "New bounty",
     "get-started": "Get Started",
     "connect": "Connect Wallet",
@@ -70,7 +71,7 @@
       "view-profile": "View profile",
       "profile": "Profile",
       "wallet": "Wallet",
-      "oracles": "Oracles",
+      "oracles": "bv{{token}}",
       "payments": "Payments",
       "bounties": "Bounties",
       "pull-requests": "Pull Requests",
@@ -358,7 +359,7 @@
       "deploy-bounty-token": "Deploy Bounty Token",
       "set-draft-time": "Set Draft Time",
       "set-disputable-time": "Set Disputable Time",
-      "set-council-amount": "Set Council Amount",
+      "set-council-amount": "Set Curator Amount",
       "set-percentage-dispute": "Set Percentage for Dispute",
       "fund-bounty": "Fund Bounty",
       "retract-fund": "Retract Bounty Fund",

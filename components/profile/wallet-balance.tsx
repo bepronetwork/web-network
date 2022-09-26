@@ -40,7 +40,7 @@ export default function WalletBalance() {
   const { service: DAOService } = useDAO();
 
   const oracleToken = {
-    symbol: t("$oracles"),
+    symbol: t("$oracles",  { token: activeNetwork?.networkToken?.symbol }),
     name: t("profile:oracle-name-placeholder"),
     icon: <OracleIcon />
   };
@@ -126,7 +126,9 @@ export default function WalletBalance() {
       {tokens.map(token => <TokenBalance key={`balance-${token.address}`} {...token} type="token" />)}
 
       <FlexRow className="mt-3 mb-3 justify-content-between align-items-center">
-        <span className="h4 family-Regular text-white font-weight-medium">{t("$oracles")}</span>
+        <span className="h4 family-Regular text-white font-weight-medium">
+          {t("$oracles",  { token: activeNetwork?.networkToken?.symbol })}
+        </span>
 
         <FlexRow className="align-items-center">
           <span className="caption-medium text-white mr-2 font-weight-medium">{t("misc.total")}</span>

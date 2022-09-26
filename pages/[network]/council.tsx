@@ -9,6 +9,7 @@ import ListIssues from "components/list-issues";
 import PageHero, { InfosHero } from "components/page-hero";
 
 import { useAuthentication } from "contexts/authentication";
+import { useNetwork } from "contexts/network";
 
 import useApi from "x-hooks/use-api";
 
@@ -16,6 +17,7 @@ export default function PageCouncil() {
   const { t } = useTranslation(["council"]);
   const { wallet } = useAuthentication();
   const { getTotalBounties } = useApi();
+  const { activeNetwork } = useNetwork()
 
   const [infos, setInfos] = useState<InfosHero[]>([
     {
@@ -64,7 +66,7 @@ export default function PageCouncil() {
     <>
       <PageHero
         title={t("council:title")}
-        subtitle={t("council:subtitle")}
+        subtitle={t("council:subtitle", {token: activeNetwork?.networkToken?.symbol})}
         infos={infos}
       />
       <div className="container">

@@ -2,12 +2,15 @@ import { useTranslation } from "next-i18next";
 
 import InternalLink from "components/internal-link";
 
+import { useNetwork } from "contexts/network";
+
 import useNetworkTheme from "x-hooks/use-network";
 
 export default function ProfileSide() {
   const { t } = useTranslation("common");
 
   const { getURLWithNetwork } = useNetworkTheme();
+  const { activeNetwork } = useNetwork()
 
   const Link = (label, href) => ({ label, href });
   const ProfileLink = ({ label, href }) => (
@@ -25,12 +28,20 @@ export default function ProfileSide() {
   const links = [
     Link(t("main-nav.nav-avatar.profile"), getURLWithNetwork("/profile")),
     Link(t("main-nav.nav-avatar.wallet"), getURLWithNetwork("/profile/wallet")),
-    Link(t("main-nav.nav-avatar.oracles"), getURLWithNetwork("/profile/oracles")),
-    Link(t("main-nav.nav-avatar.payments"), getURLWithNetwork("/profile/payments")),
-    Link(t("main-nav.nav-avatar.bounties"), getURLWithNetwork("/profile/bounties")),
-    Link(t("main-nav.nav-avatar.pull-requests"), getURLWithNetwork("/profile/pull-requests")),
-    Link(t("main-nav.nav-avatar.proposals"), getURLWithNetwork("/profile/proposals")),
-    Link(t("main-nav.nav-avatar.my-network"), getURLWithNetwork("/profile/my-network"))
+    Link(t("main-nav.nav-avatar.oracles", {
+        token: activeNetwork?.networkToken?.symbol,
+    }),
+         getURLWithNetwork("/profile/oracles")),
+    Link(t("main-nav.nav-avatar.payments"),
+         getURLWithNetwork("/profile/payments")),
+    Link(t("main-nav.nav-avatar.bounties"),
+         getURLWithNetwork("/profile/bounties")),
+    Link(t("main-nav.nav-avatar.pull-requests"),
+         getURLWithNetwork("/profile/pull-requests")),
+    Link(t("main-nav.nav-avatar.proposals"),
+         getURLWithNetwork("/profile/proposals")),
+    Link(t("main-nav.nav-avatar.my-network"),
+         getURLWithNetwork("/profile/my-network")),
   ];
 
   return(

@@ -12,6 +12,7 @@ import Button from "components/button";
 import Identicon from "components/identicon";
 
 import { useAuthentication } from "contexts/authentication";
+import { useNetwork } from "contexts/network";
 
 import { truncateAddress } from "helpers/truncate-address";
 
@@ -26,6 +27,7 @@ export default function NavAvatar() {
 
   const { getURLWithNetwork } = useNetworkTheme();
   const { wallet, user, disconnectWallet } = useAuthentication();
+  const { activeNetwork } = useNetwork()
 
   const avatar = () => user?.login && 
     <Avatar userLogin={user.login} className="border-primary" size="md" /> || 
@@ -89,13 +91,22 @@ export default function NavAvatar() {
 
   const internalLinks = [
     Link(t("main-nav.nav-avatar.wallet"), getURLWithNetwork("/profile/wallet")),
-    Link(t("main-nav.nav-avatar.oracles"), getURLWithNetwork("/profile/oracles")),
-    Link(t("main-nav.nav-avatar.payments"), getURLWithNetwork("/profile/payments")),
-    Link(t("main-nav.nav-avatar.bounties"), getURLWithNetwork("/profile/bounties")),
-    Link(t("main-nav.nav-avatar.pull-requests"), getURLWithNetwork("/profile/pull-requests")),
-    Link(t("main-nav.nav-avatar.proposals"), getURLWithNetwork("/profile/proposals")),
-    Link(t("main-nav.nav-avatar.my-network"), getURLWithNetwork("/profile/my-network")),
+    Link(t("main-nav.nav-avatar.oracles", {
+        token: activeNetwork?.networkToken?.symbol,
+    }),
+         getURLWithNetwork("/profile/oracles")),
+    Link(t("main-nav.nav-avatar.payments"),
+         getURLWithNetwork("/profile/payments")),
+    Link(t("main-nav.nav-avatar.bounties"),
+         getURLWithNetwork("/profile/bounties")),
+    Link(t("main-nav.nav-avatar.pull-requests"),
+         getURLWithNetwork("/profile/pull-requests")),
+    Link(t("main-nav.nav-avatar.proposals"),
+         getURLWithNetwork("/profile/proposals")),
+    Link(t("main-nav.nav-avatar.my-network"),
+         getURLWithNetwork("/profile/my-network")),
   ];
+
 
   const externalLinks = [
     Link(t("main-nav.nav-avatar.support-center"), "https://support.bepro.network/en/"),
