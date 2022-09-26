@@ -72,11 +72,13 @@ export default function PageActions({
   const isWalletAndGHConnected = isWalletConnected && !!user?.login;
   const isWorkingOnBounty = !!activeIssue?.working?.find((login) => login === user?.login);
   const isBountyOpen = networkIssue?.closed === false && networkIssue?.canceled === false;
-  const isStateToWorking = ["proposal", "open", "ready"].some(value => value === getIssueState({
+  const issueState = getIssueState({
     state: activeIssue?.state,
     amount: activeIssue?.amount,
-    fundingAmount: activeIssue?.fundingAmount
-  }))
+    fundingAmount: activeIssue?.fundingAmount 
+  })
+  const isBountyFunded = activeIssue?.fundedAmount === activeIssue?.fundingAmount
+  const isStateToWorking = ["proposal", "open", "ready"].some(value => value === issueState)
 
   const isBountyOwner =
     wallet?.address && networkIssue?.creator && networkIssue?.creator?.toLowerCase() === wallet?.address?.toLowerCase();
@@ -97,7 +99,7 @@ export default function PageActions({
   }
 
   async function handleRedeem() {
-    handleReedemIssue()
+    handleReedemIssue(issueState === "funding")
       .then(() => {
         updateWalletBalance();
         updateBountyData();
@@ -300,7 +302,7 @@ export default function PageActions({
   }
 
   function renderCancelButton() {
-    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft)
+    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft && !isBountyFunded)
       return(
         <ReadOnlyButtonWrapper>
           <Button

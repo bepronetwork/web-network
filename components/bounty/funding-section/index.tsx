@@ -16,6 +16,8 @@ import CustomContainer from "components/custom-container";
 import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
 
+import { getIssueState } from "helpers/handleTypeIssue";
+
 import { BenefactorExtended } from "interfaces/bounty";
 
 import RetractOrWithdrawModal from "./retract-or-withdraw-modal";
@@ -27,7 +29,7 @@ export default function FundingSection() {
   const [walletFunds, setWalletFunds] = useState<BenefactorExtended[]>();
   const [fundingtoRetractOrWithdraw, setFundingToRetractOrWithdraw] = useState<BenefactorExtended>();
 
-  const { networkIssue } = useIssue();
+  const { networkIssue, activeIssue } = useIssue();
   const { wallet } = useAuthentication();
   
   const isConnected = !!wallet?.address;
@@ -37,6 +39,11 @@ export default function FundingSection() {
   const futureRewards = fundsGiven / networkIssue?.fundingAmount * networkIssue?.rewardAmount;
   const transactionalSymbol = networkIssue?.transactionalTokenData?.symbol;
   const rewardTokenSymbol = networkIssue?.rewardTokenData?.symbol;
+  const isCanceled = getIssueState({
+    state: activeIssue?.state,
+    amount: activeIssue?.amount,
+    fundingAmount: activeIssue?.fundingAmount,
+  }) === "canceled"
 
   const handleShowFundModal = () => setShowFundModal(true);
   const handleCloseFundModal = () => setShowFundModal(false);
@@ -72,7 +79,7 @@ export default function FundingSection() {
 
       <RowWithTwoColumns
         col1={<h4 className="family-Regular">{t("funding:title")}</h4>}
-        col2={isBountyFunded ? <></> : 
+        col2={isBountyFunded || isCanceled ? <></> : 
           <Button onClick={handleShowFundModal}>
             {t("funding:actions.fund-bounty")}
           </Button>}
