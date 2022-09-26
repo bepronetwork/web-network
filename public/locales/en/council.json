@@ -8,5 +8,7 @@
   "become-council": "Become a Curator",
   "become-council-description-part-one": "By becoming a curator you can participate in the bounty distribution and disputes on the network. Become a Curator by locking",
   "become-council-description-part-two": "through your wallet.",
-  "go-to-oracles": "Go To bv{{token}}"
+  "go-to-oracles": "Go To bv{{token}}",
+  "ready-to-merge": "Ready to Merge",
+  "ready-to-propose": "Ready to Propose"
 }
