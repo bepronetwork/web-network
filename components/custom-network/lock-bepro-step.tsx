@@ -14,13 +14,13 @@ import UnlockBeproModal from "components/unlock-bepro-modal";
 
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
+import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
 import { useSettings } from "contexts/settings";
 
 import { formatNumberToCurrency, formatNumberToNScale } from "helpers/formatNumber";
 
 import { StepWrapperProps } from "interfaces/stepper";
-import { useNetwork } from "contexts/network";
 
 export default function LockBeproStep({ activeStep, index, handleClick, validated }: StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
