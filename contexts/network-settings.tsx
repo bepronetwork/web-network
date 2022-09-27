@@ -1,10 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { Defaults } from "@taikai/dappkit";
-import e from "cors";
 import { useRouter } from "next/router";
-
-import ThemeColors from "components/custom-network/theme-colors";
 
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
