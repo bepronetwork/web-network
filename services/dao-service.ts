@@ -7,7 +7,8 @@ import {
   TreasuryInfo,
   OraclesResume,
   Web3Connection,
-  NetworkRegistry
+  NetworkRegistry,
+  toSmartContractDecimals
 } from "@taikai/dappkit";
 import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import {PromiEvent, TransactionReceipt as TransactionReceiptWeb3Core} from "web3-core";
@@ -447,7 +448,7 @@ export default class DAO {
 
     await deployer.loadAbi();
 
-    return deployer.deployJsonAbi(name, symbol, cap, ownerAddress);
+    return deployer.deployJsonAbi(name, symbol, toSmartContractDecimals(cap, 18), ownerAddress);
   }
 
   async openBounty({
