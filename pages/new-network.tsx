@@ -54,7 +54,7 @@ export default function NewNetwork() {
   const { createNetwork, registerNetwork } = useApi();
   const { handleChangeNetworkParameter } = useBepro();
   const { getURLWithNetwork, colorsToCSS } = useNetworkTheme();
-  const { tokensLocked, details, github, tokens, settings, isSettingsValidated } = useNetworkSettings();
+  const { tokensLocked, details, github, tokens, settings, isSettingsValidated, cleanStorage } = useNetworkSettings();
   const { handleDeployNetworkV2, handleAddNetworkToRegistry } = useBepro();
 
   const { dispatch } = useContext(ApplicationContext);
@@ -108,8 +108,6 @@ export default function NewNetwork() {
 
     if (!networkCreated) return;
 
-    
-
     const deployNetworkTX = await handleDeployNetworkV2(tokens.settler).catch(error => error);
 
     if (!(deployNetworkTX as TransactionReceipt)?.contractAddress) return setCreatingNetwork(-1);
@@ -152,6 +150,7 @@ export default function NewNetwork() {
       creator: payload.creator
     })
       .then(() => {
+        cleanStorage?.()
         router.push(getURLWithNetwork("/", { network: payload.name }));
       })
       .catch((error) => {

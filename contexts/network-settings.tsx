@@ -304,6 +304,8 @@ export const NetworkSettingsProvider = ({ children }) => {
     setFields('settings.treasury.closeFee', {value: DEFAULT_CLOSE_FEE, validated: true})
   }
   
+  const cleanStorage = () => localStorage.removeItem(`${localStorageKey}:${wallet.address}`)
+
   // TODO: Better this effect
   useEffect(() => {
     if ( !wallet?.address || 
@@ -419,6 +421,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     forcedNetwork,
     setForcedNetwork,
     LIMITS,
+    cleanStorage,
     fields: Fields
   }), [networkSettings, Fields, LIMITS, setForcedNetwork]);
 
