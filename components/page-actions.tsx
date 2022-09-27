@@ -78,6 +78,7 @@ export default function PageActions({
     fundingAmount: activeIssue?.fundingAmount 
   })
   const isBountyFunded = activeIssue?.fundedAmount === activeIssue?.fundingAmount
+  const isBountyFunding = activeIssue?.fundingAmount > 0
   const isStateToWorking = ["proposal", "open", "ready"].some(value => value === issueState)
 
   const isBountyOwner =
@@ -316,7 +317,7 @@ export default function PageActions({
   }
 
   function renderUpdateAmountButton() {
-    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft)
+    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft && !isBountyFunding)
       return(
         <ReadOnlyButtonWrapper>
           <Button
