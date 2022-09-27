@@ -5,7 +5,6 @@ import {
   Network_v2,
   BountyToken,
   TreasuryInfo,
-  OraclesResume,
   Web3Connection,
   NetworkRegistry,
   toSmartContractDecimals
@@ -15,6 +14,8 @@ import BigNumber from "bignumber.js";
 import {PromiEvent, TransactionReceipt as TransactionReceiptWeb3Core} from "web3-core";
 import {Contract} from "web3-eth-contract";
 
+import { BountyExtended } from "interfaces/bounty";
+import { OraclesResumeExtended } from "interfaces/oracles-state";
 import { Token } from "interfaces/token";
 
 import { NetworkParameters } from "types/dappkit";
@@ -220,7 +221,7 @@ export default class DAO {
   }
 
   async getOraclesOf(address: string): Promise<BigNumber> { 
-    const oracles = this.network.getOraclesOf(address);
+    const oracles = await this.network.getOraclesOf(address);
     
     return new BigNumber(oracles);
   }
@@ -232,7 +233,7 @@ export default class DAO {
     return oraclesOf.gte(councilAmount);
   }
 
-  async getOraclesResume(address: string): Promise<OraclesResume> {
+  async getOraclesResume(address: string): Promise<OraclesResumeExtended> {
     const resume = await this.network.getOraclesResume(address);
     
     return {
@@ -244,7 +245,7 @@ export default class DAO {
     };
   }
 
-  async getBounty(id: number): Promise<Bounty> {
+  async getBounty(id: number): Promise<BountyExtended> {
     const bounty = await this.network.getBounty(id);
 
     return {
@@ -253,7 +254,9 @@ export default class DAO {
       rewardAmount: new BigNumber(bounty.rewardAmount),
       fundingAmount: new BigNumber(bounty.fundingAmount),
       proposals: 
-        bounty.proposals.map(proposal => ({ ...proposal, disputeWeight: new BigNumber(proposal.disputeWeight) }))
+        bounty.proposals.map(proposal => ({ ...proposal, disputeWeight: new BigNumber(proposal.disputeWeight) })),
+      funding: 
+        bounty.funding.map(funding => ({ ...funding, amount: new BigNumber(funding.amount) }))
     };
   }
 

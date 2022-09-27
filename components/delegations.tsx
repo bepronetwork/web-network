@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import OracleIcon from "assets/icons/oracle-icon";
@@ -9,7 +10,7 @@ import DelegationItem from "components/delegation-item";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 
-import { formatStringToCurrency } from "helpers/formatNumber";
+import { formatNumberToCurrency, formatStringToCurrency } from "helpers/formatNumber";
 
 import InfoTooltip from "./info-tooltip";
 import { FlexRow } from "./profile/wallet-balance";
@@ -26,6 +27,8 @@ export default function Delegations({
   const { activeNetwork } = useNetwork();
   const { wallet, updateWalletBalance } = useAuthentication();
 
+  const walletDelegations = wallet?.balance?.oracles?.delegations || [];
+
   const renderInfo = {
     toMe: {
       title: t("profile:deletaged-to-me"),
@@ -35,7 +38,8 @@ export default function Delegations({
     },
     toOthers: {
       title: t("profile:deletaged-to-others"),
-      total: wallet?.balance?.oracles?.delegations?.reduce((acc, delegation) => delegation.amount.plus(acc), 0),
+      total: formatNumberToCurrency(walletDelegations.reduce((acc, delegation) => 
+        delegation.amount.plus(acc), BigNumber(0)).toNumber()),
       description: 
              t("my-oracles:descriptions.oracles-delegated-to-others", { token: activeNetwork?.networkToken?.symbol }),
       delegations: wallet?.balance?.oracles?.delegations || []

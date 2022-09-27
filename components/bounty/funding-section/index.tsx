@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import ArrowRight from "assets/icons/arrow-right";
@@ -22,6 +23,7 @@ import { BenefactorExtended } from "interfaces/bounty";
 
 import RetractOrWithdrawModal from "./retract-or-withdraw-modal";
 
+
 export default function FundingSection() {
   const { t } = useTranslation(["common", "funding"]);
 
@@ -33,10 +35,11 @@ export default function FundingSection() {
   const { wallet } = useAuthentication();
   
   const isConnected = !!wallet?.address;
-  const hasReward = networkIssue?.rewardAmount > 0;
+  const hasReward = networkIssue?.rewardAmount?.gt(0);
   const isBountyFunded = !!networkIssue?.funded;
-  const fundsGiven = walletFunds?.reduce((acc, fund) => acc + fund.amount, 0);
-  const futureRewards = fundsGiven / networkIssue?.fundingAmount * networkIssue?.rewardAmount;
+  const fundsGiven = walletFunds?.reduce((acc, fund) => fund.amount.plus(acc), BigNumber(0)) || BigNumber(0);
+  const futureRewards = 
+    fundsGiven.multipliedBy(networkIssue?.rewardAmount).dividedBy(networkIssue?.fundingAmount).toString();
   const transactionalSymbol = networkIssue?.transactionalTokenData?.symbol;
   const rewardTokenSymbol = networkIssue?.rewardTokenData?.symbol;
   const isCanceled = getIssueState({
@@ -52,10 +55,10 @@ export default function FundingSection() {
   useEffect(() => {
     if (!wallet?.address || !networkIssue) return;
 
-    const funds = 
+    const funds =
       networkIssue.funding
         .map((fund, index) => ({ ...fund, id: index }))
-        .filter(fund => fund.benefactor.toLowerCase() === wallet.address.toLowerCase() && fund.amount > 0);
+        .filter(fund => fund.benefactor.toLowerCase() === wallet.address.toLowerCase() && fund.amount.gt(0));
 
     setWalletFunds(funds);
   }, [wallet, networkIssue]);
@@ -93,8 +96,8 @@ export default function FundingSection() {
           />
 
           <FundingProgress
-            fundedAmount={networkIssue?.fundedAmount}
-            fundingAmount={networkIssue?.fundingAmount}
+            fundedAmount={networkIssue?.fundedAmount?.toString()}
+            fundingAmount={networkIssue?.fundingAmount?.toString()}
             fundingTokenSymbol={transactionalSymbol}
             fundedPercent={networkIssue?.fundedPercent}
           />
@@ -109,7 +112,7 @@ export default function FundingSection() {
               }
               col2={
                 <Amount 
-                  amount={networkIssue?.rewardAmount}
+                  amount={networkIssue?.rewardAmount?.toString()}
                   symbol={networkIssue?.rewardTokenData?.symbol}
                   symbolColor="warning"
                   className="caption-large text-white font-weight-normal"
@@ -127,26 +130,28 @@ export default function FundingSection() {
                     col1={<CaptionMedium text={t("funding:funds-given")} color="white" />}
                     col2={
                       <Amount 
-                        amount={fundsGiven}
+                        amount={fundsGiven.toString()}
                         symbol={transactionalSymbol}
                         className="caption-large text-white font-weight-normal"
                       />
                     }
                     filler
                   />
-
-                  <RowWithTwoColumns 
-                    col1={<CaptionMedium text={t("funding:future-rewards")} color="white" />}
-                    col2={
-                      <Amount 
-                        amount={futureRewards}
-                        symbol={networkIssue?.rewardTokenData?.symbol}
-                        className="caption-large text-white font-weight-normal"
-                        symbolColor="warning"
-                      />
-                    }
-                    filler
-                  />
+                  
+                  { hasReward &&
+                    <RowWithTwoColumns 
+                      col1={<CaptionMedium text={t("funding:future-rewards")} color="white" />}
+                      col2={
+                        <Amount 
+                          amount={futureRewards}
+                          symbol={networkIssue?.rewardTokenData?.symbol}
+                          className="caption-large text-white font-weight-normal"
+                          symbolColor="warning"
+                        />
+                      }
+                      filler
+                    />
+                  }
                 </Col>
               </Row>
               { (networkIssue?.isDraft || !isBountyFunded || networkIssue?.closed) &&
@@ -166,11 +171,11 @@ export default function FundingSection() {
                         col1={
                           <>
                           <Amount 
-                            amount={fund.amount}
+                            amount={fund.amount.toString()}
                             symbol={transactionalSymbol}
                             className="caption-large text-white"
                           />
-                              {networkIssue?.closed && networkIssue?.rewardAmount > 0 && (
+                              {networkIssue?.closed && networkIssue?.rewardAmount?.gt(0) && (
                                 <>
                                   <ArrowRight className="mx-2" />
                                   <span className="caption-medium me-2 text-uppercase">
@@ -178,9 +183,10 @@ export default function FundingSection() {
                                   </span>
                                   <Amount
                                     amount={
-                                      (fund.amount /
-                                        networkIssue.fundingAmount) *
-                                      networkIssue.rewardAmount
+                                      fund.amount
+                                        .dividedBy(networkIssue.fundingAmount)
+                                        .multipliedBy(networkIssue.rewardAmount)
+                                        .toString()
                                     }
                                     symbol={rewardTokenSymbol}
                                     symbolColor="warning"
@@ -191,7 +197,7 @@ export default function FundingSection() {
                         </>
                         }
                         col2={ 
-                            networkIssue?.closed && networkIssue?.rewardAmount > 0 && (
+                            networkIssue?.closed && networkIssue?.rewardAmount?.gt(0) && (
                               <Button
                               textClass={`${networkIssue?.closed ? "text-primary" : 'text-danger'} p-0`}
                               transparent

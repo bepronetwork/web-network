@@ -138,7 +138,7 @@ export default function PageProposal() {
 
       const { githubLogin } = await getUserOf(detail.recipient);
       const oracles = networkProposal?.details[i]?.percentage.toString();
-      const distributedAmount = networkIssue.tokenAmount * detail.percentage / 100;
+      const distributedAmount = networkIssue.tokenAmount.multipliedBy(detail.percentage).dividedBy(100).toString();
 
       return { 
         githubLogin, 
@@ -155,7 +155,7 @@ export default function PageProposal() {
 
     const { proposalId } = router.query;
 
-    const mergeProposal = activeIssue?.mergeProposals.find((p) => +p.id === +proposalId);
+    const mergeProposal = activeIssue?.mergeProposals?.find((p) => +p.id === +proposalId);
     const networkProposals = networkIssue?.proposals?.[+mergeProposal?.scMergeId];
     const pullRequest = activeIssue?.pullRequests.find((pr) => pr.id === mergeProposal?.pullRequestId);
 

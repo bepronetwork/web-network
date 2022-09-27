@@ -1,15 +1,17 @@
 import { Col, ProgressBar, Row } from "react-bootstrap";
 
+import BigNumber from "bignumber.js";
+
 import ArrowRightLine from "assets/icons/arrow-right-line";
 
 import { Amount, ColAuto, RowCenterBetween, RowWithTwoColumns } from "components/bounty/funding-section/minimals";
 
 interface FundingProgressProps {
-  fundedAmount: number;
-  fundingAmount: number;
+  fundedAmount: string;
+  fundingAmount: string;
   fundedPercent: number;
   fundingTokenSymbol: string;
-  amountToFund?: number;
+  amountToFund?: string;
 }
 
 export default function FundingProgress({
@@ -17,12 +19,12 @@ export default function FundingProgress({
   fundingAmount,
   fundedPercent,
   fundingTokenSymbol,
-  amountToFund = 0
+  amountToFund = "0"
 } : FundingProgressProps) {
-  const fundingPercent = amountToFund / fundingAmount * 100;
+  const fundingPercent = +BigNumber(amountToFund).dividedBy(fundingAmount).multipliedBy(100).toString();
   const maxPercent = 100 - fundedPercent;
   const totalPercent = fundingPercent + fundedPercent;
-  const isFundingModal = amountToFund > 0;
+  const isFundingModal = BigNumber(amountToFund).gt(0);
   const contextClass = totalPercent < 100 ? "primary" : (totalPercent === 100 ? "success" : "danger");
   const secondaryProgressVariant = 
     totalPercent < 100 ? "blue-dark" : (totalPercent === 100 ? "success-50" : "danger-50");
@@ -59,7 +61,7 @@ export default function FundingProgress({
         <Col>
           <ProgressBar>
             <ProgressBar
-              now={fundedPercent}
+              now={+fundedPercent}
               isChild
             />
 

@@ -70,7 +70,7 @@ export default function PageActions({
   const isBountyFinished = !!networkIssue?.isFinished;
   const isWalletConnected = !!wallet?.address;
   const isWalletAndGHConnected = isWalletConnected && !!user?.login;
-  const isFundingRequest = +networkIssue?.fundingAmount > 0 || +activeIssue?.fundingAmount > 0;
+  const isFundingRequest = networkIssue?.fundingAmount?.gt(0) || activeIssue?.fundingAmount?.gt(0);
   const isWorkingOnBounty = !!activeIssue?.working?.find((login) => login === user?.login);
   const isBountyOpen = networkIssue?.closed === false && networkIssue?.canceled === false;
   const issueState = getIssueState({

@@ -1,3 +1,5 @@
+import BigNumber from "bignumber.js";
+
 import { Proposal, INetworkProposal } from "interfaces/proposal";
 import { Token } from "interfaces/token";
 
@@ -46,6 +48,12 @@ export interface IssueData {
   contractId?: number;
   token?: Token;
   working: string[];
+}
+
+export interface IssueBigNumberData extends Omit<IssueData , "amount" | "fundingAmount" | "fundedAmount"> {
+  amount: BigNumber;
+  fundingAmount: BigNumber;
+  fundedAmount: BigNumber;
 }
 
 export interface Repository {

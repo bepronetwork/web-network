@@ -86,13 +86,13 @@ export const NetworkProvider: React.FC = function ({ children }) {
               networkToken]) => {
         setActiveNetwork(prevNetwork => ({
           ...prevNetwork,
-          councilAmount,
-          disputableTime: disputableTime / 1000,
-          draftTime: draftTime / 1000,
-          oracleExchangeRate,
-          mergeCreatorFeeShare,
-          proposerFeeShare,
-          percentageNeededForDispute,
+          councilAmount: councilAmount.toString(),
+          disputableTime: +disputableTime / 1000,
+          draftTime: +draftTime / 1000,
+          oracleExchangeRate: +oracleExchangeRate,
+          mergeCreatorFeeShare: +mergeCreatorFeeShare,
+          proposerFeeShare: +proposerFeeShare,
+          percentageNeededForDispute: +percentageNeededForDispute,
           treasury,
           networkToken: {
             ...networkToken,

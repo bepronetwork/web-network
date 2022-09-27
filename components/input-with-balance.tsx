@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import ArrowRightLine from "assets/icons/arrow-right-line";
@@ -8,11 +9,12 @@ import InputNumber from "./input-number";
 
 interface InputWithBalanceProps {
   label: string;
-  value: number;
+  value: BigNumber;
   symbol: string;
-  balance: number;
-  max?: number;
-  onChange: (value: number) => void;
+  balance: BigNumber;
+  max?: BigNumber;
+  decimals?: number;
+  onChange: (value: BigNumber) => void;
 }
 
 export default function InputWithBalance({
@@ -20,27 +22,28 @@ export default function InputWithBalance({
   onChange,
   symbol,
   balance,
-  max
+  max,
+  decimals = 18
 } : InputWithBalanceProps) {
   const { t } = useTranslation("common");
 
   const setMaxValue = () => onChange(max || balance);
-  const handleAmountChange = ({ floatValue }) => onChange(floatValue);
+  const handleAmountChange = ({ value }) => onChange(value);
 
   return(
     <div className="row mx-0 bg-dark-gray border-radius-8 amount-input">
       <div className="col px-0">
         <InputNumber
           classSymbol={"text-primary"}
-          max={max || balance}
-          value={value}
-          error={value > (max || balance)}
+          max={(max || balance)?.toString()}
+          value={value?.toString()}
+          error={value?.gt(max || balance)}
           setMaxValue={setMaxValue}
           min={0}
           placeholder={"0"}
           thousandSeparator
           decimalSeparator="."
-          decimalScale={18}
+          decimalScale={decimals}
           onValueChange={handleAmountChange}
         />
 
@@ -52,20 +55,20 @@ export default function InputWithBalance({
 
         <div className="d-flex align-items-center">
           <span className="text-gray">
-            {formatNumberToCurrency(balance, {
-              maximumFractionDigits: 18
+            {formatNumberToCurrency(balance.toString(), {
+              maximumFractionDigits: decimals
             })}
           </span>
 
-          { value > 0 &&
+          { value?.gt(0) &&
             <>
               <span className="svg-white-40 ml-1">
                 <ArrowRightLine width={10} height={10} />
               </span>
 
               <span className="text-white ml-1">
-                {formatNumberToCurrency(balance - value, {
-                  maximumFractionDigits: 18
+                {formatNumberToCurrency(balance.minus(value).toString(), {
+                  maximumFractionDigits: decimals
                 })}
               </span>
             </>

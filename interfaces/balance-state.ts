@@ -1,5 +1,6 @@
-import { OraclesResume } from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
+
+import { OraclesResumeExtended } from "./oracles-state";
 export interface BalanceState {
   eth: BigNumber;
   staked: BigNumber;
@@ -7,5 +8,5 @@ export interface BalanceState {
 }
 
 export interface Balance extends BalanceState {
-  oracles: OraclesResume;
+  oracles: OraclesResumeExtended;
 }

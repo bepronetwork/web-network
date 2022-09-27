@@ -18,7 +18,7 @@ import { FlexRow } from "components/profile/wallet-balance";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 
-import { formatStringToCurrency } from "helpers/formatNumber";
+import { formatNumberToCurrency } from "helpers/formatNumber";
 
 export default function BeproVotes() {
   const { t } = useTranslation(["common", "profile"]);
@@ -47,7 +47,7 @@ export default function BeproVotes() {
             <span className="caption-large text-white mr-2 font-weight-medium">{t("misc.total")}</span>
             <span className="caption-large text-white bg-dark-gray py-2 px-3 rounded-3 font-weight-medium">
               <span className="mr-2">
-                {formatStringToCurrency(oraclesLocked.plus(oraclesDelegatedToMe).toString())}
+                {formatNumberToCurrency(oraclesLocked.plus(oraclesDelegatedToMe).toNumber())}
               </span>
 
               <InfoTooltip
