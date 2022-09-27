@@ -54,6 +54,12 @@ const argv = require('yargs')
     type: 'string',
     nargs: 1,
   })
+  .option('f', {
+    alias: "treasuryAddress",
+    describe: "Treasury Eth Address",
+    type: 'string',
+    nargs: 1,
+  })
   .option('t', {
     alias: "transactionalTokenAddress",
     describe: "Transactional Address",
@@ -215,7 +221,8 @@ async function main() {
 
 
     console.log(`Deploying Network_V2 With Registry...`);
-    const registryReceipt = await Deployer(NetworkRegistry, [networkToken.contractAddress, 1000, ownerAddress, 10000]);
+    const treasuryAddress = argv.treasuryAddress ? argv.treasuryAddress: ownerAddress;
+    const registryReceipt = await Deployer(NetworkRegistry, [networkToken.contractAddress, 1000, treasuryAddress, 10000]);
     const networkReceipt = await Deployer(Network_v2, [networkToken.contractAddress, registryReceipt.contractAddress]);
 
     const network = new Network_v2(web3Connection, networkReceipt.contractAddress);
@@ -246,6 +253,7 @@ async function main() {
 
     console.table({
       Owner: ownerAddress,
+      TreasuryAddress: treasuryAddress,      
       NetworkToken: networkToken.contractAddress,
       BountyTransactional: bountyTransactional.contractAddress,
       RewardToken: rewardToken.contractAddress,
