@@ -178,7 +178,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     }
 
     //TODO: move tokens logic to new endpoint   
-    if(allowedTokens?.allowedTransactions.length > 0){
+    if(allowedTokens?.allowedTransactions?.length > 0){
       for (const token of allowedTokens.allowedTransactions) {
         await Database.networkTokens.create({
           networkId: network.id,
