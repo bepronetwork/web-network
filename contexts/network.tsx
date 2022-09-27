@@ -94,10 +94,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
           proposerFeeShare: +proposerFeeShare,
           percentageNeededForDispute: +percentageNeededForDispute,
           treasury,
-          networkToken: {
-            ...networkToken,
-            symbol: `${networkToken.symbol}`,
-          }
+          networkToken
         }));
       });
   }, [activeNetwork?.networkAddress, DAOService?.network?.contractAddress]);

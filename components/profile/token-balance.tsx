@@ -64,7 +64,7 @@ export default function TokenBalance({
           </Button> ||
           <>
             <span className="caption text-white mr-1">{formatStringToCurrency(balance.toString())}</span>
-            <span className={`caption text-${symbolColor[type]}`}>{type === "token" && "$"}{symbol}</span>
+            <span className={`caption text-${symbolColor[type]}`}>{symbol}</span>
           </>
         }
       </FlexRow>
