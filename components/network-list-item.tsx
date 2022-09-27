@@ -56,7 +56,7 @@ export default function NetworkListItem({
 
       <div className="col-3 d-flex flex-row align-items-center justify-content-center gap-20">
         <span className="caption-medium text-white ml-3">
-          {isNotUndefined(network?.tokensLocked) ? formatNumberToNScale(network?.tokensLocked) : <Spinner />}
+          {isNotUndefined(network?.tokensLocked) ? formatNumberToNScale(+network?.tokensLocked) : <Spinner />}
         </span>
 
         <span

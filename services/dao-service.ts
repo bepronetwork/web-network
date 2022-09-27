@@ -374,13 +374,13 @@ export default class DAO {
     return this.registry.token.isApproved(this.registry.contractAddress, amount);
   }
 
-  async approveTokenInRegistry(amount: number): Promise<TransactionReceipt> {
+  async approveTokenInRegistry(amount: string): Promise<TransactionReceipt> {
     if (!this.registry) await this.loadRegistry();
 
     return this.registry.token.approve(this.registry.contractAddress, amount);
   }
 
-  async lockInRegistry(amount: number): Promise<TransactionReceipt> {
+  async lockInRegistry(amount: string): Promise<TransactionReceipt> {
     if (!this.registry) await this.loadRegistry();
 
     return this.registry.lock(amount);

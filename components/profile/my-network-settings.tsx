@@ -83,7 +83,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   
   const NetworkAmount = (title, description, amount) => ({ title, description, amount });
 
-  const tvl = (forcedNetwork?.tokensStaked || 0) + (forcedNetwork?.tokensLocked || 0);
+  const tvl = (+forcedNetwork?.tokensStaked || 0) + (+forcedNetwork?.tokensLocked || 0);
 
   const networkAmounts = [
     NetworkAmount(t("custom-network:tokens-staked", { symbol: forcedNetwork?.networkToken?.symbol }), 
@@ -146,7 +146,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
             [handleChangeNetworkParameter("draftTime", draftTime, networkAddress)] : [],
           ... disputableTime !== forcedNetwork.disputableTime ? 
             [handleChangeNetworkParameter("disputableTime", disputableTime, networkAddress)] : [],
-          ... councilAmount !== forcedNetwork.councilAmount ? 
+          ... councilAmount !== +forcedNetwork.councilAmount ? 
             [handleChangeNetworkParameter("councilAmount", councilAmount, networkAddress)] : [],
           ... percentageForDispute !== forcedNetwork.percentageNeededForDispute ? 
             [handleChangeNetworkParameter("percentageNeededForDispute", percentageForDispute, networkAddress)] : []
@@ -286,17 +286,17 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
                 tokensStaked]) => {
           setForcedNetwork({
             ...network,
-            councilAmount,
-            disputableTime: disputableTime / 1000,
-            draftTime: draftTime / 1000,
-            oracleExchangeRate,
-            mergeCreatorFeeShare,
-            proposerFeeShare,
-            percentageNeededForDispute,
+            councilAmount: councilAmount.toString(),
+            disputableTime: +disputableTime / 1000,
+            draftTime: +draftTime / 1000,
+            oracleExchangeRate: +oracleExchangeRate,
+            mergeCreatorFeeShare: +mergeCreatorFeeShare,
+            proposerFeeShare: +proposerFeeShare,
+            percentageNeededForDispute: +percentageNeededForDispute,
             treasury,
             networkToken,
-            tokensLocked,
-            tokensStaked
+            tokensLocked: tokensLocked.toString(),
+            tokensStaked: tokensStaked.toString(),
           });
 
           setIsAbleToBeClosed(isNetworkAbleToBeClosed);

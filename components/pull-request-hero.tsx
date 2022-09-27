@@ -86,7 +86,7 @@ export default function PullRequestHero({
 
           <div className="col-2 d-flex align-items-center justify-content-center">
             <PriceConversor
-              currentValue={activeIssue?.amount || 0}
+              currentValue={activeIssue?.amount?.toString() || "0"}
               currency="BEPRO"
             />
           </div>

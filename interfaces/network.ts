@@ -85,8 +85,8 @@ export interface NetworkSettings {
   setForcedNetwork?: (network: Network) => void;
   cleanStorage?: () => void;
   tokensLocked?: {
-    locked: number;
-    needed: number;
+    locked: string;
+    needed: string;
     validated: boolean;
   };
   details?: {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ProgressBar } from "react-bootstrap";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import ArrowRightLine from "assets/icons/arrow-right-line";
@@ -25,13 +26,13 @@ import { StepWrapperProps } from "interfaces/stepper";
 export default function LockBeproStep({ activeStep, index, handleClick, validated }: StepWrapperProps) {
   const { t } = useTranslation(["common", "bounty","custom-network"]);
 
-  const [amount, setAmount] = useState(0);
-  const [isApproving, setIsApproving] = useState(false);
+  const [amount, setAmount] = useState<BigNumber>();
   const [isLocking, setIsLocking] = useState(false);
   const [inputError, setInputError] = useState("")
   const [isUnlocking, setIsUnlocking] = useState(false);
-  const [settlerAllowance, setSettlerAllowance] = useState(0);
+  const [isApproving, setIsApproving] = useState(false);
   const [showUnlockBepro, setShowUnlockBepro] = useState(false);
+  const [settlerAllowance, setSettlerAllowance] = useState<BigNumber>();
 
   const { settings } = useSettings();
   const { service: DAOService } = useDAO();
@@ -43,35 +44,36 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
   const balance = {
     beproAvailable: wallet?.balance?.bepro,
-    oraclesAvailable: +wallet?.balance?.oracles?.tokensLocked - wallet?.balance?.oracles?.delegatedToOthers,
-    tokensLocked: wallet?.balance?.oracles?.tokensLocked,
+    oraclesAvailable: wallet?.balance?.oracles?.locked?.minus(wallet?.balance?.oracles?.delegatedToOthers),
+    tokensLocked: wallet?.balance?.oracles?.locked?.toString(),
   };
 
-  const amountLocked = tokensLocked.locked;
-  const amountNeeded = tokensLocked.needed;
+  const amountLocked = BigNumber(tokensLocked.locked);
+  const amountNeeded = BigNumber(tokensLocked.needed);
 
-  const lockedPercent = (amountLocked / amountNeeded) * 100;
-  const lockingPercent = (amount / amountNeeded) * 100;
-  const maxPercent = 100 - lockedPercent;
-  const maxValue = Math.min(balance.beproAvailable, amountNeeded - amountLocked);
+  const lockedPercent = amountLocked?.dividedBy(amountNeeded)?.multipliedBy(100);
+  const lockingPercent = amount?.dividedBy(amountNeeded)?.multipliedBy(100);
+  const maxPercent = lockedPercent?.minus(100)?.toFixed(4);
+  const maxValue = BigNumber.minimum(balance.beproAvailable, amountNeeded?.minus(amountLocked));
   const textAmountClass = amount > balance.beproAvailable ? "danger" : "primary";
   const amountsClass = amount > maxValue ? "danger" : "success";
   const needsAllowance = amount > settlerAllowance;
   const isLockBtnDisabled = [
-    amount <= 0,
-    lockedPercent >= 100,
-    amount > maxValue,
-    isLocking
+    amount?.isZero(),
+    amount?.isNaN(),
+    lockedPercent?.gte(100),
+    amount?.gt(maxValue)
   ].some(c => c);
+  const isUnlockBtnDisabled = lockedPercent?.isZero() || lockedPercent?.isNaN();
 
   async function handleLock() {
     if (!DAOService || !amount) return;
 
     setIsLocking(true);
 
-    DAOService.lockInRegistry(amount)
+    DAOService.lockInRegistry(amount.toString())
       .then(() => {
-        setAmount(0);
+        setAmount(undefined);
         updateWalletBalance();
       })
       .catch(console.log)
@@ -85,7 +87,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
     DAOService.unlockFromRegistry()
       .then(() => 
-        Promise.all([setAmount(0),
+        Promise.all([setAmount(undefined),
                      updateWalletBalance(),
                      updateAllowance()]))
       .catch((error) => {
@@ -103,12 +105,14 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   }
 
   function handleAmountChange(params) {
-    if(params.floatValue > balance.beproAvailable)
+    const newValue = BigNumber(params.value);
+    
+    if(newValue.gt(balance.beproAvailable))
       setInputError(t("bounty:errors.exceeds-allowance"))
     else if(inputError)
       setInputError("")
       
-    setAmount(params.floatValue);
+    setAmount(newValue);
   }
 
   function handleSetMaxValue() {
@@ -116,9 +120,11 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   }
 
   function handleApproval() {
-    if (amountNeeded <= 0|| isApproving) return;
+    if (amountNeeded?.lte(0) || isApproving) return;
+
     setIsApproving(true)
-    DAOService.approveTokenInRegistry(amountNeeded - settlerAllowance)
+
+    DAOService.approveTokenInRegistry(amountNeeded?.minus(settlerAllowance)?.toString())
       .then(() => Promise.all([updateWalletBalance(),updateAllowance()]))
       .catch(console.log).finally(()=> setIsApproving(false))
   }
@@ -151,7 +157,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
             <div className="row mb-4">
               <span className="caption-small text-gray">
                 {t("custom-network:steps.lock.you-need-to-lock",
-                  { creatorAmount: formatNumberToNScale(amountNeeded), currency: networkTokenName })}
+                  { creatorAmount: formatNumberToNScale(amountNeeded?.toNumber()), currency: networkTokenName })}
               </span>
             </div>
 
@@ -170,8 +176,8 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                       <div className="col px-0">
                         <InputNumber
                           classSymbol={"text-primary"}
-                          max={maxValue}
-                          value={amount}
+                          max={maxValue?.toString()}
+                          value={amount?.toString()}
                           error={amount > maxValue || !!inputError}
                           setMaxValue={handleSetMaxValue}
                           min={0}
@@ -196,12 +202,12 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
                           <div className="d-flex align-items-center">
                             <span className="text-gray">
-                              {formatNumberToCurrency(balance.beproAvailable || 0, {
+                              {formatNumberToCurrency(balance?.beproAvailable?.toNumber() || 0, {
                                 maximumFractionDigits: 18
                               })}
                             </span>
 
-                            {amount > 0 && (
+                            {amount?.gt(0) && (
                               <>
                                 <span
                                   className={`${textAmountClass} ml-1 d-flex align-items-center`}
@@ -210,7 +216,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                                 </span>
 
                                 <span className={`${textAmountClass} ml-1`}>
-                                  {formatNumberToCurrency(balance.beproAvailable - amount)}
+                                  {formatNumberToCurrency(balance?.beproAvailable?.minus(amount)?.toNumber())}
                                 </span>
                               </>
                             )}
@@ -219,7 +225,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                       </div>
                     </div>
 
-                    {balance.oraclesAvailable > 0 && (  
+                    {balance?.oraclesAvailable?.gt(0) && (
                       <>
                         <div className="row mt-4">
                           <p className="caption-small text-gray">
@@ -246,7 +252,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                             </span>
 
                             <span className="text-gray">
-                              {formatNumberToCurrency(balance.oraclesAvailable || 0, {
+                              {formatNumberToCurrency(balance?.oraclesAvailable?.toNumber() || 0, {
                                 maximumFractionDigits: 18
                               })}
                             </span>
@@ -265,16 +271,16 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                 </p>
                 <div className="d-flex justify-content-between caption-large mb-3 amount-input">
                   <AmountWithPreview
-                    amount={amountLocked}
-                    amountColor={(lockedPercent >= 100 && "success") || "white"}
-                    preview={amountLocked + (amount || 0)}
+                    amount={amountLocked?.toString()}
+                    amountColor={(lockedPercent?.gte(100) && "success") || "white"}
+                    preview={amountLocked?.plus(amount)?.toString()}
                     previewColor={amountsClass}
                     type="currency"
                   />
 
                   <AmountWithPreview
-                    amount={lockedPercent >= 100 && t("custom-network:steps.lock.full") || amountNeeded}
-                    amountColor={(lockedPercent >= 100 && "success") || "gray"}
+                    amount={lockedPercent?.gte(100) && t("custom-network:steps.lock.full") || amountNeeded?.toString()}
+                    amountColor={(lockedPercent?.gte(100) && "success") || "gray"}
                     type="currency"
                   />
                 </div>
@@ -283,13 +289,13 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                   <ProgressBar>
                     <ProgressBar
                       variant={amountsClass}
-                      now={lockingPercent > maxPercent ? 100 : lockedPercent}
+                      now={lockingPercent?.gt(maxPercent) ? 100 : lockedPercent?.toNumber()}
                       isChild
                     />
 
                     <ProgressBar
                       min={0}
-                      now={lockingPercent > maxPercent ? 0 : lockingPercent}
+                      now={lockingPercent?.gt(maxPercent) ? 0 : lockingPercent?.toNumber()}
                       isChild
                     />
                   </ProgressBar>
@@ -297,9 +303,9 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
                 <div className="d-flex align-items-center caption-large amount-input">
                   <AmountWithPreview
-                    amount={lockedPercent}
-                    amountColor={(lockedPercent >= 100 && "success") || "white"}
-                    preview={lockingPercent + lockedPercent}
+                    amount={lockedPercent?.toNumber()}
+                    amountColor={(lockedPercent?.gte(100) && "success") || "white"}
+                    preview={lockingPercent?.plus(lockedPercent)?.toNumber()}
                     previewColor={amountsClass}
                     type="percent"
                   />
@@ -314,10 +320,10 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                     </Button>
                     ||
                     <Button
-                      withLockIcon={!isLocking && isLockBtnDisabled}
-                      disabled={isLockBtnDisabled}
-                      isLoading={isLocking}
+                      disabled={isLockBtnDisabled || isLocking}
                       onClick={() => handleLock()}
+                      isLoading={isLocking}
+                      withLockIcon={!isLocking && isLockBtnDisabled}
                     >
                       <span>
                         {t("transactions.types.lock")} {networkTokenName}
@@ -325,12 +331,12 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                     </Button>
                   }
 
-                  <Button 
-                    disabled={lockedPercent <= 0 || isUnlocking || isLocking} 
-                    color="ligth-gray" 
+                  <Button
+                    disabled={isUnlockBtnDisabled || isUnlocking}
+                    color="ligth-gray"
                     onClick={handleUnLock}
                     isLoading={isUnlocking}
-                    withLockIcon={lockedPercent <= 0 || isLocking}
+                    withLockIcon={!isUnlocking && isUnlockBtnDisabled}
                   >
                     <span>{t('transactions.types.unlock')}</span>
                   </Button>

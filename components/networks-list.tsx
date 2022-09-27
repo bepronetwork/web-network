@@ -85,10 +85,10 @@ export default function NetworksList() {
     if (!networks.length) return;
 
     setNumberOfBounties(networks.reduce((acc, el) => acc + (el?.totalBounties || 0), 0));
-    setTotalConverted(networks.reduce((acc, el) => acc + (el?.totalSettlerConverted || 0), 0));
+    setTotalConverted(networks.reduce((acc, el) => acc + (+el?.totalSettlerConverted || 0), 0));
 
     const networkWithNotConvertedToken = 
-      networks.filter(network => network?.tokensLocked > 0 && network?.totalSettlerConverted === 0);
+      networks.filter(network => +network?.tokensLocked > 0 && +network?.totalSettlerConverted === 0);
 
     const notConvertedEntries = 
       networkWithNotConvertedToken.map(({ tokensLocked, networkToken }) => [networkToken.address, {
@@ -121,14 +121,14 @@ export default function NetworksList() {
 
       const coinInfo = await getCoinInfoByContract(settlerTokenData?.address).catch(() => ({ prices: {} }));
 
-      const totalSettlerConverted = (coinInfo.prices[mainCurrency] || 0) * totalSettlerLocked;
+      const totalSettlerConverted = (coinInfo.prices[mainCurrency] || 0) * +totalSettlerLocked;
 
       return { ...network, 
                openBounties, 
                totalBounties, 
                networkToken: settlerTokenData, 
-               tokensLocked: totalSettlerLocked,
-               totalSettlerConverted
+               tokensLocked: totalSettlerLocked.toString(),
+               totalSettlerConverted: totalSettlerConverted.toString()
       }
     }))
       .then(setNetworks)

@@ -73,7 +73,8 @@ export default function ProposalItem({
       !isDisputable,
       isProposalDisputed,
       !isDisputableByUser,
-      wallet?.balance?.oracles?.locked === 0,
+      wallet?.balance?.oracles?.locked?.isZero(),
+      wallet?.balance?.oracles?.locked?.isNaN(),
   ].some(v => v);
 
   async function handleDispute(event: React.MouseEvent<HTMLButtonElement>) {
@@ -169,7 +170,7 @@ export default function ProposalItem({
               <ProposalProgressSmall
                 pgClass={`${proposalState.contextColor}`}
                 value={+networkProposal?.disputeWeight}
-                total={wallet?.balance?.staked}
+                total={wallet?.balance?.staked?.toNumber()}
                 textClass={`pb-2 text-${proposalState.contextColor}`}
               />
             </div>

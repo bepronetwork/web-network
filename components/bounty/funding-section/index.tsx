@@ -76,7 +76,7 @@ export default function FundingSection() {
 
       <RetractOrWithdrawModal
         show={!!fundingtoRetractOrWithdraw}
-        fundingtoRetractOrWithdraw={fundingtoRetractOrWithdraw}
+        funding={fundingtoRetractOrWithdraw}
         onCloseClick={handleCloseRetractOrWithdrawModal}
       />
 

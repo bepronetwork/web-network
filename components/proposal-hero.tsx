@@ -74,7 +74,7 @@ export default function ProposalHero({
 
           <div className="col-2 d-flex align-items-center justify-content-center">
             <PriceConversor
-              currentValue={activeIssue?.amount || 0}
+              currentValue={activeIssue?.amount?.toString() || "0"}
               currency={activeIssue?.token?.symbol || t('common:misc.token')}
             />
           </div>

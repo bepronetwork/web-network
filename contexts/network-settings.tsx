@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { Defaults } from "@taikai/dappkit";
+import BigNumber from "bignumber.js";
 import { useRouter } from "next/router";
 
 import { useAuthentication } from "contexts/authentication";
@@ -193,7 +194,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   const Fields = {
     amount: {
       setter: (value: string) => setFields('tokensLocked.amount', value),
-      validator: (locked: number, needed: number) => needed > 0 && locked >= needed
+      validator: (locked: string, needed: string) => BigNumber(needed).gt(0) && BigNumber(locked).gte(needed)
     },
     name: {
       setter: async (value: string) => {

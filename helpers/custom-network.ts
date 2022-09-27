@@ -6,9 +6,9 @@ import { Token } from "interfaces/token";
 export const DefaultNetworkSettings = {
   isSettingsValidated: false,
   tokensLocked: {
-    amount: 0,
-    locked: 0,
-    needed: 0,
+    amount: "0",
+    locked: "0",
+    needed: "0",
     validated: false,
   },
   details: {

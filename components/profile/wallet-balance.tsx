@@ -46,8 +46,8 @@ export default function WalletBalance() {
     icon: <OracleIcon />
   };
 
-  const oraclesLocked = wallet?.balance?.oracles?.locked || 0;
-  const oraclesDelegatedToMe = wallet?.balance?.oracles?.delegatedByOthers || 0;
+  const oraclesLocked = wallet?.balance?.oracles?.locked || BigNumber(0);
+  const oraclesDelegatedToMe = wallet?.balance?.oracles?.delegatedByOthers || BigNumber(0);
 
   useEffect(() => {
     let beproToken = undefined;
@@ -136,7 +136,7 @@ export default function WalletBalance() {
         <FlexRow className="align-items-center">
           <span className="caption-medium text-white mr-2 font-weight-medium">{t("misc.total")}</span>
           <span className="caption-large text-white font-weight-medium bg-dark-gray py-2 px-3 rounded-3">
-            <span className="mr-2">{formatNumberToCurrency(oraclesLocked + oraclesDelegatedToMe)}</span>
+            <span className="mr-2">{formatNumberToCurrency(oraclesLocked?.plus(oraclesDelegatedToMe).toNumber())}</span>
             <InfoTooltip 
               description={t("profile:tips.total-oracles", {
                 tokenName: activeNetwork?.networkToken?.name || oracleToken.name
