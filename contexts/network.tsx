@@ -96,7 +96,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
           treasury,
           networkToken: {
             ...networkToken,
-            symbol: `$${networkToken.symbol}`,
+            symbol: `${networkToken.symbol}`,
           }
         }));
       });
