@@ -35,10 +35,10 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const [settlerAllowance, setSettlerAllowance] = useState<BigNumber>();
 
   const { settings } = useSettings();
+  const { activeNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
   const { tokensLocked } = useNetworkSettings();
   const { user, wallet, updateWalletBalance } = useAuthentication();
-  const { activeNetwork } = useNetwork();
   
   const networkTokenName = settings?.beproToken?.symbol || t("misc.$token");
 
@@ -51,14 +51,15 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const amountLocked = BigNumber(tokensLocked.locked);
   const amountNeeded = BigNumber(tokensLocked.needed);
 
-  const lockedPercent = amountLocked?.dividedBy(amountNeeded)?.multipliedBy(100);
-  const lockingPercent = amount?.dividedBy(amountNeeded)?.multipliedBy(100);
+  const lockedPercent = amountLocked?.multipliedBy(100)?.dividedBy(amountNeeded);
+  const lockingPercent = amount?.multipliedBy(100)?.dividedBy(amountNeeded);
   const maxPercent = lockedPercent?.minus(100)?.toFixed(4);
   const maxValue = BigNumber.minimum(balance.beproAvailable, amountNeeded?.minus(amountLocked));
-  const textAmountClass = amount > balance.beproAvailable ? "danger" : "primary";
-  const amountsClass = amount > maxValue ? "danger" : "success";
-  const needsAllowance = amount > settlerAllowance;
+  const textAmountClass = amount?.gt(balance.beproAvailable) ? "danger" : "primary";
+  const amountsClass = amount?.gt(maxValue) ? "danger" : "success";
+  const needsAllowance = amount?.gt(settlerAllowance);
   const isLockBtnDisabled = [
+    !amount,
     amount?.isZero(),
     amount?.isNaN(),
     lockedPercent?.gte(100),
@@ -75,6 +76,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
       .then(() => {
         setAmount(undefined);
         updateWalletBalance();
+        updateAllowance();
       })
       .catch(console.log)
       .finally(() => setIsLocking(false));
@@ -112,11 +114,11 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
     else if(inputError)
       setInputError("")
       
-    setAmount(newValue);
+    setAmount(params.value !== "" && newValue || undefined);
   }
 
   function handleSetMaxValue() {
-    setAmount(maxValue);
+    if (lockedPercent?.lt(100)) setAmount(maxValue);
   }
 
   function handleApproval() {
@@ -125,13 +127,14 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
     setIsApproving(true)
 
     DAOService.approveTokenInRegistry(amountNeeded?.minus(settlerAllowance)?.toString())
-      .then(() => Promise.all([updateWalletBalance(),updateAllowance()]))
-      .catch(console.log).finally(()=> setIsApproving(false))
+      .then(() => updateAllowance())
+      .catch(console.log)
+      .finally(()=> setIsApproving(false));
   }
 
   function updateAllowance() {
     DAOService.getAllowance(settings?.contracts?.settlerToken, wallet.address, settings?.contracts?.networkRegistry)
-      .then(setSettlerAllowance).catch(() => 0);
+      .then(setSettlerAllowance).catch(() => BigNumber(0));
   }
 
   useEffect(() => {
@@ -178,7 +181,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                           classSymbol={"text-primary"}
                           max={maxValue?.toString()}
                           value={amount?.toString()}
-                          error={amount > maxValue || !!inputError}
+                          error={amount?.gt(maxValue) || !!inputError}
                           setMaxValue={handleSetMaxValue}
                           min={0}
                           placeholder={"0"}
@@ -192,6 +195,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                             {inputError && <p className="p-small my-2 mx-2">{inputError}</p>}
                             </>
                           }
+                          disabled={lockedPercent?.gte(100)}
                         />
 
                         <div className="d-flex caption-small justify-content-between align-items-center p-3 mt-1 mb-1">
@@ -273,7 +277,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                   <AmountWithPreview
                     amount={amountLocked?.toString()}
                     amountColor={(lockedPercent?.gte(100) && "success") || "white"}
-                    preview={amountLocked?.plus(amount)?.toString()}
+                    preview={amountLocked?.plus(amount || 0)?.toString()}
                     previewColor={amountsClass}
                     type="currency"
                   />
@@ -303,9 +307,9 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
                 <div className="d-flex align-items-center caption-large amount-input">
                   <AmountWithPreview
-                    amount={lockedPercent?.toNumber()}
+                    amount={lockedPercent?.toString()}
                     amountColor={(lockedPercent?.gte(100) && "success") || "white"}
-                    preview={lockingPercent?.plus(lockedPercent)?.toNumber()}
+                    preview={lockingPercent?.plus(lockedPercent)?.toString()}
                     previewColor={amountsClass}
                     type="percent"
                   />
