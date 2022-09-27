@@ -25,7 +25,7 @@ export default function PriceConversor({
       <span className="text-white caption-large">
         {formatStringToCurrency(currentValue)}
       </span>
-      <span className="text-primary ms-2 caption-medium">${currency}</span>
+      <span className="text-primary ms-2 caption-medium">{currency}</span>
     </div>
     <PriceConversorModal show={isVisible} onClose={() => setIsVisible(false)}/>
     </>

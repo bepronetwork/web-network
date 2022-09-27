@@ -2,8 +2,6 @@ import { useContext, useEffect, useState } from "react";
 
 import { useTranslation } from "next-i18next";
 
-import LockedIcon from "assets/icons/locked-icon";
-
 import Button from "components/button";
 import Modal from "components/modal";
 
@@ -14,10 +12,13 @@ import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 import { toastError } from "contexts/reducers/add-toast";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import { formatStringToCurrency } from "helpers/formatNumber";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
+import useERC20 from "x-hooks/use-erc20";
+
+import InputNumber from "./input-number";
 
 export default function UpdateBountyAmountModal({
   show,
@@ -28,28 +29,26 @@ export default function UpdateBountyAmountModal({
   ghId
 }) {
   const { t } = useTranslation("common");
-  const { handleApproveToken, handleUpdateBountyAmount } = useBepro();
-  const { dispatch } = useContext(ApplicationContext);
-  const { updateIssue } = useIssue();
-  const { processEvent } = useApi();
-  const { activeNetwork } = useNetwork();
-  const { service: DAOService } = useDAO();
-  const { wallet } = useAuthentication();
 
+  const [newAmount, setNewAmount] = useState<string>();
   const [isExecuting, setIsExecuting] = useState(false);
-  const [newAmount, setNewAmount] = useState(0);
-  const [allowance, setAllowance] = useState(0);
-  const [balance, setBalance] = useState(0);
+  
+  const { processEvent } = useApi();
+  const { updateIssue } = useIssue();
+  const transactionalERC20 = useERC20();
+  const { activeNetwork } = useNetwork();
+  const { wallet } = useAuthentication();
+  const { service: DAOService } = useDAO();
+  const { dispatch } = useContext(ApplicationContext);
+  const { handleApproveToken, handleUpdateBountyAmount } = useBepro();
 
-  const handleChange = e => setNewAmount(+e.target.value);
+  const handleChange = params => setNewAmount(params?.value);
 
-  const needsApproval = () => newAmount > allowance;
-  const exceedsBalance = () => newAmount > balance;
+  const needsApproval = () => +newAmount > +transactionalERC20.allowance;
+  const exceedsBalance = () => +newAmount > +transactionalERC20.balance;
 
   const resetValues = () => {
-    setNewAmount(0);
-    setAllowance(0);
-    setBalance(0);
+    setNewAmount(undefined);
     setIsExecuting(false);
   }
 
@@ -57,97 +56,88 @@ export default function UpdateBountyAmountModal({
     setIsExecuting(true);
 
     handleApproveToken(transactionalAddress, newAmount)
-    .then(() => {
-      updateAllowanceAndBalance();
-    })
-    .catch(error => {
-      dispatch(toastError(`Failed to approve:`, error));
-    })
-    .finally(() => {
-      setIsExecuting(false);
-    });
+      .then(() => {
+        return transactionalERC20.updateAllowanceAndBalance();
+      })
+      .catch(error => {
+        dispatch(toastError(`Failed to approve:`, error));
+      })
+      .finally(() => {
+        setIsExecuting(false);
+      });
   }
 
   const handleSubmit = async () => {
     setIsExecuting(true);
 
     handleUpdateBountyAmount(bountyId, newAmount)
-    .then(txInfo => {
-      return processEvent("bounty", "updated", activeNetwork?.name, { 
-        fromBlock: (txInfo as { blockNumber: number }).blockNumber 
+      .then(txInfo => {
+        return processEvent("bounty", "updated", activeNetwork?.name, { 
+          fromBlock: (txInfo as { blockNumber: number }).blockNumber 
+        });
+      })
+      .then(() => {
+        updateIssue(repoId, ghId);
+        resetValues();
+        handleClose();
+      })
+      .catch(console.log)
+      .finally(() => {
+        setIsExecuting(false);
       });
-    })
-    .then(() => {
-      updateIssue(repoId, ghId);
-      resetValues();
-      handleClose();
-    })
-    .catch(console.log)
-    .finally(() => {
-      setIsExecuting(false);
-    });
-  }
-
-  function updateAllowanceAndBalance() {
-    DAOService.getAllowance(transactionalAddress, wallet?.address, DAOService.network.contractAddress)
-      .then(setAllowance);
-      
-    DAOService.getTokenBalance(transactionalAddress, wallet?.address).then(setBalance);
   }
 
   useEffect(() => {
     if (!transactionalAddress || !DAOService || !wallet?.address || !show) return;
 
-    updateAllowanceAndBalance();
+    transactionalERC20.setAddress(transactionalAddress);
   }, [transactionalAddress, DAOService, wallet, show]);
 
   return (
     <Modal show={show} onCloseClick={handleClose} title={t("modals.update-bounty-amount.title")} titlePosition="center">
       <div className="container">
         <div className="form-group">
-          <label className="caption-small mb-2">{t("modals.update-bounty-amount.fields.amount.label")}</label>
-
-          <input 
-            type="text" 
-            className={`form-control ${exceedsBalance() && "is-invalid"}`} 
-            value={newAmount} 
-            onChange={handleChange} 
+          <InputNumber
+            label={t("modals.update-bounty-amount.fields.amount.label")}
+            max={transactionalERC20.balance.toString()}
+            error={exceedsBalance()}
+            value={newAmount}
+            min={0}
+            onValueChange={handleChange}
+            thousandSeparator
+            decimalSeparator="."
+            decimalScale={transactionalERC20.decimals}
+            helperText={
+              <>
+                {formatStringToCurrency(transactionalERC20.balance.toString())}{" "}
+                {transactionalERC20.symbol} Available
+              </>
+            }
           />
-
-          <span className={`small-info text-gray ${exceedsBalance() && "text-danger" || "text-gray"}`}>
-            Max. {formatNumberToCurrency(balance)}
-          </span>
         </div>
 
         <div className="d-flex pt-2 justify-content-center">
           {needsApproval() ? 
-            <Button className="mr-2" onClick={handleApprove} disabled={isExecuting || exceedsBalance()}>
-              {(isExecuting || exceedsBalance()) && (
-                <LockedIcon />
-                )}
+            <Button 
+              className="mr-2" 
+              onClick={handleApprove} 
+              disabled={isExecuting || exceedsBalance()}
+              withLockIcon={exceedsBalance()}
+              isLoading={isExecuting}
+            >
               <span>{t("actions.approve")}</span>
-              {isExecuting ? (
-                <span className="spinner-border spinner-border-xs ml-1" />
-                ) : (
-                ""
-                )}
             </Button> :
             <Button
                 className="mr-2"
-                disabled={isExecuting || exceedsBalance()}
+                disabled={isExecuting || exceedsBalance() || !newAmount}
+                withLockIcon={exceedsBalance() || !newAmount}
                 onClick={handleSubmit}
+                isLoading={isExecuting}
             >
-                {(isExecuting || exceedsBalance()) && (
-                <LockedIcon />
-                )}
-                <span>{t("actions.confirm")}</span>
-                {isExecuting ? (
-                <span className="spinner-border spinner-border-xs ml-1" />
-                ) : (
-                ""
-                )}
+              <span>{t("actions.confirm")}</span>
             </Button>
           }
+          
           <Button color="dark-gray" onClick={handleClose}>
               {t("actions.cancel")}
           </Button>
