@@ -45,7 +45,7 @@ export default function BeproVotes() {
           <FlexRow className="align-items-center">
             <span className="caption-large text-white mr-2 font-weight-medium">{t("misc.total")}</span>
             <span className="caption-large text-white bg-dark-gray py-2 px-3 rounded-3 font-weight-medium">
-              <span className="mr-2">{formatNumberToCurrency(oraclesLocked + oraclesDelegatedToMe)}</span>
+              <span className="mr-2">{formatNumberToCurrency(Number(oraclesLocked)+Number(oraclesDelegatedToMe))}</span>
               <InfoTooltip
                 description={t("profile:tips.total-oracles", {
                   tokenName: activeNetwork?.networkToken?.name || oracleToken.name
