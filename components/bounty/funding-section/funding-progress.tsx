@@ -21,13 +21,13 @@ export default function FundingProgress({
   fundingTokenSymbol,
   amountToFund = "0"
 } : FundingProgressProps) {
-  const fundingPercent = +BigNumber(amountToFund).dividedBy(fundingAmount).multipliedBy(100).toString();
+  const fundingPercent = BigNumber(amountToFund).multipliedBy(100).dividedBy(fundingAmount);
   const maxPercent = 100 - fundedPercent;
-  const totalPercent = fundingPercent + fundedPercent;
+  const totalPercent = fundingPercent.plus(fundedPercent);
   const isFundingModal = BigNumber(amountToFund).gt(0);
-  const contextClass = totalPercent < 100 ? "primary" : (totalPercent === 100 ? "success" : "danger");
+  const contextClass = totalPercent.lt(100) ? "primary" : (totalPercent.isEqualTo(100) ? "success" : "danger");
   const secondaryProgressVariant = 
-    totalPercent < 100 ? "blue-dark" : (totalPercent === 100 ? "success-50" : "danger-50");
+    totalPercent.lt(100)? "blue-dark" : (totalPercent.isEqualTo(100) ? "success-50" : "danger-50");
 
   const AmountWithPreview = ({ amount, preview = undefined, type }) => 
     <Row className="align-items-center">
@@ -69,7 +69,7 @@ export default function FundingProgress({
               <ProgressBar
                 variant={secondaryProgressVariant}
                 min={0}
-                now={fundingPercent > maxPercent ? 100 : fundingPercent}
+                now={fundingPercent.gt(maxPercent) ? 100 : fundingPercent.toNumber()}
                 isChild
               />
             }
@@ -77,7 +77,7 @@ export default function FundingProgress({
         </Col>
 
         <ColAuto>
-          <AmountWithPreview amount={fundedPercent} preview={totalPercent} type="percent" />
+          <AmountWithPreview amount={fundedPercent} preview={totalPercent.toFixed(2, 1)} type="percent" />
         </ColAuto>
       </RowCenterBetween>
     </div>
