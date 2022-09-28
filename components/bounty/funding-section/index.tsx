@@ -99,7 +99,7 @@ export default function FundingSection() {
             fundedAmount={networkIssue?.fundedAmount?.toString()}
             fundingAmount={networkIssue?.fundingAmount?.toString()}
             fundingTokenSymbol={transactionalSymbol}
-            fundedPercent={networkIssue?.fundedPercent}
+            fundedPercent={networkIssue?.fundedPercent?.toString()}
           />
 
           { hasReward &&

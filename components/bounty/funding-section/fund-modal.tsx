@@ -152,7 +152,7 @@ export default function FundModal({
           fundedAmount={networkIssue?.fundedAmount?.toString()}
           fundingAmount={networkIssue?.fundingAmount?.toString()}
           fundingTokenSymbol={networkIssue?.transactionalTokenData?.symbol}
-          fundedPercent={networkIssue?.fundedPercent}
+          fundedPercent={networkIssue?.fundedPercent?.toString()}
           amountToFund={amountToFund?.toString()}
         />
 

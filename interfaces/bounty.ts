@@ -14,7 +14,7 @@ export interface BountyExtended extends Bounty {
     rewardAmount: BigNumber;
     fundingAmount: BigNumber;
     fundedAmount?: BigNumber;
-    fundedPercent?: number;
+    fundedPercent?: BigNumber;
 
     closed: boolean;
     canceled: boolean;

@@ -26,12 +26,13 @@ import useOctokit from "x-hooks/use-octokit";
 import { useDAO } from "./dao";
 
 
-export interface IActiveIssue extends Omit<IssueData, "amount" | "fundingAmount" | "fundedAmount"> {
+export interface IActiveIssue extends Omit<IssueData, "amount" | "fundingAmount" | "fundedAmount" | "fundedPercent"> {
   comments: IssueDataComment[];
   lastUpdated: number;
   amount?: BigNumber;
   fundingAmount?: BigNumber;
   fundedAmount?: BigNumber;
+  fundedPercent?: BigNumber;
 }
 const TTL = 60 * 2 * 100; // 2 Min
 export interface IssueContextData {
@@ -168,7 +169,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     const rewardTokenData = bounty.rewardToken !== Defaults.nativeZeroAddress ? 
       await DAOService.getERC20TokenData(bounty.rewardToken).catch(() => undefined) : undefined;
     const fundedAmount = bounty.funding.reduce((acc, benefactor) => benefactor.amount.plus(acc), BigNumber(0));
-    const fundedPercent = +fundedAmount.multipliedBy(100).dividedBy(bounty.fundingAmount).toFixed(2, 1);
+    const fundedPercent = fundedAmount.multipliedBy(100).dividedBy(bounty.fundingAmount);
 
     setNetworkIssue({ 
       ...bounty, 

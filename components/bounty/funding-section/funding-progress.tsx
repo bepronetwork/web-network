@@ -9,7 +9,7 @@ import { Amount, ColAuto, RowCenterBetween, RowWithTwoColumns } from "components
 interface FundingProgressProps {
   fundedAmount: string;
   fundingAmount: string;
-  fundedPercent: number;
+  fundedPercent: string;
   fundingTokenSymbol: string;
   amountToFund?: string;
 }
@@ -22,7 +22,7 @@ export default function FundingProgress({
   amountToFund = "0"
 } : FundingProgressProps) {
   const fundingPercent = BigNumber(amountToFund).multipliedBy(100).dividedBy(fundingAmount);
-  const maxPercent = 100 - fundedPercent;
+  const maxPercent = BigNumber(100).minus(fundedPercent);
   const totalPercent = fundingPercent.plus(fundedPercent);
   const isFundingModal = BigNumber(amountToFund).gt(0);
   const contextClass = totalPercent.lt(100) ? "primary" : (totalPercent.isEqualTo(100) ? "success" : "danger");
