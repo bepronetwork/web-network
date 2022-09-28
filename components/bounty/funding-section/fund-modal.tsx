@@ -112,7 +112,11 @@ export default function FundModal({
   function handleApprove() {
     setIsExecuting(true);
     approve(amountToFund.toString())
-      .catch(console.debug)
+      .catch(error => {
+        if (error?.code === MetamaskErrors.UserRejected) return;
+        
+        console.debug("Failed to approve", error);
+      })
       .finally(() => setIsExecuting(false));
   }
 
@@ -141,6 +145,7 @@ export default function FundModal({
       subTitleComponent={SubTitle}
       show={show}
       onCloseClick={handleClose}
+      onCloseDisabled={isExecuting}
     >
       <div className="mt-2 px-2 d-grid gap-4">
         <FundingProgress
@@ -184,6 +189,7 @@ export default function FundModal({
               color="gray" 
               outline
               onClick={handleClose}
+              disabled={isExecuting}
             >
               {t("actions.cancel")}
             </Button>
