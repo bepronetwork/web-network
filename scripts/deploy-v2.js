@@ -222,7 +222,8 @@ async function main() {
 
     console.log(`Deploying Network_V2 With Registry...`);
     const treasuryAddress = argv.treasuryAddress ? argv.treasuryAddress: ownerAddress;
-    const registryReceipt = await Deployer(NetworkRegistry, [networkToken.contractAddress, 1000, treasuryAddress, 10000]);
+    const registryReceipt = await Deployer(NetworkRegistry,
+      [networkToken.contractAddress, 1000, treasuryAddress, 10000, 1000000, 2000000, bountyToken.contractAddress]);
     const networkReceipt = await Deployer(Network_v2, [networkToken.contractAddress, registryReceipt.contractAddress]);
 
     const network = new Network_v2(web3Connection, networkReceipt.contractAddress);
