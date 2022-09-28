@@ -490,8 +490,8 @@ export default class DAO {
     return this.network.disputeBountyProposal(bountyId, proposalId);
   }
 
-  async closeBounty(bountyId: number, proposalId: number): Promise<TransactionReceipt> {
-    return this.network.closeBounty(bountyId, proposalId);
+  async closeBounty(bountyId: number, proposalId: number, uri: string): Promise<TransactionReceipt> {
+    return this.network.closeBounty(bountyId, proposalId, uri);
   }
 
   async updateBountyAmount(bountyId: number, amount: number): Promise<TransactionReceipt> {

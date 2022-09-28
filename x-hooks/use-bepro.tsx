@@ -9,6 +9,7 @@ import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 import { addTransaction } from "contexts/reducers/add-transaction";
 import { updateTransaction } from "contexts/reducers/update-transaction";
+import { useSettings } from "contexts/settings";
 
 import { parseTransaction } from "helpers/transactions";
 
@@ -29,6 +30,7 @@ export default function useBepro() {
   const { activeNetwork } = useNetwork();
   const { networkIssue, activeIssue, updateIssue } = useIssue();
   const { service: DAOService } = useDAO();
+  const { settings } = useSettings();
   const { t } = useTranslation("common");
 
   const { processEvent } = useApi();
@@ -99,7 +101,7 @@ export default function useBepro() {
                                           activeNetwork);
       dispatch(closeIssueTx);
 
-      await DAOService.closeBounty(+bountyId, +proposalscMergeId)
+      await DAOService.closeBounty(+bountyId, +proposalscMergeId, settings?.urls?.nft)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           txWindow.updateItem(closeIssueTx.payload.id,
                               parseTransaction(txInfo, closeIssueTx.payload));
