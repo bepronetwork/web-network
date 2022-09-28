@@ -223,9 +223,10 @@ async function main() {
     console.log(`Deploying Network_V2 With Registry...`);
     const treasuryAddress = argv.treasuryAddress ? argv.treasuryAddress: ownerAddress;
     const registryReceipt = await Deployer(NetworkRegistry,
-      [networkToken.contractAddress, 1000, treasuryAddress, 10000, 1000000, 2000000, bountyToken.contractAddress]);
+      [networkToken.contractAddress, 100, treasuryAddress, 10000, 1000000, 2000000, bountyToken.contractAddress]);
     const networkReceipt = await Deployer(Network_v2, [networkToken.contractAddress, registryReceipt.contractAddress]);
 
+    
     const network = new Network_v2(web3Connection, networkReceipt.contractAddress);
     await network.loadContract();
 
@@ -246,10 +247,10 @@ async function main() {
     }
     // Transactionals Tokens
     await network.registry.addAllowedTokens(tokensAllowed, true);
-
+    await bountyToken.setDispatcher(registryReceipt.contractAddress);
     console.log(`Adding Network_V2 to registry...`)
-    await network.registry.token.approve(registryReceipt.contractAddress, 1000);
-    await network.registry.lock(1000)
+    await network.registry.token.approve(registryReceipt.contractAddress, 100);
+    await network.registry.lock(100)
     await network.registry.registerNetwork(networkReceipt.contractAddress);
 
     console.table({
