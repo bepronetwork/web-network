@@ -32,8 +32,6 @@ const publicRuntimeConfig = {
     allowCustomTokens: process.env.NEXT_PUBLIC_ALLOW_CUSTOM_TOKENS,
     adminWalletAddress: process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS,
   },
-  nftUri: process.env.NEXT_PUBLIC_NFT_URI,
-  web3ProviderConnection: process.env.NEXT_PUBLIC_WEB3_CONNECTION,
   github:{
     botUser: process.env.NEXT_PUBLIC_GH_USER,
   },
