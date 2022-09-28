@@ -12,7 +12,7 @@ export default function calculateDistributedAmounts(treasury,
                                                     proposalPercents: number[]) {
   let treasuryAmount = BigNumber(0);
   
-  if (!treasury.treasury && treasury.treasury === Defaults.nativeZeroAddress)
+  if (treasury.treasury && treasury.treasury !== Defaults.nativeZeroAddress)
     treasuryAmount = bountyAmount.dividedBy(100).multipliedBy(treasury.closeFee);
 
   const realAmount = bountyAmount.minus(treasuryAmount);
