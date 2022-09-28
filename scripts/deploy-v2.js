@@ -252,7 +252,6 @@ async function main() {
     await network.registry.token.approve(registryReceipt.contractAddress, 100);
     await network.registry.lock(100)
     await network.registry.registerNetwork(networkReceipt.contractAddress);
-    await network.nftToken.setDispatcher(network.registry.contractAddress);
 
     console.table({
       Owner: ownerAddress,
