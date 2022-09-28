@@ -70,7 +70,9 @@ const publicRuntimeConfig = {
     1500: 'seneca',
     1501: 'afrodite',
     1502: 'irene',
-    1503: 'iris'
+    1503: 'iris',
+    1504: 'diogenes',
+    1505: 'aurelius'
   }
 }
 
