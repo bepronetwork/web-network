@@ -23,7 +23,6 @@ import { BenefactorExtended } from "interfaces/bounty";
 
 import RetractOrWithdrawModal from "./retract-or-withdraw-modal";
 
-
 export default function FundingSection() {
   const { t } = useTranslation(["common", "funding"]);
 
@@ -31,22 +30,27 @@ export default function FundingSection() {
   const [walletFunds, setWalletFunds] = useState<BenefactorExtended[]>();
   const [fundingtoRetractOrWithdraw, setFundingToRetractOrWithdraw] = useState<BenefactorExtended>();
 
-  const { networkIssue, activeIssue } = useIssue();
   const { wallet } = useAuthentication();
+  const { networkIssue, activeIssue } = useIssue();
   
   const isConnected = !!wallet?.address;
   const hasReward = networkIssue?.rewardAmount?.gt(0);
+  const isBountyClosed = !!networkIssue?.closed;
   const isBountyFunded = !!networkIssue?.funded;
-  const fundsGiven = walletFunds?.reduce((acc, fund) => fund.amount.plus(acc), BigNumber(0)) || BigNumber(0);
-  const futureRewards = 
-    fundsGiven.multipliedBy(networkIssue?.rewardAmount).dividedBy(networkIssue?.fundingAmount).toString();
+  const isBountyInDraft = !!networkIssue?.isDraft;
   const transactionalSymbol = networkIssue?.transactionalTokenData?.symbol;
   const rewardTokenSymbol = networkIssue?.rewardTokenData?.symbol;
+
+  const fundsGiven = walletFunds?.reduce((acc, fund) => fund.amount.plus(acc), BigNumber(0)) || BigNumber(0);
+  
+  const futureRewards = 
+    fundsGiven.multipliedBy(networkIssue?.rewardAmount).dividedBy(networkIssue?.fundingAmount).toString();
+  
   const isCanceled = getIssueState({
     state: activeIssue?.state,
     amount: activeIssue?.amount,
     fundingAmount: activeIssue?.fundingAmount,
-  }) === "canceled"
+  }) === "canceled";
 
   const handleShowFundModal = () => setShowFundModal(true);
   const handleCloseFundModal = () => setShowFundModal(false);
@@ -99,7 +103,7 @@ export default function FundingSection() {
             fundedAmount={networkIssue?.fundedAmount?.toString()}
             fundingAmount={networkIssue?.fundingAmount?.toString()}
             fundingTokenSymbol={transactionalSymbol}
-            fundedPercent={networkIssue?.fundedPercent?.toString()}
+            fundedPercent={networkIssue?.fundedPercent?.toFixed(2, 1)}
           />
 
           { hasReward &&
@@ -154,68 +158,67 @@ export default function FundingSection() {
                   }
                 </Col>
               </Row>
-              { (networkIssue?.isDraft || !isBountyFunded || networkIssue?.closed) &&
-                <Row className="mx-0">
-                  <Collapsable
-                    labelShow={t("funding:actions.manage-funding")}
-                    labelHide={t("funding:actions.manage-funding")}
-                    labelColor="gray"
-                    activeColor="white"
-                    className="gap-2"
-                  >
-                    {walletFunds?.map(fund => 
-                    <>
-                      <RowWithTwoColumns 
-                        key={`fund-${fund.id}`}
-                        className="p-2 bg-shadow border-radius-8"
-                        col1={
-                          <>
-                          <Amount 
-                            amount={fund.amount.toString()}
-                            symbol={transactionalSymbol}
-                            className="caption-large text-white"
-                          />
-                              {networkIssue?.closed && networkIssue?.rewardAmount?.gt(0) && (
-                                <>
-                                  <ArrowRight className="mx-2" />
-                                  <span className="caption-medium me-2 text-uppercase">
-                                    {t("funding:reward")}
-                                  </span>
-                                  <Amount
-                                    amount={
-                                      fund.amount
-                                        .dividedBy(networkIssue.fundingAmount)
-                                        .multipliedBy(networkIssue.rewardAmount)
-                                        .toString()
-                                    }
-                                    symbol={rewardTokenSymbol}
-                                    symbolColor="warning"
-                                    className="caption-large text-white"
-                                  />
-                                </>
-                              )}
-                        </>
-                        }
-                        col2={ 
-                            networkIssue?.closed && networkIssue?.rewardAmount?.gt(0) && (
-                              <Button
-                              textClass={`${networkIssue?.closed ? "text-primary" : 'text-danger'} p-0`}
-                              transparent
-                              onClick={() => setFundingToRetractOrWithdraw(fund)}
-                            >
-                              {networkIssue?.closed
-                                ? t("funding:actions.withdraw-funding")
-                                : t("funding:actions.retract-funding")}
-                            </Button>
-                            )
-                        }
-                      />
-                      </>)
-                    }
 
-                  </Collapsable>
-                </Row>
-              }
+              <Row className="mx-0">
+                <Collapsable
+                  labelShow={t("funding:actions.manage-funding")}
+                  labelHide={t("funding:actions.manage-funding")}
+                  labelColor="gray"
+                  activeColor="white"
+                  className="gap-2"
+                >
+                  {walletFunds?.map(fund => 
+                  <>
+                    <RowWithTwoColumns 
+                      key={`fund-${fund.id}`}
+                      className="p-2 bg-shadow border-radius-8"
+                      col1={
+                        <>
+                        <Amount 
+                          amount={fund.amount.toString()}
+                          symbol={transactionalSymbol}
+                          className="caption-large text-white"
+                        />
+                            {(isBountyClosed && hasReward) && (
+                              <>
+                                <ArrowRight className="mx-2" />
+                                <span className="caption-medium me-2 text-uppercase">
+                                  {t("funding:reward")}
+                                </span>
+                                <Amount
+                                  amount={
+                                    fund.amount
+                                      .dividedBy(networkIssue.fundingAmount)
+                                      .multipliedBy(networkIssue.rewardAmount)
+                                      .toString()
+                                  }
+                                  symbol={rewardTokenSymbol}
+                                  symbolColor="warning"
+                                  className="caption-large text-white"
+                                />
+                              </>
+                            )}
+                      </>
+                      }
+                      col2={
+                          (isBountyInDraft || isBountyClosed && hasReward) && (
+                            <Button
+                            textClass={`${isBountyClosed ? "text-primary" : 'text-danger'} p-0`}
+                            transparent
+                            onClick={() => setFundingToRetractOrWithdraw(fund)}
+                          >
+                            {isBountyClosed
+                              ? t("funding:actions.withdraw-funding")
+                              : t("funding:actions.retract-funding")}
+                          </Button>
+                          )
+                      }
+                    />
+                    </>)
+                  }
+
+                </Collapsable>
+              </Row>
             </>
           }
         </Col>
