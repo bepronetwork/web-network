@@ -168,7 +168,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     const rewardTokenData = bounty.rewardToken !== Defaults.nativeZeroAddress ? 
       await DAOService.getERC20TokenData(bounty.rewardToken).catch(() => undefined) : undefined;
     const fundedAmount = bounty.funding.reduce((acc, benefactor) => benefactor.amount.plus(acc), BigNumber(0));
-    const fundedPercent = fundedAmount.dividedBy(bounty.fundingAmount).multipliedBy(100).toNumber();
+    const fundedPercent = +fundedAmount.multipliedBy(100).dividedBy(bounty.fundingAmount).toFixed(2, 1);
 
     setNetworkIssue({ 
       ...bounty, 
