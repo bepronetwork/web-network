@@ -46,7 +46,7 @@ export default function ProposalListAddresses({
                     />
                     <span>
                       {formatNumberToCurrency(+item?.distributedAmount, { minimumFractionDigits: 2 })}{" "}
-                      <span className="text-primary">${currency || t('common:misc.token')}</span>
+                      <span className="text-primary">{currency || t('common:misc.token')}</span>
                     </span>
                   </div>
                 </div>
