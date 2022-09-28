@@ -118,7 +118,7 @@ export default function ProposalItem({
         .then(chainTime => {
           const canDispute = 
             isProposalDisputable(networkProposal?.creationDate, activeNetwork?.disputableTime, chainTime);
-          console.log(activeNetwork?.disputableTime)
+
           setIsDisputable(canDispute && !isProposalDisputed);
         });
   }, [DAOService, proposal?.createdAt, activeNetwork?.disputableTime, isProposalDisputed]);
