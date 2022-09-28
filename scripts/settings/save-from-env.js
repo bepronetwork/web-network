@@ -17,6 +17,7 @@ const publicSettings = [
   PublicSettingItem("ipfs", process.env.NEXT_PUBLIC_IPFS_BASE, "string", "urls"),
   PublicSettingItem("blockScan", process.env.NEXT_PUBLIC_BLOCKSCAN_LINK || '', "string", "urls"),
   PublicSettingItem("web3Provider", process.env.NEXT_PUBLIC_WEB3_CONNECTION, "string", "urls"),
+  PublicSettingItem("nft", process.env.NEXT_PUBLIC_NFT_URI, "string", "urls"),
   PublicSettingItem("settlerToken", process.env.NEXT_PUBLIC_SETTLER_ADDRESS, "string", "contracts"),
   PublicSettingItem("network", process.env.NEXT_PUBLIC_CONTRACT_ADDRESS, "string", "contracts"),
   PublicSettingItem("transactionalToken", process.env.NEXT_PUBLIC_TRANSACTION_ADDRESS, "string", "contracts"),
