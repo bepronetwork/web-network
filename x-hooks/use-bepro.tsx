@@ -22,6 +22,7 @@ import { NetworkParameters } from "types/dappkit";
 
 import useApi from "x-hooks/use-api";
 import useTransactions from "x-hooks/useTransactions";
+import {useSettings} from "../contexts/settings";
 
 
 export default function useBepro() {
@@ -30,6 +31,7 @@ export default function useBepro() {
   const { networkIssue, activeIssue, updateIssue } = useIssue();
   const { service: DAOService } = useDAO();
   const { t } = useTranslation("common");
+  const { settings: {urls: {nft: uri}} } = useSettings();
 
   const { processEvent } = useApi();
   const txWindow = useTransactions();
@@ -99,7 +101,7 @@ export default function useBepro() {
                                           activeNetwork);
       dispatch(closeIssueTx);
 
-      await DAOService.closeBounty(+bountyId, +proposalscMergeId)
+      await DAOService.closeBounty(+bountyId, +proposalscMergeId, uri)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           txWindow.updateItem(closeIssueTx.payload.id,
                               parseTransaction(txInfo, closeIssueTx.payload));

@@ -23,6 +23,7 @@ import { Token } from "interfaces/token";
 import { api, eventsApi } from "services/api";
 
 import { Entities, Events } from "types/dappkit";
+import getConfig from "next/config";
 interface NewIssueParams {
   title: string;
   description: string;
@@ -44,6 +45,8 @@ type FileUploadReturn = {
   fileName: string;
   size: string;
 }[]
+
+const { publicRuntimeConfig } = getConfig();
 
 const repoList: ReposList = [];
 
@@ -493,7 +496,12 @@ export default function useApi() {
 
   async function getSettings() {
     return api.get("/settings")
-      .then((({ data }) => data))
+      .then((({ data }) => {
+        return {
+          ...publicRuntimeConfig,
+          ...data
+        }
+      }))
       .catch((error) => { throw error });
   }
 
