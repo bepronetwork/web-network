@@ -15,13 +15,13 @@ import UnlockBeproModal from "components/unlock-bepro-modal";
 
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
+import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
 import { useSettings } from "contexts/settings";
 
 import { formatNumberToCurrency, formatNumberToNScale } from "helpers/formatNumber";
 
 import { StepWrapperProps } from "interfaces/stepper";
-import { useNetwork } from "contexts/network";
 
 export default function LockBeproStep({ activeStep, index, handleClick, validated }: StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
@@ -202,7 +202,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                       </div>
                     </div>
 
-                    {balance.oraclesAvailable > 0 && (
+                    {balance.oraclesAvailable > 0 && (  
                       <>
                         <div className="row mt-4">
                           <p className="caption-small text-gray">
@@ -251,7 +251,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                   <AmountWithPreview
                     amount={amountLocked}
                     amountColor={(lockedPercent >= 100 && "success") || "white"}
-                    preview={amountLocked + amount}
+                    preview={amountLocked + (amount || 0)}
                     previewColor={amountsClass}
                     type="currency"
                   />
