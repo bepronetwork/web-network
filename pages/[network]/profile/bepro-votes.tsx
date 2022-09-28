@@ -19,7 +19,7 @@ import { useNetwork } from "contexts/network";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
-export default function Oracles() {
+export default function BeproVotes() {
   const { t } = useTranslation(["common", "profile"]);
 
   const { activeNetwork } = useNetwork();
