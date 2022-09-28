@@ -1,3 +1,6 @@
+const {WinStorage} = require("../services/win-storage");
+const storage = new WinStorage('web-network.settings', 3600, "sessionStorage");
+
 class Settings {
   constructor(settings = undefined) {
     this.settings = settings || [];
@@ -50,13 +53,8 @@ class Settings {
   }
 }
 
-const getSettingsFromSessionStorage = () => 
-  typeof window !== 'undefined' && JSON.parse(sessionStorage.getItem("web-network.settings")) || undefined;
-
-const setSettingsToSessionStorage = settings => {
-  if (typeof window !== 'undefined')
-    sessionStorage.setItem("web-network.settings", JSON.stringify(settings));
-}
+const getSettingsFromSessionStorage = () => storage.getItem();
+const setSettingsToSessionStorage = settings => storage.setItem(settings);
 
 module.exports = { 
   Settings,
