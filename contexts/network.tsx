@@ -111,6 +111,10 @@ export const NetworkProvider: React.FC = function ({ children }) {
     updateActiveNetwork();
   }, [query?.network]);
 
+  useEffect(() => {
+    if (activeNetwork?.isRegistered === false) push("/networks");
+  }, [activeNetwork]);
+
   useEffect(() => {    
     if (DAOService?.network?.contractAddress !== activeNetwork?.networkAddress ||! activeNetwork?.draftTime) 
       changeNetwork(activeNetwork?.networkAddress)

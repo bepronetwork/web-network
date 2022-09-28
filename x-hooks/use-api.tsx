@@ -354,15 +354,6 @@ export default function useApi() {
         throw error;
       });
   }
-
-  async function registerNetwork(networkInfo) {
-    return api
-      .patch("/network", { ...networkInfo })
-      .then((response) => response)
-      .catch((error) => {
-        throw error;
-      });
-  }
   
   async function uploadFiles(files: File | File[]): Promise<FileUploadReturn> {
     const form = new FormData();
@@ -433,7 +424,7 @@ export default function useApi() {
         throw error;
       });
   }
-
+  
   async function getTokens() {
     return api
       .get<Token[]>(`/tokens`)
@@ -442,7 +433,6 @@ export default function useApi() {
         throw error;
       });
   }
-
 
   async function searchNetworks({
     page = "1",
@@ -536,7 +526,6 @@ export default function useApi() {
     cancelPrePullRequest,
     resetUser,
     getSettings,
-    registerNetwork,
     getTokens,
   };
 }
