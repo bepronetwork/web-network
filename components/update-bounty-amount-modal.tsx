@@ -1,8 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import Button from "components/button";
+import InputNumber from "components/input-number";
 import Modal from "components/modal";
 
 import { ApplicationContext } from "contexts/application";
@@ -18,8 +20,6 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useERC20 from "x-hooks/use-erc20";
 
-import InputNumber from "./input-number";
-
 export default function UpdateBountyAmountModal({
   show,
   transactionalAddress,
@@ -30,8 +30,8 @@ export default function UpdateBountyAmountModal({
 }) {
   const { t } = useTranslation("common");
 
-  const [newAmount, setNewAmount] = useState<string>();
   const [isExecuting, setIsExecuting] = useState(false);
+  const [newAmount, setNewAmount] = useState<BigNumber>();
   
   const { processEvent } = useApi();
   const { updateIssue } = useIssue();
@@ -42,10 +42,10 @@ export default function UpdateBountyAmountModal({
   const { dispatch } = useContext(ApplicationContext);
   const { handleApproveToken, handleUpdateBountyAmount } = useBepro();
 
-  const handleChange = params => setNewAmount(params?.value);
+  const handleChange = params => setNewAmount(BigNumber(params.value));
 
-  const needsApproval = () => +newAmount > +transactionalERC20.allowance;
-  const exceedsBalance = () => +newAmount > +transactionalERC20.balance;
+  const needsApproval = !!newAmount?.gt(transactionalERC20.allowance);
+  const exceedsBalance = !!newAmount?.gt(transactionalERC20.balance);
 
   const resetValues = () => {
     setNewAmount(undefined);
@@ -55,7 +55,7 @@ export default function UpdateBountyAmountModal({
   const handleApprove = async () => {
     setIsExecuting(true);
 
-    handleApproveToken(transactionalAddress, newAmount)
+    handleApproveToken(transactionalAddress, newAmount.toString())
       .then(() => {
         return transactionalERC20.updateAllowanceAndBalance();
       })
@@ -70,7 +70,7 @@ export default function UpdateBountyAmountModal({
   const handleSubmit = async () => {
     setIsExecuting(true);
 
-    handleUpdateBountyAmount(bountyId, newAmount)
+    handleUpdateBountyAmount(bountyId, newAmount.toString())
       .then(txInfo => {
         return processEvent("bounty", "updated", activeNetwork?.name, { 
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
@@ -100,8 +100,8 @@ export default function UpdateBountyAmountModal({
           <InputNumber
             label={t("modals.update-bounty-amount.fields.amount.label")}
             max={transactionalERC20.balance.toString()}
-            error={exceedsBalance()}
-            value={newAmount}
+            error={exceedsBalance}
+            value={newAmount?.toString()}
             min={0}
             onValueChange={handleChange}
             thousandSeparator
@@ -117,20 +117,20 @@ export default function UpdateBountyAmountModal({
         </div>
 
         <div className="d-flex pt-2 justify-content-center">
-          {needsApproval() ? 
+          {needsApproval ? 
             <Button 
               className="mr-2" 
               onClick={handleApprove} 
-              disabled={isExecuting || exceedsBalance()}
-              withLockIcon={exceedsBalance()}
+              disabled={isExecuting || exceedsBalance}
+              withLockIcon={exceedsBalance}
               isLoading={isExecuting}
             >
               <span>{t("actions.approve")}</span>
             </Button> :
             <Button
                 className="mr-2"
-                disabled={isExecuting || exceedsBalance() || !newAmount}
-                withLockIcon={exceedsBalance() || !newAmount}
+                disabled={isExecuting || exceedsBalance || !newAmount}
+                withLockIcon={exceedsBalance || !newAmount}
                 onClick={handleSubmit}
                 isLoading={isExecuting}
             >
