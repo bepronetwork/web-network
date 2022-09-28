@@ -345,7 +345,7 @@
       "dispute": "Dispute bounty",
       "propose": "Propose merge request",
       "close-bounty": "Close bounty",
-      "redeem-bounty": "Redeem bounty",
+      "redeem-bounty": "Cancel bounty",
       "approve-settler": "Approve Network Token",
       "recognize-finished": "Recognize bounty as finished",
       "create-pull-request": "Create Pull Request",
