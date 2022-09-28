@@ -31,7 +31,7 @@ export default function useBepro() {
   const { networkIssue, activeIssue, updateIssue } = useIssue();
   const { service: DAOService } = useDAO();
   const { t } = useTranslation("common");
-  const { settings: {urls: {nft: uri}} } = useSettings();
+  const { settings } = useSettings();
 
   const { processEvent } = useApi();
   const txWindow = useTransactions();
@@ -101,7 +101,7 @@ export default function useBepro() {
                                           activeNetwork);
       dispatch(closeIssueTx);
 
-      await DAOService.closeBounty(+bountyId, +proposalscMergeId, uri)
+      await DAOService.closeBounty(+bountyId, +proposalscMergeId, settings?.urls?.nft)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           txWindow.updateItem(closeIssueTx.payload.id,
                               parseTransaction(txInfo, closeIssueTx.payload));
