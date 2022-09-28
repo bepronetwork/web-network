@@ -47,7 +47,7 @@ export default function BeproVotes() {
             <span className="caption-large text-white mr-2 font-weight-medium">{t("misc.total")}</span>
             <span className="caption-large text-white bg-dark-gray py-2 px-3 rounded-3 font-weight-medium">
               <span className="mr-2">
-                {formatNumberToCurrency(oraclesLocked.plus(oraclesDelegatedToMe).toNumber())}
+                {formatNumberToCurrency(oraclesLocked.plus(oraclesDelegatedToMe).toString())}
               </span>
 
               <InfoTooltip
