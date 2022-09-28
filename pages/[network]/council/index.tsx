@@ -3,16 +3,17 @@ import React from "react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next/types";
 
-import Newissues from "./new-bounties";
+import ReadyToPropose from "./ready-to-propose";
 
-export default function PageOracle() {
-  return <Newissues />;
+
+export default function PageCouncil() {
+  return <ReadyToPropose />
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common", "bounty", "oracle", "connect-wallet-button", "council"]))
+        ...(await serverSideTranslations(locale, ["common", "bounty", "council", "connect-wallet-button"]))
     }
   };
 };
