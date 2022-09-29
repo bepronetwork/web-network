@@ -76,7 +76,7 @@ export default function CreateBountyModal() {
   const [customTokens, setCustomTokens] = useState<Token[]>([]);
   const [isTokenApproved, setIsTokenApproved] = useState(false);
   const [currentSection, setCurrentSection] = useState<number>(0);
-  const [isFundingType, setIsFundingType] = useState<boolean>(true);
+  const [isBountyType, setisBountyType] = useState<boolean>(true);
   const [rewardChecked, setRewardChecked] = useState<boolean>(false);
   const [transactionalToken, setTransactionalToken] = useState<Token>();
   const [bountyDescription, setBountyDescription] = useState<string>("");
@@ -134,6 +134,10 @@ export default function CreateBountyModal() {
 
   function handleRewardChecked(e) {
     setRewardChecked(e.target.checked);
+    if(!(e.target.checked)){
+      setRewardAmount(ZeroNumberFormatValues)
+      setRewardToken(undefined);
+    }
   }
 
   function renderDetails(review = false) {
@@ -191,7 +195,7 @@ export default function CreateBountyModal() {
         issueAmount={fieldParams[type].amount}
         setIssueAmount={fieldParams[type].setAmount}
         tokenBalance={fieldParams[type].balance}
-        isFundingType={fieldParams[type].isFunding}
+        needValueValidation={isBountyType || type === 'reward'}
         labelSelect={fieldParams[type].label}
         review={review}
       />
@@ -210,10 +214,10 @@ export default function CreateBountyModal() {
               <Button
                 color="black"
                 className={`container-bounty w-100 bg-30-hover ${
-                  isFundingType && "funding-type"
+                  isBountyType && "funding-type"
                 }`}
                 onClick={() => {
-                  setIsFundingType(true);
+                  setisBountyType(true);
                   setRewardChecked(false);
                   setRewardAmount(ZeroNumberFormatValues);
                   setIssueAmount(ZeroNumberFormatValues);
@@ -226,10 +230,10 @@ export default function CreateBountyModal() {
               <Button
                 color="black"
                 className={`container-bounty w-100 bg-30-hover ${
-                  !isFundingType && "funding-type"
+                  !isBountyType && "funding-type"
                 }`}
                 onClick={() => {
-                  setIsFundingType(false);
+                  setisBountyType(false);
                   setRewardChecked(true);
                   setIssueAmount(ZeroNumberFormatValues);
                 }}
@@ -238,7 +242,7 @@ export default function CreateBountyModal() {
               </Button>
             </div>
             {renderBountyToken(false, "bounty")}
-            {!isFundingType && (
+            {!isBountyType && (
               <>
                 <div className="col-md-12">
                   <FormCheck
@@ -359,24 +363,24 @@ export default function CreateBountyModal() {
         : false;
     if ((currentSection === 0 && !bountyTitle) || !bountyDescription)
       return true;
-    if (currentSection === 1 && isFundingType && isIssueAmount) return true;
+    if (currentSection === 1 && isBountyType && isIssueAmount) return true;
     if (
       currentSection === 1 &&
-      !isFundingType &&
+      !isBountyType &&
       !rewardChecked &&
       isIssueAmount
     )
       return true;
     if (
       currentSection === 1 &&
-      !isFundingType &&
+      !isBountyType &&
       rewardChecked &&
       isIssueAmount
     )
       return true;
     if (
       currentSection === 1 &&
-      !isFundingType &&
+      !isBountyType &&
       rewardChecked &&
       isRewardAmount
     )
@@ -507,7 +511,7 @@ export default function CreateBountyModal() {
       githubUser: payload.githubUser,
       };
 
-      if (!isFundingType && !rewardChecked) {
+      if (!isBountyType && !rewardChecked) {
         bountyPayload.tokenAmount = 0;
         bountyPayload.fundingAmount = issueAmount.floatValue;
       }
@@ -602,7 +606,7 @@ export default function CreateBountyModal() {
   }, [customTokens]);
 
   useEffect(() => {
-    if (isFundingType)
+    if (isBountyType)
       setIsTokenApproved(isAmountApproved(transactionalERC20.allowance, issueAmount.floatValue));
     else
       setIsTokenApproved(isAmountApproved(rewardERC20.allowance, rewardAmount.floatValue));

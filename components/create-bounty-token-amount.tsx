@@ -23,7 +23,7 @@ export default function CreateBountyTokenAmount({
   issueAmount,
   setIssueAmount,
   review = false,
-  isFundingType,
+  needValueValidation,
   decimals = 18
 }) {
   const { t } = useTranslation("bounty");
@@ -33,7 +33,7 @@ export default function CreateBountyTokenAmount({
   }
 
   function handleIssueAmountOnValueChange(values: NumberFormatValues) {
-    if(!isFundingType && (+values.floatValue > +currentToken?.currentValue)){
+    if(needValueValidation && (+values.floatValue > +currentToken?.currentValue)){
       setIssueAmount({ formattedValue: "" });
       setInputError(t("bounty:errors.exceeds-allowance"))
     }else if (values.floatValue < 0) {
@@ -45,14 +45,14 @@ export default function CreateBountyTokenAmount({
   }
 
   function handleIssueAmountBlurChange() {
-    if (isFundingType && issueAmount.floatValue > tokenBalance) {
+    if (needValueValidation && issueAmount.floatValue > tokenBalance) {
       setIssueAmount({ formattedValue: tokenBalance.toString() });
     }
   }
 
   function handleMaxValue() {
     if (review) return;
-    if (!isFundingType) return;
+    if (!needValueValidation) return;
     return (
       <div className="text-gray text-uppercase caption-small">
         {t("fields.set")}
@@ -85,6 +85,7 @@ export default function CreateBountyTokenAmount({
           setToken={setCurrentToken}
           disabled={review}
           defaultToken={defaultToken}
+          showCurrencyValue={needValueValidation}
           needsBalance
         />
       </div>
