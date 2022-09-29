@@ -11,7 +11,6 @@ import ArrowRight from "assets/icons/arrow-right";
 import NothingFound from "components/nothing-found";
 import PaymentsList from "components/profile/payments-list";
 import ProfileLayout from "components/profile/profile-layout";
-import { FlexRow } from "components/profile/wallet-balance";
 import ReactSelect from "components/react-select";
 
 import { useAuthentication } from "contexts/authentication";
