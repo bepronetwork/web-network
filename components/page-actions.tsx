@@ -243,7 +243,6 @@ export default function PageActions({
   function renderStartWorkingButton() {
     if (isWalletAndGHConnected && 
         !isBountyInDraft && 
-        !isBountyFinished && 
         isBountyOpen && 
         !isWorkingOnBounty && 
         isRepoForked &&
@@ -255,15 +254,11 @@ export default function PageActions({
             onClick={handleStartWorking}
             className="read-only-button"
             disabled={isExecuting}
+            isLoading={isExecuting}
           >
             <span>
               <Translation ns="bounty" label="actions.start-working.title" />
             </span>
-            {isExecuting ? (
-              <span className="spinner-border spinner-border-xs ml-1" />
-            ) : (
-              ""
-            )}
           </Button>
         </ReadOnlyButtonWrapper>
       );
