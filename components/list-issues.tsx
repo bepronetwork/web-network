@@ -24,7 +24,7 @@ import { useNetwork } from "contexts/network";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 import { changeShowCreateBountyState } from "contexts/reducers/change-show-create-bounty";
 
-import { IssueBigNumberData } from "interfaces/issue-data";
+import { IssueState, IssueBigNumberData } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import usePage from "x-hooks/use-page";
