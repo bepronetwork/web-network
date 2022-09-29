@@ -37,7 +37,8 @@ export default function Delegations({
       title: t("profile:deletaged-to-others"),
       description: 
              t("my-oracles:descriptions.oracles-delegated-to-others", { token: activeNetwork?.networkToken?.symbol }),
-      total: wallet?.balance?.oracles?.delegations?.reduce((acc, delegation) => acc + delegation.amount, 0),
+      total: wallet?.balance?.oracles?.delegations?.reduce((acc, delegation) => Number(acc) + Number(delegation.amount),
+                                                           0),
       delegations: wallet?.balance?.oracles?.delegations || []
     }
   };
@@ -85,7 +86,7 @@ export default function Delegations({
               <DelegationItem
                 key={`delegation-${delegation.id}-${delegation.to}`}
                 type={type}
-                delegation={delegation} 
+                delegation={type === "toMe" ? {amount: delegation} : delegation} 
                 tokenName={networkTokenName}
               />)
           }
