@@ -22,6 +22,7 @@ interface TokensDropdownProps {
   userAddress?: string;
   disabled?: boolean;
   needsBalance?: boolean;
+  showCurrencyValue?: boolean;
   token?: Token;
 }
 
@@ -41,6 +42,7 @@ export default function TokensDropdown({
   userAddress,
   disabled = false,
   token,
+  showCurrencyValue = true,
   needsBalance
 }: TokensDropdownProps) {
   const [options, setOptions] = useState<Option[]>();
@@ -144,7 +146,7 @@ export default function TokensDropdown({
               {tokenInfo ? tokenInfo.name : name}
             </span>
             <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">
-              {currentValue} {tokenInfo?.symbol ? tokenInfo?.symbol : symbol}
+              {showCurrencyValue && `${currentValue} ${tokenInfo?.symbol ? tokenInfo?.symbol : symbol}`}
               {address === option?.value?.address && (
                 <DoneIcon
                   className="ms-1 text-primary"
@@ -185,7 +187,7 @@ export default function TokensDropdown({
               </span>
             </div>
             <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">
-              {currentValue} {tokenInfo?.symbol && currentValue ? tokenInfo?.symbol : symbol}
+              {showCurrencyValue && `${currentValue} ${tokenInfo?.symbol && currentValue ? tokenInfo?.symbol : symbol}`}
             </div>
           </>
         ) : (
