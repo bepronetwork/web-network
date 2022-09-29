@@ -52,33 +52,30 @@ export default function CouncilLayout({ children }) {
       DAOService.getTotalNetworkToken(),
     ]);
 
-    Promise.all([
-      DAOService.getClosedBounties(),
-      DAOService.getOpenBounties(),
-      DAOService.getTotalNetworkToken(),
-      getTotalUsers()
-    ])
-    .then(([closed, inProgress, onNetwork, totalUsers]) => {
-      setInfos([
-        {
-          value: inProgress,
-          label: t("common:heroes.in-progress")
-        },
-        {
-          value: closed,
-          label: t("common:heroes.bounties-closed")
-        },
-        {
-          value: onNetwork.toNumber(),
-          label: t("common:heroes.bounties-in-network"),
-          currency: "BEPRO"
-        },
-        {
-          value: totalUsers,
-          label: t("common:heroes.protocol-members")
-        }
-      ]);
-    });
+    setInfos([
+      {
+        value: totalBounties,
+        label: t("council:ready-bountys"),
+      },
+      {
+        value: activeNetwork?.councilMembers?.length || 0,
+        label: t("council:council-members"),
+      },
+      {
+        value: 0,
+        label: t("council:distributed-developers"),
+        currency: "BEPRO",
+      },
+      {
+        value: onNetwork.toNumber(),
+        label: t("common:heroes.bounties-in-network"),
+        currency: "BEPRO",
+      },
+    ]);
+  }
+
+  useEffect(() => {
+    loadTotals();
   }, [DAOService, activeNetwork]);
 
   return (
