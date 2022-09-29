@@ -78,9 +78,8 @@ export default function PageActions({
     amount: activeIssue?.amount,
     fundingAmount: activeIssue?.fundingAmount 
   })
-  const isBountyFunded = activeIssue?.fundedAmount === activeIssue?.fundingAmount
-  const isBountyFunding = activeIssue?.fundingAmount > 0
-  const isStateToWorking = ["proposal", "open", "ready"].some(value => value === issueState)
+  const isBountyFunded = activeIssue?.fundedAmount === activeIssue?.fundingAmount;
+  const isStateToWorking = ["proposal", "open", "ready"].some(value => value === issueState);
 
   const isBountyOwner =
     wallet?.address && networkIssue?.creator && networkIssue?.creator?.toLowerCase() === wallet?.address?.toLowerCase();
