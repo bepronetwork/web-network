@@ -94,7 +94,6 @@ export default function InputNumber({
                 "border border-1 border-success": success,
                 "border border-1 border-danger": error,
                 "border border-1 border-warning": warning,
-                "group-disabled": params?.disabled,
                 ...errorStyle
                             })}
             onClick={setMaxValue}

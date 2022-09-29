@@ -183,7 +183,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                           setMaxValue={handleSetMaxValue}
                           min={0}
                           placeholder={"0"}
-                          disabled={lockedPercent >= 100}
+                          disabled={!!lockedPercent?.gt(100)}
                           thousandSeparator
                           decimalSeparator="."
                           decimalScale={18}
@@ -193,7 +193,6 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                             {inputError && <p className="p-small my-2 mx-2">{inputError}</p>}
                             </>
                           }
-                          disabled={lockedPercent?.gte(100)}
                         />
 
                         <div className="d-flex caption-small justify-content-between align-items-center p-3 mt-1 mb-1">
@@ -316,7 +315,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                 <div className="d-flex justify-content-center mt-4 pt-3">
                   {
                     needsAllowance &&
-                    <Button disabled={isApproving || lockingPercent > 100} onClick={handleApproval}>
+                    <Button disabled={isApproving || !!lockingPercent?.gt(100)} onClick={handleApproval}>
                       {t('actions.approve')}
                       {isApproving && <span className="spinner-border spinner-border-xs ml-1" />}
                     </Button>
