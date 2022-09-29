@@ -11,7 +11,6 @@ import Modal from "components/modal";
 import NetworkTxButton from "components/network-tx-button";
 
 import { useAuthentication } from "contexts/authentication";
-import { useNetwork } from "contexts/network";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 
@@ -20,6 +19,7 @@ import { TransactionTypes } from "interfaces/enums/transaction-types";
 export default function UnlockBeproModal({
   show = false,
   onCloseClick,
+  networkTokenSymbol
 }) {
   const { t } = useTranslation(["common", "pull-request"]);
 
@@ -28,7 +28,6 @@ export default function UnlockBeproModal({
 
   const networkTxRef = useRef<HTMLButtonElement>(null);
 
-  const { activeNetwork } = useNetwork();
   const { wallet, updateWalletBalance } = useAuthentication();
 
   const oraclesAvailable = wallet?.balance?.oracles?.locked;
@@ -36,6 +35,7 @@ export default function UnlockBeproModal({
   const textOracleClass = amountExceedsAvailable ? "text-danger" : "text-purple";
   const textBeproClass = amountExceedsAvailable ? "text-danger" : "text-success";
   const isButtonDisabled = [
+    !amountToUnlock,
     amountToUnlock?.isZero(),
     amountToUnlock?.isNaN(),
     isUnlocking,
@@ -49,12 +49,17 @@ export default function UnlockBeproModal({
     setIsUnlocking(false);
   }
 
+  function handleError(e) {
+    setDefaults();
+    console.debug('error', e);
+  }
+
   function setToMax() {
     setAmountToUnlock(wallet?.balance?.oracles?.locked);
   }
 
-  function handleChange({ floatValue }) {
-    setAmountToUnlock(floatValue);
+  function handleChange({ value }) {
+    setAmountToUnlock(BigNumber(value));
   }
 
   function handleUnlock() {
@@ -77,7 +82,7 @@ export default function UnlockBeproModal({
       <div className="container">
         <div className="mb-3">
           <p className="caption-medium text-gray mb-2">
-            <span className="text-purple">{t("$oracles",  { token: activeNetwork?.networkToken?.symbol })}</span>{" "}
+            <span className="text-purple">{t("$oracles",  { token: networkTokenSymbol })}</span>{" "}
             {t("transactions.amount")}
           </p>
 
@@ -99,7 +104,7 @@ export default function UnlockBeproModal({
             <div className="d-flex caption-small justify-content-between align-items-center p-20">
               <span className="text-ligth-gray">
                 <span className="text-purple">
-                  {t("$oracles", { token: activeNetwork?.networkToken?.symbol })}
+                  {t("$oracles", { token: networkTokenSymbol })}
                 </span>{" "}
                 {t("misc.available")}
               </span>
@@ -179,16 +184,16 @@ export default function UnlockBeproModal({
       <NetworkTxButton
         txMethod="unlock"
         txType={TransactionTypes.unlock}
-        txCurrency={t("$oracles",  { token: activeNetwork?.networkToken?.symbol })}
+        txCurrency={t("$oracles",  { token: networkTokenSymbol })}
         txParams={{
           tokenAmount: amountToUnlock?.toString(),
           from: wallet?.address
         }}
         buttonLabel=""
         modalTitle={t("my-oracles:actions.unlock.title")}
-        modalDescription={t("my-oracles:actions.unlock.description", { token: activeNetwork?.networkToken?.symbol })}
+        modalDescription={t("my-oracles:actions.unlock.description", { token: networkTokenSymbol })}
         onSuccess={setDefaults}
-        onFail={(e) => {console.error('error', e)}}
+        onFail={handleError}
         ref={networkTxRef}
       />
     </Modal>

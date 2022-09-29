@@ -15,7 +15,6 @@ import UnlockBeproModal from "components/unlock-bepro-modal";
 
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
-import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
 import { useSettings } from "contexts/settings";
 
@@ -35,12 +34,11 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const [settlerAllowance, setSettlerAllowance] = useState<BigNumber>();
 
   const { settings } = useSettings();
-  const { activeNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
   const { tokensLocked } = useNetworkSettings();
   const { user, wallet, updateWalletBalance } = useAuthentication();
   
-  const networkTokenName = settings?.beproToken?.symbol || t("misc.$token");
+  const networkTokenSymbol = settings?.beproToken?.symbol || t("misc.$token");
 
   const balance = {
     beproAvailable: wallet?.balance?.bepro,
@@ -143,7 +141,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
   return (
     <Step
-      title={t("custom-network:steps.lock.title", { currency: networkTokenName })}
+      title={t("custom-network:steps.lock.title", { currency: networkTokenSymbol })}
       index={index}
       activeStep={activeStep}
       validated={validated && !!user?.login}
@@ -160,7 +158,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
             <div className="row mb-4">
               <span className="caption-small text-gray">
                 {t("custom-network:steps.lock.you-need-to-lock",
-                  { creatorAmount: formatNumberToNScale(amountNeeded?.toNumber()), currency: networkTokenName })}
+                  { creatorAmount: formatNumberToNScale(amountNeeded?.toNumber()), currency: networkTokenSymbol })}
               </span>
             </div>
 
@@ -170,7 +168,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                   <div className="col px-0">
                     <div className="row mb-2">
                       <label htmlFor="" className="caption-medium text-gray">
-                        <span className="text-primary">{networkTokenName}</span>{" "}
+                        <span className="text-primary">{networkTokenSymbol}</span>{" "}
                         {t("transactions.amount")}
                       </label>
                     </div>
@@ -200,7 +198,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
                         <div className="d-flex caption-small justify-content-between align-items-center p-3 mt-1 mb-1">
                           <span className="text-ligth-gray">
-                            <span className="text-primary">{networkTokenName}</span>{" "}
+                            <span className="text-primary">{networkTokenSymbol}</span>{" "}
                             {t("misc.available")}
                           </span>
 
@@ -229,15 +227,15 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                       </div>
                     </div>
 
-                    {balance?.oraclesAvailable?.gt(0) && (
+                    {(balance?.oraclesAvailable?.gt(0) && lockedPercent?.lt(100)) && (
                       <>
                         <div className="row mt-4">
                           <p className="caption-small text-gray">
                             {t("transactions.types.unlock")}{" "}
-                            <span className="text-primary">{networkTokenName}</span>{" "}
+                            <span className="text-primary">{networkTokenSymbol}</span>{" "}
                             {t("misc.by")} {t("misc.giving-away")}{" "}
                             <span className="text-purple">
-                              {t("$oracles", { token: activeNetwork?.networkToken?.symbol })}
+                              {t("$oracles", { token: networkTokenSymbol })}
                             </span>
                           </p>
                         </div>
@@ -250,7 +248,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                           <div className="d-flex justify-content-between px-0">
                             <span className="text-ligth-gray">
                               <span className="text-purple text-uppercase">
-                                {t("$oracles", { token: activeNetwork?.networkToken?.symbol })}
+                                {t("$oracles", { token: networkTokenSymbol })}
                               </span>{" "}
                               {t("misc.available")}
                             </span>
@@ -270,7 +268,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
               <div className="col bg-dark-gray border-radius-8 p-3">
                 <p className="caption-medium text-gray mb-4">
-                  <span className="text-primary">{networkTokenName}</span>{" "}
+                  <span className="text-primary">{networkTokenSymbol}</span>{" "}
                   {t("misc.locked")}
                 </p>
                 <div className="d-flex justify-content-between caption-large mb-3 amount-input">
@@ -330,7 +328,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                       withLockIcon={!isLocking && isLockBtnDisabled}
                     >
                       <span>
-                        {t("transactions.types.lock")} {networkTokenName}
+                        {t("transactions.types.lock")} {networkTokenSymbol}
                       </span>
                     </Button>
                   }
@@ -354,6 +352,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
       <UnlockBeproModal
         show={showUnlockBepro}
         onCloseClick={handleCloseUnlockModal}
+        networkTokenSymbol={networkTokenSymbol}
       />
     </Step>
   );
