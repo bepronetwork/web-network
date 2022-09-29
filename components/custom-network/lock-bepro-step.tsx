@@ -23,11 +23,12 @@ import { formatNumberToCurrency, formatNumberToNScale } from "helpers/formatNumb
 import { StepWrapperProps } from "interfaces/stepper";
 
 export default function LockBeproStep({ activeStep, index, handleClick, validated }: StepWrapperProps) {
-  const { t } = useTranslation(["common", "custom-network"]);
+  const { t } = useTranslation(["common", "bounty","custom-network"]);
 
   const [amount, setAmount] = useState(0);
   const [isApproving, setIsApproving] = useState(false);
   const [isLocking, setIsLocking] = useState(false);
+  const [inputError, setInputError] = useState("")
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [settlerAllowance, setSettlerAllowance] = useState(0);
   const [showUnlockBepro, setShowUnlockBepro] = useState(false);
@@ -102,6 +103,11 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   }
 
   function handleAmountChange(params) {
+    if(params.floatValue > balance.beproAvailable)
+      setInputError(t("bounty:errors.exceeds-allowance"))
+    else if(inputError)
+      setInputError("")
+      
     setAmount(params.floatValue);
   }
 
@@ -166,14 +172,20 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                           classSymbol={"text-primary"}
                           max={maxValue}
                           value={amount}
-                          error={amount > maxValue}
+                          error={amount > maxValue || !!inputError}
                           setMaxValue={handleSetMaxValue}
                           min={0}
                           placeholder={"0"}
+                          disabled={lockedPercent >= 100}
                           thousandSeparator
                           decimalSeparator="."
                           decimalScale={18}
                           onValueChange={handleAmountChange}
+                          helperText={
+                            <>
+                            {inputError && <p className="p-small my-2 mx-2">{inputError}</p>}
+                            </>
+                          }
                         />
 
                         <div className="d-flex caption-small justify-content-between align-items-center p-3 mt-1 mb-1">
@@ -251,12 +263,11 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                   <span className="text-primary">{networkTokenName}</span>{" "}
                   {t("misc.locked")}
                 </p>
-
                 <div className="d-flex justify-content-between caption-large mb-3 amount-input">
                   <AmountWithPreview
                     amount={amountLocked}
                     amountColor={(lockedPercent >= 100 && "success") || "white"}
-                    preview={amountLocked + amount}
+                    preview={amountLocked + (amount || 0)}
                     previewColor={amountsClass}
                     type="currency"
                   />
@@ -297,7 +308,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                 <div className="d-flex justify-content-center mt-4 pt-3">
                   {
                     needsAllowance &&
-                    <Button disabled={isApproving} onClick={handleApproval}>
+                    <Button disabled={isApproving || lockingPercent > 100} onClick={handleApproval}>
                       {t('actions.approve')}
                       {isApproving && <span className="spinner-border spinner-border-xs ml-1" />}
                     </Button>

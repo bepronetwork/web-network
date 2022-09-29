@@ -53,19 +53,12 @@ export default function NewNetwork() {
   const { createNetwork, processEvent } = useApi();
   const { handleChangeNetworkParameter } = useBepro();
   const { getURLWithNetwork, colorsToCSS } = useNetworkTheme();
-  const { tokensLocked, details, github, tokens, settings } = useNetworkSettings();
+  const { tokensLocked, details, github, tokens, settings, isSettingsValidated, cleanStorage } = useNetworkSettings();
   const { handleDeployNetworkV2, handleAddNetworkToRegistry } = useBepro();
 
   const { dispatch } = useContext(ApplicationContext);
 
   const defaultNetworkName = appSettings?.defaultNetworkConfig?.name?.toLowerCase() || "bepro";
-  const isFormValidates = [
-    tokensLocked?.validated,
-    details?.validated,
-    settings?.validated,
-    github?.validated,
-    tokens?.validated,
-  ].every(condition=>condition)
     
   const creationSteps = [
     { id: 1, name: t("custom-network:modals.loader.steps.deploy-network") },
@@ -159,6 +152,7 @@ export default function NewNetwork() {
 
     await processEvent("registry", "registered", payload.name.toLowerCase(), { fromBlock: registrationTx.blockNumber })
       .then(() => {
+        cleanStorage?.()
         router.push(getURLWithNetwork("/", { network: payload.name }));
       })
       .catch((error) => {
@@ -222,7 +216,7 @@ export default function NewNetwork() {
             <SelectRepositoriesStep validated={github?.validated} />
 
             <TokenConfiguration 
-              validated={isFormValidates} 
+              validated={isSettingsValidated} 
               handleFinish={handleCreateNetwork} 
               finishLabel={t("custom-network:steps.repositories.submit-label")} 
             />
