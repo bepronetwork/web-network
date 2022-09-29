@@ -28,6 +28,7 @@ export default function FundingProgress({
   const contextClass = totalPercent.lt(100) ? "primary" : (totalPercent.isEqualTo(100) ? "success" : "danger");
   const secondaryProgressVariant = 
     totalPercent.lt(100)? "blue-dark" : (totalPercent.isEqualTo(100) ? "success-50" : "danger-50");
+  const fundPreview = BigNumber(fundedAmount).plus(amountToFund).toString();
 
   const AmountWithPreview = ({ amount, preview = undefined, type }) => 
     <Row className="align-items-center">
@@ -49,7 +50,7 @@ export default function FundingProgress({
   return(
     <div>
       <RowWithTwoColumns
-        col1={<AmountWithPreview amount={fundedAmount} preview={amountToFund} type="currency" />}
+        col1={<AmountWithPreview amount={fundedAmount} preview={fundPreview} type="currency" />}
         col2={<Amount 
                 amount={fundingAmount} 
                 symbol={fundingTokenSymbol} 
