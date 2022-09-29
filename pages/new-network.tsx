@@ -114,12 +114,6 @@ export default function NewNetwork() {
 
     if (!networkCreated) return;
 
-    const deployNetworkTX = await handleDeployNetworkV2(tokens.settler).catch(error => error);
-
-    if (!(deployNetworkTX as TransactionReceipt)?.contractAddress) return setCreatingNetwork(-1);
-
-    const deployedNetworkAddress = (deployNetworkTX as TransactionReceipt).contractAddress;
-
     const draftTime = settings.parameters.draftTime.value;
     const disputableTime = settings.parameters.disputableTime.value;
     const councilAmount = settings.parameters.councilAmount.value;
