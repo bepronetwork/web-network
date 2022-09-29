@@ -3,7 +3,6 @@ import { TreasuryInfo } from "@taikai/dappkit";
 import { Token } from "interfaces/token";
 
 export interface Network {
-  councilMembers: string[];
   id: number;
   name: string;
   updatedAt: Date;
@@ -22,6 +21,7 @@ export interface Network {
   openBounties?: number;
   totalBounties?: number;
   allowCustomTokens?: boolean;
+  councilMembers: string[];
   tokens?: Token[];
   networkToken?: Token;
   councilAmount?: number;

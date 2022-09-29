@@ -291,13 +291,13 @@ export default function ListIssues({
                 },
                 {
                   value: "highest-bounty",
-                  sortBy: "amount",
+                  sortBy: "amount,fundingAmount",
                   order: "DESC",
                   label: t("sort.types.highest-bounty")
                 },
                 {
                   value: "lowest-bounty",
-                  sortBy: "amount",
+                  sortBy: "amount,fundingAmount",
                   order: "ASC",
                   label: t("sort.types.lowest-bounty")
                 }

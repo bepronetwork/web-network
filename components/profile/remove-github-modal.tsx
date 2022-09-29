@@ -66,7 +66,7 @@ function RemoveGithubAccount({
       title={t("modals.remove-github.title")}
       onCloseClick={onCloseClick}
       onOkClick={handleClickRemove}
-      isOkActionExecuting={isExecuting}
+      isExecuting={isExecuting}
     >
       <Row>
         <Col>
