@@ -38,7 +38,7 @@ export default function NetworkInformationStep({ activeStep, index, validated, h
     
     debounce.current = setTimeout(() => {
       fields.name.setter(e.target.value);
-    }, 1000)
+    }, 500)
   }
 
   function handleBlur(e) {
@@ -61,7 +61,7 @@ export default function NetworkInformationStep({ activeStep, index, validated, h
     
     debounce.current = setTimeout(() => {
       fields.description.setter(e.target.value);
-    }, 1000)
+    }, 500)
   }
 
   useEffect(()=>{
