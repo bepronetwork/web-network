@@ -516,7 +516,7 @@ export default function CreateBountyModal() {
         githubUser: payload.githubUser,
       };
 
-      if (!isFundingType && !rewardChecked) {
+      if (!isBountyType && !rewardChecked) {
         bountyPayload.tokenAmount = "0";
         bountyPayload.fundingAmount = issueAmount.floatValue;
       }

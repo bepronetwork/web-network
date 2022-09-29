@@ -47,11 +47,13 @@ export default function TokensDropdown({
   showCurrencyValue = true,
   needsBalance
 }: TokensDropdownProps) {
-  const [options, setOptions] = useState<Option[]>();
-  const [option, setOption] = useState<Option>();
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const { service: DAOService } = useDAO();
   const { t } = useTranslation("common");
+
+  const [option, setOption] = useState<Option>();
+  const [options, setOptions] = useState<Option[]>();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const { service: DAOService } = useDAO();
 
   const formatCreateLabel = (inputValue: string) =>
     canAddToken
@@ -147,7 +149,8 @@ export default function TokensDropdown({
               {tokenInfo ? tokenInfo.name : name}
             </span>
             <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">
-              {showCurrencyValue && `${formatNumberToCurrency(currentValue)} ${tokenInfo?.symbol ? tokenInfo?.symbol : symbol}`}
+              { showCurrencyValue && 
+                `${formatNumberToCurrency(currentValue)} ${tokenInfo?.symbol ? tokenInfo?.symbol : symbol}` }
               {address === option?.value?.address && (
                 <DoneIcon
                   className="ms-1 text-primary"
@@ -169,6 +172,8 @@ export default function TokensDropdown({
 
     const { name, tokenInfo, currentValue, symbol } = getValue()[0].value;
 
+    const currentValueFormatted = formatNumberToCurrency(currentValue);
+
     return (
       <>
         {props.children[0] !== null ? (
@@ -188,7 +193,8 @@ export default function TokensDropdown({
               </span>
             </div>
             <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">
-              {showCurrencyValue && `${formatNumberToCurrency(currentValue)} ${tokenInfo?.symbol && currentValue ? tokenInfo?.symbol : symbol}`}
+              { showCurrencyValue && 
+                `${currentValueFormatted} ${tokenInfo?.symbol && currentValue ? tokenInfo?.symbol : symbol}`}
             </div>
           </>
         ) : (

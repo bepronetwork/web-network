@@ -185,7 +185,9 @@ function OraclesActions({
   }
 
   function approveSettlerToken() {
-    networkTokenERC20.approve(tokenAmount);
+    setIsApproving(true);
+    networkTokenERC20.approve(tokenAmount)
+     .finally(() => setIsApproving(false));
   }
 
   function getCurrentLabel() {
