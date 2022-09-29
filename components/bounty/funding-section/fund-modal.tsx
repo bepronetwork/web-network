@@ -129,7 +129,7 @@ export default function FundModal({
 
     if (amountToFund?.lte(amountNotFunded)) {
       const preview = amountToFund.multipliedBy(networkIssue.rewardAmount).dividedBy(networkIssue.fundingAmount);
-      setRewardPreview(preview.toString());
+      setRewardPreview(preview.toFixed());
     } else
       setRewardPreview("0");
   }, [networkIssue?.fundingAmount, networkIssue?.rewardAmount, amountToFund]);

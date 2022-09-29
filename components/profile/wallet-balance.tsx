@@ -14,7 +14,7 @@ import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { useSettings } from "contexts/settings";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import { formatStringToCurrency } from "helpers/formatNumber";
 
 import { TokenInfo } from "interfaces/token";
 
@@ -101,7 +101,7 @@ export default function WalletBalance() {
     const totalTokens = tokens.reduce((acc, token) => BigNumber(token.balance).plus(acc), BigNumber(0));
     const noConverted = !!tokens.find(token => token.prices?.eur === undefined);
 
-    setTotalAmount(noConverted ? totalTokens.toString() : totalConverted.toString());
+    setTotalAmount(noConverted ? totalTokens.toFixed() : totalConverted.toFixed());
     setHasNoConvertedToken(noConverted);
 
   }, [tokens]);
@@ -114,7 +114,7 @@ export default function WalletBalance() {
         <FlexRow className="align-items-center">
           <span className="caption-large text-white mr-2 font-weight-medium">{t("misc.total")}</span>
           <span className="caption-large text-white bg-dark-gray py-2 px-3 rounded-3 font-weight-medium">
-            {formatNumberToCurrency(totalAmount)}
+            {formatStringToCurrency(totalAmount)}
             <span className="text-white-30 ml-1 mr-2">
               {!hasNoConvertedToken ? t("currencies.euro") : t("misc.token_other")}
             </span>
@@ -136,7 +136,7 @@ export default function WalletBalance() {
         <FlexRow className="align-items-center">
           <span className="caption-medium text-white mr-2 font-weight-medium">{t("misc.total")}</span>
           <span className="caption-large text-white font-weight-medium bg-dark-gray py-2 px-3 rounded-3">
-            <span className="mr-2">{formatNumberToCurrency(oraclesLocked?.plus(oraclesDelegatedToMe).toNumber())}</span>
+            <span className="mr-2">{formatStringToCurrency(oraclesLocked?.plus(oraclesDelegatedToMe)?.toFixed())}</span>
             <InfoTooltip 
               description={t("profile:tips.total-oracles", {
                 tokenName: activeNetwork?.networkToken?.name || oracleToken.name

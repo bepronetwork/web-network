@@ -36,7 +36,7 @@ export default function InputWithBalance({
         <InputNumber
           classSymbol={"text-primary"}
           max={(max || balance)?.toString()}
-          value={value?.toString()}
+          value={value?.toFixed()}
           error={value?.gt(max || balance)}
           setMaxValue={setMaxValue}
           min={0}

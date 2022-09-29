@@ -86,7 +86,7 @@ function networkTxButton({
 
     const tmpTransaction = addTransaction({
         type: txType,
-        amount: txParams?.tokenAmount || 0,
+        amount: txParams?.tokenAmount || "0",
         currency: txCurrency || t("misc.$token")
     }, activeNetwork);
     dispatch(tmpTransaction);

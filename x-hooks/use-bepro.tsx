@@ -620,7 +620,7 @@ export default function useBepro() {
 
   async function handleFundBounty(bountyId: number, amount: string, tokenDecimals?: number) {
     return new Promise(async (resolve, reject) => {
-      const transaction = addTransaction({ type: TransactionTypes.fundBounty }, activeNetwork);
+      const transaction = addTransaction({ type: TransactionTypes.fundBounty, amount }, activeNetwork);
 
       dispatch(transaction);
 

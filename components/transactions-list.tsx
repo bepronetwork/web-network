@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import CenterArrows from "assets/icons/center-arrows";
@@ -24,7 +25,7 @@ import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { clearTransactions } from "contexts/reducers/clear-transactions";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import { formatStringToCurrency } from "helpers/formatNumber";
 
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { Transaction } from "interfaces/transaction";
@@ -75,7 +76,7 @@ export default function TransactionsList({
           <div className="ms-3 me-auto">
             {(item.amount && (
               <span className="caption-large text-white text-uppercase">
-                {formatNumberToCurrency(item.amount)} {item.currency}
+                {formatStringToCurrency(BigNumber(item.amount).toFixed())} {item.currency}
               </span>
             )) ||
               ""}

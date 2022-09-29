@@ -23,7 +23,7 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import { ApplicationContext } from "contexts/application";
 import { useNetwork } from "contexts/network";
 
-import { formatStringToCurrency } from "helpers/formatNumber";
+import { formatNumberToNScale, formatStringToCurrency } from "helpers/formatNumber";
 
 import { Wallet } from "interfaces/authentication";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
@@ -79,7 +79,7 @@ function OraclesActions({
                token: activeNetwork?.networkToken?.symbol 
              }),
       label: t("my-oracles:actions.lock.get-amount-oracles", {
-        amount: renderAmount,
+        amount: formatNumberToNScale(tokenAmount),
         token: activeNetwork?.networkToken?.symbol 
       }),
       caption: (
@@ -94,7 +94,7 @@ function OraclesActions({
       ),
       body: 
         t("my-oracles:actions.lock.body", { 
-          amount: renderAmount, 
+          amount: formatNumberToNScale(tokenAmount), 
           currency: networkTokenSymbol,
           token: activeNetwork?.networkToken?.symbol
         }),
@@ -111,7 +111,7 @@ function OraclesActions({
           token: activeNetwork?.networkToken?.symbol
         }),
       label: t("my-oracles:actions.unlock.get-amount-bepro", {
-        amount: renderAmount,
+        amount: formatNumberToNScale(tokenAmount),
         currency: networkTokenSymbol,
         token: activeNetwork?.networkToken?.symbol
       }),
@@ -125,7 +125,7 @@ function OraclesActions({
         </>
       ),
       body: t("my-oracles:actions.unlock.body", { 
-        amount: renderAmount,
+        amount: formatNumberToNScale(tokenAmount),
         currency: networkTokenSymbol,
         token: activeNetwork?.networkToken?.symbol
       }),
@@ -198,9 +198,9 @@ function OraclesActions({
 
   function getMaxAmmount(): string {
     if (action === t("my-oracles:actions.lock.label")) 
-      return wallet?.balance?.bepro?.toString();
+      return wallet?.balance?.bepro?.toFixed();
 
-    return wallet?.balance?.oracles?.locked?.toString();
+    return wallet?.balance?.oracles?.locked?.toFixed();
   }
 
   function setMaxAmmount() {
@@ -260,7 +260,7 @@ function OraclesActions({
             helperText={
               <>
                 {formatStringToCurrency(getMaxAmmount())}{" "}
-                {getCurrentLabel()} Available
+                {getCurrentLabel()} {t("misc.available")}
                 <span
                   className={`caption-small ml-1 cursor-pointer text-uppercase ${`${
                     getCurrentLabel() === t("$oracles", { token: activeNetwork?.networkToken?.symbol })

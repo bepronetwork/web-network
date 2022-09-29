@@ -113,8 +113,8 @@ function OraclesDelegate({
           decimalScale={networkTokenDecimals}
           helperText={
             <>
-              {formatStringToCurrency(availableAmount?.toString())}{" "}
-              {`${t("$oracles", { token: networkTokenSymbol })} ${t("my-oracles:available")}`}
+              {formatStringToCurrency(availableAmount?.toFixed())}{" "}
+              {`${t("$oracles", { token: networkTokenSymbol })} ${t("misc.available")}`}
               <span
                 className="caption-small ml-1 cursor-pointer text-uppercase text-purple"
                 onClick={setMaxAmmount}

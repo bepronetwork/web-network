@@ -1,4 +1,5 @@
 import { Delegation } from "@taikai/dappkit/dist/src/interfaces/delegation";
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import Button from "components/button";
@@ -41,8 +42,8 @@ export default function TokenBalance({
     delegation: "purple"
   };
 
-  const delegationSymbol = 
-    delegation && <>{formatStringToCurrency(balance.toString())}<span className="ml-1 text-purple">{symbol}</span></>;
+  const delegationSymbol =  delegation && 
+    <>{formatStringToCurrency(BigNumber(balance).toFixed())}<span className="ml-1 text-purple">{symbol}</span></>;
 
   return (
     <FlexRow className={CONTAINER_CLASSES.join(" ")}>
@@ -63,7 +64,7 @@ export default function TokenBalance({
             {t("actions.take-back")}
           </Button> ||
           <>
-            <span className="caption text-white mr-1">{formatStringToCurrency(balance.toString())}</span>
+            <span className="caption text-white mr-1">{formatStringToCurrency(BigNumber(balance).toFixed())}</span>
             <span className={`caption text-${symbolColor[type]}`}>{symbol}</span>
           </>
         }

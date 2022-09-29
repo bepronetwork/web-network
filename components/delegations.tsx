@@ -38,8 +38,8 @@ export default function Delegations({
     },
     toOthers: {
       title: t("profile:deletaged-to-others"),
-      total: formatNumberToCurrency(walletDelegations.reduce((acc, delegation) => 
-        delegation.amount.plus(acc), BigNumber(0)).toNumber()),
+      total: formatStringToCurrency(walletDelegations.reduce((acc, delegation) => 
+        delegation.amount.plus(acc), BigNumber(0)).toFixed()),
       description: 
              t("my-oracles:descriptions.oracles-delegated-to-others", { token: activeNetwork?.networkToken?.symbol }),
       delegations: wallet?.balance?.oracles?.delegations || []
