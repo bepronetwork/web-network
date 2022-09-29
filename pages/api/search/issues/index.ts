@@ -98,21 +98,17 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     { association: "repository" },
     { association: "token" }
   ];
-  const sortBy = String(req?.query?.sortBy).split(',');
-  
+  const sortBy = String(req?.query?.sortBy)
+                                          .replaceAll(',',`,+,`)
+                                          .split(',')
+                                          .map((value)=> value === '+' ? Sequelize.literal('+'): value)
+
   if (search) {
-
-    const fields = sortBy?.reduce((prev, current, index) => {
-      prev.push(current)
-      if(index !== sortBy.length - 1) prev.push(Sequelize.literal('+'))
-      return prev
-    },[])
-
     const issues = await models.issue.findAll({
       where: whereCondition,
       include,
       nest: true,
-      order: [[...fields || "createdAt", req.query.order || "DESC"]]
+      order: [[...sortBy || "createdAt", req.query.order || "DESC"]]
     });
 
     const result = [];
@@ -130,17 +126,10 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       currentPage: +paginatedData.page
     });
   } else {
-
-    const fields = sortBy?.reduce((prev, current, index) => {
-      prev.push(current)
-      if(index !== sortBy.length - 1) prev.push(Sequelize.literal('+'))
-      return prev
-    },[])
-
     const issues = await models.issue.findAndCountAll(paginate({ 
       where: whereCondition, 
       include, nest: true }, req.query, [
-        [...fields|| "updatedAt", req.query.order || "DESC"]
+        [...sortBy|| "updatedAt", req.query.order || "DESC"]
       ]));
 
     return res.status(200).json({
