@@ -3,7 +3,6 @@ import { TreasuryInfo } from "@taikai/dappkit";
 import { Token } from "interfaces/token";
 
 export interface Network {
-  councilMembers: string[];
   id: number;
   name: string;
   updatedAt: Date;
