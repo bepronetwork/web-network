@@ -1,9 +1,9 @@
 {
   "no-description": "No description",
   "deployed": "Deployed!",
-  "council-amount-changed": "Council amount changed !",
+  "council-amount-changed": "Curator amount changed !",
   "deploy-contract": "Deploy contract",
-  "update-council-amount": "Update council amount",
+  "update-council-amount": "Update curator amount",
   "deploy-settler-token": "Deploy settler token",
   "change-redeem-time": "Change redeem time to 1min",
   "change-disputable-time": "Change disputable time to 1min",
@@ -32,8 +32,8 @@
       "placeholder": "Address will appear here"
     },
     "council-amount": {
-      "label": "New council amount",
-      "placeholder": "Amount needed to be a council member"
+      "label": "New curator amount",
+      "placeholder": "Amount needed to be a curator"
     },
     "settler-token-name": {
       "label": "New settler token name",
@@ -41,7 +41,7 @@
     },
     "settler-token-symbol": {
       "label": "New settler token symbol",
-      "placeholder": "pex $BEPRO"
+      "placeholder": "pex BEPRO"
     },
     "settler-token-address": {
       "label": "New settler token address"

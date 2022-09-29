@@ -34,10 +34,14 @@ const argv = require('yargs')
     type: 'string',
     nargs: 1,
   })
+  .boolean('p')
+  .alias('p', 'production')
+  .describe('p', 'Is a production environment')
+  .default('p', false)
   .alias('n', 'network')
   .describe('n', 'Ethereum Blockchain')
   .default('n', 'development')
-  .choices(["development", "moonbase", "kovan", "mainnet", "ropsten", "seneca", "afrodite", "custom"])
+  .choices(["development", "moonbase", "kovan", "mainnet", "ropsten", "seneca", "afrodite", "custom", "diogenes","aurelius"])
   .option('k', {
     alias: "ownerKey",
     describe: "Owner Private key",
@@ -47,6 +51,12 @@ const argv = require('yargs')
   .option('a', {
     alias: "ownerAddress",
     describe: "Owner Eth Address",
+    type: 'string',
+    nargs: 1,
+  })
+  .option('f', {
+    alias: "treasuryAddress",
+    describe: "Treasury Eth Address",
     type: 'string',
     nargs: 1,
   })
@@ -106,7 +116,13 @@ const networks = {
   },
   iris: {
     url: 'https://eth-iris.taikai.network:8080',
-  }
+  },
+  diogenes: {
+    url: 'https://eth-diogenes.taikai.network:8080',
+  },
+  aurelius: {
+    url: 'https://eth-aurelius.taikai.network:8080',
+  }  
 }
 
 async function main() {
@@ -147,7 +163,7 @@ async function main() {
       cap: "300000000000000000000000000"
     },
     network: {
-      name: 'Bepro Token',
+      name: 'Bepro',
       symbol: "BEPRO",
       cap: "300000000000000000000000000"
     },
@@ -182,6 +198,7 @@ async function main() {
 
     // 2. Loading Contracts Instance
     console.log(`Loading Contracts...`);
+    
     const networkToken = new ERC20(web3Connection, networkReceiptAddress);
     const bountyTransactional = new ERC20(web3Connection, transactionalReceiptAddress);
     const rewardToken = new ERC20(web3Connection, rewardReceiptAddress);
@@ -194,7 +211,7 @@ async function main() {
     await bountyToken.loadContract();
 
     // Transfer BEPRO to dev accounts
-    if (argv.network !== 'custom' || argv.network !== 'local')
+    if ((argv.network !== 'custom' || argv.network !== 'local') && !argv.production)
       for (const address of stagingAccounts) {
         console.log(`Transfering 10M BEPRO to ${address}`);
         await bountyTransactional.transferTokenAmount(address, 10000000);
@@ -204,9 +221,12 @@ async function main() {
 
 
     console.log(`Deploying Network_V2 With Registry...`);
-    const registryReceipt = await Deployer(NetworkRegistry, [networkToken.contractAddress, 1000, ownerAddress, 10000]);
+    const treasuryAddress = argv.treasuryAddress ? argv.treasuryAddress: ownerAddress;
+    const registryReceipt = await Deployer(NetworkRegistry,
+      [networkToken.contractAddress, 100, treasuryAddress, 10000, 1000000, 2000000, bountyToken.contractAddress]);
     const networkReceipt = await Deployer(Network_v2, [networkToken.contractAddress, registryReceipt.contractAddress]);
 
+    
     const network = new Network_v2(web3Connection, networkReceipt.contractAddress);
     await network.loadContract();
 
@@ -218,16 +238,24 @@ async function main() {
     //add allowed tokens
     console.log(`Adding Allowed Tokens...`);
     // Reward Tokens
-    await network.registry.addAllowedTokens([networkToken.contractAddress, rewardToken.contractAddress])
+    const tokensAllowed = [networkToken.contractAddress];
+    if(!tokensAllowed.includes(rewardToken.contractAddress)) {
+      tokensAllowed.push(rewardToken.contractAddress);
+    }
+    if(!tokensAllowed.includes(bountyTransactional.contractAddress)) {
+      tokensAllowed.push(bountyTransactional.contractAddress);
+    }
     // Transactionals Tokens
-    await network.registry.addAllowedTokens([networkToken.contractAddress, bountyTransactional.contractAddress], true);
-
+    await network.registry.addAllowedTokens(tokensAllowed, true);
+    await bountyToken.setDispatcher(registryReceipt.contractAddress);
     console.log(`Adding Network_V2 to registry...`)
-    await network.registry.token.approve(registryReceipt.contractAddress, 1000);
-    await network.registry.lock(1000)
+    await network.registry.token.approve(registryReceipt.contractAddress, 100);
+    await network.registry.lock(100)
     await network.registry.registerNetwork(networkReceipt.contractAddress);
 
     console.table({
+      Owner: ownerAddress,
+      TreasuryAddress: treasuryAddress,      
       NetworkToken: networkToken.contractAddress,
       BountyTransactional: bountyTransactional.contractAddress,
       RewardToken: rewardToken.contractAddress,
@@ -236,36 +264,41 @@ async function main() {
       NetworkRegistry: registryReceipt.contractAddress || undefined
     });
 
-    await Promise.all([
-      updateSetting("settlerToken", networkToken.contractAddress, "contracts"),
-      updateSetting("network", network.contractAddress, "contracts"),
-      updateSetting("transactionalToken", networkToken.contractAddress, "contracts"),
-      updateSetting("networkRegistry", registryReceipt.contractAddress, "contracts"),
-      updateTokens({
-        name: await networkToken.name(),
-        symbol: await networkToken.symbol(),
-        isTransactional: false,
-        address: networkToken.contractAddress
-      }),
-      updateTokens({
-        name: await networkToken.name(),
-        symbol: await networkToken.symbol(),
-        isTransactional: true,
-        address: networkToken.contractAddress
-      }),
-      updateTokens({
-        name: await rewardToken.name(),
-        symbol: await rewardToken.symbol(),
-        isTransactional: false,
-        address: rewardToken.contractAddress
-      }),
-      updateTokens({
-        name: await bountyTransactional.name(),
-        symbol: await bountyTransactional.symbol(),
-        isTransactional: true,
-        address: bountyTransactional.contractAddress
-      })
-    ]);
+    if (!argv.production) {
+      await Promise.all([
+        updateSetting("settlerToken", networkToken.contractAddress, "contracts"),
+        updateSetting("network", network.contractAddress, "contracts"),
+        updateSetting("transactionalToken", networkToken.contractAddress, "contracts"),
+        updateSetting("networkRegistry", registryReceipt.contractAddress, "contracts"),
+        updateTokens({
+          name: await networkToken.name(),
+          symbol: await networkToken.symbol(),
+          isTransactional: false,
+          address: networkToken.contractAddress
+        }),
+        updateTokens({
+          name: await networkToken.name(),
+          symbol: await networkToken.symbol(),
+          isTransactional: true,
+          address: networkToken.contractAddress
+        }),
+        updateTokens({
+          name: await rewardToken.name(),
+          symbol: await rewardToken.symbol(),
+          isTransactional: false,
+          address: rewardToken.contractAddress
+        }),
+        updateTokens({
+          name: await bountyTransactional.name(),
+          symbol: await bountyTransactional.symbol(),
+          isTransactional: true,
+          address: bountyTransactional.contractAddress
+        })
+      ]);
+    } else {
+      console.log('Skiping Database Save');
+    }
+  
 
   } catch (error) {
     console.error(error);

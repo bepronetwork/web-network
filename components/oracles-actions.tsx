@@ -77,13 +77,19 @@ function OraclesActions({
     Lock: {
       title: t("my-oracles:actions.lock.title", { currency: networkTokenSymbol }),
       description: 
-        t("my-oracles:actions.lock.description", { currency: networkTokenSymbol }),
+             t("my-oracles:actions.lock.description", { 
+               currency: networkTokenSymbol, 
+               token: activeNetwork?.networkToken?.symbol 
+             }),
       label: t("my-oracles:actions.lock.get-amount-oracles", {
-        amount: renderAmount
+        amount: renderAmount,
+        token: activeNetwork?.networkToken?.symbol 
       }),
       caption: (
         <>
-          {t("misc.get")} <span className="text-purple">{t("$oracles")}</span>{" "}
+          {t("misc.get")} <span className="text-purple">
+                            {t("$oracles", { token: activeNetwork?.networkToken?.symbol })}
+                          </span>{" "}
           {t("misc.from")} <span className="text-primary">
             {networkTokenSymbol}
           </span>
@@ -92,7 +98,8 @@ function OraclesActions({
       body: 
         t("my-oracles:actions.lock.body", { 
           amount: renderAmount, 
-          currency: networkTokenSymbol
+          currency: networkTokenSymbol,
+          token: activeNetwork?.networkToken?.symbol
         }),
       params() {
         return { tokenAmount };
@@ -103,22 +110,27 @@ function OraclesActions({
         t("my-oracles:actions.unlock.title", { currency: networkTokenSymbol }),
       description: 
         t("my-oracles:actions.unlock.description", { 
-          currency: networkTokenSymbol
+          currency: networkTokenSymbol,
+          token: activeNetwork?.networkToken?.symbol
         }),
       label: t("my-oracles:actions.unlock.get-amount-bepro", {
         amount: renderAmount,
-        currency: networkTokenSymbol
+        currency: networkTokenSymbol,
+        token: activeNetwork?.networkToken?.symbol
       }),
       caption: (
         <>
           {t("misc.get")} <span className="text-primary">
             { networkTokenSymbol}</span>{" "}
-          {t("misc.from")} <span className="text-purple">{t("$oracles")}</span>
+          {t("misc.from")} <span className="text-purple">
+                            {t("$oracles", { token: activeNetwork?.networkToken?.symbol })}
+                           </span>
         </>
       ),
       body: t("my-oracles:actions.unlock.body", { 
         amount: renderAmount,
-        currency: networkTokenSymbol
+        currency: networkTokenSymbol,
+        token: activeNetwork?.networkToken?.symbol
       }),
       params(from: string) {
         return { tokenAmount, from };
@@ -186,7 +198,9 @@ function OraclesActions({
   }
 
   function getCurrentLabel() {
-    return action === t("my-oracles:actions.lock.label") ? networkTokenSymbol : t("$oracles");
+    return action === t("my-oracles:actions.lock.label")
+      ? networkTokenSymbol
+      : t("$oracles", { token: activeNetwork?.networkToken?.symbol });
   }
 
   function getMaxAmmount(): number {
@@ -241,7 +255,7 @@ function OraclesActions({
             })}
             symbol={`${getCurrentLabel()}`}
             classSymbol={`${
-              getCurrentLabel() === t("$oracles")
+              getCurrentLabel() === t("$oracles", { token: activeNetwork?.networkToken?.symbol })
                 ? "text-purple"
                 : "text-primary"
             }`}
@@ -264,7 +278,7 @@ function OraclesActions({
                 {getCurrentLabel()} Available
                 <span
                   className={`caption-small ml-1 cursor-pointer text-uppercase ${`${
-                    getCurrentLabel() === t("$oracles")
+                    getCurrentLabel() === t("$oracles", { token: activeNetwork?.networkToken?.symbol })
                       ? "text-purple"
                       : "text-primary"
                   }`}`}

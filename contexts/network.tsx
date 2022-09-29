@@ -96,7 +96,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
           treasury,
           networkToken: {
             ...networkToken,
-            symbol: `$${networkToken.symbol}`,
+            symbol: `${networkToken.symbol}`,
           }
         }));
       });
@@ -110,6 +110,10 @@ export const NetworkProvider: React.FC = function ({ children }) {
     
     updateActiveNetwork();
   }, [query?.network]);
+
+  useEffect(() => {
+    if (activeNetwork?.isRegistered === false) push("/networks");
+  }, [activeNetwork]);
 
   useEffect(() => {    
     if (DAOService?.network?.contractAddress !== activeNetwork?.networkAddress ||! activeNetwork?.draftTime) 

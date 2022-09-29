@@ -4,7 +4,6 @@ import { ProgressBar } from "react-bootstrap";
 import { useTranslation } from "next-i18next";
 
 import ArrowRightLine from "assets/icons/arrow-right-line";
-import LockedIcon from "assets/icons/locked-icon";
 
 import Button from "components/button";
 import ConnectGithub from "components/connect-github";
@@ -15,6 +14,7 @@ import UnlockBeproModal from "components/unlock-bepro-modal";
 
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
+import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
 import { useSettings } from "contexts/settings";
 
@@ -23,11 +23,12 @@ import { formatNumberToCurrency, formatNumberToNScale } from "helpers/formatNumb
 import { StepWrapperProps } from "interfaces/stepper";
 
 export default function LockBeproStep({ activeStep, index, handleClick, validated }: StepWrapperProps) {
-  const { t } = useTranslation(["common", "custom-network"]);
+  const { t } = useTranslation(["common", "bounty","custom-network"]);
 
   const [amount, setAmount] = useState(0);
   const [isApproving, setIsApproving] = useState(false);
   const [isLocking, setIsLocking] = useState(false);
+  const [inputError, setInputError] = useState("")
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [settlerAllowance, setSettlerAllowance] = useState(0);
   const [showUnlockBepro, setShowUnlockBepro] = useState(false);
@@ -36,7 +37,8 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const { service: DAOService } = useDAO();
   const { tokensLocked } = useNetworkSettings();
   const { user, wallet, updateWalletBalance } = useAuthentication();
-
+  const { activeNetwork } = useNetwork();
+  
   const networkTokenName = settings?.beproToken?.symbol || t("misc.$token");
 
   const balance = {
@@ -55,6 +57,12 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const textAmountClass = amount > balance.beproAvailable ? "danger" : "primary";
   const amountsClass = amount > maxValue ? "danger" : "success";
   const needsAllowance = amount > settlerAllowance;
+  const isLockBtnDisabled = [
+    amount <= 0,
+    lockedPercent >= 100,
+    amount > maxValue,
+    isLocking
+  ].some(c => c);
 
   async function handleLock() {
     if (!DAOService || !amount) return;
@@ -95,6 +103,11 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   }
 
   function handleAmountChange(params) {
+    if(params.floatValue > balance.beproAvailable)
+      setInputError(t("bounty:errors.exceeds-allowance"))
+    else if(inputError)
+      setInputError("")
+      
     setAmount(params.floatValue);
   }
 
@@ -159,14 +172,20 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                           classSymbol={"text-primary"}
                           max={maxValue}
                           value={amount}
-                          error={amount > maxValue}
+                          error={amount > maxValue || !!inputError}
                           setMaxValue={handleSetMaxValue}
                           min={0}
                           placeholder={"0"}
+                          disabled={lockedPercent >= 100}
                           thousandSeparator
                           decimalSeparator="."
                           decimalScale={18}
                           onValueChange={handleAmountChange}
+                          helperText={
+                            <>
+                            {inputError && <p className="p-small my-2 mx-2">{inputError}</p>}
+                            </>
+                          }
                         />
 
                         <div className="d-flex caption-small justify-content-between align-items-center p-3 mt-1 mb-1">
@@ -207,7 +226,9 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                             {t("transactions.types.unlock")}{" "}
                             <span className="text-primary">{networkTokenName}</span>{" "}
                             {t("misc.by")} {t("misc.giving-away")}{" "}
-                            <span className="text-purple">{t("$oracles")}</span>
+                            <span className="text-purple">
+                              {t("$oracles", { token: activeNetwork?.networkToken?.symbol })}
+                            </span>
                           </p>
                         </div>
 
@@ -219,7 +240,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                           <div className="d-flex justify-content-between px-0">
                             <span className="text-ligth-gray">
                               <span className="text-purple text-uppercase">
-                                {t("$oracles")}
+                                {t("$oracles", { token: activeNetwork?.networkToken?.symbol })}
                               </span>{" "}
                               {t("misc.available")}
                             </span>
@@ -242,12 +263,11 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                   <span className="text-primary">{networkTokenName}</span>{" "}
                   {t("misc.locked")}
                 </p>
-
                 <div className="d-flex justify-content-between caption-large mb-3 amount-input">
                   <AmountWithPreview
                     amount={amountLocked}
                     amountColor={(lockedPercent >= 100 && "success") || "white"}
-                    preview={amountLocked + amount}
+                    preview={amountLocked + (amount || 0)}
                     previewColor={amountsClass}
                     type="currency"
                   />
@@ -288,47 +308,31 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                 <div className="d-flex justify-content-center mt-4 pt-3">
                   {
                     needsAllowance &&
-                    <Button disabled={isApproving} onClick={handleApproval}>
+                    <Button disabled={isApproving || lockingPercent > 100} onClick={handleApproval}>
                       {t('actions.approve')}
                       {isApproving && <span className="spinner-border spinner-border-xs ml-1" />}
                     </Button>
                     ||
                     <Button
-                      disabled={
-                        !(amount > 0) ||
-                        lockedPercent >= 100 ||
-                        amount > maxValue ||
-                        isLocking
-                      }
+                      withLockIcon={!isLocking && isLockBtnDisabled}
+                      disabled={isLockBtnDisabled}
+                      isLoading={isLocking}
                       onClick={() => handleLock()}
                     >
-                      {!isLocking &&
-                        (!(amount > 0) ||
-                          lockedPercent >= 100 ||
-                          amount > maxValue) && (
-                          <LockedIcon width={12} height={12} className="mr-1" />
-                        )}
                       <span>
                         {t("transactions.types.lock")} {networkTokenName}
                       </span>
-                      {isLocking ? (
-                        <span className="spinner-border spinner-border-xs ml-1" />
-                      ) : (
-                        ""
-                      )}
                     </Button>
                   }
 
-                  <Button disabled={lockedPercent === 0 || isUnlocking} color="ligth-gray" onClick={handleUnLock}>
-                    {!isUnlocking || lockedPercent === 0 && (
-                      <LockedIcon width={12} height={12} className="mr-1" />
-                    )}
-                    {t('transactions.types.unlock')}
-                    {isUnlocking ? (
-                      <span className="spinner-border spinner-border-xs ml-1" />
-                    ) : (
-                      ''
-                    )}
+                  <Button 
+                    disabled={lockedPercent <= 0 || isUnlocking || isLocking} 
+                    color="ligth-gray" 
+                    onClick={handleUnLock}
+                    isLoading={isUnlocking}
+                    withLockIcon={lockedPercent <= 0 || isLocking}
+                  >
+                    <span>{t('transactions.types.unlock')}</span>
                   </Button>
                 </div>
               </div>

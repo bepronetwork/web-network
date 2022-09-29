@@ -30,6 +30,7 @@ import { psReadAsText } from "helpers/file-reader";
 import { formatDate } from "helpers/formatDate";
 import { getQueryableText, urlWithoutProtocol } from "helpers/string";
 
+import { MetamaskErrors } from "interfaces/enums/Errors";
 import { Network } from "interfaces/network";
 import { Token } from "interfaces/token";
 
@@ -59,8 +60,8 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
 
   const { service: DAOService } = useDAO();
   const { colorsToCSS } = useNetworkTheme();
-  const { updateNetwork, registerNetwork } = useApi();
-  const { handleChangeNetworkParameter } = useBepro();
+  const { updateNetwork, processEvent } = useApi();
+  const { handleChangeNetworkParameter, handleAddNetworkToRegistry } = useBepro();
   const { dispatch } = useContext(ApplicationContext);
   const { activeNetwork, updateActiveNetwork } = useNetwork();
   const { user, wallet, updateWalletBalance } = useAuthentication();
@@ -218,26 +219,30 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   }
 
   function handleRegisterNetwork() {
+    if (!network) return;
+
     setIsRegistering(true);
-    registerNetwork({
-      creator: wallet.address
-    })
+
+    handleAddNetworkToRegistry(network.networkAddress)
+      .then(txInfo => {
+        return processEvent("registry", "registered", network.name, { fromBlock: txInfo.blockNumber });
+      })
       .then(() => {
         if (isCurrentNetwork) updateActiveNetwork(true);
 
         return updateEditingNetwork();
       })
       .catch(error => {
-        dispatch(addToast({
+        if (error?.code !== MetamaskErrors.UserRejected)
+          dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
-            content: t("custom-network:errors.failed-to-create-network", {
-              error,
-            }),
-        }));
+            content: t("custom-network:errors.failed-to-create-network", { error })
+          }));
 
-        console.debug("Failed register network", error);
-      }).finally(() => setIsRegistering(false));
+        console.debug("Failed to add to registry", network.networkAddress, error);
+      })
+      .finally(() => setIsRegistering(false));
   }
   
   useEffect(() => {

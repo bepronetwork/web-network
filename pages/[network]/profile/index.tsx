@@ -39,7 +39,7 @@ export default function Profile() {
             
             { wallet?.isCouncil && 
               <Badge 
-                label="Council" 
+                label={t("council")} 
                 color="purple-30" 
                 className="caption border border-purple text-purple border-radius-8"
               /> 

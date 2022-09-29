@@ -8,6 +8,7 @@ import OracleIcon from "assets/icons/oracle-icon";
 import Modal from "components/modal";
 
 import { useAuthentication } from "contexts/authentication";
+import { useNetwork } from "contexts/network";
 
 import { formatNumberToString } from "helpers/formatNumber";
 import { truncateAddress } from "helpers/truncate-address";
@@ -33,13 +34,14 @@ export default function DelegationItem({
   const [isExecuting, setIsExecuting] = useState(false);
 
   const { handleTakeBack } = useBepro();
+  const { activeNetwork } = useNetwork();
   const { updateWalletBalance } = useAuthentication();
 
   const delegationAmount = +delegation?.amount || 0;
   const tokenBalanceType = type === "toMe" ? "oracle" : "delegation";
 
   const oracleToken = {
-    symbol: t("$oracles"),
+    symbol: t("$oracles", {token: activeNetwork?.networkToken?.symbol}),
     name: t("profile:oracle-name-placeholder"),
     icon: <OracleIcon />
   };
@@ -87,7 +89,7 @@ export default function DelegationItem({
         <p className="text-center h4">
           <span className="me-2">{t("actions.take-back")}</span>
           <span className="text-purple me-2">
-            {formatNumberToString(delegationAmount, 2)} {t("$oracles")}
+            {formatNumberToString(delegationAmount, 2)} {t("$oracles", {token: activeNetwork?.networkToken?.symbol})}
           </span>
           <span>
             {t("misc.from")} {truncateAddress(delegation?.to || "", 12, 3)}

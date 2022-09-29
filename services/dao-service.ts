@@ -7,7 +7,8 @@ import {
   TreasuryInfo,
   OraclesResume,
   Web3Connection,
-  NetworkRegistry
+  NetworkRegistry,
+  toSmartContractDecimals
 } from "@taikai/dappkit";
 import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import {PromiEvent, TransactionReceipt as TransactionReceiptWeb3Core} from "web3-core";
@@ -395,7 +396,7 @@ export default class DAO {
       ]);
 
     return (
-      parseInt(totalNetworkToken) === 0 &&
+      +totalNetworkToken === 0 &&
       closedBounties + canceledBounties === bountiesTotal
     );
   }
@@ -447,7 +448,7 @@ export default class DAO {
 
     await deployer.loadAbi();
 
-    return deployer.deployJsonAbi(name, symbol, cap, ownerAddress);
+    return deployer.deployJsonAbi(name, symbol, toSmartContractDecimals(cap, 18), ownerAddress);
   }
 
   async openBounty({
@@ -498,8 +499,8 @@ export default class DAO {
     return this.network.updateBountyAmount(bountyId, amount);
   }
 
-  async cancelBounty(bountyId: number): Promise<TransactionReceipt> {
-    return this.network.cancelBounty(bountyId);
+  async cancelBounty(bountyId: number, funding: boolean): Promise<TransactionReceipt> {
+    return funding ? this.network.cancelFundRequest(bountyId) : this.network.cancelBounty(bountyId);
   }
 
   async createPullRequest(bountyId: number,

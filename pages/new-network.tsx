@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 
 import { Defaults } from "@taikai/dappkit";
-import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -51,22 +50,15 @@ export default function NewNetwork() {
   const { service: DAOService } = useDAO();
   const { user, wallet } = useAuthentication();
   const { settings: appSettings } = useSettings(); 
-  const { createNetwork, registerNetwork } = useApi();
+  const { createNetwork, processEvent } = useApi();
   const { handleChangeNetworkParameter } = useBepro();
   const { getURLWithNetwork, colorsToCSS } = useNetworkTheme();
-  const { tokensLocked, details, github, tokens, settings } = useNetworkSettings();
+  const { tokensLocked, details, github, tokens, settings, isSettingsValidated, cleanStorage } = useNetworkSettings();
   const { handleDeployNetworkV2, handleAddNetworkToRegistry } = useBepro();
 
   const { dispatch } = useContext(ApplicationContext);
 
   const defaultNetworkName = appSettings?.defaultNetworkConfig?.name?.toLowerCase() || "bepro";
-  const isFormValidates = [
-    tokensLocked?.validated,
-    details?.validated,
-    settings?.validated,
-    github?.validated,
-    tokens?.validated,
-  ].every(condition=>condition)
     
   const creationSteps = [
     { id: 1, name: t("custom-network:modals.loader.steps.deploy-network") },
@@ -82,6 +74,12 @@ export default function NewNetwork() {
     if (!user?.login || !wallet?.address || !DAOService) return;
     setCreatingNetwork(0);
 
+    const deployNetworkTX = await handleDeployNetworkV2(tokens.settler).catch(error => error);
+
+    if (!deployNetworkTX?.contractAddress) return setCreatingNetwork(-1);
+
+    const deployedNetworkAddress = deployNetworkTX.contractAddress;
+
     const payload = {
       name: details.name.value,
       description: details.description,
@@ -96,7 +94,8 @@ export default function NewNetwork() {
       creator: wallet.address,
       accessToken: user.accessToken,
       githubLogin: user.login,
-      allowedTokens: tokens
+      allowedTokens: tokens,
+      networkAddress: deployedNetworkAddress
     };
 
     const networkCreated = await createNetwork(payload)
@@ -114,14 +113,6 @@ export default function NewNetwork() {
       });
 
     if (!networkCreated) return;
-
-    
-
-    const deployNetworkTX = await handleDeployNetworkV2(tokens.settler).catch(error => error);
-
-    if (!(deployNetworkTX as TransactionReceipt)?.contractAddress) return setCreatingNetwork(-1);
-
-    const deployedNetworkAddress = (deployNetworkTX as TransactionReceipt).contractAddress;
 
     const draftTime = settings.parameters.draftTime.value;
     const disputableTime = settings.parameters.disputableTime.value;
@@ -150,15 +141,18 @@ export default function NewNetwork() {
 
     setCreatingNetwork(5);
 
-    await handleAddNetworkToRegistry(deployedNetworkAddress)
-      .catch(error => console.error("Failed to add to registry", deployedNetworkAddress, error));
+    const registrationTx = await handleAddNetworkToRegistry(deployedNetworkAddress)
+      .catch(error => {
+        console.debug("Failed to add to registry", deployedNetworkAddress, error);
+
+        return error;
+      });
 
     setCreatingNetwork(6);
 
-    await registerNetwork({
-      creator: payload.creator
-    })
+    await processEvent("registry", "registered", payload.name.toLowerCase(), { fromBlock: registrationTx.blockNumber })
       .then(() => {
+        cleanStorage?.()
         router.push(getURLWithNetwork("/", { network: payload.name }));
       })
       .catch((error) => {
@@ -172,7 +166,7 @@ export default function NewNetwork() {
         }));
 
         setCreatingNetwork(-1);
-        console.error("Failed synchronize network with web-network", deployedNetworkAddress, error);
+        console.debug("Failed synchronize network with web-network", deployedNetworkAddress, error);
       });
   }
 
@@ -182,7 +176,7 @@ export default function NewNetwork() {
 
   function checkHasNetwork() {
     dispatch(changeLoadState(true));
-
+    
     DAOService.getNetworkAdressByCreator(wallet.address)
       .then(networkAddress => setHasNetwork(networkAddress !== Defaults.nativeZeroAddress))
       .catch(console.log)
@@ -193,7 +187,7 @@ export default function NewNetwork() {
     if (!activeNetwork) return;
 
     if (activeNetwork.name.toLowerCase() !== defaultNetworkName)
-      router.push(getURLWithNetwork("/account", { network: defaultNetworkName }));
+      router.push(getURLWithNetwork("/profile/my-network", { network: defaultNetworkName }));
   }, [activeNetwork]);
 
   useEffect(() => {
@@ -222,7 +216,7 @@ export default function NewNetwork() {
             <SelectRepositoriesStep validated={github?.validated} />
 
             <TokenConfiguration 
-              validated={isFormValidates} 
+              validated={isSettingsValidated} 
               handleFinish={handleCreateNetwork} 
               finishLabel={t("custom-network:steps.repositories.submit-label")} 
             />

@@ -32,7 +32,7 @@ export default function MultipleTokensDropdown({
   const { t } = useTranslation("common");
 
   const tokenToOption = (token: Token): Option => ({
-    label: `${token?.tokenInfo ? token.tokenInfo.name : token.symbol}`,
+    label: `${token?.tokenInfo ? token.tokenInfo.name : token?.symbol}`,
     value: token,
   });
 

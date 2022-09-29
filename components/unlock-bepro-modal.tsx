@@ -11,6 +11,7 @@ import Modal from "components/modal";
 import NetworkTxButton from "components/network-tx-button";
 
 import { useAuthentication } from "contexts/authentication";
+import { useNetwork } from "contexts/network";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
@@ -28,6 +29,7 @@ export default function UnlockBeproModal({
   const networkTxRef = useRef<HTMLButtonElement>(null);
 
   const { wallet, updateWalletBalance } = useAuthentication();
+  const { activeNetwork } = useNetwork();
 
   const oraclesAvailable =
     wallet?.balance?.oracles?.locked;
@@ -77,7 +79,7 @@ export default function UnlockBeproModal({
       <div className="container">
         <div className="mb-3">
           <p className="caption-medium text-gray mb-2">
-            <span className="text-purple">{t("$oracles")}</span>{" "}
+            <span className="text-purple">{t("$oracles",  { token: activeNetwork?.networkToken?.symbol })}</span>{" "}
             {t("transactions.amount")}
           </p>
 
@@ -98,7 +100,9 @@ export default function UnlockBeproModal({
 
             <div className="d-flex caption-small justify-content-between align-items-center p-20">
               <span className="text-ligth-gray">
-                <span className="text-purple">{t("$oracles")}</span>{" "}
+                <span className="text-purple">
+                  {t("$oracles", { token: activeNetwork?.networkToken?.symbol })}
+                </span>{" "}
                 {t("misc.available")}
               </span>
 
@@ -192,14 +196,14 @@ export default function UnlockBeproModal({
       <NetworkTxButton
         txMethod="unlock"
         txType={TransactionTypes.unlock}
-        txCurrency={t("$oracles")}
+        txCurrency={t("$oracles",  { token: activeNetwork?.networkToken?.symbol })}
         txParams={{
           tokenAmount: amountToUnlock,
           from: wallet?.address
         }}
         buttonLabel=""
         modalTitle={t("my-oracles:actions.unlock.title")}
-        modalDescription={t("my-oracles:actions.unlock.description")}
+        modalDescription={t("my-oracles:actions.unlock.description", { token: activeNetwork?.networkToken?.symbol })}
         onSuccess={setDefaults}
         onFail={(e) => {console.error('error', e)}}
         ref={networkTxRef}
