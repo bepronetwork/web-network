@@ -21,7 +21,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     });
   });
   const values = Object.values(formData.files);
-  console.log({ values });
+
   if (values.length < 1) {
     return res.status(400).json("Undefined files");
   }
@@ -33,9 +33,6 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   const files = await Promise.all(uploadFiles).catch((e) => {
     return res.status(403).json(e);
   });
-
-  console.log({ files });
-
   return res.status(200).json(files);
 }
 
