@@ -12,6 +12,7 @@ import { updateTransaction } from "contexts/reducers/update-transaction";
 
 import { parseTransaction } from "helpers/transactions";
 
+import { MetamaskErrors } from "interfaces/enums/Errors";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { BlockTransaction, TransactionCurrency } from "interfaces/transaction";
@@ -150,14 +151,14 @@ export default function useBepro() {
     });
   }
 
-  async function handleReedemIssue(): Promise<TransactionReceipt | Error> {
+  async function handleReedemIssue(funding = false): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const redeemTx = addTransaction({ type: TransactionTypes.redeemIssue }, activeNetwork);
       dispatch(redeemTx);
 
       let tx: { blockNumber: number; }
 
-      await DAOService.cancelBounty(networkIssue?.id)
+      await DAOService.cancelBounty(networkIssue?.id, funding)
         .then((txInfo: { blockNumber: number; }) => {
           tx = txInfo;
           return processEvent("bounty", 
@@ -521,19 +522,19 @@ export default function useBepro() {
     });
   }
 
-  async function handleAddNetworkToRegistry(networkAddress: string): Promise<TransactionReceipt | Error> {
+  async function handleAddNetworkToRegistry(networkAddress: string): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
       const transaction = addTransaction({ type: TransactionTypes.addNetworkToRegistry }, activeNetwork);
 
       dispatch(transaction);
 
       await DAOService.addNetworkToRegistry(networkAddress)
-        .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
+        .then(txInfo => {
           txWindow.updateItem(transaction.payload.id,  parseTransaction(txInfo, transaction.payload));
           resolve(txInfo);
         })
-        .catch((err: { message: string; }) => {
-          if (err?.message?.search("User denied") > -1)
+        .catch(err => {
+          if (err?.code === MetamaskErrors.UserRejected)
             dispatch(updateTransaction({
               ...(transaction.payload as BlockTransaction),
               status: TransactionStatus.rejected

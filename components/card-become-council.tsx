@@ -41,9 +41,12 @@ export default function CardBecomeCouncil() {
         </span>{" "}
         {t("become-council-description-part-two")}
       </div>
-      <Link href={getURLWithNetwork("/profile/oracles")}>
+      <Link href={getURLWithNetwork("/profile/bepro-votes")}>
         <a className="text-decoration-none text-purple text-uppercase">
-          {t("go-to-oracles")} <ArrowRight className="text-purple ms-2 mb-1" />
+          {t("go-to-oracles", {
+            token: activeNetwork?.networkToken?.symbol,
+          })}{" "}
+          <ArrowRight className="text-purple ms-2 mb-1" />
         </a>
       </Link>
     </div>

@@ -14,6 +14,7 @@ export type TokenBalanceType = Partial<TokenInfo>;
 interface TokenBalanceProps {
   type: "token" | "oracle" | "delegation";
   delegation?: Delegation;
+  overSymbol?: string;
   onTakeBackClick?: () => void;
 }
 
@@ -24,6 +25,7 @@ export default function TokenBalance({
   balance ,
   type,
   delegation,
+  overSymbol,
   onTakeBackClick
 } : TokenBalanceType & TokenBalanceProps) {
   const { t } = useTranslation(["common"]);
@@ -50,7 +52,7 @@ export default function TokenBalance({
         </FlexColumn>
 
         <FlexColumn>
-          <span className="caption text-white">{delegationSymbol || symbol}</span>
+          <span className="caption text-white">{overSymbol ? overSymbol : (delegationSymbol || symbol)}</span>
           <span className="caption text-gray text-capitalize font-weight-normal">{delegation?.to || name}</span>
         </FlexColumn>
       </FlexRow>

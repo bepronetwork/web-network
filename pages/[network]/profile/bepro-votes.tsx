@@ -19,14 +19,14 @@ import { useNetwork } from "contexts/network";
 
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
-export default function Oracles() {
+export default function BeproVotes() {
   const { t } = useTranslation(["common", "profile"]);
 
   const { activeNetwork } = useNetwork();
   const { wallet, updateWalletBalance } = useAuthentication();
 
   const oracleToken = {
-    symbol: t("$oracles"),
+    symbol: t("$oracles",   { token: activeNetwork?.networkToken?.symbol }),
     name: t("profile:oracle-name-placeholder"),
     icon: <OracleIcon />
   };
@@ -38,7 +38,9 @@ export default function Oracles() {
     <ProfileLayout>
       <Col xs={10}>
         <FlexRow className="mb-3 justify-content-between align-items-center">
-          <span className="h4 family-Regular text-white font-weight-medium">{t("$oracles")}</span>
+          <span className="h4 family-Regular text-white font-weight-medium">
+            {t("$oracles",   { token: activeNetwork?.networkToken?.symbol })}
+          </span>
 
           <FlexRow className="align-items-center">
             <span className="caption-large text-white mr-2 font-weight-medium">{t("misc.total")}</span>
@@ -58,6 +60,7 @@ export default function Oracles() {
           icon={oracleToken.icon} 
           symbol={oracleToken.symbol}
           name={`${t("misc.locked")} ${activeNetwork?.networkToken?.name || oracleToken.name}`}
+          overSymbol={t("bepro-votes")}
           balance={oraclesLocked}
           type="oracle"
         />

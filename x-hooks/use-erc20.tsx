@@ -76,7 +76,7 @@ export default function useERC20() {
                                         cap: string, 
                                         ownerAddress: string): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
-      const transaction = addTransaction({ type: TransactionTypes.deployBountyToken }, activeNetwork);
+      const transaction = addTransaction({ type: TransactionTypes.deployERC20Token }, activeNetwork);
 
       dispatch(transaction);
 

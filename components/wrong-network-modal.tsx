@@ -14,7 +14,7 @@ import { NetworkColors } from "interfaces/enums/network-colors";
 
 import Button from "./button";
 
-type typeError = { code?: number}
+type typeError = { code?: number; message?: string }
 
 export default function WrongNetworkModal({
   requiredNetworkId = null,
@@ -55,7 +55,7 @@ export default function WrongNetworkModal({
         ],
       });
     } catch (error) {
-      if ((error as typeError).code === 4902) {
+      if ((error as typeError)?.message?.indexOf('wallet_addEthereumChain') > -1) {
         try {
           await window.ethereum.request({
             method: "wallet_addEthereumChain",

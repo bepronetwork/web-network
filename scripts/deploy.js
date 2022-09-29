@@ -86,6 +86,12 @@ const networks = {
   },
   iris: {
     url: 'https://eth-iris.taikai.network:8080',
+  },
+  diogenes: {
+    url: 'https://eth-diogenes.taikai.network:8080',
+  },
+  aurelius: {
+    url: 'https://eth-aurelius.taikai.network:8080',
   }
 }
 
