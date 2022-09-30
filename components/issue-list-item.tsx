@@ -32,7 +32,7 @@ export default function IssueListItem({
   const { activeNetwork } = useNetwork();
 
   const isFundingRequest = !!issue?.fundingAmount?.gt(0);
-  const bountyAmount = +((isFundingRequest ? issue?.fundingAmount : issue?.amount) || BigNumber("0")).toFixed(4);
+  const bountyAmount = ((isFundingRequest ? issue?.fundingAmount : issue?.amount) || BigNumber("0")).toFixed(4);
 
   function renderIssueData(state: IssueState) {
     const types = {

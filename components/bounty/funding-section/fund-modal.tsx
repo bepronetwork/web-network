@@ -149,11 +149,11 @@ export default function FundModal({
     >
       <div className="mt-2 px-2 d-grid gap-4">
         <FundingProgress
-          fundedAmount={networkIssue?.fundedAmount?.toString()}
-          fundingAmount={networkIssue?.fundingAmount?.toString()}
+          fundedAmount={networkIssue?.fundedAmount?.toFixed()}
+          fundingAmount={networkIssue?.fundingAmount?.toFixed()}
           fundingTokenSymbol={networkIssue?.transactionalTokenData?.symbol}
-          fundedPercent={networkIssue?.fundedPercent?.toString()}
-          amountToFund={amountToFund?.toString()}
+          fundedPercent={networkIssue?.fundedPercent?.toFixed()}
+          amountToFund={amountToFund?.toFixed()}
         />
 
         <InputWithBalance

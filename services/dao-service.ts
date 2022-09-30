@@ -500,8 +500,8 @@ export default class DAO {
     transactional,
     rewardToken = Defaults.nativeZeroAddress,
     tokenAmount = "0",
-    rewardAmount = 0,
-    fundingAmount = 0
+    rewardAmount = "0",
+    fundingAmount = "0"
   }): Promise<TransactionReceipt> {
     return this.network.openBounty(tokenAmount,
                                    transactional,

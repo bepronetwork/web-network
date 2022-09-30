@@ -57,8 +57,8 @@ interface BountyPayload {
   githubUser: string;
   tokenAmount: string;
   rewardToken?: string;
-  rewardAmount?: number;
-  fundingAmount?: number;
+  rewardAmount?: string;
+  fundingAmount?: string;
 }
 
 const ZeroNumberFormatValues = {
@@ -435,7 +435,7 @@ export default function CreateBountyModal() {
       });
   }
 
-  const isAmountApproved = (tokenAllowance: BigNumber, amount: BigNumber) => tokenAllowance.gte(amount);
+  const isAmountApproved = (tokenAllowance: BigNumber, amount: BigNumber) => !tokenAllowance.lt(amount);
 
   async function allowCreateIssue() {
     if (!DAOService || !transactionalToken || issueAmount.floatValue <= 0)
@@ -518,14 +518,14 @@ export default function CreateBountyModal() {
 
       if (!isBountyType && !rewardChecked) {
         bountyPayload.tokenAmount = "0";
-        bountyPayload.fundingAmount = issueAmount.floatValue;
+        bountyPayload.fundingAmount = issueAmount.value;
       }
 
       if (rewardChecked) {
         bountyPayload.tokenAmount = "0";
-        bountyPayload.rewardAmount = rewardAmount.floatValue;
+        bountyPayload.rewardAmount = rewardAmount.value;
         bountyPayload.rewardToken = rewardToken.address;
-        bountyPayload.fundingAmount = issueAmount.floatValue;
+        bountyPayload.fundingAmount = issueAmount.value;
       }
 
       const networkBounty = await DAOService.openBounty(bountyPayload).catch((e) => {

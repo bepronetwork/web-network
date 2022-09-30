@@ -62,7 +62,6 @@ function OraclesActions({
   const networkTokenSymbol = networkTokenERC20.symbol || t("misc.$token");
   const networkTokenDecimals = networkTokenERC20.decimals || 18;
 
-  const renderAmount = tokenAmount ? `${formatStringToCurrency(tokenAmount)}` : "0";
   const exceedsAvailable = value => BigNumber(value).gt(getMaxAmmount());
 
   const verifyTransactionState = (type: TransactionTypes): boolean =>

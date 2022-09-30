@@ -10,7 +10,7 @@ import DelegationItem from "components/delegation-item";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 
-import { formatNumberToCurrency, formatStringToCurrency } from "helpers/formatNumber";
+import { formatStringToCurrency } from "helpers/formatNumber";
 
 import InfoTooltip from "./info-tooltip";
 import { FlexRow } from "./profile/wallet-balance";

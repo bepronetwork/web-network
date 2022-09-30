@@ -74,7 +74,7 @@ export default function TransactionsList({
           {IconMaps[item.type] || <HelpIcon />}
 
           <div className="ms-3 me-auto">
-            {(item.amount && (
+            {(item.amount > 0 && (
               <span className="caption-large text-white text-uppercase">
                 {formatStringToCurrency(BigNumber(item.amount).toFixed())} {item.currency}
               </span>

@@ -349,7 +349,7 @@ export default function useBepro() {
                                          userBranch: string,
                                          cid: number ) {
     return new Promise(async (resolve, reject) => {
-      const tx = addTransaction({ type: TransactionTypes.createPullRequest, }, activeNetwork);
+      const tx = addTransaction({ type: TransactionTypes.createPullRequest }, activeNetwork);
       dispatch(tx);
 
       await DAOService.createPullRequest(bountyId,
