@@ -36,7 +36,7 @@ export default function InputWithBalance({
       <div className="col px-0">
         <InputNumber
           classSymbol={"text-primary"}
-          max={(max || balance)?.toString()}
+          max={(max || balance)?.toFixed()}
           value={value?.toFixed()}
           error={value?.gt(max || balance)}
           setMaxValue={setMaxValue}
@@ -57,7 +57,7 @@ export default function InputWithBalance({
 
         <div className="d-flex align-items-center">
           <span className="text-gray">
-            {formatNumberToCurrency(balance.toString(), {
+            {formatNumberToCurrency(balance.toFixed(), {
               maximumFractionDigits: decimals
             })}
           </span>
@@ -69,7 +69,7 @@ export default function InputWithBalance({
               </span>
 
               <span className="text-white ml-1">
-                {formatNumberToCurrency(balance.minus(value).toString(), {
+                {formatNumberToCurrency(balance.minus(value).toFixed(), {
                   maximumFractionDigits: decimals
                 })}
               </span>

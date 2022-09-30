@@ -43,7 +43,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const balance = {
     beproAvailable: wallet?.balance?.bepro,
     oraclesAvailable: wallet?.balance?.oracles?.locked?.minus(wallet?.balance?.oracles?.delegatedToOthers),
-    tokensLocked: wallet?.balance?.oracles?.locked?.toString(),
+    tokensLocked: wallet?.balance?.oracles?.locked?.toFixed(),
   };
 
   const amountLocked = BigNumber(tokensLocked.locked);
@@ -70,7 +70,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
     setIsLocking(true);
 
-    DAOService.lockInRegistry(amount.toString())
+    DAOService.lockInRegistry(amount.toFixed())
       .then(() => {
         setAmount(undefined);
         updateWalletBalance();
@@ -124,7 +124,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
     setIsApproving(true)
 
-    DAOService.approveTokenInRegistry(amountNeeded?.minus(settlerAllowance)?.toString())
+    DAOService.approveTokenInRegistry(amountNeeded?.minus(settlerAllowance)?.toFixed())
       .then(() => updateAllowance())
       .catch(console.log)
       .finally(()=> setIsApproving(false));
@@ -177,8 +177,8 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                       <div className="col px-0">
                         <InputNumber
                           classSymbol={"text-primary"}
-                          max={maxValue?.toString()}
-                          value={amount?.toString()}
+                          max={maxValue?.toFixed()}
+                          value={amount?.toFixed()}
                           error={amount?.gt(maxValue) || !!inputError}
                           setMaxValue={handleSetMaxValue}
                           min={0}
@@ -272,15 +272,15 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                 </p>
                 <div className="d-flex justify-content-between caption-large mb-3 amount-input">
                   <AmountWithPreview
-                    amount={amountLocked?.toString()}
+                    amount={amountLocked?.toFixed()}
                     amountColor={(lockedPercent?.gte(100) && "success") || "white"}
-                    preview={amountLocked?.plus(amount || 0)?.toString()}
+                    preview={amountLocked?.plus(amount || 0)?.toFixed()}
                     previewColor={amountsClass}
                     type="currency"
                   />
 
                   <AmountWithPreview
-                    amount={lockedPercent?.gte(100) && t("custom-network:steps.lock.full") || amountNeeded?.toString()}
+                    amount={lockedPercent?.gte(100) && t("custom-network:steps.lock.full") || amountNeeded?.toFixed()}
                     amountColor={(lockedPercent?.gte(100) && "success") || "gray"}
                     type="currency"
                   />
@@ -304,9 +304,9 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
                 <div className="d-flex align-items-center caption-large amount-input">
                   <AmountWithPreview
-                    amount={lockedPercent?.toString()}
+                    amount={lockedPercent?.toFixed()}
                     amountColor={(lockedPercent?.gte(100) && "success") || "white"}
-                    preview={lockingPercent?.plus(lockedPercent)?.toString()}
+                    preview={lockingPercent?.plus(lockedPercent)?.toFixed()}
                     previewColor={amountsClass}
                     type="percent"
                   />

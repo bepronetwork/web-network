@@ -44,7 +44,7 @@ export default function FundingSection() {
   const fundsGiven = walletFunds?.reduce((acc, fund) => fund.amount.plus(acc), BigNumber(0)) || BigNumber(0);
   
   const futureRewards = 
-    fundsGiven.multipliedBy(networkIssue?.rewardAmount).dividedBy(networkIssue?.fundingAmount).toString();
+    fundsGiven.multipliedBy(networkIssue?.rewardAmount).dividedBy(networkIssue?.fundingAmount).toFixed();
   
   const isCanceled = getIssueState({
     state: activeIssue?.state,
@@ -100,8 +100,8 @@ export default function FundingSection() {
           />
 
           <FundingProgress
-            fundedAmount={networkIssue?.fundedAmount?.toString()}
-            fundingAmount={networkIssue?.fundingAmount?.toString()}
+            fundedAmount={networkIssue?.fundedAmount?.toFixed()}
+            fundingAmount={networkIssue?.fundingAmount?.toFixed()}
             fundingTokenSymbol={transactionalSymbol}
             fundedPercent={networkIssue?.fundedPercent?.toFixed(2, 1)}
           />
@@ -116,7 +116,7 @@ export default function FundingSection() {
               }
               col2={
                 <Amount 
-                  amount={networkIssue?.rewardAmount?.toString()}
+                  amount={networkIssue?.rewardAmount?.toFixed()}
                   symbol={networkIssue?.rewardTokenData?.symbol}
                   symbolColor="warning"
                   className="caption-large text-white font-weight-normal"
@@ -134,7 +134,7 @@ export default function FundingSection() {
                     col1={<CaptionMedium text={t("funding:funds-given")} color="white" />}
                     col2={
                       <Amount 
-                        amount={fundsGiven.toString()}
+                        amount={fundsGiven.toFixed()}
                         symbol={transactionalSymbol}
                         className="caption-large text-white font-weight-normal"
                       />
@@ -175,7 +175,7 @@ export default function FundingSection() {
                       col1={
                         <>
                         <Amount 
-                          amount={fund.amount.toString()}
+                          amount={fund.amount.toFixed()}
                           symbol={transactionalSymbol}
                           className="caption-large text-white"
                         />
@@ -190,7 +190,7 @@ export default function FundingSection() {
                                     fund.amount
                                       .dividedBy(networkIssue.fundingAmount)
                                       .multipliedBy(networkIssue.rewardAmount)
-                                      .toString()
+                                      .toFixed()
                                   }
                                   symbol={rewardTokenSymbol}
                                   symbolColor="warning"

@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import { Delegation } from "@taikai/dappkit/dist/src/interfaces/delegation";
 import { useTranslation } from "next-i18next";
 
 import OracleIcon from "assets/icons/oracle-icon";
@@ -10,8 +9,10 @@ import Modal from "components/modal";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 
-import { formatNumberToString } from "helpers/formatNumber";
+import { formatStringToCurrency } from "helpers/formatNumber";
 import { truncateAddress } from "helpers/truncate-address";
+
+import { DelegationExtended } from "interfaces/oracles-state";
 
 import useBepro from "x-hooks/use-bepro";
 
@@ -20,7 +21,7 @@ import TokenBalance from "./profile/token-balance";
 interface DelegationProps {
   type: "toMe" | "toOthers";
   tokenName: string;
-  delegation?: Delegation;
+  delegation?: DelegationExtended;
 }
 
 export default function DelegationItem({
@@ -37,7 +38,7 @@ export default function DelegationItem({
   const { activeNetwork } = useNetwork();
   const { updateWalletBalance } = useAuthentication();
 
-  const delegationAmount = delegation?.amount?.toString() || "0";
+  const delegationAmount = delegation?.amount?.toFixed() || "0";
   const tokenBalanceType = type === "toMe" ? "oracle" : "delegation";
 
   const oracleToken = {
@@ -58,7 +59,7 @@ export default function DelegationItem({
     handleCancel();
     setIsExecuting(true);
 
-    await handleTakeBack(delegation?.id, delegationAmount.toString(), 'Oracles').catch(console.debug);
+    await handleTakeBack(delegation?.id, delegationAmount, 'Oracles').catch(console.debug);
 
     updateWalletBalance();
     setIsExecuting(false);
@@ -89,7 +90,7 @@ export default function DelegationItem({
         <p className="text-center h4">
           <span className="me-2">{t("actions.take-back")}</span>
           <span className="text-purple me-2">
-            {formatNumberToString(delegationAmount, 2)} {t("$oracles", {token: activeNetwork?.networkToken?.symbol})}
+            {formatStringToCurrency(delegationAmount)} {t("$oracles", {token: activeNetwork?.networkToken?.symbol})}
           </span>
           <span>
             {t("misc.from")} {truncateAddress(delegation?.to || "", 12, 3)}

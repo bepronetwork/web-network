@@ -23,22 +23,22 @@ export default function calculateDistributedAmounts(treasury,
 
   return {
     treasuryAmount: {
-      value: treasuryAmount.toString(),
+      value: treasuryAmount.toFixed(),
       percentage: bigNumberPercentage(treasuryAmount, bountyAmount),
     },
     mergerAmount: {
-      value: mergerAmount.toString(),
+      value: mergerAmount.toFixed(),
       percentage: bigNumberPercentage(mergerAmount, bountyAmount),
     },
     proposerAmount: {
-      value: proposerAmount.toString(),
+      value: proposerAmount.toFixed(),
       percentage: bigNumberPercentage(proposerAmount, bountyAmount),
     },
     proposals: proposalPercents.map(percent => {
       const value = amount.dividedBy(100).multipliedBy(percent);
 
       return {
-        value: value.toString(),
+        value: value.toFixed(),
         percentage: bigNumberPercentage(value, bountyAmount),
       }
     }),

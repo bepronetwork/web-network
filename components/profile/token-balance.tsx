@@ -1,4 +1,3 @@
-import { Delegation } from "@taikai/dappkit/dist/src/interfaces/delegation";
 import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
@@ -6,6 +5,7 @@ import Button from "components/button";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 
+import { DelegationExtended } from "interfaces/oracles-state";
 import { TokenInfo } from "interfaces/token";
 
 import { FlexColumn, FlexRow } from "./wallet-balance";
@@ -14,7 +14,7 @@ export type TokenBalanceType = Partial<TokenInfo>;
 
 interface TokenBalanceProps {
   type: "token" | "oracle" | "delegation";
-  delegation?: Delegation;
+  delegation?: DelegationExtended;
   overSymbol?: string;
   onTakeBackClick?: () => void;
 }

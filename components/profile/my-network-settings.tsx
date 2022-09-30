@@ -295,8 +295,8 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
             percentageNeededForDispute: +percentageNeededForDispute,
             treasury,
             networkToken,
-            tokensLocked: tokensLocked.toString(),
-            tokensStaked: tokensStaked.toString(),
+            tokensLocked: tokensLocked.toFixed(),
+            tokensStaked: tokensStaked.toFixed(),
           });
 
           setIsAbleToBeClosed(isNetworkAbleToBeClosed);

@@ -52,7 +52,7 @@ function OraclesDelegate({
   }
 
   function setMaxAmmount() {
-    return setTokenAmount(availableAmount.toString());
+    return setTokenAmount(availableAmount.toFixed());
   }
 
   function handleChangeAddress(params: ChangeEvent<HTMLInputElement>) {

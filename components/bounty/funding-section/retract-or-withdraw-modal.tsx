@@ -38,8 +38,8 @@ export default function RetractOrWithdrawModal({
   const tokenSymbol = networkIssue?.transactionalTokenData?.symbol;
   const rewardTokenSymbol = networkIssue?.rewardTokenData?.symbol;
   const retractOrWithdrawAmount = networkIssue?.closed ? 
-    funding?.amount?.dividedBy(networkIssue?.fundingAmount).multipliedBy(networkIssue?.rewardAmount)?.toString() : 
-    funding?.amount?.toString();
+    funding?.amount?.dividedBy(networkIssue?.fundingAmount).multipliedBy(networkIssue?.rewardAmount)?.toFixed() : 
+    funding?.amount?.toFixed();
 
   function handleRetractOrWithdraw() {
     if (!networkIssue || !funding) return;

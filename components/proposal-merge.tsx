@@ -224,7 +224,7 @@ export default function ProposalMerge({
           >
             <div className="d-flex justify-content-end mb-1">
               <span className="text-white caption-medium">
-                {formatStringToCurrency(amountTotal?.toString())}
+                {formatStringToCurrency(amountTotal?.toFixed())}
               </span>
               <span className="text-primary ms-2 caption-medium text-white-40">
                 {currentTokenSymbol()}
@@ -233,7 +233,7 @@ export default function ProposalMerge({
             {amounTotalConverted?.gt(0) && (
             <div className="d-flex justify-content-end">
               <span className="text-white caption-small text-ligth-gray">
-                {amounTotalConverted?.toString()}</span>
+                {amounTotalConverted?.toFixed()}</span>
               <span className=" ms-2 caption-small text-ligth-gray">
                 EUR
               </span>

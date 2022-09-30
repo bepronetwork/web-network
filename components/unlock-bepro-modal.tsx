@@ -89,8 +89,8 @@ export default function UnlockBeproModal({
           <div className="row mx-0 bg-dark-gray border-radius-8 amount-input">
             <InputNumber
               classSymbol={"text-purple"}
-              max={oraclesAvailable?.toString()}
-              value={amountToUnlock?.toString()}
+              max={oraclesAvailable?.toFixed()}
+              value={amountToUnlock?.toFixed()}
               error={amountExceedsAvailable}
               setMaxValue={setToMax}
               min={0}
@@ -111,7 +111,7 @@ export default function UnlockBeproModal({
 
               <div className="d-flex align-items-center">
                 <span className="text-gray">
-                  {formatStringToCurrency(oraclesAvailable?.toString())}
+                  {formatStringToCurrency(oraclesAvailable?.toFixed())}
                 </span>
 
                 {amountToUnlock?.gt(0) && (
@@ -123,7 +123,7 @@ export default function UnlockBeproModal({
                     </span>
 
                     <span className={`${textOracleClass} ml-1`}>
-                      {formatStringToCurrency(oraclesAvailable?.minus(amountToUnlock).toString())}
+                      {formatStringToCurrency(oraclesAvailable?.minus(amountToUnlock).toFixed())}
                     </span>
                   </>
                 )}
@@ -143,7 +143,7 @@ export default function UnlockBeproModal({
 
           <div className="d-flex align-items-center">
             <span className="text-gray">
-              {formatStringToCurrency(wallet?.balance?.bepro?.toString())}
+              {formatStringToCurrency(wallet?.balance?.bepro?.toFixed())}
             </span>
 
             {amountToUnlock?.gt(0) && (
@@ -155,7 +155,7 @@ export default function UnlockBeproModal({
                 </span>
 
                 <span className={`${textBeproClass} ml-1`}>
-                  {formatStringToCurrency(wallet?.balance?.bepro?.plus(amountToUnlock)?.toString())}
+                  {formatStringToCurrency(wallet?.balance?.bepro?.plus(amountToUnlock)?.toFixed())}
                 </span>
               </>
             )}
@@ -174,7 +174,7 @@ export default function UnlockBeproModal({
               {t("transactions.types.unlock")}{" "}
               {!isButtonDisabled &&
                 amountToUnlock?.gt(0) &&
-                formatStringToCurrency(amountToUnlock?.toString())}{" "}
+                formatStringToCurrency(amountToUnlock?.toFixed())}{" "}
               {t("$bepro")}
             </span>
           </Button>
@@ -186,7 +186,7 @@ export default function UnlockBeproModal({
         txType={TransactionTypes.unlock}
         txCurrency={t("$oracles",  { token: networkTokenSymbol })}
         txParams={{
-          tokenAmount: amountToUnlock?.toString(),
+          tokenAmount: amountToUnlock?.toFixed(),
           from: wallet?.address
         }}
         buttonLabel=""

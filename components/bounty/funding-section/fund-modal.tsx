@@ -82,7 +82,7 @@ export default function FundModal({
 
     setIsExecuting(true);
 
-    handleFundBounty(networkIssue.id, amountToFund.toString())
+    handleFundBounty(networkIssue.id, amountToFund.toFixed())
       .then((txInfo) => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
         
@@ -91,7 +91,7 @@ export default function FundModal({
         });
       })
       .then(() => {
-        const amountFormatted = formatNumberToCurrency(amountToFund.toString());
+        const amountFormatted = formatNumberToCurrency(amountToFund.toFixed());
         updateIssue(repoId.toString(), activeIssue?.githubId)
         handleClose();
         getNetworkIssue();
@@ -111,7 +111,7 @@ export default function FundModal({
 
   function handleApprove() {
     setIsExecuting(true);
-    approve(amountToFund.toString())
+    approve(amountToFund.toFixed())
       .catch(error => {
         if (error?.code === MetamaskErrors.UserRejected) return;
         

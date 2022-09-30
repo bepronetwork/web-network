@@ -247,7 +247,7 @@ function OraclesActions({
                 ? "text-purple"
                 : "text-primary"
             }`}
-            max={wallet?.balance?.bepro?.toString()}
+            max={wallet?.balance?.bepro?.toFixed()}
             error={!!error}
             value={tokenAmount}
             min={0}

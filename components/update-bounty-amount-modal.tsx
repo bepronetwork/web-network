@@ -55,7 +55,7 @@ export default function UpdateBountyAmountModal({
   const handleApprove = async () => {
     setIsExecuting(true);
 
-    handleApproveToken(transactionalAddress, newAmount.toString())
+    handleApproveToken(transactionalAddress, newAmount.toFixed())
       .then(() => {
         return transactionalERC20.updateAllowanceAndBalance();
       })
@@ -70,7 +70,7 @@ export default function UpdateBountyAmountModal({
   const handleSubmit = async () => {
     setIsExecuting(true);
 
-    handleUpdateBountyAmount(bountyId, newAmount.toString())
+    handleUpdateBountyAmount(bountyId, newAmount.toFixed())
       .then(txInfo => {
         return processEvent("bounty", "updated", activeNetwork?.name, { 
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
@@ -99,9 +99,9 @@ export default function UpdateBountyAmountModal({
         <div className="form-group">
           <InputNumber
             label={t("modals.update-bounty-amount.fields.amount.label")}
-            max={transactionalERC20.balance.toString()}
+            max={transactionalERC20.balance.toFixed()}
             error={exceedsBalance}
-            value={newAmount?.toString()}
+            value={newAmount?.toFixed()}
             min={0}
             onValueChange={handleChange}
             thousandSeparator
@@ -109,7 +109,7 @@ export default function UpdateBountyAmountModal({
             decimalScale={transactionalERC20.decimals}
             helperText={
               <>
-                {formatStringToCurrency(transactionalERC20.balance.toString())}{" "}
+                {formatStringToCurrency(transactionalERC20.balance.toFixed())}{" "}
                 {transactionalERC20.symbol} Available
               </>
             }

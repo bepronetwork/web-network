@@ -11,7 +11,10 @@ export interface OraclesState {
   delegatedEntries?: [string, number][];
 }
 
-export interface DeletagionExtended extends Delegation {
+export interface DelegationExtended extends Delegation {
+  id: number;
+  from: string;
+  to: string;
   amount: BigNumber;
 }
 
@@ -19,5 +22,5 @@ export interface OraclesResumeExtended extends OraclesResume {
   locked: BigNumber;
   delegatedToOthers: BigNumber;
   delegatedByOthers: BigNumber;
-  delegations: DeletagionExtended[];
+  delegations: DelegationExtended[];
 }

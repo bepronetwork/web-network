@@ -127,8 +127,8 @@ export default function NetworksList() {
                openBounties, 
                totalBounties, 
                networkToken: settlerTokenData, 
-               tokensLocked: totalSettlerLocked.toString(),
-               totalSettlerConverted: totalSettlerConverted.toString()
+               tokensLocked: totalSettlerLocked.toFixed(),
+               totalSettlerConverted: totalSettlerConverted.toFixed()
       }
     }))
       .then(setNetworks)

@@ -80,7 +80,7 @@ export default function TokensDropdown({
     setToken(newToken);
     await DAOService.getTokenBalance(newToken.address, userAddress)
       .then((value) =>
-        setOption(tokenToOption({ ...newToken, currentValue: value.toString() })))
+        setOption(tokenToOption({ ...newToken, currentValue: value.toFixed() })))
       .catch(() => setOption(tokenToOption(newToken)));
   }
 
@@ -89,7 +89,7 @@ export default function TokensDropdown({
       if (token?.address && userAddress) {
         const value = await DAOService.getTokenBalance(token.address, userAddress);
 
-        return { ...token, currentValue: value.toString() };
+        return { ...token, currentValue: value.toFixed() };
       }
     }))
       .then((values) => {

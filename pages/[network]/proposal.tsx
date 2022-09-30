@@ -138,7 +138,7 @@ export default function PageProposal() {
 
       const { githubLogin } = await getUserOf(detail.recipient);
       const oracles = networkProposal?.details[i]?.percentage.toString();
-      const distributedAmount = networkIssue.tokenAmount.multipliedBy(detail.percentage).dividedBy(100).toString();
+      const distributedAmount = networkIssue.tokenAmount.multipliedBy(detail.percentage).dividedBy(100).toFixed();
 
       return { 
         githubLogin, 
