@@ -123,7 +123,7 @@ export const NETWORKS: {
     currency: GLMR,
     decimals: 18,
     explorerURL: "https://moonscan.io/",
-    rpcUrls: ["https://rpc.api.moonbase.moonbeam.network"]
+    rpcUrls: ["https://rpc.api.moonbeam.network"]
   },
   "0x5e0": {
     id: "1504",
