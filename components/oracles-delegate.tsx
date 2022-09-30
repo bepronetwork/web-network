@@ -78,6 +78,8 @@ function OraclesDelegate({
       wallet?.balance?.oracles?.locked?.lt(tokenAmount),
       !delegatedTo,
       isAddressesEqual(),
+      BigNumber(tokenAmount).isZero(),
+      BigNumber(tokenAmount).isNaN(),
       myTransactions.find(({ status, type }) =>
           status === TransactionStatus.pending &&
           type === TransactionTypes.delegateOracles)
@@ -111,6 +113,7 @@ function OraclesDelegate({
           thousandSeparator
           error={!!error}
           decimalScale={networkTokenDecimals}
+          allowNegative={false}
           helperText={
             <>
               {formatStringToCurrency(availableAmount?.toFixed())}{" "}

@@ -171,8 +171,8 @@ export default function ProposalItem({
             <div className="col-9 offset-1 text-white">
               <ProposalProgressSmall
                 pgClass={`${proposalState.contextColor}`}
-                value={+networkProposal?.disputeWeight}
-                total={wallet?.balance?.staked?.toNumber()}
+                value={networkProposal?.disputeWeight}
+                total={wallet?.balance?.staked}
                 textClass={`pb-2 text-${proposalState.contextColor}`}
               />
             </div>

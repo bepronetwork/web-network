@@ -138,6 +138,8 @@ function OraclesActions({
     [
       action === t("my-oracles:actions.lock.label") && needsApproval(),
       !wallet?.address,
+      BigNumber(tokenAmount).isZero(),
+      BigNumber(tokenAmount).isNaN(),
       exceedsAvailable(tokenAmount),
       !tokenAmount,
       myTransactions.find(({ status, type }) =>
@@ -255,6 +257,7 @@ function OraclesActions({
             onValueChange={handleChangeToken}
             thousandSeparator
             decimalSeparator="."
+            allowNegative={false}
             decimalScale={networkTokenDecimals}
             helperText={
               <>

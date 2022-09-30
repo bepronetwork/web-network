@@ -1,19 +1,20 @@
+import BigNumber from "bignumber.js";
+
 import Translation from "components/translation";
 
 import { formatNumberToNScale } from "helpers/formatNumber";
-import { handlePercentage } from "helpers/handlePercentage";
 
 interface Options {
   pgClass: string;
-  value: number;
-  total: number;
+  value: BigNumber;
+  total: BigNumber;
   textClass: string;
 }
 
 export default function ProposalProgressSmall({
   pgClass = "",
-  value = 0,
-  total,
+  value = BigNumber(0),
+  total = BigNumber(0),
   textClass
 }: Options) {
   const dotStyle = { width: "10px", height: "10px" };
@@ -22,14 +23,14 @@ export default function ProposalProgressSmall({
     return (value * 100) / total;
   }
 
-  const percent = handlePercentage(value, total, 2);
+  const percent = value.multipliedBy(100).dividedBy(total);
 
   return (
     <div className="text-center position-relative d-inline-block col">
       <div className={"caption-small mb-1"}>
-        <span className={textClass}>{formatNumberToNScale(value)}</span>
+        <span className={textClass}>{formatNumberToNScale(value.toFixed(0 , 1))}</span>
         <span>
-          /{formatNumberToNScale(total)} <Translation label={"oracles"} />
+          /{formatNumberToNScale(total.toFixed(0, 1))} <Translation label={"oracles"} />
         </span>
       </div>
       <div className={"progress bg-gray w-100 mb-1"}>
@@ -42,18 +43,18 @@ export default function ProposalProgressSmall({
           <div
             style={{ ...dotStyle, left: 0 }}
             className={`rounded-circle position-absolute ${
-              +percent > 0 ? `bg-${pgClass}` : "empty-dot"
+              percent.gt(0)? `bg-${pgClass}` : "empty-dot"
             }`}
           />
           <div
             style={{ ...dotStyle, right: 0 }}
             className={`rounded-circle position-absolute ${
-              +percent >= 3 ? `bg-${pgClass}` : "empty-dot"
+              percent.gte(3) ? `bg-${pgClass}` : "empty-dot"
             }`}
           />
         </div>
       </div>
-      <div className={`caption-small ${textClass}`}>{percent}%</div>
+      <div className={`caption-small ${textClass}`}>{percent.toFixed(0 , 1)}%</div>
     </div>
   );
 }

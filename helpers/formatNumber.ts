@@ -10,10 +10,10 @@ export const formatNumberToNScale = (number: number | string) => {
   const bigNumber = new BigNumber(number);
 
   if (bigNumber.lt(1e3)) return bigNumber.toFixed();
-  if (bigNumber.gte(1e3) && bigNumber.lt(1e6)) return bigNumber.dividedBy(1e3).toFixed(1, 1) + "K";
-  if (bigNumber.gte(1e6) && bigNumber.lt(1e9)) return bigNumber.dividedBy(1e6).toFixed(1, 1) + "M";
-  if (bigNumber.gte(1e9) && bigNumber.lt(1e12)) return bigNumber.dividedBy(1e9).toFixed(1, 1) + "B";
-  if (bigNumber.gte(1e12)) return bigNumber.dividedBy(1e12).toFixed(1, 1) + "T";
+  if (bigNumber.gte(1e3) && bigNumber.lt(1e6)) return bigNumber.dividedBy(1e3).toFixed(0, 1) + "K";
+  if (bigNumber.gte(1e6) && bigNumber.lt(1e9)) return bigNumber.dividedBy(1e6).toFixed(0, 1) + "M";
+  if (bigNumber.gte(1e9) && bigNumber.lt(1e12)) return bigNumber.dividedBy(1e9).toFixed(0, 1) + "B";
+  if (bigNumber.gte(1e12)) return bigNumber.dividedBy(1e12).toFixed(0, 1) + "T";
 };
 
 export const formatNumberToCurrency = (number: number | string, options = {}) =>

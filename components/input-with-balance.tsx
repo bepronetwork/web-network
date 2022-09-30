@@ -29,6 +29,7 @@ export default function InputWithBalance({
 
   const setMaxValue = () => onChange(max || balance);
   const handleAmountChange = ({ value }) => onChange(value);
+  const isAllowed = ({ value: newValue }) => BigNumber(newValue !== "" && newValue || 0).lte(max || balance);
 
   return(
     <div className="row mx-0 bg-dark-gray border-radius-8 amount-input">
@@ -45,6 +46,7 @@ export default function InputWithBalance({
           decimalSeparator="."
           decimalScale={decimals}
           onValueChange={handleAmountChange}
+          isAllowed={isAllowed}
         />
 
       <div className="d-flex caption-small justify-content-between align-items-center p-3 mt-1 mb-1">
