@@ -219,7 +219,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                       </div>
                     </div>
 
-                    {balance.oraclesAvailable > 0 && (
+                    {balance.oraclesAvailable > 0 && (  
                       <>
                         <div className="row mt-4">
                           <p className="caption-small text-gray">
