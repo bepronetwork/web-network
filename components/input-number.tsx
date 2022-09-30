@@ -24,6 +24,7 @@ export default function InputNumber({
   errorMessage,
   setMaxValue,
   description,
+  allowNegative = false,
   ...params
 }: InputNumberProps) {
   const { t } = useTranslation(["common"]);
@@ -67,6 +68,7 @@ export default function InputNumber({
           htmlFor={id}
           min={min}
           placeholder={placeholder}
+          allowNegative={allowNegative}
           {...params}
         />
         {symbol && (
