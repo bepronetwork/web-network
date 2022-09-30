@@ -411,7 +411,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         }
         setFields('github.repositories', repositories)
       });
-  },[user?.login])
+  },[user?.login, isCreating]);
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({
     ...networkSettings,
