@@ -101,6 +101,15 @@ export const NETWORKS: {
     explorerURL: "https://blockscout.moonriver.moonbeam.network",
     rpcUrls: ["https://eth-iris.taikai.network:8080"]
   },
+  "0x507": {
+    id: "1287",
+    name: "Moonbase Testnet",   
+    key: "moonbase",
+    currency: MOVR,
+    decimals: 18,
+    explorerURL: "https://blockscout.moonriver.moonbeam.network",
+    rpcUrls: ["https://rpc.api.moonbase.moonbeam.network"]
+  },
   "0x5e0": {
     id: "1504",
     name: "Diogenes Testnet",
