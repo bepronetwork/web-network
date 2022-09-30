@@ -105,7 +105,16 @@ export const NETWORKS: {
     id: "1287",
     name: "Moonbase Testnet",   
     key: "moonbase",
-    currency: MOVR,
+    currency: ETH,
+    decimals: 18,
+    explorerURL: "https://blockscout.moonriver.moonbeam.network",
+    rpcUrls: ["https://rpc.api.moonbase.moonbeam.network"]
+  },
+  "0x504": {
+    id: "1284",
+    name: "Moonbeam Testnet",   
+    key: "moonbeam",
+    currency: ETH,
     decimals: 18,
     explorerURL: "https://blockscout.moonriver.moonbeam.network",
     rpcUrls: ["https://rpc.api.moonbase.moonbeam.network"]

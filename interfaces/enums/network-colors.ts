@@ -12,6 +12,7 @@ export enum NetworkColors {
   irene = "#29b6af",
   iris = "#29b6af",
   moonbase = "#29b6af",
+  moonbeam = "#29b6af",
   diogenes = "#29b6af",
   aurelius = "#29b6af",
 }
