@@ -17,7 +17,7 @@ export default function PageDevelopers() {
 
   const { getTotalUsers } = useApi();
   const { service: DAOService } = useDAO();
-  const {activeNetwork} = useNetwork()
+  const { activeNetwork } = useNetwork()
 
   const [infos, setInfos] = useState<InfosHero[]>([
     {
@@ -60,7 +60,7 @@ export default function PageDevelopers() {
         {
           value: onNetwork,
           label: t("heroes.bounties-in-network"),
-          currency: t("$oracles",{token: activeNetwork?.networkToken?.symbol})
+          currency: t("$oracles",{ token: activeNetwork?.networkToken?.symbol || t("misc.$token") })
         },
         {
           value: totalUsers,
@@ -68,7 +68,7 @@ export default function PageDevelopers() {
         }
       ]);
     });
-  }, [DAOService]);
+  }, [DAOService, activeNetwork]);
 
   return (
     <>
@@ -77,7 +77,7 @@ export default function PageDevelopers() {
         subtitle={t("heroes.bounties.subtitle")}
         infos={infos}
       />
-
+    
       <ListIssues />
     </>
   );
