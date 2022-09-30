@@ -122,7 +122,7 @@ export const NETWORKS: {
     key: "moonbeam",
     currency: GLMR,
     decimals: 18,
-    explorerURL: "https://blockscout.moonriver.moonbeam.network",
+    explorerURL: "https://moonscan.io/",
     rpcUrls: ["https://rpc.api.moonbase.moonbeam.network"]
   },
   "0x5e0": {
