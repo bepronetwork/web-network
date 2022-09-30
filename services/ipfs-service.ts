@@ -34,8 +34,6 @@ export async function add(file: Buffer | string,
       contentType: fileType?.mime || "image/jpeg"
     };
 
-    console.log({ isBuffer, fileType, options });
-
     form.append("file", content, options);
   } else {
     form.append("file", content, `${uuidv4()}.${ext}`);

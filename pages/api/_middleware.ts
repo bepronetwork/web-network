@@ -22,6 +22,7 @@ const whiteList = {
           "search/users/all", 
           "search/users/login", 
           "search/users/total", 
+          "files",
           "seo" ],
   PUT: [ "network" ]
 };
