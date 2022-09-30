@@ -175,7 +175,6 @@ export const NetworkSettingsProvider = ({ children }) => {
   }
 
   const setFields = (field: string, value: unknown)=> {
-    console.log({field, value})
     const method = field.split('.')
     
     if(!method || !value) return;
@@ -322,7 +321,7 @@ export const NetworkSettingsProvider = ({ children }) => {
           Fields.cancelFee.setter(cancelFee)
         })
       })
-      .catch(error => console.log("Failed to load network parameters", error, network));
+      .catch(error => console.debug("Failed to load network parameters", error, network));
 
       Fields.name.setter(network?.name);
       Fields.description.setter(network?.description);
