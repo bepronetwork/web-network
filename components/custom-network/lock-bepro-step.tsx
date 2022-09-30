@@ -183,7 +183,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                           setMaxValue={handleSetMaxValue}
                           min={0}
                           placeholder={"0"}
-                          disabled={!!lockedPercent?.gt(100)}
+                          disabled={!!lockedPercent?.gte(100)}
                           thousandSeparator
                           decimalSeparator="."
                           decimalScale={18}
