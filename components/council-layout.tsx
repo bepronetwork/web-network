@@ -67,7 +67,7 @@ export default function CouncilLayout({ children }) {
         currency: "BEPRO",
       },
       {
-        value: onNetwork.toNumber(),
+        value: onNetwork.toFixed(),
         label: t("common:heroes.bounties-in-network"),
         currency: "BEPRO",
       },

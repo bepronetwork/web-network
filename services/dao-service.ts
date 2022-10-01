@@ -197,14 +197,14 @@ export default class DAO {
         n = new BigNumber(await this.network.networkToken.getTokenAmount(address)).decimalPlaces(decimals);
         break;
       case 'eth':
-        n = new BigNumber(await this.web3Connection.getBalance()).decimalPlaces(16);
+        n = new BigNumber(this.web3Connection.Web3.utils.fromWei(await this.web3Connection.getBalance()));
         break;
       case 'staked':
         n = new BigNumber(await this.network.totalNetworkToken()).decimalPlaces(decimals);
         break;
       }
     } catch (error) {
-      console.debug("Failed to getBalance", error);
+      console.debug(`Failed to getBalance of ${kind} from ${address}`, error);
     }
 
     return n;
