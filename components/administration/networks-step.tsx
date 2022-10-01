@@ -66,7 +66,7 @@ export default function NetworksStep({
   const canSubmit = [
     forcedNetwork?.name !== details?.name?.value && details?.name?.validated,
     forcedNetwork?.description !== details?.description && details?.description?.trim() !== "",
-    forcedNetwork?.councilAmount !== parameters?.councilAmount?.value && parameters?.councilAmount?.validated,
+    +forcedNetwork?.councilAmount !== parameters?.councilAmount?.value && parameters?.councilAmount?.validated,
     forcedNetwork?.disputableTime !== parameters?.disputableTime?.value && parameters?.disputableTime?.validated,
     forcedNetwork?.draftTime !== parameters?.draftTime?.value && parameters?.draftTime?.validated,
     forcedNetwork?.percentageNeededForDispute !== parameters?.percentageNeededForDispute?.value 
@@ -168,8 +168,8 @@ export default function NetworksStep({
               networkToken]) => setForcedNetwork({
                 ...network,
                 councilAmount,
-                disputableTime: disputableTime / 1000,
-                draftTime: draftTime / 1000,
+                disputableTime: +disputableTime / 1000,
+                draftTime: +draftTime / 1000,
                 oracleExchangeRate,
                 mergeCreatorFeeShare,
                 proposerFeeShare,
@@ -235,7 +235,7 @@ export default function NetworksStep({
     if (forcedNetwork.disputableTime !== parameters.disputableTime.value)
       await DAOService.setNetworkParameter("disputableTime", parameters.disputableTime.value).catch(console.log);
 
-    if (forcedNetwork.councilAmount !== parameters.councilAmount.value)
+    if (+forcedNetwork.councilAmount !== parameters.councilAmount.value)
       await DAOService.setNetworkParameter("councilAmount", parameters.councilAmount.value).catch(console.log);
 
     if (forcedNetwork.percentageNeededForDispute !== parameters.percentageNeededForDispute.value)

@@ -51,11 +51,6 @@ const defaultState: GlobalState = {
       tokensLocked: 0
     },
     myIssues: [],
-    balance: {
-      eth: 0,
-      staked: 0,
-      bepro: 0
-    },
     toaster: [],
     microServiceReady: null,
     myTransactions: [],

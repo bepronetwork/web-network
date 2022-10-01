@@ -1,6 +1,8 @@
 import { Col, Row } from "react-bootstrap";
 
-import { formatNumberToCurrency, formatNumberToString } from "helpers/formatNumber";
+import BigNumber from "bignumber.js";
+
+import { formatNumberToCurrency, formatStringToCurrency } from "helpers/formatNumber";
 
 export const RowCenterBetween = ({ children, className = "" }) => 
     <Row className={`align-items-center justify-content-between ${className}`}>
@@ -21,15 +23,21 @@ export const Amount = ({
   symbolColor = "primary", 
   className = undefined, 
   type = "currency" 
+}: {
+  amount: number | string;
+  symbol?: string;
+  symbolColor?: string;
+  className?: string;
+  type?: "currency" | "percent";
 }) => 
   <span className={`family-Regular ${className || "h4 text-white"}`}>
-    {type === "currency" && formatNumberToCurrency(amount)}
+    {type === "currency" && formatStringToCurrency(BigNumber(amount).toFixed())}
     
-    {type === "percent" && `${formatNumberToString(amount, 0)}%`}
+    {type === "percent" && `${formatNumberToCurrency(amount, { maximumFractionDigits: 4 })}%`}
 
     {(type === "currency" && symbol) && 
       <span className={`ml-1 ${ className && "caption-small" || "caption-medium"} text-${symbolColor}`}>
-        ${symbol}
+        {symbol}
       </span>
     }
   </span>;

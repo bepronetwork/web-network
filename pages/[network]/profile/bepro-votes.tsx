@@ -1,5 +1,6 @@
 import { Col, Row } from "react-bootstrap";
 
+import BigNumber from "bignumber.js";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -17,7 +18,7 @@ import { FlexRow } from "components/profile/wallet-balance";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import { formatStringToCurrency } from "helpers/formatNumber";
 
 export default function BeproVotes() {
   const { t } = useTranslation(["common", "profile"]);
@@ -31,8 +32,8 @@ export default function BeproVotes() {
     icon: <OracleIcon />
   };
 
-  const oraclesLocked = wallet?.balance?.oracles?.locked || 0;
-  const oraclesDelegatedToMe = wallet?.balance?.oracles?.delegatedByOthers || 0;
+  const oraclesLocked = wallet?.balance?.oracles?.locked || BigNumber("0");
+  const oraclesDelegatedToMe = wallet?.balance?.oracles?.delegatedByOthers || BigNumber("0");
 
   return(
     <ProfileLayout>
@@ -45,7 +46,10 @@ export default function BeproVotes() {
           <FlexRow className="align-items-center">
             <span className="caption-large text-white mr-2 font-weight-medium">{t("misc.total")}</span>
             <span className="caption-large text-white bg-dark-gray py-2 px-3 rounded-3 font-weight-medium">
-              <span className="mr-2">{formatNumberToCurrency(Number(oraclesLocked)+Number(oraclesDelegatedToMe))}</span>
+              <span className="mr-2">
+                {formatStringToCurrency(oraclesLocked.plus(oraclesDelegatedToMe).toFixed())}
+              </span>
+
               <InfoTooltip
                 description={t("profile:tips.total-oracles", {
                   tokenName: activeNetwork?.networkToken?.name || oracleToken.name

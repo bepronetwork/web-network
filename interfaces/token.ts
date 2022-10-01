@@ -1,12 +1,14 @@
 import { ReactElement } from "react";
+
+import BigNumber from "bignumber.js";
 export interface Token {
   id?: number;
   address: string;
   name: string;
   symbol: string;
-  currentValue?: number;
+  currentValue?: number | string;
   tokenInfo?: TokenInfo;
-  balance?: number;
+  balance?: string | BigNumber;
   decimals?: number;
   isTransactional?: boolean;
 }

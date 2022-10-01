@@ -45,8 +45,8 @@ export default function CreateBountyTokenAmount({
   }
 
   function handleIssueAmountBlurChange() {
-    if (needValueValidation && issueAmount.floatValue > tokenBalance) {
-      setIssueAmount({ formattedValue: tokenBalance.toString() });
+    if (needValueValidation && tokenBalance?.lt(issueAmount.floatValue)) {
+      setIssueAmount({ formattedValue: tokenBalance.toFixed() });
     }
   }
 
@@ -60,9 +60,9 @@ export default function CreateBountyTokenAmount({
           className="text-primary ms-2 cursor-pointer text-uppercase"
           onClick={() =>
             setIssueAmount({
-              formattedValue: tokenBalance.toString(),
-              floatValue: tokenBalance,
-              value: tokenBalance.toString()
+              formattedValue: tokenBalance.toFixed(),
+              floatValue: tokenBalance.toNumber(),
+              value: tokenBalance.toFixed()
             })
           }
         >
@@ -94,7 +94,7 @@ export default function CreateBountyTokenAmount({
           <InputNumber
             thousandSeparator
             disabled={review || !currentToken?.currentValue}
-            max={tokenBalance}
+            max={tokenBalance.toFixed()}
             label={
               <div className="d-flex mb-2">
                 <label className="flex-grow-1 caption-small text-gray align-items-center">
@@ -108,6 +108,7 @@ export default function CreateBountyTokenAmount({
             symbol={currentToken?.symbol || t("common:misc.token")}
             value={issueAmount.value}
             placeholder="0"
+            allowNegative={false}
             decimalScale={decimals}
             onValueChange={handleIssueAmountOnValueChange}
             onBlur={handleIssueAmountBlurChange}
@@ -127,6 +128,7 @@ export default function CreateBountyTokenAmount({
             className="mt-3"
             symbol={"EUR"}
             classSymbol="text-white-30 mt-3"
+            allowNegative={false}
             disabled
             value={
               getCurrentCoin()?.tokenInfo

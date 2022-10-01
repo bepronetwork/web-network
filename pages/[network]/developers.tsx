@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next/types";
@@ -45,7 +46,7 @@ export default function PageDevelopers() {
     Promise.all([
       DAOService.getClosedBounties().catch(() => 0),
       DAOService.getOpenBounties().catch(() => 0),
-      DAOService.getTotalNetworkToken().catch(() => 0),
+      DAOService.getTotalNetworkToken().catch(() => BigNumber(0)),
       getTotalUsers(),
     ]).then(([closed, inProgress, onNetwork, totalUsers]) => {
       setInfos([
@@ -58,7 +59,7 @@ export default function PageDevelopers() {
           label: t("heroes.bounties-closed")
         },
         {
-          value: onNetwork,
+          value: onNetwork.toNumber(),
           label: t("heroes.bounties-in-network"),
           currency: t("$oracles",{ token: activeNetwork?.networkToken?.symbol || t("misc.$token") })
         },

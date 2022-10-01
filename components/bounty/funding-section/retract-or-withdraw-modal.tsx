@@ -10,15 +10,23 @@ import { ApplicationContext } from "contexts/application";
 import { useIssue } from "contexts/issue";
 import { toastError, toastSuccess } from "contexts/reducers/add-toast";
 
+import { BenefactorExtended } from "interfaces/bounty";
+
 import useBepro from "x-hooks/use-bepro";
 
 import { Amount, RowWithTwoColumns } from "./minimals";
 
+interface RetractOrWithdrawModalProps {
+  show?: boolean;
+  onCloseClick: () => void;
+  funding: BenefactorExtended;
+}
+
 export default function RetractOrWithdrawModal({
   show = false,
   onCloseClick,
-  fundingtoRetractOrWithdraw
-}) {
+  funding
+} : RetractOrWithdrawModalProps) {
   const { t } = useTranslation(["common", "funding", "bounty"]);
 
   const [isExecuting, setIsExecuting] = useState(false);
@@ -29,18 +37,21 @@ export default function RetractOrWithdrawModal({
 
   const tokenSymbol = networkIssue?.transactionalTokenData?.symbol;
   const rewardTokenSymbol = networkIssue?.rewardTokenData?.symbol;
+  const retractOrWithdrawAmount = networkIssue?.closed ? 
+    funding?.amount?.dividedBy(networkIssue?.fundingAmount).multipliedBy(networkIssue?.rewardAmount)?.toFixed() : 
+    funding?.amount?.toFixed();
 
   function handleRetractOrWithdraw() {
-    if (!networkIssue || !fundingtoRetractOrWithdraw) return;
+    if (!networkIssue || !funding) return;
 
     setIsExecuting(true);
     if(networkIssue?.closed){
-      handleWithdrawFundRewardBounty(networkIssue?.id, fundingtoRetractOrWithdraw.id)
+      handleWithdrawFundRewardBounty(networkIssue?.id, funding.id)
       .then(() => {
         onCloseClick();
         getNetworkIssue();
         dispatch(toastSuccess(t("funding:modals.reward.withdraw-x-symbol", {
-          amount: fundingtoRetractOrWithdraw.amount,
+          amount: funding.amount,
           symbol: tokenSymbol
         }), t("funding:modals.reward.withdraw-successfully")));
       })
@@ -50,12 +61,12 @@ export default function RetractOrWithdrawModal({
       })
       .finally(() => setIsExecuting(false));
     } else {
-      handleRetractFundBounty(networkIssue?.id, fundingtoRetractOrWithdraw.id)
+      handleRetractFundBounty(networkIssue?.id, funding.id)
       .then(() => {
         onCloseClick();
         getNetworkIssue();
         dispatch(toastSuccess(t("funding:modals.retract.retract-x-symbol", {
-          amount: fundingtoRetractOrWithdraw.amount,
+          amount: funding.amount,
           symbol: tokenSymbol
         }), t("funding:modals.retract.retract-successfully")));
       })
@@ -81,13 +92,7 @@ export default function RetractOrWithdrawModal({
 
           <div className="bg-dark-gray border-radius-8 py-2 px-3 mb-2">
           <Amount
-              amount={
-                networkIssue?.closed
-                  ? (fundingtoRetractOrWithdraw?.amount /
-                      networkIssue.fundingAmount) *
-                    networkIssue.rewardAmount
-                  : fundingtoRetractOrWithdraw?.amount
-              }
+              amount={retractOrWithdrawAmount}
               symbol={networkIssue?.closed ?  rewardTokenSymbol : tokenSymbol}
               symbolColor={networkIssue?.closed ?  "warning" : "primary"}
             />

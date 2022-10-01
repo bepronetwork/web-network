@@ -70,6 +70,7 @@ export default function PageActions({
   const isBountyFinished = !!networkIssue?.isFinished;
   const isWalletConnected = !!wallet?.address;
   const isWalletAndGHConnected = isWalletConnected && !!user?.login;
+  const isFundingRequest = networkIssue?.fundingAmount?.gt(0) || activeIssue?.fundingAmount?.gt(0);
   const isWorkingOnBounty = !!activeIssue?.working?.find((login) => login === user?.login);
   const isBountyOpen = networkIssue?.closed === false && networkIssue?.canceled === false;
   const issueState = getIssueState({
@@ -77,9 +78,8 @@ export default function PageActions({
     amount: activeIssue?.amount,
     fundingAmount: activeIssue?.fundingAmount 
   })
-  const isBountyFunded = activeIssue?.fundedAmount === activeIssue?.fundingAmount
-  const isBountyFunding = activeIssue?.fundingAmount > 0
-  const isStateToWorking = ["proposal", "open", "ready"].some(value => value === issueState)
+  const isBountyFunded = activeIssue?.fundedAmount === activeIssue?.fundingAmount;
+  const isStateToWorking = ["proposal", "open", "ready"].some(value => value === issueState);
 
   const isBountyOwner =
     wallet?.address && networkIssue?.creator && networkIssue?.creator?.toLowerCase() === wallet?.address?.toLowerCase();
@@ -242,7 +242,6 @@ export default function PageActions({
   function renderStartWorkingButton() {
     if (isWalletAndGHConnected && 
         !isBountyInDraft && 
-        !isBountyFinished && 
         isBountyOpen && 
         !isWorkingOnBounty && 
         isRepoForked &&
@@ -254,15 +253,11 @@ export default function PageActions({
             onClick={handleStartWorking}
             className="read-only-button"
             disabled={isExecuting}
+            isLoading={isExecuting}
           >
             <span>
               <Translation ns="bounty" label="actions.start-working.title" />
             </span>
-            {isExecuting ? (
-              <span className="spinner-border spinner-border-xs ml-1" />
-            ) : (
-              ""
-            )}
           </Button>
         </ReadOnlyButtonWrapper>
       );
@@ -317,7 +312,7 @@ export default function PageActions({
   }
 
   function renderUpdateAmountButton() {
-    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft && !isBountyFunding)
+    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft && !isFundingRequest)
       return(
         <ReadOnlyButtonWrapper>
           <Button

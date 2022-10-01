@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 
+import BigNumber from "bignumber.js";
 import { format } from "date-fns";
 import { useTranslation } from "next-i18next";
 
@@ -7,6 +8,8 @@ import ArrowRight from "assets/icons/arrow-right";
 import CopyIcon from "assets/icons/copy";
 import LinkIcon from "assets/icons/link-icon";
 
+import Button from "components/button";
+import InternalLink from "components/internal-link";
 import Modal from "components/modal";
 import TransactionStats from "components/transaction-stats";
 
@@ -15,15 +18,12 @@ import { toastInfo } from "contexts/reducers/add-toast";
 import { useSettings } from "contexts/settings";
 
 import { CopyValue } from "helpers/copy-value";
-import { formatNumberToString } from "helpers/formatNumber";
+import { formatStringToCurrency } from "helpers/formatNumber";
 import { truncateAddress } from "helpers/truncate-address";
 
 import { BlockTransaction, Transaction } from "interfaces/transaction";
 
 import useNetworkTheme from "x-hooks/use-network";
-
-import Button from "./button";
-import InternalLink from "./internal-link";
 
 export default function TransactionModal({
   transaction = null,
@@ -55,7 +55,7 @@ export default function TransactionModal({
     setDetails([
       makeDetail(t("transactions.amount"),
                  <>
-          <span>{formatNumberToString(blockTransaction.amount)}</span>{" "}
+          <span>{formatStringToCurrency(BigNumber(blockTransaction.amount).toFixed())}</span>{" "}
           <span
             className={`${
               blockTransaction.currency.toLowerCase() === "oralces"

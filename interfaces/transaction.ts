@@ -10,7 +10,7 @@ export interface SimpleBlockTransactionPayload {
   id: string;
   type: TransactionTypes;
   status: TransactionStatus;
-  amount: number;
+  amount: number | string;
   currency: string;
   network?: Network;
 }

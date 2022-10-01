@@ -5,7 +5,6 @@ import { UpdateTransaction } from "contexts/reducers/update-transaction";
 
 import { AddToast } from "./add-toast";
 import { AddTransactions } from "./add-transaction";
-import { ChangeBalance } from "./change-balance";
 import { ChangeBeproInit } from "./change-bepro-init-state";
 import { ChangeCurrentAddress } from "./change-current-address";
 import { ChangeGithubHandle } from "./change-github-handle";
@@ -34,7 +33,6 @@ export default function LoadApplicationReducers() {
     ChangeOraclesState,
     ChangeStakedState,
     ChangeCurrentAddress,
-    ChangeBalance,
     AddToast,
     RemoveToast,
     ChangeMicroServiceReady,

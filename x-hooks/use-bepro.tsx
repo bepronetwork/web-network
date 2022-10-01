@@ -123,7 +123,7 @@ export default function useBepro() {
     });
   }
 
-  async function handleUpdateBountyAmount(bountyId: number, amount: number): Promise<TransactionReceipt | Error> {
+  async function handleUpdateBountyAmount(bountyId: number, amount: string): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const transaction = addTransaction({ type: TransactionTypes.updateBountyAmount }, activeNetwork);
 
@@ -264,7 +264,7 @@ export default function useBepro() {
   }
 
   async function handleApproveToken(tokenAddress: string, 
-                                    amount: number, 
+                                    amount: string, 
                                     tokenType: "transactional" | "network" = "transactional"):
     Promise<TransactionReceipt | Error> {
 
@@ -304,7 +304,7 @@ export default function useBepro() {
   }
 
   async function handleTakeBack(delegationId: number,
-                                amount: number, 
+                                amount: string, 
                                 currency: TransactionCurrency): Promise<TransactionReceipt | Error> {
 
     return new Promise(async (resolve, reject) => {
@@ -349,7 +349,7 @@ export default function useBepro() {
                                          userBranch: string,
                                          cid: number ) {
     return new Promise(async (resolve, reject) => {
-      const tx = addTransaction({ type: TransactionTypes.createPullRequest, }, activeNetwork);
+      const tx = addTransaction({ type: TransactionTypes.createPullRequest }, activeNetwork);
       dispatch(tx);
 
       await DAOService.createPullRequest(bountyId,
@@ -618,9 +618,9 @@ export default function useBepro() {
     });
   }
 
-  async function handleFundBounty(bountyId: number, amount: number, tokenDecimals?: number) {
+  async function handleFundBounty(bountyId: number, amount: string, tokenDecimals?: number) {
     return new Promise(async (resolve, reject) => {
-      const transaction = addTransaction({ type: TransactionTypes.fundBounty }, activeNetwork);
+      const transaction = addTransaction({ type: TransactionTypes.fundBounty, amount }, activeNetwork);
 
       dispatch(transaction);
 

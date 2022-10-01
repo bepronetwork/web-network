@@ -1,19 +1,20 @@
 import { PullRequest, Benefactor, ProposalDetail, Bounty, Proposal } from "@taikai/dappkit";
+import BigNumber from "bignumber.js";
 
 import { Token } from "interfaces/token";
 
 export interface BountyExtended extends Bounty {
     id: number;
     creationDate: number;
-    tokenAmount: number;
+    tokenAmount: BigNumber;
 
     creator: string;
     transactional: string;
     rewardToken: string;
-    rewardAmount: number;
-    fundingAmount: number;
-    fundedAmount?: number;
-    fundedPercent?: number;
+    rewardAmount: BigNumber;
+    fundingAmount: BigNumber;
+    fundedAmount?: BigNumber;
+    fundedPercent?: BigNumber;
 
     closed: boolean;
     canceled: boolean;
@@ -28,7 +29,7 @@ export interface BountyExtended extends Bounty {
     closedDate: number;
 
     pullRequests: PullRequest[];
-    funding: Benefactor[];
+    funding: BenefactorExtended[];
 
     isDraft?: boolean;
     isFinished?: boolean;
@@ -44,7 +45,7 @@ export interface ProposalExtended extends Proposal {
     id: number;
     creationDate: number;
     oracles: number;
-    disputeWeight: number;
+    disputeWeight: BigNumber;
     prId: number;
     refusedByBountyOwner: boolean;
     creator: string;
@@ -57,7 +58,7 @@ export interface ProposalExtended extends Proposal {
 
 export interface BenefactorExtended extends Benefactor {
     id: number;
-    amount: number;
+    amount: BigNumber;
     benefactor: string;
     creationDate: number;
 }
