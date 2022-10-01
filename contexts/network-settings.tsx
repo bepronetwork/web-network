@@ -177,7 +177,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   const setFields = (field: string, value: unknown)=> {
     const method = field.split('.')
     
-    if(!method || !value) return;
+    if(!method) return;
 
     setNetworkSettings((prev)=>{
       const newValues = {...prev}
