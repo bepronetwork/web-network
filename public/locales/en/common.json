@@ -278,7 +278,7 @@
     },
     "already-has-network": {
       "title": "Network already exists",
-      "button-label": "My networks",
+      "button-label": "My network",
       "content": "Connected wallet already has a network."
     },
     "settings-not-loaded": {
