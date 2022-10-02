@@ -224,7 +224,7 @@ export default class DAO {
     const councilAmount = await this.getNetworkParameter("councilAmount");
     const oraclesOf = await this.getOraclesOf(address);
 
-    return oraclesOf >= councilAmount;
+    return +oraclesOf >= +councilAmount;
   }
 
   async getOraclesResume(address: string): Promise<OraclesResume> {
@@ -491,8 +491,8 @@ export default class DAO {
     return this.network.disputeBountyProposal(bountyId, proposalId);
   }
 
-  async closeBounty(bountyId: number, proposalId: number): Promise<TransactionReceipt> {
-    return this.network.closeBounty(bountyId, proposalId);
+  async closeBounty(bountyId: number, proposalId: number, tokenUri: string): Promise<TransactionReceipt> {
+    return this.network.closeBounty(bountyId, proposalId, tokenUri);
   }
 
   async updateBountyAmount(bountyId: number, amount: number): Promise<TransactionReceipt> {
