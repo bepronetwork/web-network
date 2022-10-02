@@ -10,8 +10,9 @@ import paginate, { calculateTotalPages, paginateArray } from "helpers/paginate";
 import { searchPatternInText } from "helpers/string";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
-  const whereCondition: WhereOptions = { state: { [Op.not]: "pending" } };
-  const {
+  try{
+    const whereCondition: WhereOptions = { state: { [Op.not]: "pending" } };
+    const {
     state,
     issueId,
     repoId,
@@ -26,57 +27,57 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     repoPath
   } = req.query || {};
 
-  if (state) whereCondition.state = state;
+    if (state) whereCondition.state = state;
 
-  if (issueId) whereCondition.issueId = issueId;
+    if (issueId) whereCondition.issueId = issueId;
 
-  if (repoId) whereCondition.repository_id = repoId;
+    if (repoId) whereCondition.repository_id = repoId;
 
-  if (creator) whereCondition.creatorGithub = creator;
+    if (creator) whereCondition.creatorGithub = creator;
 
-  if (address) whereCondition.creatorAddress = address;
+    if (address) whereCondition.creatorAddress = address;
 
-  if (networkName) {
-    const network = await models.network.findOne({
+    if (networkName) {
+      const network = await models.network.findOne({
       where: {
         name: {
           [Op.iLike]: String(networkName)
         }
       }
-    });
+      });
 
-    if (!network) return res.status(404).json("Invalid network");
+      if (!network) return res.status(404).json("Invalid network");
 
-    whereCondition.network_id = network?.id;
-  }
+      whereCondition.network_id = network?.id;
+    }
 
-  if (repoPath) {
-    const repository = await models.repositories.findOne({
+    if (repoPath) {
+      const repository = await models.repositories.findOne({
       where: {
         githubPath: {
           [Op.in]: String(repoPath).split(",")
         }
       }
-    });
+      });
 
-    if (!repository) return res.status(404).json("Invalid repository");
+      if (!repository) return res.status(404).json("Invalid repository");
 
-    whereCondition.repository_id = repository.id;
-  }
+      whereCondition.repository_id = repository.id;
+    }
 
-  if (time) {
-    let fn;
-    if (time === "week") fn = subWeeks;
-    if (time === "month") fn = subMonths;
-    if (time === "year") fn = subYears;
-    if (time === "hour") fn = subHours;
+    if (time) {
+      let fn;
+      if (time === "week") fn = subWeeks;
+      if (time === "month") fn = subMonths;
+      if (time === "year") fn = subYears;
+      if (time === "hour") fn = subHours;
 
-    if (!fn) return res.status(422).json("Unable to parse date");
+      if (!fn) return res.status(422).json("Unable to parse date");
 
-    whereCondition.createdAt = { [Op.gt]: fn(+new Date(), 1) };
-  }
+      whereCondition.createdAt = { [Op.gt]: fn(+new Date(), 1) };
+    }
 
-  const include = [
+    const include = [
     { association: "developers" },
     {
       association: "pullRequests",
@@ -97,46 +98,50 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     },
     { association: "repository" },
     { association: "token" }
-  ];
-  const sortBy = String(req?.query?.sortBy)
-                                          .replaceAll(',',`,+,`)
-                                          .split(',')
-                                          .map((value)=> value === '+' ? Sequelize.literal('+'): value)
+    ];
 
-  if (search) {
-    const issues = await models.issue.findAll({
+    const sortBy = req?.query?.sortBy?.length && String(req?.query?.sortBy)
+                                    .replaceAll(',',`,+,`)
+                                    .split(',')
+                                    .map((value)=> value === '+' ? Sequelize.literal('+'): value)
+
+    if (search) {
+      const issues = await models.issue.findAll({
       where: whereCondition,
       include,
       nest: true,
-      order: [[...sortBy || "createdAt", req.query.order || "DESC"]]
-    });
+      order: [[...sortBy ||["createdAt"], req.query.order || "DESC"]]
+      });
 
-    const result = [];
+      const result = [];
 
-    result.push(...issues.filter(({ title, body }) =>
+      result.push(...issues.filter(({ title, body }) =>
         [title, body].some((text) =>
           searchPatternInText(text || "", String(search)))));
 
-    const paginatedData = paginateArray(result, 10, page || 1);
+      const paginatedData = paginateArray(result, 10, page || 1);
 
-    return res.status(200).json({
+      return res.status(200).json({
       count: result.length,
       rows: paginatedData.data,
       pages: paginatedData.pages,
       currentPage: +paginatedData.page
-    });
-  } else {
-    const issues = await models.issue.findAndCountAll(paginate({ 
+      });
+    } else {
+      const issues = await models.issue.findAndCountAll(paginate({ 
       where: whereCondition, 
       include, nest: true }, req.query, [
-        [...sortBy|| "updatedAt", req.query.order || "DESC"]
+        [...sortBy|| ["updatedAt"], req.query.order || "DESC"]
       ]));
 
-    return res.status(200).json({
+      return res.status(200).json({
       ...issues,
       currentPage: +page || 1,
       pages: calculateTotalPages(issues.count)
-    });
+      })}
+  } catch(e){
+    console.error(e)
+    return res.status(500)
   }
 }
 

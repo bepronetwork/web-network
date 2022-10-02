@@ -397,7 +397,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         
         if (isCreating) repositories.push(...filtered);
         else {
-          repositories.push(... await searchRepositories({ networkName: network.name })
+          repositories.push(... await searchRepositories({ networkName: network?.name })
             .then(({ rows }) => Promise.all(rows.map( async repo => ({
               checked: true,
               isSaved: true,
