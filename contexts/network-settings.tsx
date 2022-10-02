@@ -174,7 +174,6 @@ export const NetworkSettingsProvider = ({ children }) => {
   }
 
   const setFields = (field: string, value: unknown)=> {
-    console.log({field, value})
     const method = field.split('.')
     
     if(!method || !value) return;

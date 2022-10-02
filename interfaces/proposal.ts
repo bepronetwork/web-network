@@ -27,4 +27,5 @@ export interface DistribuitonPerUser {
   oracles: string;
   percentage: number;
   distributedAmount?: number;
+  isPRCreator?: boolean;
 }
