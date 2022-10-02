@@ -139,7 +139,8 @@ li {
     &__control {
       border-color: transparent;
       background-color: $black;
-      min-width: 210px;
+      // min-width: 210px;
+      min-width: max-content;
       min-height: 38px;
       box-shadow: none;
       border-radius: 8px;
@@ -1246,6 +1247,7 @@ textarea.form-control {
   .react-select__menu {
     color: var(--bs-gray);
     min-width: 170px !important;
+    // min-width: max-content;
   }
 
   .react-select__single-value {

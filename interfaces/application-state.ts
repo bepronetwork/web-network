@@ -1,4 +1,3 @@
-import { BalanceState } from "./balance-state";
 import { LoadingState } from "./loading-state";
 import { OraclesState } from "./oracles-state";
 import { ToastNotification } from "./toast-notification";
@@ -17,7 +16,6 @@ export interface ApplicationState {
   oracles: OraclesState;
   myIssues: number[];
   currentAddress: string;
-  balance: BalanceState;
   toaster: ToastNotification[];
   microServiceReady: boolean | null;
   myTransactions: (

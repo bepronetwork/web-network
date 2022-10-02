@@ -35,6 +35,12 @@ const MOVR: Currency = {
   symbol: "MOVR"
 };
 
+const GLMR: Currency = {
+  name: "GLMR",
+  ticker: "GLMR",
+  symbol: "GLMR"
+}
+
 export const NETWORKS: {
   [key: string]: Network;
 } = {
@@ -100,6 +106,24 @@ export const NETWORKS: {
     decimals: 18,
     explorerURL: "https://blockscout.moonriver.moonbeam.network",
     rpcUrls: ["https://eth-iris.taikai.network:8080"]
+  },
+  "0x507": {
+    id: "1287",
+    name: "Moonbase Testnet",   
+    key: "moonbase",
+    currency: ETH,
+    decimals: 18,
+    explorerURL: "https://blockscout.moonriver.moonbeam.network",
+    rpcUrls: ["https://rpc.api.moonbase.moonbeam.network"]
+  },
+  "0x504": {
+    id: "1284",
+    name: "Moonbeam",   
+    key: "moonbeam",
+    currency: GLMR,
+    decimals: 18,
+    explorerURL: "https://moonscan.io/",
+    rpcUrls: ["https://rpc.api.moonbeam.network"]
   },
   "0x5e0": {
     id: "1504",

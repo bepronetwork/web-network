@@ -86,18 +86,15 @@ export const NetworkProvider: React.FC = function ({ children }) {
               networkToken]) => {
         setActiveNetwork(prevNetwork => ({
           ...prevNetwork,
-          councilAmount,
-          disputableTime: disputableTime / 1000,
-          draftTime: draftTime / 1000,
-          oracleExchangeRate,
-          mergeCreatorFeeShare,
-          proposerFeeShare,
-          percentageNeededForDispute,
+          councilAmount: councilAmount.toString(),
+          disputableTime: +disputableTime / 1000,
+          draftTime: +draftTime / 1000,
+          oracleExchangeRate: +oracleExchangeRate,
+          mergeCreatorFeeShare: +mergeCreatorFeeShare,
+          proposerFeeShare: +proposerFeeShare,
+          percentageNeededForDispute: +percentageNeededForDispute,
           treasury,
-          networkToken: {
-            ...networkToken,
-            symbol: `$${networkToken.symbol}`,
-          }
+          networkToken
         }));
       });
   }, [activeNetwork?.networkAddress, DAOService?.network?.contractAddress]);
@@ -110,6 +107,10 @@ export const NetworkProvider: React.FC = function ({ children }) {
     
     updateActiveNetwork();
   }, [query?.network]);
+
+  useEffect(() => {
+    if (activeNetwork?.isRegistered === false) push("/networks");
+  }, [activeNetwork]);
 
   useEffect(() => {    
     if (DAOService?.network?.contractAddress !== activeNetwork?.networkAddress ||! activeNetwork?.draftTime) 

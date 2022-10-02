@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { Defaults } from "@taikai/dappkit";
+import BigNumber from "bignumber.js";
 import { useRouter } from "next/router";
 
 import { useAuthentication } from "contexts/authentication";
@@ -19,7 +20,7 @@ import {
 } from "helpers/contants";
 import { DefaultNetworkSettings } from "helpers/custom-network";
 
-import { Color, Icon, Network, NetworkSettings, Theme } from "interfaces/network";
+import { Color, Network, NetworkSettings, Theme } from "interfaces/network";
 
 import DAO from "services/dao-service";
 
@@ -32,22 +33,20 @@ import { useSettings } from "./settings";
 const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefined);
 
 const ALLOWED_PATHS = ["/new-network", "/[network]/profile/my-network", "/administration"];
+const TTL = 48 * 60 * 60 // 2 day
+const localStorageKey = `create-network-settings`;
 
 export const NetworkSettingsProvider = ({ children }) => {
   const router = useRouter();
   
   const [forcedNetwork, setForcedNetwork] = useState<Network>();
-  const [github, setGithub] = useState(DefaultNetworkSettings.github);
-  const [tokens, setTokens] = useState(DefaultNetworkSettings.tokens);
-  const [details, setDetails] = useState(DefaultNetworkSettings.details);
-  const [settings, setSettings] = useState(DefaultNetworkSettings.settings);
-  const [tokensLocked, setTokensLocked] = useState(DefaultNetworkSettings.tokensLocked);
-  const [isSettingsValidated, setIsSettingsValidated] = useState(DefaultNetworkSettings.isSettingsValidated);
+  const [networkSettings, setNetworkSettings] = useState(DefaultNetworkSettings)
   
   const { activeNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
   const { DefaultTheme } = useNetworkTheme();
   const { wallet, user } = useAuthentication();
+  
   const { getUserRepositories } = useOctokit();
   const { settings: appSettings } = useSettings();
   const { getNetwork, searchRepositories, repositoryHasIssues } = useApi();
@@ -64,120 +63,198 @@ export const NetworkSettingsProvider = ({ children }) => {
   const needsToLoad = useMemo(() => ALLOWED_PATHS.includes(router.pathname), [router.pathname]);
   const network = useMemo(() => forcedNetwork || activeNetwork, [forcedNetwork, activeNetwork]);
 
+  function handlerValidateSettings(settings){
+    //Treasury
+    if (DAOService) {
+      const isAddressEmptyOrZeroAddress = settings?.treasury?.address?.value?.trim() === "" || 
+      settings?.treasury?.address?.value === Defaults.nativeZeroAddress;
+
+      const conditionOrUndefined = condition => isAddressEmptyOrZeroAddress ? undefined : condition;
+
+      Promise.all([
+      conditionOrUndefined(DAOService.isAddress(settings?.treasury?.address?.value)),
+      conditionOrUndefined(settings?.treasury?.cancelFee?.value >= 0 && settings?.treasury?.cancelFee?.value <= 100),
+      conditionOrUndefined(settings?.treasury?.closeFee?.value >= 0 && settings?.treasury?.closeFee?.value <= 100),
+      ]).then((treasuryValidator)=>{
+        settings.treasury.address.validated = treasuryValidator[0];
+        settings.treasury.cancelFee.validated = treasuryValidator[1]
+        settings.treasury.closeFee.validated = treasuryValidator[2]
+        settings.treasury.validated = treasuryValidator.every(condition => condition !== false);
+      })
+      
+    }
+
+    //Parameters
+    const parametersValidations = [
+      Fields.parameter.validator("draftTime", settings?.parameters?.draftTime?.value),
+      Fields.parameter.validator("councilAmount", settings?.parameters?.councilAmount?.value),
+      Fields.parameter.validator("disputableTime", settings?.parameters?.disputableTime?.value),
+      Fields.parameter.validator("percentageNeededForDispute", 
+                                 settings?.parameters?.percentageNeededForDispute?.value)
+    ];
+
+    settings.parameters.draftTime.validated = parametersValidations[0];
+    settings.parameters.councilAmount.validated = parametersValidations[1];
+    settings.parameters.disputableTime.validated = parametersValidations[2];
+    settings.parameters.percentageNeededForDispute.validated = parametersValidations[3];
+    settings.parameters.validated = parametersValidations.every(condition => condition);
+    //Theme
+    const colors = settings.theme?.colors;
+    
+    if (colors?.primary){
+      const similar = [];
+
+      similar.push(...isColorsSimilar({ label: "text", code: colors.text }, [
+      { label: "primary", code: colors.primary },
+      { label: "background", code: colors.background },
+      { label: "shadow", code: colors.shadow },
+      ]));
+
+      similar.push(...isColorsSimilar({ label: "background", code: colors.background }, [
+        { label: "success", code: colors.success },
+        { label: "danger", code: colors.danger },
+        { label: "warning", code: colors.warning },
+      ]));
+
+      if (!isSameSet(new Set(similar), new Set(settings.theme?.similar)))
+        settings.theme.similar = similar;
+    }
+
+    return settings;
+  }
+
+  function handerValidateForm(newState) {
+
+    const tokensLockedValidate = [
+      Fields.amount.validator(newState.tokensLocked?.locked, newState.tokensLocked?.needed)
+    ].every(condition => condition);
+      
+    const detailsValidate = [
+      newState.details.name.validated,
+      newState.details.fullLogo.validated,
+      newState.details.iconLogo.validated,
+    ].every(condition => condition);
+
+    const githubValidate = [
+        Fields.repository.validator(newState.github?.repositories),
+        newState.github?.botPermission,
+    ].every(condition => condition);
+    
+    newState.settings = handlerValidateSettings(newState.settings)
+
+    const settingsValidated = [
+    !newState.settings?.theme?.similar?.length,
+    newState.settings?.treasury?.validated,
+    newState.settings?.parameters?.draftTime?.validated,
+    newState.settings?.parameters?.disputableTime?.validated,
+    newState.settings?.parameters?.percentageNeededForDispute?.validated,
+    newState.settings?.parameters?.councilAmount?.validated,
+    ].every(condition => condition);
+    
+    const tokensValidated = [
+      newState.tokens?.settler?.trim() !== "",
+    ].every(condition => condition);
+    
+    newState.tokensLocked.validated = tokensLockedValidate;
+    newState.details.validated = detailsValidate;
+    newState.github.validated = githubValidate;
+    newState.settings.validated = !!settingsValidated;
+    newState.tokens.validated = tokensValidated;
+    newState.isSettingsValidated = [tokensLockedValidate,
+                                    detailsValidate,
+                                    githubValidate,
+                                    settingsValidated,
+                                    tokensValidated,
+    ].every(condtion=> condtion)
+
+    if(detailsValidate)
+      localStorage.setItem(`${localStorageKey}:${wallet.address}`, 
+                           JSON.stringify({data: newState, at: +new Date()}));
+
+    return newState;
+  }
+
+  const setFields = (field: string, value: unknown)=> {
+    const method = field.split('.')
+    
+    if(!method) return;
+
+    setNetworkSettings((prev)=>{
+      const newValues = {...prev}
+
+      method.reduce((p,c)=> 
+          c === method[method.length-1] ? p[c] = value : p[c]
+        , newValues)
+
+      return handerValidateForm(newValues)
+    })
+  }
+  
   const Fields = {
     amount: {
-      setter: (value: number) => setTokensLocked(previous => ({ ...previous, amount: value })),
-      validator: (locked: number, needed: number) => needed > 0 && locked >= needed
+      setter: (value: string) => setFields('tokensLocked.amount', value),
+      validator: (locked: string, needed: string) => BigNumber(needed).gt(0) && BigNumber(locked).gte(needed)
     },
     name: {
-      setter: (value: string) => setDetails(previous => {
-        const newState = { ...previous };
-
-        newState.validated = false;
-        newState.name.value = value.replace(/\s+/g,"-").replace(/--+/gm, "-");
-        newState.name.validated = undefined;
-
-        return newState;
-      }),
-      validator: async (value: string): Promise<boolean | undefined> => {
+      setter: async (value: string) => {
+        setFields('details.name', {value, validated: await Fields.name.validator(value)})
+      },
+      validator: async (value: string) => {
         let validated = undefined;
   
         if (value.trim() !== "")
           validated = /bepro|taikai/gi.test(value) ? false : !(await getNetwork({name: value}).catch(() => false));
 
-        setDetails(previous => {
-          const newState = { ...previous };
-
-          newState.name.validated = validated;
-          
-          return newState;
-        });
-  
-        return validated;
+        return !!validated;
       }
     },
     description: {
-      setter: (value: string) => setDetails(previous => ({ ...previous, description: value })),
+      setter: (value: string) => setFields('details.description', value),
     },
     logo: {
-      setter: (value: Icon, type: "full" | "icon") => setDetails(previous => ({ 
-        ...previous, 
-        [`${type}Logo`]: { 
-          value,
-          validated: value?.preview !== "" && value?.raw?.type?.includes("image/svg")
-        }
-      })),
-      validator: (value: Icon) => value?.preview !== "" && value?.raw?.type?.includes("image/svg")
+      setter: (value, type: "full" | "icon") => {
+        setFields(`details.${type}Logo`, {
+                    value,
+                    validated: value?.preview !== "" && value?.raw?.type?.includes("image/svg")
+        })
+      }
     },
     colors: {
-      setter: (value: Color) => setSettings(previous => {
-        const newState = { ...previous };
-
-        newState.theme.colors[value.label] = value.code;
-
-        return newState;
-      }),
+      setter: (value: Color) => setFields(`settings.theme.colors.${value.label}`, value.code),
       validator: (value: Theme) => !value?.similar?.length
     },
     repository: {
-      setter: (fullName: string) => setGithub(previous => {
-        const newState = { ...previous };
-        const index = newState.repositories.findIndex((repo) => repo.fullName === fullName);
-        const selectedRepository = newState.repositories[index];
-
-        newState.repositories[index].checked = !selectedRepository.checked;
-
-        return newState;
-      }),
+      setter: (fullName: string) =>{
+        const index = networkSettings.github.repositories.findIndex((repo) => repo.fullName === fullName);
+        const selectedRepository = networkSettings.github.repositories[index];
+        selectedRepository.checked = !selectedRepository.checked;
+        setFields(`github.repositories.${index}`, selectedRepository)
+      },
       validator: value => value.some((repository) => repository.checked)
     },
     permission: {
-      setter: value => setGithub(previous => ({ ...previous, botPermission: value }))
+      setter: value => setFields(`github.botPermission`, !!value)
     },
     settlerToken: {
-      setter: value => setTokens(previous => ({ ...previous, settler: value })),
+      setter: value => setFields(`tokens.settler`, value)
     },
     allowedTransactions: {
-      setter: value => setTokens(previous => ({ ...previous, allowedTransactions: value })),
+      setter: value => setFields(`tokens.allowedTransactions`, value)
     },
     allowedRewards: {
-      setter: value => setTokens(previous => ({ ...previous, allowedRewards: value })),
+      setter: value => setFields(`tokens.allowedRewards`, value)
     },
     treasury: {
-      setter: value => setSettings(previous => ({ 
-        ...previous, 
-        treasury: { 
-          ...previous.treasury, 
-          address: { value, validated: undefined } 
-        } 
-      })),
+      setter: value => setFields(`settings.treasury.address.value`, value)
     },
     cancelFee: {
-      setter: value => setSettings(previous => ({ 
-        ...previous, 
-        treasury: { 
-          ...previous.treasury, 
-          cancelFee: { value, validated: undefined }
-        } 
-      })),
+      setter: value => setFields(`settings.treasury.cancelFee.value`, value)
     },
     closeFee: {
-      setter: value => setSettings(previous => ({ 
-        ...previous, 
-        treasury: { 
-          ...previous.treasury, 
-          closeFee: { value, validated: undefined }
-        } 
-      })),
+      setter: value => setFields(`settings.treasury.closeFee.value`, value)
     },
     parameter: {
-      setter: value => setSettings(previous => ({ 
-        ...previous, 
-        parameters: {
-          ...previous.parameters,
-          [value.label]: { value: value.value, validated: undefined }
-        },  
-      })),
+      setter: value => setFields(`settings.parameters.${[value.label]}.value`, value.value),
       validator: 
         (parameter, value) => value >= (LIMITS[parameter]?.min || value) && value <= (LIMITS[parameter]?.max || value)
     }
@@ -197,7 +274,36 @@ export const NetworkSettingsProvider = ({ children }) => {
     return dao;
   }
 
-  // Getting external data
+  function handlerDefaultSettings(){
+    setFields('settings.theme.colors', DefaultTheme())
+    
+    setFields('settings.parameters', {
+    draftTime: {
+      value: DEFAULT_DRAFT_TIME,
+      validated: undefined
+    },
+    disputableTime: {
+      value: DEFAULT_DISPUTE_TIME,
+      validated: undefined
+    },
+    percentageNeededForDispute: {
+      value: DEFAULT_PERCENTAGE_FOR_DISPUTE,
+      validated: undefined
+    },
+    councilAmount: {
+      value: DEFAULT_COUNCIL_AMOUNT,
+      validated: undefined
+    },
+    validated: undefined
+    })
+
+    setFields('settings.treasury.cancelFee', {value:DEFAULT_CANCEL_FEE, validated: true})
+    setFields('settings.treasury.closeFee', {value: DEFAULT_CLOSE_FEE, validated: true})
+  }
+  
+  const cleanStorage = () => localStorage.removeItem(`${localStorageKey}:${wallet.address}`)
+
+  // TODO: Better this effect
   useEffect(() => {
     if ( !wallet?.address || 
          !DAOService || 
@@ -205,109 +311,24 @@ export const NetworkSettingsProvider = ({ children }) => {
          !needsToLoad )
       return;
 
-    if (user?.login)
-      getUserRepositories(user.login)
-        .then(async (githubRepositories) => {
-          const repositories = [];
-          const filtered = githubRepositories
-            .filter(repo => (
-              !repo?.isFork 
-              && (user.login === repo?.nameWithOwner.split("/")[0])) 
-              || repo?.isInOrganization)
-            .map(repo => ({
-              checked: false,
-              isSaved: false,
-              hasIssues: false,
-              name: repo?.name,
-              fullName: repo?.nameWithOwner
-            }));
-          
-          if (isCreating) repositories.push(...filtered);
-          else {
-            repositories.push(... await searchRepositories({ networkName: network.name })
-              .then(({ rows }) => Promise.all(rows.map( async repo => ({
-                checked: true,
-                isSaved: true,
-                name: repo.githubPath.split("/")[1],
-                fullName: repo.githubPath,
-                hasIssues: await repositoryHasIssues(repo.githubPath)
-              })))));
-            
-            repositories.push(...filtered.filter(repo =>
-              !repositories.find((repoB) => repoB.fullName === repo.fullName)));
-          }
-
-          setGithub(previous => ({
-            ...previous,
-            repositories
-          }));
-        });
-
     if (!isCreating) {
       getService()
       .then(service => {
         service.getTreasury()
-        .then(({ treasury, closeFee, cancelFee }) => 
-          setSettings(previous => {
-            const newState = { ...previous };
-
-            newState.parameters.draftTime = { value: network.draftTime, validated: true };
-            newState.parameters.disputableTime = { value: network.disputableTime, validated: true };
-            newState.parameters.percentageNeededForDispute = { 
-              value: network.percentageNeededForDispute, 
-              validated: true 
-            };
-            newState.parameters.councilAmount = { value: network.councilAmount, validated: true };
-            newState.treasury.address = { value: treasury, validated: true };
-            newState.treasury.cancelFee = { value: cancelFee, validated: true };
-            newState.treasury.closeFee = { value: closeFee, validated: true };
-            newState.theme.colors = network?.colors;
-
-            return newState;
-          }));
+        .then(({ treasury, closeFee, cancelFee }) => {
+          Fields.treasury.setter(treasury);
+          Fields.closeFee.setter(closeFee);
+          Fields.cancelFee.setter(cancelFee)
+        })
       })
-      .catch(error => console.log("Failed to load network parameters", error, network));
+      .catch(error => console.debug("Failed to load network parameters", error, network));
 
-      setDetails(previous => {
-        const newState = { ...previous };
+      Fields.name.setter(network?.name);
+      Fields.description.setter(network?.description);
+      Fields.logo.setter(`${IPFS_URL}/${network?.fullLogo}`, 'full')
+      Fields.logo.setter(`${IPFS_URL}/${network?.logoIcon}`, 'icon')
 
-        newState.name = { value: network?.name, validated: undefined };
-        newState.description = network?.description || "";
-        newState.fullLogo.value.preview = `${IPFS_URL}/${network?.fullLogo}`;
-        newState.iconLogo.value.preview = `${IPFS_URL}/${network?.logoIcon}`;
-
-        return newState;
-      });
     } else {
-      setDetails({ 
-        ...DefaultNetworkSettings.details,
-        fullLogo: { ...DefaultNetworkSettings.details.fullLogo, value: { preview: "", raw: undefined } },
-        iconLogo: { ...DefaultNetworkSettings.details.iconLogo, value: { preview: "", raw: undefined } }
-      });
-      setSettings(previous => {
-        const newState = { ...previous };
-
-        newState.parameters.draftTime = { value: DEFAULT_DRAFT_TIME, validated: true };
-        newState.parameters.disputableTime = { value: DEFAULT_DISPUTE_TIME, validated: true };
-        newState.parameters.percentageNeededForDispute = { value: DEFAULT_PERCENTAGE_FOR_DISPUTE, validated: true };
-        newState.parameters.councilAmount = { value: DEFAULT_COUNCIL_AMOUNT, validated: true };
-        newState.treasury.cancelFee = { value: DEFAULT_CANCEL_FEE, validated: true };
-        newState.treasury.closeFee = { value: DEFAULT_CLOSE_FEE, validated: true };
-        newState.theme.colors = DefaultTheme();
-
-        return newState;
-      });
-    }
-  }, [ wallet?.address, 
-       user?.login, 
-       DAOService, 
-       network, 
-       isCreating, 
-       needsToLoad,
-       router.pathname ]);
-
-  useEffect(() => {
-    if (wallet?.balance)
       Promise.all([
         DAOService.getTokensLockedInRegistryByAddress(wallet.address),
         DAOService.getRegistryCreatorAmount()
@@ -316,202 +337,90 @@ export const NetworkSettingsProvider = ({ children }) => {
           tokensLockedInRegistry,
           registryCreatorAmount
         ]) => {
-          setTokensLocked(previous => ({
-            ...previous,
+          setFields('tokensLocked', {
+            amount: 0,
             locked: tokensLockedInRegistry,
-            needed: registryCreatorAmount
-          }));
+            needed: registryCreatorAmount,
+            validated: tokensLockedInRegistry === registryCreatorAmount
+          })
         });
-  }, [wallet?.balance]);
+      const storageData = localStorage.getItem(`${localStorageKey}:${wallet?.address}`);
+      if(storageData){
+        const {at, data} = JSON.parse(storageData);
+        if(+new Date() - +new Date(at) <= TTL){
+          if(data?.details){
+            setFields('details.name', data?.details.name)
+            setFields('details.description', data?.details.description)
+          }
 
-  // General validation
-  useEffect(() => {
-    setIsSettingsValidated([
-      tokensLocked?.validated,
-      details?.validated,
-      github?.validated,
-      tokens?.validated,
-      settings?.validated !== false
-    ].every( condition => !!condition ));
-  }, [tokensLocked?.validated, details?.validated, github?.validated, tokens?.validated, settings?.validated]);
+          if(data?.settings)
+            setFields('settings', data?.settings)
+          else
+            handlerDefaultSettings();
 
-  // Tokens locked validation
-  useEffect(() => {
-    setTokensLocked(previous => ({
-      ...previous,
-      validated: Fields.amount.validator(tokensLocked?.locked, tokensLocked?.needed)
-    }));
-  }, [tokensLocked?.locked, tokensLocked?.needed]);
+          if(data?.github)
+            setFields('github', data?.github)
 
-  // Details validation
-  useEffect(() => {
-    const validated = [
-      details?.name?.validated,
-      Fields.logo.validator(details?.fullLogo?.value),
-      Fields.logo.validator(details?.iconLogo?.value),
-    ].every(condition => condition);
-
-    setDetails(previous => ({
-      ...previous,
-      validated
-    }));
-  }, [details?.iconLogo, details?.fullLogo, details?.name?.validated]);
-
-  // Settings Validation
-  useEffect(() => {
-    const validated = [
-      !settings?.theme?.similar?.length,
-      settings?.treasury?.validated,
-      settings?.parameters?.draftTime?.validated,
-      settings?.parameters?.disputableTime?.validated,
-      settings?.parameters?.percentageNeededForDispute?.validated,
-      settings?.parameters?.councilAmount?.validated,
-    ].every(condition => condition);
-
-    setSettings(previous => ({
-      ...previous,
-      validated
-    }));
-  }, [ settings?.theme?.similar,
-       settings?.treasury?.validated,
-       settings?.parameters?.councilAmount?.validated, 
-       settings?.parameters?.disputableTime?.validated, 
-       settings?.parameters?.draftTime?.validated, 
-       settings?.parameters?.percentageNeededForDispute?.validated ]);
-
-  useEffect(() => {
-    const colors = settings?.theme?.colors;
-    
-    if (!colors?.primary) return;
-    
-    const similar = [];
-
-    similar.push(...isColorsSimilar({ label: "text", code: colors.text }, [
-      { label: "primary", code: colors.primary },
-      { label: "background", code: colors.background },
-      { label: "shadow", code: colors.shadow },
-    ]));
-
-    similar.push(...isColorsSimilar({ label: "background", code: colors.background }, [
-        { label: "success", code: colors.success },
-        { label: "danger", code: colors.danger },
-        { label: "warning", code: colors.warning },
-    ]));
-
-    if (!isSameSet(new Set(similar), new Set(settings?.theme?.similar)))
-      setSettings(previous => ({
-        ...previous,
-        theme: {
-          ...previous.theme,
-          similar
+          if(data?.tokens)
+            setFields('tokens', data?.tokens)
         }
-      }));
-  }, [ settings?.theme?.colors?.primary,
-       settings?.theme?.colors?.secondary,
-       settings?.theme?.colors?.oracle,
-       settings?.theme?.colors?.text,
-       settings?.theme?.colors?.background,
-       settings?.theme?.colors?.shadow,
-       settings?.theme?.colors?.gray,
-       settings?.theme?.colors?.success,
-       settings?.theme?.colors?.danger,
-       settings?.theme?.colors?.warning,
-       settings?.theme?.colors?.info ]);
+      } else
+        handlerDefaultSettings();
+    }
 
-  // Treasury validation
-  useEffect(() => {
-    if (!DAOService) return;
-    
-    const isAddressEmptyOrZeroAddress = settings?.treasury?.address?.value?.trim() === "" || 
-      settings?.treasury?.address?.value === Defaults.nativeZeroAddress;
+  }, [ wallet, 
+       user?.login, 
+       DAOService, 
+       network, 
+       isCreating, 
+       needsToLoad,
+       router.pathname]);
 
-    const conditionOrUndefined = condition => isAddressEmptyOrZeroAddress ? undefined : condition;
-
-    Promise.all([
-      conditionOrUndefined(DAOService.isAddress(settings?.treasury?.address?.value)),
-      conditionOrUndefined(settings?.treasury?.cancelFee?.value >= 0 && settings?.treasury?.cancelFee?.value <= 100),
-      conditionOrUndefined(settings?.treasury?.closeFee?.value >= 0 && settings?.treasury?.closeFee?.value <= 100)
-    ]).then(validations => {
-      setSettings(previous => {
-        const newState = { ...previous };
-        newState.treasury.address.validated = validations[0];
-        newState.treasury.cancelFee.validated = validations[1];
-        newState.treasury.closeFee.validated = validations[2];
-        newState.treasury.validated = validations.every(condition => condition !== false);
-
-        return newState;
+  //Load GH Repositories
+  useEffect(()=>{
+    if (user?.login && !networkSettings?.github?.repositories?.length)
+      getUserRepositories(user.login)
+      .then(async (githubRepositories) => {
+        const repositories = [];
+        const filtered = githubRepositories
+          .filter(repo => (
+            !repo?.isFork 
+            && (user.login === repo?.nameWithOwner.split("/")[0])) 
+            || repo?.isInOrganization)
+          .map(repo => ({
+            checked: false,
+            isSaved: false,
+            hasIssues: false,
+            name: repo?.name,
+            fullName: repo?.nameWithOwner
+          }));
+        
+        if (isCreating) repositories.push(...filtered);
+        else {
+          repositories.push(... await searchRepositories({ networkName: network.name })
+            .then(({ rows }) => Promise.all(rows.map( async repo => ({
+              checked: true,
+              isSaved: true,
+              name: repo.githubPath.split("/")[1],
+              fullName: repo.githubPath,
+              hasIssues: await repositoryHasIssues(repo.githubPath)
+            })))));
+          
+          repositories.push(...filtered.filter(repo =>
+            !repositories.find((repoB) => repoB.fullName === repo.fullName)));
+        }
+        setFields('github.repositories', repositories)
       });
-    });
-  }, [ DAOService, 
-       settings?.treasury?.address?.value, 
-       settings?.treasury?.cancelFee?.value, 
-       settings?.treasury?.closeFee?.value ]);
-
-  // Parameters Validation
-  useEffect(() => {
-    setSettings(previous => {
-      const newState = { ...previous };
-      const validations = [
-        Fields.parameter.validator("draftTime", settings?.parameters?.draftTime?.value),
-        Fields.parameter.validator("councilAmount", settings?.parameters?.councilAmount?.value),
-        Fields.parameter.validator("disputableTime", settings?.parameters?.disputableTime?.value),
-        Fields.parameter.validator("percentageNeededForDispute", 
-                                   settings?.parameters?.percentageNeededForDispute?.value)
-      ];
-
-      newState.parameters.draftTime.validated = validations[0];
-      newState.parameters.councilAmount.validated = validations[1];
-      newState.parameters.disputableTime.validated = validations[2];
-      newState.parameters.percentageNeededForDispute.validated = validations[3];
-      newState.parameters.validated = validations.every(condition => condition);
-
-      return newState;
-    });
-  }, [ settings?.parameters?.councilAmount?.value, 
-       settings?.parameters?.disputableTime?.value, 
-       settings?.parameters?.draftTime?.value, 
-       settings?.parameters?.percentageNeededForDispute?.value ]);
-
-  // Github validation
-  useEffect(() => {
-    if (!github?.repositories?.length) return;
-
-    const validated = [
-      Fields.repository.validator(github?.repositories),
-      github?.botPermission
-    ].every(condition => condition);
-
-    if (validated !== github?.validated)
-      setGithub(previous => ({
-        ...previous,
-        validated
-      }));
-  }, [github]);
-
-  // Tokens validation
-  useEffect(() => {
-    const validated = [
-      tokens?.settler?.trim() !== "",
-    ].every(condition => condition);
-
-    setTokens(previous => ({
-      ...previous,
-      validated
-    }));
-  }, [tokens?.settler]);
+  },[user?.login, isCreating]);
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({
-    tokensLocked,
-    details,
-    github,
-    tokens,
-    settings,
-    isSettingsValidated,
+    ...networkSettings,
     forcedNetwork,
     setForcedNetwork,
     LIMITS,
+    cleanStorage,
     fields: Fields
-  }), [tokensLocked, details, github, tokens, settings, isSettingsValidated, Fields, LIMITS, setForcedNetwork]);
+  }), [networkSettings, Fields, LIMITS, setForcedNetwork]);
 
   return (
     <NetworkSettingsContext.Provider value={memorizedValue}>

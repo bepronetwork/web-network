@@ -27,7 +27,7 @@ export default function PaymentItem({
             {formatNumberToCurrency(ammount)}
           </span>
           <span className="text-primary">
-            {`$${issue?.token?.symbol || labelToken}`}
+            {`${issue?.token?.symbol || labelToken}`}
           </span>
         </FlexRow>
 

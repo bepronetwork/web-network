@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { NumberFormatValues } from "react-number-format";
 
 import { useTranslation } from "next-i18next";
@@ -22,32 +23,36 @@ export default function CreateBountyTokenAmount({
   issueAmount,
   setIssueAmount,
   review = false,
-  isFundingType,
+  needValueValidation,
   decimals = 18
 }) {
   const { t } = useTranslation("bounty");
-
+  const [inputError, setInputError] = useState("")
   function getCurrentCoin() {
     return customTokens?.find((token) => token?.address === currentToken);
   }
 
   function handleIssueAmountOnValueChange(values: NumberFormatValues) {
-    if (values.floatValue < 0) {
+    if(needValueValidation && (+values.floatValue > +currentToken?.currentValue)){
+      setIssueAmount({ formattedValue: "" });
+      setInputError(t("bounty:errors.exceeds-allowance"))
+    }else if (values.floatValue < 0) {
       setIssueAmount({ formattedValue: "" });
     } else {
       setIssueAmount(values);
+      inputError && setInputError("")
     }
   }
 
   function handleIssueAmountBlurChange() {
-    if (isFundingType && issueAmount.floatValue > tokenBalance) {
-      setIssueAmount({ formattedValue: tokenBalance.toString() });
+    if (needValueValidation && tokenBalance?.lt(issueAmount.floatValue)) {
+      setIssueAmount({ formattedValue: tokenBalance.toFixed() });
     }
   }
 
   function handleMaxValue() {
     if (review) return;
-    if (!isFundingType) return;
+    if (!needValueValidation) return;
     return (
       <div className="text-gray text-uppercase caption-small">
         {t("fields.set")}
@@ -55,9 +60,9 @@ export default function CreateBountyTokenAmount({
           className="text-primary ms-2 cursor-pointer text-uppercase"
           onClick={() =>
             setIssueAmount({
-              formattedValue: tokenBalance.toString(),
-              floatValue: tokenBalance,
-              value: tokenBalance.toString()
+              formattedValue: tokenBalance.toFixed(),
+              floatValue: tokenBalance.toNumber(),
+              value: tokenBalance.toFixed()
             })
           }
         >
@@ -80,6 +85,7 @@ export default function CreateBountyTokenAmount({
           setToken={setCurrentToken}
           disabled={review}
           defaultToken={defaultToken}
+          showCurrencyValue={needValueValidation}
           needsBalance
         />
       </div>
@@ -87,8 +93,8 @@ export default function CreateBountyTokenAmount({
         <div className="d-flex">
           <InputNumber
             thousandSeparator
-            disabled={review}
-            max={tokenBalance}
+            disabled={review || !currentToken?.currentValue}
+            max={tokenBalance.toFixed()}
             label={
               <div className="d-flex mb-2">
                 <label className="flex-grow-1 caption-small text-gray align-items-center">
@@ -102,9 +108,16 @@ export default function CreateBountyTokenAmount({
             symbol={currentToken?.symbol || t("common:misc.token")}
             value={issueAmount.value}
             placeholder="0"
+            allowNegative={false}
             decimalScale={decimals}
             onValueChange={handleIssueAmountOnValueChange}
             onBlur={handleIssueAmountBlurChange}
+            error={!!inputError}
+            helperText={
+              <>
+              {inputError && <p className="p-small my-2">{inputError}</p>}
+              </>
+            }
           />
           <div className="mt-4 pt-1 mx-2">
             <ArrowRight className="text-gray" width={9} height={9} />
@@ -115,7 +128,8 @@ export default function CreateBountyTokenAmount({
             className="mt-3"
             symbol={"EUR"}
             classSymbol="text-white-30 mt-3"
-            disabled={true}
+            allowNegative={false}
+            disabled
             value={
               getCurrentCoin()?.tokenInfo
                 ? handleTokenToEurConversion(Number(issueAmount.value),

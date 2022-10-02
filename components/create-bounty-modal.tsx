@@ -6,6 +6,7 @@ import {
 import { FormCheck } from "react-bootstrap";
 import { NumberFormatValues } from "react-number-format";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 import router from "next/router";
 
@@ -54,10 +55,10 @@ interface BountyPayload {
   transactional: string;
   branch: string;
   githubUser: string;
-  tokenAmount: number;
+  tokenAmount: string;
   rewardToken?: string;
-  rewardAmount?: number;
-  fundingAmount?: number;
+  rewardAmount?: string;
+  fundingAmount?: string;
 }
 
 const ZeroNumberFormatValues = {
@@ -76,7 +77,7 @@ export default function CreateBountyModal() {
   const [customTokens, setCustomTokens] = useState<Token[]>([]);
   const [isTokenApproved, setIsTokenApproved] = useState(false);
   const [currentSection, setCurrentSection] = useState<number>(0);
-  const [isFundingType, setIsFundingType] = useState<boolean>(true);
+  const [isBountyType, setisBountyType] = useState<boolean>(true);
   const [rewardChecked, setRewardChecked] = useState<boolean>(false);
   const [transactionalToken, setTransactionalToken] = useState<Token>();
   const [bountyDescription, setBountyDescription] = useState<string>("");
@@ -134,6 +135,10 @@ export default function CreateBountyModal() {
 
   function handleRewardChecked(e) {
     setRewardChecked(e.target.checked);
+    if(!(e.target.checked)){
+      setRewardAmount(ZeroNumberFormatValues)
+      setRewardToken(undefined);
+    }
   }
 
   function renderDetails(review = false) {
@@ -191,7 +196,7 @@ export default function CreateBountyModal() {
         issueAmount={fieldParams[type].amount}
         setIssueAmount={fieldParams[type].setAmount}
         tokenBalance={fieldParams[type].balance}
-        isFundingType={fieldParams[type].isFunding}
+        needValueValidation={isBountyType || type === 'reward'}
         labelSelect={fieldParams[type].label}
         review={review}
       />
@@ -210,10 +215,10 @@ export default function CreateBountyModal() {
               <Button
                 color="black"
                 className={`container-bounty w-100 bg-30-hover ${
-                  isFundingType && "funding-type"
+                  isBountyType && "funding-type"
                 }`}
                 onClick={() => {
-                  setIsFundingType(true);
+                  setisBountyType(true);
                   setRewardChecked(false);
                   setRewardAmount(ZeroNumberFormatValues);
                   setIssueAmount(ZeroNumberFormatValues);
@@ -226,10 +231,10 @@ export default function CreateBountyModal() {
               <Button
                 color="black"
                 className={`container-bounty w-100 bg-30-hover ${
-                  !isFundingType && "funding-type"
+                  !isBountyType && "funding-type"
                 }`}
                 onClick={() => {
-                  setIsFundingType(false);
+                  setisBountyType(false);
                   setRewardChecked(true);
                   setIssueAmount(ZeroNumberFormatValues);
                 }}
@@ -238,7 +243,7 @@ export default function CreateBountyModal() {
               </Button>
             </div>
             {renderBountyToken(false, "bounty")}
-            {!isFundingType && (
+            {!isBountyType && (
               <>
                 <div className="col-md-12">
                   <FormCheck
@@ -359,24 +364,24 @@ export default function CreateBountyModal() {
         : false;
     if ((currentSection === 0 && !bountyTitle) || !bountyDescription)
       return true;
-    if (currentSection === 1 && isFundingType && isIssueAmount) return true;
+    if (currentSection === 1 && isBountyType && isIssueAmount) return true;
     if (
       currentSection === 1 &&
-      !isFundingType &&
+      !isBountyType &&
       !rewardChecked &&
       isIssueAmount
     )
       return true;
     if (
       currentSection === 1 &&
-      !isFundingType &&
+      !isBountyType &&
       rewardChecked &&
       isIssueAmount
     )
       return true;
     if (
       currentSection === 1 &&
-      !isFundingType &&
+      !isBountyType &&
       rewardChecked &&
       isRewardAmount
     )
@@ -430,26 +435,29 @@ export default function CreateBountyModal() {
       });
   }
 
-  const isAmountApproved = (tokenAllowance: number, amount: number) => tokenAllowance >= amount;
+  const isAmountApproved = (tokenAllowance: BigNumber, amount: BigNumber) => !tokenAllowance.lt(amount);
 
   async function allowCreateIssue() {
     if (!DAOService || !transactionalToken || issueAmount.floatValue <= 0)
       return;
+
     setIsLoadingApprove(true)
 
+    let tokenAddress = transactionalToken.address;
+    let bountyValue = issueAmount.value;
+    let tokenERC20 = transactionalERC20;
+
     if (rewardChecked && rewardToken?.address && rewardAmount.floatValue > 0) {
-      handleApproveToken(rewardToken.address, rewardAmount.floatValue)
-        .then(() => {
-          return rewardERC20.updateAllowanceAndBalance();
-        })
-        .finally(() => setIsLoadingApprove(false))
-    } else {
-      handleApproveToken(transactionalToken.address, issueAmount.floatValue)
-        .then(() => {
-          return transactionalERC20.updateAllowanceAndBalance();
-        })
-        .finally(() => setIsLoadingApprove(false));
+      tokenAddress = rewardToken.address;
+      bountyValue = rewardAmount.value;
+      tokenERC20 = rewardERC20;
     }
+
+    handleApproveToken(tokenAddress, bountyValue)
+      .then(() => {
+        return tokenERC20.updateAllowanceAndBalance();
+      })
+      .finally(() => setIsLoadingApprove(false));
   }
 
   const verifyTransactionState = (type: TransactionTypes): boolean =>
@@ -472,7 +480,7 @@ export default function CreateBountyModal() {
       const payload = {
         title: bountyTitle,
         body: addFilesInDescription(bountyDescription),
-        amount: issueAmount.floatValue,
+        amount: issueAmount.value,
         creatorAddress: wallet.address,
         githubUser: user?.login,
         repositoryId: repository?.id,
@@ -491,32 +499,33 @@ export default function CreateBountyModal() {
         return dispatch(toastError(t("bounty:errors.creating-bounty")));
       }
       
-      const transactionToast = 
-    addTransaction({ type: TransactionTypes.openIssue, amount: payload.amount },
-                   activeNetwork);
+      const transactionToast =  addTransaction({
+        type: TransactionTypes.openIssue, 
+        amount: payload.amount
+      }, activeNetwork);
 
       dispatch(transactionToast);
 
       const bountyPayload: BountyPayload = {
-      cid,
-      branch,
-      repoPath: repository.path,
-      transactional: transactionalToken.address,
-      title: payload.title,
-      tokenAmount: payload.amount,
-      githubUser: payload.githubUser,
+        cid,
+        branch,
+        repoPath: repository.path,
+        transactional: transactionalToken.address,
+        title: payload.title,
+        tokenAmount: payload.amount,
+        githubUser: payload.githubUser,
       };
 
-      if (!isFundingType && !rewardChecked) {
-        bountyPayload.tokenAmount = 0;
-        bountyPayload.fundingAmount = issueAmount.floatValue;
+      if (!isBountyType && !rewardChecked) {
+        bountyPayload.tokenAmount = "0";
+        bountyPayload.fundingAmount = issueAmount.value;
       }
 
       if (rewardChecked) {
-        bountyPayload.tokenAmount = 0;
-        bountyPayload.rewardAmount = rewardAmount.floatValue;
+        bountyPayload.tokenAmount = "0";
+        bountyPayload.rewardAmount = rewardAmount.value;
         bountyPayload.rewardToken = rewardToken.address;
-        bountyPayload.fundingAmount = issueAmount.floatValue;
+        bountyPayload.fundingAmount = issueAmount.value;
       }
 
       const networkBounty = await DAOService.openBounty(bountyPayload).catch((e) => {
@@ -576,11 +585,11 @@ export default function CreateBountyModal() {
 
   useEffect(() => {
     if (transactionalToken?.address) transactionalERC20.setAddress(transactionalToken.address);
-  }, [transactionalToken, wallet, DAOService]);
+  }, [transactionalToken?.address, wallet, DAOService]);
 
   useEffect(() => {
     if (rewardToken?.address) rewardERC20.setAddress(rewardToken.address);
-  }, [rewardToken, wallet, DAOService]);
+  }, [rewardToken?.address, wallet, DAOService]);
 
   useEffect(() => {
     setIssueAmount(ZeroNumberFormatValues);
@@ -602,11 +611,13 @@ export default function CreateBountyModal() {
   }, [customTokens]);
 
   useEffect(() => {
-    if (isFundingType)
-      setIsTokenApproved(isAmountApproved(transactionalERC20.allowance, issueAmount.floatValue));
+    if (isBountyType)
+      setIsTokenApproved(isAmountApproved(transactionalERC20.allowance, BigNumber(issueAmount.value)));
+    else if (rewardChecked)
+      setIsTokenApproved(isAmountApproved(rewardERC20.allowance, BigNumber(rewardAmount.value)));
     else
-      setIsTokenApproved(isAmountApproved(rewardERC20.allowance, rewardAmount.floatValue));
-  }, [transactionalERC20.allowance, rewardERC20.allowance, issueAmount.floatValue, rewardAmount.floatValue]);
+      setIsTokenApproved(true);
+  }, [transactionalERC20.allowance, rewardERC20.allowance, issueAmount.value, rewardAmount.value, rewardChecked]);
 
   useEffect(() => {
     if (!settings?.contracts?.settlerToken || activeNetwork?.tokens === undefined) return;

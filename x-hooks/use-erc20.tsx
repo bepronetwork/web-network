@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, useContext } from "react";
 
 import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
+import BigNumber from "bignumber.js";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
@@ -20,10 +21,10 @@ import useBepro from "x-hooks/use-bepro";
 import useTransactions from "./useTransactions";
 
 export default function useERC20() {
-  const [balance, setBalance] = useState(0);
+  const [balance, setBalance] = useState(BigNumber(0));
   const [name, setName] = useState<string>();
   const [decimals, setDecimals] = useState(18); 
-  const [allowance, setAllowance] = useState(0);
+  const [allowance, setAllowance] = useState(BigNumber(0));
   const [symbol, setSymbol] = useState<string>();
   const [address, setAddress] = useState<string>();
 
@@ -52,7 +53,7 @@ export default function useERC20() {
       .catch(error => console.debug("useERC20:getAllowance", logData, error));
   }, [wallet?.address, DAOService, address]);
 
-  const approve = useCallback((amount: number) => {
+  const approve = useCallback((amount: string) => {
     if (!wallet?.address || !DAOService || !address || !amount) return;
 
     return handleApproveToken(address, amount).then(updateAllowanceAndBalance);
@@ -76,7 +77,7 @@ export default function useERC20() {
                                         cap: string, 
                                         ownerAddress: string): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
-      const transaction = addTransaction({ type: TransactionTypes.deployBountyToken }, activeNetwork);
+      const transaction = addTransaction({ type: TransactionTypes.deployERC20Token }, activeNetwork);
 
       dispatch(transaction);
 

@@ -23,10 +23,12 @@ interface IPullRequestHeroProps {
 export default function PullRequestHero({
   currentPullRequest
 }: IPullRequestHeroProps) {
-  const { activeIssue } = useIssue();
-  const router = useRouter();
-  const {getURLWithNetwork} = useNetworkTheme()
   const { t } = useTranslation(["common", "pull-request"]);
+  
+  const router = useRouter();
+  
+  const { getURLWithNetwork } = useNetworkTheme()
+  const { activeIssue, networkIssue } = useIssue();
 
   return (
     <div className="banner-shadow">
@@ -86,8 +88,8 @@ export default function PullRequestHero({
 
           <div className="col-2 d-flex align-items-center justify-content-center">
             <PriceConversor
-              currentValue={activeIssue?.amount || 0}
-              currency="BEPRO"
+              currentValue={activeIssue?.amount?.toFixed() || "0"}
+              currency={networkIssue?.transactionalTokenData?.symbol || t("misc.token")}
             />
           </div>
         </div>

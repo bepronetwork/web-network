@@ -27,7 +27,7 @@ export default function Modal({
   subTitleComponent,
   okDisabled = false,
   okColor = "primary",
-  isOkActionExecuting = false,
+  isExecuting = false,
   ...params
 }: ModalProps) {
   const modalTitle = `${kebabCase(key || title)}-modal`;
@@ -45,12 +45,12 @@ export default function Modal({
 
           {okLabel && (
             <button
-              disabled={okDisabled || isOkActionExecuting}
+              disabled={okDisabled || isExecuting}
               className={`btn btn-${okColor}`}
               onClick={() => onOkClick()}
             >
               {okLabel}
-              { isOkActionExecuting && 
+              { isExecuting && 
                 <span className="spinner-border spinner-border-xs ml-1" />
               }
             </button>
@@ -89,7 +89,7 @@ export default function Modal({
             transparent
             className="close-button p-1 position-absolute end-94 text-gray mt-1"
             onClick={onCloseClick}
-            disabled={onCloseDisabled}
+            disabled={isExecuting||onCloseDisabled}
           >
             <CloseIcon />
           </Button>

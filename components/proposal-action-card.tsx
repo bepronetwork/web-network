@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import { useAuthentication } from "contexts/authentication";
@@ -16,6 +17,7 @@ import { Proposal } from "interfaces/proposal";
 import Button from "./button";
 import ProposalMerge from "./proposal-merge";
 import ProposalProgressBar from "./proposal-progress-bar";
+
 
 interface IProposalActionCardProps {
   proposal: Proposal;
@@ -46,6 +48,7 @@ export default function ProposalActionCard({
   const { service: DAOService } = useDAO();
   const { networkIssue, activeIssue } = useIssue();
 
+  const bountyAmount = BigNumber.maximum(activeIssue?.amount || 0, activeIssue?.fundingAmount || 0);
 
   const isDisable = () => [
     networkIssue?.closed,
@@ -53,7 +56,7 @@ export default function ProposalActionCard({
     networkProposal?.isDisputed,
     networkProposal?.refusedByBountyOwner,
     !networkProposal?.canUserDispute,
-    wallet?.balance?.oracles?.locked === 0,
+    wallet?.balance?.oracles?.locked?.isZero(),
     isMerging,
     isRefusing
   ].some((v) => v);
@@ -124,7 +127,7 @@ export default function ProposalActionCard({
           <div className="d-flex flex-row justify-content-between mt-3">
 
             <ProposalMerge 
-              amountTotal={Math.max(activeIssue?.amount || 0, activeIssue?.fundingAmount || 0)} 
+              amountTotal={bountyAmount} 
               tokenSymbol={activeIssue?.token?.symbol} 
               proposal={networkProposal}
               isMerging={isMerging}

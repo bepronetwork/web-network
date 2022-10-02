@@ -24,6 +24,7 @@ export default function InputNumber({
   errorMessage,
   setMaxValue,
   description,
+  allowNegative = false,
   ...params
 }: InputNumberProps) {
   const { t } = useTranslation(["common"]);
@@ -67,6 +68,7 @@ export default function InputNumber({
           htmlFor={id}
           min={min}
           placeholder={placeholder}
+          allowNegative={allowNegative}
           {...params}
         />
         {symbol && (
@@ -86,9 +88,11 @@ export default function InputNumber({
         )}
         {setMaxValue && (
           <span
-            className={clsx("input-group-text caption-medium border-radius-8 cursor-pointer",
+            className={clsx("input-group-text caption-medium border-radius-8",
                             classSymbol,
                             {
+                "group-disabled": params?.disabled,
+                "cursor-pointer": !params?.disabled,
                 "border border-1 border-success": success,
                 "border border-1 border-danger": error,
                 "border border-1 border-warning": warning,

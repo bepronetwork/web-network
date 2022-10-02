@@ -1,10 +1,10 @@
 import ArrowRightLine from "assets/icons/arrow-right-line";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import { formatStringToCurrency } from "helpers/formatNumber";
 
 interface AmountWithPreviewProps {
-  amount: number | string;
-  preview?: number | string;
+  amount: string;
+  preview?: string;
   previewColor?: string;
   amountColor: string;
   type: "currency" | "percent";
@@ -18,16 +18,16 @@ export default function AmountWithPreview({
   type
 }: AmountWithPreviewProps) {
   function renderAmount() {
-    if (type === "percent") return `${formatNumberToCurrency(amount, { maximumFractionDigits: 2 })}%`;
+    if (type === "percent") return `${formatStringToCurrency(amount)}%`;
     else if (isNaN(+amount)) return `${amount}`;
     
-    return formatNumberToCurrency(amount, { maximumFractionDigits: 18 });
+    return formatStringToCurrency(amount);
   }
 
   function renderPreview() {
-    if (type === "percent") return `${formatNumberToCurrency(preview, { maximumFractionDigits: 2 })}%`;
+    if (type === "percent") return `${formatStringToCurrency(preview)}%`;
 
-    return formatNumberToCurrency(preview, { maximumFractionDigits: 18 });
+    return formatStringToCurrency(preview);
   }
 
   return(

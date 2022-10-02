@@ -8,6 +8,7 @@ import React, {
 import { Spinner } from "react-bootstrap";
 import { NumberFormatValues } from "react-number-format";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
@@ -20,22 +21,20 @@ import OraclesBoxHeader from "components/oracles-box-header";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import { ApplicationContext } from "contexts/application";
-import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import { formatNumberToNScale, formatStringToCurrency } from "helpers/formatNumber";
 
 import { Wallet } from "interfaces/authentication";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 
-import useBepro from "x-hooks/use-bepro";
+import useERC20 from "x-hooks/use-erc20";
 
 interface OraclesActionsProps {
   wallet: Wallet;
   updateWalletBalance: () => void;
 }
-
 
 function OraclesActions({
   wallet,
@@ -50,22 +49,20 @@ function OraclesActions({
 
   const [error, setError] = useState<string>("");
   const [show, setShow] = useState<boolean>(false);
+  const [isApproving, setIsApproving] = useState<boolean>(false)
   const [action, setAction] = useState<string>(actions[0]);
-  const [tokenAmount, setTokenAmount] = useState<number | undefined>();
-  const [networkTokenAllowance, setNetworkTokenAllowance] = useState(0);
+  const [tokenAmount, setTokenAmount] = useState<string>();
 
   const networkTxRef = useRef<HTMLButtonElement>(null);
 
+  const networkTokenERC20 = useERC20();
   const { activeNetwork } = useNetwork();
-  const { service: DAOService } = useDAO();
-  const { handleApproveToken } = useBepro();
   const { state: { myTransactions }} = useContext(ApplicationContext);
 
-  const networkTokenSymbol = activeNetwork?.networkToken?.symbol || t("misc.$token");
+  const networkTokenSymbol = networkTokenERC20.symbol || t("misc.$token");
+  const networkTokenDecimals = networkTokenERC20.decimals || 18;
 
-  const renderAmount = tokenAmount
-    ? `${formatNumberToCurrency(tokenAmount, {maximumFractionDigits: 18})}`
-    : "0";
+  const exceedsAvailable = value => BigNumber(value).gt(getMaxAmmount());
 
   const verifyTransactionState = (type: TransactionTypes): boolean =>
     !!myTransactions.find((transactions) =>
@@ -81,7 +78,7 @@ function OraclesActions({
                token: activeNetwork?.networkToken?.symbol 
              }),
       label: t("my-oracles:actions.lock.get-amount-oracles", {
-        amount: renderAmount,
+        amount: formatNumberToNScale(tokenAmount),
         token: activeNetwork?.networkToken?.symbol 
       }),
       caption: (
@@ -96,7 +93,7 @@ function OraclesActions({
       ),
       body: 
         t("my-oracles:actions.lock.body", { 
-          amount: renderAmount, 
+          amount: formatNumberToNScale(tokenAmount), 
           currency: networkTokenSymbol,
           token: activeNetwork?.networkToken?.symbol
         }),
@@ -113,7 +110,7 @@ function OraclesActions({
           token: activeNetwork?.networkToken?.symbol
         }),
       label: t("my-oracles:actions.unlock.get-amount-bepro", {
-        amount: renderAmount,
+        amount: formatNumberToNScale(tokenAmount),
         currency: networkTokenSymbol,
         token: activeNetwork?.networkToken?.symbol
       }),
@@ -127,7 +124,7 @@ function OraclesActions({
         </>
       ),
       body: t("my-oracles:actions.unlock.body", { 
-        amount: renderAmount,
+        amount: formatNumberToNScale(tokenAmount),
         currency: networkTokenSymbol,
         token: activeNetwork?.networkToken?.symbol
       }),
@@ -139,10 +136,12 @@ function OraclesActions({
 
   const isButtonDisabled = (): boolean =>
     [
-      tokenAmount < 1e-18,
       action === t("my-oracles:actions.lock.label") && needsApproval(),
       !wallet?.address,
-      tokenAmount > getMaxAmmount(),
+      BigNumber(tokenAmount).isZero(),
+      BigNumber(tokenAmount).isNaN(),
+      exceedsAvailable(tokenAmount),
+      !tokenAmount,
       myTransactions.find(({ status, type }) =>
           status === TransactionStatus.pending && type === getTxType())
     ].some((values) => values);
@@ -155,14 +154,14 @@ function OraclesActions({
     }
     const isChecked = !needsApproval();
     setShow(isChecked);
-    setError(!isChecked ? t("my-oracles:errors.approve-transactions", {
-      currency: networkTokenSymbol
-    }) : "")
+    setError(!isChecked ? t("my-oracles:errors.approve-transactions", { currency: networkTokenSymbol }) : "")
   }
 
   function onSuccess() {
     setError("");
+    setTokenAmount("");
     updateWalletBalance();
+    networkTokenERC20.updateAllowanceAndBalance();
   }
 
   function handleChangeToken(params: NumberFormatValues) {
@@ -170,12 +169,10 @@ function OraclesActions({
 
     if (params.value === "") return setTokenAmount(undefined);
 
-    if (params.floatValue < 1 || !params.floatValue) return setTokenAmount(0);
-
-    if (params.floatValue > getMaxAmmount())
+    if (exceedsAvailable(params.value))
       setError(t("my-oracles:errors.amount-greater", { amount: getCurrentLabel() }));
 
-    setTokenAmount(params.floatValue);
+    setTokenAmount(params.value);
   }
 
   function handleConfirm() {
@@ -184,14 +181,14 @@ function OraclesActions({
   }
 
   function handleCancel() {
-    setTokenAmount(0);
+    setTokenAmount("0");
     setShow(false);
   }
 
   function approveSettlerToken() {
-    if (!wallet?.address || !DAOService) return;
-
-    handleApproveToken(DAOService.network.networkToken.contractAddress, tokenAmount).then(updateAllowance);
+    setIsApproving(true);
+    networkTokenERC20.approve(tokenAmount)
+     .finally(() => setIsApproving(false));
   }
 
   function getCurrentLabel() {
@@ -200,12 +197,11 @@ function OraclesActions({
       : t("$oracles", { token: activeNetwork?.networkToken?.symbol });
   }
 
-  function getMaxAmmount(): number {
-    return (
-      action === t("my-oracles:actions.lock.label") ?
-        wallet?.balance?.bepro :
-      +wallet?.balance?.oracles?.locked
-    );
+  function getMaxAmmount(): string {
+    if (action === t("my-oracles:actions.lock.label")) 
+      return wallet?.balance?.bepro?.toFixed();
+
+    return wallet?.balance?.oracles?.locked?.toFixed();
   }
 
   function setMaxAmmount() {
@@ -218,18 +214,13 @@ function OraclesActions({
       : TransactionTypes.unlock;
   }
 
-  function updateAllowance() {
-    DAOService.getSettlerTokenAllowance(wallet.address)
-    .then(setNetworkTokenAllowance)
-    .catch(console.log);
-  }
-
-  const needsApproval = () => tokenAmount > networkTokenAllowance && action === t("my-oracles:actions.lock.label");
+  const needsApproval = () => 
+    networkTokenERC20.allowance.isLessThan(tokenAmount) && action === t("my-oracles:actions.lock.label");
 
   useEffect(() => {
-    if (wallet?.address && DAOService && activeNetwork?.networkAddress) 
-      updateAllowance();
-  }, [wallet, DAOService, activeNetwork?.networkAddress]);
+    if (activeNetwork?.networkToken?.address) 
+      networkTokenERC20.setAddress(activeNetwork.networkToken.address);
+  }, [activeNetwork?.networkToken?.address]);
 
   return (
     <>
@@ -256,7 +247,7 @@ function OraclesActions({
                 ? "text-purple"
                 : "text-primary"
             }`}
-            max={wallet?.balance?.bepro}
+            max={wallet?.balance?.bepro?.toFixed()}
             error={!!error}
             value={tokenAmount}
             min={0}
@@ -266,13 +257,12 @@ function OraclesActions({
             onValueChange={handleChangeToken}
             thousandSeparator
             decimalSeparator="."
-            decimalScale={18}
+            allowNegative={false}
+            decimalScale={networkTokenDecimals}
             helperText={
               <>
-                {formatNumberToCurrency(getMaxAmmount(), {
-                  maximumFractionDigits: 18
-                })}{" "}
-                {getCurrentLabel()} Available
+                {formatStringToCurrency(getMaxAmmount())}{" "}
+                {getCurrentLabel()} {t("misc.available")}
                 <span
                   className={`caption-small ml-1 cursor-pointer text-uppercase ${`${
                     getCurrentLabel() === t("$oracles", { token: activeNetwork?.networkToken?.symbol })
@@ -292,7 +282,7 @@ function OraclesActions({
             <div className="mt-5 d-grid gap-3">
               {action === t("my-oracles:actions.lock.label") && (
                 <Button
-                  disabled={!needsApproval()}
+                  disabled={!needsApproval() || isApproving}
                   className="ms-0 read-only-button"
                   onClick={approveSettlerToken}
                 >

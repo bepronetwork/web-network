@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next/types";
@@ -17,7 +18,7 @@ export default function PageDevelopers() {
 
   const { getTotalUsers } = useApi();
   const { service: DAOService } = useDAO();
-  const { activeNetwork } = useNetwork();
+  const { activeNetwork } = useNetwork()
 
   const [infos, setInfos] = useState<InfosHero[]>([
     {
@@ -40,12 +41,12 @@ export default function PageDevelopers() {
   ]);
 
   useEffect(() => {
-    if (!DAOService || !activeNetwork?.networkToken) return;
+    if (!DAOService) return;
 
     Promise.all([
       DAOService.getClosedBounties().catch(() => 0),
       DAOService.getOpenBounties().catch(() => 0),
-      DAOService.getTotalNetworkToken().catch(() => 0),
+      DAOService.getTotalNetworkToken().catch(() => BigNumber(0)),
       getTotalUsers(),
     ]).then(([closed, inProgress, onNetwork, totalUsers]) => {
       setInfos([
@@ -58,9 +59,9 @@ export default function PageDevelopers() {
           label: t("heroes.bounties-closed")
         },
         {
-          value: onNetwork,
+          value: onNetwork.toNumber(),
           label: t("heroes.bounties-in-network"),
-          currency: activeNetwork.networkToken.symbol || t("misc.$token")
+          currency: t("$oracles",{ token: activeNetwork?.networkToken?.symbol || t("misc.$token") })
         },
         {
           value: totalUsers,
@@ -68,7 +69,7 @@ export default function PageDevelopers() {
         }
       ]);
     });
-  }, [DAOService, activeNetwork?.networkToken]);
+  }, [DAOService, activeNetwork]);
 
   return (
     <>
@@ -77,7 +78,7 @@ export default function PageDevelopers() {
         subtitle={t("heroes.bounties.subtitle")}
         infos={infos}
       />
-
+    
       <ListIssues />
     </>
   );

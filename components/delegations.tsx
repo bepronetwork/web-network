@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import OracleIcon from "assets/icons/oracle-icon";
@@ -9,7 +10,7 @@ import DelegationItem from "components/delegation-item";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import { formatStringToCurrency } from "helpers/formatNumber";
 
 import InfoTooltip from "./info-tooltip";
 import { FlexRow } from "./profile/wallet-balance";
@@ -26,6 +27,8 @@ export default function Delegations({
   const { activeNetwork } = useNetwork();
   const { wallet, updateWalletBalance } = useAuthentication();
 
+  const walletDelegations = wallet?.balance?.oracles?.delegations || [];
+
   const renderInfo = {
     toMe: {
       title: t("profile:deletaged-to-me"),
@@ -35,9 +38,10 @@ export default function Delegations({
     },
     toOthers: {
       title: t("profile:deletaged-to-others"),
+      total: formatStringToCurrency(walletDelegations.reduce((acc, delegation) => 
+        delegation.amount.plus(acc), BigNumber(0)).toFixed()),
       description: 
              t("my-oracles:descriptions.oracles-delegated-to-others", { token: activeNetwork?.networkToken?.symbol }),
-      total: wallet?.balance?.oracles?.delegations?.reduce((acc, delegation) => acc + delegation.amount, 0),
       delegations: wallet?.balance?.oracles?.delegations || []
     }
   };
@@ -70,7 +74,7 @@ export default function Delegations({
           <FlexRow className="align-items-center">
             <span className="caption-large text-white mr-2 font-weight-medium">{t("misc.total")}</span>
             <span className="caption-large text-white bg-dark-gray py-2 px-3 rounded-3 font-weight-medium">
-              {formatNumberToCurrency(renderInfo[type].total)}
+              {formatStringToCurrency(renderInfo[type].total)}
             </span>
           </FlexRow>
         }
@@ -85,7 +89,7 @@ export default function Delegations({
               <DelegationItem
                 key={`delegation-${delegation.id}-${delegation.to}`}
                 type={type}
-                delegation={delegation} 
+                delegation={type === "toMe" ? {amount: delegation} : delegation} 
                 tokenName={networkTokenName}
               />)
           }

@@ -53,7 +53,11 @@ export default function MainNav() {
   const { network, getURLWithNetwork } = useNetwork();
 
   const isNetworksPage = ["/networks", "/new-network"].includes(pathname);
-  const isBeproNetwork = !network?.name || network?.name === settings?.defaultNetworkConfig?.name;
+  const isBeproNetwork = [
+    !network?.name,
+    !settings?.defaultNetworkConfig?.name,
+    network?.name === settings?.defaultNetworkConfig?.name
+  ].some(c => c);
 
   useEffect(() => {
     if (!DAOService || !wallet?.address || !isNetworksPage) return;
@@ -132,17 +136,6 @@ export default function MainNav() {
                     uppercase
                   />
                 </li>
-
-                <li>
-                  <InternalLink
-                    href={getURLWithNetwork("/oracle")}
-                    label={<Translation label={"main-nav.Oracle"} 
-                                        params={{ token: network?.networkToken?.symbol }} />}
-                    nav
-                    uppercase
-                  />
-                </li>
-
                 <li>
                   <InternalLink
                     href={"/networks"}

@@ -24,7 +24,7 @@ import { useNetwork } from "contexts/network";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 import { changeShowCreateBountyState } from "contexts/reducers/change-show-create-bounty";
 
-import { IssueData } from "interfaces/issue-data";
+import { IssueState, IssueBigNumberData } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import usePage from "x-hooks/use-page";
@@ -42,7 +42,7 @@ type FiltersByIssueState = Filter[];
 interface ListIssuesProps {
   creator?: string;
   redirect?: string | UrlObject;
-  filterState?: string;
+  filterState?: IssueState;
   emptyMessage?: string;
   buttonMessage?: string;
   pullRequester?: string;
@@ -51,7 +51,7 @@ interface ListIssuesProps {
 
 interface IssuesPage {
   page: number;
-  issues: IssueData[];
+  issues: IssueBigNumberData[];
 }
 
 export default function ListIssues({
@@ -291,13 +291,13 @@ export default function ListIssues({
                 },
                 {
                   value: "highest-bounty",
-                  sortBy: "amount",
+                  sortBy: "amount,fundingAmount",
                   order: "DESC",
                   label: t("sort.types.highest-bounty")
                 },
                 {
                   value: "lowest-bounty",
-                  sortBy: "amount",
+                  sortBy: "amount,fundingAmount",
                   order: "ASC",
                   label: t("sort.types.lowest-bounty")
                 }

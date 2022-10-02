@@ -1,6 +1,7 @@
 import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { NumberFormatValues } from "react-number-format";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import InputNumber from "components/input-number";
@@ -11,7 +12,7 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import { ApplicationContext } from "contexts/application";
 import { useNetwork } from "contexts/network";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import { formatStringToCurrency } from "helpers/formatNumber";
 
 import { Wallet } from "interfaces/authentication";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
@@ -27,29 +28,31 @@ function OraclesDelegate({
   const { t } = useTranslation(["common", "my-oracles"]);
 
   const [error, setError] = useState<string>("");
-  const [availableAmount, setAvailableAmount] = useState(0);
+  const [tokenAmount, setTokenAmount] = useState<string>();
   const [delegatedTo, setDelegatedTo] = useState<string>("");
-  const [tokenAmount, setTokenAmount] = useState<number | undefined>();
+  const [availableAmount, setAvailableAmount] = useState<BigNumber>();
+
   const { activeNetwork } = useNetwork();
 
   const {
     state: { myTransactions }
   } = useContext(ApplicationContext);
 
+  const networkTokenDecimals = activeNetwork?.networkToken?.decimals || 18;
+  const networkTokenSymbol = activeNetwork?.networkToken?.symbol;
+
   function handleChangeOracles(params: NumberFormatValues) {
-    if (params.value === "") return setTokenAmount(undefined);
+    if (params.value === "") return setTokenAmount("");
 
-    if (params.floatValue < 1 || !params.floatValue) return setTokenAmount(0);
-
-    if (params.floatValue > availableAmount)
+    if (availableAmount.lt(params.value))
       setError(t("my-oracles:errors.amount-greater", { amount: "total" }));
     else setError("");
 
-    setTokenAmount(params.floatValue);
+    setTokenAmount(params.value);
   }
 
   function setMaxAmmount() {
-    return setTokenAmount(availableAmount);
+    return setTokenAmount(availableAmount.toFixed());
   }
 
   function handleChangeAddress(params: ChangeEvent<HTMLInputElement>) {
@@ -64,57 +67,57 @@ function OraclesDelegate({
   }
 
   function handleTransition() {
-    handleChangeOracles({ floatValue: 0, formattedValue: "0", value: "0" });
+    handleChangeOracles({ floatValue: 0, formattedValue: "", value: "" });
     setDelegatedTo("");
     setError("");
+
   }
 
   const isButtonDisabled = (): boolean =>
     [
-      tokenAmount < 1,
-      tokenAmount > +wallet?.balance?.oracles?.locked,
+      wallet?.balance?.oracles?.locked?.lt(tokenAmount),
       !delegatedTo,
       isAddressesEqual(),
+      BigNumber(tokenAmount).isZero(),
+      BigNumber(tokenAmount).isNaN(),
       myTransactions.find(({ status, type }) =>
           status === TransactionStatus.pending &&
           type === TransactionTypes.delegateOracles)
     ].some((values) => values);
 
-  const isAddressesEqual = () =>
-    wallet?.address &&
-    delegatedTo?.toLowerCase() === wallet?.address?.toLowerCase();
+  const isAddressesEqual = () => wallet?.address && delegatedTo?.toLowerCase() === wallet?.address?.toLowerCase();
 
   useEffect(() => {
     if (!wallet?.balance) return;
 
-    setAvailableAmount(+wallet?.balance?.oracles?.locked);
+    setAvailableAmount(wallet?.balance?.oracles?.locked || BigNumber("0"));
   }, [wallet?.balance]);
 
   return (
     <div className="col-md-6">
       <div className="content-wrapper h-100">
         <OraclesBoxHeader
-          actions={t("my-oracles:actions.delegate.title", { token: activeNetwork?.networkToken?.symbol })}
+          actions={t("my-oracles:actions.delegate.title", { token: networkTokenSymbol })}
         />
         <p className="caption-small text-white text-uppercase mt-2 mb-3">
-          {t("my-oracles:actions.delegate.description", { token: activeNetwork?.networkToken?.symbol })}
+          {t("my-oracles:actions.delegate.description", { token: networkTokenSymbol })}
         </p>
         <InputNumber
-          label={t("my-oracles:fields.oracles.label", { token: activeNetwork?.networkToken?.symbol })}
+          label={t("my-oracles:fields.oracles.label", { token: networkTokenSymbol })}
           value={tokenAmount}
-          symbol={t("$oracles", { token: activeNetwork?.networkToken?.symbol })}
+          symbol={t("$oracles", { token: networkTokenSymbol })}
           classSymbol="text-purple"
           onValueChange={handleChangeOracles}
           min={0}
-          placeholder={t("my-oracles:fields.oracles.placeholder", { token: activeNetwork?.networkToken?.symbol })}
+          placeholder={t("my-oracles:fields.oracles.placeholder", { token: networkTokenSymbol })}
           thousandSeparator
           error={!!error}
+          decimalScale={networkTokenDecimals}
+          allowNegative={false}
           helperText={
             <>
-              {formatNumberToCurrency(availableAmount, {
-                maximumFractionDigits: 18
-              })}{" "}
-              {`${t("$oracles", { token: activeNetwork?.networkToken?.symbol })} ${t("my-oracles:available")}`}
+              {formatStringToCurrency(availableAmount?.toFixed())}{" "}
+              {`${t("$oracles", { token: networkTokenSymbol })} ${t("misc.available")}`}
               <span
                 className="caption-small ml-1 cursor-pointer text-uppercase text-purple"
                 onClick={setMaxAmmount}
@@ -141,7 +144,7 @@ function OraclesDelegate({
           />
           {(isAddressesEqual() && (
             <small className="text-danger text-italic">
-              {t("my-oracles:errors.self-delegate", { token: activeNetwork?.networkToken?.symbol })}
+              {t("my-oracles:errors.self-delegate", { token: networkTokenSymbol })}
             </small>
           )) ||
             ""}
@@ -154,10 +157,10 @@ function OraclesDelegate({
             className="read-only-button"
             txParams={{ tokenAmount, from: delegatedTo }}
             txType={TransactionTypes.delegateOracles}
-            txCurrency={t("$oracles", { token: activeNetwork?.networkToken?.symbol })}
-            modalTitle={t("my-oracles:actions.delegate.title", { token: activeNetwork?.networkToken?.symbol })}
+            txCurrency={t("$oracles", { token: networkTokenSymbol })}
+            modalTitle={t("my-oracles:actions.delegate.title", { token: networkTokenSymbol })}
             modalDescription={t("my-oracles:actions.delegate.delegate-to-address", 
-                              { token: activeNetwork?.networkToken?.symbol })}
+                              { token: networkTokenSymbol })}
             onTxStart={handleClickVerification}
             onSuccess={handleTransition}
             onFail={setError}

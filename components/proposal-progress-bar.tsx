@@ -65,7 +65,7 @@ export default function ProposalProgressBar({
   function loadDisputeState() {
     setIssueState(getStateText());
     setIssueColor(getStateColor());
-    setPercentage(+toPercent(issueDisputeAmount, wallet?.balance?.staked));
+    setPercentage(+toPercent(issueDisputeAmount, wallet?.balance?.staked?.toNumber()));
   }
 
   function renderColumn(dotLabel, index) {
@@ -118,7 +118,7 @@ export default function ProposalProgressBar({
             <span className={`text-${issueColor} text-uppercase`}>
               {formatNumberToNScale(issueDisputeAmount)}{" "}
             </span>{" "}
-            /{formatNumberToNScale(wallet?.balance?.staked || 0)}{" "}
+            /{formatNumberToNScale(wallet?.balance?.staked?.toNumber() || 0)}{" "}
             <Translation label="$oracles" params={{ token: activeNetwork?.networkToken?.symbol }}/>{" "}
             <span className={`text-${issueColor}`}> ({percentage}%)</span>
           </div>

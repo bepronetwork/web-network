@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import { head } from "lodash";
 
 import { getSettingsFromSessionStorage } from "helpers/settings";
@@ -13,7 +14,7 @@ import {
   MergeClosedIssueParams,
   CreateReviewParams
 } from "interfaces/api";
-import { IssueData, pullRequest } from "interfaces/issue-data";
+import { IssueBigNumberData, IssueData, pullRequest } from "interfaces/issue-data";
 import { Network } from "interfaces/network";
 import { PaginatedData } from "interfaces/paginated-data";
 import { Proposal } from "interfaces/proposal";
@@ -87,12 +88,20 @@ export default function useApi() {
     }).toString();
     return api
       .get<{
-        rows: IssueData[];
+        rows: IssueBigNumberData[];
         count: number;
         pages: number;
         currentPage: number;
       }>(`/search/issues/?${params}`)
-      .then(({ data }) => data)
+      .then(({ data }) => ({
+        ...data,
+        rows: data.rows.map(row => ({
+          ...row,
+          amount: BigNumber(row.amount),
+          fundingAmount: BigNumber(row.fundingAmount),
+          fundedAmount: BigNumber(row.fundedAmount)
+        }))
+      }))
       .catch(() => ({ rows: [], count: 0, pages: 0, currentPage: 1 }));
   }
 
@@ -354,15 +363,6 @@ export default function useApi() {
         throw error;
       });
   }
-
-  async function registerNetwork(networkInfo) {
-    return api
-      .patch("/network", { ...networkInfo })
-      .then((response) => response)
-      .catch((error) => {
-        throw error;
-      });
-  }
   
   async function uploadFiles(files: File | File[]): Promise<FileUploadReturn> {
     const form = new FormData();
@@ -433,7 +433,7 @@ export default function useApi() {
         throw error;
       });
   }
-
+  
   async function getTokens() {
     return api
       .get<Token[]>(`/tokens`)
@@ -442,7 +442,6 @@ export default function useApi() {
         throw error;
       });
   }
-
 
   async function searchNetworks({
     page = "1",
@@ -536,7 +535,6 @@ export default function useApi() {
     cancelPrePullRequest,
     resetUser,
     getSettings,
-    registerNetwork,
     getTokens,
   };
 }

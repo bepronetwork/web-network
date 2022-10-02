@@ -1,11 +1,13 @@
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import BigNumber from "bignumber.js";
+
+import { formatStringToCurrency } from "helpers/formatNumber";
 
 import { BountyDistribution } from "interfaces/bounty-distribution";
 
 import InfoTooltip from "./info-tooltip";
 
 export default function BountyDistributionItem({
-  percentage = 0,
+  percentage = "0",
   name,
   symbols,
   amounts,
@@ -13,7 +15,7 @@ export default function BountyDistributionItem({
   line,
 }: BountyDistribution) {
   function verifyAmount(): boolean {
-    if (amounts.length > 1 && amounts[1] > 0) {
+    if (amounts.length > 1 && BigNumber(amounts[1]).gt(0)) {
       return true;
     } else {
       return false;
@@ -41,7 +43,7 @@ export default function BountyDistributionItem({
         <div className={"d-flex flex-shrink-0 w-40 flex-column"}>
           <div className="d-flex justify-content-end">
             <span className="caption-medium pb-1">
-              {formatNumberToCurrency(amounts[0])}{" "}
+              {formatStringToCurrency(amounts[0])}{" "}
             </span>
             <label className="ps-1 pt-1 caption-small text-uppercase text-white-40">
               {symbols[0]}
