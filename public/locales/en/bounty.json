@@ -69,6 +69,7 @@
     "no-bounties-in-draft": "No bounties in draft",
     "no-bounties-to-merge": "No bounties ready to merge",
     "creating-bounty": "Error creating bounty",
+    "bounty-canceled": "Bounty creation canceled",
     "sync": "The bounty was created, but something went wrong while reading the blockchain, please go to the home page while we try to get your bounty",
     "exceeds-allowance": "Bounty amount exceeds your allowance"
   },

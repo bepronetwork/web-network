@@ -542,40 +542,42 @@ export default function CreateBountyModal() {
 
         if (e?.code === MetamaskErrors.ExceedAllowance)
           dispatch(toastError(t("bounty:errors.exceeds-allowance")));
-        else  if (e?.code !== MetamaskErrors.UserRejected)
+        else if(e?.code === MetamaskErrors.UserRejected)
+          dispatch(toastError(t("bounty:errors.bounty-canceled")))
+        else 
           dispatch(toastError(e.message || t("bounty:errors.creating-bounty")));
         
         console.debug(e);
 
-        return e;
+        return {...e, error: true};
       });
 
-      if (!networkBounty?.blockNumber) return;
-
-      txWindow.updateItem(transactionToast.payload.id,
-                          parseTransaction(networkBounty, transactionToast.payload));
+      if (networkBounty?.error !== true) {
+        txWindow.updateItem(transactionToast.payload.id,
+                            parseTransaction(networkBounty, transactionToast.payload));
 
     
-      const createdBounty = await processEvent("bounty",
-                                               "created",
-                                               activeNetwork?.name,
+        const createdBounty = await processEvent("bounty",
+                                                 "created",
+                                                 activeNetwork?.name,
       { fromBlock: networkBounty?.blockNumber})
 
-      if (!createdBounty){
-        dispatch(toastWarning(t("bounty:errors.sync")));
-      }
+        if (!createdBounty){
+          dispatch(toastWarning(t("bounty:errors.sync")));
+        }
     
-      if (createdBounty?.[cid]) {
-        const [repoId, githubId] = String(cid).split("/");
+        if (createdBounty?.[cid]) {
+          const [repoId, githubId] = String(cid).split("/");
 
-        router.push(getURLWithNetwork("/bounty", {
+          router.push(getURLWithNetwork("/bounty", {
           id: githubId,
           repoId,
-        }));
-      }
+          }));
+        }
 
-      cleanFields();
-      dispatch(changeShowCreateBountyState(false))
+        cleanFields();
+        dispatch(changeShowCreateBountyState(false))
+      }  
     }finally{
       setIsLoadingCreateBounty(false)
     }
