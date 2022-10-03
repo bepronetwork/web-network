@@ -237,11 +237,15 @@ async function main() {
 
     //add allowed tokens
     console.log(`Adding Allowed Tokens...`);
-    // Reward Tokens
-    const transactionTokensAllowed = [networkToken.contractAddress, bountyTransactional.contractAddress];
-    const rewardTokensAllowed = [networkToken.contractAddress, rewardToken.contractAddress];
-   
-    // Transactionals Tokens
+    // Tokens
+    const transactionTokensAllowed = [networkToken.contractAddress];
+    const rewardTokensAllowed = [networkToken.contractAddress];
+
+    if (!transactionTokensAllowed.includes(bountyTransactional.contractAddress))
+      transactionTokensAllowed.push(bountyTransactional.contractAddress)
+    if (!rewardTokensAllowed.includes(rewardToken.contractAddress))
+      rewardTokensAllowed.push(rewardToken.contractAddress)
+
     await network.registry.addAllowedTokens(transactionTokensAllowed, true);
     await network.registry.addAllowedTokens(rewardTokensAllowed, false);
     await bountyToken.setDispatcher(registryReceipt.contractAddress);
