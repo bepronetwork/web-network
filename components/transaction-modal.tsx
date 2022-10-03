@@ -58,7 +58,7 @@ export default function TransactionModal({
           <span>{formatStringToCurrency(BigNumber(blockTransaction.amount).toFixed())}</span>{" "}
           <span
             className={`${
-              blockTransaction.currency.toLowerCase() === "oralces"
+              blockTransaction.currency.toLowerCase() === "oracles"
                 ? "text-purple"
                 : "text-primary"
             }`}

@@ -42,7 +42,7 @@ export default function FundModal({
   const { handleFundBounty } = useBepro();
   const { dispatch } = useContext(ApplicationContext);
   const { activeIssue, networkIssue, getNetworkIssue, updateIssue } = useIssue();
-  const { allowance, balance, setAddress, approve, updateAllowanceAndBalance } = useERC20();
+  const { allowance, balance, decimals, setAddress, approve, updateAllowanceAndBalance } = useERC20();
 
   const bountyId = activeIssue?.contractId || networkIssue?.id || "XX";
   const fundBtnDisabled = [
@@ -52,6 +52,7 @@ export default function FundModal({
     amountToFund?.plus(networkIssue?.fundedAmount).gt(networkIssue?.fundingAmount)
   ].some(c => c);
   const rewardTokenSymbol = networkIssue?.rewardTokenData?.symbol;
+  const transactionalSymbol = networkIssue?.transactionalTokenData?.symbol;
   const needsApproval = amountToFund?.gt(allowance);
   const amountNotFunded = networkIssue?.fundingAmount?.minus(networkIssue?.fundedAmount) || BigNumber(0);
 
@@ -82,7 +83,7 @@ export default function FundModal({
 
     setIsExecuting(true);
 
-    handleFundBounty(networkIssue.id, amountToFund.toFixed())
+    handleFundBounty(networkIssue.id, amountToFund.toFixed(), transactionalSymbol, decimals)
       .then((txInfo) => {
         const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
         
@@ -97,7 +98,7 @@ export default function FundModal({
         getNetworkIssue();
         dispatch(toastSuccess(t("funding:modals.fund.funded-x-symbol", {
           amount: amountFormatted,
-          symbol: rewardTokenSymbol
+          symbol: transactionalSymbol
         }), t("funding:modals.fund.funded-succesfully")));
       })
       .catch(error => {
