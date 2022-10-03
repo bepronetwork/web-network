@@ -487,11 +487,11 @@ export default function useApi() {
       .catch((error) => { throw error });
   }
 
-  async function createNFT(issueId: string,
+  async function createNFT(issueContractId: number,
                            proposalscMergeId: number,
-                           rewardAmount: number) {
+                           networkName: string = DEFAULT_NETWORK_NAME,) {
     return api
-      .post("/nft/", { issueId, proposalscMergeId, rewardAmount })
+      .post("/nft", { issueContractId, proposalscMergeId, networkName })
       .then(({ data }) => data)
       .catch((error) => {
         throw error;

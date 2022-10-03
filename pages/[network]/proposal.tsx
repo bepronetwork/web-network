@@ -49,11 +49,7 @@ export default function PageProposal() {
 
   async function closeIssue() {
     try{
-      const creator = usersDistribution.find(distribution => distribution.isPRCreator);
-      
-      if(!creator) throw Error('Creator not founded');
-
-      const {url} = await createNFT(activeIssue?.issueId, proposal.contractId, creator?.distributedAmount)
+      const {url} = await createNFT(activeIssue?.contractId, proposal.contractId)
       
       handleCloseIssue(+activeIssue?.contractId, +proposal.contractId, url)
         .then(txInfo => {
@@ -153,7 +149,6 @@ export default function PageProposal() {
         address: detail.recipient, 
         oracles, 
         distributedAmount,
-        isPRCreator: detail.recipient === networkProposal.creator,
       };
     })).then(setUsersDistribution);
   }, [networkProposal, activeIssue]);
