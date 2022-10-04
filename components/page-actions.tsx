@@ -79,7 +79,7 @@ export default function PageActions({
     amount: activeIssue?.amount,
     fundingAmount: activeIssue?.fundingAmount 
   })
-  const isBountyFunded = activeIssue?.fundedAmount?.isEqualTo(activeIssue?.fundingAmount)
+  const isBountyFunded = networkIssue?.fundedAmount?.isEqualTo(networkIssue?.fundingAmount)
   const isStateToWorking = ["proposal", "open", "ready"].some(value => value === issueState);
 
   const isBountyOwner =
