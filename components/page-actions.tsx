@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { isMobile } from "react-device-detect";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
@@ -78,7 +79,7 @@ export default function PageActions({
     amount: activeIssue?.amount,
     fundingAmount: activeIssue?.fundingAmount 
   })
-  const isBountyFunded = activeIssue?.fundedAmount === activeIssue?.fundingAmount;
+  const isBountyFunded = activeIssue?.fundedAmount?.isEqualTo(activeIssue?.fundingAmount)
   const isStateToWorking = ["proposal", "open", "ready"].some(value => value === issueState);
 
   const isBountyOwner =
@@ -298,7 +299,11 @@ export default function PageActions({
   }
 
   function renderCancelButton() {
-    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft && !isBountyFunded)
+    const isDraftOrNotFunded = activeIssue?.fundingAmount.isGreaterThan(BigNumber(0))
+    ? !isBountyFunded
+    : isBountyInDraft;
+    
+    if (isWalletConnected && isBountyOpen && isBountyOwner && isDraftOrNotFunded)
       return(
         <ReadOnlyButtonWrapper>
           <Button

@@ -8,10 +8,12 @@ import Modal from "components/modal";
 
 import { ApplicationContext } from "contexts/application";
 import { useIssue } from "contexts/issue";
+import { useNetwork } from "contexts/network";
 import { toastError, toastSuccess } from "contexts/reducers/add-toast";
 
 import { BenefactorExtended } from "interfaces/bounty";
 
+import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 
 import { Amount, RowWithTwoColumns } from "./minimals";
@@ -31,8 +33,10 @@ export default function RetractOrWithdrawModal({
 
   const [isExecuting, setIsExecuting] = useState(false);
 
+  const { processEvent } = useApi();
+  const { activeNetwork } = useNetwork();
   const { handleRetractFundBounty, handleWithdrawFundRewardBounty } = useBepro();
-  const { networkIssue, getNetworkIssue } = useIssue();
+  const { networkIssue, getNetworkIssue, updateIssue, activeIssue } = useIssue();
   const { dispatch } = useContext(ApplicationContext);
 
   const tokenSymbol = networkIssue?.transactionalTokenData?.symbol;
@@ -61,10 +65,18 @@ export default function RetractOrWithdrawModal({
       })
       .finally(() => setIsExecuting(false));
     } else {
-      handleRetractFundBounty(networkIssue?.id, funding.id, retractOrWithdrawAmount, tokenSymbol)
+      handleRetractFundBounty(networkIssue?.id, funding.id)
+      .then((txInfo) => {
+        const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
+        
+        return processEvent("bounty", "funded", activeNetwork?.name, { 
+          fromBlock
+        });
+      })
       .then(() => {
         onCloseClick();
         getNetworkIssue();
+        updateIssue(activeIssue?.repository_id, activeIssue?.githubId)
         dispatch(toastSuccess(t("funding:modals.retract.retract-x-symbol", {
           amount: retractOrWithdrawAmount,
           symbol: tokenSymbol
