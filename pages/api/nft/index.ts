@@ -1,3 +1,4 @@
+import { error as LogError } from "@scripts/logging.js";
 import { ProposalDetail } from "@taikai/dappkit";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -5,6 +6,7 @@ import { Op } from "sequelize";
 
 import models from "db/models";
 
+import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
 import { Settings } from "helpers/settings";
 
 import DAO from "services/dao-service";
@@ -12,7 +14,7 @@ import ipfsService from "services/ipfs-service";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   try{
-  // eslint-disable-next-line max-len
+    // eslint-disable-next-line max-len
     const {issueContractId, proposalscMergeId, networkName} = req.body as {issueContractId: number, proposalscMergeId: number, networkName: string};
   
     if(!networkName || proposalscMergeId < 0 || issueContractId < 0)
@@ -54,16 +56,38 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const network = DAOService.network;
 
     await network.start();
-    
+
     const networkBounty = await network.getBounty(issueContractId);
-    if (!networkBounty) return res.status(404).json("Invalid");
+    if (!networkBounty) return res.status(404).json("Bounty invalid");
+
+    if(networkBounty.canceled || networkBounty.closed)
+      return res.status(404).json("Bounty has been closed or canceled");
 
     const proposal = networkBounty.proposals.find(p=> p.id === +proposalscMergeId)
-
+    
     if(!proposal)
-      return res.status(404).json("Invalid");
-  
-    const participants = await Promise.all(proposal.details.map(async(detail: ProposalDetail) => {
+      return res.status(404).json("Proposal invalid");
+
+    if(proposal.refusedByBountyOwner || await network.isProposalDisputed(issueContractId, proposalscMergeId))
+      return res.status(404).json("proposal can be accepted");
+
+    const pullRequest = networkBounty.pullRequests.find(pr=> pr.id === proposal.prId)
+
+    if(pullRequest.canceled || !pullRequest.ready)
+      return res.status(404).json("PR can be accepted");
+
+    const [{treasury}, creatorFee, proposerFee] = await Promise.all([DAOService?.getTreasury(),
+                                                                     DAOService?.getMergeCreatorFee(),
+                                                                     DAOService?.getProposerFee()
+    ])
+    
+    const distributions = calculateDistributedAmounts(treasury, 
+                                                      creatorFee, 
+                                                      proposerFee,
+                                                      networkBounty.tokenAmount, 
+                                                      proposal.details.map(({ percentage }) => percentage));
+
+    const participants = await Promise.all(proposal.details.map(async(detail: ProposalDetail, i) => {
       if(!detail.recipient) return;
 
       const user = await models.user.findOne({
@@ -71,18 +95,14 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
         [Op.iLike]: String(detail.recipient)
         } }});
 
-      const distributedAmount = networkBounty.tokenAmount * detail.percentage / 100;
-      
       return { 
         githubHandle: user?.githubHandle || '', 
-        percentage: detail.percentage, 
+        percentage: distributions.proposals[i].percentage, 
         address: detail.recipient, 
-        distributedAmount,
+        distributedAmount: distributions.proposals[i].value,
       };
     }))
-
-    const pullRequest = networkBounty.pullRequests.find(pr=> pr.id === proposal.prId)
-
+    
     const nft = {
       price: networkBounty.tokenAmount,
       participants,
@@ -99,6 +119,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     return res.status(200).json({url});
   }
   catch(error){
+    LogError(error)
     return res.status(500).send(error);
   }
 }
