@@ -299,9 +299,7 @@ export default function PageActions({
   }
 
   function renderCancelButton() {
-    const isDraftOrFunded = activeIssue?.fundingAmount.isGreaterThan(BigNumber(0)) ? !isBountyFunded : isBountyInDraft 
-    
-    if (isWalletConnected && isBountyOpen && isBountyOwner && isDraftOrFunded)
+    if (isWalletConnected && isBountyOpen && isBountyOwner && isBountyInDraft && !isBountyFunded)
       return(
         <ReadOnlyButtonWrapper>
           <Button
