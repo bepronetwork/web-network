@@ -50,13 +50,13 @@ export default function RetractOrWithdrawModal({
 
     setIsExecuting(true);
     if(networkIssue?.closed){
-      handleWithdrawFundRewardBounty(networkIssue?.id, funding.id)
+      handleWithdrawFundRewardBounty(networkIssue?.id, funding.id, retractOrWithdrawAmount, rewardTokenSymbol)
       .then(() => {
         onCloseClick();
         getNetworkIssue();
         dispatch(toastSuccess(t("funding:modals.reward.withdraw-x-symbol", {
-          amount: funding.amount,
-          symbol: tokenSymbol
+          amount: retractOrWithdrawAmount,
+          symbol: rewardTokenSymbol
         }), t("funding:modals.reward.withdraw-successfully")));
       })
       .catch(error => {
@@ -78,7 +78,7 @@ export default function RetractOrWithdrawModal({
         getNetworkIssue();
         updateIssue(activeIssue?.repository_id, activeIssue?.githubId)
         dispatch(toastSuccess(t("funding:modals.retract.retract-x-symbol", {
-          amount: funding.amount,
+          amount: retractOrWithdrawAmount,
           symbol: tokenSymbol
         }), t("funding:modals.retract.retract-successfully")));
       })
