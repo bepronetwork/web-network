@@ -13,12 +13,15 @@ import { Network } from "interfaces/network";
 import useApi from "x-hooks/use-api";
 
 import { useSettings } from "./settings";
+import {NetworkParameters} from "../types/dappkit";
 
 export interface NetworkContextData {
   activeNetwork: Network;
   lastNetworkVisited?: string;
   updateActiveNetwork: (forced?: boolean) => void;
 }
+
+
 
 const NetworkContext = createContext<NetworkContextData>({} as NetworkContextData);
 
@@ -27,6 +30,7 @@ export const cookieKey = "bepro.network";
 export const NetworkProvider: React.FC = function ({ children }) {
   const [activeNetwork, setActiveNetwork] = useState<Network>(null);
   const [lastNetworkVisited, setLastNetworkVisited] = useState<string>();
+  const [loading, setLoadingProp] = useState<{[p: string]: boolean}>({});
 
   const { getNetwork } = useApi();
   const { settings } = useSettings();
@@ -63,40 +67,43 @@ export const NetworkProvider: React.FC = function ({ children }) {
 
   const updateNetworkParameters = useCallback(() => {
     if (!DAOService?.network?.contractAddress || !activeNetwork?.networkAddress) return;
-    
-    Promise.all([
-        DAOService.getNetworkParameter("councilAmount"),
-        DAOService.getNetworkParameter("disputableTime"),
-        DAOService.getNetworkParameter("draftTime"),
-        DAOService.getNetworkParameter("oracleExchangeRate"),
-        DAOService.getNetworkParameter("mergeCreatorFeeShare"),
-        DAOService.getNetworkParameter("proposerFeeShare"),
-        DAOService.getNetworkParameter("percentageNeededForDispute"),
-        DAOService.getTreasury(),
-        DAOService.getSettlerTokenData()
-    ])
-      .then(([councilAmount, 
-              disputableTime, 
-              draftTime, 
-              oracleExchangeRate, 
-              mergeCreatorFeeShare,
-              proposerFeeShare,
-              percentageNeededForDispute, 
-              treasury,
-              networkToken]) => {
-        setActiveNetwork(prevNetwork => ({
-          ...prevNetwork,
-          councilAmount: councilAmount.toString(),
-          disputableTime: +disputableTime / 1000,
-          draftTime: +draftTime / 1000,
-          oracleExchangeRate: +oracleExchangeRate,
-          mergeCreatorFeeShare: +mergeCreatorFeeShare,
-          proposerFeeShare: +proposerFeeShare,
-          percentageNeededForDispute: +percentageNeededForDispute,
-          treasury,
-          networkToken
-        }));
-      });
+
+    const devide = (value) => +value / 1000;
+    const toString = (value) => value.toString();
+    const toNumber = (value) => +value;
+
+    ([
+      ["councilAmount", toString], ["disputableTime", devide], ["draftTime", devide],
+      ["oracleExchangeRate", toNumber], ["mergeCreatorFeeShare", toNumber], ["proposerFeeShare", toNumber],
+      ["percentageNeededForDispute", toNumber],
+    ] as [NetworkParameters, (value) => any][]).forEach(([prop, action]) => {
+      if (loading[prop])
+        return;
+
+      setLoadingProp({...loading, [prop]: true});
+      DAOService.getNetworkParameter(prop)
+        .then(value => {
+          setActiveNetwork({...activeNetwork, [prop]: action(value)})
+        })
+        .finally(() => setLoadingProp({...loading, [prop]: false}))
+    });
+
+    if (!loading.treasury) {
+      setLoadingProp({...loading, treasury: true});
+      DAOService
+        .getTreasury()
+        .then(value => setActiveNetwork({...activeNetwork, treasury: value}))
+        .finally(() => setLoadingProp({...loading, treasury: false}))
+    }
+
+    if (!loading.networkToken) {
+      setLoadingProp({...loading, networkToken: true});
+      DAOService
+        .getSettlerTokenData()
+        .then(value => setActiveNetwork({...activeNetwork, networkToken: value}))
+        .finally(() => setLoadingProp({...loading, networkToken: false}))
+    }
+
   }, [activeNetwork?.networkAddress, DAOService?.network?.contractAddress]);
 
   useEffect(() => {
