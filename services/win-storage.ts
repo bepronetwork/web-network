@@ -1,4 +1,4 @@
-export class WinStorage {
+export class WinStorage<T = any> {
   constructor(readonly key: string,
               readonly expire: number = 3600,
               readonly type: "localStorage" | "sessionStorage" = "localStorage",) {}
@@ -10,7 +10,7 @@ export class WinStorage {
     window[this.type].setItem(this.key, JSON.stringify({value, time: +new Date()}));
   }
 
-  getItem<T>(): T {
+  getItem(): T {
     if (typeof window === "undefined")
       return undefined;
 
@@ -25,4 +25,7 @@ export class WinStorage {
 
     return value;
   }
+
+  get value() { return this.getItem(); }
+  set value(v) { this.setItem(v); }
 }

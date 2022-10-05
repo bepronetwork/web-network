@@ -14,6 +14,7 @@ import useApi from "x-hooks/use-api";
 
 import { useSettings } from "./settings";
 import {NetworkParameters} from "../types/dappkit";
+import {WinStorage} from "../services/win-storage";
 
 export interface NetworkContextData {
   activeNetwork: Network;
@@ -31,6 +32,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
   const [activeNetwork, setActiveNetwork] = useState<Network>(null);
   const [lastNetworkVisited, setLastNetworkVisited] = useState<string>();
   const [loading, setLoadingProp] = useState<{[p: string]: boolean}>({});
+  const [storageLastNetworkVisited,] = useState(new WinStorage('lastNetworkVisited', 60*1000, "localStorage"))
 
   const { getNetwork } = useApi();
   const { settings } = useSettings();
@@ -107,13 +109,13 @@ export const NetworkProvider: React.FC = function ({ children }) {
   }, [activeNetwork?.networkAddress, DAOService?.network?.contractAddress]);
 
   useEffect(() => {
-    if (localStorage.getItem('lastNetworkVisited') === query?.network.toString())
+    if (storageLastNetworkVisited.value === query?.network.toString())
       return;
 
-    if (query?.network) 
-      localStorage.setItem("lastNetworkVisited", query.network.toString());
+    if (query?.network)
+      storageLastNetworkVisited.value = query.network.toString();
     
-    setLastNetworkVisited(localStorage.getItem("lastNetworkVisited"));
+    setLastNetworkVisited(storageLastNetworkVisited.value);
     
     updateActiveNetwork();
   }, [query?.network]);
