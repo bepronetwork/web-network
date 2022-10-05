@@ -22,6 +22,7 @@ export interface NetworkContextData {
   updateActiveNetwork: (forced?: boolean) => void;
 }
 
+type ParamAction = [() => any, null | ((value) => any), string];
 
 
 const NetworkContext = createContext<NetworkContextData>({} as NetworkContextData);
@@ -31,7 +32,7 @@ export const cookieKey = "bepro.network";
 export const NetworkProvider: React.FC = function ({ children }) {
   const [activeNetwork, setActiveNetwork] = useState<Network>(null);
   const [lastNetworkVisited, setLastNetworkVisited] = useState<string>();
-  const [loading, setLoadingProp] = useState<{[p: string]: boolean}>({});
+  const [loading, setLoadingProp] = useState<boolean>(false);
   const [storageLastNetworkVisited,] = useState(new WinStorage('lastNetworkVisited', 60*1000, "localStorage"))
 
   const { getNetwork } = useApi();
@@ -73,38 +74,33 @@ export const NetworkProvider: React.FC = function ({ children }) {
     const divide = (value) => +value / 1000;
     const toString = (value) => value.toString();
     const toNumber = (value) => +value;
+    const getParam = (param) => DAOService.getNetworkParameter(param);
+
+    if (loading)
+      return;
+
+    let loadedPropCount = 0;
+    setLoadingProp(true);
 
     ([
-      ["councilAmount", toString], ["disputableTime", divide], ["draftTime", divide],
-      ["oracleExchangeRate", toNumber], ["mergeCreatorFeeShare", toNumber], ["proposerFeeShare", toNumber],
-      ["percentageNeededForDispute", toNumber],
-    ] as [NetworkParameters, (value) => any][]).forEach(([prop, action]) => {
-      if (loading[prop])
-        return;
-
-      setLoadingProp({...loading, [prop]: true});
-      DAOService.getNetworkParameter(prop)
-        .then(value => {
-          setActiveNetwork({...activeNetwork, [prop]: action(value)})
-        })
-        .finally(() => setLoadingProp({...loading, [prop]: false}))
-    });
-
-    if (!loading.treasury) {
-      setLoadingProp({...loading, treasury: true});
-      DAOService
-        .getTreasury()
-        .then(value => setActiveNetwork({...activeNetwork, treasury: value}))
-        .finally(() => setLoadingProp({...loading, treasury: false}))
-    }
-
-    if (!loading.networkToken) {
-      setLoadingProp({...loading, networkToken: true});
-      DAOService
-        .getSettlerTokenData()
-        .then(value => setActiveNetwork({...activeNetwork, networkToken: value}))
-        .finally(() => setLoadingProp({...loading, networkToken: false}))
-    }
+      [() => getParam("councilAmount"), toString, "councilAmount"],
+      [() => getParam("disputableTime"), divide, "disputableTime"],
+      [() => getParam("draftTime"), divide, "draftTime"],
+      [() => getParam("oracleExchangeRate"), toNumber, "oracleExchangeRate"],
+      [() => getParam("mergeCreatorFeeShare"), toNumber, "mergeCreatorFeeShare"],
+      [() => getParam("proposerFeeShare"), toNumber, "proposerFeeShare"],
+      [() => getParam("percentageNeededForDispute"), toNumber, "percentageNeededForDispute"],
+      [DAOService.getTreasury, null, "treasury"],
+      [DAOService.getSettlerTokenData, null, "networkToken"],
+    ] as ParamAction[])
+      .forEach(([action, transformer, key], index, array) =>
+        action()
+          .then(value => {
+            loadedPropCount++;
+            setActiveNetwork({...activeNetwork, [key]: transformer ? transformer(value) : value});
+            if (loadedPropCount === array.length)
+              setLoadingProp(false);
+          }));
 
   }, [activeNetwork?.networkAddress, DAOService?.network?.contractAddress]);
 
