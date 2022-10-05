@@ -14,16 +14,24 @@ export class WinStorage<T = any> {
     if (typeof window === "undefined")
       return undefined;
 
-    const entry = window[this.type].getItem(this.key);
+    const entry = window[this.type]?.getItem(this.key);
 
     if (!entry)
       return undefined;
 
-    const {value, time} = JSON.parse(entry);
-    if (this.expire && +new Date() > time + this.expire)
-      return undefined;
+    try {
+      const {value, time} = JSON.parse(entry);
+      if (this.expire && +new Date() > time + this.expire) {
+        this.setItem(undefined);
+        return undefined;
+      }
 
-    return value;
+      return value;
+    } catch (e) {
+      console.debug(`Failed to parse ${this.key} from ${this.type}`);
+      return undefined;
+    }
+
   }
 
   get value() { return this.getItem(); }

@@ -70,12 +70,12 @@ export const NetworkProvider: React.FC = function ({ children }) {
   const updateNetworkParameters = useCallback(() => {
     if (!DAOService?.network?.contractAddress || !activeNetwork?.networkAddress) return;
 
-    const devide = (value) => +value / 1000;
+    const divide = (value) => +value / 1000;
     const toString = (value) => value.toString();
     const toNumber = (value) => +value;
 
     ([
-      ["councilAmount", toString], ["disputableTime", devide], ["draftTime", devide],
+      ["councilAmount", toString], ["disputableTime", divide], ["draftTime", divide],
       ["oracleExchangeRate", toNumber], ["mergeCreatorFeeShare", toNumber], ["proposerFeeShare", toNumber],
       ["percentageNeededForDispute", toNumber],
     ] as [NetworkParameters, (value) => any][]).forEach(([prop, action]) => {
