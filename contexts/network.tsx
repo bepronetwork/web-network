@@ -107,6 +107,9 @@ export const NetworkProvider: React.FC = function ({ children }) {
   }, [activeNetwork?.networkAddress, DAOService?.network?.contractAddress]);
 
   useEffect(() => {
+    if (localStorage.getItem('lastNetworkVisited') === query?.network.toString())
+      return;
+
     if (query?.network) 
       localStorage.setItem("lastNetworkVisited", query.network.toString());
     
