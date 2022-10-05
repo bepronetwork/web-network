@@ -9,6 +9,8 @@ import ChangeTokenModal from "components/change-token-modal";
 
 import { useDAO } from "contexts/dao";
 
+import { formatNumberToCurrency } from "helpers/formatNumber";
+
 import { Token } from "interfaces/token";
 
 interface TokensDropdownProps {
@@ -45,11 +47,13 @@ export default function TokensDropdown({
   showCurrencyValue = true,
   needsBalance
 }: TokensDropdownProps) {
-  const [options, setOptions] = useState<Option[]>();
-  const [option, setOption] = useState<Option>();
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const { service: DAOService } = useDAO();
   const { t } = useTranslation("common");
+
+  const [option, setOption] = useState<Option>();
+  const [options, setOptions] = useState<Option[]>();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const { service: DAOService } = useDAO();
 
   const formatCreateLabel = (inputValue: string) =>
     canAddToken
@@ -76,17 +80,16 @@ export default function TokensDropdown({
     setToken(newToken);
     await DAOService.getTokenBalance(newToken.address, userAddress)
       .then((value) =>
-        setOption(tokenToOption({ ...newToken, currentValue: value })))
+        setOption(tokenToOption({ ...newToken, currentValue: value.toFixed() })))
       .catch(() => setOption(tokenToOption(newToken)));
   }
 
   async function getBalanceTokens() {
     Promise.all(tokens?.map(async (token) => {
       if (token?.address && userAddress) {
-        const value = await DAOService.getTokenBalance(token.address,
-                                                       userAddress);
+        const value = await DAOService.getTokenBalance(token.address, userAddress);
 
-        return { ...token, currentValue: value };
+        return { ...token, currentValue: value.toFixed() };
       }
     }))
       .then((values) => {
@@ -146,7 +149,8 @@ export default function TokensDropdown({
               {tokenInfo ? tokenInfo.name : name}
             </span>
             <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">
-              {showCurrencyValue && `${currentValue} ${tokenInfo?.symbol ? tokenInfo?.symbol : symbol}`}
+              { showCurrencyValue && 
+                `${formatNumberToCurrency(currentValue)} ${tokenInfo?.symbol ? tokenInfo?.symbol : symbol}` }
               {address === option?.value?.address && (
                 <DoneIcon
                   className="ms-1 text-primary"
@@ -168,6 +172,8 @@ export default function TokensDropdown({
 
     const { name, tokenInfo, currentValue, symbol } = getValue()[0].value;
 
+    const currentValueFormatted = formatNumberToCurrency(currentValue);
+
     return (
       <>
         {props.children[0] !== null ? (
@@ -187,7 +193,8 @@ export default function TokensDropdown({
               </span>
             </div>
             <div className="d-flex flex-grow-1 justify-content-end text-uppercase me-2">
-              {showCurrencyValue && `${currentValue} ${tokenInfo?.symbol && currentValue ? tokenInfo?.symbol : symbol}`}
+              { showCurrencyValue && 
+                `${currentValueFormatted} ${tokenInfo?.symbol && currentValue ? tokenInfo?.symbol : symbol}`}
             </div>
           </>
         ) : (

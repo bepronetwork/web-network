@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import LockedIcon from "assets/icons/locked-icon";
@@ -11,17 +12,17 @@ import Modal from "components/modal";
 import { useNetwork } from "contexts/network";
 
 import calculateDistributedAmounts from "helpers/calculateDistributedAmounts";
-import { formatNumberToCurrency } from "helpers/formatNumber";
-import { handleTokenToEurConversion } from "helpers/handleTokenToEurConversion";
+import { formatStringToCurrency } from "helpers/formatNumber";
 
 import { ProposalExtended } from "interfaces/bounty";
 import { TokenInfo } from "interfaces/token";
 
 import { getCoinInfoByContract } from "services/coingecko";
 
+
 interface amount {
-  value: number;
-  percentage: number;
+  value: string;
+  percentage: string;
 }
 
 interface distributedAmounts {
@@ -32,7 +33,7 @@ interface distributedAmounts {
 }
 
 interface props {
-  amountTotal: number;
+  amountTotal: BigNumber;
   tokenSymbol?: string;
   proposal: ProposalExtended;
   onClickMerge: () => void;
@@ -42,8 +43,8 @@ interface props {
 }
 
 const defaultAmount = {
-  value: 0,
-  percentage: 0,
+  value: "0",
+  percentage: "0",
 };
 
 export default function ProposalMerge({
@@ -69,6 +70,8 @@ export default function ProposalMerge({
 
   const { activeNetwork } = useNetwork();
 
+  const amounTotalConverted = BigNumber(handleConversion(amountTotal));
+
   async function getDistributedAmounts() {
     if (!proposal?.details) return;
 
@@ -87,7 +90,7 @@ export default function ProposalMerge({
   }
 
   function handleConversion(value) {
-    return handleTokenToEurConversion(value, coinInfo?.prices['eur'])
+    return BigNumber(value).multipliedBy(coinInfo?.prices['eur']).toFixed(4);
   }
 
   function currentTokenSymbol() {
@@ -217,20 +220,20 @@ export default function ProposalMerge({
 
           <div
             className={`d-flex flex-column cursor-pointer 
-          ${handleConversion(amountTotal) > 0 ? "mt-1" : "mt-3"}`}
+          ${amounTotalConverted?.gt(0) ? "mt-1" : "mt-3"}`}
           >
             <div className="d-flex justify-content-end mb-1">
               <span className="text-white caption-medium">
-                {formatNumberToCurrency(amountTotal)}
+                {formatStringToCurrency(amountTotal?.toFixed())}
               </span>
               <span className="text-primary ms-2 caption-medium text-white-40">
                 {currentTokenSymbol()}
               </span>
             </div>
-            {handleConversion(amountTotal) > 0 && (
+            {amounTotalConverted?.gt(0) && (
             <div className="d-flex justify-content-end">
               <span className="text-white caption-small text-ligth-gray">
-                {handleConversion(amountTotal)}</span>
+                {amounTotalConverted?.toFixed()}</span>
               <span className=" ms-2 caption-small text-ligth-gray">
                 EUR
               </span>

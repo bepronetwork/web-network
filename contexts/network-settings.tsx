@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { Defaults } from "@taikai/dappkit";
+import BigNumber from "bignumber.js";
 import { useRouter } from "next/router";
 
 import { useAuthentication } from "contexts/authentication";
@@ -176,7 +177,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   const setFields = (field: string, value: unknown)=> {
     const method = field.split('.')
     
-    if(!method || !value) return;
+    if(!method) return;
 
     setNetworkSettings((prev)=>{
       const newValues = {...prev}
@@ -192,7 +193,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   const Fields = {
     amount: {
       setter: (value: string) => setFields('tokensLocked.amount', value),
-      validator: (locked: number, needed: number) => needed > 0 && locked >= needed
+      validator: (locked: string, needed: string) => BigNumber(needed).gt(0) && BigNumber(locked).gte(needed)
     },
     name: {
       setter: async (value: string) => {
@@ -320,7 +321,7 @@ export const NetworkSettingsProvider = ({ children }) => {
           Fields.cancelFee.setter(cancelFee)
         })
       })
-      .catch(error => console.log("Failed to load network parameters", error, network));
+      .catch(error => console.debug("Failed to load network parameters", error, network));
 
       Fields.name.setter(network?.name);
       Fields.description.setter(network?.description);
@@ -410,7 +411,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         }
         setFields('github.repositories', repositories)
       });
-  },[user?.login])
+  },[user?.login, isCreating]);
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({
     ...networkSettings,

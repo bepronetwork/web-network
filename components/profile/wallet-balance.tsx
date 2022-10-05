@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import BeProBlue from "assets/icons/bepro-blue";
@@ -13,7 +14,7 @@ import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { useSettings } from "contexts/settings";
 
-import { formatNumberToCurrency } from "helpers/formatNumber";
+import { formatStringToCurrency } from "helpers/formatNumber";
 
 import { TokenInfo } from "interfaces/token";
 
@@ -31,7 +32,7 @@ export default function WalletBalance() {
   const { t } = useTranslation(["common", "profile"]);
   
   const [tokens, setTokens] = useState<TokenBalanceType[]>([]);
-  const [totalAmount, setTotalAmount] = useState(0);
+  const [totalAmount, setTotalAmount] = useState("0");
   const [hasNoConvertedToken, setHasNoConvertedToken] = useState(false);
   
   const { settings } = useSettings();
@@ -45,8 +46,8 @@ export default function WalletBalance() {
     icon: <OracleIcon />
   };
 
-  const oraclesLocked = wallet?.balance?.oracles?.locked || 0;
-  const oraclesDelegatedToMe = wallet?.balance?.oracles?.delegatedByOthers || 0;
+  const oraclesLocked = wallet?.balance?.oracles?.locked || BigNumber(0);
+  const oraclesDelegatedToMe = wallet?.balance?.oracles?.delegatedByOthers || BigNumber(0);
 
   useEffect(() => {
     let beproToken = undefined;
@@ -55,7 +56,7 @@ export default function WalletBalance() {
       beproToken = {
         ...settings.beproToken,
         icon: <BeProBlue width={24} height={24} />,
-        balance: 0
+        balance: "0"
       };
   
       setTokens([beproToken]);
@@ -94,11 +95,13 @@ export default function WalletBalance() {
   useEffect(() => {
     if (!tokens.length) return;
 
-    const totalConverted = tokens.reduce((acc, token) => acc + (token.balance * (token.prices?.eur || 0)), 0);
-    const totalTokens = tokens.reduce((acc,token) => acc + token.balance, 0)
+    const totalConverted = tokens.reduce((acc, token) => BigNumber(token.balance)
+                                                          .multipliedBy(token.prices?.eur || 0)
+                                                          .plus(acc), BigNumber(0));
+    const totalTokens = tokens.reduce((acc, token) => BigNumber(token.balance).plus(acc), BigNumber(0));
     const noConverted = !!tokens.find(token => token.prices?.eur === undefined);
 
-    setTotalAmount(noConverted ? totalTokens : totalConverted);
+    setTotalAmount(noConverted ? totalTokens.toFixed() : totalConverted.toFixed());
     setHasNoConvertedToken(noConverted);
 
   }, [tokens]);
@@ -111,7 +114,7 @@ export default function WalletBalance() {
         <FlexRow className="align-items-center">
           <span className="caption-large text-white mr-2 font-weight-medium">{t("misc.total")}</span>
           <span className="caption-large text-white bg-dark-gray py-2 px-3 rounded-3 font-weight-medium">
-            {formatNumberToCurrency(totalAmount)}
+            {formatStringToCurrency(totalAmount)}
             <span className="text-white-30 ml-1 mr-2">
               {!hasNoConvertedToken ? t("currencies.euro") : t("misc.token_other")}
             </span>
@@ -133,7 +136,7 @@ export default function WalletBalance() {
         <FlexRow className="align-items-center">
           <span className="caption-medium text-white mr-2 font-weight-medium">{t("misc.total")}</span>
           <span className="caption-large text-white font-weight-medium bg-dark-gray py-2 px-3 rounded-3">
-            <span className="mr-2">{formatNumberToCurrency(oraclesLocked + oraclesDelegatedToMe)}</span>
+            <span className="mr-2">{formatStringToCurrency(oraclesLocked?.plus(oraclesDelegatedToMe)?.toFixed())}</span>
             <InfoTooltip 
               description={t("profile:tips.total-oracles", {
                 tokenName: activeNetwork?.networkToken?.name || oracleToken.name

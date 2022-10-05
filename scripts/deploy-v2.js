@@ -237,16 +237,17 @@ async function main() {
 
     //add allowed tokens
     console.log(`Adding Allowed Tokens...`);
-    // Reward Tokens
-    const tokensAllowed = [networkToken.contractAddress];
-    if(!tokensAllowed.includes(rewardToken.contractAddress)) {
-      tokensAllowed.push(rewardToken.contractAddress);
-    }
-    if(!tokensAllowed.includes(bountyTransactional.contractAddress)) {
-      tokensAllowed.push(bountyTransactional.contractAddress);
-    }
-    // Transactionals Tokens
-    await network.registry.addAllowedTokens(tokensAllowed, true);
+    // Tokens
+    const transactionTokensAllowed = [networkToken.contractAddress];
+    const rewardTokensAllowed = [networkToken.contractAddress];
+
+    if (!transactionTokensAllowed.includes(bountyTransactional.contractAddress))
+      transactionTokensAllowed.push(bountyTransactional.contractAddress)
+    if (!rewardTokensAllowed.includes(rewardToken.contractAddress))
+      rewardTokensAllowed.push(rewardToken.contractAddress)
+
+    await network.registry.addAllowedTokens(transactionTokensAllowed, true);
+    await network.registry.addAllowedTokens(rewardTokensAllowed, false);
     await bountyToken.setDispatcher(registryReceipt.contractAddress);
     console.log(`Adding Network_V2 to registry...`)
     await network.registry.token.approve(registryReceipt.contractAddress, 100);

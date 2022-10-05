@@ -1,4 +1,4 @@
-import { IBalance } from "interfaces/balance-state";
+import { Balance } from "interfaces/balance-state";
 
 export interface User {
   name?: string;
@@ -19,6 +19,6 @@ export interface Wallet {
   address: string;
   isCouncil: boolean;
   isNetworkGovernor: boolean;
-  balance?: IBalance;
+  balance?: Balance;
 }
 

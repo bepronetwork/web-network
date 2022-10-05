@@ -11,7 +11,7 @@ import Button from "./button";
 import CustomContainer from "./custom-container";
 
 export interface InfosHero {
-  value: number;
+  value: number | string;
   label: string;
   currency?: Currency;
   hasNotConvertedTokens?: boolean;

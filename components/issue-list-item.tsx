@@ -2,8 +2,13 @@ import React from "react";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { isMobile } from "react-device-detect";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
+
+import BountyStatusInfo from "components/bounty-status-info";
+import Identicon from "components/identicon";
+import Translation from "components/translation";
 
 import { useNetwork } from "contexts/network";
 
@@ -11,32 +16,32 @@ import { formatDate } from "helpers/formatDate";
 import { formatNumberToNScale } from "helpers/formatNumber";
 import { getIssueState } from "helpers/handleTypeIssue";
 
-import { IssueData } from "interfaces/issue-data";
+import { IssueBigNumberData } from "interfaces/issue-data";
 import { IssueState } from "interfaces/issue-data";
-
-import BountyStatusInfo from "./bounty-status-info";
-import Identicon from "./identicon";
-import Translation from "./translation";
 
 export default function IssueListItem({
   issue = null,
   xClick,
 }: {
-  issue?: IssueData;
+  issue?: IssueBigNumberData;
   xClick?: () => void;
 }) {
   const router = useRouter();
-  const { activeNetwork } = useNetwork();
   const { t } = useTranslation(["bounty", "common"]);
+  
+  const { activeNetwork } = useNetwork();
+
+  const isFundingRequest = !!issue?.fundingAmount?.gt(0);
+  const bountyAmount = ((isFundingRequest ? issue?.fundingAmount : issue?.amount) || BigNumber("0")).toFixed(4);
 
   function renderIssueData(state: IssueState) {
     const types = {
       open: {
-        value: issue.working?.length,
+        value: issue?.working?.length,
         translation: t("info.working"),
       },
       ready: {
-        value: issue.pullRequests?.length,
+        value: issue?.pullRequests?.length,
         translation: t("info.pull-requests", {
           count: issue?.pullRequests?.length,
         }),
@@ -54,20 +59,20 @@ export default function IssueListItem({
       return (
         <div className="d-flex align-items-center" key={issue.githubId}>
           <span className="caption-medium mr-1 text-white">
-            {(issue !== null && value) || 0}
+            {issue !== null && value || 0}
           </span>
           <span className="caption-medium text-white-40 text-uppercase">
             {translation}
           </span>
         </div>
       );
-    } else return null;
+    } else return <></>;
   }
 
   function renderAmount() {
     const isActive = ["closed", "canceled"].includes(issue?.state);
 
-    const percentage = (issue?.fundedAmount * 100) / issue?.fundingAmount;
+    const percentage = issue?.fundedAmount?.multipliedBy(100).dividedBy(issue?.fundingAmount).toNumber() || 0;
 
     return (
       <div
@@ -75,16 +80,14 @@ export default function IssueListItem({
           !isActive ? "bg-black" : "bg-dark-gray"
         } `}
       >
-        {issue?.fundingAmount > 0 && isMobile ? null : (
+        {isFundingRequest && isMobile ? null : (
           <div className="px-0 pt-1 col-md-12">
             <span
               className={`caption-large text-opacity-1 text-white${
                 isActive && "-40"
               }`}
             >
-              {formatNumberToNScale(issue?.fundingAmount > 0
-                  ? issue?.fundingAmount
-                  : issue?.amount || 0)}{" "}
+              {formatNumberToNScale(bountyAmount)}{" "}
               <label
                 className={`caption-small text-uppercase ${
                   !isActive ? "text-primary" : "text-white-40"
@@ -96,7 +99,7 @@ export default function IssueListItem({
           </div>
         )}
 
-        {issue?.fundingAmount > 0 && (
+        {isFundingRequest && (
           <>
             <div className={`p-0 col-md-6 col-10 mt-1 ${isMobile && "pt-1"}`}>
               <div className="bg-dark-gray w-100 issue-funding-progress">

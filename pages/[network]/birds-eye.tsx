@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import BigNumber from "bignumber.js";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import router from "next/router";
@@ -55,9 +56,9 @@ export default function FalconPunchPage() {
         .then(connected => {
           if (connected) return DAOService.getBalance("eth", address);
 
-          return 0;
+          return BigNumber(0);
         })
-        .then((eth) => +eth)
+        .then(eth => eth.toNumber())
         .catch((e) => {
           console.error("Error on get eth", e);
           return 0;

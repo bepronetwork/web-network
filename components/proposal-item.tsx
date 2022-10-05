@@ -73,7 +73,8 @@ export default function ProposalItem({
       !isDisputable,
       isProposalDisputed,
       !isDisputableByUser,
-      wallet?.balance?.oracles?.locked === 0,
+      wallet?.balance?.oracles?.locked?.isZero(),
+      wallet?.balance?.oracles?.locked?.isNaN(),
   ].some(v => v);
 
   async function handleDispute(event: React.MouseEvent<HTMLButtonElement>) {
@@ -115,7 +116,9 @@ export default function ProposalItem({
     if (proposal?.createdAt && activeNetwork?.disputableTime && DAOService)
       DAOService.getTimeChain()
         .then(chainTime => {
-          const canDispute = isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime, chainTime);
+          const canDispute = 
+            isProposalDisputable(networkProposal?.creationDate, activeNetwork?.disputableTime, chainTime);
+
           setIsDisputable(canDispute && !isProposalDisputed);
         });
   }, [DAOService, proposal?.createdAt, activeNetwork?.disputableTime, isProposalDisputed]);
@@ -168,7 +171,7 @@ export default function ProposalItem({
             <div className="col-9 offset-1 text-white">
               <ProposalProgressSmall
                 pgClass={`${proposalState.contextColor}`}
-                value={+networkProposal?.disputeWeight}
+                value={networkProposal?.disputeWeight}
                 total={wallet?.balance?.staked}
                 textClass={`pb-2 text-${proposalState.contextColor}`}
               />

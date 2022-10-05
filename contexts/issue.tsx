@@ -4,7 +4,9 @@ import React, {
 } from "react";
 
 import { Defaults } from "@taikai/dappkit";
+import BigNumber from "bignumber.js";
 import { useRouter } from "next/router";
+
 
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
@@ -24,9 +26,13 @@ import useOctokit from "x-hooks/use-octokit";
 import { useDAO } from "./dao";
 
 
-export interface IActiveIssue extends IssueData {
+export interface IActiveIssue extends Omit<IssueData, "amount" | "fundingAmount" | "fundedAmount" | "fundedPercent"> {
   comments: IssueDataComment[];
   lastUpdated: number;
+  amount?: BigNumber;
+  fundingAmount?: BigNumber;
+  fundedAmount?: BigNumber;
+  fundedPercent?: BigNumber;
 }
 const TTL = 60 * 2 * 100; // 2 Min
 export interface IssueContextData {
@@ -104,7 +110,10 @@ export const IssueProvider: React.FC = function ({ children }) {
         comments,
         mergeProposals: issue.mergeProposals.map(mp => 
           ({...mp, isMerged: issue.merged !== null && +mp.scMergeId === +issue.merged})),
-        lastUpdated: +new Date()
+        lastUpdated: +new Date(),
+        amount: BigNumber(issue.amount),
+        fundingAmount: BigNumber(issue.fundingAmount),
+        fundedAmount: BigNumber(issue.fundedAmount)
     } as IActiveIssue;
   
     setActiveIssue(newActiveIssue);
@@ -159,8 +168,8 @@ export const IssueProvider: React.FC = function ({ children }) {
     const transactionalTokenData = await DAOService.getERC20TokenData(bounty.transactional);
     const rewardTokenData = bounty.rewardToken !== Defaults.nativeZeroAddress ? 
       await DAOService.getERC20TokenData(bounty.rewardToken).catch(() => undefined) : undefined;
-    const fundedAmount = bounty.funding.reduce((acc, benefactor) => acc + benefactor.amount, 0);
-    const fundedPercent = fundedAmount / bounty.fundingAmount * 100;
+    const fundedAmount = bounty.funding.reduce((acc, benefactor) => benefactor.amount.plus(acc), BigNumber(0));
+    const fundedPercent = fundedAmount.multipliedBy(100).dividedBy(bounty.fundingAmount);
 
     setNetworkIssue({ 
       ...bounty, 
@@ -169,7 +178,7 @@ export const IssueProvider: React.FC = function ({ children }) {
       proposals: networkProposals,
       isFinished,
       isInValidation,
-      isFundingRequest: bounty.fundingAmount > 0,
+      isFundingRequest: bounty.fundingAmount.gt(0),
       transactionalTokenData,
       rewardTokenData,
       fundedAmount,

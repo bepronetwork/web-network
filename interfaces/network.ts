@@ -14,8 +14,8 @@ export interface Network {
   description: string;
   network_id?: number;
   colors?: ThemeColors;
-  tokensStaked?: number;
-  tokensLocked?: number;
+  tokensStaked?: string;
+  tokensLocked?: string;
   networkAddress: string;
   creatorAddress: string;
   openBounties?: number;
@@ -24,7 +24,7 @@ export interface Network {
   councilMembers: string[];
   tokens?: Token[];
   networkToken?: Token;
-  councilAmount?: number;
+  councilAmount?: string;
   disputableTime?: number;
   draftTime?: number;
   oracleExchangeRate?: number;
@@ -33,7 +33,7 @@ export interface Network {
   percentageNeededForDispute?: number;
   treasury?: TreasuryInfo;
   isRegistered?: boolean;
-  totalSettlerConverted?: number;
+  totalSettlerConverted?: string;
 }
 
 export interface ThemeColors {
@@ -85,8 +85,8 @@ export interface NetworkSettings {
   setForcedNetwork?: (network: Network) => void;
   cleanStorage?: () => void;
   tokensLocked?: {
-    locked: number;
-    needed: number;
+    locked: string;
+    needed: string;
     validated: boolean;
   };
   details?: {

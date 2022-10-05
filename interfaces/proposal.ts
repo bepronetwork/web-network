@@ -26,5 +26,5 @@ export interface DistribuitonPerUser {
   address: string;
   oracles: string;
   percentage: number;
-  distributedAmount?: number;
+  distributedAmount?: string;
 }

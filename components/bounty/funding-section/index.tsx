@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import ArrowRight from "assets/icons/arrow-right";
@@ -29,21 +30,27 @@ export default function FundingSection() {
   const [walletFunds, setWalletFunds] = useState<BenefactorExtended[]>();
   const [fundingtoRetractOrWithdraw, setFundingToRetractOrWithdraw] = useState<BenefactorExtended>();
 
-  const { networkIssue, activeIssue } = useIssue();
   const { wallet } = useAuthentication();
+  const { networkIssue, activeIssue } = useIssue();
   
   const isConnected = !!wallet?.address;
-  const hasReward = networkIssue?.rewardAmount > 0;
+  const hasReward = networkIssue?.rewardAmount?.gt(0);
+  const isBountyClosed = !!networkIssue?.closed;
   const isBountyFunded = !!networkIssue?.funded;
-  const fundsGiven = walletFunds?.reduce((acc, fund) => acc + fund.amount, 0);
-  const futureRewards = fundsGiven / networkIssue?.fundingAmount * networkIssue?.rewardAmount;
+  const isBountyInDraft = !!networkIssue?.isDraft;
   const transactionalSymbol = networkIssue?.transactionalTokenData?.symbol;
   const rewardTokenSymbol = networkIssue?.rewardTokenData?.symbol;
+
+  const fundsGiven = walletFunds?.reduce((acc, fund) => fund.amount.plus(acc), BigNumber(0)) || BigNumber(0);
+  
+  const futureRewards = 
+    fundsGiven.multipliedBy(networkIssue?.rewardAmount).dividedBy(networkIssue?.fundingAmount).toFixed();
+  
   const isCanceled = getIssueState({
     state: activeIssue?.state,
     amount: activeIssue?.amount,
     fundingAmount: activeIssue?.fundingAmount,
-  }) === "canceled"
+  }) === "canceled";
 
   const handleShowFundModal = () => setShowFundModal(true);
   const handleCloseFundModal = () => setShowFundModal(false);
@@ -52,10 +59,10 @@ export default function FundingSection() {
   useEffect(() => {
     if (!wallet?.address || !networkIssue) return;
 
-    const funds = 
+    const funds =
       networkIssue.funding
         .map((fund, index) => ({ ...fund, id: index }))
-        .filter(fund => fund.benefactor.toLowerCase() === wallet.address.toLowerCase() && fund.amount > 0);
+        .filter(fund => fund.benefactor.toLowerCase() === wallet.address.toLowerCase() && fund.amount.gt(0));
 
     setWalletFunds(funds);
   }, [wallet, networkIssue]);
@@ -73,7 +80,7 @@ export default function FundingSection() {
 
       <RetractOrWithdrawModal
         show={!!fundingtoRetractOrWithdraw}
-        fundingtoRetractOrWithdraw={fundingtoRetractOrWithdraw}
+        funding={fundingtoRetractOrWithdraw}
         onCloseClick={handleCloseRetractOrWithdrawModal}
       />
 
@@ -93,10 +100,10 @@ export default function FundingSection() {
           />
 
           <FundingProgress
-            fundedAmount={networkIssue?.fundedAmount}
-            fundingAmount={networkIssue?.fundingAmount}
+            fundedAmount={networkIssue?.fundedAmount?.toFixed()}
+            fundingAmount={networkIssue?.fundingAmount?.toFixed()}
             fundingTokenSymbol={transactionalSymbol}
-            fundedPercent={networkIssue?.fundedPercent}
+            fundedPercent={networkIssue?.fundedPercent?.toFixed(2, 1)}
           />
 
           { hasReward &&
@@ -109,7 +116,7 @@ export default function FundingSection() {
               }
               col2={
                 <Amount 
-                  amount={networkIssue?.rewardAmount}
+                  amount={networkIssue?.rewardAmount?.toFixed()}
                   symbol={networkIssue?.rewardTokenData?.symbol}
                   symbolColor="warning"
                   className="caption-large text-white font-weight-normal"
@@ -127,89 +134,91 @@ export default function FundingSection() {
                     col1={<CaptionMedium text={t("funding:funds-given")} color="white" />}
                     col2={
                       <Amount 
-                        amount={fundsGiven}
+                        amount={fundsGiven.toFixed()}
                         symbol={transactionalSymbol}
                         className="caption-large text-white font-weight-normal"
                       />
                     }
                     filler
                   />
-
-                  <RowWithTwoColumns 
-                    col1={<CaptionMedium text={t("funding:future-rewards")} color="white" />}
-                    col2={
-                      <Amount 
-                        amount={futureRewards}
-                        symbol={networkIssue?.rewardTokenData?.symbol}
-                        className="caption-large text-white font-weight-normal"
-                        symbolColor="warning"
-                      />
-                    }
-                    filler
-                  />
+                  
+                  { hasReward &&
+                    <RowWithTwoColumns 
+                      col1={<CaptionMedium text={t("funding:future-rewards")} color="white" />}
+                      col2={
+                        <Amount 
+                          amount={futureRewards}
+                          symbol={networkIssue?.rewardTokenData?.symbol}
+                          className="caption-large text-white font-weight-normal"
+                          symbolColor="warning"
+                        />
+                      }
+                      filler
+                    />
+                  }
                 </Col>
               </Row>
-              { (networkIssue?.isDraft || !isBountyFunded || networkIssue?.closed) &&
-                <Row className="mx-0">
-                  <Collapsable
-                    labelShow={t("funding:actions.manage-funding")}
-                    labelHide={t("funding:actions.manage-funding")}
-                    labelColor="gray"
-                    activeColor="white"
-                    className="gap-2"
-                  >
-                    {walletFunds?.map(fund => 
-                    <>
-                      <RowWithTwoColumns 
-                        key={`fund-${fund.id}`}
-                        className="p-2 bg-shadow border-radius-8"
-                        col1={
-                          <>
-                          <Amount 
-                            amount={fund.amount}
-                            symbol={transactionalSymbol}
-                            className="caption-large text-white"
-                          />
-                              {networkIssue?.closed && networkIssue?.rewardAmount > 0 && (
-                                <>
-                                  <ArrowRight className="mx-2" />
-                                  <span className="caption-medium me-2 text-uppercase">
-                                    {t("funding:reward")}
-                                  </span>
-                                  <Amount
-                                    amount={
-                                      (fund.amount /
-                                        networkIssue.fundingAmount) *
-                                      networkIssue.rewardAmount
-                                    }
-                                    symbol={rewardTokenSymbol}
-                                    symbolColor="warning"
-                                    className="caption-large text-white"
-                                  />
-                                </>
-                              )}
-                        </>
-                        }
-                        col2={ 
-                            networkIssue?.closed && networkIssue?.rewardAmount > 0 && (
-                              <Button
-                              textClass={`${networkIssue?.closed ? "text-primary" : 'text-danger'} p-0`}
-                              transparent
-                              onClick={() => setFundingToRetractOrWithdraw(fund)}
-                            >
-                              {networkIssue?.closed
-                                ? t("funding:actions.withdraw-funding")
-                                : t("funding:actions.retract-funding")}
-                            </Button>
-                            )
-                        }
-                      />
-                      </>)
-                    }
 
-                  </Collapsable>
-                </Row>
-              }
+              <Row className="mx-0">
+                <Collapsable
+                  labelShow={t("funding:actions.manage-funding")}
+                  labelHide={t("funding:actions.manage-funding")}
+                  labelColor="gray"
+                  activeColor="white"
+                  className="gap-2"
+                >
+                  {walletFunds?.map(fund => 
+                  <>
+                    <RowWithTwoColumns 
+                      key={`fund-${fund.id}`}
+                      className="p-2 bg-shadow border-radius-8"
+                      col1={
+                        <>
+                        <Amount 
+                          amount={fund.amount.toFixed()}
+                          symbol={transactionalSymbol}
+                          className="caption-large text-white"
+                        />
+                            {(isBountyClosed && hasReward) && (
+                              <>
+                                <ArrowRight className="mx-2" />
+                                <span className="caption-medium me-2 text-uppercase">
+                                  {t("funding:reward")}
+                                </span>
+                                <Amount
+                                  amount={
+                                    fund.amount
+                                      .dividedBy(networkIssue.fundingAmount)
+                                      .multipliedBy(networkIssue.rewardAmount)
+                                      .toFixed()
+                                  }
+                                  symbol={rewardTokenSymbol}
+                                  symbolColor="warning"
+                                  className="caption-large text-white"
+                                />
+                              </>
+                            )}
+                      </>
+                      }
+                      col2={
+                          (isBountyInDraft || isBountyClosed && hasReward) && (
+                            <Button
+                            textClass={`${isBountyClosed ? "text-primary" : 'text-danger'} p-0`}
+                            transparent
+                            onClick={() => setFundingToRetractOrWithdraw(fund)}
+                          >
+                            {isBountyClosed
+                              ? t("funding:actions.withdraw-funding")
+                              : t("funding:actions.retract-funding")}
+                          </Button>
+                          )
+                      }
+                    />
+                    </>)
+                  }
+
+                </Collapsable>
+              </Row>
             </>
           }
         </Col>

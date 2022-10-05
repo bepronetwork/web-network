@@ -167,7 +167,7 @@
     "from": "From",
     "to": "To",
     "status": "Status",
-    "available": "available",
+    "available": "Available",
     "giving-away": "giving away",
     "locked": "Locked",
     "upload": "upload",
@@ -278,7 +278,7 @@
     },
     "already-has-network": {
       "title": "Network already exists",
-      "button-label": "My networks",
+      "button-label": "My network",
       "content": "Connected wallet already has a network."
     },
     "settings-not-loaded": {
@@ -345,7 +345,7 @@
       "dispute": "Dispute bounty",
       "propose": "Propose merge request",
       "close-bounty": "Close bounty",
-      "redeem-bounty": "Redeem bounty",
+      "redeem-bounty": "Cancel bounty",
       "approve-settler": "Approve Network Token",
       "recognize-finished": "Recognize bounty as finished",
       "create-pull-request": "Create Pull Request",
