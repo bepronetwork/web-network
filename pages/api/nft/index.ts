@@ -69,12 +69,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       return res.status(404).json("Proposal invalid");
 
     if(proposal.refusedByBountyOwner || await network.isProposalDisputed(issueContractId, proposalscMergeId))
-      return res.status(404).json("proposal can be accepted");
+      return res.status(404).json("proposal cannot be accepted");
 
     const pullRequest = networkBounty.pullRequests.find(pr=> pr.id === proposal.prId)
 
     if(pullRequest.canceled || !pullRequest.ready)
-      return res.status(404).json("PR can be accepted");
+      return res.status(404).json("PR cannot be accepted");
 
     const [{treasury}, creatorFee, proposerFee] = await Promise.all([DAOService?.getTreasury(),
                                                                      DAOService?.getMergeCreatorFee(),
