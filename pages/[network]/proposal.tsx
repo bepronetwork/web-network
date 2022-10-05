@@ -43,37 +43,40 @@ export default function PageProposal() {
   const [networkProposal, setNetworkProposal] = useState<ProposalExtended>({} as ProposalExtended);
   
   const { activeNetwork } = useNetwork();
-  const { getUserOf, processEvent } = useApi();
+  const { getUserOf, processEvent, createNFT } = useApi();
   const { activeIssue, networkIssue, getNetworkIssue, updateIssue } = useIssue();
   const { handlerDisputeProposal, handleCloseIssue, handleRefuseByOwner } = useBepro();
 
   async function closeIssue() {
-    return handleCloseIssue(+activeIssue?.contractId, +proposal.contractId)
-      .then(txInfo => {
-        const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
+    try{
+      const {url} = await createNFT(activeIssue?.contractId, proposal.contractId)
+      
+      handleCloseIssue(+activeIssue?.contractId, +proposal.contractId, url)
+        .then(txInfo => {
+          const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
 
-        return processEvent("bounty", "closed", activeNetwork?.name, { fromBlock } );
-      })
-      .then(() => {
-        updateIssue(activeIssue?.repository_id, activeIssue?.githubId);
+          return processEvent("bounty", "closed", activeNetwork?.name, { fromBlock } );
+        })
+        .then(() => {
+          updateIssue(activeIssue?.repository_id, activeIssue?.githubId);
+  
+          dispatch(addToast({
+              type: "success",
+              title: t("actions.success"),
+              content: t("modals.not-mergeable.success-message")
+          }));
+        })
+    }
+    catch(error){
+      if (error?.code === MetamaskErrors.UserRejected) return;
 
-        dispatch(addToast({
-            type: "success",
-            title: t("actions.success"),
-            content: t("modals.not-mergeable.success-message")
-        }));
-      })
-      .catch(error => {
-        if (error?.code === MetamaskErrors.UserRejected) return;
+      console.log("Failed to close bounty", error);
 
-        console.log("Failed to close bounty", error);
-
-        dispatch(addToast({
+      dispatch(addToast({
             type: "danger",
             title: t("actions.failed"),
             content: error?.response?.data?.message
-        }));
-      });
+      }))}
   }
 
   async function disputeProposal() {
@@ -145,7 +148,7 @@ export default function PageProposal() {
         percentage: detail.percentage, 
         address: detail.recipient, 
         oracles, 
-        distributedAmount 
+        distributedAmount,
       };
     })).then(setUsersDistribution);
   }, [networkProposal, activeIssue]);

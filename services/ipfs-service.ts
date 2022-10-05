@@ -14,7 +14,7 @@ const auth =
     serverRuntimeConfig?.infura?.projectSecret).toString("base64");
 const baseURL = `https://${host}:${port}/api/v0`;
 
-export async function add(file: Buffer | string,
+export async function add(file: Buffer | string | JSON | Record<string, unknown>,
                           pin = false,
                           originalFilename?: string,
                           ext?: string): Promise<{ hash: string; fileName: string; size: string }> {
@@ -22,7 +22,7 @@ export async function add(file: Buffer | string,
 
   const isBuffer = Buffer.isBuffer(file);
 
-  const content = isBuffer ? Buffer.from(file) : file;
+  const content = isBuffer ? Buffer.from(file) : JSON.stringify(file);
 
   if (isBuffer) {
     const fileType = await fileTypeFromBuffer(file);

@@ -496,6 +496,17 @@ export default function useApi() {
       .catch((error) => { throw error });
   }
 
+  async function createNFT(issueContractId: number,
+                           proposalscMergeId: number,
+                           networkName: string = DEFAULT_NETWORK_NAME,) {
+    return api
+      .post("/nft", { issueContractId, proposalscMergeId, networkName })
+      .then(({ data }) => data)
+      .catch((error) => {
+        throw error;
+      });
+  }
+
   return {
     createIssue,
     createNetwork,
@@ -536,5 +547,6 @@ export default function useApi() {
     resetUser,
     getSettings,
     getTokens,
+    createNFT
   };
 }

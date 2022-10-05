@@ -9,6 +9,7 @@ const publicRuntimeConfig = {
     api: process.env.NEXT_PUBLIC_API_HOST || "http://localhost:3000",
     home: process.env.NEXT_PUBLIC_HOME_URL || "http://localhost:3000",
     events: process.env.NEXT_PUBLIC_EVENTS_API || "http://localhost:3334",
+    ipfs: process.env.NEXT_PUBLIC_IPFS_BASE
   }
 }
 

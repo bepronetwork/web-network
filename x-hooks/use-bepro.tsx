@@ -94,13 +94,14 @@ export default function useBepro() {
   }
 
   async function handleCloseIssue(bountyId: number,
-                                  proposalscMergeId: number): Promise<TransactionReceipt | Error> {
+                                  proposalscMergeId: number, 
+                                  tokenUri: string): Promise<TransactionReceipt | Error> {
     return new Promise(async (resolve, reject) => {
       const closeIssueTx = addTransaction({ type: TransactionTypes.closeIssue },
                                           activeNetwork);
       dispatch(closeIssueTx);
-
-      await DAOService.closeBounty(+bountyId, +proposalscMergeId)
+      
+      await DAOService.closeBounty(+bountyId, +proposalscMergeId, tokenUri)
         .then((txInfo: Error | TransactionReceipt | PromiseLike<Error | TransactionReceipt>) => {
           txWindow.updateItem(closeIssueTx.payload.id,
                               parseTransaction(txInfo, closeIssueTx.payload));

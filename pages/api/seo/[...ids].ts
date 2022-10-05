@@ -1,21 +1,17 @@
 import axios from "axios";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
-import getConfig from "next/config";
 import { Op } from "sequelize";
 
 import models from "db/models";
 
 import { Settings } from "helpers/settings";
 
-const { publicRuntimeConfig } = getConfig();
-
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const {
     ids: [repoId, ghId]
   } = req.query;
   const issueId = [repoId, ghId].join("/");
-
   const issue = await models.issue.findOne({
     where: {
       issueId,
@@ -34,11 +30,11 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   });
 
   const defaultConfig = (new Settings(settings)).raw();
-
+  
   if (!defaultConfig?.urls?.ipfs)
     return res.status(500).json("Missing ipfs url on settings");
 
-  const url = `${publicRuntimeConfig?.ipfsUrl}/${issue.seoImage}`;
+  const url = `${defaultConfig.urls.ipfs}/${issue.seoImage}`;
 
   const { data } = await axios.get(url, {
     responseType: "arraybuffer"
