@@ -47,7 +47,7 @@ export default function ListSort({
 
     return (
       <div className="flex-grow-0 react-select__single-value d-flex align-items-center text-truncate ms-2">
-        {getValue()[0]?.value}
+        {getValue()[0]?.label}
       </div>
     );
   }

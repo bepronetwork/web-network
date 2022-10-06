@@ -9,6 +9,9 @@ import models from "db/models";
 import paginate, { calculateTotalPages, paginateArray } from "helpers/paginate";
 import { searchPatternInText } from "helpers/string";
 
+const COLS_TO_CAST = ["amount", "fundingAmount"];
+const castToDecimal = columnName => Sequelize.cast(Sequelize.col(columnName), 'DECIMAL')
+
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try{
     const whereCondition: WhereOptions = { state: { [Op.not]: "pending" } };
@@ -103,7 +106,8 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     const sortBy = req?.query?.sortBy?.length && String(req?.query?.sortBy)
                                     .replaceAll(',',`,+,`)
                                     .split(',')
-                                    .map((value)=> value === '+' ? Sequelize.literal('+'): value)
+                                    .map((value)=> value === '+' ? Sequelize.literal('+') : 
+                                      (COLS_TO_CAST.includes(value) ? castToDecimal(value) : value));
 
     if (search) {
       const issues = await models.issue.findAll({
