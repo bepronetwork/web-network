@@ -1,5 +1,6 @@
 import { error as LogError } from "@scripts/logging.js";
 import { ProposalDetail } from "@taikai/dappkit";
+import BigNumber from "bignumber.js";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op } from "sequelize";
@@ -84,7 +85,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const distributions = calculateDistributedAmounts(treasury, 
                                                       creatorFee, 
                                                       proposerFee,
-                                                      networkBounty.tokenAmount, 
+                                                      BigNumber(networkBounty.tokenAmount), 
                                                       proposal.details.map(({ percentage }) => percentage));
 
     const participants = await Promise.all(proposal.details.map(async(detail: ProposalDetail, i) => {
