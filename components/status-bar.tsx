@@ -76,7 +76,7 @@ export default function StatusBar() {
       <div className="ms-3 flex-grow-1 text-center text-uppercase family-Regular status-bar-text text-ligth-gray">
         <Translation label="status.tagline" />
         <a
-          href="https://www.bepro.network/terms-and-conditions"
+          href="https://www.bepro.network/terms"
           target="_blank"
           className="ms-2 text-decoration-none text-primary"
           rel="noreferrer"
