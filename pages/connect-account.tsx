@@ -156,7 +156,7 @@ export default function ConnectAccount() {
               <div className="caption-small text-ligth-gray text-center fs-smallest text-dark text-uppercase mt-4">
                 {t("misc.by-connecting")}{" "}
                 <a
-                  href="https://www.bepro.network/terms-and-conditions"
+                  href="https://www.bepro.network/terms"
                   target="_blank"
                   className="text-decoration-none"
                   rel="noreferrer"

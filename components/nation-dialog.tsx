@@ -57,7 +57,7 @@ export default function NationDialog() {
               </p>
               <a
                 target="_blank"
-                href="https://www.bepro.network/terms-and-conditions"
+                href="https://www.bepro.network/terms"
                 className="mb-2 text-center text-white-50 text-decoration-none text-uppercase fs-8"
                 rel="noreferrer"
               >

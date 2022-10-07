@@ -105,7 +105,7 @@ export default function ConnectWalletButton({
           <div className="small-info text-center text-uppercase mt-1 pt-1">
             <span className="text-ligth-gray">{t("misc.by-connecting")} </span>
             <a
-              href="https://www.bepro.network/terms-and-conditions"
+              href="https://www.bepro.network/terms"
               target="_blank"
               className="text-decoration-none text-primary"
               rel="noreferrer"
