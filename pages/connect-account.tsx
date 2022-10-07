@@ -165,7 +165,7 @@ export default function ConnectAccount() {
                 </a>{" "}
                 &{" "}
                 <a
-                  href="https://www.bepro.network/privacy"
+                  href="https://taikai.network/privacy"
                   target="_blank"
                   className="text-decoration-none"
                   rel="noreferrer"

@@ -136,7 +136,7 @@ export default function WrongNetworkModal({
           </a>{" "}
           <br /> {t("misc.and")}{" "}
           <a
-            href="https://www.bepro.network/privacy"
+            href="https://taikai.network/privacy"
             target="_blank"
             className="text-decoration-none"
             rel="noreferrer"

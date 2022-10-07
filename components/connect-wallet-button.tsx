@@ -115,7 +115,7 @@ export default function ConnectWalletButton({
             <br />
             <span className="text-ligth-gray">{t("misc.and")} </span>
             <a
-              href="https://www.bepro.network/privacy"
+              href="https://taikai.network/privacy"
               target="_blank"
               className="text-decoration-none text-primary"
               rel="noreferrer"
