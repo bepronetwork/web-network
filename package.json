@@ -6,7 +6,6 @@
     "node": "14.17.0"
   },
   "scripts": {
-    "preinstall": "npm install --package-lock-only --ignore-scripts && npx npm-force-resolutions",
     "prestart": "npm run migrate",
     "migrate": "sequelize db:migrate",
     "migrate:undo": "sequelize db:migrate:undo",
