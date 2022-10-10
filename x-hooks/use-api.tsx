@@ -314,13 +314,12 @@ export default function useApi() {
   async function uploadFiles(files: File | File[]): Promise<any[]> {
     const form = new FormData();
     const isArray = Array.isArray(files);
-    if (isArray) {
-      files?.forEach(async (file, index) => {
-        form.append(`file${index + 1}`, file);
-      });
-    } else {
-      form.append(`file`, files);
-    }
+    const append = (file: File) => form.append(`file`, file);
+
+    if (isArray)
+      (files as File[]).forEach(append);
+    else append(files as File);
+
 
     return client.post("/files", form).then(({ data }) => data);
   }

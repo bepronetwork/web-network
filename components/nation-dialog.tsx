@@ -8,25 +8,25 @@ import useApi from '@x-hooks/use-api';
 import { useTranslation } from "next-i18next";
 
 export default function NationDialog({ children }) {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isBlock, setBlock] = useState<boolean>(false);
-  const {getClientNation} = useApi();
+  const [isLoading,] = useState<boolean>(false);
+  const [isBlock,] = useState<boolean>(false);
   const { t } = useTranslation('common')
-  const [country, setCountry] = useState<string>();
+  const [country,] = useState<string>();
 
-  useEffect(() => {
-    setIsLoading(true);
-    getClientNation()
-      .then((data)=>{
-        if (data.countryCode && COUNTRY_CODE_BLOCKED.indexOf(data.countryCode) === -1)
-          return;
-
-        setCountry(data.country || String(t('modals.nation-dialog.your-country')));
-        setBlock(true);
-
-      })
-      .finally(() => setIsLoading(false));
-  }, []);
+  // no longer applies
+  // useEffect(() => {
+  //   setIsLoading(true);
+  //   getClientNation()
+  //     .then((data)=>{
+  //       if (data.countryCode && COUNTRY_CODE_BLOCKED.indexOf(data.countryCode) === -1)
+  //         return;
+  //
+  //       setCountry(data.country || String(t('modals.nation-dialog.your-country')));
+  //       setBlock(true);
+  //
+  //     })
+  //     .finally(() => setIsLoading(false));
+  // }, []);
 
   if (isBlock) {
     return (
