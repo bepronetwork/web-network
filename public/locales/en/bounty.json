@@ -22,13 +22,14 @@
   "steps": {
     "title": "Bounty State",
     "draft": "Draft",
+    "funding": "Funding",
     "development": "Development",
     "finalized": "Finished",
     "validation": "validation & disputes",
     "closed": "closed & distributed",
     "details": "details",
     "bounty": "bounty",
-    "funding": "funding request",
+    "funding-request": "funding request",
     "additional-details": "additional details", 
     "review": "review"
   },
