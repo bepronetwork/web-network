@@ -19,7 +19,6 @@ import { User, Wallet } from "interfaces/authentication";
 import { CustomSession } from "interfaces/custom-session";
 
 import useApi from "x-hooks/use-api";
-import useNetworkTheme from "x-hooks/use-network";
 
 export interface IAuthenticationContext {
   user?: User;
@@ -39,15 +38,17 @@ const EXCLUDED_PAGES = ["/networks", "/connect-account", "/new-network", "/[netw
 
 export const AuthenticationProvider = ({ children }) => {
   const session = useSession();
-  const { asPath, pathname, push, replace } = useRouter();
+  const { asPath, pathname, push } = useRouter();
 
   const [user, setUser] = useState<User>();
   const [wallet, setWallet] = useState<Wallet>();
   const [databaseUser, setDatabaseUser] = useState<UserApi>();
   const [isGithubAndWalletMatched, setIsGithubAndWalletMatched] = useState<boolean>();
-  const {getURLWithNetwork} = useNetworkTheme()
+
   const { getUserOf, getUserWith } = useApi();
   const { service: DAOService, connect } = useDAO();
+
+  const URL_BASE = typeof window !== "undefined" ? `${window.location.protocol}//${ window.location.host}` : "";
 
   const connectWallet = useCallback(async () => {
     try {
@@ -66,10 +67,15 @@ export const AuthenticationProvider = ({ children }) => {
 
   
   const disconnectWallet = useCallback(async () => {
+    const lastNetwork = localStorage.getItem("lastNetworkVisited");
+
     localStorage.clear();
+    
     setWallet(undefined);
-    await replace(getURLWithNetwork('/'));
-    signOut();
+
+    signOut({
+      callbackUrl: `${URL_BASE}/${lastNetwork}`
+    });
   }, []);
 
   const disconnectGithub = useCallback(async () => {
@@ -77,14 +83,15 @@ export const AuthenticationProvider = ({ children }) => {
   }, [user?.login, asPath, wallet?.address]);
   
   const connectGithub = useCallback(async () => {
-    const URL_BASE = `${window.location.protocol}//${ window.location.host}`;
-
     const user = await getUserOf(wallet?.address?.toLowerCase());
 
     if (!user?.githubLogin && !asPath?.includes("connect-account")) {
       await disconnectGithub();
+      
       return push("/connect-account");
     }
+
+    sessionStorage.setItem("lastUrlBeforeGithubConnect", asPath);
 
     signIn("github", {
       callbackUrl: `${URL_BASE}${asPath}`
