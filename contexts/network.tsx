@@ -69,7 +69,9 @@ export const NetworkProvider: React.FC = function ({ children }) {
   }, [query, activeNetwork]);
 
   const updateNetworkParameters = useCallback(() => {
-    if (!DAOService?.network?.contractAddress || !activeNetwork?.networkAddress) return;
+    if (!DAOService?.network?.contractAddress ||
+        !activeNetwork?.networkAddress ||
+        storageLastNetworkVisited.value === activeNetwork?.name) return;
 
     const divide = (value) => +value / 1000;
     const toString = (value) => value.toString();
