@@ -11,7 +11,7 @@ export default function ReadyToPropose() {
 
   return (
     <CouncilLayout >
-      <ListIssues filterState="ready" emptyMessage={t("council:empty")} />
+      <ListIssues filterState="proposal" emptyMessage={t("council:empty")} />
     </CouncilLayout>
   );
 }
