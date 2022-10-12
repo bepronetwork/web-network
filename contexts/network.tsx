@@ -71,7 +71,9 @@ export const NetworkProvider: React.FC = function ({ children }) {
     console.log(`updating network params start`, DAOService?.network, activeNetwork?.networkAddress, prevNetwork?.name);
 
     if (!DAOService?.network?.contractAddress || !activeNetwork?.networkAddress) return;
-    if (prevNetwork?.name && prevNetwork?.name === activeNetwork?.name) return;
+    const sessionParams = new WinStorage(`${cookieKey}:${activeNetwork.name}:params`, 20000, 'sessionStorage');
+    if (sessionParams.value)
+      return;
 
     const divide = (value) => +value / 1000;
     const toString = (value) => value.toString();
@@ -95,8 +97,8 @@ export const NetworkProvider: React.FC = function ({ children }) {
           .map(([action, transformer, key]) => action().then(value => ({[key]: transformer(value)}))))
       .then(values => values.reduce((prev, curr) => ({...prev, ...curr}),{}))
       .then(values => {
-        console.log('reduced', values);
-        setActiveNetwork(values)
+        sessionParams.value = values;
+        setActiveNetwork(values);
       })
 
   }, [activeNetwork?.networkAddress, DAOService?.network?.contractAddress]);
