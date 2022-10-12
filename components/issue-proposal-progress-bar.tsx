@@ -80,9 +80,6 @@ export default function IssueProposalProgressBar() {
     if (creationDate && index === currentStep && currentStep === 1 && !isFundingRequest) 
       currentValue = item(addSeconds(creationDate, draftTime)).Started;
 
-    if(creationDate && index === currentStep && currentStep === 1 && isBountyFunded)
-      currentValue = item(creationDate, draftTime).Warning;
-
     if (creationDate && index === currentStep && currentStep === 0 && !isCanceled && !isFinalized) 
       currentValue = item(creationDate, draftTime).Warning;
     
