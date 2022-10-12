@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 
-import { add, addSeconds, intervalToDuration } from "date-fns";
+import { add, addSeconds, compareAsc, intervalToDuration } from "date-fns";
 import { useTranslation } from "next-i18next";
 
 import { useIssue } from "contexts/issue";
@@ -94,7 +94,14 @@ export default function IssueProposalProgressBar() {
             start: creationDate,
             end: new Date(fundedDate),
         });
-        currentValue = item(add(creationDate, intervalFunded)).Started;
+        const startedFundedDate = add(creationDate, intervalFunded)
+        const startedDraftDate = addSeconds(creationDate, draftTime)
+
+        if(compareAsc(startedDraftDate, startedFundedDate) === 1){
+          currentValue = item(startedDraftDate).Started
+        }else {
+          currentValue = item(startedFundedDate).Started;
+        }
       } else if(lastProposalCreationDate) {
         currentValue = item(lastProposalCreationDate).Started;
       }
