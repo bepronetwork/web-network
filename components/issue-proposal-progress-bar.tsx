@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 
-import { addSeconds } from "date-fns";
+import { add, addSeconds, intervalToDuration } from "date-fns";
 import { useTranslation } from "next-i18next";
 
 import { useIssue } from "contexts/issue";
@@ -28,8 +28,9 @@ export default function IssueProposalProgressBar() {
   const isInValidation = !!networkIssue?.isInValidation;
   const isIssueinDraft = !!networkIssue?.isDraft;
   const isFundingRequest = networkIssue?.fundingAmount?.gt(0) || activeIssue?.fundingAmount?.gt(0);
-  const isBountyFunded = activeIssue?.fundedAmount?.isEqualTo(activeIssue?.fundingAmount)
-  const creationDate = networkIssue?.creationDate ;
+  const isBountyFunded = activeIssue?.fundedAmount?.isEqualTo(activeIssue?.fundingAmount);
+  const creationDate = networkIssue?.creationDate;
+  const fundedDate = activeIssue?.fundedAt;
   const closedDate = networkIssue?.closedDate;
   const isCanceled = activeIssue?.state === "canceled" || !!networkIssue?.canceled;
   const lastProposalCreationDate = 
@@ -83,14 +84,21 @@ export default function IssueProposalProgressBar() {
       currentValue = item(creationDate, draftTime).Warning;
     
     if (
-        lastProposalCreationDate &&
         index === currentStep &&
         currentStep === 2 &&
         !isCanceled &&
-        !isFinalized &&
-        !isFundingRequest
-      ) 
-      currentValue = item(lastProposalCreationDate).Started;
+        !isFinalized
+      ) {
+      if (isFundingRequest && creationDate && fundedDate) {
+        const intervalFunded = intervalToDuration({
+            start: creationDate,
+            end: new Date(fundedDate),
+        });
+        currentValue = item(add(creationDate, intervalFunded)).Started;
+      } else if(lastProposalCreationDate) {
+        currentValue = item(lastProposalCreationDate).Started;
+      }
+    }
 
     if (closedDate && index === currentStep && currentStep === 3) 
       currentValue = isFundingRequest ? item(lastProposalCreationDate).Started : item(closedDate).At;
