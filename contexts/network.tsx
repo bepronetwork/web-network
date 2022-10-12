@@ -39,68 +39,6 @@ export const NetworkProvider: React.FC = function ({ children }) {
   const { query, push } = useRouter();
   const { service: DAOService, changeNetwork } = useDAO();
 
-
-  const _updateActiveNetwork = useCallback(
-    () => {
-      const name = query?.network?.toString();
-      if (!name || prevNetwork.name === name)
-        return;
-
-      const sessionNetwork = new WinStorage(`${cookieKey}:${name}`, 2000, 'sessionStorage');
-      if (sessionNetwork.value)
-        return;
-
-      getNetwork({name})
-        .then(({data}) => {
-          if (!data.isRegistered)
-            throw new Error(`Network not registered`);
-          sessionNetwork.value = data;
-          setActiveNetwork(data);
-        })
-        .catch(error => {
-          console.error(`Failed to load network ${name}`, error);
-        })
-    }, [query]
-  );
-
-  const _updateNetworkParameters = useCallback(
-    () => {
-      if (!activeNetwork || !activeNetwork.networkAddress)
-        return;
-
-      const storageParams = new WinStorage(`${cookieKey}:${activeNetwork?.name}:params`, 30000, 'sessionStorage');
-
-      if (storageParams.value)
-        return;
-
-      const divide = (value) => +value / 1000;
-      const toString = (value) => value.toString();
-      const toNumber = (value) => +value;
-      const getParam = (param) => DAOService.getNetworkParameter(param);
-
-      Promise.all(
-        ([
-          [() => getParam("councilAmount"), toString, "councilAmount"],
-          [() => getParam("disputableTime"), divide, "disputableTime"],
-          [() => getParam("draftTime"), divide, "draftTime"],
-          [() => getParam("oracleExchangeRate"), toNumber, "oracleExchangeRate"],
-          [() => getParam("mergeCreatorFeeShare"), toNumber, "mergeCreatorFeeShare"],
-          [() => getParam("proposerFeeShare"), toNumber, "proposerFeeShare"],
-          [() => getParam("percentageNeededForDispute"), toNumber, "percentageNeededForDispute"],
-          [DAOService.getTreasury, null, "treasury"],
-          [DAOService.getSettlerTokenData, null, "networkToken"],
-        ] as ParamAction[])
-          .map(([action, transformer, key]) => action().then(value => ({[key]: transformer(value)}))))
-        .then(values => values.reduce((prev, curr) => ({...prev, ...curr}),{}))
-        .then(values => {
-          console.log(`values`, values, activeNetwork);
-          setActiveNetwork(values)
-        })
-
-    }, [activeNetwork]
-  )
-
-
   const updateActiveNetwork = useCallback((forced?: boolean) => {
     const networkName = query?.network?.toString() || settings?.defaultNetworkConfig?.name;
 
@@ -131,36 +69,35 @@ export const NetworkProvider: React.FC = function ({ children }) {
 
   const updateNetworkParameters = useCallback(() => {
     if (!DAOService?.network?.contractAddress || !activeNetwork?.networkAddress) return;
+    if (prevNetwork?.name && prevNetwork?.name === activeNetwork?.name) return;
 
     const divide = (value) => +value / 1000;
     const toString = (value) => value.toString();
     const toNumber = (value) => +value;
     const getParam = (param) => DAOService.getNetworkParameter(param);
 
-    let loadedPropCount = 0;
-
-
-    ([
-      [() => getParam("councilAmount"), toString, "councilAmount"],
-      [() => getParam("disputableTime"), divide, "disputableTime"],
-      [() => getParam("draftTime"), divide, "draftTime"],
-      [() => getParam("oracleExchangeRate"), toNumber, "oracleExchangeRate"],
-      [() => getParam("mergeCreatorFeeShare"), toNumber, "mergeCreatorFeeShare"],
-      [() => getParam("proposerFeeShare"), toNumber, "proposerFeeShare"],
-      [() => getParam("percentageNeededForDispute"), toNumber, "percentageNeededForDispute"],
-      [DAOService.getTreasury, null, "treasury"],
-      [DAOService.getSettlerTokenData, null, "networkToken"],
-    ] as ParamAction[])
-      .forEach(([action, transformer, key], index, array) =>
-        action()
-          .then(value => {
-            loadedPropCount++;
-            setActiveNetwork({...activeNetwork, [key]: transformer ? transformer(value) : value});
-          }));
+    Promise.all(
+        ([
+          [() => getParam("councilAmount"), toString, "councilAmount"],
+          [() => getParam("disputableTime"), divide, "disputableTime"],
+          [() => getParam("draftTime"), divide, "draftTime"],
+          [() => getParam("oracleExchangeRate"), toNumber, "oracleExchangeRate"],
+          [() => getParam("mergeCreatorFeeShare"), toNumber, "mergeCreatorFeeShare"],
+          [() => getParam("proposerFeeShare"), toNumber, "proposerFeeShare"],
+          [() => getParam("percentageNeededForDispute"), toNumber, "percentageNeededForDispute"],
+          [DAOService.getTreasury, null, "treasury"],
+          [DAOService.getSettlerTokenData, null, "networkToken"],
+        ] as ParamAction[])
+          .map(([action, transformer, key]) => action().then(value => ({[key]: transformer(value)}))))
+      .then(values => values.reduce((prev, curr) => ({...prev, ...curr}),{}))
+      .then(values => {
+        console.log('values', values);
+        setActiveNetwork(values)
+      })
 
   }, [activeNetwork?.networkAddress, DAOService?.network?.contractAddress]);
 
-  useEffect(() => { _updateActiveNetwork(); }, [query?.network]);
+  useEffect(() => { updateActiveNetwork(); }, [query?.network]);
 
   useEffect(() => {
     if (activeNetwork?.isRegistered === false) push("/networks");
@@ -170,15 +107,15 @@ export const NetworkProvider: React.FC = function ({ children }) {
     if (DAOService?.network?.contractAddress !== activeNetwork?.networkAddress ||! activeNetwork?.draftTime) 
       changeNetwork(activeNetwork?.networkAddress)
         .then(loaded => {
-          if (loaded) _updateNetworkParameters();
+          if (loaded) updateNetworkParameters();
         });
   }, [DAOService?.network?.contractAddress, activeNetwork?.networkAddress]);
 
   const memorizeValue = useMemo<NetworkContextData>(() => ({
       activeNetwork,
       prevNetwork,
-      updateActiveNetwork: _updateActiveNetwork,
-      updateNetworkParameters: _updateNetworkParameters
+      updateActiveNetwork,
+      updateNetworkParameters
   }), [activeNetwork, prevNetwork, DAOService]);
 
   return (
