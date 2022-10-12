@@ -30,6 +30,10 @@ class Issue extends Model {
         tokenId: {
           type: DataTypes.INTEGER,
           allowNull: true
+        },
+        fundedAt: {
+          type: DataTypes.DATE,
+          allowNull: true
         }
     },
                {
