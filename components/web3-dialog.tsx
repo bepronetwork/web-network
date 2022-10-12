@@ -35,7 +35,7 @@ export default function WebThreeDialog() {
       ![
         getURLWithNetwork("/").pathname,
         getURLWithNetwork("/developers").pathname,
-        getURLWithNetwork("/council").pathname,
+        getURLWithNetwork("/curators").pathname,
         getURLWithNetwork("/oracle").pathname,
         getURLWithNetwork("/oracle/new-bounties").pathname,
         getURLWithNetwork("/oracle/ready-to-merge").pathname,
