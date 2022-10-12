@@ -68,6 +68,8 @@ export const NetworkProvider: React.FC = function ({ children }) {
   }, [query, activeNetwork]);
 
   const updateNetworkParameters = useCallback(() => {
+    console.log(`updating network params start`, DAOService?.network, activeNetwork?.networkAddress, prevNetwork?.name);
+
     if (!DAOService?.network?.contractAddress || !activeNetwork?.networkAddress) return;
     if (prevNetwork?.name && prevNetwork?.name === activeNetwork?.name) return;
 
@@ -75,6 +77,8 @@ export const NetworkProvider: React.FC = function ({ children }) {
     const toString = (value) => value.toString();
     const toNumber = (value) => +value;
     const getParam = (param) => DAOService.getNetworkParameter(param);
+
+    console.log(`updating network params`);
 
     Promise.all(
         ([
@@ -91,7 +95,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
           .map(([action, transformer, key]) => action().then(value => ({[key]: transformer(value)}))))
       .then(values => values.reduce((prev, curr) => ({...prev, ...curr}),{}))
       .then(values => {
-        console.log('values', values);
+        console.log('reduced', values);
         setActiveNetwork(values)
       })
 
