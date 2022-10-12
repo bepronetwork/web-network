@@ -15,6 +15,7 @@ import useApi from "x-hooks/use-api";
 import { useSettings } from "./settings";
 import {NetworkParameters} from "../types/dappkit";
 import {WinStorage} from "../services/win-storage";
+import {usePrevious} from "@restart/hooks";
 
 export interface NetworkContextData {
   activeNetwork: Network;
@@ -31,14 +32,74 @@ export const cookieKey = "bepro.network";
 
 export const NetworkProvider: React.FC = function ({ children }) {
   const [activeNetwork, setActiveNetwork] = useState<Network>(null);
-  const [lastNetworkVisited, setLastNetworkVisited] = useState<string>();
-  const [loading, setLoadingProp] = useState<boolean>(false);
-  const [storageLastNetworkVisited,] = useState(new WinStorage('lastNetworkVisited', 60*1000, "localStorage"))
 
+  const prevNetwork = usePrevious(activeNetwork);
   const { getNetwork } = useApi();
   const { settings } = useSettings();
   const { query, push } = useRouter();
   const { service: DAOService, changeNetwork } = useDAO();
+
+
+  const _updateActiveNetwork = useCallback(
+    () => {
+      const name = query?.network?.toString();
+      if (!name || prevNetwork.name === name)
+        return;
+
+      const sessionNetwork = new WinStorage(`${cookieKey}:${name}`, 2000, 'sessionStorage');
+      if (sessionNetwork.value)
+        return;
+
+      getNetwork({name})
+        .then(({data}) => {
+          if (!data.isRegistered)
+            throw new Error(`Network not registered`);
+          sessionNetwork.value = data;
+          setActiveNetwork(data);
+        })
+        .catch(error => {
+          console.error(`Failed to load network ${name}`, error);
+        })
+    }, [query]
+  );
+
+  const _updateNetworkParameters = useCallback(
+    () => {
+      if (!activeNetwork || !activeNetwork.networkAddress)
+        return;
+
+      const storageParams = new WinStorage(`${cookieKey}:${activeNetwork?.name}:params`, 30000, 'sessionStorage');
+
+      if (storageParams.value)
+        return;
+
+      const divide = (value) => +value / 1000;
+      const toString = (value) => value.toString();
+      const toNumber = (value) => +value;
+      const getParam = (param) => DAOService.getNetworkParameter(param);
+
+      Promise.all(
+        ([
+          [() => getParam("councilAmount"), toString, "councilAmount"],
+          [() => getParam("disputableTime"), divide, "disputableTime"],
+          [() => getParam("draftTime"), divide, "draftTime"],
+          [() => getParam("oracleExchangeRate"), toNumber, "oracleExchangeRate"],
+          [() => getParam("mergeCreatorFeeShare"), toNumber, "mergeCreatorFeeShare"],
+          [() => getParam("proposerFeeShare"), toNumber, "proposerFeeShare"],
+          [() => getParam("percentageNeededForDispute"), toNumber, "percentageNeededForDispute"],
+          [DAOService.getTreasury, null, "treasury"],
+          [DAOService.getSettlerTokenData, null, "networkToken"],
+        ] as ParamAction[])
+          .map(([action, transformer, key]) => action().then(value => ({[key]: transformer(value)}))))
+        .then(values => values.reduce((prev, curr) => ({...prev, ...curr}),{}))
+        .then(values => {
+          console.log(`values`, values, activeNetwork);
+          setActiveNetwork(values)
+        })
+
+    }, [activeNetwork]
+  )
+
 
   const updateActiveNetwork = useCallback((forced?: boolean) => {
     const networkName = query?.network?.toString() || settings?.defaultNetworkConfig?.name;
@@ -69,20 +130,15 @@ export const NetworkProvider: React.FC = function ({ children }) {
   }, [query, activeNetwork]);
 
   const updateNetworkParameters = useCallback(() => {
-    if (!DAOService?.network?.contractAddress ||
-        !activeNetwork?.networkAddress ||
-        storageLastNetworkVisited.value === activeNetwork?.name) return;
+    if (!DAOService?.network?.contractAddress || !activeNetwork?.networkAddress) return;
 
     const divide = (value) => +value / 1000;
     const toString = (value) => value.toString();
     const toNumber = (value) => +value;
     const getParam = (param) => DAOService.getNetworkParameter(param);
 
-    if (loading)
-      return;
-
     let loadedPropCount = 0;
-    setLoadingProp(true);
+
 
     ([
       [() => getParam("councilAmount"), toString, "councilAmount"],
@@ -100,23 +156,11 @@ export const NetworkProvider: React.FC = function ({ children }) {
           .then(value => {
             loadedPropCount++;
             setActiveNetwork({...activeNetwork, [key]: transformer ? transformer(value) : value});
-            if (loadedPropCount === array.length)
-              setLoadingProp(false);
           }));
 
   }, [activeNetwork?.networkAddress, DAOService?.network?.contractAddress]);
 
-  useEffect(() => {
-    if (storageLastNetworkVisited.value === query?.network.toString())
-      return;
-
-    if (query?.network)
-      storageLastNetworkVisited.value = query.network.toString();
-    
-    setLastNetworkVisited(storageLastNetworkVisited.value);
-    
-    updateActiveNetwork();
-  }, [query?.network]);
+  useEffect(() => { _updateActiveNetwork(); }, [query?.network]);
 
   useEffect(() => {
     if (activeNetwork?.isRegistered === false) push("/networks");
@@ -126,16 +170,16 @@ export const NetworkProvider: React.FC = function ({ children }) {
     if (DAOService?.network?.contractAddress !== activeNetwork?.networkAddress ||! activeNetwork?.draftTime) 
       changeNetwork(activeNetwork?.networkAddress)
         .then(loaded => {
-          if (loaded) updateNetworkParameters();
+          if (loaded) _updateNetworkParameters();
         });
   }, [DAOService?.network?.contractAddress, activeNetwork?.networkAddress]);
 
   const memorizeValue = useMemo<NetworkContextData>(() => ({
       activeNetwork,
-      lastNetworkVisited,
-      updateActiveNetwork,
-      updateNetworkParameters
-  }), [activeNetwork, lastNetworkVisited, DAOService]);
+      prevNetwork,
+      updateActiveNetwork: _updateActiveNetwork,
+      updateNetworkParameters: _updateNetworkParameters
+  }), [activeNetwork, prevNetwork, DAOService]);
 
   return (
     <NetworkContext.Provider value={memorizeValue}>
