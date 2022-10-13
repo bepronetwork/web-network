@@ -434,7 +434,7 @@ export default function NewProposal({
           placeholder={t("forms.select-placeholder")}
           defaultValue={{
             value: currentPullRequest?.id,
-            label: `PR#${currentPullRequest?.id} ${t("misc.by")} @${
+            label: `PR#${currentPullRequest?.githubId} ${t("misc.by")} @${
               currentPullRequest?.githubLogin
             }`,
             githubId: currentPullRequest?.githubId,
