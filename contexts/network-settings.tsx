@@ -392,9 +392,9 @@ export const NetworkSettingsProvider = ({ children }) => {
             isSaved: false,
             hasIssues: false,
             name: repo?.name,
+            userPermission: repo?.viewerPermission,
             fullName: repo?.nameWithOwner
           }));
-        
         if (isCreating) repositories.push(...filtered);
         else {
           repositories.push(... await searchRepositories({ networkName: network?.name })
@@ -403,6 +403,7 @@ export const NetworkSettingsProvider = ({ children }) => {
               isSaved: true,
               name: repo.githubPath.split("/")[1],
               fullName: repo.githubPath,
+              userPermission: repo?.viewerPermission,
               hasIssues: await repositoryHasIssues(repo.githubPath)
             })))));
           
