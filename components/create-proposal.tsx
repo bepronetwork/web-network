@@ -434,7 +434,7 @@ export default function NewProposal({
           placeholder={t("forms.select-placeholder")}
           defaultValue={{
             value: currentPullRequest?.id,
-            label: `PR#${currentPullRequest?.githubId} ${t("misc.by")} @${
+            label: `PR #${currentPullRequest?.githubId} ${t("misc.by")} @${
               currentPullRequest?.githubLogin
             }`,
             githubId: currentPullRequest?.githubId,
@@ -445,7 +445,7 @@ export default function NewProposal({
           }}
           options={pullRequests?.map((items: pullRequest) => ({
             value: items.id,
-            label: `#${items.githubId} ${t("misc.by")} @${items.githubLogin}`,
+            label: `PR #${items.githubId} ${t("misc.by")} @${items.githubLogin}`,
             githubId: items.githubId,
             githubLogin: items.githubLogin,
             marged: items.merged,
