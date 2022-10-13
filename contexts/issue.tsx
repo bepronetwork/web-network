@@ -123,6 +123,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     [activeNetwork, query?.repoId, query?.id, user?.accessToken]);
 
   const getNetworkIssue = useCallback(async () => {
+    console.log(`getNetworkIssue`, activeIssue)
     if (!activeIssue?.contractId || !DAOService?.network?.contractAddress)
       return;
       

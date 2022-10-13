@@ -44,21 +44,23 @@ export const NetworkProvider: React.FC = function ({ children }) {
 
     if (!networkName)
       return;
-    
+
     if (activeNetwork?.name?.toLowerCase() === networkName.toLowerCase() && !forced) return activeNetwork;
 
-    const networkFromStorage = sessionStorage.getItem(`${cookieKey}:${networkName}`);
-    
-    if (networkFromStorage && !forced) {
-      return setActiveNetwork(networkFromStorage && JSON.parse(networkFromStorage) || undefined);
+    const sessionNetwork = new WinStorage(`${cookieKey}:${networkName}`, 20000, 'sessionStorage');
+
+    if (sessionNetwork.value && !forced) {
+      setActiveNetwork(sessionNetwork.value);
+      return;
     }
 
     getNetwork({name: networkName})
         .then(({ data }) => {
-          if (!data.isRegistered) throw new Error("Network not registered");
-          
-          sessionStorage.setItem(`${cookieKey}:${networkName.toLowerCase()}`, JSON.stringify(data));
-          setActiveNetwork(data);
+          if (!data.isRegistered)
+            throw new Error("Network not registered");
+
+          sessionNetwork.value = data;
+          setActiveNetwork(sessionNetwork.value);
         })
         .catch(() => {
           push({
@@ -68,19 +70,16 @@ export const NetworkProvider: React.FC = function ({ children }) {
   }, [query, activeNetwork]);
 
   const updateNetworkParameters = useCallback(() => {
-    console.log(`updating network params start`, DAOService?.network, activeNetwork?.networkAddress, prevNetwork?.name);
-
     if (!DAOService?.network?.contractAddress || !activeNetwork?.networkAddress) return;
-    const sessionParams = new WinStorage(`${cookieKey}:${activeNetwork.name}:params`, 20000, 'sessionStorage');
-    if (sessionParams.value)
+
+    const sessionParams = new WinStorage(`${cookieKey}:${activeNetwork.name}`, 20000, 'sessionStorage');
+    if (sessionParams.value && sessionParams.value.councilAmount)
       return;
 
     const divide = (value) => +value / 1000;
     const toString = (value) => value.toString();
     const toNumber = (value) => +value;
     const getParam = (param) => DAOService.getNetworkParameter(param);
-
-    console.log(`updating network params`);
 
     Promise.all(
         ([
@@ -91,26 +90,32 @@ export const NetworkProvider: React.FC = function ({ children }) {
           [() => getParam("mergeCreatorFeeShare"), toNumber, "mergeCreatorFeeShare"],
           [() => getParam("proposerFeeShare"), toNumber, "proposerFeeShare"],
           [() => getParam("percentageNeededForDispute"), toNumber, "percentageNeededForDispute"],
-          [DAOService.getTreasury, null, "treasury"],
-          [DAOService.getSettlerTokenData, null, "networkToken"],
+          [() => DAOService.getTreasury(), null, "treasury"],
+          [() => DAOService.getSettlerTokenData(), null, "networkToken"],
         ] as ParamAction[])
-          .map(([action, transformer, key]) => action().then(value => ({[key]: transformer(value)}))))
+          .map(([action, transformer, key]) => action().then(value => ({[key]: transformer ? transformer(value) : value}))))
       .then(values => values.reduce((prev, curr) => ({...prev, ...curr}),{}))
       .then(values => {
-        sessionParams.value = values;
-        setActiveNetwork(values);
-      })
+        sessionParams.value = {...activeNetwork, ...values};
+        setActiveNetwork(sessionParams.value);
+      });
 
-  }, [activeNetwork?.networkAddress, DAOService?.network?.contractAddress]);
+  }, [activeNetwork, DAOService?.network?.contractAddress]);
 
-  useEffect(() => { updateActiveNetwork(); }, [query?.network]);
+  useEffect(() => {
+    console.log(`useEffect, updateActiveNetwork`);
+    updateActiveNetwork();
+  }, [query?.network]);
 
   useEffect(() => {
     if (activeNetwork?.isRegistered === false) push("/networks");
   }, [activeNetwork]);
 
-  useEffect(() => {    
-    if (DAOService?.network?.contractAddress !== activeNetwork?.networkAddress ||! activeNetwork?.draftTime) 
+  useEffect(() => {
+    if (!activeNetwork?.networkAddress || !DAOService?.network?.contractAddress)
+      return;
+
+    if (DAOService?.network?.contractAddress !== activeNetwork?.networkAddress || !activeNetwork?.draftTime)
       changeNetwork(activeNetwork?.networkAddress)
         .then(loaded => {
           if (loaded) updateNetworkParameters();
@@ -126,9 +131,7 @@ export const NetworkProvider: React.FC = function ({ children }) {
 
   return (
     <NetworkContext.Provider value={memorizeValue}>
-      <div
-        className={`${(activeNetwork?.isClosed && "read-only-network") || ""}`}
-      >
+      <div className={`${(activeNetwork?.isClosed && "read-only-network") || ""}`}>
         <NetworkThemeInjector />
         {children}
       </div>

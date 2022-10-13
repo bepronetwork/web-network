@@ -41,6 +41,16 @@ const getCurrencyByToken = async (tokenId = DEFAULT_TOKEN, comparedToken?: strin
  * Get coin information from CoinGecko by its contract address
  */
 const getCoinInfoByContract = async (contractAddress: string, asset_platform = "ethereum"): Promise<TokenInfo> => {
+  // turn off coingecko for now, we need to re-do it
+  if (!settings?.forceCoinPrice)
+    return {
+      name: "",
+      symbol: "",
+      address: contractAddress,
+      icon: "",
+      prices: {}
+    }
+
   const { data } = await COINGECKO_API.get(`/coins/${asset_platform}/contract/${contractAddress}`);
 
   const currencies = 

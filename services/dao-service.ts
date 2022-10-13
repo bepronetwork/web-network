@@ -57,12 +57,18 @@ export default class DAO {
   }
 
   async loadNetwork(networkAddress: string, skipAssignment?: boolean): Promise<Network_v2 | boolean> {
+    console.log(`loadnetwork`, networkAddress, skipAssignment, !!this._network);
     try {
       if (!networkAddress) throw new Error("Missing Network_v2 Contract Address");
+
+      if (this._network?.contractAddress === networkAddress)
+        return this._network;
 
       const network = new Network_v2(this.web3Connection, networkAddress);
 
       await network.loadContract();
+
+      console.log(network.contractAddress)
 
       if (!skipAssignment) this._network = network;
 
@@ -211,6 +217,7 @@ export default class DAO {
   }
 
   async getNetworkParameter(parameter: NetworkParameters): Promise<string | number> {
+    console.log(`getNetworkParameter`, parameter);
     return this.network[parameter]();
   }
 
