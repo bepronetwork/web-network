@@ -1,4 +1,4 @@
-import { addReducer } from "./main";
+import {Actions, addReducer} from "./main";
 import {changeSettings,} from "./change-settings";
 import {changeChain} from "./change-chain";
 import {changeTxList} from "./change-tx-list";
@@ -13,4 +13,11 @@ export default function loadApplicationStateReducers() {
     changeToaster,
     changeShowProp,
   ].forEach(addReducer);
+
+  console.debug(`Loaded State Reducers`);
+  console.table(
+    Actions
+      .map(({id, stateKey}) => ({id, stateKey}))
+      .reduce((p, c) => ({...p, [c.id]: c.stateKey}), {})
+  );
 }

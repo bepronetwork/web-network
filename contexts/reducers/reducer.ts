@@ -27,7 +27,7 @@ export class SimpleAction<T = any, A = any> extends SimpleActor<T> implements Ac
   }
 
   reducer(state: State, payload: T, subAction?: A): State {
-    console.debug(`updating`, this.stateKey, subAction || `no subAction`, payload);
+    console.debug(`updating`, this.stateKey, payload, subAction || `subAction=undefined`);
     return {...state, [this.stateKey]: payload};
   }
 }
