@@ -8,14 +8,14 @@ import metamaskLogo from "assets/metamask.png";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
-import { changeShowWeb3DialogState } from "contexts/reducers/change-show-web3-dialog";
+
 import { useSettings } from "contexts/settings";
 
 import { NetworkColors } from "interfaces/enums/network-colors";
 import {AppStateContext} from "../contexts/app-state";
+import {changeShowWeb3} from "../contexts/reducers/change-show-prop";
 
 export default function ConnectWalletButton({
   children = null,
@@ -32,7 +32,7 @@ export default function ConnectWalletButton({
   const { wallet, connectWallet } = useAuthentication();
 
   async function handleLogin()  {
-    if(!window?.ethereum) return dispatch(changeShowWeb3DialogState(true))
+    if(!window?.ethereum) return dispatch(changeShowWeb3(true))
 
     if (+connectedChain?.id === +settings?.requiredChain?.id) {
       connectWallet();

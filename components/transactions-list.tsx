@@ -37,7 +37,7 @@ export default function TransactionsList({
 }) {
   const {
     dispatch,
-    state: { myTransactions }
+    state: { transactions }
   } = useContext(ApplicationContext);
   const { t } = useTranslation("common");
   const { wallet } = useAuthentication();
@@ -111,7 +111,7 @@ export default function TransactionsList({
         <h4 className="h4 m-0 text-white">{t("transactions.title_other")}</h4>
 
         { 
-          myTransactions.length && 
+          transactions.length &&
           <Button 
             textClass="text-ligth-gray" 
             className="px-0 hover-primary" 
@@ -123,8 +123,8 @@ export default function TransactionsList({
         }
       </div>
       <div className="overflow-auto tx-container mt-1 pt-2">
-        {(!myTransactions || !myTransactions.length) && emptyTransaction()}
-        {myTransactions.map(renderTransactionRow)}
+        {(!transactions || !transactions.length) && emptyTransaction()}
+        {transactions.map(renderTransactionRow)}
       </div>
     </div>
   );

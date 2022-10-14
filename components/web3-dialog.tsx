@@ -1,29 +1,23 @@
+import WebThreeUnavailable from "assets/web3-unavailable";
+import MobileNotSupported from "components/mobile-not-supported";
+import Button from "./button";
+import useNetwork from "x-hooks/use-network";
 import { useContext, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import { isMobile } from "react-device-detect";
-
 import { kebabCase } from "lodash";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-
-import WebThreeUnavailable from "assets/web3-unavailable";
-
-import MobileNotSupported from "components/mobile-not-supported";
-
-import { ApplicationContext } from "contexts/application";
-import { changeShowWeb3DialogState } from "contexts/reducers/change-show-web3-dialog";
-
-import useNetwork from "x-hooks/use-network";
-
-import Button from "./button";
+import {changeShowWeb3} from "../contexts/reducers/change-show-prop";
+import {AppStateContext} from "../contexts/app-state";
 
 export default function WebThreeDialog() {
   const router = useRouter();
   const { getURLWithNetwork } = useNetwork();
   const {
     dispatch,
-    state: { showWeb3Dialog },
-  } = useContext(ApplicationContext);
+    state: { show: {web3Dialog: showWeb3Dialog} },
+  } = useContext(AppStateContext);
   const { t } = useTranslation("common");
 
   function handleClickTryAgain() {
@@ -31,8 +25,7 @@ export default function WebThreeDialog() {
   }
 
   useEffect(() => {
-    if (
-      ![
+    if (![
         getURLWithNetwork("/").pathname,
         getURLWithNetwork("/developers").pathname,
         getURLWithNetwork("/curators").pathname,
@@ -41,12 +34,11 @@ export default function WebThreeDialog() {
         getURLWithNetwork("/oracle/ready-to-merge").pathname,
         "/[network]/bounty",
         "/[network]",
-      ].includes(router.pathname)
-    )
-      dispatch(changeShowWeb3DialogState(!window?.ethereum));
+      ].includes(router.pathname))
+      dispatch(changeShowWeb3(!window?.ethereum));
   }, [router.pathname]);
 
-  if(showWeb3Dialog && isMobile) return <MobileNotSupported />
+  if (showWeb3Dialog && isMobile) return <MobileNotSupported />
   
   if (showWeb3Dialog && !isMobile)
     return (

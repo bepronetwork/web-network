@@ -47,7 +47,7 @@ const defaultState: GlobalState = {
     myIssues: [],
     toaster: [],
     microServiceReady: null,
-    myTransactions: [],
+    transactions: [],
     network: "",
     networkId: null,
     githubLogin: "",
