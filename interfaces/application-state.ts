@@ -26,7 +26,7 @@ export interface ApplicationState {
   currentAddress: string;
   toaster: ToastNotification[];
   microServiceReady: boolean | null;
-  myTransactions: (| SimpleBlockTransactionPayload | BlockTransaction | UpdateBlockTransaction)[];
+  transactions: (| SimpleBlockTransactionPayload | BlockTransaction | UpdateBlockTransaction)[];
   network: string;
   networkId: number;
   githubLogin: string;

@@ -20,12 +20,12 @@ import WrongNetworkModal from "components/wrong-network-modal";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
-import { changeShowCreateBountyState } from "contexts/reducers/change-show-create-bounty";
-import { changeShowWeb3DialogState } from "contexts/reducers/change-show-web3-dialog";
+
 import { useSettings } from "contexts/settings";
 
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
+import {changeShowCreateBounty, changeShowWeb3} from "../contexts/reducers/change-show-prop";
 
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 
@@ -84,8 +84,8 @@ export default function MainNav() {
   }, [DAOService, wallet?.address, isNetworksPage]);
 
   function handleNewBounty () {
-    if(!window.ethereum) return dispatch(changeShowWeb3DialogState(true))
-    return dispatch(changeShowCreateBountyState(true))
+    if(!window.ethereum) return dispatch(changeShowWeb3(true))
+    return dispatch(changeShowCreateBounty(true))
   } 
 
   return (

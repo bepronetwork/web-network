@@ -27,7 +27,7 @@ import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { toastError, toastWarning } from "contexts/reducers/add-toast";
-import { changeShowCreateBountyState } from "contexts/reducers/change-show-create-bounty";
+
 import { useSettings } from "contexts/settings";
 
 import { parseTransaction } from "helpers/transactions";
@@ -45,6 +45,8 @@ import useERC20 from "x-hooks/use-erc20";
 import useNetworkTheme from "x-hooks/use-network";
 
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
+import {AppStateContext} from "../contexts/app-state";
+import {changeShowCreateBounty} from "../contexts/reducers/change-show-prop";
 
 interface BountyPayload {
   title: string;
@@ -98,8 +100,8 @@ export default function CreateBountyModal() {
 
   const {
     dispatch,
-    state: { myTransactions, showCreateBounty },
-  } = useContext(ApplicationContext);
+    state: { transactions, show: { createBounty: showCreateBounty } },
+  } = useContext(AppStateContext);
   
 
   const [canAddCustomToken, setCanAddCustomToken] = 
@@ -390,7 +392,7 @@ export default function CreateBountyModal() {
   function handleCancelAndBack() {
     if (currentSection === 0) {
       cleanFields();
-      dispatch(changeShowCreateBountyState(false))
+      dispatch(changeShowCreateBounty(false))
     } else {
       setCurrentSection((prevState) => prevState - 1);
     }
@@ -455,7 +457,7 @@ export default function CreateBountyModal() {
   }
 
   const verifyTransactionState = (type: TransactionTypes): boolean =>
-    !!myTransactions.find((transactions) =>
+    !!transactions.find((transactions) =>
         transactions.type === type &&
         transactions.status === TransactionStatus.pending);
 
@@ -560,7 +562,7 @@ export default function CreateBountyModal() {
         }
 
         cleanFields();
-        dispatch(changeShowCreateBountyState(false))
+        dispatch(changeShowCreateBounty(false))
       }  
     }finally{
       setIsLoadingCreateBounty(false)
@@ -638,7 +640,7 @@ export default function CreateBountyModal() {
         titlePosition="center"
         onCloseClick={() => {
           cleanFields();
-          dispatch(changeShowCreateBountyState(false))
+          dispatch(changeShowCreateBounty(false))
           setRewardChecked(false);
         }}
         onCloseDisabled={isLoadingApprove || isLoadingCreateBounty}

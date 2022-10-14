@@ -35,7 +35,7 @@ function OraclesDelegate({
   const { activeNetwork } = useNetwork();
 
   const {
-    state: { myTransactions }
+    state: { transactions }
   } = useContext(ApplicationContext);
 
   const networkTokenDecimals = activeNetwork?.networkToken?.decimals || 18;
@@ -80,7 +80,7 @@ function OraclesDelegate({
       isAddressesEqual(),
       BigNumber(tokenAmount).isZero(),
       BigNumber(tokenAmount).isNaN(),
-      myTransactions.find(({ status, type }) =>
+      transactions.find(({ status, type }) =>
           status === TransactionStatus.pending &&
           type === TransactionTypes.delegateOracles)
     ].some((values) => values);

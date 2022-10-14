@@ -57,7 +57,7 @@ function OraclesActions({
 
   const networkTokenERC20 = useERC20();
   const { activeNetwork } = useNetwork();
-  const { state: { myTransactions }} = useContext(ApplicationContext);
+  const { state: { transactions }} = useContext(ApplicationContext);
 
   const networkTokenSymbol = networkTokenERC20.symbol || t("misc.$token");
   const networkTokenDecimals = networkTokenERC20.decimals || 18;
@@ -65,7 +65,7 @@ function OraclesActions({
   const exceedsAvailable = value => BigNumber(value).gt(getMaxAmmount());
 
   const verifyTransactionState = (type: TransactionTypes): boolean =>
-    !!myTransactions.find((transactions) =>
+    !!transactions.find((transactions) =>
         transactions.type === type &&
         transactions.status === TransactionStatus.pending);
 
@@ -142,7 +142,7 @@ function OraclesActions({
       BigNumber(tokenAmount).isNaN(),
       exceedsAvailable(tokenAmount),
       !tokenAmount,
-      myTransactions.find(({ status, type }) =>
+      transactions.find(({ status, type }) =>
           status === TransactionStatus.pending && type === getTxType())
     ].some((values) => values);
 

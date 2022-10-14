@@ -22,13 +22,14 @@ import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 import { changeLoadState } from "contexts/reducers/change-load-state";
-import { changeShowCreateBountyState } from "contexts/reducers/change-show-create-bounty";
+
 
 import { IssueState, IssueBigNumberData } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import usePage from "x-hooks/use-page";
 import useSearch from "x-hooks/use-search";
+import {changeShowCreateBounty} from "../contexts/reducers/change-show-prop";
 
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 
@@ -198,7 +199,7 @@ export default function ListIssues({
   }
 
   function handleNotFoundClick() {
-    if (!redirect) return dispatch(changeShowCreateBountyState(true));
+    if (!redirect) return dispatch(changeShowCreateBounty(true));
 
     router.push(redirect);
   }
