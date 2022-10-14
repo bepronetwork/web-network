@@ -116,8 +116,8 @@ export default function NewProposal({
   const { activeRepo } = useRepos();
   const { wallet } = useAuthentication();
 
-  const { handleProposeMerge } = useBepro()
-  const { updateIssue, activeIssue, networkIssue } = useIssue()
+  const { handleProposeMerge } = useBepro();
+  const { updateIssue, getNetworkIssue, activeIssue, networkIssue } = useIssue();
   const { getPullRequestParticipants } = useOctokit();
   const { getUserWith, processEvent } = useApi();
   const { activeNetwork } = useNetwork();
@@ -276,7 +276,10 @@ export default function NewProposal({
       return processEvent("proposal", "created", activeNetwork?.name, { fromBlock });
     })
     .then(() => {
-      return updateIssue(activeIssue.repository.id, activeIssue.githubId);
+      return Promise.all([
+        updateIssue(activeIssue.repository.id, activeIssue.githubId),
+        getNetworkIssue()
+      ]);
     })
     .finally(() => {
       handleClose();
