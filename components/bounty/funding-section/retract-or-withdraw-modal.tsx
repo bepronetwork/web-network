@@ -9,7 +9,7 @@ import Modal from "components/modal";
 import { ApplicationContext } from "contexts/application";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
-import { toastError, toastSuccess } from "contexts/reducers/add-toast";
+import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
 
 import { fundingBenefactor } from "interfaces/issue-data";
 

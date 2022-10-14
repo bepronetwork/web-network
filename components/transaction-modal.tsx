@@ -14,7 +14,7 @@ import Modal from "components/modal";
 import TransactionStats from "components/transaction-stats";
 
 import { ApplicationContext } from "contexts/application";
-import { toastInfo } from "contexts/reducers/add-toast";
+import { toastInfo } from "contexts/reducers/change-toaster";
 import { useSettings } from "contexts/settings";
 
 import { CopyValue } from "helpers/copy-value";

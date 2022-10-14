@@ -10,7 +10,7 @@ import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
-import { addToast } from "contexts/reducers/add-toast";
+import { addToast } from "contexts/reducers/change-toaster";
 
 import { ProposalExtended } from "interfaces/bounty";
 import { pullRequest } from "interfaces/issue-data";

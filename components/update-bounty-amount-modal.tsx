@@ -12,7 +12,7 @@ import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
-import { toastError } from "contexts/reducers/add-toast";
+import { toastError } from "contexts/reducers/change-toaster";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 

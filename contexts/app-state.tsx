@@ -1,11 +1,11 @@
 import {createContext, useEffect, useReducer} from "react";
-import {Actions, mainReducer} from "./reducers/main";
+import {mainReducer} from "./reducers/main";
 import loadApplicationStateReducers from "./reducers";
 import {AppState} from "../interfaces/application-state";
 import sanitizeHtml from "sanitize-html";
 import {useRouter} from "next/router";
-import {toastError} from "./reducers/add-toast";
-import {changeChain} from "./reducers/change-chain";
+import {toastError} from "./reducers/change-toaster";
+
 
 const appState: AppState = {
   state: {

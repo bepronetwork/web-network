@@ -39,6 +39,8 @@ class ChangeToaster extends SimpleAction<ToastNotification[], SubActions> {
 
 export const changeToaster = new ChangeToaster();
 
+export const addToast = (toast: ToastNotification) =>
+  changeToaster.update([toast], SubActions.add);
 export const removeToast = (toast: ToastNotification) =>
   changeToaster.update([toast], SubActions.remove);
 export const toastError = (content: string, title = "Error", ...rest) =>

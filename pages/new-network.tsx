@@ -23,7 +23,7 @@ import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
 import { NetworkSettingsProvider } from "contexts/network-settings";
-import { addToast } from "contexts/reducers/add-toast";
+import { addToast } from "contexts/reducers/change-toaster";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 import { useSettings } from "contexts/settings";
 
