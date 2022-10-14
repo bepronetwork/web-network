@@ -1,16 +1,16 @@
 ## 1. NEXTAUTH
 
-The authentication in the project is composed by two parts;  A metamask wallet and a [Github Provider](https://next-auth.js.org/providers/github) with [NextAuth](next-auth.js.org).
+The authentication in the project is composed by two parts;  A Metamask Wallet and a [Github Provider](https://next-auth.js.org/providers/github) with [NextAuth](next-auth.js.org).
 
-NextAuth required a environment key to be able to use JWT, create it with;
+NextAuth required a environment key to be able to use JWT, create it with:
 
-generate key;
+generate key
 
 ```console
 $ openssl rand -base64 32
 ```
 
-Use the value to update the .env file with it;
+Use the value to update the .env file with it
 
 ```text
 # .env
