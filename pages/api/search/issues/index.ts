@@ -10,7 +10,8 @@ import paginate, { calculateTotalPages, paginateArray } from "helpers/paginate";
 import { searchPatternInText } from "helpers/string";
 
 const COLS_TO_CAST = ["amount", "fundingAmount"];
-const castToDecimal = columnName => Sequelize.cast(Sequelize.col(columnName), 'DECIMAL')
+const castToDecimal = columnName => Sequelize.cast(Sequelize.col(columnName), 'DECIMAL');
+const iLikeCondition = (key, value) => ({ [key]: { [Op.iLike]: value } });
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try{
@@ -96,7 +97,9 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
       association: "mergeProposals",
       required: !!proposer,
       where: {
-        ...(proposer ? { githubLogin: proposer } : {})
+        ...(proposer ? { 
+          [Op.or]: [ iLikeCondition("githubLogin", proposer), iLikeCondition("creator", proposer) ] 
+        } : {})
       }
     },
     { association: "repository" },

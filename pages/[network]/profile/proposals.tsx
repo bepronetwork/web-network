@@ -12,7 +12,7 @@ import useNetworkTheme from "x-hooks/use-network";
 export default function Proposals() {
   const { t } = useTranslation(["proposal", "bounty"]);
 
-  const { user } = useAuthentication();
+  const { wallet } = useAuthentication();
   const { getURLWithNetwork } = useNetworkTheme();
 
   return(
@@ -22,7 +22,7 @@ export default function Proposals() {
       <ListIssues
         redirect={getURLWithNetwork("/oracle")}
         buttonMessage={t('bounty:label_other')}
-        proposer={user?.login || "not-connected"} 
+        proposer={wallet?.address || "not-connected"} 
         emptyMessage={t('errors.you-dont-have-proposals')}
       />
     </ProfileLayout>
