@@ -46,7 +46,7 @@ import useNetworkTheme from "x-hooks/use-network";
 
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
 import {AppStateContext} from "../contexts/app-state";
-import {changeShowCreateBounty} from "../contexts/reducers/change-show-prop";
+import {changeShowCreateBounty} from "../contexts/reducers/update-show-prop";
 
 interface BountyPayload {
   title: string;

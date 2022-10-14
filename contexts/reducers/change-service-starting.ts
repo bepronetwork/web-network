@@ -13,7 +13,7 @@ export class ChangeServiceProp extends SimpleActor<boolean> implements Action<bo
       ...state.Service || {} as any,
       [this.prop]: payload,
     }
-
+// todo this needs to take in subActions so we can start with microservice-ready
     return {...state, Service: transformed};
   }
 }

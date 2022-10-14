@@ -5,17 +5,17 @@ import { useTranslation } from "next-i18next";
 import NetworkIdentifier from "components/network-identifier";
 import Translation from "components/translation";
 
-import { ApplicationContext } from "contexts/application";
 import { changeMicroServiceReady } from "contexts/reducers/change-microservice-ready";
 
 import useApi from "x-hooks/use-api";
+import {AppStateContext} from "../contexts/app-state";
 
 
 export default function StatusBar() {
   const {
     dispatch,
-    state: { microServiceReady }
-  } = useContext(ApplicationContext);
+    state: { Service }
+  } = useContext(AppStateContext);
   const [ms, setMs] = useState(0);
   const { getHealth } = useApi();
   const { t } = useTranslation("common");
@@ -32,8 +32,8 @@ export default function StatusBar() {
   function renderNetworkStatus() {
     let info;
 
-    if (microServiceReady === null) info = ["white-50", t("status.waiting")];
-    else if (microServiceReady === false)
+    if (Service === null || Service?.microReady === null) info = ["white-50", t("status.waiting")];
+    else if (Service?.microReady === false)
       info = ["danger", t("status.network-problems")];
     else
       info =
