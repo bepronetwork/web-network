@@ -15,7 +15,8 @@ NEXT_PUBLIC_BLOCKSCAN_LINK=kova.etherscan.com
 
 ## 2. ADMIN WALLET
 
-The admin wallet is the address of the contracts governor, this person will be able to access the `/parity` page where actions for deploying `ERC20` and `Network` are available. Check Networks Manager [doc](../docs/NETWORK-MANAGER.md). for more
+The admin wallet is the address of the contracts governor, this person will be able
+manege the default network, also to access the `/administration` page where actions for manege default settings for `ERC20` and `Network` are available. Check Networks Manager [doc](../docs/NETWORK-MANAGER.md). for more
 
 ```text
 # .env
