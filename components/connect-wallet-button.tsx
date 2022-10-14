@@ -11,7 +11,6 @@ import Modal from "components/modal";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
-import { changeNetworkId } from "contexts/reducers/change-network-id";
 import { changeShowWeb3DialogState } from "contexts/reducers/change-show-web3-dialog";
 import { useSettings } from "contexts/settings";
 

@@ -4,46 +4,52 @@ import {ToastNotification} from "../../interfaces/toast-notification";
 import {State} from "../../interfaces/application-state";
 import {v4 as uuidv4} from "uuid";
 
-class AddToast extends SimpleAction<ToastNotification[]> {
+enum SubActions { add, remove}
+
+class AddToast extends SimpleAction<ToastNotification[], SubActions> {
   constructor() {
     super(AppStateReduceId.AddToast, 'toaster');
   }
 
-  reducer(state: State, payload: ToastNotification[]): State {
-    const mapper = (toast) => ({
-      type: "primary",
-      delay: 10000,
-      ...toast,
-      id: uuidv4()
-    });
+  reducer(state: State, payload: ToastNotification[], subAction): State {
+    let transformed;
+    switch (subAction) {
+      case SubActions.add:
+        const mapper = (toast) => ({
+          type: "primary",
+          delay: 10000,
+          ...toast,
+          id: uuidv4()
+        });
 
-    return super.reducer(state, [...state.toaster, ...payload.map(mapper)]);
-  }
-}
+        transformed = [...state.toaster, ...payload.map(mapper)];
+        break;
+      case SubActions.remove:
+        transformed = state.toaster.filter(({id}) => !payload.some(({id: _id}) => _id === id));
+        break;
+      default:
+        console.log(`Something went wrong, ${subAction} is not a valid subAction`);
+        break;
+    }
 
-class RemoveToast extends SimpleAction<ToastNotification[]> {
-  constructor() {
-    super(AppStateReduceId.RemoveToast, 'toaster');
-  }
 
-  reducer(state: State, payload: ToastNotification[]): State {
-    const transformed = state.toaster.filter(({id}) => !payload.some(({id: _id}) => _id === id));
     return super.reducer(state, transformed);
   }
 }
 
-export const addToast = new AddToast();
-export const removeToast = new RemoveToast();
+export const changeToaster = new AddToast();
 
+export const removeToast = (toast: ToastNotification) =>
+  changeToaster.update([toast], SubActions.remove);
 export const toastError = (content: string, title = "Error", ...rest) =>
-  addToast.update([{content, title, type: `danger`, ...rest}])
+  changeToaster.update([{content, title, type: `danger`, ...rest}], SubActions.add)
 export const toastSuccess = (content: string, title = "success", ...rest) =>
-  addToast.update([{content, title, type: `success`, ...rest}])
+  changeToaster.update([{content, title, type: `success`, ...rest}], SubActions.add)
 export const toastInfo = (content: string, title = "Info", ...rest) =>
-  addToast.update([{content, title, type: `info`, ...rest}])
+  changeToaster.update([{content, title, type: `info`, ...rest}], SubActions.add)
 export const toastWarning = (content: string, title = "Warning", ...rest) =>
-  addToast.update([{content, title, type: `warning`, ...rest}])
+  changeToaster.update([{content, title, type: `warning`, ...rest}], SubActions.add)
 export const toastPrimary = (content: string, title = "BEPRO", ...rest) =>
-  addToast.update([{content, title, type: `primary`, ...rest}])
+  changeToaster.update([{content, title, type: `primary`, ...rest}], SubActions.add)
 export const toastSecondary = (content: string, title = "Notice", ...rest) =>
-  addToast.update([{content, title, type: `secondary`, ...rest}])
+  changeToaster.update([{content, title, type: `secondary`, ...rest}], SubActions.add)
