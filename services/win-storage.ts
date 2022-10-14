@@ -3,7 +3,7 @@ export class WinStorage<T = any> {
               readonly expire: number = 3600,
               readonly type: "localStorage" | "sessionStorage" = "localStorage",) {}
 
-  setItem(value: any) {
+  setItem(value: T) {
     if (typeof window === "undefined")
       return;
 

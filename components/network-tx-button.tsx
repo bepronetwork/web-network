@@ -1,30 +1,22 @@
 import { forwardRef, useContext, useEffect, useState, ReactChild } from "react";
-
 import { useTranslation } from "next-i18next";
-
 import LockedIcon from "assets/icons/locked-icon";
-
 import Button from "components/button";
 import Icon from "components/icon";
 import Modal from "components/modal";
-
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/add-toast";
-import { addTransaction } from "contexts/reducers/add-transaction";
-import { updateTransaction } from "contexts/reducers/update-transaction";
-
 import { formatNumberToCurrency } from "helpers/formatNumber";
 import { parseTransaction } from "helpers/transactions";
-
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { BlockTransaction } from "interfaces/transaction";
-
 import useApi from "x-hooks/use-api";
-import useTransactions from "x-hooks/useTransactions";
+
+import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
+import {MetamaskErrors} from "../interfaces/enums/Errors";
 
 interface NetworkTxButtonParams {
   txMethod: string;
@@ -67,8 +59,7 @@ function networkTxButton({
   const [txSuccess,] = useState(false);
 
   const { dispatch } = useContext(ApplicationContext);
-  
-  const txWindow = useTransactions();
+
   const { processEvent } = useApi();
   const { activeNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
@@ -84,11 +75,12 @@ function networkTxButton({
   function makeTx() {
     if (!DAOService || !wallet) return;
 
-    const tmpTransaction = addTransaction({
+    const tmpTransaction = addTx.update([{
         type: txType,
         amount: txParams?.tokenAmount || "0",
         currency: txCurrency || t("misc.$token")
-    }, activeNetwork);
+      } as any]);
+
     dispatch(tmpTransaction);
     
     const methodName = txMethod === 'delegateOracles' ? 'delegate' : txMethod;
@@ -106,11 +98,10 @@ function networkTxButton({
               `
           }));
 
-          if(answer.blockNumber) 
+          if (answer.blockNumber)
             processEvent("oracles","changed", activeNetwork.name, {fromBlock:answer.blockNumber}).catch(console.debug);
 
-          txWindow.updateItem(tmpTransaction.payload.id,
-                              parseTransaction(answer, tmpTransaction.payload));
+          updateTx.update([parseTransaction(answer, tmpTransaction.payload[0])])
         } else {
           onFail(answer.message);
           dispatch(addToast({
@@ -121,18 +112,15 @@ function networkTxButton({
         }
       })
       .catch((e) => {
+
+        dispatch(updateTx.update([{
+          ...tmpTransaction.payload[0],
+          status: e?.code === MetamaskErrors.UserRejected ? TransactionStatus.rejected : TransactionStatus.failed,
+        }]));
+
+        console.error(`Failed network-tx-button`, e);
+
         onFail(e.message);
-        if (e?.message?.search("User denied") > -1)
-          dispatch(updateTransaction({
-              ...(tmpTransaction.payload as BlockTransaction),
-              remove: true
-          }));
-        else
-          dispatch(updateTransaction({
-              ...(tmpTransaction.payload as BlockTransaction),
-              status: TransactionStatus.failed
-          }));
-        console.error(e);
       })
       .finally(() => {
         updateWalletBalance();

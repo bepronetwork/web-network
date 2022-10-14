@@ -13,6 +13,7 @@ import { NETWORKS } from "helpers/networks";
 import { NetworkColors } from "interfaces/enums/network-colors";
 
 import Button from "./button";
+import {AppStateContext} from "../contexts/app-state";
 
 type typeError = { code?: number; message?: string }
 
@@ -26,17 +27,15 @@ export default function WrongNetworkModal({
   const [error, setError] = useState<string>("");
   const [isAddingNetwork, setIsAddingNetwork] = useState(false);
 
-  const {
-    state: { networkId: activeNetworkId },
-  } = useContext(ApplicationContext);
+  const {state: { connectedChain },} = useContext(AppStateContext);
 
   const { settings } = useSettings();
 
   function showModal() {
     return (
-      !!activeNetworkId &&
+      !!connectedChain?.id &&
       !!requiredNetworkId &&
-      +activeNetworkId !== +requiredNetworkId
+      +connectedChain?.id !== +requiredNetworkId
     );
   }
 

@@ -1,44 +1,42 @@
-import { useContext, useEffect } from "react";
-
-import { useTranslation } from "next-i18next";
-
 import Indicator from "components/indicator";
-
-import { ApplicationContext } from "contexts/application";
-import { useDAO } from "contexts/dao";
-import { changeNetwork } from "contexts/reducers/change-network";
-import { changeNetworkId } from "contexts/reducers/change-network-id";
-import { useSettings } from "contexts/settings";
-
+import { useContext, useEffect } from "react";
 import { NetworkColors } from "interfaces/enums/network-colors";
+import {changeChain} from "../contexts/reducers/change-chain";
+import {AppStateContext} from "../contexts/app-state";
 
 export default function NetworkIdentifier() {
-  const {
-    state: { network },
-    dispatch
-  } = useContext(ApplicationContext);
-  const { t } = useTranslation("common");
+  const {state, dispatch} = useContext(AppStateContext);
 
-  const { settings } = useSettings();
-  const { service: DAOService } = useDAO();
 
-  function updateNetwork() {
-    if (!DAOService) return;
+  useEffect(() => {
+    if (!window.ethereum)
+      return;
 
-    const chainId = window?.ethereum?.chainId;
-    
-    dispatch(changeNetworkId(+chainId));
-    dispatch(changeNetwork((settings?.chainIds && settings?.chainIds[+chainId] || t("misc.unkown"))?.toLowerCase()));
-  }
+    window.ethereum.removeAllListeners(`chainChanged`);
 
-  useEffect(updateNetwork, [DAOService]);
+    if (window.ethereum.isConnected()) {
+      dispatch(changeChain.update({
+        id: (+window.ethereum.chainId)?.toString(),
+        name: state.Settings?.chainIds[(+window.ethereum.chainId)?.toString() || 'unknown']
+      }))
+    }
+
+    window.ethereum.on(`chainChanged`, evt => {
+      dispatch(changeChain.update({
+        id: (+evt)?.toString(),
+        name: state.Settings?.chainIds[(+evt)?.toString() || 'unknown']
+      }))
+    });
+
+  }, []);
+
 
   return (
-    (network && (
+    (state.connectedChain?.name && (
       <div className="ml-2 bg-transparent p-0 d-flex flex-row align-items-center justify-content-center">
-        <Indicator bg={NetworkColors[network] || "gray"} />
+        <Indicator bg={NetworkColors[state.connectedChain?.name] || "gray"} />
         <span className="caption-small text-white-50 ">
-          {network}
+          {state.connectedChain?.name}
         </span>
       </div>
     )) || <></>

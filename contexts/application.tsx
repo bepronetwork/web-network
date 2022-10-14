@@ -12,21 +12,15 @@ import sanitizeHtml from "sanitize-html";
 import Loading from "components/loading";
 import Toaster from "components/toaster";
 
-import { useAuthentication } from "contexts/authentication";
-import { useNetwork } from "contexts/network";
 import { toastError } from "contexts/reducers/add-toast";
-import { addTransaction } from "contexts/reducers/add-transaction";
-import { changeNetwork } from "contexts/reducers/change-network";
-import { changeNetworkId } from "contexts/reducers/change-network-id";
-import LoadApplicationReducers from "contexts/reducers/index";
+
+import loadApplicationStateReducers from "contexts/reducers/index";
 import { mainReducer } from "contexts/reducers/main";
-import { updateTransaction } from "contexts/reducers/update-transaction";
+
 
 import { ApplicationState } from "interfaces/application-state";
-import { TransactionStatus } from "interfaces/enums/transaction-status";
-import { ReduceActor } from "interfaces/reduce-action";
 
-import { useSettings } from "./settings";
+import { ReduceActor } from "interfaces/reduce-action";
 
 
 interface GlobalState {
@@ -73,123 +67,16 @@ const defaultState: GlobalState = {
 
 export const ApplicationContext = createContext<GlobalState>(defaultState);
 
-const cheatAddress = "";
-let waitingForTx = null;
-
 export default function ApplicationContextProvider({ children }) {
-  const [state, dispatch] = useReducer(mainReducer, defaultState.state);
-  const [txListener, setTxListener] = useState<NodeJS.Timeout | undefined>();
+  const [, dispatch] = useReducer(() => {}, null);
+
   const {
     query: { authError },
   } = useRouter();
 
-  const { settings } = useSettings();
-  const { activeNetwork } = useNetwork();
-  const { wallet } = useAuthentication();
 
-  const Initialize = () => {
-    if (!window.ethereum) return;
 
-    window.ethereum.on("chainChanged", (evt) => {
-      dispatch(changeNetworkId(+evt?.toString()));
-      dispatch(changeNetwork((settings?.chainIds && settings?.chainIds[+evt?.toString()] || "unknown")?.toLowerCase()));
-    });
-
-    if (txListener) clearInterval(txListener);
-
-    const web3 = (window as any).web3; // eslint-disable-line
-
-    const getPendingBlock = () => {
-      if (!cheatAddress || !waitingForTx || !waitingForTx?.transactionHash)
-        return;
-
-      web3.eth
-        .getTransaction(waitingForTx.transactionHash)
-        .then((transaction) => {
-          dispatch(updateTransaction({
-              ...waitingForTx,
-              addressFrom: transaction.from,
-              addressTo: transaction.to,
-              transactionHash: transaction.hash,
-              blockHash: transaction.blockHash,
-              confirmations: transaction?.nonce,
-              status: transaction.blockNumber
-                ? TransactionStatus.completed
-                : TransactionStatus.pending
-          }));
-
-          if (transaction.blockNumber) waitingForTx = null;
-        });
-    };
-
-    setTxListener(setInterval(getPendingBlock, 1000));
-  };
-
-  LoadApplicationReducers();
-
-  useEffect(Initialize, []);
-  useEffect(() => {
-    if (!authError) return;
-
-    dispatch(toastError(sanitizeHtml(authError, { allowedTags: [], allowedAttributes: {} })));
-  }, [authError]);
-
-  useEffect(() => {
-    if (!waitingForTx)
-      waitingForTx =
-        state.myTransactions.find(({ status }) => status === TransactionStatus.pending) || null;
-
-    if (waitingForTx?.transactionHash) return;
-
-    const transactionWithHash = state.myTransactions.find(({ id }) => id === waitingForTx?.id);
-
-    if (
-      !transactionWithHash ||
-      transactionWithHash?.status === TransactionStatus.failed
-    )
-      waitingForTx = null;
-    else waitingForTx = transactionWithHash;
-  }, [state.myTransactions]);
-
-  const restoreTransactions = async (address) => {
-    const transactions = JSON.parse(localStorage.getItem(`bepro.transactions:${address}`) || "[]");
-    const web3 = (window as any).web3; // eslint-disable-line
-
-    const getStatusFromBlock = async (tx) => {
-      const transaction = { ...tx };
-
-      if (tx?.transactionHash) {
-        const block = await web3.eth.getTransaction(tx.transactionHash);
-        if (block) {
-          transaction.addressFrom = block.from;
-          (transaction.addressTo = block.to),
-            (transaction.transactionHash = block.hash),
-            (transaction.blockHash = block.blockHash),
-            (transaction.confirmations = block?.nonce),
-            (transaction.status = block.blockNumber
-              ? TransactionStatus.completed
-              : TransactionStatus.pending);
-        }
-      }
-
-      dispatch(addTransaction(transaction, activeNetwork));
-
-      return transaction;
-    };
-
-    transactions.filter(transaction => transaction.status !== TransactionStatus.rejected).forEach(getStatusFromBlock);
-  };
-
-  useEffect(() => {
-    if (!wallet?.address) return;
-
-    if (state.myTransactions.length < 1)
-      restoreTransactions(wallet.address.toLowerCase());
-    else {
-      const value = JSON.stringify(state.myTransactions.slice(0, 5));
-      localStorage.setItem(`bepro.transactions:${wallet.address.toLowerCase()}`, value);
-    }
-  }, [state.myTransactions, wallet]);
+  loadApplicationStateReducers();
 
   return (
     <ApplicationContext.Provider value={{ 

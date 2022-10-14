@@ -3,6 +3,6 @@ export interface BranchInfo {
   protected?: boolean;
 }
 
-export type BranchsList = {
+export type BranchesList = {
   [repoId: number]: BranchInfo[];
 };
