@@ -8,21 +8,20 @@ import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
-import { addTransaction } from "contexts/reducers/add-transaction";
-import { updateTransaction } from "contexts/reducers/update-transaction";
-
 import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
-import { BlockTransaction } from "interfaces/transaction";
 
 import useBepro from "x-hooks/use-bepro";
+
+import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
+import {MetamaskErrors} from "../interfaces/enums/Errors";
 import useTransactions from "x-hooks/useTransactions";
 
 export default function useERC20() {
   const [name, setName] = useState<string>();
-  const [decimals, setDecimals] = useState(18); 
+  const [decimals, setDecimals] = useState(18);
   const [symbol, setSymbol] = useState<string>();
   const [address, setAddress] = useState<string>();
   const [balance, setBalance] = useState(BigNumber(0));
@@ -31,10 +30,10 @@ export default function useERC20() {
   const [totalSupply, setTotalSupply] = useState(BigNumber(0));
 
   const txWindow = useTransactions();
-  const { activeNetwork } = useNetwork();
   const { wallet } = useAuthentication();
   const { service: DAOService } = useDAO();
   const { handleApproveToken } = useBepro();
+  const { activeNetwork } = useNetwork();
   const { dispatch } = useContext(ApplicationContext);
 
   const logData = { 
@@ -92,31 +91,25 @@ export default function useERC20() {
     updateAllowanceAndBalance();
   }, [wallet?.address, DAOService, address]);
 
-  async function deploy(name: string, 
-                        symbol: string, 
-                        cap: string, 
+  async function deploy(name: string,
+                        symbol: string,
+                        cap: string,
                         ownerAddress: string): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
-      const transaction = addTransaction({ type: TransactionTypes.deployERC20Token }, activeNetwork);
+      const transaction = addTx.update([{ type: TransactionTypes.deployERC20Token } as any]);
 
       dispatch(transaction);
 
       await DAOService.deployERC20Token(name, symbol, cap, ownerAddress)
         .then((txInfo: TransactionReceipt) => {
-          txWindow.updateItem(transaction.payload.id,  parseTransaction(txInfo, transaction.payload));
+          updateTx.update([parseTransaction(txInfo, transaction.payload[0])])
           resolve(txInfo);
         })
-        .catch((err: { message: string; }) => {
-          if (err?.message?.search("User denied") > -1)
-            dispatch(updateTransaction({
-              ...(transaction.payload as BlockTransaction),
-              status: TransactionStatus.rejected
-            }));
-          else
-            dispatch(updateTransaction({
-              ...(transaction.payload as BlockTransaction),
-              status: TransactionStatus.failed
-            }));
+        .catch((err) => {
+          dispatch(updateTx.update([{
+            ...transaction.payload[0],
+            status: err?.code === MetamaskErrors.UserRejected ? TransactionStatus.rejected : TransactionStatus.failed,
+          }]));
           reject(err);
         });
     });

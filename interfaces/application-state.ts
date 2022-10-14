@@ -6,6 +6,14 @@ import {
   SimpleBlockTransactionPayload,
   UpdateBlockTransaction
 } from "./transaction";
+import {SettingsType} from "../types/settings";
+import DAO from "../services/dao-service";
+import {Network} from "./network";
+import {ForkInfo, ForksList, ReposList} from "./repos-list";
+import {BranchesList, BranchInfo} from "./branches-list";
+
+import {Dispatch} from "react";
+import {XReducerAction} from "../contexts/reducers/reducer";
 
 export interface ApplicationState {
   githubHandle: string;
@@ -18,11 +26,7 @@ export interface ApplicationState {
   currentAddress: string;
   toaster: ToastNotification[];
   microServiceReady: boolean | null;
-  myTransactions: (
-    | SimpleBlockTransactionPayload
-    | BlockTransaction
-    | UpdateBlockTransaction
-  )[];
+  myTransactions: (| SimpleBlockTransactionPayload | BlockTransaction | UpdateBlockTransaction)[];
   network: string;
   networkId: number;
   githubLogin: string;
@@ -44,4 +48,47 @@ export interface ChangeNetworkSummaryProps {
   label?: "bounties" | "amountInNetwork" | "amountDistributed";
   amount?: number;
   action?: "add" | "reset";
+}
+
+export interface ServiceState {
+  starting: boolean;
+  microReady: boolean | null;
+  active: DAO | null;
+  network: {
+    active: Network | null;
+    repos: {
+      list: ReposList;
+      forks: ForksList | null;
+      branches: BranchesList | null;
+      active: {
+        forks: ForkInfo[];
+        branches: BranchInfo[];
+        ghVisibility: boolean;
+      }
+    },
+    lastVisited: string;
+  };
+}
+
+export interface ConnectedChain {
+  id: string;
+  name: string
+}
+
+export interface State {
+  Settings: SettingsType | null;
+  Service: ServiceState | null,
+  loading: LoadingState | null;
+  toaster: ToastNotification[];
+  transactions: (SimpleBlockTransactionPayload | BlockTransaction | UpdateBlockTransaction)[];
+  currentUser: { handle: string; walletAddress: string; } | null,
+  connectedChain: ConnectedChain | null,
+  show: {
+    [key: string]: boolean;
+  }
+}
+
+export interface AppState {
+  state: State,
+  dispatch: (action: XReducerAction<any>) => Dispatch<XReducerAction<any>>;
 }

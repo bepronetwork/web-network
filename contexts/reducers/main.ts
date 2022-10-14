@@ -1,21 +1,21 @@
-import { ApplicationState } from "interfaces/application-state";
-import { ReduceActionName } from "interfaces/enums/reduce-action-names";
-import { ReduceAction, ReduceActor } from "interfaces/reduce-action";
+import {State} from "interfaces/application-state";
+import {XReducer,} from "./reducer";
 
-const ReduceActions: ReduceAction[] = [];
 
-const findReducer = (action: ReduceActionName) =>
-  ReduceActions.find(({ name }) => name === action);
+export const Actions: XReducer<any>[] = [];
 
-export const mainReducer = <T = any>(
-  state: ApplicationState,
-  action: ReduceActor<T>
-) => {
-  const act = ReduceActions.find(({ name }) => name === action.name)?.fn;
-  if (act) return act(state, action.payload);
+const findReducer = (id: number) =>
+  Actions.find(({ id: _id }) => _id === id);
 
-  throw new Error(`Could not find reducer with name ${action.name}`);
-};
+export const addReducer = (reducer: XReducer<any>) =>
+  (!findReducer(reducer.id) && Actions.push(reducer)) || false;
 
-export const addReducer = (reducer: ReduceAction<any>) =>
-  (!findReducer(reducer.name) && ReduceActions.push(reducer)) || false;
+export const mainReducer = <T = any> (state: State, actor: { id, payload }) => {
+  console.debug(`reducingState`, actor, Actions);
+
+  const action = Actions.find(({id: id}) => id === actor.id);
+  if (!action)
+    throw new Error(`No action found for ${actor.id}`);
+
+  return action.reducer(state, actor.payload);
+}

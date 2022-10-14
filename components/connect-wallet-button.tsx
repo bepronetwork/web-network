@@ -16,6 +16,7 @@ import { changeShowWeb3DialogState } from "contexts/reducers/change-show-web3-di
 import { useSettings } from "contexts/settings";
 
 import { NetworkColors } from "interfaces/enums/network-colors";
+import {AppStateContext} from "../contexts/app-state";
 
 export default function ConnectWalletButton({
   children = null,
@@ -24,15 +25,29 @@ export default function ConnectWalletButton({
 }) {
   const { t } = useTranslation(["common", "connect-wallet-button"]);
 
-  const {
-    dispatch,
-    state: { loading },
-  } = useContext(ApplicationContext);
+  const {dispatch, state: { loading, connectedChain },} = useContext(AppStateContext);
   const [showModal, setShowModal] = useState(false);
 
   const { service: DAOService } = useDAO();
   const { settings } = useSettings();
   const { wallet, connectWallet } = useAuthentication();
+
+  async function handleLogin()  {
+    if(!window?.ethereum) return dispatch(changeShowWeb3DialogState(true))
+
+    if (+connectedChain?.id === +settings?.requiredChain?.id) {
+      connectWallet();
+    } else {
+      console.log(connectedChain, settings?.requiredChain);
+      //dispatch(changeNetworkId(+connectedChain?.id));
+      setShowModal(false);
+    }
+  }
+
+  function handleShowModal() {
+    if (!wallet?.address) setShowModal(true);
+    else setShowModal(false);
+  }
 
   useEffect(() => {
     if (!DAOService) return;
@@ -44,27 +59,6 @@ export default function ConnectWalletButton({
     handleShowModal();
   }, [wallet]);
 
-  async function handleLogin()  {
-    if(!window?.ethereum) return dispatch(changeShowWeb3DialogState(true))
-    if (DAOService) {
-      DAOService.getChainId()
-        .then((chainId) => {
-          if (+chainId === +settings?.requiredChain?.id) {
-            connectWallet();
-          } else {
-            dispatch(changeNetworkId(+chainId));
-            setShowModal(false);
-          }
-        });
-    } else {
-      connectWallet();
-    }
-  }
-
-  function handleShowModal() {
-    if (!wallet?.address) setShowModal(true);
-    else setShowModal(false);
-  }
 
   if (asModal) {
     if (loading.isLoading) return <></>;

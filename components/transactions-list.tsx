@@ -23,12 +23,12 @@ import TransactionType from "components/transaction-type";
 
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
-import { clearTransactions } from "contexts/reducers/clear-transactions";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { Transaction } from "interfaces/transaction";
+import {updateTx} from "../contexts/reducers/change-tx-list";
 
 export default function TransactionsList({
   onActiveTransactionChange
@@ -102,7 +102,7 @@ export default function TransactionsList({
   function clearTransactionsList() {
     localStorage.setItem(`bepro.transactions:${wallet?.address?.toLowerCase()}`, "[]");
 
-    dispatch(clearTransactions());
+    dispatch(updateTx.update([]));
   }
 
   return (

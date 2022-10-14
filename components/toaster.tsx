@@ -5,8 +5,10 @@ import BeproSmallLogo from "assets/icons/bepro-small-logo";
 
 import Icon from "components/icon";
 
-import { ApplicationContext } from "contexts/application";
-import { removeToast } from "contexts/reducers/remove-toast";
+
+import { removeToast } from "contexts/reducers/change-toaster";
+import {ToastNotification} from "../interfaces/toast-notification";
+import {AppStateContext} from "../contexts/app-state";
 
 enum IconMapper {
   info = "info",
@@ -17,13 +19,10 @@ enum IconMapper {
 }
 
 export default function Toaster() {
-  const {
-    state: { toaster },
-    dispatch
-  } = useContext(ApplicationContext);
+  const {state: { toaster }, dispatch} = useContext(AppStateContext);
 
-  function onClose(i: string) {
-    dispatch(removeToast(i));
+  function onClose(i: ToastNotification) {
+    dispatch(removeToast.update([i]));
   }
 
   return (
@@ -33,7 +32,7 @@ export default function Toaster() {
           <Toast
           delay={toast.delay || 3000}
             autohide={true}
-            onClose={() => onClose(toast.id)}
+            onClose={() => onClose(toast)}
             show={true}
             key={i}
             bg={toast.type}

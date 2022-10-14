@@ -1,28 +1,22 @@
-import { useContext, useEffect, useState } from "react";
-
 import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
-
 import FundingProgress from "components/bounty/funding-section/funding-progress";
 import Button from "components/button";
 import InputWithBalance from "components/input-with-balance";
 import Modal from "components/modal";
-
-import { ApplicationContext } from "contexts/application";
+import { useContext, useEffect, useState } from "react";
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
-import { toastError, toastSuccess } from "contexts/reducers/add-toast";
-
+import {addToast, toastError, toastSuccess} from "contexts/reducers/change-toaster";
 import { formatNumberToCurrency } from "helpers/formatNumber";
-
 import { MetamaskErrors } from "interfaces/enums/Errors";
-
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useERC20 from "x-hooks/use-erc20";
-
 import { Amount, CaptionMedium, RowWithTwoColumns } from "./minimals";
+import {AppStateContext} from "../../../contexts/app-state";
+
 
 export default function FundModal({
   show = false,
@@ -40,7 +34,7 @@ export default function FundModal({
   const { processEvent } = useApi();
   const { activeNetwork } = useNetwork();
   const { handleFundBounty } = useBepro();
-  const { dispatch } = useContext(ApplicationContext);
+  const { dispatch } = useContext(AppStateContext);
   const { activeIssue, networkIssue, getNetworkIssue, updateIssue } = useIssue();
   const { allowance, balance, decimals, setAddress, approve, updateAllowanceAndBalance } = useERC20();
 
@@ -97,6 +91,7 @@ export default function FundModal({
         updateIssue(repoId.toString(), activeIssue?.githubId)
         handleClose();
         getNetworkIssue();
+
         dispatch(toastSuccess(t("funding:modals.fund.funded-x-symbol", {
           amount: amountFormatted,
           symbol: transactionalSymbol

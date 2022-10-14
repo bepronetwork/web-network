@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 
 import { changeLoadState } from "contexts/reducers/change-load-state";
 
-import { BranchInfo, BranchsList } from "interfaces/branchs-list";
+import { BranchInfo, BranchesList } from "interfaces/branches-list";
 import {
   ReposList,
   RepoInfo,
@@ -41,7 +41,7 @@ export type RepoListByNetwork = {
 export interface ReposContextData {
   repoList: ReposList;
   forksList: ForksList;
-  branchsList: BranchsList;
+  branchsList: BranchesList;
   activeRepo: IActiveRepo;
   loadRepos: () => Promise<ReposList>;
   updateActiveRepo: (repoId: number) => Promise<IActiveRepo>;
@@ -56,7 +56,7 @@ const ReposContext = createContext<ReposContextData>({} as ReposContextData);
 
 export const ReposProvider: React.FC = function ({ children }) {
   const [repoList, setRepoList] = useState<RepoListByNetwork>({});
-  const [branchsList, setBranchsList] = useState<BranchsList>({});
+  const [branchsList, setBranchsList] = useState<BranchesList>({});
   const [forksList, setForksList] = useState<ForksList>({});
   const [activeRepo, setActiveRepo] = useState<IActiveRepo>(null);
 

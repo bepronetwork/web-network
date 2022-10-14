@@ -27,9 +27,7 @@ import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { toastError, toastWarning } from "contexts/reducers/add-toast";
-import { addTransaction } from "contexts/reducers/add-transaction";
 import { changeShowCreateBountyState } from "contexts/reducers/change-show-create-bounty";
-import { updateTransaction } from "contexts/reducers/update-transaction";
 import { useSettings } from "contexts/settings";
 
 import { parseTransaction } from "helpers/transactions";
@@ -38,7 +36,6 @@ import { MetamaskErrors } from "interfaces/enums/Errors";
 import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { Token } from "interfaces/token";
-import { BlockTransaction } from "interfaces/transaction";
 
 import { getCoinInfoByContract } from "services/coingecko";
 
@@ -46,7 +43,8 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useERC20 from "x-hooks/use-erc20";
 import useNetworkTheme from "x-hooks/use-network";
-import useTransactions from "x-hooks/useTransactions";
+
+import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
 
 interface BountyPayload {
   title: string;
@@ -89,7 +87,6 @@ export default function CreateBountyModal() {
   const [rewardAmount, setRewardAmount] = useState<NumberFormatValues>(ZeroNumberFormatValues);
 
   const rewardERC20 = useERC20();
-  const txWindow = useTransactions();
   const { settings } = useSettings();
   const transactionalERC20 = useERC20();
   const { activeNetwork } = useNetwork();
@@ -496,10 +493,7 @@ export default function CreateBountyModal() {
         return dispatch(toastError(t("bounty:errors.creating-bounty")));
       }
       
-      const transactionToast =  addTransaction({
-        type: TransactionTypes.openIssue, 
-        amount: payload.amount
-      }, activeNetwork);
+      const transactionToast =  addTx.update([{type: TransactionTypes.openIssue, amount: payload.amount } as any]);
 
       dispatch(transactionToast);
 
@@ -526,16 +520,11 @@ export default function CreateBountyModal() {
       }
 
       const networkBounty = await DAOService.openBounty(bountyPayload).catch((e) => {
-        if (e?.code === MetamaskErrors.UserRejected)
-          dispatch(updateTransaction({
-            ...(transactionToast.payload as BlockTransaction),
-            status: TransactionStatus.rejected,
-          }));
-        else
-          dispatch(updateTransaction({
-              ...(transactionToast.payload as BlockTransaction),
-              status: TransactionStatus.failed,
-          }));
+
+        dispatch(updateTx.update([{
+          ...transactionToast.payload[0],
+          status: e?.code === MetamaskErrors.UserRejected ? TransactionStatus.failed : TransactionStatus.failed,
+        }]));
 
         if (e?.code === MetamaskErrors.ExceedAllowance)
           dispatch(toastError(t("bounty:errors.exceeds-allowance")));
@@ -550,10 +539,8 @@ export default function CreateBountyModal() {
       });
 
       if (networkBounty?.error !== true) {
-        txWindow.updateItem(transactionToast.payload.id,
-                            parseTransaction(networkBounty, transactionToast.payload));
+        updateTx.update([parseTransaction(networkBounty, transactionToast.payload[0])])
 
-    
         const createdBounty = await processEvent("bounty",
                                                  "created",
                                                  activeNetwork?.name,
