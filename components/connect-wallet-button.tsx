@@ -15,7 +15,7 @@ import { useSettings } from "contexts/settings";
 
 import { NetworkColors } from "interfaces/enums/network-colors";
 import {AppStateContext} from "../contexts/app-state";
-import {changeShowWeb3} from "../contexts/reducers/change-show-prop";
+import {changeShowWeb3} from "../contexts/reducers/update-show-prop";
 
 export default function ConnectWalletButton({
   children = null,

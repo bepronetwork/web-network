@@ -8,7 +8,7 @@ import { isMobile } from "react-device-detect";
 import { kebabCase } from "lodash";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import {changeShowWeb3} from "../contexts/reducers/change-show-prop";
+import {changeShowWeb3} from "../contexts/reducers/update-show-prop";
 import {AppStateContext} from "../contexts/app-state";
 
 export default function WebThreeDialog() {

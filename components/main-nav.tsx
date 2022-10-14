@@ -25,7 +25,7 @@ import { useSettings } from "contexts/settings";
 
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
-import {changeShowCreateBounty, changeShowWeb3} from "../contexts/reducers/change-show-prop";
+import {changeShowCreateBounty, changeShowWeb3} from "../contexts/reducers/update-show-prop";
 
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 
