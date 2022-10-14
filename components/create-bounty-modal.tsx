@@ -493,7 +493,7 @@ export default function CreateBountyModal() {
         return dispatch(toastError(t("bounty:errors.creating-bounty")));
       }
       
-      const transactionToast =  addTx.update([{type: TransactionTypes.openIssue, amount: payload.amount } as any]);
+      const transactionToast =  addTx([{type: TransactionTypes.openIssue, amount: payload.amount } as any]);
 
       dispatch(transactionToast);
 
@@ -521,7 +521,7 @@ export default function CreateBountyModal() {
 
       const networkBounty = await DAOService.openBounty(bountyPayload).catch((e) => {
 
-        dispatch(updateTx.update([{
+        dispatch(updateTx([{
           ...transactionToast.payload[0],
           status: e?.code === MetamaskErrors.UserRejected ? TransactionStatus.failed : TransactionStatus.failed,
         }]));
@@ -539,7 +539,7 @@ export default function CreateBountyModal() {
       });
 
       if (networkBounty?.error !== true) {
-        updateTx.update([parseTransaction(networkBounty, transactionToast.payload[0])])
+        updateTx([parseTransaction(networkBounty, transactionToast.payload[0])])
 
         const createdBounty = await processEvent("bounty",
                                                  "created",

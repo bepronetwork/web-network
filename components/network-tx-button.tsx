@@ -75,7 +75,7 @@ function networkTxButton({
   function makeTx() {
     if (!DAOService || !wallet) return;
 
-    const tmpTransaction = addTx.update([{
+    const tmpTransaction = addTx([{
         type: txType,
         amount: txParams?.tokenAmount || "0",
         currency: txCurrency || t("misc.$token")
@@ -101,7 +101,7 @@ function networkTxButton({
           if (answer.blockNumber)
             processEvent("oracles","changed", activeNetwork.name, {fromBlock:answer.blockNumber}).catch(console.debug);
 
-          updateTx.update([parseTransaction(answer, tmpTransaction.payload[0])])
+          updateTx([parseTransaction(answer, tmpTransaction.payload[0])])
         } else {
           onFail(answer.message);
           dispatch(addToast({
@@ -113,7 +113,7 @@ function networkTxButton({
       })
       .catch((e) => {
 
-        dispatch(updateTx.update([{
+        dispatch(updateTx([{
           ...tmpTransaction.payload[0],
           status: e?.code === MetamaskErrors.UserRejected ? TransactionStatus.rejected : TransactionStatus.failed,
         }]));

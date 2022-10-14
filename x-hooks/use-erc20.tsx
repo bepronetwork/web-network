@@ -96,17 +96,17 @@ export default function useERC20() {
                         cap: string,
                         ownerAddress: string): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
-      const transaction = addTx.update([{ type: TransactionTypes.deployERC20Token } as any]);
+      const transaction = addTx([{ type: TransactionTypes.deployERC20Token } as any]);
 
       dispatch(transaction);
 
       await DAOService.deployERC20Token(name, symbol, cap, ownerAddress)
         .then((txInfo: TransactionReceipt) => {
-          updateTx.update([parseTransaction(txInfo, transaction.payload[0])])
+          updateTx([parseTransaction(txInfo, transaction.payload[0])])
           resolve(txInfo);
         })
         .catch((err) => {
-          dispatch(updateTx.update([{
+          dispatch(updateTx([{
             ...transaction.payload[0],
             status: err?.code === MetamaskErrors.UserRejected ? TransactionStatus.rejected : TransactionStatus.failed,
           }]));

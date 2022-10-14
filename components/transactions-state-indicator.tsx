@@ -10,7 +10,7 @@ import { TransactionStatus } from "interfaces/enums/transaction-status";
 import { Transaction } from "interfaces/transaction";
 import {AppStateContext} from "../contexts/app-state";
 import {WinStorage} from "../services/win-storage";
-import {changeTxList} from "../contexts/reducers/change-tx-list";
+import {setTxList} from "../contexts/reducers/change-tx-list";
 
 export default function TransactionsStateIndicator() {
   const {state: { transactions, currentUser: { walletAddress } }, dispatch} = useContext(AppStateContext);
@@ -60,7 +60,7 @@ export default function TransactionsStateIndicator() {
         .map(tx =>
           getTransaction(tx.transactionHash)
             .then(block => parseBlock(tx, block))))
-      .then(txs => dispatch(changeTxList.update(txs)))
+      .then(txs => dispatch(setTxList(txs)))
   }
 
   useEffect(updateLoadingState, [transactions]);

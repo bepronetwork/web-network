@@ -102,7 +102,7 @@ export default function TransactionsList({
   function clearTransactionsList() {
     localStorage.setItem(`bepro.transactions:${wallet?.address?.toLowerCase()}`, "[]");
 
-    dispatch(updateTx.update([]));
+    dispatch(updateTx([]));
   }
 
   return (
