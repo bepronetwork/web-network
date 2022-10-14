@@ -22,7 +22,7 @@ export default function Toaster() {
   const {state: { toaster }, dispatch} = useContext(AppStateContext);
 
   function onClose(i: ToastNotification) {
-    dispatch(removeToast.update([i]));
+    dispatch(removeToast(i));
   }
 
   return (

@@ -8,7 +8,7 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
-import {addToast, toastError, toastSuccess} from "contexts/reducers/change-toaster";
+import { toastError, toastSuccess} from "contexts/reducers/change-toaster";
 import { formatNumberToCurrency } from "helpers/formatNumber";
 import { MetamaskErrors } from "interfaces/enums/Errors";
 import useApi from "x-hooks/use-api";
