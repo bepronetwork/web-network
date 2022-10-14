@@ -49,7 +49,8 @@ const SettingsProvider = ({ children }) => {
   useEffect(() => {
     const settingsOnSessionStorage = getSettingsFromSessionStorage();
 
-    if (settingsOnSessionStorage) return setSettings(settingsOnSessionStorage);
+    if (settingsOnSessionStorage)
+      return setSettings(settingsOnSessionStorage);
 
     fetchAndUpdateSettings();
   }, []);

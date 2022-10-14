@@ -1,5 +1,7 @@
 const {WinStorage} = require("../services/win-storage");
-const storage = new WinStorage('web-network.settings', 3600, "sessionStorage");
+
+// 24hrs
+const storage = new WinStorage('web-network.settings', 24 * 3600 * 1000, "sessionStorage");
 
 class Settings {
   constructor(settings = undefined) {

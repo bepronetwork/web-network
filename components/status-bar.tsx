@@ -23,7 +23,9 @@ export default function StatusBar() {
   function neverEndingUpdate() {
     const past = +new Date();
     getHealth().then((state) => {
-      dispatch(changeMicroServiceReady(state));
+      if (state !== microServiceReady)
+        dispatch(changeMicroServiceReady(state));
+
       setMs(+new Date() - past);
       setTimeout(neverEndingUpdate, 60 * 1000);
     });

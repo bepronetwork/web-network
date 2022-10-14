@@ -18,7 +18,7 @@ import CreateBountyProgress from "components/create-bounty-progress";
 import CreateBountyTokenAmount from "components/create-bounty-token-amount";
 import { IFilesProps } from "components/drag-and-drop";
 import GithubInfo from "components/github-info";
-import Modal from "components/modal"; 
+import Modal from "components/modal";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import ReposDropdown from "components/repos-dropdown";
 
@@ -103,9 +103,9 @@ export default function CreateBountyModal() {
     dispatch,
     state: { myTransactions, showCreateBounty },
   } = useContext(ApplicationContext);
-  
 
-  const [canAddCustomToken, setCanAddCustomToken] = 
+
+  const [canAddCustomToken, setCanAddCustomToken] =
   useState<boolean>(activeNetwork?.networkAddress === settings?.contracts?.network
     ? settings?.defaultNetworkConfig?.allowCustomTokens
     : !!activeNetwork?.allowCustomTokens)
@@ -353,15 +353,11 @@ export default function CreateBountyModal() {
   //TODO: add some function
   function verifyNextStepAndCreate() {
     if (isLoadingCreateBounty) return true;
-    
+
     const isIssueAmount =
-      issueAmount.floatValue <= 0 || issueAmount.floatValue === undefined
-        ? true
-        : false;
+      issueAmount.floatValue <= 0 || issueAmount.floatValue === undefined;
     const isRewardAmount =
-      rewardAmount.floatValue <= 0 || rewardAmount.floatValue === undefined
-        ? true
-        : false;
+      rewardAmount.floatValue <= 0 || rewardAmount.floatValue === undefined;
     if ((currentSection === 0 && !bountyTitle) || !bountyDescription)
       return true;
     if (currentSection === 1 && isBountyType && isIssueAmount) return true;
@@ -544,9 +540,9 @@ export default function CreateBountyModal() {
           dispatch(toastError(t("bounty:errors.exceeds-allowance")));
         else if(e?.code === MetamaskErrors.UserRejected)
           dispatch(toastError(t("bounty:errors.bounty-canceled")))
-        else 
+        else
           dispatch(toastError(e.message || t("bounty:errors.creating-bounty")));
-        
+
         console.debug(e);
 
         return {...e, error: true};
@@ -556,7 +552,7 @@ export default function CreateBountyModal() {
         txWindow.updateItem(transactionToast.payload.id,
                             parseTransaction(networkBounty, transactionToast.payload));
 
-    
+
         const createdBounty = await processEvent("bounty",
                                                  "created",
                                                  activeNetwork?.name,
@@ -565,7 +561,7 @@ export default function CreateBountyModal() {
         if (!createdBounty){
           dispatch(toastWarning(t("bounty:errors.sync")));
         }
-    
+
         if (createdBounty?.[cid]) {
           const [repoId, githubId] = String(cid).split("/");
 
@@ -577,7 +573,7 @@ export default function CreateBountyModal() {
 
         cleanFields();
         dispatch(changeShowCreateBountyState(false))
-      }  
+      }
     }finally{
       setIsLoadingCreateBounty(false)
     }
@@ -639,6 +635,9 @@ export default function CreateBountyModal() {
   if (showCreateBounty && !wallet?.address)
     return <ConnectWalletButton asModal={true} />;
 
+  if (!showCreateBounty)
+    return <></>
+
   return (
     <>
       <Modal
@@ -654,9 +653,9 @@ export default function CreateBountyModal() {
         footer={
           <>
             <div className="d-flex flex-row justify-content-between">
-              <Button 
-                color="dark-gray" 
-                onClick={handleCancelAndBack} 
+              <Button
+                color="dark-gray"
+                onClick={handleCancelAndBack}
                 disabled={isLoadingApprove || isLoadingCreateBounty}
               >
                 <span>
