@@ -16,9 +16,9 @@
 
 ---
 
-<p align="center">
+<h3 align="center">
   We are delighted to announce the release of <a href="https://app.bepro.network/">Bepro Network's v2 </a> protocol. Try it.
-</p>
+</h3>
 
 # Documentation
 
