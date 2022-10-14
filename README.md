@@ -15,13 +15,10 @@
 </p>
 
 ---
-<br>
 
-<h3 align="center">
+<p align="center">
   We are delighted to announce the release of <a href="https://app.bepro.network/">Bepro Network's v2 </a> protocol. Try it.
-</h3>
-
-<br>
+</p>
 
 # Documentation
 
