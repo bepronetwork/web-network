@@ -23,7 +23,8 @@
 
 <br>
 
-# Getting Started
+# Documentation
+
 ## 1. Prerequisites
 
 - [NodeJS](https://nodejs.dev/) in v16.13 or newer.
