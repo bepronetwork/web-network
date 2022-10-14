@@ -6,7 +6,7 @@ import {v4 as uuidv4} from "uuid";
 
 enum SubActions { add, remove}
 
-class AddToast extends SimpleAction<ToastNotification[], SubActions> {
+class ChangeToaster extends SimpleAction<ToastNotification[], SubActions> {
   constructor() {
     super(AppStateReduceId.AddToast, 'toaster');
   }
@@ -37,7 +37,7 @@ class AddToast extends SimpleAction<ToastNotification[], SubActions> {
   }
 }
 
-export const changeToaster = new AddToast();
+export const changeToaster = new ChangeToaster();
 
 export const removeToast = (toast: ToastNotification) =>
   changeToaster.update([toast], SubActions.remove);
