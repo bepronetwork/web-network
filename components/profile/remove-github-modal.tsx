@@ -8,7 +8,7 @@ import Modal from "components/modal";
 import { WarningSpan } from "components/warning-span";
 
 import { ApplicationContext } from "contexts/application";
-import { toastError } from "contexts/reducers/add-toast";
+import { toastError } from "contexts/reducers/change-toaster";
 
 import useApi from "x-hooks/use-api";
 

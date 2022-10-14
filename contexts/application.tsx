@@ -1,21 +1,18 @@
 import {
   createContext,
   Dispatch,
-  useEffect,
   useReducer,
-  useState
 } from "react";
 
 import { useRouter } from "next/router";
-import sanitizeHtml from "sanitize-html";
+
 
 import Loading from "components/loading";
 import Toaster from "components/toaster";
 
-import { toastError } from "contexts/reducers/add-toast";
 
 import loadApplicationStateReducers from "contexts/reducers/index";
-import { mainReducer } from "contexts/reducers/main";
+
 
 
 import { ApplicationState } from "interfaces/application-state";

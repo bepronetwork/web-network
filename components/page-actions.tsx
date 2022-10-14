@@ -19,7 +19,7 @@ import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
-import { addToast } from "contexts/reducers/add-toast";
+import { addToast } from "contexts/reducers/change-toaster";
 import { useRepos } from "contexts/repos";
 
 import { getIssueState } from "helpers/handleTypeIssue";

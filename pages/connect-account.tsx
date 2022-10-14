@@ -16,7 +16,7 @@ import { FlexRow } from "components/profile/wallet-balance";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
-import { toastError, toastSuccess } from "contexts/reducers/add-toast";
+import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 
 import { CustomSession } from "interfaces/custom-session";

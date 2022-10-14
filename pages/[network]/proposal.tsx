@@ -17,7 +17,7 @@ import ProposalPullRequestDetail from "components/proposal-pullrequest-details";
 import { ApplicationContext } from "contexts/application";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
-import { addToast } from "contexts/reducers/add-toast";
+import { addToast } from "contexts/reducers/change-toaster";
 
 
 import { ProposalExtended } from "interfaces/bounty";

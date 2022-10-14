@@ -22,11 +22,10 @@ import Modal from "components/modal";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import ReposDropdown from "components/repos-dropdown";
 
-import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
-import { toastError, toastWarning } from "contexts/reducers/add-toast";
+import { toastError, toastWarning } from "contexts/reducers/change-toaster";
 
 import { useSettings } from "contexts/settings";
 
@@ -351,13 +350,9 @@ export default function CreateBountyModal() {
     if (isLoadingCreateBounty) return true;
     
     const isIssueAmount =
-      issueAmount.floatValue <= 0 || issueAmount.floatValue === undefined
-        ? true
-        : false;
+      issueAmount.floatValue <= 0 || issueAmount.floatValue === undefined;
     const isRewardAmount =
-      rewardAmount.floatValue <= 0 || rewardAmount.floatValue === undefined
-        ? true
-        : false;
+      rewardAmount.floatValue <= 0 || rewardAmount.floatValue === undefined;
     if ((currentSection === 0 && !bountyTitle) || !bountyDescription)
       return true;
     if (currentSection === 1 && isBountyType && isIssueAmount) return true;
@@ -384,9 +379,9 @@ export default function CreateBountyModal() {
       return true;
     if (currentSection === 2 && (!repository || !branch)) return true;
     if (currentSection === 3 && !isTokenApproved) return true;
-    if (currentSection === 3 && isLoadingCreateBounty) return true;
+    return currentSection === 3 && isLoadingCreateBounty;
 
-    return false;
+
   }
 
   function handleCancelAndBack() {

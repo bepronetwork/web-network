@@ -25,7 +25,7 @@ import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
-import { addToast, toastError, toastSuccess } from "contexts/reducers/add-toast";
+import { addToast, toastError, toastSuccess } from "contexts/reducers/change-toaster";
 
 import { psReadAsText } from "helpers/file-reader";
 import { formatDate } from "helpers/formatDate";

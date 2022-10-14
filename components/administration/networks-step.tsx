@@ -13,7 +13,7 @@ import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetworkSettings } from "contexts/network-settings";
-import { addToast } from "contexts/reducers/add-toast";
+import { addToast } from "contexts/reducers/change-toaster";
 import { useSettings } from "contexts/settings";
 
 import { psReadAsText } from "helpers/file-reader";
