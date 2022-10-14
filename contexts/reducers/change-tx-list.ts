@@ -7,59 +7,64 @@ import {TransactionStatus} from "../../interfaces/enums/transaction-status";
 import {TransactionTypes} from "../../interfaces/enums/transaction-types";
 
 type Tx = (SimpleBlockTransactionPayload | BlockTransaction | UpdateBlockTransaction);
-type TxList = Tx[]
+type TxList = Tx[];
 
-class AddTx extends SimpleAction<TxList> {
+enum SubActions {add, remove, update, change};
+
+class ChangeTxList extends SimpleAction<TxList, SubActions> {
   constructor() {
     super(AppStateReduceId.AddTransaction, 'transactions');
   }
 
-  reducer(state: State, payload: TxList): State {
-    const tx = (_tx) => ({
-      status: TransactionStatus.pending,
-      type: TransactionTypes.unknown,
-      date: +new Date(),
-      amount: "0",
-      currency: 'TOKEN',
-      ..._tx,
-      id: uuidv4(),
-    });
+  reducer(state: State, payload: TxList, subAction): State {
+    let transformed;
 
-    const transformed = [...state.transactions, ...payload.map(tx)]
+    switch (subAction) {
+
+      case SubActions.add:
+        const mapper = (_tx) => ({
+          status: TransactionStatus.pending,
+          type: TransactionTypes.unknown,
+          date: +new Date(),
+          amount: "0",
+          currency: 'TOKEN',
+          ..._tx,
+          id: uuidv4(),
+        });
+
+        transformed = [...state.transactions, ...payload.map(mapper)];
+        break;
+
+      case SubActions.remove:
+        transformed = state.transactions.filter(({id}) => !payload.some(({id: _id}) => _id === id));
+        break;
+
+      case SubActions.update:
+        transformed = [...state.transactions];
+
+        payload.forEach((tx) => {
+          const i = transformed.findIndex(t => t.id === tx.id);
+          if (i > -1)
+            transformed.splice(i, 1, tx);
+        });
+        break;
+
+      case SubActions.change:
+        transformed = payload;
+        break;
+
+      default:
+        console.log(`Unknown subAction ${subAction}`);
+        break;
+    }
+
     return super.reducer(state, transformed);
   }
 }
 
-class RemoveTx extends SimpleAction<TxList> {
-  constructor() {
-    super(AppStateReduceId.RemoveTransaction, 'transactions');
-  }
+export const changeTxList = new ChangeTxList();
 
-  reducer(state: State, payload: TxList): State {
-    const transformed = state.transactions.filter(({id}) => !payload.some(({id: _id}) => _id === id));
-    return super.reducer(state, transformed);
-  }
-}
-
-class UpdateTx extends SimpleAction<TxList> {
-  constructor() {
-    super(AppStateReduceId.RemoveTransaction, 'transactions');
-  }
-
-  reducer(state: State, payload: TxList): State {
-    const transformed = [...state.transactions];
-
-    payload.forEach((tx) => {
-      const i = transformed.findIndex(t => t.id === tx.id);
-      if (i > -1)
-        transformed.splice(i, 1, tx);
-    });
-
-    return super.reducer(state, transformed);
-  }
-}
-
-export const changeTxList = new SimpleAction(AppStateReduceId.Transactions, 'transactions');
-export const removeTx = new RemoveTx();
-export const addTx = new AddTx();
-export const updateTx = new UpdateTx();
+export const addTx = (tx: TxList) => changeTxList.update(tx, SubActions.add);
+export const removeTx = (tx: TxList) => changeTxList.update(tx, SubActions.remove);
+export const updateTx = (tx: TxList) => changeTxList.update(tx, SubActions.update);
+export const setTxList = (tx: TxList) => changeTxList.update(tx, SubActions.change);
