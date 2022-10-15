@@ -6,7 +6,7 @@ import Button from "components/button";
 import GithubLink from "components/github-link";
 import Modal from "components/modal";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
@@ -32,7 +32,7 @@ export default function NotMergeableModal({
 
   const {
     dispatch
-  } = useContext(ApplicationContext);
+  } = useContext(AppStateContext);
 
   const [isVisible, setVisible] = useState(false);
   const [mergeState, setMergeState] = useState("");

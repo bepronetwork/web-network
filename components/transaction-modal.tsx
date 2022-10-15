@@ -13,7 +13,7 @@ import InternalLink from "components/internal-link";
 import Modal from "components/modal";
 import TransactionStats from "components/transaction-stats";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { toastInfo } from "contexts/reducers/change-toaster";
 import { useSettings } from "contexts/settings";
 
@@ -38,7 +38,7 @@ export default function TransactionModal({
   const [addressTo, setAddressTo] = useState("...");
   const [addressFrom, setAddressFrom] = useState("...");
 
-  const { dispatch } = useContext(ApplicationContext);
+  const { dispatch } = useContext(AppStateContext);
 
   const { settings } = useSettings();
   const { getURLWithNetwork } = useNetworkTheme();

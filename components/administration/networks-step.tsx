@@ -9,7 +9,7 @@ import ImageUploader from "components/image-uploader";
 import InputNumber from "components/input-number";
 import Step from "components/step";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetworkSettings } from "contexts/network-settings";
@@ -41,7 +41,7 @@ export default function NetworksStep({
   const { service: DAOService } = useDAO();
   const { wallet, user } = useAuthentication();
   const { searchNetworks, updateNetwork } = useApi();
-  const { dispatch } = useContext(ApplicationContext);
+  const { dispatch } = useContext(AppStateContext);
   const { forcedNetwork, details, fields, settings, setForcedNetwork } = useNetworkSettings();
 
   const MAX_PERCENTAGE_FOR_DISPUTE = +appSettings?.networkParametersLimits?.disputePercentage?.max;

@@ -4,7 +4,7 @@ import LockedIcon from "assets/icons/locked-icon";
 import Button from "components/button";
 import Icon from "components/icon";
 import Modal from "components/modal";
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
@@ -58,7 +58,7 @@ function networkTxButton({
   const [showModal, setShowModal] = useState(false);
   const [txSuccess,] = useState(false);
 
-  const { dispatch } = useContext(ApplicationContext);
+  const { dispatch } = useContext(AppStateContext);
 
   const { processEvent } = useApi();
   const { activeNetwork } = useNetwork();

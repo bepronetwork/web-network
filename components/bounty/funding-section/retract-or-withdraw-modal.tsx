@@ -6,7 +6,7 @@ import { useTranslation } from "next-i18next";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
@@ -37,7 +37,7 @@ export default function RetractOrWithdrawModal({
   const { activeNetwork } = useNetwork();
   const { handleRetractFundBounty, handleWithdrawFundRewardBounty } = useBepro();
   const { networkIssue, getNetworkIssue, updateIssue, activeIssue } = useIssue();
-  const { dispatch } = useContext(ApplicationContext);
+  const { dispatch } = useContext(AppStateContext);
 
   const tokenSymbol = networkIssue?.transactionalTokenData?.symbol;
   const rewardTokenSymbol = networkIssue?.rewardTokenData?.symbol;

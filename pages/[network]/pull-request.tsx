@@ -16,7 +16,7 @@ import NothingFound from "components/nothing-found";
 import PullRequestHero from "components/pull-request-hero";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
@@ -43,7 +43,7 @@ export default function PullRequestPage() {
   const [pullRequest, setPullRequest] = useState<pullRequest>();
   const [networkPullRequest, setNetworkPullRequest] = useState<PullRequest>();
 
-  const { dispatch } = useContext(ApplicationContext);
+  const { dispatch } = useContext(AppStateContext);
   
   const { activeRepo } = useRepos();
   const { activeNetwork } = useNetwork();

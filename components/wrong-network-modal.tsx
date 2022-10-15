@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 
 import Modal from "components/modal";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { useSettings } from "contexts/settings";
 
 import { NETWORKS } from "helpers/networks";

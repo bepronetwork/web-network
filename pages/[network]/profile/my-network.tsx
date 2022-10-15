@@ -10,7 +10,7 @@ import NothingFound from "components/nothing-found";
 import MyNetworkSettings from "components/profile/my-network-settings";
 import ProfileLayout from "components/profile/profile-layout";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { useAuthentication } from "contexts/authentication";
 import { cookieKey, useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
@@ -27,7 +27,7 @@ function MyNetwork() {
 
   const [myNetwork, setMyNetwork] = useState<Network>();
 
-  const { dispatch } = useContext(ApplicationContext);
+  const { dispatch } = useContext(AppStateContext);
   
   const { searchNetworks } = useApi();
   const { wallet } = useAuthentication();

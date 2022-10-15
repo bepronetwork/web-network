@@ -22,7 +22,7 @@ import {
 import useApi from "x-hooks/use-api";
 import useOctokit from "x-hooks/use-octokit";
 
-import { ApplicationContext } from "./application";
+import { AppStateContext } from "contexts/app-state";
 import { useNetwork } from "./network";
 
 interface IActiveRepo extends RepoInfo {
@@ -61,7 +61,7 @@ export const ReposProvider: React.FC = function ({ children }) {
   const [activeRepo, setActiveRepo] = useState<IActiveRepo>(null);
 
   const { getReposList } = useApi();
-  const { dispatch } = useContext(ApplicationContext);
+  const { dispatch } = useContext(AppStateContext);
   const { activeNetwork } = useNetwork();
   const { getRepository, getRepositoryForks, getRepositoryBranches } = useOctokit();
   const { query } = useRouter();

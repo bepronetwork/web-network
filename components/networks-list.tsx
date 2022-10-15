@@ -9,7 +9,7 @@ import NetworkListBar from "components/network-list-bar";
 import NetworkListItem from "components/network-list-item";
 import NothingFound from "components/nothing-found";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { useDAO } from "contexts/dao";
 import { changeLoadState } from "contexts/reducers/change-load";
 import { useSettings } from "contexts/settings";
@@ -40,7 +40,7 @@ export default function NetworksList() {
   const { service: DAOService } = useDAO();
   const { getURLWithNetwork } = useNetwork();
 
-  const { dispatch } = useContext(ApplicationContext);
+  const { dispatch } = useContext(AppStateContext);
   const { 
     setNumberOfNetworks, 
     setNumberOfBounties, 

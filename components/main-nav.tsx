@@ -17,7 +17,7 @@ import TransactionsStateIndicator from "components/transactions-state-indicator"
 import Translation from "components/translation";
 import WrongNetworkModal from "components/wrong-network-modal";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 
@@ -41,7 +41,7 @@ export default function MainNav() {
   const [showHelp, setShowHelp] = useState(false);
   const {
     dispatch
-  } = useContext(ApplicationContext);
+  } = useContext(AppStateContext);
   const [myNetwork, setMyNetwork] = useState<MyNetworkLink>({ 
     label: <Translation label={"main-nav.new-network"} />, 
     href: "/new-network", 
