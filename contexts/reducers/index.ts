@@ -4,6 +4,7 @@ import {changeChain} from "./change-chain";
 import {changeTxList} from "./change-tx-list";
 import {changeToaster} from "./change-toaster";
 import {changeShowProp} from "./update-show-prop";
+import {changeNetwork, changeRepos, changeServiceProp} from "./change-service";
 
 export default function loadApplicationStateReducers() {
   [
@@ -12,6 +13,9 @@ export default function loadApplicationStateReducers() {
     changeTxList,
     changeToaster,
     changeShowProp,
+    changeServiceProp,
+    changeNetwork,
+    changeRepos
   ].forEach(addReducer);
 
   console.debug(`Loaded State Reducers`);
