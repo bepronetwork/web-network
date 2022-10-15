@@ -50,24 +50,30 @@ export interface ChangeNetworkSummaryProps {
   action?: "add" | "reset";
 }
 
+export interface ServiceNetworkRepostActive {
+  forks: ForkInfo[];
+  branches: BranchInfo[];
+  ghVisibility: boolean;
+}
+
+export interface ServiceNetworkRepos {
+  list: ReposList;
+  forks: ForksList | null;
+  branches: BranchesList | null;
+  active: ServiceNetworkRepostActive | null;
+}
+
+export interface ServiceNetwork {
+  lastVisited: string;
+  active: Network | null;
+  repos: ServiceNetworkRepos | null;
+}
+
 export interface ServiceState {
   starting: boolean;
   microReady: boolean | null;
   active: DAO | null;
-  network: {
-    active: Network | null;
-    repos: {
-      list: ReposList;
-      forks: ForksList | null;
-      branches: BranchesList | null;
-      active: {
-        forks: ForkInfo[];
-        branches: BranchInfo[];
-        ghVisibility: boolean;
-      }
-    },
-    lastVisited: string;
-  };
+  network: ServiceNetwork | null;
 }
 
 export interface ConnectedChain {
