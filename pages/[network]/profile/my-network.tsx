@@ -15,7 +15,7 @@ import { useAuthentication } from "contexts/authentication";
 import { cookieKey, useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
 import { NetworkSettingsProvider } from "contexts/network-settings";
-import { changeLoadState } from "contexts/reducers/change-load-state";
+import { changeLoadState } from "contexts/reducers/change-load";
 import { useSettings } from "contexts/settings";
 
 import { Network } from "interfaces/network";
@@ -33,7 +33,7 @@ function MyNetwork() {
   const { wallet } = useAuthentication();
   const {  activeNetwork } = useNetwork();
   const { setForcedNetwork } = useNetworkSettings()
-  const { settings: appSettings } = useSettings(); 
+  const { settings: appSettings } = useSettings();
 
   const defaultNetworkName = appSettings?.defaultNetworkConfig?.name?.toLowerCase() || "bepro";
 

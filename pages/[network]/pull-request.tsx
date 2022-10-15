@@ -21,7 +21,7 @@ import { useAuthentication } from "contexts/authentication";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/change-toaster";
-import { changeLoadState } from "contexts/reducers/change-load-state";
+import { changeLoadState } from "contexts/reducers/change-load";
 import { useRepos } from "contexts/repos";
 
 import { MetamaskErrors } from "interfaces/enums/Errors";

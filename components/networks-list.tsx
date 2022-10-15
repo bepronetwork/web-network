@@ -11,7 +11,7 @@ import NothingFound from "components/nothing-found";
 
 import { ApplicationContext } from "contexts/application";
 import { useDAO } from "contexts/dao";
-import { changeLoadState } from "contexts/reducers/change-load-state";
+import { changeLoadState } from "contexts/reducers/change-load";
 import { useSettings } from "contexts/settings";
 
 import { orderByProperty } from "helpers/array";

@@ -9,7 +9,7 @@ import React, {
 
 import { useRouter } from "next/router";
 
-import { changeLoadState } from "contexts/reducers/change-load-state";
+import { changeLoadState } from "contexts/reducers/change-load";
 
 import { BranchInfo, BranchesList } from "interfaces/branches-list";
 import {

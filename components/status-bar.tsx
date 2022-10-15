@@ -5,17 +5,14 @@ import { useTranslation } from "next-i18next";
 import NetworkIdentifier from "components/network-identifier";
 import Translation from "components/translation";
 
-import { changeMicroServiceReady } from "contexts/reducers/change-microservice-ready";
+import { changeMicroServiceReady } from "contexts/reducers/change-service";
 
 import useApi from "x-hooks/use-api";
 import {AppStateContext} from "../contexts/app-state";
 
 
 export default function StatusBar() {
-  const {
-    dispatch,
-    state: { Service }
-  } = useContext(AppStateContext);
+  const {dispatch, state: { Service }} = useContext(AppStateContext);
   const [ms, setMs] = useState(0);
   const { getHealth } = useApi();
   const { t } = useTranslation("common");

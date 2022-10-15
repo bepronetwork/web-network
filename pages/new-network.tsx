@@ -24,7 +24,7 @@ import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
 import { NetworkSettingsProvider } from "contexts/network-settings";
 import { addToast } from "contexts/reducers/change-toaster";
-import { changeLoadState } from "contexts/reducers/change-load-state";
+import { changeLoadState } from "contexts/reducers/change-load";
 import { useSettings } from "contexts/settings";
 
 import { 

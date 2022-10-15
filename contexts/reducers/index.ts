@@ -5,9 +5,11 @@ import {changeTxList} from "./change-tx-list";
 import {changeToaster} from "./change-toaster";
 import {changeShowProp} from "./update-show-prop";
 import {changeNetwork, changeRepos, changeServiceProp} from "./change-service";
+import {changeLoad} from "./change-load";
 
 export default function loadApplicationStateReducers() {
   [
+    changeLoad,
     changeSettings,
     changeChain,
     changeTxList,
