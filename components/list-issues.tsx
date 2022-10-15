@@ -21,7 +21,7 @@ import ScrollTopButton from "components/scroll-top-button";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
-import { changeLoadState } from "contexts/reducers/change-load-state";
+import { changeLoadState } from "contexts/reducers/change-load";
 
 
 import { IssueState, IssueBigNumberData } from "interfaces/issue-data";
