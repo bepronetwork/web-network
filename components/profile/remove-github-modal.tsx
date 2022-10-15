@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import Modal from "components/modal";
 import { WarningSpan } from "components/warning-span";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { toastError } from "contexts/reducers/change-toaster";
 
 import useApi from "x-hooks/use-api";
@@ -32,7 +32,7 @@ function RemoveGithubAccount({
   const [isExecuting, setIsExecuting] = useState(false);
 
   const { resetUser } = useApi();
-  const { dispatch } = useContext(ApplicationContext);
+  const { dispatch } = useContext(AppStateContext);
   
   const SpanPrimary = ({ text }) => <span className="text-primary">{text}</span>;
 

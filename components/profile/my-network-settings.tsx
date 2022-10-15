@@ -20,7 +20,7 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import TokensSettings from "components/tokens-settings";
 import { WarningSpan } from "components/warning-span";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
@@ -61,7 +61,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   const { colorsToCSS } = useNetworkTheme();
   const { updateNetwork, processEvent } = useApi();
   const { handleChangeNetworkParameter, handleAddNetworkToRegistry } = useBepro();
-  const { dispatch } = useContext(ApplicationContext);
+  const { dispatch } = useContext(AppStateContext);
   const { activeNetwork, updateActiveNetwork } = useNetwork();
   const { user, wallet, updateWalletBalance } = useAuthentication();
   const { details, fields, github, settings, tokens, forcedNetwork, isAbleToClosed } = useNetworkSettings();

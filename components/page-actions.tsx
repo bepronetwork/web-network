@@ -14,7 +14,7 @@ import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
 import UpdateBountyAmountModal from "components/update-bounty-amount-modal";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useIssue } from "contexts/issue";
@@ -55,7 +55,7 @@ export default function PageActions({
 
   const {
     dispatch
-  } = useContext(ApplicationContext);
+  } = useContext(AppStateContext);
 
   const { activeRepo } = useRepos();
   const { activeNetwork } = useNetwork();

@@ -21,7 +21,7 @@ import Button from "components/button";
 import TransactionStats from "components/transaction-stats";
 import TransactionType from "components/transaction-type";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { useAuthentication } from "contexts/authentication";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
@@ -38,7 +38,7 @@ export default function TransactionsList({
   const {
     dispatch,
     state: { transactions }
-  } = useContext(ApplicationContext);
+  } = useContext(AppStateContext);
   const { t } = useTranslation("common");
   const { wallet } = useAuthentication();
 

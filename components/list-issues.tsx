@@ -18,7 +18,7 @@ import ListSort from "components/list-sort";
 import NothingFound from "components/nothing-found";
 import ScrollTopButton from "components/scroll-top-button";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 import { changeLoadState } from "contexts/reducers/change-load";
@@ -71,7 +71,7 @@ export default function ListIssues({
   const {
     dispatch,
     state: { loading }
-  } = useContext(ApplicationContext);
+  } = useContext(AppStateContext);
 
   const router = useRouter();
   const { t } = useTranslation(["common", "bounty"]);

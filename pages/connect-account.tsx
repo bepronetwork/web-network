@@ -13,7 +13,7 @@ import Button from "components/button";
 import { ConnectionButton } from "components/profile/connect-button";
 import { FlexRow } from "components/profile/wallet-balance";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
 import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
@@ -30,7 +30,7 @@ export default function ConnectAccount() {
 
   const { joinAddressToUser } = useApi();
   const { lastNetworkVisited } = useNetwork();
-  const { dispatch } = useContext(ApplicationContext);
+  const { dispatch } = useContext(AppStateContext);
   const { 
     wallet, 
     isGithubAndWalletMatched,

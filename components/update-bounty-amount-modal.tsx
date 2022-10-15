@@ -7,7 +7,7 @@ import Button from "components/button";
 import InputNumber from "components/input-number";
 import Modal from "components/modal";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useIssue } from "contexts/issue";
@@ -39,7 +39,7 @@ export default function UpdateBountyAmountModal({
   const { activeNetwork } = useNetwork();
   const { wallet } = useAuthentication();
   const { service: DAOService } = useDAO();
-  const { dispatch } = useContext(ApplicationContext);
+  const { dispatch } = useContext(AppStateContext);
   const { handleApproveToken, handleUpdateBountyAmount } = useBepro();
 
   const handleChange = params => setNewAmount(BigNumber(params.value));

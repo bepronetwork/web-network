@@ -17,7 +17,7 @@ import SelectRepositoriesStep from "components/custom-network/select-repositorie
 import TokenConfiguration from "components/custom-network/token-configuration";
 import Stepper from "components/stepper";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
@@ -57,7 +57,7 @@ function NewNetwork() {
   const { tokensLocked, details, github, tokens, settings, isSettingsValidated, cleanStorage } = useNetworkSettings();
   const { handleDeployNetworkV2, handleAddNetworkToRegistry } = useBepro();
 
-  const { dispatch } = useContext(ApplicationContext);
+  const { dispatch } = useContext(AppStateContext);
 
   const defaultNetworkName = appSettings?.defaultNetworkConfig?.name?.toLowerCase() || "bepro";
     

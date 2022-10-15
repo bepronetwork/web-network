@@ -4,7 +4,7 @@ import { setDefaults } from "react-i18next";
 import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import BigNumber from "bignumber.js";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
@@ -34,7 +34,7 @@ export default function useERC20() {
   const { service: DAOService } = useDAO();
   const { handleApproveToken } = useBepro();
   const { activeNetwork } = useNetwork();
-  const { dispatch } = useContext(ApplicationContext);
+  const { dispatch } = useContext(AppStateContext);
 
   const logData = { 
     wallet: wallet?.address, 

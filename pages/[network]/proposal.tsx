@@ -14,7 +14,7 @@ import ProposalHero from "components/proposal-hero";
 import ProposalListAddresses from "components/proposal-list-addresses";
 import ProposalPullRequestDetail from "components/proposal-pullrequest-details";
 
-import { ApplicationContext } from "contexts/application";
+import { AppStateContext } from "contexts/app-state";
 import { useIssue } from "contexts/issue";
 import { useNetwork } from "contexts/network";
 import { addToast } from "contexts/reducers/change-toaster";
@@ -35,7 +35,7 @@ export default function PageProposal() {
   const router = useRouter();
   const { t } = useTranslation();
 
-  const { dispatch } = useContext(ApplicationContext);
+  const { dispatch } = useContext(AppStateContext);
   
   const [proposal, setProposal] = useState<Proposal>({} as Proposal);
   const [pullRequest, setPullRequest] = useState<pullRequest>({} as pullRequest);
