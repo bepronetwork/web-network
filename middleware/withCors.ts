@@ -24,12 +24,12 @@ function runMiddleware(req, res, fn) {
 }
 
 function runLogger(req, e = null) {
-  const {page = {}, url, body, method} = req as any;
+  const {url, method} = req as any;
   const search = Object(new URLSearchParams(url.split('?')[1]));
   const pathname = url.split('/api')[1].replace(/\?.+/g, '');
 
   if (!ignorePaths.some(k => pathname.includes(k)))
-    info('Access', {method, ...page, pathname, search, body});
+    info('Access', {method, pathname, search,});
 
   if (e)
     error(e?.message, e);
