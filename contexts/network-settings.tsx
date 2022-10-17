@@ -167,9 +167,17 @@ export const NetworkSettingsProvider = ({ children }) => {
                                     tokensValidated,
     ].every(condtion=> condtion)
 
-    if(detailsValidate)
+    if(detailsValidate && isCreating){
+      const data = Object.keys(newState)
+                          .filter(key => newState[key].validated)
+                          .reduce((obj, key) => {
+                            obj[key] = newState[key]
+                            return obj
+                          }, {});
+                          
       localStorage.setItem(`${localStorageKey}:${wallet.address}`, 
-                           JSON.stringify({data: newState, at: +new Date()}));
+                           JSON.stringify({data, at: +new Date()}));
+    }
 
     return newState;
   }
@@ -260,7 +268,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     }
   };
 
-  async function getService() {
+  async function loadDaoService(): Promise<DAO> {
     if (!forcedNetwork) return DAOService;
 
     const networkAddress = network?.networkAddress;
@@ -273,36 +281,72 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     return dao;
   }
-
-  function handlerDefaultSettings(){
-    setFields('settings.theme.colors', DefaultTheme())
-    
-    setFields('settings.parameters', {
-    draftTime: {
-      value: DEFAULT_DRAFT_TIME,
-      validated: undefined
-    },
-    disputableTime: {
-      value: DEFAULT_DISPUTE_TIME,
-      validated: undefined
-    },
-    percentageNeededForDispute: {
-      value: DEFAULT_PERCENTAGE_FOR_DISPUTE,
-      validated: undefined
-    },
-    councilAmount: {
-      value: DEFAULT_COUNCIL_AMOUNT,
-      validated: undefined
-    },
-    validated: undefined
-    })
-
-    setFields('settings.treasury.cancelFee', {value:DEFAULT_CANCEL_FEE, validated: true})
-    setFields('settings.treasury.closeFee', {value: DEFAULT_CLOSE_FEE, validated: true})
-  }
   
   const cleanStorage = () => localStorage.removeItem(`${localStorageKey}:${wallet.address}`)
 
+  async function loadDefaultSettings(){
+    const defaultState = DefaultNetworkSettings;
+
+    const [tokensLockedInRegistry, registryCreatorAmount] = await Promise.all([
+        DAOService.getTokensLockedInRegistryByAddress(wallet.address),
+        DAOService.getRegistryCreatorAmount()
+    ])
+    
+    defaultState.tokensLocked = {
+      amount: '0',
+      locked: BigNumber(tokensLockedInRegistry).toString(),
+      needed: BigNumber(registryCreatorAmount).toString(),
+      validated: BigNumber(tokensLockedInRegistry).isEqualTo(registryCreatorAmount),
+    }
+
+    defaultState.settings.theme.colors = DefaultTheme();
+    
+    defaultState.settings.parameters = {
+        draftTime: {
+          value: DEFAULT_DRAFT_TIME,
+          validated: undefined
+        },
+        disputableTime: {
+          value: DEFAULT_DISPUTE_TIME,
+          validated: undefined
+        },
+        percentageNeededForDispute: {
+          value: DEFAULT_PERCENTAGE_FOR_DISPUTE,
+          validated: undefined
+        },
+        councilAmount: {
+          value: DEFAULT_COUNCIL_AMOUNT,
+          validated: undefined
+        },
+        validated: undefined
+    }
+
+    defaultState.settings.treasury.cancelFee = { value:DEFAULT_CANCEL_FEE, validated: true };
+    defaultState.settings.treasury.closeFee = { value: DEFAULT_CLOSE_FEE, validated: true };
+
+    const storageData = localStorage.getItem(`${localStorageKey}:${wallet?.address}`);
+
+    if(storageData){
+      const {at, data} = JSON.parse(storageData);
+      if(+new Date() - +new Date(at) <= TTL){
+        if(data?.details){
+          defaultState.details.name =  data?.details.name;
+          defaultState.details.description =  data?.details.description;
+        }
+
+        if(data?.settings)
+          defaultState.settings = data?.settings;
+        
+        if(data?.github)
+          defaultState.github = data?.github;
+
+        if(data?.tokens)
+          defaultState.tokens = data?.tokens;
+      }
+    }
+
+    setNetworkSettings(defaultState)
+  }
   // TODO: Better this effect
   useEffect(() => {
     if ( !wallet?.address || 
@@ -312,7 +356,7 @@ export const NetworkSettingsProvider = ({ children }) => {
       return;
 
     if (!isCreating) {
-      getService()
+      loadDaoService()
       .then(service => {
         service.getTreasury()
         .then(({ treasury, closeFee, cancelFee }) => {
@@ -328,57 +372,22 @@ export const NetworkSettingsProvider = ({ children }) => {
       Fields.logo.setter(`${IPFS_URL}/${network?.fullLogo}`, 'full')
       Fields.logo.setter(`${IPFS_URL}/${network?.logoIcon}`, 'icon')
 
-    } else {
-      Promise.all([
-        DAOService.getTokensLockedInRegistryByAddress(wallet.address),
-        DAOService.getRegistryCreatorAmount()
-      ])
-        .then(([
-          tokensLockedInRegistry,
-          registryCreatorAmount
-        ]) => {
-          setFields('tokensLocked', {
-            amount: 0,
-            locked: tokensLockedInRegistry,
-            needed: registryCreatorAmount,
-            validated: tokensLockedInRegistry === registryCreatorAmount
-          })
-        });
-      const storageData = localStorage.getItem(`${localStorageKey}:${wallet?.address}`);
-      if(storageData){
-        const {at, data} = JSON.parse(storageData);
-        if(+new Date() - +new Date(at) <= TTL){
-          if(data?.details){
-            setFields('details.name', data?.details.name)
-            setFields('details.description', data?.details.description)
-          }
+    } else
+      loadDefaultSettings();
 
-          if(data?.settings)
-            setFields('settings', data?.settings)
-          else
-            handlerDefaultSettings();
-
-          if(data?.github)
-            setFields('github', data?.github)
-
-          if(data?.tokens)
-            setFields('tokens', data?.tokens)
-        }
-      } else
-        handlerDefaultSettings();
-    }
-
-  }, [ wallet, 
-       user?.login, 
-       DAOService, 
-       network, 
-       isCreating, 
-       needsToLoad,
-       router.pathname]);
+  }, [ 
+    wallet, 
+    user?.login, 
+    DAOService, 
+    network, 
+    isCreating, 
+    needsToLoad,
+    router.pathname
+  ]);
 
   //Load GH Repositories
   useEffect(()=>{
-    if (user?.login && !networkSettings?.github?.repositories?.length)
+    if (user?.login && !networkSettings?.github?.repositories?.length && ALLOWED_PATHS)
       getUserRepositories(user.login)
       .then(async (githubRepositories) => {
         const repositories = [];
@@ -412,7 +421,7 @@ export const NetworkSettingsProvider = ({ children }) => {
         }
         setFields('github.repositories', repositories)
       });
-  },[user?.login, isCreating]);
+  },[user?.login, isCreating, ALLOWED_PATHS]);
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({
     ...networkSettings,

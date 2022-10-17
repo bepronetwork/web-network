@@ -150,12 +150,9 @@ export default function NewNetwork() {
       });
 
     setCreatingNetwork(6);
-
+    cleanStorage?.()
     await processEvent("registry", "registered", payload.name.toLowerCase(), { fromBlock: registrationTx.blockNumber })
-      .then(() => {
-        cleanStorage?.()
-        router.push(getURLWithNetwork("/", { network: payload.name }));
-      })
+      .then(() => router.push(getURLWithNetwork("/", { network: payload.name })))
       .catch((error) => {
         checkHasNetwork();
         dispatch(addToast({
