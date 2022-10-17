@@ -239,7 +239,7 @@ export default function CreateBountyModal() {
                   setIssueAmount(ZeroNumberFormatValues);
                 }}
               >
-                <span>{t("bounty:steps.funding")}</span>
+                <span>{t("bounty:steps.funding-request")}</span>
               </Button>
             </div>
             {renderBountyToken(false, "bounty")}

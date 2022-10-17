@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 
-import { addSeconds } from "date-fns";
+import { add, addSeconds, compareAsc, intervalToDuration } from "date-fns";
 import { useTranslation } from "next-i18next";
 
 import { useIssue } from "contexts/issue";
@@ -14,21 +14,23 @@ export default function IssueProposalProgressBar() {
   const [stepColor, setStepColor] = useState<string>("");
   const [currentStep, setCurrentStep] = useState<number>();
   const [draftTime, setDraftTime] = useState(0);
-  
-  const { activeNetwork } = useNetwork();
-  const { activeIssue, networkIssue } = useIssue();
-  
-  const steps = [
+  const [steps, setSteps] = useState<string[]>([
     t("bounty:steps.draft"),
+    t("bounty:steps.funding"),
     t("bounty:steps.development"),
     t("bounty:steps.validation"),
     t("bounty:steps.closed")
-  ];
+  ])  
+  const { activeNetwork } = useNetwork();
+  const { activeIssue, networkIssue } = useIssue();
 
   const isFinalized = !!networkIssue?.closed;
   const isInValidation = !!networkIssue?.isInValidation;
   const isIssueinDraft = !!networkIssue?.isDraft;
-  const creationDate = networkIssue?.creationDate ;
+  const isFundingRequest = networkIssue?.fundingAmount?.gt(0) || activeIssue?.fundingAmount?.gt(0);
+  const isBountyFunded = activeIssue?.fundedAmount?.isEqualTo(activeIssue?.fundingAmount);
+  const creationDate = networkIssue?.creationDate;
+  const fundedDate = activeIssue?.fundedAt;
   const closedDate = networkIssue?.closedDate;
   const isCanceled = activeIssue?.state === "canceled" || !!networkIssue?.canceled;
   const lastProposalCreationDate = 
@@ -39,6 +41,10 @@ export default function IssueProposalProgressBar() {
 
   function toRepresentationHeight() {
     return currentStep === 0 ? "1px" : `${currentStep * 66.7}px`;
+  }
+
+  function heightIssueProgressHorizontal() {
+    return isFundingRequest ? "270px" : "200px"
   }
 
   function renderSecondaryText(stepLabel, index) {
@@ -71,16 +77,40 @@ export default function IssueProposalProgressBar() {
       text: ""
     };
 
-    if (creationDate && index === currentStep && currentStep === 1) 
+    if (creationDate && index === currentStep && currentStep === 1 && !isFundingRequest) 
       currentValue = item(addSeconds(creationDate, draftTime)).Started;
 
     if (creationDate && index === currentStep && currentStep === 0 && !isCanceled && !isFinalized) 
       currentValue = item(creationDate, draftTime).Warning;
     
-    if (lastProposalCreationDate && index === currentStep && currentStep === 2 && !isCanceled && !isFinalized) 
-      currentValue = item(lastProposalCreationDate).Started;
+    if (
+        index === currentStep &&
+        currentStep === 2 &&
+        !isCanceled &&
+        !isFinalized
+      ) {
+      if (isFundingRequest && creationDate && fundedDate) {
+        const intervalFunded = intervalToDuration({
+            start: creationDate,
+            end: new Date(fundedDate),
+        });
+        const startedFundedDate = add(creationDate, intervalFunded)
+        const startedDraftDate = addSeconds(creationDate, draftTime)
 
-    if (closedDate && index === currentStep && currentStep === 3) currentValue = item(closedDate).At;
+        if(compareAsc(startedDraftDate, startedFundedDate) === 1){
+          currentValue = item(startedDraftDate).Started
+        }else {
+          currentValue = item(startedFundedDate).Started;
+        }
+      } else if(lastProposalCreationDate) {
+        currentValue = item(lastProposalCreationDate).Started;
+      }
+    }
+
+    if (closedDate && index === currentStep && currentStep === 3) 
+      currentValue = isFundingRequest ? item(lastProposalCreationDate).Started : item(closedDate).At;
+    
+    if (closedDate && index === currentStep && currentStep === 4) item(closedDate).At;
 
     if (currentValue)
       return (
@@ -143,24 +173,40 @@ export default function IssueProposalProgressBar() {
   }, [activeNetwork?.draftTime, activeNetwork?.disputableTime]);
 
   useEffect(() => {
+    const isFundingStep = !!steps.find(name => name === t("bounty:steps.funding"))
+
+    if (isFundingRequest && !isFundingStep) setSteps(currentState => {
+      currentState.splice(1,0,t("bounty:steps.funding"))
+      return currentState
+    })
+    
+    if (!isFundingRequest && isFundingStep) setSteps((currentState) => {
+      return currentState.filter(state => state !== t("bounty:steps.funding"))
+    })
+
+  }, [isFundingRequest]);
+
+  useEffect(() => {
     //Draft -> isIssueInDraft()
     //Development -> estado inicial
     //Finalized -> recognizedAsFinished == true
     //Dispute Window -> mergeProposalAmount > 0
     //Closed and Distributed -> finalized == true
-    let step = 0;
+    const addIsFunding = isFundingRequest ? 1 : 0
+    
+    let step = 1 + addIsFunding;
     let stepColor = "primary"
 
-    if (isFinalized) step = 3;
-    else if (isInValidation) step = 2;
-    else if (!isIssueinDraft) step = 1;
+    if (isFinalized) step = 3 + addIsFunding;
+    else if (isInValidation) step = 2 + addIsFunding;
+    else if (!isIssueinDraft) step = 1 + addIsFunding;
 
     if (isCanceled) stepColor = "danger";
     if (isFinalized) stepColor = "success";
 
     setStepColor(stepColor);
     setCurrentStep(step);
-  }, [isFinalized, isIssueinDraft, isCanceled, isInValidation]);
+  }, [isFinalized, isIssueinDraft, isCanceled, isInValidation, isFundingRequest, isBountyFunded]);
 
   return (
     <div className="container">
@@ -172,7 +218,9 @@ export default function IssueProposalProgressBar() {
             </div>
             <div className="row">
               <div className="position-relative">
-                <div className="progress bg-ligth-gray issue-progress-horizontal">
+                <div className="progress bg-ligth-gray issue-progress-horizontal" style={{
+                  height: `${heightIssueProgressHorizontal()}`
+                }}>
                   <div
                     className={`progress-bar w-100 bg-${stepColor}`}
                     role="progressbar"
