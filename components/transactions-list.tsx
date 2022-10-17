@@ -30,15 +30,12 @@ import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { Transaction } from "interfaces/transaction";
 import {updateTx} from "../contexts/reducers/change-tx-list";
 
-export default function TransactionsList({
-  onActiveTransactionChange
-}: {
+interface TransactionListProps {
   onActiveTransactionChange: (transaction: Transaction) => void
-}) {
-  const {
-    dispatch,
-    state: { transactions }
-  } = useContext(AppStateContext);
+}
+
+export default function TransactionsList({onActiveTransactionChange}: TransactionListProps) {
+  const {dispatch, state: { transactions }} = useContext(AppStateContext);
   const { t } = useTranslation("common");
   const { wallet } = useAuthentication();
 
