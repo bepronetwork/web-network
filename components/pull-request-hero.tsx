@@ -39,8 +39,8 @@ export default function PullRequestHero({
               <div
                 className="me-2 cursor-pointer"
                 onClick={() => router.push(getURLWithNetwork("/bounty", {
-                  id: activeIssue.githubId,
-                  repoId: activeIssue.repository_id,
+                  id: activeIssue?.githubId,
+                  repoId: activeIssue?.repository_id,
                 }))}
               >
                 <ArrowLeft
