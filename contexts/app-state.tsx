@@ -5,6 +5,7 @@ import {AppState} from "../interfaces/application-state";
 import sanitizeHtml from "sanitize-html";
 import {useRouter} from "next/router";
 import {toastError} from "./reducers/change-toaster";
+import {useSettings} from "../x-hooks/use-settings";
 
 
 const appState: AppState = {
@@ -25,17 +26,20 @@ export const AppStateContext = createContext(appState);
 
 export default function AppStateContextProvider({children}) {
   const [state, dispatch] = useReducer(mainReducer, appState.state);
+
   const {query: {authError}} = useRouter();
 
-  loadApplicationStateReducers();
+  loadApplicationStateReducers(); // load reducers into app-state
+  useSettings(); // loads settings from database and dispatches its state
 
-  useEffect(() => {
+  function parseError() {
     if (!authError)
       return;
 
     dispatch(toastError(sanitizeHtml(authError, { allowedTags: [], allowedAttributes: {} })));
+  }
 
-  }, [authError])
+  useEffect(parseError, [authError])
 
   return <AppStateContext.Provider value={{state, dispatch: dispatch as any}}>
     {children}

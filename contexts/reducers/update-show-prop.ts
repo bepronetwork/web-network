@@ -5,8 +5,9 @@ import {AppStateReduceId} from "../../interfaces/enums/app-state-reduce-id";
 interface ShowProps {
   web3Dialog?: boolean;
   createBounty?: boolean;
+  failedLoadSettings?: boolean;
 
-  [k: string]: boolean
+  // [k: string]: boolean
 }
 
 export const changeShowProp = new SimpleAction<ShowProps>(AppStateReduceId.Show, 'show');
