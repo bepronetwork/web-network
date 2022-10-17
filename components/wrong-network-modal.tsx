@@ -13,7 +13,6 @@ import { NETWORKS } from "helpers/networks";
 import { NetworkColors } from "interfaces/enums/network-colors";
 
 import Button from "./button";
-import {AppStateContext} from "../contexts/app-state";
 
 type typeError = { code?: number; message?: string }
 
