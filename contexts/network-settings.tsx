@@ -294,9 +294,9 @@ export const NetworkSettingsProvider = ({ children }) => {
     
     defaultState.tokensLocked = {
       amount: '0',
-      locked: BigNumber(tokensLockedInRegistry).toString(),
-      needed: BigNumber(registryCreatorAmount).toString(),
-      validated: BigNumber(tokensLockedInRegistry).isEqualTo(registryCreatorAmount),
+      locked: BigNumber(tokensLockedInRegistry).toFixed(),
+      needed: BigNumber(registryCreatorAmount).toFixed(),
+      validated: BigNumber(tokensLockedInRegistry).isGreaterThanOrEqualTo(registryCreatorAmount),
     }
 
     defaultState.settings.theme.colors = DefaultTheme();
