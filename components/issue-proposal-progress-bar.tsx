@@ -192,18 +192,14 @@ export default function IssueProposalProgressBar() {
     //Finalized -> recognizedAsFinished == true
     //Dispute Window -> mergeProposalAmount > 0
     //Closed and Distributed -> finalized == true
-    let step = isFundingRequest ? 1 : 0;
+    const addIsFunding = isFundingRequest ? 1 : 0
+    
+    let step = 1 + addIsFunding;
     let stepColor = "primary"
 
-    if(isFundingRequest){
-      if (isFinalized) step = 4;
-      else if (isInValidation) step = 3;
-      else if (!isIssueinDraft && isBountyFunded) step = 2;
-    }else {
-      if (isFinalized) step = 3;
-      else if (isInValidation) step = 2;
-      else if (!isIssueinDraft) step = 1;
-    }
+    if (isFinalized) step = 3 + addIsFunding;
+    else if (isInValidation) step = 2 + addIsFunding;
+    else if (!isIssueinDraft) step = 1 + addIsFunding;
 
     if (isCanceled) stepColor = "danger";
     if (isFinalized) stepColor = "success";
