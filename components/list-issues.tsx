@@ -30,6 +30,8 @@ import useApi from "x-hooks/use-api";
 import usePage from "x-hooks/use-page";
 import useSearch from "x-hooks/use-search";
 
+import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
+
 
 type Filter = {
   label: string;
@@ -328,9 +330,11 @@ export default function ListIssues({
         <div className="pt-4">
           <NothingFound description={emptyMessage || filterByState.emptyState}>
             {wallet?.address && (
+              <ReadOnlyButtonWrapper>
                 <Button onClick={handleNotFoundClick}>
                   {buttonMessage || String(t("actions.create-one"))}
                 </Button>
+                </ReadOnlyButtonWrapper>
               )}
           </NothingFound>
         </div>
