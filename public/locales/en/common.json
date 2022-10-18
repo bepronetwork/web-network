@@ -98,7 +98,7 @@
     "waiting": "waiting",
     "operational": "operational",
     "network-congestion": "network congestion",
-    "tagline": "Bepro Network Services and BEPRO Token are not available in Excluded Jurisdictions. By accessing and using the interface you agree with our",
+    "tagline": "By accessing and using the interface you agree with our",
     "terms-and-conditions": "Terms & Conditions",
     "support": "support"
   },
@@ -234,13 +234,6 @@
       "our-web-application": "Our web application currently does not support a mobile version.",
       "if-you-want": "If you want to use it you must connect to our web application via desktop.",
       "stay-updated": "Stay updated on"
-    },
-    "nation-dialog": {
-      "your-country": "Your country",
-      "at-the-moment": "At the moment BEPRO services and BEPRO Token (BEPRO) are not available in {{country}}",
-      "excluded": "Excluded Jurisdictions.",
-      "further": "For further information please contact us on",
-      "email": "general@bepro.network"
     },
     "web3-dialog": {
       "title": "MetaMask not detected.",
