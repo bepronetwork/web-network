@@ -8,6 +8,7 @@ import {toastError} from "./reducers/change-toaster";
 import {useSettings} from "../x-hooks/use-settings";
 import {useDao} from "../x-hooks/use-dao";
 import {useNetwork} from "../x-hooks/use-network";
+import {useAuthentication} from "../x-hooks/use-authentication";
 
 
 const appState: AppState = {
@@ -35,6 +36,7 @@ export default function AppStateContextProvider({children}) {
   useSettings(); // loads settings from database and dispatches its state
   useDao(); // start DAO state
   useNetwork(); // start network state
+  useAuthentication(); // github-connection, wallet & balance
 
   function parseError() {
     if (!authError)

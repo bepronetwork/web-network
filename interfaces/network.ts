@@ -34,6 +34,8 @@ export interface Network {
   treasury?: TreasuryInfo;
   isRegistered?: boolean;
   totalSettlerConverted?: string;
+  isCouncil?: boolean;
+  isGovernor?: boolean;
 }
 
 export interface ThemeColors {

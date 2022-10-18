@@ -8,6 +8,7 @@ import {Network} from "./network";
 import {ForkInfo, ForksList, ReposList} from "./repos-list";
 import {BranchesList, BranchInfo} from "./branches-list";
 import {XReducerAction} from "../contexts/reducers/reducer";
+import {Balance} from "./balance-state";
 
 export interface ServiceNetworkRepostActive {
   forks: ForkInfo[];
@@ -40,7 +41,12 @@ export interface ConnectedChain {
   name: string
 }
 
-export interface CurrentUserState { handle: string; walletAddress: string; }
+export interface CurrentUserState {
+  handle: string;
+  walletAddress: string;
+  match?: boolean | undefined;
+  balance?: Balance | null;
+}
 
 export interface State {
   Settings: SettingsType | null;
