@@ -182,7 +182,8 @@
     "organization": "Organization",
     "total": "Total",
     "clear": "Clear",
-    "wallet": "Wallet"
+    "wallet": "Wallet",
+    "unkown": "Unknown"
   },
   "modals": {
     "help-modal": {
