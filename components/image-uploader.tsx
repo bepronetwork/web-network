@@ -45,8 +45,7 @@ export default function ImageUploader({
         } ${className}`}
         htmlFor={name}
       >
-        {console.log('value', value, image)}
-        {image.preview || image ? (
+        {image.preview || typeof image === "string" ? (
           <img
             src={image.preview || image}
             alt="dummy"
