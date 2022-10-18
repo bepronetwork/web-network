@@ -45,9 +45,10 @@ export default function ImageUploader({
         } ${className}`}
         htmlFor={name}
       >
-        {image.preview ? (
+        {console.log('value', value, image)}
+        {image.preview || image ? (
           <img
-            src={image.preview}
+            src={image.preview || image}
             alt="dummy"
             width={dimensions.width}
             height={dimensions.height}
