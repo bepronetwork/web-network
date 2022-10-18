@@ -194,7 +194,7 @@ export default function IssueProposalProgressBar() {
     //Closed and Distributed -> finalized == true
     const addIsFunding = isFundingRequest ? 1 : 0
     
-    let step = 1 + addIsFunding;
+    let step = 0 + addIsFunding;
     let stepColor = "primary"
 
     if (isFinalized) step = 3 + addIsFunding;
