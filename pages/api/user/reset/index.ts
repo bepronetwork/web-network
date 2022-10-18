@@ -1,7 +1,7 @@
 import { error as LogError } from "@scripts/logging.js";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getToken } from "next-auth/jwt";
-import { Op } from "sequelize";
+import { Sequelize, Op } from "sequelize";
 
 import models from "db/models";
 
@@ -11,7 +11,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   try {
     const user = await models.user.findOne({ where: {
       address: address.toLowerCase(),
-      githubLogin: githubLogin.toLowerCase()
+      githubLogin: Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("githubLogin")), "=", githubLogin.toLowerCase())
     } });
 
     if (!user) 

@@ -130,7 +130,7 @@ export default function MainNav() {
 
                 <li>
                   <InternalLink
-                    href={getURLWithNetwork("/council")}
+                    href={getURLWithNetwork("/curators")}
                     label={<Translation label={"main-nav.council"} />}
                     nav
                     uppercase

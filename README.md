@@ -15,11 +15,12 @@
 </p>
 
 ---
-<br>
 
-# How it Works?
-Soon.
-<br>
+<h3 align="center">
+  We are delighted to announce the release of <a href="https://app.bepro.network/">Bepro Network's v2 </a> protocol. Try it.
+</h3>
+
+# Documentation
 
 ## 1. Prerequisites
 
@@ -42,6 +43,12 @@ Create database:
 ```bash
 $ docker-compose up -d
 ```
+
+Run migrations:
+
+```bash
+$ npm run migrate
+```
 <br>
 
 
@@ -58,9 +65,9 @@ $ cp .env.exemple .env
 - `*` [MetaMask Setup](./docs/METAMASK.md)
 - `*` [Authentication Setup](./docs/AUTHENTICATION.md)
 - `*` [Github Gateway](./docs/GITHUB-GATEWAY.md)
+- `*` [Past Events MicroService](https://github.com/taikai/webnetwork-events)
 - `*` [IPFS/Infura Host](./docs/IPFS.md)
 - [Ganache](./docs/GANACHE.md)
-- [IP-Api](./docs/IP-API.md)
 
 <br>
 
@@ -68,22 +75,10 @@ $ cp .env.exemple .env
 
 After having completed the [Environment Configuration](#3-environment-configuration) step, the project is ready to be started.
 
-make sure the database is up and run migrations;
-
-```bash
-$ npm run migrate
-```
-
-start project with;
+start project with:
 
 ```bash
 $ npm run dev
-```
-
-and start a script to listen past events from blockchain:
-
-```bash
-$ npm run schedules
 ```
 <br>
 
@@ -111,27 +106,6 @@ if no errors are shown, you should see this page
 <br>
 
 <br>
-
-### Parity Configuration
-*`if project is using Ganache you can skip this step`*
-
-With the admin wallet loaded in the metamask, browse to the parity page in `yourdomain/defaultnetworkname/parity`, and deploy the required contracts.
-
-<br/>
-
-> <img align="center" src="./docs/assets/parity-page.png" width="500"/>
-<br/>
-
-With the new contract address deployed, update .env again in
-```text
-.env
-
-NEXT_PUBLIC_CONTRACT_ADDRESS=
-NEXT_PUBLIC_SETTLER_ADDRESS=
-NEXT_PUBLIC_TRANSACTION_ADDRESS=
-```
-<br>
-
 
 ### Network Configuration
 

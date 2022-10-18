@@ -216,6 +216,7 @@ export default function ListIssues({
     sortBy,
     order,
     creator,
+    proposer,
     activeNetwork
   ]);
 

@@ -48,6 +48,7 @@ export interface IssueData {
   contractId?: number;
   token?: Token;
   working: string[];
+  fundedAt?: Date;
 }
 
 export interface IssueBigNumberData extends Omit<IssueData , "amount" | "fundingAmount" | "fundedAmount"> {

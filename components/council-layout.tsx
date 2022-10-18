@@ -91,16 +91,16 @@ export default function CouncilLayout({ children }) {
         <div className="row">
           <div className="d-flex justify-content-center">
             <InternalLink
-              href={getURLWithNetwork("/council/ready-to-propose")}
+              href={getURLWithNetwork("/curators/ready-to-propose")}
               label={String(t("ready-to-propose"))}
               className={"mr-3 h3 p-0"}
-              active={(asPath.endsWith("/council") && true) || undefined}
+              active={(asPath.endsWith("/curators") && true) || undefined}
               nav
               transparent
             />
 
             <InternalLink
-              href={getURLWithNetwork("/council/ready-to-merge")}
+              href={getURLWithNetwork("/curators/ready-to-merge")}
               label={String(t("ready-to-merge"))}
               className={"h3 p-0"}
               nav

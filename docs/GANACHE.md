@@ -1,6 +1,6 @@
 ## 1. GANACHE
 
-Ganache is a personal blockchain for rapid Ethereum and Corda distributed application development. Ganache can be used for the entire development cycle; enabling you to develop, deploy, and test your dApps in a safe and deterministic environment.
+Ganache is a personal blockchain for rapid Ethereum and Corda distributed application development. Ganache can be used for the entire development cycle. enabling you to develop, deploy, and test your dApps in a safe and deterministic environment.
 
 read more about in [doc](https://trufflesuite.com/docs/ganache/).
 
@@ -54,26 +54,14 @@ DEPLOY_OWNER_ADDRESS=
 DEPLOY_PRIVATE_KEY=
 ```
 
-2. to make deploy, run
+2. Make sure your database are up, and run:
 
 ```bash
-$  node ./scripts/deploy-v2 -n custom -u 'http://127.0.0.1:7545'
+$ npm run deploy:local
 ```
 
-The console should output the deployed contracts.
-
-```bash
-Deploying Bepro Network on custom - http://localhost:7545
-Deployed Bepro on 0xB07F50EBc910F3AB52742629f17f9E0DdBe0Fe14
-Deployed Network Factory on 0x8e4dE4A261eA6963Da54b09Eb24422480f44bD3A
-Deployed Bounty Token on 0x1B762a3902c4BC5eB3E2795408F7db8f50d44519
-Deployed Network on 0xF0c0ffF429349413f4Ad43B7FC912228f2b109Cd
-Setting Redeeem time on 0xF0c0ffF429349413f4Ad43B7FC912228f2b109Cd
-Setting Disputable time on 0xF0c0ffF429349413f4Ad43B7FC912228f2b109Cd
-Set Bounty Token Dispatcher 0xF0c0ffF429349413f4Ad43B7FC912228f2b109Cd
-```
-
-3. Update the .env with the contract addresses
+### 3.1 USE A DEPLOYED CONTRACT
+If you want to use a deployed contract, you must update the env file with current address **before** run migrations.
 
 ```text
 # .env
