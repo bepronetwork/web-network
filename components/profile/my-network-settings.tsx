@@ -57,6 +57,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   const [isGovernorRegistry, setIsGovernorRegistry] = useState(false);
   const [isAbleToBeClosed, setIsAbleToBeClosed] = useState(false);
   const [updatingNetwork, setUpdatingNetwork] = useState(false);
+  const [errorBigImages, setErrorBigImages] = useState(false)
 
   const { service: DAOService } = useDAO();
   const { colorsToCSS } = useNetworkTheme();
@@ -101,7 +102,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   const handleFullChange = value => fields.logo.setter(value, "full");
 
   async function handleSubmit() {
-    if (!user?.login || !wallet?.address || !DAOService || !forcedNetwork) return;
+    if (!user?.login || !wallet?.address || !DAOService || !forcedNetwork || errorBigImages) return;
 
     setUpdatingNetwork(true);
 
@@ -308,6 +309,19 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   }, [network?.networkAddress]);
 
   useEffect(() => {
+    const logoSize = details?.fullLogo?.value?.raw?.size
+    const iconSize = details?.iconLogo?.value?.raw?.size
+
+    const megaByte = 1000000
+    if(logoSize >= megaByte || iconSize >= megaByte || logoSize + iconSize >= megaByte){
+      setErrorBigImages(true)
+    }else {
+      setErrorBigImages(false)
+    }
+
+  }, [details?.fullLogo, details?.iconLogo])
+
+  useEffect(() => {
     if(!DAOService || !wallet?.address) return;
 
     DAOService.isRegistryGovernor(wallet?.address).then(setIsGovernorRegistry)
@@ -423,7 +437,15 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
           </Button>
         </Col>
       </Row>
-
+      <Row className="mb-2 justify-content-center">
+        <Col xs="auto">
+        {errorBigImages && (
+            <small className="text-danger small-info mt-1">
+              {t("custom-network:errors.images-too-big")}
+            </small>
+          )}        
+        </Col>
+      </Row>
       <Row>
         {networkAmounts.map(amount => 
           <Col xs={3} key={amount.title}>
