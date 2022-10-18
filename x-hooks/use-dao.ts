@@ -1,12 +1,18 @@
-import {useCallback, useContext, useEffect, useMemo} from "react";
+import {useContext, useEffect,} from "react";
 import {AppStateContext} from "../contexts/app-state";
 import {changeActiveDAO, changeStarting} from "../contexts/reducers/change-service";
 import DAO from "../services/dao-service";
-import {toastError, toastSuccess} from "../contexts/reducers/change-toaster";
+import {toastError,} from "../contexts/reducers/change-toaster";
 
+/**
+ * Populate `state.Settings` and instantiates a DAOService
+ */
 export function useDao() {
   const {state, dispatch} = useContext(AppStateContext);
 
+  /**
+   * Enables the user/dapp to connect to the active DAOService
+   */
   function connect() {
     if (!state.Service?.active)
       return;
@@ -23,6 +29,10 @@ export function useDao() {
       });
   }
 
+  /**
+   * Change network to a known address if not the same
+   * @param networkAddress
+   */
   function changeNetwork(networkAddress: string) {
       if (!state.Service || !state.Service?.active || !networkAddress)
         return;
@@ -53,6 +63,10 @@ export function useDao() {
         });
     }
 
+  /**
+   * Starts DAOService
+   * dispatches changeNetwork() to active network
+   */
   function start() {
     if (!state.Settings || state.Service)
       return;

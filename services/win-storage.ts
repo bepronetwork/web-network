@@ -1,6 +1,6 @@
 export class WinStorage<T = any> {
   constructor(readonly key: string,
-              readonly expire: number = 3600,
+              readonly expire: number = 3600, // 3600ms = 3.6secs
               readonly type: "localStorage" | "sessionStorage" = "localStorage",) {}
 
   setItem(value: T) {
