@@ -22,6 +22,7 @@ import { Network } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 
+
 function MyNetwork() {
   const { t } = useTranslation(["common", "custom-network"]);
 
@@ -87,11 +88,8 @@ function MyNetwork() {
     </ProfileLayout>
   );
 }
-export default () => (
-  <NetworkSettingsProvider>
-    <MyNetwork/>
-  </NetworkSettingsProvider>
-  )
+
+export default () => <NetworkSettingsProvider><MyNetwork></MyNetwork></NetworkSettingsProvider>
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 

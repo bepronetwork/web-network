@@ -24,7 +24,7 @@ import { useDAO } from "contexts/dao";
 import { useSettings } from "contexts/settings";
 
 import useApi from "x-hooks/use-api";
-import useNetwork from "x-hooks/use-network";
+import useNetwork from "x-hooks/use-network-theme";
 import {changeShowCreateBounty, changeShowWeb3} from "../contexts/reducers/update-show-prop";
 
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";

@@ -64,7 +64,16 @@ export default class DAO {
 
       await network.loadContract();
 
-      if (!skipAssignment) this._network = network;
+      if (!skipAssignment)
+        this._network = network;
+
+      console.table({
+        networkAddress,
+        networkTokenAddress: network.networkToken?.contractAddress,
+        registryAddress: network.registry?.contractAddress,
+        nftAddress: network.nftToken?.contractAddress,
+      });
+
 
       return network;
     } catch (error) {

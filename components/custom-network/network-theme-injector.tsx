@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 
 import { useSettings } from "contexts/settings";
 
-import useNetworkTheme from "x-hooks/use-network";
+import useNetworkTheme from "x-hooks/use-network-theme";
 
 export default function NetworkThemeInjector() {
   const { pathname } = useRouter();

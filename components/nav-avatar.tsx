@@ -15,7 +15,7 @@ import { useAuthentication } from "contexts/authentication";
 
 import { truncateAddress } from "helpers/truncate-address";
 
-import useNetworkTheme from "x-hooks/use-network";
+import useNetworkTheme from "x-hooks/use-network-theme";
 
 
 export default function NavAvatar() {

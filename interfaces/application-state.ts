@@ -40,13 +40,15 @@ export interface ConnectedChain {
   name: string
 }
 
+export interface CurrentUserState { handle: string; walletAddress: string; }
+
 export interface State {
   Settings: SettingsType | null;
   Service: ServiceState | null,
   loading: LoadingState | null;
   toaster: ToastNotification[];
   transactions: (SimpleBlockTransactionPayload | BlockTransaction | UpdateBlockTransaction)[];
-  currentUser: { handle: string; walletAddress: string; } | null,
+  currentUser: CurrentUserState | null,
   connectedChain: ConnectedChain | null,
   show: {
     [key: string]: boolean;

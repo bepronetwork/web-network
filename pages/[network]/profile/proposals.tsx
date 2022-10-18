@@ -7,7 +7,7 @@ import ProfileLayout from "components/profile/profile-layout";
 
 import { useAuthentication } from "contexts/authentication";
 
-import useNetworkTheme from "x-hooks/use-network";
+import useNetworkTheme from "x-hooks/use-network-theme";
 
 export default function Proposals() {
   const { t } = useTranslation(["proposal", "bounty"]);

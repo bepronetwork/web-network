@@ -8,7 +8,7 @@ import CloseIcon from "assets/icons/close-icon";
 
 import { formatNumberToNScale } from "helpers/formatNumber";
 
-import useNetwork from "x-hooks/use-network";
+import useNetwork from "x-hooks/use-network-theme";
 
 import Button from "./button";
 

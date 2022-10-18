@@ -10,7 +10,7 @@ import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 
 import useApi from "x-hooks/use-api";
-import useNetwork from "x-hooks/use-network";
+import useNetwork from "x-hooks/use-network-theme";
 
 import CardBecomeCouncil from "./card-become-council";
 

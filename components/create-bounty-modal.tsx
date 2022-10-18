@@ -41,7 +41,7 @@ import { getCoinInfoByContract } from "services/coingecko";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useERC20 from "x-hooks/use-erc20";
-import useNetworkTheme from "x-hooks/use-network";
+import useNetworkTheme from "x-hooks/use-network-theme";
 
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
 import {AppStateContext} from "../contexts/app-state";

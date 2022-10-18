@@ -37,7 +37,7 @@ import { Token } from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-import useNetworkTheme from "x-hooks/use-network";
+import useNetworkTheme from "x-hooks/use-network-theme";
 
 import RegistryGovernorSettings from "./registry-governor-settings";
 
