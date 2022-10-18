@@ -99,22 +99,19 @@ export default function IssueListItem({
           </div>
         )}
 
-        {isFundingRequest && (
+        {isFundingRequest && percentage < 100 && (
           <>
             <div className={`p-0 col-md-6 col-10 mt-1 ${isMobile && "pt-1"}`}>
               <div className="bg-dark-gray w-100 issue-funding-progress">
                 <div
-                  className={`${
-                    percentage !== 100 ? "bg-primary" : "bg-success"
-                  } issue-funding-progress`}
+                  className={`bg-primary issue-funding-progress`}
                   style={{ width: `${percentage}%` }}
                 />
               </div>
             </div>
             <div
-              className={`issue-percentage-text caption-small py-0 pe-0 ps-1 pb-1 col-2 col-md-2 ${
-                percentage !== 100 ? "text-white" : "text-success"
-              } ${isMobile && "pt-1"}`}
+              className={`issue-percentage-text caption-small py-0 pe-0 ps-1 pb-1 col-2 col-md-2 text-white
+              ${isMobile && "pt-1"}`}
             >
               {percentage.toFixed(0)}%
             </div>
