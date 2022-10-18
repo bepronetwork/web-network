@@ -10,7 +10,7 @@ import { useIssue } from "contexts/issue";
 
 import { pullRequest } from "interfaces/issue-data";
 
-import useNetworkTheme from "x-hooks/use-network";
+import useNetworkTheme from "x-hooks/use-network-theme";
 
 import CustomContainer from "./custom-container";
 import DateLabel from "./date-label";

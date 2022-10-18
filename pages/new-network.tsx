@@ -21,8 +21,7 @@ import { AppStateContext } from "contexts/app-state";
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
-import { useNetworkSettings } from "contexts/network-settings";
-import { NetworkSettingsProvider } from "contexts/network-settings";
+import {NetworkSettingsProvider, useNetworkSettings} from "contexts/network-settings";
 import { addToast } from "contexts/reducers/change-toaster";
 import { changeLoadState } from "contexts/reducers/change-load";
 import { useSettings } from "contexts/settings";
@@ -37,7 +36,7 @@ import { psReadAsText } from "helpers/file-reader";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-import useNetworkTheme from "x-hooks/use-network";
+import useNetworkTheme from "x-hooks/use-network-theme";
 
 function NewNetwork() {
   const router = useRouter();
@@ -151,7 +150,7 @@ function NewNetwork() {
       });
 
     setCreatingNetwork(6);
-    cleanStorage?.()
+    cleanStorage?.();
     await processEvent("registry", "registered", payload.name.toLowerCase(), { fromBlock: registrationTx.blockNumber })
       .then(() => router.push(getURLWithNetwork("/", { network: payload.name })))
       .catch((error) => {
@@ -228,11 +227,7 @@ function NewNetwork() {
   );
 }
 
-export default () => (
-  <NetworkSettingsProvider>
-  <NewNetwork/>
-  </NetworkSettingsProvider>
-  )
+export default () => <NetworkSettingsProvider><NewNetwork></NewNetwork></NetworkSettingsProvider>
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

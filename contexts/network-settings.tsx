@@ -26,7 +26,7 @@ import DAO from "services/dao-service";
 import { WinStorage } from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
-import useNetworkTheme from "x-hooks/use-network";
+import useNetworkTheme from "x-hooks/use-network-theme";
 import useOctokit from "x-hooks/use-octokit";
 
 import { useSettings } from "./settings";

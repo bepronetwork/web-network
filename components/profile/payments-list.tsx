@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 
 import { Payment } from "interfaces/payments";
 
-import useNetworkTheme from "x-hooks/use-network";
+import useNetworkTheme from "x-hooks/use-network-theme";
 
 import PaymentItem from "./payment-item";
 

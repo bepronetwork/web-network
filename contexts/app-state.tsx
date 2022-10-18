@@ -6,6 +6,8 @@ import sanitizeHtml from "sanitize-html";
 import {useRouter} from "next/router";
 import {toastError} from "./reducers/change-toaster";
 import {useSettings} from "../x-hooks/use-settings";
+import {useDao} from "../x-hooks/use-dao";
+import {useNetwork} from "../x-hooks/use-network";
 
 
 const appState: AppState = {
@@ -31,6 +33,8 @@ export default function AppStateContextProvider({children}) {
 
   loadApplicationStateReducers(); // load reducers into app-state
   useSettings(); // loads settings from database and dispatches its state
+  useDao(); // start DAO state
+  useNetwork(); // start network state
 
   function parseError() {
     if (!authError)

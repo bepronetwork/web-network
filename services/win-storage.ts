@@ -41,6 +41,10 @@ export class WinStorage<T = any> {
     window[this.type]?.removeItem(this.key);
   }
 
+  delete() {
+    window[this.type].removeItem(this.key);
+  }
+
   get value() { return this.getItem(); }
   set value(v) { this.setItem(v); }
 }

@@ -1,7 +1,7 @@
 import WebThreeUnavailable from "assets/web3-unavailable";
 import MobileNotSupported from "components/mobile-not-supported";
 import Button from "./button";
-import useNetwork from "x-hooks/use-network";
+import useNetwork from "x-hooks/use-network-theme";
 import { useContext, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import { isMobile } from "react-device-detect";

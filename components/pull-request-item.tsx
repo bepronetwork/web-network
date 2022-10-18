@@ -20,7 +20,7 @@ import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { pullRequest } from "interfaces/issue-data";
 
-import useNetwork from "x-hooks/use-network";
+import useNetwork from "x-hooks/use-network-theme";
 import useOctokit from "x-hooks/use-octokit";
 
 interface PullRequestItem {

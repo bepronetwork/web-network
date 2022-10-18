@@ -23,7 +23,7 @@ import { truncateAddress } from "helpers/truncate-address";
 
 import { BlockTransaction, Transaction } from "interfaces/transaction";
 
-import useNetworkTheme from "x-hooks/use-network";
+import useNetworkTheme from "x-hooks/use-network-theme";
 
 export default function TransactionModal({
   transaction = null,

@@ -29,7 +29,7 @@ export function useSettings() {
       return;
     }
 
-    dispatch(updateShowProp({failedLoadSettings: true}));
+    dispatch(updateShowProp({failedLoadSettings: false}));
 
     getSettings()
       .then(settings => {

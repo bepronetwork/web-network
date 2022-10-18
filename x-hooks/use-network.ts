@@ -1,168 +1,65 @@
-import { useRouter } from "next/router";
-import { UrlObject } from "url";
+import {useCallback, useContext, useEffect, useState} from "react";
+import {useRouter} from "next/router";
+import {WinStorage} from "services/win-storage";
+import {AppStateContext} from "contexts/app-state";
+import useApi from "./use-api";
+import {changeActiveNetwork, changeNetworkLastVisited} from "contexts/reducers/change-service";
 
-import { useNetwork } from "contexts/network";
-import { useSettings } from "contexts/settings";
+export function useNetwork() {
+  const {state, dispatch} = useContext(AppStateContext);
+  const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
+  const {query, push} = useRouter();
+  const {getNetwork} = useApi();
 
-import { hexadecimalToRGB } from "helpers/colors";
+  function clearNetworkFromStorage() {
+    storage.delete();
 
-import { ThemeColors } from "interfaces/network";
-
-import useApi from "x-hooks/use-api";
-
-export default function useNetworkTheme() {
-  const router = useRouter();
-
-  const { getNetwork } = useApi();
-  const { settings } = useSettings();
-  const { activeNetwork: network } = useNetwork();
-
-  async function networkExists(networkName: string) {
-    try {
-      await getNetwork({name: networkName});
-
-      return true;
-    } catch (error) {
-      return false;
-    }
+    const networkName = state.Service?.network?.active?.name;
+    if (networkName)
+      new WinStorage(`bepro.network:${networkName}`, 0, `sessionStorage`).delete();
   }
 
-  function DefaultTheme(): ThemeColors {
-    return {
-      primary: getComputedStyle(document.documentElement).getPropertyValue("--bs-primary").trim(),
-      secondary: getComputedStyle(document.documentElement).getPropertyValue("--bs-secondary").trim(),
-      oracle: getComputedStyle(document.documentElement).getPropertyValue("--bs-purple").trim(),
-      text: getComputedStyle(document.documentElement).getPropertyValue("--bs-body-color").trim(),
-      background: getComputedStyle(document.documentElement).getPropertyValue("--bs-body-bg").trim(),
-      shadow: getComputedStyle(document.documentElement).getPropertyValue("--bs-shadow").trim(),
-      gray: getComputedStyle(document.documentElement).getPropertyValue("--bs-gray").trim(),
-      success: getComputedStyle(document.documentElement).getPropertyValue("--bs-success").trim(),
-      danger: getComputedStyle(document.documentElement).getPropertyValue("--bs-danger").trim(),
-      warning: getComputedStyle(document.documentElement).getPropertyValue("--bs-warning").trim(),
-      info: getComputedStyle(document.documentElement).getPropertyValue("--bs-info").trim()
-    };
+  function updateActiveNetwork(forceUpdate = false) {
+    const networkName =
+      query?.network?.toString() ||
+      state.Service?.network?.active?.name ||
+      state.Settings?.defaultNetworkConfig?.name;
+
+    if (!networkName || (storage.value && networkName && storage.value === networkName))
+      return;
+
+    console.debug(`Updating active network`, networkName);
+
+    storage.value = networkName;
+    dispatch(changeNetworkLastVisited(networkName));
+    const storageParams = new WinStorage(`bepro.network:${networkName}`, 3600, `sessionStorage`);
+    if (storageParams.value && !forceUpdate)
+      return;
+
+    console.debug(`Update active params`)
+
+    getNetwork({name: networkName})
+      .then(({data}) => {
+        if (!data.isRegistered)
+          throw new Error("Network not registered");
+
+        storageParams.value = data;
+        dispatch(changeActiveNetwork(data));
+
+        console.debug(`Updated active params`, data);
+      })
+      .catch(error => {
+        console.error(`Failed to get network`, error);
+        push({pathname: `/networks`});
+      });
+
   }
 
-  function colorsToCSS(overrideColors = undefined as ThemeColors): string {
-    if (!network || (!network?.colors && !overrideColors)) return "";
-
-    const colors = {
-      text: overrideColors?.text || network.colors?.text,
-      background: overrideColors?.background || network.colors?.background,
-      shadow: overrideColors?.shadow || network.colors?.shadow,
-      gray: overrideColors?.gray || network.colors?.gray,
-      primary: overrideColors?.primary || network.colors?.primary,
-      secondary: overrideColors?.secondary || network.colors?.secondary,
-      oracle: overrideColors?.oracle || network.colors?.oracle,
-      success: overrideColors?.success || network.colors?.success,
-      danger: overrideColors?.danger || network.colors?.danger,
-      warning: overrideColors?.warning || network.colors?.warning,
-      info: overrideColors?.info || network.colors?.info
-    };
-
-    return `:root {
-      --bs-bg-opacity: 1;
-      ${
-        (colors.gray &&
-          `--bs-gray: ${colors.gray}; --bs-gray-rgb: ${hexadecimalToRGB(colors.gray).join(",")};`) ||
-        ""
-      }
-      ${
-        (colors.danger &&
-          `--bs-danger: ${colors.danger}; --bs-danger-rgb: ${hexadecimalToRGB(colors.danger).join(",")};`) ||
-        ""
-      }
-      ${
-        (colors.shadow &&
-          `--bs-shadow: ${colors.shadow}; --bs-shadow-rgb: ${hexadecimalToRGB(colors.shadow).join(",")};`) ||
-        ""
-      }
-      ${
-        (colors.oracle &&
-          `--bs-oracle: ${colors.oracle}; --bs-oracle-rgb: ${hexadecimalToRGB(colors.oracle).join(",")};`) ||
-        ""
-      }
-      ${
-        (colors.text &&
-          `--bs-body-color: ${
-            colors.text
-          }; --bs-body-color-rgb: ${hexadecimalToRGB(colors.text).join(",")};`) ||
-        ""
-      }
-      ${
-        (colors.primary &&
-          `--bs-primary: ${
-            colors.primary
-          }; --bs-primary-rgb: ${hexadecimalToRGB(colors.primary).join(",")};`) ||
-        ""
-      }
-      ${
-        (colors.success &&
-          `--bs-success: ${
-            colors.success
-          }; --bs-success-rgb: ${hexadecimalToRGB(colors.success).join(",")};`) ||
-        ""
-      }
-      ${
-        (colors.warning &&
-          `--bs-warning: ${
-            colors.warning
-          }; --bs-warning-rgb: ${hexadecimalToRGB(colors.warning).join(",")};`) ||
-        ""
-      }
-      ${
-        (colors.secondary &&
-          `--bs-secondary: ${
-            colors.secondary
-          }; --bs-secondary-rgb: ${hexadecimalToRGB(colors.secondary).join(",")};`) ||
-        ""
-      }
-      ${
-        (colors.background &&
-          `--bs-body-bg: ${
-            colors.background
-          }; --bs-body-bg-rgb: ${hexadecimalToRGB(colors.background).join(",")};`) ||
-        ""
-      }
-      ${
-        (colors.info &&
-          `--bs-info: ${
-            colors.info
-          }; --bs-info-rgb: ${hexadecimalToRGB(colors.info).join(",")};`) ||
-        ""
-      }
-    }`;
-  }
-
-  function changeNetwork(newNetwork: string): void {
-    router.push({
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        network: newNetwork
-      }
-    });
-  }
-
-  function getURLWithNetwork(href: string, query = undefined): UrlObject {
-    return {
-      pathname: `/[network]/${href}`.replace("//", "/"),
-      query: {
-        ...query,
-        network: query?.network || 
-                 router?.query?.network || 
-                 settings?.defaultNetworkConfig?.name || 
-                 "bepro"
-      }
-    };
-  }
+  useEffect(updateActiveNetwork, [query?.network, state.Settings, state.Service]);
 
   return {
-    network,
-    colorsToCSS,
-    DefaultTheme,
-    networkExists,
-    getURLWithNetwork,
-    setNetwork: changeNetwork
-  };
+    updateActiveNetwork,
+    clearNetworkFromStorage,
+  }
+
 }

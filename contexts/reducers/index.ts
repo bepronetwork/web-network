@@ -6,6 +6,7 @@ import {changeToaster} from "./change-toaster";
 import {changeShowProp} from "./update-show-prop";
 import {changeNetwork, changeRepos, changeServiceProp} from "./change-service";
 import {changeLoad} from "./change-load";
+import {changeCurrentUser} from "./change-current-user";
 
 export default function loadApplicationStateReducers() {
   [
@@ -17,7 +18,8 @@ export default function loadApplicationStateReducers() {
     changeShowProp,
     changeServiceProp,
     changeNetwork,
-    changeRepos
+    changeRepos,
+    changeCurrentUser
   ].forEach(addReducer);
 
   console.debug(`Loaded State Reducers`);

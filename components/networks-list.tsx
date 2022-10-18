@@ -24,7 +24,7 @@ import { getCoinInfoByContract } from "services/coingecko";
 import DAO from "services/dao-service";
 
 import useApi from "x-hooks/use-api";
-import useNetwork from "x-hooks/use-network";
+import useNetwork from "x-hooks/use-network-theme";
 
 
 export default function NetworksList() {
