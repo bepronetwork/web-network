@@ -6,6 +6,7 @@ interface ShowProps {
   web3Dialog?: boolean;
   createBounty?: boolean;
   failedLoadSettings?: boolean;
+  githubWalletDontMatch?: boolean;
 
   // [k: string]: boolean
 }
@@ -21,3 +22,5 @@ export const updateShowProp = (payload: ShowProps) => changeShowProp.update(payl
  * as it is shown in change-service.ts */
 export const changeShowWeb3 = (web3Dialog: boolean) => updateShowProp({web3Dialog});
 export const changeShowCreateBounty = (createBounty: boolean) => updateShowProp({createBounty});
+export const changeGithubWalletDontMatch = (githubWalletDontMatch: boolean) =>
+  updateShowProp({githubWalletDontMatch});

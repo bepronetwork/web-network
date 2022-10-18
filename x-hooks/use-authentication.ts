@@ -1,23 +1,31 @@
 import {useContext, useEffect, useState} from "react";
-import {AppStateContext} from "../contexts/app-state";
+import {AppStateContext} from "contexts/app-state";
 import {signIn, signOut, useSession} from "next-auth/react";
 import {useRouter} from "next/router";
 import {useDao} from "./use-dao";
-import {changeCurrentUser} from "../contexts/reducers/change-current-user";
-import {useNetwork} from "./use-network";
+import {
+  changeCurrentUser, changeCurrentUserBalance,
+  changeCurrentUserMatch,
+  changeCurrentUserWallet
+} from "contexts/reducers/change-current-user";
+
 import useApi from "./use-api";
-import {WinStorage} from "../services/win-storage";
+import {WinStorage} from "services/win-storage";
+
+import {Balance} from "interfaces/balance-state";
+import {changeActiveNetwork} from "../contexts/reducers/change-service";
+import {Network} from "interfaces/network";
 
 export function useAuthentication() {
-  const sessions = useSession();
+  const session = useSession();
   const {state, dispatch} = useContext(AppStateContext);
   const {connect} = useDao();
-  const {clearNetworkFromStorage} = useNetwork();
 
-  const {asPath, pathname, push} = useRouter();
+  const {asPath, push} = useRouter();
   const {getUserOf, getUserWith} = useApi();
 
   const [lastUrl,] = useState(new WinStorage('lastUrlBeforeGHConnect', 0, 'sessionStorage'));
+  const [balance,] = useState(new WinStorage('lastUrlBeforeGHConnect', 1000, 'sessionStorage'));
 
   const URL_BASE = typeof window !== "undefined" ? `${window.location.protocol}//${ window.location.host}` : "";
 
@@ -49,10 +57,7 @@ export function useAuthentication() {
     if (state.Service?.active?.web3Connection?.Account?.address === state.currentUser?.walletAddress)
       return;
 
-    dispatch(changeCurrentUser.update({
-      walletAddress: state.Service.active.web3Connection.Account.address,
-      handle: state.currentUser?.handle || ''
-    }));
+    dispatch(changeCurrentUserWallet(state.Service?.active?.web3Connection?.Account?.address));
   }
 
   function connectGithub() {
@@ -78,7 +83,61 @@ export function useAuthentication() {
       })
   }
 
+  function validateGhAndWallet() {
+    if (!state.currentUser?.walletAddress || !(session?.data?.user as any)?.login) {
+      dispatch(changeCurrentUserMatch(undefined));
+      return;
+    }
+
+    const userLogin = (session.data.user as any).login;
+    const walletAddress = state.currentUser.walletAddress
+
+    getUserWith(userLogin)
+      .then(user => {
+        if (!user.githubLogin)
+          dispatch(changeCurrentUserMatch(undefined));
+        else if (user.githubLogin && userLogin)
+          dispatch(changeCurrentUserMatch(userLogin === user.githubLogin &&
+            (walletAddress ? walletAddress === user.address : true)));
+      })
+  }
+
+  function listenToAccountsChanged() {
+    if (!state.Service || window?.ethereum?.listenerCount(`accountsChanged`) > 0)
+      return;
+
+    window.ethereum.on(`accountsChanged`, () => {
+      connect();
+    });
+  }
+
+  function updateWalletBalance() {
+    if (balance.value || !state.currentUser?.walletAddress)
+      return;
+
+    const update = (k: keyof Balance) => (b) => {
+      const newState = {...(state.currentUser.balance || {}), [k]: b};
+      dispatch(changeCurrentUserBalance(newState));
+      balance.value = newState;
+    }
+
+    const updateNetwork = (k: keyof Network) => (v) =>
+      dispatch(changeActiveNetwork({...state.Service.network.active, [k]: v}));
+
+    state.Service.active.getOraclesOf(state.currentUser.walletAddress).then(update('oracles'))
+    state.Service.active.getBalance('settler', state.currentUser.walletAddress).then(update('bepro'))
+    state.Service.active.getBalance('eth', state.currentUser.walletAddress).then(update('eth'))
+    state.Service.active.getBalance('staked', state.currentUser.walletAddress).then(update('staked'));
+
+    // not balance, but related to address, no need for a second useEffect()
+    state.Service.active.isCouncil(state.currentUser.walletAddress).then(updateNetwork('isCouncil'));
+    state.Service.active.isNetworkGovernor(state.currentUser.walletAddress).then(updateNetwork('isGovernor'));
+  }
+
+  useEffect(validateGhAndWallet, [(session?.data?.user as any)?.login, state.currentUser]);
   useEffect(updateWalletAddress, [state.Service?.active]);
+  useEffect(listenToAccountsChanged, [state.Service]);
+  useEffect(updateWalletBalance, [state.currentUser?.walletAddress]);
 
   return {
     connectWallet,
@@ -86,5 +145,4 @@ export function useAuthentication() {
     disconnectGithub,
     connectGithub
   }
-
 }
