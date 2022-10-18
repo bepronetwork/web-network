@@ -10,17 +10,18 @@ import {BranchesList, BranchInfo} from "./branches-list";
 import {XReducerAction} from "../contexts/reducers/reducer";
 import {Balance} from "./balance-state";
 
-export interface ServiceNetworkRepostActive {
+export interface ServiceNetworkReposActive {
   forks: ForkInfo[];
   branches: BranchInfo[];
   ghVisibility: boolean;
+  id?: number;
 }
 
 export interface ServiceNetworkRepos {
   list: ReposList;
   forks: ForksList | null;
   branches: BranchesList | null;
-  active: ServiceNetworkRepostActive | null;
+  active: ServiceNetworkReposActive | null;
 }
 
 export interface ServiceNetwork {

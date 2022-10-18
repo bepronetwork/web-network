@@ -1,7 +1,7 @@
 import {
   ServiceNetwork,
   ServiceNetworkRepos,
-  ServiceNetworkRepostActive,
+  ServiceNetworkReposActive,
   ServiceState,
   State
 } from "../../interfaces/application-state";
@@ -90,4 +90,4 @@ export const changeNetworkReposForks = (forks: ForksList) => changeRepos.update(
 
 export const changeNetworkReposBranches = (branches: BranchesList) => changeRepos.update({branches});
 
-export const changeNetworkReposActive = (active: ServiceNetworkRepostActive) => changeRepos.update({active});
+export const changeNetworkReposActive = (active: ServiceNetworkReposActive) => changeRepos.update({active});

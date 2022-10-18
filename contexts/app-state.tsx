@@ -9,6 +9,7 @@ import {useSettings} from "../x-hooks/use-settings";
 import {useDao} from "../x-hooks/use-dao";
 import {useNetwork} from "../x-hooks/use-network";
 import {useAuthentication} from "../x-hooks/use-authentication";
+import {useRepos} from "../x-hooks/use-repos";
 
 
 const appState: AppState = {
@@ -34,9 +35,10 @@ export default function AppStateContextProvider({children}) {
 
   loadApplicationStateReducers(); // load reducers into app-state
   useSettings(); // loads settings from database and dispatches its state
-  useDao(); // start DAO state
+  useDao(); // populate `state.Settings`
   useNetwork(); // start network state
   useAuthentication(); // github-connection, wallet & balance
+  useRepos(); // load repos and hook to the query?.repoId param to load active repo
 
   function parseError() {
     if (!authError)
