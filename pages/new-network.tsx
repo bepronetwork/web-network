@@ -89,6 +89,7 @@ export default function NewNetwork() {
       repositories: 
         JSON.stringify(github.repositories
           .filter((repo) => repo.checked)
+          .filter((repo) => repo?.userPermission === "ADMIN")
           .map(({ name, fullName }) => ({ name, fullName }))),
       botPermission: github.botPermission,
       creator: wallet.address,

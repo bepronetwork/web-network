@@ -5,6 +5,7 @@ interface GithubInfoProps {
   hasIssues?: boolean;
   active?: boolean;
   usedByOtherNetwork?: boolean;
+  userPermission?: "ADMIN" | "MAINTAIN" | "READ" | "TRIAGE" | "WRITE";
   onClick?: () => void;
 }
 
@@ -12,11 +13,12 @@ export default function RepositoryCheck({
   label,
   hasIssues,
   usedByOtherNetwork,
+  userPermission,
   active = false,
   onClick
 }: GithubInfoProps) {
   const XIcon = <CloseIcon width={8} height={8} />;
-  const isDisabled = usedByOtherNetwork || hasIssues;
+  const isDisabled = usedByOtherNetwork || hasIssues || userPermission !== "ADMIN";
   const isActive = active && !isDisabled;
 
   const ClassCondition = (condition, trueValue, falseValue = "") => condition && trueValue || falseValue;
@@ -28,6 +30,7 @@ export default function RepositoryCheck({
     ClassCondition(!isActive && !isDisabled, "bg-dark-gray"),
     ClassCondition(isDisabled && hasIssues, "bg-info"),
     ClassCondition(isDisabled && usedByOtherNetwork, "bg-danger"),
+    ClassCondition(isDisabled && userPermission !== "ADMIN", "bg-warning"),
     ClassCondition(isDisabled, "cursor-not-allowed", "cursor-pointer")
   ];
 

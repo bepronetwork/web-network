@@ -4,7 +4,6 @@ import { appWithTranslation } from "next-i18next";
 import { AppProps } from "next/app";
 
 import MainNav from "components/main-nav";
-import NationDialog from "components/nation-dialog";
 import Seo from "components/seo";
 import StatusBar from "components/status-bar";
 import WebThreeDialog from "components/web3-dialog";
@@ -24,7 +23,6 @@ function App({
       <SessionProvider session={session}>
         <RootProviders>
           <WebThreeDialog />
-          <NationDialog />
           <MainNav />
           <div id="root-container">
           <Component {...pageProps} />

@@ -167,6 +167,7 @@ export default function useOctokit() {
       isFork: boolean;
       isInOrganization: boolean;
       owner: string;
+      viewerPermission: "ADMIN" | "MAINTAIN" | "READ" | "TRIAGE" | "WRITE"
     }>(item => {
       return getPropertyRecursively<GraphQlQueryResponseData>("nodes", item?.["user"]?.repositories)
         ?.map(el => ({

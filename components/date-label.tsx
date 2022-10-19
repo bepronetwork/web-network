@@ -16,15 +16,16 @@ export default function DateLabel({ date, className }: IDataLabelProps) {
     end: end
   });
 
-  const translated = (measure: string, amount = 0) =>
-    `${amount} ${t(`info-data.${measure}${amount > 1 ? "_other" : ""}`)}`;
+  const translated = (measure: string, count = 0) =>
+    `${count} ${t(`info-data.${measure}`, { count })}`;
 
   const groups: string[][] = [
     ["years", "months"],
     ["months", "days"],
     ["days", "hours"],
     ["hours", "minutes"],
-    ["minutes"]
+    ["minutes"],
+    ["seconds"]
   ];
 
   function handleDurationTranslation() {
