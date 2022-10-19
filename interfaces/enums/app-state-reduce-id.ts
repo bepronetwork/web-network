@@ -22,4 +22,6 @@ export enum AppStateReduceId {
   CurrentUserWallet,
   ConnectedChain,
   Show,
+  CurrentBounty,
+  CurrentBountyChainData,
 }

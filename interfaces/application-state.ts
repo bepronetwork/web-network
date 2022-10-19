@@ -9,6 +9,9 @@ import {ForkInfo, ForksList, ReposList} from "./repos-list";
 import {BranchesList, BranchInfo} from "./branches-list";
 import {XReducerAction} from "../contexts/reducers/reducer";
 import {Balance} from "./balance-state";
+import {IssueBigNumberData, IssueData, IssueDataComment} from "./issue-data";
+import BigNumber from "bignumber.js";
+import {BountyExtended} from "./bounty";
 
 export interface ServiceNetworkReposActive {
   forks: ForkInfo[];
@@ -49,6 +52,13 @@ export interface CurrentUserState {
   balance?: Balance | null;
 }
 
+export interface CurrentBounty {
+  comments: IssueDataComment[];
+  lastUpdated: number;
+  data: IssueBigNumberData;
+  chainData: BountyExtended;
+}
+
 export interface State {
   Settings: SettingsType | null;
   Service: ServiceState | null,
@@ -57,6 +67,7 @@ export interface State {
   transactions: (SimpleBlockTransactionPayload | BlockTransaction | UpdateBlockTransaction)[];
   currentUser: CurrentUserState | null,
   connectedChain: ConnectedChain | null,
+  currentBounty: CurrentBounty | null,
   show: {
     [key: string]: boolean;
   }

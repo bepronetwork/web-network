@@ -19,6 +19,7 @@ const appState: AppState = {
     loading: null,
     currentUser: null,
     connectedChain: null,
+    currentBounty: null,
     show: {},
     transactions: [],
     toaster: [],
