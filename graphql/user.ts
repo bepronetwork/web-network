@@ -11,6 +11,7 @@ export const Repositories =
           nameWithOwner
           isFork
           isInOrganization
+          isArchived
           owner {
             login
           }
