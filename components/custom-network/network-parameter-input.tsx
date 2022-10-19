@@ -26,7 +26,7 @@ export default function NetworkParameterInput({
   ...props
 } : NetworkParameterInputProps) {
 
-  const [inputValue, setInputValue] = useState(value)
+  const [inputValue, setInputValue] = useState<number | null>(null)
 
   const debounce = useRef(null)
   
@@ -48,7 +48,7 @@ export default function NetworkParameterInput({
         min={0}
         placeholder={"0"}
         thousandSeparator
-        value={inputValue}
+        value={inputValue || value}
         onValueChange={handleChange}
         disabled={disabled}
         decimalScale={decimals}
