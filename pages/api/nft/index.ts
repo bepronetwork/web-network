@@ -1,4 +1,4 @@
-import { error as LogError } from "@scripts/logging.js";
+import { error as LogError } from "services/logging";
 import { ProposalDetail } from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 import { withCors } from "middleware";

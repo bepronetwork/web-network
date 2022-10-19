@@ -1,4 +1,4 @@
-import { error as LogError } from "@scripts/logging.js";
+import { error as LogError } from "services/logging";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getToken } from "next-auth/jwt";
 import { Op } from "sequelize";
