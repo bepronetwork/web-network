@@ -392,6 +392,8 @@
     "years_other": "years",
     "days": "day",
     "days_other": "days",
+    "seconds": "second",
+    "seconds_other": "seconds",
     "text-data": "Opened {{value}} Ago"
   }
 }
