@@ -648,10 +648,15 @@ export default class DAO {
   }
 
   async isBountyInDraftChain(creationDateIssue: number): Promise<boolean> { 
-    const time = await this.getTimeChain();
-    const redeemTime = await this.network.draftTime();
+    try {
+      const time = await this.getTimeChain();
+      const redeemTime = await this.network.draftTime();
 
-    return (new Date(time) < new Date(creationDateIssue + redeemTime))
+      return (new Date(time) < new Date(creationDateIssue + redeemTime))
+    } catch (e) {
+      console.error(`Failed to calculate isDraft bounty`, e);
+      return null;
+    }
   }
 
   getCancelableTime(): Promise<number> {

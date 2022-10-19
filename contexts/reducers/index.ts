@@ -7,6 +7,7 @@ import {changeShowProp} from "./update-show-prop";
 import {changeNetwork, changeRepos, changeServiceProp} from "./change-service";
 import {changeLoad} from "./change-load";
 import {changeCurrentUser} from "./change-current-user";
+import {changeCurrentBounty} from "./change-current-bounty";
 
 export default function loadApplicationStateReducers() {
   [
@@ -19,7 +20,8 @@ export default function loadApplicationStateReducers() {
     changeServiceProp,
     changeNetwork,
     changeRepos,
-    changeCurrentUser
+    changeCurrentUser,
+    changeCurrentBounty
   ].forEach(addReducer);
 
   console.debug(`Loaded State Reducers`);

@@ -196,7 +196,7 @@ export const IssueProvider: React.FC = function ({ children }) {
     getNetworkIssue();
   }, [activeIssue, wallet?.address, DAOService?.network?.contractAddress]);
 
-  useEffect(() => {    
+  useEffect(() => {
     const noExpired = +new Date() - activeIssue?.lastUpdated <= TTL;
 
     if (query.id && query.repoId) {
