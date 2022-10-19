@@ -881,14 +881,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   }
 }
 
-#nation-dialog-modal {
-  max-width: 420px;
-  color: $white;
-  .white-space-wrap {
-    white-space: pre-wrap;
-  }
-}
-
 $c_directions: (
   "left": "l",
   "right": "r",
