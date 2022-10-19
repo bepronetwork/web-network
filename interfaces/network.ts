@@ -61,6 +61,7 @@ export interface Icon {
 }
 
 export interface Repository {
+  userPermission?: "ADMIN" | "MAINTAIN" | "READ" | "TRIAGE" | "WRITE";
   checked: boolean;
   name: string;
   fullName: string;
