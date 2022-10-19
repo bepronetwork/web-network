@@ -25,7 +25,6 @@ const publicSettings = [
   PublicSettingItem("token", process.env.NEXT_PUBLIC_NATIVE_TOKEN_NAME, "string", "requiredChain"),
   PublicSettingItem("id", process.env.NEXT_PUBLIC_NEEDS_CHAIN_ID, "string", "requiredChain"),
   PublicSettingItem("name", process.env.NEXT_PUBLIC_NEEDS_CHAIN_NAME, "string", "requiredChain"),
-  PublicSettingItem("excludedJurisdictions", process.env.NEXT_PUBLIC_COUNTRY_CODE_BLOCKED || '[]', "json"),
   PublicSettingItem("api", process.env.NEXT_PUBLIC_CURRENCY_API || '', "string", "currency"),
   PublicSettingItem("defaultFiat", process.env.NEXT_PUBLIC_CURRENCY_MAIN || '', "string", "currency"),
   PublicSettingItem("defaultToken", process.env.NEXT_PUBLIC_CURRENCY_ID || '', "string", "currency"),

@@ -83,19 +83,13 @@
     "connect": "Conectar"
   },
   "mobile-information": {},
-  "nation-dialog": {
-    "at-the-moment": "De momento, os serviços BEPRO e o token BEPRO não estão disponíveis no seu país ",
-    "excluded": "Jurisdições excluídas .",
-    "further": "Para mais informações contacte-nos em ",
-    "email": "general@bepro.network"
-  },
   "select-a-repository": "escolha um repositório ",
   "status": {
     "network-problems": "problemas de rede ",
     "waiting": "à espera",
     "operational": "operacional ",
     "network-congestion": "congestionamento na rede",
-    "tagline": "Os serviços de rede Bepro e o token BEPRO não estão disponíveis em jurisdições excluídas. Ao acessar e usar a interface, você concorda com nosso ",
+    "tagline": "Os serviços de rede Bepro e o token BEPRO não estão disponíveis em jurisdições excluídas. Ao acessar e usar a interface, você concorda com nossos ",
     "terms-and-conditions": "termos e condições",
     "support": "suporte"
   },
