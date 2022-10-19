@@ -80,16 +80,19 @@ export interface Field<T> {
   validated?: boolean;
 }
 
+type TokensLocked = {
+  locked: string;
+  needed: string;
+  validated: boolean;
+};
 export interface NetworkSettings {
   isSettingsValidated: boolean;
   forcedNetwork?: Network;
+  isAbleToClosed?: boolean;
   setForcedNetwork?: (network: Network) => void;
+  updateTokenBalance?: ()=> Promise<TokensLocked>
   cleanStorage?: () => void;
-  tokensLocked?: {
-    locked: string;
-    needed: string;
-    validated: boolean;
-  };
+  tokensLocked?: TokensLocked;
   details?: {
     name: Field<string>;
     description: string;
