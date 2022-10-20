@@ -202,6 +202,7 @@
     "failed-to-update-network": "Failed to update network {{error}}",
     "failed-to-close-network": "Failed to close network {{error}}",
     "invalid-format": "Invalid format",
+    "images-too-big": "Your images are too big, maximum 1MB for both files combined",
     "not-found": "You don't have a custom network created.",
     "dispute-time": "The time that proposals can be disputed. Min. {{min}} and Max. {{max}} seconds.",
     "percentage-for-dispute": "`Percentage needed for a proposal to be disputed by the community. Max. {{max}}%.`",
