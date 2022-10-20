@@ -103,7 +103,15 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   const handleFullChange = value => fields.logo.setter(value, "full");
 
   async function handleSubmit() {
-    if (!user?.login || !wallet?.address || !DAOService || !forcedNetwork || activeNetwork.isClosed || errorBigImages) return;
+    if (
+      !user?.login ||
+      !wallet?.address ||
+      !DAOService ||
+      !forcedNetwork ||
+      activeNetwork.isClosed ||
+      errorBigImages
+    )
+      return;
 
     setUpdatingNetwork(true);
 
