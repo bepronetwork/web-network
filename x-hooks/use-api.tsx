@@ -285,15 +285,6 @@ export default function useApi() {
       .catch(() => false);
   }
 
-  async function getClientNation() {
-    return api
-      .get("/ip")
-      .then(({ data }) => data || { countryCode: "US", country: "" })
-      .catch(() => {
-        return { countryCode: "US", country: "" };
-      });
-  }
-
   async function userHasPR(issueId: string, login: string, networkName = DEFAULT_NETWORK_NAME) {
     const search = new URLSearchParams({
       issueId,
@@ -514,7 +505,6 @@ export default function useApi() {
     createRepo,
     createReviewForPR,
     getAllUsers,
-    getClientNation,
     getHealth,
     getIssue,
     getPayments,

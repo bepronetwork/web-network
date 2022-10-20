@@ -11,6 +11,7 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
 
   const [existingRepos, setExistingRepos] = useState([]);
   const [reposWithIssues, setReposWithIssues] = useState([]);
+  const [reposUserNotAdmin, setReposUserNotAdmin] = useState([]);
 
   const { searchRepositories } = useApi();
 
@@ -40,6 +41,10 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
 
     setReposWithIssues(repositories.filter(repository => repository.hasIssues)
       .map((repository) => repository.fullName));
+
+    setReposUserNotAdmin(repositories.filter(repository => repository.userPermission !== "ADMIN")
+    .map((repository) => repository.fullName))
+
   }, [repositories]);
 
   return (
@@ -55,6 +60,7 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
           key={repository.name}
           label={repository.name}
           active={repository.checked}
+          userPermission={repository.userPermission}
           hasIssues={reposWithIssues.includes(repository.fullName)}
           onClick={() => handleClick(repository)}
           usedByOtherNetwork={!repository.isSaved && existingRepos.includes(repository.fullName)}
@@ -72,6 +78,14 @@ export default function RepositoriesList({ withLabel = true, repositories, onCli
       {reposWithIssues.length ? (
         <span className="p-small text-info px-0">
           {t("steps.repositories.has-bounties")}
+        </span>
+      ) : (
+        ""
+      )}
+      
+      {reposUserNotAdmin.length ? (
+        <span className="p-small text-warning px-0">
+          {t("steps.repositories.user-permission-not-admin")}
         </span>
       ) : (
         ""
