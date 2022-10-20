@@ -40,6 +40,9 @@ const storage = new WinStorage('create-network-settings', TTL, "localStorage");
 export const NetworkSettingsProvider = ({ children }) => {
   const router = useRouter();
   
+  /* NOTE - forced network might be renamed to `user network`, 
+            referred to user nework when he access `/my-network` page from/in another network.
+  */
   const [forcedNetwork, setForcedNetwork] = useState<Network>();
   const [networkSettings, setNetworkSettings] = useState(DefaultNetworkSettings)
   const [isLoadingData, setIsLoadingData] = useState(false)
@@ -176,7 +179,7 @@ export const NetworkSettingsProvider = ({ children }) => {
                             obj[key] = newState[key]
                             return obj
                           }, {});
-                          
+
       storage.setItem(data);
     }
     
@@ -283,7 +286,7 @@ export const NetworkSettingsProvider = ({ children }) => {
     return dao;
   }
   
-  const cleanStorage = () => storage.removeItem()
+  const cleanStorage = () => storage.removeItem();
 
   async function getTokenBalance() {
     const [tokensLockedInRegistry, registryCreatorAmount] = await Promise.all([
@@ -382,27 +385,25 @@ export const NetworkSettingsProvider = ({ children }) => {
     defaultState.settings.treasury.cancelFee = { value:DEFAULT_CANCEL_FEE, validated: true };
     defaultState.settings.treasury.closeFee = { value: DEFAULT_CLOSE_FEE, validated: true };
 
-    // const storageData = storage.getItem();
-
-    // if(storageData){
-    //   const {at, data} = JSON.parse(storageData);
-    //   if(+new Date() - +new Date(at) <= TTL){
-    //     if(data?.details){
-    //       defaultState.details.name =  data?.details.name;
-    //       defaultState.details.description =  data?.details.description;
-    //     }
-
-    //     if(data?.settings)
-    //       defaultState.settings = data?.settings;
-        
-    //     if(data?.github)
-    //       defaultState.github = data?.github;
-
-    //     if(data?.tokens)
-    //       defaultState.tokens = data?.tokens;
-    //   }
-    // }
     defaultState.github.repositories = await loadGHRepos();
+
+    const storageData = storage.getItem();
+
+    if(storageData){
+      if(storageData?.details){
+        defaultState.details.name =  storageData?.details.name;
+        defaultState.details.description =  storageData?.details.description;
+      }
+
+      if(storageData?.settings)
+        defaultState.settings = storageData?.settings;
+        
+      if(storageData?.github)
+        defaultState.github = storageData?.github;
+
+      if(storageData?.tokens)
+        defaultState.tokens = storageData?.tokens;
+    }
     
     setNetworkSettings(defaultState)
     return defaultState;
@@ -411,7 +412,6 @@ export const NetworkSettingsProvider = ({ children }) => {
   async function loadNetworkSettings(): Promise<typeof DefaultNetworkSettings>{
     const defaultState = DefaultNetworkSettings;
     const service = await loadDaoService()
-    
     const [
         treasury,
         councilAmount, 
@@ -472,11 +472,10 @@ export const NetworkSettingsProvider = ({ children }) => {
     defaultState.isAbleToClosed = isNetworkAbleToBeClosed;
     defaultState.settings.theme.colors = network?.colors || DefaultTheme();
     defaultState.github.repositories = await loadGHRepos();
-      
+
     setNetworkSettings(defaultState)
     return defaultState;
   }
-  
 
   useEffect(() => {
     if (!DAOService ||
@@ -485,9 +484,9 @@ export const NetworkSettingsProvider = ({ children }) => {
         !needsToLoad )
       return;
     setIsLoadingData(true)
-    if (!isCreating)
+    if (!isCreating && forcedNetwork)
       loadNetworkSettings().finally(()=> setIsLoadingData(false));
-    else
+    else if(isCreating)
       loadDefaultSettings().finally(()=> setIsLoadingData(false));
   }, [ 
     user?.login,
@@ -495,13 +494,14 @@ export const NetworkSettingsProvider = ({ children }) => {
     DAOService, 
     network, 
     isCreating, 
+    forcedNetwork,
     needsToLoad,
     router.pathname
   ]);
   
-  // Load User Network
+  // NOTE -  Load Forced/User Network
   useEffect(()=>{
-    if(DAOService && (!forcedNetwork?.tokensLocked || !forcedNetwork.tokensStaked))
+    if(DAOService && forcedNetwork && (!forcedNetwork?.tokensLocked || !forcedNetwork.tokensStaked))
       loadDaoService()
       .then((service)=> 
        Promise.all([  
@@ -534,6 +534,7 @@ export const NetworkSettingsProvider = ({ children }) => {
   const memorizedValue = useMemo<NetworkSettings>(() => ({
     ...networkSettings,
     forcedNetwork,
+    isLoadingData,
     setForcedNetwork,
     LIMITS,
     cleanStorage,

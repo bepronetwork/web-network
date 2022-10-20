@@ -87,6 +87,7 @@ type TokensLocked = {
 };
 export interface NetworkSettings {
   isSettingsValidated: boolean;
+  isLoadingData: boolean;
   forcedNetwork?: Network;
   isAbleToClosed?: boolean;
   setForcedNetwork?: (network: Network) => void;

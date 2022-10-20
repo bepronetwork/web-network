@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useState } from "react";
 import { NumberFormatValues } from "react-number-format";
 
@@ -40,6 +40,8 @@ export default function NetworkParameterInput({
       onChange(values.floatValue)
     }, 500)
   };
+
+  useEffect(()=>{if(value !== inputValue) setInputValue(value)},[value])
   
   return(
     <div className={`form-group col mb-0 ${className}`}>
@@ -48,7 +50,7 @@ export default function NetworkParameterInput({
         min={0}
         placeholder={"0"}
         thousandSeparator
-        value={inputValue || value}
+        value={inputValue}
         onValueChange={handleChange}
         disabled={disabled}
         decimalScale={decimals}
