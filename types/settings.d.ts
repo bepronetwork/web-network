@@ -57,6 +57,5 @@ export type SettingsType = {
     home: string;
     ipfs: string;
   };
-  excludedJurisdictions: string[];
   beproToken?: Token
 }

@@ -53,7 +53,7 @@ export default function ProposalHero({
 
             <div className="mt-3 pt-1 d-inline-flex align-items-center justify-content-md-start gap-2">
               <h4>{t("proposal:title")}</h4>
-              <h4 className="text-white-40">#{proposal?.scMergeId}</h4>
+              <h4 className="text-white-40">#{+(proposal?.scMergeId || 0) + 1}</h4>
             </div>
 
             <div className="mt-3 pt-1 d-inline-flex align-items-center justify-content-md-start gap-2">

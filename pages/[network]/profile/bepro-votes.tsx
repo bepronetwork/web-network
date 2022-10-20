@@ -14,6 +14,7 @@ import OraclesDelegate from "components/oracles-delegate";
 import ProfileLayout from "components/profile/profile-layout";
 import TokenBalance from "components/profile/token-balance";
 import { FlexRow } from "components/profile/wallet-balance";
+import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import { useAuthentication } from "contexts/authentication";
 import { useNetwork } from "contexts/network";
@@ -36,7 +37,9 @@ export default function BeproVotes() {
   const oraclesDelegatedToMe = wallet?.balance?.oracles?.delegatedByOthers || BigNumber("0");
 
   return(
+    
     <ProfileLayout>
+      <ReadOnlyButtonWrapper>
       <Col xs={10}>
         <FlexRow className="mb-3 justify-content-between align-items-center">
           <span className="h4 family-Regular text-white font-weight-medium">
@@ -83,6 +86,7 @@ export default function BeproVotes() {
           <Delegations type="toOthers" />
         </Row>
       </Col>
+    </ReadOnlyButtonWrapper>
     </ProfileLayout>
   );
 }
