@@ -4,7 +4,7 @@ import {signIn, signOut, useSession} from "next-auth/react";
 import {useRouter} from "next/router";
 import {useDao} from "./use-dao";
 import {
-  changeCurrentUser, changeCurrentUserBalance,
+  changeCurrentUser, changeCurrentUserBalance, changeCurrentUserHandle, changeCurrentUserLogin,
   changeCurrentUserMatch,
   changeCurrentUserWallet
 } from "contexts/reducers/change-current-user";
@@ -134,10 +134,19 @@ export function useAuthentication() {
     state.Service.active.isNetworkGovernor(state.currentUser.walletAddress).then(updateNetwork('isGovernor'));
   }
 
+  function updateCurrentUserLogin() {
+    if (!session?.data?.user || state.currentUser.login === (session.data.user as any).login)
+      return;
+
+    dispatch(changeCurrentUserHandle(session.data.user.name));
+    dispatch(changeCurrentUserLogin((session.data.user as any).login));
+  }
+
   useEffect(validateGhAndWallet, [(session?.data?.user as any)?.login, state.currentUser]);
   useEffect(updateWalletAddress, [state.Service?.active]);
   useEffect(listenToAccountsChanged, [state.Service]);
   useEffect(updateWalletBalance, [state.currentUser?.walletAddress]);
+  useEffect(updateCurrentUserLogin, [session?.data?.user])
 
   return {
     connectWallet,
