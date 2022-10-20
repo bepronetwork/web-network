@@ -319,7 +319,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
 
   useEffect(() => {
     const logoSize = (details?.fullLogo?.value?.raw?.size || 0)/1024/1024
-    const iconSize = (details?.iconLogo?.value?.raw?.size|| 0)/1024/1024 
+    const iconSize = (details?.iconLogo?.value?.raw?.size || 0)/1024/1024 
 
     if(logoSize + iconSize >= 1){
       setErrorBigImages(true)
