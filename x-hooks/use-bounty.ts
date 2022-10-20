@@ -3,19 +3,18 @@ import {AppStateContext} from "../contexts/app-state";
 import {useRouter} from "next/router";
 import useApi from "./use-api";
 import useOctokit from "./use-octokit";
-import {changeLoadState} from "../contexts/reducers/change-load";
 import {
-  changeCurrentBounty,
   changeCurrentBountyComments,
   changeCurrentBountyData,
   changeCurrentBountyDataChain,
   changeCurrentBountyDataIsDraft,
-  changeCurrentBountyDataIsFinished, changeCurrentBountyDataIsInValidation, changeCurrentBountyDataProposals
+  changeCurrentBountyDataIsFinished,
+  changeCurrentBountyDataIsInValidation,
 } from "../contexts/reducers/change-current-bounty";
 import {IssueData} from "../interfaces/issue-data";
 import BigNumber from "bignumber.js";
 import {bountyReadyPRsHasNoInvalidProposals} from "../helpers/proposal";
-import {proposal} from "@taikai/dappkit";
+
 
 const CACHE_BOUNTY_TIME = 60 * 1000; // 1min
 
@@ -111,17 +110,12 @@ export function useBounty() {
   }
 
   /**
-   *  todo: there should be a smarter way of doing this, maybe each row should be responsible
-   *  todo: for grepping this data off of `state.currentBounty.chainData` when in-view?
-   *  todo:
-   *  todo: alternatively, we can make this logic on the webnetwork-events actions that deal with
-   *  todo: disputes and then this information would already exist when `getBounty()` is called
-   *  todo:
-   *  todo: what is clear is that we CANNOT hook this logic onto the `getBounty()`
-   *  todo: as it would severely decrease our render time (because.. chain is slow, yo!)
+   *  todo: getExtendedProposalsForCurrentBounty() should happen on webnetwork-events
    *
-   *  MAKE SURE that this function is only called once, since it ignores cached information
+   *  MAKE SURE that these functions (getExtendedProposalsForCurrentBounty, getExtendedPullRequestsForCurrentBounty)
+   *  are only called once, since they ignore cached information
    */
+
   function getExtendedProposalsForCurrentBounty() {
     if (!state.currentBounty?.chainData || !state.Service?.active)
       return Promise.resolve([]);
@@ -143,13 +137,45 @@ export function useBounty() {
       .then(proposals => {
         // dispatch(changeCurrentBountyDataProposals(proposals));
         return proposals;
+      })
+      .catch(e => {
+        console.error(`Failed to get extended proposals`, e);
+        return;
       });
+  }
+
+  function getExtendedPullRequestsForCurrentBounty() {
+    if (!state.currentBounty?.data || !state.currentBounty?.data?.pullRequests?.length)
+      return;
+
+    const bounty = state.currentBounty.data;
+
+    return Promise.all(bounty.pullRequests.map(pullRequest =>
+      getPullRequestDetails(bounty.repository.githubPath, +pullRequest.githubId)
+        .then(details =>
+          getIssueOrPullRequestComments(bounty.repository.githubPath, +pullRequest.githubId)
+            .then(comments => ({
+              ...pullRequest,
+              isMergeable: details.mergeable === "MERGEABLE",
+              merged: details.merged,
+              state: details.state,
+              comments,
+            })))))
+      .then(extendedPrs => {
+        // dispatch(changeCurrentBountyDataPullRequests(extendedPrs));
+        return extendedPrs;
+      })
+      .catch(e => {
+        console.error(`Failed to get extended pull-requests`, e);
+        return;
+      })
   }
 
   useEffect(getDatabaseBounty, [state.Service?.network?.active, query?.id, query?.repoId]);
   useEffect(getChainBounty, [state.Service?.active, state.Service?.network, state.currentBounty?.data?.contractId])
 
   return {
-    getExtendedProposalsForCurrentBounty
+    getExtendedProposalsForCurrentBounty,
+    getExtendedPullRequestsForCurrentBounty
   }
 }
