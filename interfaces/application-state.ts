@@ -71,6 +71,9 @@ export interface State {
   show: {
     [key: string]: boolean;
   }
+  spinners: {
+    [key: string]: boolean;
+  }
 }
 
 export interface AppState {

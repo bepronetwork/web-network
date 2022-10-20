@@ -8,6 +8,7 @@ import {changeNetwork, changeRepos, changeServiceProp} from "./change-service";
 import {changeLoad} from "./change-load";
 import {changeCurrentUser} from "./change-current-user";
 import {changeCurrentBounty} from "./change-current-bounty";
+import {changeSpinners} from "./change-spinners";
 
 export default function loadApplicationStateReducers() {
   [
@@ -21,7 +22,8 @@ export default function loadApplicationStateReducers() {
     changeNetwork,
     changeRepos,
     changeCurrentUser,
-    changeCurrentBounty
+    changeCurrentBounty,
+    changeSpinners
   ].forEach(addReducer);
 
   console.debug(`Loaded State Reducers`);
