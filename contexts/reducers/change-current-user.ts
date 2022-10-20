@@ -24,6 +24,9 @@ export const changeCurrentUser = new ChangeCurrentUser();
 export const changeCurrentUserHandle = (handle: string) =>
   changeCurrentUser.update({handle});
 
+export const changeCurrentUserLogin = (login: string) =>
+  changeCurrentUser.update({login});
+
 export const changeCurrentUserWallet = (walletAddress: string) =>
   changeCurrentUser.update({walletAddress});
 

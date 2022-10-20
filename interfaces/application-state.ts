@@ -50,6 +50,7 @@ export interface CurrentUserState {
   walletAddress: string;
   match?: boolean | undefined;
   balance?: Balance | null;
+  login?: string;
 }
 
 export interface CurrentBounty {
