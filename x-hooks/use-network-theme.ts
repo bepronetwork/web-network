@@ -1,21 +1,21 @@
 import { useRouter } from "next/router";
 import { UrlObject } from "url";
 
-import { useNetwork } from "contexts/network";
-import { useSettings } from "contexts/settings";
-
 import { hexadecimalToRGB } from "helpers/colors";
 
 import { ThemeColors } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
+import {useContext} from "react";
+import {AppStateContext} from "../contexts/app-state";
 
 export default function useNetworkTheme() {
   const router = useRouter();
 
+  const {state} = useContext(AppStateContext);
+
+
   const { getNetwork } = useApi();
-  const { settings } = useSettings();
-  const { activeNetwork: network } = useNetwork();
 
   async function networkExists(networkName: string) {
     try {
@@ -44,20 +44,20 @@ export default function useNetworkTheme() {
   }
 
   function colorsToCSS(overrideColors = undefined as ThemeColors): string {
-    if (!network || (!network?.colors && !overrideColors)) return "";
+    if (!state.Service?.network?.active || (!state.Service?.network?.active?.colors && !overrideColors)) return "";
 
     const colors = {
-      text: overrideColors?.text || network.colors?.text,
-      background: overrideColors?.background || network.colors?.background,
-      shadow: overrideColors?.shadow || network.colors?.shadow,
-      gray: overrideColors?.gray || network.colors?.gray,
-      primary: overrideColors?.primary || network.colors?.primary,
-      secondary: overrideColors?.secondary || network.colors?.secondary,
-      oracle: overrideColors?.oracle || network.colors?.oracle,
-      success: overrideColors?.success || network.colors?.success,
-      danger: overrideColors?.danger || network.colors?.danger,
-      warning: overrideColors?.warning || network.colors?.warning,
-      info: overrideColors?.info || network.colors?.info
+      text: overrideColors?.text || state.Service?.network?.active.colors?.text,
+      background: overrideColors?.background || state.Service?.network?.active.colors?.background,
+      shadow: overrideColors?.shadow || state.Service?.network?.active.colors?.shadow,
+      gray: overrideColors?.gray || state.Service?.network?.active.colors?.gray,
+      primary: overrideColors?.primary || state.Service?.network?.active.colors?.primary,
+      secondary: overrideColors?.secondary || state.Service?.network?.active.colors?.secondary,
+      oracle: overrideColors?.oracle || state.Service?.network?.active.colors?.oracle,
+      success: overrideColors?.success || state.Service?.network?.active.colors?.success,
+      danger: overrideColors?.danger || state.Service?.network?.active.colors?.danger,
+      warning: overrideColors?.warning || state.Service?.network?.active.colors?.warning,
+      info: overrideColors?.info || state.Service?.network?.active.colors?.info
     };
 
     return `:root {
@@ -151,17 +151,15 @@ export default function useNetworkTheme() {
         ...query,
         network: query?.network || 
                  router?.query?.network || 
-                 settings?.defaultNetworkConfig?.name || 
+                 state.Settings?.defaultNetworkConfig?.name ||
                  "bepro"
       }
     };
   }
 
   return {
-    network,
     colorsToCSS,
     DefaultTheme,
-    networkExists,
     getURLWithNetwork,
     setNetwork: changeNetwork
   };

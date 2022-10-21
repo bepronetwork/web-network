@@ -5,7 +5,8 @@ import { setCookie } from "nookies";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import { useAuthentication } from "contexts/authentication";
+import {useContext} from "react";
+import {AppStateContext} from "../contexts/app-state";
 
 export default function UpdateGithubTokenModal({
   redirectTo,
@@ -14,15 +15,14 @@ export default function UpdateGithubTokenModal({
   setVisible,
 }) {
   const { t } = useTranslation(["common", "custom-network"]);
-
-  const { wallet } = useAuthentication();
+  const {state} = useContext(AppStateContext);
 
   function handleClose() {
     setVisible?.(false);
   }
 
   function handleConfirm() {
-    setCookie(null, `updated-github-token:${wallet?.address}`, "true", {
+    setCookie(null, `updated-github-token:${state.currentUser?.walletAddress}`, "true", {
       maxAge: 24 * 60 * 60,
       path: "/"
     });

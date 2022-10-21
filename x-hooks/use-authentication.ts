@@ -168,6 +168,7 @@ export function useAuthentication() {
     disconnectWallet,
     disconnectGithub,
     connectGithub,
-    updateWalletBalance
+    updateWalletBalance,
+    validateGhAndWallet
   }
 }

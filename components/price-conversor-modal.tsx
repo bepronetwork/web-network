@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useContext, useEffect, useState} from "react";
 
 import { useTranslation } from "next-i18next";
 
@@ -8,12 +8,10 @@ import InputNumber from "components/input-number";
 import Modal from "components/modal";
 import ReactSelect from "components/react-select";
 
-import { useNetwork } from "contexts/network";
-import { useSettings } from "contexts/settings";
-
 import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { getCoinInfoByContract } from "services/coingecko";
+import {AppStateContext} from "../contexts/app-state";
 
 interface IPriceConversiorModalProps{
   show: boolean;
@@ -34,14 +32,13 @@ export default function PriceConversorModal({
   const [errorCoinInfo, setErrorCoinInfo] = useState<boolean>(false);
   const [currentCurrency, setCurrentCurrency] = useState<{label: string, value: string}>(null);
 
-  const { settings } = useSettings();
-  const { activeNetwork } = useNetwork();
+  const {state} = useContext(AppStateContext);
 
   async function handlerChange({value, label}){
-    if (!activeNetwork?.networkToken?.address) return;
+    if (!state.Service?.network?.active?.networkToken?.address) return;
 
     const data = 
-      await getCoinInfoByContract(activeNetwork.networkToken.address)
+      await getCoinInfoByContract(state.Service?.network?.active.networkToken.address)
         .catch((err) => {
           if(err) setErrorCoinInfo(true)
           return ({ prices: { [value]: 0 } })
@@ -52,7 +49,7 @@ export default function PriceConversorModal({
   }
 
   useEffect(()=>{
-    const currencyList = settings?.currency?.conversionList || defaultValue;
+    const currencyList = state.Settings?.currency?.conversionList || defaultValue;
     
     if(currencyList.length){
       const opt = currencyList.map(currency=>({value: currency?.value, label: currency?.label}))
@@ -106,7 +103,7 @@ export default function PriceConversorModal({
           <InputNumber
             className="caption-large"
             symbol={
-              activeNetwork?.networkToken?.symbol || t("common:misc.$token")
+              state.Service?.network?.active?.networkToken?.symbol || t("common:misc.$token")
             }
             value={currentValue}
             onValueChange={(e) => setValue(e.floatValue)}

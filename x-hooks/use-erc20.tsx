@@ -5,9 +5,6 @@ import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-cor
 import BigNumber from "bignumber.js";
 
 import { AppStateContext } from "contexts/app-state";
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { useNetwork } from "contexts/network";
 import { parseTransaction } from "helpers/transactions";
 
 import { TransactionStatus } from "interfaces/enums/transaction-status";
@@ -30,35 +27,34 @@ export default function useERC20() {
   const [totalSupply, setTotalSupply] = useState(BigNumber(0));
 
   const txWindow = useTransactions();
-  const { wallet } = useAuthentication();
-  const { service: DAOService } = useDAO();
+  const { state, dispatch } = useContext(AppStateContext);
   const { handleApproveToken } = useBepro();
-  const { activeNetwork } = useNetwork();
-  const { dispatch } = useContext(AppStateContext);
+
+
 
   const logData = { 
-    wallet: wallet?.address, 
+    wallet: state.currentUser?.walletAddress,
     token: address, 
-    network: DAOService?.network?.contractAddress 
+    network: state.Service?.active?.network?.contractAddress
   };
 
   const updateAllowanceAndBalance = useCallback(() => {
-    if (!wallet?.address || !DAOService?.network?.contractAddress || !address) return;
+    if (!state.currentUser?.walletAddress || !state.Service?.active?.network?.contractAddress || !address) return;
 
-    DAOService.getTokenBalance(address, wallet.address)
+    state.Service?.active.getTokenBalance(address, state.currentUser.walletAddress)
       .then(setBalance)
       .catch(error => console.debug("useERC20:getTokenBalance", logData, error));
 
-    DAOService.getAllowance(address, wallet.address, DAOService.network.contractAddress)
+    state.Service?.active.getAllowance(address, state.currentUser.walletAddress, state.Service?.active.network.contractAddress)
       .then(setAllowance)
       .catch(error => console.debug("useERC20:getAllowance", logData, error));
-  }, [wallet?.address, DAOService, address]);
+  }, [state.currentUser?.walletAddress, state.Service?.active, address]);
 
   const approve = useCallback((amount: string) => {
-    if (!wallet?.address || !DAOService || !address || !amount) return;
+    if (!state.currentUser?.walletAddress || !state.Service?.active || !address || !amount) return;
 
     return handleApproveToken(address, amount).then(updateAllowanceAndBalance);
-  }, [wallet?.address, DAOService, address]);
+  }, [state.currentUser?.walletAddress, state.Service?.active, address]);
 
   function setDefaults() {
     setName("");
@@ -72,24 +68,19 @@ export default function useERC20() {
   useEffect(() => {
     if (!address) setLoadError(undefined);
     if (!address && name) setDefaults();
-    if (!DAOService || !address) return;
-
-    DAOService.getERC20TokenData(address)
-      .then(({ name, symbol, decimals, totalSupply }) => {
-        setName(name);
-        setSymbol(symbol);
-        setDecimals(decimals);
-        setTotalSupply(totalSupply);
-        setLoadError(false);
-      })
-      .catch(error => {
-        setDefaults();
-        setLoadError(true);
-        console.debug("useERC20:getERC20TokenData", logData, error)
-      });
+    if (state.Service?.active && address)
+      state.Service?.active.getERC20TokenData(address)
+        .then(({ name, symbol, decimals }) => {
+          setName(name);
+          setSymbol(symbol);
+          setDecimals(decimals);
+          setTotalSupply(totalSupply);
+          setLoadError(false);
+        })
+        .catch(error => console.debug("useERC20:getERC20TokenData", logData, error));
         
     updateAllowanceAndBalance();
-  }, [wallet?.address, DAOService, address]);
+  }, [state.currentUser?.walletAddress, state.Service?.active, address]);
 
   async function deploy(name: string,
                         symbol: string,
@@ -100,7 +91,7 @@ export default function useERC20() {
 
       dispatch(transaction);
 
-      await DAOService.deployERC20Token(name, symbol, cap, ownerAddress)
+      await state.Service?.active.deployERC20Token(name, symbol, cap, ownerAddress)
         .then((txInfo: TransactionReceipt) => {
           updateTx([parseTransaction(txInfo, transaction.payload[0])])
           resolve(txInfo);

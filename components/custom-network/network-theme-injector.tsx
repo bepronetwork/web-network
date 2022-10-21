@@ -1,29 +1,26 @@
-import { useEffect, useState } from "react";
+import {useContext, useEffect, useState} from "react";
 
 import { useRouter } from "next/router";
-
-import { useSettings } from "contexts/settings";
-
 import useNetworkTheme from "x-hooks/use-network-theme";
+import {AppStateContext} from "../../contexts/app-state";
 
 export default function NetworkThemeInjector() {
   const { pathname } = useRouter();
-
   const [currentColors, setCurrentColors] = useState("");
+  const {state} = useContext(AppStateContext);
 
-  const { settings } = useSettings();
-  const { network, colorsToCSS } = useNetworkTheme();
+  const { colorsToCSS } = useNetworkTheme();
 
   const ignorePaths = ["/networks", "/new-network"];
 
   useEffect(() => {
-    if (network?.name && 
-        network?.name !== settings?.defaultNetworkConfig?.name && 
+    if (state.Service?.network?.active?.name &&
+        state.Service?.network?.active?.name !== state.Settings?.defaultNetworkConfig?.name &&
         !ignorePaths.includes(pathname))
       setCurrentColors(colorsToCSS());
     else
       setCurrentColors("");
-  }, [network]);
+  }, [state.Service?.network?.active]);
 
   return (
     <>

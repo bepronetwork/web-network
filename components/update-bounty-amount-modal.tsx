@@ -8,10 +8,7 @@ import InputNumber from "components/input-number";
 import Modal from "components/modal";
 
 import { AppStateContext } from "contexts/app-state";
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { useIssue } from "contexts/issue";
-import { useNetwork } from "contexts/network";
+
 import { toastError } from "contexts/reducers/change-toaster";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
@@ -19,27 +16,25 @@ import { formatStringToCurrency } from "helpers/formatNumber";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useERC20 from "x-hooks/use-erc20";
+import {useBounty} from "../x-hooks/use-bounty";
 
 export default function UpdateBountyAmountModal({
   show,
   transactionalAddress,
   handleClose = undefined,
   bountyId,
-  repoId,
-  ghId
 }) {
   const { t } = useTranslation("common");
 
   const [isExecuting, setIsExecuting] = useState(false);
   const [newAmount, setNewAmount] = useState<BigNumber>();
-  
+
+  const { state, dispatch } = useContext(AppStateContext);
+
+  const {getDatabaseBounty} = useBounty();
   const { processEvent } = useApi();
-  const { updateIssue } = useIssue();
   const transactionalERC20 = useERC20();
-  const { activeNetwork } = useNetwork();
-  const { wallet } = useAuthentication();
-  const { service: DAOService } = useDAO();
-  const { dispatch } = useContext(AppStateContext);
+
   const { handleApproveToken, handleUpdateBountyAmount } = useBepro();
 
   const handleChange = params => setNewAmount(BigNumber(params.value));
@@ -72,12 +67,12 @@ export default function UpdateBountyAmountModal({
 
     handleUpdateBountyAmount(bountyId, newAmount.toFixed())
       .then(txInfo => {
-        return processEvent("bounty", "updated", activeNetwork?.name, { 
+        return processEvent("bounty", "updated", state.Service?.network?.active?.name, {
           fromBlock: (txInfo as { blockNumber: number }).blockNumber 
         });
       })
       .then(() => {
-        updateIssue(repoId, ghId);
+        getDatabaseBounty(true);
         resetValues();
         handleClose();
       })
@@ -88,10 +83,10 @@ export default function UpdateBountyAmountModal({
   }
 
   useEffect(() => {
-    if (!transactionalAddress || !DAOService || !wallet?.address || !show) return;
+    if (!transactionalAddress || !state.Service?.active || !state.currentUser?.walletAddress || !show) return;
 
     transactionalERC20.setAddress(transactionalAddress);
-  }, [transactionalAddress, DAOService, wallet, show]);
+  }, [transactionalAddress, state.Service?.active, state.currentUser, show]);
 
   return (
     <Modal show={show} onCloseClick={handleClose} title={t("modals.update-bounty-amount.title")} titlePosition="center">

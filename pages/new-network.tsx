@@ -18,13 +18,9 @@ import TokenConfiguration from "components/custom-network/token-configuration";
 import Stepper from "components/stepper";
 
 import { AppStateContext } from "contexts/app-state";
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { useNetwork } from "contexts/network";
 import {NetworkSettingsProvider, useNetworkSettings} from "contexts/network-settings";
 import { addToast } from "contexts/reducers/change-toaster";
 import { changeLoadState } from "contexts/reducers/change-load";
-import { useSettings } from "contexts/settings";
 
 import { 
   DEFAULT_COUNCIL_AMOUNT, 
@@ -46,19 +42,15 @@ function NewNetwork() {
   const [creatingNetwork, setCreatingNetwork] = useState<number>(-1);
   const [hasNetwork, setHasNetwork] = useState(false);
 
-  const { activeNetwork } = useNetwork();
-  const { service: DAOService } = useDAO();
-  const { user, wallet } = useAuthentication();
-  const { settings: appSettings } = useSettings(); 
+  const { state, dispatch } = useContext(AppStateContext);
+
   const { createNetwork, processEvent } = useApi();
   const { handleChangeNetworkParameter } = useBepro();
   const { getURLWithNetwork, colorsToCSS } = useNetworkTheme();
   const { tokensLocked, details, github, tokens, settings, isSettingsValidated, cleanStorage } = useNetworkSettings();
   const { handleDeployNetworkV2, handleAddNetworkToRegistry } = useBepro();
 
-  const { dispatch } = useContext(AppStateContext);
-
-  const defaultNetworkName = appSettings?.defaultNetworkConfig?.name?.toLowerCase() || "bepro";
+  const defaultNetworkName = state.Settings?.defaultNetworkConfig?.name?.toLowerCase() || "bepro";
     
   const creationSteps = [
     { id: 1, name: t("custom-network:modals.loader.steps.deploy-network") },
@@ -71,7 +63,7 @@ function NewNetwork() {
   ];
 
   async function handleCreateNetwork() {
-    if (!user?.login || !wallet?.address || !DAOService) return;
+    if (!state.currentUser?.login || !state.currentUser?.walletAddress || !state.Service?.active) return;
     setCreatingNetwork(0);
 
     const deployNetworkTX = await handleDeployNetworkV2(tokens.settler).catch(error => error);
@@ -92,9 +84,9 @@ function NewNetwork() {
           .filter((repo) => repo?.userPermission === "ADMIN")
           .map(({ name, fullName }) => ({ name, fullName }))),
       botPermission: github.botPermission,
-      creator: wallet.address,
-      accessToken: user.accessToken,
-      githubLogin: user.login,
+      creator: state.currentUser.walletAddress,
+      accessToken: state.currentUser.accessToken,
+      githubLogin: state.currentUser.login,
       allowedTokens: tokens,
       networkAddress: deployedNetworkAddress
     };
@@ -175,24 +167,24 @@ function NewNetwork() {
   function checkHasNetwork() {
     dispatch(changeLoadState(true));
     
-    DAOService.getNetworkAdressByCreator(wallet.address)
+    state.Service?.active.getNetworkAdressByCreator(state.currentUser.walletAddress)
       .then(networkAddress => setHasNetwork(networkAddress !== Defaults.nativeZeroAddress))
       .catch(console.log)
       .finally(() => dispatch(changeLoadState(false)));
   }
 
   useEffect(() => {
-    if (!activeNetwork) return;
+    if (!state.Service?.network?.active) return;
 
-    if (activeNetwork.name.toLowerCase() !== defaultNetworkName)
+    if (state.Service?.network?.active.name.toLowerCase() !== defaultNetworkName)
       router.push(getURLWithNetwork("/profile/my-network", { network: defaultNetworkName }));
-  }, [activeNetwork]);
+  }, [state.Service?.network?.active]);
 
   useEffect(() => {
-    if (!DAOService || !wallet?.address) return;
+    if (!state.Service?.active || !state.currentUser?.walletAddress) return;
 
     checkHasNetwork();
-  }, [DAOService, wallet]);
+  }, [state.Service?.active, state.currentUser]);
 
   return (
     <div>
