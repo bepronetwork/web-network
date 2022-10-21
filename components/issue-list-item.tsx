@@ -72,7 +72,7 @@ export default function IssueListItem({
   function renderAmount() {
     const isActive = ["closed", "canceled"].includes(issue?.state);
 
-    const percentage = issue?.fundedAmount?.multipliedBy(100).dividedBy(issue?.fundingAmount).toNumber() || 0;
+    const percentage = issue?.fundedAmount?.multipliedBy(100).dividedBy(issue?.fundingAmount).toFixed(1,1) || 0;
     
     return (
       <div
@@ -112,7 +112,7 @@ export default function IssueListItem({
               className={`issue-percentage-text caption-small py-0 pe-0 ps-1 pb-1 col-2 col-md-2 text-white
               ${isMobile && "pt-1"}`}
             >
-              {percentage.toFixed(1)}%
+              {percentage}%
             </div>
           </>
         )}
