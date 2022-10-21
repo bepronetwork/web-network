@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from "react";
 
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -16,14 +16,11 @@ import IssuePullRequests from "components/issue-pull-requests";
 import PageActions from "components/page-actions";
 import TabbedNavigation from "components/tabbed-navigation";
 
-import { useAuthentication } from "contexts/authentication";
-import { useIssue } from "contexts/issue";
-import { useRepos } from "contexts/repos";
-
 import { TabbedNavigationItem } from "interfaces/tabbed-navigation";
 
 import useApi from "x-hooks/use-api";
 import useOctokit from "x-hooks/use-octokit";
+import {AppStateContext} from "../../contexts/app-state";
 
 export default function PageIssue() {
   const router = useRouter();
@@ -32,15 +29,14 @@ export default function PageIssue() {
   const [commentsIssue, setCommentsIssue] = useState([]);
   const [isRepoForked, setIsRepoForked] = useState(false);
 
-  const { activeRepo } = useRepos();
-  const { wallet, user } = useAuthentication();
-  const { activeIssue, networkIssue } = useIssue();
+  const {state} = useContext(AppStateContext);
+
   const { getUserRepositories } = useOctokit();
 
   const { id } = router.query;
 
-  const proposalsCount = networkIssue?.proposals?.length || 0;
-  const pullRequestsCount = networkIssue?.pullRequests?.length || 0;
+  const proposalsCount = state.currentBounty?.chainData?.proposals?.length || 0;
+  const pullRequestsCount = state.currentBounty?.chainData?.pullRequests?.length || 0;
 
   const tabs: TabbedNavigationItem[] = [
     {
@@ -65,37 +61,37 @@ export default function PageIssue() {
   }
 
   useEffect(() => {
-    if (activeIssue?.comments) setCommentsIssue([...activeIssue.comments]);
-  }, [ activeIssue, activeRepo ]);
+    if (state.currentBounty?.comments) setCommentsIssue([...state.currentBounty?.comments]);
+  }, [ state.currentBounty?.data, state.Service?.network?.repos?.active ]);
 
   useEffect(() => {
-    if (!user?.login || !activeRepo) return;
+    if (!state.currentUser?.login || !state.Service?.network?.repos?.active) return;
 
-    getUserRepositories(user?.login)
+    getUserRepositories(state.currentUser?.login)
       .then((repos) => {
         const isForked = 
-          !!repos.find(repo => (repo.isFork && repo.nameWithOwner === `${user.login}/${activeRepo.name}`) 
-                                || repo.nameWithOwner === activeRepo.githubPath);
+          !!repos.find(repo => (repo.isFork && repo.nameWithOwner === `${state.currentUser.login}/${state.Service?.network?.repos?.active.name}`)
+                                || repo.nameWithOwner === state.Service?.network?.repos?.active.githubPath);
 
         setIsRepoForked(isForked);
       })
       .catch((e) => {
         console.log("Failed to get users repositories: ", e);
       });
-  }, [ user?.login, wallet?.address, id, activeIssue, activeRepo ]);
+  }, [ state.currentUser?.login, state.currentUser?.walletAddress, id, state.currentBounty?.data, state.Service?.network?.repos?.active ]);
 
   return (
     <>
       <BountyHero />
 
-      { networkIssue?.isFundingRequest && <FundingSection /> }
+      { state.currentBounty?.chainData?.isFundingRequest && <FundingSection /> }
 
       <PageActions
         isRepoForked={isRepoForked}
         addNewComment={addNewComment}
       />
 
-      {((!!proposalsCount || !!pullRequestsCount) && wallet?.address ) &&
+      {((!!proposalsCount || !!pullRequestsCount) && state.currentUser?.walletAddress ) &&
           <CustomContainer className="mb-4">
             <TabbedNavigation
               className="issue-tabs"
@@ -105,12 +101,12 @@ export default function PageIssue() {
           </CustomContainer>
       }
 
-      { wallet?.address ? (
+      { state.currentUser?.walletAddress ? (
         <div className="container mb-1">
           <div className="d-flex bd-highlight justify-content-center mx-2 px-4">
             <div className="ps-3 pe-0 ms-0 me-2 w-65 bd-highlight">
               <div className="container">
-                <IssueDescription description={activeIssue?.body || ""} />
+                <IssueDescription description={state.currentBounty?.data?.body || ""} />
               </div>
             </div>
             <div className="p-0 me-3 flex-shrink-0 w-25 bd-highlight">
@@ -122,13 +118,13 @@ export default function PageIssue() {
         </div>
       ) : (
         <CustomContainer>
-          <IssueDescription description={activeIssue?.body || ""} />
+          <IssueDescription description={state.currentBounty?.data?.body || ""} />
         </CustomContainer>
       )}
 
       <IssueComments
         comments={commentsIssue}
-        repo={activeIssue?.repository?.githubPath}
+        repo={state.currentBounty?.data?.repository?.githubPath}
         issueId={id}
       />
     </>

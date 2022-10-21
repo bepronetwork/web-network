@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import {useContext, useRef, useState} from "react";
 
 import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
@@ -10,11 +10,12 @@ import InputNumber from "components/input-number";
 import Modal from "components/modal";
 import NetworkTxButton from "components/network-tx-button";
 
-import { useAuthentication } from "contexts/authentication";
+import { useAuthentication } from "x-hooks/use-authentication";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 
 import { TransactionTypes } from "interfaces/enums/transaction-types";
+import {AppStateContext} from "../contexts/app-state";
 
 export default function UnlockBeproModal({
   show = false,
@@ -28,9 +29,12 @@ export default function UnlockBeproModal({
 
   const networkTxRef = useRef<HTMLButtonElement>(null);
 
-  const { wallet, updateWalletBalance } = useAuthentication();
+  const {state} = useContext(AppStateContext);
 
-  const oraclesAvailable = wallet?.balance?.oracles?.locked;
+
+  const { updateWalletBalance } = useAuthentication();
+
+  const oraclesAvailable = state.currentUser?.balance?.oracles?.locked;
   const amountExceedsAvailable = amountToUnlock?.gt(oraclesAvailable);
   const textOracleClass = amountExceedsAvailable ? "text-danger" : "text-purple";
   const textBeproClass = amountExceedsAvailable ? "text-danger" : "text-success";
@@ -55,7 +59,7 @@ export default function UnlockBeproModal({
   }
 
   function setToMax() {
-    setAmountToUnlock(wallet?.balance?.oracles?.locked);
+    setAmountToUnlock(state.currentUser?.balance?.oracles?.locked);
   }
 
   function handleChange({ value }) {
@@ -143,7 +147,7 @@ export default function UnlockBeproModal({
 
           <div className="d-flex align-items-center">
             <span className="text-gray">
-              {formatStringToCurrency(wallet?.balance?.bepro?.toFixed())}
+              {formatStringToCurrency(state.currentUser?.balance?.bepro?.toFixed())}
             </span>
 
             {amountToUnlock?.gt(0) && (
@@ -155,7 +159,7 @@ export default function UnlockBeproModal({
                 </span>
 
                 <span className={`${textBeproClass} ml-1`}>
-                  {formatStringToCurrency(wallet?.balance?.bepro?.plus(amountToUnlock)?.toFixed())}
+                  {formatStringToCurrency(state.currentUser?.balance?.bepro?.plus(amountToUnlock)?.toFixed())}
                 </span>
               </>
             )}
@@ -187,7 +191,7 @@ export default function UnlockBeproModal({
         txCurrency={t("$oracles",  { token: networkTokenSymbol })}
         txParams={{
           tokenAmount: amountToUnlock?.toFixed(),
-          from: wallet?.address
+          from: state.currentUser?.walletAddress
         }}
         buttonLabel=""
         modalTitle={t("my-oracles:actions.unlock.title")}

@@ -1,11 +1,10 @@
 import NetworkLogo from "components/network-logo";
 import PullRequestLabels from "components/pull-request-labels";
-
-import { useSettings } from "contexts/settings";
-
 import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { Network } from "interfaces/network";
+import {useContext} from "react";
+import {AppStateContext} from "../contexts/app-state";
 interface NetworkListItemProps {
   network: Network;
   tokenSymbolDefault: string;
@@ -17,7 +16,7 @@ export default function NetworkListItem({
   tokenSymbolDefault,
   handleRedirect
 }: NetworkListItemProps) {
-  const { settings } = useSettings();
+  const {state: {Settings: settings}} = useContext(AppStateContext);
 
   const Spinner = () => <span className="spinner-border spinner-border-xs ml-1" />;
   const isNotUndefined = value => value !== undefined;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useContext, useEffect, useState} from "react";
 
 import BigNumber from "bignumber.js";
 import { GetServerSideProps } from "next";
@@ -8,13 +8,10 @@ import { Octokit } from "octokit";
 
 import ConnectWalletButton from "components/connect-wallet-button";
 
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { useSettings } from "contexts/settings";
-
 import { User } from "interfaces/api";
 
 import useApi from "x-hooks/use-api";
+import {AppStateContext} from "../../contexts/app-state";
 
 interface PropsUserList extends Partial<User> {
    created_at: string; 
@@ -24,14 +21,11 @@ interface PropsUserList extends Partial<User> {
 }
 
 export default function FalconPunchPage() {
-  const [userList, setUserList] = useState<
-  PropsUserList[]
-  >([]);
+  const [userList, setUserList] = useState<PropsUserList[]>([]);
+
+  const {state} = useContext(AppStateContext);
 
   const { getAllUsers } = useApi();
-  const { settings } = useSettings();
-  const { service: DAOService } = useDAO();
-  const { wallet, user } = useAuthentication();
 
   function toDays(date = "") {
     return +new Date(date) / (24 * 60 * 60 * 1000);
@@ -39,9 +33,9 @@ export default function FalconPunchPage() {
 
   function listAllUsers() {
     async function getGithubInfo(ghlogin: string) {
-      if (!user) return;
+      if (!state.currentUser) return;
 
-      const octokit = new Octokit({ auth: user.accessToken });
+      const octokit = new Octokit({ auth: state.currentUser.accessToken });
 
       return octokit.rest.users
         .getByUsername({ username: ghlogin })
@@ -50,11 +44,11 @@ export default function FalconPunchPage() {
     }
 
     async function hasEthBalance(address: string) {
-      if (!DAOService) return 0;
+      if (!state.Service?.active) return 0;
 
-      return DAOService.connect()
+      return state.Service?.active.connect()
         .then(connected => {
-          if (connected) return DAOService.getBalance("eth", address);
+          if (connected) return state.Service?.active.getBalance("eth", address);
 
           return BigNumber(0);
         })
@@ -107,11 +101,11 @@ export default function FalconPunchPage() {
   }
 
   useEffect(() => {
-    if (!wallet?.address) return;
+    if (!state.currentUser?.walletAddress) return;
 
-    if (wallet.address !== settings?.defaultNetworkConfig?.adminWallet)
+    if (state.currentUser.walletAddress !== state.Settings?.defaultNetworkConfig?.adminWallet)
       router.push("/");
-  }, [wallet?.address]);
+  }, [state.currentUser?.walletAddress]);
 
   return (
     <>
@@ -126,7 +120,7 @@ export default function FalconPunchPage() {
             <div className="col">
               <label className="p-small mb-2">Github Token</label>
               <input
-                value={user?.accessToken}
+                value={state.currentUser?.accessToken}
                 type="text"
                 className="form-control"
                 placeholder={"Github token"}
@@ -136,7 +130,7 @@ export default function FalconPunchPage() {
           </div>
           <div className="row mb-3">
             <div className="col d-flex justify-content-end">
-              {(wallet?.address && (
+              {(state.currentUser?.walletAddress && (
                 <button
                   className="btn btn-md btn-primary"
                   onClick={listAllUsers}

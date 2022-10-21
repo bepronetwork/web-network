@@ -5,18 +5,19 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import ListIssues from "components/list-issues";
 import ProfileLayout from "components/profile/profile-layout";
 
-import { useAuthentication } from "contexts/authentication";
+import {useContext} from "react";
+import {AppStateContext} from "../../../contexts/app-state";
 
 export default function Bounties() {
   const { t } = useTranslation("bounty");
 
-  const { user } = useAuthentication();
+  const {state} = useContext(AppStateContext);
 
   return(
     <ProfileLayout>
       <span className="family-Regular h4 text-white text-capitalize">{t("label_other")}</span>
 
-      <ListIssues creator={user?.login || "not-connected"} />
+      <ListIssues creator={state.currentUser?.login || "not-connected"} />
     </ProfileLayout>
   );
 }

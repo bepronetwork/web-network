@@ -1,4 +1,4 @@
-import { ChangeEvent, SetStateAction, useEffect, useState } from "react";
+import {ChangeEvent, SetStateAction, useContext, useEffect, useState} from "react";
 
 import { format, subDays } from "date-fns";
 import { GetServerSideProps } from "next";
@@ -13,9 +13,6 @@ import ProfileLayout from "components/profile/profile-layout";
 import { FlexColumn, FlexRow } from "components/profile/wallet-balance";
 import ReactSelect from "components/react-select";
 
-import { useAuthentication } from "contexts/authentication";
-import { useNetwork } from "contexts/network";
-
 import { formatNumberToCurrency } from "helpers/formatNumber";
 
 import { Payment } from "interfaces/payments";
@@ -23,6 +20,7 @@ import { Payment } from "interfaces/payments";
 import { getCoinInfoByContract } from "services/coingecko";
 
 import useApi from "x-hooks/use-api";
+import {AppStateContext} from "../../../contexts/app-state";
 
 export default function Payments() {
   const { t } = useTranslation(["common", "profile"]);
@@ -46,9 +44,10 @@ export default function Payments() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [hasNoConvertedToken, setHasNoConvertedToken] = useState(false);
 
+  const {state} = useContext(AppStateContext);
+
   const { getPayments } = useApi();
-  const { wallet } = useAuthentication();
-  const { activeNetwork } = useNetwork();
+
 
   const [option, setOption] = useState<{ value: string; label: string }>(defaultOptions[0]);
   const [startDate, setStartDate] = useState<string>(format(subDays(new Date(), 7), "yyyy-MM-dd").toString());
@@ -73,10 +72,10 @@ export default function Payments() {
   }
 
   useEffect(() => {
-    if (!wallet?.address || !activeNetwork?.name) return;
+    if (!state.currentUser?.walletAddress || !state.Service?.network?.active?.name) return;
 
-    getPayments(wallet.address, activeNetwork.name, startDate, endDate).then(setPayments);
-  }, [wallet?.address, activeNetwork?.name, startDate, endDate]);
+    getPayments(state.currentUser.walletAddress, state.Service?.network?.active.name, startDate, endDate).then(setPayments);
+  }, [state.currentUser?.walletAddress, state.Service?.network?.active?.name, startDate, endDate]);
 
   useEffect(() => {
     if (!payments?.length) return;
@@ -146,7 +145,7 @@ export default function Payments() {
               />
             </FlexRow>
           </FlexColumn>
-          
+
           <label className="text-uppercase caption-small">
             {t("profile:payments.period")}
           </label>

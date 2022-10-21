@@ -22,7 +22,6 @@ import TransactionStats from "components/transaction-stats";
 import TransactionType from "components/transaction-type";
 
 import { AppStateContext } from "contexts/app-state";
-import { useAuthentication } from "contexts/authentication";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 
@@ -35,9 +34,8 @@ interface TransactionListProps {
 }
 
 export default function TransactionsList({onActiveTransactionChange}: TransactionListProps) {
-  const {dispatch, state: { transactions }} = useContext(AppStateContext);
+  const {dispatch, state: { transactions, currentUser }} = useContext(AppStateContext);
   const { t } = useTranslation("common");
-  const { wallet } = useAuthentication();
 
   const IconMaps = {
     [TransactionTypes.openIssue]: <InformationChatBubble />,
@@ -97,7 +95,7 @@ export default function TransactionsList({onActiveTransactionChange}: Transactio
   }
 
   function clearTransactionsList() {
-    localStorage.setItem(`bepro.transactions:${wallet?.address?.toLowerCase()}`, "[]");
+    localStorage.setItem(`bepro.transactions:${currentUser?.walletAddress?.toLowerCase()}`, "[]");
 
     dispatch(updateTx([]));
   }

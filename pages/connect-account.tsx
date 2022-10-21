@@ -14,7 +14,7 @@ import { ConnectionButton } from "components/profile/connect-button";
 import { FlexRow } from "components/profile/wallet-balance";
 
 import { AppStateContext } from "contexts/app-state";
-import { useAuthentication } from "contexts/authentication";
+import { useAuthentication } from "x-hooks/use-authentication";
 import { useNetwork } from "contexts/network";
 import { toastError, toastSuccess } from "contexts/reducers/change-toaster";
 import { changeLoadState } from "contexts/reducers/change-load";
@@ -30,23 +30,15 @@ export default function ConnectAccount() {
 
   const { joinAddressToUser } = useApi();
   const { lastNetworkVisited } = useNetwork();
-  const { dispatch } = useContext(AppStateContext);
-  const { 
-    wallet, 
-    isGithubAndWalletMatched,
-    isConnecting,
-    connectWallet, 
-    connectGithub, 
-    disconnectGithub,
-    validateWalletAndGithub 
-  } = useAuthentication();
+  const { state, dispatch } = useContext(AppStateContext);
+  const {connectWallet, connectGithub, disconnectGithub, validateGhAndWallet} = useAuthentication();
 
   const { user: sessionUser } = (sessionData || {}) as CustomSession;
 
   const isButtonDisabled = [
-    isGithubAndWalletMatched !== undefined,
+    state.currentUser?.match !== undefined,
     !sessionUser?.login,
-    !wallet?.address
+    !state.currentUser?.walletAddress
   ].some(condition => condition);
 
   const connectButtonState = {
@@ -65,24 +57,24 @@ export default function ConnectAccount() {
 
   function redirectToProfile() {
     const previusRouter = sessionStorage.getItem("lastUrlBeforeGithubConnect")
-    
+
     if(previusRouter)
       return router.push(previusRouter);
-    
+
     const redirectTo = lastNetworkVisited ? `${lastNetworkVisited}/profile` : "/networks";
 
     router.push(redirectTo);
   }
 
   function handleCancel() {
-    if (!isGithubAndWalletMatched)
+    if (!state.currentUser?.match)
       disconnectGithub();
 
     const previusRouter = sessionStorage.getItem("lastUrlBeforeGithubConnect")
-    
+
     if(previusRouter)
       return router.push(previusRouter)
-      
+
     router.back();
   }
 
@@ -91,11 +83,11 @@ export default function ConnectAccount() {
 
     joinAddressToUser({
       githubLogin: sessionUser?.login?.toString(),
-      wallet: wallet?.address.toLowerCase()
+      wallet: state.currentUser?.walletAddress.toLowerCase()
     }).then(() => {
       dispatch(toastSuccess(t("connect-account:connected-accounts")));
 
-      return validateWalletAndGithub(wallet?.address.toLowerCase(), sessionUser?.login?.toString());
+      return validateGhAndWallet();
     })
     .then(() => redirectToProfile())
     .catch(error => {
@@ -134,7 +126,7 @@ export default function ConnectAccount() {
                   <ConnectionButton
                     type="github"
                     variant="connect-account"
-                    state={connectButtonState[String(isGithubAndWalletMatched)]}
+                    state={connectButtonState[String(state.currentUser?.match)]}
                     credential={sessionUser?.login} 
                     connect={connectGithub}
                     isLoading={isConnecting}
@@ -146,21 +138,21 @@ export default function ConnectAccount() {
                   <ConnectionButton
                     type="wallet"
                     variant="connect-account"
-                    state={connectButtonState[String(isGithubAndWalletMatched)]}
-                    credential={wallet?.address} 
+                    state={connectButtonState[String(state.currentUser?.match)]}
+                    credential={state.currentUser?.walletAddress}
                     connect={connectWallet}
                   />
                 </div>
               </div>
 
-              { isGithubAndWalletMatched &&
+              { state.currentUser?.match &&
                 <Message 
                   text={t("connect-account:warnings.already-connected")}
                   type="success"
                 />
               }
 
-              { isGithubAndWalletMatched === false &&
+              { state.currentUser?.match === false &&
                 <Message 
                   text={t("connect-account:warnings.already-in-use")}
                   type="danger"

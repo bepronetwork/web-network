@@ -16,25 +16,27 @@ import TokenBalance from "components/profile/token-balance";
 import { FlexRow } from "components/profile/wallet-balance";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
-import { useAuthentication } from "contexts/authentication";
-import { useNetwork } from "contexts/network";
+import { useAuthentication } from "x-hooks/use-authentication";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
+import {useContext} from "react";
+import {AppStateContext} from "../../../contexts/app-state";
 
 export default function BeproVotes() {
   const { t } = useTranslation(["common", "profile"]);
 
-  const { activeNetwork } = useNetwork();
-  const { wallet, updateWalletBalance } = useAuthentication();
+  const {state} = useContext(AppStateContext);
+
+  const { updateWalletBalance } = useAuthentication();
 
   const oracleToken = {
-    symbol: t("$oracles",   { token: activeNetwork?.networkToken?.symbol }),
+    symbol: t("$oracles",   { token: state.Service?.network?.active?.networkToken?.symbol }),
     name: t("profile:oracle-name-placeholder"),
     icon: <OracleIcon />
   };
 
-  const oraclesLocked = wallet?.balance?.oracles?.locked || BigNumber("0");
-  const oraclesDelegatedToMe = wallet?.balance?.oracles?.delegatedByOthers || BigNumber("0");
+  const oraclesLocked = state.currentUser?.balance?.oracles?.locked || BigNumber("0");
+  const oraclesDelegatedToMe = state.currentUser?.balance?.oracles?.delegatedByOthers || BigNumber("0");
 
   return(
     
@@ -43,7 +45,7 @@ export default function BeproVotes() {
       <Col xs={10}>
         <FlexRow className="mb-3 justify-content-between align-items-center">
           <span className="h4 family-Regular text-white font-weight-medium">
-            {t("$oracles",   { token: activeNetwork?.networkToken?.symbol })}
+            {t("$oracles",   { token: state.Service?.network?.active?.networkToken?.symbol })}
           </span>
 
           <FlexRow className="align-items-center">
@@ -55,7 +57,7 @@ export default function BeproVotes() {
 
               <InfoTooltip
                 description={t("profile:tips.total-oracles", {
-                  tokenName: activeNetwork?.networkToken?.name || oracleToken.name
+                  tokenName: state.Service?.network?.active?.networkToken?.name || oracleToken.name
                 })}
                 secondaryIcon
               />
@@ -66,16 +68,25 @@ export default function BeproVotes() {
         <TokenBalance
           icon={oracleToken.icon} 
           symbol={oracleToken.symbol}
-          name={`${t("misc.locked")} ${activeNetwork?.networkToken?.name || oracleToken.name}`}
+          name={`${t("misc.locked")} ${state.Service?.network?.active?.networkToken?.name || oracleToken.name}`}
           overSymbol={t("bepro-votes")}
           balance={oraclesLocked}
           type="oracle"
         />
 
         <Row className="mt-4 mb-4">
-          <OraclesActions wallet={wallet} updateWalletBalance={updateWalletBalance} />
+          <OraclesActions wallet={{
+            address: state.currentUser?.walletAddress,
+            balance: state.currentUser?.balance,
+            isCouncil: state.Service?.network?.active?.isCouncil,
+            isNetworkGovernor: state.Service?.network?.active?.isGovernor}}
+                          updateWalletBalance={() => updateWalletBalance(true) } />
 
-          <OraclesDelegate wallet={wallet} />
+          <OraclesDelegate wallet={{
+            address: state.currentUser?.walletAddress,
+            balance: state.currentUser?.balance,
+            isCouncil: state.Service?.network?.active?.isCouncil,
+            isNetworkGovernor: state.Service?.network?.active?.isGovernor}} />
         </Row>
 
         <Row>

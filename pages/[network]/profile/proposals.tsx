@@ -1,19 +1,18 @@
-import { GetServerSideProps } from "next";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-
 import ListIssues from "components/list-issues";
 import ProfileLayout from "components/profile/profile-layout";
 
-import { useAuthentication } from "contexts/authentication";
-
-import useNetworkTheme from "x-hooks/use-network-theme";
+import { GetServerSideProps } from "next";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import {useContext} from "react";
+import {AppStateContext} from "../../../contexts/app-state";
+import {useNetwork} from "../../../x-hooks/use-network";
 
 export default function Proposals() {
   const { t } = useTranslation(["proposal", "bounty"]);
 
-  const { wallet } = useAuthentication();
-  const { getURLWithNetwork } = useNetworkTheme();
+  const {state} = useContext(AppStateContext);
+  const { getURLWithNetwork } = useNetwork();
 
   return(
     <ProfileLayout>
@@ -22,7 +21,7 @@ export default function Proposals() {
       <ListIssues
         redirect={getURLWithNetwork("/oracle")}
         buttonMessage={t('bounty:label_other')}
-        proposer={wallet?.address || "not-connected"} 
+        proposer={state.currentUser?.walletAddress || "not-connected"}
         emptyMessage={t('errors.you-dont-have-proposals')}
       />
     </ProfileLayout>

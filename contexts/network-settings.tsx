@@ -4,10 +4,6 @@ import { Defaults } from "@taikai/dappkit";
 import BigNumber from "bignumber.js";
 import { useRouter } from "next/router";
 
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { useNetwork } from "contexts/network";
-
 import { isSameSet } from "helpers/array";
 import { isColorsSimilar } from "helpers/colors";
 import { 

@@ -15,15 +15,14 @@ import TransactionStats from "components/transaction-stats";
 
 import { AppStateContext } from "contexts/app-state";
 import { toastInfo } from "contexts/reducers/change-toaster";
-import { useSettings } from "contexts/settings";
 
 import { CopyValue } from "helpers/copy-value";
 import { formatStringToCurrency } from "helpers/formatNumber";
 import { truncateAddress } from "helpers/truncate-address";
 
 import { BlockTransaction, Transaction } from "interfaces/transaction";
+import {useNetwork} from "../x-hooks/use-network";
 
-import useNetworkTheme from "x-hooks/use-network-theme";
 
 export default function TransactionModal({
   transaction = null,
@@ -38,10 +37,9 @@ export default function TransactionModal({
   const [addressTo, setAddressTo] = useState("...");
   const [addressFrom, setAddressFrom] = useState("...");
 
-  const { dispatch } = useContext(AppStateContext);
+  const { state, dispatch } = useContext(AppStateContext);
 
-  const { settings } = useSettings();
-  const { getURLWithNetwork } = useNetworkTheme();
+  const { getURLWithNetwork } = useNetwork();
 
   function updateAddresses() {
     if (!transaction) return;
@@ -101,7 +99,7 @@ export default function TransactionModal({
   }
 
   function getEtherScanHref(tx: string) {
-    return `${settings?.urls?.blockScan}/${tx}`;
+    return `${state.Settings?.urls?.blockScan}/${tx}`;
   }
 
   return (
@@ -155,7 +153,7 @@ export default function TransactionModal({
           <span className="text-ligth-gray">{t("misc.on")}</span>
           <InternalLink
             className={`${
-              transaction?.network?.name === settings?.defaultNetworkConfig?.name
+              transaction?.network?.name === state.Settings?.defaultNetworkConfig?.name
                 ? " text-primary "
                 : ""
             } p-0 ml-1`}

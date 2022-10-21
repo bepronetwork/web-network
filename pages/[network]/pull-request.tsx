@@ -17,19 +17,20 @@ import PullRequestHero from "components/pull-request-hero";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 
 import { AppStateContext } from "contexts/app-state";
-import { useAuthentication } from "contexts/authentication";
-import { useIssue } from "contexts/issue";
-import { useNetwork } from "contexts/network";
+
 import { addToast } from "contexts/reducers/change-toaster";
 import { changeLoadState } from "contexts/reducers/change-load";
-import { useRepos } from "contexts/repos";
+
 
 import { MetamaskErrors } from "interfaces/enums/Errors";
 import { pullRequest } from "interfaces/issue-data";
 
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
-import useNetworkTheme from "x-hooks/use-network-theme";
+
+import {useNetwork} from "../../x-hooks/use-network";
+import {useBounty} from "../../x-hooks/use-bounty";
+import {changeCurrentBountyComments} from "../../contexts/reducers/change-current-bounty";
 
 export default function PullRequestPage() {
   const router = useRouter();
@@ -43,37 +44,34 @@ export default function PullRequestPage() {
   const [pullRequest, setPullRequest] = useState<pullRequest>();
   const [networkPullRequest, setNetworkPullRequest] = useState<PullRequest>();
 
-  const { dispatch } = useContext(AppStateContext);
-  
-  const { activeRepo } = useRepos();
-  const { activeNetwork } = useNetwork();
-  const { wallet, user } = useAuthentication();
-  const { getURLWithNetwork } = useNetworkTheme();
+  const { state, dispatch } = useContext(AppStateContext);
+
+  const { getURLWithNetwork } = useNetwork();
   const { createReviewForPR, processEvent } = useApi();
   const { handleMakePullRequestReady, handleCancelPullRequest } = useBepro();
-  const { activeIssue, networkIssue, addNewComment, updateIssue } = useIssue();
-  
+  const { getDatabaseBounty } = useBounty();
+
   const { prId, review } = router.query;
 
-  const isWalletConnected = !!wallet?.address;
+  const isWalletConnected = !!state.currentUser?.walletAddress;
   const isPullRequestOpen = pullRequest?.state?.toLowerCase() === "open";
   const isPullRequestReady = !!networkPullRequest?.ready;
   const isPullRequestCanceled = !!networkPullRequest?.canceled;
   const isPullRequestCancelable = !!networkPullRequest?.isCancelable;
-  const isPullRequestCreator = networkPullRequest?.creator?.toLowerCase() === wallet?.address?.toLowerCase();
+  const isPullRequestCreator = networkPullRequest?.creator?.toLowerCase() === state.currentUser?.walletAddress?.toLowerCase();
 
   function handleCreateReview(body) {
-    if (!user?.login) return;
+    if (!state.currentUser?.login) return;
 
     setIsCreatingReview(true);
 
     createReviewForPR({
-      issueId: String(activeIssue?.issueId),
+      issueId: String(state.currentBounty?.data?.issueId),
       pullRequestId: String(prId),
-      githubLogin: user?.login,
+      githubLogin: state.currentUser?.login,
       body,
-      networkName: activeNetwork?.name,
-      wallet: wallet.address
+      networkName: state.Service?.network?.active?.name,
+      wallet: state.currentUser.walletAddress
     })
       .then((response) => {
         dispatch(addToast({
@@ -86,8 +84,8 @@ export default function PullRequestPage() {
           ...pullRequest,
           comments: [...pullRequest.comments, response.data],
         });
-        
-        addNewComment(pullRequest?.id, response.data);
+
+        dispatch(changeCurrentBountyComments([...state.currentBounty?.comments, response.data]))
 
         setShowModal(false);
       })
@@ -104,17 +102,17 @@ export default function PullRequestPage() {
   }
 
   function handleMakeReady() {
-    if (!activeIssue || !pullRequest) return;
+    if (!state.currentBounty?.data || !pullRequest) return;
     
     setIsMakingReady(true);
 
-    handleMakePullRequestReady(activeIssue.contractId, pullRequest.contractId)
+    handleMakePullRequestReady(state.currentBounty?.data.contractId, pullRequest.contractId)
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
-      return processEvent("pull-request", "ready", activeNetwork?.name, { fromBlock });
+      return processEvent("pull-request", "ready", state.Service?.network?.active?.name, { fromBlock });
     })
     .then(() => {
-      return updateIssue(activeIssue.repository_id, activeIssue.githubId);
+      return getDatabaseBounty(true);
     })
     .then(() => {
       setIsMakingReady(false);
@@ -140,13 +138,13 @@ export default function PullRequestPage() {
   function handleCancel() {
     setIsCancelling(true);
 
-    handleCancelPullRequest(activeIssue?.contractId, pullRequest?.contractId)
+    handleCancelPullRequest(state.currentBounty?.data?.contractId, pullRequest?.contractId)
     .then(txInfo => {
       const { blockNumber: fromBlock } = txInfo as { blockNumber: number };
-      return processEvent("pull-request", "canceled", activeNetwork?.name, { fromBlock });
+      return processEvent("pull-request", "canceled", state.Service?.network?.active?.name, { fromBlock });
     })
     .then(() => {
-      updateIssue(activeIssue.repository_id, activeIssue.githubId);
+      getDatabaseBounty(true);
       
       dispatch(addToast({
         type: "success",
@@ -155,8 +153,8 @@ export default function PullRequestPage() {
       }));
 
       router.push(getURLWithNetwork('/bounty', {
-        id: activeIssue.githubId,
-        repoId: activeIssue.repository_id
+        id: state.currentBounty?.data.githubId,
+        repoId: state.currentBounty?.data.repository_id
       }));
     })
     .catch(error => {
@@ -181,22 +179,22 @@ export default function PullRequestPage() {
   }
 
   useEffect(() => {
-    if (!activeIssue || !networkIssue || !prId) return;
+    if (!state.currentBounty?.data || !state.currentBounty?.chainData || !prId) return;
 
     dispatch(changeLoadState(true));
 
-    const currentPR = activeIssue.pullRequests.find((pr) => +pr.githubId === +prId);
-    const currentNetworkPR = networkIssue?.pullRequests?.find(pr => +pr.id === +currentPR?.contractId);
+    const currentPR = state.currentBounty?.data.pullRequests.find((pr) => +pr.githubId === +prId);
+    const currentNetworkPR = state.currentBounty?.chainData?.pullRequests?.find(pr => +pr.id === +currentPR?.contractId);
 
     setPullRequest(currentPR);
     setNetworkPullRequest(currentNetworkPR);
 
     dispatch(changeLoadState(false));
-  }, [activeIssue, networkIssue, prId]);
+  }, [state.currentBounty?.data, state.currentBounty?.chainData, prId]);
 
   useEffect(() => {
-    if (review && pullRequest && user?.login) setShowModal(true);
-  }, [review, pullRequest, user]);
+    if (review && pullRequest && state.currentUser?.login) setShowModal(true);
+  }, [review, pullRequest, state.currentUser]);
 
   return (
     <>
@@ -271,8 +269,8 @@ export default function PullRequestPage() {
                 }
 
                 <GithubLink
-                  repoId={String(activeRepo?.id)}
-                  forcePath={activeRepo?.githubPath}
+                  repoId={String(state.Service?.network?.repos?.active?.id)}
+                  forcePath={state.Service?.network?.repos?.active?.githubPath}
                   hrefPath={`pull/${pullRequest?.githubId || ""}`}
                 >
                   {t("actions.view-on-github")}

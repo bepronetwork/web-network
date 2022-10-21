@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useContext, useState} from "react";
 
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
@@ -11,19 +11,22 @@ import { ConnectionButton } from "components/profile/connect-button";
 import ProfileLayout from "components/profile/profile-layout";
 import { RemoveGithubAccount } from "components/profile/remove-github-modal";
 
-import { useAuthentication } from "contexts/authentication";
+import { useAuthentication } from "x-hooks/use-authentication";
 
 import { truncateAddress } from "helpers/truncate-address";
+import {AppStateContext} from "../../../contexts/app-state";
 
 export default function Profile() {
   const { t } = useTranslation("profile");
 
   const [showRemoveModal, setShowRemoveModal] = useState(false);
 
-  const { wallet, user, connectWallet, connectGithub, disconnectGithub } = useAuthentication();
+  const {state} = useContext(AppStateContext);
 
-  const isConnected = !!user?.login && !!wallet?.address;
-  const addressOrUsername = user?.login ? user.login : truncateAddress(wallet?.address);
+  const { connectWallet, connectGithub, disconnectGithub } = useAuthentication();
+
+  const isConnected = !!state.currentUser?.login && !!state.currentUser?.walletAddress;
+  const addressOrUsername = state.currentUser?.login ? state.currentUser.login : truncateAddress(state.currentUser?.walletAddress);
 
   const handleClickDisconnect = () => setShowRemoveModal(true);
   const hideRemoveModal = () => setShowRemoveModal(false);
@@ -32,12 +35,12 @@ export default function Profile() {
     <ProfileLayout>
       <div className="row mb-5">
         <div className="col">
-          <AvatarOrIdenticon user={user?.login} address={wallet?.address} size="lg" withBorder />
+          <AvatarOrIdenticon user={state.currentUser?.login} address={state.currentUser?.walletAddress} size="lg" withBorder />
           
           <div className="d-flex flex-row mt-3 align-items-center">
             <h4 className="text-gray text-uppercase mr-2">{addressOrUsername}</h4>
             
-            { wallet?.isCouncil && 
+            { state.Service?.network?.active?.isCouncil &&
               <Badge 
                 label={t("council")} 
                 color="purple-30" 
@@ -56,7 +59,7 @@ export default function Profile() {
         <div className="col-4">
           <ConnectionButton
             type="github" 
-            credential={user?.login} 
+            credential={state.currentUser?.login}
             connect={connectGithub}
           />
 
@@ -70,7 +73,7 @@ export default function Profile() {
         <div className="col-4">
           <ConnectionButton 
             type="wallet" 
-            credential={wallet?.address} 
+            credential={state.currentUser?.walletAddress}
             connect={connectWallet} 
           />
         </div>
@@ -78,8 +81,8 @@ export default function Profile() {
 
       <RemoveGithubAccount
         show={showRemoveModal}
-        githubLogin={user?.login}
-        walletAddress={wallet?.address}
+        githubLogin={state.currentUser?.login}
+        walletAddress={state.currentUser?.walletAddress}
         onCloseClick={hideRemoveModal}
         disconnectGithub={disconnectGithub}
       />

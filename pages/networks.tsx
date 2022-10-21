@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import {createContext, useContext, useEffect, useState} from "react";
 
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
@@ -8,7 +8,7 @@ import NetworksList from "components/networks-list";
 import NotListedTokens from "components/not-listed-tokens";
 import PageHero, { InfosHero } from "components/page-hero";
 
-import { useDAO } from "contexts/dao";
+import {AppStateContext} from "../contexts/app-state";
 
 interface NetworkTokenLocked {
   name: string;
@@ -44,8 +44,8 @@ export const NetworksPageContext = createContext<NetworksPageProps>({
 export default function NetworksPage() {
   const { t } = useTranslation(["common", "custom-network"]);
 
-  const { service: DAOService } = useDAO();
-  
+  const {state} = useContext(AppStateContext);
+
   const [totalConverted, setTotalConverted] = useState(0);
   const [numberOfNetworks, setNumberOfNetworks] = useState(0);
   const [numberOfBounties, setNumberOfBounties] = useState(0);
@@ -69,8 +69,8 @@ export default function NetworksPage() {
   ]);
 
   useEffect(() => {
-    if (DAOService) DAOService.loadRegistry();
-  }, [DAOService]);
+    if (state.Service?.active) state.Service?.active.loadRegistry();
+  }, [state.Service?.active]);
 
   useEffect(() => {    
     setInfos([
