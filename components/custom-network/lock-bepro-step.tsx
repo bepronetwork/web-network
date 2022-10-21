@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useContext, useEffect, useState} from "react";
 import { ProgressBar } from "react-bootstrap";
 
 import BigNumber from "bignumber.js";
@@ -13,14 +13,12 @@ import InputNumber from "components/input-number";
 import Step from "components/step";
 import UnlockBeproModal from "components/unlock-bepro-modal";
 
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
+import { useAuthentication } from "x-hooks/use-authentication";
 import { useNetworkSettings } from "contexts/network-settings";
-import { useSettings } from "contexts/settings";
-
 import { formatNumberToCurrency, formatNumberToNScale } from "helpers/formatNumber";
 
 import { StepWrapperProps } from "interfaces/stepper";
+import {AppStateContext} from "../../contexts/app-state";
 
 export default function LockBeproStep({ activeStep, index, handleClick, validated }: StepWrapperProps) {
   const { t } = useTranslation(["common", "bounty","custom-network"]);
@@ -33,17 +31,17 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const [showUnlockBepro, setShowUnlockBepro] = useState(false);
   const [settlerAllowance, setSettlerAllowance] = useState<BigNumber>();
 
-  const { settings } = useSettings();
-  const { service: DAOService } = useDAO();
+  const {state} = useContext(AppStateContext);
+
   const { tokensLocked, updateTokenBalance } = useNetworkSettings();
-  const { user, wallet, updateWalletBalance } = useAuthentication();
-  
-  const networkTokenSymbol = settings?.beproToken?.symbol || t("misc.$token");
+  const {updateWalletBalance} = useAuthentication()
+
+  const networkTokenSymbol = state.Settings?.beproToken?.symbol || t("misc.$token");
 
   const balance = {
-    beproAvailable: wallet?.balance?.bepro,
-    oraclesAvailable: wallet?.balance?.oracles?.locked?.minus(wallet?.balance?.oracles?.delegatedToOthers),
-    tokensLocked: wallet?.balance?.oracles?.locked?.toFixed(),
+    beproAvailable: state.currentUser?.balance?.bepro,
+    oraclesAvailable: state.currentUser?.balance?.oracles?.locked?.minus(state.currentUser?.balance?.oracles?.delegatedToOthers),
+    tokensLocked: state.currentUser?.balance?.oracles?.locked?.toFixed(),
   };
 
   const amountLocked = BigNumber(tokensLocked.locked);
@@ -66,12 +64,12 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   const isUnlockBtnDisabled = lockedPercent?.isZero() || lockedPercent?.isNaN();
 
   async function handleLock() {
-    if (!DAOService || !amount) return;
+    if (!state.Service?.active || !amount) return;
 
     setIsLocking(true);
 
-    DAOService.lockInRegistry(amount.toFixed())
-      .then(() => 
+    state.Service?.active.lockInRegistry(amount.toFixed())
+      .then(() =>
         Promise.all([
           updateWalletBalance(),
           updateAllowance(),
@@ -83,11 +81,11 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
   }
 
   async function handleUnLock() {
-    if (!DAOService) return;
+    if (!state.Service?.active) return;
 
     setIsUnlocking(true);
 
-    DAOService.unlockFromRegistry()
+    state.Service?.active.unlockFromRegistry()
       .then(() => 
         Promise.all([
           updateWalletBalance(),
@@ -129,30 +127,30 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
     setIsApproving(true)
 
-    DAOService.approveTokenInRegistry(amount?.toFixed())
+    state.Service?.active.approveTokenInRegistry(amount?.toFixed())
       .then(() => updateAllowance())
       .catch(console.log)
       .finally(()=> setIsApproving(false));
   }
 
   function updateAllowance() {
-    DAOService.getAllowance(settings?.contracts?.settlerToken, wallet.address, settings?.contracts?.networkRegistry)
+    state.Service?.active.getAllowance(state.Settings?.contracts?.settlerToken, state.currentUser.walletAddress, state.Settings?.contracts?.networkRegistry)
       .then(setSettlerAllowance).catch(() => BigNumber(0));
   }
 
   useEffect(() => {
-    if (DAOService && wallet?.address) updateAllowance();
-  }, [DAOService, wallet?.address]);
+    if (state.Service?.active && state.currentUser?.walletAddress) updateAllowance();
+  }, [state.Service?.active, state.currentUser?.walletAddress]);
 
   return (
     <Step
       title={t("custom-network:steps.lock.title", { currency: networkTokenSymbol })}
       index={index}
       activeStep={activeStep}
-      validated={validated && !!user?.login}
+      validated={validated && !!state.currentUser?.login}
       handleClick={handleClick}
     >
-      {(!user?.login ?
+      {(!state.currentUser?.login ?
         (
           <div className="pt-3">
             <ConnectGithub />

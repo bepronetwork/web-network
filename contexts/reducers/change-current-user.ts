@@ -27,6 +27,9 @@ export const changeCurrentUserHandle = (handle: string) =>
 export const changeCurrentUserLogin = (login: string) =>
   changeCurrentUser.update({login});
 
+export const changeCurrentUserAccessToken = (accessToken: string) =>
+  changeCurrentUser.update({accessToken});
+
 export const changeCurrentUserWallet = (walletAddress: string) =>
   changeCurrentUser.update({walletAddress});
 

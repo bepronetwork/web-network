@@ -10,11 +10,9 @@ import InputNumber from "components/input-number";
 import Step from "components/step";
 
 import { AppStateContext } from "contexts/app-state";
-import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetworkSettings } from "contexts/network-settings";
 import { addToast } from "contexts/reducers/change-toaster";
-import { useSettings } from "contexts/settings";
 
 import { psReadAsText } from "helpers/file-reader";
 import { formatNumberToCurrency } from "helpers/formatNumber";
@@ -37,20 +35,21 @@ export default function NetworksStep({
   const [ isNetworkGovernor, setIsNetworkGovernor ] = useState(false);
   const [ selectedNetworkAddress, setSelectedNetworkAddress ] = useState<string>();
 
-  const { settings: appSettings } = useSettings();
+  const {state, dispatch} = useContext(AppStateContext);
+
   const { service: DAOService } = useDAO();
-  const { wallet, user } = useAuthentication();
+
   const { searchNetworks, updateNetwork } = useApi();
-  const { dispatch } = useContext(AppStateContext);
+
   const { forcedNetwork, details, fields, settings, setForcedNetwork } = useNetworkSettings();
 
-  const MAX_PERCENTAGE_FOR_DISPUTE = +appSettings?.networkParametersLimits?.disputePercentage?.max;
-  const MIN_DRAFT_TIME = +appSettings?.networkParametersLimits?.draftTime?.min;
-  const MAX_DRAFT_TIME = +appSettings?.networkParametersLimits?.draftTime?.max;
-  const MIN_DISPUTE_TIME = +appSettings?.networkParametersLimits?.disputableTime?.min;
-  const MAX_DISPUTE_TIME = +appSettings?.networkParametersLimits?.disputableTime?.max;
-  const MIN_COUNCIL_AMOUNT = +appSettings?.networkParametersLimits?.councilAmount?.min;
-  const MAX_COUNCIL_AMOUNT = +appSettings?.networkParametersLimits?.councilAmount?.max;
+  const MAX_PERCENTAGE_FOR_DISPUTE = +state.Settings?.networkParametersLimits?.disputePercentage?.max;
+  const MIN_DRAFT_TIME = +state.Settings?.networkParametersLimits?.draftTime?.min;
+  const MAX_DRAFT_TIME = +state.Settings?.networkParametersLimits?.draftTime?.max;
+  const MIN_DISPUTE_TIME = +state.Settings?.networkParametersLimits?.disputableTime?.min;
+  const MAX_DISPUTE_TIME = +state.Settings?.networkParametersLimits?.disputableTime?.max;
+  const MIN_COUNCIL_AMOUNT = +state.Settings?.networkParametersLimits?.councilAmount?.min;
+  const MAX_COUNCIL_AMOUNT = +state.Settings?.networkParametersLimits?.councilAmount?.max;
 
   const differentOrUndefined = (valueA, valueB) => valueA !== valueB ? valueA : undefined;
 
@@ -133,7 +132,7 @@ export default function NetworksStep({
   }
 
   async function handleLoad() {
-    if (networkAlreadyLoaded || !wallet) return;
+    if (networkAlreadyLoaded || !state.currentUser) return;
 
     try {
       setIsLoading(true);
@@ -144,7 +143,7 @@ export default function NetworksStep({
       if (network.networkAddress !== DAOService.network.contractAddress) 
         await DAOService.loadNetwork(network.networkAddress);
 
-      DAOService.isNetworkGovernor(wallet.address).then(setIsNetworkGovernor).catch(error => console.log(error));
+      DAOService.isNetworkGovernor(state.currentUser.walletAddress).then(setIsNetworkGovernor).catch(error => console.log(error));
 
       await Promise.all([
         DAOService.getNetworkParameter("councilAmount"),
@@ -185,14 +184,14 @@ export default function NetworksStep({
   }
 
   async function handleSubmit() {
-    if (!wallet?.address || !user?.login || !forcedNetwork) return;
+    if (!state.currentUser?.walletAddress || !state.currentUser?.login || !forcedNetwork) return;
 
     setIsUpdatingNetwork(true);
 
     const json = {
-      githubLogin: user?.login,
+      githubLogin: state.currentUser?.login,
       override: true,
-      creator: wallet?.address,
+      creator: state.currentUser?.walletAddress,
       networkAddress: forcedNetwork.networkAddress,
       name: differentOrUndefined(details?.name?.value, forcedNetwork.name),
       description: differentOrUndefined(details?.description, forcedNetwork.description),

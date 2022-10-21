@@ -3,6 +3,7 @@ import {AppStateContext} from "../contexts/app-state";
 import {changeActiveDAO, changeStarting} from "../contexts/reducers/change-service";
 import DAO from "../services/dao-service";
 import {toastError,} from "../contexts/reducers/change-toaster";
+import {changeCurrentUserWallet} from "../contexts/reducers/change-current-user";
 
 /**
  * Populate `state.Settings` and instantiates a DAOService
@@ -26,6 +27,7 @@ export function useDao() {
         }
 
         dispatch(changeActiveDAO(state.Service.active));
+        dispatch(changeCurrentUserWallet(state.Service.active.web3Connection.Account.address));
       });
   }
 

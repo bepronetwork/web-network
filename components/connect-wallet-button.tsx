@@ -8,10 +8,8 @@ import metamaskLogo from "assets/metamask.png";
 import Button from "components/button";
 import Modal from "components/modal";
 
-import { useAuthentication } from "contexts/authentication";
+import { useAuthentication } from "x-hooks/use-authentication";
 import { useDAO } from "contexts/dao";
-
-import { useSettings } from "contexts/settings";
 
 import { NetworkColors } from "interfaces/enums/network-colors";
 import {AppStateContext} from "../contexts/app-state";
@@ -27,36 +25,44 @@ export default function ConnectWalletButton({
   const {dispatch, state: { loading, connectedChain },} = useContext(AppStateContext);
   const [showModal, setShowModal] = useState(false);
 
-  const { service: DAOService } = useDAO();
-  const { settings } = useSettings();
-  const { wallet, connectWallet } = useAuthentication();
+  const {state} = useContext(AppStateContext);
+
+  const { connectWallet } = useAuthentication();
 
   async function handleLogin()  {
-    if(!window?.ethereum) return dispatch(changeShowWeb3(true))
+    if(!window?.ethereum) {
+      dispatch(changeShowWeb3(true))
+      return;
+    }
 
-    if (+connectedChain?.id === +settings?.requiredChain?.id) {
+    if (!state.Service?.active)
+      return;
+
+    if (+state.connectedChain?.id === +state.Settings?.requiredChain?.id) {
       connectWallet();
     } else {
-      console.log(connectedChain, settings?.requiredChain);
-      //dispatch(changeNetworkId(+connectedChain?.id));
+      console.log(connectedChain, state.Settings?.requiredChain);
+      // dispatch(changeNetworkId(+connectedChain?.id));
       setShowModal(false);
     }
   }
 
   function handleShowModal() {
-    if (!wallet?.address) setShowModal(true);
+    if (!state.currentUser?.walletAddress) setShowModal(true);
     else setShowModal(false);
   }
 
   useEffect(() => {
-    if (!DAOService) return;
+    if (!state.Service?.active) return;
 
-    if (forceLogin) connectWallet();
-  }, [DAOService]);
+    if (forceLogin)
+      connectWallet();
+
+  }, [state.Service?.active, forceLogin]);
 
   useEffect(() => {
     handleShowModal();
-  }, [wallet]);
+  }, [state.currentUser?.walletAddress]);
 
 
   if (asModal) {
@@ -75,9 +81,9 @@ export default function ConnectWalletButton({
             {t("connect-wallet-button:to-access-this-page")}
             <br />
             <span
-              style={{ color: NetworkColors[settings?.requiredChain?.name?.toLowerCase()] }}
+              style={{ color: NetworkColors[state.Settings?.requiredChain?.name?.toLowerCase()] }}
             >
-              <span>{settings?.requiredChain?.name}</span>{" "}
+              <span>{state.Settings?.requiredChain?.name}</span>{" "}
               {t("connect-wallet-button:network")}
             </span>{" "}
             {t("connect-wallet-button:on-your-wallet")}
@@ -121,7 +127,7 @@ export default function ConnectWalletButton({
     );
   }
 
-  if (!wallet)
+  if (!state.currentUser?.walletAddress)
     return (
       <Button
         color="white"

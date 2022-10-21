@@ -36,11 +36,11 @@ export function useBounty() {
     return false;
   }
 
-  function getDatabaseBounty() {
+  function getDatabaseBounty(force = false) {
     if (!state.Service?.network?.active || (!query?.id || !query.repoId))
       return;
 
-    if (isCurrentBountyCached())
+    if (!force && isCurrentBountyCached())
       return;
 
     console.debug(`Loading bounty information`);
@@ -69,11 +69,11 @@ export function useBounty() {
 
   }
 
-  function getChainBounty() {
+  function getChainBounty(force = false) {
     if (!state.Service?.active || !state.Service?.network || !state.currentBounty?.data?.contractId)
       return;
 
-    if (isCurrentBountyCached())
+    if (!force && isCurrentBountyCached())
       return;
 
     const {getBounty, isBountyInDraftChain} = state.Service.active;
@@ -176,6 +176,8 @@ export function useBounty() {
 
   return {
     getExtendedProposalsForCurrentBounty,
-    getExtendedPullRequestsForCurrentBounty
+    getExtendedPullRequestsForCurrentBounty,
+    getDatabaseBounty,
+    getChainBounty,
   }
 }

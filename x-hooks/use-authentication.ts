@@ -4,7 +4,11 @@ import {signIn, signOut, useSession} from "next-auth/react";
 import {useRouter} from "next/router";
 import {useDao} from "./use-dao";
 import {
-  changeCurrentUser, changeCurrentUserBalance, changeCurrentUserHandle, changeCurrentUserLogin,
+  changeCurrentUser,
+  changeCurrentUserAccessToken,
+  changeCurrentUserBalance,
+  changeCurrentUserHandle,
+  changeCurrentUserLogin,
   changeCurrentUserMatch,
   changeCurrentUserWallet
 } from "contexts/reducers/change-current-user";
@@ -15,6 +19,7 @@ import {WinStorage} from "services/win-storage";
 import {Balance} from "interfaces/balance-state";
 import {changeActiveNetwork} from "../contexts/reducers/change-service";
 import {Network} from "interfaces/network";
+import {changeSpinners} from "../contexts/reducers/change-spinners";
 
 export function useAuthentication() {
   const session = useSession();
@@ -111,8 +116,8 @@ export function useAuthentication() {
     });
   }
 
-  function updateWalletBalance() {
-    if (balance.value || !state.currentUser?.walletAddress)
+  function updateWalletBalance(force = false) {
+    if (!force && (balance.value || !state.currentUser?.walletAddress))
       return;
 
     const update = (k: keyof Balance) => (b) => {
@@ -124,22 +129,32 @@ export function useAuthentication() {
     const updateNetwork = (k: keyof Network) => (v) =>
       dispatch(changeActiveNetwork({...state.Service.network.active, [k]: v}));
 
-    state.Service.active.getOraclesOf(state.currentUser.walletAddress).then(update('oracles'))
-    state.Service.active.getBalance('settler', state.currentUser.walletAddress).then(update('bepro'))
-    state.Service.active.getBalance('eth', state.currentUser.walletAddress).then(update('eth'))
-    state.Service.active.getBalance('staked', state.currentUser.walletAddress).then(update('staked'));
+    dispatch(changeSpinners.update({balance: true}))
 
-    // not balance, but related to address, no need for a second useEffect()
-    state.Service.active.isCouncil(state.currentUser.walletAddress).then(updateNetwork('isCouncil'));
-    state.Service.active.isNetworkGovernor(state.currentUser.walletAddress).then(updateNetwork('isGovernor'));
+    Promise.all([
+      state.Service.active.getOraclesOf(state.currentUser.walletAddress).then(update('oracles')),
+      state.Service.active.getBalance('settler', state.currentUser.walletAddress).then(update('bepro')),
+      state.Service.active.getBalance('eth', state.currentUser.walletAddress).then(update('eth')),
+      state.Service.active.getBalance('staked', state.currentUser.walletAddress).then(update('staked')),
+
+      // not balance, but related to address, no need for a second useEffect()
+      state.Service.active.isCouncil(state.currentUser.walletAddress).then(updateNetwork('isCouncil')),
+      state.Service.active.isNetworkGovernor(state.currentUser.walletAddress).then(updateNetwork('isGovernor'))
+    ])
+      .finally(() => {
+        dispatch(changeSpinners.update({balance: false}));
+      })
   }
 
   function updateCurrentUserLogin() {
-    if (!session?.data?.user || state.currentUser.login === (session.data.user as any).login)
+    if (!session?.data?.user ||
+      state.currentUser.login === (session.data.user as any).login ||
+      (session.data?.user as any).accessToken !== state.currentUser?.accessToken)
       return;
 
     dispatch(changeCurrentUserHandle(session.data.user.name));
     dispatch(changeCurrentUserLogin((session.data.user as any).login));
+    dispatch(changeCurrentUserAccessToken((session.data.user as any).accessToken));
   }
 
   useEffect(validateGhAndWallet, [(session?.data?.user as any)?.login, state.currentUser]);
@@ -152,6 +167,7 @@ export function useAuthentication() {
     connectWallet,
     disconnectWallet,
     disconnectGithub,
-    connectGithub
+    connectGithub,
+    updateWalletBalance
   }
 }

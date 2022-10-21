@@ -6,17 +6,16 @@ import ConnectGithub from "components/connect-github";
 import RepositoriesList from "components/custom-network/repositories-list";
 import Step from "components/step";
 
-import { useAuthentication } from "contexts/authentication";
 import { useNetworkSettings } from "contexts/network-settings";
-import { useSettings } from "contexts/settings";
 
 import { StepWrapperProps } from "interfaces/stepper";
+import {useContext} from "react";
+import {AppStateContext} from "../../contexts/app-state";
 
 export default function SelectRepositoriesStep({ activeStep, index, validated, handleClick } : StepWrapperProps) {
   const { t } = useTranslation("custom-network");
 
-  const { settings } = useSettings();
-  const { user } = useAuthentication();
+  const {state} = useContext(AppStateContext);
   const { github, fields } = useNetworkSettings();
 
   function handleRepositoryCheck(fullName: string) {
@@ -35,12 +34,12 @@ export default function SelectRepositoriesStep({ activeStep, index, validated, h
       validated={validated}
       handleClick={handleClick}
     >
-      {(user?.login && (
+      {(state.currentUser?.login && (
         <div>
           <RepositoriesList repositories={github.repositories} onClick={handleRepositoryCheck} />
 
           <span className="caption-small text-gray px-0 mt-3">
-            {settings?.github?.botUser}
+            {state.Settings?.github?.botUser}
           </span>
 
           <div className="d-flex align-items-center p-small text-white px-0 m-0 p-0">
@@ -51,7 +50,7 @@ export default function SelectRepositoriesStep({ activeStep, index, validated, h
               onChange={handlePermissonCheck}
             />
             <span>
-              {t("steps.repositories.give-access", { user: settings?.github?.botUser })}
+              {t("steps.repositories.give-access", { user: state.Settings?.github?.botUser })}
             </span>
           </div>
 

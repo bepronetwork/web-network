@@ -22,13 +22,7 @@ import Modal from "components/modal";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import ReposDropdown from "components/repos-dropdown";
 
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { useNetwork } from "contexts/network";
 import { toastError, toastWarning } from "contexts/reducers/change-toaster";
-
-import { useSettings } from "contexts/settings";
-
 import { parseTransaction } from "helpers/transactions";
 
 import { MetamaskErrors } from "interfaces/enums/Errors";
@@ -41,7 +35,7 @@ import { getCoinInfoByContract } from "services/coingecko";
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useERC20 from "x-hooks/use-erc20";
-import useNetworkTheme from "x-hooks/use-network-theme";
+import {useNetwork} from "x-hooks/use-network";
 
 import {addTx, updateTx} from "../contexts/reducers/change-tx-list";
 import {AppStateContext} from "../contexts/app-state";
@@ -88,25 +82,29 @@ export default function CreateBountyModal() {
   const [rewardAmount, setRewardAmount] = useState<NumberFormatValues>(ZeroNumberFormatValues);
 
   const rewardERC20 = useERC20();
-  const { settings } = useSettings();
+
   const transactionalERC20 = useERC20();
-  const { activeNetwork } = useNetwork();
-  const { service: DAOService } = useDAO();
+
   const { handleApproveToken } = useBepro();
-  const { wallet, user } = useAuthentication();
-  const { getURLWithNetwork } = useNetworkTheme();
+  const { getURLWithNetwork } = useNetwork();
   const { createPreBounty, processEvent } = useApi();
 
   const {
     dispatch,
-    state: { transactions, show: { createBounty: showCreateBounty } },
+    state: {
+      transactions,
+      Settings,
+      Service,
+      currentUser,
+      show: { createBounty: showCreateBounty }
+    },
   } = useContext(AppStateContext);
   
 
   const [canAddCustomToken, setCanAddCustomToken] = 
-  useState<boolean>(activeNetwork?.networkAddress === settings?.contracts?.network
-    ? settings?.defaultNetworkConfig?.allowCustomTokens
-    : !!activeNetwork?.allowCustomTokens)
+  useState<boolean>(Service?.network?.active?.networkAddress === Settings?.contracts?.network
+    ? Settings?.defaultNetworkConfig?.allowCustomTokens
+    : !!Service?.network?.active?.allowCustomTokens)
 
   const steps = [
     t("bounty:steps.details"),
@@ -123,7 +121,7 @@ export default function CreateBountyModal() {
     const strFiles = files?.map((file) =>
         file.uploaded &&
         `${file?.type?.split("/")[0] === "image" ? "!" : ""}[${file.name}](${
-          settings?.urls?.ipfs
+          Settings?.urls?.ipfs
         }/${file.hash}) \n\n`);
     return `${str}\n\n${strFiles
       .toString()
@@ -186,7 +184,7 @@ export default function CreateBountyModal() {
         currentToken={fieldParams[type].token}
         setCurrentToken={fieldParams[type].setToken}
         customTokens={fieldParams[type].tokens}
-        userAddress={wallet?.address}
+        userAddress={currentUser?.walletAddress}
         defaultToken={review && fieldParams[type].default}
         canAddCustomToken={canAddCustomToken}
         addToken={addToken}
@@ -429,7 +427,7 @@ export default function CreateBountyModal() {
   const isAmountApproved = (tokenAllowance: BigNumber, amount: BigNumber) => !tokenAllowance.lt(amount);
 
   async function allowCreateIssue() {
-    if (!DAOService || !transactionalToken || issueAmount.floatValue <= 0)
+    if (!Service?.active || !transactionalToken || issueAmount.floatValue <= 0)
       return;
 
     setIsLoadingApprove(true)
@@ -463,7 +461,7 @@ export default function CreateBountyModal() {
     ].some((value) => value === false);
 
   async function createBounty() {
-    if (!repository || !transactionalToken || !DAOService || !wallet) return;
+    if (!repository || !transactionalToken || !Service?.active || !currentUser) return;
 
     setIsLoadingCreateBounty(true)
 
@@ -472,8 +470,8 @@ export default function CreateBountyModal() {
         title: bountyTitle,
         body: addFilesInDescription(bountyDescription),
         amount: issueAmount.value,
-        creatorAddress: wallet.address,
-        githubUser: user?.login,
+        creatorAddress: currentUser.walletAddress,
+        githubUser: currentUser?.login,
         repositoryId: repository?.id,
         branch,
       };
@@ -483,7 +481,7 @@ export default function CreateBountyModal() {
         body: payload.body,
         creator: payload.githubUser,
         repositoryId: payload.repositoryId,
-      }, activeNetwork?.name)
+      }, Service?.network?.active?.name)
       .then((cid) => cid)
 
       if (!cid){
@@ -516,7 +514,7 @@ export default function CreateBountyModal() {
         bountyPayload.fundingAmount = issueAmount.value;
       }
 
-      const networkBounty = await DAOService.openBounty(bountyPayload).catch((e) => {
+      const networkBounty = await Service?.active.openBounty(bountyPayload).catch((e) => {
 
         dispatch(updateTx([{
           ...transactionToast.payload[0],
@@ -540,7 +538,7 @@ export default function CreateBountyModal() {
 
         const createdBounty = await processEvent("bounty",
                                                  "created",
-                                                 activeNetwork?.name,
+                                                 Service?.network?.active?.name,
       { fromBlock: networkBounty?.blockNumber})
 
         if (!createdBounty){
@@ -566,11 +564,11 @@ export default function CreateBountyModal() {
 
   useEffect(() => {
     if (transactionalToken?.address) transactionalERC20.setAddress(transactionalToken.address);
-  }, [transactionalToken?.address, wallet, DAOService]);
+  }, [transactionalToken?.address, currentUser, Service?.active]);
 
   useEffect(() => {
     if (rewardToken?.address) rewardERC20.setAddress(rewardToken.address);
-  }, [rewardToken?.address, wallet, DAOService]);
+  }, [rewardToken?.address, currentUser, Service?.active]);
 
   useEffect(() => {
     setIssueAmount(ZeroNumberFormatValues);
@@ -593,20 +591,20 @@ export default function CreateBountyModal() {
 
   useEffect(() => {
     let approved = true
-    
+
     if (isBountyType)
       approved = isAmountApproved(transactionalERC20.allowance, BigNumber(issueAmount.value));
     else if (rewardChecked)
       approved = isAmountApproved(rewardERC20.allowance, BigNumber(rewardAmount.value));
-    
+
     setIsTokenApproved(approved);
   }, [transactionalERC20.allowance, rewardERC20.allowance, issueAmount, rewardAmount, rewardChecked]);
 
   useEffect(() => {
-    if (!settings?.contracts?.settlerToken || activeNetwork?.tokens === undefined) return;
-    if (!activeNetwork.tokens.length && settings.contracts.settlerToken) {
+    if (!Settings?.contracts?.settlerToken || Service?.network?.active?.tokens === undefined) return;
+    if (!Service?.network?.active.tokens.length && Settings.contracts.settlerToken) {
       const beproToken = {
-        address: settings.contracts.settlerToken,
+        address: Settings.contracts.settlerToken,
         name: "Bepro Network",
         symbol: "BEPRO"
       };
@@ -616,21 +614,21 @@ export default function CreateBountyModal() {
       return;
     }
     setCanAddCustomToken(false)
-    getTokenInfo(activeNetwork.tokens);
-  }, [activeNetwork?.tokens, settings]);
+    getTokenInfo(Service?.network?.active.tokens);
+  }, [Service?.network?.active?.tokens, Settings]);
 
   useEffect(()=>{
     transactionalERC20.updateAllowanceAndBalance();
     rewardERC20.updateAllowanceAndBalance();
   },[showCreateBounty])
 
-  if (showCreateBounty && !wallet?.address)
+  if (showCreateBounty && !currentUser?.walletAddress)
     return <ConnectWalletButton asModal={true} />;
 
   return (
     <>
       <Modal
-        show={showCreateBounty && !!wallet?.address}
+        show={showCreateBounty && !!currentUser?.walletAddress}
         title={t("bounty:title")}
         titlePosition="center"
         onCloseClick={() => {

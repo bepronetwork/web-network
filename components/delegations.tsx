@@ -1,19 +1,16 @@
-import { useEffect } from "react";
+import {useContext,} from "react";
 
 import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import OracleIcon from "assets/icons/oracle-icon";
-
 import DelegationItem from "components/delegation-item";
-
-import { useAuthentication } from "contexts/authentication";
-import { useNetwork } from "contexts/network";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
 
 import InfoTooltip from "./info-tooltip";
 import { FlexRow } from "./profile/wallet-balance";
+import {AppStateContext} from "../contexts/app-state";
 
 interface DelegationsProps {
   type?: "toMe" | "toOthers";
@@ -24,40 +21,33 @@ export default function Delegations({
 } : DelegationsProps) {
   const { t } = useTranslation(["common", "profile", "my-oracles"]);
 
-  const { activeNetwork } = useNetwork();
-  const { wallet, updateWalletBalance } = useAuthentication();
-
-  const walletDelegations = wallet?.balance?.oracles?.delegations || [];
+  const {state} = useContext(AppStateContext);
+  const walletDelegations = state.currentUser?.balance?.oracles?.delegations || [];
 
   const renderInfo = {
     toMe: {
       title: t("profile:deletaged-to-me"),
-      description: t("my-oracles:descriptions.oracles-delegated-to-me", { token: activeNetwork?.networkToken?.symbol }),
+      description: t("my-oracles:descriptions.oracles-delegated-to-me", { token: state.Service?.network?.active?.networkToken?.symbol }),
       total: undefined,
-      delegations: [ wallet?.balance?.oracles?.delegatedByOthers || 0 ]
+      delegations: [ state.currentUser?.balance?.oracles?.delegatedByOthers || 0 ]
     },
     toOthers: {
       title: t("profile:deletaged-to-others"),
-      total: formatStringToCurrency(walletDelegations.reduce((acc, delegation) => 
+      total: formatStringToCurrency(walletDelegations.reduce((acc, delegation) =>
         delegation.amount.plus(acc), BigNumber(0)).toFixed()),
       description: 
-             t("my-oracles:descriptions.oracles-delegated-to-others", { token: activeNetwork?.networkToken?.symbol }),
-      delegations: wallet?.balance?.oracles?.delegations || []
+             t("my-oracles:descriptions.oracles-delegated-to-others", { token: state.Service?.network?.active?.networkToken?.symbol }),
+      delegations: state.currentUser?.balance?.oracles?.delegations || []
     }
   };
 
   const oracleToken = {
-    symbol: t("$oracles", { token: activeNetwork?.networkToken?.symbol }),
+    symbol: t("$oracles", { token: state.Service?.network?.active?.networkToken?.symbol }),
     name: t("profile:oracle-name-placeholder"),
     icon: <OracleIcon />
   };
 
-  const networkTokenName = activeNetwork?.networkToken?.name || oracleToken.name;
-
-  useEffect(() => {
-    if (!wallet?.address) return;
-    updateWalletBalance();
-  }, [wallet?.address]);
+  const networkTokenName = state.Service?.network?.active?.networkToken?.name || oracleToken.name;
 
   return (
     <div className="mb-3">

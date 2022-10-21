@@ -1,16 +1,15 @@
 import Avatar from "components/avatar";
 import Button from "components/button";
-
-import { useAuthentication } from "contexts/authentication";
+import {useSession} from "next-auth/react";
 
 export default function GithubHandle() {
-  const { user } = useAuthentication();
+  const session = useSession();
 
-  if (user?.login)
+  if (session?.data?.login)
     return (
       <Button className="mr-1" transparent>
-        <span>{user?.name} </span>
-        <Avatar src={user?.image} userLogin={user?.login} className="ms-2" />
+        <span>{session?.data.name} </span>
+        <Avatar src={session?.data.image as string} userLogin={session?.data.login as string} className="ms-2" />
       </Button>
     );
 

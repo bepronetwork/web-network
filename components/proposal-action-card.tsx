@@ -1,16 +1,9 @@
-import React, { useEffect, useState } from "react";
-
-import BigNumber from "bignumber.js";
-import { useTranslation } from "next-i18next";
-
+import React, {useContext, useEffect, useState} from "react";
 import Button from "components/button";
 import ProposalMerge from "components/proposal-merge";
 import ProposalProgressBar from "components/proposal-progress-bar";
-
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-import { useIssue } from "contexts/issue";
-import { useNetwork } from "contexts/network";
+import BigNumber from "bignumber.js";
+import { useTranslation } from "next-i18next";
 
 import { isProposalDisputable } from "helpers/proposal";
 
@@ -19,6 +12,7 @@ import { pullRequest } from "interfaces/issue-data";
 import { Proposal } from "interfaces/proposal";
 
 import useOctokit from "x-hooks/use-octokit";
+import {AppStateContext} from "../contexts/app-state";
 
 import { ContextualSpan } from "./contextual-span";
 
@@ -47,36 +41,32 @@ export default function ProposalActionCard({
   const [isDisputing, setIsDisputing] = useState(false);
   const [allowMergeCommit, setAllowMergeCommit] = useState<boolean>();
 
-  const { activeNetwork } = useNetwork();
-  const { wallet } = useAuthentication();
-  const { getRepository } = useOctokit();
-  const { service: DAOService } = useDAO();
-  const { networkIssue, activeIssue } = useIssue();
+  const {state} = useContext(AppStateContext);
 
-  const bountyAmount = BigNumber.maximum(activeIssue?.amount || 0, activeIssue?.fundingAmount || 0);
+  const bountyAmount = BigNumber.maximum(state.currentBounty?.data?.amount || 0, state.currentBounty?.data?.fundingAmount || 0);
 
   const isDisable = () => [
-    networkIssue?.closed,
-    !isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime, chaintime),
+    state.currentBounty?.chainData?.closed,
+    !isProposalDisputable(proposal?.createdAt, state.Service?.network?.active?.disputableTime, chaintime),
     networkProposal?.isDisputed,
     networkProposal?.refusedByBountyOwner,
     !networkProposal?.canUserDispute,
-    wallet?.balance?.oracles?.locked?.isZero(),
+    state.currentUser?.balance?.oracles?.locked?.isZero(),
     isMerging,
     isRefusing
   ].some((v) => v);
 
   const isSuccess =  () => [
-    networkIssue?.closed,
+    state.currentBounty?.chainData?.closed,
     !networkProposal?.isDisputed && proposal?.isMerged
   ].every((v) => v);
 
   const isRefusable = () => [
-    !networkIssue?.closed,
-    !networkIssue?.canceled,
+    !state.currentBounty?.chainData?.closed,
+    !state.currentBounty?.chainData?.canceled,
     !networkProposal?.isDisputed,
     !networkProposal?.refusedByBountyOwner,
-    networkIssue?.creator === wallet?.address
+    state.currentBounty?.chainData?.creator === state.currentUser?.walletAddress
   ].every(v => v);
 
   const canMerge = () => [
@@ -84,7 +74,7 @@ export default function ProposalActionCard({
     !proposal?.isMerged,
     !networkProposal?.isDisputed,
     !networkProposal?.refusedByBountyOwner,
-    !isProposalDisputable(proposal?.createdAt, activeNetwork?.disputableTime),
+    !isProposalDisputable(proposal?.createdAt, state.Service?.network?.active?.disputableTime),
     !isMerging,
     !isRefusing,
     !isDisputing,
@@ -107,9 +97,9 @@ export default function ProposalActionCard({
   }
 
   useEffect(() => {
-    if (DAOService)
-      DAOService.getTimeChain().then(setChainTime);
-  }, [DAOService]);
+    if (state.Service?.active)
+      state.Service?.active.getTimeChain().then(setChainTime);
+  }, [state.Service?.active]);
 
   useEffect(() => {
     if (activeIssue?.repository?.githubPath)
@@ -125,7 +115,7 @@ export default function ProposalActionCard({
           <ProposalProgressBar
             issueDisputeAmount={+networkProposal?.disputeWeight}
             isDisputed={networkProposal?.isDisputed}
-            isFinished={networkIssue?.closed}
+            isFinished={state.currentBounty?.chainData?.closed}
             isMerged={proposal?.isMerged}
             refused={networkProposal?.refusedByBountyOwner}
           />
@@ -140,10 +130,10 @@ export default function ProposalActionCard({
           <div className="d-flex flex-row justify-content-between mt-3">
             <ProposalMerge 
               amountTotal={bountyAmount} 
-              tokenSymbol={activeIssue?.token?.symbol} 
+              tokenSymbol={state.currentBounty?.data?.token?.symbol}
               proposal={networkProposal}
               isMerging={isMerging}
-              idBounty={activeIssue?.id} 
+              idBounty={state.currentBounty?.data?.id}
               onClickMerge={handleMerge}
               canMerge={canMerge()}
             />

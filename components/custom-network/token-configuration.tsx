@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useContext, useEffect, useState} from "react";
 
 import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
@@ -7,10 +7,7 @@ import { Divider } from "components/divider";
 import MultipleTokensDropdown from "components/multiple-tokens-dropdown";
 import Step from "components/step";
 
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
 import { useNetworkSettings } from "contexts/network-settings";
-import { useSettings } from "contexts/settings";
 
 import { handleAllowedTokensDatabase } from "helpers/handleAllowedTokens";
 
@@ -18,10 +15,11 @@ import { StepWrapperProps } from "interfaces/stepper";
 import { Token } from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
+import {AppStateContext} from "../../contexts/app-state";
 
 import { NetworkTokenConfig } from "./network-token-config";
 
-export default function TokenConfiguration({ 
+export default function TokenConfiguration({
   activeStep, 
   index, 
   validated, 
@@ -30,17 +28,25 @@ export default function TokenConfiguration({
   handleFinish
 } : StepWrapperProps) {
   const { t } = useTranslation(["common", "custom-network"]);
-  
+
+  const {state} = useContext(AppStateContext);
+  const { tokens, fields } = useNetworkSettings();
+
+  const [networkTokenAddress, setNetworkTokenAddress] = useState("");
+  const [networkTokenError, setNetworkTokenError] = useState(false);
+  const [networkToken, setNetworkToken] = useState<Token>(undefined);
+  const [showModalDeploy, setShowModalDeploy] = useState(false);
+  const [allowedTransactionalTokens, setAllowedTransactionalTokens] = useState<Token[]>();
   const [allowedRewardTokens, setAllowedRewardTokens] = useState<Token[]>([]);
   const [selectedRewardTokens, setSelectedRewardTokens] = useState<Token[]>([]);
   const [allowedTransactionalTokens, setAllowedTransactionalTokens] = useState<Token[]>();
   const [selectedTransactionalTokens, setSelectedTransactionalTokens] = useState<Token[]>();
   const [createNetworkAmount, setCreateNetworkAmount] = useState<string>();
 
+  const debounce = useRef(null)
+
   const { getTokens } = useApi();
-  const { settings } = useSettings();
-  const { wallet } = useAuthentication();
-  const { service: DAOService } = useDAO();
+
 
   const { tokens, fields, tokensLocked } = useNetworkSettings();
   const networkTokenSymbol = settings?.beproToken?.symbol || t("misc.$token");
@@ -67,16 +73,35 @@ export default function TokenConfiguration({
     setSelectedRewardTokens(newToken);
   }
 
+  function handleNetworkTokenChange(e) {
+    setNetworkTokenAddress(e.target.value)
+  }
+
+  async function validateNetworkAddress(address) {
+    setNetworkTokenError(false);
+    if (address?.trim() === "" || !state.Service?.active) return undefined;
+
+    try {
+      await state.Service?.active.getERC20TokenData(address)
+      .then(setNetworkToken)
+    } catch(error) {
+      setNetworkTokenError(true);
+      setNetworkToken({ address: "", name: "", symbol: ""})
+      return false;
+    }
+
+    return true;
+  }
+
   // LoadData from context
   useEffect(() => {
-    if (!DAOService) return;
-
+    if (!state.Service?.active) return;
     if(!selectedRewardTokens?.length && tokens?.allowedRewards)
       setSelectedRewardTokens(tokens.allowedRewards);
 
     if(!selectedTransactionalTokens?.length && tokens?.allowedTransactions)
       setSelectedTransactionalTokens(tokens.allowedTransactions);
-  }, [DAOService, tokens?.settler]);
+  }, [state.Service?.active, tokens?.settler]);
 
   useEffect(() => {
     fields.allowedRewards.setter(selectedRewardTokens);
@@ -87,9 +112,9 @@ export default function TokenConfiguration({
   }, [selectedTransactionalTokens])
 
   useEffect(() => {
-    if(!wallet?.address || !DAOService) return
+    if(!state.currentUser?.walletAddress || !state.Service?.active) return
     
-    DAOService.getAllowedTokens()
+    state.Service?.active.getAllowedTokens()
       .then((allowedTokens) => {
         getTokens()
           .then((tokens) => {
@@ -99,7 +124,7 @@ export default function TokenConfiguration({
           })
           .catch((err) => console.log("error to get tokens database ->", err));
       }).catch((err) => console.log("error to get allowed tokens contract ->", err));
-  }, [wallet?.address])
+  }, [state.currentUser?.walletAddress])
 
   useEffect(() => {
     if(!wallet?.address || !DAOService || !BigNumber(tokensLocked.needed).gt(0)) return
@@ -111,8 +136,8 @@ export default function TokenConfiguration({
   }, [wallet?.address, tokensLocked.needed])
   
   function handleEmptyTokens (tokens: Token[]) {
-    if(tokens?.length === 0) return [settings?.beproToken];
-    
+    if(tokens?.length === 0) return [state.Settings?.beproToken];
+
     return tokens;
   }
 
@@ -165,7 +190,7 @@ export default function TokenConfiguration({
         })}
         </span>
         </>
-      )} 
+      )}
     </Step>
   );
 }

@@ -1,11 +1,6 @@
-import { useTranslation } from "next-i18next";
-
 import GithubImage from "components/github-image";
-
-import { useAuthentication } from "contexts/authentication";
-
-
-import Button from "./button";
+import { useTranslation } from "next-i18next";
+import { useAuthentication } from "x-hooks/use-authentication";
 
 interface IProps{
   size?: 'md' | 'sm';
@@ -13,17 +8,8 @@ interface IProps{
 
 export default function ConnectGithub({size = 'md'}:IProps) {
   const { t } = useTranslation("common");
+  const { connectGithub } = useAuthentication();
 
-  const { wallet, connectGithub, isConnecting } = useAuthentication();
-
-
-  if(size === 'sm'){
-    return (
-    <Button onClick={connectGithub} disabled={isConnecting} isLoading={isConnecting}> 
-      <GithubImage  opacity={1} /> 
-      <span>{t("actions.connect")}</span>
-    </Button>)
-  }
 
   return (
     <div className="container-fluid">
@@ -34,15 +20,12 @@ export default function ConnectGithub({size = 'md'}:IProps) {
             <span className="caption-small mx-3">
               {t("actions.connect-github")}
             </span>
-            <span className="d-inline-block">
-              <Button
-                className="d-inline btn btn-primary text-uppercase"
-                disabled={isConnecting || !wallet?.address}
-                onClick={connectGithub}
-              >
-                {t("actions.connect")}
-              </Button>
-            </span>
+            <button
+              className="btn btn-primary text-uppercase"
+              onClick={() => connectGithub()}
+            >
+              {t("actions.connect")}
+            </button>
           </div>
         </div>
       </div>

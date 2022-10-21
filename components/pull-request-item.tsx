@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useContext, useEffect, useState} from "react";
 
 import { PullRequest } from "@taikai/dappkit";
 import Link from "next/link";
@@ -12,16 +12,15 @@ import PullRequestLabels from "components/pull-request-labels";
 import ReadOnlyButtonWrapper from "components/read-only-button-wrapper";
 import Translation from "components/translation";
 
-import { useAuthentication } from "contexts/authentication";
-import { useIssue } from "contexts/issue";
-
 import { getTimeDifferenceInWords } from "helpers/formatDate";
 import { formatNumberToNScale } from "helpers/formatNumber";
 
 import { pullRequest } from "interfaces/issue-data";
 
-import useNetwork from "x-hooks/use-network-theme";
+
 import useOctokit from "x-hooks/use-octokit";
+import {AppStateContext} from "../contexts/app-state";
+import {useNetwork} from "../x-hooks/use-network";
 
 interface PullRequestItem {
   pullRequest: pullRequest;
@@ -35,9 +34,9 @@ export default function PullRequestItem({
   const router = useRouter();
 
   const [linesOfCode, setLinesOfCode] = useState(0);
-  
-  const { activeIssue } = useIssue();
-  const { user } = useAuthentication();
+
+  const {state} = useContext(AppStateContext);
+
   const { getURLWithNetwork } = useNetwork();
   const { getPullRequestLinesOfCode } = useOctokit();
 
@@ -45,8 +44,8 @@ export default function PullRequestItem({
 
   function handleReviewClick() {
     router.push(getURLWithNetwork("/pull-request", {
-        id: activeIssue?.githubId,
-        repoId: activeIssue?.repository_id,
+        id: state.currentBounty?.data?.githubId,
+        repoId: state.currentBounty?.data?.repository_id,
         prId: pullRequest?.githubId,
         review: true
     }));
@@ -54,15 +53,15 @@ export default function PullRequestItem({
 
   function canReview() {    
     return pullRequest?.state === "open" && 
-    !!user?.login && pullRequest?.status === "ready" && 
+    !!state.currentUser?.login && pullRequest?.status === "ready" &&
     !!networkPullRequest?.ready && 
     !networkPullRequest?.canceled;
   }
 
   useEffect(() => {
-    if (!pullRequest || !activeIssue) return;
+    if (!pullRequest || !state.currentBounty?.data) return;
 
-    getPullRequestLinesOfCode(activeIssue.repository.githubPath, +pullRequest.githubId)
+    getPullRequestLinesOfCode(state.currentBounty?.data.repository.githubPath, +pullRequest.githubId)
       .then(setLinesOfCode)
       .catch(error => console.log("Failed to get lines of code", error));
   }, [pullRequest]);
@@ -72,8 +71,8 @@ export default function PullRequestItem({
         <Link
           passHref
           href={getURLWithNetwork("/pull-request", {
-            id: activeIssue?.githubId,
-            repoId: activeIssue?.repository_id,
+            id: state.currentBounty?.data?.githubId,
+            repoId: state.currentBounty?.data?.repository_id,
             prId: pullRequest?.githubId
           })}
         >
