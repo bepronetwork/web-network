@@ -71,8 +71,11 @@ export default function IssueListItem({
 
   function renderAmount() {
     const isActive = ["closed", "canceled"].includes(issue?.state);
-
-    const percentage = issue?.fundedAmount?.multipliedBy(100).dividedBy(issue?.fundingAmount).toFixed(1,1) || 0;
+    
+    const percentage =
+      BigNumber(issue?.fundedAmount?.multipliedBy(100).toFixed(2, 1))
+        .dividedBy(issue?.fundingAmount)
+        .toFixed(1, 1) || 0;
     
     return (
       <div
