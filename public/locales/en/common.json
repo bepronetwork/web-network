@@ -182,7 +182,8 @@
     "organization": "Organization",
     "total": "Total",
     "clear": "Clear",
-    "wallet": "Wallet"
+    "wallet": "Wallet",
+    "unkown": "Unknown"
   },
   "modals": {
     "help-modal": {
@@ -234,13 +235,6 @@
       "our-web-application": "Our web application currently does not support a mobile version.",
       "if-you-want": "If you want to use it you must connect to our web application via desktop.",
       "stay-updated": "Stay updated on"
-    },
-    "nation-dialog": {
-      "your-country": "Your country",
-      "at-the-moment": "At the moment BEPRO services and BEPRO Token (BEPRO) are not available in {{country}}",
-      "excluded": "Excluded Jurisdictions.",
-      "further": "For further information please contact us on",
-      "email": "general@bepro.network"
     },
     "web3-dialog": {
       "title": "MetaMask not detected.",
@@ -392,6 +386,8 @@
     "years_other": "years",
     "days": "day",
     "days_other": "days",
+    "seconds": "second",
+    "seconds_other": "seconds",
     "text-data": "Opened {{value}} Ago"
   }
 }

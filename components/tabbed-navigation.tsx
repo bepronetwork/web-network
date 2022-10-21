@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Accordion,
   Nav,
@@ -47,14 +47,21 @@ export default function TabbedNavigation({
   ...props
 }: TabbedNavigationProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const [activeKey, setActiveKey] = useState<string>();
+
   const toggleOnClick = useAccordionButton(String(!collapsed), () =>
     setCollapsed(!collapsed));
 
   function getDefaultActiveTab() {
     return tabs.find((tab) => tab.isEmpty === false)?.eventKey;
   }
+
+  useEffect(() => {
+    setActiveKey(getDefaultActiveTab());
+  }, [tabs]);
+
   return (
-    <Tab.Container defaultActiveKey={getDefaultActiveTab()}>
+    <Tab.Container activeKey={activeKey} onSelect={setActiveKey}>
       <Accordion defaultActiveKey="false">
         <div
           className={`row ${props.className} align-items-center m-0 ${

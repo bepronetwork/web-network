@@ -27,6 +27,8 @@ import { useSettings } from "contexts/settings";
 import useApi from "x-hooks/use-api";
 import useNetwork from "x-hooks/use-network";
 
+import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
+
 interface MyNetworkLink {
   href: string;
   label: string | ReactElement;
@@ -87,7 +89,7 @@ export default function MainNav() {
   } 
 
   return (
-    <>
+    <div className="nav-container">
       {network?.isClosed && <ClosedNetworkAlert />}
       <div
         className={`main-nav d-flex flex-column justify-content-center
@@ -151,14 +153,16 @@ export default function MainNav() {
 
           <div className="d-flex flex-row align-items-center gap-20">
             {(!isNetworksPage && (
-              <Button 
-                outline
-                onClick={handleNewBounty}
-                textClass="text-white"
-              >
-                <PlusIcon />
-                <span><Translation label={"main-nav.new-bounty"} /></span>
-              </Button>
+              <ReadOnlyButtonWrapper>
+                <Button 
+                  outline
+                  onClick={handleNewBounty}
+                  textClass="text-white"
+                >
+                  <PlusIcon />
+                  <span><Translation label={"main-nav.new-bounty"} /></span>
+                </Button>
+              </ReadOnlyButtonWrapper>
             )) || (
               <InternalLink
                 href={myNetwork.href}
@@ -183,14 +187,6 @@ export default function MainNav() {
 
             <ConnectWalletButton>
               <>
-                {/* <Button
-                  className="opacity-75 opacity-100-hover"
-                  transparent
-                  rounded
-                >
-                  <NotificationIcon />
-                </Button> */}
-
                 <TransactionsStateIndicator />
 
                 <NavAvatar />
@@ -200,6 +196,6 @@ export default function MainNav() {
           <HelpModal show={showHelp} onCloseClick={() => setShowHelp(false)} />
         </div>
       </div>
-    </>
+    </div>
   );
 }

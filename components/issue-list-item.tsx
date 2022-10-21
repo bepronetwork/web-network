@@ -93,7 +93,7 @@ export default function IssueListItem({
                   !isActive ? "text-primary" : "text-white-40"
                 }`}
               >
-                ${issue?.token?.symbol || t("common:misc.token")}
+                {issue?.token?.symbol || t("common:misc.token")}
               </label>
             </span>
           </div>

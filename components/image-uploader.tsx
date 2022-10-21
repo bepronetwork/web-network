@@ -45,9 +45,9 @@ export default function ImageUploader({
         } ${className}`}
         htmlFor={name}
       >
-        {image.preview ? (
+        {image.preview || typeof image === "string" ? (
           <img
-            src={image.preview}
+            src={image.preview || image}
             alt="dummy"
             width={dimensions.width}
             height={dimensions.height}

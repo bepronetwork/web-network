@@ -27,10 +27,6 @@ const serverRuntimeConfig = {
     owner: process.env.NEXT_GH_OWNER,
     repository: process.env.NEXT_GH_REPO,
   },
-  ipApi: {
-    key: process.env.NEXT_IP_API_KEY,
-    skip: process.env.NEXT_SKIP_IP_API || false
-  },
   walletPrivateKey: process.env.NEXT_WALLET_PRIVATE_KEY,
   elasticSearch: {
     username: process.env.NEXT_ELASTIC_SEARCH_USERNAME,

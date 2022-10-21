@@ -345,10 +345,14 @@ li {
   width: auto;
 }
 
-.main-nav {
-  width: 100%;
+.nav-container{
   position: fixed;
   z-index: 5;
+  width: 100%;
+}
+
+.main-nav {
+  width: 100%;
   min-height: $navbar-height;
 
   .brand {
@@ -878,14 +882,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
   .modal-body {
     padding: 28px 30px 6px;
-  }
-}
-
-#nation-dialog-modal {
-  max-width: 420px;
-  color: $white;
-  .white-space-wrap {
-    white-space: pre-wrap;
   }
 }
 
@@ -1510,8 +1506,17 @@ input[type="color"] {
 }
 
 .read-only-network {
+  #root-container{
+    padding-top: $navbar-height + 30px;
+  }
   .read-only-wrapper {
-    cursor: not-allowed !important;
+    // cursor: not-allowed !important;
+     button, a, input, select,
+     .react-select-container{
+      cursor: not-allowed !important;
+      pointer-events: none;
+      opacity: 0.65;
+    }
   }
 
   .read-only-button {

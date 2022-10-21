@@ -18,11 +18,16 @@ export async function add(file: Buffer | string | JSON | Record<string, unknown>
                           pin = false,
                           originalFilename?: string,
                           ext?: string): Promise<{ hash: string; fileName: string; size: string }> {
-  const form = new FormData();
 
+  if(!file) return;
+
+  const form = new FormData();               
   const isBuffer = Buffer.isBuffer(file);
 
-  const content = isBuffer ? Buffer.from(file) : JSON.stringify(file);
+  let content = file;
+
+  if(isBuffer) content = Buffer.from(file)
+  else if(typeof content === "object") content = JSON.stringify(file)
 
   if (isBuffer) {
     const fileType = await fileTypeFromBuffer(file);
@@ -50,7 +55,7 @@ export async function add(file: Buffer | string | JSON | Record<string, unknown>
                                     form,
                                     {
       headers
-                                    });
+                                    });                                 
   return { hash: data.Hash, fileName: data.Name, size: data.Size };
 }
 
@@ -77,7 +82,6 @@ export async function addAll(files: Buffer[]): Promise<{ hash: string; fileName:
     Connection: "keep-alive",
     authorization: auth
   };
-
   const { data } = await axios.post(`${baseURL}/add?wrap-with-directory=true&only-hash=true`,
                                     form,
                                     {

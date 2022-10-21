@@ -15,7 +15,7 @@ export function isProposalDisputable(createdAt: Date | number, disputableTime: n
  * @throws Error
  */
 export const bountyReadyPRsHasNoInvalidProposals = async (bounty: Bounty, network: Network_v2) : Promise<number> => {
-  const readyPRsIds = bounty.pullRequests.filter(pr => pr.ready).map(pr => pr.id);
+  const readyPRsIds = bounty.pullRequests.filter(pr => pr.ready && !pr.canceled).map(pr => pr.id);
 
   if (!readyPRsIds.length) return 0;
 
