@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import NumberFormat from "react-number-format";
 
 import clsx from "clsx";
@@ -25,16 +25,32 @@ export default function InputNumber({
   setMaxValue,
   description,
   allowNegative = false,
+  value,
+  onValueChange,
   ...params
 }: InputNumberProps) {
   const { t } = useTranslation(["common"]);
-
+  const [inputValue, setInputValue] = useState<number | string | null>()
+  const debounce = useRef(null)
+  
   const id = kebabCase(typeof label === 'string' ? label : "");
   const errorStyle = { "text-danger bg-opacity-100": error };
   const successStyle = { "text-success bg-opacity-100": success };
   const warningStyle = { "text-warning bg-opacity-100": warning };
   const shouldBeWrapped = label || helperText;
   const Component = shouldBeWrapped ? "div" : Fragment;
+
+  function handleInputChange(e) {
+    setInputValue(e?.target?.value || null)
+
+    clearTimeout(debounce.current)
+    
+    debounce.current = setTimeout(() => {
+      onValueChange?.(e)
+    }, 500)
+  }
+
+  useEffect(()=>{if(value !== inputValue) setInputValue(value)},[value])
 
   return (
     <Component {...(shouldBeWrapped && { className: "form-group" })}>
@@ -70,6 +86,8 @@ export default function InputNumber({
           placeholder={placeholder}
           allowNegative={allowNegative}
           {...params}
+          onValueChange={handleInputChange}
+          value={inputValue}
         />
         {symbol && (
           <span
