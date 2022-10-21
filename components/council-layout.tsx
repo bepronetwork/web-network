@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from "react";
 
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
@@ -6,22 +6,21 @@ import { useRouter } from "next/router";
 import InternalLink from "components/internal-link";
 import PageHero, { InfosHero } from "components/page-hero";
 
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
-
 import useApi from "x-hooks/use-api";
-import useNetwork from "x-hooks/use-network-theme";
+import {useNetwork} from "x-hooks/use-network";
 
 import CardBecomeCouncil from "./card-become-council";
+import {AppStateContext} from "../contexts/app-state";
 
 export default function CouncilLayout({ children }) {
   const { asPath } = useRouter();
   const { t } = useTranslation(["council"]);
 
+  const {state} = useContext(AppStateContext);
+
   const { getTotalBounties } = useApi();
-  const { service: DAOService } = useDAO();
-  const { network: activeNetwork, getURLWithNetwork } = useNetwork();
-  const { wallet } = useAuthentication();
+  const { getURLWithNetwork } = useNetwork();
+
 
   const [infos, setInfos] = useState<InfosHero[]>([
     {
@@ -45,11 +44,11 @@ export default function CouncilLayout({ children }) {
   ]);
 
   async function loadTotals() {
-    if (!DAOService || !activeNetwork) return;
+    if (!state.Service?.active || !state.Service?.network?.active) return;
     
     const [totalBounties, onNetwork] = await Promise.all([
       getTotalBounties("ready"),
-      DAOService.getTotalNetworkToken(),
+      state.Service?.active.getTotalNetworkToken(),
     ]);
 
     setInfos([
@@ -58,7 +57,7 @@ export default function CouncilLayout({ children }) {
         label: t("council:ready-bountys"),
       },
       {
-        value: activeNetwork?.councilMembers?.length || 0,
+        value: state.Service?.network?.active?.councilMembers?.length || 0,
         label: t("council:council-members"),
       },
       {
@@ -76,14 +75,14 @@ export default function CouncilLayout({ children }) {
 
   useEffect(() => {
     loadTotals();
-  }, [DAOService, activeNetwork]);
+  }, [state.Service?.active, state.Service?.network?.active]);
 
   return (
     <div>
       <PageHero
         title={t("council:title")}
         subtitle={t("council:subtitle", {
-          token: activeNetwork?.networkToken?.symbol,
+          token: state.Service?.network?.active?.networkToken?.symbol,
         })}
         infos={infos}
       />
@@ -112,7 +111,7 @@ export default function CouncilLayout({ children }) {
       <div className="container p-footer">
         <div className="row justify-content-center">
           <div className="col-md-10 mt-2">
-            {!wallet?.isCouncil && <CardBecomeCouncil />}
+            {!state?.Service?.network?.active?.isCouncil && <CardBecomeCouncil />}
           </div>
           {children}
         </div>

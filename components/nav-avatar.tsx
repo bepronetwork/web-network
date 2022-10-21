@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useContext, useState} from "react";
 import { OverlayTrigger, Popover } from "react-bootstrap";
 
 import { useTranslation } from "next-i18next";
@@ -11,11 +11,13 @@ import Avatar from "components/avatar";
 import Button from "components/button";
 import Identicon from "components/identicon";
 
-import { useAuthentication } from "contexts/authentication";
+import {AppStateContext} from "../contexts/app-state";
 
+import { useAuthentication } from "x-hooks/use-authentication";
+import {useNetwork} from "x-hooks/use-network";
 import { truncateAddress } from "helpers/truncate-address";
 
-import useNetworkTheme from "x-hooks/use-network-theme";
+
 
 
 export default function NavAvatar() {
@@ -24,14 +26,17 @@ export default function NavAvatar() {
 
   const [visible, setVisible] = useState(false);
 
-  const { getURLWithNetwork } = useNetworkTheme();
-  const { wallet, user, disconnectWallet } = useAuthentication();
+  const {state} = useContext(AppStateContext);
 
-  const avatar = () => user?.login && 
-    <Avatar userLogin={user.login} className="border-primary" size="md" /> || 
-    <Identicon address={wallet?.address} />;
+
+  const { getURLWithNetwork } = useNetwork();
+  const { disconnectWallet } = useAuthentication();
+
+  const avatar = () => state.currentUser?.login &&
+    <Avatar userLogin={state.currentUser.login} className="border-primary" size="md" /> ||
+    <Identicon address={state.currentUser?.walletAddress} />;
   
-  const username = user?.login ? user.login : truncateAddress(wallet?.address);
+  const username = state.currentUser?.login ? state.currentUser.login : truncateAddress(state.currentUser?.walletAddress);
 
   function handleInternalLinkClick(href) {
     setVisible(false);

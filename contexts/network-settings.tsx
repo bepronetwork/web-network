@@ -45,16 +45,10 @@ export const NetworkSettingsProvider = ({ children }) => {
   */
   const [forcedNetwork, setForcedNetwork] = useState<Network>();
   const [networkSettings, setNetworkSettings] = useState(DefaultNetworkSettings)
+  const [isLoadingData, setIsLoadingData] = useState(false);
 
   const {state} = useContext(AppStateContext);
-
-  const [isLoadingData, setIsLoadingData] = useState(false)
-
-  const { activeNetwork } = useNetwork();
-  const { service: DAOService } = useDAO();
   const { DefaultTheme } = useNetworkTheme();
-  const { wallet, user } = useAuthentication();
-  
   const { getUserRepositories } = useOctokit();
   const { getNetwork, searchRepositories, repositoryHasIssues } = useApi();
 
@@ -68,18 +62,18 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   const isCreating = useMemo(() => router.pathname === "/new-network", [router.pathname]);
   const needsToLoad = useMemo(() => ALLOWED_PATHS.includes(router.pathname), [router.pathname]);
-  const network = useMemo(() => forcedNetwork || activeNetwork, [forcedNetwork, activeNetwork]);
+  const network = useMemo(() => forcedNetwork || state.Service?.network?.active, [forcedNetwork, state.Service?.network?.active]);
 
   function handlerValidateSettings(settings){
     //Treasury
-    if (DAOService) {
+    if (state.Service?.active) {
       const isAddressEmptyOrZeroAddress = settings?.treasury?.address?.value?.trim() === "" || 
       settings?.treasury?.address?.value === Defaults.nativeZeroAddress;
 
       const conditionOrUndefined = condition => isAddressEmptyOrZeroAddress ? undefined : condition;
 
       Promise.all([
-      conditionOrUndefined(DAOService.isAddress(settings?.treasury?.address?.value)),
+      conditionOrUndefined(state.Service?.active.isAddress(settings?.treasury?.address?.value)),
       conditionOrUndefined(settings?.treasury?.cancelFee?.value >= 0 && settings?.treasury?.cancelFee?.value <= 100),
       conditionOrUndefined(settings?.treasury?.closeFee?.value >= 0 && settings?.treasury?.closeFee?.value <= 100),
       ]).then((treasuryValidator)=>{
@@ -275,11 +269,11 @@ export const NetworkSettingsProvider = ({ children }) => {
   };
 
   async function loadDaoService(): Promise<DAO> {
-    if (!forcedNetwork) return DAOService;
+    if (!forcedNetwork) return state.Service?.active;
 
     const networkAddress = network?.networkAddress;
     const dao = new DAO({
-      web3Connection: DAOService.web3Connection,
+      web3Connection: state.Service?.active.web3Connection,
       skipWindowAssignment: true
     });
 
@@ -292,8 +286,8 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   async function getTokenBalance() {
     const [tokensLockedInRegistry, registryCreatorAmount] = await Promise.all([
-      DAOService.getTokensLockedInRegistryByAddress(wallet.address),
-      DAOService.getRegistryCreatorAmount()
+      state.Service?.active?.getTokensLockedInRegistryByAddress(wallet.address),
+      state.Service?.active?.getRegistryCreatorAmount()
     ])
 
     return {
@@ -485,8 +479,8 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   useEffect(() => {
     if ([
-      !DAOService,
-      !wallet?.address,
+      !state.Service?.active,
+      !state.currentUser?.walletAddress,
       !isCreating && !network?.name && !network?.councilAmount,
       isCreating && !state.Settings?.beproToken?.address,
       !needsToLoad
@@ -500,9 +494,9 @@ export const NetworkSettingsProvider = ({ children }) => {
     else if(isCreating)
       loadDefaultSettings().finally(()=> setIsLoadingData(false));
   }, [
-    user?.login,
-    wallet?.address,
-    DAOService,
+    state.currentUser?.login,
+    state.currentUser?.walletAddress,
+    state.Service?.active,
     network,
     isCreating,
     forcedNetwork,
@@ -513,7 +507,7 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   // NOTE -  Load Forced/User Network
   useEffect(()=>{
-    if(DAOService && forcedNetwork && (!forcedNetwork?.tokensLocked || !forcedNetwork.tokensStaked))
+    if(state.Service?.active && forcedNetwork && (!forcedNetwork?.tokensLocked || !forcedNetwork.tokensStaked))
       loadDaoService()
       .then((service)=>
        Promise.all([
@@ -540,7 +534,7 @@ export const NetworkSettingsProvider = ({ children }) => {
           draftTime: +draftTime / 1000,
           percentageNeededForDispute: +percentageNeededForDispute,
          })))
-  },[forcedNetwork, DAOService])
+  },[forcedNetwork, state.Service?.active])
 
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({

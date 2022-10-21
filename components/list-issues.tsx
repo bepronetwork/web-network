@@ -19,8 +19,6 @@ import NothingFound from "components/nothing-found";
 import ScrollTopButton from "components/scroll-top-button";
 
 import { AppStateContext } from "contexts/app-state";
-import { useAuthentication } from "contexts/authentication";
-import { useNetwork } from "contexts/network";
 import { changeLoadState } from "contexts/reducers/change-load";
 
 
@@ -84,10 +82,10 @@ export default function ListIssues({
   const [issuesPages, setIssuesPages] = useState<IssuesPage[]>([]);
 
   const searchTimeout = useRef(null);
-  
+
+  const {state: appState} = useContext(AppStateContext);
+
   const { searchIssues } = useApi();
-  const { wallet } = useAuthentication();
-  const { activeNetwork } = useNetwork();
   const { page, nextPage, goToFirstPage } = usePage();
 
   const isProfilePage = router?.asPath?.includes("profile");
@@ -147,7 +145,7 @@ export default function ListIssues({
   }
 
   function handlerSearch() {
-    if (!activeNetwork) return;
+    if (!appState.Service?.network?.active) return;
 
     dispatch(changeLoadState(true));
 
@@ -163,7 +161,7 @@ export default function ListIssues({
       pullRequesterLogin,
       pullRequesterAddress,
       proposer,
-      networkName: activeNetwork?.name
+      networkName: appState.Service?.network?.active?.name
     })
       .then(({ rows, pages, currentPage }) => {
         if (currentPage > 1) {
@@ -223,7 +221,7 @@ export default function ListIssues({
     order,
     creator,
     proposer,
-    activeNetwork
+    appState.Service?.network?.active
   ]);
 
   useEffect(() => {
@@ -333,7 +331,7 @@ export default function ListIssues({
       !loading.isLoading ? (
         <div className="pt-4">
           <NothingFound description={emptyMessage || filterByState.emptyState}>
-            {wallet?.address && (
+            {appState.currentUser?.walletAddress && (
               <ReadOnlyButtonWrapper>
                 <Button onClick={handleNotFoundClick}>
                   {buttonMessage || String(t("actions.create-one"))}

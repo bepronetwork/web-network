@@ -5,9 +5,9 @@ import Button from "components/button";
 import Icon from "components/icon";
 import Modal from "components/modal";
 import { AppStateContext } from "contexts/app-state";
-import { useAuthentication } from "contexts/authentication";
+import { useAuthentication } from "x-hooks/use-authentication";
 import { useDAO } from "contexts/dao";
-import { useNetwork } from "contexts/network";
+
 import { addToast } from "contexts/reducers/change-toaster";
 import { formatNumberToCurrency } from "helpers/formatNumber";
 import { parseTransaction } from "helpers/transactions";
@@ -58,22 +58,21 @@ function networkTxButton({
   const [showModal, setShowModal] = useState(false);
   const [txSuccess,] = useState(false);
 
-  const { dispatch } = useContext(AppStateContext);
+  const { state, dispatch } = useContext(AppStateContext);
 
   const { processEvent } = useApi();
-  const { activeNetwork } = useNetwork();
-  const { service: DAOService } = useDAO();
-  const { wallet, updateWalletBalance } = useAuthentication();
+
+  const { updateWalletBalance } = useAuthentication();
 
   function checkForTxMethod() {
-    if (!DAOService || !wallet) return;
+    if (!state.Service?.active || !state.currentUser) return;
 
-    if (!txMethod || typeof DAOService.network[txMethod] !== "function")
+    if (!txMethod || typeof state.Service?.active.network[txMethod] !== "function")
       throw new Error("Wrong txMethod");
   }
 
   function makeTx() {
-    if (!DAOService || !wallet) return;
+    if (!state.Service?.active || !state.currentUser) return;
 
     const tmpTransaction = addTx([{
         type: txType,
@@ -86,7 +85,7 @@ function networkTxButton({
     const methodName = txMethod === 'delegateOracles' ? 'delegate' : txMethod;
     const currency = txCurrency || t("misc.$token");
     
-    DAOService.network[txMethod](txParams.tokenAmount, txParams.from)
+    state.Service?.active.network[txMethod](txParams.tokenAmount, txParams.from)
       .then(answer => {
         if (answer.status) {
           onSuccess && onSuccess();
@@ -99,7 +98,7 @@ function networkTxButton({
           }));
 
           if (answer.blockNumber)
-            processEvent("oracles","changed", activeNetwork.name, {fromBlock:answer.blockNumber}).catch(console.debug);
+            processEvent("oracles","changed", state.Service?.network?.active.name, {fromBlock:answer.blockNumber}).catch(console.debug);
 
           updateTx([parseTransaction(answer, tmpTransaction.payload[0])])
         } else {
@@ -123,7 +122,7 @@ function networkTxButton({
         onFail(e.message);
       })
       .finally(() => {
-        updateWalletBalance();
+        updateWalletBalance(true);
       });
   }
 
@@ -145,7 +144,7 @@ function networkTxButton({
     </Button>
   );
 
-  useEffect(checkForTxMethod, [DAOService, wallet]);
+  useEffect(checkForTxMethod, [state.Service?.active, state.currentUser]);
 
   return (
     <>

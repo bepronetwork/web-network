@@ -4,12 +4,14 @@ import {WinStorage} from "services/win-storage";
 import {AppStateContext} from "contexts/app-state";
 import useApi from "./use-api";
 import {changeActiveNetwork, changeNetworkLastVisited} from "contexts/reducers/change-service";
+import {UrlObject} from "url";
 
 export function useNetwork() {
   const {state, dispatch} = useContext(AppStateContext);
   const [storage,] = useState(new WinStorage(`lastNetworkVisited`, 0, 'localStorage'));
   const {query, push} = useRouter();
   const {getNetwork} = useApi();
+
 
   function clearNetworkFromStorage() {
     storage.delete();
@@ -55,10 +57,24 @@ export function useNetwork() {
 
   }
 
+  function getURLWithNetwork(href: string, _query = undefined): UrlObject {
+    return {
+      pathname: `/[network]/${href}`.replace("//", "/"),
+      query: {
+        ..._query,
+        network: _query?.network ||
+          query?.network ||
+          state.Settings?.defaultNetworkConfig?.name ||
+          "bepro"
+      }
+    };
+  }
+
   useEffect(updateActiveNetwork, [query?.network, state.Settings, state.Service]);
 
   return {
     updateActiveNetwork,
+    getURLWithNetwork,
     clearNetworkFromStorage,
   }
 

@@ -18,14 +18,12 @@ import Translation from "components/translation";
 import WrongNetworkModal from "components/wrong-network-modal";
 
 import { AppStateContext } from "contexts/app-state";
-import { useAuthentication } from "contexts/authentication";
-import { useDAO } from "contexts/dao";
 
-import { useSettings } from "contexts/settings";
 
 import useApi from "x-hooks/use-api";
-import useNetwork from "x-hooks/use-network-theme";
+
 import {changeShowCreateBounty, changeShowWeb3} from "../contexts/reducers/update-show-prop";
+import {useNetwork} from "../x-hooks/use-network";
 
 import ReadOnlyButtonWrapper from "./read-only-button-wrapper";
 
@@ -48,23 +46,21 @@ export default function MainNav() {
     icon: <PlusIcon /> 
   });
 
-  const { settings } = useSettings();
+  const {state} = useContext(AppStateContext);
   const { searchNetworks } = useApi();
-  const { wallet } = useAuthentication();
-  const { service: DAOService } = useDAO();
-  const { network, getURLWithNetwork } = useNetwork();
+  const { getURLWithNetwork } = useNetwork();
 
   const isNetworksPage = ["/networks", "/new-network"].includes(pathname);
   const isBeproNetwork = [
-    !network?.name,
-    !settings?.defaultNetworkConfig?.name,
-    network?.name === settings?.defaultNetworkConfig?.name
+    !state.Service?.network?.active?.name,
+    !state.Settings?.defaultNetworkConfig?.name,
+    state.Service?.network?.active?.name === state.Settings?.defaultNetworkConfig?.name
   ].some(c => c);
 
   useEffect(() => {
-    if (!DAOService || !wallet?.address || !isNetworksPage) return;
+    if (!state.Service?.active || !state.currentUser?.walletAddress || !isNetworksPage) return;
 
-    DAOService.getNetworkAdressByCreator(wallet.address)
+    state.Service?.active.getNetworkAdressByCreator(state.currentUser.walletAddress)
       .then(async networkAddress => {
         if (networkAddress === Defaults.nativeZeroAddress) 
           return setMyNetwork({ 
@@ -81,7 +77,7 @@ export default function MainNav() {
         });
       })
       .catch(console.log);
-  }, [DAOService, wallet?.address, isNetworksPage]);
+  }, [state.Service?.active, state.currentUser?.walletAddress, isNetworksPage]);
 
   function handleNewBounty () {
     if(!window.ethereum) return dispatch(changeShowWeb3(true))
@@ -90,23 +86,23 @@ export default function MainNav() {
 
   return (
     <div className="nav-container">
-      {network?.isClosed && <ClosedNetworkAlert />}
+      {state.Service?.network?.active?.isClosed && <ClosedNetworkAlert />}
       <div
         className={`main-nav d-flex flex-column justify-content-center
           bg-${isBeproNetwork || isNetworksPage ? "dark" : "primary"}`}
       >
         <div
           className={`d-flex flex-row align-items-center justify-content-between px-3 ${
-            wallet?.address ? "py-0" : "py-3"
+            state.currentUser?.walletAddress ? "py-0" : "py-3"
           }`}
         >
           <div className="d-flex">
             <InternalLink
-              href={getURLWithNetwork("/", { network: network?.name })}
+              href={getURLWithNetwork("/", { network: state.Service?.network?.active?.name })}
               icon={
                 !isBeproNetwork ? (
                   <img
-                    src={`${settings?.urls?.ipfs}/${network?.fullLogo}`}
+                    src={`${state.Settings?.urls?.ipfs}/${state.Service?.network?.active?.fullLogo}`}
                     width={104}
                     height={32}
                   />
@@ -154,7 +150,7 @@ export default function MainNav() {
           <div className="d-flex flex-row align-items-center gap-20">
             {(!isNetworksPage && (
               <ReadOnlyButtonWrapper>
-                <Button 
+                <Button
                   outline
                   onClick={handleNewBounty}
                   textClass="text-white"
@@ -183,7 +179,7 @@ export default function MainNav() {
               <HelpIcon />
             </Button>
 
-            <WrongNetworkModal requiredNetworkId={settings?.requiredChain?.id} />
+            <WrongNetworkModal requiredNetworkId={state.Settings?.requiredChain?.id} />
 
             <ConnectWalletButton>
               <>

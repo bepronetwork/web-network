@@ -5,7 +5,7 @@ import {ToastNotification} from "./toast-notification";
 import {BlockTransaction, SimpleBlockTransactionPayload, UpdateBlockTransaction} from "./transaction";
 import {SettingsType} from "../types/settings";
 import {Network} from "./network";
-import {ForkInfo, ForksList, ReposList} from "./repos-list";
+import {ForkInfo, ForksList, RepoInfo, ReposList} from "./repos-list";
 import {BranchesList, BranchInfo} from "./branches-list";
 import {XReducerAction} from "../contexts/reducers/reducer";
 import {Balance} from "./balance-state";
@@ -13,11 +13,12 @@ import {IssueBigNumberData, IssueData, IssueDataComment} from "./issue-data";
 import BigNumber from "bignumber.js";
 import {BountyExtended} from "./bounty";
 
-export interface ServiceNetworkReposActive {
-  forks: ForkInfo[];
-  branches: BranchInfo[];
-  ghVisibility: boolean;
-  id?: number;
+export interface ServiceNetworkReposActive extends RepoInfo {
+  forks?: ForkInfo[];
+  branches?: BranchInfo[];
+  ghVisibility?: boolean;
+  githubPath: string;
+  id: number;
 }
 
 export interface ServiceNetworkRepos {
@@ -51,6 +52,7 @@ export interface CurrentUserState {
   match?: boolean | undefined;
   balance?: Balance | null;
   login?: string;
+  accessToken?: string;
 }
 
 export interface CurrentBounty {

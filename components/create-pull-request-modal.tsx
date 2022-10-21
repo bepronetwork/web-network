@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useContext, useEffect, useState} from "react";
 
 import { useTranslation } from "next-i18next";
 
@@ -9,11 +9,8 @@ import IconSingleValue from "components/icon-single-value";
 import Modal from "components/modal";
 import ReactSelect from "components/react-select";
 
-import { useAuthentication } from "contexts/authentication";
-import { useIssue } from "contexts/issue";
-import { useRepos } from "contexts/repos";
-
 import useOctokit from "x-hooks/use-octokit";
+import {AppStateContext} from "../contexts/app-state";
 
 interface props {
   show: boolean,
@@ -40,9 +37,7 @@ export default function CreatePullRequestModal({
   const [description, setDescription] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
-  const { user } = useAuthentication();
-  const { activeRepo } = useRepos();
-  const { activeIssue } = useIssue()
+  const {state} = useContext(AppStateContext);
 
   const { getRepositoryBranches, getUserRepositories } = useOctokit();
 
@@ -69,13 +64,14 @@ export default function CreatePullRequestModal({
 
   useEffect(setDefaults, [show]);
   useEffect(() => {
-    if (!user?.accessToken || !repo || !show) return;
+    if (!state.currentUser?.login || !repo || !show) return;
 
-    getUserRepositories(user.login)
+    // todo: add app-state for user-repositories ?
+    getUserRepositories(state.currentUser.login)
     .then(repositories => {
       const filteredRepos = 
-        repositories.filter(repo => (repo.isFork && repo.nameWithOwner === `${user.login}/${activeRepo?.name}`) 
-                                    || repo.nameWithOwner === activeRepo?.githubPath);
+        repositories.filter(repo => (repo.isFork && repo.nameWithOwner === `${state.currentUser.login}/${state.Service?.network?.repos?.active?.name}`)
+                                    || repo.nameWithOwner === state.Service?.network?.repos?.active?.githubPath);
       
       return Promise.all(filteredRepos
         .map(async (repository) => ({ repository, branches:  await getRepositoryBranches(repository.nameWithOwner)})));
@@ -84,33 +80,34 @@ export default function CreatePullRequestModal({
       .map(({ repository, branches }) => branches
         .map(branch => { 
 
-          const prExistsInActiveIssue = 
-          activeIssue.pullRequests
-          .some(({branch: b}) => b === `${repository.owner}:${branch}`);
+          const prExistsInActiveIssue =
+            state.currentBounty?.data.pullRequests
+              .some(({branch: b}) => b === `${repository.owner}:${branch}`);
 
-          const isBaseBranch = 
-          (activeIssue.repository.githubPath === repository.nameWithOwner 
-          && activeIssue.branch === branch) ;
+          const isBaseBranch =
+            (state.currentBounty?.data.repository.githubPath === repository.nameWithOwner &&
+              state.currentBounty?.data.branch === branch) ;
           
           let postIcon = <></>
 
-          if(repository.isFork){
-            postIcon =  <Badge 
+          if(repository.isFork)
+            postIcon = <Badge
               color={"primary-30"}
               label={t("misc.fork")}
             />
-          }
 
-          if(repository.isInOrganization){
+
+          if (repository.isInOrganization)
             postIcon =  <Badge 
               color={"white-10"}
               label={t("misc.organization")}
             />
-          }
 
-          const disabledIcon = !prExistsInActiveIssue 
-          ? <></> 
-          : <Badge color={"danger"} label={`${t("pull-request:abbreviation")} ${t("pull-request:opened")}`} />;
+
+          const disabledIcon = !prExistsInActiveIssue
+            ? <></>
+            : <Badge color={"danger"}
+                     label={`${t("pull-request:abbreviation")} ${t("pull-request:opened")}`} />;
 
           return {
             value: `${repository.owner}:${branch}`, 
@@ -123,7 +120,7 @@ export default function CreatePullRequestModal({
       .flatMap(branch => branch))
     .then(setOptions)
     .catch(console.log);
-  }, [user?.accessToken, repo, show]);
+  }, [state.currentUser?.login, repo, show]);
 
   return (
     <Modal

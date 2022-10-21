@@ -51,6 +51,9 @@ export default function AppStateContextProvider({children}) {
 
   useEffect(parseError, [authError])
 
+  // debug
+  useEffect(() => { console.debug(`AppState Started`, new Date()) }, [])
+
   return <AppStateContext.Provider value={{state, dispatch: dispatch as any}}>
     {children}
   </AppStateContext.Provider>

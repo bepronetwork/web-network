@@ -6,6 +6,7 @@ interface Spinners {
   proposals: boolean;
   pullRequests: boolean;
   bountyState: boolean;
+  balance: boolean;
 }
 
 class ChangeSpinners extends SimpleAction<Spinners|Partial<Spinners>> {
