@@ -326,6 +326,7 @@ export const NetworkSettingsProvider = ({ children }) => {
             checked: false,
             isSaved: false,
             hasIssues: false,
+            userPermission:repo.viewerPermission,
             name: repo?.name,
             fullName: repo?.nameWithOwner
           }));
