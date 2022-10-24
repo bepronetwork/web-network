@@ -44,6 +44,8 @@ function renderDescription(description: string) {
 export default function TabbedNavigation({
   collapsable = false,
   tabs,
+  defaultActiveKey,
+  onTransition,
   ...props
 }: TabbedNavigationProps) {
   const [collapsed, setCollapsed] = useState(false);
@@ -56,12 +58,17 @@ export default function TabbedNavigation({
     return tabs.find((tab) => tab.isEmpty === false)?.eventKey;
   }
 
+  function handleTransition(newActiveKey: string) {
+    setActiveKey(newActiveKey);
+    onTransition?.(newActiveKey);
+  }
+
   useEffect(() => {
-    setActiveKey(getDefaultActiveTab());
-  }, [tabs]);
+    if (!defaultActiveKey) setActiveKey(getDefaultActiveTab());
+  }, [tabs, defaultActiveKey]);
 
   return (
-    <Tab.Container activeKey={activeKey} onSelect={setActiveKey}>
+    <Tab.Container defaultActiveKey={defaultActiveKey} activeKey={activeKey} onSelect={handleTransition}>
       <Accordion defaultActiveKey="false">
         <div
           className={`row ${props.className} align-items-center m-0 ${

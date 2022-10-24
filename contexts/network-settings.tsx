@@ -388,6 +388,8 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     defaultState.github.repositories = await loadGHRepos();
 
+    defaultState.tokens.settler = appSettings?.beproToken?.address;
+
     const storageData = storage.getItem();
 
     if(storageData){
@@ -406,7 +408,8 @@ export const NetworkSettingsProvider = ({ children }) => {
         defaultState.tokens = storageData?.tokens;
     }
     
-    setNetworkSettings(defaultState)
+    setNetworkSettings(defaultState);
+
     return defaultState;
   }
 
@@ -479,12 +482,17 @@ export const NetworkSettingsProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    if (!DAOService ||
-        !wallet?.address||
-        (!isCreating && !network?.name && !network?.councilAmount) || 
-        !needsToLoad )
+    if ([
+      !DAOService,
+      !wallet?.address,
+      !isCreating && !network?.name && !network?.councilAmount, 
+      isCreating && !appSettings?.beproToken?.address,
+      !needsToLoad
+    ].some(c => c))
       return;
-    setIsLoadingData(true)
+    
+    setIsLoadingData(true);
+
     if (!isCreating && forcedNetwork)
       loadNetworkSettings().finally(()=> setIsLoadingData(false));
     else if(isCreating)
@@ -497,7 +505,8 @@ export const NetworkSettingsProvider = ({ children }) => {
     isCreating, 
     forcedNetwork,
     needsToLoad,
-    router.pathname
+    router.pathname,
+    appSettings?.beproToken?.address
   ]);
   
   // NOTE -  Load Forced/User Network

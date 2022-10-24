@@ -4,8 +4,10 @@ import { useTranslation } from "next-i18next";
 
 import Button from "components/button";
 import DeployERC20Modal from "components/deploy-erc20-modal";
+import { Divider } from "components/divider";
 import MultipleTokensDropdown from "components/multiple-tokens-dropdown";
 import Step from "components/step";
+import TabbedNavigation from "components/tabbed-navigation";
 
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
@@ -18,6 +20,9 @@ import { StepWrapperProps } from "interfaces/stepper";
 import { Token } from "interfaces/token";
 
 import useApi from "x-hooks/use-api";
+
+import { ERC20Details } from "./erc20-details";
+import { NetworkTokenConfig } from "./network-token-config";
 
 export default function TokenConfiguration({ 
   activeStep, 
@@ -40,7 +45,7 @@ export default function TokenConfiguration({
   const [selectedTransactionalTokens, setSelectedTransactionalTokens] =
     useState<Token[]>();
 
-  const debounce = useRef(null)
+  const debounce = useRef(null);
 
   const { tokens, fields } = useNetworkSettings();
   const { service: DAOService } = useDAO();
@@ -101,12 +106,13 @@ export default function TokenConfiguration({
   useEffect(() => {
     if (!DAOService) return;
     if(!networkTokenAddress.length && tokens?.settler)
-      setNetworkTokenAddress(tokens?.settler)
+      setNetworkTokenAddress(tokens.settler);
+
     if(!selectedRewardTokens?.length && tokens?.allowedRewards)
-      setSelectedRewardTokens(tokens.allowedRewards)
+      setSelectedRewardTokens(tokens.allowedRewards);
+
     if(!selectedTransactionalTokens?.length && tokens?.allowedTransactions)
-      setSelectedTransactionalTokens(tokens.allowedTransactions)
-    
+      setSelectedTransactionalTokens(tokens.allowedTransactions);
   }, [DAOService, tokens?.settler]);
  
 
@@ -133,20 +139,22 @@ export default function TokenConfiguration({
   useEffect(() => {
     if(!wallet?.address || !DAOService) return
     
-    DAOService.getAllowedTokens().then((allowedTokens) => {
-      getTokens()
-        .then((tokens) => {
-          const { transactional, reward } = handleAllowedTokensDatabase(allowedTokens, tokens)
-          setAllowedTransactionalTokens(transactional);
-          setAllowedRewardTokens(reward);
-        })
-        .catch((err) => console.log("error to get tokens database ->", err));
-    }).catch((err) => console.log("error to get allowed tokens contract ->", err));
+    DAOService.getAllowedTokens()
+      .then((allowedTokens) => {
+        getTokens()
+          .then((tokens) => {
+            const { transactional, reward } = handleAllowedTokensDatabase(allowedTokens, tokens)
+            setAllowedTransactionalTokens(transactional);
+            setAllowedRewardTokens(reward);
+          })
+          .catch((err) => console.log("error to get tokens database ->", err));
+      }).catch((err) => console.log("error to get allowed tokens contract ->", err));
   }, [wallet?.address])
   
   function handleEmptyTokens (tokens: Token[]) {
-    if(tokens?.length === 0) return [settings?.beproToken]
-    return tokens
+    if(tokens?.length === 0) return [settings?.beproToken];
+    
+    return tokens;
   }
 
   return (
@@ -159,79 +167,33 @@ export default function TokenConfiguration({
       handleFinish={handleFinish}
       finishLabel={finishLabel}
     >
-      <div className="row align-items-center">
-        <div className="form-group col-9">
-          <label className="caption-small mb-2">
-            {t("custom-network:steps.token-configuration.fields.tokens-dropdown.label")}
-          </label>
+      <NetworkTokenConfig
+        onChange={fields.settlerToken.setter}
+        networkTokenAddress={tokens?.settler}
+        beproTokenAddress={settings?.beproToken?.address}
+      />
 
-          <input 
-            type="text" 
-            className="form-control" 
-            value={networkTokenAddress}
-            onChange={handleNetworkTokenChange}
-          />
+      <Divider />
 
-          {
-            networkTokenError && 
-            <small className="small-info text-danger">
-              {t("custom-network:steps.token-configuration.fields.nft-token.error.pre")}
-              {" "}
-              <a href="https://sdk.dappkit.dev/classes/ERC20.html" target="_blank">
-                {t("misc.token")}
-              </a>
-              {" "}
-              {t("custom-network:steps.token-configuration.fields.nft-token.error.post")}
-            </small>
-          }
-        </div>
+      <MultipleTokensDropdown
+        label={t("select-multiple.allowed-transactional-tokens")}
+        description={t("select-multiple.add-transactional-tokens")}
+        addToken={addTransactionalToken}
+        tokens={handleEmptyTokens(allowedTransactionalTokens)}
+        canAddToken={false}
+        selectedTokens={selectedTransactionalTokens}
+        changeSelectedTokens={changeSelectedTransactionalTokens}
+      />
 
-        <div className="col-3 pt-2">
-          <Button onClick={handleShowModal}>
-            {t("custom-network:steps.token-configuration.actions.deploy-new-token")}
-          </Button>
-        </div>
-      </div>
-
-      <div className="row">
-        <div className="form-group col-6">
-          <label className="caption-small mb-2">
-            {t("custom-network:steps.token-configuration.fields.name.label")}
-          </label>
-          <input type="text" className="form-control" value={networkToken?.name}  readOnly />
-        </div>
-
-        <div className="form-group col-6">
-          <label className="caption-small mb-2">
-          {t("custom-network:steps.token-configuration.fields.symbol.label")}
-          </label>
-          <input type="text" className="form-control" value={networkToken?.symbol}  readOnly />
-        </div>
-      </div>
-
-      <div className="row">
-          <>
-            <MultipleTokensDropdown
-              label={t("select-multiple.allowed-transactional-tokens")}
-              description={t("select-multiple.add-transactional-tokens")}
-              addToken={addTransactionalToken}
-              tokens={handleEmptyTokens(allowedTransactionalTokens)}
-              canAddToken={false}
-              selectedTokens={selectedTransactionalTokens}
-              changeSelectedTokens={changeSelectedTransactionalTokens}
-            />
-
-            <MultipleTokensDropdown
-              label={t("select-multiple.allowed-reward-tokens")}
-              description={t("select-multiple.add-reward-tokens")}
-              addToken={addRewardToken}
-              tokens={handleEmptyTokens(allowedRewardTokens)}
-              canAddToken={false}
-              selectedTokens={selectedRewardTokens}
-              changeSelectedTokens={changeSelectedRewardTokens}
-            />
-          </>
-      </div>
+      <MultipleTokensDropdown
+        label={t("select-multiple.allowed-reward-tokens")}
+        description={t("select-multiple.add-reward-tokens")}
+        addToken={addRewardToken}
+        tokens={handleEmptyTokens(allowedRewardTokens)}
+        canAddToken={false}
+        selectedTokens={selectedRewardTokens}
+        changeSelectedTokens={changeSelectedRewardTokens}
+      />
 
       <DeployERC20Modal 
         show={showModalDeploy}
