@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState, useContext } from "react";
+import { setDefaults } from "react-i18next";
 
 import { TransactionReceipt } from "@taikai/dappkit/dist/src/interfaces/web3-core";
 import BigNumber from "bignumber.js";
@@ -17,22 +18,23 @@ import { TransactionTypes } from "interfaces/enums/transaction-types";
 import { BlockTransaction } from "interfaces/transaction";
 
 import useBepro from "x-hooks/use-bepro";
-
-import useTransactions from "./useTransactions";
+import useTransactions from "x-hooks/useTransactions";
 
 export default function useERC20() {
-  const [balance, setBalance] = useState(BigNumber(0));
   const [name, setName] = useState<string>();
   const [decimals, setDecimals] = useState(18); 
-  const [allowance, setAllowance] = useState(BigNumber(0));
   const [symbol, setSymbol] = useState<string>();
   const [address, setAddress] = useState<string>();
+  const [loadError, setLoadError] = useState(false);
+  const [balance, setBalance] = useState(BigNumber(0));
+  const [allowance, setAllowance] = useState(BigNumber(0));
+  const [totalSupply, setTotalSupply] = useState(BigNumber(0));
 
+  const txWindow = useTransactions();
+  const { activeNetwork } = useNetwork();
   const { wallet } = useAuthentication();
   const { service: DAOService } = useDAO();
   const { handleApproveToken } = useBepro();
-  const { activeNetwork } = useNetwork();
-  const txWindow = useTransactions();
   const { dispatch } = useContext(ApplicationContext);
 
   const logData = { 
@@ -59,15 +61,32 @@ export default function useERC20() {
     return handleApproveToken(address, amount).then(updateAllowanceAndBalance);
   }, [wallet?.address, DAOService, address]);
 
+  function setDefaults() {
+    setName(undefined);
+    setSymbol(undefined);
+    setDecimals(undefined);
+    setTotalSupply(undefined);
+    setBalance(undefined);
+    setAllowance(undefined);
+  }
+
   useEffect(() => {
-    if (DAOService && address) 
-      DAOService.getERC20TokenData(address)
-        .then(({ name, symbol, decimals }) => {
-          setName(name);
-          setSymbol(symbol);
-          setDecimals(decimals);
-        })
-        .catch(error => console.debug("useERC20:getERC20TokenData", logData, error));
+    if (!address && name) setDefaults();
+    if (!DAOService || !address) return;
+
+    DAOService.getERC20TokenData(address)
+      .then(({ name, symbol, decimals, totalSupply }) => {
+        setName(name);
+        setSymbol(symbol);
+        setDecimals(decimals);
+        setTotalSupply(totalSupply);
+        setLoadError(false);
+      })
+      .catch(error => {
+        setDefaults();
+        setLoadError(true);
+        console.debug("useERC20:getERC20TokenData", logData, error)
+      });
         
     updateAllowanceAndBalance();
   }, [wallet?.address, DAOService, address]);
@@ -104,14 +123,16 @@ export default function useERC20() {
 
   return {
     name,
-    decimals,
     symbol,
-    handleDeployERC20Token,
-    allowance,
     balance,
     address,
-    setAddress,
+    decimals,
+    loadError,
+    allowance,
+    totalSupply,
     approve,
+    setAddress,
+    handleDeployERC20Token,
     updateAllowanceAndBalance
   };
 }

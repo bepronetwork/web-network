@@ -444,7 +444,8 @@ export default class DAO {
       name: await token.name(),
       symbol: await token.symbol(),
       address: tokenAddress,
-      decimals: token.decimals
+      decimals: token.decimals,
+      totalSupply: BigNumber(await token.totalSupply())
     };
   }
 
