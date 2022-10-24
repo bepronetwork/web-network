@@ -10,12 +10,13 @@ import Stepper from "components/stepper";
 
 import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
+import { NetworkSettingsProvider } from "contexts/network-settings";
 
 import { Network } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 
-export default function ParityPage() {
+function AdministrationPage() {
   const [networks, setNetworks] = useState<Network[]>([]);
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -58,6 +59,12 @@ export default function ParityPage() {
     </div>
   );
 }
+
+export default () => (
+  <NetworkSettingsProvider>
+  <AdministrationPage/>
+  </NetworkSettingsProvider>
+  )
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

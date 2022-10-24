@@ -35,7 +35,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
   const { settings } = useSettings();
   const { service: DAOService } = useDAO();
-  const { tokensLocked } = useNetworkSettings();
+  const { tokensLocked, updateTokenBalance } = useNetworkSettings();
   const { user, wallet, updateWalletBalance } = useAuthentication();
   
   const networkTokenSymbol = settings?.beproToken?.symbol || t("misc.$token");
@@ -51,7 +51,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
   const lockedPercent = amountLocked?.multipliedBy(100)?.dividedBy(amountNeeded);
   const lockingPercent = amount?.multipliedBy(100)?.dividedBy(amountNeeded);
-  const maxPercent = lockedPercent?.minus(100)?.toFixed(4);
+  const maxPercent = BigNumber(100).minus(lockedPercent).toFixed(4);
   const maxValue = BigNumber.minimum(balance.beproAvailable, amountNeeded?.minus(amountLocked));
   const textAmountClass = amount?.gt(balance.beproAvailable) ? "danger" : "primary";
   const amountsClass = amount?.gt(maxValue) ? "danger" : "success";
@@ -71,11 +71,13 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
     setIsLocking(true);
 
     DAOService.lockInRegistry(amount.toFixed())
-      .then(() => {
-        setAmount(undefined);
-        updateWalletBalance();
-        updateAllowance();
-      })
+      .then(() => 
+        Promise.all([
+          updateWalletBalance(),
+          updateAllowance(),
+          updateTokenBalance(),
+          setAmount(BigNumber(0))
+        ]))
       .catch(console.log)
       .finally(() => setIsLocking(false));
   }
@@ -87,9 +89,12 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
     DAOService.unlockFromRegistry()
       .then(() => 
-        Promise.all([setAmount(undefined),
-                     updateWalletBalance(),
-                     updateAllowance()]))
+        Promise.all([
+          updateWalletBalance(),
+          updateAllowance(),
+          updateTokenBalance(),
+          setAmount(BigNumber(0))
+        ]))
       .catch((error) => {
         console.log("Failed to Unlock", error);
       })
@@ -124,7 +129,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
     setIsApproving(true)
 
-    DAOService.approveTokenInRegistry(amountNeeded?.minus(settlerAllowance)?.toFixed())
+    DAOService.approveTokenInRegistry(amount?.toFixed())
       .then(() => updateAllowance())
       .catch(console.log)
       .finally(()=> setIsApproving(false));
@@ -296,7 +301,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
 
                     <ProgressBar
                       min={0}
-                      now={lockingPercent?.gt(maxPercent) ? 0 : lockingPercent?.toNumber()}
+                      now={(lockingPercent?.gt(maxPercent) ? 0 : lockingPercent?.toNumber()) || 0}
                       isChild
                     />
                   </ProgressBar>
@@ -333,7 +338,7 @@ export default function LockBeproStep({ activeStep, index, handleClick, validate
                   }
 
                   <Button
-                    disabled={isUnlockBtnDisabled || isUnlocking}
+                    disabled={isUnlockBtnDisabled || isUnlocking || isApproving || isLocking }
                     color="ligth-gray"
                     onClick={handleUnLock}
                     isLoading={isUnlocking}

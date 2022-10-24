@@ -1,3 +1,5 @@
+import BigNumber from "bignumber.js";
+
 import ArrowRightLine from "assets/icons/arrow-right-line";
 
 import { formatStringToCurrency } from "helpers/formatNumber";
@@ -36,7 +38,7 @@ export default function AmountWithPreview({
         {renderAmount()}
       </span>
 
-      {preview > amount && (
+      {BigNumber(preview).gt(amount) && (
         <div className={`text-${previewColor}`}>
           <ArrowRightLine />
 

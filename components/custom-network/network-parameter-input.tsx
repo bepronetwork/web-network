@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+import { useState } from "react";
 import { NumberFormatValues } from "react-number-format";
 
 import InputNumber from "components/input-number";
@@ -20,10 +22,27 @@ export default function NetworkParameterInput({
   decimals = 18,
   className,
   disabled = false,
+  value,
   ...props
 } : NetworkParameterInputProps) {
-  const handleChange = (values: NumberFormatValues) => onChange(values.floatValue);
 
+  const [inputValue, setInputValue] = useState<number | null>(null)
+
+  const debounce = useRef(null)
+  
+  const handleChange = (values: NumberFormatValues) => {
+    if(values.floatValue === inputValue) return;
+    setInputValue(values.floatValue)
+    
+    clearTimeout(debounce.current)
+    
+    debounce.current = setTimeout(() => {
+      onChange(values.floatValue)
+    }, 500)
+  };
+
+  useEffect(()=>{if(value !== inputValue) setInputValue(value)},[value])
+  
   return(
     <div className={`form-group col mb-0 ${className}`}>
       <InputNumber
@@ -31,6 +50,7 @@ export default function NetworkParameterInput({
         min={0}
         placeholder={"0"}
         thousandSeparator
+        value={inputValue}
         onValueChange={handleChange}
         disabled={disabled}
         decimalScale={decimals}

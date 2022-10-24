@@ -13,6 +13,8 @@ import ProfileLayout from "components/profile/profile-layout";
 import { ApplicationContext } from "contexts/application";
 import { useAuthentication } from "contexts/authentication";
 import { cookieKey, useNetwork } from "contexts/network";
+import { useNetworkSettings } from "contexts/network-settings";
+import { NetworkSettingsProvider } from "contexts/network-settings";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 import { useSettings } from "contexts/settings";
 
@@ -20,7 +22,7 @@ import { Network } from "interfaces/network";
 
 import useApi from "x-hooks/use-api";
 
-export default function MyNetwork() {
+function MyNetwork() {
   const { t } = useTranslation(["common", "custom-network"]);
 
   const [myNetwork, setMyNetwork] = useState<Network>();
@@ -30,6 +32,7 @@ export default function MyNetwork() {
   const { searchNetworks } = useApi();
   const { wallet } = useAuthentication();
   const {  activeNetwork } = useNetwork();
+  const { setForcedNetwork } = useNetworkSettings()
   const { settings: appSettings } = useSettings(); 
 
   const defaultNetworkName = appSettings?.defaultNetworkConfig?.name?.toLowerCase() || "bepro";
@@ -48,6 +51,7 @@ export default function MyNetwork() {
           sessionStorage.setItem(`${cookieKey}:${savedNetwork.name.toLowerCase()}`, JSON.stringify(savedNetwork));
 
         setMyNetwork(savedNetwork);
+        setForcedNetwork(savedNetwork);
       })
       .catch(error => console.debug("Failed to get network", error))
       .finally(() => dispatch(changeLoadState(false)));
@@ -83,6 +87,11 @@ export default function MyNetwork() {
     </ProfileLayout>
   );
 }
+export default () => (
+  <NetworkSettingsProvider>
+    <MyNetwork/>
+  </NetworkSettingsProvider>
+  )
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 

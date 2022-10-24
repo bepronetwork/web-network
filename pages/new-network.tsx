@@ -22,6 +22,7 @@ import { useAuthentication } from "contexts/authentication";
 import { useDAO } from "contexts/dao";
 import { useNetwork } from "contexts/network";
 import { useNetworkSettings } from "contexts/network-settings";
+import { NetworkSettingsProvider } from "contexts/network-settings";
 import { addToast } from "contexts/reducers/add-toast";
 import { changeLoadState } from "contexts/reducers/change-load-state";
 import { useSettings } from "contexts/settings";
@@ -38,7 +39,7 @@ import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network";
 
-export default function NewNetwork() {
+function NewNetwork() {
   const router = useRouter();
 
   const { t } = useTranslation(["common", "custom-network"]);
@@ -150,12 +151,9 @@ export default function NewNetwork() {
       });
 
     setCreatingNetwork(6);
-
+    cleanStorage?.()
     await processEvent("registry", "registered", payload.name.toLowerCase(), { fromBlock: registrationTx.blockNumber })
-      .then(() => {
-        cleanStorage?.()
-        router.push(getURLWithNetwork("/", { network: payload.name }));
-      })
+      .then(() => router.push(getURLWithNetwork("/", { network: payload.name })))
       .catch((error) => {
         checkHasNetwork();
         dispatch(addToast({
@@ -229,6 +227,12 @@ export default function NewNetwork() {
     </div>
   );
 }
+
+export default () => (
+  <NetworkSettingsProvider>
+  <NewNetwork/>
+  </NetworkSettingsProvider>
+  )
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

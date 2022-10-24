@@ -7,7 +7,6 @@ import { AuthenticationProvider } from "contexts/authentication";
 import { DAOContextProvider } from "contexts/dao";
 import { IssueProvider } from "contexts/issue";
 import { NetworkProvider } from "contexts/network";
-import { NetworkSettingsProvider } from "contexts/network-settings";
 import { ReposProvider } from "contexts/repos";
 import { SettingsProvider } from "contexts/settings";
 
@@ -17,7 +16,6 @@ const RootProviders: React.FC = ({ children }) => {
       <DAOContextProvider>
         <NetworkProvider>
           <AuthenticationProvider>
-            <NetworkSettingsProvider>
               <ApplicationContextProvider>
                 <ReposProvider>
                   <IssueProvider>
@@ -26,7 +24,6 @@ const RootProviders: React.FC = ({ children }) => {
                   </IssueProvider>
                 </ReposProvider>
               </ApplicationContextProvider>
-            </NetworkSettingsProvider>
           </AuthenticationProvider>
         </NetworkProvider>
       </DAOContextProvider>

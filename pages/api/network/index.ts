@@ -3,7 +3,7 @@ import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import getConfig from "next/config";
 import { Octokit } from "octokit";
-import { Op } from "sequelize";
+import Sequelize, { Op } from "sequelize";
 
 import Database from "db/models";
 
@@ -225,10 +225,13 @@ async function put(req: NextApiRequest, res: NextApiResponse) {
     const isAdminOverriding = !!override;
 
     if (!accessToken && !isAdminOverriding) return res.status(401).json("Unauthorized user");
-
+    
     const network = await Database.network.findOne({
       where: {
-        ...(isAdminOverriding ? {} : { creatorAddress: creator }),
+        ...(isAdminOverriding ? {} : { 
+          creatorAddress: 
+            Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("creatorAddress")), "=", creator.toLowerCase()) 
+        }),
         networkAddress
       },
       include: [{ association: "repositories" }]

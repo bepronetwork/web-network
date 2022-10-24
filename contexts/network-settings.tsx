@@ -23,6 +23,7 @@ import { DefaultNetworkSettings } from "helpers/custom-network";
 import { Color, Network, NetworkSettings, Theme } from "interfaces/network";
 
 import DAO from "services/dao-service";
+import { WinStorage } from "services/win-storage";
 
 import useApi from "x-hooks/use-api";
 import useNetworkTheme from "x-hooks/use-network";
@@ -34,13 +35,17 @@ const NetworkSettingsContext = createContext<NetworkSettings | undefined>(undefi
 
 const ALLOWED_PATHS = ["/new-network", "/[network]/profile/my-network", "/administration"];
 const TTL = 48 * 60 * 60 // 2 day
-const localStorageKey = `create-network-settings`;
+const storage = new WinStorage('create-network-settings', TTL, "localStorage");
 
 export const NetworkSettingsProvider = ({ children }) => {
   const router = useRouter();
   
+  /* NOTE - forced network might be renamed to `user network`, 
+            referred to user nework when he access `/my-network` page from/in another network.
+  */
   const [forcedNetwork, setForcedNetwork] = useState<Network>();
   const [networkSettings, setNetworkSettings] = useState(DefaultNetworkSettings)
+  const [isLoadingData, setIsLoadingData] = useState(false)
   
   const { activeNetwork } = useNetwork();
   const { service: DAOService } = useDAO();
@@ -167,14 +172,21 @@ export const NetworkSettingsProvider = ({ children }) => {
                                     tokensValidated,
     ].every(condtion=> condtion)
 
-    if(detailsValidate)
-      localStorage.setItem(`${localStorageKey}:${wallet.address}`, 
-                           JSON.stringify({data: newState, at: +new Date()}));
+    if(detailsValidate && isCreating){
+      const data = Object.keys(newState)
+                          .filter(key => newState[key].validated)
+                          .reduce((obj, key) => {
+                            obj[key] = newState[key]
+                            return obj
+                          }, {});
 
+      storage.setItem(data);
+    }
+    
     return newState;
   }
 
-  const setFields = (field: string, value: unknown)=> {
+  const setFields = (field: string, value: unknown) => {
     const method = field.split('.')
     
     if(!method) return;
@@ -254,13 +266,13 @@ export const NetworkSettingsProvider = ({ children }) => {
       setter: value => setFields(`settings.treasury.closeFee.value`, value)
     },
     parameter: {
-      setter: value => setFields(`settings.parameters.${[value.label]}.value`, value.value),
+      setter: value =>  setFields(`settings.parameters.${[value.label]}.value`, value.value),
       validator: 
         (parameter, value) => value >= (LIMITS[parameter]?.min || value) && value <= (LIMITS[parameter]?.max || value)
     }
   };
 
-  async function getService() {
+  async function loadDaoService(): Promise<DAO> {
     if (!forcedNetwork) return DAOService;
 
     const networkAddress = network?.networkAddress;
@@ -273,153 +285,261 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     return dao;
   }
-
-  function handlerDefaultSettings(){
-    setFields('settings.theme.colors', DefaultTheme())
-    
-    setFields('settings.parameters', {
-    draftTime: {
-      value: DEFAULT_DRAFT_TIME,
-      validated: undefined
-    },
-    disputableTime: {
-      value: DEFAULT_DISPUTE_TIME,
-      validated: undefined
-    },
-    percentageNeededForDispute: {
-      value: DEFAULT_PERCENTAGE_FOR_DISPUTE,
-      validated: undefined
-    },
-    councilAmount: {
-      value: DEFAULT_COUNCIL_AMOUNT,
-      validated: undefined
-    },
-    validated: undefined
-    })
-
-    setFields('settings.treasury.cancelFee', {value:DEFAULT_CANCEL_FEE, validated: true})
-    setFields('settings.treasury.closeFee', {value: DEFAULT_CLOSE_FEE, validated: true})
-  }
   
-  const cleanStorage = () => localStorage.removeItem(`${localStorageKey}:${wallet.address}`)
+  const cleanStorage = () => storage.removeItem();
 
-  // TODO: Better this effect
-  useEffect(() => {
-    if ( !wallet?.address || 
-         !DAOService || 
-         (!isCreating && !network?.name && !network?.councilAmount) || 
-         !needsToLoad )
-      return;
+  async function getTokenBalance() {
+    const [tokensLockedInRegistry, registryCreatorAmount] = await Promise.all([
+      DAOService.getTokensLockedInRegistryByAddress(wallet.address),
+      DAOService.getRegistryCreatorAmount()
+    ])
 
-    if (!isCreating) {
-      getService()
-      .then(service => {
-        service.getTreasury()
-        .then(({ treasury, closeFee, cancelFee }) => {
-          Fields.treasury.setter(treasury);
-          Fields.closeFee.setter(closeFee);
-          Fields.cancelFee.setter(cancelFee)
-        })
-      })
-      .catch(error => console.debug("Failed to load network parameters", error, network));
-
-      Fields.name.setter(network?.name);
-      Fields.description.setter(network?.description);
-      Fields.logo.setter(`${IPFS_URL}/${network?.fullLogo}`, 'full')
-      Fields.logo.setter(`${IPFS_URL}/${network?.logoIcon}`, 'icon')
-
-    } else {
-      Promise.all([
-        DAOService.getTokensLockedInRegistryByAddress(wallet.address),
-        DAOService.getRegistryCreatorAmount()
-      ])
-        .then(([
-          tokensLockedInRegistry,
-          registryCreatorAmount
-        ]) => {
-          setFields('tokensLocked', {
-            amount: 0,
-            locked: tokensLockedInRegistry,
-            needed: registryCreatorAmount,
-            validated: tokensLockedInRegistry === registryCreatorAmount
-          })
-        });
-      const storageData = localStorage.getItem(`${localStorageKey}:${wallet?.address}`);
-      if(storageData){
-        const {at, data} = JSON.parse(storageData);
-        if(+new Date() - +new Date(at) <= TTL){
-          if(data?.details){
-            setFields('details.name', data?.details.name)
-            setFields('details.description', data?.details.description)
-          }
-
-          if(data?.settings)
-            setFields('settings', data?.settings)
-          else
-            handlerDefaultSettings();
-
-          if(data?.github)
-            setFields('github', data?.github)
-
-          if(data?.tokens)
-            setFields('tokens', data?.tokens)
-        }
-      } else
-        handlerDefaultSettings();
+    return {
+      locked: BigNumber(tokensLockedInRegistry).toFixed(),
+      needed: BigNumber(registryCreatorAmount).toFixed(),
+      validated: BigNumber(tokensLockedInRegistry).isGreaterThanOrEqualTo(registryCreatorAmount),
     }
+    
+  }
 
-  }, [ wallet, 
-       user?.login, 
-       DAOService, 
-       network, 
-       isCreating, 
-       needsToLoad,
-       router.pathname]);
+  async function updateTokenBalance(){
+    const balance = await getTokenBalance()
+    const tokensLocked = {...networkSettings.tokensLocked, ...balance}
+    setFields('tokensLocked', tokensLocked)
+    return tokensLocked;
+  }
 
-  //Load GH Repositories
-  useEffect(()=>{
-    if (user?.login && !networkSettings?.github?.repositories?.length)
-      getUserRepositories(user.login)
-      .then(async (githubRepositories) => {
-        const repositories = [];
-        const filtered = githubRepositories
-          .filter(repo => (
-            !repo?.isFork 
-            && (user.login === repo?.nameWithOwner.split("/")[0])) 
-            || repo?.isInOrganization)
+  async function loadGHRepos(){
+    const repositories = [];
+    
+    if(user?.login){
+      const githubRepositories = await getUserRepositories(user?.login)
+    
+      const filtered = githubRepositories
+          .filter(repo => {
+            const isOwner = user.login === repo?.nameWithOwner.split("/")[0];
+            
+            if((!repo?.isFork && isOwner || repo?.isInOrganization) && !repo?.isArchived)
+              return repo
+          })
           .map(repo => ({
             checked: false,
             isSaved: false,
             hasIssues: false,
+            userPermission:repo.viewerPermission,
             name: repo?.name,
-            userPermission: repo?.viewerPermission,
             fullName: repo?.nameWithOwner
           }));
-        if (isCreating) repositories.push(...filtered);
-        else {
-          repositories.push(... await searchRepositories({ networkName: network?.name })
-            .then(({ rows }) => Promise.all(rows.map( async repo => ({
+        
+      
+      if (!isCreating){
+        const repositoryAlreadyExists =  await searchRepositories({ networkName: network?.name })
+            .then(({ rows }) => 
+            Promise.all(rows.map( async repo => ({
               checked: true,
               isSaved: true,
               name: repo.githubPath.split("/")[1],
               fullName: repo.githubPath,
-              userPermission: repo?.viewerPermission,
               hasIssues: await repositoryHasIssues(repo.githubPath)
-            })))));
-          
-          repositories.push(...filtered.filter(repo =>
-            !repositories.find((repoB) => repoB.fullName === repo.fullName)));
-        }
-        setFields('github.repositories', repositories)
-      });
-  },[user?.login, isCreating]);
+            }))))
+        repositories.push(...repositoryAlreadyExists)
+      }
+  
+      repositories.push(...filtered.filter(repo => !repositories.find((repoB) => repoB.fullName === repo.fullName)));
+    }
+    
+    return repositories;
+  }
+
+  async function loadDefaultSettings(): Promise<typeof DefaultNetworkSettings>{
+    const defaultState = DefaultNetworkSettings;
+
+    const balance = await getTokenBalance();
+
+    defaultState.tokensLocked = {
+      amount: '0',
+      ...balance,
+    }
+
+    defaultState.settings.theme.colors = DefaultTheme();
+    
+    defaultState.settings.parameters = {
+        draftTime: {
+          value: DEFAULT_DRAFT_TIME,
+          validated: undefined
+        },
+        disputableTime: {
+          value: DEFAULT_DISPUTE_TIME,
+          validated: undefined
+        },
+        percentageNeededForDispute: {
+          value: DEFAULT_PERCENTAGE_FOR_DISPUTE,
+          validated: undefined
+        },
+        councilAmount: {
+          value: DEFAULT_COUNCIL_AMOUNT,
+          validated: undefined
+        },
+        validated: undefined
+    }
+
+    defaultState.settings.treasury.cancelFee = { value:DEFAULT_CANCEL_FEE, validated: true };
+    defaultState.settings.treasury.closeFee = { value: DEFAULT_CLOSE_FEE, validated: true };
+
+    defaultState.github.repositories = await loadGHRepos();
+
+    const storageData = storage.getItem();
+
+    if(storageData){
+      if(storageData?.details){
+        defaultState.details.name =  storageData?.details.name;
+        defaultState.details.description =  storageData?.details.description;
+      }
+
+      if(storageData?.settings)
+        defaultState.settings = storageData?.settings;
+        
+      if(storageData?.github)
+        defaultState.github = storageData?.github;
+
+      if(storageData?.tokens)
+        defaultState.tokens = storageData?.tokens;
+    }
+    
+    setNetworkSettings(defaultState)
+    return defaultState;
+  }
+
+  async function loadNetworkSettings(): Promise<typeof DefaultNetworkSettings>{
+    const defaultState = DefaultNetworkSettings;
+    const service = await loadDaoService()
+    const [
+        treasury,
+        councilAmount, 
+        disputableTime, 
+        draftTime, 
+        percentageNeededForDispute, 
+        isNetworkAbleToBeClosed,
+      ] = await Promise.all([
+        service.getTreasury(),
+        service.getNetworkParameter("councilAmount"),
+        service.getNetworkParameter("disputableTime"),
+        service.getNetworkParameter("draftTime"),
+        service.getNetworkParameter("percentageNeededForDispute"),
+        service.isNetworkAbleToBeClosed(),
+      ])
+
+    defaultState.settings.parameters = {
+        draftTime: {
+          value: +draftTime / 1000,
+          validated: true
+        },
+        disputableTime: {
+          value: +disputableTime / 1000,
+          validated: true
+        },
+        percentageNeededForDispute: {
+          value: +percentageNeededForDispute,
+          validated: true
+        },
+        councilAmount: {
+          value: +councilAmount,
+          validated: true
+        },
+        validated: true
+    }
+
+    defaultState.settings.treasury.address = {value: treasury.treasury, validated: true}
+    defaultState.settings.treasury.cancelFee = { value: treasury.closeFee, validated: true };
+    defaultState.settings.treasury.closeFee = { value: treasury.cancelFee, validated: true };
+
+    defaultState.details.name = {value: network?.name, validated: true}
+    defaultState.details.description = network?.description
+
+    defaultState.details.fullLogo = {
+      value: {
+        preview:`${IPFS_URL}/${network?.fullLogo}`, 
+        raw: undefined
+      }, 
+      validated: true
+    }
+    defaultState.details.iconLogo = {
+      value: {
+        preview:`${IPFS_URL}/${network?.logoIcon}`, 
+        raw: undefined
+      }, 
+      validated: true
+    }
+    defaultState.isAbleToClosed = isNetworkAbleToBeClosed;
+    defaultState.settings.theme.colors = network?.colors || DefaultTheme();
+    defaultState.github.repositories = await loadGHRepos();
+
+    setNetworkSettings(defaultState)
+    return defaultState;
+  }
+
+  useEffect(() => {
+    if (!DAOService ||
+        !wallet?.address||
+        (!isCreating && !network?.name && !network?.councilAmount) || 
+        !needsToLoad )
+      return;
+    setIsLoadingData(true)
+    if (!isCreating && forcedNetwork)
+      loadNetworkSettings().finally(()=> setIsLoadingData(false));
+    else if(isCreating)
+      loadDefaultSettings().finally(()=> setIsLoadingData(false));
+  }, [ 
+    user?.login,
+    wallet?.address,
+    DAOService, 
+    network, 
+    isCreating, 
+    forcedNetwork,
+    needsToLoad,
+    router.pathname
+  ]);
+  
+  // NOTE -  Load Forced/User Network
+  useEffect(()=>{
+    if(DAOService && forcedNetwork && (!forcedNetwork?.tokensLocked || !forcedNetwork.tokensStaked))
+      loadDaoService()
+      .then((service)=> 
+       Promise.all([  
+                service.getTotalNetworkToken(),
+                0,
+                service.getNetworkParameter("councilAmount"),
+                service.getNetworkParameter("disputableTime"),
+                service.getNetworkParameter("draftTime"),
+                service.getNetworkParameter("percentageNeededForDispute")
+       ]))
+       .then(([
+        tokensLocked,
+        tokensStaked,
+        councilAmount, 
+        disputableTime, 
+        draftTime, 
+        percentageNeededForDispute, ])=>
+         setForcedNetwork((prev)=>({
+          ...prev, 
+          tokensLocked: tokensLocked.toFixed(),
+          tokensStaked: tokensStaked.toFixed(),
+          councilAmount: councilAmount.toString(),
+          disputableTime: +disputableTime / 1000,
+          draftTime: +draftTime / 1000,
+          percentageNeededForDispute: +percentageNeededForDispute,
+         })))
+  },[forcedNetwork, DAOService])
+
 
   const memorizedValue = useMemo<NetworkSettings>(() => ({
     ...networkSettings,
     forcedNetwork,
+    isLoadingData,
     setForcedNetwork,
     LIMITS,
     cleanStorage,
+    updateTokenBalance,
     fields: Fields
   }), [networkSettings, Fields, LIMITS, setForcedNetwork]);
 

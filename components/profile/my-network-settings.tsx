@@ -35,8 +35,6 @@ import { MetamaskErrors } from "interfaces/enums/Errors";
 import { Network } from "interfaces/network";
 import { Token } from "interfaces/token";
 
-import DAO from "services/dao-service";
-
 import useApi from "x-hooks/use-api";
 import useBepro from "x-hooks/use-bepro";
 import useNetworkTheme from "x-hooks/use-network";
@@ -56,9 +54,8 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   const [isClosing, setIsClosing] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [isGovernorRegistry, setIsGovernorRegistry] = useState(false);
-  const [isAbleToBeClosed, setIsAbleToBeClosed] = useState(false);
-  const [updatingNetwork, setUpdatingNetwork] = useState(false);
   const [errorBigImages, setErrorBigImages] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const { service: DAOService } = useDAO();
   const { colorsToCSS } = useNetworkTheme();
@@ -67,19 +64,10 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
   const { dispatch } = useContext(ApplicationContext);
   const { activeNetwork, updateActiveNetwork } = useNetwork();
   const { user, wallet, updateWalletBalance } = useAuthentication();
-  const { details, fields, github, settings, tokens, forcedNetwork, setForcedNetwork } = useNetworkSettings();
+  const { details, fields, github, settings, tokens, forcedNetwork, isAbleToClosed } = useNetworkSettings();
 
   const isCurrentNetwork = !!network && !!activeNetwork && network?.networkAddress === activeNetwork?.networkAddress;
   const networkNeedRegistration = network?.isRegistered === false;
-
-  const settingsValidated = [
-    fields.colors.validator(settings?.theme?.colors),
-    fields.repository.validator(github?.repositories),
-    settings?.parameters?.draftTime?.validated,
-    settings?.parameters?.disputableTime?.validated,
-    settings?.parameters?.percentageNeededForDispute?.validated,
-    settings?.parameters?.councilAmount?.validated
-  ].every(condition => condition);
 
   const handleColorChange = value => fields.colors.setter(value);
   
@@ -113,7 +101,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
     )
       return;
 
-    setUpdatingNetwork(true);
+    setIsUpdating(true);
 
     const json = {
       description: details?.description || "",
@@ -195,7 +183,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
         
         console.log(error);
       })
-      .finally(() => setUpdatingNetwork(false));
+      .finally(() => setIsUpdating(false));
   }
 
   function handleCloseNetwork() {
@@ -255,67 +243,6 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
       .finally(() => setIsRegistering(false));
   }
   
-  useEffect(() => {
-    if (!network?.networkAddress) return;
-
-    try {
-      const dao = new DAO({
-        web3Connection: DAOService.web3Connection,
-        skipWindowAssignment: true
-      });
-
-      dao.loadNetwork(network.networkAddress)
-      .then(loaded => {
-        if (!loaded) return;
-
-        Promise.all([
-          dao.getNetworkParameter("councilAmount"),
-          dao.getNetworkParameter("disputableTime"),
-          dao.getNetworkParameter("draftTime"),
-          dao.getNetworkParameter("oracleExchangeRate"),
-          dao.getNetworkParameter("mergeCreatorFeeShare"),
-          dao.getNetworkParameter("proposerFeeShare"),
-          dao.getNetworkParameter("percentageNeededForDispute"),
-          dao.getTreasury(),
-          dao.getSettlerTokenData(),
-          dao.getTotalNetworkToken(),
-          dao.isNetworkAbleToBeClosed(),
-          0
-        ])
-        .then(([councilAmount, 
-                disputableTime, 
-                draftTime, 
-                oracleExchangeRate, 
-                mergeCreatorFeeShare,
-                proposerFeeShare,
-                percentageNeededForDispute, 
-                treasury,
-                networkToken,
-                tokensLocked,
-                isNetworkAbleToBeClosed,
-                tokensStaked]) => {
-          setForcedNetwork({
-            ...network,
-            councilAmount: councilAmount.toString(),
-            disputableTime: +disputableTime / 1000,
-            draftTime: +draftTime / 1000,
-            oracleExchangeRate: +oracleExchangeRate,
-            mergeCreatorFeeShare: +mergeCreatorFeeShare,
-            proposerFeeShare: +proposerFeeShare,
-            percentageNeededForDispute: +percentageNeededForDispute,
-            treasury,
-            networkToken,
-            tokensLocked: tokensLocked.toFixed(),
-            tokensStaked: tokensStaked.toFixed(),
-          });
-
-          setIsAbleToBeClosed(isNetworkAbleToBeClosed);
-        });
-      });
-    } catch (error) {
-      console.log("Failed to load network data", error, network);
-    }
-  }, [network?.networkAddress]);
 
   useEffect(() => {
     const logoSize = (details?.fullLogo?.value?.raw?.size || 0)/1024/1024
@@ -431,11 +358,11 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
         <Col xs="auto">
           <Button
             color="dark-gray"
-            disabled={!isAbleToBeClosed || isClosing || !user?.login}
+            disabled={!isAbleToClosed || isClosing || !user?.login}
             className="ml-2"
             onClick={handleCloseNetwork}
           >
-            {(!isAbleToBeClosed || !user?.login) && <LockedIcon className="me-2" />}
+            {(!isAbleToClosed || !user?.login) && <LockedIcon className="me-2" />}
             <span>{t("custom-network:close-network")}</span>
             {isClosing ? (
               <span className="spinner-border spinner-border-xs ml-1" />
@@ -487,7 +414,7 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
           />
         </Col>
       </Row>
-      <Row>
+      <Row className="mt-4">
         <span className="caption-medium text-white mb-3">
           {t("custom-network:steps.network-settings.fields.fees.title")}
         </span>
@@ -536,12 +463,12 @@ export default function MyNetworkSettings({ network, updateEditingNetwork } : My
         <NetworkContractSettings />
       </Row>
 
-      {(settingsValidated && !network?.isClosed && !networkNeedRegistration) &&
+      {(settings?.validated && !network?.isClosed && !networkNeedRegistration) &&
         <Row className="mt-1 mb-5">
           <Col>
-            <Button onClick={handleSubmit} disabled={updatingNetwork}>
+            <Button onClick={handleSubmit} disabled={isUpdating}>
               <span>{t("custom-network:save-settings")}</span>
-              {updatingNetwork ? (
+              {isUpdating ? (
                 <span className="spinner-border spinner-border-xs ml-1" />
               ) : (
                 ""

@@ -165,6 +165,7 @@ export default function useOctokit() {
       name: string;
       nameWithOwner: string;
       isFork: boolean;
+      isArchived: boolean;
       isInOrganization: boolean;
       owner: string;
       viewerPermission: "ADMIN" | "MAINTAIN" | "READ" | "TRIAGE" | "WRITE"
