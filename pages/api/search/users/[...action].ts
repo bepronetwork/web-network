@@ -1,4 +1,4 @@
-import { error as LogError } from "@scripts/logging.js";
+import { error as LogError } from "services/logging";
 import { withCors } from "middleware";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op } from "sequelize";

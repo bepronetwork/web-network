@@ -1,4 +1,4 @@
-import { info, error } from '@scripts/logging.js';
+import { info, error } from 'services/logging';
 import Cors from 'cors'
 import getConfig from "next/config";
 
@@ -42,7 +42,7 @@ const withCors = (handler) => {
     .then(()=>{
       return handler(req, res);
     }).catch((e)=>{
-      runLogger(req, e);
+      runLogger(req, e?.message || e.toString());
       return res.status(401).write('Unautorized');
     })
   };
