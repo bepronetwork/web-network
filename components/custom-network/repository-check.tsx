@@ -18,7 +18,7 @@ export default function RepositoryCheck({
   onClick
 }: GithubInfoProps) {
   const XIcon = <CloseIcon width={8} height={8} />;
-  const isDisabled = usedByOtherNetwork || hasIssues || userPermission !== "ADMIN";
+  const isDisabled = usedByOtherNetwork || hasIssues || userPermission && userPermission !== "ADMIN";
   const isActive = active && !isDisabled;
 
   const ClassCondition = (condition, trueValue, falseValue = "") => condition && trueValue || falseValue;
