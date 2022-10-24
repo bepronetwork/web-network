@@ -21,7 +21,7 @@ export default function FundingProgress({
   fundingTokenSymbol,
   amountToFund = "0"
 } : FundingProgressProps) {
-  const fundingPercent = BigNumber(amountToFund).multipliedBy(100).dividedBy(fundingAmount);
+  const fundingPercent = BigNumber(BigNumber(amountToFund).multipliedBy(100).toFixed(2,1)).dividedBy(fundingAmount);
   const maxPercent = BigNumber(100).minus(fundedPercent);
   const totalPercent = fundingPercent.plus(fundedPercent);
   const isFundingModal = BigNumber(amountToFund).gt(0);

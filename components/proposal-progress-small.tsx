@@ -23,7 +23,7 @@ export default function ProposalProgressSmall({
     return (value * 100) / total;
   }
 
-  const percent = value.multipliedBy(100).dividedBy(total);
+  const percent = BigNumber(value.multipliedBy(100).toFixed(2,1)).dividedBy(total);
 
   return (
     <div className="text-center position-relative d-inline-block col">
