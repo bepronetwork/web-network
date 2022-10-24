@@ -49,6 +49,7 @@ const publicSettings = [
   PublicSettingItem("disputePercentage", `{ "max": 15 }`, "json", "networkParametersLimits"),
   PublicSettingItem("name", process.env.NEXT_PUBLIC_DEFAULT_NETWORK_NAME || 'bepro', "string", "defaultNetworkConfig"),
   PublicSettingItem("allowCustomTokens", process.env.NEXT_PUBLIC_ALLOW_CUSTOM_TOKENS || 0, "boolean", "defaultNetworkConfig"),
+  PublicSettingItem("minBountyValue", process.env.NEXT_MIN_BOUNTY_VALUE_WEI || "0.000000000000000100", "string"),
   PublicSettingItem("adminWallet", process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS, "string", "defaultNetworkConfig"),
 ];
 

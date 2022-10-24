@@ -58,4 +58,5 @@ export type SettingsType = {
     ipfs: string;
   };
   beproToken?: Token
+  minBountyValue?: string | number;
 }

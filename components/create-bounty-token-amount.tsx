@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { NumberFormatValues } from "react-number-format";
 
+import BigNumber from "bignumber.js";
 import { useTranslation } from "next-i18next";
 
 import ArrowRight from "assets/icons/arrow-right";
+
+import { useSettings } from "contexts/settings";
 
 import { handleTokenToEurConversion } from "helpers/handleTokenToEurConversion";
 
@@ -27,7 +30,10 @@ export default function CreateBountyTokenAmount({
   decimals = 18
 }) {
   const { t } = useTranslation("bounty");
-  const [inputError, setInputError] = useState("")
+  const {settings} = useSettings()
+
+  const [inputError, setInputError] = useState("");
+  
   function getCurrentCoin() {
     return customTokens?.find((token) => token?.address === currentToken);
   }
@@ -36,8 +42,12 @@ export default function CreateBountyTokenAmount({
     if(needValueValidation && (+values.floatValue > +currentToken?.currentValue)){
       setIssueAmount({ formattedValue: "" });
       setInputError(t("bounty:errors.exceeds-allowance"))
-    }else if (values.floatValue < 0) {
+    } else if (values.floatValue < 0) {
       setIssueAmount({ formattedValue: "" });
+    } else if(values.floatValue !== 0 && BigNumber(values.floatValue).isLessThan(BigNumber(settings.minBountyValue))){
+      setInputError(t("bounty:errors.exceeds-minimum-amount",{
+        amount: settings.minBountyValue
+      }))
     } else {
       setIssueAmount(values);
       inputError && setInputError("")
