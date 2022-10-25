@@ -282,7 +282,7 @@ export const NetworkSettingsProvider = ({ children }) => {
 
   async function getTokenBalance() {
     const [tokensLockedInRegistry, registryCreatorAmount] = await Promise.all([
-      state.Service?.active?.getTokensLockedInRegistryByAddress(wallet.address),
+      state.Service?.active?.getTokensLockedInRegistryByAddress(state.currentUser?.walletAddress),
       state.Service?.active?.getRegistryCreatorAmount()
     ])
 
@@ -304,12 +304,12 @@ export const NetworkSettingsProvider = ({ children }) => {
   async function loadGHRepos(){
     const repositories = [];
 
-    if(user?.login){
-      const githubRepositories = await getUserRepositories(user?.login)
+    if(state.currentUser?.login){
+      const githubRepositories = await getUserRepositories(state.currentUser?.login)
 
       const filtered = githubRepositories
           .filter(repo => {
-            const isOwner = user.login === repo?.nameWithOwner.split("/")[0];
+            const isOwner = state.currentUser.login === repo?.nameWithOwner.split("/")[0];
 
             if((!repo?.isFork && isOwner || repo?.isInOrganization) && !repo?.isArchived)
               return repo
