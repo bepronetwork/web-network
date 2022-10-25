@@ -134,8 +134,8 @@
           "label": "NFT Token Address",
           "error": {
             "pre": "Please provide a valid",
-            "mid": "BountyToken",
-            "post": "address."
+            "mid": "ERC20",
+            "post": "token address"
           }
         },
         "nft-token-uri": {

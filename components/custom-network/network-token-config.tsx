@@ -1,19 +1,27 @@
+import { useEffect, useState } from "react";
+
 import { ERC20Details } from "components/custom-network/erc20-details";
 import TabbedNavigation from "components/tabbed-navigation";
 
 export function NetworkTokenConfig({
   onChange,
-  beproTokenAddress,
-  networkTokenAddress
+  beproTokenAddress
 }) {
+  const [tokenAddress, setTokenAddress] = useState<string>();
+
+  function handleTokenAddressChange(newAddress) {
+    setTokenAddress(newAddress);
+    onChange(newAddress);
+  }
+
   const TABS = [
     {
       eventKey: "bepro",
       title: "Use BEPRO token",
       component: ( 
         <ERC20Details
-          address={networkTokenAddress}
-          onChange={onChange}
+          key="beproToken"
+          address={beproTokenAddress}
           readOnly
         />
       )
@@ -23,29 +31,33 @@ export function NetworkTokenConfig({
       title: "Use a custom token",
       component: ( 
         <ERC20Details
-          address={networkTokenAddress}
-          onChange={onChange}
+          key="customToken"
+          onChange={handleTokenAddressChange}
+          address={tokenAddress}
         />
       )
     },
     {
-      eventKey: "deploy",
+      eventKey: "deployed",
       title: "Deploy new token",
       component: ( 
         <ERC20Details
-          address={networkTokenAddress}
-          onChange={onChange}
+          key="deployedToken"
+          onChange={handleTokenAddressChange}
+          address={tokenAddress}
+          deployer
         />
       )
     }
   ];
 
   function onTransition(newActiveKey: string) {
-    if (newActiveKey === "bepro")
-      onChange(beproTokenAddress);
-    else
-      onChange("");
+    onChange(newActiveKey === "bepro" && beproTokenAddress || tokenAddress);
   }
+
+  useEffect(() => {
+    if (beproTokenAddress) onChange(beproTokenAddress);
+  }, [beproTokenAddress]);
 
   return(
     <>

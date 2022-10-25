@@ -388,8 +388,6 @@ export const NetworkSettingsProvider = ({ children }) => {
 
     defaultState.github.repositories = await loadGHRepos();
 
-    defaultState.tokens.settler = appSettings?.beproToken?.address;
-
     const storageData = storage.getItem();
 
     if(storageData){

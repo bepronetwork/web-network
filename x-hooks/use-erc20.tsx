@@ -25,8 +25,8 @@ export default function useERC20() {
   const [decimals, setDecimals] = useState(18); 
   const [symbol, setSymbol] = useState<string>();
   const [address, setAddress] = useState<string>();
-  const [loadError, setLoadError] = useState(false);
   const [balance, setBalance] = useState(BigNumber(0));
+  const [loadError, setLoadError] = useState<boolean>();
   const [allowance, setAllowance] = useState(BigNumber(0));
   const [totalSupply, setTotalSupply] = useState(BigNumber(0));
 
@@ -71,6 +71,7 @@ export default function useERC20() {
   }
 
   useEffect(() => {
+    if (!address) setLoadError(undefined);
     if (!address && name) setDefaults();
     if (!DAOService || !address) return;
 
@@ -91,10 +92,10 @@ export default function useERC20() {
     updateAllowanceAndBalance();
   }, [wallet?.address, DAOService, address]);
 
-  async function handleDeployERC20Token(name: string, 
-                                        symbol: string, 
-                                        cap: string, 
-                                        ownerAddress: string): Promise<TransactionReceipt> {
+  async function deploy(name: string, 
+                        symbol: string, 
+                        cap: string, 
+                        ownerAddress: string): Promise<TransactionReceipt> {
     return new Promise(async (resolve, reject) => {
       const transaction = addTransaction({ type: TransactionTypes.deployERC20Token }, activeNetwork);
 
@@ -132,7 +133,7 @@ export default function useERC20() {
     totalSupply,
     approve,
     setAddress,
-    handleDeployERC20Token,
+    deploy,
     updateAllowanceAndBalance
   };
 }
